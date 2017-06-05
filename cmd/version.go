@@ -48,7 +48,9 @@ var LibVersionCmd = &cobra.Command{
 	},
 }
 
-//TODO : maybe it is possible to autogenerate versions from ancestors, as I wrote in this function.
+// TODO : maybe it is possible to autogenerate versions from ancestors, as I wrote in this function.
+// suggestions : save in a map[string]*cobra.Command variable all info about templates which vary only by command name and
+// version number.
 func ancestorsBreadcrumb(cmd *cobra.Command) string {
 	ancestors := make([]string, 2, 2)
 	cmd.VisitParents(func(ancestor *cobra.Command) {
