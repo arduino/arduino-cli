@@ -27,33 +27,20 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package libraries
+package cmd
 
 import (
-	"strconv"
-
-	"strings"
+	"github.com/spf13/cobra"
 )
 
-func (r *Release) String() string {
-	res := "  Release: " + r.Version + "\n"
-	res += "    URL: " + r.URL + "\n"
-	res += "    ArchiveFileName: " + r.ArchiveFileName + "\n"
-	res += "    Size: " + strconv.Itoa(r.Size) + "\n"
-	res += "    Checksum: " + r.Checksum + "\n"
-	return res
+// LibRoot represents the libs command
+var LibRoot = &cobra.Command{
+	Use:   "lib",
+	Short: "Shows all commands regarding libraries.",
+	Long:  `Shows all commands regarding libraries.`,
 }
 
-func (l *Library) String() string {
-	res := "Name: " + l.Name + "\n"
-	res += "  Author: " + l.Author + "\n"
-	res += "  Maintainer: " + l.Maintainer + "\n"
-	res += "  Sentence: " + l.Sentence + "\n"
-	res += "  Paragraph: " + l.Paragraph + "\n"
-	res += "  Website: " + l.Website + "\n"
-	res += "  Category: " + l.Category + "\n"
-	res += "  Architecture: " + strings.Join(l.Architectures, ", ") + "\n"
-	res += "  Types: " + strings.Join(l.Types, ", ") + "\n"
-	res += "  Versions: " + strings.Join(l.Versions(), ", ") + "\n"
-	return res
+func init() {
+	RootCmd.AddCommand(LibRoot)
+
 }

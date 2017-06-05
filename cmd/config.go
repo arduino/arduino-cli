@@ -27,33 +27,29 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package libraries
+package cmd
 
 import (
-	"strconv"
+	"fmt"
 
-	"strings"
+	"github.com/spf13/cobra"
 )
 
-func (r *Release) String() string {
-	res := "  Release: " + r.Version + "\n"
-	res += "    URL: " + r.URL + "\n"
-	res += "    ArchiveFileName: " + r.ArchiveFileName + "\n"
-	res += "    Size: " + strconv.Itoa(r.Size) + "\n"
-	res += "    Checksum: " + r.Checksum + "\n"
-	return res
+// configCmd represents the config command
+var configCmd = &cobra.Command{
+	Use:   "config",
+	Short: "A brief description of your command",
+	Long: `A longer description that spans multiple lines and likely contains examples
+and usage of using your command. For example:
+
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("config called")
+	},
 }
 
-func (l *Library) String() string {
-	res := "Name: " + l.Name + "\n"
-	res += "  Author: " + l.Author + "\n"
-	res += "  Maintainer: " + l.Maintainer + "\n"
-	res += "  Sentence: " + l.Sentence + "\n"
-	res += "  Paragraph: " + l.Paragraph + "\n"
-	res += "  Website: " + l.Website + "\n"
-	res += "  Category: " + l.Category + "\n"
-	res += "  Architecture: " + strings.Join(l.Architectures, ", ") + "\n"
-	res += "  Types: " + strings.Join(l.Types, ", ") + "\n"
-	res += "  Versions: " + strings.Join(l.Versions(), ", ") + "\n"
-	return res
+func init() {
+	RootCmd.AddCommand(configCmd)
 }
