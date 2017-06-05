@@ -1,0 +1,24 @@
+= arduino-cli
+
+Arduino CLI is a tool to access all Arduino Create API from Command Line.
+It implements all functions provided by web version of Arduino Create.
+
+== Installation 
+ . `git clone` this repository into a folder of your choice
+ . Add '/path/to/arduino/cli/folder' to your PATH environment variable
+ . Reload shell configuration or reboot
+ And you're done, now let's see how to use the CLI.
+
+== Usage 
+
+A general call is `arduino [COMMAND] [options]`
+To see the full list of commands, call `arduino -h` or `arduino --help`
+
+== Contribution
+
+To contribute to this project:
+
+. `git clone` this repository
+. Create a new branch with the name `feature-to-implement` or `bug-to-fix`
+. Code your contribution and push to your branch
+. Ask a Pull Request
