@@ -101,6 +101,7 @@ func (l *StatusContext) Names() []string {
 	return res
 }
 
+// CreateStatusContextFromIndex creates a status context from index data.
 func CreateStatusContextFromIndex(index *Index, sketchbookPaths []string, corePaths []string) (*StatusContext, error) {
 	// Start with an empty status context
 	libraries := StatusContext{
