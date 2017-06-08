@@ -38,7 +38,6 @@ import (
 
 // ListLibrariesPath computes a request path to the list action of libraries.
 func ListLibrariesPath() string {
-
 	return fmt.Sprintf("/builder/v1/libraries")
 }
 
@@ -78,12 +77,10 @@ func (c *Client) NewListLibrariesRequest(ctx context.Context, path string, maint
 
 // ShowLibrariesPath computes a request path to the show action of libraries.
 func ShowLibrariesPath(id string) string {
-	param0 := id
-
-	return fmt.Sprintf("/builder/v1/libraries/%s", param0)
+	return fmt.Sprintf("/builder/v1/libraries/%s", id)
 }
 
-// Provides the library identified by the :id and :pid param. Doesn't require authentication. Also contains a list of other versions of the library
+// ShowLibraries provides the library identified by the :id and :pid param. Doesn't require authentication. Also contains a list of other versions of the library
 func (c *Client) ShowLibraries(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewShowLibrariesRequest(ctx, path)
 	if err != nil {

@@ -31,35 +31,39 @@ package libraries
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"net/http"
+
+	"github.com/arduino/arduino-cli/builder_client_helpers"
 )
 
 // Index represents the content of a library_index.json file
 type Index struct {
-	Libraries []IndexRelease
+	Libraries []IndexRelease `json:"libraries"`
 }
 
 // IndexRelease is an entry of a library_index.json
 type IndexRelease struct {
-	Name            string
-	Version         string
-	Author          string
-	Maintainer      string
-	Sentence        string
-	Paragraph       string
-	Website         string
-	Category        string
-	Architectures   []string
-	Types           []string
-	URL             string
-	ArchiveFileName string
-	Size            int
-	Checksum        string
+	Name            string   `json:"name"`
+	Version         string   `json:"version"`
+	Author          string   `json:"author"`
+	Maintainer      string   `json:"maintainer"`
+	Sentence        string   `json:"sentence"`
+	Paragraph       string   `json:"paragraph"`
+	Website         string   `json:"website"`
+	Category        string   `json:"category"`
+	Architectures   []string `json:"architectures"`
+	Types           []string `json:"types"`
+	URL             string   `json:"url"`
+	ArchiveFileName string   `json:"archiveFileName"`
+	Size            int      `json:"size"`
+	Checksum        string   `json:"checksum"`
 }
 
-// LoadLibrariesIndex reads a library_index.json from a file and returns
-// the corresponding LibrariesIndex structure
-func LoadLibrariesIndex(libFile string) (*Index, error) {
+// LoadLibrariesIndexFromFile reads a library_index.json from a file and returns
+// the corresponding LibrariesIndex structure.
+func LoadLibrariesIndexFromFile(libFile string) (*Index, error) {
 	libBuff, err := ioutil.ReadFile(libFile)
 	if err != nil {
 		return nil, err
@@ -71,6 +75,85 @@ func LoadLibrariesIndex(libFile string) (*Index, error) {
 	}
 
 	return &index, nil
+}
+
+func DownloadLibrariesFileBase(saveToPath string) error {
+	req, err := http.NewRequest("GET", "http://downloads.arduino.cc/libraries/library_index.json", nil)
+	if err != nil {
+		return err
+	}
+
+	client := http.DefaultClient
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	content, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(saveToPath, content, 0666)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateLocalFile(localFilePath string, libraries []Library) error {
+	content, err := ioutil.ReadFile(localFilePath)
+	if err != nil {
+		return err
+	}
+	var index IndexRelease
+	err = json.Unmarshal(content, &index)
+	if err != nil {
+		return err
+	}
+
+}
+
+// DownloadLibrariesIndex downloads from arduino repository the libraries index.
+func (indexLib *IndexRelease) DownloadLibrariesIndex() (*[]Library, error) {
+	client := builderClient.New(nil)
+	response, err := client.ListLibraries(nil, builderClient.ListLibrariesPath(), nil, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != 200 {
+		return nil, fmt.Errorf("Status Code not OK, request failed")
+	}
+
+	jsonResult, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+	var result []Library
+	err = json.Unmarshal(jsonResult, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// UpdateLocalFile updates local cache file using an Index (most of times downloaded from arduino archives)
+func (indexLib *IndexRelease) UpdateLocalFile(localFilePath string, index *Index) error {
+	if localFilePath == "" || index == nil {
+		return fmt.Errorf("Invalid arguments, please specify valid localFilePath and index")
+	}
+	content, err := json.Marshal(index)
+
+	if err != nil {
+		return err
+	}
+
+	ioutil.WriteFile(localFilePath, content, 0666)
+	return nil
 }
 
 // ExtractRelease create a new Release with the information contained

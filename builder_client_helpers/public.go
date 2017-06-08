@@ -29,6 +29,7 @@
 
 package builderClient
 
+/*
 import (
 	"context"
 	"fmt"
@@ -140,3 +141,4 @@ func (c *Client) DownloadSwaggerJSON(ctx context.Context, dest string) (int64, e
 	defer out.Close()
 	return io.Copy(out, resp.Body)
 }
+*/

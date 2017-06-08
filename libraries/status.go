@@ -34,32 +34,32 @@ import "github.com/pmylund/sortutil"
 // StatusContext keeps the current status of the libraries in the system
 // (the list of libraries, revisions, installed paths, etc.)
 type StatusContext struct {
-	Libraries map[string]*Library
+	Libraries map[string]*Library `json:"libraries"`
 }
 
 // Library represents a library in the system
 type Library struct {
-	Name          string
-	Author        string
-	Maintainer    string
-	Sentence      string
-	Paragraph     string
-	Website       string
-	Category      string
-	Architectures []string
-	Types         []string
-	Releases      []*Release
-	Installed     *Release
-	Latest        *Release
+	Name          string     `json:"name"`
+	Author        string     `json:"author"`
+	Maintainer    string     `json:"maintainer"`
+	Sentence      string     `json:"sentence"`
+	Paragraph     string     `json:"paragraph"`
+	Website       string     `json:"website"`
+	Category      string     `json:"category"`
+	Architectures []string   `json:"architectures"`
+	Types         []string   `json:"types"`
+	Releases      []*Release `json:"releases"`
+	Installed     *Release   `json:"installed"`
+	Latest        *Release   `json:"latest"`
 }
 
 // Release represents a release of a library
 type Release struct {
-	Version         string
-	URL             string
-	ArchiveFileName string
-	Size            int
-	Checksum        string
+	Version         string `json:"version"`
+	URL             string `json:"url"`
+	ArchiveFileName string `json:"archiveFileName"`
+	Size            int    `json:"size"`
+	Checksum        string `json:"checksum"`
 }
 
 // Versions returns an array of all versions available of the library
