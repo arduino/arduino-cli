@@ -27,33 +27,43 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package libraries
+package createClient
 
 import (
-	"strconv"
-
-	"strings"
+	"context"
+	"fmt"
+	"net/http"
+	"net/url"
 )
 
-func (r *Release) String() string {
-	res := "  Release: " + r.Version + "\n"
-	res += "    URL: " + r.URL + "\n"
-	res += "    ArchiveFileName: " + r.ArchiveFileName + "\n"
-	res += "    Size: " + strconv.Itoa(r.Size) + "\n"
-	res += "    Checksum: " + r.Checksum + "\n"
-	return res
+// ShowFilesPath computes a request path to the show action of files.
+func ShowFilesPath(type_ string, id string, name string) string {
+	param0 := type_
+	param1 := id
+	param2 := name
+
+	return fmt.Sprintf("/create/v1/files/%s/%s/%s", param0, param1, param2)
 }
 
-func (l *Library) String() string {
-	res := "Name: " + l.Name + "\n"
-	res += "  Author: " + l.Author + "\n"
-	res += "  Maintainer: " + l.Maintainer + "\n"
-	res += "  Sentence: " + l.Sentence + "\n"
-	res += "  Paragraph: " + l.Paragraph + "\n"
-	res += "  Website: " + l.Website + "\n"
-	res += "  Category: " + l.Category + "\n"
-	res += "  Architecture: " + strings.Join(l.Architectures, ", ") + "\n"
-	res += "  Types: " + strings.Join(l.Types, ", ") + "\n"
-	res += "  Versions: " + strings.Join(l.Versions(), ", ") + "\n"
-	return res
+// Provides the content of the file identified by :name and :id
+func (c *Client) ShowFiles(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewShowFilesRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewShowFilesRequest create the request corresponding to the show action endpoint of the files resource.
+func (c *Client) NewShowFilesRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "http"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
 }

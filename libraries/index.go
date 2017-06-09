@@ -1,36 +1,66 @@
+/*
+ * This file is part of arduino-cli.
+ *
+ * arduino-cli is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * As a special exception, you may use this file as part of a free software
+ * library without restriction.  Specifically, if other files instantiate
+ * templates or use macros or inline functions from this file, or you compile
+ * this file and link it with other files to produce an executable, this
+ * file does not by itself cause the resulting executable to be covered by
+ * the GNU General Public License.  This exception does not however
+ * invalidate any other reasons why the executable file might be covered by
+ * the GNU General Public License.
+ *
+ * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
+ */
+
 package libraries
 
 import (
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
 )
 
 // Index represents the content of a library_index.json file
 type Index struct {
-	Libraries []IndexRelease
+	Libraries []IndexRelease `json:"libraries"`
 }
 
 // IndexRelease is an entry of a library_index.json
 type IndexRelease struct {
-	Name            string
-	Version         string
-	Author          string
-	Maintainer      string
-	Sentence        string
-	Paragraph       string
-	Website         string
-	Category        string
-	Architectures   []string
-	Types           []string
-	URL             string
-	ArchiveFileName string
-	Size            int
-	Checksum        string
+	Name            string   `json:"name"`
+	Version         string   `json:"version"`
+	Author          string   `json:"author"`
+	Maintainer      string   `json:"maintainer"`
+	Sentence        string   `json:"sentence"`
+	Paragraph       string   `json:"paragraph"`
+	Website         string   `json:"website"`
+	Category        string   `json:"category"`
+	Architectures   []string `json:"architectures"`
+	Types           []string `json:"types"`
+	URL             string   `json:"url"`
+	ArchiveFileName string   `json:"archiveFileName"`
+	Size            int      `json:"size"`
+	Checksum        string   `json:"checksum"`
 }
 
-// LoadLibrariesIndex reads a library_index.json from a file and returns
-// the corresponding LibrariesIndex structure
-func LoadLibrariesIndex(libFile string) (*Index, error) {
+// LoadLibrariesIndexFromFile reads a library_index.json from a file and returns
+// the corresponding LibrariesIndex structure.
+func LoadLibrariesIndexFromFile(libFile string) (*Index, error) {
 	libBuff, err := ioutil.ReadFile(libFile)
 	if err != nil {
 		return nil, err
@@ -42,6 +72,32 @@ func LoadLibrariesIndex(libFile string) (*Index, error) {
 	}
 
 	return &index, nil
+}
+
+//DownloadLibrariesFile downloads the lib file from arduino repository.
+func DownloadLibrariesFile(saveToPath string) error {
+	req, err := http.NewRequest("GET", "http://downloads.arduino.cc/libraries/library_index.json", nil)
+	if err != nil {
+		return err
+	}
+
+	client := http.DefaultClient
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	content, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(saveToPath, content, 0666)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // ExtractRelease create a new Release with the information contained

@@ -27,33 +27,41 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package libraries
+package builderClient
 
 import (
-	"strconv"
-
-	"strings"
+	"github.com/goadesign/goa"
+	goaclient "github.com/goadesign/goa/client"
 )
 
-func (r *Release) String() string {
-	res := "  Release: " + r.Version + "\n"
-	res += "    URL: " + r.URL + "\n"
-	res += "    ArchiveFileName: " + r.ArchiveFileName + "\n"
-	res += "    Size: " + strconv.Itoa(r.Size) + "\n"
-	res += "    Checksum: " + r.Checksum + "\n"
-	return res
+// Client is the ArduinoBuilderV1 service client.
+type Client struct {
+	*goaclient.Client
+	Oauth2Signer goaclient.Signer
+	Encoder      *goa.HTTPEncoder
+	Decoder      *goa.HTTPDecoder
 }
 
-func (l *Library) String() string {
-	res := "Name: " + l.Name + "\n"
-	res += "  Author: " + l.Author + "\n"
-	res += "  Maintainer: " + l.Maintainer + "\n"
-	res += "  Sentence: " + l.Sentence + "\n"
-	res += "  Paragraph: " + l.Paragraph + "\n"
-	res += "  Website: " + l.Website + "\n"
-	res += "  Category: " + l.Category + "\n"
-	res += "  Architecture: " + strings.Join(l.Architectures, ", ") + "\n"
-	res += "  Types: " + strings.Join(l.Types, ", ") + "\n"
-	res += "  Versions: " + strings.Join(l.Versions(), ", ") + "\n"
-	return res
+// New instantiates the client.
+func New(c goaclient.Doer) *Client {
+	client := &Client{
+		Client:  goaclient.New(c),
+		Encoder: goa.NewHTTPEncoder(),
+		Decoder: goa.NewHTTPDecoder(),
+	}
+
+	// Setup encoders and decoders
+	client.Encoder.Register(goa.NewJSONEncoder, "application/json")
+	client.Decoder.Register(goa.NewJSONDecoder, "application/json")
+
+	// Setup default encoder and decoder
+	client.Encoder.Register(goa.NewJSONEncoder, "*/*")
+	client.Decoder.Register(goa.NewJSONDecoder, "*/*")
+
+	return client
+}
+
+// SetOauth2Signer sets the request signer for the oauth2 security scheme.
+func (c *Client) SetOauth2Signer(signer goaclient.Signer) {
+	c.Oauth2Signer = signer
 }

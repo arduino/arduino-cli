@@ -27,33 +27,47 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package libraries
+package builderClient
 
 import (
-	"strconv"
-
-	"strings"
+	"context"
+	"fmt"
+	"net/http"
+	"net/url"
 )
 
-func (r *Release) String() string {
-	res := "  Release: " + r.Version + "\n"
-	res += "    URL: " + r.URL + "\n"
-	res += "    ArchiveFileName: " + r.ArchiveFileName + "\n"
-	res += "    Size: " + strconv.Itoa(r.Size) + "\n"
-	res += "    Checksum: " + r.Checksum + "\n"
-	return res
+// ListExamplesPath computes a request path to the list action of examples.
+func ListExamplesPath() string {
+	return fmt.Sprintf("/builder/v1/examples")
 }
 
-func (l *Library) String() string {
-	res := "Name: " + l.Name + "\n"
-	res += "  Author: " + l.Author + "\n"
-	res += "  Maintainer: " + l.Maintainer + "\n"
-	res += "  Sentence: " + l.Sentence + "\n"
-	res += "  Paragraph: " + l.Paragraph + "\n"
-	res += "  Website: " + l.Website + "\n"
-	res += "  Category: " + l.Category + "\n"
-	res += "  Architecture: " + strings.Join(l.Architectures, ", ") + "\n"
-	res += "  Types: " + strings.Join(l.Types, ", ") + "\n"
-	res += "  Versions: " + strings.Join(l.Versions(), ", ") + "\n"
-	return res
+// ListExamples provides a list of all the builtin examples
+func (c *Client) ListExamples(ctx context.Context, path string, maintainer *string, type_ *string) (*http.Response, error) {
+	req, err := c.NewListExamplesRequest(ctx, path, maintainer, type_)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewListExamplesRequest create the request corresponding to the list action endpoint of the examples resource.
+func (c *Client) NewListExamplesRequest(ctx context.Context, path string, maintainer *string, type_ *string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "http"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	if maintainer != nil {
+		values.Set("maintainer", *maintainer)
+	}
+	if type_ != nil {
+		values.Set("type", *type_)
+	}
+	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
 }
