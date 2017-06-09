@@ -42,5 +42,4 @@ var LibRoot = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(LibRoot)
-
 }

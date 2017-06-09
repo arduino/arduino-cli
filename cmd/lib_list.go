@@ -39,8 +39,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// libListCmd represents the list libraries command.
-var libListCmd = &cobra.Command{
+// LibListCmd represents the list libraries command.
+var LibListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "Shows a list of all libraries from arduino repository.",
 	Long: `Shows a list of all libraries from arduino repository.
@@ -53,7 +53,7 @@ var libListCmdFlags struct {
 }
 
 func init() {
-	LibRoot.AddCommand(libListCmd)
+	LibRoot.AddCommand(LibListCmd)
 }
 
 func executeListCommand(command *cobra.Command, args []string) {
@@ -66,6 +66,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 	}
 	libFile := filepath.Join(baseFolder, "library_index.json")
 
+	//If it doesn't exist download it
 	if _, err := os.Stat(libFile); os.IsNotExist(err) {
 		fmt.Print("Index file does not exist. Downloading it from download.arduino.cc ...")
 		err := libraries.DownloadLibrariesFile(libFile)
@@ -77,7 +78,23 @@ func executeListCommand(command *cobra.Command, args []string) {
 		fmt.Println("DONE")
 	}
 
+	//If it exists but it is corrupt replace it from arduino repository.
 	index, err := libraries.LoadLibrariesIndexFromFile(libFile)
+	if err != nil {
+		fmt.Print("Index file is corrupt. Downloading a new copy from download.arduino.cc ...")
+		err := libraries.DownloadLibrariesFile(libFile)
+		if err != nil {
+			fmt.Println("ERROR")
+			fmt.Println("Cannot download index file.")
+			return
+		}
+		fmt.Println("DONE")
+		index, err = libraries.LoadLibrariesIndexFromFile(libFile)
+		if err != nil {
+			fmt.Printf("Cannot parse index file : %s\n", libFile)
+			return
+		}
+	}
 
 	//fmt.Printf("libFile = %s\n", libFile)
 	//fmt.Printf("index = %v\n", index)
