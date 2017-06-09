@@ -15,7 +15,6 @@ package cmd
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/arduino/arduino-cli/libraries"
 	"github.com/spf13/cobra"
@@ -34,15 +33,8 @@ func init() {
 }
 
 func execUpdateListIndex(cmd *cobra.Command, args []string) {
-	baseFolder, err := GetDefaultArduinoFolder()
-	if err != nil {
-		fmt.Printf("Could not determine data folder: %s", err)
-		return
-	}
-	libFile := filepath.Join(baseFolder, "library_index.json")
-
 	fmt.Print("Downloading libraries index file from download.arduino.cc... ")
-	err = libraries.DownloadLibrariesFile(libFile)
+	err := libraries.DownloadLibrariesFile()
 	if err != nil {
 		fmt.Println("ERROR")
 		fmt.Println("Cannot download index file.")

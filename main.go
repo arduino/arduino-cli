@@ -33,16 +33,5 @@ import (
 )
 
 func main() {
-	//executes root command
 	cmd.Execute()
-
-	/*
-		opts.Parser.AddCommand("version", "Prints version info", "", &versionOpts{})
-		args, err := opts.Parse()
-		if err != nil {
-			os.Exit(1)
-		}
-
-		fmt.Println("remaining args: ", args)
-	*/
 }

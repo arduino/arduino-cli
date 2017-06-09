@@ -31,7 +31,6 @@ package cmd
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"os"
 
@@ -59,17 +58,12 @@ func init() {
 func executeListCommand(command *cobra.Command, args []string) {
 	//fmt.Println("libs list:", args)
 	//fmt.Println("long =", libListCmdFlags.Long)
-	baseFolder, err := GetDefaultArduinoFolder()
-	if err != nil {
-		fmt.Printf("Could not determine data folder: %s", err)
-		return
-	}
-	libFile := filepath.Join(baseFolder, "library_index.json")
+	libFile, _ := libraries.IndexPath()
 
 	//If it doesn't exist download it
 	if _, err := os.Stat(libFile); os.IsNotExist(err) {
 		fmt.Print("Index file does not exist. Downloading it from download.arduino.cc ...")
-		err := libraries.DownloadLibrariesFile(libFile)
+		err := libraries.DownloadLibrariesFile()
 		if err != nil {
 			fmt.Println("ERROR")
 			fmt.Println("Cannot download index file.")
@@ -79,17 +73,17 @@ func executeListCommand(command *cobra.Command, args []string) {
 	}
 
 	//If it exists but it is corrupt replace it from arduino repository.
-	index, err := libraries.LoadLibrariesIndexFromFile(libFile)
+	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
 		fmt.Print("Index file is corrupt. Downloading a new copy from download.arduino.cc ...")
-		err := libraries.DownloadLibrariesFile(libFile)
+		err := libraries.DownloadLibrariesFile()
 		if err != nil {
 			fmt.Println("ERROR")
 			fmt.Println("Cannot download index file.")
 			return
 		}
 		fmt.Println("DONE")
-		index, err = libraries.LoadLibrariesIndexFromFile(libFile)
+		index, err = libraries.LoadLibrariesIndex()
 		if err != nil {
 			fmt.Printf("Cannot parse index file : %s\n", libFile)
 			return

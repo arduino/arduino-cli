@@ -31,8 +31,12 @@ package libraries
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"path/filepath"
+
+	"github.com/arduino/arduino-cli/common"
 )
 
 // Index represents the content of a library_index.json file
@@ -58,9 +62,24 @@ type IndexRelease struct {
 	Checksum        string   `json:"checksum"`
 }
 
-// LoadLibrariesIndexFromFile reads a library_index.json from a file and returns
+//IndexPath returns the path of the index file for libraries.
+func IndexPath() (string, error) {
+	baseFolder, err := common.GetDefaultArduinoFolder()
+	if err != nil {
+		fmt.Printf("Could not determine data folder: %s", err)
+		return "", err
+	}
+	return filepath.Join(baseFolder, "library_index.json"), nil
+}
+
+// LoadLibrariesIndex reads a library_index.json from a file and returns
 // the corresponding LibrariesIndex structure.
-func LoadLibrariesIndexFromFile(libFile string) (*Index, error) {
+func LoadLibrariesIndex() (*Index, error) {
+	libFile, err := IndexPath()
+	if err != nil {
+		return nil, err
+	}
+
 	libBuff, err := ioutil.ReadFile(libFile)
 	if err != nil {
 		return nil, err
@@ -75,7 +94,12 @@ func LoadLibrariesIndexFromFile(libFile string) (*Index, error) {
 }
 
 //DownloadLibrariesFile downloads the lib file from arduino repository.
-func DownloadLibrariesFile(saveToPath string) error {
+func DownloadLibrariesFile() error {
+	libFile, err := IndexPath()
+	if err != nil {
+		return err
+	}
+
 	req, err := http.NewRequest("GET", "http://downloads.arduino.cc/libraries/library_index.json", nil)
 	if err != nil {
 		return err
@@ -93,7 +117,7 @@ func DownloadLibrariesFile(saveToPath string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(saveToPath, content, 0666)
+	err = ioutil.WriteFile(libFile, content, 0666)
 	if err != nil {
 		return err
 	}
