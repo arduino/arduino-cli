@@ -33,6 +33,8 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"os"
+
 	"github.com/arduino/arduino-cli/libraries"
 	"github.com/spf13/cobra"
 )
@@ -55,39 +57,27 @@ func init() {
 }
 
 func executeListCommand(command *cobra.Command, args []string) {
-	var offlineResource = false
 	//fmt.Println("libs list:", args)
 	//fmt.Println("long =", libListCmdFlags.Long)
-
+	baseFolder, err := GetDefaultArduinoFolder()
+	if err != nil {
+		fmt.Printf("Could not determine data folder: %s", err)
+		return
+	}
 	libFile := filepath.Join(baseFolder, "library_index.json")
 
-	fmt.Println("Updating index")
-
-	index, err := libraries.DownloadLibrariesIndex()
-	if err != nil {
-		offlineResource = true
-		fmt.Println("Online repository not available, searching for local index...")
-
-		baseFolder, err := GetDefaultArduinoFolder()
+	if _, err := os.Stat(libFile); os.IsNotExist(err) {
+		fmt.Print("Index file does not exist. Downloading it from download.arduino.cc ...")
+		err := libraries.DownloadLibrariesFile(libFile)
 		if err != nil {
-			fmt.Printf("Could not determine data folder: %s", err)
+			fmt.Println("ERROR")
+			fmt.Println("Cannot download index file.")
 			return
 		}
-
-		index, err := libraries.LoadLibrariesIndexFromFile(libFile)
-		if err != nil {
-			fmt.Print("Cannot use local index file. Downloading from download.arduino.cc ...")
-			err2 := libraries.DownloadLibrariesFileBase(libFile)
-			if err2 != nil {
-				fmt.Println("ERROR")
-				fmt.Println(err2)
-				return
-			}
-			fmt.Println("OK")
-		}
+		fmt.Println("DONE")
 	}
 
-	syncError := libraries.UpdateLocalFile(index)
+	index, err := libraries.LoadLibrariesIndexFromFile(libFile)
 
 	//fmt.Printf("libFile = %s\n", libFile)
 	//fmt.Printf("index = %v\n", index)
@@ -112,13 +102,5 @@ func executeListCommand(command *cobra.Command, args []string) {
 		} else {
 			fmt.Println(name)
 		}
-	}
-
-	if offlineResource {
-		fmt.Println()
-		fmt.Printf("(Obtained using local index at %s)\n", libFile)
-	} else if syncError && GlobalFlags.Verbose > 0 {
-		fmt.Println()
-		fmt.Printf("(Local cache file %s is not synced because of an error: %s)\n", libFile, err.Error())
 	}
 }

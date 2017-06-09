@@ -31,11 +31,8 @@ package libraries
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/arduino/arduino-cli/builder_client_helpers"
 )
 
 // Index represents the content of a library_index.json file
@@ -77,7 +74,8 @@ func LoadLibrariesIndexFromFile(libFile string) (*Index, error) {
 	return &index, nil
 }
 
-func DownloadLibrariesFileBase(saveToPath string) error {
+//DownloadLibrariesFile downloads the lib file from arduino repository.
+func DownloadLibrariesFile(saveToPath string) error {
 	req, err := http.NewRequest("GET", "http://downloads.arduino.cc/libraries/library_index.json", nil)
 	if err != nil {
 		return err
@@ -99,60 +97,6 @@ func DownloadLibrariesFileBase(saveToPath string) error {
 	if err != nil {
 		return err
 	}
-	return nil
-}
-
-func UpdateLocalFile(localFilePath string, libraries []Library) error {
-	content, err := ioutil.ReadFile(localFilePath)
-	if err != nil {
-		return err
-	}
-	var index IndexRelease
-	err = json.Unmarshal(content, &index)
-	if err != nil {
-		return err
-	}
-
-}
-
-// DownloadLibrariesIndex downloads from arduino repository the libraries index.
-func (indexLib *IndexRelease) DownloadLibrariesIndex() (*[]Library, error) {
-	client := builderClient.New(nil)
-	response, err := client.ListLibraries(nil, builderClient.ListLibrariesPath(), nil, nil, nil)
-	if err != nil {
-		return nil, err
-	}
-	defer response.Body.Close()
-
-	if response.StatusCode != 200 {
-		return nil, fmt.Errorf("Status Code not OK, request failed")
-	}
-
-	jsonResult, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
-	}
-	var result []Library
-	err = json.Unmarshal(jsonResult, &result)
-	if err != nil {
-		return nil, err
-	}
-
-	return &result, nil
-}
-
-// UpdateLocalFile updates local cache file using an Index (most of times downloaded from arduino archives)
-func (indexLib *IndexRelease) UpdateLocalFile(localFilePath string, index *Index) error {
-	if localFilePath == "" || index == nil {
-		return fmt.Errorf("Invalid arguments, please specify valid localFilePath and index")
-	}
-	content, err := json.Marshal(index)
-
-	if err != nil {
-		return err
-	}
-
-	ioutil.WriteFile(localFilePath, content, 0666)
 	return nil
 }
 
