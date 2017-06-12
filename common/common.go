@@ -22,3 +22,12 @@ func GetDefaultArduinoFolder() (string, error) {
 		return "", fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
 	}
 }
+
+// GetDefaultLibFolder get the default folder of downloaded libraries.
+func GetDefaultLibFolder() (string, error) {
+	usr, err := user.Current()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(usr.HomeDir, "Arduino", "libraries"), nil
+}
