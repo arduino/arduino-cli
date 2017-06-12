@@ -29,7 +29,7 @@
 package main
 
 import (
-	"github.com/arduino/arduino-cli/cmd"
+	"github.com/bcmi-labs/arduino-cli/cmd"
 )
 
 func main() {

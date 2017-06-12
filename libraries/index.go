@@ -36,7 +36,7 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/arduino/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/common"
 )
 
 // Index represents the content of a library_index.json file

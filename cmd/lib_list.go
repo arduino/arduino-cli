@@ -34,7 +34,7 @@ import (
 
 	"os"
 
-	"github.com/arduino/arduino-cli/libraries"
+	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/spf13/cobra"
 )
 

@@ -5,7 +5,7 @@ It implements all functions provided by web version of Arduino Create.
 
 == Installation 
  . `git clone` this repository into a folder of your choice
- . Add '/path/to/arduino/cli/folder' to your PATH environment variable
+ . Add '/path/to/arduino-cli/folder' to your PATH environment variable
  . Reload shell configuration or reboot
  And you're done, now let's see how to use the CLI.
 
