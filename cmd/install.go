@@ -26,8 +26,8 @@ import (
 // installCmd represents the lib install command.
 var installCmd = &cobra.Command{
 	Use:   "install",
-	Short: "Installs a specified library into the system.",
-	Long:  `Installs a specified library into the system.`,
+	Short: "Installs one of more specified libraries into the system.",
+	Long:  `Installs one or more specified libraries into the system.`,
 	RunE:  executeInstallCommand,
 }
 
