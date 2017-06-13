@@ -38,6 +38,7 @@ import (
 	"path/filepath"
 )
 
+// GetFolder gets a folder on a path, and creates it if not found.
 func GetFolder(folder string, messageName string) (string, error) {
 	_, err := os.Stat(folder)
 	if os.IsNotExist(err) {
@@ -53,7 +54,7 @@ func GetFolder(folder string, messageName string) (string, error) {
 	return folder, nil
 }
 
-//Unzip extracts a zip file to a specified destination path.
+// Unzip extracts a zip file to a specified destination path.
 func Unzip(archive *zip.Reader, destination string) error {
 	for _, file := range archive.File {
 		path := filepath.Join(destination, file.Name)

@@ -38,6 +38,7 @@ import (
 )
 
 var install func(*zip.Reader, string) error = common.Unzip
+var Uninstall func(string) error = common.TruncateDir
 
 func downloadLatest(library *Library) ([]byte, error) {
 	return common.DownloadPackage(library.Latest.URL)
@@ -50,7 +51,7 @@ func getDownloadCacheFolder(library *Library) (string, error) {
 		return "", err
 	}
 
-	stagingFolder := filepath.Join(libFolder, ".cache")
+	stagingFolder := filepath.Join(libFolder, ".download-cache")
 	return common.GetFolder(stagingFolder, "libraries cache")
 }
 

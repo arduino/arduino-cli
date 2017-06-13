@@ -68,7 +68,26 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 
 	status, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
 	if err != nil {
-		fmt.Println("Cannot parse index file, it may be corrupted. Try run arduino lib list update to update the index.")
+		fmt.Println("Cannot parse index file, it may be corrupted. downloading from downloads.arduino.cc")
+
+		err = libraries.DownloadLibrariesFile()
+		if err != nil {
+			fmt.Println("ERROR")
+			fmt.Println("Cannot download index file, please check your network connection.")
+			return nil
+		}
+		fmt.Println("OK")
+
+		fmt.Print("Parsing downloaded index file ... ")
+
+		//after download, I retry.
+		status, err = libraries.CreateStatusContextFromIndex(index, nil, nil)
+		if err != nil {
+			fmt.Println("ERROR")
+			fmt.Println("Cannot parse downloaded index file")
+			return nil
+		}
+		fmt.Println("OK")
 	}
 
 	libraryOK := make([]string, 0, len(args))
