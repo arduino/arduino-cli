@@ -27,52 +27,41 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package common
+package libraries
 
 import (
+	"archive/zip"
 	"fmt"
-	"os/user"
 	"path/filepath"
-	"runtime"
+
+	"github.com/bcmi-labs/arduino-cli/common"
 )
 
-// GetDefaultArduinoFolder returns the default data folder for Arduino platform
-func GetDefaultArduinoFolder() (string, error) {
-	var folder string
+var install func(*zip.Reader, string) error = common.Unzip
 
-	usr, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-
-	switch runtime.GOOS {
-	case "linux":
-		folder = filepath.Join(usr.HomeDir, ".arduino15")
-	case "darwin":
-		folder = filepath.Join(usr.HomeDir, "Library", "arduino15")
-	default:
-		return "", fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
-	}
-	return GetFolder(folder, "default arduino")
+func downloadLatest(library *Library) ([]byte, error) {
+	return common.DownloadPackage(library.Latest.URL)
 }
 
-// GetDefaultLibFolder get the default folder of downloaded libraries.
-func GetDefaultLibFolder() (string, error) {
-	baseFolder, err := GetDefaultArduinoHomeFolder()
+// getDownloadCacheFolder gets the folder where temp installs are stored until installation complete (libraries).
+func getDownloadCacheFolder(library *Library) (string, error) {
+	libFolder, err := common.GetDefaultLibFolder()
 	if err != nil {
 		return "", err
 	}
 
-	libFolder := filepath.Join(baseFolder, "libraries")
-	return GetFolder(libFolder, "libraries")
+	stagingFolder := filepath.Join(libFolder, ".cache")
+	return common.GetFolder(stagingFolder, "libraries cache")
 }
 
-// GetDefaultArduinoHomeFolder gets the home directory for arduino CLI.
-func GetDefaultArduinoHomeFolder() (string, error) {
-	usr, err := user.Current()
+// getLibFolder returns the destination folder of the downloaded specified library.
+// It creates the folder if does not find it.
+func getLibFolder(library *Library) (string, error) {
+	baseFolder, err := common.GetDefaultLibFolder()
 	if err != nil {
 		return "", err
 	}
-	homeFolder := filepath.Join(usr.HomeDir, "Arduino")
-	return GetFolder(homeFolder, "Arduino home")
+
+	libFolder := filepath.Join(baseFolder, fmt.Sprintf("%s-%s", library.Name, library.Latest.Version))
+	return common.GetFolder(libFolder, "library")
 }
