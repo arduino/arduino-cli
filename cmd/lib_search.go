@@ -41,7 +41,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 		return errors.New("Wrong Number of Arguments")
 	}
 	if len(args) == 1 {
-		query = args[0]
+		query = strings.ToLower(strings.Join(args, " "))
 	}
 
 	index, err := libraries.LoadLibrariesIndex()
@@ -60,7 +60,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 
 	//Pretty print libraries from index.
 	for _, name := range libraries.Names() {
-		if strings.Contains(name, query) {
+		if strings.Contains(strings.ToLower(name), query) {
 			found = true
 			if GlobalFlags.Verbose > 0 {
 				lib := libraries.Libraries[name]
