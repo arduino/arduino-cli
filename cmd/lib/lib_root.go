@@ -27,9 +27,10 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package cmd
+package libCmd
 
 import (
+	cliCmd "github.com/bcmi-labs/arduino-cli/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -41,5 +42,5 @@ var LibRoot = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(LibRoot)
+	cliCmd.RootCmd.AddCommand(LibRoot)
 }

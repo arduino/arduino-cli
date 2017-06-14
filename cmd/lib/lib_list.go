@@ -27,7 +27,7 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package cmd
+package libCmd
 
 import (
 	"fmt"
@@ -47,10 +47,6 @@ Can be used with -v (or --verbose) flag (up to 2 times) to have longer output.`,
 	Run: executeListCommand,
 }
 
-var libListCmdFlags struct {
-	Verbose int
-}
-
 func init() {
 	LibRoot.AddCommand(LibListCmd)
 }
@@ -62,30 +58,42 @@ func executeListCommand(command *cobra.Command, args []string) {
 
 	//If it doesn't exist download it
 	if _, err := os.Stat(libFile); os.IsNotExist(err) {
-		fmt.Print("Index file does not exist. Downloading it from download.arduino.cc ...")
+		if GlobalFlags.Verbose > 0 {
+			fmt.Print("Index file does not exist. Downloading it from download.arduino.cc ...")
+		}
 		err := libraries.DownloadLibrariesFile()
 		if err != nil {
-			fmt.Println("ERROR")
+			if GlobalFlags.Verbose > 0 {
+				fmt.Println("ERROR")
+			}
 			fmt.Println("Cannot download index file.")
 			return
 		}
-		fmt.Println("DONE")
+		if GlobalFlags.Verbose > 0 {
+			fmt.Println("OK")
+		}
 	}
 
 	//If it exists but it is corrupt replace it from arduino repository.
 	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
-		fmt.Print("Index file is corrupt. Downloading a new copy from download.arduino.cc ...")
+		if GlobalFlags.Verbose > 0 {
+			fmt.Print("Index file is corrupt. Downloading a new copy from download.arduino.cc ...")
+		}
 		err := libraries.DownloadLibrariesFile()
 		if err != nil {
-			fmt.Println("ERROR")
+			if GlobalFlags.Verbose > 0 {
+				fmt.Println("ERROR")
+			}
 			fmt.Println("Cannot download index file.")
 			return
 		}
-		fmt.Println("DONE")
+		if GlobalFlags.Verbose > 0 {
+			fmt.Println("OK")
+		}
 		index, err = libraries.LoadLibrariesIndex()
 		if err != nil {
-			fmt.Printf("Cannot parse index file : %s\n", libFile)
+			fmt.Println("Cannot parse index file")
 			return
 		}
 	}
@@ -93,16 +101,50 @@ func executeListCommand(command *cobra.Command, args []string) {
 	//fmt.Printf("libFile = %s\n", libFile)
 	//fmt.Printf("index = %v\n", index)
 
-	libraries, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
+	status, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
 	if err != nil {
-		fmt.Printf("Could not synchronize library status: %s", err)
-		return
+		if GlobalFlags.Verbose > 0 {
+			fmt.Println("Cannot parse index file, it may be corrupted. downloading from downloads.arduino.cc")
+		}
+
+		err = libraries.DownloadLibrariesFile()
+		if err != nil {
+			if GlobalFlags.Verbose > 0 {
+				fmt.Println("ERROR")
+			}
+			fmt.Println("Cannot download index file, please check your network connection.")
+			return
+		}
+		if GlobalFlags.Verbose > 0 {
+			fmt.Println("OK")
+		}
+
+		if GlobalFlags.Verbose > 0 {
+			fmt.Print("Parsing downloaded index file ... ")
+		}
+
+		//after download, I retry.
+		status, err = libraries.CreateStatusContextFromIndex(index, nil, nil)
+		if err != nil {
+			if GlobalFlags.Verbose > 0 {
+				fmt.Println("ERROR")
+			}
+			fmt.Println("Cannot parse downloaded index file")
+			return
+		}
+		if GlobalFlags.Verbose > 0 {
+			fmt.Println("OK")
+		}
 	}
 
+	prettyPrintStatus(status)
+}
+
+func prettyPrintStatus(status *libraries.StatusContext) {
 	//Pretty print libraries from index.
-	for _, name := range libraries.Names() {
+	for _, name := range status.Names() {
 		if GlobalFlags.Verbose > 0 {
-			lib := libraries.Libraries[name]
+			lib := status.Libraries[name]
 			fmt.Print(lib)
 			if GlobalFlags.Verbose > 1 {
 				for _, r := range lib.Releases {

@@ -27,7 +27,7 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package cmd
+package libCmd
 
 import (
 	"fmt"
@@ -68,26 +68,38 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 
 	status, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
 	if err != nil {
-		fmt.Println("Cannot parse index file, it may be corrupted. downloading from downloads.arduino.cc")
+		if GlobalFlags.Verbose > 0 {
+			fmt.Println("Cannot parse index file, it may be corrupted. downloading from downloads.arduino.cc")
+		}
 
 		err = libraries.DownloadLibrariesFile()
 		if err != nil {
-			fmt.Println("ERROR")
+			if GlobalFlags.Verbose > 0 {
+				fmt.Println("ERROR")
+			}
 			fmt.Println("Cannot download index file, please check your network connection.")
 			return nil
 		}
-		fmt.Println("OK")
+		if GlobalFlags.Verbose > 0 {
+			fmt.Println("OK")
+		}
 
-		fmt.Print("Parsing downloaded index file ... ")
+		if GlobalFlags.Verbose > 0 {
+			fmt.Print("Parsing downloaded index file ... ")
+		}
 
 		//after download, I retry.
 		status, err = libraries.CreateStatusContextFromIndex(index, nil, nil)
 		if err != nil {
-			fmt.Println("ERROR")
+			if GlobalFlags.Verbose > 0 {
+				fmt.Println("ERROR")
+			}
 			fmt.Println("Cannot parse downloaded index file")
 			return nil
 		}
-		fmt.Println("OK")
+		if GlobalFlags.Verbose > 0 {
+			fmt.Println("OK")
+		}
 	}
 
 	libraryOK := make([]string, 0, len(args))
@@ -108,6 +120,21 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	if GlobalFlags.Verbose > 0 {
+		prettyPrint(libraryOK, libraryFails)
+	} else {
+		for _, library := range libraryOK {
+			fmt.Printf("%s - Installed\n", library)
+		}
+		for library, failure := range libraryFails {
+			fmt.Printf("%s - Error : %s\n", library, failure)
+		}
+	}
+
+	return nil
+}
+
+func prettyPrintInstall(libraryOK []string, libraryFails map[string]string) {
 	if len(libraryFails) > 0 {
 		fmt.Println("The following libraries were succesfully installed:")
 		fmt.Println(strings.Join(libraryOK, " "))
@@ -115,10 +142,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		for library, failure := range libraryFails {
 			fmt.Printf("%s - %s\n", library, failure)
 		}
-
 	} else {
 		fmt.Println("All libraries successfully installed")
 	}
-
-	return nil
 }
