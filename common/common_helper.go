@@ -142,7 +142,7 @@ func DownloadPackage(URL string) ([]byte, error) {
 
 	request, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot create HTTP request")
+		return nil, fmt.Errorf("Cannot create HTTP request: %s", err)
 	}
 
 	response, err := client.Do(request)
