@@ -38,6 +38,30 @@ import (
 	"github.com/spf13/viper"
 )
 
+const bashAutoCompletionFunction = `
+__arduino_autocomplete() 
+{
+    case $(last_command) in
+        arduino_lib)
+		    opts="install uninstall list search version"
+	        ;;
+		arduino_lib_list)
+		    opts="update"
+			;;
+		arduino_help)
+		    opts="lib core version"
+		    ;;
+        arduino)
+		    opts="lib help version"
+		    ;;
+	esac		  
+	if [[ ${cur} == " *" ]] ; then
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        return 0
+    fi
+	return 1
+}`
+
 // GlobalFlags represents flags available in all the program.
 var GlobalFlags struct {
 	Verbose int
@@ -53,13 +77,14 @@ var RootCmd = &cobra.Command{
 	Use:   "arduino",
 	Short: "Arduino CLI",
 	Long:  "Arduino Create Command Line Interface (arduino-cli)",
+	BashCompletionFunction: bashAutoCompletionFunction,
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		//fmt.Println(err)
 		os.Exit(1)
 	}
 }

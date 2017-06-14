@@ -26,11 +26,13 @@
  *
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
+
 package main
 
-import "github.com/spf13/cobra/cobra/cmd"
+import "github.com/bcmi-labs/arduino-cli/cmd"
 
 func main() {
 	cmd.Execute()
+	//cmd.RootCmd.GenBashCompletionFile("docs/bash_completions/arduino")
 	//docs.GenerateManPages()
 }
