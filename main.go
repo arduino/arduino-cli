@@ -28,9 +28,9 @@
  */
 package main
 
-import "github.com/bcmi-labs/arduino-cli/docs"
+import "github.com/spf13/cobra/cobra/cmd"
 
 func main() {
-	//cmd.Execute()
-	docs.GenerateManPages()
+	cmd.Execute()
+	//docs.GenerateManPages()
 }
