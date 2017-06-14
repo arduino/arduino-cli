@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package libCmd
 
 import (
 	"errors"
@@ -41,7 +41,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 		return errors.New("Wrong Number of Arguments")
 	}
 	if len(args) == 1 {
-		query = args[0]
+		query = strings.ToLower(strings.Join(args, " "))
 	}
 
 	index, err := libraries.LoadLibrariesIndex()
@@ -50,20 +50,47 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	libraries, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
+	status, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
 	if err != nil {
-		fmt.Printf("Could not synchronize library status: %s", err)
-		return nil
+		if GlobalFlags.Verbose > 0 {
+			fmt.Println("Cannot parse index file, it may be corrupted. downloading from downloads.arduino.cc")
+		}
+
+		err = libraries.DownloadLibrariesFile()
+		if err != nil {
+			if GlobalFlags.Verbose > 0 {
+				fmt.Println("ERROR")
+			}
+			fmt.Println("Cannot download index file, please check your network connection.")
+			return nil
+		}
+		if GlobalFlags.Verbose > 0 {
+			fmt.Println("OK")
+			fmt.Print("Parsing downloaded index file ... ")
+		}
+
+		//after download, I retry.
+		status, err = libraries.CreateStatusContextFromIndex(index, nil, nil)
+		if err != nil {
+			if GlobalFlags.Verbose > 0 {
+				fmt.Println("ERROR")
+			}
+			fmt.Println("Cannot parse downloaded index file")
+			return nil
+		}
+		if GlobalFlags.Verbose > 0 {
+			fmt.Println("OK")
+		}
 	}
 
 	found := false
 
 	//Pretty print libraries from index.
-	for _, name := range libraries.Names() {
-		if strings.Contains(name, query) {
+	for _, name := range status.Names() {
+		if strings.Contains(strings.ToLower(name), query) {
 			found = true
 			if GlobalFlags.Verbose > 0 {
-				lib := libraries.Libraries[name]
+				lib := status.Libraries[name]
 				fmt.Print(lib)
 				if GlobalFlags.Verbose > 1 {
 					for _, r := range lib.Releases {

@@ -27,52 +27,63 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package common
+package libraries
 
 import (
+	"archive/zip"
+	"bytes"
 	"fmt"
-	"os/user"
+	"io/ioutil"
 	"path/filepath"
-	"runtime"
+
+	"github.com/bcmi-labs/arduino-cli/common"
 )
 
-// GetDefaultArduinoFolder returns the default data folder for Arduino platform
-func GetDefaultArduinoFolder() (string, error) {
-	var folder string
-
-	usr, err := user.Current()
+// DownloadAndInstall downloads a library and installs it to its specified location.
+func DownloadAndInstall(library *Library) error {
+	libFolder, err := common.GetDefaultLibFolder()
 	if err != nil {
-		return "", err
+		return fmt.Errorf("Cannot get Lib destination directory")
 	}
 
-	switch runtime.GOOS {
-	case "linux":
-		folder = filepath.Join(usr.HomeDir, ".arduino15")
-	case "darwin":
-		folder = filepath.Join(usr.HomeDir, "Library", "arduino15")
-	default:
-		return "", fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
+	zipContent, err := downloadLatest(library)
+	if err != nil {
+		return err
 	}
-	return GetFolder(folder, "default arduino")
+
+	zipArchive, err := prepareInstall(library, zipContent)
+	if err != nil {
+		return err
+	}
+
+	err = install(zipArchive, libFolder)
+	if err != nil {
+		return err
+	}
+
+	//add postinstall here? for verbose maybe
+
+	return nil
 }
 
-// GetDefaultLibFolder get the default folder of downloaded libraries.
-func GetDefaultLibFolder() (string, error) {
-	baseFolder, err := GetDefaultArduinoHomeFolder()
+// prepareInstall move a downloaded library to a cache folder, before installation.
+func prepareInstall(library *Library, body []byte) (*zip.Reader, error) {
+	reader := bytes.NewReader(body)
+
+	archive, err := zip.NewReader(reader, int64(reader.Len()))
 	if err != nil {
-		return "", err
+		return nil, fmt.Errorf("Cannot read downloaded archive")
 	}
 
-	libFolder := filepath.Join(baseFolder, "libraries")
-	return GetFolder(libFolder, "libraries")
-}
-
-// GetDefaultArduinoHomeFolder gets the home directory for arduino CLI.
-func GetDefaultArduinoHomeFolder() (string, error) {
-	usr, err := user.Current()
+	// if I can read the archive I save it to staging folder.
+	stagingFolder, err := getDownloadCacheFolder(library)
 	if err != nil {
-		return "", err
+		return nil, fmt.Errorf("Cannot get download cache folder")
 	}
-	homeFolder := filepath.Join(usr.HomeDir, "Arduino")
-	return GetFolder(homeFolder, "Arduino home")
+
+	err = ioutil.WriteFile(filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, library.Latest.Version)), body, 0666)
+	if err != nil {
+		return nil, fmt.Errorf("Cannot write download to cache folder, %s", err.Error())
+	}
+	return archive, nil
 }

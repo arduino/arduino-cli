@@ -27,19 +27,42 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package cmd
+package libraries
 
 import (
-	"github.com/spf13/cobra"
+	"archive/zip"
+	"fmt"
+	"path/filepath"
+
+	"github.com/bcmi-labs/arduino-cli/common"
 )
 
-// LibRoot represents the libs command
-var LibRoot = &cobra.Command{
-	Use:   "lib",
-	Short: "Shows all commands regarding libraries.",
-	Long:  `Shows all commands regarding libraries.`,
+var install func(*zip.Reader, string) error = common.Unzip
+var Uninstall func(string) error = common.TruncateDir
+
+func downloadLatest(library *Library) ([]byte, error) {
+	return common.DownloadPackage(library.Latest.URL)
 }
 
-func init() {
-	RootCmd.AddCommand(LibRoot)
+// getDownloadCacheFolder gets the folder where temp installs are stored until installation complete (libraries).
+func getDownloadCacheFolder(library *Library) (string, error) {
+	libFolder, err := common.GetDefaultLibFolder()
+	if err != nil {
+		return "", err
+	}
+
+	stagingFolder := filepath.Join(libFolder, ".download-cache")
+	return common.GetFolder(stagingFolder, "libraries cache")
+}
+
+// getLibFolder returns the destination folder of the downloaded specified library.
+// It creates the folder if does not find it.
+func getLibFolder(library *Library) (string, error) {
+	baseFolder, err := common.GetDefaultLibFolder()
+	if err != nil {
+		return "", err
+	}
+
+	libFolder := filepath.Join(baseFolder, fmt.Sprintf("%s-%s", library.Name, library.Latest.Version))
+	return common.GetFolder(libFolder, "library")
 }

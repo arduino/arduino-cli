@@ -27,52 +27,29 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package common
+package libCmd
 
 import (
 	"fmt"
-	"os/user"
-	"path/filepath"
-	"runtime"
+
+	"github.com/spf13/cobra"
 )
 
-// GetDefaultArduinoFolder returns the default data folder for Arduino platform
-func GetDefaultArduinoFolder() (string, error) {
-	var folder string
+const (
+	// LibVersion represents the `arduino lib` package version number.
+	LibVersion string = "0.0.1-pre-alpha"
+)
 
-	usr, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-
-	switch runtime.GOOS {
-	case "linux":
-		folder = filepath.Join(usr.HomeDir, ".arduino15")
-	case "darwin":
-		folder = filepath.Join(usr.HomeDir, "Library", "arduino15")
-	default:
-		return "", fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
-	}
-	return GetFolder(folder, "default arduino")
+func init() {
+	LibRoot.AddCommand(libVersionCmd)
 }
 
-// GetDefaultLibFolder get the default folder of downloaded libraries.
-func GetDefaultLibFolder() (string, error) {
-	baseFolder, err := GetDefaultArduinoHomeFolder()
-	if err != nil {
-		return "", err
-	}
-
-	libFolder := filepath.Join(baseFolder, "libraries")
-	return GetFolder(libFolder, "libraries")
-}
-
-// GetDefaultArduinoHomeFolder gets the home directory for arduino CLI.
-func GetDefaultArduinoHomeFolder() (string, error) {
-	usr, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-	homeFolder := filepath.Join(usr.HomeDir, "Arduino")
-	return GetFolder(homeFolder, "Arduino home")
+// LibVersionCmd represents the version command.
+var libVersionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Shows version Number of arduino lib",
+	Long:  `Shows version Number of arduino lib which is installed on your system.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Printf("arduino lib V. %s\n", LibsVersion)
+	},
 }
