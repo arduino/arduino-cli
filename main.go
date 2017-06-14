@@ -28,10 +28,9 @@
  */
 package main
 
-import (
-	"github.com/bcmi-labs/arduino-cli/cmd"
-)
+import "github.com/bcmi-labs/arduino-cli/docs"
 
 func main() {
-	cmd.Execute()
+	//cmd.Execute()
+	docs.GenerateManPages()
 }
