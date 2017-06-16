@@ -249,10 +249,13 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 				indexFile := filepath.Join(libFolder, file.Name(), "library.properties")
 				_, err = os.Stat(indexFile)
 				if os.IsNotExist(err) {
+					fileName := file.Name()
+					//replacing underscore in foldernames with spaces.
+					strings.Replace(fileName, "_", " ", 0)
 					//I use folder name
-					if strings.Contains(file.Name(), library) {
+					if strings.Contains(fileName, library) {
 						//found
-						err = libraries.Uninstall(filepath.Join(libFolder, file.Name()))
+						err = libraries.Uninstall(filepath.Join(libFolder, fileName))
 						if err != nil {
 							libraryFails = append(libraryFails, library)
 						} else {
@@ -270,11 +273,11 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 					// create map from content
 					scanner := bufio.NewScanner(content)
 					for scanner.Scan() {
-						line := strings.Split(scanner.Text(), "=")
+						lines := strings.Split(scanner.Text(), "=")
 						// NOTE: asserting that if there is a library.properties, there is always the
 						// name of the library.
-						if line[0] == "name" {
-							if strings.Contains(line[1], library) {
+						if lines[0] == "name" {
+							if strings.Contains(lines[1], library) {
 								//found
 								err = libraries.Uninstall(filepath.Join(libFolder, file.Name()))
 								if err != nil {
