@@ -24,6 +24,7 @@ func DownloadAndCache(library *Library) (*zip.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return zipArchive, nil
 }
 
@@ -64,7 +65,7 @@ func DownloadLibrariesFile() error {
 }
 
 // getDownloadCacheFolder gets the folder where temp installs are stored until installation complete (libraries).
-func getDownloadCacheFolder(library *Library) (string, error) {
+func getDownloadCacheFolder() (string, error) {
 	libFolder, err := common.GetDefaultArduinoHomeFolder()
 	if err != nil {
 		return "", err

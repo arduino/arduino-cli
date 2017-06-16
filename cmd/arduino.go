@@ -60,6 +60,19 @@ var arduinoCmd = &cobra.Command{
 	Long:  "Arduino Create Command Line Interface (arduino-cli)",
 }
 
+// arduinoVersionCmd represents the version command.
+var arduinoVersionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Shows version Number of arduino",
+	Long:  `Shows version Number of arduino which is installed on your system.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Printf("arduino V. %s\n", ArduinoVersion)
+		if GlobalFlags.Verbose > 0 {
+			fmt.Printf("arduino V. %s\n", LibVersion)
+		}
+	},
+}
+
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
@@ -73,8 +86,9 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	arduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
-
 	arduinoCmd.Flags().StringVar(&rootCmdFlags.ConfigFile, "config", "", "config file (default is $HOME/.arduino-cli.yaml)")
+
+	arduinoCmd.AddCommand(arduinoVersionCmd)
 }
 
 // initConfig reads in config file and ENV variables if set.

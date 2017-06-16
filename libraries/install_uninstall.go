@@ -34,6 +34,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
@@ -51,7 +52,29 @@ func DownloadAndInstall(library *Library) error {
 		return fmt.Errorf("Cannot get Lib destination directory")
 	}
 
-	zipArchive, err := DownloadAndCache(library)
+	stagingFolder, err := getDownloadCacheFolder()
+	cacheFilePath := filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, library.Latest.Version))
+
+	var zipArchive *zip.Reader
+
+	_, err = os.Stat(cacheFilePath)
+	if os.IsNotExist(err) {
+		zipArchive, err = DownloadAndCache(library)
+		if err != nil {
+			return err
+		}
+	} else {
+		fmt.Printf("%s library found in cache downloads ... using cached zip archive\n", library.Name)
+		content, err := ioutil.ReadFile(cacheFilePath)
+		if err != nil {
+			return err
+		}
+
+		zipArchive, err = zip.NewReader(bytes.NewReader(content), int64(len(content)))
+		if err != nil {
+			return err
+		}
+	}
 
 	err = install(zipArchive, libFolder)
 	if err != nil {
@@ -73,7 +96,7 @@ func prepareInstall(library *Library, body []byte) (*zip.Reader, error) {
 	}
 
 	// if I can read the archive I save it to staging folder.
-	stagingFolder, err := getDownloadCacheFolder(library)
+	stagingFolder, err := getDownloadCacheFolder()
 	if err != nil {
 		return nil, fmt.Errorf("Cannot get download cache folder")
 	}
