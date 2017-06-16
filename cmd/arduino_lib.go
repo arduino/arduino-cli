@@ -32,6 +32,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -231,24 +232,40 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 	libraryFails := make([]string, 0, len(args))
 	libraryOK := make([]string, 0, len(args))
 
-	dirFiles, err := dir.Readdirnames(0)
+	dirFiles, err := dir.Readdir(0)
 	if err != nil {
 		fmt.Println("Cannot read into libraries folder")
 		return nil
 	}
 
-	for _, fileName := range dirFiles {
+	//TODO : remove only one version
+	for _, file := range dirFiles {
 		for _, library := range args {
-			if strings.Contains(fileName, library) {
-				//found
-				//TODO : remove only one version
-				err = libraries.Uninstall(filepath.Join(libFolder, fileName))
-				if err != nil {
-					libraryFails = append(libraryFails, library)
+			if file.IsDir() {
+				indexFile := filepath.Join(libFolder, file.Name(), "library.properties")
+				_, err = os.Stat(indexFile)
+				if os.IsNotExist(err) {
+					//I use folder name
+					if strings.Contains(file.Name(), library) {
+						//found
+						err = libraries.Uninstall(filepath.Join(libFolder, file.Name()))
+						if err != nil {
+							libraryFails = append(libraryFails, library)
+						} else {
+							libraryOK = append(libraryOK, library)
+						}
+					}
 				} else {
-					libraryOK = append(libraryOK, library)
+					//I use library.properties file
+					content, err := ioutil.ReadFile(indexFile)
+					if err != nil {
+						libraryFails = append(libraryFails, library)
+					}
+
 				}
+
 			}
+
 		}
 	}
 
