@@ -30,9 +30,9 @@
 package cmd
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -238,6 +238,10 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
+	//TODO: optimize this algorithm
+	// time complexity O(libraries_to_install(from RAM) *
+	//                   library_folder_number(from DISK) *
+	//                   library_folder_file_number (from DISK))
 	//TODO : remove only one version
 	for _, file := range dirFiles {
 		for _, library := range args {
@@ -256,16 +260,38 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 						}
 					}
 				} else {
-					//I use library.properties file
-					content, err := ioutil.ReadFile(indexFile)
+					// I use library.properties file
+					content, err := os.OpenFile(indexFile, os.O_RDONLY, 0666)
 					if err != nil {
 						libraryFails = append(libraryFails, library)
+						continue
 					}
 
+					// create map from content
+					scanner := bufio.NewScanner(content)
+					for scanner.Scan() {
+						line := strings.Split(scanner.Text(), "=")
+						// NOTE: asserting that if there is a library.properties, there is always the
+						// name of the library.
+						if line[0] == "name" {
+							if strings.Contains(line[1], library) {
+								//found
+								err = libraries.Uninstall(filepath.Join(libFolder, file.Name()))
+								if err != nil {
+									libraryFails = append(libraryFails, library)
+								} else {
+									libraryOK = append(libraryOK, library)
+								}
+							}
+							break
+						}
+					}
+
+					if err := scanner.Err(); err != nil {
+						libraryFails = append(libraryFails, library)
+					}
 				}
-
 			}
-
 		}
 	}
 

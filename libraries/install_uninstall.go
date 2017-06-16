@@ -42,8 +42,8 @@ import (
 
 var install func(*zip.Reader, string) error = common.Unzip
 
-// Uninstall a library means truncate the directory.
-var Uninstall func(string) error = common.TruncateDir
+// Uninstall a library means remove its directory.
+var Uninstall func(libraryFolder string) error = os.RemoveAll
 
 // DownloadAndInstall downloads a library and installs it to its specified location.
 func DownloadAndInstall(library *Library) error {
