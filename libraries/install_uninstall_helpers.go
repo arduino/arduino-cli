@@ -38,22 +38,9 @@ import (
 )
 
 var install func(*zip.Reader, string) error = common.Unzip
+
+// Uninstall a library means truncate the directory.
 var Uninstall func(string) error = common.TruncateDir
-
-func downloadLatest(library *Library) ([]byte, error) {
-	return common.DownloadPackage(library.Latest.URL)
-}
-
-// getDownloadCacheFolder gets the folder where temp installs are stored until installation complete (libraries).
-func getDownloadCacheFolder(library *Library) (string, error) {
-	libFolder, err := common.GetDefaultLibFolder()
-	if err != nil {
-		return "", err
-	}
-
-	stagingFolder := filepath.Join(libFolder, ".download-cache")
-	return common.GetFolder(stagingFolder, "libraries cache")
-}
 
 // getLibFolder returns the destination folder of the downloaded specified library.
 // It creates the folder if does not find it.

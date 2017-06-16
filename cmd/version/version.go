@@ -39,14 +39,14 @@ import (
 	lib "github.com/bcmi-labs/arduino-cli/cmd/lib"
 )
 
-// CliVersionCmd represents the version command.
-var CliVersionCmd = &cobra.Command{
+// cliVersionCmd represents the version command.
+var cliVersionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Shows version Number of arduino",
 	Long:  `Shows version Number of arduino which is installed on your system.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("arduino V. %s\n", arduino.ArduinoVersion)
-		if rootCmd.GlobalFlags.Verbose > 0 {
+		if arduino.GlobalFlags.Verbose > 0 {
 			fmt.Printf("arduino V. %s\n", lib.LibVersion)
 		}
 	},
@@ -65,6 +65,5 @@ func ancestorsBreadcrumb(cmd *cobra.Command) string {
 }
 
 func init() {
-	RootCmd.AddCommand(CliVersionCmd)
-	//LibRoot.AddCommand(LibVersionCmd)
+	arduino.RootCmd.AddCommand(cliVersionCmd)
 }

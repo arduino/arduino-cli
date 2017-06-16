@@ -46,15 +46,7 @@ func DownloadAndInstall(library *Library) error {
 		return fmt.Errorf("Cannot get Lib destination directory")
 	}
 
-	zipContent, err := downloadLatest(library)
-	if err != nil {
-		return err
-	}
-
-	zipArchive, err := prepareInstall(library, zipContent)
-	if err != nil {
-		return err
-	}
+	zipArchive, err := DownloadAndCache(library)
 
 	err = install(zipArchive, libFolder)
 	if err != nil {
