@@ -120,30 +120,9 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 
 	status, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
 	if err != nil {
-		if GlobalFlags.Verbose > 0 {
-			fmt.Println("Cannot parse index file, it may be corrupted.")
-		}
-
-		err = prettyPrintDownloadFileIndex()
+		status, err = prettyPrintCorruptedIndexFix(index)
 		if err != nil {
 			return nil
-		}
-
-		if GlobalFlags.Verbose > 0 {
-			fmt.Print("Parsing downloaded index file ... ")
-		}
-
-		//after download, I retry.
-		status, err = libraries.CreateStatusContextFromIndex(index, nil, nil)
-		if err != nil {
-			if GlobalFlags.Verbose > 0 {
-				fmt.Println("ERROR")
-			}
-			fmt.Println("Cannot parse downloaded index file")
-			return nil
-		}
-		if GlobalFlags.Verbose > 0 {
-			fmt.Println("OK")
 		}
 	}
 

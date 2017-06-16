@@ -80,10 +80,6 @@ func executeListCommand(command *cobra.Command, args []string) {
 	//If it exists but it is corrupt replace it from arduino repository.
 	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
-		if GlobalFlags.Verbose > 0 {
-			fmt.Print("Index file is corrupt ... ")
-		}
-
 		err = prettyPrintDownloadFileIndex()
 		if err != nil {
 			return
@@ -96,35 +92,11 @@ func executeListCommand(command *cobra.Command, args []string) {
 		}
 	}
 
-	//fmt.Printf("libFile = %s\n", libFile)
-	//fmt.Printf("index = %v\n", index)
-
 	status, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
 	if err != nil {
-		if GlobalFlags.Verbose > 0 {
-			fmt.Println("Cannot parse index file, it may be corrupted ...")
-		}
-
-		err = prettyPrintDownloadFileIndex()
+		status, err = prettyPrintCorruptedIndexFix(index)
 		if err != nil {
 			return
-		}
-
-		if GlobalFlags.Verbose > 0 {
-			fmt.Print("Parsing downloaded index file ... ")
-		}
-
-		//after download, I retry.
-		status, err = libraries.CreateStatusContextFromIndex(index, nil, nil)
-		if err != nil {
-			if GlobalFlags.Verbose > 0 {
-				fmt.Println("ERROR")
-			}
-			fmt.Println("Cannot parse downloaded index file")
-			return
-		}
-		if GlobalFlags.Verbose > 0 {
-			fmt.Println("OK")
 		}
 	}
 
@@ -157,6 +129,7 @@ func prettyPrintDownloadFileIndex() error {
 	if GlobalFlags.Verbose > 0 {
 		fmt.Print("Downloading a new index file from download.arduino.cc ... ")
 	}
+
 	err := libraries.DownloadLibrariesFile()
 	if err != nil {
 		if GlobalFlags.Verbose > 0 {
@@ -165,8 +138,10 @@ func prettyPrintDownloadFileIndex() error {
 		fmt.Println("Cannot download index file, check your network connection.")
 		return err
 	}
+
 	if GlobalFlags.Verbose > 0 {
 		fmt.Println("OK")
 	}
+
 	return nil
 }
