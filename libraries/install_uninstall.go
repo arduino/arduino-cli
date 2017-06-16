@@ -39,6 +39,11 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common"
 )
 
+var install func(*zip.Reader, string) error = common.Unzip
+
+// Uninstall a library means truncate the directory.
+var Uninstall func(string) error = common.TruncateDir
+
 // DownloadAndInstall downloads a library and installs it to its specified location.
 func DownloadAndInstall(library *Library) error {
 	libFolder, err := common.GetDefaultLibFolder()
@@ -78,4 +83,16 @@ func prepareInstall(library *Library, body []byte) (*zip.Reader, error) {
 		return nil, fmt.Errorf("Cannot write download to cache folder, %s", err.Error())
 	}
 	return archive, nil
+}
+
+// getLibFolder returns the destination folder of the downloaded specified library.
+// It creates the folder if does not find it.
+func getLibFolder(library *Library) (string, error) {
+	baseFolder, err := common.GetDefaultLibFolder()
+	if err != nil {
+		return "", err
+	}
+
+	libFolder := filepath.Join(baseFolder, fmt.Sprintf("%s-%s", library.Name, library.Latest.Version))
+	return common.GetFolder(libFolder, "library")
 }

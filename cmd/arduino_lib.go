@@ -111,7 +111,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 
 	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
-		fmt.Print("Cannot find index file, downloading from downloads.arduino.cc ... ")
+		fmt.Print("Cannot find index file ... ")
 		err = prettyPrintDownloadFileIndex()
 		if err != nil {
 			return nil
@@ -334,9 +334,14 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 
 func prettyPrintInstall(libraryOK []string, libraryFails map[string]string) {
 	if len(libraryFails) > 0 {
-		fmt.Println("The following libraries were succesfully installed:")
-		fmt.Println(strings.Join(libraryOK, " "))
-		fmt.Println("However, the installation process failed on the following libraries:")
+		if len(libraryOK) > 0 {
+			fmt.Println("The following libraries were succesfully installed:")
+			fmt.Println(strings.Join(libraryOK, " "))
+			fmt.Print("However, t")
+		} else { //UGLYYYY but it works
+			fmt.Print("T")
+		}
+		fmt.Println("he installation process failed on the following libraries:")
 		for library, failure := range libraryFails {
 			fmt.Printf("%s - %s\n", library, failure)
 		}
@@ -345,11 +350,17 @@ func prettyPrintInstall(libraryOK []string, libraryFails map[string]string) {
 	}
 }
 
+//TODO: remove copypasting from prettyPrintInstall and merge them in a single function
 func prettyPrintDownload(libraryOK []string, libraryFails map[string]string) {
 	if len(libraryFails) > 0 {
-		fmt.Println("The following libraries were succesfully downloaded:")
-		fmt.Println(strings.Join(libraryOK, " "))
-		fmt.Println("However, the download failed on the following libraries:")
+		if len(libraryOK) > 0 {
+			fmt.Println("The following libraries were succesfully downloaded:")
+			fmt.Println(strings.Join(libraryOK, " "))
+			fmt.Print("However, t")
+		} else { //UGLYYYY but it works
+			fmt.Print("T")
+		}
+		fmt.Println("he download of the following libraries failed:")
 		for library, failure := range libraryFails {
 			fmt.Printf("%s - %s\n", library, failure)
 		}
