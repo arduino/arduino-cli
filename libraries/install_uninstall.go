@@ -34,10 +34,16 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
 )
+
+var install func(*zip.Reader, string) error = common.Unzip
+
+// Uninstall a library means remove its directory.
+var Uninstall func(libraryFolder string) error = os.RemoveAll
 
 // DownloadAndInstall downloads a library and installs it to its specified location.
 func DownloadAndInstall(library *Library) error {
@@ -46,14 +52,28 @@ func DownloadAndInstall(library *Library) error {
 		return fmt.Errorf("Cannot get Lib destination directory")
 	}
 
-	zipContent, err := downloadLatest(library)
-	if err != nil {
-		return err
-	}
+	stagingFolder, err := getDownloadCacheFolder()
+	cacheFilePath := filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, library.Latest.Version))
 
-	zipArchive, err := prepareInstall(library, zipContent)
-	if err != nil {
-		return err
+	var zipArchive *zip.Reader
+
+	_, err = os.Stat(cacheFilePath)
+	if os.IsNotExist(err) {
+		zipArchive, err = DownloadAndCache(library)
+		if err != nil {
+			return err
+		}
+	} else {
+		fmt.Printf("%s library found in cache downloads ... using cached zip archive\n", library.Name)
+		content, err := ioutil.ReadFile(cacheFilePath)
+		if err != nil {
+			return err
+		}
+
+		zipArchive, err = zip.NewReader(bytes.NewReader(content), int64(len(content)))
+		if err != nil {
+			return err
+		}
 	}
 
 	err = install(zipArchive, libFolder)
@@ -76,7 +96,7 @@ func prepareInstall(library *Library, body []byte) (*zip.Reader, error) {
 	}
 
 	// if I can read the archive I save it to staging folder.
-	stagingFolder, err := getDownloadCacheFolder(library)
+	stagingFolder, err := getDownloadCacheFolder()
 	if err != nil {
 		return nil, fmt.Errorf("Cannot get download cache folder")
 	}
@@ -86,4 +106,16 @@ func prepareInstall(library *Library, body []byte) (*zip.Reader, error) {
 		return nil, fmt.Errorf("Cannot write download to cache folder, %s", err.Error())
 	}
 	return archive, nil
+}
+
+// getLibFolder returns the destination folder of the downloaded specified library.
+// It creates the folder if does not find it.
+func getLibFolder(library *Library) (string, error) {
+	baseFolder, err := common.GetDefaultLibFolder()
+	if err != nil {
+		return "", err
+	}
+
+	libFolder := filepath.Join(baseFolder, fmt.Sprintf("%s-%s", library.Name, library.Latest.Version))
+	return common.GetFolder(libFolder, "library")
 }

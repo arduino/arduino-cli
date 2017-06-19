@@ -89,7 +89,7 @@ func (l *StatusContext) AddLibrary(indexLib *IndexRelease) {
 	}
 }
 
-// Names returns an array with all the names of the registered libraries
+// Names returns an array with all the names of the registered libraries.
 func (l *StatusContext) Names() []string {
 	res := make([]string, len(l.Libraries))
 	i := 0

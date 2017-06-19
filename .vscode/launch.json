@@ -1,0 +1,54 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Launch no args",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceRoot}/main.go",
+            "showLog": true
+        }, 
+        {
+            "name": "Launch LIB no args",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceRoot}/main.go",
+            "env": {},
+            "args": ["lib"],
+            "showLog": true
+        },
+        {
+            "name": "Launch LIB LIST",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceRoot}/main.go",
+            "env": {},
+            "args": ["lib", "list"],
+            "showLog": true
+        },
+        {
+            "name": "Launch LIB LIST UPDATE",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceRoot}/main.go",
+            "env": {},
+            "args": ["lib", "list", "update", "-v"],
+            "showLog": true
+        },
+        {
+            "name": "Launch LIB INSTALL",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceRoot}/main.go",
+            "env": {},
+            "args": ["lib", "install", "YoutubeApi"],
+            "showLog": true
+        }
+    ]
+}
