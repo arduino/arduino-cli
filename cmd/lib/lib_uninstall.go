@@ -27,7 +27,7 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package cmd
+package libCmd
 
 import (
 	"fmt"

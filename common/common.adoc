@@ -1,16 +1,20 @@
 = Common
+Alessandro Sanino <a.sanino@bcmi-lbs.cc>
 
 Contains common functions regarding all the environment
 
 == Here some useful info regarding common entities
 
-```
+[source, bash]
+----
 CLI_HOME = $HOME/.arduino15 (linux)
 CLI_HOME = $HOME/Library/arduino15 (OSX)
 
-LIB_HOME = $CLI_HOME/libraries
+SKETCH_HOME = $HOME/Arduino
+
+LIB_HOME = $SKETCH_HOME/libraries
 
 LIB_FOLDER = $LIB_HOME/LIB_NAME-LIB_VERSION
 
-LIB_CACHE = $LIB_HOME/.download-cache
-```
+LIB_CACHE = $LIB_HOME/staging
+----

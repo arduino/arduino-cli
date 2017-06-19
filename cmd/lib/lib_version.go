@@ -27,19 +27,29 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package cmd
+package libCmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
-// LibRoot represents the libs command
-var LibRoot = &cobra.Command{
-	Use:   "lib",
-	Short: "Shows all commands regarding libraries.",
-	Long:  `Shows all commands regarding libraries.`,
-}
+const (
+	// LibVersion represents the `arduino lib` package version number.
+	LibVersion string = "0.0.1-pre-alpha"
+)
 
 func init() {
-	RootCmd.AddCommand(LibRoot)
+	LibRoot.AddCommand(libVersionCmd)
+}
+
+// LibVersionCmd represents the version command.
+var libVersionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Shows version Number of arduino lib",
+	Long:  `Shows version Number of arduino lib which is installed on your system.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Printf("arduino lib V. %s\n", LibsVersion)
+	},
 }
