@@ -31,7 +31,6 @@ package libraries
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
@@ -65,7 +64,6 @@ type IndexRelease struct {
 func IndexPath() (string, error) {
 	baseFolder, err := common.GetDefaultArduinoFolder()
 	if err != nil {
-		fmt.Printf("Could not determine data folder: %s", err)
 		return "", err
 	}
 	return filepath.Join(baseFolder, "library_index.json"), nil

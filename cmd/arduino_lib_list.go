@@ -30,10 +30,15 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
+	"strings"
 
 	"os"
 
+	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/spf13/cobra"
 )
@@ -41,8 +46,8 @@ import (
 // arduinoLibListCmd represents the list libraries command.
 var arduinoLibListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "Shows a list of all libraries from arduino repository.",
-	Long: `Shows a list of all libraries from arduino repository.
+	Short: "Shows a list of all installed libraries",
+	Long: `Shows a list of all installed libraries.
 Can be used with -v (or --verbose) flag (up to 2 times) to have longer output.`,
 	Run: executeListCommand,
 }
@@ -61,87 +66,84 @@ func init() {
 }
 
 func executeListCommand(command *cobra.Command, args []string) {
-	//fmt.Println("libs list:", args)
-	//fmt.Println("long =", libListCmdFlags.Long)
-	libFile, _ := libraries.IndexPath()
-
-	//If it doesn't exist download it
-	if _, err := os.Stat(libFile); os.IsNotExist(err) {
-		if GlobalFlags.Verbose > 0 {
-			fmt.Println("Index file not found ... ")
-		}
-
-		err = prettyPrintDownloadFileIndex()
-		if err != nil {
-			return
-		}
-	}
-
-	//If it exists but it is corrupt replace it from arduino repository.
-	index, err := libraries.LoadLibrariesIndex()
+	libHome, err := common.GetDefaultLibFolder()
 	if err != nil {
-		err = prettyPrintDownloadFileIndex()
-		if err != nil {
-			return
-		}
-
-		index, err = libraries.LoadLibrariesIndex()
-		if err != nil {
-			fmt.Println("Cannot parse index file")
-			return
-		}
+		fmt.Println("Cannot get libraries folder")
+		return
 	}
 
-	status, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
+	//prettyPrintStatus(status)
+	dir, err := os.Open(libHome)
 	if err != nil {
-		status, err = prettyPrintCorruptedIndexFix(index)
-		if err != nil {
-			return
-		}
+		fmt.Println("Cannot open libraries folder")
+		return
 	}
 
-	prettyPrintStatus(status)
-}
+	dirFiles, err := dir.Readdir(0)
+	if err != nil {
+		fmt.Println("Cannot read into libraries folder")
+		return
+	}
 
-func prettyPrintStatus(status *libraries.StatusContext) {
-	//Pretty print libraries from index.
-	for _, name := range status.Names() {
-		if GlobalFlags.Verbose > 0 {
-			lib := status.Libraries[name]
-			fmt.Print(lib)
-			if GlobalFlags.Verbose > 1 {
-				for _, r := range lib.Releases {
-					fmt.Print(r)
+	libs := make([]string, 0, 10)
+
+	//TODO: optimize this algorithm
+	// time complexity O(libraries_to_install(from RAM) *
+	//                   library_folder_number(from DISK) *
+	//                   library_folder_file_number (from DISK))
+	//TODO : remove only one version
+	for _, file := range dirFiles {
+		if file.IsDir() {
+			indexFile := filepath.Join(libHome, file.Name(), "library.properties")
+			_, err = os.Stat(indexFile)
+			if os.IsNotExist(err) {
+				fileName := file.Name()
+				//replacing underscore in foldernames with spaces.
+				fileName = strings.Replace(fileName, "_", " ", -1)
+				fileName = strings.Replace(fileName, "-", " v. ", -1)
+				//I use folder name
+				libs = append(libs, fileName)
+			} else {
+				// I use library.properties file
+				content, err := ioutil.ReadFile(indexFile)
+				if err != nil {
+					fileName := file.Name()
+					//replacing underscore in foldernames with spaces.
+					fileName = strings.Replace(fileName, "_", " ", -1)
+					fileName = strings.Replace(fileName, "-", " v. ", -1)
+					//I use folder name
+					libs = append(libs, fileName)
+					continue
+				}
+
+				var jsonContent libraries.IndexRelease
+				err = json.Unmarshal(content, &jsonContent)
+				if err != nil {
+					//I use library name
+					fileName := file.Name()
+					//replacing underscore in foldernames with spaces.
+					fileName = strings.Replace(fileName, "_", " ", -1)
+					fileName = strings.Replace(fileName, "-", " v. ", -1)
+					//I use folder name
+					libs = append(libs, fileName)
+					continue
+				} else {
+					libs = append(libs, fmt.Sprintf("%s v. %s", jsonContent.Name, jsonContent.Version))
 				}
 			}
-			fmt.Println()
-		} else {
-			fmt.Println(name)
+		}
+	}
+
+	if len(libs) < 1 {
+		fmt.Println("No library installed")
+	} else {
+		//pretty prints installed libraries
+		for _, item := range libs {
+			fmt.Println(item)
 		}
 	}
 }
 
 func execUpdateListIndex(cmd *cobra.Command, args []string) {
 	prettyPrintDownloadFileIndex()
-}
-
-func prettyPrintDownloadFileIndex() error {
-	if GlobalFlags.Verbose > 0 {
-		fmt.Print("Downloading a new index file from download.arduino.cc ... ")
-	}
-
-	err := libraries.DownloadLibrariesFile()
-	if err != nil {
-		if GlobalFlags.Verbose > 0 {
-			fmt.Println("ERROR")
-		}
-		fmt.Println("Cannot download index file, check your network connection.")
-		return err
-	}
-
-	if GlobalFlags.Verbose > 0 {
-		fmt.Println("OK")
-	}
-
-	return nil
 }

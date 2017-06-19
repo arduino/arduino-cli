@@ -50,8 +50,8 @@ const (
 // arduinoLibCmd represents the libs command
 var arduinoLibCmd = &cobra.Command{
 	Use:   "lib",
-	Short: "Shows all commands regarding libraries.",
-	Long:  `Shows all commands regarding libraries.`,
+	Short: "Arduino commands about libraries",
+	Long:  `Arduino commands about libraries`,
 }
 
 // arduinoLibInstallCmd represents the lib install command.
@@ -64,7 +64,7 @@ var arduinoLibInstallCmd = &cobra.Command{
 
 // arduinoLibUninstallCmd represents the uninstall command
 var arduinoLibUninstallCmd = &cobra.Command{
-	Use:   "uninstall",
+	Use:   "uninstall [LIBRARY_NAME(S)]",
 	Short: "Uninstalls one or more libraries",
 	Long:  `Uninstalls one or more libraries`,
 	RunE:  executeUninstallCommand,
@@ -251,7 +251,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 				if os.IsNotExist(err) {
 					fileName := file.Name()
 					//replacing underscore in foldernames with spaces.
-					strings.Replace(fileName, "_", " ", 0)
+					fileName = strings.Replace(fileName, "_", " ", -1)
 					//I use folder name
 					if strings.Contains(fileName, library) {
 						//found
@@ -376,75 +376,4 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
-}
-
-func prettyPrintInstall(libraryOK []string, libraryFails map[string]string) {
-	if len(libraryFails) > 0 {
-		if len(libraryOK) > 0 {
-			fmt.Println("The following libraries were succesfully installed:")
-			fmt.Println(strings.Join(libraryOK, " "))
-			fmt.Print("However, t")
-		} else { //UGLYYYY but it works
-			fmt.Print("T")
-		}
-		fmt.Println("he installation process failed on the following libraries:")
-		for library, failure := range libraryFails {
-			fmt.Printf("%s - %s\n", library, failure)
-		}
-	} else {
-		fmt.Println("All libraries successfully installed")
-	}
-}
-
-//TODO: remove copypasting from prettyPrintInstall and merge them in a single function
-func prettyPrintDownload(libraryOK []string, libraryFails map[string]string) {
-	if len(libraryFails) > 0 {
-		if len(libraryOK) > 0 {
-			fmt.Println("The following libraries were succesfully downloaded:")
-			fmt.Println(strings.Join(libraryOK, " "))
-			fmt.Print("However, t")
-		} else { //UGLYYYY but it works
-			fmt.Print("T")
-		}
-		fmt.Println("he download of the following libraries failed:")
-		for library, failure := range libraryFails {
-			fmt.Printf("%s - %s\n", library, failure)
-		}
-	} else {
-		fmt.Println("All libraries successfully downloaded")
-	}
-}
-
-func prettyPrintCorruptedIndexFix(index *libraries.Index) (*libraries.StatusContext, error) {
-	if GlobalFlags.Verbose > 0 {
-		fmt.Println("Cannot parse index file, it may be corrupted.")
-	}
-
-	err := prettyPrintDownloadFileIndex()
-	if err != nil {
-		return nil, err
-	}
-
-	return prettyIndexParse(index)
-}
-
-func prettyIndexParse(index *libraries.Index) (*libraries.StatusContext, error) {
-	if GlobalFlags.Verbose > 0 {
-		fmt.Print("Parsing downloaded index file ... ")
-	}
-
-	//after download, I retry.
-	status, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
-	if err != nil {
-		if GlobalFlags.Verbose > 0 {
-			fmt.Println("ERROR")
-		}
-		fmt.Println("Cannot parse index file")
-		return nil, err
-	}
-	if GlobalFlags.Verbose > 0 {
-		fmt.Println("OK")
-	}
-
-	return status, nil
 }
