@@ -31,9 +31,7 @@ package libraries
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
-	"net/http"
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
@@ -66,7 +64,6 @@ type IndexRelease struct {
 func IndexPath() (string, error) {
 	baseFolder, err := common.GetDefaultArduinoFolder()
 	if err != nil {
-		fmt.Printf("Could not determine data folder: %s", err)
 		return "", err
 	}
 	return filepath.Join(baseFolder, "library_index.json"), nil
@@ -91,37 +88,6 @@ func LoadLibrariesIndex() (*Index, error) {
 	}
 
 	return &index, nil
-}
-
-//DownloadLibrariesFile downloads the lib file from arduino repository.
-func DownloadLibrariesFile() error {
-	libFile, err := IndexPath()
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("GET", "http://downloads.arduino.cc/libraries/library_index.json", nil)
-	if err != nil {
-		return err
-	}
-
-	client := http.DefaultClient
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile(libFile, content, 0666)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // ExtractRelease create a new Release with the information contained
