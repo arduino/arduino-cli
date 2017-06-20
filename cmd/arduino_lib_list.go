@@ -30,7 +30,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -39,8 +38,8 @@ import (
 	"os"
 
 	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/spf13/cobra"
+	"github.com/zieckey/goini"
 )
 
 // arduinoLibListCmd represents the list libraries command.
@@ -116,10 +115,13 @@ func executeListCommand(command *cobra.Command, args []string) {
 					continue
 				}
 
-				var jsonContent libraries.IndexRelease
-				err = json.Unmarshal(content, &jsonContent)
+				ini := goini.New()
+				err = ini.Parse(content, "\n", "=")
 				if err != nil {
-					//I use library name
+					fmt.Println(err)
+				}
+				Name, ok := ini.Get("name")
+				if !ok {
 					fileName := file.Name()
 					//replacing underscore in foldernames with spaces.
 					fileName = strings.Replace(fileName, "_", " ", -1)
@@ -127,9 +129,18 @@ func executeListCommand(command *cobra.Command, args []string) {
 					//I use folder name
 					libs = append(libs, fileName)
 					continue
-				} else {
-					libs = append(libs, fmt.Sprintf("%s v. %s", jsonContent.Name, jsonContent.Version))
 				}
+				Version, ok := ini.Get("version")
+				if !ok {
+					fileName := file.Name()
+					//replacing underscore in foldernames with spaces.
+					fileName = strings.Replace(fileName, "_", " ", -1)
+					fileName = strings.Replace(fileName, "-", " v. ", -1)
+					//I use folder name
+					libs = append(libs, fileName)
+					continue
+				}
+				libs = append(libs, fmt.Sprintf("%-10s v. %s", Name, Version))
 			}
 		}
 	}

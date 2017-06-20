@@ -130,11 +130,11 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	libraryOK := make([]string, 0, len(args))
 	libraryFails := make(map[string]string, len(args))
 
-	for _, libraryName := range args {
+	for i, libraryName := range args {
 		library := status.Libraries[libraryName]
 		if library != nil {
 			//found
-			_, err = libraries.DownloadAndCache(library)
+			_, err = libraries.DownloadAndCache(library, i+1, len(args))
 			if err != nil {
 				libraryFails[libraryName] = err.Error()
 			} else {
@@ -149,10 +149,10 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		prettyPrintDownload(libraryOK, libraryFails)
 	} else {
 		for _, library := range libraryOK {
-			fmt.Printf("%s - Downloaded\n", library)
+			fmt.Printf("%-10s -Downloaded\n", library)
 		}
 		for library, failure := range libraryFails {
-			fmt.Printf("%s - Error : %s\n", library, failure)
+			fmt.Printf("%-10s -Error : %s\n", library, failure)
 		}
 	}
 
@@ -184,11 +184,11 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	libraryOK := make([]string, 0, len(args))
 	libraryFails := make(map[string]string, len(args))
 
-	for _, libraryName := range args {
+	for i, libraryName := range args {
 		library := status.Libraries[libraryName]
 		if library != nil {
 			//found
-			err = libraries.DownloadAndInstall(library)
+			err = libraries.DownloadAndInstall(library, i+1, len(args))
 			if err != nil {
 				libraryFails[libraryName] = err.Error()
 			} else {
@@ -202,11 +202,13 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	if GlobalFlags.Verbose > 0 {
 		prettyPrintInstall(libraryOK, libraryFails)
 	} else {
-		for _, library := range libraryOK {
-			fmt.Printf("%s - Installed\n", library)
+		for i, library := range libraryOK {
+			fmt.Printf("%-10s - Installed (%d/%d)\n", library, i+1, len(libraryOK))
 		}
+		i := 1
 		for library, failure := range libraryFails {
-			fmt.Printf("%s - Error : %s\n", library, failure)
+			i++
+			fmt.Printf("%-10s - Error : %-10s (%d/%d)\n", library, failure, i, len(libraryFails))
 		}
 	}
 
@@ -298,15 +300,20 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	if len(libraryFails) > 0 {
-		fmt.Println("The following libraries were succesfully uninstalled:")
-		fmt.Println(strings.Join(libraryOK, " "))
-		fmt.Println("However, the uninstall process failed on the following libraries:")
-		fmt.Println(strings.Join(libraryFails, " "))
-	} else {
-		fmt.Println("All libraries successfully uninstalled")
+	if GlobalFlags.Verbose > 0 {
+		if len(libraryFails) > 0 {
+			fmt.Println("The following libraries were succesfully uninstalled:")
+			fmt.Println(strings.Join(libraryOK, " "))
+			fmt.Println("However, the uninstall process failed on the following libraries:")
+			fmt.Println(strings.Join(libraryFails, " "))
+		} else {
+			fmt.Println("All libraries successfully uninstalled")
+		}
+	} else if len(libraryFails) > 0 {
+		for _, failed := range libraryFails {
+			fmt.Printf("%-10s - Failed\n", failed)
+		}
 	}
-
 	return nil
 }
 

@@ -31,6 +31,7 @@ package libraries
 
 import (
 	"archive/zip"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
@@ -43,8 +44,8 @@ const (
 )
 
 // DownloadAndCache downloads a library without installing it
-func DownloadAndCache(library *Library) (*zip.Reader, error) {
-	zipContent, err := downloadLatest(library)
+func DownloadAndCache(library *Library, progressFiles int, totalFiles int) (*zip.Reader, error) {
+	zipContent, err := downloadLatest(library, progressFiles, totalFiles)
 	if err != nil {
 		return nil, err
 	}
@@ -58,8 +59,8 @@ func DownloadAndCache(library *Library) (*zip.Reader, error) {
 }
 
 // DownloadLatest downloads Latest version of a library.
-func downloadLatest(library *Library) ([]byte, error) {
-	return common.DownloadPackage(library.Latest.URL)
+func downloadLatest(library *Library, progressFiles int, totalFiles int) ([]byte, error) {
+	return common.DownloadPackage(library.Latest.URL, fmt.Sprintf("library %s", library.Name), progressFiles, totalFiles)
 }
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.

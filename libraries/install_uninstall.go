@@ -46,7 +46,7 @@ var install = common.Unzip
 var Uninstall = os.RemoveAll
 
 // DownloadAndInstall downloads a library and installs it to its specified location.
-func DownloadAndInstall(library *Library) error {
+func DownloadAndInstall(library *Library, progressFiles int, totalFiles int) error {
 	libFolder, err := common.GetDefaultLibFolder()
 	if err != nil {
 		return fmt.Errorf("Cannot get Lib destination directory")
@@ -59,12 +59,12 @@ func DownloadAndInstall(library *Library) error {
 
 	_, err = os.Stat(cacheFilePath)
 	if os.IsNotExist(err) {
-		zipArchive, err = DownloadAndCache(library)
+		zipArchive, err = DownloadAndCache(library, progressFiles, totalFiles)
 		if err != nil {
 			return err
 		}
 	} else {
-		fmt.Printf("%s library found in cache downloads ... using cached zip archive\n", library.Name)
+		fmt.Printf("%-10s - Cached    (%d/%d)\n", library.Name, progressFiles, totalFiles)
 		content, err := ioutil.ReadFile(cacheFilePath)
 		if err != nil {
 			return err

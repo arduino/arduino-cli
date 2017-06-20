@@ -36,8 +36,8 @@ import (
 	"github.com/bcmi-labs/arduino-cli/libraries"
 )
 
+// prettyPrintStatus pretty prints libraries from index status.
 func prettyPrintStatus(status *libraries.StatusContext) {
-	//Pretty print libraries from index.
 	for _, name := range status.Names() {
 		if GlobalFlags.Verbose > 0 {
 			lib := status.Libraries[name]
@@ -86,7 +86,7 @@ func prettyPrintInstall(libraryOK []string, libraryFails map[string]string) {
 		}
 		fmt.Println("he installation process failed on the following libraries:")
 		for library, failure := range libraryFails {
-			fmt.Printf("%s - %s\n", library, failure)
+			fmt.Printf("%-10s -%s\n", library, failure)
 		}
 	} else {
 		fmt.Println("All libraries successfully installed")
@@ -105,7 +105,7 @@ func prettyPrintDownload(libraryOK []string, libraryFails map[string]string) {
 		}
 		fmt.Println("he download of the following libraries failed:")
 		for library, failure := range libraryFails {
-			fmt.Printf("%s - %s\n", library, failure)
+			fmt.Printf("%-10s -%s\n", library, failure)
 		}
 	} else {
 		fmt.Println("All libraries successfully downloaded")
