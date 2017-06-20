@@ -1,4 +1,5 @@
 = arduino-cli
+Alessandro Sanino <a.sanino@bcmi-labs.cc>
 
 Arduino CLI is a tool to access all Arduino Create API from Command Line.
 It implements all functions provided by web version of Arduino Create.
@@ -9,10 +10,10 @@ It implements all functions provided by web version of Arduino Create.
  . Reload shell configuration or reboot
  And you're done, now let's see how to use the CLI.
 
-== Usage 
+== Usage : An example
 
 A general call is `arduino [COMMAND] [options]`
-To see the full list of commands, call `arduino -h` or `arduino --help`
+To see the full list of commands, call `arduino help [COMMAND]`, arduino [COMMAND] -h` or `arduino [COMMAND] --help`
 
 == Contribution
 

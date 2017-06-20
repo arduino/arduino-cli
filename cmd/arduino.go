@@ -39,8 +39,32 @@ import (
 )
 
 const (
-	// ArduinoVersion represents Arduino CLI version number.
-	ArduinoVersion string = "0.0.1-pre-alpha"
+  bashAutoCompletionFunction = `
+    __arduino_autocomplete() 
+    {
+        case $(last_command) in
+            arduino_lib)
+    		    opts="install uninstall list search version"
+    	        ;;
+    		arduino_lib_list)
+    		    opts="update"
+    			;;
+    		arduino_help)
+    		    opts="lib core version"
+    		    ;;
+            arduino)
+    		    opts="lib help version"
+    		    ;;
+	    esac		  
+    	if [[ ${cur} == " *" ]] ; then
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+        fi
+	    return 1
+    }`,
+
+  // ArduinoVersion represents Arduino CLI version number.
+  ArduinoVersion string = "0.0.1-pre-alpha"	
 )
 
 // GlobalFlags represents flags available in all the program.
@@ -58,6 +82,7 @@ var arduinoCmd = &cobra.Command{
 	Use:   "arduino",
 	Short: "Arduino CLI",
 	Long:  "Arduino Create Command Line Interface (arduino-cli)",
+	BashCompletionFunction: bashAutoCompletionFunction,
 }
 
 // arduinoVersionCmd represents the version command.
