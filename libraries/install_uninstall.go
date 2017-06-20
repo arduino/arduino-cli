@@ -40,10 +40,10 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common"
 )
 
-var install func(*zip.Reader, string) error = common.Unzip
+var install = common.Unzip
 
 // Uninstall a library means remove its directory.
-var Uninstall func(libraryFolder string) error = os.RemoveAll
+var Uninstall = os.RemoveAll
 
 // DownloadAndInstall downloads a library and installs it to its specified location.
 func DownloadAndInstall(library *Library) error {
