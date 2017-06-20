@@ -65,6 +65,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/mitchellh/ioprogress"
 )
 
 // GetFolder gets a folder on a path, and creates it if not found.
@@ -136,8 +138,8 @@ func TruncateDir(dir string) error {
 	return nil
 }
 
-// DownloadPackage downloads a package from arduino repository.
-func DownloadPackage(URL string) ([]byte, error) {
+// DownloadPackage downloads a package from arduino repository, applying a label for the progress bar.
+func DownloadPackage(URL string, downloadLabel string, progressFile int, totalFiles int) ([]byte, error) {
 	client := http.DefaultClient
 
 	request, err := http.NewRequest("GET", URL, nil)
@@ -146,6 +148,7 @@ func DownloadPackage(URL string) ([]byte, error) {
 	}
 
 	response, err := client.Do(request)
+
 	if err != nil {
 		return nil, fmt.Errorf("Cannot fetch library. Response creation error")
 	} else if response.StatusCode != 200 {
@@ -155,7 +158,15 @@ func DownloadPackage(URL string) ([]byte, error) {
 	defer response.Body.Close()
 
 	// Download completed, now move the archive to temp location and unpack it.
-	body, err := ioutil.ReadAll(response.Body)
+	rd := &ioprogress.Reader{
+		Reader: response.Body,
+		Size:   response.ContentLength,
+		DrawFunc: ioprogress.DrawTerminalf(os.Stdout, func(progress int64, size int64) string {
+			return fmt.Sprintf("%s ... %s -%.2f %% (%d/%d)", downloadLabel, ioprogress.DrawTextFormatBytes(progress, size), float64(progress)/float64(size)*100, progressFile, totalFiles)
+		}),
+	}
+
+	body, err := ioutil.ReadAll(rd)
 	if err != nil {
 		return nil, fmt.Errorf("Cannot read response body")
 	}

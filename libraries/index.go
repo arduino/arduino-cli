@@ -103,7 +103,7 @@ func (indexLib *IndexRelease) ExtractRelease() *Release {
 }
 
 // ExtractLibrary create a new Library with the information contained
-// in this index element
+// in this index element.
 func (indexLib *IndexRelease) ExtractLibrary() *Library {
 	release := indexLib.ExtractRelease()
 	return &Library{
