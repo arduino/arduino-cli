@@ -1,3 +1,7 @@
+workspace:
+  base: /go
+  path: src/github.com/bcmi-labs/arduino-cli
+
 pipeline:
   build:
     image: golang:latest
