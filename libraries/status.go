@@ -37,64 +37,6 @@ type StatusContext struct {
 	Libraries map[string]*Library `json:"libraries"`
 }
 
-// Library represents a library in the system
-type Library struct {
-	Name          string              `json:"name"`
-	Author        string              `json:"author"`
-	Maintainer    string              `json:"maintainer"`
-	Sentence      string              `json:"sentence"`
-	Paragraph     string              `json:"paragraph"`
-	Website       string              `json:"website"`
-	Category      string              `json:"category"`
-	Architectures []string            `json:"architectures"`
-	Types         []string            `json:"types"`
-	Releases      map[string]*Release `json:"releases"`
-	Installed     *Release            `json:"installed"`
-}
-
-// Release represents a release of a library
-type Release struct {
-	Version         string `json:"version"`
-	URL             string `json:"url"`
-	ArchiveFileName string `json:"archiveFileName"`
-	Size            int    `json:"size"`
-	Checksum        string `json:"checksum"`
-}
-
-// Versions returns an array of all versions available of the library
-func (l *Library) Versions() []string {
-	res := make([]string, len(l.Releases))
-	i := 0
-	for version := range l.Releases {
-		res[i] = version
-		i++
-	}
-	sortutil.CiAsc(res)
-	return res
-}
-
-// GetVersion returns the Release corresponding to the specified version, or
-// nil if not found.
-func (l *Library) GetVersion(version string) *Release {
-	return l.Releases[version]
-}
-
-// Latest obtains the latest version of a library.
-func (l *Library) Latest() *Release {
-	return l.GetVersion(l.latestVersion())
-}
-
-// latestVersion obtains latest version number.
-//
-// It uses lexicographics to compare version strings.
-func (l *Library) latestVersion() string {
-	versions := l.Versions()
-	if len(versions) > 0 {
-		return versions[0]
-	}
-	return ""
-}
-
 // AddLibrary adds an indexRelease to the status context
 func (l *StatusContext) AddLibrary(indexLib *indexRelease) {
 	name := indexLib.Name
