@@ -131,7 +131,7 @@ func prettyIndexParse(index *libraries.Index) (*libraries.StatusContext, error) 
 	}
 
 	//after download, I retry.
-	status, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
+	status, err := libraries.CreateStatusContextFromIndex(index)
 	if err != nil {
 		if GlobalFlags.Verbose > 0 {
 			fmt.Println("ERROR")
