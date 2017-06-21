@@ -30,10 +30,16 @@
 package common
 
 import (
+	"archive/zip"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
 	"os/user"
 	"path/filepath"
 	"runtime"
+
+	"github.com/mitchellh/ioprogress"
 )
 
 // GetDefaultArduinoFolder returns the default data folder for Arduino platform
@@ -75,4 +81,108 @@ func GetDefaultArduinoHomeFolder() (string, error) {
 	}
 	homeFolder := filepath.Join(usr.HomeDir, "Arduino")
 	return GetFolder(homeFolder, "Arduino home")
+}
+
+// GetFolder gets a folder on a path, and creates it if not found.
+func GetFolder(folder string, messageName string) (string, error) {
+	_, err := os.Stat(folder)
+	if os.IsNotExist(err) {
+		fmt.Printf("Cannot find default %s folder, attemping to create it ...", messageName)
+		err = os.MkdirAll(folder, 0755)
+		if err != nil {
+			fmt.Println("ERROR")
+			fmt.Printf("Cannot create %s folder\n", messageName)
+			return "", err
+		}
+		fmt.Println("OK")
+	}
+	return folder, nil
+}
+
+// Unzip extracts a zip file to a specified destination path.
+func Unzip(archive *zip.Reader, destination string) error {
+	for _, file := range archive.File {
+		path := filepath.Join(destination, file.Name)
+		if file.FileInfo().IsDir() {
+			err := os.MkdirAll(path, 0755)
+			if err != nil {
+				return fmt.Errorf("Cannot create directory during extraction. Process has been aborted")
+			}
+		} else {
+			err := os.MkdirAll(filepath.Dir(path), 0755)
+			if err != nil {
+				return fmt.Errorf("Cannot create directory tree of file during extraction. Process has been aborted")
+			}
+
+			fileOpened, err := file.Open()
+			if err != nil {
+				return fmt.Errorf("Cannot open archived file, process has been aborted")
+			}
+			content, err := ioutil.ReadAll(fileOpened)
+			if err != nil {
+				return fmt.Errorf("Cannot read archived file, process has been aborted")
+			}
+			err = ioutil.WriteFile(path, content, 0664)
+			if err != nil {
+				return fmt.Errorf("Cannot copy archived file, process has been aborted, %s", err)
+			}
+		}
+	}
+	return nil
+}
+
+// TruncateDir removes all content from a directory, without deleting it.
+// like `rm -rf dir/*`
+func TruncateDir(dir string) error {
+	d, err := os.Open(dir)
+	if err != nil {
+		return err
+	}
+	defer d.Close()
+	names, err := d.Readdirnames(-1)
+	if err != nil {
+		return err
+	}
+	for _, name := range names {
+		err = os.RemoveAll(filepath.Join(dir, name))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// DownloadPackage downloads a package from arduino repository, applying a label for the progress bar.
+func DownloadPackage(URL string, downloadLabel string, progressFile int, totalFiles int) ([]byte, error) {
+	client := http.DefaultClient
+
+	request, err := http.NewRequest("GET", URL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("Cannot create HTTP request: %s", err)
+	}
+
+	response, err := client.Do(request)
+
+	if err != nil {
+		return nil, fmt.Errorf("Cannot fetch library. Response creation error")
+	} else if response.StatusCode != 200 {
+		response.Body.Close()
+		return nil, fmt.Errorf("Cannot fetch library. Source responded with a status %d code", response.StatusCode)
+	}
+	defer response.Body.Close()
+
+	// Download completed, now move the archive to temp location and unpack it.
+	rd := &ioprogress.Reader{
+		Reader: response.Body,
+		Size:   response.ContentLength,
+		DrawFunc: ioprogress.DrawTerminalf(os.Stdout, func(progress int64, size int64) string {
+			return fmt.Sprintf("%s ... %s -%.2f %% (%d/%d)", downloadLabel, ioprogress.DrawTextFormatBytes(progress, size), float64(progress)/float64(size)*100, progressFile, totalFiles)
+		}),
+	}
+
+	body, err := ioutil.ReadAll(rd)
+	if err != nil {
+		return nil, fmt.Errorf("Cannot read response body")
+	}
+	return body, nil
 }

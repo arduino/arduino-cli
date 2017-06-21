@@ -39,18 +39,18 @@ type StatusContext struct {
 
 // Library represents a library in the system
 type Library struct {
-	Name          string     `json:"name"`
-	Author        string     `json:"author"`
-	Maintainer    string     `json:"maintainer"`
-	Sentence      string     `json:"sentence"`
-	Paragraph     string     `json:"paragraph"`
-	Website       string     `json:"website"`
-	Category      string     `json:"category"`
-	Architectures []string   `json:"architectures"`
-	Types         []string   `json:"types"`
-	Releases      []*Release `json:"releases"`
-	Installed     *Release   `json:"installed"`
-	Latest        *Release   `json:"latest"`
+	Name          string              `json:"name"`
+	Author        string              `json:"author"`
+	Maintainer    string              `json:"maintainer"`
+	Sentence      string              `json:"sentence"`
+	Paragraph     string              `json:"paragraph"`
+	Website       string              `json:"website"`
+	Category      string              `json:"category"`
+	Architectures []string            `json:"architectures"`
+	Types         []string            `json:"types"`
+	Releases      map[string]*Release `json:"releases"`
+	Installed     *Release            `json:"installed"`
+	Latest        *Release            `json:"latest"`
 }
 
 // Release represents a release of a library
@@ -66,23 +66,29 @@ type Release struct {
 func (l *Library) Versions() []string {
 	res := make([]string, len(l.Releases))
 	i := 0
-	for _, r := range l.Releases {
-		res[i] = r.Version
+	for version := range l.Releases {
+		res[i] = version
 		i++
 	}
 	sortutil.CiAsc(res)
 	return res
 }
 
-// AddLibrary adds an IndexRelease to the status context
-func (l *StatusContext) AddLibrary(indexLib *IndexRelease) {
+// GetVersion returns the Release corresponding to the specified version, or
+// nil if not found.
+func (l *Library) GetVersion(version string) *Release {
+	return l.Releases[version]
+}
+
+// AddLibrary adds an indexRelease to the status context
+func (l *StatusContext) AddLibrary(indexLib *indexRelease) {
 	name := indexLib.Name
 	if l.Libraries[name] == nil {
-		l.Libraries[name] = indexLib.ExtractLibrary()
+		l.Libraries[name] = indexLib.extractLibrary()
 	} else {
-		release := indexLib.ExtractRelease()
+		release := indexLib.extractRelease()
 		lib := l.Libraries[name]
-		lib.Releases = append(lib.Releases, release)
+		lib.Releases[release.Version] = release
 		if lib.Latest.Version < release.Version {
 			lib.Latest = release
 		}
