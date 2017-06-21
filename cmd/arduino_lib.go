@@ -119,7 +119,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	status, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
+	status, err := libraries.CreateStatusContextFromIndex(index)
 	if err != nil {
 		status, err = prettyPrintCorruptedIndexFix(index)
 		if err != nil {
@@ -173,7 +173,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	status, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
+	status, err := libraries.CreateStatusContextFromIndex(index)
 	if err != nil {
 		status, err = prettyPrintCorruptedIndexFix(index)
 		if err != nil {
@@ -332,28 +332,11 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	status, err := libraries.CreateStatusContextFromIndex(index, nil, nil)
+	status, err := libraries.CreateStatusContextFromIndex(index)
 	if err != nil {
-		if GlobalFlags.Verbose > 0 {
-			fmt.Println("Cannot parse index file, it may be corrupted. downloading from downloads.arduino.cc")
-		}
-
-		err = prettyPrintDownloadFileIndex()
+		status, err = prettyPrintCorruptedIndexFix(index)
 		if err != nil {
 			return nil
-		}
-
-		//after download, I retry.
-		status, err = libraries.CreateStatusContextFromIndex(index, nil, nil)
-		if err != nil {
-			if GlobalFlags.Verbose > 0 {
-				fmt.Println("ERROR")
-			}
-			fmt.Println("Cannot parse downloaded index file")
-			return nil
-		}
-		if GlobalFlags.Verbose > 0 {
-			fmt.Println("OK")
 		}
 	}
 
