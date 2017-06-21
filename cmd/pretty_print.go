@@ -56,7 +56,7 @@ func prettyPrintStatus(status *libraries.StatusContext) {
 
 func prettyPrintDownloadFileIndex() error {
 	if GlobalFlags.Verbose > 0 {
-		fmt.Print("Downloading a new index file from download.arduino.cc ... ")
+		fmt.Print("Downloading from download.arduino.cc ... ")
 	}
 
 	err := libraries.DownloadLibrariesFile()
@@ -64,7 +64,7 @@ func prettyPrintDownloadFileIndex() error {
 		if GlobalFlags.Verbose > 0 {
 			fmt.Println("ERROR")
 		}
-		fmt.Println("Cannot download index file, check your network connection.")
+		fmt.Println("Cannot download file, check your network connection.")
 		return err
 	}
 
