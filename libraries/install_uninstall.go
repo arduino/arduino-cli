@@ -53,7 +53,7 @@ func DownloadAndInstall(library *Library, progressFiles int, totalFiles int) err
 	}
 
 	stagingFolder, err := getDownloadCacheFolder()
-	cacheFilePath := filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, library.Latest.Version))
+	cacheFilePath := filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, library.Latest().Version))
 
 	var zipArchive *zip.Reader
 
@@ -101,7 +101,7 @@ func prepareInstall(library *Library, body []byte) (*zip.Reader, error) {
 		return nil, fmt.Errorf("Cannot get download cache folder")
 	}
 
-	err = ioutil.WriteFile(filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, library.Latest.Version)), body, 0666)
+	err = ioutil.WriteFile(filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, library.Latest().Version)), body, 0666)
 	if err != nil {
 		return nil, fmt.Errorf("Cannot write download to cache folder, %s", err.Error())
 	}
@@ -116,6 +116,6 @@ func getLibFolder(library *Library) (string, error) {
 		return "", err
 	}
 
-	libFolder := filepath.Join(baseFolder, fmt.Sprintf("%s-%s", library.Name, library.Latest.Version))
+	libFolder := filepath.Join(baseFolder, fmt.Sprintf("%s-%s", library.Name, library.Latest().Version))
 	return common.GetFolder(libFolder, "library")
 }

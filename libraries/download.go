@@ -60,7 +60,7 @@ func DownloadAndCache(library *Library, progressFiles int, totalFiles int) (*zip
 
 // DownloadLatest downloads Latest version of a library.
 func downloadLatest(library *Library, progressFiles int, totalFiles int) ([]byte, error) {
-	return common.DownloadPackage(library.Latest.URL, fmt.Sprintf("library %s", library.Name), progressFiles, totalFiles)
+	return common.DownloadPackage(library.Latest().URL, fmt.Sprintf("library %s", library.Name), progressFiles, totalFiles)
 }
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.
