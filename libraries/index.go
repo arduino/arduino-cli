@@ -118,6 +118,5 @@ func (indexLib *indexRelease) extractLibrary() *Library {
 		Architectures: indexLib.Architectures,
 		Types:         indexLib.Types,
 		Releases:      map[string]*Release{release.Version: release},
-		Latest:        release,
 	}
 }

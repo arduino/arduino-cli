@@ -50,7 +50,6 @@ type Library struct {
 	Types         []string            `json:"types"`
 	Releases      map[string]*Release `json:"releases"`
 	Installed     *Release            `json:"installed"`
-	Latest        *Release            `json:"latest"`
 }
 
 // Release represents a release of a library
@@ -80,6 +79,22 @@ func (l *Library) GetVersion(version string) *Release {
 	return l.Releases[version]
 }
 
+// Latest obtains the latest version of a library.
+func (l *Library) Latest() *Release {
+	return l.GetVersion(l.latestVersion())
+}
+
+// latestVersion obtains latest version number.
+//
+// It uses lexicographics to compare version strings.
+func (l *Library) latestVersion() string {
+	versions := l.Versions()
+	if len(versions) > 0 {
+		return versions[0]
+	}
+	return ""
+}
+
 // AddLibrary adds an indexRelease to the status context
 func (l *StatusContext) AddLibrary(indexLib *indexRelease) {
 	name := indexLib.Name
@@ -89,9 +104,6 @@ func (l *StatusContext) AddLibrary(indexLib *indexRelease) {
 		release := indexLib.extractRelease()
 		lib := l.Libraries[name]
 		lib.Releases[release.Version] = release
-		if lib.Latest.Version < release.Version {
-			lib.Latest = release
-		}
 	}
 }
 
