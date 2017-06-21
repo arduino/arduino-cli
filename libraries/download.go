@@ -96,7 +96,7 @@ func DownloadLibrariesFile() error {
 
 // getDownloadCacheFolder gets the folder where temp installs are stored until installation complete (libraries).
 func getDownloadCacheFolder() (string, error) {
-	libFolder, err := common.GetDefaultArduinoHomeFolder()
+	libFolder, err := common.GetDefaultArduinoFolder()
 	if err != nil {
 		return "", err
 	}
