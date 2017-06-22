@@ -37,6 +37,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/spf13/cobra"
@@ -113,7 +114,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
 		fmt.Print("Cannot find index file ... ")
-		err = prettyPrintDownloadFileIndex()
+		err = prettyPrints.DownloadLibFileIndex(GlobalFlags.Verbose)
 		if err != nil {
 			return nil
 		}
@@ -121,7 +122,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 
 	status, err := libraries.CreateStatusContextFromIndex(index)
 	if err != nil {
-		status, err = prettyPrintCorruptedIndexFix(index)
+		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
 		if err != nil {
 			return nil
 		}
@@ -146,7 +147,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	if GlobalFlags.Verbose > 0 {
-		prettyPrintDownload(libraryOK, libraryFails)
+		prettyPrints.DownloadLib(libraryOK, libraryFails)
 	} else {
 		for _, library := range libraryOK {
 			fmt.Printf("%-10s -Downloaded\n", library)
@@ -167,7 +168,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
 		fmt.Println("Cannot find index file ...")
-		err = prettyPrintDownloadFileIndex()
+		err = prettyPrints.DownloadLibFileIndex(GlobalFlags.Verbose)
 		if err != nil {
 			return nil
 		}
@@ -175,7 +176,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 
 	status, err := libraries.CreateStatusContextFromIndex(index)
 	if err != nil {
-		status, err = prettyPrintCorruptedIndexFix(index)
+		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
 		if err != nil {
 			return nil
 		}
@@ -200,7 +201,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	if GlobalFlags.Verbose > 0 {
-		prettyPrintInstall(libraryOK, libraryFails)
+		prettyPrints.InstallLib(libraryOK, libraryFails)
 	} else {
 		for i, library := range libraryOK {
 			fmt.Printf("%-10s - Installed (%d/%d)\n", library, i+1, len(libraryOK))
@@ -334,7 +335,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 
 	status, err := libraries.CreateStatusContextFromIndex(index)
 	if err != nil {
-		status, err = prettyPrintCorruptedIndexFix(index)
+		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
 		if err != nil {
 			return nil
 		}

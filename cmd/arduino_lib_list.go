@@ -37,6 +37,7 @@ import (
 
 	"os"
 
+	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/spf13/cobra"
 	"github.com/zieckey/goini"
@@ -71,7 +72,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 		return
 	}
 
-	//prettyPrintStatus(status)
+	//prettyPrints.Status(status)
 	dir, err := os.Open(libHome)
 	if err != nil {
 		fmt.Println("Cannot open libraries folder")
@@ -156,5 +157,5 @@ func executeListCommand(command *cobra.Command, args []string) {
 }
 
 func execUpdateListIndex(cmd *cobra.Command, args []string) {
-	prettyPrintDownloadFileIndex()
+	prettyPrints.DownloadLibFileIndex(GlobalFlags.Verbose)
 }

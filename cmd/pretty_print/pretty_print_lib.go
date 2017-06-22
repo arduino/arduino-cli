@@ -27,7 +27,7 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package cmd
+package prettyPrints
 
 import (
 	"fmt"
@@ -36,13 +36,13 @@ import (
 	"github.com/bcmi-labs/arduino-cli/libraries"
 )
 
-// prettyPrintStatus pretty prints libraries from index status.
-func prettyPrintStatus(status *libraries.StatusContext) {
+// Status pretty prints libraries from index status.
+func Status(status *libraries.StatusContext, verbosity int) {
 	for _, name := range status.Names() {
-		if GlobalFlags.Verbose > 0 {
+		if verbosity > 0 {
 			lib := status.Libraries[name]
 			fmt.Print(lib)
-			if GlobalFlags.Verbose > 1 {
+			if verbosity > 1 {
 				for _, r := range lib.Releases {
 					fmt.Print(r)
 				}
@@ -54,28 +54,30 @@ func prettyPrintStatus(status *libraries.StatusContext) {
 	}
 }
 
-func prettyPrintDownloadFileIndex() error {
-	if GlobalFlags.Verbose > 0 {
+// DownloadLibFileIndex shows info regarding the download of a missing (or corrupted) file index.
+func DownloadLibFileIndex(verbosity int) error {
+	if verbosity > 0 {
 		fmt.Print("Downloading from download.arduino.cc ... ")
 	}
 
 	err := libraries.DownloadLibrariesFile()
 	if err != nil {
-		if GlobalFlags.Verbose > 0 {
+		if verbosity > 0 {
 			fmt.Println("ERROR")
 		}
 		fmt.Println("Cannot download file, check your network connection.")
 		return err
 	}
 
-	if GlobalFlags.Verbose > 0 {
+	if verbosity > 0 {
 		fmt.Println("OK")
 	}
 
 	return nil
 }
 
-func prettyPrintInstall(libraryOK []string, libraryFails map[string]string) {
+// InstallLib pretty prints info about installarion of one or more libraries.
+func InstallLib(libraryOK []string, libraryFails map[string]string) {
 	if len(libraryFails) > 0 {
 		if len(libraryOK) > 0 {
 			fmt.Println("The following libraries were succesfully installed:")
@@ -93,8 +95,9 @@ func prettyPrintInstall(libraryOK []string, libraryFails map[string]string) {
 	}
 }
 
-//TODO: remove copypasting from prettyPrintInstall and merge them in a single function
-func prettyPrintDownload(libraryOK []string, libraryFails map[string]string) {
+// DownloadLib pretty prints info about a pending download of libraries
+// TODO: remove copypasting from Install and merge them in a single function.
+func DownloadLib(libraryOK []string, libraryFails map[string]string) {
 	if len(libraryFails) > 0 {
 		if len(libraryOK) > 0 {
 			fmt.Println("The following libraries were succesfully downloaded:")
@@ -112,34 +115,36 @@ func prettyPrintDownload(libraryOK []string, libraryFails map[string]string) {
 	}
 }
 
-func prettyPrintCorruptedIndexFix(index *libraries.Index) (*libraries.StatusContext, error) {
-	if GlobalFlags.Verbose > 0 {
+// CorruptedLibIndexFix pretty prints messages regarding corrupted index fixes of libraries.
+func CorruptedLibIndexFix(index *libraries.Index, verbosity int) (*libraries.StatusContext, error) {
+	if verbosity > 0 {
 		fmt.Println("Cannot parse index file, it may be corrupted.")
 	}
 
-	err := prettyPrintDownloadFileIndex()
+	err := DownloadLibFileIndex(verbosity)
 	if err != nil {
 		return nil, err
 	}
 
-	return prettyIndexParse(index)
+	return libIndexParse(index, verbosity)
 }
 
-func prettyIndexParse(index *libraries.Index) (*libraries.StatusContext, error) {
-	if GlobalFlags.Verbose > 0 {
+// libIndexParse pretty prints info about parsing an index file of libraries.
+func libIndexParse(index *libraries.Index, verbosity int) (*libraries.StatusContext, error) {
+	if verbosity > 0 {
 		fmt.Print("Parsing downloaded index file ... ")
 	}
 
 	//after download, I retry.
 	status, err := libraries.CreateStatusContextFromIndex(index)
 	if err != nil {
-		if GlobalFlags.Verbose > 0 {
+		if verbosity > 0 {
 			fmt.Println("ERROR")
 		}
 		fmt.Println("Cannot parse index file")
 		return nil, err
 	}
-	if GlobalFlags.Verbose > 0 {
+	if verbosity > 0 {
 		fmt.Println("OK")
 	}
 
