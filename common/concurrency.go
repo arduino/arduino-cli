@@ -142,6 +142,18 @@ func CreateTaskSequence(taskWrappers []TaskWrapper, ignoreOnFailure []bool, verb
 	})
 }
 
+// Task creates a Task from a tasksequence, by putting it []TaskResult into
+// a TaskResult.Result. To access this result it should be done like this
+// `result = []TaskResult(ts.Task().Execute(verbosity).Result)`
+func (ts TaskSequence) Task() Task {
+	return Task(func() TaskResult {
+		return TaskResult{
+			Result: ts(),
+			Error:  nil,
+		}
+	})
+}
+
 // ExecuteSequence creates and executes an array of tasks in strict sequence.
 func ExecuteSequence(taskWrappers []TaskWrapper, ignoreOnFailure []bool, verbosity int) []TaskResult {
 	return CreateTaskSequence(taskWrappers, ignoreOnFailure, verbosity)()

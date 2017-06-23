@@ -92,7 +92,10 @@ func DownloadLib(libraryOK []string, libraryFails map[string]string) {
 func CorruptedLibIndexFix(index *libraries.Index, verbosity int) (*libraries.StatusContext, error) {
 	downloadTask := DownloadLibFileIndex()
 	parseTask := libIndexParse(index, verbosity)
-	common.TaskWrapper{
+
+	subTasks := []common.TaskWrapper{downloadTask, parseTask}
+
+	result := common.TaskWrapper{
 		BeforeMessage: []string{
 			"Cannot parse index file, it may be corrupted.",
 		},
@@ -100,10 +103,10 @@ func CorruptedLibIndexFix(index *libraries.Index, verbosity int) (*libraries.Sta
 		ErrorMessage: []string{ //printed by sub-task
 			"",
 		},
-		Task: parseTask.Task,
-	}.Execute(verbosity)
-	downloadTask.Execute(verbosity)
-	return nil, nil
+		Task: common.CreateTaskSequence(subTasks, []bool{false, false}, verbosity).Task(),
+	}.Execute(verbosity).Result.([]common.TaskResult)
+
+	return result[1].Result.(*libraries.StatusContext), result[1].Error
 }
 
 // libIndexParse pretty prints info about parsing an index file of libraries.
