@@ -114,7 +114,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
 		fmt.Print("Cannot find index file ... ")
-		err = prettyPrints.DownloadLibFileIndex(GlobalFlags.Verbose)
+		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose)
 		if err != nil {
 			return nil
 		}
@@ -168,7 +168,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
 		fmt.Println("Cannot find index file ...")
-		err = prettyPrints.DownloadLibFileIndex(GlobalFlags.Verbose)
+		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose)
 		if err != nil {
 			return nil
 		}

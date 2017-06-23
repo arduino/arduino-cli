@@ -158,5 +158,5 @@ func executeListCommand(command *cobra.Command, args []string) {
 }
 
 func execUpdateListIndex(cmd *cobra.Command, args []string) {
-	prettyPrints.DownloadLibFileIndex(GlobalFlags.Verbose)
+	prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose)
 }

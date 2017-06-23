@@ -30,61 +30,25 @@
 package prettyPrints
 
 import (
-	"math"
-
-	"github.com/sirupsen/logrus"
+	"fmt"
+	"strings"
 )
 
-var log *logrus.Entry
-
-func init() {
-	log = logrus.WithFields(logrus.Fields{})
-}
-
-// A TaskWrapper wraps a task to be executed to allow
-// Useful messages to be print. It is used to pretty
-// print operations.
-//
-// All Message arrays use VERBOSITY as index.
-type TaskWrapper struct {
-	beforeMessage []string
-	task          Task
-	afterMessage  []string
-	errorMessage  []string
-}
-
-// verbosity represents the verbosity level of the message.
-//
-// Examples:
-//
-// verbosity 0 Message ""
-// verbosity 1 Message "Hi"
-// verbosity 2 Message "Hello folk, how are you?"
-// type verbosity int
-
-// Task represents a function which can be safely wrapped into a TaskWrapper
-type Task func() error
-
-// ExecuteTask executes a task while printing messages to describe what is happening.
-func (tw TaskWrapper) ExecuteTask(verb int) error {
-	var maxUsableVerb int
-	maxUsableVerb = minVerb(verb, tw.beforeMessage)
-	log.Info(tw.beforeMessage[maxUsableVerb])
-	err := tw.task()
-	if err != nil {
-		maxUsableVerb = minVerb(verb, tw.errorMessage)
-		log.Warn(tw.errorMessage[maxUsableVerb])
+// actionOnItems pretty prints info about an action on one or more items.
+func actionOnItems(itemPluralName string, actionPastParticiple string, itemOK []string, itemFails map[string]string) {
+	if len(itemFails) > 0 {
+		if len(itemOK) > 0 {
+			fmt.Printf("The following %0s were succesfully %s:\n", itemPluralName, actionPastParticiple)
+			fmt.Println(strings.Join(itemOK, " "))
+			fmt.Print("However, t")
+		} else { //UGLYYYY but it works
+			fmt.Print("T")
+		}
+		fmt.Printf("he the following %s were not %s and failed :", itemPluralName, actionPastParticiple)
+		for item, failure := range itemFails {
+			fmt.Printf("%-10s -%s\n", item, failure)
+		}
 	} else {
-		maxUsableVerb = minVerb(verb, tw.afterMessage)
-		log.Info(tw.afterMessage[maxUsableVerb])
+		fmt.Printf("All %s successfully installed\n", itemPluralName)
 	}
-	return err
-}
-
-// minVerb tells which is the max level of verbosity for the specified verbosity level (set by another
-// function call) and the provided array of strings.
-//
-// Refer to TaskRunner struct for the usage of the array.
-func minVerb(verb1 int, sentences []string) int {
-	return int(math.Min(float64(verb1), float64(len(sentences)-1)))
 }

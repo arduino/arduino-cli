@@ -31,14 +31,9 @@ package prettyPrints
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/libraries"
 )
-
-func prettyPrint() {
-
-}
 
 // LibStatus pretty prints libraries from index status.
 func LibStatus(status *libraries.StatusContext, verbosity int) {
@@ -59,116 +54,68 @@ func LibStatus(status *libraries.StatusContext, verbosity int) {
 }
 
 // DownloadLibFileIndex shows info regarding the download of a missing (or corrupted) file index.
-func DownloadLibFileIndex(verbosity int) error {
+func DownloadLibFileIndex() TaskWrapper {
 	return TaskWrapper{
 		beforeMessage: []string{
 			"",
-			"Downloading from download.arduino.cc ... ",
+			"Downloading from download.arduino.cc",
 		},
 		afterMessage: []string{
 			"",
-			"OK",
+			"",
+			"Download complete",
 		},
 		errorMessage: []string{
 			"Cannot download file, check your network connection.",
-			"ERROR\n" +
-				"Cannot download file, check your network connection.",
 		},
 		task: libraries.DownloadLibrariesFile,
-	}.ExecuteTask(verbosity)
-	/*
-		if verbosity > 0 {
-			fmt.Print("Downloading from download.arduino.cc ... ")
-		}
-
-		err := libraries.DownloadLibrariesFile()
-		if err != nil {
-			if verbosity > 0 {
-				fmt.Println("ERROR")
-			}
-			fmt.Println("Cannot download file, check your network connection.")
-			return err
-		}
-
-		if verbosity > 0 {
-			fmt.Println("OK")
-		}
-
-		return nil
-	*/
+	}
 }
 
-// InstallLib pretty prints info about installarion of one or more libraries.
+//InstallLib pretty prints info about a pending install of libraries.
 func InstallLib(libraryOK []string, libraryFails map[string]string) {
-	if len(libraryFails) > 0 {
-		if len(libraryOK) > 0 {
-			fmt.Println("The following libraries were succesfully installed:")
-			fmt.Println(strings.Join(libraryOK, " "))
-			fmt.Print("However, t")
-		} else { //UGLYYYY but it works
-			fmt.Print("T")
-		}
-		fmt.Println("he installation process failed on the following libraries:")
-		for library, failure := range libraryFails {
-			fmt.Printf("%-10s -%s\n", library, failure)
-		}
-	} else {
-		fmt.Println("All libraries successfully installed")
-	}
+	actionOnItems("libraries", "installed", libraryOK, libraryFails)
 }
 
-// DownloadLib pretty prints info about a pending download of libraries
-// TODO: remove copypasting from Install and merge them in a single function.
+// DownloadLib pretty prints info about a pending download of libraries.
 func DownloadLib(libraryOK []string, libraryFails map[string]string) {
-	if len(libraryFails) > 0 {
-		if len(libraryOK) > 0 {
-			fmt.Println("The following libraries were succesfully downloaded:")
-			fmt.Println(strings.Join(libraryOK, " "))
-			fmt.Print("However, t")
-		} else { //UGLYYYY but it works
-			fmt.Print("T")
-		}
-		fmt.Println("he download of the following libraries failed:")
-		for library, failure := range libraryFails {
-			fmt.Printf("%-10s -%s\n", library, failure)
-		}
-	} else {
-		fmt.Println("All libraries successfully downloaded")
-	}
+	actionOnItems("libraries", "downloaded", libraryOK, libraryFails)
 }
 
 // CorruptedLibIndexFix pretty prints messages regarding corrupted index fixes of libraries.
 func CorruptedLibIndexFix(index *libraries.Index, verbosity int) (*libraries.StatusContext, error) {
-	if verbosity > 0 {
-		fmt.Println("Cannot parse index file, it may be corrupted.")
-	}
-
-	err := DownloadLibFileIndex(verbosity)
-	if err != nil {
-		return nil, err
-	}
-
-	return libIndexParse(index, int(verbosity))
+	downloadTask := DownloadLibFileIndex()
+	parseTask := libIndexParse(index, verbosity)
+	TaskWrapper{
+		beforeMessage: []string{
+			"Cannot parse index file, it may be corrupted.",
+		},
+		afterMessage: []string{""},
+		errorMessage: []string{ //printed by sub-task
+			"",
+		},
+		task: parseTask.Task(),
+	}.Execute(verbosity)
+	downloadTask.Execute(verbosity)
+	return nil, nil
 }
 
 // libIndexParse pretty prints info about parsing an index file of libraries.
-func libIndexParse(index *libraries.Index, verbosity int) (*libraries.StatusContext, error) {
-	if verbosity > 0 {
-		fmt.Print("Parsing downloaded index file ... ")
+func libIndexParse(index *libraries.Index, verbosity int) TaskWrapper {
+	return TaskWrapper{
+		beforeMessage: []string{
+			"",
+			"Parsing downloaded index file",
+		},
+		afterMessage: []string{
+			"",
+		},
+		errorMessage: []string{
+			"Cannot parse index file",
+		},
+		task: func() error {
+			_, err := libraries.CreateStatusContextFromIndex(index)
+			return err
+		},
 	}
-
-	//after download, I retry.
-	status, err := libraries.CreateStatusContextFromIndex(index)
-	if err != nil {
-		if verbosity > 0 {
-			fmt.Println("ERROR")
-		}
-		fmt.Println("Cannot parse index file")
-		return nil, err
-	}
-	if verbosity > 0 {
-		fmt.Println("OK")
-	}
-
-	return status, nil
 }
