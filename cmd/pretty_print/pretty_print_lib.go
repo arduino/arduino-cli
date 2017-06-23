@@ -36,8 +36,12 @@ import (
 	"github.com/bcmi-labs/arduino-cli/libraries"
 )
 
-// Status pretty prints libraries from index status.
-func Status(status *libraries.StatusContext, verbosity int) {
+func prettyPrint() {
+
+}
+
+// LibStatus pretty prints libraries from index status.
+func LibStatus(status *libraries.StatusContext, verbosity int) {
 	for _, name := range status.Names() {
 		if verbosity > 0 {
 			lib := status.Libraries[name]
@@ -56,24 +60,42 @@ func Status(status *libraries.StatusContext, verbosity int) {
 
 // DownloadLibFileIndex shows info regarding the download of a missing (or corrupted) file index.
 func DownloadLibFileIndex(verbosity int) error {
-	if verbosity > 0 {
-		fmt.Print("Downloading from download.arduino.cc ... ")
-	}
-
-	err := libraries.DownloadLibrariesFile()
-	if err != nil {
+	return TaskWrapper{
+		beforeMessage: []string{
+			"",
+			"Downloading from download.arduino.cc ... ",
+		},
+		afterMessage: []string{
+			"",
+			"OK",
+		},
+		errorMessage: []string{
+			"Cannot download file, check your network connection.",
+			"ERROR\n" +
+				"Cannot download file, check your network connection.",
+		},
+		task: libraries.DownloadLibrariesFile,
+	}.ExecuteTask(verbosity)
+	/*
 		if verbosity > 0 {
-			fmt.Println("ERROR")
+			fmt.Print("Downloading from download.arduino.cc ... ")
 		}
-		fmt.Println("Cannot download file, check your network connection.")
-		return err
-	}
 
-	if verbosity > 0 {
-		fmt.Println("OK")
-	}
+		err := libraries.DownloadLibrariesFile()
+		if err != nil {
+			if verbosity > 0 {
+				fmt.Println("ERROR")
+			}
+			fmt.Println("Cannot download file, check your network connection.")
+			return err
+		}
 
-	return nil
+		if verbosity > 0 {
+			fmt.Println("OK")
+		}
+
+		return nil
+	*/
 }
 
 // InstallLib pretty prints info about installarion of one or more libraries.
@@ -126,7 +148,7 @@ func CorruptedLibIndexFix(index *libraries.Index, verbosity int) (*libraries.Sta
 		return nil, err
 	}
 
-	return libIndexParse(index, verbosity)
+	return libIndexParse(index, int(verbosity))
 }
 
 // libIndexParse pretty prints info about parsing an index file of libraries.

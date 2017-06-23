@@ -27,24 +27,11 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package cmd
+package prettyPrints
 
-import (
-	"github.com/spf13/cobra"
-)
+import "github.com/bcmi-labs/arduino-cli/cores"
 
-var arduinoCoreListCmd = &cobra.Command{
-	Use:   "list",
-	Short: "Shows the list of installed cores",
-	Long: `Shows the list of installed cores. 
-With -v tag (up to 2 times) can provide more verbose output.`,
-	Run: executeCoreListCommand,
-}
+// PackageStatus pretty prints packages from index status.
+func PackageStatus(status *cores.StatusContext) {
 
-func init() {
-	arduinoCoreCmd.AddCommand(arduinoCoreListCmd)
-}
-
-func executeCoreListCommand(cmd *cobra.Command, args []string) {
-    
 }

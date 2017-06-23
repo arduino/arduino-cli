@@ -103,6 +103,7 @@ func (core *Core) String(verbosity int) (res string) {
 	} else {
 		res = fmt.Sprintf("%s\n", core.Name)
 	}
+	return
 }
 
 func (release *Release) String() string {

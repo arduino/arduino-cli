@@ -52,27 +52,28 @@ Can be used with -v (or --verbose) flag (up to 2 times) to have longer output.`,
 	Run: executeListCommand,
 }
 
-// arduinoLibListUpdateCmd represents the lib list update command
-var arduinoLibListUpdateCmd = &cobra.Command{
-	Use:   "update",
-	Short: "Updates the library index to latest version",
-	Long:  `Updates the library index to latest version from downloads.arduino.cc repository.`,
-	Run:   execUpdateListIndex,
+var arduinoLibListFlags struct {
+	updateIndex bool
 }
 
 func init() {
 	arduinoLibCmd.AddCommand(arduinoLibListCmd)
-	arduinoLibListCmd.AddCommand(arduinoLibListUpdateCmd)
+	arduinoLibListCmd.Flags().BoolVarP(&arduinoLibListFlags.updateIndex, "update-index", "u", false, "Updates the libraries index")
 }
 
 func executeListCommand(command *cobra.Command, args []string) {
+	if arduinoLibListFlags.updateIndex {
+		execUpdateListIndex(command, args)
+		return
+	}
+
 	libHome, err := common.GetDefaultLibFolder()
 	if err != nil {
 		fmt.Println("Cannot get libraries folder")
 		return
 	}
 
-	//prettyPrints.Status(status)
+	//prettyPrints.LibStatus(status)
 	dir, err := os.Open(libHome)
 	if err != nil {
 		fmt.Println("Cannot open libraries folder")
