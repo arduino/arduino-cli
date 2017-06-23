@@ -49,11 +49,10 @@ func init() {
 //
 // All Message arrays use VERBOSITY as index.
 type TaskWrapper struct {
-	beforeMessage []string
-	task          Task
-	afterMessage  []string
-	errorMessage  []string
-	Result        interface{}
+	BeforeMessage []string
+	Task          Task
+	AfterMessage  []string
+	ErrorMessage  []string
 }
 
 // verbosity represents the verbosity level of the message.
@@ -81,37 +80,36 @@ type TaskSequence func() []TaskResult
 
 // Execute executes a task while printing messages to describe what is happening.
 func (tw TaskWrapper) Execute(verb int) TaskResult {
-	var maxUsableVerb int
+	var maxUsableVerb [3]int
 	var msg string
-	maxUsableVerb = minVerb(verb, tw.beforeMessage)
-	msg = tw.beforeMessage[maxUsableVerb]
+	maxUsableVerb[0] = minVerb(verb, tw.BeforeMessage)
+	msg = tw.BeforeMessage[maxUsableVerb[0]]
 	if msg != "" {
 		log.Infof("%s ... ", msg)
 	}
 
-	ret := tw.task()
+	ret := tw.Task()
 
 	if ret.Error != nil {
-		maxUsableVerb = minVerb(verb, tw.errorMessage)
-		msg = tw.errorMessage[maxUsableVerb]
-		log.Warn("ERROR\n")
+		maxUsableVerb[1] = minVerb(verb, tw.ErrorMessage)
+		msg = tw.ErrorMessage[maxUsableVerb[1]]
+		if tw.BeforeMessage[maxUsableVerb[0]] != "" {
+			log.Warn("ERROR\n")
+		}
 		if msg != "" {
 			log.Warnf("%s\n", msg)
 		}
 	} else {
-		maxUsableVerb = minVerb(verb, tw.afterMessage)
-		msg = tw.afterMessage[maxUsableVerb]
-		log.Info("OK\n")
+		maxUsableVerb[2] = minVerb(verb, tw.AfterMessage)
+		msg = tw.AfterMessage[maxUsableVerb[2]]
+		if tw.BeforeMessage[maxUsableVerb[0]] != "" {
+			log.Info("OK\n")
+		}
 		if msg != "" {
 			log.Infof("%s\n", msg)
 		}
 	}
 	return ret
-}
-
-// Task returns task of this wrapper.
-func (tw TaskWrapper) Task() Task {
-	return tw.task
 }
 
 // minVerb tells which is the max level of verbosity for the specified verbosity level (set by another

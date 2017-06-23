@@ -32,6 +32,7 @@ package prettyPrints
 import (
 	"fmt"
 
+	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 )
 
@@ -54,21 +55,26 @@ func LibStatus(status *libraries.StatusContext, verbosity int) {
 }
 
 // DownloadLibFileIndex shows info regarding the download of a missing (or corrupted) file index.
-func DownloadLibFileIndex() TaskWrapper {
-	return TaskWrapper{
-		beforeMessage: []string{
+func DownloadLibFileIndex() common.TaskWrapper {
+	return common.TaskWrapper{
+		BeforeMessage: []string{
 			"",
 			"Downloading from download.arduino.cc",
 		},
-		afterMessage: []string{
+		AfterMessage: []string{
 			"",
 			"",
 			"Download complete",
 		},
-		errorMessage: []string{
+		ErrorMessage: []string{
 			"Cannot download file, check your network connection.",
 		},
-		task: libraries.DownloadLibrariesFile,
+		Task: common.Task(func() common.TaskResult {
+			return common.TaskResult{
+				Result: nil,
+				Error:  libraries.DownloadLibrariesFile(),
+			}
+		}),
 	}
 }
 
@@ -86,36 +92,39 @@ func DownloadLib(libraryOK []string, libraryFails map[string]string) {
 func CorruptedLibIndexFix(index *libraries.Index, verbosity int) (*libraries.StatusContext, error) {
 	downloadTask := DownloadLibFileIndex()
 	parseTask := libIndexParse(index, verbosity)
-	TaskWrapper{
-		beforeMessage: []string{
+	common.TaskWrapper{
+		BeforeMessage: []string{
 			"Cannot parse index file, it may be corrupted.",
 		},
-		afterMessage: []string{""},
-		errorMessage: []string{ //printed by sub-task
+		AfterMessage: []string{""},
+		ErrorMessage: []string{ //printed by sub-task
 			"",
 		},
-		task: parseTask.Task(),
+		Task: parseTask.Task,
 	}.Execute(verbosity)
 	downloadTask.Execute(verbosity)
 	return nil, nil
 }
 
 // libIndexParse pretty prints info about parsing an index file of libraries.
-func libIndexParse(index *libraries.Index, verbosity int) TaskWrapper {
-	return TaskWrapper{
-		beforeMessage: []string{
+func libIndexParse(index *libraries.Index, verbosity int) common.TaskWrapper {
+	return common.TaskWrapper{
+		BeforeMessage: []string{
 			"",
 			"Parsing downloaded index file",
 		},
-		afterMessage: []string{
+		AfterMessage: []string{
 			"",
 		},
-		errorMessage: []string{
+		ErrorMessage: []string{
 			"Cannot parse index file",
 		},
-		task: func() error {
+		Task: common.Task(func() common.TaskResult {
 			_, err := libraries.CreateStatusContextFromIndex(index)
-			return err
-		},
+			return common.TaskResult{
+				Result: nil,
+				Error:  err,
+			}
+		}),
 	}
 }
