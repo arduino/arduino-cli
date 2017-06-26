@@ -64,10 +64,10 @@ func DownloadLibFileIndex() common.TaskWrapper {
 		AfterMessage: []string{
 			"",
 			"",
-			"Download complete",
+			"Index File downloaded",
 		},
 		ErrorMessage: []string{
-			"Cannot download file, check your network connection.",
+			"Can't download index file, check your network connection.",
 		},
 		Task: common.Task(func() common.TaskResult {
 			return common.TaskResult{
@@ -86,6 +86,11 @@ func InstallLib(libraryOK []string, libraryFails map[string]string) {
 // DownloadLib pretty prints info about a pending download of libraries.
 func DownloadLib(libraryOK []string, libraryFails map[string]string) {
 	actionOnItems("libraries", "downloaded", libraryOK, libraryFails)
+}
+
+//UninstallLib pretty prints info about a pending install of libraries.
+func UninstallLib(libraryOK []string, libraryFails map[string]string) {
+	actionOnItems("libraries", "uninstalled", libraryOK, libraryFails)
 }
 
 // CorruptedLibIndexFix pretty prints messages regarding corrupted index fixes of libraries.

@@ -33,6 +33,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -41,6 +42,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/spf13/cobra"
+	"github.com/zieckey/goini"
 )
 
 const (
@@ -48,11 +50,17 @@ const (
 	LibVersion string = "0.0.1-pre-alpha"
 )
 
-// arduinoLibCmd represents the libs command
+// arduinoLibCmd represents the libs command.
 var arduinoLibCmd = &cobra.Command{
 	Use:   "lib",
 	Short: "Arduino commands about libraries",
 	Long:  `Arduino commands about libraries`,
+	Run:   executeLibCommand,
+}
+
+// arduinoLibFlags represents `arduino lib` flags.
+var arduinoLibFlags struct {
+	updateIndex bool
 }
 
 // arduinoLibInstallCmd represents the lib install command.
@@ -87,6 +95,15 @@ var arduinoLibDownloadCmd = &cobra.Command{
 	RunE:  executeDownloadCommand,
 }
 
+// arduinoLibListCmd represents the list libraries command.
+var arduinoLibListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "Shows a list of all installed libraries",
+	Long: `Shows a list of all installed libraries.
+Can be used with -v (or --verbose) flag (up to 2 times) to have longer output.`,
+	Run: executeListCommand,
+}
+
 // arduinoLibVersionCmd represents the version command.
 var arduinoLibVersionCmd = &cobra.Command{
 	Use:   "version",
@@ -104,6 +121,14 @@ func init() {
 	arduinoLibCmd.AddCommand(arduinoLibSearchCmd)
 	arduinoLibCmd.AddCommand(arduinoLibDownloadCmd)
 	arduinoLibCmd.AddCommand(arduinoLibVersionCmd)
+	arduinoLibCmd.AddCommand(arduinoLibListCmd)
+	arduinoLibCmd.Flags().BoolVar(&arduinoLibFlags.updateIndex, "update-index", false, "Updates the libraries index")
+}
+
+func executeLibCommand(cmd *cobra.Command, args []string) {
+	if arduinoLibFlags.updateIndex {
+		execUpdateListIndex(cmd, args)
+	} // else return
 }
 
 func executeDownloadCommand(cmd *cobra.Command, args []string) error {
@@ -367,4 +392,104 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func executeListCommand(command *cobra.Command, args []string) {
+	if arduinoLibFlags.updateIndex {
+		execUpdateListIndex(command, args)
+		return
+	}
+
+	libHome, err := common.GetDefaultLibFolder()
+	if err != nil {
+		fmt.Println("Cannot get libraries folder")
+		return
+	}
+
+	//prettyPrints.LibStatus(status)
+	dir, err := os.Open(libHome)
+	if err != nil {
+		fmt.Println("Cannot open libraries folder")
+		return
+	}
+
+	dirFiles, err := dir.Readdir(0)
+	if err != nil {
+		fmt.Println("Cannot read into libraries folder")
+		return
+	}
+
+	libs := make([]string, 0, 10)
+
+	//TODO: optimize this algorithm
+	// time complexity O(libraries_to_install(from RAM) *
+	//                   library_folder_number(from DISK) *
+	//                   library_folder_file_number (from DISK))
+	//TODO : remove only one version
+	for _, file := range dirFiles {
+		if file.IsDir() {
+			indexFile := filepath.Join(libHome, file.Name(), "library.properties")
+			_, err = os.Stat(indexFile)
+			if os.IsNotExist(err) {
+				fileName := file.Name()
+				//replacing underscore in foldernames with spaces.
+				fileName = strings.Replace(fileName, "_", " ", -1)
+				fileName = strings.Replace(fileName, "-", " v. ", -1)
+				//I use folder name
+				libs = append(libs, fileName)
+			} else {
+				// I use library.properties file
+				content, err := ioutil.ReadFile(indexFile)
+				if err != nil {
+					fileName := file.Name()
+					//replacing underscore in foldernames with spaces.
+					fileName = strings.Replace(fileName, "_", " ", -1)
+					fileName = strings.Replace(fileName, "-", " v. ", -1)
+					//I use folder name
+					libs = append(libs, fileName)
+					continue
+				}
+
+				ini := goini.New()
+				err = ini.Parse(content, "\n", "=")
+				if err != nil {
+					fmt.Println(err)
+				}
+				Name, ok := ini.Get("name")
+				if !ok {
+					fileName := file.Name()
+					//replacing underscore in foldernames with spaces.
+					fileName = strings.Replace(fileName, "_", " ", -1)
+					fileName = strings.Replace(fileName, "-", " v. ", -1)
+					//I use folder name
+					libs = append(libs, fileName)
+					continue
+				}
+				Version, ok := ini.Get("version")
+				if !ok {
+					fileName := file.Name()
+					//replacing underscore in foldernames with spaces.
+					fileName = strings.Replace(fileName, "_", " ", -1)
+					fileName = strings.Replace(fileName, "-", " v. ", -1)
+					//I use folder name
+					libs = append(libs, fileName)
+					continue
+				}
+				libs = append(libs, fmt.Sprintf("%-10s v. %s", Name, Version))
+			}
+		}
+	}
+
+	if len(libs) < 1 {
+		fmt.Println("No library installed")
+	} else {
+		//pretty prints installed libraries
+		for _, item := range libs {
+			fmt.Println(item)
+		}
+	}
+}
+
+func execUpdateListIndex(cmd *cobra.Command, args []string) {
+	prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose)
 }
