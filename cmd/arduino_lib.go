@@ -43,6 +43,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/spf13/cobra"
 	"github.com/zieckey/goini"
+	"gopkg.in/cheggaaa/pb.v1"
 )
 
 const (
@@ -155,19 +156,36 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 
 	libraryOK := make([]string, 0, len(args))
 	libraryFails := make(map[string]string, len(args))
+	tasks := make(map[string]common.TaskWrapper, len(args))
+	progressBars := make(map[string]*pb.ProgressBar)
 
-	for i, libraryName := range args {
+	for _, libraryName := range args {
 		library := status.Libraries[libraryName]
 		if library != nil {
 			//found
-			_, err = libraries.DownloadAndCache(library, i+1, len(args))
-			if err != nil {
-				libraryFails[libraryName] = err.Error()
-			} else {
-				libraryOK = append(libraryOK, libraryName)
-			}
+			progressBars[libraryName] = pb.StartNew(library.Latest().Size).SetUnits(pb.U_BYTES).Prefix(libraryName)
+			tasks[libraryName] = libraries.DownloadAndCache(library, progressBars[libraryName])
 		} else {
 			libraryFails[libraryName] = "This library is not in library index"
+		}
+	}
+
+	pBarsArray := make([]*pb.ProgressBar, 0, len(progressBars))
+	for _, progBar := range progressBars {
+		pBarsArray = append(pBarsArray, progBar)
+	}
+
+	pool, _ := pb.StartPool(pBarsArray...)
+
+	results := common.ExecuteParallelFromMap(tasks, 0)
+
+	pool.Stop()
+
+	for libraryName, result := range results {
+		if result.Error != nil {
+			libraryFails[libraryName] = err.Error()
+		} else {
+			libraryOK = append(libraryOK, libraryName)
 		}
 	}
 
