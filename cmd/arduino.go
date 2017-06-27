@@ -61,7 +61,7 @@ const (
             return 0
         fi
 	    return 1
-    }`,
+    }`
 
   // ArduinoVersion represents Arduino CLI version number.
   ArduinoVersion string = "0.0.1-pre-alpha"	
