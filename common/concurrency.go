@@ -91,6 +91,7 @@ func (tw TaskWrapper) Execute(verb int) TaskResult {
 	}
 
 	ret := tw.Task()
+	log.Errorf("%v\n", ret)
 
 	if ret.Error != nil {
 		if tw.ErrorMessage != nil && len(tw.ErrorMessage) > 0 {
@@ -189,8 +190,8 @@ func ExecuteParallelFromMap(taskMap map[string]TaskWrapper, verbosity int) map[s
 	wg.Wait()
 	close(results)
 	mapResult := make(map[string]TaskResult, len(results))
-	for _ = range results {
-		result := <-results
+	for result := range results {
+		//log.Errorf("results : %v %v\n", result.Key, result.Result)
 		mapResult[result.Key] = result.Result
 	}
 	return mapResult
