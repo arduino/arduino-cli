@@ -82,7 +82,7 @@ type TaskSequence func() []TaskResult
 func (tw TaskWrapper) Execute(verb int) TaskResult {
 	var maxUsableVerb [3]int
 	var msg string
-	if len(tw.BeforeMessage) > 0 {
+	if tw.BeforeMessage != nil && len(tw.BeforeMessage) > 0 {
 		maxUsableVerb[0] = minVerb(verb, tw.BeforeMessage)
 		msg = tw.BeforeMessage[maxUsableVerb[0]]
 		if msg != "" {
@@ -93,7 +93,7 @@ func (tw TaskWrapper) Execute(verb int) TaskResult {
 	ret := tw.Task()
 
 	if ret.Error != nil {
-		if len(tw.ErrorMessage) > 0 {
+		if tw.ErrorMessage != nil && len(tw.ErrorMessage) > 0 {
 			maxUsableVerb[1] = minVerb(verb, tw.ErrorMessage)
 			msg = tw.ErrorMessage[maxUsableVerb[1]]
 			if tw.BeforeMessage[maxUsableVerb[0]] != "" {
@@ -103,7 +103,7 @@ func (tw TaskWrapper) Execute(verb int) TaskResult {
 				log.Warnf("%s\n", msg)
 			}
 		}
-	} else if len(tw.AfterMessage) > 0 {
+	} else if tw.AfterMessage != nil && len(tw.AfterMessage) > 0 {
 		maxUsableVerb[2] = minVerb(verb, tw.AfterMessage)
 		msg = tw.AfterMessage[maxUsableVerb[2]]
 		if tw.BeforeMessage[maxUsableVerb[0]] != "" {
