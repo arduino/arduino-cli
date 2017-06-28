@@ -157,13 +157,13 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	libraryOK := make([]string, 0, len(args))
 	libraryFails := make(map[string]string, len(args))
 	tasks := make(map[string]common.TaskWrapper, len(args))
-	progressBars := make(map[string]*pb.ProgressBar)
+	progressBars := make(map[string]*pb.ProgressBar, len(tasks))
 
 	for _, libraryName := range args {
 		library := status.Libraries[libraryName]
 		if library != nil {
 			//found
-			progressBars[libraryName] = pb.StartNew(library.Latest().Size).SetUnits(pb.U_BYTES).Prefix(libraryName)
+			progressBars[libraryName] = pb.StartNew(library.Latest().Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", libraryName))
 			tasks[libraryName] = libraries.DownloadAndCache(library, progressBars[libraryName])
 		} else {
 			libraryFails[libraryName] = "This library is not in library index"
@@ -177,7 +177,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 
 	pool, _ := pb.StartPool(pBarsArray...)
 
-	results := common.ExecuteParallelFromMap(tasks, 0)
+	results := common.ExecuteParallelFromMap(tasks, GlobalFlags.Verbose)
 
 	pool.Stop()
 
@@ -192,11 +192,14 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	if GlobalFlags.Verbose > 0 {
 		prettyPrints.DownloadLib(libraryOK, libraryFails)
 	} else {
+		fmt.Println(libraryOK)
+		fmt.Println(libraryFails)
+		fmt.Println(results)
 		for _, library := range libraryOK {
-			fmt.Printf("%-10s -Downloaded\n", library)
+			fmt.Printf("%s\t - Downloaded\n", library)
 		}
 		for library, failure := range libraryFails {
-			fmt.Printf("%-10s -Error : %s\n", library, failure)
+			fmt.Printf("%s\t - Error : %s\n", library, failure)
 		}
 	}
 
