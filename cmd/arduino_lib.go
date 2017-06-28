@@ -201,7 +201,7 @@ func parallelLibDownloads(items []*libraries.Library, argC int, forced bool) ([]
 	progressBars := make([]*pb.ProgressBar, 0, len(items))
 
 	for i, library := range items {
-		if library.Installed == nil || forced {
+		if !library.IsCached(library.Latest().Version) || forced {
 			progressBars = append(progressBars, pb.StartNew(library.Latest().Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name)))
 			tasks[library.Name] = libraries.DownloadAndCache(library, progressBars[i])
 		}

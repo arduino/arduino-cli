@@ -65,14 +65,9 @@ const (
         fi
 	    return 1
     }`
-<<<<<<< HEAD
+
 	// ArduinoVersion represents Arduino CLI version number.
 	ArduinoVersion string = "0.0.1-pre-alpha"
-=======
-
-  // ArduinoVersion represents Arduino CLI version number.
-  ArduinoVersion string = "0.0.1-pre-alpha"	
->>>>>>> 10eb053320b324ffecf44033b88701660a124b60
 )
 
 // GlobalFlags represents flags available in all the program.

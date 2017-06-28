@@ -30,11 +30,20 @@
 package libraries
 
 import (
+	"bufio"
 	"strconv"
 
 	"github.com/pmylund/sortutil"
 
 	"strings"
+
+	"io/ioutil"
+
+	"path/filepath"
+
+	"os"
+
+	"github.com/bcmi-labs/arduino-cli/common"
 )
 
 // Library represents a library in the system
@@ -49,7 +58,68 @@ type Library struct {
 	Architectures []string            `json:"architectures"`
 	Types         []string            `json:"types"`
 	Releases      map[string]*Release `json:"releases"`
-	Installed     *Release            `json:"installed"`
+}
+
+// InstalledRelease returns the installed release of the library.
+func (l *Library) InstalledRelease() (*Release, error) {
+	libFolder, err := common.GetDefaultLibFolder()
+	if err != nil {
+		return nil, err
+	}
+	files, err := ioutil.ReadDir(libFolder)
+	if err != nil {
+		return nil, err
+	}
+	// reached := false
+	// QUESTION : what to do if i find multiple versions installed? @cmaglie
+	// purpose : use reached variable to create a list of installed versions,
+	//           it may be useful if someone accidentally put in libFolder multiple
+	//           versions, to allow them to be deleted.
+	for _, file := range files {
+		name := file.Name()
+		strings.Replace(name, "_", " ", -1)
+		// found
+		// QUESTION : what to do if i find multiple versions installed? @cmaglie
+		if file.IsDir() {
+			// try to read library.properties
+			content, err := os.Open(filepath.Join(libFolder, file.Name(), "library.properties"))
+			if err != nil && strings.Contains(name, l.Name) {
+				// use folder name
+				version := strings.SplitN(name, "-", 2)[1] // split only once, useful for libName-1.0.0-pre-alpha/beta versions.
+				return l.Releases[version], nil
+			}
+			defer content.Close()
+
+			scanner := bufio.NewScanner(content)
+			fields := make(map[string]string, 20)
+
+			for scanner.Scan() {
+				line := strings.SplitN(scanner.Text(), "=", 1)
+				if len(line) == 2 {
+					fields[line[0]] = line[1]
+				}
+			}
+			if scanner.Err() != nil && strings.Contains(name, l.Name) {
+				// use folder name
+				version := strings.SplitN(name, "-", 2)[1] // split only once, useful for libName-1.0.0-pre-alpha/beta versions.
+				return l.Releases[version], nil
+			}
+
+			_, nameExists := fields["name"]
+			version, versionExists := fields["version"]
+			if nameExists && versionExists {
+				return l.GetVersion(version), nil
+			} else if strings.Contains(name, l.Name) {
+				// use folder name
+				version = strings.SplitN(name, "-", 2)[1] // split only once, useful for libName-1.0.0-pre-alpha/beta versions.
+				return l.Releases[version], nil
+			}
+		}
+	}
+	return nil, nil // no error, but not found
+	// return nil, errors.New("Not Found")
+	// QUESTION : should errors.New("Not found") be returned?
+	// Can I create a func libraries.IsNotFound(error) bool method, following guidelines dictated by os.IsNotExists(err) func?
 }
 
 // Release represents a release of a library

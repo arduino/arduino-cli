@@ -89,8 +89,40 @@ func DownloadAndInstall(library *Library, progressFiles int, totalFiles int) err
 	return nil
 }
 
+// IsCached returns a bool representing if the release has already been downloaded
+func (lib Library) IsCached(version string) bool {
+	stagingFolder, err := getDownloadCacheFolder()
+	if err != nil {
+		return false
+	}
+
+	rel, exists := lib.Releases[version]
+	if !exists {
+		return false
+	}
+
+	_, err = os.Stat(filepath.Join(stagingFolder, rel.ArchiveFileName))
+	return !os.IsNotExist(err)
+}
+
 // InstallLib installs a library.
 func InstallLib(library *Library, version string) error {
+	_, exists := library.Releases[version]
+	if !exists {
+		return errors.New("Not existing version of the library")
+	}
+
+	installedRelease, err := library.InstalledRelease()
+	if err != nil {
+		return err
+	}
+	if installedRelease != nil {
+		err := removeRelease(library, installedRelease)
+		if err != nil {
+			return err
+		}
+	}
+
 	libFolder, err := common.GetDefaultLibFolder()
 	if err != nil {
 		return err
@@ -100,10 +132,7 @@ func InstallLib(library *Library, version string) error {
 	if err != nil {
 		return err
 	}
-	release, exists := library.Releases[version]
-	if !exists {
-		return errors.New("Not existing version of the library")
-	}
+
 	cacheFilePath := filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, version))
 	content, err := ioutil.ReadFile(cacheFilePath)
 	if err != nil {
@@ -120,8 +149,16 @@ func InstallLib(library *Library, version string) error {
 		return err
 	}
 
-	library.Installed = release
 	return nil
+}
+
+func removeRelease(l *Library, r *Release) error {
+	libFolder, err := common.GetDefaultLibFolder()
+	if err != nil {
+		return err
+	}
+	path := filepath.Join(libFolder, fmt.Sprintf("%s-%s", l.Name, r.Version))
+	return os.RemoveAll(path)
 }
 
 // prepareInstall move a downloaded library to a cache folder, before installation.

@@ -91,7 +91,6 @@ func (tw TaskWrapper) Execute(verb int) TaskResult {
 	}
 
 	ret := tw.Task()
-	log.Errorf("%v\n", ret)
 
 	if ret.Error != nil {
 		if tw.ErrorMessage != nil && len(tw.ErrorMessage) > 0 {
@@ -177,9 +176,8 @@ func ExecuteParallelFromMap(taskMap map[string]TaskWrapper, verbosity int) map[s
 			results <- resultWithKey{
 				Key: key,
 				Result: func() TaskResult {
-					ret := task.Execute(verbosity)
-					wg.Done()
-					return ret
+					defer wg.Done()
+					return task.Execute(verbosity)
 				}(),
 			}
 		}(key, task, &wg)
@@ -201,8 +199,10 @@ func ExecuteParallel(taskWrappers []TaskWrapper, verbosity int) []TaskResult {
 	wg.Add(len(taskWrappers))
 	for _, task := range taskWrappers {
 		go func(task TaskWrapper, wg *sync.WaitGroup) {
-			defer wg.Done()
-			results <- task.Execute(verbosity)
+			results <- func(wg *sync.WaitGroup) TaskResult {
+				defer wg.Done()
+				return task.Execute(verbosity)
+			}(wg)
 		}(task, &wg)
 	}
 	wg.Wait()
