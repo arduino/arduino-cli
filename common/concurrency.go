@@ -136,10 +136,7 @@ func CreateTaskSequence(taskWrappers []TaskWrapper, ignoreOnFailure []bool, verb
 		for i, taskWrapper := range taskWrappers {
 			result := taskWrapper.Execute(verbosity)
 			results = append(results, result)
-			if result.Error != nil {
-				if ignoreOnFailure[i] {
-					break
-				}
+			if result.Error != nil && !ignoreOnFailure[i] {
 				log.Warnf("Warning from task %d: %s", i, result.Error)
 			}
 		}

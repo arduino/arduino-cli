@@ -128,7 +128,7 @@ func libIndexParse(index *libraries.Index, verbosity int) common.TaskWrapper {
 			"Cannot parse index file",
 		},
 		Task: common.Task(func() common.TaskResult {
-			_, err := libraries.CreateStatusContextFromIndex(index)
+			_, err := index.CreateStatusContext()
 			return common.TaskResult{
 				Result: nil,
 				Error:  err,

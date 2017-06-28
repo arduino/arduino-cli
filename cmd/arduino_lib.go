@@ -146,7 +146,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	status, err := libraries.CreateStatusContextFromIndex(index)
+	status, err := index.CreateStatusContext()
 	if err != nil {
 		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
 		if err != nil {
@@ -154,39 +154,11 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	libraryOK := make([]string, 0, len(args))
-	libraryFails := make(map[string]string, len(args))
-	tasks := make(map[string]common.TaskWrapper, len(args))
-	progressBars := make(map[string]*pb.ProgressBar, len(tasks))
+	items, failed := extractValidLibraries(args, status)
 
-	for _, libraryName := range args {
-		library := status.Libraries[libraryName]
-		if library != nil {
-			//found
-			progressBars[libraryName] = pb.StartNew(library.Latest().Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", libraryName))
-			tasks[libraryName] = libraries.DownloadAndCache(library, progressBars[libraryName])
-		} else {
-			libraryFails[libraryName] = "This library is not in library index"
-		}
-	}
-
-	pBarsArray := make([]*pb.ProgressBar, 0, len(progressBars))
-	for _, progBar := range progressBars {
-		pBarsArray = append(pBarsArray, progBar)
-	}
-
-	pool, _ := pb.StartPool(pBarsArray...)
-
-	results := common.ExecuteParallelFromMap(tasks, GlobalFlags.Verbose)
-
-	pool.Stop()
-
-	for libraryName, result := range results {
-		if result.Error != nil {
-			libraryFails[libraryName] = err.Error()
-		} else {
-			libraryOK = append(libraryOK, libraryName)
-		}
+	libraryOK, libraryFails := parallelLibDownloads(items, len(args), true)
+	for _, fail := range failed {
+		libraryFails[fail] = "Not Found"
 	}
 
 	if GlobalFlags.Verbose > 0 {
@@ -203,6 +175,57 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func extractValidLibraries(args []string, status *libraries.StatusContext) ([]*libraries.Library, []string) {
+	items := make([]*libraries.Library, 0, len(args))
+	fails := make([]string, 0, len(args))
+
+	for _, libraryName := range args {
+		library := status.Libraries[libraryName]
+		if library != nil {
+			items = append(items, library)
+		} else {
+			fails = append(fails, libraryName)
+		}
+	}
+
+	return items, fails
+}
+
+// parallelLibDownloads executes multiple libraries downloads in parallel
+func parallelLibDownloads(items []*libraries.Library, argC int, forced bool) ([]string, map[string]string) {
+	itemC := len(items)
+	libraryOK := make([]string, 0, itemC)
+	libraryFails := make(map[string]string, argC-itemC)
+
+	tasks := make(map[string]common.TaskWrapper, len(items))
+	progressBars := make([]*pb.ProgressBar, 0, len(items))
+
+	for i, library := range items {
+		if library.Installed == nil || forced {
+			progressBars = append(progressBars, pb.StartNew(library.Latest().Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name)))
+			tasks[library.Name] = libraries.DownloadAndCache(library, progressBars[i])
+		}
+	}
+
+	if len(tasks) > 0 {
+		pool, _ := pb.StartPool(progressBars...)
+
+		results := common.ExecuteParallelFromMap(tasks, GlobalFlags.Verbose)
+
+		pool.Stop()
+
+		for libraryName, result := range results {
+			if result.Error != nil {
+				libraryFails[libraryName] = result.Error.Error()
+			} else {
+				libraryOK = append(libraryOK, libraryName)
+			}
+		}
+	}
+
+	return libraryOK, libraryFails
+}
+
 func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	if len(args) < 1 {
 		return fmt.Errorf("No library specified for install command")
@@ -217,7 +240,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	status, err := libraries.CreateStatusContextFromIndex(index)
+	status, err := index.CreateStatusContext()
 	if err != nil {
 		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
 		if err != nil {
@@ -225,21 +248,19 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	libraryOK := make([]string, 0, len(args))
-	libraryFails := make(map[string]string, len(args))
+	items, fails := extractValidLibraries(args, status)
 
-	for i, libraryName := range args {
-		library := status.Libraries[libraryName]
-		if library != nil {
-			//found
-			err = libraries.DownloadAndInstall(library, i+1, len(args))
-			if err != nil {
-				libraryFails[libraryName] = err.Error()
-			} else {
-				libraryOK = append(libraryOK, libraryName)
-			}
+	libraryOK, libraryFails := parallelLibDownloads(items, len(args), false)
+	for _, fail := range fails {
+		libraryFails[fail] = "Not Found"
+	}
+
+	for _, library := range items {
+		err = libraries.InstallLib(library, library.Latest().Version)
+		if err != nil {
+			libraryFails[library.Name] = err.Error()
 		} else {
-			libraryFails[libraryName] = "This library is not in library index"
+			libraryOK = append(libraryOK, library.Name)
 		}
 	}
 
@@ -376,7 +397,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	status, err := libraries.CreateStatusContextFromIndex(index)
+	status, err := index.CreateStatusContext()
 	if err != nil {
 		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
 		if err != nil {
