@@ -82,24 +82,29 @@ type TaskSequence func() []TaskResult
 func (tw TaskWrapper) Execute(verb int) TaskResult {
 	var maxUsableVerb [3]int
 	var msg string
-	maxUsableVerb[0] = minVerb(verb, tw.BeforeMessage)
-	msg = tw.BeforeMessage[maxUsableVerb[0]]
-	if msg != "" {
-		log.Infof("%s ... ", msg)
+	if tw.BeforeMessage != nil && len(tw.BeforeMessage) > 0 {
+		maxUsableVerb[0] = minVerb(verb, tw.BeforeMessage)
+		msg = tw.BeforeMessage[maxUsableVerb[0]]
+		if msg != "" {
+			log.Infof("%s ... ", msg)
+		}
 	}
 
 	ret := tw.Task()
+	log.Errorf("%v\n", ret)
 
 	if ret.Error != nil {
-		maxUsableVerb[1] = minVerb(verb, tw.ErrorMessage)
-		msg = tw.ErrorMessage[maxUsableVerb[1]]
-		if tw.BeforeMessage[maxUsableVerb[0]] != "" {
-			log.Warn("ERROR\n")
+		if tw.ErrorMessage != nil && len(tw.ErrorMessage) > 0 {
+			maxUsableVerb[1] = minVerb(verb, tw.ErrorMessage)
+			msg = tw.ErrorMessage[maxUsableVerb[1]]
+			if tw.BeforeMessage[maxUsableVerb[0]] != "" {
+				log.Warn("ERROR\n")
+			}
+			if msg != "" {
+				log.Warnf("%s\n", msg)
+			}
 		}
-		if msg != "" {
-			log.Warnf("%s\n", msg)
-		}
-	} else {
+	} else if tw.AfterMessage != nil && len(tw.AfterMessage) > 0 {
 		maxUsableVerb[2] = minVerb(verb, tw.AfterMessage)
 		msg = tw.AfterMessage[maxUsableVerb[2]]
 		if tw.BeforeMessage[maxUsableVerb[0]] != "" {
@@ -131,10 +136,7 @@ func CreateTaskSequence(taskWrappers []TaskWrapper, ignoreOnFailure []bool, verb
 		for i, taskWrapper := range taskWrappers {
 			result := taskWrapper.Execute(verbosity)
 			results = append(results, result)
-			if result.Error != nil {
-				if ignoreOnFailure[i] {
-					break
-				}
+			if result.Error != nil && !ignoreOnFailure[i] {
 				log.Warnf("Warning from task %d: %s", i, result.Error)
 			}
 		}
@@ -159,20 +161,52 @@ func ExecuteSequence(taskWrappers []TaskWrapper, ignoreOnFailure []bool, verbosi
 	return CreateTaskSequence(taskWrappers, ignoreOnFailure, verbosity)()
 }
 
-// ExecuteParallel executes a set of TaskWrappers in parallel, handling concurrency for results.
-func ExecuteParallel(taskWrappers []TaskWrapper, verbosity int) []TaskResult {
-	results := make(chan TaskResult)
+type resultWithKey struct {
+	Result TaskResult
+	Key    string
+}
+
+// ExecuteParallelFromMap executes a set of taskwrappers in parallel, taking input from a map[string]TaskWrapper.
+func ExecuteParallelFromMap(taskMap map[string]TaskWrapper, verbosity int) map[string]TaskResult {
+	results := make(chan resultWithKey, len(taskMap))
 	wg := sync.WaitGroup{}
+	wg.Add(len(taskMap))
 
-	wg.Add(len(taskWrappers))
-
-	for _, task := range taskWrappers {
-		go func(task TaskWrapper) {
-			defer wg.Done()
-			results <- task.Execute(verbosity)
-		}(task)
+	for key, task := range taskMap {
+		go func(key string, task TaskWrapper, wg *sync.WaitGroup) {
+			results <- resultWithKey{
+				Key: key,
+				Result: func() TaskResult {
+					ret := task.Execute(verbosity)
+					wg.Done()
+					return ret
+				}(),
+			}
+		}(key, task, &wg)
 	}
 	wg.Wait()
+	close(results)
+	mapResult := make(map[string]TaskResult, len(results))
+	for result := range results {
+		//log.Errorf("results : %v %v\n", result.Key, result.Result)
+		mapResult[result.Key] = result.Result
+	}
+	return mapResult
+}
+
+// ExecuteParallel executes a set of TaskWrappers in parallel, handling concurrency for results.
+func ExecuteParallel(taskWrappers []TaskWrapper, verbosity int) []TaskResult {
+	results := make(chan TaskResult, len(taskWrappers))
+	wg := sync.WaitGroup{}
+	wg.Add(len(taskWrappers))
+	for _, task := range taskWrappers {
+		go func(task TaskWrapper, wg *sync.WaitGroup) {
+			defer wg.Done()
+			results <- task.Execute(verbosity)
+		}(task, &wg)
+	}
+	wg.Wait()
+	close(results)
 	array := make([]TaskResult, len(results))
 	for i := range array {
 		array[i] = <-results

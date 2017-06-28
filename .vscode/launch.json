@@ -49,6 +49,16 @@
             "env": {},
             "args": ["lib", "install", "YoutubeApi"],
             "showLog": true
+        },
+        {
+            "name": "Launch LIB DOWNLOAD",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceRoot}/main.go",
+            "env": {},
+            "args": ["lib", "download", "Zumo32U4", "YoutubeApi", "YouMadeIt", "XLR8SPI", "XLR8Servo", "XLR8Pong", "XLR8NeoPixel"],
+            "showLog": true
         }
     ]
 }

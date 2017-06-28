@@ -30,13 +30,13 @@
 package libraries
 
 import (
-	"archive/zip"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
+	"gopkg.in/cheggaaa/pb.v1"
 )
 
 const (
@@ -44,23 +44,38 @@ const (
 )
 
 // DownloadAndCache downloads a library without installing it
-func DownloadAndCache(library *Library, progressFiles int, totalFiles int) (*zip.Reader, error) {
-	zipContent, err := downloadLatest(library, progressFiles, totalFiles)
-	if err != nil {
-		return nil, err
-	}
+func DownloadAndCache(library *Library, progBar *pb.ProgressBar) common.TaskWrapper {
+	return common.TaskWrapper{
+		Task: func() common.TaskResult {
+			zipContent, err := downloadLatest(library, progBar)
+			if err != nil {
+				log.Warnf("Error %s", err)
+				return common.TaskResult{
+					Result: nil,
+					Error:  err,
+				}
+			}
 
-	zipArchive, err := prepareInstall(library, zipContent)
-	if err != nil {
-		return nil, err
-	}
+			zipArchive, err := prepareInstall(library, zipContent)
+			if err != nil {
+				log.Warnf("Error %s", err)
+				return common.TaskResult{
+					Result: nil,
+					Error:  err,
+				}
+			}
 
-	return zipArchive, nil
+			return common.TaskResult{
+				Result: zipArchive,
+				Error:  nil,
+			}
+		},
+	}
 }
 
 // DownloadLatest downloads Latest version of a library.
-func downloadLatest(library *Library, progressFiles int, totalFiles int) ([]byte, error) {
-	return common.DownloadPackage(library.Latest().URL, fmt.Sprintf("library %s", library.Name), progressFiles, totalFiles)
+func downloadLatest(library *Library, progBar *pb.ProgressBar) ([]byte, error) {
+	return common.DownloadPackage(library.Latest().URL, fmt.Sprintf("library %s", library.Name), progBar)
 }
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.

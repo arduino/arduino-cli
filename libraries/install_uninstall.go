@@ -32,15 +32,15 @@ package libraries
 import (
 	"archive/zip"
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
+	"gopkg.in/cheggaaa/pb.v1"
 )
-
-var install = common.Unzip
 
 // Uninstall a library means remove its directory.
 var Uninstall = os.RemoveAll
@@ -59,7 +59,10 @@ func DownloadAndInstall(library *Library, progressFiles int, totalFiles int) err
 
 	_, err = os.Stat(cacheFilePath)
 	if os.IsNotExist(err) {
-		zipArchive, err = DownloadAndCache(library, progressFiles, totalFiles)
+		progBar := pb.New(library.Latest().Size)
+		Result := DownloadAndCache(library, progBar).Execute(0)
+		zipArchive = Result.Result.(*zip.Reader)
+		err = Result.Error
 		if err != nil {
 			return err
 		}
@@ -76,13 +79,48 @@ func DownloadAndInstall(library *Library, progressFiles int, totalFiles int) err
 		}
 	}
 
-	err = install(zipArchive, libFolder)
+	err = common.Unzip(zipArchive, libFolder)
 	if err != nil {
 		return err
 	}
 
 	//add postinstall here? for verbose maybe
 
+	return nil
+}
+
+// InstallLib installs a library.
+func InstallLib(library *Library, version string) error {
+	libFolder, err := common.GetDefaultLibFolder()
+	if err != nil {
+		return err
+	}
+
+	stagingFolder, err := getDownloadCacheFolder()
+	if err != nil {
+		return err
+	}
+	release, exists := library.Releases[version]
+	if !exists {
+		return errors.New("Not existing version of the library")
+	}
+	cacheFilePath := filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, version))
+	content, err := ioutil.ReadFile(cacheFilePath)
+	if err != nil {
+		return err
+	}
+
+	zipArchive, err := zip.NewReader(bytes.NewReader(content), int64(len(content)))
+	if err != nil {
+		return err
+	}
+
+	err = common.Unzip(zipArchive, libFolder)
+	if err != nil {
+		return err
+	}
+
+	library.Installed = release
 	return nil
 }
 

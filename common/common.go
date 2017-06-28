@@ -39,7 +39,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/mitchellh/ioprogress"
+	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
 // GetDefaultArduinoFolder returns the default data folder for Arduino platform
@@ -153,7 +153,7 @@ func TruncateDir(dir string) error {
 }
 
 // DownloadPackage downloads a package from arduino repository, applying a label for the progress bar.
-func DownloadPackage(URL string, downloadLabel string, progressFile int, totalFiles int) ([]byte, error) {
+func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressBar) ([]byte, error) {
 	client := http.DefaultClient
 
 	request, err := http.NewRequest("GET", URL, nil)
@@ -164,21 +164,14 @@ func DownloadPackage(URL string, downloadLabel string, progressFile int, totalFi
 	response, err := client.Do(request)
 
 	if err != nil {
-		return nil, fmt.Errorf("Cannot fetch library. Response creation error")
+		return nil, fmt.Errorf("Cannot fetch %s. Response creation error", downloadLabel)
 	} else if response.StatusCode != 200 {
 		response.Body.Close()
-		return nil, fmt.Errorf("Cannot fetch library. Source responded with a status %d code", response.StatusCode)
+		return nil, fmt.Errorf("Cannot fetch %s. Source responded with a status %d code", downloadLabel, response.StatusCode)
 	}
 	defer response.Body.Close()
 
-	// Download completed, now move the archive to temp location and unpack it.
-	rd := &ioprogress.Reader{
-		Reader: response.Body,
-		Size:   response.ContentLength,
-		DrawFunc: ioprogress.DrawTerminalf(os.Stdout, func(progress int64, size int64) string {
-			return fmt.Sprintf("%s ... %s -%.2f %% (%d/%d)", downloadLabel, ioprogress.DrawTextFormatBytes(progress, size), float64(progress)/float64(size)*100, progressFile, totalFiles)
-		}),
-	}
+	rd := progressBar.NewProxyReader(response.Body)
 
 	body, err := ioutil.ReadAll(rd)
 	if err != nil {
