@@ -29,7 +29,6 @@
 package common
 
 import (
-	"fmt"
 	"math"
 	"sync"
 
@@ -173,8 +172,6 @@ type resultWithKey struct {
 func ExecuteParallelFromMap(taskMap map[string]TaskWrapper, verbosity int) map[string]TaskResult {
 	results := make(chan resultWithKey, len(taskMap))
 	wg := sync.WaitGroup{}
-	fmt.Println(taskMap)
-	fmt.Println(len(taskMap))
 	wg.Add(len(taskMap))
 
 	for key, task := range taskMap {
@@ -191,7 +188,6 @@ func ExecuteParallelFromMap(taskMap map[string]TaskWrapper, verbosity int) map[s
 	}
 	wg.Wait()
 	close(results)
-	fmt.Println(results)
 	mapResult := make(map[string]TaskResult, len(results))
 	for _ = range results {
 		result := <-results

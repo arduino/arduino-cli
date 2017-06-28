@@ -31,6 +31,7 @@ package cmd
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -180,6 +181,11 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	results := common.ExecuteParallelFromMap(tasks, GlobalFlags.Verbose)
 
 	pool.Stop()
+	val, _ := json.Marshal(&tasks)
+	log.Infof("Tasks : %s", val)
+
+	val, _ = json.Marshal(&results)
+	log.Infof("Results : %s", val)
 
 	for libraryName, result := range results {
 		if result.Error != nil {
@@ -192,9 +198,6 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	if GlobalFlags.Verbose > 0 {
 		prettyPrints.DownloadLib(libraryOK, libraryFails)
 	} else {
-		fmt.Println(libraryOK)
-		fmt.Println(libraryFails)
-		fmt.Println(results)
 		for _, library := range libraryOK {
 			fmt.Printf("%s\t - Downloaded\n", library)
 		}
