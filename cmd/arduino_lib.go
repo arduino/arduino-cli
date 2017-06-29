@@ -421,7 +421,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 				}
 				fmt.Println()
 			} else {
-				fmt.Println(name)
+				fmt.Printf("\"%s\"\n", name)
 			}
 		}
 	}

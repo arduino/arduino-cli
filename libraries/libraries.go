@@ -175,7 +175,7 @@ func (r *Release) String() string {
 }
 
 func (l *Library) String() string {
-	res := "Name: " + l.Name + "\n"
+	res := "Name: \"" + l.Name + "\"\n"
 	res += "  Author: " + l.Author + "\n"
 	res += "  Maintainer: " + l.Maintainer + "\n"
 	res += "  Sentence: " + l.Sentence + "\n"
