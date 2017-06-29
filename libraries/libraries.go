@@ -76,8 +76,7 @@ func (l *Library) InstalledRelease() (*Release, error) {
 	//           it may be useful if someone accidentally put in libFolder multiple
 	//           versions, to allow them to be deleted.
 	for _, file := range files {
-		name := file.Name()
-		strings.Replace(name, "_", " ", -1)
+		name := strings.Replace(file.Name(), "_", " ", -1)
 		// found
 		// QUESTION : what to do if i find multiple versions installed? @cmaglie
 		if file.IsDir() {

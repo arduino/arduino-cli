@@ -38,6 +38,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"strings"
+
 	"github.com/bcmi-labs/arduino-cli/common"
 	"gopkg.in/cheggaaa/pb.v1"
 )
@@ -116,11 +118,13 @@ func InstallLib(library *Library, version string) error {
 	if err != nil {
 		return err
 	}
-	if installedRelease != nil {
+	if installedRelease != nil && installedRelease.Version != library.Latest().Version {
 		err := removeRelease(library, installedRelease)
 		if err != nil {
 			return err
 		}
+	} else {
+		return nil // Already installed and latest version.
 	}
 
 	libFolder, err := common.GetDefaultLibFolder()
@@ -157,7 +161,10 @@ func removeRelease(l *Library, r *Release) error {
 	if err != nil {
 		return err
 	}
-	path := filepath.Join(libFolder, fmt.Sprintf("%s-%s", l.Name, r.Version))
+
+	name := strings.Replace(l.Name, " ", "_", -1)
+
+	path := filepath.Join(libFolder, fmt.Sprintf("%s-%s", name, r.Version))
 	return os.RemoveAll(path)
 }
 
@@ -176,7 +183,7 @@ func prepareInstall(library *Library, body []byte) (*zip.Reader, error) {
 		return nil, fmt.Errorf("Cannot get download cache folder")
 	}
 
-	err = ioutil.WriteFile(filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, library.Latest().Version)), body, 0666)
+	err = ioutil.WriteFile(filepath.Join(stagingFolder, library.Latest().ArchiveFileName), body, 0666)
 	if err != nil {
 		return nil, fmt.Errorf("Cannot write download to cache folder, %s", err.Error())
 	}

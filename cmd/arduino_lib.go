@@ -200,10 +200,11 @@ func parallelLibDownloads(items []*libraries.Library, argC int, forced bool) ([]
 	tasks := make(map[string]common.TaskWrapper, len(items))
 	progressBars := make([]*pb.ProgressBar, 0, len(items))
 
-	for i, library := range items {
+	for _, library := range items {
 		if !library.IsCached(library.Latest().Version) || forced {
-			progressBars = append(progressBars, pb.StartNew(library.Latest().Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name)))
-			tasks[library.Name] = libraries.DownloadAndCache(library, progressBars[i])
+			pBar := pb.StartNew(library.Latest().Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name))
+			progressBars = append(progressBars, pBar)
+			tasks[library.Name] = libraries.DownloadAndCache(library, pBar)
 		}
 	}
 
@@ -249,8 +250,9 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	items, fails := extractValidLibraries(args, status)
+	libraryOK := make([]string, 0, len(items))
 
-	libraryOK, libraryFails := parallelLibDownloads(items, len(args), false)
+	_, libraryFails := parallelLibDownloads(items, len(args), false)
 	for _, fail := range fails {
 		libraryFails[fail] = "Not Found"
 	}
@@ -267,10 +269,11 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	if GlobalFlags.Verbose > 0 {
 		prettyPrints.InstallLib(libraryOK, libraryFails)
 	} else {
+		okEnd := len(libraryOK)
 		for i, library := range libraryOK {
-			fmt.Printf("%-10s - Installed (%d/%d)\n", library, i+1, len(libraryOK))
+			fmt.Printf("%-10s - Installed (%d/%d)\n", library, i+1, okEnd)
 		}
-		i := 1
+		i := okEnd
 		for library, failure := range libraryFails {
 			i++
 			fmt.Printf("%-10s - Error : %-10s (%d/%d)\n", library, failure, i, len(libraryFails))
