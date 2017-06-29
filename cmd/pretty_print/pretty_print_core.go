@@ -27,49 +27,11 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package libraries
+package prettyPrints
 
-import "github.com/pmylund/sortutil"
+import "github.com/bcmi-labs/arduino-cli/cores"
 
-// StatusContext keeps the current status of the libraries in the system
-// (the list of libraries, revisions, installed paths, etc.)
-type StatusContext struct {
-	Libraries map[string]*Library `json:"libraries"`
-}
+// PackageStatus pretty prints packages from index status.
+func PackageStatus(status *cores.StatusContext) {
 
-// AddLibrary adds an indexRelease to the status context
-func (l *StatusContext) AddLibrary(indexLib *indexRelease) {
-	name := indexLib.Name
-	if l.Libraries[name] == nil {
-		l.Libraries[name] = indexLib.extractLibrary()
-	} else {
-		release := indexLib.extractRelease()
-		lib := l.Libraries[name]
-		lib.Releases[release.Version] = release
-	}
-}
-
-// Names returns an array with all the names of the registered libraries.
-func (l *StatusContext) Names() []string {
-	res := make([]string, len(l.Libraries))
-	i := 0
-	for n := range l.Libraries {
-		res[i] = n
-		i++
-	}
-	sortutil.CiAsc(res)
-	return res
-}
-
-// CreateStatusContext creates a status context from index data.
-func (index *Index) CreateStatusContext() (*StatusContext, error) {
-	// Start with an empty status context
-	libraries := StatusContext{
-		Libraries: map[string]*Library{},
-	}
-	for _, lib := range index.Libraries {
-		// Add all indexed libraries in the status context
-		libraries.AddLibrary(&lib)
-	}
-	return &libraries, nil
 }

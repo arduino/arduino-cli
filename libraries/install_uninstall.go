@@ -32,15 +32,17 @@ package libraries
 import (
 	"archive/zip"
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"github.com/bcmi-labs/arduino-cli/common"
-)
+	"strings"
 
-var install = common.Unzip
+	"github.com/bcmi-labs/arduino-cli/common"
+	"gopkg.in/cheggaaa/pb.v1"
+)
 
 // Uninstall a library means remove its directory.
 var Uninstall = os.RemoveAll
@@ -53,13 +55,16 @@ func DownloadAndInstall(library *Library, progressFiles int, totalFiles int) err
 	}
 
 	stagingFolder, err := getDownloadCacheFolder()
-	cacheFilePath := filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, library.Latest.Version))
+	cacheFilePath := filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, library.Latest().Version))
 
 	var zipArchive *zip.Reader
 
 	_, err = os.Stat(cacheFilePath)
 	if os.IsNotExist(err) {
-		zipArchive, err = DownloadAndCache(library, progressFiles, totalFiles)
+		progBar := pb.New(library.Latest().Size)
+		Result := DownloadAndCache(library, progBar).Execute(0)
+		zipArchive = Result.Result.(*zip.Reader)
+		err = Result.Error
 		if err != nil {
 			return err
 		}
@@ -76,7 +81,7 @@ func DownloadAndInstall(library *Library, progressFiles int, totalFiles int) err
 		}
 	}
 
-	err = install(zipArchive, libFolder)
+	err = common.Unzip(zipArchive, libFolder)
 	if err != nil {
 		return err
 	}
@@ -84,6 +89,83 @@ func DownloadAndInstall(library *Library, progressFiles int, totalFiles int) err
 	//add postinstall here? for verbose maybe
 
 	return nil
+}
+
+// IsCached returns a bool representing if the release has already been downloaded
+func (lib Library) IsCached(version string) bool {
+	stagingFolder, err := getDownloadCacheFolder()
+	if err != nil {
+		return false
+	}
+
+	rel, exists := lib.Releases[version]
+	if !exists {
+		return false
+	}
+
+	_, err = os.Stat(filepath.Join(stagingFolder, rel.ArchiveFileName))
+	return !os.IsNotExist(err)
+}
+
+// InstallLib installs a library.
+func InstallLib(library *Library, version string) error {
+	_, exists := library.Releases[version]
+	if !exists {
+		return errors.New("Not existing version of the library")
+	}
+
+	installedRelease, err := library.InstalledRelease()
+	if err != nil {
+		return err
+	}
+	if installedRelease != nil && installedRelease.Version != library.Latest().Version {
+		err := removeRelease(library, installedRelease)
+		if err != nil {
+			return err
+		}
+	} else {
+		return nil // Already installed and latest version.
+	}
+
+	libFolder, err := common.GetDefaultLibFolder()
+	if err != nil {
+		return err
+	}
+
+	stagingFolder, err := getDownloadCacheFolder()
+	if err != nil {
+		return err
+	}
+
+	cacheFilePath := filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, version))
+	content, err := ioutil.ReadFile(cacheFilePath)
+	if err != nil {
+		return err
+	}
+
+	zipArchive, err := zip.NewReader(bytes.NewReader(content), int64(len(content)))
+	if err != nil {
+		return err
+	}
+
+	err = common.Unzip(zipArchive, libFolder)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func removeRelease(l *Library, r *Release) error {
+	libFolder, err := common.GetDefaultLibFolder()
+	if err != nil {
+		return err
+	}
+
+	name := strings.Replace(l.Name, " ", "_", -1)
+
+	path := filepath.Join(libFolder, fmt.Sprintf("%s-%s", name, r.Version))
+	return os.RemoveAll(path)
 }
 
 // prepareInstall move a downloaded library to a cache folder, before installation.
@@ -101,7 +183,7 @@ func prepareInstall(library *Library, body []byte) (*zip.Reader, error) {
 		return nil, fmt.Errorf("Cannot get download cache folder")
 	}
 
-	err = ioutil.WriteFile(filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, library.Latest.Version)), body, 0666)
+	err = ioutil.WriteFile(filepath.Join(stagingFolder, library.Latest().ArchiveFileName), body, 0666)
 	if err != nil {
 		return nil, fmt.Errorf("Cannot write download to cache folder, %s", err.Error())
 	}
@@ -116,6 +198,6 @@ func getLibFolder(library *Library) (string, error) {
 		return "", err
 	}
 
-	libFolder := filepath.Join(baseFolder, fmt.Sprintf("%s-%s", library.Name, library.Latest.Version))
+	libFolder := filepath.Join(baseFolder, fmt.Sprintf("%s-%s", library.Name, library.Latest().Version))
 	return common.GetFolder(libFolder, "library")
 }

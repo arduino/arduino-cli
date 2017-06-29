@@ -27,33 +27,49 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package libraries
+package cores
 
 import "github.com/pmylund/sortutil"
 
-// StatusContext keeps the current status of the libraries in the system
-// (the list of libraries, revisions, installed paths, etc.)
+// StatusContext represents the Context of the Cores and Tools in the system.
 type StatusContext struct {
-	Libraries map[string]*Library `json:"libraries"`
+	Packages map[string]*Package
 }
 
-// AddLibrary adds an indexRelease to the status context
-func (l *StatusContext) AddLibrary(indexLib *indexRelease) {
-	name := indexLib.Name
-	if l.Libraries[name] == nil {
-		l.Libraries[name] = indexLib.extractLibrary()
+//Package represents a package in the system.
+type Package struct {
+	Name       string
+	Maintainer string
+	WebsiteURL string
+	Email      string
+	Cores      map[string]*Core // The cores in the system.
+	// Tools map[string]*Tool // The tools in the system.
+}
+
+// AddPackage adds a package to a context from an indexPackage.
+//
+// NOTE: If the package is already in the context, it is overwritten!
+func (sc *StatusContext) AddPackage(indexPackage *indexPackage) {
+	sc.Packages[indexPackage.Name] = indexPackage.extractPackage()
+}
+
+// AddCore adds a core to the context.
+func (pm *Package) AddCore(indexCore *indexCoreRelease) {
+	name := indexCore.Name
+	if pm.Cores[name] == nil {
+		pm.Cores[name] = indexCore.extractCore()
 	} else {
-		release := indexLib.extractRelease()
-		lib := l.Libraries[name]
-		lib.Releases[release.Version] = release
+		release := indexCore.extractRelease()
+		core := pm.Cores[name]
+		core.Releases[release.Version] = release
 	}
 }
 
-// Names returns an array with all the names of the registered libraries.
-func (l *StatusContext) Names() []string {
-	res := make([]string, len(l.Libraries))
+// CoreNames returns an array with all the names of the registered cores.
+func (pm *Package) CoreNames() []string {
+	res := make([]string, len(pm.Cores))
 	i := 0
-	for n := range l.Libraries {
+	for n := range pm.Cores {
 		res[i] = n
 		i++
 	}
@@ -61,15 +77,14 @@ func (l *StatusContext) Names() []string {
 	return res
 }
 
-// CreateStatusContext creates a status context from index data.
-func (index *Index) CreateStatusContext() (*StatusContext, error) {
+// CreateStatusContextFromIndex creates a status context from index data.
+func CreateStatusContextFromIndex(index *Index) (*StatusContext, error) {
 	// Start with an empty status context
-	libraries := StatusContext{
-		Libraries: map[string]*Library{},
+	packages := StatusContext{
+		Packages: make(map[string]*Package, len(index.Packages)),
 	}
-	for _, lib := range index.Libraries {
-		// Add all indexed libraries in the status context
-		libraries.AddLibrary(&lib)
+	for _, packageManager := range index.Packages {
+		packages.AddPackage(packageManager)
 	}
-	return &libraries, nil
+	return &packages, nil
 }

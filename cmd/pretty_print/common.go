@@ -27,49 +27,28 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package libraries
+package prettyPrints
 
-import "github.com/pmylund/sortutil"
+import (
+	"fmt"
+	"strings"
+)
 
-// StatusContext keeps the current status of the libraries in the system
-// (the list of libraries, revisions, installed paths, etc.)
-type StatusContext struct {
-	Libraries map[string]*Library `json:"libraries"`
-}
-
-// AddLibrary adds an indexRelease to the status context
-func (l *StatusContext) AddLibrary(indexLib *indexRelease) {
-	name := indexLib.Name
-	if l.Libraries[name] == nil {
-		l.Libraries[name] = indexLib.extractLibrary()
+// actionOnItems pretty prints info about an action on one or more items.
+func actionOnItems(itemPluralName string, actionPastParticiple string, itemOK []string, itemFails map[string]string) {
+	if len(itemFails) > 0 {
+		if len(itemOK) > 0 {
+			fmt.Printf("The following %0s were succesfully %s:\n", itemPluralName, actionPastParticiple)
+			fmt.Println(strings.Join(itemOK, " "))
+			fmt.Print("However, t")
+		} else { //UGLYYYY but it works
+			fmt.Print("T")
+		}
+		fmt.Printf("he the following %s were not %s and failed :", itemPluralName, actionPastParticiple)
+		for item, failure := range itemFails {
+			fmt.Printf("%-10s -%s\n", item, failure)
+		}
 	} else {
-		release := indexLib.extractRelease()
-		lib := l.Libraries[name]
-		lib.Releases[release.Version] = release
+		fmt.Printf("All %s successfully installed\n", itemPluralName)
 	}
-}
-
-// Names returns an array with all the names of the registered libraries.
-func (l *StatusContext) Names() []string {
-	res := make([]string, len(l.Libraries))
-	i := 0
-	for n := range l.Libraries {
-		res[i] = n
-		i++
-	}
-	sortutil.CiAsc(res)
-	return res
-}
-
-// CreateStatusContext creates a status context from index data.
-func (index *Index) CreateStatusContext() (*StatusContext, error) {
-	// Start with an empty status context
-	libraries := StatusContext{
-		Libraries: map[string]*Library{},
-	}
-	for _, lib := range index.Libraries {
-		// Add all indexed libraries in the status context
-		libraries.AddLibrary(&lib)
-	}
-	return &libraries, nil
 }

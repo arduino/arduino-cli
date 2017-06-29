@@ -39,11 +39,11 @@ import (
 
 // Index represents the content of a library_index.json file
 type Index struct {
-	Libraries []IndexRelease `json:"libraries"`
+	Libraries []indexRelease `json:"libraries"`
 }
 
-// IndexRelease is an entry of a library_index.json
-type IndexRelease struct {
+// indexRelease is an entry of a library_index.json
+type indexRelease struct {
 	Name            string   `json:"name"`
 	Version         string   `json:"version"`
 	Author          string   `json:"author"`
@@ -83,16 +83,17 @@ func LoadLibrariesIndex() (*Index, error) {
 	}
 
 	var index Index
-	if err := json.Unmarshal(libBuff, &index); err != nil {
+	err = json.Unmarshal(libBuff, &index)
+	if err != nil {
 		return nil, err
 	}
 
 	return &index, nil
 }
 
-// ExtractRelease create a new Release with the information contained
+// extractRelease create a new Release with the information contained
 // in this index element
-func (indexLib *IndexRelease) ExtractRelease() *Release {
+func (indexLib *indexRelease) extractRelease() *Release {
 	return &Release{
 		Version:         indexLib.Version,
 		URL:             indexLib.URL,
@@ -102,10 +103,10 @@ func (indexLib *IndexRelease) ExtractRelease() *Release {
 	}
 }
 
-// ExtractLibrary create a new Library with the information contained
+// extractLibrary create a new Library with the information contained
 // in this index element.
-func (indexLib *IndexRelease) ExtractLibrary() *Library {
-	release := indexLib.ExtractRelease()
+func (indexLib *indexRelease) extractLibrary() *Library {
+	release := indexLib.extractRelease()
 	return &Library{
 		Name:          indexLib.Name,
 		Author:        indexLib.Author,
@@ -116,7 +117,6 @@ func (indexLib *IndexRelease) ExtractLibrary() *Library {
 		Category:      indexLib.Category,
 		Architectures: indexLib.Architectures,
 		Types:         indexLib.Types,
-		Releases:      []*Release{release},
-		Latest:        release,
+		Releases:      map[string]*Release{release.Version: release},
 	}
 }

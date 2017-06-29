@@ -39,13 +39,16 @@ import (
 )
 
 const (
-  bashAutoCompletionFunction = `
+	bashAutoCompletionFunction = `
     __arduino_autocomplete() 
     {
         case $(last_command) in
             arduino_lib)
     		    opts="install uninstall list search version"
     	        ;;
+			arduino_core)
+			    opts="install uninstall list search version"
+				;;
     		arduino_lib_list)
     		    opts="update"
     			;;
@@ -63,8 +66,8 @@ const (
 	    return 1
     }`
 
-  // ArduinoVersion represents Arduino CLI version number.
-  ArduinoVersion string = "0.0.1-pre-alpha"	
+	// ArduinoVersion represents Arduino CLI version number.
+	ArduinoVersion string = "0.0.1-pre-alpha"
 )
 
 // GlobalFlags represents flags available in all the program.
