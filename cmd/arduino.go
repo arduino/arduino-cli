@@ -44,7 +44,7 @@ const (
     {
         case $(last_command) in
             arduino_lib)
-    		    opts="install uninstall list search version"
+    		    opts="install uninstall list search version --update-index"
     	        ;;
 			arduino_core)
 			    opts="install uninstall list search version --update-index"
@@ -53,7 +53,7 @@ const (
     		    opts="lib core version"
     		    ;;
             arduino)
-    		    opts="lib help version"
+    		    opts="lib core help version"
     		    ;;
 	    esac		  
     	if [[ ${cur} == " *" ]] ; then
