@@ -30,25 +30,26 @@
 package prettyPrints
 
 import (
-	"fmt"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 // actionOnItems pretty prints info about an action on one or more items.
 func actionOnItems(itemPluralName string, actionPastParticiple string, itemOK []string, itemFails map[string]string) {
 	if len(itemFails) > 0 {
 		if len(itemOK) > 0 {
-			fmt.Printf("The following %0s were succesfully %s:\n", itemPluralName, actionPastParticiple)
-			fmt.Println(strings.Join(itemOK, " "))
-			fmt.Print("However, t")
+			logrus.Infof("The following %0s were succesfully %s:\n", itemPluralName, actionPastParticiple)
+			logrus.Infoln(strings.Join(itemOK, " "))
+			logrus.Info("However, t")
 		} else { //UGLYYYY but it works
-			fmt.Print("T")
+			logrus.Info("T")
 		}
-		fmt.Printf("he the following %s were not %s and failed :", itemPluralName, actionPastParticiple)
+		logrus.Infof("he the following %s were not %s and failed :", itemPluralName, actionPastParticiple)
 		for item, failure := range itemFails {
-			fmt.Printf("%-10s -%s\n", item, failure)
+			logrus.Infof("%-10s -%s\n", item, failure)
 		}
 	} else {
-		fmt.Printf("All %s successfully installed\n", itemPluralName)
+		logrus.Infof("All %s successfully installed\n", itemPluralName)
 	}
 }

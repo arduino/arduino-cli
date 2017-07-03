@@ -30,10 +30,9 @@
 package prettyPrints
 
 import (
-	"fmt"
-
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/libraries"
+	"github.com/sirupsen/logrus"
 )
 
 // LibStatus pretty prints libraries from index status.
@@ -41,15 +40,15 @@ func LibStatus(status *libraries.StatusContext, verbosity int) {
 	for _, name := range status.Names() {
 		if verbosity > 0 {
 			lib := status.Libraries[name]
-			fmt.Print(lib)
+			logrus.WithField("test", "test").Info(lib)
 			if verbosity > 1 {
 				for _, r := range lib.Releases {
-					fmt.Print(r)
+					logrus.Info(r)
 				}
 			}
-			fmt.Println()
+			logrus.Infoln()
 		} else {
-			fmt.Println(name)
+			logrus.Infoln(name)
 		}
 	}
 }

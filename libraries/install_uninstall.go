@@ -41,55 +41,10 @@ import (
 	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/common"
-	"gopkg.in/cheggaaa/pb.v1"
 )
 
 // Uninstall a library means remove its directory.
 var Uninstall = os.RemoveAll
-
-// DownloadAndInstall downloads a library and installs it to its specified location.
-func DownloadAndInstall(library *Library, progressFiles int, totalFiles int) error {
-	libFolder, err := common.GetDefaultLibFolder()
-	if err != nil {
-		return fmt.Errorf("Cannot get Lib destination directory")
-	}
-
-	stagingFolder, err := getDownloadCacheFolder()
-	cacheFilePath := filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, library.Latest().Version))
-
-	var zipArchive *zip.Reader
-
-	_, err = os.Stat(cacheFilePath)
-	if os.IsNotExist(err) {
-		progBar := pb.New(library.Latest().Size)
-		Result := DownloadAndCache(library, progBar).Execute(0)
-		zipArchive = Result.Result.(*zip.Reader)
-		err = Result.Error
-		if err != nil {
-			return err
-		}
-	} else {
-		fmt.Printf("%-10s - Cached    (%d/%d)\n", library.Name, progressFiles, totalFiles)
-		content, err := ioutil.ReadFile(cacheFilePath)
-		if err != nil {
-			return err
-		}
-
-		zipArchive, err = zip.NewReader(bytes.NewReader(content), int64(len(content)))
-		if err != nil {
-			return err
-		}
-	}
-
-	err = common.Unzip(zipArchive, libFolder)
-	if err != nil {
-		return err
-	}
-
-	//add postinstall here? for verbose maybe
-
-	return nil
-}
 
 // IsCached returns a bool representing if the release has already been downloaded
 func (lib Library) IsCached(version string) bool {

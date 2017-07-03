@@ -36,6 +36,7 @@ import (
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -49,7 +50,7 @@ func DownloadAndCache(library *Library, progBar *pb.ProgressBar) common.TaskWrap
 		Task: func() common.TaskResult {
 			zipContent, err := downloadLatest(library, progBar)
 			if err != nil {
-				log.Warnf("Error %s", err)
+				logrus.Warnf("Error %s", err)
 				return common.TaskResult{
 					Result: nil,
 					Error:  err,
@@ -58,7 +59,7 @@ func DownloadAndCache(library *Library, progBar *pb.ProgressBar) common.TaskWrap
 
 			zipArchive, err := prepareInstall(library, zipContent)
 			if err != nil {
-				log.Warnf("Error %s", err)
+				logrus.Warnf("Error %s", err)
 				return common.TaskResult{
 					Result: nil,
 					Error:  err,

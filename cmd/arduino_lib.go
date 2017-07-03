@@ -41,6 +41,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/libraries"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/zieckey/goini"
 	"gopkg.in/cheggaaa/pb.v1"
@@ -111,7 +112,7 @@ var arduinoLibVersionCmd = &cobra.Command{
 	Short: "Shows version Number of arduino lib",
 	Long:  `Shows version Number of arduino lib which is installed on your system.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("arduino lib V. %s\n", LibVersion)
+		logrus.Infof("arduino lib V. %s\n", LibVersion)
 	},
 }
 
@@ -139,7 +140,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 
 	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
-		fmt.Print("Cannot find index file ... ")
+		logrus.Info("Cannot find index file ... ")
 		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
 		if err != nil {
 			return nil
@@ -165,10 +166,10 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		prettyPrints.DownloadLib(libraryOK, libraryFails)
 	} else {
 		for _, library := range libraryOK {
-			fmt.Printf("%s\t - Downloaded\n", library)
+			logrus.Infof("%s\t - Downloaded\n", library)
 		}
 		for library, failure := range libraryFails {
-			fmt.Printf("%s\t - Error : %s\n", library, failure)
+			logrus.Infof("%s\t - Error : %s\n", library, failure)
 		}
 	}
 
@@ -234,7 +235,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 
 	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
-		fmt.Println("Cannot find index file ...")
+		logrus.Infoln("Cannot find index file ...")
 		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
 		if err != nil {
 			return nil
@@ -271,12 +272,12 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	} else {
 		okEnd := len(libraryOK)
 		for i, library := range libraryOK {
-			fmt.Printf("%-10s - Installed (%d/%d)\n", library, i+1, okEnd)
+			logrus.Infof("%-10s - Installed (%d/%d)\n", library, i+1, okEnd)
 		}
 		i := okEnd
 		for library, failure := range libraryFails {
 			i++
-			fmt.Printf("%-10s - Error : %-10s (%d/%d)\n", library, failure, i, len(libraryFails))
+			logrus.Infof("%-10s - Error : %-10s (%d/%d)\n", library, failure, i, len(libraryFails))
 		}
 	}
 
@@ -295,7 +296,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 
 	dir, err := os.Open(libFolder)
 	if err != nil {
-		fmt.Println("Cannot open libraries folder")
+		logrus.Infoln("Cannot open libraries folder")
 		return nil
 	}
 
@@ -304,7 +305,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
-		fmt.Println("Cannot read into libraries folder")
+		logrus.Infoln("Cannot read into libraries folder")
 		return nil
 	}
 
@@ -370,16 +371,16 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 
 	if GlobalFlags.Verbose > 0 {
 		if len(libraryFails) > 0 {
-			fmt.Println("The following libraries were succesfully uninstalled:")
-			fmt.Println(strings.Join(libraryOK, " "))
-			fmt.Println("However, the uninstall process failed on the following libraries:")
-			fmt.Println(strings.Join(libraryFails, " "))
+			logrus.Infoln("The following libraries were succesfully uninstalled:")
+			logrus.Infoln(strings.Join(libraryOK, " "))
+			logrus.Infoln("However, the uninstall process failed on the following libraries:")
+			logrus.Infoln(strings.Join(libraryFails, " "))
 		} else {
-			fmt.Println("All libraries successfully uninstalled")
+			logrus.Infoln("All libraries successfully uninstalled")
 		}
 	} else if len(libraryFails) > 0 {
 		for _, failed := range libraryFails {
-			fmt.Printf("%-10s - Failed\n", failed)
+			logrus.Infof("%-10s - Failed\n", failed)
 		}
 	}
 	return nil
@@ -396,7 +397,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 
 	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
-		fmt.Println("Index file is corrupted. Please replace it by updating : arduino lib list update")
+		logrus.Infoln("Index file is corrupted. Please replace it by updating : arduino lib list update")
 		return nil
 	}
 
@@ -416,21 +417,21 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 			found = true
 			if GlobalFlags.Verbose > 0 {
 				lib := status.Libraries[name]
-				fmt.Print(lib)
+				logrus.Info(lib)
 				if GlobalFlags.Verbose > 1 {
 					for _, r := range lib.Releases {
-						fmt.Print(r)
+						logrus.Info(r)
 					}
 				}
-				fmt.Println()
+				logrus.Infoln()
 			} else {
-				fmt.Printf("\"%s\"\n", name)
+				logrus.Infof("\"%s\"\n", name)
 			}
 		}
 	}
 
 	if !found {
-		fmt.Printf("No library found matching \"%s\" search query.\n", query)
+		logrus.Infof("No library found matching \"%s\" search query.\n", query)
 	}
 
 	return nil
@@ -444,20 +445,20 @@ func executeListCommand(command *cobra.Command, args []string) {
 
 	libHome, err := common.GetDefaultLibFolder()
 	if err != nil {
-		fmt.Println("Cannot get libraries folder")
+		logrus.Infoln("Cannot get libraries folder")
 		return
 	}
 
 	//prettyPrints.LibStatus(status)
 	dir, err := os.Open(libHome)
 	if err != nil {
-		fmt.Println("Cannot open libraries folder")
+		logrus.Infoln("Cannot open libraries folder")
 		return
 	}
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
-		fmt.Println("Cannot read into libraries folder")
+		logrus.Infoln("Cannot read into libraries folder")
 		return
 	}
 
@@ -495,7 +496,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 				ini := goini.New()
 				err = ini.Parse(content, "\n", "=")
 				if err != nil {
-					fmt.Println(err)
+					logrus.Infoln(err)
 				}
 				Name, ok := ini.Get("name")
 				if !ok {
@@ -523,11 +524,11 @@ func executeListCommand(command *cobra.Command, args []string) {
 	}
 
 	if len(libs) < 1 {
-		fmt.Println("No library installed")
+		logrus.Infoln("No library installed")
 	} else {
 		//pretty prints installed libraries
 		for _, item := range libs {
-			fmt.Println(item)
+			logrus.Infoln(item)
 		}
 	}
 }

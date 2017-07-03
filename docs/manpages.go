@@ -13,6 +13,6 @@ func GenerateManPages() {
 	}
 	//out := new(bytes.Buffer)
 	//doc.GenMan(cmd.RootCmd, header, out)
-	//fmt.Print(out.String())
+	//logrus.Info(out.String())
 	doc.GenManTree(cmd.RootCmd, header, "./docs/manpages")
 }

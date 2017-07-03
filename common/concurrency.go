@@ -32,16 +32,8 @@ import (
 	"math"
 	"sync"
 
-	lcf "github.com/Robpol86/logrus-custom-formatter"
 	"github.com/sirupsen/logrus"
 )
-
-var log *logrus.Entry
-
-func init() {
-	log = logrus.WithFields(logrus.Fields{})
-	logrus.SetFormatter(lcf.NewFormatter("%[message]s", nil))
-}
 
 // A TaskWrapper wraps a task to be executed to allow
 // Useful messages to be print. It is used to pretty
@@ -86,7 +78,7 @@ func (tw TaskWrapper) Execute(verb int) TaskResult {
 		maxUsableVerb[0] = minVerb(verb, tw.BeforeMessage)
 		msg = tw.BeforeMessage[maxUsableVerb[0]]
 		if msg != "" {
-			log.Infof("%s ... ", msg)
+			logrus.Infof("%s ... ", msg)
 		}
 	}
 
@@ -97,20 +89,20 @@ func (tw TaskWrapper) Execute(verb int) TaskResult {
 			maxUsableVerb[1] = minVerb(verb, tw.ErrorMessage)
 			msg = tw.ErrorMessage[maxUsableVerb[1]]
 			if tw.BeforeMessage[maxUsableVerb[0]] != "" {
-				log.Warn("ERROR\n")
+				logrus.Warn("ERROR\n")
 			}
 			if msg != "" {
-				log.Warnf("%s\n", msg)
+				logrus.Warnf("%s\n", msg)
 			}
 		}
 	} else if tw.AfterMessage != nil && len(tw.AfterMessage) > 0 {
 		maxUsableVerb[2] = minVerb(verb, tw.AfterMessage)
 		msg = tw.AfterMessage[maxUsableVerb[2]]
 		if tw.BeforeMessage[maxUsableVerb[0]] != "" {
-			log.Info("OK\n")
+			logrus.Info("OK\n")
 		}
 		if msg != "" {
-			log.Infof("%s\n", msg)
+			logrus.Infof("%s\n", msg)
 		}
 	}
 	return ret
@@ -136,7 +128,7 @@ func CreateTaskSequence(taskWrappers []TaskWrapper, ignoreOnFailure []bool, verb
 			result := taskWrapper.Execute(verbosity)
 			results = append(results, result)
 			if result.Error != nil && !ignoreOnFailure[i] {
-				log.Warnf("Warning from task %d: %s", i, result.Error)
+				logrus.Warnf("Warning from task %d: %s", i, result.Error)
 			}
 		}
 		return results
@@ -186,7 +178,7 @@ func ExecuteParallelFromMap(taskMap map[string]TaskWrapper, verbosity int) map[s
 	close(results)
 	mapResult := make(map[string]TaskResult, len(results))
 	for result := range results {
-		//log.Errorf("results : %v %v\n", result.Key, result.Result)
+		//logrus.Errorf("results : %v %v\n", result.Key, result.Result)
 		mapResult[result.Key] = result.Result
 	}
 	return mapResult

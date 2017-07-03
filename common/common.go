@@ -39,8 +39,20 @@ import (
 	"path/filepath"
 	"runtime"
 
+	lcf "github.com/Robpol86/logrus-custom-formatter"
+	"github.com/sirupsen/logrus"
+
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
+
+// Formatters represents all formatting objects passable to logrus.
+var Formatters map[string]logrus.Formatter
+
+func init() {
+	Formatters = make(map[string]logrus.Formatter, 2)
+	Formatters["text"] = lcf.NewFormatter("%[message]s", nil)
+	Formatters["json"] = new(logrus.JSONFormatter)
+}
 
 // GetDefaultArduinoFolder returns the default data folder for Arduino platform
 func GetDefaultArduinoFolder() (string, error) {
@@ -87,14 +99,14 @@ func GetDefaultArduinoHomeFolder() (string, error) {
 func GetFolder(folder string, messageName string) (string, error) {
 	_, err := os.Stat(folder)
 	if os.IsNotExist(err) {
-		fmt.Printf("Cannot find default %s folder, attemping to create it ...", messageName)
+		logrus.Infof("Cannot find default %s folder, attemping to create it ...", messageName)
 		err = os.MkdirAll(folder, 0755)
 		if err != nil {
-			fmt.Println("ERROR")
-			fmt.Printf("Cannot create %s folder\n", messageName)
+			logrus.Infoln("ERROR")
+			logrus.Infof("Cannot create %s folder\n", messageName)
 			return "", err
 		}
-		fmt.Println("OK")
+		logrus.Infoln("OK")
 	}
 	return folder, nil
 }

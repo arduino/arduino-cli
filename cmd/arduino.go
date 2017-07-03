@@ -30,10 +30,13 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
+	"errors"
+
+	"github.com/bcmi-labs/arduino-cli/common"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -70,6 +73,7 @@ const (
 // GlobalFlags represents flags available in all the program.
 var GlobalFlags struct {
 	Verbose int
+	Format  string
 }
 
 // rootCmdFlags represent flags available to the root command.
@@ -83,6 +87,10 @@ var arduinoCmd = &cobra.Command{
 	Short: "Arduino CLI",
 	Long:  "Arduino Create Command Line Interface (arduino-cli)",
 	BashCompletionFunction: bashAutoCompletionFunction,
+	PersistentPreRun:       arduinoPreRun,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return errors.New("")
+	},
 }
 
 // arduinoVersionCmd represents the version command.
@@ -91,29 +99,37 @@ var arduinoVersionCmd = &cobra.Command{
 	Short: "Shows version Number of arduino",
 	Long:  `Shows version Number of arduino which is installed on your system.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("arduino V. %s\n", ArduinoVersion)
+		logrus.Infof("arduino V. %s\n", ArduinoVersion)
 		if GlobalFlags.Verbose > 0 {
-			fmt.Printf("arduino V. %s\n", LibVersion)
+			logrus.Infof("arduino V. %s\n", LibVersion)
 		}
 	},
-}
-
-// Execute adds all child commands to the root command sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	err := arduinoCmd.Execute()
-	if err != nil {
-		os.Exit(1)
-	}
 }
 
 func init() {
 	cobra.OnInitialize(initConfig)
 
 	arduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
-	arduinoCmd.Flags().StringVar(&rootCmdFlags.ConfigFile, "config", "", "config file (default is $HOME/.arduino-cli.yaml)")
+	arduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
+	arduinoCmd.Flags().StringVar(&rootCmdFlags.ConfigFile, "config", "", "config file (default is $HOME/.arduino.yaml)")
 
 	arduinoCmd.AddCommand(arduinoVersionCmd)
+}
+
+func arduinoPreRun(cmd *cobra.Command, args []string) {
+	_, formatterExists := common.Formatters[GlobalFlags.Format]
+	if !formatterExists {
+		GlobalFlags.Format = "text"
+	}
+	logrus.SetFormatter(common.Formatters[GlobalFlags.Format])
+}
+
+// Execute adds all child commands to the root command sets flags appropriately.
+func Execute() {
+	err := arduinoCmd.Execute()
+	if err != nil {
+		os.Exit(1)
+	}
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -125,23 +141,23 @@ func initConfig() {
 		// Find home directory.
 		home, err := homedir.Dir()
 		if err != nil {
-			fmt.Print("Error while searching for home directory for this user")
+			logrus.Warn("Error while searching for home directory for this user")
 			if GlobalFlags.Verbose > 0 {
-				fmt.Printf(": %s\n", err.Error())
+				logrus.WithField("error", err).Warnf(": %s\n", err.Error())
 			}
-			fmt.Println()
+			logrus.Warnln()
 			os.Exit(1)
 		}
 
 		// Search config in home directory with name ".arduino-cli" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".arduino-cli")
+		viper.SetConfigName(".arduino")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		logrus.Infoln("Using config file:", viper.ConfigFileUsed())
 	}
 }
