@@ -45,7 +45,6 @@ package auth
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -234,8 +233,6 @@ func (c *Config) authenticate(client *http.Client, cookies cookies, uri, user, p
 	}
 
 	if res.StatusCode != 302 {
-		log.Println(uri, csrf, query.Encode())
-
 		return "", errors.New("authentication failed")
 	}
 
