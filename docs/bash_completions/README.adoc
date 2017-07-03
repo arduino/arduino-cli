@@ -1,0 +1,31 @@
+= Bash Autocompletion 
+Alessandro Sanino <a.sanino@bcmi-labs.cc>
+
+File contained in this directory is the file to allow autocompletion of the arduino CLI commands
+
+== Installation
+. Move the file (using `sudo`) to directory `/etc/bash_completion.d`
+[source, bash]
+----
+sudo mv $PROJECT_DIR/docs/bash_completion/arduino /etc/bash_completion.d/
+----
+
+. Reload bash completion configuration :
+[source, bash]
+----
+source /etc/bash_completion
+. /etc/bash_completion.d/arduino
+----
+
+. Requires `$PROJECT_DIR` in `PATH` environment variable
+[source, bash]
+----
+export PATH=$PATH:$PROJECT_DIR
+----
+
+== How has been autocompletion obtained?
+It has been obtained by setting up the BashAutocompletionFunction field of Root Command
+
+```
+
+```

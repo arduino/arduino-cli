@@ -27,12 +27,11 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package main
+package prettyPrints
 
-import "github.com/bcmi-labs/arduino-cli/cmd"
+import "github.com/bcmi-labs/arduino-cli/cores"
 
-func main() {
-	cmd.Execute()
-	//cmd.RootCmd.GenBashCompletionFile("docs/bash_completions/arduino")
-	//docs.GenerateManPages()
+// PackageStatus pretty prints packages from index status.
+func PackageStatus(status *cores.StatusContext) {
+
 }

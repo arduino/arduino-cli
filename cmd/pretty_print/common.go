@@ -27,12 +27,28 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package main
+package prettyPrints
 
-import "github.com/bcmi-labs/arduino-cli/cmd"
+import (
+	"fmt"
+	"strings"
+)
 
-func main() {
-	cmd.Execute()
-	//cmd.RootCmd.GenBashCompletionFile("docs/bash_completions/arduino")
-	//docs.GenerateManPages()
+// actionOnItems pretty prints info about an action on one or more items.
+func actionOnItems(itemPluralName string, actionPastParticiple string, itemOK []string, itemFails map[string]string) {
+	if len(itemFails) > 0 {
+		if len(itemOK) > 0 {
+			fmt.Printf("The following %0s were succesfully %s:\n", itemPluralName, actionPastParticiple)
+			fmt.Println(strings.Join(itemOK, " "))
+			fmt.Print("However, t")
+		} else { //UGLYYYY but it works
+			fmt.Print("T")
+		}
+		fmt.Printf("he the following %s were not %s and failed :", itemPluralName, actionPastParticiple)
+		for item, failure := range itemFails {
+			fmt.Printf("%-10s -%s\n", item, failure)
+		}
+	} else {
+		fmt.Printf("All %s successfully installed\n", itemPluralName)
+	}
 }

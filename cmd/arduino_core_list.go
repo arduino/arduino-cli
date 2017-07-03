@@ -27,12 +27,24 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package main
+package cmd
 
-import "github.com/bcmi-labs/arduino-cli/cmd"
+import (
+	"github.com/spf13/cobra"
+)
 
-func main() {
-	cmd.Execute()
-	//cmd.RootCmd.GenBashCompletionFile("docs/bash_completions/arduino")
-	//docs.GenerateManPages()
+var arduinoCoreListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "Shows the list of installed cores",
+	Long: `Shows the list of installed cores. 
+With -v tag (up to 2 times) can provide more verbose output.`,
+	Run: executeCoreListCommand,
+}
+
+func init() {
+	arduinoCoreCmd.AddCommand(arduinoCoreListCmd)
+}
+
+func executeCoreListCommand(cmd *cobra.Command, args []string) {
+    
 }
