@@ -47,11 +47,8 @@ const (
     		    opts="install uninstall list search version"
     	        ;;
 			arduino_core)
-			    opts="install uninstall list search version"
+			    opts="install uninstall list search version --update-index"
 				;;
-    		arduino_lib_list)
-    		    opts="update"
-    			;;
     		arduino_help)
     		    opts="lib core version"
     		    ;;
