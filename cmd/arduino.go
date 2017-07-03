@@ -90,6 +90,9 @@ var arduinoCmd = &cobra.Command{
 	PersistentPreRun:       arduinoPreRun,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return errors.New("")
+		// this is just a placeholder to call help and run PreRun
+		// one of the cobra issues is that if Run is not present PreRun and
+		// PersistentPreRun are not executed.
 	},
 }
 
