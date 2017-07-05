@@ -30,6 +30,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"errors"
@@ -102,9 +103,9 @@ var arduinoVersionCmd = &cobra.Command{
 	Short: "Shows version Number of arduino",
 	Long:  `Shows version Number of arduino which is installed on your system.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		logrus.Infof("arduino V. %s\n", ArduinoVersion)
+		Formatter.Print(fmt.Sprintf("arduino V. %s\n", ArduinoVersion))
 		if GlobalFlags.Verbose > 0 {
-			logrus.Infof("arduino V. %s\n", LibVersion)
+			Formatter.Print(fmt.Sprintf("arduino V. %s\n", LibVersion))
 		}
 	},
 }
@@ -124,7 +125,7 @@ func arduinoPreRun(cmd *cobra.Command, args []string) {
 	if !formatterExists {
 		GlobalFlags.Format = "text"
 	}
-	logrus.SetFormatter(common.Formatters[GlobalFlags.Format])
+	Formatter = common.Formatters[GlobalFlags.Format]
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -146,7 +147,7 @@ func initConfig() {
 		if err != nil {
 			logrus.Warn("Error while searching for home directory for this user")
 			if GlobalFlags.Verbose > 0 {
-				logrus.WithField("error", err).Warnf(": %s\n", err.Error())
+				logrus.Warnf(": %s\n", err.Error())
 			}
 			logrus.Warnln()
 			os.Exit(1)

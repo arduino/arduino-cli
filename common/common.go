@@ -39,19 +39,18 @@ import (
 	"path/filepath"
 	"runtime"
 
-	lcf "github.com/Robpol86/logrus-custom-formatter"
 	"github.com/sirupsen/logrus"
 
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
 // Formatters represents all formatting objects passable to logrus.
-var Formatters map[string]logrus.Formatter
+var Formatters map[string]Formatter
 
 func init() {
-	Formatters = make(map[string]logrus.Formatter, 2)
-	Formatters["text"] = lcf.NewFormatter("%[message]s", nil)
-	Formatters["json"] = new(logrus.JSONFormatter)
+	Formatters = make(map[string]Formatter, 2)
+	Formatters["text"] = TextPrinter(0)
+	Formatters["json"] = JSONPrinter(1)
 }
 
 // GetDefaultArduinoFolder returns the default data folder for Arduino platform

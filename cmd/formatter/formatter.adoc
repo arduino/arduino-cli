@@ -1,0 +1,32 @@
+= Formatters 
+Alessandro Sanino <a.sanino@bcmi-labs.cc>
+
+This package contains all formatters.
+
+.) Formatter - A generic interface to format data.
+.) TextFormatter - Formats interface{} to Text String.
+.) JSONFormatter - Formats interface{} to JSON String.
+
+== Usage
+[source, go]
+----
+var a Formatter = TextFormatter(0)
+var b JSONFormatter = JSONFormatter(0) //every int8 will be ok.
+
+var test struct {
+   field1 string `json:"field1,omitempty"` //same json tag as required by json.Marshal
+   field2 int    `json:"field2"`            //same json tag as required by json.Marshal
+}{
+    field1 : "test",
+    field2 : 42,
+}
+
+var testString = a.Format(test) 
+fmt.Println(testString) // Prints test.String()
+a.Print(test) //does the same.
+ 
+
+testString = b.Format(test) 
+fmt.Println(testString) // Prints { field1 : "test", field2 : "42" }
+b.Print(test) //Does the same
+----

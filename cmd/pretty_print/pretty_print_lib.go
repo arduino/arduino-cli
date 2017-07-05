@@ -30,26 +30,33 @@
 package prettyPrints
 
 import (
+	"fmt"
+
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/libraries"
-	"github.com/sirupsen/logrus"
 )
 
 // LibStatus pretty prints libraries from index status.
-func LibStatus(status *libraries.StatusContext, verbosity int) {
+func LibStatus(status *libraries.StatusContext, verbosity int) interface{} {
+	message := ""
+
 	for _, name := range status.Names() {
 		if verbosity > 0 {
 			lib := status.Libraries[name]
-			logrus.WithField("test", "test").Info(lib)
+			message += fmt.Sprint(lib)
 			if verbosity > 1 {
 				for _, r := range lib.Releases {
-					logrus.Info(r)
+					message += fmt.Sprint(r)
 				}
 			}
-			logrus.Infoln()
+			message += "\n"
 		} else {
-			logrus.Infoln(name)
+			message += name
 		}
+	}
+	return common.Message{
+		Header: "Library Search Results:",
+		Data:   message,
 	}
 }
 
