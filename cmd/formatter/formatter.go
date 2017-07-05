@@ -99,13 +99,15 @@ func Print(msg interface{}) error {
 	return defaultFormatter.Print(msg)
 }
 
-// printFunc is the base function of all Print methods of Formatters.
+// defaultPrintFunc is the base function of all Print methods of Formatters.
 //
 // It can be used for an unified implementation.
 func defaultPrintFunc(f Formatter, msg interface{}) error {
 	val, err := f.Format(msg)
-	if err != nil {
+	if err == nil {
 		fmt.Println(val)
+	} else {
+		fmt.Println(err)
 	}
 	return err
 }

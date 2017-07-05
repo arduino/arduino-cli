@@ -118,6 +118,42 @@ var arduinoLibVersionCmd = &cobra.Command{
 	},
 }
 
+//DownloadResult contains info about a completed Download process.
+type DownloadResult struct {
+	Downloaded []string          `json:"downloaded"`
+	Errors     map[string]string `json:"errors"`
+}
+
+func (dr DownloadResult) String() string {
+	ret := ""
+	for _, name := range dr.Downloaded {
+		ret += fmt.Sprintf("%s - Downloaded\n", name)
+	}
+	ret += "Errors:\n"
+	for libName, err := range dr.Errors {
+		ret += fmt.Sprintf("%s - %s\n", libName, err)
+	}
+	return ret
+}
+
+//InstallResult contains info about a completed installation process.
+type InstallResult struct {
+	Installed []string          `json:"installed"`
+	Errors    map[string]string `json:"errors"`
+}
+
+func (dr InstallResult) String() string {
+	ret := ""
+	for _, name := range dr.Installed {
+		ret += fmt.Sprintf("%s - Installed\n", name)
+	}
+	ret += "Errors:\n"
+	for libName, err := range dr.Errors {
+		ret += fmt.Sprintf("%s - %s\n", libName, err)
+	}
+	return ret
+}
+
 func init() {
 	arduinoCmd.AddCommand(arduinoLibCmd)
 	arduinoLibCmd.AddCommand(arduinoLibInstallCmd)
@@ -167,12 +203,11 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	if GlobalFlags.Verbose > 0 {
 		prettyPrints.DownloadLib(libraryOK, libraryFails)
 	} else {
-		for _, library := range libraryOK {
-			logrus.Infof("%s\t - Downloaded\n", library)
-		}
-		for library, failure := range libraryFails {
-			logrus.Infof("%s\t - Error : %s\n", library, failure)
-		}
+		formatter.Print(DownloadResult{
+			Downloaded: libraryOK,
+			Errors:     libraryFails,
+		})
+
 	}
 
 	return nil
@@ -203,10 +238,12 @@ func parallelLibDownloads(items []*libraries.Library, argC int, forced bool) ([]
 	tasks := make(map[string]task.Wrapper, len(items))
 	progressBars := make([]*pb.ProgressBar, 0, len(items))
 
+	textMode := GlobalFlags.Format == "text"
+
 	for _, library := range items {
 		if !library.IsCached(library.Latest().Version) || forced {
 			var pBar *pb.ProgressBar
-			if GlobalFlags.Format != "text" {
+			if textMode {
 				pBar = pb.StartNew(library.Latest().Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name))
 				progressBars = append(progressBars, pBar)
 			}
@@ -215,11 +252,15 @@ func parallelLibDownloads(items []*libraries.Library, argC int, forced bool) ([]
 	}
 
 	if len(tasks) > 0 {
-		pool, _ := pb.StartPool(progressBars...)
-
+		var pool *pb.Pool
+		if textMode {
+			pool, _ = pb.StartPool(progressBars...)
+		}
 		results := task.ExecuteParallelFromMap(tasks, GlobalFlags.Verbose)
 
-		pool.Stop()
+		if textMode {
+			pool.Stop()
+		}
 
 		for libraryName, result := range results {
 			if result.Error != nil {
@@ -416,27 +457,28 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 
 	found := false
 
+	message := make(map[string]interface{})
+	libs := make([]interface{}, 0, len(status.Libraries))
 	//Pretty print libraries from index.
 	for _, name := range status.Names() {
 		if strings.Contains(strings.ToLower(name), query) {
 			found = true
 			if GlobalFlags.Verbose > 0 {
-				lib := status.Libraries[name]
-				logrus.Info(lib)
-				if GlobalFlags.Verbose > 1 {
-					for _, r := range lib.Releases {
-						logrus.Info(r)
-					}
+				libs = append(libs, status.Libraries[name])
+				if GlobalFlags.Verbose < 2 {
+					status.Libraries[name].Releases = nil
 				}
-				logrus.Infoln()
 			} else {
-				logrus.Infof("\"%s\"\n", name)
+				libs = append(libs, name)
 			}
 		}
 	}
 
 	if !found {
-		logrus.Infof("No library found matching \"%s\" search query.\n", query)
+		formatter.Print(common.FromError(fmt.Errorf("No library found matching \"%s\" search query", query)))
+	} else {
+		message["libraries"] = libs
+		formatter.Print(message)
 	}
 
 	return nil

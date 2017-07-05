@@ -24,3 +24,10 @@ func (err ErrorMessage) Error() string {
 func (err ErrorMessage) String() string {
 	return err.Error()
 }
+
+// FromError creates an ErrorMessage from an Error.
+func FromError(err error) ErrorMessage {
+	return ErrorMessage{
+		message: err.Error(),
+	}
+}

@@ -38,7 +38,7 @@ import (
 )
 
 // LibStatus pretty prints libraries from index status.
-func LibStatus(status *libraries.StatusContext, verbosity int) interface{} {
+func LibStatus(status *libraries.StatusContext, verbosity int) {
 	message := ""
 
 	for _, name := range status.Names() {
@@ -55,10 +55,10 @@ func LibStatus(status *libraries.StatusContext, verbosity int) interface{} {
 			message += name
 		}
 	}
-	return formatter.Message{
+	formatter.Print(formatter.Message{
 		Header: "Library Search Results:",
 		Data:   message,
-	}
+	})
 }
 
 // DownloadLibFileIndex shows info regarding the download of a missing (or corrupted) file index.

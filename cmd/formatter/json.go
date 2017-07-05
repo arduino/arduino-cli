@@ -39,11 +39,12 @@ type JSONPrinter int8
 //
 // It ignores Header and Footer fields of the message.
 func (jp JSONPrinter) Format(msg interface{}) (string, error) {
-	if reflect.TypeOf(msg).Kind().String() != "struct" { // TODO : optimize if possible
+	if reflect.TypeOf(msg).Kind().String() == "struct" ||
+		reflect.TypeOf(msg).Kind().String() == "map" { // TODO : optimize if possible
 		ret, err := json.Marshal(msg)
 		return string(ret), err
 	}
-	return "", errors.New("Only struct values are accepted")
+	return "", errors.New("Only structs and maps values are accepted")
 }
 
 // Print prints a JSON object.

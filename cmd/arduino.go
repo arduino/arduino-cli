@@ -33,8 +33,6 @@ import (
 	"fmt"
 	"os"
 
-	"errors"
-
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/sirupsen/logrus"
@@ -90,7 +88,7 @@ var arduinoCmd = &cobra.Command{
 	BashCompletionFunction: bashAutoCompletionFunction,
 	PersistentPreRun:       arduinoPreRun,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return errors.New("")
+		return cmd.Help()
 		// this is just a placeholder to call help and run PreRun
 		// one of the cobra issues is that if Run is not present PreRun and
 		// PersistentPreRun are not executed.
@@ -121,6 +119,7 @@ func init() {
 }
 
 func arduinoPreRun(cmd *cobra.Command, args []string) {
+	fmt.Println(GlobalFlags)
 	if !formatter.IsSupported(GlobalFlags.Format) {
 		GlobalFlags.Format = "text"
 	}

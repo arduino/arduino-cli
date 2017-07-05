@@ -49,15 +49,15 @@ import (
 // Library represents a library in the system
 type Library struct {
 	Name          string              `json:"name"`
-	Author        string              `json:"author"`
-	Maintainer    string              `json:"maintainer"`
-	Sentence      string              `json:"sentence"`
-	Paragraph     string              `json:"paragraph"`
+	Author        string              `json:"author,omitempty"`
+	Maintainer    string              `json:"maintainer,omitempty"`
+	Sentence      string              `json:"sentence,omitempty"`
+	Paragraph     string              `json:"paragraph,omitempty"`
 	Website       string              `json:"website"`
 	Category      string              `json:"category"`
 	Architectures []string            `json:"architectures"`
 	Types         []string            `json:"types"`
-	Releases      map[string]*Release `json:"releases"`
+	Releases      map[string]*Release `json:"releases,omitempty"`
 }
 
 // InstalledRelease returns the installed release of the library.
