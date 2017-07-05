@@ -38,6 +38,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/libraries"
@@ -141,7 +142,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 
 	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
-		logrus.Info("Cannot find index file ... ")
+		formatter.Print("Cannot find index file ... ")
 		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
 		if err != nil {
 			return nil
@@ -204,8 +205,11 @@ func parallelLibDownloads(items []*libraries.Library, argC int, forced bool) ([]
 
 	for _, library := range items {
 		if !library.IsCached(library.Latest().Version) || forced {
-			pBar := pb.StartNew(library.Latest().Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name))
-			progressBars = append(progressBars, pBar)
+			var pBar *pb.ProgressBar
+			if GlobalFlags.Format != "text" {
+				pBar = pb.StartNew(library.Latest().Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name))
+				progressBars = append(progressBars, pBar)
+			}
 			tasks[library.Name] = libraries.DownloadAndCache(library, pBar)
 		}
 	}

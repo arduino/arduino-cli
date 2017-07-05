@@ -38,14 +38,21 @@ type Formatter interface {
 	Print(interface{}) error            // Print just prints specified parameter, returns error if it is not parsable.
 }
 
+// PrintFunc represents a function used to print formatted data.
+type PrintFunc func(Formatter, interface{}) error
+
 var formatters map[string]Formatter
 var defaultFormatter Formatter
+
+var printFunc PrintFunc
 
 func init() {
 	formatters = make(map[string]Formatter, 2)
 	AddCustomFormatter("text", TextPrinter(0))
 	AddCustomFormatter("json", JSONPrinter(1))
 	defaultFormatter = formatters["text"]
+
+	printFunc = defaultPrintFunc
 }
 
 // SetFormatter sets the defaults format to the one specified, if valid. Otherwise it returns an error.
@@ -95,10 +102,15 @@ func Print(msg interface{}) error {
 // printFunc is the base function of all Print methods of Formatters.
 //
 // It can be used for an unified implementation.
-func printFunc(f Formatter, msg interface{}) error {
+func defaultPrintFunc(f Formatter, msg interface{}) error {
 	val, err := f.Format(msg)
 	if err != nil {
 		fmt.Println(val)
 	}
 	return err
+}
+
+// SetPrintFunc changes the actual print function with a specified one.
+func SetPrintFunc(p PrintFunc) {
+	printFunc = p
 }

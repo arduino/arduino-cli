@@ -30,8 +30,12 @@
 package task
 
 import (
+	"errors"
 	"math"
 
+	"fmt"
+
+	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/sirupsen/logrus"
 )
 
@@ -69,7 +73,7 @@ func (tw Wrapper) Execute(verb int) Result {
 		maxUsableVerb[0] = minVerb(verb, tw.BeforeMessage)
 		msg = tw.BeforeMessage[maxUsableVerb[0]]
 		if msg != "" {
-			logrus.Infof("%s ... ", msg)
+			formatter.Print(fmt.Sprintf("%s ... ", msg))
 		}
 	}
 
@@ -80,10 +84,10 @@ func (tw Wrapper) Execute(verb int) Result {
 			maxUsableVerb[1] = minVerb(verb, tw.ErrorMessage)
 			msg = tw.ErrorMessage[maxUsableVerb[1]]
 			if tw.BeforeMessage[maxUsableVerb[0]] != "" {
-				logrus.Warn("ERROR\n")
+				formatter.Print("ERROR\n")
 			}
 			if msg != "" {
-				logrus.Warnf("%s\n", msg)
+				formatter.Print(errors.New(msg))
 			}
 		}
 	} else if tw.AfterMessage != nil && len(tw.AfterMessage) > 0 {
