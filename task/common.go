@@ -47,7 +47,7 @@ type Task func() Result
 // All Message arrays use VERBOSITY as index.
 type Wrapper struct {
 	BeforeMessage []string
-	task          Task
+	Task          Task
 	AfterMessage  []string
 	ErrorMessage  []string
 }
@@ -73,7 +73,7 @@ func (tw Wrapper) Execute(verb int) Result {
 		}
 	}
 
-	ret := tw.task()
+	ret := tw.Task()
 
 	if ret.Error != nil {
 		if tw.ErrorMessage != nil && len(tw.ErrorMessage) > 0 {

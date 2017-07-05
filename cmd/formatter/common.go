@@ -58,6 +58,12 @@ func SetFormatter(formatName string) error {
 	return nil
 }
 
+// IsSupported returns whether the format specified is supported or not by the current set of formatters.
+func IsSupported(formatName string) bool {
+	_, supported := formatters[formatName]
+	return supported
+}
+
 // AddCustomFormatter adds a custom formatter to the list of available formatters of this package.
 //
 // If a key is already present, it is replaced and old Value is returned.

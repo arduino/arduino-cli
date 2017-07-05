@@ -36,6 +36,7 @@ import (
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/task"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/cheggaaa/pb.v1"
 )
@@ -45,13 +46,13 @@ const (
 )
 
 // DownloadAndCache downloads a library without installing it
-func DownloadAndCache(library *Library, progBar *pb.ProgressBar) common.TaskWrapper {
-	return common.TaskWrapper{
-		Task: func() common.TaskResult {
+func DownloadAndCache(library *Library, progBar *pb.ProgressBar) task.Wrapper {
+	return task.Wrapper{
+		Task: func() task.Result {
 			zipContent, err := downloadLatest(library, progBar)
 			if err != nil {
 				logrus.Warnf("Error %s", err)
-				return common.TaskResult{
+				return task.Result{
 					Result: nil,
 					Error:  err,
 				}
@@ -60,13 +61,13 @@ func DownloadAndCache(library *Library, progBar *pb.ProgressBar) common.TaskWrap
 			zipArchive, err := prepareInstall(library, zipContent)
 			if err != nil {
 				logrus.Warnf("Error %s", err)
-				return common.TaskResult{
+				return task.Result{
 					Result: nil,
 					Error:  err,
 				}
 			}
 
-			return common.TaskResult{
+			return task.Result{
 				Result: zipArchive,
 				Error:  nil,
 			}

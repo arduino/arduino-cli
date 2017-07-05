@@ -35,7 +35,7 @@ import (
 
 	"errors"
 
-	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -103,9 +103,9 @@ var arduinoVersionCmd = &cobra.Command{
 	Short: "Shows version Number of arduino",
 	Long:  `Shows version Number of arduino which is installed on your system.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		Formatter.Print(fmt.Sprintf("arduino V. %s\n", ArduinoVersion))
+		formatter.Print(fmt.Sprintf("arduino V. %s\n", ArduinoVersion))
 		if GlobalFlags.Verbose > 0 {
-			Formatter.Print(fmt.Sprintf("arduino V. %s\n", LibVersion))
+			formatter.Print(fmt.Sprintf("arduino V. %s\n", LibVersion))
 		}
 	},
 }
@@ -121,11 +121,10 @@ func init() {
 }
 
 func arduinoPreRun(cmd *cobra.Command, args []string) {
-	_, formatterExists := common.Formatters[GlobalFlags.Format]
-	if !formatterExists {
+	if !formatter.IsSupported(GlobalFlags.Format) {
 		GlobalFlags.Format = "text"
 	}
-	Formatter = common.Formatters[GlobalFlags.Format]
+	formatter.SetFormatter(GlobalFlags.Format)
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.

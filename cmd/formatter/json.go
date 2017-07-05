@@ -29,6 +29,8 @@
 package formatter
 
 import "encoding/json"
+import "reflect"
+import "errors"
 
 //JSONPrinter represents a Printer and Formatter of JSON objects.
 type JSONPrinter int8
@@ -37,8 +39,11 @@ type JSONPrinter int8
 //
 // It ignores Header and Footer fields of the message.
 func (jp JSONPrinter) Format(msg interface{}) (string, error) {
-	ret, err := json.Marshal(msg)
-	return string(ret), err
+	if reflect.TypeOf(msg).Kind().String() != "struct" { // TODO : optimize if possible
+		ret, err := json.Marshal(msg)
+		return string(ret), err
+	}
+	return "", errors.New("Only struct values are accepted")
 }
 
 // Print prints a JSON object.

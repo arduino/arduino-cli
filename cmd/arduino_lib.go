@@ -41,6 +41,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/libraries"
+	"github.com/bcmi-labs/arduino-cli/task"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/zieckey/goini"
@@ -198,7 +199,7 @@ func parallelLibDownloads(items []*libraries.Library, argC int, forced bool) ([]
 	libraryOK := make([]string, 0, itemC)
 	libraryFails := make(map[string]string, argC-itemC)
 
-	tasks := make(map[string]common.TaskWrapper, len(items))
+	tasks := make(map[string]task.Wrapper, len(items))
 	progressBars := make([]*pb.ProgressBar, 0, len(items))
 
 	for _, library := range items {
@@ -212,7 +213,7 @@ func parallelLibDownloads(items []*libraries.Library, argC int, forced bool) ([]
 	if len(tasks) > 0 {
 		pool, _ := pb.StartPool(progressBars...)
 
-		results := common.ExecuteParallelFromMap(tasks, GlobalFlags.Verbose)
+		results := task.ExecuteParallelFromMap(tasks, GlobalFlags.Verbose)
 
 		pool.Stop()
 

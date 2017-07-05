@@ -44,15 +44,6 @@ import (
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
-// Formatters represents all formatting objects passable to logrus.
-var Formatters map[string]Formatter
-
-func init() {
-	Formatters = make(map[string]Formatter, 2)
-	Formatters["text"] = TextPrinter(0)
-	Formatters["json"] = JSONPrinter(1)
-}
-
 // GetDefaultArduinoFolder returns the default data folder for Arduino platform
 func GetDefaultArduinoFolder() (string, error) {
 	var folder string
