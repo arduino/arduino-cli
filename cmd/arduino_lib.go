@@ -40,6 +40,7 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
+	"github.com/bcmi-labs/arduino-cli/cmd/structs"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/bcmi-labs/arduino-cli/task"
@@ -118,42 +119,6 @@ var arduinoLibVersionCmd = &cobra.Command{
 	},
 }
 
-//DownloadResult contains info about a completed Download process.
-type DownloadResult struct {
-	Downloaded []string          `json:"downloaded"`
-	Errors     map[string]string `json:"errors"`
-}
-
-func (dr DownloadResult) String() string {
-	ret := ""
-	for _, name := range dr.Downloaded {
-		ret += fmt.Sprintf("%s - Downloaded\n", name)
-	}
-	ret += "Errors:\n"
-	for libName, err := range dr.Errors {
-		ret += fmt.Sprintf("%s - %s\n", libName, err)
-	}
-	return ret
-}
-
-//InstallResult contains info about a completed installation process.
-type InstallResult struct {
-	Installed []string          `json:"installed"`
-	Errors    map[string]string `json:"errors"`
-}
-
-func (dr InstallResult) String() string {
-	ret := ""
-	for _, name := range dr.Installed {
-		ret += fmt.Sprintf("%s - Installed\n", name)
-	}
-	ret += "Errors:\n"
-	for libName, err := range dr.Errors {
-		ret += fmt.Sprintf("%s - %s\n", libName, err)
-	}
-	return ret
-}
-
 func init() {
 	arduinoCmd.AddCommand(arduinoLibCmd)
 	arduinoLibCmd.AddCommand(arduinoLibInstallCmd)
@@ -195,20 +160,12 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 
 	items, failed := extractValidLibraries(args, status)
 
-	libraryOK, libraryFails := parallelLibDownloads(items, len(args), true)
+	libraryResults := parallelLibDownloads(items, true)
 	for _, fail := range failed {
-		libraryFails[fail] = "Not Found"
+		libraryResults[fail] = "Error : Not Found"
 	}
 
-	if GlobalFlags.Verbose > 0 {
-		prettyPrints.DownloadLib(libraryOK, libraryFails)
-	} else {
-		formatter.Print(DownloadResult{
-			Downloaded: libraryOK,
-			Errors:     libraryFails,
-		})
-
-	}
+	formatter.Print(structs.LibResultsFromMap(libraryResults))
 
 	return nil
 }
@@ -230,10 +187,9 @@ func extractValidLibraries(args []string, status *libraries.StatusContext) ([]*l
 }
 
 // parallelLibDownloads executes multiple libraries downloads in parallel
-func parallelLibDownloads(items []*libraries.Library, argC int, forced bool) ([]string, map[string]string) {
+func parallelLibDownloads(items []*libraries.Library, forced bool) map[string]string {
 	itemC := len(items)
-	libraryOK := make([]string, 0, itemC)
-	libraryFails := make(map[string]string, argC-itemC)
+	libraryResults := make(map[string]string, itemC)
 
 	tasks := make(map[string]task.Wrapper, len(items))
 	progressBars := make([]*pb.ProgressBar, 0, len(items))
@@ -264,14 +220,14 @@ func parallelLibDownloads(items []*libraries.Library, argC int, forced bool) ([]
 
 		for libraryName, result := range results {
 			if result.Error != nil {
-				libraryFails[libraryName] = result.Error.Error()
+				libraryResults[libraryName] = fmt.Sprintf("Error : %s", result.Error)
 			} else {
-				libraryOK = append(libraryOK, libraryName)
+				libraryResults[libraryName] = "OK"
 			}
 		}
 	}
 
-	return libraryOK, libraryFails
+	return libraryResults
 }
 
 func executeInstallCommand(cmd *cobra.Command, args []string) error {
@@ -297,35 +253,22 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	items, fails := extractValidLibraries(args, status)
-	libraryOK := make([]string, 0, len(items))
 
-	_, libraryFails := parallelLibDownloads(items, len(args), false)
+	libraryResults := parallelLibDownloads(items, false)
 	for _, fail := range fails {
-		libraryFails[fail] = "Not Found"
+		libraryResults[fail] = "Not Found"
 	}
 
 	for _, library := range items {
 		err = libraries.InstallLib(library, library.Latest().Version)
 		if err != nil {
-			libraryFails[library.Name] = err.Error()
+			libraryResults[library.Name] = fmt.Sprintf("Error : %s", err)
 		} else {
-			libraryOK = append(libraryOK, library.Name)
+			libraryResults[library.Name] = "OK"
 		}
 	}
 
-	if GlobalFlags.Verbose > 0 {
-		prettyPrints.InstallLib(libraryOK, libraryFails)
-	} else {
-		okEnd := len(libraryOK)
-		for i, library := range libraryOK {
-			logrus.Infof("%-10s - Installed (%d/%d)\n", library, i+1, okEnd)
-		}
-		i := okEnd
-		for library, failure := range libraryFails {
-			i++
-			logrus.Infof("%-10s - Error : %-10s (%d/%d)\n", library, failure, i, len(libraryFails))
-		}
-	}
+	formatter.Print(structs.LibResultsFromMap(libraryResults))
 
 	return nil
 }

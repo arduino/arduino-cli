@@ -35,7 +35,6 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	homedir "github.com/mitchellh/go-homedir"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -119,7 +118,6 @@ func init() {
 }
 
 func arduinoPreRun(cmd *cobra.Command, args []string) {
-	fmt.Println(GlobalFlags)
 	if !formatter.IsSupported(GlobalFlags.Format) {
 		GlobalFlags.Format = "text"
 	}
@@ -143,11 +141,11 @@ func initConfig() {
 		// Find home directory.
 		home, err := homedir.Dir()
 		if err != nil {
-			logrus.Warn("Error while searching for home directory for this user")
+			base := "Error while searching for home directory for this user"
 			if GlobalFlags.Verbose > 0 {
-				logrus.Warnf(": %s\n", err.Error())
+				base += fmt.Sprintf(": %s\n", err)
 			}
-			logrus.Warnln()
+			formatter.Print(base)
 			os.Exit(1)
 		}
 
@@ -160,6 +158,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		logrus.Infoln("Using config file:", viper.ConfigFileUsed())
+		formatter.Print(fmt.Sprintln("Using config file:", viper.ConfigFileUsed()))
 	}
 }
