@@ -52,7 +52,7 @@ import (
 
 const (
 	// LibVersion represents the `arduino lib` package version number.
-	LibVersion string = "0.0.1-pre-alpha"
+	LibVersion string = "0.1.0-alpha.preview"
 )
 
 // arduinoLibCmd represents the libs command.
