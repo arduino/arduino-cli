@@ -48,15 +48,15 @@ import (
 
 // Library represents a library in the system
 type Library struct {
-	Name          string              `json:"name"`
+	Name          string              `json:"name,required"`
 	Author        string              `json:"author,omitempty"`
 	Maintainer    string              `json:"maintainer,omitempty"`
 	Sentence      string              `json:"sentence,omitempty"`
 	Paragraph     string              `json:"paragraph,omitempty"`
-	Website       string              `json:"website"`
-	Category      string              `json:"category"`
-	Architectures []string            `json:"architectures"`
-	Types         []string            `json:"types"`
+	Website       string              `json:"website,omitempty"`
+	Category      string              `json:"category,omitempty"`
+	Architectures []string            `json:"architectures,omitempty"`
+	Types         []string            `json:"types,omitempty"`
 	Releases      map[string]*Release `json:"releases,omitempty"`
 }
 

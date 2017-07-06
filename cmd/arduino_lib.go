@@ -128,6 +128,7 @@ func init() {
 	arduinoLibCmd.AddCommand(arduinoLibDownloadCmd)
 	arduinoLibCmd.AddCommand(arduinoLibVersionCmd)
 	arduinoLibCmd.AddCommand(arduinoLibListCmd)
+
 	arduinoLibCmd.Flags().BoolVar(&arduinoLibFlags.updateIndex, "update-index", false, "Updates the libraries index")
 }
 
@@ -161,9 +162,9 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 
 	items, failed := extractValidLibraries(args, status)
 
-	libraryResults := parallelLibDownloads(items, true)
+	libraryResults := parallelLibDownloads(items, true, "Downloaded")
 	for _, fail := range failed {
-		libraryResults[fail] = "Error : Not Found"
+		libraryResults[fail] = errors.New("Not Found")
 	}
 
 	formatter.Print(output.LibResultsFromMap(libraryResults))
@@ -187,10 +188,13 @@ func extractValidLibraries(args []string, status *libraries.StatusContext) ([]*l
 	return items, fails
 }
 
-// parallelLibDownloads executes multiple libraries downloads in parallel
-func parallelLibDownloads(items []*libraries.Library, forced bool) map[string]string {
+// parallelLibDownloads executes multiple libraries downloads in parallel and fills properly results.
+//
+// forced is used to force download if cached.
+// OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
+func parallelLibDownloads(items []*libraries.Library, forced bool, OkStatus string) map[string]interface{} {
 	itemC := len(items)
-	libraryResults := make(map[string]string, itemC)
+	libraryResults := make(map[string]interface{}, itemC)
 
 	tasks := make(map[string]task.Wrapper, len(items))
 	progressBars := make([]*pb.ProgressBar, 0, len(items))
@@ -221,9 +225,9 @@ func parallelLibDownloads(items []*libraries.Library, forced bool) map[string]st
 
 		for libraryName, result := range results {
 			if result.Error != nil {
-				libraryResults[libraryName] = fmt.Sprintf("Error : %s", result.Error)
+				libraryResults[libraryName] = result.Error
 			} else {
-				libraryResults[libraryName] = "OK"
+				libraryResults[libraryName] = OkStatus
 			}
 		}
 	}
@@ -255,17 +259,17 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 
 	items, fails := extractValidLibraries(args, status)
 
-	libraryResults := parallelLibDownloads(items, false)
+	libraryResults := parallelLibDownloads(items, false, "Installed")
 	for _, fail := range fails {
-		libraryResults[fail] = "Not Found"
+		libraryResults[fail] = errors.New("Not Found")
 	}
 
 	for _, library := range items {
 		err = libraries.InstallLib(library, library.Latest().Version)
 		if err != nil {
-			libraryResults[library.Name] = fmt.Sprintf("Error : %s", err)
+			libraryResults[library.Name] = err
 		} else {
-			libraryResults[library.Name] = "OK"
+			libraryResults[library.Name] = "Installed"
 		}
 	}
 
@@ -387,7 +391,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 
 	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
-		logrus.Infoln("Index file is corrupted. Please replace it by updating : arduino lib list update")
+		formatter.PrintErrorMessage("Index file is corrupted. Please replace it by updating : arduino lib list update")
 		return nil
 	}
 
@@ -401,7 +405,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 
 	found := false
 
-	message := make(map[string]interface{})
+	message := output.LibSearchResults{}
 	libs := make([]interface{}, 0, len(status.Libraries))
 	//Pretty print libraries from index.
 	for _, name := range status.Names() {
@@ -419,9 +423,9 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	if !found {
-		formatter.Print(common.FromError(fmt.Errorf("No library found matching \"%s\" search query", query)))
+		formatter.PrintErrorMessage(fmt.Sprintf("No library found matching \"%s\" search query", query))
 	} else {
-		message["libraries"] = libs
+		message.Libraries = libs
 		formatter.Print(message)
 	}
 

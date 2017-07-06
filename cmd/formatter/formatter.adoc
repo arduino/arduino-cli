@@ -10,13 +10,15 @@ This package contains all formatters.
 == Usage
 [source, go]
 ----
+type TestType struct {
+   field1 string `json:"field1,omitempty"` //same json tag as required by json.Marshal
+   field2 int    `json:"field2"`           //same json tag as required by json.Marshal
+}
+
 var a Formatter = TextFormatter(0)
 var b JSONFormatter = JSONFormatter(0) //every int8 will be ok.
 
-var test struct {
-   field1 string `json:"field1,omitempty"` //same json tag as required by json.Marshal
-   field2 int    `json:"field2"`            //same json tag as required by json.Marshal
-}{
+var test TestType{
     field1 : "test",
     field2 : 42,
 }
@@ -29,4 +31,66 @@ a.Print(test) //does the same.
 testString = b.Format(test) 
 fmt.Println(testString) // Prints { field1 : "test", field2 : "42" }
 b.Print(test) //Does the same
+----
+
+=== The default formatter
+There is a global formatter which can be used globally. You can set it with the `formatter.setFormatter(Formatter)` function.
+[source, go]
+----
+
+type TestType struct {
+   field1 string `json:"field1,omitempty"` //same json tag as required by json.Marshal
+   field2 int    `json:"field2"`           //same json tag as required by json.Marshal
+}
+
+var test TestType{
+    field1 : "test",
+    field2 : 42,
+}
+
+formatter.setFormatter("text")
+formatter.Print(test) // Prints string representation of the test struct, using String().
+formatter.setFormatter("json")
+formatter.Print(test) // Prints test struct as a JSON object.
+----
+
+== Custom Formatters
+It is possible to add custom formatters with the `formatter.AddCustomFormatter(format, Formatter)` function.
+
+Let's assume we want to add a YamlFormatter which parses to Yaml Objects.
+[source, go]
+----
+// Solution 1 : YamlFormatter is a struct.
+type YamlFormatter struct{}
+
+func (yf YamlFormatter) Format(msg interface{}) (string, error) {
+    // do something and return values.
+}
+
+//...
+formatter.AddCustomFormatter("yaml", YamlFormatter{})
+//...
+
+// Solution 2 : YamlFormatter is a int8 or other primitive type, useful for formatters which does not need fields.
+type YamlFormatter int8
+
+func (yf YamlFormatter) Format(msg interface{}) (string, error) {
+    // do something and return values.
+}
+
+//...
+formatter.AddCustomFormatter("yaml", YamlFormatter(3)) // every int8 is valid, this is a cast.
+----
+
+== Printing Errors
+Just use `formatter.PrintErrorMessage(string)` or `formatter.PrintError(error)` function.
+[source, go]
+----
+var errormessage string = "Some error occurred"
+formatter.PrintErrorMessage(errormessage) // Prints the error formatted properly.
+
+err := functionWhichMayReturnAnError()
+if err != nil {
+    formatter.PrintError(err)
+}
 ----

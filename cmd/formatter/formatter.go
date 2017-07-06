@@ -99,6 +99,16 @@ func Print(msg interface{}) error {
 	return defaultFormatter.Print(msg)
 }
 
+// PrintErrorMessage formats and prints info about an error message.
+func PrintErrorMessage(msg string) {
+	PrintError(errors.New(msg))
+}
+
+// PrintError formats and prints info about an error.
+func PrintError(err error) {
+	Print(fromError(err))
+}
+
 // defaultPrintFunc is the base function of all Print methods of Formatters.
 //
 // It can be used for an unified implementation.

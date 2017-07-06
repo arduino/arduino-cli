@@ -27,34 +27,38 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package output
+package formatter
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
-// LibResultsFromMap returns a LibProcessResults struct from a specified map of results.
-func LibResultsFromMap(resMap map[string]interface{}) LibProcessResults {
-	results := LibProcessResults{
-		Libraries: make([]libProcessResult, len(resMap)),
+// ErrorMessage represents an Error with an attached message.
+//
+// It's the same as a normal error, but It is also parsable as JSON.
+type ErrorMessage struct {
+	message string
+}
+
+// MarshalJSON allows to marshal this object as a JSON object.
+func (err ErrorMessage) MarshalJSON() ([]byte, error) {
+	return json.Marshal(err.message)
+}
+
+// Error returns the error message.
+func (err ErrorMessage) Error() string {
+	return fmt.Sprint(err.message)
+}
+
+// String returns a string representation of the Error.
+func (err ErrorMessage) String() string {
+	return err.Error()
+}
+
+// romError creates an ErrorMessage from an Error.
+func fromError(err error) ErrorMessage {
+	return ErrorMessage{
+		message: err.Error(),
 	}
-	i := 0
-	for libName, libResult := range resMap {
-		_, isError := libResult.(error)
-		if isError {
-			results.Libraries[i] = libProcessResult{
-				LibraryName: libName,
-				Status:      "",
-				Error:       fmt.Sprint(libResult),
-			}
-		} else {
-			results.Libraries[i] = libProcessResult{
-				LibraryName: libName,
-				Status:      fmt.Sprint(libResult),
-				Error:       "",
-			}
-		}
-		i++
-	}
-	return results
 }
