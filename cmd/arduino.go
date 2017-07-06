@@ -100,9 +100,9 @@ var arduinoVersionCmd = &cobra.Command{
 	Short: "Shows version Number of arduino",
 	Long:  `Shows version Number of arduino which is installed on your system.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		formatter.Print(fmt.Sprintf("arduino V. %s\n", ArduinoVersion))
+		formatter.Print(fmt.Sprintf("arduino ver.%s\n", ArduinoVersion))
 		if GlobalFlags.Verbose > 0 {
-			formatter.Print(fmt.Sprintf("arduino V. %s\n", LibVersion))
+			formatter.Print(fmt.Sprintf("arduino ver.%s\n", LibVersion))
 		}
 	},
 }
