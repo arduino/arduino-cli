@@ -162,9 +162,14 @@ func initConfig() {
 }
 
 func executeVersionCommand(cmd *cobra.Command, args []string) {
-	versionsToPrint := make([]string, 0, 10)
-	descendants := make([]*cobra.Command, 0, 10)
-	versionsToPrint = append(versionsToPrint, cmd.Parent().Name())
+	versionPrint(versionsToPrint(cmd, true)...)
+}
+
+func versionsToPrint(cmd *cobra.Command, isRoot bool) []string {
+	verToPrint := make([]string, 0, 10)
+	if isRoot {
+		verToPrint = append(verToPrint, cmd.Parent().Name())
+	}
 
 	if GlobalFlags.Verbose > 0 {
 		siblings := findSiblings(cmd)
@@ -173,17 +178,15 @@ func executeVersionCommand(cmd *cobra.Command, args []string) {
 			for _, sibChild := range sibling.Commands() {
 				//fmt.Println(sibling.Name(), " >", sibChild.Name())
 				if sibChild.Name() == "version" {
-					versionsToPrint = append(versionsToPrint, sibling.Name())
+					verToPrint = append(verToPrint, sibling.Name())
+				} else {
+					verToPrint = append(verToPrint, versionsToPrint(sibChild, false)...)
 				}
 			}
 		}
 	}
 
-	versionPrint(versionsToPrint...)
-
-	for _, descendant := range descendants {
-		executeVersionCommand(descendant, args)
-	}
+	return verToPrint
 }
 
 // versionPrint formats and prints the version of the specified command.
