@@ -39,8 +39,8 @@ import (
 	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
-	"github.com/bcmi-labs/arduino-cli/cmd/structs"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/bcmi-labs/arduino-cli/task"
@@ -114,13 +114,14 @@ var arduinoLibVersionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Shows version Number of arduino lib",
 	Long:  `Shows version Number of arduino lib which is installed on your system.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		logrus.Infof("arduino lib V. %s\n", LibVersion)
-	},
+	Run:   executeVersionCommand,
 }
 
 func init() {
 	arduinoCmd.AddCommand(arduinoLibCmd)
+
+	versions[arduinoLibCmd.Name()] = LibVersion
+
 	arduinoLibCmd.AddCommand(arduinoLibInstallCmd)
 	arduinoLibCmd.AddCommand(arduinoLibUninstallCmd)
 	arduinoLibCmd.AddCommand(arduinoLibSearchCmd)
@@ -165,7 +166,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		libraryResults[fail] = "Error : Not Found"
 	}
 
-	formatter.Print(structs.LibResultsFromMap(libraryResults))
+	formatter.Print(output.LibResultsFromMap(libraryResults))
 
 	return nil
 }
@@ -268,7 +269,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	formatter.Print(structs.LibResultsFromMap(libraryResults))
+	formatter.Print(output.LibResultsFromMap(libraryResults))
 
 	return nil
 }

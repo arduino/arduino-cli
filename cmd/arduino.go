@@ -34,6 +34,7 @@ import (
 	"os"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -65,18 +66,20 @@ const (
     }`
 
 	// ArduinoVersion represents Arduino CLI version number.
-	ArduinoVersion string = "0.0.1-pre-alpha"
+	ArduinoVersion = "0.1.0-alpha.preview"
 )
+
+var versions = make(map[string]string)
 
 // GlobalFlags represents flags available in all the program.
 var GlobalFlags struct {
-	Verbose int
-	Format  string
+	Verbose int    // More time verbose flag is written, the more the Verbose count increases. Represents verbosity level.
+	Format  string // The Output format (e.g. text, json).
 }
 
 // rootCmdFlags represent flags available to the root command.
 var rootCmdFlags struct {
-	ConfigFile string
+	ConfigFile string // The path of the config file provided by the omonym flag.
 }
 
 // arduinoCmd represents the base command when called without any subcommands
@@ -99,17 +102,13 @@ var arduinoVersionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Shows version Number of arduino",
 	Long:  `Shows version Number of arduino which is installed on your system.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		formatter.Print(fmt.Sprintf("arduino ver.%s\n", ArduinoVersion))
-		if GlobalFlags.Verbose > 0 {
-			formatter.Print(fmt.Sprintf("arduino ver.%s\n", LibVersion))
-		}
-	},
+	Run:   executeVersionCommand,
 }
 
 func init() {
 	cobra.OnInitialize(initConfig)
 
+	versions[arduinoCmd.Name()] = ArduinoVersion
 	arduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
 	arduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
 	arduinoCmd.Flags().StringVar(&rootCmdFlags.ConfigFile, "config", "", "config file (default is $HOME/.arduino.yaml)")
@@ -160,4 +159,63 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		formatter.Print(fmt.Sprintln("Using config file:", viper.ConfigFileUsed()))
 	}
+}
+
+func executeVersionCommand(cmd *cobra.Command, args []string) {
+	versionsToPrint := make([]string, 0, 10)
+	descendants := make([]*cobra.Command, 0, 10)
+	versionsToPrint = append(versionsToPrint, cmd.Parent().Name())
+
+	if GlobalFlags.Verbose > 0 {
+		siblings := findSiblings(cmd)
+		//search version command in siblings children.
+		for _, sibling := range siblings {
+			for _, sibChild := range sibling.Commands() {
+				//fmt.Println(sibling.Name(), " >", sibChild.Name())
+				if sibChild.Name() == "version" {
+					versionsToPrint = append(versionsToPrint, sibling.Name())
+				}
+			}
+		}
+	}
+
+	versionPrint(versionsToPrint...)
+
+	for _, descendant := range descendants {
+		executeVersionCommand(descendant, args)
+	}
+}
+
+// versionPrint formats and prints the version of the specified command.
+func versionPrint(commandNames ...string) {
+	if len(commandNames) == 1 {
+		verCommand := output.VersionResult{
+			CommandName: commandNames[0],
+			Version:     versions[commandNames[0]],
+		}
+		formatter.Print(verCommand)
+	} else {
+		verFullInfo := output.VersionFullInfo{
+			Versions: make([]output.VersionResult, len(commandNames)),
+		}
+
+		for i, commandName := range commandNames {
+			verFullInfo.Versions[i] = output.VersionResult{
+				CommandName: commandName,
+				Version:     versions[commandName],
+			}
+		}
+
+		formatter.Print(verFullInfo)
+	}
+}
+
+// findSiblings returns the array of the siblings of the specified command.
+func findSiblings(cmd *cobra.Command) (siblings []*cobra.Command) {
+	for _, childCmd := range cmd.Parent().Commands() {
+		if childCmd.Name() != "version" {
+			siblings = append(siblings, childCmd)
+		}
+	}
+	return
 }
