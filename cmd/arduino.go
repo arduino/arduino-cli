@@ -45,17 +45,17 @@ const (
     __arduino_autocomplete() 
     {
         case $(last_command) in
+            arduino)
+    		    opts="lib core help version"
+    		    ;;
             arduino_lib)
     		    opts="install uninstall list search version --update-index"
-    	        ;;
+    	        ;;			
 			arduino_core)
 			    opts="install uninstall list search version --update-index"
 				;;
     		arduino_help)
     		    opts="lib core version"
-    		    ;;
-            arduino)
-    		    opts="lib core help version"
     		    ;;
 	    esac		  
     	if [[ ${cur} == " *" ]] ; then
