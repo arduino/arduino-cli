@@ -1,30 +1,36 @@
 :source-highlighter: pygments
 :pygments-style: manni
 
-= Setup a fully working asciidoc environment in visual studio code
+= Asciidoc in VS Code
+Setup a fully working asciidoc environment in Visual Studio Code.
 Alessandro Sanino <a.sanino@bcmi-labs.cc>
 
-.> Install Ascii Doctor (needs Python installed)
+. Install Ascii Doctor (needs Python installed)
++
 [source, bash]
 ----
 $ gem install asciidoctor
 ----
 
-.> Install Highlighters
+. Install Extra Highlighters
++
 [source, bash]
 ----
 $ gem install pygments.rb #Pygments
 $ gem install coderay     #Coderay
 ----
 
-.> Install the following plugins (Guide link:https://code.visualstudio.com/docs/editor/extension-gallery[Here])
+. Install the following plugins (Guide link:https://code.visualstudio.com/docs/editor/extension-gallery[Here])
 .. `justusadam.language-asciidoc` : it has better highlighting of asciidoc documents
 
 .. `joaompinto.asciidoctor-vscode` : enables previews
 
-Finally Reload Visual Studio Code and your environment is ready.
+. Reload Visual Studio Code
 
-== Shortcuts
+=== Default Highlighters
+`highlightjs` is an highlighter which is available without installation, but requires internet connection, since it is downloaded from a CDN.
+
+=== Shortcuts
 
 *CTRL+K R* (Press _CTRL+K first, then R key_) Enables the tab previews aside the current working document window.
 
