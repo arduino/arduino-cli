@@ -145,6 +145,9 @@ func (l *Library) Versions() []string {
 // GetVersion returns the Release corresponding to the specified version, or
 // nil if not found.
 func (l *Library) GetVersion(version string) *Release {
+	if version == "latest" {
+		return l.Releases[l.latestVersion()]
+	}
 	return l.Releases[version]
 }
 

@@ -70,7 +70,7 @@ var arduinoLibFlags struct {
 
 // arduinoLibInstallCmd represents the lib install command.
 var arduinoLibInstallCmd = &cobra.Command{
-	Use:   "install [LIBRARY_NAME(S)]",
+	Use:   "install LIBRARY[@VERSION_NUMBER](S)",
 	Short: "Installs one of more specified libraries into the system.",
 	Long:  `Installs one or more specified libraries into the system.`,
 	RunE:  executeInstallCommand,
@@ -78,7 +78,7 @@ var arduinoLibInstallCmd = &cobra.Command{
 
 // arduinoLibUninstallCmd represents the uninstall command
 var arduinoLibUninstallCmd = &cobra.Command{
-	Use:   "uninstall [LIBRARY_NAME(S)]",
+	Use:   "uninstall LIBRARY_NAME(S)",
 	Short: "Uninstalls one or more libraries",
 	Long:  `Uninstalls one or more libraries`,
 	RunE:  executeUninstallCommand,
@@ -160,11 +160,11 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	items, failed := extractValidLibraries(args, status)
+	libs, failed := purgeInvalidLibraries(parseLibArgs(args), status)
+	libraryResults := parallelLibDownloads(libs, true, "Downloaded")
 
-	libraryResults := parallelLibDownloads(items, true, "Downloaded")
-	for _, fail := range failed {
-		libraryResults[fail] = errors.New("Not Found")
+	for libFail, err := range failed {
+		libraryResults[libFail] = err
 	}
 
 	formatter.Print(output.LibResultsFromMap(libraryResults))
@@ -172,16 +172,36 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func extractValidLibraries(args []string, status *libraries.StatusContext) ([]*libraries.Library, []string) {
-	items := make([]*libraries.Library, 0, len(args))
-	fails := make([]string, 0, len(args))
-
-	for _, libraryName := range args {
-		library := status.Libraries[libraryName]
-		if library != nil {
-			items = append(items, library)
+// parseLibArgs parses a sequence of "library@version" tokens and returns a map.
+//
+// If version is not present it is assumed as "latest" version.
+func parseLibArgs(args []string) map[string]string {
+	ret := make(map[string]string, len(args))
+	for _, item := range args {
+		tokens := strings.SplitN(item, "@", 2)
+		var version string
+		if len(tokens) == 2 {
+			version = tokens[1]
 		} else {
-			fails = append(fails, libraryName)
+			version = "latest"
+		}
+		ret[tokens[0]] = version
+	}
+	return ret
+}
+
+func purgeInvalidLibraries(libnames map[string]string, status *libraries.StatusContext) (map[*libraries.Library]string, map[string]error) {
+	items := make(map[*libraries.Library]string, len(libnames))
+	fails := make(map[string]error, len(libnames))
+
+	for libraryName, version := range libnames {
+		library, valid := status.Libraries[libraryName]
+		if !valid {
+			fails[libraryName] = errors.New("Not Found")
+		} else if library.GetVersion(version) == nil {
+			fails[libraryName] = errors.New("Version not found")
+		} else {
+			items[library] = version
 		}
 	}
 
@@ -192,7 +212,7 @@ func extractValidLibraries(args []string, status *libraries.StatusContext) ([]*l
 //
 // forced is used to force download if cached.
 // OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
-func parallelLibDownloads(items []*libraries.Library, forced bool, OkStatus string) map[string]interface{} {
+func parallelLibDownloads(items map[*libraries.Library]string, forced bool, OkStatus string) map[string]interface{} {
 	itemC := len(items)
 	libraryResults := make(map[string]interface{}, itemC)
 
@@ -201,14 +221,15 @@ func parallelLibDownloads(items []*libraries.Library, forced bool, OkStatus stri
 
 	textMode := GlobalFlags.Format == "text"
 
-	for _, library := range items {
-		if !library.IsCached(library.Latest().Version) || forced {
+	for library, version := range items {
+		release := library.GetVersion(version)
+		if release != nil && !library.IsCached(version) || forced {
 			var pBar *pb.ProgressBar
 			if textMode {
 				pBar = pb.StartNew(library.Latest().Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name))
 				progressBars = append(progressBars, pBar)
 			}
-			tasks[library.Name] = libraries.DownloadAndCache(library, pBar)
+			tasks[library.Name] = libraries.DownloadAndCache(library, pBar, version)
 		}
 	}
 
@@ -242,7 +263,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 
 	index, err := libraries.LoadLibrariesIndex()
 	if err != nil {
-		logrus.Infoln("Cannot find index file ...")
+		formatter.Print("Cannot find index file ...")
 		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
 		if err != nil {
 			return nil
@@ -257,15 +278,14 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	items, fails := extractValidLibraries(args, status)
+	libs, failed := purgeInvalidLibraries(parseLibArgs(args), status)
 
-	libraryResults := parallelLibDownloads(items, false, "Installed")
-	for _, fail := range fails {
-		libraryResults[fail] = errors.New("Not Found")
+	libraryResults := parallelLibDownloads(libs, true, "Downloaded")
+	for fail, reason := range failed {
+		libraryResults[fail] = reason
 	}
-
-	for _, library := range items {
-		err = libraries.InstallLib(library, library.Latest().Version)
+	for library, version := range libs {
+		err = libraries.InstallLib(library, version)
 		if err != nil {
 			libraryResults[library.Name] = err
 		} else {
@@ -290,7 +310,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 
 	dir, err := os.Open(libFolder)
 	if err != nil {
-		logrus.Infoln("Cannot open libraries folder")
+		formatter.Print("Cannot open libraries folder")
 		return nil
 	}
 
@@ -299,7 +319,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
-		logrus.Infoln("Cannot read into libraries folder")
+		formatter.Print("Cannot read into libraries folder")
 		return nil
 	}
 
@@ -365,12 +385,12 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 
 	if GlobalFlags.Verbose > 0 {
 		if len(libraryFails) > 0 {
-			logrus.Infoln("The following libraries were succesfully uninstalled:")
-			logrus.Infoln(strings.Join(libraryOK, " "))
-			logrus.Infoln("However, the uninstall process failed on the following libraries:")
-			logrus.Infoln(strings.Join(libraryFails, " "))
+			formatter.Print("The following libraries were succesfully uninstalled:")
+			formatter.Print(strings.Join(libraryOK, " "))
+			formatter.Print("However, the uninstall process failed on the following libraries:")
+			formatter.Print(strings.Join(libraryFails, " "))
 		} else {
-			logrus.Infoln("All libraries successfully uninstalled")
+			formatter.Print("All libraries successfully uninstalled")
 		}
 	} else if len(libraryFails) > 0 {
 		for _, failed := range libraryFails {
@@ -440,20 +460,20 @@ func executeListCommand(command *cobra.Command, args []string) {
 
 	libHome, err := common.GetDefaultLibFolder()
 	if err != nil {
-		logrus.Infoln("Cannot get libraries folder")
+		formatter.Print("Cannot get libraries folder")
 		return
 	}
 
 	//prettyPrints.LibStatus(status)
 	dir, err := os.Open(libHome)
 	if err != nil {
-		logrus.Infoln("Cannot open libraries folder")
+		formatter.Print("Cannot open libraries folder")
 		return
 	}
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
-		logrus.Infoln("Cannot read into libraries folder")
+		formatter.Print("Cannot read into libraries folder")
 		return
 	}
 
@@ -491,7 +511,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 				ini := goini.New()
 				err = ini.Parse(content, "\n", "=")
 				if err != nil {
-					logrus.Infoln(err)
+					formatter.Print(err)
 				}
 				Name, ok := ini.Get("name")
 				if !ok {
@@ -519,11 +539,11 @@ func executeListCommand(command *cobra.Command, args []string) {
 	}
 
 	if len(libs) < 1 {
-		logrus.Infoln("No library installed")
+		formatter.Print("No library installed")
 	} else {
 		//pretty prints installed libraries
 		for _, item := range libs {
-			logrus.Infoln(item)
+			formatter.Print(item)
 		}
 	}
 }

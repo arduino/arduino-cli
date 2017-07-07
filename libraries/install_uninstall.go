@@ -64,8 +64,8 @@ func (lib Library) IsCached(version string) bool {
 
 // InstallLib installs a library.
 func InstallLib(library *Library, version string) error {
-	_, exists := library.Releases[version]
-	if !exists {
+	release := library.GetVersion(version)
+	if release == nil {
 		return errors.New("Not existing version of the library")
 	}
 
@@ -74,14 +74,14 @@ func InstallLib(library *Library, version string) error {
 		return err
 	}
 	if installedRelease != nil {
-		if installedRelease.Version != library.Latest().Version {
-			err := removeRelease(library, installedRelease)
-			if err != nil {
-				return err
-			}
-		} else {
-			return nil // Already installed and latest version.
+		//if installedRelease.Version != library.Latest().Version {
+		err := removeRelease(library, installedRelease)
+		if err != nil {
+			return err
 		}
+		//} else {
+		//	return nil // Already installed and latest version.
+		//}
 	}
 
 	libFolder, err := common.GetDefaultLibFolder()
@@ -94,7 +94,7 @@ func InstallLib(library *Library, version string) error {
 		return err
 	}
 
-	cacheFilePath := filepath.Join(stagingFolder, fmt.Sprintf("%s.zip", library.Name))
+	cacheFilePath := filepath.Join(stagingFolder, release.ArchiveFileName)
 	content, err := ioutil.ReadFile(cacheFilePath)
 	if err != nil {
 		return err

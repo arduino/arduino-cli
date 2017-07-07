@@ -35,9 +35,10 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"errors"
+
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/task"
-	"github.com/sirupsen/logrus"
 	"gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -46,12 +47,11 @@ const (
 )
 
 // DownloadAndCache downloads a library without installing it
-func DownloadAndCache(library *Library, progBar *pb.ProgressBar) task.Wrapper {
+func DownloadAndCache(library *Library, progBar *pb.ProgressBar, version string) task.Wrapper {
 	return task.Wrapper{
 		Task: func() task.Result {
-			zipContent, err := downloadLatest(library, progBar)
+			zipContent, err := downloadVersion(library, progBar, version)
 			if err != nil {
-				logrus.Warnf("Error %s", err)
 				return task.Result{
 					Result: nil,
 					Error:  err,
@@ -60,7 +60,6 @@ func DownloadAndCache(library *Library, progBar *pb.ProgressBar) task.Wrapper {
 
 			zipArchive, err := prepareInstall(library, zipContent)
 			if err != nil {
-				logrus.Warnf("Error %s", err)
 				return task.Result{
 					Result: nil,
 					Error:  err,
@@ -77,7 +76,15 @@ func DownloadAndCache(library *Library, progBar *pb.ProgressBar) task.Wrapper {
 
 // DownloadLatest downloads Latest version of a library.
 func downloadLatest(library *Library, progBar *pb.ProgressBar) ([]byte, error) {
-	return common.DownloadPackage(library.Latest().URL, fmt.Sprintf("library %s", library.Name), progBar)
+	return downloadVersion(library, progBar, library.latestVersion())
+}
+
+func downloadVersion(library *Library, progBar *pb.ProgressBar, version string) ([]byte, error) {
+	release := library.GetVersion(version)
+	if release == nil {
+		return nil, errors.New("Invalid version number")
+	}
+	return common.DownloadPackage(release.URL, fmt.Sprintf("library %s", library.Name), progBar)
 }
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.
