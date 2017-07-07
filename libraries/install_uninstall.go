@@ -94,7 +94,7 @@ func InstallLib(library *Library, version string) error {
 		return err
 	}
 
-	cacheFilePath := filepath.Join(stagingFolder, fmt.Sprintf("%s-%s.zip", library.Name, version))
+	cacheFilePath := filepath.Join(stagingFolder, fmt.Sprintf("%s.zip", library.Name))
 	content, err := ioutil.ReadFile(cacheFilePath)
 	if err != nil {
 		return err

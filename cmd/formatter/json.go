@@ -32,13 +32,13 @@ import "encoding/json"
 import "reflect"
 import "errors"
 
-//JSONPrinter represents a Printer and Formatter of JSON objects.
-type JSONPrinter int8
+//JSONFormatter represents a Printer and Formatter of JSON objects.
+type JSONFormatter struct{}
 
 // Format formaats a message into a JSON object.
 //
 // It ignores Header and Footer fields of the message.
-func (jp JSONPrinter) Format(msg interface{}) (string, error) {
+func (jp JSONFormatter) Format(msg interface{}) (string, error) {
 	if reflect.TypeOf(msg).Kind().String() == "struct" ||
 		reflect.TypeOf(msg).Kind().String() == "map" { // TODO : optimize if possible
 		ret, err := json.Marshal(msg)
@@ -48,6 +48,6 @@ func (jp JSONPrinter) Format(msg interface{}) (string, error) {
 }
 
 // Print prints a JSON object.
-func (jp JSONPrinter) Print(msg interface{}) error {
+func (jp JSONFormatter) Print(msg interface{}) error {
 	return printFunc(jp, msg)
 }

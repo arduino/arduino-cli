@@ -1,0 +1,10 @@
+= Setup a fully working asciidoc environment in visual studio code
+Alessandro Sanino <a.sanino@bcmi-labs.cc>
+
+. Install the following plugins
+  .. `justusadam.language-asciidoc` : it has better highlighting of asciidoc documents
+  .. `joaompinto.asciidoctor-vscode` : enables previews
+. Install Pygments
+[source, bash]
+----
+----

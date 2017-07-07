@@ -1,0 +1,112 @@
+:source-highlighter: pygments
+:pygments-style: manni
+
+= Output Package
+Alessandro Sanino <a.sanino@bcmi-labs.cc>
+
+This package provides structs and helpers to be used in the rest of the project.
+
+Usually it is paired to link:../https://github.com/bcmi-labs/arduino-cli/cmd/formatter[Formatter Package]
+
+== Output structs
+Any Output struct must implement a set of functions, depending on the formatter.
+
+In the case of TextFormatter and JSONFormatter.
+[source,go]
+----
+String() string               // For Text Formatter.
+marshalJSON() ([]byte, error) // For JSON formatter.
+----
+
+Normally `marshalJSON()` is already implemented using JSON Go Tags if using structs.
+
+=== Example of correct output structs
+This is a correct example about how to build an output struct:
+[source,go,numbered]
+----
+// ExampleOutput is a struct which implements Formattable
+//JSON tags are used automatically by marshalJSON.
+type ExampleOutput struct {
+    ExampleOfField         interface{} `json:"exampleOfField"`
+    ExampleOfAnotherField  int         `json:"ExampleOfAnotherField"`
+    ExampleOfRequiredField string      `json:"ExampleOfRequiredField,required"`
+    ExampleOfOptionalField string      `json:"ExampleOfOptionalField,omitempty"`
+}
+
+// String() is used by fmt.Printf, fmt.Sprintf, fmt.Fprintf families of functions,
+// and TextFormatter.
+func (eo ExampleOutput) String() string {
+   ret := fmt.Sprintln("ExampleOfField:", eo.ExampleOfField)
+   ret += fmt.Sprintln("ExampleOfAnotherField:", eo.ExampleOfAnotherField)
+   ret += fmt.Sprintln("ExampleOfRequiredField (error if not set):", eo.ExampleOfRequiredField)
+   // Do not show optional fields.
+   if eo.ExampleOfOptionalField != "" {
+       ret += fmt.Sprintln("ExampleOfOptionalField (may not appear if not set):", eo.ExampleOfField)
+   }
+   // Print that required variable is missing.
+   if eo.ExampleOfRequiredField == "" {
+       ret += fmt.Sprintln("WARNING : Required field ExampleOfRequiredField is not set")
+   }
+   return ret
+}
+----
+
+== Helper functions
+Sometimes it's not that easy to build complex structs directly using the default Go way to instance.
+[source, go]
+----
+type ComplexStruct struct {
+    Field1 interface{} `json:"field1"`
+    // A lot of fields ...
+    Field999999 interface{} `json:"Field999999"`
+    // Adding inner struct, to enhcance complexity
+    InnerComplexStruct AnotherComplexStruct
+    // and so forth ...
+}
+
+type AnotherComplexStruct struct {
+    Field1 interface{} `json:"field1"`
+    // A lot of fields ...
+    Field999999 interface{} `json:"Field999999"`
+}
+
+// Let's instantiate this (with a horrible code)
+func main() {
+    some_value := anotherPackage.getSomeValue()
+    complex := ComplexStruct{
+        Field1 : some_value,
+        // ...
+        // AAAAAARGHHHHH!!!
+        // ...
+        InnerComplexStruct : {
+            // AAAAAARGHHHHH!!!
+            // ...
+        },
+    }
+}
+----
+
+This is where helpers come in.
+
+=== Defining helpers
+Just create functions to wrap results in an elegant way. One example is using `map[string]interface{}` values to create instances of objects.
+
+[source,go]
+----
+// Let's instantiate this (that's better)
+func main() {
+    Map := anotherPackage.DoSomethingAndReturnMapOfResults()
+    complex := output.GenerateComplexStructFromMap(Map)
+}
+
+// Meanwhile, in helpers.go ...
+func GenerateComplexStructFromMap(Map map[string]interface{}) {
+    // Do the instantiation stuff here
+    return ComplexStruct{
+        Field1 : Map["field1"],
+        // ...
+        InnerComplexStruct: GenerateAnotherComplexStructFromMap(Map),
+        // and so forth
+    }
+}
+----
