@@ -197,11 +197,14 @@ func purgeInvalidLibraries(libnames map[string]string, status *libraries.StatusC
 	for libraryName, version := range libnames {
 		library, valid := status.Libraries[libraryName]
 		if !valid {
-			fails[libraryName] = errors.New("Not Found")
-		} else if library.GetVersion(version) == nil {
-			fails[libraryName] = errors.New("Version not found")
+			fails[libraryName] = errors.New("Library Not Found")
 		} else {
-			items[library] = version
+			release := library.GetVersion(version)
+			if release == nil {
+				fails[libraryName] = errors.New("Version Not Found")
+			} else { // replaces "latest" with latest version too
+				items[library] = release.Version
+			}
 		}
 	}
 
@@ -280,7 +283,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 
 	libs, failed := purgeInvalidLibraries(parseLibArgs(args), status)
 
-	libraryResults := parallelLibDownloads(libs, true, "Downloaded")
+	libraryResults := parallelLibDownloads(libs, false, "Installed")
 	for fail, reason := range failed {
 		libraryResults[fail] = reason
 	}

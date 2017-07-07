@@ -30,6 +30,7 @@
 package libraries
 
 import "github.com/pmylund/sortutil"
+import "fmt"
 
 // StatusContext keeps the current status of the libraries in the system
 // (the list of libraries, revisions, installed paths, etc.)
@@ -45,7 +46,7 @@ func (l *StatusContext) AddLibrary(indexLib *indexRelease) {
 	} else {
 		release := indexLib.extractRelease()
 		lib := l.Libraries[name]
-		lib.Releases[release.Version] = release
+		lib.Releases[fmt.Sprint(release.Version)] = release
 	}
 }
 
