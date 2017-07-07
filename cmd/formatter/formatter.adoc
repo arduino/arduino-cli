@@ -1,14 +1,16 @@
-= Formatters 
+= Formatters Package
 Alessandro Sanino <a.sanino@bcmi-labs.cc>
+:source-highlighter: pygments
+:pygments-style: manni
 
-This package contains all formatters.
+Formatters is a package which contains a useful and customizable set of formatters for your application.
 
-.) Formatter - A generic interface to format data.
-.) TextFormatter - Formats interface{} to Text String.
-.) JSONFormatter - Formats interface{} to JSON String.
+. Formatter - A generic `interface` to format data.
+. TextFormatter - Formats `interface{}` to Text String - Binded to `String()` method.
+. JSONFormatter - Formats `interface{}` to JSON String - Binded to `json.Marshal()` method.
 
-== Usage
-[source, go]
+== Usage 
+[source,go]
 ----
 type TestType struct {
    field1 string `json:"field1,omitempty"` //same json tag as required by json.Marshal
@@ -26,7 +28,6 @@ var test TestType{
 var testString = a.Format(test) 
 fmt.Println(testString) // Prints test.String()
 a.Print(test) //does the same.
- 
 
 testString = b.Format(test) 
 fmt.Println(testString) // Prints { field1 : "test", field2 : "42" }
@@ -34,7 +35,7 @@ b.Print(test) //Does the same
 ----
 
 === The default formatter
-There is a global formatter which can be used globally. You can set it with the `formatter.setFormatter(Formatter)` function.
+There is a global formatter which can be used across other packages. You can set it with the `formatter.setFormatter(Formatter)` function.
 [source, go]
 ----
 
