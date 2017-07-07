@@ -215,6 +215,7 @@ func (l *Library) latestVersion() string {
 			max = versions[i]
 		}
 	}
+	fmt.Print(max)
 	return fmt.Sprint(max)
 }
 
@@ -237,6 +238,6 @@ func (l *Library) String() string {
 	res += "  Category: " + l.Category + "\n"
 	res += "  Architecture: " + strings.Join(l.Architectures, ", ") + "\n"
 	res += "  Types: " + strings.Join(l.Types, ", ") + "\n"
-	res += "  Versions: " + strings.Join(l.Versions(), ", ") + "\n"
+	res += "  Versions: " + fmt.Sprint(l.Versions()) + "\n"
 	return res
 }

@@ -35,7 +35,6 @@ import (
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/blang/semver"
 )
 
 // Index represents the content of a library_index.json file
@@ -95,12 +94,8 @@ func LoadLibrariesIndex() (*Index, error) {
 // extractRelease create a new Release with the information contained
 // in this index element
 func (indexLib *indexRelease) extractRelease() *Release {
-	semVersion, err := semver.Make(indexLib.Version)
-	if err != nil {
-		return nil
-	}
 	return &Release{
-		Version:         semVersion,
+		Version:         indexLib.Version,
 		URL:             indexLib.URL,
 		ArchiveFileName: indexLib.ArchiveFileName,
 		Size:            indexLib.Size,
@@ -123,6 +118,6 @@ func (indexLib *indexRelease) extractLibrary() *Library {
 		Category:      indexLib.Category,
 		Architectures: indexLib.Architectures,
 		Types:         indexLib.Types,
-		Releases:      map[string]*Release{release.Version.String(): release},
+		Releases:      map[string]*Release{release.Version: release},
 	}
 }
