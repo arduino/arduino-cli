@@ -73,13 +73,15 @@ func InstallLib(library *Library, version string) error {
 	if err != nil {
 		return err
 	}
-	if installedRelease != nil && installedRelease.Version != library.Latest().Version {
-		err := removeRelease(library, installedRelease)
-		if err != nil {
-			return err
+	if installedRelease != nil {
+		if installedRelease.Version != library.Latest().Version {
+			err := removeRelease(library, installedRelease)
+			if err != nil {
+				return err
+			}
+		} else {
+			return nil // Already installed and latest version.
 		}
-	} else {
-		return nil // Already installed and latest version.
 	}
 
 	libFolder, err := common.GetDefaultLibFolder()
