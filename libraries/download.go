@@ -35,8 +35,10 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"errors"
+
 	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/sirupsen/logrus"
+	"github.com/bcmi-labs/arduino-cli/task"
 	"gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -45,13 +47,12 @@ const (
 )
 
 // DownloadAndCache downloads a library without installing it
-func DownloadAndCache(library *Library, progBar *pb.ProgressBar) common.TaskWrapper {
-	return common.TaskWrapper{
-		Task: func() common.TaskResult {
-			zipContent, err := downloadLatest(library, progBar)
+func DownloadAndCache(library *Library, progBar *pb.ProgressBar, version string) task.Wrapper {
+	return task.Wrapper{
+		Task: func() task.Result {
+			zipContent, err := downloadVersion(library, progBar, version)
 			if err != nil {
-				logrus.Warnf("Error %s", err)
-				return common.TaskResult{
+				return task.Result{
 					Result: nil,
 					Error:  err,
 				}
@@ -59,14 +60,13 @@ func DownloadAndCache(library *Library, progBar *pb.ProgressBar) common.TaskWrap
 
 			zipArchive, err := prepareInstall(library, zipContent)
 			if err != nil {
-				logrus.Warnf("Error %s", err)
-				return common.TaskResult{
+				return task.Result{
 					Result: nil,
 					Error:  err,
 				}
 			}
 
-			return common.TaskResult{
+			return task.Result{
 				Result: zipArchive,
 				Error:  nil,
 			}
@@ -76,7 +76,15 @@ func DownloadAndCache(library *Library, progBar *pb.ProgressBar) common.TaskWrap
 
 // DownloadLatest downloads Latest version of a library.
 func downloadLatest(library *Library, progBar *pb.ProgressBar) ([]byte, error) {
-	return common.DownloadPackage(library.Latest().URL, fmt.Sprintf("library %s", library.Name), progBar)
+	return downloadVersion(library, progBar, library.latestVersion())
+}
+
+func downloadVersion(library *Library, progBar *pb.ProgressBar, version string) ([]byte, error) {
+	release := library.GetVersion(version)
+	if release == nil {
+		return nil, errors.New("Invalid version number")
+	}
+	return common.DownloadPackage(release.URL, fmt.Sprintf("library %s", library.Name), progBar)
 }
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.

@@ -27,50 +27,38 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package libraries
+package formatter
 
-import "github.com/pmylund/sortutil"
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
-// StatusContext keeps the current status of the libraries in the system
-// (the list of libraries, revisions, installed paths, etc.)
-type StatusContext struct {
-	Libraries map[string]*Library `json:"libraries"`
+// ErrorMessage represents an Error with an attached message.
+//
+// It's the same as a normal error, but It is also parsable as JSON.
+type ErrorMessage struct {
+	message string
 }
 
-// AddLibrary adds an indexRelease to the status context
-func (l *StatusContext) AddLibrary(indexLib *indexRelease) {
-	name := indexLib.Name
-	if l.Libraries[name] == nil {
-		l.Libraries[name] = indexLib.extractLibrary()
-	} else {
-		release := indexLib.extractRelease()
-		lib := l.Libraries[name]
-		lib.Releases[fmt.Sprint(release.Version)] = release
-	}
+// MarshalJSON allows to marshal this object as a JSON object.
+func (err ErrorMessage) MarshalJSON() ([]byte, error) {
+	return json.Marshal(err.message)
 }
 
-// Names returns an array with all the names of the registered libraries.
-func (l *StatusContext) Names() []string {
-	res := make([]string, len(l.Libraries))
-	i := 0
-	for n := range l.Libraries {
-		res[i] = n
-		i++
-	}
-	sortutil.CiAsc(res)
-	return res
+// Error returns the error message.
+func (err ErrorMessage) Error() string {
+	return fmt.Sprint(err.message)
 }
 
-// CreateStatusContext creates a status context from index data.
-func (index *Index) CreateStatusContext() (*StatusContext, error) {
-	// Start with an empty status context
-	libraries := StatusContext{
-		Libraries: map[string]*Library{},
+// String returns a string representation of the Error.
+func (err ErrorMessage) String() string {
+	return err.Error()
+}
+
+// romError creates an ErrorMessage from an Error.
+func fromError(err error) ErrorMessage {
+	return ErrorMessage{
+		message: err.Error(),
 	}
-	for _, lib := range index.Libraries {
-		// Add all indexed libraries in the status context
-		libraries.AddLibrary(&lib)
-	}
-	return &libraries, nil
 }

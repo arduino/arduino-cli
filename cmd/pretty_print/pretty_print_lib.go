@@ -30,32 +30,40 @@
 package prettyPrints
 
 import (
-	"github.com/bcmi-labs/arduino-cli/common"
+	"fmt"
+
+	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/libraries"
-	"github.com/sirupsen/logrus"
+	"github.com/bcmi-labs/arduino-cli/task"
 )
 
 // LibStatus pretty prints libraries from index status.
 func LibStatus(status *libraries.StatusContext, verbosity int) {
+	message := ""
+
 	for _, name := range status.Names() {
 		if verbosity > 0 {
 			lib := status.Libraries[name]
-			logrus.WithField("test", "test").Info(lib)
+			message += fmt.Sprint(lib)
 			if verbosity > 1 {
 				for _, r := range lib.Releases {
-					logrus.Info(r)
+					message += fmt.Sprint(r)
 				}
 			}
-			logrus.Infoln()
+			message += "\n"
 		} else {
-			logrus.Infoln(name)
+			message += name
 		}
 	}
+	formatter.Print(formatter.Message{
+		Header: "Library Search Results:",
+		Data:   message,
+	})
 }
 
 // DownloadLibFileIndex shows info regarding the download of a missing (or corrupted) file index.
-func DownloadLibFileIndex() common.TaskWrapper {
-	return common.TaskWrapper{
+func DownloadLibFileIndex() task.Wrapper {
+	return task.Wrapper{
 		BeforeMessage: []string{
 			"",
 			"Downloading from download.arduino.cc",
@@ -68,8 +76,8 @@ func DownloadLibFileIndex() common.TaskWrapper {
 		ErrorMessage: []string{
 			"Can't download index file, check your network connection.",
 		},
-		Task: common.Task(func() common.TaskResult {
-			return common.TaskResult{
+		Task: task.Task(func() task.Result {
+			return task.Result{
 				Result: nil,
 				Error:  libraries.DownloadLibrariesFile(),
 			}
@@ -97,9 +105,9 @@ func CorruptedLibIndexFix(index *libraries.Index, verbosity int) (*libraries.Sta
 	downloadTask := DownloadLibFileIndex()
 	parseTask := libIndexParse(index, verbosity)
 
-	subTasks := []common.TaskWrapper{downloadTask, parseTask}
+	subTasks := []task.Wrapper{downloadTask, parseTask}
 
-	result := common.TaskWrapper{
+	result := task.Wrapper{
 		BeforeMessage: []string{
 			"Cannot parse index file, it may be corrupted.",
 		},
@@ -107,15 +115,15 @@ func CorruptedLibIndexFix(index *libraries.Index, verbosity int) (*libraries.Sta
 		ErrorMessage: []string{ //printed by sub-task
 			"",
 		},
-		Task: common.CreateTaskSequence(subTasks, []bool{false, false}, verbosity).Task(),
-	}.Execute(verbosity).Result.([]common.TaskResult)
+		Task: task.CreateSequence(subTasks, []bool{false, false}, verbosity).Task(),
+	}.Execute(verbosity).Result.([]task.Result)
 
 	return result[1].Result.(*libraries.StatusContext), result[1].Error
 }
 
 // libIndexParse pretty prints info about parsing an index file of libraries.
-func libIndexParse(index *libraries.Index, verbosity int) common.TaskWrapper {
-	return common.TaskWrapper{
+func libIndexParse(index *libraries.Index, verbosity int) task.Wrapper {
+	return task.Wrapper{
 		BeforeMessage: []string{
 			"",
 			"Parsing downloaded index file",
@@ -126,9 +134,9 @@ func libIndexParse(index *libraries.Index, verbosity int) common.TaskWrapper {
 		ErrorMessage: []string{
 			"Cannot parse index file",
 		},
-		Task: common.Task(func() common.TaskResult {
+		Task: task.Task(func() task.Result {
 			_, err := index.CreateStatusContext()
-			return common.TaskResult{
+			return task.Result{
 				Result: nil,
 				Error:  err,
 			}

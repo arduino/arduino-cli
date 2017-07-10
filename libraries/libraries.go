@@ -33,8 +33,6 @@ import (
 	"bufio"
 	"strconv"
 
-	"github.com/pmylund/sortutil"
-
 	"strings"
 
 	"io/ioutil"
@@ -43,21 +41,24 @@ import (
 
 	"os"
 
+	"fmt"
+
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/blang/semver"
 )
 
 // Library represents a library in the system
 type Library struct {
-	Name          string              `json:"name"`
-	Author        string              `json:"author"`
-	Maintainer    string              `json:"maintainer"`
-	Sentence      string              `json:"sentence"`
-	Paragraph     string              `json:"paragraph"`
-	Website       string              `json:"website"`
-	Category      string              `json:"category"`
-	Architectures []string            `json:"architectures"`
-	Types         []string            `json:"types"`
-	Releases      map[string]*Release `json:"releases"`
+	Name          string              `json:"name,required"`
+	Author        string              `json:"author,omitempty"`
+	Maintainer    string              `json:"maintainer,omitempty"`
+	Sentence      string              `json:"sentence,omitempty"`
+	Paragraph     string              `json:"paragraph,omitempty"`
+	Website       string              `json:"website,omitempty"`
+	Category      string              `json:"category,omitempty"`
+	Architectures []string            `json:"architectures,omitempty"`
+	Types         []string            `json:"types,omitempty"`
+	Releases      map[string]*Release `json:"releases,omitempty"`
 }
 
 // InstalledRelease returns the installed release of the library.
@@ -116,9 +117,6 @@ func (l *Library) InstalledRelease() (*Release, error) {
 		}
 	}
 	return nil, nil // no error, but not found
-	// return nil, errors.New("Not Found")
-	// QUESTION : should errors.New("Not found") be returned?
-	// Can I create a func libraries.IsNotFound(error) bool method, following guidelines dictated by os.IsNotExists(err) func?
 }
 
 // Release represents a release of a library
@@ -130,21 +128,70 @@ type Release struct {
 	Checksum        string `json:"checksum"`
 }
 
+/*
+
+type releaseAlias Release
+
+// MarshalJSON parses the release and returns a JSON Object
+func (r *Release) MarshalJSON() ([]byte, error) {
+	bytez, err := json.Marshal(&struct {
+		Version string `json:"version"`
+		*releaseAlias
+	}{
+		Version:      r.Version.String(),
+		releaseAlias: (*releaseAlias)(r),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return bytez, nil
+}
+
+// UnmarshalJSON takes a byte array and creates an object.
+func (r *Release) UnmarshalJSON(bytez []byte) error {
+	aux := &struct {
+		Version string `json:"version"`
+		*releaseAlias
+	}{
+		releaseAlias: (*releaseAlias)(r),
+	}
+
+	err := json.Unmarshal(bytez, aux)
+	if err != nil {
+		return err
+	}
+
+	r.Version, err = semver.Make(aux.Version)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+*/
+
 // Versions returns an array of all versions available of the library
-func (l *Library) Versions() []string {
-	res := make([]string, len(l.Releases))
+func (l *Library) Versions() semver.Versions {
+	res := make([]semver.Version, len(l.Releases))
 	i := 0
 	for version := range l.Releases {
-		res[i] = version
-		i++
+		temp, err := semver.Make(version)
+		if err != nil {
+			res[i] = temp
+			i++
+		}
 	}
-	sortutil.CiAsc(res)
+	//sortutil.CiAsc(res)
 	return res
 }
 
 // GetVersion returns the Release corresponding to the specified version, or
 // nil if not found.
+//
+// If version == "latest" then release.Version contains the latest version.
 func (l *Library) GetVersion(version string) *Release {
+	if version == "latest" {
+		return l.Releases[l.latestVersion()]
+	}
 	return l.Releases[version]
 }
 
@@ -158,14 +205,22 @@ func (l *Library) Latest() *Release {
 // It uses lexicographics to compare version strings.
 func (l *Library) latestVersion() string {
 	versions := l.Versions()
-	if len(versions) > 0 {
-		return versions[0]
+	if len(versions) == 0 {
+		return ""
 	}
-	return ""
+	max := versions[0]
+
+	for i := 1; i < len(versions); i++ {
+		if versions[i].GT(max) {
+			max = versions[i]
+		}
+	}
+	fmt.Print(max)
+	return fmt.Sprint(max)
 }
 
 func (r *Release) String() string {
-	res := "  Release: " + r.Version + "\n"
+	res := "  Release: " + fmt.Sprint(r.Version) + "\n"
 	res += "    URL: " + r.URL + "\n"
 	res += "    ArchiveFileName: " + r.ArchiveFileName + "\n"
 	res += "    Size: " + strconv.Itoa(r.Size) + "\n"
@@ -183,6 +238,6 @@ func (l *Library) String() string {
 	res += "  Category: " + l.Category + "\n"
 	res += "  Architecture: " + strings.Join(l.Architectures, ", ") + "\n"
 	res += "  Types: " + strings.Join(l.Types, ", ") + "\n"
-	res += "  Versions: " + strings.Join(l.Versions(), ", ") + "\n"
+	res += "  Versions: " + fmt.Sprint(l.Versions()) + "\n"
 	return res
 }

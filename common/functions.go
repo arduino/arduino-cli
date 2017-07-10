@@ -39,20 +39,10 @@ import (
 	"path/filepath"
 	"runtime"
 
-	lcf "github.com/Robpol86/logrus-custom-formatter"
 	"github.com/sirupsen/logrus"
 
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
-
-// Formatters represents all formatting objects passable to logrus.
-var Formatters map[string]logrus.Formatter
-
-func init() {
-	Formatters = make(map[string]logrus.Formatter, 2)
-	Formatters["text"] = lcf.NewFormatter("%[message]s", nil)
-	Formatters["json"] = new(logrus.JSONFormatter)
-}
 
 // GetDefaultArduinoFolder returns the default data folder for Arduino platform
 func GetDefaultArduinoFolder() (string, error) {
@@ -183,9 +173,12 @@ func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressB
 	}
 	defer response.Body.Close()
 
-	rd := progressBar.NewProxyReader(response.Body)
+	source := response.Body
+	if progressBar != nil {
+		source = progressBar.NewProxyReader(response.Body)
+	}
 
-	body, err := ioutil.ReadAll(rd)
+	body, err := ioutil.ReadAll(source)
 	if err != nil {
 		return nil, fmt.Errorf("Cannot read response body")
 	}

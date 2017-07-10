@@ -101,6 +101,7 @@ func (indexLib *indexRelease) extractRelease() *Release {
 		Size:            indexLib.Size,
 		Checksum:        indexLib.Checksum,
 	}
+
 }
 
 // extractLibrary create a new Library with the information contained

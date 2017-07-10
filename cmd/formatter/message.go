@@ -26,51 +26,30 @@
  *
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
+package formatter
 
-package libraries
+import (
+	"fmt"
+	"strings"
+)
 
-import "github.com/pmylund/sortutil"
-import "fmt"
-
-// StatusContext keeps the current status of the libraries in the system
-// (the list of libraries, revisions, installed paths, etc.)
-type StatusContext struct {
-	Libraries map[string]*Library `json:"libraries"`
+// Message represents a formattable message.
+type Message struct {
+	Header string      `json:"header,omitempty"` // What is written before parsing Data.
+	Data   interface{} `json:"data,omitempty"`   // The Data of the message, this should be the most important data to convert.
+	Footer string      `json:"footer,omitempty"` // What is written after parsing Data.
 }
 
-// AddLibrary adds an indexRelease to the status context
-func (l *StatusContext) AddLibrary(indexLib *indexRelease) {
-	name := indexLib.Name
-	if l.Libraries[name] == nil {
-		l.Libraries[name] = indexLib.extractLibrary()
-	} else {
-		release := indexLib.extractRelease()
-		lib := l.Libraries[name]
-		lib.Releases[fmt.Sprint(release.Version)] = release
+// String returns a string representation of the object.
+func (m *Message) String() string {
+	data := fmt.Sprintf("%s", m.Data)
+	message := m.Header
+	if message != "" {
+		message += "\n"
 	}
-}
-
-// Names returns an array with all the names of the registered libraries.
-func (l *StatusContext) Names() []string {
-	res := make([]string, len(l.Libraries))
-	i := 0
-	for n := range l.Libraries {
-		res[i] = n
-		i++
+	message += data
+	if data != "" {
+		message += "\n"
 	}
-	sortutil.CiAsc(res)
-	return res
-}
-
-// CreateStatusContext creates a status context from index data.
-func (index *Index) CreateStatusContext() (*StatusContext, error) {
-	// Start with an empty status context
-	libraries := StatusContext{
-		Libraries: map[string]*Library{},
-	}
-	for _, lib := range index.Libraries {
-		// Add all indexed libraries in the status context
-		libraries.AddLibrary(&lib)
-	}
-	return &libraries, nil
+	return strings.TrimSpace(message + m.Footer)
 }
