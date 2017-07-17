@@ -44,7 +44,6 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/bcmi-labs/arduino-cli/task"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/zieckey/goini"
 	"gopkg.in/cheggaaa/pb.v1"
@@ -222,14 +221,14 @@ func parallelLibDownloads(items map[*libraries.Library]string, forced bool, OkSt
 	tasks := make(map[string]task.Wrapper, len(items))
 	progressBars := make([]*pb.ProgressBar, 0, len(items))
 
-	textMode := GlobalFlags.Format == "text"
+	textMode := formatter.IsSupported("text")
 
 	for library, version := range items {
 		release := library.GetVersion(version)
 		if release != nil && !library.IsCached(version) || forced {
 			var pBar *pb.ProgressBar
 			if textMode {
-				pBar = pb.StartNew(library.Latest().Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name))
+				pBar = pb.StartNew(release.Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name))
 				progressBars = append(progressBars, pBar)
 			}
 			tasks[library.Name] = libraries.DownloadAndCache(library, pBar, version)
@@ -241,6 +240,7 @@ func parallelLibDownloads(items map[*libraries.Library]string, forced bool, OkSt
 		if textMode {
 			pool, _ = pb.StartPool(progressBars...)
 		}
+
 		results := task.ExecuteParallelFromMap(tasks, GlobalFlags.Verbose)
 
 		if textMode {
@@ -313,24 +313,26 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 
 	dir, err := os.Open(libFolder)
 	if err != nil {
-		formatter.Print("Cannot open libraries folder")
+		formatter.PrintErrorMessage("Cannot open libraries folder")
 		return nil
 	}
-
-	libraryFails := make([]string, 0, len(args))
-	libraryOK := make([]string, 0, len(args))
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
-		formatter.Print("Cannot read into libraries folder")
+		formatter.PrintErrorMessage("Cannot read into libraries folder")
 		return nil
 	}
 
+	libraryResults := make(map[string]interface{}, len(args))
+	for _, arg := range args {
+		libraryResults[arg] = errors.New("Not Found or Not Installed")
+	}
 	//TODO: optimize this algorithm
-	// time complexity O(libraries_to_install(from RAM) *
-	//                   library_folder_number(from DISK) *
-	//                   library_folder_file_number (from DISK))
-	//TODO : remove only one version
+	//      time complexity O(libraries_to_install(from RAM) *
+	//                        library_folder_number(from DISK) *
+	//                        library_folder_file_number (from DISK)).
+	//TODO : remove only one version.
+
 	for _, file := range dirFiles {
 		for _, library := range args {
 			if file.IsDir() {
@@ -345,16 +347,16 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 						//found
 						err = libraries.Uninstall(filepath.Join(libFolder, fileName))
 						if err != nil {
-							libraryFails = append(libraryFails, library)
+							libraryResults[library] = err
 						} else {
-							libraryOK = append(libraryOK, library)
+							libraryResults[library] = "Uninstalled"
 						}
 					}
 				} else {
 					// I use library.properties file
 					content, err := os.OpenFile(indexFile, os.O_RDONLY, 0666)
 					if err != nil {
-						libraryFails = append(libraryFails, library)
+						libraryResults[library] = err
 						continue
 					}
 
@@ -369,9 +371,9 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 								//found
 								err = libraries.Uninstall(filepath.Join(libFolder, file.Name()))
 								if err != nil {
-									libraryFails = append(libraryFails, library)
+									libraryResults[library] = err
 								} else {
-									libraryOK = append(libraryOK, library)
+									libraryResults[library] = "Uninstalled"
 								}
 							}
 							break
@@ -379,27 +381,18 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 					}
 
 					if err := scanner.Err(); err != nil {
-						libraryFails = append(libraryFails, library)
+						libraryResults[library] = err
+					} else {
+						libraryResults[library] = errors.New("name not found in library.properties")
 					}
 				}
 			}
 		}
 	}
-
-	if GlobalFlags.Verbose > 0 {
-		if len(libraryFails) > 0 {
-			formatter.Print("The following libraries were succesfully uninstalled:")
-			formatter.Print(strings.Join(libraryOK, " "))
-			formatter.Print("However, the uninstall process failed on the following libraries:")
-			formatter.Print(strings.Join(libraryFails, " "))
-		} else {
-			formatter.Print("All libraries successfully uninstalled")
-		}
-	} else if len(libraryFails) > 0 {
-		for _, failed := range libraryFails {
-			logrus.Infof("%-10s - Failed\n", failed)
-		}
+	if len(libraryResults) > 0 {
+		formatter.Print(output.LibResultsFromMap(libraryResults))
 	}
+
 	return nil
 }
 

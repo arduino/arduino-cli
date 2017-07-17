@@ -30,13 +30,11 @@
 package task
 
 import (
-	"errors"
 	"math"
 
 	"fmt"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
-	"github.com/sirupsen/logrus"
 )
 
 // Task represents a function which can be safely wrapped into a Wrapper.
@@ -87,17 +85,17 @@ func (tw Wrapper) Execute(verb int) Result {
 				formatter.Print("ERROR\n")
 			}
 			if msg != "" {
-				formatter.Print(errors.New(msg))
+				formatter.Print(msg)
 			}
 		}
 	} else if tw.AfterMessage != nil && len(tw.AfterMessage) > 0 {
 		maxUsableVerb[2] = minVerb(verb, tw.AfterMessage)
 		msg = tw.AfterMessage[maxUsableVerb[2]]
 		if tw.BeforeMessage[maxUsableVerb[0]] != "" {
-			logrus.Info("OK\n")
+			formatter.Print("OK\n")
 		}
 		if msg != "" {
-			logrus.Infof("%s\n", msg)
+			formatter.Print(msg)
 		}
 	}
 	return ret

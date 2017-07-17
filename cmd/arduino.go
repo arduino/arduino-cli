@@ -144,7 +144,7 @@ func initConfig() {
 			if GlobalFlags.Verbose > 0 {
 				base += fmt.Sprintf(": %s\n", err)
 			}
-			formatter.Print(base)
+			formatter.PrintErrorMessage(base)
 			os.Exit(1)
 		}
 

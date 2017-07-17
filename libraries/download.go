@@ -50,7 +50,7 @@ const (
 func DownloadAndCache(library *Library, progBar *pb.ProgressBar, version string) task.Wrapper {
 	return task.Wrapper{
 		Task: func() task.Result {
-			zipContent, err := downloadVersion(library, progBar, version)
+			zipContent, err := downloadRelease(library, progBar, version)
 			if err != nil {
 				return task.Result{
 					Result: nil,
@@ -58,7 +58,7 @@ func DownloadAndCache(library *Library, progBar *pb.ProgressBar, version string)
 				}
 			}
 
-			zipArchive, err := prepareInstall(library, zipContent)
+			zipArchive, err := prepareInstall(library, zipContent, version)
 			if err != nil {
 				return task.Result{
 					Result: nil,
@@ -76,10 +76,10 @@ func DownloadAndCache(library *Library, progBar *pb.ProgressBar, version string)
 
 // DownloadLatest downloads Latest version of a library.
 func downloadLatest(library *Library, progBar *pb.ProgressBar) ([]byte, error) {
-	return downloadVersion(library, progBar, library.latestVersion())
+	return downloadRelease(library, progBar, library.latestVersion())
 }
 
-func downloadVersion(library *Library, progBar *pb.ProgressBar, version string) ([]byte, error) {
+func downloadRelease(library *Library, progBar *pb.ProgressBar, version string) ([]byte, error) {
 	release := library.GetVersion(version)
 	if release == nil {
 		return nil, errors.New("Invalid version number")

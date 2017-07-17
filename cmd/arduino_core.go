@@ -39,6 +39,19 @@ var arduinoCoreCmd = &cobra.Command{
 	Long:  `Arduino Core operations`,
 }
 
+var arduinoCoreListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "Shows the list of installed cores",
+	Long: `Shows the list of installed cores. 
+With -v tag (up to 2 times) can provide more verbose output.`,
+	Run: executeCoreListCommand,
+}
+
 func init() {
 	arduinoCmd.AddCommand(arduinoCoreCmd)
+	arduinoCoreCmd.AddCommand(arduinoCoreListCmd)
+}
+
+func executeCoreListCommand(cmd *cobra.Command, args []string) {
+
 }

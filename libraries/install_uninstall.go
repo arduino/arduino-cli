@@ -126,8 +126,12 @@ func removeRelease(l *Library, r *Release) error {
 }
 
 // prepareInstall move a downloaded library to a cache folder, before installation.
-func prepareInstall(library *Library, body []byte) (*zip.Reader, error) {
+func prepareInstall(library *Library, body []byte, version string) (*zip.Reader, error) {
 	reader := bytes.NewReader(body)
+	release := library.GetVersion(version)
+	if release == nil {
+		return nil, errors.New("Invalid version number")
+	}
 
 	archive, err := zip.NewReader(reader, int64(reader.Len()))
 	if err != nil {
@@ -140,7 +144,7 @@ func prepareInstall(library *Library, body []byte) (*zip.Reader, error) {
 		return nil, fmt.Errorf("Cannot get download cache folder")
 	}
 
-	err = ioutil.WriteFile(filepath.Join(stagingFolder, library.Latest().ArchiveFileName), body, 0666)
+	err = ioutil.WriteFile(filepath.Join(stagingFolder, release.ArchiveFileName), body, 0666)
 	if err != nil {
 		return nil, fmt.Errorf("Cannot write download to cache folder, %s", err.Error())
 	}

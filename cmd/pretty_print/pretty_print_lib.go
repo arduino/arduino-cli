@@ -85,16 +85,6 @@ func DownloadLibFileIndex() task.Wrapper {
 	}
 }
 
-//InstallLib pretty prints info about a pending install of libraries.
-func InstallLib(libraryOK []string, libraryFails map[string]string) {
-	actionOnItems("libraries", "installed", libraryOK, libraryFails)
-}
-
-// DownloadLib pretty prints info about a pending download of libraries.
-func DownloadLib(libraryOK []string, libraryFails map[string]string) {
-	actionOnItems("libraries", "downloaded", libraryOK, libraryFails)
-}
-
 //UninstallLib pretty prints info about a pending install of libraries.
 func UninstallLib(libraryOK []string, libraryFails map[string]string) {
 	actionOnItems("libraries", "uninstalled", libraryOK, libraryFails)

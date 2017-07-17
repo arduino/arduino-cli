@@ -171,11 +171,11 @@ func (r *Release) UnmarshalJSON(bytez []byte) error {
 
 // Versions returns an array of all versions available of the library
 func (l *Library) Versions() semver.Versions {
-	res := make([]semver.Version, len(l.Releases))
+	res := make(semver.Versions, len(l.Releases))
 	i := 0
 	for version := range l.Releases {
 		temp, err := semver.Make(version)
-		if err != nil {
+		if err == nil {
 			res[i] = temp
 			i++
 		}
@@ -215,7 +215,6 @@ func (l *Library) latestVersion() string {
 			max = versions[i]
 		}
 	}
-	fmt.Print(max)
 	return fmt.Sprint(max)
 }
 

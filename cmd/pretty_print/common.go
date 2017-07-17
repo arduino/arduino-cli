@@ -30,26 +30,29 @@
 package prettyPrints
 
 import (
+	"fmt"
 	"strings"
 
-	"github.com/sirupsen/logrus"
+	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 )
 
 // actionOnItems pretty prints info about an action on one or more items.
 func actionOnItems(itemPluralName string, actionPastParticiple string, itemOK []string, itemFails map[string]string) {
+	msg := ""
 	if len(itemFails) > 0 {
 		if len(itemOK) > 0 {
-			logrus.Infof("The following %0s were succesfully %s:\n", itemPluralName, actionPastParticiple)
-			logrus.Infoln(strings.Join(itemOK, " "))
-			logrus.Info("However, t")
+			msg += fmt.Sprintf("The following %s were succesfully %s:\n", itemPluralName, actionPastParticiple)
+			msg += fmt.Sprintln(strings.Join(itemOK, " "))
+			msg += "However, t"
 		} else { //UGLYYYY but it works
-			logrus.Info("T")
+			msg += "T"
 		}
-		logrus.Infof("he the following %s were not %s and failed :", itemPluralName, actionPastParticiple)
+		msg += fmt.Sprintf("he the following %s were not %s and failed :", itemPluralName, actionPastParticiple)
 		for item, failure := range itemFails {
-			logrus.Infof("%-10s -%s\n", item, failure)
+			msg += fmt.Sprintf("%-10s -%s\n", item, failure)
 		}
 	} else {
-		logrus.Infof("All %s successfully installed\n", itemPluralName)
+		msg += fmt.Sprintf("All %s successfully installed\n", itemPluralName)
 	}
+	formatter.Print(msg)
 }
