@@ -125,6 +125,6 @@ func getDownloadCacheFolder() (string, error) {
 		return "", err
 	}
 
-	stagingFolder := filepath.Join(libFolder, "staging")
+	stagingFolder := filepath.Join(libFolder, "staging", "libraries")
 	return common.GetFolder(stagingFolder, "libraries cache")
 }

@@ -473,7 +473,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 		return
 	}
 
-	libs := make([]string, 0, 10)
+	libs := make(map[string]interface{}, 10)
 
 	//TODO: optimize this algorithm
 	// time complexity O(libraries_to_install(from RAM) *
@@ -490,7 +490,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 				fileName = strings.Replace(fileName, "_", " ", -1)
 				fileName = strings.Replace(fileName, "-", " v. ", -1)
 				//I use folder name
-				libs = append(libs, fileName)
+				libs[fileName] = "Unknown Version"
 			} else {
 				// I use library.properties file
 				content, err := ioutil.ReadFile(indexFile)
@@ -500,7 +500,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					libs = append(libs, fileName)
+					libs[fileName] = "Unknown Version"
 					continue
 				}
 
@@ -516,7 +516,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					libs = append(libs, fileName)
+					libs[fileName] = "Unknown Version"
 					continue
 				}
 				Version, ok := ini.Get("version")
@@ -526,10 +526,10 @@ func executeListCommand(command *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					libs = append(libs, fileName)
+					libs[fileName] = "Unknown Version"
 					continue
 				}
-				libs = append(libs, fmt.Sprintf("%-10s v. %s", Name, Version))
+				libs[Name] = fmt.Sprintf("v.%s", Version)
 			}
 		}
 	}
@@ -537,10 +537,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 	if len(libs) < 1 {
 		formatter.Print("No library installed")
 	} else {
-		//pretty prints installed libraries
-		for _, item := range libs {
-			formatter.Print(item)
-		}
+		formatter.Print(output.LibResultsFromMap(libs))
 	}
 }
 

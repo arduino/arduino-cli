@@ -30,7 +30,16 @@
 package cmd
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/spf13/cobra"
+	"github.com/zieckey/goini"
 )
 
 var arduinoCoreCmd = &cobra.Command{
@@ -53,5 +62,97 @@ func init() {
 }
 
 func executeCoreListCommand(cmd *cobra.Command, args []string) {
+	if arduinoLibFlags.updateIndex {
+		execUpdateListIndex(cmd, args)
+		return
+	}
 
+	libHome, err := common.GetDefaultLibFolder()
+	if err != nil {
+		formatter.Print("Cannot get libraries folder")
+		return
+	}
+
+	//prettyPrints.corestatus(status)
+	dir, err := os.Open(libHome)
+	if err != nil {
+		formatter.Print("Cannot open libraries folder")
+		return
+	}
+
+	dirFiles, err := dir.Readdir(0)
+	if err != nil {
+		formatter.Print("Cannot read into libraries folder")
+		return
+	}
+
+	cores := make([]string, 0, 10)
+
+	//TODO: optimize this algorithm
+	// time complexity O(libraries_to_install(from RAM) *
+	//                   library_folder_number(from DISK) *
+	//                   library_folder_file_number (from DISK))
+	//TODO : remove only one version
+	for _, file := range dirFiles {
+		if file.IsDir() {
+			indexFile := filepath.Join(libHome, file.Name(), "library.properties")
+			_, err = os.Stat(indexFile)
+			if os.IsNotExist(err) {
+				fileName := file.Name()
+				//replacing underscore in foldernames with spaces.
+				fileName = strings.Replace(fileName, "_", " ", -1)
+				fileName = strings.Replace(fileName, "-", " v. ", -1)
+				//I use folder name
+				cores = append(cores, fileName)
+			} else {
+				// I use library.properties file
+				content, err := ioutil.ReadFile(indexFile)
+				if err != nil {
+					fileName := file.Name()
+					//replacing underscore in foldernames with spaces.
+					fileName = strings.Replace(fileName, "_", " ", -1)
+					fileName = strings.Replace(fileName, "-", " v. ", -1)
+					//I use folder name
+					cores = append(cores, fileName)
+					continue
+				}
+
+				ini := goini.New()
+				err = ini.Parse(content, "\n", "=")
+				if err != nil {
+					formatter.Print(err)
+				}
+				Name, ok := ini.Get("name")
+				if !ok {
+					fileName := file.Name()
+					//replacing underscore in foldernames with spaces.
+					fileName = strings.Replace(fileName, "_", " ", -1)
+					fileName = strings.Replace(fileName, "-", " v. ", -1)
+					//I use folder name
+					cores = append(cores, fileName)
+					continue
+				}
+				Version, ok := ini.Get("version")
+				if !ok {
+					fileName := file.Name()
+					//replacing underscore in foldernames with spaces.
+					fileName = strings.Replace(fileName, "_", " ", -1)
+					fileName = strings.Replace(fileName, "-", " v. ", -1)
+					//I use folder name
+					cores = append(cores, fileName)
+					continue
+				}
+				cores = append(cores, fmt.Sprintf("%-10s v. %s", Name, Version))
+			}
+		}
+	}
+
+	if len(cores) < 1 {
+		formatter.Print("No core installed")
+	} else {
+		//pretty prints installed libraries
+		for _, item := range cores {
+			formatter.Print(item)
+		}
+	}
 }

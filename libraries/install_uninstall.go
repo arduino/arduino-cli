@@ -150,15 +150,3 @@ func prepareInstall(library *Library, body []byte, version string) (*zip.Reader,
 	}
 	return archive, nil
 }
-
-// getLibFolder returns the destination folder of the downloaded specified library.
-// It creates the folder if does not find it.
-func getLibFolder(library *Library) (string, error) {
-	baseFolder, err := common.GetDefaultLibFolder()
-	if err != nil {
-		return "", err
-	}
-
-	libFolder := filepath.Join(baseFolder, fmt.Sprintf("%s-%s", library.Name, library.Latest().Version))
-	return common.GetFolder(libFolder, "library")
-}

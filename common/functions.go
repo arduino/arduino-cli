@@ -39,8 +39,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/sirupsen/logrus"
-
+	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -89,14 +88,14 @@ func GetDefaultArduinoHomeFolder() (string, error) {
 func GetFolder(folder string, messageName string) (string, error) {
 	_, err := os.Stat(folder)
 	if os.IsNotExist(err) {
-		logrus.Infof("Cannot find default %s folder, attemping to create it ...", messageName)
+		formatter.Print(fmt.Sprintf("Cannot find default %s folder, attemping to create it ...", messageName))
 		err = os.MkdirAll(folder, 0755)
 		if err != nil {
-			logrus.Infoln("ERROR")
-			logrus.Infof("Cannot create %s folder\n", messageName)
+			formatter.Print("ERROR")
+			formatter.PrintErrorMessage(fmt.Sprintf("Cannot create %s folder\n", messageName))
 			return "", err
 		}
-		logrus.Infoln("OK")
+		formatter.Print("OK")
 	}
 	return folder, nil
 }
