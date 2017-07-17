@@ -29,21 +29,14 @@
 
 package cores
 
-import "github.com/pmylund/sortutil"
+import (
+	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/pmylund/sortutil"
+)
 
 // StatusContext represents the Context of the Cores and Tools in the system.
 type StatusContext struct {
 	Packages map[string]*Package
-}
-
-//Package represents a package in the system.
-type Package struct {
-	Name       string
-	Maintainer string
-	WebsiteURL string
-	Email      string
-	Cores      map[string]*Core // The cores in the system.
-	// Tools map[string]*Tool // The tools in the system.
 }
 
 // AddPackage adds a package to a context from an indexPackage.
@@ -53,23 +46,20 @@ func (sc *StatusContext) AddPackage(indexPackage *indexPackage) {
 	sc.Packages[indexPackage.Name] = indexPackage.extractPackage()
 }
 
-// AddCore adds a core to the context.
-func (pm *Package) AddCore(indexCore *indexCoreRelease) {
-	name := indexCore.Name
-	if pm.Cores[name] == nil {
-		pm.Cores[name] = indexCore.extractCore()
-	} else {
-		release := indexCore.extractRelease()
-		core := pm.Cores[name]
-		core.Releases[release.Version] = release
+// Items returns a map matching core name and core struct.
+func (pm Package) Items() map[string]interface{} {
+	ret := make(map[string]interface{}, len(pm.Cores))
+	for key, val := range pm.Cores {
+		ret[key] = val
 	}
+	return ret
 }
 
-// CoreNames returns an array with all the names of the registered cores.
-func (pm *Package) CoreNames() []string {
-	res := make([]string, len(pm.Cores))
+// Names returns the array containing the name of the packages.
+func (sc StatusContext) Names() []string {
+	res := make([]string, len(sc.Packages))
 	i := 0
-	for n := range pm.Cores {
+	for n := range sc.Packages {
 		res[i] = n
 		i++
 	}
@@ -77,8 +67,17 @@ func (pm *Package) CoreNames() []string {
 	return res
 }
 
-// CreateStatusContextFromIndex creates a status context from index data.
-func CreateStatusContextFromIndex(index *Index) (*StatusContext, error) {
+// Items returns a map matching core name and core struct.
+func (sc StatusContext) Items() map[string]interface{} {
+	ret := make(map[string]interface{}, len(sc.Packages))
+	for key, val := range sc.Packages {
+		ret[key] = val
+	}
+	return ret
+}
+
+// CreateStatusContext creates a status context from index data.
+func (index Index) CreateStatusContext() (common.StatusContext, error) {
 	// Start with an empty status context
 	packages := StatusContext{
 		Packages: make(map[string]*Package, len(index.Packages)),
@@ -86,5 +85,5 @@ func CreateStatusContextFromIndex(index *Index) (*StatusContext, error) {
 	for _, packageManager := range index.Packages {
 		packages.AddPackage(packageManager)
 	}
-	return &packages, nil
+	return packages, nil
 }

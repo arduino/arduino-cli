@@ -33,7 +33,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pmylund/sortutil"
+	"github.com/blang/semver"
 )
 
 // Core represents a core package.
@@ -60,20 +60,23 @@ func (core *Core) GetVersion(version string) *Release {
 }
 
 // Versions returns all the version numbers in this Core Package.
-func (core *Core) Versions() []string {
-	versions := make([]string, len(core.Releases))
-	i := 0
-	for version := range core.Releases {
-		versions[i] = version
-		i++
+func (core *Core) Versions() semver.Versions {
+	versions := make(semver.Versions, 0, len(core.Releases))
+
+	for _, release := range core.Releases {
+		temp, err := semver.Make(release.Version)
+		if err == nil {
+			versions = append(versions, temp)
+		}
 	}
-	sortutil.CiAsc(versions)
+
 	return versions
 }
 
 // Latest obtains latest version of a core package.
 func (core *Core) Latest() *Release {
-	return core.GetVersion(core.latestVersion())
+	latest := core.latestVersion()
+	return core.GetVersion(latest)
 }
 
 // latestVersion obtains latest version number.
@@ -82,35 +85,36 @@ func (core *Core) Latest() *Release {
 func (core *Core) latestVersion() string {
 	versions := core.Versions()
 	if len(versions) > 0 {
-		return versions[0]
+		max := versions[0]
+		for i := 1; i < len(versions); i++ {
+			if versions[i].GT(max) {
+				max = versions[i]
+			}
+		}
+		return fmt.Sprint(max)
 	}
 	return ""
 }
 
-func (core *Core) String(verbosity int) (res string) {
-	if verbosity > 0 {
-		res += fmt.Sprintf("Name        : %s\n", core.Name)
-		res += fmt.Sprintf("Architecture: %s\n", core.Architecture)
-		res += fmt.Sprintf("Category    : %s\n", core.Category)
-		if verbosity > 1 {
-			res += "Releases:\n"
-			for _, release := range core.Releases {
-				res += fmt.Sprintf("%s\n", release.String())
-			}
-		} else {
-			res += fmt.Sprintf("Releases    : %s", core.Versions())
+func (core *Core) String() string {
+	res := fmt.Sprintln("Name        :", core.Name)
+	res += fmt.Sprintln("Architecture:", core.Architecture)
+	res += fmt.Sprintln("Category    :", core.Category)
+	if core.Releases != nil && len(core.Releases) > 0 {
+		res += "Releases:\n"
+		for _, release := range core.Releases {
+			res += fmt.Sprintln(release)
 		}
-	} else {
-		res = fmt.Sprintf("%s\n", core.Name)
 	}
-	return
+	return res
 }
 
 func (release *Release) String() string {
-	res := fmt.Sprintf("Version           : %s\n", release.Version)
-	res += fmt.Sprintf("Boards            : \n%s\n", strings.Join(release.Boards, ", "))
-	res += fmt.Sprintf("Archive File Name : %s\n", release.ArchiveFileName)
-	res += fmt.Sprintf("Checksum          : %s\n", release.Checksum)
-	res += fmt.Sprintf("File Size         : %d\n", release.Size)
+	res := fmt.Sprintln("  Version           : ", release.Version)
+	res += fmt.Sprintln("  Boards            :")
+	res += fmt.Sprintln(strings.Join(release.Boards, ", "))
+	res += fmt.Sprintln("  Archive File Name :", release.ArchiveFileName)
+	res += fmt.Sprintln("  Checksum          :", release.Checksum)
+	res += fmt.Sprintln("  File Size         :", release.Size)
 	return res
 }

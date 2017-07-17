@@ -27,15 +27,40 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package common
+package cores
 
-// Index represents a generic index parsed from an index file.
-type Index interface {
-	CreateStatusContext() (StatusContext, error) // CreateStatusContext creates a status context with this index data.
+import "github.com/pmylund/sortutil"
+
+//Package represents a package in the system.
+type Package struct {
+	Name       string
+	Maintainer string
+	WebsiteURL string
+	Email      string
+	Cores      map[string]*Core // The cores in the system.
+	// Tools map[string]*Tool // The tools in the system.
 }
 
-// StatusContext represents a generic status context, created from an Index.
-type StatusContext interface {
-	Names() []string               // Names Returns an array with all the names of the items.
-	Items() map[string]interface{} // Items Returns a map of all items with their names.
+// AddCore adds a core to the context.
+func (pm *Package) AddCore(indexCore *indexCoreRelease) {
+	name := indexCore.Name
+	if pm.Cores[name] == nil {
+		pm.Cores[name] = indexCore.extractCore()
+	} else {
+		release := indexCore.extractRelease()
+		core := pm.Cores[name]
+		core.Releases[release.Version] = release
+	}
+}
+
+// Names returns an array with all the names of the registered cores.
+func (pm Package) Names() []string {
+	res := make([]string, len(pm.Cores))
+	i := 0
+	for n := range pm.Cores {
+		res[i] = n
+		i++
+	}
+	sortutil.CiAsc(res)
+	return res
 }

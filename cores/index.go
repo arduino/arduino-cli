@@ -121,7 +121,7 @@ func (release *indexCoreRelease) extractBoards() []string {
 
 // LoadPackagesIndex reads a package_index.json from a file and returns
 // the corresponding Index structure.
-func LoadPackagesIndex() (*Index, error) {
+func LoadPackagesIndex() (common.Index, error) {
 	libFile, err := IndexPath()
 	if err != nil {
 		return nil, err
@@ -138,5 +138,5 @@ func LoadPackagesIndex() (*Index, error) {
 		return nil, err
 	}
 
-	return &index, nil
+	return index, nil
 }
