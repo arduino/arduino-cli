@@ -363,7 +363,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 					// create map from content
 					scanner := bufio.NewScanner(content)
 					for scanner.Scan() {
-						lines := strings.Split(scanner.Text(), "=")
+						lines := strings.SplitN(scanner.Text(), "=", 2)
 						// NOTE: asserting that if there is a library.properties, there is always the
 						// name of the library.
 						if lines[0] == "name" {
@@ -382,7 +382,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 
 					if err := scanner.Err(); err != nil {
 						libraryResults[library] = err
-					} else {
+					} else if _, ok := libraryResults[library].(error); ok {
 						libraryResults[library] = errors.New("name not found in library.properties")
 					}
 				}
