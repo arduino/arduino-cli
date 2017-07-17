@@ -159,7 +159,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	libs, failed := purgeInvalidLibraries(parseLibArgs(args), status)
+	libs, failed := purgeInvalidLibraries(parseLibArgs(args), status.(*libraries.StatusContext))
 	libraryResults := parallelLibDownloads(libs, true, "Downloaded")
 
 	for libFail, err := range failed {
@@ -189,12 +189,13 @@ func parseLibArgs(args []string) map[string]string {
 	return ret
 }
 
-func purgeInvalidLibraries(libnames map[string]string, status *libraries.StatusContext) (map[*libraries.Library]string, map[string]error) {
+func purgeInvalidLibraries(libnames map[string]string, status common.StatusContext) (map[*libraries.Library]string, map[string]error) {
 	items := make(map[*libraries.Library]string, len(libnames))
+	statusItems := status.Items()
 	fails := make(map[string]error, len(libnames))
 
 	for libraryName, version := range libnames {
-		library, valid := status.Libraries[libraryName]
+		library, valid := statusItems[libraryName].(*libraries.Library)
 		if !valid {
 			fails[libraryName] = errors.New("Library Not Found")
 		} else {
@@ -422,15 +423,18 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 	found := false
 
 	message := output.LibSearchResults{}
-	libs := make([]interface{}, 0, len(status.Libraries))
+	names := status.Names()
+	items := status.Items()
+	libs := make([]interface{}, 0, len(names))
 	//Pretty print libraries from index.
-	for _, name := range status.Names() {
+	for _, name := range names {
 		if strings.Contains(strings.ToLower(name), query) {
 			found = true
+			item := items[name].(*libraries.Library)
 			if GlobalFlags.Verbose > 0 {
-				libs = append(libs, status.Libraries[name])
+				libs = append(libs, item)
 				if GlobalFlags.Verbose < 2 {
-					status.Libraries[name].Releases = nil
+					item.Releases = nil
 				}
 			} else {
 				libs = append(libs, name)
@@ -456,20 +460,20 @@ func executeListCommand(command *cobra.Command, args []string) {
 
 	libHome, err := common.GetDefaultLibFolder()
 	if err != nil {
-		formatter.Print("Cannot get libraries folder")
+		formatter.PrintErrorMessage("Cannot get libraries folder")
 		return
 	}
 
 	//prettyPrints.LibStatus(status)
 	dir, err := os.Open(libHome)
 	if err != nil {
-		formatter.Print("Cannot open libraries folder")
+		formatter.PrintErrorMessage("Cannot open libraries folder")
 		return
 	}
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
-		formatter.Print("Cannot read into libraries folder")
+		formatter.PrintErrorMessage("Cannot read into libraries folder")
 		return
 	}
 
@@ -535,7 +539,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 	}
 
 	if len(libs) < 1 {
-		formatter.Print("No library installed")
+		formatter.PrintErrorMessage("No library installed")
 	} else {
 		formatter.Print(output.LibResultsFromMap(libs))
 	}

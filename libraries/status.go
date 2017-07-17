@@ -29,8 +29,12 @@
 
 package libraries
 
-import "github.com/pmylund/sortutil"
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/pmylund/sortutil"
+)
 
 // StatusContext keeps the current status of the libraries in the system
 // (the list of libraries, revisions, installed paths, etc.)
@@ -51,7 +55,7 @@ func (l *StatusContext) AddLibrary(indexLib *indexRelease) {
 }
 
 // Names returns an array with all the names of the registered libraries.
-func (l *StatusContext) Names() []string {
+func (l StatusContext) Names() []string {
 	res := make([]string, len(l.Libraries))
 	i := 0
 	for n := range l.Libraries {
@@ -62,8 +66,17 @@ func (l *StatusContext) Names() []string {
 	return res
 }
 
+// Items Returns a map of all items with their names.
+func (l StatusContext) Items() map[string]interface{} {
+	ret := make(map[string]interface{}, len(l.Libraries))
+	for key, item := range l.Libraries {
+		ret[key] = item
+	}
+	return ret
+}
+
 // CreateStatusContext creates a status context from index data.
-func (index *Index) CreateStatusContext() (*StatusContext, error) {
+func (index Index) CreateStatusContext() (common.StatusContext, error) {
 	// Start with an empty status context
 	libraries := StatusContext{
 		Libraries: map[string]*Library{},
@@ -72,5 +85,5 @@ func (index *Index) CreateStatusContext() (*StatusContext, error) {
 		// Add all indexed libraries in the status context
 		libraries.AddLibrary(&lib)
 	}
-	return &libraries, nil
+	return common.StatusContext(libraries), nil
 }

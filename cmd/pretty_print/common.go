@@ -34,6 +34,8 @@ import (
 	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/task"
 )
 
 // actionOnItems pretty prints info about an action on one or more items.
@@ -55,4 +57,50 @@ func actionOnItems(itemPluralName string, actionPastParticiple string, itemOK []
 		msg += fmt.Sprintf("All %s successfully installed\n", itemPluralName)
 	}
 	formatter.Print(msg)
+}
+
+// CorruptedIndexFix pretty prints messages regarding corrupted index fixes.
+func CorruptedIndexFix(index common.Index, verbosity int, downloadFunc func() task.Wrapper, parseFunc func(index common.Index, verbosity int) task.Wrapper) (common.StatusContext, error) {
+	downloadTask := downloadFunc()
+	parseTask := parseFunc(index, verbosity)
+
+	subTasks := []task.Wrapper{downloadTask, parseTask}
+
+	result := task.Wrapper{
+		BeforeMessage: []string{
+			"Cannot parse index file, it may be corrupted.",
+		},
+		AfterMessage: []string{""},
+		ErrorMessage: []string{ //printed by sub-task
+			"",
+		},
+		Task: task.CreateSequence(subTasks, []bool{false, false}, verbosity).Task(),
+	}.Execute(verbosity).Result.([]task.Result)
+
+	return result[1].Result.(common.StatusContext), result[1].Error
+}
+
+// DownloadFileIndex shows info regarding the download of a missing (or corrupted) file index.
+// uses DownloadFunc to download the file.
+func DownloadFileIndex(downloadFunc func() error) task.Wrapper {
+	return task.Wrapper{
+		BeforeMessage: []string{
+			"",
+			"Downloading from download.arduino.cc",
+		},
+		AfterMessage: []string{
+			"",
+			"",
+			"Index File downloaded",
+		},
+		ErrorMessage: []string{
+			"Can't download index file, check your network connection.",
+		},
+		Task: task.Task(func() task.Result {
+			return task.Result{
+				Result: nil,
+				Error:  downloadFunc(),
+			}
+		}),
+	}
 }

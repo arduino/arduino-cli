@@ -37,6 +37,7 @@ import (
 	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/spf13/cobra"
 	"github.com/zieckey/goini"
@@ -56,37 +57,43 @@ With -v tag (up to 2 times) can provide more verbose output.`,
 	Run: executeCoreListCommand,
 }
 
+var arduinoCoreFlags struct {
+	updateIndex bool
+}
+
 func init() {
 	arduinoCmd.AddCommand(arduinoCoreCmd)
 	arduinoCoreCmd.AddCommand(arduinoCoreListCmd)
+
+	arduinoCoreCmd.Flags().BoolVar(&arduinoCoreFlags.updateIndex, "update-index", false, "Updates the index of cores to the latest version")
 }
 
 func executeCoreListCommand(cmd *cobra.Command, args []string) {
-	if arduinoLibFlags.updateIndex {
+	if arduinoCoreFlags.updateIndex {
 		execUpdateListIndex(cmd, args)
 		return
 	}
 
 	libHome, err := common.GetDefaultLibFolder()
 	if err != nil {
-		formatter.Print("Cannot get libraries folder")
+		formatter.PrintErrorMessage("Cannot get libraries folder")
 		return
 	}
 
-	//prettyPrints.corestatus(status)
+	//prettyPrints.LibStatus(status)
 	dir, err := os.Open(libHome)
 	if err != nil {
-		formatter.Print("Cannot open libraries folder")
+		formatter.PrintErrorMessage("Cannot open libraries folder")
 		return
 	}
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
-		formatter.Print("Cannot read into libraries folder")
+		formatter.PrintErrorMessage("Cannot read into libraries folder")
 		return
 	}
 
-	cores := make([]string, 0, 10)
+	libs := make(map[string]interface{}, 10)
 
 	//TODO: optimize this algorithm
 	// time complexity O(libraries_to_install(from RAM) *
@@ -103,7 +110,7 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 				fileName = strings.Replace(fileName, "_", " ", -1)
 				fileName = strings.Replace(fileName, "-", " v. ", -1)
 				//I use folder name
-				cores = append(cores, fileName)
+				libs[fileName] = "Unknown Version"
 			} else {
 				// I use library.properties file
 				content, err := ioutil.ReadFile(indexFile)
@@ -113,7 +120,7 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					cores = append(cores, fileName)
+					libs[fileName] = "Unknown Version"
 					continue
 				}
 
@@ -129,7 +136,7 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					cores = append(cores, fileName)
+					libs[fileName] = "Unknown Version"
 					continue
 				}
 				Version, ok := ini.Get("version")
@@ -139,20 +146,17 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					cores = append(cores, fileName)
+					libs[fileName] = "Unknown Version"
 					continue
 				}
-				cores = append(cores, fmt.Sprintf("%-10s v. %s", Name, Version))
+				libs[Name] = fmt.Sprintf("v.%s", Version)
 			}
 		}
 	}
 
-	if len(cores) < 1 {
-		formatter.Print("No core installed")
+	if len(libs) < 1 {
+		formatter.PrintErrorMessage("No library installed")
 	} else {
-		//pretty prints installed libraries
-		for _, item := range cores {
-			formatter.Print(item)
-		}
+		formatter.Print(output.LibResultsFromMap(libs))
 	}
 }

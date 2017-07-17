@@ -71,7 +71,7 @@ func IndexPath() (string, error) {
 
 // LoadLibrariesIndex reads a library_index.json from a file and returns
 // the corresponding LibrariesIndex structure.
-func LoadLibrariesIndex() (*Index, error) {
+func LoadLibrariesIndex() (common.Index, error) {
 	libFile, err := IndexPath()
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func LoadLibrariesIndex() (*Index, error) {
 		return nil, err
 	}
 
-	return &index, nil
+	return index, nil
 }
 
 // extractRelease create a new Release with the information contained

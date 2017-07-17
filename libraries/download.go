@@ -43,7 +43,8 @@ import (
 )
 
 const (
-	libraryIndexURL string = "http://downloads.arduino.cc/libraries/library_index.json"
+	// LibraryIndexURL is the URL where to get library index.
+	LibraryIndexURL string = "http://downloads.arduino.cc/libraries/library_index.json"
 )
 
 // DownloadAndCache downloads a library without installing it
@@ -94,7 +95,7 @@ func DownloadLibrariesFile() error {
 		return err
 	}
 
-	req, err := http.NewRequest("GET", libraryIndexURL, nil)
+	req, err := http.NewRequest("GET", LibraryIndexURL, nil)
 	if err != nil {
 		return err
 	}
