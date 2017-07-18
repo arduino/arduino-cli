@@ -75,8 +75,7 @@ func (core *Core) Versions() semver.Versions {
 
 // Latest obtains latest version of a core package.
 func (core *Core) Latest() *Release {
-	latest := core.latestVersion()
-	return core.GetVersion(latest)
+	return core.GetVersion(core.latestVersion())
 }
 
 // latestVersion obtains latest version number.

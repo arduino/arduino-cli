@@ -46,15 +46,6 @@ func (sc *StatusContext) AddPackage(indexPackage *indexPackage) {
 	sc.Packages[indexPackage.Name] = indexPackage.extractPackage()
 }
 
-// Items returns a map matching core name and core struct.
-func (pm Package) Items() map[string]interface{} {
-	ret := make(map[string]interface{}, len(pm.Cores))
-	for key, val := range pm.Cores {
-		ret[key] = val
-	}
-	return ret
-}
-
 // Names returns the array containing the name of the packages.
 func (sc StatusContext) Names() []string {
 	res := make([]string, len(sc.Packages))

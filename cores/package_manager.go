@@ -53,6 +53,15 @@ func (pm *Package) AddCore(indexCore *indexCoreRelease) {
 	}
 }
 
+// Items returns the list of cores of this package.
+func (pm Package) Items() map[string]interface{} {
+	ret := make(map[string]interface{}, len(pm.Cores))
+	for key, val := range pm.Cores {
+		ret[key] = val
+	}
+	return ret
+}
+
 // Names returns an array with all the names of the registered cores.
 func (pm Package) Names() []string {
 	res := make([]string, len(pm.Cores))

@@ -31,6 +31,7 @@ package common
 
 import (
 	"archive/zip"
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -154,7 +155,7 @@ func TruncateDir(dir string) error {
 }
 
 // DownloadPackage downloads a package from arduino repository, applying a label for the progress bar.
-func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressBar) ([]byte, error) {
+func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressBar, initialData []byte) ([]byte, error) {
 	client := http.DefaultClient
 
 	request, err := http.NewRequest("GET", URL, nil)
@@ -162,6 +163,17 @@ func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressB
 		return nil, fmt.Errorf("Cannot create HTTP request: %s", err)
 	}
 
+	var initialSize int
+	if initialData == nil {
+		initialSize = 0
+	} else {
+		initialSize = len(initialData)
+	}
+
+	if initialSize > 0 {
+		request.Header.Add("Range", fmt.Sprintf("bytes=%d-", initialSize))
+	}
+	//TODO : how to add progressbar with resume download?
 	response, err := client.Do(request)
 
 	if err != nil {
@@ -174,6 +186,7 @@ func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressB
 
 	source := response.Body
 	if progressBar != nil {
+		progressBar.Add(initialSize)
 		source = progressBar.NewProxyReader(response.Body)
 	}
 
@@ -181,5 +194,12 @@ func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressB
 	if err != nil {
 		return nil, fmt.Errorf("Cannot read response body")
 	}
-	return body, nil
+	var total []byte
+	if initialData != nil {
+		total = bytes.Join([][]byte{initialData, body}, nil)
+	} else {
+		total = body
+	}
+
+	return total, nil
 }

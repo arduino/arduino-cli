@@ -85,7 +85,8 @@ func downloadRelease(library *Library, progBar *pb.ProgressBar, version string) 
 	if release == nil {
 		return nil, errors.New("Invalid version number")
 	}
-	return common.DownloadPackage(release.URL, fmt.Sprintf("library %s", library.Name), progBar)
+	initialData := release.ReadLocalArchive()
+	return common.DownloadPackage(release.URL, fmt.Sprintf("library %s", library.Name), progBar, initialData)
 }
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.

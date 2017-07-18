@@ -128,6 +128,23 @@ type Release struct {
 	Checksum        string `json:"checksum"`
 }
 
+// ReadLocalArchive reads the data from the local archive if present,
+// and returns the []byte of the file content. Used by resume Download.
+func (r Release) ReadLocalArchive() []byte {
+	staging, err := getDownloadCacheFolder()
+	if err != nil {
+		return nil
+	}
+	path := filepath.Join(staging, r.ArchiveFileName)
+	content, err := ioutil.ReadFile(path)
+	// if the size is the same the archive has been downloaded and if we force redownload
+	// it won't work.
+	if err != nil || len(content) == r.Size {
+		return nil
+	}
+	return content
+}
+
 /*
 
 type releaseAlias Release
