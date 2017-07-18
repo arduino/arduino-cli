@@ -81,7 +81,15 @@ func downloadRelease(library *Library, progBar *pb.ProgressBar, version string) 
 		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
 	}
 	defer initialData.Close()
-	return common.DownloadPackage(release.URL, fmt.Sprintf("library %s", library.Name), progBar, initialData, release.Size)
+	err = common.DownloadPackage(release.URL, fmt.Sprintf("library %s", library.Name), progBar, initialData, release.Size)
+	if err != nil {
+		return err
+	}
+	err = release.CheckLocalArchive()
+	if err != nil {
+		return errors.New("Archive has been downloaded, but it seems corrupted")
+	}
+	return nil
 }
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.
