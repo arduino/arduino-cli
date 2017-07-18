@@ -87,7 +87,7 @@ func downloadRelease(library *Library, progBar *pb.ProgressBar, version string) 
 	}
 	err = release.CheckLocalArchive()
 	if err != nil {
-		return errors.New("Archive has been downloaded, but it seems corrupted")
+		return errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
 	}
 	return nil
 }
