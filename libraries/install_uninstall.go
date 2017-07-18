@@ -31,10 +31,8 @@ package libraries
 
 import (
 	"archive/zip"
-	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -95,15 +93,12 @@ func InstallLib(library *Library, version string) error {
 	}
 
 	cacheFilePath := filepath.Join(stagingFolder, release.ArchiveFileName)
-	content, err := ioutil.ReadFile(cacheFilePath)
-	if err != nil {
-		return err
-	}
 
-	zipArchive, err := zip.NewReader(bytes.NewReader(content), int64(len(content)))
+	zipArchive, err := zip.OpenReader(cacheFilePath)
 	if err != nil {
 		return err
 	}
+	defer zipArchive.Close()
 
 	err = common.Unzip(zipArchive, libFolder)
 	if err != nil {
@@ -123,30 +118,4 @@ func removeRelease(l *Library, r *Release) error {
 
 	path := filepath.Join(libFolder, fmt.Sprintf("%s-%s", name, r.Version))
 	return os.RemoveAll(path)
-}
-
-// prepareInstall move a downloaded library to a cache folder, before installation.
-func prepareInstall(library *Library, body []byte, version string) (*zip.Reader, error) {
-	reader := bytes.NewReader(body)
-	release := library.GetVersion(version)
-	if release == nil {
-		return nil, errors.New("Invalid version number")
-	}
-
-	archive, err := zip.NewReader(reader, int64(reader.Len()))
-	if err != nil {
-		return nil, fmt.Errorf("Cannot read downloaded archive")
-	}
-
-	// if I can read the archive I save it to staging folder.
-	stagingFolder, err := getDownloadCacheFolder()
-	if err != nil {
-		return nil, fmt.Errorf("Cannot get download cache folder")
-	}
-
-	err = ioutil.WriteFile(filepath.Join(stagingFolder, release.ArchiveFileName), body, 0666)
-	if err != nil {
-		return nil, fmt.Errorf("Cannot write download to cache folder, %s", err.Error())
-	}
-	return archive, nil
 }

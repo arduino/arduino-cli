@@ -31,8 +31,9 @@ package common
 
 import (
 	"archive/zip"
-	"bytes"
+	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -102,7 +103,7 @@ func GetFolder(folder string, messageName string) (string, error) {
 }
 
 // Unzip extracts a zip file to a specified destination path.
-func Unzip(archive *zip.Reader, destination string) error {
+func Unzip(archive *zip.ReadCloser, destination string) error {
 	for _, file := range archive.File {
 		path := filepath.Join(destination, file.Name)
 		if file.FileInfo().IsDir() {
@@ -155,32 +156,44 @@ func TruncateDir(dir string) error {
 }
 
 // DownloadPackage downloads a package from arduino repository, applying a label for the progress bar.
-func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressBar, initialData []byte) ([]byte, error) {
+func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressBar, initialData *os.File, totalSize int) error {
 	client := http.DefaultClient
+
+	if initialData == nil {
+		return errors.New("Cannot fill a nil file pointer")
+	}
 
 	request, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot create HTTP request: %s", err)
+		return fmt.Errorf("Cannot create HTTP request: %s", err)
 	}
 
 	var initialSize int
-	if initialData == nil {
+	stats, err := initialData.Stat()
+	if err != nil {
 		initialSize = 0
 	} else {
-		initialSize = len(initialData)
+		fileSize := int(stats.Size())
+		if fileSize >= totalSize {
+			initialSize = 0
+		} else {
+			initialSize = fileSize
+		}
 	}
 
 	if initialSize > 0 {
 		request.Header.Add("Range", fmt.Sprintf("bytes=%d-", initialSize))
 	}
-	//TODO : how to add progressbar with resume download?
+
 	response, err := client.Do(request)
 
 	if err != nil {
-		return nil, fmt.Errorf("Cannot fetch %s. Response creation error", downloadLabel)
-	} else if response.StatusCode != 200 {
+		return fmt.Errorf("Cannot fetch %s. Response creation error", downloadLabel)
+	} else if response.StatusCode != 200 &&
+		response.StatusCode != 206 &&
+		response.StatusCode != 416 {
 		response.Body.Close()
-		return nil, fmt.Errorf("Cannot fetch %s. Source responded with a status %d code", downloadLabel, response.StatusCode)
+		return fmt.Errorf("Cannot fetch %s. Source responded with a status %d code", downloadLabel, response.StatusCode)
 	}
 	defer response.Body.Close()
 
@@ -190,16 +203,9 @@ func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressB
 		source = progressBar.NewProxyReader(response.Body)
 	}
 
-	body, err := ioutil.ReadAll(source)
+	_, err = io.Copy(initialData, source)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot read response body")
+		return fmt.Errorf("Cannot read response body %s", err)
 	}
-	var total []byte
-	if initialData != nil {
-		total = bytes.Join([][]byte{initialData, body}, nil)
-	} else {
-		total = body
-	}
-
-	return total, nil
+	return nil
 }

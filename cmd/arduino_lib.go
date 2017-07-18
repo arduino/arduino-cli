@@ -159,7 +159,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	libs, failed := purgeInvalidLibraries(parseLibArgs(args), status.(*libraries.StatusContext))
+	libs, failed := purgeInvalidLibraries(parseLibArgs(args), status.(libraries.StatusContext))
 	libraryResults := parallelLibDownloads(libs, true, "Downloaded")
 
 	for libFail, err := range failed {
@@ -226,7 +226,7 @@ func parallelLibDownloads(items map[*libraries.Library]string, forced bool, OkSt
 
 	for library, version := range items {
 		release := library.GetVersion(version)
-		if release != nil && !library.IsCached(version) || forced {
+		if forced || release != nil && !library.IsCached(version) || release.CheckLocalArchive() != nil {
 			var pBar *pb.ProgressBar
 			if textMode {
 				pBar = pb.StartNew(release.Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name))

@@ -51,24 +51,15 @@ const (
 func DownloadAndCache(library *Library, progBar *pb.ProgressBar, version string) task.Wrapper {
 	return task.Wrapper{
 		Task: func() task.Result {
-			zipContent, err := downloadRelease(library, progBar, version)
+			err := downloadRelease(library, progBar, version)
 			if err != nil {
 				return task.Result{
 					Result: nil,
 					Error:  err,
 				}
 			}
-
-			zipArchive, err := prepareInstall(library, zipContent, version)
-			if err != nil {
-				return task.Result{
-					Result: nil,
-					Error:  err,
-				}
-			}
-
 			return task.Result{
-				Result: zipArchive,
+				Result: nil,
 				Error:  nil,
 			}
 		},
@@ -77,16 +68,20 @@ func DownloadAndCache(library *Library, progBar *pb.ProgressBar, version string)
 
 // DownloadLatest downloads Latest version of a library.
 func downloadLatest(library *Library, progBar *pb.ProgressBar) ([]byte, error) {
-	return downloadRelease(library, progBar, library.latestVersion())
+	return nil, downloadRelease(library, progBar, library.latestVersion())
 }
 
-func downloadRelease(library *Library, progBar *pb.ProgressBar, version string) ([]byte, error) {
+func downloadRelease(library *Library, progBar *pb.ProgressBar, version string) error {
 	release := library.GetVersion(version)
 	if release == nil {
-		return nil, errors.New("Invalid version number")
+		return errors.New("Invalid version number")
 	}
-	initialData := release.ReadLocalArchive()
-	return common.DownloadPackage(release.URL, fmt.Sprintf("library %s", library.Name), progBar, initialData)
+	initialData, err := release.OpenLocalArchiveForDownload()
+	if err != nil {
+		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
+	}
+	defer initialData.Close()
+	return common.DownloadPackage(release.URL, fmt.Sprintf("library %s", library.Name), progBar, initialData, release.Size)
 }
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.
