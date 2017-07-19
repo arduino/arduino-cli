@@ -284,16 +284,15 @@ func (r *Release) String() string {
 	return res
 }
 
-func (l *Library) String() string {
-	res := "Name: \"" + l.Name + "\"\n"
-	res += "  Author: " + l.Author + "\n"
-	res += "  Maintainer: " + l.Maintainer + "\n"
-	res += "  Sentence: " + l.Sentence + "\n"
-	res += "  Paragraph: " + l.Paragraph + "\n"
-	res += "  Website: " + l.Website + "\n"
-	res += "  Category: " + l.Category + "\n"
-	res += "  Architecture: " + strings.Join(l.Architectures, ", ") + "\n"
-	res += "  Types: " + strings.Join(l.Types, ", ") + "\n"
-	res += "  Versions: " + fmt.Sprint(l.Versions()) + "\n"
-	return res
+func (l Library) String() string {
+	return fmt.Sprintf("Name: \"%s\"\n", l.Name) +
+		fmt.Sprintln("  Author: ", l.Author) +
+		fmt.Sprintln("  Maintainer: ", l.Maintainer) +
+		fmt.Sprintln("  Sentence: ", l.Sentence) +
+		fmt.Sprintln("  Paragraph: ", l.Paragraph) +
+		fmt.Sprintln("  Website: ", l.Website) +
+		fmt.Sprintln("  Category: ", l.Category) +
+		fmt.Sprintln("  Architecture: ", strings.Join(l.Architectures, ", ")) +
+		fmt.Sprintln("  Types: ", strings.Join(l.Types, ", ")) +
+		fmt.Sprintln("  Versions: ", strings.Replace(fmt.Sprint(l.Versions()), " ", ", ", -1))
 }
