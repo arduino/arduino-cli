@@ -31,6 +31,9 @@ package cores
 
 import "github.com/pmylund/sortutil"
 
+// PackageManager represents a set of packages, mapped by vendor name.
+type PackageManager map[string]*Package
+
 //Package represents a package in the system.
 type Package struct {
 	Name       string
@@ -38,11 +41,16 @@ type Package struct {
 	WebsiteURL string
 	Email      string
 	Cores      map[string]*Core // The cores in the system.
-	// Tools map[string]*Tool // The tools in the system.
+	Tools      map[string]*Tool // The tools in the system.
 }
 
-// AddCore adds a core to the context.
-func (pm *Package) AddCore(indexCore *indexCoreRelease) {
+// addPackage adds a package to the context.
+func (pm PackageManager) addPackage(indexPkg *indexPackage) {
+	pm[indexPkg.Name] = indexPkg.extractPackage()
+}
+
+// addCore adds a core to the context.
+func (pm *Package) addCore(indexCore *indexCoreRelease) {
 	name := indexCore.Name
 	if pm.Cores[name] == nil {
 		pm.Cores[name] = indexCore.extractCore()
@@ -50,6 +58,16 @@ func (pm *Package) AddCore(indexCore *indexCoreRelease) {
 		release := indexCore.extractRelease()
 		core := pm.Cores[name]
 		core.Releases[release.Version] = release
+	}
+}
+
+// addTool adds a tool to the context.
+func (pm *Package) addTool(indexTool *indexToolRelease) {
+	name := indexTool.Name
+	if pm.Tools[name] == nil {
+		pm.Tools[name] = indexTool.extractTool()
+	} else {
+		pm.Tools[name].Releases[indexTool.Version] = indexTool.extractRelease()
 	}
 }
 

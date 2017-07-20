@@ -30,6 +30,7 @@
 package cores
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -51,6 +52,40 @@ type Release struct {
 	Checksum        string
 	Size            int64
 	Boards          []string
+	Dependencies    ToolDependencies
+}
+
+// ToolDependencies is a set of tuples representing summary data of a tool.
+type ToolDependencies []toolDependency
+
+func (tdep toolDependency) extractTool(pm PackageManager) (*Tool, error) {
+	pkg, exists := pm[tdep.ToolPackager]
+	if !exists {
+		return nil, errors.New("Package not found")
+	}
+	tool, exists := pkg.Tools[tdep.ToolName]
+	if !exists {
+		return nil, errors.New("Tool not found")
+	}
+	return tool, nil
+}
+
+func (tdep toolDependency) extractRelease(pm PackageManager) (*ToolRelease, error) {
+	tool, err := tdep.extractTool(pm)
+	if err != nil {
+		return nil, err
+	}
+	release, exists := tool.Releases[tdep.ToolVersion]
+	if !exists {
+		return nil, errors.New("Release Not Found")
+	}
+	return release, nil
+}
+
+type toolDependency struct {
+	ToolPackager string
+	ToolName     string
+	ToolVersion  string
 }
 
 // GetVersion returns the specified release corresponding the provided version,
@@ -62,7 +97,6 @@ func (core *Core) GetVersion(version string) *Release {
 // Versions returns all the version numbers in this Core Package.
 func (core *Core) Versions() semver.Versions {
 	versions := make(semver.Versions, 0, len(core.Releases))
-
 	for _, release := range core.Releases {
 		temp, err := semver.Make(release.Version)
 		if err == nil {
