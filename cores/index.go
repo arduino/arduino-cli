@@ -30,6 +30,8 @@
 package cores
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
@@ -190,5 +192,20 @@ func (itr indexToolRelease) extractFlavours() map[string]*Flavour {
 // LoadPackagesIndex reads a package_index.json from a file and returns
 // the corresponding Index structure.
 func LoadPackagesIndex(index *Index) error {
-	return common.LoadIndex(IndexPath, index)
+	libFile, err := IndexPath()
+	if err != nil {
+		return err
+	}
+
+	buff, err := ioutil.ReadFile(libFile)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(buff, index)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -31,7 +31,6 @@ package common
 
 import (
 	"archive/zip"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -43,7 +42,6 @@ import (
 	"runtime"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
-	"github.com/bcmi-labs/arduino-cli/common"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -209,25 +207,5 @@ func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressB
 	if err != nil {
 		return fmt.Errorf("Cannot read response body %s", err)
 	}
-	return nil
-}
-
-// LoadIndex is a function to load a generic index.
-func LoadIndex(pathFunc func() (string, err), index *common.Index) error {
-	path, err := pathFunc()
-	if err != nil {
-		return err
-	}
-
-	libBuff, err := ioutil.ReadFile(libFile)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(libBuff, index)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }

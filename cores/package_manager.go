@@ -31,9 +31,6 @@ package cores
 
 import "github.com/pmylund/sortutil"
 
-// PackageManager represents a set of packages, mapped by vendor name.
-type PackageManager map[string]*Package
-
 //Package represents a package in the system.
 type Package struct {
 	Name       string
@@ -42,11 +39,6 @@ type Package struct {
 	Email      string
 	Cores      map[string]*Core // The cores in the system.
 	Tools      map[string]*Tool // The tools in the system.
-}
-
-// addPackage adds a package to the context.
-func (pm PackageManager) addPackage(indexPkg *indexPackage) {
-	pm[indexPkg.Name] = indexPkg.extractPackage()
 }
 
 // addCore adds a core to the context.

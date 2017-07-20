@@ -142,9 +142,10 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("No library specified for download command")
 	}
 
-	index, err := libraries.LoadLibrariesIndex()
+	var index libraries.Index
+	err := libraries.LoadLibrariesIndex(&index)
 	if err != nil {
-		formatter.Print("Cannot find index file ... ")
+		formatter.Print("Cannot find index file ... " + err.Error())
 		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
 		if err != nil {
 			return nil
@@ -265,9 +266,10 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("No library specified for install command")
 	}
 
-	index, err := libraries.LoadLibrariesIndex()
+	var index libraries.Index
+	err := libraries.LoadLibrariesIndex(&index)
 	if err != nil {
-		formatter.Print("Cannot find index file ...")
+		formatter.Print("Cannot find index file ..." + err.Error())
 		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
 		if err != nil {
 			return nil
@@ -406,7 +408,8 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 		query = strings.ToLower(strings.Join(args, " "))
 	}
 
-	index, err := libraries.LoadLibrariesIndex()
+	var index libraries.Index
+	err := libraries.LoadLibrariesIndex(&index)
 	if err != nil {
 		formatter.PrintErrorMessage("Index file is corrupted. Please replace it by updating : arduino lib list update")
 		return nil

@@ -30,6 +30,8 @@
 package cores
 
 import (
+	"errors"
+
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/pmylund/sortutil"
 )
@@ -65,6 +67,30 @@ func (sc StatusContext) Items() map[string]interface{} {
 		ret[key] = val
 	}
 	return ret
+}
+
+func (tdep toolDependency) extractTool(sc StatusContext) (*Tool, error) {
+	pkg, exists := sc.Packages[tdep.ToolPackager]
+	if !exists {
+		return nil, errors.New("Package not found")
+	}
+	tool, exists := pkg.Tools[tdep.ToolName]
+	if !exists {
+		return nil, errors.New("Tool not found")
+	}
+	return tool, nil
+}
+
+func (tdep toolDependency) extractRelease(sc StatusContext) (*ToolRelease, error) {
+	tool, err := tdep.extractTool(sc)
+	if err != nil {
+		return nil, err
+	}
+	release, exists := tool.Releases[tdep.ToolVersion]
+	if !exists {
+		return nil, errors.New("Release Not Found")
+	}
+	return release, nil
 }
 
 // CreateStatusContext creates a status context from index data.

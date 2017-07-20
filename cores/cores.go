@@ -30,7 +30,6 @@
 package cores
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -57,30 +56,6 @@ type Release struct {
 
 // ToolDependencies is a set of tuples representing summary data of a tool.
 type ToolDependencies []toolDependency
-
-func (tdep toolDependency) extractTool(pm PackageManager) (*Tool, error) {
-	pkg, exists := pm[tdep.ToolPackager]
-	if !exists {
-		return nil, errors.New("Package not found")
-	}
-	tool, exists := pkg.Tools[tdep.ToolName]
-	if !exists {
-		return nil, errors.New("Tool not found")
-	}
-	return tool, nil
-}
-
-func (tdep toolDependency) extractRelease(pm PackageManager) (*ToolRelease, error) {
-	tool, err := tdep.extractTool(pm)
-	if err != nil {
-		return nil, err
-	}
-	release, exists := tool.Releases[tdep.ToolVersion]
-	if !exists {
-		return nil, errors.New("Release Not Found")
-	}
-	return release, nil
-}
 
 type toolDependency struct {
 	ToolPackager string
