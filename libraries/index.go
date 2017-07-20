@@ -30,8 +30,6 @@
 package libraries
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
@@ -71,24 +69,8 @@ func IndexPath() (string, error) {
 
 // LoadLibrariesIndex reads a library_index.json from a file and returns
 // the corresponding LibrariesIndex structure.
-func LoadLibrariesIndex() (common.Index, error) {
-	libFile, err := IndexPath()
-	if err != nil {
-		return nil, err
-	}
-
-	libBuff, err := ioutil.ReadFile(libFile)
-	if err != nil {
-		return nil, err
-	}
-
-	var index Index
-	err = json.Unmarshal(libBuff, &index)
-	if err != nil {
-		return nil, err
-	}
-
-	return index, nil
+func LoadLibrariesIndex(index *common.Index) error {
+	return common.LoadIndex(IndexPath, index)
 }
 
 // extractRelease create a new Release with the information contained
