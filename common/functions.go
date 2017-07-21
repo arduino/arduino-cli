@@ -42,6 +42,7 @@ import (
 	"runtime"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/task"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
@@ -214,4 +215,46 @@ func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressB
 // ExecUpdateIndex is a generic procedure to update an index file.
 func ExecUpdateIndex(wrapper task.Wrapper, verbosity int) {
 	wrapper.Execute(verbosity)
+}
+
+// DownloadPackageIndexFunc is a function to download a generic index.
+func DownloadPackageIndexFunc(indexPathFunc func() (string, error), URL string) error {
+	file, err := indexPathFunc()
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("GET", URL, nil)
+	if err != nil {
+		return err
+	}
+
+	client := http.DefaultClient
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	content, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(file, content, 0666)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// GetDownloadCacheFolder gets a generic cache folder for downloads.
+func GetDownloadCacheFolder(item string) (string, error) {
+	libFolder, err := common.GetDefaultArduinoFolder()
+	if err != nil {
+		return "", err
+	}
+
+	stagingFolder := filepath.Join(libFolder, "staging", item)
+	return common.GetFolder(stagingFolder, fmt.Sprint(item, "cache"))
 }

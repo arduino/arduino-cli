@@ -30,9 +30,13 @@
 package cores
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/common/checksums"
 	"github.com/blang/semver"
 )
 
@@ -125,4 +129,57 @@ func (release *Release) String() string {
 	res += fmt.Sprintln("  Checksum          :", release.Checksum)
 	res += fmt.Sprintln("  File Size         :", release.Size)
 	return res
+}
+
+// Creates an empty file if not found.
+func (r Release) OpenLocalArchiveForDownload() (*os.File, error) {
+	path, err := r.ArchivePath()
+	if err != nil {
+		return nil, err
+	}
+	stats, err := os.Stat(path)
+	if os.IsNotExist(err) || err == nil && int(stats.Size()) >= r.Size {
+		return os.Create(path)
+	}
+	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+}
+
+// ArchivePath returns the fullPath of the Archive of this release.
+func (r Release) ArchivePath() (string, error) {
+	staging, err := getDownloadCacheFolder()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(staging, r.ArchiveFileName), nil
+}
+
+// CheckLocalArchive check for integrity of the local archive.
+func (r Release) CheckLocalArchive() error {
+	archivePath, err := r.ArchivePath()
+	if err != nil {
+		return err
+	}
+	stats, err := os.Stat(archivePath)
+	if os.IsNotExist(err) {
+		return errors.New("Archive does not exist")
+	}
+	if err != nil {
+		return err
+	}
+	if stats.Size() > r.Size {
+		return errors.New("Archive size does not match with specification of this release, assuming corruption")
+	}
+	if !r.checksumMatches() {
+		return errors.New("Checksum does not match, assuming corruption")
+	}
+	return nil
+}
+
+func (r Release) checksumMatches() bool {
+	return checksums.Match(r)
+}
+
+// ExpectedChecksum returns the expected checksum for this release.
+func (r Release) ExpectedChecksum() string {
+	return r.Checksum
 }

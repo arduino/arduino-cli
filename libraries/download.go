@@ -31,9 +31,6 @@ package libraries
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"path/filepath"
 
 	"errors"
 
@@ -94,42 +91,11 @@ func downloadRelease(library *Library, progBar *pb.ProgressBar, version string) 
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.
 func DownloadLibrariesFile() error {
-	libFile, err := IndexPath()
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("GET", LibraryIndexURL, nil)
-	if err != nil {
-		return err
-	}
-
-	client := http.DefaultClient
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile(libFile, content, 0666)
-	if err != nil {
-		return err
-	}
-	return nil
+	return common.DownloadPackageIndexFunc(IndexPath, LibraryIndexURL)
 }
 
-// getDownloadCacheFolder gets the folder where temp installs are stored until installation complete (libraries).
+// getDownloadCacheFolder gets the folder where temp installs are stored
+// until installation complete (libraries).
 func getDownloadCacheFolder() (string, error) {
-	libFolder, err := common.GetDefaultArduinoFolder()
-	if err != nil {
-		return "", err
-	}
-
-	stagingFolder := filepath.Join(libFolder, "staging", "libraries")
-	return common.GetFolder(stagingFolder, "libraries cache")
+	return common.GetDownloadCacheFolder("libraries")
 }

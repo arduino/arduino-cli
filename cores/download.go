@@ -30,8 +30,7 @@
 package cores
 
 import (
-	"io/ioutil"
-	"net/http"
+	"github.com/bcmi-labs/arduino-cli/common"
 )
 
 const (
@@ -39,33 +38,12 @@ const (
 	PackageIndexURL = "http://downloads.arduino.cc/packages/package_index.json"
 )
 
+// getDownloadCacheFolder gets the folder where temp installs are stored until installation complete (libraries).
+func getDownloadCacheFolder() (string, error) {
+	return common.GetDownloadCacheFolder("packages")
+}
+
 // DownloadPackagesFile downloads the core packages index file from arduino repository.
 func DownloadPackagesFile() error {
-	libFile, err := IndexPath()
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("GET", PackageIndexURL, nil)
-	if err != nil {
-		return err
-	}
-
-	client := http.DefaultClient
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile(libFile, content, 0666)
-	if err != nil {
-		return err
-	}
-	return nil
+	return common.DownloadPackageIndexFunc(IndexPath, PackageIndexURL)
 }

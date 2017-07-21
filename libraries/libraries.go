@@ -185,47 +185,6 @@ func (r Release) ExpectedChecksum() string {
 	return r.Checksum
 }
 
-/*
-
-type releaseAlias Release
-
-// MarshalJSON parses the release and returns a JSON Object
-func (r *Release) MarshalJSON() ([]byte, error) {
-	bytez, err := json.Marshal(&struct {
-		Version string `json:"version"`
-		*releaseAlias
-	}{
-		Version:      r.Version.String(),
-		releaseAlias: (*releaseAlias)(r),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return bytez, nil
-}
-
-// UnmarshalJSON takes a byte array and creates an object.
-func (r *Release) UnmarshalJSON(bytez []byte) error {
-	aux := &struct {
-		Version string `json:"version"`
-		*releaseAlias
-	}{
-		releaseAlias: (*releaseAlias)(r),
-	}
-
-	err := json.Unmarshal(bytez, aux)
-	if err != nil {
-		return err
-	}
-
-	r.Version, err = semver.Make(aux.Version)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-*/
-
 // Versions returns an array of all versions available of the library
 func (l *Library) Versions() semver.Versions {
 	res := make(semver.Versions, len(l.Releases))
