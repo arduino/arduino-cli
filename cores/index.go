@@ -32,7 +32,6 @@ package cores
 import (
 	"encoding/json"
 	"io/ioutil"
-	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
 )
@@ -44,11 +43,7 @@ type Index struct {
 
 //IndexPath returns the path of the index file for libraries.
 func IndexPath() (string, error) {
-	baseFolder, err := common.GetDefaultArduinoFolder()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(baseFolder, "package_index.json"), nil
+	return common.IndexPath("package_index.json")
 }
 
 //indexPackage represents a single entry from package_index.json file.

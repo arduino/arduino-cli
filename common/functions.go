@@ -258,3 +258,12 @@ func GetDownloadCacheFolder(item string) (string, error) {
 	stagingFolder := filepath.Join(libFolder, "staging", item)
 	return common.GetFolder(stagingFolder, fmt.Sprint(item, "cache"))
 }
+
+// IndexPath returns the path of the specified index file.
+func IndexPath(fileName string) {
+	baseFolder, err := common.GetDefaultArduinoFolder()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(baseFolder, "library_index.json"), nil
+}
