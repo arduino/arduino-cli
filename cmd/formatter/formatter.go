@@ -57,8 +57,7 @@ func init() {
 
 // SetFormatter sets the defaults format to the one specified, if valid. Otherwise it returns an error.
 func SetFormatter(formatName string) error {
-	_, formatterExists := formatters[formatName]
-	if !formatterExists {
+	if !IsSupported(formatName) {
 		return fmt.Errorf("Formatter for %s format not implemented", formatName)
 	}
 	defaultFormatter = formatters[formatName]
@@ -69,6 +68,11 @@ func SetFormatter(formatName string) error {
 func IsSupported(formatName string) bool {
 	_, supported := formatters[formatName]
 	return supported
+}
+
+// IsCurrentFormat returns if the specified format is the one currently set.
+func IsCurrentFormat(formatName string) bool {
+	return formatters[formatName] == defaultFormatter
 }
 
 // AddCustomFormatter adds a custom formatter to the list of available formatters of this package.
@@ -97,16 +101,6 @@ func Print(msg interface{}) error {
 		return errors.New("No formatter set")
 	}
 	return defaultFormatter.Print(msg)
-}
-
-// PrintErrorMessage formats and prints info about an error message.
-func PrintErrorMessage(msg string) {
-	PrintError(errors.New(msg))
-}
-
-// PrintError formats and prints info about an error.
-func PrintError(err error) {
-	Print(fromError(err))
 }
 
 // defaultPrintFunc is the base function of all Print methods of Formatters.

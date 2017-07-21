@@ -27,44 +27,31 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package cores
+package formatter
 
 import (
-	"io/ioutil"
-	"net/http"
+	"encoding/json"
+	"fmt"
 )
 
-const (
-	PackageIndexURL = ""
-)
+type resultMessage struct {
+	message interface{}
+}
 
-// DownloadLibrariesFile downloads the lib file from arduino repository.
-func DownloadPackagesFile() error {
-	libFile, err := IndexPath()
-	if err != nil {
-		return err
-	}
+// MarshalJSON allows to marshal this object as a JSON object.
+func (res resultMessage) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{
+		"result": res.message,
+	})
+}
 
-	req, err := http.NewRequest("GET", PackageIndexURL, nil)
-	if err != nil {
-		return err
-	}
+func (res resultMessage) String() string {
+	return fmt.Sprint(res.message)
+}
 
-	client := http.DefaultClient
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile(libFile, content, 0666)
-	if err != nil {
-		return err
-	}
-	return nil
+// PrintResult prints a value as a result from an operation.
+func PrintResult(res interface{}) {
+	Print(resultMessage{
+		message: res,
+	})
 }

@@ -34,6 +34,7 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/bcmi-labs/arduino-cli/task"
 )
@@ -65,6 +66,11 @@ func LibStatus(status *libraries.StatusContext, verbosity int) {
 // DownloadLibFileIndex shows info regarding the download of a missing (or corrupted) file index of libraries.
 func DownloadLibFileIndex() task.Wrapper {
 	return DownloadFileIndex(libraries.DownloadLibrariesFile)
+}
+
+// DownloadCoreFileIndex shows info regarding the download of a missing (or corrupted) file index of core packages.
+func DownloadCoreFileIndex() task.Wrapper {
+	return DownloadFileIndex(cores.DownloadPackagesFile)
 }
 
 //UninstallLib pretty prints info about a pending install of libraries.

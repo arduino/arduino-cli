@@ -133,8 +133,10 @@ func init() {
 
 func executeLibCommand(cmd *cobra.Command, args []string) {
 	if arduinoLibFlags.updateIndex {
-		execUpdateListIndex(cmd, args)
-	} // else return
+		common.ExecUpdateIndex(prettyPrints.DownloadLibFileIndex(), GlobalFlags.Verbose)
+	} else {
+		cmd.Help()
+	}
 }
 
 func executeDownloadCommand(cmd *cobra.Command, args []string) error {
@@ -223,7 +225,7 @@ func parallelLibDownloads(items map[*libraries.Library]string, forced bool, OkSt
 	tasks := make(map[string]task.Wrapper, len(items))
 	progressBars := make([]*pb.ProgressBar, 0, len(items))
 
-	textMode := formatter.IsSupported("text")
+	textMode := formatter.IsCurrentFormat("text")
 
 	for library, version := range items {
 		release := library.GetVersion(version)
@@ -456,11 +458,6 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 }
 
 func executeListCommand(command *cobra.Command, args []string) {
-	if arduinoLibFlags.updateIndex {
-		execUpdateListIndex(command, args)
-		return
-	}
-
 	libHome, err := common.GetDefaultLibFolder()
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot get libraries folder")
@@ -546,8 +543,4 @@ func executeListCommand(command *cobra.Command, args []string) {
 	} else {
 		formatter.Print(output.LibResultsFromMap(libs))
 	}
-}
-
-func execUpdateListIndex(cmd *cobra.Command, args []string) {
-	prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose)
 }

@@ -42,6 +42,7 @@ import (
 	"runtime"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/task"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -208,4 +209,9 @@ func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressB
 		return fmt.Errorf("Cannot read response body %s", err)
 	}
 	return nil
+}
+
+// ExecUpdateIndex is a generic procedure to update an index file.
+func ExecUpdateIndex(wrapper task.Wrapper, verbosity int) {
+	wrapper.Execute(verbosity)
 }

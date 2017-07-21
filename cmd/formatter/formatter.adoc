@@ -10,7 +10,7 @@ Formatters is a package which contains a useful and customizable set of formatte
 . JSONFormatter - Formats and Prints `interface{}` to JSON String - Binded to `json.Marshal()` method.
 
 == Usage 
-[source,go]
+[source, go]
 ----
 type TestType struct {
    field1 string `json:"field1,omitempty"` //same json tag as required by json.Marshal

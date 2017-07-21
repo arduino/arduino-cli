@@ -60,7 +60,7 @@ type indexPackage struct {
 	Platforms  []*indexCoreRelease `json:"platforms,required"`
 	Tools      []*indexToolRelease `json:"tools,required"`
 	Help       indexHelpRelease    `json:"help,omitempty"`
-} //TODO: help : { online : "address" } is not in all package managers
+}
 
 // indexCoreRelease represents a single Core Platform from package_index.json file.
 type indexCoreRelease struct {

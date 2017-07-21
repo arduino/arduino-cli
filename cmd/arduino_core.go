@@ -38,6 +38,7 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
+	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/spf13/cobra"
 	"github.com/zieckey/goini"
@@ -47,6 +48,7 @@ var arduinoCoreCmd = &cobra.Command{
 	Use:   "core",
 	Short: "Arduino Core operations",
 	Long:  `Arduino Core operations`,
+	Run:   executeCoreCommand,
 }
 
 var arduinoCoreListCmd = &cobra.Command{
@@ -68,12 +70,15 @@ func init() {
 	arduinoCoreCmd.Flags().BoolVar(&arduinoCoreFlags.updateIndex, "update-index", false, "Updates the index of cores to the latest version")
 }
 
-func executeCoreListCommand(cmd *cobra.Command, args []string) {
+func executeCoreCommand(cmd *cobra.Command, args []string) {
 	if arduinoCoreFlags.updateIndex {
-		execUpdateListIndex(cmd, args)
-		return
+		common.ExecUpdateIndex(prettyPrints.DownloadCoreFileIndex(), GlobalFlags.Verbose)
+	} else {
+		cmd.Help()
 	}
+}
 
+func executeCoreListCommand(cmd *cobra.Command, args []string) {
 	libHome, err := common.GetDefaultLibFolder()
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot get libraries folder")

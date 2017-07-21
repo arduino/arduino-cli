@@ -89,8 +89,6 @@ func DownloadFileIndex(downloadFunc func() error) task.Wrapper {
 			"Downloading from download.arduino.cc",
 		},
 		AfterMessage: []string{
-			"",
-			"",
 			"Index File downloaded",
 		},
 		ErrorMessage: []string{

@@ -31,34 +31,47 @@ package formatter
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
 // ErrorMessage represents an Error with an attached message.
 //
 // It's the same as a normal error, but It is also parsable as JSON.
-type ErrorMessage struct {
+type errorMessage struct {
 	message string
 }
 
 // MarshalJSON allows to marshal this object as a JSON object.
-func (err ErrorMessage) MarshalJSON() ([]byte, error) {
-	return json.Marshal(err.message)
+func (err errorMessage) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]string{
+		"error": err.message,
+	})
 }
 
 // Error returns the error message.
-func (err ErrorMessage) Error() string {
+func (err errorMessage) Error() string {
 	return fmt.Sprint(err.message)
 }
 
 // String returns a string representation of the Error.
-func (err ErrorMessage) String() string {
+func (err errorMessage) String() string {
 	return err.Error()
 }
 
-// romError creates an ErrorMessage from an Error.
-func fromError(err error) ErrorMessage {
-	return ErrorMessage{
+// fromError creates an errorMessage from an Error.
+func fromError(err error) errorMessage {
+	return errorMessage{
 		message: err.Error(),
 	}
+}
+
+// PrintErrorMessage formats and prints info about an error message.
+func PrintErrorMessage(msg string) {
+	PrintError(errors.New(msg))
+}
+
+// PrintError formats and prints info about an error.
+func PrintError(err error) {
+	Print(fromError(err))
 }
