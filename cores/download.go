@@ -35,10 +35,11 @@ import (
 )
 
 const (
-	PackageIndexURL = ""
+	//PackageIndexURL contains the index URL for core packages.
+	PackageIndexURL = "http://downloads.arduino.cc/packages/package_index.json"
 )
 
-// DownloadLibrariesFile downloads the lib file from arduino repository.
+// DownloadPackagesFile downloads the core packages index file from arduino repository.
 func DownloadPackagesFile() error {
 	libFile, err := IndexPath()
 	if err != nil {
