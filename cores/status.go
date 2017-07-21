@@ -32,7 +32,6 @@ package cores
 import (
 	"errors"
 
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/pmylund/sortutil"
 )
 
@@ -94,7 +93,7 @@ func (tdep toolDependency) extractRelease(sc StatusContext) (*ToolRelease, error
 }
 
 // CreateStatusContext creates a status context from index data.
-func (index Index) CreateStatusContext() (common.StatusContext, error) {
+func (index Index) CreateStatusContext() (StatusContext, error) {
 	// Start with an empty status context
 	packages := StatusContext{
 		Packages: make(map[string]*Package, len(index.Packages)),

@@ -162,7 +162,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	libs, failed := purgeInvalidLibraries(parseLibArgs(args), status.(libraries.StatusContext))
+	libs, failed := purgeInvalidLibraries(parseLibArgs(args), status)
 	libraryResults := parallelLibDownloads(libs, true, "Downloaded")
 
 	for libFail, err := range failed {
@@ -192,21 +192,20 @@ func parseLibArgs(args []string) map[string]string {
 	return ret
 }
 
-func purgeInvalidLibraries(libnames map[string]string, status common.StatusContext) (map[*libraries.Library]string, map[string]error) {
+func purgeInvalidLibraries(libnames map[string]string, status libraries.StatusContext) (map[*libraries.Library]string, map[string]error) {
 	items := make(map[*libraries.Library]string, len(libnames))
-	statusItems := status.Items()
 	fails := make(map[string]error, len(libnames))
 
 	for libraryName, version := range libnames {
-		library, valid := statusItems[libraryName].(*libraries.Library)
+		library, valid := libnames[libraryName]
 		if !valid {
 			fails[libraryName] = errors.New("Library Not Found")
 		} else {
-			release := library.GetVersion(version)
+			release := status.Libraries[library].GetVersion(version)
 			if release == nil {
 				fails[libraryName] = errors.New("Version Not Found")
 			} else { // replaces "latest" with latest version too
-				items[library] = release.Version
+				items[status.Libraries[library]] = release.Version
 			}
 		}
 	}

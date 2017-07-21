@@ -37,7 +37,6 @@ import (
 	"runtime"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/task"
 )
 
@@ -105,18 +104,18 @@ func ExecUpdateIndex(wrapper task.Wrapper, verbosity int) {
 
 // GetDownloadCacheFolder gets a generic cache folder for downloads.
 func GetDownloadCacheFolder(item string) (string, error) {
-	libFolder, err := common.GetDefaultArduinoFolder()
+	libFolder, err := GetDefaultArduinoFolder()
 	if err != nil {
 		return "", err
 	}
 
 	stagingFolder := filepath.Join(libFolder, "staging", item)
-	return common.GetFolder(stagingFolder, fmt.Sprint(item, "cache"))
+	return GetFolder(stagingFolder, fmt.Sprint(item, "cache"))
 }
 
 // IndexPath returns the path of the specified index file.
-func IndexPath(fileName string) {
-	baseFolder, err := common.GetDefaultArduinoFolder()
+func IndexPath(fileName string) (string, error) {
+	baseFolder, err := GetDefaultArduinoFolder()
 	if err != nil {
 		return "", err
 	}

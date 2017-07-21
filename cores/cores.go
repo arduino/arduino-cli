@@ -131,31 +131,31 @@ func (release *Release) String() string {
 	return res
 }
 
-// Creates an empty file if not found.
-func (r Release) OpenLocalArchiveForDownload() (*os.File, error) {
-	path, err := r.ArchivePath()
+// OpenLocalArchiveForDownload Creates an empty file if not found.
+func (release Release) OpenLocalArchiveForDownload() (*os.File, error) {
+	path, err := release.ArchivePath()
 	if err != nil {
 		return nil, err
 	}
 	stats, err := os.Stat(path)
-	if os.IsNotExist(err) || err == nil && int(stats.Size()) >= r.Size {
+	if os.IsNotExist(err) || err == nil && stats.Size() >= release.Size {
 		return os.Create(path)
 	}
 	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 }
 
 // ArchivePath returns the fullPath of the Archive of this release.
-func (r Release) ArchivePath() (string, error) {
+func (release Release) ArchivePath() (string, error) {
 	staging, err := getDownloadCacheFolder()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(staging, r.ArchiveFileName), nil
+	return filepath.Join(staging, release.ArchiveFileName), nil
 }
 
 // CheckLocalArchive check for integrity of the local archive.
-func (r Release) CheckLocalArchive() error {
-	archivePath, err := r.ArchivePath()
+func (release Release) CheckLocalArchive() error {
+	archivePath, err := release.ArchivePath()
 	if err != nil {
 		return err
 	}
@@ -166,20 +166,20 @@ func (r Release) CheckLocalArchive() error {
 	if err != nil {
 		return err
 	}
-	if stats.Size() > r.Size {
+	if stats.Size() > release.Size {
 		return errors.New("Archive size does not match with specification of this release, assuming corruption")
 	}
-	if !r.checksumMatches() {
+	if !release.checksumMatches() {
 		return errors.New("Checksum does not match, assuming corruption")
 	}
 	return nil
 }
 
-func (r Release) checksumMatches() bool {
-	return checksums.Match(r)
+func (release Release) checksumMatches() bool {
+	return checksums.Match(release)
 }
 
 // ExpectedChecksum returns the expected checksum for this release.
-func (r Release) ExpectedChecksum() string {
-	return r.Checksum
+func (release Release) ExpectedChecksum() string {
+	return release.Checksum
 }

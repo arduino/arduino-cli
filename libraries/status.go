@@ -32,7 +32,6 @@ package libraries
 import (
 	"fmt"
 
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/pmylund/sortutil"
 )
 
@@ -76,7 +75,7 @@ func (l StatusContext) Items() map[string]interface{} {
 }
 
 // CreateStatusContext creates a status context from index data.
-func (index Index) CreateStatusContext() (common.StatusContext, error) {
+func (index Index) CreateStatusContext() (StatusContext, error) {
 	// Start with an empty status context
 	libraries := StatusContext{
 		Libraries: map[string]*Library{},
@@ -85,5 +84,5 @@ func (index Index) CreateStatusContext() (common.StatusContext, error) {
 		// Add all indexed libraries in the status context
 		libraries.AddLibrary(&lib)
 	}
-	return common.StatusContext(libraries), nil
+	return libraries, nil
 }
