@@ -34,6 +34,7 @@ import (
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/spf13/cobra"
@@ -93,56 +94,56 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 	toolMap := make(map[string]map[string][]string, 10)
 
 	for _, file := range dirFiles {
-		if file.IsDir() {
-			packageName := file.Name()
-			coreHome, err := common.GetDefaultCoresFolder(packageName)
-			if err == nil {
-				coreHomeFolder, err := os.Open(coreHome)
-				if err == nil {
-					defer coreHomeFolder.Close()
-					cores, err := coreHomeFolder.Readdir(0)
-					if err == nil {
-						for _, core := range cores {
-							if core.IsDir() {
-								coreName := core.Name()
-								coreDir, err := os.Open(filepath.Join(coreHome, coreName))
-								if err == nil {
-									defer coreDir.Close()
-									versions, err := coreDir.Readdirnames(0)
-									if err == nil {
-										coreMap[packageName] = make(map[string][]string, len(versions))
-										coreMap[packageName][coreName] = versions
-									} //else skip
-								} //else skip
-							} //else skip
-						}
-					} //else skip
-				} //else skip
-			} //else skip
-			toolsHome, err := common.GetDefaultToolsFolder(packageName)
-			if err == nil {
-				toolsHomeFolder, err := os.Open(toolsHome)
-				if err == nil {
-					defer toolsHomeFolder.Close()
-					toolFolders, err := toolsHomeFolder.Readdir(0)
-					if err == nil {
-						for _, toolFolderInfo := range toolFolders {
-							if toolFolderInfo.IsDir() {
-								toolName := toolFolderInfo.Name()
-								toolFolder, err := os.Open(filepath.Join(toolsHome, toolName))
-								if err == nil {
-									defer toolFolder.Close()
-									versions, err := toolFolder.Readdirnames(0)
-									if err == nil {
-										toolMap[packageName] = make(map[string][]string)
-										toolMap[packageName][toolName] = versions
-									}
-								} //else skip
-							} //else skip
-						}
-					} //else skip
-				} //else skip
-			} //else skip
-		} //else skip
+		if !file.IsDir() {
+			continue
+		}
+		packageName := file.Name()
+		getInstalledCores(packageName, coreMap)
+		getInstalledTools(packageName, toolMap)
+	}
+
+	output.InstalledCoresToolsFromMaps(coreMap, toolMap)
+}
+
+func getInstalledCores(packageName string, coreMap map[string]map[string][]string) {
+	getInstalledStuff(packageName, coreMap, common.GetDefaultCoresFolder)
+}
+
+func getInstalledTools(packageName string, toolMap map[string]map[string][]string) {
+	getInstalledStuff(packageName, toolMap, common.GetDefaultToolsFolder)
+}
+
+func getInstalledStuff(packageName string, stuffMap map[string]map[string][]string, startPathFunc func(string) (string, error)) {
+	stuffHome, err := startPathFunc(packageName)
+	if err != nil {
+		return
+	}
+	stuffHomeFolder, err := os.Open(stuffHome)
+	if err != nil {
+		return
+	}
+	defer stuffHomeFolder.Close()
+	stuffFolders, err := stuffHomeFolder.Readdir(0)
+	if err != nil {
+		return
+	}
+	for _, stuffFolderInfo := range stuffFolders {
+		if !stuffFolderInfo.IsDir() {
+			continue
+		}
+		stuffName := stuffFolderInfo.Name()
+		stuffFolder, err := os.Open(filepath.Join(stuffHome, stuffName))
+		if err != nil {
+			continue
+		}
+		defer stuffFolder.Close()
+		versions, err := stuffFolder.Readdirnames(0)
+		if err != nil {
+			continue
+		}
+		if stuffMap[packageName] == nil {
+			stuffMap[packageName] = make(map[string][]string)
+		}
+		stuffMap[packageName][stuffName] = versions
 	}
 }

@@ -31,6 +31,9 @@ package output
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 )
 
 // LibResultsFromMap returns a LibProcessResults struct from a specified map of results.
@@ -57,4 +60,99 @@ func LibResultsFromMap(resMap map[string]interface{}) LibProcessResults {
 		i++
 	}
 	return results
+}
+
+type installedStuff struct {
+	Name     string   `json:"name,required"`
+	Versions []string `json:"versions,required"`
+}
+
+func (is installedStuff) String() string {
+	return fmt.Sprintln("  Name:", is.Name) +
+		fmt.Sprintln("  Versions:", is.Versions)
+}
+
+type installedPackage struct {
+	Name           string           `json:"package,required"`
+	InstalledCores []installedStuff `json:"cores,required"`
+	InstalledTools []installedStuff `json:"tools,required"`
+}
+
+func (ip installedPackage) String() string {
+	ret := ""
+	thereAreCores := len(ip.InstalledCores) > 0
+	thereAreTools := len(ip.InstalledTools) > 0
+	if thereAreCores || thereAreTools {
+		ret += fmt.Sprintln("Package", ip.Name)
+	}
+	if thereAreCores {
+		ret += fmt.Sprintln("Cores:")
+		for _, core := range ip.InstalledCores {
+			ret += fmt.Sprintln(core)
+		}
+	}
+	if thereAreTools {
+		ret += fmt.Sprintln("Tools:")
+		for _, tool := range ip.InstalledTools {
+			ret += fmt.Sprintln(tool)
+		}
+	}
+	return strings.TrimSpace(ret)
+}
+
+type installedCoresList struct {
+	InstalledPackages []installedPackage `json:"packages,required"`
+}
+
+func (icl installedCoresList) String() string {
+	ret := ""
+	for _, pkg := range icl.InstalledPackages {
+		ret += fmt.Sprintln(pkg)
+	}
+	return strings.TrimSpace(ret)
+}
+
+type installedPackages []installedPackage
+
+func (ips installedPackages) String() string {
+	ret := ""
+	for _, ip := range ips {
+		ret += fmt.Sprintln(ip)
+	}
+	return ret
+}
+
+// InstalledCoresToolsFromMaps pretty prints a list of ALREADY INSTALLED cores and tools.
+func InstalledCoresToolsFromMaps(coreMap map[string]map[string][]string, toolMap map[string]map[string][]string) {
+	var packages = make(installedPackages, len(coreMap))
+	var i, j int
+	i = 0
+	for pkg, coresData := range coreMap {
+		j = 0
+		packages[i] = installedPackage{
+			Name:           pkg,
+			InstalledCores: make([]installedStuff, len(coresData)),
+		}
+		for core, versions := range coresData {
+			packages[i].InstalledCores[j] = installedStuff{
+				Name:     core,
+				Versions: versions,
+			}
+		}
+		j++
+		i++
+	}
+	for i := range packages {
+		toolData := toolMap[packages[i].Name]
+		packages[i].InstalledTools = make([]installedStuff, len(toolData))
+		j = 0
+		for tool, versions := range toolData {
+			packages[i].InstalledTools[j] = installedStuff{
+				Name:     tool,
+				Versions: versions,
+			}
+			j++
+		}
+	}
+	formatter.Print(packages)
 }
