@@ -62,11 +62,6 @@ var arduinoLibCmd = &cobra.Command{
 	Run:   executeLibCommand,
 }
 
-// arduinoLibFlags represents `arduino lib` flags.
-var arduinoLibFlags struct {
-	updateIndex bool
-}
-
 // arduinoLibInstallCmd represents the lib install command.
 var arduinoLibInstallCmd = &cobra.Command{
 	Use:   "install LIBRARY[@VERSION_NUMBER](S)",

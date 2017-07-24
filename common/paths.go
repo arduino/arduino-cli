@@ -40,6 +40,22 @@ import (
 	"github.com/bcmi-labs/arduino-cli/task"
 )
 
+// GetFolder gets a folder on a path, and creates it if not found.
+func GetFolder(folder string, label string) (string, error) {
+	_, err := os.Stat(folder)
+	if os.IsNotExist(err) {
+		formatter.Print(fmt.Sprintf("Cannot find default %s folder, attemping to create it ...", label))
+		err = os.MkdirAll(folder, 0755)
+		if err != nil {
+			formatter.Print("ERROR")
+			formatter.PrintErrorMessage(fmt.Sprintf("Cannot create %s folder\n", label))
+			return "", err
+		}
+		formatter.Print("OK")
+	}
+	return folder, nil
+}
+
 // GetDefaultArduinoFolder returns the default data folder for Arduino platform
 func GetDefaultArduinoFolder() (string, error) {
 	var folder string
@@ -55,20 +71,9 @@ func GetDefaultArduinoFolder() (string, error) {
 	case "darwin":
 		folder = filepath.Join(usr.HomeDir, "Library", "arduino15")
 	default:
-		return "", fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
+		return folder, fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
 	}
 	return GetFolder(folder, "default arduino")
-}
-
-// GetDefaultLibFolder get the default folder of downloaded libraries.
-func GetDefaultLibFolder() (string, error) {
-	baseFolder, err := GetDefaultArduinoHomeFolder()
-	if err != nil {
-		return "", err
-	}
-
-	libFolder := filepath.Join(baseFolder, "libraries")
-	return GetFolder(libFolder, "libraries")
 }
 
 // GetDefaultArduinoHomeFolder gets the home directory for arduino CLI.
@@ -81,25 +86,34 @@ func GetDefaultArduinoHomeFolder() (string, error) {
 	return GetFolder(homeFolder, "Arduino home")
 }
 
-// GetFolder gets a folder on a path, and creates it if not found.
-func GetFolder(folder string, messageName string) (string, error) {
-	_, err := os.Stat(folder)
-	if os.IsNotExist(err) {
-		formatter.Print(fmt.Sprintf("Cannot find default %s folder, attemping to create it ...", messageName))
-		err = os.MkdirAll(folder, 0755)
-		if err != nil {
-			formatter.Print("ERROR")
-			formatter.PrintErrorMessage(fmt.Sprintf("Cannot create %s folder\n", messageName))
-			return "", err
-		}
-		formatter.Print("OK")
+// getDefaultFolder returns the default folder with specified name and label.
+func getDefaultFolder(baseFolderFunc func() (string, error), folderName string, folderLabel string) (string, error) {
+	baseFolder, err := baseFolderFunc()
+	if err != nil {
+		return "", err
 	}
-	return folder, nil
+	destFolder := filepath.Join(baseFolder, folderName)
+	return GetFolder(destFolder, folderLabel)
 }
 
-// ExecUpdateIndex is a generic procedure to update an index file.
-func ExecUpdateIndex(wrapper task.Wrapper, verbosity int) {
-	wrapper.Execute(verbosity)
+// GetDefaultLibFolder gets the default folder of downloaded libraries.
+func GetDefaultLibFolder() (string, error) {
+	return getDefaultFolder(GetDefaultArduinoHomeFolder, "libraries", "libraries")
+}
+
+// GetDefaultPkgFolder gets the default folder of downloaded packages.
+func GetDefaultPkgFolder() (string, error) {
+	return getDefaultFolder(GetDefaultArduinoFolder, "packages", "packages")
+}
+
+// GetDefaultCoresFolder gets the default folder of downloaded cores.
+func GetDefaultCoresFolder() (string, error) {
+	return getDefaultFolder(GetDefaultPkgFolder, "hardware", "cores")
+}
+
+// GetDefaultToolsFolder gets the default folder of downloaded packages.
+func GetDefaultToolsFolder() (string, error) {
+	return getDefaultFolder(GetDefaultPkgFolder, "tools", "tools")
 }
 
 // GetDownloadCacheFolder gets a generic cache folder for downloads.
@@ -111,6 +125,11 @@ func GetDownloadCacheFolder(item string) (string, error) {
 
 	stagingFolder := filepath.Join(libFolder, "staging", item)
 	return GetFolder(stagingFolder, fmt.Sprint(item, "cache"))
+}
+
+// ExecUpdateIndex is a generic procedure to update an index file.
+func ExecUpdateIndex(wrapper task.Wrapper, verbosity int) {
+	wrapper.Execute(verbosity)
 }
 
 // IndexPath returns the path of the specified index file.

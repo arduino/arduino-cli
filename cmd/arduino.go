@@ -71,17 +71,6 @@ const (
 
 var versions = make(map[string]string)
 
-// GlobalFlags represents flags available in all the program.
-var GlobalFlags struct {
-	Verbose int    // More time verbose flag is written, the more the Verbose count increases. Represents verbosity level.
-	Format  string // The Output format (e.g. text, json).
-}
-
-// rootCmdFlags represent flags available to the root command.
-var rootCmdFlags struct {
-	ConfigFile string // The path of the config file provided by the omonym flag.
-}
-
 // arduinoCmd represents the base command when called without any subcommands
 var arduinoCmd = &cobra.Command{
 	Use:   "arduino",

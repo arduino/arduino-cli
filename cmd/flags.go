@@ -29,42 +29,23 @@
 
 package cmd
 
-import (
-	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
-	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/spf13/cobra"
-)
-
-var arduinoCoreCmd = &cobra.Command{
-	Use:   "core",
-	Short: "Arduino Core operations",
-	Long:  `Arduino Core operations`,
-	Run:   executeCoreCommand,
+// GlobalFlags represents flags available in all the program.
+var GlobalFlags struct {
+	Verbose int    // More time verbose flag is written, the more the Verbose count increases. Represents verbosity level.
+	Format  string // The Output format (e.g. text, json).
 }
 
-var arduinoCoreListCmd = &cobra.Command{
-	Use:   "list",
-	Short: "Shows the list of installed cores",
-	Long: `Shows the list of installed cores. 
-With -v tag (up to 2 times) can provide more verbose output.`,
-	Run: executeCoreListCommand,
+// rootCmdFlags represent flags available to the root command.
+var rootCmdFlags struct {
+	ConfigFile string // The path of the config file provided by the omonym flag.
 }
 
-func init() {
-	arduinoCmd.AddCommand(arduinoCoreCmd)
-	arduinoCoreCmd.AddCommand(arduinoCoreListCmd)
-
-	arduinoCoreCmd.Flags().BoolVar(&arduinoCoreFlags.updateIndex, "update-index", false, "Updates the index of cores to the latest version")
+// arduinoLibFlags represents `arduino lib` flags.
+var arduinoLibFlags struct {
+	updateIndex bool
 }
 
-func executeCoreCommand(cmd *cobra.Command, args []string) {
-	if arduinoCoreFlags.updateIndex {
-		common.ExecUpdateIndex(prettyPrints.DownloadCoreFileIndex(), GlobalFlags.Verbose)
-	} else {
-		cmd.Help()
-	}
-}
-
-func executeCoreListCommand(cmd *cobra.Command, args []string) {
-
+// arduinoCoreFlags represents `arduino core` flags.
+var arduinoCoreFlags struct {
+	updateIndex bool
 }
