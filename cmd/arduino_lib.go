@@ -454,7 +454,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 func executeListCommand(command *cobra.Command, args []string) {
 	libHome, err := common.GetDefaultLibFolder()
 	if err != nil {
-		formatter.PrintErrorMessage("Cannot get libraries folder")
+		formatter.PrintError(err)
 		return
 	}
 
@@ -464,6 +464,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 		formatter.PrintErrorMessage("Cannot open libraries folder")
 		return
 	}
+	defer dir.Close()
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {

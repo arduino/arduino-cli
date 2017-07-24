@@ -36,7 +36,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/checksums"
 	"github.com/blang/semver"
 )
@@ -66,15 +65,6 @@ type toolDependency struct {
 	ToolPackager string
 	ToolName     string
 	ToolVersion  string
-}
-
-// GetReleaseFolder gets the home of the current name and version of the core.
-// it does not create the folder if it is not found (it means the version is not installed)
-func (core Core) GetReleaseFolder(version string) (string, error) {
-	if core.GetVersion(version) != nil {
-		return common.GetDefaultFolder(common.GetDefaultCoresFolder, filepath.Join(core.Name, version), fmt.Sprintf("%s v.%s", core.Name, version), false)
-	}
-	return "", fmt.Errorf("version %s of Core %s does not exist", version, core.Name)
 }
 
 // GetVersion returns the specified release corresponding the provided version,

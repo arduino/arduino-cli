@@ -30,6 +30,10 @@
 package cmd
 
 import (
+	"os"
+	"path/filepath"
+
+	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/spf13/cobra"
@@ -66,5 +70,79 @@ func executeCoreCommand(cmd *cobra.Command, args []string) {
 }
 
 func executeCoreListCommand(cmd *cobra.Command, args []string) {
-    
+	pkgHome, err := common.GetDefaultPkgFolder()
+	if err != nil {
+		formatter.PrintError(err)
+		return
+	}
+
+	dir, err := os.Open(pkgHome)
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot open packages folder")
+		return
+	}
+	defer dir.Close()
+
+	dirFiles, err := dir.Readdir(0)
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot read into packages folder")
+		return
+	}
+
+	coreMap := make(map[string]map[string][]string, 10)
+	toolMap := make(map[string]map[string][]string, 10)
+
+	for _, file := range dirFiles {
+		if file.IsDir() {
+			packageName := file.Name()
+			coreHome, err := common.GetDefaultCoresFolder(packageName)
+			if err == nil {
+				coreHomeFolder, err := os.Open(coreHome)
+				if err == nil {
+					defer coreHomeFolder.Close()
+					cores, err := coreHomeFolder.Readdir(0)
+					if err == nil {
+						for _, core := range cores {
+							if core.IsDir() {
+								coreName := core.Name()
+								coreDir, err := os.Open(filepath.Join(coreHome, coreName))
+								if err == nil {
+									defer coreDir.Close()
+									versions, err := coreDir.Readdirnames(0)
+									if err == nil {
+										coreMap[packageName] = make(map[string][]string, len(versions))
+										coreMap[packageName][coreName] = versions
+									} //else skip
+								} //else skip
+							} //else skip
+						}
+					} //else skip
+				} //else skip
+			} //else skip
+			toolsHome, err := common.GetDefaultToolsFolder(packageName)
+			if err == nil {
+				toolsHomeFolder, err := os.Open(toolsHome)
+				if err == nil {
+					defer toolsHomeFolder.Close()
+					toolFolders, err := toolsHomeFolder.Readdir(0)
+					if err == nil {
+						for _, toolFolderInfo := range toolFolders {
+							if toolFolderInfo.IsDir() {
+								toolName := toolFolderInfo.Name()
+								toolFolder, err := os.Open(filepath.Join(toolsHome, toolName))
+								if err == nil {
+									defer toolFolder.Close()
+									versions, err := toolFolder.Readdirnames(0)
+									if err == nil {
+										toolMap[packageName] = make(map[string][]string)
+										toolMap[packageName][toolName] = versions
+									}
+								} //else skip
+							} //else skip
+						}
+					} //else skip
+				} //else skip
+			} //else skip
+		} //else skip
+	}
 }

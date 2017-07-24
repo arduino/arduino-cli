@@ -111,13 +111,13 @@ func GetDefaultPkgFolder() (string, error) {
 }
 
 // GetDefaultCoresFolder gets the default folder of downloaded cores.
-func GetDefaultCoresFolder() (string, error) {
-	return GetDefaultFolder(GetDefaultPkgFolder, "hardware", "cores", true)
+func GetDefaultCoresFolder(packageName string) (string, error) {
+	return GetDefaultFolder(GetDefaultPkgFolder, filepath.Join(packageName, "hardware"), "cores", true)
 }
 
 // GetDefaultToolsFolder gets the default folder of downloaded packages.
-func GetDefaultToolsFolder() (string, error) {
-	return GetDefaultFolder(GetDefaultPkgFolder, "tools", "tools", true)
+func GetDefaultToolsFolder(packageName string) (string, error) {
+	return GetDefaultFolder(GetDefaultPkgFolder, filepath.Join(packageName, "tools"), "tools", true)
 }
 
 // GetDownloadCacheFolder gets a generic cache folder for downloads.
