@@ -26,6 +26,7 @@
  *
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
+
 package formatter
 
 import "fmt"
@@ -44,3 +45,9 @@ func (tp TextFormatter) Format(msg interface{}) (string, error) {
 func (tp TextFormatter) Print(msg interface{}) error {
 	return printFunc(tp, msg)
 }
+
+// StartDebug starts a debugging session (for TextFormatter it is only a dummy).
+func (tp TextFormatter) StartDebug() {}
+
+// EndDebug end a debugging session (for TextFormatter it is only a dummy).
+func (tp TextFormatter) EndDebug() {}
