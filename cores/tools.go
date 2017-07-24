@@ -2,7 +2,9 @@ package cores
 
 import (
 	"fmt"
+	"path/filepath"
 
+	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/blang/semver"
 )
 
@@ -31,6 +33,15 @@ type Flavour struct {
 // or nil if not found.
 func (tool Tool) GetVersion(version string) *ToolRelease {
 	return tool.Releases[version]
+}
+
+// GetToolFolder gets the home of the current name and version of the tool.
+// it does not create the folder if it is not found (it means the version is not installed)
+func (tool Tool) GetToolFolder(version string) (string, error) {
+	if tool.GetVersion(version) != nil {
+		return common.GetDefaultFolder(common.GetDefaultToolsFolder, filepath.Join(tool.Name, version), fmt.Sprintf("%s v.%s", tool.Name, version), false)
+	}
+	return "", fmt.Errorf("version %s of Tool %s does not exist", version, tool.Name)
 }
 
 // GetFlavor returns the flavor of the specified OS.

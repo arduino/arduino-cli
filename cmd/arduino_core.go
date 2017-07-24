@@ -66,5 +66,5 @@ func executeCoreCommand(cmd *cobra.Command, args []string) {
 }
 
 func executeCoreListCommand(cmd *cobra.Command, args []string) {
-
+    
 }

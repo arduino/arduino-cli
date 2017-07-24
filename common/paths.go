@@ -30,6 +30,7 @@
 package common
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/user"
@@ -40,10 +41,10 @@ import (
 	"github.com/bcmi-labs/arduino-cli/task"
 )
 
-// GetFolder gets a folder on a path, and creates it if not found.
-func GetFolder(folder string, label string) (string, error) {
+// GetFolder gets a folder on a path, and creates it if createIfMissing == true and not found.
+func GetFolder(folder string, label string, createIfMissing bool) (string, error) {
 	_, err := os.Stat(folder)
-	if os.IsNotExist(err) {
+	if os.IsNotExist(err) && createIfMissing {
 		formatter.Print(fmt.Sprintf("Cannot find default %s folder, attemping to create it ...", label))
 		err = os.MkdirAll(folder, 0755)
 		if err != nil {
@@ -52,6 +53,9 @@ func GetFolder(folder string, label string) (string, error) {
 			return "", err
 		}
 		formatter.Print("OK")
+	} else if err != nil {
+		formatter.PrintErrorMessage(fmt.Sprintf("Cannot get %s folder\n", label))
+		return "", errors.New("Cannot get folder, it does not exist")
 	}
 	return folder, nil
 }
@@ -73,7 +77,7 @@ func GetDefaultArduinoFolder() (string, error) {
 	default:
 		return folder, fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
 	}
-	return GetFolder(folder, "default arduino")
+	return GetFolder(folder, "default arduino", true)
 }
 
 // GetDefaultArduinoHomeFolder gets the home directory for arduino CLI.
@@ -83,42 +87,42 @@ func GetDefaultArduinoHomeFolder() (string, error) {
 		return "", err
 	}
 	homeFolder := filepath.Join(usr.HomeDir, "Arduino")
-	return GetFolder(homeFolder, "Arduino home")
+	return GetFolder(homeFolder, "Arduino home", true)
 }
 
-// getDefaultFolder returns the default folder with specified name and label.
-func getDefaultFolder(baseFolderFunc func() (string, error), folderName string, folderLabel string) (string, error) {
+// GetDefaultFolder returns the default folder with specified name and label.
+func GetDefaultFolder(baseFolderFunc func() (string, error), folderName string, folderLabel string, createIfMissing bool) (string, error) {
 	baseFolder, err := baseFolderFunc()
 	if err != nil {
 		return "", err
 	}
 	destFolder := filepath.Join(baseFolder, folderName)
-	return GetFolder(destFolder, folderLabel)
+	return GetFolder(destFolder, folderLabel, createIfMissing)
 }
 
 // GetDefaultLibFolder gets the default folder of downloaded libraries.
 func GetDefaultLibFolder() (string, error) {
-	return getDefaultFolder(GetDefaultArduinoHomeFolder, "libraries", "libraries")
+	return GetDefaultFolder(GetDefaultArduinoHomeFolder, "libraries", "libraries", true)
 }
 
 // GetDefaultPkgFolder gets the default folder of downloaded packages.
 func GetDefaultPkgFolder() (string, error) {
-	return getDefaultFolder(GetDefaultArduinoFolder, "packages", "packages")
+	return GetDefaultFolder(GetDefaultArduinoFolder, "packages", "packages", true)
 }
 
 // GetDefaultCoresFolder gets the default folder of downloaded cores.
 func GetDefaultCoresFolder() (string, error) {
-	return getDefaultFolder(GetDefaultPkgFolder, "hardware", "cores")
+	return GetDefaultFolder(GetDefaultPkgFolder, "hardware", "cores", true)
 }
 
 // GetDefaultToolsFolder gets the default folder of downloaded packages.
 func GetDefaultToolsFolder() (string, error) {
-	return getDefaultFolder(GetDefaultPkgFolder, "tools", "tools")
+	return GetDefaultFolder(GetDefaultPkgFolder, "tools", "tools", true)
 }
 
 // GetDownloadCacheFolder gets a generic cache folder for downloads.
 func GetDownloadCacheFolder(item string) (string, error) {
-	return getDefaultFolder(GetDefaultArduinoFolder, "staging", "cache")
+	return GetDefaultFolder(GetDefaultArduinoFolder, "staging", "cache", true)
 }
 
 // ExecUpdateIndex is a generic procedure to update an index file.
