@@ -49,7 +49,7 @@ var printFunc PrintFunc
 func init() {
 	formatters = make(map[string]Formatter, 2)
 	AddCustomFormatter("text", TextFormatter{})
-	AddCustomFormatter("json", JSONFormatter{})
+	AddCustomFormatter("json", JSONFormatter{debug: true})
 	defaultFormatter = formatters["text"]
 
 	printFunc = defaultPrintFunc

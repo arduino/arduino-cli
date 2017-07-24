@@ -95,3 +95,17 @@ if err != nil {
     formatter.PrintError(err)
 }
 ----
+
+== Debug with JSON values
+`JSONFormatter` by default does not print what it cannot parse (everything which is not a map or a struct).
+If you are in a debugging session you will print an error message instead.
+Sessions are opened by `formatterInstance.StartDebug()` and closed by `formatterInstance.EndDebug()`
+
+[source, go]
+----
+formatter = JSONFormatter{}
+formatter.StartDebug()
+formatter.Print("Invalid String")
+//Outputs "\"Invalid String\" is a non supported data, please use map or struct"
+formatter.EndDebug()
+----
