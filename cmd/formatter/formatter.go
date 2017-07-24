@@ -48,11 +48,25 @@ var printFunc PrintFunc
 
 func init() {
 	formatters = make(map[string]Formatter, 2)
-	AddCustomFormatter("text", TextFormatter{})
-	AddCustomFormatter("json", JSONFormatter{})
+	AddCustomFormatter("text", &TextFormatter{})
+	AddCustomFormatter("json", &JSONFormatter{})
 	defaultFormatter = formatters["text"]
 
 	printFunc = defaultPrintFunc
+}
+
+// StartDebug starts a debugging session, if the format is json.
+func StartDebug() {
+	if IsCurrentFormat("json") {
+		defaultFormatter.(*JSONFormatter).StartDebug()
+	}
+}
+
+// EndDebug starts a debugging session, if the format is json.
+func EndDebug() {
+	if IsCurrentFormat("json") {
+		defaultFormatter.(*JSONFormatter).EndDebug()
+	}
 }
 
 // SetFormatter sets the defaults format to the one specified, if valid. Otherwise it returns an error.
