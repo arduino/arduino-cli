@@ -107,7 +107,7 @@ func arduinoPreRun(cmd *cobra.Command, args []string) {
 	formatter.SetFormatter(GlobalFlags.Format)
 	if !formatter.IsCurrentFormat("text") {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
-			formatter.PrintErrorMessage("Help available only in TEXT mode")
+			formatter.PrintErrorMessage("Invalid Call : should show Help, but it is available only in TEXT mode")
 		})
 	}
 }
@@ -119,7 +119,7 @@ func arduinoRun(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			errorText += fmt.Sprintln(err.Error())
 		}
-		err = generateManPages()
+		err = generateManPages(cmd)
 		if err != nil {
 			errorText += fmt.Sprintln(err.Error())
 		}
