@@ -33,6 +33,4 @@ import "github.com/bcmi-labs/arduino-cli/cmd"
 
 func main() {
 	cmd.Execute()
-	//cmd.RootCmd.GenBashCompletionFile("docs/bash_completions/arduino")
-	//docs.GenerateManPages()
 }

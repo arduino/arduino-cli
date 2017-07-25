@@ -35,6 +35,7 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
+	"github.com/bcmi-labs/arduino-cli/docs"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -78,12 +79,7 @@ var arduinoCmd = &cobra.Command{
 	Long:  "Arduino Create Command Line Interface (arduino-cli)",
 	BashCompletionFunction: bashAutoCompletionFunction,
 	PersistentPreRun:       arduinoPreRun,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return cmd.Help()
-		// this is just a placeholder to call help and run PreRun
-		// one of the cobra issues is that if Run is not present PreRun and
-		// PersistentPreRun are not executed.
-	},
+	RunE:                   arduinoRun,
 }
 
 // arduinoVersionCmd represents the version command.
@@ -114,6 +110,15 @@ func arduinoPreRun(cmd *cobra.Command, args []string) {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 			formatter.PrintErrorMessage("Help available only in TEXT mode")
 		})
+	}
+}
+
+func arduinoRun(cmd *cobra.Command, args []string) error {
+	if rootCmdFlags.GenerateDocs {
+		cmd.RootCmd.GenBashCompletionFile("docs/bash_completions/arduino")
+		docs.GenerateManPages()
+	} else {
+		return cmd.Help()
 	}
 }
 
