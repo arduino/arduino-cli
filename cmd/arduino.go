@@ -35,7 +35,6 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
-	"github.com/bcmi-labs/arduino-cli/docs"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -115,11 +114,21 @@ func arduinoPreRun(cmd *cobra.Command, args []string) {
 
 func arduinoRun(cmd *cobra.Command, args []string) error {
 	if rootCmdFlags.GenerateDocs {
-		cmd.RootCmd.GenBashCompletionFile("docs/bash_completions/arduino")
-		docs.GenerateManPages()
-	} else {
-		return cmd.Help()
+		errorText := ""
+		err := cmd.GenBashCompletionFile("docs/bash_completions/arduino")
+		if err != nil {
+			errorText += fmt.Sprintln(err.Error())
+		}
+		err = generateManPages()
+		if err != nil {
+			errorText += fmt.Sprintln(err.Error())
+		}
+		if errorText != "" {
+			formatter.PrintErrorMessage(errorText)
+		}
+		return nil
 	}
+	return cmd.Help()
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
