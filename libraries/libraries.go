@@ -186,7 +186,7 @@ func (r Release) ExpectedChecksum() string {
 }
 
 // Versions returns an array of all versions available of the library
-func (l *Library) Versions() semver.Versions {
+func (l Library) Versions() semver.Versions {
 	res := make(semver.Versions, len(l.Releases))
 	i := 0
 	for version := range l.Releases {
@@ -204,7 +204,7 @@ func (l *Library) Versions() semver.Versions {
 // nil if not found.
 //
 // If version == "latest" then release.Version contains the latest version.
-func (l *Library) GetVersion(version string) *Release {
+func (l Library) GetVersion(version string) *Release {
 	if version == "latest" {
 		return l.Releases[l.latestVersion()]
 	}
@@ -212,7 +212,7 @@ func (l *Library) GetVersion(version string) *Release {
 }
 
 // Latest obtains the latest version of a library.
-func (l *Library) Latest() *Release {
+func (l Library) Latest() *Release {
 	return l.GetVersion(l.latestVersion())
 }
 

@@ -30,7 +30,6 @@
 package common
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/user"
@@ -49,13 +48,14 @@ func GetFolder(folder string, label string, createIfMissing bool) (string, error
 		err = os.MkdirAll(folder, 0755)
 		if err != nil {
 			formatter.Print("ERROR")
-			formatter.PrintErrorMessage(fmt.Sprintf("Cannot create %s folder\n", label))
+			formatter.PrintErrorMessage(fmt.Sprintf("Folder %s missing and cannot create it", label))
 			return "", err
 		}
 		formatter.Print("OK")
 	} else if err != nil {
-		formatter.PrintErrorMessage(fmt.Sprintf("Cannot get %s folder\n", label))
-		return "", errors.New("Cannot get folder, it does not exist")
+		msgFormat := "Cannot get %s folder, it does not exist"
+		formatter.PrintErrorMessage(fmt.Sprintf(msgFormat, label))
+		return "", fmt.Errorf(msgFormat, label)
 	}
 	return folder, nil
 }

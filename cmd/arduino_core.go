@@ -104,8 +104,8 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 			InstalledCores: make([]output.InstalledStuff, 0, 5),
 			InstalledTools: make([]output.InstalledStuff, 0, 5),
 		}
-		getInstalledCores(packageName, &(pkg.InstalledCores))
-		getInstalledTools(packageName, &(pkg.InstalledTools))
+		getInstalledCores(packageName, &pkg.InstalledCores)
+		getInstalledTools(packageName, &pkg.InstalledTools)
 		pkgs.InstalledPackages = append(pkgs.InstalledPackages, pkg)
 	}
 

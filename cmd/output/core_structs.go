@@ -52,6 +52,11 @@ type InstalledPackageList struct {
 	InstalledPackages []InstalledPackage `json:"packages,required"`
 }
 
+//CoreSearchResults represents a result of a search of cores.
+type CoreSearchResults struct {
+	Cores []interface{} `json:"cores,required"`
+}
+
 func (is InstalledStuff) String() string {
 	return fmt.Sprintln("  Name:", is.Name) +
 		fmt.Sprintln("  Versions:", is.Versions)

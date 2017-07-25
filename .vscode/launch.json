@@ -21,13 +21,13 @@
             "showLog": true
         },
         {
-            "name": "Launch LIB LIST",
+            "name": "Launch LIB LIST JSON",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceRoot}/main.go",
             "env": {},
-            "args": ["lib", "list"],
+            "args": ["lib", "list", "--format", "json"],
             "showLog": true
         },
         {
@@ -41,13 +41,23 @@
             "showLog": true
         },
         {
-            "name": "Launch LIB INSTALL",
+            "name": "Launch LIB INSTALL JSON",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceRoot}/main.go",
             "env": {},
-            "args": ["lib", "install", "YoutubeApi"],
+            "args": ["lib", "install", "YoutubeApi", "--format", "json"],
+            "showLog": true
+        },
+        {
+            "name": "Launch LIB UNINSTALL JSON",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceRoot}/main.go",
+            "env": {},
+            "args": ["lib", "uninstall", "YoutubeApi", "--format", "json"],
             "showLog": true
         },
         {
