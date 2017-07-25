@@ -101,7 +101,7 @@ func init() {
 	arduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
 	arduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
 	arduinoCmd.Flags().StringVar(&rootCmdFlags.ConfigFile, "config", "", "config file (default is $HOME/.arduino.yaml)")
-
+	arduinoCmd.Flags().BoolVar(&rootCmdFlags.GenerateDocs, "generate-docs", false, "generates the docs for the CLI and puts it in docs folder")
 	arduinoCmd.AddCommand(arduinoVersionCmd)
 }
 
@@ -110,6 +110,11 @@ func arduinoPreRun(cmd *cobra.Command, args []string) {
 		GlobalFlags.Format = "text"
 	}
 	formatter.SetFormatter(GlobalFlags.Format)
+	if !formatter.IsCurrentFormat("text") {
+		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+			formatter.PrintErrorMessage("Help available only in TEXT mode")
+		})
+	}
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.

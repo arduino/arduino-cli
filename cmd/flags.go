@@ -37,7 +37,8 @@ var GlobalFlags struct {
 
 // rootCmdFlags represent flags available to the root command.
 var rootCmdFlags struct {
-	ConfigFile string // The path of the config file provided by the omonym flag.
+	ConfigFile   string // The path of the config file provided by the omonym flag.
+	GenerateDocs bool   // if true, generates manpages and bash autocompletion.
 }
 
 // arduinoLibFlags represents `arduino lib` flags.
