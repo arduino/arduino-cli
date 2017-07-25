@@ -36,8 +36,6 @@ import "errors"
 type Formatter interface {
 	Format(interface{}) (string, error) // Format formats a parameter if possible, otherwise it returns an error.
 	Print(interface{}) error            // Print just prints specified parameter, returns error if it is not parsable.
-	StartDebug()                        // StartDebug starts a debugging session.
-	EndDebug()                          // EndDebug ends a debugging session.
 }
 
 // PrintFunc represents a function used to print formatted data.
@@ -48,6 +46,8 @@ var defaultFormatter Formatter
 
 var printFunc PrintFunc
 
+var debug bool
+
 func init() {
 	formatters = make(map[string]Formatter, 2)
 	AddCustomFormatter("text", &TextFormatter{})
@@ -55,16 +55,6 @@ func init() {
 	defaultFormatter = formatters["text"]
 
 	printFunc = defaultPrintFunc
-}
-
-// StartDebug starts a debugging session.
-func StartDebug() {
-	defaultFormatter.StartDebug()
-}
-
-// EndDebug starts a debugging session.
-func EndDebug() {
-	defaultFormatter.EndDebug()
 }
 
 // SetFormatter sets the defaults format to the one specified, if valid. Otherwise it returns an error.

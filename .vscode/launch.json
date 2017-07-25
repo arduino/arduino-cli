@@ -37,7 +37,7 @@
             "mode": "debug",
             "program": "${workspaceRoot}/main.go",
             "env": {},
-            "args": ["lib", "list", "update", "-v"],
+            "args": ["lib", "--update-index", "-v"],
             "showLog": true
         },
         {
@@ -59,6 +59,16 @@
             "env": {},
             "args": ["lib", "download", "Zumo32U4", "YoutubeApi", "YouMadeIt", "XLR8SPI", "XLR8Servo", "XLR8Pong", "XLR8NeoPixel"],
             "showLog": true
-        }
+        },
+        {
+            "name": "Launch CORE LIST JSON",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceRoot}/main.go",
+            "env": {},
+            "args": ["core", "list", "--format", "json"],
+            "showLog": true
+        },
     ]
 }

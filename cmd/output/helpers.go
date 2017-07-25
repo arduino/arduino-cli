@@ -100,11 +100,11 @@ func (ip installedPackage) String() string {
 	return strings.TrimSpace(ret)
 }
 
-type installedCoresList struct {
+type installedPackageList struct {
 	InstalledPackages []installedPackage `json:"packages,required"`
 }
 
-func (icl installedCoresList) String() string {
+func (icl installedPackageList) String() string {
 	ret := ""
 	for _, pkg := range icl.InstalledPackages {
 		ret += fmt.Sprintln(pkg)
@@ -112,29 +112,22 @@ func (icl installedCoresList) String() string {
 	return strings.TrimSpace(ret)
 }
 
-type installedPackages []installedPackage
-
-func (ips installedPackages) String() string {
-	ret := ""
-	for _, ip := range ips {
-		ret += fmt.Sprintln(ip)
-	}
-	return ret
-}
-
 // InstalledCoresToolsFromMaps pretty prints a list of ALREADY INSTALLED cores and tools.
 func InstalledCoresToolsFromMaps(coreMap map[string]map[string][]string, toolMap map[string]map[string][]string) {
-	var packages = make(installedPackages, len(coreMap))
+	packages := installedPackageList{
+		InstalledPackages: make([]installedPackage, len(coreMap)),
+	}
+
 	var i, j int
 	i = 0
 	for pkg, coresData := range coreMap {
 		j = 0
-		packages[i] = installedPackage{
+		packages.InstalledPackages[i] = installedPackage{
 			Name:           pkg,
 			InstalledCores: make([]installedStuff, len(coresData)),
 		}
 		for core, versions := range coresData {
-			packages[i].InstalledCores[j] = installedStuff{
+			packages.InstalledPackages[i].InstalledCores[j] = installedStuff{
 				Name:     core,
 				Versions: versions,
 			}
@@ -142,12 +135,12 @@ func InstalledCoresToolsFromMaps(coreMap map[string]map[string][]string, toolMap
 		j++
 		i++
 	}
-	for i := range packages {
-		toolData := toolMap[packages[i].Name]
-		packages[i].InstalledTools = make([]installedStuff, len(toolData))
+	for i := range packages.InstalledPackages {
+		toolData := toolMap[packages.InstalledPackages[i].Name]
+		packages.InstalledPackages[i].InstalledTools = make([]installedStuff, len(toolData))
 		j = 0
 		for tool, versions := range toolData {
-			packages[i].InstalledTools[j] = installedStuff{
+			packages.InstalledPackages[i].InstalledTools[j] = installedStuff{
 				Name:     tool,
 				Versions: versions,
 			}

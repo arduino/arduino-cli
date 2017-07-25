@@ -35,17 +35,7 @@ import "errors"
 
 //JSONFormatter represents a Printer and Formatter of JSON objects.
 type JSONFormatter struct {
-	debug *bool //if false, errors are not shown. Unparsable inputs are skipped. Otherwise an error message is shown.
-}
-
-// StartDebug starts a debugging session.
-func (jf JSONFormatter) StartDebug() {
-	*jf.debug = true
-}
-
-// EndDebug end a debugging session.
-func (jf JSONFormatter) EndDebug() {
-	*jf.debug = false
+	debug bool //if false, errors are not shown. Unparsable inputs are skipped. Otherwise an error message is shown.
 }
 
 // Format formaats a message into a JSON object.
@@ -57,7 +47,7 @@ func (jf JSONFormatter) Format(msg interface{}) (string, error) {
 		msgType == "map" { // TODO : optimize if possible
 		ret, err := json.Marshal(msg)
 		return string(ret), err
-	} else if *jf.debug {
+	} else if jf.debug {
 		return "", errors.New("Only structs and maps values are accepted")
 	}
 	return "", nil
