@@ -466,22 +466,23 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 
 	found := false
 
-	message := output.LibSearchResults{}
 	names := status.Names()
+	message := output.LibSearchResults{
+		Libraries: make([]interface{}, 0, len(names)),
+	}
 	items := status.Items()
-	libs := make([]interface{}, 0, len(names))
 	//Pretty print libraries from index.
 	for _, name := range names {
 		if strings.Contains(strings.ToLower(name), query) {
 			found = true
 			item := items[name].(*libraries.Library)
 			if GlobalFlags.Verbose > 0 {
-				libs = append(libs, item)
+				message.Libraries = append(message.Libraries, item)
 				if GlobalFlags.Verbose < 2 {
 					item.Releases = nil
 				}
 			} else {
-				libs = append(libs, name)
+				message.Libraries = append(message.Libraries, name)
 			}
 		}
 	}
@@ -489,7 +490,6 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 	if !found {
 		formatter.PrintErrorMessage(fmt.Sprintf("No library found matching \"%s\" search query", query))
 	} else {
-		message.Libraries = libs
 		formatter.Print(message)
 	}
 

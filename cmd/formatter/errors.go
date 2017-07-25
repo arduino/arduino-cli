@@ -38,30 +38,30 @@ import (
 // ErrorMessage represents an Error with an attached message.
 //
 // It's the same as a normal error, but It is also parsable as JSON.
-type errorMessage struct {
+type ErrorMessage struct {
 	message string
 }
 
 // MarshalJSON allows to marshal this object as a JSON object.
-func (err errorMessage) MarshalJSON() ([]byte, error) {
+func (err ErrorMessage) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]string{
 		"error": err.message,
 	})
 }
 
 // Error returns the error message.
-func (err errorMessage) Error() string {
+func (err ErrorMessage) Error() string {
 	return fmt.Sprint(err.message)
 }
 
 // String returns a string representation of the Error.
-func (err errorMessage) String() string {
+func (err ErrorMessage) String() string {
 	return err.Error()
 }
 
-// fromError creates an errorMessage from an Error.
-func fromError(err error) errorMessage {
-	return errorMessage{
+// FromError creates an ErrorMessage from an Error.
+func FromError(err error) ErrorMessage {
+	return ErrorMessage{
 		message: err.Error(),
 	}
 }
@@ -73,5 +73,5 @@ func PrintErrorMessage(msg string) {
 
 // PrintError formats and prints info about an error.
 func PrintError(err error) {
-	Print(fromError(err))
+	Print(FromError(err))
 }
