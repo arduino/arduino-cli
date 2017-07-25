@@ -90,30 +90,37 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	coreMap := make(map[string]map[string][]string, 10)
-	toolMap := make(map[string]map[string][]string, 10)
+	pkgs := output.InstalledPackageList{
+		InstalledPackages: make([]output.InstalledPackage, 0, 10),
+	}
 
 	for _, file := range dirFiles {
 		if !file.IsDir() {
 			continue
 		}
 		packageName := file.Name()
-		getInstalledCores(packageName, coreMap)
-		getInstalledTools(packageName, toolMap)
+		pkg := output.InstalledPackage{
+			Name:           packageName,
+			InstalledCores: make([]output.InstalledStuff, 0, 5),
+			InstalledTools: make([]output.InstalledStuff, 0, 5),
+		}
+		getInstalledCores(packageName, &(pkg.InstalledCores))
+		getInstalledTools(packageName, &(pkg.InstalledTools))
+		pkgs.InstalledPackages = append(pkgs.InstalledPackages, pkg)
 	}
 
-	output.InstalledCoresToolsFromMaps(coreMap, toolMap)
+	formatter.Print(pkgs)
 }
 
-func getInstalledCores(packageName string, coreMap map[string]map[string][]string) {
-	getInstalledStuff(packageName, coreMap, common.GetDefaultCoresFolder)
+func getInstalledCores(packageName string, cores *[]output.InstalledStuff) {
+	getInstalledStuff(packageName, cores, common.GetDefaultCoresFolder)
 }
 
-func getInstalledTools(packageName string, toolMap map[string]map[string][]string) {
-	getInstalledStuff(packageName, toolMap, common.GetDefaultToolsFolder)
+func getInstalledTools(packageName string, tools *[]output.InstalledStuff) {
+	getInstalledStuff(packageName, tools, common.GetDefaultToolsFolder)
 }
 
-func getInstalledStuff(packageName string, stuffMap map[string]map[string][]string, startPathFunc func(string) (string, error)) {
+func getInstalledStuff(packageName string, stuff *[]output.InstalledStuff, startPathFunc func(string) (string, error)) {
 	stuffHome, err := startPathFunc(packageName)
 	if err != nil {
 		return
@@ -141,9 +148,9 @@ func getInstalledStuff(packageName string, stuffMap map[string]map[string][]stri
 		if err != nil {
 			continue
 		}
-		if stuffMap[packageName] == nil {
-			stuffMap[packageName] = make(map[string][]string)
-		}
-		stuffMap[packageName][stuffName] = versions
+		*stuff = append(*stuff, output.InstalledStuff{
+			Name:     stuffName,
+			Versions: versions,
+		})
 	}
 }

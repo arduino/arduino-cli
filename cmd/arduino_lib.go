@@ -472,8 +472,9 @@ func executeListCommand(command *cobra.Command, args []string) {
 		return
 	}
 
-	libs := make(map[string]interface{}, 10)
-
+	libs := output.LibProcessResults{
+		Libraries: make([]output.LibProcessResult, 0, 10),
+	}
 	//TODO: optimize this algorithm
 	// time complexity O(libraries_to_install(from RAM) *
 	//                   library_folder_number(from DISK) *
@@ -489,7 +490,11 @@ func executeListCommand(command *cobra.Command, args []string) {
 				fileName = strings.Replace(fileName, "_", " ", -1)
 				fileName = strings.Replace(fileName, "-", " v. ", -1)
 				//I use folder name
-				libs[fileName] = "Unknown Version"
+				libs.Libraries = append(libs.Libraries, output.LibProcessResult{
+					LibraryName: fileName,
+					Status:      "",
+					Error:       "Unknown Version",
+				})
 			} else {
 				// I use library.properties file
 				content, err := ioutil.ReadFile(indexFile)
@@ -499,7 +504,11 @@ func executeListCommand(command *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					libs[fileName] = "Unknown Version"
+					libs.Libraries = append(libs.Libraries, output.LibProcessResult{
+						LibraryName: fileName,
+						Status:      "",
+						Error:       "Unknown Version",
+					})
 					continue
 				}
 
@@ -515,7 +524,11 @@ func executeListCommand(command *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					libs[fileName] = "Unknown Version"
+					libs.Libraries = append(libs.Libraries, output.LibProcessResult{
+						LibraryName: fileName,
+						Status:      "",
+						Error:       "Unknown Version",
+					})
 					continue
 				}
 				Version, ok := ini.Get("version")
@@ -525,17 +538,25 @@ func executeListCommand(command *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					libs[fileName] = "Unknown Version"
+					libs.Libraries = append(libs.Libraries, output.LibProcessResult{
+						LibraryName: fileName,
+						Status:      "",
+						Error:       "Unknown Version",
+					})
 					continue
 				}
-				libs[Name] = fmt.Sprintf("v.%s", Version)
+				libs.Libraries = append(libs.Libraries, output.LibProcessResult{
+					LibraryName: Name,
+					Status:      fmt.Sprint("v.", Version),
+					Error:       "",
+				})
 			}
 		}
 	}
 
-	if len(libs) < 1 {
+	if len(libs.Libraries) < 1 {
 		formatter.PrintErrorMessage("No library installed")
 	} else {
-		formatter.Print(output.LibResultsFromMap(libs))
+		formatter.Print(libs)
 	}
 }

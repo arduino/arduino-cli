@@ -61,7 +61,7 @@ func (vfi VersionFullInfo) String() string {
 
 //LibProcessResults represent the result of a process on libraries.
 type LibProcessResults struct {
-	Libraries []libProcessResult `json:"libraries,required"`
+	Libraries []LibProcessResult `json:"libraries,required"`
 }
 
 // String returns a string representation of the object.
@@ -73,8 +73,8 @@ func (lpr LibProcessResults) String() string {
 	return strings.TrimSpace(ret)
 }
 
-//libProcessResult contains info about a completed process.
-type libProcessResult struct {
+//LibProcessResult contains info about a completed process.
+type LibProcessResult struct {
 	LibraryName string `json:"name,required"`
 	Status      string `json:"status,omitempty"`
 	Error       string `json:"error,omitempty"`
@@ -82,7 +82,7 @@ type libProcessResult struct {
 }
 
 // String returns a string representation of the object.
-func (lr libProcessResult) String() string {
+func (lr LibProcessResult) String() string {
 	if lr.Error != "" {
 		return strings.TrimSpace(fmt.Sprintf("%s - Error : %s", lr.LibraryName, lr.Error))
 	}
@@ -108,9 +108,4 @@ func (lsr LibSearchResults) String() string {
 		}
 	}
 	return strings.TrimSpace(ret)
-}
-
-//CoreSearchResults represents a result of a search of cores.
-type CoreSearchResults struct {
-	Cores []interface{} `json:"cores,required"`
 }
