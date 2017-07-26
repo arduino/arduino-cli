@@ -65,15 +65,6 @@ func (l StatusContext) Names() []string {
 	return res
 }
 
-// Items Returns a map of all items with their names.
-func (l StatusContext) Items() map[string]interface{} {
-	ret := make(map[string]interface{}, len(l.Libraries))
-	for key, item := range l.Libraries {
-		ret[key] = item
-	}
-	return ret
-}
-
 // CreateStatusContext creates a status context from index data.
 func (index Index) CreateStatusContext() (StatusContext, error) {
 	// Start with an empty status context

@@ -29,8 +29,6 @@
 
 package cores
 
-import "github.com/pmylund/sortutil"
-
 //Package represents a package in the system.
 type Package struct {
 	Name       string
@@ -61,25 +59,4 @@ func (pm *Package) addTool(indexTool *indexToolRelease) {
 	} else {
 		pm.Tools[name].Releases[indexTool.Version] = indexTool.extractRelease()
 	}
-}
-
-// Items returns the list of cores of this package.
-func (pm Package) Items() map[string]interface{} {
-	ret := make(map[string]interface{}, len(pm.Cores))
-	for key, val := range pm.Cores {
-		ret[key] = val
-	}
-	return ret
-}
-
-// Names returns an array with all the names of the registered cores.
-func (pm Package) Names() []string {
-	res := make([]string, len(pm.Cores))
-	i := 0
-	for n := range pm.Cores {
-		res[i] = n
-		i++
-	}
-	sortutil.CiAsc(res)
-	return res
 }

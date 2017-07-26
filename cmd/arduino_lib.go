@@ -470,12 +470,12 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 	message := output.LibSearchResults{
 		Libraries: make([]interface{}, 0, len(names)),
 	}
-	items := status.Items()
+	items := status.Libraries
 	//Pretty print libraries from index.
 	for _, name := range names {
 		if strings.Contains(strings.ToLower(name), query) {
 			found = true
-			item := items[name].(*libraries.Library)
+			item := items[name]
 			if GlobalFlags.Verbose > 0 {
 				message.Libraries = append(message.Libraries, item)
 				if GlobalFlags.Verbose < 2 {
