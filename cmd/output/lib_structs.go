@@ -51,15 +51,13 @@ type VersionFullInfo struct {
 
 //LibProcessResults represent the result of a process on libraries.
 type LibProcessResults struct {
-	Libraries []LibProcessResult `json:"libraries,required"`
+	Libraries []ProcessResult `json:"libraries,required"`
 }
 
-//LibProcessResult contains info about a completed process.
-type LibProcessResult struct {
-	LibraryName string `json:"name,required"`
-	Status      string `json:"status,omitempty"`
-	Error       string `json:"error,omitempty"`
-	Path        string `json:"path,omitempty"`
+//CoreProcessResults represent the result of a process on cores or tools.
+type CoreProcessResults struct {
+	Cores []ProcessResult `json:"cores,omitempty"`
+	Tools []ProcessResult `json:"tools,omitempty"`
 }
 
 // LibSearchResults represents a set of results of a search of libraries.
@@ -82,11 +80,6 @@ func (vfi VersionFullInfo) String() string {
 		ret += fmt.Sprintln(vr)
 	}
 	return strings.TrimSpace(ret)
-}
-
-// String returns a string representation of the object.
-func (lr LibProcessResult) String() string {
-	return strings.TrimSpace(fmt.Sprintf("%s - %s", lr.LibraryName, lr.Status))
 }
 
 // String returns a string representation of the object.

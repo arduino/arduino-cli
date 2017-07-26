@@ -31,6 +31,8 @@ package cores
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/pmylund/sortutil"
 )
@@ -57,15 +59,6 @@ func (sc StatusContext) Names() []string {
 	}
 	sortutil.CiAsc(res)
 	return res
-}
-
-// Items returns a map matching core name and core struct.
-func (sc StatusContext) Items() map[string]interface{} {
-	ret := make(map[string]interface{}, len(sc.Packages))
-	for key, val := range sc.Packages {
-		ret[key] = val
-	}
-	return ret
 }
 
 func (tdep toolDependency) extractTool(sc StatusContext) (*Tool, error) {
@@ -102,4 +95,41 @@ func (index Index) CreateStatusContext() (StatusContext, error) {
 		packages.AddPackage(packageManager)
 	}
 	return packages, nil
+}
+
+// GetDeps returns the deps of a specified release of a core.
+func (sc StatusContext) GetDeps(release *Release) ([]CoreDependency, error) {
+	ret := make([]CoreDependency, 0, 5)
+	if release == nil {
+		return nil, errors.New("release cannot be nil")
+	}
+	for _, dep := range release.Dependencies {
+		pkg, exists := sc.Packages[dep.ToolPackager]
+		if !exists {
+			return nil, fmt.Errorf("Package %s not found", dep.ToolPackager)
+		}
+		tool, exists := pkg.Tools[dep.ToolName]
+		if !exists {
+			return nil, fmt.Errorf("Tool %s not found", dep.ToolName)
+		}
+		toolRelease, exists := tool.Releases[dep.ToolVersion]
+		if !exists {
+			return nil, fmt.Errorf("Tool version %s not found", dep.ToolVersion)
+		}
+		ret = append(ret, CoreDependency{
+			ToolName: dep.ToolName,
+			Release:  toolRelease,
+		})
+	}
+	return ret, nil
+}
+
+// CoreDependency is a representation of a parsed core dependency (single ToolRelease).
+type CoreDependency struct {
+	ToolName string       `json:"tool,required"`
+	Release  *ToolRelease `json:"release,required"`
+}
+
+func (cd CoreDependency) String() string {
+	return strings.TrimSpace(fmt.Sprintln(cd.ToolName, " v.", cd.Release.Version))
 }

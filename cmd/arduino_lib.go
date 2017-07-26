@@ -215,9 +215,9 @@ func purgeInvalidLibraries(libnames map[string]string, status libraries.StatusCo
 //
 // forced is used to force download if cached.
 // OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
-func parallelLibDownloads(items map[*libraries.Library]string, forced bool, OkStatus string) output.LibProcessResults {
+func parallelLibDownloads(items map[*libraries.Library]string, forced bool, OkStatus string) output.ProcessResults {
 	itemC := len(items)
-	libraryResults := output.LibProcessResults{
+	libraryResults := output.ProcessResults{
 		Libraries: make([]output.LibProcessResult, 0, itemC),
 	}
 
@@ -341,7 +341,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	libraryResults := output.LibProcessResults{
+	libraryResults := output.ProcessResults{
 		Libraries: make([]output.LibProcessResult, 0, 10),
 	}
 	for _, arg := range args {
@@ -517,7 +517,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 		return
 	}
 
-	libs := output.LibProcessResults{
+	libs := output.ProcessResults{
 		Libraries: make([]output.LibProcessResult, 0, 10),
 	}
 	//TODO: optimize this algorithm

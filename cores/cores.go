@@ -55,7 +55,7 @@ type Release struct {
 	Checksum        string
 	Size            int64
 	Boards          []string
-	Dependencies    ToolDependencies
+	Dependencies    ToolDependencies // The Dependency entries to load tools.
 }
 
 // ToolDependencies is a set of tuples representing summary data of a tool.
