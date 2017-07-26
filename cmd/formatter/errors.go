@@ -33,6 +33,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 // ErrorMessage represents an Error with an attached message.
@@ -68,7 +69,7 @@ func FromError(err error) ErrorMessage {
 
 // PrintErrorMessage formats and prints info about an error message.
 func PrintErrorMessage(msg string) {
-	PrintError(errors.New(msg))
+	PrintError(errors.New(strings.TrimSpace(msg)))
 }
 
 // PrintError formats and prints info about an error.

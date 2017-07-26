@@ -42,6 +42,16 @@ type StatusContext struct {
 	Packages map[string]*Package
 }
 
+// CoreDependency is a representation of a parsed core dependency (single ToolRelease).
+type CoreDependency struct {
+	ToolName string       `json:"tool,required"`
+	Release  *ToolRelease `json:"release,required"`
+}
+
+func (cd CoreDependency) String() string {
+	return strings.TrimSpace(fmt.Sprintln(cd.ToolName, " v.", cd.Release.Version))
+}
+
 // AddPackage adds a package to a context from an indexPackage.
 //
 // NOTE: If the package is already in the context, it is overwritten!
@@ -122,14 +132,4 @@ func (sc StatusContext) GetDeps(release *Release) ([]CoreDependency, error) {
 		})
 	}
 	return ret, nil
-}
-
-// CoreDependency is a representation of a parsed core dependency (single ToolRelease).
-type CoreDependency struct {
-	ToolName string       `json:"tool,required"`
-	Release  *ToolRelease `json:"release,required"`
-}
-
-func (cd CoreDependency) String() string {
-	return strings.TrimSpace(fmt.Sprintln(cd.ToolName, " v.", cd.Release.Version))
 }

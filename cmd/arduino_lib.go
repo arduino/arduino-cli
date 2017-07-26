@@ -161,9 +161,9 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	libraryResults := parallelLibDownloads(libs, true, "Downloaded")
 
 	for libFail, err := range failed {
-		libraryResults.Libraries = append(libraryResults.Libraries, output.LibProcessResult{
-			LibraryName: libFail,
-			Error:       err.Error(),
+		libraryResults.Libraries = append(libraryResults.Libraries, output.ProcessResult{
+			ItemName: libFail,
+			Error:    err.Error(),
 		})
 	}
 
@@ -215,10 +215,10 @@ func purgeInvalidLibraries(libnames map[string]string, status libraries.StatusCo
 //
 // forced is used to force download if cached.
 // OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
-func parallelLibDownloads(items map[*libraries.Library]string, forced bool, OkStatus string) output.ProcessResults {
+func parallelLibDownloads(items map[*libraries.Library]string, forced bool, OkStatus string) output.LibProcessResults {
 	itemC := len(items)
-	libraryResults := output.ProcessResults{
-		Libraries: make([]output.LibProcessResult, 0, itemC),
+	libraryResults := output.LibProcessResults{
+		Libraries: make([]output.ProcessResult, 0, itemC),
 	}
 
 	tasks := make(map[string]task.Wrapper, len(items))
@@ -252,14 +252,14 @@ func parallelLibDownloads(items map[*libraries.Library]string, forced bool, OkSt
 
 		for libraryName, result := range results {
 			if result.Error != nil {
-				libraryResults.Libraries = append(libraryResults.Libraries, output.LibProcessResult{
-					LibraryName: libraryName,
-					Error:       result.Error.Error(),
+				libraryResults.Libraries = append(libraryResults.Libraries, output.ProcessResult{
+					ItemName: libraryName,
+					Error:    result.Error.Error(),
 				})
 			} else {
-				libraryResults.Libraries = append(libraryResults.Libraries, output.LibProcessResult{
-					LibraryName: libraryName,
-					Status:      OkStatus,
+				libraryResults.Libraries = append(libraryResults.Libraries, output.ProcessResult{
+					ItemName: libraryName,
+					Status:   OkStatus,
 				})
 			}
 		}
@@ -295,22 +295,22 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 
 	libraryResults := parallelLibDownloads(libs, false, "Installed")
 	for libFail, reason := range failed {
-		libraryResults.Libraries = append(libraryResults.Libraries, output.LibProcessResult{
-			LibraryName: libFail,
-			Error:       reason.Error(),
+		libraryResults.Libraries = append(libraryResults.Libraries, output.ProcessResult{
+			ItemName: libFail,
+			Error:    reason.Error(),
 		})
 	}
 	for library, version := range libs {
 		err = libraries.InstallLib(library, version)
 		if err != nil {
-			libraryResults.Libraries = append(libraryResults.Libraries, output.LibProcessResult{
-				LibraryName: library.Name,
-				Error:       err.Error(),
+			libraryResults.Libraries = append(libraryResults.Libraries, output.ProcessResult{
+				ItemName: library.Name,
+				Error:    err.Error(),
 			})
 		} else {
-			libraryResults.Libraries = append(libraryResults.Libraries, output.LibProcessResult{
-				LibraryName: library.Name,
-				Status:      "Installed",
+			libraryResults.Libraries = append(libraryResults.Libraries, output.ProcessResult{
+				ItemName: library.Name,
+				Status:   "Installed",
 			})
 		}
 	}
@@ -341,23 +341,21 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	libraryResults := output.ProcessResults{
-		Libraries: make([]output.LibProcessResult, 0, 10),
+	libraryResults := output.LibProcessResults{
+		Libraries: make([]output.ProcessResult, 0, 10),
 	}
 	for _, arg := range args {
-		libraryResults.Libraries = append(libraryResults.Libraries, output.LibProcessResult{
-			LibraryName: arg,
-			Error:       "Not Found or Not Installed",
+		libraryResults.Libraries = append(libraryResults.Libraries, output.ProcessResult{
+			ItemName: arg,
+			Error:    "Not Found or Not Installed",
 		})
 	}
 	//TODO: optimize this algorithm
 	//      time complexity O(libraries_to_install(from RAM) *
 	//                        library_folder_number(from DISK) *
 	//                        library_folder_file_number (from DISK)).
-	//TODO : remove only one version.
-
 	for _, library := range args {
-		var result *output.LibProcessResult
+		var result *output.ProcessResult
 		for _, file := range dirFiles {
 			if file.IsDir() {
 				indexFile := filepath.Join(libFolder, file.Name(), "library.properties")
@@ -368,8 +366,8 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					//I use folder name
 					if strings.Contains(fileName, library) {
-						result = &output.LibProcessResult{
-							LibraryName: library,
+						result = &output.ProcessResult{
+							ItemName: library,
 						}
 						//found
 						err = libraries.Uninstall(filepath.Join(libFolder, fileName))
@@ -386,9 +384,9 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 					// I use library.properties file
 					content, err := os.OpenFile(indexFile, os.O_RDONLY, 0666)
 					if err != nil {
-						libraryResults.Libraries = append(libraryResults.Libraries, output.LibProcessResult{
-							LibraryName: library,
-							Error:       err.Error(),
+						libraryResults.Libraries = append(libraryResults.Libraries, output.ProcessResult{
+							ItemName: library,
+							Error:    err.Error(),
 						})
 						break
 					}
@@ -400,8 +398,8 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 						// name of the library.
 						if lines[0] == "name" {
 							if strings.Contains(lines[1], library) {
-								result = &output.LibProcessResult{
-									LibraryName: library,
+								result = &output.ProcessResult{
+									ItemName: library,
 								}
 								//found
 								err = libraries.Uninstall(filepath.Join(libFolder, file.Name()))
@@ -425,9 +423,9 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 					break
 				}
 				if result == nil {
-					libraryResults.Libraries = append(libraryResults.Libraries, output.LibProcessResult{
-						LibraryName: library,
-						Error:       "\"name\" field not found in library.properties file of the library",
+					libraryResults.Libraries = append(libraryResults.Libraries, output.ProcessResult{
+						ItemName: library,
+						Error:    "\"name\" field not found in library.properties file of the library",
 					})
 				}
 			}
@@ -517,8 +515,8 @@ func executeListCommand(command *cobra.Command, args []string) {
 		return
 	}
 
-	libs := output.ProcessResults{
-		Libraries: make([]output.LibProcessResult, 0, 10),
+	libs := output.LibProcessResults{
+		Libraries: make([]output.ProcessResult, 0, 10),
 	}
 	//TODO: optimize this algorithm
 	// time complexity O(libraries_to_install(from RAM) *
@@ -535,10 +533,10 @@ func executeListCommand(command *cobra.Command, args []string) {
 				fileName = strings.Replace(fileName, "_", " ", -1)
 				fileName = strings.Replace(fileName, "-", " v. ", -1)
 				//I use folder name
-				libs.Libraries = append(libs.Libraries, output.LibProcessResult{
-					LibraryName: fileName,
-					Status:      "",
-					Error:       "Unknown Version",
+				libs.Libraries = append(libs.Libraries, output.ProcessResult{
+					ItemName: fileName,
+					Status:   "",
+					Error:    "Unknown Version",
 				})
 			} else {
 				// I use library.properties file
@@ -549,10 +547,10 @@ func executeListCommand(command *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					libs.Libraries = append(libs.Libraries, output.LibProcessResult{
-						LibraryName: fileName,
-						Status:      "",
-						Error:       "Unknown Version",
+					libs.Libraries = append(libs.Libraries, output.ProcessResult{
+						ItemName: fileName,
+						Status:   "",
+						Error:    "Unknown Version",
 					})
 					continue
 				}
@@ -569,10 +567,9 @@ func executeListCommand(command *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					libs.Libraries = append(libs.Libraries, output.LibProcessResult{
-						LibraryName: fileName,
-						Status:      "",
-						Error:       "Unknown Version",
+					libs.Libraries = append(libs.Libraries, output.ProcessResult{
+						ItemName: fileName,
+						Error:    "Unknown Version",
 					})
 					continue
 				}
@@ -583,17 +580,16 @@ func executeListCommand(command *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					libs.Libraries = append(libs.Libraries, output.LibProcessResult{
-						LibraryName: fileName,
-						Status:      "",
-						Error:       "Unknown Version",
+					libs.Libraries = append(libs.Libraries, output.ProcessResult{
+						ItemName: fileName,
+						Error:    "Unknown Version",
 					})
 					continue
 				}
-				libs.Libraries = append(libs.Libraries, output.LibProcessResult{
-					LibraryName: Name,
-					Status:      fmt.Sprint("v.", Version),
-					Error:       "",
+				libs.Libraries = append(libs.Libraries, output.ProcessResult{
+					ItemName: Name,
+					Status:   fmt.Sprint("v.", Version),
+					Error:    "",
 				})
 			}
 		}
