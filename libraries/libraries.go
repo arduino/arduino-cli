@@ -32,7 +32,6 @@ package libraries
 import (
 	"bufio"
 	"errors"
-	"strconv"
 
 	"strings"
 
@@ -126,7 +125,7 @@ type Release struct {
 	Version         string `json:"version"`
 	URL             string `json:"url"`
 	ArchiveFileName string `json:"archiveFileName"`
-	Size            int    `json:"size"`
+	Size            int64  `json:"size"`
 	Checksum        string `json:"checksum"`
 }
 
@@ -139,7 +138,7 @@ func (r Release) OpenLocalArchiveForDownload() (*os.File, error) {
 		return nil, err
 	}
 	stats, err := os.Stat(path)
-	if os.IsNotExist(err) || err == nil && int(stats.Size()) >= r.Size {
+	if os.IsNotExist(err) || err == nil && stats.Size() >= r.ArchiveSize() {
 		return os.Create(path)
 	}
 	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
@@ -167,7 +166,7 @@ func (r Release) CheckLocalArchive() error {
 	if err != nil {
 		return err
 	}
-	if int(stats.Size()) > r.Size {
+	if stats.Size() > r.ArchiveSize() {
 		return errors.New("Archive size does not match with specification of this release, assuming corruption")
 	}
 	if !r.checksumMatches() {
@@ -235,12 +234,11 @@ func (l *Library) latestVersion() string {
 }
 
 func (r *Release) String() string {
-	res := "  Release: " + fmt.Sprint(r.Version) + "\n"
-	res += "    URL: " + r.URL + "\n"
-	res += "    ArchiveFileName: " + r.ArchiveFileName + "\n"
-	res += "    Size: " + strconv.Itoa(r.Size) + "\n"
-	res += "    Checksum: " + r.Checksum + "\n"
-	return res
+	return fmt.Sprintln("  Release: "+fmt.Sprint(r.Version)) +
+		fmt.Sprintln("    URL: "+r.URL) +
+		fmt.Sprintln("    ArchiveFileName: "+r.ArchiveFileName) +
+		fmt.Sprintln("    Size: ", r.ArchiveSize()) +
+		fmt.Sprintln("    Checksum: ", r.Checksum)
 }
 
 func (l Library) String() string {
@@ -254,4 +252,14 @@ func (l Library) String() string {
 		fmt.Sprintln("  Architecture: ", strings.Join(l.Architectures, ", ")) +
 		fmt.Sprintln("  Types: ", strings.Join(l.Types, ", ")) +
 		fmt.Sprintln("  Versions: ", strings.Replace(fmt.Sprint(l.Versions()), " ", ", ", -1))
+}
+
+// ArchiveSize returns the archive size.
+func (r Release) ArchiveSize() int64 {
+	return r.Size
+}
+
+// ArchiveURL returns the archive URL.
+func (r Release) ArchiveURL() string {
+	return r.URL
 }

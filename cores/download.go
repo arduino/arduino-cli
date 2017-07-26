@@ -47,3 +47,8 @@ func getDownloadCacheFolder() (string, error) {
 func DownloadPackagesFile() error {
 	return common.DownloadPackageIndexFunc(IndexPath, PackageIndexURL)
 }
+
+// download core
+// check core deps, needs statuscontext
+// download tools
+// download tool -> download Release -> downloadPackage

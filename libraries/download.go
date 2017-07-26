@@ -30,10 +30,6 @@
 package libraries
 
 import (
-	"fmt"
-
-	"errors"
-
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/task"
 	"gopkg.in/cheggaaa/pb.v1"
@@ -48,7 +44,7 @@ const (
 func DownloadAndCache(library *Library, progBar *pb.ProgressBar, version string) task.Wrapper {
 	return task.Wrapper{
 		Task: func() task.Result {
-			err := downloadRelease(library, progBar, version)
+			err := common.DownloadRelease(library.Name, library.GetVersion(version), progBar, "library")
 			if err != nil {
 				return task.Result{
 					Result: nil,
@@ -63,30 +59,9 @@ func DownloadAndCache(library *Library, progBar *pb.ProgressBar, version string)
 	}
 }
 
-// DownloadLatest downloads Latest version of a library.
-func downloadLatest(library *Library, progBar *pb.ProgressBar) ([]byte, error) {
-	return nil, downloadRelease(library, progBar, library.latestVersion())
-}
-
-func downloadRelease(library *Library, progBar *pb.ProgressBar, version string) error {
-	release := library.GetVersion(version)
-	if release == nil {
-		return errors.New("Invalid version number")
-	}
-	initialData, err := release.OpenLocalArchiveForDownload()
-	if err != nil {
-		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
-	}
-	defer initialData.Close()
-	err = common.DownloadPackage(release.URL, fmt.Sprintf("library %s", library.Name), progBar, initialData, release.Size)
-	if err != nil {
-		return err
-	}
-	err = release.CheckLocalArchive()
-	if err != nil {
-		return errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
-	}
-	return nil
+// downloadLatest downloads Latest version of a library.
+func downloadLatest(library *Library, progBar *pb.ProgressBar, label string) ([]byte, error) {
+	return nil, common.DownloadRelease(library.Name, library.GetVersion(library.latestVersion()), progBar, "library")
 }
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.

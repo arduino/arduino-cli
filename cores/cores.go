@@ -55,6 +55,7 @@ type Release struct {
 	Checksum        string
 	Size            int64
 	Boards          []string
+	URL             string
 	Dependencies    ToolDependencies // The Dependency entries to load tools.
 }
 
@@ -182,4 +183,14 @@ func (release Release) checksumMatches() bool {
 // ExpectedChecksum returns the expected checksum for this release.
 func (release Release) ExpectedChecksum() string {
 	return release.Checksum
+}
+
+// ArchiveSize returns the archive size.
+func (release Release) ArchiveSize() int64 {
+	return release.Size
+}
+
+// ArchiveURL returns the archive URL.
+func (release Release) ArchiveURL() string {
+	return release.URL
 }

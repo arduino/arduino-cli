@@ -29,8 +29,14 @@
 
 package common
 
+import "os"
+
 // Release represents a generic release.
 type Release interface {
+	OpenLocalArchiveForDownload() (*os.File, error)
 	ArchivePath() (string, error) // ArchivePath returns the fullPath of the Archive of this release.
 	ExpectedChecksum() string     // Checksum returns the expected checksum for this release.
+	ArchiveURL() string           // ArchiveURL returns the archive URL.
+	ArchiveSize() int64           // ArchiveSize returns the archive size.
+	CheckLocalArchive() error
 }

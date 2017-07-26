@@ -55,7 +55,7 @@ type indexRelease struct {
 	Types           []string `json:"types"`
 	URL             string   `json:"url"`
 	ArchiveFileName string   `json:"archiveFileName"`
-	Size            int      `json:"size"`
+	Size            int64    `json:"size"`
 	Checksum        string   `json:"checksum"`
 }
 

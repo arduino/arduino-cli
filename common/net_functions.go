@@ -72,7 +72,7 @@ func DownloadPackageIndexFunc(indexPathFunc func() (string, error), URL string) 
 }
 
 // DownloadPackage downloads a package from arduino repository, applying a label for the progress bar.
-func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressBar, initialData *os.File, totalSize int) error {
+func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressBar, initialData *os.File, totalSize int64) error {
 	client := http.DefaultClient
 
 	if initialData == nil {
@@ -84,12 +84,12 @@ func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressB
 		return fmt.Errorf("Cannot create HTTP request: %s", err)
 	}
 
-	var initialSize int
+	var initialSize int64
 	stats, err := initialData.Stat()
 	if err != nil {
 		initialSize = 0
 	} else {
-		fileSize := int(stats.Size())
+		fileSize := stats.Size()
 		if fileSize >= totalSize {
 			initialSize = 0
 		} else {
@@ -115,13 +115,43 @@ func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressB
 
 	source := response.Body
 	if progressBar != nil {
-		progressBar.Add(initialSize)
+		progressBar.Add(int(initialSize))
 		source = progressBar.NewProxyReader(response.Body)
 	}
 
 	_, err = io.Copy(initialData, source)
 	if err != nil {
 		return fmt.Errorf("Cannot read response body %s", err)
+	}
+	return nil
+}
+
+// DownloadRelease downloads a generic release.
+//
+//   PARAMS:
+//     name -> The name of the Item to download
+//     release -> The release to download
+//     progBar -> a progress bar, can be nil. If not nill progress is handled for that bar.
+//     label -> Name used to identify the type of the Item downloaded (library, core, tool)
+//   RETURNS:
+//     error if any
+func DownloadRelease(name string, release Release, progBar *pb.ProgressBar, label string) error {
+	if release == nil {
+		return errors.New("Cannot accept nil release")
+	}
+
+	initialData, err := release.OpenLocalArchiveForDownload()
+	if err != nil {
+		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
+	}
+	defer initialData.Close()
+	err = DownloadPackage(release.ArchiveURL(), fmt.Sprint(label, " ", name), progBar, initialData, release.ArchiveSize())
+	if err != nil {
+		return err
+	}
+	err = release.CheckLocalArchive()
+	if err != nil {
+		return errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
 	}
 	return nil
 }

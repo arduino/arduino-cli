@@ -231,7 +231,7 @@ func parallelLibDownloads(items map[*libraries.Library]string, forced bool, OkSt
 		if forced || release != nil && !library.IsCached(version) || release.CheckLocalArchive() != nil {
 			var pBar *pb.ProgressBar
 			if textMode {
-				pBar = pb.StartNew(release.Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name))
+				pBar = pb.StartNew(int(release.Size)).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name))
 				progressBars = append(progressBars, pBar)
 			}
 			tasks[library.Name] = libraries.DownloadAndCache(library, pBar, version)
