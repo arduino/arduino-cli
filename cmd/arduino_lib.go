@@ -220,9 +220,10 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	libs, failed := purgeInvalidItems(releases.ParseArgs(args), status)
+	parsedArgs := releases.ParseArgs(args)
+	libs, failOutputs := purgeInvalidItems(parsedArgs, status)
 	outputResults := output.LibProcessResults{
-		Libraries: failed,
+		Libraries: failOutputs,
 	}
 	releases.ParallelDownloads(libs, false, "Installed", GlobalFlags.Verbose, &outputResults.Libraries)
 

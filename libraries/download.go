@@ -34,13 +34,13 @@ import (
 )
 
 const (
-	// LibraryIndexURL is the URL where to get library index.
-	LibraryIndexURL string = "http://downloads.arduino.cc/libraries/library_index.json"
+	// libraryIndexURL is the URL where to get library index.
+	libraryIndexURL string = "http://downloads.arduino.cc/libraries/library_index.json"
 )
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.
 func DownloadLibrariesFile() error {
-	return common.DownloadPackageIndex(IndexPath, LibraryIndexURL)
+	return common.DownloadPackageIndex(IndexPath, libraryIndexURL)
 }
 
 // getDownloadCacheFolder gets the folder where temp installs are stored

@@ -135,14 +135,16 @@ func ParallelDownloads(items []DownloadItem, forced bool, OkStatus string, verbo
 	progressBars := make([]*pb.ProgressBar, 0, itemC)
 	textMode := formatter.IsCurrentFormat("text")
 	for _, item := range items {
-		if forced || item.Release != nil && (!IsCached(item.Release) || item.Release.CheckLocalArchive() != nil) {
+		cached := IsCached(item.Release)
+		releaseNotNil := item.Release != nil
+		if forced || releaseNotNil && (!cached || item.Release.CheckLocalArchive() != nil) {
 			var pBar *pb.ProgressBar
 			if textMode {
 				pBar = pb.StartNew(int(item.Release.ArchiveSize())).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", item.Name))
 				progressBars = append(progressBars, pBar)
 			}
 			tasks[item.Name] = downloadAndCache(item, pBar)
-		} else if !forced && item.Release != nil && IsCached(item.Release) {
+		} else if !forced && releaseNotNil && cached {
 			//Consider OK
 			*refResults = append(*refResults, output.ProcessResult{
 				ItemName: item.Name,
