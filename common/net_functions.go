@@ -40,8 +40,8 @@ import (
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
-// DownloadPackageIndexFunc is a function to download a generic index.
-func DownloadPackageIndexFunc(indexPathFunc func() (string, error), URL string) error {
+// DownloadPackageIndex is a function to download a generic index.
+func DownloadPackageIndex(indexPathFunc func() (string, error), URL string) error {
 	file, err := indexPathFunc()
 	if err != nil {
 		return err

@@ -66,7 +66,7 @@ func downloadLatest(library *Library, progBar *pb.ProgressBar, label string) ([]
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.
 func DownloadLibrariesFile() error {
-	return common.DownloadPackageIndexFunc(IndexPath, LibraryIndexURL)
+	return common.DownloadPackageIndex(IndexPath, LibraryIndexURL)
 }
 
 // getDownloadCacheFolder gets the folder where temp installs are stored
