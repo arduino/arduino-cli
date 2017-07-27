@@ -31,18 +31,12 @@ package libraries
 
 import (
 	"github.com/bcmi-labs/arduino-cli/common"
-	"gopkg.in/cheggaaa/pb.v1"
 )
 
 const (
 	// LibraryIndexURL is the URL where to get library index.
 	LibraryIndexURL string = "http://downloads.arduino.cc/libraries/library_index.json"
 )
-
-// downloadLatest downloads Latest version of a library.
-func downloadLatest(library *Library, progBar *pb.ProgressBar, label string) ([]byte, error) {
-	return nil, common.DownloadRelease(library.Name, library.GetVersion(library.latestVersion()), progBar, "library")
-}
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.
 func DownloadLibrariesFile() error {

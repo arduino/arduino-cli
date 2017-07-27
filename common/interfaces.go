@@ -33,10 +33,19 @@ import "os"
 
 // Release represents a generic release.
 type Release interface {
+	// OpenLocalArchiveForDownload opens the local archive file
+	// in append mode if it exists, otherwise it creates it. Returns
+	// the file pointer.
 	OpenLocalArchiveForDownload() (*os.File, error)
-	ArchivePath() (string, error) // ArchivePath returns the fullPath of the Archive of this release.
-	ExpectedChecksum() string     // Checksum returns the expected checksum for this release.
-	ArchiveURL() string           // ArchiveURL returns the archive URL.
-	ArchiveSize() int64           // ArchiveSize returns the archive size.
+	// ArchivePath returns the fullPath of the Archive of this release.
+	ArchivePath() (string, error)
+	// ExpectedChecksum returns the expected checksum for this release.
+	ExpectedChecksum() string
+	// ArchiveURL returns the archive URL.
+	ArchiveURL() string
+	// ArchiveSize returns the archive size.
+	ArchiveSize() int64
+	// CheckLocalArchive uses ExpectedChecksum to check if the file is
+	// correctly downloaded.
 	CheckLocalArchive() error
 }
