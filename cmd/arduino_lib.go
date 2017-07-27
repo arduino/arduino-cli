@@ -234,7 +234,7 @@ func parallelLibDownloads(items map[*libraries.Library]string, forced bool, OkSt
 				pBar = pb.StartNew(int(release.Size)).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name))
 				progressBars = append(progressBars, pBar)
 			}
-			tasks[library.Name] = libraries.DownloadAndCache(library, pBar, version)
+			tasks[library.Name] = common.DownloadAndCache(library.Name, release, pBar)
 		}
 	}
 

@@ -37,6 +37,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/bcmi-labs/arduino-cli/task"
+
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -154,4 +156,23 @@ func DownloadRelease(name string, release Release, progBar *pb.ProgressBar, labe
 		return errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
 	}
 	return nil
+}
+
+// DownloadAndCache returns the wrapper to download something without installing it
+func DownloadAndCache(name string, release Release, progBar *pb.ProgressBar) task.Wrapper {
+	return task.Wrapper{
+		Task: func() task.Result {
+			err := DownloadRelease(name, release, progBar, "library")
+			if err != nil {
+				return task.Result{
+					Result: nil,
+					Error:  err,
+				}
+			}
+			return task.Result{
+				Result: nil,
+				Error:  nil,
+			}
+		},
+	}
 }

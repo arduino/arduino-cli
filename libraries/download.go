@@ -31,7 +31,6 @@ package libraries
 
 import (
 	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/bcmi-labs/arduino-cli/task"
 	"gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -39,25 +38,6 @@ const (
 	// LibraryIndexURL is the URL where to get library index.
 	LibraryIndexURL string = "http://downloads.arduino.cc/libraries/library_index.json"
 )
-
-// DownloadAndCache downloads a library without installing it
-func DownloadAndCache(library *Library, progBar *pb.ProgressBar, version string) task.Wrapper {
-	return task.Wrapper{
-		Task: func() task.Result {
-			err := common.DownloadRelease(library.Name, library.GetVersion(version), progBar, "library")
-			if err != nil {
-				return task.Result{
-					Result: nil,
-					Error:  err,
-				}
-			}
-			return task.Result{
-				Result: nil,
-				Error:  nil,
-			}
-		},
-	}
-}
 
 // downloadLatest downloads Latest version of a library.
 func downloadLatest(library *Library, progBar *pb.ProgressBar, label string) ([]byte, error) {
