@@ -227,31 +227,31 @@ __handle_word()
 }
 
 
-__arduino_autocomplete() 
+    __arduino_autocomplete() 
+    {
+        case $(last_command) in
+            arduino)
+    		    opts="lib core help version"
+    		    ;;
+            arduino_lib)
+    		    opts="install uninstall list search version --update-index"
+    	        ;;			
+			arduino_core)
+			    opts="install uninstall list search version --update-index"
+				;;
+    		arduino_help)
+    		    opts="lib core version"
+    		    ;;
+	    esac		  
+    	if [[ ${cur} == " *" ]] ; then
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+        fi
+	    return 1
+    }
+_arduino_core_list()
 {
-    case $(last_command) in
-        arduino_lib)
-		    opts="install uninstall list search version"
-	        ;;
-		arduino_lib_list)
-		    opts="update"
-			;;
-		arduino_help)
-		    opts="lib core version"
-		    ;;
-        arduino)
-		    opts="lib help version"
-		    ;;
-	esac		  
-	if [[ ${cur} == " *" ]] ; then
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-        return 0
-    fi
-	return 1
-}
-_arduino_config()
-{
-    last_command="arduino_config"
+    last_command="arduino_core_list"
     commands=()
 
     flags=()
@@ -260,6 +260,50 @@ _arduino_config()
     flags_with_completion=()
     flags_completion=()
 
+    flags+=("--format=")
+    flags+=("--verbose")
+    flags+=("-v")
+
+    must_have_one_flag=()
+    must_have_one_noun=()
+    noun_aliases=()
+}
+
+_arduino_core()
+{
+    last_command="arduino_core"
+    commands=()
+    commands+=("list")
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--update-index")
+    local_nonpersistent_flags+=("--update-index")
+    flags+=("--format=")
+    flags+=("--verbose")
+    flags+=("-v")
+
+    must_have_one_flag=()
+    must_have_one_noun=()
+    noun_aliases=()
+}
+
+_arduino_lib_download()
+{
+    last_command="arduino_lib_download"
+    commands=()
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--format=")
     flags+=("--verbose")
     flags+=("-v")
 
@@ -279,25 +323,7 @@ _arduino_lib_install()
     flags_with_completion=()
     flags_completion=()
 
-    flags+=("--verbose")
-    flags+=("-v")
-
-    must_have_one_flag=()
-    must_have_one_noun=()
-    noun_aliases=()
-}
-
-_arduino_lib_list_update()
-{
-    last_command="arduino_lib_list_update"
-    commands=()
-
-    flags=()
-    two_word_flags=()
-    local_nonpersistent_flags=()
-    flags_with_completion=()
-    flags_completion=()
-
+    flags+=("--format=")
     flags+=("--verbose")
     flags+=("-v")
 
@@ -310,7 +336,6 @@ _arduino_lib_list()
 {
     last_command="arduino_lib_list"
     commands=()
-    commands+=("update")
 
     flags=()
     two_word_flags=()
@@ -318,6 +343,7 @@ _arduino_lib_list()
     flags_with_completion=()
     flags_completion=()
 
+    flags+=("--format=")
     flags+=("--verbose")
     flags+=("-v")
 
@@ -337,6 +363,7 @@ _arduino_lib_search()
     flags_with_completion=()
     flags_completion=()
 
+    flags+=("--format=")
     flags+=("--verbose")
     flags+=("-v")
 
@@ -356,6 +383,7 @@ _arduino_lib_uninstall()
     flags_with_completion=()
     flags_completion=()
 
+    flags+=("--format=")
     flags+=("--verbose")
     flags+=("-v")
 
@@ -375,6 +403,7 @@ _arduino_lib_version()
     flags_with_completion=()
     flags_completion=()
 
+    flags+=("--format=")
     flags+=("--verbose")
     flags+=("-v")
 
@@ -387,6 +416,7 @@ _arduino_lib()
 {
     last_command="arduino_lib"
     commands=()
+    commands+=("download")
     commands+=("install")
     commands+=("list")
     commands+=("search")
@@ -399,6 +429,9 @@ _arduino_lib()
     flags_with_completion=()
     flags_completion=()
 
+    flags+=("--update-index")
+    local_nonpersistent_flags+=("--update-index")
+    flags+=("--format=")
     flags+=("--verbose")
     flags+=("-v")
 
@@ -418,6 +451,7 @@ _arduino_version()
     flags_with_completion=()
     flags_completion=()
 
+    flags+=("--format=")
     flags+=("--verbose")
     flags+=("-v")
 
@@ -430,7 +464,7 @@ _arduino()
 {
     last_command="arduino"
     commands=()
-    commands+=("config")
+    commands+=("core")
     commands+=("lib")
     commands+=("version")
 
@@ -442,6 +476,9 @@ _arduino()
 
     flags+=("--config=")
     local_nonpersistent_flags+=("--config=")
+    flags+=("--format=")
+    flags+=("--generate-docs")
+    local_nonpersistent_flags+=("--generate-docs")
     flags+=("--help")
     flags+=("-h")
     local_nonpersistent_flags+=("--help")
