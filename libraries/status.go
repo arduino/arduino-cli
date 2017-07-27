@@ -32,6 +32,8 @@ package libraries
 import (
 	"fmt"
 
+	"github.com/bcmi-labs/arduino-cli/cmd/output"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/pmylund/sortutil"
 )
 
@@ -42,27 +44,61 @@ type StatusContext struct {
 }
 
 // AddLibrary adds an indexRelease to the status context
-func (l *StatusContext) AddLibrary(indexLib *indexRelease) {
+func (sc *StatusContext) AddLibrary(indexLib *indexRelease) {
 	name := indexLib.Name
-	if l.Libraries[name] == nil {
-		l.Libraries[name] = indexLib.extractLibrary()
+	if sc.Libraries[name] == nil {
+		sc.Libraries[name] = indexLib.extractLibrary()
 	} else {
 		release := indexLib.extractRelease()
-		lib := l.Libraries[name]
+		lib := sc.Libraries[name]
 		lib.Releases[fmt.Sprint(release.Version)] = release
 	}
 }
 
 // Names returns an array with all the names of the registered libraries.
-func (l StatusContext) Names() []string {
-	res := make([]string, len(l.Libraries))
+func (sc StatusContext) Names() []string {
+	res := make([]string, len(sc.Libraries))
 	i := 0
-	for n := range l.Libraries {
+	for n := range sc.Libraries {
 		res[i] = n
 		i++
 	}
 	sortutil.CiAsc(res)
 	return res
+}
+
+// ProcessPairs takes a set of name-version pairs and return
+// a set of items to download and a set of outputs for non
+// existing libraries.
+func (sc StatusContext) ProcessPairs(items []releases.NameVersionPair) ([]releases.DownloadItem, []output.ProcessResult) {
+	itemC := len(items)
+	ret := make([]releases.DownloadItem, 0, itemC)
+	fails := make([]output.ProcessResult, 0, itemC)
+
+	for _, item := range items {
+		library, exists := sc.Libraries[item.Name]
+		if !exists {
+			fails = append(fails, output.ProcessResult{
+				ItemName: item.Name,
+				Error:    "Library Not Found",
+			})
+		} else {
+			release := library.GetVersion(item.Version)
+			if release == nil {
+				fails = append(fails, output.ProcessResult{
+					ItemName: item.Name,
+					Error:    "Version Not Found",
+				})
+			} else { // replaces "latest" with latest version too
+				ret = append(ret, releases.DownloadItem{
+					Name:    library.Name,
+					Release: release,
+				})
+			}
+		}
+	}
+
+	return ret, fails
 }
 
 // CreateStatusContext creates a status context from index data.

@@ -156,45 +156,15 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	libs, failed := purgeInvalidItems(releases.ParseArgs(args), status)
+	pairs := releases.ParseArgs(args)
+	libsToDownload, failOutputs := status.ProcessPairs(pairs)
 	outputResults := output.LibProcessResults{
-		Libraries: failed,
+		Libraries: failOutputs,
 	}
-	releases.ParallelDownloads(libs, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Libraries)
+	releases.ParallelDownload(libsToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Libraries)
 
 	formatter.Print(outputResults)
 	return nil
-}
-
-func purgeInvalidItems(items []releases.NameVersionPair, status libraries.StatusContext) ([]releases.DownloadItem, []output.ProcessResult) {
-	itemC := len(items)
-	ret := make([]releases.DownloadItem, 0, itemC)
-	fails := make([]output.ProcessResult, 0, itemC)
-
-	for _, item := range items {
-		library, exists := status.Libraries[item.Name]
-		if !exists {
-			fails = append(fails, output.ProcessResult{
-				ItemName: item.Name,
-				Error:    "Library Not Found",
-			})
-		} else {
-			release := library.GetVersion(item.Version)
-			if release == nil {
-				fails = append(fails, output.ProcessResult{
-					ItemName: item.Name,
-					Error:    "Version Not Found",
-				})
-			} else { // replaces "latest" with latest version too
-				ret = append(ret, releases.DownloadItem{
-					Name:    library.Name,
-					Release: release,
-				})
-			}
-		}
-	}
-
-	return ret, fails
 }
 
 func executeInstallCommand(cmd *cobra.Command, args []string) error {
@@ -220,14 +190,14 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	parsedArgs := releases.ParseArgs(args)
-	libs, failOutputs := purgeInvalidItems(parsedArgs, status)
+	pairs := releases.ParseArgs(args)
+	libsToDownload, failOutputs := status.ProcessPairs(pairs)
 	outputResults := output.LibProcessResults{
 		Libraries: failOutputs,
 	}
-	releases.ParallelDownloads(libs, false, "Installed", GlobalFlags.Verbose, &outputResults.Libraries)
+	releases.ParallelDownload(libsToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Libraries)
 
-	for i, item := range libs {
+	for i, item := range libsToDownload {
 		err = libraries.InstallLib(item.Name, item.Release)
 		if err != nil {
 			outputResults.Libraries[i] = output.ProcessResult{

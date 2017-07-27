@@ -124,12 +124,12 @@ func downloadAndCache(item DownloadItem, progBar *pb.ProgressBar) task.Wrapper {
 	}
 }
 
-// ParallelDownloads executes multiple releases downloads in parallel and fills properly results.
+// ParallelDownload executes multiple releases downloads in parallel and fills properly results.
 //
 // forced is used to force download if cached.
 // OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
 // DOES NOT RETURN because modified refResults array of results using pointer provided by refResults.Results().
-func ParallelDownloads(items []DownloadItem, forced bool, OkStatus string, verbosity int, refResults *[]output.ProcessResult) {
+func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbosity int, refResults *[]output.ProcessResult) {
 	itemC := len(items)
 	tasks := make(map[string]task.Wrapper, itemC)
 	progressBars := make([]*pb.ProgressBar, 0, itemC)
