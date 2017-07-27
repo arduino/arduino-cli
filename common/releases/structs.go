@@ -27,25 +27,16 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package common
+package releases
 
-import "os"
+// DownloadItem represents a generic item to be Downloaded.
+type DownloadItem struct {
+	Name    string
+	Release Release
+}
 
-// Release represents a generic release.
-type Release interface {
-	// OpenLocalArchiveForDownload opens the local archive file
-	// in append mode if it exists, otherwise it creates it. Returns
-	// the file pointer.
-	OpenLocalArchiveForDownload() (*os.File, error)
-	// ArchivePath returns the fullPath of the Archive of this release.
-	ArchivePath() (string, error)
-	// ExpectedChecksum returns the expected checksum for this release.
-	ExpectedChecksum() string
-	// ArchiveURL returns the archive URL.
-	ArchiveURL() string
-	// ArchiveSize returns the archive size.
-	ArchiveSize() int64
-	// CheckLocalArchive uses ExpectedChecksum to check if the file is
-	// correctly downloaded.
-	CheckLocalArchive() error
+// NameVersionPair represents a pair Name - Version.
+type NameVersionPair struct {
+	Name    string
+	Version string
 }

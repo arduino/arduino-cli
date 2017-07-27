@@ -37,8 +37,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/bcmi-labs/arduino-cli/task"
-
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -126,53 +124,4 @@ func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressB
 		return fmt.Errorf("Cannot read response body %s", err)
 	}
 	return nil
-}
-
-// DownloadRelease downloads a generic release.
-//
-//   PARAMS:
-//     name -> The name of the Item to download
-//     release -> The release to download
-//     progBar -> a progress bar, can be nil. If not nill progress is handled for that bar.
-//     label -> Name used to identify the type of the Item downloaded (library, core, tool)
-//   RETURNS:
-//     error if any
-func DownloadRelease(name string, release Release, progBar *pb.ProgressBar, label string) error {
-	if release == nil {
-		return errors.New("Cannot accept nil release")
-	}
-
-	initialData, err := release.OpenLocalArchiveForDownload()
-	if err != nil {
-		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
-	}
-	defer initialData.Close()
-	err = DownloadPackage(release.ArchiveURL(), fmt.Sprint(label, " ", name), progBar, initialData, release.ArchiveSize())
-	if err != nil {
-		return err
-	}
-	err = release.CheckLocalArchive()
-	if err != nil {
-		return errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
-	}
-	return nil
-}
-
-// DownloadAndCache returns the wrapper to download something without installing it
-func DownloadAndCache(name string, release Release, progBar *pb.ProgressBar) task.Wrapper {
-	return task.Wrapper{
-		Task: func() task.Result {
-			err := DownloadRelease(name, release, progBar, "library")
-			if err != nil {
-				return task.Result{
-					Result: nil,
-					Error:  err,
-				}
-			}
-			return task.Result{
-				Result: nil,
-				Error:  nil,
-			}
-		},
-	}
 }

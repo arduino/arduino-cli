@@ -39,60 +39,45 @@ import (
 	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
 )
 
 // Uninstall a library means remove its directory.
 var Uninstall = os.RemoveAll
 
-// IsCached returns a bool representing if the release has already been downloaded
-func (lib Library) IsCached(version string) bool {
-	stagingFolder, err := getDownloadCacheFolder()
-	if err != nil {
-		return false
-	}
-
-	rel, exists := lib.Releases[version]
-	if !exists {
-		return false
-	}
-
-	_, err = os.Stat(filepath.Join(stagingFolder, rel.ArchiveFileName))
-	return !os.IsNotExist(err)
-}
-
 // InstallLib installs a library.
-func InstallLib(library *Library, version string) error {
-	release := library.GetVersion(version)
+func InstallLib(name string, release releases.Release) error {
 	if release == nil {
 		return errors.New("Not existing version of the library")
 	}
 
-	installedRelease, err := library.InstalledRelease()
-	if err != nil {
-		return err
-	}
-	if installedRelease != nil {
-		//if installedRelease.Version != library.Latest().Version {
-		err := removeRelease(library, installedRelease)
+	/*
+		installedRelease, err := library.InstalledRelease()
 		if err != nil {
 			return err
 		}
-		//} else {
-		//	return nil // Already installed and latest version.
-		//}
-	}
-
+		if installedRelease != nil {
+			//if installedRelease.Version != library.Latest().Version {
+			err := removeRelease(library, installedRelease)
+			if err != nil {
+				return err
+			}
+			//} else {
+			//	return nil // Already installed and latest version.
+			//}
+		}
+	*/
 	libFolder, err := common.GetDefaultLibFolder()
 	if err != nil {
 		return err
 	}
 
-	stagingFolder, err := getDownloadCacheFolder()
+	stagingFolder, err := release.GetDownloadCacheFolder()
 	if err != nil {
 		return err
 	}
 
-	cacheFilePath := filepath.Join(stagingFolder, release.ArchiveFileName)
+	cacheFilePath := filepath.Join(stagingFolder, release.ArchiveName())
 
 	zipArchive, err := zip.OpenReader(cacheFilePath)
 	if err != nil {

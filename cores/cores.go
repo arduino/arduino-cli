@@ -180,9 +180,22 @@ func (release Release) checksumMatches() bool {
 	return checksums.Match(release)
 }
 
+// Implementation of Release interface
+
 // ExpectedChecksum returns the expected checksum for this release.
 func (release Release) ExpectedChecksum() string {
 	return release.Checksum
+}
+
+// GetDownloadCacheFolder returns the cache folder of this release.
+// Mostly this is based on the type of release (library, core, tool)
+func (release Release) GetDownloadCacheFolder() (string, error) {
+	return getDownloadCacheFolder()
+}
+
+// ArchiveName returns the archive file name (not the path)
+func (release Release) ArchiveName() string {
+	return release.ArchiveFileName
 }
 
 // ArchiveSize returns the archive size.

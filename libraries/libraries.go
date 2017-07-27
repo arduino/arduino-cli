@@ -179,11 +179,6 @@ func (r Release) checksumMatches() bool {
 	return checksums.Match(r)
 }
 
-// ExpectedChecksum returns the expected checksum for this release.
-func (r Release) ExpectedChecksum() string {
-	return r.Checksum
-}
-
 // Versions returns an array of all versions available of the library
 func (l Library) Versions() semver.Versions {
 	res := make(semver.Versions, len(l.Releases))
@@ -254,6 +249,8 @@ func (l Library) String() string {
 		fmt.Sprintln("  Versions: ", strings.Replace(fmt.Sprint(l.Versions()), " ", ", ", -1))
 }
 
+// Release interface implementation
+
 // ArchiveSize returns the archive size.
 func (r Release) ArchiveSize() int64 {
 	return r.Size
@@ -262,4 +259,21 @@ func (r Release) ArchiveSize() int64 {
 // ArchiveURL returns the archive URL.
 func (r Release) ArchiveURL() string {
 	return r.URL
+}
+
+// GetDownloadCacheFolder returns the cache folder of this release.
+// Mostly this is based on the type of release (library, core, tool)
+// In this case returns libraries cache folder.
+func (r Release) GetDownloadCacheFolder() (string, error) {
+	return getDownloadCacheFolder()
+}
+
+// ArchiveName returns the archive file name (not the path).
+func (r Release) ArchiveName() string {
+	return r.ArchiveFileName
+}
+
+// ExpectedChecksum returns the expected checksum for this release.
+func (r Release) ExpectedChecksum() string {
+	return r.Checksum
 }
