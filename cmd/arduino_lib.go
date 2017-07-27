@@ -156,13 +156,11 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	outputResults := output.LibProcessResults{
-		Libraries: make([]output.ProcessResult, 0, 10),
-	}
 	libs, failed := purgeInvalidItems(releases.ParseArgs(args), status)
-	releases.ParallelDownloads(libs, true, "Downloaded", GlobalFlags.Verbose, outputResults)
-
-	outputResults.Libraries = append(outputResults.Libraries, failed...)
+	outputResults := output.LibProcessResults{
+		Libraries: failed,
+	}
+	releases.ParallelDownloads(libs, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Libraries)
 
 	formatter.Print(outputResults)
 	return nil
@@ -171,7 +169,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 func purgeInvalidItems(items []releases.NameVersionPair, status libraries.StatusContext) ([]releases.DownloadItem, []output.ProcessResult) {
 	itemC := len(items)
 	ret := make([]releases.DownloadItem, 0, itemC)
-	fails := make([]output.ProcessResult, itemC)
+	fails := make([]output.ProcessResult, 0, itemC)
 
 	for _, item := range items {
 		library, exists := status.Libraries[item.Name]
@@ -222,13 +220,11 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	outputResults := output.LibProcessResults{
-		Libraries: make([]output.ProcessResult, 0, 10),
-	}
 	libs, failed := purgeInvalidItems(releases.ParseArgs(args), status)
-	releases.ParallelDownloads(libs, false, "Installed", GlobalFlags.Verbose, outputResults)
-
-	outputResults.Libraries = append(outputResults.Libraries, failed...)
+	outputResults := output.LibProcessResults{
+		Libraries: failed,
+	}
+	releases.ParallelDownloads(libs, false, "Installed", GlobalFlags.Verbose, &outputResults.Libraries)
 
 	for i, item := range libs {
 		err = libraries.InstallLib(item.Name, item.Release)
@@ -237,12 +233,6 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 				ItemName: item.Name,
 				Status:   "",
 				Error:    err.Error(),
-			}
-		} else {
-			outputResults.Libraries[i] = output.ProcessResult{
-				ItemName: item.Name,
-				Status:   "Installed",
-				Error:    "",
 			}
 		}
 	}

@@ -129,22 +129,25 @@ func downloadAndCache(item DownloadItem, progBar *pb.ProgressBar) task.Wrapper {
 // forced is used to force download if cached.
 // OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
 // DOES NOT RETURN because modified refResults array of results using pointer provided by refResults.Results().
-func ParallelDownloads(items []DownloadItem, forced bool, OkStatus string, verbosity int, refResults output.ProcessResults) {
+func ParallelDownloads(items []DownloadItem, forced bool, OkStatus string, verbosity int, refResults *[]output.ProcessResult) {
 	itemC := len(items)
-
 	tasks := make(map[string]task.Wrapper, itemC)
 	progressBars := make([]*pb.ProgressBar, 0, itemC)
-
 	textMode := formatter.IsCurrentFormat("text")
-	// items as map[name]release ????
 	for _, item := range items {
-		if forced || item.Release != nil && !IsCached(item.Release) || item.Release.CheckLocalArchive() != nil {
+		if forced || item.Release != nil && (!IsCached(item.Release) || item.Release.CheckLocalArchive() != nil) {
 			var pBar *pb.ProgressBar
 			if textMode {
 				pBar = pb.StartNew(int(item.Release.ArchiveSize())).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", item.Name))
 				progressBars = append(progressBars, pBar)
 			}
 			tasks[item.Name] = downloadAndCache(item, pBar)
+		} else if !forced && item.Release != nil && IsCached(item.Release) {
+			//Consider OK
+			*refResults = append(*refResults, output.ProcessResult{
+				ItemName: item.Name,
+				Status:   OkStatus,
+			})
 		}
 	}
 
@@ -160,15 +163,14 @@ func ParallelDownloads(items []DownloadItem, forced bool, OkStatus string, verbo
 			pool.Stop()
 		}
 
-		outputResults := refResults.Results()
 		for name, result := range results {
 			if result.Error != nil {
-				*outputResults = append(*outputResults, output.ProcessResult{
+				*refResults = append(*refResults, output.ProcessResult{
 					ItemName: name,
 					Error:    result.Error.Error(),
 				})
 			} else {
-				*outputResults = append(*outputResults, output.ProcessResult{
+				*refResults = append(*refResults, output.ProcessResult{
 					ItemName: name,
 					Status:   OkStatus,
 				})

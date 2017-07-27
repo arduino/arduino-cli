@@ -91,7 +91,7 @@ func (lsr LibSearchResults) String() string {
 	return strings.TrimSpace(ret)
 }
 
-// Results returns a set of generic results.
+// Results returns a set of generic results, to allow them to be modified externally.
 //
 // -> ProcessResults interface.
 func (lpr LibProcessResults) Results() *[]ProcessResult {
