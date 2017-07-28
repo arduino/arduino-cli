@@ -1,6 +1,7 @@
 package formatter
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 )
@@ -87,4 +88,15 @@ func TestJSONFormatterPrintDebug(test *testing.T) {
 	// {value:20}
 	// Only structs and maps values are accepted
 	// {value2:10}
+}
+
+func TestPrintError(test *testing.T) {
+	SetFormatter("text")
+	PrintError(errors.New("text error"))
+	SetFormatter("json")
+	PrintError(errors.New("json error"))
+
+	// Output:
+	// text error
+	// {error:"json error"}
 }

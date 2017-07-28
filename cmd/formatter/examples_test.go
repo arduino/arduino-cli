@@ -29,7 +29,7 @@ func ExampleJSONFormatter_Print() {
 
 	// Output:
 	// {"field1":"test","field2":10,"field3":{"inner1":"inner test","inner2":10.432412}}
-	// "Only struct values and maps are accepted"
+	//
 }
 
 func ExampleJSONFormatter_Format() {
@@ -51,19 +51,20 @@ func ExampleJSONFormatter_Format() {
 	var result string
 	result, err := jf.Format(example)
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println("ERROR:", err)
+	} else {
+		fmt.Println("RESULT:", result)
 	}
-	fmt.Print(result)
 
 	var example2 float32 = 3.14
 	result, err = jf.Format(example2)
 	if err != nil {
-		fmt.Print("ERROR: ", err)
-	} else {
-		fmt.Print("RESULT: ", result)
+		fmt.Println("ERROR:", err)
+	} else if result == "" {
+		fmt.Println("RESULT: <empty string>")
 	}
 
 	// Output:
 	// RESULT: {"field1":"test","field2":10,"field3":{"inner1":"inner test","inner2":10.432412}}
-	// ERROR: "Only struct values and maps are accepted"
+	// RESULT: <empty string>
 }
