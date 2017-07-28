@@ -71,7 +71,7 @@ func DownloadIndex(indexPathFunc func() (string, error), URL string) error {
 }
 
 // DownloadPackage downloads a package from arduino repository, applying a label for the progress bar.
-func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleResultFunc func(io.Reader, int) error) error {
+func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleResultFunc func(io.Reader, *os.File, int) error) error {
 	if initialData == nil {
 		return errors.New("Cannot fill a nil file pointer")
 	}
@@ -116,7 +116,7 @@ func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleRe
 	if handleResultFunc == nil {
 		_, err = io.Copy(initialData, response.Body)
 	} else {
-		err = handleResultFunc(response.Body, int(initialSize))
+		err = handleResultFunc(response.Body, initialData, int(initialSize))
 	}
 	if err != nil {
 		return fmt.Errorf("Cannot read response body from %s : %s", URL, err)

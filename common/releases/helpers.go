@@ -85,37 +85,26 @@ func ParseArgs(args []string) []NameVersionPair {
 //     label -> Name used to identify the type of the Item downloaded (library, core, tool)
 //   RETURNS:
 //     error if any
-func downloadRelease(item DownloadItem, progBar *pb.ProgressBar, label string) (io.Reader, error) {
+func downloadRelease(item DownloadItem, progBar *pb.ProgressBar, label string) error {
 	if item.Release == nil {
-		return nil, errors.New("Cannot accept nil release")
+		return errors.New("Cannot accept nil release")
 	}
-
 	initialData, err := item.Release.OpenLocalArchiveForDownload()
 	if err != nil {
-		return nil, fmt.Errorf("Cannot get Archive file of this release : %s", err)
+		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
 	}
 	defer initialData.Close()
 	// puts the progress bar
-	err = common.DownloadPackage(item.Release.ArchiveURL(), initialData, item.Release.ArchiveSize(), func(source io.Reader, initialSize int) error {
-		if progBar != nil {
-			progBar.Add(int(initialSize))
-			source = progBar.NewProxyReader(source)
-		}
-
-		_, err = io.Copy(initialData, source)
-		if err != nil {
-			return fmt.Errorf("Cannot read response body %s", err)
-		}
-		return nil
-	})
+	err = common.DownloadPackage(item.Release.ArchiveURL(), initialData,
+		item.Release.ArchiveSize(), handleWithProgressBarFunc(progBar))
 	if err != nil {
-		return nil, err
+		return err
 	}
 	err = checkLocalArchive(item.Release)
 	if err != nil {
-		return nil, errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
+		return errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
 	}
-	return reader, nil
+	return nil
 }
 
 // downloadAndCache returns the wrapper to download something without installing it
@@ -191,5 +180,21 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbos
 				})
 			}
 		}
+	}
+}
+
+func handleWithProgressBarFunc(progBar *pb.ProgressBar) func(io.Reader, *os.File, int) error {
+	if progBar == nil {
+		return nil
+	}
+	return func(source io.Reader, initialData *os.File, initialSize int) error {
+		progBar.Add(int(initialSize))
+		source = progBar.NewProxyReader(source)
+
+		_, err := io.Copy(initialData, source)
+		if err != nil {
+			return fmt.Errorf("Cannot read response body %s", err)
+		}
+		return nil
 	}
 }
