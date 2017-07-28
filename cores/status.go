@@ -52,10 +52,10 @@ func (cd CoreDependency) String() string {
 	return strings.TrimSpace(fmt.Sprintln(cd.ToolName, " v.", cd.Release.Version))
 }
 
-// AddPackage adds a package to a context from an indexPackage.
+// Add adds a package to a context from an indexPackage.
 //
 // NOTE: If the package is already in the context, it is overwritten!
-func (sc *StatusContext) AddPackage(indexPackage *indexPackage) {
+func (sc *StatusContext) Add(indexPackage *indexPackage) {
 	sc.Packages[indexPackage.Name] = indexPackage.extractPackage()
 }
 
@@ -102,7 +102,7 @@ func (index Index) CreateStatusContext() (StatusContext, error) {
 		Packages: make(map[string]*Package, len(index.Packages)),
 	}
 	for _, packageManager := range index.Packages {
-		packages.AddPackage(packageManager)
+		packages.Add(packageManager)
 	}
 	return packages, nil
 }
