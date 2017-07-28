@@ -64,9 +64,9 @@ func IndexPath() (string, error) {
 	return common.IndexPath("library_index.json")
 }
 
-// LoadLibrariesIndex reads a library_index.json from a file and returns
+// LoadIndex reads a library_index.json from a file and returns
 // the corresponding LibrariesIndex structure.
-func LoadLibrariesIndex(index *Index) error {
+func LoadIndex(index *Index) error {
 	libFile, err := IndexPath()
 	if err != nil {
 		return err

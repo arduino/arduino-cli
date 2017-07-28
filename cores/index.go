@@ -184,9 +184,9 @@ func (itr indexToolRelease) extractFlavours() map[string]*Flavour {
 	return ret
 }
 
-// LoadPackagesIndex reads a package_index.json from a file and returns
+// LoadIndex reads a package_index.json from a file and returns
 // the corresponding Index structure.
-func LoadPackagesIndex(index *Index) error {
+func LoadIndex(index *Index) error {
 	libFile, err := IndexPath()
 	if err != nil {
 		return err

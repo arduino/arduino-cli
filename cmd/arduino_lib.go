@@ -139,7 +139,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	var index libraries.Index
-	err := libraries.LoadLibrariesIndex(&index)
+	err := libraries.LoadIndex(&index)
 	if err != nil {
 		formatter.Print("Cannot find index file ... " + err.Error())
 		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
@@ -173,7 +173,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	var index libraries.Index
-	err := libraries.LoadLibrariesIndex(&index)
+	err := libraries.LoadIndex(&index)
 	if err != nil {
 		formatter.Print("Cannot find index file ..." + err.Error())
 		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
@@ -341,7 +341,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	var index libraries.Index
-	err := libraries.LoadLibrariesIndex(&index)
+	err := libraries.LoadIndex(&index)
 	if err != nil {
 		formatter.PrintErrorMessage("Index file is corrupted. Please replace it by updating : arduino lib list update")
 		return nil
