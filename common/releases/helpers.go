@@ -98,7 +98,7 @@ func downloadRelease(item DownloadItem, progBar *pb.ProgressBar, label string) e
 	if err != nil {
 		return err
 	}
-	err = item.Release.CheckLocalArchive()
+	err = checkLocalArchive(item.Release)
 	if err != nil {
 		return errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
 	}
@@ -137,7 +137,7 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbos
 	for _, item := range items {
 		cached := IsCached(item.Release)
 		releaseNotNil := item.Release != nil
-		if forced || releaseNotNil && (!cached || item.Release.CheckLocalArchive() != nil) {
+		if forced || releaseNotNil && (!cached || checkLocalArchive(item.Release) != nil) {
 			var pBar *pb.ProgressBar
 			if textMode {
 				pBar = pb.StartNew(int(item.Release.ArchiveSize())).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", item.Name))

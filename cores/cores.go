@@ -30,13 +30,11 @@
 package cores
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/blang/semver"
 )
 
@@ -152,32 +150,6 @@ func (release Release) ArchivePath() (string, error) {
 		return "", err
 	}
 	return filepath.Join(staging, release.ArchiveFileName), nil
-}
-
-// CheckLocalArchive check for integrity of the local archive.
-func (release Release) CheckLocalArchive() error {
-	archivePath, err := release.ArchivePath()
-	if err != nil {
-		return err
-	}
-	stats, err := os.Stat(archivePath)
-	if os.IsNotExist(err) {
-		return errors.New("Archive does not exist")
-	}
-	if err != nil {
-		return err
-	}
-	if stats.Size() > release.Size {
-		return errors.New("Archive size does not match with specification of this release, assuming corruption")
-	}
-	if !release.checksumMatches() {
-		return errors.New("Checksum does not match, assuming corruption")
-	}
-	return nil
-}
-
-func (release Release) checksumMatches() bool {
-	return releases.Match(release)
 }
 
 // Implementation of Release interface

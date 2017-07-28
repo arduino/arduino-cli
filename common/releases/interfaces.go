@@ -47,9 +47,6 @@ type Release interface {
 	ArchiveURL() string
 	// ArchiveSize returns the archive size.
 	ArchiveSize() int64
-	// CheckLocalArchive uses ExpectedChecksum to check if the file is
-	// correctly downloaded.
-	CheckLocalArchive() error
 	// GetDownloadCacheFolder returns the cache folder of this release.
 	// Mostly this is based on the type of release (library, core, tool)
 	GetDownloadCacheFolder() (string, error)

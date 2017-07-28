@@ -31,7 +31,6 @@ package libraries
 
 import (
 	"bufio"
-	"errors"
 
 	"strings"
 
@@ -44,7 +43,6 @@ import (
 	"fmt"
 
 	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/blang/semver"
 )
 
@@ -151,32 +149,6 @@ func (r Release) ArchivePath() (string, error) {
 		return "", err
 	}
 	return filepath.Join(staging, r.ArchiveFileName), nil
-}
-
-// CheckLocalArchive check for integrity of the local archive.
-func (r Release) CheckLocalArchive() error {
-	archivePath, err := r.ArchivePath()
-	if err != nil {
-		return err
-	}
-	stats, err := os.Stat(archivePath)
-	if os.IsNotExist(err) {
-		return errors.New("Archive does not exist")
-	}
-	if err != nil {
-		return err
-	}
-	if stats.Size() > r.ArchiveSize() {
-		return errors.New("Archive size does not match with specification of this release, assuming corruption")
-	}
-	if !r.checksumMatches() {
-		return errors.New("Checksum does not match, assuming corruption")
-	}
-	return nil
-}
-
-func (r Release) checksumMatches() bool {
-	return releases.Match(r)
 }
 
 // Versions returns an array of all versions available of the library
