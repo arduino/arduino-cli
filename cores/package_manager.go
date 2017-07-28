@@ -29,20 +29,18 @@
 
 package cores
 
-import "github.com/pmylund/sortutil"
-
 //Package represents a package in the system.
 type Package struct {
-	Name       string
-	Maintainer string
-	WebsiteURL string
-	Email      string
+	Name       string           // Name of the package.
+	Maintainer string           // Name of the maintainer.
+	WebsiteURL string           // Website of maintainer.
+	Email      string           // Email of maintainer.
 	Cores      map[string]*Core // The cores in the system.
-	// Tools map[string]*Tool // The tools in the system.
+	Tools      map[string]*Tool // The tools in the system.
 }
 
-// AddCore adds a core to the context.
-func (pm *Package) AddCore(indexCore *indexCoreRelease) {
+// addCore adds a core to the context.
+func (pm *Package) addCore(indexCore *indexCoreRelease) {
 	name := indexCore.Name
 	if pm.Cores[name] == nil {
 		pm.Cores[name] = indexCore.extractCore()
@@ -53,23 +51,12 @@ func (pm *Package) AddCore(indexCore *indexCoreRelease) {
 	}
 }
 
-// Items returns the list of cores of this package.
-func (pm Package) Items() map[string]interface{} {
-	ret := make(map[string]interface{}, len(pm.Cores))
-	for key, val := range pm.Cores {
-		ret[key] = val
+// addTool adds a tool to the context.
+func (pm *Package) addTool(indexTool *indexToolRelease) {
+	name := indexTool.Name
+	if pm.Tools[name] == nil {
+		pm.Tools[name] = indexTool.extractTool()
+	} else {
+		pm.Tools[name].Releases[indexTool.Version] = indexTool.extractRelease()
 	}
-	return ret
-}
-
-// Names returns an array with all the names of the registered cores.
-func (pm Package) Names() []string {
-	res := make([]string, len(pm.Cores))
-	i := 0
-	for n := range pm.Cores {
-		res[i] = n
-		i++
-	}
-	sortutil.CiAsc(res)
-	return res
 }

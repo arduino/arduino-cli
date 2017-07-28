@@ -1,15 +1,14 @@
-package checksums
+package releases
 
 import (
 	"bytes"
 	"crypto"
 	"encoding/hex"
+	"errors"
 	"hash"
 	"io"
 	"os"
 	"strings"
-
-	"github.com/bcmi-labs/arduino-cli/common"
 )
 
 func getHashAlgoAndComponent(checksum string) (hash.Hash, []byte) {
@@ -33,9 +32,9 @@ func getHashAlgoAndComponent(checksum string) (hash.Hash, []byte) {
 	}
 }
 
-// Match checks the checksum of a Release archive, in compliance with
+// ChecksumMatches checks the checksum of a Release archive, in compliance with
 // What Checksum is expected.
-func Match(r common.Release) bool {
+func checksumMatches(r Release) bool {
 	hash, content := getHashAlgoAndComponent(r.ExpectedChecksum())
 	filePath, err := r.ArchivePath()
 	if err != nil {
@@ -49,4 +48,26 @@ func Match(r common.Release) bool {
 	defer file.Close()
 	io.Copy(hash, file)
 	return bytes.Compare(hash.Sum(nil), content) == 0
+}
+
+// CheckLocalArchive check for integrity of the local archive.
+func checkLocalArchive(release Release) error {
+	archivePath, err := release.ArchivePath()
+	if err != nil {
+		return err
+	}
+	stats, err := os.Stat(archivePath)
+	if os.IsNotExist(err) {
+		return errors.New("Archive does not exist")
+	}
+	if err != nil {
+		return err
+	}
+	if stats.Size() > release.ArchiveSize() {
+		return errors.New("Archive size does not match with specification of this release, assuming corruption")
+	}
+	if !checksumMatches(release) {
+		return errors.New("Checksum does not match, assuming corruption")
+	}
+	return nil
 }

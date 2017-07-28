@@ -27,34 +27,16 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package output
+package releases
 
-import (
-	"fmt"
-)
+// DownloadItem represents a generic item to be Downloaded.
+type DownloadItem struct {
+	Name    string
+	Release Release
+}
 
-// LibResultsFromMap returns a LibProcessResults struct from a specified map of results.
-func LibResultsFromMap(resMap map[string]interface{}) LibProcessResults {
-	results := LibProcessResults{
-		Libraries: make([]libProcessResult, len(resMap)),
-	}
-	i := 0
-	for libName, libResult := range resMap {
-		_, isError := libResult.(error)
-		if isError {
-			results.Libraries[i] = libProcessResult{
-				LibraryName: libName,
-				Status:      "",
-				Error:       fmt.Sprint(libResult),
-			}
-		} else {
-			results.Libraries[i] = libProcessResult{
-				LibraryName: libName,
-				Status:      fmt.Sprint(libResult),
-				Error:       "",
-			}
-		}
-		i++
-	}
-	return results
+// NameVersionPair represents a pair Name - Version.
+type NameVersionPair struct {
+	Name    string
+	Version string
 }

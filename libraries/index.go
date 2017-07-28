@@ -32,7 +32,6 @@ package libraries
 import (
 	"encoding/json"
 	"io/ioutil"
-	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
 )
@@ -44,8 +43,8 @@ type Index struct {
 
 // indexRelease is an entry of a library_index.json
 type indexRelease struct {
-	Name            string   `json:"name"`
-	Version         string   `json:"version"`
+	Name            string   `json:"name,required"`
+	Version         string   `json:"version,required"`
 	Author          string   `json:"author"`
 	Maintainer      string   `json:"maintainer"`
 	Sentence        string   `json:"sentence"`
@@ -56,39 +55,34 @@ type indexRelease struct {
 	Types           []string `json:"types"`
 	URL             string   `json:"url"`
 	ArchiveFileName string   `json:"archiveFileName"`
-	Size            int      `json:"size"`
+	Size            int64    `json:"size"`
 	Checksum        string   `json:"checksum"`
 }
 
 //IndexPath returns the path of the index file for libraries.
 func IndexPath() (string, error) {
-	baseFolder, err := common.GetDefaultArduinoFolder()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(baseFolder, "library_index.json"), nil
+	return common.IndexPath("library_index.json")
 }
 
-// LoadLibrariesIndex reads a library_index.json from a file and returns
+// LoadIndex reads a library_index.json from a file and returns
 // the corresponding LibrariesIndex structure.
-func LoadLibrariesIndex() (common.Index, error) {
+func LoadIndex(index *Index) error {
 	libFile, err := IndexPath()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	libBuff, err := ioutil.ReadFile(libFile)
+	buff, err := ioutil.ReadFile(libFile)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var index Index
-	err = json.Unmarshal(libBuff, &index)
+	err = json.Unmarshal(buff, index)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return index, nil
+	return nil
 }
 
 // extractRelease create a new Release with the information contained

@@ -27,52 +27,26 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package formatter
+package cmd
 
-import (
-	"encoding/json"
-	"errors"
-	"fmt"
-	"strings"
-)
-
-// ErrorMessage represents an Error with an attached message.
-//
-// It's the same as a normal error, but It is also parsable as JSON.
-type ErrorMessage struct {
-	message string
+// GlobalFlags represents flags available in all the program.
+var GlobalFlags struct {
+	Verbose int    // More time verbose flag is written, the more the Verbose count increases. Represents verbosity level.
+	Format  string // The Output format (e.g. text, json).
 }
 
-// MarshalJSON allows to marshal this object as a JSON object.
-func (err ErrorMessage) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]string{
-		"error": err.message,
-	})
+// rootCmdFlags represent flags available to the root command.
+var rootCmdFlags struct {
+	ConfigFile   string // The path of the config file provided by the omonym flag.
+	GenerateDocs bool   // if true, generates manpages and bash autocompletion.
 }
 
-// Error returns the error message.
-func (err ErrorMessage) Error() string {
-	return fmt.Sprint(err.message)
+// arduinoLibFlags represents `arduino lib` flags.
+var arduinoLibFlags struct {
+	updateIndex bool
 }
 
-// String returns a string representation of the Error.
-func (err ErrorMessage) String() string {
-	return err.Error()
-}
-
-// FromError creates an ErrorMessage from an Error.
-func FromError(err error) ErrorMessage {
-	return ErrorMessage{
-		message: err.Error(),
-	}
-}
-
-// PrintErrorMessage formats and prints info about an error message.
-func PrintErrorMessage(msg string) {
-	PrintError(errors.New(strings.TrimSpace(msg)))
-}
-
-// PrintError formats and prints info about an error.
-func PrintError(err error) {
-	Print(FromError(err))
+// arduinoCoreFlags represents `arduino core` flags.
+var arduinoCoreFlags struct {
+	updateIndex bool
 }

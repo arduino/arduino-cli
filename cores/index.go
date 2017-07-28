@@ -32,7 +32,6 @@ package cores
 import (
 	"encoding/json"
 	"io/ioutil"
-	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
 )
@@ -44,38 +43,65 @@ type Index struct {
 
 //IndexPath returns the path of the index file for libraries.
 func IndexPath() (string, error) {
-	baseFolder, err := common.GetDefaultArduinoFolder()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(baseFolder, "package_index.json"), nil
+	return common.IndexPath("package_index.json")
 }
 
 //indexPackage represents a single entry from package_index.json file.
 type indexPackage struct {
-	Name       string              `json:"name"`
-	Maintainer string              `json:"maintainer"`
+	Name       string              `json:"name,required"`
+	Maintainer string              `json:"maintainer,required"`
 	WebsiteURL string              `json:"websiteUrl"`
 	Email      string              `json:"email"`
-	Platforms  []*indexCoreRelease `json:"platforms"`
-	//Tools      []*indexToolRelease `json:"tools"`
-} //TODO: help : { online : "address" } is not in all package managers
+	Platforms  []*indexCoreRelease `json:"platforms,required"`
+	Tools      []*indexToolRelease `json:"tools,required"`
+	Help       indexHelpRelease    `json:"help,omitempty"`
+}
 
 // indexCoreRelease represents a single Core Platform from package_index.json file.
 type indexCoreRelease struct {
-	Name            string              `json:"name"`
-	Architecture    string              `json:"architecture"`
-	Version         string              `json:"version"`
-	Category        string              `json:"category"`
-	URL             string              `json:"url"`
-	ArchiveFileName string              `json:"archiveFileName"`
-	Checksum        string              `json:"checksum"`
-	Size            int64               `json:"size"`
-	Boards          []indexBoardRelease `json:"boards"`
+	Name             string                `json:"name,required"`
+	Architecture     string                `json:"architecture"`
+	Version          string                `json:"version,required"`
+	Category         string                `json:"category"`
+	URL              string                `json:"url"`
+	ArchiveFileName  string                `json:"archiveFileName,required"`
+	Checksum         string                `json:"checksum,required"`
+	Size             int64                 `json:"size,required"`
+	Boards           []indexBoardRelease   `json:"boards"`
+	Help             indexHelpRelease      `json:"help,omitempty"`
+	ToolDependencies []indexToolDependency `json:"toolDependencies"`
 }
 
+// indexToolDependency represents a single dependency of a core from a tool.
+type indexToolDependency struct {
+	Packager string `json:"packager,required"`
+	Name     string `json:"name,required"`
+	Version  string `json:"version,required"`
+}
+
+// indexToolRelease represents a single Tool from package_index.json file.
+type indexToolRelease struct {
+	Name    string                `json:"name,required"`
+	Version string                `json:"version,required"`
+	Systems []indexFlavourRelease `json:"systems,required"`
+}
+
+//indexFlavourRelease represents a single flavour in the package_index.json file.
+type indexFlavourRelease struct {
+	OS              string `json:"host,required"`
+	URL             string `json:"url,required"`
+	ArchiveFileName string `json:"archiveFileName,required"`
+	Size            int    `json:"size,required"`
+	Checksum        string `json:"checksum,required"`
+}
+
+// indexBoardRelease represents a single Board as written in package_index.json file.
 type indexBoardRelease struct {
 	Name string
+}
+
+type indexHelpRelease struct {
+	Online string `json:"online,omitempty"`
 }
 
 func (packag indexPackage) extractPackage() (pm *Package) {
@@ -85,14 +111,20 @@ func (packag indexPackage) extractPackage() (pm *Package) {
 		WebsiteURL: packag.WebsiteURL,
 		Email:      packag.Email,
 		Cores:      make(map[string]*Core, len(packag.Platforms)),
+		Tools:      make(map[string]*Tool, len(packag.Tools)),
+	}
+
+	for _, tool := range packag.Tools {
+		pm.addTool(tool)
 	}
 	for _, core := range packag.Platforms {
-		pm.AddCore(core)
+		pm.addCore(core)
 	}
+
 	return
 }
 
-func (release *indexCoreRelease) extractCore() *Core {
+func (release indexCoreRelease) extractCore() *Core {
 	return &Core{
 		Name:         release.Name,
 		Architecture: release.Architecture,
@@ -101,7 +133,7 @@ func (release *indexCoreRelease) extractCore() *Core {
 	}
 }
 
-func (release *indexCoreRelease) extractRelease() *Release {
+func (release indexCoreRelease) extractRelease() *Release {
 	return &Release{
 		Version:         release.Version,
 		ArchiveFileName: release.ArchiveFileName,
@@ -111,7 +143,7 @@ func (release *indexCoreRelease) extractRelease() *Release {
 	}
 }
 
-func (release *indexCoreRelease) extractBoards() []string {
+func (release indexCoreRelease) extractBoards() []string {
 	boards := make([]string, 0, len(release.Boards))
 	for i, board := range release.Boards {
 		boards[i] = board.Name
@@ -119,24 +151,56 @@ func (release *indexCoreRelease) extractBoards() []string {
 	return boards
 }
 
-// LoadPackagesIndex reads a package_index.json from a file and returns
+// extractTool extracts a Tool object from an indexToolRelease entry.
+func (itr indexToolRelease) extractTool() *Tool {
+	releases := make(map[string]*ToolRelease, len(itr.Systems))
+	releases[itr.Version] = itr.extractRelease()
+	return &Tool{
+		Name:     itr.Name,
+		Releases: releases,
+	}
+}
+
+// extractRelease extracts a ToolRelease object from an indexToolRelease entry.
+func (itr indexToolRelease) extractRelease() *ToolRelease {
+	return &ToolRelease{
+		Version:  itr.Version,
+		Flavours: itr.extractFlavours(),
+	}
+}
+
+// extractFlavours extracts a map[OS]Flavour object from an indexToolRelease entry.
+func (itr indexToolRelease) extractFlavours() map[string]*Flavour {
+	ret := make(map[string]*Flavour, len(itr.Systems))
+	for _, flavour := range itr.Systems {
+		ret[flavour.OS] = &Flavour{
+			OS:              flavour.OS,
+			ArchiveFileName: flavour.ArchiveFileName,
+			Checksum:        flavour.Checksum,
+			Size:            flavour.Size,
+			URL:             flavour.URL,
+		}
+	}
+	return ret
+}
+
+// LoadIndex reads a package_index.json from a file and returns
 // the corresponding Index structure.
-func LoadPackagesIndex() (common.Index, error) {
+func LoadIndex(index *Index) error {
 	libFile, err := IndexPath()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	buff, err := ioutil.ReadFile(libFile)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var index Index
-	err = json.Unmarshal(buff, &index)
+	err = json.Unmarshal(buff, index)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return index, nil
+	return nil
 }

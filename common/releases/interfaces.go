@@ -27,52 +27,27 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package formatter
+package releases
 
-import (
-	"encoding/json"
-	"errors"
-	"fmt"
-	"strings"
-)
+import "os"
 
-// ErrorMessage represents an Error with an attached message.
-//
-// It's the same as a normal error, but It is also parsable as JSON.
-type ErrorMessage struct {
-	message string
-}
-
-// MarshalJSON allows to marshal this object as a JSON object.
-func (err ErrorMessage) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]string{
-		"error": err.message,
-	})
-}
-
-// Error returns the error message.
-func (err ErrorMessage) Error() string {
-	return fmt.Sprint(err.message)
-}
-
-// String returns a string representation of the Error.
-func (err ErrorMessage) String() string {
-	return err.Error()
-}
-
-// FromError creates an ErrorMessage from an Error.
-func FromError(err error) ErrorMessage {
-	return ErrorMessage{
-		message: err.Error(),
-	}
-}
-
-// PrintErrorMessage formats and prints info about an error message.
-func PrintErrorMessage(msg string) {
-	PrintError(errors.New(strings.TrimSpace(msg)))
-}
-
-// PrintError formats and prints info about an error.
-func PrintError(err error) {
-	Print(FromError(err))
+// Release represents a generic release.
+type Release interface {
+	// OpenLocalArchiveForDownload opens the local archive file
+	// in append mode if it exists, otherwise it creates it. Returns
+	// the file pointer.
+	OpenLocalArchiveForDownload() (*os.File, error)
+	// ArchivePath returns the fullPath of the Archive of this release.
+	ArchivePath() (string, error)
+	// ExpectedChecksum returns the expected checksum for this release.
+	ExpectedChecksum() string
+	// ArchiveName returns the archive file name (not the path).
+	ArchiveName() string
+	// ArchiveURL returns the archive URL.
+	ArchiveURL() string
+	// ArchiveSize returns the archive size.
+	ArchiveSize() int64
+	// GetDownloadCacheFolder returns the cache folder of this release.
+	// Mostly this is based on the type of release (library, core, tool)
+	GetDownloadCacheFolder() (string, error)
 }

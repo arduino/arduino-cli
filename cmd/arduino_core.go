@@ -30,23 +30,21 @@
 package cmd
 
 import (
-	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
+	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/spf13/cobra"
-	"github.com/zieckey/goini"
 )
 
 var arduinoCoreCmd = &cobra.Command{
 	Use:   "core",
 	Short: "Arduino Core operations",
 	Long:  `Arduino Core operations`,
+	Run:   executeCoreCommand,
 }
 
 var arduinoCoreListCmd = &cobra.Command{
@@ -57,10 +55,6 @@ With -v tag (up to 2 times) can provide more verbose output.`,
 	Run: executeCoreListCommand,
 }
 
-var arduinoCoreFlags struct {
-	updateIndex bool
-}
-
 func init() {
 	arduinoCmd.AddCommand(arduinoCoreCmd)
 	arduinoCoreCmd.AddCommand(arduinoCoreListCmd)
@@ -68,95 +62,95 @@ func init() {
 	arduinoCoreCmd.Flags().BoolVar(&arduinoCoreFlags.updateIndex, "update-index", false, "Updates the index of cores to the latest version")
 }
 
-func executeCoreListCommand(cmd *cobra.Command, args []string) {
+func executeCoreCommand(cmd *cobra.Command, args []string) {
 	if arduinoCoreFlags.updateIndex {
-		execUpdateListIndex(cmd, args)
+		common.ExecUpdateIndex(prettyPrints.DownloadCoreFileIndex(), GlobalFlags.Verbose)
+	} else {
+		cmd.Help()
+	}
+}
+
+func executeCoreListCommand(cmd *cobra.Command, args []string) {
+	pkgHome, err := common.GetDefaultPkgFolder()
+	if err != nil {
+		formatter.PrintError(err)
 		return
 	}
 
-	libHome, err := common.GetDefaultLibFolder()
+	dir, err := os.Open(pkgHome)
 	if err != nil {
-		formatter.PrintErrorMessage("Cannot get libraries folder")
+		formatter.PrintErrorMessage("Cannot open packages folder")
 		return
 	}
-
-	//prettyPrints.LibStatus(status)
-	dir, err := os.Open(libHome)
-	if err != nil {
-		formatter.PrintErrorMessage("Cannot open libraries folder")
-		return
-	}
+	defer dir.Close()
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
-		formatter.PrintErrorMessage("Cannot read into libraries folder")
+		formatter.PrintErrorMessage("Cannot read into packages folder")
 		return
 	}
 
-	libs := make(map[string]interface{}, 10)
-
-	//TODO: optimize this algorithm
-	// time complexity O(libraries_to_install(from RAM) *
-	//                   library_folder_number(from DISK) *
-	//                   library_folder_file_number (from DISK))
-	//TODO : remove only one version
-	for _, file := range dirFiles {
-		if file.IsDir() {
-			indexFile := filepath.Join(libHome, file.Name(), "library.properties")
-			_, err = os.Stat(indexFile)
-			if os.IsNotExist(err) {
-				fileName := file.Name()
-				//replacing underscore in foldernames with spaces.
-				fileName = strings.Replace(fileName, "_", " ", -1)
-				fileName = strings.Replace(fileName, "-", " v. ", -1)
-				//I use folder name
-				libs[fileName] = "Unknown Version"
-			} else {
-				// I use library.properties file
-				content, err := ioutil.ReadFile(indexFile)
-				if err != nil {
-					fileName := file.Name()
-					//replacing underscore in foldernames with spaces.
-					fileName = strings.Replace(fileName, "_", " ", -1)
-					fileName = strings.Replace(fileName, "-", " v. ", -1)
-					//I use folder name
-					libs[fileName] = "Unknown Version"
-					continue
-				}
-
-				ini := goini.New()
-				err = ini.Parse(content, "\n", "=")
-				if err != nil {
-					formatter.Print(err)
-				}
-				Name, ok := ini.Get("name")
-				if !ok {
-					fileName := file.Name()
-					//replacing underscore in foldernames with spaces.
-					fileName = strings.Replace(fileName, "_", " ", -1)
-					fileName = strings.Replace(fileName, "-", " v. ", -1)
-					//I use folder name
-					libs[fileName] = "Unknown Version"
-					continue
-				}
-				Version, ok := ini.Get("version")
-				if !ok {
-					fileName := file.Name()
-					//replacing underscore in foldernames with spaces.
-					fileName = strings.Replace(fileName, "_", " ", -1)
-					fileName = strings.Replace(fileName, "-", " v. ", -1)
-					//I use folder name
-					libs[fileName] = "Unknown Version"
-					continue
-				}
-				libs[Name] = fmt.Sprintf("v.%s", Version)
-			}
-		}
+	pkgs := output.InstalledPackageList{
+		InstalledPackages: make([]output.InstalledPackage, 0, 10),
 	}
 
-	if len(libs) < 1 {
-		formatter.PrintErrorMessage("No library installed")
-	} else {
-		formatter.Print(output.LibResultsFromMap(libs))
+	for _, file := range dirFiles {
+		if !file.IsDir() {
+			continue
+		}
+		packageName := file.Name()
+		pkg := output.InstalledPackage{
+			Name:           packageName,
+			InstalledCores: make([]output.InstalledStuff, 0, 5),
+			InstalledTools: make([]output.InstalledStuff, 0, 5),
+		}
+		getInstalledCores(packageName, &pkg.InstalledCores)
+		getInstalledTools(packageName, &pkg.InstalledTools)
+		pkgs.InstalledPackages = append(pkgs.InstalledPackages, pkg)
+	}
+
+	formatter.Print(pkgs)
+}
+
+func getInstalledCores(packageName string, cores *[]output.InstalledStuff) {
+	getInstalledStuff(packageName, cores, common.GetDefaultCoresFolder)
+}
+
+func getInstalledTools(packageName string, tools *[]output.InstalledStuff) {
+	getInstalledStuff(packageName, tools, common.GetDefaultToolsFolder)
+}
+
+func getInstalledStuff(packageName string, stuff *[]output.InstalledStuff, startPathFunc func(string) (string, error)) {
+	stuffHome, err := startPathFunc(packageName)
+	if err != nil {
+		return
+	}
+	stuffHomeFolder, err := os.Open(stuffHome)
+	if err != nil {
+		return
+	}
+	defer stuffHomeFolder.Close()
+	stuffFolders, err := stuffHomeFolder.Readdir(0)
+	if err != nil {
+		return
+	}
+	for _, stuffFolderInfo := range stuffFolders {
+		if !stuffFolderInfo.IsDir() {
+			continue
+		}
+		stuffName := stuffFolderInfo.Name()
+		stuffFolder, err := os.Open(filepath.Join(stuffHome, stuffName))
+		if err != nil {
+			continue
+		}
+		defer stuffFolder.Close()
+		versions, err := stuffFolder.Readdirnames(0)
+		if err != nil {
+			continue
+		}
+		*stuff = append(*stuff, output.InstalledStuff{
+			Name:     stuffName,
+			Versions: versions,
+		})
 	}
 }

@@ -26,6 +26,7 @@
  *
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
+
 package formatter
 
 import "fmt"

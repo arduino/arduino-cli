@@ -32,7 +32,8 @@ package libraries
 import (
 	"fmt"
 
-	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/cmd/output"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/pmylund/sortutil"
 )
 
@@ -43,22 +44,22 @@ type StatusContext struct {
 }
 
 // AddLibrary adds an indexRelease to the status context
-func (l *StatusContext) AddLibrary(indexLib *indexRelease) {
+func (sc *StatusContext) AddLibrary(indexLib *indexRelease) {
 	name := indexLib.Name
-	if l.Libraries[name] == nil {
-		l.Libraries[name] = indexLib.extractLibrary()
+	if sc.Libraries[name] == nil {
+		sc.Libraries[name] = indexLib.extractLibrary()
 	} else {
 		release := indexLib.extractRelease()
-		lib := l.Libraries[name]
+		lib := sc.Libraries[name]
 		lib.Releases[fmt.Sprint(release.Version)] = release
 	}
 }
 
 // Names returns an array with all the names of the registered libraries.
-func (l StatusContext) Names() []string {
-	res := make([]string, len(l.Libraries))
+func (sc StatusContext) Names() []string {
+	res := make([]string, len(sc.Libraries))
 	i := 0
-	for n := range l.Libraries {
+	for n := range sc.Libraries {
 		res[i] = n
 		i++
 	}
@@ -66,17 +67,44 @@ func (l StatusContext) Names() []string {
 	return res
 }
 
-// Items Returns a map of all items with their names.
-func (l StatusContext) Items() map[string]interface{} {
-	ret := make(map[string]interface{}, len(l.Libraries))
-	for key, item := range l.Libraries {
-		ret[key] = item
+// ProcessPairs takes a set of name-version pairs and return
+// a set of items to download and a set of outputs for non
+// existing libraries.
+//
+// Uses a label to print messages ("library" | "core" | "tool")
+func (sc StatusContext) ProcessPairs(items []releases.NameVersionPair, label string) ([]releases.DownloadItem, []output.ProcessResult) {
+	itemC := len(items)
+	ret := make([]releases.DownloadItem, 0, itemC)
+	fails := make([]output.ProcessResult, 0, itemC)
+
+	for _, item := range items {
+		library, exists := sc.Libraries[item.Name]
+		if !exists {
+			fails = append(fails, output.ProcessResult{
+				ItemName: item.Name,
+				Error:    fmt.Sprint(label, " not found"),
+			})
+		} else {
+			release := library.GetVersion(item.Version)
+			if release == nil {
+				fails = append(fails, output.ProcessResult{
+					ItemName: item.Name,
+					Error:    "Version Not Found",
+				})
+			} else { // replaces "latest" with latest version too
+				ret = append(ret, releases.DownloadItem{
+					Name:    library.Name,
+					Release: release,
+				})
+			}
+		}
 	}
-	return ret
+
+	return ret, fails
 }
 
 // CreateStatusContext creates a status context from index data.
-func (index Index) CreateStatusContext() (common.StatusContext, error) {
+func (index Index) CreateStatusContext() (StatusContext, error) {
 	// Start with an empty status context
 	libraries := StatusContext{
 		Libraries: map[string]*Library{},
@@ -85,5 +113,5 @@ func (index Index) CreateStatusContext() (common.StatusContext, error) {
 		// Add all indexed libraries in the status context
 		libraries.AddLibrary(&lib)
 	}
-	return common.StatusContext(libraries), nil
+	return libraries, nil
 }

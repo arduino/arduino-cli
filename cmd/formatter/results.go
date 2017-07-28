@@ -27,21 +27,31 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package common
+package formatter
 
-// Index represents a generic index parsed from an index file.
-type Index interface {
-	CreateStatusContext() (StatusContext, error) // CreateStatusContext creates a status context with this index data.
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type resultMessage struct {
+	message interface{}
 }
 
-// StatusContext represents a generic status context, created from an Index.
-type StatusContext interface {
-	Names() []string               // Names Returns an array with all the names of the items.
-	Items() map[string]interface{} // Items Returns a map of all items with their names.
+// MarshalJSON allows to marshal this object as a JSON object.
+func (res resultMessage) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{
+		"result": res.message,
+	})
 }
 
-// Release represents a generic release.
-type Release interface {
-	ArchivePath() (string, error) // ArchivePath returns the fullPath of the Archive of this release.
-	ExpectedChecksum() string     // Checksum returns the expected checksum for this release.
+func (res resultMessage) String() string {
+	return fmt.Sprint(res.message)
+}
+
+// PrintResult prints a value as a result from an operation.
+func PrintResult(res interface{}) {
+	Print(resultMessage{
+		message: res,
+	})
 }

@@ -26,6 +26,7 @@
  *
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
+
 package formatter
 
 import "encoding/json"
@@ -33,21 +34,26 @@ import "reflect"
 import "errors"
 
 //JSONFormatter represents a Printer and Formatter of JSON objects.
-type JSONFormatter struct{}
+type JSONFormatter struct {
+	debug bool //if false, errors are not shown. Unparsable inputs are skipped. Otherwise an error message is shown.
+}
 
 // Format formaats a message into a JSON object.
 //
 // It ignores Header and Footer fields of the message.
-func (jp JSONFormatter) Format(msg interface{}) (string, error) {
-	if reflect.TypeOf(msg).Kind().String() == "struct" ||
-		reflect.TypeOf(msg).Kind().String() == "map" { // TODO : optimize if possible
+func (jf JSONFormatter) Format(msg interface{}) (string, error) {
+	msgType := reflect.TypeOf(msg).Kind().String()
+	if msgType == "struct" ||
+		msgType == "map" { // TODO : optimize if possible
 		ret, err := json.Marshal(msg)
 		return string(ret), err
+	} else if jf.debug {
+		return "", errors.New("Only structs and maps values are accepted")
 	}
-	return "", errors.New("Only structs and maps values are accepted")
+	return "", nil
 }
 
 // Print prints a JSON object.
-func (jp JSONFormatter) Print(msg interface{}) error {
-	return printFunc(jp, msg)
+func (jf JSONFormatter) Print(msg interface{}) error {
+	return printFunc(jf, msg)
 }

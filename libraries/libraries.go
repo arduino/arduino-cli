@@ -31,8 +31,6 @@ package libraries
 
 import (
 	"bufio"
-	"errors"
-	"strconv"
 
 	"strings"
 
@@ -45,7 +43,6 @@ import (
 	"fmt"
 
 	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/bcmi-labs/arduino-cli/common/checksums"
 	"github.com/blang/semver"
 )
 
@@ -126,7 +123,7 @@ type Release struct {
 	Version         string `json:"version"`
 	URL             string `json:"url"`
 	ArchiveFileName string `json:"archiveFileName"`
-	Size            int    `json:"size"`
+	Size            int64  `json:"size"`
 	Checksum        string `json:"checksum"`
 }
 
@@ -139,7 +136,7 @@ func (r Release) OpenLocalArchiveForDownload() (*os.File, error) {
 		return nil, err
 	}
 	stats, err := os.Stat(path)
-	if os.IsNotExist(err) || err == nil && int(stats.Size()) >= r.Size {
+	if os.IsNotExist(err) || err == nil && stats.Size() >= r.ArchiveSize() {
 		return os.Create(path)
 	}
 	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
@@ -154,80 +151,8 @@ func (r Release) ArchivePath() (string, error) {
 	return filepath.Join(staging, r.ArchiveFileName), nil
 }
 
-// CheckLocalArchive check for integrity of the local archive.
-func (r Release) CheckLocalArchive() error {
-	archivePath, err := r.ArchivePath()
-	if err != nil {
-		return err
-	}
-	stats, err := os.Stat(archivePath)
-	if os.IsNotExist(err) {
-		return errors.New("Archive does not exist")
-	}
-	if err != nil {
-		return err
-	}
-	if int(stats.Size()) > r.Size {
-		return errors.New("Archive size does not match with specification of this release, assuming corruption")
-	}
-	if !r.checksumMatches() {
-		return errors.New("Checksum does not match, assuming corruption")
-	}
-	return nil
-}
-
-func (r Release) checksumMatches() bool {
-	return checksums.Match(r)
-}
-
-// ExpectedChecksum returns the expected checksum for this release.
-func (r Release) ExpectedChecksum() string {
-	return r.Checksum
-}
-
-/*
-
-type releaseAlias Release
-
-// MarshalJSON parses the release and returns a JSON Object
-func (r *Release) MarshalJSON() ([]byte, error) {
-	bytez, err := json.Marshal(&struct {
-		Version string `json:"version"`
-		*releaseAlias
-	}{
-		Version:      r.Version.String(),
-		releaseAlias: (*releaseAlias)(r),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return bytez, nil
-}
-
-// UnmarshalJSON takes a byte array and creates an object.
-func (r *Release) UnmarshalJSON(bytez []byte) error {
-	aux := &struct {
-		Version string `json:"version"`
-		*releaseAlias
-	}{
-		releaseAlias: (*releaseAlias)(r),
-	}
-
-	err := json.Unmarshal(bytez, aux)
-	if err != nil {
-		return err
-	}
-
-	r.Version, err = semver.Make(aux.Version)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-*/
-
 // Versions returns an array of all versions available of the library
-func (l *Library) Versions() semver.Versions {
+func (l Library) Versions() semver.Versions {
 	res := make(semver.Versions, len(l.Releases))
 	i := 0
 	for version := range l.Releases {
@@ -245,7 +170,7 @@ func (l *Library) Versions() semver.Versions {
 // nil if not found.
 //
 // If version == "latest" then release.Version contains the latest version.
-func (l *Library) GetVersion(version string) *Release {
+func (l Library) GetVersion(version string) *Release {
 	if version == "latest" {
 		return l.Releases[l.latestVersion()]
 	}
@@ -253,7 +178,7 @@ func (l *Library) GetVersion(version string) *Release {
 }
 
 // Latest obtains the latest version of a library.
-func (l *Library) Latest() *Release {
+func (l Library) Latest() *Release {
 	return l.GetVersion(l.latestVersion())
 }
 
@@ -276,12 +201,11 @@ func (l *Library) latestVersion() string {
 }
 
 func (r *Release) String() string {
-	res := "  Release: " + fmt.Sprint(r.Version) + "\n"
-	res += "    URL: " + r.URL + "\n"
-	res += "    ArchiveFileName: " + r.ArchiveFileName + "\n"
-	res += "    Size: " + strconv.Itoa(r.Size) + "\n"
-	res += "    Checksum: " + r.Checksum + "\n"
-	return res
+	return fmt.Sprintln("  Release: "+fmt.Sprint(r.Version)) +
+		fmt.Sprintln("    URL: "+r.URL) +
+		fmt.Sprintln("    ArchiveFileName: "+r.ArchiveFileName) +
+		fmt.Sprintln("    Size: ", r.ArchiveSize()) +
+		fmt.Sprintln("    Checksum: ", r.Checksum)
 }
 
 func (l Library) String() string {
@@ -295,4 +219,33 @@ func (l Library) String() string {
 		fmt.Sprintln("  Architecture: ", strings.Join(l.Architectures, ", ")) +
 		fmt.Sprintln("  Types: ", strings.Join(l.Types, ", ")) +
 		fmt.Sprintln("  Versions: ", strings.Replace(fmt.Sprint(l.Versions()), " ", ", ", -1))
+}
+
+// Release interface implementation
+
+// ArchiveSize returns the archive size.
+func (r Release) ArchiveSize() int64 {
+	return r.Size
+}
+
+// ArchiveURL returns the archive URL.
+func (r Release) ArchiveURL() string {
+	return r.URL
+}
+
+// GetDownloadCacheFolder returns the cache folder of this release.
+// Mostly this is based on the type of release (library, core, tool)
+// In this case returns libraries cache folder.
+func (r Release) GetDownloadCacheFolder() (string, error) {
+	return getDownloadCacheFolder()
+}
+
+// ArchiveName returns the archive file name (not the path).
+func (r Release) ArchiveName() string {
+	return r.ArchiveFileName
+}
+
+// ExpectedChecksum returns the expected checksum for this release.
+func (r Release) ExpectedChecksum() string {
+	return r.Checksum
 }

@@ -31,6 +31,8 @@ package cores
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/blang/semver"
@@ -51,6 +53,17 @@ type Release struct {
 	Checksum        string
 	Size            int64
 	Boards          []string
+	URL             string
+	Dependencies    ToolDependencies // The Dependency entries to load tools.
+}
+
+// ToolDependencies is a set of tuples representing summary data of a tool.
+type ToolDependencies []toolDependency
+
+type toolDependency struct {
+	ToolPackager string
+	ToolName     string
+	ToolVersion  string
 }
 
 // GetVersion returns the specified release corresponding the provided version,
@@ -62,7 +75,6 @@ func (core *Core) GetVersion(version string) *Release {
 // Versions returns all the version numbers in this Core Package.
 func (core *Core) Versions() semver.Versions {
 	versions := make(semver.Versions, 0, len(core.Releases))
-
 	for _, release := range core.Releases {
 		temp, err := semver.Make(release.Version)
 		if err == nil {
@@ -116,4 +128,56 @@ func (release *Release) String() string {
 	res += fmt.Sprintln("  Checksum          :", release.Checksum)
 	res += fmt.Sprintln("  File Size         :", release.Size)
 	return res
+}
+
+// OpenLocalArchiveForDownload Creates an empty file if not found.
+func (release Release) OpenLocalArchiveForDownload() (*os.File, error) {
+	path, err := release.ArchivePath()
+	if err != nil {
+		return nil, err
+	}
+	stats, err := os.Stat(path)
+	if os.IsNotExist(err) || err == nil && stats.Size() >= release.Size {
+		return os.Create(path)
+	} else if err != nil {
+		return nil, err
+	}
+	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+}
+
+// ArchivePath returns the fullPath of the Archive of this release.
+func (release Release) ArchivePath() (string, error) {
+	staging, err := getDownloadCacheFolder()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(staging, release.ArchiveFileName), nil
+}
+
+// Implementation of Release interface
+
+// ExpectedChecksum returns the expected checksum for this release.
+func (release Release) ExpectedChecksum() string {
+	return release.Checksum
+}
+
+// GetDownloadCacheFolder returns the cache folder of this release.
+// Mostly this is based on the type of release (library, core, tool)
+func (release Release) GetDownloadCacheFolder() (string, error) {
+	return getDownloadCacheFolder()
+}
+
+// ArchiveName returns the archive file name (not the path)
+func (release Release) ArchiveName() string {
+	return release.ArchiveFileName
+}
+
+// ArchiveSize returns the archive size.
+func (release Release) ArchiveSize() int64 {
+	return release.Size
+}
+
+// ArchiveURL returns the archive URL.
+func (release Release) ArchiveURL() string {
+	return release.URL
 }

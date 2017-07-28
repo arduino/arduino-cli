@@ -33,7 +33,7 @@ import (
 	"fmt"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
-	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/bcmi-labs/arduino-cli/task"
 )
@@ -67,18 +67,39 @@ func DownloadLibFileIndex() task.Wrapper {
 	return DownloadFileIndex(libraries.DownloadLibrariesFile)
 }
 
+// DownloadCoreFileIndex shows info regarding the download of a missing (or corrupted) file index of core packages.
+func DownloadCoreFileIndex() task.Wrapper {
+	return DownloadFileIndex(cores.DownloadPackagesFile)
+}
+
 //UninstallLib pretty prints info about a pending install of libraries.
 func UninstallLib(libraryOK []string, libraryFails map[string]string) {
 	actionOnItems("libraries", "uninstalled", libraryOK, libraryFails)
 }
 
 // CorruptedLibIndexFix pretty prints messages regarding corrupted index fixes of libraries.
-func CorruptedLibIndexFix(index common.Index, verbosity int) (common.StatusContext, error) {
-	return CorruptedIndexFix(index, verbosity, DownloadLibFileIndex, libIndexParse)
+func CorruptedLibIndexFix(index libraries.Index, verbosity int) (libraries.StatusContext, error) {
+	downloadTask := DownloadLibFileIndex()
+	parseTask := libIndexParse(index, verbosity)
+
+	subTasks := []task.Wrapper{downloadTask, parseTask}
+
+	result := task.Wrapper{
+		BeforeMessage: []string{
+			"Cannot parse index file, it may be corrupted.",
+		},
+		AfterMessage: []string{""},
+		ErrorMessage: []string{ //printed by sub-task
+			"",
+		},
+		Task: task.CreateSequence(subTasks, []bool{false, false}, verbosity).Task(),
+	}.Execute(verbosity).Result.([]task.Result)
+
+	return result[1].Result.(libraries.StatusContext), result[1].Error
 }
 
 // libIndexParse pretty prints info about parsing an index file of libraries.
-func libIndexParse(index common.Index, verbosity int) task.Wrapper {
+func libIndexParse(index libraries.Index, verbosity int) task.Wrapper {
 	return task.Wrapper{
 		BeforeMessage: []string{
 			"",

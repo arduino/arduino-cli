@@ -30,7 +30,10 @@
 package cores
 
 import (
-	"github.com/bcmi-labs/arduino-cli/common"
+	"errors"
+	"fmt"
+	"strings"
+
 	"github.com/pmylund/sortutil"
 )
 
@@ -39,10 +42,20 @@ type StatusContext struct {
 	Packages map[string]*Package
 }
 
-// AddPackage adds a package to a context from an indexPackage.
+// CoreDependency is a representation of a parsed core dependency (single ToolRelease).
+type CoreDependency struct {
+	ToolName string       `json:"tool,required"`
+	Release  *ToolRelease `json:"release,required"`
+}
+
+func (cd CoreDependency) String() string {
+	return strings.TrimSpace(fmt.Sprintln(cd.ToolName, " v.", cd.Release.Version))
+}
+
+// Add adds a package to a context from an indexPackage.
 //
 // NOTE: If the package is already in the context, it is overwritten!
-func (sc *StatusContext) AddPackage(indexPackage *indexPackage) {
+func (sc *StatusContext) Add(indexPackage *indexPackage) {
 	sc.Packages[indexPackage.Name] = indexPackage.extractPackage()
 }
 
@@ -58,23 +71,65 @@ func (sc StatusContext) Names() []string {
 	return res
 }
 
-// Items returns a map matching core name and core struct.
-func (sc StatusContext) Items() map[string]interface{} {
-	ret := make(map[string]interface{}, len(sc.Packages))
-	for key, val := range sc.Packages {
-		ret[key] = val
+func (tdep toolDependency) extractTool(sc StatusContext) (*Tool, error) {
+	pkg, exists := sc.Packages[tdep.ToolPackager]
+	if !exists {
+		return nil, errors.New("Package not found")
 	}
-	return ret
+	tool, exists := pkg.Tools[tdep.ToolName]
+	if !exists {
+		return nil, errors.New("Tool not found")
+	}
+	return tool, nil
+}
+
+func (tdep toolDependency) extractRelease(sc StatusContext) (*ToolRelease, error) {
+	tool, err := tdep.extractTool(sc)
+	if err != nil {
+		return nil, err
+	}
+	release, exists := tool.Releases[tdep.ToolVersion]
+	if !exists {
+		return nil, errors.New("Release Not Found")
+	}
+	return release, nil
 }
 
 // CreateStatusContext creates a status context from index data.
-func (index Index) CreateStatusContext() (common.StatusContext, error) {
+func (index Index) CreateStatusContext() (StatusContext, error) {
 	// Start with an empty status context
 	packages := StatusContext{
 		Packages: make(map[string]*Package, len(index.Packages)),
 	}
 	for _, packageManager := range index.Packages {
-		packages.AddPackage(packageManager)
+		packages.Add(packageManager)
 	}
 	return packages, nil
+}
+
+// GetDeps returns the deps of a specified release of a core.
+func (sc StatusContext) GetDeps(release *Release) ([]CoreDependency, error) {
+	ret := make([]CoreDependency, 0, 5)
+	if release == nil {
+		return nil, errors.New("release cannot be nil")
+	}
+	for _, dep := range release.Dependencies {
+		pkg, exists := sc.Packages[dep.ToolPackager]
+		if !exists {
+			return nil, fmt.Errorf("Package %s not found", dep.ToolPackager)
+		}
+		tool, exists := pkg.Tools[dep.ToolName]
+		if !exists {
+			return nil, fmt.Errorf("Tool %s not found", dep.ToolName)
+		}
+		toolRelease, exists := tool.Releases[dep.ToolVersion]
+		if !exists {
+			return nil, fmt.Errorf("Tool version %s not found", dep.ToolVersion)
+		}
+		ret = append(ret, CoreDependency{
+			ToolName: dep.ToolName,
+			Release:  toolRelease,
+		})
+	}
+	return ret, nil
 }

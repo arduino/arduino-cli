@@ -10,7 +10,7 @@ Formatters is a package which contains a useful and customizable set of formatte
 . JSONFormatter - Formats and Prints `interface{}` to JSON String - Binded to `json.Marshal()` method.
 
 == Usage 
-[source,go]
+[source, go]
 ----
 type TestType struct {
    field1 string `json:"field1,omitempty"` //same json tag as required by json.Marshal
@@ -94,4 +94,18 @@ err := functionWhichMayReturnAnError()
 if err != nil {
     formatter.PrintError(err)
 }
+----
+
+== Debug with JSON values
+`JSONFormatter` by default does not print what it cannot parse (everything which is not a map or a struct).
+If you are in a debugging session you will print an error message instead.
+Sessions are opened by `formatterInstance.StartDebug()` and closed by `formatterInstance.EndDebug()`
+
+[source, go]
+----
+formatter = JSONFormatter{}
+formatter.StartDebug()
+formatter.Print("Invalid String")
+//Outputs "\"Invalid String\" is a non supported data, please use map or struct"
+formatter.EndDebug()
 ----

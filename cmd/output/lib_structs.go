@@ -32,8 +32,6 @@ package output
 import (
 	"fmt"
 	"strings"
-
-	"github.com/bcmi-labs/arduino-cli/libraries"
 )
 
 // VersionResult represents the output of the version commands.
@@ -51,17 +49,20 @@ type VersionFullInfo struct {
 	Versions []VersionResult `json:"versions,required"`
 }
 
-func (vfi VersionFullInfo) String() string {
-	ret := ""
-	for _, vr := range vfi.Versions {
-		ret += fmt.Sprintln(vr)
-	}
-	return strings.TrimSpace(ret)
-}
-
 //LibProcessResults represent the result of a process on libraries.
 type LibProcessResults struct {
-	Libraries []libProcessResult `json:"libraries,required"`
+	Libraries []ProcessResult `json:"libraries,required"`
+}
+
+//CoreProcessResults represent the result of a process on cores or tools.
+type CoreProcessResults struct {
+	Cores []ProcessResult `json:"cores,omitempty"`
+	Tools []ProcessResult `json:"tools,omitempty"`
+}
+
+// LibSearchResults represents a set of results of a search of libraries.
+type LibSearchResults struct {
+	Libraries []interface{} `json:"libraries,required"`
 }
 
 // String returns a string representation of the object.
@@ -73,25 +74,12 @@ func (lpr LibProcessResults) String() string {
 	return strings.TrimSpace(ret)
 }
 
-//libProcessResult contains info about a completed process.
-type libProcessResult struct {
-	LibraryName string `json:"name,required"`
-	Status      string `json:"status,omitempty"`
-	Error       string `json:"error,omitempty"`
-	Path        string `json:"path,omitempty"`
-}
-
-// String returns a string representation of the object.
-func (lr libProcessResult) String() string {
-	if lr.Error != "" {
-		return strings.TrimSpace(fmt.Sprintf("%s - Error : %s", lr.LibraryName, lr.Error))
+func (vfi VersionFullInfo) String() string {
+	ret := ""
+	for _, vr := range vfi.Versions {
+		ret += fmt.Sprintln(vr)
 	}
-	return strings.TrimSpace(fmt.Sprintf("%s - %s", lr.LibraryName, lr.Status))
-}
-
-//LibSearchResults represents a result of a search of libraries.
-type LibSearchResults struct {
-	Libraries []interface{} `json:"searchResults,required"`
+	return strings.TrimSpace(ret)
 }
 
 // String returns a string representation of the object.
@@ -99,18 +87,13 @@ func (lsr LibSearchResults) String() string {
 	ret := fmt.Sprintln("Search results:")
 	for _, lib := range lsr.Libraries {
 		ret += fmt.Sprintln(lib)
-		// if the single cell is a library I may have higher verbosity.
-		libVal, isLib := lib.(libraries.Library)
-		if isLib && libVal.Releases != nil {
-			for _, release := range libVal.Releases {
-				ret += fmt.Sprintln(release)
-			}
-		}
 	}
 	return strings.TrimSpace(ret)
 }
 
-//CoreSearchResults represents a result of a search of cores.
-type CoreSearchResults struct {
-	Cores []interface{} `json:"cores,required"`
+// Results returns a set of generic results, to allow them to be modified externally.
+//
+// -> ProcessResults interface.
+func (lpr LibProcessResults) Results() *[]ProcessResult {
+	return &lpr.Libraries
 }

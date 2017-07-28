@@ -30,106 +30,21 @@
 package libraries
 
 import (
-	"fmt"
-	"io/ioutil"
-	"net/http"
-	"path/filepath"
-
-	"errors"
-
 	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/bcmi-labs/arduino-cli/task"
-	"gopkg.in/cheggaaa/pb.v1"
 )
 
 const (
-	// LibraryIndexURL is the URL where to get library index.
-	LibraryIndexURL string = "http://downloads.arduino.cc/libraries/library_index.json"
+	// libraryIndexURL is the URL where to get library index.
+	libraryIndexURL string = "http://downloads.arduino.cc/libraries/library_index.json"
 )
-
-// DownloadAndCache downloads a library without installing it
-func DownloadAndCache(library *Library, progBar *pb.ProgressBar, version string) task.Wrapper {
-	return task.Wrapper{
-		Task: func() task.Result {
-			err := downloadRelease(library, progBar, version)
-			if err != nil {
-				return task.Result{
-					Result: nil,
-					Error:  err,
-				}
-			}
-			return task.Result{
-				Result: nil,
-				Error:  nil,
-			}
-		},
-	}
-}
-
-// DownloadLatest downloads Latest version of a library.
-func downloadLatest(library *Library, progBar *pb.ProgressBar) ([]byte, error) {
-	return nil, downloadRelease(library, progBar, library.latestVersion())
-}
-
-func downloadRelease(library *Library, progBar *pb.ProgressBar, version string) error {
-	release := library.GetVersion(version)
-	if release == nil {
-		return errors.New("Invalid version number")
-	}
-	initialData, err := release.OpenLocalArchiveForDownload()
-	if err != nil {
-		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
-	}
-	defer initialData.Close()
-	err = common.DownloadPackage(release.URL, fmt.Sprintf("library %s", library.Name), progBar, initialData, release.Size)
-	if err != nil {
-		return err
-	}
-	err = release.CheckLocalArchive()
-	if err != nil {
-		return errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
-	}
-	return nil
-}
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.
 func DownloadLibrariesFile() error {
-	libFile, err := IndexPath()
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("GET", LibraryIndexURL, nil)
-	if err != nil {
-		return err
-	}
-
-	client := http.DefaultClient
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile(libFile, content, 0666)
-	if err != nil {
-		return err
-	}
-	return nil
+	return common.DownloadIndex(IndexPath, libraryIndexURL)
 }
 
-// getDownloadCacheFolder gets the folder where temp installs are stored until installation complete (libraries).
+// getDownloadCacheFolder gets the folder where temp installs are stored
+// until installation complete (libraries).
 func getDownloadCacheFolder() (string, error) {
-	libFolder, err := common.GetDefaultArduinoFolder()
-	if err != nil {
-		return "", err
-	}
-
-	stagingFolder := filepath.Join(libFolder, "staging", "libraries")
-	return common.GetFolder(stagingFolder, "libraries cache")
+	return common.GetDownloadCacheFolder("libraries")
 }

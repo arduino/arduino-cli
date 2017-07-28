@@ -42,11 +42,10 @@ import (
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/libraries"
-	"github.com/bcmi-labs/arduino-cli/task"
 	"github.com/spf13/cobra"
 	"github.com/zieckey/goini"
-	"gopkg.in/cheggaaa/pb.v1"
 )
 
 const (
@@ -60,11 +59,6 @@ var arduinoLibCmd = &cobra.Command{
 	Short: "Arduino commands about libraries",
 	Long:  `Arduino commands about libraries`,
 	Run:   executeLibCommand,
-}
-
-// arduinoLibFlags represents `arduino lib` flags.
-var arduinoLibFlags struct {
-	updateIndex bool
 }
 
 // arduinoLibInstallCmd represents the lib install command.
@@ -133,8 +127,10 @@ func init() {
 
 func executeLibCommand(cmd *cobra.Command, args []string) {
 	if arduinoLibFlags.updateIndex {
-		execUpdateListIndex(cmd, args)
-	} // else return
+		common.ExecUpdateIndex(prettyPrints.DownloadLibFileIndex(), GlobalFlags.Verbose)
+	} else {
+		cmd.Help()
+	}
 }
 
 func executeDownloadCommand(cmd *cobra.Command, args []string) error {
@@ -142,9 +138,10 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("No library specified for download command")
 	}
 
-	index, err := libraries.LoadLibrariesIndex()
+	var index libraries.Index
+	err := libraries.LoadIndex(&index)
 	if err != nil {
-		formatter.Print("Cannot find index file ... ")
+		formatter.Print("Cannot find index file ... " + err.Error())
 		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
 		if err != nil {
 			return nil
@@ -159,105 +156,15 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	libs, failed := purgeInvalidLibraries(parseLibArgs(args), status.(libraries.StatusContext))
-	libraryResults := parallelLibDownloads(libs, true, "Downloaded")
-
-	for libFail, err := range failed {
-		libraryResults[libFail] = err
+	pairs := releases.ParseArgs(args)
+	libsToDownload, failOutputs := status.ProcessPairs(pairs, "library")
+	outputResults := output.LibProcessResults{
+		Libraries: failOutputs,
 	}
+	releases.ParallelDownload(libsToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Libraries)
 
-	formatter.Print(output.LibResultsFromMap(libraryResults))
-
+	formatter.Print(outputResults)
 	return nil
-}
-
-// parseLibArgs parses a sequence of "library@version" tokens and returns a map.
-//
-// If version is not present it is assumed as "latest" version.
-func parseLibArgs(args []string) map[string]string {
-	ret := make(map[string]string, len(args))
-	for _, item := range args {
-		tokens := strings.SplitN(item, "@", 2)
-		var version string
-		if len(tokens) == 2 {
-			version = tokens[1]
-		} else {
-			version = "latest"
-		}
-		ret[tokens[0]] = version
-	}
-	return ret
-}
-
-func purgeInvalidLibraries(libnames map[string]string, status common.StatusContext) (map[*libraries.Library]string, map[string]error) {
-	items := make(map[*libraries.Library]string, len(libnames))
-	statusItems := status.Items()
-	fails := make(map[string]error, len(libnames))
-
-	for libraryName, version := range libnames {
-		library, valid := statusItems[libraryName].(*libraries.Library)
-		if !valid {
-			fails[libraryName] = errors.New("Library Not Found")
-		} else {
-			release := library.GetVersion(version)
-			if release == nil {
-				fails[libraryName] = errors.New("Version Not Found")
-			} else { // replaces "latest" with latest version too
-				items[library] = release.Version
-			}
-		}
-	}
-
-	return items, fails
-}
-
-// parallelLibDownloads executes multiple libraries downloads in parallel and fills properly results.
-//
-// forced is used to force download if cached.
-// OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
-func parallelLibDownloads(items map[*libraries.Library]string, forced bool, OkStatus string) map[string]interface{} {
-	itemC := len(items)
-	libraryResults := make(map[string]interface{}, itemC)
-
-	tasks := make(map[string]task.Wrapper, len(items))
-	progressBars := make([]*pb.ProgressBar, 0, len(items))
-
-	textMode := formatter.IsSupported("text")
-
-	for library, version := range items {
-		release := library.GetVersion(version)
-		if forced || release != nil && !library.IsCached(version) || release.CheckLocalArchive() != nil {
-			var pBar *pb.ProgressBar
-			if textMode {
-				pBar = pb.StartNew(release.Size).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", library.Name))
-				progressBars = append(progressBars, pBar)
-			}
-			tasks[library.Name] = libraries.DownloadAndCache(library, pBar, version)
-		}
-	}
-
-	if len(tasks) > 0 {
-		var pool *pb.Pool
-		if textMode {
-			pool, _ = pb.StartPool(progressBars...)
-		}
-
-		results := task.ExecuteParallelFromMap(tasks, GlobalFlags.Verbose)
-
-		if textMode {
-			pool.Stop()
-		}
-
-		for libraryName, result := range results {
-			if result.Error != nil {
-				libraryResults[libraryName] = result.Error
-			} else {
-				libraryResults[libraryName] = OkStatus
-			}
-		}
-	}
-
-	return libraryResults
 }
 
 func executeInstallCommand(cmd *cobra.Command, args []string) error {
@@ -265,9 +172,10 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("No library specified for install command")
 	}
 
-	index, err := libraries.LoadLibrariesIndex()
+	var index libraries.Index
+	err := libraries.LoadIndex(&index)
 	if err != nil {
-		formatter.Print("Cannot find index file ...")
+		formatter.Print("Cannot find index file ..." + err.Error())
 		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
 		if err != nil {
 			return nil
@@ -282,23 +190,25 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	libs, failed := purgeInvalidLibraries(parseLibArgs(args), status)
-
-	libraryResults := parallelLibDownloads(libs, false, "Installed")
-	for fail, reason := range failed {
-		libraryResults[fail] = reason
+	pairs := releases.ParseArgs(args)
+	libsToDownload, failOutputs := status.ProcessPairs(pairs, "library")
+	outputResults := output.LibProcessResults{
+		Libraries: failOutputs,
 	}
-	for library, version := range libs {
-		err = libraries.InstallLib(library, version)
+	releases.ParallelDownload(libsToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Libraries)
+
+	for i, item := range libsToDownload {
+		err = libraries.InstallLib(item.Name, item.Release)
 		if err != nil {
-			libraryResults[library.Name] = err
-		} else {
-			libraryResults[library.Name] = "Installed"
+			outputResults.Libraries[i] = output.ProcessResult{
+				ItemName: item.Name,
+				Status:   "",
+				Error:    err.Error(),
+			}
 		}
 	}
 
-	formatter.Print(output.LibResultsFromMap(libraryResults))
-
+	formatter.Print(outputResults)
 	return nil
 }
 
@@ -324,18 +234,22 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	libraryResults := make(map[string]interface{}, len(args))
+	outputResults := output.LibProcessResults{
+		Libraries: make([]output.ProcessResult, 0, 10),
+	}
 	for _, arg := range args {
-		libraryResults[arg] = errors.New("Not Found or Not Installed")
+		outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
+			ItemName: arg,
+			Error:    "Not Found or Not Installed",
+		})
 	}
 	//TODO: optimize this algorithm
 	//      time complexity O(libraries_to_install(from RAM) *
 	//                        library_folder_number(from DISK) *
 	//                        library_folder_file_number (from DISK)).
-	//TODO : remove only one version.
-
-	for _, file := range dirFiles {
-		for _, library := range args {
+	for _, library := range args {
+		var result *output.ProcessResult
+		for _, file := range dirFiles {
 			if file.IsDir() {
 				indexFile := filepath.Join(libFolder, file.Name(), "library.properties")
 				_, err = os.Stat(indexFile)
@@ -345,23 +259,31 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					//I use folder name
 					if strings.Contains(fileName, library) {
+						result = &output.ProcessResult{
+							ItemName: library,
+						}
 						//found
 						err = libraries.Uninstall(filepath.Join(libFolder, fileName))
 						if err != nil {
-							libraryResults[library] = err
+							result.Error = err.Error()
+							outputResults.Libraries = append(outputResults.Libraries, *result)
 						} else {
-							libraryResults[library] = "Uninstalled"
+							result.Error = "Uninstalled"
+							outputResults.Libraries = append(outputResults.Libraries, *result)
 						}
+						break
 					}
-				} else {
+				} else if err == nil {
 					// I use library.properties file
 					content, err := os.OpenFile(indexFile, os.O_RDONLY, 0666)
 					if err != nil {
-						libraryResults[library] = err
-						continue
+						outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
+							ItemName: library,
+							Error:    err.Error(),
+						})
+						break
 					}
 
-					// create map from content
 					scanner := bufio.NewScanner(content)
 					for scanner.Scan() {
 						lines := strings.SplitN(scanner.Text(), "=", 2)
@@ -369,29 +291,41 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 						// name of the library.
 						if lines[0] == "name" {
 							if strings.Contains(lines[1], library) {
+								result = &output.ProcessResult{
+									ItemName: library,
+								}
 								//found
 								err = libraries.Uninstall(filepath.Join(libFolder, file.Name()))
 								if err != nil {
-									libraryResults[library] = err
+									result.Error = err.Error()
+									outputResults.Libraries = append(outputResults.Libraries, *result)
 								} else {
-									libraryResults[library] = "Uninstalled"
+									result.Status = "Uninstalled"
+									outputResults.Libraries = append(outputResults.Libraries, *result)
 								}
 							}
 							break
 						}
 					}
 
-					if err := scanner.Err(); err != nil {
-						libraryResults[library] = err
-					} else if _, ok := libraryResults[library].(error); ok {
-						libraryResults[library] = errors.New("name not found in library.properties")
+					err = scanner.Err()
+					if err != nil {
+						result.Error = err.Error()
+						outputResults.Libraries = append(outputResults.Libraries, *result)
 					}
+					break
+				}
+				if result == nil {
+					outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
+						ItemName: library,
+						Error:    "\"name\" field not found in library.properties file of the library",
+					})
 				}
 			}
 		}
 	}
-	if len(libraryResults) > 0 {
-		formatter.Print(output.LibResultsFromMap(libraryResults))
+	if len(outputResults.Libraries) > 0 {
+		formatter.Print(outputResults)
 	}
 
 	return nil
@@ -406,7 +340,8 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 		query = strings.ToLower(strings.Join(args, " "))
 	}
 
-	index, err := libraries.LoadLibrariesIndex()
+	var index libraries.Index
+	err := libraries.LoadIndex(&index)
 	if err != nil {
 		formatter.PrintErrorMessage("Index file is corrupted. Please replace it by updating : arduino lib list update")
 		return nil
@@ -422,22 +357,23 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 
 	found := false
 
-	message := output.LibSearchResults{}
 	names := status.Names()
-	items := status.Items()
-	libs := make([]interface{}, 0, len(names))
+	message := output.LibSearchResults{
+		Libraries: make([]interface{}, 0, len(names)),
+	}
+	items := status.Libraries
 	//Pretty print libraries from index.
 	for _, name := range names {
 		if strings.Contains(strings.ToLower(name), query) {
 			found = true
-			item := items[name].(*libraries.Library)
+			item := items[name]
 			if GlobalFlags.Verbose > 0 {
-				libs = append(libs, item)
+				message.Libraries = append(message.Libraries, item)
 				if GlobalFlags.Verbose < 2 {
 					item.Releases = nil
 				}
 			} else {
-				libs = append(libs, name)
+				message.Libraries = append(message.Libraries, name)
 			}
 		}
 	}
@@ -445,7 +381,6 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 	if !found {
 		formatter.PrintErrorMessage(fmt.Sprintf("No library found matching \"%s\" search query", query))
 	} else {
-		message.Libraries = libs
 		formatter.Print(message)
 	}
 
@@ -453,14 +388,9 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 }
 
 func executeListCommand(command *cobra.Command, args []string) {
-	if arduinoLibFlags.updateIndex {
-		execUpdateListIndex(command, args)
-		return
-	}
-
 	libHome, err := common.GetDefaultLibFolder()
 	if err != nil {
-		formatter.PrintErrorMessage("Cannot get libraries folder")
+		formatter.PrintError(err)
 		return
 	}
 
@@ -470,6 +400,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 		formatter.PrintErrorMessage("Cannot open libraries folder")
 		return
 	}
+	defer dir.Close()
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
@@ -477,8 +408,9 @@ func executeListCommand(command *cobra.Command, args []string) {
 		return
 	}
 
-	libs := make(map[string]interface{}, 10)
-
+	libs := output.LibProcessResults{
+		Libraries: make([]output.ProcessResult, 0, 10),
+	}
 	//TODO: optimize this algorithm
 	// time complexity O(libraries_to_install(from RAM) *
 	//                   library_folder_number(from DISK) *
@@ -494,7 +426,11 @@ func executeListCommand(command *cobra.Command, args []string) {
 				fileName = strings.Replace(fileName, "_", " ", -1)
 				fileName = strings.Replace(fileName, "-", " v. ", -1)
 				//I use folder name
-				libs[fileName] = "Unknown Version"
+				libs.Libraries = append(libs.Libraries, output.ProcessResult{
+					ItemName: fileName,
+					Status:   "",
+					Error:    "Unknown Version",
+				})
 			} else {
 				// I use library.properties file
 				content, err := ioutil.ReadFile(indexFile)
@@ -504,7 +440,11 @@ func executeListCommand(command *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					libs[fileName] = "Unknown Version"
+					libs.Libraries = append(libs.Libraries, output.ProcessResult{
+						ItemName: fileName,
+						Status:   "",
+						Error:    "Unknown Version",
+					})
 					continue
 				}
 
@@ -520,7 +460,10 @@ func executeListCommand(command *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					libs[fileName] = "Unknown Version"
+					libs.Libraries = append(libs.Libraries, output.ProcessResult{
+						ItemName: fileName,
+						Error:    "Unknown Version",
+					})
 					continue
 				}
 				Version, ok := ini.Get("version")
@@ -530,21 +473,24 @@ func executeListCommand(command *cobra.Command, args []string) {
 					fileName = strings.Replace(fileName, "_", " ", -1)
 					fileName = strings.Replace(fileName, "-", " v. ", -1)
 					//I use folder name
-					libs[fileName] = "Unknown Version"
+					libs.Libraries = append(libs.Libraries, output.ProcessResult{
+						ItemName: fileName,
+						Error:    "Unknown Version",
+					})
 					continue
 				}
-				libs[Name] = fmt.Sprintf("v.%s", Version)
+				libs.Libraries = append(libs.Libraries, output.ProcessResult{
+					ItemName: Name,
+					Status:   fmt.Sprint("v.", Version),
+					Error:    "",
+				})
 			}
 		}
 	}
 
-	if len(libs) < 1 {
+	if len(libs.Libraries) < 1 {
 		formatter.PrintErrorMessage("No library installed")
 	} else {
-		formatter.Print(output.LibResultsFromMap(libs))
+		formatter.Print(libs)
 	}
-}
-
-func execUpdateListIndex(cmd *cobra.Command, args []string) {
-	prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose)
 }

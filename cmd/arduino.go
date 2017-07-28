@@ -71,17 +71,6 @@ const (
 
 var versions = make(map[string]string)
 
-// GlobalFlags represents flags available in all the program.
-var GlobalFlags struct {
-	Verbose int    // More time verbose flag is written, the more the Verbose count increases. Represents verbosity level.
-	Format  string // The Output format (e.g. text, json).
-}
-
-// rootCmdFlags represent flags available to the root command.
-var rootCmdFlags struct {
-	ConfigFile string // The path of the config file provided by the omonym flag.
-}
-
 // arduinoCmd represents the base command when called without any subcommands
 var arduinoCmd = &cobra.Command{
 	Use:   "arduino",
@@ -89,12 +78,7 @@ var arduinoCmd = &cobra.Command{
 	Long:  "Arduino Create Command Line Interface (arduino-cli)",
 	BashCompletionFunction: bashAutoCompletionFunction,
 	PersistentPreRun:       arduinoPreRun,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return cmd.Help()
-		// this is just a placeholder to call help and run PreRun
-		// one of the cobra issues is that if Run is not present PreRun and
-		// PersistentPreRun are not executed.
-	},
+	RunE:                   arduinoRun,
 }
 
 // arduinoVersionCmd represents the version command.
@@ -112,7 +96,7 @@ func init() {
 	arduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
 	arduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
 	arduinoCmd.Flags().StringVar(&rootCmdFlags.ConfigFile, "config", "", "config file (default is $HOME/.arduino.yaml)")
-
+	arduinoCmd.Flags().BoolVar(&rootCmdFlags.GenerateDocs, "generate-docs", false, "generates the docs for the CLI and puts it in docs folder")
 	arduinoCmd.AddCommand(arduinoVersionCmd)
 }
 
@@ -121,6 +105,30 @@ func arduinoPreRun(cmd *cobra.Command, args []string) {
 		GlobalFlags.Format = "text"
 	}
 	formatter.SetFormatter(GlobalFlags.Format)
+	if !formatter.IsCurrentFormat("text") {
+		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+			formatter.PrintErrorMessage("Invalid Call : should show Help, but it is available only in TEXT mode")
+		})
+	}
+}
+
+func arduinoRun(cmd *cobra.Command, args []string) error {
+	if rootCmdFlags.GenerateDocs {
+		errorText := ""
+		err := cmd.GenBashCompletionFile("docs/bash_completions/arduino")
+		if err != nil {
+			errorText += fmt.Sprintln(err.Error())
+		}
+		err = generateManPages(cmd)
+		if err != nil {
+			errorText += fmt.Sprintln(err.Error())
+		}
+		if errorText != "" {
+			formatter.PrintErrorMessage(errorText)
+		}
+		return nil
+	}
+	return cmd.Help()
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.

@@ -27,52 +27,31 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package formatter
+package output
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 )
 
-// ErrorMessage represents an Error with an attached message.
-//
-// It's the same as a normal error, but It is also parsable as JSON.
-type ErrorMessage struct {
-	message string
+//ProcessResult contains info about a completed process.
+type ProcessResult struct {
+	ItemName string `json:"name,required"`
+	Status   string `json:"status,omitempty"`
+	Error    string `json:"error,omitempty"`
+	Path     string `json:"path,omitempty"`
 }
 
-// MarshalJSON allows to marshal this object as a JSON object.
-func (err ErrorMessage) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]string{
-		"error": err.message,
-	})
-}
-
-// Error returns the error message.
-func (err ErrorMessage) Error() string {
-	return fmt.Sprint(err.message)
-}
-
-// String returns a string representation of the Error.
-func (err ErrorMessage) String() string {
-	return err.Error()
-}
-
-// FromError creates an ErrorMessage from an Error.
-func FromError(err error) ErrorMessage {
-	return ErrorMessage{
-		message: err.Error(),
+// String returns a string representation of the object.
+//   EXAMPLE:
+//   ToolName - ErrorText: Error explaining why failed
+//   ToolName - StatusText: PATH = /path/to/result/folder
+func (lr ProcessResult) String() string {
+	ret := fmt.Sprintf("%s - %s", lr.ItemName, lr.Status)
+	if lr.Error != "" {
+		ret += fmt.Sprint(": ", lr.Error)
+	} else if lr.Path != "" {
+		ret += fmt.Sprint(": PATH = ", lr.Path)
 	}
-}
-
-// PrintErrorMessage formats and prints info about an error message.
-func PrintErrorMessage(msg string) {
-	PrintError(errors.New(strings.TrimSpace(msg)))
-}
-
-// PrintError formats and prints info about an error.
-func PrintError(err error) {
-	Print(FromError(err))
+	return strings.TrimSpace(ret)
 }
