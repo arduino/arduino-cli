@@ -45,7 +45,7 @@ func getDownloadCacheFolder() (string, error) {
 
 // DownloadPackagesFile downloads the core packages index file from arduino repository.
 func DownloadPackagesFile() error {
-	return common.DownloadPackageIndex(IndexPath, packageIndexURL)
+	return common.DownloadIndex(IndexPath, packageIndexURL)
 }
 
 // download core
