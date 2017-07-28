@@ -31,10 +31,10 @@ package cores
 
 //Package represents a package in the system.
 type Package struct {
-	Name       string
-	Maintainer string
-	WebsiteURL string
-	Email      string
+	Name       string           // Name of the package.
+	Maintainer string           // Name of the maintainer.
+	WebsiteURL string           // Website of maintainer.
+	Email      string           // Email of maintainer.
 	Cores      map[string]*Core // The cores in the system.
 	Tools      map[string]*Tool // The tools in the system.
 }

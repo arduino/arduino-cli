@@ -32,6 +32,7 @@ package releases
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -84,25 +85,37 @@ func ParseArgs(args []string) []NameVersionPair {
 //     label -> Name used to identify the type of the Item downloaded (library, core, tool)
 //   RETURNS:
 //     error if any
-func downloadRelease(item DownloadItem, progBar *pb.ProgressBar, label string) error {
+func downloadRelease(item DownloadItem, progBar *pb.ProgressBar, label string) (io.Reader, error) {
 	if item.Release == nil {
-		return errors.New("Cannot accept nil release")
+		return nil, errors.New("Cannot accept nil release")
 	}
 
 	initialData, err := item.Release.OpenLocalArchiveForDownload()
 	if err != nil {
-		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
+		return nil, fmt.Errorf("Cannot get Archive file of this release : %s", err)
 	}
 	defer initialData.Close()
-	err = common.DownloadPackage(item.Release.ArchiveURL(), fmt.Sprint(label, " ", item.Name), progBar, initialData, item.Release.ArchiveSize())
+	// puts the progress bar
+	err = common.DownloadPackage(item.Release.ArchiveURL(), initialData, item.Release.ArchiveSize(), func(source io.Reader, initialSize int) error {
+		if progBar != nil {
+			progBar.Add(int(initialSize))
+			source = progBar.NewProxyReader(source)
+		}
+
+		_, err = io.Copy(initialData, source)
+		if err != nil {
+			return fmt.Errorf("Cannot read response body %s", err)
+		}
+		return nil
+	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	err = checkLocalArchive(item.Release)
 	if err != nil {
-		return errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
+		return nil, errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
 	}
-	return nil
+	return reader, nil
 }
 
 // downloadAndCache returns the wrapper to download something without installing it

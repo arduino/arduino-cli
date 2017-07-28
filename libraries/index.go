@@ -43,8 +43,8 @@ type Index struct {
 
 // indexRelease is an entry of a library_index.json
 type indexRelease struct {
-	Name            string   `json:"name"`
-	Version         string   `json:"version"`
+	Name            string   `json:"name,required"`
+	Version         string   `json:"version,required"`
 	Author          string   `json:"author"`
 	Maintainer      string   `json:"maintainer"`
 	Sentence        string   `json:"sentence"`

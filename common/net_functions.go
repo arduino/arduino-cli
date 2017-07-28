@@ -36,8 +36,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-
-	pb "gopkg.in/cheggaaa/pb.v1"
+	"time"
 )
 
 // DownloadIndex is a function to download a generic index.
@@ -72,17 +71,13 @@ func DownloadIndex(indexPathFunc func() (string, error), URL string) error {
 }
 
 // DownloadPackage downloads a package from arduino repository, applying a label for the progress bar.
-func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressBar, initialData *os.File, totalSize int64) error {
-	client := http.DefaultClient
-
+func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleResultFunc func(io.Reader, int) error) error {
 	if initialData == nil {
 		return errors.New("Cannot fill a nil file pointer")
 	}
 
-	request, err := http.NewRequest("GET", URL, nil)
-	if err != nil {
-		return fmt.Errorf("Cannot create HTTP request: %s", err)
-	}
+	client := http.DefaultClient
+	client.Timeout = time.Minute
 
 	var initialSize int64
 	stats, err := initialData.Stat()
@@ -97,31 +92,34 @@ func DownloadPackage(URL string, downloadLabel string, progressBar *pb.ProgressB
 		}
 	}
 
+	request, err := http.NewRequest("GET", URL, nil)
+	if err != nil {
+		return fmt.Errorf("Cannot create HTTP request: %s", err)
+	}
+
 	if initialSize > 0 {
 		request.Header.Add("Range", fmt.Sprintf("bytes=%d-", initialSize))
 	}
 
 	response, err := client.Do(request)
-
 	if err != nil {
-		return fmt.Errorf("Cannot fetch %s. Response creation error", downloadLabel)
+		return fmt.Errorf("Cannot fetch %s. Response creation error", URL)
 	} else if response.StatusCode != 200 &&
 		response.StatusCode != 206 &&
 		response.StatusCode != 416 {
 		response.Body.Close()
-		return fmt.Errorf("Cannot fetch %s. Source responded with a status %d code", downloadLabel, response.StatusCode)
+		return fmt.Errorf("Cannot fetch %s. Source responded with code %d",
+			URL, response.StatusCode)
 	}
 	defer response.Body.Close()
 
-	source := response.Body
-	if progressBar != nil {
-		progressBar.Add(int(initialSize))
-		source = progressBar.NewProxyReader(response.Body)
+	if handleResultFunc == nil {
+		_, err = io.Copy(initialData, response.Body)
+	} else {
+		err = handleResultFunc(response.Body, int(initialSize))
 	}
-
-	_, err = io.Copy(initialData, source)
 	if err != nil {
-		return fmt.Errorf("Cannot read response body %s", err)
+		return fmt.Errorf("Cannot read response body from %s : %s", URL, err)
 	}
 	return nil
 }

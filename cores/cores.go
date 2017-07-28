@@ -139,6 +139,8 @@ func (release Release) OpenLocalArchiveForDownload() (*os.File, error) {
 	stats, err := os.Stat(path)
 	if os.IsNotExist(err) || err == nil && stats.Size() >= release.Size {
 		return os.Create(path)
+	} else if err != nil {
+		return nil, err
 	}
 	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 }
