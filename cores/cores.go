@@ -36,7 +36,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/common/checksums"
 	"github.com/blang/semver"
 )
 
@@ -177,7 +176,7 @@ func (release Release) CheckLocalArchive() error {
 }
 
 func (release Release) checksumMatches() bool {
-	return checksums.Match(release)
+	return releases.Match(release)
 }
 
 // Implementation of Release interface

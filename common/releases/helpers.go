@@ -78,8 +78,8 @@ func ParseArgs(args []string) []NameVersionPair {
 // downloadRelease downloads a generic release.
 //
 //   PARAMS:
-//     name -> The name of the Item to download
-//     release -> The release to download
+//     name -> The name of the Item to download.
+//     release -> The release to download.
 //     progBar -> a progress bar, can be nil. If not nill progress is handled for that bar.
 //     label -> Name used to identify the type of the Item downloaded (library, core, tool)
 //   RETURNS:
@@ -126,9 +126,9 @@ func downloadAndCache(item DownloadItem, progBar *pb.ProgressBar) task.Wrapper {
 
 // ParallelDownload executes multiple releases downloads in parallel and fills properly results.
 //
-// forced is used to force download if cached.
-// OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
-// DOES NOT RETURN because modified refResults array of results using pointer provided by refResults.Results().
+//   forced is used to force download if cached.
+//   OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
+//   DOES NOT RETURN because modified refResults array of results using pointer provided by refResults.Results().
 func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbosity int, refResults *[]output.ProcessResult) {
 	itemC := len(items)
 	tasks := make(map[string]task.Wrapper, itemC)

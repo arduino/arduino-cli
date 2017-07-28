@@ -1,4 +1,4 @@
-package checksums
+package releases
 
 import (
 	"bytes"
@@ -8,8 +8,6 @@ import (
 	"io"
 	"os"
 	"strings"
-
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 )
 
 func getHashAlgoAndComponent(checksum string) (hash.Hash, []byte) {
@@ -35,7 +33,7 @@ func getHashAlgoAndComponent(checksum string) (hash.Hash, []byte) {
 
 // Match checks the checksum of a Release archive, in compliance with
 // What Checksum is expected.
-func Match(r releases.Release) bool {
+func Match(r Release) bool {
 	hash, content := getHashAlgoAndComponent(r.ExpectedChecksum())
 	filePath, err := r.ArchivePath()
 	if err != nil {

@@ -44,7 +44,7 @@ import (
 	"fmt"
 
 	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/bcmi-labs/arduino-cli/common/checksums"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/blang/semver"
 )
 
@@ -176,7 +176,7 @@ func (r Release) CheckLocalArchive() error {
 }
 
 func (r Release) checksumMatches() bool {
-	return checksums.Match(r)
+	return releases.Match(r)
 }
 
 // Versions returns an array of all versions available of the library
