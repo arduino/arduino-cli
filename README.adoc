@@ -13,7 +13,7 @@ It implements all functions provided by web version of Arduino Create.
 
 
 == Compiling
-you have two ways:
+There are two ways to execute the project:
 
 . By running the go main file.
 +
@@ -50,9 +50,7 @@ To see the full list of commands, call one of the following:
 ----
 
 Here is the output from help command `arduino help`:
-[source, bash]
 ----
-$ arduino help
 Arduino Create Command Line Interface (arduino-cli)
 
 Usage:
