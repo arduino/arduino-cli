@@ -15,13 +15,14 @@ It implements all functions provided by web version of Arduino Create.
 == Compiling
 you have two ways:
 
-.> By running the go main file.
+. By running the go main file.
++
 [source, bash]
 ----
 $ go run main.go ARGS
 ----
-
-.> By compiling then running the go program.
+. By compiling then running the go program.
++
 [source, bash]
 ----
 $ go build -o arduino
