@@ -67,6 +67,7 @@ func InstallLib(name string, release releases.Release) error {
 			//}
 		}
 	*/
+
 	libFolder, err := common.GetDefaultLibFolder()
 	if err != nil {
 		return err

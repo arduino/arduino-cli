@@ -31,16 +31,11 @@ package libraries
 
 import (
 	"bufio"
-
-	"strings"
-
-	"io/ioutil"
-
-	"path/filepath"
-
-	"os"
-
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/blang/semver"
