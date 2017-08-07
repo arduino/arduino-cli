@@ -84,8 +84,11 @@ func (vfi VersionFullInfo) String() string {
 
 // String returns a string representation of the object.
 func (lsr LibSearchResults) String() string {
-	ret := fmt.Sprintln("Search results:")
+	ret := ""
 	for _, lib := range lsr.Libraries {
+		if _, isString := lib.(string); isString {
+			lib = fmt.Sprintf("\"%s\"", lib)
+		}
 		ret += fmt.Sprintln(lib)
 	}
 	return strings.TrimSpace(ret)
