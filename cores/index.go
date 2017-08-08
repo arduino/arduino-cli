@@ -31,6 +31,7 @@ package cores
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 
 	"github.com/bcmi-labs/arduino-cli/common"
@@ -196,7 +197,7 @@ func LoadIndex(index *Index) error {
 	if err != nil {
 		return err
 	}
-
+	fmt.Println(string(buff))
 	err = json.Unmarshal(buff, index)
 	if err != nil {
 		return err

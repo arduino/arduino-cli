@@ -42,8 +42,3 @@ const (
 func DownloadPackagesFile() error {
 	return common.DownloadIndex(IndexPath, packageIndexURL)
 }
-
-// download core
-// check core deps, needs statuscontext
-// download tools
-// download tool -> download Release -> downloadPackage

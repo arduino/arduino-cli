@@ -102,6 +102,8 @@ func (f Flavour) String() string {
 		fmt.Sprintln("    Checksum:", f.Checksum)
 }
 
+// Release interface implementation
+
 // ArchiveName returns the archive file name (not the path).
 func (tr ToolRelease) ArchiveName() string {
 	return tr.Flavours[runtime.GOOS].ArchiveFileName
