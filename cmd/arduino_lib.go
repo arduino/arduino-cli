@@ -421,30 +421,12 @@ func executeListCommand(command *cobra.Command, args []string) {
 			indexFile := filepath.Join(libHome, file.Name(), "library.properties")
 			_, err = os.Stat(indexFile)
 			if os.IsNotExist(err) {
-				fileName := file.Name()
-				//replacing underscore in foldernames with spaces.
-				fileName = strings.Replace(fileName, "_", " ", -1)
-				fileName = strings.Replace(fileName, "-", " v. ", -1)
-				//I use folder name
-				libs.Libraries = append(libs.Libraries, output.ProcessResult{
-					ItemName: fileName,
-					Status:   "",
-					Error:    "Unknown Version",
-				})
+				resultFromFileName(file, &libs)
 			} else {
 				// I use library.properties file
 				content, err := ioutil.ReadFile(indexFile)
 				if err != nil {
-					fileName := file.Name()
-					//replacing underscore in foldernames with spaces.
-					fileName = strings.Replace(fileName, "_", " ", -1)
-					fileName = strings.Replace(fileName, "-", " v. ", -1)
-					//I use folder name
-					libs.Libraries = append(libs.Libraries, output.ProcessResult{
-						ItemName: fileName,
-						Status:   "",
-						Error:    "Unknown Version",
-					})
+					resultFromFileName(file, &libs)
 					continue
 				}
 
@@ -455,28 +437,12 @@ func executeListCommand(command *cobra.Command, args []string) {
 				}
 				Name, ok := ini.Get("name")
 				if !ok {
-					fileName := file.Name()
-					//replacing underscore in foldernames with spaces.
-					fileName = strings.Replace(fileName, "_", " ", -1)
-					fileName = strings.Replace(fileName, "-", " v. ", -1)
-					//I use folder name
-					libs.Libraries = append(libs.Libraries, output.ProcessResult{
-						ItemName: fileName,
-						Error:    "Unknown Version",
-					})
+					resultFromFileName(file, &libs)
 					continue
 				}
 				Version, ok := ini.Get("version")
 				if !ok {
-					fileName := file.Name()
-					//replacing underscore in foldernames with spaces.
-					fileName = strings.Replace(fileName, "_", " ", -1)
-					fileName = strings.Replace(fileName, "-", " v. ", -1)
-					//I use folder name
-					libs.Libraries = append(libs.Libraries, output.ProcessResult{
-						ItemName: fileName,
-						Error:    "Unknown Version",
-					})
+					resultFromFileName(file, &libs)
 					continue
 				}
 				libs.Libraries = append(libs.Libraries, output.ProcessResult{
@@ -493,4 +459,17 @@ func executeListCommand(command *cobra.Command, args []string) {
 	} else {
 		formatter.Print(libs)
 	}
+}
+
+func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
+	fileName := file.Name()
+	//replacing underscore in foldernames with spaces.
+	fileName = strings.Replace(fileName, "_", " ", -1)
+	fileName = strings.Replace(fileName, "-", " v. ", -1)
+	//I use folder name
+	libs.Libraries = append(libs.Libraries, output.ProcessResult{
+		ItemName: fileName,
+		Status:   "",
+		Error:    "Unknown Version",
+	})
 }
