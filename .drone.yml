@@ -7,5 +7,5 @@ pipeline:
     image: golang:latest
     commands:
       - go get
+      - go build -o arduino
       - go test
-      - go build
