@@ -2,6 +2,7 @@ package cores
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/blang/semver"
 )
@@ -23,7 +24,7 @@ type Flavour struct {
 	OS              string `json:"os,required"`              // The OS Supported by this flavour.
 	URL             string `json:"url,required"`             // The URL where to download this flavour.
 	ArchiveFileName string `json:"archiveFileName,required"` // The name of the archive to download.
-	Size            int    `json:"size,required"`            // The size of the archive.
+	Size            int64  `json:"size,required"`            // The size of the archive.
 	Checksum        string `json:"checksum,required"`        // The checksum of the archive. Made like ALGO:checksum.
 }
 
@@ -99,4 +100,24 @@ func (f Flavour) String() string {
 		fmt.Sprintln("    ArchiveFileName:", f.ArchiveFileName) +
 		fmt.Sprintln("    Size:", f.Size) +
 		fmt.Sprintln("    Checksum:", f.Checksum)
+}
+
+// ArchiveName returns the archive file name (not the path).
+func (tr ToolRelease) ArchiveName() string {
+	return tr.Flavours[runtime.GOOS].ArchiveFileName
+}
+
+// ArchiveURL returns the archive URL.
+func (tr ToolRelease) ArchiveURL() string {
+	return tr.Flavours[runtime.GOOS].URL
+}
+
+// ExpectedChecksum returns the expected checksum for this release.
+func (tr ToolRelease) ExpectedChecksum() string {
+	return tr.Flavours[runtime.GOOS].Checksum
+}
+
+// ArchiveSize returns the archive size.
+func (tr ToolRelease) ArchiveSize() int64 {
+	return tr.Flavours[runtime.GOOS].Size
 }

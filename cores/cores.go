@@ -32,8 +32,9 @@ package cores
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
+
+	"github.com/bcmi-labs/arduino-cli/common/releases"
 
 	"github.com/blang/semver"
 )
@@ -132,7 +133,7 @@ func (release *Release) String() string {
 
 // OpenLocalArchiveForDownload Creates an empty file if not found.
 func (release Release) OpenLocalArchiveForDownload() (*os.File, error) {
-	path, err := release.ArchivePath()
+	path, err := releases.ArchivePath(release)
 	if err != nil {
 		return nil, err
 	}
@@ -145,26 +146,11 @@ func (release Release) OpenLocalArchiveForDownload() (*os.File, error) {
 	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 }
 
-// ArchivePath returns the fullPath of the Archive of this release.
-func (release Release) ArchivePath() (string, error) {
-	staging, err := getDownloadCacheFolder()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(staging, release.ArchiveFileName), nil
-}
-
 // Implementation of Release interface
 
 // ExpectedChecksum returns the expected checksum for this release.
 func (release Release) ExpectedChecksum() string {
 	return release.Checksum
-}
-
-// GetDownloadCacheFolder returns the cache folder of this release.
-// Mostly this is based on the type of release (library, core, tool)
-func (release Release) GetDownloadCacheFolder() (string, error) {
-	return getDownloadCacheFolder()
 }
 
 // ArchiveName returns the archive file name (not the path)

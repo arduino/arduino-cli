@@ -156,8 +156,8 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	pairs := releases.ParseArgs(args)
-	libsToDownload, failOutputs := status.ProcessPairs(pairs, "library")
+	pairs := libraries.ParseArgs(args)
+	libsToDownload, failOutputs := status.Process(pairs)
 	outputResults := output.LibProcessResults{
 		Libraries: failOutputs,
 	}
@@ -190,8 +190,8 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	pairs := releases.ParseArgs(args)
-	libsToDownload, failOutputs := status.ProcessPairs(pairs, "library")
+	pairs := libraries.ParseArgs(args)
+	libsToDownload, failOutputs := status.Process(pairs)
 	outputResults := output.LibProcessResults{
 		Libraries: failOutputs,
 	}

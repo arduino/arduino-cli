@@ -91,7 +91,7 @@ type indexFlavourRelease struct {
 	OS              string `json:"host,required"`
 	URL             string `json:"url,required"`
 	ArchiveFileName string `json:"archiveFileName,required"`
-	Size            int    `json:"size,required"`
+	Size            int64  `json:"size,required"`
 	Checksum        string `json:"checksum,required"`
 }
 
@@ -144,7 +144,7 @@ func (release indexCoreRelease) extractRelease() *Release {
 }
 
 func (release indexCoreRelease) extractBoards() []string {
-	boards := make([]string, 0, len(release.Boards))
+	boards := make([]string, len(release.Boards))
 	for i, board := range release.Boards {
 		boards[i] = board.Name
 	}
@@ -187,12 +187,12 @@ func (itr indexToolRelease) extractFlavours() map[string]*Flavour {
 // LoadIndex reads a package_index.json from a file and returns
 // the corresponding Index structure.
 func LoadIndex(index *Index) error {
-	libFile, err := IndexPath()
+	coreFile, err := IndexPath()
 	if err != nil {
 		return err
 	}
 
-	buff, err := ioutil.ReadFile(libFile)
+	buff, err := ioutil.ReadFile(coreFile)
 	if err != nil {
 		return err
 	}

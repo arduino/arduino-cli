@@ -30,6 +30,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -37,6 +38,8 @@ import (
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/spf13/cobra"
 )
 
@@ -55,9 +58,17 @@ With -v tag (up to 2 times) can provide more verbose output.`,
 	Run: executeCoreListCommand,
 }
 
+var arduinoCoreDownloadCmd = &cobra.Command{
+	Use:   "download [PACKAGER:NAME[=VERSION]](S)",
+	Short: "Downloads one or more cores and relative tool dependencies",
+	Long:  `Downloads one or more cores and relative tool dependencies`,
+	RunE:  executeCoreDownloadCommand,
+}
+
 func init() {
 	arduinoCmd.AddCommand(arduinoCoreCmd)
 	arduinoCoreCmd.AddCommand(arduinoCoreListCmd)
+	arduinoCoreCmd.AddCommand(arduinoCoreDownloadCmd)
 
 	arduinoCoreCmd.Flags().BoolVar(&arduinoCoreFlags.updateIndex, "update-index", false, "Updates the index of cores to the latest version")
 }
@@ -112,14 +123,51 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 	formatter.Print(pkgs)
 }
 
+func executeCoreDownloadCommand(cmd *cobra.Command, args []string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("No core specified for download command")
+	}
+
+	var index cores.Index
+	err := cores.LoadIndex(&index)
+	if err != nil {
+		formatter.Print("Cannot find index file ... " + err.Error())
+		err = prettyPrints.DownloadCoreFileIndex().Execute(GlobalFlags.Verbose).Error
+		if err != nil {
+			return nil
+		}
+	}
+
+	status, err := index.CreateStatusContext()
+	if err != nil {
+		status, err = prettyPrints.CorruptedCoreIndexFix(index, GlobalFlags.Verbose)
+		if err != nil {
+			return nil
+		}
+	}
+
+	IDTuples := cores.ParseArgs(args)
+	coresToDownload, failOutputs := status.Process(IDTuples)
+	outputResults := output.CoreProcessResults{
+		Cores: failOutputs,
+	}
+	releases.ParallelDownload(coresToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Cores)
+
+	formatter.Print(outputResults)
+	return nil
+}
+
+// getInstalledCores gets the installed cores and puts them in the output struct.
 func getInstalledCores(packageName string, cores *[]output.InstalledStuff) {
 	getInstalledStuff(packageName, cores, common.GetDefaultCoresFolder)
 }
 
+// getInstalledTools gets the installed tools and puts them in the output struct.
 func getInstalledTools(packageName string, tools *[]output.InstalledStuff) {
 	getInstalledStuff(packageName, tools, common.GetDefaultToolsFolder)
 }
 
+// getInstalledStuff is a generic procedure to get installed cores or tools and put them in an output struct.
 func getInstalledStuff(packageName string, stuff *[]output.InstalledStuff, startPathFunc func(string) (string, error)) {
 	stuffHome, err := startPathFunc(packageName)
 	if err != nil {

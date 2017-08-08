@@ -27,18 +27,40 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package libraries
+package cores
 
 import (
-	"github.com/bcmi-labs/arduino-cli/common"
+	"regexp"
+	"strings"
 )
 
-const (
-	// libraryIndexURL is the URL where to get library index.
-	libraryIndexURL string = "http://downloads.arduino.cc/libraries/library_index.json"
-)
+// CoreIDTuple represents a tuple to identify a Core
+type CoreIDTuple struct {
+	Package     string // The package where this core belongs to.
+	CoreName    string // The core name.
+	CoreVersion string // The version of the core, to get the release.
+}
 
-// DownloadLibrariesFile downloads the lib file from arduino repository.
-func DownloadLibrariesFile() error {
-	return common.DownloadIndex(IndexPath, libraryIndexURL)
+var coreTupleRegexp = regexp.MustCompile("[a-zA-Z0-9]+:[a-zA-Z0-9]+(=([0-9]|[0-9].)*[0-9]+)?")
+
+func ParseArgs(args []string) []CoreIDTuple {
+	ret := make([]CoreIDTuple, 0, 5)
+
+	for _, arg := range args {
+		if coreTupleRegexp.MatchString(arg) {
+			// splits the string according to regexp into its components.
+			split := strings.FieldsFunc(arg, func(r rune) bool {
+				return r == '=' || r == ':'
+			})
+			if len(split) < 3 {
+				split = append(split, "latest")
+			}
+			ret = append(ret, CoreIDTuple{
+				Package:     split[0],
+				CoreName:    split[1],
+				CoreVersion: split[2],
+			})
+		}
+	}
+	return ret
 }

@@ -35,7 +35,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
@@ -46,34 +45,13 @@ import (
 
 // IsCached returns a bool representing if the release has already been downloaded
 func IsCached(release Release) bool {
-	stagingFolder, err := release.GetDownloadCacheFolder()
+	stagingFolder, err := common.GetDownloadCacheFolder()
 	if err != nil {
 		return false
 	}
 
 	_, err = os.Stat(filepath.Join(stagingFolder, release.ArchiveName()))
 	return !os.IsNotExist(err)
-}
-
-// ParseArgs parses a sequence of "item@version" tokens and returns a Name-Version slice.
-//
-// If version is not present it is assumed as "latest" version.
-func ParseArgs(args []string) []NameVersionPair {
-	ret := make([]NameVersionPair, 0, len(args))
-	for _, item := range args {
-		tokens := strings.SplitN(item, "@", 2)
-		var version string
-		if len(tokens) == 2 {
-			version = tokens[1]
-		} else {
-			version = "latest"
-		}
-		ret = append(ret, NameVersionPair{
-			Name:    tokens[0],
-			Version: version,
-		})
-	}
-	return ret
 }
 
 // downloadRelease downloads a generic release.
@@ -89,7 +67,7 @@ func downloadRelease(item DownloadItem, progBar *pb.ProgressBar, label string) e
 	if item.Release == nil {
 		return errors.New("Cannot accept nil release")
 	}
-	initialData, err := item.Release.OpenLocalArchiveForDownload()
+	initialData, err := OpenLocalArchiveForDownload(item.Release)
 	if err != nil {
 		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
 	}
@@ -197,4 +175,28 @@ func handleWithProgressBarFunc(progBar *pb.ProgressBar) func(io.Reader, *os.File
 		}
 		return nil
 	}
+}
+
+// ArchivePath returns the fullPath of the Archive of this release.
+func ArchivePath(release Release) (string, error) {
+	staging, err := common.GetDownloadCacheFolder()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(staging, release.ArchiveName()), nil
+}
+
+// OpenLocalArchiveForDownload reads the data from the local archive if present,
+// and returns the []byte of the file content. Used by resume Download.
+// Creates an empty file if not found.
+func OpenLocalArchiveForDownload(r Release) (*os.File, error) {
+	path, err := ArchivePath(r)
+	if err != nil {
+		return nil, err
+	}
+	stats, err := os.Stat(path)
+	if os.IsNotExist(err) || err == nil && stats.Size() >= r.ArchiveSize() {
+		return os.Create(path)
+	}
+	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 }

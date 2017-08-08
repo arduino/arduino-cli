@@ -80,5 +80,15 @@
             "args": ["core", "list", "--format", "json"],
             "showLog": true
         },
+        {
+            "name": "Launch CORE DOWNLOAD",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceRoot}/main.go",
+            "env": {},
+            "args": ["core", "download", "arduino:samd"],
+            "showLog": true
+        },
     ]
 }

@@ -121,7 +121,7 @@ func GetDefaultToolsFolder(packageName string) (string, error) {
 }
 
 // GetDownloadCacheFolder gets a generic cache folder for downloads.
-func GetDownloadCacheFolder(item string) (string, error) {
+func GetDownloadCacheFolder() (string, error) {
 	return GetDefaultFolder(GetDefaultArduinoFolder, "staging", "cache", true)
 }
 

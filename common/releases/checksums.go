@@ -36,7 +36,7 @@ func getHashAlgoAndComponent(checksum string) (hash.Hash, []byte) {
 // What Checksum is expected.
 func checksumMatches(r Release) bool {
 	hash, content := getHashAlgoAndComponent(r.ExpectedChecksum())
-	filePath, err := r.ArchivePath()
+	filePath, err := ArchivePath(r)
 	if err != nil {
 		return false
 	}
@@ -52,7 +52,7 @@ func checksumMatches(r Release) bool {
 
 // CheckLocalArchive check for integrity of the local archive.
 func checkLocalArchive(release Release) error {
-	archivePath, err := release.ArchivePath()
+	archivePath, err := ArchivePath(release)
 	if err != nil {
 		return err
 	}

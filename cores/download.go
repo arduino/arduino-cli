@@ -38,11 +38,6 @@ const (
 	packageIndexURL = "http://downloads.arduino.cc/packages/package_index.json"
 )
 
-// getDownloadCacheFolder gets the folder where temp installs are stored until installation complete (libraries).
-func getDownloadCacheFolder() (string, error) {
-	return common.GetDownloadCacheFolder("packages")
-}
-
 // DownloadPackagesFile downloads the core packages index file from arduino repository.
 func DownloadPackagesFile() error {
 	return common.DownloadIndex(IndexPath, packageIndexURL)

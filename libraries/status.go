@@ -70,9 +70,7 @@ func (sc StatusContext) Names() []string {
 // ProcessPairs takes a set of name-version pairs and return
 // a set of items to download and a set of outputs for non
 // existing libraries.
-//
-// Uses a label to print messages ("library" | "core" | "tool")
-func (sc StatusContext) ProcessPairs(items []releases.NameVersionPair, label string) ([]releases.DownloadItem, []output.ProcessResult) {
+func (sc StatusContext) Process(items []NameVersionPair) ([]releases.DownloadItem, []output.ProcessResult) {
 	itemC := len(items)
 	ret := make([]releases.DownloadItem, 0, itemC)
 	fails := make([]output.ProcessResult, 0, itemC)
@@ -82,7 +80,7 @@ func (sc StatusContext) ProcessPairs(items []releases.NameVersionPair, label str
 		if !exists {
 			fails = append(fails, output.ProcessResult{
 				ItemName: item.Name,
-				Error:    fmt.Sprint(label, " not found"),
+				Error:    "library not found",
 			})
 		} else {
 			release := library.GetVersion(item.Version)

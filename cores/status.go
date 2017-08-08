@@ -34,6 +34,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/cmd/output"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/pmylund/sortutil"
 )
 
@@ -134,36 +136,60 @@ func (sc StatusContext) GetDeps(release *Release) ([]CoreDependency, error) {
 	return ret, nil
 }
 
-
-// ProcessPairs takes a set of name-version pairs and return
+// Process takes a set of name-version pairs and return
 // a set of items to download and a set of outputs for non
-// existing libraries.
-//
-// Uses a label to print messages ("library" | "core" | "tool")
-func (sc StatusContext) ProcessPairs(items []releases.NameVersionPair) ([]releases.DownloadItem, []output.ProcessResult) {
+// existing cores.
+func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, []output.ProcessResult) {
 	itemC := len(items)
 	ret := make([]releases.DownloadItem, 0, itemC)
 	fails := make([]output.ProcessResult, 0, itemC)
 
 	for _, item := range items {
-		core, exists := sc.Packages[item.Name]
+		fmt.Println(sc)
+		pkg, exists := sc.Packages[item.Package]
 		if !exists {
 			fails = append(fails, output.ProcessResult{
-				ItemName: item.Name,
-				Error:    fmt.Sprint("core not found"),
+				ItemName: item.CoreName,
+				Error:    fmt.Sprint("package not found : ", pkg),
 			})
-		} else {
-			release := library.GetVersion(item.Version)
-			if release == nil {
-				fails = append(fails, output.ProcessResult{
-					ItemName: item.Name,
-					Error:    "Version Not Found",
-				})
-			} else { // replaces "latest" with latest version too
-				ret = append(ret, releases.DownloadItem{
-					Name:    core.Name,
-					Release: release,
-				})
-			}
+			continue
 		}
+		core, exists := pkg.Cores[item.CoreName]
+		if !exists {
+			fails = append(fails, output.ProcessResult{
+				ItemName: item.CoreName,
+				Error:    fmt.Sprint("core not found : ", item.CoreName),
+			})
+			continue
+		}
+		release := core.GetVersion(item.CoreVersion)
+		if release == nil {
+			fails = append(fails, output.ProcessResult{
+				ItemName: item.CoreName,
+				Error:    "Version Not Found",
+			})
+			continue
+		}
+		// replaces "latest" with latest version too
+		deps, err := sc.GetDeps(release)
+		if err != nil {
+			fails = append(fails, output.ProcessResult{
+				ItemName: item.CoreName,
+				Error:    fmt.Sprint("Can't find tool :", err.Error()),
+			})
+			continue
+		}
+		ret = append(ret, releases.DownloadItem{
+			Name:    core.Name,
+			Release: release,
+		})
+		for _, tool := range deps {
+			ret = append(ret, releases.DownloadItem{
+				Name:    tool.ToolName,
+				Release: tool.Release,
+			})
+		}
+
 	}
+	return ret, fails
+}
