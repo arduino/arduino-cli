@@ -139,21 +139,16 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	var index libraries.Index
-	err := libraries.LoadIndex(&index)
-	if err != nil {
-		formatter.Print("Cannot find index file ... " + err.Error())
-		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
-		if err != nil {
-			return nil
-		}
-	}
+	var status libraries.StatusContext
 
-	status, err := index.CreateStatusContext()
+	err := libraries.LoadIndex(&index)
 	if err != nil {
 		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
 		if err != nil {
 			return nil
 		}
+	} else {
+		status = index.CreateStatusContext()
 	}
 
 	pairs := libraries.ParseArgs(args)
@@ -173,21 +168,16 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	var index libraries.Index
-	err := libraries.LoadIndex(&index)
-	if err != nil {
-		formatter.Print("Cannot find index file ..." + err.Error())
-		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
-		if err != nil {
-			return nil
-		}
-	}
+	var status libraries.StatusContext
 
-	status, err := index.CreateStatusContext()
+	err := libraries.LoadIndex(&index)
 	if err != nil {
 		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
 		if err != nil {
 			return nil
 		}
+	} else {
+		status = index.CreateStatusContext()
 	}
 
 	pairs := libraries.ParseArgs(args)
@@ -341,18 +331,16 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	var index libraries.Index
-	err := libraries.LoadIndex(&index)
-	if err != nil {
-		formatter.PrintErrorMessage("Index file is corrupted. Please replace it by updating : arduino lib list --update-index")
-		return nil
-	}
+	var status libraries.StatusContext
 
-	status, err := index.CreateStatusContext()
+	err := libraries.LoadIndex(&index)
 	if err != nil {
 		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
 		if err != nil {
 			return nil
 		}
+	} else {
+		status = index.CreateStatusContext()
 	}
 
 	found := false

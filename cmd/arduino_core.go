@@ -33,7 +33,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
@@ -130,21 +129,18 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	var index cores.Index
+	var status cores.StatusContext
+
 	err := cores.LoadIndex(&index)
 	if err != nil {
-		formatter.Print("Cannot find index file ... " + err.Error())
-		err = prettyPrints.DownloadCoreFileIndex().Execute(GlobalFlags.Verbose).Error
 		if err != nil {
-			return nil
+			status, err = prettyPrints.CorruptedCoreIndexFix(index, GlobalFlags.Verbose)
+			if err != nil {
+				return nil
+			}
 		}
-	}
-
-	status, err := index.CreateStatusContext()
-	if err != nil {
-		status, err = prettyPrints.CorruptedCoreIndexFix(index, GlobalFlags.Verbose)
-		if err != nil {
-			return nil
-		}
+	} else {
+		status = index.CreateStatusContext()
 	}
 
 	IDTuples := cores.ParseArgs(args)
@@ -155,7 +151,6 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) error {
 	releases.ParallelDownload(coresToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Cores, "core")
 
 	formatter.Print(outputResults)
-	fmt.Println(runtime.GOOS)
 	return nil
 }
 

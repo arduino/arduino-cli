@@ -102,7 +102,7 @@ func (sc StatusContext) Process(items []NameVersionPair) ([]releases.DownloadIte
 }
 
 // CreateStatusContext creates a status context from index data.
-func (index Index) CreateStatusContext() (StatusContext, error) {
+func (index Index) CreateStatusContext() StatusContext {
 	// Start with an empty status context
 	libraries := StatusContext{
 		Libraries: map[string]*Library{},
@@ -111,5 +111,5 @@ func (index Index) CreateStatusContext() (StatusContext, error) {
 		// Add all indexed libraries in the status context
 		libraries.AddLibrary(&lib)
 	}
-	return libraries, nil
+	return libraries
 }

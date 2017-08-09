@@ -98,7 +98,7 @@ func (tdep toolDependency) extractRelease(sc StatusContext) (*ToolRelease, error
 }
 
 // CreateStatusContext creates a status context from index data.
-func (index Index) CreateStatusContext() (StatusContext, error) {
+func (index Index) CreateStatusContext() StatusContext {
 	// Start with an empty status context
 	packages := StatusContext{
 		Packages: make(map[string]*Package, len(index.Packages)),
@@ -106,7 +106,7 @@ func (index Index) CreateStatusContext() (StatusContext, error) {
 	for _, packageManager := range index.Packages {
 		packages.Add(packageManager)
 	}
-	return packages, nil
+	return packages
 }
 
 // GetDeps returns the deps of a specified release of a core.
