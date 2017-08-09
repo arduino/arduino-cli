@@ -58,13 +58,14 @@ type Release struct {
 	Dependencies    ToolDependencies // The Dependency entries to load tools.
 }
 
-// ToolDependencies is a set of tuples representing summary data of a tool.
-type ToolDependencies []toolDependency
+// ToolDependencies is a set of tuples representing summary data of a tool dependency set.
+type ToolDependencies []*ToolDependency
 
-type toolDependency struct {
-	ToolPackager string
+// ToolDependency is a tuple representing summary data of a tool.
+type ToolDependency struct {
 	ToolName     string
 	ToolVersion  string
+	ToolPackager string
 }
 
 // GetVersion returns the specified release corresponding the provided version,

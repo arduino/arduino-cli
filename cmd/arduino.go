@@ -90,7 +90,8 @@ var arduinoVersionCmd = &cobra.Command{
 	Long:  `Shows version Number of arduino CLI components which are installed on your system.`,
 	Run:   executeVersionCommand,
 	Example: `arduino version     # for the versions of all components.
-arduino lib version # for the version of the lib component.`,
+arduino lib version # for the version of the lib component.
+arduino core version # for the version of the core component.`,
 }
 
 func init() {

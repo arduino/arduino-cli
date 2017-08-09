@@ -72,7 +72,6 @@ func downloadRelease(item DownloadItem, progBar *pb.ProgressBar, label string) e
 		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
 	}
 	defer initialData.Close()
-	fmt.Println(item.Release)
 	// puts the progress bar
 	err = common.DownloadPackage(item.Release.ArchiveURL(), initialData,
 		item.Release.ArchiveSize(), handleWithProgressBarFunc(progBar))

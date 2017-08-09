@@ -69,7 +69,7 @@ type indexCoreRelease struct {
 	Size             int64                 `json:"size,required,string"`
 	Boards           []indexBoardRelease   `json:"boards"`
 	Help             indexHelpRelease      `json:"help,omitempty"`
-	ToolDependencies []indexToolDependency `json:"toolDependencies"`
+	ToolDependencies []indexToolDependency `json:"toolsDependencies, required"`
 }
 
 // indexToolDependency represents a single dependency of a core from a tool.
@@ -141,7 +141,20 @@ func (release indexCoreRelease) extractRelease() *Release {
 		Size:            release.Size,
 		URL:             release.URL,
 		Boards:          release.extractBoards(),
+		Dependencies:    release.extractDeps(),
 	}
+}
+
+func (release indexCoreRelease) extractDeps() ToolDependencies {
+	ret := make(ToolDependencies, len(release.ToolDependencies))
+	for i, dep := range release.ToolDependencies {
+		ret[i] = &ToolDependency{
+			ToolName:     dep.Name,
+			ToolVersion:  dep.Version,
+			ToolPackager: dep.Packager,
+		}
+	}
+	return ret
 }
 
 func (release indexCoreRelease) extractBoards() []string {

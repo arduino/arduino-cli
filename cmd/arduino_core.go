@@ -43,12 +43,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	// CoreVersion represents the `arduino core` package version number.
+	CoreVersion string = "0.1.0-alpha.preview"
+)
+
 var arduinoCoreCmd = &cobra.Command{
 	Use:     "core",
 	Short:   "Arduino Core operations",
 	Long:    `Arduino Core operations`,
 	Run:     executeCoreCommand,
 	Example: `arduino core --update-index to update the package index file`,
+}
+
+// arduinoCoreVersionCmd represents the version command.
+var arduinoCoreVersionCmd = &cobra.Command{
+	Use:     "version",
+	Short:   "Shows version Number of arduino core package",
+	Long:    `Shows version Number of arduino core package which is installed on your system.`,
+	Run:     executeVersionCommand,
+	Example: arduinoVersionCmd.Example,
 }
 
 var arduinoCoreListCmd = &cobra.Command{
@@ -74,6 +88,7 @@ func init() {
 	arduinoCmd.AddCommand(arduinoCoreCmd)
 	arduinoCoreCmd.AddCommand(arduinoCoreListCmd)
 	arduinoCoreCmd.AddCommand(arduinoCoreDownloadCmd)
+	arduinoCoreCmd.AddCommand(arduinoCoreVersionCmd)
 
 	arduinoCoreCmd.Flags().BoolVar(&arduinoCoreFlags.updateIndex, "update-index", false, "Updates the index of cores to the latest version")
 }

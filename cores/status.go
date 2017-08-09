@@ -73,7 +73,7 @@ func (sc StatusContext) Names() []string {
 	return res
 }
 
-func (tdep toolDependency) extractTool(sc StatusContext) (*Tool, error) {
+func (tdep ToolDependency) extractTool(sc StatusContext) (*Tool, error) {
 	pkg, exists := sc.Packages[tdep.ToolPackager]
 	if !exists {
 		return nil, errors.New("Package not found")
@@ -85,7 +85,7 @@ func (tdep toolDependency) extractTool(sc StatusContext) (*Tool, error) {
 	return tool, nil
 }
 
-func (tdep toolDependency) extractRelease(sc StatusContext) (*ToolRelease, error) {
+func (tdep ToolDependency) extractRelease(sc StatusContext) (*ToolRelease, error) {
 	tool, err := tdep.extractTool(sc)
 	if err != nil {
 		return nil, err
@@ -189,6 +189,5 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 			})
 		}
 	}
-
 	return ret, fails
 }
