@@ -2,7 +2,9 @@ package cores
 
 import (
 	"fmt"
+	"regexp"
 	"runtime"
+	"strings"
 
 	"github.com/blang/semver"
 )
@@ -15,8 +17,8 @@ type Tool struct {
 
 // ToolRelease represents a single release of a tool
 type ToolRelease struct {
-	Version  string              `json:"version,required"` // The version number of this Release.
-	Flavours map[string]*Flavour `json:"systems"`          // Maps OS to Flavour
+	Version  string     `json:"version,required"` // The version number of this Release.
+	Flavours []*Flavour `json:"systems"`          // Maps OS to Flavour
 }
 
 // Flavour represents a flavour of a Tool version.
@@ -32,11 +34,6 @@ type Flavour struct {
 // or nil if not found.
 func (tool Tool) GetVersion(version string) *ToolRelease {
 	return tool.Releases[version]
-}
-
-// GetFlavor returns the flavor of the specified OS.
-func (tr ToolRelease) GetFlavor(OS string) *Flavour {
-	return tr.Flavours[OS]
 }
 
 // Versions returns all the version numbers in this Core Package.
@@ -102,24 +99,100 @@ func (f Flavour) String() string {
 		fmt.Sprintln("    Checksum:", f.Checksum)
 }
 
+// Raspberry PI, BBB or other ARM based host
+
+// PI: "arm-linux-gnueabihf"
+// Arch-linux on PI2: "armv7l-unknown-linux-gnueabihf"
+// Raspbian on PI2: "arm-linux-gnueabihf"
+// Ubuntu Mate on PI2: "arm-linux-gnueabihf"
+// Debian 7.9 on BBB: "arm-linux-gnueabihf"
+// Raspbian on PI Zero: "arm-linux-gnueabihf"
+var (
+	regexpArmLinux = regexp.MustCompile("arm.*-linux-gnueabihf")
+	regexpAmd64    = regexp.MustCompile("x86_64-.*linux-gnu")
+	regexpi386     = regexp.MustCompile("i[3456]86-.*linux-gnu")
+	regexpWindows  = regexp.MustCompile("i[3456]86-.*(mingw32|cygwin)")
+	regexpMac64Bit = regexp.MustCompile("(i[3456]86|x86_64)-apple-darwin.*")
+	regexpmac32Bit = regexp.MustCompile("i[3456]86-apple-darwin.*")
+	regexpArmBSD   = regexp.MustCompile("arm.*-freebsd[0-9]*")
+)
+
+func (f Flavour) isCompatibleWithCurrentMachine() bool {
+	osName := runtime.GOOS
+	osArch := runtime.GOARCH
+
+	if f.OS == "all" {
+		return true
+	}
+
+	if strings.Contains(osName, "linux") {
+		if osArch == "arm" {
+			return regexpArmLinux.MatchString(f.OS)
+		} else if strings.Contains(osArch, "amd64") {
+			return regexpAmd64.MatchString(f.OS)
+		} else {
+			return regexpi386.MatchString(f.OS)
+		}
+	} else if strings.Contains(osName, "windows") {
+		return regexpWindows.MatchString(f.OS)
+	} else if strings.Contains(osName, "darwin") {
+		if strings.Contains(osArch, "x84_64") {
+			return regexpMac64Bit.MatchString(f.OS)
+		}
+		return regexpmac32Bit.MatchString(f.OS)
+	} else if strings.Contains(osName, "freebsd") {
+		if osArch == "arm" {
+			return regexpArmBSD.MatchString(f.OS)
+		}
+		genericFreeBSDexp := regexp.MustCompile(fmt.Sprintf("%s-freebsd[0-9]*", osArch))
+		return genericFreeBSDexp.MatchString(f.OS)
+	}
+	return false
+}
+
+func (tr ToolRelease) getCompatibleFlavour() *Flavour {
+	for _, flavour := range tr.Flavours {
+		if flavour.isCompatibleWithCurrentMachine() {
+			return flavour
+		}
+	}
+	return nil
+}
+
 // Release interface implementation
 
 // ArchiveName returns the archive file name (not the path).
 func (tr ToolRelease) ArchiveName() string {
-	return tr.Flavours[runtime.GOOS].ArchiveFileName
+	f := tr.getCompatibleFlavour()
+	if f == nil {
+		return "INVALID"
+	}
+	return f.ArchiveFileName
 }
 
 // ArchiveURL returns the archive URL.
 func (tr ToolRelease) ArchiveURL() string {
-	return tr.Flavours[runtime.GOOS].URL
+	f := tr.getCompatibleFlavour()
+	if f == nil {
+		return "INVALID"
+	}
+	return f.URL
 }
 
 // ExpectedChecksum returns the expected checksum for this release.
 func (tr ToolRelease) ExpectedChecksum() string {
-	return tr.Flavours[runtime.GOOS].Checksum
+	f := tr.getCompatibleFlavour()
+	if f == nil {
+		return "INVALID"
+	}
+	return f.Checksum
 }
 
 // ArchiveSize returns the archive size.
 func (tr ToolRelease) ArchiveSize() int64 {
-	return tr.Flavours[runtime.GOOS].Size
+	f := tr.getCompatibleFlavour()
+	if f == nil {
+		return -1
+	}
+	return f.Size
 }

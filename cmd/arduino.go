@@ -79,14 +79,18 @@ var arduinoCmd = &cobra.Command{
 	BashCompletionFunction: bashAutoCompletionFunction,
 	PersistentPreRun:       arduinoPreRun,
 	RunE:                   arduinoRun,
+	Example: `arduino --config /path/to/my/config/file # sets the config file instead of passing parameters or using the default one.
+arduino --generate-docs to generate the docs and autocompletion for the whole CLI.`,
 }
 
 // arduinoVersionCmd represents the version command.
 var arduinoVersionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Shows version Number of arduino",
-	Long:  `Shows version Number of arduino which is installed on your system.`,
+	Short: "Shows version Number of arduino CLI components",
+	Long:  `Shows version Number of arduino CLI components which are installed on your system.`,
 	Run:   executeVersionCommand,
+	Example: `arduino version     # for the versions of all components.
+arduino lib version # for the version of the lib component.`,
 }
 
 func init() {

@@ -57,8 +57,11 @@ const (
 var arduinoLibCmd = &cobra.Command{
 	Use:   "lib",
 	Short: "Arduino commands about libraries",
-	Long:  `Arduino commands about libraries`,
-	Run:   executeLibCommand,
+	Long: `Arduino commands about libraries
+Can be used with --update-index flag to update the libraries index too.`,
+	Run: executeLibCommand,
+	Example: `arduino lib install [LIBRARIES] # where 
+arduino lib --update-index`,
 }
 
 // arduinoLibInstallCmd represents the lib install command.
@@ -67,22 +70,28 @@ var arduinoLibInstallCmd = &cobra.Command{
 	Short: "Installs one of more specified libraries into the system.",
 	Long:  `Installs one or more specified libraries into the system.`,
 	RunE:  executeInstallCommand,
+	Example: `arduino lib install YoutubeApi # for the latest version
+arduino lib install YoutubeApi@1.0.0     # for the specific version (in this case 1.0.0)`,
 }
 
 // arduinoLibUninstallCmd represents the uninstall command
 var arduinoLibUninstallCmd = &cobra.Command{
-	Use:   "uninstall LIBRARY_NAME(S)",
-	Short: "Uninstalls one or more libraries",
-	Long:  `Uninstalls one or more libraries`,
-	RunE:  executeUninstallCommand,
+	Use:     "uninstall LIBRARY_NAME(S)",
+	Short:   "Uninstalls one or more libraries",
+	Long:    `Uninstalls one or more libraries`,
+	RunE:    executeUninstallCommand,
+	Example: ` arduino uninstall YoutubeApi`,
 }
 
 // arduinoLibSearchCmd represents the search command
 var arduinoLibSearchCmd = &cobra.Command{
 	Use:   "search [LIBRARY_NAME]",
-	Short: "Searchs for a library data",
-	Long:  `Search for one or more libraries data.`,
+	Short: "Searchs for one or more libraries data.",
+	Long:  `Search for one or more libraries data (case insensitive search).`,
 	RunE:  executeSearch,
+	Example: `arduino lib search You # to show all libraries containing "You" in their name (case insensitive).
+YoumadeIt
+YoutubeApi`,
 }
 
 // arduinoLibDownloadCmd represents the download command
@@ -91,6 +100,8 @@ var arduinoLibDownloadCmd = &cobra.Command{
 	Short: "Downloads one or more libraries without installing them",
 	Long:  `Downloads one or more libraries without installing them`,
 	RunE:  executeDownloadCommand,
+	Example: `arduino lib download YoutubeApi       # for the latest version.
+arduino lib download YoutubeApi@1.0.0 # for a specific version (in this case 1.0.0)`,
 }
 
 // arduinoLibListCmd represents the list libraries command.
@@ -100,14 +111,17 @@ var arduinoLibListCmd = &cobra.Command{
 	Long: `Shows a list of all installed libraries.
 Can be used with -v (or --verbose) flag (up to 2 times) to have longer output.`,
 	Run: executeListCommand,
+	Example: `arduino lib list    # to show all installed library names
+arduino lib list -v # to show more details`,
 }
 
 // arduinoLibVersionCmd represents the version command.
 var arduinoLibVersionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Shows version Number of arduino lib",
-	Long:  `Shows version Number of arduino lib which is installed on your system.`,
-	Run:   executeVersionCommand,
+	Use:     "version",
+	Short:   "Shows version Number of arduino lib",
+	Long:    `Shows version Number of arduino lib which is installed on your system.`,
+	Run:     executeVersionCommand,
+	Example: arduinoVersionCmd.Example,
 }
 
 func init() {

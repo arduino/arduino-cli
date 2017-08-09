@@ -44,10 +44,11 @@ import (
 )
 
 var arduinoCoreCmd = &cobra.Command{
-	Use:   "core",
-	Short: "Arduino Core operations",
-	Long:  `Arduino Core operations`,
-	Run:   executeCoreCommand,
+	Use:     "core",
+	Short:   "Arduino Core operations",
+	Long:    `Arduino Core operations`,
+	Run:     executeCoreCommand,
+	Example: `arduino core --update-index to update the package index file`,
 }
 
 var arduinoCoreListCmd = &cobra.Command{
@@ -55,14 +56,18 @@ var arduinoCoreListCmd = &cobra.Command{
 	Short: "Shows the list of installed cores",
 	Long: `Shows the list of installed cores. 
 With -v tag (up to 2 times) can provide more verbose output.`,
-	Run: executeCoreListCommand,
+	Run:     executeCoreListCommand,
+	Example: `arduino core list -v for a medium verbosity level`,
 }
 
 var arduinoCoreDownloadCmd = &cobra.Command{
-	Use:   "download [PACKAGER:NAME[=VERSION]](S)",
+	Use:   "download [PACKAGER:ARCH[=VERSION]](S)",
 	Short: "Downloads one or more cores and relative tool dependencies",
 	Long:  `Downloads one or more cores and relative tool dependencies`,
 	RunE:  executeCoreDownloadCommand,
+	Example: `
+arduino core download arduino:samd #to download latest version of arduino SAMD core.
+arduino core download arduino:samd=1.6.9 #for the specific version (in this case 1.6.9)`,
 }
 
 func init() {
@@ -133,11 +138,9 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) error {
 
 	err := cores.LoadIndex(&index)
 	if err != nil {
+		status, err = prettyPrints.CorruptedCoreIndexFix(index, GlobalFlags.Verbose)
 		if err != nil {
-			status, err = prettyPrints.CorruptedCoreIndexFix(index, GlobalFlags.Verbose)
-			if err != nil {
-				return nil
-			}
+			return nil
 		}
 	} else {
 		status = index.CreateStatusContext()

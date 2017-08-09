@@ -139,6 +139,7 @@ func (release indexCoreRelease) extractRelease() *Release {
 		ArchiveFileName: release.ArchiveFileName,
 		Checksum:        release.Checksum,
 		Size:            release.Size,
+		URL:             release.URL,
 		Boards:          release.extractBoards(),
 	}
 }
@@ -170,10 +171,10 @@ func (itr indexToolRelease) extractRelease() *ToolRelease {
 }
 
 // extractFlavours extracts a map[OS]Flavour object from an indexToolRelease entry.
-func (itr indexToolRelease) extractFlavours() map[string]*Flavour {
-	ret := make(map[string]*Flavour, len(itr.Systems))
-	for _, flavour := range itr.Systems {
-		ret[flavour.OS] = &Flavour{
+func (itr indexToolRelease) extractFlavours() []*Flavour {
+	ret := make([]*Flavour, len(itr.Systems))
+	for i, flavour := range itr.Systems {
+		ret[i] = &Flavour{
 			OS:              flavour.OS,
 			ArchiveFileName: flavour.ArchiveFileName,
 			Checksum:        flavour.Checksum,

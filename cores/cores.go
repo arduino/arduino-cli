@@ -107,9 +107,9 @@ func (core *Core) latestVersion() string {
 }
 
 func (core *Core) String() string {
-	res := fmt.Sprintln("Name        :", core.Name)
-	res += fmt.Sprintln("Architecture:", core.Architecture)
-	res += fmt.Sprintln("Category    :", core.Category)
+	res := fmt.Sprintln("Name        :", core.Name) +
+		fmt.Sprintln("Architecture:", core.Architecture) +
+		fmt.Sprintln("Category    :", core.Category)
 	if core.Releases != nil && len(core.Releases) > 0 {
 		res += "Releases:\n"
 		for _, release := range core.Releases {
@@ -120,13 +120,13 @@ func (core *Core) String() string {
 }
 
 func (release *Release) String() string {
-	res := fmt.Sprintln("  Version           : ", release.Version)
-	res += fmt.Sprintln("  Boards            :")
-	res += fmt.Sprintln(strings.Join(release.Boards, ", "))
-	res += fmt.Sprintln("  Archive File Name :", release.ArchiveFileName)
-	res += fmt.Sprintln("  Checksum          :", release.Checksum)
-	res += fmt.Sprintln("  File Size         :", release.Size)
-	return res
+	return fmt.Sprintln("  Version           : ", release.Version) +
+		fmt.Sprintln("  Boards            :") +
+		fmt.Sprintln(strings.Join(release.Boards, ", ")) +
+		fmt.Sprintln("  Archive File Name :", release.ArchiveFileName) +
+		fmt.Sprintln("  Checksum          :", release.Checksum) +
+		fmt.Sprintln("  File Size         :", release.Size) +
+		fmt.Sprintln("  URL               :", release.URL)
 }
 
 // OpenLocalArchiveForDownload Creates an empty file if not found.

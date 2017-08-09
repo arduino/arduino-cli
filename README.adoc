@@ -25,3 +25,21 @@ To contribute to this project:
 . Create a new branch with the name `feature-to-implement` or `bug-to-fix`
 . Code your contribution and push to your branch
 . Ask a Pull Request
+
+== Tips and Tricks
+==== Download all libraries of the current library index:
+[source, bash]
+----
+$ arduino lib search | tr "\n" " " | xargs arduino lib install
+----
+Same trick can be used on cores as well:
+[source, bash]
+----
+$ arduino core search | tr "\n" " " | xargs arduino core install
+----
+And with the `download` command:
+[source, bash]
+----
+$ arduino lib search | tr "\n" " " | xargs arduino lib download
+$ arduino core search | tr "\n" " " | xargs arduino core download
+----
