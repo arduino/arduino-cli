@@ -161,7 +161,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	outputResults := output.LibProcessResults{
 		Libraries: failOutputs,
 	}
-	releases.ParallelDownload(libsToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Libraries)
+	releases.ParallelDownload(libsToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Libraries, "library")
 
 	formatter.Print(outputResults)
 	return nil
@@ -195,7 +195,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	outputResults := output.LibProcessResults{
 		Libraries: failOutputs,
 	}
-	releases.ParallelDownload(libsToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Libraries)
+	releases.ParallelDownload(libsToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Libraries, "library")
 
 	for i, item := range libsToDownload {
 		err = libraries.InstallLib(item.Name, item.Release)
@@ -343,7 +343,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 	var index libraries.Index
 	err := libraries.LoadIndex(&index)
 	if err != nil {
-		formatter.PrintErrorMessage("Index file is corrupted. Please replace it by updating : arduino lib list update")
+		formatter.PrintErrorMessage("Index file is corrupted. Please replace it by updating : arduino lib list --update-index")
 		return nil
 	}
 
@@ -373,7 +373,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 					item.Releases = nil
 				}
 			} else {
-				message.Libraries = append(message.Libraries, name)
+				message.Libraries = append(message.Libraries, fmt.Sprintf("\"%s\"", name))
 			}
 		}
 	}

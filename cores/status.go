@@ -145,12 +145,11 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 	fails := make([]output.ProcessResult, 0, itemC)
 
 	for _, item := range items {
-		fmt.Println(sc)
 		pkg, exists := sc.Packages[item.Package]
 		if !exists {
 			fails = append(fails, output.ProcessResult{
 				ItemName: item.CoreName,
-				Error:    fmt.Sprint("package not found : ", pkg),
+				Error:    fmt.Sprintf("Package %s not found", item.Package),
 			})
 			continue
 		}
@@ -158,7 +157,7 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 		if !exists {
 			fails = append(fails, output.ProcessResult{
 				ItemName: item.CoreName,
-				Error:    fmt.Sprint("core not found : ", item.CoreName),
+				Error:    "Core not found",
 			})
 			continue
 		}
@@ -166,7 +165,7 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 		if release == nil {
 			fails = append(fails, output.ProcessResult{
 				ItemName: item.CoreName,
-				Error:    "Version Not Found",
+				Error:    fmt.Sprintf("Version %s Not Found", item.CoreVersion),
 			})
 			continue
 		}
@@ -175,7 +174,7 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 		if err != nil {
 			fails = append(fails, output.ProcessResult{
 				ItemName: item.CoreName,
-				Error:    fmt.Sprint("Can't find tool :", err.Error()),
+				Error:    fmt.Sprintf("Tool %s not found", err.Error()),
 			})
 			continue
 		}
@@ -189,7 +188,7 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 				Release: tool.Release,
 			})
 		}
-
 	}
+
 	return ret, fails
 }

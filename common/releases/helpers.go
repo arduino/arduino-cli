@@ -85,11 +85,11 @@ func downloadRelease(item DownloadItem, progBar *pb.ProgressBar, label string) e
 	return nil
 }
 
-// downloadAndCache returns the wrapper to download something without installing it
-func downloadAndCache(item DownloadItem, progBar *pb.ProgressBar) task.Wrapper {
+// downloadTask returns the wrapper to download something without installing it.
+func downloadTask(item DownloadItem, progBar *pb.ProgressBar, label string) task.Wrapper {
 	return task.Wrapper{
 		Task: func() task.Result {
-			err := downloadRelease(item, progBar, "library")
+			err := downloadRelease(item, progBar, label)
 			if err != nil {
 				return task.Result{
 					Result: nil,
@@ -109,7 +109,7 @@ func downloadAndCache(item DownloadItem, progBar *pb.ProgressBar) task.Wrapper {
 //   forced is used to force download if cached.
 //   OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
 //   DOES NOT RETURN because modified refResults array of results using pointer provided by refResults.Results().
-func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbosity int, refResults *[]output.ProcessResult) {
+func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbosity int, refResults *[]output.ProcessResult, label string) {
 	itemC := len(items)
 	tasks := make(map[string]task.Wrapper, itemC)
 	progressBars := make([]*pb.ProgressBar, 0, itemC)
@@ -123,7 +123,7 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbos
 				pBar = pb.StartNew(int(item.Release.ArchiveSize())).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", item.Name))
 				progressBars = append(progressBars, pBar)
 			}
-			tasks[item.Name] = downloadAndCache(item, pBar)
+			tasks[item.Name] = downloadTask(item, pBar, label)
 		} else if !forced && releaseNotNil && cached {
 			//Consider OK
 			*refResults = append(*refResults, output.ProcessResult{

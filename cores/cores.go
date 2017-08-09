@@ -70,6 +70,9 @@ type toolDependency struct {
 // GetVersion returns the specified release corresponding the provided version,
 // or nil if not found.
 func (core *Core) GetVersion(version string) *Release {
+	if version == "latest" {
+		return core.GetVersion(core.latestVersion())
+	}
 	return core.Releases[version]
 }
 
@@ -84,11 +87,6 @@ func (core *Core) Versions() semver.Versions {
 	}
 
 	return versions
-}
-
-// Latest obtains latest version of a core package.
-func (core *Core) Latest() *Release {
-	return core.GetVersion(core.latestVersion())
 }
 
 // latestVersion obtains latest version number.

@@ -67,7 +67,7 @@ func (sc StatusContext) Names() []string {
 	return res
 }
 
-// ProcessPairs takes a set of name-version pairs and return
+// Process takes a set of name-version pairs and return
 // a set of items to download and a set of outputs for non
 // existing libraries.
 func (sc StatusContext) Process(items []NameVersionPair) ([]releases.DownloadItem, []output.ProcessResult) {
@@ -80,7 +80,7 @@ func (sc StatusContext) Process(items []NameVersionPair) ([]releases.DownloadIte
 		if !exists {
 			fails = append(fails, output.ProcessResult{
 				ItemName: item.Name,
-				Error:    "library not found",
+				Error:    "Library not found",
 			})
 		} else {
 			release := library.GetVersion(item.Version)

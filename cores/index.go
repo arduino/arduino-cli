@@ -31,7 +31,6 @@ package cores
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 
 	"github.com/bcmi-labs/arduino-cli/common"
@@ -67,7 +66,7 @@ type indexCoreRelease struct {
 	URL              string                `json:"url"`
 	ArchiveFileName  string                `json:"archiveFileName,required"`
 	Checksum         string                `json:"checksum,required"`
-	Size             int64                 `json:"size,required"`
+	Size             int64                 `json:"size,required,string"`
 	Boards           []indexBoardRelease   `json:"boards"`
 	Help             indexHelpRelease      `json:"help,omitempty"`
 	ToolDependencies []indexToolDependency `json:"toolDependencies"`
@@ -92,7 +91,7 @@ type indexFlavourRelease struct {
 	OS              string `json:"host,required"`
 	URL             string `json:"url,required"`
 	ArchiveFileName string `json:"archiveFileName,required"`
-	Size            int64  `json:"size,required"`
+	Size            int64  `json:"size,required,string"`
 	Checksum        string `json:"checksum,required"`
 }
 
@@ -197,7 +196,7 @@ func LoadIndex(index *Index) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(buff))
+	//fmt.Println(string(buff))
 	err = json.Unmarshal(buff, index)
 	if err != nil {
 		return err

@@ -33,6 +33,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
@@ -151,9 +152,10 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) error {
 	outputResults := output.CoreProcessResults{
 		Cores: failOutputs,
 	}
-	releases.ParallelDownload(coresToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Cores)
+	releases.ParallelDownload(coresToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Cores, "core")
 
 	formatter.Print(outputResults)
+	fmt.Println(runtime.GOOS)
 	return nil
 }
 

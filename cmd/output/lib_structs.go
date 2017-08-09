@@ -60,6 +60,18 @@ type CoreProcessResults struct {
 	Tools []ProcessResult `json:"tools,omitempty"`
 }
 
+// String returns a string representation of the object.
+func (cpr CoreProcessResults) String() string {
+	ret := ""
+	for _, cr := range cpr.Cores {
+		ret += fmt.Sprintln(cr)
+	}
+	for _, tr := range cpr.Tools {
+		ret += fmt.Sprintln(tr)
+	}
+	return ret
+}
+
 // LibSearchResults represents a set of results of a search of libraries.
 type LibSearchResults struct {
 	Libraries []interface{} `json:"libraries,required"`
