@@ -77,7 +77,6 @@ func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleRe
 	}
 
 	client := http.DefaultClient
-	client.Timeout = time.Minute
 
 	var initialSize int64
 	stats, err := initialData.Stat()
@@ -91,6 +90,8 @@ func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleRe
 			initialSize = fileSize
 		}
 	}
+
+	client.Timeout = time.Duration(totalSize-initialSize) / 57344 * time.Second // size to download divided by 56KB/s (56 * 1024 = 57344)
 
 	request, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
