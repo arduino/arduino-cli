@@ -79,8 +79,7 @@ var arduinoCmd = &cobra.Command{
 	BashCompletionFunction: bashAutoCompletionFunction,
 	PersistentPreRun:       arduinoPreRun,
 	RunE:                   arduinoRun,
-	Example: `arduino --config /path/to/my/config/file # sets the config file instead of passing parameters or using the default one.
-arduino --generate-docs to generate the docs and autocompletion for the whole CLI.
+	Example: `arduino --generate-docs to generate the docs and autocompletion for the whole CLI.
 arduino --home /new/arduino/home/folder`,
 }
 
