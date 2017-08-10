@@ -43,6 +43,9 @@ type CoreIDTuple struct {
 
 var coreTupleRegexp = regexp.MustCompile("[a-zA-Z0-9]+:[a-zA-Z0-9]+(=([0-9]|[0-9].)*[0-9]+)?")
 
+// ParseArgs parses a sequence of "packager:name=version" tokens and returns a CoreIDTuple slice.
+//
+// If version is not present it is assumed as "latest" version.
 func ParseArgs(args []string) []CoreIDTuple {
 	ret := make([]CoreIDTuple, 0, 5)
 
@@ -59,6 +62,11 @@ func ParseArgs(args []string) []CoreIDTuple {
 				Package:     split[0],
 				CoreName:    split[1],
 				CoreVersion: split[2],
+			})
+		} else {
+			ret = append(ret, CoreIDTuple{
+				Package:  "invalid",
+				CoreName: arg,
 			})
 		}
 	}

@@ -149,6 +149,13 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 	presenceMap := make(map[string]bool, itemC)
 
 	for _, item := range items {
+		if item.Package == "invalid" {
+			fails = append(fails, output.ProcessResult{
+				ItemName: item.CoreName,
+				Error:    "Invalid item provided (not PACKAGER:CORE[=VERSION])",
+			})
+			continue
+		}
 		pkg, exists := sc.Packages[item.Package]
 		if !exists {
 			fails = append(fails, output.ProcessResult{
