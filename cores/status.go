@@ -136,13 +136,17 @@ func (sc StatusContext) GetDeps(release *Release) ([]CoreDependency, error) {
 	return ret, nil
 }
 
-// Process takes a set of name-version pairs and return
+// Process takes a set of ID tuples and returns
 // a set of items to download and a set of outputs for non
 // existing cores.
 func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, []output.ProcessResult) {
 	itemC := len(items)
 	ret := make([]releases.DownloadItem, 0, itemC)
 	fails := make([]output.ProcessResult, 0, itemC)
+
+	// value is not used, this map is only to check if an item is inside (set implementation)
+	// see https://stackoverflow.com/questions/34018908/golang-why-dont-we-have-a-set-datastructure
+	presenceMap := make(map[string]bool, itemC)
 
 	for _, item := range items {
 		pkg, exists := sc.Packages[item.Package]
@@ -161,6 +165,12 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 			})
 			continue
 		}
+
+		_, exists = presenceMap[item.CoreName]
+		if exists { //skip
+			continue
+		}
+
 		release := core.GetVersion(item.CoreVersion)
 		if release == nil {
 			fails = append(fails, output.ProcessResult{
@@ -169,6 +179,7 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 			})
 			continue
 		}
+
 		// replaces "latest" with latest version too
 		deps, err := sc.GetDeps(release)
 		if err != nil {
@@ -178,11 +189,20 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 			})
 			continue
 		}
+
 		ret = append(ret, releases.DownloadItem{
 			Name:    core.Name,
 			Release: release,
 		})
+
+		presenceMap[core.Name] = true
 		for _, tool := range deps {
+			_, exists = presenceMap[tool.ToolName]
+			if exists { //skip
+				continue
+			}
+
+			presenceMap[tool.ToolName] = true
 			ret = append(ret, releases.DownloadItem{
 				Name:    tool.ToolName,
 				Release: tool.Release,
