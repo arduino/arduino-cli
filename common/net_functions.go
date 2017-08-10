@@ -70,7 +70,7 @@ func DownloadIndex(indexPathFunc func() (string, error), URL string) error {
 	return nil
 }
 
-// DownloadPackage downloads a package from arduino repository, applying a label for the progress bar.
+// DownloadPackage downloads a package from arduino repository.
 func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleResultFunc func(io.Reader, *os.File, int) error) error {
 	if initialData == nil {
 		return errors.New("Cannot fill a nil file pointer")

@@ -85,6 +85,8 @@ arduino core download arduino:samd=1.6.9 #for the specific version (in this case
 }
 
 func init() {
+	versions[arduinoCoreCmd.Name()] = CoreVersion
+
 	arduinoCmd.AddCommand(arduinoCoreCmd)
 	arduinoCoreCmd.AddCommand(arduinoCoreListCmd)
 	arduinoCoreCmd.AddCommand(arduinoCoreDownloadCmd)
