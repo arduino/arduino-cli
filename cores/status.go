@@ -149,10 +149,10 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 	presenceMap := make(map[string]bool, itemC)
 
 	for _, item := range items {
-		if item.Package == "invalid" {
+		if item.Package == "invalid-arg" {
 			fails = append(fails, output.ProcessResult{
 				ItemName: item.CoreName,
-				Error:    "Invalid item provided (not PACKAGER:CORE[=VERSION])",
+				Error:    "Invalid item (not PACKAGER:CORE[=VERSION])",
 			})
 			continue
 		}

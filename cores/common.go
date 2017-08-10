@@ -65,7 +65,7 @@ func ParseArgs(args []string) []CoreIDTuple {
 			})
 		} else {
 			ret = append(ret, CoreIDTuple{
-				Package:  "invalid",
+				Package:  "invalid-arg",
 				CoreName: arg,
 			})
 		}

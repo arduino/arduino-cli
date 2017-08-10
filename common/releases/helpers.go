@@ -113,6 +113,8 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbos
 	itemC := len(items)
 	tasks := make(map[string]task.Wrapper, itemC)
 	progressBars := make([]*pb.ProgressBar, 0, itemC)
+	paths := make(map[string]string, itemC)
+
 	textMode := formatter.IsCurrentFormat("text")
 	for _, item := range items {
 		cached := IsCached(item.Release)
@@ -123,12 +125,15 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbos
 				pBar = pb.StartNew(int(item.Release.ArchiveSize())).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", item.Name))
 				progressBars = append(progressBars, pBar)
 			}
+			paths[item.Name], _ = ArchivePath(item.Release) //if the release exists the archivepath always exists
 			tasks[item.Name] = downloadTask(item, pBar, label)
 		} else if !forced && releaseNotNil && cached {
 			//Consider OK
+			path, _ := ArchivePath(item.Release)
 			*refResults = append(*refResults, output.ProcessResult{
 				ItemName: item.Name,
 				Status:   OkStatus,
+				Path:     path,
 			})
 		}
 	}
@@ -155,6 +160,7 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbos
 				*refResults = append(*refResults, output.ProcessResult{
 					ItemName: name,
 					Status:   OkStatus,
+					Path:     paths[name],
 				})
 			}
 		}
