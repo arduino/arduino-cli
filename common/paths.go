@@ -32,13 +32,15 @@ package common
 import (
 	"fmt"
 	"os"
-	"os/user"
 	"path/filepath"
 	"runtime"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/task"
 )
+
+// RootDirPath represents the current root of the arduino tree.
+var RootDirPath = ""
 
 // GetFolder gets a folder on a path, and creates it if createIfMissing == true and not found.
 func GetFolder(folder string, label string, createIfMissing bool) (string, error) {
@@ -63,17 +65,11 @@ func GetFolder(folder string, label string, createIfMissing bool) (string, error
 // GetDefaultArduinoFolder returns the default data folder for Arduino platform
 func GetDefaultArduinoFolder() (string, error) {
 	var folder string
-
-	usr, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-
 	switch runtime.GOOS {
 	case "linux":
-		folder = filepath.Join(usr.HomeDir, ".arduino15")
+		folder = filepath.Join(RootDirPath, ".arduino15")
 	case "darwin":
-		folder = filepath.Join(usr.HomeDir, "Library", "arduino15")
+		folder = filepath.Join(RootDirPath, "Library", "arduino15")
 	default:
 		return folder, fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
 	}
@@ -82,12 +78,7 @@ func GetDefaultArduinoFolder() (string, error) {
 
 // GetDefaultArduinoHomeFolder gets the home directory for arduino CLI.
 func GetDefaultArduinoHomeFolder() (string, error) {
-	usr, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-	homeFolder := filepath.Join(usr.HomeDir, "Arduino")
-	return GetFolder(homeFolder, "Arduino home", true)
+	return GetFolder(filepath.Join(RootDirPath, "Arduino"), "Arduino home", true)
 }
 
 // GetDefaultFolder returns the default folder with specified name and label.

@@ -33,6 +33,7 @@ package cmd
 var GlobalFlags struct {
 	Verbose int    // More time verbose flag is written, the more the Verbose count increases. Represents verbosity level.
 	Format  string // The Output format (e.g. text, json).
+	Home    string // The Custom Home directory.
 }
 
 // rootCmdFlags represent flags available to the root command.

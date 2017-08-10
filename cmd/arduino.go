@@ -32,12 +32,12 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/user"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 const (
@@ -80,7 +80,8 @@ var arduinoCmd = &cobra.Command{
 	PersistentPreRun:       arduinoPreRun,
 	RunE:                   arduinoRun,
 	Example: `arduino --config /path/to/my/config/file # sets the config file instead of passing parameters or using the default one.
-arduino --generate-docs to generate the docs and autocompletion for the whole CLI.`,
+arduino --generate-docs to generate the docs and autocompletion for the whole CLI.
+arduino --home /new/arduino/home/folder`,
 }
 
 // arduinoVersionCmd represents the version command.
@@ -95,11 +96,12 @@ arduino core version # for the version of the core component.`,
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
 
 	versions[arduinoCmd.Name()] = ArduinoVersion
 	arduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
 	arduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
+	arduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Home, "home", "", "the custom home (if not specified $HOME will be used)")
+
 	arduinoCmd.Flags().StringVar(&rootCmdFlags.ConfigFile, "config", "", "config file (default is $HOME/.arduino.yaml)")
 	arduinoCmd.Flags().BoolVar(&rootCmdFlags.GenerateDocs, "generate-docs", false, "generates the docs for the CLI and puts it in docs folder")
 	arduinoCmd.AddCommand(arduinoVersionCmd)
@@ -114,6 +116,15 @@ func arduinoPreRun(cmd *cobra.Command, args []string) {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 			formatter.PrintErrorMessage("Invalid Call : should show Help, but it is available only in TEXT mode")
 		})
+	}
+	if GlobalFlags.Home == "" {
+		usr, err := user.Current()
+		if err != nil {
+			common.RootDirPath = GlobalFlags.Home
+		}
+		common.RootDirPath = usr.HomeDir
+	} else {
+		common.RootDirPath = GlobalFlags.Home
 	}
 }
 
@@ -141,36 +152,6 @@ func Execute() {
 	err := arduinoCmd.Execute()
 	if err != nil {
 		os.Exit(1)
-	}
-}
-
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	if rootCmdFlags.ConfigFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(rootCmdFlags.ConfigFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			base := "Error while searching for home directory for this user"
-			if GlobalFlags.Verbose > 0 {
-				base += fmt.Sprintf(": %s\n", err)
-			}
-			formatter.PrintErrorMessage(base)
-			os.Exit(1)
-		}
-
-		// Search config in home directory with name ".arduino-cli" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".arduino")
-	}
-
-	//viper.AutomaticEnv() // Reads in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		formatter.Print(fmt.Sprintln("Using config file:", viper.ConfigFileUsed()))
 	}
 }
 
