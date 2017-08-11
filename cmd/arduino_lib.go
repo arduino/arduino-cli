@@ -30,7 +30,6 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -240,39 +239,46 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 	outputResults := output.LibProcessResults{
 		Libraries: make([]output.ProcessResult, 0, 10),
 	}
+
+	useFileName := func(file os.FileInfo, library string, outputResults *output.LibProcessResults) bool {
+		fileName := file.Name()
+		//replacing underscore in foldernames with spaces.
+		fileName = strings.Replace(fileName, "_", " ", -1)
+		//I use folder name
+		if strings.Contains(fileName, library) {
+			result := output.ProcessResult{
+				ItemName: library,
+			}
+			//found
+			err = libraries.Uninstall(filepath.Join(libFolder, fileName))
+			if err != nil {
+				result.Error = err.Error()
+				(*outputResults).Libraries = append((*outputResults).Libraries, result)
+			} else {
+				result.Error = "Uninstalled"
+				(*outputResults).Libraries = append((*outputResults).Libraries, result)
+			}
+			return true
+		}
+		return false
+	}
+
 	//TODO: optimize this algorithm
 	//      time complexity O(libraries_to_install(from RAM) *
 	//                        library_folder_number(from DISK) *
 	//                        library_folder_file_number (from DISK)).
 	for _, library := range args {
-		var result *output.ProcessResult
 		for _, file := range dirFiles {
 			if file.IsDir() {
 				indexFile := filepath.Join(libFolder, file.Name(), "library.properties")
 				_, err = os.Stat(indexFile)
 				if os.IsNotExist(err) {
-					fileName := file.Name()
-					//replacing underscore in foldernames with spaces.
-					fileName = strings.Replace(fileName, "_", " ", -1)
-					//I use folder name
-					if strings.Contains(fileName, library) {
-						result = &output.ProcessResult{
-							ItemName: library,
-						}
-						//found
-						err = libraries.Uninstall(filepath.Join(libFolder, fileName))
-						if err != nil {
-							result.Error = err.Error()
-							outputResults.Libraries = append(outputResults.Libraries, *result)
-						} else {
-							result.Error = "Uninstalled"
-							outputResults.Libraries = append(outputResults.Libraries, *result)
-						}
+					if useFileName(file, library, &outputResults) {
 						break
 					}
 				} else if err == nil {
 					// I use library.properties file
-					content, err := os.OpenFile(indexFile, os.O_RDONLY, 0666)
+					content, err := ioutil.ReadFile(indexFile)
 					if err != nil {
 						outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
 							ItemName: library,
@@ -281,42 +287,21 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 						break
 					}
 
-					scanner := bufio.NewScanner(content)
-					for scanner.Scan() {
-						lines := strings.SplitN(scanner.Text(), "=", 2)
-						// NOTE: asserting that if there is a library.properties, there is always the
-						// name of the library.
-						if lines[0] == "name" {
-							if strings.Contains(lines[1], library) {
-								result = &output.ProcessResult{
-									ItemName: library,
-								}
-								//found
-								err = libraries.Uninstall(filepath.Join(libFolder, file.Name()))
-								if err != nil {
-									result.Error = err.Error()
-									outputResults.Libraries = append(outputResults.Libraries, *result)
-								} else {
-									result.Status = "Uninstalled"
-									outputResults.Libraries = append(outputResults.Libraries, *result)
-								}
-							}
+					ini := goini.New()
+					err = ini.Parse(content, "\n", "=")
+					if err != nil {
+						formatter.Print(err)
+					}
+					Name, ok := ini.Get("name")
+					if !ok {
+						if useFileName(file, library, &outputResults) {
 							break
 						}
+						continue
 					}
-
-					err = scanner.Err()
-					if err != nil {
-						result.Error = err.Error()
-						outputResults.Libraries = append(outputResults.Libraries, *result)
+					if Name == library {
+						libraries.Uninstall(filepath.Join(libFolder, file.Name()))
 					}
-					break
-				}
-				if result == nil {
-					outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
-						ItemName: library,
-						Error:    "\"name\" field not found in library.properties file of the library",
-					})
 				}
 			}
 		}
