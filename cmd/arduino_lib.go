@@ -240,12 +240,6 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 	outputResults := output.LibProcessResults{
 		Libraries: make([]output.ProcessResult, 0, 10),
 	}
-	for _, arg := range args {
-		outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
-			ItemName: arg,
-			Error:    "Not Found or Not Installed",
-		})
-	}
 	//TODO: optimize this algorithm
 	//      time complexity O(libraries_to_install(from RAM) *
 	//                        library_folder_number(from DISK) *
