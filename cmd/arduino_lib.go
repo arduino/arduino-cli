@@ -31,7 +31,6 @@ package cmd
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -88,7 +87,7 @@ var arduinoLibSearchCmd = &cobra.Command{
 	Use:   "search [LIBRARY_NAME]",
 	Short: "Searchs for one or more libraries data.",
 	Long:  `Search for one or more libraries data (case insensitive search).`,
-	RunE:  executeSearch,
+	RunE:  executeSearchCommand,
 	Example: `arduino lib search You # to show all libraries containing "You" in their name (case insensitive).
 YoumadeIt
 YoutubeApi`,
@@ -125,7 +124,7 @@ var arduinoLibVersionCmd = &cobra.Command{
 }
 
 func init() {
-	arduinoCmd.AddCommand(arduinoLibCmd)
+	ArduinoCmd.AddCommand(arduinoLibCmd)
 
 	versions[arduinoLibCmd.Name()] = LibVersion
 
@@ -335,14 +334,8 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func executeSearch(cmd *cobra.Command, args []string) error {
-	query := ""
-	if len(args) > 1 {
-		return errors.New("Wrong Number of Arguments")
-	}
-	if len(args) == 1 {
-		query = strings.ToLower(strings.Join(args, " "))
-	}
+func executeSearchCommand(cmd *cobra.Command, args []string) error {
+	query := strings.ToLower(strings.Join(args, " "))
 
 	var index libraries.Index
 	var status libraries.StatusContext
@@ -375,7 +368,10 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 					item.Releases = nil
 				}
 			} else {
-				message.Libraries = append(message.Libraries, fmt.Sprintf("\"%s\"", name))
+				if formatter.IsCurrentFormat("text") {
+					name = fmt.Sprintf("\"%s\"", name)
+				}
+				message.Libraries = append(message.Libraries, name)
 			}
 		}
 	}

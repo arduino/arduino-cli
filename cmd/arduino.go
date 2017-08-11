@@ -71,8 +71,8 @@ const (
 
 var versions = make(map[string]string)
 
-// arduinoCmd represents the base command when called without any subcommands
-var arduinoCmd = &cobra.Command{
+// ArduinoCmd represents the base command when called without any subcommands
+var ArduinoCmd = &cobra.Command{
 	Use:   "arduino",
 	Short: "Arduino CLI",
 	Long:  "Arduino Create Command Line Interface (arduino-cli)",
@@ -95,14 +95,15 @@ arduino core version # for the version of the core component.`,
 }
 
 func init() {
+	versions[ArduinoCmd.Name()] = ArduinoVersion
 
-	versions[arduinoCmd.Name()] = ArduinoVersion
-	arduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
-	arduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
-	arduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Home, "home", "", "the custom home (if not specified $HOME will be used)")
+	ArduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
+	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
+	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Home, "home", "", "the custom home (if not specified $HOME will be used)")
 
-	arduinoCmd.Flags().BoolVar(&rootCmdFlags.GenerateDocs, "generate-docs", false, "generates the docs for the CLI and puts it in docs folder")
-	arduinoCmd.AddCommand(arduinoVersionCmd)
+	ArduinoCmd.Flags().BoolVar(&rootCmdFlags.GenerateDocs, "generate-docs", false, "generates the docs for the CLI and puts it in docs folder")
+
+	ArduinoCmd.AddCommand(arduinoVersionCmd)
 }
 
 func arduinoPreRun(cmd *cobra.Command, args []string) {
@@ -147,7 +148,7 @@ func arduinoRun(cmd *cobra.Command, args []string) error {
 
 // Execute adds all child commands to the root command sets flags appropriately.
 func Execute() {
-	err := arduinoCmd.Execute()
+	err := ArduinoCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
