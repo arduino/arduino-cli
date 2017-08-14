@@ -58,10 +58,11 @@ func CorruptedCoreIndexFix(index cores.Index, verbosity int) (cores.StatusContex
 func coreIndexParse(index cores.Index, verbosity int) task.Wrapper {
 	ret := indexParseWrapperSkeleton()
 	ret.Task = task.Task(func() task.Result {
-		index.CreateStatusContext()
+		err := cores.LoadIndex(&index) // I try again
+		status := index.CreateStatusContext()
 		return task.Result{
-			Result: nil,
-			Error:  nil,
+			Result: status,
+			Error:  err,
 		}
 	})
 	return ret
