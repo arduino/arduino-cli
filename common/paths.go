@@ -112,8 +112,8 @@ func GetDefaultToolsFolder(packageName string) (string, error) {
 }
 
 // GetDownloadCacheFolder gets a generic cache folder for downloads.
-func GetDownloadCacheFolder() (string, error) {
-	return GetDefaultFolder(GetDefaultArduinoFolder, "staging", "cache", true)
+func GetDownloadCacheFolder(item string) (string, error) {
+	return GetDefaultFolder(GetDefaultArduinoFolder, filepath.Join("staging", item), "cache", true)
 }
 
 // ExecUpdateIndex is a generic procedure to update an index file.

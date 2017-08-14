@@ -39,4 +39,6 @@ type Release interface {
 	ArchiveURL() string
 	// ArchiveSize returns the archive size.
 	ArchiveSize() int64
+	// GetDownloadCacheFolder returns the path of the staging folders for this release.
+	GetDownloadCacheFolder() (string, error)
 }

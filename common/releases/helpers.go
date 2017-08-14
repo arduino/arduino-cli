@@ -45,7 +45,7 @@ import (
 
 // IsCached returns a bool representing if the release has already been downloaded
 func IsCached(release Release) bool {
-	stagingFolder, err := common.GetDownloadCacheFolder()
+	stagingFolder, err := release.GetDownloadCacheFolder()
 	if err != nil {
 		return false
 	}
@@ -185,7 +185,7 @@ func handleWithProgressBarFunc(progBar *pb.ProgressBar) func(io.Reader, *os.File
 
 // ArchivePath returns the fullPath of the Archive of this release.
 func ArchivePath(release Release) (string, error) {
-	staging, err := common.GetDownloadCacheFolder()
+	staging, err := release.GetDownloadCacheFolder()
 	if err != nil {
 		return "", err
 	}

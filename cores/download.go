@@ -35,7 +35,7 @@ import (
 
 const (
 	//packageIndexURL contains the index URL for core packages.
-	packageIndexURL = "http://downloads.arduino.cc/packages/package_index.json"
+	packageIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
 )
 
 // DownloadPackagesFile downloads the core packages index file from arduino repository.
