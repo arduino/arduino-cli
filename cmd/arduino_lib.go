@@ -219,6 +219,8 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("No library specified for uninstall command")
 	}
 
+	libs := libraries.ParseArgs(args)
+
 	libFolder, err := common.GetDefaultLibFolder()
 	if err != nil {
 		return nil
@@ -240,14 +242,14 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 		Libraries: make([]output.ProcessResult, 0, 10),
 	}
 
-	useFileName := func(file os.FileInfo, library string, outputResults *output.LibProcessResults) bool {
+	useFileName := func(file os.FileInfo, library libraries.NameVersionPair, outputResults *output.LibProcessResults) bool {
 		fileName := file.Name()
 		//replacing underscore in foldernames with spaces.
 		fileName = strings.Replace(fileName, "_", " ", -1)
 		//I use folder name
-		if strings.Contains(fileName, library) {
+		if strings.Contains(fileName, library.Name) && strings.Contains(fileName, library.Version) {
 			result := output.ProcessResult{
-				ItemName: library,
+				ItemName: fmt.Sprint(library.Name, "v. ", library.Version),
 			}
 			//found
 			err = libraries.Uninstall(filepath.Join(libFolder, fileName))
@@ -267,7 +269,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 	//      time complexity O(libraries_to_install(from RAM) *
 	//                        library_folder_number(from DISK) *
 	//                        library_folder_file_number (from DISK)).
-	for _, library := range args {
+	for _, library := range libs {
 		for _, file := range dirFiles {
 			if file.IsDir() {
 				indexFile := filepath.Join(libFolder, file.Name(), "library.properties")
@@ -281,7 +283,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 					content, err := ioutil.ReadFile(indexFile)
 					if err != nil {
 						outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
-							ItemName: library,
+							ItemName: fmt.Sprint(library.Name, "v. ", library.Version),
 							Error:    err.Error(),
 						})
 						break
@@ -292,14 +294,21 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 					if err != nil {
 						formatter.Print(err)
 					}
-					Name, ok := ini.Get("name")
+					name, ok := ini.Get("name")
 					if !ok {
 						if useFileName(file, library, &outputResults) {
 							break
 						}
 						continue
 					}
-					if Name == library {
+					version, ok := ini.Get("name")
+					if !ok {
+						if useFileName(file, library, &outputResults) {
+							break
+						}
+						continue
+					}
+					if name == library.Name && version == library.Version {
 						libraries.Uninstall(filepath.Join(libFolder, file.Name()))
 					}
 				}
