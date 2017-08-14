@@ -15,6 +15,13 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common"
 )
 
+/*
+This test file will always fail if all tests are executed at the same time
+this is a go test error with cobra which relies on init() function
+there is an open issue about that : https://github.com/bcmi-labs/arduino-cli/issues/58
+For now test all test functions separately.
+*/
+
 var stdOut *os.File
 
 func init() {
@@ -83,7 +90,7 @@ func TestLibDownload(t *testing.T) {
 	defer cleanTempRedirect(tempFile)
 
 	// getting the paths to create the want path of the want object.
-	stagingFolder, err := common.GetDownloadCacheFolder()
+	stagingFolder, err := common.GetDownloadCacheFolder("libraries")
 	if err != nil {
 		t.Error("Cannot get cache folder")
 	}
