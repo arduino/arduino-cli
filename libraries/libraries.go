@@ -218,3 +218,8 @@ func (r Release) ArchiveName() string {
 func (r Release) ExpectedChecksum() string {
 	return r.Checksum
 }
+
+// GetDownloadCacheFolder returns the path of the staging folders for this release.
+func (r Release) GetDownloadCacheFolder() (string, error) {
+	return common.GetDownloadCacheFolder("libraries")
+}

@@ -72,7 +72,7 @@ func InstallLib(name string, release releases.Release) error {
 		return err
 	}
 
-	stagingFolder, err := common.GetDownloadCacheFolder()
+	stagingFolder, err := release.GetDownloadCacheFolder()
 	if err != nil {
 		return err
 	}

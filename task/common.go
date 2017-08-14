@@ -89,7 +89,7 @@ func (tw Wrapper) Execute(verb int) Result {
 		maxUsableVerb[2] = minVerb(verb, tw.AfterMessage)
 		msg = tw.AfterMessage[maxUsableVerb[2]]
 		if msg != "" {
-			formatter.PrintResult(msg)
+			formatter.Print(msg)
 		}
 	}
 	return ret
