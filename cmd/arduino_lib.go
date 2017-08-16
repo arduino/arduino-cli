@@ -199,14 +199,21 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	}
 	releases.ParallelDownload(libsToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Libraries, "library")
 
+	folder, err := common.GetDefaultLibFolder()
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot get default lib install path, try again.")
+		return nil
+	}
+
 	for i, item := range libsToDownload {
-		err = libraries.InstallLib(item.Name, item.Release)
+		err = libraries.Install(item.Name, item.Release)
 		if err != nil {
 			outputResults.Libraries[i] = output.ProcessResult{
 				ItemName: item.Name,
-				Status:   "",
-				Error:    err.Error(),
+				Error:    err.Error()
 			}
+		} else {
+			outputResults.Libraries[i].Path
 		}
 	}
 

@@ -139,9 +139,10 @@ func (sc StatusContext) GetDeps(release *Release) ([]CoreDependency, error) {
 // Process takes a set of ID tuples and returns
 // a set of items to download and a set of outputs for non
 // existing cores.
-func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, []output.ProcessResult) {
+func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, []releases.DownloadItem, []output.ProcessResult) {
 	itemC := len(items)
-	ret := make([]releases.DownloadItem, 0, itemC)
+	retCores := make([]releases.DownloadItem, 0, itemC)
+	retTools := make([]releases.DownloadItem, 0, itemC)
 	fails := make([]output.ProcessResult, 0, itemC)
 
 	// value is not used, this map is only to check if an item is inside (set implementation)
@@ -192,12 +193,12 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 		if err != nil {
 			fails = append(fails, output.ProcessResult{
 				ItemName: item.CoreName,
-				Error:    fmt.Sprintf("Tool %s not found", err.Error()),
+				Error:    fmt.Sprintf("Cannot get tool dependencies of %s core: %s", core.Name, err.Error()),
 			})
 			continue
 		}
 
-		ret = append(ret, releases.DownloadItem{
+		ret = append(retCores, releases.DownloadItem{
 			Name:    core.Name,
 			Release: release,
 		})
@@ -210,11 +211,11 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 			}
 
 			presenceMap[tool.ToolName] = true
-			ret = append(ret, releases.DownloadItem{
+			retTools = append(retTools, releases.DownloadItem{
 				Name:    tool.ToolName,
 				Release: tool.Release,
 			})
 		}
 	}
-	return ret, fails
+	return retCores, retTools, fails
 }

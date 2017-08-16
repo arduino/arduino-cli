@@ -204,12 +204,43 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	IDTuples := cores.ParseArgs(args)
-	coresToDownload, failOutputs := status.Process(IDTuples)
+	coresToDownload, toolsToDownload, failOutputs := status.Process(IDTuples)
 	outputResults := output.CoreProcessResults{
 		Cores: failOutputs,
 	}
+
+	releases.ParallelDownload(toolsToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Tools, "tool")
+	// while downloading the cores, install the tools.
+	go func() {
+		for i, item := range toolsToDownload {
+			err = cores.InstallTool(item.Name, item.Release)
+			if err != nil {
+				outputResults.Tools[i] = output.ProcessResult{
+					ItemName: item.Name,
+					Status:   "",
+					Error:    err.Error(),
+				}
+			}
+		}
+	}()
 	releases.ParallelDownload(coresToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Cores, "core")
-	// TODO : install
+
+	root, err := common.GetDefaultPkgFolder()
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot get core install path, try again.")
+		return nil
+	}
+
+	for i, item := range coresToDownload {
+		err = cores.Install(item.Name, item.Release)
+		if err != nil {
+			outputResults.Cores[i] = output.ProcessResult{
+				ItemName: item.Name,
+				Status:   "",
+				Error:    err.Error(),
+			}
+		}
+	}
 	return nil
 }
 

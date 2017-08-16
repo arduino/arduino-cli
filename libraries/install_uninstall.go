@@ -45,8 +45,8 @@ import (
 // Uninstall a library means remove its directory.
 var Uninstall = os.RemoveAll
 
-// InstallLib installs a library.
-func InstallLib(name string, release releases.Release) error {
+// Install installs a library.
+func Install(name string, release releases.Release) error {
 	if release == nil {
 		return errors.New("Not existing version of the library")
 	}
@@ -72,12 +72,10 @@ func InstallLib(name string, release releases.Release) error {
 		return err
 	}
 
-	stagingFolder, err := release.GetDownloadCacheFolder()
+	cacheFilePath, err := releases.ArchivePath(release)
 	if err != nil {
 		return err
 	}
-
-	cacheFilePath := filepath.Join(stagingFolder, release.ArchiveName())
 
 	zipArchive, err := zip.OpenReader(cacheFilePath)
 	if err != nil {

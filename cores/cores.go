@@ -172,3 +172,8 @@ func (release Release) ArchiveURL() string {
 func (release Release) GetDownloadCacheFolder() (string, error) {
 	return common.GetDownloadCacheFolder("packages")
 }
+
+// VersionName represents the version of the release.
+func (release Release) VersionName() string {
+	return release.Version
+}

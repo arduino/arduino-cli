@@ -223,3 +223,8 @@ func (r Release) ExpectedChecksum() string {
 func (r Release) GetDownloadCacheFolder() (string, error) {
 	return common.GetDownloadCacheFolder("libraries")
 }
+
+// VersionName represents the version of the release.
+func (r Release) VersionName() string {
+	return r.Version
+}

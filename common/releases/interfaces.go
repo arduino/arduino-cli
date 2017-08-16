@@ -41,4 +41,6 @@ type Release interface {
 	ArchiveSize() int64
 	// GetDownloadCacheFolder returns the path of the staging folders for this release.
 	GetDownloadCacheFolder() (string, error)
+	// VersionName represents the version of the release.
+	VersionName() string
 }

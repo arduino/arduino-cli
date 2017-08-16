@@ -45,12 +45,12 @@ import (
 
 // IsCached returns a bool representing if the release has already been downloaded
 func IsCached(release Release) bool {
-	stagingFolder, err := release.GetDownloadCacheFolder()
+	archivePath, err := ArchivePath(release)
 	if err != nil {
 		return false
 	}
 
-	_, err = os.Stat(filepath.Join(stagingFolder, release.ArchiveName()))
+	_, err = os.Stat(archivePath)
 	return !os.IsNotExist(err)
 }
 

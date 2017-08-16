@@ -202,3 +202,8 @@ func (tr ToolRelease) ArchiveSize() int64 {
 func (tr ToolRelease) GetDownloadCacheFolder() (string, error) {
 	return common.GetDownloadCacheFolder("packages")
 }
+
+// VersionName represents the version of the release.
+func (tr ToolRelease) VersionName() string {
+	return tr.Version
+}
