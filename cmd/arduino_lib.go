@@ -247,9 +247,10 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 		//replacing underscore in foldernames with spaces.
 		fileName = strings.Replace(fileName, "_", " ", -1)
 		//I use folder name
-		if strings.Contains(fileName, library.Name) && strings.Contains(fileName, library.Version) {
+		if strings.Contains(fileName, library.Name) &&
+			(library.Version == "all" || strings.Contains(fileName, library.Version)) {
 			result := output.ProcessResult{
-				ItemName: fmt.Sprint(library.Name, "v. ", library.Version),
+				ItemName: fmt.Sprint(library.Name, "@", library.Version),
 			}
 			//found
 			err = libraries.Uninstall(filepath.Join(libFolder, fileName))
@@ -270,6 +271,10 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 	//                        library_folder_number(from DISK) *
 	//                        library_folder_file_number (from DISK)).
 	for _, library := range libs {
+		//readapting "latest" to "any" to avoid to use two struct with a minor change.
+		if library.Version == "latest" {
+			library.Version = "all"
+		}
 		for _, file := range dirFiles {
 			if file.IsDir() {
 				indexFile := filepath.Join(libFolder, file.Name(), "library.properties")
@@ -283,7 +288,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 					content, err := ioutil.ReadFile(indexFile)
 					if err != nil {
 						outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
-							ItemName: fmt.Sprint(library.Name, "v. ", library.Version),
+							ItemName: fmt.Sprint(library.Name, "@", library.Version),
 							Error:    err.Error(),
 						})
 						break
@@ -301,14 +306,15 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 						}
 						continue
 					}
-					version, ok := ini.Get("name")
+					version, ok := ini.Get("version")
 					if !ok {
 						if useFileName(file, library, &outputResults) {
 							break
 						}
 						continue
 					}
-					if name == library.Name && version == library.Version {
+					if name == library.Name &&
+						(library.Version == "all" || library.Version == version) {
 						libraries.Uninstall(filepath.Join(libFolder, file.Name()))
 					}
 				}
