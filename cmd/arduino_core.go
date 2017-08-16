@@ -84,6 +84,16 @@ arduino core download arduino:samd #to download latest version of arduino SAMD c
 arduino core download arduino:samd=1.6.9 #for the specific version (in this case 1.6.9)`,
 }
 
+var arduinoCoreInstallCmd = &cobra.Command{
+	Use:   "install [PACKAGER:ARCH[=VERSION]](S)",
+	Short: "Installs one or more cores and relative tool dependencies",
+	Long:  `Installs one or more cores and relative tool dependencies`,
+	RunE:  executeCoreInstallCommand,
+	Example: `
+arduino core install arduino:samd #to download latest version of arduino SAMD core.
+arduino core installteele arduino:samd=1.6.9 #for the specific version (in this case 1.6.9)`,
+}
+
 func init() {
 	versions[arduinoCoreCmd.Name()] = CoreVersion
 
@@ -91,6 +101,7 @@ func init() {
 	arduinoCoreCmd.AddCommand(arduinoCoreListCmd)
 	arduinoCoreCmd.AddCommand(arduinoCoreDownloadCmd)
 	arduinoCoreCmd.AddCommand(arduinoCoreVersionCmd)
+	arduinoCoreCmd.AddCommand(arduinoCoreInstallCmd)
 
 	arduinoCoreCmd.Flags().BoolVar(&arduinoCoreFlags.updateIndex, "update-index", false, "Updates the index of cores to the latest version")
 }
@@ -171,6 +182,34 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) error {
 	releases.ParallelDownload(coresToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Cores, "core")
 
 	formatter.Print(outputResults)
+	return nil
+}
+
+func executeCoreInstallCommand(cmd *cobra.Command, args []string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("No core specified for download command")
+	}
+
+	var index cores.Index
+	var status cores.StatusContext
+
+	err := cores.LoadIndex(&index)
+	if err != nil {
+		status, err = prettyPrints.CorruptedCoreIndexFix(index, GlobalFlags.Verbose)
+		if err != nil {
+			return nil
+		}
+	} else {
+		status = index.CreateStatusContext()
+	}
+
+	IDTuples := cores.ParseArgs(args)
+	coresToDownload, failOutputs := status.Process(IDTuples)
+	outputResults := output.CoreProcessResults{
+		Cores: failOutputs,
+	}
+	releases.ParallelDownload(coresToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Cores, "core")
+	// TODO : install
 	return nil
 }
 

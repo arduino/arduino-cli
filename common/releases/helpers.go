@@ -112,10 +112,15 @@ func downloadTask(item DownloadItem, progBar *pb.ProgressBar, label string) task
 func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbosity int, refResults *[]output.ProcessResult, label string) {
 	itemC := len(items)
 	tasks := make(map[string]task.Wrapper, itemC)
-	progressBars := make([]*pb.ProgressBar, 0, itemC)
 	paths := make(map[string]string, itemC)
 
 	textMode := formatter.IsCurrentFormat("text")
+
+	var progressBars []*pb.ProgressBar
+	if textMode {
+		progressBars = make([]*pb.ProgressBar, 0, itemC)
+	}
+
 	for _, item := range items {
 		cached := IsCached(item.Release)
 		releaseNotNil := item.Release != nil
