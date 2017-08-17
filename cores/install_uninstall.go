@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
@@ -98,7 +99,10 @@ func InstallTool(packager, name string, release releases.Release) error {
 func coreTempDir(tempDir string) string {
 	realDir := "invalid"
 	filepath.Walk(tempDir, func(path string, info os.FileInfo, err error) error {
-		if info.Name() == "platform.txt" {
+		if err != nil || info.IsDir() {
+			return filepath.SkipDir
+		}
+		if strings.Contains(info.Name(), "platform.txt") {
 			realDir = filepath.Dir(path)
 			return errors.New("stopped, ok") //error put to stop the search of the root
 		}
@@ -109,9 +113,18 @@ func coreTempDir(tempDir string) string {
 
 func toolTempDir(tempDir string) string {
 	realDir := "invalid"
-	filepath.Walk(tempDir, func(path string) string {
-		if info.Name() == "platform.txt" {
-			realDir = filepath.Dir(path)
+	filepath.Walk(tempDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil || !info.IsDir() {
+			return nil //ignore this step
+		}
+		files, err := ioutil.ReadDir(path)
+		if err != nil {
+			return nil
+		}
+		if len(files) == 2 {
+			//found
+			realDir = path
+			return errors.New("stopped, ok") //error put to stop the search of the root
 		}
 		return nil
 	})
