@@ -1,10 +1,10 @@
 package cores
 
 import (
-	"archive/zip"
 	"errors"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
@@ -31,62 +31,89 @@ func Install(packager, name string, release releases.Release) error {
 	if err != nil {
 		return err
 	}
+	defer os.RemoveAll(tempFolder)
 
 	file, err := os.Open(cacheFilePath)
 	if err != nil {
 		return err
 	}
+	defer file.Close()
 
 	extract.Archive(file, tempFolder, nil)
 
-	purgeTempDir()
-	moveTempDir()
+	realDir := coreTempDir(tempFolder)
+	if realDir == "invalid" {
+		return errors.New("invalid archive structure")
+	}
+
+	destCoreDir := filepath.Join(coresFolder, name, release.VersionName())
+
+	os.Rename(realDir, destCoreDir)
 
 	return nil
 }
 
-// Install installs a library.
-func Install(name string, release releases.Release) error {
+// InstallTool installs a specific release of a tool.
+func InstallTool(packager, name string, release releases.Release) error {
 	if release == nil {
-		return errors.New("Not existing version of the library")
+		return errors.New("Not existing version of the core")
 	}
 
-	/*
-		installedRelease, err := library.InstalledRelease()
-		if err != nil {
-			return err
-		}
-		if installedRelease != nil {
-			//if installedRelease.Version != library.Latest().Version {
-			err := removeRelease(library.Name, installedRelease)
-			if err != nil {
-				return err
-			}
-			//} else {
-			//	return nil // Already installed and latest version.
-			//}
-		}
-	*/
-	libFolder, err := common.GetDefaultLibFolder()
+	toolsFolder, err := common.GetDefaultToolsFolder(packager)
 	if err != nil {
 		return err
 	}
 
-	cacheFilePath, err := release.ArchivePath()
+	cacheFilePath, err := releases.ArchivePath(release)
 	if err != nil {
 		return err
 	}
 
-	zipArchive, err := zip.OpenReader(cacheFilePath)
+	tempFolder, err := ioutil.TempDir("tools", name)
 	if err != nil {
 		return err
 	}
-	defer zipArchive.Close()
+	defer os.RemoveAll(tempFolder)
 
-	err = common.Unzip(zipArchive, libFolder)
+	file, err := os.Open(cacheFilePath)
 	if err != nil {
 		return err
 	}
+	defer file.Close()
+
+	extract.Archive(file, tempFolder, nil)
+
+	realDir := toolTempDir(tempFolder)
+	if realDir == "invalid" {
+		return errors.New("invalid archive structure")
+	}
+
+	destToolDir := filepath.Join(toolsFolder, name, release.VersionName())
+
+	os.Rename(realDir, destToolDir)
 
 	return nil
+}
+
+func coreTempDir(tempDir string) string {
+	realDir := "invalid"
+	filepath.Walk(tempDir, func(path string, info os.FileInfo, err error) error {
+		if info.Name() == "platform.txt" {
+			realDir = filepath.Dir(path)
+			return errors.New("stopped, ok") //error put to stop the search of the root
+		}
+		return nil
+	})
+	return realDir
+}
+
+func toolTempDir(tempDir string) string {
+	realDir := "invalid"
+	filepath.Walk(tempDir, func(path string) string {
+		if info.Name() == "platform.txt" {
+			realDir = filepath.Dir(path)
+		}
+		return nil
+	})
+	return realDir
 }
