@@ -175,10 +175,12 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	IDTuples := cores.ParseArgs(args)
-	coresToDownload, failOutputs := status.Process(IDTuples)
+	coresToDownload, toolsToDownload, failOutputs := status.Process(IDTuples)
 	outputResults := output.CoreProcessResults{
 		Cores: failOutputs,
 	}
+
+	releases.ParallelDownload(coresToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Cores, "tool")
 	releases.ParallelDownload(coresToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Cores, "core")
 
 	formatter.Print(outputResults)
@@ -210,19 +212,6 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	releases.ParallelDownload(toolsToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Tools, "tool")
-	// while downloading the cores, install the tools.
-	go func() {
-		for i, item := range toolsToDownload {
-			err = cores.InstallTool(item.Name, item.Release)
-			if err != nil {
-				outputResults.Tools[i] = output.ProcessResult{
-					ItemName: item.Name,
-					Status:   "",
-					Error:    err.Error(),
-				}
-			}
-		}
-	}()
 	releases.ParallelDownload(coresToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Cores, "core")
 
 	root, err := common.GetDefaultPkgFolder()
@@ -231,8 +220,8 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	for i, item := range coresToDownload {
-		err = cores.Install(item.Name, item.Release)
+	for i, item := range IDTuples {
+		err = cores.Install(item.Package, item.CoreName, item.Release)
 		if err != nil {
 			outputResults.Cores[i] = output.ProcessResult{
 				ItemName: item.Name,

@@ -210,7 +210,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			outputResults.Libraries[i] = output.ProcessResult{
 				ItemName: item.Name,
-				Error:    err.Error()
+				Error:    err.Error(),
 			}
 		} else {
 			outputResults.Libraries[i].Path
