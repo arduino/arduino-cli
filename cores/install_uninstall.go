@@ -148,8 +148,6 @@ func InstallTool(packager, name string, release releases.Release) error {
 	}
 
 	realDir := toolTempDir(tempFolder)
-	fmt.Println(file)
-	fmt.Println(realDir)
 	if realDir == "invalid" {
 		return errors.New("invalid archive structure")
 	}
@@ -194,7 +192,7 @@ func coreTempDir(tempDir string) string {
 }
 
 func toolTempDir(tempDir string) string {
-	realDir := "invalid"
+	realDir := tempDir
 	filepath.Walk(tempDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil || !info.IsDir() {
 			return nil //ignore this step
@@ -205,7 +203,7 @@ func toolTempDir(tempDir string) string {
 		}
 		defer dir.Close()
 		_, err = dir.Readdir(3)
-		if err == io.EOF { // read 3 files failed with EOF, dir has 2 files.
+		if err == io.EOF { // read 3 files failed with EOF, dir has 2 files or more.
 			realDir = path
 			return errors.New("stopped, ok") //error put to stop the search of the root
 		}
