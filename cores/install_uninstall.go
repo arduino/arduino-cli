@@ -19,7 +19,7 @@ import (
 var DirPermissions os.FileMode = 0777
 
 // Install installs a specific release of a core.
-func Install(packager, name string, release releases.Release) error {
+func Install(packager, arch string, release releases.Release) error {
 	if release == nil {
 		return errors.New("Not existing version of the core")
 	}
@@ -41,16 +41,16 @@ func Install(packager, name string, release releases.Release) error {
 		return err
 	}
 
-	destCoresDir := filepath.Join(coresFolder, name, release.VersionName())
+	destCoresDirParent := filepath.Join(coresFolder, arch)
+	destCoresDir := filepath.Join(destCoresDirParent, release.VersionName())
 
 	defer func() {
 		//cleaning empty directories
-		coreNameDir := filepath.Join(coresFolder, name)
 		if empty, _ := IsDirEmpty(destCoresDir); empty {
 			os.RemoveAll(destCoresDir)
 		}
-		if empty, _ := IsDirEmpty(coreNameDir); empty {
-			os.RemoveAll(coreNameDir)
+		if empty, _ := IsDirEmpty(destCoresDirParent); empty {
+			os.RemoveAll(destCoresDirParent)
 		}
 	}()
 
@@ -60,7 +60,7 @@ func Install(packager, name string, release releases.Release) error {
 	}
 	defer os.RemoveAll(tempFolder)
 
-	err = os.MkdirAll(destCoresDir, DirPermissions)
+	err = os.MkdirAll(destCoresDirParent, DirPermissions)
 	if err != nil {
 		return err
 	}
@@ -112,16 +112,16 @@ func InstallTool(packager, name string, release releases.Release) error {
 		return err
 	}
 
-	destToolDir := filepath.Join(toolsFolder, name, release.VersionName())
+	destToolsDirParent := filepath.Join(toolsFolder, name)
+	destToolsDir := filepath.Join(destToolsDirParent, release.VersionName())
 
 	defer func() {
 		//cleaning empty directories
-		toolNameDir := filepath.Join(toolsFolder, name)
-		if empty, _ := IsDirEmpty(destToolDir); empty {
-			os.RemoveAll(destToolDir)
+		if empty, _ := IsDirEmpty(destToolsDir); empty {
+			os.RemoveAll(destToolsDir)
 		}
-		if empty, _ := IsDirEmpty(toolNameDir); empty {
-			os.RemoveAll(toolNameDir)
+		if empty, _ := IsDirEmpty(destToolsDirParent); empty {
+			os.RemoveAll(destToolsDirParent)
 		}
 	}()
 
@@ -131,7 +131,7 @@ func InstallTool(packager, name string, release releases.Release) error {
 	}
 	defer os.RemoveAll(tempFolder)
 
-	err = os.MkdirAll(destToolDir, DirPermissions)
+	err = os.MkdirAll(destToolsDirParent, DirPermissions)
 	if err != nil {
 		return err
 	}
@@ -148,11 +148,13 @@ func InstallTool(packager, name string, release releases.Release) error {
 	}
 
 	realDir := toolTempDir(tempFolder)
+	fmt.Println(file)
+	fmt.Println(realDir)
 	if realDir == "invalid" {
 		return errors.New("invalid archive structure")
 	}
 
-	err = os.Rename(realDir, destToolDir)
+	err = os.Rename(realDir, destToolsDir)
 	if err != nil {
 		return err
 	}
@@ -204,7 +206,6 @@ func toolTempDir(tempDir string) string {
 		defer dir.Close()
 		_, err = dir.Readdir(3)
 		if err == io.EOF { // read 3 files failed with EOF, dir has 2 files.
-			//found
 			realDir = path
 			return errors.New("stopped, ok") //error put to stop the search of the root
 		}

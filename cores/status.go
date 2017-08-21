@@ -202,7 +202,7 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]DownloadItem, []Download
 		retCores = append(retCores, DownloadItem{
 			Package: pkg.Name,
 			DownloadItem: releases.DownloadItem{
-				Name:    core.Name,
+				Name:    core.Architecture,
 				Release: release,
 			},
 		})
