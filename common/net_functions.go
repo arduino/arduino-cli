@@ -95,7 +95,7 @@ func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleRe
 
 	request, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
-		return fmt.Errorf("Cannot create HTTP request: %s", err)
+		return fmt.Errorf("Cannot create HTTP to URL %s request: %s", URL, err)
 	}
 
 	if initialSize > 0 {
@@ -104,12 +104,12 @@ func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleRe
 
 	response, err := client.Do(request)
 	if err != nil {
-		return fmt.Errorf("Cannot fetch %s. Response creation error", URL)
+		return fmt.Errorf("Cannot fetch %s Response creation error", URL)
 	} else if response.StatusCode != 200 &&
 		response.StatusCode != 206 &&
 		response.StatusCode != 416 {
 		response.Body.Close()
-		return fmt.Errorf("Cannot fetch %s. Source responded with code %d",
+		return fmt.Errorf("Cannot fetch %s Source responded with code %d",
 			URL, response.StatusCode)
 	}
 	defer response.Body.Close()
