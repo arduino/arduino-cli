@@ -76,7 +76,7 @@ func Install(packager, name string, release releases.Release) error {
 		return err
 	}
 
-	realDir := toolTempDir(tempFolder)
+	realDir := coreTempDir(tempFolder)
 	if realDir == "invalid" {
 		return errors.New("invalid archive structure")
 	}
@@ -182,10 +182,7 @@ func IsDirEmpty(path string) (bool, error) {
 func coreTempDir(tempDir string) string {
 	realDir := "invalid"
 	filepath.Walk(tempDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil || info.IsDir() {
-			return filepath.SkipDir
-		}
-		if strings.Contains(info.Name(), "platform.txt") {
+		if strings.HasSuffix(path, "platform.txt") {
 			realDir = filepath.Dir(path)
 			return errors.New("stopped, ok") //error put to stop the search of the root
 		}

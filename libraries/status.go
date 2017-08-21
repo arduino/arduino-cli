@@ -33,7 +33,6 @@ import (
 	"fmt"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/pmylund/sortutil"
 )
 
@@ -70,9 +69,9 @@ func (sc StatusContext) Names() []string {
 // Process takes a set of name-version pairs and return
 // a set of items to download and a set of outputs for non
 // existing libraries.
-func (sc StatusContext) Process(items []NameVersionPair) ([]releases.DownloadItem, []output.ProcessResult) {
+func (sc StatusContext) Process(items []NameVersionPair) ([]DownloadItem, []output.ProcessResult) {
 	itemC := len(items)
-	ret := make([]releases.DownloadItem, 0, itemC)
+	ret := make([]DownloadItem, 0, itemC)
 	fails := make([]output.ProcessResult, 0, itemC)
 
 	for _, item := range items {
@@ -90,7 +89,7 @@ func (sc StatusContext) Process(items []NameVersionPair) ([]releases.DownloadIte
 					Error:    "Version Not Found",
 				})
 			} else { // replaces "latest" with latest version too
-				ret = append(ret, releases.DownloadItem{
+				ret = append(ret, DownloadItem{
 					Name:    library.Name,
 					Release: release,
 				})

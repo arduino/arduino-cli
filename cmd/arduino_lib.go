@@ -168,7 +168,13 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	outputResults := output.LibProcessResults{
 		Libraries: failOutputs,
 	}
-	releases.ParallelDownload(libsToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Libraries, "library")
+
+	libs := make([]releases.DownloadItem, len(libsToDownload))
+	for i := range libs {
+		libs[i] = releases.DownloadItem(libsToDownload[i])
+	}
+
+	releases.ParallelDownload(libs, false, "Downloaded", GlobalFlags.Verbose, &outputResults.Libraries, "library")
 
 	formatter.Print(outputResults)
 	return nil
@@ -197,7 +203,13 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	outputResults := output.LibProcessResults{
 		Libraries: failOutputs,
 	}
-	releases.ParallelDownload(libsToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Libraries, "library")
+
+	libs := make([]releases.DownloadItem, len(libsToDownload))
+	for i := range libs {
+		libs[i] = releases.DownloadItem(libsToDownload[i])
+	}
+
+	releases.ParallelDownload(libs, false, "Installed", GlobalFlags.Verbose, &outputResults.Libraries, "library")
 
 	folder, err := common.GetDefaultLibFolder()
 	if err != nil {
@@ -213,7 +225,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 				Error:    err.Error(),
 			}
 		} else {
-			outputResults.Libraries[i].Path
+			outputResults.Libraries[i].Path = filepath.Join(folder, fmt.Sprintf("%s-%s", item.Name, item.Release.VersionName()))
 		}
 	}
 

@@ -180,8 +180,17 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) error {
 		Cores: failOutputs,
 	}
 
-	releases.ParallelDownload(coresToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Cores, "tool")
-	releases.ParallelDownload(coresToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Cores, "core")
+	downloads := make([]releases.DownloadItem, len(toolsToDownload))
+	for i := range toolsToDownload {
+		downloads[i] = toolsToDownload[i].DownloadItem
+	}
+	releases.ParallelDownload(downloads, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Tools, "tool")
+
+	downloads = make([]releases.DownloadItem, len(coresToDownload))
+	for i := range coresToDownload {
+		downloads[i] = coresToDownload[i].DownloadItem
+	}
+	releases.ParallelDownload(downloads, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Cores, "core")
 
 	formatter.Print(outputResults)
 	return nil
@@ -207,29 +216,59 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) error {
 
 	IDTuples := cores.ParseArgs(args)
 	coresToDownload, toolsToDownload, failOutputs := status.Process(IDTuples)
+	failOutputsCount := len(failOutputs)
 	outputResults := output.CoreProcessResults{
 		Cores: failOutputs,
 	}
 
-	releases.ParallelDownload(toolsToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Tools, "tool")
-	releases.ParallelDownload(coresToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Cores, "core")
+	downloads := make([]releases.DownloadItem, len(toolsToDownload))
+	for i := range toolsToDownload {
+		downloads[i] = toolsToDownload[i].DownloadItem
+	}
+	releases.ParallelDownload(downloads, false, "Installed", GlobalFlags.Verbose, &outputResults.Tools, "tool")
 
-	root, err := common.GetDefaultPkgFolder()
-	if err != nil {
-		formatter.PrintErrorMessage("Cannot get core install path, try again.")
-		return nil
+	downloads = make([]releases.DownloadItem, len(coresToDownload))
+	for i := range coresToDownload {
+		downloads[i] = coresToDownload[i].DownloadItem
+	}
+	releases.ParallelDownload(downloads, false, "Installed", GlobalFlags.Verbose, &outputResults.Cores, "core")
+
+	for i, item := range toolsToDownload {
+		err = cores.InstallTool(item.Package, item.Name, item.Release)
+		if err != nil {
+			outputResults.Tools[i] = output.ProcessResult{
+				ItemName: item.Name,
+				Error:    err.Error(),
+			}
+		} else {
+			toolRoot, err := common.GetDefaultToolsFolder(item.Package)
+			if err != nil {
+				formatter.PrintErrorMessage("Cannot get tool install path, try again.")
+				return nil
+			}
+			outputResults.Tools[i].Path = filepath.Join(toolRoot, item.Name, item.Release.VersionName())
+		}
 	}
 
-	for i, item := range IDTuples {
-		err = cores.Install(item.Package, item.CoreName, item.Release)
+	for i, item := range coresToDownload {
+		err = cores.Install(item.Package, item.Name, item.Release)
 		if err != nil {
-			outputResults.Cores[i] = output.ProcessResult{
+			outputResults.Cores[i+failOutputsCount] = output.ProcessResult{
 				ItemName: item.Name,
 				Status:   "",
 				Error:    err.Error(),
 			}
+		} else {
+			coreRoot, err := common.GetDefaultCoresFolder(item.Package)
+			if err != nil {
+				formatter.PrintErrorMessage("Cannot get core install path, try again.")
+				return nil
+			}
+			outputResults.Cores[i+failOutputsCount].Path = filepath.Join(coreRoot, item.Name, item.Release.VersionName())
 		}
 	}
+
+	formatter.Print(outputResults)
 	return nil
 }
 

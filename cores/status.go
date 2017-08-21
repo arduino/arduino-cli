@@ -34,8 +34,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
+
+	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/pmylund/sortutil"
 )
 
@@ -139,10 +140,10 @@ func (sc StatusContext) GetDeps(release *Release) ([]CoreDependency, error) {
 // Process takes a set of ID tuples and returns
 // a set of items to download and a set of outputs for non
 // existing cores.
-func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, []releases.DownloadItem, []output.ProcessResult) {
+func (sc StatusContext) Process(items []CoreIDTuple) ([]DownloadItem, []DownloadItem, []output.ProcessResult) {
 	itemC := len(items)
-	retCores := make([]releases.DownloadItem, 0, itemC)
-	retTools := make([]releases.DownloadItem, 0, itemC)
+	retCores := make([]DownloadItem, 0, itemC)
+	retTools := make([]DownloadItem, 0, itemC)
 	fails := make([]output.ProcessResult, 0, itemC)
 
 	// value is not used, this map is only to check if an item is inside (set implementation)
@@ -198,9 +199,12 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 			continue
 		}
 
-		retCores = append(retCores, releases.DownloadItem{
-			Name:    core.Name,
-			Release: release,
+		retCores = append(retCores, DownloadItem{
+			Package: pkg.Name,
+			DownloadItem: releases.DownloadItem{
+				Name:    core.Name,
+				Release: release,
+			},
 		})
 
 		presenceMap[core.Name] = true
@@ -211,9 +215,12 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]releases.DownloadItem, [
 			}
 
 			presenceMap[tool.ToolName] = true
-			retTools = append(retTools, releases.DownloadItem{
-				Name:    tool.ToolName,
-				Release: tool.Release,
+			retTools = append(retTools, DownloadItem{
+				Package: pkg.Name,
+				DownloadItem: releases.DownloadItem{
+					Name:    tool.ToolName,
+					Release: tool.Release,
+				},
 			})
 		}
 	}

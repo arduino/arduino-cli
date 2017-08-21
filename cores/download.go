@@ -31,12 +31,20 @@ package cores
 
 import (
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
 )
 
 const (
 	//packageIndexURL contains the index URL for core packages.
 	packageIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
 )
+
+// DownloadItem represents a core or tool download struct.
+type DownloadItem struct {
+	Package string
+	releases.DownloadItem
+}
+
 
 // DownloadPackagesFile downloads the core packages index file from arduino repository.
 func DownloadPackagesFile() error {
