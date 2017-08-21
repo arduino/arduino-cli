@@ -76,12 +76,12 @@ func Install(packager, arch string, release releases.Release) error {
 		return err
 	}
 
-	realDir := coreTempDir(tempFolder)
-	if realDir == "invalid" {
+	root := coreRealRoot(tempFolder)
+	if root == "invalid" {
 		return errors.New("invalid archive structure")
 	}
 
-	err = os.Rename(realDir, destCoresDir)
+	err = os.Rename(root, destCoresDir)
 	if err != nil {
 		return err
 	}
@@ -147,12 +147,9 @@ func InstallTool(packager, name string, release releases.Release) error {
 		return err
 	}
 
-	realDir := toolTempDir(tempFolder)
-	if realDir == "invalid" {
-		return errors.New("invalid archive structure")
-	}
+	root := toolRealRoot(tempFolder)
 
-	err = os.Rename(realDir, destToolsDir)
+	err = os.Rename(root, destToolsDir)
 	if err != nil {
 		return err
 	}
@@ -179,21 +176,21 @@ func IsDirEmpty(path string) (bool, error) {
 	return false, err
 }
 
-func coreTempDir(tempDir string) string {
-	realDir := "invalid"
-	filepath.Walk(tempDir, func(path string, info os.FileInfo, err error) error {
+func coreRealRoot(root string) string {
+	realRoot := "invalid"
+	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if strings.HasSuffix(path, "platform.txt") {
-			realDir = filepath.Dir(path)
+			realRoot = filepath.Dir(path)
 			return errors.New("stopped, ok") //error put to stop the search of the root
 		}
 		return nil
 	})
-	return realDir
+	return realRoot
 }
 
-func toolTempDir(tempDir string) string {
-	realDir := tempDir
-	filepath.Walk(tempDir, func(path string, info os.FileInfo, err error) error {
+func toolRealRoot(root string) string {
+	realRoot := root
+	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil || !info.IsDir() {
 			return nil //ignore this step
 		}
@@ -204,10 +201,10 @@ func toolTempDir(tempDir string) string {
 		defer dir.Close()
 		_, err = dir.Readdir(3)
 		if err == io.EOF { // read 3 files failed with EOF, dir has 2 files or more.
-			realDir = path
+			realRoot = path
 			return errors.New("stopped, ok") //error put to stop the search of the root
 		}
 		return nil
 	})
-	return realDir
+	return realRoot
 }
