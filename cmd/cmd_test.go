@@ -169,9 +169,7 @@ func TestCoreDownload(t *testing.T) {
 
 	// getting the paths to create the want path of the want object.
 	stagingFolder, err := common.GetDownloadCacheFolder("packages")
-	if err != nil {
-		t.Error("Cannot get cache folder")
-	}
+	require.NoError(t, err, "Getting cache folder")
 
 	// desired output
 	want := output.CoreProcessResults{
@@ -196,21 +194,17 @@ func TestCoreDownload(t *testing.T) {
 
 	//resetting the file to allow the full read (it has been written by executeWithArgs)
 	_, err = tempFile.Seek(0, 0)
-	if err != nil {
-		t.Error("Cannot set file for read mode")
-	}
+	require.NoError(t, err, "Rewinding output file")
+	d, err := ioutil.ReadAll(tempFile)
+	require.NoError(t, err, "Reading output file")
 
-	d, _ := ioutil.ReadAll(tempFile)
 	var have output.CoreProcessResults
 	err = json.Unmarshal(d, &have)
-	if err != nil {
-		t.Error("JSON marshalling error ", d)
-	}
+	require.NoError(t, err, "Unmarshaling json output")
 
-	//checking if it is what I want...
-	if len(have.Cores) != len(want.Cores) || len(have.Tools) != len(want.Tools) {
-		t.Error("Output not matching, different line number from command", len(have.Cores), len(want.Cores), len(have.Tools), len(want.Tools))
-	}
+	// checking output
+
+	assert.Equal(t, len(want.Cores), len(have.Cores), "Number of cores in the output")
 
 	for _, itemHave := range have.Cores {
 		ok := false
@@ -225,6 +219,8 @@ func TestCoreDownload(t *testing.T) {
 			t.Errorf(`Got "%s" not found`, itemHave)
 		}
 	}
+
+	assert.Equal(t, len(want.Tools), len(have.Tools), "Number of tools in the output")
 
 	for _, itemHave := range have.Tools {
 		ok := false
@@ -243,21 +239,14 @@ func TestCoreDownload(t *testing.T) {
 
 func checkOutput(t *testing.T, want []string, tempFile *os.File) {
 	_, err := tempFile.Seek(0, 0)
-	if err != nil {
-		t.Error("Cannot set file for read mode")
-	}
+	require.NoError(t, err, "Rewinding output file")
+	d, err := ioutil.ReadAll(tempFile)
+	require.NoError(t, err, "Reading output file")
 
-	d, _ := ioutil.ReadAll(tempFile)
 	have := strings.Split(strings.TrimSpace(string(d)), "\n")
-	if len(have) != len(want) {
-		t.Error("Output not matching, different line number from command")
-	}
+	assert.Equal(t, len(want), len(have), "Number of lines in the output")
 
 	for i := range have {
-		if have[i] != want[i] {
-			fmt.Fprintln(stdOut, have)
-			fmt.Fprintln(stdOut, want)
-			t.Errorf(`Expected "%s", but had "%s"`, want[i], have[i])
-		}
+		assert.Equal(t, want[i], have[i], "Content of line %d", i)
 	}
 }
