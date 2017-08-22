@@ -31,7 +31,6 @@ package cmd_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -128,10 +127,9 @@ func TestLibDownload(t *testing.T) {
 	// lib download YoutubeApi invalidLibrary YouMadeIt@invalidVersion --format json
 	executeWithArgs(t, "lib", "download", "YoutubeApi", "invalidLibrary", "YouMadeIt@invalidVersion", "--format", "json")
 
-	// resetting the file to allow the full read (it has been written by executeWithArgs)
+	// read output
 	_, err = tempFile.Seek(0, 0)
 	require.NoError(t, err, "Rewinding output file")
-
 	d, err := ioutil.ReadAll(tempFile)
 	require.NoError(t, err, "Reading output file")
 
@@ -139,16 +137,16 @@ func TestLibDownload(t *testing.T) {
 	err = json.Unmarshal(d, &have)
 	require.NoError(t, err, "Unmarshaling json output")
 
-	// checking if it is what I want...
+	// checking output
+
 	assert.Equal(t, len(want.Libraries), len(have.Libraries), "Number of libraries in the output")
 
-	// since the order of the libraries is random I have to scan the whole array everytime.
 	pop := func(lib *output.ProcessResult) bool {
 		for idx, h := range have.Libraries {
 			if lib.String() == h.String() {
 				// XXX: Consider changing the Libraries field to an array of pointers
 				//have.Libraries[idx] = nil
-				have.Libraries[idx] = output.ProcessResult{ItemName: ""}
+				have.Libraries[idx] = output.ProcessResult{ItemName: ""} // Mark library as matched
 				return true
 			}
 		}
@@ -192,7 +190,7 @@ func TestCoreDownload(t *testing.T) {
 	// core download arduino:samd unparsablearg arduino:sam=notexistingversion arduino:sam=1.0.0 --format json
 	executeWithArgs(t, "core", "download", "arduino:samd", "unparsablearg", "arduino:sam=notexistingversion", "arduino:sam=1.0.0", "--format", "json")
 
-	//resetting the file to allow the full read (it has been written by executeWithArgs)
+	// read output
 	_, err = tempFile.Seek(0, 0)
 	require.NoError(t, err, "Rewinding output file")
 	d, err := ioutil.ReadAll(tempFile)
