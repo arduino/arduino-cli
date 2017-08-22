@@ -27,19 +27,21 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-// Package auth uses the `oauth2 authorization_code` flow to authenticate with Arduino
-//
-// If you have the username and password of a user, you can just instantiate a client with sane defaults:
-//
-//   client := auth.New()
-//
-// and then call the Token method to obtain a Token object with an AccessToken and a RefreshToken
-//
-//   token, err := client.Token(username, password)
-//
-// If instead you already have a token but want to refresh it, just call
-//
-//   token, err := client.refresh(refreshToken)
+/*
+Package auth uses the `oauth2 authorization_code` flow to authenticate with Arduino
+
+If you have the username and password of a user, you can just instantiate a client with sane defaults:
+
+  client := auth.New()
+
+and then call the Token method to obtain a Token object with an AccessToken and a RefreshToken
+
+  token, err := client.Token(username, password)
+
+If instead you already have a token but want to refresh it, just call
+
+  token, err := client.refresh(refreshToken)
+*/
 package auth
 
 import (
