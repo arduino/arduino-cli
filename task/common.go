@@ -48,7 +48,7 @@ type Task func() Result
 //
 // All Message arrays use VERBOSITY as index.
 type Wrapper struct {
-	BeforeMessage []string
+	BeforeMessage []string 
 	Task          Task
 	AfterMessage  []string
 	ErrorMessage  []string
