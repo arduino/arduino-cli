@@ -40,6 +40,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/cmd"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -115,53 +116,40 @@ func TestLibDownload(t *testing.T) {
 
 	// getting the paths to create the want path of the want object.
 	stagingFolder, err := common.GetDownloadCacheFolder("libraries")
-	if err != nil {
-		t.Error("Cannot get cache folder")
-	}
+	require.NoError(t, err, "Getting cache folder")
 
 	// getting what I want...
 	var have, want output.LibProcessResults
 	jsonObj := fmt.Sprintf(`{"libraries":[{"name":"invalidLibrary","error":"Library not found"},{"name":"YoutubeApi","status":"Downloaded","path":"%s/YoutubeApi-1.0.0.zip"},{"name":"YouMadeIt","error":"Version Not Found"}]}`,
 		stagingFolder)
-	t.Log(jsonObj)
 	err = json.Unmarshal([]byte(jsonObj), &want)
-	if err != nil {
-		t.Error("JSON marshalling error. TestLibDownload want. " + err.Error())
-	}
+	require.NoError(t, err)
 
 	// arduino lib download YoutubeApi --format json
 	executeWithArgs("lib", "download", "YoutubeApi", "invalidLibrary", "YouMadeIt@invalidVersion", "--format", "json")
 
-	//resetting the file to allow the full read (it has been written by executeWithArgs)
+	// resetting the file to allow the full read (it has been written by executeWithArgs)
 	_, err = tempFile.Seek(0, 0)
-	if err != nil {
-		t.Error("Cannot set file for read mode")
-	}
+	require.NoError(t, err, "Rewinding output file")
 
-	d, _ := ioutil.ReadAll(tempFile)
+	d, err := ioutil.ReadAll(tempFile)
+	require.NoError(t, err, "Reading output file")
 	err = json.Unmarshal(d, &have)
-	if err != nil {
-		t.Error("JSON marshalling error. TestLibDownload have ", jsonObj)
-	}
+	require.NoError(t, err, "Unmarshaling json output")
 
-	//checking if it is what I want...
-	if len(have.Libraries) != len(want.Libraries) {
-		t.Error("Output not matching, different line number from command")
-	}
+	// checking if it is what I want...
+	assert.Equal(t, len(want.Libraries), len(have.Libraries), "Number of libraries downloaded")
 
-	//since the order of the libraries is random I have to scan the whole array everytime.
+	// since the order of the libraries is random I have to scan the whole array everytime.
 	for _, itemHave := range have.Libraries {
 		ok := false
 		for _, itemWant := range want.Libraries {
-			t.Log(itemHave, " -------- ", itemWant)
 			if itemHave.String() == itemWant.String() {
 				ok = true
 				break
 			}
 		}
-		if !ok {
-			t.Errorf("Got %s not found", itemHave)
-		}
+		assert.True(t, ok, "Search inside output for library: ", itemHave)
 	}
 }
 
