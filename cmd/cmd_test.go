@@ -40,6 +40,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/cmd"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/stretchr/testify/require"
 )
 
 /*
@@ -51,11 +52,9 @@ NOTE: the use of func init() for test is discouraged, please create public InitF
 // line and check with what we want.
 var stdOut *os.File = os.Stdout
 
-func createTempRedirect() *os.File {
+func createTempRedirect(t *testing.T) *os.File {
 	tempFile, err := ioutil.TempFile(os.TempDir(), "test")
-	if err != nil {
-		fmt.Fprint(stdOut, err)
-	}
+	require.NoError(t, err, "Opening temp file")
 	os.Stdout = tempFile
 	return tempFile
 }
@@ -79,7 +78,7 @@ func executeWithArgs(args ...string) {
 }
 
 func TestArduinoCmd(t *testing.T) {
-	tempFile := createTempRedirect()
+	tempFile := createTempRedirect(t)
 	defer cleanTempRedirect(tempFile)
 	want := []string{
 		`{"error":"Invalid Call : should show Help, but it is available only in TEXT mode"}`,
@@ -93,7 +92,7 @@ func TestArduinoCmd(t *testing.T) {
 }
 
 func TestLibSearch(t *testing.T) {
-	tempFile := createTempRedirect()
+	tempFile := createTempRedirect(t)
 	defer cleanTempRedirect(tempFile)
 	want := []string{
 		`"YouMadeIt"`,
@@ -111,7 +110,7 @@ func TestLibSearch(t *testing.T) {
 }
 
 func TestLibDownload(t *testing.T) {
-	tempFile := createTempRedirect()
+	tempFile := createTempRedirect(t)
 	defer cleanTempRedirect(tempFile)
 
 	// getting the paths to create the want path of the want object.
@@ -167,7 +166,7 @@ func TestLibDownload(t *testing.T) {
 }
 
 func TestCoreDownload(t *testing.T) {
-	tempFile := createTempRedirect()
+	tempFile := createTempRedirect(t)
 	defer cleanTempRedirect(tempFile)
 
 	// getting the paths to create the want path of the want object.
