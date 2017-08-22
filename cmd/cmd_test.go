@@ -206,34 +206,43 @@ func TestCoreDownload(t *testing.T) {
 
 	assert.Equal(t, len(want.Cores), len(have.Cores), "Number of cores in the output")
 
-	for _, itemHave := range have.Cores {
-		ok := false
-		for _, itemWant := range want.Cores {
-			//t.Log(itemHave, " -------- ", itemWant)
-			if itemHave.String() == itemWant.String() {
-				ok = true
-				break
+	pop := func(core *output.ProcessResult) bool {
+		for idx, h := range have.Cores {
+			if core.String() == h.String() {
+				// XXX: Consider changing the Cores field to an array of pointers
+				//have.Cores[idx] = nil
+				have.Cores[idx] = output.ProcessResult{ItemName: ""} // Mark core as matched
+				return true
 			}
 		}
-		if !ok {
-			t.Errorf(`Got "%s" not found`, itemHave)
-		}
+		return false
+	}
+	for _, w := range want.Cores {
+		assert.True(t, pop(&w), "Expected core '%s' is missing from output", w)
+	}
+	for _, h := range have.Cores {
+		assert.Empty(t, h.String(), "Unexpected core '%s' is inside output", h)
 	}
 
 	assert.Equal(t, len(want.Tools), len(have.Tools), "Number of tools in the output")
 
-	for _, itemHave := range have.Tools {
-		ok := false
-		for _, itemWant := range want.Tools {
-			//t.Log(itemHave, " -------- ", itemWant)
-			if itemHave.String() == itemWant.String() {
-				ok = true
-				break
+	pop = func(tool *output.ProcessResult) bool {
+		for idx, h := range have.Tools {
+			if tool.String() == h.String() {
+				// XXX: Consider changing the Tools field to an array of pointers
+				//have.Tools[idx] = nil
+				have.Tools[idx] = output.ProcessResult{ItemName: ""} // Mark tool as matched
+				return true
 			}
 		}
-		if !ok {
-			t.Errorf(`Got "%s" not found`, itemHave)
-		}
+		return false
+	}
+
+	for _, w := range want.Tools {
+		assert.True(t, pop(&w), "Expected tool '%s' is missing from output", w)
+	}
+	for _, h := range have.Tools {
+		assert.Empty(t, h.String(), "Unexpected tool '%s' is inside output", h)
 	}
 }
 
