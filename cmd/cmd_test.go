@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/user"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -45,6 +43,8 @@ func cleanTempRedirect(tempFile *os.File) {
 
 func executeWithArgs(args ...string) {
 	if args != nil {
+		cmd.InitFlags()
+		cmd.InitCommands()
 		cmd.ArduinoCmd.SetArgs(args)
 	}
 	err := cmd.ArduinoCmd.Execute()
@@ -94,12 +94,6 @@ func TestLibDownload(t *testing.T) {
 	if err != nil {
 		t.Error("Cannot get cache folder")
 	}
-	usr, err := user.Current()
-	if err != nil {
-		t.Error("Cannot get user home")
-	}
-
-	stagingFolder = filepath.Join(usr.HomeDir, stagingFolder)
 
 	// getting what I want...
 	var have, want output.LibProcessResults
@@ -130,15 +124,17 @@ func TestLibDownload(t *testing.T) {
 	}
 
 	//since the order of the libraries is random I have to scan the whole array everytime.
-	for i := range have.Libraries {
+	for _, itemHave := range have.Libraries {
 		ok := false
-		for j := range want.Libraries {
-			if have.Libraries[i] == want.Libraries[j] {
+		for _, itemWant := range want.Libraries {
+			t.Log(itemHave, " -------- ", itemWant)
+			if itemHave.String() == itemWant.String() {
 				ok = true
+				break
 			}
 		}
 		if !ok {
-			t.Errorf("Got %s not found in expected", have.Libraries[i])
+			t.Errorf("Got %s not found", itemHave)
 		}
 	}
 }

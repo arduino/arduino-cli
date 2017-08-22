@@ -96,6 +96,15 @@ arduino core version # for the version of the core component.`,
 
 func init() {
 	versions[ArduinoCmd.Name()] = ArduinoVersion
+	InitFlags()
+	InitCommands()
+}
+
+// InitFlags reinitialize flags (useful for testing too)
+func InitFlags() {
+	ArduinoCmd.ResetFlags()
+	arduinoCoreCmd.ResetFlags()
+	arduinoLibCmd.ResetFlags()
 
 	ArduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
 	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
@@ -103,7 +112,32 @@ func init() {
 
 	ArduinoCmd.Flags().BoolVar(&rootCmdFlags.GenerateDocs, "generate-docs", false, "generates the docs for the CLI and puts it in docs folder")
 
+	arduinoLibCmd.Flags().BoolVar(&arduinoLibFlags.updateIndex, "update-index", false, "Updates the libraries index")
+
+	arduinoCoreCmd.Flags().BoolVar(&arduinoCoreFlags.updateIndex, "update-index", false, "Updates the index of cores to the latest version")
+}
+
+// InitCommands reinitialize commands (useful for testing too)
+func InitCommands() {
+	ArduinoCmd.ResetCommands()
+	arduinoLibCmd.ResetCommands()
+	arduinoCoreCmd.ResetCommands()
+
 	ArduinoCmd.AddCommand(arduinoVersionCmd)
+	ArduinoCmd.AddCommand(arduinoLibCmd)
+	ArduinoCmd.AddCommand(arduinoCoreCmd)
+
+	arduinoLibCmd.AddCommand(arduinoLibInstallCmd)
+	arduinoLibCmd.AddCommand(arduinoLibUninstallCmd)
+	arduinoLibCmd.AddCommand(arduinoLibSearchCmd)
+	arduinoLibCmd.AddCommand(arduinoLibDownloadCmd)
+	arduinoLibCmd.AddCommand(arduinoLibVersionCmd)
+	arduinoLibCmd.AddCommand(arduinoLibListCmd)
+
+	arduinoCoreCmd.AddCommand(arduinoCoreListCmd)
+	arduinoCoreCmd.AddCommand(arduinoCoreDownloadCmd)
+	arduinoCoreCmd.AddCommand(arduinoCoreVersionCmd)
+	arduinoCoreCmd.AddCommand(arduinoCoreInstallCmd)
 }
 
 func arduinoPreRun(cmd *cobra.Command, args []string) {

@@ -96,14 +96,6 @@ arduino core installteele arduino:samd=1.6.9 #for the specific version (in this 
 
 func init() {
 	versions[arduinoCoreCmd.Name()] = CoreVersion
-
-	ArduinoCmd.AddCommand(arduinoCoreCmd)
-	arduinoCoreCmd.AddCommand(arduinoCoreListCmd)
-	arduinoCoreCmd.AddCommand(arduinoCoreDownloadCmd)
-	arduinoCoreCmd.AddCommand(arduinoCoreVersionCmd)
-	arduinoCoreCmd.AddCommand(arduinoCoreInstallCmd)
-
-	arduinoCoreCmd.Flags().BoolVar(&arduinoCoreFlags.updateIndex, "update-index", false, "Updates the index of cores to the latest version")
 }
 
 func executeCoreCommand(cmd *cobra.Command, args []string) {

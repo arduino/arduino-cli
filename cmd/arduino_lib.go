@@ -123,18 +123,7 @@ var arduinoLibVersionCmd = &cobra.Command{
 }
 
 func init() {
-	ArduinoCmd.AddCommand(arduinoLibCmd)
-
 	versions[arduinoLibCmd.Name()] = LibVersion
-
-	arduinoLibCmd.AddCommand(arduinoLibInstallCmd)
-	arduinoLibCmd.AddCommand(arduinoLibUninstallCmd)
-	arduinoLibCmd.AddCommand(arduinoLibSearchCmd)
-	arduinoLibCmd.AddCommand(arduinoLibDownloadCmd)
-	arduinoLibCmd.AddCommand(arduinoLibVersionCmd)
-	arduinoLibCmd.AddCommand(arduinoLibListCmd)
-
-	arduinoLibCmd.Flags().BoolVar(&arduinoLibFlags.updateIndex, "update-index", false, "Updates the libraries index")
 }
 
 func executeLibCommand(cmd *cobra.Command, args []string) {
