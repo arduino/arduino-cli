@@ -116,12 +116,14 @@ func TestLibDownload(t *testing.T) {
 	stagingFolder, err := common.GetDownloadCacheFolder("libraries")
 	require.NoError(t, err, "Getting cache folder")
 
-	// getting what I want...
-	var have, want output.LibProcessResults
-	jsonObj := fmt.Sprintf(`{"libraries":[{"name":"invalidLibrary","error":"Library not found"},{"name":"YoutubeApi","status":"Downloaded","path":"%s/YoutubeApi-1.0.0.zip"},{"name":"YouMadeIt","error":"Version Not Found"}]}`,
-		stagingFolder)
-	err = json.Unmarshal([]byte(jsonObj), &want)
-	require.NoError(t, err)
+	// desired output
+	want := output.LibProcessResults{
+		Libraries: []output.ProcessResult{
+			{ItemName: "invalidLibrary", Error: "Library not found"},
+			{ItemName: "YoutubeApi", Status: "Downloaded", Path: stagingFolder + "/YoutubeApi-1.0.0.zip"},
+			{ItemName: "YouMadeIt", Error: "Version Not Found"},
+		},
+	}
 
 	// lib download YoutubeApi invalidLibrary YouMadeIt@invalidVersion --format json
 	executeWithArgs(t, "lib", "download", "YoutubeApi", "invalidLibrary", "YouMadeIt@invalidVersion", "--format", "json")
@@ -132,6 +134,8 @@ func TestLibDownload(t *testing.T) {
 
 	d, err := ioutil.ReadAll(tempFile)
 	require.NoError(t, err, "Reading output file")
+
+	var have output.LibProcessResults
 	err = json.Unmarshal(d, &have)
 	require.NoError(t, err, "Unmarshaling json output")
 
@@ -169,15 +173,22 @@ func TestCoreDownload(t *testing.T) {
 		t.Error("Cannot get cache folder")
 	}
 
-	// getting what I want...
-	var have, want output.CoreProcessResults
-	jsonObj := strings.Replace(`{"cores":[{"name":"unparsablearg","error":"Invalid item (not PACKAGER:CORE[=VERSION])"},{"name":"sam","error":"Version notexistingversion Not Found"},{"name":"sam","error":"Version 1.0.0 Not Found"},{"name":"samd","status":"Downloaded","path":"%s/samd-1.6.15.tar.bz2"}],"tools":[{"name":"arduinoOTA","status":"Downloaded","path":"%s/arduinoOTA-1.2.0-linux_amd64.tar.bz2"},{"name":"openocd","status":"Downloaded","path":"%s/openocd-0.9.0-arduino6-static-x86_64-linux-gnu.tar.bz2"},{"name":"CMSIS-Atmel","status":"Downloaded","path":"%s/CMSIS-Atmel-1.1.0.tar.bz2"},{"name":"CMSIS","status":"Downloaded","path":"%s/CMSIS-4.5.0.tar.bz2"},{"name":"arm-none-eabi-gcc","status":"Downloaded","path":"%s/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz"},{"name":"bossac","status":"Downloaded","path":"%s/bossac-1.7.0-x86_64-linux-gnu.tar.gz"}]}`,
-		"%s", stagingFolder, 8)
-
-	t.Log(jsonObj)
-	err = json.Unmarshal([]byte(jsonObj), &want)
-	if err != nil {
-		t.Error("JSON marshalling error. TestCoreDownload want. " + err.Error())
+	// desired output
+	want := output.CoreProcessResults{
+		Cores: []output.ProcessResult{
+			{ItemName: "unparsablearg", Error: "Invalid item (not PACKAGER:CORE[=VERSION])"},
+			{ItemName: "sam", Error: "Version notexistingversion Not Found"},
+			{ItemName: "sam", Error: "Version 1.0.0 Not Found"},
+			{ItemName: "samd", Status: "Downloaded", Path: stagingFolder + "/samd-1.6.15.tar.bz2"},
+		},
+		Tools: []output.ProcessResult{
+			{ItemName: "arduinoOTA", Status: "Downloaded", Path: stagingFolder + "/arduinoOTA-1.2.0-linux_amd64.tar.bz2"},
+			{ItemName: "openocd", Status: "Downloaded", Path: stagingFolder + "/openocd-0.9.0-arduino6-static-x86_64-linux-gnu.tar.bz2"},
+			{ItemName: "CMSIS-Atmel", Status: "Downloaded", Path: stagingFolder + "/CMSIS-Atmel-1.1.0.tar.bz2"},
+			{ItemName: "CMSIS", Status: "Downloaded", Path: stagingFolder + "/CMSIS-4.5.0.tar.bz2"},
+			{ItemName: "arm-none-eabi-gcc", Status: "Downloaded", Path: stagingFolder + "/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz"},
+			{ItemName: "bossac", Status: "Downloaded", Path: stagingFolder + "/bossac-1.7.0-x86_64-linux-gnu.tar.gz"},
+		},
 	}
 
 	// core download arduino:samd unparsablearg arduino:sam=notexistingversion arduino:sam=1.0.0 --format json
@@ -190,6 +201,7 @@ func TestCoreDownload(t *testing.T) {
 	}
 
 	d, _ := ioutil.ReadAll(tempFile)
+	var have output.CoreProcessResults
 	err = json.Unmarshal(d, &have)
 	if err != nil {
 		t.Error("JSON marshalling error ", d)
