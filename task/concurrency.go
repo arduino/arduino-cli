@@ -31,7 +31,6 @@ package task
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 )
@@ -81,21 +80,20 @@ func ExecuteSequence(taskWrappers []Wrapper, ignoreOnFailure []bool, verbosity i
 // ExecuteParallelFromMap executes a set of taskwrappers in parallel, taking input from a map[string]Wrapper.
 func ExecuteParallelFromMap(taskMap map[string]Wrapper, verbosity int) map[string]Result {
 	results := make(chan resultWithKey, len(taskMap))
-	wg := sync.WaitGroup{}
-	wg.Add(len(taskMap))
+	turn := make(chan bool)
 
 	for key, task := range taskMap {
-		go func(key string, task Wrapper, wg *sync.WaitGroup) {
+		go func(key string, task Wrapper) {
+			turn <- true
 			results <- resultWithKey{
 				Key: key,
 				Result: func() Result {
-					defer wg.Done()
 					return task.Execute(verbosity)
 				}(),
 			}
-		}(key, task, &wg)
+			<-turn
+		}(key, task)
 	}
-	wg.Wait()
 	close(results)
 	mapResult := make(map[string]Result, len(results))
 	for result := range results {
@@ -108,17 +106,16 @@ func ExecuteParallelFromMap(taskMap map[string]Wrapper, verbosity int) map[strin
 // ExecuteParallel executes a set of Wrappers in parallel, handling concurrency for results.
 func ExecuteParallel(taskWrappers []Wrapper, verbosity int) []Result {
 	results := make(chan Result, len(taskWrappers))
-	wg := sync.WaitGroup{}
-	wg.Add(len(taskWrappers))
+	turn := make(chan bool)
 	for _, task := range taskWrappers {
-		go func(task Wrapper, wg *sync.WaitGroup) {
-			results <- func(wg *sync.WaitGroup) Result {
-				defer wg.Done()
+		go func(task Wrapper) {
+			turn <- true
+			results <- func() Result {
 				return task.Execute(verbosity)
-			}(wg)
-		}(task, &wg)
+			}()
+			<-turn
+		}(task)
 	}
-	wg.Wait()
 	close(results)
 	array := make([]Result, len(results))
 	for i := range array {

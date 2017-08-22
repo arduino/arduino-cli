@@ -122,8 +122,10 @@ func TestLibDownload(t *testing.T) {
 
 	// getting what I want...
 	var have, want output.LibProcessResults
-	err = json.Unmarshal([]byte(fmt.Sprintf(`{"libraries":[{"name":"invalidLibrary","error":"Library not found"},{"name":"YoutubeApi","status":"Downloaded","path":"%s/YoutubeApi-1.0.0.zip"},{"name":"YouMadeIt","error":"Version Not Found"}]}`,
-		stagingFolder)), &want)
+	jsonObj := fmt.Sprintf(`{"libraries":[{"name":"invalidLibrary","error":"Library not found"},{"name":"YoutubeApi","status":"Downloaded","path":"%s/YoutubeApi-1.0.0.zip"},{"name":"YouMadeIt","error":"Version Not Found"}]}`,
+		stagingFolder)
+	t.Log(jsonObj)
+	err = json.Unmarshal([]byte(jsonObj), &want)
 	if err != nil {
 		t.Error("JSON marshalling error. TestLibDownload want. " + err.Error())
 	}
@@ -140,7 +142,7 @@ func TestLibDownload(t *testing.T) {
 	d, _ := ioutil.ReadAll(tempFile)
 	err = json.Unmarshal(d, &have)
 	if err != nil {
-		t.Error("JSON marshalling error. TestLibDownload have")
+		t.Error("JSON marshalling error. TestLibDownload have ", jsonObj)
 	}
 
 	//checking if it is what I want...
@@ -160,6 +162,76 @@ func TestLibDownload(t *testing.T) {
 		}
 		if !ok {
 			t.Errorf("Got %s not found", itemHave)
+		}
+	}
+}
+
+func TestCoreDownload(t *testing.T) {
+	tempFile := createTempRedirect()
+	defer cleanTempRedirect(tempFile)
+
+	// getting the paths to create the want path of the want object.
+	stagingFolder, err := common.GetDownloadCacheFolder("packages")
+	if err != nil {
+		t.Error("Cannot get cache folder")
+	}
+
+	// getting what I want...
+	var have, want output.CoreProcessResults
+	jsonObj := strings.Replace(`{"cores":[{"name":"unparsablearg","error":"Invalid item (not PACKAGER:CORE[=VERSION])"},{"name":"sam","error":"Version notexistingversion Not Found"},{"name":"sam","error":"Version 1.0.0 Not Found"},{"name":"samd","status":"Downloaded","path":"%s/samd-1.6.15.tar.bz2"}],"tools":[{"name":"arduinoOTA","status":"Downloaded","path":"%s/arduinoOTA-1.2.0-linux_amd64.tar.bz2"},{"name":"openocd","status":"Downloaded","path":"%s/openocd-0.9.0-arduino6-static-x86_64-linux-gnu.tar.bz2"},{"name":"CMSIS-Atmel","status":"Downloaded","path":"%s/CMSIS-Atmel-1.1.0.tar.bz2"},{"name":"CMSIS","status":"Downloaded","path":"%s/CMSIS-4.5.0.tar.bz2"},{"name":"arm-none-eabi-gcc","status":"Downloaded","path":"%s/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz"},{"name":"bossac","status":"Downloaded","path":"%s/bossac-1.7.0-x86_64-linux-gnu.tar.gz"}]}`,
+		"%s", stagingFolder, 8)
+
+	t.Log(jsonObj)
+	err = json.Unmarshal([]byte(jsonObj), &want)
+	if err != nil {
+		t.Error("JSON marshalling error. TestCoreDownload want. " + err.Error())
+	}
+
+	// arduino lib download YoutubeApi --format json
+	executeWithArgs("core", "download", "arduino:samd", "unparsablearg", "arduino:sam=notexistingversion", "arduino:sam=1.0.0", "--format", "json")
+
+	//resetting the file to allow the full read (it has been written by executeWithArgs)
+	_, err = tempFile.Seek(0, 0)
+	if err != nil {
+		t.Error("Cannot set file for read mode")
+	}
+
+	d, _ := ioutil.ReadAll(tempFile)
+	err = json.Unmarshal(d, &have)
+	if err != nil {
+		t.Error("JSON marshalling error ", d)
+	}
+
+	//checking if it is what I want...
+	if len(have.Cores) != len(want.Cores) || len(have.Tools) != len(want.Tools) {
+		t.Error("Output not matching, different line number from command", len(have.Cores), len(want.Cores), len(have.Tools), len(want.Tools))
+	}
+
+	for _, itemHave := range have.Cores {
+		ok := false
+		for _, itemWant := range want.Cores {
+			//t.Log(itemHave, " -------- ", itemWant)
+			if itemHave.String() == itemWant.String() {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			t.Errorf(`Got "%s" not found`, itemHave)
+		}
+	}
+
+	for _, itemHave := range have.Tools {
+		ok := false
+		for _, itemWant := range want.Tools {
+			//t.Log(itemHave, " -------- ", itemWant)
+			if itemHave.String() == itemWant.String() {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			t.Errorf(`Got "%s" not found`, itemHave)
 		}
 	}
 }

@@ -76,7 +76,7 @@ func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleRe
 		return errors.New("Cannot fill a nil file pointer")
 	}
 
-	client := http.DefaultClient
+	client := &http.Client{}
 
 	var initialSize int64
 	stats, err := initialData.Stat()
