@@ -125,7 +125,7 @@ func TestLibDownload(t *testing.T) {
 	err = json.Unmarshal([]byte(jsonObj), &want)
 	require.NoError(t, err)
 
-	// arduino lib download YoutubeApi --format json
+	// lib download YoutubeApi invalidLibrary YouMadeIt@invalidVersion --format json
 	executeWithArgs("lib", "download", "YoutubeApi", "invalidLibrary", "YouMadeIt@invalidVersion", "--format", "json")
 
 	// resetting the file to allow the full read (it has been written by executeWithArgs)
@@ -138,18 +138,26 @@ func TestLibDownload(t *testing.T) {
 	require.NoError(t, err, "Unmarshaling json output")
 
 	// checking if it is what I want...
-	assert.Equal(t, len(want.Libraries), len(have.Libraries), "Number of libraries downloaded")
+	assert.Equal(t, len(want.Libraries), len(have.Libraries), "Number of libraries in the output")
 
 	// since the order of the libraries is random I have to scan the whole array everytime.
-	for _, itemHave := range have.Libraries {
-		ok := false
-		for _, itemWant := range want.Libraries {
-			if itemHave.String() == itemWant.String() {
-				ok = true
-				break
+	pop := func(lib *output.ProcessResult) bool {
+		for idx, h := range have.Libraries {
+			if lib.String() == h.String() {
+				// XXX: Consider changing the Libraries field to an array of pointers
+				//have.Libraries[idx] = nil
+				have.Libraries[idx] = output.ProcessResult{ItemName: ""}
+				return true
 			}
 		}
-		assert.True(t, ok, "Search inside output for library: ", itemHave)
+		return false
+	}
+
+	for _, w := range want.Libraries {
+		assert.True(t, pop(&w), "Expected library '%s' is missing from output", w)
+	}
+	for _, h := range have.Libraries {
+		assert.Empty(t, h.String(), "Unexpected library '%s' is inside output", h)
 	}
 }
 
