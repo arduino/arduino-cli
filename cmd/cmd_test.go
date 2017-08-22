@@ -13,18 +13,9 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common"
 )
 
-/*
-This test file will always fail if all tests are executed at the same time
-this is a go test error with cobra which relies on init() function
-there is an open issue about that : https://github.com/bcmi-labs/arduino-cli/issues/58
-For now test all test functions separately.
-*/
-
-var stdOut *os.File
-
-func init() {
-	stdOut = os.Stdout
-}
+// Redirecting stdOut so we can analyze output line by
+// line and check with what we want.
+var stdOut *os.File = os.Stdout
 
 func createTempRedirect() *os.File {
 	tempFile, err := ioutil.TempFile(os.TempDir(), "test")
