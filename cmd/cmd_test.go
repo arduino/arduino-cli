@@ -42,6 +42,11 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common"
 )
 
+/*
+NOTE: the use of func init() for test is discouraged, please create public InitFunctions and call them,
+	  or use (untested) cmd.PersistentPreRun or cmd.PreRun to reinitialize the flags and the commands every time.
+*/
+
 // Redirecting stdOut so we can analyze output line by
 // line and check with what we want.
 var stdOut *os.File = os.Stdout

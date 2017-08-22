@@ -30,9 +30,10 @@
 package task
 
 import (
+	"fmt"
 	"sync"
 
-	"github.com/sirupsen/logrus"
+	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 )
 
 // resultWithKey values are used by ExecuteParallelFromMap as temporary values.
@@ -53,7 +54,7 @@ func CreateSequence(taskWrappers []Wrapper, ignoreOnFailure []bool, verbosity in
 			result := taskWrapper.Execute(verbosity)
 			results = append(results, result)
 			if result.Error != nil && !ignoreOnFailure[i] {
-				logrus.Warnf("Warning from task %d: %s", i, result.Error)
+				formatter.Print(fmt.Sprintf("Warning from task %d: %s", i, result.Error))
 			}
 		}
 		return results

@@ -1,0 +1,4 @@
+= Task package by bcmi-labs
+Alessandro Sanino <a.sanino@bci-labs.cc>
+
+This package allows to easily wrap procedures with messages, execute them in parallel or in sequence.

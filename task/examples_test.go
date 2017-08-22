@@ -80,3 +80,367 @@ func ExampleWrapper_Execute() {
 	// I am printing something on the console
 	// I accomplished my job in a very accurate way, and without errors
 }
+
+func ExampleCreateSequence() {
+	verbosity := 1
+
+	tasks := []task.Wrapper{
+		task.Wrapper{
+			BeforeMessage: []string{
+				"starting first task",
+			},
+			AfterMessage: []string{
+				"first task over",
+			},
+			Task: func() task.Result {
+				fmt.Println("First task")
+				return task.Result{}
+			},
+		}, task.Wrapper{
+			BeforeMessage: []string{
+				"starting second task",
+			},
+			AfterMessage: []string{
+				"second task over",
+			},
+			Task: func() task.Result {
+				fmt.Println("second task")
+				return task.Result{}
+			},
+		},
+		task.Wrapper{
+			BeforeMessage: []string{
+				"starting third task",
+			},
+			AfterMessage: []string{
+				"third task over",
+			},
+			Task: func() task.Result {
+				fmt.Println("third task")
+				return task.Result{}
+			},
+		},
+	}
+
+	sequence := task.Wrapper{
+		BeforeMessage: []string{
+			"Starting sequence",
+		},
+		AfterMessage: []string{
+			"Sequence over",
+		},
+		Task: task.CreateSequence(tasks, []bool{true, true, true}, verbosity).Task(),
+	}
+
+	sequence.Execute(verbosity)
+
+	// Output:
+	// Starting sequence ...
+	// starting first task ...
+	// First task
+	// first task over
+	// starting second task ...
+	// second task
+	// second task over
+	// starting third task ...
+	// third task
+	// third task over
+	// Sequence over
+}
+
+func ExampleCreateSequence_errors_ignored() {
+	verbosity := 1
+
+	tasks := []task.Wrapper{
+		task.Wrapper{
+			BeforeMessage: []string{
+				"starting first task",
+			},
+			AfterMessage: []string{
+				"first task over",
+			},
+			ErrorMessage: []string{
+				"first task with error",
+			},
+			Task: func() task.Result {
+				fmt.Println("First task")
+				return task.Result{}
+			},
+		}, task.Wrapper{
+			BeforeMessage: []string{
+				"starting second task",
+			},
+			AfterMessage: []string{
+				"second task over",
+			},
+			ErrorMessage: []string{
+				"second task with error",
+			},
+			Task: func() task.Result {
+				fmt.Println("second task (with error)")
+				return task.Result{Error: errors.New("Error Triggered")}
+			},
+		},
+		task.Wrapper{
+			BeforeMessage: []string{
+				"starting third task",
+			},
+			AfterMessage: []string{
+				"third task over",
+			},
+			ErrorMessage: []string{
+				"third task with error",
+			},
+			Task: func() task.Result {
+				fmt.Println("third task (with error)")
+				return task.Result{Error: errors.New("Second Error Triggered")}
+			},
+		},
+		task.Wrapper{
+			BeforeMessage: []string{
+				"starting fourth task",
+			},
+			AfterMessage: []string{
+				"fourth task over",
+			},
+			ErrorMessage: []string{
+				"fourth task with error",
+			},
+			Task: func() task.Result {
+				fmt.Println("fourth task")
+				return task.Result{}
+			},
+		},
+	}
+
+	sequence := task.Wrapper{
+		BeforeMessage: []string{
+			"Starting sequence",
+		},
+		AfterMessage: []string{
+			"Sequence over",
+		},
+		ErrorMessage: []string{
+			"Sequence with errors",
+		},
+		// Do not ignore errors for every step.
+		Task: task.CreateSequence(tasks, []bool{true, true, true, true}, verbosity).Task(),
+	}
+
+	sequence.Execute(verbosity)
+
+	// Output:
+	// Starting sequence ...
+	// starting first task ...
+	// First task
+	// first task over
+	// starting second task ...
+	// second task (with error)
+	// second task with error
+	// starting third task ...
+	// third task (with error)
+	// third task with error
+	// starting fourth task ...
+	// fourth task
+	// fourth task over
+	// Sequence over
+}
+
+func ExampleCreateSequence_errors_shown_all() {
+	verbosity := 1
+
+	tasks := []task.Wrapper{
+		task.Wrapper{
+			BeforeMessage: []string{
+				"starting first task",
+			},
+			AfterMessage: []string{
+				"first task over",
+			},
+			ErrorMessage: []string{
+				"first task with error",
+			},
+			Task: func() task.Result {
+				fmt.Println("First task")
+				return task.Result{}
+			},
+		}, task.Wrapper{
+			BeforeMessage: []string{
+				"starting second task",
+			},
+			AfterMessage: []string{
+				"second task over",
+			},
+			ErrorMessage: []string{
+				"second task with error",
+			},
+			Task: func() task.Result {
+				fmt.Println("second task (with error)")
+				return task.Result{Error: errors.New("Error Triggered")}
+			},
+		},
+		task.Wrapper{
+			BeforeMessage: []string{
+				"starting third task",
+			},
+			AfterMessage: []string{
+				"third task over",
+			},
+			ErrorMessage: []string{
+				"third task with error",
+			},
+			Task: func() task.Result {
+				fmt.Println("third task (with error)")
+				return task.Result{Error: errors.New("Second Error Triggered")}
+			},
+		},
+		task.Wrapper{
+			BeforeMessage: []string{
+				"starting fourth task",
+			},
+			AfterMessage: []string{
+				"fourth task over",
+			},
+			ErrorMessage: []string{
+				"fourth task with error",
+			},
+			Task: func() task.Result {
+				fmt.Println("fourth task")
+				return task.Result{}
+			},
+		},
+	}
+
+	sequence := task.Wrapper{
+		BeforeMessage: []string{
+			"Starting sequence",
+		},
+		AfterMessage: []string{
+			"Sequence over",
+		},
+		ErrorMessage: []string{
+			"Sequence with errors",
+		},
+		// Do not ignore errors for every step.
+		Task: task.CreateSequence(tasks, []bool{false, false, false, false}, verbosity).Task(),
+	}
+
+	sequence.Execute(verbosity)
+
+	// Output:
+	// Starting sequence ...
+	// starting first task ...
+	// First task
+	// first task over
+	// starting second task ...
+	// second task (with error)
+	// second task with error
+	// Warning from task 1: Error Triggered
+	// starting third task ...
+	// third task (with error)
+	// third task with error
+	// Warning from task 2: Second Error Triggered
+	// starting fourth task ...
+	// fourth task
+	// fourth task over
+	// Sequence over
+}
+
+func ExampleCreateSequence_errors_ignored_first_and_third() {
+	verbosity := 1
+
+	tasks := []task.Wrapper{
+		task.Wrapper{
+			BeforeMessage: []string{
+				"starting first task",
+			},
+			AfterMessage: []string{
+				"first task over",
+			},
+			ErrorMessage: []string{
+				"first task with error",
+			},
+			Task: func() task.Result {
+				fmt.Println("First task")
+				return task.Result{}
+			},
+		}, task.Wrapper{
+			BeforeMessage: []string{
+				"starting second task",
+			},
+			AfterMessage: []string{
+				"second task over",
+			},
+			ErrorMessage: []string{
+				"second task with error",
+			},
+			Task: func() task.Result {
+				fmt.Println("second task (with error)")
+				return task.Result{Error: errors.New("Error Triggered")}
+			},
+		},
+		task.Wrapper{
+			BeforeMessage: []string{
+				"starting third task",
+			},
+			AfterMessage: []string{
+				"third task over",
+			},
+			ErrorMessage: []string{
+				"third task with error",
+			},
+			Task: func() task.Result {
+				fmt.Println("third task (with error)")
+				return task.Result{Error: errors.New("Second Error Triggered")}
+			},
+		},
+		task.Wrapper{
+			BeforeMessage: []string{
+				"starting fourth task",
+			},
+			AfterMessage: []string{
+				"fourth task over",
+			},
+			ErrorMessage: []string{
+				"fourth task with error",
+			},
+			Task: func() task.Result {
+				fmt.Println("fourth task")
+				return task.Result{}
+			},
+		},
+	}
+
+	sequence := task.Wrapper{
+		BeforeMessage: []string{
+			"Starting sequence",
+		},
+		AfterMessage: []string{
+			"Sequence over",
+		},
+		ErrorMessage: []string{
+			"Sequence with errors",
+		},
+		// Do not ignore errors for every step.
+		Task: task.CreateSequence(tasks, []bool{true, false, true, false}, verbosity).Task(),
+	}
+
+	sequence.Execute(verbosity)
+
+	// Output:
+	// Starting sequence ...
+	// starting first task ...
+	// First task
+	// first task over
+	// starting second task ...
+	// second task (with error)
+	// second task with error
+	// Warning from task 1: Error Triggered
+	// starting third task ...
+	// third task (with error)
+	// third task with error
+	// starting fourth task ...
+	// fourth task
+	// fourth task over
+	// Sequence over
+}
