@@ -66,16 +66,14 @@ func cleanTempRedirect(tempFile *os.File) {
 	os.Stdout = stdOut
 }
 
-func executeWithArgs(args ...string) {
+func executeWithArgs(t *testing.T, args ...string) {
 	if args != nil {
 		cmd.InitFlags()
 		cmd.InitCommands()
 		cmd.ArduinoCmd.SetArgs(args)
 	}
 	err := cmd.ArduinoCmd.Execute()
-	if err != nil {
-		os.Exit(1)
-	}
+	require.NoError(t, err, "Error executing command")
 }
 
 func TestArduinoCmd(t *testing.T) {
@@ -87,7 +85,7 @@ func TestArduinoCmd(t *testing.T) {
 
 	// arduino --format json
 	// arduino --format=json
-	executeWithArgs("--format", "json")
+	executeWithArgs(t, "--format", "json")
 
 	checkOutput(t, want, tempFile)
 }
@@ -102,10 +100,10 @@ func TestLibSearch(t *testing.T) {
 	}
 
 	// arduino lib search you
-	executeWithArgs("lib", "search", "you")
+	executeWithArgs(t, "lib", "search", "you")
 	// arduino lib search youtu --format json
 	// arduino lib search youtu --format=json
-	executeWithArgs("lib", "search", "youtu", "--format", "json")
+	executeWithArgs(t, "lib", "search", "youtu", "--format", "json")
 
 	checkOutput(t, want, tempFile)
 }
@@ -126,7 +124,7 @@ func TestLibDownload(t *testing.T) {
 	require.NoError(t, err)
 
 	// lib download YoutubeApi invalidLibrary YouMadeIt@invalidVersion --format json
-	executeWithArgs("lib", "download", "YoutubeApi", "invalidLibrary", "YouMadeIt@invalidVersion", "--format", "json")
+	executeWithArgs(t, "lib", "download", "YoutubeApi", "invalidLibrary", "YouMadeIt@invalidVersion", "--format", "json")
 
 	// resetting the file to allow the full read (it has been written by executeWithArgs)
 	_, err = tempFile.Seek(0, 0)
@@ -182,8 +180,8 @@ func TestCoreDownload(t *testing.T) {
 		t.Error("JSON marshalling error. TestCoreDownload want. " + err.Error())
 	}
 
-	// arduino lib download YoutubeApi --format json
-	executeWithArgs("core", "download", "arduino:samd", "unparsablearg", "arduino:sam=notexistingversion", "arduino:sam=1.0.0", "--format", "json")
+	// core download arduino:samd unparsablearg arduino:sam=notexistingversion arduino:sam=1.0.0 --format json
+	executeWithArgs(t, "core", "download", "arduino:samd", "unparsablearg", "arduino:sam=notexistingversion", "arduino:sam=1.0.0", "--format", "json")
 
 	//resetting the file to allow the full read (it has been written by executeWithArgs)
 	_, err = tempFile.Seek(0, 0)
