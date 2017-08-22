@@ -1,6 +1,7 @@
 package formatter_test
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
@@ -42,4 +43,27 @@ func ExamplePrint() {
 	// Field2: 10
 	// Field3.Inner1: inner test
 	// Field3.Inner2: 10.432412
+}
+
+func ExamplePrint_alternative() {
+	formatter.SetFormatter("text")
+	formatter.Print(TestStruct{5})
+
+	formatter.SetFormatter("json")
+	formatter.Print(TestStruct{10})
+
+	// Output:
+	// VALUE = 5
+	// {"value":10}
+}
+
+func ExamplePrintError() {
+	formatter.SetFormatter("text")
+	formatter.PrintError(errors.New("text error"))
+	formatter.SetFormatter("json")
+	formatter.PrintError(errors.New("json error"))
+
+	// Output:
+	// text error
+	// {"error":"json error"}
 }

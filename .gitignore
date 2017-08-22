@@ -3,3 +3,4 @@ arduino
 arduino-cli
 main
 .vscode/settings.json
+cmd/formatter/debug.test
