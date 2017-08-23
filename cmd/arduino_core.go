@@ -153,17 +153,9 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("No core specified for download command")
 	}
 
-	var index cores.Index
-	var status cores.StatusContext
-
-	err := cores.LoadIndex(&index)
+	status, err := getPackagesStatusContext(GlobalFlags.Verbose)
 	if err != nil {
-		status, err = prettyPrints.CorruptedCoreIndexFix(index, GlobalFlags.Verbose)
-		if err != nil {
-			return nil
-		}
-	} else {
-		status = index.CreateStatusContext()
+		return nil
 	}
 
 	IDTuples := cores.ParseArgs(args)
@@ -194,17 +186,9 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("No core specified for download command")
 	}
 
-	var index cores.Index
-	var status cores.StatusContext
-
-	err := cores.LoadIndex(&index)
+	status, err := getPackagesStatusContext(GlobalFlags.Verbose)
 	if err != nil {
-		status, err = prettyPrints.CorruptedCoreIndexFix(index, GlobalFlags.Verbose)
-		if err != nil {
-			return nil
-		}
-	} else {
-		status = index.CreateStatusContext()
+		return nil
 	}
 
 	IDTuples := cores.ParseArgs(args)
@@ -309,4 +293,19 @@ func getInstalledStuff(packageName string, stuff *[]output.InstalledStuff, start
 			Versions: versions,
 		})
 	}
+}
+
+func getPackagesStatusContext(verbosity int) (*cores.StatusContext, error) {
+	var index cores.Index
+	err := cores.LoadIndex(&index)
+	if err != nil {
+		status, err := prettyPrints.CorruptedCoreIndexFix(index, verbosity)
+		if err != nil {
+			return nil, err
+		}
+		return &status, nil
+	}
+
+	status := index.CreateStatusContext()
+	return &status, nil
 }

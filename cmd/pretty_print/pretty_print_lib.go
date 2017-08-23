@@ -84,12 +84,16 @@ func CorruptedLibIndexFix(index libraries.Index, verbosity int) (libraries.Statu
 // libIndexParse pretty prints info about parsing an index file of libraries.
 func libIndexParse(index libraries.Index, verbosity int) task.Wrapper {
 	ret := indexParseWrapperSkeleton()
-	ret.Task = task.Task(func() task.Result {
-		status := index.CreateStatusContext()
-		return task.Result{
-			Result: status,
-			Error:  nil,
+	ret.Task = func() task.Result {
+		err := libraries.LoadIndex(&index)
+		if err != nil {
+			return task.Result{
+				Error: err,
+			}
 		}
-	})
+		return task.Result{
+			Result: index.CreateStatusContext(),
+		}
+	}
 	return ret
 }

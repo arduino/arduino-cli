@@ -51,7 +51,10 @@ func DownloadIndex(indexPathFunc func() (string, error), URL string) error {
 		return err
 	}
 
-	client := http.DefaultClient
+	client := http.Client{
+		Timeout: 30 * time.Second,
+	}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return err

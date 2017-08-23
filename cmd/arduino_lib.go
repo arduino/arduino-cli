@@ -139,17 +139,9 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("No library specified for download command")
 	}
 
-	var index libraries.Index
-	var status libraries.StatusContext
-
-	err := libraries.LoadIndex(&index)
+	status, err := getLibStatusContext(GlobalFlags.Verbose)
 	if err != nil {
-		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
-		if err != nil {
-			return nil
-		}
-	} else {
-		status = index.CreateStatusContext()
+		return nil
 	}
 
 	pairs := libraries.ParseArgs(args)
@@ -174,17 +166,9 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("No library specified for install command")
 	}
 
-	var index libraries.Index
-	var status libraries.StatusContext
-
-	err := libraries.LoadIndex(&index)
+	status, err := getLibStatusContext(GlobalFlags.Verbose)
 	if err != nil {
-		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
-		if err != nil {
-			return nil
-		}
-	} else {
-		status = index.CreateStatusContext()
+		return nil
 	}
 
 	pairs := libraries.ParseArgs(args)
@@ -339,17 +323,9 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 func executeSearchCommand(cmd *cobra.Command, args []string) error {
 	query := strings.ToLower(strings.Join(args, " "))
 
-	var index libraries.Index
-	var status libraries.StatusContext
-
-	err := libraries.LoadIndex(&index)
+	status, err := getLibStatusContext(GlobalFlags.Verbose)
 	if err != nil {
-		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
-		if err != nil {
-			return nil
-		}
-	} else {
-		status = index.CreateStatusContext()
+		return nil
 	}
 
 	found := false
@@ -358,6 +334,7 @@ func executeSearchCommand(cmd *cobra.Command, args []string) error {
 	message := output.LibSearchResults{
 		Libraries: make([]interface{}, 0, len(names)),
 	}
+
 	items := status.Libraries
 	//Pretty print libraries from index.
 	for _, name := range names {
@@ -472,4 +449,19 @@ func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
 		Status:   "",
 		Error:    "Unknown Version",
 	})
+}
+
+func getLibStatusContext(verbosity int) (*libraries.StatusContext, error) {
+	var index libraries.Index
+	err := libraries.LoadIndex(&index)
+	if err != nil {
+		status, err := prettyPrints.CorruptedLibIndexFix(index, verbosity)
+		if err != nil {
+			return nil, err
+		}
+		return &status, nil
+	}
+
+	status := index.CreateStatusContext()
+	return &status, nil
 }
