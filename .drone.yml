@@ -8,4 +8,4 @@ pipeline:
     commands:
       - go get
       - go build -o arduino
-      - go test
+      - go test ./... -race
