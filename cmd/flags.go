@@ -30,32 +30,23 @@
 package cmd
 
 // GlobalFlags represents flags available in all the program.
-type globalFlags struct {
+var GlobalFlags struct {
 	Verbose int    // More time verbose flag is written, the more the Verbose count increases. Represents verbosity level.
 	Format  string // The Output format (e.g. text, json).
 	Home    string // The Custom Home directory.
 }
 
-// GlobalFlags represents flags available in all the program.
-var GlobalFlags globalFlags
-
-type rootFlags struct {
+// rootCmdFlags represent flags available to the root command.
+var rootCmdFlags struct {
 	GenerateDocs bool // if true, generates manpages and bash autocompletion.
 }
 
-// rootCmdFlags represent flags available to the root command.
-var rootCmdFlags rootFlags
-
-type libFlags struct {
-	updateIndex bool
-}
-
 // arduinoLibFlags represents `arduino lib` flags.
-var arduinoLibFlags libFlags
-
-type coreFlags struct {
+var arduinoLibFlags struct {
 	updateIndex bool
 }
 
 // arduinoCoreFlags represents `arduino core` flags.
-var arduinoCoreFlags coreFlags
+var arduinoCoreFlags struct {
+	updateIndex bool
+}

@@ -102,11 +102,6 @@ func init() {
 
 // InitFlags reinitialize flags (useful for testing too)
 func InitFlags() {
-	GlobalFlags = globalFlags{}
-	rootCmdFlags = rootFlags{}
-	arduinoLibFlags = libFlags{}
-	arduinoCoreFlags = coreFlags{}
-
 	ArduinoCmd.ResetFlags()
 	arduinoVersionCmd.ResetFlags()
 
