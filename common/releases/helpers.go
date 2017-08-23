@@ -92,14 +92,10 @@ func downloadTask(item DownloadItem, progBar *pb.ProgressBar, label string) task
 			err := downloadRelease(item, progBar, label)
 			if err != nil {
 				return task.Result{
-					Result: nil,
-					Error:  err,
+					Error: err,
 				}
 			}
-			return task.Result{
-				Result: nil,
-				Error:  nil,
-			}
+			return task.Result{}
 		},
 	}
 }

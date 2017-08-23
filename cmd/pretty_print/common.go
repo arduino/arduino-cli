@@ -96,11 +96,6 @@ func indexFixWrapperSkeleton() task.Wrapper {
 		BeforeMessage: []string{
 			"Cannot parse index file, it may be corrupted.",
 		},
-		AfterMessage: []string{""},
-		ErrorMessage: []string{ //printed by sub-task
-			"",
-		},
-		Task: nil,
 	}
 }
 
@@ -111,9 +106,6 @@ func indexParseWrapperSkeleton() task.Wrapper {
 		BeforeMessage: []string{
 			"",
 			"Parsing downloaded index file",
-		},
-		AfterMessage: []string{
-			"",
 		},
 		ErrorMessage: []string{
 			"Cannot parse index file",

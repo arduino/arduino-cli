@@ -34,11 +34,6 @@ import (
 	"github.com/bcmi-labs/arduino-cli/task"
 )
 
-// PackageStatus pretty prints packages from index status.
-func PackageStatus(status *cores.StatusContext) {
-
-}
-
 // DownloadCoreFileIndex shows info regarding the download of a missing (or corrupted) file index of core packages.
 func DownloadCoreFileIndex() task.Wrapper {
 	return DownloadFileIndex(cores.DownloadPackagesFile)

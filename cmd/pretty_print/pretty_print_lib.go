@@ -30,45 +30,13 @@
 package prettyPrints
 
 import (
-	"fmt"
-
-	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/bcmi-labs/arduino-cli/task"
 )
 
-// LibStatus pretty prints libraries from index status.
-func LibStatus(status *libraries.StatusContext, verbosity int) {
-	message := ""
-
-	for _, name := range status.Names() {
-		if verbosity > 0 {
-			lib := status.Libraries[name]
-			message += fmt.Sprint(lib)
-			if verbosity > 1 {
-				for _, r := range lib.Releases {
-					message += fmt.Sprint(r)
-				}
-			}
-			message += "\n"
-		} else {
-			message += name
-		}
-	}
-	formatter.Print(formatter.Message{
-		Header: "Library Search Results:",
-		Data:   message,
-	})
-}
-
 // DownloadLibFileIndex shows info regarding the download of a missing (or corrupted) file index of libraries.
 func DownloadLibFileIndex() task.Wrapper {
 	return DownloadFileIndex(libraries.DownloadLibrariesFile)
-}
-
-//UninstallLib pretty prints info about a pending install of libraries.
-func UninstallLib(libraryOK []string, libraryFails map[string]string) {
-	actionOnItems("libraries", "uninstalled", libraryOK, libraryFails)
 }
 
 // CorruptedLibIndexFix pretty prints messages regarding corrupted index fixes of libraries.

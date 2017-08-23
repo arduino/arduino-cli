@@ -48,7 +48,7 @@ type Task func() Result
 //
 // All Message arrays use VERBOSITY as index.
 type Wrapper struct {
-	BeforeMessage []string 
+	BeforeMessage []string
 	Task          Task
 	AfterMessage  []string
 	ErrorMessage  []string
@@ -67,6 +67,17 @@ type Sequence func() []Result
 func (tw Wrapper) Execute(verb int) Result {
 	var maxUsableVerb [3]int
 	var msg string
+
+	if tw.BeforeMessage == nil {
+		tw.BeforeMessage = []string{}
+	}
+	if tw.AfterMessage == nil {
+		tw.AfterMessage = []string{}
+	}
+	if tw.ErrorMessage == nil {
+		tw.ErrorMessage = []string{}
+	}
+
 	if formatter.IsCurrentFormat("text") && tw.BeforeMessage != nil && len(tw.BeforeMessage) > 0 {
 		maxUsableVerb[0] = minVerb(verb, tw.BeforeMessage)
 		msg = tw.BeforeMessage[maxUsableVerb[0]]
