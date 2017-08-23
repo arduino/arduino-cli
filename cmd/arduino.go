@@ -102,9 +102,27 @@ func init() {
 
 // InitFlags reinitialize flags (useful for testing too)
 func InitFlags() {
+	GlobalFlags = globalFlags{}
+	rootCmdFlags = rootFlags{}
+	arduinoLibFlags = libFlags{}
+	arduinoCoreFlags = coreFlags{}
+
 	ArduinoCmd.ResetFlags()
-	arduinoCoreCmd.ResetFlags()
+	arduinoVersionCmd.ResetFlags()
+
 	arduinoLibCmd.ResetFlags()
+	arduinoLibInstallCmd.ResetFlags()
+	arduinoLibDownloadCmd.ResetFlags()
+	arduinoLibListCmd.ResetFlags()
+	arduinoLibSearchCmd.ResetFlags()
+	arduinoLibUninstallCmd.ResetFlags()
+	arduinoLibVersionCmd.ResetFlags()
+
+	arduinoCoreCmd.ResetFlags()
+	arduinoCoreDownloadCmd.ResetFlags()
+	arduinoCoreInstallCmd.ResetFlags()
+	arduinoCoreListCmd.ResetFlags()
+	arduinoCoreVersionCmd.ResetFlags()
 
 	ArduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
 	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
@@ -123,21 +141,13 @@ func InitCommands() {
 	arduinoLibCmd.ResetCommands()
 	arduinoCoreCmd.ResetCommands()
 
-	ArduinoCmd.AddCommand(arduinoVersionCmd)
-	ArduinoCmd.AddCommand(arduinoLibCmd)
-	ArduinoCmd.AddCommand(arduinoCoreCmd)
+	ArduinoCmd.AddCommand(arduinoVersionCmd, arduinoLibCmd, arduinoCoreCmd)
 
-	arduinoLibCmd.AddCommand(arduinoLibInstallCmd)
-	arduinoLibCmd.AddCommand(arduinoLibUninstallCmd)
-	arduinoLibCmd.AddCommand(arduinoLibSearchCmd)
-	arduinoLibCmd.AddCommand(arduinoLibDownloadCmd)
-	arduinoLibCmd.AddCommand(arduinoLibVersionCmd)
-	arduinoLibCmd.AddCommand(arduinoLibListCmd)
+	arduinoLibCmd.AddCommand(arduinoLibInstallCmd, arduinoLibUninstallCmd, arduinoLibSearchCmd,
+		arduinoLibVersionCmd, arduinoLibListCmd, arduinoLibDownloadCmd)
 
-	arduinoCoreCmd.AddCommand(arduinoCoreListCmd)
-	arduinoCoreCmd.AddCommand(arduinoCoreDownloadCmd)
-	arduinoCoreCmd.AddCommand(arduinoCoreVersionCmd)
-	arduinoCoreCmd.AddCommand(arduinoCoreInstallCmd)
+	arduinoCoreCmd.AddCommand(arduinoCoreListCmd, arduinoCoreDownloadCmd, arduinoCoreVersionCmd,
+		arduinoCoreInstallCmd)
 }
 
 func arduinoPreRun(cmd *cobra.Command, args []string) {

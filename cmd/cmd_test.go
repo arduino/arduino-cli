@@ -59,16 +59,17 @@ func createTempRedirect(t *testing.T) *os.File {
 	return tempFile
 }
 
-func cleanTempRedirect(tempFile *os.File) {
+func cleanTempRedirect(t *testing.T, tempFile *os.File) {
 	tempFile.Close()
-	os.Remove(tempFile.Name())
+	err := os.Remove(tempFile.Name())
+	assert.NoError(t, err, "Removing temp file")
 	os.Stdout = stdOut
 }
 
 func executeWithArgs(t *testing.T, args ...string) {
+	cmd.InitFlags()
+	cmd.InitCommands()
 	if args != nil {
-		cmd.InitFlags()
-		cmd.InitCommands()
 		cmd.ArduinoCmd.SetArgs(args)
 	}
 	err := cmd.ArduinoCmd.Execute()
@@ -77,7 +78,7 @@ func executeWithArgs(t *testing.T, args ...string) {
 
 func TestArduinoCmd(t *testing.T) {
 	tempFile := createTempRedirect(t)
-	defer cleanTempRedirect(tempFile)
+	defer cleanTempRedirect(t, tempFile)
 	want := []string{
 		`{"error":"Invalid Call : should show Help, but it is available only in TEXT mode"}`,
 	}
@@ -91,7 +92,7 @@ func TestArduinoCmd(t *testing.T) {
 
 func TestLibSearch(t *testing.T) {
 	tempFile := createTempRedirect(t)
-	defer cleanTempRedirect(tempFile)
+	defer cleanTempRedirect(t, tempFile)
 	want := []string{
 		`"YouMadeIt"`,
 		`"YoutubeApi"`,
@@ -109,7 +110,7 @@ func TestLibSearch(t *testing.T) {
 
 func TestLibDownload(t *testing.T) {
 	tempFile := createTempRedirect(t)
-	defer cleanTempRedirect(tempFile)
+	defer cleanTempRedirect(t, tempFile)
 
 	// getting the paths to create the want path of the want object.
 	stagingFolder, err := common.GetDownloadCacheFolder("libraries")
@@ -163,7 +164,7 @@ func TestLibDownload(t *testing.T) {
 
 func TestCoreDownload(t *testing.T) {
 	tempFile := createTempRedirect(t)
-	defer cleanTempRedirect(tempFile)
+	defer cleanTempRedirect(t, tempFile)
 
 	// getting the paths to create the want path of the want object.
 	stagingFolder, err := common.GetDownloadCacheFolder("packages")
@@ -199,6 +200,9 @@ func TestCoreDownload(t *testing.T) {
 	var have output.CoreProcessResults
 	err = json.Unmarshal(d, &have)
 	require.NoError(t, err, "Unmarshaling json output")
+	t.Log("HAVE: \n", have)
+	t.Log("D:\n", string(d))
+	t.Log("WANT: \n", want)
 
 	// checking output
 

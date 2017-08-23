@@ -167,17 +167,18 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	IDTuples := cores.ParseArgs(args)
+
 	coresToDownload, toolsToDownload, failOutputs := status.Process(IDTuples)
 	outputResults := output.CoreProcessResults{
 		Cores: failOutputs,
+		Tools: make([]output.ProcessResult, 0, 10),
 	}
-
 	downloads := make([]releases.DownloadItem, len(toolsToDownload))
 	for i := range toolsToDownload {
 		downloads[i] = toolsToDownload[i].DownloadItem
 	}
-	releases.ParallelDownload(downloads, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Tools, "tool")
 
+	releases.ParallelDownload(downloads, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Tools, "tool")
 	downloads = make([]releases.DownloadItem, len(coresToDownload))
 	for i := range coresToDownload {
 		downloads[i] = coresToDownload[i].DownloadItem
