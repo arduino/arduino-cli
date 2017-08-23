@@ -35,7 +35,6 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/task"
 )
 
@@ -46,17 +45,12 @@ var RootDirPath = ""
 func GetFolder(folder string, label string, createIfMissing bool) (string, error) {
 	_, err := os.Stat(folder)
 	if os.IsNotExist(err) && createIfMissing {
-		formatter.Print(fmt.Sprintf("Cannot find default %s folder, attemping to create it ...", label))
 		err = os.MkdirAll(folder, 0755)
 		if err != nil {
-			formatter.Print("ERROR")
-			formatter.PrintErrorMessage(fmt.Sprintf("Folder %s missing and cannot create it", label))
 			return "", err
 		}
-		formatter.Print("OK")
 	} else if err != nil {
 		msgFormat := "Cannot get %s folder, it does not exist"
-		formatter.PrintErrorMessage(fmt.Sprintf(msgFormat, label))
 		return "", fmt.Errorf(msgFormat, label)
 	}
 	return folder, nil

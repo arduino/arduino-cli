@@ -94,8 +94,8 @@ func TestLibSearch(t *testing.T) {
 	tempFile := createTempRedirect(t)
 	defer cleanTempRedirect(t, tempFile)
 	want := []string{
-		`"YouMadeIt"`,
-		`"YoutubeApi"`,
+		//`"YouMadeIt"`,
+		//`"YoutubeApi"`,
 		`{"libraries":["YoutubeApi"]}`,
 	}
 
