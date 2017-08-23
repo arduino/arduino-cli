@@ -6,6 +6,6 @@ pipeline:
   build:
     image: golang:latest
     commands:
-      - go get
+      - go get ./...
       - go build -o arduino
       - go test ./... -race
