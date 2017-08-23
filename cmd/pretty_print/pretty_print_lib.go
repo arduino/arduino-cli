@@ -85,9 +85,9 @@ func CorruptedLibIndexFix(index libraries.Index, verbosity int) (libraries.Statu
 func libIndexParse(index libraries.Index, verbosity int) task.Wrapper {
 	ret := indexParseWrapperSkeleton()
 	ret.Task = task.Task(func() task.Result {
-		index.CreateStatusContext()
+		status := index.CreateStatusContext()
 		return task.Result{
-			Result: nil,
+			Result: status,
 			Error:  nil,
 		}
 	})
