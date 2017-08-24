@@ -97,18 +97,26 @@ func (c Configs) Serialize(path string) error {
 
 func fixMissingFields(c *Configs) {
 	def := defaultConfig
-	//env := envConfig
+	env := envConfig
 
-	if c.HTTPProxy == "" {
+	if env.HTTPProxy != "" {
+		c.HTTPProxy = env.HTTPProxy
+	} else if c.HTTPProxy == "" {
 		c.HTTPProxy = def.HTTPProxy
 	}
-	if c.SketchBookPath == "" {
+	if env.SketchBookPath == "" {
+		c.SketchBookPath = env.SketchBookPath
+	} else if c.SketchBookPath == "" {
 		c.SketchBookPath = def.SketchBookPath
 	}
-	if c.LibrariesPath == "" {
+	if env.LibrariesPath != "" {
+		c.LibrariesPath = env.LibrariesPath
+	} else if c.LibrariesPath == "" {
 		c.LibrariesPath = def.LibrariesPath
 	}
-	if c.PackagesPath == "" {
+	if env.PackagesPath != "" {
+		c.PackagesPath = env.PackagesPath
+	} else if c.PackagesPath == "" {
 		c.PackagesPath = def.PackagesPath
 	}
 }
