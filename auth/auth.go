@@ -62,7 +62,7 @@ func New() *Config {
 		CodeURL:     "https://hydra.arduino.cc/oauth2/auth",
 		TokenURL:    "https://hydra.arduino.cc/oauth2/token",
 		ClientID:    "cli",
-		RedirectURI: "http://localhost:5000",
+		RedirectURI: "http://auth.arduino.cc:5000",
 		Scopes:      "profile:core offline",
 	}
 }
@@ -129,6 +129,37 @@ func (c *Config) Refresh(token string) (*Token, error) {
 		return nil, err
 	}
 	return &data, nil
+}
+
+type User struct{}
+
+// LoggedUser returns the logged User's data.
+func (t *Token) LoggedUser() (*User, error) {
+	req, err := http.NewRequest("GET", "https://auth.arduino.cc/v1/users/byID/me", nil)
+	if err != nil {
+		return nil, err
+	}
+	req.SetBasicAuth("cli", "")
+	req.Header.Add("Authorization", "Bearer "+t.Access)
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "LoggedUser")
+	}
+	if resp.StatusCode != 200 {
+		return nil, errors.New(resp.Status)
+	}
+	defer resp.Body.Close()
+	content, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "LoggedUser")
+	}
+	var ret User
+	err = json.Unmarshal(content, &ret)
+	if err != nil {
+		return nil, errors.Wrap(err, "LoggedUser")
+	}
+	return &ret, nil
 }
 
 // cookies keeps track of the cookies for each request
