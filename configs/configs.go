@@ -39,12 +39,24 @@ import (
 // Configs represents the possible configurations for the CLI.
 type Configs struct {
 	HTTPProxy      string `yaml:"HTTP_Proxy,omitempty"`
-	ConnectedBoard string `yaml:"ConnectedBoard,omitempty"`
+	SketchBookPath string `yaml:"HTTP_Proxy,omitempty"`
+	LibrariesPath  string `yaml:"HTTP_Proxy,omitempty"`
+	PackagesPath   string `yaml:"HTTP_Proxy,omitempty"`
 }
 
 // defaultConfig represents the default configuration.
 var defaultConfig = Configs{
-	HTTPProxy: os.Getenv("HTTP_PROXY"),
+	HTTPProxy:      os.Getenv("HTTP_PROXY"),
+	SketchBookPath: "",
+	LibrariesPath:  "",
+	PackagesPath:   "",
+}
+
+var envConfig = Configs{
+	HTTPProxy:      os.Getenv("HTTP_PROXY"),
+	SketchBookPath: os.Getenv("SKETCHBOOK_FOLDER"),
+	LibrariesPath:  os.Getenv("LIBS_FOLDER"),
+	PackagesPath:   os.Getenv("PACKAGES_FOLDER"),
 }
 
 // Default returns a copy of the default configuration.
@@ -65,6 +77,7 @@ func Unserialize(path string) (Configs, error) {
 	if err != nil {
 		return Default(), err
 	}
+	fixMissingFields(&ret)
 	return ret, nil
 }
 
@@ -80,4 +93,22 @@ func (c Configs) Serialize(path string) error {
 		return err
 	}
 	return nil
+}
+
+func fixMissingFields(c *Configs) {
+	def := defaultConfig
+	//env := envConfig
+
+	if c.HTTPProxy == "" {
+		c.HTTPProxy = def.HTTPProxy
+	}
+	if c.SketchBookPath == "" {
+		c.SketchBookPath = def.SketchBookPath
+	}
+	if c.LibrariesPath == "" {
+		c.LibrariesPath = def.LibrariesPath
+	}
+	if c.PackagesPath == "" {
+		c.PackagesPath = def.PackagesPath
+	}
 }
