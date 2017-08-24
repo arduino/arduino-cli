@@ -49,9 +49,7 @@ var defaultConfig = Configs{
 
 // Default returns a copy of the default configuration.
 func Default() Configs {
-	var def Configs
-	def = defaultConfig
-	return def
+	return defaultConfig
 }
 
 // Unserialize loads the configs from a yaml file.
