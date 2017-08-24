@@ -39,11 +39,10 @@ import (
 
 // CreateSketchesPath computes a request path to the create action of sketches.
 func CreateSketchesPath() string {
-
 	return fmt.Sprintf("/create/v1/sketches")
 }
 
-// Adds a new sketch.
+// CreateSketches Adds a new sketch.
 func (c *Client) CreateSketches(ctx context.Context, path string, payload *Sketch, authorization string) (*http.Response, error) {
 	req, err := c.NewCreateSketchesRequest(ctx, path, payload, authorization)
 	if err != nil {
@@ -78,12 +77,10 @@ func (c *Client) NewCreateSketchesRequest(ctx context.Context, path string, payl
 
 // DeleteSketchesPath computes a request path to the delete action of sketches.
 func DeleteSketchesPath(id string) string {
-	param0 := id
-
-	return fmt.Sprintf("/create/v1/sketches/%s", param0)
+	return fmt.Sprintf("/create/v1/sketches/%s", id)
 }
 
-// Removes the sketch identified by the :id param.
+// DeleteSketches Removes the sketch identified by the :id param.
 func (c *Client) DeleteSketches(ctx context.Context, path string, authorization string) (*http.Response, error) {
 	req, err := c.NewDeleteSketchesRequest(ctx, path, authorization)
 	if err != nil {
@@ -117,7 +114,7 @@ func EditSketchesPath(id string) string {
 	return fmt.Sprintf("/create/v1/sketches/%s", param0)
 }
 
-// Modifies the sketch identified by the :id param.
+// EditSketches Modifies the sketch identified by the :id param.
 // If a file has a valid data field, it will be modified too.
 func (c *Client) EditSketches(ctx context.Context, path string, payload *Sketch, authorization string) (*http.Response, error) {
 	req, err := c.NewEditSketchesRequest(ctx, path, payload, authorization)
@@ -157,7 +154,7 @@ func SearchSketchesPath() string {
 	return fmt.Sprintf("/create/v1/sketches")
 }
 
-// Provides a paginated list of sketches filtered according to the params. The page size is 100 items.
+// SearchSketches Provides a paginated list of sketches filtered according to the params. The page size is 100 items.
 func (c *Client) SearchSketches(ctx context.Context, path string, offset *string, owner *string, authorization *string) (*http.Response, error) {
 	req, err := c.NewSearchSketchesRequest(ctx, path, offset, owner, authorization)
 	if err != nil {
@@ -200,7 +197,7 @@ func ShowSketchesPath(id string) string {
 	return fmt.Sprintf("/create/v1/sketches/%s", param0)
 }
 
-// Provides the sketch identified by the :id param.
+// ShowSketches Provides the sketch identified by the :id param.
 func (c *Client) ShowSketches(ctx context.Context, path string, authorization *string) (*http.Response, error) {
 	req, err := c.NewShowSketchesRequest(ctx, path, authorization)
 	if err != nil {
