@@ -107,7 +107,8 @@ func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleRe
 
 	response, err := client.Do(request)
 	if err != nil {
-		return fmt.Errorf("Cannot fetch %s Response creation error: %s", URL, err)
+		return fmt.Errorf("Cannot fetch %s Response creation error: %s",
+			URL, err)
 	} else if response.StatusCode != 200 &&
 		response.StatusCode != 206 &&
 		response.StatusCode != 416 {
