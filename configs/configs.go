@@ -99,24 +99,16 @@ func fixMissingFields(c *Configs) {
 	def := defaultConfig
 	env := envConfig
 
-	if env.HTTPProxy != "" {
-		c.HTTPProxy = env.HTTPProxy
-	} else if c.HTTPProxy == "" {
-		c.HTTPProxy = def.HTTPProxy
+	compareAndReplace := func(envVal string, configVal *string, defVal string) {
+		if envVal != "" {
+			*configVal = envVal
+		} else if defVal == "" {
+			*configVal = defVal
+		}
 	}
-	if env.SketchBookPath == "" {
-		c.SketchBookPath = env.SketchBookPath
-	} else if c.SketchBookPath == "" {
-		c.SketchBookPath = def.SketchBookPath
-	}
-	if env.LibrariesPath != "" {
-		c.LibrariesPath = env.LibrariesPath
-	} else if c.LibrariesPath == "" {
-		c.LibrariesPath = def.LibrariesPath
-	}
-	if env.PackagesPath != "" {
-		c.PackagesPath = env.PackagesPath
-	} else if c.PackagesPath == "" {
-		c.PackagesPath = def.PackagesPath
-	}
+
+	compareAndReplace(env.HTTPProxy, &c.HTTPProxy, def.HTTPProxy)
+	compareAndReplace(env.SketchBookPath, &c.SketchBookPath, def.SketchBookPath)
+	compareAndReplace(env.LibrariesPath, &c.LibrariesPath, def.LibrariesPath)
+	compareAndReplace(env.PackagesPath, &c.PackagesPath, def.PackagesPath)
 }
