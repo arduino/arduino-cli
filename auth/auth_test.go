@@ -23,7 +23,7 @@ func TestMain(m *testing.M) {
 
 func TestToken(t *testing.T) {
 	if testUser == "" || testPass == "" {
-		t.Fatal("Failed because user and pass were not provided")
+		t.Skip("Skipped because user and pass were not provided")
 	}
 	auth := auth.New()
 	token, err := auth.Token(testUser, testPass)
