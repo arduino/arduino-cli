@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	testUser = flag.String("user", "", "The username of the test")
-	testPass = flag.String("pass", "", "The password of the test")
+	testUser = os.Getenv("TEST_USERNAME")
+	testPass = os.Getenv("TEST_PASSWORD")
 )
 
 func TestMain(m *testing.M) {
@@ -22,11 +22,11 @@ func TestMain(m *testing.M) {
 }
 
 func TestToken(t *testing.T) {
-	if *testUser == "" || *testPass == "" {
-		t.Skip("Skipped because -user and -pass were not provided")
+	if testUser == "" || testPass == "" {
+		t.Fatal("Failed because user and pass were not provided")
 	}
 	auth := auth.New()
-	token, err := auth.Token(*testUser, *testPass)
+	token, err := auth.Token(testUser, testPass)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +58,7 @@ func TestToken(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if data.Username != *testUser {
-		t.Fatalf("Expected username '%s', got '%s'", *testUser, data.Username)
+	if data.Username != testUser {
+		t.Fatalf("Expected username '%s', got '%s'", testUser, data.Username)
 	}
 }
