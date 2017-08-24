@@ -27,21 +27,19 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-/*
-Package auth uses the `oauth2 authorization_code` flow to authenticate with Arduino
-
-If you have the username and password of a user, you can just instantiate a client with sane defaults:
-
-  client := auth.New()
-
-and then call the Token method to obtain a Token object with an AccessToken and a RefreshToken
-
-  token, err := client.Token(username, password)
-
-If instead you already have a token but want to refresh it, just call
-
-  token, err := client.refresh(refreshToken)
-*/
+// Package auth uses the `oauth2 authorization_code` flow to authenticate with Arduino
+//
+// If you have the username and password of a user, you can just instantiate a client with sane defaults:
+//
+//   client := auth.New()
+//
+// and then call the Token method to obtain a Token object with an AccessToken and a RefreshToken
+//
+//   token, err := client.Token(username, password)
+//
+// If instead you already have a token but want to refresh it, just call
+//
+//   token, err := client.refresh(refreshToken)
 package auth
 
 import (
@@ -56,15 +54,51 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Config contains the variables you may want to change
+type Config struct {
+	// CodeURL is the endpoint to redirect to obtain a code
+	CodeURL string
+
+	// TokenURL is the endpoint where you can request an access code
+	TokenURL string
+
+	// ClientID is the client id you are using
+	ClientID string
+
+	// RedirectURI is the redirectURI where the oauth process will redirect. It's only required since the oauth system checks for it, but we intercept the redirect before hitting it
+	RedirectURI string
+
+	// Scopes is a space-separated list of scopes to require
+	Scopes string
+}
+
 // New returns an auth configuration with sane defaults
 func New() *Config {
 	return &Config{
 		CodeURL:     "https://hydra.arduino.cc/oauth2/auth",
 		TokenURL:    "https://hydra.arduino.cc/oauth2/token",
 		ClientID:    "cli",
-		RedirectURI: "http://auth.arduino.cc:5000",
+		RedirectURI: "http://localhost:5000",
 		Scopes:      "profile:core offline",
 	}
+}
+
+// Token is the response of the two authentication functions
+type Token struct {
+	// Access is the token to use to authenticate requests
+	Access string `json:"access_token"`
+
+	// Refresh is the token to use to request another access token. It's only returned if one of the scopes is "offline"
+	Refresh string `json:"refresh_token"`
+
+	// TTL is the number of seconds that the tokens will last
+	TTL int `json:"expires_in"`
+
+	// Scopes is a space-separated list of scopes associated to the access token
+	Scopes string `json:"scope"`
+
+	// Type is the type of token
+	Type string `json:"token_type"`
 }
 
 // Token authenticates with the given username and password and returns a Token object
@@ -129,37 +163,6 @@ func (c *Config) Refresh(token string) (*Token, error) {
 		return nil, err
 	}
 	return &data, nil
-}
-
-type User struct{}
-
-// LoggedUser returns the logged User's data.
-func (t *Token) LoggedUser() (*User, error) {
-	req, err := http.NewRequest("GET", "https://auth.arduino.cc/v1/users/byID/me", nil)
-	if err != nil {
-		return nil, err
-	}
-	req.SetBasicAuth("cli", "")
-	req.Header.Add("Authorization", "Bearer "+t.Access)
-	client := http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, errors.Wrap(err, "LoggedUser")
-	}
-	if resp.StatusCode != 200 {
-		return nil, errors.New(resp.Status)
-	}
-	defer resp.Body.Close()
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "LoggedUser")
-	}
-	var ret User
-	err = json.Unmarshal(content, &ret)
-	if err != nil {
-		return nil, errors.Wrap(err, "LoggedUser")
-	}
-	return &ret, nil
 }
 
 // cookies keeps track of the cookies for each request
@@ -269,7 +272,7 @@ func (c *Config) requestToken(client *http.Client, code string) (*Token, error) 
 	}
 
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	req.SetBasicAuth("cli", "")
+	req.SetBasicAuth(c.ClientID, "")
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -278,6 +281,14 @@ func (c *Config) requestToken(client *http.Client, code string) (*Token, error) 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	if res.StatusCode != 200 {
+		data := struct {
+			Error string `json:"error_description"`
+		}{}
+		json.Unmarshal(body, &data)
+		return nil, errors.New(data.Error)
 	}
 
 	data := Token{}
