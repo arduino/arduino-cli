@@ -27,19 +27,36 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
+/*
+ * Package configs contains all CLI configurations handling.
+ * It is done via a YAML file which can be in a custom location,
+ * but is defaulted to "$EXECUTABLE_DIR/cli-config.yaml"
+ */
 package configs
 
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 )
 
+// DefaultLocation represents the default location of the config file (same directory as executable)
+var DefaultLocation string
+
+func init() {
+	DefaultLocation, err := os.Getwd()
+	if err != nil {
+		DefaultLocation = "."
+	}
+	DefaultLocation = filepath.Join(DefaultLocation, "cli-config.yaml")
+}
+
 // Configs represents the possible configurations for the CLI.
 type Configs struct {
 	HTTPProxy      string `yaml:"HTTP_Proxy,omitempty"`
-	SketchBookPath string `yaml:"HTTP_Proxy,omitempty"`
+	SketchbookPath string `yaml:"sketchbook_path,omitempty"`
 	LibrariesPath  string `yaml:"HTTP_Proxy,omitempty"`
 	PackagesPath   string `yaml:"HTTP_Proxy,omitempty"`
 }
@@ -47,14 +64,14 @@ type Configs struct {
 // defaultConfig represents the default configuration.
 var defaultConfig = Configs{
 	HTTPProxy:      os.Getenv("HTTP_PROXY"),
-	SketchBookPath: "",
+	SketchbookPath: "",
 	LibrariesPath:  "",
 	PackagesPath:   "",
 }
 
 var envConfig = Configs{
 	HTTPProxy:      os.Getenv("HTTP_PROXY"),
-	SketchBookPath: os.Getenv("SKETCHBOOK_FOLDER"),
+	SketchbookPath: os.Getenv("SKETCHBOOK_FOLDER"),
 	LibrariesPath:  os.Getenv("LIBS_FOLDER"),
 	PackagesPath:   os.Getenv("PACKAGES_FOLDER"),
 }

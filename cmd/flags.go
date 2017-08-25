@@ -43,10 +43,16 @@ var rootCmdFlags struct {
 
 // arduinoLibFlags represents `arduino lib` flags.
 var arduinoLibFlags struct {
-	updateIndex bool
+	updateIndex bool // If true, update library index.
 }
 
 // arduinoCoreFlags represents `arduino core` flags.
 var arduinoCoreFlags struct {
-	updateIndex bool
+	updateIndex bool // If true, update package index.
+}
+
+// arduinoConfigInitFlags represents `arduino config init` flags.
+var arduinoConfigInitFlags struct {
+	Default  bool   // If false, ask questions to the user about setting configuration properties, otherwise use default configuration.
+	Location string // The custom location of the file to create.
 }

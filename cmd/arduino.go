@@ -37,6 +37,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/spf13/cobra"
 )
 
@@ -119,6 +120,9 @@ func InitFlags() {
 	arduinoCoreListCmd.ResetFlags()
 	arduinoCoreVersionCmd.ResetFlags()
 
+	arduinoConfigCmd.ResetFlags()
+	arduinoConfigInitCmd.ResetFlags()
+
 	ArduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
 	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
 	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Home, "home", "", "the custom home (if not specified $HOME will be used)")
@@ -128,6 +132,9 @@ func InitFlags() {
 	arduinoLibCmd.Flags().BoolVar(&arduinoLibFlags.updateIndex, "update-index", false, "Updates the libraries index")
 
 	arduinoCoreCmd.Flags().BoolVar(&arduinoCoreFlags.updateIndex, "update-index", false, "Updates the index of cores to the latest version")
+
+	arduinoConfigInitCmd.Flags().BoolVar(&arduinoConfigInitFlags.Default, "default", false, "If omitted, ask questions to the user about setting configuration properties, otherwise use default configuration")
+	arduinoConfigInitCmd.Flags().StringVar(&arduinoConfigInitFlags.Location, "location", configs.DefaultLocation)
 }
 
 // InitCommands reinitialize commands (useful for testing too)
@@ -135,14 +142,17 @@ func InitCommands() {
 	ArduinoCmd.ResetCommands()
 	arduinoLibCmd.ResetCommands()
 	arduinoCoreCmd.ResetCommands()
+	arduinoConfigCmd.ResetCommands()
 
-	ArduinoCmd.AddCommand(arduinoVersionCmd, arduinoLibCmd, arduinoCoreCmd)
+	ArduinoCmd.AddCommand(arduinoVersionCmd, arduinoLibCmd, arduinoCoreCmd, arduinoConfigCmd)
 
 	arduinoLibCmd.AddCommand(arduinoLibInstallCmd, arduinoLibUninstallCmd, arduinoLibSearchCmd,
 		arduinoLibVersionCmd, arduinoLibListCmd, arduinoLibDownloadCmd)
 
 	arduinoCoreCmd.AddCommand(arduinoCoreListCmd, arduinoCoreDownloadCmd, arduinoCoreVersionCmd,
 		arduinoCoreInstallCmd)
+
+	arduinoConfigCmd.AddCommand(arduinoConfigInitCmd)
 }
 
 func arduinoPreRun(cmd *cobra.Command, args []string) {
