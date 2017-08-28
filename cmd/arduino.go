@@ -196,11 +196,11 @@ func arduinoRun(cmd *cobra.Command, args []string) error {
 		errorText := ""
 		err := cmd.GenBashCompletionFile("docs/bash_completions/arduino")
 		if err != nil {
-			errorText += fmt.Sprintln(err.Error())
+			errorText += fmt.Sprintln(err)
 		}
 		err = generateManPages(cmd)
 		if err != nil {
-			errorText += fmt.Sprintln(err.Error())
+			errorText += fmt.Sprintln(err)
 		}
 		if errorText != "" {
 			formatter.PrintErrorMessage(errorText)

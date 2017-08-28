@@ -201,7 +201,6 @@ func TestCoreDownload(t *testing.T) {
 	err = json.Unmarshal(d, &have)
 	require.NoError(t, err, "Unmarshaling json output")
 	t.Log("HAVE: \n", have)
-	//t.Log("D:\n", string(d))
 	t.Log("WANT: \n", want)
 
 	// checking output
@@ -235,7 +234,7 @@ func TestCoreDownload(t *testing.T) {
 		for idx, h := range have.Tools {
 			if tool.String() == h.String() {
 				// XXX: Consider changing the Tools field to an array of pointers
-				//have.Tools[idx] = nil
+				// have.Tools[idx] = nil
 				have.Tools[idx] = output.ProcessResult{ItemName: ""} // Mark tool as matched
 				return true
 			}

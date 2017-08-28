@@ -77,8 +77,13 @@ func GetDefaultArduinoFolder() (string, error) {
 		switch runtime.GOOS {
 		case "linux":
 			ArduinoDataFolder = filepath.Join(ArduinoDataFolder, ".arduino15")
+			break
 		case "darwin":
 			ArduinoDataFolder = filepath.Join(ArduinoDataFolder, "Library", "arduino15")
+			break
+		case "windows":
+			
+			return "", fmt.Errorf("Windows temporarily unsupported")
 		default:
 			return "", fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
 		}

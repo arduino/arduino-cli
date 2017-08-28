@@ -99,6 +99,7 @@ func Default() Configs {
 
 // UnserializeFromIDEPreferences loads the config from an IDE preferences.txt file.
 func UnserializeFromIDEPreferences() (Configs, error) {
+	//sketchbook.path
 	return Configs{}, nil
 }
 
