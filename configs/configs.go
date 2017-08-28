@@ -44,15 +44,22 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// DefaultLocation represents the default location of the config file (same directory as executable)
-var DefaultLocation string
+// FileLocation represents the default location of the config file (same directory as executable).
+var FileLocation string
+
+// BundledInIDE tells if the CLI is paired with the Java Arduino IDE.
+var BundledInIDE bool
+
+// ArduinoIDEFolder represents the path of the IDE directory, set only if BundledInIDE = true.
+var ArduinoIDEFolder string
 
 func init() {
-	DefaultLocation, err := os.Getwd()
+	FileLocation, err := os.Executable()
 	if err != nil {
-		DefaultLocation = "."
+		FileLocation = "."
 	}
-	DefaultLocation = filepath.Join(DefaultLocation, "cli-config.yaml")
+	FileLocation = filepath.Dir(FileLocation)
+	FileLocation = filepath.Join(FileLocation, "cli-config.yaml")
 }
 
 // Configs represents the possible configurations for the CLI.
@@ -60,7 +67,6 @@ type Configs struct {
 	HTTPProxy         string `yaml:"HTTP_proxy,omitempty"`
 	SketchbookPath    string `yaml:"sketchbook_path,omitempty"`
 	ArduinoDataFolder string `yaml:"arduino_data,omitempty"`
-	Bundled           bool   `yaml:"-"`
 }
 
 // defaultConfig represents the default configuration.
@@ -73,45 +79,27 @@ var envConfig = Configs{
 }
 
 func init() {
-	defArduinoData, err1 := common.GetDefaultArduinoFolder()
-	defSketchbook, err2 := common.GetDefaultArduinoHomeFolder()
-	bund, err3 := isBundled()
+	defArduinoData, _ := common.GetDefaultArduinoFolder()
+	defSketchbook, _ := common.GetDefaultArduinoHomeFolder()
+	if checkIfBundled() != nil {
+		BundledInIDE = false
+	}
+
 	defaultConfig = Configs{
 		HTTPProxy:         os.Getenv("HTTP_PROXY"),
 		SketchbookPath:    defSketchbook,
 		ArduinoDataFolder: defArduinoData,
-		Bundled:           bund,
 	}
-}
-
-func isBundled() (bool, error) {
-	executable, err := os.Executable()
-	if err != nil {
-		return false, err
-	}
-	executable, err = filepath.EvalSymlinks(executable)
-	if err != nil {
-		return false, err
-	}
-	execParent := filepath.SplitList(filepath.Dir(executable))
-	execParentDir := filepath.Join(execParent[0 : len(execParent)-1]...)
-
-	bundled := false
-	possible := []string{"arduino", "arduino.sh", "arduino.exe"}
-	for _, poss := range possible {
-		possibleIDEexe := filepath.Join(execParentDir, poss)
-		_, err := os.Stat(possibleIDEexe)
-		if !os.IsNotExist(err) {
-			bundled = true
-			break
-		}
-	}
-	return bundled, nil
 }
 
 // Default returns a copy of the default configuration.
 func Default() Configs {
 	return defaultConfig
+}
+
+// UnserializeFromIDEPreferences loads the config from an IDE preferences.txt file.
+func UnserializeFromIDEPreferences() (Configs, error) {
+	return Configs{}, nil
 }
 
 // Unserialize loads the configs from a yaml file.
@@ -160,5 +148,30 @@ func fixMissingFields(c *Configs) {
 	compareAndReplace(env.HTTPProxy, &c.HTTPProxy, def.HTTPProxy)
 	compareAndReplace(env.SketchbookPath, &c.SketchbookPath, def.SketchbookPath)
 	compareAndReplace(env.ArduinoDataFolder, &c.ArduinoDataFolder, def.ArduinoDataFolder)
-	compareAndReplace(env.ArduinoHomeFolder, &c.ArduinoHomeFolder, def.ArduinoHomeFolder)
+}
+
+// checkIfBundled checks if the CLI is bundled with the Arduino IDE.
+func checkIfBundled() error {
+	executable, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	executable, err = filepath.EvalSymlinks(executable)
+	if err != nil {
+		return err
+	}
+	execParent := filepath.SplitList(filepath.Dir(executable))
+	ArduinoIDEFolder := filepath.Join(execParent[0 : len(execParent)-1]...)
+
+	BundledInIDE = false
+	executables := []string{"arduino", "arduino.sh", "arduino.exe"}
+	for _, exe := range executables {
+		exePath := filepath.Join(ArduinoIDEFolder, exe)
+		_, err := os.Stat(exePath)
+		if !os.IsNotExist(err) {
+			BundledInIDE = true
+			break
+		}
+	}
+	return nil
 }

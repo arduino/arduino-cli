@@ -32,11 +32,11 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"os/user"
+
+	"github.com/bcmi-labs/arduino-cli/common"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/spf13/cobra"
 )
@@ -95,6 +95,8 @@ arduino lib version # for the version of the lib component.
 arduino core version # for the version of the core component.`,
 }
 
+var bundled bool
+
 func init() {
 	versions[ArduinoCmd.Name()] = ArduinoVersion
 	InitConfigs()
@@ -126,8 +128,7 @@ func InitFlags() {
 
 	ArduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
 	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
-	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Config.Location, "config-file", , "the custom config file (if not specified ./.cli-config.yml will be used)")
-	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Home, "home", "", "the custom home (if not specified $HOME will be used)")
+	ArduinoCmd.PersistentFlags().StringVar(&configs.FileLocation, "config-file", configs.FileLocation, "the custom config file (if not specified ./.cli-config.yml will be used)")
 
 	ArduinoCmd.Flags().BoolVar(&rootCmdFlags.GenerateDocs, "generate-docs", false, "generates the docs for the CLI and puts it in docs folder")
 
@@ -136,7 +137,7 @@ func InitFlags() {
 	arduinoCoreCmd.Flags().BoolVar(&arduinoCoreFlags.updateIndex, "update-index", false, "Updates the index of cores to the latest version")
 
 	arduinoConfigInitCmd.Flags().BoolVar(&arduinoConfigInitFlags.Default, "default", false, "If omitted, ask questions to the user about setting configuration properties, otherwise use default configuration")
-	arduinoConfigInitCmd.Flags().StringVar(&arduinoConfigInitFlags.Location, "location", configs.DefaultLocation)
+	arduinoConfigInitCmd.Flags().StringVar(&arduinoConfigInitFlags.Location, "save-as", configs.FileLocation, "Sets where to save the configuration file [default is ./.cli-config.yml]")
 }
 
 // InitCommands reinitialize commands (useful for testing too)
@@ -159,15 +160,23 @@ func InitCommands() {
 
 // InitConfigs initializes the configuration from the specified file.
 func InitConfigs() {
-	GlobalFlags.Config, err = configs.Unserialize(GlobalFlags.ConfigFile)
+	c, err := configs.Unserialize(configs.FileLocation)
 	if err != nil {
-		GlobalFlags.Config = configs.Default()
+		GlobalFlags.Configs = configs.Default()
 	}
+	GlobalFlags.Configs = c
+	if configs.BundledInIDE {
+		configs.UnserializeFromIDEPreferences()
+	}
+	common.ArduinoDataFolder = GlobalFlags.Configs.ArduinoDataFolder
+	common.ArduinoIDEFolder = configs.ArduinoIDEFolder
+	common.SketchbookFolder = GlobalFlags.Configs.SketchbookPath
+	os.Setenv("HTTP_PROXY", GlobalFlags.Configs.HTTPProxy)
 }
 
 // IgnoreConfigs is used in tests to ignore the config file.
 func IgnoreConfigs() {
-	GlobalFlags.Config = configs.Default()
+	GlobalFlags.Configs = configs.Default()
 }
 
 func arduinoPreRun(cmd *cobra.Command, args []string) {
@@ -179,15 +188,6 @@ func arduinoPreRun(cmd *cobra.Command, args []string) {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 			formatter.PrintErrorMessage("Invalid Call : should show Help, but it is available only in TEXT mode")
 		})
-	}
-	if GlobalFlags.Home == "" {
-		usr, err := user.Current()
-		if err != nil {
-			common.RootDirPath = GlobalFlags.Home
-		}
-		common.RootDirPath = usr.HomeDir
-	} else {
-		common.RootDirPath = GlobalFlags.Home
 	}
 }
 

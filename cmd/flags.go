@@ -33,9 +33,9 @@ import "github.com/bcmi-labs/arduino-cli/configs"
 
 // GlobalFlags represents flags available in all the program.
 var GlobalFlags struct {
-	Verbose        int    // More time verbose flag is written, the more the Verbose count increases. Represents verbosity level.
-	Format         string // The Output format (e.g. text, json).
-	configs.Config        // The Configurations for the CLI.
+	Verbose         int    // More time verbose flag is written, the more the Verbose count increases. Represents verbosity level.
+	Format          string // The Output format (e.g. text, json).
+	configs.Configs        // The Configurations for the CLI.
 }
 
 // rootCmdFlags represent flags available to the root command.

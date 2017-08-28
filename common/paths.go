@@ -41,13 +41,13 @@ import (
 
 var (
 	// SketchbookFolder represents the current root of the sketchbooks tree (defaulted to `$HOME/Arduino`).
-	SketchbookFolder = ""
+	SketchbookFolder string
 
 	// ArduinoDataFolder represents the current root of the arduino tree (defaulted to `$HOME/.arduino15` on linux).
-	ArduinoDataFolder = ""
+	ArduinoDataFolder string
 
-	// ArduinoHomeFolder represents the current root of the arduino home directory (defaulted to `$HOME/Arduino`).
-	ArduinoHomeFolder = ""
+	// ArduinoIDEFolder represents the current folder where the Arduino IDE relies, not used if CLI is not bundled with the IDE.
+	ArduinoIDEFolder string
 )
 
 // GetFolder gets a folder on a path, and creates it if createIfMissing == true and not found.
@@ -73,14 +73,15 @@ func GetDefaultArduinoFolder() (string, error) {
 			return "", err
 		}
 		ArduinoDataFolder = usr.HomeDir
-	}
-	switch runtime.GOOS {
-	case "linux":
-		ArduinoDataFolder = filepath.Join(ArduinoDataFolder, ".arduino15")
-	case "darwin":
-		ArduinoDataFolder = filepath.Join(ArduinoDataFolder, "Library", "arduino15")
-	default:
-		return "", fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
+
+		switch runtime.GOOS {
+		case "linux":
+			ArduinoDataFolder = filepath.Join(ArduinoDataFolder, ".arduino15")
+		case "darwin":
+			ArduinoDataFolder = filepath.Join(ArduinoDataFolder, "Library", "arduino15")
+		default:
+			return "", fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
+		}
 	}
 	return GetFolder(ArduinoDataFolder, "default arduino", true)
 }

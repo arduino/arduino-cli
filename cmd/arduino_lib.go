@@ -455,8 +455,11 @@ func getLibStatusContext(verbosity int) (*libraries.StatusContext, error) {
 	var index libraries.Index
 	err := libraries.LoadIndex(&index)
 	if err != nil {
+		fmt.Println(GlobalFlags.Configs)
+		fmt.Print(err)
 		status, err := prettyPrints.CorruptedLibIndexFix(index, verbosity)
 		if err != nil {
+			fmt.Print(err)
 			return nil, err
 		}
 		return &status, nil
