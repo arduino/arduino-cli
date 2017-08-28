@@ -98,6 +98,9 @@ func (vfi VersionFullInfo) String() string {
 func (lsr LibSearchResults) String() string {
 	ret := ""
 	for _, lib := range lsr.Libraries {
+		if _, isString := lib.(string); isString {
+			lib = fmt.Sprintf("\"%s\"", lib)
+		}
 		ret += fmt.Sprintln(lib)
 	}
 	return strings.TrimSpace(ret)

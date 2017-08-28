@@ -10,14 +10,70 @@ It implements all functions provided by web version of Arduino Create.
  . `git clone` this repository into a folder of your choice
  . Add '/path/to/arduino-cli/folder' to your PATH environment variable
  . Reload shell configuration or reboot
- And you're done, now let's see how to use the CLI.
+
+
+== Compiling
+There are two ways to execute the project:
+
+. By running the go main file.
++
+[source, bash]
+----
+$ go run main.go ARGS
+----
+. By compiling then running the go program.
++
+[source, bash]
+----
+$ go build -o arduino
+$ ./arduino ARGS
+----
+
+If you want autocompletion and manpages you have to compile and execute (second way)
+
+And you're done, now let's see how to use the CLI.
 
 == Usage : An example
 
-A general call is `arduino [COMMAND] [options]`
-To see the full list of commands, call `arduino help [COMMAND]`, arduino [COMMAND] -h` or `arduino [COMMAND] --help`
+A general call is
+[source, bash]
+----
+  $ arduino [COMMAND] [options]
+----
 
-== Contribution
+To see the full list of commands, call one of the following:
+[source, bash]
+----
+  $ arduino help [COMMAND]
+  $ arduino [COMMAND] -h
+  $ arduino [COMMAND] --help
+----
+
+Here is the output from help command `arduino help`:
+----
+Arduino Create Command Line Interface (arduino-cli)
+
+Usage:
+  arduino [flags]
+  arduino [command]
+
+Available Commands:
+  core        Arduino Core operations
+  help        Help about any command
+  lib         Arduino commands about libraries
+  version     Shows version Number of arduino
+
+Flags:
+      --config string        config file (default is $HOME/.arduino.yaml)
+      --format string        the output format, can be [text|json] (default "text")
+      --generate-docs        generates the docs for the CLI and puts it in docs folder
+  -h, --help                 help for arduino
+  -v, --verbose count[=-1]   enables verbose output (use more times for a higher level)
+
+Use "arduino [command] --help" for more information about a command.
+----
+
+== Contributing
 
 To contribute to this project:
 
