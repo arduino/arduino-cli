@@ -97,6 +97,7 @@ arduino core version # for the version of the core component.`,
 
 func init() {
 	versions[ArduinoCmd.Name()] = ArduinoVersion
+	InitConfigs()
 	InitFlags()
 	InitCommands()
 }
@@ -125,6 +126,7 @@ func InitFlags() {
 
 	ArduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
 	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
+	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Config.Location, "config-file", , "the custom config file (if not specified ./.cli-config.yml will be used)")
 	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Home, "home", "", "the custom home (if not specified $HOME will be used)")
 
 	ArduinoCmd.Flags().BoolVar(&rootCmdFlags.GenerateDocs, "generate-docs", false, "generates the docs for the CLI and puts it in docs folder")
@@ -153,6 +155,19 @@ func InitCommands() {
 		arduinoCoreInstallCmd)
 
 	arduinoConfigCmd.AddCommand(arduinoConfigInitCmd)
+}
+
+// InitConfigs initializes the configuration from the specified file.
+func InitConfigs() {
+	GlobalFlags.Config, err = configs.Unserialize(GlobalFlags.ConfigFile)
+	if err != nil {
+		GlobalFlags.Config = configs.Default()
+	}
+}
+
+// IgnoreConfigs is used in tests to ignore the config file.
+func IgnoreConfigs() {
+	GlobalFlags.Config = configs.Default()
 }
 
 func arduinoPreRun(cmd *cobra.Command, args []string) {

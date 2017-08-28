@@ -39,6 +39,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/bcmi-labs/arduino-cli/common"
+
 	"gopkg.in/yaml.v2"
 )
 
@@ -55,25 +57,56 @@ func init() {
 
 // Configs represents the possible configurations for the CLI.
 type Configs struct {
-	HTTPProxy      string `yaml:"HTTP_Proxy,omitempty"`
-	SketchbookPath string `yaml:"sketchbook_path,omitempty"`
-	LibrariesPath  string `yaml:"HTTP_Proxy,omitempty"`
-	PackagesPath   string `yaml:"HTTP_Proxy,omitempty"`
+	HTTPProxy         string `yaml:"HTTP_proxy,omitempty"`
+	SketchbookPath    string `yaml:"sketchbook_path,omitempty"`
+	ArduinoDataFolder string `yaml:"arduino_data,omitempty"`
+	Bundled           bool   `yaml:"-"`
 }
 
 // defaultConfig represents the default configuration.
-var defaultConfig = Configs{
-	HTTPProxy:      os.Getenv("HTTP_PROXY"),
-	SketchbookPath: "",
-	LibrariesPath:  "",
-	PackagesPath:   "",
-}
+var defaultConfig Configs
 
 var envConfig = Configs{
-	HTTPProxy:      os.Getenv("HTTP_PROXY"),
-	SketchbookPath: os.Getenv("SKETCHBOOK_FOLDER"),
-	LibrariesPath:  os.Getenv("LIBS_FOLDER"),
-	PackagesPath:   os.Getenv("PACKAGES_FOLDER"),
+	HTTPProxy:         os.Getenv("HTTP_PROXY"),
+	SketchbookPath:    os.Getenv("SKETCHBOOK_FOLDER"),
+	ArduinoDataFolder: os.Getenv("ARDUINO_DATA"),
+}
+
+func init() {
+	defArduinoData, err1 := common.GetDefaultArduinoFolder()
+	defSketchbook, err2 := common.GetDefaultArduinoHomeFolder()
+	bund, err3 := isBundled()
+	defaultConfig = Configs{
+		HTTPProxy:         os.Getenv("HTTP_PROXY"),
+		SketchbookPath:    defSketchbook,
+		ArduinoDataFolder: defArduinoData,
+		Bundled:           bund,
+	}
+}
+
+func isBundled() (bool, error) {
+	executable, err := os.Executable()
+	if err != nil {
+		return false, err
+	}
+	executable, err = filepath.EvalSymlinks(executable)
+	if err != nil {
+		return false, err
+	}
+	execParent := filepath.SplitList(filepath.Dir(executable))
+	execParentDir := filepath.Join(execParent[0 : len(execParent)-1]...)
+
+	bundled := false
+	possible := []string{"arduino", "arduino.sh", "arduino.exe"}
+	for _, poss := range possible {
+		possibleIDEexe := filepath.Join(execParentDir, poss)
+		_, err := os.Stat(possibleIDEexe)
+		if !os.IsNotExist(err) {
+			bundled = true
+			break
+		}
+	}
+	return bundled, nil
 }
 
 // Default returns a copy of the default configuration.
@@ -119,13 +152,13 @@ func fixMissingFields(c *Configs) {
 	compareAndReplace := func(envVal string, configVal *string, defVal string) {
 		if envVal != "" {
 			*configVal = envVal
-		} else if defVal == "" {
+		} else if *configVal == "" {
 			*configVal = defVal
 		}
 	}
 
 	compareAndReplace(env.HTTPProxy, &c.HTTPProxy, def.HTTPProxy)
-	compareAndReplace(env.SketchBookPath, &c.SketchBookPath, def.SketchBookPath)
-	compareAndReplace(env.LibrariesPath, &c.LibrariesPath, def.LibrariesPath)
-	compareAndReplace(env.PackagesPath, &c.PackagesPath, def.PackagesPath)
+	compareAndReplace(env.SketchbookPath, &c.SketchbookPath, def.SketchbookPath)
+	compareAndReplace(env.ArduinoDataFolder, &c.ArduinoDataFolder, def.ArduinoDataFolder)
+	compareAndReplace(env.ArduinoHomeFolder, &c.ArduinoHomeFolder, def.ArduinoHomeFolder)
 }

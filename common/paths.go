@@ -32,14 +32,23 @@ package common
 import (
 	"fmt"
 	"os"
+	"os/user"
 	"path/filepath"
 	"runtime"
 
 	"github.com/bcmi-labs/arduino-cli/task"
 )
 
-// RootDirPath represents the current root of the arduino tree.
-var RootDirPath = ""
+var (
+	// SketchbookFolder represents the current root of the sketchbooks tree (defaulted to `$HOME/Arduino`).
+	SketchbookFolder = ""
+
+	// ArduinoDataFolder represents the current root of the arduino tree (defaulted to `$HOME/.arduino15` on linux).
+	ArduinoDataFolder = ""
+
+	// ArduinoHomeFolder represents the current root of the arduino home directory (defaulted to `$HOME/Arduino`).
+	ArduinoHomeFolder = ""
+)
 
 // GetFolder gets a folder on a path, and creates it if createIfMissing == true and not found.
 func GetFolder(folder string, label string, createIfMissing bool) (string, error) {
@@ -58,21 +67,34 @@ func GetFolder(folder string, label string, createIfMissing bool) (string, error
 
 // GetDefaultArduinoFolder returns the default data folder for Arduino platform
 func GetDefaultArduinoFolder() (string, error) {
-	var folder string
+	if ArduinoDataFolder == "" {
+		usr, err := user.Current()
+		if err != nil {
+			return "", err
+		}
+		ArduinoDataFolder = usr.HomeDir
+	}
 	switch runtime.GOOS {
 	case "linux":
-		folder = filepath.Join(RootDirPath, ".arduino15")
+		ArduinoDataFolder = filepath.Join(ArduinoDataFolder, ".arduino15")
 	case "darwin":
-		folder = filepath.Join(RootDirPath, "Library", "arduino15")
+		ArduinoDataFolder = filepath.Join(ArduinoDataFolder, "Library", "arduino15")
 	default:
-		return folder, fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
+		return "", fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
 	}
-	return GetFolder(folder, "default arduino", true)
+	return GetFolder(ArduinoDataFolder, "default arduino", true)
 }
 
 // GetDefaultArduinoHomeFolder gets the home directory for arduino CLI.
 func GetDefaultArduinoHomeFolder() (string, error) {
-	return GetFolder(filepath.Join(RootDirPath, "Arduino"), "Arduino home", true)
+	if SketchbookFolder == "" {
+		usr, err := user.Current()
+		if err != nil {
+			return "", err
+		}
+		SketchbookFolder = filepath.Join(usr.HomeDir, "Arduino")
+	}
+	return GetFolder(SketchbookFolder, "Arduino home", true)
 }
 
 // GetDefaultFolder returns the default folder with specified name and label.
