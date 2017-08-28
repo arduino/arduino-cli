@@ -27,40 +27,47 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-package prettyPrints
+package cores
 
 import (
-	"github.com/bcmi-labs/arduino-cli/libraries"
-	"github.com/bcmi-labs/arduino-cli/task"
+	"regexp"
+	"strings"
 )
 
-// DownloadLibFileIndex shows info regarding the download of a missing (or corrupted) file index of libraries.
-func DownloadLibFileIndex() task.Wrapper {
-	return DownloadFileIndex(libraries.DownloadLibrariesFile)
+// CoreIDTuple represents a tuple to identify a Core
+type CoreIDTuple struct {
+	Package     string // The package where this core belongs to.
+	CoreName    string // The core name.
+	CoreVersion string // The version of the core, to get the release.
 }
 
-// CorruptedLibIndexFix pretty prints messages regarding corrupted index fixes of libraries.
-func CorruptedLibIndexFix(index libraries.Index, verbosity int) (libraries.StatusContext, error) {
-	downloadTask := DownloadLibFileIndex()
-	parseTask := libIndexParse(index, verbosity)
+var coreTupleRegexp = regexp.MustCompile("[a-zA-Z0-9]+:[a-zA-Z0-9]+(=([0-9]|[0-9].)*[0-9]+)?")
 
-	result := corruptedIndexFixResults(downloadTask, parseTask, verbosity)
+// ParseArgs parses a sequence of "packager:name=version" tokens and returns a CoreIDTuple slice.
+//
+// If version is not present it is assumed as "latest" version.
+func ParseArgs(args []string) []CoreIDTuple {
+	ret := make([]CoreIDTuple, 0, 5)
 
-	return result[1].Result.(libraries.StatusContext), result[0].Error
-}
-
-// libIndexParse pretty prints info about parsing an index file of libraries.
-func libIndexParse(index libraries.Index, verbosity int) task.Wrapper {
-	ret := indexParseWrapperSkeleton()
-	ret.Task = func() task.Result {
-		err := libraries.LoadIndex(&index)
-		if err != nil {
-			return task.Result{
-				Error: err,
+	for _, arg := range args {
+		if coreTupleRegexp.MatchString(arg) {
+			// splits the string according to regexp into its components.
+			split := strings.FieldsFunc(arg, func(r rune) bool {
+				return r == '=' || r == ':'
+			})
+			if len(split) < 3 {
+				split = append(split, "latest")
 			}
-		}
-		return task.Result{
-			Result: index.CreateStatusContext(),
+			ret = append(ret, CoreIDTuple{
+				Package:     split[0],
+				CoreName:    split[1],
+				CoreVersion: split[2],
+			})
+		} else {
+			ret = append(ret, CoreIDTuple{
+				Package:  "invalid-arg",
+				CoreName: arg,
+			})
 		}
 	}
 	return ret

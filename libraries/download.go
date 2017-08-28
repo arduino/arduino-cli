@@ -31,6 +31,7 @@ package libraries
 
 import (
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
 )
 
 const (
@@ -38,13 +39,10 @@ const (
 	libraryIndexURL string = "http://downloads.arduino.cc/libraries/library_index.json"
 )
 
+// DownloadItem represents a library download struct.
+type DownloadItem releases.DownloadItem
+
 // DownloadLibrariesFile downloads the lib file from arduino repository.
 func DownloadLibrariesFile() error {
 	return common.DownloadIndex(IndexPath, libraryIndexURL)
-}
-
-// getDownloadCacheFolder gets the folder where temp installs are stored
-// until installation complete (libraries).
-func getDownloadCacheFolder() (string, error) {
-	return common.GetDownloadCacheFolder("libraries")
 }

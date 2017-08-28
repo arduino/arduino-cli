@@ -1,0 +1,115 @@
+= Task package by bcmi-labs
+Alessandro Sanino <a.sanino@bci-labs.cc>
+
+This package allows to easily wrap procedures with messages, execute them in parallel or in sequence.
+
+[source, go]
+----
+// Execute executes the task at the specified level of verbosity.
+func (tw *TaskWrapper) Execute(verbosity int) task.Result
+----
+
+[source, go]
+----
+// CreateSequence creates a sequence of tasks, specifying the verbosity 
+// level and a bool array indicating wether ignore or signal error 
+// details.
+func CreateSequence(tasks []task.Wrapper, ignoreOnFail []bool, verbosity int) task.Sequence
+----
+
+[source, go]
+----
+// ExecuteParallel executes a set of Wrappers in parallel, handling concurrency for results.
+func ExecuteParallel(tasks []task.Wrapper, verbosity int) []task.Result
+----
+
+Check out the documentation for further details
+
+== The task.Wrapper struct and Task type
+This struct allows to wrap useful messages to describe the behaviour of a function while it is executing.
+
+[source, go]
+----
+type Wrapper struct {
+    BeforeMessage []string 
+	Task          task.Task
+	AfterMessage  []string
+	ErrorMessage  []string
+}
+
+type task.Task func() task.Result
+
+type task.Result struct {
+    Result interface{}
+    Error error
+}
+----
+
+Where `BeforeMessage`, `AfterMessage` and `ErrorMessage` are slices of different strings, one string per verbosity level supported.
+Example : `verbosity = 2` equals to print second cell of each slice (`index = 1`).
+
+`Task` is the task to accomplish and `Result` represents a possible return value, with an error.
+
+Let's put everything in practice with the following example:
+[source, go]
+----
+myWrapper := task.Wrapper{
+    BeforeMessage: []string{
+        "Hello",
+    },
+    AfterMessage: []string{
+        "Good bye",
+        "Farewell, my friend",
+    },
+    ErrorMessage: []string{
+        "There's something's rotten in Denmark...",
+        `Through me the way into the suffering city
+Through me the way to eternal pain,
+Through me the way that runs among the lost....`,
+    },
+    Task: func() task.Result {
+        fmt.Println("Printing awesome poetry quotes on error")
+        return task.Result{
+            Error: errors.New("poetry error")
+        }
+    },
+}
+----
+
+We espect this wrapper to print different stuff when executed. For example:
+[source, go]
+----
+var verbosity int = 1
+myWrapper.Execute(verbosity)
+fmt.Println()
+verbosity++
+myWrapper.Execute(verbosity)
+fmt.Println()
+verbosity++ // Note that verbosity = 3 and there is no slice in BeforeMessage, 
+            // AfterMessage, ErrorMessage with 3 elements
+myWrapper.Execute(verbosity)
+----
+
+Expects to print:
+----
+Hello
+Printing awesome poetry quotes on error
+There's something's rotten in Denmark...
+Good bye
+
+Hello
+Printing awesome poetry quotes on error
+Through me the way into the suffering city
+Through me the way to eternal pain,
+Through me the way that runs among the lost....
+Farewell, my friend
+
+Hello
+Printing awesome poetry quotes on error
+Through me the way into the suffering city
+Through me the way to eternal pain,
+Through me the way that runs among the lost....
+Farewell, my friend
+----
+
+Check out the documentation for further details

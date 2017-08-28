@@ -41,7 +41,7 @@ type Package struct {
 
 // addCore adds a core to the context.
 func (pm *Package) addCore(indexCore *indexCoreRelease) {
-	name := indexCore.Name
+	name := indexCore.Architecture
 	if pm.Cores[name] == nil {
 		pm.Cores[name] = indexCore.extractCore()
 	} else {

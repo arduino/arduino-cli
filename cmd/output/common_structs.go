@@ -47,11 +47,14 @@ type ProcessResult struct {
 //   ToolName - ErrorText: Error explaining why failed
 //   ToolName - StatusText: PATH = /path/to/result/folder
 func (lr ProcessResult) String() string {
-	ret := fmt.Sprintf("%s - %s", lr.ItemName, lr.Status)
+	ret := lr.ItemName
+	if lr.Status != "" {
+		ret += fmt.Sprint(" - ", lr.Status)
+	}
 	if lr.Error != "" {
-		ret += fmt.Sprint(": ", lr.Error)
+		ret += fmt.Sprint(" - ", lr.Error)
 	} else if lr.Path != "" {
-		ret += fmt.Sprint(": PATH = ", lr.Path)
+		ret += fmt.Sprint(" - PATH : ", lr.Path)
 	}
 	return strings.TrimSpace(ret)
 }

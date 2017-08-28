@@ -29,16 +29,8 @@
 
 package releases
 
-import "os"
-
 // Release represents a generic release.
 type Release interface {
-	// OpenLocalArchiveForDownload opens the local archive file
-	// in append mode if it exists, otherwise it creates it. Returns
-	// the file pointer.
-	OpenLocalArchiveForDownload() (*os.File, error)
-	// ArchivePath returns the fullPath of the Archive of this release.
-	ArchivePath() (string, error)
 	// ExpectedChecksum returns the expected checksum for this release.
 	ExpectedChecksum() string
 	// ArchiveName returns the archive file name (not the path).
@@ -47,7 +39,8 @@ type Release interface {
 	ArchiveURL() string
 	// ArchiveSize returns the archive size.
 	ArchiveSize() int64
-	// GetDownloadCacheFolder returns the cache folder of this release.
-	// Mostly this is based on the type of release (library, core, tool)
+	// GetDownloadCacheFolder returns the path of the staging folders for this release.
 	GetDownloadCacheFolder() (string, error)
+	// VersionName represents the version of the release.
+	VersionName() string
 }

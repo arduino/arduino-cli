@@ -31,24 +31,22 @@ package cores
 
 import (
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
 )
 
 const (
 	//packageIndexURL contains the index URL for core packages.
-	packageIndexURL = "http://downloads.arduino.cc/packages/package_index.json"
+	packageIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
 )
 
-// getDownloadCacheFolder gets the folder where temp installs are stored until installation complete (libraries).
-func getDownloadCacheFolder() (string, error) {
-	return common.GetDownloadCacheFolder("packages")
+// DownloadItem represents a core or tool download struct.
+type DownloadItem struct {
+	Package string
+	releases.DownloadItem
 }
+
 
 // DownloadPackagesFile downloads the core packages index file from arduino repository.
 func DownloadPackagesFile() error {
 	return common.DownloadIndex(IndexPath, packageIndexURL)
 }
-
-// download core
-// check core deps, needs statuscontext
-// download tools
-// download tool -> download Release -> downloadPackage

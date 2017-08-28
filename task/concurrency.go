@@ -30,9 +30,10 @@
 package task
 
 import (
+	"fmt"
 	"sync"
 
-	"github.com/sirupsen/logrus"
+	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 )
 
 // resultWithKey values are used by ExecuteParallelFromMap as temporary values.
@@ -53,7 +54,7 @@ func CreateSequence(taskWrappers []Wrapper, ignoreOnFailure []bool, verbosity in
 			result := taskWrapper.Execute(verbosity)
 			results = append(results, result)
 			if result.Error != nil && !ignoreOnFailure[i] {
-				logrus.Warnf("Warning from task %d: %s", i, result.Error)
+				formatter.Print(fmt.Sprintf("Warning from task %d: %s", i, result.Error))
 			}
 		}
 		return results
@@ -80,19 +81,20 @@ func ExecuteSequence(taskWrappers []Wrapper, ignoreOnFailure []bool, verbosity i
 // ExecuteParallelFromMap executes a set of taskwrappers in parallel, taking input from a map[string]Wrapper.
 func ExecuteParallelFromMap(taskMap map[string]Wrapper, verbosity int) map[string]Result {
 	results := make(chan resultWithKey, len(taskMap))
-	wg := sync.WaitGroup{}
+
+	var wg sync.WaitGroup
 	wg.Add(len(taskMap))
 
 	for key, task := range taskMap {
-		go func(key string, task Wrapper, wg *sync.WaitGroup) {
+		go func(key string, task Wrapper) {
+			defer wg.Done()
 			results <- resultWithKey{
 				Key: key,
 				Result: func() Result {
-					defer wg.Done()
 					return task.Execute(verbosity)
 				}(),
 			}
-		}(key, task, &wg)
+		}(key, task)
 	}
 	wg.Wait()
 	close(results)
@@ -107,15 +109,17 @@ func ExecuteParallelFromMap(taskMap map[string]Wrapper, verbosity int) map[strin
 // ExecuteParallel executes a set of Wrappers in parallel, handling concurrency for results.
 func ExecuteParallel(taskWrappers []Wrapper, verbosity int) []Result {
 	results := make(chan Result, len(taskWrappers))
-	wg := sync.WaitGroup{}
+
+	var wg sync.WaitGroup
 	wg.Add(len(taskWrappers))
+
 	for _, task := range taskWrappers {
-		go func(task Wrapper, wg *sync.WaitGroup) {
-			results <- func(wg *sync.WaitGroup) Result {
-				defer wg.Done()
+		go func(task Wrapper) {
+			defer wg.Done()
+			results <- func() Result {
 				return task.Execute(verbosity)
-			}(wg)
-		}(task, &wg)
+			}()
+		}(task)
 	}
 	wg.Wait()
 	close(results)

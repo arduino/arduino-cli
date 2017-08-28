@@ -26,42 +26,33 @@
  *
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
+package libraries
 
-package prettyPrints
+import "strings"
 
-import (
-	"github.com/bcmi-labs/arduino-cli/libraries"
-	"github.com/bcmi-labs/arduino-cli/task"
-)
-
-// DownloadLibFileIndex shows info regarding the download of a missing (or corrupted) file index of libraries.
-func DownloadLibFileIndex() task.Wrapper {
-	return DownloadFileIndex(libraries.DownloadLibrariesFile)
+// NameVersionPair represents a pair Name - Version.
+type NameVersionPair struct {
+	Name    string
+	Version string
 }
 
-// CorruptedLibIndexFix pretty prints messages regarding corrupted index fixes of libraries.
-func CorruptedLibIndexFix(index libraries.Index, verbosity int) (libraries.StatusContext, error) {
-	downloadTask := DownloadLibFileIndex()
-	parseTask := libIndexParse(index, verbosity)
-
-	result := corruptedIndexFixResults(downloadTask, parseTask, verbosity)
-
-	return result[1].Result.(libraries.StatusContext), result[0].Error
-}
-
-// libIndexParse pretty prints info about parsing an index file of libraries.
-func libIndexParse(index libraries.Index, verbosity int) task.Wrapper {
-	ret := indexParseWrapperSkeleton()
-	ret.Task = func() task.Result {
-		err := libraries.LoadIndex(&index)
-		if err != nil {
-			return task.Result{
-				Error: err,
-			}
+// ParseLibArgs parses a sequence of "item@version" tokens and returns a Name-Version slice.
+//
+// If version is not present it is assumed as "latest" version.
+func ParseArgs(args []string) []NameVersionPair {
+	ret := make([]NameVersionPair, 0, len(args))
+	for _, item := range args {
+		tokens := strings.SplitN(item, "@", 2)
+		var version string
+		if len(tokens) == 2 {
+			version = tokens[1]
+		} else {
+			version = "latest"
 		}
-		return task.Result{
-			Result: index.CreateStatusContext(),
-		}
+		ret = append(ret, NameVersionPair{
+			Name:    tokens[0],
+			Version: version,
+		})
 	}
 	return ret
 }

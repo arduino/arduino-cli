@@ -45,8 +45,8 @@ import (
 // Uninstall a library means remove its directory.
 var Uninstall = os.RemoveAll
 
-// InstallLib installs a library.
-func InstallLib(name string, release releases.Release) error {
+// Install installs a library.
+func Install(name string, release releases.Release) error {
 	if release == nil {
 		return errors.New("Not existing version of the library")
 	}
@@ -58,7 +58,7 @@ func InstallLib(name string, release releases.Release) error {
 		}
 		if installedRelease != nil {
 			//if installedRelease.Version != library.Latest().Version {
-			err := removeRelease(library, installedRelease)
+			err := removeRelease(library.Name, installedRelease)
 			if err != nil {
 				return err
 			}
@@ -73,12 +73,10 @@ func InstallLib(name string, release releases.Release) error {
 		return err
 	}
 
-	stagingFolder, err := release.GetDownloadCacheFolder()
+	cacheFilePath, err := releases.ArchivePath(release)
 	if err != nil {
 		return err
 	}
-
-	cacheFilePath := filepath.Join(stagingFolder, release.ArchiveName())
 
 	zipArchive, err := zip.OpenReader(cacheFilePath)
 	if err != nil {
@@ -94,14 +92,14 @@ func InstallLib(name string, release releases.Release) error {
 	return nil
 }
 
-func removeRelease(l *Library, r *Release) error {
+func removeRelease(libName string, r *Release) error {
 	libFolder, err := common.GetDefaultLibFolder()
 	if err != nil {
 		return err
 	}
 
-	name := strings.Replace(l.Name, " ", "_", -1)
+	libName = strings.Replace(libName, " ", "_", -1)
 
-	path := filepath.Join(libFolder, fmt.Sprintf("%s-%s", name, r.Version))
-	return os.RemoveAll(path)
+	path := filepath.Join(libFolder, fmt.Sprintf("%s-%s", libName, r.Version))
+	return Uninstall(path)
 }

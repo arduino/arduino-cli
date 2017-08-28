@@ -34,9 +34,3 @@ type DownloadItem struct {
 	Name    string
 	Release Release
 }
-
-// NameVersionPair represents a pair Name - Version.
-type NameVersionPair struct {
-	Name    string
-	Version string
-}

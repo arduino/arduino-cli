@@ -32,8 +32,10 @@ package cores
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
+
+	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
 
 	"github.com/blang/semver"
 )
@@ -57,18 +59,22 @@ type Release struct {
 	Dependencies    ToolDependencies // The Dependency entries to load tools.
 }
 
-// ToolDependencies is a set of tuples representing summary data of a tool.
-type ToolDependencies []toolDependency
+// ToolDependencies is a set of tuples representing summary data of a tool dependency set.
+type ToolDependencies []*ToolDependency
 
-type toolDependency struct {
-	ToolPackager string
+// ToolDependency is a tuple representing summary data of a tool.
+type ToolDependency struct {
 	ToolName     string
 	ToolVersion  string
+	ToolPackager string
 }
 
 // GetVersion returns the specified release corresponding the provided version,
 // or nil if not found.
 func (core *Core) GetVersion(version string) *Release {
+	if version == "latest" {
+		return core.GetVersion(core.latestVersion())
+	}
 	return core.Releases[version]
 }
 
@@ -83,11 +89,6 @@ func (core *Core) Versions() semver.Versions {
 	}
 
 	return versions
-}
-
-// Latest obtains latest version of a core package.
-func (core *Core) Latest() *Release {
-	return core.GetVersion(core.latestVersion())
 }
 
 // latestVersion obtains latest version number.
@@ -108,9 +109,9 @@ func (core *Core) latestVersion() string {
 }
 
 func (core *Core) String() string {
-	res := fmt.Sprintln("Name        :", core.Name)
-	res += fmt.Sprintln("Architecture:", core.Architecture)
-	res += fmt.Sprintln("Category    :", core.Category)
+	res := fmt.Sprintln("Name        :", core.Name) +
+		fmt.Sprintln("Architecture:", core.Architecture) +
+		fmt.Sprintln("Category    :", core.Category)
 	if core.Releases != nil && len(core.Releases) > 0 {
 		res += "Releases:\n"
 		for _, release := range core.Releases {
@@ -121,18 +122,18 @@ func (core *Core) String() string {
 }
 
 func (release *Release) String() string {
-	res := fmt.Sprintln("  Version           : ", release.Version)
-	res += fmt.Sprintln("  Boards            :")
-	res += fmt.Sprintln(strings.Join(release.Boards, ", "))
-	res += fmt.Sprintln("  Archive File Name :", release.ArchiveFileName)
-	res += fmt.Sprintln("  Checksum          :", release.Checksum)
-	res += fmt.Sprintln("  File Size         :", release.Size)
-	return res
+	return fmt.Sprintln("  Version           : ", release.Version) +
+		fmt.Sprintln("  Boards            :") +
+		fmt.Sprintln(strings.Join(release.Boards, ", ")) +
+		fmt.Sprintln("  Archive File Name :", release.ArchiveFileName) +
+		fmt.Sprintln("  Checksum          :", release.Checksum) +
+		fmt.Sprintln("  File Size         :", release.Size) +
+		fmt.Sprintln("  URL               :", release.URL)
 }
 
 // OpenLocalArchiveForDownload Creates an empty file if not found.
 func (release Release) OpenLocalArchiveForDownload() (*os.File, error) {
-	path, err := release.ArchivePath()
+	path, err := releases.ArchivePath(release)
 	if err != nil {
 		return nil, err
 	}
@@ -145,26 +146,11 @@ func (release Release) OpenLocalArchiveForDownload() (*os.File, error) {
 	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 }
 
-// ArchivePath returns the fullPath of the Archive of this release.
-func (release Release) ArchivePath() (string, error) {
-	staging, err := getDownloadCacheFolder()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(staging, release.ArchiveFileName), nil
-}
-
 // Implementation of Release interface
 
 // ExpectedChecksum returns the expected checksum for this release.
 func (release Release) ExpectedChecksum() string {
 	return release.Checksum
-}
-
-// GetDownloadCacheFolder returns the cache folder of this release.
-// Mostly this is based on the type of release (library, core, tool)
-func (release Release) GetDownloadCacheFolder() (string, error) {
-	return getDownloadCacheFolder()
 }
 
 // ArchiveName returns the archive file name (not the path)
@@ -180,4 +166,14 @@ func (release Release) ArchiveSize() int64 {
 // ArchiveURL returns the archive URL.
 func (release Release) ArchiveURL() string {
 	return release.URL
+}
+
+// GetDownloadCacheFolder returns the path of the staging folders for this release.
+func (release Release) GetDownloadCacheFolder() (string, error) {
+	return common.GetDownloadCacheFolder("packages")
+}
+
+// VersionName represents the version of the release.
+func (release Release) VersionName() string {
+	return release.Version
 }

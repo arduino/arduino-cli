@@ -66,10 +66,10 @@ type indexCoreRelease struct {
 	URL              string                `json:"url"`
 	ArchiveFileName  string                `json:"archiveFileName,required"`
 	Checksum         string                `json:"checksum,required"`
-	Size             int64                 `json:"size,required"`
+	Size             int64                 `json:"size,required,string"`
 	Boards           []indexBoardRelease   `json:"boards"`
 	Help             indexHelpRelease      `json:"help,omitempty"`
-	ToolDependencies []indexToolDependency `json:"toolDependencies"`
+	ToolDependencies []indexToolDependency `json:"toolsDependencies, required"`
 }
 
 // indexToolDependency represents a single dependency of a core from a tool.
@@ -91,7 +91,7 @@ type indexFlavourRelease struct {
 	OS              string `json:"host,required"`
 	URL             string `json:"url,required"`
 	ArchiveFileName string `json:"archiveFileName,required"`
-	Size            int    `json:"size,required"`
+	Size            int64  `json:"size,required,string"`
 	Checksum        string `json:"checksum,required"`
 }
 
@@ -139,12 +139,26 @@ func (release indexCoreRelease) extractRelease() *Release {
 		ArchiveFileName: release.ArchiveFileName,
 		Checksum:        release.Checksum,
 		Size:            release.Size,
+		URL:             release.URL,
 		Boards:          release.extractBoards(),
+		Dependencies:    release.extractDeps(),
 	}
 }
 
+func (release indexCoreRelease) extractDeps() ToolDependencies {
+	ret := make(ToolDependencies, len(release.ToolDependencies))
+	for i, dep := range release.ToolDependencies {
+		ret[i] = &ToolDependency{
+			ToolName:     dep.Name,
+			ToolVersion:  dep.Version,
+			ToolPackager: dep.Packager,
+		}
+	}
+	return ret
+}
+
 func (release indexCoreRelease) extractBoards() []string {
-	boards := make([]string, 0, len(release.Boards))
+	boards := make([]string, len(release.Boards))
 	for i, board := range release.Boards {
 		boards[i] = board.Name
 	}
@@ -170,10 +184,10 @@ func (itr indexToolRelease) extractRelease() *ToolRelease {
 }
 
 // extractFlavours extracts a map[OS]Flavour object from an indexToolRelease entry.
-func (itr indexToolRelease) extractFlavours() map[string]*Flavour {
-	ret := make(map[string]*Flavour, len(itr.Systems))
-	for _, flavour := range itr.Systems {
-		ret[flavour.OS] = &Flavour{
+func (itr indexToolRelease) extractFlavours() []*Flavour {
+	ret := make([]*Flavour, len(itr.Systems))
+	for i, flavour := range itr.Systems {
+		ret[i] = &Flavour{
 			OS:              flavour.OS,
 			ArchiveFileName: flavour.ArchiveFileName,
 			Checksum:        flavour.Checksum,
@@ -187,16 +201,16 @@ func (itr indexToolRelease) extractFlavours() map[string]*Flavour {
 // LoadIndex reads a package_index.json from a file and returns
 // the corresponding Index structure.
 func LoadIndex(index *Index) error {
-	libFile, err := IndexPath()
+	coreFile, err := IndexPath()
 	if err != nil {
 		return err
 	}
 
-	buff, err := ioutil.ReadFile(libFile)
+	buff, err := ioutil.ReadFile(coreFile)
 	if err != nil {
 		return err
 	}
-
+	//fmt.Println(string(buff))
 	err = json.Unmarshal(buff, index)
 	if err != nil {
 		return err

@@ -122,45 +122,6 @@ type Release struct {
 	Checksum        string `json:"checksum"`
 }
 
-// OpenLocalArchiveForDownload reads the data from the local archive if present,
-// and returns the []byte of the file content. Used by resume Download.
-// Creates an empty file if not found.
-func (r Release) OpenLocalArchiveForDownload() (*os.File, error) {
-	path, err := r.ArchivePath()
-	if err != nil {
-		return nil, err
-	}
-	stats, err := os.Stat(path)
-	if os.IsNotExist(err) || err == nil && stats.Size() >= r.ArchiveSize() {
-		return os.Create(path)
-	}
-	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
-}
-
-// ArchivePath returns the fullPath of the Archive of this release.
-func (r Release) ArchivePath() (string, error) {
-	staging, err := getDownloadCacheFolder()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(staging, r.ArchiveFileName), nil
-}
-
-// Versions returns an array of all versions available of the library
-func (l Library) Versions() semver.Versions {
-	res := make(semver.Versions, len(l.Releases))
-	i := 0
-	for version := range l.Releases {
-		temp, err := semver.Make(version)
-		if err == nil {
-			res[i] = temp
-			i++
-		}
-	}
-	//sortutil.CiAsc(res)
-	return res
-}
-
 // GetVersion returns the Release corresponding to the specified version, or
 // nil if not found.
 //
@@ -193,6 +154,21 @@ func (l *Library) latestVersion() string {
 		}
 	}
 	return fmt.Sprint(max)
+}
+
+// Versions returns an array of all versions available of the library
+func (l Library) Versions() semver.Versions {
+	res := make(semver.Versions, len(l.Releases))
+	i := 0
+	for version := range l.Releases {
+		temp, err := semver.Make(version)
+		if err == nil {
+			res[i] = temp
+			i++
+		}
+	}
+	//sortutil.CiAsc(res)
+	return res
 }
 
 func (r *Release) String() string {
@@ -228,13 +204,6 @@ func (r Release) ArchiveURL() string {
 	return r.URL
 }
 
-// GetDownloadCacheFolder returns the cache folder of this release.
-// Mostly this is based on the type of release (library, core, tool)
-// In this case returns libraries cache folder.
-func (r Release) GetDownloadCacheFolder() (string, error) {
-	return getDownloadCacheFolder()
-}
-
 // ArchiveName returns the archive file name (not the path).
 func (r Release) ArchiveName() string {
 	return r.ArchiveFileName
@@ -243,4 +212,14 @@ func (r Release) ArchiveName() string {
 // ExpectedChecksum returns the expected checksum for this release.
 func (r Release) ExpectedChecksum() string {
 	return r.Checksum
+}
+
+// GetDownloadCacheFolder returns the path of the staging folders for this release.
+func (r Release) GetDownloadCacheFolder() (string, error) {
+	return common.GetDownloadCacheFolder("libraries")
+}
+
+// VersionName represents the version of the release.
+func (r Release) VersionName() string {
+	return r.Version
 }

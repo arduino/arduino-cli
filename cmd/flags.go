@@ -33,12 +33,12 @@ package cmd
 var GlobalFlags struct {
 	Verbose int    // More time verbose flag is written, the more the Verbose count increases. Represents verbosity level.
 	Format  string // The Output format (e.g. text, json).
+	Home    string // The Custom Home directory.
 }
 
 // rootCmdFlags represent flags available to the root command.
 var rootCmdFlags struct {
-	ConfigFile   string // The path of the config file provided by the omonym flag.
-	GenerateDocs bool   // if true, generates manpages and bash autocompletion.
+	GenerateDocs bool // if true, generates manpages and bash autocompletion.
 }
 
 // arduinoLibFlags represents `arduino lib` flags.
@@ -48,5 +48,11 @@ var arduinoLibFlags struct {
 
 // arduinoCoreFlags represents `arduino core` flags.
 var arduinoCoreFlags struct {
-	updateIndex bool // if true, updates packages index.
+	updateIndex bool // If true, update packages index.
+}
+
+// arduinoConfigInitFlags represents `arduino config init` flags.
+var arduinoConfigInitFlags struct {
+	Default  bool   // If false, ask questions to the user about setting configuration properties, otherwise use default configuration.
+	Location string // The custom location of the file to create.
 }
