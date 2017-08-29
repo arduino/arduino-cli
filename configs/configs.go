@@ -35,7 +35,6 @@
 package configs
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -129,7 +128,6 @@ func (c Configs) Serialize(path string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(path)
 	err = ioutil.WriteFile(path, content, 0666)
 	if err != nil {
 		return err
