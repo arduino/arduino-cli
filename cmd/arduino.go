@@ -128,6 +128,7 @@ func InitFlags() {
 
 	ArduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
 	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
+
 	ArduinoCmd.PersistentFlags().StringVar(&configs.FileLocation, "config-file", configs.FileLocation, "the custom config file (if not specified ./.cli-config.yml will be used)")
 
 	ArduinoCmd.Flags().BoolVar(&rootCmdFlags.GenerateDocs, "generate-docs", false, "generates the docs for the CLI and puts it in docs folder")
@@ -146,8 +147,9 @@ func InitCommands() {
 	arduinoLibCmd.ResetCommands()
 	arduinoCoreCmd.ResetCommands()
 	arduinoConfigCmd.ResetCommands()
+	arduinoBoardCmd.ResetCommands()
 
-	ArduinoCmd.AddCommand(arduinoVersionCmd, arduinoLibCmd, arduinoCoreCmd, arduinoConfigCmd)
+	ArduinoCmd.AddCommand(arduinoVersionCmd, arduinoLibCmd, arduinoCoreCmd, arduinoConfigCmd, arduinoBoardCmd)
 
 	arduinoLibCmd.AddCommand(arduinoLibInstallCmd, arduinoLibUninstallCmd, arduinoLibSearchCmd,
 		arduinoLibVersionCmd, arduinoLibListCmd, arduinoLibDownloadCmd)
@@ -156,6 +158,8 @@ func InitCommands() {
 		arduinoCoreInstallCmd)
 
 	arduinoConfigCmd.AddCommand(arduinoConfigInitCmd)
+
+	arduinoBoardCmd.AddCommand(arduinoBoardListCmd)
 }
 
 // InitConfigs initializes the configuration from the specified file.

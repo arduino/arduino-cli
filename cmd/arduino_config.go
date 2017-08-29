@@ -39,8 +39,8 @@ import (
 
 var arduinoConfigCmd = &cobra.Command{
 	Use:     `config`,
-	Short:   `Configuration Commands`,
-	Long:    `Configuration Commands`,
+	Short:   `Arduino Configuration Commands`,
+	Long:    `Arduino Configuration Commands`,
 	Example: `arduino config init # Initializes a new config file into the default location`,
 }
 

@@ -35,6 +35,7 @@
 package configs
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -45,7 +46,7 @@ import (
 )
 
 // FileLocation represents the default location of the config file (same directory as executable).
-var FileLocation string
+var FileLocation = getFileLocation()
 
 // BundledInIDE tells if the CLI is paired with the Java Arduino IDE.
 var BundledInIDE bool
@@ -53,13 +54,14 @@ var BundledInIDE bool
 // ArduinoIDEFolder represents the path of the IDE directory, set only if BundledInIDE = true.
 var ArduinoIDEFolder string
 
-func init() {
-	FileLocation, err := os.Executable()
+func getFileLocation() string {
+	fileLocation, err := os.Executable()
 	if err != nil {
-		FileLocation = "."
+		fileLocation = "."
 	}
-	FileLocation = filepath.Dir(FileLocation)
-	FileLocation = filepath.Join(FileLocation, "cli-config.yaml")
+	fileLocation = filepath.Dir(fileLocation)
+	fileLocation = filepath.Join(fileLocation, ".cli-config.yml")
+	return fileLocation
 }
 
 // Configs represents the possible configurations for the CLI.
@@ -127,6 +129,7 @@ func (c Configs) Serialize(path string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(path)
 	err = ioutil.WriteFile(path, content, 0666)
 	if err != nil {
 		return err
