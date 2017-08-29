@@ -64,7 +64,7 @@ func executeConfigInitCommand(cmd *cobra.Command, args []string) {
 	if err != nil {
 		formatter.PrintErrorMessage(fmt.Sprint("Config file creation error: ", err))
 	} else {
-		formatter.PrintResult("success")
+		formatter.PrintResult("Config file PATH: " + arduinoConfigInitFlags.Location)
 	}
 }
 
