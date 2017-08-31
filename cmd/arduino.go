@@ -32,13 +32,16 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
+
+	"github.com/spf13/cobra"
+	"github.com/theherk/viper"
 
 	"github.com/bcmi-labs/arduino-cli/common"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/bcmi-labs/arduino-cli/configs"
-	"github.com/spf13/cobra"
 )
 
 const (
@@ -133,7 +136,7 @@ func InitFlags() {
 
 	ArduinoCmd.Flags().BoolVar(&rootCmdFlags.GenerateDocs, "generate-docs", false, "generates the docs for the CLI and puts it in docs folder")
 
-	arduinoLibCmd.Flags().BoolVar(&arduinoLibFlags.updateIndex, "update-index", false, "Updates the libraries index")
+	arduinoLibCmd.Flags().Bool("update-index", false, "Updates the libraries index")
 
 	arduinoCoreCmd.Flags().BoolVar(&arduinoCoreFlags.updateIndex, "update-index", false, "Updates the index of cores to the latest version")
 
@@ -168,14 +171,14 @@ func InitConfigs() {
 	if err != nil {
 		GlobalFlags.Configs = configs.Default()
 	}
-	GlobalFlags.Configs = c
 	if configs.BundledInIDE {
-		configs.UnserializeFromIDEPreferences()
+		configs.UnserializeFromIDEPreferences(&c)
 	}
+	GlobalFlags.Configs = c
 	common.ArduinoDataFolder = GlobalFlags.Configs.ArduinoDataFolder
 	common.ArduinoIDEFolder = configs.ArduinoIDEFolder
 	common.SketchbookFolder = GlobalFlags.Configs.SketchbookPath
-	os.Setenv("HTTP_PROXY", GlobalFlags.Configs.HTTPProxy)
+
 }
 
 // IgnoreConfigs is used in tests to ignore the config file.
@@ -193,6 +196,8 @@ func arduinoPreRun(cmd *cobra.Command, args []string) {
 			formatter.PrintErrorMessage("Invalid Call : should show Help, but it is available only in TEXT mode")
 		})
 	}
+
+	cobra.OnInitialize(initViper)
 }
 
 func arduinoRun(cmd *cobra.Command, args []string) error {
@@ -282,4 +287,48 @@ func findSiblings(cmd *cobra.Command) (siblings []*cobra.Command) {
 		}
 	}
 	return
+}
+
+func initViper() {
+	defHome, _ := common.GetDefaultArduinoHomeFolder()
+	defArduinoData, _ := common.GetDefaultArduinoFolder()
+	viper.SetConfigName(".cli-config")
+	viper.AddConfigPath(".")
+	viper.SetConfigType("yaml")
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot read configuration file in any of the default folders")
+		os.Exit(1) //Exit with error is OK here?
+	}
+
+	viper.SetDefault("paths.sketchbook", defHome)
+	viper.SetDefault("paths.arduino_data", defArduinoData)
+	viper.SetDefault("proxy.type", "auto")
+	viper.SetDefault("proxy.hostname", "")
+	viper.SetDefault("proxy.username", "")
+	viper.SetDefault("proxy.password", "")
+
+	viper.AutomaticEnv()
+
+	if viper.GetString("proxy.type") == "manual" {
+		hostname := viper.GetString("proxy.hostname")
+		if hostname == "" {
+			formatter.PrintErrorMessage("With manual proxy configuration, hostname is required.")
+			os.Exit(1)
+		}
+
+		if strings.HasPrefix(hostname, "http") {
+			os.Setenv("HTTP_PROXY", hostname)
+		}
+		if strings.HasPrefix(hostname, "https") {
+			os.Setenv("HTTPS_PROXY", hostname)
+		}
+
+		username := viper.GetString("proxy.username")
+		if username != "" { // put username and pass somewhere
+
+		}
+
+	}
 }
