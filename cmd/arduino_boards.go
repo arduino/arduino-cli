@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"time"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
@@ -23,7 +24,14 @@ var arduinoBoardListCmd = &cobra.Command{
 	Run: executeBoardListCommand,
 }
 
-var arduinoBoardAttachCmd = &cobra.Command{}
+var arduinoBoardAttachCmd = &cobra.Command{
+	Use:   "attach --sketch=[SKETCH-NAME] --board=[BOARD]",
+	Short: `Attaches a board to a sketch`,
+	Long:  `Attaches a board to a sketch`,
+	Example: `arduino board attach --board 754393135373516091F1 \
+					 --sketch mySketch # Attaches a sketch to a board`,
+	RunE: executeBoardAttachCommand,
+}
 
 // executeBoardListCommand detects and lists the connected arduino boards
 // (either via serial or network ports).
@@ -35,4 +43,25 @@ func executeBoardListCommand(cmd *cobra.Command, args []string) {
 
 	formatter.Print(*monitor)
 	//monitor.Stop() //If called will slow like 1sec the program to close after print, with the same result (tested).
+	// it closes gracefully, but at the end of the command we can't have races.
+}
+
+func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
+	if len(args) > 0 {
+		return errors.New("Not accepting additional arguments")
+	}
+
+	monitor := discovery.New(time.Millisecond)
+	monitor.Start()
+
+	time.Sleep(time.Second)
+
+	formatter.Print(*monitor)
+
+	serialDevices := monitor.Serial()
+	for name, device := range serialDevices {
+
+	}
+
+	return nil
 }

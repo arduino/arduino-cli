@@ -162,7 +162,7 @@ func InitCommands() {
 
 	arduinoConfigCmd.AddCommand(arduinoConfigInitCmd)
 
-	arduinoBoardCmd.AddCommand(arduinoBoardListCmd)
+	arduinoBoardCmd.AddCommand(arduinoBoardListCmd, arduinoBoardAttachCmd)
 }
 
 // InitConfigs initializes the configuration from the specified file.
