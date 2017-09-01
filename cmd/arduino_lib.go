@@ -30,8 +30,6 @@
 package cmd
 
 import (
-	"bufio"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -57,8 +55,11 @@ const (
 var arduinoLibCmd = &cobra.Command{
 	Use:   "lib",
 	Short: "Arduino commands about libraries",
-	Long:  `Arduino commands about libraries`,
-	Run:   executeLibCommand,
+	Long: `Arduino commands about libraries
+Can be used with --update-index flag to update the libraries index too.`,
+	Run: executeLibCommand,
+	Example: `arduino lib install [LIBRARIES] # where 
+arduino lib --update-index`,
 }
 
 // arduinoLibInstallCmd represents the lib install command.
@@ -67,22 +68,28 @@ var arduinoLibInstallCmd = &cobra.Command{
 	Short: "Installs one of more specified libraries into the system.",
 	Long:  `Installs one or more specified libraries into the system.`,
 	RunE:  executeInstallCommand,
+	Example: `arduino lib install YoutubeApi # for the latest version
+arduino lib install YoutubeApi@1.0.0     # for the specific version (in this case 1.0.0)`,
 }
 
 // arduinoLibUninstallCmd represents the uninstall command
 var arduinoLibUninstallCmd = &cobra.Command{
-	Use:   "uninstall LIBRARY_NAME(S)",
-	Short: "Uninstalls one or more libraries",
-	Long:  `Uninstalls one or more libraries`,
-	RunE:  executeUninstallCommand,
+	Use:     "uninstall LIBRARY_NAME(S)",
+	Short:   "Uninstalls one or more libraries",
+	Long:    `Uninstalls one or more libraries`,
+	RunE:    executeUninstallCommand,
+	Example: ` arduino uninstall YoutubeApi`,
 }
 
 // arduinoLibSearchCmd represents the search command
 var arduinoLibSearchCmd = &cobra.Command{
 	Use:   "search [LIBRARY_NAME]",
-	Short: "Searchs for a library data",
-	Long:  `Search for one or more libraries data.`,
-	RunE:  executeSearch,
+	Short: "Searchs for one or more libraries data.",
+	Long:  `Search for one or more libraries data (case insensitive search).`,
+	RunE:  executeSearchCommand,
+	Example: `arduino lib search You # to show all libraries containing "You" in their name (case insensitive).
+YoumadeIt
+YoutubeApi`,
 }
 
 // arduinoLibDownloadCmd represents the download command
@@ -91,6 +98,8 @@ var arduinoLibDownloadCmd = &cobra.Command{
 	Short: "Downloads one or more libraries without installing them",
 	Long:  `Downloads one or more libraries without installing them`,
 	RunE:  executeDownloadCommand,
+	Example: `arduino lib download YoutubeApi       # for the latest version.
+arduino lib download YoutubeApi@1.0.0 # for a specific version (in this case 1.0.0)`,
 }
 
 // arduinoLibListCmd represents the list libraries command.
@@ -100,29 +109,21 @@ var arduinoLibListCmd = &cobra.Command{
 	Long: `Shows a list of all installed libraries.
 Can be used with -v (or --verbose) flag (up to 2 times) to have longer output.`,
 	Run: executeListCommand,
+	Example: `arduino lib list    # to show all installed library names
+arduino lib list -v # to show more details`,
 }
 
 // arduinoLibVersionCmd represents the version command.
 var arduinoLibVersionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Shows version Number of arduino lib",
-	Long:  `Shows version Number of arduino lib which is installed on your system.`,
-	Run:   executeVersionCommand,
+	Use:     "version",
+	Short:   "Shows version Number of arduino lib",
+	Long:    `Shows version Number of arduino lib which is installed on your system.`,
+	Run:     executeVersionCommand,
+	Example: arduinoVersionCmd.Example,
 }
 
 func init() {
-	arduinoCmd.AddCommand(arduinoLibCmd)
-
 	versions[arduinoLibCmd.Name()] = LibVersion
-
-	arduinoLibCmd.AddCommand(arduinoLibInstallCmd)
-	arduinoLibCmd.AddCommand(arduinoLibUninstallCmd)
-	arduinoLibCmd.AddCommand(arduinoLibSearchCmd)
-	arduinoLibCmd.AddCommand(arduinoLibDownloadCmd)
-	arduinoLibCmd.AddCommand(arduinoLibVersionCmd)
-	arduinoLibCmd.AddCommand(arduinoLibListCmd)
-
-	arduinoLibCmd.Flags().BoolVar(&arduinoLibFlags.updateIndex, "update-index", false, "Updates the libraries index")
 }
 
 func executeLibCommand(cmd *cobra.Command, args []string) {
@@ -138,30 +139,23 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("No library specified for download command")
 	}
 
-	var index libraries.Index
-	err := libraries.LoadIndex(&index)
+	status, err := getLibStatusContext(GlobalFlags.Verbose)
 	if err != nil {
-		formatter.Print("Cannot find index file ... " + err.Error())
-		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
-		if err != nil {
-			return nil
-		}
+		return nil
 	}
 
-	status, err := index.CreateStatusContext()
-	if err != nil {
-		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
-		if err != nil {
-			return nil
-		}
-	}
-
-	pairs := releases.ParseArgs(args)
-	libsToDownload, failOutputs := status.ProcessPairs(pairs, "library")
+	pairs := libraries.ParseArgs(args)
+	libsToDownload, failOutputs := status.Process(pairs)
 	outputResults := output.LibProcessResults{
 		Libraries: failOutputs,
 	}
-	releases.ParallelDownload(libsToDownload, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Libraries)
+
+	libs := make([]releases.DownloadItem, len(libsToDownload))
+	for i := range libs {
+		libs[i] = releases.DownloadItem(libsToDownload[i])
+	}
+
+	releases.ParallelDownload(libs, false, "Downloaded", GlobalFlags.Verbose, &outputResults.Libraries, "library")
 
 	formatter.Print(outputResults)
 	return nil
@@ -172,39 +166,39 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("No library specified for install command")
 	}
 
-	var index libraries.Index
-	err := libraries.LoadIndex(&index)
+	status, err := getLibStatusContext(GlobalFlags.Verbose)
 	if err != nil {
-		formatter.Print("Cannot find index file ..." + err.Error())
-		err = prettyPrints.DownloadLibFileIndex().Execute(GlobalFlags.Verbose).Error
-		if err != nil {
-			return nil
-		}
+		return nil
 	}
 
-	status, err := index.CreateStatusContext()
-	if err != nil {
-		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
-		if err != nil {
-			return nil
-		}
-	}
-
-	pairs := releases.ParseArgs(args)
-	libsToDownload, failOutputs := status.ProcessPairs(pairs, "library")
+	pairs := libraries.ParseArgs(args)
+	libsToDownload, failOutputs := status.Process(pairs)
 	outputResults := output.LibProcessResults{
 		Libraries: failOutputs,
 	}
-	releases.ParallelDownload(libsToDownload, false, "Installed", GlobalFlags.Verbose, &outputResults.Libraries)
+
+	libs := make([]releases.DownloadItem, len(libsToDownload))
+	for i := range libs {
+		libs[i] = releases.DownloadItem(libsToDownload[i])
+	}
+
+	releases.ParallelDownload(libs, false, "Installed", GlobalFlags.Verbose, &outputResults.Libraries, "library")
+
+	folder, err := common.GetDefaultLibFolder()
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot get default lib install path, try again.")
+		return nil
+	}
 
 	for i, item := range libsToDownload {
-		err = libraries.InstallLib(item.Name, item.Release)
+		err = libraries.Install(item.Name, item.Release)
 		if err != nil {
 			outputResults.Libraries[i] = output.ProcessResult{
 				ItemName: item.Name,
-				Status:   "",
 				Error:    err.Error(),
 			}
+		} else {
+			outputResults.Libraries[i].Path = filepath.Join(folder, fmt.Sprintf("%s-%s", item.Name, item.Release.VersionName()))
 		}
 	}
 
@@ -216,6 +210,8 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 	if len(args) < 1 {
 		return fmt.Errorf("No library specified for uninstall command")
 	}
+
+	libs := libraries.ParseArgs(args)
 
 	libFolder, err := common.GetDefaultLibFolder()
 	if err != nil {
@@ -237,89 +233,82 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 	outputResults := output.LibProcessResults{
 		Libraries: make([]output.ProcessResult, 0, 10),
 	}
-	for _, arg := range args {
-		outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
-			ItemName: arg,
-			Error:    "Not Found or Not Installed",
-		})
+
+	useFileName := func(file os.FileInfo, library libraries.NameVersionPair, outputResults *output.LibProcessResults) bool {
+		fileName := file.Name()
+		//replacing underscore in foldernames with spaces.
+		fileName = strings.Replace(fileName, "_", " ", -1)
+		//I use folder name
+		if strings.Contains(fileName, library.Name) &&
+			(library.Version == "all" || strings.Contains(fileName, library.Version)) {
+			result := output.ProcessResult{
+				ItemName: fmt.Sprint(library.Name, "@", library.Version),
+			}
+			//found
+			err = libraries.Uninstall(filepath.Join(libFolder, fileName))
+			if err != nil {
+				result.Error = err.Error()
+				(*outputResults).Libraries = append((*outputResults).Libraries, result)
+			} else {
+				result.Error = "Uninstalled"
+				(*outputResults).Libraries = append((*outputResults).Libraries, result)
+			}
+			return true
+		}
+		return false
 	}
+
 	//TODO: optimize this algorithm
 	//      time complexity O(libraries_to_install(from RAM) *
 	//                        library_folder_number(from DISK) *
 	//                        library_folder_file_number (from DISK)).
-	for _, library := range args {
-		var result *output.ProcessResult
+	for _, library := range libs {
+		//readapting "latest" to "any" to avoid to use two struct with a minor change.
+		if library.Version == "latest" {
+			library.Version = "all"
+		}
 		for _, file := range dirFiles {
 			if file.IsDir() {
 				indexFile := filepath.Join(libFolder, file.Name(), "library.properties")
 				_, err = os.Stat(indexFile)
 				if os.IsNotExist(err) {
-					fileName := file.Name()
-					//replacing underscore in foldernames with spaces.
-					fileName = strings.Replace(fileName, "_", " ", -1)
-					//I use folder name
-					if strings.Contains(fileName, library) {
-						result = &output.ProcessResult{
-							ItemName: library,
-						}
-						//found
-						err = libraries.Uninstall(filepath.Join(libFolder, fileName))
-						if err != nil {
-							result.Error = err.Error()
-							outputResults.Libraries = append(outputResults.Libraries, *result)
-						} else {
-							result.Error = "Uninstalled"
-							outputResults.Libraries = append(outputResults.Libraries, *result)
-						}
+					if useFileName(file, library, &outputResults) {
 						break
 					}
 				} else if err == nil {
 					// I use library.properties file
-					content, err := os.OpenFile(indexFile, os.O_RDONLY, 0666)
+					content, err := ioutil.ReadFile(indexFile)
 					if err != nil {
 						outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
-							ItemName: library,
+							ItemName: fmt.Sprint(library.Name, "@", library.Version),
 							Error:    err.Error(),
 						})
 						break
 					}
 
-					scanner := bufio.NewScanner(content)
-					for scanner.Scan() {
-						lines := strings.SplitN(scanner.Text(), "=", 2)
-						// NOTE: asserting that if there is a library.properties, there is always the
-						// name of the library.
-						if lines[0] == "name" {
-							if strings.Contains(lines[1], library) {
-								result = &output.ProcessResult{
-									ItemName: library,
-								}
-								//found
-								err = libraries.Uninstall(filepath.Join(libFolder, file.Name()))
-								if err != nil {
-									result.Error = err.Error()
-									outputResults.Libraries = append(outputResults.Libraries, *result)
-								} else {
-									result.Status = "Uninstalled"
-									outputResults.Libraries = append(outputResults.Libraries, *result)
-								}
-							}
+					ini := goini.New()
+					err = ini.Parse(content, "\n", "=")
+					if err != nil {
+						formatter.Print(err)
+					}
+					name, ok := ini.Get("name")
+					if !ok {
+						if useFileName(file, library, &outputResults) {
 							break
 						}
+						continue
 					}
-
-					err = scanner.Err()
-					if err != nil {
-						result.Error = err.Error()
-						outputResults.Libraries = append(outputResults.Libraries, *result)
+					version, ok := ini.Get("version")
+					if !ok {
+						if useFileName(file, library, &outputResults) {
+							break
+						}
+						continue
 					}
-					break
-				}
-				if result == nil {
-					outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
-						ItemName: library,
-						Error:    "\"name\" field not found in library.properties file of the library",
-					})
+					if name == library.Name &&
+						(library.Version == "all" || library.Version == version) {
+						libraries.Uninstall(filepath.Join(libFolder, file.Name()))
+					}
 				}
 			}
 		}
@@ -331,28 +320,12 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func executeSearch(cmd *cobra.Command, args []string) error {
-	query := ""
-	if len(args) > 1 {
-		return errors.New("Wrong Number of Arguments")
-	}
-	if len(args) == 1 {
-		query = strings.ToLower(strings.Join(args, " "))
-	}
+func executeSearchCommand(cmd *cobra.Command, args []string) error {
+	query := strings.ToLower(strings.Join(args, " "))
 
-	var index libraries.Index
-	err := libraries.LoadIndex(&index)
+	status, err := getLibStatusContext(GlobalFlags.Verbose)
 	if err != nil {
-		formatter.PrintErrorMessage("Index file is corrupted. Please replace it by updating : arduino lib list update")
 		return nil
-	}
-
-	status, err := index.CreateStatusContext()
-	if err != nil {
-		status, err = prettyPrints.CorruptedLibIndexFix(index, GlobalFlags.Verbose)
-		if err != nil {
-			return nil
-		}
 	}
 
 	found := false
@@ -361,6 +334,7 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 	message := output.LibSearchResults{
 		Libraries: make([]interface{}, 0, len(names)),
 	}
+
 	items := status.Libraries
 	//Pretty print libraries from index.
 	for _, name := range names {
@@ -373,6 +347,9 @@ func executeSearch(cmd *cobra.Command, args []string) error {
 					item.Releases = nil
 				}
 			} else {
+				if formatter.IsCurrentFormat("text") {
+					name = fmt.Sprintf("\"%s\"", name)
+				}
 				message.Libraries = append(message.Libraries, name)
 			}
 		}
@@ -421,30 +398,12 @@ func executeListCommand(command *cobra.Command, args []string) {
 			indexFile := filepath.Join(libHome, file.Name(), "library.properties")
 			_, err = os.Stat(indexFile)
 			if os.IsNotExist(err) {
-				fileName := file.Name()
-				//replacing underscore in foldernames with spaces.
-				fileName = strings.Replace(fileName, "_", " ", -1)
-				fileName = strings.Replace(fileName, "-", " v. ", -1)
-				//I use folder name
-				libs.Libraries = append(libs.Libraries, output.ProcessResult{
-					ItemName: fileName,
-					Status:   "",
-					Error:    "Unknown Version",
-				})
+				resultFromFileName(file, &libs)
 			} else {
 				// I use library.properties file
 				content, err := ioutil.ReadFile(indexFile)
 				if err != nil {
-					fileName := file.Name()
-					//replacing underscore in foldernames with spaces.
-					fileName = strings.Replace(fileName, "_", " ", -1)
-					fileName = strings.Replace(fileName, "-", " v. ", -1)
-					//I use folder name
-					libs.Libraries = append(libs.Libraries, output.ProcessResult{
-						ItemName: fileName,
-						Status:   "",
-						Error:    "Unknown Version",
-					})
+					resultFromFileName(file, &libs)
 					continue
 				}
 
@@ -455,28 +414,12 @@ func executeListCommand(command *cobra.Command, args []string) {
 				}
 				Name, ok := ini.Get("name")
 				if !ok {
-					fileName := file.Name()
-					//replacing underscore in foldernames with spaces.
-					fileName = strings.Replace(fileName, "_", " ", -1)
-					fileName = strings.Replace(fileName, "-", " v. ", -1)
-					//I use folder name
-					libs.Libraries = append(libs.Libraries, output.ProcessResult{
-						ItemName: fileName,
-						Error:    "Unknown Version",
-					})
+					resultFromFileName(file, &libs)
 					continue
 				}
 				Version, ok := ini.Get("version")
 				if !ok {
-					fileName := file.Name()
-					//replacing underscore in foldernames with spaces.
-					fileName = strings.Replace(fileName, "_", " ", -1)
-					fileName = strings.Replace(fileName, "-", " v. ", -1)
-					//I use folder name
-					libs.Libraries = append(libs.Libraries, output.ProcessResult{
-						ItemName: fileName,
-						Error:    "Unknown Version",
-					})
+					resultFromFileName(file, &libs)
 					continue
 				}
 				libs.Libraries = append(libs.Libraries, output.ProcessResult{
@@ -493,4 +436,32 @@ func executeListCommand(command *cobra.Command, args []string) {
 	} else {
 		formatter.Print(libs)
 	}
+}
+
+func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
+	fileName := file.Name()
+	//replacing underscore in foldernames with spaces.
+	fileName = strings.Replace(fileName, "_", " ", -1)
+	fileName = strings.Replace(fileName, "-", " v. ", -1)
+	//I use folder name
+	libs.Libraries = append(libs.Libraries, output.ProcessResult{
+		ItemName: fileName,
+		Status:   "",
+		Error:    "Unknown Version",
+	})
+}
+
+func getLibStatusContext(verbosity int) (*libraries.StatusContext, error) {
+	var index libraries.Index
+	err := libraries.LoadIndex(&index)
+	if err != nil {
+		status, err := prettyPrints.CorruptedLibIndexFix(index, verbosity)
+		if err != nil {
+			return nil, err
+		}
+		return &status, nil
+	}
+
+	status := index.CreateStatusContext()
+	return &status, nil
 }

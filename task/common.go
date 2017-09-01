@@ -67,6 +67,17 @@ type Sequence func() []Result
 func (tw Wrapper) Execute(verb int) Result {
 	var maxUsableVerb [3]int
 	var msg string
+
+	if tw.BeforeMessage == nil {
+		tw.BeforeMessage = []string{}
+	}
+	if tw.AfterMessage == nil {
+		tw.AfterMessage = []string{}
+	}
+	if tw.ErrorMessage == nil {
+		tw.ErrorMessage = []string{}
+	}
+
 	if formatter.IsCurrentFormat("text") && tw.BeforeMessage != nil && len(tw.BeforeMessage) > 0 {
 		maxUsableVerb[0] = minVerb(verb, tw.BeforeMessage)
 		msg = tw.BeforeMessage[maxUsableVerb[0]]
@@ -89,7 +100,7 @@ func (tw Wrapper) Execute(verb int) Result {
 		maxUsableVerb[2] = minVerb(verb, tw.AfterMessage)
 		msg = tw.AfterMessage[maxUsableVerb[2]]
 		if msg != "" {
-			formatter.PrintResult(msg)
+			formatter.Print(msg)
 		}
 	}
 	return ret

@@ -29,8 +29,11 @@
 
 package formatter
 
-import "fmt"
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
 
 // Formatter interface represents a generic formatter. It allows to print and format Messages.
 type Formatter interface {
@@ -51,7 +54,7 @@ var debug bool
 func init() {
 	formatters = make(map[string]Formatter, 2)
 	AddCustomFormatter("text", &TextFormatter{})
-	AddCustomFormatter("json", &JSONFormatter{})
+	AddCustomFormatter("json", &JSONFormatter{Debug: true})
 	defaultFormatter = formatters["text"]
 
 	printFunc = defaultPrintFunc
@@ -111,9 +114,9 @@ func Print(msg interface{}) error {
 func defaultPrintFunc(f Formatter, msg interface{}) error {
 	val, err := f.Format(msg)
 	if err == nil {
-		fmt.Println(val)
+		fmt.Println(strings.TrimSpace(val))
 	} else {
-		fmt.Println(err)
+		fmt.Println(strings.TrimSpace(err.Error()))
 	}
 	return err
 }

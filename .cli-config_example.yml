@@ -1,0 +1,34 @@
+Example1:
+   - paths:
+     - sketchbook_path: /home/bcmi/Arduino
+     - arduino_data: /home/bcmi/.arduino15
+   - proxy:
+     - type: auto
+
+Example2:
+   - paths:
+     - sketchbook_path: /home/bcmi/Arduino
+     - arduino_data: /home/bcmi/.arduino15
+   - proxy:
+     - type: manual
+     - hostname: localhost
+     - port: 8080
+
+Example3:
+   - paths:
+     - sketchbook_path: /home/bcmi/Arduino
+     - arduino_data: /home/bcmi/.arduino15
+   - proxy:
+     - type: manual
+     - hostname: localhost
+     - port: 8080
+     - username: pippo
+     - password: my awesome password
+
+Example4: # not supported for now
+   - paths:
+     - sketchbook_path: /home/bcmi/Arduino
+     - arduino_data: /home/bcmi/.arduino15
+   - proxy:
+     - type: pac
+     - pac_file: path/to/the/pac/file 

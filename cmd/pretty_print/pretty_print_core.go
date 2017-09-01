@@ -29,9 +29,36 @@
 
 package prettyPrints
 
-import "github.com/bcmi-labs/arduino-cli/cores"
+import (
+	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/task"
+)
 
-// PackageStatus pretty prints packages from index status.
-func PackageStatus(status *cores.StatusContext) {
+// DownloadCoreFileIndex shows info regarding the download of a missing (or corrupted) file index of core packages.
+func DownloadCoreFileIndex() task.Wrapper {
+	return DownloadFileIndex(cores.DownloadPackagesFile)
+}
 
+// CorruptedCoreIndexFix pretty prints messages regarding corrupted index fixes of cores.
+func CorruptedCoreIndexFix(index cores.Index, verbosity int) (cores.StatusContext, error) {
+	downloadTask := DownloadCoreFileIndex()
+	parseTask := coreIndexParse(index, verbosity)
+
+	result := corruptedIndexFixResults(downloadTask, parseTask, verbosity)
+
+	return result[1].Result.(cores.StatusContext), result[1].Error
+}
+
+// coreIndexParse pretty prints info about parsing an index file of libraries.
+func coreIndexParse(index cores.Index, verbosity int) task.Wrapper {
+	ret := indexParseWrapperSkeleton()
+	ret.Task = task.Task(func() task.Result {
+		err := cores.LoadIndex(&index) // I try again
+		status := index.CreateStatusContext()
+		return task.Result{
+			Result: status,
+			Error:  err,
+		}
+	})
+	return ret
 }

@@ -51,7 +51,10 @@ func DownloadIndex(indexPathFunc func() (string, error), URL string) error {
 		return err
 	}
 
-	client := http.DefaultClient
+	client := http.Client{
+		Timeout: 30 * time.Second,
+	}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
@@ -70,14 +73,13 @@ func DownloadIndex(indexPathFunc func() (string, error), URL string) error {
 	return nil
 }
 
-// DownloadPackage downloads a package from arduino repository, applying a label for the progress bar.
+// DownloadPackage downloads a package from arduino repository.
 func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleResultFunc func(io.Reader, *os.File, int) error) error {
 	if initialData == nil {
 		return errors.New("Cannot fill a nil file pointer")
 	}
 
-	client := http.DefaultClient
-	client.Timeout = time.Minute
+	client := &http.Client{}
 
 	var initialSize int64
 	stats, err := initialData.Stat()
@@ -92,9 +94,11 @@ func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleRe
 		}
 	}
 
+	client.Timeout = time.Duration(totalSize-initialSize) / 57344 * time.Second // size to download divided by 56KB/s (56 * 1024 = 57344)
+
 	request, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
-		return fmt.Errorf("Cannot create HTTP request: %s", err)
+		return fmt.Errorf("Cannot create HTTP to URL %s request: %s", URL, err)
 	}
 
 	if initialSize > 0 {
@@ -103,12 +107,13 @@ func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleRe
 
 	response, err := client.Do(request)
 	if err != nil {
-		return fmt.Errorf("Cannot fetch %s. Response creation error", URL)
+		return fmt.Errorf("Cannot fetch %s Response creation error: %s",
+			URL, err)
 	} else if response.StatusCode != 200 &&
 		response.StatusCode != 206 &&
 		response.StatusCode != 416 {
 		response.Body.Close()
-		return fmt.Errorf("Cannot fetch %s. Source responded with code %d",
+		return fmt.Errorf("Cannot fetch %s Source responded with code %d",
 			URL, response.StatusCode)
 	}
 	defer response.Body.Close()

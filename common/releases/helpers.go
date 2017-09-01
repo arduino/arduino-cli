@@ -35,7 +35,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
@@ -46,34 +45,13 @@ import (
 
 // IsCached returns a bool representing if the release has already been downloaded
 func IsCached(release Release) bool {
-	stagingFolder, err := release.GetDownloadCacheFolder()
+	archivePath, err := ArchivePath(release)
 	if err != nil {
 		return false
 	}
 
-	_, err = os.Stat(filepath.Join(stagingFolder, release.ArchiveName()))
+	_, err = os.Stat(archivePath)
 	return !os.IsNotExist(err)
-}
-
-// ParseArgs parses a sequence of "item@version" tokens and returns a Name-Version slice.
-//
-// If version is not present it is assumed as "latest" version.
-func ParseArgs(args []string) []NameVersionPair {
-	ret := make([]NameVersionPair, 0, len(args))
-	for _, item := range args {
-		tokens := strings.SplitN(item, "@", 2)
-		var version string
-		if len(tokens) == 2 {
-			version = tokens[1]
-		} else {
-			version = "latest"
-		}
-		ret = append(ret, NameVersionPair{
-			Name:    tokens[0],
-			Version: version,
-		})
-	}
-	return ret
 }
 
 // downloadRelease downloads a generic release.
@@ -89,7 +67,7 @@ func downloadRelease(item DownloadItem, progBar *pb.ProgressBar, label string) e
 	if item.Release == nil {
 		return errors.New("Cannot accept nil release")
 	}
-	initialData, err := item.Release.OpenLocalArchiveForDownload()
+	initialData, err := OpenLocalArchiveForDownload(item.Release)
 	if err != nil {
 		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
 	}
@@ -107,21 +85,17 @@ func downloadRelease(item DownloadItem, progBar *pb.ProgressBar, label string) e
 	return nil
 }
 
-// downloadAndCache returns the wrapper to download something without installing it
-func downloadAndCache(item DownloadItem, progBar *pb.ProgressBar) task.Wrapper {
+// downloadTask returns the wrapper to download something without installing it.
+func downloadTask(item DownloadItem, progBar *pb.ProgressBar, label string) task.Wrapper {
 	return task.Wrapper{
 		Task: func() task.Result {
-			err := downloadRelease(item, progBar, "library")
+			err := downloadRelease(item, progBar, label)
 			if err != nil {
 				return task.Result{
-					Result: nil,
-					Error:  err,
+					Error: err,
 				}
 			}
-			return task.Result{
-				Result: nil,
-				Error:  nil,
-			}
+			return task.Result{}
 		},
 	}
 }
@@ -131,11 +105,18 @@ func downloadAndCache(item DownloadItem, progBar *pb.ProgressBar) task.Wrapper {
 //   forced is used to force download if cached.
 //   OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
 //   DOES NOT RETURN because modified refResults array of results using pointer provided by refResults.Results().
-func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbosity int, refResults *[]output.ProcessResult) {
+func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbosity int, refResults *[]output.ProcessResult, label string) {
 	itemC := len(items)
 	tasks := make(map[string]task.Wrapper, itemC)
-	progressBars := make([]*pb.ProgressBar, 0, itemC)
+	paths := make(map[string]string, itemC)
+
 	textMode := formatter.IsCurrentFormat("text")
+
+	var progressBars []*pb.ProgressBar
+	if textMode {
+		progressBars = make([]*pb.ProgressBar, 0, itemC)
+	}
+
 	for _, item := range items {
 		cached := IsCached(item.Release)
 		releaseNotNil := item.Release != nil
@@ -145,12 +126,15 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbos
 				pBar = pb.StartNew(int(item.Release.ArchiveSize())).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", item.Name))
 				progressBars = append(progressBars, pBar)
 			}
-			tasks[item.Name] = downloadAndCache(item, pBar)
+			paths[item.Name], _ = ArchivePath(item.Release) //if the release exists the archivepath always exists
+			tasks[item.Name] = downloadTask(item, pBar, label)
 		} else if !forced && releaseNotNil && cached {
 			//Consider OK
+			path, _ := ArchivePath(item.Release)
 			*refResults = append(*refResults, output.ProcessResult{
 				ItemName: item.Name,
 				Status:   OkStatus,
+				Path:     path,
 			})
 		}
 	}
@@ -177,6 +161,7 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbos
 				*refResults = append(*refResults, output.ProcessResult{
 					ItemName: name,
 					Status:   OkStatus,
+					Path:     paths[name],
 				})
 			}
 		}
@@ -197,4 +182,28 @@ func handleWithProgressBarFunc(progBar *pb.ProgressBar) func(io.Reader, *os.File
 		}
 		return nil
 	}
+}
+
+// ArchivePath returns the fullPath of the Archive of this release.
+func ArchivePath(release Release) (string, error) {
+	staging, err := release.GetDownloadCacheFolder()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(staging, release.ArchiveName()), nil
+}
+
+// OpenLocalArchiveForDownload reads the data from the local archive if present,
+// and returns the []byte of the file content. Used by resume Download.
+// Creates an empty file if not found.
+func OpenLocalArchiveForDownload(r Release) (*os.File, error) {
+	path, err := ArchivePath(r)
+	if err != nil {
+		return nil, err
+	}
+	stats, err := os.Stat(path)
+	if os.IsNotExist(err) || err == nil && stats.Size() >= r.ArchiveSize() {
+		return os.Create(path)
+	}
+	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 }

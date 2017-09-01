@@ -80,3 +80,36 @@ func DownloadFileIndex(downloadFunc func() error) task.Wrapper {
 		}),
 	}
 }
+
+//corruptedIndexFixResults executes a generic index fix procedure, made by a download and parse task.
+func corruptedIndexFixResults(downloadTask, parseTask task.Wrapper, verbosity int) []task.Result {
+	subTasks := []task.Wrapper{downloadTask, parseTask}
+	wrapper := indexFixWrapperSkeleton()
+	wrapper.Task = task.CreateSequence(subTasks, []bool{false, false}, verbosity).Task()
+	return wrapper.Execute(verbosity).Result.([]task.Result)
+}
+
+// indexParseWrapperSkeleton provides an empty skeleton for a task wrapper regarding index (core index, lib index) error fixing tasks,
+// which will be assigned later.
+func indexFixWrapperSkeleton() task.Wrapper {
+	return task.Wrapper{
+		BeforeMessage: []string{
+			"Cannot parse index file, it may be corrupted.",
+		},
+	}
+}
+
+// indexParseWrapperSkeleton provides an empty skeleton for a task wrapper regarding index (core index, lib index) parsing tasks,
+// which will be assigned later.
+func indexParseWrapperSkeleton() task.Wrapper {
+	return task.Wrapper{
+		BeforeMessage: []string{
+			"",
+			"Parsing downloaded index file",
+		},
+		ErrorMessage: []string{
+			"Cannot parse index file",
+		},
+		Task: nil,
+	}
+}

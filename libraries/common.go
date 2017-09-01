@@ -26,27 +26,33 @@
  *
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
+package libraries
 
-package cores
+import "strings"
 
-import (
-	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
-)
-
-const (
-	//packageIndexURL contains the index URL for core packages.
-	packageIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
-)
-
-// DownloadItem represents a core or tool download struct.
-type DownloadItem struct {
-	Package string
-	releases.DownloadItem
+// NameVersionPair represents a pair Name - Version.
+type NameVersionPair struct {
+	Name    string
+	Version string
 }
 
-
-// DownloadPackagesFile downloads the core packages index file from arduino repository.
-func DownloadPackagesFile() error {
-	return common.DownloadIndex(IndexPath, packageIndexURL)
+// ParseLibArgs parses a sequence of "item@version" tokens and returns a Name-Version slice.
+//
+// If version is not present it is assumed as "latest" version.
+func ParseArgs(args []string) []NameVersionPair {
+	ret := make([]NameVersionPair, 0, len(args))
+	for _, item := range args {
+		tokens := strings.SplitN(item, "@", 2)
+		var version string
+		if len(tokens) == 2 {
+			version = tokens[1]
+		} else {
+			version = "latest"
+		}
+		ret = append(ret, NameVersionPair{
+			Name:    tokens[0],
+			Version: version,
+		})
+	}
+	return ret
 }

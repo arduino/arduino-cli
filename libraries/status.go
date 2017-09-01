@@ -33,7 +33,6 @@ import (
 	"fmt"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/pmylund/sortutil"
 )
 
@@ -67,14 +66,12 @@ func (sc StatusContext) Names() []string {
 	return res
 }
 
-// ProcessPairs takes a set of name-version pairs and return
+// Process takes a set of name-version pairs and return
 // a set of items to download and a set of outputs for non
 // existing libraries.
-//
-// Uses a label to print messages ("library" | "core" | "tool")
-func (sc StatusContext) ProcessPairs(items []releases.NameVersionPair, label string) ([]releases.DownloadItem, []output.ProcessResult) {
+func (sc StatusContext) Process(items []NameVersionPair) ([]DownloadItem, []output.ProcessResult) {
 	itemC := len(items)
-	ret := make([]releases.DownloadItem, 0, itemC)
+	ret := make([]DownloadItem, 0, itemC)
 	fails := make([]output.ProcessResult, 0, itemC)
 
 	for _, item := range items {
@@ -82,7 +79,7 @@ func (sc StatusContext) ProcessPairs(items []releases.NameVersionPair, label str
 		if !exists {
 			fails = append(fails, output.ProcessResult{
 				ItemName: item.Name,
-				Error:    fmt.Sprint(label, " not found"),
+				Error:    "Library not found",
 			})
 		} else {
 			release := library.GetVersion(item.Version)
@@ -92,7 +89,7 @@ func (sc StatusContext) ProcessPairs(items []releases.NameVersionPair, label str
 					Error:    "Version Not Found",
 				})
 			} else { // replaces "latest" with latest version too
-				ret = append(ret, releases.DownloadItem{
+				ret = append(ret, DownloadItem{
 					Name:    library.Name,
 					Release: release,
 				})
@@ -104,7 +101,7 @@ func (sc StatusContext) ProcessPairs(items []releases.NameVersionPair, label str
 }
 
 // CreateStatusContext creates a status context from index data.
-func (index Index) CreateStatusContext() (StatusContext, error) {
+func (index Index) CreateStatusContext() StatusContext {
 	// Start with an empty status context
 	libraries := StatusContext{
 		Libraries: map[string]*Library{},
@@ -113,5 +110,5 @@ func (index Index) CreateStatusContext() (StatusContext, error) {
 		// Add all indexed libraries in the status context
 		libraries.AddLibrary(&lib)
 	}
-	return libraries, nil
+	return libraries
 }

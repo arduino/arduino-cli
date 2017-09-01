@@ -36,25 +36,30 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/task"
+)
+
+var (
+	// SketchbookFolder represents the current root of the sketchbooks tree (defaulted to `$HOME/Arduino`).
+	SketchbookFolder string
+
+	// ArduinoDataFolder represents the current root of the arduino tree (defaulted to `$HOME/.arduino15` on linux).
+	ArduinoDataFolder string
+
+	// ArduinoIDEFolder represents the current folder where the Arduino IDE relies, not used if CLI is not bundled with the IDE.
+	ArduinoIDEFolder string
 )
 
 // GetFolder gets a folder on a path, and creates it if createIfMissing == true and not found.
 func GetFolder(folder string, label string, createIfMissing bool) (string, error) {
 	_, err := os.Stat(folder)
 	if os.IsNotExist(err) && createIfMissing {
-		formatter.Print(fmt.Sprintf("Cannot find default %s folder, attemping to create it ...", label))
 		err = os.MkdirAll(folder, 0755)
 		if err != nil {
-			formatter.Print("ERROR")
-			formatter.PrintErrorMessage(fmt.Sprintf("Folder %s missing and cannot create it", label))
 			return "", err
 		}
-		formatter.Print("OK")
 	} else if err != nil {
 		msgFormat := "Cannot get %s folder, it does not exist"
-		formatter.PrintErrorMessage(fmt.Sprintf(msgFormat, label))
 		return "", fmt.Errorf(msgFormat, label)
 	}
 	return folder, nil
@@ -62,32 +67,39 @@ func GetFolder(folder string, label string, createIfMissing bool) (string, error
 
 // GetDefaultArduinoFolder returns the default data folder for Arduino platform
 func GetDefaultArduinoFolder() (string, error) {
-	var folder string
+	if ArduinoDataFolder == "" {
+		usr, err := user.Current()
+		if err != nil {
+			return "", err
+		}
+		ArduinoDataFolder = usr.HomeDir
 
-	usr, err := user.Current()
-	if err != nil {
-		return "", err
+		switch runtime.GOOS {
+		case "linux":
+			ArduinoDataFolder = filepath.Join(ArduinoDataFolder, ".arduino15")
+			break
+		case "darwin":
+			ArduinoDataFolder = filepath.Join(ArduinoDataFolder, "Library", "arduino15")
+			break
+		case "windows":
+			return "", fmt.Errorf("Windows temporarily unsupported")
+		default:
+			return "", fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
+		}
 	}
-
-	switch runtime.GOOS {
-	case "linux":
-		folder = filepath.Join(usr.HomeDir, ".arduino15")
-	case "darwin":
-		folder = filepath.Join(usr.HomeDir, "Library", "arduino15")
-	default:
-		return folder, fmt.Errorf("Unsupported OS: %s", runtime.GOOS)
-	}
-	return GetFolder(folder, "default arduino", true)
+	return GetFolder(ArduinoDataFolder, "default arduino", true)
 }
 
 // GetDefaultArduinoHomeFolder gets the home directory for arduino CLI.
 func GetDefaultArduinoHomeFolder() (string, error) {
-	usr, err := user.Current()
-	if err != nil {
-		return "", err
+	if SketchbookFolder == "" {
+		usr, err := user.Current()
+		if err != nil {
+			return "", err
+		}
+		SketchbookFolder = filepath.Join(usr.HomeDir, "Arduino")
 	}
-	homeFolder := filepath.Join(usr.HomeDir, "Arduino")
-	return GetFolder(homeFolder, "Arduino home", true)
+	return GetFolder(SketchbookFolder, "Arduino home", true)
 }
 
 // GetDefaultFolder returns the default folder with specified name and label.
@@ -122,12 +134,12 @@ func GetDefaultToolsFolder(packageName string) (string, error) {
 
 // GetDownloadCacheFolder gets a generic cache folder for downloads.
 func GetDownloadCacheFolder(item string) (string, error) {
-	return GetDefaultFolder(GetDefaultArduinoFolder, "staging", "cache", true)
+	return GetDefaultFolder(GetDefaultArduinoFolder, filepath.Join("staging", item), "cache", true)
 }
 
 // ExecUpdateIndex is a generic procedure to update an index file.
-func ExecUpdateIndex(wrapper task.Wrapper, verbosity int) {
-	wrapper.Execute(verbosity)
+func ExecUpdateIndex(updateTask task.Wrapper, verbosity int) {
+	updateTask.Execute(verbosity)
 }
 
 // IndexPath returns the path of the specified index file.
@@ -136,5 +148,5 @@ func IndexPath(fileName string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(baseFolder, "library_index.json"), nil
+	return filepath.Join(baseFolder, fileName), nil
 }
