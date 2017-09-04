@@ -3,6 +3,15 @@ Alessandro Sanino <a.sanino@bcmi-lbs.cc>
 
 Contains common functions regarding all the environment
 
+====== Net Common Functions
+They regard code which downloads packages (in a general form)
+
+====== Paths functions
+They allow to get main folders used by the CLI. Allowing auto creation if they are not found.
+
+== Releases
+See link:releases/README.adoc[Releases Docs]
+
 == Here some useful info regarding common entities
 
 [source, bash]

@@ -79,7 +79,7 @@ func checksumMatches(r Release) bool {
 	return bytes.Compare(hash.Sum(nil), content) == 0
 }
 
-// CheckLocalArchive check for integrity of the local archive.
+// checkLocalArchive check for integrity of the local archive.
 func checkLocalArchive(release Release) error {
 	archivePath, err := ArchivePath(release)
 	if err != nil {
