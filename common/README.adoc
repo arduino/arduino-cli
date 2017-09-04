@@ -7,7 +7,7 @@ Contains common functions regarding all the environment
 They regard code which downloads packages (in a general form)
 
 ====== Paths functions
-They allow to get main folders used by the CLI. Allowing auto creation if they are not found.
+They allow to get main folders used by the CLI, allowing auto creation if they are not found.
 
 == Releases
 See link:releases/README.adoc[Releases Docs]
