@@ -99,12 +99,26 @@ arduino core version # for the version of the core component.`,
 }
 
 var bundled bool
+var testing = false
 
 func init() {
 	versions[ArduinoCmd.Name()] = ArduinoVersion
 	InitConfigs()
 	InitFlags()
 	InitCommands()
+}
+
+// TestInit creates an initialization for tests
+func TestInit() {
+	InitFlags()
+	InitCommands()
+	InitConfigs()
+
+	cobra.OnInitialize(func() {
+		viper.SetConfigFile("./test-config.yml")
+	})
+
+	testing = true
 }
 
 // InitFlags reinitialize flags (useful for testing too)
@@ -197,7 +211,9 @@ func arduinoPreRun(cmd *cobra.Command, args []string) {
 		})
 	}
 
-	cobra.OnInitialize(initViper)
+	if !testing {
+		cobra.OnInitialize(initViper)
+	}
 }
 
 func arduinoRun(cmd *cobra.Command, args []string) error {
@@ -223,6 +239,7 @@ func arduinoRun(cmd *cobra.Command, args []string) error {
 func Execute() {
 	err := ArduinoCmd.Execute()
 	if err != nil {
+		formatter.PrintError(err)
 		os.Exit(1)
 	}
 }
@@ -298,8 +315,8 @@ func initViper() {
 
 	err := viper.ReadInConfig()
 	if err != nil {
+		formatter.PrintError(err)
 		formatter.PrintErrorMessage("Cannot read configuration file in any of the default folders")
-		os.Exit(1) //Exit with error is OK here?
 	}
 
 	viper.SetDefault("paths.sketchbook", defHome)
@@ -315,7 +332,7 @@ func initViper() {
 		hostname := viper.GetString("proxy.hostname")
 		if hostname == "" {
 			formatter.PrintErrorMessage("With manual proxy configuration, hostname is required.")
-			os.Exit(1)
+			os.Exit(2)
 		}
 
 		if strings.HasPrefix(hostname, "http") {

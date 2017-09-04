@@ -2,7 +2,12 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"time"
+
+	"github.com/bcmi-labs/arduino-cli/common"
+
+	"github.com/bcmi-labs/arduino-modules/boards"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 
@@ -43,7 +48,7 @@ func executeBoardListCommand(cmd *cobra.Command, args []string) {
 
 	formatter.Print(*monitor)
 	//monitor.Stop() //If called will slow like 1sec the program to close after print, with the same result (tested).
-	// it closes gracefully, but at the end of the command we can't have races.
+	// it closes ungracefully, but at the end of the command we can't have races.
 }
 
 func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
@@ -58,9 +63,20 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
 
 	formatter.Print(*monitor)
 
-	serialDevices := monitor.Serial()
-	for name, device := range serialDevices {
+	packageFolder, err := common.GetDefaultPkgFolder()
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot Parse Board Index file")
+		return nil
+	}
+	boards, err := boards.Find(packageFolder)
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot Parse Board Index file")
+		return nil
+	}
 
+	fmt.Println("SUPPORTED BOARDS:")
+	for _, device := range monitor.Serial() {
+		fmt.Println(boards.ByVidPid(device.ProductID, device.VendorID))
 	}
 
 	return nil

@@ -32,11 +32,11 @@ import "strings"
 
 // NameVersionPair represents a pair Name - Version.
 type NameVersionPair struct {
-	Name    string
-	Version string
+	Name    string // The name of the parsed item.
+	Version string // The Version of the parsed item.
 }
 
-// ParseLibArgs parses a sequence of "item@version" tokens and returns a Name-Version slice.
+// ParseArgs parses a sequence of "item@version" tokens and returns a Name-Version slice.
 //
 // If version is not present it is assumed as "latest" version.
 func ParseArgs(args []string) []NameVersionPair {

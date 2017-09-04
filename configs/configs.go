@@ -68,7 +68,7 @@ func getFileLocation() string {
 
 // Configs represents the possible configurations for the CLI.
 type Configs struct {
-	ProxyType         string        `yaml:"proxy_type,required"`
+	ProxyType         string        `yaml:"proxy_type"`
 	ProxyManualConfig *ProxyConfigs `yaml:"manual_configs,omitempty"`
 	SketchbookPath    string        `yaml:"sketchbook_path,omitempty"`
 	ArduinoDataFolder string        `yaml:"arduino_data,omitempty"`
@@ -76,7 +76,7 @@ type Configs struct {
 
 //ProxyConfigs represents a possible manual proxy configuration.
 type ProxyConfigs struct {
-	Hostname string `yaml:"hostname,required"`
+	Hostname string `yaml:"hostname"`
 	Username string `yaml:"username,omitempty"`
 	Password string `yaml:"password,omitempty"` // can be encrypted, see issue #71
 }
