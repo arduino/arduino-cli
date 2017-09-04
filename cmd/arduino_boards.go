@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/bcmi-labs/arduino-modules/sketches"
+
 	"github.com/bcmi-labs/arduino-cli/common"
 
 	"github.com/bcmi-labs/arduino-modules/boards"
@@ -68,15 +70,34 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
 		formatter.PrintErrorMessage("Cannot Parse Board Index file")
 		return nil
 	}
-	boards, err := boards.Find(packageFolder)
+
+	homeFolder, err := common.GetDefaultArduinoHomeFolder()
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot Parse Board Index file")
 		return nil
 	}
 
+	bs, err := boards.Find(packageFolder)
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot Parse Board Index file")
+		return nil
+	}
+
+	ss := sketches.Find(homeFolder)
+	sketch, exists := ss[flag]
+	if !exists {
+		formatter.PrintErrorMessage("Cannot find specified sketch")
+		return nil
+	}
 	fmt.Println("SUPPORTED BOARDS:")
 	for _, device := range monitor.Serial() {
-		fmt.Println(boards.ByVidPid(device.ProductID, device.VendorID))
+		board := bs.ByVidPid(device.VendorID, device.ProductID)
+		if board != nil {
+			fmt.Println("NOT FOUND")
+		} else {
+			fmt.Println(" -", bs.ByVidPid(device.VendorID, device.ProductID).Fqbn)
+		}
+
 	}
 
 	return nil

@@ -83,8 +83,7 @@ var ArduinoCmd = &cobra.Command{
 	BashCompletionFunction: bashAutoCompletionFunction,
 	PersistentPreRun:       arduinoPreRun,
 	RunE:                   arduinoRun,
-	Example: `arduino --generate-docs to generate the docs and autocompletion for the whole CLI.
-arduino --home /new/arduino/home/folder`,
+	Example:                `arduino --generate-docs to generate the docs and autocompletion for the whole CLI.`,
 }
 
 // arduinoVersionCmd represents the version command.
