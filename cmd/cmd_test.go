@@ -31,6 +31,7 @@ package cmd_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -56,6 +57,7 @@ func createTempRedirect(t *testing.T) *os.File {
 	tempFile, err := ioutil.TempFile(os.TempDir(), "test")
 	require.NoError(t, err, "Opening temp file")
 	os.Stdout = tempFile
+
 	return tempFile
 }
 
@@ -67,12 +69,13 @@ func cleanTempRedirect(t *testing.T, tempFile *os.File) {
 }
 
 func executeWithArgs(t *testing.T, args ...string) {
-	cmd.InitFlags()
-	cmd.InitCommands()
+	cmd.TestInit()
 	if args != nil {
 		cmd.ArduinoCmd.SetArgs(args)
 	}
+
 	err := cmd.ArduinoCmd.Execute()
+	fmt.Fprintln(stdOut, err)
 	require.NoError(t, err, "Error executing command")
 }
 

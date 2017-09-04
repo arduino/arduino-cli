@@ -1,0 +1,3 @@
+proxy_type: auto
+sketchbook_path: /home/bcmi/Arduino
+arduino_data: /home/bcmi/.arduino15
