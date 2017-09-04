@@ -50,48 +50,5 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		return errors.New("Not accepting additional arguments")
 	}
-	/*
-
-		monitor := discovery.New(time.Millisecond)
-		monitor.Start()
-
-		time.Sleep(time.Second)
-
-		formatter.Print(*monitor)
-
-		packageFolder, err := common.GetDefaultPkgFolder()
-		if err != nil {
-			formatter.PrintErrorMessage("Cannot Parse Board Index file")
-			return nil
-		}
-
-		homeFolder, err := common.GetDefaultArduinoHomeFolder()
-		if err != nil {
-			formatter.PrintErrorMessage("Cannot Parse Board Index file")
-			return nil
-		}
-
-		bs, err := boards.Find(packageFolder)
-		if err != nil {
-			formatter.PrintErrorMessage("Cannot Parse Board Index file")
-			return nil
-		}
-
-		ss := sketches.Find(homeFolder)
-		sketch, exists := ss[flag]
-		if !exists {
-			formatter.PrintErrorMessage("Cannot find specified sketch")
-			return nil
-		}
-		fmt.Println("SUPPORTED BOARDS:")
-		for _, device := range monitor.Serial() {
-			board := bs.ByVidPid(device.VendorID, device.ProductID)
-			if board != nil {
-				fmt.Println("NOT FOUND")
-			} else {
-				fmt.Println(" -", bs.ByVidPid(device.VendorID, device.ProductID).Fqbn)
-			}
-		}
-	*/
 	return nil
 }
