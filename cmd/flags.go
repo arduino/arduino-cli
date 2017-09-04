@@ -61,7 +61,7 @@ var arduinoConfigInitFlags struct {
 }
 
 var validSerialBoardURIRegexp = regexp.MustCompile("(serial|tty)://0x[0-9A-F]{4}/0x[0-9A-F]{4}(/.{1,256})?")
-var validNetworkBoardURIRegexp = regexp.MustCompile("(http(s)?|(tc|ud)p)://")
+var validNetworkBoardURIRegexp = regexp.MustCompile("(http(s)?|(tc|ud)p)://[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:[0-9]{1,5}")
 
 // arduinoConfigInitFlags represents `arduino board attach` flags.
 var arduinoBoardAttachFlags struct {
