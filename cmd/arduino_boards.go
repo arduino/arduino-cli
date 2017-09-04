@@ -91,7 +91,6 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
 			} else {
 				fmt.Println(" -", bs.ByVidPid(device.VendorID, device.ProductID).Fqbn)
 			}
-
 		}
 	*/
 	return nil
