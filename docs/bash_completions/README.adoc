@@ -1,7 +1,8 @@
 = Bash Autocompletion 
 Alessandro Sanino <a.sanino@bcmi-labs.cc>
 
-File contained in this directory is the file to allow autocompletion of the arduino CLI commands
+File contained in this directory is the file to allow autocompletion of the arduino CLI commands (for bash only, but similar for
+other shells).
 
 == Installation
 . Move the file (using `sudo`) to directory `/etc/bash_completion.d`
@@ -24,8 +25,37 @@ $ export PATH=$PATH:$PROJECT_DIR
 ----
 
 == How has been autocompletion obtained?
-It has been obtained by setting up the BashAutocompletionFunction field of Root Command
+It has been obtained by setting up the BashAutocompletionFunction field of Root Command, as 
+shown in the example with the Arduino Root Command.
+[source, go]
+----
+const bashAutoCompletionFunction = `
+__arduino_autocomplete() 
+{
+    case $(last_command) in
+        arduino)
+ 		    opts="lib core help version"
+ 		    ;;
+        arduino_lib)
+  		    opts="install uninstall list search version --update-index"
+  	        ;;			
+    	arduino_core)
+		    opts="install uninstall list search version --update-index"
+			;;
+    	arduino_help)
+    	    opts="lib core version"
+    	    ;;
+	esac		  
+    if [[ ${cur} == " *" ]] ; then
+            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+        fi
+	    return 1
+    }`
 
-```
-
-```
+var ArduinoCmd = &cobra.Command{
+	Use:   "arduino",
+	...,
+	BashCompletionFunction: bashAutoCompletionFunction,
+}
+----

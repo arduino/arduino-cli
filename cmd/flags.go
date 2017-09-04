@@ -60,7 +60,8 @@ var arduinoConfigInitFlags struct {
 	Location string // The custom location of the file to create.
 }
 
-var validBoardURIRegexp = regexp.MustCompile("(serial|tty|http(s)?|(tc|ud)p)://")
+var validSerialBoardURIRegexp = regexp.MustCompile("(serial|tty)://0x[0-9A-F]{4}/0x[0-9A-F]{4}(/.{1,256})?")
+var validNetworkBoardURIRegexp = regexp.MustCompile("(http(s)?|(tc|ud)p)://")
 
 // arduinoConfigInitFlags represents `arduino board attach` flags.
 var arduinoBoardAttachFlags struct {

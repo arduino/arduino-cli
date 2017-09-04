@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"net/url"
 	"time"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
@@ -50,5 +51,53 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		return errors.New("Not accepting additional arguments")
 	}
+
+	monitor := discovery.New(time.Millisecond)
+	monitor.Start()
+
+	time.Sleep(time.Second)
+
+	formatter.Print(*monitor)
+
+	packageFolder, err := common.GetDefaultPkgFolder()
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot Parse Board Index file")
+		return nil
+	}
+
+	homeFolder, err := common.GetDefaultArduinoHomeFolder()
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot Parse Board Index file")
+		return nil
+	}
+
+	bs, err := boards.Find(packageFolder)
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot Parse Board Index file")
+		return nil
+	}
+
+	ss := sketches.Find(homeFolder)
+	sketch, exists := ss[arduinoBoardAttachFlags.SketchName]
+	if !exists {
+		formatter.PrintErrorMessage("Cannot find specified sketch in the Sketchbook")
+		return nil
+	}
+
+	deviceURI, err := url.Parse(arduinoBoardAttachFlags.BoardURI)
+	if err != nil {
+		formatter.PrintErrorMessage("The provided Device URL is not in a valid format")
+		return nil
+	}
+
+	if validSerialBoardURIRegexp.Match([]byte(deviceURI.Scheme)) {
+
+	} else if validNetworkBoardURIRegexp.Match([]byte(deviceURI.Scheme)) {
+
+	} else {
+		formatter.PrintErrorMessage("Invalid device port type provided. Accepted types are: serial://, tty://, http://, https://, tcp://, udp://")
+		return nil
+	}
+
 	return nil
 }
