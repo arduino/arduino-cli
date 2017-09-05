@@ -141,6 +141,7 @@ func InitFlags() {
 
 	arduinoConfigCmd.ResetFlags()
 	arduinoConfigInitCmd.ResetFlags()
+	arduinoBoardAttachCmd.ResetFlags()
 
 	ArduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
 	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
