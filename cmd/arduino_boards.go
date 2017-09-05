@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/codeclysm/cc"
 
 	"github.com/bcmi-labs/arduino-modules/boards"
 
@@ -44,9 +45,27 @@ var arduinoBoardAttachCmd = &cobra.Command{
 func executeBoardListCommand(cmd *cobra.Command, args []string) {
 	monitor := discovery.New(time.Millisecond)
 	monitor.Start()
+	stoppable := cc.Run(func(stop chan struct{}) {
+		for {
+			select {
+			case <-stop:
+				fmt.Print("\r              ")
+				return
+			default:
+				fmt.Print("\rDiscovering.  ")
+				time.Sleep(time.Millisecond * 500)
+				fmt.Print("\rDiscovering.. ")
+				time.Sleep(time.Millisecond * 500)
+				fmt.Print("\rDiscovering...")
+				time.Sleep(time.Millisecond * 500)
+			}
 
-	time.Sleep(time.Second)
-
+		}
+	})
+	time.Sleep(time.Second * 5)
+	stoppable.Stop()
+	<-stoppable.Stopped
+	fmt.Print("\r")
 	formatter.Print(*monitor)
 	//monitor.Stop() //If called will slow like 1sec the program to close after print, with the same result (tested).
 	// it closes ungracefully, but at the end of the command we can't have races.
@@ -57,7 +76,7 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
 		return errors.New("Not accepting additional arguments")
 	}
 
-	monitor := discovery.New(time.Millisecond)
+	monitor := discovery.New(time.Second)
 	monitor.Start()
 
 	time.Sleep(time.Second)
