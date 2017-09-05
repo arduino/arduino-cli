@@ -155,6 +155,9 @@ func InitFlags() {
 
 	arduinoConfigInitCmd.Flags().BoolVar(&arduinoConfigInitFlags.Default, "default", false, "If omitted, ask questions to the user about setting configuration properties, otherwise use default configuration")
 	arduinoConfigInitCmd.Flags().StringVar(&arduinoConfigInitFlags.Location, "save-as", configs.FileLocation, "Sets where to save the configuration file [default is ./.cli-config.yml]")
+
+	arduinoBoardAttachCmd.Flags().StringVar(&arduinoBoardAttachFlags.BoardURI, "board", "", "The URI of the board to connect")
+	arduinoBoardAttachCmd.Flags().StringVar(&arduinoBoardAttachFlags.SketchName, "sketch", "", "The Name of the sketch to attach the board to")
 }
 
 // InitCommands reinitialize commands (useful for testing too)

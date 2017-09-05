@@ -2,8 +2,13 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"time"
+
+	"github.com/bcmi-labs/arduino-cli/common"
+
+	"github.com/bcmi-labs/arduino-modules/boards"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 
@@ -65,24 +70,21 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	homeFolder, err := common.GetDefaultArduinoHomeFolder()
-	if err != nil {
-		formatter.PrintErrorMessage("Cannot Parse Board Index file")
-		return nil
-	}
-
 	bs, err := boards.Find(packageFolder)
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot Parse Board Index file")
 		return nil
 	}
 
-	ss := sketches.Find(homeFolder)
-	sketch, exists := ss[arduinoBoardAttachFlags.SketchName]
-	if !exists {
-		formatter.PrintErrorMessage("Cannot find specified sketch in the Sketchbook")
-		return nil
-	}
+	/*
+		ss := sketches.Find(homeFolder)
+
+		_, exists := ss[arduinoBoardAttachFlags.SketchName]
+		if !exists {
+			formatter.PrintErrorMessage("Cannot find specified sketch in the Sketchbook")
+			return nil
+		}
+	*/
 
 	deviceURI, err := url.Parse(arduinoBoardAttachFlags.BoardURI)
 	if err != nil {
@@ -90,14 +92,63 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	if validSerialBoardURIRegexp.Match([]byte(deviceURI.Scheme)) {
+	var findBoardFunc func(boards.Boards, *discovery.Monitor, *url.URL) *boards.Board
 
-	} else if validNetworkBoardURIRegexp.Match([]byte(deviceURI.Scheme)) {
-
+	if validSerialBoardURIRegexp.Match([]byte(arduinoBoardAttachFlags.BoardURI)) {
+		findBoardFunc = findSerialConnectedBoard
+	} else if validNetworkBoardURIRegexp.Match([]byte(arduinoBoardAttachFlags.BoardURI)) {
+		findBoardFunc = findNetworkConnectedBoard
 	} else {
 		formatter.PrintErrorMessage("Invalid device port type provided. Accepted types are: serial://, tty://, http://, https://, tcp://, udp://")
 		return nil
 	}
 
+	board := findBoardFunc(bs, monitor, deviceURI)
+	fmt.Println(board.Fqbn)
 	return nil
+}
+
+// findSerialConnectedBoard find the board which is connected to the specified URI via serial port, using a monitor and a set of Boards
+// for the matching.
+func findSerialConnectedBoard(bs boards.Boards, monitor *discovery.Monitor, deviceURI *url.URL) *boards.Board {
+	found := false
+	var serialDevice discovery.SerialDevice
+	for _, device := range monitor.Serial() {
+		if device.Port == deviceURI.Path {
+			// Found the device !
+			found = true
+			serialDevice = *device
+		}
+	}
+	if !found {
+		formatter.PrintErrorMessage("No Supported board has been found at the specified board URI, try either install new cores or check your board URI")
+		return nil
+	}
+
+	fmt.Println()
+	fmt.Println("SUPPORTED BOARD FOUND:")
+	return bs.ByVidPid(serialDevice.VendorID, serialDevice.ProductID)
+}
+
+// findNetworkConnectedBoard find the board which is connected to the specified URI on the network, using a monitor and a set of Boards
+// for the matching.
+func findNetworkConnectedBoard(bs boards.Boards, monitor *discovery.Monitor, deviceURI *url.URL) *boards.Board {
+	found := false
+	var networkDevice discovery.NetworkDevice
+	for _, device := range monitor.Network() {
+		if device.Address == deviceURI.Host &&
+			fmt.Sprint(device.Port) == deviceURI.Port() {
+			// Found the device !
+			found = true
+			networkDevice = *device
+		}
+	}
+	if !found {
+		formatter.PrintErrorMessage("No Supported board has been found at the specified board URI, try either install new cores or check your board URI")
+		return nil
+	}
+
+	fmt.Println()
+	fmt.Println("SUPPORTED BOARD FOUND:")
+	return bs.ByID(networkDevice.Name)
 }
