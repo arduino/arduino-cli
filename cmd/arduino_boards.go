@@ -76,6 +76,14 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
 		return errors.New("Not accepting additional arguments")
 	}
 
+	if arduinoBoardAttachFlags.SketchName == "" {
+		return errors.New("No sketch name provided")
+	}
+
+	if arduinoBoardAttachFlags.BoardURI == "" {
+		return errors.New("No board URI provided")
+	}
+
 	monitor := discovery.New(time.Second)
 	monitor.Start()
 

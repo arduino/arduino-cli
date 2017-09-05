@@ -65,7 +65,13 @@ var validNetworkBoardURIRegexp = regexp.MustCompile("(http(s)?|(tc|ud)p)://[0-9]
 
 // arduinoConfigInitFlags represents `arduino board attach` flags.
 var arduinoBoardAttachFlags struct {
-	BoardURI   string // The URI of the board to attach: can be serial:// tty:// http:// https:// tcp:// udp:// referring to the validBoardURIRegexp variable.
-	SketchName string // The name of the sketch to attach to the board.
-	FromPath   string // The Path of the file to import and attach to the board.
+	BoardURI      string // The URI of the board to attach: can be serial:// tty:// http:// https:// tcp:// udp:// referring to the validBoardURIRegexp variable.
+	BoardFlavour  string // The flavour of the chipset of the cpu of the connected board, if not specified it is set to "default".
+	SketchName    string // The name of the sketch to attach to the board.
+	FromPath      string // The Path of the file to import and attach to the board.
+	SearchTimeout string // Expressed in a parsable duration, is the timeout for the list and attach commands
+}
+
+var arduinoBoardListFlags struct {
+	SearchTimeout string // Expressed in a parsable duration, is the timeout for the list and attach commands
 }

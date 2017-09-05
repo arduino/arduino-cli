@@ -157,8 +157,12 @@ func InitFlags() {
 	arduinoConfigInitCmd.Flags().BoolVar(&arduinoConfigInitFlags.Default, "default", false, "If omitted, ask questions to the user about setting configuration properties, otherwise use default configuration")
 	arduinoConfigInitCmd.Flags().StringVar(&arduinoConfigInitFlags.Location, "save-as", configs.FileLocation, "Sets where to save the configuration file [default is ./.cli-config.yml]")
 
+	arduinoBoardListCmd.Flags().StringVar(&arduinoBoardListFlags.SearchTimeout, "timeout", "5s", "The timeout of the search of connected devices, try to high it if your board is not found (e.g. to 10s)")
+
 	arduinoBoardAttachCmd.Flags().StringVar(&arduinoBoardAttachFlags.BoardURI, "board", "", "The URI of the board to connect")
+	arduinoBoardAttachCmd.Flags().StringVar(&arduinoBoardAttachFlags.BoardFlavour, "flavour", "default", "The Name of the CPU flavour, it is required for some boards (e.g. Arduino Nano)")
 	arduinoBoardAttachCmd.Flags().StringVar(&arduinoBoardAttachFlags.SketchName, "sketch", "", "The Name of the sketch to attach the board to")
+	arduinoBoardAttachCmd.Flags().StringVar(&arduinoBoardAttachFlags.SearchTimeout, "timeout", "5s", "The timeout of the search of connected devices, try to high it if your board is not found (e.g. to 10s)")
 }
 
 // InitCommands reinitialize commands (useful for testing too)
