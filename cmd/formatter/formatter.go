@@ -113,10 +113,12 @@ func Print(msg interface{}) error {
 // It can be used for an unified implementation.
 func defaultPrintFunc(f Formatter, msg interface{}) error {
 	val, err := f.Format(msg)
-	if err == nil {
-		fmt.Println(strings.TrimSpace(val))
-	} else {
-		fmt.Println(strings.TrimSpace(err.Error()))
+	if val != "" {
+		if err == nil {
+			fmt.Println(strings.TrimSpace(val))
+		} else {
+			fmt.Println(strings.TrimSpace(err.Error()))
+		}
 	}
 	return err
 }
