@@ -129,7 +129,6 @@ func ExampleJSONFormatter_Print_debug() {
 	jf.Print(newValue)
 	// Output:
 	// {"value":20}
-	//
 	// {"value":20}
 	// Only structs and maps values are accepted
 	// {"value2":10}

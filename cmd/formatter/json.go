@@ -32,6 +32,7 @@ package formatter
 import "encoding/json"
 import "reflect"
 import "errors"
+import "fmt"
 
 //JSONFormatter represents a Printer and Formatter of JSON objects.
 type JSONFormatter struct {
@@ -48,7 +49,7 @@ func (jf JSONFormatter) Format(msg interface{}) (string, error) {
 		ret, err := json.Marshal(msg)
 		return string(ret), err
 	} else if jf.Debug {
-		return "", errors.New("Only structs and maps values are accepted")
+		return fmt.Sprint(msg), errors.New("Only structs and maps values are accepted")
 	}
 	return "", nil
 }
