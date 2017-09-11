@@ -1,4 +1,4 @@
-Authorization (auth) package
+= Authorization (auth) package
 Alessandro Sanino <a.sanino@arduino.cc>
 
 This package allows to connect via OAuth2.0 to the arduino.cc system (Hydra)

@@ -27,36 +27,4 @@
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package cores
-
-//Package represents a package in the system.
-type Package struct {
-	Name       string           // Name of the package.
-	Maintainer string           // Name of the maintainer.
-	WebsiteURL string           // Website of maintainer.
-	Email      string           // Email of maintainer.
-	Cores      map[string]*Core // The cores in the system.
-	Tools      map[string]*Tool // The tools in the system.
-}
-
-// addCore adds a core to the context.
-func (pm *Package) addCore(indexCore *indexCoreRelease) {
-	name := indexCore.Architecture
-	if pm.Cores[name] == nil {
-		pm.Cores[name] = indexCore.extractCore()
-	} else {
-		release := indexCore.extractRelease()
-		core := pm.Cores[name]
-		core.Releases[release.Version] = release
-	}
-}
-
-// addTool adds a tool to the context.
-func (pm *Package) addTool(indexTool *indexToolRelease) {
-	name := indexTool.Name
-	if pm.Tools[name] == nil {
-		pm.Tools[name] = indexTool.extractTool()
-	} else {
-		pm.Tools[name].Releases[indexTool.Version] = indexTool.extractRelease()
-	}
-}
+package cmd

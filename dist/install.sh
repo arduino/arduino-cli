@@ -26,7 +26,7 @@
 # invalidate any other reasons why the executable file might be covered by
 # the GNU General Public License.
 #
-# Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
+# Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
 
 #Arduino CLI install script
 #Assumes installation from folder cloned from github
