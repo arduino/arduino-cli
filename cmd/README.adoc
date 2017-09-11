@@ -1,5 +1,5 @@
 = cmd.adoc
-Alessandro Sanino <a.sanino@bcmi-labs.cc>
+Alessandro Sanino <a.sanino@arduino.cc>
 
 This package has all info regarding commands structure.
 Made using Cobra Commander.

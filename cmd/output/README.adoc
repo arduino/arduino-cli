@@ -2,7 +2,7 @@
 :pygments-style: manni
 
 = Output Package
-Alessandro Sanino <a.sanino@bcmi-labs.cc>
+Alessandro Sanino <a.sanino@arduino.cc>
 
 This package provides structs and helpers to be used in the rest of the project.
 

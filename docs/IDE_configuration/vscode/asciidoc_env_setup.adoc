@@ -3,7 +3,7 @@
 
 = Asciidoc in VS Code
 Setup a fully working asciidoc environment in Visual Studio Code.
-Alessandro Sanino <a.sanino@bcmi-labs.cc>
+Alessandro Sanino <a.sanino@arduino.cc>
 
 . Install Ascii Doctor (needs Python installed)
 +

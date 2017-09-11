@@ -1,5 +1,5 @@
 = Formatters Package
-Alessandro Sanino <a.sanino@bcmi-labs.cc>
+Alessandro Sanino <a.sanino@arduino.cc>
 :source-highlighter: pygments
 :pygments-style: manni
 

@@ -1,5 +1,5 @@
 = Man Pages of Arduino CLI
-Alessandro Sanino <a.sanino@bcmi-labs.cc>
+Alessandro Sanino <a.sanino@arduino.cc>
 
 In this folder there are the man page files for Arduino CLI.
 

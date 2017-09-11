@@ -1,5 +1,5 @@
 = Releases sub-package
-Alessandro Sanino <a.sanino@bcmi-labs.cc>
+Alessandro Sanino <a.sanino@arduino.cc>
 
 This package allows to handle all types of releases (Libraries, Cores and Tools)
 

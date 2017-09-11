@@ -1,5 +1,5 @@
 = arduino-cli
-Alessandro Sanino <a.sanino@bcmi-labs.cc>
+Alessandro Sanino <a.sanino@arduino.cc>
 
 https://drone.arduino.cc/bcmi-labs/arduino-cli[image:https://drone.arduino.cc/api/badges/bcmi-labs/arduino-cli/status.svg[Build Status]]
 

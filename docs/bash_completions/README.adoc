@@ -1,5 +1,5 @@
 = Bash Autocompletion 
-Alessandro Sanino <a.sanino@bcmi-labs.cc>
+Alessandro Sanino <a.sanino@arduino.cc>
 
 File contained in this directory is the file to allow autocompletion of the arduino CLI commands (for bash only, but similar for
 other shells).

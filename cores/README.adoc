@@ -1,0 +1,13 @@
+= Cores (and Tools) package
+Alessandro Sanino <a.sanno@arduino.cc>
+
+This package allows to handle all cores and tools features for the CLI.
+
+The `cores` is divided in 2 pseudo packages, one regarding tools and one regarding cores.
+
+==== The cores download process
+Cores are downloaded after their dependencies have been at least cached into the system.
+
+Tools cannot be downloaded directly, they are downloaded if needed by a core.
+
+Downloads are executed in parallel using `releases.ParallelDownload()` function.

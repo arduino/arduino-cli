@@ -1,0 +1,37 @@
+Authorization (auth) package
+Alessandro Sanino <a.sanino@arduino.cc>
+
+This package allows to connect via OAuth2.0 to the arduino.cc system (Hydra)
+
+See test package for an example of usage.
+
+==== Basic usage
+[source, go]
+----
+// Just create a new auth object.
+authObj := auth.New()
+token, err := auth.Token(testUser, testPass)
+if err != nil {
+	// Handle error
+}
+
+// Then use the generated token in your requests, for example:
+// Obtain info of my user.
+req, err := http.NewRequest("GET", "https://auth.arduino.cc/v1/users/byID/me", nil)
+if err != nil {
+	// Handle error
+}
+req.Header.Add("Authorization", "Bearer "+token.Access)
+client := http.Client{}
+resp, err := client.Do(req)
+if err != nil {
+	// Handle error
+}
+
+// Before your token expires, you can do a refresh to have a new one for the 
+// same session:
+newToken, err := auth.Refresh(token.Access)
+if err != nil {
+	// Handle error
+}
+----
