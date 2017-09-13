@@ -72,6 +72,18 @@ var arduinoBoardAttachFlags struct {
 	SearchTimeout string // Expressed in a parsable duration, is the timeout for the list and attach commands
 }
 
+// arduinoBoardListFlags represents `arduino board list` flags.
 var arduinoBoardListFlags struct {
 	SearchTimeout string // Expressed in a parsable duration, is the timeout for the list and attach commands
+}
+
+// arduinoSketchSyncFlags represents `arduino sketch sync` flags.
+var arduinoSketchSyncFlags struct {
+	Priority string // The Prioritary resource when we have conflicts. Can be local, remote, skip-conflict.
+}
+
+// arduinoLoginFlags represents `arduino login` flags.
+var arduinoLoginFlags struct {
+	User     string // The user who asks to login.
+	Password string // The password used to authenticate.
 }

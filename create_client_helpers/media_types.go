@@ -30,10 +30,11 @@
 package createClient
 
 import (
-	"github.com/goadesign/goa"
-	uuid "github.com/goadesign/goa/uuid"
 	"net/http"
 	"time"
+
+	"github.com/goadesign/goa"
+	uuid "github.com/goadesign/goa/uuid"
 )
 
 // A file saved on the virtual filesystem (default view)
@@ -262,99 +263,6 @@ func (mt *ArduinoCreateSketches) Validate() (err error) {
 // DecodeArduinoCreateSketches decodes the ArduinoCreateSketches instance encoded in resp body.
 func (c *Client) DecodeArduinoCreateSketches(resp *http.Response) (*ArduinoCreateSketches, error) {
 	var decoded ArduinoCreateSketches
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
-
-// A user registered with the create service (default view)
-//
-// Identifier: application/vnd.arduino.create.user+json; view=default
-type ArduinoCreateUser struct {
-	// When the user was activated in the create service
-	Activated *time.Time `form:"activated,omitempty" json:"activated,omitempty" xml:"activated,omitempty"`
-	// When the user was created in the create service
-	Created *time.Time `form:"created,omitempty" json:"created,omitempty" xml:"created,omitempty"`
-	Email   *string    `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	// The id of the user
-	ID     *string                  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Limits *ArduinoCreateUserLimits `form:"limits,omitempty" json:"limits,omitempty" xml:"limits,omitempty"`
-	Prefs  *ArduinoCreateUserPrefs  `form:"prefs,omitempty" json:"prefs,omitempty" xml:"prefs,omitempty"`
-}
-
-// DecodeArduinoCreateUser decodes the ArduinoCreateUser instance encoded in resp body.
-func (c *Client) DecodeArduinoCreateUser(resp *http.Response) (*ArduinoCreateUser, error) {
-	var decoded ArduinoCreateUser
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
-
-// The limits of the user (default view)
-//
-// Identifier: application/vnd.arduino.create.user.limits+json; view=default
-type ArduinoCreateUserLimits struct {
-	// The maximum number of compilations in 24 hours
-	Compilations *int `form:"compilations,omitempty" json:"compilations,omitempty" xml:"compilations,omitempty"`
-	// The total space available to the user, in kb
-	Disk *int `form:"disk,omitempty" json:"disk,omitempty" xml:"disk,omitempty"`
-	// The maximum number of sketches they can have
-	Sketches *int `form:"sketches,omitempty" json:"sketches,omitempty" xml:"sketches,omitempty"`
-}
-
-// DecodeArduinoCreateUserLimits decodes the ArduinoCreateUserLimits instance encoded in resp body.
-func (c *Client) DecodeArduinoCreateUserLimits(resp *http.Response) (*ArduinoCreateUserLimits, error) {
-	var decoded ArduinoCreateUserLimits
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
-
-// The user preferences about create (default view)
-//
-// Identifier: application/vnd.arduino.create.user.prefs+json; view=default
-type ArduinoCreateUserPrefs struct {
-	// Save every few seconds
-	Autosave *bool `form:"autosave,omitempty" json:"autosave,omitempty" xml:"autosave,omitempty"`
-	// The size of the text
-	FontSize *int `form:"font_size,omitempty" json:"font_size,omitempty" xml:"font_size,omitempty"`
-	// Hide the verbose panel
-	HidePanel *bool `form:"hide_panel,omitempty" json:"hide_panel,omitempty" xml:"hide_panel,omitempty"`
-	// Save when compiling
-	SaveOnBuild *bool `form:"save_on_build,omitempty" json:"save_on_build,omitempty" xml:"save_on_build,omitempty"`
-	// Show all files
-	ShowAllContent *bool `form:"show_all_content,omitempty" json:"show_all_content,omitempty" xml:"show_all_content,omitempty"`
-	// The editor theme
-	Skin *string `form:"skin,omitempty" json:"skin,omitempty" xml:"skin,omitempty"`
-	// Show verbose output
-	Verbose *bool `form:"verbose,omitempty" json:"verbose,omitempty" xml:"verbose,omitempty"`
-	// DEPRECATED. Use hide_panel instead
-	VerboseAlwaysVisible *bool `form:"verbose_always_visible,omitempty" json:"verbose_always_visible,omitempty" xml:"verbose_always_visible,omitempty"`
-}
-
-// DecodeArduinoCreateUserPrefs decodes the ArduinoCreateUserPrefs instance encoded in resp body.
-func (c *Client) DecodeArduinoCreateUserPrefs(resp *http.Response) (*ArduinoCreateUserPrefs, error) {
-	var decoded ArduinoCreateUserPrefs
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
-
-// The stats about the user (default view)
-//
-// Identifier: application/vnd.arduino.create.user.stats+json; view=default
-type ArduinoCreateUserStats struct {
-	// The number of compilations made in the last 24 hours
-	Compilations *int `form:"compilations,omitempty" json:"compilations,omitempty" xml:"compilations,omitempty"`
-	// The space used by the user's libraries, in kb
-	DiskLibraries *int `form:"disk_libraries,omitempty" json:"disk_libraries,omitempty" xml:"disk_libraries,omitempty"`
-	// The space used by the user's sketches, in kb
-	DiskSketches *int `form:"disk_sketches,omitempty" json:"disk_sketches,omitempty" xml:"disk_sketches,omitempty"`
-	// The number of libraries they own
-	Libraries *int `form:"libraries,omitempty" json:"libraries,omitempty" xml:"libraries,omitempty"`
-	// The number of sketches they own
-	Sketches *int `form:"sketches,omitempty" json:"sketches,omitempty" xml:"sketches,omitempty"`
-}
-
-// DecodeArduinoCreateUserStats decodes the ArduinoCreateUserStats instance encoded in resp body.
-func (c *Client) DecodeArduinoCreateUserStats(resp *http.Response) (*ArduinoCreateUserStats, error) {
-	var decoded ArduinoCreateUserStats
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }

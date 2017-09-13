@@ -31,12 +31,21 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
+	"syscall"
+
+	"github.com/bgentry/go-netrc/netrc"
+	"github.com/mitchellh/go-homedir"
+
+	"golang.org/x/crypto/ssh/terminal"
 
 	"github.com/spf13/cobra"
 	"github.com/theherk/viper"
 
+	"github.com/bcmi-labs/arduino-cli/auth"
 	"github.com/bcmi-labs/arduino-cli/common"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
@@ -95,6 +104,16 @@ var arduinoVersionCmd = &cobra.Command{
 	Example: `arduino version     # for the versions of all components.
 arduino lib version # for the version of the lib component.
 arduino core version # for the version of the core component.`,
+}
+
+var arduinoLoginCmd = &cobra.Command{
+	Use:   `login [--user USER --password PASSWORD | --user USER`,
+	Short: `create default credentials for an Arduino Create Session`,
+	Long:  `create default credentials for an Arduino Create Session`,
+	Example: `arduino login                          # Asks all credentials.
+arduino login --user myUser --password MySecretPassword
+arduino login --user myUser --password # Asks to write the password inside the command instead of having it in clear.`,
+	Run: executeLoginCommand,
 }
 
 var bundled bool
@@ -165,6 +184,10 @@ func InitFlags() {
 	arduinoBoardAttachCmd.Flags().StringVar(&arduinoBoardAttachFlags.BoardFlavour, "flavour", "default", "The Name of the CPU flavour, it is required for some boards (e.g. Arduino Nano)")
 	arduinoBoardAttachCmd.Flags().StringVar(&arduinoBoardAttachFlags.SketchName, "sketch", "", "The Name of the sketch to attach the board to")
 	arduinoBoardAttachCmd.Flags().StringVar(&arduinoBoardAttachFlags.SearchTimeout, "timeout", "5s", "The timeout of the search of connected devices, try to high it if your board is not found (e.g. to 10s)")
+
+	arduinoSketchSyncCmd.Flags().StringVar(&arduinoSketchSyncFlags.Priority, "priority", "skip-conflict", "The Prioritary resource when we have conflicts. Can be local, remote, skip-conflict.")
+	arduinoLoginCmd.Flags().StringVarP(&arduinoLoginFlags.User, "user", "u", "", "The username used to log in")
+	arduinoLoginCmd.Flags().StringVarP(&arduinoLoginFlags.Password, "password", "p", "unspecified-totally-really-no-one-thought-to-put-a-valid_value", "The username used to log in")
 }
 
 // InitCommands reinitialize commands (useful for testing too)
@@ -175,7 +198,7 @@ func InitCommands() {
 	arduinoConfigCmd.ResetCommands()
 	arduinoBoardCmd.ResetCommands()
 
-	ArduinoCmd.AddCommand(arduinoVersionCmd, arduinoLibCmd, arduinoCoreCmd, arduinoConfigCmd, arduinoBoardCmd)
+	ArduinoCmd.AddCommand(arduinoVersionCmd, arduinoLibCmd, arduinoCoreCmd, arduinoConfigCmd, arduinoBoardCmd, arduinoSketchCmd)
 
 	arduinoLibCmd.AddCommand(arduinoLibInstallCmd, arduinoLibUninstallCmd, arduinoLibSearchCmd,
 		arduinoLibVersionCmd, arduinoLibListCmd, arduinoLibDownloadCmd)
@@ -186,6 +209,8 @@ func InitCommands() {
 	arduinoConfigCmd.AddCommand(arduinoConfigInitCmd)
 
 	arduinoBoardCmd.AddCommand(arduinoBoardListCmd, arduinoBoardAttachCmd)
+
+	arduinoSketchCmd.AddCommand(arduinoSketchSyncCmd)
 }
 
 // InitConfigs initializes the configuration from the specified file.
@@ -201,7 +226,6 @@ func InitConfigs() {
 	common.ArduinoDataFolder = GlobalFlags.Configs.ArduinoDataFolder
 	common.ArduinoIDEFolder = configs.ArduinoIDEFolder
 	common.SketchbookFolder = GlobalFlags.Configs.SketchbookPath
-
 }
 
 // IgnoreConfigs is used in tests to ignore the config file.
@@ -357,4 +381,65 @@ func initViper() {
 		}
 
 	}
+}
+
+func executeLoginCommand(cmd *cobra.Command, args []string) {
+	userEmpty := arduinoLoginFlags.User == ""
+	passwordEmpty := arduinoLoginFlags.Password == ""
+	isTextMode := formatter.IsCurrentFormat("text")
+	if isTextMode && (userEmpty || passwordEmpty) {
+		formatter.PrintErrorMessage("User and password must be specified outside of text format")
+		return
+	}
+
+	if userEmpty {
+		fmt.Print("Username: ")
+		fmt.Scanln(&arduinoLoginFlags.User)
+	}
+
+	if passwordEmpty {
+		fmt.Print("Password: ")
+		pass, err := terminal.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			formatter.PrintErrorMessage("Cannot read password, login aborted")
+		}
+		arduinoLoginFlags.Password = string(pass)
+	}
+
+	//save into netrc
+	netRCHome, err := homedir.Dir()
+	if err != nil {
+		formatter.PrintError(err)
+		return
+	}
+
+	netRCFile := filepath.Join(netRCHome, ".netrc")
+	NetRC, err := netrc.ParseFile(netRCFile)
+	if err != nil {
+		formatter.PrintError(err)
+		return
+	}
+
+	usr := arduinoLoginFlags.User
+	pwd := arduinoLoginFlags.Password
+	authConf := auth.New()
+
+	token, err := authConf.Token(usr, pwd)
+	if err != nil {
+		formatter.PrintError(err)
+	}
+
+	NetRC.NewMachine("arduino.cc", usr, token.Access, "arduino-cli")
+	content, err := NetRC.MarshalText()
+	if err != nil {
+		formatter.PrintError(err)
+	}
+
+	err = ioutil.WriteFile(netRCFile, content, 0666)
+	if err != nil {
+		formatter.PrintError(err)
+	}
+
+	formatter.PrintResult(`Successfully logged into the system
+The session will continue to be refreshed with every call of the CLI and will expire if not used`)
 }

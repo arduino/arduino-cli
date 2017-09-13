@@ -218,7 +218,6 @@ func (c *Client) NewShowSketchesRequest(ctx context.Context, path string, author
 	}
 	header := req.Header
 	if authorization != nil {
-
 		header.Set("Authorization", *authorization)
 	}
 	return req, nil
