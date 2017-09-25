@@ -436,17 +436,21 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 	token, err := authConf.Token(usr, pwd)
 	if err != nil {
 		formatter.PrintError(err)
+		return
 	}
 
-	NetRC.NewMachine("arduino.cc", usr, token.Access, "arduino-cli")
+	NetRC.RemoveMachine("arduino.cc")
+	NetRC.NewMachine("arduino.cc", usr, token.Access, token.Refresh)
 	content, err := NetRC.MarshalText()
 	if err != nil {
 		formatter.PrintError(err)
+		return
 	}
 
 	err = ioutil.WriteFile(netRCFile, content, 0666)
 	if err != nil {
 		formatter.PrintError(err)
+		return
 	}
 
 	formatter.PrintResult(`Successfully logged into the system

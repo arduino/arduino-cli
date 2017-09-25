@@ -30,6 +30,9 @@
 package createClient
 
 import (
+	"encoding/base64"
+	"fmt"
+
 	"github.com/bcmi-labs/arduino-modules/sketches"
 )
 
@@ -63,7 +66,9 @@ type Sketch struct {
 }
 
 func ConvertFrom(sketch sketches.Sketch) *Sketch {
-	ino := string(sketch.Ino.Data)
+	var temp []byte
+	base64.StdEncoding.Encode(temp, sketch.Ino.Data)
+	ino := string(temp)
 	ret := Sketch{
 		Name:   sketch.Name,
 		Folder: &sketch.Path,
@@ -78,12 +83,15 @@ func ConvertFrom(sketch sketches.Sketch) *Sketch {
 	}
 	ret.Files = make([]*File, len(sketch.Files))
 	for i, f := range sketch.Files {
-		data := string(f.Data)
+		base64.StdEncoding.Encode(temp, f.Data)
+		data := string(temp)
 		ret.Files[i] = &File{
 			Data: &data,
 			Name: f.Name,
 		}
 	}
+	fmt.Println(sketch.Metadata.CPU.Fqbn)
+	fmt.Println(*ret.Metadata.CPU.Fqbn)
 	return &ret
 }
 

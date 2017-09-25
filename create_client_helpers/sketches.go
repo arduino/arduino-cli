@@ -42,6 +42,12 @@ func CreateSketchesPath() string {
 	return fmt.Sprintf("/create/v1/sketches")
 }
 
+const (
+	devURL  = "api-dev.arduino.cc"
+	prodURL = "api.arduino.cc"
+	prod    = false
+)
+
 // CreateSketches Adds a new sketch.
 func (c *Client) CreateSketches(ctx context.Context, path string, payload *Sketch, authorization string) (*http.Response, error) {
 	req, err := c.NewCreateSketchesRequest(ctx, path, payload, authorization)
@@ -61,6 +67,11 @@ func (c *Client) NewCreateSketchesRequest(ctx context.Context, path string, payl
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
+	}
+	if prod {
+		path = prodURL + path
+	} else {
+		path = devURL + path
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("PUT", u.String(), &body)
@@ -94,6 +105,11 @@ func (c *Client) NewDeleteSketchesRequest(ctx context.Context, path string, auth
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
+	}
+	if prod {
+		path = prodURL + path
+	} else {
+		path = devURL + path
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("DELETE", u.String(), nil)
@@ -135,6 +151,11 @@ func (c *Client) NewEditSketchesRequest(ctx context.Context, path string, payloa
 	if scheme == "" {
 		scheme = "http"
 	}
+	if prod {
+		path = prodURL + path
+	} else {
+		path = devURL + path
+	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("POST", u.String(), &body)
 	if err != nil {
@@ -167,6 +188,11 @@ func (c *Client) NewSearchSketchesRequest(ctx context.Context, path string, offs
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
+	}
+	if prod {
+		path = prodURL + path
+	} else {
+		path = devURL + path
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
@@ -210,6 +236,11 @@ func (c *Client) NewShowSketchesRequest(ctx context.Context, path string, author
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
+	}
+	if prod {
+		path = prodURL + path
+	} else {
+		path = devURL + path
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)

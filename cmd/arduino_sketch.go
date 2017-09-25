@@ -32,7 +32,6 @@ package cmd
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -96,21 +95,19 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 
 	client := createClient.New(nil)
 	tok := "Bearer " + bearerToken
-	resp, err := client.SearchSketches(context.Background(), "", nil, nil, &tok)
+	resp, err := client.SearchSketches(context.Background(), createClient.SearchSketchesPath(), nil, nil, &tok)
 	if err != nil {
+		//formatter.Print(err)
 		formatter.PrintErrorMessage("Cannot get create sketches, sync failed")
 		return nil
 	}
 	defer resp.Body.Close()
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		formatter.PrintErrorMessage("Cannot get create sketches, sync failed")
-		return nil
-	}
 
-	var onlineSketches createClient.ArduinoCreateSketches
-	err = json.Unmarshal(content, resp)
+	onlineSketches, err := client.DecodeArduinoCreateSketches(resp)
 	if err != nil {
+		content, _ := ioutil.ReadAll(resp.Body)
+		formatter.PrintResult(content)
+		formatter.Print(err)
 		formatter.PrintErrorMessage("Cannot unmarshal response from create, sync failed")
 		return nil
 	}
@@ -293,7 +290,11 @@ func login() (string, error) {
 	}
 
 	netRCFile := filepath.Join(home, ".netrc")
-	NetRC, err := netrc.ParseFile(netRCFile)
+	file, err := os.OpenFile(netRCFile, os.O_CREATE|os.O_RDONLY, 0666)
+	if err != nil {
+		return "", err
+	}
+	NetRC, err := netrc.Parse(file)
 	if err != nil {
 		return "", err
 	}
@@ -308,7 +309,15 @@ func login() (string, error) {
 		return "", err
 	}
 
-	arduinoMachine.UpdatePassword(newToken.Access)
+	var token string
+	if newToken.TTL != 0 { //we haven't recently requested a valid token, which is in .netrc under "account", so we have to update it
+		arduinoMachine.UpdatePassword(newToken.Refresh)
+		arduinoMachine.UpdateAccount(newToken.Access)
+		token = newToken.Access
+	} else {
+		token = arduinoMachine.Account
+	}
+
 	content, err := NetRC.MarshalText()
 	if err == nil { //serialize new info
 		err := ioutil.WriteFile(netRCFile, content, 0666)
@@ -318,5 +327,5 @@ func login() (string, error) {
 	} else if GlobalFlags.Verbose > 0 {
 		formatter.Print(err.Error())
 	}
-	return newToken.Access, nil
+	return token, nil
 }
