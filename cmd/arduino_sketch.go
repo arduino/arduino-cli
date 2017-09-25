@@ -105,8 +105,6 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 
 	onlineSketches, err := client.DecodeArduinoCreateSketches(resp)
 	if err != nil {
-
-		fmt.Println(ioutil.ReadAll(resp.Body))
 		formatter.PrintErrorMessage("Cannot unmarshal response from create, sync failed")
 		return nil
 	}
@@ -117,6 +115,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	for _, item := range sketchMap {
+
 		itemOnline, hasConflict := onlineSketchesMap[item.Name]
 		if hasConflict {
 			//solve conflicts
@@ -141,11 +140,17 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 			switch priority {
 			case "remote":
 				formatter.Print("pushing edits of sketch: " + item.Name)
-				editSketch(*item, sketchbook, bearerToken)
+				err := editSketch(*item, sketchbook, bearerToken)
+				if err != nil {
+					formatter.PrintError(err)
+				}
 				break
 			case "local":
 				formatter.Print("pulling " + item.Name)
-				pullSketch(itemOnline, sketchbook, bearerToken)
+				err := pullSketch(itemOnline, sketchbook, bearerToken)
+				if err != nil {
+					formatter.PrintError(err)
+				}
 				break
 			case "skip-conflict":
 				formatter.Print("skipping " + item.Name)
@@ -156,17 +161,15 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 					formatter.Print("Priority not recognized, using skip-conflict")
 				}
 				formatter.Print("skipping " + item.Name)
-				break
 			}
 
-			delete(onlineSketchesMap, fmt.Sprint(item.ID))
 		} else { //only local, push
 			formatter.Print("pushing " + item.Name)
 			pushSketch(*item, sketchbook, bearerToken)
 		}
 	}
 	for _, item := range onlineSketches.Sketches {
-		_, hasConflict := onlineSketchesMap[fmt.Sprint(item.ID)]
+		_, hasConflict := onlineSketchesMap[*item.Name]
 		if hasConflict {
 			continue
 		}
@@ -260,51 +263,39 @@ func pullSketch(sketch *createClient.ArduinoCreateSketch, sketchbook string, bea
 
 	destFolder := filepath.Join(sketchbook, *sketch.Name)
 
-	resp, err = client.ShowFiles(context.Background(), *sketch.Ino.Path)
-	if err != nil {
-		return err
-	}
-
-	for _, file := range r.Files {
-		urlPath := strings.Split(*file.Path, ":")[1]
+	for _, file := range append(r.Files, sketch.Ino) {
 		path := findPathOf(*sketch.Name, *file.Path)
-		path = filepath.Join(sketchFolder, path)
 
 		err := os.MkdirAll(filepath.Dir(path), 0755)
 		if err != nil {
 			return err
 		}
-		resp, err := client.ShowFiles(context.Background(), "/"+urlPath)
+
+		resp, err := client.ShowFiles(context.Background(), createClient.ShowFilesPath("sketch", sketch.ID.String(), path))
 		if err != nil {
 			return err
 		}
-
 		filewithData, err := client.DecodeArduinoCreateFile(resp)
 		if err != nil {
-			return err
-		}
-		if resp.StatusCode != 200 {
-			errResp, err := client.DecodeErrorResponse(resp)
-			if err != nil {
-				return errors.New(resp.Status)
+			if resp.StatusCode != 200 {
+				errResp, err := client.DecodeErrorResponse(resp)
+				if err != nil {
+					return errors.New(resp.Status)
+				}
+				return errResp
 			}
-			return errResp
 		}
 
-		encodedData, err := base64.StdEncoding.DecodeString(*filewithData.Data)
+		path = filepath.Join(sketchFolder, path)
+		decodedData, err := base64.StdEncoding.DecodeString(*filewithData.Data)
 		if err != nil {
 			return err
 		}
 
-		err = ioutil.WriteFile(path, encodedData, 0666)
+		err = ioutil.WriteFile(path, decodedData, 0666)
 		if err != nil {
 			return errors.New("Copy of a file of the downloaded sketch failed, sync failed")
 		}
-	}
-	encodedData, err := base64.StdEncoding.DecodeString(*sketch.Ino.Data)
-	err = ioutil.WriteFile(filepath.Join(sketchFolder, *sketch.Ino.Name), encodedData, 0666)
-	if err != nil {
-		return errors.New("Copy of a file of the downloaded sketch failed, sync failed")
 	}
 
 	err = os.RemoveAll(destFolder)
@@ -323,7 +314,7 @@ func findPathOf(sketchName string, path string) string {
 	list := strings.Split(path, "/")
 
 	for i := len(list) - 1; i > -1; i-- {
-		fmt.Println(list[i], "==", sketchName, "?")
+		//fmt.Println(list[i], "==", sketchName, "?", list[i] == sketchName)
 		if list[i] == sketchName {
 			return filepath.Join(list[i+1 : len(list)]...)
 		}
