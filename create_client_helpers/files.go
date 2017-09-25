@@ -60,6 +60,11 @@ func (c *Client) NewShowFilesRequest(ctx context.Context, path string) (*http.Re
 	if scheme == "" {
 		scheme = "http"
 	}
+	if prod {
+		path = prodURL + path
+	} else {
+		path = devURL + path
+	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {

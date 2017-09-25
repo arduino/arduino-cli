@@ -31,7 +31,8 @@ package createClient
 
 import (
 	"encoding/base64"
-	"fmt"
+	"io/ioutil"
+	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-modules/sketches"
 )
@@ -65,10 +66,15 @@ type Sketch struct {
 	Types []string `form:"types,omitempty" json:"types,omitempty" xml:"types,omitempty"`
 }
 
+//ConvertFrom converts from a local sketch to an Arduino Create sketch.
 func ConvertFrom(sketch sketches.Sketch) *Sketch {
-	var temp []byte
-	base64.StdEncoding.Encode(temp, sketch.Ino.Data)
-	ino := string(temp)
+	_, inoPath := filepath.Split(sketch.Ino.Path)
+	content, err := ioutil.ReadFile(filepath.Join(sketch.FullPath, inoPath))
+	if err != nil {
+		return nil
+	}
+
+	ino := base64.StdEncoding.EncodeToString(content)
 	ret := Sketch{
 		Name:   sketch.Name,
 		Folder: &sketch.Path,
@@ -83,15 +89,18 @@ func ConvertFrom(sketch sketches.Sketch) *Sketch {
 	}
 	ret.Files = make([]*File, len(sketch.Files))
 	for i, f := range sketch.Files {
-		base64.StdEncoding.Encode(temp, f.Data)
-		data := string(temp)
+		_, filePath := filepath.Split(f.Path)
+		content, err := ioutil.ReadFile(filepath.Join(sketch.FullPath, filePath))
+		if err != nil {
+			return nil
+		}
+
+		data := base64.StdEncoding.EncodeToString(content)
 		ret.Files[i] = &File{
 			Data: &data,
 			Name: f.Name,
 		}
 	}
-	fmt.Println(sketch.Metadata.CPU.Fqbn)
-	fmt.Println(*ret.Metadata.CPU.Fqbn)
 	return &ret
 }
 

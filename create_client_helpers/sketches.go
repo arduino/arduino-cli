@@ -45,7 +45,7 @@ func CreateSketchesPath() string {
 const (
 	devURL  = "api-dev.arduino.cc"
 	prodURL = "api.arduino.cc"
-	prod    = false
+	prod    = true
 )
 
 // CreateSketches Adds a new sketch.

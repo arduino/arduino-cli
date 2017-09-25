@@ -37,6 +37,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/auth"
 	"github.com/bcmi-labs/arduino-cli/create_client_helpers"
@@ -82,7 +83,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	bearerToken, err := login()
+	username, bearerToken, err := login()
 	if err != nil {
 		if GlobalFlags.Verbose == 0 {
 			formatter.PrintErrorMessage("Cannot login automatically: try arduino login the run again this command")
@@ -91,13 +92,12 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	sketchMap := sketches.Find(sketchbook)
+	sketchMap := sketches.Find(sketchbook, "libraries") //exclude libraries folder
 
 	client := createClient.New(nil)
 	tok := "Bearer " + bearerToken
-	resp, err := client.SearchSketches(context.Background(), createClient.SearchSketchesPath(), nil, nil, &tok)
+	resp, err := client.SearchSketches(context.Background(), createClient.SearchSketchesPath(), nil, &username, &tok)
 	if err != nil {
-		//formatter.Print(err)
 		formatter.PrintErrorMessage("Cannot get create sketches, sync failed")
 		return nil
 	}
@@ -105,20 +105,19 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 
 	onlineSketches, err := client.DecodeArduinoCreateSketches(resp)
 	if err != nil {
-		content, _ := ioutil.ReadAll(resp.Body)
-		formatter.PrintResult(content)
-		formatter.Print(err)
+
+		fmt.Println(ioutil.ReadAll(resp.Body))
 		formatter.PrintErrorMessage("Cannot unmarshal response from create, sync failed")
 		return nil
 	}
 
 	onlineSketchesMap := make(map[string]*createClient.ArduinoCreateSketch, len(onlineSketches.Sketches))
 	for _, item := range onlineSketches.Sketches {
-		onlineSketchesMap[fmt.Sprint(item.ID)] = item
+		onlineSketchesMap[*item.Name] = item
 	}
 
 	for _, item := range sketchMap {
-		itemOnline, hasConflict := onlineSketchesMap[item.ID]
+		itemOnline, hasConflict := onlineSketchesMap[item.Name]
 		if hasConflict {
 			//solve conflicts
 			priority := arduinoSketchSyncFlags.Priority
@@ -141,23 +140,28 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 			}
 			switch priority {
 			case "remote":
+				formatter.Print("pushing edits of sketch: " + item.Name)
 				editSketch(*item, sketchbook, bearerToken)
 				break
 			case "local":
-				pullSketch(*itemOnline, sketchbook, bearerToken)
+				formatter.Print("pulling " + item.Name)
+				pullSketch(itemOnline, sketchbook, bearerToken)
 				break
 			case "skip-conflict":
+				formatter.Print("skipping " + item.Name)
 				break
 			default:
 				priority = "skip-conflict"
 				if GlobalFlags.Verbose > 0 {
 					formatter.Print("Priority not recognized, using skip-conflict")
 				}
+				formatter.Print("skipping " + item.Name)
 				break
 			}
 
 			delete(onlineSketchesMap, fmt.Sprint(item.ID))
 		} else { //only local, push
+			formatter.Print("pushing " + item.Name)
 			pushSketch(*item, sketchbook, bearerToken)
 		}
 	}
@@ -167,7 +171,11 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 			continue
 		}
 		//only online, pull
-		pullSketch(*item, sketchbook, bearerToken)
+		formatter.Print("pulling " + *item.Name)
+		err := pullSketch(item, sketchbook, bearerToken)
+		if err != nil {
+			formatter.PrintError(err)
+		}
 	}
 	formatter.PrintResult("OK") // Issue # : Provide output struct to print the result in a prettier way.
 	return nil
@@ -176,7 +184,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 func pushSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) error {
 	client := createClient.New(nil)
 
-	resp, err := client.CreateSketches(nil, createClient.CreateSketchesPath(), createClient.ConvertFrom(sketch), "Bearer "+bearerToken)
+	resp, err := client.CreateSketches(context.Background(), createClient.CreateSketchesPath(), createClient.ConvertFrom(sketch), "Bearer "+bearerToken)
 	if err != nil {
 		return err
 	}
@@ -200,7 +208,7 @@ func pushSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) e
 func editSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) error {
 	client := createClient.New(nil)
 
-	resp, err := client.EditSketches(nil, createClient.EditSketchesPath(sketch.ID), createClient.ConvertFrom(sketch), "Bearer "+bearerToken)
+	resp, err := client.EditSketches(context.Background(), createClient.EditSketchesPath(sketch.ID), createClient.ConvertFrom(sketch), "Bearer "+bearerToken)
 	if err != nil {
 		return err
 	}
@@ -221,10 +229,11 @@ func editSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) e
 	return nil
 }
 
-func pullSketch(sketch createClient.ArduinoCreateSketch, sketchbook string, bearerToken string) error {
+func pullSketch(sketch *createClient.ArduinoCreateSketch, sketchbook string, bearerToken string) error {
 	client := createClient.New(nil)
 	bearer := "Bearer " + bearerToken
-	resp, err := client.ShowSketches(nil, createClient.ShowSketchesPath(fmt.Sprint(sketch.ID)), &bearer)
+
+	resp, err := client.ShowSketches(context.Background(), createClient.ShowSketchesPath(fmt.Sprint(sketch.ID)), &bearer)
 	if err != nil {
 		return err
 	}
@@ -251,13 +260,42 @@ func pullSketch(sketch createClient.ArduinoCreateSketch, sketchbook string, bear
 
 	destFolder := filepath.Join(sketchbook, *sketch.Name)
 
+	resp, err = client.ShowFiles(context.Background(), *sketch.Ino.Path)
+	if err != nil {
+		return err
+	}
+
 	for _, file := range r.Files {
-		path := filepath.Join(sketchFolder, *file.Path)
+		urlPath := strings.Split(*file.Path, ":")[1]
+		path := findPathOf(*sketch.Name, *file.Path)
+		path = filepath.Join(sketchFolder, path)
+
 		err := os.MkdirAll(filepath.Dir(path), 0755)
 		if err != nil {
 			return err
 		}
-		encodedData, _ := base64.StdEncoding.DecodeString(*file.Data)
+		resp, err := client.ShowFiles(context.Background(), "/"+urlPath)
+		if err != nil {
+			return err
+		}
+
+		filewithData, err := client.DecodeArduinoCreateFile(resp)
+		if err != nil {
+			return err
+		}
+		if resp.StatusCode != 200 {
+			errResp, err := client.DecodeErrorResponse(resp)
+			if err != nil {
+				return errors.New(resp.Status)
+			}
+			return errResp
+		}
+
+		encodedData, err := base64.StdEncoding.DecodeString(*filewithData.Data)
+		if err != nil {
+			return err
+		}
+
 		err = ioutil.WriteFile(path, encodedData, 0666)
 		if err != nil {
 			return errors.New("Copy of a file of the downloaded sketch failed, sync failed")
@@ -281,32 +319,44 @@ func pullSketch(sketch createClient.ArduinoCreateSketch, sketchbook string, bear
 	return nil
 }
 
-func login() (string, error) {
+func findPathOf(sketchName string, path string) string {
+	list := strings.Split(path, "/")
+
+	for i := len(list) - 1; i > -1; i-- {
+		fmt.Println(list[i], "==", sketchName, "?")
+		if list[i] == sketchName {
+			return filepath.Join(list[i+1 : len(list)]...)
+		}
+	}
+	return ""
+}
+
+func login() (string, string, error) {
 	authConf := auth.New()
 
 	home, err := homedir.Dir()
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	netRCFile := filepath.Join(home, ".netrc")
 	file, err := os.OpenFile(netRCFile, os.O_CREATE|os.O_RDONLY, 0666)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	NetRC, err := netrc.Parse(file)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	arduinoMachine := NetRC.FindMachine("arduino.cc")
 	if arduinoMachine.Name != "arduino.cc" {
-		return "", errors.New("Credentials not present, try login with arduino login first")
+		return "", "", errors.New("Credentials not present, try login with arduino login first")
 	}
 
 	newToken, err := authConf.Refresh(arduinoMachine.Password)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	var token string
@@ -327,5 +377,5 @@ func login() (string, error) {
 	} else if GlobalFlags.Verbose > 0 {
 		formatter.Print(err.Error())
 	}
-	return token, nil
+	return arduinoMachine.Login, token, nil
 }
