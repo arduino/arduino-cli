@@ -164,6 +164,9 @@ func InitFlags() {
 	arduinoBoardAttachCmd.ResetFlags()
 	arduinoBoardListCmd.ResetFlags()
 
+	arduinoSketchSyncCmd.ResetFlags()
+	arduinoLoginCmd.ResetFlags()
+
 	ArduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
 	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
 
@@ -197,6 +200,7 @@ func InitCommands() {
 	arduinoCoreCmd.ResetCommands()
 	arduinoConfigCmd.ResetCommands()
 	arduinoBoardCmd.ResetCommands()
+	arduinoSketchCmd.ResetCommands()
 
 	ArduinoCmd.AddCommand(arduinoVersionCmd, arduinoLibCmd, arduinoCoreCmd, arduinoConfigCmd,
 		arduinoBoardCmd, arduinoSketchCmd, arduinoLoginCmd)
