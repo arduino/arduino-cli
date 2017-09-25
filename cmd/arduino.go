@@ -187,7 +187,7 @@ func InitFlags() {
 
 	arduinoSketchSyncCmd.Flags().StringVar(&arduinoSketchSyncFlags.Priority, "priority", "skip-conflict", "The Prioritary resource when we have conflicts. Can be local, remote, skip-conflict.")
 	arduinoLoginCmd.Flags().StringVarP(&arduinoLoginFlags.User, "user", "u", "", "The username used to log in")
-	arduinoLoginCmd.Flags().StringVarP(&arduinoLoginFlags.Password, "password", "p", "unspecified-totally-really-no-one-thought-to-put-a-valid_value", "The username used to log in")
+	arduinoLoginCmd.Flags().StringVarP(&arduinoLoginFlags.Password, "password", "p", "", "The username used to log in")
 }
 
 // InitCommands reinitialize commands (useful for testing too)
@@ -198,7 +198,8 @@ func InitCommands() {
 	arduinoConfigCmd.ResetCommands()
 	arduinoBoardCmd.ResetCommands()
 
-	ArduinoCmd.AddCommand(arduinoVersionCmd, arduinoLibCmd, arduinoCoreCmd, arduinoConfigCmd, arduinoBoardCmd, arduinoSketchCmd)
+	ArduinoCmd.AddCommand(arduinoVersionCmd, arduinoLibCmd, arduinoCoreCmd, arduinoConfigCmd,
+		arduinoBoardCmd, arduinoSketchCmd, arduinoLoginCmd)
 
 	arduinoLibCmd.AddCommand(arduinoLibInstallCmd, arduinoLibUninstallCmd, arduinoLibSearchCmd,
 		arduinoLibVersionCmd, arduinoLibListCmd, arduinoLibDownloadCmd)
@@ -387,7 +388,7 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 	userEmpty := arduinoLoginFlags.User == ""
 	passwordEmpty := arduinoLoginFlags.Password == ""
 	isTextMode := formatter.IsCurrentFormat("text")
-	if isTextMode && (userEmpty || passwordEmpty) {
+	if !isTextMode && (userEmpty || passwordEmpty) {
 		formatter.PrintErrorMessage("User and password must be specified outside of text format")
 		return
 	}
@@ -402,8 +403,10 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 		pass, err := terminal.ReadPassword(int(syscall.Stdin))
 		if err != nil {
 			formatter.PrintErrorMessage("Cannot read password, login aborted")
+			return
 		}
 		arduinoLoginFlags.Password = string(pass)
+		fmt.Println()
 	}
 
 	//save into netrc
@@ -414,7 +417,13 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 	}
 
 	netRCFile := filepath.Join(netRCHome, ".netrc")
-	NetRC, err := netrc.ParseFile(netRCFile)
+	file, err := os.OpenFile(netRCFile, os.O_RDONLY|os.O_CREATE, 0666)
+	if err != nil {
+		formatter.PrintError(err)
+		return
+	}
+	defer file.Close()
+	NetRC, err := netrc.Parse(file)
 	if err != nil {
 		formatter.PrintError(err)
 		return
