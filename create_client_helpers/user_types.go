@@ -89,6 +89,9 @@ func ConvertFrom(sketch sketches.Sketch) *Sketch {
 	}
 	ret.Files = make([]*File, len(sketch.Files))
 	for i, f := range sketch.Files {
+		if f.Name == "sketch.json" { //skipping sketch.json file, since it is Metadata of the sketch
+			continue
+		}
 		_, filePath := filepath.Split(f.Path)
 		content, err := ioutil.ReadFile(filepath.Join(sketch.FullPath, filePath))
 		if err != nil {
