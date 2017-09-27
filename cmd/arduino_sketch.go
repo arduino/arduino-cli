@@ -114,53 +114,79 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 		onlineSketchesMap[*item.Name] = item
 	}
 
+	priority := arduinoSketchSyncFlags.Priority
+
+	if priority == "ask-once" {
+		if !formatter.IsCurrentFormat("text") {
+			formatter.PrintErrorMessage("ask mode for this command is only supported using text format")
+			return nil
+		}
+		firstAsk := true
+		for priority != "pull-remote" &&
+			priority != "push-local" &&
+			priority != "skip" {
+			if !firstAsk {
+				formatter.Print("Invalid option: " + priority)
+			}
+			formatter.Print("What should I do when I detect a conflict? [pull-remote | push-local | skip]")
+			fmt.Scanln(&priority)
+			firstAsk = false
+		}
+	}
 	for _, item := range sketchMap {
 
 		itemOnline, hasConflict := onlineSketchesMap[item.Name]
 		if hasConflict {
+			item.ID = itemOnline.ID.String()
 			//solve conflicts
-			priority := arduinoSketchSyncFlags.Priority
-			if priority == "ask" {
+			if priority == "ask-always" {
 				if !formatter.IsCurrentFormat("text") {
 					formatter.PrintErrorMessage("ask mode for this command is only supported using text format")
 					return nil
 				}
 				firstAsk := true
-				for priority != "remote" &&
-					priority != "local" &&
-					priority != "skip-conflict" {
+				for priority != "pull-remote" &&
+					priority != "push-local" &&
+					priority != "skip" {
 					if !firstAsk {
 						formatter.Print("Invalid option: " + priority)
 					}
-					formatter.Print("What should I retain if I have a conflict between local and remote sketches? [remote | local | skip-conflict]")
+					formatter.Print(fmt.Sprintf("Conflict detected for `%s` sketch, what should I do? [pull-remote | push-local | skip]", item.Name))
 					fmt.Scanln(&priority)
 					firstAsk = false
 				}
 			}
 			switch priority {
-			case "remote":
-				formatter.Print("pushing edits of sketch: " + item.Name)
+			case "push-local":
+				if GlobalFlags.Verbose > 0 {
+					formatter.Print("pushing edits of sketch: " + item.Name)
+				}
 				err := editSketch(*item, sketchbook, bearerToken)
 				if err != nil {
 					formatter.PrintError(err)
 				}
 				break
-			case "local":
-				formatter.Print("pulling " + item.Name)
+			case "pull-remote":
+				if GlobalFlags.Verbose > 0 {
+					formatter.Print("pulling " + item.Name)
+				}
 				err := pullSketch(itemOnline, sketchbook, bearerToken)
 				if err != nil {
 					formatter.PrintError(err)
 				}
 				break
-			case "skip-conflict":
-				formatter.Print("skipping " + item.Name)
+			case "skip":
+				if GlobalFlags.Verbose > 0 {
+					formatter.Print("skipping " + item.Name)
+				}
 				break
 			default:
-				priority = "skip-conflict"
+				priority = "skip"
 				if GlobalFlags.Verbose > 0 {
-					formatter.Print("Priority not recognized, using skip-conflict")
+					formatter.Print("Priority not recognized, using skipping by default")
+					formatter.Print("skipping " + item.Name)
 				}
-				formatter.Print("skipping " + item.Name)
+
 			}
 
 		} else { //only local, push
@@ -180,7 +206,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 			formatter.PrintError(err)
 		}
 	}
-	formatter.PrintResult("OK") // Issue # : Provide output struct to print the result in a prettier way.
+	formatter.PrintResult("Sync Completed") // Issue # : Provide output struct to print the result in a prettier way.
 	return nil
 }
 
@@ -193,42 +219,42 @@ func pushSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) e
 	}
 	defer resp.Body.Close()
 
-	_, err = client.DecodeArduinoCreateSketch(resp)
-	if err != nil {
+	if resp.StatusCode != 200 {
 		errorMsg, err := client.DecodeErrorResponse(resp)
 		if err != nil {
-			return err
+			return errors.New(resp.Status)
 		}
 		return errorMsg
 	}
-
-	if resp.StatusCode != 200 {
-		return errors.New(resp.Status)
+	_, err = client.DecodeArduinoCreateSketch(resp)
+	if err != nil {
+		return err
 	}
+
 	return nil
 }
 
 func editSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) error {
 	client := createClient.New(nil)
-
 	resp, err := client.EditSketches(context.Background(), createClient.EditSketchesPath(sketch.ID), createClient.ConvertFrom(sketch), "Bearer "+bearerToken)
 	if err != nil {
+
 		return err
 	}
 	defer resp.Body.Close()
 
-	_, err = client.DecodeArduinoCreateSketch(resp)
-	if err != nil {
+	if resp.StatusCode != 200 {
 		errorMsg, err := client.DecodeErrorResponse(resp)
 		if err != nil {
-			return err
+			return errors.New(resp.Status)
 		}
 		return errorMsg
 	}
-
-	if resp.StatusCode != 200 {
-		return errors.New(resp.Status)
+	_, err = client.DecodeArduinoCreateSketch(resp)
+	if err != nil {
+		return err
 	}
+
 	return nil
 }
 

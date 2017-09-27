@@ -188,7 +188,7 @@ func InitFlags() {
 	arduinoBoardAttachCmd.Flags().StringVar(&arduinoBoardAttachFlags.SketchName, "sketch", "", "The Name of the sketch to attach the board to")
 	arduinoBoardAttachCmd.Flags().StringVar(&arduinoBoardAttachFlags.SearchTimeout, "timeout", "5s", "The timeout of the search of connected devices, try to high it if your board is not found (e.g. to 10s)")
 
-	arduinoSketchSyncCmd.Flags().StringVar(&arduinoSketchSyncFlags.Priority, "priority", "skip-conflict", "The Prioritary resource when we have conflicts. Can be local, remote, skip-conflict.")
+	arduinoSketchSyncCmd.Flags().StringVar(&arduinoSketchSyncFlags.Priority, "conflict-policy", "skip", "The decision made by default on conflicting sketches. Can be push-local, pull-remote, skip, ask-once, ask-always.")
 	arduinoLoginCmd.Flags().StringVarP(&arduinoLoginFlags.User, "user", "u", "", "The username used to log in")
 	arduinoLoginCmd.Flags().StringVarP(&arduinoLoginFlags.Password, "password", "p", "", "The username used to log in")
 }
