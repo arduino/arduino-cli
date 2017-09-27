@@ -6,3 +6,4 @@ main
 cmd/formatter/debug.test
 .cli-config.yml
 wiki/
+arduino-cli.wiki/*
