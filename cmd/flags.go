@@ -46,12 +46,12 @@ var rootCmdFlags struct {
 
 // arduinoLibFlags represents `arduino lib` flags.
 var arduinoLibFlags struct {
-	updateIndex bool // If true, update library index.
+	updateIndex bool // if true, updates libraries index.
 }
 
 // arduinoCoreFlags represents `arduino core` flags.
 var arduinoCoreFlags struct {
-	updateIndex bool // If true, update package index.
+	updateIndex bool // If true, update packages index.
 }
 
 // arduinoConfigInitFlags represents `arduino config init` flags.
