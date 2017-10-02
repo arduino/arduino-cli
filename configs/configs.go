@@ -224,7 +224,6 @@ func fixMissingFields(c *Configs) {
 			}
 		}
 		viper.AutomaticEnv()
-		viper.Get("asd")
 	}
 }
 
