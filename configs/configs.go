@@ -35,7 +35,6 @@ package configs
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -217,7 +216,7 @@ func fixMissingFields(c *Configs) {
 		}
 	} else if c.ProxyManualConfig == nil {
 		if def.ProxyManualConfig != nil {
-			fmt.Println(def.ProxyManualConfig)
+			//fmt.Println(def.ProxyManualConfig)
 			c.ProxyManualConfig = &ProxyConfigs{
 				Hostname: def.ProxyManualConfig.Hostname,
 				Username: def.ProxyManualConfig.Username,
