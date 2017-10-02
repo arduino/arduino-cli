@@ -35,6 +35,7 @@ package configs
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -215,10 +216,13 @@ func fixMissingFields(c *Configs) {
 			Password: env.ProxyManualConfig.Password,
 		}
 	} else if c.ProxyManualConfig == nil {
-		c.ProxyManualConfig = &ProxyConfigs{
-			Hostname: def.ProxyManualConfig.Hostname,
-			Username: def.ProxyManualConfig.Username,
-			Password: def.ProxyManualConfig.Password,
+		if def.ProxyManualConfig != nil {
+			fmt.Println(def.ProxyManualConfig)
+			c.ProxyManualConfig = &ProxyConfigs{
+				Hostname: def.ProxyManualConfig.Hostname,
+				Username: def.ProxyManualConfig.Username,
+				Password: def.ProxyManualConfig.Password,
+			}
 		}
 		viper.AutomaticEnv()
 		viper.Get("asd")
