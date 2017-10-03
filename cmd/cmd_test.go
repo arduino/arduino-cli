@@ -79,20 +79,6 @@ func executeWithArgs(t *testing.T, args ...string) {
 	require.NoError(t, err, "Error executing command")
 }
 
-func TestArduinoCmd(t *testing.T) {
-	tempFile := createTempRedirect(t)
-	defer cleanTempRedirect(t, tempFile)
-	want := []string{
-		`{"error":"Invalid Call : should show Help, but it is available only in TEXT mode"}`,
-	}
-
-	// arduino --format json
-	// arduino --format=json
-	executeWithArgs(t, "--format", "json")
-
-	checkOutput(t, want, tempFile)
-}
-
 func TestLibSearch(t *testing.T) {
 	tempFile := createTempRedirect(t)
 	defer cleanTempRedirect(t, tempFile)
