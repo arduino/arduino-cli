@@ -44,34 +44,43 @@ var arduinoBoardAttachCmd = &cobra.Command{
 // executeBoardListCommand detects and lists the connected arduino boards
 // (either via serial or network ports).
 func executeBoardListCommand(cmd *cobra.Command, args []string) {
+	if len(args) > 0 {
+		formatter.PrintErrorMessage("Not accepting additional arguments")
+		os.Exit(errBadCall)
+	}
 	monitor := discovery.New(time.Millisecond)
 	monitor.Start()
 	duration, err := time.ParseDuration(arduinoBoardListFlags.SearchTimeout)
 	if err != nil {
 		duration = time.Second * 5
 	}
-	stoppable := cc.Run(func(stop chan struct{}) {
-		for {
-			select {
-			case <-stop:
-				fmt.Print("\r              ")
-				return
-			default:
-				fmt.Print("\rDiscovering.  ")
-				time.Sleep(time.Millisecond * 500)
-				fmt.Print("\rDiscovering.. ")
-				time.Sleep(time.Millisecond * 500)
-				fmt.Print("\rDiscovering...")
-				time.Sleep(time.Millisecond * 500)
+	if formatter.IsCurrentFormat("text") {
+		stoppable := cc.Run(func(stop chan struct{}) {
+			for {
+				select {
+				case <-stop:
+					fmt.Print("\r              ")
+					return
+				default:
+					fmt.Print("\rDiscovering.  ")
+					time.Sleep(time.Millisecond * 500)
+					fmt.Print("\rDiscovering.. ")
+					time.Sleep(time.Millisecond * 500)
+					fmt.Print("\rDiscovering...")
+					time.Sleep(time.Millisecond * 500)
+				}
+
 			}
+		})
 
-		}
-	})
+		fmt.Print("\r")
 
-	time.Sleep(duration)
-	stoppable.Stop()
-	<-stoppable.Stopped
-	fmt.Print("\r")
+		time.Sleep(duration)
+		stoppable.Stop()
+		<-stoppable.Stopped
+	} else {
+		time.Sleep(duration)
+	}
 	formatter.Print(*monitor)
 	//monitor.Stop() //If called will slow like 1sec the program to close after print, with the same result (tested).
 	// it closes ungracefully, but at the end of the command we can't have races.
