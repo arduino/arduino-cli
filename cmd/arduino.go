@@ -91,7 +91,7 @@ var ArduinoCmd = &cobra.Command{
 	Long:  "Arduino Create Command Line Interface (arduino-cli)",
 	BashCompletionFunction: bashAutoCompletionFunction,
 	PersistentPreRun:       arduinoPreRun,
-	RunE:                   arduinoRun,
+	Run:                    arduinoRun,
 	Example:                `arduino --generate-docs to generate the docs and autocompletion for the whole CLI.`,
 }
 
@@ -246,6 +246,7 @@ func arduinoPreRun(cmd *cobra.Command, args []string) {
 	if !formatter.IsCurrentFormat("text") {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 			formatter.PrintErrorMessage("Invalid Call : should show Help, but it is available only in TEXT mode")
+			os.Exit(errBadCall)
 		})
 	}
 
@@ -254,7 +255,7 @@ func arduinoPreRun(cmd *cobra.Command, args []string) {
 	}
 }
 
-func arduinoRun(cmd *cobra.Command, args []string) error {
+func arduinoRun(cmd *cobra.Command, args []string) {
 	if rootCmdFlags.GenerateDocs {
 		errorText := ""
 		err := cmd.GenBashCompletionFile("docs/bash_completions/arduino")
@@ -268,9 +269,10 @@ func arduinoRun(cmd *cobra.Command, args []string) error {
 		if errorText != "" {
 			formatter.PrintErrorMessage(errorText)
 		}
-		return nil
+	} else {
+		cmd.Help()
+		os.Exit(errBadCall)
 	}
-	return cmd.Help()
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -353,8 +355,9 @@ func initViper() {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		formatter.PrintError(err)
+		//formatter.PrintError(err)
 		formatter.PrintErrorMessage("Cannot read configuration file in any of the default folders")
+		os.Exit(errNoConfigFile)
 	}
 
 	viper.SetDefault("paths.sketchbook", defHome)
@@ -384,7 +387,6 @@ func initViper() {
 		if username != "" { // put username and pass somewhere
 
 		}
-
 	}
 }
 
@@ -417,7 +419,7 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 	netRCHome, err := homedir.Dir()
 	if err != nil {
 		formatter.PrintError(err)
-		return
+		os.Exit(errGeneric)
 	}
 
 	netRCFile := filepath.Join(netRCHome, ".netrc")
@@ -430,7 +432,7 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 	NetRC, err := netrc.Parse(file)
 	if err != nil {
 		formatter.PrintError(err)
-		return
+		os.Exit(errGeneric)
 	}
 
 	usr := arduinoLoginFlags.User
@@ -440,7 +442,7 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 	token, err := authConf.Token(usr, pwd)
 	if err != nil {
 		formatter.PrintError(err)
-		return
+		os.Exit(errNetwork)
 	}
 
 	NetRC.RemoveMachine("arduino.cc")
@@ -448,13 +450,13 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 	content, err := NetRC.MarshalText()
 	if err != nil {
 		formatter.PrintError(err)
-		return
+		os.Exit(errGeneric)
 	}
 
 	err = ioutil.WriteFile(netRCFile, content, 0666)
 	if err != nil {
 		formatter.PrintError(err)
-		return
+		os.Exit(errGeneric)
 	}
 
 	formatter.PrintResult(`Successfully logged into the system

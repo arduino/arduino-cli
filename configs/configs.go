@@ -223,6 +223,7 @@ func fixMissingFields(c *Configs) {
 				Password: def.ProxyManualConfig.Password,
 			}
 		}
+
 		viper.AutomaticEnv()
 	}
 }

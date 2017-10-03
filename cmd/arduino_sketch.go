@@ -57,7 +57,7 @@ var arduinoSketchCmd = &cobra.Command{
 	Short:   `Arduino CLI Sketch Commands`,
 	Long:    `Arduino CLI Sketch Commands`,
 	Example: `arduino sketch sync`,
-	RunE:    executeSketchCommand,
+	Run:     executeSketchCommand,
 }
 
 var arduinoSketchSyncCmd = &cobra.Command{
@@ -65,22 +65,25 @@ var arduinoSketchSyncCmd = &cobra.Command{
 	Short:   `Arduino CLI Sketch Commands`,
 	Long:    `Arduino CLI Sketch Commands`,
 	Example: `arduino sketch sync`,
-	RunE:    executeSketchSyncCommand,
+	Run:     executeSketchSyncCommand,
 }
 
-func executeSketchCommand(cmd *cobra.Command, args []string) error {
-	return errors.New("No subcommand specified")
+func executeSketchCommand(cmd *cobra.Command, args []string) {
+	formatter.PrintErrorMessage("No subcommand specified")
+	cmd.Help()
+	os.Exit(errBadCall)
 }
 
-func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
+func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	if len(args) > 0 {
-		return errors.New("No arguments are accepted")
+		formatter.PrintErrorMessage("No arguments are accepted")
+		os.Exit(errBadCall)
 	}
 
 	sketchbook, err := common.GetDefaultArduinoHomeFolder()
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot get sketchbook folder")
-		return nil
+		os.Exit(errCoreConfig)
 	}
 
 	username, bearerToken, err := login()
@@ -99,14 +102,14 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 	resp, err := client.SearchSketches(context.Background(), createClient.SearchSketchesPath(), nil, &username, &tok)
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot get create sketches, sync failed")
-		return nil
+		os.Exit(errNetwork)
 	}
 	defer resp.Body.Close()
 
 	onlineSketches, err := client.DecodeArduinoCreateSketches(resp)
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot unmarshal response from create, sync failed")
-		return nil
+		os.Exit(errGeneric)
 	}
 
 	onlineSketchesMap := make(map[string]*createClient.ArduinoCreateSketch, len(onlineSketches.Sketches))
@@ -119,7 +122,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 	if priority == "ask-once" {
 		if !formatter.IsCurrentFormat("text") {
 			formatter.PrintErrorMessage("ask mode for this command is only supported using text format")
-			return nil
+			os.Exit(errBadCall)
 		}
 		firstAsk := true
 		for priority != "pull-remote" &&
@@ -142,7 +145,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 			if priority == "ask-always" {
 				if !formatter.IsCurrentFormat("text") {
 					formatter.PrintErrorMessage("ask mode for this command is only supported using text format")
-					return nil
+					os.Exit(errBadCall)
 				}
 				firstAsk := true
 				for priority != "pull-remote" &&
@@ -207,7 +210,6 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 	formatter.PrintResult("Sync Completed") // Issue # : Provide output struct to print the result in a prettier way.
-	return nil
 }
 
 func pushSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) error {

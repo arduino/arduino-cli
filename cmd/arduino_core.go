@@ -30,7 +30,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -78,7 +77,7 @@ var arduinoCoreDownloadCmd = &cobra.Command{
 	Use:   "download [PACKAGER:ARCH[=VERSION]](S)",
 	Short: "Downloads one or more cores and relative tool dependencies",
 	Long:  `Downloads one or more cores and relative tool dependencies`,
-	RunE:  executeCoreDownloadCommand,
+	Run:   executeCoreDownloadCommand,
 	Example: `
 arduino core download arduino:samd #to download latest version of arduino SAMD core.
 arduino core download arduino:samd=1.6.9 #for the specific version (in this case 1.6.9)`,
@@ -88,7 +87,7 @@ var arduinoCoreInstallCmd = &cobra.Command{
 	Use:   "install [PACKAGER:ARCH[=VERSION]](S)",
 	Short: "Installs one or more cores and relative tool dependencies",
 	Long:  `Installs one or more cores and relative tool dependencies`,
-	RunE:  executeCoreInstallCommand,
+	Run:   executeCoreInstallCommand,
 	Example: `
 arduino core install arduino:samd #to download latest version of arduino SAMD core.
 arduino core installteele arduino:samd=1.6.9 #for the specific version (in this case 1.6.9)`,
@@ -103,6 +102,7 @@ func executeCoreCommand(cmd *cobra.Command, args []string) {
 		common.ExecUpdateIndex(prettyPrints.DownloadCoreFileIndex(), GlobalFlags.Verbose)
 	} else {
 		cmd.Help()
+		os.Exit(errBadCall)
 	}
 }
 
@@ -110,20 +110,20 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 	pkgHome, err := common.GetDefaultPkgFolder()
 	if err != nil {
 		formatter.PrintError(err)
-		return
+		os.Exit(errCoreConfig)
 	}
 
 	dir, err := os.Open(pkgHome)
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot open packages folder")
-		return
+		os.Exit(errCoreConfig)
 	}
 	defer dir.Close()
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot read into packages folder")
-		return
+		os.Exit(errCoreConfig)
 	}
 
 	pkgs := output.InstalledPackageList{
@@ -148,14 +148,15 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 	formatter.Print(pkgs)
 }
 
-func executeCoreDownloadCommand(cmd *cobra.Command, args []string) error {
+func executeCoreDownloadCommand(cmd *cobra.Command, args []string) {
 	if len(args) < 1 {
-		return fmt.Errorf("No core specified for download command")
+		formatter.PrintErrorMessage("No core specified for download command")
+		os.Exit(errBadCall)
 	}
 
 	status, err := getPackagesStatusContext(GlobalFlags.Verbose)
 	if err != nil {
-		return nil
+		os.Exit(errGeneric)
 	}
 
 	IDTuples := cores.ParseArgs(args)
@@ -178,17 +179,18 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) error {
 	releases.ParallelDownload(downloads, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Cores, "core")
 
 	formatter.Print(outputResults)
-	return nil
 }
 
-func executeCoreInstallCommand(cmd *cobra.Command, args []string) error {
+func executeCoreInstallCommand(cmd *cobra.Command, args []string) {
 	if len(args) < 1 {
-		return fmt.Errorf("No core specified for download command")
+		formatter.PrintErrorMessage("No core specified for download command")
+		os.Exit(errBadCall)
 	}
 
 	status, err := getPackagesStatusContext(GlobalFlags.Verbose)
 	if err != nil {
-		return nil
+		formatter.PrintError(err)
+		os.Exit(errCoreConfig)
 	}
 
 	IDTuples := cores.ParseArgs(args)
@@ -221,7 +223,7 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) error {
 			toolRoot, err := common.GetDefaultToolsFolder(item.Package)
 			if err != nil {
 				formatter.PrintErrorMessage("Cannot get tool install path, try again.")
-				return nil
+				os.Exit(errCoreConfig)
 			}
 			outputResults.Tools[i].Path = filepath.Join(toolRoot, item.Name, item.Release.VersionName())
 		}
@@ -239,14 +241,13 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) error {
 			coreRoot, err := common.GetDefaultCoresFolder(item.Package)
 			if err != nil {
 				formatter.PrintErrorMessage("Cannot get core install path, try again.")
-				return nil
+				os.Exit(errCoreConfig)
 			}
 			outputResults.Cores[i+failOutputsCount].Path = filepath.Join(coreRoot, item.Name, item.Release.VersionName())
 		}
 	}
 
 	formatter.Print(outputResults)
-	return nil
 }
 
 // getInstalledCores gets the installed cores and puts them in the output struct.

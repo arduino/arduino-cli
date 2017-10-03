@@ -67,7 +67,7 @@ var arduinoLibInstallCmd = &cobra.Command{
 	Use:   "install LIBRARY[@VERSION_NUMBER](S)",
 	Short: "Installs one of more specified libraries into the system.",
 	Long:  `Installs one or more specified libraries into the system.`,
-	RunE:  executeInstallCommand,
+	Run:   executeInstallCommand,
 	Example: `arduino lib install YoutubeApi # for the latest version
 arduino lib install YoutubeApi@1.0.0     # for the specific version (in this case 1.0.0)`,
 }
@@ -77,7 +77,7 @@ var arduinoLibUninstallCmd = &cobra.Command{
 	Use:     "uninstall LIBRARY_NAME(S)",
 	Short:   "Uninstalls one or more libraries",
 	Long:    `Uninstalls one or more libraries`,
-	RunE:    executeUninstallCommand,
+	Run:     executeUninstallCommand,
 	Example: ` arduino uninstall YoutubeApi`,
 }
 
@@ -86,7 +86,7 @@ var arduinoLibSearchCmd = &cobra.Command{
 	Use:   "search [LIBRARY_NAME]",
 	Short: "Searchs for one or more libraries data.",
 	Long:  `Search for one or more libraries data (case insensitive search).`,
-	RunE:  executeSearchCommand,
+	Run:   executeSearchCommand,
 	Example: `arduino lib search You # to show all libraries containing "You" in their name (case insensitive).
 YoumadeIt
 YoutubeApi`,
@@ -97,7 +97,7 @@ var arduinoLibDownloadCmd = &cobra.Command{
 	Use:   "download [LIBRARY_NAME(S)]",
 	Short: "Downloads one or more libraries without installing them",
 	Long:  `Downloads one or more libraries without installing them`,
-	RunE:  executeDownloadCommand,
+	Run:   executeDownloadCommand,
 	Example: `arduino lib download YoutubeApi       # for the latest version.
 arduino lib download YoutubeApi@1.0.0 # for a specific version (in this case 1.0.0)`,
 }
@@ -131,17 +131,19 @@ func executeLibCommand(cmd *cobra.Command, args []string) {
 		common.ExecUpdateIndex(prettyPrints.DownloadLibFileIndex(), GlobalFlags.Verbose)
 	} else {
 		cmd.Help()
+		os.Exit(errBadCall)
 	}
 }
 
-func executeDownloadCommand(cmd *cobra.Command, args []string) error {
+func executeDownloadCommand(cmd *cobra.Command, args []string) {
 	if len(args) < 1 {
-		return fmt.Errorf("No library specified for download command")
+		formatter.PrintErrorMessage("No library specified for download command")
+		os.Exit(errBadCall)
 	}
 
 	status, err := getLibStatusContext(GlobalFlags.Verbose)
 	if err != nil {
-		return nil
+		os.Exit(errGeneric)
 	}
 
 	pairs := libraries.ParseArgs(args)
@@ -158,17 +160,17 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) error {
 	releases.ParallelDownload(libs, false, "Downloaded", GlobalFlags.Verbose, &outputResults.Libraries, "library")
 
 	formatter.Print(outputResults)
-	return nil
 }
 
-func executeInstallCommand(cmd *cobra.Command, args []string) error {
+func executeInstallCommand(cmd *cobra.Command, args []string) {
 	if len(args) < 1 {
-		return fmt.Errorf("No library specified for install command")
+		formatter.PrintErrorMessage("No library specified for install command")
+		os.Exit(errBadCall)
 	}
 
 	status, err := getLibStatusContext(GlobalFlags.Verbose)
 	if err != nil {
-		return nil
+		os.Exit(errGeneric)
 	}
 
 	pairs := libraries.ParseArgs(args)
@@ -186,8 +188,8 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 
 	folder, err := common.GetDefaultLibFolder()
 	if err != nil {
-		formatter.PrintErrorMessage("Cannot get default lib install path, try again.")
-		return nil
+		formatter.PrintErrorMessage("Cannot get default lib install path.")
+		os.Exit(errCoreConfig)
 	}
 
 	for i, item := range libsToDownload {
@@ -203,31 +205,31 @@ func executeInstallCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	formatter.Print(outputResults)
-	return nil
 }
 
-func executeUninstallCommand(cmd *cobra.Command, args []string) error {
+func executeUninstallCommand(cmd *cobra.Command, args []string) {
 	if len(args) < 1 {
-		return fmt.Errorf("No library specified for uninstall command")
+		formatter.PrintErrorMessage("No library specified for uninstall command")
+		os.Exit(errBadCall)
 	}
 
 	libs := libraries.ParseArgs(args)
 
 	libFolder, err := common.GetDefaultLibFolder()
 	if err != nil {
-		return nil
+		os.Exit(errGeneric)
 	}
 
 	dir, err := os.Open(libFolder)
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot open libraries folder")
-		return nil
+		os.Exit(errCoreConfig)
 	}
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot read into libraries folder")
-		return nil
+		os.Exit(errCoreConfig)
 	}
 
 	outputResults := output.LibProcessResults{
@@ -316,16 +318,14 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) error {
 	if len(outputResults.Libraries) > 0 {
 		formatter.Print(outputResults)
 	}
-
-	return nil
 }
 
-func executeSearchCommand(cmd *cobra.Command, args []string) error {
+func executeSearchCommand(cmd *cobra.Command, args []string) {
 	query := strings.ToLower(strings.Join(args, " "))
 
 	status, err := getLibStatusContext(GlobalFlags.Verbose)
 	if err != nil {
-		return nil
+		os.Exit(errCoreConfig)
 	}
 
 	found := false
@@ -360,29 +360,27 @@ func executeSearchCommand(cmd *cobra.Command, args []string) error {
 	} else {
 		formatter.Print(message)
 	}
-
-	return nil
 }
 
 func executeListCommand(command *cobra.Command, args []string) {
 	libHome, err := common.GetDefaultLibFolder()
 	if err != nil {
-		formatter.PrintError(err)
-		return
+		formatter.PrintErrorMessage("Cannot get libraries folder")
+		os.Exit(errCoreConfig)
 	}
 
 	//prettyPrints.LibStatus(status)
 	dir, err := os.Open(libHome)
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot open libraries folder")
-		return
+		os.Exit(errCoreConfig)
 	}
 	defer dir.Close()
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot read into libraries folder")
-		return
+		os.Exit(errCoreConfig)
 	}
 
 	libs := output.LibProcessResults{

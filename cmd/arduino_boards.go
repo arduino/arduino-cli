@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/bcmi-labs/arduino-cli/common"
@@ -38,7 +38,7 @@ var arduinoBoardAttachCmd = &cobra.Command{
 	Long:  `Attaches a board to a sketch`,
 	Example: `arduino board attach --board serial:///dev/tty/ACM0 \
 	             --sketch mySketch # Attaches a sketch to a board`,
-	RunE: executeBoardAttachCommand,
+	Run: executeBoardAttachCommand,
 }
 
 // executeBoardListCommand detects and lists the connected arduino boards
@@ -77,17 +77,20 @@ func executeBoardListCommand(cmd *cobra.Command, args []string) {
 	// it closes ungracefully, but at the end of the command we can't have races.
 }
 
-func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
+func executeBoardAttachCommand(cmd *cobra.Command, args []string) {
 	if len(args) > 0 {
-		return errors.New("Not accepting additional arguments")
+		formatter.PrintErrorMessage("Not accepting additional arguments")
+		os.Exit(errBadCall)
 	}
 
 	if arduinoBoardAttachFlags.SketchName == "" {
-		return errors.New("No sketch name provided")
+		formatter.PrintErrorMessage("No sketch name provided")
+		os.Exit(errBadCall)
 	}
 
 	if arduinoBoardAttachFlags.BoardURI == "" {
-		return errors.New("No board URI provided")
+		formatter.PrintErrorMessage("No board URI provided")
+		os.Exit(errBadCall)
 	}
 
 	duration, err := time.ParseDuration(arduinoBoardListFlags.SearchTimeout)
@@ -103,19 +106,19 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
 	homeFolder, err := common.GetDefaultArduinoHomeFolder()
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot Parse Board Index file")
-		return nil
+		os.Exit(errCoreConfig)
 	}
 
 	packageFolder, err := common.GetDefaultPkgFolder()
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot Parse Board Index file")
-		return nil
+		os.Exit(errCoreConfig)
 	}
 
 	bs, err := boards.Find(packageFolder)
 	if err != nil {
 		formatter.PrintErrorMessage("Cannot Parse Board Index file")
-		return nil
+		os.Exit(errCoreConfig)
 	}
 
 	ss := sketches.Find(homeFolder)
@@ -123,13 +126,13 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
 	sketch, exists := ss[arduinoBoardAttachFlags.SketchName]
 	if !exists {
 		formatter.PrintErrorMessage("Cannot find specified sketch in the Sketchbook")
-		return nil
+		os.Exit(errGeneric)
 	}
 
 	deviceURI, err := url.Parse(arduinoBoardAttachFlags.BoardURI)
 	if err != nil {
 		formatter.PrintErrorMessage("The provided Device URL is not in a valid format")
-		return nil
+		os.Exit(errBadCall)
 	}
 
 	var findBoardFunc func(boards.Boards, *discovery.Monitor, *url.URL) *boards.Board
@@ -143,7 +146,7 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
 		Type = "network"
 	} else {
 		formatter.PrintErrorMessage("Invalid device port type provided. Accepted types are: serial://, tty://, http://, https://, tcp://, udp://")
-		return nil
+		os.Exit(errBadCall)
 	}
 
 	board := findBoardFunc(bs, monitor, deviceURI)
@@ -158,7 +161,6 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) error {
 		formatter.PrintError(err)
 	}
 	formatter.PrintResult("BOARD ATTACHED")
-	return nil
 }
 
 // findSerialConnectedBoard find the board which is connected to the specified URI via serial port, using a monitor and a set of Boards
@@ -182,7 +184,7 @@ func findSerialConnectedBoard(bs boards.Boards, monitor *discovery.Monitor, devi
 	board := bs.ByVidPid(serialDevice.VendorID, serialDevice.ProductID)
 	if board == nil {
 		formatter.PrintErrorMessage("No Supported board has been found, try either install new cores or check your board URI")
-		return nil
+		os.Exit(errGeneric)
 	}
 
 	formatter.Print("SUPPORTED BOARD FOUND:")
@@ -207,7 +209,7 @@ func findNetworkConnectedBoard(bs boards.Boards, monitor *discovery.Monitor, dev
 	}
 	if !found {
 		formatter.PrintErrorMessage("No Supported board has been found at the specified board URI, try either install new cores or check your board URI")
-		return nil
+		os.Exit(errGeneric)
 	}
 
 	formatter.Print("SUPPORTED BOARD FOUND:")
