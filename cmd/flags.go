@@ -29,11 +29,14 @@
 
 package cmd
 
+import "github.com/bcmi-labs/arduino-cli/configs"
+import "regexp"
+
 // GlobalFlags represents flags available in all the program.
 var GlobalFlags struct {
-	Verbose int    // More time verbose flag is written, the more the Verbose count increases. Represents verbosity level.
-	Format  string // The Output format (e.g. text, json).
-	Home    string // The Custom Home directory.
+	Verbose         int    // More time verbose flag is written, the more the Verbose count increases. Represents verbosity level.
+	Format          string // The Output format (e.g. text, json).
+	configs.Configs        // The Configurations for the CLI.
 }
 
 // rootCmdFlags represent flags available to the root command.
@@ -55,4 +58,13 @@ var arduinoCoreFlags struct {
 var arduinoConfigInitFlags struct {
 	Default  bool   // If false, ask questions to the user about setting configuration properties, otherwise use default configuration.
 	Location string // The custom location of the file to create.
+}
+
+var validBoardURIRegexp = regexp.MustCompile("(serial|tty|http(s)?|(tc|ud)p)://")
+
+// arduinoConfigInitFlags represents `arduino board attach` flags.
+var arduinoBoardAttachFlags struct {
+	BoardURI   string // The URI of the board to attach: can be serial:// tty:// http:// https:// tcp:// udp:// referring to the validBoardURIRegexp variable.
+	SketchName string // The name of the sketch to attach to the board.
+	FromPath   string // The Path of the file to import and attach to the board.
 }

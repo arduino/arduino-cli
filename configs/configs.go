@@ -27,58 +27,138 @@
  * Copyright 2017 BCMI LABS SA (http://www.arduino.cc/)
  */
 
-/*
- * Package configs contains all CLI configurations handling.
- * It is done via a YAML file which can be in a custom location,
- * but is defaulted to "$EXECUTABLE_DIR/cli-config.yaml"
- */
+// Package configs contains all CLI configurations handling.
+//
+// It is done via a YAML file which can be in a custom location,
+// but is defaulted to "$EXECUTABLE_DIR/cli-config.yaml"
 package configs
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
+	"github.com/spf13/viper"
+
+	properties "github.com/arduino/go-properties-map"
+	"github.com/bcmi-labs/arduino-cli/common"
+
 	"gopkg.in/yaml.v2"
 )
 
-// DefaultLocation represents the default location of the config file (same directory as executable)
-var DefaultLocation string
+// FileLocation represents the default location of the config file (same directory as executable).
+var FileLocation = getFileLocation()
 
-func init() {
-	DefaultLocation, err := os.Getwd()
+// BundledInIDE tells if the CLI is paired with the Java Arduino IDE.
+var BundledInIDE bool
+
+// ArduinoIDEFolder represents the path of the IDE directory, set only if BundledInIDE = true.
+var ArduinoIDEFolder string
+
+func getFileLocation() string {
+	fileLocation, err := os.Executable()
 	if err != nil {
-		DefaultLocation = "."
+		fileLocation = "."
 	}
-	DefaultLocation = filepath.Join(DefaultLocation, "cli-config.yaml")
+	fileLocation = filepath.Dir(fileLocation)
+	fileLocation = filepath.Join(fileLocation, ".cli-config.yml")
+	return fileLocation
 }
 
 // Configs represents the possible configurations for the CLI.
 type Configs struct {
-	HTTPProxy      string `yaml:"HTTP_Proxy,omitempty"`
-	SketchbookPath string `yaml:"sketchbook_path,omitempty"`
-	LibrariesPath  string `yaml:"HTTP_Proxy,omitempty"`
-	PackagesPath   string `yaml:"HTTP_Proxy,omitempty"`
+	ProxyType         string        `yaml:"proxy_type"`
+	ProxyManualConfig *ProxyConfigs `yaml:"manual_configs,omitempty"`
+	SketchbookPath    string        `yaml:"sketchbook_path,omitempty"`
+	ArduinoDataFolder string        `yaml:"arduino_data,omitempty"`
+}
+
+//ProxyConfigs represents a possible manual proxy configuration.
+type ProxyConfigs struct {
+	Hostname string `yaml:"hostname"`
+	Username string `yaml:"username,omitempty"`
+	Password string `yaml:"password,omitempty"` // can be encrypted, see issue #71
 }
 
 // defaultConfig represents the default configuration.
-var defaultConfig = Configs{
-	HTTPProxy:      os.Getenv("HTTP_PROXY"),
-	SketchbookPath: "",
-	LibrariesPath:  "",
-	PackagesPath:   "",
-}
+var defaultConfig Configs
 
 var envConfig = Configs{
-	HTTPProxy:      os.Getenv("HTTP_PROXY"),
-	SketchbookPath: os.Getenv("SKETCHBOOK_FOLDER"),
-	LibrariesPath:  os.Getenv("LIBS_FOLDER"),
-	PackagesPath:   os.Getenv("PACKAGES_FOLDER"),
+	ProxyType:         os.Getenv("PROXY_TYPE"),
+	SketchbookPath:    os.Getenv("SKETCHBOOK_FOLDER"),
+	ArduinoDataFolder: os.Getenv("ARDUINO_DATA"),
+}
+
+func init() {
+	defArduinoData, _ := common.GetDefaultArduinoFolder()
+	defSketchbook, _ := common.GetDefaultArduinoHomeFolder()
+	if checkIfBundled() != nil {
+		BundledInIDE = false
+	}
+
+	defaultConfig = Configs{
+		ProxyType:         "auto",
+		SketchbookPath:    defSketchbook,
+		ArduinoDataFolder: defArduinoData,
+	}
 }
 
 // Default returns a copy of the default configuration.
 func Default() Configs {
 	return defaultConfig
+}
+
+// UnserializeFromIDEPreferences loads the config from an IDE preferences.txt file, by Updating the specified otherConfigs.
+func UnserializeFromIDEPreferences(otherConfigs *Configs) error {
+	props, err := properties.Load(filepath.Join(otherConfigs.ArduinoDataFolder, "preferences.txt"))
+	if err != nil {
+		return err
+	}
+	err = proxyConfigsFromIDEPrefs(otherConfigs, props)
+	if err != nil {
+		return err
+	}
+	sketchbookPath, exists := props.SubTree("sketchbook")["path"]
+	if exists {
+		otherConfigs.SketchbookPath = sketchbookPath
+	}
+	return nil
+}
+
+func proxyConfigsFromIDEPrefs(otherConfigs *Configs, props properties.Map) error {
+	proxy := props.SubTree("proxy")
+	typo := proxy["type"]
+	switch typo {
+	case "auto":
+		//automatic proxy
+		viper.Set("proxy.type", "auto")
+		break
+	case "manual":
+		//manual proxy configuration
+		manualConfig := proxy.SubTree("manual")
+		hostname, exists := manualConfig["hostname"]
+		if !exists {
+			return errors.New("Proxy ostname not found in preferences.txt")
+		}
+		username := manualConfig["username"]
+		password := manualConfig["password"]
+
+		otherConfigs.ProxyType = "manual"
+		otherConfigs.ProxyManualConfig = &ProxyConfigs{
+			Hostname: hostname,
+			Username: username,
+			Password: password,
+		}
+		viper.Set("proxy", *otherConfigs.ProxyManualConfig)
+		break
+	case "none":
+		//No proxy
+		break
+	default:
+		return errors.New("Unsupported config type")
+	}
+	return nil
 }
 
 // Unserialize loads the configs from a yaml file.
@@ -119,13 +199,56 @@ func fixMissingFields(c *Configs) {
 	compareAndReplace := func(envVal string, configVal *string, defVal string) {
 		if envVal != "" {
 			*configVal = envVal
-		} else if defVal == "" {
+		} else if *configVal == "" {
 			*configVal = defVal
 		}
 	}
 
-	compareAndReplace(env.HTTPProxy, &c.HTTPProxy, def.HTTPProxy)
-	compareAndReplace(env.SketchBookPath, &c.SketchBookPath, def.SketchBookPath)
-	compareAndReplace(env.LibrariesPath, &c.LibrariesPath, def.LibrariesPath)
-	compareAndReplace(env.PackagesPath, &c.PackagesPath, def.PackagesPath)
+	compareAndReplace(env.ProxyType, &c.ProxyType, def.ProxyType)
+	compareAndReplace(env.SketchbookPath, &c.SketchbookPath, def.SketchbookPath)
+	compareAndReplace(env.ArduinoDataFolder, &c.ArduinoDataFolder, def.ArduinoDataFolder)
+
+	if env.ProxyManualConfig != nil {
+		c.ProxyManualConfig = &ProxyConfigs{
+			Hostname: env.ProxyManualConfig.Hostname,
+			Username: env.ProxyManualConfig.Username,
+			Password: env.ProxyManualConfig.Password,
+		}
+	} else if c.ProxyManualConfig == nil {
+		if def.ProxyManualConfig != nil {
+			//fmt.Println(def.ProxyManualConfig)
+			c.ProxyManualConfig = &ProxyConfigs{
+				Hostname: def.ProxyManualConfig.Hostname,
+				Username: def.ProxyManualConfig.Username,
+				Password: def.ProxyManualConfig.Password,
+			}
+		}
+		viper.AutomaticEnv()
+	}
+}
+
+// checkIfBundled checks if the CLI is bundled with the Arduino IDE.
+func checkIfBundled() error {
+	executable, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	executable, err = filepath.EvalSymlinks(executable)
+	if err != nil {
+		return err
+	}
+	execParent := filepath.SplitList(filepath.Dir(executable))
+	ArduinoIDEFolder := filepath.Join(execParent[0 : len(execParent)-1]...)
+
+	BundledInIDE = false
+	executables := []string{"arduino", "arduino.sh", "arduino.exe"}
+	for _, exe := range executables {
+		exePath := filepath.Join(ArduinoIDEFolder, exe)
+		_, err := os.Stat(exePath)
+		if !os.IsNotExist(err) {
+			BundledInIDE = true
+			break
+		}
+	}
+	return nil
 }

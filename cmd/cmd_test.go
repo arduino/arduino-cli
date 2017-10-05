@@ -31,6 +31,7 @@ package cmd_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -56,6 +57,7 @@ func createTempRedirect(t *testing.T) *os.File {
 	tempFile, err := ioutil.TempFile(os.TempDir(), "test")
 	require.NoError(t, err, "Opening temp file")
 	os.Stdout = tempFile
+
 	return tempFile
 }
 
@@ -67,12 +69,13 @@ func cleanTempRedirect(t *testing.T, tempFile *os.File) {
 }
 
 func executeWithArgs(t *testing.T, args ...string) {
-	cmd.InitFlags()
-	cmd.InitCommands()
+	cmd.TestInit()
 	if args != nil {
 		cmd.ArduinoCmd.SetArgs(args)
 	}
+
 	err := cmd.ArduinoCmd.Execute()
+	fmt.Fprintln(stdOut, err)
 	require.NoError(t, err, "Error executing command")
 }
 
@@ -176,7 +179,7 @@ func TestCoreDownload(t *testing.T) {
 			{ItemName: "unparsablearg", Error: "Invalid item (not PACKAGER:CORE[=VERSION])"},
 			{ItemName: "sam", Error: "Version notexistingversion Not Found"},
 			{ItemName: "sam", Error: "Version 1.0.0 Not Found"},
-			{ItemName: "samd", Status: "Downloaded", Path: stagingFolder + "/samd-1.6.15.tar.bz2"},
+			{ItemName: "samd", Status: "Downloaded", Path: stagingFolder + "/samd-1.6.16.tar.bz2"},
 		},
 		Tools: []output.ProcessResult{
 			{ItemName: "arduinoOTA", Status: "Downloaded", Path: stagingFolder + "/arduinoOTA-1.2.0-linux_amd64.tar.bz2"},
@@ -188,8 +191,8 @@ func TestCoreDownload(t *testing.T) {
 		},
 	}
 
-	// core download arduino:samd unparsablearg arduino:sam=notexistingversion arduino:sam=1.0.0 --format json
-	executeWithArgs(t, "core", "download", "arduino:samd", "unparsablearg", "arduino:sam=notexistingversion", "arduino:sam=1.0.0", "--format", "json")
+	// core download arduino:samd=1.6.16 unparsablearg arduino:sam=notexistingversion arduino:sam=1.0.0 --format json
+	executeWithArgs(t, "core", "download", "arduino:samd=1.6.16", "unparsablearg", "arduino:sam=notexistingversion", "arduino:sam=1.0.0", "--format", "json")
 
 	// read output
 	_, err = tempFile.Seek(0, 0)
@@ -201,7 +204,6 @@ func TestCoreDownload(t *testing.T) {
 	err = json.Unmarshal(d, &have)
 	require.NoError(t, err, "Unmarshaling json output")
 	t.Log("HAVE: \n", have)
-	t.Log("D:\n", string(d))
 	t.Log("WANT: \n", want)
 
 	// checking output
@@ -220,10 +222,13 @@ func TestCoreDownload(t *testing.T) {
 		return false
 	}
 	for _, w := range want.Cores {
-		assert.True(t, pop(&w), "Expected core '%s' is missing from output", w)
+		popR := pop(&w)
+		t.Log(w)
+		t.Log(popR)
+		assert.True(t, popR, "Expected core '%s' is missing from output", w)
 	}
 	for _, h := range have.Cores {
-		assert.Empty(t, h.String(), "Unexpected core '%s' is inside output", h)
+		assert.Empty(t, h.ItemName, "Unexpected core '%s' is inside output", h)
 	}
 
 	assert.Equal(t, len(want.Tools), len(have.Tools), "Number of tools in the output")
@@ -232,7 +237,7 @@ func TestCoreDownload(t *testing.T) {
 		for idx, h := range have.Tools {
 			if tool.String() == h.String() {
 				// XXX: Consider changing the Tools field to an array of pointers
-				//have.Tools[idx] = nil
+				// have.Tools[idx] = nil
 				have.Tools[idx] = output.ProcessResult{ItemName: ""} // Mark tool as matched
 				return true
 			}

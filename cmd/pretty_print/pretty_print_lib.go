@@ -45,8 +45,9 @@ func CorruptedLibIndexFix(index libraries.Index, verbosity int) (libraries.Statu
 	parseTask := libIndexParse(index, verbosity)
 
 	result := corruptedIndexFixResults(downloadTask, parseTask, verbosity)
-
-	return result[1].Result.(libraries.StatusContext), result[0].Error
+	ret, _ := result[1].Result.(libraries.StatusContext)
+	err := result[1].Error
+	return ret, err
 }
 
 // libIndexParse pretty prints info about parsing an index file of libraries.
