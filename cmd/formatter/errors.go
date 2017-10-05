@@ -45,8 +45,12 @@ type ErrorMessage struct {
 
 // MarshalJSON allows to marshal this object as a JSON object.
 func (err ErrorMessage) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]string{
-		"error": err.message,
+	type JSONErrorMessage struct {
+		Error string `json:"error,required"`
+	}
+
+	return json.Marshal(JSONErrorMessage{
+		Error: err.message,
 	})
 }
 
