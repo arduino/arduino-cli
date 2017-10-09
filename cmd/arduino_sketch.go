@@ -38,15 +38,18 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/bcmi-labs/arduino-cli/auth"
 	"github.com/bcmi-labs/arduino-cli/create_client_helpers"
 	"github.com/bgentry/go-netrc/netrc"
+	"github.com/briandowns/spinner"
 	homedir "github.com/mitchellh/go-homedir"
 
 	"github.com/bcmi-labs/arduino-modules/sketches"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/bcmi-labs/arduino-cli/common"
 
 	"github.com/spf13/cobra"
@@ -86,37 +89,6 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errCoreConfig)
 	}
 
-	username, bearerToken, err := login()
-	if err != nil {
-		if GlobalFlags.Verbose == 0 {
-			formatter.PrintErrorMessage("Cannot login automatically: try arduino login the run again this command")
-		} else {
-			formatter.PrintError(err)
-		}
-	}
-
-	sketchMap := sketches.Find(sketchbook, "libraries") //exclude libraries folder
-
-	client := createClient.New(nil)
-	tok := "Bearer " + bearerToken
-	resp, err := client.SearchSketches(context.Background(), createClient.SearchSketchesPath(), nil, &username, &tok)
-	if err != nil {
-		formatter.PrintErrorMessage("Cannot get create sketches, sync failed")
-		os.Exit(errNetwork)
-	}
-	defer resp.Body.Close()
-
-	onlineSketches, err := client.DecodeArduinoCreateSketches(resp)
-	if err != nil {
-		formatter.PrintErrorMessage("Cannot unmarshal response from create, sync failed")
-		os.Exit(errGeneric)
-	}
-
-	onlineSketchesMap := make(map[string]*createClient.ArduinoCreateSketch, len(onlineSketches.Sketches))
-	for _, item := range onlineSketches.Sketches {
-		onlineSketchesMap[*item.Name] = item
-	}
-
 	priority := arduinoSketchSyncFlags.Priority
 
 	if priority == "ask-once" {
@@ -136,6 +108,76 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 			firstAsk = false
 		}
 	}
+
+	//loader
+	isTextMode := formatter.IsCurrentFormat("text")
+
+	var loader *spinner.Spinner
+
+	if isTextMode {
+		loader = spinner.New(spinner.CharSets[39], 100*time.Millisecond)
+		loader.Prefix = "Syncing Sketches... "
+
+		loader.Start()
+	}
+
+	stopSpinner := func() {
+		if isTextMode {
+			loader.Stop()
+		}
+	}
+
+	startSpinner := func() {
+		if isTextMode {
+			loader.Start()
+		}
+	}
+
+	username, bearerToken, err := login()
+	if err != nil {
+		if GlobalFlags.Verbose == 0 {
+			formatter.PrintErrorMessage("Cannot login automatically: try arduino login the run again this command")
+		} else {
+			stopSpinner()
+			formatter.PrintError(err)
+			os.Exit(errNetwork)
+		}
+	}
+
+	sketchMap := sketches.Find(sketchbook, "libraries") //exclude libraries folder
+
+	client := createClient.New(nil)
+	tok := "Bearer " + bearerToken
+	resp, err := client.SearchSketches(context.Background(), createClient.SearchSketchesPath(), nil, &username, &tok)
+	if err != nil {
+		stopSpinner()
+		formatter.PrintErrorMessage("Cannot get create sketches, sync failed")
+		os.Exit(errNetwork)
+	}
+	defer resp.Body.Close()
+
+	onlineSketches, err := client.DecodeArduinoCreateSketches(resp)
+	if err != nil {
+		stopSpinner()
+		formatter.PrintErrorMessage("Cannot unmarshal response from create, sync failed")
+		os.Exit(errGeneric)
+	}
+
+	onlineSketchesMap := make(map[string]*createClient.ArduinoCreateSketch, len(onlineSketches.Sketches))
+	for _, item := range onlineSketches.Sketches {
+		onlineSketchesMap[*item.Name] = item
+	}
+
+	maxLength := len(sketchMap) + len(onlineSketchesMap)
+
+	// create output result struct with empty arrays.
+	result := output.SketchSyncResult{
+		PushedSketches:  make([]string, 0, maxLength),
+		PulledSketches:  make([]string, 0, maxLength),
+		SkippedSketches: make([]string, 0, maxLength),
+		Errors:          make([]output.SketchSyncError, 0, maxLength),
+	}
+
 	for _, item := range sketchMap {
 
 		itemOnline, hasConflict := onlineSketchesMap[item.Name]
@@ -143,6 +185,8 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 			item.ID = itemOnline.ID.String()
 			//solve conflicts
 			if priority == "ask-always" {
+				stopSpinner()
+
 				if !formatter.IsCurrentFormat("text") {
 					formatter.PrintErrorMessage("ask mode for this command is only supported using text format")
 					os.Exit(errBadCall)
@@ -158,43 +202,50 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 					fmt.Scanln(&priority)
 					firstAsk = false
 				}
+
+				startSpinner()
 			}
 			switch priority {
 			case "push-local":
-				if GlobalFlags.Verbose > 0 {
-					formatter.Print("pushing edits of sketch: " + item.Name)
-				}
 				err := editSketch(*item, sketchbook, bearerToken)
 				if err != nil {
-					formatter.PrintError(err)
+					result.Errors = append(result.Errors, output.SketchSyncError{
+						Sketch: item.Name,
+						Error:  err,
+					})
+				} else {
+					result.PushedSketches = append(result.PushedSketches, item.Name)
 				}
 				break
 			case "pull-remote":
-				if GlobalFlags.Verbose > 0 {
-					formatter.Print("pulling " + item.Name)
-				}
 				err := pullSketch(itemOnline, sketchbook, bearerToken)
 				if err != nil {
-					formatter.PrintError(err)
+					result.Errors = append(result.Errors, output.SketchSyncError{
+						Sketch: item.Name,
+						Error:  err,
+					})
+				} else {
+					result.PulledSketches = append(result.PulledSketches, item.Name)
 				}
 				break
 			case "skip":
-				if GlobalFlags.Verbose > 0 {
-					formatter.Print("skipping " + item.Name)
-				}
+				result.SkippedSketches = append(result.SkippedSketches, item.Name)
 				break
 			default:
 				priority = "skip"
-				if GlobalFlags.Verbose > 0 {
-					formatter.Print("Priority not recognized, using skipping by default")
-					formatter.Print("skipping " + item.Name)
-				}
-
+				result.SkippedSketches = append(result.SkippedSketches, item.Name)
 			}
 
 		} else { //only local, push
-			formatter.Print("pushing " + item.Name)
-			pushSketch(*item, sketchbook, bearerToken)
+			err := pushSketch(*item, sketchbook, bearerToken)
+			if err != nil {
+				result.Errors = append(result.Errors, output.SketchSyncError{
+					Sketch: item.Name,
+					Error:  err,
+				})
+			} else {
+				result.PushedSketches = append(result.PushedSketches, item.Name)
+			}
 		}
 	}
 	for _, item := range onlineSketches.Sketches {
@@ -203,13 +254,26 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 			continue
 		}
 		//only online, pull
-		formatter.Print("pulling " + *item.Name)
 		err := pullSketch(item, sketchbook, bearerToken)
 		if err != nil {
-			formatter.PrintError(err)
+			result.Errors = append(result.Errors, output.SketchSyncError{
+				Sketch: *item.Name,
+				Error:  err,
+			})
+		} else {
+			result.PulledSketches = append(result.PulledSketches, *item.Name)
 		}
 	}
-	formatter.PrintResult("Sync Completed") // Issue # : Provide output struct to print the result in a prettier way.
+
+	stopSpinner()
+
+	// for text mode, show full info (aka String()) only if verbose > 0.
+	// for other formats always print full info.
+	if GlobalFlags.Verbose > 0 || !formatter.IsCurrentFormat("text") {
+		formatter.Print(result)
+	} else {
+		formatter.PrintResult("Sync Completed")
+	}
 }
 
 func pushSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) error {
