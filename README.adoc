@@ -71,6 +71,7 @@ Flags:
   -v, --verbose count[=-1]   enables verbose output (use more times for a higher level)
 
 Use "arduino [command] --help" for more information about a command.
+----
 
 == Contributing
 
