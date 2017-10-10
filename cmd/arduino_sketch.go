@@ -115,7 +115,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	var loader *spinner.Spinner
 
 	if isTextMode {
-		loader = spinner.New(spinner.CharSets[39], 100*time.Millisecond)
+		loader = spinner.New(spinner.CharSets[27], 100*time.Millisecond)
 		loader.Prefix = "Syncing Sketches... "
 
 		loader.Start()
