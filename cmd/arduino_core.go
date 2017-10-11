@@ -99,7 +99,7 @@ func init() {
 
 func executeCoreCommand(cmd *cobra.Command, args []string) {
 	if arduinoCoreFlags.updateIndex {
-		common.ExecUpdateIndex(prettyPrints.DownloadCoreFileIndex(), GlobalFlags.Verbose)
+		common.ExecUpdateIndex(prettyPrints.DownloadCoreFileIndex())
 	} else {
 		cmd.Help()
 		os.Exit(errBadCall)
@@ -154,7 +154,7 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errBadCall)
 	}
 
-	status, err := getPackagesStatusContext(GlobalFlags.Verbose)
+	status, err := getPackagesStatusContext()
 	if err != nil {
 		os.Exit(errGeneric)
 	}
@@ -171,12 +171,12 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) {
 		downloads[i] = toolsToDownload[i].DownloadItem
 	}
 
-	releases.ParallelDownload(downloads, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Tools, "tool")
+	releases.ParallelDownload(downloads, true, "Downloaded", &outputResults.Tools, "tool")
 	downloads = make([]releases.DownloadItem, len(coresToDownload))
 	for i := range coresToDownload {
 		downloads[i] = coresToDownload[i].DownloadItem
 	}
-	releases.ParallelDownload(downloads, true, "Downloaded", GlobalFlags.Verbose, &outputResults.Cores, "core")
+	releases.ParallelDownload(downloads, true, "Downloaded", &outputResults.Cores, "core")
 
 	formatter.Print(outputResults)
 }
@@ -187,7 +187,7 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errBadCall)
 	}
 
-	status, err := getPackagesStatusContext(GlobalFlags.Verbose)
+	status, err := getPackagesStatusContext()
 	if err != nil {
 		formatter.PrintError(err)
 		os.Exit(errCoreConfig)
@@ -204,13 +204,13 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) {
 	for i := range toolsToDownload {
 		downloads[i] = toolsToDownload[i].DownloadItem
 	}
-	releases.ParallelDownload(downloads, false, "Installed", GlobalFlags.Verbose, &outputResults.Tools, "tool")
+	releases.ParallelDownload(downloads, false, "Installed", &outputResults.Tools, "tool")
 
 	downloads = make([]releases.DownloadItem, len(coresToDownload))
 	for i := range coresToDownload {
 		downloads[i] = coresToDownload[i].DownloadItem
 	}
-	releases.ParallelDownload(downloads, false, "Installed", GlobalFlags.Verbose, &outputResults.Cores, "core")
+	releases.ParallelDownload(downloads, false, "Installed", &outputResults.Cores, "core")
 
 	for i, item := range toolsToDownload {
 		err = cores.InstallTool(item.Package, item.Name, item.Release)
@@ -296,11 +296,11 @@ func getInstalledStuff(packageName string, stuff *[]output.InstalledStuff, start
 	}
 }
 
-func getPackagesStatusContext(verbosity int) (*cores.StatusContext, error) {
+func getPackagesStatusContext() (*cores.StatusContext, error) {
 	var index cores.Index
 	err := cores.LoadIndex(&index)
 	if err != nil {
-		status, err := prettyPrints.CorruptedCoreIndexFix(index, verbosity)
+		status, err := prettyPrints.CorruptedCoreIndexFix(index)
 		if err != nil {
 			return nil, err
 		}

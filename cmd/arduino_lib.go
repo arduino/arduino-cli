@@ -128,7 +128,7 @@ func init() {
 
 func executeLibCommand(cmd *cobra.Command, args []string) {
 	if arduinoLibFlags.updateIndex {
-		common.ExecUpdateIndex(prettyPrints.DownloadLibFileIndex(), GlobalFlags.Verbose)
+		common.ExecUpdateIndex(prettyPrints.DownloadLibFileIndex())
 	} else {
 		cmd.Help()
 		os.Exit(errBadCall)
@@ -141,7 +141,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errBadCall)
 	}
 
-	status, err := getLibStatusContext(GlobalFlags.Verbose)
+	status, err := getLibStatusContext()
 	if err != nil {
 		os.Exit(errGeneric)
 	}
@@ -157,7 +157,7 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) {
 		libs[i] = releases.DownloadItem(libsToDownload[i])
 	}
 
-	releases.ParallelDownload(libs, false, "Downloaded", GlobalFlags.Verbose, &outputResults.Libraries, "library")
+	releases.ParallelDownload(libs, false, "Downloaded", &outputResults.Libraries, "library")
 
 	formatter.Print(outputResults)
 }
@@ -168,7 +168,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errBadCall)
 	}
 
-	status, err := getLibStatusContext(GlobalFlags.Verbose)
+	status, err := getLibStatusContext()
 	if err != nil {
 		os.Exit(errGeneric)
 	}
@@ -184,7 +184,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) {
 		libs[i] = releases.DownloadItem(libsToDownload[i])
 	}
 
-	releases.ParallelDownload(libs, false, "Installed", GlobalFlags.Verbose, &outputResults.Libraries, "library")
+	releases.ParallelDownload(libs, false, "Installed", &outputResults.Libraries, "library")
 
 	folder, err := common.GetDefaultLibFolder()
 	if err != nil {
@@ -323,7 +323,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) {
 func executeSearchCommand(cmd *cobra.Command, args []string) {
 	query := strings.ToLower(strings.Join(args, " "))
 
-	status, err := getLibStatusContext(GlobalFlags.Verbose)
+	status, err := getLibStatusContext()
 	if err != nil {
 		os.Exit(errCoreConfig)
 	}
@@ -340,17 +340,13 @@ func executeSearchCommand(cmd *cobra.Command, args []string) {
 	for _, name := range names {
 		if strings.Contains(strings.ToLower(name), query) {
 			found = true
-			item := items[name]
-			if GlobalFlags.Verbose > 0 {
-				message.Libraries = append(message.Libraries, item)
-				if GlobalFlags.Verbose < 2 {
-					item.Releases = nil
-				}
-			} else {
+			if arduinoLibSearchFlags.Names {
 				if formatter.IsCurrentFormat("text") {
 					name = fmt.Sprintf("\"%s\"", name)
 				}
 				message.Libraries = append(message.Libraries, name)
+			} else {
+				message.Libraries = append(message.Libraries, items[name])
 			}
 		}
 	}
@@ -449,11 +445,11 @@ func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
 	})
 }
 
-func getLibStatusContext(verbosity int) (*libraries.StatusContext, error) {
+func getLibStatusContext() (*libraries.StatusContext, error) {
 	var index libraries.Index
 	err := libraries.LoadIndex(&index)
 	if err != nil {
-		status, err := prettyPrints.CorruptedLibIndexFix(index, verbosity)
+		status, err := prettyPrints.CorruptedLibIndexFix(index)
 		if err != nil {
 			return nil, err
 		}

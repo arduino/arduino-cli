@@ -30,10 +30,6 @@
 package task
 
 import (
-	"math"
-
-	"fmt"
-
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 )
 
@@ -48,10 +44,10 @@ type Task func() Result
 //
 // All Message arrays use VERBOSITY as index.
 type Wrapper struct {
-	BeforeMessage []string
+	BeforeMessage string
 	Task          Task
-	AfterMessage  []string
-	ErrorMessage  []string
+	AfterMessage  string
+	ErrorMessage  string
 }
 
 //Result represents a result from a task, or an error.
@@ -64,52 +60,15 @@ type Result struct {
 type Sequence func() []Result
 
 // Execute executes a task while printing messages to describe what is happening.
-func (tw Wrapper) Execute(verb int) Result {
-	var maxUsableVerb [3]int
-	var msg string
-
-	if tw.BeforeMessage == nil {
-		tw.BeforeMessage = []string{}
-	}
-	if tw.AfterMessage == nil {
-		tw.AfterMessage = []string{}
-	}
-	if tw.ErrorMessage == nil {
-		tw.ErrorMessage = []string{}
-	}
-
-	if formatter.IsCurrentFormat("text") && tw.BeforeMessage != nil && len(tw.BeforeMessage) > 0 {
-		maxUsableVerb[0] = minVerb(verb, tw.BeforeMessage)
-		msg = tw.BeforeMessage[maxUsableVerb[0]]
-		if msg != "" {
-			formatter.Print(fmt.Sprintf("%s ... ", msg))
-		}
-	}
+func (tw Wrapper) Execute() Result {
+	formatter.Print(tw.BeforeMessage)
 
 	ret := tw.Task()
 
 	if ret.Error != nil {
-		if tw.ErrorMessage != nil && len(tw.ErrorMessage) > 0 {
-			maxUsableVerb[1] = minVerb(verb, tw.ErrorMessage)
-			msg = tw.ErrorMessage[maxUsableVerb[1]]
-			if msg != "" {
-				formatter.PrintErrorMessage(msg)
-			}
-		}
-	} else if tw.AfterMessage != nil && len(tw.AfterMessage) > 0 {
-		maxUsableVerb[2] = minVerb(verb, tw.AfterMessage)
-		msg = tw.AfterMessage[maxUsableVerb[2]]
-		if msg != "" {
-			formatter.Print(msg)
-		}
+		formatter.Print(tw.ErrorMessage)
+	} else {
+		formatter.Print(tw.AfterMessage)
 	}
 	return ret
-}
-
-// minVerb tells which is the max level of verbosity for the specified verbosity level (set by another
-// function call) and the provided array of strings.
-//
-// Refer to Runner struct for the usage of the array.
-func minVerb(verb1 int, sentences []string) int {
-	return int(math.Min(float64(verb1), float64(len(sentences)-1)))
 }

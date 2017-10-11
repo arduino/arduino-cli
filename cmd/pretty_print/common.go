@@ -62,16 +62,9 @@ func actionOnItems(itemPluralName string, actionPastParticiple string, itemOK []
 // uses DownloadFunc to download the file.
 func DownloadFileIndex(downloadFunc func() error) task.Wrapper {
 	return task.Wrapper{
-		BeforeMessage: []string{
-			"",
-			"Downloading from download.arduino.cc",
-		},
-		AfterMessage: []string{
-			"Index File downloaded",
-		},
-		ErrorMessage: []string{
-			"Can't download index file, check your network connection.",
-		},
+		BeforeMessage: "Downloading from download.arduino.cc",
+		AfterMessage:  "Index File downloaded",
+		ErrorMessage:  "Can't download index file, check your network connection.",
 		Task: task.Task(func() task.Result {
 			return task.Result{
 				Result: nil,
@@ -82,20 +75,18 @@ func DownloadFileIndex(downloadFunc func() error) task.Wrapper {
 }
 
 //corruptedIndexFixResults executes a generic index fix procedure, made by a download and parse task.
-func corruptedIndexFixResults(downloadTask, parseTask task.Wrapper, verbosity int) []task.Result {
+func corruptedIndexFixResults(downloadTask, parseTask task.Wrapper) []task.Result {
 	subTasks := []task.Wrapper{downloadTask, parseTask}
 	wrapper := indexFixWrapperSkeleton()
-	wrapper.Task = task.CreateSequence(subTasks, []bool{false, false}, verbosity).Task()
-	return wrapper.Execute(verbosity).Result.([]task.Result)
+	wrapper.Task = task.CreateSequence(subTasks, []bool{false, false}).Task()
+	return wrapper.Execute().Result.([]task.Result)
 }
 
 // indexParseWrapperSkeleton provides an empty skeleton for a task wrapper regarding index (core index, lib index) error fixing tasks,
 // which will be assigned later.
 func indexFixWrapperSkeleton() task.Wrapper {
 	return task.Wrapper{
-		BeforeMessage: []string{
-			"Cannot parse index file, it may be corrupted.",
-		},
+		BeforeMessage: "Cannot parse index file, it may be corrupted.",
 	}
 }
 
@@ -103,13 +94,8 @@ func indexFixWrapperSkeleton() task.Wrapper {
 // which will be assigned later.
 func indexParseWrapperSkeleton() task.Wrapper {
 	return task.Wrapper{
-		BeforeMessage: []string{
-			"",
-			"Parsing downloaded index file",
-		},
-		ErrorMessage: []string{
-			"Cannot parse index file",
-		},
-		Task: nil,
+		BeforeMessage: "Parsing downloaded index file",
+		ErrorMessage:  "Cannot parse index file",
+		Task:          nil,
 	}
 }

@@ -105,7 +105,7 @@ func downloadTask(item DownloadItem, progBar *pb.ProgressBar, label string) task
 //   forced is used to force download if cached.
 //   OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
 //   DOES NOT RETURN because modified refResults array of results using pointer provided by refResults.Results().
-func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbosity int, refResults *[]output.ProcessResult, label string) {
+func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, refResults *[]output.ProcessResult, label string) {
 	itemC := len(items)
 	tasks := make(map[string]task.Wrapper, itemC)
 	paths := make(map[string]string, itemC)
@@ -145,7 +145,7 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, verbos
 			pool, _ = pb.StartPool(progressBars...)
 		}
 
-		results := task.ExecuteParallelFromMap(tasks, verbosity)
+		results := task.ExecuteParallelFromMap(tasks)
 
 		if textMode {
 			pool.Stop()

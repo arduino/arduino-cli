@@ -34,7 +34,7 @@ import "regexp"
 
 // GlobalFlags represents flags available in all the program.
 var GlobalFlags struct {
-	Verbose         int    // More time verbose flag is written, the more the Verbose count increases. Represents verbosity level.
+	Debug           bool   // If true, dump debug output to stderr.
 	Format          string // The Output format (e.g. text, json).
 	configs.Configs        // The Configurations for the CLI.
 }
@@ -47,6 +47,10 @@ var rootCmdFlags struct {
 // arduinoLibFlags represents `arduino lib` flags.
 var arduinoLibFlags struct {
 	updateIndex bool // if true, updates libraries index.
+}
+
+var arduinoLibSearchFlags struct {
+	Names bool // if true outputs lib names only.
 }
 
 // arduinoCoreFlags represents `arduino core` flags.

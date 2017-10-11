@@ -46,12 +46,12 @@ type resultWithKey struct {
 //
 // if abortOnFailure = true then the sequence is aborted with the error,
 // otherwise there is just an error logged.
-func CreateSequence(taskWrappers []Wrapper, ignoreOnFailure []bool, verbosity int) Sequence {
+func CreateSequence(taskWrappers []Wrapper, ignoreOnFailure []bool) Sequence {
 	results := make([]Result, 0, 10)
 
 	return Sequence(func() []Result {
 		for i, taskWrapper := range taskWrappers {
-			result := taskWrapper.Execute(verbosity)
+			result := taskWrapper.Execute()
 			results = append(results, result)
 			if result.Error != nil && !ignoreOnFailure[i] {
 				formatter.Print(fmt.Sprintf("Warning from task %d: %s", i, result.Error))
@@ -74,12 +74,12 @@ func (ts Sequence) Task() Task {
 }
 
 // ExecuteSequence creates and executes an array of tasks in strict sequence.
-func ExecuteSequence(taskWrappers []Wrapper, ignoreOnFailure []bool, verbosity int) []Result {
-	return CreateSequence(taskWrappers, ignoreOnFailure, verbosity)()
+func ExecuteSequence(taskWrappers []Wrapper, ignoreOnFailure []bool) []Result {
+	return CreateSequence(taskWrappers, ignoreOnFailure)()
 }
 
 // ExecuteParallelFromMap executes a set of taskwrappers in parallel, taking input from a map[string]Wrapper.
-func ExecuteParallelFromMap(taskMap map[string]Wrapper, verbosity int) map[string]Result {
+func ExecuteParallelFromMap(taskMap map[string]Wrapper) map[string]Result {
 	results := make(chan resultWithKey, len(taskMap))
 
 	var wg sync.WaitGroup
@@ -91,7 +91,7 @@ func ExecuteParallelFromMap(taskMap map[string]Wrapper, verbosity int) map[strin
 			results <- resultWithKey{
 				Key: key,
 				Result: func() Result {
-					return task.Execute(verbosity)
+					return task.Execute()
 				}(),
 			}
 		}(key, task)
@@ -107,7 +107,7 @@ func ExecuteParallelFromMap(taskMap map[string]Wrapper, verbosity int) map[strin
 }
 
 // ExecuteParallel executes a set of Wrappers in parallel, handling concurrency for results.
-func ExecuteParallel(taskWrappers []Wrapper, verbosity int) []Result {
+func ExecuteParallel(taskWrappers []Wrapper) []Result {
 	results := make(chan Result, len(taskWrappers))
 
 	var wg sync.WaitGroup
@@ -117,7 +117,7 @@ func ExecuteParallel(taskWrappers []Wrapper, verbosity int) []Result {
 		go func(task Wrapper) {
 			defer wg.Done()
 			results <- func() Result {
-				return task.Execute(verbosity)
+				return task.Execute()
 			}()
 		}(task)
 	}

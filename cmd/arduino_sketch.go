@@ -135,13 +135,9 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 
 	username, bearerToken, err := login()
 	if err != nil {
-		if GlobalFlags.Verbose == 0 {
-			formatter.PrintErrorMessage("Cannot login automatically: try arduino login the run again this command")
-		} else {
-			stopSpinner()
-			formatter.PrintError(err)
-			os.Exit(errNetwork)
-		}
+		stopSpinner()
+		formatter.PrintError(err)
+		os.Exit(errNetwork)
 	}
 
 	sketchMap := sketches.Find(sketchbook, "libraries") //exclude libraries folder
@@ -266,14 +262,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	}
 
 	stopSpinner()
-
-	// for text mode, show full info (aka String()) only if verbose > 0.
-	// for other formats always print full info.
-	if GlobalFlags.Verbose > 0 || !formatter.IsCurrentFormat("text") {
-		formatter.Print(result)
-	} else {
-		formatter.PrintResult("Sync Completed")
-	}
+	formatter.Print(result)
 }
 
 func pushSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) error {
@@ -454,10 +443,10 @@ func login() (string, string, error) {
 	content, err := NetRC.MarshalText()
 	if err == nil { //serialize new info
 		err := ioutil.WriteFile(netRCFile, content, 0666)
-		if err != nil && GlobalFlags.Verbose > 0 {
+		if err != nil {
 			formatter.Print(err.Error())
 		}
-	} else if GlobalFlags.Verbose > 0 {
+	} else {
 		formatter.Print(err.Error())
 	}
 	return arduinoMachine.Login, token, nil

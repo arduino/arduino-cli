@@ -43,14 +43,14 @@ func ExampleCreateSequence() {
 	sequence.Execute()
 
 	// Output:
-	// Starting sequence ...
-	// starting first task ...
+	// Starting sequence
+	// starting first task
 	// First task
 	// first task over
-	// starting second task ...
+	// starting second task
 	// second task
 	// second task over
-	// starting third task ...
+	// starting third task
 	// third task
 	// third task over
 	// Sequence over
@@ -106,17 +106,17 @@ func ExampleCreateSequence_errors_ignored() {
 	sequence.Execute()
 
 	// Output:
-	// Starting sequence ...
-	// starting first task ...
+	// Starting sequence
+	// starting first task
 	// First task
 	// first task over
-	// starting second task ...
+	// starting second task
 	// second task (with error)
 	// second task with error
-	// starting third task ...
+	// starting third task
 	// third task (with error)
 	// third task with error
-	// starting fourth task ...
+	// starting fourth task
 	// fourth task
 	// fourth task over
 	// Sequence over
@@ -172,19 +172,19 @@ func ExampleCreateSequence_errors_shown_all() {
 	sequence.Execute()
 
 	// Output:
-	// Starting sequence ...
-	// starting first task ...
+	// Starting sequence
+	// starting first task
 	// First task
 	// first task over
-	// starting second task ...
+	// starting second task
 	// second task (with error)
 	// second task with error
 	// Warning from task 1: Error Triggered
-	// starting third task ...
+	// starting third task
 	// third task (with error)
 	// third task with error
 	// Warning from task 2: Second Error Triggered
-	// starting fourth task ...
+	// starting fourth task
 	// fourth task
 	// fourth task over
 	// Sequence over
@@ -240,18 +240,18 @@ func ExampleCreateSequence_errors_ignored_first_and_third() {
 	sequence.Execute()
 
 	// Output:
-	// Starting sequence ...
-	// starting first task ...
+	// Starting sequence
+	// starting first task
 	// First task
 	// first task over
-	// starting second task ...
+	// starting second task
 	// second task (with error)
 	// second task with error
 	// Warning from task 1: Error Triggered
-	// starting third task ...
+	// starting third task
 	// third task (with error)
 	// third task with error
-	// starting fourth task ...
+	// starting fourth task
 	// fourth task
 	// fourth task over
 	// Sequence over

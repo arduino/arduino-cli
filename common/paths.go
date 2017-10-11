@@ -140,8 +140,8 @@ func GetDownloadCacheFolder(item string) (string, error) {
 }
 
 // ExecUpdateIndex is a generic procedure to update an index file.
-func ExecUpdateIndex(updateTask task.Wrapper, verbosity int) {
-	updateTask.Execute(verbosity)
+func ExecUpdateIndex(updateTask task.Wrapper) {
+	updateTask.Execute()
 }
 
 // IndexPath returns the path of the specified index file.

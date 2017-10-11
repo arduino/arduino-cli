@@ -92,7 +92,7 @@ func TestLibSearch(t *testing.T) {
 	//executeWithArgs(t, "lib", "search", "you") //test not working on drone, but working locally
 	// arduino lib search youtu --format json
 	// arduino lib search youtu --format=json
-	executeWithArgs(t, "lib", "search", "youtu", "--format", "json")
+	executeWithArgs(t, "lib", "search", "youtu", "--format", "json", "--names")
 
 	checkOutput(t, want, tempFile)
 }

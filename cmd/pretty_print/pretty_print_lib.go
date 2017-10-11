@@ -40,18 +40,18 @@ func DownloadLibFileIndex() task.Wrapper {
 }
 
 // CorruptedLibIndexFix pretty prints messages regarding corrupted index fixes of libraries.
-func CorruptedLibIndexFix(index libraries.Index, verbosity int) (libraries.StatusContext, error) {
+func CorruptedLibIndexFix(index libraries.Index) (libraries.StatusContext, error) {
 	downloadTask := DownloadLibFileIndex()
-	parseTask := libIndexParse(index, verbosity)
+	parseTask := libIndexParse(index)
 
-	result := corruptedIndexFixResults(downloadTask, parseTask, verbosity)
+	result := corruptedIndexFixResults(downloadTask, parseTask)
 	ret, _ := result[1].Result.(libraries.StatusContext)
 	err := result[1].Error
 	return ret, err
 }
 
 // libIndexParse pretty prints info about parsing an index file of libraries.
-func libIndexParse(index libraries.Index, verbosity int) task.Wrapper {
+func libIndexParse(index libraries.Index) task.Wrapper {
 	ret := indexParseWrapperSkeleton()
 	ret.Task = func() task.Result {
 		err := libraries.LoadIndex(&index)

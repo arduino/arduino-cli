@@ -167,14 +167,16 @@ func InitFlags() {
 	arduinoSketchSyncCmd.ResetFlags()
 	arduinoLoginCmd.ResetFlags()
 
-	ArduinoCmd.PersistentFlags().CountVarP(&GlobalFlags.Verbose, "verbose", "v", "enables verbose output (use more times for a higher level)")
+	ArduinoCmd.PersistentFlags().BoolVar(&GlobalFlags.Debug, "debug", false, "enables debug output")
 	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
 
 	ArduinoCmd.PersistentFlags().StringVar(&configs.FileLocation, "config-file", configs.FileLocation, "the custom config file (if not specified ./.cli-config.yml will be used)")
 
 	ArduinoCmd.Flags().BoolVar(&rootCmdFlags.GenerateDocs, "generate-docs", false, "generates the docs for the CLI and puts it in docs folder")
 
-	arduinoLibCmd.Flags().Bool("update-index", false, "Updates the libraries index")
+	arduinoLibCmd.Flags().BoolVar(&arduinoLibFlags.updateIndex, "update-index", false, "Updates the libraries index")
+
+	arduinoLibSearchCmd.Flags().BoolVar(&arduinoLibSearchFlags.Names, "names", false, "Show library names only")
 
 	arduinoCoreCmd.Flags().BoolVar(&arduinoCoreFlags.updateIndex, "update-index", false, "Updates the index of cores to the latest version")
 
@@ -292,21 +294,6 @@ func versionsToPrint(cmd *cobra.Command, isRoot bool) []string {
 	verToPrint := make([]string, 0, 10)
 	if isRoot {
 		verToPrint = append(verToPrint, cmd.Parent().Name())
-	}
-
-	if GlobalFlags.Verbose > 0 {
-		siblings := findSiblings(cmd)
-		//search version command in siblings children.
-		for _, sibling := range siblings {
-			for _, sibChild := range sibling.Commands() {
-				//fmt.Println(sibling.Name(), " >", sibChild.Name())
-				if sibChild.Name() == "version" {
-					verToPrint = append(verToPrint, sibling.Name())
-				} else {
-					verToPrint = append(verToPrint, versionsToPrint(sibChild, false)...)
-				}
-			}
-		}
 	}
 
 	return verToPrint
