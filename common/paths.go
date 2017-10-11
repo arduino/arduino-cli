@@ -97,6 +97,7 @@ func GetDefaultArduinoHomeFolder() (string, error) {
 		if err != nil {
 			return "", err
 		}
+		// TODO: before doing this, check IDE's preferences.txt for different sketchbook path
 		SketchbookFolder = filepath.Join(usr.HomeDir, "Arduino")
 	}
 	return GetFolder(SketchbookFolder, "Arduino home", true)
@@ -124,6 +125,7 @@ func GetDefaultPkgFolder() (string, error) {
 
 // GetDefaultCoresFolder gets the default folder of downloaded cores.
 func GetDefaultCoresFolder(packageName string) (string, error) {
+	// TODO: wrong, this is not the correct location of the cores (in Java IDE)
 	return GetDefaultFolder(GetDefaultPkgFolder, filepath.Join(packageName, "hardware"), "cores", true)
 }
 
