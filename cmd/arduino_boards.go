@@ -13,6 +13,7 @@ import (
 	"github.com/bcmi-labs/arduino-modules/sketches"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/cmd/output"
 
 	"github.com/arduino/board-discovery"
 	"github.com/spf13/cobra"
@@ -48,6 +49,19 @@ func executeBoardListCommand(cmd *cobra.Command, args []string) {
 		formatter.PrintErrorMessage("Not accepting additional arguments")
 		os.Exit(errBadCall)
 	}
+
+	packageFolder, err := common.GetDefaultPkgFolder()
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot Parse Board Index file")
+		os.Exit(errCoreConfig)
+	}
+
+	bs, err := boards.Find(packageFolder)
+	if err != nil {
+		formatter.PrintErrorMessage("Cannot Parse Board Index file")
+		os.Exit(errCoreConfig)
+	}
+
 	monitor := discovery.New(time.Millisecond)
 	monitor.Start()
 	duration, err := time.ParseDuration(arduinoBoardListFlags.SearchTimeout)
@@ -59,7 +73,7 @@ func executeBoardListCommand(cmd *cobra.Command, args []string) {
 			for {
 				select {
 				case <-stop:
-					fmt.Print("\r              ")
+					fmt.Print("\r              \r")
 					return
 				default:
 					fmt.Print("\rDiscovering.  ")
@@ -69,7 +83,6 @@ func executeBoardListCommand(cmd *cobra.Command, args []string) {
 					fmt.Print("\rDiscovering...")
 					time.Sleep(time.Millisecond * 500)
 				}
-
 			}
 		})
 
@@ -81,7 +94,9 @@ func executeBoardListCommand(cmd *cobra.Command, args []string) {
 	} else {
 		time.Sleep(duration)
 	}
-	formatter.Print(*monitor)
+
+	formatter.Print(output.NewBoardList(bs, monitor))
+
 	//monitor.Stop() //If called will slow like 1sec the program to close after print, with the same result (tested).
 	// it closes ungracefully, but at the end of the command we can't have races.
 }
