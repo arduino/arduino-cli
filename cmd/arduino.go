@@ -354,30 +354,31 @@ func versionPrint(commandNames ...string) {
 	}
 }
 
-// findSiblings returns the array of the siblings of the specified command.
-func findSiblings(cmd *cobra.Command) (siblings []*cobra.Command) {
-	for _, childCmd := range cmd.Parent().Commands() {
-		if childCmd.Name() != "version" {
-			siblings = append(siblings, childCmd)
-		}
-	}
-	return
-}
-
 func initViper() {
-	defHome, _ := common.GetDefaultArduinoHomeFolder()
-	defArduinoData, _ := common.GetDefaultArduinoFolder()
+	logrus.Info("Initiating viper config")
+
+	defHome, err := common.GetDefaultArduinoHomeFolder()
+	if err != nil {
+		logrus.WithError(err).Warn("Cannot get default Arduino Home")
+	}
+	defArduinoData, err := common.GetDefaultArduinoFolder()
+	if err != nil {
+		logrus.WithError(err).Warn("Cannot get default Arduino folder")
+	}
+
 	viper.SetConfigName(".cli-config")
 	viper.AddConfigPath(".")
 	viper.SetConfigType("yaml")
 
-	err := viper.ReadInConfig()
+	logrus.Info("Reading configuration for viper")
+	err = viper.ReadInConfig()
 	if err != nil {
-		//formatter.PrintError(err)
+		logrus.WithError(err).Error("Cannot read configuration file in any of the default folders")
 		formatter.PrintErrorMessage("Cannot read configuration file in any of the default folders")
 		os.Exit(errNoConfigFile)
 	}
 
+	logrus.Info("Setting defaults")
 	viper.SetDefault("paths.sketchbook", defHome)
 	viper.SetDefault("paths.arduino_data", defArduinoData)
 	viper.SetDefault("proxy.type", "auto")
@@ -387,11 +388,13 @@ func initViper() {
 
 	viper.AutomaticEnv()
 
+	logrus.Info("Setting proxy")
 	if viper.GetString("proxy.type") == "manual" {
 		hostname := viper.GetString("proxy.hostname")
 		if hostname == "" {
+			logrus.Error("With manual proxy configuration, hostname is required.")
 			formatter.PrintErrorMessage("With manual proxy configuration, hostname is required.")
-			os.Exit(2)
+			os.Exit(errCoreConfig)
 		}
 
 		if strings.HasPrefix(hostname, "http") {
@@ -406,17 +409,22 @@ func initViper() {
 
 		}
 	}
+	logrus.Info("Done viper configuration loading")
 }
 
 func executeLoginCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino login`")
+
 	userEmpty := arduinoLoginFlags.User == ""
 	passwordEmpty := arduinoLoginFlags.Password == ""
 	isTextMode := formatter.IsCurrentFormat("text")
 	if !isTextMode && (userEmpty || passwordEmpty) {
+		logrus.Error("User and password must be specified outside of text format")
 		formatter.PrintErrorMessage("User and password must be specified outside of text format")
 		return
 	}
 
+	logrus.Info("Using/Asking credentials")
 	if userEmpty {
 		fmt.Print("Username: ")
 		fmt.Scanln(&arduinoLoginFlags.User)
@@ -424,8 +432,9 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 
 	if passwordEmpty {
 		fmt.Print("Password: ")
-		pass, err := terminal.ReadPassword(int(syscall.Stdin))
+		pass, err := terminal.ReadPassword(syscall.Stdin)
 		if err != nil {
+			logrus.WithError(err).Error("Cannot read password, login aborted")
 			formatter.PrintErrorMessage("Cannot read password, login aborted")
 			return
 		}
@@ -433,25 +442,32 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 		fmt.Println()
 	}
 
+	logrus.Info("Getting ~/.netrc file")
+
 	//save into netrc
 	netRCHome, err := homedir.Dir()
 	if err != nil {
-		formatter.PrintError(err)
+		logrus.WithError(err).Error("Cannot get current home directory")
+		formatter.PrintErrorMessage("Cannot get current home directory")
 		os.Exit(errGeneric)
 	}
 
 	netRCFile := filepath.Join(netRCHome, ".netrc")
 	file, err := os.OpenFile(netRCFile, os.O_RDONLY|os.O_CREATE, 0666)
 	if err != nil {
-		formatter.PrintError(err)
+		logrus.WithError(err).Error("Cannot cannot read .netrc file")
+		formatter.PrintErrorMessage("Cannot cannot read .netrc file")
 		return
 	}
 	defer file.Close()
 	NetRC, err := netrc.Parse(file)
 	if err != nil {
-		formatter.PrintError(err)
+		logrus.WithError(err).Error("Cannot parse read .netrc file")
+		formatter.PrintErrorMessage("Cannot parse read .netrc file")
 		os.Exit(errGeneric)
 	}
+
+	logrus.Info("Trying to login")
 
 	usr := arduinoLoginFlags.User
 	pwd := arduinoLoginFlags.Password
@@ -459,6 +475,7 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 
 	token, err := authConf.Token(usr, pwd)
 	if err != nil {
+		logrus.WithError(err).Error("Cannot login")
 		formatter.PrintError(err)
 		os.Exit(errNetwork)
 	}
@@ -467,16 +484,19 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 	NetRC.NewMachine("arduino.cc", usr, token.Access, token.Refresh)
 	content, err := NetRC.MarshalText()
 	if err != nil {
-		formatter.PrintError(err)
+		logrus.WithError(err).Error("Cannot parse new .netrc file")
+		formatter.PrintErrorMessage("Cannot parse new .netrc file")
 		os.Exit(errGeneric)
 	}
 
 	err = ioutil.WriteFile(netRCFile, content, 0666)
 	if err != nil {
-		formatter.PrintError(err)
+		logrus.WithError(err).Error("Cannot cannot write new .netrc file")
+		formatter.PrintErrorMessage("Cannot cannot write new .netrc file")
 		os.Exit(errGeneric)
 	}
 
 	formatter.PrintResult(`Successfully logged into the system
 The session will continue to be refreshed with every call of the CLI and will expire if not used`)
+	logrus.Info("Done")
 }
