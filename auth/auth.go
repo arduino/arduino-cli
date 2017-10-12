@@ -233,7 +233,7 @@ func (c *Config) authenticate(client *http.Client, cookies cookies, uri, user, p
 	}
 
 	if res.StatusCode != 302 {
-		return "", errors.New("authentication failed")
+		return "", errors.New("status = " + res.Status)
 	}
 
 	// Follow redirect to hydra
