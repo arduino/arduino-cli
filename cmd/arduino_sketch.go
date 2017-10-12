@@ -40,6 +40,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/bcmi-labs/arduino-cli/auth"
 	"github.com/bcmi-labs/arduino-cli/create_client_helpers"
 	"github.com/bgentry/go-netrc/netrc"
@@ -72,27 +74,37 @@ var arduinoSketchSyncCmd = &cobra.Command{
 }
 
 func executeSketchCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino sketch`")
+	logrus.Error("No subcommand specified, showing help message")
 	formatter.PrintErrorMessage("No subcommand specified")
 	cmd.Help()
+	logrus.Error("Bad Call Exit")
 	os.Exit(errBadCall)
 }
 
 func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino sketch sync`")
 	if len(args) > 0 {
+		logrus.Error("No arguments are accepted for this command")
 		formatter.PrintErrorMessage("No arguments are accepted")
 		os.Exit(errBadCall)
 	}
 
 	sketchbook, err := common.GetDefaultArduinoHomeFolder()
 	if err != nil {
+		logrus.WithError(err).Error("Cannot get sketchbook folder")
 		formatter.PrintErrorMessage("Cannot get sketchbook folder")
 		os.Exit(errCoreConfig)
 	}
 
+	isTextMode := formatter.IsCurrentFormat("text")
+
+	logrus.Info("Setting priority")
 	priority := arduinoSketchSyncFlags.Priority
 
 	if priority == "ask-once" {
-		if !formatter.IsCurrentFormat("text") {
+		if !isTextMode {
+			logrus.Error("ask mode for this command is only supported using text format")
 			formatter.PrintErrorMessage("ask mode for this command is only supported using text format")
 			os.Exit(errBadCall)
 		}
@@ -109,12 +121,13 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	//loader
-	isTextMode := formatter.IsCurrentFormat("text")
+	logrus.Infof("Priority set to %s", priority)
+
+	logrus.Info("Preparing")
 
 	var loader *spinner.Spinner
 
-	if isTextMode {
+	if isTextMode && !GlobalFlags.Debug {
 		loader = spinner.New(spinner.CharSets[27], 100*time.Millisecond)
 		loader.Prefix = "Syncing Sketches... "
 
@@ -122,31 +135,36 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	}
 
 	stopSpinner := func() {
-		if isTextMode {
+		if isTextMode && !GlobalFlags.Debug {
 			loader.Stop()
 		}
 	}
 
 	startSpinner := func() {
-		if isTextMode {
+		if isTextMode && !GlobalFlags.Debug {
 			loader.Start()
 		}
 	}
 
+	logrus.Info("Logging in")
 	username, bearerToken, err := login()
 	if err != nil {
 		stopSpinner()
+		logrus.WithError(err).Error("Cannot login")
 		formatter.PrintError(err)
 		os.Exit(errNetwork)
 	}
 
+	logrus.Info("Finding local sketches")
 	sketchMap := sketches.Find(sketchbook, "libraries") //exclude libraries folder
 
+	logrus.Info("Finding online sketches")
 	client := createClient.New(nil)
 	tok := "Bearer " + bearerToken
 	resp, err := client.SearchSketches(context.Background(), createClient.SearchSketchesPath(), nil, &username, &tok)
 	if err != nil {
 		stopSpinner()
+		logrus.WithError(err).Error("Cannot get create sketches, sync failed")
 		formatter.PrintErrorMessage("Cannot get create sketches, sync failed")
 		os.Exit(errNetwork)
 	}
@@ -155,6 +173,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	onlineSketches, err := client.DecodeArduinoCreateSketches(resp)
 	if err != nil {
 		stopSpinner()
+		logrus.WithError(err).Error("Cannot unmarshal response from create, sync failed")
 		formatter.PrintErrorMessage("Cannot unmarshal response from create, sync failed")
 		os.Exit(errGeneric)
 	}
@@ -166,6 +185,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 
 	maxLength := len(sketchMap) + len(onlineSketchesMap)
 
+	logrus.Info("Syncing sketches")
 	// create output result struct with empty arrays.
 	result := output.SketchSyncResult{
 		PushedSketches:  make([]string, 0, maxLength),
@@ -175,18 +195,21 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for _, item := range sketchMap {
-
 		itemOnline, hasConflict := onlineSketchesMap[item.Name]
 		if hasConflict {
+			logrus.Warnf("Conflict found for sketch `%s`", item.Name)
 			item.ID = itemOnline.ID.String()
 			//solve conflicts
 			if priority == "ask-always" {
 				stopSpinner()
 
-				if !formatter.IsCurrentFormat("text") {
+				logrus.Warn("Asking user what to do")
+				if !isTextMode {
+					logrus.WithField("format", GlobalFlags.Format).Error("ask mode for this command is only supported using text format")
 					formatter.PrintErrorMessage("ask mode for this command is only supported using text format")
 					os.Exit(errBadCall)
 				}
+
 				firstAsk := true
 				for priority != "pull-remote" &&
 					priority != "push-local" &&
@@ -198,48 +221,59 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 					fmt.Scanln(&priority)
 					firstAsk = false
 				}
+				logrus.Warnf("Decision has been taken: %s", priority)
 
 				startSpinner()
 			}
 			switch priority {
 			case "push-local":
+				logrus.Infof("Pushing local sketch `%s` as edit", item.Name)
 				err := editSketch(*item, sketchbook, bearerToken)
 				if err != nil {
+					logrus.WithError(err).Warnf("Cannot push `%s`", item.Name)
 					result.Errors = append(result.Errors, output.SketchSyncError{
 						Sketch: item.Name,
 						Error:  err,
 					})
 				} else {
+					logrus.Infof("`%s` pushed", item.Name)
 					result.PushedSketches = append(result.PushedSketches, item.Name)
 				}
 				break
 			case "pull-remote":
+				logrus.Infof("Pulling remote sketch `%s`", item.Name)
 				err := pullSketch(itemOnline, sketchbook, bearerToken)
 				if err != nil {
+					logrus.WithError(err).Warnf("Cannot pull `%s`", item.Name)
 					result.Errors = append(result.Errors, output.SketchSyncError{
 						Sketch: item.Name,
 						Error:  err,
 					})
 				} else {
+					logrus.Infof("`%s` pulled", item.Name)
 					result.PulledSketches = append(result.PulledSketches, item.Name)
 				}
 				break
 			case "skip":
+				logrus.Warnf("Skipping `%s`", item.Name)
 				result.SkippedSketches = append(result.SkippedSketches, item.Name)
 				break
 			default:
+				logrus.Warnf("Skipping by default `%s`", item.Name)
 				priority = "skip"
 				result.SkippedSketches = append(result.SkippedSketches, item.Name)
 			}
-
 		} else { //only local, push
+			logrus.Info("No conflict, pushing `%s` as new sketch", item.Name)
 			err := pushSketch(*item, sketchbook, bearerToken)
 			if err != nil {
+				logrus.WithError(err).Warnf("Cannot push `%s`", item.Name)
 				result.Errors = append(result.Errors, output.SketchSyncError{
 					Sketch: item.Name,
 					Error:  err,
 				})
 			} else {
+				logrus.Infof("`%s` pushed", item.Name)
 				result.PushedSketches = append(result.PushedSketches, item.Name)
 			}
 		}
@@ -250,19 +284,23 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 			continue
 		}
 		//only online, pull
+		logrus.Infof("Pulling only online sketch `%s`", *item.Name)
 		err := pullSketch(item, sketchbook, bearerToken)
 		if err != nil {
+			logrus.WithError(err).Warnf("Cannot pull `%s`", *item.Name)
 			result.Errors = append(result.Errors, output.SketchSyncError{
 				Sketch: *item.Name,
 				Error:  err,
 			})
 		} else {
+			logrus.Infof("`%s` pulled", *item.Name)
 			result.PulledSketches = append(result.PulledSketches, *item.Name)
 		}
 	}
 
 	stopSpinner()
 	formatter.Print(result)
+	logrus.Info("Done")
 }
 
 func pushSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) error {
@@ -411,23 +449,30 @@ func login() (string, string, error) {
 		return "", "", err
 	}
 
+	logrus.Info("Reading ~/.netrc file")
 	netRCFile := filepath.Join(home, ".netrc")
 	file, err := os.OpenFile(netRCFile, os.O_CREATE|os.O_RDONLY, 0666)
 	if err != nil {
+		logrus.WithError(err).Error("Cannot read ~/.netrc file")
 		return "", "", err
 	}
 	NetRC, err := netrc.Parse(file)
 	if err != nil {
+		logrus.WithError(err).Error("Cannot parse ~/.netrc file")
 		return "", "", err
 	}
 
+	logrus.Info("Searching for user credentials into the ~/.netrc file")
 	arduinoMachine := NetRC.FindMachine("arduino.cc")
 	if arduinoMachine.Name != "arduino.cc" {
-		return "", "", errors.New("Credentials not present, try login with arduino login first")
+		logrus.WithError(err).Error("Credentials not found")
+		return "", "", errors.New("Credentials not found, try typing `arduino login` to login")
 	}
 
+	logrus.Info("Refreshing user session")
 	newToken, err := authConf.Refresh(arduinoMachine.Password)
 	if err != nil {
+		logrus.WithError(err).Error("Session expired, try typing `arduino login` to login again")
 		return "", "", err
 	}
 
@@ -444,10 +489,13 @@ func login() (string, string, error) {
 	if err == nil { //serialize new info
 		err := ioutil.WriteFile(netRCFile, content, 0666)
 		if err != nil {
+			logrus.WithError(err).Error("Cannot write new ~/.netrc file")
 			formatter.Print(err.Error())
 		}
 	} else {
+		logrus.WithError(err).Error("Cannot serialize ~/.netrc file")
 		formatter.Print(err.Error())
 	}
+	logrus.Info("Login successful")
 	return arduinoMachine.Login, token, nil
 }
