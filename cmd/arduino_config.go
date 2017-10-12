@@ -30,7 +30,9 @@
 package cmd
 
 import (
-	"fmt"
+	"os"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/configs"
@@ -42,6 +44,7 @@ var arduinoConfigCmd = &cobra.Command{
 	Short:   `Arduino Configuration Commands`,
 	Long:    `Arduino Configuration Commands`,
 	Example: `arduino config init # Initializes a new config file into the default location`,
+	Run:     executeConfigCommand,
 }
 
 var arduinoConfigInitCmd = &cobra.Command{
@@ -53,19 +56,43 @@ arduino config init --default # Creates a config file with default configuration
 	Run: executeConfigInitCommand,
 }
 
+func executeConfigCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino config`")
+	logrus.Warn("No subcommand specified for this command")
+	formatter.PrintErrorMessage("No subcommand specified")
+	if formatter.IsCurrentFormat("text") {
+		logrus.Warn("Showing help message")
+		cmd.Help()
+	}
+	logrus.Info("Done")
+}
+
 func executeConfigInitCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino config init`")
+
 	var conf configs.Configs
-	if !arduinoConfigInitFlags.Default && formatter.IsCurrentFormat("text") {
+
+	if !arduinoConfigInitFlags.Default {
+		if !formatter.IsCurrentFormat("text") {
+			logrus.Error("The interactive mode is supported only in text mode")
+			formatter.PrintErrorMessage("The interactive mode is supported only in text mode")
+			os.Exit(errBadCall)
+		}
+		logrus.Info("Asking questions to the user to populate configuration")
 		conf = ConfigsFromQuestions()
 	} else {
+		logrus.Info("Setting default configuration")
 		conf = configs.Default()
 	}
 	err := conf.Serialize(arduinoConfigInitFlags.Location)
 	if err != nil {
-		formatter.PrintErrorMessage(fmt.Sprint("Config file creation error: ", err))
+		logrus.WithError(err).Error("Cannot create config file")
+		formatter.PrintErrorMessage("Cannot create config file")
+		os.Exit(errGeneric)
 	} else {
 		formatter.PrintResult("Config file PATH: " + arduinoConfigInitFlags.Location)
 	}
+	logrus.Info("Done")
 }
 
 // ConfigsFromQuestions asks some questions to the user to properly initialize configs.

@@ -33,6 +33,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
@@ -98,23 +100,30 @@ func init() {
 }
 
 func executeCoreCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino core`")
 	if arduinoCoreFlags.updateIndex {
+		logrus.Info("Updating package index")
 		common.ExecUpdateIndex(prettyPrints.DownloadCoreFileIndex())
 	} else {
+		logrus.Warn("No subcommand specified, showing help message")
 		cmd.Help()
 		os.Exit(errBadCall)
 	}
+	logrus.Info("Done")
 }
 
 func executeCoreListCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino core list`")
 	pkgHome, err := common.GetDefaultPkgFolder()
 	if err != nil {
+		logrus.WithError(err).Error("Cannot get packages folder")
 		formatter.PrintError(err)
 		os.Exit(errCoreConfig)
 	}
 
 	dir, err := os.Open(pkgHome)
 	if err != nil {
+		logrus.WithError(err).Error("Cannot open packages folder")
 		formatter.PrintErrorMessage("Cannot open packages folder")
 		os.Exit(errCoreConfig)
 	}
@@ -122,6 +131,7 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
+		logrus.WithError(err).Error("Cannot read into packages folder")
 		formatter.PrintErrorMessage("Cannot read into packages folder")
 		os.Exit(errCoreConfig)
 	}
@@ -130,6 +140,7 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 		InstalledPackages: make([]output.InstalledPackage, 0, 10),
 	}
 
+	logrus.Info("Listing")
 	for _, file := range dirFiles {
 		if !file.IsDir() {
 			continue
@@ -140,25 +151,35 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 			InstalledCores: make([]output.InstalledStuff, 0, 5),
 			InstalledTools: make([]output.InstalledStuff, 0, 5),
 		}
+		logrus.Infof("Getting installed cores of package: `%s`", packageName)
 		getInstalledCores(packageName, &pkg.InstalledCores)
+		logrus.Infof("Getting installed tools of package: `%s`", packageName)
 		getInstalledTools(packageName, &pkg.InstalledTools)
+		logrus.Infof("Adding package of dir: `%s` to the list", file)
 		pkgs.InstalledPackages = append(pkgs.InstalledPackages, pkg)
 	}
 
 	formatter.Print(pkgs)
+	logrus.Info("Done")
 }
 
 func executeCoreDownloadCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino core download`")
+
 	if len(args) < 1 {
+		logrus.Error("No core specified for download command, exiting")
 		formatter.PrintErrorMessage("No core specified for download command")
 		os.Exit(errBadCall)
 	}
 
+	logrus.Info("Getting packages status context")
 	status, err := getPackagesStatusContext()
 	if err != nil {
-		os.Exit(errGeneric)
+		logrus.WithError(err).Error("Cannot get packages status context")
+		os.Exit(errCoreConfig)
 	}
 
+	logrus.Info("Preparing download")
 	IDTuples := cores.ParseArgs(args)
 
 	coresToDownload, toolsToDownload, failOutputs := status.Process(IDTuples)
@@ -171,83 +192,144 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) {
 		downloads[i] = toolsToDownload[i].DownloadItem
 	}
 
+	logrus.Info("Downloading tool dependencies of all cores requested")
 	releases.ParallelDownload(downloads, true, "Downloaded", &outputResults.Tools, "tool")
 	downloads = make([]releases.DownloadItem, len(coresToDownload))
 	for i := range coresToDownload {
 		downloads[i] = coresToDownload[i].DownloadItem
 	}
+	logrus.Info("Downloading cores")
 	releases.ParallelDownload(downloads, true, "Downloaded", &outputResults.Cores, "core")
 
 	formatter.Print(outputResults)
+	logrus.Info("Done")
 }
 
 func executeCoreInstallCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino core download`")
+
 	if len(args) < 1 {
+		logrus.Error("No core specified for download command, exiting")
 		formatter.PrintErrorMessage("No core specified for download command")
 		os.Exit(errBadCall)
 	}
 
+	logrus.Info("Getting packages status context")
 	status, err := getPackagesStatusContext()
 	if err != nil {
-		formatter.PrintError(err)
+		logrus.WithError(err).Error("Cannot get packages status context")
 		os.Exit(errCoreConfig)
 	}
 
+	logrus.Info("Preparing download")
 	IDTuples := cores.ParseArgs(args)
+
 	coresToDownload, toolsToDownload, failOutputs := status.Process(IDTuples)
 	failOutputsCount := len(failOutputs)
 	outputResults := output.CoreProcessResults{
 		Cores: failOutputs,
+		Tools: make([]output.ProcessResult, 0, 10),
 	}
-
 	downloads := make([]releases.DownloadItem, len(toolsToDownload))
 	for i := range toolsToDownload {
 		downloads[i] = toolsToDownload[i].DownloadItem
 	}
-	releases.ParallelDownload(downloads, false, "Installed", &outputResults.Tools, "tool")
 
+	logrus.Info("Downloading tool dependencies of all cores requested")
+	releases.ParallelDownload(downloads, false, "Downloaded", &outputResults.Tools, "tool")
 	downloads = make([]releases.DownloadItem, len(coresToDownload))
 	for i := range coresToDownload {
 		downloads[i] = coresToDownload[i].DownloadItem
 	}
-	releases.ParallelDownload(downloads, false, "Installed", &outputResults.Cores, "core")
+	logrus.Info("Downloading cores")
+	releases.ParallelDownload(downloads, false, "Downloaded", &outputResults.Cores, "core")
 
+	logrus.Info("Installing tool dependencies")
 	for i, item := range toolsToDownload {
+		logrus.WithField("Package", item.Package).
+			WithField("Name", item.Name).
+			WithField("Version", item.Release.VersionName()).
+			Info("Installing tool")
+
+		toolRoot, err := common.GetDefaultToolsFolder(item.Package)
+		if err != nil {
+			logrus.WithError(err).Error("Cannot get tool install path, try again.")
+			formatter.PrintErrorMessage("Cannot get tool install path, try again.")
+			os.Exit(errCoreConfig)
+		}
+		possiblePath := filepath.Join(toolRoot, item.Name, item.Release.VersionName())
+
 		err = cores.InstallTool(item.Package, item.Name, item.Release)
 		if err != nil {
-			outputResults.Tools[i] = output.ProcessResult{
-				ItemName: item.Name,
-				Error:    err.Error(),
+			if os.IsExist(err) {
+				logrus.WithError(err).Warnf("Cannot install tool `%s`, it is already installed", item.Name)
+				outputResults.Tools[i] = output.ProcessResult{
+					ItemName: item.Name,
+					Status:   "Already Installed",
+					Path:     possiblePath,
+				}
+			} else {
+				logrus.WithError(err).Warnf("Cannot install tool `%s`", item.Name)
+				outputResults.Tools[i] = output.ProcessResult{
+					ItemName: item.Name,
+					Status:   "",
+					Error:    err.Error(),
+				}
 			}
 		} else {
-			toolRoot, err := common.GetDefaultToolsFolder(item.Package)
-			if err != nil {
-				formatter.PrintErrorMessage("Cannot get tool install path, try again.")
-				os.Exit(errCoreConfig)
+			logrus.Info("Adding installed tool to final result")
+			outputResults.Tools[i] = output.ProcessResult{
+				ItemName: item.Name,
+				Status:   "Installed",
+				Path:     possiblePath,
 			}
-			outputResults.Tools[i].Path = filepath.Join(toolRoot, item.Name, item.Release.VersionName())
 		}
 	}
 
 	for i, item := range coresToDownload {
+		logrus.WithField("Package", item.Package).
+			WithField("Name", item.Name).
+			WithField("Version", item.Release.VersionName()).
+			Info("Installing core")
+
+		coreRoot, err := common.GetDefaultCoresFolder(item.Package)
+		if err != nil {
+			logrus.WithError(err).Error("Cannot get core install path, try again.")
+			formatter.PrintErrorMessage("Cannot get core install path, try again.")
+			os.Exit(errCoreConfig)
+		}
+		possiblePath := filepath.Join(coreRoot, item.Name, item.Release.VersionName())
+
 		err = cores.Install(item.Package, item.Name, item.Release)
 		if err != nil {
-			outputResults.Cores[i+failOutputsCount] = output.ProcessResult{
-				ItemName: item.Name,
-				Status:   "",
-				Error:    err.Error(),
+			if os.IsExist(err) {
+				logrus.WithError(err).Warnf("Cannot install core `%s`, it is already installed", item.Name)
+				outputResults.Cores[i+failOutputsCount] = output.ProcessResult{
+					ItemName: item.Name,
+					Status:   "Already Installed",
+					Path:     possiblePath,
+				}
+			} else {
+				logrus.WithError(err).Warnf("Cannot install core `%s`", item.Name)
+				outputResults.Cores[i+failOutputsCount] = output.ProcessResult{
+					ItemName: item.Name,
+					Status:   "",
+					Error:    err.Error(),
+				}
 			}
 		} else {
-			coreRoot, err := common.GetDefaultCoresFolder(item.Package)
-			if err != nil {
-				formatter.PrintErrorMessage("Cannot get core install path, try again.")
-				os.Exit(errCoreConfig)
+			logrus.Info("Adding installed core to final result")
+
+			outputResults.Cores[i+failOutputsCount] = output.ProcessResult{
+				ItemName: item.Name,
+				Status:   "Installed",
+				Path:     possiblePath,
 			}
-			outputResults.Cores[i+failOutputsCount].Path = filepath.Join(coreRoot, item.Name, item.Release.VersionName())
 		}
 	}
 
 	formatter.Print(outputResults)
+	logrus.Info("Done")
 }
 
 // getInstalledCores gets the installed cores and puts them in the output struct.
@@ -261,18 +343,21 @@ func getInstalledTools(packageName string, tools *[]output.InstalledStuff) {
 }
 
 // getInstalledStuff is a generic procedure to get installed cores or tools and put them in an output struct.
-func getInstalledStuff(packageName string, stuff *[]output.InstalledStuff, startPathFunc func(string) (string, error)) {
-	stuffHome, err := startPathFunc(packageName)
+func getInstalledStuff(packageName string, stuff *[]output.InstalledStuff, defaultFolderFunc func(string) (string, error)) {
+	stuffHome, err := defaultFolderFunc(packageName)
 	if err != nil {
+		logrus.WithError(err).Warn("Cannot get default folder ")
 		return
 	}
 	stuffHomeFolder, err := os.Open(stuffHome)
 	if err != nil {
+		logrus.WithError(err).Warn("Cannot open default folder")
 		return
 	}
 	defer stuffHomeFolder.Close()
 	stuffFolders, err := stuffHomeFolder.Readdir(0)
 	if err != nil {
+		logrus.WithError(err).Warn("Cannot read into default folder")
 		return
 	}
 	for _, stuffFolderInfo := range stuffFolders {
@@ -282,13 +367,16 @@ func getInstalledStuff(packageName string, stuff *[]output.InstalledStuff, start
 		stuffName := stuffFolderInfo.Name()
 		stuffFolder, err := os.Open(filepath.Join(stuffHome, stuffName))
 		if err != nil {
+			logrus.WithError(err).Warn("Cannot open inner directory")
 			continue
 		}
 		defer stuffFolder.Close()
 		versions, err := stuffFolder.Readdirnames(0)
 		if err != nil {
+			logrus.WithError(err).Warn("Cannot read into inner directory")
 			continue
 		}
+		logrus.WithField("Name", stuffName).Info("Item added")
 		*stuff = append(*stuff, output.InstalledStuff{
 			Name:     stuffName,
 			Versions: versions,

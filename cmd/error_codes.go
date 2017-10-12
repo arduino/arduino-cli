@@ -1,7 +1,6 @@
 package cmd
 
 const (
-	errOk           int = iota
 	errNoConfigFile int = iota
 	errBadCall      int = iota
 	errGeneric      int = iota
