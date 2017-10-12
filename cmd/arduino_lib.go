@@ -36,6 +36,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
 	"github.com/bcmi-labs/arduino-cli/cmd/output"
 	"github.com/bcmi-labs/arduino-cli/cmd/pretty_print"
@@ -128,24 +130,32 @@ func init() {
 
 func executeLibCommand(cmd *cobra.Command, args []string) {
 	if arduinoLibFlags.updateIndex {
+		logrus.Info("Updating index")
 		common.ExecUpdateIndex(prettyPrints.DownloadLibFileIndex())
 	} else {
+		logrus.Warn("Bad call, executing help command")
 		cmd.Help()
 		os.Exit(errBadCall)
 	}
+	logrus.Info("Done")
 }
 
 func executeDownloadCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino lib download`")
 	if len(args) < 1 {
+		logrus.Warn("No library specified for download command")
 		formatter.PrintErrorMessage("No library specified for download command")
 		os.Exit(errBadCall)
 	}
 
+	logrus.Info("Getting Libraries status context")
 	status, err := getLibStatusContext()
 	if err != nil {
+		logrus.WithError(err).Warn("Cannot get status context")
 		os.Exit(errGeneric)
 	}
 
+	logrus.Info("Preparing download")
 	pairs := libraries.ParseArgs(args)
 	libsToDownload, failOutputs := status.Process(pairs)
 	outputResults := output.LibProcessResults{
@@ -156,20 +166,25 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) {
 	for i := range libs {
 		libs[i] = releases.DownloadItem(libsToDownload[i])
 	}
-
+	logrus.Info("Downloading")
 	releases.ParallelDownload(libs, false, "Downloaded", &outputResults.Libraries, "library")
-
+	logrus.Info("Download finished")
 	formatter.Print(outputResults)
+	logrus.Info("Done")
 }
 
 func executeInstallCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino lib install`")
 	if len(args) < 1 {
+		logrus.Warn("No library specified for install command")
 		formatter.PrintErrorMessage("No library specified for install command")
 		os.Exit(errBadCall)
 	}
 
+	logrus.Info("Getting Libraries status context")
 	status, err := getLibStatusContext()
 	if err != nil {
+		logrus.WithError(err).Warn("Cannot get status context")
 		os.Exit(errGeneric)
 	}
 
@@ -184,10 +199,14 @@ func executeInstallCommand(cmd *cobra.Command, args []string) {
 		libs[i] = releases.DownloadItem(libsToDownload[i])
 	}
 
+	logrus.Info("Downloading")
 	releases.ParallelDownload(libs, false, "Installed", &outputResults.Libraries, "library")
+	logrus.Info("Download finished")
 
+	logrus.Info("Installing")
 	folder, err := common.GetDefaultLibFolder()
 	if err != nil {
+		logrus.WithError(err).Error("Cannot get libraries install path")
 		formatter.PrintErrorMessage("Cannot get default lib install path.")
 		os.Exit(errCoreConfig)
 	}
@@ -195,6 +214,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) {
 	for i, item := range libsToDownload {
 		err = libraries.Install(item.Name, item.Release)
 		if err != nil {
+			logrus.WithError(err).Warn("Library", item.Name, "errored")
 			outputResults.Libraries[i] = output.ProcessResult{
 				ItemName: item.Name,
 				Error:    err.Error(),
@@ -205,29 +225,36 @@ func executeInstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	formatter.Print(outputResults)
+	logrus.Info("Done")
 }
 
 func executeUninstallCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino lib uninstall`")
 	if len(args) < 1 {
+		logrus.Warn("No library specified to uninstall")
 		formatter.PrintErrorMessage("No library specified for uninstall command")
 		os.Exit(errBadCall)
 	}
 
+	logrus.Info("Preparing")
 	libs := libraries.ParseArgs(args)
 
 	libFolder, err := common.GetDefaultLibFolder()
 	if err != nil {
-		os.Exit(errGeneric)
+		logrus.WithError(err).Error("Cannot get default libraries folder")
+		os.Exit(errCoreConfig)
 	}
 
 	dir, err := os.Open(libFolder)
 	if err != nil {
+		logrus.WithError(err).Error("Cannot open libraries folder")
 		formatter.PrintErrorMessage("Cannot open libraries folder")
 		os.Exit(errCoreConfig)
 	}
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
+		logrus.WithError(err).Error("Cannot read into libraries folder")
 		formatter.PrintErrorMessage("Cannot read into libraries folder")
 		os.Exit(errCoreConfig)
 	}
@@ -237,6 +264,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	useFileName := func(file os.FileInfo, library libraries.NameVersionPair, outputResults *output.LibProcessResults) bool {
+		logrus.Info("Using file name to uninstall")
 		fileName := file.Name()
 		//replacing underscore in foldernames with spaces.
 		fileName = strings.Replace(fileName, "_", " ", -1)
@@ -249,9 +277,11 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) {
 			//found
 			err = libraries.Uninstall(filepath.Join(libFolder, fileName))
 			if err != nil {
+				logrus.WithError(err).Warn("Cannot uninstall", fileName)
 				result.Error = err.Error()
 				(*outputResults).Libraries = append((*outputResults).Libraries, result)
 			} else {
+				logrus.Info(fileName, "Uninstalled")
 				result.Error = "Uninstalled"
 				(*outputResults).Libraries = append((*outputResults).Libraries, result)
 			}
@@ -259,6 +289,8 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) {
 		}
 		return false
 	}
+
+	logrus.Info("Removing libraries")
 
 	//TODO: optimize this algorithm
 	//      time complexity O(libraries_to_install(from RAM) *
@@ -278,9 +310,11 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) {
 						break
 					}
 				} else if err == nil {
+					logrus.Info("using library.properties for", library.Name)
 					// I use library.properties file
 					content, err := ioutil.ReadFile(indexFile)
 					if err != nil {
+						logrus.WithError(err).Warn("Cannot read library.properties")
 						outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
 							ItemName: fmt.Sprint(library.Name, "@", library.Version),
 							Error:    err.Error(),
@@ -288,13 +322,16 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) {
 						break
 					}
 
+					logrus.Info("Parsing library.properties")
 					ini := goini.New()
 					err = ini.Parse(content, "\n", "=")
 					if err != nil {
+						logrus.WithError(err).Warn("Cannot parse library.properties")
 						formatter.Print(err)
 					}
 					name, ok := ini.Get("name")
 					if !ok {
+						logrus.Warn("Name not found in library.properties")
 						if useFileName(file, library, &outputResults) {
 							break
 						}
@@ -302,6 +339,7 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) {
 					}
 					version, ok := ini.Get("version")
 					if !ok {
+						logrus.Warn("Version not found in library.properties")
 						if useFileName(file, library, &outputResults) {
 							break
 						}
@@ -309,32 +347,43 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) {
 					}
 					if name == library.Name &&
 						(library.Version == "all" || library.Version == version) {
-						libraries.Uninstall(filepath.Join(libFolder, file.Name()))
+						logrus.Info("Uninstalling", file.Name())
+						err := libraries.Uninstall(filepath.Join(libFolder, file.Name()))
+						if err != nil {
+							logrus.WithError(err).Warn("Cannot uninstall", file.Name())
+						}
 					}
 				}
 			}
 		}
 	}
+
 	if len(outputResults.Libraries) > 0 {
 		formatter.Print(outputResults)
 	}
+	logrus.Info("Done")
 }
 
 func executeSearchCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino lib search`")
 	query := strings.ToLower(strings.Join(args, " "))
 
+	logrus.Info("Getting libraries status context")
 	status, err := getLibStatusContext()
 	if err != nil {
+		logrus.WithError(err).Error("Cannot get libraries status context")
 		os.Exit(errCoreConfig)
 	}
 
-	found := false
+	logrus.Info("Preparing")
 
+	found := false
 	names := status.Names()
 	message := output.LibSearchResults{
 		Libraries: make([]interface{}, 0, len(names)),
 	}
 
+	logrus.Info("Searching")
 	items := status.Libraries
 	//Pretty print libraries from index.
 	for _, name := range names {
@@ -352,22 +401,27 @@ func executeSearchCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if !found {
+		logrus.Warnf("No library found matching \"%s\" search query", query)
 		formatter.PrintErrorMessage(fmt.Sprintf("No library found matching \"%s\" search query", query))
 	} else {
 		formatter.Print(message)
 	}
+	logrus.Info("Done")
 }
 
 func executeListCommand(command *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino lib list`")
+
 	libHome, err := common.GetDefaultLibFolder()
 	if err != nil {
+		logrus.WithError(err).Error("Cannot get libraries folder")
 		formatter.PrintErrorMessage("Cannot get libraries folder")
 		os.Exit(errCoreConfig)
 	}
 
-	//prettyPrints.LibStatus(status)
 	dir, err := os.Open(libHome)
 	if err != nil {
+		logrus.WithError(err).Error("Cannot open libraries folder")
 		formatter.PrintErrorMessage("Cannot open libraries folder")
 		os.Exit(errCoreConfig)
 	}
@@ -375,6 +429,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
+		logrus.WithError(err).Error("Cannot read into libraries folder")
 		formatter.PrintErrorMessage("Cannot read into libraries folder")
 		os.Exit(errCoreConfig)
 	}
@@ -382,6 +437,9 @@ func executeListCommand(command *cobra.Command, args []string) {
 	libs := output.LibProcessResults{
 		Libraries: make([]output.ProcessResult, 0, 10),
 	}
+
+	logrus.Info("Listing")
+
 	//TODO: optimize this algorithm
 	// time complexity O(libraries_to_install(from RAM) *
 	//                   library_folder_number(from DISK) *
@@ -392,27 +450,34 @@ func executeListCommand(command *cobra.Command, args []string) {
 			indexFile := filepath.Join(libHome, file.Name(), "library.properties")
 			_, err = os.Stat(indexFile)
 			if os.IsNotExist(err) {
+				logrus.WithError(err).Warn("No library.properties for this library")
 				resultFromFileName(file, &libs)
 			} else {
-				// I use library.properties file
+				logrus.Infof("Using library.properties for %s", file.Name())
 				content, err := ioutil.ReadFile(indexFile)
 				if err != nil {
+					logrus.WithError(err).Warn("Cannot read into library.properties for this library")
 					resultFromFileName(file, &libs)
 					continue
 				}
 
+				logrus.Info("Parsing library.properties")
+
 				ini := goini.New()
 				err = ini.Parse(content, "\n", "=")
 				if err != nil {
+					logrus.WithError(err).Warn("Cannot parse library.properties")
 					formatter.Print(err)
 				}
 				Name, ok := ini.Get("name")
 				if !ok {
+					logrus.Warn("Name not found in library.properties")
 					resultFromFileName(file, &libs)
 					continue
 				}
 				Version, ok := ini.Get("version")
 				if !ok {
+					logrus.Warn("Version not found in library.properties")
 					resultFromFileName(file, &libs)
 					continue
 				}
@@ -430,6 +495,7 @@ func executeListCommand(command *cobra.Command, args []string) {
 	} else {
 		formatter.Print(libs)
 	}
+	logrus.Info("Done")
 }
 
 func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
@@ -438,6 +504,7 @@ func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
 	fileName = strings.Replace(fileName, "_", " ", -1)
 	fileName = strings.Replace(fileName, "-", " v. ", -1)
 	//I use folder name
+	logrus.WithField("Name", fileName).Warn("Using filename to get result")
 	libs.Libraries = append(libs.Libraries, output.ProcessResult{
 		ItemName: fileName,
 		Status:   "",
@@ -449,13 +516,17 @@ func getLibStatusContext() (*libraries.StatusContext, error) {
 	var index libraries.Index
 	err := libraries.LoadIndex(&index)
 	if err != nil {
+		logrus.WithError(err).Warn("Error during index load, pretty printing error message and trying to recover")
 		status, err := prettyPrints.CorruptedLibIndexFix(index)
 		if err != nil {
+			logrus.WithError(err).Error("Did not recover, returning error")
 			return nil, err
 		}
+		logrus.Warn("Recovered and status context created")
 		return &status, nil
 	}
 
+	logrus.Info("Creating status context")
 	status := index.CreateStatusContext()
 	return &status, nil
 }

@@ -37,6 +37,8 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/bgentry/go-netrc/netrc"
 	"github.com/mitchellh/go-homedir"
 
@@ -101,7 +103,7 @@ var arduinoVersionCmd = &cobra.Command{
 	Short: "Shows version Number of arduino CLI components",
 	Long:  `Shows version Number of arduino CLI components which are installed on your system.`,
 	Run:   executeVersionCommand,
-	Example: `arduino version     # for the versions of all components.
+	Example: `arduino version     # for the main component version.
 arduino lib version # for the version of the lib component.
 arduino core version # for the version of the core component.`,
 }
@@ -116,12 +118,10 @@ arduino login --user myUser --password # Asks to write the password inside the c
 	Run: executeLoginCommand,
 }
 
-var bundled bool
 var testing = false
 
 func init() {
 	versions[ArduinoCmd.Name()] = ArduinoVersion
-	InitConfigs()
 	InitFlags()
 	InitCommands()
 }
@@ -167,8 +167,9 @@ func InitFlags() {
 	arduinoSketchSyncCmd.ResetFlags()
 	arduinoLoginCmd.ResetFlags()
 
-	ArduinoCmd.PersistentFlags().BoolVar(&GlobalFlags.Debug, "debug", false, "enables debug output")
-	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "invalid", "the output format, can be [text|json]")
+	ArduinoCmd.PersistentFlags().BoolVar(&GlobalFlags.Debug, "debug", false, "enables debug output (super verbose, used to debug the CLI)")
+
+	ArduinoCmd.PersistentFlags().StringVar(&GlobalFlags.Format, "format", "text", "the output format, can be [text|json]")
 
 	ArduinoCmd.PersistentFlags().StringVar(&configs.FileLocation, "config-file", configs.FileLocation, "the custom config file (if not specified ./.cli-config.yml will be used)")
 
@@ -222,13 +223,23 @@ func InitCommands() {
 
 // InitConfigs initializes the configuration from the specified file.
 func InitConfigs() {
+	logrus.Info("Initiating configuration")
 	c, err := configs.Unserialize(configs.FileLocation)
 	if err != nil {
+		logrus.WithError(err).Warn("Did not manage to get config file, using default configuration")
 		GlobalFlags.Configs = configs.Default()
 	}
-	if configs.BundledInIDE {
-		configs.UnserializeFromIDEPreferences(&c)
+	if configs.Bundled() {
+		logrus.Info("CLI is bundled into the IDE")
+		err := configs.UnserializeFromIDEPreferences(&c)
+		if err != nil {
+			logrus.WithError(err).Warn("Did not manage to get config file of IDE, using default configuration")
+			GlobalFlags.Configs = configs.Default()
+		}
+	} else {
+		logrus.Info("CLI is not bundled into the IDE")
 	}
+	logrus.Info("Configuration set")
 	GlobalFlags.Configs = c
 	common.ArduinoDataFolder = GlobalFlags.Configs.ArduinoDataFolder
 	common.ArduinoIDEFolder = configs.ArduinoIDEFolder
@@ -237,41 +248,59 @@ func InitConfigs() {
 
 // IgnoreConfigs is used in tests to ignore the config file.
 func IgnoreConfigs() {
+	logrus.Info("Ignoring configurations and using always default ones")
 	GlobalFlags.Configs = configs.Default()
 }
 
 func arduinoPreRun(cmd *cobra.Command, args []string) {
+	// Reset logrus if debug flag changed
+	if !GlobalFlags.Debug { // discard logrus output if no debug
+		logrus.SetOutput(ioutil.Discard)
+	} else { // else print on stderr
+		logrus.SetOutput(os.Stderr)
+	}
+	InitConfigs()
+
+	logrus.Info("Starting root command preparation (`arduino`)")
 	if !formatter.IsSupported(GlobalFlags.Format) {
+		logrus.WithField("inserted format", GlobalFlags.Format).Warn("Unsupported format, using text as default")
 		GlobalFlags.Format = "text"
 	}
 	formatter.SetFormatter(GlobalFlags.Format)
+	logrus.Info("Formatter set")
 	if !formatter.IsCurrentFormat("text") {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+			logrus.Warn("Calling help on JSON format")
 			formatter.PrintErrorMessage("Invalid Call : should show Help, but it is available only in TEXT mode")
 			os.Exit(errBadCall)
 		})
 	}
 
 	if !testing {
+		logrus.Info("Initializing viper configuration")
 		cobra.OnInitialize(initViper)
 	}
 }
 
 func arduinoRun(cmd *cobra.Command, args []string) {
 	if rootCmdFlags.GenerateDocs {
+		logrus.Info("Generating docs")
 		errorText := ""
 		err := cmd.GenBashCompletionFile("docs/bash_completions/arduino")
 		if err != nil {
+			logrus.WithError(err).Warn("Error Generating bash autocompletions")
 			errorText += fmt.Sprintln(err)
 		}
 		err = generateManPages(cmd)
 		if err != nil {
+			logrus.WithError(err).Warn("Error Generating manpages")
 			errorText += fmt.Sprintln(err)
 		}
 		if errorText != "" {
 			formatter.PrintErrorMessage(errorText)
 		}
 	} else {
+		logrus.Info("Calling help command")
 		cmd.Help()
 		os.Exit(errBadCall)
 	}
@@ -281,12 +310,14 @@ func arduinoRun(cmd *cobra.Command, args []string) {
 func Execute() {
 	err := ArduinoCmd.Execute()
 	if err != nil {
+		logrus.WithError(err).Error("Bad Exit")
 		formatter.PrintError(err)
 		os.Exit(1)
 	}
 }
 
 func executeVersionCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Calling version command on `arduino`")
 	versionPrint(versionsToPrint(cmd, true)...)
 }
 

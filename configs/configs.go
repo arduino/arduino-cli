@@ -39,6 +39,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/spf13/viper"
 
 	properties "github.com/arduino/go-properties-map"
@@ -50,8 +52,8 @@ import (
 // FileLocation represents the default location of the config file (same directory as executable).
 var FileLocation = getFileLocation()
 
-// BundledInIDE tells if the CLI is paired with the Java Arduino IDE.
-var BundledInIDE bool
+// bundledInIDE tells if the CLI is paired with the Java Arduino IDE.
+var bundledInIDE *bool
 
 // ArduinoIDEFolder represents the path of the IDE directory, set only if BundledInIDE = true.
 var ArduinoIDEFolder string
@@ -93,9 +95,6 @@ var envConfig = Configs{
 func init() {
 	defArduinoData, _ := common.GetDefaultArduinoFolder()
 	defSketchbook, _ := common.GetDefaultArduinoHomeFolder()
-	if checkIfBundled() != nil {
-		BundledInIDE = false
-	}
 
 	defaultConfig = Configs{
 		ProxyType:         "auto",
@@ -106,17 +105,21 @@ func init() {
 
 // Default returns a copy of the default configuration.
 func Default() Configs {
+	logrus.Info("Returning default configuration")
 	return defaultConfig
 }
 
 // UnserializeFromIDEPreferences loads the config from an IDE preferences.txt file, by Updating the specified otherConfigs.
 func UnserializeFromIDEPreferences(otherConfigs *Configs) error {
+	logrus.Info("Unserializing from IDE preferences")
 	props, err := properties.Load(filepath.Join(otherConfigs.ArduinoDataFolder, "preferences.txt"))
 	if err != nil {
+		logrus.WithError(err).Warn("Error during unserialize from IDE preferences")
 		return err
 	}
 	err = proxyConfigsFromIDEPrefs(otherConfigs, props)
 	if err != nil {
+		logrus.WithError(err).Warn("Error during unserialize from IDE preferences")
 		return err
 	}
 	sketchbookPath, exists := props.SubTree("sketchbook")["path"]
@@ -165,13 +168,16 @@ func proxyConfigsFromIDEPrefs(otherConfigs *Configs, props properties.Map) error
 // Returns the default configuration if there is an
 // error.
 func Unserialize(path string) (Configs, error) {
+	logrus.Info("Unserializing configurations from ", path)
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
+		logrus.WithError(err).Warn("Error during unserialize, using default configuration")
 		return Default(), err
 	}
 	var ret Configs
 	err = yaml.Unmarshal(content, &ret)
 	if err != nil {
+		logrus.WithError(err).Warn("Error during unserialize, using default configuration")
 		return Default(), err
 	}
 	fixMissingFields(&ret)
@@ -181,12 +187,15 @@ func Unserialize(path string) (Configs, error) {
 // Serialize creates a file in the specified path with
 // corresponds to a config file reflecting the configs.
 func (c Configs) Serialize(path string) error {
+	logrus.Info("Serializing configurations to ", path)
 	content, err := yaml.Marshal(c)
 	if err != nil {
+		logrus.WithError(err).Warn("Error during serialize")
 		return err
 	}
 	err = ioutil.WriteFile(path, content, 0666)
 	if err != nil {
+		logrus.WithError(err).Warn("Error during serialize")
 		return err
 	}
 	return nil
@@ -228,28 +237,37 @@ func fixMissingFields(c *Configs) {
 	}
 }
 
-// checkIfBundled checks if the CLI is bundled with the Arduino IDE.
-func checkIfBundled() error {
+// Bundled returns if the CLI is bundled with the Arduino IDE.
+func Bundled() bool {
+	if bundledInIDE != nil {
+		return *bundledInIDE
+	}
+	bundledInIDE = new(bool)
+	logrus.Info("Checking if CLI is Bundled into the IDE")
+	*bundledInIDE = false
 	executable, err := os.Executable()
 	if err != nil {
-		return err
+		logrus.WithError(err).Warn("Cannot get executable path")
+		return false
 	}
 	executable, err = filepath.EvalSymlinks(executable)
 	if err != nil {
-		return err
+		logrus.WithError(err).Warn("Cannot get executable path (symlinks error)")
+		return false
 	}
-	execParent := filepath.SplitList(filepath.Dir(executable))
-	ArduinoIDEFolder := filepath.Join(execParent[0 : len(execParent)-1]...)
+	ArduinoIDEFolder := filepath.Dir(filepath.Dir(executable))
 
-	BundledInIDE = false
+	logrus.Info("Candidate IDE Folder:", ArduinoIDEFolder)
+
 	executables := []string{"arduino", "arduino.sh", "arduino.exe"}
 	for _, exe := range executables {
 		exePath := filepath.Join(ArduinoIDEFolder, exe)
 		_, err := os.Stat(exePath)
 		if !os.IsNotExist(err) {
-			BundledInIDE = true
+			logrus.WithError(err).Info("CLI is bundled")
+			*bundledInIDE = true
 			break
 		}
 	}
-	return nil
+	return false
 }
