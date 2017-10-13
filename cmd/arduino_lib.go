@@ -390,9 +390,6 @@ func executeSearchCommand(cmd *cobra.Command, args []string) {
 		if strings.Contains(strings.ToLower(name), query) {
 			found = true
 			if arduinoLibSearchFlags.Names {
-				if formatter.IsCurrentFormat("text") {
-					name = fmt.Sprintf("\"%s\"", name)
-				}
 				message.Libraries = append(message.Libraries, name)
 			} else {
 				message.Libraries = append(message.Libraries, items[name])
