@@ -215,6 +215,7 @@ func (c *Config) authenticate(client *http.Client, cookies cookies, uri, user, p
 	query.Add("username", user)
 	query.Add("password", pass)
 	query.Add("csrf", csrf)
+	query.Add("g-recaptcha-response", "")
 
 	req, err := http.NewRequest("POST", uri, strings.NewReader(query.Encode()))
 	if err != nil {
@@ -233,7 +234,8 @@ func (c *Config) authenticate(client *http.Client, cookies cookies, uri, user, p
 	}
 
 	if res.StatusCode != 302 {
-		return "", errors.New("status = " + res.Status)
+		body, _ := ioutil.ReadAll(res.Body)
+		return "", errors.New("status = " + res.Status + ", response = " + string(body))
 	}
 
 	// Follow redirect to hydra
