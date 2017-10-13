@@ -167,7 +167,7 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
 	if len(args) < 1 {
-		logrus.Error("No core specified for download command, exiting")
+		ErrLogrus.Error("No core specified for download command, exiting")
 		formatter.PrintErrorMessage("No core specified for download command")
 		os.Exit(errBadCall)
 	}
@@ -209,7 +209,7 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
 	if len(args) < 1 {
-		logrus.Error("No core specified for download command, exiting")
+		ErrLogrus.Error("No core specified for download command, exiting")
 		formatter.PrintErrorMessage("No core specified for download command")
 		os.Exit(errBadCall)
 	}

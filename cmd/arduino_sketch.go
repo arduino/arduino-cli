@@ -75,17 +75,17 @@ var arduinoSketchSyncCmd = &cobra.Command{
 
 func executeSketchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino sketch`")
-	logrus.Error("No subcommand specified, showing help message")
+	ErrLogrus.Error("No subcommand specified, showing help message")
 	formatter.PrintErrorMessage("No subcommand specified")
 	cmd.Help()
-	logrus.Error("Bad Call Exit")
+	ErrLogrus.Error("Bad Call Exit")
 	os.Exit(errBadCall)
 }
 
 func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino sketch sync`")
 	if len(args) > 0 {
-		logrus.Error("No arguments are accepted for this command")
+		ErrLogrus.Error("No arguments are accepted for this command")
 		formatter.PrintErrorMessage("No arguments are accepted")
 		os.Exit(errBadCall)
 	}
@@ -104,7 +104,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 
 	if priority == "ask-once" {
 		if !isTextMode {
-			logrus.Error("ask mode for this command is only supported using text format")
+			ErrLogrus.Error("ask mode for this command is only supported using text format")
 			formatter.PrintErrorMessage("ask mode for this command is only supported using text format")
 			os.Exit(errBadCall)
 		}

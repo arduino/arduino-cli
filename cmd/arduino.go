@@ -120,6 +120,10 @@ arduino login --user myUser --password # Asks to write the password inside the c
 
 var testing = false
 
+// ErrLogrus represents the logrus instance, which has the role to
+// log all non info messages.
+var ErrLogrus = logrus.New()
+
 func init() {
 	versions[ArduinoCmd.Name()] = ArduinoVersion
 	InitFlags()
@@ -255,9 +259,10 @@ func IgnoreConfigs() {
 func arduinoPreRun(cmd *cobra.Command, args []string) {
 	// Reset logrus if debug flag changed
 	if !GlobalFlags.Debug { // discard logrus output if no debug
-		logrus.SetOutput(ioutil.Discard)
+		logrus.SetOutput(ioutil.Discard) // for standard logger
+		ErrLogrus.Out = ioutil.Discard   // for error logger
 	} else { // else print on stderr
-		logrus.SetOutput(os.Stderr)
+		ErrLogrus.Out = os.Stderr
 	}
 	InitConfigs()
 
@@ -359,7 +364,7 @@ func initViper() {
 
 	defHome, err := common.GetDefaultArduinoHomeFolder()
 	if err != nil {
-		logrus.WithError(err).Warn("Cannot get default Arduino Home")
+		ErrLogrus.WithError(err).Warn("Cannot get default Arduino Home")
 	}
 	defArduinoData, err := common.GetDefaultArduinoFolder()
 	if err != nil {
@@ -373,7 +378,7 @@ func initViper() {
 	logrus.Info("Reading configuration for viper")
 	err = viper.ReadInConfig()
 	if err != nil {
-		logrus.WithError(err).Error("Cannot read configuration file in any of the default folders")
+		ErrLogrus.WithError(err).Error("Cannot read configuration file in any of the default folders")
 		formatter.PrintErrorMessage("Cannot read configuration file in any of the default folders")
 		os.Exit(errNoConfigFile)
 	}
@@ -392,7 +397,7 @@ func initViper() {
 	if viper.GetString("proxy.type") == "manual" {
 		hostname := viper.GetString("proxy.hostname")
 		if hostname == "" {
-			logrus.Error("With manual proxy configuration, hostname is required.")
+			ErrLogrus.Error("With manual proxy configuration, hostname is required.")
 			formatter.PrintErrorMessage("With manual proxy configuration, hostname is required.")
 			os.Exit(errCoreConfig)
 		}
@@ -419,7 +424,7 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 	passwordEmpty := arduinoLoginFlags.Password == ""
 	isTextMode := formatter.IsCurrentFormat("text")
 	if !isTextMode && (userEmpty || passwordEmpty) {
-		logrus.Error("User and password must be specified outside of text format")
+		ErrLogrus.Error("User and password must be specified outside of text format")
 		formatter.PrintErrorMessage("User and password must be specified outside of text format")
 		return
 	}
@@ -434,7 +439,7 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 		fmt.Print("Password: ")
 		pass, err := terminal.ReadPassword(syscall.Stdin)
 		if err != nil {
-			logrus.WithError(err).Error("Cannot read password, login aborted")
+			ErrLogrus.WithError(err).Error("Cannot read password, login aborted")
 			formatter.PrintErrorMessage("Cannot read password, login aborted")
 			return
 		}

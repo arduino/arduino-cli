@@ -74,7 +74,7 @@ func executeConfigInitCommand(cmd *cobra.Command, args []string) {
 
 	if !arduinoConfigInitFlags.Default {
 		if !formatter.IsCurrentFormat("text") {
-			logrus.Error("The interactive mode is supported only in text mode")
+			ErrLogrus.Error("The interactive mode is supported only in text mode")
 			formatter.PrintErrorMessage("The interactive mode is supported only in text mode")
 			os.Exit(errBadCall)
 		}

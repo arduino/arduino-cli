@@ -100,7 +100,6 @@ func ExecuteParallelFromMap(taskMap map[string]Wrapper) map[string]Result {
 	close(results)
 	mapResult := make(map[string]Result, len(results))
 	for result := range results {
-		//logrus.Errorf("results : %v %v\n", result.Key, result.Result)
 		mapResult[result.Key] = result.Result
 	}
 	return mapResult
