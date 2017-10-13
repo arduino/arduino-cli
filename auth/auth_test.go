@@ -44,7 +44,7 @@ func TestToken(t *testing.T) {
 	}
 
 	if resp.StatusCode != 200 {
-		t.Fatal(resp.StatusCode)
+		t.Fatal(resp.Status)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
