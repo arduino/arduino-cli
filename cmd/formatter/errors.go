@@ -84,5 +84,5 @@ func PrintError(err error, msg string) {
 	if logger != nil {
 		logger.WithError(err).Error(msg)
 	}
-	Print(msg)
+	Print(FromError(errors.New(msg)))
 }
