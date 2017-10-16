@@ -88,9 +88,9 @@ func ExamplePrint_alternative() {
 
 func ExamplePrintError() {
 	formatter.SetFormatter("text")
-	formatter.PrintError(errors.New("text error"))
+	formatter.PrintError(errors.New("text error"), "text error")
 	formatter.SetFormatter("json")
-	formatter.PrintError(errors.New("json error"))
+	formatter.PrintError(errors.New("json error"), "json error")
 
 	// Output:
 	// text error
