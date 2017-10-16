@@ -33,6 +33,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Formatter interface represents a generic formatter. It allows to print and format Messages.
@@ -48,6 +50,8 @@ var formatters map[string]Formatter
 var defaultFormatter Formatter
 
 var printFunc PrintFunc
+
+var logger *logrus.Logger
 
 var debug bool
 
@@ -67,6 +71,11 @@ func SetFormatter(formatName string) error {
 	}
 	defaultFormatter = formatters[formatName]
 	return nil
+}
+
+// SetLogger sets the logger for printed errors.
+func SetLogger(log *logrus.Logger) {
+	logger = log
 }
 
 // IsSupported returns whether the format specified is supported or not by the current set of formatters.

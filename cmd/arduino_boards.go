@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/codeclysm/cc"
 
@@ -52,13 +54,13 @@ func executeBoardListCommand(cmd *cobra.Command, args []string) {
 
 	packageFolder, err := common.GetDefaultPkgFolder()
 	if err != nil {
-		formatter.PrintErrorMessage("Cannot Parse Board Index file")
+		formatter.PrintError(err, "Cannot Parse Board Index file")
 		os.Exit(errCoreConfig)
 	}
 
 	bs, err := boards.Find(packageFolder)
 	if err != nil {
-		formatter.PrintErrorMessage("Cannot Parse Board Index file")
+		formatter.PrintError(err, "Cannot Parse Board Index file")
 		os.Exit(errCoreConfig)
 	}
 
@@ -119,6 +121,7 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) {
 
 	duration, err := time.ParseDuration(arduinoBoardListFlags.SearchTimeout)
 	if err != nil {
+		logrus.WithError(err).Warnf("Invalid interval `%s` provided, using default (5s)", arduinoBoardListFlags.SearchTimeout)
 		duration = time.Second * 5
 	}
 
@@ -129,19 +132,19 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) {
 
 	homeFolder, err := common.GetDefaultArduinoHomeFolder()
 	if err != nil {
-		formatter.PrintErrorMessage("Cannot Parse Board Index file")
+		formatter.PrintError(err, "Cannot Parse Board Index file")
 		os.Exit(errCoreConfig)
 	}
 
 	packageFolder, err := common.GetDefaultPkgFolder()
 	if err != nil {
-		formatter.PrintErrorMessage("Cannot Parse Board Index file")
+		formatter.PrintError(err, "Cannot Parse Board Index file")
 		os.Exit(errCoreConfig)
 	}
 
 	bs, err := boards.Find(packageFolder)
 	if err != nil {
-		formatter.PrintErrorMessage("Cannot Parse Board Index file")
+		formatter.PrintError(err, "Cannot Parse Board Index file")
 		os.Exit(errCoreConfig)
 	}
 
@@ -155,7 +158,7 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) {
 
 	deviceURI, err := url.Parse(arduinoBoardAttachFlags.BoardURI)
 	if err != nil {
-		formatter.PrintErrorMessage("The provided Device URL is not in a valid format")
+		formatter.PrintError(err, "The provided Device URL is not in a valid format")
 		os.Exit(errBadCall)
 	}
 
@@ -182,7 +185,7 @@ func executeBoardAttachCommand(cmd *cobra.Command, args []string) {
 	}
 	err = sketch.ExportMetadata()
 	if err != nil {
-		formatter.PrintError(err)
+		formatter.PrintError(err, "Cannot export sketch metadata")
 	}
 	formatter.PrintResult("BOARD ATTACHED")
 }

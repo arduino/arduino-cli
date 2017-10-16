@@ -58,7 +58,6 @@ arduino config init --default # Creates a config file with default configuration
 
 func executeConfigCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config`")
-	logrus.Warn("No subcommand specified for this command")
 	formatter.PrintErrorMessage("No subcommand specified")
 	if formatter.IsCurrentFormat("text") {
 		logrus.Warn("Showing help message")
@@ -74,7 +73,6 @@ func executeConfigInitCommand(cmd *cobra.Command, args []string) {
 
 	if !arduinoConfigInitFlags.Default {
 		if !formatter.IsCurrentFormat("text") {
-			ErrLogrus.Error("The interactive mode is supported only in text mode")
 			formatter.PrintErrorMessage("The interactive mode is supported only in text mode")
 			os.Exit(errBadCall)
 		}
@@ -86,8 +84,7 @@ func executeConfigInitCommand(cmd *cobra.Command, args []string) {
 	}
 	err := conf.Serialize(arduinoConfigInitFlags.Location)
 	if err != nil {
-		logrus.WithError(err).Error("Cannot create config file")
-		formatter.PrintErrorMessage("Cannot create config file")
+		formatter.PrintError(err, "Cannot create config file")
 		os.Exit(errGeneric)
 	} else {
 		formatter.PrintResult("Config file PATH: " + arduinoConfigInitFlags.Location)

@@ -143,7 +143,6 @@ func executeLibCommand(cmd *cobra.Command, args []string) {
 func executeDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib download`")
 	if len(args) < 1 {
-		logrus.Warn("No library specified for download command")
 		formatter.PrintErrorMessage("No library specified for download command")
 		os.Exit(errBadCall)
 	}
@@ -176,7 +175,6 @@ func executeDownloadCommand(cmd *cobra.Command, args []string) {
 func executeInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib install`")
 	if len(args) < 1 {
-		logrus.Warn("No library specified for install command")
 		formatter.PrintErrorMessage("No library specified for install command")
 		os.Exit(errBadCall)
 	}
@@ -184,7 +182,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Getting Libraries status context")
 	status, err := getLibStatusContext()
 	if err != nil {
-		logrus.WithError(err).Warn("Cannot get status context")
+		formatter.PrintError(err, "Cannot get status context")
 		os.Exit(errGeneric)
 	}
 
@@ -206,8 +204,7 @@ func executeInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Installing")
 	folder, err := common.GetDefaultLibFolder()
 	if err != nil {
-		logrus.WithError(err).Error("Cannot get libraries install path")
-		formatter.PrintErrorMessage("Cannot get default lib install path.")
+		formatter.PrintError(err, "Cannot get default lib install path.")
 		os.Exit(errCoreConfig)
 	}
 
@@ -231,7 +228,6 @@ func executeInstallCommand(cmd *cobra.Command, args []string) {
 func executeUninstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib uninstall`")
 	if len(args) < 1 {
-		logrus.Warn("No library specified to uninstall")
 		formatter.PrintErrorMessage("No library specified for uninstall command")
 		os.Exit(errBadCall)
 	}
@@ -241,21 +237,19 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) {
 
 	libFolder, err := common.GetDefaultLibFolder()
 	if err != nil {
-		logrus.WithError(err).Error("Cannot get default libraries folder")
+		formatter.PrintError(err, "Cannot get default libraries folder")
 		os.Exit(errCoreConfig)
 	}
 
 	dir, err := os.Open(libFolder)
 	if err != nil {
-		logrus.WithError(err).Error("Cannot open libraries folder")
-		formatter.PrintErrorMessage("Cannot open libraries folder")
+		formatter.PrintError(err, "Cannot open libraries folder")
 		os.Exit(errCoreConfig)
 	}
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
-		logrus.WithError(err).Error("Cannot read into libraries folder")
-		formatter.PrintErrorMessage("Cannot read into libraries folder")
+		formatter.PrintError(err, "Cannot read into libraries folder")
 		os.Exit(errCoreConfig)
 	}
 
@@ -327,7 +321,10 @@ func executeUninstallCommand(cmd *cobra.Command, args []string) {
 					err = ini.Parse(content, "\n", "=")
 					if err != nil {
 						logrus.WithError(err).Warn("Cannot parse library.properties")
-						formatter.Print(err)
+						if useFileName(file, library, &outputResults) {
+							break
+						}
+						continue
 					}
 					name, ok := ini.Get("name")
 					if !ok {
@@ -371,7 +368,7 @@ func executeSearchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Getting libraries status context")
 	status, err := getLibStatusContext()
 	if err != nil {
-		logrus.WithError(err).Error("Cannot get libraries status context")
+		formatter.PrintError(err, "Cannot get libraries status context")
 		os.Exit(errCoreConfig)
 	}
 
@@ -398,8 +395,7 @@ func executeSearchCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if !found {
-		logrus.Warnf("No library found matching \"%s\" search query", query)
-		formatter.PrintErrorMessage(fmt.Sprintf("No library found matching \"%s\" search query", query))
+		formatter.PrintErrorMessage(fmt.Sprintf("No library found matching `%s` search query", query))
 	} else {
 		formatter.Print(message)
 	}
@@ -411,23 +407,20 @@ func executeListCommand(command *cobra.Command, args []string) {
 
 	libHome, err := common.GetDefaultLibFolder()
 	if err != nil {
-		logrus.WithError(err).Error("Cannot get libraries folder")
-		formatter.PrintErrorMessage("Cannot get libraries folder")
+		formatter.PrintError(err, "Cannot get libraries folder")
 		os.Exit(errCoreConfig)
 	}
 
 	dir, err := os.Open(libHome)
 	if err != nil {
-		logrus.WithError(err).Error("Cannot open libraries folder")
-		formatter.PrintErrorMessage("Cannot open libraries folder")
+		formatter.PrintError(err, "Cannot open libraries folder")
 		os.Exit(errCoreConfig)
 	}
 	defer dir.Close()
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
-		logrus.WithError(err).Error("Cannot read into libraries folder")
-		formatter.PrintErrorMessage("Cannot read into libraries folder")
+		formatter.PrintError(err, "Cannot read into libraries folder")
 		os.Exit(errCoreConfig)
 	}
 
@@ -464,7 +457,8 @@ func executeListCommand(command *cobra.Command, args []string) {
 				err = ini.Parse(content, "\n", "=")
 				if err != nil {
 					logrus.WithError(err).Warn("Cannot parse library.properties")
-					formatter.Print(err)
+					resultFromFileName(file, &libs)
+					continue
 				}
 				Name, ok := ini.Get("name")
 				if !ok {

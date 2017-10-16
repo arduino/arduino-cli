@@ -116,23 +116,20 @@ func executeCoreListCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core list`")
 	pkgHome, err := common.GetDefaultPkgFolder()
 	if err != nil {
-		logrus.WithError(err).Error("Cannot get packages folder")
-		formatter.PrintError(err)
+		formatter.PrintError(err, "Cannot get packages folder")
 		os.Exit(errCoreConfig)
 	}
 
 	dir, err := os.Open(pkgHome)
 	if err != nil {
-		logrus.WithError(err).Error("Cannot open packages folder")
-		formatter.PrintErrorMessage("Cannot open packages folder")
+		formatter.PrintError(err, "Cannot open packages folder")
 		os.Exit(errCoreConfig)
 	}
 	defer dir.Close()
 
 	dirFiles, err := dir.Readdir(0)
 	if err != nil {
-		logrus.WithError(err).Error("Cannot read into packages folder")
-		formatter.PrintErrorMessage("Cannot read into packages folder")
+		formatter.PrintError(err, "Cannot read into packages folder")
 		os.Exit(errCoreConfig)
 	}
 
@@ -167,7 +164,6 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
 	if len(args) < 1 {
-		ErrLogrus.Error("No core specified for download command, exiting")
 		formatter.PrintErrorMessage("No core specified for download command")
 		os.Exit(errBadCall)
 	}
@@ -175,7 +171,7 @@ func executeCoreDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Getting packages status context")
 	status, err := getPackagesStatusContext()
 	if err != nil {
-		logrus.WithError(err).Error("Cannot get packages status context")
+		formatter.PrintError(err, "Cannot get packages status context")
 		os.Exit(errCoreConfig)
 	}
 
@@ -209,7 +205,6 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
 	if len(args) < 1 {
-		ErrLogrus.Error("No core specified for download command, exiting")
 		formatter.PrintErrorMessage("No core specified for download command")
 		os.Exit(errBadCall)
 	}
@@ -217,7 +212,7 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Getting packages status context")
 	status, err := getPackagesStatusContext()
 	if err != nil {
-		logrus.WithError(err).Error("Cannot get packages status context")
+		formatter.PrintError(err, "Cannot get packages status context")
 		os.Exit(errCoreConfig)
 	}
 
@@ -253,8 +248,7 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) {
 
 		toolRoot, err := common.GetDefaultToolsFolder(item.Package)
 		if err != nil {
-			logrus.WithError(err).Error("Cannot get tool install path, try again.")
-			formatter.PrintErrorMessage("Cannot get tool install path, try again.")
+			formatter.PrintError(err, "Cannot get tool install path, try again.")
 			os.Exit(errCoreConfig)
 		}
 		possiblePath := filepath.Join(toolRoot, item.Name, item.Release.VersionName())
@@ -294,8 +288,7 @@ func executeCoreInstallCommand(cmd *cobra.Command, args []string) {
 
 		coreRoot, err := common.GetDefaultCoresFolder(item.Package)
 		if err != nil {
-			logrus.WithError(err).Error("Cannot get core install path, try again.")
-			formatter.PrintErrorMessage("Cannot get core install path, try again.")
+			formatter.PrintError(err, "Cannot get core install path, try again.")
 			os.Exit(errCoreConfig)
 		}
 		possiblePath := filepath.Join(coreRoot, item.Name, item.Release.VersionName())
@@ -346,7 +339,7 @@ func getInstalledTools(packageName string, tools *[]output.InstalledStuff) {
 func getInstalledStuff(packageName string, stuff *[]output.InstalledStuff, defaultFolderFunc func(string) (string, error)) {
 	stuffHome, err := defaultFolderFunc(packageName)
 	if err != nil {
-		logrus.WithError(err).Warn("Cannot get default folder ")
+		logrus.WithError(err).Warn("Cannot get default folder")
 		return
 	}
 	stuffHomeFolder, err := os.Open(stuffHome)

@@ -260,9 +260,9 @@ func arduinoPreRun(cmd *cobra.Command, args []string) {
 	// Reset logrus if debug flag changed
 	if !GlobalFlags.Debug { // discard logrus output if no debug
 		logrus.SetOutput(ioutil.Discard) // for standard logger
-		ErrLogrus.Out = ioutil.Discard   // for error logger
 	} else { // else print on stderr
 		ErrLogrus.Out = os.Stderr
+		formatter.SetLogger(ErrLogrus)
 	}
 	InitConfigs()
 
@@ -315,9 +315,8 @@ func arduinoRun(cmd *cobra.Command, args []string) {
 func Execute() {
 	err := ArduinoCmd.Execute()
 	if err != nil {
-		logrus.WithError(err).Error("Bad Exit")
-		formatter.PrintError(err)
-		os.Exit(1)
+		formatter.PrintError(err, "Bad Exit")
+		os.Exit(errGeneric)
 	}
 }
 
@@ -378,8 +377,7 @@ func initViper() {
 	logrus.Info("Reading configuration for viper")
 	err = viper.ReadInConfig()
 	if err != nil {
-		ErrLogrus.WithError(err).Error("Cannot read configuration file in any of the default folders")
-		formatter.PrintErrorMessage("Cannot read configuration file in any of the default folders")
+		formatter.PrintError(err, "Cannot read configuration file in any of the default folders")
 		os.Exit(errNoConfigFile)
 	}
 
@@ -424,7 +422,6 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 	passwordEmpty := arduinoLoginFlags.Password == ""
 	isTextMode := formatter.IsCurrentFormat("text")
 	if !isTextMode && (userEmpty || passwordEmpty) {
-		ErrLogrus.Error("User and password must be specified outside of text format")
 		formatter.PrintErrorMessage("User and password must be specified outside of text format")
 		return
 	}
@@ -439,8 +436,7 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 		fmt.Print("Password: ")
 		pass, err := terminal.ReadPassword(syscall.Stdin)
 		if err != nil {
-			ErrLogrus.WithError(err).Error("Cannot read password, login aborted")
-			formatter.PrintErrorMessage("Cannot read password, login aborted")
+			formatter.PrintError(err, "Cannot read password, login aborted")
 			return
 		}
 		arduinoLoginFlags.Password = string(pass)
@@ -452,23 +448,20 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 	//save into netrc
 	netRCHome, err := homedir.Dir()
 	if err != nil {
-		logrus.WithError(err).Error("Cannot get current home directory")
-		formatter.PrintErrorMessage("Cannot get current home directory")
+		formatter.PrintError(err, "Cannot get current home directory")
 		os.Exit(errGeneric)
 	}
 
 	netRCFile := filepath.Join(netRCHome, ".netrc")
 	file, err := os.OpenFile(netRCFile, os.O_RDONLY|os.O_CREATE, 0666)
 	if err != nil {
-		logrus.WithError(err).Error("Cannot cannot read .netrc file")
-		formatter.PrintErrorMessage("Cannot cannot read .netrc file")
+		formatter.PrintError(err, "Cannot parse .netrc file")
 		return
 	}
 	defer file.Close()
 	NetRC, err := netrc.Parse(file)
 	if err != nil {
-		logrus.WithError(err).Error("Cannot parse read .netrc file")
-		formatter.PrintErrorMessage("Cannot parse read .netrc file")
+		formatter.PrintError(err, "Cannot parse .netrc file")
 		os.Exit(errGeneric)
 	}
 
@@ -480,8 +473,7 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 
 	token, err := authConf.Token(usr, pwd)
 	if err != nil {
-		logrus.WithError(err).Error("Cannot login")
-		formatter.PrintError(err)
+		formatter.PrintError(err, "Cannot login")
 		os.Exit(errNetwork)
 	}
 
@@ -489,15 +481,13 @@ func executeLoginCommand(cmd *cobra.Command, args []string) {
 	NetRC.NewMachine("arduino.cc", usr, token.Access, token.Refresh)
 	content, err := NetRC.MarshalText()
 	if err != nil {
-		logrus.WithError(err).Error("Cannot parse new .netrc file")
-		formatter.PrintErrorMessage("Cannot parse new .netrc file")
+		formatter.PrintError(err, "Cannot parse new .netrc file")
 		os.Exit(errGeneric)
 	}
 
 	err = ioutil.WriteFile(netRCFile, content, 0666)
 	if err != nil {
-		logrus.WithError(err).Error("Cannot cannot write new .netrc file")
-		formatter.PrintErrorMessage("Cannot cannot write new .netrc file")
+		formatter.PrintError(err, "Cannot write new .netrc file")
 		os.Exit(errGeneric)
 	}
 

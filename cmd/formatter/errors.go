@@ -73,10 +73,16 @@ func FromError(err error) ErrorMessage {
 
 // PrintErrorMessage formats and prints info about an error message.
 func PrintErrorMessage(msg string) {
-	PrintError(errors.New(strings.TrimSpace(msg)))
+	msg = strings.TrimSpace(msg)
+	PrintError(errors.New(msg), msg)
 }
 
 // PrintError formats and prints info about an error.
-func PrintError(err error) {
-	Print(FromError(err))
+//
+// Err is the error to print full info while msg is the user friendly message to print.
+func PrintError(err error, msg string) {
+	if logger != nil {
+		logger.WithError(err).Error(msg)
+	}
+	Print(msg)
 }

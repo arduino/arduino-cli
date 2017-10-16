@@ -75,7 +75,6 @@ var arduinoSketchSyncCmd = &cobra.Command{
 
 func executeSketchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino sketch`")
-	ErrLogrus.Error("No subcommand specified, showing help message")
 	formatter.PrintErrorMessage("No subcommand specified")
 	cmd.Help()
 	ErrLogrus.Error("Bad Call Exit")
@@ -85,15 +84,13 @@ func executeSketchCommand(cmd *cobra.Command, args []string) {
 func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino sketch sync`")
 	if len(args) > 0 {
-		ErrLogrus.Error("No arguments are accepted for this command")
 		formatter.PrintErrorMessage("No arguments are accepted")
 		os.Exit(errBadCall)
 	}
 
 	sketchbook, err := common.GetDefaultArduinoHomeFolder()
 	if err != nil {
-		logrus.WithError(err).Error("Cannot get sketchbook folder")
-		formatter.PrintErrorMessage("Cannot get sketchbook folder")
+		formatter.PrintError(err, "Cannot get sketchbook folder")
 		os.Exit(errCoreConfig)
 	}
 
@@ -104,8 +101,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 
 	if priority == "ask-once" {
 		if !isTextMode {
-			ErrLogrus.Error("ask mode for this command is only supported using text format")
-			formatter.PrintErrorMessage("ask mode for this command is only supported using text format")
+			formatter.PrintErrorMessage("Ask mode for this command is only supported using text format")
 			os.Exit(errBadCall)
 		}
 		firstAsk := true
@@ -150,8 +146,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	username, bearerToken, err := login()
 	if err != nil {
 		stopSpinner()
-		logrus.WithError(err).Error("Cannot login")
-		formatter.PrintError(err)
+		formatter.PrintError(err, "Cannot login")
 		os.Exit(errNetwork)
 	}
 
@@ -164,8 +159,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	resp, err := client.SearchSketches(context.Background(), createClient.SearchSketchesPath(), nil, &username, &tok)
 	if err != nil {
 		stopSpinner()
-		logrus.WithError(err).Error("Cannot get create sketches, sync failed")
-		formatter.PrintErrorMessage("Cannot get create sketches, sync failed")
+		formatter.PrintError(err, "Cannot get create sketches, sync failed")
 		os.Exit(errNetwork)
 	}
 	defer resp.Body.Close()
@@ -173,8 +167,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	onlineSketches, err := client.DecodeArduinoCreateSketches(resp)
 	if err != nil {
 		stopSpinner()
-		logrus.WithError(err).Error("Cannot unmarshal response from create, sync failed")
-		formatter.PrintErrorMessage("Cannot unmarshal response from create, sync failed")
+		formatter.PrintError(err, "Cannot unmarshal response from create, sync failed")
 		os.Exit(errGeneric)
 	}
 
@@ -490,11 +483,9 @@ func login() (string, string, error) {
 		err := ioutil.WriteFile(netRCFile, content, 0666)
 		if err != nil {
 			logrus.WithError(err).Error("Cannot write new ~/.netrc file")
-			formatter.Print(err.Error())
 		}
 	} else {
 		logrus.WithError(err).Error("Cannot serialize ~/.netrc file")
-		formatter.Print(err.Error())
 	}
 	logrus.Info("Login successful")
 	return arduinoMachine.Login, token, nil
