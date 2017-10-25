@@ -1,0 +1,170 @@
+Sortutil is a Go library which lets you sort a slice without implementing a
+sort.Interface, and in different orderings: ascending, descending, or
+case-insensitive ascending or descending (for slices of strings.)
+
+Additionally, Sortutil lets you sort a slice of a custom struct by a given
+struct field or index--for example, you can sort a []MyStruct by the structs'
+"Name" fields, or a [][]int by the second index of each nested slice, similar
+to using sorted(key=operator.itemgetter/attrgetter) in Python.
+
+== Installation
+go get github.com/pmylund/sortutil
+
+== Documentation
+go doc github.com/pmylund/sortutil
+or http://go.pkgdoc.org/github.com/pmylund/sortutil
+
+== Functions
+func Asc(slice interface{})
+    Sort a slice in ascending order.
+
+func AscByField(slice interface{}, name string)
+    Sort a slice in ascending order by a field name.
+
+func AscByFieldIndex(slice interface{}, index []int)
+    Sort a slice in ascending order by a list of nested field indices, e.g.
+    {1, 2, 3} to sort by the third field of the struct in the second field
+    of the struct in the first field of each struct in the slice.
+
+func AscByIndex(slice interface{}, index int)
+    Sort a slice in ascending order by an index in a child slice.
+
+func CiAsc(slice interface{})
+    Sort a slice in case-insensitive ascending order.
+
+func CiAscByField(slice interface{}, name string)
+    Sort a slice in case-insensitive ascending order by a field name. (Valid
+    for string types.)
+
+func CiAscByFieldIndex(slice interface{}, index []int)
+    Sort a slice in case-insensitive ascending order by a list of nested
+    field indices, e.g. {1, 2, 3} to sort by the third field of the struct
+    in the second field of the struct in the first field of each struct in
+    the slice. (Valid for string types.)
+
+func CiAscByIndex(slice interface{}, index int)
+    Sort a slice in case-insensitive ascending order by an index in a child
+    slice. (Valid for string types.)
+
+func CiDesc(slice interface{})
+    Sort a slice in case-insensitive descending order.
+
+func CiDescByField(slice interface{}, name string)
+    Sort a slice in case-insensitive descending order by a field name.
+    (Valid for string types.)
+
+func CiDescByFieldIndex(slice interface{}, index []int)
+    Sort a slice in case-insensitive descending order by a list of nested
+    field indices, e.g. {1, 2, 3} to sort by the third field of the struct
+    in the second field of the struct in the first field of each struct in
+    the slice. (Valid for string types.)
+
+func CiDescByIndex(slice interface{}, index int)
+    Sort a slice in case-insensitive descending order by an index in a child
+    slice. (Valid for string types.)
+
+func Desc(slice interface{})
+    Sort a slice in descending order.
+
+func DescByField(slice interface{}, name string)
+    Sort a slice in descending order by a field name.
+
+func DescByFieldIndex(slice interface{}, index []int)
+    Sort a slice in descending order by a list of nested field indices, e.g.
+    {1, 2, 3} to sort by the third field of the struct in the second field
+    of the struct in the first field of each struct in the slice.
+
+func DescByIndex(slice interface{}, index int)
+    Sort a slice in descending order by an index in a child slice.
+
+func Reverse(slice interface{})
+    Reverse a slice.
+
+=== Utility functions for types that already implement sort.Interface
+
+func ReverseInterface(s sort.Interface)
+    Reverse a type which implements sort.Interface.
+
+func SortReverseInterface(s sort.Interface)
+    Sort a type using its existing sort.Interface, then reverse it. For a
+    slice with a "normal" sort interface (where Less returns true if i is
+    less than j), this causes the slice to be sorted in descending order.
+
+== Examples
+
+=== Normal sorting
+
+ints := []int{4, 7, 2, 6}
+
+// Sort the int slice in descending order, such that
+// ints[0] == 7
+// ints[1] == 6
+// ints[2] == 4
+// ints[3] == 2
+sortutil.Desc(ints)
+
+strings := []string{"ABC", "def", "abc", "GHI"}
+
+// Sort the string slice in case-insensitive ascending order, such that:
+// strings[0] == "ABC"
+// strings[1] == "abc"
+// strings[2] == "def"
+// strings[3] == "GHI"
+sortutil.CiAsc(strings)
+
+=== Nested sorting
+
+type MyStruct struct {
+        Id   int
+        Name string
+	Date time.Time
+}
+now := time.Now()
+day := 24*time.Hour
+structs := []MyStruct{
+        {3, "foo", now.Add(1*day)},
+        {1, "bar", now.Add(-1*day)},
+        {2, "baz", now},
+}
+
+// Sort the slice by the Id field in ascending order, such that
+// structs[0].Id == 1
+// structs[1].Id == 2
+// structs[2].Id == 3
+sortutil.AscByField(structs, "Id")
+
+// Sort the slice by the Date field in ascending order, such that
+// structs[0].Date == yesterday
+// structs[1].Date == now
+// structs[2].Date == tomorrow
+sortutil.AscByField(structs, "Date")
+
+// Sort the slice by the Name field in descending order, such that
+// structs[0].Name == "foo"
+// structs[1].Name == "baz"
+// structs[2].Name == "bar"
+sortutil.DescByField(structs, "Name")
+
+ints := [][]ints{
+        {4, 5, 1},
+        {2, 1, 7},
+        {9, 3, 3},
+        {1, 6, 2},
+}
+
+// Sort the ints by the last number in child slices in ascending
+// order, such that
+// ints[0] == {4, 5, 1}
+// ints[1] == {1, 6, 2}
+// ints[2] == {9, 3, 3}
+// ints[3] == {2, 1, 7}
+sortutil.AscByIndex(ints, 2)
+
+== Performance
+While sortutil is convenient, it won't beat a dedicated sort.Interface in
+terms of performance. Implementing sort.Interface for a type ByName which
+embeds e.g. []MyStruct and doing sort.Sort(ByName{MySlice}) should be
+considered when high performance is required.
+
+See the top of sortutil/all_test.go, go/src/pkg/sort/example_interface_test.go,
+and go/src/pkg/sort/example_reverse_test.go for examples.

@@ -6,8 +6,6 @@ pipeline:
   build:
     image: golang:latest
     commands:
-      - go get "github.com/stretchr/testify/assert"
-      - go get ./...
       - go build -o arduino
       - go test ./... -race
     secrets: [TEST_USERNAME, TEST_PASSWORD]

@@ -1,0 +1,17 @@
+= Troubleshooting problems
+Alessandro Sanino <a.sanino@arduino.cc>
+
+This document contains troubleshoot practice when encountering common problems.
+
+=== Missing vendored packages even if pushed correctly on GitHub
+This issue is related to link:https://github.com/Masterminds/glide/issues/106[this one] and 
+is about some folders being ignored since they are git repositories (and become submodules).
+
+To solve this, simply force add the packages, the most simple way is:
+[source, bash]
+----
+$ cd path/to/arduino-cli/repo
+$ git add -f .                # Force adds every file, even if should be ignored.
+$ git commit -m "Awesome message"
+$ git push 
+----

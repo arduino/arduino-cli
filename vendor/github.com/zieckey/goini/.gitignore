@@ -1,0 +1,5 @@
+*.exe
+coverage.out
+examples/ini_file_parsing/ini_file_parsing
+examples/inherited_ini_parsing/inherited_ini_parsing
+examples/memory_ini_data_parsing/memory_ini_data_parsing

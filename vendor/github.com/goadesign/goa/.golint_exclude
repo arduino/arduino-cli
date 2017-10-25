@@ -1,0 +1,5 @@
+^examples/cellar/design
+^examples/cellar/app
+^examples/cellar/client
+^examples/cellar/swagger
+^metrics.go

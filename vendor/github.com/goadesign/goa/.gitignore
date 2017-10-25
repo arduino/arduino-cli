@@ -1,0 +1,18 @@
+# Golang tools artifacts
+**/*.coverprofile
+**/*.test
+vendor
+
+# Executables and test outputs
+goagen/goagen
+_integration_tests/*/**/*.*
+
+# Editor / IDEs cruft
+.idea/
+*.iml
+.vscode/
+*~
+*.orig
+
+# OSes cruft
+.DS_Store
