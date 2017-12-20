@@ -1,31 +1,20 @@
-/*
- * This file is part of arduino-cli.
- *
- * arduino-cli is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- * As a special exception, you may use this file as part of a free software
- * library without restriction.  Specifically, if other files instantiate
- * templates or use macros or inline functions from this file, or you compile
- * this file and link it with other files to produce an executable, this
- * file does not by itself cause the resulting executable to be covered by
- * the GNU General Public License.  This exception does not however
- * invalidate any other reasons why the executable file might be covered by
- * the GNU General Public License.
- *
- * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
- */
+//
+//  This file is part of arduino-connector
+//
+//  Copyright (C) 2017  Arduino AG (http://www.arduino.cc/)
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
 
 // Package auth uses the `oauth2 authorization_code` flow to authenticate with Arduino
 //
@@ -48,6 +37,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"time"
 
@@ -202,13 +192,16 @@ func (c *Config) requestAuth(client *http.Client) (string, cookies, error) {
 	return res.Request.URL.String(), cookies, err
 }
 
+var errorRE = regexp.MustCompile(`<div class="error">(?P<error>.*)</div>`)
+
 // authenticate uses the user and pass to pass the authentication challenge and returns the authorization_code
 func (c *Config) authenticate(client *http.Client, cookies cookies, uri, user, pass string) (string, error) {
 	// Find csrf
 	csrf := ""
 	for _, cookie := range cookies["auth"] {
-		if cookie.Name == "_csrf" {
+		if cookie.Name == "_csrf" && cookie.Value != "" {
 			csrf = cookie.Value
+			break;
 		}
 	}
 	query := url.Values{}
@@ -235,7 +228,11 @@ func (c *Config) authenticate(client *http.Client, cookies cookies, uri, user, p
 
 	if res.StatusCode != 302 {
 		body, _ := ioutil.ReadAll(res.Body)
-		return "", errors.New("status = " + res.Status + ", response = " + string(body))
+		errs := errorRE.FindStringSubmatch(string(body))
+		if len(errs) < 2 {
+			return "", errors.New("status = " + res.Status + ", response = " + string(body))
+		}
+		return "", errors.New(errs[1])
 	}
 
 	// Follow redirect to hydra
