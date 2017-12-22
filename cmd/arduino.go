@@ -57,28 +57,28 @@ import (
 
 const (
 	bashAutoCompletionFunction = `
-    __arduino_autocomplete() 
-    {
-        case $(last_command) in
-            arduino)
-    		    opts="lib core help version"
-    		    ;;
-            arduino_lib)
-    		    opts="install uninstall list search version --update-index"
-    	        ;;			
-			arduino_core)
-			    opts="install uninstall list search version --update-index"
+	__arduino_autocomplete()
+	{
+		case $(last_command) in
+			arduino)
+				opts="lib core help version"
 				;;
-    		arduino_help)
-    		    opts="lib core version"
-    		    ;;
-	    esac		  
-    	if [[ ${cur} == " *" ]] ; then
-            COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-            return 0
-        fi
-	    return 1
-    }`
+			arduino_lib)
+				opts="install uninstall list search version --update-index"
+				;;
+			arduino_core)
+				opts="install uninstall list search version --update-index"
+				;;
+			arduino_help)
+				opts="lib core version"
+				;;
+		esac
+		if [[ ${cur} == " *" ]] ; then
+			COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+			return 0
+		fi
+		return 1
+	}`
 
 	// ArduinoVersion represents Arduino CLI version number.
 	ArduinoVersion = "0.1.0-alpha.preview"
@@ -170,6 +170,7 @@ func InitFlags() {
 
 	arduinoSketchSyncCmd.ResetFlags()
 	arduinoLoginCmd.ResetFlags()
+	arduinoCompileCmd.ResetFlags()
 
 	ArduinoCmd.PersistentFlags().BoolVar(&GlobalFlags.Debug, "debug", false, "enables debug output (super verbose, used to debug the CLI)")
 
@@ -198,6 +199,17 @@ func InitFlags() {
 	arduinoSketchSyncCmd.Flags().StringVar(&arduinoSketchSyncFlags.Priority, "conflict-policy", "skip", "The decision made by default on conflicting sketches. Can be push-local, pull-remote, skip, ask-once, ask-always.")
 	arduinoLoginCmd.Flags().StringVarP(&arduinoLoginFlags.User, "user", "u", "", "The username used to log in")
 	arduinoLoginCmd.Flags().StringVarP(&arduinoLoginFlags.Password, "password", "p", "", "The username used to log in")
+
+	arduinoCompileCmd.Flags().StringVarP(&arduinoCompileFlags.FullyQualifiedBoardName, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	arduinoCompileCmd.Flags().StringVarP(&arduinoCompileFlags.SketchName, "sketch", "s", "", "The Name of the sketch to compile.")
+	arduinoCompileCmd.Flags().BoolVar(&arduinoCompileFlags.DumpPreferences, "dump-prefs", false, "Show all build preferences used instead of compiling.")
+	arduinoCompileCmd.Flags().BoolVar(&arduinoCompileFlags.Preprocess, "preprocess", false, "Print preprocessed code to stdout instead of compiling.")
+	arduinoCompileCmd.Flags().StringVar(&arduinoCompileFlags.BuildPath, "build-path", "", "Folder where to save compiled files. If omitted, a folder will be created in the temporary folder specified by your OS.")
+	arduinoCompileCmd.Flags().StringVar(&arduinoCompileFlags.Warnings, "warnings", "none", `Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
+	arduinoCompileCmd.Flags().BoolVar(&arduinoCompileFlags.Verbose, "verbose", false, "Optional, turns on verbose mode.")
+	arduinoCompileCmd.Flags().BoolVar(&arduinoCompileFlags.Quiet, "quiet", false, "Optional, supresses almost every output.")
+	arduinoCompileCmd.Flags().IntVar(&arduinoCompileFlags.DebugLevel, "debug-level", 5, "Optional, defaults to 5. Used for debugging. Set it to 10 when submitting an issue.")
+	arduinoCompileCmd.Flags().StringVar(&arduinoCompileFlags.VidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if boards supports them.")
 }
 
 // InitCommands reinitialize commands (useful for testing too)
@@ -208,9 +220,10 @@ func InitCommands() {
 	arduinoConfigCmd.ResetCommands()
 	arduinoBoardCmd.ResetCommands()
 	arduinoSketchCmd.ResetCommands()
+	arduinoCompileCmd.ResetCommands()
 
 	ArduinoCmd.AddCommand(arduinoVersionCmd, arduinoLibCmd, arduinoCoreCmd, arduinoConfigCmd,
-		arduinoBoardCmd, arduinoSketchCmd, arduinoLoginCmd)
+		arduinoBoardCmd, arduinoSketchCmd, arduinoLoginCmd, arduinoCompileCmd)
 
 	arduinoLibCmd.AddCommand(arduinoLibInstallCmd, arduinoLibUninstallCmd, arduinoLibSearchCmd,
 		arduinoLibVersionCmd, arduinoLibListCmd, arduinoLibDownloadCmd)

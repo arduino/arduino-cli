@@ -91,3 +91,17 @@ var arduinoLoginFlags struct {
 	User     string // The user who asks to login.
 	Password string // The password used to authenticate.
 }
+
+// arduinoCompileFlags represents `arduino compile` flags.
+var arduinoCompileFlags struct {
+	FullyQualifiedBoardName string // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	SketchName              string // The name of the sketch to compile.
+	DumpPreferences         bool   // Show all build preferences used instead of compiling.
+	Preprocess              bool   // Print preprocessed code to stdout.
+	BuildPath               string // Folder where to save compiled files.
+	Warnings                string // Used to tell gcc which warning level to use.
+	Verbose                 bool   // Turns on verbose mode.
+	Quiet                   bool   // Supresses almost every output.
+	DebugLevel              int    // Used for debugging.
+	VidPid                  string // VID/PID specific build properties.
+}

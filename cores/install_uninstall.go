@@ -171,7 +171,13 @@ func InstallTool(packager, name string, release releases.Release) error {
 	}
 	defer file.Close()
 
-	err = extract.Archive(file, tempFolder, nil)
+	// Ignore the top level directory inside archives. E.g. not "avr/bin/avr-g++"", but "bin/avr-g++"".
+	var shift = func(path string) string {
+		parts := strings.Split(path, string(filepath.Separator))
+		parts = parts[1:]
+		return strings.Join(parts, string(filepath.Separator))
+	}
+	err = extract.Archive(file, tempFolder, shift)
 	if err != nil {
 		return err
 	}
