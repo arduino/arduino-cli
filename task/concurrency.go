@@ -33,7 +33,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
 )
 
 // resultWithKey values are used by ExecuteParallelFromMap as temporary values.

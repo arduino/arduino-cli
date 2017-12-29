@@ -36,8 +36,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
-	"github.com/bcmi-labs/arduino-cli/cmd/output"
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/task"
 	pb "gopkg.in/cheggaaa/pb.v1"

@@ -27,7 +27,7 @@
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package cmd_test
+package commands_test
 
 import (
 	"encoding/json"
@@ -37,9 +37,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bcmi-labs/arduino-cli/cmd"
-	"github.com/bcmi-labs/arduino-cli/cmd/output"
+	"github.com/bcmi-labs/arduino-cli/commands/root"
 	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -69,12 +69,15 @@ func cleanTempRedirect(t *testing.T, tempFile *os.File) {
 }
 
 func executeWithArgs(t *testing.T, args ...string) {
-	cmd.TestInit()
+	// Init only once.
+	if !root.Command.HasFlags() {
+		root.Init()
+	}
 	if args != nil {
-		cmd.ArduinoCmd.SetArgs(args)
+		root.Command.SetArgs(args)
 	}
 
-	err := cmd.ArduinoCmd.Execute()
+	err := root.Command.Execute()
 	fmt.Fprintln(stdOut, err)
 	require.NoError(t, err, "Error executing command")
 }

@@ -27,48 +27,21 @@
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package task
+package core
 
 import (
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/commands/version"
+	"github.com/spf13/cobra"
 )
 
-// Task represents a function which can be safely wrapped into a Wrapper.
-//
-// It may provide a result but always provides an error.
-type Task func() Result
-
-// A Wrapper wraps a task to be executed to allow
-// Useful messages to be print. It is used to pretty
-// print operations.
-//
-// All Message arrays use VERBOSITY as index.
-type Wrapper struct {
-	BeforeMessage string
-	Task          Task
-	AfterMessage  string
-	ErrorMessage  string
+func init() {
+	command.AddCommand(versionCommand)
 }
 
-//Result represents a result from a task, or an error.
-type Result struct {
-	Result interface{}
-	Error  error
-}
-
-//Sequence represents a sequence of tasks.
-type Sequence func() []Result
-
-// Execute executes a task while printing messages to describe what is happening.
-func (tw Wrapper) Execute() Result {
-	formatter.Print(tw.BeforeMessage)
-
-	ret := tw.Task()
-
-	if ret.Error != nil {
-		formatter.Print(tw.ErrorMessage)
-	} else {
-		formatter.Print(tw.AfterMessage)
-	}
-	return ret
+var versionCommand = &cobra.Command{
+	Use:     "version",
+	Short:   "Shows version number of arduino core package.",
+	Long:    `Shows version number of arduino core package which is installed on your system.`,
+	Run:     version.Command.Run,
+	Example: version.Command.Example,
 }

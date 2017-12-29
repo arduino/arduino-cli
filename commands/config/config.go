@@ -27,48 +27,33 @@
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package task
+package config
 
 import (
+	"github.com/sirupsen/logrus"
+
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/spf13/cobra"
 )
 
-// Task represents a function which can be safely wrapped into a Wrapper.
-//
-// It may provide a result but always provides an error.
-type Task func() Result
-
-// A Wrapper wraps a task to be executed to allow
-// Useful messages to be print. It is used to pretty
-// print operations.
-//
-// All Message arrays use VERBOSITY as index.
-type Wrapper struct {
-	BeforeMessage string
-	Task          Task
-	AfterMessage  string
-	ErrorMessage  string
+// Init prepares the command.
+func Init(rootCommand *cobra.Command) {
+	rootCommand.AddCommand(command)
 }
 
-//Result represents a result from a task, or an error.
-type Result struct {
-	Result interface{}
-	Error  error
+var command = &cobra.Command{
+	Use:     "config",
+	Short:   "Arduino Configuration Commands.",
+	Example: "arduino config init",
+	Run:     run,
 }
 
-//Sequence represents a sequence of tasks.
-type Sequence func() []Result
-
-// Execute executes a task while printing messages to describe what is happening.
-func (tw Wrapper) Execute() Result {
-	formatter.Print(tw.BeforeMessage)
-
-	ret := tw.Task()
-
-	if ret.Error != nil {
-		formatter.Print(tw.ErrorMessage)
-	} else {
-		formatter.Print(tw.AfterMessage)
+func run(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino config`")
+	formatter.PrintErrorMessage("No subcommand specified.")
+	if formatter.IsCurrentFormat("text") {
+		logrus.Warn("Showing help message")
+		cmd.Help()
 	}
-	return ret
+	logrus.Info("Done")
 }

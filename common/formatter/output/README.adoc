@@ -6,7 +6,7 @@ Alessandro Sanino <a.sanino@arduino.cc>
 
 This package provides structs and helpers to be used in the rest of the project.
 
-Usually it is paired to link:../https://github.com/bcmi-labs/arduino-cli/cmd/formatter[Formatter Package]
+Usually it is paired to link:../https://github.com/bcmi-labs/arduino-cli/common/formatter[Formatter Package]
 
 == Output structs
 Any Output struct must implement a set of functions, depending on the formatter.
@@ -28,10 +28,10 @@ This is a correct example about how to build an output struct:
 // ExampleOutput is a struct which implements Formattable
 // JSON tags are used automatically by marshalJSON.
 type ExampleOutput struct {
-    ExampleOfField         interface{} `json:"exampleOfField"`
-    ExampleOfAnotherField  int         `json:"ExampleOfAnotherField"`
-    ExampleOfRequiredField string      `json:"ExampleOfRequiredField,required"`
-    ExampleOfOptionalField string      `json:"ExampleOfOptionalField,omitempty"`
+	ExampleOfField         interface{} `json:"exampleOfField"`
+	ExampleOfAnotherField  int         `json:"ExampleOfAnotherField"`
+	ExampleOfRequiredField string      `json:"ExampleOfRequiredField,required"`
+	ExampleOfOptionalField string      `json:"ExampleOfOptionalField,omitempty"`
 }
 
 // String() is used by fmt.Printf, fmt.Sprintf, fmt.Fprintf families of functions,
@@ -42,11 +42,11 @@ func (eo ExampleOutput) String() string {
    ret += fmt.Sprintln("ExampleOfRequiredField (error if not set):", eo.ExampleOfRequiredField)
    // Do not show optional fields.
    if eo.ExampleOfOptionalField != "" {
-       ret += fmt.Sprintln("ExampleOfOptionalField (may not appear if not set):", eo.ExampleOfField)
+	   ret += fmt.Sprintln("ExampleOfOptionalField (may not appear if not set):", eo.ExampleOfField)
    }
    // Print that required variable is missing.
    if eo.ExampleOfRequiredField == "" {
-       ret += fmt.Sprintln("WARNING : Required field ExampleOfRequiredField is not set")
+	   ret += fmt.Sprintln("WARNING : Required field ExampleOfRequiredField is not set")
    }
    return ret
 }

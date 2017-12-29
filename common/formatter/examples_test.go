@@ -32,7 +32,7 @@ package formatter_test
 import (
 	"fmt"
 
-	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
 )
 
 type TestStruct struct {

@@ -32,7 +32,7 @@ package libraries
 import (
 	"fmt"
 
-	"github.com/bcmi-labs/arduino-cli/cmd/output"
+	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/pmylund/sortutil"
 )
 

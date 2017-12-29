@@ -29,8 +29,18 @@
 
 package main
 
-import "github.com/bcmi-labs/arduino-cli/cmd"
+import (
+	"os"
+
+	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/bcmi-labs/arduino-cli/commands/root"
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
+)
 
 func main() {
-	cmd.Execute()
+	root.Init()
+	if err := root.Command.Execute(); err != nil {
+		formatter.PrintError(err, "Bad exit.")
+		os.Exit(commands.ErrGeneric)
+	}
 }

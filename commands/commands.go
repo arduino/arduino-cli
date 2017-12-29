@@ -27,20 +27,29 @@
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package cmd
+package commands
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/spf13/cobra/doc"
+	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/sirupsen/logrus"
 )
 
-// generateManPages generates man pages for all commands and puts them in $PROJECT_DIR/manpages
-func generateManPages(rootCmd *cobra.Command) error {
-	header := &doc.GenManHeader{
-		Title:   "ARDUINO COMMAND LINE MANUAL",
-		Section: "1",
-	}
-	//out := new(bytes.Buffer)
-	//doc.GenMan(cmd.RootCmd, header, out)
-	return doc.GenManTree(rootCmd, header, "./docs/manpages")
+// Error codes to be used for os.Exit().
+const (
+	ErrNoConfigFile int = iota
+	ErrBadCall      int = iota
+	ErrGeneric      int = iota
+	ErrNetwork      int = iota
+	ErrCoreConfig   int = iota // Represents an error in the cli core config, for example some basic files shipped with the installation are missing, or cannot create or get basic folder vital for the CLI to work.
+)
+
+// ErrLogrus represents the logrus instance, which has the role to
+// log all non info messages.
+var ErrLogrus = logrus.New()
+
+// GlobalFlags represents flags available in all the program.
+var GlobalFlags struct {
+	Debug           bool   // If true, dump debug output to stderr.
+	Format          string // The Output format (e.g. text, json).
+	configs.Configs        // The Configurations for the CLI.
 }

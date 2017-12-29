@@ -27,7 +27,7 @@
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package cmd
+package sketch
 
 import (
 	"context"
@@ -40,74 +40,70 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/bcmi-labs/arduino-cli/auth"
+	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/create_client_helpers"
+	"github.com/bcmi-labs/arduino-modules/sketches"
 	"github.com/bgentry/go-netrc/netrc"
 	"github.com/briandowns/spinner"
 	homedir "github.com/mitchellh/go-homedir"
-
-	"github.com/bcmi-labs/arduino-modules/sketches"
-
-	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
-	"github.com/bcmi-labs/arduino-cli/cmd/output"
-	"github.com/bcmi-labs/arduino-cli/common"
-
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-var arduinoSketchCmd = &cobra.Command{
-	Use:     "sketch",
-	Short:   `Arduino CLI Sketch Commands`,
-	Long:    `Arduino CLI Sketch Commands`,
-	Example: `arduino sketch sync`,
-	Run:     executeSketchCommand,
+const (
+	priorityPullRemote = "pull-remote"
+	priorityPushLocal  = "push-local"
+	prioritySkip       = "skip"
+)
+
+func init() {
+	command.AddCommand(syncCommand)
+	syncCommand.Flags().StringVar(&syncFlags.priority, "conflict-policy", "skip", "The decision made by default on conflicting sketches. Can be push-local, pull-remote, skip, ask-once, ask-always.")
 }
 
-var arduinoSketchSyncCmd = &cobra.Command{
+var syncFlags struct {
+	priority string // The Prioritary resource when we have conflicts. Can be local, remote, skip-conflict.
+}
+
+var syncCommand = &cobra.Command{
 	Use:     "sync",
-	Short:   `Arduino CLI Sketch Commands`,
-	Long:    `Arduino CLI Sketch Commands`,
+	Short:   `Arduino CLI Sketch Commands.`,
+	Long:    `Arduino CLI Sketch Commands.`,
 	Example: `arduino sketch sync`,
-	Run:     executeSketchSyncCommand,
+	Run:     runSyncCommand,
 }
 
-func executeSketchCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino sketch`")
-	formatter.PrintErrorMessage("No subcommand specified")
-	cmd.Help()
-	ErrLogrus.Error("Bad Call Exit")
-	os.Exit(errBadCall)
-}
-
-func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
+func runSyncCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino sketch sync`")
 	if len(args) > 0 {
-		formatter.PrintErrorMessage("No arguments are accepted")
-		os.Exit(errBadCall)
+		formatter.PrintErrorMessage("No arguments are accepted.")
+		os.Exit(commands.ErrBadCall)
 	}
 
 	sketchbook, err := common.GetDefaultArduinoHomeFolder()
 	if err != nil {
-		formatter.PrintError(err, "Cannot get sketchbook folder")
-		os.Exit(errCoreConfig)
+		formatter.PrintError(err, "Cannot get sketchbook folder.")
+		os.Exit(commands.ErrCoreConfig)
 	}
 
 	isTextMode := formatter.IsCurrentFormat("text")
 
 	logrus.Info("Setting priority")
-	priority := arduinoSketchSyncFlags.Priority
+	priority := syncFlags.priority
 
 	if priority == "ask-once" {
 		if !isTextMode {
-			formatter.PrintErrorMessage("Ask mode for this command is only supported using text format")
-			os.Exit(errBadCall)
+			formatter.PrintErrorMessage("Ask mode for this command is only supported using text format.")
+			os.Exit(commands.ErrBadCall)
 		}
 		firstAsk := true
-		for priority != "pull-remote" &&
-			priority != "push-local" &&
-			priority != "skip" {
+		for priority != priorityPullRemote &&
+			priority != priorityPushLocal &&
+			priority != prioritySkip {
 			if !firstAsk {
 				formatter.Print("Invalid option: " + priority)
 			}
@@ -123,7 +119,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 
 	var loader *spinner.Spinner
 
-	if isTextMode && !GlobalFlags.Debug {
+	if isTextMode && !commands.GlobalFlags.Debug {
 		loader = spinner.New(spinner.CharSets[27], 100*time.Millisecond)
 		loader.Prefix = "Syncing Sketches... "
 
@@ -131,13 +127,13 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	}
 
 	stopSpinner := func() {
-		if isTextMode && !GlobalFlags.Debug {
+		if isTextMode && !commands.GlobalFlags.Debug {
 			loader.Stop()
 		}
 	}
 
 	startSpinner := func() {
-		if isTextMode && !GlobalFlags.Debug {
+		if isTextMode && !commands.GlobalFlags.Debug {
 			loader.Start()
 		}
 	}
@@ -147,11 +143,11 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	if err != nil {
 		stopSpinner()
 		formatter.PrintError(err, "Cannot login")
-		os.Exit(errNetwork)
+		os.Exit(commands.ErrNetwork)
 	}
 
 	logrus.Info("Finding local sketches")
-	sketchMap := sketches.Find(sketchbook, "libraries") //exclude libraries folder
+	sketchMap := sketches.Find(sketchbook, "libraries") // Exclude libraries folder.
 
 	logrus.Info("Finding online sketches")
 	client := createClient.New(nil)
@@ -159,16 +155,16 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	resp, err := client.SearchSketches(context.Background(), createClient.SearchSketchesPath(), nil, &username, &tok)
 	if err != nil {
 		stopSpinner()
-		formatter.PrintError(err, "Cannot get create sketches, sync failed")
-		os.Exit(errNetwork)
+		formatter.PrintError(err, "Cannot get create sketches, sync failed.")
+		os.Exit(commands.ErrNetwork)
 	}
 	defer resp.Body.Close()
 
 	onlineSketches, err := client.DecodeArduinoCreateSketches(resp)
 	if err != nil {
 		stopSpinner()
-		formatter.PrintError(err, "Cannot unmarshal response from create, sync failed")
-		os.Exit(errGeneric)
+		formatter.PrintError(err, "Cannot unmarshal response from create, sync failed.")
+		os.Exit(commands.ErrGeneric)
 	}
 
 	onlineSketchesMap := make(map[string]*createClient.ArduinoCreateSketch, len(onlineSketches.Sketches))
@@ -179,7 +175,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 	maxLength := len(sketchMap) + len(onlineSketchesMap)
 
 	logrus.Info("Syncing sketches")
-	// create output result struct with empty arrays.
+	// Create output result struct with empty arrays.
 	result := output.SketchSyncResult{
 		PushedSketches:  make([]string, 0, maxLength),
 		PulledSketches:  make([]string, 0, maxLength),
@@ -192,21 +188,21 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 		if hasConflict {
 			logrus.Warnf("Conflict found for sketch `%s`", item.Name)
 			item.ID = itemOnline.ID.String()
-			//solve conflicts
+			// Resolve conflicts.
 			if priority == "ask-always" {
 				stopSpinner()
 
 				logrus.Warn("Asking user what to do")
 				if !isTextMode {
-					logrus.WithField("format", GlobalFlags.Format).Error("ask mode for this command is only supported using text format")
-					formatter.PrintErrorMessage("ask mode for this command is only supported using text format")
-					os.Exit(errBadCall)
+					logrus.WithField("format", commands.GlobalFlags.Format).Error("ask mode for this command is only supported using text format")
+					formatter.PrintErrorMessage("ask mode for this command is only supported using text format.")
+					os.Exit(commands.ErrBadCall)
 				}
 
 				firstAsk := true
-				for priority != "pull-remote" &&
-					priority != "push-local" &&
-					priority != "skip" {
+				for priority != priorityPullRemote &&
+					priority != priorityPushLocal &&
+					priority != prioritySkip {
 					if !firstAsk {
 						formatter.Print("Invalid option: " + priority)
 					}
@@ -219,7 +215,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 				startSpinner()
 			}
 			switch priority {
-			case "push-local":
+			case priorityPushLocal:
 				logrus.Infof("Pushing local sketch `%s` as edit", item.Name)
 				err := editSketch(*item, sketchbook, bearerToken)
 				if err != nil {
@@ -233,7 +229,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 					result.PushedSketches = append(result.PushedSketches, item.Name)
 				}
 				break
-			case "pull-remote":
+			case priorityPullRemote:
 				logrus.Infof("Pulling remote sketch `%s`", item.Name)
 				err := pullSketch(itemOnline, sketchbook, bearerToken)
 				if err != nil {
@@ -247,16 +243,16 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 					result.PulledSketches = append(result.PulledSketches, item.Name)
 				}
 				break
-			case "skip":
+			case prioritySkip:
 				logrus.Warnf("Skipping `%s`", item.Name)
 				result.SkippedSketches = append(result.SkippedSketches, item.Name)
 				break
 			default:
 				logrus.Warnf("Skipping by default `%s`", item.Name)
-				priority = "skip"
+				priority = prioritySkip
 				result.SkippedSketches = append(result.SkippedSketches, item.Name)
 			}
-		} else { //only local, push
+		} else { // Only local, push.
 			logrus.Info("No conflict, pushing `%s` as new sketch", item.Name)
 			err := pushSketch(*item, sketchbook, bearerToken)
 			if err != nil {
@@ -276,7 +272,7 @@ func executeSketchSyncCommand(cmd *cobra.Command, args []string) {
 		if hasConflict {
 			continue
 		}
-		//only online, pull
+		// Only online, pull.
 		logrus.Infof("Pulling only online sketch `%s`", *item.Name)
 		err := pullSketch(item, sketchbook, bearerToken)
 		if err != nil {
@@ -324,7 +320,6 @@ func editSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) e
 	client := createClient.New(nil)
 	resp, err := client.EditSketches(context.Background(), createClient.EditSketchesPath(sketch.ID), createClient.ConvertFrom(sketch), "Bearer "+bearerToken)
 	if err != nil {
-
 		return err
 	}
 	defer resp.Body.Close()
@@ -378,12 +373,12 @@ func pullSketch(sketch *createClient.ArduinoCreateSketch, sketchbook string, bea
 	for _, file := range append(r.Files, sketch.Ino) {
 		path := findPathOf(*sketch.Name, *file.Path)
 
-		err := os.MkdirAll(filepath.Dir(path), 0755)
+		err = os.MkdirAll(filepath.Dir(path), 0755)
 		if err != nil {
 			return err
 		}
 
-		resp, err := client.ShowFiles(context.Background(), createClient.ShowFilesPath("sketch", sketch.ID.String(), path))
+		resp, err = client.ShowFiles(context.Background(), createClient.ShowFilesPath("sketch", sketch.ID.String(), path))
 		if err != nil {
 			return err
 		}
@@ -406,7 +401,7 @@ func pullSketch(sketch *createClient.ArduinoCreateSketch, sketchbook string, bea
 
 		err = ioutil.WriteFile(path, decodedData, 0666)
 		if err != nil {
-			return errors.New("Copy of a file of the downloaded sketch failed, sync failed")
+			return errors.New("Copy of a file of the downloaded sketch failed, sync failed.")
 		}
 	}
 
@@ -470,7 +465,7 @@ func login() (string, string, error) {
 	}
 
 	var token string
-	if newToken.TTL != 0 { //we haven't recently requested a valid token, which is in .netrc under "account", so we have to update it
+	if newToken.TTL != 0 { // We haven't recently requested a valid token, which is in .netrc under "account", so we have to update it.
 		arduinoMachine.UpdatePassword(newToken.Refresh)
 		arduinoMachine.UpdateAccount(newToken.Access)
 		token = newToken.Access
@@ -480,7 +475,7 @@ func login() (string, string, error) {
 
 	content, err := NetRC.MarshalText()
 	if err == nil { //serialize new info
-		err := ioutil.WriteFile(netRCFile, content, 0666)
+		err = ioutil.WriteFile(netRCFile, content, 0666)
 		if err != nil {
 			logrus.WithError(err).Error("Cannot write new ~/.netrc file")
 		}

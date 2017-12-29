@@ -36,7 +36,7 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/common/releases"
 
-	"github.com/bcmi-labs/arduino-cli/cmd/output"
+	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/pmylund/sortutil"
 )
 

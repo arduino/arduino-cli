@@ -33,7 +33,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/task"
 )
 

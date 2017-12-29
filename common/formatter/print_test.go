@@ -33,7 +33,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
 )
 
 type ExType struct {

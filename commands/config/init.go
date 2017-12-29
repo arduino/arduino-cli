@@ -27,74 +27,68 @@
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package cmd
+package config
 
 import (
 	"os"
 
-	"github.com/sirupsen/logrus"
-
-	"github.com/bcmi-labs/arduino-cli/cmd/formatter"
+	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-var arduinoConfigCmd = &cobra.Command{
-	Use:     `config`,
-	Short:   `Arduino Configuration Commands`,
-	Long:    `Arduino Configuration Commands`,
-	Example: `arduino config init # Initializes a new config file into the default location`,
-	Run:     executeConfigCommand,
+func init() {
+	command.AddCommand(initCommand)
+	initCommand.Flags().BoolVar(&initFlags._default, "default", false, "If omitted, ask questions to the user about setting configuration properties, otherwise use default configuration.")
+	initCommand.Flags().StringVar(&initFlags.location, "save-as", configs.FileLocation, "Sets where to save the configuration file [default is ./.cli-config.yml].")
 }
 
-var arduinoConfigInitCmd = &cobra.Command{
-	Use:   `init`,
-	Short: `Initializes a new config file into the default location`,
-	Long:  `Initializes a new config file into the default location ($EXE_DIR/cli-config.yml)`,
-	Example: `arduino config init           # Creates a config file by asking questions to the user into the default location
-arduino config init --default # Creates a config file with default configuration into default location`,
-	Run: executeConfigInitCommand,
+var initFlags struct {
+	_default bool   // If false, ask questions to the user about setting configuration properties, otherwise use default configuration.
+	location string // The custom location of the file to create.
 }
 
-func executeConfigCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino config`")
-	formatter.PrintErrorMessage("No subcommand specified")
-	if formatter.IsCurrentFormat("text") {
-		logrus.Warn("Showing help message")
-		cmd.Help()
-	}
-	logrus.Info("Done")
+var initCommand = &cobra.Command{
+	Use:   "init",
+	Short: "Initializes a new config file into the default location.",
+	Long:  "Initializes a new config file into the default location ($EXE_DIR/cli-config.yml).",
+	Example: "" +
+		"arduino config init           # Creates a config file by asking questions to the user into the default location.\n" +
+		"arduino config init --default # Creates a config file with default configuration into default location.",
+	Run: runInitCommand,
 }
 
-func executeConfigInitCommand(cmd *cobra.Command, args []string) {
+func runInitCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config init`")
 
 	var conf configs.Configs
 
-	if !arduinoConfigInitFlags.Default {
+	if !initFlags._default {
 		if !formatter.IsCurrentFormat("text") {
-			formatter.PrintErrorMessage("The interactive mode is supported only in text mode")
-			os.Exit(errBadCall)
+			formatter.PrintErrorMessage("The interactive mode is supported only in text mode.")
+			os.Exit(commands.ErrBadCall)
 		}
 		logrus.Info("Asking questions to the user to populate configuration")
-		conf = ConfigsFromQuestions()
+		conf = configsFromQuestions()
 	} else {
 		logrus.Info("Setting default configuration")
 		conf = configs.Default()
 	}
-	err := conf.Serialize(arduinoConfigInitFlags.Location)
+	err := conf.Serialize(initFlags.location)
 	if err != nil {
-		formatter.PrintError(err, "Cannot create config file")
-		os.Exit(errGeneric)
+		formatter.PrintError(err, "Cannot create config file.")
+		os.Exit(commands.ErrGeneric)
 	} else {
-		formatter.PrintResult("Config file PATH: " + arduinoConfigInitFlags.Location)
+		formatter.PrintResult("Config file PATH: " + initFlags.location)
 	}
 	logrus.Info("Done")
 }
 
 // ConfigsFromQuestions asks some questions to the user to properly initialize configs.
 // It does not have much sense to use it in JSON formatting, though.
-func ConfigsFromQuestions() configs.Configs {
+func configsFromQuestions() configs.Configs {
 	ret := configs.Default()
 	//Set of questions here
 	return ret
