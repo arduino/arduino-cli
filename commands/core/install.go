@@ -51,19 +51,15 @@ var installCommand = &cobra.Command{
 	Use:   "install [PACKAGER:ARCH[=VERSION]](S)",
 	Short: "Installs one or more cores and corresponding tool dependencies.",
 	Long:  "Installs one or more cores and corresponding tool dependencies.",
-	Run:   runInstallCommand,
 	Example: "" +
 		"arduino core install arduino:samd       # to download the latest version of arduino SAMD core.\n" +
 		"arduino core install arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
+	Args: cobra.MinimumNArgs(1),
+	Run:  runInstallCommand,
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
-
-	if len(args) < 1 {
-		formatter.PrintErrorMessage("No core specified for download command.")
-		os.Exit(commands.ErrBadCall)
-	}
 
 	logrus.Info("Getting packages status context")
 	status, err := getPackagesStatusContext()

@@ -49,11 +49,12 @@ var Command = &cobra.Command{
 	Use:   "version",
 	Short: "Shows version Number of arduino CLI components.",
 	Long:  "Shows version Number of arduino CLI components which are installed on your system.",
-	Run:   run,
 	Example: "" +
 		"arduino version      # for the main component version.\n" +
 		"arduino lib version  # for the version of the lib component.\n" +
 		"arduino core version # for the version of the core component.",
+	Args: cobra.NoArgs,
+	Run:  run,
 }
 
 // Version command for different subcommands.

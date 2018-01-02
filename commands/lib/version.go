@@ -41,7 +41,8 @@ func init() {
 var versionCommand = &cobra.Command{
 	Use:     "version",
 	Short:   "Shows version Number of arduino lib.",
-	Long:    `Shows version Number of arduino lib which is installed on your system.`,
-	Run:     version.Command.Run,
+	Long:    "Shows version Number of arduino lib which is installed on your system.",
 	Example: version.Command.Example,
+	Args:    version.Command.Args,
+	Run:     version.Command.Run,
 }

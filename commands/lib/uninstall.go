@@ -59,16 +59,13 @@ var uninstallCommand = &cobra.Command{
 	Use:     "uninstall LIBRARY_NAME(S)",
 	Short:   "Uninstalls one or more libraries.",
 	Long:    "Uninstalls one or more libraries.",
-	Run:     runUninstallCommand,
 	Example: "arduino uninstall YoutubeApi",
+	Args:    cobra.MinimumNArgs(1),
+	Run:     runUninstallCommand,
 }
 
 func runUninstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib uninstall`")
-	if len(args) < 1 {
-		formatter.PrintErrorMessage("No library specified for uninstall command.")
-		os.Exit(commands.ErrBadCall)
-	}
 
 	logrus.Info("Preparing")
 	libs := libraries.ParseArgs(args)

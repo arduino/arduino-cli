@@ -49,18 +49,15 @@ var downloadCommand = &cobra.Command{
 	Use:   "download [LIBRARY_NAME(S)]",
 	Short: "Downloads one or more libraries without installing them.",
 	Long:  "Downloads one or more libraries without installing them.",
-	Run:   runDownloadCommand,
 	Example: "" +
 		"arduino lib download YoutubeApi       # for the latest version.\n" +
 		"arduino lib download YoutubeApi@1.0.0 # for a specific version (in this case 1.0.0).",
+	Args: cobra.MinimumNArgs(1),
+	Run:  runDownloadCommand,
 }
 
 func runDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib download`")
-	if len(args) < 1 {
-		formatter.PrintErrorMessage("No library specified for download command.")
-		os.Exit(commands.ErrBadCall)
-	}
 
 	logrus.Info("Getting Libraries status context")
 	status, err := getLibStatusContext()

@@ -63,13 +63,15 @@ var command = &cobra.Command{
 	Short: "Arduino commands about libraries.",
 	Long: "Arduino commands about libraries.\n" +
 		"Can be used with --update-index flag to update the libraries index too.",
-	Run: run,
 	Example: "" +
 		"arduino lib install YoutubeApi\n" +
 		"arduino lib --update-index",
+	Args: cobra.NoArgs,
+	Run:  run,
 }
 
 func run(cmd *cobra.Command, args []string) {
+	// TODO: Convert into a commmand.
 	if flags.updateIndex {
 		logrus.Info("Updating index")
 		common.ExecUpdateIndex(prettyPrints.DownloadLibFileIndex())

@@ -54,11 +54,12 @@ var searchCommand = &cobra.Command{
 	Use:   "search [LIBRARY_NAME]",
 	Short: "Searchs for one or more libraries data.",
 	Long:  "Search for one or more libraries data (case insensitive search).",
-	Run:   runSearchCommand,
 	Example: "" +
 		"arduino lib search You # to show all libraries containing \"You\" in their name (case insensitive).\n" +
 		"YoumadeIt\n" +
 		"YoutubeApi",
+	Args: cobra.MinimumNArgs(1),
+	Run:  runSearchCommand,
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {

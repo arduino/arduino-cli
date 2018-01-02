@@ -105,13 +105,14 @@ var flags struct {
 
 // Command represents the base command when called without any subcommands
 var Command = &cobra.Command{
-	Use:   "arduino",
-	Short: "Arduino CLI.",
-	Long:  "Arduino Create Command Line Interface (arduino-cli).",
-	BashCompletionFunction: bashAutoCompletionFunction,
-	PersistentPreRun:       preRun,
-	Run:                    run,
+	Use:                    "arduino",
+	Short:                  "Arduino CLI.",
+	Long:                   "Arduino Create Command Line Interface (arduino-cli).",
 	Example:                "arduino --generate-docs to generate the docs and autocompletion for the whole CLI.",
+	BashCompletionFunction: bashAutoCompletionFunction,
+	Args:             cobra.NoArgs,
+	PersistentPreRun: preRun,
+	Run:              run,
 }
 
 func preRun(cmd *cobra.Command, args []string) {

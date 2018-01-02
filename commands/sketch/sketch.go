@@ -30,11 +30,6 @@
 package sketch
 
 import (
-	"os"
-
-	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -45,16 +40,7 @@ func Init(rootCommand *cobra.Command) {
 
 var command = &cobra.Command{
 	Use:     "sketch",
-	Short:   `Arduino CLI Sketch Commands.`,
-	Long:    `Arduino CLI Sketch Commands.`,
-	Example: `arduino sketch sync`,
-	Run:     run,
-}
-
-func run(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino sketch`")
-	formatter.PrintErrorMessage("No subcommand specified.")
-	cmd.Help()
-	commands.ErrLogrus.Error("Bad Call Exit")
-	os.Exit(commands.ErrBadCall)
+	Short:   "Arduino CLI Sketch Commands.",
+	Long:    "Arduino CLI Sketch Commands.",
+	Example: "arduino sketch sync",
 }

@@ -42,6 +42,7 @@ var versionCommand = &cobra.Command{
 	Use:     "version",
 	Short:   "Shows version number of arduino core package.",
 	Long:    `Shows version number of arduino core package which is installed on your system.`,
-	Run:     version.Command.Run,
 	Example: version.Command.Example,
+	Args:    version.Command.Args,
+	Run:     version.Command.Run,
 }

@@ -2,9 +2,7 @@ package board
 
 import (
 	"fmt"
-	"net/url"
 	"os"
-	"regexp"
 	"time"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
@@ -30,21 +28,17 @@ var listFlags struct {
 }
 
 var listCommand = &cobra.Command{
-	Use: "list",
-	Run: runListCommand,
+	Use:     "list",
+	Short:   "List connected boards.",
+	Long:    "Detects and displays a list of connected boards to the current computer.",
+	Example: "arduino board list --timeout 10s",
+	Args:    cobra.NoArgs,
+	Run:     runListCommand,
 }
-
-var validSerialBoardURIRegexp = regexp.MustCompile("(serial|tty)://.+")
-var validNetworkBoardURIRegexp = regexp.MustCompile("(http(s)?|(tc|ud)p)://[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:[0-9]{1,5}")
 
 // runListCommand detects and lists the connected arduino boards
 // (either via serial or network ports).
 func runListCommand(cmd *cobra.Command, args []string) {
-	if len(args) > 0 {
-		formatter.PrintErrorMessage("Not accepting additional arguments.")
-		os.Exit(commands.ErrBadCall)
-	}
-
 	packageFolder, err := common.GetDefaultPkgFolder()
 	if err != nil {
 		formatter.PrintError(err, "Cannot Parse Board Index file.")
@@ -94,57 +88,4 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 	//monitor.Stop() //If called will slow like 1sec the program to close after print, with the same result (tested).
 	// it closes ungracefully, but at the end of the command we can't have races.
-}
-
-// findSerialConnectedBoard find the board which is connected to the specified URI via serial port, using a monitor and a set of Boards
-// for the matching.
-func findSerialConnectedBoard(bs boards.Boards, monitor *discovery.Monitor, deviceURI *url.URL) *boards.Board {
-	found := false
-	location := deviceURI.Path
-	var serialDevice discovery.SerialDevice
-	for _, device := range monitor.Serial() {
-		if device.Port == location {
-			// Found the device !
-			found = true
-			serialDevice = *device
-		}
-	}
-	if !found {
-		formatter.PrintErrorMessage("No Supported board has been found at the specified board URI.")
-		return nil
-	}
-
-	board := bs.ByVidPid(serialDevice.VendorID, serialDevice.ProductID)
-	if board == nil {
-		formatter.PrintErrorMessage("No Supported board has been found, try either install new cores or check your board URI.")
-		os.Exit(commands.ErrGeneric)
-	}
-
-	formatter.Print("SUPPORTED BOARD FOUND:")
-	formatter.Print(board.String())
-	return board
-}
-
-// findNetworkConnectedBoard find the board which is connected to the specified URI on the network, using a monitor and a set of Boards
-// for the matching.
-func findNetworkConnectedBoard(bs boards.Boards, monitor *discovery.Monitor, deviceURI *url.URL) *boards.Board {
-	found := false
-
-	var networkDevice discovery.NetworkDevice
-
-	for _, device := range monitor.Network() {
-		if device.Address == deviceURI.Host &&
-			fmt.Sprint(device.Port) == deviceURI.Port() {
-			// Found the device !
-			found = true
-			networkDevice = *device
-		}
-	}
-	if !found {
-		formatter.PrintErrorMessage("No Supported board has been found at the specified board URI, try either install new cores or check your board URI.")
-		os.Exit(commands.ErrGeneric)
-	}
-
-	formatter.Print("SUPPORTED BOARD FOUND:")
-	return bs.ByID(networkDevice.Name)
 }

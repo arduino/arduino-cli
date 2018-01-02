@@ -52,18 +52,15 @@ var installCommand = &cobra.Command{
 	Use:   "install LIBRARY[@VERSION_NUMBER](S)",
 	Short: "Installs one of more specified libraries into the system.",
 	Long:  "Installs one or more specified libraries into the system.",
-	Run:   runInstallCommand,
 	Example: "" +
 		"arduino lib install YoutubeApi       # for the latest version.\n" +
 		"arduino lib install YoutubeApi@1.0.0 # for the specific version (in this case 1.0.0).",
+	Args: cobra.MinimumNArgs(1),
+	Run:  runInstallCommand,
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib install`")
-	if len(args) < 1 {
-		formatter.PrintErrorMessage("No library specified for install command.")
-		os.Exit(commands.ErrBadCall)
-	}
 
 	logrus.Info("Getting Libraries status context")
 	status, err := getLibStatusContext()

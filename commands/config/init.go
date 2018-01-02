@@ -57,7 +57,8 @@ var initCommand = &cobra.Command{
 	Example: "" +
 		"arduino config init           # Creates a config file by asking questions to the user into the default location.\n" +
 		"arduino config init --default # Creates a config file with default configuration into default location.",
-	Run: runInitCommand,
+	Args: cobra.NoArgs,
+	Run:  runInitCommand,
 }
 
 func runInitCommand(cmd *cobra.Command, args []string) {
@@ -90,6 +91,6 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 // It does not have much sense to use it in JSON formatting, though.
 func configsFromQuestions() configs.Configs {
 	ret := configs.Default()
-	//Set of questions here
+	// Set of questions here.
 	return ret
 }

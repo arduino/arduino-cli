@@ -30,8 +30,10 @@
 package board
 
 import (
+	"fmt"
 	"net/url"
 	"os"
+	"regexp"
 	"time"
 
 	discovery "github.com/arduino/board-discovery"
@@ -44,42 +46,32 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var validSerialBoardURIRegexp = regexp.MustCompile("(serial|tty)://.+")
+var validNetworkBoardURIRegexp = regexp.MustCompile("(http(s)?|(tc|ud)p)://[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:[0-9]{1,5}")
+
 func init() {
 	command.AddCommand(attachCommand)
-	attachCommand.Flags().StringVar(&attachFlags.boardURI, "board", "", "The URI of the board to connect.")
 	attachCommand.Flags().StringVar(&attachFlags.boardFlavour, "flavour", "default", "The Name of the CPU flavour, it is required for some boards (e.g. Arduino Nano).")
-	attachCommand.Flags().StringVar(&attachFlags.sketchName, "sketch", "", "The Name of the sketch to attach the board to.")
 	attachCommand.Flags().StringVar(&attachFlags.searchTimeout, "timeout", "5s", "The timeout of the search of connected devices, try to high it if your board is not found (e.g. to 10s).")
 }
 
 var attachFlags struct {
-	boardURI      string // The URI of the board to attach: can be serial:// tty:// http:// https:// tcp:// udp:// referring to the validBoardURIRegexp variable.
 	boardFlavour  string // The flavour of the chipset of the cpu of the connected board, if not specified it is set to "default".
-	sketchName    string // The name of the sketch to attach to the board.
-	fromPath      string // The Path of the file to import and attach to the board.
 	searchTimeout string // Expressed in a parsable duration, is the timeout for the list and attach commands.
 }
 
 var attachCommand = &cobra.Command{
-	Use:   "attach --sketch=[SKETCH-NAME] --board=[BOARD]",
-	Short: "Attaches a board to a sketch.",
-	Long:  "Attaches a board to a sketch.",
-	Example: "" +
-		"arduino board attach --board serial:///dev/tty/ACM0 \\\n" +
-		"                     --sketch sketchName # Attaches a sketch to a board.",
-	Run: runAttachCommand,
+	Use:     "attach sketchName boardURI",
+	Short:   "Attaches a sketch to a board.",
+	Long:    "Attaches a sketch to a board. Provide sketch name and a board URI to connect.",
+	Example: "arduino board attach sketchName serial:///dev/tty/ACM0",
+	Args:    cobra.ExactArgs(2),
+	Run:     runAttachCommand,
 }
 
 func runAttachCommand(cmd *cobra.Command, args []string) {
-	if attachFlags.sketchName == "" {
-		formatter.PrintErrorMessage("No sketch name provided.")
-		os.Exit(commands.ErrBadCall)
-	}
-
-	if attachFlags.boardURI == "" {
-		formatter.PrintErrorMessage("No board URI provided.")
-		os.Exit(commands.ErrBadCall)
-	}
+	sketchName := args[0]
+	boardURI := args[1]
 
 	duration, err := time.ParseDuration(attachFlags.searchTimeout)
 	if err != nil {
@@ -112,13 +104,13 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 
 	ss := sketches.Find(homeFolder)
 
-	sketch, exists := ss[attachFlags.sketchName]
+	sketch, exists := ss[sketchName]
 	if !exists {
 		formatter.PrintErrorMessage("Cannot find specified sketch in the Sketchbook.")
 		os.Exit(commands.ErrGeneric)
 	}
 
-	deviceURI, err := url.Parse(attachFlags.boardURI)
+	deviceURI, err := url.Parse(boardURI)
 	if err != nil {
 		formatter.PrintError(err, "The provided Device URL is not in a valid format.")
 		os.Exit(commands.ErrBadCall)
@@ -127,10 +119,10 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	var findBoardFunc func(boards.Boards, *discovery.Monitor, *url.URL) *boards.Board
 	var Type string
 
-	if validSerialBoardURIRegexp.Match([]byte(attachFlags.boardURI)) {
+	if validSerialBoardURIRegexp.Match([]byte(boardURI)) {
 		findBoardFunc = findSerialConnectedBoard
 		Type = "serial"
-	} else if validNetworkBoardURIRegexp.Match([]byte(attachFlags.boardURI)) {
+	} else if validNetworkBoardURIRegexp.Match([]byte(boardURI)) {
 		findBoardFunc = findNetworkConnectedBoard
 		Type = "network"
 	} else {
@@ -138,6 +130,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrBadCall)
 	}
 
+	// TODO: Handle the case when no board is found.
 	board := findBoardFunc(bs, monitor, deviceURI)
 
 	sketch.Metadata.CPU = sketches.MetadataCPU{
@@ -150,4 +143,57 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		formatter.PrintError(err, "Cannot export sketch metadata.")
 	}
 	formatter.PrintResult("BOARD ATTACHED.")
+}
+
+// findSerialConnectedBoard find the board which is connected to the specified URI via serial port, using a monitor and a set of Boards
+// for the matching.
+func findSerialConnectedBoard(bs boards.Boards, monitor *discovery.Monitor, deviceURI *url.URL) *boards.Board {
+	found := false
+	location := deviceURI.Path
+	var serialDevice discovery.SerialDevice
+	for _, device := range monitor.Serial() {
+		if device.Port == location {
+			// Found the device !
+			found = true
+			serialDevice = *device
+		}
+	}
+	if !found {
+		formatter.PrintErrorMessage("No Supported board has been found at the specified board URI.")
+		return nil
+	}
+
+	board := bs.ByVidPid(serialDevice.VendorID, serialDevice.ProductID)
+	if board == nil {
+		formatter.PrintErrorMessage("No Supported board has been found, try either install new cores or check your board URI.")
+		os.Exit(commands.ErrGeneric)
+	}
+
+	formatter.Print("SUPPORTED BOARD FOUND:")
+	formatter.Print(board.String())
+	return board
+}
+
+// findNetworkConnectedBoard find the board which is connected to the specified URI on the network, using a monitor and a set of Boards
+// for the matching.
+func findNetworkConnectedBoard(bs boards.Boards, monitor *discovery.Monitor, deviceURI *url.URL) *boards.Board {
+	found := false
+
+	var networkDevice discovery.NetworkDevice
+
+	for _, device := range monitor.Network() {
+		if device.Address == deviceURI.Host &&
+			fmt.Sprint(device.Port) == deviceURI.Port() {
+			// Found the device !
+			found = true
+			networkDevice = *device
+		}
+	}
+	if !found {
+		formatter.PrintErrorMessage("No Supported board has been found at the specified board URI, try either install new cores or check your board URI.")
+		os.Exit(commands.ErrGeneric)
+	}
+
+	formatter.Print("SUPPORTED BOARD FOUND:")
+	return bs.ByID(networkDevice.Name)
 }

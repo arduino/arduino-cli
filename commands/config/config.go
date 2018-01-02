@@ -30,9 +30,6 @@
 package config
 
 import (
-	"github.com/sirupsen/logrus"
-
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/spf13/cobra"
 )
 
@@ -45,15 +42,4 @@ var command = &cobra.Command{
 	Use:     "config",
 	Short:   "Arduino Configuration Commands.",
 	Example: "arduino config init",
-	Run:     run,
-}
-
-func run(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino config`")
-	formatter.PrintErrorMessage("No subcommand specified.")
-	if formatter.IsCurrentFormat("text") {
-		logrus.Warn("Showing help message")
-		cmd.Help()
-	}
-	logrus.Info("Done")
 }

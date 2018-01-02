@@ -49,41 +49,43 @@ import (
 // Init prepares the command.
 func Init(rootCommand *cobra.Command) {
 	rootCommand.AddCommand(command)
-	command.Flags().StringVarP(&flags.user, "user", "u", "", "The username used to log in.")
-	command.Flags().StringVarP(&flags.password, "password", "p", "", "The password used to authenticate.")
-}
-
-var flags struct {
-	user     string // The user who asks to login.
-	password string // The password used to authenticate.
 }
 
 var command = &cobra.Command{
-	Use:   "login [--user USER --password PASSWORD | --user USER",
+	Use:   "login [username] [password]",
 	Short: "create default credentials for an Arduino Create Session.",
 	Long:  "create default credentials for an Arduino Create Session.",
 	Example: "" +
-		"arduino login                          # Asks all credentials.\n" +
-		"arduino login --user myUser --password MySecretPassword\n" +
-		"arduino login --user myUser --password # Asks to write the password inside the command instead of having it in clear.",
-	Run: run,
+		"arduino login                          # Asks for all credentials.\n" +
+		"arduino login myUser MySecretPassword  # Provide all credentials.\n" +
+		"arduino login myUser                   # Asks for just the password instead of having it in clear.",
+	Args: cobra.RangeArgs(0, 2),
+	Run:  run,
 }
 
 func run(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino login`")
 
-	userEmpty := flags.user == ""
-	passwordEmpty := flags.password == ""
+	userEmpty, passwordEmpty := true, true
+	if len(args) > 0 {
+		userEmpty = false
+		if len(args) == 2 {
+			passwordEmpty = false
+		}
+	}
 	isTextMode := formatter.IsCurrentFormat("text")
 	if !isTextMode && (userEmpty || passwordEmpty) {
 		formatter.PrintErrorMessage("User and password must be specified outside of text format.")
 		return
 	}
 
+	var user, password string
 	logrus.Info("Using/Asking credentials")
 	if userEmpty {
 		fmt.Print("Username: ")
-		fmt.Scanln(&flags.user)
+		fmt.Scanln(&user)
+	} else {
+		user = args[0]
 	}
 
 	if passwordEmpty {
@@ -93,8 +95,10 @@ func run(cmd *cobra.Command, args []string) {
 			formatter.PrintError(err, "Cannot read password, login aborted.")
 			return
 		}
-		flags.password = string(pass)
+		password = string(pass)
 		fmt.Println()
+	} else {
+		password = args[1]
 	}
 
 	logrus.Info("Getting ~/.netrc file")
@@ -121,18 +125,16 @@ func run(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Trying to login")
 
-	usr := flags.user
-	pwd := flags.password
 	authConf := auth.New()
 
-	token, err := authConf.Token(usr, pwd)
+	token, err := authConf.Token(user, password)
 	if err != nil {
 		formatter.PrintError(err, "Cannot login.")
 		os.Exit(commands.ErrNetwork)
 	}
 
 	NetRC.RemoveMachine("arduino.cc")
-	NetRC.NewMachine("arduino.cc", usr, token.Access, token.Refresh)
+	NetRC.NewMachine("arduino.cc", user, token.Access, token.Refresh)
 	content, err := NetRC.MarshalText()
 	if err != nil {
 		formatter.PrintError(err, "Cannot parse new .netrc file.")

@@ -83,6 +83,7 @@ var command = &cobra.Command{
 func run(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino compile`")
 	isCorrectSyntax := true
+	// TODO: Check if sketch exists.
 	sketchName := args[0]
 	var packageName string
 	if flags.fullyQualifiedBoardName == "" {

@@ -49,8 +49,9 @@ var listCommand = &cobra.Command{
 	Short: "Shows the list of installed cores.",
 	Long: "Shows the list of installed cores.\n" +
 		"With -v tag (up to 2 times) can provide more verbose output.",
-	Run:     runListCommand,
 	Example: "arduino core list -v # for a medium verbosity level.",
+	Args:    cobra.NoArgs,
+	Run:     runListCommand,
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
