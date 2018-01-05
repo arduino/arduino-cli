@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  branch = "package"
+  name = "github.com/arduino/arduino-builder"
+  packages = [".","builder_utils","constants","ctags","gohasissues","i18n","phases","types","utils"]
+  revision = "aa7cb314374b7748671407c44174c794746462dc"
+
+[[projects]]
   branch = "master"
   name = "github.com/arduino/board-discovery"
   packages = ["."]
@@ -12,6 +18,12 @@
   name = "github.com/arduino/go-properties-map"
   packages = ["."]
   revision = "3856e7be95d97e8462c11907fc5b5e4fe360d683"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/arduino/go-timeutils"
+  packages = ["."]
+  revision = "d1dd9e313b1bfede35fe0bbf46d612e16a50e04e"
 
 [[projects]]
   branch = "master"
@@ -122,6 +134,12 @@
   version = "v1.4.2"
 
 [[projects]]
+  name = "github.com/go-errors/errors"
+  packages = ["."]
+  revision = "3afebba5a48dbc89b574d890b6b34d9ee10b4785"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/go-ini/ini"
   packages = ["."]
   revision = "5b3e00af70a9484542169a976dcab8d03e601a17"
@@ -160,7 +178,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/hcl"
-  packages = [".","hcl/ast","hcl/parser","hcl/printer","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
+  packages = [".","hcl/ast","hcl/parser","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
   revision = "23c074d0eceb2b8a5bfdbb271ab780cde70f05a8"
 
 [[projects]]
@@ -313,12 +331,6 @@
   version = "v1.1.4"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/theherk/viper"
-  packages = ["."]
-  revision = "1c64bdc5d63b5e58e48d1d1b4928fc9cf735c399"
-
-[[projects]]
   name = "github.com/zieckey/goini"
   packages = ["."]
   revision = "ef198e44330230cf3989b754eff33c97888f5a26"
@@ -381,6 +393,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "acbb31c14b71eeb356043533dc05904e4b9030ec78f21d88a74ddcf284f43cf5"
+  inputs-digest = "1aa2c4d2f2f0f1159a7bb9b5f097ffc575662bebe53a9e7402c1e9453b9aa1d4"
   solver-name = "gps-cdcl"
   solver-version = 1
