@@ -34,7 +34,6 @@ import (
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/commands/version"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/pretty_print"
@@ -43,15 +42,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	commandVersion string = "0.1.0-alpha.preview"
-)
-
 // Init prepares the command.
 func Init(rootCommand *cobra.Command) {
 	rootCommand.AddCommand(command)
 	command.Flags().BoolVar(&flags.updateIndex, "update-index", false, "Updates the index of cores to the latest version.")
-	version.AddVersion(command.Name(), commandVersion)
 }
 
 var flags struct {

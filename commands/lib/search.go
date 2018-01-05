@@ -58,7 +58,7 @@ var searchCommand = &cobra.Command{
 		"arduino lib search You # to show all libraries containing \"You\" in their name (case insensitive).\n" +
 		"YoumadeIt\n" +
 		"YoutubeApi",
-	Args: cobra.MinimumNArgs(1),
+	Args: cobra.ArbitraryArgs,
 	Run:  runSearchCommand,
 }
 

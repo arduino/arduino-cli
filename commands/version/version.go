@@ -30,6 +30,7 @@
 package version
 
 import (
+	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
@@ -38,65 +39,23 @@ import (
 
 // Init prepares the command.
 func Init(rootCommand *cobra.Command) {
-	rootCommand.AddCommand(Command)
+	rootCommand.AddCommand(command)
 }
 
-// versions holds version information of different commands.
-var versions = make(map[string]string)
-
-// Command represents the version command. It's exported so it can be reused for subcommand versions display.
-var Command = &cobra.Command{
-	Use:   "version",
-	Short: "Shows version Number of arduino CLI components.",
-	Long:  "Shows version Number of arduino CLI components which are installed on your system.",
-	Example: "" +
-		"arduino version      # for the main component version.\n" +
-		"arduino lib version  # for the version of the lib component.\n" +
-		"arduino core version # for the version of the core component.",
-	Args: cobra.NoArgs,
-	Run:  run,
+var command = &cobra.Command{
+	Use:     "version",
+	Short:   "Shows version number of arduino CLI.",
+	Long:    "Shows version number of arduino CLI which is installed on your system.",
+	Example: "arduino version",
+	Args:    cobra.NoArgs,
+	Run:     run,
 }
 
-// Version command for different subcommands.
 func run(cmd *cobra.Command, args []string) {
 	logrus.Info("Calling version command on `arduino`")
-	versionPrint(versionsToPrint(cmd, true)...)
-}
-
-// AddVersion accepts command versions and stores them internally.
-func AddVersion(name string, version string) {
-	versions[name] = version
-}
-
-func versionsToPrint(cmd *cobra.Command, isRoot bool) []string {
-	verToPrint := make([]string, 0, 10)
-	if isRoot {
-		verToPrint = append(verToPrint, cmd.Parent().Name())
+	versionInfo := output.VersionResult{
+		CommandName: cmd.Parent().Name(),
+		Version:     commands.Version,
 	}
-
-	return verToPrint
-}
-
-// versionPrint formats and prints the version of the specified command.
-func versionPrint(commandNames ...string) {
-	if len(commandNames) == 1 {
-		verCommand := output.VersionResult{
-			CommandName: commandNames[0],
-			Version:     versions[commandNames[0]],
-		}
-		formatter.Print(verCommand)
-	} else {
-		verFullInfo := output.VersionFullInfo{
-			Versions: make([]output.VersionResult, len(commandNames)),
-		}
-
-		for i, commandName := range commandNames {
-			verFullInfo.Versions[i] = output.VersionResult{
-				CommandName: commandName,
-				Version:     versions[commandName],
-			}
-		}
-
-		formatter.Print(verFullInfo)
-	}
+	formatter.Print(versionInfo)
 }

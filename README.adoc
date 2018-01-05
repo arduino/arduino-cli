@@ -6,7 +6,7 @@ https://drone.arduino.cc/bcmi-labs/arduino-cli[image:https://drone.arduino.cc/ap
 Arduino CLI is a tool to access all Arduino Create API from Command Line.
 It implements all functions provided by web version of Arduino Create.
 
-== Installation 
+== Installation
  . `git clone` this repository into a folder of your choice
  . Add '/path/to/arduino-cli/folder' to your PATH environment variable
  . Reload shell configuration or reboot
@@ -64,9 +64,9 @@ Available Commands:
   version     Shows version Number of arduino
 
 Flags:
-      --config string        config file (default is $HOME/.arduino.yaml)
-      --format string        the output format, can be [text|json] (default "text")
-      --generate-docs        generates the docs for the CLI and puts it in docs folder
+	  --config string        config file (default is $HOME/.arduino.yaml)
+	  --format string        the output format, can be [text|json] (default "text")
+	  --generate-docs        generates the docs for the CLI and puts it in docs folder
   -h, --help                 help for arduino
   -v, --verbose count[=-1]   enables verbose output (use more times for a higher level)
 
@@ -86,7 +86,7 @@ To contribute to this project:
 ==== Download all libraries of the current library index:
 [source, bash]
 ----
-$ arduino lib search | tr "\n" " " | xargs arduino lib install
+$ arduino lib search --names | tr "\n" " " | xargs arduino lib install
 ----
 Same trick can be used on cores as well:
 [source, bash]

@@ -27,22 +27,54 @@
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package lib
+package generatedocs
 
 import (
-	"github.com/bcmi-labs/arduino-cli/commands/version"
+	"fmt"
+
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/cobra/doc"
 )
 
-func init() {
-	command.AddCommand(versionCommand)
+// Init prepares the command.
+func Init(rootCommand *cobra.Command) {
+	rootCommand.AddCommand(command)
 }
 
-var versionCommand = &cobra.Command{
-	Use:     "version",
-	Short:   "Shows version Number of arduino lib.",
-	Long:    "Shows version Number of arduino lib which is installed on your system.",
-	Example: version.Command.Example,
-	Args:    version.Command.Args,
-	Run:     version.Command.Run,
+var command = &cobra.Command{
+	Use:     "generate-docs",
+	Short:   "Generates documentation.",
+	Long:    "Generates bash autocompletion, command manpages and puts it into the docs folder.",
+	Example: "arduino generate-docs",
+	Args:    cobra.NoArgs,
+	Run:     run,
+}
+
+func run(cmd *cobra.Command, args []string) {
+	logrus.Info("Generating docs")
+	errorText := ""
+	err := cmd.Parent().GenBashCompletionFile("docs/bash_completions/arduino")
+	if err != nil {
+		logrus.WithError(err).Warn("Error Generating bash autocompletions")
+		errorText += fmt.Sprintln(err)
+	}
+	err = generateManPages(cmd.Parent())
+	if err != nil {
+		logrus.WithError(err).Warn("Error Generating manpages")
+		errorText += fmt.Sprintln(err)
+	}
+	if errorText != "" {
+		formatter.PrintErrorMessage(errorText)
+	}
+}
+
+// Generate man pages for all commands and puts them in $PROJECT_DIR/docs/manpages.
+func generateManPages(rootCommand *cobra.Command) error {
+	header := &doc.GenManHeader{
+		Title:   "ARDUINO COMMAND LINE MANUAL",
+		Section: "1",
+	}
+	return doc.GenManTree(rootCommand, header, "./docs/manpages")
 }

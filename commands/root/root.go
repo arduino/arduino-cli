@@ -30,7 +30,6 @@
 package root
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -40,6 +39,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/commands/compile"
 	"github.com/bcmi-labs/arduino-cli/commands/config"
 	"github.com/bcmi-labs/arduino-cli/commands/core"
+	"github.com/bcmi-labs/arduino-cli/commands/generatedocs"
 	"github.com/bcmi-labs/arduino-cli/commands/lib"
 	"github.com/bcmi-labs/arduino-cli/commands/login"
 	"github.com/bcmi-labs/arduino-cli/commands/sketch"
@@ -58,16 +58,25 @@ const (
 	{
 		case $(last_command) in
 			arduino)
-				opts="lib core help version"
+				opts="board compile config core generate-docs help lib login sketch version"
 				;;
-			arduino_lib)
-				opts="install uninstall list search version --update-index"
+			arduino_board)
+				opts="attach list"
+				;;
+			arduino_config)
+				opts="init"
 				;;
 			arduino_core)
-				opts="install uninstall list search version --update-index"
+				opts="download install list search uninstall --update-index"
 				;;
 			arduino_help)
-				opts="lib core version"
+				opts="board compile config core generate-docs lib login sketch version"
+				;;
+			arduino_lib)
+				opts="download install list search uninstall --update-index"
+				;;
+			arduino_sketch)
+				opts="sync"
 				;;
 		esac
 		if [[ ${cur} == " *" ]] ; then
@@ -76,8 +85,6 @@ const (
 		fi
 		return 1
 	}`
-
-	commandVersion = "0.1.0-alpha.preview"
 )
 
 var testing = false
@@ -87,32 +94,25 @@ func Init() {
 	Command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
 	Command.PersistentFlags().StringVar(&commands.GlobalFlags.Format, "format", "text", "The output format, can be [text|json].")
 	Command.PersistentFlags().StringVar(&configs.FileLocation, "config-file", configs.FileLocation, "The custom config file (if not specified ./.cli-config.yml will be used).")
-	Command.Flags().BoolVar(&flags.generateDocs, "generate-docs", false, "Generates the docs for the CLI and puts it in docs folder.")
-	version.AddVersion(Command.Name(), commandVersion)
 	board.Init(Command)
 	compile.Init(Command)
 	config.Init(Command)
 	core.Init(Command)
+	generatedocs.Init(Command)
 	lib.Init(Command)
 	login.Init(Command)
 	sketch.Init(Command)
 	version.Init(Command)
 }
 
-var flags struct {
-	generateDocs bool // if true, generates manpages and bash autocompletion.
-}
-
-// Command represents the base command when called without any subcommands
+// Command represents the base command when called without any subcommands.
 var Command = &cobra.Command{
 	Use:                    "arduino",
 	Short:                  "Arduino CLI.",
 	Long:                   "Arduino Create Command Line Interface (arduino-cli).",
-	Example:                "arduino --generate-docs to generate the docs and autocompletion for the whole CLI.",
+	Example:                "arduino generate-docs # To generate the docs and autocompletion for the whole CLI.",
 	BashCompletionFunction: bashAutoCompletionFunction,
-	Args:             cobra.NoArgs,
-	PersistentPreRun: preRun,
-	Run:              run,
+	PersistentPreRun:       preRun,
 }
 
 func preRun(cmd *cobra.Command, args []string) {
@@ -143,30 +143,6 @@ func preRun(cmd *cobra.Command, args []string) {
 	if !testing {
 		logrus.Info("Initializing viper configuration")
 		cobra.OnInitialize(initViper)
-	}
-}
-
-func run(cmd *cobra.Command, args []string) {
-	if flags.generateDocs {
-		logrus.Info("Generating docs")
-		errorText := ""
-		err := cmd.GenBashCompletionFile("docs/bash_completions/arduino")
-		if err != nil {
-			logrus.WithError(err).Warn("Error Generating bash autocompletions")
-			errorText += fmt.Sprintln(err)
-		}
-		err = generateManPages(cmd)
-		if err != nil {
-			logrus.WithError(err).Warn("Error Generating manpages")
-			errorText += fmt.Sprintln(err)
-		}
-		if errorText != "" {
-			formatter.PrintErrorMessage(errorText)
-		}
-	} else {
-		logrus.Info("Calling help command")
-		cmd.Help()
-		os.Exit(commands.ErrBadCall)
 	}
 }
 
