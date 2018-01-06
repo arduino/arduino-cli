@@ -33,7 +33,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/pretty_print"
@@ -45,33 +44,13 @@ import (
 // Init prepares the command.
 func Init(rootCommand *cobra.Command) {
 	rootCommand.AddCommand(command)
-	command.Flags().BoolVar(&flags.updateIndex, "update-index", false, "Updates the index of cores to the latest version.")
-}
-
-var flags struct {
-	updateIndex bool // If true, update packages index.
 }
 
 var command = &cobra.Command{
 	Use:     "core",
 	Short:   "Arduino Core operations.",
 	Long:    "Arduino Core operations.",
-	Example: "arduino core --update-index # to update the package index file.",
-	Args:    cobra.NoArgs,
-	Run:     run,
-}
-
-func run(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino core`")
-	if flags.updateIndex {
-		logrus.Info("Updating package index")
-		common.ExecUpdateIndex(prettyPrints.DownloadCoreFileIndex())
-	} else {
-		logrus.Warn("No subcommand specified, showing help message")
-		cmd.Help()
-		os.Exit(commands.ErrBadCall)
-	}
-	logrus.Info("Done")
+	Example: "arduino core update-index # to update the package index file.",
 }
 
 // getInstalledCores gets the installed cores and puts them in the output struct.
