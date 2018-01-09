@@ -40,6 +40,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/sketches"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -83,15 +84,22 @@ var command = &cobra.Command{
 func run(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino compile`")
 	isCorrectSyntax := true
-	// TODO: Check if sketch exists.
 	sketchName := args[0]
+	sketch, err := sketches.GetSketch(sketchName)
+	if err != nil {
+		formatter.PrintError(err, "Sketch file not found.")
+		isCorrectSyntax = false
+	}
 	var packageName string
-	if flags.fullyQualifiedBoardName == "" {
-		// TODO: Determine from Sketch file.
+	fullyQualifiedBoardName := flags.fullyQualifiedBoardName
+	if fullyQualifiedBoardName == "" && sketch != nil {
+		fullyQualifiedBoardName = sketch.Metadata.CPU.Fqbn
+	}
+	if fullyQualifiedBoardName == "" {
 		formatter.PrintErrorMessage("No Fully Qualified Board Name provided.")
 		isCorrectSyntax = false
 	} else {
-		fqbnParts := strings.Split(flags.fullyQualifiedBoardName, ":")
+		fqbnParts := strings.Split(fullyQualifiedBoardName, ":")
 		if len(fqbnParts) != 3 {
 			formatter.PrintErrorMessage("Fully Qualified Board Name has incorrect format.")
 			isCorrectSyntax = false
@@ -105,7 +113,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	ctx := &types.Context{}
 
-	ctx.FQBN = flags.fullyQualifiedBoardName
+	ctx.FQBN = fullyQualifiedBoardName
 	ctx.SketchLocation = filepath.Join(common.SketchbookFolder, sketchName)
 
 	packagesFolder, err := common.GetDefaultPkgFolder()
