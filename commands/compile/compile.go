@@ -30,6 +30,7 @@
 package compile
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -40,6 +41,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/bcmi-labs/arduino-cli/sketches"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -90,7 +92,7 @@ func run(cmd *cobra.Command, args []string) {
 		formatter.PrintError(err, "Sketch file not found.")
 		isCorrectSyntax = false
 	}
-	var packageName string
+	var packageName, coreName string
 	fullyQualifiedBoardName := flags.fullyQualifiedBoardName
 	if fullyQualifiedBoardName == "" && sketch != nil {
 		fullyQualifiedBoardName = sketch.Metadata.CPU.Fqbn
@@ -105,8 +107,31 @@ func run(cmd *cobra.Command, args []string) {
 			isCorrectSyntax = false
 		} else {
 			packageName = fqbnParts[0]
+			coreName = fqbnParts[1]
 		}
 	}
+
+	isCtagsInstalled, err := cores.IsToolInstalled(packageName, "ctags")
+	if err != nil {
+		formatter.PrintError(err, "Cannot check ctags installation.")
+		os.Exit(commands.ErrCoreConfig)
+	}
+	if !isCtagsInstalled {
+		// TODO: how to properly install ctags?
+		formatter.PrintErrorMessage("\"ctags\" tool not installed, please install it.")
+		isCorrectSyntax = false
+	}
+
+	isCoreInstalled, err := cores.IsCoreInstalled(packageName, coreName)
+	if err != nil {
+		formatter.PrintError(err, "Cannot check core installation.")
+		os.Exit(commands.ErrCoreConfig)
+	}
+	if !isCoreInstalled {
+		formatter.PrintErrorMessage(fmt.Sprintf("\"%[1]s:%[2]s\" core is not installed, please install it by running \"arduino core install %[1]s:%[2]s\".", packageName, coreName))
+		isCorrectSyntax = false
+	}
+
 	if !isCorrectSyntax {
 		os.Exit(commands.ErrBadCall)
 	}

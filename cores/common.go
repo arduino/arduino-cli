@@ -30,8 +30,12 @@
 package cores
 
 import (
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/bcmi-labs/arduino-cli/common"
 )
 
 // CoreIDTuple represents a tuple to identify a Core
@@ -71,4 +75,30 @@ func ParseArgs(args []string) []CoreIDTuple {
 		}
 	}
 	return ret
+}
+
+// IsCoreInstalled detects if a core has been installed.
+func IsCoreInstalled(packageName string, name string) (bool, error) {
+	location, err := common.GetDefaultCoresFolder(packageName)
+	if err != nil {
+		return false, err
+	}
+	_, err = os.Stat(filepath.Join(location, name))
+	if !os.IsNotExist(err) {
+		return true, nil
+	}
+	return false, nil
+}
+
+// IsToolInstalled detects if a tool has been installed.
+func IsToolInstalled(packageName string, name string) (bool, error) {
+	location, err := common.GetDefaultToolsFolder(packageName)
+	if err != nil {
+		return false, err
+	}
+	_, err = os.Stat(filepath.Join(location, name))
+	if !os.IsNotExist(err) {
+		return true, nil
+	}
+	return false, nil
 }
