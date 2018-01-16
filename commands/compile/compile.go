@@ -33,11 +33,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	builder "github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
@@ -53,7 +55,9 @@ func Init(rootCommand *cobra.Command) {
 	command.Flags().StringVarP(&flags.fullyQualifiedBoardName, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
 	command.Flags().BoolVar(&flags.dumpPreferences, "dump-prefs", false, "Show all build preferences used instead of compiling.")
 	command.Flags().BoolVar(&flags.preprocess, "preprocess", false, "Print preprocessed code to stdout instead of compiling.")
+	command.Flags().StringVar(&flags.buildCachePath, "build-cache-path", "", "Builds of 'core.a' are saved into this folder to be cached and reused.")
 	command.Flags().StringVar(&flags.buildPath, "build-path", "", "Folder where to save compiled files. If omitted, a folder will be created in the temporary folder specified by your OS.")
+	command.Flags().StringSliceVar(&flags.buildProperties, "build-properties", []string{}, "List of custom build properties separated by commas. Or can be used multiple times for multiple properties.")
 	command.Flags().StringVar(&flags.warnings, "warnings", "none", `Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
 	command.Flags().BoolVar(&flags.verbose, "verbose", false, "Optional, turns on verbose mode.")
 	command.Flags().BoolVar(&flags.quiet, "quiet", false, "Optional, supresses almost every output.")
@@ -62,15 +66,17 @@ func Init(rootCommand *cobra.Command) {
 }
 
 var flags struct {
-	fullyQualifiedBoardName string // Fully Qualified Board Name, e.g.: arduino:avr:uno.
-	dumpPreferences         bool   // Show all build preferences used instead of compiling.
-	preprocess              bool   // Print preprocessed code to stdout.
-	buildPath               string // Folder where to save compiled files.
-	warnings                string // Used to tell gcc which warning level to use.
-	verbose                 bool   // Turns on verbose mode.
-	quiet                   bool   // Supresses almost every output.
-	debugLevel              int    // Used for debugging.
-	vidPid                  string // VID/PID specific build properties.
+	fullyQualifiedBoardName string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	dumpPreferences         bool     // Show all build preferences used instead of compiling.
+	preprocess              bool     // Print preprocessed code to stdout.
+	buildCachePath          string   // Builds of 'core.a' are saved into this folder to be cached and reused.
+	buildPath               string   // Folder where to save compiled files.
+	buildProperties         []string // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
+	warnings                string   // Used to tell gcc which warning level to use.
+	verbose                 bool     // Turns on verbose mode.
+	quiet                   bool     // Supresses almost every output.
+	debugLevel              int      // Used for debugging.
+	vidPid                  string   // VID/PID specific build properties.
 }
 
 var command = &cobra.Command{
@@ -82,7 +88,6 @@ var command = &cobra.Command{
 	Run:     run,
 }
 
-// TODO: check if ctags or core is missing.
 func run(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino compile`")
 	isCorrectSyntax := true
@@ -117,7 +122,7 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrCoreConfig)
 	}
 	if !isCtagsInstalled {
-		// TODO: how to properly install ctags?
+		// TODO: ctags will be installable.
 		formatter.PrintErrorMessage("\"ctags\" tool not installed, please install it.")
 		isCorrectSyntax = false
 	}
@@ -164,13 +169,6 @@ func run(cmd *cobra.Command, args []string) {
 
 	ctx.BuildPath = flags.buildPath
 	if ctx.BuildPath != "" {
-		// TODO: Needed?
-		/*_, err = os.Stat(ctx.BuildPath)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(commands.ErrBadCall)
-		}*/
-
 		err = utils.EnsureFolderExists(ctx.BuildPath)
 		if err != nil {
 			formatter.PrintError(err, "Cannot create the build folder.")
@@ -184,11 +182,34 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.USBVidPid = flags.vidPid
 	ctx.WarningsLevel = flags.warnings
 
-	// TODO:
+	ctx.CustomBuildProperties = flags.buildProperties
+	if flags.buildCachePath != "" {
+		err = utils.EnsureFolderExists(flags.buildCachePath)
+		if err != nil {
+			formatter.PrintError(err, "Cannot create the build cache folder.")
+			os.Exit(commands.ErrBadCall)
+		}
+		ctx.BuildCachePath = flags.buildCachePath
+	}
+
+	// Will be deprecated.
 	ctx.ArduinoAPIVersion = "10600"
-	//ctx.BuiltInLibrariesFolders = ?
-	//ctx.CustomBuildProperties = ?
-	//ctx.BuildCachePath = ?
+	// Check if Arduino IDE is installed and get it's libraries location.
+	ideProperties, err := properties.Load(filepath.Join(common.ArduinoDataFolder, "preferences.txt"))
+	if err == nil {
+		lastIdeSubProperties := ideProperties.SubTree("last").SubTree("ide")
+		// Preferences can contain records from previous IDE versions. Find the latest one.
+		var pathVariants []string
+		for k := range lastIdeSubProperties {
+			if strings.HasSuffix(k, ".hardwarepath") {
+				pathVariants = append(pathVariants, k)
+			}
+		}
+		sort.Strings(pathVariants)
+		ideHardwarePath := lastIdeSubProperties[pathVariants[len(pathVariants)-1]]
+		ideLibrariesPath := filepath.Join(filepath.Dir(ideHardwarePath), "libraries")
+		ctx.BuiltInLibrariesFolders = []string{ideLibrariesPath}
+	}
 
 	if flags.dumpPreferences {
 		err = builder.RunParseHardwareAndDumpBuildProperties(ctx)
