@@ -7,9 +7,8 @@ Arduino CLI is a tool to access all Arduino Create API from Command Line.
 It implements all functions provided by web version of Arduino Create.
 
 == Installation
- . `git clone` this repository into a folder of your choice
- . Add '/path/to/arduino-cli/folder' to your PATH environment variable
- . Reload shell configuration or reboot
+ . You should have Go compiler installed and `GOPATH` environment variable set.
+ . Run `go get github.com/bcmi-labs/arduino-cli` to install this repository under your `GOPATH`.
 
 
 == Compiling
@@ -29,7 +28,10 @@ $ go build -o arduino
 $ ./arduino ARGS
 ----
 
-If you want autocompletion and manpages you have to compile and execute (second way)
+You may want to copy the binary into a directory which is in your `PATH` environment variable
+(such as `/usr/local/bin/`) or add the binary's directory to it.
+
+Bash autocompletion and manpages can be generated with the `arduino generate-docs` command.
 
 And you're done, now let's see how to use the CLI.
 
@@ -51,24 +53,31 @@ To see the full list of commands, call one of the following:
 
 Here is the output from help command `arduino help`:
 ----
-Arduino Create Command Line Interface (arduino-cli)
+Arduino Create Command Line Interface (arduino-cli).
 
 Usage:
-  arduino [flags]
   arduino [command]
 
+Examples:
+arduino generate-docs # To generate the docs and autocompletion for the whole CLI.
+
 Available Commands:
-  core        Arduino Core operations
-  help        Help about any command
-  lib         Arduino commands about libraries
-  version     Shows version Number of arduino
+  board         Arduino board commands.
+  compile       Compiles Arduino sketches.
+  config        Arduino Configuration Commands.
+  core          Arduino Core operations.
+  generate-docs Generates documentation.
+  help          Help about any command
+  lib           Arduino commands about libraries.
+  login         create default credentials for an Arduino Create Session.
+  sketch        Arduino CLI Sketch Commands.
+  version       Shows version number of arduino CLI.
 
 Flags:
-	  --config string        config file (default is $HOME/.arduino.yaml)
-	  --format string        the output format, can be [text|json] (default "text")
-	  --generate-docs        generates the docs for the CLI and puts it in docs folder
+	  --config-file string   The custom config file (if not specified ./.cli-config.yml will be used). (default "/usr/local/bin/.cli-config.yml")
+	  --debug                Enables debug output (super verbose, used to debug the CLI).
+	  --format string        The output format, can be [text|json]. (default "text")
   -h, --help                 help for arduino
-  -v, --verbose count[=-1]   enables verbose output (use more times for a higher level)
 
 Use "arduino [command] --help" for more information about a command.
 ----
@@ -77,10 +86,10 @@ Use "arduino [command] --help" for more information about a command.
 
 To contribute to this project:
 
-. `git clone` this repository
-. Create a new branch with the name `feature-to-implement` or `bug-to-fix`
-. Code your contribution and push to your branch
-. Ask a Pull Request
+. `git clone` this repository.
+. Create a new branch with the name `feature-to-implement` or `bug-to-fix`.
+. Code your contribution and push to your branch.
+. Ask a Pull Request.
 
 == Tips and Tricks
 ==== Download all libraries of the current library index:
@@ -96,6 +105,6 @@ $ arduino core search | tr "\n" " " | xargs arduino core install
 And with the `download` command:
 [source, bash]
 ----
-$ arduino lib search | tr "\n" " " | xargs arduino lib download
+$ arduino lib search --names | tr "\n" " " | xargs arduino lib download
 $ arduino core search | tr "\n" " " | xargs arduino core download
 ----
