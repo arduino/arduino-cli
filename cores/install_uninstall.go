@@ -115,6 +115,11 @@ func Install(packager, arch string, release releases.Release) error {
 		return err
 	}
 
+	err = createPackageFile(destCoresDir)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -185,6 +190,11 @@ func InstallTool(packager, name string, release releases.Release) error {
 	root := toolRealRoot(tempFolder)
 
 	err = os.Rename(root, destToolsDir)
+	if err != nil {
+		return err
+	}
+
+	err = createPackageFile(destToolsDir)
 	if err != nil {
 		return err
 	}
