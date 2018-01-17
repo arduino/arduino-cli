@@ -27,74 +27,69 @@
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package cores
+package validate
 
 import (
-	"crypto/sha256"
-	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
+
+	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
-const (
-	filePermissions = 0644
-	packageFileName = "package.json"
-)
-
-type packageFile struct {
-	Checksum string `json:"checksum"`
+// Init prepares the command.
+func Init(rootCommand *cobra.Command) {
+	rootCommand.AddCommand(command)
 }
 
-func computeDirChecksum(root string) (string, error) {
-	hash := sha256.New()
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil || info.IsDir() || (info.Name() == packageFileName && filepath.Dir(path) == root) {
-			return nil
-		}
-		f, err := os.Open(path)
+var command = &cobra.Command{
+	Use:     "validate",
+	Short:   "Validates Arduino installation.",
+	Long:    "Checks installed cores and tools for corruption.",
+	Example: "arduino validate",
+	Args:    cobra.NoArgs,
+	Run:     run,
+}
+
+func run(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino validate`")
+	packagesFolder, err := common.GetDefaultPkgFolder()
+	if err != nil {
+		formatter.PrintError(err, "Cannot get packages folder.")
+		os.Exit(commands.ErrCoreConfig)
+	}
+	err = filepath.Walk(packagesFolder, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
 			return nil
 		}
-		defer f.Close()
-		if _, err := io.Copy(hash, f); err != nil {
-			return fmt.Errorf("failed to compute hash of file \"%s\"", info.Name())
+		relativePath, err := filepath.Rel(packagesFolder, path)
+		if err != nil {
+			return err
+		}
+		pathParts := strings.Split(relativePath, string(filepath.Separator))
+		if len(pathParts) == 4 {
+			isValid, err := cores.CheckDirChecksum(path)
+			if err != nil {
+				return err
+			}
+			if !isValid {
+				formatter.PrintErrorMessage(fmt.Sprintf("Corrupted %s", path))
+			}
+			return filepath.SkipDir
 		}
 		return nil
 	})
 	if err != nil {
-		return "", err
+		formatter.PrintError(err, "Failed to perform validation.")
+		os.Exit(commands.ErrBadCall)
 	}
-	return fmt.Sprintf("%x", hash.Sum(nil)), nil
-}
-
-func createPackageFile(root string) error {
-	checksum, err := computeDirChecksum(root)
-	if err != nil {
-		return err
-	}
-
-	packageJSON, _ := json.Marshal(packageFile{checksum})
-	err = ioutil.WriteFile(filepath.Join(root, packageFileName), packageJSON, filePermissions)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// CheckDirChecksum reads checksum from the package.json and compares it with a recomputed value.
-func CheckDirChecksum(root string) (bool, error) {
-	packageJSON, err := ioutil.ReadFile(filepath.Join(root, packageFileName))
-	if err != nil {
-		return false, err
-	}
-	var file packageFile
-	json.Unmarshal(packageJSON, &file)
-	checksum, err := computeDirChecksum(root)
-	if err != nil {
-		return false, err
-	}
-	return file.Checksum == checksum, nil
 }

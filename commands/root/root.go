@@ -43,6 +43,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/commands/lib"
 	"github.com/bcmi-labs/arduino-cli/commands/login"
 	"github.com/bcmi-labs/arduino-cli/commands/sketch"
+	"github.com/bcmi-labs/arduino-cli/commands/validate"
 	"github.com/bcmi-labs/arduino-cli/commands/version"
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
@@ -102,6 +103,7 @@ func Init() {
 	lib.Init(Command)
 	login.Init(Command)
 	sketch.Init(Command)
+	validate.Init(Command)
 	version.Init(Command)
 }
 
