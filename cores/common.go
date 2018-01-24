@@ -30,9 +30,11 @@
 package cores
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/common"
@@ -101,4 +103,56 @@ func IsToolInstalled(packageName string, name string) (bool, error) {
 		return true, nil
 	}
 	return false, nil
+}
+
+// IsToolVersionInstalled detects if a specific version of a tool has been installed.
+func IsToolVersionInstalled(packageName string, name string, version string) (bool, error) {
+	location, err := common.GetDefaultToolsFolder(packageName)
+	if err != nil {
+		return false, err
+	}
+	_, err = os.Stat(filepath.Join(location, name, version))
+	if !os.IsNotExist(err) {
+		return true, nil
+	}
+	return false, nil
+}
+
+// GetLatestInstalledCoreVersion returns the latest version of an installed core.
+func GetLatestInstalledCoreVersion(packageName string, name string) (string, error) {
+	location, err := common.GetDefaultCoresFolder(packageName)
+	if err != nil {
+		return "", err
+	}
+	return getLatestInstalledVersion(location, name)
+}
+
+// GetLatestInstalledToolVersion returns the latest version of an installed tool.
+func GetLatestInstalledToolVersion(packageName string, name string) (string, error) {
+	location, err := common.GetDefaultToolsFolder(packageName)
+	if err != nil {
+		return "", err
+	}
+	return getLatestInstalledVersion(location, name)
+}
+
+func getLatestInstalledVersion(location string, name string) (string, error) {
+	var versions []string
+	root := filepath.Join(location, name)
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil || !info.IsDir() || path == root {
+			return nil
+		}
+		versions = append(versions, info.Name())
+		return filepath.SkipDir
+	})
+	if err != nil {
+		return "", err
+	}
+
+	if len(versions) > 0 {
+		sort.Strings(versions)
+		return versions[len(versions)-1], nil
+	}
+	return "", errors.New("no versions found")
 }

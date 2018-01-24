@@ -53,7 +53,7 @@ import (
 func Init(rootCommand *cobra.Command) {
 	rootCommand.AddCommand(command)
 	command.Flags().StringVarP(&flags.fullyQualifiedBoardName, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	command.Flags().BoolVar(&flags.dumpPreferences, "dump-prefs", false, "Show all build preferences used instead of compiling.")
+	command.Flags().BoolVar(&flags.showProperties, "show-properties", false, "Show all build properties used instead of compiling.")
 	command.Flags().BoolVar(&flags.preprocess, "preprocess", false, "Print preprocessed code to stdout instead of compiling.")
 	command.Flags().StringVar(&flags.buildCachePath, "build-cache-path", "", "Builds of 'core.a' are saved into this folder to be cached and reused.")
 	command.Flags().StringVar(&flags.buildPath, "build-path", "", "Folder where to save compiled files. If omitted, a folder will be created in the temporary folder specified by your OS.")
@@ -67,7 +67,7 @@ func Init(rootCommand *cobra.Command) {
 
 var flags struct {
 	fullyQualifiedBoardName string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
-	dumpPreferences         bool     // Show all build preferences used instead of compiling.
+	showProperties          bool     // Show all build preferences used instead of compiling.
 	preprocess              bool     // Print preprocessed code to stdout.
 	buildCachePath          string   // Builds of 'core.a' are saved into this folder to be cached and reused.
 	buildPath               string   // Folder where to save compiled files.
@@ -182,7 +182,35 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.USBVidPid = flags.vidPid
 	ctx.WarningsLevel = flags.warnings
 
-	ctx.CustomBuildProperties = flags.buildProperties
+	ctx.CustomBuildProperties = append(flags.buildProperties, "build.warn_data_percentage=75")
+
+	coreVersion, err := cores.GetLatestInstalledCoreVersion(packageName, coreName)
+	if err != nil {
+		formatter.PrintError(err, "Cannot get the core version.")
+		os.Exit(commands.ErrBadCall)
+	}
+	// Add dependency tools paths to build properties with versions corresponding to specific core version.
+	var packageIndex cores.Index
+	cores.LoadIndex(&packageIndex)
+	for _, packageFromIndex := range packageIndex.Packages {
+		if packageFromIndex.Name == packageName {
+			for _, platformFromIndex := range packageFromIndex.Platforms {
+				if platformFromIndex.Architecture == coreName && platformFromIndex.Version == coreVersion {
+					for _, toolDependencyFromIndex := range platformFromIndex.ToolDependencies {
+						if isInstalled, _ := cores.IsToolVersionInstalled(packageName, toolDependencyFromIndex.Name, toolDependencyFromIndex.Version); !isInstalled {
+							formatter.PrintError(err, fmt.Sprintf("Required tool version not found: %s - %s.", toolDependencyFromIndex.Name, toolDependencyFromIndex.Version))
+							os.Exit(commands.ErrBadCall)
+						}
+						property := "runtime.tools." + toolDependencyFromIndex.Name + ".path=" + filepath.Join(toolsFolder, toolDependencyFromIndex.Name, toolDependencyFromIndex.Version)
+						ctx.CustomBuildProperties = append(ctx.CustomBuildProperties, property)
+					}
+					break
+				}
+			}
+			break
+		}
+	}
+
 	if flags.buildCachePath != "" {
 		err = utils.EnsureFolderExists(flags.buildCachePath)
 		if err != nil {
@@ -211,7 +239,7 @@ func run(cmd *cobra.Command, args []string) {
 		ctx.BuiltInLibrariesFolders = []string{ideLibrariesPath}
 	}
 
-	if flags.dumpPreferences {
+	if flags.showProperties {
 		err = builder.RunParseHardwareAndDumpBuildProperties(ctx)
 	} else if flags.preprocess {
 		err = builder.RunPreprocess(ctx)
