@@ -42,6 +42,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/commands/generatedocs"
 	"github.com/bcmi-labs/arduino-cli/commands/lib"
 	"github.com/bcmi-labs/arduino-cli/commands/login"
+	"github.com/bcmi-labs/arduino-cli/commands/logout"
 	"github.com/bcmi-labs/arduino-cli/commands/sketch"
 	"github.com/bcmi-labs/arduino-cli/commands/validate"
 	"github.com/bcmi-labs/arduino-cli/commands/version"
@@ -102,6 +103,7 @@ func Init() {
 	generatedocs.Init(Command)
 	lib.Init(Command)
 	login.Init(Command)
+	logout.Init(Command)
 	sketch.Init(Command)
 	validate.Init(Command)
 	version.Init(Command)

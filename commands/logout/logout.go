@@ -27,23 +27,19 @@
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package login
+package logout
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"syscall"
 
-	"github.com/bcmi-labs/arduino-cli/auth"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bgentry/go-netrc/netrc"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 // Init prepares the command.
@@ -52,58 +48,18 @@ func Init(rootCommand *cobra.Command) {
 }
 
 var command = &cobra.Command{
-	Use:   "login [username] [password]",
-	Short: "Creates default credentials for an Arduino Create Session.",
-	Long:  "Creates default credentials for an Arduino Create Session.",
-	Example: "" +
-		"arduino login                          # Asks for all credentials.\n" +
-		"arduino login myUser MySecretPassword  # Provide all credentials.\n" +
-		"arduino login myUser                   # Asks for just the password instead of having it in clear.",
-	Args: cobra.RangeArgs(0, 2),
-	Run:  run,
+	Use:     "logout",
+	Short:   "Clears credentials for the Arduino Create Session.",
+	Long:    "Clears credentials for the Arduino Create Session.",
+	Example: "arduino logout",
+	Args:    cobra.NoArgs,
+	Run:     run,
 }
 
 func run(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino login`")
-
-	userEmpty, passwordEmpty := true, true
-	if len(args) > 0 {
-		userEmpty = false
-		if len(args) == 2 {
-			passwordEmpty = false
-		}
-	}
-	isTextMode := formatter.IsCurrentFormat("text")
-	if !isTextMode && (userEmpty || passwordEmpty) {
-		formatter.PrintErrorMessage("User and password must be specified outside of text format.")
-		return
-	}
-
-	var user, password string
-	logrus.Info("Using/Asking credentials")
-	if userEmpty {
-		fmt.Print("Username: ")
-		fmt.Scanln(&user)
-	} else {
-		user = args[0]
-	}
-
-	if passwordEmpty {
-		fmt.Print("Password: ")
-		pass, err := terminal.ReadPassword(int(syscall.Stdin))
-		if err != nil {
-			formatter.PrintError(err, "Cannot read password, login aborted.")
-			return
-		}
-		password = string(pass)
-		fmt.Println()
-	} else {
-		password = args[1]
-	}
+	logrus.Info("Executing `arduino logout`")
 
 	logrus.Info("Getting ~/.netrc file")
-
-	// Save into netrc.
 	netRCHome, err := homedir.Dir()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get current home directory.")
@@ -117,24 +73,14 @@ func run(cmd *cobra.Command, args []string) {
 		return
 	}
 	defer file.Close()
+
 	netRC, err := netrc.Parse(file)
 	if err != nil {
 		formatter.PrintError(err, "Cannot parse .netrc file.")
 		os.Exit(commands.ErrGeneric)
 	}
 
-	logrus.Info("Trying to login")
-
-	authConf := auth.New()
-
-	token, err := authConf.Token(user, password)
-	if err != nil {
-		formatter.PrintError(err, "Cannot login.")
-		os.Exit(commands.ErrNetwork)
-	}
-
 	netRC.RemoveMachine("arduino.cc")
-	netRC.NewMachine("arduino.cc", user, token.Access, token.Refresh)
 	content, err := netRC.MarshalText()
 	if err != nil {
 		formatter.PrintError(err, "Cannot parse new .netrc file.")
@@ -147,8 +93,6 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrGeneric)
 	}
 
-	formatter.PrintResult("" +
-		"Successfully logged into the system.\n" +
-		"The session will continue to be refreshed with every call of the CLI and will expire if not used.")
+	formatter.PrintResult("Successfully logged out.")
 	logrus.Info("Done")
 }
