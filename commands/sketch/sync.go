@@ -250,7 +250,7 @@ func runSyncCommand(cmd *cobra.Command, args []string) {
 				result.SkippedSketches = append(result.SkippedSketches, item.Name)
 			}
 		} else { // Only local, push.
-			logrus.Info("No conflict, pushing `%s` as new sketch", item.Name)
+			logrus.Infof("No conflict, pushing `%s` as new sketch", item.Name)
 			err := pushSketch(*item, sketchbook, bearerToken)
 			if err != nil {
 				logrus.WithError(err).Warnf("Cannot push `%s`", item.Name)
@@ -265,8 +265,7 @@ func runSyncCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 	for _, item := range onlineSketches.Sketches {
-		_, hasConflict := onlineSketchesMap[*item.Name]
-		if hasConflict {
+		if sketchMap[*item.Name] != nil {
 			continue
 		}
 		// Only online, pull.

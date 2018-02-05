@@ -34,6 +34,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"syscall"
 
 	"github.com/bcmi-labs/arduino-cli/auth"
@@ -87,6 +88,8 @@ func run(cmd *cobra.Command, args []string) {
 	} else {
 		user = args[0]
 	}
+	// Username is always lowercase.
+	user = strings.ToLower(user)
 
 	if passwordEmpty {
 		fmt.Print("Password: ")

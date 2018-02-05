@@ -295,7 +295,12 @@ func Find(location string, excludeFolders ...string) map[string]*Sketch {
 		}
 		sk.ImportMetadata()
 		sketches[skname] = sk
-
+	}
+	// Exclude non-sketch directories.
+	for name, sketch := range sketches {
+		if sketch.Ino.Name == "" {
+			delete(sketches, name)
+		}
 	}
 
 	return sketches

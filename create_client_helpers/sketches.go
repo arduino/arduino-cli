@@ -209,7 +209,6 @@ func (c *Client) NewSearchSketchesRequest(ctx context.Context, path string, offs
 	}
 	header := req.Header
 	if authorization != nil {
-
 		header.Set("Authorization", *authorization)
 	}
 	return req, nil

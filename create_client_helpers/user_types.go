@@ -37,26 +37,26 @@ import (
 	"github.com/bcmi-labs/arduino-modules/sketches"
 )
 
-// A file saved on the virtual filesystem
+// File is a file saved on the virtual filesystem.
 type File struct {
-	// The contents of the file, encoded in base64
+	// The contents of the file, encoded in base64.
 	Data *string `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
-	// The name of the file
+	// The name of the file.
 	Name string `form:"name" json:"name" xml:"name"`
 }
 
-// A program meant to be uploaded onto a board
+// Sketch is a program meant to be uploaded onto a board.
 type Sketch struct {
-	// The name of the sketch
+	// The name of the sketch.
 	Name string `form:"name" json:"name" xml:"name"`
-	// The other files contained in the sketch
+	// The other files contained in the sketch.
 	Files []*File `form:"files,omitempty" json:"files,omitempty" xml:"files,omitempty"`
-	// The folder path where the sketch is saved
+	// The folder path where the sketch is saved.
 	Folder *string `form:"folder,omitempty" json:"folder,omitempty" xml:"folder,omitempty"`
-	// The main file of the sketch
+	// The main file of the sketch.
 	Ino      *File           `form:"ino" json:"ino" xml:"ino"`
 	Metadata *SketchMetadata `form:"metadata,omitempty" json:"metadata,omitempty" xml:"metadata,omitempty"`
-	// The username of the owner of the sketch
+	// The username of the owner of the sketch.
 	Owner *string `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
 	// A private sketch is only visible to its owner.
 	Private bool `form:"private" json:"private" xml:"private"`
@@ -87,9 +87,8 @@ func ConvertFrom(sketch sketches.Sketch) *Sketch {
 		Types:     sketch.Types,
 		Metadata:  ConvertMetadataFrom(sketch.Metadata),
 	}
-	ret.Files = make([]*File, len(sketch.Files))
-	for i, f := range sketch.Files {
-		if f.Name == "sketch.json" { //skipping sketch.json file, since it is Metadata of the sketch
+	for _, f := range sketch.Files {
+		if f.Name == "sketch.json" { // Skipping sketch.json file, since it is Metadata of the sketch.
 			continue
 		}
 		_, filePath := filepath.Split(f.Path)
@@ -99,10 +98,10 @@ func ConvertFrom(sketch sketches.Sketch) *Sketch {
 		}
 
 		data := base64.StdEncoding.EncodeToString(content)
-		ret.Files[i] = &File{
+		ret.Files = append(ret.Files, &File{
 			Data: &data,
 			Name: f.Name,
-		}
+		})
 	}
 	return &ret
 }
@@ -113,6 +112,7 @@ type SketchMetadata struct {
 	IncludedLibs []*SketchMetadataLib `form:"included_libs,omitempty" json:"included_libs,omitempty" xml:"included_libs,omitempty"`
 }
 
+// ConvertMetadataFrom creates SketchMetadata object from sketches.Metadata.
 func ConvertMetadataFrom(metadata *sketches.Metadata) *SketchMetadata {
 	if metadata == nil {
 		return nil
@@ -137,22 +137,22 @@ func ConvertMetadataFrom(metadata *sketches.Metadata) *SketchMetadata {
 	return &ret
 }
 
-// The board associated with the sketch
+// SketchMetadataCPU is the board associated with the sketch.
 type SketchMetadataCPU struct {
-	// The fqbn of the board
+	// The fqbn of the board.
 	Fqbn *string `form:"fqbn,omitempty" json:"fqbn,omitempty" xml:"fqbn,omitempty"`
-	// The name of the board
+	// The name of the board.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	// Requires an upload via network
+	// Requires an upload via network.
 	Network *bool `form:"network,omitempty" json:"network,omitempty" xml:"network,omitempty"`
-	// The port of the board
+	// The port of the board.
 	Port *string `form:"port,omitempty" json:"port,omitempty" xml:"port,omitempty"`
 }
 
-// A library associated with the sketch
+// SketchMetadataLib is a library associated with the sketch.
 type SketchMetadataLib struct {
-	// The name of the library
+	// The name of the library.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	// The version of the library
+	// The version of the library.
 	Version *string `form:"version,omitempty" json:"version,omitempty" xml:"version,omitempty"`
 }
