@@ -97,7 +97,7 @@ var testing = false
 func Init() {
 	Command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
 	Command.PersistentFlags().StringVar(&commands.GlobalFlags.Format, "format", "text", "The output format, can be [text|json].")
-	Command.PersistentFlags().StringVar(&configs.FileLocation, "config-file", configs.FileLocation, "The custom config file (if not specified ./.cli-config.yml will be used).")
+	Command.PersistentFlags().StringVar(&configs.ConfigFilePath, "config-file", configs.ConfigFilePath, "The custom config file (if not specified ./.cli-config.yml will be used).")
 	board.Init(Command)
 	compile.Init(Command)
 	config.Init(Command)
@@ -155,7 +155,7 @@ func preRun(cmd *cobra.Command, args []string) {
 // initConfigs initializes the configuration from the specified file.
 func initConfigs() {
 	logrus.Info("Initiating configuration")
-	c, err := configs.Unserialize(configs.FileLocation)
+	c, err := configs.Unserialize(configs.ConfigFilePath)
 	if err != nil {
 		logrus.WithError(err).Warn("Did not manage to get config file, using default configuration")
 		commands.GlobalFlags.Configs = configs.Default()

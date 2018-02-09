@@ -49,8 +49,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// FileLocation represents the default location of the config file (same directory as executable).
-var FileLocation = getFileLocation()
+// ConfigFilePath represents the default location of the config file (same directory as executable).
+var ConfigFilePath = detectConfigFilePath()
 
 // bundledInIDE tells if the CLI is paired with the Java Arduino IDE.
 var bundledInIDE *bool
@@ -58,7 +58,7 @@ var bundledInIDE *bool
 // ArduinoIDEFolder represents the path of the IDE directory, set only if BundledInIDE = true.
 var ArduinoIDEFolder string
 
-func getFileLocation() string {
+func detectConfigFilePath() string {
 	fileLocation, err := os.Executable()
 	if err != nil {
 		fileLocation = "."

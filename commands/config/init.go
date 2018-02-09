@@ -42,7 +42,7 @@ import (
 func init() {
 	command.AddCommand(initCommand)
 	initCommand.Flags().BoolVar(&initFlags._default, "default", false, "If omitted, ask questions to the user about setting configuration properties, otherwise use default configuration.")
-	initCommand.Flags().StringVar(&initFlags.location, "save-as", configs.FileLocation, "Sets where to save the configuration file [default is ./.cli-config.yml].")
+	initCommand.Flags().StringVar(&initFlags.location, "save-as", configs.ConfigFilePath, "Sets where to save the configuration file [default is ./.cli-config.yml].")
 }
 
 var initFlags struct {
