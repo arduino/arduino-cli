@@ -36,17 +36,15 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common"
 )
 
+// coreIndexPath returns the path of the index file for libraries.
+var coreIndexPath = common.IndexPath("package_index.json")
+
 // Index represents Cores and Tools struct as seen from package_index.json file.
 type Index struct {
 	Packages []*indexPackage `json:"packages"`
 }
 
-//IndexPath returns the path of the index file for libraries.
-func IndexPath() (string, error) {
-	return common.IndexPath("package_index.json")
-}
-
-//indexPackage represents a single entry from package_index.json file.
+// indexPackage represents a single entry from package_index.json file.
 type indexPackage struct {
 	Name       string              `json:"name,required"`
 	Maintainer string              `json:"maintainer,required"`
@@ -201,7 +199,7 @@ func (itr indexToolRelease) extractFlavours() []*Flavour {
 // LoadIndex reads a package_index.json from a file and returns
 // the corresponding Index structure.
 func LoadIndex(index *Index) error {
-	coreFile, err := IndexPath()
+	coreFile, err := coreIndexPath.Get()
 	if err != nil {
 		return err
 	}

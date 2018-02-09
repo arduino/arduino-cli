@@ -38,7 +38,7 @@ import (
 
 // GetSketch loads a sketch file.
 func GetSketch(name string) (*sketches.Sketch, error) {
-	sketchbookLocation, err := common.GetDefaultArduinoHomeFolder()
+	sketchbookLocation, err := common.ArduinoHomeFolder.Get()
 	if err != nil {
 		return nil, err
 	}

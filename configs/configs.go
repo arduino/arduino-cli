@@ -93,8 +93,8 @@ var envConfig = Configs{
 }
 
 func init() {
-	defArduinoData, _ := common.GetDefaultArduinoFolder()
-	defSketchbook, _ := common.GetDefaultArduinoHomeFolder()
+	defArduinoData, _ := common.ArduinoDataFolder.Get()
+	defSketchbook, _ := common.ArduinoHomeFolder.Get()
 
 	defaultConfig = Configs{
 		ProxyType:         "auto",

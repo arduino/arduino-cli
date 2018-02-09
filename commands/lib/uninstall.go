@@ -70,7 +70,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Preparing")
 	libs := libraries.ParseArgs(args)
 
-	libFolder, err := common.GetDefaultLibFolder()
+	libFolder, err := common.LibrariesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get default libraries folder.")
 		os.Exit(commands.ErrCoreConfig)

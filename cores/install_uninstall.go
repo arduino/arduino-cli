@@ -53,14 +53,14 @@ func Install(packager, arch string, release releases.Release) error {
 		return errors.New("Not existing version of the core")
 	}
 
-	arduinoFolder, err := common.GetDefaultArduinoHomeFolder()
+	arduinoFolder, err := common.ArduinoHomeFolder.Get()
 	if err != nil {
 		return err
 	}
 	tempFolder := filepath.Join(arduinoFolder, "tmp", "packages",
 		fmt.Sprintf("core-%d", time.Now().Unix()))
 
-	coresFolder, err := common.GetDefaultCoresFolder(packager)
+	coresFolder, err := common.CoresFolder(packager).Get()
 	if err != nil {
 		return err
 	}
@@ -129,14 +129,14 @@ func InstallTool(packager, name string, release releases.Release) error {
 		return errors.New("Not existing version of the tool")
 	}
 
-	arduinoFolder, err := common.GetDefaultArduinoHomeFolder()
+	arduinoFolder, err := common.ArduinoHomeFolder.Get()
 	if err != nil {
 		return err
 	}
 	tempFolder := filepath.Join(arduinoFolder, "tmp", "tools",
 		fmt.Sprintf("tool-%d", time.Now().Unix()))
 
-	toolsFolder, err := common.GetDefaultToolsFolder(packager)
+	toolsFolder, err := common.ToolsFolder(packager).Get()
 	if err != nil {
 		return err
 	}

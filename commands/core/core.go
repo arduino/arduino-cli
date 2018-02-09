@@ -37,6 +37,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/pathutils"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -55,17 +56,17 @@ var command = &cobra.Command{
 
 // getInstalledCores gets the installed cores and puts them in the output struct.
 func getInstalledCores(packageName string, cores *[]output.InstalledStuff) {
-	getInstalledStuff(packageName, cores, common.GetDefaultCoresFolder)
+	getInstalledStuff(cores, common.CoresFolder(packageName))
 }
 
 // getInstalledTools gets the installed tools and puts them in the output struct.
 func getInstalledTools(packageName string, tools *[]output.InstalledStuff) {
-	getInstalledStuff(packageName, tools, common.GetDefaultToolsFolder)
+	getInstalledStuff(tools, common.ToolsFolder(packageName))
 }
 
 // getInstalledStuff is a generic procedure to get installed cores or tools and put them in an output struct.
-func getInstalledStuff(packageName string, stuff *[]output.InstalledStuff, defaultFolderFunc func(string) (string, error)) {
-	stuffHome, err := defaultFolderFunc(packageName)
+func getInstalledStuff(stuff *[]output.InstalledStuff, folder pathutils.Path) {
+	stuffHome, err := folder.Get()
 	if err != nil {
 		logrus.WithError(err).Warn("Cannot get default folder")
 		return

@@ -59,15 +59,13 @@ type indexRelease struct {
 	Checksum        string   `json:"checksum"`
 }
 
-//IndexPath returns the path of the index file for libraries.
-func IndexPath() (string, error) {
-	return common.IndexPath("library_index.json")
-}
+// IndexPath is the path of the index file for libraries.
+var IndexPath = common.IndexPath("library_index.json")
 
 // LoadIndex reads a library_index.json from a file and returns
 // the corresponding LibrariesIndex structure.
 func LoadIndex(index *Index) error {
-	libFile, err := IndexPath()
+	libFile, err := IndexPath.Get()
 	if err != nil {
 		return err
 	}

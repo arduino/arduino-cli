@@ -39,7 +39,7 @@ var listCommand = &cobra.Command{
 // runListCommand detects and lists the connected arduino boards
 // (either via serial or network ports).
 func runListCommand(cmd *cobra.Command, args []string) {
-	packageFolder, err := common.GetDefaultPkgFolder()
+	packageFolder, err := common.PackagesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot Parse Board Index file.")
 		os.Exit(commands.ErrCoreConfig)

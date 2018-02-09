@@ -81,7 +81,7 @@ var syncCommand = &cobra.Command{
 func runSyncCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino sketch sync`")
 
-	sketchbook, err := common.GetDefaultArduinoHomeFolder()
+	sketchbook, err := common.ArduinoHomeFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get sketchbook folder.")
 		os.Exit(commands.ErrCoreConfig)

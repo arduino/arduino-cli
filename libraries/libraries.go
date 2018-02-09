@@ -57,7 +57,7 @@ type Library struct {
 
 // InstalledRelease returns the installed release of the library.
 func (l *Library) InstalledRelease() (*Release, error) {
-	libFolder, err := common.GetDefaultLibFolder()
+	libFolder, err := common.LibrariesFolder.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -216,7 +216,7 @@ func (r Release) ExpectedChecksum() string {
 
 // GetDownloadCacheFolder returns the path of the staging folders for this release.
 func (r Release) GetDownloadCacheFolder() (string, error) {
-	return common.GetDownloadCacheFolder("libraries")
+	return common.DownloadCacheFolder("libraries").Get()
 }
 
 // VersionName represents the version of the release.

@@ -85,7 +85,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Download finished")
 
 	logrus.Info("Installing")
-	folder, err := common.GetDefaultLibFolder()
+	folder, err := common.LibrariesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get default lib install path.")
 		os.Exit(commands.ErrCoreConfig)

@@ -98,7 +98,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			WithField("Version", item.Release.VersionName()).
 			Info("Installing tool")
 
-		toolRoot, err := common.GetDefaultToolsFolder(item.Package)
+		toolRoot, err := common.ToolsFolder(item.Package).Get()
 		if err != nil {
 			formatter.PrintError(err, "Cannot get tool install path, try again.")
 			os.Exit(commands.ErrCoreConfig)
@@ -138,7 +138,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			WithField("Version", item.Release.VersionName()).
 			Info("Installing core")
 
-		coreRoot, err := common.GetDefaultCoresFolder(item.Package)
+		coreRoot, err := common.CoresFolder(item.Package).Get()
 		if err != nil {
 			formatter.PrintError(err, "Cannot get core install path, try again.")
 			os.Exit(commands.ErrCoreConfig)

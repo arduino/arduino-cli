@@ -144,23 +144,28 @@ func run(cmd *cobra.Command, args []string) {
 	ctx := &types.Context{}
 
 	ctx.FQBN = fullyQualifiedBoardName
-	ctx.SketchLocation = filepath.Join(common.SketchbookFolder, sketchName)
+	sketchbookPath, err := common.SketchbookFolder.Get()
+	if err != nil {
+		formatter.PrintError(err, "Getting sketchbook folder")
+		os.Exit(commands.ErrCoreConfig)
+	}
+	ctx.SketchLocation = filepath.Join(sketchbookPath, sketchName)
 
-	packagesFolder, err := common.GetDefaultPkgFolder()
+	packagesFolder, err := common.PackagesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get packages folder.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 	ctx.HardwareFolders = []string{packagesFolder}
 
-	toolsFolder, err := common.GetDefaultToolsFolder(packageName)
+	toolsFolder, err := common.ToolsFolder(packageName).Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get tools folder.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 	ctx.ToolsFolders = []string{toolsFolder}
 
-	librariesFolder, err := common.GetDefaultLibFolder()
+	librariesFolder, err := common.LibrariesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get libraries folder.")
 		os.Exit(commands.ErrCoreConfig)
@@ -222,8 +227,15 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Will be deprecated.
 	ctx.ArduinoAPIVersion = "10600"
+
 	// Check if Arduino IDE is installed and get it's libraries location.
-	ideProperties, err := properties.Load(filepath.Join(common.ArduinoDataFolder, "preferences.txt"))
+	dataFolder, err := common.ArduinoDataFolder.Get()
+	if err != nil {
+		formatter.PrintError(err, "Cannot locate arduino data folder.")
+		os.Exit(commands.ErrCoreConfig)
+	}
+
+	ideProperties, err := properties.Load(filepath.Join(dataFolder, "preferences.txt"))
 	if err == nil {
 		lastIdeSubProperties := ideProperties.SubTree("last").SubTree("ide")
 		// Preferences can contain records from previous IDE versions. Find the latest one.

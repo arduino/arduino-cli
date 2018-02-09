@@ -34,6 +34,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/pathutils"
+
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/commands/board"
 	"github.com/bcmi-labs/arduino-cli/commands/compile"
@@ -170,19 +172,19 @@ func initConfigs() {
 	}
 	logrus.Info("Configuration set")
 	commands.GlobalFlags.Configs = c
-	common.ArduinoDataFolder = commands.GlobalFlags.Configs.ArduinoDataFolder
-	common.ArduinoIDEFolder = configs.ArduinoIDEFolder
-	common.SketchbookFolder = commands.GlobalFlags.Configs.SketchbookPath
+	common.ArduinoDataFolder = pathutils.NewConstPath(commands.GlobalFlags.Configs.ArduinoDataFolder)
+	common.ArduinoIDEFolder = pathutils.NewConstPath(configs.ArduinoIDEFolder)
+	common.SketchbookFolder = pathutils.NewConstPath(commands.GlobalFlags.Configs.SketchbookPath)
 }
 
 func initViper() {
 	logrus.Info("Initiating viper config")
 
-	defHome, err := common.GetDefaultArduinoHomeFolder()
+	defHome, err := common.ArduinoHomeFolder.Get()
 	if err != nil {
 		commands.ErrLogrus.WithError(err).Warn("Cannot get default Arduino Home")
 	}
-	defArduinoData, err := common.GetDefaultArduinoFolder()
+	defArduinoData, err := common.ArduinoDataFolder.Get()
 	if err != nil {
 		logrus.WithError(err).Warn("Cannot get default Arduino folder")
 	}

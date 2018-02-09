@@ -68,7 +68,7 @@ func Install(name string, release releases.Release) error {
 		}
 	*/
 
-	libFolder, err := common.GetDefaultLibFolder()
+	libFolder, err := common.LibrariesFolder.Get()
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func Install(name string, release releases.Release) error {
 }
 
 func removeRelease(libName string, r *Release) error {
-	libFolder, err := common.GetDefaultLibFolder()
+	libFolder, err := common.LibrariesFolder.Get()
 	if err != nil {
 		return err
 	}

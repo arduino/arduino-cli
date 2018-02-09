@@ -37,11 +37,13 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/bcmi-labs/arduino-cli/pathutils"
 )
 
 // DownloadIndex is a function to download a generic index.
-func DownloadIndex(indexPathFunc func() (string, error), URL string) error {
-	file, err := indexPathFunc()
+func DownloadIndex(indexPath pathutils.Path, URL string) error {
+	file, err := indexPath.Get()
 	if err != nil {
 		return err
 	}

@@ -84,13 +84,13 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 
 	time.Sleep(duration)
 
-	homeFolder, err := common.GetDefaultArduinoHomeFolder()
+	homeFolder, err := common.ArduinoHomeFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot Parse Board Index file.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	packageFolder, err := common.GetDefaultPkgFolder()
+	packageFolder, err := common.PackagesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot Parse Board Index file.")
 		os.Exit(commands.ErrCoreConfig)

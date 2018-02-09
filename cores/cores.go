@@ -170,7 +170,7 @@ func (release Release) ArchiveURL() string {
 
 // GetDownloadCacheFolder returns the path of the staging folders for this release.
 func (release Release) GetDownloadCacheFolder() (string, error) {
-	return common.GetDownloadCacheFolder("packages")
+	return common.DownloadCacheFolder("packages").Get()
 }
 
 // VersionName represents the version of the release.

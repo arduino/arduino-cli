@@ -105,7 +105,7 @@ func TestLibDownload(t *testing.T) {
 	defer cleanTempRedirect(t, tempFile)
 
 	// getting the paths to create the want path of the want object.
-	stagingFolder, err := common.GetDownloadCacheFolder("libraries")
+	stagingFolder, err := common.DownloadCacheFolder("libraries").Get()
 	require.NoError(t, err, "Getting cache folder")
 
 	// desired output
@@ -159,7 +159,7 @@ func TestCoreDownload(t *testing.T) {
 	defer cleanTempRedirect(t, tempFile)
 
 	// getting the paths to create the want path of the want object.
-	stagingFolder, err := common.GetDownloadCacheFolder("packages")
+	stagingFolder, err := common.DownloadCacheFolder("packages").Get()
 	require.NoError(t, err, "Getting cache folder")
 
 	// desired output

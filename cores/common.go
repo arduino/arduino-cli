@@ -81,7 +81,7 @@ func ParseArgs(args []string) []CoreIDTuple {
 
 // IsCoreInstalled detects if a core has been installed.
 func IsCoreInstalled(packageName string, name string) (bool, error) {
-	location, err := common.GetDefaultCoresFolder(packageName)
+	location, err := common.CoresFolder(packageName).Get()
 	if err != nil {
 		return false, err
 	}
@@ -94,7 +94,7 @@ func IsCoreInstalled(packageName string, name string) (bool, error) {
 
 // IsToolInstalled detects if a tool has been installed.
 func IsToolInstalled(packageName string, name string) (bool, error) {
-	location, err := common.GetDefaultToolsFolder(packageName)
+	location, err := common.ToolsFolder(packageName).Get()
 	if err != nil {
 		return false, err
 	}
@@ -107,7 +107,7 @@ func IsToolInstalled(packageName string, name string) (bool, error) {
 
 // IsToolVersionInstalled detects if a specific version of a tool has been installed.
 func IsToolVersionInstalled(packageName string, name string, version string) (bool, error) {
-	location, err := common.GetDefaultToolsFolder(packageName)
+	location, err := common.ToolsFolder(packageName).Get()
 	if err != nil {
 		return false, err
 	}
@@ -120,7 +120,7 @@ func IsToolVersionInstalled(packageName string, name string, version string) (bo
 
 // GetLatestInstalledCoreVersion returns the latest version of an installed core.
 func GetLatestInstalledCoreVersion(packageName string, name string) (string, error) {
-	location, err := common.GetDefaultCoresFolder(packageName)
+	location, err := common.CoresFolder(packageName).Get()
 	if err != nil {
 		return "", err
 	}
@@ -129,7 +129,7 @@ func GetLatestInstalledCoreVersion(packageName string, name string) (string, err
 
 // GetLatestInstalledToolVersion returns the latest version of an installed tool.
 func GetLatestInstalledToolVersion(packageName string, name string) (string, error) {
-	location, err := common.GetDefaultToolsFolder(packageName)
+	location, err := common.ToolsFolder(packageName).Get()
 	if err != nil {
 		return "", err
 	}

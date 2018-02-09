@@ -63,7 +63,7 @@ var listCommand = &cobra.Command{
 func runListCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib list`")
 
-	libHome, err := common.GetDefaultLibFolder()
+	libHome, err := common.LibrariesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get libraries folder.")
 		os.Exit(commands.ErrCoreConfig)

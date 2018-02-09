@@ -59,7 +59,7 @@ var command = &cobra.Command{
 
 func run(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino validate`")
-	packagesFolder, err := common.GetDefaultPkgFolder()
+	packagesFolder, err := common.PackagesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get packages folder.")
 		os.Exit(commands.ErrCoreConfig)
