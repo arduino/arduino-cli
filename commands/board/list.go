@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/codeclysm/cc"
 
 	"github.com/bcmi-labs/arduino-modules/boards"
@@ -39,7 +39,7 @@ var listCommand = &cobra.Command{
 // runListCommand detects and lists the connected arduino boards
 // (either via serial or network ports).
 func runListCommand(cmd *cobra.Command, args []string) {
-	packageFolder, err := common.PackagesFolder.Get()
+	packageFolder, err := configs.PackagesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot Parse Board Index file.")
 		os.Exit(commands.ErrCoreConfig)

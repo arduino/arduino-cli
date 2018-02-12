@@ -33,11 +33,11 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/configs"
 )
 
 // coreIndexPath returns the path of the index file for libraries.
-var coreIndexPath = common.IndexPath("package_index.json")
+var coreIndexPath = configs.IndexPath("package_index.json")
 
 // Index represents Cores and Tools struct as seen from package_index.json file.
 type Index struct {

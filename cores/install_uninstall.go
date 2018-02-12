@@ -38,8 +38,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/codeclysm/extract"
 )
 
@@ -53,14 +53,14 @@ func Install(packager, arch string, release releases.Release) error {
 		return errors.New("Not existing version of the core")
 	}
 
-	arduinoFolder, err := common.ArduinoHomeFolder.Get()
+	arduinoFolder, err := configs.ArduinoHomeFolder.Get()
 	if err != nil {
 		return err
 	}
 	tempFolder := filepath.Join(arduinoFolder, "tmp", "packages",
 		fmt.Sprintf("core-%d", time.Now().Unix()))
 
-	coresFolder, err := common.CoresFolder(packager).Get()
+	coresFolder, err := configs.CoresFolder(packager).Get()
 	if err != nil {
 		return err
 	}
@@ -129,14 +129,14 @@ func InstallTool(packager, name string, release releases.Release) error {
 		return errors.New("Not existing version of the tool")
 	}
 
-	arduinoFolder, err := common.ArduinoHomeFolder.Get()
+	arduinoFolder, err := configs.ArduinoHomeFolder.Get()
 	if err != nil {
 		return err
 	}
 	tempFolder := filepath.Join(arduinoFolder, "tmp", "tools",
 		fmt.Sprintf("tool-%d", time.Now().Unix()))
 
-	toolsFolder, err := common.ToolsFolder(packager).Get()
+	toolsFolder, err := configs.ToolsFolder(packager).Get()
 	if err != nil {
 		return err
 	}

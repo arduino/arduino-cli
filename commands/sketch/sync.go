@@ -42,9 +42,9 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/auth"
 	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/create_client_helpers"
 	"github.com/bcmi-labs/arduino-modules/sketches"
 	"github.com/bgentry/go-netrc/netrc"
@@ -81,7 +81,7 @@ var syncCommand = &cobra.Command{
 func runSyncCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino sketch sync`")
 
-	sketchbook, err := common.ArduinoHomeFolder.Get()
+	sketchbook, err := configs.ArduinoHomeFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get sketchbook folder.")
 		os.Exit(commands.ErrCoreConfig)

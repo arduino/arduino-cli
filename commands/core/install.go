@@ -34,10 +34,10 @@ import (
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -98,7 +98,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			WithField("Version", item.Release.VersionName()).
 			Info("Installing tool")
 
-		toolRoot, err := common.ToolsFolder(item.Package).Get()
+		toolRoot, err := configs.ToolsFolder(item.Package).Get()
 		if err != nil {
 			formatter.PrintError(err, "Cannot get tool install path, try again.")
 			os.Exit(commands.ErrCoreConfig)
@@ -138,7 +138,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			WithField("Version", item.Release.VersionName()).
 			Info("Installing core")
 
-		coreRoot, err := common.CoresFolder(item.Package).Get()
+		coreRoot, err := configs.CoresFolder(item.Package).Get()
 		if err != nil {
 			formatter.PrintError(err, "Cannot get core install path, try again.")
 			os.Exit(commands.ErrCoreConfig)

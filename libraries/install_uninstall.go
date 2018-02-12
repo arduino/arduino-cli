@@ -40,6 +40,7 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/configs"
 )
 
 // Uninstall a library means remove its directory.
@@ -68,7 +69,7 @@ func Install(name string, release releases.Release) error {
 		}
 	*/
 
-	libFolder, err := common.LibrariesFolder.Get()
+	libFolder, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		return err
 	}
@@ -93,7 +94,7 @@ func Install(name string, release releases.Release) error {
 }
 
 func removeRelease(libName string, r *Release) error {
-	libFolder, err := common.LibrariesFolder.Get()
+	libFolder, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		return err
 	}

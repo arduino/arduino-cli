@@ -36,9 +36,9 @@ import (
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/zieckey/goini"
@@ -63,7 +63,7 @@ var listCommand = &cobra.Command{
 func runListCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib list`")
 
-	libHome, err := common.LibrariesFolder.Get()
+	libHome, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get libraries folder.")
 		os.Exit(commands.ErrCoreConfig)

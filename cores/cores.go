@@ -34,8 +34,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/configs"
 
 	"github.com/blang/semver"
 )
@@ -170,7 +170,7 @@ func (release Release) ArchiveURL() string {
 
 // GetDownloadCacheFolder returns the path of the staging folders for this release.
 func (release Release) GetDownloadCacheFolder() (string, error) {
-	return common.DownloadCacheFolder("packages").Get()
+	return configs.DownloadCacheFolder("packages").Get()
 }
 
 // VersionName represents the version of the release.

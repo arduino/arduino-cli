@@ -42,8 +42,6 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/bcmi-labs/arduino-cli/common"
-
 	"gopkg.in/yaml.v2"
 )
 
@@ -68,7 +66,7 @@ type Configs struct {
 	ArduinoDataFolder string        `yaml:"arduino_data,omitempty"`
 }
 
-//ProxyConfigs represents a possible manual proxy configuration.
+// ProxyConfigs represents a possible manual proxy configuration.
 type ProxyConfigs struct {
 	Hostname string `yaml:"hostname"`
 	Username string `yaml:"username,omitempty"`
@@ -85,8 +83,8 @@ var envConfig = Configs{
 }
 
 func init() {
-	defArduinoData, _ := common.ArduinoDataFolder.Get()
-	defSketchbook, _ := common.ArduinoHomeFolder.Get()
+	defArduinoData, _ := ArduinoDataFolder.Get()
+	defSketchbook, _ := ArduinoHomeFolder.Get()
 
 	defaultConfig = Configs{
 		ProxyType:         "auto",

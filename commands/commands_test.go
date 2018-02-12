@@ -38,8 +38,8 @@ import (
 	"testing"
 
 	"github.com/bcmi-labs/arduino-cli/commands/root"
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -105,7 +105,7 @@ func TestLibDownload(t *testing.T) {
 	defer cleanTempRedirect(t, tempFile)
 
 	// getting the paths to create the want path of the want object.
-	stagingFolder, err := common.DownloadCacheFolder("libraries").Get()
+	stagingFolder, err := configs.DownloadCacheFolder("libraries").Get()
 	require.NoError(t, err, "Getting cache folder")
 
 	// desired output
@@ -159,7 +159,7 @@ func TestCoreDownload(t *testing.T) {
 	defer cleanTempRedirect(t, tempFile)
 
 	// getting the paths to create the want path of the want object.
-	stagingFolder, err := common.DownloadCacheFolder("packages").Get()
+	stagingFolder, err := configs.DownloadCacheFolder("packages").Get()
 	require.NoError(t, err, "Getting cache folder")
 
 	// desired output

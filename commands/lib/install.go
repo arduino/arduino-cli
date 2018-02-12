@@ -35,10 +35,10 @@ import (
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -85,7 +85,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Download finished")
 
 	logrus.Info("Installing")
-	folder, err := common.LibrariesFolder.Get()
+	folder, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get default lib install path.")
 		os.Exit(commands.ErrCoreConfig)

@@ -33,9 +33,9 @@ import (
 	"os"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -56,7 +56,7 @@ var listCommand = &cobra.Command{
 
 func runListCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core list`")
-	pkgHome, err := common.PackagesFolder.Get()
+	pkgHome, err := configs.PackagesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get packages folder.")
 		os.Exit(commands.ErrCoreConfig)

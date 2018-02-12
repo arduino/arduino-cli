@@ -37,9 +37,9 @@ import (
 	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -70,7 +70,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Preparing")
 	libs := libraries.ParseArgs(args)
 
-	libFolder, err := common.LibrariesFolder.Get()
+	libFolder, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get default libraries folder.")
 		os.Exit(commands.ErrCoreConfig)

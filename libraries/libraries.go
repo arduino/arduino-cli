@@ -37,7 +37,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/blang/semver"
 )
 
@@ -57,7 +57,7 @@ type Library struct {
 
 // InstalledRelease returns the installed release of the library.
 func (l *Library) InstalledRelease() (*Release, error) {
-	libFolder, err := common.LibrariesFolder.Get()
+	libFolder, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		return nil, err
 	}
@@ -216,7 +216,7 @@ func (r Release) ExpectedChecksum() string {
 
 // GetDownloadCacheFolder returns the path of the staging folders for this release.
 func (r Release) GetDownloadCacheFolder() (string, error) {
-	return common.DownloadCacheFolder("libraries").Get()
+	return configs.DownloadCacheFolder("libraries").Get()
 }
 
 // VersionName represents the version of the release.

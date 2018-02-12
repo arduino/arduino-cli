@@ -32,13 +32,13 @@ package sketches
 import (
 	"path/filepath"
 
-	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-modules/sketches"
 )
 
 // GetSketch loads a sketch file.
 func GetSketch(name string) (*sketches.Sketch, error) {
-	sketchbookLocation, err := common.ArduinoHomeFolder.Get()
+	sketchbookLocation, err := configs.ArduinoHomeFolder.Get()
 	if err != nil {
 		return nil, err
 	}

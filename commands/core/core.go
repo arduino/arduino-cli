@@ -33,9 +33,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/pretty_print"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/bcmi-labs/arduino-cli/pathutils"
 	"github.com/sirupsen/logrus"
@@ -56,12 +56,12 @@ var command = &cobra.Command{
 
 // getInstalledCores gets the installed cores and puts them in the output struct.
 func getInstalledCores(packageName string, cores *[]output.InstalledStuff) {
-	getInstalledStuff(cores, common.CoresFolder(packageName))
+	getInstalledStuff(cores, configs.CoresFolder(packageName))
 }
 
 // getInstalledTools gets the installed tools and puts them in the output struct.
 func getInstalledTools(packageName string, tools *[]output.InstalledStuff) {
-	getInstalledStuff(tools, common.ToolsFolder(packageName))
+	getInstalledStuff(tools, configs.ToolsFolder(packageName))
 }
 
 // getInstalledStuff is a generic procedure to get installed cores or tools and put them in an output struct.

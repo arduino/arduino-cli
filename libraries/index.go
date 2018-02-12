@@ -33,7 +33,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/configs"
 )
 
 // Index represents the content of a library_index.json file
@@ -60,7 +60,7 @@ type indexRelease struct {
 }
 
 // IndexPath is the path of the index file for libraries.
-var IndexPath = common.IndexPath("library_index.json")
+var IndexPath = configs.IndexPath("library_index.json")
 
 // LoadIndex reads a library_index.json from a file and returns
 // the corresponding LibrariesIndex structure.

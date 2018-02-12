@@ -41,8 +41,8 @@ import (
 	"github.com/arduino/arduino-builder/utils"
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/bcmi-labs/arduino-cli/sketches"
 	"github.com/sirupsen/logrus"
@@ -144,28 +144,28 @@ func run(cmd *cobra.Command, args []string) {
 	ctx := &types.Context{}
 
 	ctx.FQBN = fullyQualifiedBoardName
-	sketchbookPath, err := common.SketchbookFolder.Get()
+	sketchbookPath, err := configs.SketchbookFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Getting sketchbook folder")
 		os.Exit(commands.ErrCoreConfig)
 	}
 	ctx.SketchLocation = filepath.Join(sketchbookPath, sketchName)
 
-	packagesFolder, err := common.PackagesFolder.Get()
+	packagesFolder, err := configs.PackagesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get packages folder.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 	ctx.HardwareFolders = []string{packagesFolder}
 
-	toolsFolder, err := common.ToolsFolder(packageName).Get()
+	toolsFolder, err := configs.ToolsFolder(packageName).Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get tools folder.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 	ctx.ToolsFolders = []string{toolsFolder}
 
-	librariesFolder, err := common.LibrariesFolder.Get()
+	librariesFolder, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get libraries folder.")
 		os.Exit(commands.ErrCoreConfig)
@@ -229,7 +229,7 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.ArduinoAPIVersion = "10600"
 
 	// Check if Arduino IDE is installed and get it's libraries location.
-	dataFolder, err := common.ArduinoDataFolder.Get()
+	dataFolder, err := configs.ArduinoDataFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot locate arduino data folder.")
 		os.Exit(commands.ErrCoreConfig)

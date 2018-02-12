@@ -38,8 +38,8 @@ import (
 
 	discovery "github.com/arduino/board-discovery"
 	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-modules/boards"
 	"github.com/bcmi-labs/arduino-modules/sketches"
 	"github.com/sirupsen/logrus"
@@ -84,13 +84,13 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 
 	time.Sleep(duration)
 
-	homeFolder, err := common.ArduinoHomeFolder.Get()
+	homeFolder, err := configs.ArduinoHomeFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot Parse Board Index file.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	packageFolder, err := common.PackagesFolder.Get()
+	packageFolder, err := configs.PackagesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot Parse Board Index file.")
 		os.Exit(commands.ErrCoreConfig)
