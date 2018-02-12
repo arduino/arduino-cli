@@ -173,7 +173,6 @@ func initConfigs() {
 	logrus.Info("Configuration set")
 	commands.GlobalFlags.Configs = c
 	common.ArduinoDataFolder = pathutils.NewConstPath(commands.GlobalFlags.Configs.ArduinoDataFolder)
-	common.ArduinoIDEFolder = pathutils.NewConstPath(configs.ArduinoIDEFolder)
 	common.SketchbookFolder = pathutils.NewConstPath(commands.GlobalFlags.Configs.SketchbookPath)
 }
 

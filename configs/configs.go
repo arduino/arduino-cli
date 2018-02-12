@@ -50,12 +50,6 @@ import (
 // ConfigFilePath represents the default location of the config file (same directory as executable).
 var ConfigFilePath = detectConfigFilePath()
 
-// bundledInIDE tells if the CLI is paired with the Java Arduino IDE.
-var bundledInIDE *bool
-
-// ArduinoIDEFolder represents the path of the IDE directory, set only if BundledInIDE = true.
-var ArduinoIDEFolder string
-
 func detectConfigFilePath() string {
 	fileLocation, err := os.Executable()
 	if err != nil {
@@ -180,14 +174,17 @@ func fixMissingFields(c *Configs) {
 	}
 }
 
+var arduinoIDEDirectory *string
+
 // Bundled returns if the CLI is bundled with the Arduino IDE.
 func Bundled() bool {
-	if bundledInIDE != nil {
-		return *bundledInIDE
+	if arduinoIDEDirectory != nil {
+		return *arduinoIDEDirectory != ""
 	}
-	bundledInIDE = new(bool)
+	empty := ""
+	arduinoIDEDirectory = &empty
+
 	logrus.Info("Checking if CLI is Bundled into the IDE")
-	*bundledInIDE = false
 	executable, err := os.Executable()
 	if err != nil {
 		logrus.WithError(err).Warn("Cannot get executable path")
@@ -198,19 +195,19 @@ func Bundled() bool {
 		logrus.WithError(err).Warn("Cannot get executable path (symlinks error)")
 		return false
 	}
-	ArduinoIDEFolder := filepath.Dir(filepath.Dir(executable))
-
-	logrus.Info("Candidate IDE Folder:", ArduinoIDEFolder)
+	ideDir := filepath.Dir(filepath.Dir(executable))
+	logrus.Info("Candidate IDE Directory:", ideDir)
 
 	executables := []string{"arduino", "arduino.sh", "arduino.exe"}
 	for _, exe := range executables {
-		exePath := filepath.Join(ArduinoIDEFolder, exe)
+		exePath := filepath.Join(ideDir, exe)
 		_, err := os.Stat(exePath)
 		if !os.IsNotExist(err) {
-			logrus.WithError(err).Info("CLI is bundled")
-			*bundledInIDE = true
+			arduinoIDEDirectory = &ideDir
+			logrus.Info("CLI is bundled:", *arduinoIDEDirectory)
 			break
 		}
 	}
-	return false
+
+	return *arduinoIDEDirectory != ""
 }

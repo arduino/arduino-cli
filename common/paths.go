@@ -39,9 +39,6 @@ import (
 	"github.com/bcmi-labs/arduino-cli/task"
 )
 
-// ArduinoIDEFolder represents the current folder where the Arduino IDE relies, not used if CLI is not bundled with the IDE.
-var ArduinoIDEFolder pathutils.Path
-
 // ArduinoDataFolder represents the current root of the arduino tree (defaulted to `$HOME/.arduino15` on linux).
 var ArduinoDataFolder = pathutils.NewPath("Arduino Data", getDefaultArduinoDataFolder, true)
 
