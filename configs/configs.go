@@ -34,7 +34,6 @@
 package configs
 
 import (
-	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -43,7 +42,6 @@ import (
 
 	"github.com/spf13/viper"
 
-	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/common"
 
 	"gopkg.in/yaml.v2"
@@ -107,61 +105,6 @@ func init() {
 func Default() Configs {
 	logrus.Info("Returning default configuration")
 	return defaultConfig
-}
-
-// UnserializeFromIDEPreferences loads the config from an IDE preferences.txt file, by Updating the specified otherConfigs.
-func UnserializeFromIDEPreferences(otherConfigs *Configs) error {
-	logrus.Info("Unserializing from IDE preferences")
-	props, err := properties.Load(filepath.Join(otherConfigs.ArduinoDataFolder, "preferences.txt"))
-	if err != nil {
-		logrus.WithError(err).Warn("Error during unserialize from IDE preferences")
-		return err
-	}
-	err = proxyConfigsFromIDEPrefs(otherConfigs, props)
-	if err != nil {
-		logrus.WithError(err).Warn("Error during unserialize from IDE preferences")
-		return err
-	}
-	sketchbookPath, exists := props.SubTree("sketchbook")["path"]
-	if exists {
-		otherConfigs.SketchbookPath = sketchbookPath
-	}
-	return nil
-}
-
-func proxyConfigsFromIDEPrefs(otherConfigs *Configs, props properties.Map) error {
-	proxy := props.SubTree("proxy")
-	typo := proxy["type"]
-	switch typo {
-	case "auto":
-		//automatic proxy
-		viper.Set("proxy.type", "auto")
-		break
-	case "manual":
-		//manual proxy configuration
-		manualConfig := proxy.SubTree("manual")
-		hostname, exists := manualConfig["hostname"]
-		if !exists {
-			return errors.New("Proxy ostname not found in preferences.txt")
-		}
-		username := manualConfig["username"]
-		password := manualConfig["password"]
-
-		otherConfigs.ProxyType = "manual"
-		otherConfigs.ProxyManualConfig = &ProxyConfigs{
-			Hostname: hostname,
-			Username: username,
-			Password: password,
-		}
-		viper.Set("proxy", *otherConfigs.ProxyManualConfig)
-		break
-	case "none":
-		//No proxy
-		break
-	default:
-		return errors.New("Unsupported config type")
-	}
-	return nil
 }
 
 // Unserialize loads the configs from a yaml file.
