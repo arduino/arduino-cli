@@ -193,8 +193,8 @@ func Bundled() bool {
 		logrus.WithError(err).Warn("Cannot get executable path (symlinks error)")
 		return false
 	}
-	ideDir := filepath.Dir(filepath.Dir(executable))
-	logrus.Info("Candidate IDE Directory:", ideDir)
+	ideDir := filepath.Dir(executable)
+	logrus.Info("Candidate IDE Directory: ", ideDir)
 
 	executables := []string{"arduino", "arduino.sh", "arduino.exe"}
 	for _, exe := range executables {
@@ -202,7 +202,6 @@ func Bundled() bool {
 		_, err := os.Stat(exePath)
 		if !os.IsNotExist(err) {
 			arduinoIDEDirectory = &ideDir
-			logrus.Info("CLI is bundled:", *arduinoIDEDirectory)
 			break
 		}
 	}
