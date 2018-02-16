@@ -34,8 +34,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/pathutils"
-
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/commands/board"
 	"github.com/bcmi-labs/arduino-cli/commands/compile"
@@ -154,25 +152,21 @@ func preRun(cmd *cobra.Command, args []string) {
 // initConfigs initializes the configuration from the specified file.
 func initConfigs() {
 	logrus.Info("Initiating configuration")
-	c, err := configs.Unserialize(configs.ConfigFilePath)
+	err := configs.Unserialize(configs.ConfigFilePath)
 	if err != nil {
 		logrus.WithError(err).Warn("Did not manage to get config file, using default configuration")
-		commands.GlobalFlags.Configs = configs.Default()
 	}
 	if configs.Bundled() {
 		logrus.Info("CLI is bundled into the IDE")
-		err := configs.UnserializeFromIDEPreferences(&c)
+		err := configs.UnserializeFromIDEPreferences()
 		if err != nil {
 			logrus.WithError(err).Warn("Did not manage to get config file of IDE, using default configuration")
-			commands.GlobalFlags.Configs = configs.Default()
 		}
 	} else {
 		logrus.Info("CLI is not bundled into the IDE")
 	}
+	configs.LoadFromEnv()
 	logrus.Info("Configuration set")
-	commands.GlobalFlags.Configs = c
-	configs.ArduinoDataFolder = pathutils.NewConstPath(commands.GlobalFlags.Configs.ArduinoDataFolder)
-	configs.SketchbookFolder = pathutils.NewConstPath(commands.GlobalFlags.Configs.SketchbookPath)
 }
 
 func initViper() {
@@ -246,5 +240,4 @@ func TestInit() {
 // IgnoreConfigs is used in tests to ignore the config file.
 func IgnoreConfigs() {
 	logrus.Info("Ignoring configurations and using always default ones")
-	commands.GlobalFlags.Configs = configs.Default()
 }

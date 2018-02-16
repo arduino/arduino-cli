@@ -42,7 +42,7 @@ import (
 func init() {
 	command.AddCommand(initCommand)
 	initCommand.Flags().BoolVar(&initFlags._default, "default", false, "If omitted, ask questions to the user about setting configuration properties, otherwise use default configuration.")
-	initCommand.Flags().StringVar(&initFlags.location, "save-as", configs.ConfigFilePath, "Sets where to save the configuration file [default is ./.cli-config.yml].")
+	initCommand.Flags().StringVar(&initFlags.location, "save-as", "", "Sets where to save the configuration file [default is ./.cli-config.yml].")
 }
 
 var initFlags struct {
@@ -64,33 +64,30 @@ var initCommand = &cobra.Command{
 func runInitCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config init`")
 
-	var conf configs.Configs
-
 	if !initFlags._default {
 		if !formatter.IsCurrentFormat("text") {
 			formatter.PrintErrorMessage("The interactive mode is supported only in text mode.")
 			os.Exit(commands.ErrBadCall)
 		}
-		logrus.Info("Asking questions to the user to populate configuration")
-		conf = configsFromQuestions()
-	} else {
-		logrus.Info("Setting default configuration")
-		conf = configs.Default()
+		configsFromQuestions()
 	}
-	err := conf.Serialize(initFlags.location)
+
+	filepath := initFlags.location
+	if filepath == "" {
+		filepath = configs.ConfigFilePath
+	}
+	err := configs.Serialize(filepath)
 	if err != nil {
 		formatter.PrintError(err, "Cannot create config file.")
 		os.Exit(commands.ErrGeneric)
-	} else {
-		formatter.PrintResult("Config file PATH: " + initFlags.location)
 	}
+	formatter.PrintResult("Config file PATH: " + filepath)
 	logrus.Info("Done")
 }
 
 // ConfigsFromQuestions asks some questions to the user to properly initialize configs.
 // It does not have much sense to use it in JSON formatting, though.
-func configsFromQuestions() configs.Configs {
-	ret := configs.Default()
+func configsFromQuestions() {
+	//logrus.Info("Asking questions to the user to populate configuration")
 	// Set of questions here.
-	return ret
 }

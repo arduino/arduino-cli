@@ -30,7 +30,6 @@
 package commands
 
 import (
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/sirupsen/logrus"
 )
 
@@ -51,7 +50,6 @@ var ErrLogrus = logrus.New()
 
 // GlobalFlags represents flags available in all the program.
 var GlobalFlags struct {
-	Debug           bool   // If true, dump debug output to stderr.
-	Format          string // The Output format (e.g. text, json).
-	configs.Configs        // The Configurations for the CLI.
+	Debug  bool   // If true, dump debug output to stderr.
+	Format string // The Output format (e.g. text, json).
 }

@@ -33,6 +33,8 @@ import (
 	"errors"
 	"path/filepath"
 
+	"github.com/bcmi-labs/arduino-cli/pathutils"
+
 	"github.com/arduino/go-properties-map"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -40,26 +42,31 @@ import (
 
 // UnserializeFromIDEPreferences loads the config from an IDE
 // preferences.txt file, by Updating the specified otherConfigs
-func UnserializeFromIDEPreferences(otherConfigs *Configs) error {
+func UnserializeFromIDEPreferences() error {
 	logrus.Info("Unserializing from IDE preferences")
-	props, err := properties.Load(filepath.Join(otherConfigs.ArduinoDataFolder, "preferences.txt"))
+	dataDir, err := ArduinoDataFolder.Get()
+	if err != nil {
+		logrus.WithError(err).Warn("Error looking for IDE preferences")
+		return err
+	}
+	props, err := properties.Load(filepath.Join(dataDir, "preferences.txt"))
 	if err != nil {
 		logrus.WithError(err).Warn("Error during unserialize from IDE preferences")
 		return err
 	}
-	err = proxyConfigsFromIDEPrefs(otherConfigs, props)
+	err = proxyConfigsFromIDEPrefs(props)
 	if err != nil {
 		logrus.WithError(err).Warn("Error during unserialize from IDE preferences")
 		return err
 	}
-	sketchbookPath, exists := props.SubTree("sketchbook")["path"]
-	if exists {
-		otherConfigs.SketchbookPath = sketchbookPath
+	if dir, has := props["sketchbook.path"]; has {
+		SketchbookFolder = pathutils.NewConstPath(dir)
+		ArduinoHomeFolder = SketchbookFolder
 	}
 	return nil
 }
 
-func proxyConfigsFromIDEPrefs(otherConfigs *Configs, props properties.Map) error {
+func proxyConfigsFromIDEPrefs(props properties.Map) error {
 	proxy := props.SubTree("proxy")
 	switch proxy["type"] {
 	case "auto":
@@ -76,13 +83,10 @@ func proxyConfigsFromIDEPrefs(otherConfigs *Configs, props properties.Map) error
 		username := manualConfig["username"]
 		password := manualConfig["password"]
 
-		otherConfigs.ProxyType = "manual"
-		otherConfigs.ProxyManualConfig = &ProxyConfigs{
-			Hostname: hostname,
-			Username: username,
-			Password: password,
-		}
-		viper.Set("proxy", otherConfigs.ProxyManualConfig)
+		ProxyType = "manual"
+		ProxyHostname = hostname
+		ProxyUsername = username
+		ProxyPassword = password
 		break
 	case "none":
 		// No proxy

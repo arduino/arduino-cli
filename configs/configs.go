@@ -38,17 +38,19 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
+	"github.com/bcmi-labs/arduino-cli/pathutils"
 
-	"github.com/spf13/viper"
+	"github.com/sirupsen/logrus"
 
 	"gopkg.in/yaml.v2"
 )
 
 // ConfigFilePath represents the default location of the config file (same directory as executable).
-var ConfigFilePath = detectConfigFilePath()
+var ConfigFilePath = getDefaultConfigFilePath()
 
-func detectConfigFilePath() string {
+// getDefaultConfigFilePath returns the default path for .cli-config.yml,
+// this is the directory where the arduino-cli executable resides.
+func getDefaultConfigFilePath() string {
 	fileLocation, err := os.Executable()
 	if err != nil {
 		fileLocation = "."
@@ -58,118 +60,107 @@ func detectConfigFilePath() string {
 	return fileLocation
 }
 
-// Configs represents the possible configurations for the CLI.
-type Configs struct {
-	ProxyType         string        `yaml:"proxy_type"`
-	ProxyManualConfig *ProxyConfigs `yaml:"manual_configs,omitempty"`
-	SketchbookPath    string        `yaml:"sketchbook_path,omitempty"`
-	ArduinoDataFolder string        `yaml:"arduino_data,omitempty"`
+type yamlConfig struct {
+	ProxyType         string           `yaml:"proxy_type"`
+	ProxyManualConfig *yamlProxyConfig `yaml:"manual_configs,omitempty"`
+	SketchbookPath    string           `yaml:"sketchbook_path,omitempty"`
+	ArduinoDataFolder string           `yaml:"arduino_data,omitempty"`
 }
 
-// ProxyConfigs represents a possible manual proxy configuration.
-type ProxyConfigs struct {
+type yamlProxyConfig struct {
 	Hostname string `yaml:"hostname"`
 	Username string `yaml:"username,omitempty"`
 	Password string `yaml:"password,omitempty"` // can be encrypted, see issue #71
 }
 
-// defaultConfig represents the default configuration.
-var defaultConfig Configs
+// ProxyType is the type of proxy configured
+var ProxyType = "auto"
 
-var envConfig = Configs{
-	ProxyType:         os.Getenv("PROXY_TYPE"),
-	SketchbookPath:    os.Getenv("SKETCHBOOK_FOLDER"),
-	ArduinoDataFolder: os.Getenv("ARDUINO_DATA"),
-}
+// ProxyHostname is the proxy hostname
+var ProxyHostname string
 
-func init() {
-	defArduinoData, _ := ArduinoDataFolder.Get()
-	defSketchbook, _ := ArduinoHomeFolder.Get()
+// ProxyUsername is the proxy user
+var ProxyUsername string
 
-	defaultConfig = Configs{
-		ProxyType:         "auto",
-		SketchbookPath:    defSketchbook,
-		ArduinoDataFolder: defArduinoData,
+// ProxyPassword is the proxy password
+var ProxyPassword string
+
+// LoadFromEnv read configurations from the environment variables
+func LoadFromEnv() {
+	if p, has := os.LookupEnv("PROXY_TYPE"); has {
+		ProxyType = p
 	}
-}
-
-// Default returns a copy of the default configuration.
-func Default() Configs {
-	logrus.Info("Returning default configuration")
-	return defaultConfig
+	if dir, has := os.LookupEnv("SKETCHBOOK_DIR"); has {
+		SketchbookFolder = pathutils.NewConstPath(dir)
+		ArduinoHomeFolder = SketchbookFolder
+	}
+	if dir, has := os.LookupEnv("ARDUINO_DATA_DIR"); has {
+		ArduinoDataFolder = pathutils.NewConstPath(dir)
+	}
 }
 
 // Unserialize loads the configs from a yaml file.
-// Returns the default configuration if there is an
-// error.
-func Unserialize(path string) (Configs, error) {
+func Unserialize(path string) error {
 	logrus.Info("Unserializing configurations from ", path)
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
-		logrus.WithError(err).Warn("Error during unserialize, using default configuration")
-		return Default(), err
+		logrus.WithError(err).Warn("Error reading config, using default configuration")
+		return err
 	}
-	var ret Configs
+	var ret yamlConfig
 	err = yaml.Unmarshal(content, &ret)
 	if err != nil {
-		logrus.WithError(err).Warn("Error during unserialize, using default configuration")
-		return Default(), err
+		logrus.WithError(err).Warn("Error parsing config, using default configuration")
+		return err
 	}
-	fixMissingFields(&ret)
-	return ret, nil
-}
 
-// Serialize creates a file in the specified path with
-// corresponds to a config file reflecting the configs.
-func (c Configs) Serialize(path string) error {
-	logrus.Info("Serializing configurations to ", path)
-	content, err := yaml.Marshal(c)
-	if err != nil {
-		logrus.WithError(err).Warn("Error during serialize")
-		return err
+	if ret.ArduinoDataFolder != "" {
+		ArduinoDataFolder = pathutils.NewConstPath(ret.ArduinoDataFolder)
 	}
-	err = ioutil.WriteFile(path, content, 0666)
-	if err != nil {
-		logrus.WithError(err).Warn("Error during serialize")
-		return err
+	if ret.SketchbookPath != "" {
+		SketchbookFolder = pathutils.NewConstPath(ret.SketchbookPath)
+	}
+	if ret.ProxyType != "" {
+		ProxyType = ret.ProxyType
+		if ret.ProxyManualConfig != nil {
+			ProxyHostname = ret.ProxyManualConfig.Hostname
+			ProxyUsername = ret.ProxyManualConfig.Username
+			ProxyPassword = ret.ProxyManualConfig.Password
+		}
 	}
 	return nil
 }
 
-func fixMissingFields(c *Configs) {
-	def := defaultConfig
-	env := envConfig
-
-	compareAndReplace := func(envVal string, configVal *string, defVal string) {
-		if envVal != "" {
-			*configVal = envVal
-		} else if *configVal == "" {
-			*configVal = defVal
+// Serialize creates a file in the specified path with
+// corresponds to a config file reflecting the configs.
+func Serialize(path string) error {
+	logrus.Info("Serializing configurations to ", path)
+	c := &yamlConfig{}
+	if dir, err := SketchbookFolder.Get(); err == nil {
+		c.SketchbookPath = dir
+	}
+	if dir, err := ArduinoDataFolder.Get(); err == nil {
+		c.ArduinoDataFolder = dir
+	}
+	c.ProxyType = ProxyType
+	if ProxyType == "manual" {
+		c.ProxyManualConfig = &yamlProxyConfig{
+			Hostname: ProxyHostname,
+			Username: ProxyUsername,
+			Password: ProxyPassword,
 		}
 	}
-
-	compareAndReplace(env.ProxyType, &c.ProxyType, def.ProxyType)
-	compareAndReplace(env.SketchbookPath, &c.SketchbookPath, def.SketchbookPath)
-	compareAndReplace(env.ArduinoDataFolder, &c.ArduinoDataFolder, def.ArduinoDataFolder)
-
-	if env.ProxyManualConfig != nil {
-		c.ProxyManualConfig = &ProxyConfigs{
-			Hostname: env.ProxyManualConfig.Hostname,
-			Username: env.ProxyManualConfig.Username,
-			Password: env.ProxyManualConfig.Password,
-		}
-	} else if c.ProxyManualConfig == nil {
-		if def.ProxyManualConfig != nil {
-			//fmt.Println(def.ProxyManualConfig)
-			c.ProxyManualConfig = &ProxyConfigs{
-				Hostname: def.ProxyManualConfig.Hostname,
-				Username: def.ProxyManualConfig.Username,
-				Password: def.ProxyManualConfig.Password,
-			}
-		}
-
-		viper.AutomaticEnv()
+	content, err := yaml.Marshal(c)
+	if err != nil {
+		logrus.WithError(err).Warn("Error encoding config")
+		return err
 	}
+	err = ioutil.WriteFile(path, content, 0666)
+	if err != nil {
+		logrus.WithError(err).Warn("Error writing config")
+		return err
+	}
+	return nil
 }
 
 var arduinoIDEDirectory *string
