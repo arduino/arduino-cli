@@ -24,41 +24,18 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
+ * Copyright 2017-2018 ARDUINO AG (http://www.arduino.cc/)
  */
 
-// Package configs contains all CLI configurations handling.
-//
-// It is done via a YAML file which can be in a custom location,
-// but is defaulted to "$EXECUTABLE_DIR/cli-config.yaml"
 package configs
 
 import (
 	"io/ioutil"
-	"os"
-	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/pathutils"
-
 	"github.com/sirupsen/logrus"
-
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
-
-// ConfigFilePath represents the default location of the config file (same directory as executable).
-var ConfigFilePath = getDefaultConfigFilePath()
-
-// getDefaultConfigFilePath returns the default path for .cli-config.yml,
-// this is the directory where the arduino-cli executable resides.
-func getDefaultConfigFilePath() string {
-	fileLocation, err := os.Executable()
-	if err != nil {
-		fileLocation = "."
-	}
-	fileLocation = filepath.Dir(fileLocation)
-	fileLocation = filepath.Join(fileLocation, ".cli-config.yml")
-	return fileLocation
-}
 
 type yamlConfig struct {
 	ProxyType         string           `yaml:"proxy_type"`
@@ -73,34 +50,8 @@ type yamlProxyConfig struct {
 	Password string `yaml:"password,omitempty"` // can be encrypted, see issue #71
 }
 
-// ProxyType is the type of proxy configured
-var ProxyType = "auto"
-
-// ProxyHostname is the proxy hostname
-var ProxyHostname string
-
-// ProxyUsername is the proxy user
-var ProxyUsername string
-
-// ProxyPassword is the proxy password
-var ProxyPassword string
-
-// LoadFromEnv read configurations from the environment variables
-func LoadFromEnv() {
-	if p, has := os.LookupEnv("PROXY_TYPE"); has {
-		ProxyType = p
-	}
-	if dir, has := os.LookupEnv("SKETCHBOOK_DIR"); has {
-		SketchbookFolder = pathutils.NewConstPath(dir)
-		ArduinoHomeFolder = SketchbookFolder
-	}
-	if dir, has := os.LookupEnv("ARDUINO_DATA_DIR"); has {
-		ArduinoDataFolder = pathutils.NewConstPath(dir)
-	}
-}
-
-// Unserialize loads the configs from a yaml file.
-func Unserialize(path string) error {
+// LoadFromYAML loads the configs from a yaml file.
+func LoadFromYAML(path string) error {
 	logrus.Info("Unserializing configurations from ", path)
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -131,9 +82,9 @@ func Unserialize(path string) error {
 	return nil
 }
 
-// Serialize creates a file in the specified path with
+// SaveToYAML creates a file in the specified path with
 // corresponds to a config file reflecting the configs.
-func Serialize(path string) error {
+func SaveToYAML(path string) error {
 	logrus.Info("Serializing configurations to ", path)
 	c := &yamlConfig{}
 	if dir, err := SketchbookFolder.Get(); err == nil {
@@ -161,41 +112,4 @@ func Serialize(path string) error {
 		return err
 	}
 	return nil
-}
-
-var arduinoIDEDirectory *string
-
-// Bundled returns if the CLI is bundled with the Arduino IDE.
-func Bundled() bool {
-	if arduinoIDEDirectory != nil {
-		return *arduinoIDEDirectory != ""
-	}
-	empty := ""
-	arduinoIDEDirectory = &empty
-
-	logrus.Info("Checking if CLI is Bundled into the IDE")
-	executable, err := os.Executable()
-	if err != nil {
-		logrus.WithError(err).Warn("Cannot get executable path")
-		return false
-	}
-	executable, err = filepath.EvalSymlinks(executable)
-	if err != nil {
-		logrus.WithError(err).Warn("Cannot get executable path (symlinks error)")
-		return false
-	}
-	ideDir := filepath.Dir(executable)
-	logrus.Info("Candidate IDE Directory: ", ideDir)
-
-	executables := []string{"arduino", "arduino.sh", "arduino.exe"}
-	for _, exe := range executables {
-		exePath := filepath.Join(ideDir, exe)
-		_, err := os.Stat(exePath)
-		if !os.IsNotExist(err) {
-			arduinoIDEDirectory = &ideDir
-			break
-		}
-	}
-
-	return *arduinoIDEDirectory != ""
 }

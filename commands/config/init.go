@@ -76,7 +76,7 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	if filepath == "" {
 		filepath = configs.ConfigFilePath
 	}
-	err := configs.Serialize(filepath)
+	err := configs.SaveToYAML(filepath)
 	if err != nil {
 		formatter.PrintError(err, "Cannot create config file.")
 		os.Exit(commands.ErrGeneric)

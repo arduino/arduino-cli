@@ -152,13 +152,13 @@ func preRun(cmd *cobra.Command, args []string) {
 // initConfigs initializes the configuration from the specified file.
 func initConfigs() {
 	logrus.Info("Initiating configuration")
-	err := configs.Unserialize(configs.ConfigFilePath)
+	err := configs.LoadFromYAML(configs.ConfigFilePath)
 	if err != nil {
 		logrus.WithError(err).Warn("Did not manage to get config file, using default configuration")
 	}
-	if configs.Bundled() {
+	if configs.IsBundledInDesktopIDE() {
 		logrus.Info("CLI is bundled into the IDE")
-		err := configs.UnserializeFromIDEPreferences()
+		err := configs.LoadFromDesktopIDEPreferences()
 		if err != nil {
 			logrus.WithError(err).Warn("Did not manage to get config file of IDE, using default configuration")
 		}

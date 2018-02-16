@@ -24,13 +24,14 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2018 ARDUINO AG (http://www.arduino.cc/)
+ * Copyright 2017-2018 ARDUINO AG (http://www.arduino.cc/)
  */
 
 package configs
 
 import (
 	"errors"
+	"os"
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/pathutils"
@@ -40,9 +41,45 @@ import (
 	"github.com/spf13/viper"
 )
 
-// UnserializeFromIDEPreferences loads the config from an IDE
-// preferences.txt file, by Updating the specified otherConfigs
-func UnserializeFromIDEPreferences() error {
+var arduinoIDEDirectory *string
+
+// IsBundledInDesktopIDE returns true if the CLI is bundled with the Arduino IDE.
+func IsBundledInDesktopIDE() bool {
+	if arduinoIDEDirectory != nil {
+		return *arduinoIDEDirectory != ""
+	}
+	empty := ""
+	arduinoIDEDirectory = &empty
+
+	logrus.Info("Checking if CLI is Bundled into the IDE")
+	executable, err := os.Executable()
+	if err != nil {
+		logrus.WithError(err).Warn("Cannot get executable path")
+		return false
+	}
+	executable, err = filepath.EvalSymlinks(executable)
+	if err != nil {
+		logrus.WithError(err).Warn("Cannot get executable path (symlinks error)")
+		return false
+	}
+	ideDir := filepath.Dir(executable)
+	logrus.Info("Candidate IDE Directory: ", ideDir)
+
+	executables := []string{"arduino", "arduino.sh", "arduino.exe"}
+	for _, exe := range executables {
+		exePath := filepath.Join(ideDir, exe)
+		_, err := os.Stat(exePath)
+		if !os.IsNotExist(err) {
+			arduinoIDEDirectory = &ideDir
+			break
+		}
+	}
+
+	return *arduinoIDEDirectory != ""
+}
+
+// LoadFromDesktopIDEPreferences loads the config from the Desktop IDE preferences.txt file
+func LoadFromDesktopIDEPreferences() error {
 	logrus.Info("Unserializing from IDE preferences")
 	dataDir, err := ArduinoDataFolder.Get()
 	if err != nil {
