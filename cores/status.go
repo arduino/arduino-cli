@@ -42,7 +42,17 @@ import (
 
 // StatusContext represents the Context of the Cores and Tools in the system.
 type StatusContext struct {
-	Packages map[string]*Package
+	Packages map[string]*Package // Maps packager name to Package
+}
+
+// Package represents a package in the system.
+type Package struct {
+	Name       string               // Name of the package.
+	Maintainer string               // Name of the maintainer.
+	WebsiteURL string               // Website of maintainer.
+	Email      string               // Email of maintainer.
+	Plaftorms  map[string]*Platform // The platforms in the system.
+	Tools      map[string]*Tool     // The tools in the system.
 }
 
 // CoreDependency is a representation of a parsed core dependency (single ToolRelease).
@@ -53,13 +63,6 @@ type CoreDependency struct {
 
 func (cd CoreDependency) String() string {
 	return strings.TrimSpace(fmt.Sprintln(cd.ToolName, " v.", cd.Release.Version))
-}
-
-// Add adds a package to a context from an indexPackage.
-//
-// NOTE: If the package is already in the context, it is overwritten!
-func (sc *StatusContext) Add(indexPackage *indexPackage) {
-	sc.Packages[indexPackage.Name] = indexPackage.extractPackage()
 }
 
 // Names returns the array containing the name of the packages.
@@ -100,22 +103,21 @@ func (tdep ToolDependency) extractRelease(sc StatusContext) (*ToolRelease, error
 
 // CreateStatusContext creates a status context from index data.
 func (index Index) CreateStatusContext() StatusContext {
-	// Start with an empty status context
-	packages := StatusContext{
-		Packages: make(map[string]*Package, len(index.Packages)),
+	packages := map[string]*Package{}
+	for _, p := range index.Packages {
+		packages[p.Name] = p.extractPackage()
 	}
-	for _, packageManager := range index.Packages {
-		packages.Add(packageManager)
+	return StatusContext{
+		Packages: packages,
 	}
-	return packages
 }
 
-// GetDeps returns the deps of a specified release of a core.
-func (sc StatusContext) GetDeps(release *Release) ([]CoreDependency, error) {
-	ret := make([]CoreDependency, 0, 5)
+// GetDepsOfPlatformRelease returns the deps of a specified release of a core.
+func (sc StatusContext) GetDepsOfPlatformRelease(release *PlatformRelease) ([]CoreDependency, error) {
 	if release == nil {
 		return nil, errors.New("release cannot be nil")
 	}
+	ret := []CoreDependency{}
 	for _, dep := range release.Dependencies {
 		pkg, exists := sc.Packages[dep.ToolPackager]
 		if !exists {
@@ -166,7 +168,7 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]DownloadItem, []Download
 			})
 			continue
 		}
-		core, exists := pkg.Cores[item.CoreName]
+		core, exists := pkg.Plaftorms[item.CoreName]
 		if !exists {
 			fails = append(fails, output.ProcessResult{
 				ItemName: item.CoreName,
@@ -190,7 +192,7 @@ func (sc StatusContext) Process(items []CoreIDTuple) ([]DownloadItem, []Download
 		}
 
 		// replaces "latest" with latest version too
-		deps, err := sc.GetDeps(release)
+		deps, err := sc.GetDepsOfPlatformRelease(release)
 		if err != nil {
 			fails = append(fails, output.ProcessResult{
 				ItemName: item.CoreName,

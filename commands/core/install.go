@@ -77,13 +77,14 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		Cores: failOutputs,
 		Tools: make([]output.ProcessResult, 0, 10),
 	}
+
 	downloads := make([]releases.DownloadItem, len(toolsToDownload))
 	for i := range toolsToDownload {
 		downloads[i] = toolsToDownload[i].DownloadItem
 	}
-
 	logrus.Info("Downloading tool dependencies of all cores requested")
 	releases.ParallelDownload(downloads, false, "Downloaded", &outputResults.Tools, "tool")
+
 	downloads = make([]releases.DownloadItem, len(coresToDownload))
 	for i := range coresToDownload {
 		downloads[i] = coresToDownload[i].DownloadItem

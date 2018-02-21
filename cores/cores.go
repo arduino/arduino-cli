@@ -40,16 +40,16 @@ import (
 	"github.com/blang/semver"
 )
 
-// Core represents a core package.
-type Core struct {
-	Name         string              // The name of the Core Package.
-	Architecture string              // The name of the architecture of this package.
-	Category     string              // The category which this core package belongs to.
-	Releases     map[string]*Release // The Releases of this core package, labeled by version.
+// Platform represents a platform package.
+type Platform struct {
+	Name         string                      // The name of the Core Package.
+	Architecture string                      // The name of the architecture of this package.
+	Category     string                      // The category which this core package belongs to.
+	Releases     map[string]*PlatformRelease // The Releases of this core package, labeled by version.
 }
 
-// Release represents a release of a core package.
-type Release struct {
+// PlatformRelease represents a release of a core package.
+type PlatformRelease struct {
 	Version         string
 	ArchiveFileName string
 	Checksum        string
@@ -71,17 +71,17 @@ type ToolDependency struct {
 
 // GetVersion returns the specified release corresponding the provided version,
 // or nil if not found.
-func (core *Core) GetVersion(version string) *Release {
+func (platform *Platform) GetVersion(version string) *PlatformRelease {
 	if version == "latest" {
-		return core.GetVersion(core.latestVersion())
+		return platform.GetVersion(platform.latestVersion())
 	}
-	return core.Releases[version]
+	return platform.Releases[version]
 }
 
 // Versions returns all the version numbers in this Core Package.
-func (core *Core) Versions() semver.Versions {
-	versions := make(semver.Versions, 0, len(core.Releases))
-	for _, release := range core.Releases {
+func (platform *Platform) Versions() semver.Versions {
+	versions := make(semver.Versions, 0, len(platform.Releases))
+	for _, release := range platform.Releases {
 		temp, err := semver.Make(release.Version)
 		if err == nil {
 			versions = append(versions, temp)
@@ -94,8 +94,8 @@ func (core *Core) Versions() semver.Versions {
 // latestVersion obtains latest version number.
 //
 // It uses lexicographics to compare version strings.
-func (core *Core) latestVersion() string {
-	versions := core.Versions()
+func (platform *Platform) latestVersion() string {
+	versions := platform.Versions()
 	if len(versions) > 0 {
 		max := versions[0]
 		for i := 1; i < len(versions); i++ {
@@ -108,20 +108,20 @@ func (core *Core) latestVersion() string {
 	return ""
 }
 
-func (core *Core) String() string {
-	res := fmt.Sprintln("Name        :", core.Name) +
-		fmt.Sprintln("Architecture:", core.Architecture) +
-		fmt.Sprintln("Category    :", core.Category)
-	if core.Releases != nil && len(core.Releases) > 0 {
+func (platform *Platform) String() string {
+	res := fmt.Sprintln("Name        :", platform.Name) +
+		fmt.Sprintln("Architecture:", platform.Architecture) +
+		fmt.Sprintln("Category    :", platform.Category)
+	if platform.Releases != nil && len(platform.Releases) > 0 {
 		res += "Releases:\n"
-		for _, release := range core.Releases {
+		for _, release := range platform.Releases {
 			res += fmt.Sprintln(release)
 		}
 	}
 	return res
 }
 
-func (release *Release) String() string {
+func (release *PlatformRelease) String() string {
 	return fmt.Sprintln("  Version           : ", release.Version) +
 		fmt.Sprintln("  Boards            :") +
 		fmt.Sprintln(strings.Join(release.Boards, ", ")) +
@@ -132,7 +132,7 @@ func (release *Release) String() string {
 }
 
 // OpenLocalArchiveForDownload Creates an empty file if not found.
-func (release Release) OpenLocalArchiveForDownload() (*os.File, error) {
+func (release PlatformRelease) OpenLocalArchiveForDownload() (*os.File, error) {
 	path, err := releases.ArchivePath(release)
 	if err != nil {
 		return nil, err
@@ -149,31 +149,31 @@ func (release Release) OpenLocalArchiveForDownload() (*os.File, error) {
 // Implementation of Release interface
 
 // ExpectedChecksum returns the expected checksum for this release.
-func (release Release) ExpectedChecksum() string {
+func (release PlatformRelease) ExpectedChecksum() string {
 	return release.Checksum
 }
 
 // ArchiveName returns the archive file name (not the path)
-func (release Release) ArchiveName() string {
+func (release PlatformRelease) ArchiveName() string {
 	return release.ArchiveFileName
 }
 
 // ArchiveSize returns the archive size.
-func (release Release) ArchiveSize() int64 {
+func (release PlatformRelease) ArchiveSize() int64 {
 	return release.Size
 }
 
 // ArchiveURL returns the archive URL.
-func (release Release) ArchiveURL() string {
+func (release PlatformRelease) ArchiveURL() string {
 	return release.URL
 }
 
 // GetDownloadCacheFolder returns the path of the staging folders for this release.
-func (release Release) GetDownloadCacheFolder() (string, error) {
+func (release PlatformRelease) GetDownloadCacheFolder() (string, error) {
 	return configs.DownloadCacheFolder("packages").Get()
 }
 
 // VersionName represents the version of the release.
-func (release Release) VersionName() string {
+func (release PlatformRelease) VersionName() string {
 	return release.Version
 }

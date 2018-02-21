@@ -46,17 +46,17 @@ type Index struct {
 
 // indexPackage represents a single entry from package_index.json file.
 type indexPackage struct {
-	Name       string              `json:"name,required"`
-	Maintainer string              `json:"maintainer,required"`
-	WebsiteURL string              `json:"websiteUrl"`
-	Email      string              `json:"email"`
-	Platforms  []*indexCoreRelease `json:"platforms,required"`
-	Tools      []*indexToolRelease `json:"tools,required"`
-	Help       indexHelpRelease    `json:"help,omitempty"`
+	Name       string                  `json:"name,required"`
+	Maintainer string                  `json:"maintainer,required"`
+	WebsiteURL string                  `json:"websiteUrl"`
+	Email      string                  `json:"email"`
+	Platforms  []*indexPlatformRelease `json:"platforms,required"`
+	Tools      []*indexToolRelease     `json:"tools,required"`
+	Help       indexHelp               `json:"help,omitempty"`
 }
 
-// indexCoreRelease represents a single Core Platform from package_index.json file.
-type indexCoreRelease struct {
+// indexPlatformRelease represents a single Core Platform from package_index.json file.
+type indexPlatformRelease struct {
 	Name             string                `json:"name,required"`
 	Architecture     string                `json:"architecture"`
 	Version          string                `json:"version,required"`
@@ -65,8 +65,8 @@ type indexCoreRelease struct {
 	ArchiveFileName  string                `json:"archiveFileName,required"`
 	Checksum         string                `json:"checksum,required"`
 	Size             int64                 `json:"size,required,string"`
-	Boards           []indexBoardRelease   `json:"boards"`
-	Help             indexHelpRelease      `json:"help,omitempty"`
+	BoardsNames      []indexBoardName      `json:"boards"`
+	Help             indexHelp             `json:"help,omitempty"`
 	ToolDependencies []indexToolDependency `json:"toolsDependencies, required"`
 }
 
@@ -79,13 +79,13 @@ type indexToolDependency struct {
 
 // indexToolRelease represents a single Tool from package_index.json file.
 type indexToolRelease struct {
-	Name    string                `json:"name,required"`
-	Version string                `json:"version,required"`
-	Systems []indexFlavourRelease `json:"systems,required"`
+	Name    string                    `json:"name,required"`
+	Version string                    `json:"version,required"`
+	Systems []indexToolReleaseFlavour `json:"systems,required"`
 }
 
-//indexFlavourRelease represents a single flavour in the package_index.json file.
-type indexFlavourRelease struct {
+// indexToolReleaseFlavour represents a single tool flavour in the package_index.json file.
+type indexToolReleaseFlavour struct {
 	OS              string `json:"host,required"`
 	URL             string `json:"url,required"`
 	ArchiveFileName string `json:"archiveFileName,required"`
@@ -93,46 +93,58 @@ type indexFlavourRelease struct {
 	Checksum        string `json:"checksum,required"`
 }
 
-// indexBoardRelease represents a single Board as written in package_index.json file.
-type indexBoardRelease struct {
+// indexBoardName represents a single Board as written in package_index.json file.
+type indexBoardName struct {
 	Name string
 }
 
-type indexHelpRelease struct {
+type indexHelp struct {
 	Online string `json:"online,omitempty"`
 }
 
-func (packag indexPackage) extractPackage() (pm *Package) {
-	pm = &Package{
-		Name:       packag.Name,
-		Maintainer: packag.Maintainer,
-		WebsiteURL: packag.WebsiteURL,
-		Email:      packag.Email,
-		Cores:      make(map[string]*Core, len(packag.Platforms)),
-		Tools:      make(map[string]*Tool, len(packag.Tools)),
+func (pack indexPackage) extractPackage() *Package {
+	p := &Package{
+		Name:       pack.Name,
+		Maintainer: pack.Maintainer,
+		WebsiteURL: pack.WebsiteURL,
+		Email:      pack.Email,
+		Plaftorms:  map[string]*Platform{},
+		Tools:      map[string]*Tool{},
 	}
 
-	for _, tool := range packag.Tools {
-		pm.addTool(tool)
-	}
-	for _, core := range packag.Platforms {
-		pm.addCore(core)
+	for _, tool := range pack.Tools {
+		name := tool.Name
+		if p.Tools[name] == nil {
+			p.Tools[name] = tool.extractTool()
+		} else {
+			p.Tools[name].Releases[tool.Version] = tool.extractRelease()
+		}
 	}
 
-	return
+	for _, platform := range pack.Platforms {
+		name := platform.Architecture
+		if p.Plaftorms[name] == nil {
+			p.Plaftorms[name] = platform.extractPlatform()
+		} else {
+			release := platform.extractRelease()
+			p.Plaftorms[name].Releases[release.Version] = release
+		}
+	}
+
+	return p
 }
 
-func (release indexCoreRelease) extractCore() *Core {
-	return &Core{
+func (release indexPlatformRelease) extractPlatform() *Platform {
+	return &Platform{
 		Name:         release.Name,
 		Architecture: release.Architecture,
 		Category:     release.Category,
-		Releases:     map[string]*Release{release.Version: release.extractRelease()},
+		Releases:     map[string]*PlatformRelease{release.Version: release.extractRelease()},
 	}
 }
 
-func (release indexCoreRelease) extractRelease() *Release {
-	return &Release{
+func (release indexPlatformRelease) extractRelease() *PlatformRelease {
+	return &PlatformRelease{
 		Version:         release.Version,
 		ArchiveFileName: release.ArchiveFileName,
 		Checksum:        release.Checksum,
@@ -143,7 +155,7 @@ func (release indexCoreRelease) extractRelease() *Release {
 	}
 }
 
-func (release indexCoreRelease) extractDeps() ToolDependencies {
+func (release indexPlatformRelease) extractDeps() ToolDependencies {
 	ret := make(ToolDependencies, len(release.ToolDependencies))
 	for i, dep := range release.ToolDependencies {
 		ret[i] = &ToolDependency{
@@ -155,9 +167,9 @@ func (release indexCoreRelease) extractDeps() ToolDependencies {
 	return ret
 }
 
-func (release indexCoreRelease) extractBoards() []string {
-	boards := make([]string, len(release.Boards))
-	for i, board := range release.Boards {
+func (release indexPlatformRelease) extractBoards() []string {
+	boards := make([]string, len(release.BoardsNames))
+	for i, board := range release.BoardsNames {
 		boards[i] = board.Name
 	}
 	return boards
@@ -165,11 +177,11 @@ func (release indexCoreRelease) extractBoards() []string {
 
 // extractTool extracts a Tool object from an indexToolRelease entry.
 func (itr indexToolRelease) extractTool() *Tool {
-	releases := make(map[string]*ToolRelease, len(itr.Systems))
-	releases[itr.Version] = itr.extractRelease()
 	return &Tool{
-		Name:     itr.Name,
-		Releases: releases,
+		Name: itr.Name,
+		Releases: map[string]*ToolRelease{
+			itr.Version: itr.extractRelease(),
+		},
 	}
 }
 
