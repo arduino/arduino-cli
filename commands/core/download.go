@@ -36,7 +36,6 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
-	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -67,21 +66,21 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	}
 
 	logrus.Info("Preparing download")
-	IDTuples := cores.ParseArgs(args)
 
-	coresToDownload, toolsToDownload, failOutputs := status.Process(IDTuples)
+	coresToDownload, toolsToDownload, failOutputs := findDownloadItems(status, parsePlatformReferenceArgs(args))
 	outputResults := output.CoreProcessResults{
 		Cores: failOutputs,
-		Tools: make([]output.ProcessResult, 0, 10),
+		Tools: []output.ProcessResult{},
 	}
-	downloads := make([]releases.DownloadItem, len(toolsToDownload))
+
+	downloads := []releases.DownloadItem{}
 	for i := range toolsToDownload {
 		downloads[i] = toolsToDownload[i].DownloadItem
 	}
-
 	logrus.Info("Downloading tool dependencies of all cores requested")
 	releases.ParallelDownload(downloads, true, "Downloaded", &outputResults.Tools, "tool")
-	downloads = make([]releases.DownloadItem, len(coresToDownload))
+
+	downloads = []releases.DownloadItem{}
 	for i := range coresToDownload {
 		downloads[i] = coresToDownload[i].DownloadItem
 	}

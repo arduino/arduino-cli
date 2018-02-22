@@ -34,9 +34,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/common/releases"
-
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/pmylund/sortutil"
 )
 
@@ -126,94 +123,4 @@ func (sc StatusContext) GetDepsOfPlatformRelease(release *PlatformRelease) ([]Co
 		})
 	}
 	return ret, nil
-}
-
-// Process takes a set of ID tuples and returns
-// a set of items to download and a set of outputs for non
-// existing cores.
-func (sc StatusContext) Process(items []CoreIDTuple) ([]DownloadItem, []DownloadItem, []output.ProcessResult) {
-	itemC := len(items)
-	retCores := make([]DownloadItem, 0, itemC)
-	retTools := make([]DownloadItem, 0, itemC)
-	fails := make([]output.ProcessResult, 0, itemC)
-
-	// value is not used, this map is only to check if an item is inside (set implementation)
-	// see https://stackoverflow.com/questions/34018908/golang-why-dont-we-have-a-set-datastructure
-	presenceMap := make(map[string]bool, itemC)
-
-	for _, item := range items {
-		if item.Package == "invalid-arg" {
-			fails = append(fails, output.ProcessResult{
-				ItemName: item.CoreName,
-				Error:    "Invalid item (not PACKAGER:CORE[=VERSION])",
-			})
-			continue
-		}
-		pkg, exists := sc.Packages[item.Package]
-		if !exists {
-			fails = append(fails, output.ProcessResult{
-				ItemName: item.CoreName,
-				Error:    fmt.Sprintf("Package %s not found", item.Package),
-			})
-			continue
-		}
-		core, exists := pkg.Plaftorms[item.CoreName]
-		if !exists {
-			fails = append(fails, output.ProcessResult{
-				ItemName: item.CoreName,
-				Error:    "Core not found",
-			})
-			continue
-		}
-
-		_, exists = presenceMap[item.CoreName]
-		if exists { //skip
-			continue
-		}
-
-		release := core.GetVersion(item.CoreVersion)
-		if release == nil {
-			fails = append(fails, output.ProcessResult{
-				ItemName: item.CoreName,
-				Error:    fmt.Sprintf("Version %s Not Found", item.CoreVersion),
-			})
-			continue
-		}
-
-		// replaces "latest" with latest version too
-		deps, err := sc.GetDepsOfPlatformRelease(release)
-		if err != nil {
-			fails = append(fails, output.ProcessResult{
-				ItemName: item.CoreName,
-				Error:    fmt.Sprintf("Cannot get tool dependencies of %s core: %s", core.Name, err.Error()),
-			})
-			continue
-		}
-
-		retCores = append(retCores, DownloadItem{
-			Package: pkg.Name,
-			DownloadItem: releases.DownloadItem{
-				Name:    core.Architecture,
-				Release: release,
-			},
-		})
-
-		presenceMap[core.Name] = true
-		for _, tool := range deps {
-			_, exists = presenceMap[tool.ToolName]
-			if exists { //skip
-				continue
-			}
-
-			presenceMap[tool.ToolName] = true
-			retTools = append(retTools, DownloadItem{
-				Package: pkg.Name,
-				DownloadItem: releases.DownloadItem{
-					Name:    tool.ToolName,
-					Release: tool.Release,
-				},
-			})
-		}
-	}
-	return retCores, retTools, fails
 }
