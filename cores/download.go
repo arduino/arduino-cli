@@ -30,20 +30,53 @@
 package cores
 
 import (
-	"github.com/bcmi-labs/arduino-cli/common"
+	"regexp"
+	"strings"
+
 	"github.com/bcmi-labs/arduino-cli/common/releases"
 )
 
-// packageIndexURL contains the index URL for core packages.
-const packageIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
+// CoreIDTuple represents a tuple to identify a Core
+type CoreIDTuple struct {
+	Package     string // The package where this core belongs to.
+	CoreName    string // The core name.
+	CoreVersion string // The version of the core, to get the release.
+}
+
+var coreTupleRegexp = regexp.MustCompile("[a-zA-Z0-9]+:[a-zA-Z0-9]+(=([0-9]|[0-9].)*[0-9]+)?")
+
+// ParseArgs parses a sequence of "packager:name=version" tokens and returns a CoreIDTuple slice.
+//
+// If version is not present it is assumed as "latest" version.
+func ParseArgs(args []string) []CoreIDTuple {
+	ret := make([]CoreIDTuple, 0, 5)
+
+	for _, arg := range args {
+		if coreTupleRegexp.MatchString(arg) {
+			// splits the string according to regexp into its components.
+			split := strings.FieldsFunc(arg, func(r rune) bool {
+				return r == '=' || r == ':'
+			})
+			if len(split) < 3 {
+				split = append(split, "latest")
+			}
+			ret = append(ret, CoreIDTuple{
+				Package:     split[0],
+				CoreName:    split[1],
+				CoreVersion: split[2],
+			})
+		} else {
+			ret = append(ret, CoreIDTuple{
+				Package:  "invalid-arg",
+				CoreName: arg,
+			})
+		}
+	}
+	return ret
+}
 
 // DownloadItem represents a core or tool download struct.
 type DownloadItem struct {
 	Package string
 	releases.DownloadItem
-}
-
-// DownloadPackagesFile downloads the core packages index file from arduino repository.
-func DownloadPackagesFile() error {
-	return common.DownloadIndex(coreIndexPath, packageIndexURL)
 }

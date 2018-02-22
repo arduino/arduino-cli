@@ -31,16 +31,17 @@ package prettyPrints
 
 import (
 	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/cores/packageindex"
 	"github.com/bcmi-labs/arduino-cli/task"
 )
 
 // DownloadCoreFileIndex shows info regarding the download of a missing (or corrupted) file index of core packages.
 func DownloadCoreFileIndex() task.Wrapper {
-	return DownloadFileIndex(cores.DownloadPackagesFile)
+	return DownloadFileIndex(packageindex.DownloadPackagesFile)
 }
 
 // CorruptedCoreIndexFix pretty prints messages regarding corrupted index fixes of cores.
-func CorruptedCoreIndexFix(index cores.Index) (cores.StatusContext, error) {
+func CorruptedCoreIndexFix(index packageindex.Index) (cores.StatusContext, error) {
 	downloadTask := DownloadCoreFileIndex()
 	parseTask := coreIndexParse(index)
 
@@ -50,10 +51,10 @@ func CorruptedCoreIndexFix(index cores.Index) (cores.StatusContext, error) {
 }
 
 // coreIndexParse pretty prints info about parsing an index file of libraries.
-func coreIndexParse(index cores.Index) task.Wrapper {
+func coreIndexParse(index packageindex.Index) task.Wrapper {
 	ret := indexParseWrapperSkeleton()
 	ret.Task = task.Task(func() task.Result {
-		err := cores.LoadIndex(&index) // I try again
+		err := packageindex.LoadIndex(&index) // I try again
 		status := index.CreateStatusContext()
 		return task.Result{
 			Result: status,

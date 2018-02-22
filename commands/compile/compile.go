@@ -44,6 +44,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/cores/packageindex"
 	"github.com/bcmi-labs/arduino-cli/sketches"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -195,8 +196,8 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrBadCall)
 	}
 	// Add dependency tools paths to build properties with versions corresponding to specific core version.
-	var packageIndex cores.Index
-	cores.LoadIndex(&packageIndex)
+	var packageIndex packageindex.Index
+	packageindex.LoadIndex(&packageIndex)
 	for _, packageFromIndex := range packageIndex.Packages {
 		if packageFromIndex.Name == packageName {
 			for _, platformFromIndex := range packageFromIndex.Platforms {

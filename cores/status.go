@@ -101,17 +101,6 @@ func (tdep ToolDependency) extractRelease(sc StatusContext) (*ToolRelease, error
 	return release, nil
 }
 
-// CreateStatusContext creates a status context from index data.
-func (index Index) CreateStatusContext() StatusContext {
-	packages := map[string]*Package{}
-	for _, p := range index.Packages {
-		packages[p.Name] = p.extractPackage()
-	}
-	return StatusContext{
-		Packages: packages,
-	}
-}
-
 // GetDepsOfPlatformRelease returns the deps of a specified release of a core.
 func (sc StatusContext) GetDepsOfPlatformRelease(release *PlatformRelease) ([]CoreDependency, error) {
 	if release == nil {

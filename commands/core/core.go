@@ -37,6 +37,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common/formatter/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/cores/packageindex"
 	"github.com/bcmi-labs/arduino-cli/pathutils"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -107,8 +108,8 @@ func getInstalledStuff(stuff *[]output.InstalledStuff, folder pathutils.Path) {
 }
 
 func getPackagesStatusContext() (*cores.StatusContext, error) {
-	var index cores.Index
-	err := cores.LoadIndex(&index)
+	var index packageindex.Index
+	err := packageindex.LoadIndex(&index)
 	if err != nil {
 		status, err := prettyPrints.CorruptedCoreIndexFix(index)
 		if err != nil {

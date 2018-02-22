@@ -27,14 +27,19 @@
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package cores
+package packageindex
 
 import (
 	"encoding/json"
 	"io/ioutil"
 
+	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/bcmi-labs/arduino-cli/cores"
 )
+
+// packageIndexURL contains the index URL for core packages.
+const packageIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
 
 // coreIndexPath returns the path of the index file for libraries.
 var coreIndexPath = configs.IndexPath("package_index.json")
@@ -102,14 +107,25 @@ type indexHelp struct {
 	Online string `json:"online,omitempty"`
 }
 
-func (pack indexPackage) extractPackage() *Package {
-	p := &Package{
+// CreateStatusContext creates a status context from index data.
+func (index Index) CreateStatusContext() cores.StatusContext {
+	packages := map[string]*cores.Package{}
+	for _, p := range index.Packages {
+		packages[p.Name] = p.extractPackage()
+	}
+	return cores.StatusContext{
+		Packages: packages,
+	}
+}
+
+func (pack indexPackage) extractPackage() *cores.Package {
+	p := &cores.Package{
 		Name:       pack.Name,
 		Maintainer: pack.Maintainer,
 		WebsiteURL: pack.WebsiteURL,
 		Email:      pack.Email,
-		Plaftorms:  map[string]*Platform{},
-		Tools:      map[string]*Tool{},
+		Plaftorms:  map[string]*cores.Platform{},
+		Tools:      map[string]*cores.Tool{},
 	}
 
 	for _, tool := range pack.Tools {
@@ -134,17 +150,17 @@ func (pack indexPackage) extractPackage() *Package {
 	return p
 }
 
-func (release indexPlatformRelease) extractPlatform() *Platform {
-	return &Platform{
+func (release indexPlatformRelease) extractPlatform() *cores.Platform {
+	return &cores.Platform{
 		Name:         release.Name,
 		Architecture: release.Architecture,
 		Category:     release.Category,
-		Releases:     map[string]*PlatformRelease{release.Version: release.extractRelease()},
+		Releases:     map[string]*cores.PlatformRelease{release.Version: release.extractRelease()},
 	}
 }
 
-func (release indexPlatformRelease) extractRelease() *PlatformRelease {
-	return &PlatformRelease{
+func (release indexPlatformRelease) extractRelease() *cores.PlatformRelease {
+	return &cores.PlatformRelease{
 		Version:         release.Version,
 		ArchiveFileName: release.ArchiveFileName,
 		Checksum:        release.Checksum,
@@ -155,10 +171,10 @@ func (release indexPlatformRelease) extractRelease() *PlatformRelease {
 	}
 }
 
-func (release indexPlatformRelease) extractDeps() ToolDependencies {
-	ret := make(ToolDependencies, len(release.ToolDependencies))
+func (release indexPlatformRelease) extractDeps() cores.ToolDependencies {
+	ret := make(cores.ToolDependencies, len(release.ToolDependencies))
 	for i, dep := range release.ToolDependencies {
-		ret[i] = &ToolDependency{
+		ret[i] = &cores.ToolDependency{
 			ToolName:     dep.Name,
 			ToolVersion:  dep.Version,
 			ToolPackager: dep.Packager,
@@ -176,28 +192,28 @@ func (release indexPlatformRelease) extractBoards() []string {
 }
 
 // extractTool extracts a Tool object from an indexToolRelease entry.
-func (itr indexToolRelease) extractTool() *Tool {
-	return &Tool{
+func (itr indexToolRelease) extractTool() *cores.Tool {
+	return &cores.Tool{
 		Name: itr.Name,
-		Releases: map[string]*ToolRelease{
+		Releases: map[string]*cores.ToolRelease{
 			itr.Version: itr.extractRelease(),
 		},
 	}
 }
 
 // extractRelease extracts a ToolRelease object from an indexToolRelease entry.
-func (itr indexToolRelease) extractRelease() *ToolRelease {
-	return &ToolRelease{
+func (itr indexToolRelease) extractRelease() *cores.ToolRelease {
+	return &cores.ToolRelease{
 		Version:  itr.Version,
 		Flavours: itr.extractFlavours(),
 	}
 }
 
 // extractFlavours extracts a map[OS]Flavour object from an indexToolRelease entry.
-func (itr indexToolRelease) extractFlavours() []*Flavour {
-	ret := make([]*Flavour, len(itr.Systems))
+func (itr indexToolRelease) extractFlavours() []*cores.Flavour {
+	ret := make([]*cores.Flavour, len(itr.Systems))
 	for i, flavour := range itr.Systems {
-		ret[i] = &Flavour{
+		ret[i] = &cores.Flavour{
 			OS:              flavour.OS,
 			ArchiveFileName: flavour.ArchiveFileName,
 			Checksum:        flavour.Checksum,
@@ -227,4 +243,9 @@ func LoadIndex(index *Index) error {
 	}
 
 	return nil
+}
+
+// DownloadPackagesFile downloads the core packages index file from arduino repository.
+func DownloadPackagesFile() error {
+	return common.DownloadIndex(coreIndexPath, packageIndexURL)
 }
