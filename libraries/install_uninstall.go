@@ -32,7 +32,6 @@ package libraries
 import (
 	"archive/zip"
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -101,6 +100,6 @@ func removeRelease(libName string, r *Release) error {
 
 	libName = strings.Replace(libName, " ", "_", -1)
 
-	path := filepath.Join(libFolder, fmt.Sprintf("%s-%s", libName, r.Version))
+	path := filepath.Join(libFolder, libName)
 	return Uninstall(path)
 }

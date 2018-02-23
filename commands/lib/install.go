@@ -30,7 +30,6 @@
 package lib
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -100,7 +99,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 				Error:    err.Error(),
 			}
 		} else {
-			outputResults.Libraries[i].Path = filepath.Join(folder, fmt.Sprintf("%s-%s", item.Name, item.Release.VersionName()))
+			outputResults.Libraries[i].Path = filepath.Join(folder, item.Name)
 		}
 	}
 
