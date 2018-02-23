@@ -31,32 +31,29 @@ package cores
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/common/releases"
-	"github.com/bcmi-labs/arduino-cli/configs"
 
 	"github.com/blang/semver"
 )
 
 // Platform represents a platform package.
 type Platform struct {
-	Name         string                      // The name of the Core Package.
-	Architecture string                      // The name of the architecture of this package.
-	Category     string                      // The category which this core package belongs to.
-	Releases     map[string]*PlatformRelease // The Releases of this core package, labeled by version.
+	Name          string                      // The name of the Core Package.
+	Architecture  string                      // The name of the architecture of this package.
+	Category      string                      // The category which this core package belongs to.
+	Releases      map[string]*PlatformRelease // The Releases of this core package, labeled by version.
+	ParentPackage *Package                    `json:"-"`
 }
 
 // PlatformRelease represents a release of a core package.
 type PlatformRelease struct {
-	Version         string
-	ArchiveFileName string
-	Checksum        string
-	Size            int64
-	Boards          []string
-	URL             string
-	Dependencies    ToolDependencies // The Dependency entries to load tools.
+	Resource     *releases.DownloadResource
+	Version      string
+	Boards       []string
+	Dependencies ToolDependencies // The Dependency entries to load tools.
+	Platform     *Platform        `json:"-"`
 }
 
 // ToolDependencies is a set of tuples representing summary data of a tool dependency set.
@@ -125,55 +122,8 @@ func (release *PlatformRelease) String() string {
 	return fmt.Sprintln("  Version           : ", release.Version) +
 		fmt.Sprintln("  Boards            :") +
 		fmt.Sprintln(strings.Join(release.Boards, ", ")) +
-		fmt.Sprintln("  Archive File Name :", release.ArchiveFileName) +
-		fmt.Sprintln("  Checksum          :", release.Checksum) +
-		fmt.Sprintln("  File Size         :", release.Size) +
-		fmt.Sprintln("  URL               :", release.URL)
-}
-
-// OpenLocalArchiveForDownload Creates an empty file if not found.
-func (release PlatformRelease) OpenLocalArchiveForDownload() (*os.File, error) {
-	path, err := releases.ArchivePath(release)
-	if err != nil {
-		return nil, err
-	}
-	stats, err := os.Stat(path)
-	if os.IsNotExist(err) || err == nil && stats.Size() >= release.Size {
-		return os.Create(path)
-	} else if err != nil {
-		return nil, err
-	}
-	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
-}
-
-// Implementation of Release interface
-
-// ExpectedChecksum returns the expected checksum for this release.
-func (release PlatformRelease) ExpectedChecksum() string {
-	return release.Checksum
-}
-
-// ArchiveName returns the archive file name (not the path)
-func (release PlatformRelease) ArchiveName() string {
-	return release.ArchiveFileName
-}
-
-// ArchiveSize returns the archive size.
-func (release PlatformRelease) ArchiveSize() int64 {
-	return release.Size
-}
-
-// ArchiveURL returns the archive URL.
-func (release PlatformRelease) ArchiveURL() string {
-	return release.URL
-}
-
-// GetDownloadCacheFolder returns the path of the staging folders for this release.
-func (release PlatformRelease) GetDownloadCacheFolder() (string, error) {
-	return configs.DownloadCacheFolder("packages").Get()
-}
-
-// VersionName represents the version of the release.
-func (release PlatformRelease) VersionName() string {
-	return release.Version
+		fmt.Sprintln("  Archive File Name :", release.Resource.ArchiveFileName) +
+		fmt.Sprintln("  Checksum          :", release.Resource.Checksum) +
+		fmt.Sprintln("  File Size         :", release.Resource.Size) +
+		fmt.Sprintln("  URL               :", release.Resource.URL)
 }

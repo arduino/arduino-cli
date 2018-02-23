@@ -46,7 +46,7 @@ import (
 var Uninstall = os.RemoveAll
 
 // Install installs a library.
-func Install(name string, release releases.Release) error {
+func Install(name string, release *releases.DownloadResource) error {
 	if release == nil {
 		return errors.New("Not existing version of the library")
 	}

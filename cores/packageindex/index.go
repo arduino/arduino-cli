@@ -33,6 +33,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
+	"github.com/bcmi-labs/arduino-cli/common/releases"
+
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
@@ -109,13 +111,14 @@ type indexHelp struct {
 
 // CreateStatusContext creates a status context from index data.
 func (index Index) CreateStatusContext() cores.StatusContext {
-	packages := map[string]*cores.Package{}
+	res := cores.StatusContext{
+		Packages: map[string]*cores.Package{},
+	}
 	for _, p := range index.Packages {
-		packages[p.Name] = p.extractPackage()
+		res.Packages[p.Name] = p.extractPackage()
+		res.Packages[p.Name].ParentIndex = &res
 	}
-	return cores.StatusContext{
-		Packages: packages,
-	}
+	return res
 }
 
 func (pack indexPackage) extractPackage() *cores.Package {
@@ -132,19 +135,21 @@ func (pack indexPackage) extractPackage() *cores.Package {
 		name := tool.Name
 		if p.Tools[name] == nil {
 			p.Tools[name] = tool.extractTool()
-		} else {
-			p.Tools[name].Releases[tool.Version] = tool.extractRelease()
+			p.Tools[name].ParentPackage = p
 		}
+		p.Tools[name].Releases[tool.Version] = tool.extractToolRelease()
+		p.Tools[name].Releases[tool.Version].Tool = p.Tools[name]
 	}
 
 	for _, platform := range pack.Platforms {
 		name := platform.Architecture
 		if p.Plaftorms[name] == nil {
 			p.Plaftorms[name] = platform.extractPlatform()
-		} else {
-			release := platform.extractRelease()
-			p.Plaftorms[name].Releases[release.Version] = release
+			p.Plaftorms[name].ParentPackage = p
 		}
+		release := platform.extractPlatformRelease()
+		release.Platform = p.Plaftorms[name]
+		p.Plaftorms[name].Releases[release.Version] = release
 	}
 
 	return p
@@ -155,19 +160,22 @@ func (release indexPlatformRelease) extractPlatform() *cores.Platform {
 		Name:         release.Name,
 		Architecture: release.Architecture,
 		Category:     release.Category,
-		Releases:     map[string]*cores.PlatformRelease{release.Version: release.extractRelease()},
+		Releases:     map[string]*cores.PlatformRelease{},
 	}
 }
 
-func (release indexPlatformRelease) extractRelease() *cores.PlatformRelease {
+func (release indexPlatformRelease) extractPlatformRelease() *cores.PlatformRelease {
 	return &cores.PlatformRelease{
-		Version:         release.Version,
-		ArchiveFileName: release.ArchiveFileName,
-		Checksum:        release.Checksum,
-		Size:            release.Size,
-		URL:             release.URL,
-		Boards:          release.extractBoards(),
-		Dependencies:    release.extractDeps(),
+		Version: release.Version,
+		Resource: &releases.DownloadResource{
+			ArchiveFileName: release.ArchiveFileName,
+			Checksum:        release.Checksum,
+			Size:            release.Size,
+			URL:             release.URL,
+			CachePath:       "packages",
+		},
+		Boards:       release.extractBoards(),
+		Dependencies: release.extractDeps(),
 	}
 }
 
@@ -194,15 +202,13 @@ func (release indexPlatformRelease) extractBoards() []string {
 // extractTool extracts a Tool object from an indexToolRelease entry.
 func (itr indexToolRelease) extractTool() *cores.Tool {
 	return &cores.Tool{
-		Name: itr.Name,
-		Releases: map[string]*cores.ToolRelease{
-			itr.Version: itr.extractRelease(),
-		},
+		Name:     itr.Name,
+		Releases: map[string]*cores.ToolRelease{},
 	}
 }
 
 // extractRelease extracts a ToolRelease object from an indexToolRelease entry.
-func (itr indexToolRelease) extractRelease() *cores.ToolRelease {
+func (itr indexToolRelease) extractToolRelease() *cores.ToolRelease {
 	return &cores.ToolRelease{
 		Version:  itr.Version,
 		Flavours: itr.extractFlavours(),
@@ -214,11 +220,14 @@ func (itr indexToolRelease) extractFlavours() []*cores.Flavour {
 	ret := make([]*cores.Flavour, len(itr.Systems))
 	for i, flavour := range itr.Systems {
 		ret[i] = &cores.Flavour{
-			OS:              flavour.OS,
-			ArchiveFileName: flavour.ArchiveFileName,
-			Checksum:        flavour.Checksum,
-			Size:            flavour.Size,
-			URL:             flavour.URL,
+			OS: flavour.OS,
+			Resource: &releases.DownloadResource{
+				ArchiveFileName: flavour.ArchiveFileName,
+				Checksum:        flavour.Checksum,
+				Size:            flavour.Size,
+				URL:             flavour.URL,
+				CachePath:       "packages",
+			},
 		}
 	}
 	return ret

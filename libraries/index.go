@@ -33,6 +33,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
+	"github.com/bcmi-labs/arduino-cli/common/releases"
+
 	"github.com/bcmi-labs/arduino-cli/configs"
 )
 
@@ -87,11 +89,14 @@ func LoadIndex(index *Index) error {
 // in this index element
 func (indexLib *indexRelease) extractRelease() *Release {
 	return &Release{
-		Version:         indexLib.Version,
-		URL:             indexLib.URL,
-		ArchiveFileName: indexLib.ArchiveFileName,
-		Size:            indexLib.Size,
-		Checksum:        indexLib.Checksum,
+		Version: indexLib.Version,
+		Resource: &releases.DownloadResource{
+			URL:             indexLib.URL,
+			ArchiveFileName: indexLib.ArchiveFileName,
+			Size:            indexLib.Size,
+			Checksum:        indexLib.Checksum,
+			CachePath:       "libraries",
+		},
 	}
 
 }

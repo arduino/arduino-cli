@@ -36,7 +36,6 @@ import (
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/sirupsen/logrus"
@@ -74,50 +73,40 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	failOutputsCount := len(failOutputs)
 	outputResults := output.CoreProcessResults{
 		Cores: failOutputs,
-		Tools: make([]output.ProcessResult, 0, 10),
+		Tools: []output.ProcessResult{},
 	}
 
-	downloads := []releases.DownloadItem{}
-	for i := range toolsToDownload {
-		downloads[i] = toolsToDownload[i].DownloadItem
-	}
-	logrus.Info("Downloading tool dependencies of all cores requested")
-	releases.ParallelDownload(downloads, false, "Downloaded", &outputResults.Tools, "tool")
+	downloadToolsArchives(toolsToDownload, &outputResults)
 
-	downloads = []releases.DownloadItem{}
-	for i := range coresToDownload {
-		downloads[i] = coresToDownload[i].DownloadItem
-	}
-	logrus.Info("Downloading cores")
-	releases.ParallelDownload(downloads, false, "Downloaded", &outputResults.Cores, "core")
+	downloadPlatformArchives(coresToDownload, &outputResults)
 
 	logrus.Info("Installing tool dependencies")
 	for i, item := range toolsToDownload {
-		logrus.WithField("Package", item.Package).
-			WithField("Name", item.Name).
-			WithField("Version", item.Release.VersionName()).
+		logrus.WithField("Package", item.Tool.ParentPackage.Name).
+			WithField("Name", item.Tool.Name).
+			WithField("Version", item.Version).
 			Info("Installing tool")
 
-		toolRoot, err := configs.ToolsFolder(item.Package).Get()
+		toolRoot, err := configs.ToolsFolder(item.Tool.ParentPackage.Name).Get()
 		if err != nil {
 			formatter.PrintError(err, "Cannot get tool install path, try again.")
 			os.Exit(commands.ErrCoreConfig)
 		}
-		possiblePath := filepath.Join(toolRoot, item.Name, item.Release.VersionName())
+		possiblePath := filepath.Join(toolRoot, item.Tool.Name, item.Version)
 
-		err = cores.InstallTool(item.Package, item.Name, item.Release)
+		err = cores.InstallTool(possiblePath, item.GetCompatibleFlavour())
 		if err != nil {
 			if os.IsExist(err) {
-				logrus.WithError(err).Warnf("Cannot install tool `%s`, it is already installed", item.Name)
+				logrus.WithError(err).Warnf("Cannot install tool `%s`, it is already installed", item.Tool.Name)
 				outputResults.Tools[i] = output.ProcessResult{
-					ItemName: item.Name,
+					ItemName: item.Tool.Name,
 					Status:   "Already Installed",
 					Path:     possiblePath,
 				}
 			} else {
-				logrus.WithError(err).Warnf("Cannot install tool `%s`", item.Name)
+				logrus.WithError(err).Warnf("Cannot install tool `%s`", item.Tool.Name)
 				outputResults.Tools[i] = output.ProcessResult{
-					ItemName: item.Name,
+					ItemName: item.Tool.Name,
 					Status:   "",
 					Error:    err.Error(),
 				}
@@ -125,7 +114,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		} else {
 			logrus.Info("Adding installed tool to final result")
 			outputResults.Tools[i] = output.ProcessResult{
-				ItemName: item.Name,
+				ItemName: item.Tool.Name,
 				Status:   "Installed",
 				Path:     possiblePath,
 			}
@@ -133,31 +122,31 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for i, item := range coresToDownload {
-		logrus.WithField("Package", item.Package).
-			WithField("Name", item.Name).
-			WithField("Version", item.Release.VersionName()).
+		logrus.WithField("Package", item.Platform.ParentPackage.Name).
+			WithField("Name", item.Platform.Name).
+			WithField("Version", item.Version).
 			Info("Installing core")
 
-		coreRoot, err := configs.CoresFolder(item.Package).Get()
+		coreRoot, err := configs.CoresFolder(item.Platform.ParentPackage.Name).Get()
 		if err != nil {
 			formatter.PrintError(err, "Cannot get core install path, try again.")
 			os.Exit(commands.ErrCoreConfig)
 		}
-		possiblePath := filepath.Join(coreRoot, item.Name, item.Release.VersionName())
+		possiblePath := filepath.Join(coreRoot, item.Platform.Name, item.Version)
 
-		err = cores.Install(item.Package, item.Name, item.Release)
+		err = cores.InstallPlatform(possiblePath, item.Resource)
 		if err != nil {
 			if os.IsExist(err) {
-				logrus.WithError(err).Warnf("Cannot install core `%s`, it is already installed", item.Name)
+				logrus.WithError(err).Warnf("Cannot install core `%s`, it is already installed", item.Platform.Name)
 				outputResults.Cores[i+failOutputsCount] = output.ProcessResult{
-					ItemName: item.Name,
+					ItemName: item.Platform.Name,
 					Status:   "Already Installed",
 					Path:     possiblePath,
 				}
 			} else {
-				logrus.WithError(err).Warnf("Cannot install core `%s`", item.Name)
+				logrus.WithError(err).Warnf("Cannot install core `%s`", item.Platform.Name)
 				outputResults.Cores[i+failOutputsCount] = output.ProcessResult{
-					ItemName: item.Name,
+					ItemName: item.Platform.Name,
 					Status:   "",
 					Error:    err.Error(),
 				}
@@ -166,7 +155,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			logrus.Info("Adding installed core to final result")
 
 			outputResults.Cores[i+failOutputsCount] = output.ProcessResult{
-				ItemName: item.Name,
+				ItemName: item.Platform.Name,
 				Status:   "Installed",
 				Path:     possiblePath,
 			}

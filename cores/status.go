@@ -32,7 +32,6 @@ package cores
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/pmylund/sortutil"
 )
@@ -44,22 +43,13 @@ type StatusContext struct {
 
 // Package represents a package in the system.
 type Package struct {
-	Name       string               // Name of the package.
-	Maintainer string               // Name of the maintainer.
-	WebsiteURL string               // Website of maintainer.
-	Email      string               // Email of maintainer.
-	Plaftorms  map[string]*Platform // The platforms in the system.
-	Tools      map[string]*Tool     // The tools in the system.
-}
-
-// CoreDependency is a representation of a parsed core dependency (single ToolRelease).
-type CoreDependency struct {
-	ToolName string       `json:"tool,required"`
-	Release  *ToolRelease `json:"release,required"`
-}
-
-func (cd CoreDependency) String() string {
-	return strings.TrimSpace(fmt.Sprintln(cd.ToolName, " v.", cd.Release.Version))
+	Name        string               // Name of the package.
+	Maintainer  string               // Name of the maintainer.
+	WebsiteURL  string               // Website of maintainer.
+	Email       string               // Email of maintainer.
+	Plaftorms   map[string]*Platform // The platforms in the system.
+	Tools       map[string]*Tool     // The tools in the system.
+	ParentIndex *StatusContext       `json:"-"`
 }
 
 // Names returns the array containing the name of the packages.
@@ -99,11 +89,11 @@ func (tdep ToolDependency) extractRelease(sc StatusContext) (*ToolRelease, error
 }
 
 // GetDepsOfPlatformRelease returns the deps of a specified release of a core.
-func (sc StatusContext) GetDepsOfPlatformRelease(release *PlatformRelease) ([]CoreDependency, error) {
+func (sc StatusContext) GetDepsOfPlatformRelease(release *PlatformRelease) ([]*ToolRelease, error) {
 	if release == nil {
 		return nil, errors.New("release cannot be nil")
 	}
-	ret := []CoreDependency{}
+	ret := []*ToolRelease{}
 	for _, dep := range release.Dependencies {
 		pkg, exists := sc.Packages[dep.ToolPackager]
 		if !exists {
@@ -117,10 +107,7 @@ func (sc StatusContext) GetDepsOfPlatformRelease(release *PlatformRelease) ([]Co
 		if !exists {
 			return nil, fmt.Errorf("Tool version %s not found", dep.ToolVersion)
 		}
-		ret = append(ret, CoreDependency{
-			ToolName: dep.ToolName,
-			Release:  toolRelease,
-		})
+		ret = append(ret, toolRelease)
 	}
 	return ret, nil
 }

@@ -90,8 +90,8 @@ func (sc StatusContext) Process(items []NameVersionPair) ([]DownloadItem, []outp
 				})
 			} else { // replaces "latest" with latest version too
 				ret = append(ret, DownloadItem{
-					Name:    library.Name,
-					Release: release,
+					Name:     library.Name,
+					Resource: release.Resource,
 				})
 			}
 		}

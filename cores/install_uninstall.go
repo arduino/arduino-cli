@@ -48,21 +48,10 @@ import (
 var DirPermissions os.FileMode = 0777
 
 // Install installs a specific release of a core.
-func Install(packager, arch string, release releases.Release) error {
+// TODO: But why not passing the Platform?
+func InstallPlatform(destCoresDir string, release *releases.DownloadResource) error {
 	if release == nil {
 		return errors.New("Not existing version of the core")
-	}
-
-	arduinoFolder, err := configs.ArduinoHomeFolder.Get()
-	if err != nil {
-		return err
-	}
-	tempFolder := filepath.Join(arduinoFolder, "tmp", "packages",
-		fmt.Sprintf("core-%d", time.Now().Unix()))
-
-	coresFolder, err := configs.CoresFolder(packager).Get()
-	if err != nil {
-		return err
 	}
 
 	cacheFilePath, err := releases.ArchivePath(release)
@@ -70,11 +59,27 @@ func Install(packager, arch string, release releases.Release) error {
 		return err
 	}
 
-	destCoresDirParent := filepath.Join(coresFolder, arch)
-	destCoresDir := filepath.Join(destCoresDirParent, release.VersionName())
+	// Make a temp folder
+	arduinoFolder, err := configs.ArduinoHomeFolder.Get()
+	if err != nil {
+		return err
+	}
+	tempFolder := filepath.Join(arduinoFolder, "tmp", "packages",
+		fmt.Sprintf("core-%d", time.Now().Unix()))
+	err = os.MkdirAll(tempFolder, DirPermissions)
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tempFolder)
 
+	// Make container dir
+	destCoresDirParent := filepath.Dir(destCoresDir)
+	err = os.MkdirAll(destCoresDirParent, DirPermissions)
+	if err != nil {
+		return err
+	}
 	defer func() {
-		//cleaning empty directories
+		// cleaning empty directories
 		if empty, _ := IsDirEmpty(destCoresDir); empty {
 			os.RemoveAll(destCoresDir)
 		}
@@ -82,17 +87,6 @@ func Install(packager, arch string, release releases.Release) error {
 			os.RemoveAll(destCoresDirParent)
 		}
 	}()
-
-	err = os.MkdirAll(tempFolder, DirPermissions)
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(tempFolder)
-
-	err = os.MkdirAll(destCoresDirParent, DirPermissions)
-	if err != nil {
-		return err
-	}
 
 	file, err := os.Open(cacheFilePath)
 	if err != nil {
@@ -124,21 +118,9 @@ func Install(packager, arch string, release releases.Release) error {
 }
 
 // InstallTool installs a specific release of a tool.
-func InstallTool(packager, name string, release releases.Release) error {
+func InstallTool(destToolsDir string, release *releases.DownloadResource) error {
 	if release == nil {
 		return errors.New("Not existing version of the tool")
-	}
-
-	arduinoFolder, err := configs.ArduinoHomeFolder.Get()
-	if err != nil {
-		return err
-	}
-	tempFolder := filepath.Join(arduinoFolder, "tmp", "tools",
-		fmt.Sprintf("tool-%d", time.Now().Unix()))
-
-	toolsFolder, err := configs.ToolsFolder(packager).Get()
-	if err != nil {
-		return err
 	}
 
 	cacheFilePath, err := releases.ArchivePath(release)
@@ -146,11 +128,27 @@ func InstallTool(packager, name string, release releases.Release) error {
 		return err
 	}
 
-	destToolsDirParent := filepath.Join(toolsFolder, name)
-	destToolsDir := filepath.Join(destToolsDirParent, release.VersionName())
+	// Make a temp folder
+	arduinoFolder, err := configs.ArduinoHomeFolder.Get()
+	if err != nil {
+		return err
+	}
+	tempFolder := filepath.Join(arduinoFolder, "tmp", "tools",
+		fmt.Sprintf("tool-%d", time.Now().Unix()))
+	err = os.MkdirAll(tempFolder, DirPermissions)
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tempFolder)
 
+	// Make container dir
+	destToolsDirParent := filepath.Dir(destToolsDir)
+	err = os.MkdirAll(destToolsDirParent, DirPermissions)
+	if err != nil {
+		return err
+	}
 	defer func() {
-		//cleaning empty directories
+		// clean-up empty directories
 		if empty, _ := IsDirEmpty(destToolsDir); empty {
 			os.RemoveAll(destToolsDir)
 		}
@@ -158,17 +156,6 @@ func InstallTool(packager, name string, release releases.Release) error {
 			os.RemoveAll(destToolsDirParent)
 		}
 	}()
-
-	err = os.MkdirAll(tempFolder, DirPermissions)
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(tempFolder)
-
-	err = os.MkdirAll(destToolsDirParent, DirPermissions)
-	if err != nil {
-		return err
-	}
 
 	file, err := os.Open(cacheFilePath)
 	if err != nil {
@@ -202,8 +189,7 @@ func InstallTool(packager, name string, release releases.Release) error {
 	return nil
 }
 
-// IsDirEmpty returns if the directory specified by path is empty,
-// and an error if occurred.
+// IsDirEmpty returns true if the directory specified by path is empty.
 func IsDirEmpty(path string) (bool, error) {
 	f, err := os.Open(path)
 	if err != nil {

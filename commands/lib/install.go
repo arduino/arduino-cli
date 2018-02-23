@@ -91,7 +91,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for i, item := range libsToDownload {
-		err = libraries.Install(item.Name, item.Release)
+		err = libraries.Install(item.Name, item.Resource)
 		if err != nil {
 			logrus.WithError(err).Warn("Library", item.Name, "errored")
 			outputResults.Libraries[i] = output.ProcessResult{

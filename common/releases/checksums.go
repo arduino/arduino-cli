@@ -61,10 +61,10 @@ func getHashAlgoAndComponent(checksum string) (hash.Hash, []byte) {
 	}
 }
 
-// ChecksumMatches checks the checksum of a Release archive, in compliance with
+// ChecksumMatches checks the checksum of a DownloadResource archive, in compliance with
 // What Checksum is expected.
-func checksumMatches(r Release) bool {
-	hash, content := getHashAlgoAndComponent(r.ExpectedChecksum())
+func checksumMatches(r *DownloadResource) bool {
+	hash, content := getHashAlgoAndComponent(r.Checksum)
 	filePath, err := ArchivePath(r)
 	if err != nil {
 		return false
@@ -80,7 +80,7 @@ func checksumMatches(r Release) bool {
 }
 
 // checkLocalArchive check for integrity of the local archive.
-func checkLocalArchive(release Release) error {
+func checkLocalArchive(release *DownloadResource) error {
 	archivePath, err := ArchivePath(release)
 	if err != nil {
 		return err
@@ -92,7 +92,7 @@ func checkLocalArchive(release Release) error {
 	if err != nil {
 		return err
 	}
-	if stats.Size() > release.ArchiveSize() {
+	if stats.Size() > release.Size {
 		return errors.New("Archive size does not match with specification of this release, assuming corruption")
 	}
 	if !checksumMatches(release) {

@@ -35,29 +35,29 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
+
 	"github.com/blang/semver"
 )
 
 // Tool represents a single Tool, part of a Package.
 type Tool struct {
-	Name     string                  `json:"name,required"` // The Name of the Tool.
-	Releases map[string]*ToolRelease `json:"releases"`      //Maps Version to Release.
+	Name          string                  `json:"name,required"` // The Name of the Tool.
+	Releases      map[string]*ToolRelease `json:"releases"`      //Maps Version to Release.
+	ParentPackage *Package                `json:"-"`
 }
 
 // ToolRelease represents a single release of a tool
 type ToolRelease struct {
 	Version  string     `json:"version,required"` // The version number of this Release.
 	Flavours []*Flavour `json:"systems"`          // Maps OS to Flavour
+	Tool     *Tool      `json:"-"`
 }
 
 // Flavour represents a flavour of a Tool version.
 type Flavour struct {
-	OS              string `json:"os,required"`              // The OS Supported by this flavour.
-	URL             string `json:"url,required"`             // The URL where to download this flavour.
-	ArchiveFileName string `json:"archiveFileName,required"` // The name of the archive to download.
-	Size            int64  `json:"size,required"`            // The size of the archive.
-	Checksum        string `json:"checksum,required"`        // The checksum of the archive. Made like ALGO:checksum.
+	OS       string `json:"os,required"` // The OS Supported by this flavour.
+	Resource *releases.DownloadResource
 }
 
 // GetVersion returns the specified release corresponding the provided version,
@@ -123,10 +123,10 @@ func (tr ToolRelease) String() string {
 
 func (f Flavour) String() string {
 	return fmt.Sprintln("    OS :", f.OS) +
-		fmt.Sprintln("    URL:", f.URL) +
-		fmt.Sprintln("    ArchiveFileName:", f.ArchiveFileName) +
-		fmt.Sprintln("    Size:", f.Size) +
-		fmt.Sprintln("    Checksum:", f.Checksum)
+		fmt.Sprintln("    URL:", f.Resource.URL) +
+		fmt.Sprintln("    ArchiveFileName:", f.Resource.ArchiveFileName) +
+		fmt.Sprintln("    Size:", f.Resource.Size) +
+		fmt.Sprintln("    Checksum:", f.Resource.Checksum)
 }
 
 // Raspberry PI, BBB or other ARM based host
@@ -180,59 +180,12 @@ func (f Flavour) isCompatibleWithCurrentMachine() bool {
 	return false
 }
 
-func (tr ToolRelease) getCompatibleFlavour() *Flavour {
+// GetCompatibleFlavour returns the downloadable resource compatible with the running O.S.
+func (tr ToolRelease) GetCompatibleFlavour() *releases.DownloadResource {
 	for _, flavour := range tr.Flavours {
 		if flavour.isCompatibleWithCurrentMachine() {
-			return flavour
+			return flavour.Resource
 		}
 	}
 	return nil
-}
-
-// Release interface implementation
-
-// ArchiveName returns the archive file name (not the path).
-func (tr ToolRelease) ArchiveName() string {
-	f := tr.getCompatibleFlavour()
-	if f == nil {
-		return "INVALID"
-	}
-	return f.ArchiveFileName
-}
-
-// ArchiveURL returns the archive URL.
-func (tr ToolRelease) ArchiveURL() string {
-	f := tr.getCompatibleFlavour()
-	if f == nil {
-		return "INVALID"
-	}
-	return f.URL
-}
-
-// ExpectedChecksum returns the expected checksum for this release.
-func (tr ToolRelease) ExpectedChecksum() string {
-	f := tr.getCompatibleFlavour()
-	if f == nil {
-		return "INVALID"
-	}
-	return f.Checksum
-}
-
-// ArchiveSize returns the archive size.
-func (tr ToolRelease) ArchiveSize() int64 {
-	f := tr.getCompatibleFlavour()
-	if f == nil {
-		return -1
-	}
-	return f.Size
-}
-
-// GetDownloadCacheFolder returns the path of the staging folders for this release.
-func (tr ToolRelease) GetDownloadCacheFolder() (string, error) {
-	return configs.DownloadCacheFolder("packages").Get()
-}
-
-// VersionName represents the version of the release.
-func (tr ToolRelease) VersionName() string {
-	return tr.Version
 }

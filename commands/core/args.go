@@ -87,10 +87,10 @@ func parsePlatformReferenceArgs(args []string) []platformReference {
 
 // findDownloadItems takes a set of platformReference and returns a set of items to download and
 // a set of outputs for non existing platforms.
-func findDownloadItems(sc *cores.StatusContext, items []platformReference) ([]downloadItem, []downloadItem, []output.ProcessResult) {
+func findDownloadItems(sc *cores.StatusContext, items []platformReference) ([]*cores.PlatformRelease, []*cores.ToolRelease, []output.ProcessResult) {
 	itemC := len(items)
-	retCores := make([]downloadItem, 0, itemC)
-	retTools := make([]downloadItem, 0, itemC)
+	retCores := []*cores.PlatformRelease{}
+	retTools := []*cores.ToolRelease{}
 	fails := make([]output.ProcessResult, 0, itemC)
 
 	// value is not used, this map is only to check if an item is inside (set implementation)
@@ -137,7 +137,7 @@ func findDownloadItems(sc *cores.StatusContext, items []platformReference) ([]do
 		}
 
 		// replaces "latest" with latest version too
-		deps, err := sc.GetDepsOfPlatformRelease(release)
+		toolDeps, err := sc.GetDepsOfPlatformRelease(release)
 		if err != nil {
 			fails = append(fails, output.ProcessResult{
 				ItemName: item.CoreName,
@@ -146,29 +146,15 @@ func findDownloadItems(sc *cores.StatusContext, items []platformReference) ([]do
 			continue
 		}
 
-		retCores = append(retCores, downloadItem{
-			Package: pkg.Name,
-			DownloadItem: releases.DownloadItem{
-				Name:    core.Architecture,
-				Release: release,
-			},
-		})
+		retCores = append(retCores, release)
 
 		presenceMap[core.Name] = true
-		for _, tool := range deps {
-			_, exists = presenceMap[tool.ToolName]
-			if exists { //skip
+		for _, tool := range toolDeps {
+			if presenceMap[tool.Tool.Name] {
 				continue
 			}
-
-			presenceMap[tool.ToolName] = true
-			retTools = append(retTools, downloadItem{
-				Package: pkg.Name,
-				DownloadItem: releases.DownloadItem{
-					Name:    tool.ToolName,
-					Release: tool.Release,
-				},
-			})
+			presenceMap[tool.Tool.Name] = true
+			retTools = append(retTools, tool)
 		}
 	}
 	return retCores, retTools, fails

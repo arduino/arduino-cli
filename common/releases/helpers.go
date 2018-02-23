@@ -36,15 +36,16 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/task"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
 // IsCached returns a bool representing if the release has already been downloaded
-func IsCached(release Release) bool {
+func IsCached(release *DownloadResource) bool {
 	archivePath, err := ArchivePath(release)
 	if err != nil {
 		return false
@@ -57,28 +58,27 @@ func IsCached(release Release) bool {
 // downloadRelease downloads a generic release.
 //
 //   PARAMS:
-//     name -> The name of the Item to download.
-//     release -> The release to download.
+//     resource -> The resource to download.
 //     progBar -> a progress bar, can be nil. If not nill progress is handled for that bar.
 //     label -> Name used to identify the type of the Item downloaded (library, core, tool)
 //   RETURNS:
 //     error if any
-func downloadRelease(item DownloadItem, progBar *pb.ProgressBar, label string) error {
-	if item.Release == nil {
+func downloadRelease(item *DownloadResource, progBar *pb.ProgressBar, label string) error {
+	if item == nil {
 		return errors.New("Cannot accept nil release")
 	}
-	initialData, err := OpenLocalArchiveForDownload(item.Release)
+	initialData, err := OpenLocalArchiveForDownload(item)
 	if err != nil {
 		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
 	}
 	defer initialData.Close()
 	// puts the progress bar
-	err = common.DownloadPackage(item.Release.ArchiveURL(), initialData,
-		item.Release.ArchiveSize(), handleWithProgressBarFunc(progBar))
+	err = common.DownloadPackage(item.URL, initialData,
+		item.Size, handleWithProgressBarFunc(progBar))
 	if err != nil {
 		return err
 	}
-	err = checkLocalArchive(item.Release)
+	err = checkLocalArchive(item)
 	if err != nil {
 		return errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
 	}
@@ -86,7 +86,7 @@ func downloadRelease(item DownloadItem, progBar *pb.ProgressBar, label string) e
 }
 
 // downloadTask returns the wrapper to download something without installing it.
-func downloadTask(item DownloadItem, progBar *pb.ProgressBar, label string) task.Wrapper {
+func downloadTask(item *DownloadResource, progBar *pb.ProgressBar, label string) task.Wrapper {
 	return task.Wrapper{
 		Task: func() task.Result {
 			err := downloadRelease(item, progBar, label)
@@ -118,19 +118,19 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, refRes
 	}
 
 	for _, item := range items {
-		cached := IsCached(item.Release)
-		releaseNotNil := item.Release != nil
-		if forced || releaseNotNil && (!cached || checkLocalArchive(item.Release) != nil) {
+		cached := IsCached(item.Resource)
+		releaseNotNil := item.Resource != nil
+		if forced || releaseNotNil && (!cached || checkLocalArchive(item.Resource) != nil) {
 			var pBar *pb.ProgressBar
 			if textMode {
-				pBar = pb.StartNew(int(item.Release.ArchiveSize())).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", item.Name))
+				pBar = pb.StartNew(int(item.Resource.Size)).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", item.Name))
 				progressBars = append(progressBars, pBar)
 			}
-			paths[item.Name], _ = ArchivePath(item.Release) //if the release exists the archivepath always exists
-			tasks[item.Name] = downloadTask(item, pBar, label)
+			paths[item.Name], _ = ArchivePath(item.Resource) // if the release exists the archivepath always exists
+			tasks[item.Name] = downloadTask(item.Resource, pBar, label)
 		} else if !forced && releaseNotNil && cached {
-			//Consider OK
-			path, _ := ArchivePath(item.Release)
+			// Consider OK
+			path, _ := ArchivePath(item.Resource)
 			*refResults = append(*refResults, output.ProcessResult{
 				ItemName: item.Name,
 				Status:   OkStatus,
@@ -185,24 +185,23 @@ func handleWithProgressBarFunc(progBar *pb.ProgressBar) func(io.Reader, *os.File
 }
 
 // ArchivePath returns the fullPath of the Archive of this release.
-func ArchivePath(release Release) (string, error) {
-	staging, err := release.GetDownloadCacheFolder()
+func ArchivePath(r *DownloadResource) (string, error) {
+	staging, err := configs.DownloadCacheFolder(r.CachePath).Get()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(staging, release.ArchiveName()), nil
+	return filepath.Join(staging, r.ArchiveFileName), nil
 }
 
-// OpenLocalArchiveForDownload reads the data from the local archive if present,
-// and returns the []byte of the file content. Used by resume Download.
-// Creates an empty file if not found.
-func OpenLocalArchiveForDownload(r Release) (*os.File, error) {
+// OpenLocalArchiveForDownload open local archive if present
+// used to resume download. Creates an empty file if not found.
+func OpenLocalArchiveForDownload(r *DownloadResource) (*os.File, error) {
 	path, err := ArchivePath(r)
 	if err != nil {
 		return nil, err
 	}
 	stats, err := os.Stat(path)
-	if os.IsNotExist(err) || err == nil && stats.Size() >= r.ArchiveSize() {
+	if os.IsNotExist(err) || err == nil && stats.Size() >= r.Size {
 		return os.Create(path)
 	}
 	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)

@@ -30,12 +30,14 @@
 package core
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -73,20 +75,38 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		Tools: []output.ProcessResult{},
 	}
 
-	downloads := []releases.DownloadItem{}
-	for i := range toolsToDownload {
-		downloads[i] = toolsToDownload[i].DownloadItem
-	}
-	logrus.Info("Downloading tool dependencies of all cores requested")
-	releases.ParallelDownload(downloads, true, "Downloaded", &outputResults.Tools, "tool")
+	downloadToolsArchives(toolsToDownload, &outputResults)
 
-	downloads = []releases.DownloadItem{}
-	for i := range coresToDownload {
-		downloads[i] = coresToDownload[i].DownloadItem
-	}
-	logrus.Info("Downloading cores")
-	releases.ParallelDownload(downloads, true, "Downloaded", &outputResults.Cores, "core")
+	downloadPlatformArchives(coresToDownload, &outputResults)
 
 	formatter.Print(outputResults)
 	logrus.Info("Done")
+}
+
+func downloadToolsArchives(tools []*cores.ToolRelease, results *output.CoreProcessResults) {
+	downloads := []releases.DownloadItem{}
+	for _, tool := range tools {
+		resource := tool.GetCompatibleFlavour()
+		if resource == nil {
+			formatter.PrintError(fmt.Errorf("missing tool %s", tool), "A release of the tool is not available for your OS")
+		}
+		downloads = append(downloads, releases.DownloadItem{
+			Name:     tool.Tool.Name + "@" + tool.Version,
+			Resource: tool.GetCompatibleFlavour(),
+		})
+	}
+	logrus.Info("Downloading tools")
+	releases.ParallelDownload(downloads, false, "Downloaded", &results.Tools, "tool")
+}
+
+func downloadPlatformArchives(platforms []*cores.PlatformRelease, results *output.CoreProcessResults) {
+	downloads := []releases.DownloadItem{}
+	for _, platform := range platforms {
+		downloads = append(downloads, releases.DownloadItem{
+			Name:     platform.Platform.ParentPackage.Name + ":" + platform.Platform.Name + "@" + platform.Version,
+			Resource: platform.Resource,
+		})
+	}
+	logrus.Info("Downloading cores")
+	releases.ParallelDownload(downloads, false, "Downloaded", &results.Cores, "core")
 }

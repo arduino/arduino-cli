@@ -37,6 +37,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/common/releases"
+
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/blang/semver"
 )
@@ -115,11 +117,8 @@ func (l *Library) InstalledRelease() (*Release, error) {
 
 // Release represents a release of a library
 type Release struct {
-	Version         string `json:"version"`
-	URL             string `json:"url"`
-	ArchiveFileName string `json:"archiveFileName"`
-	Size            int64  `json:"size"`
-	Checksum        string `json:"checksum"`
+	Version  string `json:"version"`
+	Resource *releases.DownloadResource
 }
 
 // GetVersion returns the Release corresponding to the specified version, or
@@ -173,10 +172,10 @@ func (l Library) Versions() semver.Versions {
 
 func (r *Release) String() string {
 	return fmt.Sprintln("  Release: "+fmt.Sprint(r.Version)) +
-		fmt.Sprintln("    URL: "+r.URL) +
-		fmt.Sprintln("    ArchiveFileName: "+r.ArchiveFileName) +
-		fmt.Sprintln("    Size: ", r.ArchiveSize()) +
-		fmt.Sprintln("    Checksum: ", r.Checksum)
+		fmt.Sprintln("    URL: "+r.Resource.URL) +
+		fmt.Sprintln("    ArchiveFileName: "+r.Resource.ArchiveFileName) +
+		fmt.Sprintln("    Size: ", r.Resource.Size) +
+		fmt.Sprintln("    Checksum: ", r.Resource.Checksum)
 }
 
 func (l Library) String() string {
@@ -190,36 +189,4 @@ func (l Library) String() string {
 		fmt.Sprintln("  Architecture: ", strings.Join(l.Architectures, ", ")) +
 		fmt.Sprintln("  Types: ", strings.Join(l.Types, ", ")) +
 		fmt.Sprintln("  Versions: ", strings.Replace(fmt.Sprint(l.Versions()), " ", ", ", -1))
-}
-
-// Release interface implementation
-
-// ArchiveSize returns the archive size.
-func (r Release) ArchiveSize() int64 {
-	return r.Size
-}
-
-// ArchiveURL returns the archive URL.
-func (r Release) ArchiveURL() string {
-	return r.URL
-}
-
-// ArchiveName returns the archive file name (not the path).
-func (r Release) ArchiveName() string {
-	return r.ArchiveFileName
-}
-
-// ExpectedChecksum returns the expected checksum for this release.
-func (r Release) ExpectedChecksum() string {
-	return r.Checksum
-}
-
-// GetDownloadCacheFolder returns the path of the staging folders for this release.
-func (r Release) GetDownloadCacheFolder() (string, error) {
-	return configs.DownloadCacheFolder("libraries").Get()
-}
-
-// VersionName represents the version of the release.
-func (r Release) VersionName() string {
-	return r.Version
 }
