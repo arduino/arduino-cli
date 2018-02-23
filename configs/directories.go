@@ -71,7 +71,7 @@ func ToolsFolder(packageName string) pathutils.Path {
 
 // DownloadCacheFolder gets a generic cache folder for downloads.
 func DownloadCacheFolder(item string) pathutils.Path {
-	return pathutils.NewSubPath("tools", ArduinoDataFolder, filepath.Join("staging", item), true)
+	return pathutils.NewSubPath("zip archives cache", ArduinoDataFolder, filepath.Join("staging", item), true)
 }
 
 // IndexPath returns the path of the specified index file.
