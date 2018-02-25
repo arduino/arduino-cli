@@ -132,7 +132,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			formatter.PrintError(err, "Cannot get core install path, try again.")
 			os.Exit(commands.ErrCoreConfig)
 		}
-		possiblePath := filepath.Join(coreRoot, item.Platform.Name, item.Version)
+		possiblePath := filepath.Join(coreRoot, item.Platform.Architecture, item.Version)
 
 		err = cores.InstallPlatform(possiblePath, item.Resource)
 		if err != nil {
