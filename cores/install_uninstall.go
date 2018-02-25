@@ -47,11 +47,11 @@ import (
 // respects umask on linux.
 var DirPermissions os.FileMode = 0777
 
-// Install installs a specific release of a core.
+// InstallPlatform installs a specific release of a platform.
 // TODO: But why not passing the Platform?
-func InstallPlatform(destCoresDir string, release *releases.DownloadResource) error {
+func InstallPlatform(destDir string, release *releases.DownloadResource) error {
 	if release == nil {
-		return errors.New("Not existing version of the core")
+		return errors.New("Not existing version of the platform")
 	}
 
 	cacheFilePath, err := releases.ArchivePath(release)
@@ -65,7 +65,7 @@ func InstallPlatform(destCoresDir string, release *releases.DownloadResource) er
 		return err
 	}
 	tempFolder := filepath.Join(arduinoFolder, "tmp", "packages",
-		fmt.Sprintf("core-%d", time.Now().Unix()))
+		fmt.Sprintf("platform-%d", time.Now().Unix()))
 	err = os.MkdirAll(tempFolder, DirPermissions)
 	if err != nil {
 		return err
@@ -73,18 +73,18 @@ func InstallPlatform(destCoresDir string, release *releases.DownloadResource) er
 	defer os.RemoveAll(tempFolder)
 
 	// Make container dir
-	destCoresDirParent := filepath.Dir(destCoresDir)
-	err = os.MkdirAll(destCoresDirParent, DirPermissions)
+	destDirParent := filepath.Dir(destDir)
+	err = os.MkdirAll(destDirParent, DirPermissions)
 	if err != nil {
 		return err
 	}
 	defer func() {
 		// cleaning empty directories
-		if empty, _ := IsDirEmpty(destCoresDir); empty {
-			os.RemoveAll(destCoresDir)
+		if empty, _ := IsDirEmpty(destDir); empty {
+			os.RemoveAll(destDir)
 		}
-		if empty, _ := IsDirEmpty(destCoresDirParent); empty {
-			os.RemoveAll(destCoresDirParent)
+		if empty, _ := IsDirEmpty(destDirParent); empty {
+			os.RemoveAll(destDirParent)
 		}
 	}()
 
@@ -99,17 +99,17 @@ func InstallPlatform(destCoresDir string, release *releases.DownloadResource) er
 		return err
 	}
 
-	root := coreRealRoot(tempFolder)
+	root := platformRealRoot(tempFolder)
 	if root == "invalid" {
 		return errors.New("invalid archive structure")
 	}
 
-	err = os.Rename(root, destCoresDir)
+	err = os.Rename(root, destDir)
 	if err != nil {
 		return err
 	}
 
-	err = createPackageFile(destCoresDir)
+	err = createPackageFile(destDir)
 	if err != nil {
 		return err
 	}
@@ -207,7 +207,7 @@ func IsDirEmpty(path string) (bool, error) {
 	return false, err
 }
 
-func coreRealRoot(root string) string {
+func platformRealRoot(root string) string {
 	realRoot := "invalid"
 	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if strings.HasSuffix(path, "platform.txt") {

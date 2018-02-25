@@ -107,7 +107,7 @@ func getInstalledStuff(stuff *[]output.InstalledStuff, folder pathutils.Path) {
 	}
 }
 
-func getPackagesStatusContext() (*cores.StatusContext, error) {
+func getPackagesStatusContext() (*cores.PackagesStatus, error) {
 	var index packageindex.Index
 	err := packageindex.LoadIndex(&index)
 	if err != nil {

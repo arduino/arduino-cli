@@ -69,7 +69,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Preparing download")
 
-	coresToDownload, toolsToDownload, failOutputs := findDownloadItems(status, parsePlatformReferenceArgs(args))
+	coresToDownload, toolsToDownload, failOutputs := findItemsToDownload(status, parsePlatformReferenceArgs(args))
 	failOutputsCount := len(failOutputs)
 	outputResults := output.CoreProcessResults{
 		Cores: failOutputs,
@@ -82,12 +82,12 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Installing tool dependencies")
 	for i, item := range toolsToDownload {
-		logrus.WithField("Package", item.Tool.ParentPackage.Name).
+		logrus.WithField("Package", item.Tool.Package.Name).
 			WithField("Name", item.Tool.Name).
 			WithField("Version", item.Version).
 			Info("Installing tool")
 
-		toolRoot, err := configs.ToolsFolder(item.Tool.ParentPackage.Name).Get()
+		toolRoot, err := configs.ToolsFolder(item.Tool.Package.Name).Get()
 		if err != nil {
 			formatter.PrintError(err, "Cannot get tool install path, try again.")
 			os.Exit(commands.ErrCoreConfig)
@@ -122,12 +122,12 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for i, item := range coresToDownload {
-		logrus.WithField("Package", item.Platform.ParentPackage.Name).
+		logrus.WithField("Package", item.Platform.Package.Name).
 			WithField("Name", item.Platform.Name).
 			WithField("Version", item.Version).
 			Info("Installing core")
 
-		coreRoot, err := configs.CoresFolder(item.Platform.ParentPackage.Name).Get()
+		coreRoot, err := configs.CoresFolder(item.Platform.Package.Name).Get()
 		if err != nil {
 			formatter.PrintError(err, "Cannot get core install path, try again.")
 			os.Exit(commands.ErrCoreConfig)

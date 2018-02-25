@@ -39,7 +39,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/cores"
 )
 
-// downloadItem represents a core or tool download
+// downloadItem represents a platform or a tool to download
 // TODO: can be greatly simplified by usign directly a pointer to the Platform or Tool
 type downloadItem struct {
 	Package string
@@ -48,14 +48,14 @@ type downloadItem struct {
 
 // platformReference represents a tuple to identify a Platform
 type platformReference struct {
-	Package     string // The package where this core belongs to.
-	CoreName    string // The core name.
-	CoreVersion string // The version of the core, to get the release.
+	Package              string // The package where this Platform belongs to.
+	PlatformArchitecture string
+	PlatformVersion      string
 }
 
 var coreTupleRegexp = regexp.MustCompile("[a-zA-Z0-9]+:[a-zA-Z0-9]+(=([0-9]|[0-9].)*[0-9]+)?")
 
-// parsePlatformReferenceArgs parses a sequence of "packager:name=version" tokens and returns a CoreIDTuple slice.
+// parsePlatformReferenceArgs parses a sequence of "packager:arch=version" tokens and returns a platformReference slice.
 //
 // If version is not present it is assumed as "latest" version.
 func parsePlatformReferenceArgs(args []string) []platformReference {
@@ -71,25 +71,26 @@ func parsePlatformReferenceArgs(args []string) []platformReference {
 				split = append(split, "latest")
 			}
 			ret = append(ret, platformReference{
-				Package:     split[0],
-				CoreName:    split[1],
-				CoreVersion: split[2],
+				Package:              split[0],
+				PlatformArchitecture: split[1],
+				PlatformVersion:      split[2],
 			})
 		} else {
+			// TODO: handle errors properly
 			ret = append(ret, platformReference{
-				Package:  "invalid-arg",
-				CoreName: arg,
+				Package:              "invalid-arg",
+				PlatformArchitecture: arg,
 			})
 		}
 	}
 	return ret
 }
 
-// findDownloadItems takes a set of platformReference and returns a set of items to download and
+// findItemsToDownload takes a set of platformReference and returns a set of items to download and
 // a set of outputs for non existing platforms.
-func findDownloadItems(sc *cores.StatusContext, items []platformReference) ([]*cores.PlatformRelease, []*cores.ToolRelease, []output.ProcessResult) {
+func findItemsToDownload(sc *cores.PackagesStatus, items []platformReference) ([]*cores.PlatformRelease, []*cores.ToolRelease, []output.ProcessResult) {
 	itemC := len(items)
-	retCores := []*cores.PlatformRelease{}
+	retPlatforms := []*cores.PlatformRelease{}
 	retTools := []*cores.ToolRelease{}
 	fails := make([]output.ProcessResult, 0, itemC)
 
@@ -100,38 +101,38 @@ func findDownloadItems(sc *cores.StatusContext, items []platformReference) ([]*c
 	for _, item := range items {
 		if item.Package == "invalid-arg" {
 			fails = append(fails, output.ProcessResult{
-				ItemName: item.CoreName,
-				Error:    "Invalid item (not PACKAGER:CORE[=VERSION])",
+				ItemName: item.PlatformArchitecture,
+				Error:    "Invalid item (not PACKAGER:ARCH[=VERSION])",
 			})
 			continue
 		}
 		pkg, exists := sc.Packages[item.Package]
 		if !exists {
 			fails = append(fails, output.ProcessResult{
-				ItemName: item.CoreName,
+				ItemName: item.PlatformArchitecture,
 				Error:    fmt.Sprintf("Package %s not found", item.Package),
 			})
 			continue
 		}
-		core, exists := pkg.Plaftorms[item.CoreName]
+		platform, exists := pkg.Plaftorms[item.PlatformArchitecture]
 		if !exists {
 			fails = append(fails, output.ProcessResult{
-				ItemName: item.CoreName,
-				Error:    "Core not found",
+				ItemName: item.PlatformArchitecture,
+				Error:    "Platform not found",
 			})
 			continue
 		}
 
-		_, exists = presenceMap[item.CoreName]
+		_, exists = presenceMap[item.PlatformArchitecture]
 		if exists { //skip
 			continue
 		}
 
-		release := core.GetVersion(item.CoreVersion)
+		release := platform.GetVersion(item.PlatformVersion)
 		if release == nil {
 			fails = append(fails, output.ProcessResult{
-				ItemName: item.CoreName,
-				Error:    fmt.Sprintf("Version %s Not Found", item.CoreVersion),
+				ItemName: item.PlatformArchitecture,
+				Error:    fmt.Sprintf("Version %s Not Found", item.PlatformVersion),
 			})
 			continue
 		}
@@ -140,15 +141,15 @@ func findDownloadItems(sc *cores.StatusContext, items []platformReference) ([]*c
 		toolDeps, err := sc.GetDepsOfPlatformRelease(release)
 		if err != nil {
 			fails = append(fails, output.ProcessResult{
-				ItemName: item.CoreName,
-				Error:    fmt.Sprintf("Cannot get tool dependencies of %s core: %s", core.Name, err.Error()),
+				ItemName: item.PlatformArchitecture,
+				Error:    fmt.Sprintf("Cannot get tool dependencies of plafotmr %s: %s", platform.Name, err.Error()),
 			})
 			continue
 		}
 
-		retCores = append(retCores, release)
+		retPlatforms = append(retPlatforms, release)
 
-		presenceMap[core.Name] = true
+		presenceMap[platform.Name] = true
 		for _, tool := range toolDeps {
 			if presenceMap[tool.Tool.Name] {
 				continue
@@ -157,5 +158,5 @@ func findDownloadItems(sc *cores.StatusContext, items []platformReference) ([]*c
 			retTools = append(retTools, tool)
 		}
 	}
-	return retCores, retTools, fails
+	return retPlatforms, retTools, fails
 }

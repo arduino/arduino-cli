@@ -40,14 +40,14 @@ import (
 
 // Platform represents a platform package.
 type Platform struct {
-	Name          string                      // The name of the Core Package.
-	Architecture  string                      // The name of the architecture of this package.
-	Category      string                      // The category which this core package belongs to.
-	Releases      map[string]*PlatformRelease // The Releases of this core package, labeled by version.
-	ParentPackage *Package                    `json:"-"`
+	Architecture string // The name of the architecture of this package.
+	Name         string
+	Category     string
+	Releases     map[string]*PlatformRelease // The Releases of this platform, labeled by version.
+	Package      *Package                    `json:"-"`
 }
 
-// PlatformRelease represents a release of a core package.
+// PlatformRelease represents a release of a plaform package.
 type PlatformRelease struct {
 	Resource     *releases.DownloadResource
 	Version      string
@@ -56,10 +56,10 @@ type PlatformRelease struct {
 	Platform     *Platform        `json:"-"`
 }
 
-// ToolDependencies is a set of tuples representing summary data of a tool dependency set.
+// ToolDependencies is a set of tool dependency
 type ToolDependencies []*ToolDependency
 
-// ToolDependency is a tuple representing summary data of a tool.
+// ToolDependency is a tuple that uniquely identifies a specific version of a Tool
 type ToolDependency struct {
 	ToolName     string
 	ToolVersion  string
@@ -75,7 +75,7 @@ func (platform *Platform) GetVersion(version string) *PlatformRelease {
 	return platform.Releases[version]
 }
 
-// Versions returns all the version numbers in this Core Package.
+// Versions returns all the version numbers in this Platform Package.
 func (platform *Platform) Versions() semver.Versions {
 	versions := make(semver.Versions, 0, len(platform.Releases))
 	for _, release := range platform.Releases {
@@ -89,7 +89,6 @@ func (platform *Platform) Versions() semver.Versions {
 }
 
 // latestVersion obtains latest version number.
-//
 // It uses lexicographics to compare version strings.
 func (platform *Platform) latestVersion() string {
 	versions := platform.Versions()

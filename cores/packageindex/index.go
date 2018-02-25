@@ -110,8 +110,8 @@ type indexHelp struct {
 }
 
 // CreateStatusContext creates a status context from index data.
-func (index Index) CreateStatusContext() cores.StatusContext {
-	res := cores.StatusContext{
+func (index Index) CreateStatusContext() cores.PackagesStatus {
+	res := cores.PackagesStatus{
 		Packages: map[string]*cores.Package{},
 	}
 	for _, p := range index.Packages {
@@ -135,7 +135,7 @@ func (pack indexPackage) extractPackage() *cores.Package {
 		name := tool.Name
 		if p.Tools[name] == nil {
 			p.Tools[name] = tool.extractTool()
-			p.Tools[name].ParentPackage = p
+			p.Tools[name].Package = p
 		}
 		p.Tools[name].Releases[tool.Version] = tool.extractToolRelease()
 		p.Tools[name].Releases[tool.Version].Tool = p.Tools[name]
@@ -145,7 +145,7 @@ func (pack indexPackage) extractPackage() *cores.Package {
 		name := platform.Architecture
 		if p.Plaftorms[name] == nil {
 			p.Plaftorms[name] = platform.extractPlatform()
-			p.Plaftorms[name].ParentPackage = p
+			p.Plaftorms[name].Package = p
 		}
 		release := platform.extractPlatformRelease()
 		release.Platform = p.Plaftorms[name]

@@ -42,9 +42,9 @@ import (
 
 // Tool represents a single Tool, part of a Package.
 type Tool struct {
-	Name          string                  `json:"name,required"` // The Name of the Tool.
-	Releases      map[string]*ToolRelease `json:"releases"`      //Maps Version to Release.
-	ParentPackage *Package                `json:"-"`
+	Name     string                  `json:"name,required"` // The Name of the Tool.
+	Releases map[string]*ToolRelease `json:"releases"`      //Maps Version to Release.
+	Package  *Package                `json:"-"`
 }
 
 // ToolRelease represents a single release of a tool
@@ -129,15 +129,14 @@ func (f Flavour) String() string {
 		fmt.Sprintln("    Checksum:", f.Resource.Checksum)
 }
 
-// Raspberry PI, BBB or other ARM based host
-
-// PI: "arm-linux-gnueabihf"
-// Arch-linux on PI2: "armv7l-unknown-linux-gnueabihf"
-// Raspbian on PI2: "arm-linux-gnueabihf"
-// Ubuntu Mate on PI2: "arm-linux-gnueabihf"
-// Debian 7.9 on BBB: "arm-linux-gnueabihf"
-// Raspbian on PI Zero: "arm-linux-gnueabihf"
 var (
+	// Raspberry PI, BBB or other ARM based host
+	// PI: "arm-linux-gnueabihf"
+	// Arch-linux on PI2: "armv7l-unknown-linux-gnueabihf"
+	// Raspbian on PI2: "arm-linux-gnueabihf"
+	// Ubuntu Mate on PI2: "arm-linux-gnueabihf"
+	// Debian 7.9 on BBB: "arm-linux-gnueabihf"
+	// Raspbian on PI Zero: "arm-linux-gnueabihf"
 	regexpArmLinux = regexp.MustCompile("arm.*-linux-gnueabihf")
 	regexpAmd64    = regexp.MustCompile("x86_64-.*linux-gnu")
 	regexpi386     = regexp.MustCompile("i[3456]86-.*linux-gnu")

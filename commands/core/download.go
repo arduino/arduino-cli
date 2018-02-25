@@ -69,7 +69,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Preparing download")
 
-	coresToDownload, toolsToDownload, failOutputs := findDownloadItems(status, parsePlatformReferenceArgs(args))
+	coresToDownload, toolsToDownload, failOutputs := findItemsToDownload(status, parsePlatformReferenceArgs(args))
 	outputResults := output.CoreProcessResults{
 		Cores: failOutputs,
 		Tools: []output.ProcessResult{},
@@ -103,7 +103,7 @@ func downloadPlatformArchives(platforms []*cores.PlatformRelease, results *outpu
 	downloads := []releases.DownloadItem{}
 	for _, platform := range platforms {
 		downloads = append(downloads, releases.DownloadItem{
-			Name:     platform.Platform.ParentPackage.Name + ":" + platform.Platform.Name + "@" + platform.Version,
+			Name:     platform.Platform.Package.Name + ":" + platform.Platform.Name + "@" + platform.Version,
 			Resource: platform.Resource,
 		})
 	}
