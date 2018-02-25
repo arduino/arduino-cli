@@ -51,7 +51,7 @@ type Platform struct {
 type PlatformRelease struct {
 	Resource     *releases.DownloadResource
 	Version      string
-	Boards       []string
+	BoardNames   []string
 	Dependencies ToolDependencies // The Dependency entries to load tools.
 	Platform     *Platform        `json:"-"`
 }
@@ -120,7 +120,7 @@ func (platform *Platform) String() string {
 func (release *PlatformRelease) String() string {
 	return fmt.Sprintln("  Version           : ", release.Version) +
 		fmt.Sprintln("  Boards            :") +
-		fmt.Sprintln(strings.Join(release.Boards, ", ")) +
+		fmt.Sprintln(strings.Join(release.BoardNames, ", ")) +
 		fmt.Sprintln("  Archive File Name :", release.Resource.ArchiveFileName) +
 		fmt.Sprintln("  Checksum          :", release.Resource.Checksum) +
 		fmt.Sprintln("  File Size         :", release.Resource.Size) +

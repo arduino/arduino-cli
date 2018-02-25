@@ -174,7 +174,7 @@ func (release indexPlatformRelease) extractPlatformRelease() *cores.PlatformRele
 			URL:             release.URL,
 			CachePath:       "packages",
 		},
-		Boards:       release.extractBoards(),
+		BoardNames:   release.extractBoards(),
 		Dependencies: release.extractDeps(),
 	}
 }
