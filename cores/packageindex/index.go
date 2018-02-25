@@ -110,13 +110,13 @@ type indexHelp struct {
 }
 
 // CreateStatusContext creates a status context from index data.
-func (index Index) CreateStatusContext() cores.PackagesStatus {
-	res := cores.PackagesStatus{
+func (index Index) CreateStatusContext() cores.Packages {
+	res := cores.Packages{
 		Packages: map[string]*cores.Package{},
 	}
 	for _, p := range index.Packages {
 		res.Packages[p.Name] = p.extractPackage()
-		res.Packages[p.Name].ParentIndex = &res
+		res.Packages[p.Name].Packages = &res
 	}
 	return res
 }

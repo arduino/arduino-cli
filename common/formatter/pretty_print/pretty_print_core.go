@@ -41,13 +41,13 @@ func DownloadCoreFileIndex() task.Wrapper {
 }
 
 // CorruptedCoreIndexFix pretty prints messages regarding corrupted index fixes of cores.
-func CorruptedCoreIndexFix(index packageindex.Index) (cores.PackagesStatus, error) {
+func CorruptedCoreIndexFix(index packageindex.Index) (cores.Packages, error) {
 	downloadTask := DownloadCoreFileIndex()
 	parseTask := coreIndexParse(index)
 
 	result := corruptedIndexFixResults(downloadTask, parseTask)
 
-	return result[1].Result.(cores.PackagesStatus), result[1].Error
+	return result[1].Result.(cores.Packages), result[1].Error
 }
 
 // coreIndexParse pretty prints info about parsing an index file of libraries.

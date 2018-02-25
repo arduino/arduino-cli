@@ -36,24 +36,24 @@ import (
 	"github.com/pmylund/sortutil"
 )
 
-// PackagesStatus represents the status context of the Platforms and Tools in the system.
-type PackagesStatus struct {
+// Packages represents a set of Packages
+type Packages struct {
 	Packages map[string]*Package // Maps packager name to Package
 }
 
 // Package represents a package in the system.
 type Package struct {
-	Name        string               // Name of the package.
-	Maintainer  string               // Name of the maintainer.
-	WebsiteURL  string               // Website of maintainer.
-	Email       string               // Email of maintainer.
-	Platforms   map[string]*Platform // The platforms in the system.
-	Tools       map[string]*Tool     // The tools in the system.
-	ParentIndex *PackagesStatus      `json:"-"`
+	Name       string               // Name of the package.
+	Maintainer string               // Name of the maintainer.
+	WebsiteURL string               // Website of maintainer.
+	Email      string               // Email of maintainer.
+	Platforms  map[string]*Platform // The platforms in the system.
+	Tools      map[string]*Tool     // The tools in the system.
+	Packages   *Packages            `json:"-"`
 }
 
 // Names returns the array containing the name of the packages.
-func (sc PackagesStatus) Names() []string {
+func (sc Packages) Names() []string {
 	res := make([]string, len(sc.Packages))
 	i := 0
 	for n := range sc.Packages {
@@ -64,7 +64,7 @@ func (sc PackagesStatus) Names() []string {
 	return res
 }
 
-func (tdep ToolDependency) extractTool(sc PackagesStatus) (*Tool, error) {
+func (tdep ToolDependency) extractTool(sc Packages) (*Tool, error) {
 	pkg, exists := sc.Packages[tdep.ToolPackager]
 	if !exists {
 		return nil, errors.New("Package not found")
@@ -76,7 +76,7 @@ func (tdep ToolDependency) extractTool(sc PackagesStatus) (*Tool, error) {
 	return tool, nil
 }
 
-func (tdep ToolDependency) extractRelease(sc PackagesStatus) (*ToolRelease, error) {
+func (tdep ToolDependency) extractRelease(sc Packages) (*ToolRelease, error) {
 	tool, err := tdep.extractTool(sc)
 	if err != nil {
 		return nil, err
@@ -89,7 +89,7 @@ func (tdep ToolDependency) extractRelease(sc PackagesStatus) (*ToolRelease, erro
 }
 
 // GetDepsOfPlatformRelease returns the deps of a specified release of a core.
-func (sc PackagesStatus) GetDepsOfPlatformRelease(release *PlatformRelease) ([]*ToolRelease, error) {
+func (sc Packages) GetDepsOfPlatformRelease(release *PlatformRelease) ([]*ToolRelease, error) {
 	if release == nil {
 		return nil, errors.New("release cannot be nil")
 	}
