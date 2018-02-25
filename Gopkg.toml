@@ -25,9 +25,9 @@
   branch = "master"
   name = "github.com/arduino/board-discovery"
 
-[[constraint]]
-  branch = "master"
-  name = "github.com/arduino/go-properties-map"
+#[[constraint]]
+#  branch = "master"
+#  name = "github.com/arduino/go-properties-map"
 
 [[constraint]]
   branch = "master"
