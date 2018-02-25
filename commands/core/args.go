@@ -114,7 +114,7 @@ func findItemsToDownload(sc *cores.PackagesStatus, items []platformReference) ([
 			})
 			continue
 		}
-		platform, exists := pkg.Plaftorms[item.PlatformArchitecture]
+		platform, exists := pkg.Platforms[item.PlatformArchitecture]
 		if !exists {
 			fails = append(fails, output.ProcessResult{
 				ItemName: item.PlatformArchitecture,

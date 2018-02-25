@@ -47,7 +47,7 @@ type Package struct {
 	Maintainer  string               // Name of the maintainer.
 	WebsiteURL  string               // Website of maintainer.
 	Email       string               // Email of maintainer.
-	Plaftorms   map[string]*Platform // The platforms in the system.
+	Platforms   map[string]*Platform // The platforms in the system.
 	Tools       map[string]*Tool     // The tools in the system.
 	ParentIndex *PackagesStatus      `json:"-"`
 }

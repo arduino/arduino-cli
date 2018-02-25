@@ -127,7 +127,7 @@ func (pack indexPackage) extractPackage() *cores.Package {
 		Maintainer: pack.Maintainer,
 		WebsiteURL: pack.WebsiteURL,
 		Email:      pack.Email,
-		Plaftorms:  map[string]*cores.Platform{},
+		Platforms:  map[string]*cores.Platform{},
 		Tools:      map[string]*cores.Tool{},
 	}
 
@@ -143,13 +143,13 @@ func (pack indexPackage) extractPackage() *cores.Package {
 
 	for _, platform := range pack.Platforms {
 		name := platform.Architecture
-		if p.Plaftorms[name] == nil {
-			p.Plaftorms[name] = platform.extractPlatform()
-			p.Plaftorms[name].Package = p
+		if p.Platforms[name] == nil {
+			p.Platforms[name] = platform.extractPlatform()
+			p.Platforms[name].Package = p
 		}
 		release := platform.extractPlatformRelease()
-		release.Platform = p.Plaftorms[name]
-		p.Plaftorms[name].Releases[release.Version] = release
+		release.Platform = p.Platforms[name]
+		p.Platforms[name].Releases[release.Version] = release
 	}
 
 	return p
