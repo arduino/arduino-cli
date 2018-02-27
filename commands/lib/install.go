@@ -80,7 +80,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	logrus.Info("Downloading")
-	releases.ParallelDownload(libs, false, "Installed", &outputResults.Libraries, "library")
+	releases.ParallelDownload(libs, false, "Installed", &outputResults.Libraries, "library", commands.GenerateDownloadProgressFormatter())
 	logrus.Info("Download finished")
 
 	logrus.Info("Installing")

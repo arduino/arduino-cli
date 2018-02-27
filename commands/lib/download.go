@@ -78,7 +78,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		libs[i] = releases.DownloadItem(libsToDownload[i])
 	}
 	logrus.Info("Downloading")
-	releases.ParallelDownload(libs, false, "Downloaded", &outputResults.Libraries, "library")
+	releases.ParallelDownload(libs, false, "Downloaded", &outputResults.Libraries, "library", commands.GenerateDownloadProgressFormatter())
 	logrus.Info("Download finished")
 	formatter.Print(outputResults)
 	logrus.Info("Done")

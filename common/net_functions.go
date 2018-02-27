@@ -75,8 +75,32 @@ func DownloadIndex(indexPath pathutils.Path, URL string) error {
 	return nil
 }
 
-// DownloadPackage downloads a package from arduino repository.
-func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleResultFunc func(io.Reader, *os.File, int) error) error {
+// HandleResultFunc defines a function able to handle the content of the
+// download stream of the package (DownloadPackage), filling the File with the content
+// of the Reader, starting from the initial position
+type HandleDownloadPackageResultFunc func(io.Reader, *os.File, int) error
+
+// DefaultDownloadHandlerFunc is the default HandleDownloadPackageResultFunc, which
+// simply copies the content of the Reader into the File, starting from the initialSize
+func DefaultDownloadHandlerFunc(source io.Reader, initialData *os.File, initialSize int) error {
+	// Copy the file content
+	_, err := io.Copy(initialData, source)
+	return err
+}
+
+// DownloadPackageProgressChangedHandler defines a function able to handle the update
+// of the progress of the current download
+type DownloadPackageProgressChangedHandler func(fileSize int64, downloadedSoFar int64)
+
+// DownloadPackage downloads a package from Arduino repository.
+// Besides the download information (URL, initialData and totalSize), two external handlers are available for:
+//  - (handleResultFunc) handling the result of the download (i.e. decide how to copy the download to the file
+// 	  or do something weird during the operation)
+//  - (progressChangedHandler) handling the download progress change (and perhaps display it somehow)
+// None of the handlers is mandatory; they won't be used if nil.
+func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleResultFunc HandleDownloadPackageResultFunc,
+	progressChangedHandler DownloadPackageProgressChangedHandler) error {
+
 	if initialData == nil {
 		return errors.New("Cannot fill a nil file pointer")
 	}
@@ -120,13 +144,51 @@ func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleRe
 	}
 	defer response.Body.Close()
 
-	if handleResultFunc == nil {
-		_, err = io.Copy(initialData, response.Body)
-	} else {
-		err = handleResultFunc(response.Body, initialData, int(initialSize))
+	// Handle the progress update handler, by creating a ProgressProxyReader;
+	// only if it's needed (i.e. we actually have an external progressChangedHandler)
+	progressProxyReader := response.Body
+	downloadedSoFar := initialSize
+	if progressChangedHandler != nil {
+		progressProxyReader = ProgressProxyReader{response.Body, func(progressDelta int64) {
+			// WARNING: This is using a closure on downloadedSoFar!
+			downloadedSoFar += progressDelta
+			progressChangedHandler(totalSize, downloadedSoFar)
+		},
+		}
 	}
+
+	// Use the external handleResultFunc, if available, or the default one otherwise
+	if handleResultFunc == nil {
+		handleResultFunc = DefaultDownloadHandlerFunc
+	}
+
+	err = handleResultFunc(progressProxyReader, initialData, int(initialSize))
 	if err != nil {
 		return fmt.Errorf("Cannot read response body from %s : %s", URL, err)
 	}
 	return nil
+}
+
+// FIXME: Move outside? perhaps in commons?
+// HandleProgressUpdateFunc defines a function able to handle the progressDelta, in bytes
+type HandleProgressUpdateFunc func(progressDelta int64)
+
+// It's proxy reader, intercepting reads to post progress updates, implement io.Reader
+type ProgressProxyReader struct {
+	io.Reader
+	handleProgressUpdateFunc HandleProgressUpdateFunc
+}
+
+func (r ProgressProxyReader) Read(p []byte) (n int, err error) {
+	n, err = r.Reader.Read(p)
+	r.handleProgressUpdateFunc(int64(n))
+	return
+}
+
+// Close the reader when it implements io.Closer
+func (r ProgressProxyReader) Close() (err error) {
+	if closer, ok := r.Reader.(io.Closer); ok {
+		return closer.Close()
+	}
+	return
 }
