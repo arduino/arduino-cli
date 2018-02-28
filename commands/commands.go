@@ -31,6 +31,8 @@ package commands
 
 import (
 	"github.com/sirupsen/logrus"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
 )
 
 // Error codes to be used for os.Exit().
@@ -52,4 +54,12 @@ var ErrLogrus = logrus.New()
 var GlobalFlags struct {
 	Debug  bool   // If true, dump debug output to stderr.
 	Format string // The Output format (e.g. text, json).
+}
+
+// FIXME: Move away? Where should the display logic reside; in the formatter?
+func GenerateDownloadProgressFormatter() releases.ParallelDownloadProgressHandler {
+	if formatter.IsCurrentFormat("text") {
+		return &ProgressBarFormatter{}
+	}
+	return nil
 }

@@ -75,8 +75,16 @@ func DownloadIndex(indexPath pathutils.Path, URL string) error {
 	return nil
 }
 
-// DownloadPackage downloads a package from arduino repository.
-func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleResultFunc func(io.Reader, *os.File, int) error) error {
+// DownloadPackageProgressChangedHandler defines a function able to handle the update
+// of the progress of the current download
+type DownloadPackageProgressChangedHandler func(fileSize int64, downloadedSoFar int64)
+
+// DownloadPackage downloads a package from Arduino repository.
+// Besides the download information (URL, initialData and totalSize), an (optional) external handler (progressChangedHandler)
+// is available for handling the download progress change (and perhaps display it somehow).
+func DownloadPackage(URL string, initialData *os.File, totalSize int64,
+	progressChangedHandler DownloadPackageProgressChangedHandler) error {
+
 	if initialData == nil {
 		return errors.New("Cannot fill a nil file pointer")
 	}
@@ -120,13 +128,47 @@ func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleRe
 	}
 	defer response.Body.Close()
 
-	if handleResultFunc == nil {
-		_, err = io.Copy(initialData, response.Body)
-	} else {
-		err = handleResultFunc(response.Body, initialData, int(initialSize))
+	// Handle the progress update handler, by creating a ProgressProxyReader;
+	// only if it's needed (i.e. we actually have an external progressChangedHandler)
+	progressProxyReader := response.Body
+	downloadedSoFar := initialSize
+	if progressChangedHandler != nil {
+		progressProxyReader = ProgressProxyReader{response.Body, func(progressDelta int64) {
+			// WARNING: This is using a closure on downloadedSoFar!
+			downloadedSoFar += progressDelta
+			progressChangedHandler(totalSize, downloadedSoFar)
+		},
+		}
 	}
+
+	// Copy the file content
+	_, err = io.Copy(initialData, progressProxyReader)
 	if err != nil {
 		return fmt.Errorf("Cannot read response body from %s : %s", URL, err)
 	}
 	return nil
+}
+
+// FIXME: Move outside? perhaps in commons?
+// HandleProgressUpdateFunc defines a function able to handle the progressDelta, in bytes
+type HandleProgressUpdateFunc func(progressDelta int64)
+
+// It's proxy reader, intercepting reads to post progress updates, implement io.Reader
+type ProgressProxyReader struct {
+	io.Reader
+	handleProgressUpdateFunc HandleProgressUpdateFunc
+}
+
+func (r ProgressProxyReader) Read(p []byte) (n int, err error) {
+	n, err = r.Reader.Read(p)
+	r.handleProgressUpdateFunc(int64(n))
+	return
+}
+
+// Close the reader when it implements io.Closer
+func (r ProgressProxyReader) Close() (err error) {
+	if closer, ok := r.Reader.(io.Closer); ok {
+		return closer.Close()
+	}
+	return
 }

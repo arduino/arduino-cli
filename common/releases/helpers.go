@@ -32,16 +32,14 @@ package releases
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/task"
-	pb "gopkg.in/cheggaaa/pb.v1"
+	"github.com/sirupsen/logrus"
 )
 
 // IsCached returns a bool representing if the release has already been downloaded
@@ -59,11 +57,10 @@ func IsCached(release *DownloadResource) bool {
 //
 //   PARAMS:
 //     resource -> The resource to download.
-//     progBar -> a progress bar, can be nil. If not nill progress is handled for that bar.
-//     label -> Name used to identify the type of the Item downloaded (library, core, tool)
+//     progressChangedHandler -> (optional) is invoked at each progress change.
 //   RETURNS:
 //     error if any
-func downloadRelease(item *DownloadResource, progBar *pb.ProgressBar, label string) error {
+func downloadRelease(item *DownloadResource, progressChangedHandler common.DownloadPackageProgressChangedHandler) error {
 	if item == nil {
 		return errors.New("Cannot accept nil release")
 	}
@@ -72,9 +69,9 @@ func downloadRelease(item *DownloadResource, progBar *pb.ProgressBar, label stri
 		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
 	}
 	defer initialData.Close()
-	// puts the progress bar
+
 	err = common.DownloadPackage(item.URL, initialData,
-		item.Size, handleWithProgressBarFunc(progBar))
+		item.Size, progressChangedHandler)
 	if err != nil {
 		return err
 	}
@@ -86,10 +83,10 @@ func downloadRelease(item *DownloadResource, progBar *pb.ProgressBar, label stri
 }
 
 // downloadTask returns the wrapper to download something without installing it.
-func downloadTask(item *DownloadResource, progBar *pb.ProgressBar, label string) task.Wrapper {
+func downloadTask(item *DownloadResource, progressChangedHandler common.DownloadPackageProgressChangedHandler) task.Wrapper {
 	return task.Wrapper{
 		Task: func() task.Result {
-			err := downloadRelease(item, progBar, label)
+			err := downloadRelease(item, progressChangedHandler)
 			if err != nil {
 				return task.Result{
 					Error: err,
@@ -100,39 +97,70 @@ func downloadTask(item *DownloadResource, progBar *pb.ProgressBar, label string)
 	}
 }
 
+// ParallelDownloadProgressHandler defines an handler that is made aware of
+// the progress of the ParallelDownload.
+// For this to work, the handler is notified of each new download task and it
+// is expected to generate a FileDownloadFilter to track down the progress of the single file.
+// The starting and final moment of the whole parallel download process are also reported to the handler.
+type ParallelDownloadProgressHandler interface {
+	// OnNewDownloadTask is called when a new download task is added to the queue of the ParallelDownload
+	OnNewDownloadTask(fileName string, fileSize int64)
+	// OnProgressChanged is called at each download progress change, giving information for a specific
+	// fileName, reporting its total fileSize and the part downloadedSoFar (both in bytes)
+	OnProgressChanged(fileName string, fileSize int64, downloadedSoFar int64)
+	// OnDownloadStarted is called just before the download of the multiple tasks starts
+	OnDownloadStarted()
+	// OnDownloadStarted is called just after the download of the multiple tasks ends
+	OnDownloadFinished()
+}
+
 // ParallelDownload executes multiple releases downloads in parallel and fills properly results.
 //
 //   forced is used to force download if cached.
 //   OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
-//   DOES NOT RETURN because modified refResults array of results using pointer provided by refResults.Results().
-func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, refResults *[]output.ProcessResult, label string) {
+//	 An optional progressHandler can be passed in order to be notified of the status of the download.
+//   DOES NOT RETURN since will append results to the provided refResults; use refResults.Results() to get them.
+func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, refResults *[]output.ProcessResult,
+	progressHandler ParallelDownloadProgressHandler) {
+
+	// TODO (l.biava): Future improvements envision this utility as an object (say a Builder)
+	// to simplify the passing of all those parameters, the progress handling closure, the outputResults
+	// internally populated, etc.
+
 	itemC := len(items)
 	tasks := make(map[string]task.Wrapper, itemC)
 	paths := make(map[string]string, itemC)
 
-	textMode := formatter.IsCurrentFormat("text")
-
-	var progressBars []*pb.ProgressBar
-	if textMode {
-		progressBars = make([]*pb.ProgressBar, 0, itemC)
-	}
+	logrus.Info(fmt.Sprintf("Initiating parallel download of %d tasks", itemC))
 
 	for _, item := range items {
 		cached := IsCached(item.Resource)
 		releaseNotNil := item.Resource != nil
+		itemName := item.Name
 		if forced || releaseNotNil && (!cached || checkLocalArchive(item.Resource) != nil) {
-			var pBar *pb.ProgressBar
-			if textMode {
-				pBar = pb.StartNew(int(item.Resource.Size)).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", item.Name))
-				progressBars = append(progressBars, pBar)
+			// Notify the progress handler of the new task
+			if progressHandler != nil {
+				progressHandler.OnNewDownloadTask(itemName, int64(item.Resource.Size))
 			}
-			paths[item.Name], _ = ArchivePath(item.Resource) // if the release exists the archivepath always exists
-			tasks[item.Name] = downloadTask(item.Resource, pBar, label)
+			paths[itemName], _ = ArchivePath(item.Resource) // if the release exists the archivepath always exists
+
+			// Forward the per-file progress handler, if available
+			// WARNING: This is using a closure on itemName!
+			getProgressHandler := func(fileName string) common.DownloadPackageProgressChangedHandler {
+				if progressHandler != nil {
+					return func(fileSize int64, downloadedSoFar int64) {
+						progressHandler.OnProgressChanged(fileName, fileSize, downloadedSoFar)
+					}
+				}
+				return nil
+			}
+
+			tasks[itemName] = downloadTask(item.Resource, getProgressHandler(itemName))
 		} else if !forced && releaseNotNil && cached {
 			// Consider OK
 			path, _ := ArchivePath(item.Resource)
 			*refResults = append(*refResults, output.ProcessResult{
-				ItemName: item.Name,
+				ItemName: itemName,
 				Status:   OkStatus,
 				Path:     path,
 			})
@@ -140,15 +168,14 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, refRes
 	}
 
 	if len(tasks) > 0 {
-		var pool *pb.Pool
-		if textMode {
-			pool, _ = pb.StartPool(progressBars...)
+		if progressHandler != nil {
+			progressHandler.OnDownloadStarted()
 		}
 
 		results := task.ExecuteParallelFromMap(tasks)
 
-		if textMode {
-			pool.Stop()
+		if progressHandler != nil {
+			progressHandler.OnDownloadFinished()
 		}
 
 		for name, result := range results {
@@ -165,22 +192,6 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, refRes
 				})
 			}
 		}
-	}
-}
-
-func handleWithProgressBarFunc(progBar *pb.ProgressBar) func(io.Reader, *os.File, int) error {
-	if progBar == nil {
-		return nil
-	}
-	return func(source io.Reader, initialData *os.File, initialSize int) error {
-		progBar.Add(int(initialSize))
-		source = progBar.NewProxyReader(source)
-
-		_, err := io.Copy(initialData, source)
-		if err != nil {
-			return fmt.Errorf("Cannot read response body %s", err)
-		}
-		return nil
 	}
 }
 
