@@ -33,6 +33,7 @@ import (
 	"fmt"
 	"strings"
 
+	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
 
 	"github.com/blang/semver"
@@ -54,6 +55,11 @@ type PlatformRelease struct {
 	BoardNames   []string
 	Dependencies ToolDependencies // The Dependency entries to load tools.
 	Platform     *Platform        `json:"-"`
+
+	Properties  properties.Map            `json:"-"`
+	Boards      map[string]*Board         `json:"-"`
+	Programmers map[string]properties.Map `json:"-"`
+	Folder      string                    `json:"-"`
 }
 
 // ToolDependencies is a set of tool dependency
@@ -102,6 +108,18 @@ func (platform *Platform) latestVersion() string {
 		return fmt.Sprint(max)
 	}
 	return ""
+}
+
+// GetInstalled return one of the installed PlatformRelease
+// TODO: This is a temporary method to help incremental transition from
+// arduino-builder, it will be probably removed in the future
+func (platform *Platform) GetInstalled() *PlatformRelease {
+	for _, release := range platform.Releases {
+		if release.Folder != "" {
+			return release
+		}
+	}
+	return nil
 }
 
 func (platform *Platform) String() string {
