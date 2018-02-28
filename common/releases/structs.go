@@ -29,13 +29,7 @@
 
 package releases
 
-// DownloadItem represents a generic item to be Downloaded.
-type DownloadItem struct {
-	Name     string
-	Resource *DownloadResource
-}
-
-// DownloadResource has all the information to download an item
+// DownloadResource has all the information to download a file
 type DownloadResource struct {
 	URL             string
 	ArchiveFileName string

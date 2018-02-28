@@ -35,16 +35,8 @@ import (
 	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/cores"
 )
-
-// downloadItem represents a platform or a tool to download
-// TODO: can be greatly simplified by usign directly a pointer to the Platform or Tool
-type downloadItem struct {
-	Package string
-	releases.DownloadItem
-}
 
 // platformReference represents a tuple to identify a Platform
 type platformReference struct {

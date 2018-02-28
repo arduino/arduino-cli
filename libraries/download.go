@@ -31,16 +31,12 @@ package libraries
 
 import (
 	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 )
 
 const (
 	// libraryIndexURL is the URL where to get library index.
 	libraryIndexURL string = "http://downloads.arduino.cc/libraries/library_index.json"
 )
-
-// DownloadItem represents a library download struct.
-type DownloadItem releases.DownloadItem
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.
 func DownloadLibrariesFile() error {

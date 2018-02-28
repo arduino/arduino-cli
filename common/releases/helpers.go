@@ -120,7 +120,7 @@ type ParallelDownloadProgressHandler interface {
 //   OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
 //	 An optional progressHandler can be passed in order to be notified of the status of the download.
 //   DOES NOT RETURN since will append results to the provided refResults; use refResults.Results() to get them.
-func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, refResults *[]output.ProcessResult,
+func ParallelDownload(items map[string]*DownloadResource, forced bool, OkStatus string, refResults *[]output.ProcessResult,
 	progressHandler ParallelDownloadProgressHandler) {
 
 	// TODO (l.biava): Future improvements envision this utility as an object (say a Builder)
@@ -133,16 +133,15 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, refRes
 
 	logrus.Info(fmt.Sprintf("Initiating parallel download of %d tasks", itemC))
 
-	for _, item := range items {
-		cached := IsCached(item.Resource)
-		releaseNotNil := item.Resource != nil
-		itemName := item.Name
-		if forced || releaseNotNil && (!cached || checkLocalArchive(item.Resource) != nil) {
+	for itemName, item := range items {
+		cached := IsCached(item)
+		releaseNotNil := item != nil
+		if forced || releaseNotNil && (!cached || checkLocalArchive(item) != nil) {
 			// Notify the progress handler of the new task
 			if progressHandler != nil {
-				progressHandler.OnNewDownloadTask(itemName, int64(item.Resource.Size))
+				progressHandler.OnNewDownloadTask(itemName, int64(item.Size))
 			}
-			paths[itemName], _ = ArchivePath(item.Resource) // if the release exists the archivepath always exists
+			paths[itemName], _ = ArchivePath(item) // if the release exists the archivepath always exists
 
 			// Forward the per-file progress handler, if available
 			// WARNING: This is using a closure on itemName!
@@ -155,10 +154,10 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, refRes
 				return nil
 			}
 
-			tasks[itemName] = downloadTask(item.Resource, getProgressHandler(itemName))
+			tasks[itemName] = downloadTask(item, getProgressHandler(itemName))
 		} else if !forced && releaseNotNil && cached {
 			// Consider OK
-			path, _ := ArchivePath(item.Resource)
+			path, _ := ArchivePath(item)
 			*refResults = append(*refResults, output.ProcessResult{
 				ItemName: itemName,
 				Status:   OkStatus,

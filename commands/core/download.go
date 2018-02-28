@@ -84,28 +84,22 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 }
 
 func downloadToolsArchives(tools []*cores.ToolRelease, results *output.CoreProcessResults) {
-	downloads := []releases.DownloadItem{}
+	downloads := map[string]*releases.DownloadResource{}
 	for _, tool := range tools {
 		resource := tool.GetCompatibleFlavour()
 		if resource == nil {
 			formatter.PrintError(fmt.Errorf("missing tool %s", tool), "A release of the tool is not available for your OS")
 		}
-		downloads = append(downloads, releases.DownloadItem{
-			Name:     tool.Tool.Name + "@" + tool.Version,
-			Resource: tool.GetCompatibleFlavour(),
-		})
+		downloads[tool.Tool.Name+"@"+tool.Version] = tool.GetCompatibleFlavour()
 	}
 	logrus.Info("Downloading tools")
 	releases.ParallelDownload(downloads, false, "Downloaded", &results.Tools, commands.GenerateDownloadProgressFormatter())
 }
 
 func downloadPlatformArchives(platforms []*cores.PlatformRelease, results *output.CoreProcessResults) {
-	downloads := []releases.DownloadItem{}
+	downloads := map[string]*releases.DownloadResource{}
 	for _, platform := range platforms {
-		downloads = append(downloads, releases.DownloadItem{
-			Name:     platform.Platform.Package.Name + ":" + platform.Platform.Name + "@" + platform.Version,
-			Resource: platform.Resource,
-		})
+		downloads[platform.Platform.Package.Name+":"+platform.Platform.Name+"@"+platform.Version] = platform.Resource
 	}
 	logrus.Info("Downloading cores")
 	releases.ParallelDownload(downloads, false, "Downloaded", &results.Cores, commands.GenerateDownloadProgressFormatter())

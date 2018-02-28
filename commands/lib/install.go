@@ -31,13 +31,11 @@ package lib
 
 import (
 	"os"
-	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -69,37 +67,34 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	pairs := libraries.ParseArgs(args)
-	libsToDownload, failOutputs := status.Process(pairs)
+	libsToDownload, notFoundFailOutputs := status.Process(pairs)
 	outputResults := output.LibProcessResults{
-		Libraries: failOutputs,
-	}
-
-	libs := make([]releases.DownloadItem, len(libsToDownload))
-	for i := range libs {
-		libs[i] = releases.DownloadItem(libsToDownload[i])
+		Libraries: notFoundFailOutputs,
 	}
 
 	logrus.Info("Downloading")
-	releases.ParallelDownload(libs, false, "Installed", &outputResults.Libraries, commands.GenerateDownloadProgressFormatter())
+	releases.ParallelDownload(libsToDownload, false, "Installed", &outputResults.Libraries, commands.GenerateDownloadProgressFormatter())
 	logrus.Info("Download finished")
 
 	logrus.Info("Installing")
-	folder, err := configs.LibrariesFolder.Get()
+	// FIXME: why the library folder is calculated again HERE??
+	// folder, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get default lib install path.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	for i, item := range libsToDownload {
-		err = libraries.Install(item.Name, item.Resource)
+	for libName, item := range libsToDownload {
+		err = libraries.Install(libName, item)
 		if err != nil {
-			logrus.WithError(err).Warn("Library", item.Name, "errored")
-			outputResults.Libraries[i] = output.ProcessResult{
-				ItemName: item.Name,
+			logrus.WithError(err).Warn("Library", libName, "errored")
+			outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
+				ItemName: libName,
 				Error:    err.Error(),
-			}
+			})
 		} else {
-			outputResults.Libraries[i].Path = filepath.Join(folder, item.Name)
+			// FIXME: why the library folder is calculated again HERE??
+			// outputResults.Libraries[i].Path = filepath.Join(folder, libName)
 		}
 	}
 
