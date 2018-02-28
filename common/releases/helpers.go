@@ -58,14 +58,13 @@ func IsCached(release *DownloadResource) bool {
 //
 //   PARAMS:
 //     resource -> The resource to download.
-//     label -> Name used to identify the type of the Item downloaded (library, core, tool)
 //     fileDownloadFilter -> (optional) is called before the default download behavior, to override the handling of
 // 							 the result of the download (i.e. decide how to copy the download to the file
 // 							 or do something weird during the operation)
 //     progressChangedHandler -> (optional) is invoked at each progress change.
 //   RETURNS:
 //     error if any
-func downloadRelease(item *DownloadResource, label string, fileDownloadFilter FileDownloadFilter,
+func downloadRelease(item *DownloadResource, fileDownloadFilter FileDownloadFilter,
 	progressChangedHandler common.DownloadPackageProgressChangedHandler) error {
 	if item == nil {
 		return errors.New("Cannot accept nil release")
@@ -106,11 +105,11 @@ func downloadRelease(item *DownloadResource, label string, fileDownloadFilter Fi
 }
 
 // downloadTask returns the wrapper to download something without installing it.
-func downloadTask(item *DownloadResource, fileDownloadProgressHandler FileDownloadFilter, label string,
+func downloadTask(item *DownloadResource, fileDownloadProgressHandler FileDownloadFilter,
 	progressChangedHandler common.DownloadPackageProgressChangedHandler) task.Wrapper {
 	return task.Wrapper{
 		Task: func() task.Result {
-			err := downloadRelease(item, label, fileDownloadProgressHandler, progressChangedHandler)
+			err := downloadRelease(item, fileDownloadProgressHandler, progressChangedHandler)
 			if err != nil {
 				return task.Result{
 					Error: err,
@@ -154,7 +153,7 @@ type ParallelDownloadProgressHandler interface {
 //	 An optional progressHandler can be passed in order to be notified of the status of the download.
 //   DOES NOT RETURN since will append results to the provided refResults; use refResults.Results() to get them.
 func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, refResults *[]output.ProcessResult,
-	label string, progressHandler ParallelDownloadProgressHandler) {
+	progressHandler ParallelDownloadProgressHandler) {
 
 	// TODO (l.biava): Future improvements envision this utility as an object (say a Builder)
 	// to simplify the passing of all those parameters, the progress handling closure, the outputResults
@@ -189,7 +188,7 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, refRes
 				return nil
 			}
 
-			tasks[itemName] = downloadTask(item.Resource, fileDownloadFilter, label, getProgressHandler(itemName))
+			tasks[itemName] = downloadTask(item.Resource, fileDownloadFilter, getProgressHandler(itemName))
 		} else if !forced && releaseNotNil && cached {
 			// Consider OK
 			path, _ := ArchivePath(item.Resource)

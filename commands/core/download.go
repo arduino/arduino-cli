@@ -96,7 +96,7 @@ func downloadToolsArchives(tools []*cores.ToolRelease, results *output.CoreProce
 		})
 	}
 	logrus.Info("Downloading tools")
-	releases.ParallelDownload(downloads, false, "Downloaded", &results.Tools, "tool", commands.GenerateDownloadProgressFormatter())
+	releases.ParallelDownload(downloads, false, "Downloaded", &results.Tools, commands.GenerateDownloadProgressFormatter())
 }
 
 func downloadPlatformArchives(platforms []*cores.PlatformRelease, results *output.CoreProcessResults) {
@@ -108,5 +108,5 @@ func downloadPlatformArchives(platforms []*cores.PlatformRelease, results *outpu
 		})
 	}
 	logrus.Info("Downloading cores")
-	releases.ParallelDownload(downloads, false, "Downloaded", &results.Cores, "core", commands.GenerateDownloadProgressFormatter())
+	releases.ParallelDownload(downloads, false, "Downloaded", &results.Cores, commands.GenerateDownloadProgressFormatter())
 }
