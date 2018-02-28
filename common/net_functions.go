@@ -75,30 +75,14 @@ func DownloadIndex(indexPath pathutils.Path, URL string) error {
 	return nil
 }
 
-// HandleResultFunc defines a function able to handle the content of the
-// download stream of the package (DownloadPackage), filling the File with the content
-// of the Reader, starting from the initial position
-type HandleDownloadPackageResultFunc func(io.Reader, *os.File, int) error
-
-// DefaultDownloadHandlerFunc is the default HandleDownloadPackageResultFunc, which
-// simply copies the content of the Reader into the File, starting from the initialSize
-func DefaultDownloadHandlerFunc(source io.Reader, initialData *os.File, initialSize int) error {
-	// Copy the file content
-	_, err := io.Copy(initialData, source)
-	return err
-}
-
 // DownloadPackageProgressChangedHandler defines a function able to handle the update
 // of the progress of the current download
 type DownloadPackageProgressChangedHandler func(fileSize int64, downloadedSoFar int64)
 
 // DownloadPackage downloads a package from Arduino repository.
-// Besides the download information (URL, initialData and totalSize), two external handlers are available for:
-//  - (handleResultFunc) handling the result of the download (i.e. decide how to copy the download to the file
-// 	  or do something weird during the operation)
-//  - (progressChangedHandler) handling the download progress change (and perhaps display it somehow)
-// None of the handlers is mandatory; they won't be used if nil.
-func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleResultFunc HandleDownloadPackageResultFunc,
+// Besides the download information (URL, initialData and totalSize), an (optional) external handler (progressChangedHandler)
+// is available for handling the download progress change (and perhaps display it somehow).
+func DownloadPackage(URL string, initialData *os.File, totalSize int64,
 	progressChangedHandler DownloadPackageProgressChangedHandler) error {
 
 	if initialData == nil {
@@ -157,12 +141,8 @@ func DownloadPackage(URL string, initialData *os.File, totalSize int64, handleRe
 		}
 	}
 
-	// Use the external handleResultFunc, if available, or the default one otherwise
-	if handleResultFunc == nil {
-		handleResultFunc = DefaultDownloadHandlerFunc
-	}
-
-	err = handleResultFunc(progressProxyReader, initialData, int(initialSize))
+	// Copy the file content
+	_, err = io.Copy(initialData, progressProxyReader)
 	if err != nil {
 		return fmt.Errorf("Cannot read response body from %s : %s", URL, err)
 	}

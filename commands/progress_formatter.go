@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/sirupsen/logrus"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 )
 
 // ProgressBarFormatter implements the visualization of the progress bars
@@ -18,7 +17,7 @@ type ProgressBarFormatter struct {
 
 // Implement interface releases.ParallelDownloadProgressHandler
 
-func (pbf *ProgressBarFormatter) OnNewDownloadTask(fileName string, fileSize int64) releases.FileDownloadFilter {
+func (pbf *ProgressBarFormatter) OnNewDownloadTask(fileName string, fileSize int64) {
 	// Initialize progress bars and a new one for each the new task
 	if pbf.progressBars == nil {
 		pbf.progressBars = map[string]*pb.ProgressBar{}
@@ -29,16 +28,6 @@ func (pbf *ProgressBarFormatter) OnNewDownloadTask(fileName string, fileSize int
 	// Initialization is in bytes, to display full information about the file (not only the percentage)
 	progressBar := pb.New64(fileSize).SetUnits(pb.U_BYTES).Prefix(fmt.Sprintf("%-20s", fileName)).Start()
 	pbf.progressBars[fileName] = progressBar
-
-	// TODO: this was the legacy way to run the progress bar update; since the logic has been outsourced
-	// and the OnProgressChanged callback is now available, it can be safely removed.
-	/*return func(source io.Reader, initialData *os.File, initialSize int) (io.Reader, error) {
-		logrus.Info(fmt.Sprintf("Initialized progress bar for file '%s'", fileName))
-
-		progressBar.Add(int(initialSize))
-		return progressBar.NewProxyReader(source), nil
-	}*/
-	return nil
 }
 
 func (pbf *ProgressBarFormatter) OnProgressChanged(fileName string, fileSize int64, downloadedSoFar int64) {

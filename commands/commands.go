@@ -56,7 +56,7 @@ var GlobalFlags struct {
 	Format string // The Output format (e.g. text, json).
 }
 
-// FIXME: Move away? Where should the display logic reside; in the formatter? That causes an import cycle BTW...
+// FIXME: Move away? Where should the display logic reside; in the formatter?
 func GenerateDownloadProgressFormatter() releases.ParallelDownloadProgressHandler {
 	if formatter.IsCurrentFormat("text") {
 		return &ProgressBarFormatter{}

@@ -32,7 +32,6 @@ package releases
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
@@ -58,14 +57,10 @@ func IsCached(release *DownloadResource) bool {
 //
 //   PARAMS:
 //     resource -> The resource to download.
-//     fileDownloadFilter -> (optional) is called before the default download behavior, to override the handling of
-// 							 the result of the download (i.e. decide how to copy the download to the file
-// 							 or do something weird during the operation)
 //     progressChangedHandler -> (optional) is invoked at each progress change.
 //   RETURNS:
 //     error if any
-func downloadRelease(item *DownloadResource, fileDownloadFilter FileDownloadFilter,
-	progressChangedHandler common.DownloadPackageProgressChangedHandler) error {
+func downloadRelease(item *DownloadResource, progressChangedHandler common.DownloadPackageProgressChangedHandler) error {
 	if item == nil {
 		return errors.New("Cannot accept nil release")
 	}
@@ -75,25 +70,8 @@ func downloadRelease(item *DownloadResource, fileDownloadFilter FileDownloadFilt
 	}
 	defer initialData.Close()
 
-	// Filter the default file download handler with the external one, if available
-	filterDefaultDownloadHandler := func() common.HandleDownloadPackageResultFunc {
-		// Call the external filter first
-		if fileDownloadFilter != nil {
-			return func(source io.Reader, initialData *os.File, initialSize int) error {
-				source, err = fileDownloadFilter(source, initialData, initialSize)
-				if err != nil {
-					return err
-				}
-				// Copy the file content
-				return common.DefaultDownloadHandlerFunc(source, initialData, initialSize)
-			}
-		}
-
-		return nil
-	}
-
 	err = common.DownloadPackage(item.URL, initialData,
-		item.Size, filterDefaultDownloadHandler(), progressChangedHandler)
+		item.Size, progressChangedHandler)
 	if err != nil {
 		return err
 	}
@@ -105,11 +83,10 @@ func downloadRelease(item *DownloadResource, fileDownloadFilter FileDownloadFilt
 }
 
 // downloadTask returns the wrapper to download something without installing it.
-func downloadTask(item *DownloadResource, fileDownloadProgressHandler FileDownloadFilter,
-	progressChangedHandler common.DownloadPackageProgressChangedHandler) task.Wrapper {
+func downloadTask(item *DownloadResource, progressChangedHandler common.DownloadPackageProgressChangedHandler) task.Wrapper {
 	return task.Wrapper{
 		Task: func() task.Result {
-			err := downloadRelease(item, fileDownloadProgressHandler, progressChangedHandler)
+			err := downloadRelease(item, progressChangedHandler)
 			if err != nil {
 				return task.Result{
 					Error: err,
@@ -120,23 +97,14 @@ func downloadTask(item *DownloadResource, fileDownloadProgressHandler FileDownlo
 	}
 }
 
-// FileDownloadFilter defines a function which acts as a filter to handle the download of a file.
-// It receives a source Reader, the destination File and the initial point were the file should be filled in.
-// With that information it can actively act both on the download stream and on the target file.
-// A typical use may include wrapping the source and return a new one, in order to intercept reading to the download stream.
-type FileDownloadFilter func(source io.Reader, initialData *os.File, initialSize int) (io.Reader, error)
-
-// decorateDefaultDownloadHandler defines an handler that is made aware of
+// ParallelDownloadProgressHandler defines an handler that is made aware of
 // the progress of the ParallelDownload.
 // For this to work, the handler is notified of each new download task and it
 // is expected to generate a FileDownloadFilter to track down the progress of the single file.
 // The starting and final moment of the whole parallel download process are also reported to the handler.
 type ParallelDownloadProgressHandler interface {
-	// OnNewDownloadTask is called when a new download task is added to the queue of the ParallelDownload.
-	// This method is supposed to return an optional FileDownloadFilter, which is passed to the downstream
-	// download logic (a typical decorator uses the source Reader to intercept the reading progress and
-	// use it in some way).
-	OnNewDownloadTask(fileName string, fileSize int64) FileDownloadFilter
+	// OnNewDownloadTask is called when a new download task is added to the queue of the ParallelDownload
+	OnNewDownloadTask(fileName string, fileSize int64)
 	// OnProgressChanged is called at each download progress change, giving information for a specific
 	// fileName, reporting its total fileSize and the part downloadedSoFar (both in bytes)
 	OnProgressChanged(fileName string, fileSize int64, downloadedSoFar int64)
@@ -170,10 +138,9 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, refRes
 		releaseNotNil := item.Resource != nil
 		itemName := item.Name
 		if forced || releaseNotNil && (!cached || checkLocalArchive(item.Resource) != nil) {
-			var fileDownloadFilter FileDownloadFilter
-			// Notify the progress handlers, while retrieving the optional fileDownloadFilter
+			// Notify the progress handler of the new task
 			if progressHandler != nil {
-				fileDownloadFilter = progressHandler.OnNewDownloadTask(itemName, int64(item.Resource.Size))
+				progressHandler.OnNewDownloadTask(itemName, int64(item.Resource.Size))
 			}
 			paths[itemName], _ = ArchivePath(item.Resource) // if the release exists the archivepath always exists
 
@@ -188,7 +155,7 @@ func ParallelDownload(items []DownloadItem, forced bool, OkStatus string, refRes
 				return nil
 			}
 
-			tasks[itemName] = downloadTask(item.Resource, fileDownloadFilter, getProgressHandler(itemName))
+			tasks[itemName] = downloadTask(item.Resource, getProgressHandler(itemName))
 		} else if !forced && releaseNotNil && cached {
 			// Consider OK
 			path, _ := ArchivePath(item.Resource)
