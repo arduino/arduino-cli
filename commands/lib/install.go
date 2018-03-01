@@ -77,24 +77,27 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Download finished")
 
 	logrus.Info("Installing")
-	// FIXME: why the library folder is calculated again HERE??
-	// folder, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get default lib install path.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
 	for libName, item := range libsToDownload {
-		err = libraries.Install(libName, item)
-		if err != nil {
+		// FIXME: the library is installed again even if it's already installed
+
+		if libPath, err := libraries.Install(libName, item); err != nil {
 			logrus.WithError(err).Warn("Library", libName, "errored")
 			outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
 				ItemName: libName,
 				Error:    err.Error(),
 			})
 		} else {
-			// FIXME: why the library folder is calculated again HERE??
-			// outputResults.Libraries[i].Path = filepath.Join(folder, libName)
+			// FIXME: this outputResults mess really needs a revamp
+			for i := range outputResults.Libraries {
+				if outputResults.Libraries[i].ItemName == libName {
+					outputResults.Libraries[i].Path = libPath
+				}
+			}
 		}
 	}
 

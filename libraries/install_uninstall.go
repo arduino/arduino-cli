@@ -45,10 +45,10 @@ import (
 // Uninstall a library means remove its directory.
 var Uninstall = os.RemoveAll
 
-// Install installs a library.
-func Install(name string, release *releases.DownloadResource) error {
+// Install installs a library and returns the installed path.
+func Install(name string, release *releases.DownloadResource) (string, error) {
 	if release == nil {
-		return errors.New("Not existing version of the library")
+		return "", errors.New("Not existing version of the library")
 	}
 
 	/*
@@ -70,26 +70,27 @@ func Install(name string, release *releases.DownloadResource) error {
 
 	libFolder, err := configs.LibrariesFolder.Get()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	cacheFilePath, err := releases.ArchivePath(release)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	zipArchive, err := zip.OpenReader(cacheFilePath)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer zipArchive.Close()
 
+	// FIXME: This is NOT the correct folder for libs !!!
 	err = common.Unzip(zipArchive, libFolder)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return libFolder, nil
 }
 
 func removeRelease(libName string, r *Release) error {

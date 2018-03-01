@@ -38,6 +38,7 @@ import (
 )
 
 // Unzip extracts a zip file to a specified destination path.
+// FIXME: Remove this function in favor of github.com/codeclysm/extract
 func Unzip(archive *zip.ReadCloser, destination string) error {
 	for _, file := range archive.File {
 		path := filepath.Join(destination, file.Name)
