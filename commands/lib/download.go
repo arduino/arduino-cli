@@ -68,32 +68,16 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Preparing download")
 	pairs := libraries.ParseArgs(args)
-	libsToDownload, notFoundFailOutputs := status.Process(pairs)
-	outputResults := output.LibProcessResults{
-		Libraries: notFoundFailOutputs,
-	}
+	downloadResources, notFoundFailOutputs := status.Process(pairs)
 
 	logrus.Info("Downloading")
-	downloadRes := releases.ParallelDownload(libsToDownload, false, commands.GenerateDownloadProgressFormatter())
-	// "Downloaded", &outputResults.Libraries
-	for name, res := range downloadRes {
-		path, err := libsToDownload[name].ArchivePath()
-		if err != nil {
-			// FIXME: do something!!
-			logrus.Error("Could not determine library archive path:", err)
-		}
-		status := ""
-		if res.Error == nil {
-			status = "Installed"
-		}
-		outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
-			ItemName: name,
-			Path:     path,
-			Error:    res.Error.Error(),
-			Status:   status,
-		})
-	}
+	downloadResults := releases.ParallelDownload(downloadResources, false, commands.GenerateDownloadProgressFormatter())
 	logrus.Info("Download finished")
-	formatter.Print(outputResults)
+
+	downloadOutputs := formatter.ExtractProcessResultsFromDownloadResults(downloadResources, downloadResults, "Downloaded")
+	out := output.LibProcessResults{}
+	out.Libraries = append(out.Libraries, notFoundFailOutputs...)
+	out.Libraries = append(out.Libraries, downloadOutputs...)
+	formatter.Print(out)
 	logrus.Info("Done")
 }

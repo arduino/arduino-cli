@@ -68,31 +68,15 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 	pairs := libraries.ParseArgs(args)
 	libsToDownload, notFoundFailOutputs := status.Process(pairs)
-	outputResults := output.LibProcessResults{
-		Libraries: notFoundFailOutputs,
-	}
 
 	logrus.Info("Downloading")
 	downloadRes := releases.ParallelDownload(libsToDownload, false, commands.GenerateDownloadProgressFormatter())
-	// "Installed", &outputResults.Libraries,
-	for name, res := range downloadRes {
-		path, err := libsToDownload[name].ArchivePath()
-		if err != nil {
-			// FIXME: do something!!
-			logrus.Error("Could not determine library archive path:", err)
-		}
-		status := ""
-		if res.Error == nil {
-			status = "Installed"
-		}
-		outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
-			ItemName: name,
-			Path:     path,
-			Error:    res.Error.Error(),
-			Status:   status,
-		})
-	}
 	logrus.Info("Download finished")
+
+	downloadOutputs := formatter.ExtractProcessResultsFromDownloadResults(libsToDownload, downloadRes, "Installed")
+	out := output.LibProcessResults{}
+	out.Libraries = append(out.Libraries, notFoundFailOutputs...)
+	out.Libraries = append(out.Libraries, downloadOutputs...)
 
 	logrus.Info("Installing")
 	if err != nil {
@@ -100,25 +84,26 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrCoreConfig)
 	}
 
+	// FIXME: this outputResults mess really needs a revamp
+
 	for libName, item := range libsToDownload {
 		// FIXME: the library is installed again even if it's already installed
 
 		if libPath, err := libraries.Install(libName, item); err != nil {
 			logrus.WithError(err).Warn("Library", libName, "errored")
-			outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
+			out.Libraries = append(out.Libraries, output.ProcessResult{
 				ItemName: libName,
 				Error:    err.Error(),
 			})
 		} else {
-			// FIXME: this outputResults mess really needs a revamp
-			for i := range outputResults.Libraries {
-				if outputResults.Libraries[i].ItemName == libName {
-					outputResults.Libraries[i].Path = libPath
+			for i := range out.Libraries {
+				if out.Libraries[i].ItemName == libName {
+					out.Libraries[i].Path = libPath
 				}
 			}
 		}
 	}
 
-	formatter.Print(outputResults)
+	formatter.Print(out)
 	logrus.Info("Done")
 }

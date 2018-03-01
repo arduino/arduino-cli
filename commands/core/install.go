@@ -81,6 +81,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	downloadPlatformArchives(coresToDownload, &outputResults)
 
 	logrus.Info("Installing tool dependencies")
+	// FIXME: i index is no more guaranteed to be in sorted order
 	for i, item := range toolsToDownload {
 		logrus.WithField("Package", item.Tool.Package.Name).
 			WithField("Name", item.Tool.Name).
