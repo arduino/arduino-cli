@@ -30,6 +30,7 @@
 package task
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -52,8 +53,7 @@ func CreateSequence(tasks []Task, ignoreOnFailure []bool) Sequence {
 			result := task()
 			results = append(results, result)
 			if result.Error != nil && !ignoreOnFailure[i] {
-				// FIXME: is ignoreOnFailure really needed?
-				//formatter.Print(fmt.Sprintf("Warning from task %d: %s", i, result.Error))
+				fmt.Printf("Warning from task %d: %s\n", i, result.Error)
 			}
 		}
 		return results
