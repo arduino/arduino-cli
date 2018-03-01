@@ -52,3 +52,14 @@ func (r *DownloadResource) ArchivePath() (string, error) {
 	}
 	return filepath.Join(staging, r.ArchiveFileName), nil
 }
+
+// DownloadResult contains the result of a download
+type DownloadResult struct {
+	// Error is nil if the download is successful otherwise
+	// it contains the reason for the download failure
+	Error error
+
+	// AlreadyDownloaded is true if a cache file is found
+	// and, consequently, the download has not been executed
+	AlreadyDownloaded bool
+}

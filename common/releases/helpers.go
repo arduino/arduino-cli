@@ -35,7 +35,6 @@ import (
 	"os"
 
 	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/task"
 	"github.com/sirupsen/logrus"
 )
@@ -118,18 +117,16 @@ type ParallelDownloadProgressHandler interface {
 //   OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
 //	 An optional progressHandler can be passed in order to be notified of the status of the download.
 //   DOES NOT RETURN since will append results to the provided refResults; use refResults.Results() to get them.
-func ParallelDownload(items map[string]*DownloadResource, forced bool, OkStatus string, refResults *[]output.ProcessResult,
-	progressHandler ParallelDownloadProgressHandler) {
+func ParallelDownload(items map[string]*DownloadResource, forced bool, progressHandler ParallelDownloadProgressHandler) map[string]*DownloadResult {
 
 	// TODO (l.biava): Future improvements envision this utility as an object (say a Builder)
 	// to simplify the passing of all those parameters, the progress handling closure, the outputResults
 	// internally populated, etc.
 
-	itemC := len(items)
-	tasks := make(map[string]task.Wrapper, itemC)
-	paths := make(map[string]string, itemC)
+	tasks := map[string]task.Wrapper{}
+	res := map[string]*DownloadResult{}
 
-	logrus.Info(fmt.Sprintf("Initiating parallel download of %d tasks", itemC))
+	logrus.Info(fmt.Sprintf("Initiating parallel download of %d resources", len(items)))
 
 	for itemName, item := range items {
 		cached := IsCached(item)
@@ -137,9 +134,8 @@ func ParallelDownload(items map[string]*DownloadResource, forced bool, OkStatus 
 		if forced || releaseNotNil && (!cached || checkLocalArchive(item) != nil) {
 			// Notify the progress handler of the new task
 			if progressHandler != nil {
-				progressHandler.OnNewDownloadTask(itemName, int64(item.Size))
+				progressHandler.OnNewDownloadTask(itemName, item.Size)
 			}
-			paths[itemName], _ = item.ArchivePath() // if the release exists the archivepath always exists
 
 			// Forward the per-file progress handler, if available
 			// WARNING: This is using a closure on itemName!
@@ -154,13 +150,8 @@ func ParallelDownload(items map[string]*DownloadResource, forced bool, OkStatus 
 
 			tasks[itemName] = downloadTask(item, getProgressHandler(itemName))
 		} else if !forced && releaseNotNil && cached {
-			// Consider OK
-			path, _ := item.ArchivePath()
-			*refResults = append(*refResults, output.ProcessResult{
-				ItemName: itemName,
-				Status:   OkStatus,
-				Path:     path,
-			})
+			// Item already downloaded
+			res[itemName] = &DownloadResult{AlreadyDownloaded: true}
 		}
 	}
 
@@ -177,19 +168,14 @@ func ParallelDownload(items map[string]*DownloadResource, forced bool, OkStatus 
 
 		for name, result := range results {
 			if result.Error != nil {
-				*refResults = append(*refResults, output.ProcessResult{
-					ItemName: name,
-					Error:    result.Error.Error(),
-				})
+				res[name] = &DownloadResult{Error: result.Error}
 			} else {
-				*refResults = append(*refResults, output.ProcessResult{
-					ItemName: name,
-					Status:   OkStatus,
-					Path:     paths[name],
-				})
+				res[name] = &DownloadResult{}
 			}
 		}
 	}
+
+	return res
 }
 
 // OpenLocalArchiveForDownload open local archive if present

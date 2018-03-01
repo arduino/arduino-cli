@@ -93,7 +93,25 @@ func downloadToolsArchives(tools []*cores.ToolRelease, results *output.CoreProce
 		downloads[tool.Tool.Name+"@"+tool.Version] = tool.GetCompatibleFlavour()
 	}
 	logrus.Info("Downloading tools")
-	releases.ParallelDownload(downloads, false, "Downloaded", &results.Tools, commands.GenerateDownloadProgressFormatter())
+	downloadRes := releases.ParallelDownload(downloads, false, commands.GenerateDownloadProgressFormatter())
+
+	for name, res := range downloadRes {
+		path, err := downloads[name].ArchivePath()
+		if err != nil {
+			// FIXME: do something!!
+			logrus.Error("Could not determine library archive path:", err)
+		}
+		status := ""
+		if res.Error == nil {
+			status = "Downloaded"
+		}
+		results.Tools = append(results.Tools, output.ProcessResult{
+			ItemName: name,
+			Path:     path,
+			Error:    res.Error.Error(),
+			Status:   status,
+		})
+	}
 }
 
 func downloadPlatformArchives(platforms []*cores.PlatformRelease, results *output.CoreProcessResults) {
@@ -102,5 +120,23 @@ func downloadPlatformArchives(platforms []*cores.PlatformRelease, results *outpu
 		downloads[platform.Platform.Package.Name+":"+platform.Platform.Name+"@"+platform.Version] = platform.Resource
 	}
 	logrus.Info("Downloading cores")
-	releases.ParallelDownload(downloads, false, "Downloaded", &results.Cores, commands.GenerateDownloadProgressFormatter())
+	downloadRes := releases.ParallelDownload(downloads, false, commands.GenerateDownloadProgressFormatter())
+
+	for name, res := range downloadRes {
+		path, err := downloads[name].ArchivePath()
+		if err != nil {
+			// FIXME: do something!!
+			logrus.Error("Could not determine library archive path:", err)
+		}
+		status := ""
+		if res.Error == nil {
+			status = "Downloaded"
+		}
+		results.Cores = append(results.Cores, output.ProcessResult{
+			ItemName: name,
+			Path:     path,
+			Error:    res.Error.Error(),
+			Status:   status,
+		})
+	}
 }

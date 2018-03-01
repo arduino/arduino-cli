@@ -74,7 +74,25 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	}
 
 	logrus.Info("Downloading")
-	releases.ParallelDownload(libsToDownload, false, "Downloaded", &outputResults.Libraries, commands.GenerateDownloadProgressFormatter())
+	downloadRes := releases.ParallelDownload(libsToDownload, false, commands.GenerateDownloadProgressFormatter())
+	// "Downloaded", &outputResults.Libraries
+	for name, res := range downloadRes {
+		path, err := libsToDownload[name].ArchivePath()
+		if err != nil {
+			// FIXME: do something!!
+			logrus.Error("Could not determine library archive path:", err)
+		}
+		status := ""
+		if res.Error == nil {
+			status = "Installed"
+		}
+		outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
+			ItemName: name,
+			Path:     path,
+			Error:    res.Error.Error(),
+			Status:   status,
+		})
+	}
 	logrus.Info("Download finished")
 	formatter.Print(outputResults)
 	logrus.Info("Done")
