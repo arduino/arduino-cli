@@ -33,18 +33,16 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/task"
 	"github.com/sirupsen/logrus"
 )
 
 // IsCached returns a bool representing if the release has already been downloaded
 func IsCached(release *DownloadResource) bool {
-	archivePath, err := ArchivePath(release)
+	archivePath, err := release.ArchivePath()
 	if err != nil {
 		return false
 	}
@@ -141,7 +139,7 @@ func ParallelDownload(items map[string]*DownloadResource, forced bool, OkStatus 
 			if progressHandler != nil {
 				progressHandler.OnNewDownloadTask(itemName, int64(item.Size))
 			}
-			paths[itemName], _ = ArchivePath(item) // if the release exists the archivepath always exists
+			paths[itemName], _ = item.ArchivePath() // if the release exists the archivepath always exists
 
 			// Forward the per-file progress handler, if available
 			// WARNING: This is using a closure on itemName!
@@ -157,7 +155,7 @@ func ParallelDownload(items map[string]*DownloadResource, forced bool, OkStatus 
 			tasks[itemName] = downloadTask(item, getProgressHandler(itemName))
 		} else if !forced && releaseNotNil && cached {
 			// Consider OK
-			path, _ := ArchivePath(item)
+			path, _ := item.ArchivePath()
 			*refResults = append(*refResults, output.ProcessResult{
 				ItemName: itemName,
 				Status:   OkStatus,
@@ -194,19 +192,10 @@ func ParallelDownload(items map[string]*DownloadResource, forced bool, OkStatus 
 	}
 }
 
-// ArchivePath returns the fullPath of the Archive of this release.
-func ArchivePath(r *DownloadResource) (string, error) {
-	staging, err := configs.DownloadCacheFolder(r.CachePath).Get()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(staging, r.ArchiveFileName), nil
-}
-
 // OpenLocalArchiveForDownload open local archive if present
 // used to resume download. Creates an empty file if not found.
 func OpenLocalArchiveForDownload(r *DownloadResource) (*os.File, error) {
-	path, err := ArchivePath(r)
+	path, err := r.ArchivePath()
 	if err != nil {
 		return nil, err
 	}

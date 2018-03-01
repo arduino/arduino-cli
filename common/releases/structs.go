@@ -29,6 +29,12 @@
 
 package releases
 
+import (
+	"path/filepath"
+
+	"github.com/bcmi-labs/arduino-cli/configs"
+)
+
 // DownloadResource has all the information to download a file
 type DownloadResource struct {
 	URL             string
@@ -36,4 +42,13 @@ type DownloadResource struct {
 	Checksum        string
 	Size            int64
 	CachePath       string
+}
+
+// ArchivePath returns the fullPath of the Archive of this release.
+func (r *DownloadResource) ArchivePath() (string, error) {
+	staging, err := configs.DownloadCacheFolder(r.CachePath).Get()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(staging, r.ArchiveFileName), nil
 }

@@ -65,7 +65,7 @@ func getHashAlgoAndComponent(checksum string) (hash.Hash, []byte) {
 // What Checksum is expected.
 func checksumMatches(r *DownloadResource) bool {
 	hash, content := getHashAlgoAndComponent(r.Checksum)
-	filePath, err := ArchivePath(r)
+	filePath, err := r.ArchivePath()
 	if err != nil {
 		return false
 	}
@@ -81,7 +81,7 @@ func checksumMatches(r *DownloadResource) bool {
 
 // checkLocalArchive check for integrity of the local archive.
 func checkLocalArchive(release *DownloadResource) error {
-	archivePath, err := ArchivePath(release)
+	archivePath, err := release.ArchivePath()
 	if err != nil {
 		return err
 	}

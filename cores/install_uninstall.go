@@ -54,7 +54,7 @@ func InstallPlatform(destDir string, release *releases.DownloadResource) error {
 		return errors.New("Not existing version of the platform")
 	}
 
-	cacheFilePath, err := releases.ArchivePath(release)
+	cacheFilePath, err := release.ArchivePath()
 	if err != nil {
 		return err
 	}
@@ -123,7 +123,7 @@ func InstallTool(destToolsDir string, release *releases.DownloadResource) error 
 		return errors.New("Not existing version of the tool")
 	}
 
-	cacheFilePath, err := releases.ArchivePath(release)
+	cacheFilePath, err := release.ArchivePath()
 	if err != nil {
 		return err
 	}

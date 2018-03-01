@@ -73,7 +73,7 @@ func Install(name string, release *releases.DownloadResource) (string, error) {
 		return "", err
 	}
 
-	cacheFilePath, err := releases.ArchivePath(release)
+	cacheFilePath, err := release.ArchivePath()
 	if err != nil {
 		return "", err
 	}
