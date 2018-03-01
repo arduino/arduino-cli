@@ -30,10 +30,7 @@
 package task
 
 import (
-	"fmt"
 	"sync"
-
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
 )
 
 // resultWithKey values are used by ExecuteParallelFromMap as temporary values.
@@ -46,15 +43,17 @@ type resultWithKey struct {
 //
 // if abortOnFailure = true then the sequence is aborted with the error,
 // otherwise there is just an error logged.
-func CreateSequence(taskWrappers []Wrapper, ignoreOnFailure []bool) Sequence {
+// FIXME: Is this Sequence madness really needed?
+func CreateSequence(tasks []Task, ignoreOnFailure []bool) Sequence {
 	results := make([]Result, 0, 10)
 
 	return Sequence(func() []Result {
-		for i, taskWrapper := range taskWrappers {
-			result := taskWrapper.Execute()
+		for i, task := range tasks {
+			result := task()
 			results = append(results, result)
 			if result.Error != nil && !ignoreOnFailure[i] {
-				formatter.Print(fmt.Sprintf("Warning from task %d: %s", i, result.Error))
+				// FIXME: is ignoreOnFailure really needed?
+				//formatter.Print(fmt.Sprintf("Warning from task %d: %s", i, result.Error))
 			}
 		}
 		return results
@@ -74,24 +73,24 @@ func (ts Sequence) Task() Task {
 }
 
 // ExecuteSequence creates and executes an array of tasks in strict sequence.
-func ExecuteSequence(taskWrappers []Wrapper, ignoreOnFailure []bool) []Result {
+func ExecuteSequence(taskWrappers []Task, ignoreOnFailure []bool) []Result {
 	return CreateSequence(taskWrappers, ignoreOnFailure)()
 }
 
 // ExecuteParallelFromMap executes a set of taskwrappers in parallel, taking input from a map[string]Wrapper.
-func ExecuteParallelFromMap(taskMap map[string]Wrapper) map[string]Result {
+func ExecuteParallelFromMap(taskMap map[string]Task) map[string]Result {
 	results := make(chan resultWithKey, len(taskMap))
 
 	var wg sync.WaitGroup
 	wg.Add(len(taskMap))
 
 	for key, task := range taskMap {
-		go func(key string, task Wrapper) {
+		go func(key string, task Task) {
 			defer wg.Done()
 			results <- resultWithKey{
 				Key: key,
 				Result: func() Result {
-					return task.Execute()
+					return task()
 				}(),
 			}
 		}(key, task)
@@ -106,17 +105,17 @@ func ExecuteParallelFromMap(taskMap map[string]Wrapper) map[string]Result {
 }
 
 // ExecuteParallel executes a set of Wrappers in parallel, handling concurrency for results.
-func ExecuteParallel(taskWrappers []Wrapper) []Result {
-	results := make(chan Result, len(taskWrappers))
+func ExecuteParallel(tasks []Task) []Result {
+	results := make(chan Result, len(tasks))
 
 	var wg sync.WaitGroup
-	wg.Add(len(taskWrappers))
+	wg.Add(len(tasks))
 
-	for _, task := range taskWrappers {
-		go func(task Wrapper) {
+	for _, task := range tasks {
+		go func(task Task) {
 			defer wg.Done()
 			results <- func() Result {
-				return task.Execute()
+				return task()
 			}()
 		}(task)
 	}

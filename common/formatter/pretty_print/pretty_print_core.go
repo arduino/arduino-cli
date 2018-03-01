@@ -30,13 +30,14 @@
 package prettyPrints
 
 import (
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/bcmi-labs/arduino-cli/cores/packageindex"
 	"github.com/bcmi-labs/arduino-cli/task"
 )
 
 // DownloadCoreFileIndex shows info regarding the download of a missing (or corrupted) file index of core packages.
-func DownloadCoreFileIndex() task.Wrapper {
+func DownloadCoreFileIndex() task.Task {
 	return DownloadFileIndex(packageindex.DownloadPackagesFile)
 }
 
@@ -51,15 +52,12 @@ func CorruptedCoreIndexFix(index packageindex.Index) (cores.Packages, error) {
 }
 
 // coreIndexParse pretty prints info about parsing an index file of libraries.
-func coreIndexParse(index packageindex.Index) task.Wrapper {
-	ret := indexParseWrapperSkeleton()
-	ret.Task = task.Task(func() task.Result {
-		err := packageindex.LoadIndex(&index) // I try again
-		status := index.CreateStatusContext()
-		return task.Result{
-			Result: status,
-			Error:  err,
-		}
-	})
-	return ret
+func coreIndexParse(index packageindex.Index) task.Task {
+	msgs := indexParseWrapperSkeleton()
+	return formatter.WrapTask(
+		func() task.Result {
+			err := packageindex.LoadIndex(&index) // I try again
+			status := index.CreateStatusContext()
+			return task.Result{Result: status, Error: err}
+		}, msgs)
 }

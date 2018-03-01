@@ -79,18 +79,14 @@ func downloadRelease(item *DownloadResource, progressChangedHandler common.Downl
 	return nil
 }
 
-// downloadTask returns the wrapper to download something without installing it.
-func downloadTask(item *DownloadResource, progressChangedHandler common.DownloadPackageProgressChangedHandler) task.Wrapper {
-	return task.Wrapper{
-		Task: func() task.Result {
-			err := downloadRelease(item, progressChangedHandler)
-			if err != nil {
-				return task.Result{
-					Error: err,
-				}
-			}
-			return task.Result{}
-		},
+// downloadTask returns the task to download something without installing it.
+func downloadTask(item *DownloadResource, progressChangedHandler common.DownloadPackageProgressChangedHandler) task.Task {
+	return func() task.Result {
+		err := downloadRelease(item, progressChangedHandler)
+		if err != nil {
+			return task.Result{Error: err}
+		}
+		return task.Result{}
 	}
 }
 
@@ -123,7 +119,7 @@ func ParallelDownload(items map[string]*DownloadResource, forced bool, progressH
 	// to simplify the passing of all those parameters, the progress handling closure, the outputResults
 	// internally populated, etc.
 
-	tasks := map[string]task.Wrapper{}
+	tasks := map[string]task.Task{}
 	res := map[string]*DownloadResult{}
 
 	logrus.Info(fmt.Sprintf("Initiating parallel download of %d resources", len(items)))

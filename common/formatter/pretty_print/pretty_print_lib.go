@@ -30,12 +30,13 @@
 package prettyPrints
 
 import (
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/bcmi-labs/arduino-cli/task"
 )
 
 // DownloadLibFileIndex shows info regarding the download of a missing (or corrupted) file index of libraries.
-func DownloadLibFileIndex() task.Wrapper {
+func DownloadLibFileIndex() task.Task {
 	return DownloadFileIndex(libraries.DownloadLibrariesFile)
 }
 
@@ -51,18 +52,12 @@ func CorruptedLibIndexFix(index libraries.Index) (libraries.StatusContext, error
 }
 
 // libIndexParse pretty prints info about parsing an index file of libraries.
-func libIndexParse(index libraries.Index) task.Wrapper {
-	ret := indexParseWrapperSkeleton()
-	ret.Task = func() task.Result {
-		err := libraries.LoadIndex(&index)
-		if err != nil {
-			return task.Result{
-				Error: err,
-			}
+func libIndexParse(index libraries.Index) task.Task {
+	msgs := indexParseWrapperSkeleton()
+	return formatter.WrapTask(func() task.Result {
+		if err := libraries.LoadIndex(&index); err != nil {
+			return task.Result{Error: err}
 		}
-		return task.Result{
-			Result: index.CreateStatusContext(),
-		}
-	}
-	return ret
+		return task.Result{Result: index.CreateStatusContext()}
+	}, msgs)
 }

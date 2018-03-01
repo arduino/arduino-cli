@@ -60,42 +60,42 @@ func actionOnItems(itemPluralName string, actionPastParticiple string, itemOK []
 
 // DownloadFileIndex shows info regarding the download of a missing (or corrupted) file index.
 // uses DownloadFunc to download the file.
-func DownloadFileIndex(downloadFunc func() error) task.Wrapper {
-	return task.Wrapper{
+func DownloadFileIndex(downloadFunc func() error) task.Task {
+	msgs := &formatter.TaskWrapperMessages{
 		BeforeMessage: "Downloading from download.arduino.cc",
 		AfterMessage:  "Index File downloaded",
 		ErrorMessage:  "Can't download index file, check your network connection.",
-		Task: task.Task(func() task.Result {
-			return task.Result{
-				Result: nil,
-				Error:  downloadFunc(),
-			}
-		}),
 	}
+	return formatter.WrapTask(
+		func() task.Result {
+			return task.Result{Error: downloadFunc()}
+		},
+		msgs)
 }
 
-//corruptedIndexFixResults executes a generic index fix procedure, made by a download and parse task.
-func corruptedIndexFixResults(downloadTask, parseTask task.Wrapper) []task.Result {
-	subTasks := []task.Wrapper{downloadTask, parseTask}
-	wrapper := indexFixWrapperSkeleton()
-	wrapper.Task = task.CreateSequence(subTasks, []bool{false, false}).Task()
-	return wrapper.Execute().Result.([]task.Result)
+// corruptedIndexFixResults executes a generic index fix procedure, made by a download and parse task.
+func corruptedIndexFixResults(downloadTask, parseTask task.Task) []task.Result {
+	t := task.CreateSequence(
+		[]task.Task{downloadTask, parseTask},
+		[]bool{false, false},
+	).Task()
+	wt := formatter.WrapTask(t, indexFixWrapperSkeleton())
+	return wt().Result.([]task.Result)
 }
 
 // indexParseWrapperSkeleton provides an empty skeleton for a task wrapper regarding index (core index, lib index) error fixing tasks,
 // which will be assigned later.
-func indexFixWrapperSkeleton() task.Wrapper {
-	return task.Wrapper{
+func indexFixWrapperSkeleton() *formatter.TaskWrapperMessages {
+	return &formatter.TaskWrapperMessages{
 		BeforeMessage: "Cannot parse index file, it may be corrupted.",
 	}
 }
 
 // indexParseWrapperSkeleton provides an empty skeleton for a task wrapper regarding index (core index, lib index) parsing tasks,
 // which will be assigned later.
-func indexParseWrapperSkeleton() task.Wrapper {
-	return task.Wrapper{
+func indexParseWrapperSkeleton() *formatter.TaskWrapperMessages {
+	return &formatter.TaskWrapperMessages{
 		BeforeMessage: "Parsing downloaded index file",
 		ErrorMessage:  "Cannot parse index file",
-		Task:          nil,
 	}
 }

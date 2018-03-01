@@ -30,7 +30,6 @@
 package core
 
 import (
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/pretty_print"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -51,5 +50,6 @@ var updateIndexCommand = &cobra.Command{
 
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Updating package index")
-	common.ExecUpdateIndex(prettyPrints.DownloadCoreFileIndex())
+	updateTask := prettyPrints.DownloadCoreFileIndex()
+	updateTask()
 }

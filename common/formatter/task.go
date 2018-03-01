@@ -24,16 +24,34 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  *
- * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
+ * Copyright 2017-2018 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package common
+package formatter
 
-import (
-	"github.com/bcmi-labs/arduino-cli/task"
-)
+import "github.com/bcmi-labs/arduino-cli/task"
 
-// ExecUpdateIndex is a generic procedure to update an index file.
-func ExecUpdateIndex(updateTask task.Wrapper) {
-	updateTask.Execute()
+// TaskWrapperMessages are the messages that are printed when
+// a wrapped task is executed.
+type TaskWrapperMessages struct {
+	BeforeMessage string
+	AfterMessage  string
+	ErrorMessage  string
+}
+
+// WrapTask decorate the original task by adding the pretty-print of message
+// to be rendered before and after the task is executed.
+func WrapTask(t task.Task, messages *TaskWrapperMessages) task.Task {
+	return func() task.Result {
+		Print(messages.BeforeMessage)
+
+		ret := t()
+
+		if ret.Error != nil {
+			Print(messages.ErrorMessage)
+		} else {
+			Print(messages.AfterMessage)
+		}
+		return ret
+	}
 }
