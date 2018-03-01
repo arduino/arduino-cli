@@ -30,14 +30,9 @@
 package core
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
-	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
@@ -61,26 +56,12 @@ var downloadCommand = &cobra.Command{
 func runDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
-	logrus.Info("Getting packages status context")
-	status, err := getPackagesStatusContext()
-	if err != nil {
-		formatter.PrintError(err, "Cannot get packages status context.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-
-	logrus.Info("Preparing download")
-
-	coresToDownload, toolsToDownload, failOutputs := findItemsToDownload(status, parsePlatformReferenceArgs(args))
-	outputResults := output.CoreProcessResults{
-		Cores: failOutputs,
-		Tools: []output.ProcessResult{},
-	}
+	// The usage of this depends on the specific command, so it's on-demand
+	commands.InitPackageManager()
+	pm := packagemanager.PackageManager()
 
 	// FIXME: that's just a PoC; please have mercy...
-	fmt.Printf("TESTING THE FLUENT PKGMGR\n")
-
-	_, err = packagemanager.PackageManager().AddDefaultPackageIndex()
-	fmt.Printf("Loading default package index, error: %v\n", err)
+	/*fmt.Printf("TESTING THE FLUENT PKGMGR\n")
 
 	tool, err := packagemanager.PackageManager().Package("not-found").Tool("avrdude").IsInstalled()
 	fmt.Printf("Tool status: %s, %v\n", tool, err)
@@ -89,42 +70,20 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	fmt.Printf("Tool status: %s, %v\n", tool, err)
 
 	tool, err = packagemanager.PackageManager().Package("arduino").Tool("avrdude").IsInstalled()
-	fmt.Printf("Tool status: %s, %v\n", tool, err)
+	fmt.Printf("Tool status: %s, %v\n", tool, err)*/
 
+	logrus.Info("Preparing download")
+	// FIXME: add another round of I/O marshalling
+	platformReleasesToDownload, toolReleasesToDownload, failOutputs := pm.FindItemsToDownload(
+		parsePlatformReferenceArgs(args))
+	outputResults := output.CoreProcessResults{
+		Cores: failOutputs,
+		Tools: []output.ProcessResult{},
+	}
 
-	downloadToolsArchives(toolsToDownload, &outputResults)
-
-	downloadPlatformArchives(coresToDownload, &outputResults)
+	pm.DownloadToolReleaseArchives(toolReleasesToDownload, &outputResults)
+	pm.DownloadPlatformReleaseArchives(platformReleasesToDownload, &outputResults)
 
 	formatter.Print(outputResults)
 	logrus.Info("Done")
-}
-
-// FIXME: Move to the PackageManager and look for a way to uncouple of the printing logic
-// All this stuff is pkgmgr responsibility for sure
-
-func downloadToolsArchives(tools []*cores.ToolRelease, results *output.CoreProcessResults) {
-	downloads := map[string]*releases.DownloadResource{}
-	for _, tool := range tools {
-		resource := tool.GetCompatibleFlavour()
-		if resource == nil {
-			formatter.PrintError(fmt.Errorf("missing tool %s", tool), "A release of the tool is not available for your OS")
-		}
-		downloads[tool.Tool.Name+"@"+tool.Version] = tool.GetCompatibleFlavour()
-	}
-	logrus.Info("Downloading tools")
-	downloadRes := releases.ParallelDownload(downloads, false, commands.GenerateDownloadProgressFormatter())
-	downloadOutput := formatter.ExtractProcessResultsFromDownloadResults(downloads, downloadRes, "Downloaded")
-	results.Tools = append(results.Tools, downloadOutput...)
-}
-
-func downloadPlatformArchives(platforms []*cores.PlatformRelease, results *output.CoreProcessResults) {
-	downloads := map[string]*releases.DownloadResource{}
-	for _, platform := range platforms {
-		downloads[platform.Platform.Package.Name+":"+platform.Platform.Name+"@"+platform.Version] = platform.Resource
-	}
-	logrus.Info("Downloading cores")
-	downloadRes := releases.ParallelDownload(downloads, false, commands.GenerateDownloadProgressFormatter())
-	downloadOutput := formatter.ExtractProcessResultsFromDownloadResults(downloads, downloadRes, "Downloaded")
-	results.Cores = append(results.Cores, downloadOutput...)
 }

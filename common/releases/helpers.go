@@ -113,7 +113,8 @@ type ParallelDownloadProgressHandler interface {
 //   OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
 //	 An optional progressHandler can be passed in order to be notified of the status of the download.
 //   DOES NOT RETURN since will append results to the provided refResults; use refResults.Results() to get them.
-func ParallelDownload(items map[string]*DownloadResource, forced bool, progressHandler ParallelDownloadProgressHandler) map[string]*DownloadResult {
+func ParallelDownload(items map[string]*DownloadResource, forced bool,
+	progressHandler ParallelDownloadProgressHandler) map[string]*DownloadResult {
 
 	// TODO (l.biava): Future improvements envision this utility as an object (say a Builder)
 	// to simplify the passing of all those parameters, the progress handling closure, the outputResults

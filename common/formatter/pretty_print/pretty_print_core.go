@@ -39,7 +39,7 @@ import (
 
 // DownloadCoreFileIndex shows info regarding the download of a missing (or corrupted) file index of core packages.
 func DownloadCoreFileIndex() task.Task {
-	return DownloadFileIndex(packagemanager.PackageManager().DownloadPackagesFile)
+	return DownloadFileIndex(packagemanager.PackageManager().DownloadDefaultPackageIndexFile)
 }
 
 // CorruptedCoreIndexFix pretty prints messages regarding corrupted index fixes of cores.

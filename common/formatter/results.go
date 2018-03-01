@@ -79,13 +79,16 @@ func ExtractProcessResultsFromDownloadResults(
 		}
 		resultError := results[name].Error
 		status := ""
+		errorMessage := ""
 		if resultError == nil {
 			status = label
+		} else {
+			errorMessage = resultError.Error()
 		}
 		out = append(out, output.ProcessResult{
 			ItemName: name,
 			Path:     path,
-			Error:    resultError.Error(),
+			Error:    errorMessage,
 			Status:   status,
 		})
 	}

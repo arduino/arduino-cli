@@ -30,16 +30,13 @@
 package core
 
 import (
-	"os"
-	"path/filepath"
-
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/configs"
-	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
+	"os"
 )
 
 func init() {
@@ -60,108 +57,30 @@ var installCommand = &cobra.Command{
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
-	logrus.Info("Getting packages status context")
-	status, err := getPackagesStatusContext()
-	if err != nil {
-		formatter.PrintError(err, "Cannot get packages status context.")
-		os.Exit(commands.ErrCoreConfig)
-	}
+	// The usage of this depends on the specific command, so it's on-demand
+	commands.InitPackageManager()
+	pm := packagemanager.PackageManager()
 
 	logrus.Info("Preparing download")
-
 	// FIXME: Isn't this the same code as in core/download.go? Should be refactored
-	coresToDownload, toolsToDownload, failOutputs := findItemsToDownload(status, parsePlatformReferenceArgs(args))
-	failOutputsCount := len(failOutputs)
+	platformReleasesToDownload, toolReleasesToDownload, failOutputs := pm.FindItemsToDownload(
+		parsePlatformReferenceArgs(args))
 	outputResults := output.CoreProcessResults{
 		Cores: failOutputs,
 		Tools: []output.ProcessResult{},
 	}
 
-	downloadToolsArchives(toolsToDownload, &outputResults)
-
-	downloadPlatformArchives(coresToDownload, &outputResults)
+	pm.DownloadToolReleaseArchives(toolReleasesToDownload, &outputResults)
+	pm.DownloadPlatformReleaseArchives(platformReleasesToDownload, &outputResults)
 
 	logrus.Info("Installing tool dependencies")
-	// FIXME: i index is no more guaranteed to be in sorted order
-	for i, item := range toolsToDownload {
-		logrus.WithField("Package", item.Tool.Package.Name).
-			WithField("Name", item.Tool.Name).
-			WithField("Version", item.Version).
-			Info("Installing tool")
-
-		toolRoot, err := configs.ToolsFolder(item.Tool.Package.Name).Get()
-		if err != nil {
-			formatter.PrintError(err, "Cannot get tool install path, try again.")
-			os.Exit(commands.ErrCoreConfig)
-		}
-		possiblePath := filepath.Join(toolRoot, item.Tool.Name, item.Version)
-
-		err = cores.InstallTool(possiblePath, item.GetCompatibleFlavour())
-		if err != nil {
-			if os.IsExist(err) {
-				logrus.WithError(err).Warnf("Cannot install tool `%s`, it is already installed", item.Tool.Name)
-				outputResults.Tools[i] = output.ProcessResult{
-					ItemName: item.Tool.Name,
-					Status:   "Already Installed",
-					Path:     possiblePath,
-				}
-			} else {
-				logrus.WithError(err).Warnf("Cannot install tool `%s`", item.Tool.Name)
-				outputResults.Tools[i] = output.ProcessResult{
-					ItemName: item.Tool.Name,
-					Status:   "",
-					Error:    err.Error(),
-				}
-			}
-		} else {
-			logrus.Info("Adding installed tool to final result")
-			outputResults.Tools[i] = output.ProcessResult{
-				ItemName: item.Tool.Name,
-				Status:   "Installed",
-				Path:     possiblePath,
-			}
-		}
+	err := pm.InstallToolReleases(toolReleasesToDownload, &outputResults)
+	if err == nil {
+		err = pm.InstallPlatformReleases(platformReleasesToDownload, &outputResults)
 	}
-
-	for i, item := range coresToDownload {
-		logrus.WithField("Package", item.Platform.Package.Name).
-			WithField("Name", item.Platform.Name).
-			WithField("Version", item.Version).
-			Info("Installing core")
-
-		coreRoot, err := configs.CoresFolder(item.Platform.Package.Name).Get()
-		if err != nil {
-			formatter.PrintError(err, "Cannot get core install path, try again.")
-			os.Exit(commands.ErrCoreConfig)
-		}
-		possiblePath := filepath.Join(coreRoot, item.Platform.Architecture, item.Version)
-
-		err = cores.InstallPlatform(possiblePath, item.Resource)
-		if err != nil {
-			if os.IsExist(err) {
-				logrus.WithError(err).Warnf("Cannot install core `%s`, it is already installed", item.Platform.Name)
-				outputResults.Cores[i+failOutputsCount] = output.ProcessResult{
-					ItemName: item.Platform.Name,
-					Status:   "Already Installed",
-					Path:     possiblePath,
-				}
-			} else {
-				logrus.WithError(err).Warnf("Cannot install core `%s`", item.Platform.Name)
-				outputResults.Cores[i+failOutputsCount] = output.ProcessResult{
-					ItemName: item.Platform.Name,
-					Status:   "",
-					Error:    err.Error(),
-				}
-			}
-		} else {
-			logrus.Info("Adding installed core to final result")
-
-			outputResults.Cores[i+failOutputsCount] = output.ProcessResult{
-				ItemName: item.Platform.Name,
-				Status:   "Installed",
-				Path:     possiblePath,
-			}
-		}
+	if err != nil {
+		formatter.PrintError(err, "Cannot get tool install path, try again.")
+		os.Exit(commands.ErrCoreConfig)
 	}
 
 	formatter.Print(outputResults)

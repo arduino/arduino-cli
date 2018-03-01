@@ -23,7 +23,7 @@
  * the GNU General Public License.  This exception does not however
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
- *
+ *it
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
@@ -253,7 +253,7 @@ func LoadIndex(index *Index) error {
 	return nil
 }
 
-// DownloadPackagesFile downloads the core packages index file from arduino repository.
-func DownloadPackagesFile() error {
+// DownloadDefaultPackageIndexFile downloads the core packages index file from arduino repository.
+func DownloadDefaultPackageIndexFile() error {
 	return common.DownloadIndex(coreIndexPath, packageIndexURL)
 }

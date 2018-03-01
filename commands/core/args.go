@@ -34,24 +34,19 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/cores"
+	"os"
+	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
 )
-
-// platformReference represents a tuple to identify a Platform
-type platformReference struct {
-	Package              string // The package where this Platform belongs to.
-	PlatformArchitecture string
-	PlatformVersion      string
-}
 
 var coreTupleRegexp = regexp.MustCompile("[a-zA-Z0-9]+:[a-zA-Z0-9]+(=([0-9]|[0-9].)*[0-9]+)?")
 
 // parsePlatformReferenceArgs parses a sequence of "packager:arch=version" tokens and returns a platformReference slice.
 //
 // If version is not present it is assumed as "latest" version.
-func parsePlatformReferenceArgs(args []string) []platformReference {
-	ret := []platformReference{}
+func parsePlatformReferenceArgs(args []string) []packagemanager.PlatformReference {
+	ret := []packagemanager.PlatformReference{}
 
 	for _, arg := range args {
 		if coreTupleRegexp.MatchString(arg) {
@@ -62,94 +57,17 @@ func parsePlatformReferenceArgs(args []string) []platformReference {
 			if len(split) < 3 {
 				split = append(split, "latest")
 			}
-			ret = append(ret, platformReference{
+			ret = append(ret, packagemanager.PlatformReference{
 				Package:              split[0],
 				PlatformArchitecture: split[1],
 				PlatformVersion:      split[2],
 			})
 		} else {
-			// TODO: handle errors properly
-			ret = append(ret, platformReference{
-				Package:              "invalid-arg",
-				PlatformArchitecture: arg,
-			})
+			// Why even bother to return an error; just fail and let the user know right away...
+			formatter.PrintError(nil,
+				fmt.Sprintf("'%s' is an invalid item (does not match the syntax 'PACKAGER:ARCH[=VERSION]')", arg))
+			os.Exit(commands.ErrBadArgument)
 		}
 	}
 	return ret
-}
-
-// FIXME: Replace move to the PackageManager
-// findItemsToDownload takes a set of platformReference and returns a set of items to download and
-// a set of outputs for non existing platforms.
-func findItemsToDownload(sc *cores.Packages, items []platformReference) ([]*cores.PlatformRelease, []*cores.ToolRelease, []output.ProcessResult) {
-	itemC := len(items)
-	retPlatforms := []*cores.PlatformRelease{}
-	retTools := []*cores.ToolRelease{}
-	fails := make([]output.ProcessResult, 0, itemC)
-
-	// value is not used, this map is only to check if an item is inside (set implementation)
-	// see https://stackoverflow.com/questions/34018908/golang-why-dont-we-have-a-set-datastructure
-	presenceMap := make(map[string]bool, itemC)
-
-	for _, item := range items {
-		if item.Package == "invalid-arg" {
-			fails = append(fails, output.ProcessResult{
-				ItemName: item.PlatformArchitecture,
-				Error:    "Invalid item (not PACKAGER:ARCH[=VERSION])",
-			})
-			continue
-		}
-		pkg, exists := sc.Packages[item.Package]
-		if !exists {
-			fails = append(fails, output.ProcessResult{
-				ItemName: item.PlatformArchitecture,
-				Error:    fmt.Sprintf("Package %s not found", item.Package),
-			})
-			continue
-		}
-		platform, exists := pkg.Platforms[item.PlatformArchitecture]
-		if !exists {
-			fails = append(fails, output.ProcessResult{
-				ItemName: item.PlatformArchitecture,
-				Error:    "Platform not found",
-			})
-			continue
-		}
-
-		_, exists = presenceMap[item.PlatformArchitecture]
-		if exists { //skip
-			continue
-		}
-
-		release := platform.GetVersion(item.PlatformVersion)
-		if release == nil {
-			fails = append(fails, output.ProcessResult{
-				ItemName: item.PlatformArchitecture,
-				Error:    fmt.Sprintf("Version %s Not Found", item.PlatformVersion),
-			})
-			continue
-		}
-
-		// replaces "latest" with latest version too
-		toolDeps, err := sc.GetDepsOfPlatformRelease(release)
-		if err != nil {
-			fails = append(fails, output.ProcessResult{
-				ItemName: item.PlatformArchitecture,
-				Error:    fmt.Sprintf("Cannot get tool dependencies of plafotmr %s: %s", platform.Name, err.Error()),
-			})
-			continue
-		}
-
-		retPlatforms = append(retPlatforms, release)
-
-		presenceMap[platform.Name] = true
-		for _, tool := range toolDeps {
-			if presenceMap[tool.Tool.Name] {
-				continue
-			}
-			presenceMap[tool.Tool.Name] = true
-			retTools = append(retTools, tool)
-		}
-	}
-	return retPlatforms, retTools, fails
 }
