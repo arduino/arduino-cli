@@ -40,6 +40,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
 )
 
 func init() {
@@ -75,6 +76,22 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		Tools: []output.ProcessResult{},
 	}
 
+	// FIXME: that's just a PoC; please have mercy...
+	fmt.Printf("TESTING THE FLUENT PKGMGR\n")
+
+	_, err = packagemanager.PackageManager().AddDefaultPackageIndex()
+	fmt.Printf("Loading default package index, error: %v\n", err)
+
+	tool, err := packagemanager.PackageManager().Package("not-found").Tool("avrdude").IsInstalled()
+	fmt.Printf("Tool status: %s, %v\n", tool, err)
+
+	tool, err = packagemanager.PackageManager().Package("arduino").Tool("not-found").IsInstalled()
+	fmt.Printf("Tool status: %s, %v\n", tool, err)
+
+	tool, err = packagemanager.PackageManager().Package("arduino").Tool("avrdude").IsInstalled()
+	fmt.Printf("Tool status: %s, %v\n", tool, err)
+
+
 	downloadToolsArchives(toolsToDownload, &outputResults)
 
 	downloadPlatformArchives(coresToDownload, &outputResults)
@@ -82,6 +99,9 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	formatter.Print(outputResults)
 	logrus.Info("Done")
 }
+
+// FIXME: Move to the PackageManager and look for a way to uncouple of the printing logic
+// All this stuff is pkgmgr responsibility for sure
 
 func downloadToolsArchives(tools []*cores.ToolRelease, results *output.CoreProcessResults) {
 	downloads := map[string]*releases.DownloadResource{}

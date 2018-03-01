@@ -69,6 +69,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Preparing download")
 
+	// FIXME: Isn't this the same code as in core/download.go? Should be refactored
 	coresToDownload, toolsToDownload, failOutputs := findItemsToDownload(status, parsePlatformReferenceArgs(args))
 	failOutputsCount := len(failOutputs)
 	outputResults := output.CoreProcessResults{

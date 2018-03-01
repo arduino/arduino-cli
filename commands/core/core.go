@@ -55,6 +55,8 @@ var command = &cobra.Command{
 	Example: "arduino core update-index # to update the package index file.",
 }
 
+// FIXME: Move to the PackageManager
+
 // getInstalledCores gets the installed cores and puts them in the output struct.
 func getInstalledCores(packageName string, cores *[]output.InstalledStuff) {
 	getInstalledStuff(cores, configs.CoresFolder(packageName))
@@ -118,6 +120,5 @@ func getPackagesStatusContext() (*cores.Packages, error) {
 		return &status, nil
 	}
 
-	status := index.CreateStatusContext()
-	return &status, nil
+	return index.CreateStatusContext(), nil
 }

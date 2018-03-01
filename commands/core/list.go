@@ -75,6 +75,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrCoreConfig)
 	}
 
+	// FIXME: Use the PackageManager instead
 	pkgs := output.InstalledPackageList{
 		InstalledPackages: make([]output.InstalledPackage, 0, 10),
 	}

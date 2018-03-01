@@ -78,6 +78,7 @@ func parsePlatformReferenceArgs(args []string) []platformReference {
 	return ret
 }
 
+// FIXME: Replace move to the PackageManager
 // findItemsToDownload takes a set of platformReference and returns a set of items to download and
 // a set of outputs for non existing platforms.
 func findItemsToDownload(sc *cores.Packages, items []platformReference) ([]*cores.PlatformRelease, []*cores.ToolRelease, []output.ProcessResult) {

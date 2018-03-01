@@ -84,6 +84,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 
 	time.Sleep(duration)
 
+	// FIXME: Replace with the PackageManager
 	homeFolder, err := configs.ArduinoHomeFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot Parse Board Index file.")
@@ -145,6 +146,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	formatter.PrintResult("BOARD ATTACHED.")
 }
 
+// FIXME: Those should probably go in a "BoardManager" pkg or something
 // findSerialConnectedBoard find the board which is connected to the specified URI via serial port, using a monitor and a set of Boards
 // for the matching.
 func findSerialConnectedBoard(bs boards.Boards, monitor *discovery.Monitor, deviceURI *url.URL) *boards.Board {

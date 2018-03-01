@@ -85,6 +85,7 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Done")
 }
 
+// FIXME: is this any useful?
 // ConfigsFromQuestions asks some questions to the user to properly initialize configs.
 // It does not have much sense to use it in JSON formatting, though.
 func configsFromQuestions() {

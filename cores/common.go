@@ -38,6 +38,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/configs"
 )
 
+// FIXME: Move all of these to PackageManager().Tools().isInstalled() or something like that
 // IsCoreInstalled detects if a core has been installed.
 func IsCoreInstalled(packageName string, name string) (bool, error) {
 	location, err := configs.CoresFolder(packageName).Get()

@@ -117,6 +117,7 @@ func run(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	// FIXME: Replace with the PackageManager
 	isCtagsInstalled, err := cores.IsToolInstalled(packageName, "ctags")
 	if err != nil {
 		formatter.PrintError(err, "Cannot check ctags installation.")
@@ -195,6 +196,7 @@ func run(cmd *cobra.Command, args []string) {
 		formatter.PrintError(err, "Cannot get the core version.")
 		os.Exit(commands.ErrBadCall)
 	}
+	// FIXME: this is building the CommandLine to run the builder; we should move it to a "cores.compute" pkg
 	// Add dependency tools paths to build properties with versions corresponding to specific core version.
 	var packageIndex packageindex.Index
 	packageindex.LoadIndex(&packageIndex)
