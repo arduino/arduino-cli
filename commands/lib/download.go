@@ -75,9 +75,15 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Download finished")
 
 	downloadOutputs := formatter.ExtractProcessResultsFromDownloadResults(downloadResources, downloadResults, "Downloaded")
-	out := output.LibProcessResults{}
-	out.Libraries = append(out.Libraries, notFoundFailOutputs...)
-	out.Libraries = append(out.Libraries, downloadOutputs...)
+	out := output.LibProcessResults{
+		Libraries: map[string]output.ProcessResult{},
+	}
+	for name, value := range notFoundFailOutputs {
+		out.Libraries[name] = value
+	}
+	for name, value := range downloadOutputs {
+		out.Libraries[name] = value
+	}
 	formatter.Print(out)
 	logrus.Info("Done")
 }

@@ -67,29 +67,35 @@ func (sc StatusContext) Names() []string {
 	return res
 }
 
+// FIXME Move to PackageManager
+func GetLibraryCode(library *Library) string {
+	return library.Name
+}
+
 // Process takes a set of name-version pairs and return
 // a set of items to download and a set of outputs for non
 // existing libraries.
-func (sc StatusContext) Process(items []NameVersionPair) (map[string]*releases.DownloadResource, []output.ProcessResult) {
+func (sc StatusContext) Process(items []NameVersionPair) (map[string]*releases.DownloadResource, map[string]output.ProcessResult) {
 	ret := map[string]*releases.DownloadResource{}
-	fails := []output.ProcessResult{}
+	fails := map[string]output.ProcessResult{}
 
 	for _, item := range items {
 		library, exists := sc.Libraries[item.Name]
 		if !exists {
-			fails = append(fails, output.ProcessResult{
+			// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
+			fails[item.Name] = output.ProcessResult{
 				ItemName: item.Name,
 				Error:    "Library not found",
-			})
+			}
 		} else {
 			release := library.GetVersion(item.Version)
 			if release == nil {
-				fails = append(fails, output.ProcessResult{
+				fails[GetLibraryCode(library)] = output.ProcessResult{
 					ItemName: item.Name,
 					Error:    "Version Not Found",
-				})
+				}
 			} else { // replaces "latest" with latest version too
-				ret[library.Name] = release.Resource
+				ret[GetLibraryCode(library)] = release.Resource
 			}
 		}
 	}

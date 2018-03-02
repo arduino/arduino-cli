@@ -78,12 +78,15 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		parsePlatformReferenceArgs(args))
 	outputResults := output.CoreProcessResults{
 		Cores: failOutputs,
-		Tools: []output.ProcessResult{},
+		Tools: map[string]output.ProcessResult{},
 	}
 
+	formatter.Print("Downloading tools...")
 	pm.DownloadToolReleaseArchives(toolReleasesToDownload, &outputResults)
+	formatter.Print("Downloading cores...")
 	pm.DownloadPlatformReleaseArchives(platformReleasesToDownload, &outputResults)
 
+	formatter.Print("Results:")
 	formatter.Print(outputResults)
 	logrus.Info("Done")
 }

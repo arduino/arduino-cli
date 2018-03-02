@@ -74,9 +74,15 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Download finished")
 
 	downloadOutputs := formatter.ExtractProcessResultsFromDownloadResults(libsToDownload, downloadRes, "Installed")
-	out := output.LibProcessResults{}
-	out.Libraries = append(out.Libraries, notFoundFailOutputs...)
-	out.Libraries = append(out.Libraries, downloadOutputs...)
+	out := output.LibProcessResults{
+		Libraries:map[string]output.ProcessResult{},
+	}
+	for name, value := range notFoundFailOutputs {
+		out.Libraries[name] = value
+	}
+	for name, value := range downloadOutputs {
+		out.Libraries[name] = value
+	}
 
 	logrus.Info("Installing")
 	if err != nil {
@@ -91,15 +97,15 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 		if libPath, err := libraries.Install(libName, item); err != nil {
 			logrus.WithError(err).Warn("Library", libName, "errored")
-			out.Libraries = append(out.Libraries, output.ProcessResult{
+			// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
+			out.Libraries[libName] = output.ProcessResult{
 				ItemName: libName,
 				Error:    err.Error(),
-			})
+			}
 		} else {
-			for i := range out.Libraries {
-				if out.Libraries[i].ItemName == libName {
-					out.Libraries[i].Path = libPath
-				}
+			// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
+			if libEntry, found := out.Libraries[libName]; found {
+				libEntry.Path = libPath
 			}
 		}
 	}

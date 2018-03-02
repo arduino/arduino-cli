@@ -48,7 +48,7 @@ var installCommand = &cobra.Command{
 	Short: "Installs one or more cores and corresponding tool dependencies.",
 	Long:  "Installs one or more cores and corresponding tool dependencies.",
 	Example: "" +
-		"arduino core install arduino:samd       # to download the latest version of arduino SAMD core.\n" +
+		"arduino core install arduino:samd       # to download the latest version of arduino SAMD core." +
 		"arduino core install arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
 	Args: cobra.MinimumNArgs(1),
 	Run:  runInstallCommand,
@@ -67,15 +67,21 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		parsePlatformReferenceArgs(args))
 	outputResults := output.CoreProcessResults{
 		Cores: failOutputs,
-		Tools: []output.ProcessResult{},
+		Tools: map[string]output.ProcessResult{},
 	}
 
+	formatter.Print("Downloading tools...")
 	pm.DownloadToolReleaseArchives(toolReleasesToDownload, &outputResults)
+	formatter.Print("Downloading cores...")
 	pm.DownloadPlatformReleaseArchives(platformReleasesToDownload, &outputResults)
 
 	logrus.Info("Installing tool dependencies")
+	formatter.Print("Installing tool dependencies...")
+	
 	err := pm.InstallToolReleases(toolReleasesToDownload, &outputResults)
 	if err == nil {
+		logrus.Info("Installing cores")
+		formatter.Print("Installing cores...")
 		err = pm.InstallPlatformReleases(platformReleasesToDownload, &outputResults)
 	}
 	if err != nil {
@@ -83,6 +89,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrCoreConfig)
 	}
 
+	formatter.Print("Results:")
 	formatter.Print(outputResults)
 	logrus.Info("Done")
 }

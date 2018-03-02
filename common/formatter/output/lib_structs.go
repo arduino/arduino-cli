@@ -51,13 +51,13 @@ type VersionFullInfo struct {
 
 //LibProcessResults represent the result of a process on libraries.
 type LibProcessResults struct {
-	Libraries []ProcessResult `json:"libraries,required"`
+	Libraries map[string]ProcessResult `json:"libraries,required"`
 }
 
 //CoreProcessResults represent the result of a process on cores or tools.
 type CoreProcessResults struct {
-	Cores []ProcessResult `json:"cores,omitempty"`
-	Tools []ProcessResult `json:"tools,omitempty"`
+	Cores map[string]ProcessResult `json:"cores,omitempty"`
+	Tools map[string]ProcessResult `json:"tools,omitempty"`
 }
 
 // String returns a string representation of the object.
@@ -109,6 +109,6 @@ func (lsr LibSearchResults) String() string {
 // Results returns a set of generic results, to allow them to be modified externally.
 //
 // -> ProcessResults interface.
-func (lpr LibProcessResults) Results() *[]ProcessResult {
-	return &lpr.Libraries
+func (lpr LibProcessResults) Results() map[string]ProcessResult {
+	return lpr.Libraries
 }

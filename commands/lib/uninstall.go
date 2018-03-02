@@ -89,7 +89,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	outputResults := output.LibProcessResults{
-		Libraries: make([]output.ProcessResult, 0, 10),
+		Libraries: map[string]output.ProcessResult{},
 	}
 
 	useFileName := func(file os.FileInfo, library libraries.NameVersionPair, outputResults *output.LibProcessResults) bool {
@@ -108,12 +108,12 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 			if err != nil {
 				logrus.WithError(err).Warn("Cannot uninstall", fileName)
 				result.Error = err.Error()
-				(*outputResults).Libraries = append((*outputResults).Libraries, result)
 			} else {
 				logrus.Info(fileName, "Uninstalled")
 				result.Error = "Uninstalled"
-				(*outputResults).Libraries = append((*outputResults).Libraries, result)
 			}
+			// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
+			(*outputResults).Libraries[library.Name] = result
 			return true
 		}
 		return false
@@ -144,10 +144,11 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 					content, err := ioutil.ReadFile(indexFile)
 					if err != nil {
 						logrus.WithError(err).Warn("Cannot read library.properties")
-						outputResults.Libraries = append(outputResults.Libraries, output.ProcessResult{
+						// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
+						outputResults.Libraries[library.Name] = output.ProcessResult{
 							ItemName: fmt.Sprint(library.Name, "@", library.Version),
 							Error:    err.Error(),
-						})
+						}
 						break
 					}
 
@@ -179,11 +180,20 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 					}
 					if name == library.Name &&
 						(library.Version == versionAll || library.Version == version) {
-						logrus.Info("Uninstalling", file.Name())
+						logrus.Info("Uninstalling ", file.Name())
 						err := libraries.Uninstall(filepath.Join(libFolder, file.Name()))
+						result := output.ProcessResult{
+							ItemName: fmt.Sprint(library.Name, "@", library.Version),
+						}
 						if err != nil {
 							logrus.WithError(err).Warn("Cannot uninstall", file.Name())
+							result.Error = err.Error()
+						} else {
+							logrus.Info(file.Name(), "Uninstalled")
+							result.Error = "Uninstalled"
 						}
+						// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
+						outputResults.Libraries[library.Name] = result
 					}
 				}
 			}

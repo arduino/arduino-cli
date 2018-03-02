@@ -61,11 +61,12 @@ func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
 	fileName = strings.Replace(fileName, "-", " v. ", -1)
 	//I use folder name
 	logrus.WithField("Name", fileName).Warn("Using filename to get result")
-	libs.Libraries = append(libs.Libraries, output.ProcessResult{
+	// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
+	libs.Libraries [fileName] = output.ProcessResult{
 		ItemName: fileName,
 		Status:   "",
 		Error:    "Unknown Version",
-	})
+	}
 }
 
 func getLibStatusContext() (*libraries.StatusContext, error) {

@@ -67,9 +67,9 @@ func PrintResult(res interface{}) {
 func ExtractProcessResultsFromDownloadResults(
 	resources map[string]*releases.DownloadResource,
 	results map[string]*releases.DownloadResult,
-	label string) []output.ProcessResult {
+	label string) map[string]output.ProcessResult {
 
-	out := []output.ProcessResult{}
+	out := map[string]output.ProcessResult{}
 	for name, resource := range resources {
 		path, err := resource.ArchivePath()
 		if err != nil {
@@ -85,12 +85,12 @@ func ExtractProcessResultsFromDownloadResults(
 		} else {
 			errorMessage = resultError.Error()
 		}
-		out = append(out, output.ProcessResult{
+		out[name] = output.ProcessResult{
 			ItemName: name,
 			Path:     path,
 			Error:    errorMessage,
 			Status:   status,
-		})
+		}
 	}
 	return out
 }

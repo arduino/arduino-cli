@@ -83,7 +83,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	}
 
 	libs := output.LibProcessResults{
-		Libraries: make([]output.ProcessResult, 0, 10),
+		Libraries: map[string]output.ProcessResult{},
 	}
 
 	logrus.Info("Listing")
@@ -130,11 +130,12 @@ func runListCommand(cmd *cobra.Command, args []string) {
 					resultFromFileName(file, &libs)
 					continue
 				}
-				libs.Libraries = append(libs.Libraries, output.ProcessResult{
+				// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
+				libs.Libraries[Name] = output.ProcessResult{
 					ItemName: Name,
 					Status:   fmt.Sprint("v.", Version),
 					Error:    "",
-				})
+				}
 			}
 		}
 	}
