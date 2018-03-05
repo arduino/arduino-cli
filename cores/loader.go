@@ -38,49 +38,6 @@ import (
 	properties "github.com/arduino/go-properties-map"
 )
 
-// LoadHardwareFromFolders read all plaforms from a folder
-func (packages *Packages) LoadHardwareFromFolders(folders []string) error {
-	for _, folder := range folders {
-		folder, err := filepath.Abs(folder)
-		if err != nil {
-			return fmt.Errorf("find abs path: %s", err)
-		}
-		// TODO: IS THIS CHECK NEEDED? can we ignore and let it fail at next ReadDir?
-		if stat, err := os.Stat(folder); err != nil {
-			return fmt.Errorf("reading %s stat info: %s", folder, err)
-		} else if !stat.IsDir() {
-			return fmt.Errorf("%s is not a folder", folder)
-		}
-
-		// TODO: IS THIS REALLY NEEDED? this is used only to get ctags properties AFAIK
-		platformTxtPath := filepath.Join(folder, "platform.txt")
-		if props, err := properties.SafeLoad(platformTxtPath); err == nil {
-			packages.Properties.Merge(props)
-		} else {
-			return fmt.Errorf("reading %s: %s", platformTxtPath, err)
-		}
-
-		// Scan subfolders.
-		files, err := ioutil.ReadDir(folder)
-		if err != nil {
-			return fmt.Errorf("reading %s directory: %s", folder, err)
-		}
-		for _, subfolder := range files {
-			// First exclude all "tools" folders
-			packager := subfolder.Name()
-			if packager == "tools" {
-				continue
-			}
-
-			if err := packages.LoadPackage(packager, filepath.Join(folder, packager)); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-
 // LoadPackage load the package identified by packager in the specified path
 func (packages *Packages) LoadPackage(packager string, path string) error {
 	// Follow symlinks

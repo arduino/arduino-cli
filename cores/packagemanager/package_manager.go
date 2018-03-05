@@ -3,14 +3,15 @@ package packagemanager
 import (
 	"sync"
 
-	"github.com/bcmi-labs/arduino-cli/cores/packageindex"
 	"fmt"
-	"github.com/bcmi-labs/arduino-cli/cores"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"os"
 	"path/filepath"
-	"github.com/juju/errors"
+
 	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/cores/packageindex"
+	"github.com/juju/errors"
 )
 
 var packageManagerInstance *packageManager
