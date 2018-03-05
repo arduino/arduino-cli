@@ -36,18 +36,23 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"strconv"
 
-	"github.com/bcmi-labs/arduino-cli/commands/root"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/bcmi-labs/arduino-cli/commands/root"
+	"github.com/bouk/monkey"
+	"github.com/bcmi-labs/arduino-cli/commands"
 )
 
 /*
 NOTE: the use of func init() for test is discouraged, please create public InitFunctions and call them,
 	  or use (untested) cmd.PersistentPreRun or cmd.PreRun to reinitialize the flags and the commands every time.
 */
+
+// Utility functions
 
 // Redirecting stdOut so we can analyze output line by
 // line and check with what we want.
@@ -68,21 +73,69 @@ func cleanTempRedirect(t *testing.T, tempFile *os.File) {
 	os.Stdout = stdOut
 }
 
-func executeWithArgs(t *testing.T, args ...string) {
+// executeWithArgsNoError is a commodity function, which does the same as executeWithArgs,
+// while failing the test unless no error has occurred
+func executeWithArgsNoError(t *testing.T, args ...string) {
+	err := executeWithArgs(t, args...)
+	require.NoError(t, err, "Expected no error executing command")
+}
+
+// executeWithArgsError is a commodity function, which does the same as executeWithArgs,
+// while failing the test if no error has occurred
+func executeWithArgsError(t *testing.T, args ...string) error {
+	err := executeWithArgs(t, args...)
+	require.Error(t, err, "Expected an error executing command")
+	return err
+}
+
+// executeWithArgs executes the Cobra Command with the given arguments
+// and intercepts any errors (even `os.Exit()` ones), returning the resulting error
+// and also logging it for debugging purpose
+func executeWithArgs(t *testing.T, args ...string) error {
+	err := executeWithArgsInternal(t, args...)
+	if err != nil {
+		exitCode, conversionError := strconv.Atoi(err.Error())
+		if conversionError != nil {
+			t.Logf("Executing command with args '%s', resulted in error: %s", args, err)
+		} else {
+			t.Logf("Executing command with args '%s', resulted in exit code: %d", args, exitCode)
+		}
+	}
+	return err
+}
+
+// Please use executeWithArgs instead
+func executeWithArgsInternal(t *testing.T, args ...string) (err error) {
 	// Init only once.
 	if !root.Command.HasFlags() {
-		root.Init()
+		root.Init(true)
 	}
 	if args != nil {
 		root.Command.SetArgs(args)
 	}
 
-	err := root.Command.Execute()
-	fmt.Fprintln(stdOut, err)
-	require.NoError(t, err, "Error executing command")
+	// Mock the os.Exit function, so that we can use the
+	// error result for the test and prevent the test from exiting
+	fakeExit := func(exitCode int) {
+		panic(exitCode)
+	}
+	patch := monkey.Patch(os.Exit, fakeExit)
+	defer patch.Unpatch()
+	defer func() {
+		if exitCode := recover(); exitCode != nil {
+			err = fmt.Errorf("%d", exitCode)
+		}
+	}()
+
+	// Execute the CLI command, in this process
+	root.Command.Execute()
+
+	return err
 }
 
-func TestLibSearch(t *testing.T) {
+// END -- Utility functions
+
+func TestLibSearchSuccessful(t *testing.T) {
 	tempFile := createTempRedirect(t)
 	defer cleanTempRedirect(t, tempFile)
 	want := []string{
@@ -92,15 +145,15 @@ func TestLibSearch(t *testing.T) {
 	}
 
 	// arduino lib search you
-	//executeWithArgs(t, "lib", "search", "you") //test not working on drone, but working locally
+	//executeWithArgsNoError(t, "lib", "search", "you") //test not working on drone, but working locally
 	// arduino lib search youtu --format json
 	// arduino lib search youtu --format=json
-	executeWithArgs(t, "lib", "search", "youtu", "--format", "json", "--names")
+	executeWithArgsNoError(t, "lib", "search", "youtu", "--format", "json", "--names")
 
 	checkOutput(t, want, tempFile)
 }
 
-func TestLibDownload(t *testing.T) {
+func TestLibDownloadSuccessful(t *testing.T) {
 	tempFile := createTempRedirect(t)
 	defer cleanTempRedirect(t, tempFile)
 
@@ -111,14 +164,19 @@ func TestLibDownload(t *testing.T) {
 	// desired output
 	want := output.LibProcessResults{
 		Libraries: map[string]output.ProcessResult{
-			"invalidLibrary": {ItemName: "invalidLibrary", Error: "Library not found"},
-			"YoutubeApi":     {ItemName: "YoutubeApi", Status: "Downloaded", Path: stagingFolder + "/YoutubeApi-1.0.0.zip"},
-			"YouMadeIt":      {ItemName: "YouMadeIt", Error: "Version Not Found"},
+			"invalidLibrary":           {ItemName: "invalidLibrary", Error: "Library not found"},
+			"YoutubeApi":               {ItemName: "YoutubeApi", Status: "Downloaded", Path: stagingFolder + "/YoutubeApi-1.0.0.zip"},
+			"YouMadeIt@invalidVersion": {ItemName: "YouMadeIt", Error: "Version Not Found"},
 		},
 	}
 
 	// lib download YoutubeApi invalidLibrary YouMadeIt@invalidVersion --format json
-	executeWithArgs(t, "lib", "download", "YoutubeApi", "invalidLibrary", "YouMadeIt@invalidVersion", "--format", "json")
+	librariesArgs := []string{};
+	for libraryKey, _ := range want.Libraries {
+		librariesArgs = append(librariesArgs, libraryKey)
+	}
+
+	executeWithArgsNoError(t, append(append([]string{"lib", "download"}, librariesArgs...), "--format", "json")...)
 
 	// read output
 	_, err = tempFile.Seek(0, 0)
@@ -129,6 +187,7 @@ func TestLibDownload(t *testing.T) {
 	var have output.LibProcessResults
 	err = json.Unmarshal(d, &have)
 	require.NoError(t, err, "Unmarshaling json output")
+	require.NotNil(t, have.Libraries, "Unmarshaling json output: have '%s'", d)
 
 	// checking output
 
@@ -154,10 +213,7 @@ func TestLibDownload(t *testing.T) {
 	}
 }
 
-func TestCoreDownload(t *testing.T) {
-	tempFile := createTempRedirect(t)
-	defer cleanTempRedirect(t, tempFile)
-
+func TestCoreDownloadSuccessful(t *testing.T) {
 	// getting the paths to create the want path of the want object.
 	stagingFolder, err := configs.DownloadCacheFolder("packages").Get()
 	require.NoError(t, err, "Getting cache folder")
@@ -165,81 +221,117 @@ func TestCoreDownload(t *testing.T) {
 	// desired output
 	want := output.CoreProcessResults{
 		Cores: map[string]output.ProcessResult{
-			"unparsablearg":          {ItemName: "unparsablearg", Error: "Invalid item (not PACKAGER:CORE[=VERSION])"},
-			"sam-notexistingversion": {ItemName: "sam", Error: "Version notexistingversion Not Found"},
-			"sam":                    {ItemName: "sam", Error: "Version 1.0.0 Not Found"},
-			"samd":                   {ItemName: "samd", Status: "Downloaded", Path: stagingFolder + "/samd-1.6.16.tar.bz2"},
+			"arduino:samd=1.6.16":            {ItemName: "arduino:Arduino SAMD Boards (32-bits ARM Cortex-M0+)@1.6.16", Status: "Downloaded", Path: stagingFolder + "/samd-1.6.16.tar.bz2"},
+			"arduino:sam=notexistingversion": {ItemName: "sam", Error: "Version notexistingversion Not Found"},
+			"arduino:sam=1.0.0":              {ItemName: "sam", Error: "Version 1.0.0 Not Found"},
 		},
 		Tools: map[string]output.ProcessResult{
-			"arduinoOTA":        {ItemName: "arduinoOTA", Status: "Downloaded", Path: stagingFolder + "/arduinoOTA-1.2.0-linux_amd64.tar.bz2"},
-			"openocd":           {ItemName: "openocd", Status: "Downloaded", Path: stagingFolder + "/openocd-0.9.0-arduino6-static-x86_64-linux-gnu.tar.bz2"},
-			"CMSIS-Atmel":       {ItemName: "CMSIS-Atmel", Status: "Downloaded", Path: stagingFolder + "/CMSIS-Atmel-1.1.0.tar.bz2"},
-			"CMSIS":             {ItemName: "CMSIS", Status: "Downloaded", Path: stagingFolder + "/CMSIS-4.5.0.tar.bz2"},
-			"arm-none-eabi-gcc": {ItemName: "arm-none-eabi-gcc", Status: "Downloaded", Path: stagingFolder + "/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz"},
-			"bossac":            {ItemName: "bossac", Status: "Downloaded", Path: stagingFolder + "/bossac-1.7.0-x86_64-linux-gnu.tar.gz"},
+			"arduinoOTA":        {ItemName: "arduinoOTA@1.2.0", Status: "Downloaded", Path: stagingFolder + "/arduinoOTA-1.2.0-linux_amd64.tar.bz2"},
+			"openocd":           {ItemName: "openocd@0.9.0-arduino6-static", Status: "Downloaded", Path: stagingFolder + "/openocd-0.9.0-arduino6-static-x86_64-linux-gnu.tar.bz2"},
+			"CMSIS-Atmel":       {ItemName: "CMSIS-Atmel@1.1.0", Status: "Downloaded", Path: stagingFolder + "/CMSIS-Atmel-1.1.0.tar.bz2"},
+			"CMSIS":             {ItemName: "CMSIS@4.5.0", Status: "Downloaded", Path: stagingFolder + "/CMSIS-4.5.0.tar.bz2"},
+			"arm-none-eabi-gcc": {ItemName: "arm-none-eabi-gcc@4.8.3-2014q1", Status: "Downloaded", Path: stagingFolder + "/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz"},
+			"bossac":            {ItemName: "bossac@1.7.0", Status: "Downloaded", Path: stagingFolder + "/bossac-1.7.0-x86_64-linux-gnu.tar.gz"},
 		},
 	}
 
+	testCoreDownload(t, want, func(err error, stdOut []byte) {
+		require.NoError(t, err, "Expected no error executing command")
+
+		var have output.CoreProcessResults
+		err = json.Unmarshal(stdOut, &have)
+		require.NoError(t, err, "Unmarshaling json output")
+		require.NotNil(t, have.Cores, "Unmarshaling json output: have '%s'", stdOut)
+		t.Log("HAVE: \n", have)
+		t.Log("WANT: \n", want)
+
+		// checking output
+
+		assert.Equal(t, len(want.Cores), len(have.Cores), "Number of cores in the output")
+
+		pop := func(core *output.ProcessResult) bool {
+			for idx, h := range have.Cores {
+				if core.String() == h.String() {
+					// XXX: Consider changing the Cores field to an array of pointers
+					//have.Cores[idx] = nil
+					have.Cores[idx] = output.ProcessResult{ItemName: ""} // Mark core as matched
+					return true
+				}
+			}
+			return false
+		}
+		for _, w := range want.Cores {
+			popR := pop(&w)
+			t.Log(w)
+			t.Log(popR)
+			assert.True(t, popR, "Expected core '%s' is missing from output", w)
+		}
+		for _, h := range have.Cores {
+			assert.Empty(t, h.ItemName, "Unexpected core '%s' is inside output", h)
+		}
+
+		assert.Equal(t, len(want.Tools), len(have.Tools), "Number of tools in the output")
+
+		pop = func(tool *output.ProcessResult) bool {
+			for idx, h := range have.Tools {
+				if tool.String() == h.String() {
+					// XXX: Consider changing the Tools field to an array of pointers
+					// have.Tools[idx] = nil
+					have.Tools[idx] = output.ProcessResult{ItemName: ""} // Mark tool as matched
+					return true
+				}
+			}
+			return false
+		}
+
+		for _, w := range want.Tools {
+			assert.True(t, pop(&w), "Expected tool '%s' is missing from output", w)
+		}
+		for _, h := range have.Tools {
+			assert.Empty(t, h.String(), "Unexpected tool '%s' is inside output", h)
+		}
+	})
+}
+
+func TestCoreDownloadBadArgument(t *testing.T) {
+	// desired output
+	want := output.CoreProcessResults{
+		Cores: map[string]output.ProcessResult{
+			"unparsablearg": {ItemName: "unparsablearg", Error: "Invalid item (not PACKAGER:CORE[=VERSION])"},
+		},
+		Tools: map[string]output.ProcessResult{
+		},
+	}
+
+	testCoreDownload(t, want, func(err error, stdOut []byte) {
+		require.EqualError(t, err, strconv.Itoa(commands.ErrBadArgument),
+			fmt.Sprintf("Expected an '%s' error (exit code '%d') executing command",
+				"commands.ErrBadArgument",
+				commands.ErrBadArgument))
+	})
+}
+
+func testCoreDownload(t *testing.T, want output.CoreProcessResults, handleResults func(err error, stdOut []byte)) {
+	tempFile := createTempRedirect(t)
+	defer cleanTempRedirect(t, tempFile)
+
 	// core download arduino:samd=1.6.16 unparsablearg arduino:sam=notexistingversion arduino:sam=1.0.0 --format json
-	executeWithArgs(t, "core", "download", "arduino:samd=1.6.16", "unparsablearg", "arduino:sam=notexistingversion", "arduino:sam=1.0.0", "--format", "json")
+	coresArgs := []string{};
+	for coreKey, _ := range want.Cores {
+		coresArgs = append(coresArgs, coreKey)
+	}
+	err := executeWithArgs(t, append(append([]string{"core", "download"}, coresArgs...), "--format", "json")...)
 
 	// read output
-	_, err = tempFile.Seek(0, 0)
-	require.NoError(t, err, "Rewinding output file")
-	d, err := ioutil.ReadAll(tempFile)
-	require.NoError(t, err, "Reading output file")
-
-	var have output.CoreProcessResults
-	err = json.Unmarshal(d, &have)
-	require.NoError(t, err, "Unmarshaling json output")
-	t.Log("HAVE: \n", have)
-	t.Log("WANT: \n", want)
-
-	// checking output
-
-	assert.Equal(t, len(want.Cores), len(have.Cores), "Number of cores in the output")
-
-	pop := func(core *output.ProcessResult) bool {
-		for idx, h := range have.Cores {
-			if core.String() == h.String() {
-				// XXX: Consider changing the Cores field to an array of pointers
-				//have.Cores[idx] = nil
-				have.Cores[idx] = output.ProcessResult{ItemName: ""} // Mark core as matched
-				return true
-			}
-		}
-		return false
+	var stdOut []byte
+	if err == nil {
+		_, err = tempFile.Seek(0, 0)
+		require.NoError(t, err, "Rewinding output file")
+		stdOut, err = ioutil.ReadAll(tempFile)
+		require.NoError(t, err, "Reading output file")
 	}
-	for _, w := range want.Cores {
-		popR := pop(&w)
-		t.Log(w)
-		t.Log(popR)
-		assert.True(t, popR, "Expected core '%s' is missing from output", w)
-	}
-	for _, h := range have.Cores {
-		assert.Empty(t, h.ItemName, "Unexpected core '%s' is inside output", h)
-	}
+	handleResults(err, stdOut)
 
-	assert.Equal(t, len(want.Tools), len(have.Tools), "Number of tools in the output")
-
-	pop = func(tool *output.ProcessResult) bool {
-		for idx, h := range have.Tools {
-			if tool.String() == h.String() {
-				// XXX: Consider changing the Tools field to an array of pointers
-				// have.Tools[idx] = nil
-				have.Tools[idx] = output.ProcessResult{ItemName: ""} // Mark tool as matched
-				return true
-			}
-		}
-		return false
-	}
-
-	for _, w := range want.Tools {
-		assert.True(t, pop(&w), "Expected tool '%s' is missing from output", w)
-	}
-	for _, h := range have.Tools {
-		assert.Empty(t, h.String(), "Unexpected tool '%s' is inside output", h)
-	}
 }
 
 func checkOutput(t *testing.T, want []string, tempFile *os.File) {

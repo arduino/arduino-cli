@@ -88,10 +88,13 @@ const (
 	}`
 )
 
-var testing = false
+var isTesting = false
 
 // Init prepares the command.
-func Init() {
+func Init(_isTesting bool) {
+	// Forward the testing status
+	isTesting = _isTesting
+
 	Command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
 	Command.PersistentFlags().StringVar(&commands.GlobalFlags.Format, "format", "text", "The output format, can be [text|json].")
 	Command.PersistentFlags().StringVar(&configs.ConfigFilePath, "config-file", configs.ConfigFilePath, "The custom config file (if not specified ./.cli-config.yml will be used).")
@@ -143,7 +146,7 @@ func preRun(cmd *cobra.Command, args []string) {
 		})
 	}
 
-	if !testing {
+	if !isTesting {
 		logrus.Info("Initializing viper configuration")
 		cobra.OnInitialize(initViper)
 	}
@@ -227,6 +230,7 @@ func initViper() {
 }
 
 // TestInit creates an initialization for tests.
+// FIXME: is this any useful?
 func TestInit() {
 	initConfigs()
 
@@ -234,7 +238,7 @@ func TestInit() {
 		viper.SetConfigFile("./test-config.yml")
 	})
 
-	testing = true
+	isTesting = true
 }
 
 // IgnoreConfigs is used in tests to ignore the config file.

@@ -38,7 +38,7 @@ import (
 )
 
 func main() {
-	root.Init()
+	root.Init(false)
 	if err := root.Command.Execute(); err != nil {
 		formatter.PrintError(err, "Bad exit.")
 		os.Exit(commands.ErrGeneric)

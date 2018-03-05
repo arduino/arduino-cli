@@ -70,6 +70,11 @@ func (pm *packageManager) RegisterEventHandler(eventHandler EventHandler) {
 	pm.eventHandler = eventHandler
 }
 
+// GetEventHandlers returns a slice of the registered EventHandlers
+func (pm *packageManager) GetEventHandlers() []*EventHandler {
+	return append([]*EventHandler{}, &pm.eventHandler)
+}
+
 // FIXME this is currently hard-coded with the default PackageIndex and won't merge or check existing Packages!!
 func (pm *packageManager) AddDefaultPackageIndex() (*packageManager, error) {
 	var index packageindex.Index

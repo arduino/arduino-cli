@@ -76,7 +76,11 @@ func InitPackageManager() {
 	}
 
 	// TODO: were should we register the event handler? Multiple places?
-	pm.RegisterEventHandler(&CLIPackageManagerEventHandler{})
+	if len(pm.GetEventHandlers())==0 {
+		// During tests this could get registered multiple times,
+		// since there is an underlying singleton
+		pm.RegisterEventHandler(&CLIPackageManagerEventHandler{})
+	}
 }
 
 // CLIPackageManagerEventHandler defines an event handler which outputs the PackageManager events
