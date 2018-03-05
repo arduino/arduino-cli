@@ -171,18 +171,19 @@ func (ta *toolActions) Get() (*cores.Tool, error) {
 // IsInstalled checks whether the Tool is installed in the system
 func (ta *toolActions) IsInstalled() (bool, error) {
 	err := ta.forwardError
-	if err == nil {
-		location, err := configs.ToolsFolder(ta.tool.Package.Name).Get()
-		if err != nil {
-			return false, err
-		}
-		_, err = os.Stat(filepath.Join(location, ta.tool.Name))
-		if !os.IsNotExist(err) {
-			return true, nil
-		}
-		return false, nil
+	if err != nil {
+		return false, err
 	}
-	return false, err
+
+	location, err := configs.ToolsFolder(ta.tool.Package.Name).Get()
+	if err != nil {
+		return false, err
+	}
+	_, err = os.Stat(filepath.Join(location, ta.tool.Name))
+	if !os.IsNotExist(err) {
+		return true, nil
+	}
+	return false, nil
 }
 
 // END -- Actions that can be done on a Tool
