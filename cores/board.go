@@ -29,11 +29,40 @@
 
 package cores
 
-import properties "github.com/arduino/go-properties-map"
+import (
+	"strings"
+
+	"github.com/arduino/go-properties-map"
+)
 
 // Board represents a board loaded from an installed platform
 type Board struct {
 	BoardId         string
 	Properties      properties.Map   `json:"-"`
 	PlatformRelease *PlatformRelease `json:"-"`
+}
+
+// HasUsbID returns true if the board match the usb vid and pid parameters
+func (b *Board) HasUsbID(reqVid, reqPid string) bool {
+	vids := b.Properties.SubTree("vid")
+	pids := b.Properties.SubTree("pid")
+	for id, vid := range vids {
+		if pid, ok := pids[id]; ok {
+			if strings.EqualFold(vid, reqVid) && strings.EqualFold(pid, reqPid) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// Name returns the board name as defined in boards.txt properties
+func (b *Board) Name() string {
+	return b.Properties["name"]
+}
+
+// FQBN return the Fully-Qualified-Board-Name for the default configuration of this board
+func (b *Board) FQBN() string {
+	platform := b.PlatformRelease.Platform
+	return platform.Package.Name + ":" + platform.Architecture + ":" + b.BoardId
 }
