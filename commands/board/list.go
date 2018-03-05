@@ -116,7 +116,7 @@ func NewBoardList(monitor *discovery.Monitor) *output.BoardList {
 			Name:  board.Name(),
 			Fqbn:  board.FQBN(),
 			Port:  item.Port,
-			UsbID: fmt.Sprintf("%s:%s - %s", item.ProductID[2:len(item.ProductID)-1], item.VendorID[2:len(item.VendorID)-1], item.SerialNumber),
+			UsbID: fmt.Sprintf("%s:%s - %s", item.VendorID[2:], item.ProductID[2:], item.SerialNumber),
 		})
 	}
 
