@@ -164,6 +164,7 @@ func (release indexPlatformRelease) extractPlatform() *cores.Platform {
 }
 
 func (release indexPlatformRelease) extractPlatformRelease() *cores.PlatformRelease {
+	// FIXME: Use class methods to create new instances (getOrCreateXxxxx()...)
 	return &cores.PlatformRelease{
 		Version: release.Version,
 		Resource: &releases.DownloadResource{
@@ -174,6 +175,7 @@ func (release indexPlatformRelease) extractPlatformRelease() *cores.PlatformRele
 			CachePath:       "packages",
 		},
 		BoardNames:   release.extractBoards(),
+		Boards:       map[string]*cores.Board{},
 		Dependencies: release.extractDeps(),
 	}
 }

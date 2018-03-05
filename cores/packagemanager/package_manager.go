@@ -61,6 +61,46 @@ func PackageManager() *packageManager {
 	return packageManagerInstance
 }
 
+func (pm *packageManager) Clear() {
+	packageManagerInstance.packages = cores.NewPackages()
+}
+
+func (pm *packageManager) GetPackages() *cores.Packages {
+	return pm.packages
+}
+
+func (pm *packageManager) FindBoardsWithVidPid(vid, pid string) []*cores.Board {
+	res := []*cores.Board{}
+	for _, targetPackage := range pm.packages.Packages {
+		for _, targetPlatform := range targetPackage.Platforms {
+			if platform := targetPlatform.GetInstalled(); platform != nil {
+				for _, board := range platform.Boards {
+					if board.HasUsbID(vid, pid) {
+						res = append(res, board)
+					}
+				}
+			}
+		}
+	}
+	return res
+}
+
+func (pm *packageManager) FindBoardsWithID(id string) []*cores.Board {
+	res := []*cores.Board{}
+	for _, targetPackage := range pm.packages.Packages {
+		for _, targetPlatform := range targetPackage.Platforms {
+			if platform := targetPlatform.GetInstalled(); platform != nil {
+				for _, board := range platform.Boards {
+					if board.BoardId == id {
+						res = append(res, board)
+					}
+				}
+			}
+		}
+	}
+	return res
+}
+
 // FIXME add an handler to be invoked on each verbose operation, in order to let commands display results through the formatter
 // as for the progress bars during download
 func (pm *packageManager) RegisterEventHandler(eventHandler EventHandler) {

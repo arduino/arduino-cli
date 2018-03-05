@@ -31,9 +31,6 @@ package output
 
 import (
 	"fmt"
-
-	discovery "github.com/arduino/board-discovery"
-	"github.com/bcmi-labs/arduino-modules/boards"
 )
 
 // SerialBoardListItem represents a board connected using serial port.
@@ -79,48 +76,6 @@ func (bl *BoardList) String() string {
 				fmt.Sprintln("   FQBN:", item.Fqbn) +
 				fmt.Sprintln("   LOCATION:", item.Location)
 		}
-	}
-	return ret
-}
-
-// NewBoardList returns a new board list by adding discovered boards from the board list and a monitor.
-func NewBoardList(boards boards.Boards, monitor *discovery.Monitor) *BoardList {
-	if monitor == nil || boards == nil {
-		return nil
-	}
-
-	serialDevices := monitor.Serial()
-	networkDevices := monitor.Network()
-	ret := &BoardList{
-		SerialBoards:  make([]SerialBoardListItem, 0, len(serialDevices)),
-		NetworkBoards: make([]NetworkBoardListItem, 0, len(networkDevices)),
-	}
-
-	for _, item := range serialDevices {
-		board := boards.ByVidPid(item.VendorID, item.ProductID)
-		if board == nil { // skip it if not recognized
-			continue
-		}
-
-		ret.SerialBoards = append(ret.SerialBoards, SerialBoardListItem{
-			Name:  board.Name,
-			Fqbn:  board.Fqbn,
-			Port:  item.Port,
-			UsbID: fmt.Sprintf("%s:%s - %s", item.ProductID[2:len(item.ProductID)-1], item.VendorID[2:len(item.VendorID)-1], item.SerialNumber),
-		})
-	}
-
-	for _, item := range networkDevices {
-		board := boards.ByID(item.Name)
-		if board == nil { // skip it if not recognized
-			continue
-		}
-
-		ret.NetworkBoards = append(ret.NetworkBoards, NetworkBoardListItem{
-			Name:     board.Name,
-			Fqbn:     board.Fqbn,
-			Location: fmt.Sprintf("%s:%d", item.Address, item.Port),
-		})
 	}
 	return ret
 }

@@ -5,11 +5,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/configs"
-	"github.com/codeclysm/cc"
+	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
 
-	"github.com/bcmi-labs/arduino-modules/boards"
+	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/codeclysm/cc"
 
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
@@ -39,16 +38,16 @@ var listCommand = &cobra.Command{
 // runListCommand detects and lists the connected arduino boards
 // (either via serial or network ports).
 func runListCommand(cmd *cobra.Command, args []string) {
-	// FIXME: Replace with the PackageManager
-	packageFolder, err := configs.PackagesFolder.Get()
+	pm := packagemanager.PackageManager()
+
+	pm, err := pm.AddDefaultPackageIndex()
 	if err != nil {
-		formatter.PrintError(err, "Cannot Parse Board Index file.")
+		formatter.PrintError(err, "Error loading hardware files.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	bs, err := boards.Find(packageFolder)
-	if err != nil {
-		formatter.PrintError(err, "Cannot Parse Board Index file.")
+	if err := pm.LoadHardware(); err != nil {
+		formatter.PrintError(err, "Error loading hardware files.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
@@ -85,8 +84,55 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		time.Sleep(duration)
 	}
 
-	formatter.Print(output.NewBoardList(bs, monitor))
+	formatter.Print(NewBoardList(monitor))
 
 	//monitor.Stop() //If called will slow like 1sec the program to close after print, with the same result (tested).
 	// it closes ungracefully, but at the end of the command we can't have races.
+}
+
+// NewBoardList returns a new board list by adding discovered boards from the board list and a monitor.
+func NewBoardList(monitor *discovery.Monitor) *output.BoardList {
+	if monitor == nil {
+		return nil
+	}
+
+	serialDevices := monitor.Serial()
+	networkDevices := monitor.Network()
+	ret := &output.BoardList{
+		SerialBoards:  make([]output.SerialBoardListItem, 0, len(serialDevices)),
+		NetworkBoards: make([]output.NetworkBoardListItem, 0, len(networkDevices)),
+	}
+
+	pm := packagemanager.PackageManager()
+	for _, item := range serialDevices {
+		boards := pm.FindBoardsWithVidPid(item.VendorID, item.ProductID)
+		if len(boards) == 0 {
+			// skip it if not recognized
+			continue
+		}
+
+		board := boards[0]
+		ret.SerialBoards = append(ret.SerialBoards, output.SerialBoardListItem{
+			Name:  board.Name(),
+			Fqbn:  board.FQBN(),
+			Port:  item.Port,
+			UsbID: fmt.Sprintf("%s:%s - %s", item.ProductID[2:len(item.ProductID)-1], item.VendorID[2:len(item.VendorID)-1], item.SerialNumber),
+		})
+	}
+
+	for _, item := range networkDevices {
+		boards := pm.FindBoardsWithID(item.Name)
+		if len(boards) == 0 {
+			// skip it if not recognized
+			continue
+		}
+
+		board := boards[0]
+		ret.NetworkBoards = append(ret.NetworkBoards, output.NetworkBoardListItem{
+			Name:     board.Name(),
+			Fqbn:     board.FQBN(),
+			Location: fmt.Sprintf("%s:%d", item.Address, item.Port),
+		})
+	}
+	return ret
 }
