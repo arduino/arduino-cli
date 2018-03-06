@@ -44,6 +44,7 @@ type Packages struct {
 	Properties properties.Map `json:"-"` // TODO: used to add "ctags" properties, TO BE REMOVED
 }
 
+// NewPackages creates a new Packages object
 func NewPackages() *Packages {
 	return &Packages{
 		Packages:   map[string]*Package{},
@@ -62,16 +63,63 @@ type Package struct {
 	Packages   *Packages            `json:"-"`
 }
 
+// GetOrCreatePackage returns the specified Package or create an empty one
+// filling all the cross-references
+func (packages *Packages) GetOrCreatePackage(packager string) *Package {
+	if targetPackage, ok := packages.Packages[packager]; ok {
+		return targetPackage
+	}
+	targetPackage := &Package{
+		Name:      packager,
+		Platforms: map[string]*Platform{},
+		Tools:     map[string]*Tool{},
+		Packages:  packages,
+		//Properties: properties.Map{},
+	}
+	packages.Packages[packager] = targetPackage
+	return targetPackage
+}
+
 // Names returns the array containing the name of the packages.
-func (sc Packages) Names() []string {
-	res := make([]string, len(sc.Packages))
+func (packages *Packages) Names() []string {
+	res := make([]string, len(packages.Packages))
 	i := 0
-	for n := range sc.Packages {
+	for n := range packages.Packages {
 		res[i] = n
 		i++
 	}
 	sortutil.CiAsc(res)
 	return res
+}
+
+// GetOrCreatePlatform returns the Platform object with the specified architecture
+// or creates a new one if not found
+func (targetPackage *Package) GetOrCreatePlatform(architecure string) *Platform {
+	if platform, ok := targetPackage.Platforms[architecure]; ok {
+		return platform
+	}
+	targetPlatform := &Platform{
+		Architecture: architecure,
+		Releases:     map[string]*PlatformRelease{},
+		Package:      targetPackage,
+	}
+	targetPackage.Platforms[architecure] = targetPlatform
+	return targetPlatform
+}
+
+// GetOrCreateTool returns the Tool object with the specified name
+// or creates a new one if not found
+func (targetPackage *Package) GetOrCreateTool(name string) *Tool {
+	if tool, ok := targetPackage.Tools[name]; ok {
+		return tool
+	}
+	tool := &Tool{
+		Name:     name,
+		Package:  targetPackage,
+		Releases: map[string]*ToolRelease{},
+	}
+	targetPackage.Tools[name] = tool
+	return tool
 }
 
 func (tdep ToolDependency) extractTool(sc Packages) (*Tool, error) {
@@ -99,13 +147,13 @@ func (tdep ToolDependency) extractRelease(sc Packages) (*ToolRelease, error) {
 }
 
 // GetDepsOfPlatformRelease returns the deps of a specified release of a core.
-func (sc Packages) GetDepsOfPlatformRelease(release *PlatformRelease) ([]*ToolRelease, error) {
+func (packages *Packages) GetDepsOfPlatformRelease(release *PlatformRelease) ([]*ToolRelease, error) {
 	if release == nil {
 		return nil, errors.New("release cannot be nil")
 	}
 	ret := []*ToolRelease{}
 	for _, dep := range release.Dependencies {
-		pkg, exists := sc.Packages[dep.ToolPackager]
+		pkg, exists := packages.Packages[dep.ToolPackager]
 		if !exists {
 			return nil, fmt.Errorf("Package %s not found", dep.ToolPackager)
 		}

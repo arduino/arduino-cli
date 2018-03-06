@@ -68,23 +68,6 @@ func (packages *Packages) LoadPackage(packager string, path string) error {
 	return nil
 }
 
-// GetOrCreatePackage returns the specified Package or create an empty one
-// filling all the cross-references
-func (packages *Packages) GetOrCreatePackage(packager string) *Package {
-	if targetPackage, ok := packages.Packages[packager]; ok {
-		return targetPackage
-	}
-	targetPackage := &Package{
-		Name:      packager,
-		Platforms: map[string]*Platform{},
-		Tools:     map[string]*Tool{},
-		Packages:  packages,
-		//Properties: properties.Map{},
-	}
-	packages.Packages[packager] = targetPackage
-	return targetPackage
-}
-
 func (targetPackage *Package) load(folder string) error {
 	// packagePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
 	// if err != nil {
@@ -145,44 +128,6 @@ func (targetPackage *Package) load(folder string) error {
 	}
 
 	return nil
-}
-
-func (targetPackage *Package) GetOrCreatePlatform(architecure string) *Platform {
-	if platform, ok := targetPackage.Platforms[architecure]; ok {
-		return platform
-	}
-	targetPlatform := &Platform{
-		Architecture: architecure,
-		Releases:     map[string]*PlatformRelease{},
-		Package:      targetPackage,
-	}
-	targetPackage.Platforms[architecure] = targetPlatform
-	return targetPlatform
-}
-
-func (targetPackage *Package) GetOrCreateTool(name string) *Tool {
-	if tool, ok := targetPackage.Tools[name]; ok {
-		return tool
-	}
-	tool := &Tool{
-		Name:     name,
-		Package:  targetPackage,
-		Releases: map[string]*ToolRelease{},
-	}
-	targetPackage.Tools[name] = tool
-	return tool
-}
-
-func (tool *Tool) GetOrCreateRelease(version string) *ToolRelease {
-	if release, ok := tool.Releases[version]; ok {
-		return release
-	}
-	release := &ToolRelease{
-		Version: version,
-		Tool:    tool,
-	}
-	tool.Releases[version] = release
-	return release
 }
 
 func (platform *PlatformRelease) load(folder string) error {
@@ -252,17 +197,4 @@ func (platform *PlatformRelease) loadBoards() error {
 	}
 
 	return nil
-}
-
-func (platform *PlatformRelease) GetOrCreateBoard(boardID string) *Board {
-	if board, ok := platform.Boards[boardID]; ok {
-		return board
-	}
-	board := &Board{
-		BoardId:         boardID,
-		Properties:      properties.Map{},
-		PlatformRelease: platform,
-	}
-	platform.Boards[boardID] = board
-	return board
 }

@@ -74,14 +74,14 @@ func (tool *Tool) GetOrCreateRelease(version string) *ToolRelease {
 	return release
 }
 
-// GetVersion returns the specified release corresponding the provided version,
+// GetRelease returns the specified release corresponding the provided version,
 // or nil if not found.
-func (tool *Tool) GetVersion(version string) *ToolRelease {
+func (tool *Tool) GetRelease(version string) *ToolRelease {
 	return tool.Releases[version]
 }
 
-// Versions returns all the version numbers in this Core Package.
-func (tool *Tool) Versions() semver.Versions {
+// GetAllReleasesVersions returns all the version numbers in this Core Package.
+func (tool *Tool) GetAllReleasesVersions() semver.Versions {
 	releases := tool.Releases
 	versions := make(semver.Versions, 0, len(releases))
 	for _, release := range releases {
@@ -94,26 +94,24 @@ func (tool *Tool) Versions() semver.Versions {
 	return versions
 }
 
-// Latest obtains latest version of a core package.
-func (tool *Tool) Latest() *ToolRelease {
-	return tool.GetVersion(tool.latestVersion())
+// LatestRelease obtains latest version of a core package.
+func (tool *Tool) LatestRelease() *ToolRelease {
+	return tool.GetRelease(tool.latestReleaseVersion())
 }
 
-// latestVersion obtains latest version number.
-//
-// It uses lexicographics to compare version strings.
-func (tool *Tool) latestVersion() string {
-	versions := tool.Versions()
-	if len(versions) > 0 {
-		max := versions[0]
-		for i := 1; i < len(versions); i++ {
-			if versions[i].GT(max) {
-				max = versions[i]
-			}
-		}
-		return fmt.Sprint(max)
+// latestReleaseVersion obtains latest version number.
+func (tool *Tool) latestReleaseVersion() string {
+	versions := tool.GetAllReleasesVersions()
+	if len(versions) == 0 {
+		return ""
 	}
-	return ""
+	max := versions[0]
+	for i := 1; i < len(versions); i++ {
+		if versions[i].GT(max) {
+			max = versions[i]
+		}
+	}
+	return fmt.Sprint(max)
 }
 
 func (tool *Tool) String() string {

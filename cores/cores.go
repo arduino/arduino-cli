@@ -92,7 +92,7 @@ func (platform *Platform) GetOrCreateRelease(version string) *PlatformRelease {
 // or nil if not found.
 func (platform *Platform) GetRelease(version string) *PlatformRelease {
 	if version == "latest" {
-		return platform.GetRelease(platform.latestRelease())
+		return platform.GetRelease(platform.latestReleaseVersion())
 	}
 	return platform.Releases[version]
 }
@@ -110,8 +110,8 @@ func (platform *Platform) GetAllReleasesVersions() semver.Versions {
 	return versions
 }
 
-// latestRelease obtains latest version number.
-func (platform *Platform) latestRelease() string {
+// latestReleaseVersion obtains latest version number.
+func (platform *Platform) latestReleaseVersion() string {
 	// TODO: Cache latest version using a field in Platform
 	versions := platform.GetAllReleasesVersions()
 	if len(versions) == 0 {
@@ -149,6 +149,21 @@ func (platform *Platform) String() string {
 		}
 	}
 	return res
+}
+
+// GetOrCreateBoard returns the Board object with the specified boardID
+// or creates a new one if not found
+func (release *PlatformRelease) GetOrCreateBoard(boardID string) *Board {
+	if board, ok := release.Boards[boardID]; ok {
+		return board
+	}
+	board := &Board{
+		BoardId:         boardID,
+		Properties:      properties.Map{},
+		PlatformRelease: release,
+	}
+	release.Boards[boardID] = board
+	return board
 }
 
 func (release *PlatformRelease) String() string {
