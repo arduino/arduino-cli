@@ -36,11 +36,13 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
+
 	discovery "github.com/arduino/board-discovery"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/configs"
-	"github.com/bcmi-labs/arduino-modules/boards"
 	"github.com/bcmi-labs/arduino-modules/sketches"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -87,28 +89,21 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	// FIXME: Replace with the PackageManager
 	homeFolder, err := configs.ArduinoHomeFolder.Get()
 	if err != nil {
-		formatter.PrintError(err, "Cannot Parse Board Index file.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-
-	packageFolder, err := configs.PackagesFolder.Get()
-	if err != nil {
-		formatter.PrintError(err, "Cannot Parse Board Index file.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-
-	bs, err := boards.Find(packageFolder)
-	if err != nil {
-		formatter.PrintError(err, "Cannot Parse Board Index file.")
+		formatter.PrintError(err, "Cannot find Sketchbook.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
 	ss := sketches.Find(homeFolder)
-
 	sketch, exists := ss[sketchName]
 	if !exists {
 		formatter.PrintErrorMessage("Cannot find specified sketch in the Sketchbook.")
 		os.Exit(commands.ErrGeneric)
+	}
+
+	pm := packagemanager.PackageManager()
+	if err = pm.LoadHardware(); err != nil {
+		formatter.PrintError(err, "Cannot Parse Board Index file.")
+		os.Exit(commands.ErrCoreConfig)
 	}
 
 	deviceURI, err := url.Parse(boardURI)
@@ -117,7 +112,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrBadCall)
 	}
 
-	var findBoardFunc func(boards.Boards, *discovery.Monitor, *url.URL) *boards.Board
+	var findBoardFunc func(*discovery.Monitor, *url.URL) *cores.Board
 	var Type string
 
 	if validSerialBoardURIRegexp.Match([]byte(boardURI)) {
@@ -132,11 +127,13 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	}
 
 	// TODO: Handle the case when no board is found.
-	board := findBoardFunc(bs, monitor, deviceURI)
+	board := findBoardFunc(monitor, deviceURI)
+	formatter.Print("SUPPORTED BOARD FOUND:")
+	formatter.Print(board.Name())
 
 	sketch.Metadata.CPU = sketches.MetadataCPU{
-		Fqbn: board.Fqbn,
-		Name: board.Name,
+		Fqbn: board.FQBN(),
+		Name: board.Name(),
 		Type: Type,
 	}
 	err = sketch.ExportMetadata()
@@ -149,7 +146,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 // FIXME: Those should probably go in a "BoardManager" pkg or something
 // findSerialConnectedBoard find the board which is connected to the specified URI via serial port, using a monitor and a set of Boards
 // for the matching.
-func findSerialConnectedBoard(bs boards.Boards, monitor *discovery.Monitor, deviceURI *url.URL) *boards.Board {
+func findSerialConnectedBoard(monitor *discovery.Monitor, deviceURI *url.URL) *cores.Board {
 	found := false
 	location := deviceURI.Path
 	var serialDevice discovery.SerialDevice
@@ -165,20 +162,20 @@ func findSerialConnectedBoard(bs boards.Boards, monitor *discovery.Monitor, devi
 		return nil
 	}
 
-	board := bs.ByVidPid(serialDevice.VendorID, serialDevice.ProductID)
-	if board == nil {
+	pm := packagemanager.PackageManager()
+
+	boards := pm.FindBoardsWithVidPid(serialDevice.VendorID, serialDevice.ProductID)
+	if len(boards) == 0 {
 		formatter.PrintErrorMessage("No Supported board has been found, try either install new cores or check your board URI.")
 		os.Exit(commands.ErrGeneric)
 	}
 
-	formatter.Print("SUPPORTED BOARD FOUND:")
-	formatter.Print(board.String())
-	return board
+	return boards[0]
 }
 
 // findNetworkConnectedBoard find the board which is connected to the specified URI on the network, using a monitor and a set of Boards
 // for the matching.
-func findNetworkConnectedBoard(bs boards.Boards, monitor *discovery.Monitor, deviceURI *url.URL) *boards.Board {
+func findNetworkConnectedBoard(monitor *discovery.Monitor, deviceURI *url.URL) *cores.Board {
 	found := false
 
 	var networkDevice discovery.NetworkDevice
@@ -196,6 +193,12 @@ func findNetworkConnectedBoard(bs boards.Boards, monitor *discovery.Monitor, dev
 		os.Exit(commands.ErrGeneric)
 	}
 
-	formatter.Print("SUPPORTED BOARD FOUND:")
-	return bs.ByID(networkDevice.Name)
+	pm := packagemanager.PackageManager()
+	boards := pm.FindBoardsWithID(networkDevice.Name)
+	if len(boards) == 0 {
+		formatter.PrintErrorMessage("No Supported board has been found, try either install new cores or check your board URI.")
+		os.Exit(commands.ErrGeneric)
+	}
+
+	return boards[0]
 }
