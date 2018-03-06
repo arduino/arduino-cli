@@ -60,14 +60,28 @@ type Flavour struct {
 	Resource *releases.DownloadResource
 }
 
+// GetOrCreateRelease returns the ToolRelease object with the specified version
+// or creates a new one if not found
+func (tool *Tool) GetOrCreateRelease(version string) *ToolRelease {
+	if release, ok := tool.Releases[version]; ok {
+		return release
+	}
+	release := &ToolRelease{
+		Version: version,
+		Tool:    tool,
+	}
+	tool.Releases[version] = release
+	return release
+}
+
 // GetVersion returns the specified release corresponding the provided version,
 // or nil if not found.
-func (tool Tool) GetVersion(version string) *ToolRelease {
+func (tool *Tool) GetVersion(version string) *ToolRelease {
 	return tool.Releases[version]
 }
 
 // Versions returns all the version numbers in this Core Package.
-func (tool Tool) Versions() semver.Versions {
+func (tool *Tool) Versions() semver.Versions {
 	releases := tool.Releases
 	versions := make(semver.Versions, 0, len(releases))
 	for _, release := range releases {
@@ -81,14 +95,14 @@ func (tool Tool) Versions() semver.Versions {
 }
 
 // Latest obtains latest version of a core package.
-func (tool Tool) Latest() *ToolRelease {
+func (tool *Tool) Latest() *ToolRelease {
 	return tool.GetVersion(tool.latestVersion())
 }
 
 // latestVersion obtains latest version number.
 //
 // It uses lexicographics to compare version strings.
-func (tool Tool) latestVersion() string {
+func (tool *Tool) latestVersion() string {
 	versions := tool.Versions()
 	if len(versions) > 0 {
 		max := versions[0]
@@ -102,7 +116,7 @@ func (tool Tool) latestVersion() string {
 	return ""
 }
 
-func (tool Tool) String() string {
+func (tool *Tool) String() string {
 	res := fmt.Sprintln("Name        :", tool.Name)
 	if tool.Releases != nil && len(tool.Releases) > 0 {
 		res += "Releases:\n"
@@ -113,7 +127,7 @@ func (tool Tool) String() string {
 	return res
 }
 
-func (tr ToolRelease) String() string {
+func (tr *ToolRelease) String() string {
 	res := fmt.Sprintln("  Version :", tr.Version)
 	for _, f := range tr.Flavours {
 		res += fmt.Sprintln(f)
@@ -121,7 +135,7 @@ func (tr ToolRelease) String() string {
 	return res
 }
 
-func (f Flavour) String() string {
+func (f *Flavour) String() string {
 	return fmt.Sprintln("    OS :", f.OS) +
 		fmt.Sprintln("    URL:", f.Resource.URL) +
 		fmt.Sprintln("    ArchiveFileName:", f.Resource.ArchiveFileName) +
@@ -146,7 +160,7 @@ var (
 	regexpArmBSD   = regexp.MustCompile("arm.*-freebsd[0-9]*")
 )
 
-func (f Flavour) isCompatibleWithCurrentMachine() bool {
+func (f *Flavour) isCompatibleWithCurrentMachine() bool {
 	osName := runtime.GOOS
 	osArch := runtime.GOARCH
 
@@ -180,7 +194,7 @@ func (f Flavour) isCompatibleWithCurrentMachine() bool {
 }
 
 // GetCompatibleFlavour returns the downloadable resource compatible with the running O.S.
-func (tr ToolRelease) GetCompatibleFlavour() *releases.DownloadResource {
+func (tr *ToolRelease) GetCompatibleFlavour() *releases.DownloadResource {
 	for _, flavour := range tr.Flavours {
 		if flavour.isCompatibleWithCurrentMachine() {
 			return flavour.Resource
