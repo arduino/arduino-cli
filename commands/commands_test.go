@@ -237,6 +237,9 @@ func TestCoreDownloadSuccessful(t *testing.T) {
 	}
 
 	testCoreDownload(t, want, func(err error, stdOut []byte) {
+		if err != nil {
+			t.Log("COMMAND OUTPUT:\n", string(stdOut))
+		}
 		require.NoError(t, err, "Expected no error executing command")
 
 		var have output.CoreProcessResults
