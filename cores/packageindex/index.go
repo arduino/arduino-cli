@@ -135,47 +135,32 @@ func (inPackage indexPackage) extractPackageIn(outPackages *cores.Packages) {
 		outPackage.Tools[name].Releases[tool.Version].Tool = outPackage.Tools[name]
 	}
 
-	for _, platform := range inPackage.Platforms {
-		name := platform.Architecture
-		if outPackage.Platforms[name] == nil {
-			outPackage.Platforms[name] = platform.extractPlatform()
-			outPackage.Platforms[name].Package = outPackage
-		}
-		release := platform.extractPlatformRelease()
-		release.Platform = outPackage.Platforms[name]
-		outPackage.Platforms[name].Releases[release.Version] = release
+	for _, inPlatform := range inPackage.Platforms {
+		inPlatform.extractPlatformIn(outPackage)
 	}
 }
 
-func (release indexPlatformRelease) extractPlatform() *cores.Platform {
-	return &cores.Platform{
-		Name:         release.Name,
-		Architecture: release.Architecture,
-		Category:     release.Category,
-		Releases:     map[string]*cores.PlatformRelease{},
+func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *cores.Package) {
+	outPlatform := outPackage.GetOrCreatePlatform(inPlatformRelease.Architecture)
+	// FIXME: shall we use the Name and Category of the latest release? or maybe move Name and Category in PlatformRelease?
+	outPlatform.Name = inPlatformRelease.Name
+	outPlatform.Category = inPlatformRelease.Category
+
+	outPlatformRelease := outPlatform.GetOrCreateRelease(inPlatformRelease.Version)
+	outPlatformRelease.Resource = &releases.DownloadResource{
+		ArchiveFileName: inPlatformRelease.ArchiveFileName,
+		Checksum:        inPlatformRelease.Checksum,
+		Size:            inPlatformRelease.Size,
+		URL:             inPlatformRelease.URL,
+		CachePath:       "packages",
 	}
+	outPlatformRelease.BoardNames = inPlatformRelease.extractBoards()
+	outPlatformRelease.Dependencies = inPlatformRelease.extractDeps()
 }
 
-func (release indexPlatformRelease) extractPlatformRelease() *cores.PlatformRelease {
-	// FIXME: Use class methods to create new instances (getOrCreateXxxxx()...)
-	return &cores.PlatformRelease{
-		Version: release.Version,
-		Resource: &releases.DownloadResource{
-			ArchiveFileName: release.ArchiveFileName,
-			Checksum:        release.Checksum,
-			Size:            release.Size,
-			URL:             release.URL,
-			CachePath:       "packages",
-		},
-		BoardNames:   release.extractBoards(),
-		Boards:       map[string]*cores.Board{},
-		Dependencies: release.extractDeps(),
-	}
-}
-
-func (release indexPlatformRelease) extractDeps() cores.ToolDependencies {
-	ret := make(cores.ToolDependencies, len(release.ToolDependencies))
-	for i, dep := range release.ToolDependencies {
+func (inPlatformRelease indexPlatformRelease) extractDeps() cores.ToolDependencies {
+	ret := make(cores.ToolDependencies, len(inPlatformRelease.ToolDependencies))
+	for i, dep := range inPlatformRelease.ToolDependencies {
 		ret[i] = &cores.ToolDependency{
 			ToolName:     dep.Name,
 			ToolVersion:  dep.Version,
@@ -185,9 +170,9 @@ func (release indexPlatformRelease) extractDeps() cores.ToolDependencies {
 	return ret
 }
 
-func (release indexPlatformRelease) extractBoards() []string {
-	boards := make([]string, len(release.BoardsNames))
-	for i, board := range release.BoardsNames {
+func (inPlatformRelease indexPlatformRelease) extractBoards() []string {
+	boards := make([]string, len(inPlatformRelease.BoardsNames))
+	for i, board := range inPlatformRelease.BoardsNames {
 		boards[i] = board.Name
 	}
 	return boards

@@ -113,8 +113,8 @@ func (targetPackage *Package) load(folder string) error {
 		if _, err := os.Stat(possibleBoardTxtPath); err == nil {
 			// There is a boards.txt here, this is an unversioned Platform
 
-			platform := targetPackage.getOrCreatePlatform(architecure)
-			release := platform.getOrCreateRelease("")
+			platform := targetPackage.GetOrCreatePlatform(architecure)
+			release := platform.GetOrCreateRelease("")
 			if err := release.load(platformPath); err != nil {
 				return fmt.Errorf("loading platform release: %s", err)
 			}
@@ -122,7 +122,7 @@ func (targetPackage *Package) load(folder string) error {
 		} else if os.IsNotExist(err) {
 			// There are no boards.txt here, let's fetch version folders
 
-			platform := targetPackage.getOrCreatePlatform(architecure)
+			platform := targetPackage.GetOrCreatePlatform(architecure)
 			versionDirs, err := ioutil.ReadDir(platformPath)
 			if err != nil {
 				return fmt.Errorf("reading dir %s: %s", platformPath, err)
@@ -132,7 +132,7 @@ func (targetPackage *Package) load(folder string) error {
 					continue
 				}
 				version := versionDir.Name()
-				release := platform.getOrCreateRelease(version)
+				release := platform.GetOrCreateRelease(version)
 				platformWithVersionPath := filepath.Join(platformPath, version)
 
 				if err := release.load(platformWithVersionPath); err != nil {
@@ -147,7 +147,7 @@ func (targetPackage *Package) load(folder string) error {
 	return nil
 }
 
-func (targetPackage *Package) getOrCreatePlatform(architecure string) *Platform {
+func (targetPackage *Package) GetOrCreatePlatform(architecure string) *Platform {
 	if platform, ok := targetPackage.Platforms[architecure]; ok {
 		return platform
 	}
@@ -160,7 +160,7 @@ func (targetPackage *Package) getOrCreatePlatform(architecure string) *Platform 
 	return targetPlatform
 }
 
-func (platform *Platform) getOrCreateRelease(version string) *PlatformRelease {
+func (platform *Platform) GetOrCreateRelease(version string) *PlatformRelease {
 	if release, ok := platform.Releases[version]; ok {
 		return release
 	}
