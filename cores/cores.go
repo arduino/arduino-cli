@@ -79,6 +79,7 @@ func (platform *Platform) GetOrCreateRelease(version string) *PlatformRelease {
 		return release
 	}
 	release := &PlatformRelease{
+		Version:     version,
 		Boards:      map[string]*Board{},
 		Properties:  properties.Map{},
 		Programmers: map[string]properties.Map{},

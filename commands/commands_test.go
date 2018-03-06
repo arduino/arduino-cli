@@ -93,6 +93,7 @@ func executeWithArgsError(t *testing.T, args ...string) error {
 // and also logging it for debugging purpose
 func executeWithArgs(t *testing.T, args ...string) error {
 	err := executeWithArgsInternal(t, args...)
+	t.Logf("Running: %s", args)
 	if err != nil {
 		exitCode, conversionError := strconv.Atoi(err.Error())
 		if conversionError != nil {
