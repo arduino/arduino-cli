@@ -125,14 +125,8 @@ func (inPackage indexPackage) extractPackageIn(outPackages *cores.Packages) {
 	outPackage.WebsiteURL = inPackage.WebsiteURL
 	outPackage.Email = inPackage.Email
 
-	for _, tool := range inPackage.Tools {
-		name := tool.Name
-		if outPackage.Tools[name] == nil {
-			outPackage.Tools[name] = tool.extractTool()
-			outPackage.Tools[name].Package = outPackage
-		}
-		outPackage.Tools[name].Releases[tool.Version] = tool.extractToolRelease()
-		outPackage.Tools[name].Releases[tool.Version].Tool = outPackage.Tools[name]
+	for _, inTool := range inPackage.Tools {
+		inTool.extractToolIn(outPackage)
 	}
 
 	for _, inPlatform := range inPackage.Platforms {
@@ -178,26 +172,17 @@ func (inPlatformRelease indexPlatformRelease) extractBoards() []string {
 	return boards
 }
 
-// extractTool extracts a Tool object from an indexToolRelease entry.
-func (itr indexToolRelease) extractTool() *cores.Tool {
-	return &cores.Tool{
-		Name:     itr.Name,
-		Releases: map[string]*cores.ToolRelease{},
-	}
-}
+func (inToolRelease indexToolRelease) extractToolIn(outPackage *cores.Package) {
+	outTool := outPackage.GetOrCreateTool(inToolRelease.Name)
 
-// extractRelease extracts a ToolRelease object from an indexToolRelease entry.
-func (itr indexToolRelease) extractToolRelease() *cores.ToolRelease {
-	return &cores.ToolRelease{
-		Version:  itr.Version,
-		Flavours: itr.extractFlavours(),
-	}
+	outToolRelease := outTool.GetOrCreateRelease(inToolRelease.Version)
+	outToolRelease.Flavours = inToolRelease.extractFlavours()
 }
 
 // extractFlavours extracts a map[OS]Flavour object from an indexToolRelease entry.
-func (itr indexToolRelease) extractFlavours() []*cores.Flavour {
-	ret := make([]*cores.Flavour, len(itr.Systems))
-	for i, flavour := range itr.Systems {
+func (inToolRelease indexToolRelease) extractFlavours() []*cores.Flavour {
+	ret := make([]*cores.Flavour, len(inToolRelease.Systems))
+	for i, flavour := range inToolRelease.Systems {
 		ret[i] = &cores.Flavour{
 			OS: flavour.OS,
 			Resource: &releases.DownloadResource{

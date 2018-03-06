@@ -160,6 +160,31 @@ func (targetPackage *Package) GetOrCreatePlatform(architecure string) *Platform 
 	return targetPlatform
 }
 
+func (targetPackage *Package) GetOrCreateTool(name string) *Tool {
+	if tool, ok := targetPackage.Tools[name]; ok {
+		return tool
+	}
+	tool := &Tool{
+		Name:     name,
+		Package:  targetPackage,
+		Releases: map[string]*ToolRelease{},
+	}
+	targetPackage.Tools[name] = tool
+	return tool
+}
+
+func (tool *Tool) GetOrCreateRelease(version string) *ToolRelease {
+	if release, ok := tool.Releases[version]; ok {
+		return release
+	}
+	release := &ToolRelease{
+		Version: version,
+		Tool:    tool,
+	}
+	tool.Releases[version] = release
+	return release
+}
+
 func (platform *Platform) GetOrCreateRelease(version string) *PlatformRelease {
 	if release, ok := platform.Releases[version]; ok {
 		return release
