@@ -72,17 +72,33 @@ type ToolDependency struct {
 	ToolPackager string
 }
 
-// GetVersion returns the specified release corresponding the provided version,
+// GetOrCreateRelease returns the specified release corresponding the provided version,
+// or creates a new one if not found.
+func (platform *Platform) GetOrCreateRelease(version string) *PlatformRelease {
+	if release, ok := platform.Releases[version]; ok {
+		return release
+	}
+	release := &PlatformRelease{
+		Boards:      map[string]*Board{},
+		Properties:  properties.Map{},
+		Programmers: map[string]properties.Map{},
+		Platform:    platform,
+	}
+	platform.Releases[version] = release
+	return release
+}
+
+// GetRelease returns the specified release corresponding the provided version,
 // or nil if not found.
-func (platform *Platform) GetVersion(version string) *PlatformRelease {
+func (platform *Platform) GetRelease(version string) *PlatformRelease {
 	if version == "latest" {
-		return platform.GetVersion(platform.latestVersion())
+		return platform.GetRelease(platform.latestRelease())
 	}
 	return platform.Releases[version]
 }
 
-// Versions returns all the version numbers in this Platform Package.
-func (platform *Platform) Versions() semver.Versions {
+// GetAllReleasesVersions returns all the version numbers in this Platform Package.
+func (platform *Platform) GetAllReleasesVersions() semver.Versions {
 	versions := make(semver.Versions, 0, len(platform.Releases))
 	for _, release := range platform.Releases {
 		temp, err := semver.Make(release.Version)
@@ -94,20 +110,20 @@ func (platform *Platform) Versions() semver.Versions {
 	return versions
 }
 
-// latestVersion obtains latest version number.
-// It uses lexicographics to compare version strings.
-func (platform *Platform) latestVersion() string {
-	versions := platform.Versions()
-	if len(versions) > 0 {
-		max := versions[0]
-		for i := 1; i < len(versions); i++ {
-			if versions[i].GT(max) {
-				max = versions[i]
-			}
-		}
-		return fmt.Sprint(max)
+// latestRelease obtains latest version number.
+func (platform *Platform) latestRelease() string {
+	// TODO: Cache latest version using a field in Platform
+	versions := platform.GetAllReleasesVersions()
+	if len(versions) == 0 {
+		return ""
 	}
-	return ""
+	max := versions[0]
+	for i := 1; i < len(versions); i++ {
+		if versions[i].GT(max) {
+			max = versions[i]
+		}
+	}
+	return fmt.Sprint(max)
 }
 
 // GetInstalled return one of the installed PlatformRelease

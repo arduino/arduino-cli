@@ -1,16 +1,16 @@
 package packagemanager
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
-	"fmt"
 
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/cores"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/sirupsen/logrus"
+	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
+	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/sirupsen/logrus"
 )
 
 // PlatformReference represents a tuple to identify a Platform
@@ -60,7 +60,7 @@ func (pm *packageManager) FindItemsToDownload(items []PlatformReference) (
 			continue
 		}
 
-		release := platform.GetVersion(item.PlatformVersion)
+		release := platform.GetRelease(item.PlatformVersion)
 		if release == nil {
 			fails[GetPlatformReferenceCode(item)] = output.ProcessResult{
 				ItemName: item.PlatformArchitecture,

@@ -185,20 +185,6 @@ func (tool *Tool) GetOrCreateRelease(version string) *ToolRelease {
 	return release
 }
 
-func (platform *Platform) GetOrCreateRelease(version string) *PlatformRelease {
-	if release, ok := platform.Releases[version]; ok {
-		return release
-	}
-	release := &PlatformRelease{
-		Boards:      map[string]*Board{},
-		Properties:  properties.Map{},
-		Programmers: map[string]properties.Map{},
-		Platform:    platform,
-	}
-	platform.Releases[version] = release
-	return release
-}
-
 func (platform *PlatformRelease) load(folder string) error {
 	if _, err := os.Stat(filepath.Join(folder, "boards.txt")); err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("opening boards.txt: %s", err)
