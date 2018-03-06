@@ -111,47 +111,40 @@ type indexHelp struct {
 
 // CreateStatusContext creates a status context from index data.
 func (index Index) CreateStatusContext() *cores.Packages {
-	res := cores.NewPackages()
+	outPackages := cores.NewPackages()
 
-	for _, p := range index.Packages {
-		res.Packages[p.Name] = p.extractPackage()
-		res.Packages[p.Name].Packages = res
+	for _, inPackage := range index.Packages {
+		inPackage.extractPackageIn(outPackages)
 	}
-	return res
+	return outPackages
 }
 
-func (pack indexPackage) extractPackage() *cores.Package {
-	p := &cores.Package{
-		Name:       pack.Name,
-		Maintainer: pack.Maintainer,
-		WebsiteURL: pack.WebsiteURL,
-		Email:      pack.Email,
-		Platforms:  map[string]*cores.Platform{},
-		Tools:      map[string]*cores.Tool{},
-	}
+func (inPackage indexPackage) extractPackageIn(outPackages *cores.Packages) {
+	outPackage := outPackages.GetOrCreatePackage(inPackage.Name)
+	outPackage.Maintainer = inPackage.Maintainer
+	outPackage.WebsiteURL = inPackage.WebsiteURL
+	outPackage.Email = inPackage.Email
 
-	for _, tool := range pack.Tools {
+	for _, tool := range inPackage.Tools {
 		name := tool.Name
-		if p.Tools[name] == nil {
-			p.Tools[name] = tool.extractTool()
-			p.Tools[name].Package = p
+		if outPackage.Tools[name] == nil {
+			outPackage.Tools[name] = tool.extractTool()
+			outPackage.Tools[name].Package = outPackage
 		}
-		p.Tools[name].Releases[tool.Version] = tool.extractToolRelease()
-		p.Tools[name].Releases[tool.Version].Tool = p.Tools[name]
+		outPackage.Tools[name].Releases[tool.Version] = tool.extractToolRelease()
+		outPackage.Tools[name].Releases[tool.Version].Tool = outPackage.Tools[name]
 	}
 
-	for _, platform := range pack.Platforms {
+	for _, platform := range inPackage.Platforms {
 		name := platform.Architecture
-		if p.Platforms[name] == nil {
-			p.Platforms[name] = platform.extractPlatform()
-			p.Platforms[name].Package = p
+		if outPackage.Platforms[name] == nil {
+			outPackage.Platforms[name] = platform.extractPlatform()
+			outPackage.Platforms[name].Package = outPackage
 		}
 		release := platform.extractPlatformRelease()
-		release.Platform = p.Platforms[name]
-		p.Platforms[name].Releases[release.Version] = release
+		release.Platform = outPackage.Platforms[name]
+		outPackage.Platforms[name].Releases[release.Version] = release
 	}
-
-	return p
 }
 
 func (release indexPlatformRelease) extractPlatform() *cores.Platform {

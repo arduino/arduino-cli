@@ -61,20 +61,23 @@ func (packages *Packages) LoadPackage(packager string, path string) error {
 		return nil
 	}
 
-	targetPackage := packages.getOrCreatePackage(packager)
+	targetPackage := packages.GetOrCreatePackage(packager)
 	if err := targetPackage.load(packagePath); err != nil {
 		return fmt.Errorf("loading package %s: %s", packager, err)
 	}
 	return nil
 }
 
-func (packages *Packages) getOrCreatePackage(packager string) *Package {
+// GetOrCreatePackage returns the specified Package or create an empty one
+// filling all the cross-references
+func (packages *Packages) GetOrCreatePackage(packager string) *Package {
 	if targetPackage, ok := packages.Packages[packager]; ok {
 		return targetPackage
 	}
 	targetPackage := &Package{
 		Name:      packager,
 		Platforms: map[string]*Platform{},
+		Tools:     map[string]*Tool{},
 		Packages:  packages,
 		//Properties: properties.Map{},
 	}
