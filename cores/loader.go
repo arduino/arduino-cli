@@ -261,21 +261,22 @@ func (platform *PlatformRelease) loadBoards() error {
 
 	for boardID, boardProperties := range propertiesByBoard {
 		boardProperties["_id"] = boardID // TODO: What is that for??
-		board := platform.getOrCreateBoard(boardID)
+		board := platform.GetOrCreateBoard(boardID)
 		board.Properties.Merge(boardProperties)
-		platform.Boards[boardID] = board
 	}
 
 	return nil
 }
 
-func (platform *PlatformRelease) getOrCreateBoard(boardID string) *Board {
+func (platform *PlatformRelease) GetOrCreateBoard(boardID string) *Board {
 	if board, ok := platform.Boards[boardID]; ok {
 		return board
 	}
-	return &Board{
+	board := &Board{
 		BoardId:         boardID,
 		Properties:      properties.Map{},
 		PlatformRelease: platform,
 	}
+	platform.Boards[boardID] = board
+	return board
 }
