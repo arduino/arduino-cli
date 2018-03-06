@@ -34,17 +34,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
-	"strconv"
 
+	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/bcmi-labs/arduino-cli/commands/root"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/bouk/monkey"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/bcmi-labs/arduino-cli/commands/root"
-	"github.com/bouk/monkey"
-	"github.com/bcmi-labs/arduino-cli/commands"
 )
 
 /*
@@ -172,7 +172,7 @@ func TestLibDownloadSuccessful(t *testing.T) {
 	}
 
 	// lib download YoutubeApi invalidLibrary YouMadeIt@invalidVersion --format json
-	librariesArgs := []string{};
+	librariesArgs := []string{}
 	for libraryKey, _ := range want.Libraries {
 		librariesArgs = append(librariesArgs, libraryKey)
 	}
@@ -300,8 +300,7 @@ func TestCoreDownloadBadArgument(t *testing.T) {
 		Cores: map[string]output.ProcessResult{
 			"unparsablearg": {ItemName: "unparsablearg", Error: "Invalid item (not PACKAGER:CORE[=VERSION])"},
 		},
-		Tools: map[string]output.ProcessResult{
-		},
+		Tools: map[string]output.ProcessResult{},
 	}
 
 	testCoreDownload(t, want, func(err error, stdOut []byte) {
@@ -317,7 +316,7 @@ func testCoreDownload(t *testing.T, want output.CoreProcessResults, handleResult
 	defer cleanTempRedirect(t, tempFile)
 
 	// core download arduino:samd=1.6.16 unparsablearg arduino:sam=notexistingversion arduino:sam=1.0.0 --format json
-	coresArgs := []string{};
+	coresArgs := []string{}
 	for coreKey, _ := range want.Cores {
 		coresArgs = append(coresArgs, coreKey)
 	}
