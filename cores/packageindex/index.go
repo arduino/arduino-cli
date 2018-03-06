@@ -148,7 +148,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 		URL:             inPlatformRelease.URL,
 		CachePath:       "packages",
 	}
-	outPlatformRelease.BoardNames = inPlatformRelease.extractBoards()
+	outPlatformRelease.BoardNames = inPlatformRelease.extractBoardsNames()
 	outPlatformRelease.Dependencies = inPlatformRelease.extractDeps()
 }
 
@@ -164,7 +164,7 @@ func (inPlatformRelease indexPlatformRelease) extractDeps() cores.ToolDependenci
 	return ret
 }
 
-func (inPlatformRelease indexPlatformRelease) extractBoards() []string {
+func (inPlatformRelease indexPlatformRelease) extractBoardsNames() []string {
 	boards := make([]string, len(inPlatformRelease.BoardsNames))
 	for i, board := range inPlatformRelease.BoardsNames {
 		boards[i] = board.Name
