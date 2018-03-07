@@ -315,15 +315,21 @@ func TestCoreDownloadBadArgument(t *testing.T) {
 }
 
 func testCoreDownload(t *testing.T, want output.CoreProcessResults, handleResults func(err error, stdOut []byte)) {
+	// run a "core update-index" to download the package_index.json
+	err := executeWithArgs(t, "core", "update-index")
+	require.NoError(t, err, "running 'core update-index'")
+
+	// start output capture
 	tempFile := createTempRedirect(t)
 	defer cleanTempRedirect(t, tempFile)
 
 	// core download arduino:samd=1.6.16 unparsablearg arduino:sam=notexistingversion arduino:sam=1.0.0 --format json
-	coresArgs := []string{}
+	coresArgs := []string{"core", "download"}
 	for coreKey, _ := range want.Cores {
 		coresArgs = append(coresArgs, coreKey)
 	}
-	err := executeWithArgs(t, append(append([]string{"core", "download"}, coresArgs...), "--format", "json")...)
+	coresArgs = append(coresArgs, "--format", "json")
+	err = executeWithArgs(t, coresArgs...)
 
 	// read output
 	var stdOut []byte
@@ -334,7 +340,6 @@ func testCoreDownload(t *testing.T, want output.CoreProcessResults, handleResult
 		require.NoError(t, err, "Reading output file")
 	}
 	handleResults(err, stdOut)
-
 }
 
 func checkOutput(t *testing.T, want []string, tempFile *os.File) {
