@@ -35,6 +35,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -42,13 +43,13 @@ import (
 )
 
 // DownloadIndex is a function to download a generic index.
-func DownloadIndex(indexPath pathutils.Path, URL string) error {
+func DownloadIndex(indexPath pathutils.Path, URL *url.URL) error {
 	file, err := indexPath.Get()
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("GET", URL, nil)
+	req, err := http.NewRequest("GET", URL.String(), nil)
 	if err != nil {
 		return err
 	}

@@ -30,13 +30,13 @@
 package libraries
 
 import (
+	"net/url"
+
 	"github.com/bcmi-labs/arduino-cli/common"
 )
 
-const (
-	// libraryIndexURL is the URL where to get library index.
-	libraryIndexURL string = "http://downloads.arduino.cc/libraries/library_index.json"
-)
+// libraryIndexURL is the URL where to get library index.
+var libraryIndexURL, _ = url.Parse("http://downloads.arduino.cc/libraries/library_index.json")
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.
 func DownloadLibrariesFile() error {

@@ -32,6 +32,7 @@ package packageindex
 import (
 	"encoding/json"
 	"io/ioutil"
+	"net/url"
 
 	"github.com/bcmi-labs/arduino-cli/common/releases"
 
@@ -41,7 +42,7 @@ import (
 )
 
 // packageIndexURL contains the index URL for core packages.
-const packageIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
+var packageIndexURL, _ = url.Parse("https://downloads.arduino.cc/packages/package_index.json")
 
 // coreIndexPath returns the path of the index file for libraries.
 var coreIndexPath = configs.IndexPath("package_index.json")
