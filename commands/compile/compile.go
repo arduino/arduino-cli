@@ -36,6 +36,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
+
 	builder "github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
@@ -44,7 +46,6 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
-	"github.com/bcmi-labs/arduino-cli/cores/packageindex"
 	"github.com/bcmi-labs/arduino-cli/sketches"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -198,18 +199,21 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	// FIXME: this is building the CommandLine to run the builder; we should move it to a "cores.compute" pkg
 	// Add dependency tools paths to build properties with versions corresponding to specific core version.
-	var packageIndex packageindex.Index
-	packageindex.LoadIndex(&packageIndex)
-	for _, packageFromIndex := range packageIndex.Packages {
-		if packageFromIndex.Name == packageName {
-			for _, platformFromIndex := range packageFromIndex.Platforms {
-				if platformFromIndex.Architecture == coreName && platformFromIndex.Version == coreVersion {
-					for _, toolDependencyFromIndex := range platformFromIndex.ToolDependencies {
-						if isInstalled, _ := cores.IsToolVersionInstalled(packageName, toolDependencyFromIndex.Name, toolDependencyFromIndex.Version); !isInstalled {
-							formatter.PrintError(err, fmt.Sprintf("Required tool version not found: %s - %s.", toolDependencyFromIndex.Name, toolDependencyFromIndex.Version))
+	pm := packagemanager.PackageManager()
+	if err := pm.LoadHardware(); err != nil {
+		formatter.PrintError(err, "Error loading hardware packages.")
+		os.Exit(commands.ErrCoreConfig)
+	}
+	for _, targetPackage := range pm.GetPackages().Packages {
+		if targetPackage.Name == packageName {
+			for _, platform := range targetPackage.Platforms {
+				if platform.Architecture == coreName && platform.Releases[coreVersion] != nil {
+					for _, toolDep := range platform.Releases[coreVersion].Dependencies {
+						if isInstalled, _ := cores.IsToolVersionInstalled(toolDep); !isInstalled {
+							formatter.PrintError(err, fmt.Sprintf("Required tool version not found: %s - %s.", toolDep.ToolName, toolDep.ToolVersion))
 							os.Exit(commands.ErrBadCall)
 						}
-						property := "runtime.tools." + toolDependencyFromIndex.Name + ".path=" + filepath.Join(toolsFolder, toolDependencyFromIndex.Name, toolDependencyFromIndex.Version)
+						property := "runtime.tools." + toolDep.ToolName + ".path=" + filepath.Join(toolsFolder, toolDep.ToolName, toolDep.ToolVersion)
 						ctx.CustomBuildProperties = append(ctx.CustomBuildProperties, property)
 					}
 					break

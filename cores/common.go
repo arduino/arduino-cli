@@ -66,12 +66,12 @@ func IsToolInstalled(packageName string, name string) (bool, error) {
 }
 
 // IsToolVersionInstalled detects if a specific version of a tool has been installed.
-func IsToolVersionInstalled(packageName string, name string, version string) (bool, error) {
-	location, err := configs.ToolsFolder(packageName).Get()
+func IsToolVersionInstalled(dep *ToolDependency) (bool, error) {
+	location, err := configs.ToolsFolder(dep.ToolPackager).Get()
 	if err != nil {
 		return false, err
 	}
-	_, err = os.Stat(filepath.Join(location, name, version))
+	_, err = os.Stat(filepath.Join(location, dep.ToolName, dep.ToolVersion))
 	if !os.IsNotExist(err) {
 		return true, nil
 	}
