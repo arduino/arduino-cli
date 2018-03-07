@@ -240,8 +240,3 @@ func TestInit() {
 
 	isTesting = true
 }
-
-// IgnoreConfigs is used in tests to ignore the config file.
-func IgnoreConfigs() {
-	logrus.Info("Ignoring configurations and using always default ones")
-}
