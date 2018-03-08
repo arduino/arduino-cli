@@ -37,6 +37,7 @@ import (
 
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/bcmi-labs/arduino-cli/cores"
 )
 
 // LoadHardwareFromDirectories read all plaforms from the configured paths
@@ -105,9 +106,75 @@ func (pm *packageManager) LoadHardwareFromDirectories(hardwarePaths []string) er
 			}
 
 			targetPackage := pm.packages.GetOrCreatePackage(packager)
-			if err := targetPackage.Load(packagerPath); err != nil {
+			if err := pm.LoadPlatforms(targetPackage, packagerPath); err != nil {
 				return fmt.Errorf("loading package %s: %s", packager, err)
 			}
+		}
+	}
+
+	return nil
+}
+
+// LoadPlatforms load plaftorms from the specified directory assuming that they belongs
+// to the targetPackage object passed as parameter.
+func (pm *packageManager) LoadPlatforms(targetPackage *cores.Package, packageFolder string) error {
+	// packagePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
+	// if err != nil {
+	// 	return err
+	// }
+	// targetPackage.Properties.Merge(packagePlatformTxt)
+
+	files, err := ioutil.ReadDir(packageFolder)
+	if err != nil {
+		return fmt.Errorf("reading directory %s: %s", packageFolder, err)
+	}
+
+	for _, file := range files {
+		architecure := file.Name()
+		platformPath := filepath.Join(packageFolder, architecure)
+		if architecure == "tools" ||
+			architecure == "platform.txt" { // TODO: Check if this "platform.txt" condition should be here....
+			continue
+		}
+
+		// There are two possible platform folder structures:
+		// - ARCHITECTURE/boards.txt
+		// - ARCHITECTURE/VERSION/boards.txt
+		// We identify them by checking where is the bords.txt file
+		possibleBoardTxtPath := filepath.Join(platformPath, "boards.txt")
+		if _, err := os.Stat(possibleBoardTxtPath); err == nil {
+			// case: ARCHITECTURE/boards.txt
+			// this is an unversioned Platform
+
+			platform := targetPackage.GetOrCreatePlatform(architecure)
+			release := platform.GetOrCreateRelease("")
+			if err := release.Load(platformPath); err != nil {
+				return fmt.Errorf("loading platform release: %s", err)
+			}
+
+		} else if os.IsNotExist(err) {
+			// case: ARCHITECTURE/VERSION/boards.txt
+			// let's dive into VERSION folders
+
+			platform := targetPackage.GetOrCreatePlatform(architecure)
+			versionDirs, err := ioutil.ReadDir(platformPath)
+			if err != nil {
+				return fmt.Errorf("reading dir %s: %s", platformPath, err)
+			}
+			for _, versionDir := range versionDirs {
+				if !versionDir.IsDir() {
+					continue
+				}
+				version := versionDir.Name()
+				release := platform.GetOrCreateRelease(version)
+				platformWithVersionPath := filepath.Join(platformPath, version)
+
+				if err := release.Load(platformWithVersionPath); err != nil {
+					return fmt.Errorf("loading platform release %s: %s", version, err)
+				}
+			}
+		} else {
+			return fmt.Errorf("looking for boards.txt in %s: %s", possibleBoardTxtPath, err)
 		}
 	}
 

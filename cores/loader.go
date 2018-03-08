@@ -31,76 +31,13 @@ package cores
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	properties "github.com/arduino/go-properties-map"
 )
 
-func (targetPackage *Package) Load(folder string) error {
-	// packagePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
-	// if err != nil {
-	// 	return err
-	// }
-	// targetPackage.Properties.Merge(packagePlatformTxt)
-
-	files, err := ioutil.ReadDir(folder)
-	if err != nil {
-		return fmt.Errorf("reading directory %s: %s", folder, err)
-	}
-
-	for _, file := range files {
-		architecure := file.Name()
-		platformPath := filepath.Join(folder, architecure)
-		if architecure == "tools" ||
-			architecure == "platform.txt" { // TODO: Check if this "platform.txt" condition should be here....
-			continue
-		}
-
-		// There are two possible platform folder structures:
-		// - ARCHITECTURE/boards.txt
-		// - ARCHITECTURE/VERSION/boards.txt
-		// We identify them by checking where is the bords.txt file
-		possibleBoardTxtPath := filepath.Join(platformPath, "boards.txt")
-		if _, err := os.Stat(possibleBoardTxtPath); err == nil {
-			// There is a boards.txt here, this is an unversioned Platform
-
-			platform := targetPackage.GetOrCreatePlatform(architecure)
-			release := platform.GetOrCreateRelease("")
-			if err := release.load(platformPath); err != nil {
-				return fmt.Errorf("loading platform release: %s", err)
-			}
-
-		} else if os.IsNotExist(err) {
-			// There are no boards.txt here, let's fetch version folders
-
-			platform := targetPackage.GetOrCreatePlatform(architecure)
-			versionDirs, err := ioutil.ReadDir(platformPath)
-			if err != nil {
-				return fmt.Errorf("reading dir %s: %s", platformPath, err)
-			}
-			for _, versionDir := range versionDirs {
-				if !versionDir.IsDir() {
-					continue
-				}
-				version := versionDir.Name()
-				release := platform.GetOrCreateRelease(version)
-				platformWithVersionPath := filepath.Join(platformPath, version)
-
-				if err := release.load(platformWithVersionPath); err != nil {
-					return fmt.Errorf("loading platform release %s: %s", version, err)
-				}
-			}
-		} else {
-			return fmt.Errorf("looking for boards.txt in %s: %s", possibleBoardTxtPath, err)
-		}
-	}
-
-	return nil
-}
-
-func (platform *PlatformRelease) load(folder string) error {
+func (platform *PlatformRelease) Load(folder string) error {
 	if _, err := os.Stat(filepath.Join(folder, "boards.txt")); err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("opening boards.txt: %s", err)
 	} else if os.IsNotExist(err) {
