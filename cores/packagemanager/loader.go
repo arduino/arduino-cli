@@ -40,7 +40,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/cores"
 )
 
-// LoadHardwareFromDirectories read all plaforms from the configured paths
+// LoadHardware read all plaforms from the configured paths
 func (pm *packageManager) LoadHardware() error {
 	dirs, err := configs.HardwareDirectories()
 	if err != nil {
@@ -49,75 +49,84 @@ func (pm *packageManager) LoadHardware() error {
 	return pm.LoadHardwareFromDirectories(dirs)
 }
 
-// LoadHardwareFromDirectories read all plaforms from a set of directories
+// LoadHardwareFromDirectories load plaforms from a set of directories
 func (pm *packageManager) LoadHardwareFromDirectories(hardwarePaths []string) error {
 	for _, path := range hardwarePaths {
-		path, err := filepath.Abs(path)
-		if err != nil {
-			return fmt.Errorf("find abs path: %s", err)
+		if err := pm.LoadHardwareFromDirectory(path); err != nil {
+			return fmt.Errorf("loading hardware from %s: %s", path, err)
 		}
-		// TODO: IS THIS CHECK NEEDED? can we ignore and let it fail at next ReadDir?
-		if stat, err := os.Stat(path); err != nil {
-			return fmt.Errorf("reading %s stat info: %s", path, err)
-		} else if !stat.IsDir() {
-			return fmt.Errorf("%s is not a folder", path)
+	}
+	return nil
+}
+
+// LoadHardwareFromDirectory read a plaform from the path passed as parameter
+func (pm *packageManager) LoadHardwareFromDirectory(path string) error {
+	path, err := filepath.Abs(path)
+	if err != nil {
+		return fmt.Errorf("find abs path: %s", err)
+	}
+
+	// TODO: IS THIS CHECK NEEDED? can we ignore and let it fail at next ReadDir?
+	if stat, err := os.Stat(path); err != nil {
+		return fmt.Errorf("reading %s stat info: %s", path, err)
+	} else if !stat.IsDir() {
+		return fmt.Errorf("%s is not a folder", path)
+	}
+
+	// TODO: IS THIS REALLY NEEDED? this is used only to get ctags properties AFAIK
+	platformTxtPath := filepath.Join(path, "platform.txt")
+	if props, err := properties.SafeLoad(platformTxtPath); err == nil {
+		pm.packages.Properties.Merge(props)
+	} else {
+		return fmt.Errorf("reading %s: %s", platformTxtPath, err)
+	}
+
+	// Scan subfolders.
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		return fmt.Errorf("reading %s directory: %s", path, err)
+	}
+	for _, packagerPathInfo := range files {
+		// First exclude all "tools" folders
+		packager := packagerPathInfo.Name()
+		if packager == "tools" {
+			continue
 		}
 
-		// TODO: IS THIS REALLY NEEDED? this is used only to get ctags properties AFAIK
-		platformTxtPath := filepath.Join(path, "platform.txt")
-		if props, err := properties.SafeLoad(platformTxtPath); err == nil {
-			pm.packages.Properties.Merge(props)
+		// Follow symlinks
+		packagerPath := filepath.Join(path, packager)
+		packagerPath, err := filepath.EvalSymlinks(packagerPath)
+		if err != nil {
+			return fmt.Errorf("following possible symlink %s: %s", path, err)
+		}
+
+		// There are two possible package folder structures:
+		// - PACKAGER/ARCHITECTURE/...
+		// - PACKAGER/hardware/ARCHITECTURE/VERSION/...
+		// if we found the latter we just move into "hardware" folder and continue
+		hardwareSubdirPath := filepath.Join(packagerPath, "hardware")
+		if info, err := os.Stat(hardwareSubdirPath); err == nil && info.IsDir() {
+			// move down into the "hardware" folder
+			packagerPath = hardwareSubdirPath
+		} else if info, err := os.Stat(packagerPath); err == nil && info.IsDir() {
+			// we are already at the correct level
 		} else {
-			return fmt.Errorf("reading %s: %s", platformTxtPath, err)
+			// error: do nothing
+			continue
 		}
 
-		// Scan subfolders.
-		files, err := ioutil.ReadDir(path)
-		if err != nil {
-			return fmt.Errorf("reading %s directory: %s", path, err)
-		}
-		for _, packagerPathInfo := range files {
-			// First exclude all "tools" folders
-			packager := packagerPathInfo.Name()
-			if packager == "tools" {
-				continue
-			}
-
-			// Follow symlinks
-			packagerPath := filepath.Join(path, packager)
-			packagerPath, err := filepath.EvalSymlinks(packagerPath)
-			if err != nil {
-				return fmt.Errorf("following possible symlink %s: %s", path, err)
-			}
-
-			// There are two possible package folder structures:
-			// - PACKAGER/ARCHITECTURE/...
-			// - PACKAGER/hardware/ARCHITECTURE/VERSION/...
-			// if we found the latter we just move into "hardware" folder and continue
-			hardwareSubdirPath := filepath.Join(packagerPath, "hardware")
-			if info, err := os.Stat(hardwareSubdirPath); err == nil && info.IsDir() {
-				// move down into the "hardware" folder
-				packagerPath = hardwareSubdirPath
-			} else if info, err := os.Stat(packagerPath); err == nil && info.IsDir() {
-				// we are already at the correct level
-			} else {
-				// error: do nothing
-				continue
-			}
-
-			targetPackage := pm.packages.GetOrCreatePackage(packager)
-			if err := pm.LoadPlatforms(targetPackage, packagerPath); err != nil {
-				return fmt.Errorf("loading package %s: %s", packager, err)
-			}
+		targetPackage := pm.packages.GetOrCreatePackage(packager)
+		if err := pm.loadPlatforms(targetPackage, packagerPath); err != nil {
+			return fmt.Errorf("loading package %s: %s", packager, err)
 		}
 	}
 
 	return nil
 }
 
-// LoadPlatforms load plaftorms from the specified directory assuming that they belongs
+// loadPlatforms load plaftorms from the specified directory assuming that they belongs
 // to the targetPackage object passed as parameter.
-func (pm *packageManager) LoadPlatforms(targetPackage *cores.Package, packageFolder string) error {
+func (pm *packageManager) loadPlatforms(targetPackage *cores.Package, packageFolder string) error {
 	// packagePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
 	// if err != nil {
 	// 	return err
@@ -148,7 +157,7 @@ func (pm *packageManager) LoadPlatforms(targetPackage *cores.Package, packageFol
 
 			platform := targetPackage.GetOrCreatePlatform(architecure)
 			release := platform.GetOrCreateRelease("")
-			if err := pm.LoadPlatformRelease(release, platformPath); err != nil {
+			if err := pm.loadPlatformRelease(release, platformPath); err != nil {
 				return fmt.Errorf("loading platform release: %s", err)
 			}
 
@@ -169,7 +178,7 @@ func (pm *packageManager) LoadPlatforms(targetPackage *cores.Package, packageFol
 				release := platform.GetOrCreateRelease(version)
 				platformWithVersionPath := filepath.Join(platformPath, version)
 
-				if err := pm.LoadPlatformRelease(release, platformWithVersionPath); err != nil {
+				if err := pm.loadPlatformRelease(release, platformWithVersionPath); err != nil {
 					return fmt.Errorf("loading platform release %s: %s", version, err)
 				}
 			}
@@ -181,7 +190,7 @@ func (pm *packageManager) LoadPlatforms(targetPackage *cores.Package, packageFol
 	return nil
 }
 
-func (pm *packageManager) LoadPlatformRelease(platform *cores.PlatformRelease, folder string) error {
+func (pm *packageManager) loadPlatformRelease(platform *cores.PlatformRelease, folder string) error {
 	if _, err := os.Stat(filepath.Join(folder, "boards.txt")); err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("opening boards.txt: %s", err)
 	} else if os.IsNotExist(err) {
@@ -217,14 +226,14 @@ func (pm *packageManager) LoadPlatformRelease(platform *cores.PlatformRelease, f
 		return err
 	}
 
-	if err := pm.LoadBoards(platform); err != nil {
+	if err := pm.loadBoards(platform); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (pm *packageManager) LoadBoards(platform *cores.PlatformRelease) error {
+func (pm *packageManager) loadBoards(platform *cores.PlatformRelease) error {
 	if platform.Folder == "" {
 		return fmt.Errorf("platform not installed")
 	}
