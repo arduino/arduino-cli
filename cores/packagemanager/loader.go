@@ -148,7 +148,7 @@ func (pm *packageManager) LoadPlatforms(targetPackage *cores.Package, packageFol
 
 			platform := targetPackage.GetOrCreatePlatform(architecure)
 			release := platform.GetOrCreateRelease("")
-			if err := release.Load(platformPath); err != nil {
+			if err := pm.LoadPlatformRelease(release, platformPath); err != nil {
 				return fmt.Errorf("loading platform release: %s", err)
 			}
 
@@ -169,13 +169,56 @@ func (pm *packageManager) LoadPlatforms(targetPackage *cores.Package, packageFol
 				release := platform.GetOrCreateRelease(version)
 				platformWithVersionPath := filepath.Join(platformPath, version)
 
-				if err := release.Load(platformWithVersionPath); err != nil {
+				if err := pm.LoadPlatformRelease(release, platformWithVersionPath); err != nil {
 					return fmt.Errorf("loading platform release %s: %s", version, err)
 				}
 			}
 		} else {
 			return fmt.Errorf("looking for boards.txt in %s: %s", possibleBoardTxtPath, err)
 		}
+	}
+
+	return nil
+}
+
+func (pm *packageManager) LoadPlatformRelease(platform *cores.PlatformRelease, folder string) error {
+	if _, err := os.Stat(filepath.Join(folder, "boards.txt")); err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("opening boards.txt: %s", err)
+	} else if os.IsNotExist(err) {
+		return fmt.Errorf("invalid platform directory %s: boards.txt not found", folder)
+	}
+	platform.Folder = folder
+
+	// Some useful paths
+	platformTxtPath := filepath.Join(folder, "platform.txt")
+	platformTxtLocalPath := filepath.Join(folder, "platform.local.txt")
+	programmersTxtPath := filepath.Join(folder, "programmers.txt")
+
+	// Create platform properties
+	platform.Properties = platform.Properties.Clone() // TODO: why CLONE?
+	if p, err := properties.SafeLoad(platformTxtPath); err == nil {
+		platform.Properties.Merge(p)
+	} else {
+		return fmt.Errorf("loading %s: %s", platformTxtPath, err)
+	}
+	if p, err := properties.SafeLoad(platformTxtLocalPath); err == nil {
+		platform.Properties.Merge(p)
+	} else {
+		return fmt.Errorf("loading %s: %s", platformTxtLocalPath, err)
+	}
+
+	// Create programmers properties
+	if programmersProperties, err := properties.SafeLoad(programmersTxtPath); err == nil {
+		platform.Programmers = properties.MergeMapsOfProperties(
+			map[string]properties.Map{},
+			platform.Programmers, // TODO: Very weird, why not an empty one?
+			programmersProperties.FirstLevelOf())
+	} else {
+		return err
+	}
+
+	if err := platform.LoadBoards(); err != nil {
+		return err
 	}
 
 	return nil

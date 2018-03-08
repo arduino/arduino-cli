@@ -30,57 +30,12 @@
 package cores
 
 import (
-	"fmt"
-	"os"
 	"path/filepath"
 
 	properties "github.com/arduino/go-properties-map"
 )
 
-func (platform *PlatformRelease) Load(folder string) error {
-	if _, err := os.Stat(filepath.Join(folder, "boards.txt")); err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("opening boards.txt: %s", err)
-	} else if os.IsNotExist(err) {
-		return fmt.Errorf("invalid platform directory %s: boards.txt not found", folder)
-	}
-	platform.Folder = folder
-
-	// Some useful paths
-	platformTxtPath := filepath.Join(folder, "platform.txt")
-	platformTxtLocalPath := filepath.Join(folder, "platform.local.txt")
-	programmersTxtPath := filepath.Join(folder, "programmers.txt")
-
-	// Create platform properties
-	platform.Properties = platform.Properties.Clone() // TODO: why CLONE?
-	if p, err := properties.SafeLoad(platformTxtPath); err == nil {
-		platform.Properties.Merge(p)
-	} else {
-		return fmt.Errorf("loading %s: %s", platformTxtPath, err)
-	}
-	if p, err := properties.SafeLoad(platformTxtLocalPath); err == nil {
-		platform.Properties.Merge(p)
-	} else {
-		return fmt.Errorf("loading %s: %s", platformTxtLocalPath, err)
-	}
-
-	// Create programmers properties
-	if programmersProperties, err := properties.SafeLoad(programmersTxtPath); err == nil {
-		platform.Programmers = properties.MergeMapsOfProperties(
-			map[string]properties.Map{},
-			platform.Programmers, // TODO: Very weird, why not an empty one?
-			programmersProperties.FirstLevelOf())
-	} else {
-		return err
-	}
-
-	if err := platform.loadBoards(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (platform *PlatformRelease) loadBoards() error {
+func (platform *PlatformRelease) LoadBoards() error {
 	boardsTxtPath := filepath.Join(platform.Folder, "boards.txt")
 	boardsLocalTxtPath := filepath.Join(platform.Folder, "boards.local.txt")
 
