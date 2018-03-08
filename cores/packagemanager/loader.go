@@ -87,36 +87,44 @@ func (pm *packageManager) LoadHardwareFromDirectory(path string) error {
 		return fmt.Errorf("reading %s directory: %s", path, err)
 	}
 	for _, packagerPathInfo := range files {
-		// First exclude all "tools" folders
 		packager := packagerPathInfo.Name()
+
+		// First exclude all "tools" folders
 		if packager == "tools" {
 			continue
 		}
 
 		// Follow symlinks
 		packagerPath := filepath.Join(path, packager)
-		packagerPath, err := filepath.EvalSymlinks(packagerPath)
+		packagerPath, err := filepath.EvalSymlinks(packagerPath) // ex: .arduino15/packages/arduino/
 		if err != nil {
 			return fmt.Errorf("following possible symlink %s: %s", path, err)
 		}
 
 		// There are two possible package folder structures:
-		// - PACKAGER/ARCHITECTURE/...
-		// - PACKAGER/hardware/ARCHITECTURE/VERSION/...
+		// - PACKAGER/ARCHITECTURE-1/boards.txt...                   (ex: arduino/avr/...)
+		//   PACKAGER/ARCHITECTURE-2/boards.txt...                   (ex: arduino/sam/...)
+		//   PACKAGER/ARCHITECTURE-3/boards.txt...                   (ex: arduino/samd/...)
+		// or
+		// - PACKAGER/hardware/ARCHITECTURE-1/VERSION/boards.txt...  (ex: arduino/hardware/avr/1.6.15/...)
+		//   PACKAGER/hardware/ARCHITECTURE-2/VERSION/boards.txt...  (ex: arduino/hardware/sam/1.6.6/...)
+		//   PACKAGER/hardware/ARCHITECTURE-3/VERSION/boards.txt...  (ex: arduino/hardware/samd/1.6.12/...)
 		// if we found the latter we just move into "hardware" folder and continue
-		hardwareSubdirPath := filepath.Join(packagerPath, "hardware")
+		architectureParentPath := ""
+		hardwareSubdirPath := filepath.Join(packagerPath, "hardware") // ex: .arduino15/packages/arduino/hardware
 		if info, err := os.Stat(hardwareSubdirPath); err == nil && info.IsDir() {
-			// move down into the "hardware" folder
-			packagerPath = hardwareSubdirPath
+			// we found the "hardware" folder move down into that
+			architectureParentPath = hardwareSubdirPath // ex: .arduino15/packages/arduino/
 		} else if info, err := os.Stat(packagerPath); err == nil && info.IsDir() {
 			// we are already at the correct level
+			architectureParentPath = packagerPath
 		} else {
 			// error: do nothing
 			continue
 		}
 
 		targetPackage := pm.packages.GetOrCreatePackage(packager)
-		if err := pm.loadPlatforms(targetPackage, packagerPath); err != nil {
+		if err := pm.loadPlatforms(targetPackage, architectureParentPath); err != nil {
 			return fmt.Errorf("loading package %s: %s", packager, err)
 		}
 	}
