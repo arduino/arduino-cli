@@ -217,8 +217,37 @@ func (pm *packageManager) LoadPlatformRelease(platform *cores.PlatformRelease, f
 		return err
 	}
 
-	if err := platform.LoadBoards(); err != nil {
+	if err := pm.LoadBoards(platform); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (pm *packageManager) LoadBoards(platform *cores.PlatformRelease) error {
+	if platform.Folder == "" {
+		return fmt.Errorf("platform not installed")
+	}
+	boardsTxtPath := filepath.Join(platform.Folder, "boards.txt")
+	boardsLocalTxtPath := filepath.Join(platform.Folder, "boards.local.txt")
+
+	boardsProperties, err := properties.Load(boardsTxtPath)
+	if err != nil {
+		return err
+	}
+	if localProperties, err := properties.SafeLoad(boardsLocalTxtPath); err == nil {
+		boardsProperties.Merge(localProperties)
+	} else {
+		return err
+	}
+
+	propertiesByBoard := boardsProperties.FirstLevelOf()
+	delete(propertiesByBoard, "menu") // TODO: check this one
+
+	for boardID, boardProperties := range propertiesByBoard {
+		boardProperties["_id"] = boardID // TODO: What is that for??
+		board := platform.GetOrCreateBoard(boardID)
+		board.Properties.Merge(boardProperties)
 	}
 
 	return nil
