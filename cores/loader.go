@@ -38,37 +38,7 @@ import (
 	properties "github.com/arduino/go-properties-map"
 )
 
-// LoadPackage load the package identified by packager in the specified path
-func (packages *Packages) LoadPackage(packager string, path string) error {
-	// Follow symlinks
-	path, err := filepath.EvalSymlinks(path)
-	if err != nil {
-		return fmt.Errorf("following possible symlink %s: %s", path, err)
-	}
-
-	// There are two possible package folder structures:
-	// - PACKAGER/ARCHITECTURE/...
-	// - PACKAGER/hardware/ARCHITECTURE/VERSION/...
-	// if we found the latter we just move into "hardware" folder and continue
-	var packagePath string
-	hardwareSubdirPath := filepath.Join(path, "hardware")
-	if info, err := os.Stat(hardwareSubdirPath); err == nil && info.IsDir() {
-		packagePath = hardwareSubdirPath
-	} else if info, err := os.Stat(path); err == nil && info.IsDir() {
-		packagePath = path
-	} else {
-		// do nothing
-		return nil
-	}
-
-	targetPackage := packages.GetOrCreatePackage(packager)
-	if err := targetPackage.load(packagePath); err != nil {
-		return fmt.Errorf("loading package %s: %s", packager, err)
-	}
-	return nil
-}
-
-func (targetPackage *Package) load(folder string) error {
+func (targetPackage *Package) Load(folder string) error {
 	// packagePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
 	// if err != nil {
 	// 	return err

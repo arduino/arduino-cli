@@ -75,15 +75,38 @@ func (pm *packageManager) LoadHardwareFromDirectories(hardwarePaths []string) er
 		if err != nil {
 			return fmt.Errorf("reading %s directory: %s", path, err)
 		}
-		for _, subfolder := range files {
+		for _, packagerPathInfo := range files {
 			// First exclude all "tools" folders
-			packager := subfolder.Name()
+			packager := packagerPathInfo.Name()
 			if packager == "tools" {
 				continue
 			}
 
-			if err := pm.packages.LoadPackage(packager, filepath.Join(path, packager)); err != nil {
-				return err
+			// Follow symlinks
+			packagerPath := filepath.Join(path, packager)
+			packagerPath, err := filepath.EvalSymlinks(packagerPath)
+			if err != nil {
+				return fmt.Errorf("following possible symlink %s: %s", path, err)
+			}
+
+			// There are two possible package folder structures:
+			// - PACKAGER/ARCHITECTURE/...
+			// - PACKAGER/hardware/ARCHITECTURE/VERSION/...
+			// if we found the latter we just move into "hardware" folder and continue
+			hardwareSubdirPath := filepath.Join(packagerPath, "hardware")
+			if info, err := os.Stat(hardwareSubdirPath); err == nil && info.IsDir() {
+				// move down into the "hardware" folder
+				packagerPath = hardwareSubdirPath
+			} else if info, err := os.Stat(packagerPath); err == nil && info.IsDir() {
+				// we are already at the correct level
+			} else {
+				// error: do nothing
+				continue
+			}
+
+			targetPackage := pm.packages.GetOrCreatePackage(packager)
+			if err := targetPackage.Load(packagerPath); err != nil {
+				return fmt.Errorf("loading package %s: %s", packager, err)
 			}
 		}
 	}
