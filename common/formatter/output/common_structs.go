@@ -53,8 +53,6 @@ func (lr ProcessResult) String() string {
 	}
 	if lr.Error != "" {
 		ret += fmt.Sprint(" - ", lr.Error)
-	} else if lr.Path != "" {
-		ret += fmt.Sprint(" - PATH : ", lr.Path)
 	}
 	return strings.TrimSpace(ret)
 }
