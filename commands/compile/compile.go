@@ -32,6 +32,7 @@ package compile
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -228,6 +229,18 @@ func run(cmd *cobra.Command, args []string) {
 
 	if err != nil {
 		formatter.PrintError(err, "Compilation failed.")
+		os.Exit(commands.ErrGeneric)
+	}
+
+	outputPath := ctx.BuildProperties.ExpandPropsInString("{build.path}/{recipe.output.tmp_file}")
+	ext := filepath.Ext(outputPath)
+	fqbn = strings.Replace(fqbn, ":", ".", -1)
+	if err := exec.Command("cp", outputPath, sketch.Name+"."+fqbn+ext).Run(); err != nil {
+		formatter.PrintError(err, "Error copying output file.")
+		os.Exit(commands.ErrGeneric)
+	}
+	if err := exec.Command("cp", outputPath[:len(outputPath)-3]+"elf", sketch.Name+"."+fqbn+".elf").Run(); err != nil {
+		formatter.PrintError(err, "Error copying output file.")
 		os.Exit(commands.ErrGeneric)
 	}
 }

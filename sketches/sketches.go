@@ -55,14 +55,20 @@ func NewSketchFromCurrentSketchbook(name string) (*sketches.Sketch, error) {
 	if err != nil {
 		return nil, err
 	}
-	sketch := sketches.Sketch{FullPath: filepath.Join(sketchbookLocation, name)}
+	sketch := sketches.Sketch{
+		FullPath: filepath.Join(sketchbookLocation, name),
+		Name:     name,
+	}
 	sketch.ImportMetadata()
 	return &sketch, nil
 }
 
 // NewSketchFromPath loads a sketch from the specified path
 func NewSketchFromPath(path string) (*sketches.Sketch, error) {
-	sketch := sketches.Sketch{FullPath: path}
+	sketch := sketches.Sketch{
+		FullPath: path,
+		Name:     filepath.Base(path),
+	}
 	sketch.ImportMetadata()
 	return &sketch, nil
 }
