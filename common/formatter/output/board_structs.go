@@ -31,6 +31,8 @@ package output
 
 import (
 	"fmt"
+
+	"github.com/gosuri/uitable"
 )
 
 // SerialBoardListItem represents a board connected using serial port.
@@ -55,27 +57,16 @@ type BoardList struct {
 }
 
 func (bl *BoardList) String() string {
-	ret := fmt.Sprintln("DEVICES:") +
-		fmt.Sprintln("SERIAL:")
-	if len(bl.SerialBoards) == 0 {
-		ret += fmt.Sprintln("   <none>")
-	} else {
-		for _, item := range bl.SerialBoards {
-			ret += fmt.Sprintln(" - BOARD NAME:", item.Name) +
-				fmt.Sprintln("   FQBN:", item.Fqbn) +
-				fmt.Sprintln("   PORT:", item.Port) +
-				fmt.Sprintln("   USB ID:", item.UsbID)
-		}
+	table := uitable.New()
+	table.MaxColWidth = 100
+	table.Wrap = true // wrap columns
+
+	table.AddRow("FQBN", "Port", "ID", "Board Name")
+	for _, item := range bl.SerialBoards {
+		table.AddRow(item.Fqbn, item.Port, item.UsbID[:9], item.Name)
 	}
-	ret += fmt.Sprintln("NETWORK:")
-	if len(bl.NetworkBoards) == 0 {
-		ret += fmt.Sprintln("   <none>")
-	} else {
-		for _, item := range bl.NetworkBoards {
-			ret += fmt.Sprintln(" - BOARD NAME:", item.Name) +
-				fmt.Sprintln("   FQBN:", item.Fqbn) +
-				fmt.Sprintln("   LOCATION:", item.Location)
-		}
+	for _, item := range bl.NetworkBoards {
+		table.AddRow(item.Fqbn, "network://"+item.Location, "", item.Name)
 	}
-	return ret
+	return fmt.Sprintln(table)
 }
