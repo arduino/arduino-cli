@@ -103,7 +103,7 @@ func (s Sketch) ExportMetadata() error {
 	if s.Metadata == nil {
 		return errors.Annotate(errors.New("Cannot export nil metadata"), "ImportMetadata")
 	}
-	content, err := json.Marshal(s.Metadata)
+	content, err := json.MarshalIndent(s.Metadata, "", "  ")
 	if err != nil {
 		return errors.Annotate(err, "ImportMetadata")
 	}
