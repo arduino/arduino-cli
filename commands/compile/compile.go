@@ -59,7 +59,7 @@ func Init(rootCommand *cobra.Command) {
 	command.Flags().StringVar(&flags.buildPath, "build-path", "", "Folder where to save compiled files. If omitted, a folder will be created in the temporary folder specified by your OS.")
 	command.Flags().StringSliceVar(&flags.buildProperties, "build-properties", []string{}, "List of custom build properties separated by commas. Or can be used multiple times for multiple properties.")
 	command.Flags().StringVar(&flags.warnings, "warnings", "none", `Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
-	command.Flags().BoolVar(&flags.verbose, "verbose", false, "Optional, turns on verbose mode.")
+	command.Flags().BoolVarP(&flags.verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
 	command.Flags().BoolVar(&flags.quiet, "quiet", false, "Optional, supresses almost every output.")
 	command.Flags().IntVar(&flags.debugLevel, "debug-level", 5, "Optional, defaults to 5. Used for debugging. Set it to 10 when submitting an issue.")
 	command.Flags().StringVar(&flags.vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if boards supports them.")
