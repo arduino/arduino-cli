@@ -44,6 +44,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/commands/login"
 	"github.com/bcmi-labs/arduino-cli/commands/logout"
 	"github.com/bcmi-labs/arduino-cli/commands/sketch"
+	"github.com/bcmi-labs/arduino-cli/commands/upload"
 	"github.com/bcmi-labs/arduino-cli/commands/validate"
 	"github.com/bcmi-labs/arduino-cli/commands/version"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
@@ -107,6 +108,7 @@ func Init(_isTesting bool) {
 	login.Init(Command)
 	logout.Init(Command)
 	sketch.Init(Command)
+	upload.Init(Command)
 	validate.Init(Command)
 	version.Init(Command)
 }
