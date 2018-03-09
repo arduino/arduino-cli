@@ -36,12 +36,11 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/bcmi-labs/arduino-cli/cores"
-	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
-
 	discovery "github.com/arduino/board-discovery"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
 	"github.com/bcmi-labs/arduino-modules/sketches"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -49,6 +48,7 @@ import (
 
 var validSerialBoardURIRegexp = regexp.MustCompile("(serial|tty)://.+")
 var validNetworkBoardURIRegexp = regexp.MustCompile("(http(s)?|(tc|ud)p)://[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:[0-9]{1,5}")
+var validFQBN = regexp.MustCompile(".+:.+:.+")
 
 func init() {
 	command.AddCommand(attachCommand)
@@ -62,7 +62,7 @@ var attachFlags struct {
 }
 
 var attachCommand = &cobra.Command{
-	Use:     "attach <port> [sketchPath]",
+	Use:     "attach <port>|<FQBN> [sketchPath]",
 	Short:   "Attaches a sketch to a board.",
 	Long:    "Attaches a sketch to a board.",
 	Example: "arduino board attach serial:///dev/tty/ACM0",
@@ -82,16 +82,9 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrGeneric)
 	}
 
-	duration, err := time.ParseDuration(attachFlags.searchTimeout)
-	if err != nil {
-		logrus.WithError(err).Warnf("Invalid interval `%s` provided, using default (5s).", attachFlags.searchTimeout)
-		duration = time.Second * 5
+	if !validFQBN.MatchString(boardURI) && boardURI[:6] != "serial" {
+		boardURI = "serial://" + boardURI
 	}
-
-	monitor := discovery.New(time.Second)
-	monitor.Start()
-
-	time.Sleep(duration)
 
 	pm := commands.InitPackageManager()
 	if err = pm.LoadHardware(); err != nil {
@@ -108,10 +101,13 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	var findBoardFunc func(*packagemanager.PackageManager, *discovery.Monitor, *url.URL) *cores.Board
 	var Type string
 
-	if validSerialBoardURIRegexp.Match([]byte(boardURI)) {
+	fqbn := ""
+	if validFQBN.MatchString(boardURI) {
+		fqbn = boardURI
+	} else if validSerialBoardURIRegexp.MatchString(boardURI) {
 		findBoardFunc = findSerialConnectedBoard
 		Type = "serial"
-	} else if validNetworkBoardURIRegexp.Match([]byte(boardURI)) {
+	} else if validNetworkBoardURIRegexp.MatchString(boardURI) {
 		findBoardFunc = findNetworkConnectedBoard
 		Type = "network"
 	} else {
@@ -119,21 +115,41 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrBadCall)
 	}
 
-	// TODO: Handle the case when no board is found.
-	board := findBoardFunc(pm, monitor, deviceURI)
-	formatter.Print("SUPPORTED BOARD FOUND:")
-	formatter.Print(board.Name())
+	if fqbn == "" {
+		duration, err := time.ParseDuration(attachFlags.searchTimeout)
+		if err != nil {
+			logrus.WithError(err).Warnf("Invalid interval `%s` provided, using default (5s).", attachFlags.searchTimeout)
+			duration = time.Second * 5
+		}
 
-	sketch.Metadata.CPU = sketches.MetadataCPU{
-		Fqbn: board.FQBN(),
-		Name: board.Name(),
-		Type: Type,
+		monitor := discovery.New(time.Second)
+		monitor.Start()
+
+		time.Sleep(duration)
+
+		// TODO: Handle the case when no board is found.
+		board := findBoardFunc(pm, monitor, deviceURI)
+		if board == nil {
+			os.Exit(commands.ErrGeneric)
+		}
+		formatter.Print("Board found: " + board.Name())
+
+		sketch.Metadata.CPU = sketches.MetadataCPU{
+			Fqbn: board.FQBN(),
+			Name: board.Name(),
+			Type: Type,
+		}
+		fqbn = board.FQBN()
+	} else {
+		sketch.Metadata.CPU = sketches.MetadataCPU{
+			Fqbn: fqbn,
+		}
 	}
 	err = sketch.ExportMetadata()
 	if err != nil {
 		formatter.PrintError(err, "Cannot export sketch metadata.")
 	}
-	formatter.PrintResult("BOARD ATTACHED.")
+	formatter.PrintResult("Selected fqbn: " + fqbn)
 }
 
 // FIXME: Those should probably go in a "BoardManager" pkg or something
@@ -151,7 +167,7 @@ func findSerialConnectedBoard(pm *packagemanager.PackageManager, monitor *discov
 		}
 	}
 	if !found {
-		formatter.PrintErrorMessage("No Supported board has been found at the specified board URI.")
+		formatter.PrintErrorMessage("Sorry, no Supported board has been found at the specified board URI :-(")
 		return nil
 	}
 
