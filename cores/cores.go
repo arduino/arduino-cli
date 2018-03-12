@@ -31,7 +31,6 @@ package cores
 
 import (
 	"fmt"
-	"strings"
 
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
@@ -70,6 +69,10 @@ type ToolDependency struct {
 	ToolName     string
 	ToolVersion  string
 	ToolPackager string
+}
+
+func (dep *ToolDependency) String() string {
+	return dep.ToolPackager + ":" + dep.ToolName + "@" + dep.ToolVersion
 }
 
 // GetOrCreateRelease returns the specified release corresponding the provided version,
@@ -140,16 +143,7 @@ func (platform *Platform) GetInstalled() *PlatformRelease {
 }
 
 func (platform *Platform) String() string {
-	res := fmt.Sprintln("Name        :", platform.Name) +
-		fmt.Sprintln("Architecture:", platform.Architecture) +
-		fmt.Sprintln("Category    :", platform.Category)
-	if platform.Releases != nil && len(platform.Releases) > 0 {
-		res += "Releases:\n"
-		for _, release := range platform.Releases {
-			res += fmt.Sprintln(release)
-		}
-	}
-	return res
+	return platform.Package.Name + ":" + platform.Architecture
 }
 
 // GetOrCreateBoard returns the Board object with the specified boardID
@@ -168,11 +162,5 @@ func (release *PlatformRelease) GetOrCreateBoard(boardID string) *Board {
 }
 
 func (release *PlatformRelease) String() string {
-	return fmt.Sprintln("  Version           : ", release.Version) +
-		fmt.Sprintln("  Boards            :") +
-		fmt.Sprintln(strings.Join(release.BoardNames, ", ")) +
-		fmt.Sprintln("  Archive File Name :", release.Resource.ArchiveFileName) +
-		fmt.Sprintln("  Checksum          :", release.Resource.Checksum) +
-		fmt.Sprintln("  File Size         :", release.Resource.Size) +
-		fmt.Sprintln("  URL               :", release.Resource.URL)
+	return release.Platform.String() + "@" + release.Version
 }

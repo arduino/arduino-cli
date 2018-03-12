@@ -115,30 +115,11 @@ func (tool *Tool) latestReleaseVersion() string {
 }
 
 func (tool *Tool) String() string {
-	res := fmt.Sprintln("Name        :", tool.Name)
-	if tool.Releases != nil && len(tool.Releases) > 0 {
-		res += "Releases:\n"
-		for _, release := range tool.Releases {
-			res += fmt.Sprintln(release)
-		}
-	}
-	return res
+	return tool.Package.Name + ":" + tool.Name
 }
 
 func (tr *ToolRelease) String() string {
-	res := fmt.Sprintln("  Version :", tr.Version)
-	for _, f := range tr.Flavours {
-		res += fmt.Sprintln(f)
-	}
-	return res
-}
-
-func (f *Flavour) String() string {
-	return fmt.Sprintln("    OS :", f.OS) +
-		fmt.Sprintln("    URL:", f.Resource.URL) +
-		fmt.Sprintln("    ArchiveFileName:", f.Resource.ArchiveFileName) +
-		fmt.Sprintln("    Size:", f.Resource.Size) +
-		fmt.Sprintln("    Checksum:", f.Resource.Checksum)
+	return tr.Tool.String() + "@" + tr.Version
 }
 
 var (
