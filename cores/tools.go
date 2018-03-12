@@ -52,6 +52,7 @@ type ToolRelease struct {
 	Version  string     `json:"version,required"` // The version number of this Release.
 	Flavours []*Flavour `json:"systems"`          // Maps OS to Flavour
 	Tool     *Tool      `json:"-"`
+	Folder   string     `json:"-"`
 }
 
 // Flavour represents a flavour of a Tool version.
@@ -114,8 +115,31 @@ func (tool *Tool) latestReleaseVersion() string {
 	return fmt.Sprint(max)
 }
 
+// GetLatestInstalled returns the latest installed ToolRelease for the Tool, or nil if no releases are installed.
+func (tool *Tool) GetLatestInstalled() *ToolRelease {
+	var latest *ToolRelease
+	for _, release := range tool.Releases {
+		if release.IsInstalled() {
+			if latest == nil {
+				latest = release
+			}
+			latestVer, _ := semver.Make(latest.Version)
+			releaseVer, _ := semver.Make(release.Version)
+			if latestVer.LT(releaseVer) {
+				latest = release
+			}
+		}
+	}
+	return latest
+}
+
 func (tool *Tool) String() string {
 	return tool.Package.Name + ":" + tool.Name
+}
+
+// IsInstalled returns true if the ToolRelease is installed
+func (tr *ToolRelease) IsInstalled() bool {
+	return tr.Folder != ""
 }
 
 func (tr *ToolRelease) String() string {

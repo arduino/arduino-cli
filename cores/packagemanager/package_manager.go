@@ -33,14 +33,12 @@ import (
 	"sync"
 
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common/releases"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/bcmi-labs/arduino-cli/cores/packageindex"
 	"github.com/juju/errors"
+	"github.com/sirupsen/logrus"
 )
 
 var packageManagerInstance *packageManager
@@ -92,6 +90,14 @@ func PackageManager() *packageManager {
 
 func (pm *packageManager) Clear() {
 	packageManagerInstance.packages = cores.NewPackages()
+}
+
+func (pm *packageManager) EnableDebugOutput() {
+	logrus.SetLevel(logrus.DebugLevel)
+}
+
+func (pm *packageManager) DisableDebugOutput() {
+	logrus.SetLevel(logrus.ErrorLevel)
 }
 
 func (pm *packageManager) GetPackages() *cores.Packages {
@@ -238,22 +244,100 @@ func (ta *toolActions) Get() (*cores.Tool, error) {
 	return nil, err
 }
 
-// IsInstalled checks whether the Tool is installed in the system
+// IsInstalled checks whether any release of the Tool is installed in the system
 func (ta *toolActions) IsInstalled() (bool, error) {
-	err := ta.forwardError
-	if err != nil {
-		return false, err
+	if ta.forwardError != nil {
+		return false, ta.forwardError
 	}
 
-	location, err := configs.ToolsFolder(ta.tool.Package.Name).Get()
-	if err != nil {
-		return false, err
-	}
-	_, err = os.Stat(filepath.Join(location, ta.tool.Name))
-	if !os.IsNotExist(err) {
-		return true, nil
+	for _, release := range ta.tool.Releases {
+		if release.IsInstalled() {
+			return true, nil
+		}
 	}
 	return false, nil
 }
 
+func (ta *toolActions) Release(version string) *toolReleaseActions {
+	if ta.forwardError != nil {
+		return &toolReleaseActions{forwardError: ta.forwardError}
+	}
+	release := ta.tool.GetRelease(version)
+	if release == nil {
+		return &toolReleaseActions{forwardError: fmt.Errorf("release %s not found for tool %s", version, ta.tool.String())}
+	}
+	return &toolReleaseActions{release: release}
+}
+
 // END -- Actions that can be done on a Tool
+
+// toolReleaseActions defines what actions can be performed on the specific ToolRelease
+// It serves as a status container for the fluent APIs
+type toolReleaseActions struct {
+	release      *cores.ToolRelease
+	forwardError error
+}
+
+func (tr *toolReleaseActions) Get() (*cores.ToolRelease, error) {
+	if tr.forwardError != nil {
+		return nil, tr.forwardError
+	}
+	return tr.release, nil
+}
+
+func (pm *packageManager) GetAllInstalledToolsReleases() []*cores.ToolRelease {
+	tools := []*cores.ToolRelease{}
+	for _, targetPackage := range pm.packages.Packages {
+		for _, tool := range targetPackage.Tools {
+			for _, release := range tool.Releases {
+				if release.IsInstalled() {
+					tools = append(tools, release)
+				}
+			}
+		}
+	}
+	return tools
+}
+
+func (pm *packageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.ToolRelease, error) {
+	// core := board.Properties["build.core"]
+
+	platform := board.PlatformRelease
+
+	// maps "PACKAGER:TOOL" => ToolRelease
+	foundTools := map[string]*cores.ToolRelease{}
+
+	// a Platform may not specify required tools (because it's a platform that comes from a
+	// sketchbook/hardware folder without a package_index.json) then add all available tools
+	for _, targetPackage := range pm.packages.Packages {
+		for _, tool := range targetPackage.Tools {
+			rel := tool.GetLatestInstalled()
+			if rel != nil {
+				foundTools[rel.Tool.String()] = rel
+			}
+		}
+	}
+
+	// replace the default tools above with the specific required by the current platform
+	for _, toolDep := range platform.Dependencies {
+		tool := pm.FindToolDependency(toolDep)
+		if tool == nil {
+			return nil, fmt.Errorf("tool release not found: %s", toolDep)
+		}
+		foundTools[tool.Tool.String()] = tool
+	}
+
+	requiredTools := []*cores.ToolRelease{}
+	for _, toolRel := range foundTools {
+		requiredTools = append(requiredTools, toolRel)
+	}
+	return requiredTools, nil
+}
+
+func (pm *packageManager) FindToolDependency(dep *cores.ToolDependency) *cores.ToolRelease {
+	toolRelease, err := pm.Package(dep.ToolPackager).Tool(dep.ToolName).Release(dep.ToolVersion).Get()
+	if err != nil {
+		return nil
+	}
+	return toolRelease
+}
