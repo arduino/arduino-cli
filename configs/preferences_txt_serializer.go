@@ -67,10 +67,10 @@ func IsBundledInDesktopIDE() bool {
 	ideDir := filepath.Dir(executable)
 	logrus.Info("Candidate IDE Directory: ", ideDir)
 
-	executables := []string{"arduino", "arduino.sh", "arduino.exe"}
-	for _, exe := range executables {
-		exePath := filepath.Join(ideDir, exe)
-		_, err := os.Stat(exePath)
+	tests := []string{"tools-builder", "Examples/01.Basics/Blink"}
+	for _, test := range tests {
+		filePath := filepath.Join(ideDir, test)
+		_, err := os.Stat(filePath)
 		if !os.IsNotExist(err) {
 			arduinoIDEDirectory = &ideDir
 			break
