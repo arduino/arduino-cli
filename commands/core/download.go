@@ -33,7 +33,6 @@ import (
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -57,8 +56,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
 	// The usage of this depends on the specific command, so it's on-demand
-	commands.InitPackageManager()
-	pm := packagemanager.PackageManager()
+	pm := commands.InitPackageManager()
 
 	// FIXME: that's just a PoC; please have mercy...
 	/*fmt.Printf("TESTING THE FLUENT PKGMGR\n")

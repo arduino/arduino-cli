@@ -100,9 +100,9 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrGeneric)
 	}
 
-	pm := packagemanager.PackageManager()
+	pm := commands.InitPackageManager()
 	if err = pm.LoadHardware(); err != nil {
-		formatter.PrintError(err, "Cannot Parse Board Index file.")
+		formatter.PrintError(err, "Error loading hardware packages.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
@@ -112,7 +112,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrBadCall)
 	}
 
-	var findBoardFunc func(*discovery.Monitor, *url.URL) *cores.Board
+	var findBoardFunc func(*packagemanager.PackageManager, *discovery.Monitor, *url.URL) *cores.Board
 	var Type string
 
 	if validSerialBoardURIRegexp.Match([]byte(boardURI)) {
@@ -127,7 +127,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	}
 
 	// TODO: Handle the case when no board is found.
-	board := findBoardFunc(monitor, deviceURI)
+	board := findBoardFunc(pm, monitor, deviceURI)
 	formatter.Print("SUPPORTED BOARD FOUND:")
 	formatter.Print(board.Name())
 
@@ -146,7 +146,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 // FIXME: Those should probably go in a "BoardManager" pkg or something
 // findSerialConnectedBoard find the board which is connected to the specified URI via serial port, using a monitor and a set of Boards
 // for the matching.
-func findSerialConnectedBoard(monitor *discovery.Monitor, deviceURI *url.URL) *cores.Board {
+func findSerialConnectedBoard(pm *packagemanager.PackageManager, monitor *discovery.Monitor, deviceURI *url.URL) *cores.Board {
 	found := false
 	location := deviceURI.Path
 	var serialDevice discovery.SerialDevice
@@ -162,8 +162,6 @@ func findSerialConnectedBoard(monitor *discovery.Monitor, deviceURI *url.URL) *c
 		return nil
 	}
 
-	pm := packagemanager.PackageManager()
-
 	boards := pm.FindBoardsWithVidPid(serialDevice.VendorID, serialDevice.ProductID)
 	if len(boards) == 0 {
 		formatter.PrintErrorMessage("No Supported board has been found, try either install new cores or check your board URI.")
@@ -175,7 +173,7 @@ func findSerialConnectedBoard(monitor *discovery.Monitor, deviceURI *url.URL) *c
 
 // findNetworkConnectedBoard find the board which is connected to the specified URI on the network, using a monitor and a set of Boards
 // for the matching.
-func findNetworkConnectedBoard(monitor *discovery.Monitor, deviceURI *url.URL) *cores.Board {
+func findNetworkConnectedBoard(pm *packagemanager.PackageManager, monitor *discovery.Monitor, deviceURI *url.URL) *cores.Board {
 	found := false
 
 	var networkDevice discovery.NetworkDevice
@@ -193,7 +191,6 @@ func findNetworkConnectedBoard(monitor *discovery.Monitor, deviceURI *url.URL) *
 		os.Exit(commands.ErrGeneric)
 	}
 
-	pm := packagemanager.PackageManager()
 	boards := pm.FindBoardsWithID(networkDevice.Name)
 	if len(boards) == 0 {
 		formatter.PrintErrorMessage("No Supported board has been found, try either install new cores or check your board URI.")

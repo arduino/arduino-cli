@@ -30,8 +30,6 @@
 package packagemanager
 
 import (
-	"sync"
-
 	"fmt"
 
 	"github.com/bcmi-labs/arduino-cli/common/releases"
@@ -41,27 +39,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var packageManagerInstance *packageManager
-var once sync.Once
-
 // PackageManager defines the superior oracle which understands all about
 // Arduino Packages, how to parse them, download, and so on.
 //
 // The manager also keeps track of the status of the Packages (their Platform Releases, actually)
 // installed in the system.
-type packageManager struct {
-	/* FIXME
-
-		What's the typical flow?
-
-		1. You start by downloading a PackageIndex from a repository (remember: multiple repositories are allowed)
-		2. You update (say initialize for now) the index with one or more of those PackageIndex es
-		3. That will generate and Index structure which does not contain low-level data (i.e. platform properties, boards, etc),
-	       since you need to properly install Platform (releases) and Tools
-	       So we need a way to find out whether a Platform is installed or not.
-	*/
-
+type PackageManager struct {
 	packages *cores.Packages
+
 	// TODO: This might be a list in the future, but would it be of any help?
 	eventHandler EventHandler
 }
@@ -75,36 +60,30 @@ type EventHandler interface {
 	OnDownloadingSomething() releases.ParallelDownloadProgressHandler
 }
 
-// PackageManager return the instance of the PackageManager
-// yeah, that's a singleton by the way...
-func PackageManager() *packageManager {
-	once.Do(func() {
-		// TODO: why not just use the Go pkg init()?
-		packageManagerInstance = &packageManager{}
-		// TODO: perhaps directly use the loading from PackagesIndex file?
-		packageManagerInstance.packages = cores.NewPackages()
-	})
-
-	return packageManagerInstance
+// NewPackageManager returns a new instance of the PackageManager
+func NewPackageManager() *PackageManager {
+	return &PackageManager{
+		packages: cores.NewPackages(),
+	}
 }
 
-func (pm *packageManager) Clear() {
-	packageManagerInstance.packages = cores.NewPackages()
+func (pm *PackageManager) Clear() {
+	pm.packages = cores.NewPackages()
 }
 
-func (pm *packageManager) EnableDebugOutput() {
+func (pm *PackageManager) EnableDebugOutput() {
 	logrus.SetLevel(logrus.DebugLevel)
 }
 
-func (pm *packageManager) DisableDebugOutput() {
+func (pm *PackageManager) DisableDebugOutput() {
 	logrus.SetLevel(logrus.ErrorLevel)
 }
 
-func (pm *packageManager) GetPackages() *cores.Packages {
+func (pm *PackageManager) GetPackages() *cores.Packages {
 	return pm.packages
 }
 
-func (pm *packageManager) FindBoardsWithVidPid(vid, pid string) []*cores.Board {
+func (pm *PackageManager) FindBoardsWithVidPid(vid, pid string) []*cores.Board {
 	res := []*cores.Board{}
 	for _, targetPackage := range pm.packages.Packages {
 		for _, targetPlatform := range targetPackage.Platforms {
@@ -120,7 +99,7 @@ func (pm *packageManager) FindBoardsWithVidPid(vid, pid string) []*cores.Board {
 	return res
 }
 
-func (pm *packageManager) FindBoardsWithID(id string) []*cores.Board {
+func (pm *PackageManager) FindBoardsWithID(id string) []*cores.Board {
 	res := []*cores.Board{}
 	for _, targetPackage := range pm.packages.Packages {
 		for _, targetPlatform := range targetPackage.Platforms {
@@ -138,7 +117,7 @@ func (pm *packageManager) FindBoardsWithID(id string) []*cores.Board {
 
 // FIXME add an handler to be invoked on each verbose operation, in order to let commands display results through the formatter
 // as for the progress bars during download
-func (pm *packageManager) RegisterEventHandler(eventHandler EventHandler) {
+func (pm *PackageManager) RegisterEventHandler(eventHandler EventHandler) {
 	if pm.eventHandler != nil {
 		panic("Don't try to register another event handler to the PackageManager yet!")
 	}
@@ -147,44 +126,30 @@ func (pm *packageManager) RegisterEventHandler(eventHandler EventHandler) {
 }
 
 // GetEventHandlers returns a slice of the registered EventHandlers
-func (pm *packageManager) GetEventHandlers() []*EventHandler {
+func (pm *PackageManager) GetEventHandlers() []*EventHandler {
 	return append([]*EventHandler{}, &pm.eventHandler)
 }
 
-// FIXME this is currently hard-coded with the default PackageIndex and won't merge or check existing Packages!!
-func (pm *packageManager) AddDefaultPackageIndex() (*packageManager, error) {
+// AddDefaultPackageIndex loads the default package_index.json
+func (pm *PackageManager) AddDefaultPackageIndex() error {
 	var index packageindex.Index
 	err := packageindex.LoadIndex(&index)
 	if err != nil {
-		//TODO: The original version would automatically fix corrupted index?
-		/*status, err := prettyPrints.CorruptedCoreIndexFix(index)
-		if err != nil {
-			return pm, err
-		}
-		pm.packages = &status
-		return pm, nil*/
-
-		return pm, errors.Annotate(err, fmt.Sprintf("failed to load the package index, is probably corrupted"))
+		return errors.Annotate(err, fmt.Sprintf("failed to load the package index, is probably corrupted"))
 	}
 
-	// TODO: if this really is a singleton, a lock is needed :(
 	pm.packages = index.CreateStatusContext()
-	return pm, nil
+	return nil
 }
 
 // TODO: implement the generic version (with merge)
-/*func (pm *packageManager) AddPackageIndex() *packageManager {
+/*func (pm *PackageManager) AddPackageIndex() *PackageManager {
 
 }*/
 
-// DownloadDefaultPackageIndexFile downloads the core packages index file from Arduino repository.
-func (pm *packageManager) DownloadDefaultPackageIndexFile() error {
-	return packageindex.DownloadDefaultPackageIndexFile()
-}
-
 // Package looks for the Package with the given name, returning a structure
 // able to perform further operations on that given resource
-func (pm *packageManager) Package(name string) *packageActions {
+func (pm *PackageManager) Package(name string) *packageActions {
 	//TODO: perhaps these 2 structure should be merged? cores.Packages vs pkgmgr??
 	var err error
 	thePackage := pm.packages.Packages[name]
@@ -285,7 +250,7 @@ func (tr *toolReleaseActions) Get() (*cores.ToolRelease, error) {
 	return tr.release, nil
 }
 
-func (pm *packageManager) GetAllInstalledToolsReleases() []*cores.ToolRelease {
+func (pm *PackageManager) GetAllInstalledToolsReleases() []*cores.ToolRelease {
 	tools := []*cores.ToolRelease{}
 	for _, targetPackage := range pm.packages.Packages {
 		for _, tool := range targetPackage.Tools {
@@ -299,7 +264,7 @@ func (pm *packageManager) GetAllInstalledToolsReleases() []*cores.ToolRelease {
 	return tools
 }
 
-func (pm *packageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.ToolRelease, error) {
+func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.ToolRelease, error) {
 	// core := board.Properties["build.core"]
 
 	platform := board.PlatformRelease
@@ -334,7 +299,7 @@ func (pm *packageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*core
 	return requiredTools, nil
 }
 
-func (pm *packageManager) FindToolDependency(dep *cores.ToolDependency) *cores.ToolRelease {
+func (pm *PackageManager) FindToolDependency(dep *cores.ToolDependency) *cores.ToolRelease {
 	toolRelease, err := pm.Package(dep.ToolPackager).Tool(dep.ToolName).Release(dep.ToolVersion).Get()
 	if err != nil {
 		return nil

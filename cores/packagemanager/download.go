@@ -52,9 +52,9 @@ type PlatformReference struct {
 // FIXME: Make more generic and decouple the error print logic (that list should not exists;
 // rather a failure @ the first package)
 
-// findItemsToDownload takes a set of PlatformReference and returns a set of items to download and
+// FindItemsToDownload takes a set of PlatformReference and returns a set of items to download and
 // a set of outputs for non existing platforms.
-func (pm *packageManager) FindItemsToDownload(items []PlatformReference) (
+func (pm *PackageManager) FindItemsToDownload(items []PlatformReference) (
 	[]*cores.PlatformRelease, []*cores.ToolRelease, map[string]output.ProcessResult) {
 
 	itemC := len(items)
@@ -138,7 +138,7 @@ func GetPlatformReferenceCode(platform PlatformReference) string {
 	return platform.Package + ":" + platform.PlatformArchitecture + "@" + platform.PlatformVersion
 }
 
-func (pm *packageManager) DownloadToolReleaseArchives(tools []*cores.ToolRelease,
+func (pm *PackageManager) DownloadToolReleaseArchives(tools []*cores.ToolRelease,
 	results *output.CoreProcessResults) {
 
 	downloads := map[string]*releases.DownloadResource{}
@@ -155,7 +155,7 @@ func (pm *packageManager) DownloadToolReleaseArchives(tools []*cores.ToolRelease
 	}
 }
 
-func (pm *packageManager) DownloadPlatformReleaseArchives(platforms []*cores.PlatformRelease,
+func (pm *PackageManager) DownloadPlatformReleaseArchives(platforms []*cores.PlatformRelease,
 	results *output.CoreProcessResults) {
 
 	downloads := map[string]*releases.DownloadResource{}
@@ -169,7 +169,7 @@ func (pm *packageManager) DownloadPlatformReleaseArchives(platforms []*cores.Pla
 	}
 }
 
-func (pm *packageManager) downloadStuff(downloads map[string]*releases.DownloadResource) map[string]output.ProcessResult {
+func (pm *PackageManager) downloadStuff(downloads map[string]*releases.DownloadResource) map[string]output.ProcessResult {
 
 	var downloadProgressHandler releases.ParallelDownloadProgressHandler
 	if pm.eventHandler != nil {
@@ -181,7 +181,7 @@ func (pm *packageManager) downloadStuff(downloads map[string]*releases.DownloadR
 	return formatter.ExtractProcessResultsFromDownloadResults(downloads, downloadRes, "Downloaded")
 }
 
-func (pm *packageManager) InstallToolReleases(toolReleasesToDownload []*cores.ToolRelease,
+func (pm *PackageManager) InstallToolReleases(toolReleasesToDownload []*cores.ToolRelease,
 	result *output.CoreProcessResults) error {
 
 	for _, item := range toolReleasesToDownload {
@@ -229,7 +229,7 @@ func (pm *packageManager) InstallToolReleases(toolReleasesToDownload []*cores.To
 	return nil
 }
 
-func (pm *packageManager) InstallPlatformReleases(platformReleasesToDownload []*cores.PlatformRelease,
+func (pm *PackageManager) InstallPlatformReleases(platformReleasesToDownload []*cores.PlatformRelease,
 	outputResults *output.CoreProcessResults) error {
 
 	for _, item := range platformReleasesToDownload {

@@ -34,12 +34,11 @@ import (
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/bcmi-labs/arduino-cli/cores/packageindex"
 	"github.com/bcmi-labs/arduino-cli/task"
-	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
 )
 
 // DownloadCoreFileIndex shows info regarding the download of a missing (or corrupted) file index of core packages.
 func DownloadCoreFileIndex() task.Task {
-	return DownloadFileIndex(packagemanager.PackageManager().DownloadDefaultPackageIndexFile)
+	return DownloadFileIndex(packageindex.DownloadDefaultPackageIndexFile)
 }
 
 // CorruptedCoreIndexFix pretty prints messages regarding corrupted index fixes of cores.

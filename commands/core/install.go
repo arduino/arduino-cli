@@ -30,13 +30,13 @@
 package core
 
 import (
+	"os"
+
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
-	"os"
 )
 
 func init() {
@@ -58,8 +58,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
 	// The usage of this depends on the specific command, so it's on-demand
-	commands.InitPackageManager()
-	pm := packagemanager.PackageManager()
+	pm := commands.InitPackageManager()
 
 	logrus.Info("Preparing download")
 	// FIXME: Isn't this the same code as in core/download.go? Should be refactored
@@ -77,7 +76,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Installing tool dependencies")
 	formatter.Print("Installing tool dependencies...")
-	
+
 	err := pm.InstallToolReleases(toolReleasesToDownload, &outputResults)
 	if err == nil {
 		logrus.Info("Installing cores")

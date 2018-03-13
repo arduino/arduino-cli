@@ -38,13 +38,7 @@ var listCommand = &cobra.Command{
 // runListCommand detects and lists the connected arduino boards
 // (either via serial or network ports).
 func runListCommand(cmd *cobra.Command, args []string) {
-	pm := packagemanager.PackageManager()
-
-	pm, err := pm.AddDefaultPackageIndex()
-	if err != nil {
-		formatter.PrintError(err, "Error loading hardware files.")
-		os.Exit(commands.ErrCoreConfig)
-	}
+	pm := commands.InitPackageManager()
 
 	if err := pm.LoadHardware(); err != nil {
 		formatter.PrintError(err, "Error loading hardware files.")
@@ -84,14 +78,14 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		time.Sleep(duration)
 	}
 
-	formatter.Print(NewBoardList(monitor))
+	formatter.Print(NewBoardList(pm, monitor))
 
 	//monitor.Stop() //If called will slow like 1sec the program to close after print, with the same result (tested).
 	// it closes ungracefully, but at the end of the command we can't have races.
 }
 
 // NewBoardList returns a new board list by adding discovered boards from the board list and a monitor.
-func NewBoardList(monitor *discovery.Monitor) *output.BoardList {
+func NewBoardList(pm *packagemanager.PackageManager, monitor *discovery.Monitor) *output.BoardList {
 	if monitor == nil {
 		return nil
 	}
@@ -103,7 +97,6 @@ func NewBoardList(monitor *discovery.Monitor) *output.BoardList {
 		NetworkBoards: make([]output.NetworkBoardListItem, 0, len(networkDevices)),
 	}
 
-	pm := packagemanager.PackageManager()
 	for _, item := range serialDevices {
 		boards := pm.FindBoardsWithVidPid(item.VendorID, item.ProductID)
 		if len(boards) == 0 {

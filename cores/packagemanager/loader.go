@@ -42,7 +42,7 @@ import (
 )
 
 // LoadHardware read all plaforms from the configured paths
-func (pm *packageManager) LoadHardware() error {
+func (pm *PackageManager) LoadHardware() error {
 	dirs, err := configs.HardwareDirectories()
 	if err != nil {
 		return fmt.Errorf("getting hardware folder: %s", err)
@@ -51,7 +51,7 @@ func (pm *packageManager) LoadHardware() error {
 }
 
 // LoadHardwareFromDirectories load plaforms from a set of directories
-func (pm *packageManager) LoadHardwareFromDirectories(hardwarePaths []string) error {
+func (pm *PackageManager) LoadHardwareFromDirectories(hardwarePaths []string) error {
 	for _, path := range hardwarePaths {
 		if err := pm.LoadHardwareFromDirectory(path); err != nil {
 			return fmt.Errorf("loading hardware from %s: %s", path, err)
@@ -61,7 +61,7 @@ func (pm *packageManager) LoadHardwareFromDirectories(hardwarePaths []string) er
 }
 
 // LoadHardwareFromDirectory read a plaform from the path passed as parameter
-func (pm *packageManager) LoadHardwareFromDirectory(path string) error {
+func (pm *PackageManager) LoadHardwareFromDirectory(path string) error {
 	logrus.Infof("Loading hardware from: %s", path)
 	path, err := filepath.Abs(path)
 	if err != nil {
@@ -148,7 +148,7 @@ func (pm *packageManager) LoadHardwareFromDirectory(path string) error {
 
 // loadPlatforms load plaftorms from the specified directory assuming that they belongs
 // to the targetPackage object passed as parameter.
-func (pm *packageManager) loadPlatforms(targetPackage *cores.Package, packageFolder string) error {
+func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFolder string) error {
 	logrus.Infof("Loading package %s from: %s", targetPackage.Name, packageFolder)
 
 	// packagePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
@@ -216,7 +216,7 @@ func (pm *packageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 	return nil
 }
 
-func (pm *packageManager) loadPlatformRelease(platform *cores.PlatformRelease, folder string) error {
+func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, folder string) error {
 	if _, err := os.Stat(filepath.Join(folder, "boards.txt")); err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("opening boards.txt: %s", err)
 	} else if os.IsNotExist(err) {
@@ -259,7 +259,7 @@ func (pm *packageManager) loadPlatformRelease(platform *cores.PlatformRelease, f
 	return nil
 }
 
-func (pm *packageManager) loadBoards(platform *cores.PlatformRelease) error {
+func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 	if platform.Folder == "" {
 		return fmt.Errorf("platform not installed")
 	}
@@ -288,7 +288,7 @@ func (pm *packageManager) loadBoards(platform *cores.PlatformRelease) error {
 	return nil
 }
 
-func (pm *packageManager) loadToolsFromPackage(targetPackage *cores.Package, toolsPath string) error {
+func (pm *PackageManager) loadToolsFromPackage(targetPackage *cores.Package, toolsPath string) error {
 	logrus.Infof("Loading tools from dir: %s", toolsPath)
 
 	toolsInfo, err := ioutil.ReadDir(toolsPath)
@@ -329,7 +329,7 @@ func loadToolReleasesFromTool(tool *cores.Tool, toolPath string) error {
 	return nil
 }
 
-func (pm *packageManager) LoadToolsFromBundleDirectories(dirs []string) error {
+func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs []string) error {
 	for _, dir := range dirs {
 		if err := pm.LoadToolsFromBundleDirectory(dir); err != nil {
 			return fmt.Errorf("loading bundled tools from %s: %s", dir, err)
@@ -338,7 +338,7 @@ func (pm *packageManager) LoadToolsFromBundleDirectories(dirs []string) error {
 	return nil
 }
 
-func (pm *packageManager) LoadToolsFromBundleDirectory(toolsPath string) error {
+func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath string) error {
 	logrus.Infof("Loading tools from bundle dir: %s", toolsPath)
 
 	// We scan toolsPath content to find a "builtin_tools_versions.txt", if such file exists

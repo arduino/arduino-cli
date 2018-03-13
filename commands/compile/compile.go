@@ -36,8 +36,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
-
 	builder "github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
@@ -199,7 +197,7 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	// FIXME: this is building the CommandLine to run the builder; we should move it to a "cores.compute" pkg
 	// Add dependency tools paths to build properties with versions corresponding to specific core version.
-	pm := packagemanager.PackageManager()
+	pm := commands.InitPackageManager()
 	if err := pm.LoadHardware(); err != nil {
 		formatter.PrintError(err, "Error loading hardware packages.")
 		os.Exit(commands.ErrCoreConfig)
