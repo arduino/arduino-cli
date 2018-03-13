@@ -49,6 +49,10 @@ type PlatformReference struct {
 	PlatformVersion      string
 }
 
+func (platform *PlatformReference) String() string {
+	return platform.Package + ":" + platform.PlatformArchitecture + "@" + platform.PlatformVersion
+}
+
 // FIXME: Make more generic and decouple the error print logic (that list should not exists;
 // rather a failure @ the first package)
 
@@ -69,7 +73,7 @@ func (pm *PackageManager) FindItemsToDownload(items []PlatformReference) (
 	for _, item := range items {
 		pkg, exists := pm.packages.Packages[item.Package]
 		if !exists {
-			fails[GetPlatformReferenceCode(item)] = output.ProcessResult{
+			fails[item.String()] = output.ProcessResult{
 				ItemName: item.PlatformArchitecture,
 				Error:    fmt.Sprintf("Package %s not found", item.Package),
 			}
@@ -77,7 +81,7 @@ func (pm *PackageManager) FindItemsToDownload(items []PlatformReference) (
 		}
 		platform, exists := pkg.Platforms[item.PlatformArchitecture]
 		if !exists {
-			fails[GetPlatformReferenceCode(item)] = output.ProcessResult{
+			fails[item.String()] = output.ProcessResult{
 				ItemName: item.PlatformArchitecture,
 				Error:    "Platform not found",
 			}
@@ -91,7 +95,7 @@ func (pm *PackageManager) FindItemsToDownload(items []PlatformReference) (
 
 		release := platform.GetRelease(item.PlatformVersion)
 		if release == nil {
-			fails[GetPlatformReferenceCode(item)] = output.ProcessResult{
+			fails[item.String()] = output.ProcessResult{
 				ItemName: item.PlatformArchitecture,
 				Error:    fmt.Sprintf("Version %s Not Found", item.PlatformVersion),
 			}
@@ -101,7 +105,7 @@ func (pm *PackageManager) FindItemsToDownload(items []PlatformReference) (
 		// replaces "latest" with latest version too
 		toolDeps, err := pm.packages.GetDepsOfPlatformRelease(release)
 		if err != nil {
-			fails[GetPlatformReferenceCode(item)] = output.ProcessResult{
+			fails[item.String()] = output.ProcessResult{
 				ItemName: item.PlatformArchitecture,
 				Error: fmt.Sprintf("Cannot get tool dependencies of plafotmr %s: %s",
 					platform.Name, err.Error()),
@@ -126,18 +130,6 @@ func (pm *PackageManager) FindItemsToDownload(items []PlatformReference) (
 // FIXME: Refactor this download logic to uncouple it from the presentation layer
 // All this stuff is pkgmgr responsibility for sure
 
-func GetToolRelaseCode(tool *cores.ToolRelease) string {
-	return tool.Tool.Name + "@" + tool.Version
-}
-
-func GetPlatformReleaseCode(platform *cores.PlatformRelease) string {
-	return platform.Platform.Package.Name + ":" + platform.Platform.Name + "@" + platform.Version
-}
-
-func GetPlatformReferenceCode(platform PlatformReference) string {
-	return platform.Package + ":" + platform.PlatformArchitecture + "@" + platform.PlatformVersion
-}
-
 func (pm *PackageManager) DownloadToolReleaseArchives(tools []*cores.ToolRelease,
 	results *output.CoreProcessResults) {
 
@@ -147,7 +139,7 @@ func (pm *PackageManager) DownloadToolReleaseArchives(tools []*cores.ToolRelease
 		if resource == nil {
 			formatter.PrintError(fmt.Errorf("missing tool %s", tool), "A release of the tool is not available for your OS")
 		}
-		downloads[GetToolRelaseCode(tool)] = tool.GetCompatibleFlavour()
+		downloads[tool.String()] = tool.GetCompatibleFlavour()
 	}
 	logrus.Info("Downloading tools")
 	for name, value := range pm.downloadStuff(downloads) {
@@ -160,7 +152,7 @@ func (pm *PackageManager) DownloadPlatformReleaseArchives(platforms []*cores.Pla
 
 	downloads := map[string]*releases.DownloadResource{}
 	for _, platform := range platforms {
-		downloads[GetPlatformReleaseCode(platform)] = platform.Resource
+		downloads[platform.String()] = platform.Resource
 	}
 
 	logrus.Info("Downloading cores")
@@ -199,7 +191,7 @@ func (pm *PackageManager) InstallToolReleases(toolReleasesToDownload []*cores.To
 
 		err = cores.InstallTool(possiblePath, item.GetCompatibleFlavour())
 		var processResult output.ProcessResult
-		name := GetToolRelaseCode(item)
+		name := item.String()
 		if err != nil {
 			if os.IsExist(err) {
 				logrus.WithError(err).Warnf("Cannot install tool `%s`, it is already installed", item.Tool.Name)
@@ -246,7 +238,7 @@ func (pm *PackageManager) InstallPlatformReleases(platformReleasesToDownload []*
 
 		err = cores.InstallPlatform(possiblePath, item.Resource)
 		var result output.ProcessResult
-		name := GetPlatformReleaseCode(item)
+		name := item.String()
 		if err != nil {
 			if os.IsExist(err) {
 				logrus.WithError(err).Warnf("Cannot install core `%s`, it is already installed", item.Platform.Name)
