@@ -82,10 +82,8 @@ func LoadFromYAML(path string) error {
 	return nil
 }
 
-// SaveToYAML creates a file in the specified path with
-// corresponds to a config file reflecting the configs.
-func SaveToYAML(path string) error {
-	logrus.Info("Serializing configurations to ", path)
+// SerializeToYAML encodes the current configuration as YAML
+func SerializeToYAML() ([]byte, error) {
 	c := &yamlConfig{}
 	if dir, err := SketchbookFolder.Get(); err == nil {
 		c.SketchbookPath = dir
@@ -101,15 +99,19 @@ func SaveToYAML(path string) error {
 			Password: ProxyPassword,
 		}
 	}
-	content, err := yaml.Marshal(c)
-	if err != nil {
-		logrus.WithError(err).Warn("Error encoding config")
-		return err
 	}
-	err = ioutil.WriteFile(path, content, 0666)
+	return yaml.Marshal(c)
+}
+
+// SaveToYAML the current configuration to a YAML file
+func SaveToYAML(path string) error {
+	content, err := SerializeToYAML()
 	if err != nil {
-		logrus.WithError(err).Warn("Error writing config")
-		return err
+		return fmt.Errorf("econding configuration to YAML: %s", err)
+	}
+
+	if err = ioutil.WriteFile(path, content, 0666); err != nil {
+		return fmt.Errorf("writing configuration to %s: %s", path, err)
 	}
 	return nil
 }
