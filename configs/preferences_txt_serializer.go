@@ -31,8 +31,10 @@ package configs
 
 import (
 	"errors"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/pathutils"
 
@@ -99,6 +101,13 @@ func LoadFromDesktopIDEPreferences() error {
 	if dir, has := props["sketchbook.path"]; has {
 		SketchbookFolder = pathutils.NewConstPath(dir)
 		ArduinoHomeFolder = SketchbookFolder
+	}
+	if URLs, has := props["boardsmanager.additional.urls"]; has {
+		for _, URL := range strings.Split(URLs, ",") {
+			if newURL, err := url.Parse(URL); err == nil {
+				BoardManagerAdditionalUrls = append(BoardManagerAdditionalUrls, newURL)
+			}
+		}
 	}
 	return nil
 }

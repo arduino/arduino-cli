@@ -30,6 +30,7 @@
 package configs
 
 import (
+	"fmt"
 	"io/ioutil"
 
 	"github.com/bcmi-labs/arduino-cli/pathutils"
@@ -42,6 +43,9 @@ type yamlConfig struct {
 	ProxyManualConfig *yamlProxyConfig `yaml:"manual_configs,omitempty"`
 	SketchbookPath    string           `yaml:"sketchbook_path,omitempty"`
 	ArduinoDataFolder string           `yaml:"arduino_data,omitempty"`
+	BoardsManager     struct {
+		AdditionalURLS []string `yaml:"additional_urls,omitempty"`
+	} `yaml:"board_manager"`
 }
 
 type yamlProxyConfig struct {
@@ -99,6 +103,11 @@ func SerializeToYAML() ([]byte, error) {
 			Password: ProxyPassword,
 		}
 	}
+	if len(BoardManagerAdditionalUrls) > 1 {
+		c.BoardsManager.AdditionalURLS = []string{}
+		for _, URL := range BoardManagerAdditionalUrls[1:] {
+			c.BoardsManager.AdditionalURLS = append(c.BoardsManager.AdditionalURLS, URL.String())
+		}
 	}
 	return yaml.Marshal(c)
 }
