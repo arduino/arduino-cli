@@ -32,8 +32,10 @@ package configs
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"os/user"
+	"path"
 	"path/filepath"
 	"runtime"
 
@@ -77,6 +79,12 @@ func DownloadCacheFolder(item string) pathutils.Path {
 // IndexPath returns the path of the specified index file.
 func IndexPath(fileName string) pathutils.Path {
 	return pathutils.NewSubPath(fileName, ArduinoDataFolder, fileName, false)
+}
+
+// IndexPathFromURL returns the path of the index file corresponding to the specified URL
+func IndexPathFromURL(URL *url.URL) pathutils.Path {
+	filename := path.Base(URL.Path)
+	return IndexPath(filename)
 }
 
 // getDefaultConfigFilePath returns the default path for .cli-config.yml,

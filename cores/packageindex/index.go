@@ -32,20 +32,11 @@ package packageindex
 import (
 	"encoding/json"
 	"io/ioutil"
-	"net/url"
 
 	"github.com/bcmi-labs/arduino-cli/common/releases"
 
-	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
 )
-
-// packageIndexURL contains the index URL for core packages.
-var packageIndexURL, _ = url.Parse("https://downloads.arduino.cc/packages/package_index.json")
-
-// coreIndexPath returns the path of the index file for libraries.
-var coreIndexPath = configs.IndexPath("package_index.json")
 
 // Index represents Cores and Tools struct as seen from package_index.json file.
 type Index struct {
@@ -198,28 +189,18 @@ func (inToolRelease indexToolRelease) extractFlavours() []*cores.Flavour {
 	return ret
 }
 
-// LoadIndex reads a package_index.json from a file and returns
-// the corresponding Index structure.
-func LoadIndex(index *Index) error {
-	coreFile, err := coreIndexPath.Get()
+// LoadIndex reads a package_index.json from a file and returns the corresponding Index structure.
+func LoadIndex(jsonIndexPath string) (*Index, error) {
+	buff, err := ioutil.ReadFile(jsonIndexPath)
 	if err != nil {
-		return err
-	}
-
-	buff, err := ioutil.ReadFile(coreFile)
-	if err != nil {
-		return err
+		return nil, err
 	}
 	//fmt.Println(string(buff))
-	err = json.Unmarshal(buff, index)
+	var index Index
+	err = json.Unmarshal(buff, &index)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
-}
-
-// DownloadDefaultPackageIndexFile downloads the core packages index file from arduino repository.
-func DownloadDefaultPackageIndexFile() error {
-	return common.DownloadIndex(coreIndexPath, packageIndexURL)
+	return &index, nil
 }

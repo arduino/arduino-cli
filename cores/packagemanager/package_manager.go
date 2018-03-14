@@ -31,11 +31,13 @@ package packagemanager
 
 import (
 	"fmt"
+	"net/url"
+
+	"github.com/bcmi-labs/arduino-cli/configs"
 
 	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/bcmi-labs/arduino-cli/cores/packageindex"
-	"github.com/juju/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -130,12 +132,16 @@ func (pm *PackageManager) GetEventHandlers() []*EventHandler {
 	return append([]*EventHandler{}, &pm.eventHandler)
 }
 
-// AddDefaultPackageIndex loads the default package_index.json
-func (pm *PackageManager) AddDefaultPackageIndex() error {
-	var index packageindex.Index
-	err := packageindex.LoadIndex(&index)
+// LoadPackageIndex loads a package index by looking up the local cached file from the specified URL
+func (pm *PackageManager) LoadPackageIndex(URL *url.URL) error {
+	indexPath, err := configs.IndexPathFromURL(URL).Get()
 	if err != nil {
-		return errors.Annotate(err, fmt.Sprintf("failed to load the package index, is probably corrupted"))
+		return fmt.Errorf("retrieving json index path for %s: %s", URL, err)
+	}
+
+	index, err := packageindex.LoadIndex(indexPath)
+	if err != nil {
+		return fmt.Errorf("loading json index file %s: %s", indexPath, err)
 	}
 
 	pm.packages = index.CreateStatusContext()

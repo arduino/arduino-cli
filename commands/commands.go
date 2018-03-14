@@ -32,6 +32,8 @@ package commands
 import (
 	"os"
 
+	"github.com/bcmi-labs/arduino-cli/configs"
+
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
@@ -62,15 +64,13 @@ var GlobalFlags struct {
 	Format string // The Output format (e.g. text, json).
 }
 
-// InitPackageManager initializes the PackageManager (for now reading the default PackageIndex file, if available)
-// TODO: the initialization should be taken from some configuration file
+// InitPackageManager initializes the PackageManager
 // TODO: for the daemon mode, this might be called at startup, but for now only commands needing the PM will call it
 func InitPackageManager() *packagemanager.PackageManager {
 	logrus.Info("Loading the default Package index")
 	pm := packagemanager.NewPackageManager()
-	if err := pm.AddDefaultPackageIndex(); err != nil {
-		// TODO: currently the index fixing is disabled (it's way too complex, why can't you just download
-		// the index again?); the user need to run the command manually (not too bad after all)
+	// FIXME: Parse all 3rd party indexes
+	if err := pm.LoadPackageIndex(configs.BoardManagerAdditionalUrls[0]); err != nil {
 		formatter.PrintError(err, "Failed to load the default Package index."+
 			" Try updating the index with `arduino core update-index`.")
 		os.Exit(ErrCoreConfig)
