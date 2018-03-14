@@ -46,7 +46,10 @@ func HardwareDirectories() ([]string, error) {
 	}
 
 	if IsBundledInDesktopIDE() {
-		res = append(res, filepath.Join(*arduinoIDEDirectory, "hardware"))
+		bundledHardwareFolder := filepath.Join(*arduinoIDEDirectory, "hardware")
+		if info, err := os.Stat(bundledHardwareFolder); err == nil && info.IsDir() {
+			res = append(res, bundledHardwareFolder)
+		}
 	}
 
 	if dir, err := SketchbookFolder.Get(); err == nil {
