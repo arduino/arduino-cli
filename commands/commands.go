@@ -70,10 +70,12 @@ func InitPackageManager() *packagemanager.PackageManager {
 	logrus.Info("Loading the default Package index")
 	pm := packagemanager.NewPackageManager()
 	// FIXME: Parse all 3rd party indexes
-	if err := pm.LoadPackageIndex(configs.BoardManagerAdditionalUrls[0]); err != nil {
-		formatter.PrintError(err, "Failed to load the default Package index."+
-			" Try updating the index with `arduino core update-index`.")
-		os.Exit(ErrCoreConfig)
+	for _, URL := range configs.BoardManagerAdditionalUrls {
+		if err := pm.LoadPackageIndex(URL); err != nil {
+			formatter.PrintError(err, "Failed to load "+URL.String()+" package index.\n"+
+				"Try updating all indexes with `arduino core update-index`.")
+			os.Exit(ErrCoreConfig)
+		}
 	}
 
 	// TODO: were should we register the event handler? Multiple places?

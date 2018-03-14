@@ -144,14 +144,9 @@ func (pm *PackageManager) LoadPackageIndex(URL *url.URL) error {
 		return fmt.Errorf("loading json index file %s: %s", indexPath, err)
 	}
 
-	pm.packages = index.CreateStatusContext()
+	index.MergeIntoPackages(pm.packages)
 	return nil
 }
-
-// TODO: implement the generic version (with merge)
-/*func (pm *PackageManager) AddPackageIndex() *PackageManager {
-
-}*/
 
 // Package looks for the Package with the given name, returning a structure
 // able to perform further operations on that given resource

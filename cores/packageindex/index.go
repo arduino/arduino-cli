@@ -101,14 +101,12 @@ type indexHelp struct {
 	Online string `json:"online,omitempty"`
 }
 
-// CreateStatusContext creates a status context from index data.
-func (index Index) CreateStatusContext() *cores.Packages {
-	outPackages := cores.NewPackages()
-
+// MergeIntoPackages converts the Index data into a cores.Packages and merge them
+// with the existing conents of the cores.Packages passed as parameter.
+func (index Index) MergeIntoPackages(outPackages *cores.Packages) {
 	for _, inPackage := range index.Packages {
 		inPackage.extractPackageIn(outPackages)
 	}
-	return outPackages
 }
 
 func (inPackage indexPackage) extractPackageIn(outPackages *cores.Packages) {
