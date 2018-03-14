@@ -166,7 +166,7 @@ func TestLibDownloadSuccessful(t *testing.T) {
 	want := output.LibProcessResults{
 		Libraries: map[string]output.ProcessResult{
 			"invalidLibrary":           {ItemName: "invalidLibrary", Error: "Library not found"},
-			"YoutubeApi":               {ItemName: "YoutubeApi", Status: "Downloaded", Path: stagingFolder + "/YoutubeApi-1.0.0.zip"},
+			"YoutubeApi":               {ItemName: "YoutubeApi", Status: "Downloaded", Path: stagingFolder + "/YoutubeApi-1.1.0.zip"},
 			"YouMadeIt@invalidVersion": {ItemName: "YouMadeIt", Error: "Version Not Found"},
 		},
 	}
