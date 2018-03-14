@@ -222,17 +222,17 @@ func TestCoreDownloadSuccessful(t *testing.T) {
 	// desired output
 	want := output.CoreProcessResults{
 		Cores: map[string]output.ProcessResult{
-			"arduino:samd=1.6.16":            {ItemName: "arduino:Arduino SAMD Boards (32-bits ARM Cortex-M0+)@1.6.16", Status: "Downloaded", Path: stagingFolder + "/samd-1.6.16.tar.bz2"},
+			"arduino:samd=1.6.16":            {ItemName: "arduino:samd@1.6.16", Status: "Downloaded", Path: stagingFolder + "/samd-1.6.16.tar.bz2"},
 			"arduino:sam=notexistingversion": {ItemName: "sam", Error: "Version notexistingversion Not Found"},
 			"arduino:sam=1.0.0":              {ItemName: "sam", Error: "Version 1.0.0 Not Found"},
 		},
 		Tools: map[string]output.ProcessResult{
-			"arduinoOTA":        {ItemName: "arduinoOTA@1.2.0", Status: "Downloaded", Path: stagingFolder + "/arduinoOTA-1.2.0-linux_amd64.tar.bz2"},
-			"openocd":           {ItemName: "openocd@0.9.0-arduino6-static", Status: "Downloaded", Path: stagingFolder + "/openocd-0.9.0-arduino6-static-x86_64-linux-gnu.tar.bz2"},
-			"CMSIS-Atmel":       {ItemName: "CMSIS-Atmel@1.1.0", Status: "Downloaded", Path: stagingFolder + "/CMSIS-Atmel-1.1.0.tar.bz2"},
-			"CMSIS":             {ItemName: "CMSIS@4.5.0", Status: "Downloaded", Path: stagingFolder + "/CMSIS-4.5.0.tar.bz2"},
-			"arm-none-eabi-gcc": {ItemName: "arm-none-eabi-gcc@4.8.3-2014q1", Status: "Downloaded", Path: stagingFolder + "/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz"},
-			"bossac":            {ItemName: "bossac@1.7.0", Status: "Downloaded", Path: stagingFolder + "/bossac-1.7.0-x86_64-linux-gnu.tar.gz"},
+			"arduinoOTA":        {ItemName: "arduino:arduinoOTA@1.2.0", Status: "Downloaded", Path: stagingFolder + "/arduinoOTA-1.2.0-linux_amd64.tar.bz2"},
+			"openocd":           {ItemName: "arduino:openocd@0.9.0-arduino6-static", Status: "Downloaded", Path: stagingFolder + "/openocd-0.9.0-arduino6-static-x86_64-linux-gnu.tar.bz2"},
+			"CMSIS-Atmel":       {ItemName: "arduino:CMSIS-Atmel@1.1.0", Status: "Downloaded", Path: stagingFolder + "/CMSIS-Atmel-1.1.0.tar.bz2"},
+			"CMSIS":             {ItemName: "arduino:CMSIS@4.5.0", Status: "Downloaded", Path: stagingFolder + "/CMSIS-4.5.0.tar.bz2"},
+			"arm-none-eabi-gcc": {ItemName: "arduino:arm-none-eabi-gcc@4.8.3-2014q1", Status: "Downloaded", Path: stagingFolder + "/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz"},
+			"bossac":            {ItemName: "arduino:bossac@1.7.0", Status: "Downloaded", Path: stagingFolder + "/bossac-1.7.0-x86_64-linux-gnu.tar.gz"},
 		},
 	}
 
@@ -246,8 +246,6 @@ func TestCoreDownloadSuccessful(t *testing.T) {
 		err = json.Unmarshal(stdOut, &have)
 		require.NoError(t, err, "Unmarshaling json output")
 		require.NotNil(t, have.Cores, "Unmarshaling json output: have '%s'", stdOut)
-		t.Log("HAVE: \n", have)
-		t.Log("WANT: \n", want)
 
 		// checking output
 
