@@ -30,6 +30,7 @@
 package cores
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/arduino/go-properties-map"
@@ -65,4 +66,51 @@ func (b *Board) Name() string {
 func (b *Board) FQBN() string {
 	platform := b.PlatformRelease.Platform
 	return platform.Package.Name + ":" + platform.Architecture + ":" + b.BoardId
+}
+
+func (b *Board) String() string {
+	return b.FQBN()
+}
+
+// GeneratePropertiesForConfiguration returns the board properties for a particular
+// configuration. The parameter is the latest part of the FQBN, for example if
+// the full FQBN is "arduino:avr:mega:cpu=atmega2560" the config part must be
+// "cpu=atmega2560".
+func (b *Board) GeneratePropertiesForConfiguration(config string) (properties.Map, error) {
+	menu := b.Properties.SubTree("menu")
+	if menu == nil || len(menu) == 0 {
+		return nil, fmt.Errorf("there are no options available")
+	}
+	res := b.Properties.Clone()
+
+	options := strings.Split(config, ",")
+	for _, option := range options {
+		parts := strings.Split(option, "=")
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("invalid option '%s'", option)
+		}
+
+		key := strings.TrimSpace(parts[0])
+		value := strings.TrimSpace(parts[1])
+		if key == "" || value == "" {
+			return nil, fmt.Errorf("invalid option '%s'", option)
+		}
+
+		optionMenu := menu.SubTree(key)
+		if optionMenu == nil || len(optionMenu) == 0 {
+			return nil, fmt.Errorf("invalid option '%s'", option)
+		}
+
+		if _, ok := optionMenu[value]; !ok {
+			return nil, fmt.Errorf("invalid option value '%s' for '%s'", value, option)
+		}
+		optionsConf := optionMenu.SubTree(value)
+		if optionsConf == nil || len(optionsConf) == 0 {
+			continue
+		}
+
+		res.Merge(optionsConf)
+	}
+
+	return res, nil
 }
