@@ -150,14 +150,15 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	// Load programmer tool
-	var referencedPackage *cores.Package
-	var referencedPlatform *cores.Platform
-	var referencedPlatformRelease *cores.PlatformRelease
 	uploadToolID, have := boardProperties["upload.tool"]
 	if !have || uploadToolID == "" {
 		formatter.PrintErrorMessage("The board defines an invalid 'upload.tool': " + uploadToolID)
 		os.Exit(commands.ErrGeneric)
 	}
+
+	var referencedPackage *cores.Package
+	var referencedPlatform *cores.Platform
+	var referencedPlatformRelease *cores.PlatformRelease
 	var uploadTool *cores.Tool
 	if split := strings.Split(uploadToolID, ":"); len(split) == 1 {
 		uploadTool = targetPackage.Tools[uploadToolID]
@@ -182,12 +183,34 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrGeneric)
 	}
 	// FIXME: Look into index if the platform requires a specific version
-	uploadToolInstance := uploadTool.GetLatestInstalled()
-	if uploadToolInstance == nil {
+	uploadToolRelease := uploadTool.GetLatestInstalled()
+	if uploadToolRelease == nil {
 		formatter.PrintErrorMessage("Upload tool '" + uploadToolID + "' not installed.")
 		os.Exit(commands.ErrGeneric)
 	}
-	fmt.Println(boardProperties.Dump())
-	fmt.Println(uploadToolInstance)
 
+	// Build configuration for upload
+	uploadProperties := properties.Map{}
+	if referencedPlatformRelease != nil {
+		uploadProperties.Merge(referencedPlatformRelease.Properties)
+	}
+	uploadProperties.Merge(platformRelease.Properties)
+
+	uploadProperties.Merge(boardProperties)
+
+	uploadToolProperties := uploadProperties.SubTree("tools." + uploadTool.Name)
+	uploadProperties.Merge(uploadToolProperties)
+
+	if requiredTools, err := pm.FindToolsRequiredForBoard(board); err == nil {
+		for _, requiredTool := range requiredTools {
+			uploadProperties.Merge(requiredTool.RuntimeProperties())
+		}
+	}
+
+	// Set some
+	// Build recipe for upload
+	recipe := uploadProperties["upload.pattern"]
+	cmdLine := uploadProperties.ExpandPropsInString(recipe)
+	fmt.Println(recipe)
+	fmt.Println(cmdLine)
 }

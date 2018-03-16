@@ -35,6 +35,7 @@ import (
 	"runtime"
 	"strings"
 
+	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
 
 	"github.com/blang/semver"
@@ -144,6 +145,14 @@ func (tr *ToolRelease) IsInstalled() bool {
 
 func (tr *ToolRelease) String() string {
 	return tr.Tool.String() + "@" + tr.Version
+}
+
+// RuntimeProperties returns the runtime properties for this tool
+func (tr *ToolRelease) RuntimeProperties() properties.Map {
+	return properties.Map{
+		"runtime.tools." + tr.Tool.Name + ".path":                    tr.Folder,
+		"runtime.tools." + tr.Tool.Name + "-" + tr.Version + ".path": tr.Folder,
+	}
 }
 
 var (
