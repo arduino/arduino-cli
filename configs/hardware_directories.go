@@ -34,8 +34,7 @@ import (
 	"path/filepath"
 )
 
-// HardwareDirectories returns all paths that may contains hardware
-// packages.
+// HardwareDirectories returns all paths that may contains hardware packages.
 func HardwareDirectories() ([]string, error) {
 	res := []string{}
 
@@ -56,6 +55,20 @@ func HardwareDirectories() ([]string, error) {
 		dir = filepath.Join(dir, "hardware")
 		if info, err := os.Stat(dir); err == nil && info.IsDir() {
 			res = append(res, dir)
+		}
+	}
+
+	return res, nil
+}
+
+// BundleToolsDirectories returns all paths that may contains bundled-tools.
+func BundleToolsDirectories() ([]string, error) {
+	res := []string{}
+
+	if IsBundledInDesktopIDE() {
+		bundledToolsFolder := filepath.Join(*arduinoIDEDirectory, "hardware", "tools")
+		if info, err := os.Stat(bundledToolsFolder); err == nil && info.IsDir() {
+			res = append(res, bundledToolsFolder)
 		}
 	}
 

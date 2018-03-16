@@ -47,7 +47,14 @@ func (pm *PackageManager) LoadHardware() error {
 	if err != nil {
 		return fmt.Errorf("getting hardware folder: %s", err)
 	}
-	return pm.LoadHardwareFromDirectories(dirs)
+	if err := pm.LoadHardwareFromDirectories(dirs); err != nil {
+		return err
+	}
+	dirs, err = configs.BundleToolsDirectories()
+	if err != nil {
+		return fmt.Errorf("getting hardware folder: %s", err)
+	}
+	return pm.LoadToolsFromBundleDirectories(dirs)
 }
 
 // LoadHardwareFromDirectories load plaforms from a set of directories
