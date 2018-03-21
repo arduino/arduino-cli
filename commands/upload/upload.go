@@ -207,7 +207,20 @@ func run(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	// Set some
+	// Set serial port property
+	uploadProperties["serial.port.file"] = flags.port
+
+	// Set properties for verbose upload
+	if flags.verbose {
+		if v, ok := uploadProperties["upload.params.verbose"]; ok {
+			uploadProperties["upload.verbose"] = v
+		}
+	} else {
+		if v, ok := uploadProperties["upload.params.quiet"]; ok {
+			uploadProperties["upload.verbose"] = v
+		}
+	}
+
 	// Build recipe for upload
 	recipe := uploadProperties["upload.pattern"]
 	cmdLine := uploadProperties.ExpandPropsInString(recipe)
