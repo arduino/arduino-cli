@@ -48,6 +48,7 @@ func Init(rootCommand *cobra.Command) {
 	rootCommand.AddCommand(command)
 	command.Flags().StringVarP(&flags.fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
 	command.Flags().StringVarP(&flags.port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
+	command.Flags().BoolVarP(&flags.verbose, "verify", "t", false, "Verify uploaded binary after the upload.")
 	command.Flags().BoolVarP(&flags.verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
 }
 
@@ -55,6 +56,7 @@ var flags struct {
 	fqbn    string
 	port    string
 	verbose bool
+	verify  bool
 }
 
 var command = &cobra.Command{
@@ -219,6 +221,13 @@ func run(cmd *cobra.Command, args []string) {
 		if v, ok := uploadProperties["upload.params.quiet"]; ok {
 			uploadProperties["upload.verbose"] = v
 		}
+	}
+
+	// Set properties for verify
+	if flags.verify {
+		uploadProperties["upload.verify"] = uploadProperties["upload.params.verify"]
+	} else {
+		uploadProperties["upload.verify"] = uploadProperties["upload.params.noverify"]
 	}
 
 	// Build recipe for upload
