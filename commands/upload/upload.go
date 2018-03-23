@@ -32,14 +32,12 @@ package upload
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/cores"
-	"github.com/bcmi-labs/arduino-cli/sketches"
 	"github.com/spf13/cobra"
 )
 
@@ -63,23 +61,20 @@ var command = &cobra.Command{
 	Use:     "upload",
 	Short:   "Upload Arduino sketches.",
 	Long:    "Upload Arduino sketches.",
-	Example: "arduino upload [sketchName]",
-	Args:    cobra.ExactArgs(0),
+	Example: "arduino upload [sketchPath]",
+	Args:    cobra.MaximumNArgs(1),
 	Run:     run,
 }
 
 func run(cmd *cobra.Command, args []string) {
-	// FIXME: factorize a general way to determine current sketch
-	var sketchName string
-	if len(args) == 0 {
-		sketchName, err := os.Getwd()
-		if err != nil {
-			formatter.PrintError(err, "Could not determine current working directory")
-			os.Exit(commands.ErrGeneric)
-		}
-		sketchName = filepath.Base(sketchName)
-	} else {
-		sketchName = args[0]
+	sketchPath := ""
+	if len(args) > 0 {
+		sketchPath = args[0]
+	}
+	sketch, err := commands.InitSketch(sketchPath)
+	if err != nil {
+		formatter.PrintError(err, "Error opening sketch.")
+		os.Exit(commands.ErrGeneric)
 	}
 
 	// FIXME: make a specification on how a port is specified via command line
@@ -90,11 +85,8 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	fqbn := flags.fqbn
-	if fqbn == "" {
-		sketch, err := sketches.GetSketch(sketchName)
-		if err == nil && sketch != nil {
-			fqbn = sketch.Metadata.CPU.Fqbn
-		}
+	if fqbn == "" && sketch != nil {
+		fqbn = sketch.Metadata.CPU.Fqbn
 	}
 	if fqbn == "" {
 		formatter.PrintErrorMessage("No Fully Qualified Board Name provided.")

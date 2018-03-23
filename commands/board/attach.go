@@ -42,7 +42,6 @@ import (
 	discovery "github.com/arduino/board-discovery"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-modules/sketches"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -63,17 +62,25 @@ var attachFlags struct {
 }
 
 var attachCommand = &cobra.Command{
-	Use:     "attach sketchName boardURI",
+	Use:     "attach <port> [sketchPath]",
 	Short:   "Attaches a sketch to a board.",
-	Long:    "Attaches a sketch to a board. Provide sketch name and a board URI to connect.",
-	Example: "arduino board attach sketchName serial:///dev/tty/ACM0",
-	Args:    cobra.ExactArgs(2),
+	Long:    "Attaches a sketch to a board.",
+	Example: "arduino board attach serial:///dev/tty/ACM0",
+	Args:    cobra.RangeArgs(1, 2),
 	Run:     runAttachCommand,
 }
 
 func runAttachCommand(cmd *cobra.Command, args []string) {
-	sketchName := args[0]
-	boardURI := args[1]
+	boardURI := args[0]
+	sketchPath := ""
+	if len(args) > 1 {
+		sketchPath = args[1]
+	}
+	sketch, err := commands.InitSketch(sketchPath)
+	if err != nil {
+		formatter.PrintError(err, "Error opening sketch.")
+		os.Exit(commands.ErrGeneric)
+	}
 
 	duration, err := time.ParseDuration(attachFlags.searchTimeout)
 	if err != nil {
@@ -85,20 +92,6 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	monitor.Start()
 
 	time.Sleep(duration)
-
-	// FIXME: Replace with the PackageManager
-	homeFolder, err := configs.ArduinoHomeFolder.Get()
-	if err != nil {
-		formatter.PrintError(err, "Cannot find Sketchbook.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-
-	ss := sketches.Find(homeFolder)
-	sketch, exists := ss[sketchName]
-	if !exists {
-		formatter.PrintErrorMessage("Cannot find specified sketch in the Sketchbook.")
-		os.Exit(commands.ErrGeneric)
-	}
 
 	pm := commands.InitPackageManager()
 	if err = pm.LoadHardware(); err != nil {
