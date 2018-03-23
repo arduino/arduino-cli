@@ -92,7 +92,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path string) error {
 
 		// First exclude all "tools" folders
 		if packager == "tools" {
-			logrus.Debugf("Excluding folder: %s", filepath.Join(path, packager))
+			logrus.Infof("Excluding folder: %s", filepath.Join(path, packager))
 			continue
 		}
 
@@ -135,7 +135,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path string) error {
 		// - PACKAGER/tools/TOOL-NAME/TOOL-VERSION/... (ex: arduino/tools/bossac/1.7.0/...)
 		toolsSubdirPath := filepath.Join(packagerPath, "tools")
 		if info, err := os.Stat(toolsSubdirPath); err == nil && info.IsDir() {
-			logrus.Debugf("Checking existence of 'tools' path: %s", toolsSubdirPath)
+			logrus.Infof("Checking existence of 'tools' path: %s", toolsSubdirPath)
 			if err := pm.loadToolsFromPackage(targetPackage, toolsSubdirPath); err != nil {
 				return fmt.Errorf("loading tools from %s: %s", toolsSubdirPath, err)
 			}
@@ -183,7 +183,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 			if err := pm.loadPlatformRelease(release, platformPath); err != nil {
 				return fmt.Errorf("loading platform release: %s", err)
 			}
-			logrus.WithField("platform", release).Debugf("Loaded platform")
+			logrus.WithField("platform", release).Infof("Loaded platform")
 
 		} else if os.IsNotExist(err) {
 			// case: ARCHITECTURE/VERSION/boards.txt
@@ -205,7 +205,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 				if err := pm.loadPlatformRelease(release, platformWithVersionPath); err != nil {
 					return fmt.Errorf("loading platform release %s: %s", version, err)
 				}
-				logrus.WithField("platform", release).Debugf("Loaded platform")
+				logrus.WithField("platform", release).Infof("Loaded platform")
 			}
 		} else {
 			return fmt.Errorf("looking for boards.txt in %s: %s", possibleBoardTxtPath, err)
@@ -319,7 +319,7 @@ func loadToolReleasesFromTool(tool *cores.Tool, toolPath string) error {
 		if toolReleasePath, err := filepath.Abs(filepath.Join(toolPath, version)); err == nil {
 			release := tool.GetOrCreateRelease(version)
 			release.Folder = toolReleasePath
-			logrus.WithField("tool", release).Debugf("Loaded tool")
+			logrus.WithField("tool", release).Infof("Loaded tool")
 		} else {
 			return err
 		}
@@ -372,7 +372,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath string) error {
 	if builtinToolsVersionsTxtPath != "" {
 		// If builtin_tools_versions.txt is found create tools based on the info
 		// contained in that file
-		logrus.Debugf("Found builtin_tools_versions.txt")
+		logrus.Infof("Found builtin_tools_versions.txt")
 		toolPath, err := filepath.Abs(filepath.Dir(builtinToolsVersionsTxtPath))
 		if err != nil {
 			return fmt.Errorf("getting parent dir of %s: %s", builtinToolsVersionsTxtPath, err)
@@ -390,7 +390,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath string) error {
 				tool := targetPackage.GetOrCreateTool(toolName)
 				release := tool.GetOrCreateRelease(toolVersion)
 				release.Folder = toolPath
-				logrus.WithField("tool", release).Debugf("Loaded tool")
+				logrus.WithField("tool", release).Infof("Loaded tool")
 			}
 		}
 	} else {
