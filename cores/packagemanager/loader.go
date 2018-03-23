@@ -82,14 +82,6 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path string) error {
 		return fmt.Errorf("%s is not a folder", path)
 	}
 
-	// TODO: IS THIS REALLY NEEDED? this is used only to get ctags properties AFAIK
-	platformTxtPath := filepath.Join(path, "platform.txt")
-	if props, err := properties.SafeLoad(platformTxtPath); err == nil {
-		pm.packages.Properties.Merge(props)
-	} else {
-		return fmt.Errorf("reading %s: %s", platformTxtPath, err)
-	}
-
 	// Scan subfolders.
 	files, err := ioutil.ReadDir(path)
 	if err != nil {

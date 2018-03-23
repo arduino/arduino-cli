@@ -33,22 +33,18 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/arduino/go-properties-map"
 	"github.com/pmylund/sortutil"
 )
 
 // Packages represents a set of Packages
 type Packages struct {
 	Packages map[string]*Package // Maps packager name to Package
-
-	Properties properties.Map `json:"-"` // TODO: used to add "ctags" properties, TO BE REMOVED
 }
 
 // NewPackages creates a new Packages object
 func NewPackages() *Packages {
 	return &Packages{
-		Packages:   map[string]*Package{},
-		Properties: properties.Map{},
+		Packages: map[string]*Package{},
 	}
 }
 
