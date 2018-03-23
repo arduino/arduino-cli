@@ -30,9 +30,12 @@
 package commands
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/bcmi-labs/arduino-cli/sketches"
+	sk "github.com/bcmi-labs/arduino-modules/sketches"
 
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
@@ -85,6 +88,19 @@ func InitPackageManager() *packagemanager.PackageManager {
 		pm.RegisterEventHandler(&CLIPackageManagerEventHandler{})
 	}
 	return pm
+}
+
+func InitSketch(sketchPath string) (*sk.Sketch, error) {
+	if sketchPath != "" {
+		return sketches.NewSketchFromPath(sketchPath)
+	}
+
+	wd, err := os.Getwd()
+	logrus.Infof("Reading sketch from dir: %s", wd)
+	if err != nil {
+		return nil, fmt.Errorf("getting current directory: %s", err)
+	}
+	return sketches.NewSketchFromPath(wd)
 }
 
 // CLIPackageManagerEventHandler defines an event handler which outputs the PackageManager events

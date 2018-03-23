@@ -36,16 +36,33 @@ import (
 	"github.com/bcmi-labs/arduino-modules/sketches"
 )
 
-// GetSketch loads a sketch file.
-func GetSketch(name string) (*sketches.Sketch, error) {
+// Sketch is a sketch for Arduino
+type Sketch struct {
+	Name          string
+	Path          string
+	BoardMetadata *BoardMetadata `json:"board"`
+}
+
+// BoardMetadata represents the board metadata for the sketch
+type BoardMetadata struct {
+	Fqbn string `json:"fqbn,required"`
+	Name string `json:"name,required"`
+}
+
+// NewSketchFromCurrentSketchbook loads a sketch from the sketchbook
+func NewSketchFromCurrentSketchbook(name string) (*sketches.Sketch, error) {
 	sketchbookLocation, err := configs.ArduinoHomeFolder.Get()
 	if err != nil {
 		return nil, err
 	}
 	sketch := sketches.Sketch{FullPath: filepath.Join(sketchbookLocation, name)}
-	err = sketch.ImportMetadata()
-	if err != nil {
-		return nil, err
-	}
+	sketch.ImportMetadata()
+	return &sketch, nil
+}
+
+// NewSketchFromPath loads a sketch from the specified path
+func NewSketchFromPath(path string) (*sketches.Sketch, error) {
+	sketch := sketches.Sketch{FullPath: path}
+	sketch.ImportMetadata()
 	return &sketch, nil
 }

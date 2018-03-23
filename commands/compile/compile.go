@@ -44,7 +44,6 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
-	"github.com/bcmi-labs/arduino-cli/sketches"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -52,7 +51,7 @@ import (
 // Init prepares the command.
 func Init(rootCommand *cobra.Command) {
 	rootCommand.AddCommand(command)
-	command.Flags().StringVarP(&flags.fullyQualifiedBoardName, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	command.Flags().StringVarP(&flags.fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
 	command.Flags().BoolVar(&flags.showProperties, "show-properties", false, "Show all build properties used instead of compiling.")
 	command.Flags().BoolVar(&flags.preprocess, "preprocess", false, "Print preprocessed code to stdout instead of compiling.")
 	command.Flags().StringVar(&flags.buildCachePath, "build-cache-path", "", "Builds of 'core.a' are saved into this folder to be cached and reused.")
@@ -66,66 +65,68 @@ func Init(rootCommand *cobra.Command) {
 }
 
 var flags struct {
-	fullyQualifiedBoardName string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
-	showProperties          bool     // Show all build preferences used instead of compiling.
-	preprocess              bool     // Print preprocessed code to stdout.
-	buildCachePath          string   // Builds of 'core.a' are saved into this folder to be cached and reused.
-	buildPath               string   // Folder where to save compiled files.
-	buildProperties         []string // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
-	warnings                string   // Used to tell gcc which warning level to use.
-	verbose                 bool     // Turns on verbose mode.
-	quiet                   bool     // Supresses almost every output.
-	debugLevel              int      // Used for debugging.
-	vidPid                  string   // VID/PID specific build properties.
+	fqbn            string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	showProperties  bool     // Show all build preferences used instead of compiling.
+	preprocess      bool     // Print preprocessed code to stdout.
+	buildCachePath  string   // Builds of 'core.a' are saved into this folder to be cached and reused.
+	buildPath       string   // Folder where to save compiled files.
+	buildProperties []string // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
+	warnings        string   // Used to tell gcc which warning level to use.
+	verbose         bool     // Turns on verbose mode.
+	quiet           bool     // Supresses almost every output.
+	debugLevel      int      // Used for debugging.
+	vidPid          string   // VID/PID specific build properties.
 }
 
 var command = &cobra.Command{
 	Use:     "compile",
 	Short:   "Compiles Arduino sketches.",
-	Long:    "Compiles Arduino sketches. The specified sketch must be downloaded prior to compile.",
-	Example: "arduino compile sketchName",
-	Args:    cobra.ExactArgs(1),
+	Long:    "Compiles Arduino sketches.",
+	Example: "arduino compile [sketchPath]",
+	Args:    cobra.MaximumNArgs(1),
 	Run:     run,
 }
 
 func run(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino compile`")
-	isCorrectSyntax := true
-	sketchName := args[0]
-	sketch, err := sketches.GetSketch(sketchName)
+	sketchPath := ""
+	if len(args) > 0 {
+		sketchPath = args[0]
+	}
+	sketch, err := commands.InitSketch(sketchPath)
 	if err != nil {
-		formatter.PrintError(err, "Sketch file not found.")
-		isCorrectSyntax = false
-	}
-	var packageName, coreName string
-	fullyQualifiedBoardName := flags.fullyQualifiedBoardName
-	if fullyQualifiedBoardName == "" && sketch != nil {
-		fullyQualifiedBoardName = sketch.Metadata.CPU.Fqbn
-	}
-	if fullyQualifiedBoardName == "" {
-		formatter.PrintErrorMessage("No Fully Qualified Board Name provided.")
-		isCorrectSyntax = false
-	} else {
-		fqbnParts := strings.Split(fullyQualifiedBoardName, ":")
-		if len(fqbnParts) != 3 {
-			formatter.PrintErrorMessage("Fully Qualified Board Name has incorrect format.")
-			isCorrectSyntax = false
-		} else {
-			packageName = fqbnParts[0]
-			coreName = fqbnParts[1]
-		}
+		formatter.PrintError(err, "Error opening sketch.")
+		os.Exit(commands.ErrGeneric)
 	}
 
-	// FIXME: Replace with the PackageManager
-	isCtagsInstalled, err := cores.IsToolInstalled(packageName, "ctags")
-	if err != nil {
-		formatter.PrintError(err, "Cannot check ctags installation.")
+	fqbn := flags.fqbn
+	if fqbn == "" && sketch != nil {
+		fqbn = sketch.Metadata.CPU.Fqbn
+	}
+	if fqbn == "" {
+		formatter.PrintErrorMessage("No Fully Qualified Board Name provided.")
+		os.Exit(commands.ErrGeneric)
+	}
+	fqbnParts := strings.Split(fqbn, ":")
+	if len(fqbnParts) < 3 || len(fqbnParts) > 4 {
+		formatter.PrintErrorMessage("Fully Qualified Board Name has incorrect format.")
+		os.Exit(commands.ErrBadArgument)
+	}
+	packageName := fqbnParts[0]
+	coreName := fqbnParts[1]
+
+	pm := commands.InitPackageManager()
+	if err := pm.LoadHardware(); err != nil {
+		formatter.PrintError(err, "Could not load hardware packages.")
 		os.Exit(commands.ErrCoreConfig)
 	}
-	if !isCtagsInstalled {
+	if installed, err := pm.Package("builtin").Tool("ctags").IsInstalled(); err == nil && !installed {
 		// TODO: ctags will be installable.
-		formatter.PrintErrorMessage("\"ctags\" tool not installed, please install it.")
-		isCorrectSyntax = false
+		formatter.PrintErrorMessage(`Missing ctags tool.`)
+		os.Exit(commands.ErrCoreConfig)
+	} else if err != nil {
+		formatter.PrintError(err, `Could not detect if ctags tool is installed.`)
+		os.Exit(commands.ErrCoreConfig)
 	}
 
 	isCoreInstalled, err := cores.IsCoreInstalled(packageName, coreName)
@@ -135,36 +136,28 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	if !isCoreInstalled {
 		formatter.PrintErrorMessage(fmt.Sprintf("\"%[1]s:%[2]s\" core is not installed, please install it by running \"arduino core install %[1]s:%[2]s\".", packageName, coreName))
-		isCorrectSyntax = false
-	}
-
-	if !isCorrectSyntax {
-		os.Exit(commands.ErrBadCall)
+		os.Exit(commands.ErrCoreConfig)
 	}
 
 	ctx := &types.Context{}
 
-	ctx.FQBN = fullyQualifiedBoardName
-	sketchbookPath, err := configs.SketchbookFolder.Get()
-	if err != nil {
-		formatter.PrintError(err, "Getting sketchbook folder")
-		os.Exit(commands.ErrCoreConfig)
-	}
-	ctx.SketchLocation = filepath.Join(sketchbookPath, sketchName)
+	ctx.FQBN = fqbn
+	ctx.SketchLocation = sketch.FullPath
 
-	packagesFolder, err := configs.PackagesFolder.Get()
-	if err != nil {
-		formatter.PrintError(err, "Cannot get packages folder.")
+	// FIXME: This will be redundant when arduino-builder will be part of the cli
+	if packagesFolder, err := configs.HardwareDirectories(); err == nil {
+		ctx.HardwareFolders = packagesFolder
+	} else {
+		formatter.PrintError(err, "Cannot get hardware directories.")
 		os.Exit(commands.ErrCoreConfig)
 	}
-	ctx.HardwareFolders = []string{packagesFolder}
 
-	toolsFolder, err := configs.ToolsFolder(packageName).Get()
-	if err != nil {
-		formatter.PrintError(err, "Cannot get tools folder.")
+	if toolsFolder, err := configs.BundleToolsDirectories(); err == nil {
+		ctx.ToolsFolders = toolsFolder
+	} else {
+		formatter.PrintError(err, "Cannot get bundled tools directories.")
 		os.Exit(commands.ErrCoreConfig)
 	}
-	ctx.ToolsFolders = []string{toolsFolder}
 
 	librariesFolder, err := configs.LibrariesFolder.Get()
 	if err != nil {
@@ -189,37 +182,6 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.WarningsLevel = flags.warnings
 
 	ctx.CustomBuildProperties = append(flags.buildProperties, "build.warn_data_percentage=75")
-
-	coreVersion, err := cores.GetLatestInstalledCoreVersion(packageName, coreName)
-	if err != nil {
-		formatter.PrintError(err, "Cannot get the core version.")
-		os.Exit(commands.ErrBadCall)
-	}
-	// FIXME: this is building the CommandLine to run the builder; we should move it to a "cores.compute" pkg
-	// Add dependency tools paths to build properties with versions corresponding to specific core version.
-	pm := commands.InitPackageManager()
-	if err := pm.LoadHardware(); err != nil {
-		formatter.PrintError(err, "Error loading hardware packages.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-	for _, targetPackage := range pm.GetPackages().Packages {
-		if targetPackage.Name == packageName {
-			for _, platform := range targetPackage.Platforms {
-				if platform.Architecture == coreName && platform.Releases[coreVersion] != nil {
-					for _, toolDep := range platform.Releases[coreVersion].Dependencies {
-						if isInstalled, _ := cores.IsToolVersionInstalled(toolDep); !isInstalled {
-							formatter.PrintError(err, fmt.Sprintf("Required tool version not found: %s - %s.", toolDep.ToolName, toolDep.ToolVersion))
-							os.Exit(commands.ErrBadCall)
-						}
-						property := "runtime.tools." + toolDep.ToolName + ".path=" + filepath.Join(toolsFolder, toolDep.ToolName, toolDep.ToolVersion)
-						ctx.CustomBuildProperties = append(ctx.CustomBuildProperties, property)
-					}
-					break
-				}
-			}
-			break
-		}
-	}
 
 	if flags.buildCachePath != "" {
 		err = utils.EnsureFolderExists(flags.buildCachePath)
