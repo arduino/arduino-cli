@@ -32,12 +32,14 @@ package upload
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/executils"
 	"github.com/spf13/cobra"
 )
 
@@ -66,7 +68,7 @@ var command = &cobra.Command{
 	Run:     run,
 }
 
-func run(cmd *cobra.Command, args []string) {
+func run(command *cobra.Command, args []string) {
 	sketchPath := ""
 	if len(args) > 0 {
 		sketchPath = args[0]
@@ -222,9 +224,44 @@ func run(cmd *cobra.Command, args []string) {
 		uploadProperties["upload.verify"] = uploadProperties["upload.params.noverify"]
 	}
 
-	// Build recipe for upload
+	// Set path to compiled binary
+	// FIXME: refactor this should be made into a function
+	fqbn = strings.Replace(fqbn, ":", ".", -1)
+	uploadProperties["build.path"] = sketch.FullPath
+	uploadProperties["build.project_name"] = sketch.Name + "." + fqbn
+	if _, err := os.Stat(filepath.Join(sketch.FullPath, sketch.Name+"."+fqbn)); err != nil {
+		if os.IsNotExist(err) {
+			formatter.PrintErrorMessage("Compiled sketch not found. Please compile first.")
+		} else {
+			formatter.PrintError(err, "Could not open compiled sketch.")
+		}
+		os.Exit(commands.ErrGeneric)
+	}
+
+	// Build recipe for upload and run tool
 	recipe := uploadProperties["upload.pattern"]
 	cmdLine := uploadProperties.ExpandPropsInString(recipe)
-	fmt.Println(recipe)
-	fmt.Println(cmdLine)
+	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
+	if err != nil {
+		formatter.PrintError(err, "Invalid recipe in platform.")
+		os.Exit(commands.ErrCoreConfig)
+	}
+
+	cmd, err := executils.Command(cmdArgs)
+	if err != nil {
+		formatter.PrintError(err, "Could not execute upload tool.")
+		os.Exit(commands.ErrGeneric)
+	}
+
+	executils.AttachStdoutListener(cmd, executils.PrintToStdout)
+	executils.AttachStderrListener(cmd, executils.PrintToStderr)
+
+	if err := cmd.Start(); err != nil {
+		formatter.PrintError(err, "Could not execute upload tool.")
+		os.Exit(commands.ErrGeneric)
+	}
+	if err := cmd.Wait(); err != nil {
+		formatter.PrintError(err, "Error during upload.")
+		os.Exit(commands.ErrGeneric)
+	}
 }
