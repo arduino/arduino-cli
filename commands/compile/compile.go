@@ -232,6 +232,7 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrGeneric)
 	}
 
+	// FIXME: Make a function to obtain these info...
 	outputPath := ctx.BuildProperties.ExpandPropsInString("{build.path}/{recipe.output.tmp_file}")
 	ext := filepath.Ext(outputPath)
 	fqbn = strings.Replace(fqbn, ":", ".", -1)

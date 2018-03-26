@@ -34,13 +34,16 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/bcmi-labs/arduino-cli/executils"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	serial "go.bug.st/serial.v1"
 )
 
 // Init prepares the command.
@@ -203,9 +206,6 @@ func run(command *cobra.Command, args []string) {
 		}
 	}
 
-	// Set serial port property
-	uploadProperties["serial.port.file"] = flags.port
-
 	// Set properties for verbose upload
 	if flags.verbose {
 		if v, ok := uploadProperties["upload.params.verbose"]; ok {
@@ -229,7 +229,8 @@ func run(command *cobra.Command, args []string) {
 	fqbn = strings.Replace(fqbn, ":", ".", -1)
 	uploadProperties["build.path"] = sketch.FullPath
 	uploadProperties["build.project_name"] = sketch.Name + "." + fqbn
-	if _, err := os.Stat(filepath.Join(sketch.FullPath, sketch.Name+"."+fqbn)); err != nil {
+	ext := filepath.Ext(uploadProperties.ExpandPropsInString("{recipe.output.tmp_file}"))
+	if _, err := os.Stat(filepath.Join(sketch.FullPath, sketch.Name+"."+fqbn+ext)); err != nil {
 		if os.IsNotExist(err) {
 			formatter.PrintErrorMessage("Compiled sketch not found. Please compile first.")
 		} else {
@@ -238,7 +239,57 @@ func run(command *cobra.Command, args []string) {
 		os.Exit(commands.ErrGeneric)
 	}
 
-	// Build recipe for upload and run tool
+	// Perform reset via 1200bps touch if requested
+	if uploadProperties.GetBoolean("upload.use_1200bps_touch") {
+		ports, err := serial.GetPortsList()
+		if err != nil {
+			formatter.PrintError(err, "Can't get serial port list")
+			os.Exit(commands.ErrGeneric)
+		}
+		for _, p := range ports {
+			if p == port {
+				if err := touchSerialPortAt1200bps(p); err != nil {
+					formatter.PrintError(err, "Can't perform reset via 1200bps-touch on serial port")
+					os.Exit(commands.ErrGeneric)
+				}
+				break
+			}
+		}
+
+		// Scanning for available ports seems to open the port or
+		// otherwise assert DTR, which would cancel the WDT reset if
+		// it happened within 250 ms. So we wait until the reset should
+		// have already occurred before we start scanning.
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	// Wait for upload port if requested
+	actualPort := port // default
+	if uploadProperties.GetBoolean("upload.wait_for_upload_port") {
+		if p, err := waitForNewSerialPort(); err != nil {
+			formatter.PrintError(err, "Could not detect serial ports")
+			os.Exit(commands.ErrGeneric)
+		} else if p == "" {
+			formatter.Print("No new serial port detected.")
+		} else {
+			actualPort = p
+		}
+
+		// on OS X, if the port is opened too quickly after it is detected,
+		// a "Resource busy" error occurs, add a delay to workaround.
+		// This apply to other platforms as well.
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	// Set serial port property
+	uploadProperties["serial.port"] = actualPort
+	if strings.HasPrefix(actualPort, "/dev/") {
+		uploadProperties["serial.port.file"] = actualPort[5:]
+	} else {
+		uploadProperties["serial.port.file"] = actualPort
+	}
+
+	// Build recipe for upload
 	recipe := uploadProperties["upload.pattern"]
 	cmdLine := uploadProperties.ExpandPropsInString(recipe)
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
@@ -247,6 +298,7 @@ func run(command *cobra.Command, args []string) {
 		os.Exit(commands.ErrCoreConfig)
 	}
 
+	// Run Tool
 	cmd, err := executils.Command(cmdArgs)
 	if err != nil {
 		formatter.PrintError(err, "Could not execute upload tool.")
@@ -264,4 +316,62 @@ func run(command *cobra.Command, args []string) {
 		formatter.PrintError(err, "Error during upload.")
 		os.Exit(commands.ErrGeneric)
 	}
+}
+
+func touchSerialPortAt1200bps(port string) error {
+	logrus.Infof("Touching port %s at 1200bps", port)
+
+	// Open port
+	p, err := serial.Open(port, &serial.Mode{BaudRate: 1200})
+	if err != nil {
+		return fmt.Errorf("open port: %s", err)
+	}
+	defer p.Close()
+
+	if err = p.SetDTR(false); err != nil {
+		return fmt.Errorf("can't set DTR")
+	}
+	return nil
+}
+
+// waitForNewSerialPort is meant to be called just after a reset. It watches the ports connected
+// to the machine until a port appears. The new appeared port is returned
+func waitForNewSerialPort() (string, error) {
+	logrus.Infof("Waiting for upload port...")
+
+	getPortMap := func() (map[string]bool, error) {
+		ports, err := serial.GetPortsList()
+		if err != nil {
+			return nil, err
+		}
+		res := map[string]bool{}
+		for _, port := range ports {
+			res[port] = true
+		}
+		return res, nil
+	}
+
+	last, err := getPortMap()
+	if err != nil {
+		return "", fmt.Errorf("scanning serial port: %s", err)
+	}
+
+	deadline := time.Now().Add(10 * time.Second)
+	for time.Now().Before(deadline) {
+		now, err := getPortMap()
+		if err != nil {
+			return "", fmt.Errorf("scanning serial port: %s", err)
+		}
+
+		for p := range now {
+			if !last[p] {
+				return p, nil // Found it!
+			}
+		}
+
+		last = now
+		time.Sleep(250 * time.Millisecond)
+	}
+
+	return "", nil
 }
