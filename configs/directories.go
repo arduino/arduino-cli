@@ -126,6 +126,15 @@ func getDefaultSketchbookFolder() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("retrieving home dir: %s", err)
 	}
-	// TODO: before doing this, check IDE's preferences.txt for different sketchbook path
-	return filepath.Join(usr.HomeDir, "Arduino"), nil
+
+	switch runtime.GOOS {
+	case "linux":
+		return filepath.Join(usr.HomeDir, "Arduino"), nil
+	case "darwin":
+		return filepath.Join(usr.HomeDir, "Documents", "Arduino"), nil
+	case "windows":
+		return "", fmt.Errorf("Windows temporarily unsupported")
+	default:
+		return "", fmt.Errorf("unsupported OS: %s", runtime.GOOS)
+	}
 }
