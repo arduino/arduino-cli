@@ -194,7 +194,7 @@ func run(command *cobra.Command, args []string) {
 		uploadProperties.Merge(referencedPlatformRelease.Properties)
 	}
 	uploadProperties.Merge(platformRelease.Properties)
-
+	uploadProperties.Merge(platformRelease.RuntimeProperties())
 	uploadProperties.Merge(boardProperties)
 
 	uploadToolProperties := uploadProperties.SubTree("tools." + uploadTool.Name)

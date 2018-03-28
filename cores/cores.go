@@ -161,6 +161,13 @@ func (release *PlatformRelease) GetOrCreateBoard(boardID string) *Board {
 	return board
 }
 
+// RuntimeProperties returns the runtime properties for this PlatformRelease
+func (release *PlatformRelease) RuntimeProperties() properties.Map {
+	return properties.Map{
+		"runtime.platform.path": release.Folder,
+	}
+}
+
 func (release *PlatformRelease) String() string {
 	return release.Platform.String() + "@" + release.Version
 }
