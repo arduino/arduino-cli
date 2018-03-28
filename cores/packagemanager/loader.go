@@ -34,6 +34,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/configs"
@@ -89,6 +90,9 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path string) error {
 	}
 	for _, packagerPathInfo := range files {
 		packager := packagerPathInfo.Name()
+		if strings.HasPrefix(packager, ".") {
+			continue
+		}
 
 		// First exclude all "tools" folders
 		if packager == "tools" {
@@ -163,11 +167,11 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 
 	for _, file := range files {
 		architecure := file.Name()
-		platformPath := filepath.Join(packageFolder, architecure)
-		if architecure == "tools" ||
+		if strings.HasPrefix(architecure, ".") || architecure == "tools" ||
 			architecure == "platform.txt" { // TODO: Check if this "platform.txt" condition should be here....
 			continue
 		}
+		platformPath := filepath.Join(packageFolder, architecure)
 
 		// There are two possible platform folder structures:
 		// - ARCHITECTURE/boards.txt
@@ -195,10 +199,10 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 				return fmt.Errorf("reading dir %s: %s", platformPath, err)
 			}
 			for _, versionDir := range versionDirs {
-				if !versionDir.IsDir() {
+				version := versionDir.Name()
+				if !versionDir.IsDir() || strings.HasPrefix(version, ".") {
 					continue
 				}
-				version := versionDir.Name()
 				release := platform.GetOrCreateRelease(version)
 				platformWithVersionPath := filepath.Join(platformPath, version)
 
@@ -295,11 +299,11 @@ func (pm *PackageManager) loadToolsFromPackage(targetPackage *cores.Package, too
 		return fmt.Errorf("reading directory %s: %s", toolsPath, err)
 	}
 	for _, toolInfo := range toolsInfo {
-		if !toolInfo.IsDir() {
+		name := toolInfo.Name()
+		if !toolInfo.IsDir() || strings.HasPrefix(name, ".") {
 			continue
 		}
 
-		name := toolInfo.Name()
 		tool := targetPackage.GetOrCreateTool(name)
 		toolPath := filepath.Join(toolsPath, name)
 		if err = loadToolReleasesFromTool(tool, toolPath); err != nil {
@@ -316,6 +320,9 @@ func loadToolReleasesFromTool(tool *cores.Tool, toolPath string) error {
 	}
 	for _, versionInfo := range toolVersions {
 		version := versionInfo.Name()
+		if strings.HasPrefix(version, ".") {
+			continue
+		}
 		if toolReleasePath, err := filepath.Abs(filepath.Join(toolPath, version)); err == nil {
 			release := tool.GetOrCreateRelease(version)
 			release.Folder = toolReleasePath
