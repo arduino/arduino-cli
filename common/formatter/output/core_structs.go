@@ -51,10 +51,10 @@ func (is InstalledPlatformReleases) String() string {
 	table.MaxColWidth = 100
 	table.Wrap = true
 
-	table.AddRow("FQBN", "Version", "Name")
+	table.AddRow("FQBN", "Version", "Latest", "Name")
 	sort.Sort(is)
 	for _, item := range is {
-		table.AddRow(item.Platform.String(), item.Version, item.Platform.Name)
+		table.AddRow(item.Platform.String(), item.Version, item.Platform.GetRelease("latest").Version, item.Platform.Name)
 	}
 	return fmt.Sprintln(table)
 }
