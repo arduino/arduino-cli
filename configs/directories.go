@@ -110,10 +110,8 @@ func getDefaultArduinoDataFolder() (string, error) {
 	switch runtime.GOOS {
 	case "linux":
 		arduinoDataFolder = filepath.Join(arduinoDataFolder, ".arduino15")
-		break
 	case "darwin":
 		arduinoDataFolder = filepath.Join(arduinoDataFolder, "Library", "arduino15")
-		break
 	case "windows":
 		localAppDataPath, err := win32.GetLocalAppDataFolder()
 		if err != nil {
