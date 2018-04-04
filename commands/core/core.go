@@ -30,13 +30,6 @@
 package core
 
 import (
-	"os"
-	"path/filepath"
-
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/configs"
-	"github.com/bcmi-labs/arduino-cli/pathutils"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -50,58 +43,4 @@ var command = &cobra.Command{
 	Short:   "Arduino Core operations.",
 	Long:    "Arduino Core operations.",
 	Example: "arduino core update-index # to update the package index file.",
-}
-
-// FIXME: Move to the PackageManager
-
-// getInstalledCores gets the installed cores and puts them in the output struct.
-func getInstalledCores(packageName string, cores *[]output.InstalledStuff) {
-	getInstalledStuff(cores, configs.CoresFolder(packageName))
-}
-
-// getInstalledTools gets the installed tools and puts them in the output struct.
-func getInstalledTools(packageName string, tools *[]output.InstalledStuff) {
-	getInstalledStuff(tools, configs.ToolsFolder(packageName))
-}
-
-// getInstalledStuff is a generic procedure to get installed cores or tools and put them in an output struct.
-func getInstalledStuff(stuff *[]output.InstalledStuff, folder pathutils.Path) {
-	stuffHome, err := folder.Get()
-	if err != nil {
-		logrus.WithError(err).Warn("Cannot get default folder")
-		return
-	}
-	stuffHomeFolder, err := os.Open(stuffHome)
-	if err != nil {
-		logrus.WithError(err).Warn("Cannot open default folder")
-		return
-	}
-	defer stuffHomeFolder.Close()
-	stuffFolders, err := stuffHomeFolder.Readdir(0)
-	if err != nil {
-		logrus.WithError(err).Warn("Cannot read into default folder")
-		return
-	}
-	for _, stuffFolderInfo := range stuffFolders {
-		if !stuffFolderInfo.IsDir() {
-			continue
-		}
-		stuffName := stuffFolderInfo.Name()
-		stuffFolder, err := os.Open(filepath.Join(stuffHome, stuffName))
-		if err != nil {
-			logrus.WithError(err).Warn("Cannot open inner directory")
-			continue
-		}
-		defer stuffFolder.Close()
-		versions, err := stuffFolder.Readdirnames(0)
-		if err != nil {
-			logrus.WithError(err).Warn("Cannot read into inner directory")
-			continue
-		}
-		logrus.WithField("Name", stuffName).Info("Item added")
-		*stuff = append(*stuff, output.InstalledStuff{
-			Name:     stuffName,
-			Versions: versions,
-		})
-	}
 }

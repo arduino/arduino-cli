@@ -31,63 +31,30 @@ package output
 
 import (
 	"fmt"
-	"strings"
+	"sort"
+
+	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/gosuri/uitable"
 )
 
-// InstalledStuff represents an output set of tools or cores to format output from `core lib list` command.
-type InstalledStuff struct {
-	Name     string   `json:"name,required"`
-	Versions []string `json:"versions,required"`
+// InstalledPlatformReleases represents an output set of tools or cores to format output from `core list` command.
+type InstalledPlatformReleases []*cores.PlatformRelease
+
+func (is InstalledPlatformReleases) Len() int      { return len(is) }
+func (is InstalledPlatformReleases) Swap(i, j int) { is[i], is[j] = is[j], is[i] }
+func (is InstalledPlatformReleases) Less(i, j int) bool {
+	return is[i].Platform.String() < is[j].Platform.String()
 }
 
-// InstalledPackage represents a single package to format output from `core lib list` command.
-type InstalledPackage struct {
-	Name           string           `json:"package,required"`
-	InstalledCores []InstalledStuff `json:"cores,required"`
-	InstalledTools []InstalledStuff `json:"tools,required"`
-}
+func (is InstalledPlatformReleases) String() string {
+	table := uitable.New()
+	table.MaxColWidth = 100
+	table.Wrap = true
 
-// InstalledPackageList represents an output structure to format output from `core lib list` command.
-type InstalledPackageList struct {
-	InstalledPackages []InstalledPackage `json:"packages,required"`
-}
-
-//CoreSearchResults represents a result of a search of cores.
-type CoreSearchResults struct {
-	Cores []interface{} `json:"cores,required"`
-}
-
-func (is InstalledStuff) String() string {
-	return fmt.Sprintln("  Name:", is.Name) +
-		fmt.Sprintln("  Versions:", is.Versions)
-}
-
-func (ip InstalledPackage) String() string {
-	ret := ""
-	thereAreCores := len(ip.InstalledCores) > 0
-	thereAreTools := len(ip.InstalledTools) > 0
-	if thereAreCores || thereAreTools {
-		ret += fmt.Sprintln("Package", ip.Name)
+	table.AddRow("FQBN", "Version", "Name")
+	sort.Sort(is)
+	for _, item := range is {
+		table.AddRow(item.Platform.String(), item.Version, item.Platform.Name)
 	}
-	if thereAreCores {
-		ret += fmt.Sprintln("Cores:")
-		for _, core := range ip.InstalledCores {
-			ret += fmt.Sprintln(core)
-		}
-	}
-	if thereAreTools {
-		ret += fmt.Sprintln("Tools:")
-		for _, tool := range ip.InstalledTools {
-			ret += fmt.Sprintln(tool)
-		}
-	}
-	return strings.TrimSpace(ret)
-}
-
-func (icl InstalledPackageList) String() string {
-	ret := ""
-	for _, pkg := range icl.InstalledPackages {
-		ret += fmt.Sprintln(pkg)
-	}
-	return strings.TrimSpace(ret)
+	return fmt.Sprintln(table)
 }

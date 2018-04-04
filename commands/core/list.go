@@ -35,7 +35,6 @@ import (
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -56,49 +55,21 @@ var listCommand = &cobra.Command{
 
 func runListCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core list`")
-	pkgHome, err := configs.PackagesFolder.Get()
-	if err != nil {
-		formatter.PrintError(err, "Cannot get packages folder.")
+
+	res := output.InstalledPlatformReleases{}
+
+	pm := commands.InitPackageManager()
+	if err := pm.LoadHardware(); err != nil {
+		formatter.PrintError(err, "Error loading hardware packages")
 		os.Exit(commands.ErrCoreConfig)
 	}
-
-	dir, err := os.Open(pkgHome)
-	if err != nil {
-		formatter.PrintError(err, "Cannot open packages folder.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-	defer dir.Close()
-
-	dirFiles, err := dir.Readdir(0)
-	if err != nil {
-		formatter.PrintError(err, "Cannot read into packages folder.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-
-	// FIXME: Use the PackageManager instead
-	pkgs := output.InstalledPackageList{
-		InstalledPackages: make([]output.InstalledPackage, 0, 10),
-	}
-
-	logrus.Info("Listing")
-	for _, file := range dirFiles {
-		if !file.IsDir() {
-			continue
+	for _, targetPackage := range pm.GetPackages().Packages {
+		for _, platform := range targetPackage.Platforms {
+			if platformRelease := platform.GetInstalled(); platformRelease != nil {
+				res = append(res, platformRelease)
+			}
 		}
-		packageName := file.Name()
-		pkg := output.InstalledPackage{
-			Name:           packageName,
-			InstalledCores: make([]output.InstalledStuff, 0, 5),
-			InstalledTools: make([]output.InstalledStuff, 0, 5),
-		}
-		logrus.Infof("Getting installed cores of package: `%s`", packageName)
-		getInstalledCores(packageName, &pkg.InstalledCores)
-		logrus.Infof("Getting installed tools of package: `%s`", packageName)
-		getInstalledTools(packageName, &pkg.InstalledTools)
-		logrus.Infof("Adding package of dir: `%s` to the list", file)
-		pkgs.InstalledPackages = append(pkgs.InstalledPackages, pkg)
 	}
 
-	formatter.Print(pkgs)
-	logrus.Info("Done")
+	formatter.Print(res)
 }
