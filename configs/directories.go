@@ -39,6 +39,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/arduino/go-win32-utils"
 	"github.com/bcmi-labs/arduino-cli/pathutils"
 )
 
@@ -114,7 +115,11 @@ func getDefaultArduinoDataFolder() (string, error) {
 		arduinoDataFolder = filepath.Join(arduinoDataFolder, "Library", "arduino15")
 		break
 	case "windows":
-		return "", fmt.Errorf("Windows temporarily unsupported")
+		localAppDataPath, err := win32.GetLocalAppDataFolder()
+		if err != nil {
+			return "", fmt.Errorf("getting LocalAppData path: %s", err)
+		}
+		arduinoDataFolder = filepath.Join(localAppDataPath, "Arduino15")
 	default:
 		return "", fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
@@ -133,7 +138,11 @@ func getDefaultSketchbookFolder() (string, error) {
 	case "darwin":
 		return filepath.Join(usr.HomeDir, "Documents", "Arduino"), nil
 	case "windows":
-		return "", fmt.Errorf("Windows temporarily unsupported")
+		documentsPath, err := win32.GetDocumentsFolder()
+		if err != nil {
+			return "", fmt.Errorf("getting Documents path: %s", err)
+		}
+		return filepath.Join(documentsPath, "Arduino"), nil
 	default:
 		return "", fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
