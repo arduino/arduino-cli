@@ -33,7 +33,6 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/bcmi-labs/arduino-cli/pathutils"
 	"github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -70,10 +69,10 @@ func LoadFromYAML(path string) error {
 	}
 
 	if ret.ArduinoDataFolder != "" {
-		ArduinoDataFolder = pathutils.NewConstPath("Arduino Data", ret.ArduinoDataFolder, true)
+		ArduinoDataFolder.SetPath(ret.ArduinoDataFolder)
 	}
 	if ret.SketchbookPath != "" {
-		SketchbookFolder = pathutils.NewConstPath("Sketchbook", ret.SketchbookPath, true)
+		SketchbookFolder.SetPath(ret.SketchbookPath)
 	}
 	if ret.ProxyType != "" {
 		ProxyType = ret.ProxyType

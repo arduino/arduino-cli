@@ -36,8 +36,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/pathutils"
-
 	"github.com/arduino/go-properties-map"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -99,8 +97,7 @@ func LoadFromDesktopIDEPreferences() error {
 		return err
 	}
 	if dir, has := props["sketchbook.path"]; has {
-		SketchbookFolder = pathutils.NewConstPath("Sketchbook", dir, true)
-		ArduinoHomeFolder = SketchbookFolder
+		SketchbookFolder.SetPath(dir)
 	}
 	if URLs, has := props["boardsmanager.additional.urls"]; has {
 		for _, URL := range strings.Split(URLs, ",") {

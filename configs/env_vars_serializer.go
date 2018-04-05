@@ -31,8 +31,6 @@ package configs
 
 import (
 	"os"
-
-	"github.com/bcmi-labs/arduino-cli/pathutils"
 )
 
 // LoadFromEnv read configurations from the environment variables
@@ -41,10 +39,9 @@ func LoadFromEnv() {
 		ProxyType = p
 	}
 	if dir, has := os.LookupEnv("ARDUINO_SKETCHBOOK_DIR"); has {
-		SketchbookFolder = pathutils.NewConstPath("Sketchbook", dir, true)
-		ArduinoHomeFolder = SketchbookFolder
+		SketchbookFolder.SetPath(dir)
 	}
 	if dir, has := os.LookupEnv("ARDUINO_DATA_DIR"); has {
-		ArduinoDataFolder = pathutils.NewConstPath("Arduino Data", dir, true)
+		ArduinoDataFolder.SetPath(dir)
 	}
 }

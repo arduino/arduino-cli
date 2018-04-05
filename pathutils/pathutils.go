@@ -39,18 +39,9 @@ import (
 type Path interface {
 	// Get tries to determine the path or return an error if fails
 	Get() (string, error)
-}
 
-// NewConstPath creates a constant Path that always returns the specified
-// path, errors will always be nil
-func NewConstPath(label string, path string, createIfMissing bool) Path {
-	return &basicPath{
-		Label: label,
-		ProviderFunction: func() (string, error) {
-			return path, nil
-		},
-		CreateIfMissing: createIfMissing,
-	}
+	// SetPath change the path to the specified constant
+	SetPath(string)
 }
 
 // NewPath return a Path object that use the providerFunction to determine
@@ -106,6 +97,13 @@ func (p *basicPath) Get() (string, error) {
 	return p.cachedPath, nil
 }
 
+func (p *basicPath) SetPath(path string) {
+	p.cachedPath = ""
+	p.ProviderFunction = func() (string, error) {
+		return path, nil
+	}
+}
+
 type basicSubPath struct {
 	Label           string
 	Path            Path
@@ -136,4 +134,8 @@ func (p *basicSubPath) Get() (string, error) {
 	}
 	p.cachedPath = path
 	return p.cachedPath, nil
+}
+
+func (p *basicSubPath) SetPath(path string) {
+	panic("Could not SetPath in subPath object")
 }
