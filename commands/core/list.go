@@ -56,13 +56,13 @@ var listCommand = &cobra.Command{
 func runListCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core list`")
 
-	res := output.InstalledPlatformReleases{}
-
 	pm := commands.InitPackageManager()
 	if err := pm.LoadHardware(); err != nil {
 		formatter.PrintError(err, "Error loading hardware packages")
 		os.Exit(commands.ErrCoreConfig)
 	}
+
+	res := output.InstalledPlatformReleases{}
 	for _, targetPackage := range pm.GetPackages().Packages {
 		for _, platform := range targetPackage.Platforms {
 			if platformRelease := platform.GetInstalled(); platformRelease != nil {
@@ -71,5 +71,9 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	formatter.Print(res)
+	if len(res) == 0 {
+		formatter.Print("No cores installed")
+	} else {
+		formatter.Print(res)
+	}
 }
