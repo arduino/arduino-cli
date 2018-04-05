@@ -60,15 +60,13 @@ func InstallPlatform(destDir string, release *releases.DownloadResource) error {
 	}
 
 	// Make a temp folder
-	arduinoFolder, err := configs.ArduinoHomeFolder.Get()
+	dataFolder, err := configs.ArduinoDataFolder.Get()
 	if err != nil {
-		return err
+		return fmt.Errorf("getting data dir: %s", err)
 	}
-	tempFolder := filepath.Join(arduinoFolder, "tmp", "packages",
-		fmt.Sprintf("platform-%d", time.Now().Unix()))
-	err = os.MkdirAll(tempFolder, DirPermissions)
-	if err != nil {
-		return err
+	tempFolder := filepath.Join(dataFolder, "tmp", fmt.Sprintf("platform-%d", time.Now().Unix()))
+	if err = os.MkdirAll(tempFolder, DirPermissions); err != nil {
+		return fmt.Errorf("creating temp dir for extraction: %s", err)
 	}
 	defer os.RemoveAll(tempFolder)
 
@@ -129,12 +127,11 @@ func InstallTool(destToolsDir string, release *releases.DownloadResource) error 
 	}
 
 	// Make a temp folder
-	arduinoFolder, err := configs.ArduinoHomeFolder.Get()
+	dataFolder, err := configs.ArduinoDataFolder.Get()
 	if err != nil {
-		return err
+		return fmt.Errorf("creating temp dir for extraction: %s", err)
 	}
-	tempFolder := filepath.Join(arduinoFolder, "tmp", "tools",
-		fmt.Sprintf("tool-%d", time.Now().Unix()))
+	tempFolder := filepath.Join(dataFolder, "tmp", fmt.Sprintf("tool-%d", time.Now().Unix()))
 	err = os.MkdirAll(tempFolder, DirPermissions)
 	if err != nil {
 		return err
