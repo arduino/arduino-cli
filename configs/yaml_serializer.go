@@ -70,10 +70,10 @@ func LoadFromYAML(path string) error {
 	}
 
 	if ret.ArduinoDataFolder != "" {
-		ArduinoDataFolder = pathutils.NewConstPath(ret.ArduinoDataFolder)
+		ArduinoDataFolder = pathutils.NewConstPath("Arduino Data", ret.ArduinoDataFolder, true)
 	}
 	if ret.SketchbookPath != "" {
-		SketchbookFolder = pathutils.NewConstPath(ret.SketchbookPath)
+		SketchbookFolder = pathutils.NewConstPath("Sketchbook", ret.SketchbookPath, true)
 	}
 	if ret.ProxyType != "" {
 		ProxyType = ret.ProxyType

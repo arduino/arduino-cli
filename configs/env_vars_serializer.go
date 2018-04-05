@@ -41,10 +41,10 @@ func LoadFromEnv() {
 		ProxyType = p
 	}
 	if dir, has := os.LookupEnv("ARDUINO_SKETCHBOOK_DIR"); has {
-		SketchbookFolder = pathutils.NewConstPath(dir)
+		SketchbookFolder = pathutils.NewConstPath("Sketchbook", dir, true)
 		ArduinoHomeFolder = SketchbookFolder
 	}
 	if dir, has := os.LookupEnv("ARDUINO_DATA_DIR"); has {
-		ArduinoDataFolder = pathutils.NewConstPath(dir)
+		ArduinoDataFolder = pathutils.NewConstPath("Arduino Data", dir, true)
 	}
 }

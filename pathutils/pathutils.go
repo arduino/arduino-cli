@@ -43,8 +43,14 @@ type Path interface {
 
 // NewConstPath creates a constant Path that always returns the specified
 // path, errors will always be nil
-func NewConstPath(path string) Path {
-	return &constPath{Path: path}
+func NewConstPath(label string, path string, createIfMissing bool) Path {
+	return &basicPath{
+		Label: label,
+		ProviderFunction: func() (string, error) {
+			return path, nil
+		},
+		CreateIfMissing: createIfMissing,
+	}
 }
 
 // NewPath return a Path object that use the providerFunction to determine
@@ -68,14 +74,6 @@ func NewSubPath(label string, path Path, subPath string, createIfMissing bool) P
 		SubPath:         subPath,
 		CreateIfMissing: createIfMissing,
 	}
-}
-
-type constPath struct {
-	Path string
-}
-
-func (p *constPath) Get() (string, error) {
-	return p.Path, nil
 }
 
 type basicPath struct {

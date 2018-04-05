@@ -99,7 +99,7 @@ func LoadFromDesktopIDEPreferences() error {
 		return err
 	}
 	if dir, has := props["sketchbook.path"]; has {
-		SketchbookFolder = pathutils.NewConstPath(dir)
+		SketchbookFolder = pathutils.NewConstPath("Sketchbook", dir, true)
 		ArduinoHomeFolder = SketchbookFolder
 	}
 	if URLs, has := props["boardsmanager.additional.urls"]; has {
