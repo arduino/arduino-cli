@@ -125,33 +125,33 @@ func (pm *PackageManager) FindBoardWithFQBN(fqbn string) (*cores.Board, error) {
 	if len(fqbnParts) < 3 || len(fqbnParts) > 4 {
 		return nil, errors.New("incorrect format for fqbn")
 	}
+
 	packageName := fqbnParts[0]
 	platformArch := fqbnParts[1]
 	boardID := fqbnParts[2]
 
-	// Search for the board
-	for _, targetPackage := range pm.packages.Packages {
-		fmt.Println(targetPackage.Name, packageName)
-		if targetPackage.Name != packageName {
-			continue
-		}
-		for _, targetPlatform := range targetPackage.Platforms {
-			if targetPlatform.Architecture != platformArch {
-				continue
-			}
-
-			platform := targetPlatform.GetInstalled()
-			if platform == nil {
-				return nil, errors.New("platform not installed")
-			}
-			for _, board := range platform.Boards {
-				if board.BoardId == boardID {
-					return board, nil
-				}
-			}
-		}
+	// Find package
+	targetPackage := pm.packages.Packages[packageName]
+	if targetPackage == nil {
+		return nil, errors.New("unknown package " + packageName)
 	}
-	return nil, errors.New("board not found")
+
+	// Find platform
+	platform := targetPackage.Platforms[fqbnParts[1]]
+	if platform == nil {
+		return nil, fmt.Errorf("unknown platform %s:%s", packageName, platformArch)
+	}
+	platformRelease := platform.GetInstalled()
+	if platformRelease == nil {
+		return nil, fmt.Errorf("Platform %s:%s is not installed", packageName, platformArch)
+	}
+
+	// Find board
+	board := platformRelease.Boards[boardID]
+	if board == nil {
+		return nil, errors.New("board not found")
+	}
+	return board, nil
 }
 
 // FIXME add an handler to be invoked on each verbose operation, in order to let commands display results through the formatter
