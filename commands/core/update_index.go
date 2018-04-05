@@ -30,7 +30,6 @@
 package core
 
 import (
-	"net/url"
 	"os"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
@@ -38,7 +37,6 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/configs"
-	"github.com/bcmi-labs/arduino-cli/task"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -59,35 +57,19 @@ var updateIndexCommand = &cobra.Command{
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Updating package index")
 
-	downloadTasks := []task.Task{}
-	ignoreWarns := []bool{}
-	for _, URL := range configs.BoardManagerAdditionalUrls {
-		msgs := &formatter.TaskWrapperMessages{
-			BeforeMessage: "Downloading package index from " + URL.String(),
-			ErrorMessage:  "Can't download index file, check your network connection.",
-		}
-		task := formatter.WrapTask(downloadTask(URL), msgs)
-		downloadTasks = append(downloadTasks, task)
-		ignoreWarns = append(ignoreWarns, false)
-	}
-
-	results := task.ExecuteSequence(downloadTasks, ignoreWarns)
 	failed := false
-	for _, result := range results {
-		if result.Error != nil {
-			formatter.PrintError(result.Error, "Error downloading package index")
+	for _, URL := range configs.BoardManagerAdditionalUrls {
+		formatter.Print("Downloading package index from " + URL.String())
+		coreIndexPath := configs.IndexPathFromURL(URL)
+		if err := common.DownloadIndex(coreIndexPath, URL); err != nil {
+			formatter.PrintError(err, "Can't download index file.")
 			failed = true
 		}
 	}
+
 	if failed {
+		formatter.PrintErrorMessage("Error downloading package index, check your network connection")
 		os.Exit(commands.ErrNetwork)
 	}
 	formatter.Print("Download completed.")
-}
-
-func downloadTask(packageIndexURL *url.URL) task.Task {
-	coreIndexPath := configs.IndexPathFromURL(packageIndexURL)
-	return func() task.Result {
-		return task.Result{Error: common.DownloadIndex(coreIndexPath, packageIndexURL)}
-	}
 }

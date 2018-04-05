@@ -46,7 +46,7 @@ import (
 func DownloadIndex(indexPath pathutils.Path, URL *url.URL) error {
 	file, err := indexPath.Get()
 	if err != nil {
-		return err
+		return fmt.Errorf("getting index path: %s", err)
 	}
 
 	req, err := http.NewRequest("GET", URL.String(), nil)
