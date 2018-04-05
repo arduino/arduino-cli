@@ -37,6 +37,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
+
 	builder "github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
@@ -121,13 +123,31 @@ func run(cmd *cobra.Command, args []string) {
 		formatter.PrintError(err, "Could not load hardware packages.")
 		os.Exit(commands.ErrCoreConfig)
 	}
-	if installed, err := pm.Package("builtin").Tool("ctags").IsInstalled(); err == nil && !installed {
-		// TODO: ctags will be installable.
-		formatter.PrintErrorMessage(`Missing ctags tool.`)
-		os.Exit(commands.ErrCoreConfig)
-	} else if err != nil {
-		formatter.PrintError(err, `Could not detect if ctags tool is installed.`)
-		os.Exit(commands.ErrCoreConfig)
+
+	// Check for ctags tool
+	loadBuiltinCtagsMetadata(pm)
+	ctags, err := getBuiltinCtagsTool(pm)
+	if !ctags.IsInstalled() {
+		ctagsList := []*cores.ToolRelease{ctags}
+		res := &output.CoreProcessResults{Tools: map[string]output.ProcessResult{}}
+		formatter.Print("Downloading missing tool: ctags")
+		pm.DownloadToolReleaseArchives(ctagsList, res)
+		formatter.Print("Installing ctags")
+		if err := pm.InstallToolReleases(ctagsList, res); err != nil {
+			formatter.PrintError(err, "Error installing ctags")
+			formatter.PrintErrorMessage("Missing ctags tool.")
+			os.Exit(commands.ErrCoreConfig)
+		}
+
+		if err := pm.LoadHardware(); err != nil {
+			formatter.PrintError(err, "Could not load hardware packages.")
+			os.Exit(commands.ErrCoreConfig)
+		}
+		ctags, err = getBuiltinCtagsTool(pm)
+		if !ctags.IsInstalled() {
+			formatter.PrintErrorMessage("Missing ctags tool.")
+			os.Exit(commands.ErrCoreConfig)
+		}
 	}
 
 	isCoreInstalled, err := cores.IsCoreInstalled(packageName, coreName)
