@@ -1,0 +1,27 @@
+language: go
+
+go:
+  - 1.9.2
+
+install:
+  - go get github.com/go-errors/errors
+  - go get github.com/stretchr/testify
+  - go get github.com/jstemmer/go-junit-report
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
+  - go get github.com/wadey/gocovmerge
+  - go get github.com/arduino/go-properties-map
+  - go get github.com/arduino/go-timeutils
+
+script:
+  - go build -o $HOME/arduino-builder -v github.com/arduino/arduino-builder/arduino-builder
+  - export TEST_PACKAGES=`go list github.com/arduino/arduino-builder/...`
+  - RES=0; I=0; for PKG in $TEST_PACKAGES; do go test -v -timeout 30m -covermode=count -coverprofile=coverage.$I.out $PKG; ((RES=RES+$?)); ((I++)); done; ( exit $RES )
+
+after_success:
+  - bin/gocovmerge coverage.*.out > coverage.out
+  - bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+
+env:
+  global:
+    secure: mm7X+dFQD4tUYwXxeVOJzereC04KdpTe6vrho1g6zmWgnMEqBe/gnX16Hv1LeQRzTnMVUxpcTXMkh4Nj16WL2IFAnizWiiMfFb6wUBBOM0dFhYJR7EzSzKMu7/CuhxIqT5ps/Ls3UUnpzUoI9ImygiLJCaNJCSjJxQ+hwnxyyEZD0FHvlQQcv3kiKAd8sg9oWKqTSBGIwBnn9ZGT9G2uykv+XU2B5B+dW9IoXaDR3SfUGlANldorD4T6S9QNs+JdwhX1NDDd7rOqF92qu2RA0TFf2Ljy1STimLXvVhGgcfetsUhVgkmDGKxp1/iax4jlJ8wRU7faqeFAt1WvJpBaOnsK8OcsNqf7iqmYxWxHKavFHfGKgc7L+dMP9gWIqgtzmfqG94/49IN8lPMpB29J8sfZfrb4nKNu66S9GqQCr/jgGD1uTXzC6SggoL6ro2di0bAvAlb6zgpv5zChqKkTzhHE/6rVA6EZG/JIIx5lXaDvkD+yp3o2LNKNknpwRPEY0KpReRivvajucDwiPqQD79gkKWOGtoo5034SGSGCUmXvAydJNVPJt6c5ADKpVgyiT065Gja4/n+n4GhjT6QKc2WRGQRQZGtkYkNh95tKUvgZiZ1G7+EAuRCotoKiqLPkLgUpzCoD7kZpo/Ai5xU2aRcKpMsAHEHSRP9F06F+zp4=

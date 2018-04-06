@@ -2,7 +2,7 @@
 
 
 [[projects]]
-  branch = "master"
+  branch = "cli-inception"
   name = "github.com/arduino/arduino-builder"
   packages = [
     ".",
@@ -15,7 +15,8 @@
     "types",
     "utils"
   ]
-  revision = "608df9f1c4e2fbc8d6bdfff11d5c9013621b77a4"
+  revision = "85c6dd0bb90d0953dcd59a04ba5350856f2ba667"
+  source = "github.com/bcmi-labs/arduino-builder"
 
 [[projects]]
   branch = "master"
@@ -509,6 +510,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "14ffb99aab0aee16e7635091e47c59774d4617499b18051312b85373853decdd"
+  inputs-digest = "fdb0cf8a213f49a3fff019b457e3d779f19e0912483b8b3039d7ddf8d4e029b6"
   solver-name = "gps-cdcl"
   solver-version = 1
