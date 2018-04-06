@@ -261,7 +261,7 @@ func run(cmd *cobra.Command, args []string) {
 	src := outputPath
 	dst := filepath.Join(sketchPath, sketch.Name+"."+fqbn+ext)
 	if err = copyFile(src, dst); err != nil {
-		formatter.PrintError(err, "Error copying hex file.")
+		formatter.PrintError(err, "Error copying output file.")
 		os.Exit(commands.ErrGeneric)
 	}
 
