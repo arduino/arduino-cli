@@ -1,8 +1,8 @@
-debug
-arduino
-arduino-cli
-main
-.vscode/settings.json
-cmd/formatter/debug.test
-.cli-config.yml
-wiki
+/debug
+/arduino
+/arduino-cli
+/main
+/.vscode/settings.json
+/cmd/formatter/debug.test
+/.cli-config.yml
+/wiki
