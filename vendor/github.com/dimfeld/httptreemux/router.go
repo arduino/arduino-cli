@@ -109,6 +109,7 @@ func redirect(w http.ResponseWriter, r *http.Request, newPath string, statusCode
 func (t *TreeMux) lookup(w http.ResponseWriter, r *http.Request) (result LookupResult, found bool) {
 	result.StatusCode = http.StatusNotFound
 	path := r.RequestURI
+	unescapedPath := r.URL.Path
 	pathLen := len(path)
 	if pathLen > 0 && t.PathSource == RequestURI {
 		rawQueryLen := len(r.URL.RawQuery)
@@ -128,6 +129,7 @@ func (t *TreeMux) lookup(w http.ResponseWriter, r *http.Request) (result LookupR
 	trailingSlash := path[pathLen-1] == '/' && pathLen > 1
 	if trailingSlash && t.RedirectTrailingSlash {
 		path = path[:pathLen-1]
+		unescapedPath = unescapedPath[:len(unescapedPath)-1]
 	}
 
 	n, handler, params := t.root.search(r.Method, path[1:])
@@ -135,7 +137,7 @@ func (t *TreeMux) lookup(w http.ResponseWriter, r *http.Request) (result LookupR
 		if t.RedirectCleanPath {
 			// Path was not found. Try cleaning it up and search again.
 			// TODO Test this
-			cleanPath := Clean(path)
+			cleanPath := Clean(unescapedPath)
 			n, handler, params = t.root.search(r.Method, cleanPath[1:])
 			if n == nil {
 				// Still nothing found.
@@ -169,11 +171,11 @@ func (t *TreeMux) lookup(w http.ResponseWriter, r *http.Request) (result LookupR
 				var h HandlerFunc
 				if n.addSlash {
 					// Need to add a slash.
-					h = redirectHandler(path+"/", statusCode)
+					h = redirectHandler(unescapedPath+"/", statusCode)
 				} else if path != "/" {
 					// We need to remove the slash. This was already done at the
 					// beginning of the function.
-					h = redirectHandler(path, statusCode)
+					h = redirectHandler(unescapedPath, statusCode)
 				}
 
 				if h != nil {

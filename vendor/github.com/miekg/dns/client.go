@@ -20,9 +20,7 @@ const tcpIdleTimeout time.Duration = 8 * time.Second
 type Conn struct {
 	net.Conn                         // a net.Conn holding the connection
 	UDPSize        uint16            // minimum receive buffer for UDP messages
-	TsigSecret     map[string]string // secret(s) for Tsig map[<zonename>]<base64 secret>, zonename must be fully qualified
-	rtt            time.Duration
-	t              time.Time
+	TsigSecret     map[string]string // secret(s) for Tsig map[<zonename>]<base64 secret>, zonename must be in canonical form (lowercase, fqdn, see RFC 4034 Section 6.2)
 	tsigRequestMAC string
 }
 
@@ -39,7 +37,7 @@ type Client struct {
 	DialTimeout    time.Duration     // net.DialTimeout, defaults to 2 seconds, or net.Dialer.Timeout if expiring earlier - overridden by Timeout when that value is non-zero
 	ReadTimeout    time.Duration     // net.Conn.SetReadTimeout value for connections, defaults to 2 seconds - overridden by Timeout when that value is non-zero
 	WriteTimeout   time.Duration     // net.Conn.SetWriteTimeout value for connections, defaults to 2 seconds - overridden by Timeout when that value is non-zero
-	TsigSecret     map[string]string // secret(s) for Tsig map[<zonename>]<base64 secret>, zonename must be fully qualified
+	TsigSecret     map[string]string // secret(s) for Tsig map[<zonename>]<base64 secret>, zonename must be in canonical form (lowercase, fqdn, see RFC 4034 Section 6.2)
 	SingleInflight bool              // if true suppress multiple outstanding queries for the same Qname, Qtype and Qclass
 	group          singleflight
 }
@@ -78,6 +76,7 @@ func (c *Client) writeTimeout() time.Duration {
 	return dnsTimeout
 }
 
+// Dial connects to the address on the named network.
 func (c *Client) Dial(address string) (conn *Conn, err error) {
 	// create a new dialer with the appropriate timeout
 	var d net.Dialer
@@ -176,8 +175,9 @@ func (c *Client) exchange(m *Msg, a string) (r *Msg, rtt time.Duration, err erro
 	}
 
 	co.TsigSecret = c.TsigSecret
+	t := time.Now()
 	// write with the appropriate write timeout
-	co.SetWriteDeadline(time.Now().Add(c.getTimeoutForRequest(c.writeTimeout())))
+	co.SetWriteDeadline(t.Add(c.getTimeoutForRequest(c.writeTimeout())))
 	if err = co.WriteMsg(m); err != nil {
 		return nil, 0, err
 	}
@@ -187,12 +187,15 @@ func (c *Client) exchange(m *Msg, a string) (r *Msg, rtt time.Duration, err erro
 	if err == nil && r.Id != m.Id {
 		err = ErrId
 	}
-	return r, co.rtt, err
+	rtt = time.Since(t)
+	return r, rtt, err
 }
 
 // ReadMsg reads a message from the connection co.
-// If the received message contains a TSIG record the transaction
-// signature is verified.
+// If the received message contains a TSIG record the transaction signature
+// is verified. This method always tries to return the message, however if an
+// error is returned there are no guarantees that the returned message is a
+// valid representation of the packet read.
 func (co *Conn) ReadMsg() (*Msg, error) {
 	p, err := co.ReadMsgHeader(nil)
 	if err != nil {
@@ -201,13 +204,10 @@ func (co *Conn) ReadMsg() (*Msg, error) {
 
 	m := new(Msg)
 	if err := m.Unpack(p); err != nil {
-		// If ErrTruncated was returned, we still want to allow the user to use
+		// If an error was returned, we still want to allow the user to use
 		// the message, but naively they can just check err if they don't want
-		// to use a truncated message
-		if err == ErrTruncated {
-			return m, err
-		}
-		return nil, err
+		// to use an erroneous message
+		return m, err
 	}
 	if t := m.IsTsig(); t != nil {
 		if _, ok := co.TsigSecret[t.Hdr.Name]; !ok {
@@ -240,7 +240,6 @@ func (co *Conn) ReadMsgHeader(hdr *Header) ([]byte, error) {
 		}
 		p = make([]byte, l)
 		n, err = tcpRead(r, p)
-		co.rtt = time.Since(co.t)
 	default:
 		if co.UDPSize > MinMsgSize {
 			p = make([]byte, co.UDPSize)
@@ -248,7 +247,6 @@ func (co *Conn) ReadMsgHeader(hdr *Header) ([]byte, error) {
 			p = make([]byte, MinMsgSize)
 		}
 		n, err = co.Read(p)
-		co.rtt = time.Since(co.t)
 	}
 
 	if err != nil {
@@ -361,7 +359,6 @@ func (co *Conn) WriteMsg(m *Msg) (err error) {
 	if err != nil {
 		return err
 	}
-	co.t = time.Now()
 	if _, err = co.Write(out); err != nil {
 		return err
 	}

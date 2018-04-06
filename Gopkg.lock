@@ -2,10 +2,20 @@
 
 
 [[projects]]
-  branch = "package"
+  branch = "master"
   name = "github.com/arduino/arduino-builder"
-  packages = [".","builder_utils","constants","ctags","gohasissues","i18n","phases","types","utils"]
-  revision = "aa7cb314374b7748671407c44174c794746462dc"
+  packages = [
+    ".",
+    "builder_utils",
+    "constants",
+    "ctags",
+    "gohasissues",
+    "i18n",
+    "phases",
+    "types",
+    "utils"
+  ]
+  revision = "608df9f1c4e2fbc8d6bdfff11d5c9013621b77a4"
 
 [[projects]]
   branch = "master"
@@ -17,7 +27,7 @@
   branch = "master"
   name = "github.com/arduino/go-properties-map"
   packages = ["."]
-  revision = "3856e7be95d97e8462c11907fc5b5e4fe360d683"
+  revision = "e141b82c7cdac9250d129d7eb452bd71959281af"
 
 [[projects]]
   branch = "master"
@@ -27,21 +37,49 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/arduino/go-win32-utils"
+  packages = ["."]
+  revision = "ed041402e83b924251a5d65b4dfeb727c480c359"
+
+[[projects]]
+  branch = "master"
   name = "github.com/armon/go-metrics"
   packages = ["."]
-  revision = "9a4b6e10bed6220a1665955aa2b75afc91eb10b3"
+  revision = "783273d703149aaeb9897cf58613d5af48861c25"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
-  packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/credentials","aws/endpoints","aws/request","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/restxml","private/protocol/xml/xmlutil","service/s3","service/s3/s3iface"]
-  revision = "f426770fd5a4bae6186b280d4af7dca83a4cdef4"
-  version = "v1.12.17"
+  packages = [
+    "aws",
+    "aws/awserr",
+    "aws/awsutil",
+    "aws/client",
+    "aws/client/metadata",
+    "aws/credentials",
+    "aws/endpoints",
+    "aws/request",
+    "aws/signer/v4",
+    "internal/shareddefaults",
+    "private/protocol",
+    "private/protocol/query",
+    "private/protocol/query/queryutil",
+    "private/protocol/rest",
+    "private/protocol/restxml",
+    "private/protocol/xml/xmlutil",
+    "service/s3",
+    "service/s3/s3iface"
+  ]
+  revision = "1b176c5c6b57adb03bb982c21930e708ebca5a77"
+  version = "v1.12.70"
 
 [[projects]]
   branch = "master"
   name = "github.com/bcmi-labs/arduino-modules"
-  packages = ["boards","fs","sketches"]
-  revision = "0f569e97a36514eb1272ac2c515e9fd0781b8383"
+  packages = [
+    "fs",
+    "sketches"
+  ]
+  revision = "07170f4c30901ee9e711201f95f252a16548532f"
 
 [[projects]]
   branch = "master"
@@ -56,6 +94,11 @@
   version = "v3.5.1"
 
 [[projects]]
+  name = "github.com/bouk/monkey"
+  packages = ["."]
+  revision = "5df1f207ff77e025801505ae4d903133a0b4353f"
+
+[[projects]]
   name = "github.com/briandowns/spinner"
   packages = ["."]
   revision = "48dbb65d7bd5c74ab50d53d04c949f20e3d14944"
@@ -64,14 +107,14 @@
 [[projects]]
   name = "github.com/cenkalti/backoff"
   packages = ["."]
-  revision = "61153c768f31ee5f130071d08fc82b85208528de"
-  version = "v1.1.0"
+  revision = "2ea60e5f094469f9e65adb9cd103795b73ae743e"
+  version = "v2.0.0"
 
 [[projects]]
   name = "github.com/codeclysm/cc"
   packages = ["."]
-  revision = "46ed210237b8f5fa4a2c31a6561305cf25a347ff"
-  version = "v1.2.1"
+  revision = "6cb228ab831bc3451132b6baf4ae76c5fb802658"
+  version = "v1.2.2"
 
 [[projects]]
   name = "github.com/codeclysm/extract"
@@ -82,8 +125,14 @@
 [[projects]]
   name = "github.com/cpuguy83/go-md2man"
   packages = ["md2man"]
-  revision = "1d903dcb749992f3741d744c0f8376b4bd7eb3e1"
-  version = "v1.0.7"
+  revision = "20f5889cbdc3c73dbd2862796665e7c465ade7d1"
+  version = "v1.0.8"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/creack/goselect"
+  packages = ["."]
+  revision = "176c667f75aaf12301181e3cbf69da406ba0fd99"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -94,14 +143,8 @@
 [[projects]]
   name = "github.com/dimfeld/httptreemux"
   packages = ["."]
-  revision = "8cc36ee10f84b82d0742ffcab770815c7d3f9ad7"
-  version = "v5.0.0"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/dmotylev/goproperties"
-  packages = ["."]
-  revision = "7cbffbaada472bc302cbaca51c1d5ed2682eb509"
+  revision = "7f532489e7739b3d49df5c602bf63549881fe753"
+  version = "v5.0.1"
 
 [[projects]]
   branch = "master"
@@ -112,8 +155,8 @@
 [[projects]]
   name = "github.com/fatih/color"
   packages = ["."]
-  revision = "570b54cabe6b8eb0bc2dfce68d964677d63b5260"
-  version = "v1.5.0"
+  revision = "507f6050b8568533fb3f5504de8e5205fa62a114"
+  version = "v1.6.0"
 
 [[projects]]
   branch = "master"
@@ -122,7 +165,6 @@
   revision = "3a4dd67a94d215a3fe44f84c98b34472627fd3a3"
 
 [[projects]]
-  branch = "master"
   name = "github.com/fluxio/multierror"
   packages = ["."]
   revision = "9c68d39025e5c354adb4da3d75f3c8ee6f8c6a02"
@@ -130,32 +172,46 @@
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
-  revision = "629574ca2a5df945712d3079857300b5e4da0236"
-  version = "v1.4.2"
+  revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
+  version = "v1.4.7"
 
 [[projects]]
   name = "github.com/go-errors/errors"
   packages = ["."]
-  revision = "3afebba5a48dbc89b574d890b6b34d9ee10b4785"
-  version = "v1.0.0"
+  revision = "a6af135bd4e28680facf08a3d206b454abc877a4"
+  version = "v1.0.1"
 
 [[projects]]
   name = "github.com/go-ini/ini"
   packages = ["."]
-  revision = "5b3e00af70a9484542169a976dcab8d03e601a17"
-  version = "v1.30.0"
+  revision = "5e9692864e22d02ac79e2fa499cffb00520b4fea"
+  version = "v1.34.0"
 
 [[projects]]
   name = "github.com/goadesign/goa"
-  packages = [".","client","uuid"]
-  revision = "5646a430cdeb66983d5ace3384e0a667c185abc7"
-  version = "v1.3.0"
+  packages = [
+    ".",
+    "client",
+    "uuid"
+  ]
+  revision = "fc29b77a218fb9e190849c81911ed12d25e771de"
+  version = "v1.3.1"
+
+[[projects]]
+  name = "github.com/golang/protobuf"
+  packages = ["proto"]
+  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
-  name = "github.com/golang/protobuf"
-  packages = ["proto"]
-  revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
+  name = "github.com/gosuri/uitable"
+  packages = [
+    ".",
+    "util/strutil",
+    "util/wordwrap"
+  ]
+  revision = "36ee7e946282a3fb1cfecd476ddc9b35d8847e42"
 
 [[projects]]
   branch = "master"
@@ -167,19 +223,30 @@
   branch = "master"
   name = "github.com/hashicorp/go-immutable-radix"
   packages = ["."]
-  revision = "8aac2701530899b64bdea735a1de8da899815220"
+  revision = "7f3cd4390caab3250a57f30efdb2a65dd7649ecf"
 
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/golang-lru"
   packages = ["simplelru"]
-  revision = "0a025b7e63adc15a622f29b0b2c4c3848243bbf6"
+  revision = "0fb14efe8c47ae851c0034ed7a448854d3d34cf3"
 
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/hcl"
-  packages = [".","hcl/ast","hcl/parser","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
-  revision = "23c074d0eceb2b8a5bfdbb271ab780cde70f05a8"
+  packages = [
+    ".",
+    "hcl/ast",
+    "hcl/parser",
+    "hcl/printer",
+    "hcl/scanner",
+    "hcl/strconv",
+    "hcl/token",
+    "json/parser",
+    "json/scanner",
+    "json/token"
+  ]
+  revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -193,7 +260,6 @@
   revision = "0b12d6b5"
 
 [[projects]]
-  branch = "master"
   name = "github.com/juju/errors"
   packages = ["."]
   revision = "c7d06af17c68cd34c835053720b21f6549d9b0ee"
@@ -201,8 +267,8 @@
 [[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
-  revision = "be5ece7dd465ab0765a9682137865547526d1dfb"
-  version = "v1.7.3"
+  revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
+  version = "v1.7.6"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -223,10 +289,10 @@
   version = "v0.0.2"
 
 [[projects]]
-  branch = "master"
   name = "github.com/miekg/dns"
-  packages = [".","internal/socket"]
-  revision = "822ae18e7187e1bbde923a37081f6c1b8e9ba68a"
+  packages = ["."]
+  revision = "83c435cc65d2862736428b9b4d07d0ab10ad3e4d"
+  version = "v1.0.5"
 
 [[projects]]
   branch = "master"
@@ -238,7 +304,7 @@
   branch = "master"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
-  revision = "06020f85339e21b2478f756a78e295255ffa4d6a"
+  revision = "00c29f56e2386353d58c599509e8dc3801b0d716"
 
 [[projects]]
   branch = "master"
@@ -249,8 +315,8 @@
 [[projects]]
   name = "github.com/pelletier/go-toml"
   packages = ["."]
-  revision = "16398bac157da96aa88f98a2df640c7f32af1da2"
-  version = "v1.0.1"
+  revision = "acdc4509485b587f5e675510c4f2c63e90ff68a8"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -273,44 +339,50 @@
 [[projects]]
   name = "github.com/russross/blackfriday"
   packages = ["."]
-  revision = "4048872b16cc0fc2c5fd9eacf0ed2c2fedaa0c8c"
-  version = "v1.5"
+  revision = "55d61fa8aa702f59229e6cff85793c22e580eaf5"
+  version = "v1.5.1"
 
 [[projects]]
+  branch = "master"
   name = "github.com/satori/go.uuid"
   packages = ["."]
-  revision = "879c5887cd475cd7864858769793b2ceb0d44feb"
-  version = "v1.1.0"
+  revision = "36e9d2ebbde5e3f13ab2e25625fd453271d6522e"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "f006c2ac4710855cf0f916dd6b77acf6b048dc6e"
-  version = "v1.0.3"
+  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
+  version = "v1.0.5"
 
 [[projects]]
-  branch = "master"
   name = "github.com/spf13/afero"
-  packages = [".","mem"]
-  revision = "5660eeed305fe5f69c8fc6cf899132a459a97064"
+  packages = [
+    ".",
+    "mem"
+  ]
+  revision = "63644898a8da0bc22138abf860edaf5277b6102e"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/spf13/cast"
   packages = ["."]
-  revision = "acbeb36b902d72a7a4c18e8f3241075e7ab763e4"
-  version = "v1.1.0"
+  revision = "8965335b8c7107321228e3e3702cab9832751bac"
+  version = "v1.2.0"
 
 [[projects]]
   name = "github.com/spf13/cobra"
-  packages = [".","doc"]
-  revision = "7b2c5ac9fc04fc5efafb60700713d4fa609b777b"
-  version = "v0.0.1"
+  packages = [
+    ".",
+    "doc"
+  ]
+  revision = "a1f051bc3eba734da4772d60e2d677f47cf93ef4"
+  version = "v0.0.2"
 
 [[projects]]
   branch = "master"
   name = "github.com/spf13/jwalterweatherman"
   packages = ["."]
-  revision = "12bd96e66386c1960ab0f74ced1362f66f552f7b"
+  revision = "7c0cea34c8ece3fbeb2b27ab9b59511d360fb394"
 
 [[projects]]
   name = "github.com/spf13/pflag"
@@ -321,14 +393,17 @@
 [[projects]]
   name = "github.com/spf13/viper"
   packages = ["."]
-  revision = "25b30aa063fc18e48662b86996252eabdcf2f0c7"
-  version = "v1.0.0"
+  revision = "b5e8006cbee93ec955a89ab31e0e3ce3204f3736"
+  version = "v1.0.2"
 
 [[projects]]
   name = "github.com/stretchr/testify"
-  packages = ["assert","require"]
-  revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
-  version = "v1.1.4"
+  packages = [
+    "assert",
+    "require"
+  ]
+  revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
+  version = "v1.2.1"
 
 [[projects]]
   name = "github.com/zieckey/goini"
@@ -338,61 +413,102 @@
 
 [[projects]]
   branch = "master"
+  name = "go.bug.st/serial.v1"
+  packages = [
+    ".",
+    "unixutils"
+  ]
+  revision = "eae1344f9f90101f887b08d13391c34399f97873"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["pbkdf2","ssh/terminal"]
-  revision = "2509b142fb2b797aa7587dad548f113b2c0f20ce"
+  packages = [
+    "ed25519",
+    "ed25519/internal/edwards25519",
+    "pbkdf2",
+    "ssh/terminal"
+  ]
+  revision = "b2aa35443fbc700ab74c586ae79b81c171851023"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["bpf","context","internal/iana","internal/socket","ipv4","ipv6","websocket"]
-  revision = "4b14673ba32bee7f5ac0f990a48f033919fd418b"
+  packages = [
+    "bpf",
+    "context",
+    "internal/iana",
+    "internal/socket",
+    "ipv4",
+    "ipv6",
+    "websocket"
+  ]
+  revision = "b3c676e531a6dc479fa1b35ac961c13f5e2b4d2e"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
-  revision = "e82597366816b6fa799040628e95490bbf6e6b2b"
+  packages = [
+    "unix",
+    "windows"
+  ]
+  revision = "1d206c9fa8975fb4cf00df1dc8bf3283dc24ba0e"
 
 [[projects]]
-  branch = "master"
   name = "golang.org/x/text"
-  packages = ["internal/gen","internal/triegen","internal/ucd","transform","unicode/cldr","unicode/norm"]
-  revision = "6eab0e8f74e86c598ec3b6fad4888e0c11482d48"
+  packages = [
+    "internal/gen",
+    "internal/triegen",
+    "internal/ucd",
+    "transform",
+    "unicode/cldr",
+    "unicode/norm"
+  ]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
 
 [[projects]]
   name = "gopkg.in/cheggaaa/pb.v1"
   packages = ["."]
-  revision = "657164d0228d6bebe316fdf725c69f131a50fb10"
-  version = "v1.0.18"
+  revision = "72b964305fba1230d3d818711138195f22b9ceea"
+  version = "v1.0.22"
 
 [[projects]]
-  branch = "v2.0.0"
   name = "gopkg.in/fatih/pool.v2"
   packages = ["."]
   revision = "010e0b745d12eaf8426c95f9c3924d81dd0b668f"
+  version = "v2.0.0"
 
 [[projects]]
   name = "gopkg.in/gorethink/gorethink.v3"
-  packages = [".","encoding","ql2","types"]
+  packages = [
+    ".",
+    "encoding",
+    "ql2",
+    "types"
+  ]
   revision = "7f5bdfd858bb064d80559b2a32b86669c5de5d3b"
   version = "v3.0.5"
 
 [[projects]]
   name = "gopkg.in/h2non/filetype.v1"
-  packages = [".","matchers","types"]
-  revision = "22e255079ab40241c671d457081831d972f0436b"
-  version = "v1.0.3"
+  packages = [
+    ".",
+    "matchers",
+    "types"
+  ]
+  revision = "cc14fdc9ca0e4c2bafad7458f6ff79fd3947cfbb"
+  version = "v1.0.5"
 
 [[projects]]
-  branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1aa2c4d2f2f0f1159a7bb9b5f097ffc575662bebe53a9e7402c1e9453b9aa1d4"
+  inputs-digest = "14ffb99aab0aee16e7635091e47c59774d4617499b18051312b85373853decdd"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -63,7 +63,7 @@ class) is as easy as setting:
 
 	c.SingleInflight = true
 
-More advanced options are availabe using a net.Dialer and the corresponding API.
+More advanced options are available using a net.Dialer and the corresponding API.
 For example it is possible to set a timeout, or to specify a source IP address
 and port to use for the connection:
 
@@ -167,6 +167,11 @@ The supported algorithms include: HmacMD5, HmacSHA1, HmacSHA256 and HmacSHA512.
 Basic use pattern when querying with a TSIG name "axfr." (note that these key names
 must be fully qualified - as they are domain names) and the base64 secret
 "so6ZGir4GPAqINNh9U5c3A==":
+
+If an incoming message contains a TSIG record it MUST be the last record in
+the additional section (RFC2845 3.2).  This means that you should make the
+call to SetTsig last, right before executing the query.  If you make any
+changes to the RRset after calling SetTsig() the signature will be incorrect.
 
 	c := new(dns.Client)
 	c.TsigSecret = map[string]string{"axfr.": "so6ZGir4GPAqINNh9U5c3A=="}

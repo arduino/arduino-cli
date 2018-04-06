@@ -20,18 +20,33 @@
 #  name = "github.com/x/y"
 #  version = "2.4.0"
 
+[prune]
+  go-tests = true
+  unused-packages = true
 
 [[constraint]]
   branch = "master"
   name = "github.com/arduino/board-discovery"
 
-#[[constraint]]
-#  branch = "master"
-#  name = "github.com/arduino/go-properties-map"
+[[constraint]]
+  branch = "master"
+  name = "github.com/arduino/go-properties-map"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/arduino/go-win32-utils"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/gosuri/uitable"
 
 [[constraint]]
   branch = "master"
   name = "github.com/bcmi-labs/arduino-modules"
+
+[[constraint]]
+  branch = "master"
+  name = "go.bug.st/serial.v1"
 
 [[constraint]]
   branch = "master"
@@ -55,7 +70,12 @@
 
 [[constraint]]
   name = "github.com/goadesign/goa"
-  version = "1.3.0"
+  version = "1.3.1"
+
+# This is required for goa 1.3.1 to work
+[[override]]
+  branch = "master"
+  name = "github.com/satori/go.uuid"
 
 [[constraint]]
   branch = "master"
@@ -85,9 +105,9 @@
   name = "github.com/stretchr/testify"
   version = "1.1.4"
 
-[[constraint]]
-  branch = "master"
-  name = "github.com/theherk/viper"
+#[[constraint]]
+#  branch = "master"
+#  name = "github.com/theherk/viper"
 
 [[constraint]]
   name = "github.com/zieckey/goini"

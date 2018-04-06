@@ -1,6 +1,8 @@
 language: go
 go:
-- 1.4.2
+- 1.4
+- 1.9
+- master
 sudo: false
 os:
 - linux

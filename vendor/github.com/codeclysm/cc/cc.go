@@ -39,8 +39,9 @@ func (p *Pool) Wait() error {
 // The error returned by the function is stored into the error list returned by Wait
 func (p *Pool) Run(fn func() error) {
 	p.wg.Add(1)
+	p.semaphore <- true
+
 	go func() {
-		p.semaphore <- true
 		p.errors.Push(fn())
 		<-p.semaphore
 		p.wg.Done()

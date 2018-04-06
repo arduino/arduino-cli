@@ -1,6 +1,0 @@
-*
-!.gitignore
-!.travis.yml
-!README.md
-!LICENSE
-!*.go
