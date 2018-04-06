@@ -31,8 +31,8 @@ package compile
 
 import (
 	"fmt"
+	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -256,12 +256,41 @@ func run(cmd *cobra.Command, args []string) {
 	outputPath := ctx.BuildProperties.ExpandPropsInString("{build.path}/{recipe.output.tmp_file}")
 	ext := filepath.Ext(outputPath)
 	fqbn = strings.Replace(fqbn, ":", ".", -1)
-	if err := exec.Command("cp", outputPath, sketch.Name+"."+fqbn+ext).Run(); err != nil {
-		formatter.PrintError(err, "Error copying output file.")
+
+	// Copy .hex file to sketch folder
+	src := outputPath
+	dst := filepath.Join(sketchPath, sketch.Name+"."+fqbn+ext)
+	if err = copyFile(src, dst); err != nil {
+		formatter.PrintError(err, "Error copying hex file.")
 		os.Exit(commands.ErrGeneric)
 	}
-	if err := exec.Command("cp", outputPath[:len(outputPath)-3]+"elf", sketch.Name+"."+fqbn+".elf").Run(); err != nil {
-		formatter.PrintError(err, "Error copying output file.")
+
+	// Copy .elf file to sketch folder
+	src = outputPath[:len(outputPath)-3] + "elf"
+	dst = filepath.Join(sketchPath, sketch.Name+"."+fqbn+".elf")
+	if err = copyFile(src, dst); err != nil {
+		formatter.PrintError(err, "Error copying elf file.")
 		os.Exit(commands.ErrGeneric)
 	}
+}
+
+// copyFile copies the src file to dst. Any existing file will be overwritten and will not copy file attributes.
+func copyFile(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
 }
