@@ -6,10 +6,6 @@ pipeline:
   build:
     image: golang:latest
     commands:
-      - go get github.com/arduino/arduino-builder
-      - go get github.com/arduino/go-win32-utils
-      - go get github.com/gosuri/uitable
-      - go get go.bug.st/serial.v1
       - go build -o arduino
       - go test ./... -race
     secrets: [TEST_USERNAME, TEST_PASSWORD]

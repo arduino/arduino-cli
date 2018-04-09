@@ -26,6 +26,7 @@ const (
 	maxDomainNameWireOctets = 255     // See RFC 1035 section 2.3.4
 )
 
+// Errors defined in this package.
 var (
 	ErrAlg           error = &Error{err: "bad algorithm"}                  // ErrAlg indicates an error with the (DNSSEC) algorithm.
 	ErrAuth          error = &Error{err: "bad authentication"}             // ErrAuth indicates an error in the TSIG authentication.
@@ -57,7 +58,7 @@ var (
 // For instance, to make it return a static value:
 //
 //	dns.Id = func() uint16 { return 3 }
-var Id func() uint16 = id
+var Id = id
 
 var (
 	idLock sync.Mutex
@@ -360,7 +361,7 @@ Loop:
 				case '"', '\\':
 					s = append(s, '\\', b)
 					// presentation-format \X escapes add an extra byte
-					maxLen += 1
+					maxLen++
 				default:
 					if b < 32 || b >= 127 { // unprintable, use \DDD
 						var buf [3]byte
@@ -594,6 +595,13 @@ func UnpackRR(msg []byte, off int) (rr RR, off1 int, err error) {
 	if err != nil {
 		return nil, len(msg), err
 	}
+
+	return UnpackRRWithHeader(h, msg, off)
+}
+
+// UnpackRRWithHeader unpacks the record type specific payload given an existing
+// RR_Header.
+func UnpackRRWithHeader(h RR_Header, msg []byte, off int) (rr RR, off1 int, err error) {
 	end := off + int(h.Rdlength)
 
 	if fn, known := typeToUnpack[h.Rrtype]; !known {
@@ -611,8 +619,8 @@ func UnpackRR(msg []byte, off int) (rr RR, off1 int, err error) {
 // If we cannot unpack the whole array, then it will return nil
 func unpackRRslice(l int, msg []byte, off int) (dst1 []RR, off1 int, err error) {
 	var r RR
-	// Optimistically make dst be the length that was sent
-	dst := make([]RR, 0, l)
+	// Don't pre-allocate, l may be under attacker control
+	var dst []RR
 	for i := 0; i < l; i++ {
 		off1 := off
 		r, off, err = UnpackRR(msg, off)
@@ -810,13 +818,19 @@ func (dns *Msg) Unpack(msg []byte) (err error) {
 	dns.CheckingDisabled = (dh.Bits & _CD) != 0
 	dns.Rcode = int(dh.Bits & 0xF)
 
+	// If we are at the end of the message we should return *just* the
+	// header. This can still be useful to the caller. 9.9.9.9 sends these
+	// when responding with REFUSED for instance.
 	if off == len(msg) {
-		return ErrTruncated
+		// reset sections before returning
+		dns.Question, dns.Answer, dns.Ns, dns.Extra = nil, nil, nil, nil
+		return nil
 	}
 
-	// Optimistically use the count given to us in the header
-	dns.Question = make([]Question, 0, int(dh.Qdcount))
-
+	// Qdcount, Ancount, Nscount, Arcount can't be trusted, as they are
+	// attacker controlled. This means we can't use them to pre-allocate
+	// slices.
+	dns.Question = nil
 	for i := 0; i < int(dh.Qdcount); i++ {
 		off1 := off
 		var q Question
@@ -919,49 +933,65 @@ func compressedLen(dns *Msg, compress bool) int {
 			l += r.len()
 			compressionLenHelper(compression, r.Name)
 		}
-		l += compressionLenSlice(compression, dns.Answer)
-		l += compressionLenSlice(compression, dns.Ns)
-		l += compressionLenSlice(compression, dns.Extra)
-	} else {
-		for _, r := range dns.Question {
+		l += compressionLenSlice(l, compression, dns.Answer)
+		l += compressionLenSlice(l, compression, dns.Ns)
+		l += compressionLenSlice(l, compression, dns.Extra)
+
+		return l
+	}
+
+	for _, r := range dns.Question {
+		l += r.len()
+	}
+	for _, r := range dns.Answer {
+		if r != nil {
 			l += r.len()
 		}
-		for _, r := range dns.Answer {
-			if r != nil {
-				l += r.len()
-			}
-		}
-		for _, r := range dns.Ns {
-			if r != nil {
-				l += r.len()
-			}
-		}
-		for _, r := range dns.Extra {
-			if r != nil {
-				l += r.len()
-			}
+	}
+	for _, r := range dns.Ns {
+		if r != nil {
+			l += r.len()
 		}
 	}
+	for _, r := range dns.Extra {
+		if r != nil {
+			l += r.len()
+		}
+	}
+
 	return l
 }
 
-func compressionLenSlice(c map[string]int, rs []RR) int {
+func compressionLenSlice(len int, c map[string]int, rs []RR) int {
 	var l int
 	for _, r := range rs {
 		if r == nil {
 			continue
 		}
-		l += r.len()
+		// track this length, and the global length in len, while taking compression into account for both.
+		x := r.len()
+		l += x
+		len += x
+
 		k, ok := compressionLenSearch(c, r.Header().Name)
 		if ok {
 			l += 1 - k
+			len += 1 - k
 		}
-		compressionLenHelper(c, r.Header().Name)
+
+		if len < maxCompressionOffset {
+			compressionLenHelper(c, r.Header().Name)
+		}
+
 		k, ok = compressionLenSearchType(c, r)
 		if ok {
 			l += 1 - k
+			len += 1 - k
 		}
-		compressionLenHelperType(c, r)
+
+		if len < maxCompressionOffset {
+			compressionLenHelperType(c, r)
+		}
 	}
 	return l
 }

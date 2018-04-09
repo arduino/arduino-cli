@@ -20,6 +20,10 @@ type S3 struct {
 	Service s3iface.S3API
 }
 
+func (s *S3) Name() string {
+	return "S3"
+}
+
 // ReadFile reads the file named by filename and returns the contents.
 func (s *S3) ReadFile(filename string) ([]byte, error) {
 	input := s3.GetObjectInput{

@@ -1,0 +1,40 @@
+language: go
+
+go:
+  - 1.7.x
+  - 1.8.x
+
+go_import_path: go.bug.st/serial.v1
+
+env:
+  - TEST_OS=linux TEST_ARCH=386
+  - TEST_OS=linux TEST_ARCH=amd64
+  - TEST_OS=linux TEST_ARCH=arm
+  - TEST_OS=windows TEST_ARCH=386
+  - TEST_OS=windows TEST_ARCH=amd64
+  - TEST_OS=darwin TEST_ARCH=386
+  - TEST_OS=darwin TEST_ARCH=amd64
+  - TEST_OS=freebsd TEST_ARCH=amd64
+  - TEST_OS=openbsd TEST_ARCH=amd64
+  - TEST_OS=openbsd TEST_ARCH=386
+  - TEST_OS=openbsd TEST_ARCH=arm
+
+matrix:
+  allow_failures:
+    - env: TEST_OS=openbsd TEST_ARCH=arm
+
+before_install:
+
+script:
+  - GOARM=5 GO386=387 GOOS=$TEST_OS GOARCH=$TEST_ARCH go get github.com/stretchr/testify/require
+  - GOARM=5 GO386=387 GOOS=$TEST_OS GOARCH=$TEST_ARCH go get golang.org/x/sys/windows
+  - GOARM=5 GO386=387 GOOS=$TEST_OS GOARCH=$TEST_ARCH go build -v go.bug.st/serial.v1
+  - GOARM=5 GO386=387 GOOS=$TEST_OS GOARCH=$TEST_ARCH go test -c -v go.bug.st/serial.v1
+
+notifications:
+  email:
+    recipients:
+      - c.maglie@bug.st
+    on_success: change
+    on_failure: always
+

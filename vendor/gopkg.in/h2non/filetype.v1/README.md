@@ -49,9 +49,9 @@ import (
 func main() {
   buf, _ := ioutil.ReadFile("sample.jpg")
 
-  kind, unkwown := filetype.Match(buf)
-  if unkwown != nil {
-    fmt.Printf("Unkwown: %s", unkwown)
+  kind, unknown := filetype.Match(buf)
+  if unknown != nil {
+    fmt.Printf("Unknown: %s", unknown)
     return
   }
 
@@ -120,11 +120,12 @@ import (
 )
 
 func main() {
-  // Read a file
-  buf, _ := ioutil.ReadFile("sample.jpg")
+  // Open a file descriptor
+  file, _ := os.Open("movie.mp4")
 
   // We only have to pass the file header = first 261 bytes
-  head := buf[:261]
+  head := make([]byte, 261)
+  file.Read(head)
 
   if filetype.IsImage(head) {
     fmt.Println("File is an image")
@@ -238,6 +239,15 @@ func main() {
 - **lz** - `application/x-lzip`
 - **rpm** - `application/x-rpm`
 - **elf** - `application/x-executable`
+
+#### Documents
+
+- **doc** - `application/msword`
+- **docx** - `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
+- **xls** - `application/vnd.ms-excel`
+- **xlsx** - `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`
+- **ppt** - `application/vnd.ms-powerpoint`
+- **pptx** - `application/vnd.openxmlformats-officedocument.presentationml.presentation`
 
 #### Font
 

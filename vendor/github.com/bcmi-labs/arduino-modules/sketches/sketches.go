@@ -17,7 +17,7 @@ import (
 	"github.com/bcmi-labs/arduino-modules/fs"
 	"github.com/fluxio/multierror"
 	"github.com/juju/errors"
-	uuid "github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 )
 
 // Reader is used to retrieve sketches from the storage
@@ -34,13 +34,19 @@ type Searcher interface {
 
 // Writer is used to persist sketches on the storage
 type Writer interface {
-	Write(sketch *Sketch) error
+	Write(sketch, old *Sketch) error
 }
 
 // Deleter is used to remove sketches from the storage
 // A notfound error is returned if the sketch wasn't found
 type Deleter interface {
-	Delete(id string) error
+	Delete(id string, fromFSOnly bool) error
+}
+
+// ReadWriter combines the reader and Searcher interface
+type ReadWriter interface {
+	Reader
+	Writer
 }
 
 // Manager combines the reader and Searcher interface
@@ -54,7 +60,8 @@ type Manager interface {
 // Sketch is the representation of a piece of arduino code
 type Sketch struct {
 	Name     string    `json:"name" gorethink:"name"`
-	FullPath string    `json:"-" gorethink:"-"` //set by Find, not always required
+	FullPath string    `json:"-" gorethink:"-"`                 //set by Find, not always required
+	BasePath string    `json:"base_path" gorethink:"base_path"` //the real base folder (without inner folders), important during deletion
 	Path     string    `json:"path" gorethink:"path"`
 	Ino      fs.File   `json:"ino" gorethink:"ino"`
 	Files    []fs.File `json:"files,omitempty" gorethink:"files"`
@@ -71,6 +78,9 @@ type Sketch struct {
 	Private   bool      `json:"private" gorethink:"private"`
 	Tutorials []string  `json:"tutorials" gorethink:"tutorials"`
 	Metadata  *Metadata `json:"metadata" gorethink:"metadata"`
+
+	// This is not something we need to expose through API
+	StorageProvider string `json:"-" gorethink:"storage_provider"`
 }
 
 // ImportMetadata imports metadata into the sketch from a sketch.json file in the root
@@ -103,7 +113,7 @@ func (s Sketch) ExportMetadata() error {
 	if s.Metadata == nil {
 		return errors.Annotate(errors.New("Cannot export nil metadata"), "ImportMetadata")
 	}
-	content, err := json.MarshalIndent(s.Metadata, "", "  ")
+	content, err := json.Marshal(s.Metadata)
 	if err != nil {
 		return errors.Annotate(err, "ImportMetadata")
 	}
@@ -144,7 +154,7 @@ type MetadataSecret struct {
 
 // Validate returns nil if the sketch is ready to be saved, or a notvalid error
 // containing the missing fields
-func (s *Sketch) Validate() error {
+func (s *Sketch) Validate(old *Sketch) error {
 	var errs multierror.Accumulator
 	if s.Name == "" {
 		errs.Push(errors.New(".Name missing"))
@@ -152,6 +162,19 @@ func (s *Sketch) Validate() error {
 	if s.ID == "" && s.Ino.Data == nil {
 		errs.Push(errors.New(".Ino.Data missing"))
 	}
+
+	for i := range s.Files {
+		if s.Files[i].Data == nil {
+			if old == nil {
+				errs.Push(errors.New("file" + s.Files[i].Name + " to be created without .Data"))
+			}
+			oldFile := old.GetFile(s.Files[i].Name)
+			if oldFile == nil {
+				errs.Push(errors.New("file" + s.Files[i].Name + " to be created without .Data"))
+			}
+		}
+	}
+
 	if errs.Error() == nil {
 		return nil
 	}
@@ -162,7 +185,7 @@ func (s *Sketch) Validate() error {
 // A notvalid error is returned if the sketch doesn't contain the required fields
 // When you are creating a new sketch you should provide the Data property for the
 // ino and the files.
-//If you are updating a previous sketch you can omit the file data for the existing files.
+// If you are updating a previous sketch you can omit the file data for the existing files.
 // Note that if you omit the file entirely it will be deleted from the filesystem.
 //
 // Examples:
@@ -178,15 +201,17 @@ func (s *Sketch) Validate() error {
 //     // will remove the previously added `file.file`
 //     removeFile: = Sketch{ID: "ABC", Name: "sketch1", Owner: "user", Files: []fs.File}
 //     removeFile.Save(w)
-func (s *Sketch) Save(w Writer) error {
-	err := s.Validate()
+func (s *Sketch) Save(rw ReadWriter) error {
+	old, _ := rw.Read(s.ID)
+
+	err := s.Validate(old)
 	if err != nil {
 		return err
 	}
 
 	s.Generate()
 
-	err = w.Write(s)
+	err = rw.Write(s, old)
 	if err != nil {
 		return err
 	}
@@ -196,7 +221,7 @@ func (s *Sketch) Save(w Writer) error {
 // Generate fills some of the calculated fields, such as Path and ID
 func (s *Sketch) Generate() {
 	if s.ID == "" {
-		s.ID = uuid.NewV4().String()
+		s.ID = uuid.Must(uuid.NewV4()).String()
 	}
 
 	// Ino
@@ -206,7 +231,8 @@ func (s *Sketch) Generate() {
 	// Path
 	hashed := md5.Sum([]byte(s.Owner))
 	base := hex.EncodeToString(hashed[:16]) + ":" + s.Owner
-	s.Path = path.Join(base, "sketches", s.ID, s.Name)
+	s.BasePath = path.Join(base, "sketches", s.ID)
+	s.Path = path.Join(s.BasePath, s.Name)
 	s.Ino.Path = path.Join(s.Path, s.Ino.Name)
 	for i := range s.Files {
 		s.Files[i].Path = path.Join(s.Path, s.Files[i].Name)
@@ -295,12 +321,7 @@ func Find(location string, excludeFolders ...string) map[string]*Sketch {
 		}
 		sk.ImportMetadata()
 		sketches[skname] = sk
-	}
-	// Exclude non-sketch directories.
-	for name, sketch := range sketches {
-		if sketch.Ino.Name == "" {
-			delete(sketches, name)
-		}
+
 	}
 
 	return sketches
@@ -332,3 +353,8 @@ func walk(location string, excludeFolders ...string) []string {
 	})
 	return files
 }
+
+// Implementing common.StoredItem interface
+func (s *Sketch) GetID() string              { return s.ID }
+func (s *Sketch) GetUser() string            { return s.Owner }
+func (s *Sketch) GetStorageProvider() string { return s.StorageProvider }
