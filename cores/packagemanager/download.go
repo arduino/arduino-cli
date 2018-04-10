@@ -32,12 +32,10 @@ package packagemanager
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/common/releases"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/sirupsen/logrus"
 )
@@ -182,40 +180,28 @@ func (pm *PackageManager) InstallToolReleases(toolReleasesToDownload []*cores.To
 			WithField("Version", item.Version).
 			Info("Installing tool")
 
-		toolRoot, err := configs.ToolsFolder(item.Tool.Package.Name).Get()
-		if err != nil {
-			formatter.PrintError(err, "Cannot get tool install path, try again.")
-			return err
-		}
-		possiblePath := filepath.Join(toolRoot, item.Tool.Name, item.Version)
-
-		err = cores.InstallTool(possiblePath, item.GetCompatibleFlavour())
+		err := cores.InstallTool(item)
 		var processResult output.ProcessResult
-		name := item.String()
 		if err != nil {
 			if os.IsExist(err) {
 				logrus.WithError(err).Warnf("Cannot install tool `%s`, it is already installed", item.Tool.Name)
 				processResult = output.ProcessResult{
-					ItemName: name,
-					Status:   "Already Installed",
-					Path:     possiblePath,
+					Status: "Already Installed",
 				}
 			} else {
 				logrus.WithError(err).Warnf("Cannot install tool `%s`", item.Tool.Name)
 				processResult = output.ProcessResult{
-					ItemName: name,
-					Status:   "",
-					Error:    err.Error(),
+					Error: err.Error(),
 				}
 			}
 		} else {
 			logrus.Info("Adding installed tool to final result")
 			processResult = output.ProcessResult{
-				ItemName: name,
-				Status:   "Installed",
-				Path:     possiblePath,
+				Status: "Installed",
 			}
 		}
+		name := item.String()
+		processResult.ItemName = name
 		result.Tools[name] = processResult
 	}
 	return nil
@@ -230,40 +216,29 @@ func (pm *PackageManager) InstallPlatformReleases(platformReleasesToDownload []*
 			WithField("Version", item.Version).
 			Info("Installing core")
 
-		coreRoot, err := configs.CoresFolder(item.Platform.Package.Name).Get()
-		if err != nil {
-			return err
-		}
-		possiblePath := filepath.Join(coreRoot, item.Platform.Architecture, item.Version)
-
-		err = cores.InstallPlatform(possiblePath, item.Resource)
+		err := cores.InstallPlatform(item)
 		var result output.ProcessResult
-		name := item.String()
 		if err != nil {
 			if os.IsExist(err) {
 				logrus.WithError(err).Warnf("Cannot install core `%s`, it is already installed", item.Platform.Name)
 				result = output.ProcessResult{
-					ItemName: name,
-					Status:   "Already Installed",
-					Path:     possiblePath,
+					Status: "Already Installed",
 				}
 			} else {
 				logrus.WithError(err).Warnf("Cannot install core `%s`", item.Platform.Name)
 				result = output.ProcessResult{
-					ItemName: name,
-					Status:   "",
-					Error:    err.Error(),
+					Error: err.Error(),
 				}
 			}
 		} else {
 			logrus.Info("Adding installed core to final result")
 
 			result = output.ProcessResult{
-				ItemName: name,
-				Status:   "Installed",
-				Path:     possiblePath,
+				Status: "Installed",
 			}
 		}
+		name := item.String()
+		result.ItemName = name
 		outputResults.Cores[name] = result
 	}
 	return nil

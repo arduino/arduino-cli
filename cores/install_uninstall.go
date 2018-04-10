@@ -30,157 +30,119 @@
 package cores
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/codeclysm/extract"
 )
 
-// DirPermissions is the default permission for create directories.
-// respects umask on linux.
-var DirPermissions os.FileMode = 0777
-
-// InstallPlatform installs a specific release of a platform.
-// TODO: But why not passing the Platform?
-func InstallPlatform(destDir string, release *releases.DownloadResource) error {
-	if release == nil {
-		return errors.New("Not existing version of the platform")
-	}
-
-	cacheFilePath, err := release.ArchivePath()
-	if err != nil {
-		return err
-	}
-
-	// Make a temp folder
-	dataFolder, err := configs.ArduinoDataFolder.Get()
-	if err != nil {
-		return fmt.Errorf("getting data dir: %s", err)
-	}
-	tempFolder := filepath.Join(dataFolder, "tmp", fmt.Sprintf("platform-%d", time.Now().Unix()))
-	if err = os.MkdirAll(tempFolder, DirPermissions); err != nil {
+// installResource installs the specified resource in three steps:
+// - the archive is unpacked in a temporary subfolder of tempPath
+// - there should be only one root folder in the unpacked content
+// - the only root folder is moved/renamed to/as the destination directory
+// Note that tempPath and destDir must be on the same filesystem partition
+// otherwise the last step will fail.
+func installResource(tempPath string, destDir string, release *releases.DownloadResource) error {
+	// Create a temporary folder to extract package
+	if err := os.MkdirAll(tempPath, 0777); err != nil {
 		return fmt.Errorf("creating temp dir for extraction: %s", err)
 	}
-	defer os.RemoveAll(tempFolder)
-
-	// Make container dir
-	destDirParent := filepath.Dir(destDir)
-	err = os.MkdirAll(destDirParent, DirPermissions)
+	tempDir, err := ioutil.TempDir(tempPath, "package-")
 	if err != nil {
-		return err
+		return fmt.Errorf("creating temp dir for extraction: %s", err)
 	}
-	defer func() {
-		// cleaning empty directories
-		if empty, _ := IsDirEmpty(destDir); empty {
-			os.RemoveAll(destDir)
-		}
-		if empty, _ := IsDirEmpty(destDirParent); empty {
-			os.RemoveAll(destDirParent)
-		}
-	}()
+	defer os.RemoveAll(tempDir)
 
-	file, err := os.Open(cacheFilePath)
+	// Obtain the archive path and open it
+	archivePath, err := release.ArchivePath()
 	if err != nil {
-		return err
+		return fmt.Errorf("getting archive path: %s", err)
+	}
+	file, err := os.Open(archivePath)
+	if err != nil {
+		return fmt.Errorf("opening archive file: %s", err)
 	}
 	defer file.Close()
 
-	err = extract.Archive(file, tempFolder, nil)
-	if err != nil {
-		return err
+	// Extract into temp directory
+	if err := extract.Archive(file, tempDir, nil); err != nil {
+		return fmt.Errorf("extracting archive: %s", err)
 	}
 
-	root, err := findPackageRoot(tempFolder)
+	// Check package content and find package root dir
+	root, err := findPackageRoot(tempDir)
 	if err != nil {
 		return fmt.Errorf("searching package root dir: %s", err)
 	}
 
-	err = os.Rename(root, destDir)
-	if err != nil {
+	// Ensure container dir exists
+	destDirParent := filepath.Dir(destDir)
+	if err := os.MkdirAll(destDirParent, 0777); err != nil {
+		return err
+	}
+	defer func() {
+		if empty, err := IsDirEmpty(destDirParent); err == nil && empty {
+			os.RemoveAll(destDirParent)
+		}
+	}()
+
+	// Move/rename the extracted root directory in the destination directory
+	if err := os.Rename(root, destDir); err != nil {
 		return err
 	}
 
-	err = createPackageFile(destDir)
-	if err != nil {
+	// Create a package file
+	if err := createPackageFile(destDir); err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// InstallPlatform installs a specific release of a platform.
+func InstallPlatform(platformRelease *PlatformRelease) error {
+	coreDir, err := configs.CoresFolder(platformRelease.Platform.Package.Name).Get()
+	if err != nil {
+		return fmt.Errorf("getting platforms dir: %s", err)
+	}
+
+	dataDir, err := configs.ArduinoDataFolder.Get()
+	if err != nil {
+		return fmt.Errorf("getting data dir: %s", err)
+	}
+
+	return installResource(
+		filepath.Join(dataDir, "tmp"),
+		filepath.Join(coreDir, platformRelease.Platform.Architecture, platformRelease.Version),
+		platformRelease.Resource)
+}
+
 // InstallTool installs a specific release of a tool.
-func InstallTool(destToolsDir string, release *releases.DownloadResource) error {
-	if release == nil {
-		return errors.New("Not existing version of the tool")
+func InstallTool(toolRelease *ToolRelease) error {
+	toolResource := toolRelease.GetCompatibleFlavour()
+	if toolResource == nil {
+		return fmt.Errorf("no compatible version of %s tools found for the current os", toolRelease.Tool.Name)
 	}
 
-	cacheFilePath, err := release.ArchivePath()
+	toolDir, err := configs.ToolsFolder(toolRelease.Tool.Package.Name).Get()
 	if err != nil {
-		return err
+		return fmt.Errorf("gettin tools dir: %s", err)
 	}
 
-	// Make a temp folder
-	dataFolder, err := configs.ArduinoDataFolder.Get()
+	dataDir, err := configs.ArduinoDataFolder.Get()
 	if err != nil {
-		return fmt.Errorf("creating temp dir for extraction: %s", err)
-	}
-	tempFolder := filepath.Join(dataFolder, "tmp", fmt.Sprintf("tool-%d", time.Now().Unix()))
-	err = os.MkdirAll(tempFolder, DirPermissions)
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(tempFolder)
-
-	// Make container dir
-	destToolsDirParent := filepath.Dir(destToolsDir)
-	err = os.MkdirAll(destToolsDirParent, DirPermissions)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		// clean-up empty directories
-		if empty, _ := IsDirEmpty(destToolsDir); empty {
-			os.RemoveAll(destToolsDir)
-		}
-		if empty, _ := IsDirEmpty(destToolsDirParent); empty {
-			os.RemoveAll(destToolsDirParent)
-		}
-	}()
-
-	file, err := os.Open(cacheFilePath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	err = extract.Archive(file, tempFolder, nil)
-	if err != nil {
-		return err
+		return fmt.Errorf("getting data dir: %s", err)
 	}
 
-	root, err := findPackageRoot(tempFolder)
-	if err != nil {
-		return fmt.Errorf("searching package root dir: %s", err)
-	}
-
-	err = os.Rename(root, destToolsDir)
-	if err != nil {
-		return err
-	}
-
-	err = createPackageFile(destToolsDir)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return installResource(
+		filepath.Join(dataDir, "tmp"),
+		filepath.Join(toolDir, toolRelease.Tool.Name, toolRelease.Version),
+		toolResource)
 }
 
 // IsDirEmpty returns true if the directory specified by path is empty.
