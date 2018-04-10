@@ -33,9 +33,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/bcmi-labs/arduino-cli/common/releases"
@@ -97,9 +97,9 @@ func InstallPlatform(destDir string, release *releases.DownloadResource) error {
 		return err
 	}
 
-	root := platformRealRoot(tempFolder)
-	if root == "invalid" {
-		return errors.New("invalid archive structure")
+	root, err := findPackageRoot(tempFolder)
+	if err != nil {
+		return fmt.Errorf("searching package root dir: %s", err)
 	}
 
 	err = os.Rename(root, destDir)
@@ -160,18 +160,15 @@ func InstallTool(destToolsDir string, release *releases.DownloadResource) error 
 	}
 	defer file.Close()
 
-	// Ignore the top level directory inside archives. E.g. not "avr/bin/avr-g++"", but "bin/avr-g++"".
-	var shift = func(path string) string {
-		parts := strings.Split(path, string(filepath.Separator))
-		parts = parts[1:]
-		return strings.Join(parts, string(filepath.Separator))
-	}
-	err = extract.Archive(file, tempFolder, shift)
+	err = extract.Archive(file, tempFolder, nil)
 	if err != nil {
 		return err
 	}
 
-	root := toolRealRoot(tempFolder)
+	root, err := findPackageRoot(tempFolder)
+	if err != nil {
+		return fmt.Errorf("searching package root dir: %s", err)
+	}
 
 	err = os.Rename(root, destToolsDir)
 	if err != nil {
@@ -204,35 +201,21 @@ func IsDirEmpty(path string) (bool, error) {
 	return false, err
 }
 
-func platformRealRoot(root string) string {
-	realRoot := "invalid"
-	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if strings.HasSuffix(path, "platform.txt") {
-			realRoot = filepath.Dir(path)
-			return errors.New("stopped, ok") //error put to stop the search of the root
+func findPackageRoot(parent string) (string, error) {
+	files, err := ioutil.ReadDir(parent)
+	if err != nil {
+		return "", fmt.Errorf("reading package root dir: %s", err)
+	}
+	root := ""
+	for _, fileInfo := range files {
+		if !fileInfo.IsDir() {
+			continue
 		}
-		return nil
-	})
-	return realRoot
-}
-
-func toolRealRoot(root string) string {
-	realRoot := root
-	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil || !info.IsDir() {
-			return nil //ignore this step
+		if root == "" {
+			root = fileInfo.Name()
+		} else {
+			return "", fmt.Errorf("no unique root dir in archive, found '%s' and '%s'", root, fileInfo.Name())
 		}
-		dir, err := os.Open(path)
-		if err != nil {
-			return nil
-		}
-		defer dir.Close()
-		_, err = dir.Readdir(3)
-		if err == io.EOF { // read 3 files failed with EOF, dir has 2 files or more.
-			realRoot = path
-			return errors.New("stopped, ok") //error put to stop the search of the root
-		}
-		return nil
-	})
-	return realRoot
+	}
+	return filepath.Join(parent, root), nil
 }
