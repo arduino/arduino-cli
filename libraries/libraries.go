@@ -119,6 +119,7 @@ func (l *Library) InstalledRelease() (*Release, error) {
 type Release struct {
 	Version  string `json:"version"`
 	Resource *releases.DownloadResource
+	Library  *Library
 }
 
 // GetVersion returns the Release corresponding to the specified version, or

@@ -52,6 +52,7 @@ func (sc *StatusContext) AddLibrary(indexLib *indexRelease) {
 		release := indexLib.extractRelease()
 		lib := sc.Libraries[name]
 		lib.Releases[fmt.Sprint(release.Version)] = release
+		release.Library = lib
 	}
 }
 

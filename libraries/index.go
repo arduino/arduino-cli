@@ -105,7 +105,7 @@ func (indexLib *indexRelease) extractRelease() *Release {
 // in this index element.
 func (indexLib *indexRelease) extractLibrary() *Library {
 	release := indexLib.extractRelease()
-	return &Library{
+	lib := &Library{
 		Name:          indexLib.Name,
 		Author:        indexLib.Author,
 		Maintainer:    indexLib.Maintainer,
@@ -117,4 +117,6 @@ func (indexLib *indexRelease) extractLibrary() *Library {
 		Types:         indexLib.Types,
 		Releases:      map[string]*Release{release.Version: release},
 	}
+	release.Library = lib
+	return lib
 }
