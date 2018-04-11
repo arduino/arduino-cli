@@ -30,45 +30,9 @@
 package common
 
 import (
-	"archive/zip"
-	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
-
-// Unzip extracts a zip file to a specified destination path.
-// FIXME: Remove this function in favor of github.com/codeclysm/extract
-func Unzip(archive *zip.ReadCloser, destination string) error {
-	for _, file := range archive.File {
-		path := filepath.Join(destination, file.Name)
-		if file.FileInfo().IsDir() {
-			err := os.MkdirAll(path, 0755)
-			if err != nil {
-				return fmt.Errorf("Cannot create directory during extraction. Process has been aborted")
-			}
-		} else {
-			err := os.MkdirAll(filepath.Dir(path), 0755)
-			if err != nil {
-				return fmt.Errorf("Cannot create directory tree of file during extraction. Process has been aborted")
-			}
-
-			fileOpened, err := file.Open()
-			if err != nil {
-				return fmt.Errorf("Cannot open archived file, process has been aborted")
-			}
-			content, err := ioutil.ReadAll(fileOpened)
-			if err != nil {
-				return fmt.Errorf("Cannot read archived file, process has been aborted")
-			}
-			err = ioutil.WriteFile(path, content, 0664)
-			if err != nil {
-				return fmt.Errorf("Cannot copy archived file, process has been aborted, %s", err)
-			}
-		}
-	}
-	return nil
-}
 
 // TruncateDir removes all content from a directory, without deleting it.
 // like `rm -rf dir/*`

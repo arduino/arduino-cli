@@ -30,7 +30,6 @@
 package libraries
 
 import (
-	"archive/zip"
 	"errors"
 	"fmt"
 	"os"
@@ -38,7 +37,6 @@ import (
 
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/configs"
 )
 
@@ -68,30 +66,13 @@ func Install(library *Release) (string, error) {
 		}
 	*/
 
-	libFolder, err := configs.LibrariesFolder.Get()
+	libsFolder, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		return "", fmt.Errorf("getting libraries directory: %s", err)
 	}
-	libFolder = filepath.Join(libFolder, library.Library.Name)
-	fmt.Println(libFolder)
-	cacheFilePath, err := library.Resource.ArchivePath()
-	if err != nil {
-		return "", err
-	}
 
-	zipArchive, err := zip.OpenReader(cacheFilePath)
-	if err != nil {
-		return "", err
-	}
-	defer zipArchive.Close()
-
-	// FIXME: This is NOT the correct folder for libs !!!
-	err = common.Unzip(zipArchive, libFolder)
-	if err != nil {
-		return "", err
-	}
-
-	return libFolder, nil
+	libPath := filepath.Join(libsFolder, library.Library.Name)
+	return libPath, library.Resource.Install(libsFolder, libPath)
 }
 
 func removeRelease(libName string, r *Release) error {
