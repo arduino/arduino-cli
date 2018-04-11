@@ -32,11 +32,16 @@ package releases
 import (
 	"bytes"
 	"crypto"
+	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"hash"
 	"io"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -99,4 +104,64 @@ func checkLocalArchive(release *DownloadResource) error {
 		return errors.New("Checksum does not match, assuming corruption")
 	}
 	return nil
+}
+
+const (
+	filePermissions = 0644
+	packageFileName = "package.json"
+)
+
+type packageFile struct {
+	Checksum string `json:"checksum"`
+}
+
+func computeDirChecksum(root string) (string, error) {
+	hash := sha256.New()
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() || (info.Name() == packageFileName && filepath.Dir(path) == root) {
+			return nil
+		}
+		f, err := os.Open(path)
+		if err != nil {
+			return nil
+		}
+		defer f.Close()
+		if _, err := io.Copy(hash, f); err != nil {
+			return fmt.Errorf("failed to compute hash of file \"%s\"", info.Name())
+		}
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+}
+
+func createPackageFile(root string) error {
+	checksum, err := computeDirChecksum(root)
+	if err != nil {
+		return err
+	}
+
+	packageJSON, _ := json.Marshal(packageFile{checksum})
+	err = ioutil.WriteFile(filepath.Join(root, packageFileName), packageJSON, filePermissions)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// CheckDirChecksum reads checksum from the package.json and compares it with a recomputed value.
+func CheckDirChecksum(root string) (bool, error) {
+	packageJSON, err := ioutil.ReadFile(filepath.Join(root, packageFileName))
+	if err != nil {
+		return false, err
+	}
+	var file packageFile
+	json.Unmarshal(packageJSON, &file)
+	checksum, err := computeDirChecksum(root)
+	if err != nil {
+		return false, err
+	}
+	return file.Checksum == checksum, nil
 }
