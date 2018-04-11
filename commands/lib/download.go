@@ -68,13 +68,17 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Preparing download")
 	pairs := libraries.ParseArgs(args)
-	downloadResources, notFoundFailOutputs := status.Process(pairs)
+	libsToDownload, notFoundFailOutputs := status.Process(pairs)
+	resourceToDownload := map[string]*releases.DownloadResource{}
+	for v, k := range libsToDownload {
+		resourceToDownload[v] = k.Resource
+	}
 
 	logrus.Info("Downloading")
-	downloadResults := releases.ParallelDownload(downloadResources, false, commands.GenerateDownloadProgressFormatter())
+	downloadResults := releases.ParallelDownload(resourceToDownload, false, commands.GenerateDownloadProgressFormatter())
 	logrus.Info("Download finished")
 
-	downloadOutputs := formatter.ExtractProcessResultsFromDownloadResults(downloadResources, downloadResults, "Downloaded")
+	downloadOutputs := formatter.ExtractProcessResultsFromDownloadResults(resourceToDownload, downloadResults, "Downloaded")
 	out := output.LibProcessResults{
 		Libraries: map[string]output.ProcessResult{},
 	}

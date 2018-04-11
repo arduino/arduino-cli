@@ -32,13 +32,13 @@ package libraries
 import (
 	"archive/zip"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/configs"
 )
 
@@ -46,8 +46,8 @@ import (
 var Uninstall = os.RemoveAll
 
 // Install installs a library and returns the installed path.
-func Install(name string, release *releases.DownloadResource) (string, error) {
-	if release == nil {
+func Install(library *Release) (string, error) {
+	if library == nil {
 		return "", errors.New("Not existing version of the library")
 	}
 
@@ -70,10 +70,11 @@ func Install(name string, release *releases.DownloadResource) (string, error) {
 
 	libFolder, err := configs.LibrariesFolder.Get()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("getting libraries directory: %s", err)
 	}
-
-	cacheFilePath, err := release.ArchivePath()
+	libFolder = filepath.Join(libFolder, library.Library.Name)
+	fmt.Println(libFolder)
+	cacheFilePath, err := library.Resource.ArchivePath()
 	if err != nil {
 		return "", err
 	}

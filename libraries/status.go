@@ -33,7 +33,6 @@ import (
 	"fmt"
 
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/pmylund/sortutil"
 )
 
@@ -76,8 +75,8 @@ func GetLibraryCode(library *Library) string {
 // Process takes a set of name-version pairs and return
 // a set of items to download and a set of outputs for non
 // existing libraries.
-func (sc StatusContext) Process(items []NameVersionPair) (map[string]*releases.DownloadResource, map[string]output.ProcessResult) {
-	ret := map[string]*releases.DownloadResource{}
+func (sc StatusContext) Process(items []NameVersionPair) (map[string]*Release, map[string]output.ProcessResult) {
+	ret := map[string]*Release{}
 	fails := map[string]output.ProcessResult{}
 
 	for _, item := range items {
@@ -96,7 +95,7 @@ func (sc StatusContext) Process(items []NameVersionPair) (map[string]*releases.D
 					Error:    "Version Not Found",
 				}
 			} else { // replaces "latest" with latest version too
-				ret[GetLibraryCode(library)] = release.Resource
+				ret[GetLibraryCode(library)] = release
 			}
 		}
 	}

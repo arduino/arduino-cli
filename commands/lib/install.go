@@ -70,12 +70,16 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	libsToDownload, notFoundFailOutputs := status.Process(pairs)
 
 	logrus.Info("Downloading")
-	downloadRes := releases.ParallelDownload(libsToDownload, false, commands.GenerateDownloadProgressFormatter())
+	resourceToDownload := map[string]*releases.DownloadResource{}
+	for v, k := range libsToDownload {
+		resourceToDownload[v] = k.Resource
+	}
+	downloadRes := releases.ParallelDownload(resourceToDownload, false, commands.GenerateDownloadProgressFormatter())
 	logrus.Info("Download finished")
 
-	downloadOutputs := formatter.ExtractProcessResultsFromDownloadResults(libsToDownload, downloadRes, "Installed")
+	downloadOutputs := formatter.ExtractProcessResultsFromDownloadResults(resourceToDownload, downloadRes, "Installed")
 	out := output.LibProcessResults{
-		Libraries:map[string]output.ProcessResult{},
+		Libraries: map[string]output.ProcessResult{},
 	}
 	for name, value := range notFoundFailOutputs {
 		out.Libraries[name] = value
@@ -95,7 +99,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	for libName, item := range libsToDownload {
 		// FIXME: the library is installed again even if it's already installed
 
-		if libPath, err := libraries.Install(libName, item); err != nil {
+		if libPath, err := libraries.Install(item); err != nil {
 			logrus.WithError(err).Warn("Library", libName, "errored")
 			// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
 			out.Libraries[libName] = output.ProcessResult{
