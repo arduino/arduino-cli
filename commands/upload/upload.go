@@ -102,9 +102,6 @@ func run(command *cobra.Command, args []string) {
 		formatter.PrintErrorMessage("Fully Qualified Board Name has incorrect format.")
 		os.Exit(commands.ErrBadCall)
 	}
-	packageName := fqbnParts[0]
-	coreName := fqbnParts[1]
-	boardName := fqbnParts[2]
 
 	pm := commands.InitPackageManager()
 	if err := pm.LoadHardware(); err != nil {
@@ -113,25 +110,9 @@ func run(command *cobra.Command, args []string) {
 	}
 
 	// Find target board
-	// TODO: Make a packagemanager function to do this
-	targetPackage := pm.GetPackages().Packages[packageName]
-	if targetPackage == nil {
-		formatter.PrintErrorMessage("Unknown package " + packageName + ".")
-		os.Exit(commands.ErrBadCall)
-	}
-	platform := targetPackage.Platforms[coreName]
-	if platform == nil {
-		formatter.PrintErrorMessage("Unknown platform " + packageName + ":" + coreName + ".")
-		os.Exit(commands.ErrBadCall)
-	}
-	platformRelease := platform.GetInstalled()
-	if platformRelease == nil {
-		formatter.PrintErrorMessage("Platform " + packageName + ":" + coreName + " is not installed.")
-		os.Exit(commands.ErrBadCall)
-	}
-	board := platformRelease.Boards[boardName]
-	if board == nil {
-		formatter.PrintErrorMessage("Unknown board " + packageName + ":" + coreName + ":" + boardName + ".")
+	board, err := pm.FindBoardWithFQBN(fqbn)
+	if err != nil {
+		formatter.PrintError(err, "Invalid FQBN.")
 		os.Exit(commands.ErrBadCall)
 	}
 
@@ -160,7 +141,7 @@ func run(command *cobra.Command, args []string) {
 	var referencedPlatformRelease *cores.PlatformRelease
 	var uploadTool *cores.Tool
 	if split := strings.Split(uploadToolID, ":"); len(split) == 1 {
-		uploadTool = targetPackage.Tools[uploadToolID]
+		uploadTool = board.PlatformRelease.Platform.Package.Tools[uploadToolID]
 	} else if len(split) == 2 {
 		referencedPackage = pm.GetPackages().Packages[split[0]]
 		if referencedPackage == nil {
@@ -169,7 +150,7 @@ func run(command *cobra.Command, args []string) {
 		}
 		uploadTool = referencedPackage.Tools[split[1]]
 
-		referencedPlatform = referencedPackage.Platforms[coreName]
+		referencedPlatform = referencedPackage.Platforms[board.PlatformRelease.Platform.Architecture]
 		if referencedPlatform != nil {
 			referencedPlatformRelease = referencedPlatform.GetInstalled()
 		}
@@ -193,8 +174,8 @@ func run(command *cobra.Command, args []string) {
 	if referencedPlatformRelease != nil {
 		uploadProperties.Merge(referencedPlatformRelease.Properties)
 	}
-	uploadProperties.Merge(platformRelease.Properties)
-	uploadProperties.Merge(platformRelease.RuntimeProperties())
+	uploadProperties.Merge(board.PlatformRelease.Properties)
+	uploadProperties.Merge(board.PlatformRelease.RuntimeProperties())
 	uploadProperties.Merge(boardProperties)
 
 	uploadToolProperties := uploadProperties.SubTree("tools." + uploadTool.Name)

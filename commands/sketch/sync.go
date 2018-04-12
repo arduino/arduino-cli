@@ -448,7 +448,7 @@ func login() (string, string, error) {
 
 	logrus.Info("Searching for user credentials into the ~/.netrc file")
 	arduinoMachine := NetRC.FindMachine("arduino.cc")
-	if arduinoMachine.Name != "arduino.cc" {
+	if arduinoMachine == nil || arduinoMachine.Name != "arduino.cc" {
 		logrus.WithError(err).Error("Credentials not found")
 		return "", "", errors.New("Credentials not found, try typing `arduino login` to login")
 	}

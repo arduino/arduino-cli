@@ -30,12 +30,13 @@
 package packagemanager
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
-
-	"github.com/bcmi-labs/arduino-cli/configs"
+	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/bcmi-labs/arduino-cli/cores/packageindex"
 	"github.com/sirupsen/logrus"
@@ -115,6 +116,42 @@ func (pm *PackageManager) FindBoardsWithID(id string) []*cores.Board {
 		}
 	}
 	return res
+}
+
+// FindBoardWithFQBN returns the board identified by the fqbn, or an error
+func (pm *PackageManager) FindBoardWithFQBN(fqbn string) (*cores.Board, error) {
+	// Split fqbn
+	fqbnParts := strings.Split(fqbn, ":")
+	if len(fqbnParts) < 3 || len(fqbnParts) > 4 {
+		return nil, errors.New("incorrect format for fqbn")
+	}
+
+	packageName := fqbnParts[0]
+	platformArch := fqbnParts[1]
+	boardID := fqbnParts[2]
+
+	// Find package
+	targetPackage := pm.packages.Packages[packageName]
+	if targetPackage == nil {
+		return nil, errors.New("unknown package " + packageName)
+	}
+
+	// Find platform
+	platform := targetPackage.Platforms[fqbnParts[1]]
+	if platform == nil {
+		return nil, fmt.Errorf("unknown platform %s:%s", packageName, platformArch)
+	}
+	platformRelease := platform.GetInstalled()
+	if platformRelease == nil {
+		return nil, fmt.Errorf("Platform %s:%s is not installed", packageName, platformArch)
+	}
+
+	// Find board
+	board := platformRelease.Boards[boardID]
+	if board == nil {
+		return nil, errors.New("board not found")
+	}
+	return board, nil
 }
 
 // FIXME add an handler to be invoked on each verbose operation, in order to let commands display results through the formatter
