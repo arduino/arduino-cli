@@ -39,17 +39,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// IsCached returns a bool representing if the release has already been downloaded
-func IsCached(release *DownloadResource) bool {
-	archivePath, err := release.ArchivePath()
-	if err != nil {
-		return false
-	}
-
-	_, err = os.Stat(archivePath)
-	return !os.IsNotExist(err)
-}
-
 // downloadRelease downloads a generic release.
 //
 //   PARAMS:
@@ -72,8 +61,11 @@ func downloadRelease(item *DownloadResource, progressChangedHandler common.Downl
 	if err != nil {
 		return err
 	}
-	err = checkLocalArchive(item)
+	ok, err := item.TestLocalArchiveIntegrity()
 	if err != nil {
+		return fmt.Errorf("testing local archive integrity: %s", err)
+	}
+	if !ok {
 		return errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
 	}
 	return nil
@@ -126,9 +118,19 @@ func ParallelDownload(items map[string]*DownloadResource, forced bool,
 	logrus.Info(fmt.Sprintf("Initiating parallel download of %d resources", len(items)))
 
 	for itemName, item := range items {
-		cached := IsCached(item)
-		releaseNotNil := item != nil
-		if forced || releaseNotNil && (!cached || checkLocalArchive(item) != nil) {
+		if item == nil {
+			continue
+		}
+		cached := false
+		if !forced {
+			if c, err := item.IsCached(); err != nil {
+				res[itemName] = &DownloadResult{Error: fmt.Errorf("detecting if item is cached:%s", err)}
+				continue
+			} else {
+				cached = c
+			}
+		}
+		if forced || !cached {
 			// Notify the progress handler of the new task
 			if progressHandler != nil {
 				progressHandler.OnNewDownloadTask(itemName, item.Size)
@@ -146,7 +148,7 @@ func ParallelDownload(items map[string]*DownloadResource, forced bool,
 			}
 
 			tasks[itemName] = downloadTask(item, getProgressHandler(itemName))
-		} else if !forced && releaseNotNil && cached {
+		} else {
 			// Item already downloaded
 			res[itemName] = &DownloadResult{AlreadyDownloaded: true}
 		}

@@ -35,7 +35,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"hash"
 	"io"
@@ -45,65 +44,93 @@ import (
 	"strings"
 )
 
-func getHashAlgoAndComponent(checksum string) (hash.Hash, []byte) {
-	components := strings.SplitN(checksum, ":", 2)
-	hashAlgo := components[0]
-	hashMid, err := hex.DecodeString(components[1])
+// IsCached returns a bool representing if the release has already been downloaded
+func (r *DownloadResource) IsCached() (bool, error) {
+	archivePath, err := r.ArchivePath()
 	if err != nil {
-		return nil, nil
+		return false, fmt.Errorf("getting archive path: %s", err)
 	}
 
-	hash := []byte(hashMid)
-	switch hashAlgo {
-	case "SHA-256":
-		return crypto.SHA256.New(), hash
-	case "SHA1":
-		return crypto.SHA1.New(), hash
-	case "MD5":
-		return crypto.MD5.New(), hash
-	default:
-		return nil, nil
+	_, err = os.Stat(archivePath)
+	if err != nil && !os.IsNotExist(err) {
+		return false, fmt.Errorf("checking archive existence: %s", err)
 	}
+
+	return !os.IsNotExist(err), nil
 }
 
-// ChecksumMatches checks the checksum of a DownloadResource archive, in compliance with
-// What Checksum is expected.
-func checksumMatches(r *DownloadResource) bool {
-	hash, content := getHashAlgoAndComponent(r.Checksum)
+// TestLocalArchiveChecksum test if the checksum of the local archive match the checksum of the DownloadResource
+func (r *DownloadResource) TestLocalArchiveChecksum() (bool, error) {
+	split := strings.SplitN(r.Checksum, ":", 2)
+	if len(split) != 2 {
+		return false, fmt.Errorf("invalid checksum format: %s", r.Checksum)
+	}
+	digest, err := hex.DecodeString(split[1])
+	if err != nil {
+		return false, fmt.Errorf("invalid hash '%s': %s", split[1], err)
+	}
+
+	// names based on: https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#MessageDigest
+	var algo hash.Hash
+	switch split[0] {
+	case "SHA-256":
+		algo = crypto.SHA256.New()
+	case "SHA-1":
+		algo = crypto.SHA1.New()
+	case "MD5":
+		algo = crypto.MD5.New()
+	default:
+		return false, fmt.Errorf("unsupported hash algorithm: %s", split[0])
+	}
+
 	filePath, err := r.ArchivePath()
 	if err != nil {
-		return false
+		return false, fmt.Errorf("getting archive path: %s", err)
 	}
 
 	file, err := os.Open(filePath)
 	if err != nil {
-		return false
+		return false, fmt.Errorf("opening archive file: %s", err)
 	}
 	defer file.Close()
-	io.Copy(hash, file)
-	return bytes.Compare(hash.Sum(nil), content) == 0
+	if _, err := io.Copy(algo, file); err != nil {
+		return false, fmt.Errorf("computing hash: %s", err)
+	}
+	return bytes.Compare(algo.Sum(nil), digest) == 0, nil
 }
 
-// checkLocalArchive check for integrity of the local archive.
-func checkLocalArchive(release *DownloadResource) error {
-	archivePath, err := release.ArchivePath()
+// TestLocalArchiveSize test if the local archive size match the DownloadResource size
+func (r *DownloadResource) TestLocalArchiveSize() (bool, error) {
+	filePath, err := r.ArchivePath()
 	if err != nil {
-		return err
+		return false, fmt.Errorf("getting archive path: %s", err)
 	}
-	stats, err := os.Stat(archivePath)
-	if os.IsNotExist(err) {
-		return errors.New("Archive does not exist")
-	}
+	info, err := os.Stat(filePath)
 	if err != nil {
-		return err
+		return false, fmt.Errorf("getting archive info: %s", err)
 	}
-	if stats.Size() > release.Size {
-		return errors.New("Archive size does not match with specification of this release, assuming corruption")
+	return info.Size() != r.Size, nil
+}
+
+// TestLocalArchiveIntegrity checks for integrity of the local archive.
+func (r *DownloadResource) TestLocalArchiveIntegrity() (bool, error) {
+	if cached, err := r.IsCached(); err != nil {
+		return false, fmt.Errorf("testing if archive is cached: %s", err)
+	} else if !cached {
+		return false, nil
 	}
-	if !checksumMatches(release) {
-		return errors.New("Checksum does not match, assuming corruption")
+
+	if ok, err := r.TestLocalArchiveSize(); err != nil {
+		return false, fmt.Errorf("teting archive size: %s", err)
+	} else if !ok {
+		return false, nil
 	}
-	return nil
+
+	ok, err := r.TestLocalArchiveChecksum()
+	if err != nil {
+		return false, fmt.Errorf("testing archive checksum: %s", err)
+	}
+	return ok, nil
 }
 
 const (
