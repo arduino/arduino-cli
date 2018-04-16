@@ -34,8 +34,6 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -58,7 +56,6 @@ var installCommand = &cobra.Command{
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib install`")
-
 	logrus.Info("Getting Libraries status context")
 	status, err := getLibStatusContext()
 	if err != nil {
@@ -67,53 +64,30 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	pairs := libraries.ParseArgs(args)
-	libsToDownload, notFoundFailOutputs := status.Process(pairs)
 
-	logrus.Info("Downloading")
-	resourceToDownload := map[string]*releases.DownloadResource{}
-	for v, k := range libsToDownload {
-		resourceToDownload[v] = k.Resource
-	}
-	downloadRes := releases.ParallelDownload(resourceToDownload, false, commands.GenerateDownloadProgressFormatter())
-	logrus.Info("Download finished")
+	downloadLibraries(status, pairs)
 
-	downloadOutputs := formatter.ExtractProcessResultsFromDownloadResults(resourceToDownload, downloadRes, "Installed")
-	out := output.LibProcessResults{
-		Libraries: map[string]output.ProcessResult{},
-	}
-	for name, value := range notFoundFailOutputs {
-		out.Libraries[name] = value
-	}
-	for name, value := range downloadOutputs {
-		out.Libraries[name] = value
-	}
+	installLibraries(status, pairs)
+}
 
-	logrus.Info("Installing")
+func installLibraries(status *libraries.StatusContext, pairs []libraries.NameVersionPair) {
+	libsToInstall, err := status.Process(pairs)
 	if err != nil {
-		formatter.PrintError(err, "Cannot get default lib install path.")
-		os.Exit(commands.ErrCoreConfig)
+		formatter.PrintError(err, "Error parsing libraries")
+		os.Exit(commands.ErrBadCall)
 	}
 
-	// FIXME: this outputResults mess really needs a revamp
-
-	for libName, item := range libsToDownload {
+	for libName, lib := range libsToInstall {
 		// FIXME: the library is installed again even if it's already installed
 
-		if libPath, err := libraries.Install(item); err != nil {
-			logrus.WithError(err).Warn("Library", libName, "errored")
-			// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
-			out.Libraries[libName] = output.ProcessResult{
-				ItemName: libName,
-				Error:    err.Error(),
-			}
-		} else {
-			// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
-			if libEntry, found := out.Libraries[libName]; found {
-				libEntry.Path = libPath
-			}
-		}
-	}
+		logrus.WithField("library", lib).Info("Installing library")
 
-	formatter.Print(out)
-	logrus.Info("Done")
+		if _, err := libraries.Install(lib); err != nil {
+			logrus.WithError(err).Warn("Library", libName, "errored")
+			formatter.PrintError(err, "Error installing library: "+lib.String())
+			os.Exit(commands.ErrGeneric)
+		}
+
+		formatter.Print("Installed " + lib.String())
+	}
 }

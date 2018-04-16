@@ -30,9 +30,12 @@
 package core
 
 import (
+	"os"
+
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
+	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
+	"github.com/cavaliercoder/grab"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -55,36 +58,55 @@ var downloadCommand = &cobra.Command{
 func runDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
-	// The usage of this depends on the specific command, so it's on-demand
 	pm := commands.InitPackageManager()
+	platformsRefs := parsePlatformReferenceArgs(args)
+	downloadPlatforms(pm, platformsRefs)
+}
 
-	// FIXME: that's just a PoC; please have mercy...
-	/*fmt.Printf("TESTING THE FLUENT PKGMGR\n")
-
-	tool, err := packagemanager.PackageManager().Package("not-found").Tool("avrdude").IsInstalled()
-	fmt.Printf("Tool status: %s, %v\n", tool, err)
-
-	tool, err = packagemanager.PackageManager().Package("arduino").Tool("not-found").IsInstalled()
-	fmt.Printf("Tool status: %s, %v\n", tool, err)
-
-	tool, err = packagemanager.PackageManager().Package("arduino").Tool("avrdude").IsInstalled()
-	fmt.Printf("Tool status: %s, %v\n", tool, err)*/
-
-	logrus.Info("Preparing download")
-	// FIXME: add another round of I/O marshalling
-	platformReleasesToDownload, toolReleasesToDownload, failOutputs := pm.FindItemsToDownload(
-		parsePlatformReferenceArgs(args))
-	outputResults := output.CoreProcessResults{
-		Cores: failOutputs,
-		Tools: map[string]output.ProcessResult{},
+func downloadPlatforms(pm *packagemanager.PackageManager, platformsRefs []packagemanager.PlatformReference) {
+	platforms, tools, err := pm.FindItemsToDownload(platformsRefs)
+	if err != nil {
+		formatter.PrintError(err, "Could not determine platform dependencies")
+		os.Exit(commands.ErrBadCall)
 	}
 
-	formatter.Print("Downloading tools...")
-	pm.DownloadToolReleaseArchives(toolReleasesToDownload, &outputResults)
-	formatter.Print("Downloading cores...")
-	pm.DownloadPlatformReleaseArchives(platformReleasesToDownload, &outputResults)
+	// Check if all tools have a flavour available for the current OS
+	for _, tool := range tools {
+		if tool.GetCompatibleFlavour() == nil {
+			formatter.PrintErrorMessage("The tool " + tool.String() + " is not available for the current OS")
+			os.Exit(commands.ErrGeneric)
+		}
+	}
 
-	formatter.Print("Results:")
-	formatter.Print(outputResults)
+	// Download tools
+	formatter.Print("Downloading tools...")
+	for _, tool := range tools {
+		resp, err := pm.DownloadToolRelease(tool)
+		download(resp, err, tool.String())
+	}
+
+	// Download cores
+	formatter.Print("Downloading cores...")
+	for _, platform := range platforms {
+		resp, err := pm.DownloadPlatformRelease(platform)
+		download(resp, err, platform.String())
+	}
+
 	logrus.Info("Done")
+}
+
+func download(resp *grab.Response, err error, label string) {
+	if err != nil {
+		formatter.PrintError(err, "Error downloading "+label)
+		os.Exit(commands.ErrNetwork)
+	}
+	if resp == nil {
+		formatter.Print(label + " already downloaded")
+		return
+	}
+	formatter.DownloadProgressBar(resp, label)
+	if resp.Err() != nil {
+		formatter.PrintError(resp.Err(), "Error downloading "+label)
+		os.Exit(commands.ErrNetwork)
+	}
 }

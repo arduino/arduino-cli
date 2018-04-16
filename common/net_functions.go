@@ -30,17 +30,16 @@
 package common
 
 import (
-	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 
 	"github.com/bcmi-labs/arduino-cli/pathutils"
 )
+
+// FIXME: Remove this function and use the grab library
 
 // DownloadIndex is a function to download a generic index.
 func DownloadIndex(indexPath pathutils.Path, URL *url.URL) error {
@@ -74,102 +73,4 @@ func DownloadIndex(indexPath pathutils.Path, URL *url.URL) error {
 		return err
 	}
 	return nil
-}
-
-// DownloadPackageProgressChangedHandler defines a function able to handle the update
-// of the progress of the current download
-type DownloadPackageProgressChangedHandler func(fileSize int64, downloadedSoFar int64)
-
-// DownloadPackage downloads a package from Arduino repository.
-// Besides the download information (URL, initialData and totalSize), an (optional) external handler (progressChangedHandler)
-// is available for handling the download progress change (and perhaps display it somehow).
-func DownloadPackage(URL string, initialData *os.File, totalSize int64,
-	progressChangedHandler DownloadPackageProgressChangedHandler) error {
-
-	if initialData == nil {
-		return errors.New("Cannot fill a nil file pointer")
-	}
-
-	client := &http.Client{}
-
-	var initialSize int64
-	stats, err := initialData.Stat()
-	if err != nil {
-		initialSize = 0
-	} else {
-		fileSize := stats.Size()
-		if fileSize >= totalSize {
-			initialSize = 0
-		} else {
-			initialSize = fileSize
-		}
-	}
-
-	client.Timeout = time.Duration(totalSize-initialSize) / 57344 * time.Second // size to download divided by 56KB/s (56 * 1024 = 57344)
-
-	request, err := http.NewRequest("GET", URL, nil)
-	if err != nil {
-		return fmt.Errorf("Cannot create HTTP to URL %s request: %s", URL, err)
-	}
-
-	if initialSize > 0 {
-		request.Header.Add("Range", fmt.Sprintf("bytes=%d-", initialSize))
-	}
-
-	response, err := client.Do(request)
-	if err != nil {
-		return fmt.Errorf("Cannot fetch %s Response creation error: %s",
-			URL, err)
-	} else if response.StatusCode != 200 &&
-		response.StatusCode != 206 &&
-		response.StatusCode != 416 {
-		response.Body.Close()
-		return fmt.Errorf("Cannot fetch %s Source responded with code %d",
-			URL, response.StatusCode)
-	}
-	defer response.Body.Close()
-
-	// Handle the progress update handler, by creating a ProgressProxyReader;
-	// only if it's needed (i.e. we actually have an external progressChangedHandler)
-	progressProxyReader := response.Body
-	downloadedSoFar := initialSize
-	if progressChangedHandler != nil {
-		progressProxyReader = ProgressProxyReader{response.Body, func(progressDelta int64) {
-			// WARNING: This is using a closure on downloadedSoFar!
-			downloadedSoFar += progressDelta
-			progressChangedHandler(totalSize, downloadedSoFar)
-		},
-		}
-	}
-
-	// Copy the file content
-	_, err = io.Copy(initialData, progressProxyReader)
-	if err != nil {
-		return fmt.Errorf("Cannot read response body from %s : %s", URL, err)
-	}
-	return nil
-}
-
-// FIXME: Move outside? perhaps in commons?
-// HandleProgressUpdateFunc defines a function able to handle the progressDelta, in bytes
-type HandleProgressUpdateFunc func(progressDelta int64)
-
-// It's proxy reader, intercepting reads to post progress updates, implement io.Reader
-type ProgressProxyReader struct {
-	io.Reader
-	handleProgressUpdateFunc HandleProgressUpdateFunc
-}
-
-func (r ProgressProxyReader) Read(p []byte) (n int, err error) {
-	n, err = r.Reader.Read(p)
-	r.handleProgressUpdateFunc(int64(n))
-	return
-}
-
-// Close the reader when it implements io.Closer
-func (r ProgressProxyReader) Close() (err error) {
-	if closer, ok := r.Reader.(io.Closer); ok {
-		return closer.Close()
-	}
-	return
 }

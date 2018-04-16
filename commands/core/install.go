@@ -57,35 +57,34 @@ var installCommand = &cobra.Command{
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
-	// The usage of this depends on the specific command, so it's on-demand
 	pm := commands.InitPackageManager()
+	platformsRefs := parsePlatformReferenceArgs(args)
+	downloadPlatforms(pm, platformsRefs)
 
-	logrus.Info("Preparing download")
-	// FIXME: Isn't this the same code as in core/download.go? Should be refactored
-	platformReleasesToDownload, toolReleasesToDownload, failOutputs := pm.FindItemsToDownload(
-		parsePlatformReferenceArgs(args))
+	platforms, tools, err := pm.FindItemsToDownload(platformsRefs)
+	if err != nil {
+		formatter.PrintError(err, "Could not determine platform dependencies")
+		os.Exit(commands.ErrBadCall)
+	}
+
 	outputResults := output.CoreProcessResults{
-		Cores: failOutputs,
+		Cores: map[string]output.ProcessResult{},
 		Tools: map[string]output.ProcessResult{},
 	}
 
-	formatter.Print("Downloading tools...")
-	pm.DownloadToolReleaseArchives(toolReleasesToDownload, &outputResults)
-	formatter.Print("Downloading cores...")
-	pm.DownloadPlatformReleaseArchives(platformReleasesToDownload, &outputResults)
+	logrus.Info("Installing tools")
+	formatter.Print("Installing tools...")
 
-	logrus.Info("Installing tool dependencies")
-	formatter.Print("Installing tool dependencies...")
-
-	err := pm.InstallToolReleases(toolReleasesToDownload, &outputResults)
-	if err == nil {
-		logrus.Info("Installing cores")
-		formatter.Print("Installing cores...")
-		err = pm.InstallPlatformReleases(platformReleasesToDownload, &outputResults)
+	if err := pm.InstallToolReleases(tools, &outputResults); err != nil {
+		formatter.PrintError(err, "Error installing tools.")
+		os.Exit(commands.ErrGeneric)
 	}
-	if err != nil {
-		formatter.PrintError(err, "Cannot get tool install path, try again.")
-		os.Exit(commands.ErrCoreConfig)
+
+	logrus.Info("Installing cores")
+	formatter.Print("Installing platforms...")
+	if err := pm.InstallPlatformReleases(platforms, &outputResults); err != nil {
+		formatter.PrintError(err, "Error installing platform.")
+		os.Exit(commands.ErrGeneric)
 	}
 
 	formatter.Print("Results:")

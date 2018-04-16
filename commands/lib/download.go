@@ -34,8 +34,6 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -62,32 +60,37 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Getting Libraries status context")
 	status, err := getLibStatusContext()
 	if err != nil {
-		logrus.WithError(err).Warn("Cannot get status context.")
+		formatter.PrintError(err, "Error while parsing installed libraries.")
+		logrus.WithError(err).Warn("Error while parsing installed libraries.")
 		os.Exit(commands.ErrGeneric)
 	}
 
 	logrus.Info("Preparing download")
 	pairs := libraries.ParseArgs(args)
-	libsToDownload, notFoundFailOutputs := status.Process(pairs)
-	resourceToDownload := map[string]*releases.DownloadResource{}
-	for v, k := range libsToDownload {
-		resourceToDownload[v] = k.Resource
+	downloadLibraries(status, pairs)
+}
+
+func downloadLibraries(status *libraries.StatusContext, pairs []libraries.NameVersionPair) {
+	libsToDownload, err := status.Process(pairs)
+	if err != nil {
+		formatter.PrintError(err, "Error parsing libraries")
+		os.Exit(commands.ErrBadCall)
 	}
 
 	logrus.Info("Downloading")
-	downloadResults := releases.ParallelDownload(resourceToDownload, false, commands.GenerateDownloadProgressFormatter())
-	logrus.Info("Download finished")
+	formatter.Print("Downloading libraries...")
+	for _, lib := range libsToDownload {
+		resp, err := lib.Resource.Download()
+		if err != nil {
+			formatter.PrintError(err, "Error downloading "+lib.String())
+			os.Exit(commands.ErrNetwork)
+		}
+		formatter.DownloadProgressBar(resp, lib.String())
+		if resp.Err() != nil {
+			formatter.PrintError(err, "Error downloading "+lib.String())
+			os.Exit(commands.ErrNetwork)
+		}
+	}
 
-	downloadOutputs := formatter.ExtractProcessResultsFromDownloadResults(resourceToDownload, downloadResults, "Downloaded")
-	out := output.LibProcessResults{
-		Libraries: map[string]output.ProcessResult{},
-	}
-	for name, value := range notFoundFailOutputs {
-		out.Libraries[name] = value
-	}
-	for name, value := range downloadOutputs {
-		out.Libraries[name] = value
-	}
-	formatter.Print(out)
 	logrus.Info("Done")
 }

@@ -35,7 +35,6 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/bcmi-labs/arduino-cli/cores/packageindex"
@@ -60,7 +59,6 @@ type PackageManager struct {
 type EventHandler interface {
 	// FIXME: This is temporary, for prototyping (an handler should not return an handler; besides, this leakes
 	// the usage of releases...)
-	OnDownloadingSomething() releases.ParallelDownloadProgressHandler
 }
 
 // NewPackageManager returns a new instance of the PackageManager

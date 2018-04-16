@@ -30,163 +30,45 @@
 package releases
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
-	"github.com/bcmi-labs/arduino-cli/common"
-	"github.com/bcmi-labs/arduino-cli/task"
-	"github.com/sirupsen/logrus"
+	"github.com/cavaliercoder/grab"
 )
 
-// downloadRelease downloads a generic release.
-//
-//   PARAMS:
-//     resource -> The resource to download.
-//     progressChangedHandler -> (optional) is invoked at each progress change.
-//   RETURNS:
-//     error if any
-func downloadRelease(item *DownloadResource, progressChangedHandler common.DownloadPackageProgressChangedHandler) error {
-	if item == nil {
-		return errors.New("Cannot accept nil release")
-	}
-	initialData, err := OpenLocalArchiveForDownload(item)
+// Download a DownloadResource.
+func (r *DownloadResource) Download() (*grab.Response, error) {
+	cached, err := r.TestLocalArchiveIntegrity()
 	if err != nil {
-		return fmt.Errorf("Cannot get Archive file of this release : %s", err)
+		return nil, fmt.Errorf("testing local archive integrity: %s", err)
 	}
-	defer initialData.Close()
-
-	err = common.DownloadPackage(item.URL, initialData,
-		item.Size, progressChangedHandler)
-	if err != nil {
-		return err
-	}
-	ok, err := item.TestLocalArchiveIntegrity()
-	if err != nil {
-		return fmt.Errorf("testing local archive integrity: %s", err)
-	}
-	if !ok {
-		return errors.New("Archive has been downloaded, but it seems corrupted. Try again to redownload it")
-	}
-	return nil
-}
-
-// downloadTask returns the task to download something without installing it.
-func downloadTask(item *DownloadResource, progressChangedHandler common.DownloadPackageProgressChangedHandler) task.Task {
-	return func() task.Result {
-		err := downloadRelease(item, progressChangedHandler)
-		if err != nil {
-			return task.Result{Error: err}
-		}
-		return task.Result{}
-	}
-}
-
-// ParallelDownloadProgressHandler defines an handler that is made aware of
-// the progress of the ParallelDownload.
-// For this to work, the handler is notified of each new download task and it
-// is expected to generate a FileDownloadFilter to track down the progress of the single file.
-// The starting and final moment of the whole parallel download process are also reported to the handler.
-type ParallelDownloadProgressHandler interface {
-	// OnNewDownloadTask is called when a new download task is added to the queue of the ParallelDownload
-	OnNewDownloadTask(fileName string, fileSize int64)
-	// OnProgressChanged is called at each download progress change, giving information for a specific
-	// fileName, reporting its total fileSize and the part downloadedSoFar (both in bytes)
-	OnProgressChanged(fileName string, fileSize int64, downloadedSoFar int64)
-	// OnDownloadStarted is called just before the download of the multiple tasks starts
-	OnDownloadStarted()
-	// OnDownloadStarted is called just after the download of the multiple tasks ends
-	OnDownloadFinished()
-}
-
-// ParallelDownload executes multiple releases downloads in parallel and fills properly results.
-//
-//   forced is used to force download if cached.
-//   OkStatus is used to tell the overlying process result ("Downloaded", "Installed", etc...)
-//	 An optional progressHandler can be passed in order to be notified of the status of the download.
-//   DOES NOT RETURN since will append results to the provided refResults; use refResults.Results() to get them.
-func ParallelDownload(items map[string]*DownloadResource, forced bool,
-	progressHandler ParallelDownloadProgressHandler) map[string]*DownloadResult {
-
-	// TODO (l.biava): Future improvements envision this utility as an object (say a Builder)
-	// to simplify the passing of all those parameters, the progress handling closure, the outputResults
-	// internally populated, etc.
-
-	tasks := map[string]task.Task{}
-	res := map[string]*DownloadResult{}
-
-	logrus.Info(fmt.Sprintf("Initiating parallel download of %d resources", len(items)))
-
-	for itemName, item := range items {
-		if item == nil {
-			continue
-		}
-		cached := false
-		if !forced {
-			if c, err := item.IsCached(); err != nil {
-				res[itemName] = &DownloadResult{Error: fmt.Errorf("detecting if item is cached:%s", err)}
-				continue
-			} else {
-				cached = c
-			}
-		}
-		if forced || !cached {
-			// Notify the progress handler of the new task
-			if progressHandler != nil {
-				progressHandler.OnNewDownloadTask(itemName, item.Size)
-			}
-
-			// Forward the per-file progress handler, if available
-			// WARNING: This is using a closure on itemName!
-			getProgressHandler := func(fileName string) common.DownloadPackageProgressChangedHandler {
-				if progressHandler != nil {
-					return func(fileSize int64, downloadedSoFar int64) {
-						progressHandler.OnProgressChanged(fileName, fileSize, downloadedSoFar)
-					}
-				}
-				return nil
-			}
-
-			tasks[itemName] = downloadTask(item, getProgressHandler(itemName))
-		} else {
-			// Item already downloaded
-			res[itemName] = &DownloadResult{AlreadyDownloaded: true}
-		}
+	if cached {
+		// File is cached, nothing to do here
+		return nil, nil
 	}
 
-	if len(tasks) > 0 {
-		if progressHandler != nil {
-			progressHandler.OnDownloadStarted()
-		}
-
-		results := task.ExecuteParallelFromMap(tasks)
-
-		if progressHandler != nil {
-			progressHandler.OnDownloadFinished()
-		}
-
-		for name, result := range results {
-			if result.Error != nil {
-				res[name] = &DownloadResult{Error: result.Error}
-			} else {
-				res[name] = &DownloadResult{}
-			}
-		}
-	}
-
-	return res
-}
-
-// OpenLocalArchiveForDownload open local archive if present
-// used to resume download. Creates an empty file if not found.
-func OpenLocalArchiveForDownload(r *DownloadResource) (*os.File, error) {
 	path, err := r.ArchivePath()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getting archive path: %s", err)
 	}
-	stats, err := os.Stat(path)
-	if os.IsNotExist(err) || err == nil && stats.Size() >= r.Size {
-		return os.Create(path)
+
+	if stats, err := os.Stat(path); os.IsNotExist(err) {
+		// normal download
+	} else if err == nil && stats.Size() >= r.Size {
+		// file is bigger than expected, retry download...
+		if err := os.Remove(path); err != nil {
+			return nil, fmt.Errorf("removing corrupted archive file: %s", err)
+		}
+	} else if err == nil {
+		// resume download
+	} else {
+		return nil, fmt.Errorf("getting archive file info: %s", err)
 	}
-	return os.OpenFile(path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+
+	req, err := grab.NewRequest(path, r.URL)
+	if err != nil {
+		return nil, fmt.Errorf("creating HTTP request: %s", err)
+	}
+	client := grab.NewClient()
+	return client.Do(req), nil
 }

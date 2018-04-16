@@ -32,10 +32,6 @@ package formatter
 import (
 	"encoding/json"
 	"fmt"
-
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
-	"github.com/sirupsen/logrus"
 )
 
 type resultMessage struct {
@@ -58,39 +54,4 @@ func PrintResult(res interface{}) {
 	Print(resultMessage{
 		message: res,
 	})
-}
-
-// ExtractProcessResultsFromDownloadResults picks a set of releases.DownloadResource and
-// a set of releases.DownloadResult and creates an array of output.ProcessResult to format
-// the download results. A label is added to each result.
-// FIXME: I don't like this kind of result passing back and forth, it has to be a better way
-func ExtractProcessResultsFromDownloadResults(
-	resources map[string]*releases.DownloadResource,
-	results map[string]*releases.DownloadResult,
-	label string) map[string]output.ProcessResult {
-
-	out := map[string]output.ProcessResult{}
-	for name, resource := range resources {
-		path, err := resource.ArchivePath()
-		if err != nil {
-			// FIXME: do something!!
-			logrus.Error("Could not determine archive path:", err)
-			continue
-		}
-		resultError := results[name].Error
-		status := ""
-		errorMessage := ""
-		if resultError == nil {
-			status = label
-		} else {
-			errorMessage = resultError.Error()
-		}
-		out[name] = output.ProcessResult{
-			ItemName: name,
-			Path:     path,
-			Error:    errorMessage,
-			Status:   status,
-		}
-	}
-	return out
 }

@@ -32,7 +32,6 @@ package libraries
 import (
 	"fmt"
 
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/pmylund/sortutil"
 )
 
@@ -75,32 +74,23 @@ func GetLibraryCode(library *Library) string {
 // Process takes a set of name-version pairs and return
 // a set of items to download and a set of outputs for non
 // existing libraries.
-func (sc StatusContext) Process(items []NameVersionPair) (map[string]*Release, map[string]output.ProcessResult) {
+func (sc StatusContext) Process(items []NameVersionPair) (map[string]*Release, error) {
 	ret := map[string]*Release{}
-	fails := map[string]output.ProcessResult{}
 
 	for _, item := range items {
 		library, exists := sc.Libraries[item.Name]
 		if !exists {
-			// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
-			fails[item.Name] = output.ProcessResult{
-				ItemName: item.Name,
-				Error:    "Library not found",
-			}
-		} else {
-			release := library.GetVersion(item.Version)
-			if release == nil {
-				fails[GetLibraryCode(library)] = output.ProcessResult{
-					ItemName: item.Name,
-					Error:    "Version Not Found",
-				}
-			} else { // replaces "latest" with latest version too
-				ret[GetLibraryCode(library)] = release
-			}
+			return nil, fmt.Errorf("library not found: %s", item.Name)
 		}
+		release := library.GetVersion(item.Version)
+		if release == nil {
+			return nil, fmt.Errorf("version not found for library %s: %s", item.Name, item.Version)
+		}
+
+		ret[GetLibraryCode(library)] = release
 	}
 
-	return ret, fails
+	return ret, nil
 }
 
 // CreateStatusContext creates a status context from index data.

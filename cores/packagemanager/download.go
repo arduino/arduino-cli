@@ -33,9 +33,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/cavaliercoder/grab"
+
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/sirupsen/logrus"
 )
@@ -68,125 +68,70 @@ func (pm *PackageManager) FindPlatform(ref *PlatformReference) *cores.PlatformRe
 	return platformRelease
 }
 
-// FIXME: Make more generic and decouple the error print logic (that list should not exists;
-// rather a failure @ the first package)
-
 // FindItemsToDownload takes a set of PlatformReference and returns a set of items to download and
 // a set of outputs for non existing platforms.
 func (pm *PackageManager) FindItemsToDownload(items []PlatformReference) (
-	[]*cores.PlatformRelease, []*cores.ToolRelease, map[string]output.ProcessResult) {
+	[]*cores.PlatformRelease, []*cores.ToolRelease, error) {
 
-	itemC := len(items)
 	retPlatforms := []*cores.PlatformRelease{}
 	retTools := []*cores.ToolRelease{}
-	fails := map[string]output.ProcessResult{}
-
-	// value is not used, this map is only to check if an item is inside (set implementation)
-	// see https://stackoverflow.com/questions/34018908/golang-why-dont-we-have-a-set-datastructure
-	presenceMap := make(map[string]bool, itemC)
+	added := map[string]bool{}
 
 	for _, item := range items {
-		pkg, exists := pm.packages.Packages[item.Package]
+		targetPackage, exists := pm.packages.Packages[item.Package]
 		if !exists {
-			fails[item.String()] = output.ProcessResult{
-				ItemName: item.PlatformArchitecture,
-				Error:    fmt.Sprintf("Package %s not found", item.Package),
-			}
-			continue
+			return nil, nil, fmt.Errorf("package %s not found", item.Package)
 		}
-		platform, exists := pkg.Platforms[item.PlatformArchitecture]
+		platform, exists := targetPackage.Platforms[item.PlatformArchitecture]
 		if !exists {
-			fails[item.String()] = output.ProcessResult{
-				ItemName: item.PlatformArchitecture,
-				Error:    "Platform not found",
-			}
-			continue
+			return nil, nil, fmt.Errorf("platform %s not found in package %s", item.PlatformArchitecture, targetPackage.String())
 		}
 
-		_, exists = presenceMap[item.PlatformArchitecture]
-		if exists { //skip
+		if added[platform.String()] {
 			continue
 		}
+		added[platform.String()] = true
 
 		release := platform.GetRelease(item.PlatformVersion)
 		if release == nil {
-			fails[item.String()] = output.ProcessResult{
-				ItemName: item.PlatformArchitecture,
-				Error:    fmt.Sprintf("Version %s Not Found", item.PlatformVersion),
-			}
-			continue
+			return nil, nil, fmt.Errorf("required version %s not found for platform %s", item.PlatformVersion, platform.String())
 		}
+		retPlatforms = append(retPlatforms, release)
 
 		// replaces "latest" with latest version too
 		toolDeps, err := pm.packages.GetDepsOfPlatformRelease(release)
 		if err != nil {
-			fails[item.String()] = output.ProcessResult{
-				ItemName: item.PlatformArchitecture,
-				Error: fmt.Sprintf("Cannot get tool dependencies of plafotmr %s: %s",
-					platform.Name, err.Error()),
-			}
-			continue
+			return nil, nil, fmt.Errorf("getting tool dependencies for platform %s: %s", release.String(), err)
 		}
-
-		retPlatforms = append(retPlatforms, release)
-
-		presenceMap[platform.Name] = true
 		for _, tool := range toolDeps {
-			if presenceMap[tool.Tool.Name] {
+			if added[tool.String()] {
 				continue
 			}
-			presenceMap[tool.Tool.Name] = true
+			added[tool.String()] = true
 			retTools = append(retTools, tool)
 		}
 	}
-	return retPlatforms, retTools, fails
+	return retPlatforms, retTools, nil
 }
 
-// FIXME: Refactor this download logic to uncouple it from the presentation layer
-// All this stuff is pkgmgr responsibility for sure
-
-func (pm *PackageManager) DownloadToolReleaseArchives(tools []*cores.ToolRelease,
-	results *output.CoreProcessResults) {
-
-	downloads := map[string]*releases.DownloadResource{}
-	for _, tool := range tools {
-		resource := tool.GetCompatibleFlavour()
-		if resource == nil {
-			formatter.PrintError(fmt.Errorf("missing tool %s", tool), "A release of the tool is not available for your OS")
-		}
-		downloads[tool.String()] = tool.GetCompatibleFlavour()
+// DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Response
+// is returned.
+func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease) (*grab.Response, error) {
+	resource := tool.GetCompatibleFlavour()
+	if resource == nil {
+		return nil, fmt.Errorf("tool not available for your OS")
 	}
-	logrus.Info("Downloading tools")
-	for name, value := range pm.downloadStuff(downloads) {
-		results.Tools[name] = value
-	}
+	return resource.Download()
 }
 
-func (pm *PackageManager) DownloadPlatformReleaseArchives(platforms []*cores.PlatformRelease,
-	results *output.CoreProcessResults) {
-
-	downloads := map[string]*releases.DownloadResource{}
-	for _, platform := range platforms {
-		downloads[platform.String()] = platform.Resource
-	}
-
-	logrus.Info("Downloading cores")
-	for name, value := range pm.downloadStuff(downloads) {
-		results.Cores[name] = value
-	}
+// DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
+// nil Response is returned.
+func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease) (*grab.Response, error) {
+	return platform.Resource.Download()
 }
 
-func (pm *PackageManager) downloadStuff(downloads map[string]*releases.DownloadResource) map[string]output.ProcessResult {
-
-	var downloadProgressHandler releases.ParallelDownloadProgressHandler
-	if pm.eventHandler != nil {
-		downloadProgressHandler = pm.eventHandler.OnDownloadingSomething()
-	}
-
-	downloadRes := releases.ParallelDownload(downloads, false,
-		downloadProgressHandler)
-	return formatter.ExtractProcessResultsFromDownloadResults(downloads, downloadRes, "Downloaded")
-}
+// FIXME: Make more generic and decouple the error print logic (that list should not exists;
+// rather a failure @ the first package)
 
 func (pm *PackageManager) InstallToolReleases(toolReleasesToDownload []*cores.ToolRelease,
 	result *output.CoreProcessResults) error {

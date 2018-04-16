@@ -38,7 +38,6 @@ import (
 	sk "github.com/bcmi-labs/arduino-modules/sketches"
 
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
 	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
 	"github.com/sirupsen/logrus"
 )
@@ -108,16 +107,5 @@ func InitSketch(sketchPath string) (*sk.Sketch, error) {
 type CLIPackageManagerEventHandler struct{}
 
 // Implement packagemanager.EventHandler interface
-func (cliEH *CLIPackageManagerEventHandler) OnDownloadingSomething() releases.ParallelDownloadProgressHandler {
-	return GenerateDownloadProgressFormatter()
-}
 
 // END -- Implement packagemanager.EventHandler interface
-
-// FIXME: Move away? Where should the display logic reside; in the formatter?
-func GenerateDownloadProgressFormatter() releases.ParallelDownloadProgressHandler {
-	if formatter.IsCurrentFormat("text") {
-		return &ProgressBarFormatter{}
-	}
-	return nil
-}
