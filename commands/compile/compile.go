@@ -37,14 +37,13 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-
 	builder "github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/sirupsen/logrus"
@@ -128,12 +127,20 @@ func run(cmd *cobra.Command, args []string) {
 	loadBuiltinCtagsMetadata(pm)
 	ctags, err := getBuiltinCtagsTool(pm)
 	if !ctags.IsInstalled() {
-		ctagsList := []*cores.ToolRelease{ctags}
+		formatter.Print("Downloading missing tool: " + ctags.String())
+		resp, err := pm.DownloadToolRelease(ctags)
+		if err != nil {
+			formatter.PrintError(err, "Error downloading ctags")
+			os.Exit(commands.ErrNetwork)
+		}
+		formatter.DownloadProgressBar(resp, ctags.String())
+		if resp.Err() != nil {
+			formatter.PrintError(resp.Err(), "Error downloading ctags")
+			os.Exit(commands.ErrNetwork)
+		}
+		formatter.Print("Installing " + ctags.String())
 		res := &output.CoreProcessResults{Tools: map[string]output.ProcessResult{}}
-		formatter.Print("Downloading missing tool: ctags")
-		pm.DownloadToolReleaseArchives(ctagsList, res)
-		formatter.Print("Installing ctags")
-		if err := pm.InstallToolReleases(ctagsList, res); err != nil {
+		if err := pm.InstallToolReleases([]*cores.ToolRelease{ctags}, res); err != nil {
 			formatter.PrintError(err, "Error installing ctags")
 			formatter.PrintErrorMessage("Missing ctags tool.")
 			os.Exit(commands.ErrCoreConfig)
