@@ -106,6 +106,12 @@
   version = "1.0"
 
 [[projects]]
+  name = "github.com/cavaliercoder/grab"
+  packages = ["."]
+  revision = "3b6830dae49bc01e25b4676dae3a2a06c1b1485e"
+  version = "v2.0.0"
+
+[[projects]]
   name = "github.com/cenkalti/backoff"
   packages = ["."]
   revision = "2ea60e5f094469f9e65adb9cd103795b73ae743e"
@@ -510,6 +516,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fdb0cf8a213f49a3fff019b457e3d779f19e0912483b8b3039d7ddf8d4e029b6"
+  inputs-digest = "b5d06ff96573a67889ddd2aaadd07487131739148ce637e9e106ebc5116c59a0"
   solver-name = "gps-cdcl"
   solver-version = 1
