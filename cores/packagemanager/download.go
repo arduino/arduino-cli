@@ -51,6 +51,23 @@ func (platform *PlatformReference) String() string {
 	return platform.Package + ":" + platform.PlatformArchitecture + "@" + platform.PlatformVersion
 }
 
+// FindPlatform returns the PlatformRelease matching the PlatformReference or nil if not found
+func (pm *PackageManager) FindPlatform(ref *PlatformReference) *cores.PlatformRelease {
+	targetPackage, ok := pm.GetPackages().Packages[ref.Package]
+	if !ok {
+		return nil
+	}
+	platform, ok := targetPackage.Platforms[ref.PlatformArchitecture]
+	if !ok {
+		return nil
+	}
+	platformRelease, ok := platform.Releases[ref.PlatformVersion]
+	if !ok {
+		return nil
+	}
+	return platformRelease
+}
+
 // FIXME: Make more generic and decouple the error print logic (that list should not exists;
 // rather a failure @ the first package)
 
