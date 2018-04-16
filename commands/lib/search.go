@@ -37,6 +37,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
+	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -69,33 +70,20 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Getting libraries status context")
 	status, err := getLibStatusContext()
 	if err != nil {
-		formatter.PrintError(err, "Cannot get libraries status context.")
+		formatter.PrintError(err, "Error while parsing installed libraries.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	logrus.Info("Preparing")
-
-	found := false
-	names := status.Names()
 	message := output.LibSearchResults{
-		Libraries: make([]interface{}, 0, len(names)),
+		Libraries: []*libraries.Library{},
 	}
-
-	logrus.Info("Searching")
-	items := status.Libraries
-	//Pretty print libraries from index.
-	for _, name := range names {
-		if strings.Contains(strings.ToLower(name), query) {
-			found = true
-			if searchFlags.names {
-				message.Libraries = append(message.Libraries, name)
-			} else {
-				message.Libraries = append(message.Libraries, items[name])
-			}
+	for _, lib := range status.Libraries {
+		if strings.Contains(strings.ToLower(lib.Name), query) {
+			message.Libraries = append(message.Libraries, lib)
 		}
 	}
 
-	if !found {
+	if len(message.Libraries) == 0 {
 		formatter.PrintErrorMessage(fmt.Sprintf("No library found matching `%s` search query", query))
 	} else {
 		formatter.Print(message)

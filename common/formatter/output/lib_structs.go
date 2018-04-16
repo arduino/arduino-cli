@@ -32,6 +32,8 @@ package output
 import (
 	"fmt"
 	"strings"
+
+	"github.com/bcmi-labs/arduino-cli/libraries"
 )
 
 // VersionResult represents the output of the version commands.
@@ -74,7 +76,7 @@ func (cpr CoreProcessResults) String() string {
 
 // LibSearchResults represents a set of results of a search of libraries.
 type LibSearchResults struct {
-	Libraries []interface{} `json:"libraries,required"`
+	Libraries []*libraries.Library `json:"libraries,required"`
 }
 
 // String returns a string representation of the object.
@@ -97,14 +99,28 @@ func (vfi VersionFullInfo) String() string {
 // String returns a string representation of the object.
 func (lsr LibSearchResults) String() string {
 	ret := ""
-	for _, lib := range lsr.Libraries {
-		if _, isString := lib.(string); isString {
-			lib = fmt.Sprintf("\"%s\"", lib)
-		}
-		ret += fmt.Sprintln(lib)
+	for _, l := range lsr.Libraries {
+		ret += fmt.Sprintf("Name: \"%s\"\n", l.Name) +
+			fmt.Sprintln("  Author: ", l.Author) +
+			fmt.Sprintln("  Maintainer: ", l.Maintainer) +
+			fmt.Sprintln("  Sentence: ", l.Sentence) +
+			fmt.Sprintln("  Paragraph: ", l.Paragraph) +
+			fmt.Sprintln("  Website: ", l.Website) +
+			fmt.Sprintln("  Category: ", l.Category) +
+			fmt.Sprintln("  Architecture: ", strings.Join(l.Architectures, ", ")) +
+			fmt.Sprintln("  Types: ", strings.Join(l.Types, ", ")) +
+			fmt.Sprintln("  Versions: ", strings.Replace(fmt.Sprint(l.Versions()), " ", ", ", -1))
 	}
 	return strings.TrimSpace(ret)
 }
+
+// func (r *Release) Dump() string {
+// 	return fmt.Sprintln("  Release: "+fmt.Sprint(r.Version)) +
+// 		fmt.Sprintln("    URL: "+r.Resource.URL) +
+// 		fmt.Sprintln("    ArchiveFileName: "+r.Resource.ArchiveFileName) +
+// 		fmt.Sprintln("    Size: ", r.Resource.Size) +
+// 		fmt.Sprintln("    Checksum: ", r.Resource.Checksum)
+// }
 
 // Results returns a set of generic results, to allow them to be modified externally.
 //

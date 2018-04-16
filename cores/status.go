@@ -118,6 +118,10 @@ func (targetPackage *Package) GetOrCreateTool(name string) *Tool {
 	return tool
 }
 
+func (targetPackage *Package) String() string {
+	return targetPackage.Name
+}
+
 func (tdep ToolDependency) extractTool(sc Packages) (*Tool, error) {
 	pkg, exists := sc.Packages[tdep.ToolPackager]
 	if !exists {

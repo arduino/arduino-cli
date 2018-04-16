@@ -57,6 +57,10 @@ type Library struct {
 	Releases      map[string]*Release `json:"releases,omitempty"`
 }
 
+func (l *Library) String() string {
+	return l.Name
+}
+
 // InstalledRelease returns the installed release of the library.
 func (l *Library) InstalledRelease() (*Release, error) {
 	libFolder, err := configs.LibrariesFolder.Get()
@@ -122,6 +126,10 @@ type Release struct {
 	Library  *Library
 }
 
+func (r *Release) String() string {
+	return r.Library.String() + "@" + r.Version
+}
+
 // GetVersion returns the Release corresponding to the specified version, or
 // nil if not found.
 //
@@ -169,25 +177,4 @@ func (l Library) Versions() semver.Versions {
 	}
 	//sortutil.CiAsc(res)
 	return res
-}
-
-func (r *Release) String() string {
-	return fmt.Sprintln("  Release: "+fmt.Sprint(r.Version)) +
-		fmt.Sprintln("    URL: "+r.Resource.URL) +
-		fmt.Sprintln("    ArchiveFileName: "+r.Resource.ArchiveFileName) +
-		fmt.Sprintln("    Size: ", r.Resource.Size) +
-		fmt.Sprintln("    Checksum: ", r.Resource.Checksum)
-}
-
-func (l Library) String() string {
-	return fmt.Sprintf("Name: \"%s\"\n", l.Name) +
-		fmt.Sprintln("  Author: ", l.Author) +
-		fmt.Sprintln("  Maintainer: ", l.Maintainer) +
-		fmt.Sprintln("  Sentence: ", l.Sentence) +
-		fmt.Sprintln("  Paragraph: ", l.Paragraph) +
-		fmt.Sprintln("  Website: ", l.Website) +
-		fmt.Sprintln("  Category: ", l.Category) +
-		fmt.Sprintln("  Architecture: ", strings.Join(l.Architectures, ", ")) +
-		fmt.Sprintln("  Types: ", strings.Join(l.Types, ", ")) +
-		fmt.Sprintln("  Versions: ", strings.Replace(fmt.Sprint(l.Versions()), " ", ", ", -1))
 }
