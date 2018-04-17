@@ -54,7 +54,7 @@ func (r *DownloadResource) Download() (*grab.Response, error) {
 
 	if stats, err := os.Stat(path); os.IsNotExist(err) {
 		// normal download
-	} else if err == nil && stats.Size() >= r.Size {
+	} else if err == nil && stats.Size() > r.Size {
 		// file is bigger than expected, retry download...
 		if err := os.Remove(path); err != nil {
 			return nil, fmt.Errorf("removing corrupted archive file: %s", err)
