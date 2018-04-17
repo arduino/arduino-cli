@@ -31,30 +31,23 @@ package formatter
 
 import "encoding/json"
 import "reflect"
-import "errors"
+
 import "fmt"
 
-//JSONFormatter represents a Printer and Formatter of JSON objects.
+// JSONFormatter is a Formatter that output JSON objects.
+// Intermediate results or interactive messages are ignored.
 type JSONFormatter struct {
-	Debug bool //if false, errors are not shown. Unparsable inputs are skipped. Otherwise an error message is shown.
+	Debug bool // if false, errors are not shown. Unparsable inputs are skipped. Otherwise an error message is shown.
 }
 
-// Format formaats a message into a JSON object.
-//
-// It ignores Header and Footer fields of the message.
+// Format implements Formatter interface
 func (jf JSONFormatter) Format(msg interface{}) (string, error) {
-	msgType := reflect.TypeOf(msg).Kind().String()
-	if msgType == "struct" ||
-		msgType == "map" {
+	t := reflect.TypeOf(msg).Kind().String()
+	switch t {
+	case "struct", "map":
 		ret, err := json.Marshal(msg)
 		return string(ret), err
-	} else if jf.Debug {
-		return fmt.Sprint(msg), errors.New("Only structs and maps values are accepted")
+	default:
+		return "", fmt.Errorf("%s ignored", t)
 	}
-	return "", nil
-}
-
-// Print prints a JSON object.
-func (jf JSONFormatter) Print(msg interface{}) error {
-	return printFunc(jf, msg)
 }

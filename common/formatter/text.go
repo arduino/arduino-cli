@@ -31,17 +31,10 @@ package formatter
 
 import "fmt"
 
-//TextFormatter represents a Printer and Formatter of Text.
+// TextFormatter represents a Formatter for a text console
 type TextFormatter struct{}
 
-// Format formaats a message into a JSON object.
-//
-// It ignores Header and Footer fields of the message.
+// Format implements Formatter interface
 func (tp TextFormatter) Format(msg interface{}) (string, error) {
 	return fmt.Sprintf("%s", msg), nil
-}
-
-// Print prints a JSON object.
-func (tp TextFormatter) Print(msg interface{}) error {
-	return printFunc(tp, msg)
 }

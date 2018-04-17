@@ -62,12 +62,10 @@ func ExamplePrint() {
 
 	formatter.SetFormatter("json")
 	formatter.Print(example)
-	fmt.Println() //to separe outputs
 	formatter.SetFormatter("text")
 	formatter.Print(example)
 	// Output:
 	// {"field1":"test","field2":10,"field3":{"inner1":"inner test","inner2":10.432412}}
-	//
 	// Field1: test
 	// Field2: 10
 	// Field3.Inner1: inner test

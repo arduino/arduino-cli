@@ -32,7 +32,6 @@ package formatter
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -40,7 +39,6 @@ import (
 // Formatter interface represents a generic formatter. It allows to print and format Messages.
 type Formatter interface {
 	Format(interface{}) (string, error) // Format formats a parameter if possible, otherwise it returns an error.
-	Print(interface{}) error            // Print just prints specified parameter, returns error if it is not parsable.
 }
 
 // PrintFunc represents a function used to print formatted data.
@@ -48,8 +46,6 @@ type PrintFunc func(Formatter, interface{}) error
 
 var formatters map[string]Formatter
 var defaultFormatter Formatter
-
-var printFunc PrintFunc
 
 var logger *logrus.Logger
 
@@ -60,8 +56,6 @@ func init() {
 	AddCustomFormatter("text", &TextFormatter{})
 	AddCustomFormatter("json", &JSONFormatter{})
 	defaultFormatter = formatters["text"]
-
-	printFunc = defaultPrintFunc
 }
 
 // SetFormatter sets the defaults format to the one specified, if valid. Otherwise it returns an error.
@@ -111,28 +105,10 @@ func Format(msg interface{}) (string, error) {
 
 // Print prints a message formatted using a Formatter specified by SetFormatter(...) function.
 func Print(msg interface{}) error {
-	if defaultFormatter == nil {
-		return errors.New("No formatter set")
+	output, err := defaultFormatter.Format(msg)
+	if err != nil {
+		return err
 	}
-	return defaultFormatter.Print(msg)
-}
-
-// defaultPrintFunc is the base function of all Print methods of Formatters.
-//
-// It can be used for an unified implementation.
-func defaultPrintFunc(f Formatter, msg interface{}) error {
-	val, err := f.Format(msg)
-	if val != "" {
-		if err == nil {
-			fmt.Println(strings.TrimSpace(val))
-		} else {
-			fmt.Println(strings.TrimSpace(err.Error()))
-		}
-	}
-	return err
-}
-
-// SetPrintFunc changes the actual print function with a specified one.
-func SetPrintFunc(p PrintFunc) {
-	printFunc = p
+	fmt.Println(output)
+	return nil
 }

@@ -59,14 +59,14 @@ func ExampleJSONFormatter_Print() {
 	example.Field3.Inner2 = 10.432412
 
 	var jf formatter.JSONFormatter
-	jf.Print(example)
+	fmt.Println(jf.Format(example))
 
 	var example2 float64 = 3.14
-	jf.Print(example2)
+	fmt.Println(jf.Format(example2))
 
 	// Output:
-	// {"field1":"test","field2":10,"field3":{"inner1":"inner test","inner2":10.432412}}
-	//
+	// {"field1":"test","field2":10,"field3":{"inner1":"inner test","inner2":10.432412}} <nil>
+	//  float64 ignored
 }
 
 func ExampleJSONFormatter_Format() {
@@ -85,25 +85,14 @@ func ExampleJSONFormatter_Format() {
 	example.Field3.Inner2 = 10.432412
 
 	var jf formatter.JSONFormatter
-	var result string
-	result, err := jf.Format(example)
-	if err != nil {
-		fmt.Println("ERROR:", err)
-	} else {
-		fmt.Println("RESULT:", result)
-	}
+	fmt.Println(jf.Format(example))
 
 	var example2 float32 = 3.14
-	result, err = jf.Format(example2)
-	if err != nil {
-		fmt.Println("ERROR:", err)
-	} else if result == "" {
-		fmt.Println("RESULT: <empty string>")
-	}
+	fmt.Println(jf.Format(example2))
 
 	// Output:
-	// RESULT: {"field1":"test","field2":10,"field3":{"inner1":"inner test","inner2":10.432412}}
-	// RESULT: <empty string>
+	// {"field1":"test","field2":10,"field3":{"inner1":"inner test","inner2":10.432412}} <nil>
+	//  float32 ignored
 }
 
 func ExampleJSONFormatter_Print_debug() {
@@ -112,58 +101,39 @@ func ExampleJSONFormatter_Print_debug() {
 	jf := formatter.JSONFormatter{
 		Debug: false,
 	}
-	//using struct
-	jf.Print(valid)
+	// using struct
+	fmt.Println(jf.Format(valid))
 
-	//using string (invalid sine it's not a struct or a map)
-	jf.Print(invalid)
+	// using string (invalid sine it's not a struct or a map)
+	fmt.Println(jf.Format(invalid))
 
 	jf.Debug = true
-	jf.Print(valid)
-	jf.Print(invalid)
+	fmt.Println(jf.Format(valid))
+	fmt.Println(jf.Format(invalid))
 
-	//using map
+	// using map
 	newValue := make(map[string]int)
 	newValue["value2"] = 10
 
-	jf.Print(newValue)
+	fmt.Println(jf.Format(newValue))
+
 	// Output:
-	// {"value":20}
-	// {"value":20}
-	// Only structs and maps values are accepted
-	// {"value2":10}
+	// {"value":20} <nil>
+	//  string ignored
+	// {"value":20} <nil>
+	//  string ignored
+	// {"value2":10} <nil>
 }
 
 func ExampleFormat() {
 	formatter.SetFormatter("text")
-	result, err := formatter.Format(TestStruct{5})
-	if err == nil {
-		fmt.Println("RESULT: ", result)
-	} else {
-		fmt.Println("ERROR: ", err)
-	}
-
+	fmt.Println(formatter.Format(TestStruct{5}))
 	formatter.SetFormatter("json")
-	result, err = formatter.Format(TestStruct{10})
-	if err == nil {
-		fmt.Println("RESULT: ", result)
-	} else {
-		fmt.Println("ERROR: ", err)
-	}
-	result, err = formatter.Format(5)
-	if err == nil {
-		if result == "" {
-			result = "<empty string>"
-			fmt.Println("RESULT: ", result)
-		} else {
-			fmt.Println("unexpected RESULT: ", result)
-		}
-	} else {
-		fmt.Sprintln("ERROR: ", err)
-	}
+	fmt.Println(formatter.Format(TestStruct{10}))
+	fmt.Println(formatter.Format(5))
 
 	// Output:
-	// RESULT:  VALUE = 5
-	// RESULT:  {"value":10}
-	// RESULT:  <empty string>
+	// VALUE = 5 <nil>
+	// {"value":10} <nil>
+	//  int ignored
 }
