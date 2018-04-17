@@ -121,9 +121,9 @@ func (l *Library) InstalledRelease() (*Release, error) {
 
 // Release represents a release of a library
 type Release struct {
-	Version  string `json:"version"`
-	Resource *releases.DownloadResource
-	Library  *Library
+	Version  string                     `json:"version"`
+	Resource *releases.DownloadResource `json:"resource"`
+	Library  *Library                   `json:"-"`
 }
 
 func (r *Release) String() string {
