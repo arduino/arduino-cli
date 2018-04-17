@@ -47,11 +47,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-/*
-NOTE: the use of func init() for test is discouraged, please create public InitFunctions and call them,
-	  or use (untested) cmd.PersistentPreRun or cmd.PreRun to reinitialize the flags and the commands every time.
-*/
-
 // Utility functions
 
 // Redirecting stdOut so we can analyze output line by

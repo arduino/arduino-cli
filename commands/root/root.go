@@ -125,9 +125,11 @@ var Command = &cobra.Command{
 
 func preRun(cmd *cobra.Command, args []string) {
 	// Reset logrus if debug flag changed.
-	if !commands.GlobalFlags.Debug { // Discard logrus output if no debug.
-		logrus.SetOutput(ioutil.Discard) // For standard logger.
-	} else { // Else print on stderr.
+	if !commands.GlobalFlags.Debug {
+		// Discard logrus output if no debug.
+		logrus.SetOutput(ioutil.Discard)
+	} else {
+		// Else print on stderr.
 		commands.ErrLogrus.Out = os.Stderr
 		formatter.SetLogger(commands.ErrLogrus)
 	}
