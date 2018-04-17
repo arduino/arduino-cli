@@ -36,7 +36,7 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 )
 
 func ResolveLibrary(ctx *types.Context, header string) *types.Library {

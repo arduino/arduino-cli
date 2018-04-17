@@ -30,9 +30,9 @@
 package compile
 
 import (
-	"github.com/bcmi-labs/arduino-cli/common/releases"
-	"github.com/bcmi-labs/arduino-cli/cores"
-	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
+	"github.com/bcmi-labs/arduino-cli/arduino/releases"
 )
 
 func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {

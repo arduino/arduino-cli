@@ -33,7 +33,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/arduino/releases"
 
 	"github.com/bcmi-labs/arduino-cli/configs"
 )

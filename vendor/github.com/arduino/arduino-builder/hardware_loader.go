@@ -32,7 +32,7 @@ package builder
 import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
 )
 
 type HardwareLoader struct{}

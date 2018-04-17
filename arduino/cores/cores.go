@@ -33,7 +33,7 @@ import (
 	"fmt"
 
 	properties "github.com/arduino/go-properties-map"
-	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/arduino/releases"
 
 	"github.com/blang/semver"
 )

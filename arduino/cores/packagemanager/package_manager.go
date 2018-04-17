@@ -35,9 +35,9 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/arduino/cores"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores/packageindex"
 	"github.com/bcmi-labs/arduino-cli/configs"
-	"github.com/bcmi-labs/arduino-cli/cores"
-	"github.com/bcmi-labs/arduino-cli/cores/packageindex"
 	"github.com/sirupsen/logrus"
 )
 

@@ -33,7 +33,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/libraries"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
 // VersionResult represents the output of the version commands.

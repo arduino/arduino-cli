@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/codeclysm/cc"

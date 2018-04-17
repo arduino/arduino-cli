@@ -33,9 +33,9 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/arduino/releases"
 
-	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 )
 
 // Index represents Cores and Tools struct as seen from package_index.json file.

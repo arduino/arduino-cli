@@ -3,7 +3,7 @@ package packagemanager_test
 import (
 	"testing"
 
-	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
 	"github.com/stretchr/testify/require"
 )
 

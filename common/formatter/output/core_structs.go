@@ -33,7 +33,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/bcmi-labs/arduino-cli/cores"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/gosuri/uitable"
 )
 

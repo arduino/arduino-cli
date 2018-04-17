@@ -6,6 +6,6 @@ pipeline:
   build:
     image: golang:latest
     commands:
-      - go build -o arduino
+      - go build
       - go test ./... -race
     secrets: [TEST_USERNAME, TEST_PASSWORD]

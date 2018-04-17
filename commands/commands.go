@@ -33,12 +33,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bcmi-labs/arduino-cli/arduino/sketches"
 	"github.com/bcmi-labs/arduino-cli/configs"
-	"github.com/bcmi-labs/arduino-cli/sketches"
 	sk "github.com/bcmi-labs/arduino-modules/sketches"
 
+	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
 	"github.com/sirupsen/logrus"
 )
 

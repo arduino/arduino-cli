@@ -37,8 +37,8 @@ import (
 	"strings"
 
 	properties "github.com/arduino/go-properties-map"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/configs"
-	"github.com/bcmi-labs/arduino-cli/cores"
 	"github.com/sirupsen/logrus"
 )
 

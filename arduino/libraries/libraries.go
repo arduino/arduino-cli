@@ -37,7 +37,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/common/releases"
+	"github.com/bcmi-labs/arduino-cli/arduino/releases"
 
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/blang/semver"

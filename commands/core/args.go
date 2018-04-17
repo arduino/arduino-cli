@@ -35,9 +35,10 @@ import (
 	"strings"
 
 	"os"
+
+	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/cores/packagemanager"
 )
 
 var coreTupleRegexp = regexp.MustCompile("[a-zA-Z0-9]+:[a-zA-Z0-9]+(=([0-9]|[0-9].)*[0-9]+)?")
