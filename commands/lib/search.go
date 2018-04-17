@@ -74,19 +74,19 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	message := output.LibSearchResults{
+	res := output.LibSearchResults{
 		Libraries: []*libraries.Library{},
 	}
 	for _, lib := range status.Libraries {
 		if strings.Contains(strings.ToLower(lib.Name), query) {
-			message.Libraries = append(message.Libraries, lib)
+			res.Libraries = append(res.Libraries, lib)
 		}
 	}
 
-	if len(message.Libraries) == 0 {
-		formatter.PrintErrorMessage(fmt.Sprintf("No library found matching `%s` search query", query))
+	if len(res.Libraries) == 0 {
+		formatter.Print(fmt.Sprintf("No library found matching `%s` search query", query))
 	} else {
-		formatter.Print(message)
+		formatter.Print(res)
 	}
 	logrus.Info("Done")
 }
