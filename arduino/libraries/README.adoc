@@ -1,6 +1,0 @@
-= Libraries package
-Alessandro Sanino <a.sanno@arduino.cc>
-
-This package allows to handle all libraries features for the CLI.
-
-Downloads are executed in parallel using `releases.ParallelDownload()` function.
