@@ -33,8 +33,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
+
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/common/formatter/pretty_print"
 	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -62,7 +64,7 @@ func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
 	//I use folder name
 	logrus.WithField("Name", fileName).Warn("Using filename to get result")
 	// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
-	libs.Libraries [fileName] = output.ProcessResult{
+	libs.Libraries[fileName] = output.ProcessResult{
 		ItemName: fileName,
 		Status:   "",
 		Error:    "Unknown Version",
@@ -71,19 +73,17 @@ func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
 
 func getLibStatusContext() (*libraries.StatusContext, error) {
 	var index libraries.Index
-	err := libraries.LoadIndex(&index)
-	if err != nil {
-		logrus.WithError(err).Warn("Error during index load, pretty printing error message and trying to recover")
-		status, err := prettyPrints.CorruptedLibIndexFix(index)
-		if err != nil {
-			logrus.WithError(err).Error("Did not recover, returning error")
-			return nil, err
+	if err := libraries.LoadIndex(&index); err != nil {
+		logrus.WithError(err).Warn("Error during index loading... try to download it again")
+		updateIndex()
+
+		if err := libraries.LoadIndex(&index); err != nil {
+			formatter.PrintError(err, "Error loading libraries index")
+			os.Exit(commands.ErrGeneric)
 		}
-		logrus.Warn("Recovered and status context created")
-		return &status, nil
 	}
 
-	logrus.Info("Creating status context")
+	logrus.Info("Creating libraries status context")
 	status := index.CreateStatusContext()
 	return &status, nil
 }

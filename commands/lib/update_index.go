@@ -30,7 +30,11 @@
 package lib
 
 import (
-	"github.com/bcmi-labs/arduino-cli/common/formatter/pretty_print"
+	"os"
+
+	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/libraries"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -50,6 +54,18 @@ var updateIndexCommand = &cobra.Command{
 
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Updating index")
-	updateTask := prettyPrints.DownloadLibFileIndex()
-	updateTask()
+	updateIndex()
+}
+
+func updateIndex() {
+	resp, err := libraries.DownloadLibrariesFile()
+	if err != nil {
+		formatter.PrintError(err, "Error downloading librarires index")
+		os.Exit(commands.ErrNetwork)
+	}
+	formatter.DownloadProgressBar(resp, "Updating index: library_index.json")
+	if resp.Err() != nil {
+		formatter.PrintError(resp.Err(), "Error downloading librarires index")
+		os.Exit(commands.ErrNetwork)
+	}
 }

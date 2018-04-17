@@ -30,15 +30,25 @@
 package libraries
 
 import (
+	"fmt"
 	"net/url"
 
-	"github.com/bcmi-labs/arduino-cli/common"
+	"github.com/cavaliercoder/grab"
 )
 
 // libraryIndexURL is the URL where to get library index.
 var libraryIndexURL, _ = url.Parse("http://downloads.arduino.cc/libraries/library_index.json")
 
 // DownloadLibrariesFile downloads the lib file from arduino repository.
-func DownloadLibrariesFile() error {
-	return common.DownloadIndex(IndexPath, libraryIndexURL)
+func DownloadLibrariesFile() (*grab.Response, error) {
+	path, err := IndexPath.Get()
+	if err != nil {
+		return nil, fmt.Errorf("getting library_index.json path: %s", err)
+	}
+	req, err := grab.NewRequest(path, libraryIndexURL.String())
+	if err != nil {
+		return nil, fmt.Errorf("creating HTTP request: %s", err)
+	}
+	client := grab.NewClient()
+	return client.Do(req), nil
 }

@@ -30,11 +30,13 @@
 package core
 
 import (
+	"net/url"
 	"os"
+	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/cavaliercoder/grab"
 
-	"github.com/bcmi-labs/arduino-cli/common"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/sirupsen/logrus"
@@ -56,20 +58,31 @@ var updateIndexCommand = &cobra.Command{
 
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Updating package index")
+	updateIndexes()
+}
 
-	failed := false
+func updateIndexes() {
 	for _, URL := range configs.BoardManagerAdditionalUrls {
-		formatter.Print("Downloading package index from " + URL.String())
-		coreIndexPath := configs.IndexPathFromURL(URL)
-		if err := common.DownloadIndex(coreIndexPath, URL); err != nil {
-			formatter.PrintError(err, "Can't download index file.")
-			failed = true
-		}
+		updateIndex(URL)
 	}
+}
 
-	if failed {
-		formatter.PrintErrorMessage("Error downloading package index, check your network connection")
+func updateIndex(URL *url.URL) {
+	coreIndexPath, err := configs.IndexPathFromURL(URL).Get()
+	if err != nil {
+		formatter.PrintError(err, "Error getting index path for "+URL.String())
+		os.Exit(commands.ErrGeneric)
+	}
+	req, err := grab.NewRequest(coreIndexPath, URL.String())
+	if err != nil {
+		formatter.PrintError(err, "Error downloading index "+URL.String())
 		os.Exit(commands.ErrNetwork)
 	}
-	formatter.Print("Download completed.")
+	client := grab.NewClient()
+	resp := client.Do(req)
+	formatter.DownloadProgressBar(resp, "Updating index: "+filepath.Base(coreIndexPath))
+	if resp.Err() != nil {
+		formatter.PrintError(resp.Err(), "Error downloading index "+URL.String())
+		os.Exit(commands.ErrNetwork)
+	}
 }
