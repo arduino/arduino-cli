@@ -172,6 +172,9 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 			continue
 		}
 		platformPath := filepath.Join(packageFolder, architecure)
+		if info, err := os.Stat(platformPath); err != nil || !info.IsDir() {
+			continue
+		}
 
 		// There are two possible platform folder structures:
 		// - ARCHITECTURE/boards.txt
