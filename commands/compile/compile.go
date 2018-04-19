@@ -199,6 +199,8 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.Verbose = flags.verbose
 	ctx.DebugLevel = flags.debugLevel
 
+	ctx.CoreBuildCachePath = filepath.Join(os.TempDir(), "arduino-core-cache")
+
 	ctx.USBVidPid = flags.vidPid
 	ctx.WarningsLevel = flags.warnings
 
