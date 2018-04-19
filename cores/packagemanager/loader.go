@@ -185,6 +185,13 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 			// case: ARCHITECTURE/boards.txt
 			// this is an unversioned Platform
 
+			// FIXME: this check is duplicated, find a better way to handle this
+			if _, err := os.Stat(filepath.Join(platformPath, "boards.txt")); err != nil && !os.IsNotExist(err) {
+				return fmt.Errorf("opening boards.txt: %s", err)
+			} else if os.IsNotExist(err) {
+				continue
+			}
+
 			platform := targetPackage.GetOrCreatePlatform(architecure)
 			release := platform.GetOrCreateRelease("")
 			if err := pm.loadPlatformRelease(release, platformPath); err != nil {
@@ -206,9 +213,14 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 				if !versionDir.IsDir() || strings.HasPrefix(version, ".") {
 					continue
 				}
-				release := platform.GetOrCreateRelease(version)
 				platformWithVersionPath := filepath.Join(platformPath, version)
+				if _, err := os.Stat(filepath.Join(platformWithVersionPath, "boards.txt")); err != nil && !os.IsNotExist(err) {
+					return fmt.Errorf("opening boards.txt: %s", err)
+				} else if os.IsNotExist(err) {
+					continue
+				}
 
+				release := platform.GetOrCreateRelease(version)
 				if err := pm.loadPlatformRelease(release, platformWithVersionPath); err != nil {
 					return fmt.Errorf("loading platform release %s: %s", version, err)
 				}
@@ -223,11 +235,6 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 }
 
 func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, folder string) error {
-	if _, err := os.Stat(filepath.Join(folder, "boards.txt")); err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("opening boards.txt: %s", err)
-	} else if os.IsNotExist(err) {
-		return fmt.Errorf("invalid platform directory %s: boards.txt not found", folder)
-	}
 	platform.Folder = folder
 
 	// Some useful paths
