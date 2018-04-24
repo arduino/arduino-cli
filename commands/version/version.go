@@ -37,18 +37,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Init prepares the command.
-func Init(rootCommand *cobra.Command) {
-	rootCommand.AddCommand(command)
-}
-
-var command = &cobra.Command{
-	Use:     "version",
-	Short:   "Shows version number of arduino CLI.",
-	Long:    "Shows version number of arduino CLI which is installed on your system.",
-	Example: "arduino version",
-	Args:    cobra.NoArgs,
-	Run:     run,
+// InitCommand prepares the command.
+func InitCommand() *cobra.Command {
+	versionCommand := &cobra.Command{
+		Use:     "version",
+		Short:   "Shows version number of arduino CLI.",
+		Long:    "Shows version number of arduino CLI which is installed on your system.",
+		Example: "arduino version",
+		Args:    cobra.NoArgs,
+		Run:     run,
+	}
+	return versionCommand
 }
 
 func run(cmd *cobra.Command, args []string) {

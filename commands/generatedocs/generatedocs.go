@@ -38,18 +38,17 @@ import (
 	"github.com/spf13/cobra/doc"
 )
 
-// Init prepares the command.
-func Init(rootCommand *cobra.Command) {
-	rootCommand.AddCommand(command)
-}
-
-var command = &cobra.Command{
-	Use:     "generate-docs",
-	Short:   "Generates documentation.",
-	Long:    "Generates bash autocompletion, command manpages and puts it into the docs folder.",
-	Example: "arduino generate-docs",
-	Args:    cobra.NoArgs,
-	Run:     run,
+// InitCommand prepares the command.
+func InitCommand() *cobra.Command {
+	var command = &cobra.Command{
+		Use:     "generate-docs",
+		Short:   "Generates documentation.",
+		Long:    "Generates bash autocompletion, command manpages and puts it into the docs folder.",
+		Example: "arduino generate-docs",
+		Args:    cobra.NoArgs,
+		Run:     run,
+	}
+	return command
 }
 
 func run(cmd *cobra.Command, args []string) {

@@ -33,17 +33,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Init prepares the command.
-func Init(rootCommand *cobra.Command) {
-	rootCommand.AddCommand(command)
-}
-
-var command = &cobra.Command{
-	Use:   "board",
-	Short: "Arduino board commands.",
-	Long:  "Arduino board commands.",
-	Example: "" +
-		"arduino board list                     # Lists all connected boards.\n" +
-		"arduino board attach --board serial:///dev/tty/ACM0 \\\n" +
-		"                     --sketch mySketch # Attaches a sketch to a board.",
+// InitCommand prepares the command.
+func InitCommand() *cobra.Command {
+	boardCommand := &cobra.Command{
+		Use:   "board",
+		Short: "Arduino board commands.",
+		Long:  "Arduino board commands.",
+		Example: "" +
+			"arduino board list                     # Lists all connected boards.\n" +
+			"arduino board attach --board serial:///dev/tty/ACM0 \\\n" +
+			"                     --sketch mySketch # Attaches a sketch to a board.",
+	}
+	boardCommand.AddCommand(initAttachCommand())
+	boardCommand.AddCommand(initListCommand())
+	return boardCommand
 }

@@ -42,18 +42,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Init prepares the command.
-func Init(rootCommand *cobra.Command) {
-	rootCommand.AddCommand(command)
-}
-
-var command = &cobra.Command{
-	Use:   "lib",
-	Short: "Arduino commands about libraries.",
-	Long:  "Arduino commands about libraries.",
-	Example: "" +
-		"arduino lib install YoutubeApi\n" +
-		"arduino lib update-index",
+// InitCommand prepares the command.
+func InitCommand() *cobra.Command {
+	libCommand := &cobra.Command{
+		Use:   "lib",
+		Short: "Arduino commands about libraries.",
+		Long:  "Arduino commands about libraries.",
+		Example: "" +
+			"arduino lib install YoutubeApi\n" +
+			"arduino lib update-index",
+	}
+	libCommand.AddCommand(initDownloadCommand())
+	libCommand.AddCommand(initInstallCommand())
+	libCommand.AddCommand(initListCommand())
+	libCommand.AddCommand(initSearchCommand())
+	libCommand.AddCommand(initUninstallCommand())
+	libCommand.AddCommand(initUpdateIndexCommand())
+	return libCommand
 }
 
 func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {

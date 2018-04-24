@@ -39,18 +39,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	command.AddCommand(listCommand)
-}
-
-var listCommand = &cobra.Command{
-	Use:   "list",
-	Short: "Shows the list of installed cores.",
-	Long: "Shows the list of installed cores.\n" +
-		"With -v tag (up to 2 times) can provide more verbose output.",
-	Example: "arduino core list -v # for a medium verbosity level.",
-	Args:    cobra.NoArgs,
-	Run:     runListCommand,
+func initListCommand() *cobra.Command {
+	listCommand := &cobra.Command{
+		Use:   "list",
+		Short: "Shows the list of installed cores.",
+		Long: "Shows the list of installed cores.\n" +
+			"With -v tag (up to 2 times) can provide more verbose output.",
+		Example: "arduino core list -v # for a medium verbosity level.",
+		Args:    cobra.NoArgs,
+		Run:     runListCommand,
+	}
+	return listCommand
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {

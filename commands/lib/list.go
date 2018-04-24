@@ -44,20 +44,19 @@ import (
 	"github.com/zieckey/goini"
 )
 
-func init() {
-	command.AddCommand(listCommand)
-}
-
-var listCommand = &cobra.Command{
-	Use:   "list",
-	Short: "Shows a list of all installed libraries.",
-	Long: "Shows a list of all installed libraries.\n" +
-		"Can be used with -v (or --verbose) flag (up to 2 times) to have longer output.",
-	Example: "" +
-		"arduino lib list    # to show all installed library names.\n" +
-		"arduino lib list -v # to show more details.",
-	Args: cobra.NoArgs,
-	Run:  runListCommand,
+func initListCommand() *cobra.Command {
+	listCommand := &cobra.Command{
+		Use:   "list",
+		Short: "Shows a list of all installed libraries.",
+		Long: "Shows a list of all installed libraries.\n" +
+			"Can be used with -v (or --verbose) flag (up to 2 times) to have longer output.",
+		Example: "" +
+			"arduino lib list    # to show all installed library names.\n" +
+			"arduino lib list -v # to show more details.",
+		Args: cobra.NoArgs,
+		Run:  runListCommand,
+	}
+	return listCommand
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {

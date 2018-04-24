@@ -46,13 +46,21 @@ import (
 	serial "go.bug.st/serial.v1"
 )
 
-// Init prepares the command.
-func Init(rootCommand *cobra.Command) {
-	rootCommand.AddCommand(command)
-	command.Flags().StringVarP(&flags.fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	command.Flags().StringVarP(&flags.port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
-	command.Flags().BoolVarP(&flags.verbose, "verify", "t", false, "Verify uploaded binary after the upload.")
-	command.Flags().BoolVarP(&flags.verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
+// InitCommand prepares the command.
+func InitCommand() *cobra.Command {
+	uploadCommand := &cobra.Command{
+		Use:     "upload",
+		Short:   "Upload Arduino sketches.",
+		Long:    "Upload Arduino sketches.",
+		Example: "arduino upload [sketchPath]",
+		Args:    cobra.MaximumNArgs(1),
+		Run:     run,
+	}
+	uploadCommand.Flags().StringVarP(&flags.fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	uploadCommand.Flags().StringVarP(&flags.port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
+	uploadCommand.Flags().BoolVarP(&flags.verbose, "verify", "t", false, "Verify uploaded binary after the upload.")
+	uploadCommand.Flags().BoolVarP(&flags.verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
+	return uploadCommand
 }
 
 var flags struct {
@@ -60,15 +68,6 @@ var flags struct {
 	port    string
 	verbose bool
 	verify  bool
-}
-
-var command = &cobra.Command{
-	Use:     "upload",
-	Short:   "Upload Arduino sketches.",
-	Long:    "Upload Arduino sketches.",
-	Example: "arduino upload [sketchPath]",
-	Args:    cobra.MaximumNArgs(1),
-	Run:     run,
 }
 
 func run(command *cobra.Command, args []string) {

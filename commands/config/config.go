@@ -29,17 +29,16 @@
 
 package config
 
-import (
-	"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
-// Init prepares the command.
-func Init(rootCommand *cobra.Command) {
-	rootCommand.AddCommand(command)
-}
-
-var command = &cobra.Command{
-	Use:     "config",
-	Short:   "Arduino Configuration Commands.",
-	Example: "arduino config init",
+// InitCommand prepares the command.
+func InitCommand() *cobra.Command {
+	configCommand := &cobra.Command{
+		Use:     "config",
+		Short:   "Arduino Configuration Commands.",
+		Example: "arduino config init",
+	}
+	configCommand.AddCommand(initDumpCommand())
+	configCommand.AddCommand(initInitCommand())
+	return configCommand
 }

@@ -39,26 +39,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	command.AddCommand(initCommand)
+func initInitCommand() *cobra.Command {
+	initCommand := &cobra.Command{
+		Use:   "init",
+		Short: "Initializes a new config file into the default location.",
+		Long:  "Initializes a new config file into the default location ($EXE_DIR/cli-config.yml).",
+		Example: "" +
+			"arduino config init           # Creates a config file by asking questions to the user into the default location.\n" +
+			"arduino config init --default # Creates a config file with default configuration into default location.",
+		Args: cobra.NoArgs,
+		Run:  runInitCommand,
+	}
 	initCommand.Flags().BoolVar(&initFlags._default, "default", false, "If omitted, ask questions to the user about setting configuration properties, otherwise use default configuration.")
 	initCommand.Flags().StringVar(&initFlags.location, "save-as", "", "Sets where to save the configuration file [default is ./.cli-config.yml].")
+	return initCommand
 }
 
 var initFlags struct {
 	_default bool   // If false, ask questions to the user about setting configuration properties, otherwise use default configuration.
 	location string // The custom location of the file to create.
-}
-
-var initCommand = &cobra.Command{
-	Use:   "init",
-	Short: "Initializes a new config file into the default location.",
-	Long:  "Initializes a new config file into the default location ($EXE_DIR/cli-config.yml).",
-	Example: "" +
-		"arduino config init           # Creates a config file by asking questions to the user into the default location.\n" +
-		"arduino config init --default # Creates a config file with default configuration into default location.",
-	Args: cobra.NoArgs,
-	Run:  runInitCommand,
 }
 
 func runInitCommand(cmd *cobra.Command, args []string) {

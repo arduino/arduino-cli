@@ -60,22 +60,21 @@ const (
 	prioritySkip       = "skip"
 )
 
-func init() {
-	command.AddCommand(syncCommand)
+func initSyncCommand() *cobra.Command {
+	syncCommand := &cobra.Command{
+		Use:     "sync",
+		Short:   "Arduino CLI Sketch Commands.",
+		Long:    "Arduino CLI Sketch Commands.",
+		Example: "arduino sketch sync",
+		Args:    cobra.NoArgs,
+		Run:     runSyncCommand,
+	}
 	syncCommand.Flags().StringVar(&syncFlags.priority, "conflict-policy", prioritySkip, "The decision made by default on conflicting sketches. Can be push-local, pull-remote, skip, ask-once, ask-always.")
+	return syncCommand
 }
 
 var syncFlags struct {
 	priority string // The decisive resource when we have conflicts. Can be local, remote, skip-conflict.
-}
-
-var syncCommand = &cobra.Command{
-	Use:     "sync",
-	Short:   "Arduino CLI Sketch Commands.",
-	Long:    "Arduino CLI Sketch Commands.",
-	Example: "arduino sketch sync",
-	Args:    cobra.NoArgs,
-	Run:     runSyncCommand,
 }
 
 func runSyncCommand(cmd *cobra.Command, args []string) {

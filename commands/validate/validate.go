@@ -43,18 +43,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Init prepares the command.
-func Init(rootCommand *cobra.Command) {
-	rootCommand.AddCommand(command)
-}
-
-var command = &cobra.Command{
-	Use:     "validate",
-	Short:   "Validates Arduino installation.",
-	Long:    "Checks installed cores and tools for corruption.",
-	Example: "arduino validate",
-	Args:    cobra.NoArgs,
-	Run:     run,
+// InitCommand prepares the command.
+func InitCommand() *cobra.Command {
+	var validateCommand = &cobra.Command{
+		Use:     "validate",
+		Short:   "Validates Arduino installation.",
+		Long:    "Checks installed cores and tools for corruption.",
+		Example: "arduino validate",
+		Args:    cobra.NoArgs,
+		Run:     run,
+	}
+	return validateCommand
 }
 
 func run(cmd *cobra.Command, args []string) {

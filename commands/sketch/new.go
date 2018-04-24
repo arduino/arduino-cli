@@ -40,17 +40,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	command.AddCommand(newCommand)
-}
-
-var newCommand = &cobra.Command{
-	Use:     "new",
-	Short:   "Create a new Sketch",
-	Long:    "Create a new Sketch",
-	Example: "arduino sketch new MultiBlinker",
-	Args:    cobra.ExactArgs(1),
-	Run:     runNewCommand,
+func initNewCommand() *cobra.Command {
+	newCommand := &cobra.Command{
+		Use:     "new",
+		Short:   "Create a new Sketch",
+		Long:    "Create a new Sketch",
+		Example: "arduino sketch new MultiBlinker",
+		Args:    cobra.ExactArgs(1),
+		Run:     runNewCommand,
+	}
+	return newCommand
 }
 
 var emptySketch = []byte(`

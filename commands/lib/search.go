@@ -42,25 +42,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	command.AddCommand(searchCommand)
+func initSearchCommand() *cobra.Command {
+	searchCommand := &cobra.Command{
+		Use:   "search [LIBRARY_NAME]",
+		Short: "Searchs for one or more libraries data.",
+		Long:  "Search for one or more libraries data (case insensitive search).",
+		Example: "" +
+			"arduino lib search You # to show all libraries containing \"You\" in their name (case insensitive).\n" +
+			"YoumadeIt\n" +
+			"YoutubeApi",
+		Args: cobra.ArbitraryArgs,
+		Run:  runSearchCommand,
+	}
 	searchCommand.Flags().BoolVar(&searchFlags.names, "names", false, "Show library names only.")
+	return searchCommand
 }
 
 var searchFlags struct {
 	names bool // if true outputs lib names only.
-}
-
-var searchCommand = &cobra.Command{
-	Use:   "search [LIBRARY_NAME]",
-	Short: "Searchs for one or more libraries data.",
-	Long:  "Search for one or more libraries data (case insensitive search).",
-	Example: "" +
-		"arduino lib search You # to show all libraries containing \"You\" in their name (case insensitive).\n" +
-		"YoumadeIt\n" +
-		"YoutubeApi",
-	Args: cobra.ArbitraryArgs,
-	Run:  runSearchCommand,
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {

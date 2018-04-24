@@ -50,9 +50,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Init prepares the command.
-func Init(rootCommand *cobra.Command) {
-	rootCommand.AddCommand(command)
+// InitCommand prepares the command.
+func InitCommand() *cobra.Command {
+	command := &cobra.Command{
+		Use:     "compile",
+		Short:   "Compiles Arduino sketches.",
+		Long:    "Compiles Arduino sketches.",
+		Example: "arduino compile [sketchPath]",
+		Args:    cobra.MaximumNArgs(1),
+		Run:     run,
+	}
 	command.Flags().StringVarP(&flags.fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
 	command.Flags().BoolVar(&flags.showProperties, "show-properties", false, "Show all build properties used instead of compiling.")
 	command.Flags().BoolVar(&flags.preprocess, "preprocess", false, "Print preprocessed code to stdout instead of compiling.")
@@ -64,6 +71,7 @@ func Init(rootCommand *cobra.Command) {
 	command.Flags().BoolVar(&flags.quiet, "quiet", false, "Optional, supresses almost every output.")
 	command.Flags().IntVar(&flags.debugLevel, "debug-level", 5, "Optional, defaults to 5. Used for debugging. Set it to 10 when submitting an issue.")
 	command.Flags().StringVar(&flags.vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if boards supports them.")
+	return command
 }
 
 var flags struct {
@@ -78,15 +86,6 @@ var flags struct {
 	quiet           bool     // Supresses almost every output.
 	debugLevel      int      // Used for debugging.
 	vidPid          string   // VID/PID specific build properties.
-}
-
-var command = &cobra.Command{
-	Use:     "compile",
-	Short:   "Compiles Arduino sketches.",
-	Long:    "Compiles Arduino sketches.",
-	Example: "arduino compile [sketchPath]",
-	Args:    cobra.MaximumNArgs(1),
-	Run:     run,
 }
 
 func run(cmd *cobra.Command, args []string) {

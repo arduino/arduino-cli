@@ -87,34 +87,32 @@ const (
 	}`
 )
 
-// Init prepares the command.
-func Init() {
-
-	Command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
-	Command.PersistentFlags().StringVar(&commands.GlobalFlags.Format, "format", "text", "The output format, can be [text|json].")
-	Command.PersistentFlags().StringVar(&configs.ConfigFilePath, "config-file", configs.ConfigFilePath, "The custom config file (if not specified ./.cli-config.yml will be used).")
-	board.Init(Command)
-	compile.Init(Command)
-	config.Init(Command)
-	core.Init(Command)
-	generatedocs.Init(Command)
-	lib.Init(Command)
-	login.Init(Command)
-	logout.Init(Command)
-	sketch.Init(Command)
-	upload.Init(Command)
-	validate.Init(Command)
-	version.Init(Command)
-}
-
-// Command represents the base command when called without any subcommands.
-var Command = &cobra.Command{
-	Use:                    "arduino",
-	Short:                  "Arduino CLI.",
-	Long:                   "Arduino Create Command Line Interface (arduino-cli).",
-	Example:                "arduino generate-docs # To generate the docs and autocompletion for the whole CLI.",
-	BashCompletionFunction: bashAutoCompletionFunction,
-	PersistentPreRun:       preRun,
+// Init prepares the cobra root command.
+func Init() *cobra.Command {
+	command := &cobra.Command{
+		Use:                    "arduino",
+		Short:                  "Arduino CLI.",
+		Long:                   "Arduino Create Command Line Interface (arduino-cli).",
+		Example:                "arduino generate-docs # To generate the docs and autocompletion for the whole CLI.",
+		BashCompletionFunction: bashAutoCompletionFunction,
+		PersistentPreRun:       preRun,
+	}
+	command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
+	command.PersistentFlags().StringVar(&commands.GlobalFlags.Format, "format", "text", "The output format, can be [text|json].")
+	command.PersistentFlags().StringVar(&configs.ConfigFilePath, "config-file", configs.ConfigFilePath, "The custom config file (if not specified ./.cli-config.yml will be used).")
+	command.AddCommand(board.InitCommand())
+	command.AddCommand(compile.InitCommand())
+	command.AddCommand(config.InitCommand())
+	command.AddCommand(core.InitCommand())
+	command.AddCommand(generatedocs.InitCommand())
+	command.AddCommand(lib.InitCommand())
+	command.AddCommand(login.InitCommand())
+	command.AddCommand(logout.InitCommand())
+	command.AddCommand(sketch.InitCommand())
+	command.AddCommand(upload.InitCommand())
+	command.AddCommand(validate.InitCommand())
+	command.AddCommand(version.InitCommand())
+	return command
 }
 
 func preRun(cmd *cobra.Command, args []string) {

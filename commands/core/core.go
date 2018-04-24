@@ -33,14 +33,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Init prepares the command.
-func Init(rootCommand *cobra.Command) {
-	rootCommand.AddCommand(command)
-}
-
-var command = &cobra.Command{
-	Use:     "core",
-	Short:   "Arduino Core operations.",
-	Long:    "Arduino Core operations.",
-	Example: "arduino core update-index # to update the package index file.",
+// InitCommand prepares the command.
+func InitCommand() *cobra.Command {
+	coreCommand := &cobra.Command{
+		Use:     "core",
+		Short:   "Arduino Core operations.",
+		Long:    "Arduino Core operations.",
+		Example: "arduino core update-index # to update the package index file.",
+	}
+	coreCommand.AddCommand(initDownloadCommand())
+	coreCommand.AddCommand(initInstallCommand())
+	coreCommand.AddCommand(initListCommand())
+	coreCommand.AddCommand(initUpdateIndexCommand())
+	return coreCommand
 }

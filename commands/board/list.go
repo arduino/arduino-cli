@@ -17,22 +17,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	command.AddCommand(listCommand)
+func initListCommand() *cobra.Command {
+	listCommand := &cobra.Command{
+		Use:     "list",
+		Short:   "List connected boards.",
+		Long:    "Detects and displays a list of connected boards to the current computer.",
+		Example: "arduino board list --timeout 10s",
+		Args:    cobra.NoArgs,
+		Run:     runListCommand,
+	}
 	listCommand.Flags().StringVar(&listFlags.timeout, "timeout", "5s", "The timeout of the search of connected devices, try to high it if your board is not found (e.g. to 10s).")
+	return listCommand
 }
 
 var listFlags struct {
 	timeout string // Expressed in a parsable duration, is the timeout for the list and attach commands.
-}
-
-var listCommand = &cobra.Command{
-	Use:     "list",
-	Short:   "List connected boards.",
-	Long:    "Detects and displays a list of connected boards to the current computer.",
-	Example: "arduino board list --timeout 10s",
-	Args:    cobra.NoArgs,
-	Run:     runListCommand,
 }
 
 // runListCommand detects and lists the connected arduino boards

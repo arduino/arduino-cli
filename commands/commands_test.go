@@ -35,7 +35,6 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
@@ -88,11 +87,6 @@ func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte)
 
 	t.Logf("Running: %s", args)
 
-	// Init only once.
-	if !root.Command.HasFlags() {
-		root.Init()
-	}
-	root.Command.SetArgs(args)
 
 	// Mock the os.Exit function, so that we can use the
 	// error result for the test and prevent the test from exiting
@@ -114,7 +108,9 @@ func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte)
 	}()
 
 	// Execute the CLI command, in this process
-	root.Command.Execute()
+	cmd := root.Init()
+	cmd.SetArgs(args)
+	cmd.Execute()
 
 	exitCode = 0
 	output = redirect.GetOutput()

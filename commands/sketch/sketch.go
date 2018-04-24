@@ -33,14 +33,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Init prepares the command.
-func Init(rootCommand *cobra.Command) {
-	rootCommand.AddCommand(command)
-}
-
-var command = &cobra.Command{
-	Use:     "sketch",
-	Short:   "Arduino CLI Sketch Commands.",
-	Long:    "Arduino CLI Sketch Commands.",
-	Example: "arduino sketch sync",
+// InitCommand prepares the command.
+func InitCommand() *cobra.Command {
+	sketchCommand := &cobra.Command{
+		Use:     "sketch",
+		Short:   "Arduino CLI Sketch Commands.",
+		Long:    "Arduino CLI Sketch Commands.",
+		Example: "arduino sketch sync",
+	}
+	sketchCommand.AddCommand(initNewCommand())
+	sketchCommand.AddCommand(initSyncCommand())
+	return sketchCommand
 }

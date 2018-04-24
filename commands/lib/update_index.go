@@ -39,17 +39,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	command.AddCommand(updateIndexCommand)
-}
-
-var updateIndexCommand = &cobra.Command{
-	Use:     "update-index",
-	Short:   "Updates the libraries index.",
-	Long:    "Updates the libraries index to the latest version.",
-	Example: "arduino lib update-index",
-	Args:    cobra.NoArgs,
-	Run:     runUpdateIndexCommand,
+func initUpdateIndexCommand() *cobra.Command {
+	updateIndexCommand := &cobra.Command{
+		Use:     "update-index",
+		Short:   "Updates the libraries index.",
+		Long:    "Updates the libraries index to the latest version.",
+		Example: "arduino lib update-index",
+		Args:    cobra.NoArgs,
+		Run:     runUpdateIndexCommand,
+	}
+	return updateIndexCommand
 }
 
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {

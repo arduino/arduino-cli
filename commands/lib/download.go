@@ -39,19 +39,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	command.AddCommand(downloadCommand)
-}
-
-var downloadCommand = &cobra.Command{
-	Use:   "download [LIBRARY_NAME(S)]",
-	Short: "Downloads one or more libraries without installing them.",
-	Long:  "Downloads one or more libraries without installing them.",
-	Example: "" +
-		"arduino lib download YoutubeApi       # for the latest version.\n" +
-		"arduino lib download YoutubeApi@1.0.0 # for a specific version (in this case 1.0.0).",
-	Args: cobra.MinimumNArgs(1),
-	Run:  runDownloadCommand,
+func initDownloadCommand() *cobra.Command {
+	downloadCommand := &cobra.Command{
+		Use:   "download [LIBRARY_NAME(S)]",
+		Short: "Downloads one or more libraries without installing them.",
+		Long:  "Downloads one or more libraries without installing them.",
+		Example: "" +
+			"arduino lib download YoutubeApi       # for the latest version.\n" +
+			"arduino lib download YoutubeApi@1.0.0 # for a specific version (in this case 1.0.0).",
+		Args: cobra.MinimumNArgs(1),
+		Run:  runDownloadCommand,
+	}
+	return downloadCommand
 }
 
 func runDownloadCommand(cmd *cobra.Command, args []string) {

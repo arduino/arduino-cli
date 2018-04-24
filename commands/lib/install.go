@@ -39,19 +39,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	command.AddCommand(installCommand)
-}
-
-var installCommand = &cobra.Command{
-	Use:   "install LIBRARY[@VERSION_NUMBER](S)",
-	Short: "Installs one of more specified libraries into the system.",
-	Long:  "Installs one or more specified libraries into the system.",
-	Example: "" +
-		"arduino lib install YoutubeApi       # for the latest version.\n" +
-		"arduino lib install YoutubeApi@1.0.0 # for the specific version (in this case 1.0.0).",
-	Args: cobra.MinimumNArgs(1),
-	Run:  runInstallCommand,
+func initInstallCommand() *cobra.Command {
+	installCommand := &cobra.Command{
+		Use:   "install LIBRARY[@VERSION_NUMBER](S)",
+		Short: "Installs one of more specified libraries into the system.",
+		Long:  "Installs one or more specified libraries into the system.",
+		Example: "" +
+			"arduino lib install YoutubeApi       # for the latest version.\n" +
+			"arduino lib install YoutubeApi@1.0.0 # for the specific version (in this case 1.0.0).",
+		Args: cobra.MinimumNArgs(1),
+		Run:  runInstallCommand,
+	}
+	return installCommand
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {

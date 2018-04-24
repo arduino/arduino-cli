@@ -40,22 +40,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	command.AddCommand(dumpCommand)
+func initDumpCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:     "dump",
+		Short:   "Prints the current configuration",
+		Long:    "Prints the current configuration.",
+		Example: "arduino config dump",
+		Args:    cobra.NoArgs,
+		Run:     runDumpCommand,
+	}
 }
 
 var dumpFlags struct {
 	_default bool   // If false, ask questions to the user about setting configuration properties, otherwise use default configuration.
 	location string // The custom location of the file to create.
-}
-
-var dumpCommand = &cobra.Command{
-	Use:     "dump",
-	Short:   "Prints the current configuration",
-	Long:    "Prints the current configuration.",
-	Example: "arduino config dump",
-	Args:    cobra.NoArgs,
-	Run:     runDumpCommand,
 }
 
 func runDumpCommand(cmd *cobra.Command, args []string) {

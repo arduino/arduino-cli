@@ -42,18 +42,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Init prepares the command.
-func Init(rootCommand *cobra.Command) {
-	rootCommand.AddCommand(command)
-}
-
-var command = &cobra.Command{
-	Use:     "logout",
-	Short:   "Clears credentials for the Arduino Create Session.",
-	Long:    "Clears credentials for the Arduino Create Session.",
-	Example: "arduino logout",
-	Args:    cobra.NoArgs,
-	Run:     run,
+// InitCommand prepares the command.
+func InitCommand() *cobra.Command {
+	logoutCommand := &cobra.Command{
+		Use:     "logout",
+		Short:   "Clears credentials for the Arduino Create Session.",
+		Long:    "Clears credentials for the Arduino Create Session.",
+		Example: "arduino logout",
+		Args:    cobra.NoArgs,
+		Run:     run,
+	}
+	return logoutCommand
 }
 
 func run(cmd *cobra.Command, args []string) {

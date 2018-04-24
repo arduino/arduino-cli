@@ -50,24 +50,23 @@ var validSerialBoardURIRegexp = regexp.MustCompile("(serial|tty)://.+")
 var validNetworkBoardURIRegexp = regexp.MustCompile("(http(s)?|(tc|ud)p)://[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:[0-9]{1,5}")
 var validFQBN = regexp.MustCompile(".+:.+:.+")
 
-func init() {
-	command.AddCommand(attachCommand)
+func initAttachCommand() *cobra.Command {
+	attachCommand := &cobra.Command{
+		Use:     "attach <port>|<FQBN> [sketchPath]",
+		Short:   "Attaches a sketch to a board.",
+		Long:    "Attaches a sketch to a board.",
+		Example: "arduino board attach serial:///dev/tty/ACM0",
+		Args:    cobra.RangeArgs(1, 2),
+		Run:     runAttachCommand,
+	}
 	attachCommand.Flags().StringVar(&attachFlags.boardFlavour, "flavour", "default", "The Name of the CPU flavour, it is required for some boards (e.g. Arduino Nano).")
 	attachCommand.Flags().StringVar(&attachFlags.searchTimeout, "timeout", "5s", "The timeout of the search of connected devices, try to high it if your board is not found (e.g. to 10s).")
+	return attachCommand
 }
 
 var attachFlags struct {
 	boardFlavour  string // The flavour of the chipset of the cpu of the connected board, if not specified it is set to "default".
 	searchTimeout string // Expressed in a parsable duration, is the timeout for the list and attach commands.
-}
-
-var attachCommand = &cobra.Command{
-	Use:     "attach <port>|<FQBN> [sketchPath]",
-	Short:   "Attaches a sketch to a board.",
-	Long:    "Attaches a sketch to a board.",
-	Example: "arduino board attach serial:///dev/tty/ACM0",
-	Args:    cobra.RangeArgs(1, 2),
-	Run:     runAttachCommand,
 }
 
 func runAttachCommand(cmd *cobra.Command, args []string) {

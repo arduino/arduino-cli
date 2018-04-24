@@ -51,17 +51,16 @@ const (
 	versionLatest string = "latest"
 )
 
-func init() {
-	command.AddCommand(uninstallCommand)
-}
-
-var uninstallCommand = &cobra.Command{
-	Use:     "uninstall LIBRARY_NAME(S)",
-	Short:   "Uninstalls one or more libraries.",
-	Long:    "Uninstalls one or more libraries.",
-	Example: "arduino uninstall YoutubeApi",
-	Args:    cobra.MinimumNArgs(1),
-	Run:     runUninstallCommand,
+func initUninstallCommand() *cobra.Command {
+	uninstallCommand := &cobra.Command{
+		Use:     "uninstall LIBRARY_NAME(S)",
+		Short:   "Uninstalls one or more libraries.",
+		Long:    "Uninstalls one or more libraries.",
+		Example: "arduino uninstall YoutubeApi",
+		Args:    cobra.MinimumNArgs(1),
+		Run:     runUninstallCommand,
+	}
+	return uninstallCommand
 }
 
 func runUninstallCommand(cmd *cobra.Command, args []string) {

@@ -47,21 +47,20 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-// Init prepares the command.
-func Init(rootCommand *cobra.Command) {
-	rootCommand.AddCommand(command)
-}
-
-var command = &cobra.Command{
-	Use:   "login [username] [password]",
-	Short: "Creates default credentials for an Arduino Create Session.",
-	Long:  "Creates default credentials for an Arduino Create Session.",
-	Example: "" +
-		"arduino login                          # Asks for all credentials.\n" +
-		"arduino login myUser MySecretPassword  # Provide all credentials.\n" +
-		"arduino login myUser                   # Asks for just the password instead of having it in clear.",
-	Args: cobra.RangeArgs(0, 2),
-	Run:  run,
+// InitCommand prepares the command.
+func InitCommand() *cobra.Command {
+	loginCommand := &cobra.Command{
+		Use:   "login [username] [password]",
+		Short: "Creates default credentials for an Arduino Create Session.",
+		Long:  "Creates default credentials for an Arduino Create Session.",
+		Example: "" +
+			"arduino login                          # Asks for all credentials.\n" +
+			"arduino login myUser MySecretPassword  # Provide all credentials.\n" +
+			"arduino login myUser                   # Asks for just the password instead of having it in clear.",
+		Args: cobra.RangeArgs(0, 2),
+		Run:  run,
+	}
+	return loginCommand
 }
 
 func run(cmd *cobra.Command, args []string) {

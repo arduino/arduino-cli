@@ -40,19 +40,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	command.AddCommand(downloadCommand)
-}
-
-var downloadCommand = &cobra.Command{
-	Use:   "download [PACKAGER:ARCH[=VERSION]](S)",
-	Short: "Downloads one or more cores and corresponding tool dependencies.",
-	Long:  "Downloads one or more cores and corresponding tool dependencies.",
-	Example: "" +
-		"arduino core download arduino:samd       # to download the latest version of arduino SAMD core.\n" +
-		"arduino core download arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
-	Args: cobra.MinimumNArgs(1),
-	Run:  runDownloadCommand,
+func initDownloadCommand() *cobra.Command {
+	downloadCommand := &cobra.Command{
+		Use:   "download [PACKAGER:ARCH[=VERSION]](S)",
+		Short: "Downloads one or more cores and corresponding tool dependencies.",
+		Long:  "Downloads one or more cores and corresponding tool dependencies.",
+		Example: "" +
+			"arduino core download arduino:samd       # to download the latest version of arduino SAMD core.\n" +
+			"arduino core download arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
+		Args: cobra.MinimumNArgs(1),
+		Run:  runDownloadCommand,
+	}
+	return downloadCommand
 }
 
 func runDownloadCommand(cmd *cobra.Command, args []string) {
