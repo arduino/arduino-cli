@@ -47,39 +47,44 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Utility functions
-
 // Redirecting stdOut so we can analyze output line by
 // line and check with what we want.
 var stdOut *os.File = os.Stdout
 
-func createTempRedirect(t *testing.T) *os.File {
+type stdOutRedirect struct {
+	tempFile *os.File
+	t        *testing.T
+}
+
+func (grabber *stdOutRedirect) Open(t *testing.T) {
 	tempFile, err := ioutil.TempFile(os.TempDir(), "test")
 	require.NoError(t, err, "Opening temp output file")
 	os.Stdout = tempFile
-	return tempFile
+	grabber.tempFile = tempFile
+	grabber.t = t
 }
 
-func readTempRedirectOutput(t *testing.T, tempFile *os.File) []byte {
-	_, err := tempFile.Seek(0, 0)
-	require.NoError(t, err, "Rewinding temp output file")
-	d, err := ioutil.ReadAll(tempFile)
-	require.NoError(t, err, "Reading temp output file")
-	return d
+func (grabber *stdOutRedirect) GetOutput() []byte {
+	_, err := grabber.tempFile.Seek(0, 0)
+	require.NoError(grabber.t, err, "Rewinding temp output file")
+	output, err := ioutil.ReadAll(grabber.tempFile)
+	require.NoError(grabber.t, err, "Reading temp output file")
+	return output
 }
 
-func cleanTempRedirect(t *testing.T, tempFile *os.File) {
-	tempFile.Close()
-	err := os.Remove(tempFile.Name())
-	assert.NoError(t, err, "Removing temp output file")
+func (grabber *stdOutRedirect) Close() {
+	grabber.tempFile.Close()
+	err := os.Remove(grabber.tempFile.Name())
+	assert.NoError(grabber.t, err, "Removing temp output file")
 	os.Stdout = stdOut
 }
 
 // executeWithArgs executes the Cobra Command with the given arguments
 // and intercepts any errors (even `os.Exit()` ones), returning the exit code
 func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte) {
-	tempFile := createTempRedirect(t)
-	defer cleanTempRedirect(t, tempFile)
+	redirect := &stdOutRedirect{}
+	redirect.Open(t)
+	defer redirect.Close()
 
 	t.Logf("Running: %s", args)
 
@@ -94,7 +99,7 @@ func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte)
 	fakeExitFired := false
 	fakeExit := func(code int) {
 		exitCode = code
-		output = readTempRedirectOutput(t, tempFile)
+		output = redirect.GetOutput()
 		fakeExitFired = true
 
 		// use panic to exit and jump to deferred recover
@@ -112,7 +117,7 @@ func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte)
 	root.Command.Execute()
 
 	exitCode = 0
-	output = readTempRedirectOutput(t, tempFile)
+	output = redirect.GetOutput()
 	return
 }
 
