@@ -55,21 +55,32 @@ var stdOut *os.File = os.Stdout
 
 func createTempRedirect(t *testing.T) *os.File {
 	tempFile, err := ioutil.TempFile(os.TempDir(), "test")
-	require.NoError(t, err, "Opening temp file")
+	require.NoError(t, err, "Opening temp output file")
 	os.Stdout = tempFile
 	return tempFile
+}
+
+func readTempRedirectOutput(t *testing.T, tempFile *os.File) []byte {
+	_, err := tempFile.Seek(0, 0)
+	require.NoError(t, err, "Rewinding temp output file")
+	d, err := ioutil.ReadAll(tempFile)
+	require.NoError(t, err, "Reading temp output file")
+	return d
 }
 
 func cleanTempRedirect(t *testing.T, tempFile *os.File) {
 	tempFile.Close()
 	err := os.Remove(tempFile.Name())
-	assert.NoError(t, err, "Removing temp file")
+	assert.NoError(t, err, "Removing temp output file")
 	os.Stdout = stdOut
 }
 
 // executeWithArgs executes the Cobra Command with the given arguments
 // and intercepts any errors (even `os.Exit()` ones), returning the exit code
-func executeWithArgs(t *testing.T, args ...string) (exitCode int) {
+func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte) {
+	tempFile := createTempRedirect(t)
+	defer cleanTempRedirect(t, tempFile)
+
 	t.Logf("Running: %s", args)
 
 	// Init only once.
@@ -83,7 +94,9 @@ func executeWithArgs(t *testing.T, args ...string) (exitCode int) {
 	fakeExitFired := false
 	fakeExit := func(code int) {
 		exitCode = code
+		output = readTempRedirectOutput(t, tempFile)
 		fakeExitFired = true
+
 		// use panic to exit and jump to deferred recover
 		panic(fmt.Errorf("os.Exit(%d)", code))
 	}
@@ -98,14 +111,14 @@ func executeWithArgs(t *testing.T, args ...string) (exitCode int) {
 	// Execute the CLI command, in this process
 	root.Command.Execute()
 
-	return 0
+	exitCode = 0
+	output = readTempRedirectOutput(t, tempFile)
+	return
 }
 
 // END -- Utility functions
 
 func TestLibSearchSuccessful(t *testing.T) {
-	tempFile := createTempRedirect(t)
-	defer cleanTempRedirect(t, tempFile)
 	want := []string{
 		//`"YouMadeIt"`,
 		//`"YoutubeApi"`,
@@ -113,19 +126,16 @@ func TestLibSearchSuccessful(t *testing.T) {
 	}
 
 	// arduino lib search you
-	//executeWithArgsNoError(t, "lib", "search", "you") //test not working on drone, but working locally
-	// arduino lib search youtu --format json
-	// arduino lib search youtu --format=json
-	exitCode := executeWithArgs(t, "lib", "search", "youtu", "--format", "json", "--names")
+	executeWithArgs(t, "lib", "search", "you")
+
+	// arduino lib search audiozer --format json --names
+	exitCode, output := executeWithArgs(t, "lib", "search", "audiozer", "--format", "json", "--names")
 	require.Equal(t, 0, exitCode, "exit code")
 
-	checkOutput(t, want, tempFile)
+	checkOutput(t, want, output)
 }
 
 func TestLibDownloadSuccessful(t *testing.T) {
-	tempFile := createTempRedirect(t)
-	defer cleanTempRedirect(t, tempFile)
-
 	// getting the paths to create the want path of the want object.
 	stagingFolder, err := configs.DownloadCacheFolder("libraries").Get()
 	require.NoError(t, err, "Getting cache folder")
@@ -145,14 +155,8 @@ func TestLibDownloadSuccessful(t *testing.T) {
 		librariesArgs = append(librariesArgs, libraryKey)
 	}
 
-	exitCode := executeWithArgs(t, append(append([]string{"lib", "download"}, librariesArgs...), "--format", "json")...)
+	exitCode, d := executeWithArgs(t, append(append([]string{"lib", "download"}, librariesArgs...), "--format", "json")...)
 	require.Equal(t, 0, exitCode, "exit code")
-
-	// read output
-	_, err = tempFile.Seek(0, 0)
-	require.NoError(t, err, "Rewinding output file")
-	d, err := ioutil.ReadAll(tempFile)
-	require.NoError(t, err, "Reading output file")
 
 	var have output.LibProcessResults
 	err = json.Unmarshal(d, &have)
@@ -283,12 +287,8 @@ func TestCoreDownloadBadArgument(t *testing.T) {
 
 func testCoreDownload(t *testing.T, want output.CoreProcessResults, handleResults func(err error, stdOut []byte)) {
 	// run a "core update-index" to download the package_index.json
-	exitCode := executeWithArgs(t, "core", "update-index")
+	exitCode, _ := executeWithArgs(t, "core", "update-index")
 	require.Equal(t, 0, exitCode, "exit code")
-
-	// start output capture
-	tempFile := createTempRedirect(t)
-	defer cleanTempRedirect(t, tempFile)
 
 	// core download arduino:samd=1.6.16 unparsablearg arduino:sam=notexistingversion arduino:sam=1.0.0 --format json
 	coresArgs := []string{"core", "download"}
@@ -296,29 +296,18 @@ func testCoreDownload(t *testing.T, want output.CoreProcessResults, handleResult
 		coresArgs = append(coresArgs, coreKey)
 	}
 	coresArgs = append(coresArgs, "--format", "json")
-	exitCode = executeWithArgs(t, coresArgs...)
+	exitCode, stdOut := executeWithArgs(t, coresArgs...)
 
 	// read output
-	var err error
-	var stdOut []byte
 	if exitCode != 0 {
 		handleResults(fmt.Errorf("process exited with error code %d", exitCode), stdOut)
 	}
-	_, err = tempFile.Seek(0, 0)
-	require.NoError(t, err, "Rewinding output file")
-	stdOut, err = ioutil.ReadAll(tempFile)
-	require.NoError(t, err, "Reading output file")
 
 	handleResults(nil, stdOut)
 }
 
-func checkOutput(t *testing.T, want []string, tempFile *os.File) {
-	_, err := tempFile.Seek(0, 0)
-	require.NoError(t, err, "Rewinding output file")
-	d, err := ioutil.ReadAll(tempFile)
-	require.NoError(t, err, "Reading output file")
-
-	have := strings.Split(strings.TrimSpace(string(d)), "\n")
+func checkOutput(t *testing.T, want []string, data []byte) {
+	have := strings.Split(strings.TrimSpace(string(data)), "\n")
 	assert.Equal(t, len(want), len(have), "Number of lines in the output")
 
 	for i := range have {
