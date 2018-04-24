@@ -83,10 +83,16 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	if len(res.Libraries) == 0 {
-		formatter.Print(fmt.Sprintf("No library found matching `%s` search query", query))
+	if searchFlags.names {
+		for _, lib := range res.Libraries {
+			formatter.Print(lib.Name)
+		}
 	} else {
-		formatter.Print(res)
+		if len(res.Libraries) == 0 {
+			formatter.Print(fmt.Sprintf("No library found matching `%s` search query", query))
+		} else {
+			formatter.Print(res)
+		}
 	}
 	logrus.Info("Done")
 }
