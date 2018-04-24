@@ -57,7 +57,6 @@ func createTempRedirect(t *testing.T) *os.File {
 	tempFile, err := ioutil.TempFile(os.TempDir(), "test")
 	require.NoError(t, err, "Opening temp file")
 	os.Stdout = tempFile
-
 	return tempFile
 }
 
@@ -69,49 +68,37 @@ func cleanTempRedirect(t *testing.T, tempFile *os.File) {
 }
 
 // executeWithArgs executes the Cobra Command with the given arguments
-// and intercepts any errors (even `os.Exit()` ones), returning the resulting error
-// and also logging it for debugging purpose
-func executeWithArgs(t *testing.T, args ...string) error {
-	err := executeWithArgsInternal(t, args...)
+// and intercepts any errors (even `os.Exit()` ones), returning the exit code
+func executeWithArgs(t *testing.T, args ...string) (exitCode int) {
 	t.Logf("Running: %s", args)
-	if err != nil {
-		exitCode, conversionError := strconv.Atoi(err.Error())
-		if conversionError != nil {
-			t.Logf("Executing command with args '%s', resulted in error: %s", args, err)
-		} else {
-			t.Logf("Executing command with args '%s', resulted in exit code: %d", args, exitCode)
-		}
-	}
-	return err
-}
 
-// Please use executeWithArgs instead
-func executeWithArgsInternal(t *testing.T, args ...string) (err error) {
 	// Init only once.
 	if !root.Command.HasFlags() {
 		root.Init(true)
 	}
-	if args != nil {
-		root.Command.SetArgs(args)
-	}
+	root.Command.SetArgs(args)
 
 	// Mock the os.Exit function, so that we can use the
 	// error result for the test and prevent the test from exiting
-	fakeExit := func(exitCode int) {
-		panic(exitCode)
+	fakeExitFired := false
+	fakeExit := func(code int) {
+		exitCode = code
+		fakeExitFired = true
+		// use panic to exit and jump to deferred recover
+		panic(fmt.Errorf("os.Exit(%d)", code))
 	}
 	patch := monkey.Patch(os.Exit, fakeExit)
 	defer patch.Unpatch()
 	defer func() {
-		if exitCode := recover(); exitCode != nil {
-			err = fmt.Errorf("%d", exitCode)
+		if fakeExitFired {
+			recover()
 		}
 	}()
 
 	// Execute the CLI command, in this process
 	root.Command.Execute()
 
-	return err
+	return 0
 }
 
 // END -- Utility functions
@@ -129,8 +116,8 @@ func TestLibSearchSuccessful(t *testing.T) {
 	//executeWithArgsNoError(t, "lib", "search", "you") //test not working on drone, but working locally
 	// arduino lib search youtu --format json
 	// arduino lib search youtu --format=json
-	err := executeWithArgs(t, "lib", "search", "youtu", "--format", "json", "--names")
-	require.NoError(t, err)
+	exitCode := executeWithArgs(t, "lib", "search", "youtu", "--format", "json", "--names")
+	require.Equal(t, 0, exitCode, "exit code")
 
 	checkOutput(t, want, tempFile)
 }
@@ -158,8 +145,8 @@ func TestLibDownloadSuccessful(t *testing.T) {
 		librariesArgs = append(librariesArgs, libraryKey)
 	}
 
-	err = executeWithArgs(t, append(append([]string{"lib", "download"}, librariesArgs...), "--format", "json")...)
-	require.NoError(t, err)
+	exitCode := executeWithArgs(t, append(append([]string{"lib", "download"}, librariesArgs...), "--format", "json")...)
+	require.Equal(t, 0, exitCode, "exit code")
 
 	// read output
 	_, err = tempFile.Seek(0, 0)
@@ -296,8 +283,8 @@ func TestCoreDownloadBadArgument(t *testing.T) {
 
 func testCoreDownload(t *testing.T, want output.CoreProcessResults, handleResults func(err error, stdOut []byte)) {
 	// run a "core update-index" to download the package_index.json
-	err := executeWithArgs(t, "core", "update-index")
-	require.NoError(t, err, "running 'core update-index'")
+	exitCode := executeWithArgs(t, "core", "update-index")
+	require.Equal(t, 0, exitCode, "exit code")
 
 	// start output capture
 	tempFile := createTempRedirect(t)
@@ -309,17 +296,20 @@ func testCoreDownload(t *testing.T, want output.CoreProcessResults, handleResult
 		coresArgs = append(coresArgs, coreKey)
 	}
 	coresArgs = append(coresArgs, "--format", "json")
-	err = executeWithArgs(t, coresArgs...)
+	exitCode = executeWithArgs(t, coresArgs...)
 
 	// read output
+	var err error
 	var stdOut []byte
-	if err == nil {
-		_, err = tempFile.Seek(0, 0)
-		require.NoError(t, err, "Rewinding output file")
-		stdOut, err = ioutil.ReadAll(tempFile)
-		require.NoError(t, err, "Reading output file")
+	if exitCode != 0 {
+		handleResults(fmt.Errorf("process exited with error code %d", exitCode), stdOut)
 	}
-	handleResults(err, stdOut)
+	_, err = tempFile.Seek(0, 0)
+	require.NoError(t, err, "Rewinding output file")
+	stdOut, err = ioutil.ReadAll(tempFile)
+	require.NoError(t, err, "Reading output file")
+
+	handleResults(nil, stdOut)
 }
 
 func checkOutput(t *testing.T, want []string, tempFile *os.File) {
