@@ -122,21 +122,31 @@ func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte)
 
 // END -- Utility functions
 
-func TestLibSearchSuccessful(t *testing.T) {
-	want := []string{
-		//`"YouMadeIt"`,
-		//`"YoutubeApi"`,
-		`{"libraries":["YoutubeApi"]}`,
+func TestLibSearch(t *testing.T) {
+	exitCode, output := executeWithArgs(t, "lib", "search", "audiozer", "--format", "json")
+	require.Zero(t, exitCode, "process exit code")
+	var res struct {
+		Libraries []struct {
+			Name string
+		}
 	}
+	err := json.Unmarshal(output, &res)
+	require.NoError(t, err, "decoding json output")
+	require.NotNil(t, res.Libraries)
+	require.Len(t, res.Libraries, 1)
+	require.Equal(t, res.Libraries[0].Name, "AudioZero")
 
-	// arduino lib search you
-	executeWithArgs(t, "lib", "search", "you")
+	exitCode, output = executeWithArgs(t, "lib", "search", "audiozero", "--names")
+	require.Zero(t, exitCode, "process exit code")
+	require.Equal(t, "AudioZero\n", string(output))
 
-	// arduino lib search audiozer --format json --names
-	exitCode, output := executeWithArgs(t, "lib", "search", "audiozer", "--format", "json", "--names")
-	require.Equal(t, 0, exitCode, "exit code")
+	exitCode, output = executeWithArgs(t, "lib", "search", "audiozer", "--names")
+	require.Zero(t, exitCode, "process exit code")
+	require.Equal(t, "AudioZero\n", string(output))
 
-	checkOutput(t, want, output)
+	exitCode, output = executeWithArgs(t, "lib", "search", "audiozerooooo", "--names")
+	require.Zero(t, exitCode, "process exit code")
+	require.Equal(t, "", string(output))
 }
 
 func TestLibDownloadSuccessful(t *testing.T) {
@@ -308,13 +318,4 @@ func testCoreDownload(t *testing.T, want output.CoreProcessResults, handleResult
 	}
 
 	handleResults(nil, stdOut)
-}
-
-func checkOutput(t *testing.T, want []string, data []byte) {
-	have := strings.Split(strings.TrimSpace(string(data)), "\n")
-	assert.Equal(t, len(want), len(have), "Number of lines in the output")
-
-	for i := range have {
-		assert.Equal(t, want[i], have[i], "Content of line %d", i)
-	}
 }
