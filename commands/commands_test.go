@@ -81,19 +81,24 @@ func (grabber *stdOutRedirect) Close() {
 // executeWithArgs executes the Cobra Command with the given arguments
 // and intercepts any errors (even `os.Exit()` ones), returning the exit code
 func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte) {
+	fmt.Printf("RUNNING: %s\n", args)
+
 	redirect := &stdOutRedirect{}
 	redirect.Open(t)
-	defer redirect.Close()
-
-	t.Logf("Running: %s", args)
-
+	defer func() {
+		output = redirect.GetOutput()
+		redirect.Close()
+		fmt.Println("OUTPUT:")
+		fmt.Print(string(output))
+		fmt.Println("<END_OF_OUTPUT")
+		fmt.Println()
+	}()
 
 	// Mock the os.Exit function, so that we can use the
 	// error result for the test and prevent the test from exiting
 	fakeExitFired := false
 	fakeExit := func(code int) {
 		exitCode = code
-		output = redirect.GetOutput()
 		fakeExitFired = true
 
 		// use panic to exit and jump to deferred recover
@@ -112,8 +117,6 @@ func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte)
 	cmd.SetArgs(args)
 	cmd.Execute()
 
-	exitCode = 0
-	output = redirect.GetOutput()
 	return
 }
 
