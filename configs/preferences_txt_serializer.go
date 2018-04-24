@@ -38,7 +38,6 @@ import (
 
 	"github.com/arduino/go-properties-map"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 var arduinoIDEDirectory *string
@@ -114,7 +113,6 @@ func proxyConfigsFromIDEPrefs(props properties.Map) error {
 	switch proxy["type"] {
 	case "auto":
 		// Automatic proxy
-		viper.Set("proxy.type", "auto")
 		break
 	case "manual":
 		// Manual proxy configuration

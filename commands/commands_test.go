@@ -90,7 +90,7 @@ func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte)
 
 	// Init only once.
 	if !root.Command.HasFlags() {
-		root.Init(true)
+		root.Init()
 	}
 	root.Command.SetArgs(args)
 

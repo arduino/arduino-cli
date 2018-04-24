@@ -32,7 +32,6 @@ package root
 import (
 	"io/ioutil"
 	"os"
-	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/commands/board"
@@ -51,7 +50,6 @@ import (
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 const (
@@ -89,12 +87,8 @@ const (
 	}`
 )
 
-var isTesting = false
-
 // Init prepares the command.
-func Init(_isTesting bool) {
-	// Forward the testing status
-	isTesting = _isTesting
+func Init() {
 
 	Command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
 	Command.PersistentFlags().StringVar(&commands.GlobalFlags.Format, "format", "text", "The output format, can be [text|json].")
@@ -149,11 +143,6 @@ func preRun(cmd *cobra.Command, args []string) {
 			os.Exit(commands.ErrBadCall)
 		})
 	}
-
-	if !isTesting {
-		logrus.Info("Initializing viper configuration")
-		cobra.OnInitialize(initViper)
-	}
 }
 
 // initConfigs initializes the configuration from the specified file.
@@ -174,73 +163,4 @@ func initConfigs() {
 	}
 	configs.LoadFromEnv()
 	logrus.Info("Configuration set")
-}
-
-func initViper() {
-	logrus.Info("Initiating viper config")
-
-	defHome, err := configs.ArduinoHomeFolder.Get()
-	if err != nil {
-		commands.ErrLogrus.WithError(err).Warn("Cannot get default Arduino Home")
-	}
-	defArduinoData, err := configs.ArduinoDataFolder.Get()
-	if err != nil {
-		logrus.WithError(err).Warn("Cannot get default Arduino folder")
-	}
-
-	viper.SetConfigName(".cli-config")
-	viper.AddConfigPath(".")
-	viper.SetConfigType("yaml")
-
-	logrus.Info("Reading configuration for viper")
-	err = viper.ReadInConfig()
-	if err != nil {
-		formatter.PrintError(err, "Cannot read configuration file in any of the default folders.")
-		os.Exit(commands.ErrNoConfigFile)
-	}
-
-	logrus.Info("Setting defaults")
-	viper.SetDefault("paths.sketchbook", defHome)
-	viper.SetDefault("paths.arduino_data", defArduinoData)
-	viper.SetDefault("proxy.type", "auto")
-	viper.SetDefault("proxy.hostname", "")
-	viper.SetDefault("proxy.username", "")
-	viper.SetDefault("proxy.password", "")
-
-	viper.AutomaticEnv()
-
-	logrus.Info("Setting proxy")
-	if viper.GetString("proxy.type") == "manual" {
-		hostname := viper.GetString("proxy.hostname")
-		if hostname == "" {
-			commands.ErrLogrus.Error("With manual proxy configuration, hostname is required.")
-			formatter.PrintErrorMessage("With manual proxy configuration, hostname is required.")
-			os.Exit(commands.ErrCoreConfig)
-		}
-
-		if strings.HasPrefix(hostname, "http") {
-			os.Setenv("HTTP_PROXY", hostname)
-		}
-		if strings.HasPrefix(hostname, "https") {
-			os.Setenv("HTTPS_PROXY", hostname)
-		}
-
-		username := viper.GetString("proxy.username")
-		if username != "" { // Put username and pass somewhere.
-
-		}
-	}
-	logrus.Info("Done viper configuration loading")
-}
-
-// TestInit creates an initialization for tests.
-// FIXME: is this any useful?
-func TestInit() {
-	initConfigs()
-
-	cobra.OnInitialize(func() {
-		viper.SetConfigFile("./test-config.yml")
-	})
-
-	isTesting = true
 }
