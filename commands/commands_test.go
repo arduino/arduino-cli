@@ -68,21 +68,6 @@ func cleanTempRedirect(t *testing.T, tempFile *os.File) {
 	os.Stdout = stdOut
 }
 
-// executeWithArgsNoError is a commodity function, which does the same as executeWithArgs,
-// while failing the test unless no error has occurred
-func executeWithArgsNoError(t *testing.T, args ...string) {
-	err := executeWithArgs(t, args...)
-	require.NoError(t, err, "Expected no error executing command")
-}
-
-// executeWithArgsError is a commodity function, which does the same as executeWithArgs,
-// while failing the test if no error has occurred
-func executeWithArgsError(t *testing.T, args ...string) error {
-	err := executeWithArgs(t, args...)
-	require.Error(t, err, "Expected an error executing command")
-	return err
-}
-
 // executeWithArgs executes the Cobra Command with the given arguments
 // and intercepts any errors (even `os.Exit()` ones), returning the resulting error
 // and also logging it for debugging purpose
@@ -144,7 +129,8 @@ func TestLibSearchSuccessful(t *testing.T) {
 	//executeWithArgsNoError(t, "lib", "search", "you") //test not working on drone, but working locally
 	// arduino lib search youtu --format json
 	// arduino lib search youtu --format=json
-	executeWithArgsNoError(t, "lib", "search", "youtu", "--format", "json", "--names")
+	err := executeWithArgs(t, "lib", "search", "youtu", "--format", "json", "--names")
+	require.NoError(t, err)
 
 	checkOutput(t, want, tempFile)
 }
@@ -172,7 +158,8 @@ func TestLibDownloadSuccessful(t *testing.T) {
 		librariesArgs = append(librariesArgs, libraryKey)
 	}
 
-	executeWithArgsNoError(t, append(append([]string{"lib", "download"}, librariesArgs...), "--format", "json")...)
+	err = executeWithArgs(t, append(append([]string{"lib", "download"}, librariesArgs...), "--format", "json")...)
+	require.NoError(t, err)
 
 	// read output
 	_, err = tempFile.Seek(0, 0)
