@@ -32,43 +32,31 @@ package formatter
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strings"
 )
 
 // ErrorMessage represents an Error with an attached message.
-//
-// It's the same as a normal error, but It is also parsable as JSON.
 type ErrorMessage struct {
-	message string
+	Message string
+	Error   error
 }
 
 // MarshalJSON allows to marshal this object as a JSON object.
 func (err ErrorMessage) MarshalJSON() ([]byte, error) {
 	type JSONErrorMessage struct {
-		Error string `json:"error,required"`
+		Message string
+		Error   string
 	}
 
 	return json.Marshal(JSONErrorMessage{
-		Error: err.message,
+		Message: err.Message,
+		Error:   err.Error.Error(),
 	})
-}
-
-// Error returns the error message.
-func (err ErrorMessage) Error() string {
-	return fmt.Sprint(err.message)
 }
 
 // String returns a string representation of the Error.
 func (err ErrorMessage) String() string {
-	return err.Error()
-}
-
-// FromError creates an ErrorMessage from an Error.
-func FromError(err error) ErrorMessage {
-	return ErrorMessage{
-		message: err.Error(),
-	}
+	return err.Message + " (" + err.Error.Error() + ")"
 }
 
 // PrintErrorMessage formats and prints info about an error message.
@@ -84,5 +72,5 @@ func PrintError(err error, msg string) {
 	if logger != nil {
 		logger.WithError(err).Error(msg)
 	}
-	Print(FromError(errors.New(msg)))
+	Print(ErrorMessage{Error: err, Message: msg})
 }

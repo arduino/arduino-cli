@@ -91,6 +91,6 @@ func ExamplePrintError() {
 	formatter.PrintError(errors.New("json error"), "json error")
 
 	// Output:
-	// text error
-	// {"error":"json error"}
+	// text error (text error)
+	// {"Message":"json error","Error":"json error"}
 }
