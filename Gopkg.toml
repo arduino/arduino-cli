@@ -125,7 +125,8 @@
 
 [[constraint]]
   name = "gopkg.in/cheggaaa/pb.v1"
-  version = "1.0.18"
+  branch = "master"
+  source = "github.com/cmaglie/pb"
 
 [[constraint]]
   branch = "v2"
@@ -137,4 +138,4 @@
 
 [[constraint]]
   name = "github.com/cavaliercoder/grab"
-  version = "v2.0.0"
+  branch = "master"

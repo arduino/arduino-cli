@@ -106,10 +106,10 @@
   version = "1.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/cavaliercoder/grab"
   packages = ["."]
-  revision = "3b6830dae49bc01e25b4676dae3a2a06c1b1485e"
-  version = "v2.0.0"
+  revision = "9a6ef38cb1dde36064306741ede556db432a38fd"
 
 [[projects]]
   name = "github.com/cenkalti/backoff"
@@ -177,12 +177,6 @@
   revision = "9c68d39025e5c354adb4da3d75f3c8ee6f8c6a02"
 
 [[projects]]
-  name = "github.com/fsnotify/fsnotify"
-  packages = ["."]
-  revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
-  version = "v1.4.7"
-
-[[projects]]
   name = "github.com/go-errors/errors"
   packages = ["."]
   revision = "a6af135bd4e28680facf08a3d206b454abc877a4"
@@ -239,23 +233,6 @@
   revision = "0fb14efe8c47ae851c0034ed7a448854d3d34cf3"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/hashicorp/hcl"
-  packages = [
-    ".",
-    "hcl/ast",
-    "hcl/parser",
-    "hcl/printer",
-    "hcl/scanner",
-    "hcl/strconv",
-    "hcl/token",
-    "json/parser",
-    "json/scanner",
-    "json/token"
-  ]
-  revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
-
-[[projects]]
   name = "github.com/inconshreveable/mousetrap"
   packages = ["."]
   revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
@@ -270,12 +247,6 @@
   name = "github.com/juju/errors"
   packages = ["."]
   revision = "c7d06af17c68cd34c835053720b21f6549d9b0ee"
-
-[[projects]]
-  name = "github.com/magiconair/properties"
-  packages = ["."]
-  revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
-  version = "v1.7.6"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -309,21 +280,9 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/mitchellh/mapstructure"
-  packages = ["."]
-  revision = "00c29f56e2386353d58c599509e8dc3801b0d716"
-
-[[projects]]
-  branch = "master"
   name = "github.com/oleksandr/bonjour"
   packages = ["."]
   revision = "5dcf00d8b228be86307f952f550f2191d956b9e2"
-
-[[projects]]
-  name = "github.com/pelletier/go-toml"
-  packages = ["."]
-  revision = "acdc4509485b587f5e675510c4f2c63e90ff68a8"
-  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -362,21 +321,6 @@
   version = "v1.0.5"
 
 [[projects]]
-  name = "github.com/spf13/afero"
-  packages = [
-    ".",
-    "mem"
-  ]
-  revision = "63644898a8da0bc22138abf860edaf5277b6102e"
-  version = "v1.1.0"
-
-[[projects]]
-  name = "github.com/spf13/cast"
-  packages = ["."]
-  revision = "8965335b8c7107321228e3e3702cab9832751bac"
-  version = "v1.2.0"
-
-[[projects]]
   name = "github.com/spf13/cobra"
   packages = [
     ".",
@@ -386,22 +330,10 @@
   version = "v0.0.2"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/spf13/jwalterweatherman"
-  packages = ["."]
-  revision = "7c0cea34c8ece3fbeb2b27ab9b59511d360fb394"
-
-[[projects]]
   name = "github.com/spf13/pflag"
   packages = ["."]
   revision = "e57e3eeb33f795204c1ca35f56c44f83227c6e66"
   version = "v1.0.0"
-
-[[projects]]
-  name = "github.com/spf13/viper"
-  packages = ["."]
-  revision = "b5e8006cbee93ec955a89ab31e0e3ce3204f3736"
-  version = "v1.0.2"
 
 [[projects]]
   name = "github.com/stretchr/testify"
@@ -462,23 +394,11 @@
   revision = "1d206c9fa8975fb4cf00df1dc8bf3283dc24ba0e"
 
 [[projects]]
-  name = "golang.org/x/text"
-  packages = [
-    "internal/gen",
-    "internal/triegen",
-    "internal/ucd",
-    "transform",
-    "unicode/cldr",
-    "unicode/norm"
-  ]
-  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
-  version = "v0.3.0"
-
-[[projects]]
+  branch = "master"
   name = "gopkg.in/cheggaaa/pb.v1"
   packages = ["."]
-  revision = "72b964305fba1230d3d818711138195f22b9ceea"
-  version = "v1.0.22"
+  revision = "dcc3867d13685988f6a16700cbf1022883984b97"
+  source = "github.com/cmaglie/pb"
 
 [[projects]]
   name = "gopkg.in/fatih/pool.v2"
@@ -516,6 +436,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b5d06ff96573a67889ddd2aaadd07487131739148ce637e9e106ebc5116c59a0"
+  inputs-digest = "f7024ac62ad5fa0890d95a770835f9552763b256e8408d18c1b027b4bdbabcf4"
   solver-name = "gps-cdcl"
   solver-version = 1

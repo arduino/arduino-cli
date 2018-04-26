@@ -1,23 +1,15 @@
 package grab
 
 import (
-	"context"
 	"fmt"
+	"mime"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
+	"strings"
 	"time"
 )
-
-// isCanceled returns a non-nil error if the given context has been canceled.
-func isCanceled(ctx context.Context) error {
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
-		return nil
-	}
-}
 
 // setLastModified sets the last modified timestamp of a local file according to
 // the Last-Modified header returned by a remote server.
@@ -49,4 +41,27 @@ func mkdirp(path string) error {
 		panic("destination path is not directory")
 	}
 	return nil
+}
+
+// guessFilename returns a filename for the given http.Response. If none can be
+// determined ErrNoFilename is returned.
+func guessFilename(resp *http.Response) (string, error) {
+	filename := resp.Request.URL.Path
+	if cd := resp.Header.Get("Content-Disposition"); cd != "" {
+		if _, params, err := mime.ParseMediaType(cd); err == nil {
+			filename = params["filename"]
+		}
+	}
+
+	// sanitize
+	if filename == "" || strings.HasSuffix(filename, "/") || strings.Contains(filename, "\x00") {
+		return "", ErrNoFilename
+	}
+
+	filename = filepath.Base(path.Clean("/" + filename))
+	if filename == "" || filename == "." || filename == "/" {
+		return "", ErrNoFilename
+	}
+
+	return filename, nil
 }

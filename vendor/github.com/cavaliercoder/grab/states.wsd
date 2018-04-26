@@ -1,0 +1,111 @@
+@startuml
+title Grab transfer state
+
+legend
+| # | Meaning |
+| D | Destination path known |
+| S | File size known |
+| O | Server options known (Accept-Ranges) |
+| R | Resume supported (Accept-Ranges) |
+| Z | Local file empty or missing |
+| P | Local file partially complete |
+endlegend
+
+[*] --> Empty
+[*] --> D
+[*] --> S
+[*] --> DS
+
+Empty : Filename: ""
+Empty : Size: 0
+Empty --> O : HEAD: Method not allowed
+Empty --> DSO : HEAD: Range not supported
+Empty --> DSOR : HEAD: Range supported
+
+DS : Filename: "foo.bar"
+DS : Size: > 0
+DS --> DSZ : checkExisting(): File missing
+DS --> DSP : checkExisting(): File partial
+DS --> [*] : checkExisting(): File complete
+DS --> ERROR
+
+S : Filename: ""
+S : Size: > 0
+S --> SO : HEAD: Method not allowed
+S --> DSO : HEAD: Range not supported
+S --> DSOR : HEAD: Range supported
+
+D : Filename: "foo.bar"
+D : Size: 0
+D --> DO : HEAD: Method not allowed
+D --> DSO : HEAD: Range not supported
+D --> DSOR : HEAD: Range supported
+
+
+O : Filename: ""
+O : Size: 0
+O : CanResume: false
+O --> DSO : GET 200
+O --> ERROR
+
+SO : Filename: ""
+SO : Size: > 0
+SO : CanResume: false
+SO --> DSO : GET: 200
+SO --> ERROR
+
+DO : Filename: "foo.bar"
+DO : Size: 0
+DO : CanResume: false
+DO --> DSO : GET 200
+DO --> ERROR
+
+DSZ : Filename: "foo.bar"
+DSZ : Size: > 0
+DSZ : File: empty
+DSZ --> DSORZ : HEAD: Range supported
+DSZ --> DSOZ : HEAD 405 or Range unsupported
+
+DSP : Filename: "foo.bar"
+DSP : Size: > 0
+DSP : File: partial
+DSP --> DSORP : HEAD: Range supported
+DSP --> DSOZ : HEAD: 405 or Range unsupported
+
+DSO : Filename: "foo.bar"
+DSO : Size: > 0
+DSO : CanResume: false
+DSO --> DSOZ : checkExisting(): File partial|missing
+DSO --> [*] : checkExisting(): File complete
+
+DSOR : Filename: "foo.bar"
+DSOR : Size: > 0
+DSOR : CanResume: true
+DSOR --> DSORP : CheckLocal: File partial
+DSOR --> DSORZ : CheckLocal: File missing
+
+DSORP : Filename: "foo.bar"
+DSORP : Size: > 0
+DSORP : CanResume: true
+DSORP : File: partial
+DSORP --> Transferring
+
+DSORZ : Filename: "foo.bar"
+DSORZ : Size: > 0
+DSORZ : CanResume: true
+DSORZ : File: empty
+DSORZ --> Transferring
+
+DSOZ : Filename: "foo.bar"
+DSOZ : Size: > 0
+DSOZ : CanResume: false
+DSOZ : File: empty
+DSOZ --> Transferring
+
+Transferring --> [*]
+Transferring --> ERROR
+
+ERROR : Something went wrong
+ERROR --> [*]
+
+@enduml
