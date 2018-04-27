@@ -5,14 +5,15 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/juju/errors"
 	"strings"
+
+	"github.com/juju/errors"
 )
 
 // Disk is a wrapper around the usual os and ioutil golang libraries
 type Disk struct {
-	Base string
-	NameOverride string
+	Base             string
+	NameOverride     string
 	CharacterMapping map[string]string
 }
 
@@ -88,6 +89,7 @@ func (d *Disk) List(prefix string) ([]File, error) {
 		}
 
 		list = append(list, File{
+			Path: strings.Replace(path, d.Base+"/", "", 1),
 			Name: filepath.Base(path),
 			Size: f.Size(),
 		})
@@ -101,7 +103,7 @@ func (d *Disk) List(prefix string) ([]File, error) {
 // from the filename/path given
 func (d *Disk) replaceCharacters(filename string) string {
 	if d.CharacterMapping != nil {
-		for k, v := range(d.CharacterMapping) {
+		for k, v := range d.CharacterMapping {
 			filename = strings.Replace(filename, k, v, -1)
 		}
 	}

@@ -112,7 +112,16 @@ func (s *S3) List(prefix string) ([]File, error) {
 		}
 
 		for _, file := range resp.Contents {
+			if *file.Key == prefix {
+				continue
+			}
+
+			if *file.Key == prefix+"/" {
+				continue
+			}
+
 			list = append(list, File{
+				Path: *file.Key,
 				Name: filepath.Base(*file.Key),
 				Size: *file.Size,
 			})
