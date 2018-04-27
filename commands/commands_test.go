@@ -149,56 +149,29 @@ func TestLibSearch(t *testing.T) {
 	require.Equal(t, "", string(output))
 }
 
-func TestLibDownloadSuccessful(t *testing.T) {
-	// getting the paths to create the want path of the want object.
-	stagingFolder, err := configs.DownloadCacheFolder("libraries").Get()
-	require.NoError(t, err, "Getting cache folder")
+func TestLibDownload(t *testing.T) {
+	// Set staging folder to a temporary folder
+	tmp, err := ioutil.TempDir(os.TempDir(), "test")
+	require.NoError(t, err, "making temporary staging dir")
+	defer os.RemoveAll(tmp)
+	configs.ArduinoDataFolder.SetPath(tmp)
 
-	// desired output
-	want := output.LibProcessResults{
-		Libraries: map[string]output.ProcessResult{
-			"invalidLibrary":           {ItemName: "invalidLibrary", Error: "Library not found"},
-			"YoutubeApi":               {ItemName: "YoutubeApi", Status: "Downloaded", Path: stagingFolder + "/YoutubeApi-1.1.0.zip"},
-			"YouMadeIt@invalidVersion": {ItemName: "YouMadeIt", Error: "Version Not Found"},
-		},
-	}
+	exitCode, d := executeWithArgs(t, "lib", "download", "inexistentLibrary", "--format", "json")
+	require.NotZero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "library not found: inexistentLibrary")
 
-	// lib download YoutubeApi invalidLibrary YouMadeIt@invalidVersion --format json
-	librariesArgs := []string{}
-	for libraryKey, _ := range want.Libraries {
-		librariesArgs = append(librariesArgs, libraryKey)
-	}
+	exitCode, d = executeWithArgs(t, "lib", "download", "inexistentLibrary")
+	require.NotZero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "library not found: inexistentLibrary")
 
-	exitCode, d := executeWithArgs(t, append(append([]string{"lib", "download"}, librariesArgs...), "--format", "json")...)
-	require.Equal(t, 0, exitCode, "exit code")
+	exitCode, d = executeWithArgs(t, "lib", "download", "Audio")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Audio@")
+	require.Contains(t, string(d), "downloaded")
 
-	var have output.LibProcessResults
-	err = json.Unmarshal(d, &have)
-	require.NoError(t, err, "Unmarshaling json output")
-	require.NotNil(t, have.Libraries, "Unmarshaling json output: have '%s'", d)
-
-	// checking output
-
-	assert.Equal(t, len(want.Libraries), len(have.Libraries), "Number of libraries in the output")
-
-	pop := func(lib *output.ProcessResult) bool {
-		for idx, h := range have.Libraries {
-			if lib.String() == h.String() {
-				// XXX: Consider changing the Libraries field to an array of pointers
-				//have.Libraries[idx] = nil
-				have.Libraries[idx] = output.ProcessResult{ItemName: ""} // Mark library as matched
-				return true
-			}
-		}
-		return false
-	}
-
-	for _, w := range want.Libraries {
-		assert.True(t, pop(&w), "Expected library '%s' is missing from output", w)
-	}
-	for _, h := range have.Libraries {
-		assert.Empty(t, h.String(), "Unexpected library '%s' is inside output", h)
-	}
+	exitCode, d = executeWithArgs(t, "lib", "download", "Audio@1.2.3-nonexistent")
+	require.NotZero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "version not found")
 }
 
 func TestCoreDownloadSuccessful(t *testing.T) {

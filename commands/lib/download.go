@@ -72,7 +72,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 func downloadLibraries(status *libraries.StatusContext, pairs []libraries.NameVersionPair) {
 	libsToDownload, err := status.Process(pairs)
 	if err != nil {
-		formatter.PrintError(err, "Error parsing libraries")
+		formatter.PrintError(err, "Error parsing libraries arguments")
 		os.Exit(commands.ErrBadCall)
 	}
 
