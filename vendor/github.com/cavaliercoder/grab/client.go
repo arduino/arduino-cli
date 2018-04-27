@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -229,7 +230,7 @@ func (c *Client) validateLocal(resp *Response) stateFunc {
 
 	if size == resp.fi.Size() {
 		resp.DidResume = true
-		resp.bytesResumed = resp.fi.Size()
+		atomic.StoreInt64(&resp.bytesResumed, resp.fi.Size())
 		return c.checksumFile
 	}
 
@@ -246,7 +247,7 @@ func (c *Client) validateLocal(resp *Response) stateFunc {
 	if resp.CanResume {
 		resp.Request.HTTPRequest.Header.Set("Range", fmt.Sprintf("bytes=%d-", resp.fi.Size()))
 		resp.DidResume = true
-		resp.bytesResumed = resp.fi.Size()
+		atomic.StoreInt64(&resp.bytesResumed, resp.fi.Size())
 		resp.writeFlags = os.O_APPEND | os.O_WRONLY
 		return c.getRequest
 	}
@@ -347,7 +348,7 @@ func (c *Client) readResponse(resp *Response) stateFunc {
 	}
 
 	// check expected size
-	resp.Size = resp.bytesResumed + resp.HTTPResponse.ContentLength
+	resp.Size = atomic.LoadInt64(&resp.bytesResumed) + resp.HTTPResponse.ContentLength
 	if resp.HTTPResponse.ContentLength > 0 && resp.Request.Size > 0 {
 		if resp.Request.Size != resp.Size {
 			resp.err = ErrBadLength
@@ -398,7 +399,7 @@ func (c *Client) openWriter(resp *Response) stateFunc {
 
 	// seek to start or end
 	whence := os.SEEK_SET
-	if resp.bytesResumed > 0 {
+	if atomic.LoadInt64(&resp.bytesResumed) > 0 {
 		whence = os.SEEK_END
 	}
 	_, resp.err = f.Seek(0, whence)
@@ -429,6 +430,9 @@ func (c *Client) copyFile(resp *Response) stateFunc {
 	}
 	b := make([]byte, resp.bufferSize)
 	go resp.watchBps()
+
+	resp.transferMu.Lock()
+	defer resp.transferMu.Unlock()
 	resp.transfer = newTransfer(resp.Request.Context(), resp.writer, resp.HTTPResponse.Body, b)
 	if _, resp.err = resp.transfer.copy(); resp.err != nil {
 		return c.closeResponse
