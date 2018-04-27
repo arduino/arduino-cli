@@ -29,10 +29,13 @@
 
 package formatter
 
-import "encoding/json"
-import "reflect"
+import (
+	"encoding/json"
+	"fmt"
+	"reflect"
 
-import "fmt"
+	"github.com/cavaliercoder/grab"
+)
 
 // JSONFormatter is a Formatter that output JSON objects.
 // Intermediate results or interactive messages are ignored.
@@ -41,7 +44,7 @@ type JSONFormatter struct {
 }
 
 // Format implements Formatter interface
-func (jf JSONFormatter) Format(msg interface{}) (string, error) {
+func (jf *JSONFormatter) Format(msg interface{}) (string, error) {
 	t := reflect.TypeOf(msg).Kind().String()
 	switch t {
 	case "struct", "map":
@@ -50,4 +53,9 @@ func (jf JSONFormatter) Format(msg interface{}) (string, error) {
 	default:
 		return "", fmt.Errorf("%s ignored", t)
 	}
+}
+
+// DownloadProgressBar implements Formatter interface
+func (jf *JSONFormatter) DownloadProgressBar(resp *grab.Response, prefix string) {
+	resp.Wait()
 }

@@ -29,12 +29,43 @@
 
 package formatter
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+
+	"github.com/cavaliercoder/grab"
+	pb "gopkg.in/cheggaaa/pb.v1"
+)
 
 // TextFormatter represents a Formatter for a text console
 type TextFormatter struct{}
 
 // Format implements Formatter interface
-func (tp TextFormatter) Format(msg interface{}) (string, error) {
+func (tp *TextFormatter) Format(msg interface{}) (string, error) {
 	return fmt.Sprintf("%s", msg), nil
+}
+
+// DownloadProgressBar implements Formatter interface
+func (tp *TextFormatter) DownloadProgressBar(resp *grab.Response, prefix string) {
+	t := time.NewTicker(250 * time.Millisecond)
+	defer t.Stop()
+
+	bar := pb.StartNew(int(resp.Size))
+	bar.SetUnits(pb.U_BYTES)
+	bar.Prefix(prefix)
+	for {
+		select {
+		case <-t.C:
+			bar.Set(int(resp.BytesComplete()))
+		case <-resp.Done:
+			bar.ShowCounters = false
+			bar.ShowPercent = false
+			bar.ShowFinalTime = false
+			bar.ShowBar = false
+			bar.Prefix(prefix + " downloaded")
+			bar.Set(int(resp.BytesComplete()))
+			bar.Finish()
+			return
+		}
+	}
 }

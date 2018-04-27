@@ -33,12 +33,17 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cavaliercoder/grab"
 	"github.com/sirupsen/logrus"
 )
 
 // Formatter interface represents a generic formatter. It allows to print and format Messages.
 type Formatter interface {
-	Format(interface{}) (string, error) // Format formats a parameter if possible, otherwise it returns an error.
+	// Format formats a parameter if possible, otherwise it returns an error.
+	Format(interface{}) (string, error)
+
+	// DownloadProgressBar outputs a progress bar if possible. Waits until the download ends.
+	DownloadProgressBar(resp *grab.Response, prefix string)
 }
 
 // PrintFunc represents a function used to print formatted data.
