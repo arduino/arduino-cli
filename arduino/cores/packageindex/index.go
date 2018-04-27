@@ -63,10 +63,10 @@ type indexPlatformRelease struct {
 	URL              string                `json:"url"`
 	ArchiveFileName  string                `json:"archiveFileName,required"`
 	Checksum         string                `json:"checksum,required"`
-	Size             int64                 `json:"size,required,string"`
+	Size             json.Number           `json:"size,required"`
 	BoardsNames      []indexBoardName      `json:"boards"`
 	Help             indexHelp             `json:"help,omitempty"`
-	ToolDependencies []indexToolDependency `json:"toolsDependencies, required"`
+	ToolDependencies []indexToolDependency `json:"toolsDependencies,required"`
 }
 
 // indexToolDependency represents a single dependency of a core from a tool.
@@ -85,11 +85,11 @@ type indexToolRelease struct {
 
 // indexToolReleaseFlavour represents a single tool flavour in the package_index.json file.
 type indexToolReleaseFlavour struct {
-	OS              string `json:"host,required"`
-	URL             string `json:"url,required"`
-	ArchiveFileName string `json:"archiveFileName,required"`
-	Size            int64  `json:"size,required,string"`
-	Checksum        string `json:"checksum,required"`
+	OS              string      `json:"host,required"`
+	URL             string      `json:"url,required"`
+	ArchiveFileName string      `json:"archiveFileName,required"`
+	Size            json.Number `json:"size,required"`
+	Checksum        string      `json:"checksum,required"`
 }
 
 // indexBoardName represents a single Board as written in package_index.json file.
@@ -130,11 +130,12 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	outPlatform.Name = inPlatformRelease.Name
 	outPlatform.Category = inPlatformRelease.Category
 
+	size, _ := inPlatformRelease.Size.Int64()
 	outPlatformRelease := outPlatform.GetOrCreateRelease(inPlatformRelease.Version)
 	outPlatformRelease.Resource = &releases.DownloadResource{
 		ArchiveFileName: inPlatformRelease.ArchiveFileName,
 		Checksum:        inPlatformRelease.Checksum,
-		Size:            inPlatformRelease.Size,
+		Size:            size,
 		URL:             inPlatformRelease.URL,
 		CachePath:       "packages",
 	}
@@ -173,12 +174,13 @@ func (inToolRelease indexToolRelease) extractToolIn(outPackage *cores.Package) {
 func (inToolRelease indexToolRelease) extractFlavours() []*cores.Flavour {
 	ret := make([]*cores.Flavour, len(inToolRelease.Systems))
 	for i, flavour := range inToolRelease.Systems {
+		size, _ := flavour.Size.Int64()
 		ret[i] = &cores.Flavour{
 			OS: flavour.OS,
 			Resource: &releases.DownloadResource{
 				ArchiveFileName: flavour.ArchiveFileName,
 				Checksum:        flavour.Checksum,
-				Size:            flavour.Size,
+				Size:            size,
 				URL:             flavour.URL,
 				CachePath:       "packages",
 			},
