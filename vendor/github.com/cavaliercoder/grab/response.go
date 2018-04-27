@@ -142,9 +142,10 @@ func (c *Response) BytesComplete() int64 {
 // download is returned.
 func (c *Response) BytesPerSecond() float64 {
 	c.transferMu.Lock()
-	defer c.transferMu.Unlock()
+	transfer := c.transfer
+	c.transferMu.Unlock()
 	if c.IsComplete() {
-		return float64(c.transfer.N()) / c.Duration().Seconds()
+		return float64(transfer.N()) / c.Duration().Seconds()
 	}
 	c.bytesPerSecondMu.Lock()
 	defer c.bytesPerSecondMu.Unlock()
@@ -206,8 +207,9 @@ func (c *Response) watchBps() {
 			then = now
 
 			c.transferMu.Lock()
-			defer c.transferMu.Unlock()
-			cur := c.transfer.N()
+			transfer := c.transfer
+			c.transferMu.Unlock()
+			cur := transfer.N()
 			bs := cur - prev
 			prev = cur
 

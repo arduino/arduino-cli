@@ -109,7 +109,7 @@
   branch = "master"
   name = "github.com/cavaliercoder/grab"
   packages = ["."]
-  revision = "57f1a36d03a0123c7b191bbe55b9cc3d6d9e5890"
+  revision = "cb0999d5d352aae52ca8ed49fa97a1690ab03201"
   source = "github.com/cmaglie/grab"
 
 [[projects]]
