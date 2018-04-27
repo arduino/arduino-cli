@@ -34,12 +34,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strconv"
 	"testing"
 
-	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/commands/root"
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bouk/monkey"
 	"github.com/stretchr/testify/assert"
@@ -174,121 +171,37 @@ func TestLibDownload(t *testing.T) {
 	require.Contains(t, string(d), "version not found")
 }
 
-func TestCoreDownloadSuccessful(t *testing.T) {
-	// getting the paths to create the want path of the want object.
-	stagingFolder, err := configs.DownloadCacheFolder("packages").Get()
-	require.NoError(t, err, "Getting cache folder")
-
-	// desired output
-	want := output.CoreProcessResults{
-		Cores: map[string]output.ProcessResult{
-			"arduino:samd=1.6.16":            {ItemName: "arduino:samd@1.6.16", Status: "Downloaded", Path: stagingFolder + "/samd-1.6.16.tar.bz2"},
-			"arduino:sam=notexistingversion": {ItemName: "sam", Error: "Version notexistingversion Not Found"},
-			"arduino:sam=1.0.0":              {ItemName: "sam", Error: "Version 1.0.0 Not Found"},
-		},
-		Tools: map[string]output.ProcessResult{
-			"arduinoOTA":        {ItemName: "arduino:arduinoOTA@1.2.0", Status: "Downloaded", Path: stagingFolder + "/arduinoOTA-1.2.0-linux_amd64.tar.bz2"},
-			"openocd":           {ItemName: "arduino:openocd@0.9.0-arduino6-static", Status: "Downloaded", Path: stagingFolder + "/openocd-0.9.0-arduino6-static-x86_64-linux-gnu.tar.bz2"},
-			"CMSIS-Atmel":       {ItemName: "arduino:CMSIS-Atmel@1.1.0", Status: "Downloaded", Path: stagingFolder + "/CMSIS-Atmel-1.1.0.tar.bz2"},
-			"CMSIS":             {ItemName: "arduino:CMSIS@4.5.0", Status: "Downloaded", Path: stagingFolder + "/CMSIS-4.5.0.tar.bz2"},
-			"arm-none-eabi-gcc": {ItemName: "arduino:arm-none-eabi-gcc@4.8.3-2014q1", Status: "Downloaded", Path: stagingFolder + "/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz"},
-			"bossac":            {ItemName: "arduino:bossac@1.7.0", Status: "Downloaded", Path: stagingFolder + "/bossac-1.7.0-x86_64-linux-gnu.tar.gz"},
-		},
-	}
-
-	testCoreDownload(t, want, func(err error, stdOut []byte) {
-		if err != nil {
-			t.Log("COMMAND OUTPUT:\n", string(stdOut))
-		}
-		require.NoError(t, err, "Expected no error executing command")
-
-		var have output.CoreProcessResults
-		err = json.Unmarshal(stdOut, &have)
-		require.NoError(t, err, "Unmarshaling json output")
-		require.NotNil(t, have.Cores, "Unmarshaling json output: have '%s'", stdOut)
-
-		// checking output
-
-		assert.Equal(t, len(want.Cores), len(have.Cores), "Number of cores in the output")
-
-		pop := func(core *output.ProcessResult) bool {
-			for idx, h := range have.Cores {
-				if core.String() == h.String() {
-					// XXX: Consider changing the Cores field to an array of pointers
-					//have.Cores[idx] = nil
-					have.Cores[idx] = output.ProcessResult{ItemName: ""} // Mark core as matched
-					return true
-				}
-			}
-			return false
-		}
-		for _, w := range want.Cores {
-			popR := pop(&w)
-			t.Log(w)
-			t.Log(popR)
-			assert.True(t, popR, "Expected core '%s' is missing from output", w)
-		}
-		for _, h := range have.Cores {
-			assert.Empty(t, h.ItemName, "Unexpected core '%s' is inside output", h)
-		}
-
-		assert.Equal(t, len(want.Tools), len(have.Tools), "Number of tools in the output")
-
-		pop = func(tool *output.ProcessResult) bool {
-			for idx, h := range have.Tools {
-				if tool.String() == h.String() {
-					// XXX: Consider changing the Tools field to an array of pointers
-					// have.Tools[idx] = nil
-					have.Tools[idx] = output.ProcessResult{ItemName: ""} // Mark tool as matched
-					return true
-				}
-			}
-			return false
-		}
-
-		for _, w := range want.Tools {
-			assert.True(t, pop(&w), "Expected tool '%s' is missing from output", w)
-		}
-		for _, h := range have.Tools {
-			assert.Empty(t, h.String(), "Unexpected tool '%s' is inside output", h)
-		}
-	})
-}
-
-func TestCoreDownloadBadArgument(t *testing.T) {
-	// desired output
-	want := output.CoreProcessResults{
-		Cores: map[string]output.ProcessResult{
-			"unparsablearg": {ItemName: "unparsablearg", Error: "Invalid item (not PACKAGER:CORE[=VERSION])"},
-		},
-		Tools: map[string]output.ProcessResult{},
-	}
-
-	testCoreDownload(t, want, func(err error, stdOut []byte) {
-		require.EqualError(t, err, strconv.Itoa(commands.ErrBadArgument),
-			fmt.Sprintf("Expected an '%s' error (exit code '%d') executing command",
-				"commands.ErrBadArgument",
-				commands.ErrBadArgument))
-	})
-}
-
-func testCoreDownload(t *testing.T, want output.CoreProcessResults, handleResults func(err error, stdOut []byte)) {
+func updateCoreIndex(t *testing.T) {
 	// run a "core update-index" to download the package_index.json
 	exitCode, _ := executeWithArgs(t, "core", "update-index")
 	require.Equal(t, 0, exitCode, "exit code")
+}
 
-	// core download arduino:samd=1.6.16 unparsablearg arduino:sam=notexistingversion arduino:sam=1.0.0 --format json
-	coresArgs := []string{"core", "download"}
-	for coreKey, _ := range want.Cores {
-		coresArgs = append(coresArgs, coreKey)
-	}
-	coresArgs = append(coresArgs, "--format", "json")
-	exitCode, stdOut := executeWithArgs(t, coresArgs...)
+func TestCoreDownload(t *testing.T) {
+	// Set staging folder to a temporary folder
+	tmp, err := ioutil.TempDir(os.TempDir(), "test")
+	require.NoError(t, err, "making temporary staging dir")
+	defer os.RemoveAll(tmp)
+	configs.ArduinoDataFolder.SetPath(tmp)
 
-	// read output
-	if exitCode != 0 {
-		handleResults(fmt.Errorf("process exited with error code %d", exitCode), stdOut)
-	}
+	updateCoreIndex(t)
 
-	handleResults(nil, stdOut)
+	exitCode, d := executeWithArgs(t, "core", "download", "arduino:avr@1.6.16")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "arduino:avr-gcc@4.9.2-atmel3.5.3-arduino2 downloaded")
+	require.Contains(t, string(d), "arduino:avrdude@6.3.0-arduino8 downloaded")
+	require.Contains(t, string(d), "arduino:arduinoOTA@1.0.0 downloaded")
+	require.Contains(t, string(d), "arduino:avr@1.6.16 downloaded")
+
+	exitCode, d = executeWithArgs(t, "core", "download", "arduino:samd@1.2.3-notexisting")
+	require.NotZero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "required version 1.2.3-notexisting not found for platform arduino:samd")
+
+	exitCode, d = executeWithArgs(t, "core", "download", "arduino:notexistent")
+	require.NotZero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "not found")
+
+	exitCode, d = executeWithArgs(t, "core", "download", "wrongparameter")
+	require.NotZero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "invalid item")
 }

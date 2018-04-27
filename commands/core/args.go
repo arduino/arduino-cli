@@ -31,7 +31,6 @@ package core
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
 	"os"
@@ -41,34 +40,29 @@ import (
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 )
 
-var coreTupleRegexp = regexp.MustCompile("[a-zA-Z0-9]+:[a-zA-Z0-9]+(=([0-9]|[0-9].)*[0-9]+)?")
-
-// parsePlatformReferenceArgs parses a sequence of "packager:arch=version" tokens and returns a platformReference slice.
+// parsePlatformReferenceArgs parses a sequence of "packager:arch@version" tokens and returns a platformReference slice.
 //
 // If version is not present it is assumed as "latest" version.
 func parsePlatformReferenceArgs(args []string) []packagemanager.PlatformReference {
 	ret := []packagemanager.PlatformReference{}
 
 	for _, arg := range args {
-		if coreTupleRegexp.MatchString(arg) {
-			// splits the string according to regexp into its components.
-			split := strings.FieldsFunc(arg, func(r rune) bool {
-				return r == '=' || r == ':'
-			})
-			if len(split) < 3 {
-				split = append(split, "latest")
-			}
-			ret = append(ret, packagemanager.PlatformReference{
-				Package:              split[0],
-				PlatformArchitecture: split[1],
-				PlatformVersion:      split[2],
-			})
-		} else {
-			// Why even bother to return an error; just fail and let the user know right away...
-			formatter.PrintError(nil,
-				fmt.Sprintf("'%s' is an invalid item (does not match the syntax 'PACKAGER:ARCH[=VERSION]')", arg))
+		version := "latest"
+		if strings.Contains(arg, "@") {
+			split := strings.SplitN(arg, "@", 2)
+			arg = split[0]
+			version = split[1]
+		}
+		split := strings.Split(arg, ":")
+		if len(split) != 2 {
+			formatter.PrintErrorMessage(fmt.Sprintf("'%s' is an invalid item (does not match the syntax 'PACKAGER:ARCH[@VERSION]')", arg))
 			os.Exit(commands.ErrBadArgument)
 		}
+		ret = append(ret, packagemanager.PlatformReference{
+			Package:              split[0],
+			PlatformArchitecture: split[1],
+			PlatformVersion:      version,
+		})
 	}
 	return ret
 }
