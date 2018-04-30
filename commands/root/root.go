@@ -33,12 +33,13 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/bcmi-labs/arduino-cli/commands/generatedocs"
+
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/commands/board"
 	"github.com/bcmi-labs/arduino-cli/commands/compile"
 	"github.com/bcmi-labs/arduino-cli/commands/config"
 	"github.com/bcmi-labs/arduino-cli/commands/core"
-	"github.com/bcmi-labs/arduino-cli/commands/generatedocs"
 	"github.com/bcmi-labs/arduino-cli/commands/lib"
 	"github.com/bcmi-labs/arduino-cli/commands/login"
 	"github.com/bcmi-labs/arduino-cli/commands/logout"
@@ -52,50 +53,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	bashAutoCompletionFunction = `
-	__arduino_autocomplete()
-	{
-		case $(last_command) in
-			arduino)
-				opts="board compile config core generate-docs help lib login sketch version"
-				;;
-			arduino_board)
-				opts="attach list"
-				;;
-			arduino_config)
-				opts="init"
-				;;
-			arduino_core)
-				opts="download install list search uninstall --update-index"
-				;;
-			arduino_help)
-				opts="board compile config core generate-docs lib login sketch version"
-				;;
-			arduino_lib)
-				opts="download install list search uninstall --update-index"
-				;;
-			arduino_sketch)
-				opts="sync"
-				;;
-		esac
-		if [[ ${cur} == " *" ]] ; then
-			COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-			return 0
-		fi
-		return 1
-	}`
-)
-
 // Init prepares the cobra root command.
 func Init() *cobra.Command {
 	command := &cobra.Command{
-		Use:                    "arduino",
-		Short:                  "Arduino CLI.",
-		Long:                   "Arduino Create Command Line Interface (arduino-cli).",
-		Example:                "arduino generate-docs # To generate the docs and autocompletion for the whole CLI.",
-		BashCompletionFunction: bashAutoCompletionFunction,
-		PersistentPreRun:       preRun,
+		Use:              "arduino-cli",
+		Short:            "Arduino CLI.",
+		Long:             "Arduino Create Command Line Interface (arduino-cli).",
+		Example:          "arduino generate-docs # To generate the docs and autocompletion for the whole CLI.",
+		PersistentPreRun: preRun,
 	}
 	command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
 	command.PersistentFlags().StringVar(&commands.GlobalFlags.Format, "format", "text", "The output format, can be [text|json].")
@@ -104,7 +69,6 @@ func Init() *cobra.Command {
 	command.AddCommand(compile.InitCommand())
 	command.AddCommand(config.InitCommand())
 	command.AddCommand(core.InitCommand())
-	command.AddCommand(generatedocs.InitCommand())
 	command.AddCommand(lib.InitCommand())
 	command.AddCommand(login.InitCommand())
 	command.AddCommand(logout.InitCommand())
@@ -116,6 +80,12 @@ func Init() *cobra.Command {
 }
 
 func preRun(cmd *cobra.Command, args []string) {
+	if os.Getenv("ARDUINO_GENERATE_DOCS") == "1" {
+		generatedocs.GenerateDocs(cmd)
+		formatter.PrintResult("Generated docs as requested (ARDUINO_GENERATE_DOCS env var is set to 1)")
+		os.Exit(0)
+	}
+
 	// Reset logrus if debug flag changed.
 	if !commands.GlobalFlags.Debug {
 		// Discard logrus output if no debug.
