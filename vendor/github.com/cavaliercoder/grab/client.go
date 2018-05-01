@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
@@ -76,9 +75,17 @@ func (c *Client) Do(req *Request) *Response {
 		writeFlags: os.O_CREATE | os.O_WRONLY,
 	}
 	if resp.bufferSize == 0 {
+		// default to Client.BufferSize
 		resp.bufferSize = c.BufferSize
 	}
+
+	// Run state-machine while caller is blocked to initialize the file transfer.
+	// Must never transition to the copyFile state - this happens next in another
+	// goroutine.
 	c.run(resp, c.statFileInfo)
+
+	// Run copyFile in a new goroutine. copyFile will no-op if the transfer is
+	// already complete or failed.
 	go c.run(resp, c.copyFile)
 	return resp
 }
@@ -230,7 +237,7 @@ func (c *Client) validateLocal(resp *Response) stateFunc {
 
 	if size == resp.fi.Size() {
 		resp.DidResume = true
-		atomic.StoreInt64(&resp.bytesResumed, resp.fi.Size())
+		resp.bytesResumed = resp.fi.Size()
 		return c.checksumFile
 	}
 
@@ -245,9 +252,11 @@ func (c *Client) validateLocal(resp *Response) stateFunc {
 	}
 
 	if resp.CanResume {
-		resp.Request.HTTPRequest.Header.Set("Range", fmt.Sprintf("bytes=%d-", resp.fi.Size()))
+		resp.Request.HTTPRequest.Header.Set(
+			"Range",
+			fmt.Sprintf("bytes=%d-", resp.fi.Size()))
 		resp.DidResume = true
-		atomic.StoreInt64(&resp.bytesResumed, resp.fi.Size())
+		resp.bytesResumed = resp.fi.Size()
 		resp.writeFlags = os.O_APPEND | os.O_WRONLY
 		return c.getRequest
 	}
@@ -348,7 +357,7 @@ func (c *Client) readResponse(resp *Response) stateFunc {
 	}
 
 	// check expected size
-	resp.Size = atomic.LoadInt64(&resp.bytesResumed) + resp.HTTPResponse.ContentLength
+	resp.Size = resp.bytesResumed + resp.HTTPResponse.ContentLength
 	if resp.HTTPResponse.ContentLength > 0 && resp.Request.Size > 0 {
 		if resp.Request.Size != resp.Size {
 			resp.err = ErrBadLength
@@ -399,13 +408,24 @@ func (c *Client) openWriter(resp *Response) stateFunc {
 
 	// seek to start or end
 	whence := os.SEEK_SET
-	if atomic.LoadInt64(&resp.bytesResumed) > 0 {
+	if resp.bytesResumed > 0 {
 		whence = os.SEEK_END
 	}
 	_, resp.err = f.Seek(0, whence)
 	if resp.err != nil {
 		return c.closeResponse
 	}
+
+	// init transfer
+	if resp.bufferSize < 1 {
+		resp.bufferSize = 32 * 1024
+	}
+	b := make([]byte, resp.bufferSize)
+	resp.transfer = newTransfer(
+		resp.Request.Context(),
+		resp.writer,
+		resp.HTTPResponse.Body,
+		b)
 
 	// next step is copyFile, but this will be called later in another goroutine
 	return nil
@@ -425,17 +445,11 @@ func (c *Client) copyFile(resp *Response) stateFunc {
 		}
 	}
 
-	if resp.bufferSize < 1 {
-		resp.bufferSize = 32 * 1024
+	if resp.transfer == nil {
+		panic("developer error: Response.transfer is not initialized")
 	}
-	b := make([]byte, resp.bufferSize)
 	go resp.watchBps()
-
-	transfer := newTransfer(resp.Request.Context(), resp.writer, resp.HTTPResponse.Body, b)
-	resp.transferMu.Lock()
-	resp.transfer = transfer
-	resp.transferMu.Unlock()
-	if _, resp.err = transfer.copy(); resp.err != nil {
+	if _, resp.err = resp.transfer.copy(); resp.err != nil {
 		return c.closeResponse
 	}
 

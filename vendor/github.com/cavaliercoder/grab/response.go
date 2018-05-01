@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
@@ -80,8 +79,7 @@ type Response struct {
 
 	// transfer is responsible for copying data from the remote server to a local
 	// file, tracking progress and allowing for cancelation.
-	transfer   *transfer
-	transferMu sync.Mutex
+	transfer *transfer
 
 	// bytesPerSecond specifies the number of bytes that have been transferred in
 	// the last 1-second window.
@@ -132,20 +130,15 @@ func (c *Response) Err() error {
 // the destination, including any bytes that were resumed from a previous
 // download.
 func (c *Response) BytesComplete() int64 {
-	c.transferMu.Lock()
-	defer c.transferMu.Unlock()
-	return atomic.LoadInt64(&c.bytesResumed) + c.transfer.N()
+	return c.bytesResumed + c.transfer.N()
 }
 
 // BytesPerSecond returns the number of bytes transferred in the last second. If
 // the download is already complete, the average bytes/sec for the life of the
 // download is returned.
 func (c *Response) BytesPerSecond() float64 {
-	c.transferMu.Lock()
-	transfer := c.transfer
-	c.transferMu.Unlock()
 	if c.IsComplete() {
-		return float64(transfer.N()) / c.Duration().Seconds()
+		return float64(c.transfer.N()) / c.Duration().Seconds()
 	}
 	c.bytesPerSecondMu.Lock()
 	defer c.bytesPerSecondMu.Unlock()
@@ -206,10 +199,7 @@ func (c *Response) watchBps() {
 			d := now.Sub(then)
 			then = now
 
-			c.transferMu.Lock()
-			transfer := c.transfer
-			c.transferMu.Unlock()
-			cur := transfer.N()
+			cur := c.transfer.N()
 			bs := cur - prev
 			prev = cur
 

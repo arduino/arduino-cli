@@ -139,4 +139,3 @@
 [[constraint]]
   name = "github.com/cavaliercoder/grab"
   branch = "master"
-  source = "github.com/cmaglie/grab"
