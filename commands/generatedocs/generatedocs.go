@@ -38,9 +38,22 @@ import (
 	"github.com/spf13/cobra/doc"
 )
 
-// GenerateDocs generates the CLI man pages and bash completions in a folder
-// called "docs"
-func GenerateDocs(cmd *cobra.Command) {
+// InitCommand prepares the command.
+func InitCommand() *cobra.Command {
+	var command = &cobra.Command{
+		Use:     "generate-docs",
+		Short:   "Generates documentation.",
+		Long:    "Generates bash autocompletion, command manpages and puts it into the docs folder.",
+		Example: "arduino generate-docs",
+		Args:    cobra.NoArgs,
+		Run:     run,
+	}
+	command.Hidden = true
+	return command
+}
+
+func run(cmd *cobra.Command, args []string) {
+	logrus.Info("Generating docs")
 	errorText := ""
 	err := cmd.Parent().GenBashCompletionFile("docs/bash_completions/arduino")
 	if err != nil {

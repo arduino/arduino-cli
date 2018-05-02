@@ -33,13 +33,12 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/bcmi-labs/arduino-cli/commands/generatedocs"
-
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/commands/board"
 	"github.com/bcmi-labs/arduino-cli/commands/compile"
 	"github.com/bcmi-labs/arduino-cli/commands/config"
 	"github.com/bcmi-labs/arduino-cli/commands/core"
+	"github.com/bcmi-labs/arduino-cli/commands/generatedocs"
 	"github.com/bcmi-labs/arduino-cli/commands/lib"
 	"github.com/bcmi-labs/arduino-cli/commands/login"
 	"github.com/bcmi-labs/arduino-cli/commands/logout"
@@ -59,7 +58,7 @@ func Init() *cobra.Command {
 		Use:              "arduino-cli",
 		Short:            "Arduino CLI.",
 		Long:             "Arduino Create Command Line Interface (arduino-cli).",
-		Example:          "arduino generate-docs # To generate the docs and autocompletion for the whole CLI.",
+		Example:          "arduino <command> [flags...]",
 		PersistentPreRun: preRun,
 	}
 	command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
@@ -69,6 +68,7 @@ func Init() *cobra.Command {
 	command.AddCommand(compile.InitCommand())
 	command.AddCommand(config.InitCommand())
 	command.AddCommand(core.InitCommand())
+	command.AddCommand(generatedocs.InitCommand())
 	command.AddCommand(lib.InitCommand())
 	command.AddCommand(login.InitCommand())
 	command.AddCommand(logout.InitCommand())
@@ -80,12 +80,6 @@ func Init() *cobra.Command {
 }
 
 func preRun(cmd *cobra.Command, args []string) {
-	if os.Getenv("ARDUINO_GENERATE_DOCS") == "1" {
-		generatedocs.GenerateDocs(cmd)
-		formatter.PrintResult("Generated docs as requested (ARDUINO_GENERATE_DOCS env var is set to 1)")
-		os.Exit(0)
-	}
-
 	// Reset logrus if debug flag changed.
 	if !commands.GlobalFlags.Debug {
 		// Discard logrus output if no debug.
