@@ -47,6 +47,7 @@ import (
 // The manager also keeps track of the status of the Packages (their Platform Releases, actually)
 // installed in the system.
 type PackageManager struct {
+	Log      logrus.FieldLogger
 	packages *cores.Packages
 
 	// TODO: This might be a list in the future, but would it be of any help?
@@ -64,20 +65,13 @@ type EventHandler interface {
 // NewPackageManager returns a new instance of the PackageManager
 func NewPackageManager() *PackageManager {
 	return &PackageManager{
+		Log:      logrus.New(),
 		packages: cores.NewPackages(),
 	}
 }
 
 func (pm *PackageManager) Clear() {
 	pm.packages = cores.NewPackages()
-}
-
-func (pm *PackageManager) EnableDebugOutput() {
-	logrus.SetLevel(logrus.DebugLevel)
-}
-
-func (pm *PackageManager) DisableDebugOutput() {
-	logrus.SetLevel(logrus.ErrorLevel)
 }
 
 func (pm *PackageManager) GetPackages() *cores.Packages {

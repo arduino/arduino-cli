@@ -37,7 +37,6 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/sirupsen/logrus"
 )
 
 // PlatformReference represents a tuple to identify a Platform
@@ -137,7 +136,7 @@ func (pm *PackageManager) InstallToolReleases(toolReleasesToDownload []*cores.To
 	result *output.CoreProcessResults) error {
 
 	for _, item := range toolReleasesToDownload {
-		logrus.WithField("Package", item.Tool.Package.Name).
+		pm.Log.WithField("Package", item.Tool.Package.Name).
 			WithField("Name", item.Tool.Name).
 			WithField("Version", item.Version).
 			Info("Installing tool")
@@ -146,18 +145,18 @@ func (pm *PackageManager) InstallToolReleases(toolReleasesToDownload []*cores.To
 		var processResult output.ProcessResult
 		if err != nil {
 			if os.IsExist(err) {
-				logrus.WithError(err).Warnf("Cannot install tool `%s`, it is already installed", item.Tool.Name)
+				pm.Log.WithError(err).Warnf("Cannot install tool `%s`, it is already installed", item.Tool.Name)
 				processResult = output.ProcessResult{
 					Status: "Already Installed",
 				}
 			} else {
-				logrus.WithError(err).Warnf("Cannot install tool `%s`", item.Tool.Name)
+				pm.Log.WithError(err).Warnf("Cannot install tool `%s`", item.Tool.Name)
 				processResult = output.ProcessResult{
 					Error: err.Error(),
 				}
 			}
 		} else {
-			logrus.Info("Adding installed tool to final result")
+			pm.Log.Info("Adding installed tool to final result")
 			processResult = output.ProcessResult{
 				Status: "Installed",
 			}
@@ -173,7 +172,7 @@ func (pm *PackageManager) InstallPlatformReleases(platformReleasesToDownload []*
 	outputResults *output.CoreProcessResults) error {
 
 	for _, item := range platformReleasesToDownload {
-		logrus.WithField("Package", item.Platform.Package.Name).
+		pm.Log.WithField("Package", item.Platform.Package.Name).
 			WithField("Name", item.Platform.Name).
 			WithField("Version", item.Version).
 			Info("Installing core")
@@ -182,18 +181,18 @@ func (pm *PackageManager) InstallPlatformReleases(platformReleasesToDownload []*
 		var result output.ProcessResult
 		if err != nil {
 			if os.IsExist(err) {
-				logrus.WithError(err).Warnf("Cannot install core `%s`, it is already installed", item.Platform.Name)
+				pm.Log.WithError(err).Warnf("Cannot install core `%s`, it is already installed", item.Platform.Name)
 				result = output.ProcessResult{
 					Status: "Already Installed",
 				}
 			} else {
-				logrus.WithError(err).Warnf("Cannot install core `%s`", item.Platform.Name)
+				pm.Log.WithError(err).Warnf("Cannot install core `%s`", item.Platform.Name)
 				result = output.ProcessResult{
 					Error: err.Error(),
 				}
 			}
 		} else {
-			logrus.Info("Adding installed core to final result")
+			pm.Log.Info("Adding installed core to final result")
 
 			result = output.ProcessResult{
 				Status: "Installed",

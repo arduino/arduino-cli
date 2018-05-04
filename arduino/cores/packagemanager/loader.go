@@ -39,7 +39,6 @@ import (
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/configs"
-	"github.com/sirupsen/logrus"
 )
 
 // LoadHardware read all plaforms from the configured paths
@@ -70,7 +69,7 @@ func (pm *PackageManager) LoadHardwareFromDirectories(hardwarePaths []string) er
 
 // LoadHardwareFromDirectory read a plaform from the path passed as parameter
 func (pm *PackageManager) LoadHardwareFromDirectory(path string) error {
-	logrus.Infof("Loading hardware from: %s", path)
+	pm.Log.Infof("Loading hardware from: %s", path)
 	path, err := filepath.Abs(path)
 	if err != nil {
 		return fmt.Errorf("find abs path: %s", err)
@@ -96,7 +95,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path string) error {
 
 		// First exclude all "tools" folders
 		if packager == "tools" {
-			logrus.Infof("Excluding folder: %s", filepath.Join(path, packager))
+			pm.Log.Infof("Excluding folder: %s", filepath.Join(path, packager))
 			continue
 		}
 
@@ -139,7 +138,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path string) error {
 		// - PACKAGER/tools/TOOL-NAME/TOOL-VERSION/... (ex: arduino/tools/bossac/1.7.0/...)
 		toolsSubdirPath := filepath.Join(packagerPath, "tools")
 		if info, err := os.Stat(toolsSubdirPath); err == nil && info.IsDir() {
-			logrus.Infof("Checking existence of 'tools' path: %s", toolsSubdirPath)
+			pm.Log.Infof("Checking existence of 'tools' path: %s", toolsSubdirPath)
 			if err := pm.loadToolsFromPackage(targetPackage, toolsSubdirPath); err != nil {
 				return fmt.Errorf("loading tools from %s: %s", toolsSubdirPath, err)
 			}
@@ -152,7 +151,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path string) error {
 // loadPlatforms load plaftorms from the specified directory assuming that they belongs
 // to the targetPackage object passed as parameter.
 func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFolder string) error {
-	logrus.Infof("Loading package %s from: %s", targetPackage.Name, packageFolder)
+	pm.Log.Infof("Loading package %s from: %s", targetPackage.Name, packageFolder)
 
 	// packagePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
 	// if err != nil {
@@ -197,7 +196,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 			if err := pm.loadPlatformRelease(release, platformPath); err != nil {
 				return fmt.Errorf("loading platform release: %s", err)
 			}
-			logrus.WithField("platform", release).Infof("Loaded platform")
+			pm.Log.WithField("platform", release).Infof("Loaded platform")
 
 		} else if os.IsNotExist(err) {
 			// case: ARCHITECTURE/VERSION/boards.txt
@@ -224,7 +223,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 				if err := pm.loadPlatformRelease(release, platformWithVersionPath); err != nil {
 					return fmt.Errorf("loading platform release %s: %s", version, err)
 				}
-				logrus.WithField("platform", release).Infof("Loaded platform")
+				pm.Log.WithField("platform", release).Infof("Loaded platform")
 			}
 		} else {
 			return fmt.Errorf("looking for boards.txt in %s: %s", possibleBoardTxtPath, err)
@@ -302,7 +301,7 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 }
 
 func (pm *PackageManager) loadToolsFromPackage(targetPackage *cores.Package, toolsPath string) error {
-	logrus.Infof("Loading tools from dir: %s", toolsPath)
+	pm.Log.Infof("Loading tools from dir: %s", toolsPath)
 
 	toolsInfo, err := ioutil.ReadDir(toolsPath)
 	if err != nil {
@@ -316,14 +315,14 @@ func (pm *PackageManager) loadToolsFromPackage(targetPackage *cores.Package, too
 
 		tool := targetPackage.GetOrCreateTool(name)
 		toolPath := filepath.Join(toolsPath, name)
-		if err = loadToolReleasesFromTool(tool, toolPath); err != nil {
+		if err = pm.loadToolReleasesFromTool(tool, toolPath); err != nil {
 			return fmt.Errorf("loading tool release in %s: %s", toolPath, err)
 		}
 	}
 	return nil
 }
 
-func loadToolReleasesFromTool(tool *cores.Tool, toolPath string) error {
+func (pm *PackageManager) loadToolReleasesFromTool(tool *cores.Tool, toolPath string) error {
 	toolVersions, err := ioutil.ReadDir(toolPath)
 	if err != nil {
 		return err
@@ -336,7 +335,7 @@ func loadToolReleasesFromTool(tool *cores.Tool, toolPath string) error {
 		if toolReleasePath, err := filepath.Abs(filepath.Join(toolPath, version)); err == nil {
 			release := tool.GetOrCreateRelease(version)
 			release.Folder = toolReleasePath
-			logrus.WithField("tool", release).Infof("Loaded tool")
+			pm.Log.WithField("tool", release).Infof("Loaded tool")
 		} else {
 			return err
 		}
@@ -355,7 +354,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs []string) error {
 }
 
 func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath string) error {
-	logrus.Infof("Loading tools from bundle dir: %s", toolsPath)
+	pm.Log.Infof("Loading tools from bundle dir: %s", toolsPath)
 
 	// We scan toolsPath content to find a "builtin_tools_versions.txt", if such file exists
 	// then the all the tools are available in the same directory, mixed together, and their
@@ -389,7 +388,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath string) error {
 	if builtinToolsVersionsTxtPath != "" {
 		// If builtin_tools_versions.txt is found create tools based on the info
 		// contained in that file
-		logrus.Infof("Found builtin_tools_versions.txt")
+		pm.Log.Infof("Found builtin_tools_versions.txt")
 		toolPath, err := filepath.Abs(filepath.Dir(builtinToolsVersionsTxtPath))
 		if err != nil {
 			return fmt.Errorf("getting parent dir of %s: %s", builtinToolsVersionsTxtPath, err)
@@ -407,7 +406,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath string) error {
 				tool := targetPackage.GetOrCreateTool(toolName)
 				release := tool.GetOrCreateRelease(toolVersion)
 				release.Folder = toolPath
-				logrus.WithField("tool", release).Infof("Loaded tool")
+				pm.Log.WithField("tool", release).Infof("Loaded tool")
 			}
 		}
 	} else {
