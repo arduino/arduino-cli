@@ -58,6 +58,7 @@ type PlatformRelease struct {
 	Properties  properties.Map            `json:"-"`
 	Boards      map[string]*Board         `json:"-"`
 	Programmers map[string]properties.Map `json:"-"`
+	Menus       map[string]string         `json:"-"`
 	Folder      string                    `json:"-"`
 }
 

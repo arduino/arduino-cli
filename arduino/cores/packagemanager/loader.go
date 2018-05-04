@@ -289,6 +289,9 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 	}
 
 	propertiesByBoard := boardsProperties.FirstLevelOf()
+
+	platform.Menus = propertiesByBoard["menu"]
+
 	delete(propertiesByBoard, "menu") // TODO: check this one
 
 	for boardID, boardProperties := range propertiesByBoard {
