@@ -30,9 +30,11 @@
 package generatedocs
 
 import (
-	"fmt"
+	"os"
+	"path/filepath"
 
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/commands"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
@@ -42,39 +44,53 @@ import (
 func InitCommand() *cobra.Command {
 	var command = &cobra.Command{
 		Use:     "generate-docs",
-		Short:   "Generates documentation.",
-		Long:    "Generates bash autocompletion, command manpages and puts it into the docs folder.",
-		Example: "arduino generate-docs",
-		Args:    cobra.NoArgs,
-		Run:     run,
+		Short:   "Generates bash completion and command manpages.",
+		Long:    "Generates bash completion and command manpages.",
+		Example: "arduino generate-docs bash-completions",
 	}
+	command.PersistentFlags().StringVarP(&outputDir, "output-dir", "o", "",
+		"Directory where to save generated files. Default is './docs', the directory must exist.")
+	command.AddCommand(&cobra.Command{
+		Use:  "manpage",
+		Args: cobra.NoArgs,
+		Run:  generateManPages,
+	})
+	command.AddCommand(&cobra.Command{
+		Use:  "bash-completions",
+		Args: cobra.NoArgs,
+		Run:  generateBashCompletions,
+	})
 	command.Hidden = true
 	return command
 }
 
-func run(cmd *cobra.Command, args []string) {
-	logrus.Info("Generating docs")
-	errorText := ""
-	err := cmd.Parent().GenBashCompletionFile("docs/bash_completions/arduino")
+var outputDir = ""
+
+func generateBashCompletions(cmd *cobra.Command, args []string) {
+	if outputDir == "" {
+		outputDir = "docs/bash_completions"
+	}
+	logrus.WithField("outputDir", outputDir).Info("Generating bash completion")
+	err := cmd.Root().GenBashCompletionFile(filepath.Join(outputDir, "arduino"))
 	if err != nil {
 		logrus.WithError(err).Warn("Error Generating bash autocompletions")
-		errorText += fmt.Sprintln(err)
-	}
-	err = generateManPages(cmd.Parent())
-	if err != nil {
-		logrus.WithError(err).Warn("Error Generating manpages")
-		errorText += fmt.Sprintln(err)
-	}
-	if errorText != "" {
-		formatter.PrintErrorMessage(errorText)
+		os.Exit(commands.ErrGeneric)
 	}
 }
 
 // Generate man pages for all commands and puts them in $PROJECT_DIR/docs/manpages.
-func generateManPages(rootCommand *cobra.Command) error {
+func generateManPages(cmd *cobra.Command, args []string) {
+	if outputDir == "" {
+		outputDir = "docs/manpages"
+	}
+	logrus.WithField("outputDir", outputDir).Info("Generating manpages")
 	header := &doc.GenManHeader{
 		Title:   "ARDUINO COMMAND LINE MANUAL",
 		Section: "1",
 	}
-	return doc.GenManTree(rootCommand, header, "./docs/manpages")
+	err := doc.GenManTree(cmd.Root(), header, outputDir)
+	if err != nil {
+		logrus.WithError(err).Warn("Error Generating manpages")
+		os.Exit(commands.ErrGeneric)
+	}
 }
