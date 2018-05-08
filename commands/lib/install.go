@@ -69,7 +69,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	installLibraries(status, pairs)
 }
 
-func installLibraries(status *libraries.StatusContext, pairs []libraries.NameVersionPair) {
+func installLibraries(status *libraries.StatusContext, pairs []libraries.Reference) {
 	libsToInstall, err := status.Process(pairs)
 	if err != nil {
 		formatter.PrintError(err, "Error parsing libraries")

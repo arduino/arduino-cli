@@ -26,12 +26,13 @@
  *
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
+
 package libraries
 
 import "strings"
 
-// NameVersionPair represents a pair Name - Version.
-type NameVersionPair struct {
+// Reference uniquely identify a Library in the library index
+type Reference struct {
 	Name    string // The name of the parsed item.
 	Version string // The Version of the parsed item.
 }
@@ -39,8 +40,8 @@ type NameVersionPair struct {
 // ParseArgs parses a sequence of "item@version" tokens and returns a Name-Version slice.
 //
 // If version is not present it is assumed as "latest" version.
-func ParseArgs(args []string) []NameVersionPair {
-	ret := make([]NameVersionPair, 0, len(args))
+func ParseArgs(args []string) []Reference {
+	ret := make([]Reference, 0, len(args))
 	for _, item := range args {
 		tokens := strings.SplitN(item, "@", 2)
 		var version string
@@ -49,7 +50,7 @@ func ParseArgs(args []string) []NameVersionPair {
 		} else {
 			version = "latest"
 		}
-		ret = append(ret, NameVersionPair{
+		ret = append(ret, Reference{
 			Name:    tokens[0],
 			Version: version,
 		})

@@ -91,7 +91,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 		Libraries: map[string]output.ProcessResult{},
 	}
 
-	useFileName := func(file os.FileInfo, library libraries.NameVersionPair, outputResults *output.LibProcessResults) bool {
+	useFileName := func(file os.FileInfo, library libraries.Reference, outputResults *output.LibProcessResults) bool {
 		logrus.Info("Using file name to uninstall")
 		fileName := file.Name()
 		// Replacing underscore in foldernames with spaces.

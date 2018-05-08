@@ -74,7 +74,7 @@ func GetLibraryCode(library *Library) string {
 // Process takes a set of name-version pairs and return
 // a set of items to download and a set of outputs for non
 // existing libraries.
-func (sc StatusContext) Process(items []NameVersionPair) (map[string]*Release, error) {
+func (sc StatusContext) Process(items []Reference) (map[string]*Release, error) {
 	ret := map[string]*Release{}
 
 	for _, item := range items {
