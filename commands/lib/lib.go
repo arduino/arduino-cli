@@ -49,7 +49,7 @@ func InitCommand() *cobra.Command {
 		Short: "Arduino commands about libraries.",
 		Long:  "Arduino commands about libraries.",
 		Example: "" +
-			"arduino lib install YoutubeApi\n" +
+			"arduino lib install AudioZero\n" +
 			"arduino lib update-index",
 	}
 	libCommand.AddCommand(initDownloadCommand())

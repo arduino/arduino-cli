@@ -45,8 +45,8 @@ func initDownloadCommand() *cobra.Command {
 		Short: "Downloads one or more libraries without installing them.",
 		Long:  "Downloads one or more libraries without installing them.",
 		Example: "" +
-			"arduino lib download YoutubeApi       # for the latest version.\n" +
-			"arduino lib download YoutubeApi@1.0.0 # for a specific version (in this case 1.0.0).",
+			"arduino lib download AudioZero       # for the latest version.\n" +
+			"arduino lib download AudioZero@1.0.0 # for a specific version.",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 	}

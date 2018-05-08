@@ -56,7 +56,7 @@ func initUninstallCommand() *cobra.Command {
 		Use:     "uninstall LIBRARY_NAME(S)",
 		Short:   "Uninstalls one or more libraries.",
 		Long:    "Uninstalls one or more libraries.",
-		Example: "arduino uninstall YoutubeApi",
+		Example: "arduino lib uninstall AudioZero",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runUninstallCommand,
 	}
