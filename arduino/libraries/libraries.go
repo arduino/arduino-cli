@@ -43,22 +43,74 @@ import (
 	"github.com/blang/semver"
 )
 
-// Library represents a library in the system
-type Library struct {
-	Name          string              `json:"name,required"`
-	Author        string              `json:"author,omitempty"`
-	Maintainer    string              `json:"maintainer,omitempty"`
-	Sentence      string              `json:"sentence,omitempty"`
-	Paragraph     string              `json:"paragraph,omitempty"`
-	Website       string              `json:"website,omitempty"`
-	Category      string              `json:"category,omitempty"`
-	Architectures []string            `json:"architectures,omitempty"`
-	Types         []string            `json:"types,omitempty"`
-	Releases      map[string]*Release `json:"releases,omitempty"`
+var MandatoryProperties = []string{"name", "version", "author", "maintainer"}
+var OptionalProperties = []string{"sentence", "paragraph", "url"}
+var ValidCategories = map[string]bool{
+	"Display":             true,
+	"Communication":       true,
+	"Signal Input/Output": true,
+	"Sensors":             true,
+	"Device Control":      true,
+	"Timing":              true,
+	"Data Storage":        true,
+	"Data Processing":     true,
+	"Other":               true,
+	"Uncategorized":       true,
 }
 
-func (l *Library) String() string {
-	return l.Name
+type LibraryLayout uint16
+
+const (
+	// FlatLayout is a library without a `src` folder
+	FlatLayout LibraryLayout = 1 << iota
+	// RecursiveLayout is a library with `src` folder (that allows recursive build)
+	RecursiveLayout
+)
+
+// Library represents a library in the system
+type Library struct {
+	Name          string
+	Author        string
+	Maintainer    string
+	Sentence      string
+	Paragraph     string
+	Website       string
+	Category      string
+	Architectures []string
+
+	Types    []string            `json:"types,omitempty"`
+	Releases map[string]*Release `json:"releases,omitempty"`
+
+	Folder        string
+	SrcFolder     string
+	UtilityFolder string
+	Layout        LibraryLayout
+	RealName      string
+	DotALinkage   bool
+	Precompiled   bool
+	LDflags       string
+	IsLegacy      bool
+	Version       string
+	License       string
+	Properties    map[string]string
+}
+
+func (library *Library) String() string {
+	return library.Name + " : " + library.SrcFolder
+}
+
+func (library *Library) SupportsArchitectures(archs []string) bool {
+	for _, libArch := range library.Architectures {
+		if libArch == "*" {
+			return true
+		}
+		for _, arch := range archs {
+			if arch == libArch || arch == "*" {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // InstalledRelease returns the installed release of the library.
