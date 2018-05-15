@@ -80,23 +80,6 @@ func makeNewLibrary(libraryFolder string) (*Library, error) {
 		addUtilityFolder(library)
 	}
 
-	// subFolders, err := ioutil.ReadDir(libraryFolder)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("reading dir %s: %s", libraryFolder, err)
-	// }
-
-	// if debugLevel >= 0 {
-	// 	for _, subFolder := range subFolders {
-	// 		if utils.IsSCCSOrHiddenFile(subFolder) {
-	// 			if !utils.IsSCCSFile(subFolder) && utils.IsHiddenFile(subFolder) {
-	// 				logger.Fprintln(os.Stdout, "warn",
-	// 					"WARNING: Spurious {0} folder in '{1}' library",
-	// 					filepath.Base(subFolder.Name()), libProperties["name"])
-	// 			}
-	// 		}
-	// 	}
-	// }
-
 	if libProperties["architectures"] == "" {
 		libProperties["architectures"] = "*"
 	}
@@ -107,9 +90,6 @@ func makeNewLibrary(libraryFolder string) (*Library, error) {
 
 	libProperties["category"] = strings.TrimSpace(libProperties["category"])
 	if !ValidCategories[libProperties["category"]] {
-		// logger.Fprintln(os.Stdout, "warn",
-		// 	"WARNING: Category '{0}' in library {1} is not valid. Setting to '{2}'",
-		// 	libProperties["category"], libProperties["name"], "Uncategorized")
 		libProperties["category"] = "Uncategorized"
 	}
 	library.Category = libProperties["category"]
