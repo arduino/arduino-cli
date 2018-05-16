@@ -36,13 +36,14 @@ import (
 	"strings"
 
 	properties "github.com/arduino/go-properties-map"
+	"github.com/bcmi-labs/arduino-cli/paths"
 )
 
-func Load(libraryFolder string) (*Library, error) {
-	if _, err := os.Stat(filepath.Join(libraryFolder, "library.properties")); os.IsNotExist(err) {
-		return makeLegacyLibrary(libraryFolder)
+func Load(libraryFolder *paths.Path) (*Library, error) {
+	if exist, _ := libraryFolder.Join("library.properties").Exist(); exist {
+		return makeNewLibrary(libraryFolder)
 	}
-	return makeNewLibrary(libraryFolder)
+	return makeLegacyLibrary(libraryFolder)
 }
 
 func addUtilityFolder(library *Library) {
@@ -53,8 +54,8 @@ func addUtilityFolder(library *Library) {
 	}
 }
 
-func makeNewLibrary(libraryFolder string) (*Library, error) {
-	libProperties, err := properties.Load(filepath.Join(libraryFolder, "library.properties"))
+func makeNewLibrary(libraryFolder *paths.Path) (*Library, error) {
+	libProperties, err := properties.Load(libraryFolder.Join("library.properties").String())
 	if err != nil {
 		return nil, fmt.Errorf("loading library.properties: %s", err)
 	}
@@ -70,13 +71,15 @@ func makeNewLibrary(libraryFolder string) (*Library, error) {
 	}
 
 	library := &Library{}
-	library.Folder = libraryFolder
-	if stat, err := os.Stat(filepath.Join(libraryFolder, "src")); err == nil && stat.IsDir() {
+	// TODO: convert library.Folder to *paths.Path
+	library.Folder = libraryFolder.String()
+	if exist, _ := libraryFolder.Join("src").Exist(); exist {
 		library.Layout = RecursiveLayout
-		library.SrcFolder = filepath.Join(libraryFolder, "src")
+		// TODO: convert SrcFolder to *paths.Path
+		library.SrcFolder = libraryFolder.Join("src").String()
 	} else {
 		library.Layout = FlatLayout
-		library.SrcFolder = libraryFolder
+		library.SrcFolder = libraryFolder.String()
 		addUtilityFolder(library)
 	}
 
@@ -99,7 +102,7 @@ func makeNewLibrary(libraryFolder string) (*Library, error) {
 	}
 	library.License = libProperties["license"]
 
-	library.Name = filepath.Base(libraryFolder)
+	library.Name = libraryFolder.Base()
 	library.RealName = strings.TrimSpace(libProperties["name"])
 	library.Version = strings.TrimSpace(libProperties["version"])
 	library.Author = strings.TrimSpace(libProperties["author"])
@@ -116,12 +119,12 @@ func makeNewLibrary(libraryFolder string) (*Library, error) {
 	return library, nil
 }
 
-func makeLegacyLibrary(libraryFolder string) (*Library, error) {
+func makeLegacyLibrary(libraryFolder *paths.Path) (*Library, error) {
 	library := &Library{
-		Folder:        libraryFolder,
-		SrcFolder:     libraryFolder,
+		Folder:        libraryFolder.String(),
+		SrcFolder:     libraryFolder.String(),
 		Layout:        FlatLayout,
-		Name:          filepath.Base(libraryFolder),
+		Name:          libraryFolder.Base(),
 		Architectures: []string{"*"},
 		IsLegacy:      true,
 	}

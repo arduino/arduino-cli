@@ -173,14 +173,14 @@ func run(cmd *cobra.Command, args []string) {
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	if packagesFolder, err := configs.HardwareDirectories(); err == nil {
-		ctx.HardwareFolders = packagesFolder
+		ctx.HardwareFolders = packagesFolder.AsStrings()
 	} else {
 		formatter.PrintError(err, "Cannot get hardware directories.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
 	if toolsFolder, err := configs.BundleToolsDirectories(); err == nil {
-		ctx.ToolsFolders = toolsFolder
+		ctx.ToolsFolders = toolsFolder.AsStrings()
 	} else {
 		formatter.PrintError(err, "Cannot get bundled tools directories.")
 		os.Exit(commands.ErrCoreConfig)

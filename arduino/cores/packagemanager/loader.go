@@ -31,7 +31,6 @@ package packagemanager
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -39,6 +38,7 @@ import (
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/bcmi-labs/arduino-cli/paths"
 )
 
 // LoadHardware read all plaforms from the configured paths
@@ -58,7 +58,7 @@ func (pm *PackageManager) LoadHardware() error {
 }
 
 // LoadHardwareFromDirectories load plaforms from a set of directories
-func (pm *PackageManager) LoadHardwareFromDirectories(hardwarePaths []string) error {
+func (pm *PackageManager) LoadHardwareFromDirectories(hardwarePaths paths.PathList) error {
 	for _, path := range hardwarePaths {
 		if err := pm.LoadHardwareFromDirectory(path); err != nil {
 			return fmt.Errorf("loading hardware from %s: %s", path, err)
@@ -68,40 +68,36 @@ func (pm *PackageManager) LoadHardwareFromDirectories(hardwarePaths []string) er
 }
 
 // LoadHardwareFromDirectory read a plaform from the path passed as parameter
-func (pm *PackageManager) LoadHardwareFromDirectory(path string) error {
+func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) error {
 	pm.Log.Infof("Loading hardware from: %s", path)
-	path, err := filepath.Abs(path)
-	if err != nil {
+	if err := path.ToAbs(); err != nil {
 		return fmt.Errorf("find abs path: %s", err)
 	}
 
 	// TODO: IS THIS CHECK NEEDED? can we ignore and let it fail at next ReadDir?
-	if stat, err := os.Stat(path); err != nil {
+	if isDir, err := path.IsDir(); err != nil {
 		return fmt.Errorf("reading %s stat info: %s", path, err)
-	} else if !stat.IsDir() {
+	} else if !isDir {
 		return fmt.Errorf("%s is not a folder", path)
 	}
 
 	// Scan subfolders.
-	files, err := ioutil.ReadDir(path)
+	files, err := path.ReadDir()
 	if err != nil {
 		return fmt.Errorf("reading %s directory: %s", path, err)
 	}
-	for _, packagerPathInfo := range files {
-		packager := packagerPathInfo.Name()
-		if strings.HasPrefix(packager, ".") {
-			continue
-		}
+	files.FilterOutHiddenFiles()
+	for _, packagerPath := range files {
+		packager := packagerPath.Base()
 
 		// First exclude all "tools" folders
 		if packager == "tools" {
-			pm.Log.Infof("Excluding folder: %s", filepath.Join(path, packager))
+			pm.Log.Infof("Excluding folder: %s", packagerPath)
 			continue
 		}
 
 		// Follow symlinks
-		packagerPath := filepath.Join(path, packager)
-		packagerPath, err := filepath.EvalSymlinks(packagerPath) // ex: .arduino15/packages/arduino/
+		err := packagerPath.FollowSymLink() // ex: .arduino15/packages/arduino/
 		if err != nil {
 			return fmt.Errorf("following possible symlink %s: %s", path, err)
 		}
@@ -116,12 +112,12 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path string) error {
 		//   PACKAGER/hardware/ARCHITECTURE-3/VERSION/boards.txt...  (ex: arduino/hardware/samd/1.6.12/...)
 		//   PACKAGER/tools/...                                      (ex: arduino/tools/...)
 		// in the latter case we just move into "hardware" folder and continue
-		architectureParentPath := ""
-		hardwareSubdirPath := filepath.Join(packagerPath, "hardware") // ex: .arduino15/packages/arduino/hardware
-		if info, err := os.Stat(hardwareSubdirPath); err == nil && info.IsDir() {
+		var architectureParentPath *paths.Path
+		hardwareSubdirPath := packagerPath.Join("hardware") // ex: .arduino15/packages/arduino/hardware
+		if isDir, _ := hardwareSubdirPath.IsDir(); isDir {
 			// we found the "hardware" folder move down into that
 			architectureParentPath = hardwareSubdirPath // ex: .arduino15/packages/arduino/
-		} else if info, err := os.Stat(packagerPath); err == nil && info.IsDir() {
+		} else if isDir, _ := packagerPath.IsDir(); isDir {
 			// we are already at the correct level
 			architectureParentPath = packagerPath
 		} else {
@@ -136,8 +132,8 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path string) error {
 
 		// Check if we have tools to load, the folder structure is as follows:
 		// - PACKAGER/tools/TOOL-NAME/TOOL-VERSION/... (ex: arduino/tools/bossac/1.7.0/...)
-		toolsSubdirPath := filepath.Join(packagerPath, "tools")
-		if info, err := os.Stat(toolsSubdirPath); err == nil && info.IsDir() {
+		toolsSubdirPath := packagerPath.Join("tools")
+		if isDir, _ := toolsSubdirPath.IsDir(); isDir {
 			pm.Log.Infof("Checking existence of 'tools' path: %s", toolsSubdirPath)
 			if err := pm.loadToolsFromPackage(targetPackage, toolsSubdirPath); err != nil {
 				return fmt.Errorf("loading tools from %s: %s", toolsSubdirPath, err)
@@ -150,7 +146,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path string) error {
 
 // loadPlatforms load plaftorms from the specified directory assuming that they belongs
 // to the targetPackage object passed as parameter.
-func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFolder string) error {
+func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFolder *paths.Path) error {
 	pm.Log.Infof("Loading package %s from: %s", targetPackage.Name, packageFolder)
 
 	// packagePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
@@ -159,19 +155,19 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 	// }
 	// targetPackage.Properties.Merge(packagePlatformTxt)
 
-	files, err := ioutil.ReadDir(packageFolder)
+	files, err := packageFolder.ReadDir()
 	if err != nil {
 		return fmt.Errorf("reading directory %s: %s", packageFolder, err)
 	}
 
 	for _, file := range files {
-		architecure := file.Name()
+		architecure := file.Base()
 		if strings.HasPrefix(architecure, ".") || architecure == "tools" ||
 			architecure == "platform.txt" { // TODO: Check if this "platform.txt" condition should be here....
 			continue
 		}
-		platformPath := filepath.Join(packageFolder, architecure)
-		if info, err := os.Stat(platformPath); err != nil || !info.IsDir() {
+		platformPath := packageFolder.Join(architecure)
+		if isDir, _ := platformPath.IsDir(); !isDir {
 			continue
 		}
 
@@ -179,15 +175,20 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 		// - ARCHITECTURE/boards.txt
 		// - ARCHITECTURE/VERSION/boards.txt
 		// We identify them by checking where is the bords.txt file
-		possibleBoardTxtPath := filepath.Join(platformPath, "boards.txt")
-		if _, err := os.Stat(possibleBoardTxtPath); err == nil {
+		possibleBoardTxtPath := platformPath.Join("boards.txt")
+		if exist, err := possibleBoardTxtPath.Exist(); err != nil {
+
+			return fmt.Errorf("looking for boards.txt in %s: %s", possibleBoardTxtPath, err)
+
+		} else if exist {
+
 			// case: ARCHITECTURE/boards.txt
 			// this is an unversioned Platform
 
 			// FIXME: this check is duplicated, find a better way to handle this
-			if _, err := os.Stat(filepath.Join(platformPath, "boards.txt")); err != nil && !os.IsNotExist(err) {
+			if exist, err := platformPath.Join("boards.txt").Exist(); err != nil {
 				return fmt.Errorf("opening boards.txt: %s", err)
-			} else if os.IsNotExist(err) {
+			} else if !exist {
 				continue
 			}
 
@@ -198,64 +199,62 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 			}
 			pm.Log.WithField("platform", release).Infof("Loaded platform")
 
-		} else if os.IsNotExist(err) {
+		} else /* !exist */ {
+
 			// case: ARCHITECTURE/VERSION/boards.txt
 			// let's dive into VERSION folders
 
 			platform := targetPackage.GetOrCreatePlatform(architecure)
-			versionDirs, err := ioutil.ReadDir(platformPath)
+			versionDirs, err := platformPath.ReadDir()
 			if err != nil {
 				return fmt.Errorf("reading dir %s: %s", platformPath, err)
 			}
+			versionDirs.FilterDirs()
+			versionDirs.FilterOutHiddenFiles()
 			for _, versionDir := range versionDirs {
-				version := versionDir.Name()
-				if !versionDir.IsDir() || strings.HasPrefix(version, ".") {
-					continue
-				}
-				platformWithVersionPath := filepath.Join(platformPath, version)
-				if _, err := os.Stat(filepath.Join(platformWithVersionPath, "boards.txt")); err != nil && !os.IsNotExist(err) {
+				version := versionDir.Base()
+				if exist, err := versionDir.Join("boards.txt").Exist(); err != nil {
 					return fmt.Errorf("opening boards.txt: %s", err)
-				} else if os.IsNotExist(err) {
+				} else if !exist {
 					continue
 				}
 
 				release := platform.GetOrCreateRelease(version)
-				if err := pm.loadPlatformRelease(release, platformWithVersionPath); err != nil {
+				if err := pm.loadPlatformRelease(release, versionDir); err != nil {
 					return fmt.Errorf("loading platform release %s: %s", version, err)
 				}
 				pm.Log.WithField("platform", release).Infof("Loaded platform")
 			}
-		} else {
-			return fmt.Errorf("looking for boards.txt in %s: %s", possibleBoardTxtPath, err)
 		}
 	}
 
 	return nil
 }
 
-func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, folder string) error {
-	platform.Folder = folder
+func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, folder *paths.Path) error {
+	// TODO: Change platform.Folder into *paths.Path
+	platform.Folder = folder.String()
 
 	// Some useful paths
-	platformTxtPath := filepath.Join(folder, "platform.txt")
-	platformTxtLocalPath := filepath.Join(folder, "platform.local.txt")
-	programmersTxtPath := filepath.Join(folder, "programmers.txt")
+	platformTxtPath := folder.Join("platform.txt")
+	platformTxtLocalPath := folder.Join("platform.local.txt")
+	programmersTxtPath := folder.Join("programmers.txt")
 
 	// Create platform properties
 	platform.Properties = platform.Properties.Clone() // TODO: why CLONE?
-	if p, err := properties.SafeLoad(platformTxtPath); err == nil {
+	if p, err := properties.SafeLoad(platformTxtPath.String()); err == nil {
 		platform.Properties.Merge(p)
 	} else {
 		return fmt.Errorf("loading %s: %s", platformTxtPath, err)
 	}
-	if p, err := properties.SafeLoad(platformTxtLocalPath); err == nil {
+	if p, err := properties.SafeLoad(platformTxtLocalPath.String()); err == nil {
 		platform.Properties.Merge(p)
 	} else {
 		return fmt.Errorf("loading %s: %s", platformTxtLocalPath, err)
 	}
 
 	// Create programmers properties
-	if programmersProperties, err := properties.SafeLoad(programmersTxtPath); err == nil {
+	if programmersProperties, err := properties.SafeLoad(programmersTxtPath.String()); err == nil {
 		platform.Programmers = properties.MergeMapsOfProperties(
 			map[string]properties.Map{},
 			platform.Programmers, // TODO: Very weird, why not an empty one?
@@ -303,21 +302,18 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 	return nil
 }
 
-func (pm *PackageManager) loadToolsFromPackage(targetPackage *cores.Package, toolsPath string) error {
+func (pm *PackageManager) loadToolsFromPackage(targetPackage *cores.Package, toolsPath *paths.Path) error {
 	pm.Log.Infof("Loading tools from dir: %s", toolsPath)
 
-	toolsInfo, err := ioutil.ReadDir(toolsPath)
+	toolsPaths, err := toolsPath.ReadDir()
 	if err != nil {
 		return fmt.Errorf("reading directory %s: %s", toolsPath, err)
 	}
-	for _, toolInfo := range toolsInfo {
-		name := toolInfo.Name()
-		if !toolInfo.IsDir() || strings.HasPrefix(name, ".") {
-			continue
-		}
-
+	toolsPaths.FilterDirs()
+	toolsPaths.FilterOutHiddenFiles()
+	for _, toolPath := range toolsPaths {
+		name := toolPath.Base()
 		tool := targetPackage.GetOrCreateTool(name)
-		toolPath := filepath.Join(toolsPath, name)
 		if err = pm.loadToolReleasesFromTool(tool, toolPath); err != nil {
 			return fmt.Errorf("loading tool release in %s: %s", toolPath, err)
 		}
@@ -325,19 +321,19 @@ func (pm *PackageManager) loadToolsFromPackage(targetPackage *cores.Package, too
 	return nil
 }
 
-func (pm *PackageManager) loadToolReleasesFromTool(tool *cores.Tool, toolPath string) error {
-	toolVersions, err := ioutil.ReadDir(toolPath)
+func (pm *PackageManager) loadToolReleasesFromTool(tool *cores.Tool, toolPath *paths.Path) error {
+	toolVersions, err := toolPath.ReadDir()
 	if err != nil {
 		return err
 	}
-	for _, versionInfo := range toolVersions {
-		version := versionInfo.Name()
-		if strings.HasPrefix(version, ".") {
-			continue
-		}
-		if toolReleasePath, err := filepath.Abs(filepath.Join(toolPath, version)); err == nil {
+	toolVersions.FilterDirs()
+	toolVersions.FilterOutHiddenFiles()
+	for _, versionPath := range toolVersions {
+		version := versionPath.Base()
+		if toolReleasePath, err := versionPath.Abs(); err == nil {
 			release := tool.GetOrCreateRelease(version)
-			release.Folder = toolReleasePath
+			// TODO: Make Folder a *paths.Path
+			release.Folder = toolReleasePath.String()
 			pm.Log.WithField("tool", release).Infof("Loaded tool")
 		} else {
 			return err
@@ -347,7 +343,7 @@ func (pm *PackageManager) loadToolReleasesFromTool(tool *cores.Tool, toolPath st
 	return nil
 }
 
-func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs []string) error {
+func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs paths.PathList) error {
 	for _, dir := range dirs {
 		if err := pm.LoadToolsFromBundleDirectory(dir); err != nil {
 			return fmt.Errorf("loading bundled tools from %s: %s", dir, err)
@@ -356,7 +352,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs []string) error {
 	return nil
 }
 
-func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath string) error {
+func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) error {
 	pm.Log.Infof("Loading tools from bundle dir: %s", toolsPath)
 
 	// We scan toolsPath content to find a "builtin_tools_versions.txt", if such file exists
@@ -384,7 +380,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath string) error {
 		}
 		return nil
 	}
-	if err := filepath.Walk(toolsPath, findBuiltInToolsVersionsTxt); err != nil {
+	if err := filepath.Walk(toolsPath.String(), findBuiltInToolsVersionsTxt); err != nil {
 		return fmt.Errorf("searching for builtin_tools_versions.txt in %s: %s", toolsPath, err)
 	}
 
