@@ -55,9 +55,28 @@ func (p *Path) Join(paths ...string) *Path {
 	return New(filepath.Join(p.path, filepath.Join(paths...)))
 }
 
+// JoinPath create a new Path by joining the provided paths
+func (p *Path) JoinPath(paths ...*Path) *Path {
+	res := p.Clone()
+	for _, path := range paths {
+		res = res.Join(path.path)
+	}
+	return res
+}
+
 // Base Base returns the last element of path
 func (p *Path) Base() string {
 	return filepath.Base(p.path)
+}
+
+// RelTo returns a relative Path that is lexically equivalent to r when
+// joined to the current Path
+func (p *Path) RelTo(r *Path) (*Path, error) {
+	rel, err := filepath.Rel(p.path, r.path)
+	if err != nil {
+		return nil, err
+	}
+	return New(rel), nil
 }
 
 // Abs returns the absolute path of the current Path
