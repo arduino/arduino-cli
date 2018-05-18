@@ -4,12 +4,13 @@ import (
 	"testing"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
+	"github.com/bcmi-labs/arduino-cli/paths"
 	"github.com/stretchr/testify/require"
 )
 
 func TestFindBoardWithFQBN(t *testing.T) {
 	pm := packagemanager.NewPackageManager()
-	pm.LoadHardwareFromDirectory("testdata")
+	pm.LoadHardwareFromDirectory(paths.New("testdata"))
 
 	board, err := pm.FindBoardWithFQBN("arduino:avr:uno")
 	require.Nil(t, err)

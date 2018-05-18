@@ -96,7 +96,7 @@ type Library struct {
 }
 
 func (library *Library) String() string {
-	return library.Name + " : " + library.SrcFolder
+	return library.Name // + " : " + library.SrcFolder.String()
 }
 
 func (library *Library) SupportsArchitectures(archs []string) bool {
