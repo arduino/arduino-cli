@@ -31,8 +31,6 @@ package libraries
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 
 	properties "github.com/arduino/go-properties-map"
@@ -47,9 +45,8 @@ func Load(libraryFolder *paths.Path) (*Library, error) {
 }
 
 func addUtilityFolder(library *Library) {
-	utilitySourcePath := filepath.Join(library.Folder, "utility")
-	stat, err := os.Stat(utilitySourcePath)
-	if err == nil && stat.IsDir() {
+	utilitySourcePath := library.Folder.Join("utility")
+	if isDir, _ := utilitySourcePath.IsDir(); isDir {
 		library.UtilityFolder = utilitySourcePath
 	}
 }
@@ -71,15 +68,13 @@ func makeNewLibrary(libraryFolder *paths.Path) (*Library, error) {
 	}
 
 	library := &Library{}
-	// TODO: convert library.Folder to *paths.Path
-	library.Folder = libraryFolder.String()
+	library.Folder = libraryFolder
 	if exist, _ := libraryFolder.Join("src").Exist(); exist {
 		library.Layout = RecursiveLayout
-		// TODO: convert SrcFolder to *paths.Path
-		library.SrcFolder = libraryFolder.Join("src").String()
+		library.SrcFolder = libraryFolder.Join("src")
 	} else {
 		library.Layout = FlatLayout
-		library.SrcFolder = libraryFolder.String()
+		library.SrcFolder = libraryFolder
 		addUtilityFolder(library)
 	}
 
@@ -121,8 +116,8 @@ func makeNewLibrary(libraryFolder *paths.Path) (*Library, error) {
 
 func makeLegacyLibrary(libraryFolder *paths.Path) (*Library, error) {
 	library := &Library{
-		Folder:        libraryFolder.String(),
-		SrcFolder:     libraryFolder.String(),
+		Folder:        libraryFolder,
+		SrcFolder:     libraryFolder,
 		Layout:        FlatLayout,
 		Name:          libraryFolder.Base(),
 		Architectures: []string{"*"},

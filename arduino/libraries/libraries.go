@@ -37,6 +37,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/paths"
+
 	"github.com/bcmi-labs/arduino-cli/arduino/releases"
 
 	"github.com/bcmi-labs/arduino-cli/configs"
@@ -81,9 +83,9 @@ type Library struct {
 	Types    []string            `json:"types,omitempty"`
 	Releases map[string]*Release `json:"releases,omitempty"`
 
-	Folder        string
-	SrcFolder     string
-	UtilityFolder string
+	Folder        *paths.Path
+	SrcFolder     *paths.Path
+	UtilityFolder *paths.Path
 	Layout        LibraryLayout
 	RealName      string
 	DotALinkage   bool
@@ -111,6 +113,28 @@ func (library *Library) SupportsArchitectures(archs []string) bool {
 		}
 	}
 	return false
+}
+
+type SourceDir struct {
+	Folder  *paths.Path
+	Recurse bool
+}
+
+func (library *Library) SourceDirs() []SourceDir {
+	dirs := []SourceDir{}
+	dirs = append(dirs,
+		SourceDir{
+			Folder:  library.SrcFolder,
+			Recurse: library.Layout == RecursiveLayout,
+		})
+	if library.UtilityFolder != nil {
+		dirs = append(dirs,
+			SourceDir{
+				Folder:  library.UtilityFolder,
+				Recurse: false,
+			})
+	}
+	return dirs
 }
 
 // InstalledRelease returns the installed release of the library.
