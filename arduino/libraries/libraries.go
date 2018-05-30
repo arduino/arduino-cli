@@ -38,7 +38,7 @@ import (
 	"strings"
 
 	"github.com/arduino/go-paths-helper"
-	"github.com/bcmi-labs/arduino-cli/arduino/releases"
+	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/blang/semver"
 )
@@ -195,9 +195,9 @@ func (l *Library) InstalledRelease() (*Release, error) {
 
 // Release represents a release of a library
 type Release struct {
-	Version  string                     `json:"version"`
-	Resource *releases.DownloadResource `json:"resource"`
-	Library  *Library                   `json:"-"`
+	Version  string                      `json:"version"`
+	Resource *resources.DownloadResource `json:"resource"`
+	Library  *Library                    `json:"-"`
 }
 
 func (r *Release) String() string {

@@ -33,7 +33,7 @@ import (
 	"fmt"
 
 	properties "github.com/arduino/go-properties-map"
-	"github.com/bcmi-labs/arduino-cli/arduino/releases"
+	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 
 	"github.com/blang/semver"
 )
@@ -49,7 +49,7 @@ type Platform struct {
 
 // PlatformRelease represents a release of a plaform package.
 type PlatformRelease struct {
-	Resource     *releases.DownloadResource
+	Resource     *resources.DownloadResource
 	Version      string
 	BoardNames   []string
 	Dependencies ToolDependencies // The Dependency entries to load tools.

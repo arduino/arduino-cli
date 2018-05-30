@@ -35,7 +35,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/releases"
+	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/configs"
@@ -76,7 +76,7 @@ func run(cmd *cobra.Command, args []string) {
 		}
 		pathParts := strings.Split(relativePath, string(filepath.Separator))
 		if len(pathParts) == 4 {
-			isValid, err := releases.CheckDirChecksum(path)
+			isValid, err := resources.CheckDirChecksum(path)
 			if err != nil {
 				return err
 			}

@@ -36,7 +36,7 @@ import (
 	"strings"
 
 	properties "github.com/arduino/go-properties-map"
-	"github.com/bcmi-labs/arduino-cli/arduino/releases"
+	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 
 	"github.com/blang/semver"
 )
@@ -59,7 +59,7 @@ type ToolRelease struct {
 // Flavour represents a flavour of a Tool version.
 type Flavour struct {
 	OS       string `json:"os,required"` // The OS Supported by this flavour.
-	Resource *releases.DownloadResource
+	Resource *resources.DownloadResource
 }
 
 // GetOrCreateRelease returns the ToolRelease object with the specified version
@@ -206,7 +206,7 @@ func (f *Flavour) isCompatibleWithCurrentMachine() bool {
 }
 
 // GetCompatibleFlavour returns the downloadable resource compatible with the running O.S.
-func (tr *ToolRelease) GetCompatibleFlavour() *releases.DownloadResource {
+func (tr *ToolRelease) GetCompatibleFlavour() *resources.DownloadResource {
 	for _, flavour := range tr.Flavours {
 		if flavour.isCompatibleWithCurrentMachine() {
 			return flavour.Resource

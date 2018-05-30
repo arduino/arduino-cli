@@ -32,7 +32,7 @@ package compile
 import (
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
-	"github.com/bcmi-labs/arduino-cli/arduino/releases"
+	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 )
 
 func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
@@ -42,7 +42,7 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 	ctagsRel.Flavours = []*cores.Flavour{
 		&cores.Flavour{
 			OS: "i686-pc-linux-gnu",
-			Resource: &releases.DownloadResource{
+			Resource: &resources.DownloadResource{
 				ArchiveFileName: "ctags-5.8-arduino11-pm-i686-pc-linux-gnu.tar.bz2",
 				URL:             "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-pm-i686-pc-linux-gnu.tar.bz2",
 				Size:            106930,
@@ -52,7 +52,7 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 		},
 		&cores.Flavour{
 			OS: "x86_64-pc-linux-gnu",
-			Resource: &releases.DownloadResource{
+			Resource: &resources.DownloadResource{
 				ArchiveFileName: "ctags-5.8-arduino11-pm-x86_64-pc-linux-gnu.tar.bz2",
 				URL:             "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-pm-x86_64-pc-linux-gnu.tar.bz2",
 				Size:            111604,
@@ -62,7 +62,7 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 		},
 		&cores.Flavour{
 			OS: "i686-mingw32",
-			Resource: &releases.DownloadResource{
+			Resource: &resources.DownloadResource{
 				ArchiveFileName: "ctags-5.8-arduino11-pm-i686-mingw32.zip",
 				URL:             "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-pm-i686-mingw32.zip",
 				Size:            116455,
@@ -72,7 +72,7 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 		},
 		&cores.Flavour{
 			OS: "x86_64-apple-darwin",
-			Resource: &releases.DownloadResource{
+			Resource: &resources.DownloadResource{
 				ArchiveFileName: "ctags-5.8-arduino11-pm-x86_64-apple-darwin.zip",
 				URL:             "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-pm-x86_64-apple-darwin.zip",
 				Size:            107801,
@@ -82,7 +82,7 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 		},
 		&cores.Flavour{
 			OS: "arm-linux-gnueabihf",
-			Resource: &releases.DownloadResource{
+			Resource: &resources.DownloadResource{
 				ArchiveFileName: "ctags-5.8-arduino11-pm-armv6-linux-gnueabihf.tar.bz2",
 				URL:             "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-pm-armv6-linux-gnueabihf.tar.bz2",
 				Size:            95271,

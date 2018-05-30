@@ -33,7 +33,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/releases"
+	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 )
@@ -132,7 +132,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 
 	size, _ := inPlatformRelease.Size.Int64()
 	outPlatformRelease := outPlatform.GetOrCreateRelease(inPlatformRelease.Version)
-	outPlatformRelease.Resource = &releases.DownloadResource{
+	outPlatformRelease.Resource = &resources.DownloadResource{
 		ArchiveFileName: inPlatformRelease.ArchiveFileName,
 		Checksum:        inPlatformRelease.Checksum,
 		Size:            size,
@@ -177,7 +177,7 @@ func (inToolRelease indexToolRelease) extractFlavours() []*cores.Flavour {
 		size, _ := flavour.Size.Int64()
 		ret[i] = &cores.Flavour{
 			OS: flavour.OS,
-			Resource: &releases.DownloadResource{
+			Resource: &resources.DownloadResource{
 				ArchiveFileName: flavour.ArchiveFileName,
 				Checksum:        flavour.Checksum,
 				Size:            size,
