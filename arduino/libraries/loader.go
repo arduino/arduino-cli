@@ -33,8 +33,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-map"
-	"github.com/bcmi-labs/arduino-cli/paths"
 )
 
 func Load(libraryFolder *paths.Path) (*Library, error) {

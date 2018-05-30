@@ -33,7 +33,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bcmi-labs/arduino-cli/paths"
+	"github.com/arduino/go-paths-helper"
 )
 
 // HardwareDirectories returns all paths that may contains hardware packages.

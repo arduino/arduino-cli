@@ -35,10 +35,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/configs"
-	"github.com/bcmi-labs/arduino-cli/paths"
 )
 
 // LoadHardware read all plaforms from the configured paths
