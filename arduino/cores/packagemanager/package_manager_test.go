@@ -3,8 +3,8 @@ package packagemanager_test
 import (
 	"testing"
 
+	"github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
-	"github.com/bcmi-labs/arduino-cli/paths"
 	"github.com/stretchr/testify/require"
 )
 

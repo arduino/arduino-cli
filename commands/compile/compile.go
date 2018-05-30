@@ -37,9 +37,10 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/arduino/go-paths-helper"
+
 	builder "github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/commands"
@@ -169,18 +170,18 @@ func run(cmd *cobra.Command, args []string) {
 	ctx := &types.Context{}
 
 	ctx.FQBN = fqbn
-	ctx.SketchLocation = sketch.FullPath
+	ctx.SketchLocation = paths.New(sketch.FullPath)
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	if packagesFolder, err := configs.HardwareDirectories(); err == nil {
-		ctx.HardwareFolders = packagesFolder.AsStrings()
+		ctx.HardwareFolders = packagesFolder
 	} else {
 		formatter.PrintError(err, "Cannot get hardware directories.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
 	if toolsFolder, err := configs.BundleToolsDirectories(); err == nil {
-		ctx.ToolsFolders = toolsFolder.AsStrings()
+		ctx.ToolsFolders = toolsFolder
 	} else {
 		formatter.PrintError(err, "Cannot get bundled tools directories.")
 		os.Exit(commands.ErrCoreConfig)
@@ -191,11 +192,11 @@ func run(cmd *cobra.Command, args []string) {
 		formatter.PrintError(err, "Cannot get libraries folder.")
 		os.Exit(commands.ErrCoreConfig)
 	}
-	ctx.OtherLibrariesFolders = []string{librariesFolder}
+	ctx.OtherLibrariesFolders = paths.NewPathList(librariesFolder)
 
-	ctx.BuildPath = flags.buildPath
-	if ctx.BuildPath != "" {
-		err = utils.EnsureFolderExists(ctx.BuildPath)
+	ctx.BuildPath = paths.New(flags.buildPath)
+	if ctx.BuildPath.String() != "" {
+		err = ctx.BuildPath.MkdirAll()
 		if err != nil {
 			formatter.PrintError(err, "Cannot create the build folder.")
 			os.Exit(commands.ErrBadCall)
@@ -205,7 +206,7 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.Verbose = flags.verbose
 	ctx.DebugLevel = flags.debugLevel
 
-	ctx.CoreBuildCachePath = filepath.Join(os.TempDir(), "arduino-core-cache")
+	ctx.CoreBuildCachePath = paths.TempDir().Join("arduino-core-cache")
 
 	ctx.USBVidPid = flags.vidPid
 	ctx.WarningsLevel = flags.warnings
@@ -213,12 +214,12 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.CustomBuildProperties = append(flags.buildProperties, "build.warn_data_percentage=75")
 
 	if flags.buildCachePath != "" {
-		err = utils.EnsureFolderExists(flags.buildCachePath)
+		ctx.BuildCachePath = paths.New(flags.buildCachePath)
+		err = ctx.BuildCachePath.MkdirAll()
 		if err != nil {
 			formatter.PrintError(err, "Cannot create the build cache folder.")
 			os.Exit(commands.ErrBadCall)
 		}
-		ctx.BuildCachePath = flags.buildCachePath
 	}
 
 	// Will be deprecated.
@@ -244,7 +245,7 @@ func run(cmd *cobra.Command, args []string) {
 		sort.Strings(pathVariants)
 		ideHardwarePath := lastIdeSubProperties[pathVariants[len(pathVariants)-1]]
 		ideLibrariesPath := filepath.Join(filepath.Dir(ideHardwarePath), "libraries")
-		ctx.BuiltInLibrariesFolders = []string{ideLibrariesPath}
+		ctx.BuiltInLibrariesFolders = paths.NewPathList(ideLibrariesPath)
 	}
 
 	if flags.showProperties {
