@@ -2,7 +2,7 @@
 
 # arduino-cli
 
-`arduino-cli` helps to install and use all the tools needed to use Arduino compatible platforms and boards (it's an all-in-one solution that provides builder, boards/library manager, uploader, discovery, etc.).
+`arduino-cli` is an all-in-one solution that provides builder, boards/library manager, uploader, discovery and many other tools needed to use any Arduino compatible board and platforms.
 
 This software is currently in alpha state: new features will be added and some may be changed.
 
