@@ -37,6 +37,7 @@ import (
 	"time"
 
 	discovery "github.com/arduino/board-discovery"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
 	"github.com/bcmi-labs/arduino-cli/commands"
@@ -71,9 +72,9 @@ var attachFlags struct {
 
 func runAttachCommand(cmd *cobra.Command, args []string) {
 	boardURI := args[0]
-	sketchPath := ""
-	if len(args) > 1 {
-		sketchPath = args[1]
+	var sketchPath *paths.Path
+	if len(args) > 0 {
+		sketchPath = paths.New(args[0])
 	}
 	sketch, err := commands.InitSketch(sketchPath)
 	if err != nil {

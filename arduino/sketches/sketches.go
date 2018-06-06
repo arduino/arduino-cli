@@ -32,6 +32,8 @@ package sketches
 import (
 	"path/filepath"
 
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-modules/sketches"
 )
@@ -64,10 +66,10 @@ func NewSketchFromCurrentSketchbook(name string) (*sketches.Sketch, error) {
 }
 
 // NewSketchFromPath loads a sketch from the specified path
-func NewSketchFromPath(path string) (*sketches.Sketch, error) {
+func NewSketchFromPath(path *paths.Path) (*sketches.Sketch, error) {
 	sketch := sketches.Sketch{
-		FullPath: path,
-		Name:     filepath.Base(path),
+		FullPath: path.String(),
+		Name:     path.Base(),
 	}
 	sketch.ImportMetadata()
 	return &sketch, nil

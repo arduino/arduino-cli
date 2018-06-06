@@ -33,6 +33,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/bcmi-labs/arduino-cli/arduino/sketches"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	sk "github.com/bcmi-labs/arduino-modules/sketches"
@@ -89,16 +91,16 @@ func InitPackageManager() *packagemanager.PackageManager {
 	return pm
 }
 
-func InitSketch(sketchPath string) (*sk.Sketch, error) {
-	if sketchPath != "" {
+func InitSketch(sketchPath *paths.Path) (*sk.Sketch, error) {
+	if sketchPath != nil {
 		return sketches.NewSketchFromPath(sketchPath)
 	}
 
-	wd, err := os.Getwd()
-	logrus.Infof("Reading sketch from dir: %s", wd)
+	wd, err := paths.Getwd()
 	if err != nil {
 		return nil, fmt.Errorf("getting current directory: %s", err)
 	}
+	logrus.Infof("Reading sketch from dir: %s", wd)
 	return sketches.NewSketchFromPath(wd)
 }
 

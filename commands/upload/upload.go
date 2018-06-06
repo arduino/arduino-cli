@@ -36,6 +36,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/go-paths-helper"
+
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/commands"
@@ -71,9 +73,9 @@ var flags struct {
 }
 
 func run(command *cobra.Command, args []string) {
-	sketchPath := ""
+	var sketchPath *paths.Path
 	if len(args) > 0 {
-		sketchPath = args[0]
+		sketchPath = paths.New(args[0])
 	}
 	sketch, err := commands.InitSketch(sketchPath)
 	if err != nil {

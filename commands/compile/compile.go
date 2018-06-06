@@ -31,7 +31,6 @@ package compile
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -91,9 +90,9 @@ var flags struct {
 
 func run(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino compile`")
-	sketchPath := ""
+	var sketchPath *paths.Path
 	if len(args) > 0 {
-		sketchPath = args[0]
+		sketchPath = paths.New(args[0])
 	}
 	sketch, err := commands.InitSketch(sketchPath)
 	if err != nil {
@@ -267,39 +266,18 @@ func run(cmd *cobra.Command, args []string) {
 	fqbn = strings.Replace(fqbn, ":", ".", -1)
 
 	// Copy .hex file to sketch folder
-	src := outputPath
-	dst := filepath.Join(sketchPath, sketch.Name+"."+fqbn+ext)
-	if err = copyFile(src, dst); err != nil {
+	srcHex := paths.New(outputPath)
+	dstHex := sketchPath.Join(sketch.Name + "." + fqbn + ext)
+	if err = srcHex.CopyTo(dstHex); err != nil {
 		formatter.PrintError(err, "Error copying output file.")
 		os.Exit(commands.ErrGeneric)
 	}
 
 	// Copy .elf file to sketch folder
-	src = outputPath[:len(outputPath)-3] + "elf"
-	dst = filepath.Join(sketchPath, sketch.Name+"."+fqbn+".elf")
-	if err = copyFile(src, dst); err != nil {
+	srcElf := paths.New(outputPath[:len(outputPath)-3] + "elf")
+	dstElf := sketchPath.Join(sketch.Name + "." + fqbn + ".elf")
+	if err = srcElf.CopyTo(dstElf); err != nil {
 		formatter.PrintError(err, "Error copying elf file.")
 		os.Exit(commands.ErrGeneric)
 	}
-}
-
-// copyFile copies the src file to dst. Any existing file will be overwritten and will not copy file attributes.
-func copyFile(src, dst string) error {
-	in, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer in.Close()
-
-	out, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, in)
-	if err != nil {
-		return err
-	}
-	return out.Close()
 }
