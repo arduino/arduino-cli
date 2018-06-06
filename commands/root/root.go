@@ -57,7 +57,7 @@ func Init() *cobra.Command {
 	command := &cobra.Command{
 		Use:              "arduino-cli",
 		Short:            "Arduino CLI.",
-		Long:             "Arduino Create Command Line Interface (arduino-cli).",
+		Long:             "Arduino Command Line Interface (arduino-cli).",
 		Example:          "arduino <command> [flags...]",
 		PersistentPreRun: preRun,
 	}
