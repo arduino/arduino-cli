@@ -37,11 +37,31 @@ import (
 	properties "github.com/arduino/go-properties-map"
 )
 
-func Load(libraryFolder *paths.Path) (*Library, error) {
-	if exist, _ := libraryFolder.Join("library.properties").Exist(); exist {
-		return makeNewLibrary(libraryFolder)
+// LoadLibrariesFromDir loads all libraries in the given folder
+func LoadLibrariesFromDir(librariesDir *paths.Path) ([]*Library, error) {
+	subFolders, err := librariesDir.ReadDir()
+	if err != nil {
+		return nil, fmt.Errorf("reading dir %s: %s", librariesDir, err)
 	}
-	return makeLegacyLibrary(libraryFolder)
+	subFolders.FilterDirs()
+
+	res := []*Library{}
+	for _, subFolder := range subFolders {
+		library, err := Load(subFolder)
+		if err != nil {
+			return nil, fmt.Errorf("loading library from %s: %s", subFolder, err)
+		}
+		res = append(res, library)
+	}
+	return res, nil
+}
+
+// Load loads a library from the given folder
+func Load(libDir *paths.Path) (*Library, error) {
+	if exist, _ := libDir.Join("library.properties").Exist(); exist {
+		return makeNewLibrary(libDir)
+	}
+	return makeLegacyLibrary(libDir)
 }
 
 func addUtilityFolder(library *Library) {
