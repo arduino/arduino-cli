@@ -99,7 +99,9 @@ func (library *Library) String() string {
 	return library.Name // + " : " + library.SrcFolder.String()
 }
 
-func (library *Library) SupportsArchitectures(archs []string) bool {
+// SupportsAnyArchitectureIn check if the library supports at least one of
+// the given architectures
+func (library *Library) SupportsAnyArchitectureIn(archs []string) bool {
 	for _, libArch := range library.Architectures {
 		if libArch == "*" {
 			return true
@@ -113,11 +115,13 @@ func (library *Library) SupportsArchitectures(archs []string) bool {
 	return false
 }
 
+// SourceDir represents a source dir of a library
 type SourceDir struct {
 	Folder  *paths.Path
 	Recurse bool
 }
 
+// SourceDirs return all the source directories of a library
 func (library *Library) SourceDirs() []SourceDir {
 	dirs := []SourceDir{}
 	dirs = append(dirs,
@@ -136,7 +140,7 @@ func (library *Library) SourceDirs() []SourceDir {
 }
 
 // InstalledRelease returns the installed release of the library.
-func (l *Library) InstalledRelease() (*Release, error) {
+func (library *Library) InstalledRelease() (*Release, error) {
 	libFolder, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		return nil, err
@@ -157,10 +161,10 @@ func (l *Library) InstalledRelease() (*Release, error) {
 		if file.IsDir() {
 			// try to read library.properties
 			content, err := os.Open(filepath.Join(libFolder, file.Name(), "library.properties"))
-			if err != nil && strings.Contains(name, l.Name) {
+			if err != nil && strings.Contains(name, library.Name) {
 				// use folder name
 				version := strings.SplitN(name, "-", 2)[1] // split only once, useful for libName-1.0.0-pre-alpha/beta versions.
-				return l.Releases[version], nil
+				return library.Releases[version], nil
 			}
 			defer content.Close()
 
@@ -173,20 +177,20 @@ func (l *Library) InstalledRelease() (*Release, error) {
 					fields[line[0]] = line[1]
 				}
 			}
-			if scanner.Err() != nil && strings.Contains(name, l.Name) {
+			if scanner.Err() != nil && strings.Contains(name, library.Name) {
 				// use folder name
 				version := strings.SplitN(name, "-", 2)[1] // split only once, useful for libName-1.0.0-pre-alpha/beta versions.
-				return l.Releases[version], nil
+				return library.Releases[version], nil
 			}
 
 			_, nameExists := fields["name"]
 			version, versionExists := fields["version"]
 			if nameExists && versionExists {
-				return l.GetVersion(version), nil
-			} else if strings.Contains(name, l.Name) {
+				return library.GetVersion(version), nil
+			} else if strings.Contains(name, library.Name) {
 				// use folder name
 				version = strings.SplitN(name, "-", 2)[1] // split only once, useful for libName-1.0.0-pre-alpha/beta versions.
-				return l.Releases[version], nil
+				return library.Releases[version], nil
 			}
 		}
 	}
@@ -208,23 +212,23 @@ func (r *Release) String() string {
 // nil if not found.
 //
 // If version == "latest" then release.Version contains the latest version.
-func (l Library) GetVersion(version string) *Release {
+func (library Library) GetVersion(version string) *Release {
 	if version == "latest" {
-		return l.Releases[l.latestVersion()]
+		return library.Releases[library.latestVersion()]
 	}
-	return l.Releases[version]
+	return library.Releases[version]
 }
 
 // Latest obtains the latest version of a library.
-func (l Library) Latest() *Release {
-	return l.GetVersion(l.latestVersion())
+func (library Library) Latest() *Release {
+	return library.GetVersion(library.latestVersion())
 }
 
 // latestVersion obtains latest version number.
 //
 // It uses lexicographics to compare version strings.
-func (l *Library) latestVersion() string {
-	versions := l.Versions()
+func (library *Library) latestVersion() string {
+	versions := library.Versions()
 	if len(versions) == 0 {
 		return ""
 	}
@@ -239,10 +243,10 @@ func (l *Library) latestVersion() string {
 }
 
 // Versions returns an array of all versions available of the library
-func (l Library) Versions() semver.Versions {
-	res := make(semver.Versions, len(l.Releases))
+func (library Library) Versions() semver.Versions {
+	res := make(semver.Versions, len(library.Releases))
 	i := 0
-	for version := range l.Releases {
+	for version := range library.Releases {
 		temp, err := semver.Make(version)
 		if err == nil {
 			res[i] = temp

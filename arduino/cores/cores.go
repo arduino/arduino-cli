@@ -32,6 +32,8 @@ package cores
 import (
 	"fmt"
 
+	"github.com/arduino/go-paths-helper"
+
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 
@@ -167,6 +169,16 @@ func (release *PlatformRelease) RuntimeProperties() properties.Map {
 	return properties.Map{
 		"runtime.platform.path": release.Folder,
 	}
+}
+
+// GetLibrariesDir returns the path to the core libraries or nil if not
+// present
+func (release *PlatformRelease) GetLibrariesDir() *paths.Path {
+	libDir := paths.New(release.Folder).Join("libraries")
+	if isDir, _ := libDir.IsDir(); isDir {
+		return libDir
+	}
+	return nil
 }
 
 func (release *PlatformRelease) String() string {
