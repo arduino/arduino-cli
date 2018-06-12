@@ -35,6 +35,7 @@ import (
 	"net/url"
 	"strings"
 
+	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packageindex"
 	"github.com/bcmi-labs/arduino-cli/configs"
@@ -111,39 +112,80 @@ func (pm *PackageManager) FindBoardsWithID(id string) []*cores.Board {
 }
 
 // FindBoardWithFQBN returns the board identified by the fqbn, or an error
-func (pm *PackageManager) FindBoardWithFQBN(fqbn string) (*cores.Board, error) {
-	// Split fqbn
-	fqbnParts := strings.Split(fqbn, ":")
-	if len(fqbnParts) < 3 || len(fqbnParts) > 4 {
-		return nil, errors.New("incorrect format for fqbn")
+func (pm *PackageManager) FindBoardWithFQBN(fqbnIn string) (*cores.Board, error) {
+	fqbn, err := cores.ParseFQBN(fqbnIn)
+	if err != nil {
+		return nil, fmt.Errorf("parsing fqbn: %s", err)
 	}
 
-	packageName := fqbnParts[0]
-	platformArch := fqbnParts[1]
-	boardID := fqbnParts[2]
+	_, _, board, _, _, err := pm.ResolveFQBN(fqbn)
+	return board, err
+}
+
+// ResolveFQBN returns, in order:
+// - the Package pointed by the fqbn
+// - the PlatformRelease pointed by the fqbn
+// - the Board pointed by the fqbn
+// - the build properties for the board considering also the
+//   configuration part of the fqbn
+// - the PlatorfmRelease to be used for the build if the board
+//   requires a 3rd party core
+// - an error if any of the above is not found
+//
+// In case of error the partial results found so far are
+// returned together with the error.
+func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
+	*cores.Package, *cores.PlatformRelease, *cores.Board,
+	properties.Map, *cores.PlatformRelease, error) {
 
 	// Find package
-	targetPackage := pm.packages.Packages[packageName]
+	targetPackage := pm.packages.Packages[fqbn.Package]
 	if targetPackage == nil {
-		return nil, errors.New("unknown package " + packageName)
+		return nil, nil, nil, nil, nil,
+			errors.New("unknown package " + fqbn.Package)
 	}
 
 	// Find platform
-	platform := targetPackage.Platforms[fqbnParts[1]]
+	platform := targetPackage.Platforms[fqbn.PlatformArch]
 	if platform == nil {
-		return nil, fmt.Errorf("unknown platform %s:%s", packageName, platformArch)
+		return targetPackage, nil, nil, nil, nil,
+			fmt.Errorf("unknown platform %s:%s", targetPackage, fqbn.PlatformArch)
 	}
 	platformRelease := platform.GetInstalled()
 	if platformRelease == nil {
-		return nil, fmt.Errorf("Platform %s:%s is not installed", packageName, platformArch)
+		return targetPackage, nil, nil, nil, nil,
+			fmt.Errorf("Platform %s is not installed", platformRelease)
 	}
 
 	// Find board
-	board := platformRelease.Boards[boardID]
+	board := platformRelease.Boards[fqbn.BoardID]
 	if board == nil {
-		return nil, errors.New("board not found")
+		return targetPackage, platformRelease, nil, nil, nil,
+			fmt.Errorf("board %s:%s not found", platformRelease, fqbn.BoardID)
 	}
-	return board, nil
+
+	buildProperties, err := board.GetBuildProperties(fqbn.Configs)
+	if err != nil {
+		return targetPackage, platformRelease, board, nil, nil,
+			fmt.Errorf("getting build properties for board %s: %s", board, err)
+	}
+
+	// Determine the platform used for the build (in case the board refers
+	// to a core contained in another platform)
+	buildPlatformRelease := platformRelease
+	coreParts := strings.Split(buildProperties["build.core"], ":")
+	if len(coreParts) > 1 {
+		referredPackage := coreParts[1]
+		buildPackage := pm.packages.Packages[referredPackage]
+		if buildPackage == nil {
+			return targetPackage, platformRelease, board, buildProperties, nil,
+				fmt.Errorf("missing package %s:%s required for build", referredPackage, platform)
+		}
+		buildPlatformRelease = buildPackage.Platforms[fqbn.PlatformArch].GetInstalled()
+	}
+
+	// No errors... phew!
+	return targetPackage, platformRelease, board, buildProperties, buildPlatformRelease, nil
 }
 
 // FIXME add an handler to be invoked on each verbose operation, in order to let commands display results through the formatter
