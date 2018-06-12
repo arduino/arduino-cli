@@ -168,7 +168,11 @@ func run(cmd *cobra.Command, args []string) {
 
 	ctx := &types.Context{}
 
-	ctx.FQBN = fqbn
+	if parsedFqbn, err := cores.ParseFQBN(fqbn); err != nil {
+		formatter.PrintError(err, "Error parsing FQBN.")
+	} else {
+		ctx.FQBN = parsedFqbn
+	}
 	ctx.SketchLocation = paths.New(sketch.FullPath)
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
@@ -263,6 +267,7 @@ func run(cmd *cobra.Command, args []string) {
 	// FIXME: Make a function to obtain these info...
 	outputPath := ctx.BuildProperties.ExpandPropsInString("{build.path}/{recipe.output.tmp_file}")
 	ext := filepath.Ext(outputPath)
+	// FIXME: Make a function to produce a better name...
 	fqbn = strings.Replace(fqbn, ":", ".", -1)
 
 	// Copy .hex file to sketch folder
