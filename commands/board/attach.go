@@ -33,7 +33,6 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"regexp"
 	"time"
 
 	discovery "github.com/arduino/board-discovery"
@@ -46,10 +45,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
-
-var validSerialBoardURIRegexp = regexp.MustCompile("(serial|tty)://.+")
-var validNetworkBoardURIRegexp = regexp.MustCompile("(http(s)?|(tc|ud)p)://[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:[0-9]{1,5}")
-var validFQBN = regexp.MustCompile(".+:.+:.+")
 
 func initAttachCommand() *cobra.Command {
 	attachCommand := &cobra.Command{
@@ -82,7 +77,8 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrGeneric)
 	}
 
-	if !validFQBN.MatchString(boardURI) && boardURI[:6] != "serial" {
+	fqbn, err := cores.ParseFQBN(boardURI)
+	if err != nil && boardURI[:6] != "serial" {
 		boardURI = "serial://" + boardURI
 	}
 
@@ -92,30 +88,31 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	deviceURI, err := url.Parse(boardURI)
-	if err != nil {
-		formatter.PrintError(err, "The provided Device URL is not in a valid format.")
-		os.Exit(commands.ErrBadCall)
-	}
-
-	var findBoardFunc func(*packagemanager.PackageManager, *discovery.Monitor, *url.URL) *cores.Board
-	var Type string
-
-	fqbn := ""
-	if validFQBN.MatchString(boardURI) {
-		fqbn = boardURI
-	} else if validSerialBoardURIRegexp.MatchString(boardURI) {
-		findBoardFunc = findSerialConnectedBoard
-		Type = "serial"
-	} else if validNetworkBoardURIRegexp.MatchString(boardURI) {
-		findBoardFunc = findNetworkConnectedBoard
-		Type = "network"
+	if fqbn != nil {
+		sketch.Metadata.CPU = sketches.MetadataCPU{
+			Fqbn: fqbn.String(),
+		}
 	} else {
-		formatter.PrintErrorMessage("Invalid device port type provided. Accepted types are: serial://, tty://, http://, https://, tcp://, udp://.")
-		os.Exit(commands.ErrBadCall)
-	}
+		deviceURI, err := url.Parse(boardURI)
+		if err != nil {
+			formatter.PrintError(err, "The provided Device URL is not in a valid format.")
+			os.Exit(commands.ErrBadCall)
+		}
 
-	if fqbn == "" {
+		var findBoardFunc func(*packagemanager.PackageManager, *discovery.Monitor, *url.URL) *cores.Board
+		var Type string
+		switch deviceURI.Scheme {
+		case "serial", "tty":
+			findBoardFunc = findSerialConnectedBoard
+			Type = "serial"
+		case "http", "https", "tcp", "udp":
+			findBoardFunc = findNetworkConnectedBoard
+			Type = "network"
+		default:
+			formatter.PrintErrorMessage("Invalid device port type provided. Accepted types are: serial://, tty://, http://, https://, tcp://, udp://.")
+			os.Exit(commands.ErrBadCall)
+		}
+
 		duration, err := time.ParseDuration(attachFlags.searchTimeout)
 		if err != nil {
 			logrus.WithError(err).Warnf("Invalid interval `%s` provided, using default (5s).", attachFlags.searchTimeout)
@@ -139,17 +136,13 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 			Name: board.Name(),
 			Type: Type,
 		}
-		fqbn = board.FQBN()
-	} else {
-		sketch.Metadata.CPU = sketches.MetadataCPU{
-			Fqbn: fqbn,
-		}
 	}
+
 	err = sketch.ExportMetadata()
 	if err != nil {
 		formatter.PrintError(err, "Cannot export sketch metadata.")
 	}
-	formatter.PrintResult("Selected fqbn: " + fqbn)
+	formatter.PrintResult("Selected fqbn: " + sketch.Metadata.CPU.Fqbn)
 }
 
 // FIXME: Those should probably go in a "BoardManager" pkg or something
