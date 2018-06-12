@@ -72,45 +72,43 @@ func (b *Board) String() string {
 	return b.FQBN()
 }
 
+// GetBuildProperties returns the build properties and the build
+// platform for the Board with the configuration passed as parameter.
+func (b *Board) GetBuildProperties(configs properties.Map) (properties.Map, error) {
+	// Start with board's base properties
+	buildProperties := b.Properties.Clone()
+
+	// Add all sub-configurations one by one
+	menu := b.Properties.SubTree("menu")
+	for option, value := range configs {
+		if option == "" {
+			return nil, fmt.Errorf("invalid empty option found")
+		}
+
+		optionMenu := menu.SubTree(option)
+		if len(optionMenu) == 0 {
+			return nil, fmt.Errorf("invalid option '%s'", option)
+		}
+		if _, ok := optionMenu[value]; !ok {
+			return nil, fmt.Errorf("invalid value '%s' for option '%s'", value, option)
+		}
+
+		optionsConf := optionMenu.SubTree(value)
+		buildProperties.Merge(optionsConf)
+	}
+
+	return buildProperties, nil
+}
+
 // GeneratePropertiesForConfiguration returns the board properties for a particular
 // configuration. The parameter is the latest part of the FQBN, for example if
 // the full FQBN is "arduino:avr:mega:cpu=atmega2560" the config part must be
 // "cpu=atmega2560".
+// FIXME: deprecated, use GetBuildProperties instead
 func (b *Board) GeneratePropertiesForConfiguration(config string) (properties.Map, error) {
-	menu := b.Properties.SubTree("menu")
-	if menu == nil || len(menu) == 0 {
-		return nil, fmt.Errorf("there are no options available")
+	fqbn, err := ParseFQBN(b.String() + ":" + config)
+	if err != nil {
+		return nil, fmt.Errorf("parsing fqbn: %s", err)
 	}
-	res := b.Properties.Clone()
-
-	options := strings.Split(config, ",")
-	for _, option := range options {
-		parts := strings.Split(option, "=")
-		if len(parts) != 2 {
-			return nil, fmt.Errorf("invalid option '%s'", option)
-		}
-
-		key := strings.TrimSpace(parts[0])
-		value := strings.TrimSpace(parts[1])
-		if key == "" || value == "" {
-			return nil, fmt.Errorf("invalid option '%s'", option)
-		}
-
-		optionMenu := menu.SubTree(key)
-		if optionMenu == nil || len(optionMenu) == 0 {
-			return nil, fmt.Errorf("invalid option '%s'", option)
-		}
-
-		if _, ok := optionMenu[value]; !ok {
-			return nil, fmt.Errorf("invalid option value '%s' for '%s'", value, option)
-		}
-		optionsConf := optionMenu.SubTree(value)
-		if optionsConf == nil || len(optionsConf) == 0 {
-			continue
-		}
-
-		res.Merge(optionsConf)
-	}
-
-	return res, nil
+	return b.GetBuildProperties(fqbn.Configs)
 }
