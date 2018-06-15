@@ -46,6 +46,9 @@ type JSONFormatter struct {
 // Format implements Formatter interface
 func (jf *JSONFormatter) Format(msg interface{}) (string, error) {
 	t := reflect.TypeOf(msg).Kind().String()
+	if t == "ptr" {
+		t = reflect.Indirect(reflect.ValueOf(msg)).Kind().String()
+	}
 	switch t {
 	case "struct", "map":
 		ret, err := json.Marshal(msg)
