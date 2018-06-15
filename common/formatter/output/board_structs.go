@@ -50,13 +50,13 @@ type NetworkBoardListItem struct {
 	Location string `json:"location,required"`
 }
 
-// BoardList is a list of attached boards.
-type BoardList struct {
+// AttachedBoardList is a list of attached boards.
+type AttachedBoardList struct {
 	SerialBoards  []SerialBoardListItem  `json:"serialBoards,required"`
 	NetworkBoards []NetworkBoardListItem `json:"networkBoards,required"`
 }
 
-func (bl *BoardList) String() string {
+func (bl *AttachedBoardList) String() string {
 	table := uitable.New()
 	table.MaxColWidth = 100
 	table.Wrap = true // wrap columns

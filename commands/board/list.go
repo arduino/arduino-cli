@@ -84,14 +84,14 @@ func runListCommand(cmd *cobra.Command, args []string) {
 }
 
 // NewBoardList returns a new board list by adding discovered boards from the board list and a monitor.
-func NewBoardList(pm *packagemanager.PackageManager, monitor *discovery.Monitor) *output.BoardList {
+func NewBoardList(pm *packagemanager.PackageManager, monitor *discovery.Monitor) *output.AttachedBoardList {
 	if monitor == nil {
 		return nil
 	}
 
 	serialDevices := monitor.Serial()
 	networkDevices := monitor.Network()
-	ret := &output.BoardList{
+	ret := &output.AttachedBoardList{
 		SerialBoards:  make([]output.SerialBoardListItem, 0, len(serialDevices)),
 		NetworkBoards: make([]output.NetworkBoardListItem, 0, len(networkDevices)),
 	}
