@@ -46,5 +46,6 @@ func InitCommand() *cobra.Command {
 	}
 	boardCommand.AddCommand(initAttachCommand())
 	boardCommand.AddCommand(initListCommand())
+	boardCommand.AddCommand(initListAllCommand())
 	return boardCommand
 }

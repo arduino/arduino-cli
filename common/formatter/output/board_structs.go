@@ -70,3 +70,38 @@ func (bl *AttachedBoardList) String() string {
 	}
 	return fmt.Sprintln(table)
 }
+
+// BoardListItem is a supported board
+type BoardListItem struct {
+	Name string `json:"name,required"`
+	Fqbn string `json:"fqbn,required"`
+}
+
+// BoardList is a list of supported boards
+type BoardList struct {
+	Boards []*BoardListItem `json:"boards,required"`
+}
+
+func (bl *BoardList) String() string {
+	table := uitable.New()
+	table.MaxColWidth = 100
+	table.Wrap = true // wrap columns
+
+	table.AddRow("Board Name", "FQBN")
+	for _, item := range bl.Boards {
+		table.AddRow(item.Name, item.Fqbn)
+	}
+	return fmt.Sprintln(table)
+}
+
+func (bl *BoardList) Len() int {
+	return len(bl.Boards)
+}
+
+func (bl *BoardList) Less(i, j int) bool {
+	return bl.Boards[i].Name < bl.Boards[j].Name
+}
+
+func (bl *BoardList) Swap(i, j int) {
+	bl.Boards[i], bl.Boards[j] = bl.Boards[j], bl.Boards[i]
+}
