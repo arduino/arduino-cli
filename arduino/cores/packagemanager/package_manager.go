@@ -66,7 +66,7 @@ type EventHandler interface {
 // NewPackageManager returns a new instance of the PackageManager
 func NewPackageManager() *PackageManager {
 	return &PackageManager{
-		Log:      logrus.New(),
+		Log:      logrus.StandardLogger(),
 		packages: cores.NewPackages(),
 	}
 }
