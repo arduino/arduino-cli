@@ -33,8 +33,7 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"os"
-	"path/filepath"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
 type FailIfImportedLibraryIsWrong struct{}
@@ -48,16 +47,16 @@ func (s *FailIfImportedLibraryIsWrong) Run(ctx *types.Context) error {
 
 	for _, library := range ctx.ImportedLibraries {
 		if !library.IsLegacy {
-			if stat, err := os.Stat(filepath.Join(library.Folder, constants.LIBRARY_FOLDER_ARCH)); err == nil && stat.IsDir() {
+			if isDir, _ := library.Folder.Join(constants.LIBRARY_FOLDER_ARCH).IsDir(); isDir {
 				return i18n.ErrorfWithLogger(logger, constants.MSG_ARCH_FOLDER_NOT_SUPPORTED)
 			}
-			for _, propName := range LIBRARY_MANDATORY_PROPERTIES {
+			for _, propName := range libraries.MandatoryProperties {
 				if _, ok := library.Properties[propName]; !ok {
 					return i18n.ErrorfWithLogger(logger, constants.MSG_PROP_IN_LIBRARY, propName, library.Folder)
 				}
 			}
-			if library.Layout == types.LIBRARY_RECURSIVE {
-				if stat, err := os.Stat(filepath.Join(library.Folder, constants.LIBRARY_FOLDER_UTILITY)); err == nil && stat.IsDir() {
+			if library.Layout == libraries.RecursiveLayout {
+				if library.UtilityFolder != nil {
 					return i18n.ErrorfWithLogger(logger, constants.MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS, library.Folder)
 				}
 			}

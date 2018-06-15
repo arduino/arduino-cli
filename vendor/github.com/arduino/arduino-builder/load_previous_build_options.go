@@ -33,25 +33,22 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 )
 
 type LoadPreviousBuildOptionsMap struct{}
 
 func (s *LoadPreviousBuildOptionsMap) Run(ctx *types.Context) error {
-	buildOptionsFile := filepath.Join(ctx.BuildPath, constants.BUILD_OPTIONS_FILE)
+	buildOptionsFile := ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE)
 
-	_, err := os.Stat(buildOptionsFile)
-	if err != nil {
-		if os.IsNotExist(err) {
+	if exist, err := buildOptionsFile.Exist(); err == nil {
+		if !exist {
 			return nil
 		}
+	} else {
 		return i18n.WrapError(err)
 	}
 
-	bytes, err := ioutil.ReadFile(buildOptionsFile)
+	bytes, err := buildOptionsFile.ReadFile()
 	if err != nil {
 		return i18n.WrapError(err)
 	}

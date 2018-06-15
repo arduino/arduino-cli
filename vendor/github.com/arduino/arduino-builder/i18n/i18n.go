@@ -38,35 +38,89 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 var PLACEHOLDER = regexp.MustCompile("{(\\d)}")
 
 type Logger interface {
 	Fprintln(w io.Writer, level string, format string, a ...interface{})
+	UnformattedFprintln(w io.Writer, s string)
+	UnformattedWrite(w io.Writer, data []byte)
 	Println(level string, format string, a ...interface{})
 	Name() string
+	Flush() string
 }
 
 type NoopLogger struct{}
 
 func (s NoopLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {}
 
+func (s NoopLogger) UnformattedFprintln(w io.Writer, str string) {}
+
+func (s NoopLogger) UnformattedWrite(w io.Writer, data []byte) {}
+
 func (s NoopLogger) Println(level string, format string, a ...interface{}) {}
+
+func (s NoopLogger) Flush() string {
+	return ""
+}
 
 func (s NoopLogger) Name() string {
 	return "noop"
+}
+
+type AccumulatorLogger struct {
+	Buffer *[]string
+}
+
+func (s AccumulatorLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+	*s.Buffer = append(*s.Buffer, Format(format, a...))
+}
+
+func (s AccumulatorLogger) UnformattedFprintln(w io.Writer, str string) {
+	*s.Buffer = append(*s.Buffer, str)
+}
+
+func (s AccumulatorLogger) UnformattedWrite(w io.Writer, data []byte) {
+	*s.Buffer = append(*s.Buffer, string(data))
+}
+
+func (s AccumulatorLogger) Println(level string, format string, a ...interface{}) {
+	s.Fprintln(nil, level, format, a...)
+}
+
+func (s AccumulatorLogger) Flush() string {
+	str := strings.Join(*s.Buffer, "\n")
+	*s.Buffer = (*s.Buffer)[0:0]
+	return str
+}
+
+func (s AccumulatorLogger) Name() string {
+	return "accumulator"
 }
 
 type HumanTagsLogger struct{}
 
 func (s HumanTagsLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
 	format = "[" + level + "] " + format
-	fmt.Fprintln(w, Format(format, a...))
+	fprintln(w, Format(format, a...))
 }
 
 func (s HumanTagsLogger) Println(level string, format string, a ...interface{}) {
 	s.Fprintln(os.Stdout, level, format, a...)
+}
+
+func (s HumanTagsLogger) UnformattedFprintln(w io.Writer, str string) {
+	fprintln(w, str)
+}
+
+func (s HumanTagsLogger) UnformattedWrite(w io.Writer, data []byte) {
+	write(w, data)
+}
+
+func (s HumanTagsLogger) Flush() string {
+	return ""
 }
 
 func (s HumanTagsLogger) Name() string {
@@ -76,11 +130,23 @@ func (s HumanTagsLogger) Name() string {
 type HumanLogger struct{}
 
 func (s HumanLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
-	fmt.Fprintln(w, Format(format, a...))
+	fprintln(w, Format(format, a...))
 }
 
 func (s HumanLogger) Println(level string, format string, a ...interface{}) {
 	s.Fprintln(os.Stdout, level, format, a...)
+}
+
+func (s HumanLogger) UnformattedFprintln(w io.Writer, str string) {
+	fprintln(w, str)
+}
+
+func (s HumanLogger) UnformattedWrite(w io.Writer, data []byte) {
+	write(w, data)
+}
+
+func (s HumanLogger) Flush() string {
+	return ""
 }
 
 func (s HumanLogger) Name() string {
@@ -89,7 +155,31 @@ func (s HumanLogger) Name() string {
 
 type MachineLogger struct{}
 
-func (s MachineLogger) printWithoutFormatting(w io.Writer, level string, format string, a []interface{}) {
+func (s MachineLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+	printMachineFormattedLogLine(w, level, format, a)
+}
+
+func (s MachineLogger) Println(level string, format string, a ...interface{}) {
+	printMachineFormattedLogLine(os.Stdout, level, format, a)
+}
+
+func (s MachineLogger) UnformattedFprintln(w io.Writer, str string) {
+	fprintln(w, str)
+}
+
+func (s MachineLogger) Flush() string {
+	return ""
+}
+
+func (s MachineLogger) Name() string {
+	return "machine"
+}
+
+func (s MachineLogger) UnformattedWrite(w io.Writer, data []byte) {
+	write(w, data)
+}
+
+func printMachineFormattedLogLine(w io.Writer, level string, format string, a []interface{}) {
 	a = append([]interface{}(nil), a...)
 	for idx, value := range a {
 		typeof := reflect.Indirect(reflect.ValueOf(value)).Kind()
@@ -97,20 +187,27 @@ func (s MachineLogger) printWithoutFormatting(w io.Writer, level string, format 
 			a[idx] = url.QueryEscape(value.(string))
 		}
 	}
-	fmt.Fprintf(w, "===%s ||| %s ||| %s", level, format, a)
-	fmt.Fprintln(w)
+	fprintf(w, "===%s ||| %s ||| %s\n", level, format, a)
 }
 
-func (s MachineLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
-	s.printWithoutFormatting(w, level, format, a)
+var lock sync.Mutex
+
+func fprintln(w io.Writer, s string) {
+	lock.Lock()
+	defer lock.Unlock()
+	fmt.Fprintln(w, s)
 }
 
-func (s MachineLogger) Println(level string, format string, a ...interface{}) {
-	s.printWithoutFormatting(os.Stdout, level, format, a)
+func write(w io.Writer, data []byte) {
+	lock.Lock()
+	defer lock.Unlock()
+	w.Write(data)
 }
 
-func (s MachineLogger) Name() string {
-	return "machine"
+func fprintf(w io.Writer, format string, a ...interface{}) {
+	lock.Lock()
+	defer lock.Unlock()
+	fmt.Fprintf(w, format, a...)
 }
 
 func FromJavaToGoSyntax(s string) string {

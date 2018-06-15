@@ -4,23 +4,33 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-builder/i18n"
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
+
+type ProgressStruct struct {
+	PrintEnabled bool
+	Steps        float64
+	Progress     float64
+}
 
 // Context structure
 type Context struct {
 	// Build options
-	HardwareFolders         []string
-	ToolsFolders            []string
-	BuiltInToolsFolders     []string
-	LibrariesFolders        []string
-	BuiltInLibrariesFolders []string
-	OtherLibrariesFolders   []string
-	SketchLocation          string
+	HardwareFolders         paths.PathList
+	ToolsFolders            paths.PathList
+	BuiltInToolsFolders     paths.PathList
+	LibrariesFolders        paths.PathList
+	BuiltInLibrariesFolders paths.PathList
+	OtherLibrariesFolders   paths.PathList
+	SketchLocation          *paths.Path
+	WatchedLocations        paths.PathList
 	ArduinoAPIVersion       string
-	FQBN                    string
+	FQBN                    *cores.FQBN
+	CodeCompleteAt          string
 
 	// Build options are serialized here
 	BuildOptionsJson         string
@@ -41,37 +51,38 @@ type Context struct {
 
 	BuildProperties      properties.Map
 	BuildCore            string
-	BuildPath            string
-	BuildCachePath       string
-	SketchBuildPath      string
-	CoreBuildPath        string
-	CoreBuildCachePath   string
-	CoreArchiveFilePath  string
-	CoreObjectsFiles     []string
-	LibrariesBuildPath   string
-	LibrariesObjectFiles []string
-	PreprocPath          string
-	SketchObjectFiles    []string
+	BuildPath            *paths.Path
+	BuildCachePath       *paths.Path
+	SketchBuildPath      *paths.Path
+	CoreBuildPath        *paths.Path
+	CoreBuildCachePath   *paths.Path
+	CoreArchiveFilePath  *paths.Path
+	CoreObjectsFiles     paths.PathList
+	LibrariesBuildPath   *paths.Path
+	LibrariesObjectFiles paths.PathList
+	PreprocPath          *paths.Path
+	SketchObjectFiles    paths.PathList
 
 	CollectedSourceFiles *UniqueSourceFileQueue
 
 	Sketch          *Sketch
 	Source          string
 	SourceGccMinusE string
+	CodeCompletions string
 
 	WarningsLevel string
 
 	// Libraries handling
-	Libraries                  []*Library
-	HeaderToLibraries          map[string][]*Library
-	ImportedLibraries          []*Library
+	Libraries                  []*libraries.Library
+	HeaderToLibraries          map[string][]*libraries.Library
+	ImportedLibraries          []*libraries.Library
 	LibrariesResolutionResults map[string]LibraryResolutionResult
-	IncludeJustFound           string
-	IncludeFolders             []string
+	IncludeFolders             paths.PathList
+	//OutputGccMinusM            string
 
 	// C++ Parsing
 	CTagsOutput                 string
-	CTagsTargetFile             string
+	CTagsTargetFile             *paths.Path
 	CTagsOfPreprocessedSource   []*CTag
 	IncludeSection              string
 	LineOffset                  int
@@ -83,6 +94,9 @@ type Context struct {
 	Verbose           bool
 	DebugPreprocessor bool
 
+	// Dry run, only create progress map
+	Progress ProgressStruct
+
 	// Contents of a custom build properties file (line by line)
 	CustomBuildProperties []string
 
@@ -90,30 +104,49 @@ type Context struct {
 	logger     i18n.Logger
 	DebugLevel int
 
-	// ReadFileAndStoreInContext command
-	FileToRead string
+	// Reuse old tools since the backing storage didn't change
+	CanUseCachedTools bool
+
+	// Experimental: use arduino-preprocessor to create prototypes
+	UseArduinoPreprocessor bool
 }
 
 func (ctx *Context) ExtractBuildOptions() properties.Map {
 	opts := make(properties.Map)
-	opts["hardwareFolders"] = strings.Join(ctx.HardwareFolders, ",")
-	opts["toolsFolders"] = strings.Join(ctx.ToolsFolders, ",")
-	opts["builtInLibrariesFolders"] = strings.Join(ctx.BuiltInLibrariesFolders, ",")
-	opts["otherLibrariesFolders"] = strings.Join(ctx.OtherLibrariesFolders, ",")
-	opts["sketchLocation"] = ctx.SketchLocation
-	opts["fqbn"] = ctx.FQBN
+	opts["hardwareFolders"] = strings.Join(ctx.HardwareFolders.AsStrings(), ",")
+	opts["toolsFolders"] = strings.Join(ctx.ToolsFolders.AsStrings(), ",")
+	opts["builtInLibrariesFolders"] = strings.Join(ctx.BuiltInLibrariesFolders.AsStrings(), ",")
+	opts["otherLibrariesFolders"] = strings.Join(ctx.OtherLibrariesFolders.AsStrings(), ",")
+	opts["sketchLocation"] = ctx.SketchLocation.String()
+	var additionalFilesRelative []string
+	if ctx.Sketch != nil {
+		for _, sketch := range ctx.Sketch.AdditionalFiles {
+			absPath := ctx.SketchLocation.Parent()
+			relPath, err := sketch.Name.RelTo(absPath)
+			if err != nil {
+				continue // ignore
+			}
+			additionalFilesRelative = append(additionalFilesRelative, relPath.String())
+		}
+	}
+	opts["fqbn"] = ctx.FQBN.String()
 	opts["runtime.ide.version"] = ctx.ArduinoAPIVersion
 	opts["customBuildProperties"] = strings.Join(ctx.CustomBuildProperties, ",")
+	opts["additionalFiles"] = strings.Join(additionalFilesRelative, ",")
 	return opts
 }
 
 func (ctx *Context) InjectBuildOptions(opts properties.Map) {
-	ctx.HardwareFolders = strings.Split(opts["hardwareFolders"], ",")
-	ctx.ToolsFolders = strings.Split(opts["toolsFolders"], ",")
-	ctx.BuiltInLibrariesFolders = strings.Split(opts["builtInLibrariesFolders"], ",")
-	ctx.OtherLibrariesFolders = strings.Split(opts["otherLibrariesFolders"], ",")
-	ctx.SketchLocation = opts["sketchLocation"]
-	ctx.FQBN = opts["fqbn"]
+	ctx.HardwareFolders = paths.NewPathList(strings.Split(opts["hardwareFolders"], ",")...)
+	ctx.ToolsFolders = paths.NewPathList(strings.Split(opts["toolsFolders"], ",")...)
+	ctx.BuiltInLibrariesFolders = paths.NewPathList(strings.Split(opts["builtInLibrariesFolders"], ",")...)
+	ctx.OtherLibrariesFolders = paths.NewPathList(strings.Split(opts["otherLibrariesFolders"], ",")...)
+	ctx.SketchLocation = paths.New(opts["sketchLocation"])
+	fqbn, err := cores.ParseFQBN(opts["fqbn"])
+	if err != nil {
+		i18n.ErrorfWithLogger(ctx.GetLogger(), "Error in FQBN: %s", err)
+	}
+	ctx.FQBN = fqbn
 	ctx.ArduinoAPIVersion = opts["runtime.ide.version"]
 	ctx.CustomBuildProperties = strings.Split(opts["customBuildProperties"], ",")
 }

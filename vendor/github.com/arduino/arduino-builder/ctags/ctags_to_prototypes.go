@@ -92,7 +92,7 @@ func (p *CTagsParser) collectFunctions() []*types.CTag {
 
 func (p *CTagsParser) firstFunctionAtLine() int {
 	for _, tag := range p.tags {
-		if !tagIsUnknown(tag) && isHandled(tag) && tag.Kind == KIND_FUNCTION && tag.Filename == p.mainFile {
+		if !tagIsUnknown(tag) && isHandled(tag) && tag.Kind == KIND_FUNCTION && tag.Filename == p.mainFile.String() {
 			return tag.Line
 		}
 	}

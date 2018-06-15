@@ -30,8 +30,6 @@
 package builder
 
 import (
-	"path/filepath"
-
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
@@ -40,10 +38,20 @@ import (
 type ContainerAddPrototypes struct{}
 
 func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
-	sourceFile := filepath.Join(ctx.SketchBuildPath, filepath.Base(ctx.Sketch.MainFile.Name)+".cpp")
+	// Generate the full pathname for the preproc output file
+	if err := ctx.PreprocPath.MkdirAll(); err != nil {
+		return i18n.WrapError(err)
+	}
+	targetFilePath := ctx.PreprocPath.Join(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E)
+
+	// Run preprocessor
+	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Name.Base() + ".cpp")
+	if err := GCCPreprocRunner(ctx, sourceFile, targetFilePath, ctx.IncludeFolders); err != nil {
+		return i18n.WrapError(err)
+	}
+
 	commands := []types.Command{
-		&GCCPreprocRunner{SourceFilePath: sourceFile, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, Includes: ctx.IncludeFolders},
-		&ReadFileAndStoreInContext{Target: &ctx.SourceGccMinusE},
+		&ReadFileAndStoreInContext{FileToRead: targetFilePath, Target: &ctx.SourceGccMinusE},
 		&FilterSketchSource{Source: &ctx.SourceGccMinusE},
 		&CTagsTargetFileSaver{Source: &ctx.SourceGccMinusE, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
 		&CTagsRunner{},

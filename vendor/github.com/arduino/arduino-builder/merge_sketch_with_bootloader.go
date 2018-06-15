@@ -30,13 +30,15 @@
 package builder
 
 import (
+	"os"
+	"strings"
+
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 type MergeSketchWithBootloader struct{}
@@ -49,16 +51,16 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 
 	buildPath := ctx.BuildPath
 	sketch := ctx.Sketch
-	sketchFileName := filepath.Base(sketch.MainFile.Name)
+	sketchFileName := sketch.MainFile.Name.Base()
 	logger := ctx.GetLogger()
 
-	sketchInBuildPath := filepath.Join(buildPath, sketchFileName+".hex")
-	sketchInSubfolder := filepath.Join(buildPath, constants.FOLDER_SKETCH, sketchFileName+".hex")
+	sketchInBuildPath := buildPath.Join(sketchFileName + ".hex")
+	sketchInSubfolder := buildPath.Join(constants.FOLDER_SKETCH, sketchFileName+".hex")
 
-	builtSketchPath := constants.EMPTY_STRING
-	if _, err := os.Stat(sketchInBuildPath); err == nil {
+	var builtSketchPath *paths.Path
+	if exist, _ := sketchInBuildPath.Exist(); exist {
 		builtSketchPath = sketchInBuildPath
-	} else if _, err := os.Stat(sketchInSubfolder); err == nil {
+	} else if exist, _ := sketchInSubfolder.Exist(); exist {
 		builtSketchPath = sketchInSubfolder
 	} else {
 		return nil
@@ -72,17 +74,15 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 	}
 	bootloader = buildProperties.ExpandPropsInString(bootloader)
 
-	bootloaderPath := filepath.Join(buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH], constants.FOLDER_BOOTLOADERS, bootloader)
-	if _, err := os.Stat(bootloaderPath); err != nil {
+	bootloaderPath := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH).Join(constants.FOLDER_BOOTLOADERS, bootloader)
+	if exist, _ := bootloaderPath.Exist(); !exist {
 		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_BOOTLOADER_FILE_MISSING, bootloaderPath)
 		return nil
 	}
 
-	mergedSketchPath := filepath.Join(filepath.Dir(builtSketchPath), sketchFileName+".with_bootloader.hex")
+	mergedSketchPath := builtSketchPath.Parent().Join(sketchFileName + ".with_bootloader.hex")
 
-	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath)
-
-	return err
+	return merge(builtSketchPath, bootloaderPath, mergedSketchPath)
 }
 
 func hexLineOnlyContainsFF(line string) bool {
@@ -127,14 +127,14 @@ func extractActualBootloader(bootloader []string) []string {
 	return realBootloader
 }
 
-func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
-	sketch, err := utils.ReadFileToRows(builtSketchPath)
+func merge(builtSketchPath, bootloaderPath, mergedSketchPath *paths.Path) error {
+	sketch, err := builtSketchPath.ReadFileAsLines()
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 	sketch = sketch[:len(sketch)-2]
 
-	bootloader, err := utils.ReadFileToRows(bootloaderPath)
+	bootloader, err := bootloaderPath.ReadFileAsLines()
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -145,5 +145,5 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath string) error {
 		sketch = append(sketch, row)
 	}
 
-	return utils.WriteFile(mergedSketchPath, strings.Join(sketch, "\n"))
+	return mergedSketchPath.WriteFile([]byte(strings.Join(sketch, "\n")))
 }

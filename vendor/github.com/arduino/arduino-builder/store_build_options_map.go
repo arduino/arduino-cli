@@ -32,13 +32,11 @@ package builder
 import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
-	"path/filepath"
 )
 
 type StoreBuildOptionsMap struct{}
 
 func (s *StoreBuildOptionsMap) Run(ctx *types.Context) error {
-	utils.WriteFile(filepath.Join(ctx.BuildPath, constants.BUILD_OPTIONS_FILE), ctx.BuildOptionsJson)
+	ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE).WriteFile([]byte(ctx.BuildOptionsJson))
 	return nil
 }

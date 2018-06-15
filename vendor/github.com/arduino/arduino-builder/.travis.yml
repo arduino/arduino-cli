@@ -14,6 +14,7 @@ install:
   - go get github.com/arduino/go-timeutils
 
 script:
+  - go get github.com/arduino/arduino-builder/arduino-builder
   - go build -o $HOME/arduino-builder -v github.com/arduino/arduino-builder/arduino-builder
   - export TEST_PACKAGES=`go list github.com/arduino/arduino-builder/...`
   - RES=0; I=0; for PKG in $TEST_PACKAGES; do go test -v -timeout 30m -covermode=count -coverprofile=coverage.$I.out $PKG; ((RES=RES+$?)); ((I++)); done; ( exit $RES )

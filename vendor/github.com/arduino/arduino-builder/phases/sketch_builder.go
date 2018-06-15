@@ -35,8 +35,6 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"os"
-	"path/filepath"
 )
 
 type SketchBuilder struct{}
@@ -44,30 +42,25 @@ type SketchBuilder struct{}
 func (s *SketchBuilder) Run(ctx *types.Context) error {
 	sketchBuildPath := ctx.SketchBuildPath
 	buildProperties := ctx.BuildProperties
-	includes := ctx.IncludeFolders
-	includes = utils.Map(includes, utils.WrapWithHyphenI)
-	verbose := ctx.Verbose
-	warningsLevel := ctx.WarningsLevel
-	logger := ctx.GetLogger()
+	includes := utils.Map(ctx.IncludeFolders.AsStrings(), utils.WrapWithHyphenI)
 
-	err := utils.EnsureFolderExists(sketchBuildPath)
-	if err != nil {
+	if err := sketchBuildPath.MkdirAll(); err != nil {
 		return i18n.WrapError(err)
 	}
 
-	var objectFiles []string
-	objectFiles, err = builder_utils.CompileFiles(objectFiles, sketchBuildPath, false, sketchBuildPath, buildProperties, includes, verbose, warningsLevel, logger)
+	objectFiles, err := builder_utils.CompileFiles(ctx, sketchBuildPath, false, sketchBuildPath, buildProperties, includes)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
 	// The "src/" subdirectory of a sketch is compiled recursively
-	sketchSrcPath := filepath.Join(sketchBuildPath, constants.SKETCH_FOLDER_SRC)
-	if info, err := os.Stat(sketchSrcPath); err == nil && info.IsDir() {
-		objectFiles, err = builder_utils.CompileFiles(objectFiles, sketchSrcPath, true, sketchSrcPath, buildProperties, includes, verbose, warningsLevel, logger)
+	sketchSrcPath := sketchBuildPath.Join(constants.SKETCH_FOLDER_SRC)
+	if isDir, _ := sketchSrcPath.IsDir(); isDir {
+		srcObjectFiles, err := builder_utils.CompileFiles(ctx, sketchSrcPath, true, sketchSrcPath, buildProperties, includes)
 		if err != nil {
 			return i18n.WrapError(err)
 		}
+		objectFiles.AddAll(srcObjectFiles)
 	}
 
 	ctx.SketchObjectFiles = objectFiles

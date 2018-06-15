@@ -31,9 +31,10 @@
 package builder
 
 import (
+	"regexp"
+
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"regexp"
 )
 
 type SketchSourceMerger struct{}
@@ -47,7 +48,7 @@ func (s *SketchSourceMerger) Run(ctx *types.Context) error {
 		includeSection += "#include <Arduino.h>\n"
 		lineOffset++
 	}
-	includeSection += "#line 1 " + utils.QuoteCppString(sketch.MainFile.Name) + "\n"
+	includeSection += "#line 1 " + utils.QuoteCppString(sketch.MainFile.Name.String()) + "\n"
 	lineOffset++
 	ctx.IncludeSection = includeSection
 
@@ -73,7 +74,7 @@ func sketchIncludesArduinoH(sketch *types.SketchFile) bool {
 }
 
 func addSourceWrappedWithLineDirective(sketch *types.SketchFile) string {
-	source := "#line 1 " + utils.QuoteCppString(sketch.Name) + "\n"
+	source := "#line 1 " + utils.QuoteCppString(sketch.Name.String()) + "\n"
 	source += sketch.Source
 	source += "\n"
 

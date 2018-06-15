@@ -33,6 +33,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/arduino/arduino-builder/types"
 )
 
@@ -52,10 +54,10 @@ var KNOWN_TAG_KINDS = map[string]bool{
 
 type CTagsParser struct {
 	tags     []*types.CTag
-	mainFile string
+	mainFile *paths.Path
 }
 
-func (p *CTagsParser) Parse(ctagsOutput string, mainFile string) []*types.CTag {
+func (p *CTagsParser) Parse(ctagsOutput string, mainFile *paths.Path) []*types.CTag {
 	rows := strings.Split(ctagsOutput, "\n")
 	rows = removeEmpty(rows)
 

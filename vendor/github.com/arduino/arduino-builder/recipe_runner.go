@@ -30,13 +30,15 @@
 package builder
 
 import (
+	"os"
+	"sort"
+	"strings"
+
 	"github.com/arduino/arduino-builder/builder_utils"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"os"
-	"sort"
-	"strings"
+	"github.com/arduino/arduino-builder/utils"
 )
 
 type RecipeByPrefixSuffixRunner struct {
@@ -51,8 +53,6 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 	}
 
 	buildProperties := ctx.BuildProperties.Clone()
-	verbose := ctx.Verbose
-
 	recipes := findRecipes(buildProperties, s.Prefix, s.Suffix)
 
 	properties := buildProperties.Clone()
@@ -60,7 +60,7 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 		if ctx.DebugLevel >= 10 {
 			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_RUNNING_RECIPE, recipe)
 		}
-		_, err := builder_utils.ExecRecipe(properties, recipe, false, verbose, verbose, logger)
+		_, _, err := builder_utils.ExecRecipe(ctx, properties, recipe, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
 		if err != nil {
 			return i18n.WrapError(err)
 		}

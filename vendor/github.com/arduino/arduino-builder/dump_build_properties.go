@@ -30,10 +30,10 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
 	"fmt"
 	"sort"
+
+	"github.com/arduino/arduino-builder/types"
 )
 
 type DumpBuildProperties struct{}
@@ -41,7 +41,7 @@ type DumpBuildProperties struct{}
 func (s *DumpBuildProperties) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
 
-	keys := utils.KeysOfMapOfString(buildProperties)
+	keys := buildProperties.Keys()
 	sort.Strings(keys)
 
 	for _, key := range keys {

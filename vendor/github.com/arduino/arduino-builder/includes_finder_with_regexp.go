@@ -37,21 +37,13 @@ import (
 
 var INCLUDE_REGEXP = regexp.MustCompile("(?ms)^\\s*#[ \t]*include\\s*[<\"](\\S+)[\">]")
 
-type IncludesFinderWithRegExp struct {
-	Source *string
-}
-
-func (s *IncludesFinderWithRegExp) Run(ctx *types.Context) error {
-	source := *s.Source
-
+func IncludesFinderWithRegExp(ctx *types.Context, source string) string {
 	match := INCLUDE_REGEXP.FindStringSubmatch(source)
 	if match != nil {
-		ctx.IncludeJustFound = strings.TrimSpace(match[1])
+		return strings.TrimSpace(match[1])
 	} else {
-		ctx.IncludeJustFound = findIncludeForOldCompilers(source)
+		return findIncludeForOldCompilers(source)
 	}
-
-	return nil
 }
 
 func findIncludeForOldCompilers(source string) string {

@@ -30,8 +30,6 @@
 package builder
 
 import (
-	"path/filepath"
-
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
@@ -41,21 +39,21 @@ import (
 type AddAdditionalEntriesToContext struct{}
 
 func (*AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
-	if ctx.BuildPath != "" {
+	if ctx.BuildPath != nil {
 		buildPath := ctx.BuildPath
-		preprocPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_PREPROC))
+		preprocPath, err := buildPath.Join(constants.FOLDER_PREPROC).Abs()
 		if err != nil {
 			return i18n.WrapError(err)
 		}
-		sketchBuildPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_SKETCH))
+		sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
 		if err != nil {
 			return i18n.WrapError(err)
 		}
-		librariesBuildPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_LIBRARIES))
+		librariesBuildPath, err := buildPath.Join("libraries").Abs()
 		if err != nil {
 			return i18n.WrapError(err)
 		}
-		coreBuildPath, err := filepath.Abs(filepath.Join(buildPath, constants.FOLDER_CORE))
+		coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
 		if err != nil {
 			return i18n.WrapError(err)
 		}
@@ -66,8 +64,8 @@ func (*AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
 		ctx.CoreBuildPath = coreBuildPath
 	}
 
-	if ctx.BuildCachePath != "" {
-		coreBuildCachePath, err := filepath.Abs(filepath.Join(ctx.BuildCachePath, constants.FOLDER_CORE))
+	if ctx.BuildCachePath != nil {
+		coreBuildCachePath, err := ctx.BuildCachePath.Join(constants.FOLDER_CORE).Abs()
 		if err != nil {
 			return i18n.WrapError(err)
 		}

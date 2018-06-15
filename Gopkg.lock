@@ -15,7 +15,7 @@
     "types",
     "utils"
   ]
-  revision = "e62ce9a4a9f02f9e88a98517cf655d0440b03c0a"
+  revision = "81d2e00e1af9b45433b616c8b08f2c8a08882a03"
   source = "github.com/bcmi-labs/arduino-builder"
 
 [[projects]]
@@ -26,9 +26,15 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/arduino/go-paths-helper"
+  packages = ["."]
+  revision = "5378ef230fe6fb8aaef457a894135d3b0dd85668"
+
+[[projects]]
+  branch = "master"
   name = "github.com/arduino/go-properties-map"
   packages = ["."]
-  revision = "e141b82c7cdac9250d129d7eb452bd71959281af"
+  revision = "67ac7bed4291c361a8716ca3787c17265c2fe37d"
 
 [[projects]]
   branch = "master"
@@ -394,6 +400,19 @@
   revision = "bb9c189858d91f42db229b04d45a4c3d23a7662a"
 
 [[projects]]
+  name = "golang.org/x/text"
+  packages = [
+    "internal/gen",
+    "internal/triegen",
+    "internal/ucd",
+    "transform",
+    "unicode/cldr",
+    "unicode/norm"
+  ]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
+
+[[projects]]
   branch = "master"
   name = "gopkg.in/cheggaaa/pb.v1"
   packages = ["."]
@@ -436,6 +455,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f7024ac62ad5fa0890d95a770835f9552763b256e8408d18c1b027b4bdbabcf4"
+  inputs-digest = "e2ce452f1a21172c447b244881c9fadf1c2730bfc1b8858b7c2b950f9ec1384d"
   solver-name = "gps-cdcl"
   solver-version = 1

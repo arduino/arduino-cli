@@ -31,7 +31,6 @@ package builder
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 
 	"github.com/arduino/arduino-builder/builder_utils"
@@ -39,7 +38,6 @@ import (
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
 )
 
@@ -64,29 +62,38 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 		delete(prevOpts, "sketchLocation")
 	}
 
-	// check if any of the files contained in the core folders has changed
-	// since the json was generated - like platform.txt or similar
-	// if so, trigger a "safety" wipe
-	buildProperties := ctx.BuildProperties
-	targetCoreFolder := buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH]
-	coreFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH]
-	realCoreFolder := utils.GetParentFolder(coreFolder, 2)
-	jsonPath := filepath.Join(ctx.BuildPath, constants.BUILD_OPTIONS_FILE)
-	coreHasChanged := builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, jsonPath)
+	// If options are not changed check if core has
+	if opts.Equals(prevOpts) {
+		// check if any of the files contained in the core folders has changed
+		// since the json was generated - like platform.txt or similar
+		// if so, trigger a "safety" wipe
+		buildProperties := ctx.BuildProperties
+		targetCoreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH)
+		coreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_CORE_PATH)
+		realCoreFolder := coreFolder.Parent().Parent()
+		jsonPath := ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE)
+		coreHasChanged := builder_utils.TXTBuildRulesHaveChanged(realCoreFolder, targetCoreFolder, jsonPath)
 
-	if opts.Equals(prevOpts) && !coreHasChanged {
-		return nil
+		if !coreHasChanged {
+			return nil
+		}
 	}
 
 	logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED)
 
 	buildPath := ctx.BuildPath
-	files, err := gohasissues.ReadDir(buildPath)
+	files, err := gohasissues.ReadDir(buildPath.String())
 	if err != nil {
 		return i18n.WrapError(err)
 	}
+	// if build path is inside the sketch folder, also wipe ctx.AdditionalFiles
+	if ctx.SketchLocation != nil {
+		if inside, _ := ctx.BuildPath.IsInsideDir(ctx.SketchLocation.Parent()); inside {
+			ctx.Sketch.AdditionalFiles = ctx.Sketch.AdditionalFiles[:0]
+		}
+	}
 	for _, file := range files {
-		os.RemoveAll(filepath.Join(buildPath, file.Name()))
+		buildPath.Join(file.Name()).RemoveAll()
 	}
 
 	return nil

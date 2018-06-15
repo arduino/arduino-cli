@@ -30,9 +30,9 @@
 package builder
 
 import (
+	"encoding/json"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"encoding/json"
 )
 
 type CreateBuildOptionsMap struct{}

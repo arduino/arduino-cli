@@ -40,6 +40,7 @@ func (s *AddMissingBuildPropertiesFromParentPlatformTxtFiles) Run(ctx *types.Con
 	buildProperties := ctx.BuildProperties
 
 	newBuildProperties := ctags.CtagsProperties.Clone()
+	newBuildProperties.Merge(ArduinoPreprocessorProperties)
 	newBuildProperties.Merge(buildProperties)
 	ctx.BuildProperties = newBuildProperties
 

@@ -30,7 +30,6 @@
 package phases
 
 import (
-	"path/filepath"
 	"strings"
 
 	"github.com/arduino/arduino-builder/builder_utils"
@@ -38,6 +37,7 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-map"
 )
 
@@ -48,24 +48,21 @@ func (s *Linker) Run(ctx *types.Context) error {
 	objectFilesLibraries := ctx.LibrariesObjectFiles
 	objectFilesCore := ctx.CoreObjectsFiles
 
-	var objectFiles []string
-	objectFiles = append(objectFiles, objectFilesSketch...)
-	objectFiles = append(objectFiles, objectFilesLibraries...)
-	objectFiles = append(objectFiles, objectFilesCore...)
+	objectFiles := paths.NewPathList()
+	objectFiles.AddAll(objectFilesSketch)
+	objectFiles.AddAll(objectFilesLibraries)
+	objectFiles.AddAll(objectFilesCore)
 
 	coreArchiveFilePath := ctx.CoreArchiveFilePath
 	buildPath := ctx.BuildPath
-	coreDotARelPath, err := filepath.Rel(buildPath, coreArchiveFilePath)
+	coreDotARelPath, err := buildPath.RelTo(coreArchiveFilePath)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
 	buildProperties := ctx.BuildProperties
-	verbose := ctx.Verbose
-	warningsLevel := ctx.WarningsLevel
-	logger := ctx.GetLogger()
 
-	err = link(objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties, verbose, warningsLevel, logger)
+	err = link(ctx, objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -73,20 +70,20 @@ func (s *Linker) Run(ctx *types.Context) error {
 	return nil
 }
 
-func link(objectFiles []string, coreDotARelPath string, coreArchiveFilePath string, buildProperties properties.Map, verbose bool, warningsLevel string, logger i18n.Logger) error {
+func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties properties.Map) error {
 	optRelax := addRelaxTrickIfATMEGA2560(buildProperties)
 
-	objectFiles = utils.Map(objectFiles, wrapWithDoubleQuotes)
-	objectFileList := strings.Join(objectFiles, constants.SPACE)
+	quotedObjectFiles := utils.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes)
+	objectFileList := strings.Join(quotedObjectFiles, constants.SPACE)
 
 	properties := buildProperties.Clone()
 	properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] + optRelax
-	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel]
-	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = coreDotARelPath
-	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = coreArchiveFilePath
+	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel]
+	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = coreDotARelPath.String()
+	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = coreArchiveFilePath.String()
 	properties[constants.BUILD_PROPERTIES_OBJECT_FILES] = objectFileList
 
-	_, err := builder_utils.ExecRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false, verbose, verbose, logger)
+	_, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_C_COMBINE_PATTERN, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
 	return err
 }
 

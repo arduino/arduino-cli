@@ -38,6 +38,7 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
 )
 
@@ -52,11 +53,8 @@ func (s *Sizer) Run(ctx *types.Context) error {
 	}
 
 	buildProperties := ctx.BuildProperties
-	verbose := ctx.Verbose
-	warningsLevel := ctx.WarningsLevel
-	logger := ctx.GetLogger()
 
-	err := checkSize(buildProperties, verbose, warningsLevel, logger)
+	err := checkSize(ctx, buildProperties)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -64,10 +62,11 @@ func (s *Sizer) Run(ctx *types.Context) error {
 	return nil
 }
 
-func checkSize(buildProperties properties.Map, verbose bool, warningsLevel string, logger i18n.Logger) error {
+func checkSize(ctx *types.Context, buildProperties properties.Map) error {
+	logger := ctx.GetLogger()
 
 	properties := buildProperties.Clone()
-	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel]
+	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel]
 
 	maxTextSizeString := properties[constants.PROPERTY_UPLOAD_MAX_SIZE]
 	maxDataSizeString := properties[constants.PROPERTY_UPLOAD_MAX_DATA_SIZE]
@@ -89,7 +88,7 @@ func checkSize(buildProperties properties.Map, verbose bool, warningsLevel strin
 		}
 	}
 
-	textSize, dataSize, _, err := execSizeReceipe(properties, logger)
+	textSize, dataSize, _, err := execSizeRecipe(ctx, properties)
 	if err != nil {
 		logger.Println(constants.LOG_LEVEL_WARN, constants.MSG_SIZER_ERROR_NO_RULE)
 		return nil
@@ -127,8 +126,8 @@ func checkSize(buildProperties properties.Map, verbose bool, warningsLevel strin
 	return nil
 }
 
-func execSizeReceipe(properties properties.Map, logger i18n.Logger) (textSize int, dataSize int, eepromSize int, resErr error) {
-	out, err := builder_utils.ExecRecipe(properties, constants.RECIPE_SIZE_PATTERN, false, false, false, logger)
+func execSizeRecipe(ctx *types.Context, properties properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
+	out, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_SIZE_PATTERN, false /* stdout */, utils.Capture /* stderr */, utils.Show)
 	if err != nil {
 		resErr = errors.New("Error while determining sketch size: " + err.Error())
 		return

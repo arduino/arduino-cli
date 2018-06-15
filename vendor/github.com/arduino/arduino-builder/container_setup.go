@@ -30,6 +30,7 @@
 package builder
 
 import (
+	"github.com/arduino/arduino-builder/builder_utils"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 )
@@ -54,7 +55,10 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		&AddMissingBuildPropertiesFromParentPlatformTxtFiles{},
 	}
 
+	ctx.Progress.Steps = ctx.Progress.Steps / float64(len(commands))
+
 	for _, command := range commands {
+		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
 		PrintRingNameIfDebug(ctx, command)
 		err := command.Run(ctx)
 		if err != nil {

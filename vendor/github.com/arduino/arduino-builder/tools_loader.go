@@ -31,17 +31,22 @@ package builder
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/go-paths-helper"
 )
 
 type ToolsLoader struct{}
 
 func (s *ToolsLoader) Run(ctx *types.Context) error {
-	folders := []string{}
-	builtinFolders := []string{}
+	if ctx.CanUseCachedTools {
+		//fmt.Println("no fs modification, can use cached ctx")
+		return nil
+	}
+
+	folders := paths.NewPathList()
+	builtinFolders := paths.NewPathList()
 
 	if ctx.BuiltInToolsFolders != nil || len(ctx.BuiltInLibrariesFolders) == 0 {
 		folders = ctx.ToolsFolders
@@ -49,14 +54,14 @@ func (s *ToolsLoader) Run(ctx *types.Context) error {
 	} else {
 		// Auto-detect built-in tools folders (for arduino-builder backward compatibility)
 		// this is a deprecated feature and will be removed in the future
-		builtinHardwareFolder, err := filepath.Abs(filepath.Join(ctx.BuiltInLibrariesFolders[0], ".."))
+		builtinHardwareFolder, err := ctx.BuiltInLibrariesFolders[0].Join("..").Abs()
+
 		if err != nil {
 			fmt.Println("Error detecting ")
 		}
 
-		builtinFolders = []string{}
 		for _, folder := range ctx.ToolsFolders {
-			if !strings.Contains(folder, builtinHardwareFolder) {
+			if !strings.Contains(folder.String(), builtinHardwareFolder.String()) { // TODO: make a function to check for subfolders
 				folders = append(folders, folder)
 			} else {
 				builtinFolders = append(builtinFolders, folder)
@@ -67,6 +72,7 @@ func (s *ToolsLoader) Run(ctx *types.Context) error {
 	pm := ctx.PackageManager
 	pm.LoadToolsFromBundleDirectories(builtinFolders)
 
+	ctx.CanUseCachedTools = true
 	ctx.AllTools = pm.GetAllInstalledToolsReleases()
 
 	if ctx.TargetBoard != nil {

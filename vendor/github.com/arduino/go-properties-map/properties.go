@@ -74,6 +74,8 @@ import (
 	"runtime"
 	"sort"
 	"strings"
+
+	"github.com/arduino/go-paths-helper"
 )
 
 // Map is a container of properties
@@ -112,6 +114,11 @@ func Load(filepath string) (Map, error) {
 	}
 
 	return properties, nil
+}
+
+// LoadFromPath reads a properties file and makes a Map out of it.
+func LoadFromPath(path *paths.Path) (Map, error) {
+	return Load(path.String())
 }
 
 // LoadFromSlice reads a properties file from an array of string
@@ -280,6 +287,29 @@ func (m Map) Merge(sources ...Map) Map {
 	return m
 }
 
+// Keys returns an array of the keys contained in the Map
+func (m Map) Keys() []string {
+	keys := make([]string, len(m))
+	i := 0
+	for key := range m {
+		keys[i] = key
+		i++
+	}
+	return keys
+}
+
+// Values returns an array of the values contained in the Map. Duplicated
+// values are repeated in the list accordingly.
+func (m Map) Values() []string {
+	values := make([]string, len(m))
+	i := 0
+	for _, value := range m {
+		values[i] = value
+		i++
+	}
+	return values
+}
+
 // Clone makes a copy of the Map
 func (m Map) Clone() Map {
 	clone := make(Map)
@@ -291,23 +321,6 @@ func (m Map) Clone() Map {
 // the Map passed as argument.
 func (m Map) Equals(other Map) bool {
 	return reflect.DeepEqual(m, other)
-}
-
-// GetBoolean returns true if the map contains the specified key and the value
-// equals to the string "true", in any other case returns false.
-func (m Map) GetBoolean(key string) bool {
-	value, ok := m[key]
-	return ok && value == "true"
-}
-
-// SetBoolean sets the specified key to the string "true" of "false" if the value
-// is respectively true or false.
-func (m Map) SetBoolean(key string, value bool) {
-	if value {
-		m[key] = "true"
-	} else {
-		m[key] = "false"
-	}
 }
 
 // MergeMapsOfProperties merge the map-of-Maps (obtained from the method FirstLevelOf()) into the

@@ -33,28 +33,27 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"path/filepath"
 )
 
 type FailIfBuildPathEqualsSketchPath struct{}
 
 func (s *FailIfBuildPathEqualsSketchPath) Run(ctx *types.Context) error {
-	if ctx.BuildPath == "" || ctx.SketchLocation == "" {
+	if ctx.BuildPath == nil || ctx.SketchLocation == nil {
 		return nil
 	}
 
-	buildPath, err := filepath.Abs(ctx.BuildPath)
+	buildPath, err := ctx.BuildPath.Abs()
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
-	sketchPath, err := filepath.Abs(ctx.SketchLocation)
+	sketchPath, err := ctx.SketchLocation.Abs()
 	if err != nil {
 		return i18n.WrapError(err)
 	}
-	sketchPath = filepath.Dir(sketchPath)
+	sketchPath = sketchPath.Parent()
 
-	if buildPath == sketchPath {
+	if buildPath.EqualsTo(sketchPath) {
 		return i18n.ErrorfWithLogger(ctx.GetLogger(), constants.MSG_SKETCH_CANT_BE_IN_BUILDPATH)
 	}
 

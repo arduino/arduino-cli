@@ -38,6 +38,8 @@ import (
 type PrintPreprocessedSource struct{}
 
 func (s *PrintPreprocessedSource) Run(ctx *types.Context) error {
-	fmt.Println(ctx.Source)
+	if ctx.SourceGccMinusE != "" {
+		fmt.Println(ctx.SourceGccMinusE)
+	}
 	return nil
 }

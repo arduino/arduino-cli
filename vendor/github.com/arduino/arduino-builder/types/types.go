@@ -31,26 +31,26 @@ package types
 
 import (
 	"fmt"
-	"path/filepath"
 	"strconv"
 
-	"github.com/arduino/arduino-builder/constants"
+	"github.com/arduino/go-paths-helper"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
 type SourceFile struct {
 	// Sketch or Library pointer that this source file lives in
 	Origin interface{}
 	// Path to the source file within the sketch/library root folder
-	RelativePath string
+	RelativePath *paths.Path
 }
 
 // Create a SourceFile containing the given source file path within the
 // given origin. The given path can be absolute, or relative within the
 // origin's root source folder
-func MakeSourceFile(ctx *Context, origin interface{}, path string) (SourceFile, error) {
-	if filepath.IsAbs(path) {
+func MakeSourceFile(ctx *Context, origin interface{}, path *paths.Path) (SourceFile, error) {
+	if path.IsAbs() {
 		var err error
-		path, err = filepath.Rel(sourceRoot(ctx, origin), path)
+		path, err = sourceRoot(ctx, origin).RelTo(path)
 		if err != nil {
 			return SourceFile{}, err
 		}
@@ -61,12 +61,12 @@ func MakeSourceFile(ctx *Context, origin interface{}, path string) (SourceFile, 
 // Return the build root for the given origin, where build products will
 // be placed. Any directories inside SourceFile.RelativePath will be
 // appended here.
-func buildRoot(ctx *Context, origin interface{}) string {
+func buildRoot(ctx *Context, origin interface{}) *paths.Path {
 	switch o := origin.(type) {
 	case *Sketch:
 		return ctx.SketchBuildPath
-	case *Library:
-		return filepath.Join(ctx.LibrariesBuildPath, o.Name)
+	case *libraries.Library:
+		return ctx.LibrariesBuildPath.Join(o.Name)
 	default:
 		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
 	}
@@ -75,31 +75,31 @@ func buildRoot(ctx *Context, origin interface{}) string {
 // Return the source root for the given origin, where its source files
 // can be found. Prepending this to SourceFile.RelativePath will give
 // the full path to that source file.
-func sourceRoot(ctx *Context, origin interface{}) string {
+func sourceRoot(ctx *Context, origin interface{}) *paths.Path {
 	switch o := origin.(type) {
 	case *Sketch:
 		return ctx.SketchBuildPath
-	case *Library:
+	case *libraries.Library:
 		return o.SrcFolder
 	default:
 		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
 	}
 }
 
-func (f *SourceFile) SourcePath(ctx *Context) string {
-	return filepath.Join(sourceRoot(ctx, f.Origin), f.RelativePath)
+func (f *SourceFile) SourcePath(ctx *Context) *paths.Path {
+	return sourceRoot(ctx, f.Origin).JoinPath(f.RelativePath)
 }
 
-func (f *SourceFile) ObjectPath(ctx *Context) string {
-	return filepath.Join(buildRoot(ctx, f.Origin), f.RelativePath+".o")
+func (f *SourceFile) ObjectPath(ctx *Context) *paths.Path {
+	return buildRoot(ctx, f.Origin).Join(f.RelativePath.String() + ".o")
 }
 
-func (f *SourceFile) DepfilePath(ctx *Context) string {
-	return filepath.Join(buildRoot(ctx, f.Origin), f.RelativePath+".d")
+func (f *SourceFile) DepfilePath(ctx *Context) *paths.Path {
+	return buildRoot(ctx, f.Origin).Join(f.RelativePath.String() + ".d")
 }
 
 type SketchFile struct {
-	Name   string
+	Name   *paths.Path
 	Source string
 }
 
@@ -114,61 +114,13 @@ func (s SketchFileSortByName) Swap(i, j int) {
 }
 
 func (s SketchFileSortByName) Less(i, j int) bool {
-	return s[i].Name < s[j].Name
+	return s[i].Name.String() < s[j].Name.String()
 }
 
 type Sketch struct {
 	MainFile         SketchFile
 	OtherSketchFiles []SketchFile
 	AdditionalFiles  []SketchFile
-}
-
-type LibraryLayout uint16
-
-const (
-	LIBRARY_FLAT LibraryLayout = 1 << iota
-	LIBRARY_RECURSIVE
-)
-
-type Library struct {
-	Folder        string
-	SrcFolder     string
-	UtilityFolder string
-	Layout        LibraryLayout
-	Name          string
-	RealName      string
-	Archs         []string
-	DotALinkage   bool
-	Precompiled   bool
-	LDflags       string
-	IsLegacy      bool
-	Version       string
-	Author        string
-	Maintainer    string
-	Sentence      string
-	Paragraph     string
-	URL           string
-	Category      string
-	License       string
-	Properties    map[string]string
-}
-
-func (library *Library) String() string {
-	return library.Name + " : " + library.SrcFolder
-}
-
-func (library *Library) SupportsArchitectures(archs []string) bool {
-	if sliceContains(archs, constants.LIBRARY_ALL_ARCHS) || sliceContains(library.Archs, constants.LIBRARY_ALL_ARCHS) {
-		return true
-	}
-
-	for _, libraryArch := range library.Archs {
-		if sliceContains(archs, libraryArch) {
-			return true
-		}
-	}
-
-	return false
 }
 
 type PlatforKeysRewrite struct {
@@ -197,14 +149,9 @@ func (proto *Prototype) String() string {
 	return proto.Modifiers + " " + proto.Prototype + " @ " + strconv.Itoa(proto.Line)
 }
 
-type SourceFolder struct {
-	Folder  string
-	Recurse bool
-}
-
 type LibraryResolutionResult struct {
-	Library          *Library
-	NotUsedLibraries []*Library
+	Library          *libraries.Library
+	NotUsedLibraries []*libraries.Library
 }
 
 type CTag struct {
@@ -222,16 +169,6 @@ type CTag struct {
 
 	Prototype          string
 	PrototypeModifiers string
-}
-
-func LibraryToSourceFolder(library *Library) []SourceFolder {
-	sourceFolders := []SourceFolder{}
-	recurse := library.Layout == LIBRARY_RECURSIVE
-	sourceFolders = append(sourceFolders, SourceFolder{Folder: library.SrcFolder, Recurse: recurse})
-	if library.UtilityFolder != "" {
-		sourceFolders = append(sourceFolders, SourceFolder{Folder: library.UtilityFolder, Recurse: false})
-	}
-	return sourceFolders
 }
 
 type Command interface {

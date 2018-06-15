@@ -35,7 +35,6 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 )
 
 type TargetBoardResolver struct{}
@@ -43,71 +42,19 @@ type TargetBoardResolver struct{}
 func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 	logger := ctx.GetLogger()
 
-	fqbn := ctx.FQBN
-
-	fqbnParts := strings.Split(fqbn, ":")
-	if len(fqbnParts) < 3 {
-		return i18n.ErrorfWithLogger(logger, constants.MSG_FQBN_INVALID, fqbn)
-	}
-	targetPackageName := fqbnParts[0]
-	targetPlatformName := fqbnParts[1]
-	targetBoardName := fqbnParts[2]
-
-	packages := ctx.Hardware
-
-	targetPackage := packages.Packages[targetPackageName]
-	if targetPackage == nil {
-		return i18n.ErrorfWithLogger(logger, constants.MSG_PACKAGE_UNKNOWN, targetPackageName)
+	targetPackage, targetPlatform, targetBoard, buildProperties, actualPlatform, err := ctx.PackageManager.ResolveFQBN(ctx.FQBN)
+	if err != nil {
+		return i18n.ErrorfWithLogger(logger, "Error resolving FQBN: {0}", err)
 	}
 
-	targetPlatforms := targetPackage.Platforms[targetPlatformName]
-	if targetPlatforms == nil {
-		return i18n.ErrorfWithLogger(logger, constants.MSG_PLATFORM_UNKNOWN, targetPlatformName, targetPackageName)
-	}
-	targetPlatform := targetPlatforms.GetInstalled()
-	if targetPlatform == nil {
-		return i18n.ErrorfWithLogger(logger, constants.MSG_PLATFORM_UNKNOWN, targetPlatformName, targetPackageName)
-	}
-
-	targetBoard := targetPlatform.Boards[targetBoardName]
-	if targetBoard == nil {
-		return i18n.ErrorfWithLogger(logger, constants.MSG_BOARD_UNKNOWN, targetBoardName, targetPlatformName, targetPackageName)
-	}
-
-	ctx.TargetPlatform = targetPlatform
-	ctx.TargetPackage = targetPackage
-	ctx.TargetBoard = targetBoard
-
-	if len(fqbnParts) > 3 {
-		if props, err := targetBoard.GeneratePropertiesForConfiguration(fqbnParts[3]); err != nil {
-			i18n.ErrorfWithLogger(logger, "Error in FQBN: %s", err)
-		} else {
-			targetBoard.Properties = props
-		}
-	}
+	targetBoard.Properties = buildProperties // FIXME....
 
 	core := targetBoard.Properties["build.core"]
 	if core == "" {
 		core = "arduino"
 	}
-
-	var corePlatform *cores.PlatformRelease
-	coreParts := strings.Split(core, ":")
-	if len(coreParts) > 1 {
-		core = coreParts[1]
-		if packages.Packages[coreParts[0]] == nil {
-			return i18n.ErrorfWithLogger(logger, constants.MSG_MISSING_CORE_FOR_BOARD, coreParts[0])
-
-		}
-		corePlatform = packages.Packages[coreParts[0]].Platforms[targetPlatforms.Architecture].GetInstalled()
-	}
-
-	var actualPlatform *cores.PlatformRelease
-	if corePlatform != nil {
-		actualPlatform = corePlatform
-	} else {
-		actualPlatform = targetPlatform
-	}
+	// select the core name in case of "package:core" format
+	core = core[strings.Index(core, ":")+1:]
 
 	if ctx.Verbose {
 		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_BOARD, targetBoard.BoardId, targetPlatform.Folder)
@@ -115,7 +62,9 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 	}
 
 	ctx.BuildCore = core
+	ctx.TargetBoard = targetBoard
+	ctx.TargetPlatform = targetPlatform
+	ctx.TargetPackage = targetPackage
 	ctx.ActualPlatform = actualPlatform
-
 	return nil
 }

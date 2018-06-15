@@ -30,29 +30,25 @@
 package builder
 
 import (
+	"os"
+	"strings"
+
 	"github.com/arduino/arduino-builder/constants"
-	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"os"
-	"path/filepath"
-	"strings"
+	paths "github.com/arduino/go-paths-helper"
 )
 
 type GenerateBuildPathIfMissing struct{}
 
 func (s *GenerateBuildPathIfMissing) Run(ctx *types.Context) error {
-	if ctx.BuildPath != "" {
+	if ctx.BuildPath != nil {
 		return nil
 	}
 
-	md5sum := utils.MD5Sum([]byte(ctx.SketchLocation))
+	md5sum := utils.MD5Sum([]byte(ctx.SketchLocation.String()))
 
-	buildPath := filepath.Join(os.TempDir(), "arduino-sketch-"+strings.ToUpper(md5sum))
-	_, err := os.Stat(buildPath)
-	if err != nil && !os.IsNotExist(err) {
-		return i18n.WrapError(err)
-	}
+	buildPath := paths.TempDir().Join("arduino-sketch-" + strings.ToUpper(md5sum))
 
 	if ctx.DebugLevel > 5 {
 		logger := ctx.GetLogger()

@@ -30,16 +30,15 @@
 package builder
 
 import (
-	"os"
-	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
 
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-properties-map"
 )
 
@@ -52,18 +51,18 @@ func (s *PlatformKeysRewriteLoader) Run(ctx *types.Context) error {
 	if err != nil {
 		return i18n.WrapError(err)
 	}
-	if platformKeysRewriteTxtPath == constants.EMPTY_STRING {
+	if platformKeysRewriteTxtPath == nil {
 		return nil
 	}
 
 	platformKeysRewrite := types.PlatforKeysRewrite{}
 	platformKeysRewrite.Rewrites = []types.PlatforKeyRewrite{}
 
-	txt, err := properties.Load(platformKeysRewriteTxtPath)
+	txt, err := properties.LoadFromPath(platformKeysRewriteTxtPath)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
-	keys := utils.KeysOfMapOfString(txt)
+	keys := txt.Keys()
 	sort.Strings(keys)
 
 	for _, key := range keys {
@@ -87,19 +86,17 @@ func (s *PlatformKeysRewriteLoader) Run(ctx *types.Context) error {
 	return nil
 }
 
-func findPlatformKeysRewriteTxt(folders []string) (string, error) {
+func findPlatformKeysRewriteTxt(folders paths.PathList) (*paths.Path, error) {
 	for _, folder := range folders {
-		txtPath := filepath.Join(folder, constants.FILE_PLATFORM_KEYS_REWRITE_TXT)
-		_, err := os.Stat(txtPath)
-		if err == nil {
+		txtPath := folder.Join(constants.FILE_PLATFORM_KEYS_REWRITE_TXT)
+		if exist, err := txtPath.Exist(); exist {
 			return txtPath, nil
-		}
-		if !os.IsNotExist(err) {
-			return constants.EMPTY_STRING, i18n.WrapError(err)
+		} else if err != nil {
+			return nil, i18n.WrapError(err)
 		}
 	}
 
-	return constants.EMPTY_STRING, nil
+	return nil, nil
 }
 
 func growSliceOfRewrites(originalSlice []types.PlatforKeyRewrite, maxIndex int) []types.PlatforKeyRewrite {

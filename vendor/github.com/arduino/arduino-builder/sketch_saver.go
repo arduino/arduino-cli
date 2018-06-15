@@ -32,8 +32,6 @@ package builder
 import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
-	"path/filepath"
 )
 
 type SketchSaver struct{}
@@ -42,11 +40,10 @@ func (s *SketchSaver) Run(ctx *types.Context) error {
 	sketch := ctx.Sketch
 	sketchBuildPath := ctx.SketchBuildPath
 
-	err := utils.EnsureFolderExists(sketchBuildPath)
-	if err != nil {
+	if err := sketchBuildPath.MkdirAll(); err != nil {
 		return i18n.WrapError(err)
 	}
 
-	err = utils.WriteFile(filepath.Join(sketchBuildPath, filepath.Base(sketch.MainFile.Name)+".cpp"), ctx.Source)
+	err := sketchBuildPath.Join(sketch.MainFile.Name.Base() + ".cpp").WriteFile([]byte(ctx.Source))
 	return i18n.WrapError(err)
 }

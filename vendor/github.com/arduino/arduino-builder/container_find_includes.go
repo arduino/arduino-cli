@@ -108,9 +108,8 @@ package builder
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
-	"path/filepath"
+	"os/exec"
 	"time"
 
 	"github.com/arduino/arduino-builder/builder_utils"
@@ -118,21 +117,25 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/arduino/go-paths-helper"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+
+	"github.com/go-errors/errors"
 )
 
 type ContainerFindIncludes struct{}
 
 func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
-	cachePath := filepath.Join(ctx.BuildPath, constants.FILE_INCLUDES_CACHE)
+	cachePath := ctx.BuildPath.Join(constants.FILE_INCLUDES_CACHE)
 	cache := readCache(cachePath)
 
-	appendIncludeFolder(ctx, cache, "", "", ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH])
-	if ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] != constants.EMPTY_STRING {
-		appendIncludeFolder(ctx, cache, "", "", ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH])
+	appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_CORE_PATH))
+	if ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] != "" {
+		appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH))
 	}
 
 	sketch := ctx.Sketch
-	mergedfile, err := types.MakeSourceFile(ctx, sketch, filepath.Base(sketch.MainFile.Name)+".cpp")
+	mergedfile, err := types.MakeSourceFile(ctx, sketch, paths.New(sketch.MainFile.Name.Base()+".cpp"))
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -140,15 +143,15 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 
 	sourceFilePaths := ctx.CollectedSourceFiles
 	queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, ctx.SketchBuildPath, false /* recurse */)
-	srcSubfolderPath := filepath.Join(ctx.SketchBuildPath, constants.SKETCH_FOLDER_SRC)
-	if info, err := os.Stat(srcSubfolderPath); err == nil && info.IsDir() {
+	srcSubfolderPath := ctx.SketchBuildPath.Join(constants.SKETCH_FOLDER_SRC)
+	if isDir, _ := srcSubfolderPath.IsDir(); isDir {
 		queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, srcSubfolderPath, true /* recurse */)
 	}
 
 	for !sourceFilePaths.Empty() {
 		err := findIncludesUntilDone(ctx, cache, sourceFilePaths.Pop())
 		if err != nil {
-			os.Remove(cachePath)
+			cachePath.Remove()
 			return i18n.WrapError(err)
 		}
 	}
@@ -173,7 +176,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 // include (e.g. what #include line in what file it was resolved from)
 // and should be the empty string for the default include folders, like
 // the core or variant.
-func appendIncludeFolder(ctx *types.Context, cache *includeCache, sourceFilePath string, include string, folder string) {
+func appendIncludeFolder(ctx *types.Context, cache *includeCache, sourceFilePath *paths.Path, include string, folder *paths.Path) {
 	ctx.IncludeFolders = append(ctx.IncludeFolders, folder)
 	cache.ExpectEntry(sourceFilePath, include, folder)
 }
@@ -188,9 +191,9 @@ func runCommand(ctx *types.Context, command types.Command) error {
 }
 
 type includeCacheEntry struct {
-	Sourcefile  string
+	Sourcefile  *paths.Path
 	Include     string
-	Includepath string
+	Includepath *paths.Path
 }
 
 type includeCache struct {
@@ -212,8 +215,8 @@ func (cache *includeCache) Next() includeCacheEntry {
 // Check that the next cache entry is about the given file. If it is
 // not, or no entry is available, the cache is invalidated. Does not
 // advance the cache.
-func (cache *includeCache) ExpectFile(sourcefile string) {
-	if cache.valid && cache.next < len(cache.entries) && cache.Next().Sourcefile != sourcefile {
+func (cache *includeCache) ExpectFile(sourcefile *paths.Path) {
+	if cache.valid && (cache.next >= len(cache.entries) || !cache.Next().Sourcefile.EqualsTo(sourcefile)) {
 		cache.valid = false
 		cache.entries = cache.entries[:cache.next]
 	}
@@ -223,7 +226,7 @@ func (cache *includeCache) ExpectFile(sourcefile string) {
 // the cache. If not, the cache is invalidated. If the cache is
 // invalidated, or was already invalid, an entry with the given values
 // is appended.
-func (cache *includeCache) ExpectEntry(sourcefile string, include string, librarypath string) {
+func (cache *includeCache) ExpectEntry(sourcefile *paths.Path, include string, librarypath *paths.Path) {
 	entry := includeCacheEntry{Sourcefile: sourcefile, Include: include, Includepath: librarypath}
 	if cache.valid {
 		if cache.next < len(cache.entries) && cache.Next() == entry {
@@ -249,8 +252,8 @@ func (cache *includeCache) ExpectEnd() {
 }
 
 // Read the cache from the given file
-func readCache(path string) *includeCache {
-	bytes, err := ioutil.ReadFile(path)
+func readCache(path *paths.Path) *includeCache {
+	bytes, err := path.ReadFile()
 	if err != nil {
 		// Return an empty, invalid cache
 		return &includeCache{}
@@ -267,19 +270,19 @@ func readCache(path string) *includeCache {
 
 // Write the given cache to the given file if it is invalidated. If the
 // cache is still valid, just update the timestamps of the file.
-func writeCache(cache *includeCache, path string) error {
+func writeCache(cache *includeCache, path *paths.Path) error {
 	// If the cache was still valid all the way, just touch its file
 	// (in case any source file changed without influencing the
 	// includes). If it was invalidated, overwrite the cache with
 	// the new contents.
 	if cache.valid {
-		os.Chtimes(path, time.Now(), time.Now())
+		path.Chtimes(time.Now(), time.Now())
 	} else {
 		bytes, err := json.MarshalIndent(cache.entries, "", "  ")
 		if err != nil {
 			return i18n.WrapError(err)
 		}
-		err = utils.WriteFileBytes(path, bytes)
+		err = path.WriteFile(bytes)
 		if err != nil {
 			return i18n.WrapError(err)
 		}
@@ -289,7 +292,9 @@ func writeCache(cache *includeCache, path string) error {
 
 func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile types.SourceFile) error {
 	sourcePath := sourceFile.SourcePath(ctx)
-	targetFilePath := utils.NULLFile()
+	targetFilePath := paths.NullPath()
+	depPath := sourceFile.DepfilePath(ctx)
+	objPath := sourceFile.ObjectPath(ctx)
 
 	// TODO: This should perhaps also compare against the
 	// include.cache file timestamp. Now, it only checks if the file
@@ -303,7 +308,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 	// TODO: This reads the dependency file, but the actual building
 	// does it again. Should the result be somehow cached? Perhaps
 	// remove the object file if it is found to be stale?
-	unchanged, err := builder_utils.ObjFileIsUpToDate(sourcePath, sourceFile.ObjectPath(ctx), sourceFile.DepfilePath(ctx))
+	unchanged, err := builder_utils.ObjFileIsUpToDate(ctx, sourcePath, objPath, depPath)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -314,39 +319,62 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		cache.ExpectFile(sourcePath)
 
 		includes := ctx.IncludeFolders
-		if library, ok := sourceFile.Origin.(*types.Library); ok && library.UtilityFolder != "" {
+		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityFolder != nil {
 			includes = append(includes, library.UtilityFolder)
 		}
+		var preproc_err error
+		var preproc_stderr []byte
 		if unchanged && cache.valid {
 			include = cache.Next().Include
 			if first && ctx.Verbose {
 				ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_CACHED_INCLUDES, sourcePath)
 			}
 		} else {
-			commands := []types.Command{
-				&GCCPreprocRunnerForDiscoveringIncludes{SourceFilePath: sourcePath, TargetFilePath: targetFilePath, Includes: includes},
-				&IncludesFinderWithRegExp{Source: &ctx.SourceGccMinusE},
-			}
-			for _, command := range commands {
-				err := runCommand(ctx, command)
-				if err != nil {
-					return i18n.WrapError(err)
+			preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
+			// Unwrap error and see if it is an ExitError.
+			_, is_exit_error := i18n.UnwrapError(preproc_err).(*exec.ExitError)
+			if preproc_err == nil {
+				// Preprocessor successful, done
+				include = ""
+			} else if !is_exit_error || preproc_stderr == nil {
+				// Ignore ExitErrors (e.g. gcc returning
+				// non-zero status), but bail out on
+				// other errors
+				return i18n.WrapError(preproc_err)
+			} else {
+				include = IncludesFinderWithRegExp(ctx, string(preproc_stderr))
+				if include == "" {
+					// No include found? Bail out.
+					os.Stderr.Write(preproc_stderr)
+					return i18n.WrapError(preproc_err)
 				}
 			}
-			include = ctx.IncludeJustFound
 		}
 
 		if include == "" {
 			// No missing includes found, we're done
-			cache.ExpectEntry(sourcePath, "", "")
+			cache.ExpectEntry(sourcePath, "", nil)
 			return nil
 		}
 
 		library := ResolveLibrary(ctx, include)
 		if library == nil {
 			// Library could not be resolved, show error
-			err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E, Includes: includes})
-			return i18n.WrapError(err)
+			// err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: paths.New(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), Includes: includes})
+			// return i18n.WrapError(err)
+			if preproc_err == nil || preproc_stderr == nil {
+				// Filename came from cache, so run preprocessor to obtain error to show
+				preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
+				if preproc_err == nil {
+					// If there is a missing #include in the cache, but running
+					// gcc does not reproduce that, there is something wrong.
+					// Returning an error here will cause the cache to be
+					// deleted, so hopefully the next compilation will succeed.
+					return errors.New("Internal error in cache")
+				}
+			}
+			os.Stderr.Write(preproc_stderr)
+			return i18n.WrapError(preproc_err)
 		}
 
 		// Add this library to the list of libraries, the
@@ -354,7 +382,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		// include scanning
 		ctx.ImportedLibraries = append(ctx.ImportedLibraries, library)
 		appendIncludeFolder(ctx, cache, sourcePath, include, library.SrcFolder)
-		sourceFolders := types.LibraryToSourceFolder(library)
+		sourceFolders := library.SourceDirs()
 		for _, sourceFolder := range sourceFolders {
 			queueSourceFilesFromFolder(ctx, ctx.CollectedSourceFiles, library, sourceFolder.Folder, sourceFolder.Recurse)
 		}
@@ -362,17 +390,17 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 	}
 }
 
-func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFileQueue, origin interface{}, folder string, recurse bool) error {
+func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFileQueue, origin interface{}, folder *paths.Path, recurse bool) error {
 	extensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] }
 
 	filePaths := []string{}
-	err := utils.FindFilesInFolder(&filePaths, folder, extensions, recurse)
+	err := utils.FindFilesInFolder(&filePaths, folder.String(), extensions, recurse)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
 	for _, filePath := range filePaths {
-		sourceFile, err := types.MakeSourceFile(ctx, origin, filePath)
+		sourceFile, err := types.MakeSourceFile(ctx, origin, paths.New(filePath))
 		if err != nil {
 			return i18n.WrapError(err)
 		}

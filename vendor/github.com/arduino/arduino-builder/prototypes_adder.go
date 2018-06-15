@@ -30,10 +30,10 @@
 package builder
 
 import (
+	"fmt"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"fmt"
 	"strconv"
 	"strings"
 )

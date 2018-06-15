@@ -30,11 +30,10 @@
 package builder
 
 import (
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/arduino/go-paths-helper"
 
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
@@ -45,35 +44,35 @@ import (
 type SketchLoader struct{}
 
 func (s *SketchLoader) Run(ctx *types.Context) error {
-	if ctx.SketchLocation == "" {
+	if ctx.SketchLocation == nil {
 		return nil
 	}
 
 	sketchLocation := ctx.SketchLocation
 
-	sketchLocation, err := filepath.Abs(sketchLocation)
+	sketchLocation, err := sketchLocation.Abs()
 	if err != nil {
 		return i18n.WrapError(err)
 	}
-	mainSketchStat, err := os.Stat(sketchLocation)
+	mainSketchStat, err := sketchLocation.Stat()
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 	if mainSketchStat.IsDir() {
-		sketchLocation = filepath.Join(sketchLocation, mainSketchStat.Name()+".ino")
+		sketchLocation = sketchLocation.Join(mainSketchStat.Name() + ".ino")
 	}
 
 	ctx.SketchLocation = sketchLocation
 
-	allSketchFilePaths, err := collectAllSketchFiles(filepath.Dir(sketchLocation))
+	allSketchFilePaths, err := collectAllSketchFiles(sketchLocation.Parent())
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
 	logger := ctx.GetLogger()
 
-	if !utils.SliceContains(allSketchFilePaths, sketchLocation) {
-		return i18n.ErrorfWithLogger(logger, constants.MSG_CANT_FIND_SKETCH_IN_PATH, sketchLocation, filepath.Dir(sketchLocation))
+	if !allSketchFilePaths.Contains(sketchLocation) {
+		return i18n.ErrorfWithLogger(logger, constants.MSG_CANT_FIND_SKETCH_IN_PATH, sketchLocation, sketchLocation.Parent())
 	}
 
 	sketch, err := makeSketch(sketchLocation, allSketchFilePaths, logger)
@@ -87,39 +86,39 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 	return nil
 }
 
-func collectAllSketchFiles(from string) ([]string, error) {
+func collectAllSketchFiles(from *paths.Path) (paths.PathList, error) {
 	filePaths := []string{}
 	// Source files in the root are compiled, non-recursively. This
 	// is the only place where .ino files can be present.
 	rootExtensions := func(ext string) bool { return MAIN_FILE_VALID_EXTENSIONS[ext] || ADDITIONAL_FILE_VALID_EXTENSIONS[ext] }
-	err := utils.FindFilesInFolder(&filePaths, from, rootExtensions, true /* recurse */)
+	err := utils.FindFilesInFolder(&filePaths, from.String(), rootExtensions, true /* recurse */)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
 
-	return filePaths, i18n.WrapError(err)
+	return paths.NewPathList(filePaths...), i18n.WrapError(err)
 }
 
-func makeSketch(sketchLocation string, allSketchFilePaths []string, logger i18n.Logger) (*types.Sketch, error) {
+func makeSketch(sketchLocation *paths.Path, allSketchFilePaths paths.PathList, logger i18n.Logger) (*types.Sketch, error) {
 	sketchFilesMap := make(map[string]types.SketchFile)
 	for _, sketchFilePath := range allSketchFilePaths {
-		source, err := ioutil.ReadFile(sketchFilePath)
+		source, err := sketchFilePath.ReadFile()
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
-		sketchFilesMap[sketchFilePath] = types.SketchFile{Name: sketchFilePath, Source: string(source)}
+		sketchFilesMap[sketchFilePath.String()] = types.SketchFile{Name: sketchFilePath, Source: string(source)}
 	}
 
-	mainFile := sketchFilesMap[sketchLocation]
-	delete(sketchFilesMap, sketchLocation)
+	mainFile := sketchFilesMap[sketchLocation.String()]
+	delete(sketchFilesMap, sketchLocation.String())
 
 	additionalFiles := []types.SketchFile{}
 	otherSketchFiles := []types.SketchFile{}
-	mainFileDir := filepath.Dir(mainFile.Name)
+	mainFileDir := mainFile.Name.Parent()
 	for _, sketchFile := range sketchFilesMap {
-		ext := strings.ToLower(filepath.Ext(sketchFile.Name))
+		ext := strings.ToLower(sketchFile.Name.Ext())
 		if MAIN_FILE_VALID_EXTENSIONS[ext] {
-			if filepath.Dir(sketchFile.Name) == mainFileDir {
+			if sketchFile.Name.Parent().EqualsTo(mainFileDir) {
 				otherSketchFiles = append(otherSketchFiles, sketchFile)
 			}
 		} else if ADDITIONAL_FILE_VALID_EXTENSIONS[ext] {

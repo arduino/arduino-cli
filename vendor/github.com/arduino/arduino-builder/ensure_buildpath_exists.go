@@ -32,16 +32,13 @@ package builder
 import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
 )
 
 type EnsureBuildPathExists struct{}
 
 func (s *EnsureBuildPathExists) Run(ctx *types.Context) error {
-	err := utils.EnsureFolderExists(ctx.BuildPath)
-	if err != nil {
+	if err := ctx.BuildPath.MkdirAll(); err != nil {
 		return i18n.WrapError(err)
 	}
-
 	return nil
 }

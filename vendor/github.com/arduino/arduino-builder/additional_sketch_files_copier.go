@@ -30,12 +30,11 @@
 package builder
 
 import (
+	"bytes"
+
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
-	"bytes"
-	"io/ioutil"
-	"path/filepath"
+	"github.com/arduino/go-paths-helper"
 )
 
 type AdditionalSketchFilesCopier struct{}
@@ -44,33 +43,30 @@ func (s *AdditionalSketchFilesCopier) Run(ctx *types.Context) error {
 	sketch := ctx.Sketch
 	sketchBuildPath := ctx.SketchBuildPath
 
-	err := utils.EnsureFolderExists(sketchBuildPath)
-	if err != nil {
+	if err := sketchBuildPath.MkdirAll(); err != nil {
 		return i18n.WrapError(err)
 	}
 
-	sketchBasePath := filepath.Dir(sketch.MainFile.Name)
+	sketchBasePath := sketch.MainFile.Name.Parent()
 
 	for _, file := range sketch.AdditionalFiles {
-		relativePath, err := filepath.Rel(sketchBasePath, file.Name)
+		relativePath, err := sketchBasePath.RelTo(file.Name)
 		if err != nil {
 			return i18n.WrapError(err)
 		}
 
-		targetFilePath := filepath.Join(sketchBuildPath, relativePath)
-		err = utils.EnsureFolderExists(filepath.Dir(targetFilePath))
-		if err != nil {
+		targetFilePath := sketchBuildPath.JoinPath(relativePath)
+		if err = targetFilePath.Parent().MkdirAll(); err != nil {
 			return i18n.WrapError(err)
 		}
 
-		bytes, err := ioutil.ReadFile(file.Name)
+		bytes, err := file.Name.ReadFile()
 		if err != nil {
 			return i18n.WrapError(err)
 		}
 
 		if targetFileChanged(bytes, targetFilePath) {
-			err := utils.WriteFileBytes(targetFilePath, bytes)
-			if err != nil {
+			if err := targetFilePath.WriteFile(bytes); err != nil {
 				return i18n.WrapError(err)
 			}
 		}
@@ -79,8 +75,8 @@ func (s *AdditionalSketchFilesCopier) Run(ctx *types.Context) error {
 	return nil
 }
 
-func targetFileChanged(currentBytes []byte, targetFilePath string) bool {
-	oldBytes, err := ioutil.ReadFile(targetFilePath)
+func targetFileChanged(currentBytes []byte, targetFilePath *paths.Path) bool {
+	oldBytes, err := targetFilePath.ReadFile()
 	if err != nil {
 		return true
 	}

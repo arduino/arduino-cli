@@ -30,8 +30,6 @@
 package builder
 
 import (
-	"fmt"
-
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/ctags"
 	"github.com/arduino/arduino-builder/i18n"
@@ -48,7 +46,7 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 
 	properties := buildProperties.Clone()
 	properties.Merge(buildProperties.SubTree(constants.BUILD_PROPERTIES_TOOLS_KEY).SubTree(constants.CTAGS))
-	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = ctagsTargetFilePath
+	properties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, ctagsTargetFilePath)
 
 	pattern := properties[constants.BUILD_PROPERTIES_PATTERN]
 	if pattern == constants.EMPTY_STRING {
@@ -56,17 +54,12 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 	}
 
 	commandLine := properties.ExpandPropsInString(pattern)
-	command, err := utils.PrepareCommand(commandLine, logger)
+	command, err := utils.PrepareCommand(commandLine, logger, "")
 	if err != nil {
 		return i18n.WrapError(err)
 	}
 
-	verbose := ctx.Verbose
-	if verbose {
-		fmt.Println(commandLine)
-	}
-
-	sourceBytes, err := command.Output()
+	sourceBytes, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Ignore /* stderr */)
 	if err != nil {
 		return i18n.WrapError(err)
 	}

@@ -48,30 +48,19 @@ func (s *WarnAboutArchIncompatibleLibraries) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
 	logger := ctx.GetLogger()
 
-	archs := []string{}
-	archs = append(archs, targetPlatform.Platform.Architecture)
-
-	if buildProperties[constants.BUILD_PROPERTIES_ARCH_OVERRIDE_CHECK] != constants.EMPTY_STRING {
-		overrides := strings.Split(buildProperties[constants.BUILD_PROPERTIES_ARCH_OVERRIDE_CHECK], ",")
-		for _, override := range overrides {
-			archs = append(archs, override)
-		}
+	archs := []string{targetPlatform.Platform.Architecture}
+	if overrides, ok := buildProperties[constants.BUILD_PROPERTIES_ARCH_OVERRIDE_CHECK]; ok {
+		archs = append(archs, strings.Split(overrides, ",")...)
 	}
 
 	for _, importedLibrary := range ctx.ImportedLibraries {
-		if !importedLibrary.SupportsArchitectures(archs) {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARY_INCOMPATIBLE_ARCH, importedLibrary.Name, sliceToCommaSeparatedString(importedLibrary.Archs), sliceToCommaSeparatedString(archs))
+		if !importedLibrary.SupportsAnyArchitectureIn(archs) {
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARY_INCOMPATIBLE_ARCH,
+				importedLibrary.Name,
+				strings.Join(importedLibrary.Architectures, ", "),
+				strings.Join(archs, ", "))
 		}
 	}
 
 	return nil
-}
-
-func sliceToCommaSeparatedString(slice []string) string {
-	str := "("
-	str = str + slice[0]
-	for i := 1; i < len(slice); i++ {
-		str = str + ", " + slice[i]
-	}
-	return str + ")"
 }

@@ -30,13 +30,12 @@
 package phases
 
 import (
-	"path/filepath"
-
 	"github.com/arduino/arduino-builder/builder_utils"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-map"
 )
 
@@ -46,23 +45,18 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 	coreBuildPath := ctx.CoreBuildPath
 	coreBuildCachePath := ctx.CoreBuildCachePath
 	buildProperties := ctx.BuildProperties
-	verbose := ctx.Verbose
-	warningsLevel := ctx.WarningsLevel
-	logger := ctx.GetLogger()
 
-	err := utils.EnsureFolderExists(coreBuildPath)
-	if err != nil {
+	if err := coreBuildPath.MkdirAll(); err != nil {
 		return i18n.WrapError(err)
 	}
 
-	if coreBuildCachePath != "" {
-		err := utils.EnsureFolderExists(coreBuildCachePath)
-		if err != nil {
+	if coreBuildCachePath != nil {
+		if err := coreBuildCachePath.MkdirAll(); err != nil {
 			return i18n.WrapError(err)
 		}
 	}
 
-	archiveFile, objectFiles, err := compileCore(coreBuildPath, coreBuildCachePath, buildProperties, verbose, warningsLevel, logger)
+	archiveFile, objectFiles, err := compileCore(ctx, coreBuildPath, coreBuildCachePath, buildProperties)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -73,63 +67,66 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 	return nil
 }
 
-func compileCore(buildPath string, buildCachePath string, buildProperties properties.Map, verbose bool, warningsLevel string, logger i18n.Logger) (string, []string, error) {
-	coreFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH]
-	variantFolder := buildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH]
+func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *paths.Path, buildProperties properties.Map) (*paths.Path, paths.PathList, error) {
+	logger := ctx.GetLogger()
+	coreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_CORE_PATH)
+	variantFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH)
 
-	targetCoreFolder := buildProperties[constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH]
+	targetCoreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH)
 
 	includes := []string{}
-	includes = append(includes, coreFolder)
-	if variantFolder != constants.EMPTY_STRING {
-		includes = append(includes, variantFolder)
+	includes = append(includes, coreFolder.String())
+	if variantFolder != nil {
+		includes = append(includes, variantFolder.String())
 	}
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
 
 	var err error
 
-	variantObjectFiles := []string{}
-	if variantFolder != constants.EMPTY_STRING {
-		variantObjectFiles, err = builder_utils.CompileFiles(variantObjectFiles, variantFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
+	variantObjectFiles := paths.NewPathList()
+	if variantFolder != nil {
+		variantObjectFiles, err = builder_utils.CompileFiles(ctx, variantFolder, true, buildPath, buildProperties, includes)
 		if err != nil {
-			return "", nil, i18n.WrapError(err)
+			return nil, nil, i18n.WrapError(err)
 		}
 	}
 
 	// Recreate the archive if ANY of the core files (including platform.txt) has changed
-	realCoreFolder := utils.GetParentFolder(coreFolder, 2)
+	realCoreFolder := coreFolder.Parent().Parent()
 
-	var targetArchivedCore string
-	if buildCachePath != "" {
+	var targetArchivedCore *paths.Path
+	if buildCachePath != nil {
 		archivedCoreName := builder_utils.GetCachedCoreArchiveFileName(buildProperties[constants.BUILD_PROPERTIES_FQBN], realCoreFolder)
-		targetArchivedCore = filepath.Join(buildCachePath, archivedCoreName)
+		targetArchivedCore = buildCachePath.Join(archivedCoreName)
 		canUseArchivedCore := !builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, targetArchivedCore)
 
 		if canUseArchivedCore {
 			// use archived core
-			if verbose {
+			if ctx.Verbose {
 				logger.Println(constants.LOG_LEVEL_INFO, "Using precompiled core: {0}", targetArchivedCore)
 			}
 			return targetArchivedCore, variantObjectFiles, nil
 		}
 	}
 
-	coreObjectFiles, err := builder_utils.CompileFiles([]string{}, coreFolder, true, buildPath, buildProperties, includes, verbose, warningsLevel, logger)
+	coreObjectFiles, err := builder_utils.CompileFiles(ctx, coreFolder, true, buildPath, buildProperties, includes)
 	if err != nil {
-		return "", nil, i18n.WrapError(err)
+		return nil, nil, i18n.WrapError(err)
 	}
 
-	archiveFile, err := builder_utils.ArchiveCompiledFiles(buildPath, "core.a", coreObjectFiles, buildProperties, verbose, logger)
+	archiveFile, err := builder_utils.ArchiveCompiledFiles(ctx, buildPath, paths.New("core.a"), coreObjectFiles, buildProperties)
 	if err != nil {
-		return "", nil, i18n.WrapError(err)
+		return nil, nil, i18n.WrapError(err)
 	}
 
 	// archive core.a
-	if targetArchivedCore != "" {
-		if verbose {
+	if targetArchivedCore != nil {
+		if ctx.Verbose {
 			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_ARCHIVING_CORE_CACHE, targetArchivedCore)
 		}
-		builder_utils.CopyFile(archiveFile, targetArchivedCore)
+		if err := archiveFile.CopyTo(targetArchivedCore); err != nil {
+			return nil, nil, i18n.WrapError(err)
+		}
 	}
 
 	return archiveFile, variantObjectFiles, nil

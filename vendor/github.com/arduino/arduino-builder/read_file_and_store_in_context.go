@@ -32,15 +32,16 @@ package builder
 import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"io/ioutil"
+	"github.com/arduino/go-paths-helper"
 )
 
 type ReadFileAndStoreInContext struct {
-	Target *string
+	FileToRead *paths.Path
+	Target     *string
 }
 
 func (s *ReadFileAndStoreInContext) Run(ctx *types.Context) error {
-	bytes, err := ioutil.ReadFile(ctx.FileToRead)
+	bytes, err := s.FileToRead.ReadFile()
 	if err != nil {
 		return i18n.WrapError(err)
 	}

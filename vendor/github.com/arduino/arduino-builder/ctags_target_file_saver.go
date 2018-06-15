@@ -32,8 +32,6 @@ package builder
 import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
-	"path/filepath"
 )
 
 type CTagsTargetFileSaver struct {
@@ -45,18 +43,15 @@ func (s *CTagsTargetFileSaver) Run(ctx *types.Context) error {
 	source := *s.Source
 
 	preprocPath := ctx.PreprocPath
-	err := utils.EnsureFolderExists(preprocPath)
-	if err != nil {
+	if err := preprocPath.MkdirAll(); err != nil {
 		return i18n.WrapError(err)
 	}
 
-	ctagsTargetFilePath := filepath.Join(preprocPath, s.TargetFileName)
-	err = utils.WriteFile(ctagsTargetFilePath, source)
-	if err != nil {
+	ctagsTargetFilePath := preprocPath.Join(s.TargetFileName)
+	if err := ctagsTargetFilePath.WriteFile([]byte(source)); err != nil {
 		return i18n.WrapError(err)
 	}
 
 	ctx.CTagsTargetFile = ctagsTargetFilePath
-
 	return nil
 }
