@@ -43,7 +43,7 @@ func (ts TestStruct) String() string {
 	return fmt.Sprint("VALUE = ", ts.Value)
 }
 
-func ExampleJSONFormatter_Print() {
+func ExampleJSONFormatter_Format() {
 	var example struct {
 		Field1 string `json:"field1"`
 		Field2 int    `json:"field2"`
@@ -64,34 +64,12 @@ func ExampleJSONFormatter_Print() {
 	var example2 float64 = 3.14
 	fmt.Println(jf.Format(example2))
 
+	var example3 float32 = 3.14
+	fmt.Println(jf.Format(example3))
+
 	// Output:
 	// {"field1":"test","field2":10,"field3":{"inner1":"inner test","inner2":10.432412}} <nil>
 	//  float64 ignored
-}
-
-func ExampleJSONFormatter_Format() {
-	var example struct {
-		Field1 string `json:"field1"`
-		Field2 int    `json:"field2"`
-		Field3 struct {
-			Inner1 string  `json:"inner1"`
-			Inner2 float32 `json:"inner2"`
-		} `json:"field3"`
-	}
-
-	example.Field1 = "test"
-	example.Field2 = 10
-	example.Field3.Inner1 = "inner test"
-	example.Field3.Inner2 = 10.432412
-
-	var jf formatter.JSONFormatter
-	fmt.Println(jf.Format(example))
-
-	var example2 float32 = 3.14
-	fmt.Println(jf.Format(example2))
-
-	// Output:
-	// {"field1":"test","field2":10,"field3":{"inner1":"inner test","inner2":10.432412}} <nil>
 	//  float32 ignored
 }
 
