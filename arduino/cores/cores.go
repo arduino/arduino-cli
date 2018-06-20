@@ -51,17 +51,23 @@ type Platform struct {
 
 // PlatformRelease represents a release of a plaform package.
 type PlatformRelease struct {
-	Resource     *resources.DownloadResource
-	Version      string
-	BoardNames   []string
-	Dependencies ToolDependencies // The Dependency entries to load tools.
-	Platform     *Platform        `json:"-"`
+	Resource       *resources.DownloadResource
+	Version        string
+	BoardsManifest []*BoardManifest
+	Dependencies   ToolDependencies // The Dependency entries to load tools.
+	Platform       *Platform        `json:"-"`
 
 	Properties  properties.Map            `json:"-"`
 	Boards      map[string]*Board         `json:"-"`
 	Programmers map[string]properties.Map `json:"-"`
 	Menus       map[string]string         `json:"-"`
 	Folder      string                    `json:"-"`
+}
+
+// BoardManifest contains information about a board. These metadata are usually
+// provided by the package_index.json
+type BoardManifest struct {
+	Name string `json:"-"`
 }
 
 // ToolDependencies is a set of tool dependency

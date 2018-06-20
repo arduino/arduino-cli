@@ -64,7 +64,7 @@ type indexPlatformRelease struct {
 	ArchiveFileName  string                `json:"archiveFileName,required"`
 	Checksum         string                `json:"checksum,required"`
 	Size             json.Number           `json:"size,required"`
-	BoardsNames      []indexBoardName      `json:"boards"`
+	Boards           []indexBoard          `json:"boards"`
 	Help             indexHelp             `json:"help,omitempty"`
 	ToolDependencies []indexToolDependency `json:"toolsDependencies,required"`
 }
@@ -92,9 +92,9 @@ type indexToolReleaseFlavour struct {
 	Checksum        string      `json:"checksum,required"`
 }
 
-// indexBoardName represents a single Board as written in package_index.json file.
-type indexBoardName struct {
-	Name string
+// indexBoard represents a single Board as written in package_index.json file.
+type indexBoard struct {
+	Name string `json:"name"`
 }
 
 type indexHelp struct {
@@ -139,7 +139,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 		URL:             inPlatformRelease.URL,
 		CachePath:       "packages",
 	}
-	outPlatformRelease.BoardNames = inPlatformRelease.extractBoardsNames()
+	outPlatformRelease.BoardsManifest = inPlatformRelease.extractBoardsManifest()
 	outPlatformRelease.Dependencies = inPlatformRelease.extractDeps()
 }
 
@@ -155,10 +155,10 @@ func (inPlatformRelease indexPlatformRelease) extractDeps() cores.ToolDependenci
 	return ret
 }
 
-func (inPlatformRelease indexPlatformRelease) extractBoardsNames() []string {
-	boards := make([]string, len(inPlatformRelease.BoardsNames))
-	for i, board := range inPlatformRelease.BoardsNames {
-		boards[i] = board.Name
+func (inPlatformRelease indexPlatformRelease) extractBoardsManifest() []*cores.BoardManifest {
+	boards := make([]*cores.BoardManifest, len(inPlatformRelease.Boards))
+	for i, board := range inPlatformRelease.Boards {
+		boards[i] = &cores.BoardManifest{Name: board.Name}
 	}
 	return boards
 }
