@@ -9,14 +9,16 @@ import (
 type transfer struct {
 	n   int64 // must be 64bit aligned on 386
 	ctx context.Context
+	lim RateLimiter
 	w   io.Writer
 	r   io.Reader
 	b   []byte
 }
 
-func newTransfer(ctx context.Context, dst io.Writer, src io.Reader, buf []byte) *transfer {
+func newTransfer(ctx context.Context, lim RateLimiter, dst io.Writer, src io.Reader, buf []byte) *transfer {
 	return &transfer{
 		ctx: ctx,
+		lim: lim,
 		w:   dst,
 		r:   src,
 		b:   buf,
@@ -36,6 +38,12 @@ func (c *transfer) copy() (written int64, err error) {
 			return
 		default:
 			// keep working
+		}
+		if c.lim != nil {
+			err = c.lim.WaitN(c.ctx, len(c.b))
+			if err != nil {
+				return
+			}
 		}
 		nr, er := c.r.Read(c.b)
 		if nr > 0 {

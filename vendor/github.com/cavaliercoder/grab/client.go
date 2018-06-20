@@ -72,7 +72,6 @@ func (c *Client) Do(req *Request) *Response {
 		ctx:        ctx,
 		cancel:     cancel,
 		bufferSize: req.BufferSize,
-		writeFlags: os.O_CREATE | os.O_WRONLY,
 	}
 	if resp.bufferSize == 0 {
 		// default to Client.BufferSize
@@ -242,7 +241,6 @@ func (c *Client) validateLocal(resp *Response) stateFunc {
 	}
 
 	if resp.Request.NoResume {
-		resp.writeFlags = os.O_TRUNC | os.O_WRONLY
 		return c.getRequest
 	}
 
@@ -257,7 +255,6 @@ func (c *Client) validateLocal(resp *Response) stateFunc {
 			fmt.Sprintf("bytes=%d-", resp.fi.Size()))
 		resp.DidResume = true
 		resp.bytesResumed = resp.fi.Size()
-		resp.writeFlags = os.O_APPEND | os.O_WRONLY
 		return c.getRequest
 	}
 	return c.headRequest
@@ -281,7 +278,7 @@ func (c *Client) checksumFile(resp *Response) stateFunc {
 	defer f.Close()
 
 	// hash file
-	t := newTransfer(resp.Request.Context(), resp.Request.hash, f, nil)
+	t := newTransfer(resp.Request.Context(), nil, resp.Request.hash, f, nil)
 	if nc, err := t.copy(); err != nil {
 		resp.err = err
 		return c.closeResponse
@@ -390,7 +387,7 @@ func (c *Client) readResponse(resp *Response) stateFunc {
 // openWriter opens the destination file for writing and seeks to the location
 // from whence the file transfer will resume.
 //
-// Requires that Response.Filename and Response.writeFlags already be set.
+// Requires that Response.Filename and resp.DidResume are already be set.
 func (c *Client) openWriter(resp *Response) stateFunc {
 	if !resp.Request.NoCreateDirectories {
 		resp.err = mkdirp(resp.Filename)
@@ -399,7 +396,18 @@ func (c *Client) openWriter(resp *Response) stateFunc {
 		}
 	}
 
-	f, err := os.OpenFile(resp.Filename, resp.writeFlags, 0644)
+	// compute write flags
+	flag := os.O_CREATE | os.O_WRONLY
+	if resp.fi != nil {
+		if resp.DidResume {
+			flag = os.O_APPEND | os.O_WRONLY
+		} else {
+			flag = os.O_TRUNC | os.O_WRONLY
+		}
+	}
+
+	// open file
+	f, err := os.OpenFile(resp.Filename, flag, 0644)
 	if err != nil {
 		resp.err = err
 		return c.closeResponse
@@ -423,6 +431,7 @@ func (c *Client) openWriter(resp *Response) stateFunc {
 	b := make([]byte, resp.bufferSize)
 	resp.transfer = newTransfer(
 		resp.Request.Context(),
+		resp.Request.RateLimiter,
 		resp.writer,
 		resp.HTTPResponse.Body,
 		b)

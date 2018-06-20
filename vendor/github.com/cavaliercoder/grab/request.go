@@ -67,8 +67,14 @@ type Request struct {
 	// BufferSize specifies the size in bytes of the buffer that is used for
 	// transferring the requested file. Larger buffers may result in faster
 	// throughput but will use more memory and result in less frequent updates
-	// to the transfer progress statistics. Default: 32KB.
+	// to the transfer progress statistics. If a RateLimiter is configured,
+	// BufferSize should be much lower than the rate limit. Default: 32KB.
 	BufferSize int
+
+	// RateLimiter allows the transfer rate of a download to be limited. The given
+	// Request.BufferSize determines how frequently the RateLimiter will be
+	// polled.
+	RateLimiter RateLimiter
 
 	// BeforeCopy is a user provided function that is called immediately before
 	// a request starts downloading. If BeforeCopy returns an error, the request

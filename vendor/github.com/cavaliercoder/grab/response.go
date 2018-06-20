@@ -70,8 +70,7 @@ type Response struct {
 
 	// writer is the file handle used to write the downloaded file to local
 	// storage
-	writer     io.WriteCloser
-	writeFlags int
+	writer io.WriteCloser
 
 	// bytesCompleted specifies the number of bytes which were already
 	// transferred before this transfer began.

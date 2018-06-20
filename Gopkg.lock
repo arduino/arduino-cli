@@ -115,7 +115,7 @@
   branch = "master"
   name = "github.com/cavaliercoder/grab"
   packages = ["."]
-  revision = "94177710b7005a1bc795e6805f2f7481f4120189"
+  revision = "b7c6f788e7cbd3afa871543749c38b7a3abeb7e4"
 
 [[projects]]
   name = "github.com/cenkalti/backoff"

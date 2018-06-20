@@ -20,7 +20,7 @@ var (
 	ErrNoFilename = errors.New("no filename could be determined")
 
 	// ErrNoTimestamp indicates that a timestamp could not be automatically
-	// determined using the reponse headers from the remote server.
+	// determined using the response headers from the remote server.
 	ErrNoTimestamp = errors.New("no timestamp could be determined for the remote file")
 
 	// ErrFileExists indicates that the destination path already exists.
