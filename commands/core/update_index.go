@@ -30,15 +30,16 @@
 package core
 
 import (
+	"io/ioutil"
 	"net/url"
 	"os"
 	"path/filepath"
 
+	"github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/cavaliercoder/grab"
-
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/cavaliercoder/grab"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -72,7 +73,16 @@ func updateIndex(URL *url.URL) {
 		formatter.PrintError(err, "Error getting index path for "+URL.String())
 		os.Exit(commands.ErrGeneric)
 	}
-	req, err := grab.NewRequest(coreIndexPath, URL.String())
+
+	tmpFile, err := ioutil.TempFile("", "")
+	if err != nil {
+		formatter.PrintError(err, "Error creating temp file for download")
+		os.Exit(commands.ErrGeneric)
+	}
+	defer os.Remove(tmpFile.Name())
+	tmpFile.Close()
+
+	req, err := grab.NewRequest(tmpFile.Name(), URL.String())
 	if err != nil {
 		formatter.PrintError(err, "Error downloading index "+URL.String())
 		os.Exit(commands.ErrNetwork)
@@ -83,5 +93,10 @@ func updateIndex(URL *url.URL) {
 	if resp.Err() != nil {
 		formatter.PrintError(resp.Err(), "Error downloading index "+URL.String())
 		os.Exit(commands.ErrNetwork)
+	}
+
+	if err := paths.New(tmpFile.Name()).CopyTo(paths.New(coreIndexPath)); err != nil {
+		formatter.PrintError(err, "Error saving downloaded index "+URL.String())
+		os.Exit(commands.ErrGeneric)
 	}
 }
