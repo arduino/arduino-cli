@@ -82,7 +82,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 					continue
 				}
 				for _, board := range platformRelease.BoardsManifest {
-					if match(board.Name) || board.HasUsbID(search) {
+					if match(board.Name) {
 						res = append(res, platformRelease)
 						break
 					}
