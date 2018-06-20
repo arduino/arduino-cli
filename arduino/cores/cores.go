@@ -31,6 +31,7 @@ package cores
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/arduino/go-paths-helper"
 
@@ -67,7 +68,26 @@ type PlatformRelease struct {
 // BoardManifest contains information about a board. These metadata are usually
 // provided by the package_index.json
 type BoardManifest struct {
-	Name string `json:"-"`
+	Name string             `json:"-"`
+	ID   []*BoardManifestID `json:"-"`
+}
+
+// BoardManifestID contains information on how to identify a board. These metadata
+// are usually provided by the package_index.json
+type BoardManifestID struct {
+	USB string `json:"-"`
+}
+
+// HasUsbID returns true if the BoardManifes contains the specified USB id as
+// identification for this board. usbID should be in the format "0000:0000"
+func (bm *BoardManifest) HasUsbID(vid, pid string) bool {
+	usbID := strings.ToLower(vid + ":" + pid)
+	for _, id := range bm.ID {
+		if usbID == strings.ToLower(id.USB) {
+			return true
+		}
+	}
+	return false
 }
 
 // ToolDependencies is a set of tool dependency

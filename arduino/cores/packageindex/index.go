@@ -94,7 +94,12 @@ type indexToolReleaseFlavour struct {
 
 // indexBoard represents a single Board as written in package_index.json file.
 type indexBoard struct {
-	Name string `json:"name"`
+	Name string         `json:"name"`
+	ID   []indexBoardID `json:"id"`
+}
+
+type indexBoardID struct {
+	USB string `json:"usb"`
 }
 
 type indexHelp struct {
@@ -158,7 +163,13 @@ func (inPlatformRelease indexPlatformRelease) extractDeps() cores.ToolDependenci
 func (inPlatformRelease indexPlatformRelease) extractBoardsManifest() []*cores.BoardManifest {
 	boards := make([]*cores.BoardManifest, len(inPlatformRelease.Boards))
 	for i, board := range inPlatformRelease.Boards {
-		boards[i] = &cores.BoardManifest{Name: board.Name}
+		manifest := &cores.BoardManifest{Name: board.Name}
+		for _, id := range board.ID {
+			if id.USB != "" {
+				manifest.ID = append(manifest.ID, &cores.BoardManifestID{USB: id.USB})
+			}
+		}
+		boards[i] = manifest
 	}
 	return boards
 }
