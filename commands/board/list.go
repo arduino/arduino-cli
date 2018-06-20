@@ -99,7 +99,11 @@ func NewBoardList(pm *packagemanager.PackageManager, monitor *discovery.Monitor)
 	for _, item := range serialDevices {
 		boards := pm.FindBoardsWithVidPid(item.VendorID, item.ProductID)
 		if len(boards) == 0 {
-			// skip it if not recognized
+			ret.SerialBoards = append(ret.SerialBoards, output.SerialBoardListItem{
+				Name:  "unknown",
+				Port:  item.Port,
+				UsbID: fmt.Sprintf("%s:%s - %s", item.VendorID[2:], item.ProductID[2:], item.SerialNumber),
+			})
 			continue
 		}
 
