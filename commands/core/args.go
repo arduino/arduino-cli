@@ -41,13 +41,11 @@ import (
 )
 
 // parsePlatformReferenceArgs parses a sequence of "packager:arch@version" tokens and returns a platformReference slice.
-//
-// If version is not present it is assumed as "latest" version.
 func parsePlatformReferenceArgs(args []string) []packagemanager.PlatformReference {
 	ret := []packagemanager.PlatformReference{}
 
 	for _, arg := range args {
-		version := "latest"
+		version := ""
 		if strings.Contains(arg, "@") {
 			split := strings.SplitN(arg, "@", 2)
 			arg = split[0]

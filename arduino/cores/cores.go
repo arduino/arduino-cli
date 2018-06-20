@@ -104,10 +104,12 @@ func (platform *Platform) GetOrCreateRelease(version string) *PlatformRelease {
 // GetRelease returns the specified release corresponding the provided version,
 // or nil if not found.
 func (platform *Platform) GetRelease(version string) *PlatformRelease {
-	if version == "latest" {
-		return platform.GetRelease(platform.latestReleaseVersion())
-	}
 	return platform.Releases[version]
+}
+
+// GetLatestRelease returns the latest release of this platform
+func (platform *Platform) GetLatestRelease() *PlatformRelease {
+	return platform.GetRelease(platform.latestReleaseVersion())
 }
 
 // GetAllReleasesVersions returns all the version numbers in this Platform Package.

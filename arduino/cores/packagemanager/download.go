@@ -91,9 +91,17 @@ func (pm *PackageManager) FindItemsToDownload(items []PlatformReference) (
 		}
 		added[platform.String()] = true
 
-		release := platform.GetRelease(item.PlatformVersion)
-		if release == nil {
-			return nil, nil, fmt.Errorf("required version %s not found for platform %s", item.PlatformVersion, platform.String())
+		var release *cores.PlatformRelease
+		if item.PlatformVersion != "" {
+			release = platform.GetRelease(item.PlatformVersion)
+			if release == nil {
+				return nil, nil, fmt.Errorf("required version %s not found for platform %s", item.PlatformVersion, platform.String())
+			}
+		} else {
+			release = platform.GetLatestRelease()
+			if release == nil {
+				return nil, nil, fmt.Errorf("platform %s has no available releases", platform.String())
+			}
 		}
 		retPlatforms = append(retPlatforms, release)
 
