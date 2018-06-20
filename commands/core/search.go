@@ -31,6 +31,7 @@ package core
 
 import (
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
@@ -62,24 +63,29 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	formatter.Print("Searching for platforms matching '" + search + "'")
 	formatter.Print("")
 
-	match := func(line string) bool {
-		return strings.Contains(strings.ToLower(line), search)
-	}
 	res := output.PlatformReleases{}
-	for _, targetPackage := range pm.GetPackages().Packages {
-		for _, platform := range targetPackage.Platforms {
-			platformRelease := platform.GetLatestRelease()
-			if platformRelease == nil {
-				continue
-			}
-			if match(platform.Name) || match(platform.Architecture) {
-				res = append(res, platformRelease)
-				continue
-			}
-			for _, boards := range platformRelease.BoardsManifest {
-				if match(boards.Name) {
+	if isUsb, _ := regexp.MatchString("[0-9a-f]{4}:[0-9a-f]{4}", search); isUsb {
+		vid, pid := search[:4], search[5:]
+		res = pm.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid)
+	} else {
+		match := func(line string) bool {
+			return strings.Contains(strings.ToLower(line), search)
+		}
+		for _, targetPackage := range pm.GetPackages().Packages {
+			for _, platform := range targetPackage.Platforms {
+				platformRelease := platform.GetLatestRelease()
+				if platformRelease == nil {
+					continue
+				}
+				if match(platform.Name) || match(platform.Architecture) {
 					res = append(res, platformRelease)
-					break
+					continue
+				}
+				for _, board := range platformRelease.BoardsManifest {
+					if match(board.Name) || board.HasUsbID(search) {
+						res = append(res, platformRelease)
+						break
+					}
 				}
 			}
 		}

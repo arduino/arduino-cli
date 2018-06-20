@@ -79,6 +79,25 @@ func (pm *PackageManager) GetPackages() *cores.Packages {
 	return pm.packages
 }
 
+func (pm *PackageManager) FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid string) []*cores.PlatformRelease {
+	res := []*cores.PlatformRelease{}
+	for _, targetPackage := range pm.packages.Packages {
+		for _, targetPlatform := range targetPackage.Platforms {
+			platformRelease := targetPlatform.GetLatestRelease()
+			if platformRelease == nil {
+				continue
+			}
+			for _, boardManifest := range platformRelease.BoardsManifest {
+				if boardManifest.HasUsbID(vid, pid) {
+					res = append(res, platformRelease)
+					break
+				}
+			}
+		}
+	}
+	return res
+}
+
 func (pm *PackageManager) FindBoardsWithVidPid(vid, pid string) []*cores.Board {
 	res := []*cores.Board{}
 	for _, targetPackage := range pm.packages.Packages {
