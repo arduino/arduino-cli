@@ -37,7 +37,7 @@ import (
 	"github.com/gosuri/uitable"
 )
 
-// InstalledPlatformReleases represents an output set of tools or cores to format output from `core list` command.
+// InstalledPlatformReleases represents an output set of installed platforms.
 type InstalledPlatformReleases []*cores.PlatformRelease
 
 func (is InstalledPlatformReleases) Len() int      { return len(is) }
@@ -46,15 +46,41 @@ func (is InstalledPlatformReleases) Less(i, j int) bool {
 	return is[i].Platform.String() < is[j].Platform.String()
 }
 
+// PlatformReleases represents an output set of tools of platforms.
+type PlatformReleases []*cores.PlatformRelease
+
+func (is PlatformReleases) Len() int      { return len(is) }
+func (is PlatformReleases) Swap(i, j int) { is[i], is[j] = is[j], is[i] }
+func (is PlatformReleases) Less(i, j int) bool {
+	return is[i].Platform.String() < is[j].Platform.String()
+}
+
 func (is InstalledPlatformReleases) String() string {
 	table := uitable.New()
 	table.MaxColWidth = 100
 	table.Wrap = true
 
-	table.AddRow("FQBN", "Version", "Latest", "Name")
+	table.AddRow("ID", "Installed", "Latest", "Name")
 	sort.Sort(is)
 	for _, item := range is {
-		table.AddRow(item.Platform.String(), item.Version, item.Platform.GetRelease("latest").Version, item.Platform.Name)
+		table.AddRow(item.Platform.String(), item.Version, item.Platform.GetLatestRelease().Version, item.Platform.Name)
+	}
+	return fmt.Sprintln(table)
+}
+
+func (is PlatformReleases) String() string {
+	table := uitable.New()
+	table.MaxColWidth = 100
+	table.Wrap = true
+
+	table.AddRow("ID", "Version", "Installed", "Name")
+	sort.Sort(is)
+	for _, item := range is {
+		installed := "No"
+		if item.Folder != "" {
+			installed = "Yes"
+		}
+		table.AddRow(item.Platform.String(), item.Version, installed, item.Platform.Name)
 	}
 	return fmt.Sprintln(table)
 }

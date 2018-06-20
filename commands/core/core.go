@@ -45,5 +45,6 @@ func InitCommand() *cobra.Command {
 	coreCommand.AddCommand(initInstallCommand())
 	coreCommand.AddCommand(initListCommand())
 	coreCommand.AddCommand(initUpdateIndexCommand())
+	coreCommand.AddCommand(initSearchCommand())
 	return coreCommand
 }
