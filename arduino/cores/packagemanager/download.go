@@ -140,25 +140,25 @@ func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformReleas
 // FIXME: Make more generic and decouple the error print logic (that list should not exists;
 // rather a failure @ the first package)
 
-func (pm *PackageManager) InstallToolReleases(toolReleasesToDownload []*cores.ToolRelease,
+func (pm *PackageManager) InstallToolReleases(toolReleases []*cores.ToolRelease,
 	result *output.CoreProcessResults) error {
 
-	for _, item := range toolReleasesToDownload {
-		pm.Log.WithField("Package", item.Tool.Package.Name).
-			WithField("Name", item.Tool.Name).
-			WithField("Version", item.Version).
+	for _, toolRelease := range toolReleases {
+		pm.Log.WithField("Package", toolRelease.Tool.Package.Name).
+			WithField("Name", toolRelease.Tool.Name).
+			WithField("Version", toolRelease.Version).
 			Info("Installing tool")
 
-		err := cores.InstallTool(item)
+		err := cores.InstallTool(toolRelease)
 		var processResult output.ProcessResult
 		if err != nil {
 			if os.IsExist(err) {
-				pm.Log.WithError(err).Warnf("Cannot install tool `%s`, it is already installed", item.Tool.Name)
+				pm.Log.WithError(err).Warnf("Cannot install tool `%s`, it is already installed", toolRelease.Tool.Name)
 				processResult = output.ProcessResult{
 					Status: "Already Installed",
 				}
 			} else {
-				pm.Log.WithError(err).Warnf("Cannot install tool `%s`", item.Tool.Name)
+				pm.Log.WithError(err).Warnf("Cannot install tool `%s`", toolRelease.Tool.Name)
 				processResult = output.ProcessResult{
 					Error: err.Error(),
 				}
@@ -169,44 +169,44 @@ func (pm *PackageManager) InstallToolReleases(toolReleasesToDownload []*cores.To
 				Status: "Installed",
 			}
 		}
-		name := item.String()
+		name := toolRelease.String()
 		processResult.ItemName = name
 		result.Tools[name] = processResult
 	}
 	return nil
 }
 
-func (pm *PackageManager) InstallPlatformReleases(platformReleasesToDownload []*cores.PlatformRelease,
+func (pm *PackageManager) InstallPlatformReleases(platformReleases []*cores.PlatformRelease,
 	outputResults *output.CoreProcessResults) error {
 
-	for _, item := range platformReleasesToDownload {
-		pm.Log.WithField("Package", item.Platform.Package.Name).
-			WithField("Name", item.Platform.Name).
-			WithField("Version", item.Version).
-			Info("Installing core")
+	for _, platformRelease := range platformReleases {
+		pm.Log.WithField("Package", platformRelease.Platform.Package.Name).
+			WithField("Name", platformRelease.Platform.Name).
+			WithField("Version", platformRelease.Version).
+			Info("Installing platform")
 
-		err := cores.InstallPlatform(item)
+		err := cores.InstallPlatform(platformRelease)
 		var result output.ProcessResult
 		if err != nil {
 			if os.IsExist(err) {
-				pm.Log.WithError(err).Warnf("Cannot install core `%s`, it is already installed", item.Platform.Name)
+				pm.Log.WithError(err).Warnf("Cannot install platform `%s`, it is already installed", platformRelease.Platform.Name)
 				result = output.ProcessResult{
 					Status: "Already Installed",
 				}
 			} else {
-				pm.Log.WithError(err).Warnf("Cannot install core `%s`", item.Platform.Name)
+				pm.Log.WithError(err).Warnf("Cannot install platform `%s`", platformRelease.Platform.Name)
 				result = output.ProcessResult{
 					Error: err.Error(),
 				}
 			}
 		} else {
-			pm.Log.Info("Adding installed core to final result")
+			pm.Log.Info("Adding installed platform to final result")
 
 			result = output.ProcessResult{
 				Status: "Installed",
 			}
 		}
-		name := item.String()
+		name := platformRelease.String()
 		result.ItemName = name
 		outputResults.Cores[name] = result
 	}
