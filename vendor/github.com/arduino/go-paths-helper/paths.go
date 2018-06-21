@@ -3,7 +3,7 @@
  *
  * Copyright 2018 Arduino AG (http://www.arduino.cc/)
  *
- * PropertiesMap library is free software; you can redistribute it and/or modify
+ * PathsHelper library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
@@ -56,6 +56,12 @@ func New(path ...string) *Path {
 		return res.Join(path[1:]...)
 	}
 	return res
+}
+
+// NewFromFile creates a new Path object using the path name
+// obtained from the File object (see os.File.Name function).
+func NewFromFile(file *os.File) *Path {
+	return New(file.Name())
 }
 
 func (p *Path) setCachedFileInfo(info os.FileInfo) {

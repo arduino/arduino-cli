@@ -28,7 +28,7 @@
   branch = "master"
   name = "github.com/arduino/go-paths-helper"
   packages = ["."]
-  revision = "5378ef230fe6fb8aaef457a894135d3b0dd85668"
+  revision = "e5136ab1afbc5dcc93eebf9d4579d31491fe2be2"
 
 [[projects]]
   branch = "master"

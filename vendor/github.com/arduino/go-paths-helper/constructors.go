@@ -3,7 +3,7 @@
  *
  * Copyright 2018 Arduino AG (http://www.arduino.cc/)
  *
- * PropertiesMap library is free software; you can redistribute it and/or modify
+ * PathsHelper library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
@@ -58,6 +58,19 @@ func MkTempDir(dir, prefix string) (*Path, error) {
 		return nil, err
 	}
 	return New(path), nil
+}
+
+// MkTempFile creates a new temporary file in the directory dir with a name beginning with prefix,
+// opens the file for reading and writing, and returns the resulting *os.File. If dir is nil,
+// MkTempFile uses the default directory for temporary files (see paths.TempDir). Multiple programs
+// calling TempFile simultaneously will not choose the same file. The caller can use f.Name() to
+// find the pathname of the file. It is the caller's responsibility to remove the file when no longer needed.
+func MkTempFile(dir *Path, prefix string) (*os.File, error) {
+	tmpDir := ""
+	if dir != nil {
+		tmpDir = dir.String()
+	}
+	return ioutil.TempFile(tmpDir, prefix)
 }
 
 // Getwd returns a rooted path name corresponding to the current

@@ -46,6 +46,7 @@ func DownloadLibrariesFile() (*grab.Response, error) {
 		return nil, fmt.Errorf("getting library_index.json path: %s", err)
 	}
 	req, err := grab.NewRequest(path, libraryIndexURL.String())
+	req.NoResume = true
 	if err != nil {
 		return nil, fmt.Errorf("creating HTTP request: %s", err)
 	}
