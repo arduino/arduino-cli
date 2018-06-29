@@ -48,15 +48,6 @@ var ValidCategories = map[string]bool{
 	"Uncategorized":       true,
 }
 
-type LibraryLayout uint16
-
-const (
-	// FlatLayout is a library without a `src` folder
-	FlatLayout LibraryLayout = 1 << iota
-	// RecursiveLayout is a library with `src` folder (that allows recursive build)
-	RecursiveLayout
-)
-
 // Library represents a library in the system
 type Library struct {
 	Name          string
