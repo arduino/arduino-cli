@@ -28,7 +28,7 @@
   branch = "master"
   name = "github.com/arduino/go-paths-helper"
   packages = ["."]
-  revision = "e5136ab1afbc5dcc93eebf9d4579d31491fe2be2"
+  revision = "639661fe73f9919e530be25f21af775f094a83a1"
 
 [[projects]]
   branch = "master"
@@ -449,6 +449,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e2ce452f1a21172c447b244881c9fadf1c2730bfc1b8858b7c2b950f9ec1384d"
+  inputs-digest = "9b17348716f71b93181b4b79e32473eab275dd2cdf54f338c2e062831b6589f2"
   solver-name = "gps-cdcl"
   solver-version = 1
