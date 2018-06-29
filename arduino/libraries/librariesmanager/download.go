@@ -1,6 +1,8 @@
 /*
  * This file is part of arduino-cli.
  *
+ * Copyright 2018 ARDUINO AG (http://www.arduino.cc/)
+ *
  * arduino-cli is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -23,37 +25,41 @@
  * the GNU General Public License.  This exception does not however
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
- *
- * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package libraries
+package librariesmanager
 
-import "strings"
+import (
+	"fmt"
+	"net/url"
 
-// Reference uniquely identify a Library in the library index
-type Reference struct {
-	Name    string // The name of the parsed item.
-	Version string // The Version of the parsed item.
+	"github.com/bcmi-labs/arduino-cli/pathutils"
+
+	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/cavaliercoder/grab"
+)
+
+// LibraryIndexURL is the URL where to get library index.
+var LibraryIndexURL, _ = url.Parse("http://downloads.arduino.cc/libraries/library_index.json")
+
+// IndexPath returns the path of the library_index.json file.
+func IndexPath() pathutils.Path {
+	return configs.IndexPath("library_index.json")
 }
 
-// ParseArgs parses a sequence of "item@version" tokens and returns a Name-Version slice.
-//
-// If version is not present it is assumed as "latest" version.
-func ParseArgs(args []string) []Reference {
-	ret := make([]Reference, 0, len(args))
-	for _, item := range args {
-		tokens := strings.SplitN(item, "@", 2)
-		var version string
-		if len(tokens) == 2 {
-			version = tokens[1]
-		} else {
-			version = "latest"
-		}
-		ret = append(ret, Reference{
-			Name:    tokens[0],
-			Version: version,
-		})
+// DownloadLibrariesFile downloads the libraries index file from Arduino repository.
+func DownloadLibrariesFile() (*grab.Response, error) {
+	path, err := IndexPath().Get()
+	if err != nil {
+		return nil, fmt.Errorf("getting library_index.json path: %s", err)
 	}
-	return ret
+	req, err := grab.NewRequest(path, LibraryIndexURL.String())
+	req.NoResume = true
+	if err != nil {
+		return nil, fmt.Errorf("creating HTTP request: %s", err)
+	}
+	client := grab.NewClient()
+	return client.Do(req), nil
+
+	// TODO: Download from gzipped URL index
 }

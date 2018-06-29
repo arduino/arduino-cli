@@ -1,6 +1,8 @@
 /*
  * This file is part of arduino-cli.
  *
+ * Copyright 2018 ARDUINO AG (http://www.arduino.cc/)
+ *
  * arduino-cli is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -23,11 +25,9 @@
  * the GNU General Public License.  This exception does not however
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
- *
- * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package libraries
+package librariesmanager
 
 import (
 	"errors"
@@ -35,16 +35,14 @@ import (
 	"os"
 	"path/filepath"
 
-	"strings"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
 
 	"github.com/bcmi-labs/arduino-cli/configs"
 )
 
-// Uninstall a library means remove its directory.
-var Uninstall = os.RemoveAll
-
 // Install installs a library and returns the installed path.
-func Install(library *Release) (string, error) {
+func Install(library *librariesindex.Release) (string, error) {
 	if library == nil {
 		return "", errors.New("Not existing version of the library")
 	}
@@ -71,18 +69,17 @@ func Install(library *Release) (string, error) {
 		return "", fmt.Errorf("getting libraries directory: %s", err)
 	}
 
-	libPath := filepath.Join(libsFolder, library.Library.Name)
+	libPath := filepath.Join(libsFolder, sanitizeName(library.Library.Name))
 	return libPath, library.Resource.Install(libsFolder, libPath)
 }
 
-func removeRelease(libName string, r *Release) error {
+func removeRelease(libName string, r *libraries.Library) error {
 	libFolder, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		return err
 	}
 
-	libName = strings.Replace(libName, " ", "_", -1)
-
+	libName = sanitizeName(libName)
 	path := filepath.Join(libFolder, libName)
-	return Uninstall(path)
+	return os.RemoveAll(path)
 }

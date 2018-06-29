@@ -1,6 +1,8 @@
 /*
  * This file is part of arduino-cli.
  *
+ * Copyright 2018 ARDUINO AG (http://www.arduino.cc/)
+ *
  * arduino-cli is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -23,36 +25,36 @@
  * the GNU General Public License.  This exception does not however
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
- *
- * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package libraries
+package librariesmanager
 
 import (
-	"fmt"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
 
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/pmylund/sortutil"
 )
 
 // StatusContext keeps the current status of the libraries in the system
 // (the list of libraries, revisions, installed paths, etc.)
 type StatusContext struct {
-	Libraries map[string]*Library `json:"libraries"`
+	Libraries map[string]*libraries.Library `json:"libraries"`
+	Index     *librariesindex.Index
 }
 
-// AddLibrary adds an indexRelease to the status context
-func (sc *StatusContext) AddLibrary(indexLib *indexRelease) {
-	name := indexLib.Name
-	if sc.Libraries[name] == nil {
-		sc.Libraries[name] = indexLib.extractLibrary()
-	} else {
-		release := indexLib.extractRelease()
-		lib := sc.Libraries[name]
-		lib.Releases[fmt.Sprint(release.Version)] = release
-		release.Library = lib
-	}
-}
+// // AddLibrary adds an indexRelease to the status context
+// func (sc *StatusContext) AddLibrary(indexLib *indexRelease) {
+// 	name := indexLib.Name
+// 	if sc.Libraries[name] == nil {
+// 		sc.Libraries[name] = indexLib.extractLibrary()
+// 	} else {
+// 		release := indexLib.extractRelease()
+// 		lib := sc.Libraries[name]
+// 		lib.Releases[fmt.Sprint(release.Version)] = release
+// 		release.Library = lib
+// 	}
+// }
 
 // Names returns an array with all the names of the registered libraries.
 func (sc StatusContext) Names() []string {
@@ -66,42 +68,17 @@ func (sc StatusContext) Names() []string {
 	return res
 }
 
-// FIXME Move to PackageManager
-func GetLibraryCode(library *Library) string {
-	return library.Name
+// NewLibraryManager creates a new library manager
+func NewLibraryManager() *StatusContext {
+	return &StatusContext{
+		Libraries: map[string]*libraries.Library{},
+	}
 }
 
-// Process takes a set of name-version pairs and return
-// a set of items to download and a set of outputs for non
-// existing libraries.
-func (sc StatusContext) Process(items []Reference) (map[string]*Release, error) {
-	ret := map[string]*Release{}
-
-	for _, item := range items {
-		library, exists := sc.Libraries[item.Name]
-		if !exists {
-			return nil, fmt.Errorf("library not found: %s", item.Name)
-		}
-		release := library.GetVersion(item.Version)
-		if release == nil {
-			return nil, fmt.Errorf("version not found for library %s: %s", item.Name, item.Version)
-		}
-
-		ret[GetLibraryCode(library)] = release
-	}
-
-	return ret, nil
-}
-
-// CreateStatusContext creates a status context from index data.
-func (index Index) CreateStatusContext() StatusContext {
-	// Start with an empty status context
-	libraries := StatusContext{
-		Libraries: map[string]*Library{},
-	}
-	for _, lib := range index.Libraries {
-		// Add all indexed libraries in the status context
-		libraries.AddLibrary(&lib)
-	}
-	return libraries
+// LoadIndex reads a library_index.json from a file and returns
+// the corresponding Index structure.
+func (sc *StatusContext) LoadIndex() error {
+	index, err := librariesindex.LoadIndex(IndexPath())
+	sc.Index = index
+	return err
 }

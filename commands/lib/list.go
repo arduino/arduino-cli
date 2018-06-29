@@ -30,18 +30,16 @@
 package lib
 
 import (
-	"fmt"
-	"io/ioutil"
 	"os"
-	"path/filepath"
 
+	paths "github.com/arduino/go-paths-helper"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/zieckey/goini"
 )
 
 func initListCommand() *cobra.Command {
@@ -60,89 +58,26 @@ func initListCommand() *cobra.Command {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino lib list`")
-
 	libHome, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get libraries folder.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	dir, err := os.Open(libHome)
+	libs, err := libraries.LoadLibrariesFromDir(paths.New(libHome))
 	if err != nil {
-		formatter.PrintError(err, "Cannot open libraries folder.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-	defer dir.Close()
-
-	dirFiles, err := dir.Readdir(0)
-	if err != nil {
-		formatter.PrintError(err, "Cannot read into libraries folder.")
+		formatter.PrintError(err, "Error loading libraries.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	libs := output.LibProcessResults{
-		Libraries: map[string]output.ProcessResult{},
-	}
-
+	res := output.InstalledLibraries{}
+	res.Libraries = append(res.Libraries, libs...)
 	logrus.Info("Listing")
 
-	//TODO: optimize this algorithm
-	// time complexity O(libraries_to_install(from RAM) *
-	//                   library_folder_number(from DISK) *
-	//                   library_folder_file_number (from DISK))
-	//TODO : remove only one version
-	for _, file := range dirFiles {
-		if file.IsDir() {
-			indexFile := filepath.Join(libHome, file.Name(), "library.properties")
-			_, err = os.Stat(indexFile)
-			if os.IsNotExist(err) {
-				logrus.WithError(err).Warn("No library.properties for this library")
-				resultFromFileName(file, &libs)
-			} else {
-				logrus.Infof("Using library.properties for %s", file.Name())
-				content, err := ioutil.ReadFile(indexFile)
-				if err != nil {
-					logrus.WithError(err).Warn("Cannot read into library.properties for this library")
-					resultFromFileName(file, &libs)
-					continue
-				}
-
-				logrus.Info("Parsing library.properties")
-
-				ini := goini.New()
-				err = ini.Parse(content, "\n", "=")
-				if err != nil {
-					logrus.WithError(err).Warn("Cannot parse library.properties")
-					resultFromFileName(file, &libs)
-					continue
-				}
-				Name, ok := ini.Get("name")
-				if !ok {
-					logrus.Warn("Name not found in library.properties")
-					resultFromFileName(file, &libs)
-					continue
-				}
-				Version, ok := ini.Get("version")
-				if !ok {
-					logrus.Warn("Version not found in library.properties")
-					resultFromFileName(file, &libs)
-					continue
-				}
-				// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
-				libs.Libraries[Name] = output.ProcessResult{
-					ItemName: Name,
-					Status:   fmt.Sprint("v.", Version),
-					Error:    "",
-				}
-			}
-		}
-	}
-
-	if len(libs.Libraries) < 1 {
+	if len(libs) < 1 {
 		formatter.PrintErrorMessage("No library installed.")
 	} else {
-		formatter.Print(libs)
+		formatter.Print(res)
 	}
 	logrus.Info("Done")
 }

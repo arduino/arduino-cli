@@ -31,11 +31,9 @@ package lib
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
-	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
@@ -63,17 +61,12 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib search`")
 	query := strings.ToLower(strings.Join(args, " "))
 
-	logrus.Info("Getting libraries status context")
-	status, err := getLibStatusContext()
-	if err != nil {
-		formatter.PrintError(err, "Error while parsing installed libraries.")
-		os.Exit(commands.ErrCoreConfig)
-	}
+	lm := getLibraryManager()
 
 	res := output.LibSearchResults{
-		Libraries: []*libraries.Library{},
+		Libraries: []*librariesindex.Library{},
 	}
-	for _, lib := range status.Libraries {
+	for _, lib := range lm.Index.Libraries {
 		if strings.Contains(strings.ToLower(lib.Name), query) {
 			res.Libraries = append(res.Libraries, lib)
 		}

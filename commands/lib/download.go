@@ -32,7 +32,8 @@ package lib
 import (
 	"os"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
@@ -56,37 +57,35 @@ func initDownloadCommand() *cobra.Command {
 func runDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib download`")
 
-	logrus.Info("Getting Libraries status context")
-	status, err := getLibStatusContext()
-	if err != nil {
-		formatter.PrintError(err, "Error while parsing installed libraries.")
-		logrus.WithError(err).Warn("Error while parsing installed libraries.")
-		os.Exit(commands.ErrGeneric)
-	}
+	lm := getLibraryManager()
 
 	logrus.Info("Preparing download")
-	pairs := libraries.ParseArgs(args)
-	downloadLibraries(status, pairs)
+	pairs := librariesindex.ParseArgs(args)
+	downloadLibraries(lm, pairs)
 }
 
-func downloadLibraries(status *libraries.StatusContext, pairs []libraries.Reference) {
-	libsToDownload, err := status.Process(pairs)
-	if err != nil {
-		formatter.PrintError(err, "Error parsing libraries arguments")
-		os.Exit(commands.ErrBadCall)
+func downloadLibraries(lm *librariesmanager.StatusContext, refs []*librariesindex.Reference) {
+	libsReleaseToDownload := []*librariesindex.Release{}
+	for _, ref := range refs {
+		if lib := lm.Index.FindRelease(ref); lib == nil {
+			formatter.PrintErrorMessage("Error: library " + ref.String() + " not found")
+			os.Exit(commands.ErrBadCall)
+		} else {
+			libsReleaseToDownload = append(libsReleaseToDownload, lib)
+		}
 	}
 
 	logrus.Info("Downloading")
 	formatter.Print("Downloading libraries...")
-	for _, lib := range libsToDownload {
-		resp, err := lib.Resource.Download()
+	for _, libRelease := range libsReleaseToDownload {
+		resp, err := libRelease.Resource.Download()
 		if err != nil {
-			formatter.PrintError(err, "Error downloading "+lib.String())
+			formatter.PrintError(err, "Error downloading "+libRelease.String())
 			os.Exit(commands.ErrNetwork)
 		}
-		formatter.DownloadProgressBar(resp, lib.String())
+		formatter.DownloadProgressBar(resp, libRelease.String())
 		if resp.Err() != nil {
-			formatter.PrintError(err, "Error downloading "+lib.String())
+			formatter.PrintError(err, "Error downloading "+libRelease.String())
 			os.Exit(commands.ErrNetwork)
 		}
 	}

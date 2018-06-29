@@ -1,6 +1,8 @@
 /*
  * This file is part of arduino-cli.
  *
+ * Copyright 2018 ARDUINO AG (http://www.arduino.cc/)
+ *
  * arduino-cli is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -23,26 +25,24 @@
  * the GNU General Public License.  This exception does not however
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
- *
- * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package libraries
+package librariesindex
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 
+	"github.com/bcmi-labs/arduino-cli/pathutils"
+
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
-	"github.com/bcmi-labs/arduino-cli/configs"
 )
 
-// Index represents the content of a library_index.json file
-type Index struct {
+type indexJSON struct {
 	Libraries []indexRelease `json:"libraries"`
 }
 
-// indexRelease is an entry of a library_index.json
 type indexRelease struct {
 	Name            string   `json:"name,required"`
 	Version         string   `json:"version,required"`
@@ -60,52 +60,52 @@ type indexRelease struct {
 	Checksum        string   `json:"checksum"`
 }
 
-// IndexPath is the path of the index file for libraries.
-var IndexPath = configs.IndexPath("library_index.json")
-
-// LoadIndex reads a library_index.json from a file and returns
-// the corresponding LibrariesIndex structure.
-func LoadIndex(index *Index) error {
-	libFile, err := IndexPath.Get()
+// LoadIndex reads a library_index.json and create the corresponding Index
+func LoadIndex(indexPath pathutils.Path) (*Index, error) {
+	libFile, err := indexPath.Get()
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("getting library_index.json path: %s", err)
 	}
 
 	buff, err := ioutil.ReadFile(libFile)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("reading library_index.json: %s", err)
 	}
 
-	err = json.Unmarshal(buff, index)
+	var i indexJSON
+	err = json.Unmarshal(buff, &i)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("parsing library_index.json: %s", err)
 	}
 
-	return nil
+	return i.extractIndex()
 }
 
-// extractRelease create a new Release with the information contained
-// in this index element
-func (indexLib *indexRelease) extractRelease() *Release {
-	return &Release{
-		Version: indexLib.Version,
-		Resource: &resources.DownloadResource{
-			URL:             indexLib.URL,
-			ArchiveFileName: indexLib.ArchiveFileName,
-			Size:            indexLib.Size,
-			Checksum:        indexLib.Checksum,
-			CachePath:       "libraries",
-		},
+func (i indexJSON) extractIndex() (*Index, error) {
+	index := &Index{
+		Libraries: map[string]*Library{},
 	}
-
+	for _, indexLib := range i.Libraries {
+		indexLib.extractLibraryIn(index)
+	}
+	return index, nil
 }
 
-// extractLibrary create a new Library with the information contained
-// in this index element.
-func (indexLib *indexRelease) extractLibrary() *Library {
-	release := indexLib.extractRelease()
-	lib := &Library{
-		Name:          indexLib.Name,
+func (indexLib *indexRelease) extractLibraryIn(index *Index) {
+	library, exist := index.Libraries[indexLib.Name]
+	if !exist {
+		library = &Library{
+			Name:     indexLib.Name,
+			Releases: map[string]*Release{},
+		}
+		index.Libraries[indexLib.Name] = library
+	}
+	indexLib.extractReleaseIn(library)
+}
+
+func (indexLib *indexRelease) extractReleaseIn(library *Library) {
+	release := &Release{
+		Version:       indexLib.Version,
 		Author:        indexLib.Author,
 		Maintainer:    indexLib.Maintainer,
 		Sentence:      indexLib.Sentence,
@@ -114,8 +114,17 @@ func (indexLib *indexRelease) extractLibrary() *Library {
 		Category:      indexLib.Category,
 		Architectures: indexLib.Architectures,
 		Types:         indexLib.Types,
-		Releases:      map[string]*Release{release.Version: release},
+		Resource: &resources.DownloadResource{
+			URL:             indexLib.URL,
+			ArchiveFileName: indexLib.ArchiveFileName,
+			Size:            indexLib.Size,
+			Checksum:        indexLib.Checksum,
+			CachePath:       "libraries",
+		},
+		Library: library,
 	}
-	release.Library = lib
-	return lib
+	library.Releases[indexLib.Version] = release
+	if library.Latest == nil || library.Latest.Version < release.Version {
+		library.Latest = release
+	}
 }

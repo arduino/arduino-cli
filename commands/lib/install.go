@@ -32,7 +32,8 @@ package lib
 import (
 	"os"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
@@ -56,37 +57,37 @@ func initInstallCommand() *cobra.Command {
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib install`")
 	logrus.Info("Getting Libraries status context")
-	status, err := getLibStatusContext()
-	if err != nil {
-		formatter.PrintError(err, "Cannot get status context.")
-		os.Exit(commands.ErrGeneric)
-	}
+	lm := getLibraryManager()
 
-	pairs := libraries.ParseArgs(args)
+	refs := librariesindex.ParseArgs(args)
 
-	downloadLibraries(status, pairs)
+	downloadLibraries(lm, refs)
 
-	installLibraries(status, pairs)
+	installLibraries(lm, refs)
 }
 
-func installLibraries(status *libraries.StatusContext, pairs []libraries.Reference) {
-	libsToInstall, err := status.Process(pairs)
-	if err != nil {
-		formatter.PrintError(err, "Error parsing libraries")
-		os.Exit(commands.ErrBadCall)
+func installLibraries(lm *librariesmanager.StatusContext, refs []*librariesindex.Reference) {
+	libReleasesToInstall := []*librariesindex.Release{}
+	for _, ref := range refs {
+		rel := lm.Index.FindRelease(ref)
+		if rel == nil {
+			formatter.PrintErrorMessage("Error: library " + ref.String() + " not found")
+			os.Exit(commands.ErrBadCall)
+		}
+		libReleasesToInstall = append(libReleasesToInstall, rel)
 	}
 
-	for libName, lib := range libsToInstall {
+	for _, libRelease := range libReleasesToInstall {
 		// FIXME: the library is installed again even if it's already installed
 
-		logrus.WithField("library", lib).Info("Installing library")
+		logrus.WithField("library", libRelease).Info("Installing library")
 
-		if _, err := libraries.Install(lib); err != nil {
-			logrus.WithError(err).Warn("Library", libName, "errored")
-			formatter.PrintError(err, "Error installing library: "+lib.String())
+		if _, err := librariesmanager.Install(libRelease); err != nil {
+			logrus.WithError(err).Warn("Error installing library ", libRelease)
+			formatter.PrintError(err, "Error installing library: "+libRelease.String())
 			os.Exit(commands.ErrGeneric)
 		}
 
-		formatter.Print("Installed " + lib.String())
+		formatter.Print("Installed " + libRelease.String())
 	}
 }

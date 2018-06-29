@@ -30,13 +30,11 @@
 package librariesindex
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
+	"sort"
+
+	"github.com/blang/semver"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
-
-	"github.com/bcmi-labs/arduino-cli/configs"
 )
 
 // Index represents the list of libraries available for download
@@ -48,8 +46,8 @@ type Index struct {
 type Library struct {
 	Name     string
 	Releases map[string]*Release
-
-	Index *Index `json:"-"`
+	Latest   *Release `json:"-"`
+	Index    *Index   `json:"-"`
 }
 
 // Release is a release of a library available for download
@@ -69,92 +67,29 @@ type Release struct {
 	Library *Library `json:"-"`
 }
 
-type indexJSON struct {
-	Libraries []indexRelease `json:"libraries"`
+func (r *Release) String() string {
+	return r.Library.Name + "@" + r.Version
 }
 
-type indexRelease struct {
-	Name            string   `json:"name,required"`
-	Version         string   `json:"version,required"`
-	Author          string   `json:"author"`
-	Maintainer      string   `json:"maintainer"`
-	Sentence        string   `json:"sentence"`
-	Paragraph       string   `json:"paragraph"`
-	Website         string   `json:"website"`
-	Category        string   `json:"category"`
-	Architectures   []string `json:"architectures"`
-	Types           []string `json:"types"`
-	URL             string   `json:"url"`
-	ArchiveFileName string   `json:"archiveFileName"`
-	Size            int64    `json:"size"`
-	Checksum        string   `json:"checksum"`
+// FindRelease search a library Release in the index. Returns nil if the
+// release is not found
+func (idx *Index) FindRelease(ref *Reference) *Release {
+	if library, exists := idx.Libraries[ref.Name]; !exists {
+		return nil
+	} else {
+		return library.Releases[ref.Version]
+	}
 }
 
-// IndexPath is the path of the index file for libraries.
-var IndexPath = configs.IndexPath("library_index.json")
-
-// LoadIndex reads a library_index.json and create the corresponding Index
-func LoadIndex() (*Index, error) {
-	libFile, err := IndexPath.Get()
-	if err != nil {
-		return nil, fmt.Errorf("getting library_index.json path: %s", err)
-	}
-
-	buff, err := ioutil.ReadFile(libFile)
-	if err != nil {
-		return nil, fmt.Errorf("reading library_index.json: %s", err)
-	}
-
-	var i indexJSON
-	err = json.Unmarshal(buff, &i)
-	if err != nil {
-		return nil, fmt.Errorf("parsing library_index.json: %s", err)
-	}
-
-	return i.extractIndex()
-}
-
-func (i indexJSON) extractIndex() (*Index, error) {
-	index := &Index{
-		Libraries: map[string]*Library{},
-	}
-	for _, indexLib := range i.Libraries {
-		indexLib.extractLibraryIn(index)
-	}
-	return index, nil
-}
-
-func (indexLib *indexRelease) extractLibraryIn(index *Index) {
-	library, exist := index.Libraries[indexLib.Name]
-	if !exist {
-		library := &Library{
-			Name:     indexLib.Name,
-			Releases: map[string]*Release{},
+// Versions returns an array of all versions available of the library
+func (library *Library) Versions() semver.Versions {
+	res := semver.Versions{}
+	for version := range library.Releases {
+		v, err := semver.Make(version)
+		if err == nil {
+			res = append(res, v)
 		}
-		index.Libraries[indexLib.Name] = library
 	}
-	indexLib.extractReleaseIn(library)
-}
-
-func (indexLib *indexRelease) extractReleaseIn(library *Library) {
-	release := &Release{
-		Version:       indexLib.Version,
-		Author:        indexLib.Author,
-		Maintainer:    indexLib.Maintainer,
-		Sentence:      indexLib.Sentence,
-		Paragraph:     indexLib.Paragraph,
-		Website:       indexLib.Website,
-		Category:      indexLib.Category,
-		Architectures: indexLib.Architectures,
-		Types:         indexLib.Types,
-		Resource: &resources.DownloadResource{
-			URL:             indexLib.URL,
-			ArchiveFileName: indexLib.ArchiveFileName,
-			Size:            indexLib.Size,
-			Checksum:        indexLib.Checksum,
-			CachePath:       "libraries",
-		},
-		Library: library,
-	}
-	library.Releases[indexLib.Version] = release
+	sort.Sort(res)
+	return res
 }

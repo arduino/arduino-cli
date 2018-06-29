@@ -33,7 +33,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
 )
 
 // VersionResult represents the output of the version commands.
@@ -46,17 +46,17 @@ func (vr VersionResult) String() string {
 	return fmt.Sprintf("%s ver.%s", vr.CommandName, vr.Version)
 }
 
-//VersionFullInfo represents the output of a verbose request of version of a command.
+// VersionFullInfo represents the output of a verbose request of version of a command.
 type VersionFullInfo struct {
 	Versions []VersionResult `json:"versions,required"`
 }
 
-//LibProcessResults represent the result of a process on libraries.
+// LibProcessResults represent the result of a process on libraries.
 type LibProcessResults struct {
 	Libraries map[string]ProcessResult `json:"libraries,required"`
 }
 
-//CoreProcessResults represent the result of a process on cores or tools.
+// CoreProcessResults represent the result of a process on cores or tools.
 type CoreProcessResults struct {
 	Cores map[string]ProcessResult `json:"cores,omitempty"`
 	Tools map[string]ProcessResult `json:"tools,omitempty"`
@@ -76,7 +76,7 @@ func (cpr CoreProcessResults) String() string {
 
 // LibSearchResults represents a set of results of a search of libraries.
 type LibSearchResults struct {
-	Libraries []*libraries.Library `json:"libraries,required"`
+	Libraries []*librariesindex.Library `json:"libraries,required"`
 }
 
 // String returns a string representation of the object.
@@ -101,14 +101,14 @@ func (lsr LibSearchResults) String() string {
 	ret := ""
 	for _, l := range lsr.Libraries {
 		ret += fmt.Sprintf("Name: \"%s\"\n", l.Name) +
-			fmt.Sprintln("  Author: ", l.Author) +
-			fmt.Sprintln("  Maintainer: ", l.Maintainer) +
-			fmt.Sprintln("  Sentence: ", l.Sentence) +
-			fmt.Sprintln("  Paragraph: ", l.Paragraph) +
-			fmt.Sprintln("  Website: ", l.Website) +
-			fmt.Sprintln("  Category: ", l.Category) +
-			fmt.Sprintln("  Architecture: ", strings.Join(l.Architectures, ", ")) +
-			fmt.Sprintln("  Types: ", strings.Join(l.Types, ", ")) +
+			fmt.Sprintln("  Author: ", l.Latest.Author) +
+			fmt.Sprintln("  Maintainer: ", l.Latest.Maintainer) +
+			fmt.Sprintln("  Sentence: ", l.Latest.Sentence) +
+			fmt.Sprintln("  Paragraph: ", l.Latest.Paragraph) +
+			fmt.Sprintln("  Website: ", l.Latest.Website) +
+			fmt.Sprintln("  Category: ", l.Latest.Category) +
+			fmt.Sprintln("  Architecture: ", strings.Join(l.Latest.Architectures, ", ")) +
+			fmt.Sprintln("  Types: ", strings.Join(l.Latest.Types, ", ")) +
 			fmt.Sprintln("  Versions: ", strings.Replace(fmt.Sprint(l.Versions()), " ", ", ", -1))
 	}
 	return strings.TrimSpace(ret)

@@ -27,7 +27,7 @@
  * Copyright 2018 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package libraries
+package librariesmanager
 
 func sanitizeName(origName string) string {
 	sanitized := ""

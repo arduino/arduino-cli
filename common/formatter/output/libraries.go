@@ -1,6 +1,8 @@
 /*
  * This file is part of arduino-cli.
  *
+ * Copyright 2018 ARDUINO AG (http://www.arduino.cc/)
+ *
  * arduino-cli is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -23,48 +25,40 @@
  * the GNU General Public License.  This exception does not however
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
- *
- * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package lib
+package output
 
 import (
-	"os"
+	"fmt"
+	"sort"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/gosuri/uitable"
 )
 
-func initUpdateIndexCommand() *cobra.Command {
-	updateIndexCommand := &cobra.Command{
-		Use:     "update-index",
-		Short:   "Updates the libraries index.",
-		Long:    "Updates the libraries index to the latest version.",
-		Example: "arduino lib update-index",
-		Args:    cobra.NoArgs,
-		Run:     runUpdateIndexCommand,
-	}
-	return updateIndexCommand
+// InstalledLibraries is a list of installed libraries
+type InstalledLibraries struct {
+	Libraries []*libraries.Library `json:"libraries"`
 }
 
-func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Updating index")
-	updateIndex()
+func (il InstalledLibraries) Len() int { return len(il.Libraries) }
+func (il InstalledLibraries) Swap(i, j int) {
+	il.Libraries[i], il.Libraries[j] = il.Libraries[j], il.Libraries[i]
+}
+func (il InstalledLibraries) Less(i, j int) bool {
+	return il.Libraries[i].String() < il.Libraries[j].String()
 }
 
-func updateIndex() {
-	resp, err := librariesmanager.DownloadLibrariesFile()
-	if err != nil {
-		formatter.PrintError(err, "Error downloading librarires index")
-		os.Exit(commands.ErrNetwork)
+func (il InstalledLibraries) String() string {
+	table := uitable.New()
+	table.MaxColWidth = 100
+	table.Wrap = true
+
+	table.AddRow("Name", "Installed") //, "Latest")
+	sort.Sort(il)
+	for _, item := range il.Libraries {
+		table.AddRow(item.Name, item.Version) //, item.)
 	}
-	formatter.DownloadProgressBar(resp, "Updating index: library_index.json")
-	if resp.Err() != nil {
-		formatter.PrintError(resp.Err(), "Error downloading librarires index")
-		os.Exit(commands.ErrNetwork)
-	}
+	return fmt.Sprintln(table)
 }

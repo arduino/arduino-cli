@@ -36,7 +36,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -76,19 +76,17 @@ func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
 	}
 }
 
-func getLibStatusContext() (*libraries.StatusContext, error) {
-	var index libraries.Index
-	if err := libraries.LoadIndex(&index); err != nil {
-		logrus.WithError(err).Warn("Error during index loading... try to download it again")
+func getLibraryManager() *librariesmanager.StatusContext {
+	logrus.Info("Starting libraries manager")
+	lm := librariesmanager.NewLibraryManager()
+	if err := lm.LoadIndex(); err != nil {
+		logrus.WithError(err).Warn("Error during libraries index loading, try to download it again")
 		updateIndex()
-
-		if err := libraries.LoadIndex(&index); err != nil {
-			formatter.PrintError(err, "Error loading libraries index")
-			os.Exit(commands.ErrGeneric)
-		}
 	}
-
-	logrus.Info("Creating libraries status context")
-	status := index.CreateStatusContext()
-	return &status, nil
+	if err := lm.LoadIndex(); err != nil {
+		logrus.WithError(err).Error("Error during libraries index loading")
+		formatter.PrintError(err, "Error loading libraries index")
+		os.Exit(commands.ErrGeneric)
+	}
+	return lm
 }
