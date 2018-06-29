@@ -351,12 +351,6 @@
   version = "v1.2.1"
 
 [[projects]]
-  name = "github.com/zieckey/goini"
-  packages = ["."]
-  revision = "ef198e44330230cf3989b754eff33c97888f5a26"
-  version = "v1.2"
-
-[[projects]]
   branch = "master"
   name = "go.bug.st/serial.v1"
   packages = [
