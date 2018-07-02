@@ -33,13 +33,13 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/gosuri/uitable"
 )
 
 // InstalledLibraries is a list of installed libraries
 type InstalledLibraries struct {
-	Libraries []*libraries.Library `json:"libraries"`
+	Libraries []*librariesmanager.LibraryAlternatives `json:"libraries"`
 }
 
 func (il InstalledLibraries) Len() int { return len(il.Libraries) }
@@ -47,7 +47,7 @@ func (il InstalledLibraries) Swap(i, j int) {
 	il.Libraries[i], il.Libraries[j] = il.Libraries[j], il.Libraries[i]
 }
 func (il InstalledLibraries) Less(i, j int) bool {
-	return il.Libraries[i].String() < il.Libraries[j].String()
+	return il.Libraries[i].Alternatives[0].String() < il.Libraries[j].Alternatives[0].String()
 }
 
 func (il InstalledLibraries) String() string {
@@ -57,8 +57,10 @@ func (il InstalledLibraries) String() string {
 
 	table.AddRow("Name", "Installed") //, "Latest")
 	sort.Sort(il)
-	for _, item := range il.Libraries {
-		table.AddRow(item.Name, item.Version) //, item.)
+	for _, lib := range il.Libraries {
+		for _, libAlt := range lib.Alternatives {
+			table.AddRow(libAlt.Name, libAlt.Version) //, item.)
+		}
 	}
 	return fmt.Sprintln(table)
 }

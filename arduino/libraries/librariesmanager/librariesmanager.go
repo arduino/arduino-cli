@@ -30,6 +30,9 @@
 package librariesmanager
 
 import (
+	"fmt"
+
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
@@ -39,24 +42,31 @@ import (
 // StatusContext keeps the current status of the libraries in the system
 // (the list of libraries, revisions, installed paths, etc.)
 type StatusContext struct {
-	Libraries map[string]*libraries.Library `json:"libraries"`
+	Libraries map[string]*LibraryAlternatives `json:"libraries"`
 	Index     *librariesindex.Index
 }
 
-// // AddLibrary adds an indexRelease to the status context
-// func (sc *StatusContext) AddLibrary(indexLib *indexRelease) {
-// 	name := indexLib.Name
-// 	if sc.Libraries[name] == nil {
-// 		sc.Libraries[name] = indexLib.extractLibrary()
-// 	} else {
-// 		release := indexLib.extractRelease()
-// 		lib := sc.Libraries[name]
-// 		lib.Releases[fmt.Sprint(release.Version)] = release
-// 		release.Library = lib
-// 	}
-// }
+// LibraryAlternatives is a list of different versions of the same library
+// installed in the system
+type LibraryAlternatives struct {
+	Alternatives []*libraries.Library
+}
 
-// Names returns an array with all the names of the registered libraries.
+// Add adds a library to the alternatives
+func (alts *LibraryAlternatives) Add(library *libraries.Library) {
+	if len(alts.Alternatives) > 0 && alts.Alternatives[0].Name != library.Name {
+		panic(fmt.Sprintf("the library name is different from the set (%s != %s)", alts.Alternatives[0].Name, library.Name))
+	}
+	alts.Alternatives = append(alts.Alternatives, library)
+}
+
+// Select returns the library with the highest priority between the alternatives
+func (alts *LibraryAlternatives) Select() *libraries.Library {
+	// TODO
+	return alts.Alternatives[len(alts.Alternatives)-1]
+}
+
+// Names returns an array with all the names of the installed libraries.
 func (sc StatusContext) Names() []string {
 	res := make([]string, len(sc.Libraries))
 	i := 0
@@ -71,7 +81,7 @@ func (sc StatusContext) Names() []string {
 // NewLibraryManager creates a new library manager
 func NewLibraryManager() *StatusContext {
 	return &StatusContext{
-		Libraries: map[string]*libraries.Library{},
+		Libraries: map[string]*LibraryAlternatives{},
 	}
 }
 
@@ -81,4 +91,28 @@ func (sc *StatusContext) LoadIndex() error {
 	index, err := librariesindex.LoadIndex(IndexPath())
 	sc.Index = index
 	return err
+}
+
+// LoadLibrariesFromDir loads all libraries in the given folder
+func (sc *StatusContext) LoadLibrariesFromDir(librariesDir *paths.Path) error {
+	subFolders, err := librariesDir.ReadDir()
+	if err != nil {
+		return fmt.Errorf("reading dir %s: %s", librariesDir, err)
+	}
+	subFolders.FilterDirs()
+	subFolders.FilterOutHiddenFiles()
+
+	for _, subFolder := range subFolders {
+		library, err := libraries.Load(subFolder)
+		if err != nil {
+			return fmt.Errorf("loading library from %s: %s", subFolder, err)
+		}
+		alternatives, ok := sc.Libraries[library.Name]
+		if !ok {
+			alternatives = &LibraryAlternatives{}
+			sc.Libraries[library.Name] = alternatives
+		}
+		alternatives.Add(library)
+	}
+	return nil
 }

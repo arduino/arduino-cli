@@ -33,7 +33,6 @@ import (
 	"os"
 
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
@@ -64,17 +63,19 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	libs, err := libraries.LoadLibrariesFromDir(paths.New(libHome))
-	if err != nil {
+	lm := getLibraryManager()
+	if err := lm.LoadLibrariesFromDir(paths.New(libHome)); err != nil {
 		formatter.PrintError(err, "Error loading libraries.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
 	res := output.InstalledLibraries{}
-	res.Libraries = append(res.Libraries, libs...)
+	for _, lib := range lm.Libraries {
+		res.Libraries = append(res.Libraries, lib)
+	}
 	logrus.Info("Listing")
 
-	if len(libs) < 1 {
+	if len(res.Libraries) == 0 {
 		formatter.PrintErrorMessage("No library installed.")
 	} else {
 		formatter.Print(res)

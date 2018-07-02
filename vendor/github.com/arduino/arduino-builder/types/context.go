@@ -3,6 +3,8 @@ package types
 import (
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
+
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-map"
@@ -73,7 +75,7 @@ type Context struct {
 	WarningsLevel string
 
 	// Libraries handling
-	Libraries                  []*libraries.Library
+	LibrariesManager           *librariesmanager.StatusContext
 	HeaderToLibraries          map[string][]*libraries.Library
 	ImportedLibraries          []*libraries.Library
 	LibrariesResolutionResults map[string]LibraryResolutionResult

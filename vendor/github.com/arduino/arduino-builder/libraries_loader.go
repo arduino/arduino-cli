@@ -32,6 +32,8 @@ package builder
 import (
 	"os"
 
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
+
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
@@ -69,38 +71,40 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 
 	ctx.LibrariesFolders = sortedLibrariesFolders
 
-	var libs []*libraries.Library
+	lm := librariesmanager.NewLibraryManager()
 	for _, libraryFolder := range sortedLibrariesFolders {
-		libsInFolder, err := libraries.LoadLibrariesFromDir(libraryFolder)
-		if err != nil {
+		if err := lm.LoadLibrariesFromDir(libraryFolder); err != nil {
 			return i18n.WrapError(err)
 		}
-		libs = append(libs, libsInFolder...)
 	}
 	if debugLevel > 0 {
-		for _, lib := range libs {
-			warnings, err := lib.Lint()
+		for _, lib := range lm.Libraries {
+			for _, libAlt := range lib.Alternatives {
+				warnings, err := libAlt.Lint()
+				if err != nil {
+					return i18n.WrapError(err)
+				}
+				for _, warning := range warnings {
+					logger.Fprintln(os.Stdout, "warn", warning)
+				}
+			}
+		}
+	}
+
+	ctx.LibrariesManager = lm
+
+	headerToLibraries := make(map[string][]*libraries.Library)
+	for _, lib := range lm.Libraries {
+		for _, library := range lib.Alternatives {
+			headers, err := library.SrcFolder.ReadDir()
 			if err != nil {
 				return i18n.WrapError(err)
 			}
-			for _, warning := range warnings {
-				logger.Fprintln(os.Stdout, "warn", warning)
+			headers.FilterSuffix(".h", ".hpp", ".hh")
+			for _, header := range headers {
+				headerFileName := header.Base()
+				headerToLibraries[headerFileName] = append(headerToLibraries[headerFileName], library)
 			}
-		}
-	}
-
-	ctx.Libraries = libs
-
-	headerToLibraries := make(map[string][]*libraries.Library)
-	for _, library := range libs {
-		headers, err := library.SrcFolder.ReadDir()
-		if err != nil {
-			return i18n.WrapError(err)
-		}
-		headers.FilterSuffix(".h", ".hpp", ".hh")
-		for _, header := range headers {
-			headerFileName := header.Base()
-			headerToLibraries[headerFileName] = append(headerToLibraries[headerFileName], library)
 		}
 	}
 
