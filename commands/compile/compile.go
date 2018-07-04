@@ -214,6 +214,10 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.USBVidPid = flags.vidPid
 	ctx.WarningsLevel = flags.warnings
 
+	if flags.debugLevel > 0 {
+		ctx.DebugLevel = 100
+	}
+
 	ctx.CustomBuildProperties = append(flags.buildProperties, "build.warn_data_percentage=75")
 
 	if flags.buildCachePath != "" {
