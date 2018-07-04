@@ -57,7 +57,6 @@ func initUpdateIndexCommand() *cobra.Command {
 }
 
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Updating package index")
 	updateIndexes()
 }
 
@@ -68,6 +67,7 @@ func updateIndexes() {
 }
 
 func updateIndex(URL *url.URL) {
+	logrus.WithField("url", URL).Print("Updating index")
 	coreIndexPath, err := configs.IndexPathFromURL(URL).Get()
 	if err != nil {
 		formatter.PrintError(err, "Error getting index path for "+URL.String())
