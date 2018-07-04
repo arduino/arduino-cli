@@ -131,6 +131,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		// TODO: Handle the case when no board is found.
 		board := findBoardFunc(pm, monitor, deviceURI)
 		if board == nil {
+			formatter.PrintErrorMessage("No supported board has been found at " + deviceURI.String() + ", try either install new cores or check your board URI.")
 			os.Exit(commands.ErrGeneric)
 		}
 		formatter.Print("Board found: " + board.Name())
@@ -164,13 +165,11 @@ func findSerialConnectedBoard(pm *packagemanager.PackageManager, monitor *discov
 		}
 	}
 	if !found {
-		formatter.PrintErrorMessage("Sorry, no Supported board has been found at the specified board URI :-(")
 		return nil
 	}
 
 	boards := pm.FindBoardsWithVidPid(serialDevice.VendorID, serialDevice.ProductID)
 	if len(boards) == 0 {
-		formatter.PrintErrorMessage("No Supported board has been found, try either install new cores or check your board URI.")
 		os.Exit(commands.ErrGeneric)
 	}
 
@@ -193,14 +192,12 @@ func findNetworkConnectedBoard(pm *packagemanager.PackageManager, monitor *disco
 		}
 	}
 	if !found {
-		formatter.PrintErrorMessage("No Supported board has been found at the specified board URI, try either install new cores or check your board URI.")
-		os.Exit(commands.ErrGeneric)
+		return nil
 	}
 
 	boards := pm.FindBoardsWithID(networkDevice.Name)
 	if len(boards) == 0 {
-		formatter.PrintErrorMessage("No Supported board has been found, try either install new cores or check your board URI.")
-		os.Exit(commands.ErrGeneric)
+		return nil
 	}
 
 	return boards[0]
