@@ -69,7 +69,6 @@ func InitCommand() *cobra.Command {
 	command.Flags().StringVar(&flags.warnings, "warnings", "none", `Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
 	command.Flags().BoolVarP(&flags.verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
 	command.Flags().BoolVar(&flags.quiet, "quiet", false, "Optional, supresses almost every output.")
-	command.Flags().IntVar(&flags.debugLevel, "debug-level", 5, "Optional, defaults to 5. Used for debugging. Set it to 10 when submitting an issue.")
 	command.Flags().StringVar(&flags.vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if boards supports them.")
 	return command
 }
@@ -84,7 +83,6 @@ var flags struct {
 	warnings        string   // Used to tell gcc which warning level to use.
 	verbose         bool     // Turns on verbose mode.
 	quiet           bool     // Supresses almost every output.
-	debugLevel      int      // Used for debugging.
 	vidPid          string   // VID/PID specific build properties.
 }
 
@@ -207,15 +205,16 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	ctx.Verbose = flags.verbose
-	ctx.DebugLevel = flags.debugLevel
 
 	ctx.CoreBuildCachePath = paths.TempDir().Join("arduino-core-cache")
 
 	ctx.USBVidPid = flags.vidPid
 	ctx.WarningsLevel = flags.warnings
 
-	if flags.debugLevel > 0 {
+	if commands.GlobalFlags.Debug {
 		ctx.DebugLevel = 100
+	} else {
+		ctx.DebugLevel = 5
 	}
 
 	ctx.CustomBuildProperties = append(flags.buildProperties, "build.warn_data_percentage=75")
