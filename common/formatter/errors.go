@@ -31,7 +31,6 @@ package formatter
 
 import (
 	"encoding/json"
-	"errors"
 	"strings"
 )
 
@@ -56,13 +55,16 @@ func (err ErrorMessage) MarshalJSON() ([]byte, error) {
 
 // String returns a string representation of the Error.
 func (err ErrorMessage) String() string {
+	if err.Error == nil {
+		return err.Message
+	}
 	return err.Message + " (" + err.Error.Error() + ")"
 }
 
 // PrintErrorMessage formats and prints info about an error message.
 func PrintErrorMessage(msg string) {
 	msg = strings.TrimSpace(msg)
-	PrintError(errors.New(msg), msg)
+	PrintError(nil, msg)
 }
 
 // PrintError formats and prints info about an error.
