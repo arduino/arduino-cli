@@ -49,12 +49,14 @@ import (
 
 func initAttachCommand() *cobra.Command {
 	attachCommand := &cobra.Command{
-		Use:     "attach <port>|<FQBN> [sketchPath]",
-		Short:   "Attaches a sketch to a board.",
-		Long:    "Attaches a sketch to a board.",
-		Example: "arduino board attach serial:///dev/tty/ACM0",
-		Args:    cobra.RangeArgs(1, 2),
-		Run:     runAttachCommand,
+		Use:   "attach <port>|<FQBN> [sketchPath]",
+		Short: "Attaches a sketch to a board.",
+		Long:  "Attaches a sketch to a board.",
+		Example: "arduino board attach serial:///dev/tty/ACM0\n" +
+			"arduino board attach serial:///dev/tty/ACM0 HelloWorld\n" +
+			"arduino board attach arduino:samd:mkr1000",
+		Args: cobra.RangeArgs(1, 2),
+		Run:  runAttachCommand,
 	}
 	attachCommand.Flags().StringVar(&attachFlags.boardFlavour, "flavour", "default", "The Name of the CPU flavour, it is required for some boards (e.g. Arduino Nano).")
 	attachCommand.Flags().StringVar(&attachFlags.searchTimeout, "timeout", "5s", "The timeout of the search of connected devices, try to high it if your board is not found (e.g. to 10s).")
@@ -69,8 +71,8 @@ var attachFlags struct {
 func runAttachCommand(cmd *cobra.Command, args []string) {
 	boardURI := args[0]
 	var sketchPath *paths.Path
-	if len(args) > 0 {
-		sketchPath = paths.New(args[0])
+	if len(args) > 1 {
+		sketchPath = paths.New(args[1])
 	}
 	sketch, err := commands.InitSketch(sketchPath)
 	if err != nil {
@@ -78,6 +80,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrGeneric)
 	}
 
+	logrus.WithField("fqbn", boardURI).Print("Parsing FQBN")
 	fqbn, err := cores.ParseFQBN(boardURI)
 	if err != nil && !strings.HasPrefix(boardURI, "serial") {
 		boardURI = "serial://" + boardURI
