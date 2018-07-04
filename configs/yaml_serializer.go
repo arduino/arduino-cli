@@ -32,6 +32,7 @@ package configs
 import (
 	"fmt"
 	"io/ioutil"
+	"net/url"
 
 	"github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
@@ -42,7 +43,7 @@ type yamlConfig struct {
 	ProxyManualConfig *yamlProxyConfig `yaml:"manual_configs,omitempty"`
 	SketchbookPath    string           `yaml:"sketchbook_path,omitempty"`
 	ArduinoDataFolder string           `yaml:"arduino_data,omitempty"`
-	BoardsManager     struct {
+	BoardsManager     *struct {
 		AdditionalURLS []string `yaml:"additional_urls,omitempty"`
 	} `yaml:"board_manager"`
 }
@@ -80,6 +81,16 @@ func LoadFromYAML(path string) error {
 			ProxyHostname = ret.ProxyManualConfig.Hostname
 			ProxyUsername = ret.ProxyManualConfig.Username
 			ProxyPassword = ret.ProxyManualConfig.Password
+		}
+	}
+	if ret.BoardsManager != nil {
+		for _, rawurl := range ret.BoardsManager.AdditionalURLS {
+			url, err := url.Parse(rawurl)
+			if err != nil {
+				logrus.WithError(err).Warn("Error parsing config")
+				continue
+			}
+			BoardManagerAdditionalUrls = append(BoardManagerAdditionalUrls, url)
 		}
 	}
 	return nil
