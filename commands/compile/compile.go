@@ -197,8 +197,8 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	ctx.OtherLibrariesFolders = paths.NewPathList(librariesFolder)
 
-	ctx.BuildPath = paths.New(flags.buildPath)
-	if ctx.BuildPath.String() != "" {
+	if flags.buildPath != "" {
+		ctx.BuildPath = paths.New(flags.buildPath)
 		err = ctx.BuildPath.MkdirAll()
 		if err != nil {
 			formatter.PrintError(err, "Cannot create the build folder.")
