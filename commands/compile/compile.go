@@ -276,7 +276,8 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Copy .hex file to sketch folder
 	srcHex := paths.New(outputPath)
-	dstHex := sketchPath.Join(sketch.Name + "." + fqbn + ext)
+	dstHex := paths.New(sketch.FullPath).Join(sketch.Name + "." + fqbn + ext)
+	logrus.WithField("from", srcHex).WithField("to", dstHex).Print("copying sketch build output")
 	if err = srcHex.CopyTo(dstHex); err != nil {
 		formatter.PrintError(err, "Error copying output file.")
 		os.Exit(commands.ErrGeneric)
@@ -284,7 +285,8 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Copy .elf file to sketch folder
 	srcElf := paths.New(outputPath[:len(outputPath)-3] + "elf")
-	dstElf := sketchPath.Join(sketch.Name + "." + fqbn + ".elf")
+	dstElf := paths.New(sketch.FullPath).Join(sketch.Name + "." + fqbn + ".elf")
+	logrus.WithField("from", srcElf).WithField("to", dstElf).Print("copying sketch build output")
 	if err = srcElf.CopyTo(dstElf); err != nil {
 		formatter.PrintError(err, "Error copying elf file.")
 		os.Exit(commands.ErrGeneric)
