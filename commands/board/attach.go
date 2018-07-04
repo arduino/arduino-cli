@@ -33,6 +33,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	discovery "github.com/arduino/board-discovery"
@@ -78,7 +79,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	}
 
 	fqbn, err := cores.ParseFQBN(boardURI)
-	if err != nil && boardURI[:6] != "serial" {
+	if err != nil && !strings.HasPrefix(boardURI, "serial") {
 		boardURI = "serial://" + boardURI
 	}
 
