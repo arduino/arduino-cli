@@ -75,7 +75,7 @@ type Context struct {
 	WarningsLevel string
 
 	// Libraries handling
-	LibrariesManager           *librariesmanager.StatusContext
+	LibrariesManager           *librariesmanager.LibrariesManager
 	HeaderToLibraries          map[string][]*libraries.Library
 	ImportedLibraries          []*libraries.Library
 	LibrariesResolutionResults map[string]LibraryResolutionResult

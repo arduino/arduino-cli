@@ -76,7 +76,7 @@ func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
 	}
 }
 
-func getLibraryManager() *librariesmanager.StatusContext {
+func getLibraryManager() *librariesmanager.LibrariesManager {
 	logrus.Info("Starting libraries manager")
 	lm := librariesmanager.NewLibraryManager()
 	if err := lm.LoadIndex(); err != nil {

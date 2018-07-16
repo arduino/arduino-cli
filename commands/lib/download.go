@@ -64,7 +64,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	downloadLibraries(lm, pairs)
 }
 
-func downloadLibraries(lm *librariesmanager.StatusContext, refs []*librariesindex.Reference) {
+func downloadLibraries(lm *librariesmanager.LibrariesManager, refs []*librariesindex.Reference) {
 	libsReleaseToDownload := []*librariesindex.Release{}
 	for _, ref := range refs {
 		if lib := lm.Index.FindRelease(ref); lib == nil {

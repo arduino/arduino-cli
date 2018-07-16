@@ -66,7 +66,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	installLibraries(lm, refs)
 }
 
-func installLibraries(lm *librariesmanager.StatusContext, refs []*librariesindex.Reference) {
+func installLibraries(lm *librariesmanager.LibrariesManager, refs []*librariesindex.Reference) {
 	libReleasesToInstall := []*librariesindex.Release{}
 	for _, ref := range refs {
 		rel := lm.Index.FindRelease(ref)

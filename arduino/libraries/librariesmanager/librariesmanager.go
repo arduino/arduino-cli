@@ -39,9 +39,9 @@ import (
 	"github.com/pmylund/sortutil"
 )
 
-// StatusContext keeps the current status of the libraries in the system
+// LibrariesManager keeps the current status of the libraries in the system
 // (the list of libraries, revisions, installed paths, etc.)
-type StatusContext struct {
+type LibrariesManager struct {
 	Libraries map[string]*LibraryAlternatives `json:"libraries"`
 	Index     *librariesindex.Index
 }
@@ -67,7 +67,7 @@ func (alts *LibraryAlternatives) Select() *libraries.Library {
 }
 
 // Names returns an array with all the names of the installed libraries.
-func (sc StatusContext) Names() []string {
+func (sc LibrariesManager) Names() []string {
 	res := make([]string, len(sc.Libraries))
 	i := 0
 	for n := range sc.Libraries {
@@ -79,22 +79,22 @@ func (sc StatusContext) Names() []string {
 }
 
 // NewLibraryManager creates a new library manager
-func NewLibraryManager() *StatusContext {
-	return &StatusContext{
+func NewLibraryManager() *LibrariesManager {
+	return &LibrariesManager{
 		Libraries: map[string]*LibraryAlternatives{},
 	}
 }
 
 // LoadIndex reads a library_index.json from a file and returns
 // the corresponding Index structure.
-func (sc *StatusContext) LoadIndex() error {
+func (sc *LibrariesManager) LoadIndex() error {
 	index, err := librariesindex.LoadIndex(IndexPath())
 	sc.Index = index
 	return err
 }
 
 // LoadLibrariesFromDir loads all libraries in the given folder
-func (sc *StatusContext) LoadLibrariesFromDir(librariesDir *paths.Path) error {
+func (sc *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) error {
 	subFolders, err := librariesDir.ReadDir()
 	if err != nil {
 		return fmt.Errorf("reading dir %s: %s", librariesDir, err)
