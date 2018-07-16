@@ -37,6 +37,7 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/bcmi-labs/arduino-cli/arduino/utils"
 
 	"github.com/bcmi-labs/arduino-cli/configs"
 )
@@ -69,7 +70,7 @@ func Install(library *librariesindex.Release) (string, error) {
 		return "", fmt.Errorf("getting libraries directory: %s", err)
 	}
 
-	libPath := filepath.Join(libsFolder, sanitizeName(library.Library.Name))
+	libPath := filepath.Join(libsFolder, utils.SanitizeName(library.Library.Name))
 	return libPath, library.Resource.Install(libsFolder, libPath)
 }
 
@@ -79,7 +80,7 @@ func removeRelease(libName string, r *libraries.Library) error {
 		return err
 	}
 
-	libName = sanitizeName(libName)
+	libName = utils.SanitizeName(libName)
 	path := filepath.Join(libFolder, libName)
 	return os.RemoveAll(path)
 }

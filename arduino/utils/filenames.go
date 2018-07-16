@@ -27,9 +27,11 @@
  * Copyright 2018 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package librariesmanager
+package utils
 
-func sanitizeName(origName string) string {
+// SanitizeName replaces with underscores all chars that are not included
+// in the ranges: 0-9, A-Z, a-z, "-" and "."
+func SanitizeName(origName string) string {
 	sanitized := ""
 	for i, c := range origName {
 		if (c >= '0' && c <= '9') ||
