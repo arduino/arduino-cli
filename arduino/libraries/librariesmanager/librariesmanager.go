@@ -44,6 +44,14 @@ import (
 type LibrariesManager struct {
 	Libraries map[string]*LibraryAlternatives `json:"libraries"`
 	Index     *librariesindex.Index
+
+	librariesDir []*LibrariesDir
+}
+
+// LibrariesDir is a directory containing libraries
+type LibrariesDir struct {
+	Path     *paths.Path
+	Location libraries.LibraryLocation
 }
 
 // LibraryAlternatives is a list of different versions of the same library
@@ -93,17 +101,44 @@ func (sc *LibrariesManager) LoadIndex() error {
 	return err
 }
 
+// AddLibrariesDir adds allPaths to the list of directories
+// to scan when searching for libraries. If a path is already
+// in the list it is ignored.
+func (sc *LibrariesManager) AddLibrariesDir(location libraries.LibraryLocation, allPaths ...*paths.Path) {
+	for _, path := range allPaths {
+		for _, dir := range sc.librariesDir {
+			if dir.Path.EquivalentTo(path) {
+				return
+			}
+		}
+		sc.librariesDir = append(sc.librariesDir, &LibrariesDir{
+			Path:     path,
+			Location: location,
+		})
+	}
+}
+
+// RescanLibraries reload all installed libraries in the system.
+func (sc *LibrariesManager) RescanLibraries() error {
+	for _, dir := range sc.librariesDir {
+		if err := sc.LoadLibrariesFromDir(dir); err != nil {
+			return fmt.Errorf("loading libs from %s: %s", dir.Path, err)
+		}
+	}
+	return nil
+}
+
 // LoadLibrariesFromDir loads all libraries in the given folder
 func (sc *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) error {
-	subFolders, err := librariesDir.ReadDir()
+	subFolders, err := librariesDir.Path.ReadDir()
 	if err != nil {
-		return fmt.Errorf("reading dir %s: %s", librariesDir, err)
+		return fmt.Errorf("reading dir %s: %s", librariesDir.Path, err)
 	}
 	subFolders.FilterDirs()
 	subFolders.FilterOutHiddenFiles()
 
 	for _, subFolder := range subFolders {
-		library, err := libraries.Load(subFolder)
+		library, err := libraries.Load(subFolder, librariesDir.Location)
 		if err != nil {
 			return fmt.Errorf("loading library from %s: %s", subFolder, err)
 		}

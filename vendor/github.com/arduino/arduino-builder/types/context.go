@@ -25,7 +25,6 @@ type Context struct {
 	HardwareFolders         paths.PathList
 	ToolsFolders            paths.PathList
 	BuiltInToolsFolders     paths.PathList
-	LibrariesFolders        paths.PathList
 	BuiltInLibrariesFolders paths.PathList
 	OtherLibrariesFolders   paths.PathList
 	SketchLocation          *paths.Path

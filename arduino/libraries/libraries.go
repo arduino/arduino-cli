@@ -64,6 +64,7 @@ type Library struct {
 	Folder        *paths.Path
 	SrcFolder     *paths.Path
 	UtilityFolder *paths.Path
+	Location      LibraryLocation
 	Layout        LibraryLayout
 	RealName      string
 	DotALinkage   bool

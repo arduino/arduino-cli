@@ -52,13 +52,13 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	librariesBuildPath := ctx.LibrariesBuildPath
 	buildProperties := ctx.BuildProperties
 	includes := utils.Map(ctx.IncludeFolders.AsStrings(), utils.WrapWithHyphenI)
-	libraries := ctx.ImportedLibraries
+	libs := ctx.ImportedLibraries
 
 	if err := librariesBuildPath.MkdirAll(); err != nil {
 		return i18n.WrapError(err)
 	}
 
-	objectFiles, err := compileLibraries(ctx, libraries, librariesBuildPath, buildProperties, includes)
+	objectFiles, err := compileLibraries(ctx, libs, librariesBuildPath, buildProperties, includes)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -66,14 +66,14 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	ctx.LibrariesObjectFiles = objectFiles
 
 	// Search for precompiled libraries
-	fixLDFLAGforPrecompiledLibraries(ctx, libraries)
+	fixLDFLAGforPrecompiledLibraries(ctx, libs)
 
 	return nil
 }
 
-func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libraries []*libraries.Library) error {
+func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libs []*libraries.Library) error {
 
-	for _, library := range libraries {
+	for _, library := range libs {
 		if library.Precompiled {
 			// add library src path to compiler.c.elf.extra_flags
 			// use library.Name as lib name and srcPath/{mcpu} as location

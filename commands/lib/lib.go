@@ -33,9 +33,12 @@ import (
 	"os"
 	"strings"
 
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/bcmi-labs/arduino-cli/configs"
 
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
@@ -79,6 +82,12 @@ func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
 func getLibraryManager() *librariesmanager.LibrariesManager {
 	logrus.Info("Starting libraries manager")
 	lm := librariesmanager.NewLibraryManager()
+	if libHome, err := configs.LibrariesFolder.Get(); err != nil {
+		formatter.PrintError(err, "Cannot get libraries folder.")
+		os.Exit(commands.ErrCoreConfig)
+	} else {
+		lm.AddLibrariesDir(libraries.Sketchbook, paths.New(libHome))
+	}
 	if err := lm.LoadIndex(); err != nil {
 		logrus.WithError(err).Warn("Error during libraries index loading, try to download it again")
 		updateIndex()

@@ -42,41 +42,39 @@ import (
 type LibrariesLoader struct{}
 
 func (s *LibrariesLoader) Run(ctx *types.Context) error {
+	lm := librariesmanager.NewLibraryManager()
+	ctx.LibrariesManager = lm
+
 	builtInLibrariesFolders := ctx.BuiltInLibrariesFolders
 	if err := builtInLibrariesFolders.ToAbs(); err != nil {
 		return i18n.WrapError(err)
 	}
-	sortedLibrariesFolders := builtInLibrariesFolders.Clone()
+	lm.AddLibrariesDir(libraries.IDEBuiltIn, builtInLibrariesFolders...)
 
-	actualPlatform := ctx.ActualPlatform
-	platform := ctx.TargetPlatform
 	debugLevel := ctx.DebugLevel
 	logger := ctx.GetLogger()
 
+	actualPlatform := ctx.ActualPlatform
+	platform := ctx.TargetPlatform
 	if actualPlatform != platform {
 		if dir := actualPlatform.GetLibrariesDir(); dir != nil {
-			sortedLibrariesFolders.Add(dir)
+			lm.AddLibrariesDir(libraries.ReferencedPlatformBuiltIn, dir)
 		}
 	}
-
 	if dir := platform.GetLibrariesDir(); dir != nil {
-		sortedLibrariesFolders.Add(dir)
+		lm.AddLibrariesDir(libraries.PlatformBuiltIn, dir)
 	}
 
 	librariesFolders := ctx.OtherLibrariesFolders
 	if err := librariesFolders.ToAbs(); err != nil {
 		return i18n.WrapError(err)
 	}
-	sortedLibrariesFolders.AddAllMissing(librariesFolders)
+	lm.AddLibrariesDir(libraries.Sketchbook, librariesFolders...)
 
-	ctx.LibrariesFolders = sortedLibrariesFolders
-
-	lm := librariesmanager.NewLibraryManager()
-	for _, libraryFolder := range sortedLibrariesFolders {
-		if err := lm.LoadLibrariesFromDir(libraryFolder); err != nil {
-			return i18n.WrapError(err)
-		}
+	if err := lm.RescanLibraries(); err != nil {
+		return i18n.WrapError(err)
 	}
+
 	if debugLevel > 0 {
 		for _, lib := range lm.Libraries {
 			for _, libAlt := range lib.Alternatives {
@@ -90,8 +88,6 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 			}
 		}
 	}
-
-	ctx.LibrariesManager = lm
 
 	headerToLibraries := make(map[string][]*libraries.Library)
 	for _, lib := range lm.Libraries {

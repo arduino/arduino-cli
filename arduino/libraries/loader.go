@@ -38,11 +38,11 @@ import (
 )
 
 // Load loads a library from the given folder
-func Load(libDir *paths.Path) (*Library, error) {
+func Load(libDir *paths.Path, location LibraryLocation) (*Library, error) {
 	if exist, _ := libDir.Join("library.properties").Exist(); exist {
-		return makeNewLibrary(libDir)
+		return makeNewLibrary(libDir, location)
 	}
-	return makeLegacyLibrary(libDir)
+	return makeLegacyLibrary(libDir, location)
 }
 
 func addUtilityFolder(library *Library) {
@@ -52,7 +52,7 @@ func addUtilityFolder(library *Library) {
 	}
 }
 
-func makeNewLibrary(libraryFolder *paths.Path) (*Library, error) {
+func makeNewLibrary(libraryFolder *paths.Path, location LibraryLocation) (*Library, error) {
 	libProperties, err := properties.Load(libraryFolder.Join("library.properties").String())
 	if err != nil {
 		return nil, fmt.Errorf("loading library.properties: %s", err)
@@ -69,6 +69,7 @@ func makeNewLibrary(libraryFolder *paths.Path) (*Library, error) {
 	}
 
 	library := &Library{}
+	library.Location = location
 	library.Folder = libraryFolder
 	if exist, _ := libraryFolder.Join("src").Exist(); exist {
 		library.Layout = RecursiveLayout
@@ -115,12 +116,13 @@ func makeNewLibrary(libraryFolder *paths.Path) (*Library, error) {
 	return library, nil
 }
 
-func makeLegacyLibrary(libraryFolder *paths.Path) (*Library, error) {
+func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, error) {
 	library := &Library{
-		Folder:        libraryFolder,
-		SrcFolder:     libraryFolder,
+		Folder:        path,
+		Location:      location,
+		SrcFolder:     path,
 		Layout:        FlatLayout,
-		Name:          libraryFolder.Base(),
+		Name:          path.Base(),
 		Architectures: []string{"*"},
 		IsLegacy:      true,
 	}

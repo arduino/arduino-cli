@@ -32,11 +32,9 @@ package lib
 import (
 	"os"
 
-	paths "github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -57,14 +55,8 @@ func initListCommand() *cobra.Command {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
-	libHome, err := configs.LibrariesFolder.Get()
-	if err != nil {
-		formatter.PrintError(err, "Cannot get libraries folder.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-
 	lm := getLibraryManager()
-	if err := lm.LoadLibrariesFromDir(paths.New(libHome)); err != nil {
+	if err := lm.RescanLibraries(); err != nil {
 		formatter.PrintError(err, "Error loading libraries.")
 		os.Exit(commands.ErrCoreConfig)
 	}
