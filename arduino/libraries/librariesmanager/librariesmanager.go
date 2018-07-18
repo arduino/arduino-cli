@@ -45,7 +45,7 @@ type LibrariesManager struct {
 	Libraries map[string]*LibraryAlternatives `json:"libraries"`
 	Index     *librariesindex.Index
 
-	librariesDir []*LibrariesDir
+	LibrariesDir []*LibrariesDir
 }
 
 // LibrariesDir is a directory containing libraries
@@ -106,12 +106,12 @@ func (sc *LibrariesManager) LoadIndex() error {
 // in the list it is ignored.
 func (sc *LibrariesManager) AddLibrariesDir(location libraries.LibraryLocation, allPaths ...*paths.Path) {
 	for _, path := range allPaths {
-		for _, dir := range sc.librariesDir {
+		for _, dir := range sc.LibrariesDir {
 			if dir.Path.EquivalentTo(path) {
 				return
 			}
 		}
-		sc.librariesDir = append(sc.librariesDir, &LibrariesDir{
+		sc.LibrariesDir = append(sc.LibrariesDir, &LibrariesDir{
 			Path:     path,
 			Location: location,
 		})
@@ -120,7 +120,7 @@ func (sc *LibrariesManager) AddLibrariesDir(location libraries.LibraryLocation, 
 
 // RescanLibraries reload all installed libraries in the system.
 func (sc *LibrariesManager) RescanLibraries() error {
-	for _, dir := range sc.librariesDir {
+	for _, dir := range sc.LibrariesDir {
 		if err := sc.LoadLibrariesFromDir(dir); err != nil {
 			return fmt.Errorf("loading libs from %s: %s", dir.Path, err)
 		}
