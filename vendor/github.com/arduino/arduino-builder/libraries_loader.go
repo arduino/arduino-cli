@@ -33,6 +33,7 @@ import (
 	"os"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesresolver"
 
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
@@ -89,22 +90,11 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 		}
 	}
 
-	headerToLibraries := make(map[string][]*libraries.Library)
-	for _, lib := range lm.Libraries {
-		for _, library := range lib.Alternatives {
-			headers, err := library.SrcFolder.ReadDir()
-			if err != nil {
-				return i18n.WrapError(err)
-			}
-			headers.FilterSuffix(".h", ".hpp", ".hh")
-			for _, header := range headers {
-				headerFileName := header.Base()
-				headerToLibraries[headerFileName] = append(headerToLibraries[headerFileName], library)
-			}
-		}
+	resolver := librariesresolver.NewCppResolver()
+	if err := resolver.ScanFromLibrariesManager(lm); err != nil {
+		return i18n.WrapError(err)
 	}
-
-	ctx.HeaderToLibraries = headerToLibraries
+	ctx.LibrariesResolver = resolver
 
 	return nil
 }

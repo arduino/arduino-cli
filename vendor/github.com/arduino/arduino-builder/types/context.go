@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesresolver"
 
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/go-paths-helper"
@@ -75,8 +76,8 @@ type Context struct {
 
 	// Libraries handling
 	LibrariesManager           *librariesmanager.LibrariesManager
-	HeaderToLibraries          map[string][]*libraries.Library
-	ImportedLibraries          []*libraries.Library
+	LibrariesResolver          *librariesresolver.Cpp
+	ImportedLibraries          libraries.List
 	LibrariesResolutionResults map[string]LibraryResolutionResult
 	IncludeFolders             paths.PathList
 	//OutputGccMinusM            string

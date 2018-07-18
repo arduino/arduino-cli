@@ -30,98 +30,44 @@
 package builder
 
 import (
-	"path/filepath"
-	"strings"
+	"fmt"
 
-	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
 func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
-	headerToLibraries := ctx.HeaderToLibraries
-	platforms := []*cores.PlatformRelease{ctx.ActualPlatform, ctx.TargetPlatform}
-	libraryResolutionResults := ctx.LibrariesResolutionResults
+	resolver := ctx.LibrariesResolver
 	importedLibraries := ctx.ImportedLibraries
 
-	libs := append([]*libraries.Library{}, headerToLibraries[header]...)
+	candidates := resolver.AlternativesFor(header)
+	fmt.Printf("ResolveLibrary(%s)\n", header)
+	fmt.Printf("  -> candidates: %s\n", candidates)
 
-	if libs == nil || len(libs) == 0 {
+	if candidates == nil || len(candidates) == 0 {
 		return nil
 	}
 
-	if importedLibraryContainsOneOfCandidates(importedLibraries, libs) {
-		return nil
-	}
-
-	if len(libs) == 1 {
-		return libs[0]
-	}
-
-	reverse(libs)
-
-	var library *libraries.Library
-
-	for _, platform := range platforms {
-		if platform != nil {
-			library = findBestLibraryWithHeader(header, librariesCompatibleWithPlatform(libs, platform, true))
+	for _, candidate := range candidates {
+		if importedLibraries.Contains(candidate) {
+			return nil
 		}
 	}
 
-	if library == nil {
-		library = findBestLibraryWithHeader(header, libs)
+	selected := resolver.ResolveFor(header, ctx.TargetPlatform.Platform.Architecture)
+	if alreadyImported := importedLibraries.FindByName(selected.Name); alreadyImported != nil {
+		selected = alreadyImported
 	}
 
-	if library == nil {
-		// reorder libraries to promote fully compatible ones
-		for _, platform := range platforms {
-			if platform != nil {
-				libs = append(librariesCompatibleWithPlatform(libs, platform, false), libs...)
-			}
-		}
-		library = libs[0]
+	ctx.LibrariesResolutionResults[header] = types.LibraryResolutionResult{
+		Library:          selected,
+		NotUsedLibraries: filterOutLibraryFrom(candidates, selected),
 	}
 
-	library = useAlreadyImportedLibraryWithSameNameIfExists(library, importedLibraries)
-
-	libraryResolutionResults[header] = types.LibraryResolutionResult{
-		Library:          library,
-		NotUsedLibraries: filterOutLibraryFrom(libs, library),
-	}
-
-	return library
+	return selected
 }
 
-//facepalm. sort.Reverse needs an Interface that implements Len/Less/Swap. It's a slice! What else for reversing it?!?
-func reverse(data []*libraries.Library) {
-	for i, j := 0, len(data)-1; i < j; i, j = i+1, j-1 {
-		data[i], data[j] = data[j], data[i]
-	}
-}
-
-func importedLibraryContainsOneOfCandidates(imported []*libraries.Library, candidates []*libraries.Library) bool {
-	for _, i := range imported {
-		for _, j := range candidates {
-			if i == j {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-func useAlreadyImportedLibraryWithSameNameIfExists(library *libraries.Library, imported []*libraries.Library) *libraries.Library {
-	for _, lib := range imported {
-		if lib.Name == library.Name {
-			return lib
-		}
-	}
-	return library
-}
-
-func filterOutLibraryFrom(libs []*libraries.Library, libraryToRemove *libraries.Library) []*libraries.Library {
+func filterOutLibraryFrom(libs libraries.List, libraryToRemove *libraries.Library) libraries.List {
 	filteredOutLibraries := []*libraries.Library{}
 	for _, lib := range libs {
 		if lib != libraryToRemove {
@@ -129,108 +75,4 @@ func filterOutLibraryFrom(libs []*libraries.Library, libraryToRemove *libraries.
 		}
 	}
 	return filteredOutLibraries
-}
-
-func libraryCompatibleWithPlatform(library *libraries.Library, platform *cores.PlatformRelease) (bool, bool) {
-	if len(library.Architectures) == 0 {
-		return true, true
-	}
-	if utils.SliceContains(library.Architectures, constants.LIBRARY_ALL_ARCHS) {
-		return true, true
-	}
-	return utils.SliceContains(library.Architectures, platform.Platform.Architecture), false
-}
-
-func libraryCompatibleWithAllPlatforms(library *libraries.Library) bool {
-	if utils.SliceContains(library.Architectures, constants.LIBRARY_ALL_ARCHS) {
-		return true
-	}
-	return false
-}
-
-func librariesCompatibleWithPlatform(libs []*libraries.Library, platform *cores.PlatformRelease, reorder bool) []*libraries.Library {
-	var compatibleLibraries []*libraries.Library
-	for _, library := range libs {
-		compatible, generic := libraryCompatibleWithPlatform(library, platform)
-		if compatible {
-			if !generic && len(compatibleLibraries) != 0 && libraryCompatibleWithAllPlatforms(compatibleLibraries[0]) && reorder == true {
-				//priority inversion
-				compatibleLibraries = append([]*libraries.Library{library}, compatibleLibraries...)
-			} else {
-				compatibleLibraries = append(compatibleLibraries, library)
-			}
-		}
-	}
-
-	return compatibleLibraries
-}
-
-func findBestLibraryWithHeader(header string, libs []*libraries.Library) *libraries.Library {
-	headerName := strings.Replace(header, filepath.Ext(header), constants.EMPTY_STRING, -1)
-
-	var library *libraries.Library
-	for _, headerName := range []string{headerName, strings.ToLower(headerName)} {
-		library = findLibWithName(headerName, libs)
-		if library != nil {
-			return library
-		}
-		library = findLibWithName(headerName+"-master", libs)
-		if library != nil {
-			return library
-		}
-		library = findLibWithNameStartingWith(headerName, libs)
-		if library != nil {
-			return library
-		}
-		library = findLibWithNameEndingWith(headerName, libs)
-		if library != nil {
-			return library
-		}
-		library = findLibWithNameContaining(headerName, libs)
-		if library != nil {
-			return library
-		}
-	}
-
-	return nil
-}
-
-func findLibWithName(name string, libraries []*libraries.Library) *libraries.Library {
-	for _, library := range libraries {
-		if simplifyName(library.Name) == simplifyName(name) {
-			return library
-		}
-	}
-	return nil
-}
-
-func findLibWithNameStartingWith(name string, libraries []*libraries.Library) *libraries.Library {
-	for _, library := range libraries {
-		if strings.HasPrefix(simplifyName(library.Name), simplifyName(name)) {
-			return library
-		}
-	}
-	return nil
-}
-
-func findLibWithNameEndingWith(name string, libraries []*libraries.Library) *libraries.Library {
-	for _, library := range libraries {
-		if strings.HasSuffix(simplifyName(library.Name), simplifyName(name)) {
-			return library
-		}
-	}
-	return nil
-}
-
-func findLibWithNameContaining(name string, libraries []*libraries.Library) *libraries.Library {
-	for _, library := range libraries {
-		if strings.Contains(simplifyName(library.Name), simplifyName(name)) {
-			return library
-		}
-	}
-	return nil
-}
-
-func simplifyName(name string) string {
-	return strings.ToLower(strings.Replace(name, "_", " ", -1))
 }

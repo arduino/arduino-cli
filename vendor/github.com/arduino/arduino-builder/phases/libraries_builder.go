@@ -71,7 +71,7 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	return nil
 }
 
-func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libs []*libraries.Library) error {
+func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libs libraries.List) error {
 
 	for _, library := range libs {
 		if library.Precompiled {
@@ -96,7 +96,7 @@ func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libs []*libraries.Libr
 	return nil
 }
 
-func compileLibraries(ctx *types.Context, libraries []*libraries.Library, buildPath *paths.Path, buildProperties properties.Map, includes []string) (paths.PathList, error) {
+func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *paths.Path, buildProperties properties.Map, includes []string) (paths.PathList, error) {
 	objectFiles := paths.NewPathList()
 	for _, library := range libraries {
 		libraryObjectFiles, err := compileLibrary(ctx, library, buildPath, buildProperties, includes)
