@@ -39,13 +39,15 @@ import (
 )
 
 type yamlConfig struct {
-	ProxyType         string           `yaml:"proxy_type"`
-	ProxyManualConfig *yamlProxyConfig `yaml:"manual_configs,omitempty"`
-	SketchbookPath    string           `yaml:"sketchbook_path,omitempty"`
-	ArduinoDataFolder string           `yaml:"arduino_data,omitempty"`
-	BoardsManager     *struct {
-		AdditionalURLS []string `yaml:"additional_urls,omitempty"`
-	} `yaml:"board_manager"`
+	ProxyType         string                   `yaml:"proxy_type"`
+	ProxyManualConfig *yamlProxyConfig         `yaml:"manual_configs,omitempty"`
+	SketchbookPath    string                   `yaml:"sketchbook_path,omitempty"`
+	ArduinoDataFolder string                   `yaml:"arduino_data,omitempty"`
+	BoardsManager     *yamlBoardsManagerConfig `yaml:"board_manager"`
+}
+
+type yamlBoardsManagerConfig struct {
+	AdditionalURLS []string `yaml:"additional_urls,omitempty"`
 }
 
 type yamlProxyConfig struct {
@@ -114,7 +116,7 @@ func SerializeToYAML() ([]byte, error) {
 		}
 	}
 	if len(BoardManagerAdditionalUrls) > 1 {
-		c.BoardsManager.AdditionalURLS = []string{}
+		c.BoardsManager = &yamlBoardsManagerConfig{AdditionalURLS: []string{}}
 		for _, URL := range BoardManagerAdditionalUrls[1:] {
 			c.BoardsManager.AdditionalURLS = append(c.BoardsManager.AdditionalURLS, URL.String())
 		}
