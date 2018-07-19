@@ -36,6 +36,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/arduino/go-properties-map"
 	"github.com/sirupsen/logrus"
 )
@@ -134,6 +136,19 @@ func proxyConfigsFromIDEPrefs(props properties.Map) error {
 		break
 	default:
 		return errors.New("Unsupported proxy config")
+	}
+	return nil
+}
+
+// IDEBundledLibrariesDir returns the libraries directory bundled in
+// the Arduino IDE. If there is no Arduino IDE or the directory doesn't
+// exists then nil is returned
+func IDEBundledLibrariesDir() *paths.Path {
+	if IsBundledInDesktopIDE() {
+		libDir := paths.New(*arduinoIDEDirectory, "libraries")
+		if isDir, _ := libDir.IsDir(); isDir {
+			return libDir
+		}
 	}
 	return nil
 }

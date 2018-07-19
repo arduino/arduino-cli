@@ -81,13 +81,35 @@ func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
 
 func getLibraryManager() *librariesmanager.LibrariesManager {
 	logrus.Info("Starting libraries manager")
+	pm := commands.InitPackageManager()
+	if err := pm.LoadHardware(); err != nil {
+		formatter.PrintError(err, "Error loading hardware packages")
+		os.Exit(commands.ErrCoreConfig)
+	}
 	lm := librariesmanager.NewLibraryManager()
+
+	// Add IDE builtin libraries dir
+	if bundledLibsDir := configs.IDEBundledLibrariesDir(); bundledLibsDir != nil {
+		lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
+	}
+
+	// Add sketchbook libraries dir
 	if libHome, err := configs.LibrariesFolder.Get(); err != nil {
 		formatter.PrintError(err, "Cannot get libraries folder.")
 		os.Exit(commands.ErrCoreConfig)
 	} else {
-		lm.AddLibrariesDir(libraries.Sketchbook, paths.New(libHome))
+		lm.AddLibrariesDir(paths.New(libHome), libraries.Sketchbook)
 	}
+
+	// Add libraries dirs from installed platforms
+	for _, targetPackage := range pm.GetPackages().Packages {
+		for _, platform := range targetPackage.Platforms {
+			if platformRelease := platform.GetInstalled(); platformRelease != nil {
+				lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
+			}
+		}
+	}
+
 	if err := lm.LoadIndex(); err != nil {
 		logrus.WithError(err).Warn("Error during libraries index loading, try to download it again")
 		updateIndex()

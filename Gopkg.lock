@@ -15,7 +15,7 @@
     "types",
     "utils"
   ]
-  revision = "22a1e71c1f968a6e6c184b3ae26699197678ed15"
+  revision = "1901f83ecfb87d3c3ba741f9cd71dd856406403c"
   source = "github.com/bcmi-labs/arduino-builder"
 
 [[projects]]

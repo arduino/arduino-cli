@@ -33,7 +33,9 @@ import (
 	"fmt"
 
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/sirupsen/logrus"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/pmylund/sortutil"
@@ -50,8 +52,9 @@ type LibrariesManager struct {
 
 // LibrariesDir is a directory containing libraries
 type LibrariesDir struct {
-	Path     *paths.Path
-	Location libraries.LibraryLocation
+	Path            *paths.Path
+	Location        libraries.LibraryLocation
+	PlatformRelease *cores.PlatformRelease
 }
 
 // LibraryAlternatives is a list of different versions of the same library
@@ -101,21 +104,41 @@ func (sc *LibrariesManager) LoadIndex() error {
 	return err
 }
 
-// AddLibrariesDir adds allPaths to the list of directories
+// AddLibrariesDir adds path to the list of directories
 // to scan when searching for libraries. If a path is already
 // in the list it is ignored.
-func (sc *LibrariesManager) AddLibrariesDir(location libraries.LibraryLocation, allPaths ...*paths.Path) {
-	for _, path := range allPaths {
-		for _, dir := range sc.LibrariesDir {
-			if dir.Path.EquivalentTo(path) {
-				return
-			}
+func (sc *LibrariesManager) AddLibrariesDir(path *paths.Path, location libraries.LibraryLocation) {
+	for _, dir := range sc.LibrariesDir {
+		if dir.Path.EquivalentTo(path) {
+			return
 		}
-		sc.LibrariesDir = append(sc.LibrariesDir, &LibrariesDir{
-			Path:     path,
-			Location: location,
-		})
 	}
+	logrus.WithField("dir", path).WithField("location", location.String()).Info("Adding libraries dir")
+	sc.LibrariesDir = append(sc.LibrariesDir, &LibrariesDir{
+		Path:     path,
+		Location: location,
+	})
+}
+
+// AddPlatformReleaseLibrariesDir add the libraries folder in the
+// specified PlatformRelease to the list of directories to scan when
+// searching for libraries.
+func (sc *LibrariesManager) AddPlatformReleaseLibrariesDir(plaftormRelease *cores.PlatformRelease, location libraries.LibraryLocation) {
+	path := plaftormRelease.GetLibrariesDir()
+	if path == nil {
+		return
+	}
+	for _, dir := range sc.LibrariesDir {
+		if dir.Path.EquivalentTo(path) {
+			return
+		}
+	}
+	logrus.WithField("dir", path).WithField("location", location.String()).Info("Adding libraries dir")
+	sc.LibrariesDir = append(sc.LibrariesDir, &LibrariesDir{
+		Path:            path,
+		Location:        location,
+		PlatformRelease: plaftormRelease,
+	})
 }
 
 // RescanLibraries reload all installed libraries in the system.
@@ -142,6 +165,7 @@ func (sc *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) err
 		if err != nil {
 			return fmt.Errorf("loading library from %s: %s", subFolder, err)
 		}
+		library.ContainerPlatform = librariesDir.PlatformRelease
 		alternatives, ok := sc.Libraries[library.Name]
 		if !ok {
 			alternatives = &LibraryAlternatives{}

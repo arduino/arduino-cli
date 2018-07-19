@@ -33,6 +33,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/go-paths-helper"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 )
 
 var MandatoryProperties = []string{"name", "version", "author", "maintainer"}
@@ -63,19 +64,20 @@ type Library struct {
 
 	Types []string `json:"types,omitempty"`
 
-	Folder        *paths.Path
-	SrcFolder     *paths.Path
-	UtilityFolder *paths.Path
-	Location      LibraryLocation
-	Layout        LibraryLayout
-	RealName      string
-	DotALinkage   bool
-	Precompiled   bool
-	LDflags       string
-	IsLegacy      bool
-	Version       string
-	License       string
-	Properties    map[string]string
+	Folder            *paths.Path
+	SrcFolder         *paths.Path
+	UtilityFolder     *paths.Path
+	Location          LibraryLocation
+	ContainerPlatform *cores.PlatformRelease `json:""`
+	Layout            LibraryLayout
+	RealName          string
+	DotALinkage       bool
+	Precompiled       bool
+	LDflags           string
+	IsLegacy          bool
+	Version           string
+	License           string
+	Properties        map[string]string
 }
 
 func (library *Library) String() string {

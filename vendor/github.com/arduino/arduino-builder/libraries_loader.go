@@ -50,7 +50,9 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	if err := builtInLibrariesFolders.ToAbs(); err != nil {
 		return i18n.WrapError(err)
 	}
-	lm.AddLibrariesDir(libraries.IDEBuiltIn, builtInLibrariesFolders...)
+	for _, folder := range builtInLibrariesFolders {
+		lm.AddLibrariesDir(folder, libraries.IDEBuiltIn)
+	}
 
 	debugLevel := ctx.DebugLevel
 	logger := ctx.GetLogger()
@@ -58,19 +60,17 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	actualPlatform := ctx.ActualPlatform
 	platform := ctx.TargetPlatform
 	if actualPlatform != platform {
-		if dir := actualPlatform.GetLibrariesDir(); dir != nil {
-			lm.AddLibrariesDir(libraries.ReferencedPlatformBuiltIn, dir)
-		}
+		lm.AddPlatformReleaseLibrariesDir(actualPlatform, libraries.ReferencedPlatformBuiltIn)
 	}
-	if dir := platform.GetLibrariesDir(); dir != nil {
-		lm.AddLibrariesDir(libraries.PlatformBuiltIn, dir)
-	}
+	lm.AddPlatformReleaseLibrariesDir(platform, libraries.PlatformBuiltIn)
 
 	librariesFolders := ctx.OtherLibrariesFolders
 	if err := librariesFolders.ToAbs(); err != nil {
 		return i18n.WrapError(err)
 	}
-	lm.AddLibrariesDir(libraries.Sketchbook, librariesFolders...)
+	for _, folder := range librariesFolders {
+		lm.AddLibrariesDir(folder, libraries.Sketchbook)
+	}
 
 	if err := lm.RescanLibraries(); err != nil {
 		return i18n.WrapError(err)

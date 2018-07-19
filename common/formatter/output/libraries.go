@@ -55,11 +55,23 @@ func (il InstalledLibraries) String() string {
 	table.MaxColWidth = 100
 	table.Wrap = true
 
-	table.AddRow("Name", "Installed") //, "Latest")
+	table.AddRow("Name", "Installed", "Location")
 	sort.Sort(il)
+	lastName := ""
 	for _, lib := range il.Libraries {
 		for _, libAlt := range lib.Alternatives {
-			table.AddRow(libAlt.Name, libAlt.Version) //, item.)
+			name := libAlt.Name
+			if name == lastName {
+				name = ` "`
+			} else {
+				lastName = name
+			}
+
+			location := libAlt.Location.String()
+			if libAlt.ContainerPlatform != nil {
+				location = libAlt.ContainerPlatform.String()
+			}
+			table.AddRow(name, libAlt.Version, location)
 		}
 	}
 	return fmt.Sprintln(table)
