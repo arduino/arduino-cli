@@ -121,7 +121,79 @@ We can finally chek if the board is now recognized as a MKR1000
 Great! Now the Board FQBN (Fully Qualified Board Name) and the Board Name look good, we are ready to compile and upload the sketch
 
 ### Step 5. Compile the sketch
-To compile the sketch we have to 
+To compile the sketch we have to run the `compile` command with the proper FQBN we just got in the previous command.
+
+    arduino-cli compile --fqbn arduino:samd:mkr1000 Arduino/MyFirstSketch
+    Sketch uses 9600 bytes (3%) of program storage space. Maximum is 262144 bytes.
+
+### Step 6. Upload your sketch
+We can finally upload the sketch and see our board blinking, we now have to specify the serial port used by our board other than the FQBN:
+
+    $ arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:samd:mkr1000 Arduino/MyFirstSketch
+    No new serial port detected.
+    Atmel SMART device 0x10010005 found
+    Device       : ATSAMD21G18A
+    Chip ID      : 10010005
+    Version      : v2.0 [Arduino:XYZ] Dec 20 2016 15:36:43
+    Address      : 8192
+    Pages        : 3968
+    Page Size    : 64 bytes
+    Total Size   : 248KB
+    Planes       : 1
+    Lock Regions : 16
+    Locked       : none
+    Security     : false
+    Boot Flash   : true
+    BOD          : true
+    BOR          : true
+    Arduino      : FAST_CHIP_ERASE
+    Arduino      : FAST_MULTI_PAGE_WRITE
+    Arduino      : CAN_CHECKSUM_MEMORY_BUFFER
+    Erase flash
+    done in 0.784 seconds
+
+    Write 9856 bytes to flash (154 pages)
+    [==============================] 100% (154/154 pages)
+    done in 0.069 seconds
+
+    Verify 9856 bytes of flash with checksum.
+    Verify successful
+    done in 0.009 seconds
+    CPU reset.
+
+### Step 7. Add libraries
+Now we can try to add a useful library to our sketch. We can at first look at the name of a library, our favourite one is the wifi101, here the command to get more info
+
+    $ arduino-cli lib search wifi101
+    Name: "WiFi101OTA"
+      Author:  Arduino
+      Maintainer:  Arduino <info@arduino.cc>
+      Sentence:  Update sketches to your board over WiFi
+      Paragraph:  Requires an SD card and SAMD board
+      Website:  http://www.arduino.cc/en/Reference/WiFi101OTA
+      Category:  Other
+      Architecture:  samd
+      Types:  Arduino
+      Versions:  [1.0.2, 1.0.0, 1.0.1]
+    Name: "WiFi101"
+      Author:  Arduino
+      Maintainer:  Arduino <info@arduino.cc>
+      Sentence:  Network driver for ATMEL WINC1500 module (used on Arduino/Genuino Wifi Shield 101 and MKR1000 boards)
+      Paragraph:  This library implements a network driver for devices based on the ATMEL WINC1500 wifi module
+      Website:  http://www.arduino.cc/en/Reference/WiFi101
+      Category:  Communication
+      Architecture:  *
+      Types:  Arduino
+      Versions:  [0.5.0, 0.6.0, 0.10.0, 0.11.0, 0.11.1, 0.11.2, 0.12.0, 0.15.2, 0.8.0, 0.9.0, 0.12.1, 0.14.1, 0.14.4, 0.14.5, 0.15.1, 0.7.0, 0.14.0, 0.14.2, 0.14.3, 0.9.1, 0.13.0, 0.15.0, 0.5.1]
+
+We are now ready to install it! Please be sure to use the full name of the lib as specified in the "Name:" section previously seen
+
+    $ arduino-cli lib install "WiFi101"
+    Downloading libraries...
+    WiFi101@0.15.2 downloaded                                                                                                                                                                                                                                                                            
+    Installed WiFi101@0.15.2
+
+## Inline Help
 
 `arduino-cli` is a container of commands, to see the full list just run:
 ```bash
