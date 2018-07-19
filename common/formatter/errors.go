@@ -36,29 +36,33 @@ import (
 
 // ErrorMessage represents an Error with an attached message.
 type ErrorMessage struct {
-	Message string
-	Error   error
+	Message  string
+	CausedBy error
 }
 
 // MarshalJSON allows to marshal this object as a JSON object.
 func (err ErrorMessage) MarshalJSON() ([]byte, error) {
 	type JSONErrorMessage struct {
 		Message string
-		Error   string
+		Cause   string
 	}
 
+	cause := ""
+	if err.CausedBy != nil {
+		cause = err.CausedBy.Error()
+	}
 	return json.Marshal(JSONErrorMessage{
 		Message: err.Message,
-		Error:   err.Error.Error(),
+		Cause:   cause,
 	})
 }
 
 // String returns a string representation of the Error.
 func (err ErrorMessage) String() string {
-	if err.Error == nil {
+	if err.CausedBy == nil {
 		return err.Message
 	}
-	return err.Message + " (" + err.Error.Error() + ")"
+	return err.Message + " (" + err.CausedBy.Error() + ")"
 }
 
 // PrintErrorMessage formats and prints info about an error message.
@@ -74,5 +78,5 @@ func PrintError(err error, msg string) {
 	if logger != nil {
 		logger.WithError(err).Error(msg)
 	}
-	Print(ErrorMessage{Error: err, Message: msg})
+	Print(ErrorMessage{CausedBy: err, Message: msg})
 }
