@@ -77,6 +77,9 @@ func (idx *Index) FindRelease(ref *Reference) *Release {
 	if library, exists := idx.Libraries[ref.Name]; !exists {
 		return nil
 	} else {
+		if ref.Version == "" {
+			return library.Latest
+		}
 		return library.Releases[ref.Version]
 	}
 }
