@@ -25,6 +25,104 @@ You may want to copy the executable into a directory which is in your `PATH` env
 
 ## Usage
 
+The goal of the Arduino CLI is to be used by either including it in Makefile or in any kind of script for the Command Line.
+The Arduino CLI aims to replace the majority of features the Arduino IDE has without the graphical UI.
+
+## Getting Started
+
+### Step 1. Create a new sketch
+The command will create a new empty sketch named MyFirstSketch in the default directory under $HOME/Arduino/
+
+    $ arduino-cli sketch new MyFirstSketch
+    Sketch created in: /home/luca/Arduino/MyFirstSketch
+
+    $ cat /home/luca/Arduino/MyFirstSketch/MyFirstSketch.ino 
+    void setup() {
+    }
+
+    void loop() {
+    }
+
+### Step 2. Modify your sketch
+Use your favourite file editor or IDE to modify the .ino file under: `$HOME/Arduino/MyFirstSketch/MyFirstSketch.ino`
+and change the file to look like this one:
+
+    void setup() {
+    pinMode(LED_BUILTIN, OUTPUT);
+    }
+    void loop() {
+      digitalWrite(LED_BUILTIN, HIGH);   
+      delay(1000);                       
+      digitalWrite(LED_BUILTIN, LOW);    
+      delay(1000);                  
+    }
+
+### Step 3. Connect the board to your PC
+Just connect the board to your PCs by using the USB cable. In this example we will use the MKR1000 board.
+
+    $ arduino-cli board list
+    FQBN    Port            ID              Board Name
+            /dev/ttyACM0    2341:804E       unknown
+
+the board has been discovered but we do not have the correct core to program it yet. Let's install it!
+
+### Step 4. Find and install the right core
+
+We have to look at the core available with the `core search` command. It will provide a list of available cores matching the name arduino
+
+    $ arduino-cli core search arduino
+    Searching for platforms matching 'arduino'
+
+    ID              Version Installed       Name                                        
+    Intel:arc32     2.0.2   No              Intel Curie Boards                          
+    arduino:avr     1.6.21  No              Arduino AVR Boards                          
+    arduino:nrf52   1.0.2   No              Arduino nRF52 Boards                        
+    arduino:sam     1.6.11  No              Arduino SAM Boards (32-bits ARM Cortex-M3)  
+    arduino:samd    1.6.18  No              Arduino SAMD Boards (32-bits ARM Cortex-M0+)
+    arduino:stm32f4 1.0.1   No              Arduino STM32F4 Boards                      
+    littleBits:avr  1.0.0   No              littleBits Arduino AVR Modules  
+
+The right one for the Arduino MKR1000 is arduino:samd, now we can install it
+
+    $ arduino-cli core install arduino:samd
+    Downloading tools...
+    arduino:arm-none-eabi-gcc@4.8.3-2014q1 downloaded          
+    arduino:bossac@1.7.0 downloaded
+    arduino:openocd@0.9.0-arduino6-static downloaded              
+    arduino:CMSIS@4.5.0 downloaded                   
+    arduino:CMSIS-Atmel@1.1.0 downloaded                    
+    arduino:arduinoOTA@1.2.0 downloaded                        
+    Downloading cores...
+    arduino:samd@1.6.18 downloaded                          
+    Installing tools...
+    Installing platforms...
+    Results:
+    arduino:samd@1.6.18 - Installed
+    arduino:arm-none-eabi-gcc@4.8.3-2014q1 - Already Installed
+    arduino:bossac@1.7.0 - Already Installed
+    arduino:openocd@0.9.0-arduino6-static - Already Installed
+    arduino:CMSIS@4.5.0 - Already Installed
+    arduino:CMSIS-Atmel@1.1.0 - Already Installed
+    arduino:arduinoOTA@1.2.0 - Already Installed
+
+Now verify we have installed the core properly by running
+
+    $ arduino-cli core list
+    ID              Installed       Latest  Name                                        
+    arduino:samd    1.6.18          1.6.18  Arduino SAMD Boards (32-bits ARM Cortex-M0+)
+
+
+We can finally chek if the board is now recognized as a MKR1000
+
+    $ arduino-cli board list
+    FQBN                    Port            ID              Board Name             
+    arduino:samd:mkr1000    /dev/ttyACM0    2341:804E       Arduino/Genuino MKR1000
+  
+Great! Now the Board FQBN (Fully Qualified Board Name) and the Board Name look good, we are ready to compile and upload the sketch
+
+### Step 5. Compile the sketch
+To compile the sketch we have to 
+
 `arduino-cli` is a container of commands, to see the full list just run:
 ```bash
 $ arduino-cli
