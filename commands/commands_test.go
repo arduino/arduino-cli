@@ -85,9 +85,7 @@ func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte)
 	defer func() {
 		output = redirect.GetOutput()
 		redirect.Close()
-		fmt.Println("OUTPUT:")
 		fmt.Print(string(output))
-		fmt.Println("<END_OF_OUTPUT")
 		fmt.Println()
 	}()
 
@@ -153,13 +151,16 @@ func TestLibDownload(t *testing.T) {
 	defer os.RemoveAll(tmp)
 	configs.ArduinoDataFolder.SetPath(tmp)
 
-	exitCode, d := executeWithArgs(t, "lib", "download", "inexistentLibrary", "--format", "json")
+	exitCode, d := executeWithArgs(t, "core", "update-index")
+	require.Zero(t, exitCode, "exit code")
+
+	exitCode, d = executeWithArgs(t, "lib", "download", "inexistentLibrary", "--format", "json")
 	require.NotZero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "library not found: inexistentLibrary")
+	require.Contains(t, string(d), "library inexistentLibrary not found")
 
 	exitCode, d = executeWithArgs(t, "lib", "download", "inexistentLibrary")
 	require.NotZero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "library not found: inexistentLibrary")
+	require.Contains(t, string(d), "library inexistentLibrary not found")
 
 	exitCode, d = executeWithArgs(t, "lib", "download", "Audio")
 	require.Zero(t, exitCode, "exit code")
@@ -168,7 +169,7 @@ func TestLibDownload(t *testing.T) {
 
 	exitCode, d = executeWithArgs(t, "lib", "download", "Audio@1.2.3-nonexistent")
 	require.NotZero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "version not found")
+	require.Contains(t, string(d), "not found")
 }
 
 func updateCoreIndex(t *testing.T) {
