@@ -2,7 +2,6 @@ package board
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
@@ -38,11 +37,6 @@ var listFlags struct {
 // (either via serial or network ports).
 func runListCommand(cmd *cobra.Command, args []string) {
 	pm := commands.InitPackageManager()
-
-	if err := pm.LoadHardware(); err != nil {
-		formatter.PrintError(err, "Error loading hardware files.")
-		os.Exit(commands.ErrCoreConfig)
-	}
 
 	monitor := discovery.New(time.Millisecond)
 	monitor.Start()

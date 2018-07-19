@@ -87,10 +87,6 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	}
 
 	pm := commands.InitPackageManager()
-	if err = pm.LoadHardware(); err != nil {
-		formatter.PrintError(err, "Error loading hardware packages.")
-		os.Exit(commands.ErrCoreConfig)
-	}
 
 	if fqbn != nil {
 		sketch.Metadata.CPU = sketches.MetadataCPU{

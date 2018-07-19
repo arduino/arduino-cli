@@ -73,6 +73,7 @@ var GlobalFlags struct {
 func InitPackageManager() *packagemanager.PackageManager {
 	logrus.Info("Loading the default Package index")
 	pm := packagemanager.NewPackageManager()
+
 	for _, URL := range configs.BoardManagerAdditionalUrls {
 		if err := pm.LoadPackageIndex(URL); err != nil {
 			formatter.PrintError(err, "Failed to load "+URL.String()+" package index.\n"+
@@ -87,6 +88,12 @@ func InitPackageManager() *packagemanager.PackageManager {
 		// since there is an underlying singleton
 		pm.RegisterEventHandler(&CLIPackageManagerEventHandler{})
 	}
+
+	if err := pm.LoadHardware(); err != nil {
+		formatter.PrintError(err, "Error loading hardware packages.")
+		os.Exit(ErrCoreConfig)
+	}
+
 	return pm
 }
 

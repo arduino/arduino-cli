@@ -82,10 +82,6 @@ func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
 func getLibraryManager() *librariesmanager.LibrariesManager {
 	logrus.Info("Starting libraries manager")
 	pm := commands.InitPackageManager()
-	if err := pm.LoadHardware(); err != nil {
-		formatter.PrintError(err, "Error loading hardware packages")
-		os.Exit(commands.ErrCoreConfig)
-	}
 	lm := librariesmanager.NewLibraryManager()
 
 	// Add IDE builtin libraries dir

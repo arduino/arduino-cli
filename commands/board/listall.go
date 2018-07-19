@@ -1,7 +1,6 @@
 package board
 
 import (
-	"os"
 	"sort"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
@@ -27,11 +26,6 @@ func initListAllCommand() *cobra.Command {
 // runListAllCommand list all installed boards
 func runListAllCommand(cmd *cobra.Command, args []string) {
 	pm := commands.InitPackageManager()
-
-	if err := pm.LoadHardware(); err != nil {
-		formatter.PrintError(err, "Error loading hardware files.")
-		os.Exit(commands.ErrCoreConfig)
-	}
 
 	list := &output.BoardList{}
 	for _, targetPackage := range pm.GetPackages().Packages {

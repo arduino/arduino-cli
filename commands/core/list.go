@@ -30,8 +30,6 @@
 package core
 
 import (
-	"os"
-
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
@@ -56,10 +54,6 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core list`")
 
 	pm := commands.InitPackageManager()
-	if err := pm.LoadHardware(); err != nil {
-		formatter.PrintError(err, "Error loading hardware packages")
-		os.Exit(commands.ErrCoreConfig)
-	}
 
 	res := output.InstalledPlatformReleases{}
 	for _, targetPackage := range pm.GetPackages().Packages {

@@ -115,10 +115,6 @@ func run(cmd *cobra.Command, args []string) {
 	coreName := fqbnParts[1]
 
 	pm := commands.InitPackageManager()
-	if err := pm.LoadHardware(); err != nil {
-		formatter.PrintError(err, "Could not load hardware packages.")
-		os.Exit(commands.ErrCoreConfig)
-	}
 
 	// Check for ctags tool
 	loadBuiltinCtagsMetadata(pm)

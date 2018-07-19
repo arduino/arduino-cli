@@ -105,10 +105,6 @@ func run(command *cobra.Command, args []string) {
 	}
 
 	pm := commands.InitPackageManager()
-	if err := pm.LoadHardware(); err != nil {
-		fmt.Printf("Error loading hardware: %s", err)
-		os.Exit(commands.ErrCoreConfig)
-	}
 
 	// Find target board
 	board, err := pm.FindBoardWithFQBN(fqbn)

@@ -30,7 +30,6 @@
 package core
 
 import (
-	"os"
 	"regexp"
 	"strings"
 
@@ -54,10 +53,6 @@ func initSearchCommand() *cobra.Command {
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	pm := commands.InitPackageManager()
-	if err := pm.LoadHardware(); err != nil {
-		formatter.PrintError(err, "Error loading hardware packages")
-		os.Exit(commands.ErrCoreConfig)
-	}
 
 	search := strings.ToLower(strings.Join(args, " "))
 	formatter.Print("Searching for platforms matching '" + search + "'")
