@@ -138,6 +138,14 @@ func InitLibraryManager(pm *packagemanager.PackageManager) *librariesmanager.Lib
 		formatter.PrintError(err, "Error loading libraries index")
 		os.Exit(ErrGeneric)
 	}
+
+	// Scan for libraries
+	if err := lm.RescanLibraries(); err != nil {
+		logrus.WithError(err).Error("Error during libraries rescan")
+		formatter.PrintError(err, "Error during libraries rescan")
+		os.Exit(ErrGeneric)
+	}
+
 	return lm
 }
 

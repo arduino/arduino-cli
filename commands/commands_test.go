@@ -36,6 +36,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/bcmi-labs/arduino-cli/commands/root"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bouk/monkey"
@@ -144,12 +146,17 @@ func TestLibSearch(t *testing.T) {
 	require.Equal(t, "", string(output))
 }
 
-func TestLibDownload(t *testing.T) {
+func TestLibDownloadAndInstall(t *testing.T) {
 	// Set staging folder to a temporary folder
-	tmp, err := ioutil.TempDir(os.TempDir(), "test")
+	tmp, err := paths.MkTempDir("", "test")
 	require.NoError(t, err, "making temporary staging dir")
-	defer os.RemoveAll(tmp)
-	configs.ArduinoDataFolder.SetPath(tmp)
+	defer tmp.RemoveAll()
+	configs.ArduinoDataFolder.SetPath(tmp.String())
+
+	tmpSketchbook, err := paths.MkTempDir("", "test")
+	require.NoError(t, err, "making temporary staging dir")
+	defer tmpSketchbook.RemoveAll()
+	configs.ArduinoHomeFolder.SetPath(tmpSketchbook.String())
 
 	exitCode, d := executeWithArgs(t, "core", "update-index")
 	require.Zero(t, exitCode, "exit code")
@@ -170,6 +177,15 @@ func TestLibDownload(t *testing.T) {
 	exitCode, d = executeWithArgs(t, "lib", "download", "Audio@1.2.3-nonexistent")
 	require.NotZero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "not found")
+
+	exitCode, d = executeWithArgs(t, "lib", "install", "Audio")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Audio@")
+	require.Contains(t, string(d), "Installed")
+
+	exitCode, d = executeWithArgs(t, "lib", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Audio")
 }
 
 func updateCoreIndex(t *testing.T) {
