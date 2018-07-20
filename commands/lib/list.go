@@ -30,6 +30,7 @@
 package lib
 
 import (
+	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
@@ -49,11 +50,19 @@ func initListCommand() *cobra.Command {
 		Args: cobra.NoArgs,
 		Run:  runListCommand,
 	}
+	listCommand.Flags().BoolVar(&listFlags.all, "all", false, "Include built-in libraries (from platforms and IDE) in listing.")
 	return listCommand
 }
 
+var listFlags struct {
+	all bool
+}
+
 func runListCommand(cmd *cobra.Command, args []string) {
-	pm := commands.InitPackageManager()
+	var pm *packagemanager.PackageManager
+	if listFlags.all {
+		pm = commands.InitPackageManager()
+	}
 	lm := commands.InitLibraryManager(pm)
 
 	res := output.InstalledLibraries{}
