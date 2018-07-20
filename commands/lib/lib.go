@@ -31,7 +31,6 @@ package lib
 
 import (
 	"os"
-	"strings"
 
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/commands"
@@ -40,7 +39,6 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -62,21 +60,6 @@ func InitCommand() *cobra.Command {
 	libCommand.AddCommand(initUninstallCommand())
 	libCommand.AddCommand(initUpdateIndexCommand())
 	return libCommand
-}
-
-func resultFromFileName(file os.FileInfo, libs *output.LibProcessResults) {
-	fileName := file.Name()
-	//replacing underscore in foldernames with spaces.
-	fileName = strings.Replace(fileName, "_", " ", -1)
-	fileName = strings.Replace(fileName, "-", " v. ", -1)
-	//I use folder name
-	logrus.WithField("Name", fileName).Warn("Using filename to get result")
-	// FIXME: Should use GetLibraryCode but we don't have a damn library here -.-'
-	libs.Libraries[fileName] = output.ProcessResult{
-		ItemName: fileName,
-		Status:   "",
-		Error:    "Unknown Version",
-	}
 }
 
 func getLibraryManager() *librariesmanager.LibrariesManager {
