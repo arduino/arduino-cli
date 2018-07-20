@@ -47,8 +47,8 @@ func IndexPath() pathutils.Path {
 	return configs.IndexPath("library_index.json")
 }
 
-// DownloadLibrariesFile downloads the libraries index file from Arduino repository.
-func DownloadLibrariesFile() (*grab.Response, error) {
+// UpdateIndex downloads the libraries index file from Arduino repository.
+func UpdateIndex() (*grab.Response, error) {
 	path, err := IndexPath().Get()
 	if err != nil {
 		return nil, fmt.Errorf("getting library_index.json path: %s", err)

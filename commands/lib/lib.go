@@ -30,16 +30,6 @@
 package lib
 
 import (
-	"os"
-
-	paths "github.com/arduino/go-paths-helper"
-	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/configs"
-
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -60,43 +50,4 @@ func InitCommand() *cobra.Command {
 	libCommand.AddCommand(initUninstallCommand())
 	libCommand.AddCommand(initUpdateIndexCommand())
 	return libCommand
-}
-
-func getLibraryManager() *librariesmanager.LibrariesManager {
-	logrus.Info("Starting libraries manager")
-	pm := commands.InitPackageManager()
-	lm := librariesmanager.NewLibraryManager()
-
-	// Add IDE builtin libraries dir
-	if bundledLibsDir := configs.IDEBundledLibrariesDir(); bundledLibsDir != nil {
-		lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
-	}
-
-	// Add sketchbook libraries dir
-	if libHome, err := configs.LibrariesFolder.Get(); err != nil {
-		formatter.PrintError(err, "Cannot get libraries folder.")
-		os.Exit(commands.ErrCoreConfig)
-	} else {
-		lm.AddLibrariesDir(paths.New(libHome), libraries.Sketchbook)
-	}
-
-	// Add libraries dirs from installed platforms
-	for _, targetPackage := range pm.GetPackages().Packages {
-		for _, platform := range targetPackage.Platforms {
-			if platformRelease := platform.GetInstalled(); platformRelease != nil {
-				lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
-			}
-		}
-	}
-
-	if err := lm.LoadIndex(); err != nil {
-		logrus.WithError(err).Warn("Error during libraries index loading, try to download it again")
-		updateIndex()
-	}
-	if err := lm.LoadIndex(); err != nil {
-		logrus.WithError(err).Error("Error during libraries index loading")
-		formatter.PrintError(err, "Error loading libraries index")
-		os.Exit(commands.ErrGeneric)
-	}
-	return lm
 }

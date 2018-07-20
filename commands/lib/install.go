@@ -57,7 +57,7 @@ func initInstallCommand() *cobra.Command {
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib install`")
 	logrus.Info("Getting Libraries status context")
-	lm := getLibraryManager()
+	lm := commands.InitLibraryManager(nil)
 
 	refs := librariesindex.ParseArgs(args)
 

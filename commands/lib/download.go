@@ -57,7 +57,7 @@ func initDownloadCommand() *cobra.Command {
 func runDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib download`")
 
-	lm := getLibraryManager()
+	lm := commands.InitLibraryManager(nil)
 
 	logrus.Info("Preparing download")
 	pairs := librariesindex.ParseArgs(args)

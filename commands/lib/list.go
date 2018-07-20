@@ -30,8 +30,6 @@
 package lib
 
 import (
-	"os"
-
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
@@ -55,11 +53,8 @@ func initListCommand() *cobra.Command {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
-	lm := getLibraryManager()
-	if err := lm.RescanLibraries(); err != nil {
-		formatter.PrintError(err, "Error loading libraries.")
-		os.Exit(commands.ErrCoreConfig)
-	}
+	pm := commands.InitPackageManager()
+	lm := commands.InitLibraryManager(pm)
 
 	res := output.InstalledLibraries{}
 	for _, lib := range lm.Libraries {

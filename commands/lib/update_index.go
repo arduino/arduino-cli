@@ -30,41 +30,19 @@
 package lib
 
 import (
-	"os"
-
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 func initUpdateIndexCommand() *cobra.Command {
-	updateIndexCommand := &cobra.Command{
+	return &cobra.Command{
 		Use:     "update-index",
 		Short:   "Updates the libraries index.",
 		Long:    "Updates the libraries index to the latest version.",
 		Example: "arduino lib update-index",
 		Args:    cobra.NoArgs,
-		Run:     runUpdateIndexCommand,
-	}
-	return updateIndexCommand
-}
-
-func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Updating index")
-	updateIndex()
-}
-
-func updateIndex() {
-	resp, err := librariesmanager.DownloadLibrariesFile()
-	if err != nil {
-		formatter.PrintError(err, "Error downloading librarires index")
-		os.Exit(commands.ErrNetwork)
-	}
-	formatter.DownloadProgressBar(resp, "Updating index: library_index.json")
-	if resp.Err() != nil {
-		formatter.PrintError(resp.Err(), "Error downloading librarires index")
-		os.Exit(commands.ErrNetwork)
+		Run: func(cmd *cobra.Command, args []string) {
+			commands.UpdateLibrariesIndex()
+		},
 	}
 }

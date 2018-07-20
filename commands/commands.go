@@ -35,6 +35,8 @@ import (
 
 	"github.com/arduino/go-paths-helper"
 
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/bcmi-labs/arduino-cli/arduino/sketches"
 	"github.com/bcmi-labs/arduino-cli/configs"
 	sk "github.com/bcmi-labs/arduino-modules/sketches"
@@ -95,6 +97,63 @@ func InitPackageManager() *packagemanager.PackageManager {
 	}
 
 	return pm
+}
+
+// InitLibraryManager initialize the LibraryManager using the underlying packagemanager
+func InitLibraryManager(pm *packagemanager.PackageManager) *librariesmanager.LibrariesManager {
+	logrus.Info("Starting libraries manager")
+	lm := librariesmanager.NewLibraryManager()
+
+	// Add IDE builtin libraries dir
+	if bundledLibsDir := configs.IDEBundledLibrariesDir(); bundledLibsDir != nil {
+		lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
+	}
+
+	// Add sketchbook libraries dir
+	if libHome, err := configs.LibrariesFolder.Get(); err != nil {
+		formatter.PrintError(err, "Cannot get libraries folder.")
+		os.Exit(ErrCoreConfig)
+	} else {
+		lm.AddLibrariesDir(paths.New(libHome), libraries.Sketchbook)
+	}
+
+	// Add libraries dirs from installed platforms
+	if pm != nil {
+		for _, targetPackage := range pm.GetPackages().Packages {
+			for _, platform := range targetPackage.Platforms {
+				if platformRelease := platform.GetInstalled(); platformRelease != nil {
+					lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
+				}
+			}
+		}
+	}
+
+	// Auto-update index if needed
+	if err := lm.LoadIndex(); err != nil {
+		logrus.WithError(err).Warn("Error during libraries index loading, trying to auto-update index")
+		UpdateLibrariesIndex()
+	}
+	if err := lm.LoadIndex(); err != nil {
+		logrus.WithError(err).Error("Error during libraries index loading")
+		formatter.PrintError(err, "Error loading libraries index")
+		os.Exit(ErrGeneric)
+	}
+	return lm
+}
+
+// UpdateLibrariesIndex updates the library_index.json
+func UpdateLibrariesIndex() {
+	logrus.Info("Updating libraries index")
+	resp, err := librariesmanager.UpdateIndex()
+	if err != nil {
+		formatter.PrintError(err, "Error downloading librarires index")
+		os.Exit(ErrNetwork)
+	}
+	formatter.DownloadProgressBar(resp, "Updating index: library_index.json")
+	if resp.Err() != nil {
+		formatter.PrintError(resp.Err(), "Error downloading librarires index")
+		os.Exit(ErrNetwork)
+	}
 }
 
 func InitSketch(sketchPath *paths.Path) (*sk.Sketch, error) {
