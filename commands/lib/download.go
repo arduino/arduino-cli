@@ -75,8 +75,7 @@ func downloadLibraries(lm *librariesmanager.LibrariesManager, refs []*librariesi
 		}
 	}
 
-	logrus.Info("Downloading")
-	formatter.Print("Downloading libraries...")
+	logrus.Info("Downloading libraries")
 	for _, libRelease := range libsReleaseToDownload {
 		resp, err := libRelease.Resource.Download()
 		if err != nil {
