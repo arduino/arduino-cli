@@ -186,6 +186,11 @@ func TestLibDownloadAndInstall(t *testing.T) {
 	exitCode, d = executeWithArgs(t, "lib", "list")
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "Audio")
+
+	exitCode, d = executeWithArgs(t, "lib", "install", "Audio")
+	require.NotZero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Audio@")
+	require.Contains(t, string(d), "already installed")
 }
 
 func updateCoreIndex(t *testing.T) {

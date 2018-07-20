@@ -30,7 +30,6 @@
 package librariesmanager
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -43,35 +42,25 @@ import (
 )
 
 // Install installs a library and returns the installed path.
-func Install(library *librariesindex.Release) (string, error) {
-	if library == nil {
-		return "", errors.New("Not existing version of the library")
-	}
-
-	/*
-		installedRelease, err := library.InstalledRelease()
-		if err != nil {
-			return err
-		}
-		if installedRelease != nil {
-			//if installedRelease.Version != library.Latest().Version {
-			err := removeRelease(library.Name, installedRelease)
-			if err != nil {
-				return err
+func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release) (string, error) {
+	if installedLibs, have := lm.Libraries[indexLibrary.Library.Name]; have {
+		for _, installedLib := range installedLibs.Alternatives {
+			if installedLib.Location != libraries.Sketchbook {
+				continue
 			}
-			//} else {
-			//	return nil // Already installed and latest version.
-			//}
+			if installedLib.Version == indexLibrary.Version {
+				return installedLib.Folder.String(), fmt.Errorf("%s is already installed", indexLibrary.String())
+			}
 		}
-	*/
+	}
 
 	libsFolder, err := configs.LibrariesFolder.Get()
 	if err != nil {
 		return "", fmt.Errorf("getting libraries directory: %s", err)
 	}
 
-	libPath := filepath.Join(libsFolder, utils.SanitizeName(library.Library.Name))
-	return libPath, library.Resource.Install(libsFolder, libPath)
+	libPath := filepath.Join(libsFolder, utils.SanitizeName(indexLibrary.Library.Name))
+	return libPath, indexLibrary.Resource.Install(libsFolder, libPath)
 }
 
 func removeRelease(libName string, r *libraries.Library) error {

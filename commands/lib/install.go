@@ -75,11 +75,9 @@ func installLibraries(lm *librariesmanager.LibrariesManager, refs []*librariesin
 	}
 
 	for _, libRelease := range libReleasesToInstall {
-		// FIXME: the library is installed again even if it's already installed
-
 		logrus.WithField("library", libRelease).Info("Installing library")
 
-		if _, err := librariesmanager.Install(libRelease); err != nil {
+		if _, err := lm.Install(libRelease); err != nil {
 			logrus.WithError(err).Warn("Error installing library ", libRelease)
 			formatter.PrintError(err, "Error installing library: "+libRelease.String())
 			os.Exit(commands.ErrGeneric)
