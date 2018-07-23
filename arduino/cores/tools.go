@@ -33,7 +33,6 @@ import (
 	"fmt"
 	"regexp"
 	"runtime"
-	"strings"
 
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
@@ -156,13 +155,6 @@ func (tr *ToolRelease) RuntimeProperties() properties.Map {
 }
 
 var (
-	// Raspberry PI, BBB or other ARM based host
-	// PI: "arm-linux-gnueabihf"
-	// Arch-linux on PI2: "armv7l-unknown-linux-gnueabihf"
-	// Raspbian on PI2: "arm-linux-gnueabihf"
-	// Ubuntu Mate on PI2: "arm-linux-gnueabihf"
-	// Debian 7.9 on BBB: "arm-linux-gnueabihf"
-	// Raspbian on PI Zero: "arm-linux-gnueabihf"
 	regexpArmLinux = regexp.MustCompile("arm.*-linux-gnueabihf")
 	regexpAmd64    = regexp.MustCompile("x86_64-.*linux-gnu")
 	regexpi386     = regexp.MustCompile("i[3456]86-.*linux-gnu")
@@ -173,33 +165,31 @@ var (
 )
 
 func (f *Flavour) isCompatibleWithCurrentMachine() bool {
-	osName := runtime.GOOS
-	osArch := runtime.GOARCH
+	return f.isCompatibleWith(runtime.GOOS, runtime.GOARCH)
+}
 
+func (f *Flavour) isCompatibleWith(osName, osArch string) bool {
 	if f.OS == "all" {
 		return true
 	}
 
-	if strings.Contains(osName, "linux") {
-		if osArch == "arm" {
-			return regexpArmLinux.MatchString(f.OS)
-		} else if strings.Contains(osArch, "amd64") {
-			return regexpAmd64.MatchString(f.OS)
-		} else {
-			return regexpi386.MatchString(f.OS)
-		}
-	} else if strings.Contains(osName, "windows") {
+	switch osName + "," + osArch {
+	case "linux,arm", "linux,armbe":
+		return regexpArmLinux.MatchString(f.OS)
+	case "linux,amd64":
+		return regexpAmd64.MatchString(f.OS)
+	case "linux,i386":
+		return regexpi386.MatchString(f.OS)
+	case "windows,i386", "windows,amd64":
 		return regexpWindows.MatchString(f.OS)
-	} else if strings.Contains(osName, "darwin") {
-		if strings.Contains(osArch, "x84_64") {
-			return regexpMac64Bit.MatchString(f.OS)
-		}
+	case "darwin,amd64":
+		return regexpmac32Bit.MatchString(f.OS) || regexpMac64Bit.MatchString(f.OS)
+	case "darwin,i386":
 		return regexpmac32Bit.MatchString(f.OS)
-	} else if strings.Contains(osName, "freebsd") {
-		if osArch == "arm" {
-			return regexpArmBSD.MatchString(f.OS)
-		}
-		genericFreeBSDexp := regexp.MustCompile(fmt.Sprintf("%s-freebsd[0-9]*", osArch))
+	case "freebsd,arm":
+		return regexpArmBSD.MatchString(f.OS)
+	case "freebsd,i386", "freebsd,amd64":
+		genericFreeBSDexp := regexp.MustCompile(osArch + "%s-freebsd[0-9]*")
 		return genericFreeBSDexp.MatchString(f.OS)
 	}
 	return false
