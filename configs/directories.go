@@ -52,11 +52,8 @@ var ArduinoDataFolder = pathutils.NewPath("Arduino Data", getDefaultArduinoDataF
 // SketchbookFolder represents the current root of the sketchbooks tree (defaulted to `$HOME/Arduino`).
 var SketchbookFolder = pathutils.NewPath("Sketchbook", getDefaultSketchbookFolder, true)
 
-// TODO: Remove either ArduinoHomeFolder or SketchbookFolder
-var ArduinoHomeFolder = SketchbookFolder
-
 // LibrariesFolder is the default folder of downloaded libraries.
-var LibrariesFolder = pathutils.NewSubPath("libraries", ArduinoHomeFolder, "libraries", true)
+var LibrariesFolder = pathutils.NewSubPath("libraries", SketchbookFolder, "libraries", true)
 
 // PackagesFolder is the default folder of downloaded packages.
 var PackagesFolder = pathutils.NewSubPath("packages", ArduinoDataFolder, "packages", true)

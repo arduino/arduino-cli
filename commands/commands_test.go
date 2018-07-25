@@ -156,7 +156,7 @@ func TestLibDownloadAndInstall(t *testing.T) {
 	tmpSketchbook, err := paths.MkTempDir("", "test")
 	require.NoError(t, err, "making temporary staging dir")
 	defer tmpSketchbook.RemoveAll()
-	configs.ArduinoHomeFolder.SetPath(tmpSketchbook.String())
+	configs.SketchbookFolder.SetPath(tmpSketchbook.String())
 
 	exitCode, d := executeWithArgs(t, "core", "update-index")
 	require.Zero(t, exitCode, "exit code")

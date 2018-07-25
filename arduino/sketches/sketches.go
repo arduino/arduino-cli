@@ -53,7 +53,7 @@ type BoardMetadata struct {
 
 // NewSketchFromCurrentSketchbook loads a sketch from the sketchbook
 func NewSketchFromCurrentSketchbook(name string) (*sketches.Sketch, error) {
-	sketchbookLocation, err := configs.ArduinoHomeFolder.Get()
+	sketchbookLocation, err := configs.SketchbookFolder.Get()
 	if err != nil {
 		return nil, err
 	}

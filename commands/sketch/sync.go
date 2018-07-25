@@ -80,7 +80,7 @@ var syncFlags struct {
 func runSyncCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino sketch sync`")
 
-	sketchbook, err := configs.ArduinoHomeFolder.Get()
+	sketchbook, err := configs.SketchbookFolder.Get()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get sketchbook folder.")
 		os.Exit(commands.ErrCoreConfig)
