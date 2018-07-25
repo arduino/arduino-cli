@@ -45,6 +45,5 @@ func (p *Path) UnmarshalJSON(b []byte) error {
 		return err
 	}
 	(*p).path = s
-	(*p).cachedFileInfo = nil
 	return nil
 }
