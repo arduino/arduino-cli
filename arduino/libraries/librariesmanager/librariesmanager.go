@@ -74,12 +74,6 @@ func (alts *LibraryAlternatives) Add(library *libraries.Library) {
 	alts.Alternatives = append(alts.Alternatives, library)
 }
 
-// Select returns the library with the highest priority between the alternatives
-func (alts *LibraryAlternatives) Select() *libraries.Library {
-	// TODO
-	return alts.Alternatives[len(alts.Alternatives)-1]
-}
-
 // Names returns an array with all the names of the installed libraries.
 func (sc LibrariesManager) Names() []string {
 	res := make([]string, len(sc.Libraries))
