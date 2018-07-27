@@ -32,6 +32,8 @@ package librariesmanager
 import (
 	"fmt"
 
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
+
 	"github.com/arduino/go-paths-helper"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
@@ -41,6 +43,7 @@ import (
 
 // Install installs a library and returns the installed path.
 func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release) (*paths.Path, error) {
+	var replaced *libraries.Library
 	if installedLibs, have := lm.Libraries[indexLibrary.Library.Name]; have {
 		for _, installedLib := range installedLibs.Alternatives {
 			if installedLib.Location != libraries.Sketchbook {
@@ -49,6 +52,7 @@ func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release) (*path
 			if installedLib.Version == indexLibrary.Version {
 				return installedLib.Folder, fmt.Errorf("%s is already installed", indexLibrary.String())
 			}
+			replaced = installedLib
 		}
 	}
 
@@ -58,6 +62,11 @@ func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release) (*path
 	}
 
 	libPath := libsDir.Join(utils.SanitizeName(indexLibrary.Library.Name))
+	if replaced != nil && replaced.Folder.EquivalentTo(libPath) {
+		formatter.Print(fmt.Sprintf("Replacing %s with %s", replaced, indexLibrary))
+	} else if isdir, _ := libPath.IsDir(); isdir {
+		return nil, fmt.Errorf("destination dir %s already exists, cannot install", libPath)
+	}
 	return libPath, indexLibrary.Resource.Install(lm.DownloadsDir, libsDir, libPath)
 }
 

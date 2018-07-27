@@ -81,7 +81,10 @@ type Library struct {
 }
 
 func (library *Library) String() string {
-	return library.Name // + " : " + library.SrcFolder.String()
+	if library.Version == "" {
+		return library.Name
+	}
+	return library.Name + "@" + library.Version
 }
 
 // SupportsAnyArchitectureIn returns true if any of the following is true:
