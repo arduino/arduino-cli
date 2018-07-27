@@ -173,6 +173,9 @@ func (sc *LibrariesManager) getSketchbookLibrariesDir() *paths.Path {
 // nil if the directory doesn't exists.
 func (sc *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) error {
 	subFolders, err := librariesDir.Path.ReadDir()
+	if os.IsNotExist(err) {
+		return nil
+	}
 	if err != nil {
 		return fmt.Errorf("reading dir %s: %s", librariesDir.Path, err)
 	}
