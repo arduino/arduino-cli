@@ -33,12 +33,14 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"path"
 	"strings"
+
+	"github.com/arduino/go-paths-helper"
 
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packageindex"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/sirupsen/logrus"
 )
 
@@ -50,6 +52,11 @@ import (
 type PackageManager struct {
 	Log      logrus.FieldLogger
 	packages *cores.Packages
+
+	IndexDir    *paths.Path
+	PackagesDir *paths.Path
+	DownloadDir *paths.Path
+	TempDir     *paths.Path
 
 	// TODO: This might be a list in the future, but would it be of any help?
 	eventHandler EventHandler
@@ -64,10 +71,14 @@ type EventHandler interface {
 }
 
 // NewPackageManager returns a new instance of the PackageManager
-func NewPackageManager() *PackageManager {
+func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) *PackageManager {
 	return &PackageManager{
-		Log:      logrus.StandardLogger(),
-		packages: cores.NewPackages(),
+		Log:         logrus.StandardLogger(),
+		packages:    cores.NewPackages(),
+		IndexDir:    indexDir,
+		PackagesDir: packagesDir,
+		DownloadDir: downloadDir,
+		TempDir:     tempDir,
 	}
 }
 
@@ -225,11 +236,7 @@ func (pm *PackageManager) GetEventHandlers() []*EventHandler {
 
 // LoadPackageIndex loads a package index by looking up the local cached file from the specified URL
 func (pm *PackageManager) LoadPackageIndex(URL *url.URL) error {
-	indexPath, err := configs.IndexPathFromURL(URL).Get()
-	if err != nil {
-		return fmt.Errorf("retrieving json index path for %s: %s", URL, err)
-	}
-
+	indexPath := pm.IndexDir.Join(path.Base(URL.Path))
 	index, err := packageindex.LoadIndex(indexPath)
 	if err != nil {
 		return fmt.Errorf("loading json index file %s: %s", indexPath, err)

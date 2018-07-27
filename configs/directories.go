@@ -27,118 +27,71 @@
  * Copyright 2017-2018 ARDUINO AG (http://www.arduino.cc/)
  */
 
-// Package configs contains all CLI configurations handling.
 package configs
 
 import (
 	"fmt"
-	"net/url"
 	"os"
 	"os/user"
-	"path"
-	"path/filepath"
 	"runtime"
 
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/arduino/go-win32-utils"
-	"github.com/bcmi-labs/arduino-cli/pathutils"
 )
-
-// ConfigFilePath represents the default location of the config file (same directory as executable).
-var ConfigFilePath = getDefaultConfigFilePath()
-
-// ArduinoDataFolder represents the current root of the arduino tree (defaulted to `$HOME/.arduino15` on linux).
-var ArduinoDataFolder = pathutils.NewPath("Arduino Data", getDefaultArduinoDataFolder, true)
-
-// SketchbookFolder represents the current root of the sketchbooks tree (defaulted to `$HOME/Arduino`).
-var SketchbookFolder = pathutils.NewPath("Sketchbook", getDefaultSketchbookFolder, true)
-
-// LibrariesFolder is the default folder of downloaded libraries.
-var LibrariesFolder = pathutils.NewSubPath("libraries", SketchbookFolder, "libraries", true)
-
-// PackagesFolder is the default folder of downloaded packages.
-var PackagesFolder = pathutils.NewSubPath("packages", ArduinoDataFolder, "packages", true)
-
-// CoresFolder gets the default folder of downloaded cores.
-func CoresFolder(packageName string) pathutils.Path {
-	// TODO: wrong, this is not the correct location of the cores (in Java IDE)
-	return pathutils.NewSubPath("cores", PackagesFolder, filepath.Join(packageName, "hardware"), true)
-}
-
-// ToolsFolder gets the default folder of downloaded packages.
-func ToolsFolder(packageName string) pathutils.Path {
-	return pathutils.NewSubPath("tools", PackagesFolder, filepath.Join(packageName, "tools"), true)
-}
-
-// DownloadCacheFolder gets a generic cache folder for downloads.
-func DownloadCacheFolder(item string) pathutils.Path {
-	return pathutils.NewSubPath("zip archives cache", ArduinoDataFolder, filepath.Join("staging", item), true)
-}
-
-// IndexPath returns the path of the specified index file.
-func IndexPath(fileName string) pathutils.Path {
-	return pathutils.NewSubPath(fileName, ArduinoDataFolder, fileName, false)
-}
-
-// IndexPathFromURL returns the path of the index file corresponding to the specified URL
-func IndexPathFromURL(URL *url.URL) pathutils.Path {
-	filename := path.Base(URL.Path)
-	return IndexPath(filename)
-}
 
 // getDefaultConfigFilePath returns the default path for .cli-config.yml,
 // this is the directory where the arduino-cli executable resides.
-func getDefaultConfigFilePath() string {
-	fileLocation, err := os.Executable()
+func getDefaultConfigFilePath() *paths.Path {
+	executablePath, err := os.Executable()
 	if err != nil {
-		fileLocation = "."
+		executablePath = "."
 	}
-	fileLocation = filepath.Dir(fileLocation)
-	fileLocation = filepath.Join(fileLocation, ".cli-config.yml")
-	return fileLocation
+	return paths.New(executablePath).Parent().Join(".cli-config.yml")
 }
 
-func getDefaultArduinoDataFolder() (string, error) {
+func getDefaultArduinoDataDir() (*paths.Path, error) {
 	usr, err := user.Current()
 	if err != nil {
-		return "", fmt.Errorf("retrieving home dir: %s", err)
+		return nil, fmt.Errorf("retrieving user home dir: %s", err)
 	}
-	arduinoDataFolder := usr.HomeDir
+	arduinoDataFolder := paths.New(usr.HomeDir)
 
 	switch runtime.GOOS {
 	case "linux":
-		arduinoDataFolder = filepath.Join(arduinoDataFolder, ".arduino15")
+		arduinoDataFolder = arduinoDataFolder.Join(".arduino15")
 	case "darwin":
-		arduinoDataFolder = filepath.Join(arduinoDataFolder, "Library", "arduino15")
+		arduinoDataFolder = arduinoDataFolder.Join("Library", "arduino15")
 	case "windows":
 		localAppDataPath, err := win32.GetLocalAppDataFolder()
 		if err != nil {
-			return "", fmt.Errorf("getting LocalAppData path: %s", err)
+			return nil, fmt.Errorf("getting LocalAppData path: %s", err)
 		}
-		arduinoDataFolder = filepath.Join(localAppDataPath, "Arduino15")
+		arduinoDataFolder = paths.New(localAppDataPath).Join("Arduino15")
 	default:
-		return "", fmt.Errorf("unsupported OS: %s", runtime.GOOS)
+		return nil, fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
 	return arduinoDataFolder, nil
 }
 
-func getDefaultSketchbookFolder() (string, error) {
+func getDefaultSketchbookDir() (*paths.Path, error) {
 	usr, err := user.Current()
 	if err != nil {
-		return "", fmt.Errorf("retrieving home dir: %s", err)
+		return nil, fmt.Errorf("retrieving home dir: %s", err)
 	}
 
 	switch runtime.GOOS {
 	case "linux":
-		return filepath.Join(usr.HomeDir, "Arduino"), nil
+		return paths.New(usr.HomeDir).Join("Arduino"), nil
 	case "darwin":
-		return filepath.Join(usr.HomeDir, "Documents", "Arduino"), nil
+		return paths.New(usr.HomeDir).Join("Documents", "Arduino"), nil
 	case "windows":
 		documentsPath, err := win32.GetDocumentsFolder()
 		if err != nil {
-			return "", fmt.Errorf("getting Documents path: %s", err)
+			return nil, fmt.Errorf("getting Documents path: %s", err)
 		}
-		return filepath.Join(documentsPath, "Arduino"), nil
+		return paths.New(documentsPath).Join("Arduino"), nil
 	default:
-		return "", fmt.Errorf("unsupported OS: %s", runtime.GOOS)
+		return nil, fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
 }

@@ -30,13 +30,15 @@
 package sketches
 
 import (
-	"path/filepath"
-
 	"github.com/arduino/go-paths-helper"
 
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-modules/sketches"
 )
+
+// SketchBook is a sketchbook
+type SketchBook struct {
+	Path *paths.Path
+}
 
 // Sketch is a sketch for Arduino
 type Sketch struct {
@@ -51,14 +53,17 @@ type BoardMetadata struct {
 	Name string `json:"name,required"`
 }
 
-// NewSketchFromCurrentSketchbook loads a sketch from the sketchbook
-func NewSketchFromCurrentSketchbook(name string) (*sketches.Sketch, error) {
-	sketchbookLocation, err := configs.SketchbookFolder.Get()
-	if err != nil {
-		return nil, err
+// NewSketchBook returns a new SketchBook object
+func NewSketchBook(path *paths.Path) *SketchBook {
+	return &SketchBook{
+		Path: path,
 	}
+}
+
+// NewSketch loads a sketch from the sketchbook
+func (sketchbook *SketchBook) NewSketch(name string) (*sketches.Sketch, error) {
 	sketch := sketches.Sketch{
-		FullPath: filepath.Join(sketchbookLocation, name),
+		FullPath: sketchbook.Path.Join(name).String(),
 		Name:     name,
 	}
 	sketch.ImportMetadata()

@@ -43,7 +43,7 @@ import (
 type LibrariesLoader struct{}
 
 func (s *LibrariesLoader) Run(ctx *types.Context) error {
-	lm := librariesmanager.NewLibraryManager()
+	lm := librariesmanager.NewLibraryManager(nil, nil)
 	ctx.LibrariesManager = lm
 
 	builtInLibrariesFolders := ctx.BuiltInLibrariesFolders

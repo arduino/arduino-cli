@@ -34,6 +34,7 @@ import (
 	"io/ioutil"
 	"net/url"
 
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -57,9 +58,9 @@ type yamlProxyConfig struct {
 }
 
 // LoadFromYAML loads the configs from a yaml file.
-func LoadFromYAML(path string) error {
+func (config *Configuration) LoadFromYAML(path *paths.Path) error {
 	logrus.Info("Unserializing configurations from ", path)
-	content, err := ioutil.ReadFile(path)
+	content, err := path.ReadFile()
 	if err != nil {
 		logrus.WithError(err).Warn("Error reading config, using default configuration")
 		return err
@@ -72,10 +73,10 @@ func LoadFromYAML(path string) error {
 	}
 
 	if ret.ArduinoDataFolder != "" {
-		ArduinoDataFolder.SetPath(ret.ArduinoDataFolder)
+		config.DataDir = paths.New(ret.ArduinoDataFolder)
 	}
 	if ret.SketchbookPath != "" {
-		SketchbookFolder.SetPath(ret.SketchbookPath)
+		config.SketchbookDir = paths.New(ret.SketchbookPath)
 	}
 	if ret.ProxyType != "" {
 		ProxyType = ret.ProxyType
@@ -99,13 +100,13 @@ func LoadFromYAML(path string) error {
 }
 
 // SerializeToYAML encodes the current configuration as YAML
-func SerializeToYAML() ([]byte, error) {
+func (config *Configuration) SerializeToYAML() ([]byte, error) {
 	c := &yamlConfig{}
-	if dir, err := SketchbookFolder.Get(); err == nil {
-		c.SketchbookPath = dir
+	if config.SketchbookDir != nil {
+		c.SketchbookPath = config.SketchbookDir.String()
 	}
-	if dir, err := ArduinoDataFolder.Get(); err == nil {
-		c.ArduinoDataFolder = dir
+	if config.DataDir != nil {
+		c.ArduinoDataFolder = config.DataDir.String()
 	}
 	c.ProxyType = ProxyType
 	if ProxyType == "manual" {
@@ -125,8 +126,8 @@ func SerializeToYAML() ([]byte, error) {
 }
 
 // SaveToYAML the current configuration to a YAML file
-func SaveToYAML(path string) error {
-	content, err := SerializeToYAML()
+func (config *Configuration) SaveToYAML(path string) error {
+	content, err := config.SerializeToYAML()
 	if err != nil {
 		return fmt.Errorf("econding configuration to YAML: %s", err)
 	}

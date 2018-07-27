@@ -80,14 +80,10 @@ func IsBundledInDesktopIDE() bool {
 }
 
 // LoadFromDesktopIDEPreferences loads the config from the Desktop IDE preferences.txt file
-func LoadFromDesktopIDEPreferences() error {
+func (config *Configuration) LoadFromDesktopIDEPreferences() error {
 	logrus.Info("Unserializing from IDE preferences")
-	dataDir, err := ArduinoDataFolder.Get()
-	if err != nil {
-		logrus.WithError(err).Warn("Error looking for IDE preferences")
-		return err
-	}
-	props, err := properties.Load(filepath.Join(dataDir, "preferences.txt"))
+	preferenceTxtPath := config.DataDir.Join("preferences.txt")
+	props, err := properties.LoadFromPath(preferenceTxtPath)
 	if err != nil {
 		logrus.WithError(err).Warn("Error during unserialize from IDE preferences")
 		return err
@@ -98,7 +94,7 @@ func LoadFromDesktopIDEPreferences() error {
 		return err
 	}
 	if dir, has := props["sketchbook.path"]; has {
-		SketchbookFolder.SetPath(dir)
+		config.SketchbookDir = paths.New(dir)
 	}
 	if URLs, has := props["boardsmanager.additional.urls"]; has {
 		for _, URL := range strings.Split(URLs, ",") {

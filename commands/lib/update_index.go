@@ -42,7 +42,8 @@ func initUpdateIndexCommand() *cobra.Command {
 		Example: "arduino lib update-index",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			commands.UpdateLibrariesIndex()
+			lm := commands.InitLibraryManager(nil)
+			commands.UpdateLibrariesIndex(lm)
 		},
 	}
 }

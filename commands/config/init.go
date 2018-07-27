@@ -34,7 +34,6 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -73,9 +72,9 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 
 	filepath := initFlags.location
 	if filepath == "" {
-		filepath = configs.ConfigFilePath
+		filepath = commands.Config.ConfigFile.String()
 	}
-	err := configs.SaveToYAML(filepath)
+	err := commands.Config.SaveToYAML(filepath)
 	if err != nil {
 		formatter.PrintError(err, "Cannot create config file.")
 		os.Exit(commands.ErrGeneric)

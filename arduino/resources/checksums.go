@@ -42,25 +42,12 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	paths "github.com/arduino/go-paths-helper"
 )
 
-// IsCached returns a bool representing if the release has already been downloaded
-func (r *DownloadResource) IsCached() (bool, error) {
-	archivePath, err := r.ArchivePath()
-	if err != nil {
-		return false, fmt.Errorf("getting archive path: %s", err)
-	}
-
-	_, err = os.Stat(archivePath)
-	if err != nil && !os.IsNotExist(err) {
-		return false, fmt.Errorf("checking archive existence: %s", err)
-	}
-
-	return !os.IsNotExist(err), nil
-}
-
 // TestLocalArchiveChecksum test if the checksum of the local archive match the checksum of the DownloadResource
-func (r *DownloadResource) TestLocalArchiveChecksum() (bool, error) {
+func (r *DownloadResource) TestLocalArchiveChecksum(downloadDir *paths.Path) (bool, error) {
 	split := strings.SplitN(r.Checksum, ":", 2)
 	if len(split) != 2 {
 		return false, fmt.Errorf("invalid checksum format: %s", r.Checksum)
@@ -83,12 +70,12 @@ func (r *DownloadResource) TestLocalArchiveChecksum() (bool, error) {
 		return false, fmt.Errorf("unsupported hash algorithm: %s", split[0])
 	}
 
-	filePath, err := r.ArchivePath()
+	filePath, err := r.ArchivePath(downloadDir)
 	if err != nil {
 		return false, fmt.Errorf("getting archive path: %s", err)
 	}
 
-	file, err := os.Open(filePath)
+	file, err := os.Open(filePath.String())
 	if err != nil {
 		return false, fmt.Errorf("opening archive file: %s", err)
 	}
@@ -100,12 +87,12 @@ func (r *DownloadResource) TestLocalArchiveChecksum() (bool, error) {
 }
 
 // TestLocalArchiveSize test if the local archive size match the DownloadResource size
-func (r *DownloadResource) TestLocalArchiveSize() (bool, error) {
-	filePath, err := r.ArchivePath()
+func (r *DownloadResource) TestLocalArchiveSize(downloadDir *paths.Path) (bool, error) {
+	filePath, err := r.ArchivePath(downloadDir)
 	if err != nil {
 		return false, fmt.Errorf("getting archive path: %s", err)
 	}
-	info, err := os.Stat(filePath)
+	info, err := filePath.Stat()
 	if err != nil {
 		return false, fmt.Errorf("getting archive info: %s", err)
 	}
@@ -113,20 +100,20 @@ func (r *DownloadResource) TestLocalArchiveSize() (bool, error) {
 }
 
 // TestLocalArchiveIntegrity checks for integrity of the local archive.
-func (r *DownloadResource) TestLocalArchiveIntegrity() (bool, error) {
-	if cached, err := r.IsCached(); err != nil {
+func (r *DownloadResource) TestLocalArchiveIntegrity(downloadDir *paths.Path) (bool, error) {
+	if cached, err := r.IsCached(downloadDir); err != nil {
 		return false, fmt.Errorf("testing if archive is cached: %s", err)
 	} else if !cached {
 		return false, nil
 	}
 
-	if ok, err := r.TestLocalArchiveSize(); err != nil {
+	if ok, err := r.TestLocalArchiveSize(downloadDir); err != nil {
 		return false, fmt.Errorf("teting archive size: %s", err)
 	} else if !ok {
 		return false, nil
 	}
 
-	ok, err := r.TestLocalArchiveChecksum()
+	ok, err := r.TestLocalArchiveChecksum(downloadDir)
 	if err != nil {
 		return false, fmt.Errorf("testing archive checksum: %s", err)
 	}

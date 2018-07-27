@@ -50,14 +50,24 @@ func (platform *PlatformReference) String() string {
 	return platform.Package + ":" + platform.PlatformArchitecture + "@" + platform.PlatformVersion
 }
 
-// FindPlatform returns the PlatformRelease matching the PlatformReference or nil if not found
-func (pm *PackageManager) FindPlatform(ref *PlatformReference) *cores.PlatformRelease {
+// FindPlatform returns the Platform matching the PlatformReference or nil if not found.
+// The PlatformVersion field of the reference is ignored.
+func (pm *PackageManager) FindPlatform(ref *PlatformReference) *cores.Platform {
 	targetPackage, ok := pm.GetPackages().Packages[ref.Package]
 	if !ok {
 		return nil
 	}
 	platform, ok := targetPackage.Platforms[ref.PlatformArchitecture]
 	if !ok {
+		return nil
+	}
+	return platform
+}
+
+// FindPlatformRelease returns the PlatformRelease matching the PlatformReference or nil if not found
+func (pm *PackageManager) FindPlatformRelease(ref *PlatformReference) *cores.PlatformRelease {
+	platform := pm.FindPlatform(ref)
+	if platform == nil {
 		return nil
 	}
 	platformRelease, ok := platform.Releases[ref.PlatformVersion]
@@ -128,13 +138,13 @@ func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease) (*grab.Re
 	if resource == nil {
 		return nil, fmt.Errorf("tool not available for your OS")
 	}
-	return resource.Download()
+	return resource.Download(pm.DownloadDir)
 }
 
 // DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
 // nil Response is returned.
 func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease) (*grab.Response, error) {
-	return platform.Resource.Download()
+	return platform.Resource.Download(pm.DownloadDir)
 }
 
 // FIXME: Make more generic and decouple the error print logic (that list should not exists;
@@ -149,7 +159,7 @@ func (pm *PackageManager) InstallToolReleases(toolReleases []*cores.ToolRelease,
 			WithField("Version", toolRelease.Version).
 			Info("Installing tool")
 
-		err := cores.InstallTool(toolRelease)
+		err := pm.InstallTool(toolRelease)
 		var processResult output.ProcessResult
 		if err != nil {
 			if os.IsExist(err) {
@@ -185,7 +195,7 @@ func (pm *PackageManager) InstallPlatformReleases(platformReleases []*cores.Plat
 			WithField("Version", platformRelease.Version).
 			Info("Installing platform")
 
-		err := cores.InstallPlatform(platformRelease)
+		err := pm.InstallPlatform(platformRelease)
 		var result output.ProcessResult
 		if err != nil {
 			if os.IsExist(err) {

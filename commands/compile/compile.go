@@ -36,6 +36,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
+
 	"github.com/arduino/go-paths-helper"
 
 	builder "github.com/arduino/arduino-builder"
@@ -139,7 +141,7 @@ func run(cmd *cobra.Command, args []string) {
 			os.Exit(commands.ErrCoreConfig)
 		}
 
-		if err := pm.LoadHardware(); err != nil {
+		if err := pm.LoadHardware(commands.Config); err != nil {
 			formatter.PrintError(err, "Could not load hardware packages.")
 			os.Exit(commands.ErrCoreConfig)
 		}
@@ -150,13 +152,12 @@ func run(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	isCoreInstalled, err := cores.IsCoreInstalled(packageName, coreName)
-	if err != nil {
-		formatter.PrintError(err, "Cannot check core installation.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-	if !isCoreInstalled {
-		formatter.PrintErrorMessage(fmt.Sprintf("\"%[1]s:%[2]s\" core is not installed, please install it by running \"arduino core install %[1]s:%[2]s\".", packageName, coreName))
+	targetPlatform := pm.FindPlatform(&packagemanager.PlatformReference{
+		Package:              packageName,
+		PlatformArchitecture: coreName,
+	})
+	if targetPlatform == nil || targetPlatform.GetInstalled() == nil {
+		formatter.PrintErrorMessage(fmt.Sprintf("\"%[1]s:%[2]s\" platform is not installed, please install it by running \"arduino core install %[1]s:%[2]s\".", packageName, coreName))
 		os.Exit(commands.ErrCoreConfig)
 	}
 
@@ -170,7 +171,7 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.SketchLocation = paths.New(sketch.FullPath)
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
-	if packagesFolder, err := configs.HardwareDirectories(); err == nil {
+	if packagesFolder, err := commands.Config.HardwareDirectories(); err == nil {
 		ctx.HardwareFolders = packagesFolder
 	} else {
 		formatter.PrintError(err, "Cannot get hardware directories.")
@@ -184,12 +185,8 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	librariesFolder, err := configs.LibrariesFolder.Get()
-	if err != nil {
-		formatter.PrintError(err, "Cannot get libraries folder.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-	ctx.OtherLibrariesFolders = paths.NewPathList(librariesFolder)
+	ctx.OtherLibrariesFolders = paths.NewPathList()
+	ctx.OtherLibrariesFolders.Add(commands.Config.LibrariesDir())
 
 	if flags.buildPath != "" {
 		ctx.BuildPath = paths.New(flags.buildPath)
@@ -228,13 +225,8 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.ArduinoAPIVersion = "10600"
 
 	// Check if Arduino IDE is installed and get it's libraries location.
-	dataFolder, err := configs.ArduinoDataFolder.Get()
-	if err != nil {
-		formatter.PrintError(err, "Cannot locate arduino data folder.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-
-	ideProperties, err := properties.Load(filepath.Join(dataFolder, "preferences.txt"))
+	preferencesTxt := commands.Config.DataDir.Join("preferences.txt")
+	ideProperties, err := properties.LoadFromPath(preferencesTxt)
 	if err == nil {
 		lastIdeSubProperties := ideProperties.SubTree("last").SubTree("ide")
 		// Preferences can contain records from previous IDE versions. Find the latest one.

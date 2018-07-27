@@ -31,7 +31,8 @@ package packageindex
 
 import (
 	"encoding/json"
-	"io/ioutil"
+
+	"github.com/arduino/go-paths-helper"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 
@@ -201,8 +202,8 @@ func (inToolRelease indexToolRelease) extractFlavours() []*cores.Flavour {
 }
 
 // LoadIndex reads a package_index.json from a file and returns the corresponding Index structure.
-func LoadIndex(jsonIndexPath string) (*Index, error) {
-	buff, err := ioutil.ReadFile(jsonIndexPath)
+func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
+	buff, err := jsonIndexFile.ReadFile()
 	if err != nil {
 		return nil, err
 	}

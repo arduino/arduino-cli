@@ -31,17 +31,19 @@ package configs
 
 import (
 	"os"
+
+	paths "github.com/arduino/go-paths-helper"
 )
 
 // LoadFromEnv read configurations from the environment variables
-func LoadFromEnv() {
+func (config *Configuration) LoadFromEnv() {
 	if p, has := os.LookupEnv("PROXY_TYPE"); has {
 		ProxyType = p
 	}
 	if dir, has := os.LookupEnv("ARDUINO_SKETCHBOOK_DIR"); has {
-		SketchbookFolder.SetPath(dir)
+		config.SketchbookDir = paths.New(dir)
 	}
 	if dir, has := os.LookupEnv("ARDUINO_DATA_DIR"); has {
-		ArduinoDataFolder.SetPath(dir)
+		config.DataDir = paths.New(dir)
 	}
 }

@@ -39,7 +39,6 @@ import (
 	"github.com/arduino/go-paths-helper"
 
 	"github.com/bcmi-labs/arduino-cli/commands/root"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bouk/monkey"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -117,9 +116,36 @@ func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte)
 	return
 }
 
+func makeTempDataDir(t *testing.T) func() {
+	tmp, err := paths.MkTempDir("", "test")
+	require.NoError(t, err, "making temporary staging dir")
+	os.Setenv("ARDUINO_DATA_DIR", tmp.String())
+	fmt.Printf("ARDUINO_DATA_DIR = %s\n", os.Getenv("ARDUINO_DATA_DIR"))
+	return func() {
+		os.Unsetenv("ARDUINO_DATA_DIR")
+		tmp.RemoveAll()
+		fmt.Printf("ARDUINO_DATA_DIR = %s\n", os.Getenv("ARDUINO_DATA_DIR"))
+	}
+}
+
+func makeTempSketchbookDir(t *testing.T) func() {
+	tmp, err := paths.MkTempDir("", "test")
+	require.NoError(t, err, "making temporary staging dir")
+	os.Setenv("ARDUINO_SKETCHBOOK_DIR", tmp.String())
+	fmt.Printf("ARDUINO_SKETCHBOOK_DIR = %s\n", os.Getenv("ARDUINO_DATA_DIR"))
+	return func() {
+		os.Unsetenv("ARDUINO_SKETCHBOOK_DIR")
+		tmp.RemoveAll()
+		fmt.Printf("ARDUINO_SKETCHBOOK_DIR = %s\n", os.Getenv("ARDUINO_DATA_DIR"))
+	}
+}
+
 // END -- Utility functions
 
 func TestLibSearch(t *testing.T) {
+	defer makeTempDataDir(t)()
+	defer makeTempSketchbookDir(t)()
+
 	exitCode, output := executeWithArgs(t, "lib", "search", "audiozer", "--format", "json")
 	require.Zero(t, exitCode, "process exit code")
 	var res struct {
@@ -147,16 +173,8 @@ func TestLibSearch(t *testing.T) {
 }
 
 func TestLibDownloadAndInstall(t *testing.T) {
-	// Set staging folder to a temporary folder
-	tmp, err := paths.MkTempDir("", "test")
-	require.NoError(t, err, "making temporary staging dir")
-	defer tmp.RemoveAll()
-	configs.ArduinoDataFolder.SetPath(tmp.String())
-
-	tmpSketchbook, err := paths.MkTempDir("", "test")
-	require.NoError(t, err, "making temporary staging dir")
-	defer tmpSketchbook.RemoveAll()
-	configs.SketchbookFolder.SetPath(tmpSketchbook.String())
+	defer makeTempDataDir(t)()
+	defer makeTempSketchbookDir(t)()
 
 	exitCode, d := executeWithArgs(t, "core", "update-index")
 	require.Zero(t, exitCode, "exit code")
@@ -205,11 +223,13 @@ func updateCoreIndex(t *testing.T) {
 }
 
 func TestCoreDownload(t *testing.T) {
+	defer makeTempDataDir(t)()
+	defer makeTempSketchbookDir(t)()
+
 	// Set staging folder to a temporary folder
 	tmp, err := ioutil.TempDir(os.TempDir(), "test")
 	require.NoError(t, err, "making temporary staging dir")
 	defer os.RemoveAll(tmp)
-	configs.ArduinoDataFolder.SetPath(tmp)
 
 	updateCoreIndex(t)
 

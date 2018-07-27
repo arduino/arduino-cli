@@ -38,7 +38,6 @@ import (
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -58,12 +57,8 @@ func InitCommand() *cobra.Command {
 
 func run(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino validate`")
-	packagesFolder, err := configs.PackagesFolder.Get()
-	if err != nil {
-		formatter.PrintError(err, "Cannot get packages folder.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-	err = filepath.Walk(packagesFolder, func(path string, info os.FileInfo, err error) error {
+	packagesFolder := commands.Config.PackagesDir().String()
+	err := filepath.Walk(packagesFolder, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}

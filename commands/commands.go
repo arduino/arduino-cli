@@ -70,11 +70,18 @@ var GlobalFlags struct {
 	Format string // The Output format (e.g. text, json).
 }
 
+var Config *configs.Configuration
+
 // InitPackageManager initializes the PackageManager
 // TODO: for the daemon mode, this might be called at startup, but for now only commands needing the PM will call it
 func InitPackageManager() *packagemanager.PackageManager {
 	logrus.Info("Loading the default Package index")
-	pm := packagemanager.NewPackageManager()
+
+	pm := packagemanager.NewPackageManager(
+		Config.IndexesDir(),
+		Config.PackagesDir(),
+		Config.DownloadsDir(),
+		Config.DataDir.Join("tmp"))
 
 	for _, URL := range configs.BoardManagerAdditionalUrls {
 		if err := pm.LoadPackageIndex(URL); err != nil {
@@ -91,7 +98,7 @@ func InitPackageManager() *packagemanager.PackageManager {
 		pm.RegisterEventHandler(&CLIPackageManagerEventHandler{})
 	}
 
-	if err := pm.LoadHardware(); err != nil {
+	if err := pm.LoadHardware(Config); err != nil {
 		formatter.PrintError(err, "Error loading hardware packages.")
 		os.Exit(ErrCoreConfig)
 	}
@@ -102,7 +109,9 @@ func InitPackageManager() *packagemanager.PackageManager {
 // InitLibraryManager initialize the LibraryManager using the underlying packagemanager
 func InitLibraryManager(pm *packagemanager.PackageManager) *librariesmanager.LibrariesManager {
 	logrus.Info("Starting libraries manager")
-	lm := librariesmanager.NewLibraryManager()
+	lm := librariesmanager.NewLibraryManager(
+		Config.IndexesDir(),
+		Config.DownloadsDir())
 
 	// Add IDE builtin libraries dir
 	if bundledLibsDir := configs.IDEBundledLibrariesDir(); bundledLibsDir != nil {
@@ -110,12 +119,7 @@ func InitLibraryManager(pm *packagemanager.PackageManager) *librariesmanager.Lib
 	}
 
 	// Add sketchbook libraries dir
-	if libHome, err := configs.LibrariesFolder.Get(); err != nil {
-		formatter.PrintError(err, "Cannot get libraries folder.")
-		os.Exit(ErrCoreConfig)
-	} else {
-		lm.AddLibrariesDir(paths.New(libHome), libraries.Sketchbook)
-	}
+	lm.AddLibrariesDir(Config.LibrariesDir(), libraries.Sketchbook)
 
 	// Add libraries dirs from installed platforms
 	if pm != nil {
@@ -131,7 +135,7 @@ func InitLibraryManager(pm *packagemanager.PackageManager) *librariesmanager.Lib
 	// Auto-update index if needed
 	if err := lm.LoadIndex(); err != nil {
 		logrus.WithError(err).Warn("Error during libraries index loading, trying to auto-update index")
-		UpdateLibrariesIndex()
+		UpdateLibrariesIndex(lm)
 	}
 	if err := lm.LoadIndex(); err != nil {
 		logrus.WithError(err).Error("Error during libraries index loading")
@@ -150,9 +154,9 @@ func InitLibraryManager(pm *packagemanager.PackageManager) *librariesmanager.Lib
 }
 
 // UpdateLibrariesIndex updates the library_index.json
-func UpdateLibrariesIndex() {
+func UpdateLibrariesIndex(lm *librariesmanager.LibrariesManager) {
 	logrus.Info("Updating libraries index")
-	resp, err := librariesmanager.UpdateIndex()
+	resp, err := lm.UpdateIndex()
 	if err != nil {
 		formatter.PrintError(err, "Error downloading librarires index")
 		os.Exit(ErrNetwork)

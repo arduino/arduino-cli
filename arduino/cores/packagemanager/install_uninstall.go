@@ -27,50 +27,34 @@
  * Copyright 2017 ARDUINO AG (http://www.arduino.cc/)
  */
 
-package cores
+package packagemanager
 
 import (
 	"fmt"
-	"path/filepath"
 
-	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 )
 
 // InstallPlatform installs a specific release of a platform.
-func InstallPlatform(platformRelease *PlatformRelease) error {
-	coreDir, err := configs.CoresFolder(platformRelease.Platform.Package.Name).Get()
-	if err != nil {
-		return fmt.Errorf("getting platforms dir: %s", err)
-	}
-
-	dataDir, err := configs.ArduinoDataFolder.Get()
-	if err != nil {
-		return fmt.Errorf("getting data dir: %s", err)
-	}
-
-	return platformRelease.Resource.Install(
-		filepath.Join(dataDir, "tmp"),
-		filepath.Join(coreDir, platformRelease.Platform.Architecture, platformRelease.Version))
+func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease) error {
+	destDir := pm.PackagesDir.Join(
+		platformRelease.Platform.Package.Name,
+		"hardware",
+		platformRelease.Platform.Architecture,
+		platformRelease.Version)
+	return platformRelease.Resource.Install(pm.DownloadDir, pm.TempDir, destDir)
 }
 
 // InstallTool installs a specific release of a tool.
-func InstallTool(toolRelease *ToolRelease) error {
+func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease) error {
 	toolResource := toolRelease.GetCompatibleFlavour()
 	if toolResource == nil {
 		return fmt.Errorf("no compatible version of %s tools found for the current os", toolRelease.Tool.Name)
 	}
-
-	toolDir, err := configs.ToolsFolder(toolRelease.Tool.Package.Name).Get()
-	if err != nil {
-		return fmt.Errorf("gettin tools dir: %s", err)
-	}
-
-	dataDir, err := configs.ArduinoDataFolder.Get()
-	if err != nil {
-		return fmt.Errorf("getting data dir: %s", err)
-	}
-
-	return toolResource.Install(
-		filepath.Join(dataDir, "tmp"),
-		filepath.Join(toolDir, toolRelease.Tool.Name, toolRelease.Version))
+	destDir := pm.PackagesDir.Join(
+		toolRelease.Tool.Package.Name,
+		"tools",
+		toolRelease.Tool.Name,
+		toolRelease.Version)
+	return toolResource.Install(pm.DownloadDir, pm.TempDir, destDir)
 }

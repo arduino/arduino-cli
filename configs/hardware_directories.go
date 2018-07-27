@@ -37,27 +37,24 @@ import (
 )
 
 // HardwareDirectories returns all paths that may contains hardware packages.
-func HardwareDirectories() (paths.PathList, error) {
+func (config *Configuration) HardwareDirectories() (paths.PathList, error) {
 	res := paths.PathList{}
-
-	if dir, err := PackagesFolder.Get(); err == nil {
-		res = append(res, paths.New(dir))
-	} else {
-		return nil, err
-	}
 
 	if IsBundledInDesktopIDE() {
 		bundledHardwareFolder := filepath.Join(*arduinoIDEDirectory, "hardware")
 		if info, err := os.Stat(bundledHardwareFolder); err == nil && info.IsDir() {
-			res = append(res, paths.New(bundledHardwareFolder))
+			res.Add(paths.New(bundledHardwareFolder))
 		}
 	}
 
-	if dir, err := SketchbookFolder.Get(); err == nil {
-		dir = filepath.Join(dir, "hardware")
-		if info, err := os.Stat(dir); err == nil && info.IsDir() {
-			res = append(res, paths.New(dir))
-		}
+	dir := config.PackagesDir()
+	if isdir, _ := dir.IsDir(); isdir {
+		res.Add(dir)
+	}
+
+	dir = config.SketchbookDir.Join("hardware")
+	if isdir, _ := dir.IsDir(); isdir {
+		res.Add(dir)
 	}
 
 	return res, nil

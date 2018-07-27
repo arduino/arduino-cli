@@ -77,7 +77,7 @@ func downloadLibraries(lm *librariesmanager.LibrariesManager, refs []*librariesi
 
 	logrus.Info("Downloading libraries")
 	for _, libRelease := range libsReleaseToDownload {
-		resp, err := libRelease.Resource.Download()
+		resp, err := libRelease.Resource.Download(lm.DownloadsDir)
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+libRelease.String())
 			os.Exit(commands.ErrNetwork)

@@ -32,9 +32,8 @@ package librariesindex
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 
-	"github.com/bcmi-labs/arduino-cli/pathutils"
+	"github.com/arduino/go-paths-helper"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 )
@@ -61,13 +60,8 @@ type indexRelease struct {
 }
 
 // LoadIndex reads a library_index.json and create the corresponding Index
-func LoadIndex(indexPath pathutils.Path) (*Index, error) {
-	libFile, err := indexPath.Get()
-	if err != nil {
-		return nil, fmt.Errorf("getting library_index.json path: %s", err)
-	}
-
-	buff, err := ioutil.ReadFile(libFile)
+func LoadIndex(indexFile *paths.Path) (*Index, error) {
+	buff, err := indexFile.ReadFile()
 	if err != nil {
 		return nil, fmt.Errorf("reading library_index.json: %s", err)
 	}

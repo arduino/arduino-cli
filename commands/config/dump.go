@@ -35,7 +35,6 @@ import (
 
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -59,7 +58,7 @@ var dumpFlags struct {
 func runDumpCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config dump`")
 
-	data, err := configs.SerializeToYAML()
+	data, err := commands.Config.SerializeToYAML()
 	if err != nil {
 		formatter.PrintError(err, "Error creating configuration")
 		os.Exit(commands.ErrGeneric)

@@ -30,13 +30,10 @@
 package sketch
 
 import (
-	"io/ioutil"
 	"os"
-	"path/filepath"
 
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/spf13/cobra"
 )
 
@@ -61,23 +58,17 @@ void loop() {
 `)
 
 func runNewCommand(cmd *cobra.Command, args []string) {
-	sketchbook, err := configs.SketchbookFolder.Get()
-	if err != nil {
-		formatter.PrintError(err, "Cannot get sketchbook folder.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-
-	sketchDir := filepath.Join(sketchbook, args[0])
-	if err := os.Mkdir(sketchDir, 0755); err != nil {
+	sketchDir := commands.Config.SketchbookDir.Join(args[0])
+	if err := sketchDir.Mkdir(); err != nil {
 		formatter.PrintError(err, "Could not create sketch folder.")
 		os.Exit(commands.ErrGeneric)
 	}
 
-	sketchFile := filepath.Join(sketchDir, args[0]+".ino")
-	if err := ioutil.WriteFile(sketchFile, emptySketch, 0644); err != nil {
+	sketchFile := sketchDir.Join(args[0] + ".ino")
+	if err := sketchFile.WriteFile(emptySketch); err != nil {
 		formatter.PrintError(err, "Error creating sketch.")
 		os.Exit(commands.ErrGeneric)
 	}
 
-	formatter.Print("Sketch created in: " + sketchDir)
+	formatter.Print("Sketch created in: " + sketchDir.String())
 }

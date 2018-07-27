@@ -33,7 +33,7 @@ import (
 	"io/ioutil"
 	"net/url"
 	"os"
-	"path/filepath"
+	"path"
 
 	"github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/commands"
@@ -66,13 +66,10 @@ func updateIndexes() {
 	}
 }
 
+// TODO: This should be in packagemanager......
 func updateIndex(URL *url.URL) {
 	logrus.WithField("url", URL).Print("Updating index")
-	coreIndexPath, err := configs.IndexPathFromURL(URL).Get()
-	if err != nil {
-		formatter.PrintError(err, "Error getting index path for "+URL.String())
-		os.Exit(commands.ErrGeneric)
-	}
+	coreIndexPath := commands.Config.IndexesDir().Join(path.Base(URL.Path))
 
 	tmpFile, err := ioutil.TempFile("", "")
 	if err != nil {
@@ -89,13 +86,13 @@ func updateIndex(URL *url.URL) {
 	}
 	client := grab.NewClient()
 	resp := client.Do(req)
-	formatter.DownloadProgressBar(resp, "Updating index: "+filepath.Base(coreIndexPath))
+	formatter.DownloadProgressBar(resp, "Updating index: "+coreIndexPath.Base())
 	if resp.Err() != nil {
 		formatter.PrintError(resp.Err(), "Error downloading index "+URL.String())
 		os.Exit(commands.ErrNetwork)
 	}
 
-	if err := paths.New(tmpFile.Name()).CopyTo(paths.New(coreIndexPath)); err != nil {
+	if err := paths.New(tmpFile.Name()).CopyTo(coreIndexPath); err != nil {
 		formatter.PrintError(err, "Error saving downloaded index "+URL.String())
 		os.Exit(commands.ErrGeneric)
 	}

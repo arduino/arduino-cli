@@ -31,45 +31,42 @@ package librariesmanager
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
+
+	"github.com/arduino/go-paths-helper"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/bcmi-labs/arduino-cli/arduino/utils"
-
-	"github.com/bcmi-labs/arduino-cli/configs"
 )
 
 // Install installs a library and returns the installed path.
-func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release) (string, error) {
+func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release) (*paths.Path, error) {
 	if installedLibs, have := lm.Libraries[indexLibrary.Library.Name]; have {
 		for _, installedLib := range installedLibs.Alternatives {
 			if installedLib.Location != libraries.Sketchbook {
 				continue
 			}
 			if installedLib.Version == indexLibrary.Version {
-				return installedLib.Folder.String(), fmt.Errorf("%s is already installed", indexLibrary.String())
+				return installedLib.Folder, fmt.Errorf("%s is already installed", indexLibrary.String())
 			}
 		}
 	}
 
-	libsFolder, err := configs.LibrariesFolder.Get()
-	if err != nil {
-		return "", fmt.Errorf("getting libraries directory: %s", err)
+	libsDir := lm.getSketchbookLibrariesDir()
+	if libsDir == nil {
+		return nil, fmt.Errorf("sketchbook folder not set")
 	}
 
-	libPath := filepath.Join(libsFolder, utils.SanitizeName(indexLibrary.Library.Name))
-	return libPath, indexLibrary.Resource.Install(libsFolder, libPath)
+	libPath := libsDir.Join(utils.SanitizeName(indexLibrary.Library.Name))
+	return libPath, indexLibrary.Resource.Install(lm.DownloadsDir, libsDir, libPath)
 }
 
-func removeRelease(libName string, r *libraries.Library) error {
-	libFolder, err := configs.LibrariesFolder.Get()
-	if err != nil {
-		return err
+func (lm *LibrariesManager) removeRelease(libName string, r *libraries.Library) error {
+	libsDir := lm.getSketchbookLibrariesDir()
+	if libsDir == nil {
+		return fmt.Errorf("sketchbook folder not set")
 	}
 
 	libName = utils.SanitizeName(libName)
-	path := filepath.Join(libFolder, libName)
-	return os.RemoveAll(path)
+	return libsDir.Join(libName).RemoveAll()
 }

@@ -33,27 +33,15 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/bcmi-labs/arduino-cli/pathutils"
-
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/cavaliercoder/grab"
 )
 
 // LibraryIndexURL is the URL where to get library index.
 var LibraryIndexURL, _ = url.Parse("http://downloads.arduino.cc/libraries/library_index.json")
 
-// IndexPath returns the path of the library_index.json file.
-func IndexPath() pathutils.Path {
-	return configs.IndexPath("library_index.json")
-}
-
 // UpdateIndex downloads the libraries index file from Arduino repository.
-func UpdateIndex() (*grab.Response, error) {
-	path, err := IndexPath().Get()
-	if err != nil {
-		return nil, fmt.Errorf("getting library_index.json path: %s", err)
-	}
-	req, err := grab.NewRequest(path, LibraryIndexURL.String())
+func (lm *LibrariesManager) UpdateIndex() (*grab.Response, error) {
+	req, err := grab.NewRequest(lm.IndexFile.String(), LibraryIndexURL.String())
 	req.NoResume = true
 	if err != nil {
 		return nil, fmt.Errorf("creating HTTP request: %s", err)

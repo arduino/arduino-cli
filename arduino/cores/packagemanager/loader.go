@@ -42,8 +42,8 @@ import (
 )
 
 // LoadHardware read all plaforms from the configured paths
-func (pm *PackageManager) LoadHardware() error {
-	dirs, err := configs.HardwareDirectories()
+func (pm *PackageManager) LoadHardware(config *configs.Configuration) error {
+	dirs, err := config.HardwareDirectories()
 	if err != nil {
 		return fmt.Errorf("getting hardware folder: %s", err)
 	}

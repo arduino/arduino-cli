@@ -33,6 +33,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/commands/board"
 	"github.com/bcmi-labs/arduino-cli/commands/compile"
@@ -63,7 +65,7 @@ func Init() *cobra.Command {
 	}
 	command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
 	command.PersistentFlags().StringVar(&commands.GlobalFlags.Format, "format", "text", "The output format, can be [text|json].")
-	command.PersistentFlags().StringVar(&configs.ConfigFilePath, "config-file", configs.ConfigFilePath, "The custom config file (if not specified ./.cli-config.yml will be used).")
+	command.PersistentFlags().StringVar(&yamlConfigFile, "config-file", "", "The custom config file (if not specified ./.cli-config.yml will be used).")
 	command.AddCommand(board.InitCommand())
 	command.AddCommand(compile.InitCommand())
 	command.AddCommand(config.InitCommand())
@@ -78,6 +80,8 @@ func Init() *cobra.Command {
 	command.AddCommand(version.InitCommand())
 	return command
 }
+
+var yamlConfigFile string
 
 func preRun(cmd *cobra.Command, args []string) {
 	// Reset logrus if debug flag changed.
@@ -109,20 +113,31 @@ func preRun(cmd *cobra.Command, args []string) {
 
 // initConfigs initializes the configuration from the specified file.
 func initConfigs() {
+	if conf, err := configs.NewConfiguration(); err != nil {
+		logrus.WithError(err).Error("Error creating default configuration")
+		formatter.PrintError(err, "Error creating default configuration")
+		os.Exit(commands.ErrGeneric)
+	} else {
+		commands.Config = conf
+	}
+
+	if yamlConfigFile != "" {
+		commands.Config.ConfigFile = paths.New(yamlConfigFile)
+	}
+
 	logrus.Info("Initiating configuration")
-	err := configs.LoadFromYAML(configs.ConfigFilePath)
-	if err != nil {
+	if err := commands.Config.LoadFromYAML(commands.Config.ConfigFile); err != nil {
 		logrus.WithError(err).Warn("Did not manage to get config file, using default configuration")
 	}
 	if configs.IsBundledInDesktopIDE() {
 		logrus.Info("CLI is bundled into the IDE")
-		err := configs.LoadFromDesktopIDEPreferences()
+		err := commands.Config.LoadFromDesktopIDEPreferences()
 		if err != nil {
 			logrus.WithError(err).Warn("Did not manage to get config file of IDE, using default configuration")
 		}
 	} else {
 		logrus.Info("CLI is not bundled into the IDE")
 	}
-	configs.LoadFromEnv()
+	commands.Config.LoadFromEnv()
 	logrus.Info("Configuration set")
 }

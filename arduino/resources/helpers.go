@@ -33,12 +33,37 @@ import (
 	"fmt"
 	"os"
 
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/cavaliercoder/grab"
 )
 
+// ArchivePath returns the path of the Archive of the specified DownloadResource relative
+// to the specified downloadDir
+func (r *DownloadResource) ArchivePath(downloadDir *paths.Path) (*paths.Path, error) {
+	staging := downloadDir.Join(r.CachePath)
+	if err := staging.MkdirAll(); err != nil {
+		return nil, err
+	}
+	return staging.Join(r.ArchiveFileName), nil
+}
+
+// IsCached returns true if the specified DownloadResource has already been downloaded
+func (r *DownloadResource) IsCached(downloadDir *paths.Path) (bool, error) {
+	archivePath, err := r.ArchivePath(downloadDir)
+	if err != nil {
+		return false, fmt.Errorf("getting archive path: %s", err)
+	}
+
+	if exist, err := archivePath.Exist(); err != nil {
+		return false, fmt.Errorf("checking archive existence: %s", err)
+	} else {
+		return exist, nil
+	}
+}
+
 // Download a DownloadResource.
-func (r *DownloadResource) Download() (*grab.Response, error) {
-	cached, err := r.TestLocalArchiveIntegrity()
+func (r *DownloadResource) Download(downloadDir *paths.Path) (*grab.Response, error) {
+	cached, err := r.TestLocalArchiveIntegrity(downloadDir)
 	if err != nil {
 		return nil, fmt.Errorf("testing local archive integrity: %s", err)
 	}
@@ -47,16 +72,16 @@ func (r *DownloadResource) Download() (*grab.Response, error) {
 		return nil, nil
 	}
 
-	path, err := r.ArchivePath()
+	path, err := r.ArchivePath(downloadDir)
 	if err != nil {
 		return nil, fmt.Errorf("getting archive path: %s", err)
 	}
 
-	if stats, err := os.Stat(path); os.IsNotExist(err) {
+	if stats, err := path.Stat(); os.IsNotExist(err) {
 		// normal download
 	} else if err == nil && stats.Size() > r.Size {
 		// file is bigger than expected, retry download...
-		if err := os.Remove(path); err != nil {
+		if err := path.Remove(); err != nil {
 			return nil, fmt.Errorf("removing corrupted archive file: %s", err)
 		}
 	} else if err == nil {
@@ -65,7 +90,7 @@ func (r *DownloadResource) Download() (*grab.Response, error) {
 		return nil, fmt.Errorf("getting archive file info: %s", err)
 	}
 
-	req, err := grab.NewRequest(path, r.URL)
+	req, err := grab.NewRequest(path.String(), r.URL)
 	if err != nil {
 		return nil, fmt.Errorf("creating HTTP request: %s", err)
 	}

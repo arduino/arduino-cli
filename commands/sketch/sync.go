@@ -40,11 +40,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/go-paths-helper"
+
 	"github.com/bcmi-labs/arduino-cli/auth"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/bcmi-labs/arduino-cli/create_client_helpers"
 	"github.com/bcmi-labs/arduino-modules/sketches"
 	"github.com/bgentry/go-netrc/netrc"
@@ -80,12 +81,7 @@ var syncFlags struct {
 func runSyncCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino sketch sync`")
 
-	sketchbook, err := configs.SketchbookFolder.Get()
-	if err != nil {
-		formatter.PrintError(err, "Cannot get sketchbook folder.")
-		os.Exit(commands.ErrCoreConfig)
-	}
-
+	sketchbook := commands.Config.SketchbookDir
 	isTextMode := formatter.IsCurrentFormat("text")
 
 	logrus.Info("Setting priority")
@@ -143,7 +139,7 @@ func runSyncCommand(cmd *cobra.Command, args []string) {
 	}
 
 	logrus.Info("Finding local sketches")
-	sketchMap := sketches.Find(sketchbook, "libraries") // Exclude libraries folder.
+	sketchMap := sketches.Find(sketchbook.String(), "libraries") // Exclude libraries folder.
 
 	logrus.Info("Finding online sketches")
 	client := createClient.New(nil)
@@ -287,7 +283,7 @@ func runSyncCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Done")
 }
 
-func pushSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) error {
+func pushSketch(sketch sketches.Sketch, sketchbook *paths.Path, bearerToken string) error {
 	client := createClient.New(nil)
 
 	resp, err := client.CreateSketches(context.Background(), createClient.CreateSketchesPath(), createClient.ConvertFrom(sketch), "Bearer "+bearerToken)
@@ -311,7 +307,7 @@ func pushSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) e
 	return nil
 }
 
-func editSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) error {
+func editSketch(sketch sketches.Sketch, sketchbook *paths.Path, bearerToken string) error {
 	client := createClient.New(nil)
 	resp, err := client.EditSketches(context.Background(), createClient.EditSketchesPath(sketch.ID), createClient.ConvertFrom(sketch), "Bearer "+bearerToken)
 	if err != nil {
@@ -334,7 +330,7 @@ func editSketch(sketch sketches.Sketch, sketchbook string, bearerToken string) e
 	return nil
 }
 
-func pullSketch(sketch *createClient.ArduinoCreateSketch, sketchbook string, bearerToken string) error {
+func pullSketch(sketch *createClient.ArduinoCreateSketch, sketchbook *paths.Path, bearerToken string) error {
 	client := createClient.New(nil)
 	bearer := "Bearer " + bearerToken
 
@@ -357,13 +353,13 @@ func pullSketch(sketch *createClient.ArduinoCreateSketch, sketchbook string, bea
 		return err
 	}
 
-	sketchFolder, err := ioutil.TempDir(sketchbook, fmt.Sprintf("%s-temp", *sketch.Name))
+	sketchFolder, err := sketchbook.MkTempDir(fmt.Sprintf("%s-temp", *sketch.Name))
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(sketchFolder)
+	defer sketchFolder.RemoveAll()
 
-	destFolder := filepath.Join(sketchbook, *sketch.Name)
+	destFolder := sketchbook.Join(*sketch.Name)
 
 	for _, file := range append(r.Files, sketch.Ino) {
 		path := findPathOf(*sketch.Name, *file.Path)
@@ -388,24 +384,23 @@ func pullSketch(sketch *createClient.ArduinoCreateSketch, sketchbook string, bea
 			}
 		}
 
-		path = filepath.Join(sketchFolder, path)
 		decodedData, err := base64.StdEncoding.DecodeString(*filewithData.Data)
 		if err != nil {
 			return err
 		}
 
-		err = ioutil.WriteFile(path, decodedData, 0666)
+		destFile := sketchFolder.Join(path)
+		err = destFile.WriteFile(decodedData)
 		if err != nil {
 			return errors.New("Copy of a file of the downloaded sketch failed, sync failed.")
 		}
 	}
 
-	err = os.RemoveAll(destFolder)
-	if err != nil {
+	if err := destFolder.RemoveAll(); err != nil {
 		return err
 	}
 
-	err = os.Rename(sketchFolder, destFolder)
+	err = sketchFolder.Rename(destFolder)
 	if err != nil {
 		return err
 	}

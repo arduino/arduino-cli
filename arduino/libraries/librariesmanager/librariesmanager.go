@@ -31,6 +31,7 @@ package librariesmanager
 
 import (
 	"fmt"
+	"os"
 
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
@@ -44,10 +45,12 @@ import (
 // LibrariesManager keeps the current status of the libraries in the system
 // (the list of libraries, revisions, installed paths, etc.)
 type LibrariesManager struct {
-	Libraries map[string]*LibraryAlternatives `json:"libraries"`
-	Index     *librariesindex.Index
-
 	LibrariesDir []*LibrariesDir
+	Libraries    map[string]*LibraryAlternatives `json:"libraries"`
+
+	Index        *librariesindex.Index
+	IndexFile    *paths.Path
+	DownloadsDir *paths.Path
 }
 
 // LibrariesDir is a directory containing libraries
@@ -90,16 +93,22 @@ func (sc LibrariesManager) Names() []string {
 }
 
 // NewLibraryManager creates a new library manager
-func NewLibraryManager() *LibrariesManager {
+func NewLibraryManager(indexDir *paths.Path, downloadsDir *paths.Path) *LibrariesManager {
+	var indexFile *paths.Path
+	if indexDir != nil {
+		indexFile = indexDir.Join("library_index.json")
+	}
 	return &LibrariesManager{
-		Libraries: map[string]*LibraryAlternatives{},
+		Libraries:    map[string]*LibraryAlternatives{},
+		IndexFile:    indexFile,
+		DownloadsDir: downloadsDir,
 	}
 }
 
 // LoadIndex reads a library_index.json from a file and returns
 // the corresponding Index structure.
 func (sc *LibrariesManager) LoadIndex() error {
-	index, err := librariesindex.LoadIndex(IndexPath())
+	index, err := librariesindex.LoadIndex(sc.IndexFile)
 	sc.Index = index
 	return err
 }
@@ -151,7 +160,17 @@ func (sc *LibrariesManager) RescanLibraries() error {
 	return nil
 }
 
-// LoadLibrariesFromDir loads all libraries in the given folder
+func (sc *LibrariesManager) getSketchbookLibrariesDir() *paths.Path {
+	for _, dir := range sc.LibrariesDir {
+		if dir.Location == libraries.Sketchbook {
+			return dir.Path
+		}
+	}
+	return nil
+}
+
+// LoadLibrariesFromDir loads all libraries in the given directory. Returns
+// nil if the directory doesn't exists.
 func (sc *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) error {
 	subFolders, err := librariesDir.Path.ReadDir()
 	if err != nil {
