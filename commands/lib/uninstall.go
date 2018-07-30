@@ -30,7 +30,11 @@
 package lib
 
 import (
-	"fmt"
+	"os"
+
+	"github.com/bcmi-labs/arduino-cli/common/formatter"
+
+	"github.com/bcmi-labs/arduino-cli/commands"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/sirupsen/logrus"
@@ -57,13 +61,17 @@ func initUninstallCommand() *cobra.Command {
 func runUninstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib uninstall`")
 
-	logrus.Info("Preparing")
+	lm := commands.InitLibraryManager(nil)
 	libRefs := librariesindex.ParseArgs(args)
-
-	for _, library := range libRefs {
-		// TODO: Implement uninstall
-
-		fmt.Println("Would uninstall: ", library)
+	for _, libRef := range libRefs {
+		lib := lm.FindByReference(libRef)
+		if lib == nil {
+			formatter.PrintErrorMessage("Library not installed: " + libRef.String())
+			os.Exit(commands.ErrGeneric)
+		} else {
+			formatter.Print("Uninstalling " + lib.String())
+			lm.Uninstall(lib)
+		}
 	}
 
 	logrus.Info("Done")

@@ -179,6 +179,7 @@ func TestLibDownloadAndInstall(t *testing.T) {
 	exitCode, d := executeWithArgs(t, "core", "update-index")
 	require.Zero(t, exitCode, "exit code")
 
+	// Download inexistent
 	exitCode, d = executeWithArgs(t, "lib", "download", "inexistentLibrary", "--format", "json")
 	require.NotZero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "library inexistentLibrary not found")
@@ -187,15 +188,18 @@ func TestLibDownloadAndInstall(t *testing.T) {
 	require.NotZero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "library inexistentLibrary not found")
 
+	// Download latest
 	exitCode, d = executeWithArgs(t, "lib", "download", "Audio")
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "Audio@")
 	require.Contains(t, string(d), "downloaded")
 
+	// Download non existent version
 	exitCode, d = executeWithArgs(t, "lib", "download", "Audio@1.2.3-nonexistent")
 	require.NotZero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "not found")
 
+	// Install latest
 	exitCode, d = executeWithArgs(t, "lib", "install", "Audio")
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "Audio@")
@@ -205,20 +209,56 @@ func TestLibDownloadAndInstall(t *testing.T) {
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "Audio")
 
+	// Already installed
 	exitCode, d = executeWithArgs(t, "lib", "install", "Audio")
 	require.NotZero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "Audio@")
 	require.Contains(t, string(d), "already installed")
 
+	// Install another version
 	exitCode, d = executeWithArgs(t, "lib", "install", "Audio@1.0.4")
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "Audio@1.0.4")
 	require.Contains(t, string(d), "Installed")
-
 	exitCode, d = executeWithArgs(t, "lib", "list")
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "Audio")
 	require.Contains(t, string(d), "1.0.4")
+
+	// Uninstall version not installed
+	exitCode, d = executeWithArgs(t, "lib", "uninstall", "Audio@1.0.3")
+	require.NotZero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Audio@1.0.3")
+	require.Contains(t, string(d), "not installed")
+
+	// Uninstall (with version)
+	exitCode, d = executeWithArgs(t, "lib", "uninstall", "Audio@1.0.4")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Uninstalling")
+	require.Contains(t, string(d), "Audio")
+	require.Contains(t, string(d), "1.0.4")
+	exitCode, d = executeWithArgs(t, "lib", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.NotContains(t, string(d), "Audio")
+
+	// Uninstall (without version)
+	exitCode, d = executeWithArgs(t, "lib", "install", "Audio@1.0.4")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Audio@1.0.4")
+	require.Contains(t, string(d), "Installed")
+	exitCode, d = executeWithArgs(t, "lib", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Audio")
+	require.Contains(t, string(d), "1.0.4")
+	exitCode, d = executeWithArgs(t, "lib", "uninstall", "Audio")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Uninstalling")
+	require.Contains(t, string(d), "Audio")
+	require.Contains(t, string(d), "1.0.4")
+	exitCode, d = executeWithArgs(t, "lib", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.NotContains(t, string(d), "Audio")
+
 }
 
 func updateCoreIndex(t *testing.T) {

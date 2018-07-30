@@ -74,6 +74,26 @@ func (alts *LibraryAlternatives) Add(library *libraries.Library) {
 	alts.Alternatives = append(alts.Alternatives, library)
 }
 
+// Remove removes the library from the alternatives
+func (alts *LibraryAlternatives) Remove(library *libraries.Library) {
+	for i, lib := range alts.Alternatives {
+		if lib == library {
+			alts.Alternatives = append(alts.Alternatives[:i], alts.Alternatives[i+1:]...)
+			return
+		}
+	}
+}
+
+// FindVersion returns the library mathching the provided version or nil if not found
+func (alts *LibraryAlternatives) FindVersion(version string) *libraries.Library {
+	for _, lib := range alts.Alternatives {
+		if lib.Version == version {
+			return lib
+		}
+	}
+	return nil
+}
+
 // Names returns an array with all the names of the installed libraries.
 func (sc LibrariesManager) Names() []string {
 	res := make([]string, len(sc.Libraries))
@@ -190,4 +210,23 @@ func (sc *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) err
 		alternatives.Add(library)
 	}
 	return nil
+}
+
+// FindByReference return the installed library matching the Reference
+// name and version or if the version is the empty string the library
+// installed in the sketchbook.
+func (sc *LibrariesManager) FindByReference(libRef *librariesindex.Reference) *libraries.Library {
+	alternatives, have := sc.Libraries[libRef.Name]
+	if !have {
+		return nil
+	}
+	if libRef.Version == "" {
+		for _, candidate := range alternatives.Alternatives {
+			if candidate.Location == libraries.Sketchbook {
+				return candidate
+			}
+		}
+		return nil
+	}
+	return alternatives.FindVersion(libRef.Version)
 }

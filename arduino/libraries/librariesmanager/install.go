@@ -70,12 +70,12 @@ func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release) (*path
 	return libPath, indexLibrary.Resource.Install(lm.DownloadsDir, libsDir, libPath)
 }
 
-func (lm *LibrariesManager) removeRelease(libName string, r *libraries.Library) error {
-	libsDir := lm.getSketchbookLibrariesDir()
-	if libsDir == nil {
-		return fmt.Errorf("sketchbook folder not set")
+// Uninstall removes a Library
+func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
+	if err := lib.Folder.RemoveAll(); err != nil {
+		return fmt.Errorf("removing lib directory: %s", err)
 	}
 
-	libName = utils.SanitizeName(libName)
-	return libsDir.Join(libName).RemoveAll()
+	lm.Libraries[lib.Name].Remove(lib)
+	return nil
 }
