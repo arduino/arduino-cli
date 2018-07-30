@@ -9,7 +9,11 @@ import (
 )
 
 func TestFindBoardWithFQBN(t *testing.T) {
-	pm := packagemanager.NewPackageManager()
+	pm := packagemanager.NewPackageManager(
+		paths.New("testdata"),
+		paths.New("testdata"),
+		paths.New("testdata"),
+		paths.New("testdata"))
 	pm.LoadHardwareFromDirectory(paths.New("testdata"))
 
 	board, err := pm.FindBoardWithFQBN("arduino:avr:uno")
