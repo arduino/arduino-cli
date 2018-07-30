@@ -62,7 +62,7 @@ func (err ErrorMessage) String() string {
 	if err.CausedBy == nil {
 		return err.Message
 	}
-	return err.Message + " (" + err.CausedBy.Error() + ")"
+	return "Error: " + err.CausedBy.Error() + "\n" + err.Message
 }
 
 // PrintErrorMessage formats and prints info about an error message.

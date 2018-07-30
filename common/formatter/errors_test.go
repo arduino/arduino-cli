@@ -43,7 +43,8 @@ func ExamplePrintError() {
 
 	// Output:
 	// error message
-	// outer error message (inner error message)
+	// Error: inner error message
+	// outer error message
 	// {"Message":"error message","Cause":""}
 	// {"Message":"outer error message","Cause":"inner error message"}
 }
