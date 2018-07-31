@@ -31,6 +31,7 @@ package lib
 
 import (
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
@@ -51,11 +52,13 @@ func initListCommand() *cobra.Command {
 		Run:  runListCommand,
 	}
 	listCommand.Flags().BoolVar(&listFlags.all, "all", false, "Include built-in libraries (from platforms and IDE) in listing.")
+	listCommand.Flags().BoolVar(&listFlags.updatable, "updatable", false, "List updatable libraries.")
 	return listCommand
 }
 
 var listFlags struct {
-	all bool
+	all       bool
+	updatable bool
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
@@ -66,14 +69,24 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	lm := commands.InitLibraryManager(pm)
 
 	res := output.InstalledLibraries{}
-	for _, lib := range lm.Libraries {
-		res.Libraries = append(res.Libraries, lib)
+	for _, libAlternatives := range lm.Libraries {
+		for _, lib := range libAlternatives.Alternatives {
+			var available *librariesindex.Release
+			if listFlags.updatable {
+				available = lm.Index.FindLibraryUpdate(lib)
+				if available == nil {
+					continue
+				}
+			}
+			res.Libraries = append(res.Libraries, &output.InstalledLibary{
+				Library:   lib,
+				Available: available,
+			})
+		}
 	}
 	logrus.Info("Listing")
 
-	if len(res.Libraries) == 0 {
-		formatter.PrintErrorMessage("No library installed.")
-	} else {
+	if len(res.Libraries) > 0 {
 		formatter.Print(res)
 	}
 	logrus.Info("Done")

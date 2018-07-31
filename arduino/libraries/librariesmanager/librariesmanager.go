@@ -63,7 +63,7 @@ type LibrariesDir struct {
 // LibraryAlternatives is a list of different versions of the same library
 // installed in the system
 type LibraryAlternatives struct {
-	Alternatives []*libraries.Library
+	Alternatives libraries.List
 }
 
 // Add adds a library to the alternatives

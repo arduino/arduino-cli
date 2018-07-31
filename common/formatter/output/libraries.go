@@ -33,13 +33,21 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
+
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/gosuri/uitable"
 )
 
 // InstalledLibraries is a list of installed libraries
 type InstalledLibraries struct {
-	Libraries []*librariesmanager.LibraryAlternatives `json:"libraries"`
+	Libraries []*InstalledLibary `json:"libraries"`
+}
+
+// InstalledLibary is an installed library
+type InstalledLibary struct {
+	Library   *libraries.Library      `json:"library"`
+	Available *librariesindex.Release `omitempy,json:"available"`
 }
 
 func (il InstalledLibraries) Len() int { return len(il.Libraries) }
@@ -47,7 +55,7 @@ func (il InstalledLibraries) Swap(i, j int) {
 	il.Libraries[i], il.Libraries[j] = il.Libraries[j], il.Libraries[i]
 }
 func (il InstalledLibraries) Less(i, j int) bool {
-	return il.Libraries[i].Alternatives[0].String() < il.Libraries[j].Alternatives[0].String()
+	return il.Libraries[i].Library.String() < il.Libraries[j].Library.String()
 }
 
 func (il InstalledLibraries) String() string {
@@ -55,23 +63,41 @@ func (il InstalledLibraries) String() string {
 	table.MaxColWidth = 100
 	table.Wrap = true
 
-	table.AddRow("Name", "Installed", "Location")
+	hasUpdates := false
+	for _, libMeta := range il.Libraries {
+		if libMeta.Available != nil {
+			hasUpdates = true
+		}
+	}
+
+	if hasUpdates {
+		table.AddRow("Name", "Installed", "Available", "Location")
+	} else {
+		table.AddRow("Name", "Installed", "Location")
+	}
 	sort.Sort(il)
 	lastName := ""
-	for _, lib := range il.Libraries {
-		for _, libAlt := range lib.Alternatives {
-			name := libAlt.Name
-			if name == lastName {
-				name = ` "`
-			} else {
-				lastName = name
-			}
+	for _, libMeta := range il.Libraries {
+		lib := libMeta.Library
+		name := lib.Name
+		if name == lastName {
+			name = ` "`
+		} else {
+			lastName = name
+		}
 
-			location := libAlt.Location.String()
-			if libAlt.ContainerPlatform != nil {
-				location = libAlt.ContainerPlatform.String()
+		location := lib.Location.String()
+		if lib.ContainerPlatform != nil {
+			location = lib.ContainerPlatform.String()
+		}
+		if hasUpdates {
+			available := ""
+			if libMeta.Available != nil {
+				available = libMeta.Available.Version
 			}
-			table.AddRow(name, libAlt.Version, location)
+			table.AddRow(name, lib.Version, available, location)
+		} else {
+			table.AddRow(name, lib.Version, location)
 		}
 	}
 	return fmt.Sprintln(table)

@@ -34,6 +34,7 @@ import (
 
 	"github.com/blang/semver"
 
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 )
 
@@ -82,6 +83,26 @@ func (idx *Index) FindRelease(ref *Reference) *Release {
 		}
 		return library.Releases[ref.Version]
 	}
+}
+
+// FindIndexedLibrary search an indexed library that matches the provided
+// installed library or nil if not found
+func (idx *Index) FindIndexedLibrary(lib *libraries.Library) *Library {
+	return idx.Libraries[lib.Name]
+}
+
+// FindLibraryUpdate check if an installed library may be updated using
+// one of the indexed libraries. This function returns the Release to install
+// to update the library if found, otherwise nil is returned.
+func (idx *Index) FindLibraryUpdate(lib *libraries.Library) *Release {
+	indexLib := idx.FindIndexedLibrary(lib)
+	if indexLib == nil {
+		return nil
+	}
+	if indexLib.Latest.Version > lib.Version {
+		return indexLib.Latest
+	}
+	return nil
 }
 
 // Versions returns an array of all versions available of the library

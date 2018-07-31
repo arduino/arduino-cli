@@ -225,6 +225,13 @@ func TestLibDownloadAndInstall(t *testing.T) {
 	require.Contains(t, string(d), "Audio")
 	require.Contains(t, string(d), "1.0.4")
 
+	// List updatable
+	exitCode, d = executeWithArgs(t, "lib", "list", "--updatable")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Audio")
+	require.Contains(t, string(d), "1.0.4")
+	require.Contains(t, string(d), "1.0.5")
+
 	// Uninstall version not installed
 	exitCode, d = executeWithArgs(t, "lib", "uninstall", "Audio@1.0.3")
 	require.NotZero(t, exitCode, "exit code")
