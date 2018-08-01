@@ -46,9 +46,9 @@ func Load(libDir *paths.Path, location LibraryLocation) (*Library, error) {
 }
 
 func addUtilityFolder(library *Library) {
-	utilitySourcePath := library.Folder.Join("utility")
+	utilitySourcePath := library.InstallDir.Join("utility")
 	if isDir, _ := utilitySourcePath.IsDir(); isDir {
-		library.UtilityFolder = utilitySourcePath
+		library.UtilityDir = utilitySourcePath
 	}
 }
 
@@ -70,13 +70,13 @@ func makeNewLibrary(libraryFolder *paths.Path, location LibraryLocation) (*Libra
 
 	library := &Library{}
 	library.Location = location
-	library.Folder = libraryFolder
+	library.InstallDir = libraryFolder
 	if exist, _ := libraryFolder.Join("src").Exist(); exist {
 		library.Layout = RecursiveLayout
-		library.SrcFolder = libraryFolder.Join("src")
+		library.SourceDir = libraryFolder.Join("src")
 	} else {
 		library.Layout = FlatLayout
-		library.SrcFolder = libraryFolder
+		library.SourceDir = libraryFolder
 		addUtilityFolder(library)
 	}
 
@@ -118,9 +118,9 @@ func makeNewLibrary(libraryFolder *paths.Path, location LibraryLocation) (*Libra
 
 func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, error) {
 	library := &Library{
-		Folder:        path,
+		InstallDir:    path,
 		Location:      location,
-		SrcFolder:     path,
+		SourceDir:     path,
 		Layout:        FlatLayout,
 		Name:          path.Base(),
 		Architectures: []string{"*"},

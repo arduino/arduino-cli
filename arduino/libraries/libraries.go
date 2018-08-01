@@ -64,9 +64,9 @@ type Library struct {
 
 	Types []string `json:"types,omitempty"`
 
-	Folder            *paths.Path
-	SrcFolder         *paths.Path
-	UtilityFolder     *paths.Path
+	InstallDir        *paths.Path
+	SourceDir         *paths.Path
+	UtilityDir        *paths.Path
 	Location          LibraryLocation
 	ContainerPlatform *cores.PlatformRelease `json:""`
 	Layout            LibraryLayout
@@ -154,7 +154,7 @@ func (library *Library) PriorityForArchitecture(arch string) uint8 {
 
 // SourceDir represents a source dir of a library
 type SourceDir struct {
-	Folder  *paths.Path
+	Dir     *paths.Path
 	Recurse bool
 }
 
@@ -163,13 +163,13 @@ func (library *Library) SourceDirs() []SourceDir {
 	dirs := []SourceDir{}
 	dirs = append(dirs,
 		SourceDir{
-			Folder:  library.SrcFolder,
+			Dir:     library.SourceDir,
 			Recurse: library.Layout == RecursiveLayout,
 		})
-	if library.UtilityFolder != nil {
+	if library.UtilityDir != nil {
 		dirs = append(dirs,
 			SourceDir{
-				Folder:  library.UtilityFolder,
+				Dir:     library.UtilityDir,
 				Recurse: false,
 			})
 	}

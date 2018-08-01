@@ -47,17 +47,17 @@ func (s *FailIfImportedLibraryIsWrong) Run(ctx *types.Context) error {
 
 	for _, library := range ctx.ImportedLibraries {
 		if !library.IsLegacy {
-			if isDir, _ := library.Folder.Join(constants.LIBRARY_FOLDER_ARCH).IsDir(); isDir {
+			if isDir, _ := library.InstallDir.Join(constants.LIBRARY_FOLDER_ARCH).IsDir(); isDir {
 				return i18n.ErrorfWithLogger(logger, constants.MSG_ARCH_FOLDER_NOT_SUPPORTED)
 			}
 			for _, propName := range libraries.MandatoryProperties {
 				if _, ok := library.Properties[propName]; !ok {
-					return i18n.ErrorfWithLogger(logger, constants.MSG_PROP_IN_LIBRARY, propName, library.Folder)
+					return i18n.ErrorfWithLogger(logger, constants.MSG_PROP_IN_LIBRARY, propName, library.InstallDir)
 				}
 			}
 			if library.Layout == libraries.RecursiveLayout {
-				if library.UtilityFolder != nil {
-					return i18n.ErrorfWithLogger(logger, constants.MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS, library.Folder)
+				if library.UtilityDir != nil {
+					return i18n.ErrorfWithLogger(logger, constants.MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS, library.InstallDir)
 				}
 			}
 		}

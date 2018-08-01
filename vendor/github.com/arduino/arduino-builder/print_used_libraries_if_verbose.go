@@ -52,9 +52,9 @@ func (s *PrintUsedLibrariesIfVerbose) Run(ctx *types.Context) error {
 			legacy = constants.MSG_LIB_LEGACY
 		}
 		if library.Version == constants.EMPTY_STRING {
-			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_LIBRARY, library.Name, library.Folder, legacy)
+			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_LIBRARY, library.Name, library.InstallDir, legacy)
 		} else {
-			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_LIBRARY_AT_VERSION, library.Name, library.Version, library.Folder, legacy)
+			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_LIBRARY_AT_VERSION, library.Name, library.Version, library.InstallDir, legacy)
 		}
 	}
 

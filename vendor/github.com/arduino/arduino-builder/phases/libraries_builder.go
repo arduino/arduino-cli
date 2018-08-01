@@ -78,7 +78,7 @@ func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libs libraries.List) e
 			// add library src path to compiler.c.elf.extra_flags
 			// use library.Name as lib name and srcPath/{mcpu} as location
 			mcu := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
-			path := library.SrcFolder.Join(mcu).String()
+			path := library.SourceDir.Join(mcu).String()
 			// find all library names in the folder and prepend -l
 			filePaths := []string{}
 			libs_cmd := library.LDflags + " "
@@ -128,7 +128,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 
 		filePaths := []string{}
 		mcu := buildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
-		err := utils.FindFilesInFolder(&filePaths, library.SrcFolder.Join(mcu).String(), extensions, true)
+		err := utils.FindFilesInFolder(&filePaths, library.SourceDir.Join(mcu).String(), extensions, true)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
@@ -140,7 +140,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 	}
 
 	if library.Layout == libraries.RecursiveLayout {
-		libObjectFiles, err := builder_utils.CompileFilesRecursive(ctx, library.SrcFolder, libraryBuildPath, buildProperties, includes)
+		libObjectFiles, err := builder_utils.CompileFilesRecursive(ctx, library.SourceDir, libraryBuildPath, buildProperties, includes)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
@@ -154,18 +154,18 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 			objectFiles.AddAll(libObjectFiles)
 		}
 	} else {
-		if library.UtilityFolder != nil {
-			includes = append(includes, utils.WrapWithHyphenI(library.UtilityFolder.String()))
+		if library.UtilityDir != nil {
+			includes = append(includes, utils.WrapWithHyphenI(library.UtilityDir.String()))
 		}
-		libObjectFiles, err := builder_utils.CompileFiles(ctx, library.SrcFolder, false, libraryBuildPath, buildProperties, includes)
+		libObjectFiles, err := builder_utils.CompileFiles(ctx, library.SourceDir, false, libraryBuildPath, buildProperties, includes)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
 		objectFiles.AddAll(libObjectFiles)
 
-		if library.UtilityFolder != nil {
+		if library.UtilityDir != nil {
 			utilityBuildPath := libraryBuildPath.Join("utility")
-			utilityObjectFiles, err := builder_utils.CompileFiles(ctx, library.UtilityFolder, false, utilityBuildPath, buildProperties, includes)
+			utilityObjectFiles, err := builder_utils.CompileFiles(ctx, library.UtilityDir, false, utilityBuildPath, buildProperties, includes)
 			if err != nil {
 				return nil, i18n.WrapError(err)
 			}

@@ -30,10 +30,11 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-builder/constants"
-	"github.com/arduino/arduino-builder/types"
 	"os"
 	"time"
+
+	"github.com/arduino/arduino-builder/constants"
+	"github.com/arduino/arduino-builder/types"
 )
 
 type PrintUsedAndNotUsedLibraries struct {
@@ -58,9 +59,9 @@ func (s *PrintUsedAndNotUsedLibraries) Run(ctx *types.Context) error {
 
 	for header, libResResult := range libraryResolutionResults {
 		logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
-		logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_USED, libResResult.Library.Folder)
+		logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_USED, libResResult.Library.InstallDir)
 		for _, notUsedLibrary := range libResResult.NotUsedLibraries {
-			logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_NOT_USED, notUsedLibrary.Folder)
+			logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_NOT_USED, notUsedLibrary.InstallDir)
 		}
 	}
 

@@ -80,7 +80,7 @@ func sourceRoot(ctx *Context, origin interface{}) *paths.Path {
 	case *Sketch:
 		return ctx.SketchBuildPath
 	case *libraries.Library:
-		return o.SrcFolder
+		return o.SourceDir
 	default:
 		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
 	}

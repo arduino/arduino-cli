@@ -65,7 +65,7 @@ func (resolver *Cpp) ScanFromLibrariesManager(lm *librariesmanager.LibrariesMana
 
 // ScanLibrary reads a library to find and cache C++ headers for later retrieval
 func (resolver *Cpp) ScanLibrary(lib *libraries.Library) error {
-	cppHeaders, err := lib.SrcFolder.ReadDir()
+	cppHeaders, err := lib.SourceDir.ReadDir()
 	if err != nil {
 		return fmt.Errorf("reading lib src dir: %s", err)
 	}

@@ -231,14 +231,13 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 	return nil
 }
 
-func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, folder *paths.Path) error {
-	// TODO: Change platform.Folder into *paths.Path
-	platform.Folder = folder.String()
+func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, path *paths.Path) error {
+	platform.InstallDir = path
 
 	// Some useful paths
-	platformTxtPath := folder.Join("platform.txt")
-	platformTxtLocalPath := folder.Join("platform.local.txt")
-	programmersTxtPath := folder.Join("programmers.txt")
+	platformTxtPath := path.Join("platform.txt")
+	platformTxtLocalPath := path.Join("platform.local.txt")
+	programmersTxtPath := path.Join("programmers.txt")
 
 	// Create platform properties
 	platform.Properties = platform.Properties.Clone() // TODO: why CLONE?
@@ -271,17 +270,18 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, f
 }
 
 func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
-	if platform.Folder == "" {
+	if platform.InstallDir == nil {
 		return fmt.Errorf("platform not installed")
 	}
-	boardsTxtPath := filepath.Join(platform.Folder, "boards.txt")
-	boardsLocalTxtPath := filepath.Join(platform.Folder, "boards.local.txt")
 
-	boardsProperties, err := properties.Load(boardsTxtPath)
+	boardsTxtPath := platform.InstallDir.Join("boards.txt")
+	boardsProperties, err := properties.LoadFromPath(boardsTxtPath)
 	if err != nil {
 		return err
 	}
-	if localProperties, err := properties.SafeLoad(boardsLocalTxtPath); err == nil {
+
+	boardsLocalTxtPath := platform.InstallDir.Join("boards.local.txt")
+	if localProperties, err := properties.SafeLoadFromPath(boardsLocalTxtPath); err == nil {
 		boardsProperties.Merge(localProperties)
 	} else {
 		return err
@@ -333,7 +333,7 @@ func (pm *PackageManager) loadToolReleasesFromTool(tool *cores.Tool, toolPath *p
 		if toolReleasePath, err := versionPath.Abs(); err == nil {
 			release := tool.GetOrCreateRelease(version)
 			// TODO: Make Folder a *paths.Path
-			release.Folder = toolReleasePath.String()
+			release.InstallDir = toolReleasePath
 			pm.Log.WithField("tool", release).Infof("Loaded tool")
 		} else {
 			return err
@@ -388,7 +388,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) er
 		// If builtin_tools_versions.txt is found create tools based on the info
 		// contained in that file
 		pm.Log.Infof("Found builtin_tools_versions.txt")
-		toolPath, err := filepath.Abs(filepath.Dir(builtinToolsVersionsTxtPath))
+		toolPath, err := paths.New(builtinToolsVersionsTxtPath).Parent().Abs()
 		if err != nil {
 			return fmt.Errorf("getting parent dir of %s: %s", builtinToolsVersionsTxtPath, err)
 		}
@@ -404,7 +404,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) er
 			for toolName, toolVersion := range toolsData {
 				tool := targetPackage.GetOrCreateTool(toolName)
 				release := tool.GetOrCreateRelease(toolVersion)
-				release.Folder = toolPath
+				release.InstallDir = toolPath
 				pm.Log.WithField("tool", release).Infof("Loaded tool")
 			}
 		}

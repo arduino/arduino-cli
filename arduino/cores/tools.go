@@ -34,6 +34,8 @@ import (
 	"regexp"
 	"runtime"
 
+	"github.com/arduino/go-paths-helper"
+
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 
@@ -49,10 +51,10 @@ type Tool struct {
 
 // ToolRelease represents a single release of a tool
 type ToolRelease struct {
-	Version  string     `json:"version,required"` // The version number of this Release.
-	Flavours []*Flavour `json:"systems"`          // Maps OS to Flavour
-	Tool     *Tool      `json:"-"`
-	Folder   string     `json:"-"`
+	Version    string      `json:"version,required"` // The version number of this Release.
+	Flavours   []*Flavour  `json:"systems"`          // Maps OS to Flavour
+	Tool       *Tool       `json:"-"`
+	InstallDir *paths.Path `json:"-"`
 }
 
 // Flavour represents a flavour of a Tool version.
@@ -139,7 +141,7 @@ func (tool *Tool) String() string {
 
 // IsInstalled returns true if the ToolRelease is installed
 func (tr *ToolRelease) IsInstalled() bool {
-	return tr.Folder != ""
+	return tr.InstallDir != nil
 }
 
 func (tr *ToolRelease) String() string {
@@ -149,8 +151,8 @@ func (tr *ToolRelease) String() string {
 // RuntimeProperties returns the runtime properties for this tool
 func (tr *ToolRelease) RuntimeProperties() properties.Map {
 	return properties.Map{
-		"runtime.tools." + tr.Tool.Name + ".path":                    tr.Folder,
-		"runtime.tools." + tr.Tool.Name + "-" + tr.Version + ".path": tr.Folder,
+		"runtime.tools." + tr.Tool.Name + ".path":                    tr.InstallDir.String(),
+		"runtime.tools." + tr.Tool.Name + "-" + tr.Version + ".path": tr.InstallDir.String(),
 	}
 }
 

@@ -156,6 +156,12 @@ func (m Map) parseLine(line string) error {
 	return nil
 }
 
+// SafeLoadFromPath is like LoadFromPath, except that it returns an empty Map if
+// the specified file doesn't exists
+func SafeLoadFromPath(path *paths.Path) (Map, error) {
+	return SafeLoad(path.String())
+}
+
 // SafeLoad is like Load, except that it returns an empty Map if the specified
 // file doesn't exists
 func SafeLoad(filepath string) (Map, error) {

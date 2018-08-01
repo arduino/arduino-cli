@@ -62,7 +62,7 @@ type PlatformRelease struct {
 	Boards      map[string]*Board         `json:"-"`
 	Programmers map[string]properties.Map `json:"-"`
 	Menus       map[string]string         `json:"-"`
-	Folder      string                    `json:"-"`
+	InstallDir  *paths.Path               `json:"-"`
 }
 
 // BoardManifest contains information about a board. These metadata are usually
@@ -166,7 +166,7 @@ func (platform *Platform) latestReleaseVersion() string {
 // arduino-builder, it will be probably removed in the future
 func (platform *Platform) GetInstalled() *PlatformRelease {
 	for _, release := range platform.Releases {
-		if release.Folder != "" {
+		if release.InstallDir != nil {
 			return release
 		}
 	}
@@ -195,14 +195,14 @@ func (release *PlatformRelease) GetOrCreateBoard(boardID string) *Board {
 // RuntimeProperties returns the runtime properties for this PlatformRelease
 func (release *PlatformRelease) RuntimeProperties() properties.Map {
 	return properties.Map{
-		"runtime.platform.path": release.Folder,
+		"runtime.platform.path": release.InstallDir.String(),
 	}
 }
 
 // GetLibrariesDir returns the path to the core libraries or nil if not
 // present
 func (release *PlatformRelease) GetLibrariesDir() *paths.Path {
-	libDir := paths.New(release.Folder).Join("libraries")
+	libDir := release.InstallDir.Join("libraries")
 	if isDir, _ := libDir.IsDir(); isDir {
 		return libDir
 	}

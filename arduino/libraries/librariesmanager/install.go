@@ -50,7 +50,7 @@ func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release) (*path
 				continue
 			}
 			if installedLib.Version == indexLibrary.Version {
-				return installedLib.Folder, fmt.Errorf("%s is already installed", indexLibrary.String())
+				return installedLib.InstallDir, fmt.Errorf("%s is already installed", indexLibrary.String())
 			}
 			replaced = installedLib
 		}
@@ -62,7 +62,7 @@ func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release) (*path
 	}
 
 	libPath := libsDir.Join(utils.SanitizeName(indexLibrary.Library.Name))
-	if replaced != nil && replaced.Folder.EquivalentTo(libPath) {
+	if replaced != nil && replaced.InstallDir.EquivalentTo(libPath) {
 		formatter.Print(fmt.Sprintf("Replacing %s with %s", replaced, indexLibrary))
 	} else if isdir, _ := libPath.IsDir(); isdir {
 		return nil, fmt.Errorf("destination dir %s already exists, cannot install", libPath)
@@ -72,7 +72,7 @@ func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release) (*path
 
 // Uninstall removes a Library
 func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
-	if err := lib.Folder.RemoveAll(); err != nil {
+	if err := lib.InstallDir.RemoveAll(); err != nil {
 		return fmt.Errorf("removing lib directory: %s", err)
 	}
 

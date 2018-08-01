@@ -77,7 +77,7 @@ func (is PlatformReleases) String() string {
 	sort.Sort(is)
 	for _, item := range is {
 		installed := "No"
-		if item.Folder != "" {
+		if item.InstallDir != nil {
 			installed = "Yes"
 		}
 		table.AddRow(item.Platform.String(), item.Version, installed, item.Platform.Name)

@@ -15,7 +15,7 @@
     "types",
     "utils"
   ]
-  revision = "54213270c68494da5af64ba86969ef8ab75b788e"
+  revision = "2f39b7080c6220c43fa49ab0b378e3af4cf99ee6"
   source = "github.com/bcmi-labs/arduino-builder"
 
 [[projects]]
@@ -34,7 +34,7 @@
   branch = "master"
   name = "github.com/arduino/go-properties-map"
   packages = ["."]
-  revision = "67ac7bed4291c361a8716ca3787c17265c2fe37d"
+  revision = "ad37f0cfeff29fadeabe6b2f7f852d8db1fb5c41"
 
 [[projects]]
   branch = "master"

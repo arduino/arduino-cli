@@ -79,17 +79,17 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	// Copy used  libraries in the correct folder
 	extensions := func(ext string) bool { return VALID_EXPORT_EXTENSIONS[ext] }
 	for _, library := range ctx.ImportedLibraries {
-		libFolder := libBaseFolder.Join(library.Name)
-		utils.CopyDir(library.Folder.String(), libFolder.String(), extensions)
+		libDir := libBaseFolder.Join(library.Name)
+		utils.CopyDir(library.InstallDir.String(), libDir.String(), extensions)
 		// Remove examples folder
 		if _, err := libBaseFolder.Join("examples").Stat(); err == nil {
-			libFolder.Join("examples").RemoveAll()
+			libDir.Join("examples").RemoveAll()
 		}
 		// Remove stray folders contining incompatible libraries
 		staticLibsExtensions := func(ext string) bool { return DOTAEXTENSION[ext] }
 		mcu := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
 		var files []string
-		utils.FindFilesInFolder(&files, libFolder.Join("src").String(), staticLibsExtensions, true)
+		utils.FindFilesInFolder(&files, libDir.Join("src").String(), staticLibsExtensions, true)
 		for _, file := range files {
 			if !strings.Contains(filepath.Dir(file), mcu) {
 				os.RemoveAll(filepath.Dir(file))
