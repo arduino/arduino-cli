@@ -132,11 +132,11 @@ func makeTempSketchbookDir(t *testing.T) func() {
 	tmp, err := paths.MkTempDir("", "test")
 	require.NoError(t, err, "making temporary staging dir")
 	os.Setenv("ARDUINO_SKETCHBOOK_DIR", tmp.String())
-	fmt.Printf("ARDUINO_SKETCHBOOK_DIR = %s\n", os.Getenv("ARDUINO_DATA_DIR"))
+	fmt.Printf("ARDUINO_SKETCHBOOK_DIR = %s\n", os.Getenv("ARDUINO_SKETCHBOOK_DIR"))
 	return func() {
 		os.Unsetenv("ARDUINO_SKETCHBOOK_DIR")
 		tmp.RemoveAll()
-		fmt.Printf("ARDUINO_SKETCHBOOK_DIR = %s\n", os.Getenv("ARDUINO_DATA_DIR"))
+		fmt.Printf("ARDUINO_SKETCHBOOK_DIR = %s\n", os.Getenv("ARDUINO_SKETCHBOOK_DIR"))
 	}
 }
 
