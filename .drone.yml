@@ -7,5 +7,5 @@ pipeline:
     image: golang:latest
     commands:
       - go build
-      - go test ./... -race
+      - go test -v ./... -race
     secrets: [TEST_USERNAME, TEST_PASSWORD]
