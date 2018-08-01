@@ -61,22 +61,25 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Preparing download")
 	pairs := librariesindex.ParseArgs(args)
-	downloadLibraries(lm, pairs)
+	downloadLibrariesFromReferences(lm, pairs)
 }
 
-func downloadLibraries(lm *librariesmanager.LibrariesManager, refs []*librariesindex.Reference) {
-	libsReleaseToDownload := []*librariesindex.Release{}
+func downloadLibrariesFromReferences(lm *librariesmanager.LibrariesManager, refs []*librariesindex.Reference) {
+	libReleases := []*librariesindex.Release{}
 	for _, ref := range refs {
 		if lib := lm.Index.FindRelease(ref); lib == nil {
 			formatter.PrintErrorMessage("Error: library " + ref.String() + " not found")
 			os.Exit(commands.ErrBadCall)
 		} else {
-			libsReleaseToDownload = append(libsReleaseToDownload, lib)
+			libReleases = append(libReleases, lib)
 		}
 	}
+	downloadLibraries(lm, libReleases)
+}
 
+func downloadLibraries(lm *librariesmanager.LibrariesManager, libReleases []*librariesindex.Release) {
 	logrus.Info("Downloading libraries")
-	for _, libRelease := range libsReleaseToDownload {
+	for _, libRelease := range libReleases {
 		resp, err := libRelease.Resource.Download(lm.DownloadsDir)
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+libRelease.String())

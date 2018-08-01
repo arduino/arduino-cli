@@ -32,6 +32,7 @@ package lib
 import (
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
@@ -62,17 +63,26 @@ var listFlags struct {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Listing")
 	var pm *packagemanager.PackageManager
 	if listFlags.all {
 		pm = commands.InitPackageManager()
 	}
 	lm := commands.InitLibraryManager(pm)
 
-	res := output.InstalledLibraries{}
+	res := listLibraries(lm, listFlags.updatable)
+	if len(res.Libraries) > 0 {
+		formatter.Print(res)
+	}
+	logrus.Info("Done")
+}
+
+func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool) *output.InstalledLibraries {
+	res := &output.InstalledLibraries{}
 	for _, libAlternatives := range lm.Libraries {
 		for _, lib := range libAlternatives.Alternatives {
 			var available *librariesindex.Release
-			if listFlags.updatable {
+			if updatable {
 				available = lm.Index.FindLibraryUpdate(lib)
 				if available == nil {
 					continue
@@ -84,10 +94,5 @@ func runListCommand(cmd *cobra.Command, args []string) {
 			})
 		}
 	}
-	logrus.Info("Listing")
-
-	if len(res.Libraries) > 0 {
-		formatter.Print(res)
-	}
-	logrus.Info("Done")
+	return res
 }

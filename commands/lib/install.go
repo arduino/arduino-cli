@@ -59,22 +59,25 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	lm := commands.InitLibraryManager(nil)
 
 	refs := librariesindex.ParseArgs(args)
-	downloadLibraries(lm, refs)
-	installLibraries(lm, refs)
+	downloadLibrariesFromReferences(lm, refs)
+	installLibrariesFromReferences(lm, refs)
 }
 
-func installLibraries(lm *librariesmanager.LibrariesManager, refs []*librariesindex.Reference) {
-	libReleasesToInstall := []*librariesindex.Release{}
+func installLibrariesFromReferences(lm *librariesmanager.LibrariesManager, refs []*librariesindex.Reference) {
+	libReleases := []*librariesindex.Release{}
 	for _, ref := range refs {
 		rel := lm.Index.FindRelease(ref)
 		if rel == nil {
 			formatter.PrintErrorMessage("Error: library " + ref.String() + " not found")
 			os.Exit(commands.ErrBadCall)
 		}
-		libReleasesToInstall = append(libReleasesToInstall, rel)
+		libReleases = append(libReleases, rel)
 	}
+	installLibraries(lm, libReleases)
+}
 
-	for _, libRelease := range libReleasesToInstall {
+func installLibraries(lm *librariesmanager.LibrariesManager, libReleases []*librariesindex.Release) {
+	for _, libRelease := range libReleases {
 		logrus.WithField("library", libRelease).Info("Installing library")
 
 		if _, err := lm.Install(libRelease); err != nil {
