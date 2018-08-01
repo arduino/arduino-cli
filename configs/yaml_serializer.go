@@ -43,7 +43,7 @@ type yamlConfig struct {
 	ProxyType         string                   `yaml:"proxy_type"`
 	ProxyManualConfig *yamlProxyConfig         `yaml:"manual_configs,omitempty"`
 	SketchbookPath    string                   `yaml:"sketchbook_path,omitempty"`
-	ArduinoDataFolder string                   `yaml:"arduino_data,omitempty"`
+	ArduinoDataDir    string                   `yaml:"arduino_data,omitempty"`
 	BoardsManager     *yamlBoardsManagerConfig `yaml:"board_manager"`
 }
 
@@ -72,8 +72,8 @@ func (config *Configuration) LoadFromYAML(path *paths.Path) error {
 		return err
 	}
 
-	if ret.ArduinoDataFolder != "" {
-		config.DataDir = paths.New(ret.ArduinoDataFolder)
+	if ret.ArduinoDataDir != "" {
+		config.DataDir = paths.New(ret.ArduinoDataDir)
 	}
 	if ret.SketchbookPath != "" {
 		config.SketchbookDir = paths.New(ret.SketchbookPath)
@@ -106,7 +106,7 @@ func (config *Configuration) SerializeToYAML() ([]byte, error) {
 		c.SketchbookPath = config.SketchbookDir.String()
 	}
 	if config.DataDir != nil {
-		c.ArduinoDataFolder = config.DataDir.String()
+		c.ArduinoDataDir = config.DataDir.String()
 	}
 	c.ProxyType = ProxyType
 	if ProxyType == "manual" {

@@ -55,23 +55,23 @@ func getDefaultArduinoDataDir() (*paths.Path, error) {
 	if err != nil {
 		return nil, fmt.Errorf("retrieving user home dir: %s", err)
 	}
-	arduinoDataFolder := paths.New(usr.HomeDir)
+	arduinoDataDir := paths.New(usr.HomeDir)
 
 	switch runtime.GOOS {
 	case "linux":
-		arduinoDataFolder = arduinoDataFolder.Join(".arduino15")
+		arduinoDataDir = arduinoDataDir.Join(".arduino15")
 	case "darwin":
-		arduinoDataFolder = arduinoDataFolder.Join("Library", "arduino15")
+		arduinoDataDir = arduinoDataDir.Join("Library", "arduino15")
 	case "windows":
 		localAppDataPath, err := win32.GetLocalAppDataFolder()
 		if err != nil {
 			return nil, fmt.Errorf("getting LocalAppData path: %s", err)
 		}
-		arduinoDataFolder = paths.New(localAppDataPath).Join("Arduino15")
+		arduinoDataDir = paths.New(localAppDataPath).Join("Arduino15")
 	default:
 		return nil, fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
-	return arduinoDataFolder, nil
+	return arduinoDataDir, nil
 }
 
 func getDefaultSketchbookDir() (*paths.Path, error) {

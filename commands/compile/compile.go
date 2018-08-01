@@ -65,8 +65,8 @@ func InitCommand() *cobra.Command {
 	command.Flags().StringVarP(&flags.fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
 	command.Flags().BoolVar(&flags.showProperties, "show-properties", false, "Show all build properties used instead of compiling.")
 	command.Flags().BoolVar(&flags.preprocess, "preprocess", false, "Print preprocessed code to stdout instead of compiling.")
-	command.Flags().StringVar(&flags.buildCachePath, "build-cache-path", "", "Builds of 'core.a' are saved into this folder to be cached and reused.")
-	command.Flags().StringVar(&flags.buildPath, "build-path", "", "Folder where to save compiled files. If omitted, a folder will be created in the temporary folder specified by your OS.")
+	command.Flags().StringVar(&flags.buildCachePath, "build-cache-path", "", "Builds of 'core.a' are saved into this path to be cached and reused.")
+	command.Flags().StringVar(&flags.buildPath, "build-path", "", "Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.")
 	command.Flags().StringSliceVar(&flags.buildProperties, "build-properties", []string{}, "List of custom build properties separated by commas. Or can be used multiple times for multiple properties.")
 	command.Flags().StringVar(&flags.warnings, "warnings", "none", `Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
 	command.Flags().BoolVarP(&flags.verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
@@ -79,8 +79,8 @@ var flags struct {
 	fqbn            string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
 	showProperties  bool     // Show all build preferences used instead of compiling.
 	preprocess      bool     // Print preprocessed code to stdout.
-	buildCachePath  string   // Builds of 'core.a' are saved into this folder to be cached and reused.
-	buildPath       string   // Folder where to save compiled files.
+	buildCachePath  string   // Builds of 'core.a' are saved into this path to be cached and reused.
+	buildPath       string   // Path where to save compiled files.
 	buildProperties []string // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
 	warnings        string   // Used to tell gcc which warning level to use.
 	verbose         bool     // Turns on verbose mode.
@@ -171,28 +171,28 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.SketchLocation = paths.New(sketch.FullPath)
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
-	if packagesFolder, err := commands.Config.HardwareDirectories(); err == nil {
-		ctx.HardwareFolders = packagesFolder
+	if packagesDir, err := commands.Config.HardwareDirectories(); err == nil {
+		ctx.HardwareDirs = packagesDir
 	} else {
 		formatter.PrintError(err, "Cannot get hardware directories.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	if toolsFolder, err := configs.BundleToolsDirectories(); err == nil {
-		ctx.ToolsFolders = toolsFolder
+	if toolsDir, err := configs.BundleToolsDirectories(); err == nil {
+		ctx.ToolsDirs = toolsDir
 	} else {
 		formatter.PrintError(err, "Cannot get bundled tools directories.")
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	ctx.OtherLibrariesFolders = paths.NewPathList()
-	ctx.OtherLibrariesFolders.Add(commands.Config.LibrariesDir())
+	ctx.OtherLibrariesDirs = paths.NewPathList()
+	ctx.OtherLibrariesDirs.Add(commands.Config.LibrariesDir())
 
 	if flags.buildPath != "" {
 		ctx.BuildPath = paths.New(flags.buildPath)
 		err = ctx.BuildPath.MkdirAll()
 		if err != nil {
-			formatter.PrintError(err, "Cannot create the build folder.")
+			formatter.PrintError(err, "Cannot create the build directory.")
 			os.Exit(commands.ErrBadCall)
 		}
 	}
@@ -216,7 +216,7 @@ func run(cmd *cobra.Command, args []string) {
 		ctx.BuildCachePath = paths.New(flags.buildCachePath)
 		err = ctx.BuildCachePath.MkdirAll()
 		if err != nil {
-			formatter.PrintError(err, "Cannot create the build cache folder.")
+			formatter.PrintError(err, "Cannot create the build cache directory.")
 			os.Exit(commands.ErrBadCall)
 		}
 	}
@@ -239,7 +239,7 @@ func run(cmd *cobra.Command, args []string) {
 		sort.Strings(pathVariants)
 		ideHardwarePath := lastIdeSubProperties[pathVariants[len(pathVariants)-1]]
 		ideLibrariesPath := filepath.Join(filepath.Dir(ideHardwarePath), "libraries")
-		ctx.BuiltInLibrariesFolders = paths.NewPathList(ideLibrariesPath)
+		ctx.BuiltInLibrariesDirs = paths.NewPathList(ideLibrariesPath)
 	}
 
 	if flags.showProperties {
@@ -261,7 +261,7 @@ func run(cmd *cobra.Command, args []string) {
 	// FIXME: Make a function to produce a better name...
 	fqbn = strings.Replace(fqbn, ":", ".", -1)
 
-	// Copy .hex file to sketch folder
+	// Copy .hex file to sketch directory
 	srcHex := paths.New(outputPath)
 	dstHex := paths.New(sketch.FullPath).Join(sketch.Name + "." + fqbn + ext)
 	logrus.WithField("from", srcHex).WithField("to", dstHex).Print("copying sketch build output")
@@ -270,7 +270,7 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrGeneric)
 	}
 
-	// Copy .elf file to sketch folder
+	// Copy .elf file to sketch directory
 	srcElf := paths.New(outputPath[:len(outputPath)-3] + "elf")
 	dstElf := paths.New(sketch.FullPath).Join(sketch.Name + "." + fqbn + ".elf")
 	logrus.WithField("from", srcElf).WithField("to", dstElf).Print("copying sketch build output")

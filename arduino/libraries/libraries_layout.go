@@ -38,9 +38,9 @@ import (
 type LibraryLayout uint16
 
 const (
-	// FlatLayout is a library without a `src` folder
+	// FlatLayout is a library without a `src` directory
 	FlatLayout LibraryLayout = 1 << iota
-	// RecursiveLayout is a library with `src` folder (that allows recursive build)
+	// RecursiveLayout is a library with `src` directory (that allows recursive build)
 	RecursiveLayout
 )
 

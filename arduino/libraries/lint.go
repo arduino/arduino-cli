@@ -32,17 +32,17 @@ package libraries
 // Lint produce warnings about the formal correctness of a Library
 func (l *Library) Lint() ([]string, error) {
 
-	// TODO: check for spurious folders
-	// subFolders, err := ioutil.ReadDir(libraryFolder)
+	// TODO: check for spurious dirs
+	// subDirs, err := ioutil.ReadDir(libraryDir)
 	// if err != nil {
-	// 	return nil, fmt.Errorf("reading dir %s: %s", libraryFolder, err)
+	// 	return nil, fmt.Errorf("reading dir %s: %s", libraryDir, err)
 	// }
-	// 	for _, subFolder := range subFolders {
-	// 		if utils.IsSCCSOrHiddenFile(subFolder) {
-	// 			if !utils.IsSCCSFile(subFolder) && utils.IsHiddenFile(subFolder) {
+	// 	for _, subDir := range subDirs {
+	// 		if utils.IsSCCSOrHiddenFile(subDir) {
+	// 			if !utils.IsSCCSFile(subDir) && utils.IsHiddenFile(subDir) {
 	// 				logger.Fprintln(os.Stdout, "warn",
-	// 					"WARNING: Spurious {0} folder in '{1}' library",
-	// 					filepath.Base(subFolder.Name()), libProperties["name"])
+	// 					"WARNING: Spurious {0} directory in '{1}' library",
+	// 					filepath.Base(subDir.Name()), libProperties["name"])
 	// 			}
 	// 		}
 	// 	}

@@ -58,7 +58,7 @@ func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release) (*path
 
 	libsDir := lm.getSketchbookLibrariesDir()
 	if libsDir == nil {
-		return nil, fmt.Errorf("sketchbook folder not set")
+		return nil, fmt.Errorf("sketchbook directory not set")
 	}
 
 	libPath := libsDir.Join(utils.SanitizeName(indexLibrary.Library.Name))

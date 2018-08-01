@@ -23,16 +23,16 @@ type ProgressStruct struct {
 // Context structure
 type Context struct {
 	// Build options
-	HardwareFolders         paths.PathList
-	ToolsFolders            paths.PathList
-	BuiltInToolsFolders     paths.PathList
-	BuiltInLibrariesFolders paths.PathList
-	OtherLibrariesFolders   paths.PathList
-	SketchLocation          *paths.Path
-	WatchedLocations        paths.PathList
-	ArduinoAPIVersion       string
-	FQBN                    *cores.FQBN
-	CodeCompleteAt          string
+	HardwareDirs         paths.PathList
+	ToolsDirs            paths.PathList
+	BuiltInToolsDirs     paths.PathList
+	BuiltInLibrariesDirs paths.PathList
+	OtherLibrariesDirs   paths.PathList
+	SketchLocation       *paths.Path
+	WatchedLocations     paths.PathList
+	ArduinoAPIVersion    string
+	FQBN                 *cores.FQBN
+	CodeCompleteAt       string
 
 	// Build options are serialized here
 	BuildOptionsJson         string
@@ -115,10 +115,10 @@ type Context struct {
 
 func (ctx *Context) ExtractBuildOptions() properties.Map {
 	opts := make(properties.Map)
-	opts["hardwareFolders"] = strings.Join(ctx.HardwareFolders.AsStrings(), ",")
-	opts["toolsFolders"] = strings.Join(ctx.ToolsFolders.AsStrings(), ",")
-	opts["builtInLibrariesFolders"] = strings.Join(ctx.BuiltInLibrariesFolders.AsStrings(), ",")
-	opts["otherLibrariesFolders"] = strings.Join(ctx.OtherLibrariesFolders.AsStrings(), ",")
+	opts["hardwareFolders"] = strings.Join(ctx.HardwareDirs.AsStrings(), ",")
+	opts["toolsFolders"] = strings.Join(ctx.ToolsDirs.AsStrings(), ",")
+	opts["builtInLibrariesFolders"] = strings.Join(ctx.BuiltInLibrariesDirs.AsStrings(), ",")
+	opts["otherLibrariesFolders"] = strings.Join(ctx.OtherLibrariesDirs.AsStrings(), ",")
 	opts["sketchLocation"] = ctx.SketchLocation.String()
 	var additionalFilesRelative []string
 	if ctx.Sketch != nil {
@@ -139,10 +139,10 @@ func (ctx *Context) ExtractBuildOptions() properties.Map {
 }
 
 func (ctx *Context) InjectBuildOptions(opts properties.Map) {
-	ctx.HardwareFolders = paths.NewPathList(strings.Split(opts["hardwareFolders"], ",")...)
-	ctx.ToolsFolders = paths.NewPathList(strings.Split(opts["toolsFolders"], ",")...)
-	ctx.BuiltInLibrariesFolders = paths.NewPathList(strings.Split(opts["builtInLibrariesFolders"], ",")...)
-	ctx.OtherLibrariesFolders = paths.NewPathList(strings.Split(opts["otherLibrariesFolders"], ",")...)
+	ctx.HardwareDirs = paths.NewPathList(strings.Split(opts["hardwareFolders"], ",")...)
+	ctx.ToolsDirs = paths.NewPathList(strings.Split(opts["toolsFolders"], ",")...)
+	ctx.BuiltInLibrariesDirs = paths.NewPathList(strings.Split(opts["builtInLibrariesFolders"], ",")...)
+	ctx.OtherLibrariesDirs = paths.NewPathList(strings.Split(opts["otherLibrariesFolders"], ",")...)
 	ctx.SketchLocation = paths.New(opts["sketchLocation"])
 	fqbn, err := cores.ParseFQBN(opts["fqbn"])
 	if err != nil {

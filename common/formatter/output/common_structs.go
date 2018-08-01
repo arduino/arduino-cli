@@ -45,7 +45,7 @@ type ProcessResult struct {
 // String returns a string representation of the object.
 //   EXAMPLE:
 //   ToolName - ErrorText: Error explaining why failed
-//   ToolName - StatusText: PATH = /path/to/result/folder
+//   ToolName - StatusText: PATH = /path/to/result/dir
 func (lr ProcessResult) String() string {
 	ret := lr.ItemName
 	if lr.Status != "" {

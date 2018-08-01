@@ -45,14 +45,14 @@ import (
 func (pm *PackageManager) LoadHardware(config *configs.Configuration) error {
 	dirs, err := config.HardwareDirectories()
 	if err != nil {
-		return fmt.Errorf("getting hardware folder: %s", err)
+		return fmt.Errorf("getting hardware directory: %s", err)
 	}
 	if err := pm.LoadHardwareFromDirectories(dirs); err != nil {
 		return err
 	}
 	dirs, err = configs.BundleToolsDirectories()
 	if err != nil {
-		return fmt.Errorf("getting hardware folder: %s", err)
+		return fmt.Errorf("getting hardware directory: %s", err)
 	}
 	return pm.LoadToolsFromBundleDirectories(dirs)
 }
@@ -78,10 +78,10 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) error {
 	if isDir, err := path.IsDir(); err != nil {
 		return fmt.Errorf("reading %s stat info: %s", path, err)
 	} else if !isDir {
-		return fmt.Errorf("%s is not a folder", path)
+		return fmt.Errorf("%s is not a directory", path)
 	}
 
-	// Scan subfolders.
+	// Scan subdirs
 	files, err := path.ReadDir()
 	if err != nil {
 		return fmt.Errorf("reading %s directory: %s", path, err)
@@ -90,9 +90,9 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) error {
 	for _, packagerPath := range files {
 		packager := packagerPath.Base()
 
-		// First exclude all "tools" folders
+		// First exclude all "tools" directory
 		if packager == "tools" {
-			pm.Log.Infof("Excluding folder: %s", packagerPath)
+			pm.Log.Infof("Excluding directory: %s", packagerPath)
 			continue
 		}
 
@@ -102,7 +102,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) error {
 			return fmt.Errorf("following possible symlink %s: %s", path, err)
 		}
 
-		// There are two possible package folder structures:
+		// There are two possible package directory structures:
 		// - PACKAGER/ARCHITECTURE-1/boards.txt...                   (ex: arduino/avr/...)
 		//   PACKAGER/ARCHITECTURE-2/boards.txt...                   (ex: arduino/sam/...)
 		//   PACKAGER/ARCHITECTURE-3/boards.txt...                   (ex: arduino/samd/...)
@@ -111,11 +111,11 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) error {
 		//   PACKAGER/hardware/ARCHITECTURE-2/VERSION/boards.txt...  (ex: arduino/hardware/sam/1.6.6/...)
 		//   PACKAGER/hardware/ARCHITECTURE-3/VERSION/boards.txt...  (ex: arduino/hardware/samd/1.6.12/...)
 		//   PACKAGER/tools/...                                      (ex: arduino/tools/...)
-		// in the latter case we just move into "hardware" folder and continue
+		// in the latter case we just move into "hardware" directory and continue
 		var architectureParentPath *paths.Path
 		hardwareSubdirPath := packagerPath.Join("hardware") // ex: .arduino15/packages/arduino/hardware
 		if isDir, _ := hardwareSubdirPath.IsDir(); isDir {
-			// we found the "hardware" folder move down into that
+			// we found the "hardware" directory move down into that
 			architectureParentPath = hardwareSubdirPath // ex: .arduino15/packages/arduino/
 		} else if isDir, _ := packagerPath.IsDir(); isDir {
 			// we are already at the correct level
@@ -130,7 +130,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) error {
 			return fmt.Errorf("loading package %s: %s", packager, err)
 		}
 
-		// Check if we have tools to load, the folder structure is as follows:
+		// Check if we have tools to load, the directory structure is as follows:
 		// - PACKAGER/tools/TOOL-NAME/TOOL-VERSION/... (ex: arduino/tools/bossac/1.7.0/...)
 		toolsSubdirPath := packagerPath.Join("tools")
 		if isDir, _ := toolsSubdirPath.IsDir(); isDir {
@@ -146,18 +146,12 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) error {
 
 // loadPlatforms load plaftorms from the specified directory assuming that they belongs
 // to the targetPackage object passed as parameter.
-func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFolder *paths.Path) error {
-	pm.Log.Infof("Loading package %s from: %s", targetPackage.Name, packageFolder)
+func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir *paths.Path) error {
+	pm.Log.Infof("Loading package %s from: %s", targetPackage.Name, packageDir)
 
-	// packagePlatformTxt, err := properties.SafeLoad(filepath.Join(folder, constants.FILE_PLATFORM_TXT))
-	// if err != nil {
-	// 	return err
-	// }
-	// targetPackage.Properties.Merge(packagePlatformTxt)
-
-	files, err := packageFolder.ReadDir()
+	files, err := packageDir.ReadDir()
 	if err != nil {
-		return fmt.Errorf("reading directory %s: %s", packageFolder, err)
+		return fmt.Errorf("reading directory %s: %s", packageDir, err)
 	}
 
 	for _, file := range files {
@@ -166,12 +160,12 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 			architecure == "platform.txt" { // TODO: Check if this "platform.txt" condition should be here....
 			continue
 		}
-		platformPath := packageFolder.Join(architecure)
+		platformPath := packageDir.Join(architecure)
 		if isDir, _ := platformPath.IsDir(); !isDir {
 			continue
 		}
 
-		// There are two possible platform folder structures:
+		// There are two possible platform directory structures:
 		// - ARCHITECTURE/boards.txt
 		// - ARCHITECTURE/VERSION/boards.txt
 		// We identify them by checking where is the bords.txt file
@@ -202,7 +196,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageFol
 		} else /* !exist */ {
 
 			// case: ARCHITECTURE/VERSION/boards.txt
-			// let's dive into VERSION folders
+			// let's dive into VERSION directories
 
 			platform := targetPackage.GetOrCreatePlatform(architecure)
 			versionDirs, err := platformPath.ReadDir()
@@ -332,7 +326,6 @@ func (pm *PackageManager) loadToolReleasesFromTool(tool *cores.Tool, toolPath *p
 		version := versionPath.Base()
 		if toolReleasePath, err := versionPath.Abs(); err == nil {
 			release := tool.GetOrCreateRelease(version)
-			// TODO: Make Folder a *paths.Path
 			release.InstallDir = toolReleasePath
 			pm.Log.WithField("tool", release).Infof("Loaded tool")
 		} else {
@@ -358,7 +351,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) er
 	// We scan toolsPath content to find a "builtin_tools_versions.txt", if such file exists
 	// then the all the tools are available in the same directory, mixed together, and their
 	// name and version are written in the "builtin_tools_versions.txt" file.
-	// If no "builtin_tools_versions.txt" is found, then the folder structure is the classic
+	// If no "builtin_tools_versions.txt" is found, then the directory structure is the classic
 	// TOOLSPATH/TOOL-NAME/TOOL-VERSION and it will be parsed as such and associated to an
 	// "unnamed" packager.
 

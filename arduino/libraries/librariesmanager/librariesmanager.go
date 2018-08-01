@@ -143,7 +143,7 @@ func (sc *LibrariesManager) AddLibrariesDir(path *paths.Path, location libraries
 	})
 }
 
-// AddPlatformReleaseLibrariesDir add the libraries folder in the
+// AddPlatformReleaseLibrariesDir add the libraries directory in the
 // specified PlatformRelease to the list of directories to scan when
 // searching for libraries.
 func (sc *LibrariesManager) AddPlatformReleaseLibrariesDir(plaftormRelease *cores.PlatformRelease, location libraries.LibraryLocation) {
@@ -186,20 +186,20 @@ func (sc *LibrariesManager) getSketchbookLibrariesDir() *paths.Path {
 // LoadLibrariesFromDir loads all libraries in the given directory. Returns
 // nil if the directory doesn't exists.
 func (sc *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) error {
-	subFolders, err := librariesDir.Path.ReadDir()
+	subDirs, err := librariesDir.Path.ReadDir()
 	if os.IsNotExist(err) {
 		return nil
 	}
 	if err != nil {
 		return fmt.Errorf("reading dir %s: %s", librariesDir.Path, err)
 	}
-	subFolders.FilterDirs()
-	subFolders.FilterOutHiddenFiles()
+	subDirs.FilterDirs()
+	subDirs.FilterOutHiddenFiles()
 
-	for _, subFolder := range subFolders {
-		library, err := libraries.Load(subFolder, librariesDir.Location)
+	for _, subDir := range subDirs {
+		library, err := libraries.Load(subDir, librariesDir.Location)
 		if err != nil {
-			return fmt.Errorf("loading library from %s: %s", subFolder, err)
+			return fmt.Errorf("loading library from %s: %s", subDir, err)
 		}
 		library.ContainerPlatform = librariesDir.PlatformRelease
 		alternatives, ok := sc.Libraries[library.Name]

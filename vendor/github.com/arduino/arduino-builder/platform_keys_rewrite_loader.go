@@ -45,7 +45,7 @@ import (
 type PlatformKeysRewriteLoader struct{}
 
 func (s *PlatformKeysRewriteLoader) Run(ctx *types.Context) error {
-	folders := ctx.HardwareFolders
+	folders := ctx.HardwareDirs
 
 	platformKeysRewriteTxtPath, err := findPlatformKeysRewriteTxt(folders)
 	if err != nil {

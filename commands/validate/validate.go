@@ -57,15 +57,15 @@ func InitCommand() *cobra.Command {
 
 func run(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino validate`")
-	packagesFolder := commands.Config.PackagesDir().String()
-	err := filepath.Walk(packagesFolder, func(path string, info os.FileInfo, err error) error {
+	packagesDir := commands.Config.PackagesDir().String()
+	err := filepath.Walk(packagesDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if !info.IsDir() {
 			return nil
 		}
-		relativePath, err := filepath.Rel(packagesFolder, path)
+		relativePath, err := filepath.Rel(packagesDir, path)
 		if err != nil {
 			return err
 		}

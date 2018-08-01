@@ -285,7 +285,7 @@ func TestCoreDownload(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
 
-	// Set staging folder to a temporary folder
+	// Set staging dir to a temporary dir
 	tmp, err := ioutil.TempDir(os.TempDir(), "test")
 	require.NoError(t, err, "making temporary staging dir")
 	defer os.RemoveAll(tmp)

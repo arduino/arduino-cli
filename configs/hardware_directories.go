@@ -41,9 +41,9 @@ func (config *Configuration) HardwareDirectories() (paths.PathList, error) {
 	res := paths.PathList{}
 
 	if IsBundledInDesktopIDE() {
-		bundledHardwareFolder := filepath.Join(*arduinoIDEDirectory, "hardware")
-		if info, err := os.Stat(bundledHardwareFolder); err == nil && info.IsDir() {
-			res.Add(paths.New(bundledHardwareFolder))
+		bundledHardwareDir := filepath.Join(*arduinoIDEDirectory, "hardware")
+		if info, err := os.Stat(bundledHardwareDir); err == nil && info.IsDir() {
+			res.Add(paths.New(bundledHardwareDir))
 		}
 	}
 
@@ -65,9 +65,9 @@ func BundleToolsDirectories() (paths.PathList, error) {
 	res := paths.PathList{}
 
 	if IsBundledInDesktopIDE() {
-		bundledToolsFolder := filepath.Join(*arduinoIDEDirectory, "hardware", "tools")
-		if info, err := os.Stat(bundledToolsFolder); err == nil && info.IsDir() {
-			res = append(res, paths.New(bundledToolsFolder))
+		bundledToolsDir := filepath.Join(*arduinoIDEDirectory, "hardware", "tools")
+		if info, err := os.Stat(bundledToolsDir); err == nil && info.IsDir() {
+			res = append(res, paths.New(bundledToolsDir))
 		}
 	}
 

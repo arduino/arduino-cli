@@ -9,13 +9,13 @@ import (
 )
 
 // Install installs the resource in three steps:
-// - the archive is unpacked in a temporary subfolder of tempPath
-// - there should be only one root folder in the unpacked content
-// - the only root folder is moved/renamed to/as the destination directory
+// - the archive is unpacked in a temporary subdir of tempPath
+// - there should be only one root dir in the unpacked content
+// - the only root dir is moved/renamed to/as the destination directory
 // Note that tempPath and destDir must be on the same filesystem partition
 // otherwise the last step will fail.
 func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.Path) error {
-	// Create a temporary folder to extract package
+	// Create a temporary dir to extract package
 	if err := tempPath.MkdirAll(); err != nil {
 		return fmt.Errorf("creating temp dir for extraction: %s", err)
 	}

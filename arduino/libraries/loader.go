@@ -37,7 +37,7 @@ import (
 	properties "github.com/arduino/go-properties-map"
 )
 
-// Load loads a library from the given folder
+// Load loads a library from the given LibraryLocation
 func Load(libDir *paths.Path, location LibraryLocation) (*Library, error) {
 	if exist, _ := libDir.Join("library.properties").Exist(); exist {
 		return makeNewLibrary(libDir, location)
@@ -45,15 +45,15 @@ func Load(libDir *paths.Path, location LibraryLocation) (*Library, error) {
 	return makeLegacyLibrary(libDir, location)
 }
 
-func addUtilityFolder(library *Library) {
+func addUtilityDirectory(library *Library) {
 	utilitySourcePath := library.InstallDir.Join("utility")
 	if isDir, _ := utilitySourcePath.IsDir(); isDir {
 		library.UtilityDir = utilitySourcePath
 	}
 }
 
-func makeNewLibrary(libraryFolder *paths.Path, location LibraryLocation) (*Library, error) {
-	libProperties, err := properties.Load(libraryFolder.Join("library.properties").String())
+func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library, error) {
+	libProperties, err := properties.Load(libraryDir.Join("library.properties").String())
 	if err != nil {
 		return nil, fmt.Errorf("loading library.properties: %s", err)
 	}
@@ -70,14 +70,14 @@ func makeNewLibrary(libraryFolder *paths.Path, location LibraryLocation) (*Libra
 
 	library := &Library{}
 	library.Location = location
-	library.InstallDir = libraryFolder
-	if exist, _ := libraryFolder.Join("src").Exist(); exist {
+	library.InstallDir = libraryDir
+	if exist, _ := libraryDir.Join("src").Exist(); exist {
 		library.Layout = RecursiveLayout
-		library.SourceDir = libraryFolder.Join("src")
+		library.SourceDir = libraryDir.Join("src")
 	} else {
 		library.Layout = FlatLayout
-		library.SourceDir = libraryFolder
-		addUtilityFolder(library)
+		library.SourceDir = libraryDir
+		addUtilityDirectory(library)
 	}
 
 	if libProperties["architectures"] == "" {
@@ -99,7 +99,7 @@ func makeNewLibrary(libraryFolder *paths.Path, location LibraryLocation) (*Libra
 	}
 	library.License = libProperties["license"]
 
-	library.Name = libraryFolder.Base()
+	library.Name = libraryDir.Base()
 	library.RealName = strings.TrimSpace(libProperties["name"])
 	library.Version = strings.TrimSpace(libProperties["version"])
 	library.Author = strings.TrimSpace(libProperties["author"])
@@ -126,6 +126,6 @@ func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, er
 		Architectures: []string{"*"},
 		IsLegacy:      true,
 	}
-	addUtilityFolder(library)
+	addUtilityDirectory(library)
 	return library, nil
 }

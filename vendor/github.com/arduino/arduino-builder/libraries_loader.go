@@ -46,7 +46,7 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	lm := librariesmanager.NewLibraryManager(nil, nil)
 	ctx.LibrariesManager = lm
 
-	builtInLibrariesFolders := ctx.BuiltInLibrariesFolders
+	builtInLibrariesFolders := ctx.BuiltInLibrariesDirs
 	if err := builtInLibrariesFolders.ToAbs(); err != nil {
 		return i18n.WrapError(err)
 	}
@@ -64,7 +64,7 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	}
 	lm.AddPlatformReleaseLibrariesDir(platform, libraries.PlatformBuiltIn)
 
-	librariesFolders := ctx.OtherLibrariesFolders
+	librariesFolders := ctx.OtherLibrariesDirs
 	if err := librariesFolders.ToAbs(); err != nil {
 		return i18n.WrapError(err)
 	}

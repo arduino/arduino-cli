@@ -139,7 +139,7 @@ func runSyncCommand(cmd *cobra.Command, args []string) {
 	}
 
 	logrus.Info("Finding local sketches")
-	sketchMap := sketches.Find(sketchbook.String(), "libraries") // Exclude libraries folder.
+	sketchMap := sketches.Find(sketchbook.String(), "libraries") // Exclude libraries dirs.
 
 	logrus.Info("Finding online sketches")
 	client := createClient.New(nil)
@@ -353,13 +353,13 @@ func pullSketch(sketch *createClient.ArduinoCreateSketch, sketchbook *paths.Path
 		return err
 	}
 
-	sketchFolder, err := sketchbook.MkTempDir(fmt.Sprintf("%s-temp", *sketch.Name))
+	sketchDir, err := sketchbook.MkTempDir(fmt.Sprintf("%s-temp", *sketch.Name))
 	if err != nil {
 		return err
 	}
-	defer sketchFolder.RemoveAll()
+	defer sketchDir.RemoveAll()
 
-	destFolder := sketchbook.Join(*sketch.Name)
+	destDir := sketchbook.Join(*sketch.Name)
 
 	for _, file := range append(r.Files, sketch.Ino) {
 		path := findPathOf(*sketch.Name, *file.Path)
@@ -389,18 +389,18 @@ func pullSketch(sketch *createClient.ArduinoCreateSketch, sketchbook *paths.Path
 			return err
 		}
 
-		destFile := sketchFolder.Join(path)
+		destFile := sketchDir.Join(path)
 		err = destFile.WriteFile(decodedData)
 		if err != nil {
 			return errors.New("Copy of a file of the downloaded sketch failed, sync failed.")
 		}
 	}
 
-	if err := destFolder.RemoveAll(); err != nil {
+	if err := destDir.RemoveAll(); err != nil {
 		return err
 	}
 
-	err = sketchFolder.Rename(destFolder)
+	err = sketchDir.Rename(destDir)
 	if err != nil {
 		return err
 	}
