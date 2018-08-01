@@ -30,25 +30,34 @@
 package lib
 
 import (
+	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-// InitCommand prepares the command.
-func InitCommand() *cobra.Command {
-	libCommand := &cobra.Command{
-		Use:   "lib",
-		Short: "Arduino commands about libraries.",
-		Long:  "Arduino commands about libraries.",
-		Example: "" +
-			"arduino lib install AudioZero\n" +
-			"arduino lib update-index",
+func initUpgradeCommand() *cobra.Command {
+	listCommand := &cobra.Command{
+		Use:   "upgrade",
+		Short: "Upgrades installed libraries.",
+		Long: "This command ungrades all installed libraries to the latest available version." +
+			"To upgrade a single library use the 'install' command.",
+		Example: "arduino lib upgrade",
+		Args:    cobra.NoArgs,
+		Run:     runUpgradeCommand,
 	}
-	libCommand.AddCommand(initDownloadCommand())
-	libCommand.AddCommand(initInstallCommand())
-	libCommand.AddCommand(initListCommand())
-	libCommand.AddCommand(initSearchCommand())
-	libCommand.AddCommand(initUninstallCommand())
-	libCommand.AddCommand(initUpgradeCommand())
-	libCommand.AddCommand(initUpdateIndexCommand())
-	return libCommand
+	return listCommand
+}
+
+func runUpgradeCommand(cmd *cobra.Command, args []string) {
+	lm := commands.InitLibraryManager(nil)
+	list := listLibraries(lm, true)
+	libReleases := []*librariesindex.Release{}
+	for _, upgradeDesc := range list.Libraries {
+		libReleases = append(libReleases, upgradeDesc.Available)
+	}
+
+	downloadLibraries(lm, libReleases)
+	installLibraries(lm, libReleases)
+	logrus.Info("Done")
 }
