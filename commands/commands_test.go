@@ -34,6 +34,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/arduino/go-paths-helper"
@@ -281,6 +282,38 @@ func updateCoreIndex(t *testing.T) {
 	require.Equal(t, 0, exitCode, "exit code")
 }
 
+func detectLatestAVRCore(t *testing.T) string {
+	jsonFile := paths.New(os.Getenv("ARDUINO_DATA_DIR")).Join("package_index.json")
+	type index struct {
+		Packages []struct {
+			Name      string
+			Platforms []struct {
+				Architecture string
+				Version      string
+			}
+		}
+	}
+	var jsonIndex index
+	jsonData, err := jsonFile.ReadFile()
+	require.NoError(t, err, "reading package_index.json")
+	err = json.Unmarshal(jsonData, &jsonIndex)
+	require.NoError(t, err, "parsing package_index.json")
+	latest := ""
+	for _, p := range jsonIndex.Packages {
+		if p.Name == "arduino" {
+			for _, pl := range p.Platforms {
+				if pl.Architecture == "avr" && pl.Version > latest {
+					latest = pl.Version
+				}
+			}
+			break
+		}
+	}
+	require.NotEmpty(t, latest, "latest avr core version")
+	fmt.Println("Latest AVR core version:", latest)
+	return latest
+}
+
 func TestCoreDownload(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
@@ -291,7 +324,9 @@ func TestCoreDownload(t *testing.T) {
 	defer os.RemoveAll(tmp)
 
 	updateCoreIndex(t)
-
+	AVR := "arduino:avr@" + detectLatestAVRCore(t)
+	return
+	// Download a specific core version
 	exitCode, d := executeWithArgs(t, "core", "download", "arduino:avr@1.6.16")
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "arduino:avr-gcc@4.9.2-atmel3.5.3-arduino2 downloaded")
@@ -299,6 +334,12 @@ func TestCoreDownload(t *testing.T) {
 	require.Contains(t, string(d), "arduino:arduinoOTA@1.0.0 downloaded")
 	require.Contains(t, string(d), "arduino:avr@1.6.16 downloaded")
 
+	// Download latest
+	exitCode, d = executeWithArgs(t, "core", "download", "arduino:avr")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), AVR+" downloaded")
+
+	// Wrong downloads
 	exitCode, d = executeWithArgs(t, "core", "download", "arduino:samd@1.2.3-notexisting")
 	require.NotZero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "required version 1.2.3-notexisting not found for platform arduino:samd")
@@ -310,4 +351,15 @@ func TestCoreDownload(t *testing.T) {
 	exitCode, d = executeWithArgs(t, "core", "download", "wrongparameter")
 	require.NotZero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "invalid item")
+
+	// Empty cores list
+	exitCode, d = executeWithArgs(t, "core", "download", "wrongparameter")
+	require.NotZero(t, exitCode, "exit code")
+	require.Empty(t, strings.TrimSpace(string(d)))
+
+	// Install avr
+	exitCode, d = executeWithArgs(t, "core", "install", "arduino:avr")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "arduino:avr@1.6.21 downloaded")
+
 }
