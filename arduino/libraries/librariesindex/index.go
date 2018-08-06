@@ -53,17 +53,16 @@ type Library struct {
 
 // Release is a release of a library available for download
 type Release struct {
-	Author             string
-	Version            string
-	Maintainer         string
-	Sentence           string
-	Paragraph          string
-	Website            string
-	Category           string
-	Architectures      []string
-	Types              []string
-	Resource           *resources.DownloadResource
-	InstalledDirectory string
+	Author        string
+	Version       string
+	Maintainer    string
+	Sentence      string
+	Paragraph     string
+	Website       string
+	Category      string
+	Architectures []string
+	Types         []string
+	Resource      *resources.DownloadResource
 
 	Library *Library `json:"-"`
 }
