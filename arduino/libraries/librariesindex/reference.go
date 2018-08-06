@@ -29,33 +29,42 @@
 
 package librariesindex
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+
+	semver "go.bug.st/relaxed-semver"
+)
 
 // Reference uniquely identify a Library in the library index
 type Reference struct {
-	Name    string // The name of the parsed item.
-	Version string // The Version of the parsed item.
+	Name    string          // The name of the parsed item.
+	Version *semver.Version // The Version of the parsed item.
 }
 
 func (r *Reference) String() string {
-	if r.Version == "" {
+	if r.Version == nil {
 		return r.Name
 	}
-	return r.Name + "@" + r.Version
+	return r.Name + "@" + r.Version.String()
 }
 
 // ParseArgs parses a sequence of "item@version" tokens and returns a Name-Version slice.
 //
 // If version is not present it is assumed as "latest" version.
-func ParseArgs(args []string) []*Reference {
+func ParseArgs(args []string) ([]*Reference, error) {
 	res := []*Reference{}
 	for _, item := range args {
 		tokens := strings.SplitN(item, "@", 2)
 		if len(tokens) == 2 {
-			res = append(res, &Reference{Name: tokens[0], Version: tokens[1]})
+			version, err := semver.Parse(tokens[1])
+			if err != nil {
+				return nil, fmt.Errorf("invalid version %s: %s", version, err)
+			}
+			res = append(res, &Reference{Name: tokens[0], Version: version})
 		} else {
 			res = append(res, &Reference{Name: tokens[0]})
 		}
 	}
-	return res
+	return res, nil
 }

@@ -58,7 +58,11 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib install`")
 	lm := commands.InitLibraryManager(nil)
 
-	refs := librariesindex.ParseArgs(args)
+	refs, err := librariesindex.ParseArgs(args)
+	if err != nil {
+		formatter.PrintError(err, "Arguments error")
+		os.Exit(commands.ErrBadArgument)
+	}
 	downloadLibrariesFromReferences(lm, refs)
 	installLibrariesFromReferences(lm, refs)
 }

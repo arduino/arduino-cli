@@ -41,7 +41,7 @@ func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease
 		platformRelease.Platform.Package.Name,
 		"hardware",
 		platformRelease.Platform.Architecture,
-		platformRelease.Version)
+		platformRelease.Version.String())
 	return platformRelease.Resource.Install(pm.DownloadDir, pm.TempDir, destDir)
 }
 
@@ -55,6 +55,6 @@ func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease) error {
 		toolRelease.Tool.Package.Name,
 		"tools",
 		toolRelease.Tool.Name,
-		toolRelease.Version)
+		toolRelease.Version.String())
 	return toolResource.Install(pm.DownloadDir, pm.TempDir, destDir)
 }

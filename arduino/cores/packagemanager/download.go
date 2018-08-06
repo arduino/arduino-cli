@@ -33,21 +33,21 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cavaliercoder/grab"
-
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
+	"github.com/cavaliercoder/grab"
+	"go.bug.st/relaxed-semver"
 )
 
 // PlatformReference represents a tuple to identify a Platform
 type PlatformReference struct {
 	Package              string // The package where this Platform belongs to.
 	PlatformArchitecture string
-	PlatformVersion      string
+	PlatformVersion      *semver.Version
 }
 
 func (platform *PlatformReference) String() string {
-	return platform.Package + ":" + platform.PlatformArchitecture + "@" + platform.PlatformVersion
+	return platform.Package + ":" + platform.PlatformArchitecture + "@" + platform.PlatformVersion.String()
 }
 
 // FindPlatform returns the Platform matching the PlatformReference or nil if not found.
@@ -70,7 +70,7 @@ func (pm *PackageManager) FindPlatformRelease(ref *PlatformReference) *cores.Pla
 	if platform == nil {
 		return nil
 	}
-	platformRelease, ok := platform.Releases[ref.PlatformVersion]
+	platformRelease, ok := platform.Releases[ref.PlatformVersion.String()]
 	if !ok {
 		return nil
 	}
@@ -102,7 +102,7 @@ func (pm *PackageManager) FindItemsToDownload(items []PlatformReference) (
 		added[platform.String()] = true
 
 		var release *cores.PlatformRelease
-		if item.PlatformVersion != "" {
+		if item.PlatformVersion != nil {
 			release = platform.GetRelease(item.PlatformVersion)
 			if release == nil {
 				return nil, nil, fmt.Errorf("required version %s not found for platform %s", item.PlatformVersion, platform.String())

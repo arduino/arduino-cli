@@ -38,11 +38,11 @@ import (
 	"testing"
 
 	"github.com/arduino/go-paths-helper"
-
 	"github.com/bcmi-labs/arduino-cli/commands/root"
 	"github.com/bouk/monkey"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/relaxed-semver"
 )
 
 // Redirecting stdOut so we can analyze output line by
@@ -298,12 +298,14 @@ func detectLatestAVRCore(t *testing.T) string {
 	require.NoError(t, err, "reading package_index.json")
 	err = json.Unmarshal(jsonData, &jsonIndex)
 	require.NoError(t, err, "parsing package_index.json")
-	latest := ""
+	latest := semver.MustParse("0.0.1")
 	for _, p := range jsonIndex.Packages {
 		if p.Name == "arduino" {
 			for _, pl := range p.Platforms {
-				if pl.Architecture == "avr" && pl.Version > latest {
-					latest = pl.Version
+				ver, err := semver.Parse(pl.Version)
+				require.NoError(t, err, "version parsing")
+				if pl.Architecture == "avr" && ver.GreaterThan(latest) {
+					latest = ver
 				}
 			}
 			break
@@ -311,7 +313,7 @@ func detectLatestAVRCore(t *testing.T) string {
 	}
 	require.NotEmpty(t, latest, "latest avr core version")
 	fmt.Println("Latest AVR core version:", latest)
-	return latest
+	return latest.String()
 }
 
 func TestCoreDownload(t *testing.T) {

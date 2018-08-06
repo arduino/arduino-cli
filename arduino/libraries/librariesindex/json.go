@@ -34,6 +34,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/go-paths-helper"
+	semver "go.bug.st/relaxed-semver"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 )
@@ -43,20 +44,20 @@ type indexJSON struct {
 }
 
 type indexRelease struct {
-	Name            string   `json:"name,required"`
-	Version         string   `json:"version,required"`
-	Author          string   `json:"author"`
-	Maintainer      string   `json:"maintainer"`
-	Sentence        string   `json:"sentence"`
-	Paragraph       string   `json:"paragraph"`
-	Website         string   `json:"website"`
-	Category        string   `json:"category"`
-	Architectures   []string `json:"architectures"`
-	Types           []string `json:"types"`
-	URL             string   `json:"url"`
-	ArchiveFileName string   `json:"archiveFileName"`
-	Size            int64    `json:"size"`
-	Checksum        string   `json:"checksum"`
+	Name            string          `json:"name,required"`
+	Version         *semver.Version `json:"version,required"`
+	Author          string          `json:"author"`
+	Maintainer      string          `json:"maintainer"`
+	Sentence        string          `json:"sentence"`
+	Paragraph       string          `json:"paragraph"`
+	Website         string          `json:"website"`
+	Category        string          `json:"category"`
+	Architectures   []string        `json:"architectures"`
+	Types           []string        `json:"types"`
+	URL             string          `json:"url"`
+	ArchiveFileName string          `json:"archiveFileName"`
+	Size            int64           `json:"size"`
+	Checksum        string          `json:"checksum"`
 }
 
 // LoadIndex reads a library_index.json and create the corresponding Index
@@ -117,8 +118,8 @@ func (indexLib *indexRelease) extractReleaseIn(library *Library) {
 		},
 		Library: library,
 	}
-	library.Releases[indexLib.Version] = release
-	if library.Latest == nil || library.Latest.Version < release.Version {
+	library.Releases[indexLib.Version.String()] = release
+	if library.Latest == nil || library.Latest.Version.LessThan(release.Version) {
 		library.Latest = release
 	}
 }

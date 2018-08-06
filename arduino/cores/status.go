@@ -139,7 +139,7 @@ func (tdep ToolDependency) extractRelease(sc Packages) (*ToolRelease, error) {
 	if err != nil {
 		return nil, err
 	}
-	release, exists := tool.Releases[tdep.ToolVersion]
+	release, exists := tool.Releases[tdep.ToolVersion.String()]
 	if !exists {
 		return nil, errors.New("Release Not Found")
 	}
@@ -161,7 +161,7 @@ func (packages *Packages) GetDepsOfPlatformRelease(release *PlatformRelease) ([]
 		if !exists {
 			return nil, fmt.Errorf("Tool %s not found", dep.ToolName)
 		}
-		toolRelease, exists := tool.Releases[dep.ToolVersion]
+		toolRelease, exists := tool.Releases[dep.ToolVersion.String()]
 		if !exists {
 			return nil, fmt.Errorf("Tool version %s not found", dep.ToolVersion)
 		}

@@ -31,13 +31,13 @@ package core
 
 import (
 	"fmt"
-	"strings"
-
 	"os"
+	"strings"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
 	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"go.bug.st/relaxed-semver"
 )
 
 // parsePlatformReferenceArgs parses a sequence of "packager:arch@version" tokens and returns a platformReference slice.
@@ -45,11 +45,15 @@ func parsePlatformReferenceArgs(args []string) []packagemanager.PlatformReferenc
 	ret := []packagemanager.PlatformReference{}
 
 	for _, arg := range args {
-		version := ""
+		var version *semver.Version
 		if strings.Contains(arg, "@") {
 			split := strings.SplitN(arg, "@", 2)
 			arg = split[0]
-			version = split[1]
+			if ver, err := semver.Parse(split[1]); err != nil {
+				formatter.PrintErrorMessage(fmt.Sprintf("invalid item '%s': %s", arg, err))
+			} else {
+				version = ver
+			}
 		}
 		split := strings.Split(arg, ":")
 		if len(split) != 2 {

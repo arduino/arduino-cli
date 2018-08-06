@@ -35,6 +35,7 @@ import (
 
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-map"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // Load loads a library from the given LibraryLocation
@@ -99,9 +100,15 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	}
 	library.License = libProperties["license"]
 
+	version := strings.TrimSpace(libProperties["version"])
+	if v, err := semver.Parse(version); err != nil {
+		return nil, fmt.Errorf("invalid version %s: %s", version, err)
+	} else {
+		library.Version = v
+	}
+
 	library.Name = libraryDir.Base()
 	library.RealName = strings.TrimSpace(libProperties["name"])
-	library.Version = strings.TrimSpace(libProperties["version"])
 	library.Author = strings.TrimSpace(libProperties["author"])
 	library.Maintainer = strings.TrimSpace(libProperties["maintainer"])
 	library.Sentence = strings.TrimSpace(libProperties["sentence"])
@@ -125,6 +132,7 @@ func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, er
 		Name:          path.Base(),
 		Architectures: []string{"*"},
 		IsLegacy:      true,
+		Version:       semver.MustParse(""),
 	}
 	addUtilityDirectory(library)
 	return library, nil

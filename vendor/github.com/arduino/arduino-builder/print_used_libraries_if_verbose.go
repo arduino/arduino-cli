@@ -47,11 +47,11 @@ func (s *PrintUsedLibrariesIfVerbose) Run(ctx *types.Context) error {
 	}
 
 	for _, library := range ctx.ImportedLibraries {
-		legacy := constants.EMPTY_STRING
+		legacy := ""
 		if library.IsLegacy {
 			legacy = constants.MSG_LIB_LEGACY
 		}
-		if library.Version == constants.EMPTY_STRING {
+		if library.Version.String() == "" {
 			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_LIBRARY, library.Name, library.InstallDir, legacy)
 		} else {
 			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_LIBRARY_AT_VERSION, library.Name, library.Version, library.InstallDir, legacy)

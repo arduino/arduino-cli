@@ -100,11 +100,11 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 
 	for _, tool := range ctx.AllTools {
 		buildProperties["runtime.tools."+tool.Tool.Name+".path"] = tool.InstallDir.String()
-		buildProperties["runtime.tools."+tool.Tool.Name+"-"+tool.Version+".path"] = tool.InstallDir.String()
+		buildProperties["runtime.tools."+tool.Tool.Name+"-"+tool.Version.String()+".path"] = tool.InstallDir.String()
 	}
 	for _, tool := range ctx.RequiredTools {
 		buildProperties["runtime.tools."+tool.Tool.Name+".path"] = tool.InstallDir.String()
-		buildProperties["runtime.tools."+tool.Tool.Name+"-"+tool.Version+".path"] = tool.InstallDir.String()
+		buildProperties["runtime.tools."+tool.Tool.Name+"-"+tool.Version.String()+".path"] = tool.InstallDir.String()
 	}
 
 	if !utils.MapStringStringHas(buildProperties, "software") {

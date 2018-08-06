@@ -33,12 +33,13 @@ import (
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
+	"go.bug.st/relaxed-semver"
 )
 
 func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 	builtinPackage := pm.GetPackages().GetOrCreatePackage("builtin")
 	ctagsTool := builtinPackage.GetOrCreateTool("ctags")
-	ctagsRel := ctagsTool.GetOrCreateRelease("5.8-arduino11")
+	ctagsRel := ctagsTool.GetOrCreateRelease(semver.MustParse("5.8-arduino11"))
 	ctagsRel.Flavours = []*cores.Flavour{
 		&cores.Flavour{
 			OS: "i686-pc-linux-gnu",
@@ -93,6 +94,8 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 	}
 }
 
+var ctagsVersion = semver.MustParse("5.8-arduino11")
+
 func getBuiltinCtagsTool(pm *packagemanager.PackageManager) (*cores.ToolRelease, error) {
-	return pm.Package("builtin").Tool("ctags").Release("5.8-arduino11").Get()
+	return pm.Package("builtin").Tool("ctags").Release(ctagsVersion).Get()
 }

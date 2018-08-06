@@ -30,16 +30,13 @@
 package cores
 
 import (
-	"fmt"
 	"regexp"
 	"runtime"
 
 	"github.com/arduino/go-paths-helper"
-
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
-
-	"github.com/blang/semver"
+	"go.bug.st/relaxed-semver"
 )
 
 // Tool represents a single Tool, part of a Package.
@@ -51,10 +48,10 @@ type Tool struct {
 
 // ToolRelease represents a single release of a tool
 type ToolRelease struct {
-	Version    string      `json:"version,required"` // The version number of this Release.
-	Flavours   []*Flavour  `json:"systems"`          // Maps OS to Flavour
-	Tool       *Tool       `json:"-"`
-	InstallDir *paths.Path `json:"-"`
+	Version    *semver.Version `json:"version,required"` // The version number of this Release.
+	Flavours   []*Flavour      `json:"systems"`          // Maps OS to Flavour
+	Tool       *Tool           `json:"-"`
+	InstallDir *paths.Path     `json:"-"`
 }
 
 // Flavour represents a flavour of a Tool version.
@@ -65,33 +62,30 @@ type Flavour struct {
 
 // GetOrCreateRelease returns the ToolRelease object with the specified version
 // or creates a new one if not found
-func (tool *Tool) GetOrCreateRelease(version string) *ToolRelease {
-	if release, ok := tool.Releases[version]; ok {
+func (tool *Tool) GetOrCreateRelease(version *semver.Version) *ToolRelease {
+	if release, ok := tool.Releases[version.String()]; ok {
 		return release
 	}
 	release := &ToolRelease{
 		Version: version,
 		Tool:    tool,
 	}
-	tool.Releases[version] = release
+	tool.Releases[version.String()] = release
 	return release
 }
 
 // GetRelease returns the specified release corresponding the provided version,
 // or nil if not found.
-func (tool *Tool) GetRelease(version string) *ToolRelease {
-	return tool.Releases[version]
+func (tool *Tool) GetRelease(version *semver.Version) *ToolRelease {
+	return tool.Releases[version.String()]
 }
 
 // GetAllReleasesVersions returns all the version numbers in this Core Package.
-func (tool *Tool) GetAllReleasesVersions() semver.Versions {
+func (tool *Tool) GetAllReleasesVersions() []*semver.Version {
 	releases := tool.Releases
-	versions := make(semver.Versions, 0, len(releases))
+	versions := []*semver.Version{}
 	for _, release := range releases {
-		temp, err := semver.Make(release.Version)
-		if err == nil {
-			versions = append(versions, temp)
-		}
+		versions = append(versions, release.Version)
 	}
 
 	return versions
@@ -99,22 +93,26 @@ func (tool *Tool) GetAllReleasesVersions() semver.Versions {
 
 // LatestRelease obtains latest version of a core package.
 func (tool *Tool) LatestRelease() *ToolRelease {
-	return tool.GetRelease(tool.latestReleaseVersion())
+	if latest := tool.latestReleaseVersion(); latest == nil {
+		return nil
+	} else {
+		return tool.GetRelease(latest)
+	}
 }
 
 // latestReleaseVersion obtains latest version number.
-func (tool *Tool) latestReleaseVersion() string {
+func (tool *Tool) latestReleaseVersion() *semver.Version {
 	versions := tool.GetAllReleasesVersions()
 	if len(versions) == 0 {
-		return ""
+		return nil
 	}
 	max := versions[0]
 	for i := 1; i < len(versions); i++ {
-		if versions[i].GT(max) {
+		if versions[i].GreaterThan(max) {
 			max = versions[i]
 		}
 	}
-	return fmt.Sprint(max)
+	return max
 }
 
 // GetLatestInstalled returns the latest installed ToolRelease for the Tool, or nil if no releases are installed.
@@ -124,10 +122,7 @@ func (tool *Tool) GetLatestInstalled() *ToolRelease {
 		if release.IsInstalled() {
 			if latest == nil {
 				latest = release
-			}
-			latestVer, _ := semver.Make(latest.Version)
-			releaseVer, _ := semver.Make(release.Version)
-			if latestVer.LT(releaseVer) {
+			} else if latest.Version.LessThan(release.Version) {
 				latest = release
 			}
 		}
@@ -145,14 +140,14 @@ func (tr *ToolRelease) IsInstalled() bool {
 }
 
 func (tr *ToolRelease) String() string {
-	return tr.Tool.String() + "@" + tr.Version
+	return tr.Tool.String() + "@" + tr.Version.String()
 }
 
 // RuntimeProperties returns the runtime properties for this tool
 func (tr *ToolRelease) RuntimeProperties() properties.Map {
 	return properties.Map{
-		"runtime.tools." + tr.Tool.Name + ".path":                    tr.InstallDir.String(),
-		"runtime.tools." + tr.Tool.Name + "-" + tr.Version + ".path": tr.InstallDir.String(),
+		"runtime.tools." + tr.Tool.Name + ".path":                             tr.InstallDir.String(),
+		"runtime.tools." + tr.Tool.Name + "-" + tr.Version.String() + ".path": tr.InstallDir.String(),
 	}
 }
 

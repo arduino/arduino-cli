@@ -30,15 +30,13 @@
 package cores
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/arduino/go-paths-helper"
 
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
-
-	"github.com/blang/semver"
+	"go.bug.st/relaxed-semver"
 )
 
 // Platform represents a platform package.
@@ -53,7 +51,7 @@ type Platform struct {
 // PlatformRelease represents a release of a plaform package.
 type PlatformRelease struct {
 	Resource       *resources.DownloadResource
-	Version        string
+	Version        *semver.Version
 	BoardsManifest []*BoardManifest
 	Dependencies   ToolDependencies // The Dependency entries to load tools.
 	Platform       *Platform        `json:"-"`
@@ -96,19 +94,23 @@ type ToolDependencies []*ToolDependency
 // ToolDependency is a tuple that uniquely identifies a specific version of a Tool
 type ToolDependency struct {
 	ToolName     string
-	ToolVersion  string
+	ToolVersion  *semver.Version
 	ToolPackager string
 }
 
 func (dep *ToolDependency) String() string {
-	return dep.ToolPackager + ":" + dep.ToolName + "@" + dep.ToolVersion
+	return dep.ToolPackager + ":" + dep.ToolName + "@" + dep.ToolVersion.String()
 }
 
 // GetOrCreateRelease returns the specified release corresponding the provided version,
 // or creates a new one if not found.
-func (platform *Platform) GetOrCreateRelease(version string) *PlatformRelease {
-	if release, ok := platform.Releases[version]; ok {
-		return release
+func (platform *Platform) GetOrCreateRelease(version *semver.Version) (*PlatformRelease, error) {
+	tag := ""
+	if version != nil {
+		tag = version.String()
+	}
+	if release, ok := platform.Releases[tag]; ok {
+		return release, nil
 	}
 	release := &PlatformRelease{
 		Version:     version,
@@ -117,48 +119,50 @@ func (platform *Platform) GetOrCreateRelease(version string) *PlatformRelease {
 		Programmers: map[string]properties.Map{},
 		Platform:    platform,
 	}
-	platform.Releases[version] = release
-	return release
+	platform.Releases[tag] = release
+	return release, nil
 }
 
 // GetRelease returns the specified release corresponding the provided version,
 // or nil if not found.
-func (platform *Platform) GetRelease(version string) *PlatformRelease {
-	return platform.Releases[version]
+func (platform *Platform) GetRelease(version *semver.Version) *PlatformRelease {
+	return platform.Releases[version.String()]
 }
 
-// GetLatestRelease returns the latest release of this platform
+// GetLatestRelease returns the latest release of this platform, or nil if no releases
+// are available
 func (platform *Platform) GetLatestRelease() *PlatformRelease {
-	return platform.GetRelease(platform.latestReleaseVersion())
+	latestVersion := platform.latestReleaseVersion()
+	if latestVersion == nil {
+		return nil
+	}
+	return platform.GetRelease(latestVersion)
 }
 
 // GetAllReleasesVersions returns all the version numbers in this Platform Package.
-func (platform *Platform) GetAllReleasesVersions() semver.Versions {
-	versions := make(semver.Versions, 0, len(platform.Releases))
+func (platform *Platform) GetAllReleasesVersions() []*semver.Version {
+	versions := []*semver.Version{}
 	for _, release := range platform.Releases {
-		temp, err := semver.Make(release.Version)
-		if err == nil {
-			versions = append(versions, temp)
-		}
+		versions = append(versions, release.Version)
 	}
-
 	return versions
 }
 
-// latestReleaseVersion obtains latest version number.
-func (platform *Platform) latestReleaseVersion() string {
+// latestReleaseVersion obtains latest version number, or nil if no release available
+func (platform *Platform) latestReleaseVersion() *semver.Version {
 	// TODO: Cache latest version using a field in Platform
 	versions := platform.GetAllReleasesVersions()
 	if len(versions) == 0 {
-		return ""
+		return nil
 	}
 	max := versions[0]
+
 	for i := 1; i < len(versions); i++ {
-		if versions[i].GT(max) {
+		if versions[i].GreaterThan(max) {
 			max = versions[i]
 		}
 	}
-	return fmt.Sprint(max)
+	return max
 }
 
 // GetInstalled return one of the installed PlatformRelease
@@ -210,5 +214,9 @@ func (release *PlatformRelease) GetLibrariesDir() *paths.Path {
 }
 
 func (release *PlatformRelease) String() string {
-	return release.Platform.String() + "@" + release.Version
+	version := ""
+	if release.Version != nil {
+		version = release.Version.String()
+	}
+	return release.Platform.String() + "@" + version
 }

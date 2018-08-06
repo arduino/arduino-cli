@@ -34,6 +34,7 @@ import (
 
 	"github.com/arduino/go-paths-helper"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
+	semver "go.bug.st/relaxed-semver"
 )
 
 var MandatoryProperties = []string{"name", "version", "author", "maintainer"}
@@ -75,16 +76,16 @@ type Library struct {
 	Precompiled       bool
 	LDflags           string
 	IsLegacy          bool
-	Version           string
+	Version           *semver.Version
 	License           string
 	Properties        map[string]string
 }
 
 func (library *Library) String() string {
-	if library.Version == "" {
+	if library.Version.String() == "" {
 		return library.Name
 	}
-	return library.Name + "@" + library.Version
+	return library.Name + "@" + library.Version.String()
 }
 
 // SupportsAnyArchitectureIn returns true if any of the following is true:

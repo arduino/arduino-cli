@@ -34,6 +34,7 @@ import (
 	"sort"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
+	semver "go.bug.st/relaxed-semver"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/gosuri/uitable"
@@ -91,7 +92,7 @@ func (il InstalledLibraries) String() string {
 			location = lib.ContainerPlatform.String()
 		}
 		if hasUpdates {
-			available := ""
+			var available *semver.Version
 			if libMeta.Available != nil {
 				available = libMeta.Available.Version
 			}

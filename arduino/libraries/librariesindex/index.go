@@ -32,10 +32,9 @@ package librariesindex
 import (
 	"sort"
 
-	"github.com/blang/semver"
-
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/bcmi-labs/arduino-cli/arduino/resources"
+	"go.bug.st/relaxed-semver"
 )
 
 // Index represents the list of libraries available for download
@@ -54,7 +53,7 @@ type Library struct {
 // Release is a release of a library available for download
 type Release struct {
 	Author        string
-	Version       string
+	Version       *semver.Version
 	Maintainer    string
 	Sentence      string
 	Paragraph     string
@@ -68,20 +67,19 @@ type Release struct {
 }
 
 func (r *Release) String() string {
-	return r.Library.Name + "@" + r.Version
+	return r.Library.Name + "@" + r.Version.String()
 }
 
 // FindRelease search a library Release in the index. Returns nil if the
 // release is not found
 func (idx *Index) FindRelease(ref *Reference) *Release {
-	if library, exists := idx.Libraries[ref.Name]; !exists {
-		return nil
-	} else {
-		if ref.Version == "" {
+	if library, exists := idx.Libraries[ref.Name]; exists {
+		if ref.Version == nil {
 			return library.Latest
 		}
-		return library.Releases[ref.Version]
+		return library.Releases[ref.Version.String()]
 	}
+	return nil
 }
 
 // FindIndexedLibrary search an indexed library that matches the provided
@@ -98,21 +96,21 @@ func (idx *Index) FindLibraryUpdate(lib *libraries.Library) *Release {
 	if indexLib == nil {
 		return nil
 	}
-	if indexLib.Latest.Version > lib.Version {
+	if indexLib.Latest.Version.GreaterThan(lib.Version) {
 		return indexLib.Latest
 	}
 	return nil
 }
 
 // Versions returns an array of all versions available of the library
-func (library *Library) Versions() semver.Versions {
-	res := semver.Versions{}
+func (library *Library) Versions() []*semver.Version {
+	res := []*semver.Version{}
 	for version := range library.Releases {
-		v, err := semver.Make(version)
+		v, err := semver.Parse(version)
 		if err == nil {
 			res = append(res, v)
 		}
 	}
-	sort.Sort(res)
+	sort.Sort(semver.List(res))
 	return res
 }

@@ -15,7 +15,7 @@
     "types",
     "utils"
   ]
-  revision = "b8512dfa8616122c6a471e56295f58420775d965"
+  revision = "beb2ff2b4213fed28dc055246cc676d2ea7e2900"
   source = "github.com/bcmi-labs/arduino-builder"
 
 [[projects]]
@@ -93,12 +93,6 @@
   name = "github.com/bgentry/go-netrc"
   packages = ["netrc"]
   revision = "9fd32a8b3d3d3f9d43c341bfe098430e07609480"
-
-[[projects]]
-  name = "github.com/blang/semver"
-  packages = ["."]
-  revision = "2ee87856327ba09384cabd113bc6b5d174e9ec0f"
-  version = "v3.5.1"
 
 [[projects]]
   name = "github.com/bouk/monkey"
@@ -352,6 +346,12 @@
 
 [[projects]]
   branch = "master"
+  name = "go.bug.st/relaxed-semver"
+  packages = ["."]
+  revision = "61b95b1e6301bea4a8f994e77ef35a2665ae1fc6"
+
+[[projects]]
+  branch = "master"
   name = "go.bug.st/serial.v1"
   packages = [
     ".",
@@ -449,6 +449,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9b17348716f71b93181b4b79e32473eab275dd2cdf54f338c2e062831b6589f2"
+  inputs-digest = "08a2f335611e537e2d436d415177f4fa2f78cdcd828353a28c290259ea83aab7"
   solver-name = "gps-cdcl"
   solver-version = 1

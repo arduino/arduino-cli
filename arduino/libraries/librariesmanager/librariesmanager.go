@@ -37,6 +37,7 @@ import (
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/sirupsen/logrus"
+	semver "go.bug.st/relaxed-semver"
 
 	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 	"github.com/pmylund/sortutil"
@@ -85,9 +86,9 @@ func (alts *LibraryAlternatives) Remove(library *libraries.Library) {
 }
 
 // FindVersion returns the library mathching the provided version or nil if not found
-func (alts *LibraryAlternatives) FindVersion(version string) *libraries.Library {
+func (alts *LibraryAlternatives) FindVersion(version *semver.Version) *libraries.Library {
 	for _, lib := range alts.Alternatives {
-		if lib.Version == version {
+		if lib.Version.Equal(version) {
 			return lib
 		}
 	}
@@ -213,14 +214,15 @@ func (sc *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) err
 }
 
 // FindByReference return the installed library matching the Reference
-// name and version or if the version is the empty string the library
-// installed in the sketchbook.
+// name and version or, if the version is nil, the library installed
+// in the sketchbook.
 func (sc *LibrariesManager) FindByReference(libRef *librariesindex.Reference) *libraries.Library {
 	alternatives, have := sc.Libraries[libRef.Name]
 	if !have {
 		return nil
 	}
-	if libRef.Version == "" {
+	// TODO: Move "search into sketchbook" into another method...
+	if libRef.Version == nil {
 		for _, candidate := range alternatives.Alternatives {
 			if candidate.Location == libraries.Sketchbook {
 				return candidate

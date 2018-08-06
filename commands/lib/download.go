@@ -60,7 +60,11 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	lm := commands.InitLibraryManager(nil)
 
 	logrus.Info("Preparing download")
-	pairs := librariesindex.ParseArgs(args)
+	pairs, err := librariesindex.ParseArgs(args)
+	if err != nil {
+		formatter.PrintError(err, "Arguments error")
+		os.Exit(commands.ErrBadArgument)
+	}
 	downloadLibrariesFromReferences(lm, pairs)
 }
 

@@ -39,6 +39,7 @@ import (
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/configs"
+	"go.bug.st/relaxed-semver"
 )
 
 // LoadHardware read all plaforms from the configured paths
@@ -187,7 +188,10 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 			}
 
 			platform := targetPackage.GetOrCreatePlatform(architecure)
-			release := platform.GetOrCreateRelease("")
+			release, err := platform.GetOrCreateRelease(nil)
+			if err != nil {
+				return fmt.Errorf("loading platform release: %s", err)
+			}
 			if err := pm.loadPlatformRelease(release, platformPath); err != nil {
 				return fmt.Errorf("loading platform release: %s", err)
 			}
@@ -206,16 +210,22 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 			versionDirs.FilterDirs()
 			versionDirs.FilterOutHiddenFiles()
 			for _, versionDir := range versionDirs {
-				version := versionDir.Base()
 				if exist, err := versionDir.Join("boards.txt").Exist(); err != nil {
 					return fmt.Errorf("opening boards.txt: %s", err)
 				} else if !exist {
 					continue
 				}
 
-				release := platform.GetOrCreateRelease(version)
+				version, err := semver.Parse(versionDir.Base())
+				if err != nil {
+					return fmt.Errorf("invalid version dir %s: %s", versionDir, err)
+				}
+				release, err := platform.GetOrCreateRelease(version)
+				if err != nil {
+					return fmt.Errorf("loading platform release %s: %s", versionDir, err)
+				}
 				if err := pm.loadPlatformRelease(release, versionDir); err != nil {
-					return fmt.Errorf("loading platform release %s: %s", version, err)
+					return fmt.Errorf("loading platform release %s: %s", versionDir, err)
 				}
 				pm.Log.WithField("platform", release).Infof("Loaded platform")
 			}
@@ -323,7 +333,10 @@ func (pm *PackageManager) loadToolReleasesFromTool(tool *cores.Tool, toolPath *p
 	toolVersions.FilterDirs()
 	toolVersions.FilterOutHiddenFiles()
 	for _, versionPath := range toolVersions {
-		version := versionPath.Base()
+		version, err := semver.Parse(versionPath.Base())
+		if err != nil {
+			return fmt.Errorf("invalid tool version path %s: %s", versionPath, err)
+		}
 		if toolReleasePath, err := versionPath.Abs(); err == nil {
 			release := tool.GetOrCreateRelease(version)
 			release.InstallDir = toolReleasePath
@@ -396,7 +409,11 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) er
 
 			for toolName, toolVersion := range toolsData {
 				tool := targetPackage.GetOrCreateTool(toolName)
-				release := tool.GetOrCreateRelease(toolVersion)
+				version, err := semver.Parse(toolVersion)
+				if err != nil {
+					return fmt.Errorf("invalid tool version in %s: %s", builtinToolsVersionsTxtPath, err)
+				}
+				release := tool.GetOrCreateRelease(version)
 				release.InstallDir = toolPath
 				pm.Log.WithField("tool", release).Infof("Loaded tool")
 			}

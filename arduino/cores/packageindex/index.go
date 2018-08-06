@@ -31,12 +31,12 @@ package packageindex
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/arduino/go-paths-helper"
-
-	"github.com/bcmi-labs/arduino-cli/arduino/resources"
-
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
+	"github.com/bcmi-labs/arduino-cli/arduino/resources"
+	"go.bug.st/relaxed-semver"
 )
 
 // Index represents Cores and Tools struct as seen from package_index.json file.
@@ -59,7 +59,7 @@ type indexPackage struct {
 type indexPlatformRelease struct {
 	Name             string                `json:"name,required"`
 	Architecture     string                `json:"architecture"`
-	Version          string                `json:"version,required"`
+	Version          *semver.Version       `json:"version,required"`
 	Category         string                `json:"category"`
 	URL              string                `json:"url"`
 	ArchiveFileName  string                `json:"archiveFileName,required"`
@@ -72,15 +72,15 @@ type indexPlatformRelease struct {
 
 // indexToolDependency represents a single dependency of a core from a tool.
 type indexToolDependency struct {
-	Packager string `json:"packager,required"`
-	Name     string `json:"name,required"`
-	Version  string `json:"version,required"`
+	Packager string          `json:"packager,required"`
+	Name     string          `json:"name,required"`
+	Version  *semver.Version `json:"version,required"`
 }
 
 // indexToolRelease represents a single Tool from package_index.json file.
 type indexToolRelease struct {
 	Name    string                    `json:"name,required"`
-	Version string                    `json:"version,required"`
+	Version *semver.Version           `json:"version,required"`
 	Systems []indexToolReleaseFlavour `json:"systems,required"`
 }
 
@@ -130,14 +130,20 @@ func (inPackage indexPackage) extractPackageIn(outPackages *cores.Packages) {
 	}
 }
 
-func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *cores.Package) {
+func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *cores.Package) error {
 	outPlatform := outPackage.GetOrCreatePlatform(inPlatformRelease.Architecture)
 	// FIXME: shall we use the Name and Category of the latest release? or maybe move Name and Category in PlatformRelease?
 	outPlatform.Name = inPlatformRelease.Name
 	outPlatform.Category = inPlatformRelease.Category
 
-	size, _ := inPlatformRelease.Size.Int64()
-	outPlatformRelease := outPlatform.GetOrCreateRelease(inPlatformRelease.Version)
+	size, err := inPlatformRelease.Size.Int64()
+	if err != nil {
+		return fmt.Errorf("invalid platform archive size: %s", err)
+	}
+	outPlatformRelease, err := outPlatform.GetOrCreateRelease(inPlatformRelease.Version)
+	if err != nil {
+		return fmt.Errorf("creating release: %s", err)
+	}
 	outPlatformRelease.Resource = &resources.DownloadResource{
 		ArchiveFileName: inPlatformRelease.ArchiveFileName,
 		Checksum:        inPlatformRelease.Checksum,
@@ -146,10 +152,15 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 		CachePath:       "packages",
 	}
 	outPlatformRelease.BoardsManifest = inPlatformRelease.extractBoardsManifest()
-	outPlatformRelease.Dependencies = inPlatformRelease.extractDeps()
+	if deps, err := inPlatformRelease.extractDeps(); err != nil {
+		return fmt.Errorf("invalid tool dependencies: %s", err)
+	} else {
+		outPlatformRelease.Dependencies = deps
+	}
+	return nil
 }
 
-func (inPlatformRelease indexPlatformRelease) extractDeps() cores.ToolDependencies {
+func (inPlatformRelease indexPlatformRelease) extractDeps() (cores.ToolDependencies, error) {
 	ret := make(cores.ToolDependencies, len(inPlatformRelease.ToolDependencies))
 	for i, dep := range inPlatformRelease.ToolDependencies {
 		ret[i] = &cores.ToolDependency{
@@ -158,7 +169,7 @@ func (inPlatformRelease indexPlatformRelease) extractDeps() cores.ToolDependenci
 			ToolPackager: dep.Packager,
 		}
 	}
-	return ret
+	return ret, nil
 }
 
 func (inPlatformRelease indexPlatformRelease) extractBoardsManifest() []*cores.BoardManifest {

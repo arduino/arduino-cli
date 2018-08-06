@@ -49,7 +49,7 @@ func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release) (*path
 			if installedLib.Location != libraries.Sketchbook {
 				continue
 			}
-			if installedLib.Version == indexLibrary.Version {
+			if installedLib.Version.Equal(indexLibrary.Version) {
 				return installedLib.InstallDir, fmt.Errorf("%s is already installed", indexLibrary.String())
 			}
 			replaced = installedLib

@@ -37,11 +37,11 @@ import (
 	"strings"
 
 	"github.com/arduino/go-paths-helper"
-
 	properties "github.com/arduino/go-properties-map"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 	"github.com/bcmi-labs/arduino-cli/arduino/cores/packageindex"
 	"github.com/sirupsen/logrus"
+	"go.bug.st/relaxed-semver"
 )
 
 // PackageManager defines the superior oracle which understands all about
@@ -296,7 +296,7 @@ func (ta *toolActions) IsInstalled() (bool, error) {
 	return false, nil
 }
 
-func (ta *toolActions) Release(version string) *toolReleaseActions {
+func (ta *toolActions) Release(version *semver.Version) *toolReleaseActions {
 	if ta.forwardError != nil {
 		return &toolReleaseActions{forwardError: ta.forwardError}
 	}
