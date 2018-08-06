@@ -94,13 +94,6 @@ func InitPackageManager() *packagemanager.PackageManager {
 		}
 	}
 
-	// TODO: were should we register the event handler? Multiple places?
-	if len(pm.GetEventHandlers()) == 0 {
-		// During tests this could get registered multiple times,
-		// since there is an underlying singleton
-		pm.RegisterEventHandler(&CLIPackageManagerEventHandler{})
-	}
-
 	if err := pm.LoadHardware(Config); err != nil {
 		formatter.PrintError(err, "Error loading hardware packages.")
 		os.Exit(ErrCoreConfig)
@@ -183,11 +176,3 @@ func InitSketch(sketchPath *paths.Path) (*sk.Sketch, error) {
 	logrus.Infof("Reading sketch from dir: %s", wd)
 	return sketches.NewSketchFromPath(wd)
 }
-
-// CLIPackageManagerEventHandler defines an event handler which outputs the PackageManager events
-// in the CLI format
-type CLIPackageManagerEventHandler struct{}
-
-// Implement packagemanager.EventHandler interface
-
-// END -- Implement packagemanager.EventHandler interface
