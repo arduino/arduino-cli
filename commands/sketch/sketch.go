@@ -31,6 +31,6 @@ func InitCommand() *cobra.Command {
 		Example: "  " + commands.AppName + " sketch new MySketch",
 	}
 	sketchCommand.AddCommand(initNewCommand())
-	sketchCommand.AddCommand(initSyncCommand())
+	//sketchCommand.AddCommand(initSyncCommand())
 	return sketchCommand
 }
