@@ -117,25 +117,33 @@ func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte)
 	return
 }
 
+var currDataDir *paths.Path
+
 func makeTempDataDir(t *testing.T) func() {
 	tmp, err := paths.MkTempDir("", "test")
 	require.NoError(t, err, "making temporary staging dir")
 	os.Setenv("ARDUINO_DATA_DIR", tmp.String())
+	currDataDir = tmp
 	fmt.Printf("ARDUINO_DATA_DIR = %s\n", os.Getenv("ARDUINO_DATA_DIR"))
 	return func() {
 		os.Unsetenv("ARDUINO_DATA_DIR")
+		currDataDir = nil
 		tmp.RemoveAll()
 		fmt.Printf("ARDUINO_DATA_DIR = %s\n", os.Getenv("ARDUINO_DATA_DIR"))
 	}
 }
 
+var currSketchbookDir *paths.Path
+
 func makeTempSketchbookDir(t *testing.T) func() {
 	tmp, err := paths.MkTempDir("", "test")
 	require.NoError(t, err, "making temporary staging dir")
 	os.Setenv("ARDUINO_SKETCHBOOK_DIR", tmp.String())
+	currSketchbookDir = tmp
 	fmt.Printf("ARDUINO_SKETCHBOOK_DIR = %s\n", os.Getenv("ARDUINO_SKETCHBOOK_DIR"))
 	return func() {
 		os.Unsetenv("ARDUINO_SKETCHBOOK_DIR")
+		currSketchbookDir = nil
 		tmp.RemoveAll()
 		fmt.Printf("ARDUINO_SKETCHBOOK_DIR = %s\n", os.Getenv("ARDUINO_SKETCHBOOK_DIR"))
 	}
@@ -283,7 +291,7 @@ func updateCoreIndex(t *testing.T) {
 }
 
 func detectLatestAVRCore(t *testing.T) string {
-	jsonFile := paths.New(os.Getenv("ARDUINO_DATA_DIR")).Join("package_index.json")
+	jsonFile := currDataDir.Join("package_index.json")
 	type index struct {
 		Packages []struct {
 			Name      string
@@ -327,7 +335,7 @@ func TestCoreDownload(t *testing.T) {
 
 	updateCoreIndex(t)
 	AVR := "arduino:avr@" + detectLatestAVRCore(t)
-	return
+
 	// Download a specific core version
 	exitCode, d := executeWithArgs(t, "core", "download", "arduino:avr@1.6.16")
 	require.Zero(t, exitCode, "exit code")
@@ -355,13 +363,25 @@ func TestCoreDownload(t *testing.T) {
 	require.Contains(t, string(d), "invalid item")
 
 	// Empty cores list
-	exitCode, d = executeWithArgs(t, "core", "download", "wrongparameter")
-	require.NotZero(t, exitCode, "exit code")
+	exitCode, d = executeWithArgs(t, "core", "list")
+	require.Zero(t, exitCode, "exit code")
 	require.Empty(t, strings.TrimSpace(string(d)))
 
 	// Install avr
 	exitCode, d = executeWithArgs(t, "core", "install", "arduino:avr")
 	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "arduino:avr@1.6.21 downloaded")
+	require.Contains(t, string(d), AVR+" - Installed")
 
+	exitCode, d = executeWithArgs(t, "core", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "arduino:avr")
+
+	// Build sketch for arduino:avr:uno
+	exitCode, d = executeWithArgs(t, "sketch", "new", "Test1")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Sketch created")
+
+	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:uno", currSketchbookDir.Join("Test1").String())
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Sketch uses")
 }

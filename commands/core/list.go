@@ -64,9 +64,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	if len(res) == 0 {
-		formatter.Print("No cores installed")
-	} else {
+	if len(res) > 0 {
 		formatter.Print(res)
 	}
 }
