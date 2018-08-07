@@ -30,11 +30,8 @@ import (
 	"github.com/bcmi-labs/arduino-cli/commands/core"
 	"github.com/bcmi-labs/arduino-cli/commands/generatedocs"
 	"github.com/bcmi-labs/arduino-cli/commands/lib"
-	"github.com/bcmi-labs/arduino-cli/commands/login"
-	"github.com/bcmi-labs/arduino-cli/commands/logout"
 	"github.com/bcmi-labs/arduino-cli/commands/sketch"
 	"github.com/bcmi-labs/arduino-cli/commands/upload"
-	"github.com/bcmi-labs/arduino-cli/commands/validate"
 	"github.com/bcmi-labs/arduino-cli/commands/version"
 	"github.com/bcmi-labs/arduino-cli/common/formatter"
 	"github.com/bcmi-labs/arduino-cli/configs"
@@ -60,11 +57,11 @@ func Init() *cobra.Command {
 	command.AddCommand(core.InitCommand())
 	command.AddCommand(generatedocs.InitCommand())
 	command.AddCommand(lib.InitCommand())
-	command.AddCommand(login.InitCommand())
-	command.AddCommand(logout.InitCommand())
+	// command.AddCommand(login.InitCommand())
+	// command.AddCommand(logout.InitCommand())
 	command.AddCommand(sketch.InitCommand())
 	command.AddCommand(upload.InitCommand())
-	command.AddCommand(validate.InitCommand())
+	// command.AddCommand(validate.InitCommand())
 	command.AddCommand(version.InitCommand())
 	return command
 }
