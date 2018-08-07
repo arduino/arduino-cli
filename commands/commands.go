@@ -20,6 +20,7 @@ package commands
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/arduino/go-paths-helper"
 
@@ -60,6 +61,9 @@ var GlobalFlags struct {
 	Debug  bool   // If true, dump debug output to stderr.
 	Format string // The Output format (e.g. text, json).
 }
+
+// AppName is the command line name of the Arduino CLI executable
+var AppName = filepath.Base(os.Args[0])
 
 var Config *configs.Configuration
 

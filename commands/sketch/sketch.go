@@ -18,6 +18,7 @@
 package sketch
 
 import (
+	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +28,7 @@ func InitCommand() *cobra.Command {
 		Use:     "sketch",
 		Short:   "Arduino CLI Sketch Commands.",
 		Long:    "Arduino CLI Sketch Commands.",
-		Example: "arduino sketch sync",
+		Example: "  " + commands.AppName + " sketch new MySketch",
 	}
 	sketchCommand.AddCommand(initNewCommand())
 	sketchCommand.AddCommand(initSyncCommand())

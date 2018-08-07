@@ -36,7 +36,7 @@ func InitCommand() *cobra.Command {
 		Use:     "validate",
 		Short:   "Validates Arduino installation.",
 		Long:    "Checks installed cores and tools for corruption.",
-		Example: "arduino validate",
+		Example: "  " + commands.AppName + " validate",
 		Args:    cobra.NoArgs,
 		Run:     run,
 	}

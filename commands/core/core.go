@@ -18,6 +18,7 @@
 package core
 
 import (
+	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +28,7 @@ func InitCommand() *cobra.Command {
 		Use:     "core",
 		Short:   "Arduino Core operations.",
 		Long:    "Arduino Core operations.",
-		Example: "arduino core update-index # to update the package index file.",
+		Example: "  " + commands.AppName + " core update-index",
 	}
 	coreCommand.AddCommand(initDownloadCommand())
 	coreCommand.AddCommand(initInstallCommand())

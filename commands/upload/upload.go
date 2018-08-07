@@ -42,7 +42,7 @@ func InitCommand() *cobra.Command {
 		Use:     "upload",
 		Short:   "Upload Arduino sketches.",
 		Long:    "Upload Arduino sketches.",
-		Example: "arduino upload [sketchPath]",
+		Example: "  " + commands.AppName + " upload /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}

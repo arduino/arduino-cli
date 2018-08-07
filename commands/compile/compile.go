@@ -46,7 +46,7 @@ func InitCommand() *cobra.Command {
 		Use:     "compile",
 		Short:   "Compiles Arduino sketches.",
 		Long:    "Compiles Arduino sketches.",
-		Example: "arduino compile [sketchPath]",
+		Example: "  " + commands.AppName + " compile -b arduino:avr:uno /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}

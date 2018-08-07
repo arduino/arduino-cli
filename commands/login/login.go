@@ -42,9 +42,9 @@ func InitCommand() *cobra.Command {
 		Short: "Creates default credentials for an Arduino Create Session.",
 		Long:  "Creates default credentials for an Arduino Create Session.",
 		Example: "" +
-			"arduino login                          # Asks for all credentials.\n" +
-			"arduino login myUser MySecretPassword  # Provide all credentials.\n" +
-			"arduino login myUser                   # Asks for just the password instead of having it in clear.",
+			"  " + commands.AppName + " login                          # Asks for all credentials.\n" +
+			"  " + commands.AppName + " login myUser MySecretPassword  # Provide all credentials.\n" +
+			"  " + commands.AppName + " login myUser                   # Asks for just the password instead of having it in clear.",
 		Args: cobra.RangeArgs(0, 2),
 		Run:  run,
 	}

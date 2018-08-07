@@ -36,7 +36,7 @@ func InitCommand() *cobra.Command {
 		Use:     "logout",
 		Short:   "Clears credentials for the Arduino Create Session.",
 		Long:    "Clears credentials for the Arduino Create Session.",
-		Example: "arduino logout",
+		Example: "  " + commands.AppName + " logout",
 		Args:    cobra.NoArgs,
 		Run:     run,
 	}

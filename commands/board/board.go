@@ -18,6 +18,7 @@
 package board
 
 import (
+	"github.com/bcmi-labs/arduino-cli/commands"
 	"github.com/spf13/cobra"
 )
 
@@ -27,10 +28,10 @@ func InitCommand() *cobra.Command {
 		Use:   "board",
 		Short: "Arduino board commands.",
 		Long:  "Arduino board commands.",
-		Example: "" +
-			"arduino board list                     # Lists all connected boards.\n" +
-			"arduino board attach --board serial:///dev/tty/ACM0 \\\n" +
-			"                     --sketch mySketch # Attaches a sketch to a board.",
+		Example: "  # Lists all connected boards.\n" +
+			"  " + commands.AppName + " board list\n\n" +
+			"  # Attaches a sketch to a board.\n" +
+			"  " + commands.AppName + " board attach --board serial:///dev/tty/ACM0 --sketch mySketch",
 	}
 	boardCommand.AddCommand(initAttachCommand())
 	boardCommand.AddCommand(initListCommand())
