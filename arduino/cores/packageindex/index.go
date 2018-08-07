@@ -152,10 +152,10 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 		CachePath:       "packages",
 	}
 	outPlatformRelease.BoardsManifest = inPlatformRelease.extractBoardsManifest()
-	if deps, err := inPlatformRelease.extractDeps(); err != nil {
-		return fmt.Errorf("invalid tool dependencies: %s", err)
-	} else {
+	if deps, err := inPlatformRelease.extractDeps(); err == nil {
 		outPlatformRelease.Dependencies = deps
+	} else {
+		return fmt.Errorf("invalid tool dependencies: %s", err)
 	}
 	return nil
 }
