@@ -31,12 +31,7 @@ type VersionResult struct {
 }
 
 func (vr VersionResult) String() string {
-	return fmt.Sprintf("%s ver.%s", vr.CommandName, vr.Version)
-}
-
-// VersionFullInfo represents the output of a verbose request of version of a command.
-type VersionFullInfo struct {
-	Versions []VersionResult `json:"versions,required"`
+	return fmt.Sprintf("%s version %s", vr.CommandName, vr.Version)
 }
 
 // LibProcessResults represent the result of a process on libraries.
@@ -72,14 +67,6 @@ func (lpr LibProcessResults) String() string {
 	ret := ""
 	for _, lr := range lpr.Libraries {
 		ret += fmt.Sprintln(lr)
-	}
-	return strings.TrimSpace(ret)
-}
-
-func (vfi VersionFullInfo) String() string {
-	ret := ""
-	for _, vr := range vfi.Versions {
-		ret += fmt.Sprintln(vr)
 	}
 	return strings.TrimSpace(ret)
 }
