@@ -1,0 +1,99 @@
+{
+  "packages": [
+    {
+      "name": "attiny",
+      "maintainer": "David A. Mellis",
+      "websiteURL": "https://github.com/damellis/attiny",
+      "email": "",
+      "help": {
+        "online": ""
+      },
+      "platforms": [
+        {
+          "name": "attiny",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "attiny",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/damellis/attiny/archive/702aa287455f7e052cf94fd4949398fec0ef21b8.zip",
+          "archiveFileName": "702aa287455f7e052cf94fd4949398fec0ef21b8.zip",
+          "checksum": "SHA-256:bfffa4a700e42ae993895f5eea22bc369ba5ac3ea36eca18ac5f72a05bb60ab5",
+          "size": "5005",
+          "boards": [
+            {"name": "ATtiny45"},
+            {"name": "ATtiny85"},
+            {"name": "ATtiny44"},
+            {"name": "ATtiny84"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "attiny",
+          "architecture": "avr",
+          "version": "1.0.1",
+          "category": "attiny",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/damellis/attiny/archive/76ca88ce3c195fcba8e8a645084e352965dc80e0.zip",
+          "archiveFileName": "76ca88ce3c195fcba8e8a645084e352965dc80e0.zip",
+          "checksum": "SHA-256:49a4dfc3796caf2533050b0b962ae0affb2471b8ded1283936d7b712cc1fdff1",
+          "size": "5719",
+          "boards": [
+            {"name": "ATtiny45"},
+            {"name": "ATtiny85"},
+            {"name": "ATtiny44"},
+            {"name": "ATtiny84"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "attiny",
+          "architecture": "avr",
+          "version": "1.0.2",
+          "category": "attiny",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/damellis/attiny/archive/6bba7d452af59d5190025bc870ec9e53d170e4d9.zip",
+          "archiveFileName": "6bba7d452af59d5190025bc870ec9e53d170e4d9.zip",
+          "checksum": "SHA-256:1654a8968fea7d599255bd18430786f9c84340606e7a678b9cf9a3cd49d94ad7",
+          "size": "5913",
+          "boards": [
+            {"name": "ATtiny25"},
+            {"name": "ATtiny45"},
+            {"name": "ATtiny85"},
+            {"name": "ATtiny24"},
+            {"name": "ATtiny44"},
+            {"name": "ATtiny84"}
+          ]
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "packages": [
+    {
+      "name": "ATmegaM1-C1",
+      "maintainer": "thomasonw",
+      "websiteURL": "https://github.com/thomasonw/ATmegaxxM1-C1",
+      "email": "",
+      "help": {
+        "online": ""
+      },
+      "platforms": [
+        {
+          "name": "ATmegaM1-C1",
+          "architecture": "avr",
+          "version": "1.0.3",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/thomasonw/ATmegaxxM1-C1/raw/gh-pages/ATmegaxxM1-C1-1.0.3.tar.gz",
+          "archiveFileName": "ATmegaxxM1-C1-1.0.3.tar.gz",
+          "checksum": "SHA-256:765FF255379D4B2E8FCD62DA28E807EE1AC7AF92D01856E7FC3D23B5A474ED22",
+          "size": "102816",
+          "boards": [
+            {"name": "ATmega32M1"},
+            {"name": "ATmega64M1"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "ATmegaxxM1-C1",
+          "architecture": "avr",
+          "version": "1.0.4",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/thomasonw/ATmegaxxM1-C1/raw/gh-pages/ATmegaxxM1-C1-1.0.4.tar.gz",
+          "archiveFileName": "ATmegaxxM1-C1-1.0.4.tar.gz",
+          "checksum": "SHA-256:509479DB63CB43AF29FCFEE8C3D773272D1A05021A6CB06D9DEE02326E10A359",
+          "size": "104535",
+          "boards": [
+            {"name": "ATmega32M1"},
+            {"name": "ATmega64M1"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "ATmegaxxM1-C1",
+          "architecture": "avr",
+          "version": "1.0.5",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/thomasonw/ATmegaxxM1-C1/raw/gh-pages/ATmegaxxM1-C1-1.0.5.tar.gz",
+          "archiveFileName": "ATmegaxxM1-C1-1.0.5.tar.gz",
+          "checksum": "SHA-256:4944B62BCEE7CE2C62EDA3DFA742E1E56514914E99065EFB274367A24AB1687F",
+          "size": "104890",
+          "boards": [
+            {"name": "ATmega32M1"},
+            {"name": "ATmega64M1"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "ATmegaxxM1-C1",
+          "architecture": "avr",
+          "version": "1.0.6",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/thomasonw/ATmegaxxM1-C1/raw/gh-pages/ATmegaxxM1-C1-1.0.6.tar.gz",
+          "archiveFileName": "ATmegaxxM1-C1-1.0.6.tar.gz",
+          "checksum": "SHA-256:8AFE78C7E6D89FE0C2AA9C2AD8E8477485FF68BA5B60DEFD5CB262B6D3285CDF",
+          "size": "103731",
+          "boards": [
+            {"name": "ATmega32M1"},
+            {"name": "ATmega64M1"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "ATmegaxxM1-C1",
+          "architecture": "avr",
+          "version": "1.0.7",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/thomasonw/ATmegaxxM1-C1/raw/gh-pages/ATmegaxxM1-C1-1.0.7.tar.gz",
+          "archiveFileName": "ATmegaxxM1-C1-1.0.7.tar.gz",
+          "checksum": "SHA-256:F0386A2D4E0C1F03CF4FAFB841ED0F6BB379632863438F083414FA76DD59B7FA",
+          "size": "103629",
+          "boards": [
+            {"name": "ATmega32M1"},
+            {"name": "ATmega64M1"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

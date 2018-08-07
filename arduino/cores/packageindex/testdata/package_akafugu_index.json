@@ -1,0 +1,45 @@
+{
+  "packages": [
+    {
+      "name": "akafugu",
+      "maintainer": "Akafugu Corporation",
+      "websiteURL": "http://akafugu.jp/",
+      "email": "info@akafugu.jp",
+      "help": {
+        "online": "http://akafugu.jp"
+      },
+      "platforms": [
+        {
+          "name": "Akafugu Boards",
+          "architecture": "avr",
+          "version": "1.0",
+          "category": "Akafugu",
+          "url": "http://github.com/akafugu/akafugu_core/releases/download/1.0/akafugu-1.0.tar.bz2",
+          "archiveFileName": "akafugu-1.0.tar.bz2",
+          "checksum": "SHA-256:9c0585d97ff9ab4ee38a2d648d613559d241a14f9fbba5306c8c6a5857fa79b7",
+          "size": "6522",
+          "boards": [
+            {"name": "Akafugu Breadboard Adapter (Internal 8MHz Clock)"},
+            {"name": "Akafugu Breadboard Adapter (External 16MHz Clock)"},
+            {"name": "Akafuino L"},
+            {"name": "Akafugu SimpleClock"},
+            {"name": "Akafugu Nixie Clock"}
+          ]
+        }
+      ],
+      "toolsDependencies": [
+        {
+          "packager": "arduino",
+          "name": "avr-gcc",
+          "version": "4.8.1-arduino5"
+        },
+        {
+          "packager": "arduino",
+          "name": "avrdude",
+          "version": "6.0.1-arduino5"
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

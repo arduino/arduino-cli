@@ -1,0 +1,96 @@
+{
+  "packages": [
+    {
+      "name": "Microsoft",
+      "maintainer": "Microsoft.IoT",
+      "websiteURL": "https://github.com/ms-iot/iot-utilities/tree/master/IotCoreAppDeployment/ArduinoIde/",
+      "email": "bfjelds@microsoft.com",
+      "help": {
+        "online": "http://developer.microsoft.com/en-us/windows/iot/IotCoreAppDeployment_ArduinoIde.htm"
+      },
+      "platforms": [
+        {
+          "name": "Windows 10 Iot Core",
+          "architecture": "win10",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "help": {
+            "online": "http://developer.microsoft.com/en-us/windows/iot/IotCoreAppDeployment_ArduinoIde.htm"
+          },
+          "url": "https://github.com/ms-iot/iot-utilities/raw/master/IotCoreAppDeployment/ArduinoIde/release/win10_iotcore-1.0.0_ide-1.6.6.zip",
+          "archiveFileName": "win10_iotcore-1.0.0_ide-1.6.6.zip",
+          "checksum": "SHA-256:ed1b42b396217e242cd3a5b597ad5dad5957cb8117dd0f972376bafab7d8a0e5",
+          "size": "47325480",
+          "help": {
+                    "online": "http://developer.microsoft.com/en-us/windows/iot/IotCoreAppDeployment_ArduinoIde.htm"
+          },
+          "boards": [
+            {"name": "Windows 10 IoT Core"}
+          ],
+          "toolsDependencies":[]
+        },
+        {
+          "name": "Windows 10 Iot Core",
+          "architecture": "win10",
+          "version": "1.1.0",
+          "category": "Contributed",
+          "help": {
+            "online": "http://developer.microsoft.com/en-us/windows/iot/IotCoreAppDeployment_ArduinoIde.htm"
+          },
+          "url": "https://github.com/ms-iot/iot-utilities/raw/master/IotCoreAppDeployment/ArduinoIde/release/win10_iotcore-1.1.0_ide-1.6.6.zip",
+          "archiveFileName": "win10_iotcore-1.1.0_ide-1.6.6.zip",
+          "checksum": "SHA-256:683dcb0a72e80b9d21117f6471e0860d8cc35cd9b86557ba6fd1ed255952413e",
+          "size": "48316890",
+          "help": {
+                    "online": "http://developer.microsoft.com/en-us/windows/iot/IotCoreAppDeployment_ArduinoIde.htm"
+          },
+          "boards": [
+            {"name": "Windows 10 IoT Core"}
+          ],
+          "toolsDependencies":[]
+        },
+        {
+          "name": "Windows 10 Iot Core",
+          "architecture": "win10",
+          "version": "1.1.1",
+          "category": "Contributed",
+          "help": {
+            "online": "http://ms-iot.github.io/content/en-US/win10/IotCoreAppDeployment_ArduinoIde.htm"
+          },
+          "url": "https://github.com/ms-iot/iot-utilities/raw/master/IotCoreAppDeployment/ArduinoIde/release/win10_iotcore-1.1.1_ide-1.6.11.zip",
+          "archiveFileName": "win10_iotcore-1.1.1_ide-1.6.11.zip",
+          "checksum": "SHA-256:f455f2829164065faacde141b3c15604c51bb79b6874d55d1124c66aae372693",
+          "size": "48317624",
+          "help": {
+                    "online": "http://ms-iot.github.io/content/en-US/win10/IotCoreAppDeployment_ArduinoIde.htm"
+          },
+          "boards": [
+            {"name": "Windows 10 IoT Core"}
+          ],
+          "toolsDependencies":[]
+        },
+        {
+          "name": "Windows 10 Iot Core",
+          "architecture": "win10",
+          "version": "1.1.2",
+          "category": "Contributed",
+          "help": {
+            "online": "http://ms-iot.github.io/content/en-US/win10/IotCoreAppDeployment_ArduinoIde.htm"
+          },
+          "url": "https://github.com/ms-iot/iot-utilities/raw/master/IotCoreAppDeployment/ArduinoIde/release/win10_iotcore-1.1.2_ide-1.6.11.zip",
+          "archiveFileName": "win10_iotcore-1.1.2_ide-1.6.11.zip",
+          "checksum": "SHA-256:b1c9956b46f33bcebb7f500d29931b19ed4723c713ac0439681ea1fb172722d1",
+          "size": "48317648",
+          "help": {
+                    "online": "http://ms-iot.github.io/content/en-US/win10/IotCoreAppDeployment_ArduinoIde.htm"
+          },
+          "boards": [
+            {"name": "Windows 10 IoT Core"}
+          ],
+          "toolsDependencies":[]
+        }
+      ],
+      "tools":[]
+    }
+  ]
+}

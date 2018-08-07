@@ -34,3 +34,21 @@ func (v *Version) UnmarshalJSON(data []byte) error {
 	v.builds = parsed.builds
 	return nil
 }
+
+// MarshalJSON implements json.Marshaler
+func (v *RelaxedVersion) MarshalJSON() ([]byte, error) {
+	return json.Marshal(v.String())
+}
+
+// UnmarshalJSON implements json.Unmarshaler
+func (v *RelaxedVersion) UnmarshalJSON(data []byte) error {
+	var versionString string
+	if err := json.Unmarshal(data, &versionString); err != nil {
+		return err
+	}
+	parsed := ParseRelaxed(versionString)
+
+	v.customversion = parsed.customversion
+	v.version = parsed.version
+	return nil
+}

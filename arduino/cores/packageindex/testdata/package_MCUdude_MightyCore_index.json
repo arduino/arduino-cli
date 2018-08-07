@@ -1,0 +1,236 @@
+{
+  "packages": [
+    {
+      "name": "MightyCore",
+      "maintainer": "MCUdude",
+      "websiteURL": "https://github.com/MCUdude/MightyCore",
+      "email": "",
+      "help": {
+        "online": "http://forum.arduino.cc/index.php?topic=379427"
+      },
+      "platforms": [
+        {
+          "name": "MightyCore",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MightyCore/MightyCore-1.0.0.tar.gz",
+          "archiveFileName": "MightyCore-1.0.0.tar.gz",
+          "checksum": "SHA-256:283b442209cef5406bc7c21074664e1b2783d9b5997f50b3195a5c6cd0ee4de5",
+          "size": "306232",
+          "boards": [
+            {"name": "ATmega1284p"},
+            {"name": "ATmega644p"},
+            {"name": "ATmega324p"},
+            {"name": "ATmega164p"},
+            {"name": "ATmega32"},
+            {"name": "ATmega16"},
+            {"name": "ATmega8535"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "MightyCore",
+          "architecture": "avr",
+          "version": "1.0.1",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MightyCore/MightyCore-1.0.1.tar.gz",
+          "archiveFileName": "MightyCore-1.0.1.tar.gz",
+          "checksum": "SHA-256:999905c879d35ad8036fad976e7cccc84b7b68e4d7f3ca11e1ead5b23b1c8409",
+          "size": "310170",
+          "boards": [
+            {"name": "ATmega1284/P"},
+            {"name": "ATmega644/P/PA/A"},
+            {"name": "ATmega324P/PA/A"},
+            {"name": "ATmega164P/PA/A"},
+            {"name": "ATmega32"},
+            {"name": "ATmega16"},
+            {"name": "ATmega8535"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "MightyCore",
+          "architecture": "avr",
+          "version": "1.0.2",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MightyCore/MightyCore-1.0.2.tar.gz",
+          "archiveFileName": "MightyCore-1.0.2.tar.gz",
+          "checksum": "SHA-256:fbbb6d5f150edc71fc7d55550f066defeb3505bc19992c69d61b46b0e8462387",
+          "size": "267338",
+          "boards": [
+            {"name": "ATmega1284/P"},
+            {"name": "ATmega644/P/PA/A"},
+            {"name": "ATmega324P/PA/A"},
+            {"name": "ATmega164P/PA/A"},
+            {"name": "ATmega32"},
+            {"name": "ATmega16"},
+            {"name": "ATmega8535"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "MightyCore",
+          "architecture": "avr",
+          "version": "1.0.3-r1",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MightyCore/MightyCore-1.0.3r1.tar.gz",
+          "archiveFileName": "MightyCore-1.0.3r1.tar.gz",
+          "checksum": "SHA-256:b5e759273e63b1b415c9c3412a568f10657b12db25cd1b26d02cc43c676c03db",
+          "size": "271214",
+          "boards": [
+            {"name": "ATmega1284/P"},
+            {"name": "ATmega644/P/PA/A"},
+            {"name": "ATmega324P/PA/A"},
+            {"name": "ATmega164P/PA/A"},
+            {"name": "ATmega32"},
+            {"name": "ATmega16"},
+            {"name": "ATmega8535"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "MightyCore",
+          "architecture": "avr",
+          "version": "1.0.4",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MightyCore/MightyCore-1.0.4.tar.gz",
+          "archiveFileName": "MightyCore-1.0.4.tar.gz",
+          "checksum": "SHA-256:64e64091cb823823cbe90ccd251b1150e22e8546489dc460e41c2d73a44bc347",
+          "size": "271238",
+          "boards": [
+            {"name": "ATmega1284/P"},
+            {"name": "ATmega644/P/PA/A"},
+            {"name": "ATmega324P/PA/A"},
+            {"name": "ATmega164P/PA/A"},
+            {"name": "ATmega32"},
+            {"name": "ATmega16"},
+            {"name": "ATmega8535"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "MightyCore",
+          "architecture": "avr",
+          "version": "1.0.5",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MightyCore/MightyCore-1.0.5.tar.gz",
+          "archiveFileName": "MightyCore-1.0.5.tar.gz",
+          "checksum": "SHA-256:c3c82e0be56bd5cd745b2b5300937f4135f2be59b49d5203e6fce33bd81a184a",
+          "size": "339295",
+          "boards": [
+            {"name": "ATmega1284/P"},
+            {"name": "ATmega644/P/PA/A"},
+            {"name": "ATmega324P/PA/A"},
+            {"name": "ATmega164P/PA/A"},
+            {"name": "ATmega32"},
+            {"name": "ATmega16"},
+            {"name": "ATmega8535"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "MightyCore",
+          "architecture": "avr",
+          "version": "1.0.6",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MightyCore/MightyCore-1.0.6.tar.gz",
+          "archiveFileName": "MightyCore-1.0.6.tar.gz",
+          "checksum": "SHA-256:d85d26335782f5511a63a0b4ea62ae34517ed513599213674a531e5f1a7ec0ca",
+          "size": "310812",
+          "boards": [
+            {"name": "ATmega1284/P"},
+            {"name": "ATmega644/P/PA/A"},
+            {"name": "ATmega324P/PA/A"},
+            {"name": "ATmega164P/PA/A"},
+            {"name": "ATmega32"},
+            {"name": "ATmega16"},
+            {"name": "ATmega8535"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "MightyCore",
+          "architecture": "avr",
+          "version": "1.0.7",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MightyCore/MightyCore-1.0.7.tar.gz",
+          "archiveFileName": "MightyCore-1.0.7.tar.gz",
+          "checksum": "SHA-256:9f05e8c930246bc75e161c4002173b7e0b4ad8ad661549674f8fe550dadc16ed",
+          "size": "322325",
+          "boards": [
+            {"name": "ATmega1284/P"},
+            {"name": "ATmega644/P/PA/A"},
+            {"name": "ATmega324P/PA/A"},
+            {"name": "ATmega164P/PA/A"},
+            {"name": "ATmega32"},
+            {"name": "ATmega16"},
+            {"name": "ATmega8535"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "MightyCore",
+          "architecture": "avr",
+          "version": "1.0.8",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MightyCore/MightyCore-1.0.8.tar.bz2",
+          "archiveFileName": "MightyCore-1.0.8.tar.bz2",
+          "checksum": "SHA-256:fefd0e0220c13b948c53c0957d8343b10502b774d8d1c95a30da03de0b6ee112",
+          "size": "299204",
+          "boards": [
+            {"name": "ATmega1284/P"},
+            {"name": "ATmega644/P/PA/A"},
+            {"name": "ATmega324P/PA/A"},
+            {"name": "ATmega164P/PA/A"},
+            {"name": "ATmega32"},
+            {"name": "ATmega16"},
+            {"name": "ATmega8535"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "MightyCore",
+          "architecture": "avr",
+          "version": "2.0.0",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MightyCore/MightyCore-2.0.0.tar.bz2",
+          "archiveFileName": "MightyCore-2.0.0.tar.bz2",
+          "checksum": "SHA-256:b184c104ab024c96398900e65f5094ac6b201cc227ca8f266cfccc6f7ab0cef3",
+          "size": "323530",
+          "boards": [
+            {"name": "ATmega1284/P"},
+            {"name": "ATmega644/P/PA/A"},
+            {"name": "ATmega324P/PA/A"},
+            {"name": "ATmega164P/PA/A"},
+            {"name": "ATmega32"},
+            {"name": "ATmega16"},
+            {"name": "ATmega8535"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "MightyCore",
+          "architecture": "avr",
+          "version": "2.0.1",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MightyCore/MightyCore-2.0.1.tar.bz2",
+          "archiveFileName": "MightyCore-2.0.1.tar.bz2",
+          "checksum": "SHA-256:83cb044c4819c6da16867dc5f223f4abcb0aa1287a6b0d5acb43d5e153845aa6",
+          "size": "387729",
+          "boards": [
+            {"name": "ATmega1284/P"},
+            {"name": "ATmega644/P/PA/A"},
+            {"name": "ATmega324P/PA/A/PB"},
+            {"name": "ATmega164P/PA/A"},
+            {"name": "ATmega32"},
+            {"name": "ATmega16"},
+            {"name": "ATmega8535"}
+          ],
+          "toolsDependencies": []
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

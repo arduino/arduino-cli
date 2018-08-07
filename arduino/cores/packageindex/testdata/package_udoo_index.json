@@ -1,0 +1,299 @@
+{
+    "packages": [
+        {
+            "name": "UDOO",
+            "maintainer": "UDOO Team",
+            "websiteURL": "https://www.udoo.org",
+            "email": "social@udoo.org",
+            "help": {
+                "online": "https://forum.udoo.org"
+            },
+            "platforms": [
+                {
+                    "name": "UDOO QUAD/DUAL (Arduino Due)",
+                    "architecture": "sam",
+                    "version": "1.6.5",
+                    "category": "Contributed",
+                    "url": "https://udooboard.github.io/arduino-board-package/udooqdl-arduino-sam-1.6.5.tar.bz2",
+                    "archiveFileName": "udooqdl-arduino-sam-1.6.5.tar.bz2",
+                    "checksum": "SHA-256:5d6224c223ee9ff6ab3cdbd71518d65ac97717cbe8d24c865549a3defcd28e31",
+                    "size": "16162438",
+                    "help": {
+                        "online": "https://www.udoo.org"
+                    },
+                    "boards": [
+                        {
+                            "name": "UDOO QUAD/DUAL (Arduino Due)"
+                        }
+                    ],
+                    "toolsDependencies": [
+                        {
+                            "packager": "UDOO",
+                            "name": "bossac-udoo",
+                            "version": "1.3a-1.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        }
+                    ]
+                },
+                {
+                    "name": "UDOO NEO (iMX6 SoloX)",
+                    "architecture": "solox",
+                    "version": "1.6.5",
+                    "category": "Contributed",
+                    "url": "https://udooboard.github.io/arduino-board-package/udooneo-arduino-solox-1.6.5.tar.bz2",
+                    "archiveFileName": "udooneo-arduino-solox-1.6.5.tar.bz2",
+                    "checksum": "SHA-256:889af95bb78b086b51adf31316f1a765e8e3389345d76ce9a5aa758a615c5ee4",
+                    "size": "1816866",
+                    "help": {
+                        "online": "https://www.udoo.org"
+                    },
+                    "boards": [
+                        {
+                            "name": "UDOO NEO (iMX6 SoloX)"
+                        }
+                    ],
+                    "toolsDependencies": [
+                        {
+                            "packager": "UDOO",
+                            "name": "udooclient",
+                            "version": "1.2"
+                        },
+                        {
+                            "packager": "UDOO",
+                            "name": "gcc-arm-none-eabi",
+                            "version": "4.9-2014q4-20141203"
+                        }
+                    ]
+                },
+                {
+                    "name": "UDOO QUAD/DUAL (Arduino Due)",
+                    "architecture": "sam",
+                    "version": "1.6.6",
+                    "category": "Contributed",
+                    "url": "https://udooboard.github.io/arduino-board-package/udooqdl-arduino-sam-1.6.6.tar.bz2",
+                    "archiveFileName": "udooqdl-arduino-sam-1.6.6.tar.bz2",
+                    "checksum": "SHA-256:0728143b200dca87c8af888c2a541814b45464cf2af98f2da8632247bb1e031b",
+                    "size": "3822945",
+                    "help": {
+                        "online": "https://www.udoo.org"
+                    },
+                    "boards": [
+                        {
+                            "name": "UDOO QUAD/DUAL (Arduino Due)"
+                        }
+                    ],
+                    "toolsDependencies": [
+                        {
+                            "packager": "UDOO",
+                            "name": "bossac-udoo",
+                            "version": "1.3a-1.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        }
+                    ]
+                },
+                {
+                    "name": "UDOO NEO (iMX6 SoloX)",
+                    "architecture": "solox",
+                    "version": "1.6.6",
+                    "category": "Contributed",
+                    "url": "https://udooboard.github.io/arduino-board-package/udooneo-arduino-solox-1.6.6.tar.bz2",
+                    "archiveFileName": "udooneo-arduino-solox-1.6.6.tar.bz2",
+                    "checksum": "SHA-256:e717bb0afdf6623aebc2d480fadfe451e701fb772780af03a2127e021902e9fa",
+                    "size": "1125865",
+                    "help": {
+                        "online": "https://www.udoo.org"
+                    },
+                    "boards": [
+                        {
+                            "name": "UDOO NEO (iMX6 SoloX)"
+                        }
+                    ],
+                    "toolsDependencies": [
+                        {
+                            "packager": "UDOO",
+                            "name": "udooclient",
+                            "version": "1.2"
+                        },
+                        {
+                            "packager": "UDOO",
+                            "name": "gcc-arm-none-eabi",
+                            "version": "4.9-2014q4-20141203"
+                        }
+                    ]
+                },
+                {
+                    "name": "UDOO QUAD/DUAL (Arduino Due)",
+                    "architecture": "sam",
+                    "version": "1.6.7",
+                    "category": "Contributed",
+                    "url": "https://udooboard.github.io/arduino-board-package/udooqdl-arduino-sam-1.6.7.tar.bz2",
+                    "archiveFileName": "udooqdl-arduino-sam-1.6.7.tar.bz2",
+                    "checksum": "SHA-256:6b6ba7d05e146117a01878012bb5bf9c5d4e4d6c761421f6d641a1db5f73be46",
+                    "size": "3822968",
+                    "help": {
+                        "online": "https://www.udoo.org"
+                    },
+                    "boards": [
+                        {
+                            "name": "UDOO QUAD/DUAL (Arduino Due)"
+                        }
+                    ],
+                    "toolsDependencies": [
+                        {
+                            "packager": "UDOO",
+                            "name": "bossac-udoo",
+                            "version": "1.3a-1.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        }
+                    ]
+                },
+                {
+                    "name": "UDOO NEO (iMX6 SoloX)",
+                    "architecture": "solox",
+                    "version": "1.6.7",
+                    "category": "Contributed",
+                    "url": "https://udooboard.github.io/arduino-board-package/udooneo-arduino-solox-1.6.7.tar.bz2",
+                    "archiveFileName": "udooneo-arduino-solox-1.6.7.tar.bz2",
+                    "checksum": "SHA-256:2dc0b68d247b9b0bbfec2449b42f691095f5a0096329c08b80650c73f8771b3b",
+                    "size": "1132362",
+                    "help": {
+                        "online": "https://www.udoo.org"
+                    },
+                    "boards": [
+                        {
+                            "name": "UDOO NEO (iMX6 SoloX)"
+                        }
+                    ],
+                    "toolsDependencies": [
+                        {
+                            "packager": "UDOO",
+                            "name": "udooclient",
+                            "version": "1.2"
+                        },
+                        {
+                            "packager": "UDOO",
+                            "name": "gcc-arm-none-eabi",
+                            "version": "4.9-2014q4-20141203"
+                        }
+                    ]
+                }
+            ],
+            "tools": [
+                {
+                    "name": "udooclient",
+                    "version": "1.2",
+                    "systems": [
+                        {
+                            "host": "i686-mingw32",
+                            "url": "https://github.com/UDOOboard/udoofota/releases/download/v1.2/udooclient-1.2-i686-mingw32.tar.bz2",
+                            "archiveFileName": "udooclient-1.2-i686-mingw32.tar.bz2",
+                            "checksum": "SHA-256:6e7fb8dccba8fb1ade645a577269b68a270488997182d9adaf27a05fad1adb5a",
+                            "size": "1127441"
+                        },
+                        {
+                            "host": "x86_64-apple-darwin",
+                            "url": "https://github.com/UDOOboard/udoofota/releases/download/v1.2/udooclient-1.2-x86_64-apple-darwin.tar.bz2",
+                            "archiveFileName": "udooclient-1.2-x86_64-apple-darwin.tar.bz2",
+                            "checksum": "SHA-256:6f93d6ecd8d85a77feb46c65f3b1b837a9daee42173b254d9a5a47a6dc7ea34f",
+                            "size": "1127441"
+                        },
+                        {
+                            "host": "x86_64-pc-linux-gnu",
+                            "url": "https://github.com/UDOOboard/udoofota/releases/download/v1.2/udooclient-1.2-x86_64-pc-linux-gnu.tar.bz2",
+                            "archiveFileName": "udooclient-1.2-x86_64-pc-linux-gnu.tar.bz2",
+                            "checksum": "SHA-256:6d47719df7646ed9033a89c05706dcb4149d4c6c675bf6ef22e2b517f98f2ed4",
+                            "size": "4024"
+                        },
+                        {
+                            "host": "i686-pc-linux-gnu",
+                            "url": "https://github.com/UDOOboard/udoofota/releases/download/v1.2/udooclient-1.2-i686-pc-linux-gnu.tar.bz2",
+                            "archiveFileName": "udooclient-1.2-i686-pc-linux-gnu.tar.bz2",
+                            "checksum": "SHA-256:82dc52daf2cad5f2f98e51a671824b73cc60db8d7f23186a60330b6d6e59d9d1",
+                            "size": "4822"
+                        }
+                    ]
+                },
+                {
+                    "name": "gcc-arm-none-eabi",
+                    "version": "4.9-2014q4-20141203",
+                    "systems": [
+                        {
+                            "host": "i686-mingw32",
+                            "url": "http://www.udoo.org/download/files/crosscompiler/gcc-arm-none-eabi-4.9-2014q4-20141203-i686-mingw32.tar.bz2",
+                            "archiveFileName": "gcc-arm-none-eabi-4.9-2014q4-20141203-i686-mingw32.tar.bz2",
+                            "checksum": "SHA-256:f0afcc6f2095783e55dbb051e591bf1bf6a1144903548a5bf6b051972645d25a",
+                            "size": "4822"
+                        },
+                        {
+                            "host": "x86_64-apple-darwin",
+                            "url": "http://www.udoo.org/download/files/crosscompiler/gcc-arm-none-eabi-4.9-2014q4-20141203-x86_64-apple-darwin.tar.bz2",
+                            "archiveFileName": "gcc-arm-none-eabi-4.9-2014q4-20141203-x86_64-apple-darwin.tar.bz2",
+                            "checksum": "SHA-256:c682d317caddefba264739de1ddd32b3d4a4a3f6c527144b96c6736b353ae623",
+                            "size": "4822"
+                        },
+                        {
+                            "host": "x86_64-pc-linux-gnu",
+                            "url": "http://www.udoo.org/download/files/crosscompiler/gcc-arm-none-eabi-4.9-2014q4-20141203-x86_64-pc-linux-gnu.tar.bz2",
+                            "archiveFileName": "gcc-arm-none-eabi-4.9-2014q4-20141203-x86_64-pc-linux-gnu.tar.bz2",
+                            "checksum": "SHA-256:a440bcf68e36b291697567816e756877cd3b5782298e3e3c44eb0812a471980f",
+                            "size": "4822"
+                        },
+                        {
+                            "host": "i686-pc-linux-gnu",
+                            "url": "http://www.udoo.org/download/files/crosscompiler/gcc-arm-none-eabi-4.9-2014q4-20141203-i686-pc-linux-gnu.tar.bz2",
+                            "archiveFileName": "gcc-arm-none-eabi-4.9-2014q4-20141203-i686-pc-linux-gnu.tar.bz2",
+                            "checksum": "SHA-256:a440bcf68e36b291697567816e756877cd3b5782298e3e3c44eb0812a471980f",
+                            "size": "4822"
+                        }
+                    ]
+                },
+                {
+                    "name": "bossac-udoo",
+                    "version": "1.3a-1.0",
+                    "systems": [
+                        {
+                            "host": "i686-mingw32",
+                            "url": "https://github.com/UDOOboard/bossac/releases/download/v1.3a-1.0/bossac-udoo-1.3a-1.0-i686-mingw32.tar.bz2",
+                            "archiveFileName": "bossac-udoo-1.3a-1.0-i686-mingw32.tar.bz2",
+                            "checksum": "SHA-256:359cd5cbb398df070cfff67fd6237f5a238543fd959604407a7cdb4cd2c876fc",
+                            "size": "4822"
+                        },
+                        {
+                            "host": "x86_64-apple-darwin",
+                            "url": "https://github.com/UDOOboard/bossac/releases/download/v1.3a-1.0/bossac-udoo-1.3a-1.0-x86_64-apple-darwin.tar.bz2",
+                            "archiveFileName": "bossac-udoo-1.3a-1.0-x86_64-apple-darwin.tar.bz2",
+                            "checksum": "SHA-256:4f358f429e4363b375cdf958722df33fc4cf479f69cee0953946100bfb9346d7",
+                            "size": "4822"
+                        },
+                        {
+                            "host": "x86_64-pc-linux-gnu",
+                            "url": "https://github.com/UDOOboard/bossac/releases/download/v1.3a-1.0/bossac-udoo-1.3a-1.0-x86_64-pc-linux-gnu.tar.bz2",
+                            "archiveFileName": "bossac-udoo-1.3a-1.0-x86_64-pc-linux-gnu.tar.bz2",
+                            "checksum": "SHA-256:ec6881f71ae3a07e35e8d21c806da514bd96dfd0d50c909dc779b867468f0334",
+                            "size": "4822"
+                        },
+                        {
+                            "host": "i686-pc-linux-gnu",
+                            "url": "https://github.com/UDOOboard/bossac/releases/download/v1.3a-1.0/bossac-udoo-1.3a-1.0-i686-pc-linux-gnu.tar.bz2",
+                            "archiveFileName": "bossac-udoo-1.3a-1.0-i686-pc-linux-gnu.tar.bz2",
+                            "checksum": "SHA-256:9f71f76359c445870749ba9efea89cedcfc76de59ea7177d3baf16cffc650e94",
+                            "size": "4822"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

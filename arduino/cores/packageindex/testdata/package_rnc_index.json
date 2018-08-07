@@ -1,0 +1,44 @@
+{
+   "packages":[
+      {
+         "name":"RiddleAndCode",
+         "maintainer":"Riddle&Code Ltd.",
+         "websiteURL":"https://riddleandcode.com",
+         "email":"info@riddleandcode.com",
+         "help":{
+            "online":"http://hashlust.com"
+         },
+         "platforms":[
+            {
+               "name":"RiddleAndCode AVR Boards",
+               "architecture":"avr",
+               "version":"1.0.0",
+               "category":"Contributed",
+               "url":"https://github.com/RiddleAndCode/RnCAtmega256RFR2/raw/master/Board_Manager/rncatmega256rfr2.tar.bz2",
+               "archiveFileName":"rncatmega256rfr2.tar.bz2",
+               "checksum":"SHA-256:038CEE0B491C8C0553976E5B27E10F063048539881FDB53727508A3AE1405C34",
+               "size":"10308",
+               "help":{
+                  "online":"http://hashlust.com"
+               },
+               "boards":[
+                  { "name":"ATmega256RFR2 Xplained Pro Evaluation Kit" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  }
+               ]
+            }
+         ],
+         "tools":[]
+      }
+   ]
+}

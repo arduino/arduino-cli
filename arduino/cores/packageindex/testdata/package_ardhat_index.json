@@ -1,0 +1,58 @@
+{
+    "packages": 
+    [
+        {
+            "name": "ardhat",
+            "maintainer": "Ardhat",
+            "websiteURL": "http://ardhat.com",
+            "email": "info@ardhat.com",
+            "help": {
+                "online": "http://forums.ardhat.com"
+            },
+            "platforms": 
+            [
+                {
+                    "name": "Ardhat AVR Boards",
+                    "architecture": "avr",
+                    "version": "1.0.0",
+                    "category": "Ardhat",
+                    "url": "https://ardhat.github.io/ardhat-board-support/arduino/ardhat-1.0.0.tar.bz2",
+                    "archiveFileName": "ardhat-1.0.0.tar.bz2",
+                    "checksum": "SHA-256:7e264c1adaccd6df921645db2f11d176a512e3febcd64c20353a4c55c7aca6ac",
+                    "size": "8727289",
+                    "help": {
+                        "online": "https://forums.ardhat.com"
+                    },
+                    "boards": 
+                    [
+                        {
+                            "name": "Ardhat Basic"
+                        },
+                        {
+                            "name": "Ardhat-I"
+                        },
+                        {
+                            "name": "Ardhat-U"
+                        }
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "arduino",
+                            "name": "avr-gcc",
+                            "version": "4.8.1-arduino5"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "avrdude",
+                            "version": "6.0.1-arduino5"
+                        }
+                    ]
+                }
+            ],
+            "tools": []
+        }
+    ]
+}
+
+

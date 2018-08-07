@@ -1,0 +1,56 @@
+{
+  "packages": [
+    {
+      "name": "Breadboard Arduino",
+      "maintainer": "OSH Lab",
+      "websiteURL": "https://github.com/oshlab/Breadboard-Arduino",
+      "email": "",
+      "help": {
+        "online": ""
+      },
+      "platforms": [
+        {
+          "name": "Breadboard Arduino",
+          "architecture": "avr",
+          "version": "1.6.9",
+          "category": "Contributed",
+          "help": {
+            "online": "https://github.com/oshlab/Breadboard-Arduino"
+          },
+          "url": "https://github.com/oshlab/Breadboard-Arduino/archive/1.6.7.zip",
+          "archiveFileName": "Breadboard-Arduino-1.6.7.zip",
+          "checksum": "SHA-256:3987B081B0C15748681528FB509B9464AB8A6F4838D667F046F44EB64EEBB6AD",
+          "size": "5246",
+          "boards": [
+            {"name": "ATmega328p (8mhz internal)"}
+          ],
+          "toolsDependencies": [
+            { "packager": "arduino", "name": "avr-gcc", "version": "4.8.1-arduino5" },
+            { "packager": "arduino", "name": "avrdude", "version": "6.0.1-arduino5" }
+          ]
+        },
+        {
+          "name": "Breadboard Arduino",
+          "architecture": "avr",
+          "version": "1.6.10",
+          "category": "Contributed",
+          "help": {
+            "online": "https://github.com/oshlab/Breadboard-Arduino"
+          },
+          "url": "https://raw.github.com/oshlab/Breadboard-Arduino/gh-pages/dl/BreadboardArduino1.6.10.zip",
+          "archiveFileName": "BreadboardArduino1.6.10.zip",
+          "checksum": "SHA-256:1901CC6D9C19C3F0DE198FFB8B0983311F0334942A9B4E2D6F6977768CC7B373",
+          "size": "3405",
+          "boards": [
+            {"name": "ATmega328p (8mhz internal)"}
+          ],
+          "toolsDependencies": [
+            { "packager": "arduino", "name": "avr-gcc", "version": "4.8.1-arduino5" },
+            { "packager": "arduino", "name": "avrdude", "version": "6.0.1-arduino5" }
+          ]
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "packages": [
+    {
+      "name": "MicroCore",
+      "maintainer": "MCUdude",
+      "websiteURL": "https://github.com/MCUdude/MicroCore",
+      "email": "",
+      "help": {
+        "online": "http://forum.arduino.cc/index.php?topic=426153"
+      },
+      "platforms": [
+        {
+          "name": "MicroCore",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MicroCore/MicroCore-1.0.0.tar.gz",
+          "archiveFileName": "MicroCore-1.0.0.tar.gz",
+          "checksum": "SHA-256:e6b783bab8b00ed6850a48a9d0a8fbd246193438dcb99936cc9483257d8bdffc",
+          "size": "42801",
+          "boards": [
+            {"name": "ATtiny13"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "MicroCore",
+          "architecture": "avr",
+          "version": "1.0.1",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MicroCore/MicroCore-1.0.1.tar.bz2",
+          "archiveFileName": "MicroCore-1.0.1.tar.bz2",
+          "checksum": "SHA-256:ed0f7e870b0985d3052d296c2fc60187755d2561da86d77f980635f303bc2750",
+          "size": "40461",
+          "boards": [
+            {"name": "ATtiny13"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "MicroCore",
+          "architecture": "avr",
+          "version": "1.0.2",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MicroCore/MicroCore-1.0.2.tar.bz2",
+          "archiveFileName": "MicroCore-1.0.2.tar.bz2",
+          "checksum": "SHA-256:3d9b077ff79bd90718c5502b846e221efa1b03d9579371dd645acff61cd0946d",
+          "size": "41381",
+          "boards": [
+            {"name": "ATtiny13"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "MicroCore",
+          "architecture": "avr",
+          "version": "1.0.3",
+          "category": "Contributed",
+          "url": "https://MCUdude.github.io/MicroCore/MicroCore-1.0.3.tar.bz2",
+          "archiveFileName": "MicroCore-1.0.3.tar.bz2",
+          "checksum": "SHA-256:ffce37797a5c1df0016e4e30da29707fe41d6e72bdf2af2235e9c2ddd3d1a0fa",
+          "size": "47676",
+          "boards": [
+            {"name": "ATtiny13"}
+          ],
+          "toolsDependencies": []
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

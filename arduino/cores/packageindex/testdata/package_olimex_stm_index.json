@@ -1,0 +1,99 @@
+{
+	"packages":
+	[
+		{
+			"name": "Olimex",
+			"maintainer": "Olimex LTD",
+			"websiteURL": "https://www.olimex.com/",
+			"help":
+			{
+				"online": "https://www.olimex.com/forum"
+			},
+
+			"platforms":
+			[
+				{
+					"name": "Olimex STM boards",
+					"architecture": "stm",
+					"version": "1.0.0",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/STM/Versions/Olimex_STM-1.0.0.zip",
+					"archiveFileName": "Olimex_STM-1.0.0.zip",
+					"checksum": "SHA-256:bae194081fb2f91f4905acebf4bba1ba6de1e982c63757ab120013f41d33b1b8",
+					"size": "372380",
+					"boards":
+					[
+						{"name": "STM32-E407"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "arm-none-eabi-gcc",
+							"version": "4.8.3-2014q1"
+						},
+						{
+							"packager": "Olimex",
+							"name": "stm32-upload",
+							"version": "1.0.0"
+						}
+					]
+				},
+				{
+					"name": "Olimex STM boards",
+					"architecture": "stm",
+					"version": "1.0.1",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/STM/Versions/Olimex_STM-1.0.1.zip",
+					"archiveFileName": "Olimex_STM-1.0.1.zip",
+					"checksum": "SHA-256:6c7b6ae664ebd28f60663f5ffb68063d03a132bd5c3fbb5bedbe63f8710e3af8",
+					"size": "390464",
+					"boards":
+					[
+						{"name": "STM32-E407"},
+						{"name": "STM32-H407"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "arm-none-eabi-gcc",
+							"version": "4.8.3-2014q1"
+						},
+						{
+							"packager": "Olimex",
+							"name": "stm32-upload",
+							"version": "1.0.0"
+						}
+					]
+				}
+			],
+
+			"tools":
+			[
+				{
+					"name": "stm32-upload",
+					"version": "1.0.0",
+					"systems":
+					[
+						{
+							"host": "i686-mingw32",
+							"archiveFileName": "stm32-upload.zip",
+							"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/STM/Tools/stm32-upload.zip",
+							"checksum": "SHA-256:d2cc51bdda70d7b90a69de9a729b639c1831a4876550662ae5a6b6bfaec73c20",
+							"size": "2553406"
+						}
+					]
+				}
+			]
+		}
+	]
+}

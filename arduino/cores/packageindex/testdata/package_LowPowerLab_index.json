@@ -1,0 +1,249 @@
+{
+  "packages": [
+    {
+      "name": "Moteino",
+      "maintainer": "LowPowerLab",
+      "websiteURL": "https://LowPowerLab.com/Moteino",
+      "email": "info@lowpowerlab.com",
+      "help": {
+        "online": "https://lowpowerlab.com/forum"
+      },
+      "platforms": [
+        {
+          "name": "Moteino",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://lowpowerlab.github.io/MoteinoCore/Moteino1.0.zip",
+          "archiveFileName": "Moteino1.0.zip",
+          "checksum": "SHA-256:0b75d68c1b8b92dd249aeea58908cf1e25ba7c7076d40faa985225f2f98f7208",
+          "size": "41617",
+          "boards": [
+            {"name": "Moteino"},
+            {"name": "MoteinoMEGA"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "Moteino & MightyHat",
+          "architecture": "avr",
+          "version": "1.1.0",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://lowpowerlab.github.io/MoteinoCore/Moteino1.1.zip",
+          "archiveFileName": "Moteino1.1.zip",
+          "checksum": "SHA-256:565d56ac6977057f436a0064e7cad12cec9a3895fcd04b01e0a1e676b3d429ad",
+          "size": "41716",
+          "boards": [
+            {"name": "Moteino"},
+            {"name": "MoteinoMEGA"},
+            {"name": "MightyHat"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "Moteino & MightyHat",
+          "architecture": "avr",
+          "version": "1.2.0",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://lowpowerlab.github.io/MoteinoCore/Moteino1.2.zip",
+          "archiveFileName": "Moteino1.2.zip",
+          "checksum": "SHA-256:d61ef83f123464feab648c3208d48338afe8f9858011fe1ff4fa6f2254bcab6d",
+          "size": "41720",
+          "boards": [
+            {"name": "Moteino"},
+            {"name": "MoteinoMEGA"},
+            {"name": "MightyHat"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "Moteino & MightyHat",
+          "architecture": "avr",
+          "version": "1.3.0",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://lowpowerlab.github.io/MoteinoCore/Moteino1.3.zip",
+          "archiveFileName": "Moteino1.3.zip",
+          "checksum": "SHA-256:0297d7670a80b195bedfa246d05ad5e72d03e0cdf89f68ad305fcff9fa4d4755",
+          "size": "43492",
+          "boards": [
+            {"name": "Moteino"},
+            {"name": "Moteino (8 Mhz)"},
+            {"name": "MoteinoMEGA"},
+            {"name": "MightyHat"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "Moteino AVR Boards",
+          "architecture": "avr",
+          "version": "1.4.0",
+          "category": "Contributed",
+          "help": { "online": "https://lowpowerlab.com/forum" },
+          "url": "https://lowpowerlab.github.io/MoteinoCore/Moteino1.4.zip",
+          "archiveFileName": "Moteino1.4.zip",
+          "checksum": "SHA-256:230ae19e0794cb6e9340760961cbee3817428b05adc43f1da170ae2b3e3d7915",
+          "size": "49283",
+          "boards": [
+            {"name": "Moteino / Moteino-USB"},
+            {"name": "MoteinoMEGA / MoteinoMEGA-USB"},
+            {"name": "MightyHat"},
+            {"name": "Moteino (8 Mhz)"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "Moteino SAMD Boards",
+          "architecture": "samd",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "url": "https://lowpowerlab.github.io/MoteinoCore/MoteinoSAMD1.0.zip",
+          "archiveFileName": "MoteinoSAMD1.0.zip",
+          "checksum": "SHA-256:29a49516e2fb86be71a856509c4dac187ff9097c2a4921efd439c34ba2d17a75",
+          "size": "1152143",
+          "help": { "online": "https://lowpowerlab.com/forum" },
+          "boards": [
+            {"name": "Moteino M0"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "bossac",
+              "version": "1.7.0"
+            }
+          ]
+        },
+        {
+          "name": "Moteino SAMD Boards",
+          "architecture": "samd",
+          "version": "1.1.0",
+          "category": "Contributed",
+          "url": "https://lowpowerlab.github.io/MoteinoCore/MoteinoSAMD1.1.zip",
+          "archiveFileName": "MoteinoSAMD1.1.zip",
+          "checksum": "SHA-256:86eb8028d894fe2398571c0031172bedcf7bf53327b56d6c40b820e3267eb72c",
+          "size": "1152143",
+          "help": { "online": "https://lowpowerlab.com/forum" },
+          "boards": [
+            {"name": "Moteino M0"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "bossac",
+              "version": "1.7.0"
+            }
+          ]
+        }
+      ],
+      "tools": [
+        {
+          "name": "bossac",
+          "version": "1.7.0",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "url": "http://downloads.arduino.cc/tools/bossac-1.7.0-mingw32.tar.gz",
+              "archiveFileName": "bossac-1.7.0-mingw32.tar.gz",
+              "checksum": "SHA-256:9ef7d11b4fabca0adc17102a0290957d5cc26ce46b422c3a5344722c80acc7b2",
+              "size": "243066"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "http://downloads.arduino.cc/tools/bossac-1.7.0-i386-apple-darwin15.6.0.tar.gz",
+              "archiveFileName": "bossac-1.7.0-i386-apple-darwin15.6.0.tar.gz",
+              "checksum": "SHA-256:feac36ab38876c163dcf51bdbcfbed01554eede3d41c59a0e152e170fe5164d2",
+              "size": "63822"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "http://downloads.arduino.cc/tools/bossac-1.7.0-x86_64-linux-gnu.tar.gz",
+              "archiveFileName": "bossac-1.7.0-x86_64-linux-gnu.tar.gz",
+              "checksum": "SHA-256:9475c0c8596c1ba12dcbce60e48fef7559087fa8eccbea7bab732113f3c181ee",
+              "size": "31373"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "http://downloads.arduino.cc/tools/bossac-1.7.0-i686-linux-gnu.tar.gz",
+              "archiveFileName": "bossac-1.7.0-i686-linux-gnu.tar.gz",
+              "checksum": "SHA-256:17003b0bdc698d52eeb91b09c34aec501c6e0285b4aa88659ab7cc407a451a4d",
+              "size": "31086"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "http://downloads.arduino.cc/tools/bossac-1.7.0-arm-linux-gnueabihf.tar.gz",
+              "archiveFileName": "bossac-1.7.0-arm-linux-gnueabihf.tar.gz",
+              "checksum": "SHA-256:09e46d0af61b2189caaac0bc6d4dd15cb22c167fdedc56ec98602dd5f10e68e0",
+              "size": "27382"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

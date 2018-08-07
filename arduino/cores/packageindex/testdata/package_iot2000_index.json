@@ -1,0 +1,111 @@
+{
+  "packages": [
+    {
+      "name": "Simatic",
+      "maintainer": "Siemens AG",
+      "websiteURL": "http://w3.siemens.com/mcms/pc-based-automation/en/industrial-iot/Pages/Default.aspx",
+      "platforms": [
+        {
+          "name": "Simatic IOT2000 Devices",
+          "architecture": "iot2000",
+          "version": "1.0.1",
+          "category": "Contributed",
+          "help": {
+            "online": "https://support.industry.siemens.com/tf/ww/en/conf/60/"
+          },
+          "url": "https://github.com/sblyolcubal/arduino-iot2000/raw/master/Versions/iot2000_1.0.1.zip",
+          "archiveFileName": "iot2000_1.0.1.zip",
+          "checksum": "SHA-256:0fa5c0cb72dff7a472198f489babbd8c6959d445d0007181f97f26bfd0f3ca20",
+          "size": "423626",
+          "boards": [
+            { "name": "Simatic IOT2000" },
+            { "name": "Simatic IOT2000 Net" }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "Simatic",
+              "name": "i586-poky-linux-uclibc",
+              "version": "1.6.2+1.0"
+            },
+            {
+              "packager": "Simatic",
+              "name": "sketchUploader",
+              "version": "1.6.2+1.0"
+            }
+          ]
+        }
+      ],
+
+      "tools": [
+        {
+          "name": "i586-poky-linux-uclibc",
+          "version": "1.6.2+1.0",
+          "systems": [
+            {
+              "size": "30587705",
+              "checksum": "SHA-256:5b705d26dc1d8ca8953df6e0c08dcc8584d5be77b584d561f631360fd166677c",
+              "host": "i386-apple-darwin11",
+              "archiveFileName": "galileo-toolchain-20150323-osx.tar.bz2",
+              "url": "http://downloadmirror.intel.com/24806/eng/galileo-toolchain-osx-1.6.2-1.0.tar.bz2"
+            },
+            {
+              "size": "45948648",
+              "checksum": "SHA-256:821eb290d7c668c1caa74da30903c13843edc746d41508b35161622ae6279b56",
+              "host": "i686-mingw32",
+              "archiveFileName": "galileo-toolchain-20150323-windows.zip",
+              "url": "http://downloadmirror.intel.com/24806/eng/galileo-toolchain-windows-1.6.2-1.0.zip"
+            },
+            {
+              "size": "56227185",
+              "checksum": "SHA-256:935ccad3eaaec34f5de76eceb0f0ecd1372bdab0b7dc8f4241e8260c6f827b72",
+              "host": "x86_64-linux-gnu",
+              "archiveFileName": "galileo-toolchain-20150316-linux64.tar.bz2",
+              "url": "http://downloadmirror.intel.com/24806/eng/galileo-toolchain-linux64-1.6.2-1.0.tar.bz2"
+            },
+            {
+              "size": "55098166",
+              "checksum": "SHA-256:1dab7f21e10d0208a6dd2897c36c6f5f55f9372b947225d2b59c3c4ab4777d03",
+              "host": "i686-linux-gnu",
+              "archiveFileName": "galileo-toolchain-20150316-linux32.tar.bz2",
+              "url": "http://downloadmirror.intel.com/24806/eng/galileo-toolchain-linux32-1.6.2-1.0.tar.bz2"
+            }
+          ]
+        },
+        {
+          "name": "sketchUploader",
+          "version": "1.6.2+1.0",
+          "systems": [
+            {
+              "size": "61789",
+              "checksum": "SHA-256:8395ccb57c627f997fe01170df4613de906f48c6ce99623b9ca42806079c28ad",
+              "host": "i386-apple-darwin11",
+              "archiveFileName": "intel-arduino-tools-20150316-osx.tar.gz",
+              "url": "https://github.com/sblyolcubal/arduino-iot2000/raw/master/tools/intel-arduino-tools-1.6.2-1.0-osx.tar.gz"
+            },
+            {
+              "size": "3141735",
+              "checksum": "SHA-256:27c7f3bb0f280cae8ab89acd887ec497c66b21afe28a4e42cfc5ce4f59e24605",
+              "host": "i686-mingw32",
+              "archiveFileName": "intel-arduino-tools-20150316-windows.zip",
+              "url": "https://github.com/sblyolcubal/arduino-iot2000/raw/master/tools/intel-arduino-tools-1.6.2-1.0-windows.zip"
+            },
+            {
+              "size": "178239",
+              "checksum": "SHA-256:2876db4153db22609d2f6c9c3bfb198efbb9d9574edad579aca7d58cff9d2cca",
+              "host": "x86_64-linux-gnu",
+              "archiveFileName": "intel-arduino-tools-20150316-linux64.tar.gz",
+              "url": "https://github.com/sblyolcubal/arduino-iot2000/raw/master/tools/intel-arduino-tools-1.6.2-1.0-linux64.tar.gz"
+            },
+            {
+              "size": "187995",
+              "checksum": "SHA-256:20d87602d0194be626f592d3f2bdc9566a5a897786b042393482ef4c26ae158c",
+              "host": "i686-linux-gnu",
+              "archiveFileName": "intel-arduino-tools-20150316-linux32.tar.gz",
+              "url": "https://github.com/sblyolcubal/arduino-iot2000/raw/master/tools/intel-arduino-tools-1.6.2-1.0-linux32.tar.gz"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

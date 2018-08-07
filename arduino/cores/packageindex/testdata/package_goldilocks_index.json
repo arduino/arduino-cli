@@ -1,0 +1,35 @@
+{
+  "packages": [
+    {
+      "name": "Goldilocks",
+      "maintainer": "Phillip Stevens",
+      "websiteURL": "https://github.com/feilipu/Arduino_Goldilocks_Variant",
+      "email": "phillip.stevens@gmail.com",
+      "help": {
+        "online": "https://github.com/feilipu/Arduino_Goldilocks_Variant/issues"
+      },
+      "platforms": [
+        {
+          "name": "Goldilocks",
+          "architecture": "avr",
+          "version": "1.1.0",
+          "category": "Contributed",
+          "help": {
+            "online": "https://github.com/feilipu/Arduino_Goldilocks_Variant/issues"
+          },
+          "url": "https://raw.githubusercontent.com/feilipu/feilipu.github.io/master/Arduino_Goldilocks_Variant_v1.1.0.zip",
+          "archiveFileName": "Arduino_Goldilocks_Variant_v1.1.0.zip",
+          "checksum": "SHA-256:cd6fd4a8eae67be4e30a021d3c42eddb79c29631873dba27d074d01da854860b",
+          "size": "3978345",
+          "boards": [
+            {"name": "Goldilocks 20MHz"},
+            {"name": "Goldilocks 22.1184MHz"},
+            {"name": "Goldilocks Analogue"}
+          ],
+          "toolsDependencies": [ ]
+        }
+      ],
+      "tools": [ ]
+    }
+  ]
+}

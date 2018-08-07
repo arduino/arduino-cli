@@ -333,11 +333,8 @@ func (pm *PackageManager) loadToolReleasesFromTool(tool *cores.Tool, toolPath *p
 	toolVersions.FilterDirs()
 	toolVersions.FilterOutHiddenFiles()
 	for _, versionPath := range toolVersions {
-		version, err := semver.Parse(versionPath.Base())
-		if err != nil {
-			return fmt.Errorf("invalid tool version path %s: %s", versionPath, err)
-		}
 		if toolReleasePath, err := versionPath.Abs(); err == nil {
+			version := semver.ParseRelaxed(versionPath.Base())
 			release := tool.GetOrCreateRelease(version)
 			release.InstallDir = toolReleasePath
 			pm.Log.WithField("tool", release).Infof("Loaded tool")
@@ -409,10 +406,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) er
 
 			for toolName, toolVersion := range toolsData {
 				tool := targetPackage.GetOrCreateTool(toolName)
-				version, err := semver.Parse(toolVersion)
-				if err != nil {
-					return fmt.Errorf("invalid tool version in %s: %s", builtinToolsVersionsTxtPath, err)
-				}
+				version := semver.ParseRelaxed(toolVersion)
 				release := tool.GetOrCreateRelease(version)
 				release.InstallDir = toolPath
 				pm.Log.WithField("tool", release).Infof("Loaded tool")

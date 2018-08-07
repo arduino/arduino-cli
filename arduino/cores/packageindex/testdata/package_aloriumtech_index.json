@@ -1,0 +1,670 @@
+{
+   "packages":[
+      {
+         "name":"alorium",
+         "maintainer":"Alorium Technology",
+         "websiteURL":"http://www.aloriumtech.com",
+         "email":"info@aloriumtech.com",
+         "platforms":[
+            {
+               "name":"Alorium XLR8 Boards",
+               "architecture":"avr",
+               "version":"1.9.0",
+               "category":"Contributed",
+               "url":"https://github.com/AloriumTechnology/Arduino_Boards/raw/master/alorium-avr-1.9.0.tar.bz2",
+               "archiveFileName":"alorium-avr.1.9.0.tar.bz2",
+               "checksum":"SHA-256:935dc5a20d46db624ef7aa6097729208d35788859122d649d46258e83b382108",
+               "size":"896140",
+               "help":{
+                  "online":"http://www.aloriumtech.com/xlr8-quickstart/"
+               },
+               "boards":[
+                  { "name":"Alorium XLR8" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8reconfig",
+                     "version":"1.3.0"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8tools",
+                     "version":"1.2.0"
+                  }
+               ]
+            },
+            {
+               "name":"Alorium XLR8 Boards",
+               "architecture":"avr",
+               "version":"1.8.1",
+               "category":"Contributed",
+               "url":"https://github.com/AloriumTechnology/Arduino_Boards/raw/master/alorium-avr-1.8.1.tar.bz2",
+               "archiveFileName":"alorium-avr.1.8.1.tar.bz2",
+               "checksum":"SHA-256:3bc22d6109685cd036912db3b130cd70656f7af3f88337b4e6b0392697fa265a",
+               "size":"1285306",
+               "help":{
+                  "online":"http://www.aloriumtech.com/xlr8-quickstart/"
+               },
+               "boards":[
+                  { "name":"Alorium XLR8" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8reconfig",
+                     "version":"1.2.0"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8tools",
+                     "version":"1.2.0"
+                  }
+               ]
+            },
+            {
+               "name":"Alorium XLR8 Boards",
+               "architecture":"avr",
+               "version":"1.8.0",
+               "category":"Contributed",
+               "url":"https://github.com/AloriumTechnology/Arduino_Boards/raw/master/alorium-avr-1.8.0.tar.bz2",
+               "archiveFileName":"alorium-avr.1.8.0.tar.bz2",
+               "checksum":"SHA-256:44061ff2105a47758afcef9e26ba9ef29281603d9f80aa531aca5fce3037c78b",
+               "size":"1307630",
+               "help":{
+                  "online":"http://www.aloriumtech.com/xlr8-quickstart/"
+               },
+               "boards":[
+                  { "name":"Alorium XLR8" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8reconfig",
+                     "version":"1.2.0"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8tools",
+                     "version":"1.2.0"
+                  }
+               ]
+            },
+            {
+               "name":"Alorium XLR8 Boards",
+               "architecture":"avr",
+               "version":"1.7.0",
+               "category":"Contributed",
+               "url":"https://github.com/AloriumTechnology/Arduino_Boards/raw/master/alorium-avr-1.7.0.tar.bz2",
+               "archiveFileName":"alorium-avr.1.7.0.tar.bz2",
+               "checksum":"SHA-256:18a758b659d12313c88cadae53eae7d1f671540dd2ef827cba05991103abb2b5",
+               "size":"1346064",
+               "help":{
+                  "online":"http://www.aloriumtech.com/xlr8-quickstart/"
+               },
+               "boards":[
+                  { "name":"Alorium XLR8" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8reconfig",
+                     "version":"1.2.0"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8tools",
+                     "version":"1.2.0"
+                  }
+               ]
+            },
+            {
+               "name":"Alorium XLR8 Boards",
+               "architecture":"avr",
+               "version":"1.6.0",
+               "category":"Contributed",
+               "url":"https://github.com/AloriumTechnology/Arduino_Boards/raw/master/alorium-avr-1.6.0.tar.bz2",
+               "archiveFileName":"alorium-avr.1.6.0.tar.bz2",
+               "checksum":"SHA-256:9d5e5a91e873ae0c8273ac63ee5dff67217325e3e2488e1ba29feece909b38f0",
+               "size":"578738",
+               "help":{
+                  "online":"http://www.aloriumtech.com/xlr8-quickstart/"
+               },
+               "boards":[
+                  { "name":"Alorium XLR8" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8reconfig",
+                     "version":"1.2.0"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8tools",
+                     "version":"1.2.0"
+                  }
+               ]
+            },
+            {
+               "name":"Alorium XLR8 Boards",
+               "architecture":"avr",
+               "version":"1.5.1",
+               "category":"Contributed",
+               "url":"https://github.com/AloriumTechnology/Arduino_Boards/raw/master/alorium-avr-1.5.1.tar.bz2",
+               "archiveFileName":"alorium-avr.1.5.1.tar.bz2",
+               "checksum":"SHA-256:a19f735c17ffc03cbb4e5f0f4997528cf10a1ee2a8f96f6cf2b0710006eb1568",
+               "size":"303267",
+               "help":{
+                  "online":"http://www.aloriumtech.com/xlr8-quickstart/"
+               },
+               "boards":[
+                  { "name":"Alorium XLR8" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8reconfig",
+                     "version":"1.1.0"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8tools",
+                     "version":"1.1.0"
+                  }
+               ]
+            },
+            {
+               "name":"Alorium XLR8 Boards",
+               "architecture":"avr",
+               "version":"1.5.0",
+               "category":"Contributed",
+               "url":"https://github.com/AloriumTechnology/Arduino_Boards/raw/master/alorium-avr-1.5.0.tar.bz2",
+               "archiveFileName":"alorium-avr.1.5.0.tar.bz2",
+               "checksum":"SHA-256:e5f0b636a412e7de9eba107317d74716746ecb82937bb04ab4c902ee2e32634e",
+               "size":"214958",
+               "help":{
+                  "online":"http://www.aloriumtech.com/xlr8-quickstart/"
+               },
+               "boards":[
+                  { "name":"Alorium XLR8" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8reconfig",
+                     "version":"1.1.0"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8tools",
+                     "version":"1.1.0"
+                  }
+               ]
+            },
+            {
+               "name":"Alorium XLR8 Boards",
+               "architecture":"avr",
+               "version":"1.4.0",
+               "category":"Contributed",
+               "url":"https://github.com/AloriumTechnology/Arduino_Boards/raw/master/alorium-avr-1.4.0.tar.bz2",
+               "archiveFileName":"alorium-avr.1.4.0.tar.bz2",
+               "checksum":"SHA-256:04f8567efdf6c23fbdb2d4d7f12d75aa974183f94384ed14652dc60a1e1c3390",
+               "size":"214526",
+               "help":{
+                  "online":"http://www.aloriumtech.com/xlr8-quickstart/"
+               },
+               "boards":[
+                  { "name":"Alorium XLR8" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8reconfig",
+                     "version":"1.1.0"
+                  }
+               ]
+            },
+            {
+               "name":"Alorium XLR8 Boards",
+               "architecture":"avr",
+               "version":"1.3.2",
+               "category":"Contributed",
+               "url":"https://github.com/AloriumTechnology/Arduino_Boards/raw/master/alorium-avr-1.3.2.tar.bz2",
+               "archiveFileName":"alorium-avr.1.3.2.tar.bz2",
+               "checksum":"SHA-256:fe0dbcfd3ec056016dc7e8dcc230f2e60635f6c6929d951a2bdcd985e0c31c98",
+               "size":"212768",
+               "help":{
+                  "online":"http://www.aloriumtech.com/xlr8-quickstart/"
+               },
+               "boards":[
+                  { "name":"Alorium XLR8" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8reconfig",
+                     "version":"1.1.0"
+                  }
+               ]
+            },
+            {
+               "name":"Alorium XLR8 Boards",
+               "architecture":"avr",
+               "version":"1.2.0",
+               "category":"Contributed",
+               "url":"https://github.com/AloriumTechnology/Arduino_Boards/raw/master/alorium-avr-1.2.0.tar.bz2",
+               "archiveFileName":"alorium-avr.1.2.0.tar.bz2",
+               "checksum":"SHA-256:47141af15931bc6605db9c58a3a4f3ae324988e70c5d68bfccd0ae3b28544a12",
+               "size":"7743415",
+               "help":{
+                  "online":"http://forums.aloriumtech.com/"
+               },
+               "boards":[
+                  { "name":"Alorium XLR8" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  }
+               ]
+            },
+            {
+               "name":"Alorium XLR8 Boards",
+               "architecture":"avr",
+               "version":"1.1.0",
+               "category":"Contributed",
+               "url":"https://github.com/AloriumTechnology/Arduino_Boards/raw/master/alorium-avr-1.1.0.tar.bz2",
+               "archiveFileName":"alorium-avr.1.1.0.tar.bz2",
+               "checksum":"SHA-256:b1746b61e4e45897ee0a317468fc7489fbe2309884241ed31d699b46b7d088e1",
+               "size":"7727420",
+               "help":{
+                  "online":"http://forums.aloriumtech.com/"
+               },
+               "boards":[
+                  { "name":"Alorium XLR8" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  }
+               ]
+            },
+            {
+               "name":"Alorium XLR8 Boards",
+               "architecture":"avr",
+               "version":"1.0.0",
+               "category":"Contributed",
+               "url":"https://github.com/AloriumTechnology/Arduino_Boards/raw/master/alorium-avr-1.0.0.tar.bz2",
+               "archiveFileName":"alorium-avr.1.0.0.tar.bz2",
+               "checksum":"SHA-256:7068f6dd7db398eb84d832cc56263fa7a321457ec398c9156b0d732a54d1a9ee",
+               "size":"425274",
+               "help":{
+                  "online":"http://forums.aloriumtech.com/"
+               },
+               "boards":[
+                  { "name":"Alorium XLR8" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  }
+               ]
+            },
+            {
+               "name":"Alorium XLR8 Boards",
+               "architecture":"avr",
+               "version":"0.0.9-test",
+               "category":"Contributed",
+               "url":"https://github.com/AloriumTechnology/Arduino_Boards/raw/master/alorium-avr-1.1.0.tar.bz2",
+               "archiveFileName":"alorium-avr.1.1.0.tar.bz2",
+               "checksum":"SHA-256:b1746b61e4e45897ee0a317468fc7489fbe2309884241ed31d699b46b7d088e1",
+               "size":"7727420",
+               "help":{
+                  "online":"http://www.aloriumtech.com/xlr8-quickstart/"
+               },
+               "boards":[
+                  { "name":"Alorium XLR8" }
+               ],
+               "toolsDependencies":[
+                  {
+                     "packager":"arduino",
+                     "name":"avr-gcc",
+                     "version":"4.8.1-arduino5"
+                  },
+                  {
+                     "packager":"arduino",
+                     "name":"avrdude",
+                     "version":"6.0.1-arduino5"
+                  },
+                  {
+                     "packager":"alorium",
+                     "name":"xlr8reconfig",
+                     "version":"1.1.0"
+                  }
+               ]
+            }
+         ],
+         "tools":[
+           {
+             "name": "xlr8reconfig",
+             "version": "1.3.0",
+             "systems": [
+               {
+                 "host": "x86_64-apple-darwin",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.3.0-osx.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.3.0-osx.tar.bz2",
+                 "checksum": "SHA-256:1efed2104dc47abfc8ef223a7775f6cd78150e92c900ec509fd65f1a973e0d17",
+                 "size": "3937879"
+               },
+               {
+                 "host": "arm-linux-gnueabihf",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.3.0.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.3.0.tar.bz2",
+                 "checksum": "SHA-256:3b3d56fc6c9c4daaa3ae96739f653e5e115c556bdf71c5180c979e8884818db4",
+                 "size": "17280"
+               },
+               {
+                 "host": "i686-mingw32",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.3.0-windows.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.3.0-windows.tar.bz2",
+                 "checksum": "SHA-256:2ac5de4a9de0e0876659b60e4d0f5011849cbd30aeeb741af04b0a86a2bc4a63",
+                 "size": "3430621"
+               },
+               {
+                 "host": "x86_64-pc-linux-gnu",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.3.0.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.3.0.tar.bz2",
+                 "checksum": "SHA-256:3b3d56fc6c9c4daaa3ae96739f653e5e115c556bdf71c5180c979e8884818db4",
+                 "size": "17280"
+               },
+               {
+                 "host": "i686-pc-linux-gnu",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.3.0.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.3.0.tar.bz2",
+                 "checksum": "SHA-256:3b3d56fc6c9c4daaa3ae96739f653e5e115c556bdf71c5180c979e8884818db4",
+                 "size": "17280"
+               }
+             ]
+           },
+           {
+             "name": "xlr8reconfig",
+             "version": "1.2.0",
+             "systems": [
+               {
+                 "host": "x86_64-apple-darwin",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.2.0-osx.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.2.0-osx.tar.bz2",
+                 "checksum": "SHA-256:97087f04ba85b557054d76ee3a1a4a2828781036a50f68dbc7ff843d3ee25e48",
+                 "size": "3885390"
+               },
+               {
+                 "host": "arm-linux-gnueabihf",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.2.0.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.2.0.tar.bz2",
+                 "checksum": "SHA-256:e88043cc087eca0bbb24767ddc32fb10c9430ccc953a673275b2a41db056ea1f",
+                 "size": "17134"
+               },
+               {
+                 "host": "i686-mingw32",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.2.0-windows.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.2.0-windows.tar.bz2",
+                 "checksum": "SHA-256:e59dafc6239efaea507c54de94511c5952e7a8856af901a4a9f2c99b96182860",
+                 "size": "3430561"
+               },
+               {
+                 "host": "x86_64-pc-linux-gnu",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.2.0.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.2.0.tar.bz2",
+                 "checksum": "SHA-256:e88043cc087eca0bbb24767ddc32fb10c9430ccc953a673275b2a41db056ea1f",
+                 "size": "17134"
+               },
+               {
+                 "host": "i686-pc-linux-gnu",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.2.0.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.2.0.tar.bz2",
+                 "checksum": "SHA-256:e88043cc087eca0bbb24767ddc32fb10c9430ccc953a673275b2a41db056ea1f",
+                 "size": "17134"
+               }
+             ]
+           },
+           {
+             "name": "xlr8reconfig",
+             "version": "1.1.0",
+             "systems": [
+               {
+                 "host": "arm-linux-gnueabihf",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.1.0.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.1.0.tar.bz2",
+                 "checksum": "SHA-256:0bb50269a5398d109cdb02f6ad67b73eb27998d99328ee8dc855a23693b34774",
+                 "size": "14849"
+               },
+               {
+                 "host": "i686-mingw32",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.1.0-windows.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.1.0-windows.tar.bz2",
+                 "checksum": "SHA-256:9ece9a1b906cb4823531971802d1b5678a2bcf75eecfac5282f2b6aa0ada6e6f",
+                 "size": "3418836"
+               },
+               {
+                 "host": "x86_64-apple-darwin",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.1.0-osx.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.1.0-osx.tar.bz2",
+                 "checksum": "SHA-256:f4d6a3ecadf279e92d155e13408ec85412f02143722d081ed0f93db431a2a769",
+                 "size": "3880866"
+               },
+               {
+                 "host": "x86_64-pc-linux-gnu",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.1.0.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.1.0.tar.bz2",
+                 "checksum": "SHA-256:0bb50269a5398d109cdb02f6ad67b73eb27998d99328ee8dc855a23693b34774",
+                 "size": "14849"
+               },
+               {
+                 "host": "i686-pc-linux-gnu",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8reconfig-1.1.0.tar.bz2",
+                 "archiveFileName": "xlr8reconfig-1.1.0.tar.bz2",
+                 "checksum": "SHA-256:0bb50269a5398d109cdb02f6ad67b73eb27998d99328ee8dc855a23693b34774",
+                 "size": "14849"
+               }
+             ]
+           },
+           {
+             "name": "xlr8tools",
+             "version": "1.2.0",
+             "systems": [
+               {
+                 "host": "x86_64-apple-darwin",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8tools-1.2.0-osx.tar.bz2",
+                 "archiveFileName": "xlr8tools-1.2.0-osx.tar.bz2",
+                 "checksum": "SHA-256:b0771db94c9d8c24a25c3449db82c928a9ac78d11ae1040cd5815535ab5947f0",
+                 "size": "3833455"
+               },
+               {
+                 "host": "arm-linux-gnueabihf",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8tools-1.2.0.tar.bz2",
+                 "archiveFileName": "xlr8tools-1.2.0.tar.bz2",
+                 "checksum": "SHA-256:11d3b7d446ecc7d6a71951e3ebb3d57b1c69b8581f376c340e08fad3b713eeab",
+                 "size": "2556"
+               },
+               {
+                 "host": "i686-mingw32",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8tools-1.2.0-windows.tar.bz2",
+                 "archiveFileName": "xlr8tools-1.2.0-windows.tar.bz2",
+                 "checksum": "SHA-256:473d48ae506f0d5721418a80861416d218247deaae8147f8518b67b4d84c3033",
+                 "size": "3385559"
+               },
+               {
+                 "host": "x86_64-pc-linux-gnu",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8tools-1.2.0.tar.bz2",
+                 "archiveFileName": "xlr8tools-1.2.0.tar.bz2",
+                 "checksum": "SHA-256:11d3b7d446ecc7d6a71951e3ebb3d57b1c69b8581f376c340e08fad3b713eeab",
+                 "size": "2556"
+               },
+               {
+                 "host": "i686-pc-linux-gnu",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8tools-1.2.0.tar.bz2",
+                 "archiveFileName": "xlr8tools-1.2.0.tar.bz2",
+                 "checksum": "SHA-256:11d3b7d446ecc7d6a71951e3ebb3d57b1c69b8581f376c340e08fad3b713eeab",
+                 "size": "2556"
+               }
+             ]
+           },
+           {
+             "name": "xlr8tools",
+             "version": "1.1.0",
+             "systems": [
+               {
+                 "host": "arm-linux-gnueabihf",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8tools-1.1.0.tar.bz2",
+                 "archiveFileName": "xlr8tools-1.1.0.tar.bz2",
+                 "checksum": "SHA-256:c3a82396f6850616db5aa346799f912993822c9c2b73d2e8b898be73165b62b9",
+                 "size": "2564"
+               },
+               {
+                 "host": "i686-mingw32",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8tools-1.1.0-windows.tar.bz2",
+                 "archiveFileName": "xlr8tools-1.1.0-windows.tar.bz2",
+                 "checksum": "SHA-256:67961cf12db5ad091f423386bd49a99b100159b0acf0753e56bdce53556a1c4e",
+                 "size": "3385613"
+               },
+               {
+                 "host": "x86_64-apple-darwin",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8tools-1.1.0-osx.tar.bz2",
+                 "archiveFileName": "xlr8tools-1.1.0-osx.tar.bz2",
+                 "checksum": "SHA-256:2f594539c4a6045608c4e8882c7ddf45b2d48979f7b6b1ac4179e80f244281a5",
+                 "size": "3833625"
+               },
+               {
+                 "host": "x86_64-pc-linux-gnu",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8tools-1.1.0.tar.bz2",
+                 "archiveFileName": "xlr8tools-1.1.0.tar.bz2",
+                 "checksum": "SHA-256:c3a82396f6850616db5aa346799f912993822c9c2b73d2e8b898be73165b62b9",
+                 "size": "2564"
+               },
+               {
+                 "host": "i686-pc-linux-gnu",
+                 "url": "https://github.com/AloriumTechnology/Arduino_Boards/raw/master/avr/tools/xlr8tools-1.1.0.tar.bz2",
+                 "archiveFileName": "xlr8tools-1.1.0.tar.bz2",
+                 "checksum": "SHA-256:c3a82396f6850616db5aa346799f912993822c9c2b73d2e8b898be73165b62b9",
+                 "size": "2564"
+               }
+             ]
+           }
+         ]
+      }
+   ]
+}
+
+

@@ -1,0 +1,100 @@
+{
+  "packages": [
+    {
+      "name": "Sanguino",
+      "maintainer": "Kristian Sloth Lauszus",
+      "websiteURL": "http://lauszus.github.io/Sanguino/",
+      "email": "kristianl@tkjelectronics.dk",
+      "help": {
+        "online": "https://github.com/Lauszus/sanguino/"
+      },
+      "platforms": [
+        {
+          "name": "Sanguino",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "Sanguino",
+          "help": {
+            "online": "https://github.com/Lauszus/sanguino/"
+          },
+          "url": "https://github.com/Lauszus/Sanguino/releases/download/1.0.0/Sanguino-1.0.0.zip",
+          "archiveFileName": "Sanguino-1.0.0.zip",
+          "checksum": "SHA-256:1bfe7707894907a2792884fc726e1fe9251842fac75eaf5ef451bba0c18cbb4e",
+          "size": "92824",
+          "boards": [
+            {"name": "Sanguino"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "Sanguino",
+          "architecture": "avr",
+          "version": "1.0.1",
+          "category": "Sanguino",
+          "help": {
+            "online": "https://github.com/Lauszus/sanguino/"
+          },
+          "url": "https://github.com/Lauszus/Sanguino/releases/download/1.0.1/Sanguino-1.0.1.zip",
+          "archiveFileName": "Sanguino-1.0.1.zip",
+          "checksum": "SHA-256:f4ff1b1f7810eb13a580939a7bb46161d7554c51de070ed16acdb6834a25023f",
+          "size": "91766",
+          "boards": [
+            {"name": "Sanguino"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "Sanguino",
+          "architecture": "avr",
+          "version": "1.0.2",
+          "category": "Sanguino",
+          "help": {
+            "online": "https://github.com/Lauszus/sanguino/"
+          },
+          "url": "https://github.com/Lauszus/Sanguino/releases/download/1.0.2/Sanguino-1.0.2.zip",
+          "archiveFileName": "Sanguino-1.0.2.zip",
+          "checksum": "SHA-256:35eaab65d621450820ab094bdaa8d93993e2191b57a161c2ab201ba7626206e0",
+          "size": "91859",
+          "boards": [
+            {"name": "Sanguino"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

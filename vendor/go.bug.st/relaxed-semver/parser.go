@@ -178,7 +178,7 @@ func Parse(inVersioin string) (*Version, error) {
 				if prereleaseIdx == currIdx {
 					return nil, fmt.Errorf("empty prerelease not allowed")
 				}
-				if zeroPrefix && !alphaIdentifier {
+				if zeroPrefix && !alphaIdentifier && currIdx-prereleaseIdx > 1 {
 					return nil, fmt.Errorf("numeric prerelease must not be prefixed with zero")
 				}
 				result.prerelases = append(result.prerelases, in[prereleaseIdx:currIdx])

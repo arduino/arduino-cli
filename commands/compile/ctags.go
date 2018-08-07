@@ -39,7 +39,7 @@ import (
 func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 	builtinPackage := pm.GetPackages().GetOrCreatePackage("builtin")
 	ctagsTool := builtinPackage.GetOrCreateTool("ctags")
-	ctagsRel := ctagsTool.GetOrCreateRelease(semver.MustParse("5.8-arduino11"))
+	ctagsRel := ctagsTool.GetOrCreateRelease(semver.ParseRelaxed("5.8-arduino11"))
 	ctagsRel.Flavours = []*cores.Flavour{
 		&cores.Flavour{
 			OS: "i686-pc-linux-gnu",
@@ -94,7 +94,7 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 	}
 }
 
-var ctagsVersion = semver.MustParse("5.8-arduino11")
+var ctagsVersion = semver.ParseRelaxed("5.8-arduino11")
 
 func getBuiltinCtagsTool(pm *packagemanager.PackageManager) (*cores.ToolRelease, error) {
 	return pm.Package("builtin").Tool("ctags").Release(ctagsVersion).Get()

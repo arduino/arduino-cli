@@ -1,0 +1,495 @@
+{
+    "packages":
+    [
+        {
+            "name":"RedBear",
+            "maintainer":"RedBear",
+            "websiteURL":"http://redbear.cc",
+            "email":"info@redbear.cc",
+            "help":{ "online":"http://redbear.cc" },
+            "platforms": 
+            [
+                {
+                    "name":"RedBear AVR Boards",
+                    "architecture":"avr",
+                    "version":"1.0.0",
+                    "category":"RedBear",
+                    "url":"https://redbearlab.github.io/arduino/Blend/blend_boards.zip",
+                    "archiveFileName":"blend_boards.zip",
+                    "checksum":"SHA-256:B7D6590629FD2720986B2F06891C63654F7BFE708BF5134FB7E41BD5B4781802",
+                    "size":"52218",
+                    "help":{ "online":"https://redbearlab.zendesk.com/home" },
+                    "boards":
+                    [
+                        { "name":"Blend" },
+                        { "name":"BlendMicro 3.3v/8MHz" },
+                        { "name":"BlendMicro 3.3v/16MHz(overclock)" }
+                    ],
+                    "toolsDependencies":
+                    [
+                        {
+                            "packager":"arduino",
+                            "name":"avr-gcc",
+                            "version":"4.8.1-arduino5"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name":"RedBear AVR Boards",
+                    "architecture":"avr",
+                    "version":"1.0.2",
+                    "category":"RedBear",
+                    "url":"https://redbearlab.github.io/arduino/Blend/blend_boards_v102.zip",
+                    "archiveFileName":"blend_boards_v102.zip",
+                    "checksum":"SHA-256:1EDE306E1E65507486D7C6E88F6BF4E427A21C0BEC8FE3E12939ABF5A8FEAB39",
+                    "size":"53286",
+                    "help":{ "online":"https://redbearlab.zendesk.com/home" },
+                    "boards":
+                    [
+                        { "name":"Blend" },
+                        { "name":"BlendMicro 3.3v/8MHz" },
+                        { "name":"BlendMicro 3.3v/16MHz(overclock)" }
+                    ],
+                    "toolsDependencies":
+                    [
+                        {
+                            "packager":"arduino",
+                            "name":"avr-gcc",
+                            "version":"4.8.1-arduino5"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name":"RedBear AVR Boards",
+                    "architecture":"avr",
+                    "version":"1.0.3",
+                    "category":"RedBear",
+                    "url":"https://redbearlab.github.io/arduino/Blend/blend_boards_v103.zip",
+                    "archiveFileName":"blend_boards_v103.zip",
+                    "checksum":"SHA-256:1C15097B71D8E4AF50B1FF4D45CC4AFA77AA3A98B008606E4D3057459F8C3109",
+                    "size":"45342",
+                    "help":{ "online":"https://redbearlab.zendesk.com/home" },
+                    "boards":
+                    [
+                        { "name":"Blend" },
+                        { "name":"BlendMicro 3.3v/8MHz" },
+                        { "name":"BlendMicro 3.3v/16MHz(overclock)" }
+                    ],
+                    "toolsDependencies":
+                    [
+                        {
+                            "packager":"arduino",
+                            "name":"avr-gcc",
+                            "version":"4.8.1-arduino5"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear nRF51822 Boards (32-bits ARM Cortex-M0)",
+                    "architecture": "nRF51822",
+                    "version": "1.0.0",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/nRF51822/nRF51822_board.zip",
+                    "archiveFileName": "nRF51822_board.zip",
+                    "checksum": "SHA-256:A89B5C7EDCA505A495DEF6D80ACA86DCE058EF29E584C4FF480400801FBFF989",
+                    "size": "1382924",
+                    "boards": 
+                    [
+                        {"name": "RBL nRF51822(V1.0 16KB)"},
+                        {"name": "RBL nRF51822(V1.5 32KB)"},
+                        {"name": "BLE Nano(V1.0 16KB)"},
+                        {"name": "BLE Nano(V1.5 32KB)"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "RedBear",
+                            "name": "bossac",
+                            "version": "1.3a-arduino"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear nRF51822 Boards (32-bits ARM Cortex-M0)",
+                    "architecture": "nRF51822",
+                    "version": "1.0.3",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/nRF51822/nRF51822_board_v103.zip",
+                    "archiveFileName": "nRF51822_board_v103.zip",
+                    "checksum": "SHA-256:51F11E5154EFB31F54D99D96CAD52E8F1DAFAC45C899876155F339AFD13693D4",
+                    "size": "1261361",
+                    "boards": 
+                    [
+                        {"name": "RBL nRF51822(V1.0 16KB)"},
+                        {"name": "RBL nRF51822(V1.5 32KB)"},
+                        {"name": "BLE Nano(V1.0 16KB)"},
+                        {"name": "BLE Nano(V1.5 32KB)"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "RedBear",
+                            "name": "bossac",
+                            "version": "1.3a-arduino"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear nRF51822 Boards (32-bits ARM Cortex-M0)",
+                    "architecture": "nRF51822",
+                    "version": "1.0.4",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/nRF51822/nRF51822_board_v104.zip",
+                    "archiveFileName": "nRF51822_board_v104.zip",
+                    "checksum": "SHA-256:0025B4783DE47022DF931F5D9C601C4DFF02DC27ACA04EBD7068191CBCDACAC2",
+                    "size": "1116303",
+                    "boards": 
+                    [
+                        {"name": "RBL nRF51822(V1.0 16KB)"},
+                        {"name": "RBL nRF51822(V1.5 32KB)"},
+                        {"name": "BLE Nano(V1.0 16KB)"},
+                        {"name": "BLE Nano(V1.5 32KB)"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "RedBear",
+                            "name": "bossac",
+                            "version": "1.3a-arduino"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear nRF51822 Boards (32-bits ARM Cortex-M0)",
+                    "architecture": "nRF51822",
+                    "version": "1.0.5",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/nRF51822/nRF51822_board_v105.zip",
+                    "archiveFileName": "nRF51822_board_v105.zip",
+                    "checksum": "SHA-256:04D62B0C5094C90242123657E11A0548B8F220AE52A1E2805D2B3A810D9B63EA",
+                    "size": "1100337",
+                    "boards": 
+                    [
+                        {"name": "RBL nRF51822(V1.0 16KB)"},
+                        {"name": "RBL nRF51822(V1.5 32KB)"},
+                        {"name": "BLE Nano(V1.0 16KB)"},
+                        {"name": "BLE Nano(V1.5 32KB)"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "RedBear",
+                            "name": "bossac",
+                            "version": "1.3a-arduino"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear nRF51822 Boards (32-bits ARM Cortex-M0)",
+                    "architecture": "nRF51822",
+                    "version": "1.0.6",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/nRF51822/nRF51822_board_v106.zip",
+                    "archiveFileName": "nRF51822_board_v106.zip",
+                    "checksum": "SHA-256:980C8CE156A9FD82EBF882F6CFD613105B191DC51D21256C4A8F1894FEA427C2",
+                    "size": "1470108",
+                    "boards": 
+                    [
+                        {"name": "RBL nRF51822(V1.0 16KB)"},
+                        {"name": "RBL nRF51822(V1.5 32KB)"},
+                        {"name": "BLE Nano(V1.0 16KB)"},
+                        {"name": "BLE Nano(V1.5 32KB)"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "RedBear",
+                            "name": "bossac",
+                            "version": "1.3a-arduino"
+                        },
+                        {
+                            "packager":"arduino",
+                            "name":"avrdude",
+                            "version":"6.0.1-arduino5"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear nRF51822 Boards (32-bits ARM Cortex-M0)",
+                    "architecture": "nRF51822",
+                    "version": "1.0.7",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/nRF51822/nRF51822_board_v107.zip",
+                    "archiveFileName": "nRF51822_board_v107.zip",
+                    "checksum": "SHA-256:A8D057ACEFC8BD4E8D873C4F1C8FEFEAA9B53AA03D8F4E27884D1D0E6990183B",
+                    "size": "1475234",
+                    "boards": 
+                    [
+                        {"name": "RBL nRF51822(V1.0 16KB)"},
+                        {"name": "RBL nRF51822(V1.5 32KB)"},
+                        {"name": "BLE Nano(V1.0 16KB)"},
+                        {"name": "BLE Nano(V1.5 32KB)"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "RedBear",
+                            "name": "openocd",
+                            "version": "0.10.0-dev-nrf5"
+                        }
+                    ]
+                },
+                {
+                    "name": "RedBear nRF51822 Boards (32-bits ARM Cortex-M0)",
+                    "architecture": "nRF51822",
+                    "version": "1.0.8",
+                    "category": "RedBear",
+                    "url": "https://redbearlab.github.io/arduino/nRF51822/nRF51822_board_v108.zip",
+                    "archiveFileName": "nRF51822_board_v108.zip",
+                    "checksum": "SHA-256:E3F9C15FCCA15EFBC3141611EB58BF6A9189C08BACFE53DC3E2EA8E54D797696",
+                    "size": "1475415",
+                    "boards": 
+                    [
+                        {"name": "RBL nRF51822(V1.0 16KB)"},
+                        {"name": "RBL nRF51822(V1.5 32KB)"},
+                        {"name": "BLE Nano(V1.0 16KB)"},
+                        {"name": "BLE Nano(V1.5 32KB)"}
+                    ],
+                    "toolsDependencies": 
+                    [
+                        {
+                            "packager": "RedBear",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "RedBear",
+                            "name": "openocd",
+                            "version": "0.10.0-dev-nrf5"
+                        }
+                    ]
+                }
+            ],
+            "tools":
+            [
+                {
+                    "name": "arm-none-eabi-gcc",
+                    "version": "4.8.3-2014q1",
+                    "systems": 
+                    [
+                        {
+                            "host": "i686-mingw32",
+                            "archiveFileName": "gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz",
+                            "url": "http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz",
+                            "checksum": "SHA-256:fd8c111c861144f932728e00abd3f7d1107e186eb9cd6083a54c7236ea78b7c2",
+                            "size": "84537449"
+                        },
+                        {
+                            "host": "x86_64-apple-darwin",
+                            "url": "http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz",
+                            "archiveFileName": "gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz",
+                            "checksum": "SHA-256:3598acf21600f17a8e4a4e8e193dc422b894dc09384759b270b2ece5facb59c2",
+                            "size": "52518522"
+                        },
+                        {
+                            "host": "x86_64-pc-linux-gnu",
+                            "url": "http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz",
+                            "archiveFileName": "gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz",
+                            "checksum": "SHA-256:d23f6626148396d6ec42a5b4d928955a703e0757829195fa71a939e5b86eecf6",
+                            "size": "51395093"
+                        },
+                        {
+                            "host": "i686-pc-linux-gnu",
+                            "url": "http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz",
+                            "archiveFileName": "gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz",
+                            "checksum": "SHA-256:ba1994235f69c526c564f65343f22ddbc9822b2ea8c5ee07dd79d89f6ace2498",
+                            "size": "51029223"
+                        }
+                    ]
+                },
+                {
+                    "name": "openocd",
+                    "version": "0.9.0-arduino",
+                    "systems": 
+                    [
+                        {
+                            "host": "arm-linux-gnueabihf",
+                            "url": "http://downloads.arduino.cc/tools/OpenOCD-0.9.0-arduino-arm-linux-gnueabihf.tar.bz2",
+                            "archiveFileName": "OpenOCD-0.9.0-dev-arduino-arm-linux-gnueabihf.tar.bz2",
+                            "checksum": "SHA-256:a84e7c4cba853f2c937d77286f8a0ca317447d3873e51cbd2a2d41424e044a18",
+                            "size": "1402283"
+                        },
+                        {
+                            "host": "i686-mingw32",
+                            "url": "http://downloads.arduino.cc/tools/OpenOCD-0.9.0-arduino-i686-pc-cygwin.tar.bz2",
+                            "archiveFileName": "OpenOCD-0.9.0-arduino-i686-pc-cygwin.tar.bz2",
+                            "checksum": "SHA-256:5310bdd3730168a33b09b68558e908ca8b2fec25620c488f50a5fb35d0d1effd",
+                            "size": "2360705"
+                        },
+                        {
+                            "host": "x86_64-apple-darwin",
+                            "url": "http://downloads.arduino.cc/tools/OpenOCD-0.9.0-arduino-x86_64-apple-darwin14.3.0.tar.bz2",
+                            "archiveFileName": "OpenOCD-0.9.0-arduino-x86_64-apple-darwin14.3.0.tar.bz2",
+                            "checksum": "SHA-256:ef90769c07b8018cec3a5054e690ac6c196e03720e102ac5038c3f9da4e44782",
+                            "size": "2275101"
+                        },
+                        {
+                            "host": "x86_64-pc-linux-gnu",
+                            "url": "http://downloads.arduino.cc/tools/OpenOCD-0.9.0-arduino-x86_64-linux-gnu.tar.bz2",
+                            "archiveFileName": "OpenOCD-0.9.0-arduino-x86_64-linux-gnu.tar.bz2",
+                            "checksum": "SHA-256:c350409f7badf213dfcc516ea34289461ad92d87806e8e33945508a2c6b2c0b3",
+                            "size": "1210796"
+                        },
+                        {
+                            "host": "i686-pc-linux-gnu",
+                            "url": "http://downloads.arduino.cc/tools/OpenOCD-0.9.0-arduino-i486-linux-gnu.tar.bz2",
+                            "archiveFileName": "OpenOCD-0.9.0-arduino-i486-linux-gnu.tar.bz2",
+                            "checksum": "SHA-256:4c9793dfd7822b0fc959d039e5ecabfa89092ee2911abfdc7b5905deb171499a",
+                            "size": "1129654"
+                        }
+                    ]
+                },
+                {
+                    "name": "bossac",
+                    "version": "1.3a-arduino",
+                    "systems": 
+                    [
+                        {
+                            "host": "i686-linux-gnu",
+                            "url": "http://downloads.arduino.cc/tools/bossac-1.3a-arduino-i686-linux-gnu.tar.bz2",
+                            "archiveFileName": "bossac-1.3a-arduino-i686-linux-gnu.tar.bz2",
+                            "checksum": "SHA-256:d6d10362f40729a7877e43474fcf02ad82cf83321cc64ca931f5c82b2d25d24f",
+                            "size": "147359"
+                        },
+                        {
+                            "host": "x86_64-pc-linux-gnu",
+                            "url": "http://downloads.arduino.cc/tools/bossac-1.3a-arduino-x86_64-pc-linux-gnu.tar.bz2",
+                            "archiveFileName": "bossac-1.3a-arduino-x86_64-pc-linux-gnu.tar.bz2",
+                            "checksum": "SHA-256:c1daed033251296768fa8b63ad283e053da93427c0f3cd476a71a9188e18442c",
+                            "size": "26179"
+                        },
+                        {
+                            "host": "i686-mingw32",
+                            "url": "http://downloads.arduino.cc/tools/bossac-1.3a-arduino-i686-mingw32.tar.bz2",
+                            "archiveFileName": "bossac-1.3a-arduino-i686-mingw32.tar.bz2",
+                            "checksum": "SHA-256:a37727622e0f86cb4f2856ad0209568a5d804234dba3dc0778829730d61a5ec7",
+                            "size": "265647"
+                        },
+                        {
+                            "host": "i386-apple-darwin11",
+                            "url": "http://downloads.arduino.cc/tools/bossac-1.3a-arduino-i386-apple-darwin11.tar.bz2",
+                            "archiveFileName": "bossac-1.3a-arduino-i386-apple-darwin11.tar.bz2",
+                            "checksum": "SHA-256:40770b225753e7a52bb165e8f37e6b760364f5c5e96048168d0178945bd96ad6",
+                            "size": "39475"
+                        }
+                    ]
+                },
+                {
+                    "name": "openocd",
+                    "version": "0.10.0-dev-nrf5",
+                    "systems":
+                    [
+                        {
+                            "host": "i386-apple-darwin11",
+                            "url": "https://github.com/sandeepmistry/arduino-nRF5/releases/download/tools/openocd-osx-0.10.0-dev-nrf5.tar.gz",
+                            "archiveFileName": "openocd-osx-0.10.0-dev-nrf5.tar.gz",
+                            "size": "1345243",
+                            "checksum": "MD5:3ffaa4e7cd4b96770eec65002c5959e3"
+                        },
+                        {
+                            "host": "i686-linux-gnu",
+                            "url": "https://github.com/sandeepmistry/arduino-nRF5/releases/download/tools/openocd-linux32-0.10.0-dev-nrf5.tar.gz",
+                            "archiveFileName": "openocd-linux32-0.10.0-dev-nrf5.tar.gz",
+                            "size": "3585042",
+                            "checksum": "MD5:02b3f4a3004cae86631bf13837c84504"
+                        },
+                        {
+                            "host": "x86_64-pc-linux-gnu",
+                            "url": "https://github.com/sandeepmistry/arduino-nRF5/releases/download/tools/openocd-linux32-0.10.0-dev-nrf5.tar.gz",
+                            "archiveFileName": "openocd-linux32-0.10.0-dev-nrf5.tar.gz",
+                            "size": "3585042",
+                            "checksum": "MD5:02b3f4a3004cae86631bf13837c84504"
+                        },
+                        {
+                            "host": "i686-mingw32",
+                            "url": "https://github.com/sandeepmistry/arduino-nRF5/releases/download/tools/openocd-win32-0.10.0-dev-nrf5.tar.gz",
+                            "archiveFileName": "openocd-win32-0.10.0-dev-nrf5.tar.gz",
+                            "size": "5498373",
+                            "checksum": "MD5:3acd3b08afda2bb09e75a0de5ac7c3cd"
+                        }
+                    ]
+                }                
+            ]
+        }
+    ]
+}

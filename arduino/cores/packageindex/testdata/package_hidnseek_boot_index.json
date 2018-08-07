@@ -1,0 +1,44 @@
+{
+  "packages": [
+    {
+      "name": "HidnSeek",
+      "maintainer": "HidnSeek",
+      "websiteURL": "https://www.hidnseek.fr",
+      "email": "contact@hidnseek.fr",
+      "help": {
+        "online": ""
+      },
+      "platforms": [
+        {
+          "name": "HidnSeek",
+          "architecture": "avr",
+          "version": "1.0.1",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+	  "url": "https://www.hidnseek.fr/downloads/HidnSeek_1.0.1.tar.gz",
+          "archiveFileName": "HidnSeek_1.0.1.tar.gz",
+          "checksum": "SHA-256:88a34903d1e7667ca29f474bae58609b0214609f18e689f73b36d68f39bd2cfc",
+          "size": "7006",
+          "boards": [
+            {"name": "HidnSeek SIGFOX/LoRa GPS Trackers"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

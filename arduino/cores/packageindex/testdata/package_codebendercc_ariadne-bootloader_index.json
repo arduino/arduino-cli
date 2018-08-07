@@ -1,0 +1,92 @@
+{
+  "packages": [
+    {
+      "name": "Ariadne-Bootloader",
+      "maintainer": "codebender.cc",
+      "websiteURL": "https://github.com/per1234/Ariadne-Bootloader",
+      "email": "",
+      "help": {
+        "online": ""
+      },
+      "platforms": [
+        {
+          "name": "Ariadne Bootloader",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "Ariadne Bootloader",
+          "help": {
+            "online": "https://github.com/per1234/Ariadne-Bootloader/tree/master"
+          },
+          "url": "https://github.com/per1234/Ariadne-Bootloader/releases/download/v1.0.0/Ariadne-Bootloader_1.0.0.zip",
+          "archiveFileName": "Ariadne-Bootloader_1.0.0.zip",
+          "checksum": "SHA-256:f5bed2f81fbc649f2c9ed30f2a71b858359e20571a241dd9d31e06d49e4bcd7e",
+          "size": "242696",
+          "boards": [
+            {"name": "Ariadne Bootloader"},
+            {"name": "Arduino Duemilanove w/ ATmega328"},
+            {"name": "Arduino Uno"},
+            {"name": "Arduino Ethernet"},
+            {"name": "Arduino Mega 2560"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "Ariadne Bootloader",
+          "architecture": "avr",
+          "version": "1.0.1",
+          "category": "Ariadne Bootloader",
+          "help": {
+            "online": "https://github.com/per1234/Ariadne-Bootloader/tree/v1.0.1"
+          },
+          "url": "https://github.com/per1234/Ariadne-Bootloader/releases/download/v1.0.1/Ariadne-Bootloader_1.0.1.zip",
+          "archiveFileName": "Ariadne-Bootloader_1.0.1.zip",
+          "checksum": "SHA-256:74125d1d125b763f09ee7afca0f5253aeca9a865e1fc1ba0c81af27d3a2c41c3",
+          "size": "320528",
+          "boards": [
+            {"name": "Ariadne Bootloader"},
+            {"name": "Arduino Duemilanove w/ ATmega328"},
+            {"name": "Arduino Uno"},
+            {"name": "Arduino Ethernet"},
+            {"name": "Arduino Mega 2560"},
+            {"name": "ATmega1284P"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "Ariadne Bootloader",
+          "architecture": "avr",
+          "version": "1.0.2",
+          "category": "Ariadne Bootloader",
+          "help": {
+            "online": "https://github.com/per1234/Ariadne-Bootloader"
+          },
+          "url": "https://github.com/per1234/Ariadne-Bootloader/releases/download/v1.0.2/Ariadne-Bootloader_1.0.2.zip",
+          "archiveFileName": "Ariadne-Bootloader_1.0.2.zip",
+          "checksum": "SHA-256:076af6127e0a2c80f583a4d214b941797dd68423afa1ea365afadfaafdbdd40b",
+          "size": "972972",
+          "boards": [
+            {"name": "Uno"},
+            {"name": "Duemilanove"},
+            {"name": "Diecimila"},
+            {"name": "Nano"},
+            {"name": "Mini"},
+            {"name": "BT"},
+            {"name": "Pro"},
+            {"name": "Pro Mini"},
+            {"name": "Arduino Ethernet"},
+            {"name": "Mega 2560"},
+            {"name": "ATmega1284P"},
+            {"name": "Mighty 1284P"},
+            {"name": "Mighty Mini 1284P"},
+            {"name": "Goldilocks"},
+            {"name": "Bobuino"},
+            {"name": "Skinny Bob"}, 
+            {"name": "Sleeping Beauty"}
+          ],
+          "toolsDependencies": []
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

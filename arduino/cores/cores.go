@@ -94,7 +94,7 @@ type ToolDependencies []*ToolDependency
 // ToolDependency is a tuple that uniquely identifies a specific version of a Tool
 type ToolDependency struct {
 	ToolName     string
-	ToolVersion  *semver.Version
+	ToolVersion  *semver.RelaxedVersion
 	ToolPackager string
 }
 

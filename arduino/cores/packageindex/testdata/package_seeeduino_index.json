@@ -1,0 +1,48 @@
+{
+  "packages": [
+    {
+      "name": "Seeeduino",
+      "maintainer": "Seeed Studio",
+      "websiteURL": "http://www.seeedstudio.com/",
+      "email": "",
+      "help": {
+        "online": "http://www.seeedstudio.com/wiki/Main_Page"
+      },
+      "platforms": [
+        {
+          "name": "Seeeduino",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "ATmega",
+          "help": {
+            "online": "http://www.seeedstudio.com/wiki/Main_Page"
+          },
+          "url": "https://github.com/Seeed-Studio/Seeeduino-Boards/blob/master/download_package/seeeduino-v1.0.0.zip?raw=true",
+          "archiveFileName": "seeeduino-v1.0.0.zip",
+          "checksum": "SHA-256:db124e76b9cb9e788fa21c78d66e868472a2ec84a45ec25c92237a22b07a2b48",
+          "size": "1899",
+          "boards": [
+            {"name": "Seeeduino V3.0(Atmega328P)"},
+            {"name": "Seeeduino Mega 2560"},
+			{"name": "Seeeduino V4(Atmega328P)"},
+			{"name": "Seeeduino Lotus"},
+			{"name": "Seeeduino Lite"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

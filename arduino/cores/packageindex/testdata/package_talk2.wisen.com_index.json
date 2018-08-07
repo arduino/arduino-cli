@@ -1,0 +1,47 @@
+{
+   "packages":[
+      {
+         "name": "Talk2",
+         "maintainer": "Talk2 by Wisen",
+         "websiteURL": "http://talk2.wisen.com.au",
+         "email": "talk2@wisen.com.au",
+         "platforms":[
+            {
+               "name": "Talk2 AVR Boards",
+               "architecture": "avr",
+               "version": "1.0.1",
+               "category": "Contributed",
+               "url": "https://bitbucket.org/talk2/arduino-ide-boards/raw/master/talk2-avr_1.0.1v.zip",
+               "archiveFileName": "talk2-avr_1.0.1v.zip",
+               "checksum": "SHA-256:6A38A25612D243185F0A960B1627D5D4CD8DB44595C7D6A5E0F1ABC09A6711C1",
+               "size": "16892",
+               "help":{
+                  "online":"http://talk2forum.wisen.com.au"
+               },
+               "boards":[
+                  { "name": "Whisper Node" }
+               ],
+               "toolsDependencies":[]
+            },
+            {
+               "name": "Talk2 AVR Boards",
+               "architecture": "avr",
+               "version": "1.0.3",
+               "category": "Contributed",
+               "url": "https://bitbucket.org/talk2/arduino-ide-boards/raw/master/talk2-avr_1.0.3v.zip",
+               "archiveFileName": "talk2-avr_1.0.3v.zip",
+               "checksum": "SHA-256:A30E8AFC2FE82E71428CE6DB9527385FABE7A33B5E8B8905561A9324B69DE8C7",
+               "size": "16860",
+               "help":{
+                  "online":"http://talk2forum.wisen.com.au"
+               },
+               "boards":[
+                  { "name": "Whisper Node" }
+               ],
+               "toolsDependencies":[]
+            }
+         ],
+         "tools":[]
+      }
+   ]
+}

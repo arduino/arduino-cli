@@ -1,0 +1,180 @@
+{
+   "packages":[
+      {
+         "name":"RFduino",
+         "maintainer":"RFduino",
+         "websiteURL":"http://www.rfduino.com",
+         "email":"support@rfduino.com",
+         "help":{
+            "online":"http://forum.rfduino.com"
+         },
+         "platforms":[
+            {
+               "name": "RFduino Boards",
+               "architecture": "RFduino",
+               "version": "2.3",
+               "category": "Arduino",
+               "url": "http://www.rfdigital.com/wp-content/uploads/2014/03/RFduino_2.3.zip",
+               "archiveFileName": "RFduino_2.3.zip",
+               "checksum": "SHA-256:b0dd7bf82ad7e98c8650c71603b70ddc5877c191ab149d858dfa81d2fbb6ac4d",
+               "size": "37676704",
+               "help":{
+                  "online":"http://forum.rfduino.com"
+               },
+               "boards": [
+                  {
+                     "name": "RFduino"
+                  }
+               ],
+               "toolsDependencies": [
+                  {
+                     "packager": "RFduino",
+                     "name": "arm-none-eabi-gcc",
+                     "version": "4.8.3-2014q1"
+                  },
+                  {
+                     "packager": "RFduino",
+                     "name": "RFDLoader",
+                     "version": "1.2"
+                  }
+               ]
+            },
+            {
+               "name": "RFduino Boards",
+               "architecture": "RFduino",
+               "version": "2.3.1",
+               "category": "Arduino",
+               "url": "http://www.rfdigital.com/wp-content/uploads/2014/03/RFduino_2.3.1.zip",
+               "archiveFileName": "RFduino_2.3.1.zip",
+               "checksum": "SHA-256:b1c8dec3a2a3efe0db2c18ce911b88002d4b74849dd593475d26360a92b39468",
+               "size": "36962261",
+               "help":{
+                  "online":"http://forum.rfduino.com"
+               },
+               "boards": [
+                  {
+                     "name": "RFduino"
+                  }
+               ],
+               "toolsDependencies": [
+                  {
+                     "packager": "RFduino",
+                     "name": "arm-none-eabi-gcc",
+                     "version": "4.8.3-2014q1"
+                  },
+                  {
+                     "packager": "RFduino",
+                     "name": "RFDLoader",
+                     "version": "1.5"
+                  }
+               ]
+            }
+         ],
+
+         "tools":[
+            {
+               "name":"arm-none-eabi-gcc",
+               "version":"4.8.3-2014q1",
+               "systems":[
+                  {
+                     "host":"i686-mingw32",
+                     "archiveFileName":"gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz",
+                     "url":"http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz",
+                     "checksum":"SHA-256:fd8c111c861144f932728e00abd3f7d1107e186eb9cd6083a54c7236ea78b7c2",
+                     "size":"84537449"
+                  },
+                  {
+                     "host":"x86_64-apple-darwin",
+                     "url":"http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz",
+                     "archiveFileName":"gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz",
+                     "checksum":"SHA-256:3598acf21600f17a8e4a4e8e193dc422b894dc09384759b270b2ece5facb59c2",
+                     "size":"52518522"
+                  },
+                  {
+                     "host":"x86_64-pc-linux-gnu",
+                     "url":"http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz",
+                     "archiveFileName":"gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz",
+                     "checksum":"SHA-256:d23f6626148396d6ec42a5b4d928955a703e0757829195fa71a939e5b86eecf6",
+                     "size":"51395093"
+                  },
+                  {
+                     "host":"i686-pc-linux-gnu",
+                     "url":"http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz",
+                     "archiveFileName":"gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz",
+                     "checksum":"SHA-256:ba1994235f69c526c564f65343f22ddbc9822b2ea8c5ee07dd79d89f6ace2498",
+                     "size":"51029223"
+                  }
+               ]
+            },
+            {
+               "name":"RFDLoader",
+               "version":"1.2",
+               "systems":[
+                  {
+                     "host":"i686-mingw32",
+                     "archiveFileName":"RFDLoader_1.2_win.zip",
+                     "url":"http://www.rfdigital.com/wp-content/uploads/2014/03/RFDLoader_1.2_win.zip",
+                     "checksum":"SHA-256:e421469a1ad1c9591d20d349dafa1c1ceb7958920fd1bbf59914fcb298b04913",
+                     "size":"59910"
+                  },
+                  {
+                     "host":"x86_64-apple-darwin",
+                     "archiveFileName":"RFDLoader_1.2_osx.tar.gz",
+                     "url":"http://www.rfdigital.com/wp-content/uploads/2014/03/RFDLoader_1.2_osx.tar.gz",
+                     "checksum":"SHA-256:b00a1b84703d185e335e2a956acb8f00b79e73f3b6950b0cd831c29be5dc8da8",
+                     "size":"14348"
+                  },
+                  {
+                     "host":"x86_64-pc-linux-gnu",
+                     "archiveFileName":"RFDLoader_placeholder_linux64.zip",
+                     "url":"http://www.rfdigital.com/wp-content/uploads/2014/03/RFDLoader_placeholder_linux64.zip",
+                     "checksum":"SHA-256:144b8c9a866264cafbb600b59d9e95cd253d674d8f0d5b4bf388eeabd3ee9956",
+                     "size":"409"
+                  },
+                  {
+                     "host":"i686-pc-linux-gnu",
+                     "archiveFileName":"RFDLoader_placeholder_linux32.zip",
+                     "url":"http://www.rfdigital.com/wp-content/uploads/2014/03/RFDLoader_placeholder_linux32.zip",
+                     "checksum":"SHA-256:144b8c9a866264cafbb600b59d9e95cd253d674d8f0d5b4bf388eeabd3ee9956",
+                     "size":"409"
+                  }
+               ]
+            },
+            {
+               "name":"RFDLoader",
+               "version":"1.5",
+               "systems":[
+                  {
+                     "host":"i686-mingw32",
+                     "archiveFileName":"RFDLoader_1.5_win.zip",
+                     "url":"http://www.rfdigital.com/wp-content/uploads/2014/03/RFDLoader_1.5_win.zip",
+                     "checksum":"SHA-256:10440b2a39eb8d4bacc53c9342968d85e4d13dc9c412b249bd925fdce8021e9d",
+                     "size":"19151"
+                  },
+                  {
+                     "host":"x86_64-apple-darwin",
+                     "archiveFileName":"RFDLoader_1.5_osx.tar.gz",
+                     "url":"http://www.rfdigital.com/wp-content/uploads/2014/03/RFDLoader_1.5_osx.tar.gz",
+                     "checksum":"SHA-256:122507e32fcc0ba3e6fde41d9fa7cc5f634354b93da76c2cbfe9485800bb5e6e",
+                     "size":"14839"
+                  },
+                  {
+                     "host":"x86_64-pc-linux-gnu",
+                     "archiveFileName":"RFDLoader_1.5_linux64.tar.gz",
+                     "url":"http://www.rfdigital.com/wp-content/uploads/2014/03/RFDLoader_1.5_linux64.tar.gz",
+                     "checksum":"SHA-256:507331e7afe16091740516b5ce0197d33388e404a341161c83d7e9ed155d5b91",
+                     "size":"7700"
+                  },
+                  {
+                     "host":"i686-pc-linux-gnu",
+                     "archiveFileName":"RFDLoader_1.5_linux32.tar.gz",
+                     "url":"http://www.rfdigital.com/wp-content/uploads/2014/03/RFDLoader_1.5_linux32.tar.gz",
+                     "checksum":"SHA-256:71fe4fa94604737a73f8c660fe8e9f921a1d922f7fd93f4364514d19aeb2bf15",
+                     "size":"7141"
+                  }
+               ]
+            }
+         ]
+      }
+   ]
+}

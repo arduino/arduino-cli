@@ -1,0 +1,163 @@
+{
+  "packages": [
+    {
+      "name": "Arrow",
+      "maintainer": "IOTEAM S.r.l.",
+      "websiteURL": "http://ioteam.it/",
+      "email": "rnd@ioteam.it",
+      "help": {
+        "online": "http://www.arrowsmarteverything.com/support/"
+      },
+      "platforms": [
+        {
+          "name": "Arrow Boards",
+          "architecture": "samd",
+          "version": "1.2.0",
+          "category": "Partner",
+          "url": "http://downloads.arduino.cc/cores/Arrow-samd-1.2.0.tar.bz2",
+          "archiveFileName": "Arrow-samd-1.2.0.tar.bz2",
+          "checksum": "SHA-256:1d1cd66eb9986ed60a45b6554b8dcbf168401339c8a06bcf45c1b6ee2efa0943",
+          "size": "36575",
+          "boards": [
+            {
+              "name": "SmartEverything Fox"
+            },
+            {
+              "name": "SmartTutto"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            },
+            {
+              "packager": "arduino",
+              "name": "bossac",
+              "version": "1.5-arduino"
+            },
+            {
+              "packager": "arduino",
+              "name": "openocd",
+              "version": "0.9.0-arduino"
+            },
+            {
+              "packager": "arduino",
+              "name": "CMSIS",
+              "version": "4.0.0-atmel"
+            }
+          ]
+        },
+        {
+          "name": "Arrow Boards",
+          "architecture": "samd",
+          "version": "2.0.0",
+          "category": "Partner",
+          "url": "http://downloads.arduino.cc/cores/Arrow-samd-2.0.0.tar.gz",
+          "archiveFileName": "Arrow-samd-2.0.0.tar.gz",
+          "checksum": "SHA-256:e0bbf85d28af03a196a625462598294f9dd30ffbc9d686cbf2cc09bc5a76421a",
+          "size": "772778",
+          "boards": [
+            {
+              "name": "SmartEverything Fox"
+            },
+            {
+              "name": "SmartEverything Lion"
+            },
+            {
+              "name": "SmartTutto"
+            }
+          ],
+          "toolsDependencies": [
+            
+          ]
+        },
+        {
+          "name": "Arrow Boards",
+          "architecture": "samd",
+          "version": "2.1.0",
+          "category": "Partner",
+          "url": "http://downloads.arduino.cc/cores/Arrow-samd-2.1.0.tar.gz",
+          "archiveFileName": "Arrow-samd-2.1.0.tar.gz",
+          "checksum": "SHA-256:fc593dba03249300a9e2cff88c06f50389681e4fe6e3c92207d3ffb8a8a673f7",
+          "size": "780064",
+          "boards": [
+            {
+              "name": "SmartEverything Fox"
+            },
+            {
+              "name": "SmartEverything Lion"
+            },
+            {
+              "name": "SmartTutto"
+            }
+          ],
+          "toolsDependencies": [
+            
+          ]
+        },
+        {
+          "name": "Arrow Boards",
+          "architecture": "samd",
+          "version": "3.0.1",
+          "category": "Partner",
+          "url": "https://github.com/axelelettronica/smarteverything-core/releases/download/V3.0.1/smarteverything3_0_1.tar.gz",
+          "archiveFileName": "smarteverything3_0_1.tar.gz",
+          "checksum": "SHA-256:f3abf6d28f5caeb0c01bc29262400054e043e13952bf3f336bea26d9b74bfe28",
+          "size": "791305",
+          "boards": [
+            {
+              "name": "SmartEverything Fox"
+            },
+            {
+              "name": "SmartEverything Lion"
+            },
+            {
+              "name": "SmartEverything Dragonfly"
+            },
+            {
+              "name": "SmartTutto"
+            }
+          ],
+          "toolsDependencies": [
+            
+          ]
+        },
+        {
+          "name": "Arrow Boards",
+          "architecture": "samd",
+          "version": "4.0.0",
+          "category": "Partner",
+          "url": "https://github.com/ioteamit/smarteverything-core/releases/download/V4.0.0/smarteverything4_0_0.tar.gz",
+          "archiveFileName": "smarteverything4_0_0.tar.gz",
+          "checksum": "SHA-256:daca308c0e9630ce5a276085746d34ffb042e7f2afe59b4db433f217db0f2396",
+          "size": "789399",
+          "boards": [
+            {
+              "name": "SmartEverything Fox"
+            },
+            {
+              "name": "SmartEverything Lion"
+            },
+            {
+              "name": "SmartEverything Dragonfly"
+            },
+            {
+              "name": "SmartEverything Tiger"
+            },
+            {
+              "name": "SmartTutto"
+            }
+          ],
+          "toolsDependencies": [
+            
+          ]
+        }
+      ],
+      "tools": [
+        
+      ]
+    }
+  ]
+}

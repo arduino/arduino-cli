@@ -1,0 +1,177 @@
+{
+    "packages": [
+        {
+            "help": {
+                "online": "http://labs.mediatek.com"
+            },
+            "maintainer": "Seeed Studio and MediaTek Labs",
+            "name": "LinkIt",
+            "platforms": [
+                {
+                    "architecture": "avr",
+                    "archiveFileName": "mediatek_linkit_smart_7688_0.1.3.zip",
+                    "boards": [
+                        {
+                            "name": "LinkIt Smart 7688 Duo"
+                        }
+                    ],
+                    "category": "Contributed",
+                    "checksum": "SHA-256:9f65c6a690b50da7f500e3049612ab8328fa6620119d6f6865278fec8231a9d6",
+                    "name": "MediaTek LinkIt Smart Boards",
+                    "size": "171358",
+                    "toolsDependencies": [
+                        {
+                            "name": "avr-gcc",
+                            "packager": "arduino",
+                            "version": "4.8.1-arduino5"
+                        },
+                        {
+                            "name": "avrdude",
+                            "packager": "arduino",
+                            "version": "6.0.1-arduino5"
+                        }
+                    ],
+                    "url": "http://download.labs.mediatek.com/mediatek_linkit_smart_7688_0.1.3.zip",
+                    "version": "0.1.3"
+                },
+                {
+                    "architecture": "avr",
+                    "archiveFileName": "mediatek_linkit_smart_7688_0.1.4.zip",
+                    "boards": [
+                        {
+                            "name": "LinkIt Smart 7688 Duo"
+                        }
+                    ],
+                    "category": "Contributed",
+                    "checksum": "SHA-256:509f96002e488ef94ee0a492fb6fbcec19d0eb2097df4c28635a4a3a5d3410a7",
+                    "name": "MediaTek LinkIt Smart Boards",
+                    "size": "171367",
+                    "toolsDependencies": [
+                        {
+                            "name": "avr-gcc",
+                            "packager": "arduino",
+                            "version": "4.8.1-arduino5"
+                        },
+                        {
+                            "name": "avrdude",
+                            "packager": "arduino",
+                            "version": "6.0.1-arduino5"
+                        }
+                    ],
+                    "url": "http://download.labs.mediatek.com/mediatek_linkit_smart_7688_0.1.4.zip",
+                    "version": "0.1.4"
+                },
+                {
+                    "architecture": "avr",
+                    "archiveFileName": "mediatek_linkit_smart_7688_0.1.5.zip",
+                    "boards": [
+                        {
+                            "name": "LinkIt Smart 7688 Duo"
+                        }
+                    ],
+                    "category": "Contributed",
+                    "checksum": "SHA-256:4dc9980d1004adf03fed8289a49400614b335ccddb9701db360c138b6da8943a",
+                    "name": "MediaTek LinkIt Smart Boards",
+                    "size": "71400",
+                    "toolsDependencies": [
+                        {
+                            "name": "avr-gcc",
+                            "packager": "arduino",
+                            "version": "4.8.1-arduino5"
+                        },
+                        {
+                            "name": "avrdude",
+                            "packager": "arduino",
+                            "version": "6.0.1-arduino5"
+                        }
+                    ],
+                    "url": "http://download.labs.mediatek.com/mediatek_linkit_smart_7688_0.1.5.zip",
+                    "version": "0.1.5"
+                },
+                {
+                    "architecture": "avr",
+                    "archiveFileName": "mediatek_linkit_smart_7688_0.1.6.zip",
+                    "boards": [
+                        {
+                            "name": "LinkIt Smart 7688 Duo"
+                        }
+                    ],
+                    "category": "Contributed",
+                    "checksum": "SHA-256:535d94e106241c088e2db6683ff09d7189ada62605187136bec5a1689f57fff9",
+                    "name": "LinkIt Smart 7688 Duo",
+                    "size": "168445",
+                    "toolsDependencies": [
+                        {
+                            "name": "avr-gcc",
+                            "packager": "arduino",
+                            "version": "4.8.1-arduino5"
+                        },
+                        {
+                            "name": "avrdude",
+                            "packager": "arduino",
+                            "version": "6.0.1-arduino5"
+                        }
+                    ],
+                    "url": "http://download.labs.mediatek.com/mediatek_linkit_smart_7688_0.1.6.zip",
+                    "version": "0.1.6"
+                },
+                {
+                    "architecture": "avr",
+                    "archiveFileName": "mediatek_linkit_smart_7688_0.1.7.zip",
+                    "boards": [
+                        {
+                            "name": "LinkIt Smart 7688 Duo"
+                        }
+                    ],
+                    "category": "Contributed",
+                    "checksum": "SHA-256:030141526ff472d81eaf7cdfb75a3e0d540ead46db1c17d593d43ad1d2208e3a",
+                    "name": "LinkIt Smart 7688 Duo",
+                    "size": "178649",
+                    "toolsDependencies": [
+                        {
+                            "name": "avr-gcc",
+                            "packager": "arduino",
+                            "version": "4.8.1-arduino5"
+                        },
+                        {
+                            "name": "avrdude",
+                            "packager": "arduino",
+                            "version": "6.0.1-arduino5"
+                        }
+                    ],
+                    "url": "http://download.labs.mediatek.com/mediatek_linkit_smart_7688_0.1.7.zip",
+                    "version": "0.1.7"
+                },
+                {
+                    "architecture": "avr",
+                    "archiveFileName": "mediatek_linkit_smart_7688_0.1.8.zip",
+                    "boards": [
+                        {
+                            "name": "LinkIt Smart 7688 Duo"
+                        }
+                    ],
+                    "category": "Contributed",
+                    "checksum": "SHA-256:c59d53ecf735613436ce16c849c3dd54d0edb5568943f01835be4597daea1b8c",
+                    "name": "LinkIt Smart 7688 Duo",
+                    "size": "179984",
+                    "toolsDependencies": [
+                        {
+                            "name": "avr-gcc",
+                            "packager": "arduino",
+                            "version": "4.8.1-arduino5"
+                        },
+                        {
+                            "name": "avrdude",
+                            "packager": "arduino",
+                            "version": "6.0.1-arduino5"
+                        }
+                    ],
+                    "url": "http://download.labs.mediatek.com/mediatek_linkit_smart_7688_0.1.8.zip",
+                    "version": "0.1.8"
+                }
+            ],
+            "tools": [],
+            "websiteURL": "http://labs.mediatek.com"
+        }
+    ]
+}

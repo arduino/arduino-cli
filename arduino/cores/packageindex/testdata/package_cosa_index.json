@@ -1,0 +1,185 @@
+{
+  "packages": [
+    {
+      "name": "Cosa",
+      "maintainer": "Mikael Patel",
+      "websiteURL": "https://github.com/mikaelpatel/Cosa",
+      "email": "mikael.patel@gmail.com",
+      "help": {
+        "online": "https://dl.dropboxusercontent.com/u/993383/Cosa/doc/html/index.html"
+      },
+      "platforms": [
+        {
+          "name": "Cosa",
+          "architecture": "avr",
+          "version": "1.2.0",
+          "category": "Cosa",
+          "help": {
+            "online": "https://dl.dropboxusercontent.com/u/993383/Cosa/doc/html/index.html"
+          },
+          "url": "https://github.com/mikaelpatel/Cosa/archive/v1.2.0b.zip",
+	  "archiveFileName": "Cosa-1.2.0b.zip",
+	  "checksum": "SHA-256:07f41d063992b2af286550c8269baac4b3af1a9990d4fb6e39de33ca08e7707c",
+	  "size": "2021203",
+          "boards": [
+	    {"name" : "AdaFruit ATmega32U4"},
+	    {"name" : "Anarduino MiniWireless"},
+	    {"name" : "Arduino Diecimila"},
+	    {"name" : "Arduino Duemilanove"},
+	    {"name" : "Arduino Leonardo"},
+	    {"name" : "Arduino Mega 1280"},
+	    {"name" : "Arduino Mega 2560"},
+	    {"name" : "Arduino Micro"},
+	    {"name" : "Arduino Nano"},
+	    {"name" : "Arduino Pro Micro"},
+	    {"name" : "Arduino Pro Mini"},
+	    {"name" : "Arduino Uno"},
+	    {"name" : "ATtinyX4"},
+	    {"name" : "ATtinyX5"},
+	    {"name" : "ATtinyX61"},
+	    {"name" : "ATmega328"},
+	    {"name" : "ATmega1284"},
+	    {"name" : "ITEAD Studio IBoard"},
+	    {"name" : "LilyPad Arduino"},
+	    {"name" : "LilyPad Arduino USB"},
+	    {"name" : "LowPowerLab Moteino"},
+	    {"name" : "LowPowerLab Moteino Mega"},
+	    {"name" : "Pinoccio Scout"},
+	    {"name" : "Microduino-Core"},
+	    {"name" : "Microduino-Core32u4"},
+	    {"name" : "Microduino-Core+"},
+	    {"name" : "PJRC Teensy 2.0"},
+	    {"name" : "PJRC Teensy++ 2.0"},
+	    {"name" : "Wicked Device WildFire V3"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "Cosa",
+          "architecture": "avr",
+          "version": "1.1.1",
+          "category": "Cosa",
+          "help": {
+            "online": "https://dl.dropboxusercontent.com/u/993383/Cosa/doc/html/index.html"
+          },
+          "url": "https://github.com/mikaelpatel/Cosa/archive/v1.1.1a.zip",
+	  "archiveFileName": "Cosa-1.1.1a.zip",
+	  "checksum": "SHA-256:3334c77f5e5f44e799d45b6c2ff8993b730fe21a1308b5a6df304582fd2189db",
+	  "size": "2069014",
+          "boards": [
+	    {"name" : "AdaFruit ATmega32U4"},
+	    {"name" : "Anarduino MiniWireless"},
+	    {"name" : "Arduino Diecimila"},
+	    {"name" : "Arduino Duemilanove"},
+	    {"name" : "Arduino Leonardo"},
+	    {"name" : "Arduino Mega 1280"},
+	    {"name" : "Arduino Mega 2560"},
+	    {"name" : "Arduino Micro"},
+	    {"name" : "Arduino Nano"},
+	    {"name" : "Arduino Pro Micro"},
+	    {"name" : "Arduino Pro Mini"},
+	    {"name" : "Arduino Uno"},
+	    {"name" : "ATtinyX4"},
+	    {"name" : "ATtinyX5"},
+	    {"name" : "ATtinyX61"},
+	    {"name" : "ATmega328"},
+	    {"name" : "ATmega1284"},
+	    {"name" : "ITEAD Studio IBoard"},
+	    {"name" : "LilyPad Arduino"},
+	    {"name" : "LilyPad Arduino USB"},
+	    {"name" : "LowPowerLab Moteino"},
+	    {"name" : "LowPowerLab Moteino Mega"},
+	    {"name" : "Pinoccio Scout"},
+	    {"name" : "Microduino-Core"},
+	    {"name" : "Microduino-Core32u4"},
+	    {"name" : "Microduino-Core+"},
+	    {"name" : "PJRC Teensy 2.0"},
+	    {"name" : "PJRC Teensy++ 2.0"},
+	    {"name" : "Wicked Device WildFire V3"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "Cosa",
+          "architecture": "avr",
+          "version": "1.1.0",
+          "category": "Cosa",
+          "help": {
+            "online": "https://dl.dropboxusercontent.com/u/993383/Cosa/doc/html/index.html"
+          },
+          "url": "https://github.com/mikaelpatel/Cosa/archive/v1.1.0.zip",
+	  "archiveFileName": "Cosa-1.1.0.zip",
+	  "checksum": "SHA-256:0b604d54c21f6a88482d6417eba453a5023119b3120736745af43d65738ec3d0",
+	  "size": "1994386",
+          "boards": [
+	    {"name" : "AdaFruit ATmega32U4"},
+	    {"name" : "Anarduino MiniWireless"},
+	    {"name" : "Arduino Diecimila"},
+	    {"name" : "Arduino Duemilanove"},
+	    {"name" : "Arduino Leonardo"},
+	    {"name" : "Arduino Mega 1280"},
+	    {"name" : "Arduino Mega 2560"},
+	    {"name" : "Arduino Micro"},
+	    {"name" : "Arduino Nano"},
+	    {"name" : "Arduino Pro Micro"},
+	    {"name" : "Arduino Pro Mini"},
+	    {"name" : "Arduino Uno"},
+	    {"name" : "ATtinyX4"},
+	    {"name" : "ATtinyX5"},
+	    {"name" : "ATtinyX61"},
+	    {"name" : "ATmega328"},
+	    {"name" : "ATmega1284"},
+	    {"name" : "ITEAD Studio IBoard"},
+	    {"name" : "LilyPad Arduino"},
+	    {"name" : "LilyPad Arduino USB"},
+	    {"name" : "LowPowerLab Moteino"},
+	    {"name" : "LowPowerLab Moteino Mega"},
+	    {"name" : "Pinoccio Scout"},
+	    {"name" : "Microduino-Core"},
+	    {"name" : "Microduino-Core32u4"},
+	    {"name" : "Microduino-Core+"},
+	    {"name" : "PJRC Teensy 2.0"},
+	    {"name" : "PJRC Teensy++ 2.0"},
+	    {"name" : "Wicked Device WildFire V3"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        }
+      ],
+      "tools": [
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "packages": [
+    {
+      "name": "laika_arduino",
+      "maintainer": "eightdog",
+      "websiteURL": "http://www.project-laika.com",
+      "email": "andy@eightdog.com",
+      "help": {
+        "online": "http://www.project-laika.com/forum"
+      },
+      "platforms": [
+        {
+          "name": "Laika",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "help": {
+            "online": "http://www.project-laika.com/forum"
+          },
+          "url": "https://github.com/eightdog/laika_arduino/releases/download/v1.0.0/laika_boards.zip",
+          "archiveFileName": "laika_boards.zip",
+          "checksum": "SHA-256:2acf8089a8840cd8c5cb521c4f3f7e552bdeaa355d65be9f8fc0b46198da1a9b",
+          "size": "4450",
+          "boards": [
+            {"name": "Explorer"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        }
+      ],
+      "tools":[]
+    }
+  ]
+}
+

@@ -1,0 +1,354 @@
+{
+  "packages": [
+    {
+      "name": "megax8",
+      "maintainer": "Leonardo Miliani",
+      "websiteURL": "http://www.leonardomiliani.com",
+      "email": "leonardo@leonardomiliani.com",
+      "help": {
+        "online": "https://github.com/leomil72/megax8"
+       },
+      "platforms": [
+        {
+          "name": "ATmega168P/328P Boards",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "url": "https://github.com/leomil72/megax8/releases/download/v1.0.0/megax8-1.0.0.zip",
+          "archiveFileName": "megax8-1.0.0.zip",
+          "checksum": "SHA-256:2fa3de54fd562694df05dd2f5f700f21517a7d2cc1b0a6285a70ae995508798c",
+          "size": "146617",
+          "boards": [
+            { "name": "ATmega168P" },
+            { "name": "ATmega328P" }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        }
+      ],
+      "tools": []
+    },
+    {
+      "name": "megax4",
+      "maintainer": "Leonardo Miliani",
+      "websiteURL": "http://www.leonardomiliani.com",
+      "email": "leonardo@leonardomiliani.com",
+      "help": {
+        "online": "https://github.com/leomil72/megax4"
+      },
+      "platforms": [
+        {
+          "name": "ATmega644P/1284P Boards",
+          "architecture": "avr",
+          "version": "1.0.1",
+          "category": "Contributed",
+          "url": "https://github.com/leomil72/megax4/releases/download/1.0.1/megax4-1.0.1.zip",
+          "archiveFileName": "megax4-1.0.1.zip",
+          "checksum": "SHA-256:c8394ef065b3917c08df9d7818324fd3742c5723ac825f58a02eacbc4d19f669",
+          "size": "170122",
+          "boards": [
+            { "name": "ATmega644P" },
+            { "name": "ATmega1284P" }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        }
+      ],
+      "tools": []
+    },
+    {
+      "name": "megax4",
+      "maintainer": "Leonardo Miliani",
+      "websiteURL": "http://www.leonardomiliani.com",
+      "email": "leonardo@leonardomiliani.com",
+      "help": {
+        "online": "https://github.com/leomil72/megax4"
+      },
+      "platforms": [
+        {
+          "name": "ATmega644P/1284P Boards",
+          "architecture": "avr",
+          "version": "1.0.2",
+          "category": "Contributed",
+          "url": "https://github.com/leomil72/megax4/releases/download/1.0.2/megax4-1.0.2.zip",
+          "archiveFileName": "megax4-1.0.2.zip",
+          "checksum": "SHA-256:5696cdfcc63d70d0c67c8475c2847fcdf915d86c7d6a24249c32f76fc2fd3351",
+          "size": "166254",
+          "boards": [
+            { "name": "ATmega644P" },
+            { "name": "ATmega1284P" }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        }
+      ],
+      "tools": []
+    },
+    {
+      "name": "tiny",
+      "maintainer": "Leonardo Miliani",
+      "websiteURL": "http://www.leonardomiliani.com",
+      "email": "leonardo@leonardomiliani.com",
+      "help": {
+        "online": "https://github.com/leomil72/tiny"
+      },
+      "platforms": [
+        {
+          "name": "ATtiny extra Boards",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "url": "https://github.com/leomil72/tiny/releases/download/v1.0.0/tiny-1.0.0.zip",
+          "archiveFileName": "tiny-1.0.0.zip",
+          "checksum": "SHA-256:1db82c3dfa019b2a9ca482df7fccc9249fe46c38239583ba6dddab03abfe59ee",
+          "size": "213493",
+          "boards": [
+            { "name": "ATtiny24" },
+            { "name": "ATtiny44" },
+            { "name": "ATtiny84" },
+            { "name": "ATtiny25" },
+            { "name": "ATtiny45" },
+            { "name": "ATtiny85" },
+            { "name": "ATtiny2313" },
+            { "name": "ATtiny4313" }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "ATtiny extra Boards",
+          "architecture": "avr",
+          "version": "1.0.1",
+          "category": "Contributed",
+          "url": "https://github.com/leomil72/tiny/releases/download/1.0.1/tiny-1.0.1.zip",
+          "archiveFileName": "tiny-1.0.1.zip",
+          "checksum": "SHA-256:03056a0033cea5d595188194197357e11cf6ec7f1bae238024d595b2d9f04ed7",
+          "size": "160212",
+          "boards": [
+            { "name": "ATtiny24" },
+            { "name": "ATtiny44" },
+            { "name": "ATtiny84" },
+            { "name": "ATtiny25" },
+            { "name": "ATtiny45" },
+            { "name": "ATtiny85" },
+            { "name": "ATtiny2313" },
+            { "name": "ATtiny4313" }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "ATtiny extra Boards",
+          "architecture": "avr",
+          "version": "1.0.2",
+          "category": "Contributed",
+          "url": "https://github.com/leomil72/tiny/releases/download/1.0.2/tiny-1.0.2.zip",
+          "archiveFileName": "tiny-1.0.2.zip",
+          "checksum": "SHA-256:463fd2c78fc7b2273f30ea913ef7fbad6dafa01f7127c0bec825ecafe1cdd0c9",
+          "size": "162625",
+          "boards": [
+            { "name": "ATtiny24" },
+            { "name": "ATtiny44" },
+            { "name": "ATtiny84" },
+            { "name": "ATtiny25" },
+            { "name": "ATtiny45" },
+            { "name": "ATtiny85" },
+            { "name": "ATtiny2313" },
+            { "name": "ATtiny4313" }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "ATtiny extra Boards",
+          "architecture": "avr",
+          "version": "1.0.3",
+          "category": "Contributed",
+          "url": "https://github.com/leomil72/tiny/releases/download/1.0.3/tiny-1.0.3.zip",
+          "archiveFileName": "tiny-1.0.3.zip",
+          "checksum": "SHA-256:070ab6a691169810b7f5c0a4d6daa4d7370c2f45ebbf3d8b9a029b961aca96e1",
+          "size": "162627",
+          "boards": [
+            { "name": "ATtiny24" },
+            { "name": "ATtiny44" },
+            { "name": "ATtiny84" },
+            { "name": "ATtiny25" },
+            { "name": "ATtiny45" },
+            { "name": "ATtiny85" },
+            { "name": "ATtiny2313" },
+            { "name": "ATtiny4313" }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "ATtiny extra Boards",
+          "architecture": "avr",
+          "version": "1.0.4",
+          "category": "Contributed",
+          "url": "https://github.com/leomil72/tiny/releases/download/1.0.4/tiny-1.0.4.zip",
+          "archiveFileName": "tiny-1.0.4.zip",
+          "checksum": "SHA-256:8747e547b304cfa62de66a65e50bae8d569ad6dfd90a5cc89d714f3e25b77b55",
+          "size": "162453",
+          "boards": [
+            { "name": "ATtiny24" },
+            { "name": "ATtiny44" },
+            { "name": "ATtiny84" },
+            { "name": "ATtiny25" },
+            { "name": "ATtiny45" },
+            { "name": "ATtiny85" },
+            { "name": "ATtiny2313" },
+            { "name": "ATtiny4313" }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "ATtiny extra Boards",
+          "architecture": "avr",
+          "version": "1.0.5",
+          "category": "Contributed",
+          "url": "https://github.com/leomil72/tiny/releases/download/1.0.5/tiny-1.0.5.zip",
+          "archiveFileName": "tiny-1.0.5.zip",
+          "checksum": "SHA-256:f09191cd63cedc821e5e9b6f94066e4e916f9e88189a9fec9fcea0997299cf3d",
+          "size": "174729",
+          "boards": [
+            { "name": "ATtiny24" },
+            { "name": "ATtiny44" },
+            { "name": "ATtiny84" },
+            { "name": "ATtiny25" },
+            { "name": "ATtiny45" },
+            { "name": "ATtiny85" },
+            { "name": "ATtiny2313" },
+            { "name": "ATtiny4313" }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "ATtiny extra Boards",
+          "architecture": "avr",
+          "version": "1.0.6",
+          "category": "Contributed",
+          "url": "https://github.com/leomil72/tiny/releases/download/1.0.6/tiny-1.0.6.zip",
+          "archiveFileName": "tiny-1.0.6.zip",
+          "checksum": "SHA-256:d9ec07e77c1f11434e3ffbadd5520dd2daf7b4e1b3d9396014022f5bb0f19ed8",
+          "size": "164545",
+          "boards": [
+            { "name": "ATtiny24" },
+            { "name": "ATtiny44" },
+            { "name": "ATtiny84" },
+            { "name": "ATtiny25" },
+            { "name": "ATtiny45" },
+            { "name": "ATtiny85" },
+            { "name": "ATtiny2313" },
+            { "name": "ATtiny4313" }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

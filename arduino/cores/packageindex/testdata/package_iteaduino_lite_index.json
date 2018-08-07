@@ -1,0 +1,37 @@
+{
+  "packages": [
+    {
+      "name": "iteaduino_lite",
+      "maintainer": "udif",
+      "websiteURL": "https://github.com/udif/ITEADSW_Iteaduino-Lite-HSP",
+      "platforms": [
+        {
+          "name": "Iteaduino Lite",
+          "architecture": "avr",
+          "version": "0.9",
+          "category": "Contributed",
+          "url": "https://github.com/udif/ITEADSW_Iteaduino-Lite-HSP/releases/download/v0.9/iteaduino_lite_board.zip",
+          "archiveFileName": "iteaduino_lite_board.zip",
+          "checksum": "SHA-256:fc1c0847ff54df757b5b1d2405ea44e51b3f4458e3889b280676adce00e13053",
+          "size": "126811",
+          "boards": [
+            {"name": "Iteaduino Lite"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        }
+      ],
+      "tools":[]
+    }
+  ]
+}

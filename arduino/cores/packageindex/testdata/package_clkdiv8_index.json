@@ -1,0 +1,37 @@
+{
+	"packages": [{
+		"name": "clkdiv8",
+		"maintainer": "clkdiv8",
+		"websiteURL": "http://clkdiv8.com",
+		"email": "info@clkdiv8.com",
+		"help": {
+			"online": "http://clkdiv8.com"
+		},
+		"platforms": [{
+			"name": "clkdiv8 Sparrow Boards",
+			"architecture": "avr",
+			"version": "0.0.1",
+			"category": "clkdiv8",
+			"url": "http://clkdiv8.com/download/clkdiv8-0.0.1.zip",
+			"archiveFileName": "clkdiv8-0.0.1.zip",
+			"checksum": "SHA-256:f90b18ffed0f6259e114f02f8b14d2b1d8dae88f941ab0e2e058167d5dd35340",
+			"size": "80288",
+			"help": {
+				"online": "http://clkdiv8.com"
+			},
+			"boards": [{
+				"name": "Sparrow V4"
+			}],
+			"toolsDependencies": [{
+				"packager": "arduino",
+				"name": "avr-gcc",
+				"version": "4.8.1-arduino5"
+			}, {
+				"packager": "arduino",
+				"name": "avrdude",
+				"version": "6.0.1-arduino5"
+			}]
+		}],
+		"tools": []
+	}]
+}

@@ -1,0 +1,55 @@
+{
+  "packages": [
+    {
+      "name": "IOTEAM",
+      "maintainer": "IOTEAM S.r.l.",
+      "websiteURL": "http://www.ioteam.it/",
+      "email": "info@ioteam.it",
+      "help": {
+        "online": "http://www.ioteam.it/"
+      },
+      "platforms": [
+        {
+          "name": "IOTEAM Boards",
+          "architecture": "samd",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "url": "https://github.com/ioteamit/ioteam-arduino-core/releases/download/V1.0.0/ioteam_1_0_0.tar.gz",
+          "archiveFileName": "ioteam_1_0_0.tar.gz",
+          "checksum": "SHA-256:1f940773fd1a0b17a532cac7f012e564951155562ceda515a7d6866989202c8a",
+          "size": "724723",
+          "boards": [
+            {
+              "name": "Dustino"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            },
+            {
+              "packager": "arduino",
+              "name": "bossac",
+              "version": "1.5-arduino"
+            },
+            {
+              "packager": "arduino",
+              "name": "openocd",
+              "version": "0.9.0-arduino"
+            },
+            {
+              "packager": "arduino",
+              "name": "CMSIS",
+              "version": "4.0.0-atmel"
+            }
+          ]
+        }
+      ],
+      "tools": [
+        
+      ]
+    }
+  ]
+}

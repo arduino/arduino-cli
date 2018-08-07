@@ -1,0 +1,231 @@
+{
+  "packages": [
+    {
+      "name": "navspark",
+      "maintainer": "SkyTraq",
+      "websiteURL": "http://www.navspark.com.tw",
+      "email": "navspark@skytraq.com.tw",
+      "help": {
+        "online": "http://www.navsparkforum.com.tw"
+      },
+      "platforms": [
+        {
+          "name": "Arduino NavSpark Boards",
+          "architecture": "navspark",
+          "version": "1.0.0",
+          "category": "Arduino NavSpark Boards",
+          "url": "http://navspark.mybigcommerce.com/content/navspark-1.0.0.tar.bz2",
+          "archiveFileName": "navspark-1.0.0.tar.bz2",
+          "checksum": "SHA-256:036317E632FB151366BC4E8757DB81E28EA76AB82FBD22AA00EA4BE2AB19B285",
+          "size": "5231898",
+          "help": {
+            "online": "http://www.navsparkforum.com.tw"
+          },
+          "boards": [
+            {
+              "name": "NavSpark (GPS)"
+            },
+            {
+              "name": "NavSpark-BD"
+            },
+            {
+              "name": "NavSpark-GL"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "navspark",
+              "name": "navsparktool",
+              "version": "1.0.0"
+            }
+          ]
+        },
+        {
+          "name": "Arduino NavSpark Boards",
+          "architecture": "navspark",
+          "version": "1.0.1",
+          "category": "Arduino NavSpark Boards",
+          "url": "http://navspark.mybigcommerce.com/content/navspark-1.0.1.tar.bz2",
+          "archiveFileName": "navspark-1.0.1.tar.bz2",
+          "checksum": "SHA-256:C2806A5382E28CE4342A85C1F4D2737D20705FFBF294F843A2B4EE7BE0544E39",
+          "size": "6570600",
+          "help": {
+            "online": "http://www.navsparkforum.com.tw"
+          },
+          "boards": [
+            {
+              "name": "NavSpark (GPS)"
+            },
+            {
+              "name": "NavSpark-BD"
+            },
+            {
+              "name": "NavSpark-GL"
+            },
+            {
+              "name": "NavSpark-mini"
+            }
+           ],
+            "toolsDependencies": [
+            {
+              "packager": "navspark",
+              "name": "navsparktool",
+              "version": "1.0.0"
+            }
+          ]
+        },
+        {
+          "name": "Arduino NavSpark Boards",
+          "architecture": "navspark",
+          "version": "1.0.2",
+          "category": "Arduino NavSpark Boards",
+          "url": "http://navspark.mybigcommerce.com/content/navspark-1.0.2.tar.bz2",
+          "archiveFileName": "navspark-1.0.2.tar.bz2",
+          "checksum": "SHA-256:F8987D293C943158653F1B926D61CDA06CDF6F654E9756A1DA247FD2C4879B7C",
+          "size": "6652066",
+          "help": {
+            "online": "http://www.navsparkforum.com.tw"
+          },
+          "boards": [
+            {
+              "name": "NavSpark (GPS)"
+            },
+            {
+              "name": "NavSpark-BD"
+            },
+            {
+              "name": "NavSpark-GL"
+            },
+            {
+              "name": "NavSpark-mini"
+            }
+           ],
+            "toolsDependencies": [
+            {
+              "packager": "navspark",
+              "name": "navsparktool",
+              "version": "1.0.1"
+            }
+          ]
+        },
+        {
+          "name": "Arduino NavSpark Boards",
+          "architecture": "navspark",
+          "version": "1.0.3",
+          "category": "Arduino NavSpark Boards",
+          "url": "http://navspark.mybigcommerce.com/content/navspark-1.0.3.tar.bz2",
+          "archiveFileName": "navspark-1.0.3.tar.bz2",
+          "checksum": "SHA-256:532AAEAFAE8ACE2F947E38873DEDDC5E0AF9B07AA43E6D6EB5A48F3C0F04E19E",
+          "size": "5363839",
+          "help": {
+            "online": "http://www.navsparkforum.com.tw"
+          },
+          "boards": [
+            {
+              "name": "NavSpark (GPS)"
+            },
+            {
+              "name": "NavSpark-BD"
+            },
+            {
+              "name": "NavSpark-GL"
+            },
+            {
+              "name": "NavSpark-mini"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "navspark",
+              "name": "navsparktool",
+              "version": "1.0.1"
+            }
+          ]
+        },
+        {
+          "name": "Arduino NavSpark Boards",
+          "architecture": "navspark",
+          "version": "1.0.4",
+          "category": "Arduino NavSpark Boards",
+          "url": "http://navspark.mybigcommerce.com/content/navspark-1.0.4.tar.bz2",
+          "archiveFileName": "navspark-1.0.4.tar.bz2",
+          "checksum": "SHA-256:64B16268854ACDB90609185CAD2EC8FEA9060D6AF272ACBCF15F65A73AB0D491",
+          "size": "5363112",
+          "help": {
+            "online": "http://www.navsparkforum.com.tw"
+          },
+          "boards": [
+            {
+              "name": "NavSpark (GPS)"
+            },
+            {
+              "name": "NavSpark-BD"
+            },
+            {
+              "name": "NavSpark-GL"
+            },
+            {
+              "name": "NavSpark-mini"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "navspark",
+              "name": "navsparktool",
+              "version": "1.0.1"
+            }
+          ]
+        }
+      ],
+      "tools": [
+        {
+          "name": "navsparktool",
+          "version": "1.0.0",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "archiveFileName": "navsparktool-1.0.0-windows.tar.bz2",
+              "url": "http://navspark.mybigcommerce.com/content/navsparktool-1.0.0-windows.tar.bz2",
+              "checksum": "SHA-256:7A8CE409B918997767B89CD6CE7402B76FBBF8AE75D0A9929104F6E32E7E8A78",
+              "size": "49972002"
+            },
+            {
+              "host": "i686-linux-gnu",
+              "url": "http://navspark.mybigcommerce.com/content/navsparktool-1.0.0-linux32.tar.bz2",
+              "archiveFileName": "navsparktool-1.0.0-linux32.tar.bz2",
+              "checksum": "SHA-256:28B9B4E9B376B435AA9C578116D3ADF929C7D9739338DAFF74ECF4CE337823AF",
+              "size": "35501777"
+            }
+          ]
+        },
+        {
+          "name": "navsparktool",
+          "version": "1.0.1",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "archiveFileName": "navsparktool-1.0.1-windows.tar.bz2",
+              "url": "http://navspark.mybigcommerce.com/content/navsparktool-1.0.1-windows.tar.bz2",
+              "checksum": "SHA-256:2EFA6EEAFDAF81344162AD5F8D6FDA2B029BD6E4BD6EF027A200E5C075227824",
+              "size": "49968880"
+            },
+            {
+              "host": "i686-linux-gnu",
+              "url": "http://navspark.mybigcommerce.com/content/navsparktool-1.0.1-linux32.tar.bz2",
+              "archiveFileName": "navsparktool-1.0.1-linux32.tar.bz2",
+              "checksum": "SHA-256:8A291BD1D849683E436CF18588706287C513F1A3F2CDBB88F1B9B37CEAA3E7D5",
+              "size": "38625176"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "http://navspark.mybigcommerce.com/content/navsparktool-1.0.1-linux32.tar.bz2",
+              "archiveFileName": "navsparktool-1.0.1-linux32.tar.bz2",
+              "checksum": "SHA-256:8A291BD1D849683E436CF18588706287C513F1A3F2CDBB88F1B9B37CEAA3E7D5",
+              "size": "38625176"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

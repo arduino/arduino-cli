@@ -1,0 +1,100 @@
+{
+  "packages": [
+    {
+      "maintainer": "Stefan Stechert (Maintainer)", 
+      "help": {
+        "online": "https://mesom.de/atflash"
+      }, 
+      "websiteURL": "https://mesom.de/atflash", 
+      "platforms": [
+        {
+          "name": "atflash",
+          "architecture": "avr",
+          "category": "atflash",
+          "url": "https://mesom.de/atflash/atflashhardware-0.1.0.zip", 
+          "checksum": "SHA-256:4153f402aaca46f89edf31c695549a51db0afcdb8e019f6cad6d09e882a772b9", 
+          "help": {
+            "online": "https://mesom.de/atflash"
+          }, 
+          "version": "0.1.0", 
+          "archiveFileName": "atflashhardware-0.1.0.zip", 
+          "boards": [
+            {"name": "ATmega328P (ISP/TSB)"},
+            {"name": "ATtiny84A (ISP/TSB)"}, 
+            {"name": "ATtiny85 (ISP/TSB)"}
+          ], 
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            },
+            {
+              "packager": "atflash", 
+              "version": "0.1.0", 
+              "name": "atflashtool"
+            }
+          ], 
+          "size": "19921"
+        }
+      ], 
+      "tools": [
+        {
+          "version": "0.1.0", 
+          "name": "atflashtool", 
+          "systems": [
+            {
+              "url": "https://mesom.de/atflash/atflashtool-0.1.0.tar.gz", 
+              "checksum": "SHA-256:08aee8f8a34fe8619faef935a0a118e3bf64da5c2aefa79ea63e82f7bb97dae6", 
+              "host": "i686-mingw32", 
+              "archiveFileName": "atflashtool-0.1.0.tar.gz", 
+              "size": "619008"
+            }, 
+            {
+              "url": "https://mesom.de/atflash/atflashtool-0.1.0.tar.gz", 
+              "checksum": "SHA-256:08aee8f8a34fe8619faef935a0a118e3bf64da5c2aefa79ea63e82f7bb97dae6", 
+              "host": "x86_64-pc-linux-gnu", 
+              "archiveFileName": "atflashtool-0.1.0.tar.gz", 
+              "size": "619008"
+            }, 
+            {
+              "url": "https://mesom.de/atflash/atflashtool-0.1.0.tar.gz", 
+              "checksum": "SHA-256:08aee8f8a34fe8619faef935a0a118e3bf64da5c2aefa79ea63e82f7bb97dae6", 
+              "host": "i686-pc-linux-gnu", 
+              "archiveFileName": "atflashtool-0.1.0.tar.gz", 
+              "size": "619008"
+            },
+            {
+              "url": "https://mesom.de/atflash/atflashtool_dummy_only-0.1.0.tar.gz", 
+              "checksum": "SHA-256:cd18efea519f94f44f4c29e0709d5b9d7ea6c1b3abcb2534a6bfd92b38312f0f", 
+              "host": "x86_64-apple-darwin", 
+              "archiveFileName": "atflashtool_dummy_only-0.1.0.tar.gz", 
+              "size": "1327"
+            }, 
+            {
+              "url": "https://mesom.de/atflash/atflashtool_dummy_only-0.1.0.tar.gz", 
+              "checksum": "SHA-256:cd18efea519f94f44f4c29e0709d5b9d7ea6c1b3abcb2534a6bfd92b38312f0f", 
+              "host": "i386-apple-darwin", 
+              "archiveFileName": "atflashtool_dummy_only-0.1.0.tar.gz", 
+              "size": "1327"
+            },
+            {
+              "url": "https://mesom.de/atflash/atflashtool_dummy_only-0.1.0.tar.gz", 
+              "checksum": "SHA-256:cd18efea519f94f44f4c29e0709d5b9d7ea6c1b3abcb2534a6bfd92b38312f0f", 
+              "host": "arm-linux-gnueabihf", 
+              "archiveFileName": "atflashtool_dummy_only-0.1.0.tar.gz", 
+              "size": "1327"
+            }
+          ]
+        }
+      ], 
+      "email": "see_the_real_adress_on_my_webpage_mesom_de@mesom.de", 
+      "name": "atflash"
+    }
+  ]
+}

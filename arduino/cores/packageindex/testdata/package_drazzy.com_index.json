@@ -1,0 +1,408 @@
+{
+  "packages": [
+    {
+      "name": "ATTinyCore",
+      "maintainer": "Spence Konde",
+      "websiteURL": "https://github.com/SpenceKonde/ATTinyCore",
+      "email": "",
+      "help": {
+        "online": ""
+      },
+      "platforms": [
+        {
+          "name": "ATTinyCore",
+          "architecture": "avr",
+          "version": "1.0.4",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/SpenceKonde/ATTinyCore/archive/v1.0.4.tar.gz",
+          "archiveFileName": "ATTinyCore-1.0.4.tar.gz",
+          "checksum": "SHA-256:c647ad9efebbb44ce50153c0598b8152b6df381d0a77333e3f75c9afddad33bf",
+          "size": "249576",
+          "boards": [
+            {"name": "ATtiny2313"},
+            {"name": "ATtiny4313"},
+            {"name": "ATtiny24"},
+            {"name": "ATtiny44"},
+            {"name": "ATtiny84"},
+            {"name": "ATtiny25"},
+            {"name": "ATtiny45"},
+            {"name": "ATtiny85"},
+            {"name": "ATtiny261"},
+            {"name": "ATtiny461"},
+            {"name": "ATtiny861"},
+            {"name": "ATtiny87"},
+            {"name": "ATtiny167"},
+            {"name": "ATtiny48"},
+            {"name": "ATtiny88"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "ATTinyCore",
+          "architecture": "avr",
+          "version": "1.0.5",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/SpenceKonde/ATTinyCore/archive/v1.0.5.tar.gz",
+          "archiveFileName": "ATTinyCore-1.0.5.tar.gz",
+          "checksum": "SHA-256:cf30122e480074b02cd4deedce4f7474ab37a789277871a0798a66ee56d898ae",
+          "size": "249892",
+          "boards": [
+            {"name": "ATtiny2313"},
+            {"name": "ATtiny4313"},
+            {"name": "ATtiny24"},
+            {"name": "ATtiny44"},
+            {"name": "ATtiny84"},
+            {"name": "ATtiny25"},
+            {"name": "ATtiny45"},
+            {"name": "ATtiny85"},
+            {"name": "ATtiny261"},
+            {"name": "ATtiny461"},
+            {"name": "ATtiny861"},
+            {"name": "ATtiny87"},
+            {"name": "ATtiny167"},
+            {"name": "ATtiny48"},
+            {"name": "ATtiny88"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "ATTinyCore",
+          "architecture": "avr",
+          "version": "1.0.6",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/SpenceKonde/ATTinyCore/archive/v1.0.6.1.tar.gz",
+          "archiveFileName": "ATTinyCore-1.0.6.1.tar.gz",
+          "checksum": "SHA-256:6c7a749d6c0df8ddaac041d42c1c0c20d6a022fe3bf4bcb7dca3674c56c4fa89",
+          "size": "250882",
+          "boards": [
+            {"name": "ATtiny2313"},
+            {"name": "ATtiny4313"},
+            {"name": "ATtiny24"},
+            {"name": "ATtiny44"},
+            {"name": "ATtiny84"},
+            {"name": "ATtiny25"},
+            {"name": "ATtiny45"},
+            {"name": "ATtiny85"},
+            {"name": "ATtiny261"},
+            {"name": "ATtiny461"},
+            {"name": "ATtiny861"},
+            {"name": "ATtiny87"},
+            {"name": "ATtiny167"},
+            {"name": "ATtiny48"},
+            {"name": "ATtiny88"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "ATTinyCore",
+          "architecture": "avr",
+          "version": "1.1.0",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/SpenceKonde/ATTinyCore/archive/v1.1.0.tar.gz",
+          "archiveFileName": "ATTinyCore-1.1.0.tar.gz",
+          "checksum": "SHA-256:db2914be21f03c5f39e3dfea1d1d03f9168b7ed91a49a32def53eaaa82626dd7",
+          "size": "345765",
+          "boards": [
+            {"name": "ATtiny441"},
+            {"name": "ATtiny841"},
+            {"name": "ATtiny1634"},
+            {"name": "ATtiny828"},
+            {"name": "ATtiny2313"},
+            {"name": "ATtiny4313"},
+            {"name": "ATtiny24"},
+            {"name": "ATtiny44"},
+            {"name": "ATtiny84"},
+            {"name": "ATtiny25"},
+            {"name": "ATtiny45"},
+            {"name": "ATtiny85"},
+            {"name": "ATtiny261"},
+            {"name": "ATtiny461"},
+            {"name": "ATtiny861"},
+            {"name": "ATtiny87"},
+            {"name": "ATtiny167"},
+            {"name": "ATtiny48"},
+            {"name": "ATtiny88"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "ATTinyCore",
+          "architecture": "avr",
+          "version": "1.1.1",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/SpenceKonde/ATTinyCore/archive/v1.1.1.3.tar.gz",
+          "archiveFileName": "ATTinyCore-1.1.1.3.tar.gz",
+          "checksum": "SHA-256:eafd5e2db5812764b6d6b8889c0cf4bfaa62dfefaf1cd139ba92898bd20bc85e",
+          "size": "173202",
+          "boards": [
+            {"name": "ATtiny441"},
+            {"name": "ATtiny841"},
+            {"name": "ATtiny1634"},
+            {"name": "ATtiny828"},
+            {"name": "ATtiny2313"},
+            {"name": "ATtiny4313"},
+            {"name": "ATtiny24"},
+            {"name": "ATtiny44"},
+            {"name": "ATtiny84"},
+            {"name": "ATtiny25"},
+            {"name": "ATtiny45"},
+            {"name": "ATtiny85"},
+            {"name": "ATtiny261"},
+            {"name": "ATtiny461"},
+            {"name": "ATtiny861"},
+            {"name": "ATtiny87"},
+            {"name": "ATtiny167"},
+            {"name": "ATtiny48"},
+            {"name": "ATtiny88"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "ATTinyCore",
+          "architecture": "avr",
+          "version": "1.1.2",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/SpenceKonde/ATTinyCore/archive/v1.1.2.tar.gz",
+          "archiveFileName": "ATTinyCore-1.1.2.tar.gz",
+          "checksum": "SHA-256:b5b03ba5c1544f159804b8067bbb61e27fc5eaa1ba0b5cdc7ac08fd2bdefcf18",
+          "size": "3951319",
+          "boards": [
+            {"name": "ATtiny441"},
+            {"name": "ATtiny841"},
+            {"name": "ATtiny1634"},
+            {"name": "ATtiny828"},
+            {"name": "ATtiny2313"},
+            {"name": "ATtiny4313"},
+            {"name": "ATtiny24"},
+            {"name": "ATtiny44"},
+            {"name": "ATtiny84"},
+            {"name": "ATtiny25"},
+            {"name": "ATtiny45"},
+            {"name": "ATtiny85"},
+            {"name": "ATtiny261"},
+            {"name": "ATtiny461"},
+            {"name": "ATtiny861"},
+            {"name": "ATtiny87"},
+            {"name": "ATtiny167"},
+            {"name": "ATtiny48"},
+            {"name": "ATtiny88"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "ATTinyCore",
+          "architecture": "avr",
+          "version": "1.1.3",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/SpenceKonde/ATTinyCore/archive/1.1.3.tar.gz",
+          "archiveFileName": "ATTinyCore-1.1.3.tar.gz",
+          "checksum": "SHA-256:ed86fdebbd76f7f8e7de6aff6999088532b2a44ef85079d895a232c308b2534f",
+          "size": "6397354",
+          "boards": [
+            {"name": "ATtiny441"},
+            {"name": "ATtiny841"},
+            {"name": "ATtiny1634"},
+            {"name": "ATtiny828"},
+            {"name": "ATtiny2313"},
+            {"name": "ATtiny4313"},
+            {"name": "ATtiny24"},
+            {"name": "ATtiny44"},
+            {"name": "ATtiny84"},
+            {"name": "ATtiny25"},
+            {"name": "ATtiny45"},
+            {"name": "ATtiny85"},
+            {"name": "ATtiny261"},
+            {"name": "ATtiny461"},
+            {"name": "ATtiny861"},
+            {"name": "ATtiny87"},
+            {"name": "ATtiny167"},
+            {"name": "ATtiny48"},
+            {"name": "ATtiny88"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "ATTinyCore",
+          "architecture": "avr",
+          "version": "1.1.4",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/SpenceKonde/ATTinyCore/archive/v1.1.4.tar.gz",
+          "archiveFileName": "ATTinyCore-v1.1.4.tar.gz",
+          "checksum": "SHA-256:49927ff873c53f7ef335f584d9664bc0b7115a61b8eb6e555eee2653d6854701",
+          "size": "6397502",
+          "boards": [
+            {"name": "ATtiny441"},
+            {"name": "ATtiny841"},
+            {"name": "ATtiny1634"},
+            {"name": "ATtiny828"},
+            {"name": "ATtiny2313"},
+            {"name": "ATtiny4313"},
+            {"name": "ATtiny24"},
+            {"name": "ATtiny44"},
+            {"name": "ATtiny84"},
+            {"name": "ATtiny25"},
+            {"name": "ATtiny45"},
+            {"name": "ATtiny85"},
+            {"name": "ATtiny261"},
+            {"name": "ATtiny461"},
+            {"name": "ATtiny861"},
+            {"name": "ATtiny87"},
+            {"name": "ATtiny167"},
+            {"name": "ATtiny48"},
+            {"name": "ATtiny88"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "ATTinyCore",
+          "architecture": "avr",
+          "version": "1.1.5",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/SpenceKonde/ATTinyCore/archive/1.1.5.tar.gz",
+          "archiveFileName": "ATTinyCore-1.1.5.tar.gz",
+          "checksum": "SHA-256:ae4d9deb0dc00f3f673000782dc9ae62a432603f25364350fd1d18b37fcc12a5",
+          "size": "6402856",
+          "boards": [
+            {"name": "ATtiny441"},
+            {"name": "ATtiny841"},
+            {"name": "ATtiny1634"},
+            {"name": "ATtiny828"},
+            {"name": "ATtiny2313"},
+            {"name": "ATtiny4313"},
+            {"name": "ATtiny24"},
+            {"name": "ATtiny44"},
+            {"name": "ATtiny84"},
+            {"name": "ATtiny25"},
+            {"name": "ATtiny45"},
+            {"name": "ATtiny85"},
+            {"name": "ATtiny261"},
+            {"name": "ATtiny461"},
+            {"name": "ATtiny861"},
+            {"name": "ATtiny87"},
+            {"name": "ATtiny167"},
+            {"name": "ATtiny48"},
+            {"name": "ATtiny88"}
+          ],
+          "toolsDependencies": []
+        }
+      ],
+      "tools": []
+    },
+    {
+      "name": "arduino-tiny-841",
+      "maintainer": "Spence Konde",
+      "websiteURL": "https://github.com/SpenceKonde/arduino-tiny-841",
+      "email": "",
+      "help": {
+        "online": ""
+      },
+      "platforms": [
+        {
+          "name": "ATtiny Modern(deprecated, use ATTinyCore instead)",
+          "architecture": "avr",
+          "version": "1.0.4",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/SpenceKonde/arduino-tiny-841/archive/v1.0.4.tar.gz",
+          "archiveFileName": "arduino-tiny-841-1.0.4.tar.gz",
+          "checksum": "SHA-256:1e100474ed43ff639dce3dd217d119e725d122f3975ce94edb6f124fe554db48",
+          "size": "116602",
+          "boards": [
+            {"name": "ATtiny441"},
+            {"name": "ATtiny841"},
+            {"name": "ATtiny1634"},
+            {"name": "ATtiny828"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "ATtiny Modern(deprecated, use ATTinyCore instead)",
+          "architecture": "avr",
+          "version": "1.0.5",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/SpenceKonde/arduino-tiny-841/archive/v1.0.5.2.tar.gz",
+          "archiveFileName": "arduino-tiny-841-1.0.5.2.tar.gz",
+          "checksum": "SHA-256:5c187a7d079827497d800d7c7c97405028b8a3a5fcc9453add9fe98e8aa6f41f",
+          "size": "123605",
+          "boards": [
+            {"name": "ATtiny441"},
+            {"name": "ATtiny841"},
+            {"name": "ATtiny1634"},
+            {"name": "ATtiny828"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "ATtiny Modern(deprecated, use ATTinyCore instead)",
+          "architecture": "avr",
+          "version": "1.0.6",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/SpenceKonde/arduino-tiny-841/archive/v1.0.6.tar.gz",
+          "archiveFileName": "arduino-tiny-841-1.0.6.tar.gz",
+          "checksum": "SHA-256:f705cd4c6cda59ebc45eb74c7df749191f2ac5451d83aa57efdf2d477c152e98",
+          "size": "121546",
+          "boards": [
+            {"name": "ATtiny441"},
+            {"name": "ATtiny841"},
+            {"name": "ATtiny1634"},
+            {"name": "ATtiny828"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "ATtiny Modern(deprecated, use ATTinyCore instead)",
+          "architecture": "avr",
+          "version": "1.0.7-deprecation-notice",
+          "category": "Contributed",
+          "help": {
+            "online": ""
+          },
+          "url": "https://github.com/SpenceKonde/arduino-tiny-841/archive/v1.0.6.tar.gz",
+          "archiveFileName": "arduino-tiny-841-1.0.6.tar.gz",
+          "checksum": "SHA-256:f705cd4c6cda59ebc45eb74c7df749191f2ac5451d83aa57efdf2d477c152e98",
+          "size": "121546",
+          "boards": [
+            {"name": "ATTENTION! ATtiny Modern has been merged with ATTinyCore. If you have ATtiny Modern installed please click the Remove button and install ATTinyCore."}
+          ],
+          "toolsDependencies": []
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

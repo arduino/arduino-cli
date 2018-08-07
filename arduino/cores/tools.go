@@ -48,10 +48,10 @@ type Tool struct {
 
 // ToolRelease represents a single release of a tool
 type ToolRelease struct {
-	Version    *semver.Version `json:"version,required"` // The version number of this Release.
-	Flavours   []*Flavour      `json:"systems"`          // Maps OS to Flavour
-	Tool       *Tool           `json:"-"`
-	InstallDir *paths.Path     `json:"-"`
+	Version    *semver.RelaxedVersion `json:"version,required"` // The version number of this Release.
+	Flavours   []*Flavour             `json:"systems"`          // Maps OS to Flavour
+	Tool       *Tool                  `json:"-"`
+	InstallDir *paths.Path            `json:"-"`
 }
 
 // Flavour represents a flavour of a Tool version.
@@ -62,7 +62,7 @@ type Flavour struct {
 
 // GetOrCreateRelease returns the ToolRelease object with the specified version
 // or creates a new one if not found
-func (tool *Tool) GetOrCreateRelease(version *semver.Version) *ToolRelease {
+func (tool *Tool) GetOrCreateRelease(version *semver.RelaxedVersion) *ToolRelease {
 	if release, ok := tool.Releases[version.String()]; ok {
 		return release
 	}
@@ -76,14 +76,14 @@ func (tool *Tool) GetOrCreateRelease(version *semver.Version) *ToolRelease {
 
 // GetRelease returns the specified release corresponding the provided version,
 // or nil if not found.
-func (tool *Tool) GetRelease(version *semver.Version) *ToolRelease {
+func (tool *Tool) GetRelease(version *semver.RelaxedVersion) *ToolRelease {
 	return tool.Releases[version.String()]
 }
 
 // GetAllReleasesVersions returns all the version numbers in this Core Package.
-func (tool *Tool) GetAllReleasesVersions() []*semver.Version {
+func (tool *Tool) GetAllReleasesVersions() []*semver.RelaxedVersion {
 	releases := tool.Releases
-	versions := []*semver.Version{}
+	versions := []*semver.RelaxedVersion{}
 	for _, release := range releases {
 		versions = append(versions, release.Version)
 	}
@@ -101,7 +101,7 @@ func (tool *Tool) LatestRelease() *ToolRelease {
 }
 
 // latestReleaseVersion obtains latest version number.
-func (tool *Tool) latestReleaseVersion() *semver.Version {
+func (tool *Tool) latestReleaseVersion() *semver.RelaxedVersion {
 	versions := tool.GetAllReleasesVersions()
 	if len(versions) == 0 {
 		return nil

@@ -1,0 +1,741 @@
+{
+    "packages":[
+        {
+            "name":"SODAQ",
+            "maintainer":"SODAQ",
+            "websiteURL":"https://sodaq.com",
+            "email":"info@sodaq.com",
+            "help":{
+                "online":"https://forum.sodaq.com"
+            },
+            "platforms":[
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.0",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.0.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.0.tar.bz2",
+                    "checksum":"SHA-256:9d119bc54fa437d3fc7074459a006f4cc1f0792557a376f5433224b6dc9aa241",
+                    "size":"175026",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name":"SODAQ Autonomo" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.5-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.0.0-atmel"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.1",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.1.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.1.tar.bz2",
+                    "checksum":"SHA-256:21a09831fcecdcd9da40ec705ca9696a4dafc1530fd45b279fa4acb7965edba4",
+                    "size":"175107",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name":"SODAQ Autonomo" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.6-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.0.0-atmel"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.2",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.2.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.2.tar.bz2",
+                    "checksum":"SHA-256:bff50c66960cffef6434be6f3b248b64fcc6dbcd54a71857b295e9cef21f86cc",
+                    "size":"176127",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name":"SODAQ Autonomo" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.6-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.0.0-atmel"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.3",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.3.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.3.tar.bz2",
+                    "checksum":"SHA-256:ea2b167544ec39584e759070e9b87919102336acaed7bfbd0c399b6b83daae59",
+                    "size":"174834",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name":"SODAQ Autonomo" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.6-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.0.0-atmel"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.4",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.4.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.4.tar.bz2",
+                    "checksum":"SHA-256:970a7a3c9c8c8289ffe194d60ed243869a20f391ab54edd81986774806e92f27",
+                    "size":"321319",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name": "SODAQ Autonomo" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.6.1-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.0.0-atmel"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.5",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.5.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.5.tar.bz2",
+                    "checksum":"SHA-256:cc4c3c109e271b917403e05a4cb0a93501af90f8baa1a8b3b447af392e32fa30",
+                    "size":"321771",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name": "SODAQ Autonomo" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.6.1-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.0.0-atmel"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.6",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.6.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.6.tar.bz2",
+                    "checksum":"SHA-256:c951f6c568b4211ef1553e31b2e228f9b46c41cf34d0e18ceca0ab6e39809897",
+                    "size":"322302",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name": "SODAQ Autonomo" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.6.1-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.0.0-atmel"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.7",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.7.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.7.tar.bz2",
+                    "checksum":"SHA-256:714e92698fbfad739be661a1379b006a1fe1d35b94cfec4eee748cb24d1bf1cd",
+                    "size":"326475",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name": "SODAQ Autonomo" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.6.1-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.0.0-atmel"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.8",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.8.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.8.tar.bz2",
+                    "checksum":"SHA-256:033dd35629bb5f3883a9abddabd7fac0b21996508326f7ebb269c782a6f712ae",
+                    "size":"1807820",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name": "SODAQ Autonomo" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.6.1-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.0.0-atmel"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.9",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.9.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.9.tar.bz2",
+                    "checksum":"SHA-256:b4f979d4d9e431b765e8fe325fc8554593ddc25143a5aaebbe662d038f3a31a5",
+                    "size":"1815525",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name": "SODAQ Autonomo" },
+                        { "name": "SODAQ ONE" },
+                        { "name": "SODAQ ExpLoRer" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.6.1-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.0.0-atmel"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.10",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.10.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.10.tar.bz2",
+                    "checksum":"SHA-256:e942a764f792565af5526b3b261faff209c0d930cc412b4f93e0f9510f35aa77",
+                    "size":"1816633",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name": "SODAQ Autonomo" },
+                        { "name": "SODAQ ONE" },
+                        { "name": "SODAQ ExpLoRer" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.6.1-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.0.0-atmel"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.11",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.11.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.11.tar.bz2",
+                    "checksum":"SHA-256:41030fc68a41bc8168f06169ec0032517ed0629cd67da457a725941bc9afcbdd",
+                    "size":"1817312",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name": "SODAQ Autonomo" },
+                        { "name": "SODAQ ONE" },
+                        { "name": "SODAQ ExpLoRer" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.6.1-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.0.0-atmel"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.12",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.12.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.12.tar.bz2",
+                    "checksum":"SHA-256:ddccd7257c1acf3318cffad8ce782ac76ed0c2d407528eb13033aeb68cfe41c8",
+                    "size":"373086",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name": "SODAQ Autonomo" },
+                        { "name": "SODAQ ONE" },
+                        { "name": "SODAQ ExpLoRer" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.6.1-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.0.0-atmel"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.14",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.14.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.14.tar.bz2",
+                    "checksum":"SHA-256:050aadaaa0e1ed3c50c772d0d937f1f99b30d16e1cf3870d6e0a1293cdfe645f",
+                    "size":"2135793",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name": "SODAQ Autonomo" },
+                        { "name": "SODAQ ONE" },
+                        { "name": "SODAQ ExpLoRer" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.7.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "avrdude",
+                            "version": "6.3.0-arduino8"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.5.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS-Atmel",
+                            "version": "1.1.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "arduinoOTA",
+                            "version": "1.2.0"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.15",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.15.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.15.tar.bz2",
+                    "checksum":"SHA-256:a5d1c767781a13fef078b99144c591ec3bea3530b03b78d2d351345c5a4ca8a8",
+                    "size":"2139649",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name": "SODAQ Autonomo" },
+                        { "name": "SODAQ ONE" },
+                        { "name": "SODAQ ExpLoRer" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.7.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "avrdude",
+                            "version": "6.3.0-arduino8"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.5.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS-Atmel",
+                            "version": "1.1.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "arduinoOTA",
+                            "version": "1.2.0"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.17",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/sodaqsamdboards-1.6.17.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.17.tar.bz2",
+                    "checksum":"SHA-256:a83b4d0922ab90714b45b0ddf975367242b0f26a52bd3af154d358611c4e84d2",
+                    "size":"2173366",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name": "SODAQ Autonomo" },
+                        { "name": "SODAQ ONE" },
+                        { "name": "SODAQ ExpLoRer" },
+                        { "name": "SODAQ SARA" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.7.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "avrdude",
+                            "version": "6.3.0-arduino8"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.5.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS-Atmel",
+                            "version": "1.1.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "arduinoOTA",
+                            "version": "1.2.0"
+                        }
+                    ]
+                },
+                {
+                    "name":"SODAQ SAMD Boards",
+                    "architecture":"samd",
+                    "version":"1.6.18",
+                    "category":"Contributed",
+                    "url":"http://downloads.sodaq.net/test/sodaqsamdboards-1.6.18.tar.bz2",
+                    "archiveFileName":"sodaqsamdboards-1.6.18.tar.bz2",
+                    "checksum":"SHA-256:e9485e723a7e631452f43987fada64043a6f1de72fab84adfa5e508b6e2d2fc7",
+                    "size":"2174008",
+                    "help":{
+                        "online":"https://forums.sodaq.com"
+                    },
+                    "boards":[
+                        { "name": "SODAQ Autonomo" },
+                        { "name": "SODAQ ONE" },
+                        { "name": "SODAQ ExpLoRer" },
+                        { "name": "SODAQ SARA" },
+                        { "name": "SODAQ SFF" }
+                    ],
+                    "toolsDependencies":[
+                        {
+                            "packager": "arduino",
+                            "name": "arm-none-eabi-gcc",
+                            "version": "4.8.3-2014q1"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "bossac",
+                            "version": "1.7.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "openocd",
+                            "version": "0.9.0-arduino"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "avrdude",
+                            "version": "6.3.0-arduino8"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS",
+                            "version": "4.5.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "CMSIS-Atmel",
+                            "version": "1.1.0"
+                        },
+                        {
+                            "packager": "arduino",
+                            "name": "arduinoOTA",
+                            "version": "1.2.0"
+                        }
+                    ]
+                }
+            ],
+            "tools": []
+        }
+    ]
+}

@@ -1,0 +1,48 @@
+{
+  "packages": [
+    {
+      "name": "Elektor",
+      "maintainer": "Elektor.Labs",
+      "websiteURL": "https://github.com/ElektorLabs/arduino/",
+      "email": "info@elektor-labs.com",
+      "help": {
+        "online": "http://www.elektor-labs.com"
+      },
+      "platforms": [
+        {
+          "name": "Elektor AVR boards",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "help": {
+            "online": "http://www.elektor-labs.com"
+          },
+          "url": "https://raw.githubusercontent.com/ElektorLabs/arduino/master/elektor-boards-1.0.0_ide-1.6.6.zip",
+          "archiveFileName": "elektor-boards-1.0.0_ide-1.6.6.zip",
+          "checksum": "SHA-256:bc728e41cd7a0ccbcad8a2f5d51914117e24b33c81ef6a8a20d6428251b20b35",
+          "size": "191052",
+          "help": {
+                    "online": "http://www.elektor-labs.com"
+          },
+          "boards": [
+            {"name": "eRIC Nitro"},
+            {"name": "Platino"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        }
+      ],
+      "tools":[]
+    }
+  ]
+}

@@ -72,15 +72,15 @@ type indexPlatformRelease struct {
 
 // indexToolDependency represents a single dependency of a core from a tool.
 type indexToolDependency struct {
-	Packager string          `json:"packager,required"`
-	Name     string          `json:"name,required"`
-	Version  *semver.Version `json:"version,required"`
+	Packager string                 `json:"packager,required"`
+	Name     string                 `json:"name,required"`
+	Version  *semver.RelaxedVersion `json:"version,required"`
 }
 
 // indexToolRelease represents a single Tool from package_index.json file.
 type indexToolRelease struct {
 	Name    string                    `json:"name,required"`
-	Version *semver.Version           `json:"version,required"`
+	Version *semver.RelaxedVersion    `json:"version,required"`
 	Systems []indexToolReleaseFlavour `json:"systems,required"`
 }
 

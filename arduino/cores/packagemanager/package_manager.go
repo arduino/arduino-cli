@@ -296,7 +296,7 @@ func (ta *toolActions) IsInstalled() (bool, error) {
 	return false, nil
 }
 
-func (ta *toolActions) Release(version *semver.Version) *toolReleaseActions {
+func (ta *toolActions) Release(version *semver.RelaxedVersion) *toolReleaseActions {
 	if ta.forwardError != nil {
 		return &toolReleaseActions{forwardError: ta.forwardError}
 	}

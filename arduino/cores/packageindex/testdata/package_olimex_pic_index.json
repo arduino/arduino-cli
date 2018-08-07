@@ -1,0 +1,404 @@
+{
+	"packages":
+	[
+		{
+			"name": "Olimex",
+			"maintainer": "Olimex LTD",
+			"websiteURL": "https://www.olimex.com/",
+			"help":
+			{
+				"online": "https://www.olimex.com/forum"
+			},
+
+			"platforms":
+			[
+				{
+					"name": "Olimex PIC boards",
+					"architecture": "pic",
+					"version": "1.0.0",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/PIC/Versions/Olimex_PIC-1.0.0.zip",
+					"archiveFileName": "Olimex_PIC-1.0.0.zip",
+					"checksum": "SHA-256:c660cb0c0fcf4f4399d657fa123a5bdf794b85f08b59f681fe673a4d2560b91d",
+					"size": "1515560",
+					"boards":
+					[
+						{"name": "PIC32-Pinguino"},
+						{"name": "PIC32-Pinguino-OTG"},
+						{"name": "PIC32-Pinguino-Micro"},
+						{"name": "PIC32-T795"},
+						{"name": "DuinoMite-Mega"},
+						{"name": "DuinoMite-eMega"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "chipKIT",
+							"version": "4.8.3-pic32gcc",
+							"name": "pic32-tools"
+						},
+						{
+							"packager": "chipKIT",
+							"version": "v2.0.224-pic32gcc",
+							"name": "pic32prog"
+						},
+						{
+							"packager": "chipKIT",
+							"version": "v2",
+							"name": "drivers-windows"
+						}
+					]
+				},
+
+				{
+					"name": "Olimex PIC boards",
+					"architecture": "pic",
+					"version": "1.0.1",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/PIC/Versions/Olimex_PIC-1.0.1.zip",
+					"archiveFileName": "Olimex_PIC-1.0.1.zip",
+					"checksum": "SHA-256:52bec61e4dfa63d52bbc54a787a3d576b64b2670c4ac7826010d501819a9758e",
+					"size": "1534872",
+					"boards":
+					[
+						{"name": "PIC32-Pinguino"},
+						{"name": "PIC32-Pinguino-OTG"},
+						{"name": "PIC32-Pinguino-Micro"},
+						{"name": "PIC32-T795"},
+						{"name": "DuinoMite-Mega"},
+						{"name": "DuinoMite-eMega"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "chipKIT",
+							"version": "4.8.3-pic32gcc",
+							"name": "pic32-tools"
+						},
+						{
+							"packager": "chipKIT",
+							"version": "v2.0.224-pic32gcc",
+							"name": "pic32prog"
+						},
+						{
+							"packager": "chipKIT",
+							"version": "v2",
+							"name": "drivers-windows"
+						}
+					]
+				},
+				
+				{
+					"name": "Olimex PIC boards",
+					"architecture": "pic",
+					"version": "1.1.0",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/PIC/Versions/Olimex_PIC-1.1.0.zip",
+					"archiveFileName": "Olimex_PIC-1.1.0.zip",
+					"checksum": "SHA-256:6f70d516a0cec21672974d69cc8ac82abd98491af3e3672a9e12a14ba17b6d6c",
+					"size": "1584946",
+					"boards":
+					[
+						{"name": "PIC32-Pinguino"},
+						{"name": "PIC32-Pinguino-OTG"},
+						{"name": "PIC32-Pinguino-MX270"},
+						{"name": "PIC32-Pinguino-Micro"},
+						{"name": "PIC32-T795"},
+						{"name": "DuinoMite-Mega"},
+						{"name": "DuinoMite-eMega"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "chipKIT",
+							"version": "4.8.3-pic32gcc",
+							"name": "pic32-tools"
+						},
+						{
+							"packager": "chipKIT",
+							"version": "v2.0.224-pic32gcc",
+							"name": "pic32prog"
+						},
+						{
+							"packager": "chipKIT",
+							"version": "v2",
+							"name": "drivers-windows"
+						}
+					]
+				},
+				
+				{
+					"name": "Olimex PIC boards",
+					"architecture": "pic",
+					"version": "1.1.1",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/PIC/Versions/Olimex_PIC-1.1.1.zip",
+					"archiveFileName": "Olimex_PIC-1.1.1.zip",
+					"checksum": "SHA-256:d315e9a698d18bbf628794d1775819171e32467903914a04c0ded73bd041e200",
+					"size": "1584965",
+					"boards":
+					[
+						{"name": "PIC32-Pinguino"},
+						{"name": "PIC32-Pinguino-OTG"},
+						{"name": "PIC32-Pinguino-MX270"},
+						{"name": "PIC32-Pinguino-Micro"},
+						{"name": "PIC32-T795"},
+						{"name": "DuinoMite-Mega"},
+						{"name": "DuinoMite-eMega"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "chipKIT",
+							"version": "4.8.3-pic32gcc",
+							"name": "pic32-tools"
+						},
+						{
+							"packager": "chipKIT",
+							"version": "v2.0.224-pic32gcc",
+							"name": "pic32prog"
+						},
+						{
+							"packager": "chipKIT",
+							"version": "v2",
+							"name": "drivers-windows"
+						}
+					]
+				},
+				
+				{
+					"name": "Olimex PIC boards",
+					"architecture": "pic",
+					"version": "1.2.0",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/PIC/Versions/Olimex_PIC-1.2.0.zip",
+					"archiveFileName": "Olimex_PIC-1.2.0.zip",
+					"checksum": "SHA-256:40e95f5446c5b63dc1f9ff58c9380754e01f53dc3e5d241eea8c228de0c964c6",
+					"size": "1600857",
+					"boards":
+					[
+						{"name": "PIC32-Pinguino"},
+						{"name": "PIC32-Pinguino-OTG"},
+						{"name": "PIC32-Pinguino-MX270"},
+						{"name": "PIC32-Pinguino-Micro"},
+						{"name": "PIC32-T795"},
+						{"name": "DuinoMite-Mega"},
+						{"name": "DuinoMite-eMega"},
+						{"name": "ESP32-PRO"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "chipKIT",
+							"version": "4.8.3-pic32gcc",
+							"name": "pic32-tools"
+						},
+						{
+							"packager": "chipKIT",
+							"version": "v2.0.224-pic32gcc",
+							"name": "pic32prog"
+						},
+						{
+							"packager": "chipKIT",
+							"version": "v2",
+							"name": "drivers-windows"
+						}
+					]
+				},
+				
+				{
+					"name": "Olimex PIC boards",
+					"architecture": "pic",
+					"version": "1.2.1",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/PIC/Versions/Olimex_PIC-1.2.1.zip",
+					"archiveFileName": "Olimex_PIC-1.2.1.zip",
+					"checksum": "SHA-256:7f66b22bce9dfc18bd823e0db6efa4baada952add59f9b03578c31e1f40e680f",
+					"size": "1605632",
+					"boards":
+					[
+						{"name": "PIC32-Pinguino"},
+						{"name": "PIC32-Pinguino-OTG"},
+						{"name": "PIC32-Pinguino-MX270"},
+						{"name": "PIC32-Pinguino-Micro"},
+						{"name": "PIC32-T795"},
+						{"name": "DuinoMite-Mega"},
+						{"name": "DuinoMite-eMega"},
+						{"name": "ESP32-PRO"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "chipKIT",
+							"version": "4.8.3-pic32gcc",
+							"name": "pic32-tools"
+						},
+						{
+							"packager": "chipKIT",
+							"version": "v2.0.224-pic32gcc",
+							"name": "pic32prog"
+						},
+						{
+							"packager": "chipKIT",
+							"version": "v2",
+							"name": "drivers-windows"
+						}
+					]
+				}
+			],
+			"tools":
+			[
+				{
+					"name": "pic32-tools",
+					"version": "4.8.3-pic32gcc",
+					"systems":
+					[
+						{
+							"url": "https://github.com/chipKIT32/chipKIT-core/releases/download/v1.0.1/pic32-tools-chipKIT-cxx-master-win32-image.zip",
+							"checksum": "SHA-256:3601B978C209262CC0537138EE431A1D77029649DE0956CE8E1C2F15714161F6",
+							"host": "i686-mingw32",
+							"archiveFileName": "pic32-tools-chipKIT-cxx-master-win32-image.zip",
+							"size": "186744977"
+						},
+						{
+							"url": "https://github.com/chipKIT32/chipKIT-core/releases/download/v1.0.1/pic32-tools-chipKIT-cxx-master-Darwin-image.tar.gz",
+							"checksum": "SHA-256:abf60aba418a0ae8295411a7ae784cf3a65779c8a89457e5eb9e7a6a7c2a9c51",
+							"host": "i386-apple-darwin",
+							"archiveFileName": "pic32-tools-chipKIT-cxx-master-Darwin-image.tar.gz",
+							"size": "99409750"
+						},
+						{
+							"url": "https://github.com/chipKIT32/chipKIT-core/releases/download/v1.0.1/pic32-tools-chipKIT-cxx-master-Linux32-image.tar.gz",
+							"checksum": "SHA-256:dcd504b81ab531fc3a325e24c0a0250997492843a20d53360bbf34cef170bac7",
+							"host": "x86_64-linux-gnu",
+							"archiveFileName": "pic32-tools-chipKIT-cxx-master-Linux32-image.tar.gz",
+							"size": "100765964"
+						},
+						{
+							"url": "https://github.com/chipKIT32/chipKIT-core/releases/download/v1.0.1/pic32-tools-chipKIT-cxx-master-Linux32-image.tar.gz",
+							"checksum": "SHA-256:dcd504b81ab531fc3a325e24c0a0250997492843a20d53360bbf34cef170bac7",
+							"host": "i686-pc-linux-gnu",
+							"archiveFileName": "pic32-tools-chipKIT-cxx-master-Linux32-image.tar.gz",
+							"size": "100765964"
+						},
+						{
+							"url": "https://github.com/chipKIT32/chipKIT-core/releases/download/v1.0.1/pic32-tools-chipKIT-cxx-master-arm-linux-image.tar.gz",
+							"checksum": "SHA-256:9f03328d2ec90900daf6eb1554c63a76144456b4fcc0bc4d6ff2291713e646f2",
+							"host": "i686-arm-gnu",
+							"archiveFileName": "pic32-tools-chipKIT-cxx-master-arm-linux-image.tar.gz",
+							"size": "97933297"
+						}
+					]
+				},
+				{
+					"name": "pic32prog",
+					"version": "v2.0.224-pic32gcc",
+					"systems":
+					[
+						{
+							"host": "i386-apple-darwin11",
+							"url": "https://github.com/chipKIT32/chipKIT-core/releases/download/v1.2.0/pic32prog-macosx_2_0_220.tar.gz",
+							"archiveFileName": "pic32prog-macosx_2_0_220.tar.gz",
+							"size": "184974",
+							"checksum": "SHA-256:ed47999be31cc50cd083f7d16c909a3aeb59366f87fb17c3726287dc4bb49319"
+						}, 
+						{
+							"host": "x86_64-linux-gnu",
+							"url": "https://github.com/chipKIT32/chipKIT-core/releases/download/v1.2.1/pic32prog-linux64_2_0_224.tar.gz",
+							"archiveFileName": "pic32prog-linux64_2_0_224.tar.gz",
+							"size": "187187",
+							"checksum": "SHA-256:E5E89CBCA2F5EA9038D23400883C9990F31EC2EC0076FD54353A2AA447DE50E5"
+						}, 
+						{
+							"host": "i686-pc-linux-gnu", 
+							"url": "https://github.com/chipKIT32/chipKIT-core/releases/download/v1.2.1/pic32prog-linux32_2_0_224.tar.gz",
+							"archiveFileName": "pic32prog-linux32_2_0_224.tar.gz",
+							"size": "175510",
+							"checksum": "SHA-256:037DA2461DC340EE20D0B5D2F4DD5DBAAD7FB57CDDC2852E3EEAFB78FB95BB62"
+						}, 
+						{
+							"host": "i686-mingw32",
+							"url": "https://github.com/chipKIT32/chipKIT-core/releases/download/v1.2.1/pic32prog-windows_2_0_224.zip",
+							"archiveFileName": "pic32prog-windows_2_0_224.zip",
+							"size": "114018",
+							"checksum": "SHA-256:ECC58A7C95720F4C47B98932F7297A2BF57E42E32D231AB9770472EC0C1F2530"
+						}, 
+						{
+							"host": "i686-arm-gnu",
+							"url": "https://github.com/chipKIT32/chipKIT-core/releases/download/v1.2.1/pic32prog-armlinux_2_0_224.tar.gz",
+							"archiveFileName": "pic32prog-armlinux_2_0_224.tar.gz",
+							"size": "174996",
+							"checksum": "SHA-256:6FAEDF08D76FA87C8ACC93C3B52E2BB6B63DAD518015AD0F65E03EBC0D1B8032"
+						}
+					]
+				},
+				{
+					"name": "drivers-windows",
+					"version": "v2",
+					"systems":
+					[
+						{
+							"host": "i686-mingw32",
+							"url": "https://github.com/chipKIT32/chipKIT-drivers/releases/download/v2.0/chipKIT_USB_drivers_windows_v2.zip",
+							"archiveFileName": "chipKIT_USB_drivers_windows_v2.zip",
+							"size": "962019",
+							"checksum": "SHA-256:39F16651C21F451D106B8CDA5281D16129D755A73728E976A725341F3F671A5F"
+						},
+						{
+							"host": "i386-apple-darwin11",
+							"url": "https://github.com/chipKIT32/chipKIT-drivers/releases/download/v2.0/chipKIT_USB_drivers_otherOSes_v2.zip",
+							"archiveFileName": "chipKIT_USB_drivers_otherOSes_v2.zip",
+							"size": "162",
+							"checksum": "SHA-256:83320249BEAF1BD023A7E42DA0A8717421681B62F070331DF6084048F8D763F8"
+						}, 
+						{
+							"host": "x86_64-linux-gnu",
+							"url": "https://github.com/chipKIT32/chipKIT-drivers/releases/download/v2.0/chipKIT_USB_drivers_otherOSes_v2.zip",
+							"archiveFileName": "chipKIT_USB_drivers_otherOSes_v2.zip",
+							"size": "162",
+							"checksum": "SHA-256:83320249BEAF1BD023A7E42DA0A8717421681B62F070331DF6084048F8D763F8"
+						}, 
+						{
+							"host": "i686-pc-linux-gnu", 
+							"url": "https://github.com/chipKIT32/chipKIT-drivers/releases/download/v2.0/chipKIT_USB_drivers_otherOSes_v2.zip",
+							"archiveFileName": "chipKIT_USB_drivers_otherOSes_v2.zip",
+							"size": "162",
+							"checksum": "SHA-256:83320249BEAF1BD023A7E42DA0A8717421681B62F070331DF6084048F8D763F8"
+						}, 
+						{
+							"host": "i686-arm-gnu",
+							"url": "https://github.com/chipKIT32/chipKIT-drivers/releases/download/v2.0/chipKIT_USB_drivers_otherOSes_v2.zip",
+							"archiveFileName": "chipKIT_USB_drivers_otherOSes_v2.zip",
+							"size": "162",
+							"checksum": "SHA-256:83320249BEAF1BD023A7E42DA0A8717421681B62F070331DF6084048F8D763F8"
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,54 @@
+{
+  "packages": [
+    {
+      "name": "wirino",
+      "maintainer": "per1234",
+      "websiteURL": "https://github.com/per1234/wirino",
+      "email": "",
+      "help": {
+        "online": ""
+      },
+      "platforms": [
+        {
+          "name": "wirino",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "url": "https://per1234.github.io/wirino/wirino-1.0.0.tar.bz2",
+          "archiveFileName": "wirino-1.0.0.tar.bz2",
+          "checksum": "SHA-256:76045d2a4a8f9e982933f2528898a59e9b373064e3ef14da265cf29224dd0762",
+          "size": "87600",
+          "boards": [
+            {"name": "Wiring S"},
+            {"name": "Wiring S with Play Shield"},
+            {"name": "Wiring V1.0"},
+            {"name": "Wiring Mini V1.0"},
+            {"name": "Wiring V1.1 ATmega1281"},
+            {"name": "Wiring V1.1 ATmega2561"}
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "wirino",
+          "architecture": "avr",
+          "version": "1.0.1",
+          "category": "Contributed",
+          "url": "https://per1234.github.io/wirino/wirino-1.0.1.tar.bz2",
+          "archiveFileName": "wirino-1.0.1.tar.bz2",
+          "checksum": "SHA-256:eb05ad7b39cf39c8f0d08b221326d1e87d0884c05ed9613eb40ac62bd338770f",
+          "size": "86412",
+          "boards": [
+            {"name": "Wiring S"},
+            {"name": "Wiring S with Play Shield"},
+            {"name": "Wiring V1.0"},
+            {"name": "Wiring Mini V1.0"},
+            {"name": "Wiring V1.1 ATmega1281"},
+            {"name": "Wiring V1.1 ATmega2561"}
+          ],
+          "toolsDependencies": []
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

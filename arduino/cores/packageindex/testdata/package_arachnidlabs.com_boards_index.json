@@ -1,0 +1,36 @@
+{
+	"packages": [
+		{
+			"name": "arachnidlabs",
+			"maintainer": "Arachnid Labs Ltd",
+			"websiteURL": "http://www.arachnidlabs.com/",
+			"email": "nick@arachnidlabs.com",
+
+			"platforms": [
+				{
+					"name": "Arachnid Labs AVR boards",
+					"architecture": "avr",
+					"version": "1.0.0",
+					"category": "Contributed",
+					"help": {
+						"online": "http://discuss.arachnidlabs.com/"
+					},
+					"url": "https://github.com/arachnidlabs/arachnidlabs-boards/archive/v1.0.0.zip",
+					"archiveFileName": "arachnidlabs-boards-1.0.0.zip",
+					"size": "33894",
+					"checksum": "SHA-256:f711881903d6281dba65759b04b605387733cf81758d91b6ddc358650e8dc0f3",
+					"boards": [
+						{"name": "Tsunami"}
+					],
+					"toolsDependencies": [
+						{"packager": "arduino", "name": "avr-gcc", "version": "4.8.1-arduino2"},
+						{"packager": "arduino", "name": "avrdude", "version": "6.0.1-arduino2"}
+					]
+				}
+			],
+
+			"tools": [
+			]
+		}
+	]
+}

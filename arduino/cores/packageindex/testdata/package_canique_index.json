@@ -1,0 +1,43 @@
+{
+  "packages": [
+    {
+      "name": "canique",
+      "maintainer": "Canique.com",
+      "websiteURL": "https://www.canique.com/mk2",
+      "email": "contact@canique.com",
+      "platforms": [
+	      {
+          "name": "Canique MKx",
+          "architecture": "avr",
+          "version": "1.1.0",
+          "category": "Contributed",
+          "url": "https://resources.canique.com/ide/1.1.0/mkx.zip",
+          "archiveFileName": "mkx.zip",
+          "checksum": "SHA-256:7b66a2f6a82cd6e0d4aa10fd998cb95c48877428fdec3f4eef2be6fe81738419",
+          "size": "126704",
+          "boards": [
+            {"name": "Canique MK1/MK2/MK3E"},
+            {"name": "Canique MK20"}
+          ],
+          "toolsDependencies": [ ]
+	      },
+	      
+	      {
+          "name": "Canique MK1",
+          "architecture": "avr",
+          "version": "1.0.0",
+          "category": "Contributed",
+          "url": "https://resources.canique.com/ide/1.0.0/mkx.zip",
+          "archiveFileName": "mkx.zip",
+          "checksum": "SHA-256:5137b1cea5285fdd269af6d435cd97c7c84bf0a0a94b107864ee8a576db41eb1",
+          "size": "3939",
+          "boards": [
+            {"name": "Canique MK1/MK2"}
+          ],
+          "toolsDependencies": [ ]
+	      }
+	    ],
+	    "tools": []
+	  }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "packages": 
+  [
+    {
+       "name": "OpenPanzer",
+       "maintainer": "Open Panzer",
+       "help": 
+       {
+         "online": "http://forum.openpanzer.org"
+       },
+       "websiteURL": "http://openpanzer.org",      
+       "platforms": 
+       [
+         {
+           "category": "Contributed",
+           "help": 
+           {
+             "online": "http://forum.openpanzer.org"
+           },
+           "url": "https://openpanzerproject.github.io/OpenPanzerBoards/packages/openpanzer-avr-v1.0.2.tar.bz2",
+           "checksum": "SHA-256:A0F02324DFEE2570763C7BD287901D9195401ABDF6299300DAAC521FE8AF66DB",
+           "archiveFileName": "openpanzer-avr-v1.0.2.tar.bz2",
+           "size": "23395",
+           "name": "Open Panzer AVR Boards",
+           "version": "1.0.2",
+           "architecture": "avr",
+           "boards": 
+           [
+             {
+               "name": "TCB Mk1"
+             }
+           ],
+           "toolsDependencies": []
+         }
+      ],
+      "tools":[]
+    }
+  ]
+}

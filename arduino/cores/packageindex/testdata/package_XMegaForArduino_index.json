@@ -1,0 +1,92 @@
+{
+  "packages":
+  [
+    {
+      "maintainer": "XMegaForArduino",
+      "help":
+      {
+        "online": "https://github.com/XMegaForArduino"
+      },
+      "websiteURL": "https://github.com/XMegaForArduino",
+      "email": "XMegaForArduino@github.com",
+      "name": "XMegaForArduino",
+      "platforms":
+      [
+        {
+          "category": "XMegaForArduino",
+          "help":
+          {
+            "online": "https://github.com/XMegaForArduino"
+          },
+          "url": "https://raw.githubusercontent.com/XMegaForArduino/IDE/master/XMegaForArduino-0.9.1.tar.bz2",
+          "checksum": "SHA-256:8f4d5549f985bd59141fc4a9b859534f58f3b5338c6e22d0422d0484fca3442e",
+          "name": "XMegaForArduino XMEGA Boards",
+          "version": "0.9.1",
+          "architecture": "avr",
+          "archiveFileName": "XMegaForArduino-0.9.1.tar.bz2",
+          "size": "220194",
+          "toolsDependencies": [],
+          "boards":
+          [
+            {
+              "name": "ATXMega64D4"
+            },
+            {
+              "name": "ATXMega32E5"
+            },
+            {
+              "name": "ATXMega128A1"
+            },
+            {
+              "name": "ATXMega128A1U"
+            },
+            {
+              "name": "CC0 ATXMega32E5 breakout"
+            },
+            {
+              "name": "Rock Solid XMega 128A"
+            }
+          ]
+        },
+        {
+          "category": "XMegaForArduino",
+          "help":
+          {
+            "online": "https://github.com/XMegaForArduino"
+          },
+          "url": "https://raw.githubusercontent.com/XMegaForArduino/IDE/master/XMegaForArduino-0.9.2.tar.bz2",
+          "checksum": "SHA-256:5d06cec49b10716169b06d17feaa198bc9f5ebb65a4a73c752213c15aa049b2c",
+          "name": "XMegaForArduino XMEGA Boards",
+          "version": "0.9.2",
+          "architecture": "avr",
+          "archiveFileName": "XMegaForArduino-0.9.2.tar.bz2",
+          "size": "230744",
+          "toolsDependencies": [],
+          "boards":
+          [
+            {
+              "name": "ATXMega64D4"
+            },
+            {
+              "name": "ATXMega32E5"
+            },
+            {
+              "name": "ATXMega128A1"
+            },
+            {
+              "name": "ATXMega128A1U"
+            },
+            {
+              "name": "CC0 ATXMega32E5 breakout"
+            },
+            {
+              "name": "Rock Solid XMega 128A"
+            }
+          ]
+        }
+      ],
+      "tools": []
+    }
+  ]
+}
+

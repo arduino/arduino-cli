@@ -1,0 +1,48 @@
+{
+   "packages":[
+      {
+         "name":"OMC",
+         "maintainer":"TVRRUG",
+         "websiteURL":"http://www.tvrrug.org.uk/",
+         "email":" ",
+         "help":{
+            "online":" "
+         },
+         "platforms":[
+            {
+               "name": "OMC",
+               "architecture": "avr",
+               "version": "1.0",
+               "category": "Arduino",
+               "url": "https://github.com/ThamesValleyReprapUserGroup/Beta-TVRRUG-Mendel90/raw/master/Added-Documents/OMC/OMC_1.0.zip",
+               "archiveFileName": "OMC_1.0.zip",
+               "checksum": "SHA-256:515549CC9AF738A7F26C1D81E468DE18FBEDA439A388D6F7EB659069677F1797",
+               "size": "5179",
+               "help":{
+                  "online":" "
+               },
+               "boards": [
+                  {
+                     "name": "OMC"
+                  }
+               ],
+              "toolsDependencies": [
+                {
+                  "packager": "arduino",
+                  "name": "avr-gcc",
+                  "version": "4.8.1-arduino5"
+                },
+                {
+                  "packager": "arduino",
+                  "name": "avrdude",
+                  "version": "6.0.1-arduino5"
+                }
+              ]
+            }
+         ],
+
+         "tools":[
+         ]
+      }
+   ]
+}

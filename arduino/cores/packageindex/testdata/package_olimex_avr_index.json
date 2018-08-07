@@ -1,0 +1,681 @@
+{
+	"packages":
+	[
+		{
+			"name": "Olimex",
+			"maintainer": "Olimex LTD",
+			"websiteURL": "https://www.olimex.com/",
+			"help":
+			{
+				"online": "https://www.olimex.com/forum"
+			},
+
+			"platforms":
+			[
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.0.0",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.0.0.zip",
+					"archiveFileName": "Olimex_AVR-1.0.0.zip",
+					"checksum": "SHA-256:890b75d0df4d52738d3562fd885c6ae7943dfad45bbc599d8d5f3c01b4768645",
+					"size": "144752",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "1.0.0"
+						}
+					]
+				},
+				
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.1.0",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.1.0.zip",
+					"archiveFileName": "Olimex_AVR-1.1.0.zip",
+					"checksum": "SHA-256:4cf3a161ec0a6a2b048e3bdeb151638dae458d3c3a518d543909075b64d47992",
+					"size": "148814",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "1.0.0"
+						}
+					]
+				},
+				
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.1.1",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.1.1.zip",
+					"archiveFileName": "Olimex_AVR-1.1.1.zip",
+					"checksum": "SHA-256:b108f4628bcd2994a850ad696c2a4ad73b440cc2e3d48699fdbcff4becbb9b9c",
+					"size": "180413",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "1.0.0"
+						}
+					]
+				},
+
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.2.1",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.2.1.zip",
+					"archiveFileName": "Olimex_AVR-1.2.1.zip",
+					"checksum": "SHA-256:7d965c83fbb3be852f2e1f7c7204f3c2276763c0b210a42f90a27b59850b9c95",
+					"size": "184951",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-Nano"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "1.0.0"
+						}
+					]
+				},
+
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.2.2",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.2.2.zip",
+					"archiveFileName": "Olimex_AVR-1.2.2.zip",
+					"checksum": "SHA-256:4c734d39a7be0862c97c9b275d8fa1f7ade31280e99ea4549cbe18475f392005",
+					"size": "299280",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-Nano"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "1.0.0"
+						}
+					]
+				},
+
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.3.2",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.3.2.zip",
+					"archiveFileName": "Olimex_AVR-1.3.2.zip",
+					"checksum": "SHA-256:56b53be637d694a072eba3a261b21ca951e25299ac4d0b124f42a7ea157b9a4b",
+					"size": "299946",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-Nano"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "1.0.0"
+						}
+					]
+				},
+
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.3.3",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.3.3.zip",
+					"archiveFileName": "Olimex_AVR-1.3.3.zip",
+					"checksum": "SHA-256:d89a334c1fcdd67517779f0b4bfb46e4af4c3f1f9feac656ffbcaa2840f7e284",
+					"size": "310222",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-Nano"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "1.0.0"
+						}
+					]
+				},
+
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.3.4",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.3.4.zip",
+					"archiveFileName": "Olimex_AVR-1.3.4.zip",
+					"checksum": "SHA-256:d722ff82f1469b09ba0e6a356bb674cc1c0fe48c552ea1e7dfa37768a721bf58",
+					"size": "315587",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-Nano"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "1.0.0"
+						}
+					]
+				},
+
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.3.5",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.3.5.zip",
+					"archiveFileName": "Olimex_AVR-1.3.5.zip",
+					"checksum": "SHA-256:846bd1de11c0c83cccb6b0a0f203bea7e99153f8ef7995da881b5c3413cd89cb",
+					"size": "330330",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-Nano"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "1.0.0"
+						}
+					]
+				},
+
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.3.6",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.3.6.zip",
+					"archiveFileName": "Olimex_AVR-1.3.6.zip",
+					"checksum": "SHA-256:9d454e93d5d400916f88fc50ab1b14f740f1b10de08c90a13cafae5d42c101c3",
+					"size": "337541",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-Nano"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "1.0.0"
+						}
+					]
+				},
+
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.4.0",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.4.0.zip",
+					"archiveFileName": "Olimex_AVR-1.4.0.zip",
+					"checksum": "SHA-256:828d1675a3b05d8205d1a6d45b60e88baac16a0ad231a4b56cbd93571c82d1e5",
+					"size": "334409",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-Nano"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "2.0a4"
+						}
+					]
+				},
+
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.4.1",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.4.1.zip",
+					"archiveFileName": "Olimex_AVR-1.4.1.zip",
+					"checksum": "SHA-256:d38fcf46e0da2b065667374c48feb17a5a3c5e2e37300e5fd1f52bc61cb7bfa6",
+					"size": "330079",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-Nano"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "2.0a4"
+						}
+					]
+				},
+
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.4.2",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.4.2.zip",
+					"archiveFileName": "Olimex_AVR-1.4.2.zip",
+					"checksum": "SHA-256:c05c46694e2bc269fee875e0cbb26897b98e5cb8151a8b25afe283daf5e4f1f0",
+					"size": "333649",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-Nano"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "2.0a4"
+						}
+					]
+				},
+
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.4.3",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.4.3.zip",
+					"archiveFileName": "Olimex_AVR-1.4.3.zip",
+					"checksum": "SHA-256:6389edda37149135b26aaf98cb8d976e1adbea667ed68e467a3b6042ff531dd5",
+					"size": "352831",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-Nano"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "2.0a4"
+						}
+					]
+				},
+
+				{
+					"name": "Olimex AVR boards",
+					"architecture": "avr",
+					"version": "1.4.4",
+					"category": "Contributed",
+					"help":
+					{
+						"online": "https://www.olimex.com/forum/index.php?board=5.0"
+					},
+					"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Versions/Olimex_AVR-1.4.4.zip",
+					"archiveFileName": "Olimex_AVR-1.4.4.zip",
+					"checksum": "SHA-256:fd2852a4a7e67fed19211282f42e5e3f60faa5d0da4222d3d1be691c8f6875af",
+					"size": "361689",
+					"boards":
+					[
+						{"name": "Olimexino-328"},
+						{"name": "Olimexino-32U4"},
+						{"name": "Olimexino-Nano"},
+						{"name": "Olimexino-85"},
+						{"name": "RGB-Glasses"}
+					],
+					"toolsDependencies":
+					[
+						{
+							"packager": "arduino",
+							"name": "avr-gcc",
+							"version": "4.8.1-arduino5"
+						},
+						{
+							"packager": "arduino",
+							"name": "avrdude",
+							"version": "6.0.1-arduino5"
+						},
+						{
+							"packager": "Olimex",
+							"name": "micronucleus",
+							"version": "2.0a4"
+						}
+					]
+				}
+			],
+
+			"tools":
+			[
+				{
+					"name": "micronucleus",
+					"version": "1.0.0",
+					"systems":
+					[
+						{
+							"host": "i686-mingw32",
+							"archiveFileName": "Micronucleus.zip",
+							"url": "https://github.com/OLIMEX/Arduino_configurations/raw/master/AVR/Tools/micronucleus.zip",
+							"checksum": "SHA-256:4ed242d2d3dfbee0c511ef8581d0a56fb613d36f5f1a16e9227e0ea891c9fffb",
+							"size": "397301"
+						}
+					]
+				},
+				{
+					"name": "micronucleus",
+					"version": "2.0a4",
+					"systems":
+					[
+						{
+							"host": "x86_64-apple-darwin",
+							"archiveFileName": "micronucleus-2.0a4-osx.tar.gz",
+							"url": "https://github.com/digistump/DigistumpArduino/releases/download/1.6.5a/micronucleus-2.0a4-osx.tar.gz",
+							"checksum": "SHA-256:B5EB0C7B251CD88F4816186BB931855834141E71A28D90FB9E46788E483AA421",
+							"size": "51203"
+						},
+						{
+							"host": "i686-mingw32",
+							"archiveFileName": "micronucleus-2.0a4-win.zip",
+							"url": "https://github.com/digistump/DigistumpArduino/releases/download/1.6.5a/micronucleus-2.0a4-win.zip",
+							"checksum": "SHA-256:7027971118FDE88484AACB5D8CA7867D66E273839EC3B2592616829317BB70E4",
+							"size": "1712005"
+						},
+						{
+							"host": "i686-linux-gnu",
+							"archiveFileName": "micronucleus-2.0a4-linux32.tar.gz",
+							"url": "https://github.com/digistump/DigistumpArduino/releases/download/1.6.5a/micronucleus-2.0a4-linux32.tar.gz",
+							"checksum": "SHA-256:0D4286388EED28D1ECB29AFE81253F24F54D4F0A5C1B2C17507EABD504C595F8",
+							"size": "21909"
+						},
+						{
+							"host": "x86_64-linux-gnu",
+							"archiveFileName": "micronucleus-2.0a4-linux64.tar.gz",
+							"url": "https://github.com/digistump/DigistumpArduino/releases/download/1.6.5a/micronucleus-2.0a4-linux64.tar.gz",
+							"checksum": "SHA-256:1F545C0BB60E85A604901C2D7044772AC91776594C209C571DFEDAD4A70195B8",
+							"size": "22874"
+						}
+					]
+				}
+			]
+		}
+	]
+}

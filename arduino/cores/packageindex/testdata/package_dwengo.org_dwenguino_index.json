@@ -1,0 +1,61 @@
+{
+  "packages": [
+    {
+      "name": "dwenguino",
+      "maintainer": "Dwengo",
+      "websiteURL": "http://www.dwengo.org/",
+      "email": "developers@dwengo.org",
+      "help": {
+        "online": "http://www.dwengo.org/tutorials"
+      },
+      "platforms": [
+        {
+          "name": "Dwenguino",
+          "architecture": "avr",
+          "version": "2.1.0",
+          "category": "Contributed",
+          "help": {
+            "online": "http://www.dwengo.org/tutorials"
+          },
+          "url": "http://www.dwengo.org/sites/default/files/Dwenguino.zip",
+          "archiveFileName": "Dwenguino.zip",
+          "checksum": "SHA-256:18FDB829D8591C0B656DFBAA03F775266ECFAD5CBB99203B942CA82A1D526B19",
+          "size": "254686",
+          "boards": [
+            {"name": "Dwenguino"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino5"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
+            }
+          ]
+        },
+        {
+          "name": "Dwenguino",
+          "architecture": "avr",
+          "version": "2.2.1",
+          "category": "Contributed",
+          "help": {
+            "online": "http://www.dwengo.org/tutorials"
+          },
+          "url": "http://www.dwengo.org/sites/default/files/Dwenguino-2.2.1.zip",
+          "archiveFileName": "Dwenguino-2.2.1.zip",
+          "checksum": "SHA-256:60e42e6416e7c5b9e20d1edbbf8f93e86fa0d521249f649b3434bcc8185421da",
+          "size": "333520",
+          "boards": [
+            {"name": "Dwenguino"}
+          ],
+          "toolsDependencies": []
+        }
+      ],
+      "tools":[]
+    }
+  ]
+}
