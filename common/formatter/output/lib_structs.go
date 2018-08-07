@@ -89,14 +89,6 @@ func (lsr LibSearchResults) String() string {
 	return strings.TrimSpace(ret)
 }
 
-// func (r *Release) Dump() string {
-// 	return fmt.Sprintln("  Release: "+fmt.Sprint(r.Version)) +
-// 		fmt.Sprintln("    URL: "+r.Resource.URL) +
-// 		fmt.Sprintln("    ArchiveFileName: "+r.Resource.ArchiveFileName) +
-// 		fmt.Sprintln("    Size: ", r.Resource.Size) +
-// 		fmt.Sprintln("    Checksum: ", r.Resource.Checksum)
-// }
-
 // Results returns a set of generic results, to allow them to be modified externally.
 //
 // -> ProcessResults interface.
