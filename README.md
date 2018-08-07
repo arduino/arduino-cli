@@ -36,7 +36,7 @@ The command will create a new empty sketch named MyFirstSketch in the default di
     $ arduino-cli sketch new MyFirstSketch
     Sketch created in: /home/luca/Arduino/MyFirstSketch
 
-    $ cat /home/luca/Arduino/MyFirstSketch/MyFirstSketch.ino 
+    $ cat /home/luca/Arduino/MyFirstSketch/MyFirstSketch.ino
     void setup() {
     }
 
@@ -48,17 +48,23 @@ Use your favourite file editor or IDE to modify the .ino file under: `$HOME/Ardu
 and change the file to look like this one:
 
     void setup() {
-    pinMode(LED_BUILTIN, OUTPUT);
+      pinMode(LED_BUILTIN, OUTPUT);
     }
+
     void loop() {
-      digitalWrite(LED_BUILTIN, HIGH);   
-      delay(1000);                       
-      digitalWrite(LED_BUILTIN, LOW);    
-      delay(1000);                  
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(1000);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(1000);
     }
 
 ### Step 3. Connect the board to your PC
-Just connect the board to your PCs by using the USB cable. In this example we will use the MKR1000 board.
+If you are running a fresh install of the arduino-cli you probably need to update the platform indexes by running:
+
+    $ arduino-cli core update-index
+    Updating index: package_index.json downloaded
+
+Now, just connect the board to your PCs by using the USB cable. In this example we will use the MKR1000 board.
 
     $ arduino-cli board list
     FQBN    Port            ID              Board Name
@@ -73,57 +79,65 @@ We have to look at the core available with the `core search` command. It will pr
     $ arduino-cli core search arduino
     Searching for platforms matching 'arduino'
 
-    ID              Version Installed       Name                                        
-    Intel:arc32     2.0.2   No              Intel Curie Boards                          
-    arduino:avr     1.6.21  No              Arduino AVR Boards                          
-    arduino:nrf52   1.0.2   No              Arduino nRF52 Boards                        
-    arduino:sam     1.6.11  No              Arduino SAM Boards (32-bits ARM Cortex-M3)  
+    ID              Version Installed       Name
+    Intel:arc32     2.0.2   No              Intel Curie Boards
+    arduino:avr     1.6.21  No              Arduino AVR Boards
+    arduino:nrf52   1.0.2   No              Arduino nRF52 Boards
+    arduino:sam     1.6.11  No              Arduino SAM Boards (32-bits ARM Cortex-M3)
     arduino:samd    1.6.18  No              Arduino SAMD Boards (32-bits ARM Cortex-M0+)
-    arduino:stm32f4 1.0.1   No              Arduino STM32F4 Boards                      
-    littleBits:avr  1.0.0   No              littleBits Arduino AVR Modules  
+    arduino:stm32f4 1.0.1   No              Arduino STM32F4 Boards
+    littleBits:avr  1.0.0   No              littleBits Arduino AVR Modules
 
-The right one for the Arduino MKR1000 is arduino:samd, now we can install it
+If you're unsure you can try to refine the search with the board name
+
+    $ arduino-cli core search mkr1000
+    Searching for platforms matching 'mkr1000'
+
+    ID              Version Installed   Name
+    arduino:samd    1.6.19  No          Arduino SAMD Boards (32-bits ARM Cortex-M0+)
+
+So, the right platform for the Arduino MKR1000 is arduino:samd, now we can install it
 
     $ arduino-cli core install arduino:samd
     Downloading tools...
-    arduino:arm-none-eabi-gcc@4.8.3-2014q1 downloaded          
+    arduino:arm-none-eabi-gcc@4.8.3-2014q1 downloaded
     arduino:bossac@1.7.0 downloaded
-    arduino:openocd@0.9.0-arduino6-static downloaded              
-    arduino:CMSIS@4.5.0 downloaded                   
-    arduino:CMSIS-Atmel@1.1.0 downloaded                    
-    arduino:arduinoOTA@1.2.0 downloaded                        
+    arduino:openocd@0.9.0-arduino6-static downloaded
+    arduino:CMSIS@4.5.0 downloaded
+    arduino:CMSIS-Atmel@1.1.0 downloaded
+    arduino:arduinoOTA@1.2.0 downloaded
     Downloading cores...
-    arduino:samd@1.6.18 downloaded                          
+    arduino:samd@1.6.19 downloaded
     Installing tools...
     Installing platforms...
     Results:
-    arduino:samd@1.6.18 - Installed
-    arduino:arm-none-eabi-gcc@4.8.3-2014q1 - Already Installed
-    arduino:bossac@1.7.0 - Already Installed
-    arduino:openocd@0.9.0-arduino6-static - Already Installed
-    arduino:CMSIS@4.5.0 - Already Installed
-    arduino:CMSIS-Atmel@1.1.0 - Already Installed
-    arduino:arduinoOTA@1.2.0 - Already Installed
+    arduino:samd@1.6.19 - Installed
+    arduino:arm-none-eabi-gcc@4.8.3-2014q1 - Installed
+    arduino:bossac@1.7.0 - Installed
+    arduino:openocd@0.9.0-arduino6-static - Installed
+    arduino:CMSIS@4.5.0 - Installed
+    arduino:CMSIS-Atmel@1.1.0 - Installed
+    arduino:arduinoOTA@1.2.0 - Installed
 
 Now verify we have installed the core properly by running
 
     $ arduino-cli core list
-    ID              Installed       Latest  Name                                        
-    arduino:samd    1.6.18          1.6.18  Arduino SAMD Boards (32-bits ARM Cortex-M0+)
+    ID              Installed       Latest  Name
+    arduino:samd    1.6.19          1.6.19  Arduino SAMD Boards (32-bits ARM Cortex-M0+)
 
 
 We can finally chek if the board is now recognized as a MKR1000
 
     $ arduino-cli board list
-    FQBN                    Port            ID              Board Name             
+    FQBN                    Port            ID              Board Name
     arduino:samd:mkr1000    /dev/ttyACM0    2341:804E       Arduino/Genuino MKR1000
-  
+
 Great! Now the Board FQBN (Fully Qualified Board Name) and the Board Name look good, we are ready to compile and upload the sketch
 
 ### Step 5. Compile the sketch
 To compile the sketch we have to run the `compile` command with the proper FQBN we just got in the previous command.
 
-    arduino-cli compile --fqbn arduino:samd:mkr1000 Arduino/MyFirstSketch
+    $ arduino-cli compile --fqbn arduino:samd:mkr1000 Arduino/MyFirstSketch
     Sketch uses 9600 bytes (3%) of program storage space. Maximum is 262144 bytes.
 
 ### Step 6. Upload your sketch
@@ -190,7 +204,7 @@ We are now ready to install it! Please be sure to use the full name of the lib a
 
     $ arduino-cli lib install "WiFi101"
     Downloading libraries...
-    WiFi101@0.15.2 downloaded                                                                                                                                                                                                                                                                            
+    WiFi101@0.15.2 downloaded
     Installed WiFi101@0.15.2
 
 ## Inline Help
@@ -213,11 +227,8 @@ Available Commands:
   core          Arduino Core operations.
   help          Help about any command
   lib           Arduino commands about libraries.
-  login         Creates default credentials for an Arduino Create Session.
-  logout        Clears credentials for the Arduino Create Session.
   sketch        Arduino CLI Sketch Commands.
   upload        Upload Arduino sketches.
-  validate      Validates Arduino installation.
   version       Shows version number of arduino CLI.
 ....
 ```
