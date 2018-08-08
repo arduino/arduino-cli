@@ -20,8 +20,8 @@ package librariesindex
 import (
 	"sort"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
-	"github.com/bcmi-labs/arduino-cli/arduino/resources"
+	"github.com/arduino/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/resources"
 	"go.bug.st/relaxed-semver"
 )
 

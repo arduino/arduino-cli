@@ -33,7 +33,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-builder/types"
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/libraries"
 )
 
 func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {

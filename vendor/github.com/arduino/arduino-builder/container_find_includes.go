@@ -117,8 +117,8 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/go-paths-helper"
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 
 	"github.com/go-errors/errors"
 )

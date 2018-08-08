@@ -24,14 +24,14 @@ import (
 
 	"github.com/arduino/go-paths-helper"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/bcmi-labs/arduino-cli/arduino/sketches"
-	"github.com/bcmi-labs/arduino-cli/configs"
+	"github.com/arduino/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/arduino/sketches"
+	"github.com/arduino/arduino-cli/configs"
 	sk "github.com/bcmi-labs/arduino-modules/sketches"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 )
 

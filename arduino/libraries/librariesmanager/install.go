@@ -20,13 +20,11 @@ package librariesmanager
 import (
 	"fmt"
 
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
-
+	"github.com/arduino/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/arduino/utils"
+	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/go-paths-helper"
-
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/bcmi-labs/arduino-cli/arduino/utils"
 )
 
 // Install installs a library and returns the installed path.

@@ -21,15 +21,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
-
-	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/codeclysm/cc"
-
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/common/formatter/output"
 	"github.com/arduino/board-discovery"
+	"github.com/codeclysm/cc"
 	"github.com/spf13/cobra"
 )
 

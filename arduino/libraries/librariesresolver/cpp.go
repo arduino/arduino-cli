@@ -22,9 +22,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/bcmi-labs/arduino-cli/arduino/utils"
+	"github.com/arduino/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/sirupsen/logrus"
 )
 

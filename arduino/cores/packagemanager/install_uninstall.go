@@ -20,7 +20,7 @@ package packagemanager
 import (
 	"fmt"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/cores"
 )
 
 // InstallPlatform installs a specific release of a platform.

@@ -18,9 +18,9 @@
 package version
 
 import (
-	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
+	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

@@ -15,8 +15,8 @@
     "types",
     "utils"
   ]
-  revision = "beb2ff2b4213fed28dc055246cc676d2ea7e2900"
-  source = "github.com/bcmi-labs/arduino-builder"
+  revision = "e8663728752c05c46381b799e0bc49ba41354a85"
+  source = "github.com/arduino/arduino-builder"
 
 [[projects]]
   branch = "master"
@@ -449,6 +449,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "08a2f335611e537e2d436d415177f4fa2f78cdcd828353a28c290259ea83aab7"
+  inputs-digest = "8808a3b4fe7d849b8c6e17a006ab0daf0d660e2b2e3412089fd09a1d66dc7538"
   solver-name = "gps-cdcl"
   solver-version = 1

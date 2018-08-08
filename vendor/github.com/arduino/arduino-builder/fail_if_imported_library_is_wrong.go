@@ -33,7 +33,7 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/libraries"
 )
 
 type FailIfImportedLibraryIsWrong struct{}

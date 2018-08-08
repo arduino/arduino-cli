@@ -24,18 +24,16 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
-
-	"github.com/arduino/go-paths-helper"
-
 	builder "github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
+	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/common/formatter/output"
+	"github.com/arduino/arduino-cli/configs"
+	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-map"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores"
-	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/configs"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

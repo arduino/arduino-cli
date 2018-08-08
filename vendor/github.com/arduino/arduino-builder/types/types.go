@@ -33,8 +33,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/go-paths-helper"
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
 type SourceFile struct {

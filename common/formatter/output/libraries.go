@@ -21,11 +21,10 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
-	semver "go.bug.st/relaxed-semver"
-
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/gosuri/uitable"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // InstalledLibraries is a list of installed libraries

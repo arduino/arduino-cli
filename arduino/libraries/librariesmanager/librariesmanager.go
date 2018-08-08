@@ -21,14 +21,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores"
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/pmylund/sortutil"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
-
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
-	"github.com/pmylund/sortutil"
 )
 
 // LibrariesManager keeps the current status of the libraries in the system

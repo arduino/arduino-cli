@@ -23,9 +23,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/resources"
-	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/arduino/resources"
+	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

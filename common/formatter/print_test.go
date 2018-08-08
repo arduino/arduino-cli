@@ -20,7 +20,7 @@ package formatter_test
 import (
 	"fmt"
 
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/common/formatter"
 )
 
 type ExType struct {

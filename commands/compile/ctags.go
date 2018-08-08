@@ -18,9 +18,9 @@
 package compile
 
 import (
-	"github.com/bcmi-labs/arduino-cli/arduino/cores"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
-	"github.com/bcmi-labs/arduino-cli/arduino/resources"
+	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/resources"
 	"go.bug.st/relaxed-semver"
 )
 

@@ -20,7 +20,7 @@ package librariesresolver
 import (
 	"testing"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/stretchr/testify/require"
 )
 

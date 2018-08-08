@@ -24,10 +24,10 @@ import (
 	"path"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-map"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores/packageindex"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/relaxed-semver"
 )

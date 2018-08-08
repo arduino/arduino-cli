@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/cores"
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
+	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/common/formatter/output"
 	"github.com/cavaliercoder/grab"
 	"go.bug.st/relaxed-semver"
 )

@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 )
 
 // VersionResult represents the output of the version commands.

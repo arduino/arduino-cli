@@ -25,8 +25,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/arduino/arduino-cli/commands/root"
 	"github.com/arduino/go-paths-helper"
-	"github.com/bcmi-labs/arduino-cli/commands/root"
 	"github.com/bouk/monkey"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

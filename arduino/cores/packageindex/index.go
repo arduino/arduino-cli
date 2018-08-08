@@ -21,9 +21,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/go-paths-helper"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores"
-	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 	"go.bug.st/relaxed-semver"
 )
 

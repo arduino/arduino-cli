@@ -22,8 +22,8 @@ import (
 
 	"github.com/arduino/go-paths-helper"
 
+	"github.com/arduino/arduino-cli/arduino/resources"
 	properties "github.com/arduino/go-properties-map"
-	"github.com/bcmi-labs/arduino-cli/arduino/resources"
 	"go.bug.st/relaxed-semver"
 )
 

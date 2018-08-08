@@ -28,13 +28,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/arduino-cli/auth"
+	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/common/formatter/output"
+	"github.com/arduino/arduino-cli/create_client_helpers"
 	"github.com/arduino/go-paths-helper"
-
-	"github.com/bcmi-labs/arduino-cli/auth"
-	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
-	"github.com/bcmi-labs/arduino-cli/common/formatter/output"
-	"github.com/bcmi-labs/arduino-cli/create_client_helpers"
 	"github.com/bcmi-labs/arduino-modules/sketches"
 	"github.com/bgentry/go-netrc/netrc"
 	"github.com/briandowns/spinner"

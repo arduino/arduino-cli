@@ -20,9 +20,9 @@ package main
 import (
 	"os"
 
-	"github.com/bcmi-labs/arduino-cli/commands"
-	"github.com/bcmi-labs/arduino-cli/commands/root"
-	"github.com/bcmi-labs/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/root"
+	"github.com/arduino/arduino-cli/common/formatter"
 )
 
 func main() {

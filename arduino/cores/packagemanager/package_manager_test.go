@@ -20,8 +20,8 @@ package packagemanager_test
 import (
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/go-paths-helper"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
 	"github.com/stretchr/testify/require"
 )
 

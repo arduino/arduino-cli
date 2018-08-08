@@ -3,15 +3,14 @@ package types
 import (
 	"strings"
 
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesresolver"
-
 	"github.com/arduino/arduino-builder/i18n"
+	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-map"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores/packagemanager"
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries"
 )
 
 type ProgressStruct struct {

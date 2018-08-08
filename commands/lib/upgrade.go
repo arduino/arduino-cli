@@ -18,8 +18,8 @@
 package lib
 
 import (
-	"github.com/bcmi-labs/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

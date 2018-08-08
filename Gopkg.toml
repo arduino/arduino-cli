@@ -28,7 +28,7 @@
 [[constraint]]
   name = "github.com/arduino/arduino-builder"
   branch = "cli-inception"
-  source = "github.com/bcmi-labs/arduino-builder"
+  source = "github.com/arduino/arduino-builder"
 
 [[constraint]]
   branch = "master"

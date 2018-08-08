@@ -18,7 +18,7 @@
 package sketch
 
 import (
-	"github.com/bcmi-labs/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/spf13/cobra"
 )
 

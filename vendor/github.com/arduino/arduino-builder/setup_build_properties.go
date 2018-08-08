@@ -38,9 +38,9 @@ import (
 
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/go-properties-map"
 	"github.com/arduino/go-timeutils"
-	"github.com/bcmi-labs/arduino-cli/arduino/cores"
 )
 
 type SetupBuildProperties struct{}
