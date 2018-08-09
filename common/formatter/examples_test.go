@@ -61,7 +61,7 @@ func ExampleJSONFormatter_Format() {
 	//  float32 ignored
 }
 
-func ExampleJSONFormatter_Print_debug() {
+func ExampleJSONFormatter_Format_debug() {
 	valid := TestStruct{20}
 	invalid := "invalid"
 	jf := formatter.JSONFormatter{
@@ -91,7 +91,7 @@ func ExampleJSONFormatter_Print_debug() {
 	// {"value2":10} <nil>
 }
 
-func ExampleFormat() {
+func ExampleSetFormatter() {
 	formatter.SetFormatter("text")
 	fmt.Println(formatter.Format(TestStruct{5}))
 	formatter.SetFormatter("json")
