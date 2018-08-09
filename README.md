@@ -17,7 +17,7 @@ This is not yet available until the first stable version is released.
 ### Build from source
 
 * You should have a recent Go compiler installed.
-* Run `go get -u github.com/bcmi-labs/arduino-cli`
+* Run `go get -u github.com/arduino/arduino-cli`
 * The `arduino-cli` executable will be produced in `$GOPATH/bin/arduino-cli`
 
 You may want to copy the executable into a directory which is in your `PATH` environment variable
@@ -255,7 +255,7 @@ Flags:
   -h, --help   help for core
 
 Global Flags:
-      --config-file string   The custom config file (if not specified ./.cli-config.yml will be used). (default "/home/megabug/Workspace/go/src/github.com/bcmi-labs/arduino-cli/.cli-config.yml")
+      --config-file string   The custom config file (if not specified ./.cli-config.yml will be used). (default "/home/megabug/Workspace/go/src/github.com/arduino/arduino-cli/.cli-config.yml")
       --debug                Enables debug output (super verbose, used to debug the CLI).
       --format string        The output format, can be [text|json]. (default "text")
 
