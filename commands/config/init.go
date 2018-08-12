@@ -57,7 +57,6 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 			formatter.PrintErrorMessage("The interactive mode is supported only in text mode.")
 			os.Exit(commands.ErrBadCall)
 		}
-		configsFromQuestions()
 	}
 
 	filepath := initFlags.location
@@ -71,12 +70,4 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	}
 	formatter.PrintResult("Config file PATH: " + filepath)
 	logrus.Info("Done")
-}
-
-// FIXME: is this any useful?
-// ConfigsFromQuestions asks some questions to the user to properly initialize configs.
-// It does not have much sense to use it in JSON formatting, though.
-func configsFromQuestions() {
-	//logrus.Info("Asking questions to the user to populate configuration")
-	// Set of questions here.
 }
