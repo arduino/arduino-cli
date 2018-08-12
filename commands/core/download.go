@@ -20,6 +20,7 @@ package core
 import (
 	"os"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
@@ -45,13 +46,15 @@ func initDownloadCommand() *cobra.Command {
 func runDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
-	pm := commands.InitPackageManager()
 	platformsRefs := parsePlatformReferenceArgs(args)
-	downloadPlatforms(pm, platformsRefs)
+	pm := commands.InitPackageManager()
+	for _, platformRef := range platformsRefs {
+		downloadPlatformByRef(pm, platformRef)
+	}
 }
 
-func downloadPlatforms(pm *packagemanager.PackageManager, platformsRefs []packagemanager.PlatformReference) {
-	platforms, tools, err := pm.FindItemsToDownload(platformsRefs)
+func downloadPlatformByRef(pm *packagemanager.PackageManager, platformsRef *packagemanager.PlatformReference) {
+	platform, tools, err := pm.FindPlatformReleaseDependencies(platformsRef)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
 		os.Exit(commands.ErrBadCall)
@@ -66,20 +69,22 @@ func downloadPlatforms(pm *packagemanager.PackageManager, platformsRefs []packag
 	}
 
 	// Download tools
-	formatter.Print("Downloading tools...")
 	for _, tool := range tools {
-		resp, err := pm.DownloadToolRelease(tool)
-		download(resp, err, tool.String())
+		DownloadToolRelease(pm, tool)
 	}
 
 	// Download cores
-	formatter.Print("Downloading cores...")
-	for _, platform := range platforms {
-		resp, err := pm.DownloadPlatformRelease(platform)
-		download(resp, err, platform.String())
-	}
+	resp, err := pm.DownloadPlatformRelease(platform)
+	download(resp, err, platform.String())
 
 	logrus.Info("Done")
+}
+
+// DownloadToolRelease downloads a ToolRelease
+func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) {
+	formatter.Print("Downloading " + toolRelease.String() + "...")
+	resp, err := pm.DownloadToolRelease(toolRelease)
+	download(resp, err, toolRelease.String())
 }
 
 func download(resp *grab.Response, err error, label string) {

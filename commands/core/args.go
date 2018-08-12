@@ -29,8 +29,8 @@ import (
 )
 
 // parsePlatformReferenceArgs parses a sequence of "packager:arch@version" tokens and returns a platformReference slice.
-func parsePlatformReferenceArgs(args []string) []packagemanager.PlatformReference {
-	ret := []packagemanager.PlatformReference{}
+func parsePlatformReferenceArgs(args []string) []*packagemanager.PlatformReference {
+	ret := []*packagemanager.PlatformReference{}
 
 	for _, arg := range args {
 		var version *semver.Version
@@ -48,7 +48,7 @@ func parsePlatformReferenceArgs(args []string) []packagemanager.PlatformReferenc
 			formatter.PrintErrorMessage(fmt.Sprintf("'%s' is an invalid item (does not match the syntax 'PACKAGER:ARCH[@VERSION]')", arg))
 			os.Exit(commands.ErrBadArgument)
 		}
-		ret = append(ret, packagemanager.PlatformReference{
+		ret = append(ret, &packagemanager.PlatformReference{
 			Package:              split[0],
 			PlatformArchitecture: split[1],
 			PlatformVersion:      version,

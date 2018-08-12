@@ -29,8 +29,8 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/common/formatter/output"
 	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-map"
@@ -108,24 +108,9 @@ func run(cmd *cobra.Command, args []string) {
 	loadBuiltinCtagsMetadata(pm)
 	ctags, err := getBuiltinCtagsTool(pm)
 	if !ctags.IsInstalled() {
-		formatter.Print("Downloading missing tool: " + ctags.String())
-		resp, err := pm.DownloadToolRelease(ctags)
-		if err != nil {
-			formatter.PrintError(err, "Error downloading ctags")
-			os.Exit(commands.ErrNetwork)
-		}
-		formatter.DownloadProgressBar(resp, ctags.String())
-		if resp.Err() != nil {
-			formatter.PrintError(resp.Err(), "Error downloading ctags")
-			os.Exit(commands.ErrNetwork)
-		}
-		formatter.Print("Installing " + ctags.String())
-		res := &output.CoreProcessResults{Tools: map[string]output.ProcessResult{}}
-		if err := pm.InstallToolReleases([]*cores.ToolRelease{ctags}, res); err != nil {
-			formatter.PrintError(err, "Error installing ctags")
-			formatter.PrintErrorMessage("Missing ctags tool.")
-			os.Exit(commands.ErrCoreConfig)
-		}
+		formatter.Print("Downloading and installing missing tool: " + ctags.String())
+		core.DownloadToolRelease(pm, ctags)
+		core.InstallToolRelease(pm, ctags)
 
 		if err := pm.LoadHardware(commands.Config); err != nil {
 			formatter.PrintError(err, "Could not load hardware packages.")

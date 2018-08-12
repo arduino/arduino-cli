@@ -20,9 +20,10 @@ package core
 import (
 	"os"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -44,37 +45,68 @@ func initInstallCommand() *cobra.Command {
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
-	pm := commands.InitPackageManager()
 	platformsRefs := parsePlatformReferenceArgs(args)
-	downloadPlatforms(pm, platformsRefs)
+	pm := commands.InitPackageManager()
 
-	platforms, tools, err := pm.FindItemsToDownload(platformsRefs)
+	for _, platformRef := range platformsRefs {
+		downloadPlatformByRef(pm, platformRef)
+		installPlatformByRef(pm, platformRef)
+	}
+}
+
+func installPlatformByRef(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference) {
+	platform, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
 		os.Exit(commands.ErrBadCall)
 	}
 
-	outputResults := output.CoreProcessResults{
-		Cores: map[string]output.ProcessResult{},
-		Tools: map[string]output.ProcessResult{},
+	for _, tool := range tools {
+		InstallToolRelease(pm, tool)
 	}
+	installPlatformRelease(pm, platform)
+}
 
-	logrus.Info("Installing tools")
-	formatter.Print("Installing tools...")
+func installPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) {
+	log := pm.Log.WithField("platform", platformRelease)
 
-	if err := pm.InstallToolReleases(tools, &outputResults); err != nil {
-		formatter.PrintError(err, "Error installing tools.")
+	log.Info("Installing platform")
+	formatter.Print("Installing " + platformRelease.String() + "...")
+
+	err := pm.InstallPlatform(platformRelease)
+	if os.IsExist(err) {
+		log.Warn("Platform already installed")
+		formatter.Print("Platform " + platformRelease.String() + " already installed")
+		return
+	}
+	if err != nil {
+		log.WithError(err).Error("Cannot install platform")
 		os.Exit(commands.ErrGeneric)
 	}
 
-	logrus.Info("Installing cores")
-	formatter.Print("Installing platforms...")
-	if err := pm.InstallPlatformReleases(platforms, &outputResults); err != nil {
-		formatter.PrintError(err, "Error installing platform.")
+	log.Info("Platform installed")
+	formatter.Print(platformRelease.String() + " installed")
+}
+
+// InstallToolRelease installs a ToolRelease
+func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) {
+	log := pm.Log.WithField("Tool", toolRelease)
+
+	log.Info("Installing tool")
+	formatter.Print("Installing " + toolRelease.String())
+
+	err := pm.InstallTool(toolRelease)
+	if os.IsExist(err) {
+		log.Warn("Tool already installed")
+		formatter.Print("Tool " + toolRelease.String() + " already installed")
+		return
+	}
+	if err != nil {
+		log.WithError(err).Warn("Cannot install tool")
+		formatter.PrintError(err, "Cannot install tool: "+toolRelease.String())
 		os.Exit(commands.ErrGeneric)
 	}
 
-	formatter.Print("Results:")
-	formatter.Print(outputResults)
-	logrus.Info("Done")
+	log.Info("Tool installed")
+	formatter.Print(toolRelease.String() + " installed")
 }

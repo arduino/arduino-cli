@@ -312,7 +312,7 @@ func detectLatestAVRCore(t *testing.T) string {
 	return latest.String()
 }
 
-func TestCoreDownload(t *testing.T) {
+func TestCoreCommands(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
 
@@ -358,7 +358,7 @@ func TestCoreDownload(t *testing.T) {
 	// Install avr
 	exitCode, d = executeWithArgs(t, "core", "install", "arduino:avr")
 	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), AVR+" - Installed")
+	require.Contains(t, string(d), AVR+" installed")
 
 	exitCode, d = executeWithArgs(t, "core", "list")
 	require.Zero(t, exitCode, "exit code")
