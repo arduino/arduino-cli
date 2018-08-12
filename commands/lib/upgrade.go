@@ -30,7 +30,7 @@ func initUpgradeCommand() *cobra.Command {
 		Short: "Upgrades installed libraries.",
 		Long: "This command ungrades all installed libraries to the latest available version." +
 			"To upgrade a single library use the 'install' command.",
-		Example: "arduino lib upgrade",
+		Example: "  " + commands.AppName + " lib upgrade",
 		Args:    cobra.NoArgs,
 		Run:     runUpgradeCommand,
 	}

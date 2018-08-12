@@ -32,8 +32,10 @@ func initInitCommand() *cobra.Command {
 		Short: "Initializes a new config file into the default location.",
 		Long:  "Initializes a new config file into the default location ($EXE_DIR/cli-config.yml).",
 		Example: "" +
-			"arduino config init           # Creates a config file by asking questions to the user into the default location.\n" +
-			"arduino config init --default # Creates a config file with default configuration into default location.",
+			"  # Creates a config file by asking questions to the user into the default location.\n" +
+			"  " + commands.AppName + " config init\n\n" +
+			"  # Creates a config file with default configuration into default location.\n" +
+			"  " + commands.AppName + " config init --default\n",
 		Args: cobra.NoArgs,
 		Run:  runInitCommand,
 	}

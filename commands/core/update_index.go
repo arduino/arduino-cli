@@ -37,7 +37,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Use:     "update-index",
 		Short:   "Updates the index of cores.",
 		Long:    "Updates the index of cores to the latest version.",
-		Example: "arduino core update-index",
+		Example: "  " + commands.AppName + " core update-index",
 		Args:    cobra.NoArgs,
 		Run:     runUpdateIndexCommand,
 	}

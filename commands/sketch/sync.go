@@ -53,7 +53,7 @@ func initSyncCommand() *cobra.Command {
 		Use:     "sync",
 		Short:   "Arduino CLI Sketch Commands.",
 		Long:    "Arduino CLI Sketch Commands.",
-		Example: "arduino sketch sync",
+		Example: "  " + commands.AppName + " sketch sync",
 		Args:    cobra.NoArgs,
 		Run:     runSyncCommand,
 	}

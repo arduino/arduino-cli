@@ -29,7 +29,7 @@ import (
 
 func initInstallCommand() *cobra.Command {
 	installCommand := &cobra.Command{
-		Use:   "install [PACKAGER:ARCH[=VERSION]](S)",
+		Use:   "install PACKAGER:ARCH[@VERSION] ...",
 		Short: "Installs one or more cores and corresponding tool dependencies.",
 		Long:  "Installs one or more cores and corresponding tool dependencies.",
 		Example: "" +

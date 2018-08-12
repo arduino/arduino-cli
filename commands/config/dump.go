@@ -32,7 +32,7 @@ func initDumpCommand() *cobra.Command {
 		Use:     "dump",
 		Short:   "Prints the current configuration",
 		Long:    "Prints the current configuration.",
-		Example: "arduino config dump",
+		Example: "  " + commands.AppName + " config dump",
 		Args:    cobra.NoArgs,
 		Run:     runDumpCommand,
 	}

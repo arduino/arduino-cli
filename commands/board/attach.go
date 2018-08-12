@@ -41,8 +41,8 @@ func initAttachCommand() *cobra.Command {
 		Short: "Attaches a sketch to a board.",
 		Long:  "Attaches a sketch to a board.",
 		Example: "arduino board attach serial:///dev/tty/ACM0\n" +
-			"arduino board attach serial:///dev/tty/ACM0 HelloWorld\n" +
-			"arduino board attach arduino:samd:mkr1000",
+			"  " + commands.AppName + " board attach serial:///dev/tty/ACM0 HelloWorld\n" +
+			"  " + commands.AppName + " board attach arduino:samd:mkr1000",
 		Args: cobra.RangeArgs(1, 2),
 		Run:  runAttachCommand,
 	}

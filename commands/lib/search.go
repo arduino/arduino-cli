@@ -34,7 +34,7 @@ func initSearchCommand() *cobra.Command {
 		Use:     "search [LIBRARY_NAME]",
 		Short:   "Searchs for one or more libraries data.",
 		Long:    "Search for one or more libraries data (case insensitive search).",
-		Example: "arduino lib search audio",
+		Example: "  " + commands.AppName + " lib search audio",
 		Args:    cobra.ArbitraryArgs,
 		Run:     runSearchCommand,
 	}

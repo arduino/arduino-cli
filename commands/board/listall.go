@@ -31,7 +31,7 @@ func initListAllCommand() *cobra.Command {
 		Use:     "listall",
 		Short:   "List all known boards.",
 		Long:    "List all boards that have the support platform installed.",
-		Example: "arduino board listall",
+		Example: "  " + commands.AppName + " board listall",
 		Args:    cobra.NoArgs,
 		Run:     runListAllCommand,
 	}

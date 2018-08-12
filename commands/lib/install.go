@@ -34,8 +34,8 @@ func initInstallCommand() *cobra.Command {
 		Short: "Installs one of more specified libraries into the system.",
 		Long:  "Installs one or more specified libraries into the system.",
 		Example: "" +
-			"arduino lib install AudioZero       # for the latest version.\n" +
-			"arduino lib install AudioZero@1.0.0 # for the specific version.",
+			"  " + commands.AppName + " lib install AudioZero       # for the latest version.\n" +
+			"  " + commands.AppName + " lib install AudioZero@1.0.0 # for the specific version.",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}

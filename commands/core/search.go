@@ -32,7 +32,7 @@ func initSearchCommand() *cobra.Command {
 		Use:     "search <keywords...>",
 		Short:   "Search for a core in the package index.",
 		Long:    "Search for a core in the package index using the specified keywords.",
-		Example: "arduino core search MKRZero -v",
+		Example: "  " + commands.AppName + " core search MKRZero -v",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runSearchCommand,
 	}

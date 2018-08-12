@@ -35,8 +35,8 @@ func initListCommand() *cobra.Command {
 		Long: "Shows a list of all installed libraries.\n" +
 			"Can be used with -v (or --verbose) flag (up to 2 times) to have longer output.",
 		Example: "" +
-			"arduino lib list    # to show all installed library names.\n" +
-			"arduino lib list -v # to show more details.",
+			"  " + commands.AppName + " lib list    # to show all installed library names.\n" +
+			"  " + commands.AppName + " lib list -v # to show more details.",
 		Args: cobra.NoArgs,
 		Run:  runListCommand,
 	}

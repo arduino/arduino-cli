@@ -45,7 +45,7 @@ func Init() *cobra.Command {
 		Use:              "arduino-cli",
 		Short:            "Arduino CLI.",
 		Long:             "Arduino Command Line Interface (arduino-cli).",
-		Example:          "arduino <command> [flags...]",
+		Example:          "  " + commands.AppName + " <command> [flags...]",
 		PersistentPreRun: preRun,
 	}
 	command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")

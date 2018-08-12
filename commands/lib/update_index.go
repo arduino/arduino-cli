@@ -27,7 +27,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Use:     "update-index",
 		Short:   "Updates the libraries index.",
 		Long:    "Updates the libraries index to the latest version.",
-		Example: "arduino lib update-index",
+		Example: "  " + commands.AppName + " lib update-index",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			lm := commands.InitLibraryManager(nil)

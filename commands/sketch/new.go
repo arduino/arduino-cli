@@ -30,7 +30,7 @@ func initNewCommand() *cobra.Command {
 		Use:     "new",
 		Short:   "Create a new Sketch",
 		Long:    "Create a new Sketch",
-		Example: "arduino sketch new MultiBlinker",
+		Example: "  " + commands.AppName + " sketch new MultiBlinker",
 		Args:    cobra.ExactArgs(1),
 		Run:     runNewCommand,
 	}
