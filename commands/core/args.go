@@ -22,37 +22,46 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
+
 	"github.com/arduino/arduino-cli/common/formatter"
+
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"go.bug.st/relaxed-semver"
 )
 
 // parsePlatformReferenceArgs parses a sequence of "packager:arch@version" tokens and returns a platformReference slice.
 func parsePlatformReferenceArgs(args []string) []*packagemanager.PlatformReference {
 	ret := []*packagemanager.PlatformReference{}
-
 	for _, arg := range args {
-		var version *semver.Version
-		if strings.Contains(arg, "@") {
-			split := strings.SplitN(arg, "@", 2)
-			arg = split[0]
-			if ver, err := semver.Parse(split[1]); err != nil {
-				formatter.PrintErrorMessage(fmt.Sprintf("invalid item '%s': %s", arg, err))
-			} else {
-				version = ver
-			}
-		}
-		split := strings.Split(arg, ":")
-		if len(split) != 2 {
-			formatter.PrintErrorMessage(fmt.Sprintf("'%s' is an invalid item (does not match the syntax 'PACKAGER:ARCH[@VERSION]')", arg))
+		reference, err := parsePlatformReferenceArg(arg)
+		if err != nil {
+			formatter.PrintError(err, "Invalid item "+arg)
 			os.Exit(commands.ErrBadArgument)
 		}
-		ret = append(ret, &packagemanager.PlatformReference{
-			Package:              split[0],
-			PlatformArchitecture: split[1],
-			PlatformVersion:      version,
-		})
+		ret = append(ret, reference)
 	}
 	return ret
+}
+
+func parsePlatformReferenceArg(arg string) (*packagemanager.PlatformReference, error) {
+	split := strings.SplitN(arg, "@", 2)
+	arg = split[0]
+	var version *semver.Version
+	if len(split) > 1 {
+		if ver, err := semver.Parse(split[1]); err == nil {
+			version = ver
+		} else {
+			return nil, fmt.Errorf("invalid version: %s", err)
+		}
+	}
+	split = strings.Split(arg, ":")
+	if len(split) != 2 {
+		return nil, fmt.Errorf("invalid item %s", arg)
+	}
+	return &packagemanager.PlatformReference{
+		Package:              split[0],
+		PlatformArchitecture: split[1],
+		PlatformVersion:      version,
+	}, nil
 }
