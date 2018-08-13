@@ -81,7 +81,7 @@ func InitPackageManager() *packagemanager.PackageManager {
 	for _, URL := range configs.BoardManagerAdditionalUrls {
 		if err := pm.LoadPackageIndex(URL); err != nil {
 			formatter.PrintError(err, "Failed to load "+URL.String()+" package index.\n"+
-				"Try updating all indexes with `arduino core update-index`.")
+				"Try updating all indexes with `"+AppName+" core update-index`.")
 			os.Exit(ErrCoreConfig)
 		}
 	}
