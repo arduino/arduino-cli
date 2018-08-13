@@ -33,6 +33,26 @@ func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease
 	return platformRelease.Resource.Install(pm.DownloadDir, pm.TempDir, destDir)
 }
 
+// UninstallPlatform remove a PlatformRelease.
+func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelease) error {
+	if platformRelease.InstallDir == nil {
+		return fmt.Errorf("platform not installed")
+	}
+
+	// Safety measure
+	if safe, err := platformRelease.InstallDir.IsInsideDir(pm.PackagesDir); err != nil {
+		return fmt.Errorf("checking if plaform is installed in data dir: %s", err)
+	} else if !safe {
+		return fmt.Errorf("platform is not installed inside data dir")
+	}
+
+	if err := platformRelease.InstallDir.RemoveAll(); err != nil {
+		return fmt.Errorf("removing platform files: %s", err)
+	}
+	platformRelease.InstallDir = nil
+	return nil
+}
+
 // InstallTool installs a specific release of a tool.
 func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease) error {
 	toolResource := toolRelease.GetCompatibleFlavour()
@@ -45,6 +65,26 @@ func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease) error {
 		toolRelease.Tool.Name,
 		toolRelease.Version.String())
 	return toolResource.Install(pm.DownloadDir, pm.TempDir, destDir)
+}
+
+// UninstallTool remove a ToolRelease.
+func (pm *PackageManager) UninstallTool(toolRelease *cores.ToolRelease) error {
+	if toolRelease.InstallDir == nil {
+		return fmt.Errorf("tool not installed")
+	}
+
+	// Safety measure
+	if safe, err := toolRelease.InstallDir.IsInsideDir(pm.PackagesDir); err != nil {
+		return fmt.Errorf("checking if tool is installed in data dir: %s", err)
+	} else if !safe {
+		return fmt.Errorf("tool is not installed inside data dir")
+	}
+
+	if err := toolRelease.InstallDir.RemoveAll(); err != nil {
+		return fmt.Errorf("removing tool files: %s", err)
+	}
+	toolRelease.InstallDir = nil
+	return nil
 }
 
 // IsToolRequired returns true if any of the installed platforms requires the toolRelease

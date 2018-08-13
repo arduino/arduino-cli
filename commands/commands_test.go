@@ -372,4 +372,14 @@ func TestCoreCommands(t *testing.T) {
 	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:uno", currSketchbookDir.Join("Test1").String())
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "Sketch uses")
+
+	// Uninstall arduino:avr
+	exitCode, d = executeWithArgs(t, "core", "uninstall", "arduino:avr")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), AVR+" uninstalled")
+
+	// Empty cores list
+	exitCode, d = executeWithArgs(t, "core", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.Empty(t, strings.TrimSpace(string(d)))
 }
