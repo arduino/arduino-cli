@@ -27,15 +27,19 @@ import (
 
 func initListCommand() *cobra.Command {
 	listCommand := &cobra.Command{
-		Use:   "list",
-		Short: "Shows the list of installed cores.",
-		Long: "Shows the list of installed cores.\n" +
-			"With -v tag (up to 2 times) can provide more verbose output.",
-		Example: "  " + commands.AppName + "core list -v # for a medium verbosity level.",
+		Use:     "list",
+		Short:   "Shows the list of installed platforms.",
+		Long:    "Shows the list of installed platforms.",
+		Example: "  " + commands.AppName + "core list",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}
+	listCommand.Flags().BoolVar(&listFlags.updatableOnly, "updatable", false, "List updatable platforms.")
 	return listCommand
+}
+
+var listFlags struct {
+	updatableOnly bool
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
@@ -47,6 +51,9 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	for _, targetPackage := range pm.GetPackages().Packages {
 		for _, platform := range targetPackage.Platforms {
 			if platformRelease := platform.GetInstalled(); platformRelease != nil {
+				if listFlags.updatableOnly && platform.GetLatestRelease() == platformRelease {
+					continue
+				}
 				res = append(res, platformRelease)
 			}
 		}
