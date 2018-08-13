@@ -30,15 +30,12 @@ import (
 
 func initListCommand() *cobra.Command {
 	listCommand := &cobra.Command{
-		Use:   "list",
-		Short: "Shows a list of all installed libraries.",
-		Long: "Shows a list of all installed libraries.\n" +
-			"Can be used with -v (or --verbose) flag (up to 2 times) to have longer output.",
-		Example: "" +
-			"  " + commands.AppName + " lib list    # to show all installed library names.\n" +
-			"  " + commands.AppName + " lib list -v # to show more details.",
-		Args: cobra.NoArgs,
-		Run:  runListCommand,
+		Use:     "list",
+		Short:   "Shows a list of all installed libraries.",
+		Long:    "Shows a list of all installed libraries.",
+		Example: "  " + commands.AppName + " lib list",
+		Args:    cobra.NoArgs,
+		Run:     runListCommand,
 	}
 	listCommand.Flags().BoolVar(&listFlags.all, "all", false, "Include built-in libraries (from platforms and IDE) in listing.")
 	listCommand.Flags().BoolVar(&listFlags.updatable, "updatable", false, "List updatable libraries.")
