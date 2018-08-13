@@ -74,6 +74,7 @@ func downloadPlatformByRef(pm *packagemanager.PackageManager, platformsRef *pack
 	}
 
 	// Download cores
+	formatter.Print("Downloading " + platform.String() + "...")
 	resp, err := pm.DownloadPlatformRelease(platform)
 	download(resp, err, platform.String())
 
