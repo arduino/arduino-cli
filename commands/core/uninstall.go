@@ -52,6 +52,21 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 }
 
 func uninstallPlatformByRef(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference) {
+	// If no version is specified consider the installed
+	if platformRef.PlatformVersion == nil {
+		platform := pm.FindPlatform(platformRef)
+		if platform == nil {
+			formatter.PrintErrorMessage("Platform not found " + platformRef.String())
+			os.Exit(commands.ErrBadCall)
+		}
+		platformRelease := platform.GetInstalled()
+		if platformRelease == nil {
+			formatter.PrintErrorMessage("Platform not installed " + platformRef.String())
+			os.Exit(commands.ErrBadCall)
+		}
+		platformRef.PlatformVersion = platformRelease.Version
+	}
+
 	platform, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")

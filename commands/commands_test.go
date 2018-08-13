@@ -355,12 +355,17 @@ func TestCoreCommands(t *testing.T) {
 	require.Zero(t, exitCode, "exit code")
 	require.Empty(t, strings.TrimSpace(string(d)))
 
-	// Install avr
-	exitCode, d = executeWithArgs(t, "core", "install", "arduino:avr")
+	// Install avr 1.6.16
+	exitCode, d = executeWithArgs(t, "core", "install", "arduino:avr@1.6.16")
 	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), AVR+" installed")
+	require.Contains(t, string(d), "arduino:avr@1.6.16 installed")
 
 	exitCode, d = executeWithArgs(t, "core", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "arduino:avr")
+
+	// List updatable cores
+	exitCode, d = executeWithArgs(t, "core", "list", "--updatable")
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "arduino:avr")
 
@@ -376,7 +381,7 @@ func TestCoreCommands(t *testing.T) {
 	// Uninstall arduino:avr
 	exitCode, d = executeWithArgs(t, "core", "uninstall", "arduino:avr")
 	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), AVR+" uninstalled")
+	require.Contains(t, string(d), "arduino:avr@1.6.16 uninstalled")
 
 	// Empty cores list
 	exitCode, d = executeWithArgs(t, "core", "list")
