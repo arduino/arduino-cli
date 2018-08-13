@@ -46,3 +46,19 @@ func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease) error {
 		toolRelease.Version.String())
 	return toolResource.Install(pm.DownloadDir, pm.TempDir, destDir)
 }
+
+// IsToolRequired returns true if any of the installed platforms requires the toolRelease
+// passed as parameter
+func (pm *PackageManager) IsToolRequired(toolRelease *cores.ToolRelease) bool {
+	// Search in all installed platforms
+	for _, targetPackage := range pm.packages.Packages {
+		for _, platform := range targetPackage.Platforms {
+			if platformRelease := platform.GetInstalled(); platformRelease != nil {
+				if platformRelease.RequiresToolRelease(toolRelease) {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}

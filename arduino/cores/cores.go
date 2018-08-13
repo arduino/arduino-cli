@@ -184,6 +184,19 @@ func (release *PlatformRelease) GetOrCreateBoard(boardID string) *Board {
 	return board
 }
 
+// RequiresToolRelease returns true if the PlatformRelease requires the
+// toolReleased passed as parameter
+func (release *PlatformRelease) RequiresToolRelease(toolRelease *ToolRelease) bool {
+	for _, toolDep := range release.Dependencies {
+		if toolDep.ToolName == toolRelease.Tool.Name &&
+			toolDep.ToolPackager == toolRelease.Tool.Package.Name &&
+			toolDep.ToolVersion == toolRelease.Version {
+			return true
+		}
+	}
+	return false
+}
+
 // RuntimeProperties returns the runtime properties for this PlatformRelease
 func (release *PlatformRelease) RuntimeProperties() properties.Map {
 	return properties.Map{
