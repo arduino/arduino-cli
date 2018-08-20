@@ -35,10 +35,10 @@ func initUpgradeCommand() *cobra.Command {
 		Short: "Upgrades one or all installed platforms to the latest version.",
 		Long:  "Upgrades one or all installed platforms to the latest version.",
 		Example: "" +
-			"# upgrade everything to the latest version\n" +
-			"arduino core upgrade\n\n" +
-			"# upgrade arduino:samd to the latest version\n" +
-			"arduino core upgrade arduino:samd",
+			"  # upgrade everything to the latest version\n" +
+			"  " + commands.AppName + " core upgrade\n\n" +
+			"  # upgrade arduino:samd to the latest version\n" +
+			"  " + commands.AppName + " core upgrade arduino:samd",
 		Run: runUpgradeCommand,
 	}
 	return upgradeCommand
