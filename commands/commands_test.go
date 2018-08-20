@@ -363,6 +363,18 @@ func TestCoreCommands(t *testing.T) {
 	exitCode, d = executeWithArgs(t, "core", "list")
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "arduino:avr")
+	require.Contains(t, string(d), "1.6.16")
+
+	// Replace avr with 1.6.17
+	exitCode, d = executeWithArgs(t, "core", "install", "arduino:avr@1.6.17")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Updating arduino:avr@1.6.16 with arduino:avr@1.6.17")
+	require.Contains(t, string(d), "arduino:avr@1.6.17 installed")
+
+	exitCode, d = executeWithArgs(t, "core", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "arduino:avr")
+	require.Contains(t, string(d), "1.6.17")
 
 	// List updatable cores
 	exitCode, d = executeWithArgs(t, "core", "list", "--updatable")
@@ -370,9 +382,9 @@ func TestCoreCommands(t *testing.T) {
 	require.Contains(t, string(d), "arduino:avr")
 
 	// Upgrade platform
-	exitCode, d = executeWithArgs(t, "core", "upgrade", "arduino:avr@1.6.17")
+	exitCode, d = executeWithArgs(t, "core", "upgrade", "arduino:avr@1.6.18")
 	require.NotZero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "Invalid item arduino:avr@1.6.17")
+	require.Contains(t, string(d), "Invalid item arduino:avr@1.6.18")
 
 	exitCode, d = executeWithArgs(t, "core", "upgrade", "other:avr")
 	require.NotZero(t, exitCode, "exit code")
@@ -384,7 +396,7 @@ func TestCoreCommands(t *testing.T) {
 
 	exitCode, d = executeWithArgs(t, "core", "upgrade", "arduino:avr")
 	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "Updating arduino:avr@1.6.16 with "+AVR)
+	require.Contains(t, string(d), "Updating arduino:avr@1.6.17 with "+AVR)
 
 	// List updatable cores
 	exitCode, d = executeWithArgs(t, "core", "list", "--updatable")
