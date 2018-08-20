@@ -52,6 +52,8 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		downloadPlatformByRef(pm, platformRef)
 		installPlatformByRef(pm, platformRef)
 	}
+
+	// TODO: Cleanup unused tools
 }
 
 func installPlatformByRef(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference) {
@@ -60,6 +62,10 @@ func installPlatformByRef(pm *packagemanager.PackageManager, platformRef *packag
 		formatter.PrintError(err, "Could not determine platform dependencies")
 		os.Exit(commands.ErrBadCall)
 	}
+
+	// TODO: Check install prerequisites here
+
+	// TODO: Download here
 
 	for _, tool := range tools {
 		InstallToolRelease(pm, tool)
@@ -70,8 +76,15 @@ func installPlatformByRef(pm *packagemanager.PackageManager, platformRef *packag
 func installPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) {
 	log := pm.Log.WithField("platform", platformRelease)
 
-	log.Info("Installing platform")
-	formatter.Print("Installing " + platformRelease.String() + "...")
+	platform := platformRelease.Platform
+	installed := platform.GetInstalled()
+	if installed == nil {
+		log.Info("Installing platform")
+		formatter.Print("Installing " + platformRelease.String() + "...")
+	} else {
+		log.Info("Updating platform " + installed.String())
+		formatter.Print("Updating " + installed.String() + " with " + platformRelease.String() + "...")
+	}
 
 	err := pm.InstallPlatform(platformRelease)
 	if os.IsExist(err) {
@@ -82,6 +95,24 @@ func installPlatformRelease(pm *packagemanager.PackageManager, platformRelease *
 	if err != nil {
 		log.WithError(err).Error("Cannot install platform")
 		os.Exit(commands.ErrGeneric)
+	}
+
+	// If upgrading remove previous release
+	if installed != nil {
+		err := pm.UninstallPlatform(installed)
+
+		// In case of error try to rollback
+		if err != nil {
+			log.WithError(err).Error("Error updating platform.")
+			formatter.PrintError(err, "Error updating platform")
+
+			// Rollback
+			if err := pm.UninstallPlatform(platformRelease); err != nil {
+				log.WithError(err).Error("Error rolling-back changes.")
+				formatter.PrintError(err, "Error rolling-back changes.")
+			}
+			os.Exit(commands.ErrGeneric)
+		}
 	}
 
 	log.Info("Platform installed")

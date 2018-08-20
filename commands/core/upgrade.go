@@ -18,7 +18,6 @@
 package core
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -112,8 +111,7 @@ func upgrade(pm *packagemanager.PackageManager, platformsRefs []*packagemanager.
 	}
 
 	for _, platformRef := range toInstallRefs {
-		fmt.Printf("Upgrading %s\n", platformRef)
-		// downloadPlatformByRef(pm, platformRef)
-		// installPlatformByRef(pm, platformRef)
+		downloadPlatformByRef(pm, platformRef)
+		installPlatformByRef(pm, platformRef)
 	}
 }

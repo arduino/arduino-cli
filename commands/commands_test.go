@@ -369,6 +369,32 @@ func TestCoreCommands(t *testing.T) {
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "arduino:avr")
 
+	// Upgrade platform
+	exitCode, d = executeWithArgs(t, "core", "upgrade", "arduino:avr@1.6.17")
+	require.NotZero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Invalid item arduino:avr@1.6.17")
+
+	exitCode, d = executeWithArgs(t, "core", "upgrade", "other:avr")
+	require.NotZero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "other:avr not found")
+
+	exitCode, d = executeWithArgs(t, "core", "upgrade", "arduino:samd")
+	require.NotZero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "arduino:samd is not installed")
+
+	exitCode, d = executeWithArgs(t, "core", "upgrade", "arduino:avr")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Updating arduino:avr@1.6.16 with "+AVR)
+
+	// List updatable cores
+	exitCode, d = executeWithArgs(t, "core", "list", "--updatable")
+	require.Zero(t, exitCode, "exit code")
+	require.NotContains(t, string(d), "arduino:avr")
+
+	exitCode, d = executeWithArgs(t, "core", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "arduino:avr")
+
 	// Build sketch for arduino:avr:uno
 	exitCode, d = executeWithArgs(t, "sketch", "new", "Test1")
 	require.Zero(t, exitCode, "exit code")
@@ -381,7 +407,7 @@ func TestCoreCommands(t *testing.T) {
 	// Uninstall arduino:avr
 	exitCode, d = executeWithArgs(t, "core", "uninstall", "arduino:avr")
 	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "arduino:avr@1.6.16 uninstalled")
+	require.Contains(t, string(d), AVR+" uninstalled")
 
 	// Empty cores list
 	exitCode, d = executeWithArgs(t, "core", "list")
