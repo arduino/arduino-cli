@@ -34,6 +34,7 @@ func InitCommand() *cobra.Command {
 	coreCommand.AddCommand(initInstallCommand())
 	coreCommand.AddCommand(initListCommand())
 	coreCommand.AddCommand(initUpdateIndexCommand())
+	coreCommand.AddCommand(initUpgradeCommand())
 	coreCommand.AddCommand(initUninstallCommand())
 	coreCommand.AddCommand(initSearchCommand())
 	return coreCommand
