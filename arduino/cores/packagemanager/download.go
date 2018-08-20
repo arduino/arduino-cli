@@ -33,7 +33,11 @@ type PlatformReference struct {
 }
 
 func (platform *PlatformReference) String() string {
-	return platform.Package + ":" + platform.PlatformArchitecture + "@" + platform.PlatformVersion.String()
+	res := platform.Package + ":" + platform.PlatformArchitecture
+	if platform.PlatformVersion != nil {
+		return res + "@" + platform.PlatformVersion.String()
+	}
+	return res
 }
 
 // FindPlatform returns the Platform matching the PlatformReference or nil if not found.
