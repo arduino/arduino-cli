@@ -1,8 +1,14 @@
 language: go
 
+os:
+  - linux
+  - osx
+
 go:
   - 1.7.x
   - 1.8.x
+  - 1.9.x
+  - 1.10.x
 
 go_import_path: go.bug.st/serial.v1
 
@@ -20,6 +26,29 @@ env:
   - TEST_OS=openbsd TEST_ARCH=arm
 
 matrix:
+  exclude:
+  - os: linux
+    env: TEST_OS=darwin TEST_ARCH=386
+  - os: linux
+    env: TEST_OS=darwin TEST_ARCH=amd64
+  - os: osx
+    env: TEST_OS=linux TEST_ARCH=386
+  - os: osx
+    env: TEST_OS=linux TEST_ARCH=amd64
+  - os: osx
+    env: TEST_OS=linux TEST_ARCH=arm
+  - os: osx
+    env: TEST_OS=windows TEST_ARCH=386
+  - os: osx
+    env: TEST_OS=windows TEST_ARCH=amd64
+  - os: osx
+    env: TEST_OS=freebsd TEST_ARCH=amd64
+  - os: osx
+    env: TEST_OS=openbsd TEST_ARCH=amd64
+  - os: osx
+    env: TEST_OS=openbsd TEST_ARCH=386
+  - os: osx
+    env: TEST_OS=openbsd TEST_ARCH=arm
   allow_failures:
     - env: TEST_OS=openbsd TEST_ARCH=arm
 
