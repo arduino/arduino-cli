@@ -30,11 +30,10 @@
 package discovery
 
 import (
-	"fmt"
 	"time"
 
-	"github.com/facchinm/go-serial-native"
 	"github.com/juju/errors"
+	"go.bug.st/serial.v1/enumerator"
 )
 
 // Merge updates the device with the new one, returning false if the operation
@@ -58,21 +57,20 @@ func (d *SerialDevice) merge(dev SerialDevice) bool {
 		d.VendorID = dev.VendorID
 	}
 
-	if d.Serial != dev.Serial {
-		d.Serial = dev.Serial
-	}
+	// if d.Serial != dev.Serial {
+	// 	d.Serial = dev.Serial
+	// }
 	return changed
 }
 
 func (m *Monitor) serialDiscover() error {
-	ports, err := serial.ListPorts()
+	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
 		return errors.Annotatef(err, "while listing the serial ports")
 	}
 
 	for _, port := range ports {
 		m.addSerial(port)
-
 	}
 	m.pruneSerial(ports)
 
@@ -80,18 +78,17 @@ func (m *Monitor) serialDiscover() error {
 	return nil
 }
 
-func (m *Monitor) addSerial(port *serial.Info) {
-	vid, pid, _ := port.USBVIDPID()
-	if vid == 0 || pid == 0 {
+func (m *Monitor) addSerial(port *enumerator.PortDetails) {
+	if !port.IsUSB {
 		return
 	}
 
 	device := SerialDevice{
-		Port:         port.Name(),
-		SerialNumber: port.USBSerialNumber(),
-		ProductID:    fmt.Sprintf("0x%04X", pid),
-		VendorID:     fmt.Sprintf("0x%04X", vid),
-		Serial:       port,
+		Port:         port.Name,
+		SerialNumber: port.SerialNumber,
+		ProductID:    "0x" + port.PID,
+		VendorID:     "0x" + port.VID,
+		//Serial:       port,
 	}
 	for port, dev := range m.serial {
 		if port == device.Port {
@@ -107,12 +104,12 @@ func (m *Monitor) addSerial(port *serial.Info) {
 	//m.Events <- Event{Name: "add", SerialDevice: &device}
 }
 
-func (m *Monitor) pruneSerial(ports []*serial.Info) {
+func (m *Monitor) pruneSerial(ports []*enumerator.PortDetails) {
 	toPrune := []string{}
 	for port := range m.serial {
 		found := false
 		for _, p := range ports {
-			if port == p.Name() {
+			if port == p.Name {
 				found = true
 			}
 		}

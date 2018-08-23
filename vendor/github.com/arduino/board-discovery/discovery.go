@@ -63,16 +63,15 @@ import (
 	"time"
 
 	"github.com/codeclysm/cc"
-	serial "github.com/facchinm/go-serial-native"
 )
 
 // SerialDevice is something connected to the Serial Ports
 type SerialDevice struct {
-	Port         string       `json:"port"`
-	SerialNumber string       `json:"serial_number"`
-	ProductID    string       `json:"pid"`
-	VendorID     string       `json:"vid"`
-	Serial       *serial.Info `json:"-"`
+	Port         string `json:"port"`
+	SerialNumber string `json:"serial_number"`
+	ProductID    string `json:"pid"`
+	VendorID     string `json:"vid"`
+	//Serial       *serial.Info `json:"-"`
 }
 
 func (d SerialDevice) String() string {
