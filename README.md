@@ -220,7 +220,7 @@ We are now ready to install it! Please be sure to use the full name of the lib a
 ## Inline Help
 
 `arduino-cli` is a container of commands, to see the full list just run:
-```bash
+```console
 $ arduino-cli
 Arduino Command Line Interface (arduino-cli).
 
@@ -245,7 +245,7 @@ Available Commands:
 
 Each command has his own specific help that can be obtained with the `help` command, for example:
 
-```bash
+```console
 $ arduino-cli help core
 Arduino Core operations.
 
