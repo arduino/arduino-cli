@@ -136,7 +136,7 @@ Now verify we have installed the core properly by running
     arduino:samd    1.6.19          1.6.19  Arduino SAMD Boards (32-bits ARM Cortex-M0+)
 
 
-We can finally chek if the board is now recognized as a MKR1000
+We can finally check if the board is now recognized as a MKR1000
 
     $ arduino-cli board list
     FQBN                    Port            ID              Board Name
@@ -239,7 +239,7 @@ Available Commands:
   lib           Arduino commands about libraries.
   sketch        Arduino CLI Sketch Commands.
   upload        Upload Arduino sketches.
-  version       Shows version number of arduino CLI.
+  version       Shows version number of Arduino CLI.
 ....
 ```
 
