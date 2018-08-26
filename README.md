@@ -253,7 +253,7 @@ Usage:
   arduino-cli core [command]
 
 Examples:
-arduino core update-index # to update the package index file.
+arduino-cli core update-index # to update the package index file.
 
 Available Commands:
   download     Downloads one or more cores and corresponding tool dependencies.
@@ -272,4 +272,3 @@ Global Flags:
 Use "arduino-cli core [command] --help" for more information about a command.
 
 ```
-
