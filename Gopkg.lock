@@ -361,7 +361,7 @@
     "enumerator",
     "unixutils"
   ]
-  revision = "d759e28145989c694b4ee14a39971fb1815c2bcf"
+  revision = "5f7892a7bb453066bdc6683b9b5d24d9dee03ec1"
 
 [[projects]]
   branch = "master"

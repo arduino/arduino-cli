@@ -112,7 +112,7 @@ func serviceMatching(serviceType string) C.CFMutableDictionaryRef {
 // getMatchingServices look up registered IOService objects that match a matching dictionary.
 func getMatchingServices(matcher C.CFMutableDictionaryRef) (C.io_iterator_t, error) {
 	var i C.io_iterator_t
-	err := C.IOServiceGetMatchingServices(C.kIOMasterPortDefault, matcher, &i)
+	err := C.IOServiceGetMatchingServices(C.kIOMasterPortDefault, C.CFDictionaryRef(matcher), &i)
 	if err != C.KERN_SUCCESS {
 		return 0, fmt.Errorf("IOServiceGetMatchingServices failed (code %d)", err)
 	}
