@@ -7,5 +7,5 @@ pipeline:
     image: golang:latest
     commands:
       - go build
-      - go test -v ./... -race
+      - go test -timeout 20m -v ./... -race
     secrets: [TEST_USERNAME, TEST_PASSWORD]
