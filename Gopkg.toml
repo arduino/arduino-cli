@@ -1,7 +1,6 @@
-
 # Gopkg.toml example
 #
-# Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
+# Refer to https://golang.github.io/dep/docs/Gopkg.toml.html
 # for detailed Gopkg.toml documentation.
 #
 # required = ["github.com/user/thing/cmd/thing"]
@@ -17,12 +16,14 @@
 #   source = "github.com/myfork/project2"
 #
 # [[override]]
-#  name = "github.com/x/y"
-#  version = "2.4.0"
+#   name = "github.com/x/y"
+#   version = "2.4.0"
+#
+# [prune]
+#   non-go = false
+#   go-tests = true
+#   unused-packages = true
 
-[prune]
-  go-tests = true
-  unused-packages = true
 
 # arduino-cli requires a special version of the builder
 [[constraint]]
@@ -93,15 +94,19 @@
 
 [[constraint]]
   name = "github.com/sirupsen/logrus"
-  version = "1.0.3"
+  version = "v1.0.5"
 
 [[constraint]]
   name = "github.com/spf13/cobra"
-  version = "0.0.1"
+  version = "v0.0.2"
 
 [[constraint]]
   name = "github.com/stretchr/testify"
-  version = "1.1.4"
+  version = "v1.2.1"
+
+[[constraint]]
+  branch = "master"
+  name = "go.bug.st/relaxed-semver"
 
 [[constraint]]
   branch = "master"
@@ -113,8 +118,8 @@
   source = "github.com/cmaglie/pb"
 
 [[constraint]]
-  branch = "v2"
   name = "gopkg.in/yaml.v2"
+  version = "2.2.1"
 
 [[constraint]]
   name = "github.com/bouk/monkey"
@@ -123,3 +128,8 @@
 [[constraint]]
   name = "github.com/cavaliercoder/grab"
   branch = "master"
+
+
+[prune]
+  go-tests = true
+  unused-packages = true
