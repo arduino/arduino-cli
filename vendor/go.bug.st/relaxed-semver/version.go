@@ -17,6 +17,9 @@ type Version struct {
 }
 
 func (v *Version) String() string {
+	if v == nil {
+		return ""
+	}
 	res := string(v.major)
 	if len(v.minor) > 0 {
 		res += "." + string(v.minor)

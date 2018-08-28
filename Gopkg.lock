@@ -351,7 +351,7 @@
   branch = "master"
   name = "go.bug.st/relaxed-semver"
   packages = ["."]
-  revision = "8f3ea8a5f043c095e6a3f27021be84e28551785b"
+  revision = "634f2c8a7dad58007b2539ce542ba69f1e50893c"
 
 [[projects]]
   branch = "master"

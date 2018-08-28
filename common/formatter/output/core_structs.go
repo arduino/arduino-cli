@@ -23,6 +23,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/gosuri/uitable"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // InstalledPlatformReleases represents an output set of installed platforms.
@@ -51,7 +52,11 @@ func (is InstalledPlatformReleases) String() string {
 	table.AddRow("ID", "Installed", "Latest", "Name")
 	sort.Sort(is)
 	for _, item := range is {
-		table.AddRow(item.Platform.String(), item.Version, item.Platform.GetLatestRelease().Version, item.Platform.Name)
+		var latestVersion *semver.Version
+		if latest := item.Platform.GetLatestRelease(); latest != nil {
+			latestVersion = latest.Version
+		}
+		table.AddRow(item.Platform, item.Version, latestVersion, item.Platform.Name)
 	}
 	return fmt.Sprintln(table)
 }

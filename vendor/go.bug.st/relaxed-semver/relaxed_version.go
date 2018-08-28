@@ -1,3 +1,9 @@
+//
+// Copyright 2018 Cristian Maglie. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+//
+
 package semver
 
 import "fmt"
@@ -27,6 +33,9 @@ func ParseRelaxed(in string) *RelaxedVersion {
 }
 
 func (v *RelaxedVersion) String() string {
+	if v == nil {
+		return ""
+	}
 	if v.version != nil {
 		return v.version.String()
 	}
