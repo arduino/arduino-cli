@@ -128,7 +128,7 @@ func run(cmd *cobra.Command, args []string) {
 		PlatformArchitecture: coreName,
 	})
 	if targetPlatform == nil || targetPlatform.GetInstalled() == nil {
-		formatter.PrintErrorMessage(fmt.Sprintf("\"%[1]s:%[2]s\" platform is not installed, please install it by running \"arduino core install %[1]s:%[2]s\".", packageName, coreName))
+		formatter.PrintErrorMessage(fmt.Sprintf("\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+commands.AppName+" core install %[1]s:%[2]s\".", packageName, coreName))
 		os.Exit(commands.ErrCoreConfig)
 	}
 
