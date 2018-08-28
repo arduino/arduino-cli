@@ -193,7 +193,7 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	// Will be deprecated.
-	ctx.ArduinoAPIVersion = "10600"
+	ctx.ArduinoAPIVersion = "10607"
 
 	// Check if Arduino IDE is installed and get it's libraries location.
 	preferencesTxt := commands.Config.DataDir.Join("preferences.txt")
