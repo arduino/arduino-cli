@@ -18,6 +18,7 @@
 package formatter
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -30,7 +31,14 @@ type TextFormatter struct{}
 
 // Format implements Formatter interface
 func (tp *TextFormatter) Format(msg interface{}) (string, error) {
-	return fmt.Sprintf("%s", msg), nil
+	if msg == nil {
+		return "<nil>", nil
+	}
+	str, ok := msg.(fmt.Stringer)
+	if !ok {
+		return "", errors.New("object can't be formatted as text")
+	}
+	return str.String(), nil
 }
 
 // DownloadProgressBar implements Formatter interface
