@@ -449,7 +449,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:97467424b8c5da14284e42991d66648802e4a5abd9acfaa0d0f72d96496cdd44"
+  digest = "1:e39f0518cc8a9d0d35fdef12df30ddf1260424a8c8fa3909063b1673a21a7459"
   name = "go.bug.st/relaxed-semver"
   packages = ["."]
   pruneopts = "UT"
