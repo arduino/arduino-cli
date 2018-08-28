@@ -62,11 +62,14 @@ func ExamplePrint() {
 func ExamplePrint_alternative() {
 	formatter.SetFormatter("text")
 	formatter.Print(TestStruct{5})
+	formatter.Print("a string")
 
 	formatter.SetFormatter("json")
 	formatter.Print(TestStruct{10})
+	formatter.Print("a string")
 
 	// Output:
 	// VALUE = 5
+	// a string
 	// {"value":10}
 }

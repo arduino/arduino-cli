@@ -34,6 +34,9 @@ func (tp *TextFormatter) Format(msg interface{}) (string, error) {
 	if msg == nil {
 		return "<nil>", nil
 	}
+	if str, ok := msg.(string); ok {
+		return str, nil
+	}
 	str, ok := msg.(fmt.Stringer)
 	if !ok {
 		return "", errors.New("object can't be formatted as text")
