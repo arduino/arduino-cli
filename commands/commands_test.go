@@ -102,7 +102,7 @@ func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte)
 	cmd.SetArgs(args)
 	cmd.Execute()
 
-	return
+	return exitCode, output
 }
 
 var currDataDir *paths.Path

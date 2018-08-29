@@ -30,8 +30,6 @@ linters:
   - lll
   - maligned
   - megacheck
-  - megacheck
-  - nakedret
   - prealloc
   - unparam
   - varcheck
