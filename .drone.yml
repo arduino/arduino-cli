@@ -19,4 +19,5 @@ pipeline:
       # Build
       - go build
       - go test -timeout 20m -v ./... -race
+      - golangci-lint run
     secrets: [TEST_USERNAME, TEST_PASSWORD]
