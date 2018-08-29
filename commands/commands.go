@@ -49,7 +49,7 @@ const (
 	ErrCoreConfig
 	ErrBadArgument
 
-	Version = "0.2.0-alpha.preview"
+	Version = "0.2.1-alpha.preview"
 )
 
 // ErrLogrus represents the logrus instance, which has the role to
