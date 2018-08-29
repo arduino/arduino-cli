@@ -1,0 +1,40 @@
+linters-settings:
+  govet:
+    check-shadowing: true
+  golint:
+    min-confidence: 0
+  gocyclo:
+    min-complexity: 13 # Should be 10 but was brought to 13 to speed up the development
+  maligned:
+    suggest-new: true
+  dupl:
+    threshold: 100
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+
+  misspell:
+    locale: US
+
+linters:
+  enable-all: true
+  disable:
+  - deadcode
+  - dupl
+  - errcheck
+  - goconst
+  - gocyclo
+  - gofmt
+  - govet
+  - ineffassign
+  - interfacer
+  - lll
+  - maligned
+  - megacheck
+  - megacheck
+  - misspell
+  - nakedret
+  - prealloc
+  - unconvert
+  - unparam
+  - varcheck
