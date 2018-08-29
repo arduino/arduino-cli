@@ -28,15 +28,15 @@ func TestFlavorCompatibility(t *testing.T) {
 		Os   string
 		Arch string
 	}
-	windowsi386 := &os{"windows", "i386"}
+	windowsi386 := &os{"windows", "386"}
 	windowsx8664 := &os{"windows", "amd64"}
-	linuxi386 := &os{"linux", "i386"}
+	linuxi386 := &os{"linux", "386"}
 	linuxamd64 := &os{"linux", "amd64"}
 	linuxarm := &os{"linux", "arm"}
 	linuxarmbe := &os{"linux", "armbe"}
-	darwini386 := &os{"darwin", "i386"}
+	darwini386 := &os{"darwin", "386"}
 	darwinamd646 := &os{"darwin", "amd64"}
-	freebsdi386 := &os{"freebsd", "i386"}
+	freebsdi386 := &os{"freebsd", "386"}
 	freebsdamd64 := &os{"freebsd", "amd64"}
 	oses := []*os{
 		windowsi386,
