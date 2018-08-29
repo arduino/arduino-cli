@@ -30,8 +30,8 @@ func ListExamplesPath() string {
 }
 
 // ListExamples provides a list of all the builtin examples
-func (c *Client) ListExamples(ctx context.Context, path string, maintainer *string, type1 *string) (*http.Response, error) {
-	req, err := c.NewListExamplesRequest(ctx, path, maintainer, type1)
+func (c *Client) ListExamples(ctx context.Context, path string, maintainer *string, libType *string) (*http.Response, error) {
+	req, err := c.NewListExamplesRequest(ctx, path, maintainer, libType)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (c *Client) ListExamples(ctx context.Context, path string, maintainer *stri
 }
 
 // NewListExamplesRequest create the request corresponding to the list action endpoint of the examples resource.
-func (c *Client) NewListExamplesRequest(ctx context.Context, path string, maintainer *string, type1 *string) (*http.Request, error) {
+func (c *Client) NewListExamplesRequest(ctx context.Context, path string, maintainer *string, libType *string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
@@ -49,8 +49,8 @@ func (c *Client) NewListExamplesRequest(ctx context.Context, path string, mainta
 	if maintainer != nil {
 		values.Set("maintainer", *maintainer)
 	}
-	if type1 != nil {
-		values.Set("type", *type1)
+	if libType != nil {
+		values.Set("type", *libType)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
