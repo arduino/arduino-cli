@@ -18,11 +18,11 @@ This is **not yet available** until the first stable version is released.
 
 Please note that these are **preview** build, they may have bugs, some features may not work or may be changed without notice:
 
-- [Linux 64 bit 0.2.0-alpha.preview](http://downloads.arduino.cc/arduino-cli/arduino-cli-0.2.0-alpha.preview-linux64.tar.bz2)
-- [Linux 32 bit 0.2.0-alpha.preview](http://downloads.arduino.cc/arduino-cli/arduino-cli-0.2.0-alpha.preview-linux32.tar.bz2)
-- [Linux ARM 0.2.0-alpha.preview](http://downloads.arduino.cc/arduino-cli/arduino-cli-0.2.0-alpha.preview-linuxarm.tar.bz2)
-- [Windows 0.2.0-alpha.preview](http://downloads.arduino.cc/arduino-cli/arduino-cli-0.2.0-alpha.preview-windows.zip)
-- [Mac OSX 0.2.0-alpha.preview](http://downloads.arduino.cc/arduino-cli/arduino-cli-0.2.0-alpha.preview-osx.zip)
+- [Linux 64 bit 0.2.1-alpha.preview](http://downloads.arduino.cc/arduino-cli/arduino-cli-0.2.1-alpha.preview-linux64.tar.bz2)
+- [Linux 32 bit 0.2.1-alpha.preview](http://downloads.arduino.cc/arduino-cli/arduino-cli-0.2.1-alpha.preview-linux32.tar.bz2)
+- [Linux ARM 0.2.1-alpha.preview](http://downloads.arduino.cc/arduino-cli/arduino-cli-0.2.1-alpha.preview-linuxarm.tar.bz2)
+- [Windows 0.2.1-alpha.preview](http://downloads.arduino.cc/arduino-cli/arduino-cli-0.2.1-alpha.preview-windows.zip)
+- [Mac OSX 0.2.1-alpha.preview](http://downloads.arduino.cc/arduino-cli/arduino-cli-0.2.1-alpha.preview-osx.zip)
 
 ### Build the latest "bleeding-edge" from source
 
