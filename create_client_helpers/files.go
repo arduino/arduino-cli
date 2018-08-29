@@ -15,7 +15,7 @@
  * a commercial license, send an email to license@arduino.cc.
  */
 
-package createClient
+package createclient
 
 import (
 	"context"
@@ -25,8 +25,8 @@ import (
 )
 
 // ShowFilesPath computes a request path to the show action of files.
-func ShowFilesPath(type_ string, id string, name string) string {
-	param0 := type_
+func ShowFilesPath(fileType string, id string, name string) string {
+	param0 := fileType
 	param1 := id
 	param2 := name
 

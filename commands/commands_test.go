@@ -35,7 +35,7 @@ import (
 
 // Redirecting stdOut so we can analyze output line by
 // line and check with what we want.
-var stdOut *os.File = os.Stdout
+var stdOut = os.Stdout // *os.File
 
 type stdOutRedirect struct {
 	tempFile *os.File

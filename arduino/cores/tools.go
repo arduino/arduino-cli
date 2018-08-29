@@ -81,11 +81,12 @@ func (tool *Tool) GetAllReleasesVersions() []*semver.RelaxedVersion {
 
 // LatestRelease obtains latest version of a core package.
 func (tool *Tool) LatestRelease() *ToolRelease {
-	if latest := tool.latestReleaseVersion(); latest == nil {
+	latest := tool.latestReleaseVersion()
+	if latest == nil {
 		return nil
-	} else {
-		return tool.GetRelease(latest)
 	}
+
+	return tool.GetRelease(latest)
 }
 
 // latestReleaseVersion obtains latest version number.

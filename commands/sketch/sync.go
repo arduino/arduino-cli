@@ -129,9 +129,9 @@ func runSyncCommand(cmd *cobra.Command, args []string) {
 	sketchMap := sketches.Find(sketchbook.String(), "libraries") // Exclude libraries dirs.
 
 	logrus.Info("Finding online sketches")
-	client := createClient.New(nil)
+	client := createclient.New(nil)
 	tok := "Bearer " + bearerToken
-	resp, err := client.SearchSketches(context.Background(), createClient.SearchSketchesPath(), nil, &username, &tok)
+	resp, err := client.SearchSketches(context.Background(), createclient.SearchSketchesPath(), nil, &username, &tok)
 	if err != nil {
 		stopSpinner()
 		formatter.PrintError(err, "Cannot get create sketches, sync failed.")
@@ -146,7 +146,7 @@ func runSyncCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrGeneric)
 	}
 
-	onlineSketchesMap := make(map[string]*createClient.ArduinoCreateSketch, len(onlineSketches.Sketches))
+	onlineSketchesMap := make(map[string]*createclient.ArduinoCreateSketch, len(onlineSketches.Sketches))
 	for _, item := range onlineSketches.Sketches {
 		onlineSketchesMap[*item.Name] = item
 	}
@@ -271,9 +271,9 @@ func runSyncCommand(cmd *cobra.Command, args []string) {
 }
 
 func pushSketch(sketch sketches.Sketch, sketchbook *paths.Path, bearerToken string) error {
-	client := createClient.New(nil)
+	client := createclient.New(nil)
 
-	resp, err := client.CreateSketches(context.Background(), createClient.CreateSketchesPath(), createClient.ConvertFrom(sketch), "Bearer "+bearerToken)
+	resp, err := client.CreateSketches(context.Background(), createclient.CreateSketchesPath(), createclient.ConvertFrom(sketch), "Bearer "+bearerToken)
 	if err != nil {
 		return err
 	}
@@ -295,8 +295,8 @@ func pushSketch(sketch sketches.Sketch, sketchbook *paths.Path, bearerToken stri
 }
 
 func editSketch(sketch sketches.Sketch, sketchbook *paths.Path, bearerToken string) error {
-	client := createClient.New(nil)
-	resp, err := client.EditSketches(context.Background(), createClient.EditSketchesPath(sketch.ID), createClient.ConvertFrom(sketch), "Bearer "+bearerToken)
+	client := createclient.New(nil)
+	resp, err := client.EditSketches(context.Background(), createclient.EditSketchesPath(sketch.ID), createclient.ConvertFrom(sketch), "Bearer "+bearerToken)
 	if err != nil {
 		return err
 	}
@@ -317,11 +317,11 @@ func editSketch(sketch sketches.Sketch, sketchbook *paths.Path, bearerToken stri
 	return nil
 }
 
-func pullSketch(sketch *createClient.ArduinoCreateSketch, sketchbook *paths.Path, bearerToken string) error {
-	client := createClient.New(nil)
+func pullSketch(sketch *createclient.ArduinoCreateSketch, sketchbook *paths.Path, bearerToken string) error {
+	client := createclient.New(nil)
 	bearer := "Bearer " + bearerToken
 
-	resp, err := client.ShowSketches(context.Background(), createClient.ShowSketchesPath(fmt.Sprint(sketch.ID)), &bearer)
+	resp, err := client.ShowSketches(context.Background(), createclient.ShowSketchesPath(fmt.Sprint(sketch.ID)), &bearer)
 	if err != nil {
 		return err
 	}
@@ -356,7 +356,7 @@ func pullSketch(sketch *createClient.ArduinoCreateSketch, sketchbook *paths.Path
 			return err
 		}
 
-		resp, err = client.ShowFiles(context.Background(), createClient.ShowFilesPath("sketch", sketch.ID.String(), path))
+		resp, err = client.ShowFiles(context.Background(), createclient.ShowFilesPath("sketch", sketch.ID.String(), path))
 		if err != nil {
 			return err
 		}
@@ -379,7 +379,7 @@ func pullSketch(sketch *createClient.ArduinoCreateSketch, sketchbook *paths.Path
 		destFile := sketchDir.Join(path)
 		err = destFile.WriteFile(decodedData)
 		if err != nil {
-			return errors.New("Copy of a file of the downloaded sketch failed, sync failed.")
+			return errors.New("copy of a file of the downloaded sketch failed, sync failed")
 		}
 	}
 
@@ -431,7 +431,7 @@ func login() (string, string, error) {
 	arduinoMachine := NetRC.FindMachine("arduino.cc")
 	if arduinoMachine == nil || arduinoMachine.Name != "arduino.cc" {
 		logrus.WithError(err).Error("Credentials not found")
-		return "", "", errors.New("Credentials not found, try typing `arduino login` to login")
+		return "", "", errors.New("credentials not found, try typing `arduino login` to login")
 	}
 
 	logrus.Info("Refreshing user session")

@@ -15,7 +15,7 @@
  * a commercial license, send an email to license@arduino.cc.
  */
 
-package builderClient
+package builderclient
 
 import (
 	"context"
@@ -30,8 +30,8 @@ func ListLibrariesPath() string {
 }
 
 // ListLibraries provides a list of all the latest versions of the libraries supported by Arduino Create. Doesn't require any authentication.
-func (c *Client) ListLibraries(ctx context.Context, path string, maintainer *string, type_ *string, withoutType *string) (*http.Response, error) {
-	req, err := c.NewListLibrariesRequest(ctx, path, maintainer, type_, withoutType)
+func (c *Client) ListLibraries(ctx context.Context, path string, maintainer *string, type1 *string, withoutType *string) (*http.Response, error) {
+	req, err := c.NewListLibrariesRequest(ctx, path, maintainer, type1, withoutType)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (c *Client) ListLibraries(ctx context.Context, path string, maintainer *str
 }
 
 // NewListLibrariesRequest create the request corresponding to the list action endpoint of the libraries resource.
-func (c *Client) NewListLibrariesRequest(ctx context.Context, path string, maintainer *string, type_ *string, withoutType *string) (*http.Request, error) {
+func (c *Client) NewListLibrariesRequest(ctx context.Context, path string, maintainer *string, type1 *string, withoutType *string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
@@ -49,8 +49,8 @@ func (c *Client) NewListLibrariesRequest(ctx context.Context, path string, maint
 	if maintainer != nil {
 		values.Set("maintainer", *maintainer)
 	}
-	if type_ != nil {
-		values.Set("type", *type_)
+	if type1 != nil {
+		values.Set("type", *type1)
 	}
 	if withoutType != nil {
 		values.Set("without_type", *withoutType)
