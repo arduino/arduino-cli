@@ -108,7 +108,7 @@ func (library *Library) IsOptimizedForArchitecture(arch string) bool {
 }
 
 // IsArchitectureIndependent returns true if the library declares to be
-// compatibile with all architectures (the `architecture` field in
+// compatible with all architectures (the `architecture` field in
 // library.properties contains the `*` item)
 func (library *Library) IsArchitectureIndependent() bool {
 	return library.IsOptimizedForArchitecture("*")

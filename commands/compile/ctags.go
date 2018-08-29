@@ -28,8 +28,8 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 	builtinPackage := pm.GetPackages().GetOrCreatePackage("builtin")
 	ctagsTool := builtinPackage.GetOrCreateTool("ctags")
 	ctagsRel := ctagsTool.GetOrCreateRelease(semver.ParseRelaxed("5.8-arduino11"))
-	ctagsRel.Flavours = []*cores.Flavour{
-		&cores.Flavour{
+	ctagsRel.Flavors = []*cores.Flavor{
+		&cores.Flavor{
 			OS: "i686-pc-linux-gnu",
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: "ctags-5.8-arduino11-pm-i686-pc-linux-gnu.tar.bz2",
@@ -39,7 +39,7 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 				CachePath:       "tools",
 			},
 		},
-		&cores.Flavour{
+		&cores.Flavor{
 			OS: "x86_64-pc-linux-gnu",
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: "ctags-5.8-arduino11-pm-x86_64-pc-linux-gnu.tar.bz2",
@@ -49,7 +49,7 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 				CachePath:       "tools",
 			},
 		},
-		&cores.Flavour{
+		&cores.Flavor{
 			OS: "i686-mingw32",
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: "ctags-5.8-arduino11-pm-i686-mingw32.zip",
@@ -59,7 +59,7 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 				CachePath:       "tools",
 			},
 		},
-		&cores.Flavour{
+		&cores.Flavor{
 			OS: "x86_64-apple-darwin",
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: "ctags-5.8-arduino11-pm-x86_64-apple-darwin.zip",
@@ -69,7 +69,7 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 				CachePath:       "tools",
 			},
 		},
-		&cores.Flavour{
+		&cores.Flavor{
 			OS: "arm-linux-gnueabihf",
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: "ctags-5.8-arduino11-pm-armv6-linux-gnueabihf.tar.bz2",

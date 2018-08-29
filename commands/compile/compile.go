@@ -70,7 +70,7 @@ var flags struct {
 	buildProperties []string // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
 	warnings        string   // Used to tell gcc which warning level to use.
 	verbose         bool     // Turns on verbose mode.
-	quiet           bool     // Supresses almost every output.
+	quiet           bool     // Suppresses almost every output.
 	vidPid          string   // VID/PID specific build properties.
 }
 

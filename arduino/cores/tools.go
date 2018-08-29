@@ -37,14 +37,14 @@ type Tool struct {
 // ToolRelease represents a single release of a tool
 type ToolRelease struct {
 	Version    *semver.RelaxedVersion `json:"version,required"` // The version number of this Release.
-	Flavours   []*Flavour             `json:"systems"`          // Maps OS to Flavour
+	Flavors    []*Flavor              `json:"systems"`          // Maps OS to Flavor
 	Tool       *Tool                  `json:"-"`
 	InstallDir *paths.Path            `json:"-"`
 }
 
-// Flavour represents a flavour of a Tool version.
-type Flavour struct {
-	OS       string `json:"os,required"` // The OS Supported by this flavour.
+// Flavor represents a flavor of a Tool version.
+type Flavor struct {
+	OS       string `json:"os,required"` // The OS Supported by this flavor.
 	Resource *resources.DownloadResource
 }
 
@@ -150,11 +150,11 @@ var (
 	regexpArmBSD   = regexp.MustCompile("arm.*-freebsd[0-9]*")
 )
 
-func (f *Flavour) isCompatibleWithCurrentMachine() bool {
+func (f *Flavor) isCompatibleWithCurrentMachine() bool {
 	return f.isCompatibleWith(runtime.GOOS, runtime.GOARCH)
 }
 
-func (f *Flavour) isCompatibleWith(osName, osArch string) bool {
+func (f *Flavor) isCompatibleWith(osName, osArch string) bool {
 	if f.OS == "all" {
 		return true
 	}
@@ -183,7 +183,7 @@ func (f *Flavour) isCompatibleWith(osName, osArch string) bool {
 
 // GetCompatibleFlavour returns the downloadable resource compatible with the running O.S.
 func (tr *ToolRelease) GetCompatibleFlavour() *resources.DownloadResource {
-	for _, flavour := range tr.Flavours {
+	for _, flavour := range tr.Flavors {
 		if flavour.isCompatibleWithCurrentMachine() {
 			return flavour.Resource
 		}

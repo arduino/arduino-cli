@@ -52,7 +52,7 @@ func initAttachCommand() *cobra.Command {
 }
 
 var attachFlags struct {
-	boardFlavour  string // The flavour of the chipset of the cpu of the connected board, if not specified it is set to "default".
+	boardFlavour  string // The flavor of the chipset of the cpu of the connected board, if not specified it is set to "default".
 	searchTimeout string // Expressed in a parsable duration, is the timeout for the list and attach commands.
 }
 
