@@ -42,8 +42,6 @@ var defaultFormatter Formatter
 
 var logger *logrus.Logger
 
-var debug bool
-
 func init() {
 	formatters = make(map[string]Formatter, 2)
 	AddCustomFormatter("text", &TextFormatter{})

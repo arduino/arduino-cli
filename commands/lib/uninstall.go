@@ -27,10 +27,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	versionAll    string = "all"
-	versionLatest string = "latest"
-)
+// These const are unused
+//const (
+//	versionAll    string = "all"
+//	versionLatest string = "latest"
+//)
 
 func initUninstallCommand() *cobra.Command {
 	uninstallCommand := &cobra.Command{
