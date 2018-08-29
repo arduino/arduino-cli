@@ -56,9 +56,9 @@ func TestFlavorCompatibility(t *testing.T) {
 		Positives []*os
 	}
 	tests := []*test{
-		&test{&Flavor{OS: "i686-mingw32"}, []*os{windowsi386, windowsx8664}},
-		&test{&Flavor{OS: "i386-apple-darwin11"}, []*os{darwini386, darwinamd646}},
-		&test{&Flavor{OS: "x86_64-apple-darwin"}, []*os{darwinamd646}},
+		{&Flavor{OS: "i686-mingw32"}, []*os{windowsi386, windowsx8664}},
+		{&Flavor{OS: "i386-apple-darwin11"}, []*os{darwini386, darwinamd646}},
+		{&Flavor{OS: "x86_64-apple-darwin"}, []*os{darwinamd646}},
 
 		// Raspberry PI, BBB or other ARM based host
 		// PI: "arm-linux-gnueabihf"
@@ -66,14 +66,14 @@ func TestFlavorCompatibility(t *testing.T) {
 		// Ubuntu Mate on PI2: "arm-linux-gnueabihf"
 		// Debian 7.9 on BBB: "arm-linux-gnueabihf"
 		// Raspbian on PI Zero: "arm-linux-gnueabihf"
-		&test{&Flavor{OS: "arm-linux-gnueabihf"}, []*os{linuxarm, linuxarmbe}},
+		{&Flavor{OS: "arm-linux-gnueabihf"}, []*os{linuxarm, linuxarmbe}},
 		// Arch-linux on PI2: "armv7l-unknown-linux-gnueabihf"
-		&test{&Flavor{OS: "armv7l-unknown-linux-gnueabihf"}, []*os{linuxarm, linuxarmbe}},
+		{&Flavor{OS: "armv7l-unknown-linux-gnueabihf"}, []*os{linuxarm, linuxarmbe}},
 
-		&test{&Flavor{OS: "i686-linux-gnu"}, []*os{linuxi386}},
-		&test{&Flavor{OS: "i686-pc-linux-gnu"}, []*os{linuxi386}},
-		&test{&Flavor{OS: "x86_64-linux-gnu"}, []*os{linuxamd64}},
-		&test{&Flavor{OS: "x86_64-pc-linux-gnu"}, []*os{linuxamd64}},
+		{&Flavor{OS: "i686-linux-gnu"}, []*os{linuxi386}},
+		{&Flavor{OS: "i686-pc-linux-gnu"}, []*os{linuxi386}},
+		{&Flavor{OS: "x86_64-linux-gnu"}, []*os{linuxamd64}},
+		{&Flavor{OS: "x86_64-pc-linux-gnu"}, []*os{linuxamd64}},
 	}
 
 	check := func(test *test, os *os) {

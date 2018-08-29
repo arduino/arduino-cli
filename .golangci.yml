@@ -24,7 +24,6 @@ linters:
   - errcheck
   - goconst
   - gocyclo
-  - gofmt
   - govet
   - ineffassign
   - interfacer

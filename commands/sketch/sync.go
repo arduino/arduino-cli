@@ -400,7 +400,7 @@ func findPathOf(sketchName string, path string) string {
 	for i := len(list) - 1; i > -1; i-- {
 		//fmt.Println(list[i], "==", sketchName, "?", list[i] == sketchName)
 		if list[i] == sketchName {
-			return filepath.Join(list[i+1 : len(list)]...)
+			return filepath.Join(list[i+1:]...)
 		}
 	}
 	return ""
