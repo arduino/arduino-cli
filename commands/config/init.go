@@ -39,13 +39,9 @@ func initInitCommand() *cobra.Command {
 		Args: cobra.NoArgs,
 		Run:  runInitCommand,
 	}
-	initCommand.Flags().BoolVar(&initFlags._default,
-		"default",
-		false,
+	initCommand.Flags().BoolVar(&initFlags._default, "default", false,
 		"If omitted, ask questions to the user about setting configuration properties, otherwise use default configuration.")
-	initCommand.Flags().StringVar(&initFlags.location,
-		"save-as",
-		"",
+	initCommand.Flags().StringVar(&initFlags.location, "save-as", "",
 		"Sets where to save the configuration file [default is ./.cli-config.yml].")
 	return initCommand
 }
