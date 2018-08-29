@@ -57,7 +57,8 @@ func initSyncCommand() *cobra.Command {
 		Args:    cobra.NoArgs,
 		Run:     runSyncCommand,
 	}
-	syncCommand.Flags().StringVar(&syncFlags.priority, "conflict-policy", prioritySkip, "The decision made by default on conflicting sketches. Can be push-local, pull-remote, skip, ask-once, ask-always.")
+	usage := "The decision made by default on conflicting sketches. Can be push-local, pull-remote, skip, ask-once, ask-always."
+	syncCommand.Flags().StringVar(&syncFlags.priority, "conflict-policy", prioritySkip, usage)
 	return syncCommand
 }
 
@@ -296,7 +297,11 @@ func pushSketch(sketch sketches.Sketch, sketchbook *paths.Path, bearerToken stri
 
 func editSketch(sketch sketches.Sketch, sketchbook *paths.Path, bearerToken string) error {
 	client := createclient.New(nil)
-	resp, err := client.EditSketches(context.Background(), createclient.EditSketchesPath(sketch.ID), createclient.ConvertFrom(sketch), "Bearer "+bearerToken)
+	resp, err := client.EditSketches(
+		context.Background(),
+		createclient.EditSketchesPath(sketch.ID),
+		createclient.ConvertFrom(sketch),
+		"Bearer "+bearerToken)
 	if err != nil {
 		return err
 	}

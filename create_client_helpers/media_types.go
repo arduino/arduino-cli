@@ -77,7 +77,9 @@ func (c *Client) DecodeArduinoCreateLibraries(resp *http.Response) (*ArduinoCrea
 	return &decoded, err
 }
 
-// Library is a collection of header files containing arduino reusable code and functions. It typically contains its info in a library.properties files. The examples property contains a list of examples that use that library. (default view)
+// Library is a collection of header files containing arduino reusable code and functions.
+// It typically contains its info in a library.properties files.
+// The examples property contains a list of examples that use that library. (default view)
 //
 // Identifier: application/vnd.arduino.create.library+json; view=default
 type ArduinoCreateLibrary struct {
@@ -115,7 +117,9 @@ type ArduinoCreateLibrary struct {
 	Version *string `form:"version,omitempty" json:"version,omitempty" xml:"version,omitempty"`
 }
 
-// Library is a collection of header files containing arduino reusable code and functions. It typically contains its info in a library.properties files. The examples property contains a list of examples that use that library. (link view)
+// Library is a collection of header files containing arduino reusable code and functions.
+// It typically contains its info in a library.properties files.
+// The examples property contains a list of examples that use that library. (link view)
 //
 // Identifier: application/vnd.arduino.create.library+json; view=link
 type ArduinoCreateLibraryLink struct {

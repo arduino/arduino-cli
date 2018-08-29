@@ -48,16 +48,26 @@ func InitCommand() *cobra.Command {
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}
-	command.Flags().StringVarP(&flags.fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	command.Flags().BoolVar(&flags.showProperties, "show-properties", false, "Show all build properties used instead of compiling.")
-	command.Flags().BoolVar(&flags.preprocess, "preprocess", false, "Print preprocessed code to stdout instead of compiling.")
-	command.Flags().StringVar(&flags.buildCachePath, "build-cache-path", "", "Builds of 'core.a' are saved into this path to be cached and reused.")
-	command.Flags().StringVar(&flags.buildPath, "build-path", "", "Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.")
-	command.Flags().StringSliceVar(&flags.buildProperties, "build-properties", []string{}, "List of custom build properties separated by commas. Or can be used multiple times for multiple properties.")
-	command.Flags().StringVar(&flags.warnings, "warnings", "none", `Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
-	command.Flags().BoolVarP(&flags.verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
-	command.Flags().BoolVar(&flags.quiet, "quiet", false, "Optional, supresses almost every output.")
-	command.Flags().StringVar(&flags.vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if boards supports them.")
+	command.Flags().StringVarP(&flags.fqbn, "fqbn", "b", "",
+		"Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	command.Flags().BoolVar(&flags.showProperties, "show-properties", false,
+		"Show all build properties used instead of compiling.")
+	command.Flags().BoolVar(&flags.preprocess, "preprocess", false,
+		"Print preprocessed code to stdout instead of compiling.")
+	command.Flags().StringVar(&flags.buildCachePath, "build-cache-path", "",
+		"Builds of 'core.a' are saved into this path to be cached and reused.")
+	command.Flags().StringVar(&flags.buildPath, "build-path", "",
+		"Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.")
+	command.Flags().StringSliceVar(&flags.buildProperties, "build-properties", []string{},
+		"List of custom build properties separated by commas. Or can be used multiple times for multiple properties.")
+	command.Flags().StringVar(&flags.warnings, "warnings", "none",
+		`Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
+	command.Flags().BoolVarP(&flags.verbose, "verbose", "v", false,
+		"Optional, turns on verbose mode.")
+	command.Flags().BoolVar(&flags.quiet, "quiet", false,
+		"Optional, supresses almost every output.")
+	command.Flags().StringVar(&flags.vidPid, "vid-pid", "",
+		"When specified, VID/PID specific build properties are used, if boards supports them.")
 	return command
 }
 
@@ -128,7 +138,10 @@ func run(cmd *cobra.Command, args []string) {
 		PlatformArchitecture: coreName,
 	})
 	if targetPlatform == nil || targetPlatform.GetInstalled() == nil {
-		formatter.PrintErrorMessage(fmt.Sprintf("\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+commands.AppName+" core install %[1]s:%[2]s\".", packageName, coreName))
+		errorMessage := fmt.Sprintf(
+			"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
+				commands.AppName+" core install %[1]s:%[2]s\".", packageName, coreName)
+		formatter.PrintErrorMessage(errorMessage)
 		os.Exit(commands.ErrCoreConfig)
 	}
 

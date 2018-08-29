@@ -21,7 +21,9 @@ import (
 	"github.com/goadesign/goa"
 )
 
-// A compilation is made up of a sketch (or a path to a sketch) and an fqbn. Eventual libraries are automatically determined and linked. NOTE: swagger will force you to define the files inside the sketch because of a bug. But they are not mandatory.
+// A compilation is made up of a sketch (or a path to a sketch) and an fqbn.
+// Eventual libraries are automatically determined and linked.
+// NOTE: swagger will force you to define the files inside the sketch because of a bug. But they are not mandatory.
 type compilation struct {
 	// The fully qualified board name
 	Fqbn *string `form:"fqbn,omitempty" json:"fqbn,omitempty" xml:"fqbn,omitempty"`
@@ -72,7 +74,9 @@ func (ut *compilation) Publicize() *Compilation {
 	return &pub
 }
 
-// A Compilation is made up of a sketch (or a path to a sketch) and an fqbn. Eventual libraries are automatically determined and linked. NOTE: swagger will force you to define the files inside the sketch because of a bug. But they are not mandatory.
+// A Compilation is made up of a sketch (or a path to a sketch) and an fqbn.
+// Eventual libraries are automatically determined and linked.
+// NOTE: swagger will force you to define the files inside the sketch because of a bug. But they are not mandatory.
 type Compilation struct {
 	// The fully qualified board name
 	Fqbn string `form:"fqbn" json:"fqbn" xml:"fqbn"`
@@ -275,7 +279,8 @@ func (ut *filemeta) Publicize() *Filemeta {
 	return &pub
 }
 
-// FileMeta represent a file in the filesystem, belonging to a sketch, a library or an example. Can contain a data property with the content of the file.
+// FileMeta represent a file in the filesystem, belonging to a sketch, a library or an example.
+// Can contain a data property with the content of the file.
 type Filemeta struct {
 	// The contents of the file, in base64
 	Data *string `form:"data,omitempty" json:"data,omitempty" xml:"data,omitempty"`
@@ -291,7 +296,9 @@ func (ut *Filemeta) Validate() (err error) {
 	return
 }
 
-// Library is a collection of header files containing arduino reusable code and functions. It typically contains its info in a library.properties files. The examples property contains a list of examples that use that library.
+// Library is a collection of header files containing arduino reusable code and functions.
+// It typically contains its info in a library.properties files.
+// The examples property contains a list of examples that use that library.
 type library struct {
 	// The architectures supported by the library.
 	Architectures []string `form:"architectures,omitempty" json:"architectures,omitempty" xml:"architectures,omitempty"`
@@ -391,7 +398,9 @@ func (ut *library) Publicize() *Library {
 	return &pub
 }
 
-// Library is a collection of header files containing arduino reusable code and functions. It typically contains its info in a library.properties files. The examples property contains a list of examples that use that library.
+// Library is a collection of header files containing arduino reusable code and functions.
+// It typically contains its info in a library.properties files.
+// The examples property contains a list of examples that use that library.
 type Library struct {
 	// The architectures supported by the library.
 	Architectures []string `form:"architectures,omitempty" json:"architectures,omitempty" xml:"architectures,omitempty"`
@@ -468,7 +477,9 @@ type PinnedLib struct {
 	Version *string `form:"version,omitempty" json:"version,omitempty" xml:"version,omitempty"`
 }
 
-// A sketch is a program intended to run on an arduino board. It's composed by a main .ino file and optional other files. You should upload only .ino and .h files.
+// A sketch is a program intended to run on an arduino board.
+// It's composed by a main .ino file and optional other files.
+// You should upload only .ino and .h files.
 type sketch struct {
 	// Other files contained in the example
 	Files []*filefull `form:"files,omitempty" json:"files,omitempty" xml:"files,omitempty"`
@@ -527,7 +538,8 @@ func (ut *sketch) Publicize() *Sketch {
 	return &pub
 }
 
-// A sketch is a program intended to run on an arduino board. It's composed by a main .ino file and optional other files. You should upload only .ino and .h files.
+// A sketch is a program intended to run on an arduino board.
+// It's composed by a main .ino file and optional other files. You should upload only .ino and .h files.
 type Sketch struct {
 	// Other files contained in the example
 	Files []*Filefull `form:"files,omitempty" json:"files,omitempty" xml:"files,omitempty"`

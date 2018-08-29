@@ -30,7 +30,10 @@ func StartCompilationsPath() string {
 	return fmt.Sprintf("/builder/v1/compile")
 }
 
-// Start a compilation for the given user and saves the request (but not the generated files) on the database. requires authentication. Can return PreconditionFailed if the user has reached their maximum number of compilations per day. If the compilation failed it returns UnprocessableEntity
+// Start a compilation for the given user and saves the request (but not the generated files) on the database.
+// requires authentication.
+// Can return PreconditionFailed if the user has reached their maximum number of compilations per day.
+// If the compilation failed it returns UnprocessableEntity
 func (c *Client) StartCompilations(ctx context.Context, path string, payload *Compilation) (*http.Response, error) {
 	req, err := c.NewStartCompilationsRequest(ctx, path, payload)
 	if err != nil {

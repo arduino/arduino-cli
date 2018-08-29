@@ -29,8 +29,12 @@ func ListLibrariesPath() string {
 	return fmt.Sprintf("/builder/v1/libraries")
 }
 
-// ListLibraries provides a list of all the latest versions of the libraries supported by Arduino Create. Doesn't require any authentication.
-func (c *Client) ListLibraries(ctx context.Context, path string, maintainer *string, type1 *string, withoutType *string) (*http.Response, error) {
+// ListLibraries provides a list of all the latest versions of the libraries supported by Arduino Create.
+// Doesn't require any authentication.
+func (c *Client) ListLibraries(
+	ctx context.Context,
+	path string, maintainer *string, type1 *string, withoutType *string) (*http.Response, error) {
+
 	req, err := c.NewListLibrariesRequest(ctx, path, maintainer, type1, withoutType)
 	if err != nil {
 		return nil, err
@@ -68,7 +72,8 @@ func ShowLibrariesPath(id string) string {
 	return fmt.Sprintf("/builder/v1/libraries/%s", id)
 }
 
-// ShowLibraries provides the library identified by the :id and :pid param. Doesn't require authentication. Also contains a list of other versions of the library
+// ShowLibraries provides the library identified by the :id and :pid param. Doesn't require authentication.
+// Also contains a list of other versions of the library
 func (c *Client) ShowLibraries(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewShowLibrariesRequest(ctx, path)
 	if err != nil {
