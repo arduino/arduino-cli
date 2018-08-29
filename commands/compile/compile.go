@@ -136,6 +136,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	if parsedFqbn, err := cores.ParseFQBN(fqbn); err != nil {
 		formatter.PrintError(err, "Error parsing FQBN.")
+		os.Exit(commands.ErrBadArgument)
 	} else {
 		ctx.FQBN = parsedFqbn
 	}
