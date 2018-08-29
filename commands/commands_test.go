@@ -67,7 +67,9 @@ func (grabber *stdOutRedirect) Close() {
 
 // executeWithArgs executes the Cobra Command with the given arguments
 // and intercepts any errors (even `os.Exit()` ones), returning the exit code
-func executeWithArgs(t *testing.T, args ...string) (exitCode int, output []byte) {
+func executeWithArgs(t *testing.T, args ...string) (int, []byte) {
+	var output []byte
+	var exitCode int
 	fmt.Printf("RUNNING: %s\n", args)
 
 	redirect := &stdOutRedirect{}
