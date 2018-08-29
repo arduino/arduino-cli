@@ -111,9 +111,10 @@ func (platform *Platform) GetOrCreateRelease(version *semver.Version) (*Platform
 	return release, nil
 }
 
-// GetRelease returns the specified release corresponding the provided version,
+// GetReleaseRelaxedVersion returns the specified release corresponding the provided version,
 // or nil if not found.
-func (platform *Platform) GetRelease(version *semver.Version) *PlatformRelease {
+func (platform *Platform) GetReleaseVersion(version *semver.Version) *PlatformRelease {
+	// use as an fmt.Stringer
 	return platform.Releases[version.String()]
 }
 
@@ -124,7 +125,7 @@ func (platform *Platform) GetLatestRelease() *PlatformRelease {
 	if latestVersion == nil {
 		return nil
 	}
-	return platform.GetRelease(latestVersion)
+	return platform.GetReleaseVersion(latestVersion)
 }
 
 // GetAllReleasesVersions returns all the version numbers in this Platform Package.

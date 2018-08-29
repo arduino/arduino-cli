@@ -25,7 +25,6 @@ linters:
   - goconst
   - gocyclo
   - govet
-  - interfacer
   - lll
   - maligned
   - megacheck
