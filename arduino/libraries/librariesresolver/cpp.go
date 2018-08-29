@@ -106,7 +106,7 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 	header = simplify(header)
 	name := simplify(lib.Name)
 
-	priority := int(lib.PriorityForArchitecture(arch)) // bewteen 0..255
+	priority := int(lib.PriorityForArchitecture(arch)) // between 0..255
 	if name == header {
 		priority += 0x500
 	} else if name == header+"-master" {

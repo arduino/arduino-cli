@@ -32,7 +32,6 @@ linters:
   - maligned
   - megacheck
   - megacheck
-  - misspell
   - nakedret
   - prealloc
   - unconvert

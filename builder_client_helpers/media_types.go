@@ -32,7 +32,7 @@ type ArduinoBuilderBoard struct {
 	Architecture *string                          `form:"architecture,omitempty" json:"architecture,omitempty" xml:"architecture,omitempty"`
 	Bootloader   []*ArduinoBuilderBoardBootloader `form:"bootloader,omitempty" json:"bootloader,omitempty" xml:"bootloader,omitempty"`
 	Build        []*ArduinoBuilderBoardBuild      `form:"build,omitempty" json:"build,omitempty" xml:"build,omitempty"`
-	// The default flavour of the board
+	// The default flavor of the board
 	DefaultFlavour *string `form:"default_flavour,omitempty" json:"default_flavour,omitempty" xml:"default_flavour,omitempty"`
 	// An identifier used by the tools to determine which tools to use on it
 	Fqbn *string `form:"fqbn,omitempty" json:"fqbn,omitempty" xml:"fqbn,omitempty"`
@@ -62,7 +62,7 @@ func (c *Client) DecodeArduinoBuilderBoard(resp *http.Response) (*ArduinoBuilder
 type ArduinoBuilderBoardBootloader struct {
 	// The commandline used to bootload
 	Commandline *string `form:"commandline,omitempty" json:"commandline,omitempty" xml:"commandline,omitempty"`
-	// The flavour of the board. Usually it's default
+	// The flavor of the board. Usually it's default
 	Flavour *string `form:"flavour,omitempty" json:"flavour,omitempty" xml:"flavour,omitempty"`
 	// The signature of the commandline
 	Signature *string `form:"signature,omitempty" json:"signature,omitempty" xml:"signature,omitempty"`
@@ -75,11 +75,11 @@ func (c *Client) DecodeArduinoBuilderBoardBootloader(resp *http.Response) (*Ardu
 	return &decoded, err
 }
 
-// ArduinoBuilderBoardBuild contains the info used to compile for a certain flavour of board. (default view)
+// ArduinoBuilderBoardBuild contains the info used to compile for a certain flavor of board. (default view)
 //
 // Identifier: application/vnd.arduino.builder.board.build; view=default
 type ArduinoBuilderBoardBuild struct {
-	// The flavour of the board. Usually it's default
+	// The flavor of the board. Usually it's default
 	Flavour *string `form:"flavour,omitempty" json:"flavour,omitempty" xml:"flavour,omitempty"`
 	// An identifier used by the tools to determine which tools to use on it
 	Fqbn *string `form:"fqbn,omitempty" json:"fqbn,omitempty" xml:"fqbn,omitempty"`
@@ -92,7 +92,7 @@ func (c *Client) DecodeArduinoBuilderBoardBuild(resp *http.Response) (*ArduinoBu
 	return &decoded, err
 }
 
-// ArduinoBuilderBoardUpload contains the info used to upload a certain flavour of board. (default view)
+// ArduinoBuilderBoardUpload contains the info used to upload a certain flavor of board. (default view)
 //
 // Identifier: application/vnd.arduino.builder.board.upload; view=default
 type ArduinoBuilderBoardUpload struct {
@@ -102,7 +102,7 @@ type ArduinoBuilderBoardUpload struct {
 	Ext *string `form:"ext,omitempty" json:"ext,omitempty" xml:"ext,omitempty"`
 	// Files used by the programmer
 	Files ArduinoBuilderFileCollection `form:"files,omitempty" json:"files,omitempty" xml:"files,omitempty"`
-	// The flavour of the board. Usually it's default
+	// The flavor of the board. Usually it's default
 	Flavour *string `form:"flavour,omitempty" json:"flavour,omitempty" xml:"flavour,omitempty"`
 	// Some options used for uploading, like the speed.
 	Options map[string]string `form:"options,omitempty" json:"options,omitempty" xml:"options,omitempty"`
@@ -167,7 +167,7 @@ type ArduinoBuilderBoardv2 struct {
 	// The architecture of the board
 	Architecture *string                              `form:"architecture,omitempty" json:"architecture,omitempty" xml:"architecture,omitempty"`
 	Build        ArduinoBuilderBoardv2BuildCollection `form:"build,omitempty" json:"build,omitempty" xml:"build,omitempty"`
-	// The default flavour of the board
+	// The default flavor of the board
 	DefaultFlavour *string `form:"default_flavour,omitempty" json:"default_flavour,omitempty" xml:"default_flavour,omitempty"`
 	// An identifier used by the tools to determine which tools to use on it
 	Fqbn *string `form:"fqbn,omitempty" json:"fqbn,omitempty" xml:"fqbn,omitempty"`
@@ -185,7 +185,7 @@ type ArduinoBuilderBoardv2Full struct {
 	Architecture *string                                   `form:"architecture,omitempty" json:"architecture,omitempty" xml:"architecture,omitempty"`
 	Bootloader   ArduinoBuilderBoardv2BootloaderCollection `form:"bootloader,omitempty" json:"bootloader,omitempty" xml:"bootloader,omitempty"`
 	Build        ArduinoBuilderBoardv2BuildCollection      `form:"build,omitempty" json:"build,omitempty" xml:"build,omitempty"`
-	// The default flavour of the board
+	// The default flavor of the board
 	DefaultFlavour *string `form:"default_flavour,omitempty" json:"default_flavour,omitempty" xml:"default_flavour,omitempty"`
 	// An identifier used by the tools to determine which tools to use on it
 	Fqbn *string `form:"fqbn,omitempty" json:"fqbn,omitempty" xml:"fqbn,omitempty"`
@@ -224,7 +224,7 @@ func (c *Client) DecodeArduinoBuilderBoardv2Full(resp *http.Response) (*ArduinoB
 type ArduinoBuilderBoardv2Bootloader struct {
 	// The commandline used to bootload
 	Commandline *string `form:"commandline,omitempty" json:"commandline,omitempty" xml:"commandline,omitempty"`
-	// The flavour of the board. Usually it's default
+	// The flavor of the board. Usually it's default
 	Flavour *string `form:"flavour,omitempty" json:"flavour,omitempty" xml:"flavour,omitempty"`
 	// The signature of the commandline
 	Signature *string `form:"signature,omitempty" json:"signature,omitempty" xml:"signature,omitempty"`
@@ -249,11 +249,11 @@ func (c *Client) DecodeArduinoBuilderBoardv2BootloaderCollection(resp *http.Resp
 	return decoded, err
 }
 
-// Build contains the info used to compile for a certain flavour of board. (default view)
+// Build contains the info used to compile for a certain flavor of board. (default view)
 //
 // Identifier: application/vnd.arduino.builder.boardv2.build; view=default
 type ArduinoBuilderBoardv2Build struct {
-	// The flavour of the board. Usually it's default
+	// The flavor of the board. Usually it's default
 	Flavour *string `form:"flavour,omitempty" json:"flavour,omitempty" xml:"flavour,omitempty"`
 	// An identifier used by the tools to determine which tools to use on it
 	Fqbn *string `form:"fqbn,omitempty" json:"fqbn,omitempty" xml:"fqbn,omitempty"`
@@ -278,7 +278,7 @@ func (c *Client) DecodeArduinoBuilderBoardv2BuildCollection(resp *http.Response)
 	return decoded, err
 }
 
-// ArduinoBuilderBoardv2Upload contains the info used to upload a certain flavour of board. (default view)
+// ArduinoBuilderBoardv2Upload contains the info used to upload a certain flavor of board. (default view)
 //
 // Identifier: application/vnd.arduino.builder.boardv2.upload; view=default
 type ArduinoBuilderBoardv2Upload struct {
@@ -288,7 +288,7 @@ type ArduinoBuilderBoardv2Upload struct {
 	Ext *string `form:"ext,omitempty" json:"ext,omitempty" xml:"ext,omitempty"`
 	// Files used by the programmer
 	Files ArduinoBuilderFileCollection `form:"files,omitempty" json:"files,omitempty" xml:"files,omitempty"`
-	// The flavour of the board. Usually it's default
+	// The flavor of the board. Usually it's default
 	Flavour *string `form:"flavour,omitempty" json:"flavour,omitempty" xml:"flavour,omitempty"`
 	// Some options used for uploading, like the speed.
 	Options map[string]string `form:"options,omitempty" json:"options,omitempty" xml:"options,omitempty"`

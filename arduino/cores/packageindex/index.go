@@ -72,7 +72,7 @@ type indexToolRelease struct {
 	Systems []indexToolReleaseFlavour `json:"systems,required"`
 }
 
-// indexToolReleaseFlavour represents a single tool flavour in the package_index.json file.
+// indexToolReleaseFlavour represents a single tool flavor in the package_index.json file.
 type indexToolReleaseFlavour struct {
 	OS              string      `json:"host,required"`
 	URL             string      `json:"url,required"`
@@ -178,15 +178,15 @@ func (inToolRelease indexToolRelease) extractToolIn(outPackage *cores.Package) {
 	outTool := outPackage.GetOrCreateTool(inToolRelease.Name)
 
 	outToolRelease := outTool.GetOrCreateRelease(inToolRelease.Version)
-	outToolRelease.Flavours = inToolRelease.extractFlavours()
+	outToolRelease.Flavors = inToolRelease.extractFlavours()
 }
 
-// extractFlavours extracts a map[OS]Flavour object from an indexToolRelease entry.
-func (inToolRelease indexToolRelease) extractFlavours() []*cores.Flavour {
-	ret := make([]*cores.Flavour, len(inToolRelease.Systems))
+// extractFlavours extracts a map[OS]Flavor object from an indexToolRelease entry.
+func (inToolRelease indexToolRelease) extractFlavours() []*cores.Flavor {
+	ret := make([]*cores.Flavor, len(inToolRelease.Systems))
 	for i, flavour := range inToolRelease.Systems {
 		size, _ := flavour.Size.Int64()
-		ret[i] = &cores.Flavour{
+		ret[i] = &cores.Flavor{
 			OS: flavour.OS,
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: flavour.ArchiveFileName,

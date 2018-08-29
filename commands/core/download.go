@@ -60,7 +60,7 @@ func downloadPlatformByRef(pm *packagemanager.PackageManager, platformsRef *pack
 		os.Exit(commands.ErrBadCall)
 	}
 
-	// Check if all tools have a flavour available for the current OS
+	// Check if all tools have a flavor available for the current OS
 	for _, tool := range tools {
 		if tool.GetCompatibleFlavour() == nil {
 			formatter.PrintErrorMessage("The tool " + tool.String() + " is not available for the current OS")

@@ -22,7 +22,7 @@ import (
 	"fmt"
 )
 
-// LibraryLayout represents how the library source code is layed out in the library
+// LibraryLayout represents how the library source code is laid out in the library
 type LibraryLayout uint16
 
 const (
