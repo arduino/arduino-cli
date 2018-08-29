@@ -38,10 +38,11 @@ func initDumpCommand() *cobra.Command {
 	}
 }
 
-var dumpFlags struct {
-	_default bool   // If false, ask questions to the user about setting configuration properties, otherwise use default configuration.
-	location string // The custom location of the file to create.
-}
+// This struct is unused
+//var dumpFlags struct {
+//	_default bool   // If false, ask questions to the user about setting configuration properties, otherwise use default configuration.
+//	location string // The custom location of the file to create.
+//}
 
 func runDumpCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config dump`")
