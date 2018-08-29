@@ -49,7 +49,7 @@ func ExampleJSONFormatter_Format() {
 	var jf formatter.JSONFormatter
 	fmt.Println(jf.Format(example))
 
-	var example2 float64 = 3.14
+	var example2 = 3.14
 	fmt.Println(jf.Format(example2))
 
 	var example3 float32 = 3.14

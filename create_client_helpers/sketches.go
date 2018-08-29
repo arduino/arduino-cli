@@ -15,7 +15,7 @@
  * a commercial license, send an email to license@arduino.cc.
  */
 
-package createClient
+package createclient
 
 import (
 	"bytes"

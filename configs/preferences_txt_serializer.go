@@ -105,7 +105,7 @@ func proxyConfigsFromIDEPrefs(props properties.Map) error {
 		manualConfig := proxy.SubTree("manual")
 		hostname, exists := manualConfig["hostname"]
 		if !exists {
-			return errors.New("Proxy hostname not found in preferences.txt")
+			return errors.New("proxy hostname not found in preferences.txt")
 		}
 		username := manualConfig["username"]
 		password := manualConfig["password"]
@@ -119,7 +119,7 @@ func proxyConfigsFromIDEPrefs(props properties.Map) error {
 		// No proxy
 		break
 	default:
-		return errors.New("Unsupported proxy config")
+		return errors.New("unsupported proxy config")
 	}
 	return nil
 }

@@ -162,7 +162,7 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 	platformRelease := platform.GetInstalled()
 	if platformRelease == nil {
 		return targetPackage, nil, nil, nil, nil,
-			fmt.Errorf("Platform %s is not installed", platformRelease)
+			fmt.Errorf("platform %s is not installed", platformRelease)
 	}
 
 	// Find board
@@ -210,14 +210,14 @@ func (pm *PackageManager) LoadPackageIndex(URL *url.URL) error {
 
 // Package looks for the Package with the given name, returning a structure
 // able to perform further operations on that given resource
-func (pm *PackageManager) Package(name string) *packageActions {
+func (pm *PackageManager) Package(name string) *PackageActions {
 	//TODO: perhaps these 2 structure should be merged? cores.Packages vs pkgmgr??
 	var err error
 	thePackage := pm.packages.Packages[name]
 	if thePackage == nil {
 		err = fmt.Errorf("package '%s' not found", name)
 	}
-	return &packageActions{
+	return &PackageActions{
 		aPackage:     thePackage,
 		forwardError: err,
 	}
@@ -225,16 +225,16 @@ func (pm *PackageManager) Package(name string) *packageActions {
 
 // Actions that can be done on a Package
 
-// packageActions defines what actions can be performed on the specific Package
+// PackageActions defines what actions can be performed on the specific Package
 // It serves as a status container for the fluent APIs
-type packageActions struct {
+type PackageActions struct {
 	aPackage     *cores.Package
 	forwardError error
 }
 
 // Tool looks for the Tool with the given name, returning a structure
 // able to perform further operations on that given resource
-func (pa *packageActions) Tool(name string) *toolActions {
+func (pa *PackageActions) Tool(name string) *ToolActions {
 	var tool *cores.Tool
 	err := pa.forwardError
 	if err == nil {
@@ -244,7 +244,7 @@ func (pa *packageActions) Tool(name string) *toolActions {
 			err = fmt.Errorf("tool '%s' not found in package '%s'", name, pa.aPackage.Name)
 		}
 	}
-	return &toolActions{
+	return &ToolActions{
 		tool:         tool,
 		forwardError: err,
 	}
@@ -254,15 +254,15 @@ func (pa *packageActions) Tool(name string) *toolActions {
 
 // Actions that can be done on a Tool
 
-// toolActions defines what actions can be performed on the specific Tool
+// ToolActions defines what actions can be performed on the specific Tool
 // It serves as a status container for the fluent APIs
-type toolActions struct {
+type ToolActions struct {
 	tool         *cores.Tool
 	forwardError error
 }
 
 // Get returns the final representation of the Tool
-func (ta *toolActions) Get() (*cores.Tool, error) {
+func (ta *ToolActions) Get() (*cores.Tool, error) {
 	err := ta.forwardError
 	if err == nil {
 		return ta.tool, nil
@@ -271,7 +271,7 @@ func (ta *toolActions) Get() (*cores.Tool, error) {
 }
 
 // IsInstalled checks whether any release of the Tool is installed in the system
-func (ta *toolActions) IsInstalled() (bool, error) {
+func (ta *ToolActions) IsInstalled() (bool, error) {
 	if ta.forwardError != nil {
 		return false, ta.forwardError
 	}
@@ -284,27 +284,27 @@ func (ta *toolActions) IsInstalled() (bool, error) {
 	return false, nil
 }
 
-func (ta *toolActions) Release(version *semver.RelaxedVersion) *toolReleaseActions {
+func (ta *ToolActions) Release(version *semver.RelaxedVersion) *ToolReleaseActions {
 	if ta.forwardError != nil {
-		return &toolReleaseActions{forwardError: ta.forwardError}
+		return &ToolReleaseActions{forwardError: ta.forwardError}
 	}
 	release := ta.tool.GetRelease(version)
 	if release == nil {
-		return &toolReleaseActions{forwardError: fmt.Errorf("release %s not found for tool %s", version, ta.tool.String())}
+		return &ToolReleaseActions{forwardError: fmt.Errorf("release %s not found for tool %s", version, ta.tool.String())}
 	}
-	return &toolReleaseActions{release: release}
+	return &ToolReleaseActions{release: release}
 }
 
 // END -- Actions that can be done on a Tool
 
-// toolReleaseActions defines what actions can be performed on the specific ToolRelease
+// ToolReleaseActions defines what actions can be performed on the specific ToolRelease
 // It serves as a status container for the fluent APIs
-type toolReleaseActions struct {
+type ToolReleaseActions struct {
 	release      *cores.ToolRelease
 	forwardError error
 }
 
-func (tr *toolReleaseActions) Get() (*cores.ToolRelease, error) {
+func (tr *ToolReleaseActions) Get() (*cores.ToolRelease, error) {
 	if tr.forwardError != nil {
 		return nil, tr.forwardError
 	}

@@ -96,11 +96,11 @@ func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.P
 
 // IsDirEmpty returns true if the directory specified by path is empty.
 func IsDirEmpty(path *paths.Path) (bool, error) {
-	if files, err := path.ReadDir(); err != nil {
+	files, err := path.ReadDir()
+	if err != nil {
 		return false, err
-	} else {
-		return len(files) == 0, nil
 	}
+	return len(files) == 0, nil
 }
 
 func findPackageRoot(parent *paths.Path) (*paths.Path, error) {

@@ -113,11 +113,11 @@ func (targetPackage *Package) String() string {
 func (tdep ToolDependency) extractTool(sc Packages) (*Tool, error) {
 	pkg, exists := sc.Packages[tdep.ToolPackager]
 	if !exists {
-		return nil, errors.New("Package not found")
+		return nil, errors.New("package not found")
 	}
 	tool, exists := pkg.Tools[tdep.ToolName]
 	if !exists {
-		return nil, errors.New("Tool not found")
+		return nil, errors.New("tool not found")
 	}
 	return tool, nil
 }
@@ -129,7 +129,7 @@ func (tdep ToolDependency) extractRelease(sc Packages) (*ToolRelease, error) {
 	}
 	release, exists := tool.Releases[tdep.ToolVersion.String()]
 	if !exists {
-		return nil, errors.New("Release Not Found")
+		return nil, errors.New("release Not Found")
 	}
 	return release, nil
 }
@@ -143,15 +143,15 @@ func (packages *Packages) GetDepsOfPlatformRelease(release *PlatformRelease) ([]
 	for _, dep := range release.Dependencies {
 		pkg, exists := packages.Packages[dep.ToolPackager]
 		if !exists {
-			return nil, fmt.Errorf("Package %s not found", dep.ToolPackager)
+			return nil, fmt.Errorf("package %s not found", dep.ToolPackager)
 		}
 		tool, exists := pkg.Tools[dep.ToolName]
 		if !exists {
-			return nil, fmt.Errorf("Tool %s not found", dep.ToolName)
+			return nil, fmt.Errorf("tool %s not found", dep.ToolName)
 		}
 		toolRelease, exists := tool.Releases[dep.ToolVersion.String()]
 		if !exists {
-			return nil, fmt.Errorf("Tool version %s not found", dep.ToolVersion)
+			return nil, fmt.Errorf("tool version %s not found", dep.ToolVersion)
 		}
 		ret = append(ret, toolRelease)
 	}
