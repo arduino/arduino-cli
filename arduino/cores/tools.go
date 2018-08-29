@@ -163,17 +163,17 @@ func (f *Flavour) isCompatibleWith(osName, osArch string) bool {
 		return regexpArmLinux.MatchString(f.OS)
 	case "linux,amd64":
 		return regexpAmd64.MatchString(f.OS)
-	case "linux,i386":
+	case "linux,386":
 		return regexpi386.MatchString(f.OS)
-	case "windows,i386", "windows,amd64":
+	case "windows,386", "windows,amd64":
 		return regexpWindows.MatchString(f.OS)
 	case "darwin,amd64":
 		return regexpmac32Bit.MatchString(f.OS) || regexpMac64Bit.MatchString(f.OS)
-	case "darwin,i386":
+	case "darwin,386":
 		return regexpmac32Bit.MatchString(f.OS)
 	case "freebsd,arm":
 		return regexpArmBSD.MatchString(f.OS)
-	case "freebsd,i386", "freebsd,amd64":
+	case "freebsd,386", "freebsd,amd64":
 		genericFreeBSDexp := regexp.MustCompile(osArch + "%s-freebsd[0-9]*")
 		return genericFreeBSDexp.MatchString(f.OS)
 	}
