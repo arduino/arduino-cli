@@ -43,7 +43,7 @@ func (c *Client) ListLibraries(
 }
 
 // NewListLibrariesRequest create the request corresponding to the list action endpoint of the libraries resource.
-func (c *Client) NewListLibrariesRequest(ctx context.Context, path string, maintainer *string, type1 *string, withoutType *string) (*http.Request, error) {
+func (c *Client) NewListLibrariesRequest(ctx context.Context, path string, maintainer *string, libType *string, withoutType *string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
@@ -53,8 +53,8 @@ func (c *Client) NewListLibrariesRequest(ctx context.Context, path string, maint
 	if maintainer != nil {
 		values.Set("maintainer", *maintainer)
 	}
-	if type1 != nil {
-		values.Set("type", *type1)
+	if libType != nil {
+		values.Set("type", *libType)
 	}
 	if withoutType != nil {
 		values.Set("without_type", *withoutType)
