@@ -81,7 +81,7 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 
 	var release *cores.PlatformRelease
 	if item.PlatformVersion != nil {
-		release = platform.GetRelease(item.PlatformVersion)
+		release = platform.GetReleaseVersion(item.PlatformVersion)
 		if release == nil {
 			return nil, nil, fmt.Errorf("required version %s not found for platform %s", item.PlatformVersion, platform.String())
 		}
