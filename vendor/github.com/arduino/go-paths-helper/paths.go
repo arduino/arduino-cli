@@ -171,7 +171,7 @@ func (p *Path) IsInsideDir(dir *Path) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return strings.Contains(rel, "../") || rel == "..", nil
+	return strings.Contains(rel, ".."+string(os.PathSeparator)) || rel == "..", nil
 }
 
 // Parent returns all but the last element of path, typically the path's
