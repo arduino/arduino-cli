@@ -30,6 +30,7 @@
 package paths
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -303,6 +304,67 @@ func (p *Path) CopyTo(dst *Path) error {
 		return err
 	}
 
+	return nil
+}
+
+// CopyDirTo recursively copies the directory denoted by the current path to
+// the destination path. The source directory must exist and the destination
+// directory must NOT exist (no implicit destination name allowed).
+// Symlinks are not copied, they will be supported in future versions.
+func (p *Path) CopyDirTo(dst *Path) error {
+	src := p.Clean()
+	dst = dst.Clean()
+
+	srcInfo, err := src.Stat()
+	if err != nil {
+		return fmt.Errorf("getting stat infor for %s: %s", src, err)
+	}
+	if !srcInfo.IsDir() {
+		return fmt.Errorf("%s is not a directory", src)
+	}
+
+	if exist, err := dst.Exist(); exist {
+		return fmt.Errorf("destination %s already exists", dst)
+	} else if err != nil {
+		return fmt.Errorf("checking if %s exists: %s", dst, err)
+	}
+
+	if err := dst.MkdirAll(); err != nil {
+		return fmt.Errorf("creating destination dir %s: %s", dst, err)
+	}
+	if err := os.Chmod(dst.path, srcInfo.Mode()); err != nil {
+		return fmt.Errorf("setting permission for dir %s: %s", dst, err)
+	}
+
+	srcFiles, err := src.ReadDir()
+	if err != nil {
+		return fmt.Errorf("error reading source dir %s: %s", src, err)
+	}
+
+	for _, srcPath := range srcFiles {
+		srcPathInfo, err := srcPath.Stat()
+		if err != nil {
+			return fmt.Errorf("getting stat info for %s: %s", srcPath, err)
+		}
+		dstPath := dst.Join(srcPath.Base())
+
+		if srcPathInfo.IsDir() {
+			if err := srcPath.CopyDirTo(dstPath); err != nil {
+				return fmt.Errorf("copying %s to %s: %s", srcPath, dstPath, err)
+			}
+			continue
+		}
+
+		// Skip symlinks.
+		if srcPathInfo.Mode()&os.ModeSymlink != 0 {
+			// TODO
+			continue
+		}
+
+		if err := srcPath.CopyTo(dstPath); err != nil {
+			return fmt.Errorf("copying %s to %s: %s", srcPath, dstPath, err)
+		}
+	}
 	return nil
 }
 

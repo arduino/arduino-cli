@@ -169,6 +169,40 @@ func TestLibSearch(t *testing.T) {
 	require.Equal(t, "", string(output))
 }
 
+func TestUserLibs(t *testing.T) {
+	defer makeTempDataDir(t)()
+	defer makeTempSketchbookDir(t)()
+	libDir := currSketchbookDir.Join("libraries")
+	err := libDir.MkdirAll()
+	require.NoError(t, err, "creating 'sketchbook/libraries' dir")
+
+	installLib := func(lib string) {
+		libPath := paths.New("testdata/" + lib)
+		fmt.Printf("COPYING: %s in %s\n", libPath, libDir)
+		err = libPath.CopyDirTo(libDir.Join(lib))
+		require.NoError(t, err, "copying "+lib+" in sketchbook")
+	}
+
+	// List libraries (valid libs)
+	installLib("MyLib")
+	exitCode, d := executeWithArgs(t, "lib", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "MyLib")
+	require.Contains(t, string(d), "1.0.5")
+
+	// List libraries (pre-1.5 format)
+	installLib("MyLibPre15")
+	exitCode, d = executeWithArgs(t, "lib", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "MyLibPre15")
+
+	// List libraries (invalid version lib)
+	installLib("MyLibWithWrongVersion")
+	exitCode, d = executeWithArgs(t, "lib", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "MyLibWithWrongVersion")
+}
+
 func TestLibDownloadAndInstall(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
@@ -269,7 +303,6 @@ func TestLibDownloadAndInstall(t *testing.T) {
 	exitCode, d = executeWithArgs(t, "lib", "list")
 	require.Zero(t, exitCode, "exit code")
 	require.NotContains(t, string(d), "Audio")
-
 }
 
 func updateCoreIndex(t *testing.T) {
