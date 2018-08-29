@@ -90,7 +90,8 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 
 	version := strings.TrimSpace(libProperties["version"])
 	if v, err := semver.Parse(version); err != nil {
-		return nil, fmt.Errorf("invalid version %s: %s", version, err)
+		// FIXME: do it in linter?
+		//fmt.Printf("invalid version %s for library in %s: %s", version, libraryDir, err)
 	} else {
 		library.Version = v
 	}
