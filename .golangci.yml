@@ -33,6 +33,5 @@ linters:
   - megacheck
   - nakedret
   - prealloc
-  - unconvert
   - unparam
   - varcheck
