@@ -119,5 +119,7 @@ func TestFQBN(t *testing.T) {
 	require.Equal(t, f.Package, "arduino")
 	require.Equal(t, f.PlatformArch, "avr")
 	require.Equal(t, f.BoardID, "uno")
-	require.Equal(t, "properties.Map{\n  \"cpu\": \"atmega\",\n  \"extra\": \"core=arduino\",\n  \"speed\": \"1000\",\n}", f.Configs.Dump())
+	require.Equal(t,
+		"properties.Map{\n  \"cpu\": \"atmega\",\n  \"extra\": \"core=arduino\",\n  \"speed\": \"1000\",\n}",
+		f.Configs.Dump())
 }

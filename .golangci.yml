@@ -12,6 +12,8 @@ linters-settings:
   goconst:
     min-len: 2
     min-occurrences: 2
+  lll:
+    line-length: 160
 
   misspell:
     locale: US
@@ -25,7 +27,6 @@ linters:
   - goconst
   - gocyclo
   - govet
-  - lll
   - maligned
   - megacheck
   - unparam

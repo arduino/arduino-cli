@@ -24,7 +24,11 @@ import (
 	"github.com/goadesign/goa"
 )
 
-// ArduinoBuilderBoard is a physical board belonging to a certain architecture in a package. The most obvious package is arduino, which contains architectures avr, sam and samd. It can contain multiple versions of the upload commands and options. If there is a default version it means that it's the only version officially supported. Of course if there is only one version it will be called default (default view)
+// ArduinoBuilderBoard is a physical board belonging to a certain architecture in a package.
+// The most obvious package is arduino, which contains architectures avr, sam and samd.
+// It can contain multiple versions of the upload commands and options.
+// If there is a default version it means that it's the only version officially supported.
+// Of course if there is only one version it will be called default (default view)
 //
 // Identifier: application/vnd.arduino.builder.board+json; view=default
 type ArduinoBuilderBoard struct {
@@ -160,7 +164,11 @@ func (c *Client) DecodeArduinoBuilderBoardsv2(resp *http.Response) (*ArduinoBuil
 	return &decoded, err
 }
 
-// ArduinoBuilderBoardv2 is a physical board belonging to a certain architecture in a package. The most obvious package is arduino, which contains architectures avr, sam and samd. It can contain multiple versions of the upload commands and options. If there is a default version it means that it's the only version officially supported. Of course if there is only one version it will be called default (default view)
+// ArduinoBuilderBoardv2 is a physical board belonging to a certain architecture in a package.
+// The most obvious package is arduino, which contains architectures avr, sam and samd.
+// It can contain multiple versions of the upload commands and options.
+// If there is a default version it means that it's the only version officially supported.
+// Of course if there is only one version it will be called default (default view)
 //
 // Identifier: application/vnd.arduino.builder.boardv2+json; view=default
 type ArduinoBuilderBoardv2 struct {
@@ -177,7 +185,11 @@ type ArduinoBuilderBoardv2 struct {
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 }
 
-// ArduinoBuilderBoardv2Full is a physical board belonging to a certain architecture in a package. The most obvious package is arduino, which contains architectures avr, sam and samd. It can contain multiple versions of the upload commands and options. If there is a default version it means that it's the only version officially supported. Of course if there is only one version it will be called default (full view)
+// ArduinoBuilderBoardv2Full is a physical board belonging to a certain architecture in a package.
+// The most obvious package is arduino, which contains architectures avr, sam and samd.
+// It can contain multiple versions of the upload commands and options.
+// If there is a default version it means that it's the only version officially supported.
+// Of course if there is only one version it will be called default (full view)
 //
 // Identifier: application/vnd.arduino.builder.boardv2+json; view=full
 type ArduinoBuilderBoardv2Full struct {
@@ -343,7 +355,9 @@ func (c *Client) DecodeArduinoBuilderBoardv2FullCollection(resp *http.Response) 
 	return decoded, err
 }
 
-// ArduinoBuilderCompilationResult is the result of a compilation. It contains the output and the eventual errors. If successful it contains the generated files. (default view)
+// ArduinoBuilderCompilationResult is the result of a compilation.
+// It contains the output and the eventual errors.
+// If successful it contains the generated files. (default view)
 //
 // Identifier: application/vnd.arduino.builder.compilation.result; view=default
 type ArduinoBuilderCompilationResult struct {
@@ -388,8 +402,8 @@ type ArduinoBuilderExample struct {
 	Types []string `form:"types,omitempty" json:"types,omitempty" xml:"types,omitempty"`
 }
 
-// An ArduinoBuilderExampleLink is a simple sketch with the purpose of demonstrating the capabilities of the language. (link view)
-//
+// An ArduinoBuilderExampleLink is a simple sketch with the purpose of demonstrating the capabilities of the language.
+// (link view)
 // Identifier: application/vnd.arduino.builder.example+json; view=link
 type ArduinoBuilderExampleLink struct {
 	// The url where to find the details
@@ -471,7 +485,9 @@ func (c *Client) DecodeArduinoBuilderFileCollection(resp *http.Response) (Arduin
 	return decoded, err
 }
 
-// ArduinoBuilderLibrary is a collection of header files containing arduino reusable code and functions. It typically contains its info in a library.properties files. The examples property contains a list of examples that use that library. (default view)
+// ArduinoBuilderLibrary is a collection of header files containing arduino reusable code and functions.
+// It typically contains its info in a library.properties files.
+// The examples property contains a list of examples that use that library. (default view)
 //
 // Identifier: application/vnd.arduino.builder.library+json; view=default
 type ArduinoBuilderLibrary struct {
@@ -489,7 +505,8 @@ type ArduinoBuilderLibrary struct {
 	Files []*ArduinoBuilderFile `form:"files,omitempty" json:"files,omitempty" xml:"files,omitempty"`
 	// The url where to find the details
 	Href *string `form:"href,omitempty" json:"href,omitempty" xml:"href,omitempty"`
-	// The id of the library. It could be a combination of name and version, a combination of the package and architecture, or an uuid id
+	// The id of the library.
+	// It could be a combination of name and version, a combination of the package and architecture, or an uuid id
 	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// The maintainer of the library
 	Maintainer *string `form:"maintainer,omitempty" json:"maintainer,omitempty" xml:"maintainer,omitempty"`
@@ -507,7 +524,9 @@ type ArduinoBuilderLibrary struct {
 	Version *string `form:"version,omitempty" json:"version,omitempty" xml:"version,omitempty"`
 }
 
-// ArduinoBuilderLibraryLink is a collection of header files containing arduino reusable code and functions. It typically contains its info in a library.properties files. The examples property contains a list of examples that use that library. (link view)
+// ArduinoBuilderLibraryLink is a collection of header files containing arduino reusable code and functions.
+// It typically contains its info in a library.properties files.
+// The examples property contains a list of examples that use that library. (link view)
 //
 // Identifier: application/vnd.arduino.builder.library+json; view=link
 type ArduinoBuilderLibraryLink struct {
@@ -542,7 +561,8 @@ type ArduinoBuilderSlimlibrary struct {
 	// The number of examples that it contains
 	ExamplesNumber *int    `form:"examples_number,omitempty" json:"examples_number,omitempty" xml:"examples_number,omitempty"`
 	Href           *string `form:"href,omitempty" json:"href,omitempty" xml:"href,omitempty"`
-	// The id of the library. It could be a combination of name and version, a combination of the package and architecture, or an uuid id
+	// The id of the library.
+	// It could be a combination of name and version, a combination of the package and architecture, or an uuid id
 	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// The maintainer of the library
 	Maintainer *string `form:"maintainer,omitempty" json:"maintainer,omitempty" xml:"maintainer,omitempty"`
