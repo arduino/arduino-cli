@@ -206,8 +206,10 @@ func TestUserLibs(t *testing.T) {
 func TestLibDownloadAndInstall(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
+	var d []byte
+	var exitCode int
 
-	exitCode, d := executeWithArgs(t, "core", "update-index")
+	exitCode, _ = executeWithArgs(t, "core", "update-index")
 	require.Zero(t, exitCode, "exit code")
 
 	// Download inexistent

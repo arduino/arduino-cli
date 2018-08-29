@@ -106,7 +106,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Check for ctags tool
 	loadBuiltinCtagsMetadata(pm)
-	ctags, err := getBuiltinCtagsTool(pm)
+	ctags, _ := getBuiltinCtagsTool(pm)
 	if !ctags.IsInstalled() {
 		formatter.Print("Downloading and installing missing tool: " + ctags.String())
 		core.DownloadToolRelease(pm, ctags)
@@ -116,7 +116,7 @@ func run(cmd *cobra.Command, args []string) {
 			formatter.PrintError(err, "Could not load hardware packages.")
 			os.Exit(commands.ErrCoreConfig)
 		}
-		ctags, err = getBuiltinCtagsTool(pm)
+		ctags, _ = getBuiltinCtagsTool(pm)
 		if !ctags.IsInstalled() {
 			formatter.PrintErrorMessage("Missing ctags tool.")
 			os.Exit(commands.ErrCoreConfig)
