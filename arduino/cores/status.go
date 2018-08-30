@@ -129,7 +129,7 @@ func (tdep ToolDependency) extractRelease(sc Packages) (*ToolRelease, error) {
 	}
 	release, exists := tool.Releases[tdep.ToolVersion.String()]
 	if !exists {
-		return nil, errors.New("release Not Found")
+		return nil, errors.New("release not found")
 	}
 	return release, nil
 }
