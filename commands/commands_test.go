@@ -71,7 +71,8 @@ func executeWithArgs(t *testing.T, args ...string) (int, []byte) {
 	var output []byte
 	var exitCode int
 	fmt.Printf("RUNNING: %s\n", args)
-	// This closure is here because we won'that the defer are execute at the end of the "executeWithArgs" method
+
+	// This closure is here because we won't that the defer are executed after the end of the "executeWithArgs" method
 	func() {
 		redirect := &stdOutRedirect{}
 		redirect.Open(t)
