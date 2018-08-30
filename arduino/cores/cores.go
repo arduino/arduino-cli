@@ -111,7 +111,7 @@ func (platform *Platform) GetOrCreateRelease(version *semver.Version) (*Platform
 	return release, nil
 }
 
-// FindReleaseWithRelaxedVersion returns the specified release corresponding the provided version,
+// FindReleaseWithVersion returns the specified release corresponding the provided version,
 // or nil if not found.
 func (platform *Platform) FindReleaseWithVersion(version *semver.Version) *PlatformRelease {
 	// use as an fmt.Stringer
