@@ -288,7 +288,7 @@ func (ta *ToolActions) Release(version *semver.RelaxedVersion) *ToolReleaseActio
 	if ta.forwardError != nil {
 		return &ToolReleaseActions{forwardError: ta.forwardError}
 	}
-	release := ta.tool.GetReleaseRelaxedVersion(version)
+	release := ta.tool.FindReleaseWithRelaxedVersion(version)
 	if release == nil {
 		return &ToolReleaseActions{forwardError: fmt.Errorf("release %s not found for tool %s", version, ta.tool.String())}
 	}

@@ -62,9 +62,9 @@ func (tool *Tool) GetOrCreateRelease(version *semver.RelaxedVersion) *ToolReleas
 	return release
 }
 
-// GetReleaseRelaxedVersion returns the specified release corresponding the provided version,
+// FindReleaseWithRelaxedVersion returns the specified release corresponding the provided version,
 // or nil if not found.
-func (tool *Tool) GetReleaseRelaxedVersion(version *semver.RelaxedVersion) *ToolRelease {
+func (tool *Tool) FindReleaseWithRelaxedVersion(version *semver.RelaxedVersion) *ToolRelease {
 	return tool.Releases[version.String()]
 }
 
@@ -86,7 +86,7 @@ func (tool *Tool) LatestRelease() *ToolRelease {
 		return nil
 	}
 
-	return tool.GetReleaseRelaxedVersion(latest)
+	return tool.FindReleaseWithRelaxedVersion(latest)
 }
 
 // latestReleaseVersion obtains latest version number.

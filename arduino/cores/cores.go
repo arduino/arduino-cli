@@ -23,7 +23,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 
 	"github.com/arduino/arduino-cli/arduino/resources"
-	properties "github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-map"
 	"go.bug.st/relaxed-semver"
 )
 
@@ -111,9 +111,9 @@ func (platform *Platform) GetOrCreateRelease(version *semver.Version) (*Platform
 	return release, nil
 }
 
-// GetReleaseRelaxedVersion returns the specified release corresponding the provided version,
+// FindReleaseWithRelaxedVersion returns the specified release corresponding the provided version,
 // or nil if not found.
-func (platform *Platform) GetReleaseVersion(version *semver.Version) *PlatformRelease {
+func (platform *Platform) FindReleaseWithVersion(version *semver.Version) *PlatformRelease {
 	// use as an fmt.Stringer
 	return platform.Releases[version.String()]
 }
@@ -125,7 +125,7 @@ func (platform *Platform) GetLatestRelease() *PlatformRelease {
 	if latestVersion == nil {
 		return nil
 	}
-	return platform.GetReleaseVersion(latestVersion)
+	return platform.FindReleaseWithVersion(latestVersion)
 }
 
 // GetAllReleasesVersions returns all the version numbers in this Platform Package.
