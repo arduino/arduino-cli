@@ -71,38 +71,40 @@ func executeWithArgs(t *testing.T, args ...string) (int, []byte) {
 	var output []byte
 	var exitCode int
 	fmt.Printf("RUNNING: %s\n", args)
+	// This closure is here because we won'that the defer are execute at the end of the "executeWithArgs" method
+	func() {
+		redirect := &stdOutRedirect{}
+		redirect.Open(t)
+		defer func() {
+			output = redirect.GetOutput()
+			redirect.Close()
+			fmt.Print(string(output))
+			fmt.Println()
+		}()
 
-	redirect := &stdOutRedirect{}
-	redirect.Open(t)
-	defer func() {
-		output = redirect.GetOutput()
-		redirect.Close()
-		fmt.Print(string(output))
-		fmt.Println()
-	}()
+		// Mock the os.Exit function, so that we can use the
+		// error result for the test and prevent the test from exiting
+		fakeExitFired := false
+		fakeExit := func(code int) {
+			exitCode = code
+			fakeExitFired = true
 
-	// Mock the os.Exit function, so that we can use the
-	// error result for the test and prevent the test from exiting
-	fakeExitFired := false
-	fakeExit := func(code int) {
-		exitCode = code
-		fakeExitFired = true
-
-		// use panic to exit and jump to deferred recover
-		panic(fmt.Errorf("os.Exit(%d)", code))
-	}
-	patch := monkey.Patch(os.Exit, fakeExit)
-	defer patch.Unpatch()
-	defer func() {
-		if fakeExitFired {
-			recover()
+			// use panic to exit and jump to deferred recover
+			panic(fmt.Errorf("os.Exit(%d)", code))
 		}
-	}()
+		patch := monkey.Patch(os.Exit, fakeExit)
+		defer patch.Unpatch()
+		defer func() {
+			if fakeExitFired {
+				recover()
+			}
+		}()
 
-	// Execute the CLI command, in this process
-	cmd := root.Init()
-	cmd.SetArgs(args)
-	cmd.Execute()
+		// Execute the CLI command, in this process
+		cmd := root.Init()
+		cmd.SetArgs(args)
+		cmd.Execute()
+	}()
 
 	return exitCode, output
 }
