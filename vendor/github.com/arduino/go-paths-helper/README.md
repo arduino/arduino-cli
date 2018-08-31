@@ -37,7 +37,7 @@ using this library can be done this way:
 ```go
 buildPath := paths.New("/path/to/somewhere")
 srcPath := buildPath.Join("src")
-if isDir, _ := srcPath.IsDir(); !isDir {
+if !srcPath.IsDir() {
     scrPath.MkdirAll()
 }
 ```

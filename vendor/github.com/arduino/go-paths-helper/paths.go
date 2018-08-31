@@ -229,8 +229,23 @@ func (p *Path) FollowSymLink() error {
 	return nil
 }
 
-// Exist return true if the path exists
-func (p *Path) Exist() (bool, error) {
+// Exist return true if the file denoted by this path exists, false
+// in any other case (also in case of error).
+func (p *Path) Exist() bool {
+	exist, err := p.ExistCheck()
+	return exist && err == nil
+}
+
+// NotExist return true if the file denoted by this path DO NOT exists, false
+// in any other case (also in case of error).
+func (p *Path) NotExist() bool {
+	exist, err := p.ExistCheck()
+	return !exist && err == nil
+}
+
+// ExistCheck return true if the path exists or false if the path doesn't exists.
+// In case the check fails false is returned together with the corresponding error.
+func (p *Path) ExistCheck() (bool, error) {
 	_, err := p.Stat()
 	if err == nil {
 		return true, nil
@@ -241,8 +256,24 @@ func (p *Path) Exist() (bool, error) {
 	return false, err
 }
 
-// IsDir return true if the path exists and is a directory
-func (p *Path) IsDir() (bool, error) {
+// IsDir returns true if the path exists and is a directory. In all the other
+// cases (and also in case of any error) false is returned.
+func (p *Path) IsDir() bool {
+	isdir, err := p.IsDirCheck()
+	return isdir && err == nil
+}
+
+// IsNotDir returns true if the path exists and is NOT a directory. In all the other
+// cases (and also in case of any error) false is returned.
+func (p *Path) IsNotDir() bool {
+	isdir, err := p.IsDirCheck()
+	return !isdir && err == nil
+}
+
+// IsDirCheck return true if the path exists and is a directory or false
+// if the path exists and is not a directory. In all the other case false and
+// the corresponding error is returned.
+func (p *Path) IsDirCheck() (bool, error) {
 	info, err := p.Stat()
 	if err == nil {
 		return info.IsDir(), nil
@@ -315,15 +346,12 @@ func (p *Path) CopyDirTo(dst *Path) error {
 	src := p.Clean()
 	dst = dst.Clean()
 
-	srcInfo, err := src.Stat()
+	srcFiles, err := src.ReadDir()
 	if err != nil {
-		return fmt.Errorf("getting stat infor for %s: %s", src, err)
-	}
-	if !srcInfo.IsDir() {
-		return fmt.Errorf("%s is not a directory", src)
+		return fmt.Errorf("error reading source dir %s: %s", src, err)
 	}
 
-	if exist, err := dst.Exist(); exist {
+	if exist, err := dst.ExistCheck(); exist {
 		return fmt.Errorf("destination %s already exists", dst)
 	} else if err != nil {
 		return fmt.Errorf("checking if %s exists: %s", dst, err)
@@ -332,13 +360,13 @@ func (p *Path) CopyDirTo(dst *Path) error {
 	if err := dst.MkdirAll(); err != nil {
 		return fmt.Errorf("creating destination dir %s: %s", dst, err)
 	}
+
+	srcInfo, err := src.Stat()
+	if err != nil {
+		return fmt.Errorf("getting stat info for %s: %s", src, err)
+	}
 	if err := os.Chmod(dst.path, srcInfo.Mode()); err != nil {
 		return fmt.Errorf("setting permission for dir %s: %s", dst, err)
-	}
-
-	srcFiles, err := src.ReadDir()
-	if err != nil {
-		return fmt.Errorf("error reading source dir %s: %s", src, err)
 	}
 
 	for _, srcPath := range srcFiles {

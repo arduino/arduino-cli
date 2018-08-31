@@ -35,13 +35,11 @@ func (config *Configuration) HardwareDirectories() (paths.PathList, error) {
 		}
 	}
 
-	dir := config.PackagesDir()
-	if isdir, _ := dir.IsDir(); isdir {
+	if dir := config.PackagesDir(); dir.IsDir() {
 		res.Add(dir)
 	}
 
-	dir = config.SketchbookDir.Join("hardware")
-	if isdir, _ := dir.IsDir(); isdir {
+	if dir := config.SketchbookDir.Join("hardware"); dir.IsDir() {
 		res.Add(dir)
 	}
 

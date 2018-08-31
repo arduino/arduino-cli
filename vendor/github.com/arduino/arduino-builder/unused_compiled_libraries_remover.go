@@ -41,7 +41,7 @@ type UnusedCompiledLibrariesRemover struct{}
 func (s *UnusedCompiledLibrariesRemover) Run(ctx *types.Context) error {
 	librariesBuildPath := ctx.LibrariesBuildPath
 
-	if exist, _ := librariesBuildPath.Exist(); !exist {
+	if librariesBuildPath.NotExist() {
 		return nil
 	}
 
@@ -52,7 +52,7 @@ func (s *UnusedCompiledLibrariesRemover) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 	for _, file := range files {
-		if isDir, _ := file.IsDir(); isDir {
+		if file.IsDir() {
 			if !utils.SliceContains(libraryNames, file.Base()) {
 				if err := file.RemoveAll(); err != nil {
 					return i18n.WrapError(err)

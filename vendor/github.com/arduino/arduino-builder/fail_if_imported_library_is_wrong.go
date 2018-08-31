@@ -47,7 +47,7 @@ func (s *FailIfImportedLibraryIsWrong) Run(ctx *types.Context) error {
 
 	for _, library := range ctx.ImportedLibraries {
 		if !library.IsLegacy {
-			if isDir, _ := library.InstallDir.Join(constants.LIBRARY_FOLDER_ARCH).IsDir(); isDir {
+			if library.InstallDir.Join(constants.LIBRARY_FOLDER_ARCH).IsDir() {
 				return i18n.ErrorfWithLogger(logger, constants.MSG_ARCH_FOLDER_NOT_SUPPORTED)
 			}
 			for _, propName := range libraries.MandatoryProperties {

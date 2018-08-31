@@ -89,7 +89,7 @@ func (s *PlatformKeysRewriteLoader) Run(ctx *types.Context) error {
 func findPlatformKeysRewriteTxt(folders paths.PathList) (*paths.Path, error) {
 	for _, folder := range folders {
 		txtPath := folder.Join(constants.FILE_PLATFORM_KEYS_REWRITE_TXT)
-		if exist, err := txtPath.Exist(); exist {
+		if exist, err := txtPath.ExistCheck(); exist {
 			return txtPath, nil
 		} else if err != nil {
 			return nil, i18n.WrapError(err)

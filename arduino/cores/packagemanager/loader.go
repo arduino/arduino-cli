@@ -64,9 +64,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) error {
 	}
 
 	// TODO: IS THIS CHECK NEEDED? can we ignore and let it fail at next ReadDir?
-	if isDir, err := path.IsDir(); err != nil {
-		return fmt.Errorf("reading %s stat info: %s", path, err)
-	} else if !isDir {
+	if !path.IsDir() {
 		return fmt.Errorf("%s is not a directory", path)
 	}
 
@@ -103,10 +101,10 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) error {
 		// in the latter case we just move into "hardware" directory and continue
 		var architectureParentPath *paths.Path
 		hardwareSubdirPath := packagerPath.Join("hardware") // ex: .arduino15/packages/arduino/hardware
-		if isDir, _ := hardwareSubdirPath.IsDir(); isDir {
+		if hardwareSubdirPath.IsDir() {
 			// we found the "hardware" directory move down into that
 			architectureParentPath = hardwareSubdirPath // ex: .arduino15/packages/arduino/
-		} else if isDir, _ := packagerPath.IsDir(); isDir {
+		} else if packagerPath.IsDir() {
 			// we are already at the correct level
 			architectureParentPath = packagerPath
 		} else {
@@ -122,7 +120,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) error {
 		// Check if we have tools to load, the directory structure is as follows:
 		// - PACKAGER/tools/TOOL-NAME/TOOL-VERSION/... (ex: arduino/tools/bossac/1.7.0/...)
 		toolsSubdirPath := packagerPath.Join("tools")
-		if isDir, _ := toolsSubdirPath.IsDir(); isDir {
+		if toolsSubdirPath.IsDir() {
 			pm.Log.Infof("Checking existence of 'tools' path: %s", toolsSubdirPath)
 			if err := pm.loadToolsFromPackage(targetPackage, toolsSubdirPath); err != nil {
 				return fmt.Errorf("loading tools from %s: %s", toolsSubdirPath, err)
@@ -150,7 +148,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 			continue
 		}
 		platformPath := packageDir.Join(architecure)
-		if isDir, _ := platformPath.IsDir(); !isDir {
+		if !platformPath.IsDir() {
 			continue
 		}
 
@@ -159,7 +157,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 		// - ARCHITECTURE/VERSION/boards.txt
 		// We identify them by checking where is the bords.txt file
 		possibleBoardTxtPath := platformPath.Join("boards.txt")
-		if exist, err := possibleBoardTxtPath.Exist(); err != nil {
+		if exist, err := possibleBoardTxtPath.ExistCheck(); err != nil {
 
 			return fmt.Errorf("looking for boards.txt in %s: %s", possibleBoardTxtPath, err)
 
@@ -169,7 +167,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 			// this is an unversioned Platform
 
 			// FIXME: this check is duplicated, find a better way to handle this
-			if exist, err := platformPath.Join("boards.txt").Exist(); err != nil {
+			if exist, err := platformPath.Join("boards.txt").ExistCheck(); err != nil {
 				return fmt.Errorf("opening boards.txt: %s", err)
 			} else if !exist {
 				continue
@@ -198,7 +196,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 			versionDirs.FilterDirs()
 			versionDirs.FilterOutHiddenFiles()
 			for _, versionDir := range versionDirs {
-				if exist, err := versionDir.Join("boards.txt").Exist(); err != nil {
+				if exist, err := versionDir.Join("boards.txt").ExistCheck(); err != nil {
 					return fmt.Errorf("opening boards.txt: %s", err)
 				} else if !exist {
 					continue

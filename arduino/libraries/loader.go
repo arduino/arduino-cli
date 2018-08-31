@@ -28,7 +28,7 @@ import (
 
 // Load loads a library from the given LibraryLocation
 func Load(libDir *paths.Path, location LibraryLocation) (*Library, error) {
-	if exist, _ := libDir.Join("library.properties").Exist(); exist {
+	if libDir.Join("library.properties").Exist() {
 		return makeNewLibrary(libDir, location)
 	}
 	return makeLegacyLibrary(libDir, location)
@@ -36,7 +36,7 @@ func Load(libDir *paths.Path, location LibraryLocation) (*Library, error) {
 
 func addUtilityDirectory(library *Library) {
 	utilitySourcePath := library.InstallDir.Join("utility")
-	if isDir, _ := utilitySourcePath.IsDir(); isDir {
+	if utilitySourcePath.IsDir() {
 		library.UtilityDir = utilitySourcePath
 	}
 }
@@ -60,7 +60,7 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	library := &Library{}
 	library.Location = location
 	library.InstallDir = libraryDir
-	if exist, _ := libraryDir.Join("src").Exist(); exist {
+	if libraryDir.Join("src").Exist() {
 		library.Layout = RecursiveLayout
 		library.SourceDir = libraryDir.Join("src")
 	} else {

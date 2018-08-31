@@ -209,7 +209,7 @@ func (release *PlatformRelease) RuntimeProperties() properties.Map {
 // present
 func (release *PlatformRelease) GetLibrariesDir() *paths.Path {
 	libDir := release.InstallDir.Join("libraries")
-	if isDir, _ := libDir.IsDir(); isDir {
+	if libDir.IsDir() {
 		return libDir
 	}
 	return nil

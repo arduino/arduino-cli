@@ -67,7 +67,7 @@ func (p *PathList) AsStrings() []string {
 func (p *PathList) FilterDirs() {
 	res := (*p)[:0]
 	for _, path := range *p {
-		if isDir, _ := path.IsDir(); isDir {
+		if path.IsDir() {
 			res = append(res, path)
 		}
 	}
@@ -78,7 +78,7 @@ func (p *PathList) FilterDirs() {
 func (p *PathList) FilterOutDirs() {
 	res := (*p)[:0]
 	for _, path := range *p {
-		if isDir, _ := path.IsDir(); isDir {
+		if path.IsDir() {
 			res = append(res, path)
 		}
 	}

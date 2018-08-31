@@ -130,7 +130,7 @@ func proxyConfigsFromIDEPrefs(props properties.Map) error {
 func IDEBundledLibrariesDir() *paths.Path {
 	if IsBundledInDesktopIDE() {
 		libDir := paths.New(*arduinoIDEDirectory, "libraries")
-		if isDir, _ := libDir.IsDir(); isDir {
+		if libDir.IsDir() {
 			return libDir
 		}
 	}
