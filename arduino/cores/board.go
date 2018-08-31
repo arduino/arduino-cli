@@ -26,7 +26,7 @@ import (
 
 // Board represents a board loaded from an installed platform
 type Board struct {
-	BoardId         string
+	BoardID         string
 	Properties      properties.Map   `json:"-"`
 	PlatformRelease *PlatformRelease `json:"-"`
 }
@@ -53,7 +53,7 @@ func (b *Board) Name() string {
 // FQBN return the Fully-Qualified-Board-Name for the default configuration of this board
 func (b *Board) FQBN() string {
 	platform := b.PlatformRelease.Platform
-	return platform.Package.Name + ":" + platform.Architecture + ":" + b.BoardId
+	return platform.Package.Name + ":" + platform.Architecture + ":" + b.BoardID
 }
 
 func (b *Board) String() string {

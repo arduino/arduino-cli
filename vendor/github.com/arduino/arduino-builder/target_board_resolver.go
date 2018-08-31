@@ -57,7 +57,7 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 	core = core[strings.Index(core, ":")+1:]
 
 	if ctx.Verbose {
-		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_BOARD, targetBoard.BoardId, targetPlatform.InstallDir)
+		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_BOARD, targetBoard.BoardID, targetPlatform.InstallDir)
 		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_CORE, core, actualPlatform.InstallDir)
 	}
 

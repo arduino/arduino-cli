@@ -48,14 +48,14 @@ func (*AddBuildBoardPropertyIfMissing) Run(ctx *types.Context) error {
 			for _, platformRelease := range platform.Releases {
 				for _, board := range platformRelease.Boards {
 					if board.Properties["build.board"] == "" {
-						board.Properties["build.board"] = strings.ToUpper(platform.Architecture + "_" + board.BoardId)
+						board.Properties["build.board"] = strings.ToUpper(platform.Architecture + "_" + board.BoardID)
 						logger.Fprintln(
 							os.Stdout,
 							constants.LOG_LEVEL_WARN,
 							constants.MSG_MISSING_BUILD_BOARD,
 							aPackage.Name,
 							platform.Architecture,
-							board.BoardId,
+							board.BoardID,
 							board.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
 					}
 				}
