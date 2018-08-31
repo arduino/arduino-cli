@@ -76,7 +76,7 @@ func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.P
 	}()
 
 	// If the destination dir already exists remove it
-	if isdir, _ := destDir.IsDir(); isdir {
+	if destDir.IsDir() {
 		destDir.RemoveAll()
 	}
 
@@ -110,7 +110,7 @@ func findPackageRoot(parent *paths.Path) (*paths.Path, error) {
 	}
 	var root *paths.Path
 	for _, file := range files {
-		if isdir, _ := file.IsDir(); !isdir {
+		if !file.IsDir() {
 			continue
 		}
 		if root == nil {

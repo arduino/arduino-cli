@@ -50,7 +50,7 @@ func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release) (*path
 	libPath := libsDir.Join(utils.SanitizeName(indexLibrary.Library.Name))
 	if replaced != nil && replaced.InstallDir.EquivalentTo(libPath) {
 		formatter.Print(fmt.Sprintf("Replacing %s with %s", replaced, indexLibrary))
-	} else if isdir, _ := libPath.IsDir(); isdir {
+	} else if libPath.IsDir() {
 		return nil, fmt.Errorf("destination dir %s already exists, cannot install", libPath)
 	}
 	return libPath, indexLibrary.Resource.Install(lm.DownloadsDir, libsDir, libPath)

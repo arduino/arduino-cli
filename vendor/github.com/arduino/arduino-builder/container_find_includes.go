@@ -144,7 +144,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	sourceFilePaths := ctx.CollectedSourceFiles
 	queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, ctx.SketchBuildPath, false /* recurse */)
 	srcSubfolderPath := ctx.SketchBuildPath.Join(constants.SKETCH_FOLDER_SRC)
-	if isDir, _ := srcSubfolderPath.IsDir(); isDir {
+	if srcSubfolderPath.IsDir() {
 		queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, srcSubfolderPath, true /* recurse */)
 	}
 

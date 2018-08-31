@@ -58,9 +58,9 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 	sketchInSubfolder := buildPath.Join(constants.FOLDER_SKETCH, sketchFileName+".hex")
 
 	var builtSketchPath *paths.Path
-	if exist, _ := sketchInBuildPath.Exist(); exist {
+	if sketchInBuildPath.Exist() {
 		builtSketchPath = sketchInBuildPath
-	} else if exist, _ := sketchInSubfolder.Exist(); exist {
+	} else if sketchInSubfolder.Exist() {
 		builtSketchPath = sketchInSubfolder
 	} else {
 		return nil
@@ -75,7 +75,7 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 	bootloader = buildProperties.ExpandPropsInString(bootloader)
 
 	bootloaderPath := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH).Join(constants.FOLDER_BOOTLOADERS, bootloader)
-	if exist, _ := bootloaderPath.Exist(); !exist {
+	if bootloaderPath.NotExist() {
 		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_BOOTLOADER_FILE_MISSING, bootloaderPath)
 		return nil
 	}

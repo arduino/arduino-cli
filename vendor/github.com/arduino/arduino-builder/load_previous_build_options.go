@@ -40,12 +40,8 @@ type LoadPreviousBuildOptionsMap struct{}
 func (s *LoadPreviousBuildOptionsMap) Run(ctx *types.Context) error {
 	buildOptionsFile := ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE)
 
-	if exist, err := buildOptionsFile.Exist(); err == nil {
-		if !exist {
-			return nil
-		}
-	} else {
-		return i18n.WrapError(err)
+	if buildOptionsFile.NotExist() {
+		return nil
 	}
 
 	bytes, err := buildOptionsFile.ReadFile()
@@ -54,6 +50,5 @@ func (s *LoadPreviousBuildOptionsMap) Run(ctx *types.Context) error {
 	}
 
 	ctx.BuildOptionsJsonPrevious = string(bytes)
-
 	return nil
 }

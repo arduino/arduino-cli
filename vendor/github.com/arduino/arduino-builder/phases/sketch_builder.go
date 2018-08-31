@@ -55,7 +55,7 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 
 	// The "src/" subdirectory of a sketch is compiled recursively
 	sketchSrcPath := sketchBuildPath.Join(constants.SKETCH_FOLDER_SRC)
-	if isDir, _ := sketchSrcPath.IsDir(); isDir {
+	if sketchSrcPath.IsDir() {
 		srcObjectFiles, err := builder_utils.CompileFiles(ctx, sketchSrcPath, true, sketchSrcPath, buildProperties, includes)
 		if err != nil {
 			return i18n.WrapError(err)
