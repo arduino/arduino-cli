@@ -108,7 +108,7 @@ func (pm *PackageManager) FindBoardsWithID(id string) []*cores.Board {
 		for _, targetPlatform := range targetPackage.Platforms {
 			if platform := targetPlatform.GetInstalled(); platform != nil {
 				for _, board := range platform.Boards {
-					if board.BoardId == id {
+					if board.BoardID == id {
 						res = append(res, board)
 					}
 				}

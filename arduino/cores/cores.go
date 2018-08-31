@@ -177,7 +177,7 @@ func (release *PlatformRelease) GetOrCreateBoard(boardID string) *Board {
 		return board
 	}
 	board := &Board{
-		BoardId:         boardID,
+		BoardID:         boardID,
 		Properties:      properties.Map{},
 		PlatformRelease: release,
 	}
