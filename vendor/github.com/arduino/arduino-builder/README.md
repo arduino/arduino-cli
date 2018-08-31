@@ -63,8 +63,12 @@ To build, run the following commands:
 go get github.com/go-errors/errors
 go get github.com/stretchr/testify
 go get github.com/jstemmer/go-junit-report
-go get github.com/arduino/go-properties-map
-go get github.com/arduino/go-timeutils
+go get -u github.com/arduino/go-properties-map
+go get -u github.com/arduino/go-timeutils
+go get google.golang.org/grpc
+go get github.com/golang/protobuf/proto
+go get golang.org/x/net/context
+go get github.com/fsnotify/fsnotify
 go get github.com/arduino/arduino-builder
 go build github.com/arduino/arduino-builder/arduino-builder
 ```
