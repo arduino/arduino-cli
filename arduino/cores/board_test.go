@@ -25,7 +25,7 @@ import (
 )
 
 var boardUno = &Board{
-	BoardId: "uno",
+	BoardID: "uno",
 	Properties: properties.Map{
 		"name":                      "Arduino/Genuino Uno",
 		"vid.0":                     "0x2341",
@@ -65,7 +65,7 @@ var boardUno = &Board{
 }
 
 var boardMega = &Board{
-	BoardId: "mega",
+	BoardID: "mega",
 	Properties: properties.Map{
 		"name":                                          "Arduino/Genuino Mega or Mega 2560",
 		"vid.0":                                         "0x2341",
@@ -120,7 +120,7 @@ var boardMega = &Board{
 }
 
 var boardWatterottTiny841 = &Board{
-	BoardId: "attiny841",
+	BoardID: "attiny841",
 	Properties: properties.Map{
 		"name":                                "ATtiny841 (8 MHz)",
 		"menu.core.arduino":                   "Standard Arduino",

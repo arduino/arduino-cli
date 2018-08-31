@@ -17,7 +17,7 @@
     "utils",
   ]
   pruneopts = "UT"
-  revision = "8a51a33ba700749a9e5028e09985a2cb75f16e0e"
+  revision = "f99ab5a8093d682b710b9eebf67304aa829f5b15"
   source = "github.com/arduino/arduino-builder"
 
 [[projects]]
