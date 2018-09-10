@@ -524,5 +524,10 @@ func GetCachedCoreArchiveFileName(fqbn string, coreFolder *paths.Path) string {
 		coreFolder = absCoreFolder
 	} // silently continue if absolute path can't be detected
 	hash := utils.MD5Sum([]byte(coreFolder.String()))
-	return "core_" + fqbnToUnderscore + "_" + hash + ".a"
+	realName := "core_" + fqbnToUnderscore + "_" + hash + ".a"
+	if len(realName) > 100 {
+		// avoid really long names, simply hash the final part
+		realName = "core_" + utils.MD5Sum([]byte(fqbnToUnderscore+"_"+hash)) + ".a"
+	}
+	return realName
 }
