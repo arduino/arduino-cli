@@ -30,6 +30,8 @@
 package phases
 
 import (
+	"os"
+
 	"github.com/arduino/arduino-builder/builder_utils"
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
@@ -121,11 +123,15 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 
 	// archive core.a
 	if targetArchivedCore != nil {
+		err := archiveFile.CopyTo(targetArchivedCore)
 		if ctx.Verbose {
-			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_ARCHIVING_CORE_CACHE, targetArchivedCore)
-		}
-		if err := archiveFile.CopyTo(targetArchivedCore); err != nil {
-			return nil, nil, i18n.WrapError(err)
+			if err == nil {
+				logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_ARCHIVING_CORE_CACHE, targetArchivedCore)
+			} else if os.IsNotExist(err) {
+				logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_CORE_CACHE_UNAVAILABLE, ctx.ActualPlatform)
+			} else {
+				logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_ERROR_ARCHIVING_CORE_CACHE, targetArchivedCore, err)
+			}
 		}
 	}
 
