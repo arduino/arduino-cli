@@ -30,11 +30,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:5c252a193aaa1c0306a7465d11022653dab30d36c3ab5e1e47bd3d608659f061"
+  digest = "1:fd2ebfc02b6ad10599b226d2c0265f160e95e7c80e23f01dcf34a8aff0de98c9"
   name = "github.com/arduino/go-paths-helper"
   packages = ["."]
   pruneopts = "UT"
-  revision = "44d19052dd968f9ee7c3cc26043b81752794a6dd"
+  revision = "751652ddd9f0a98650e681673c2c73937002e889"
 
 [[projects]]
   branch = "master"
