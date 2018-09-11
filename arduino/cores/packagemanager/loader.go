@@ -164,7 +164,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 		} else if exist {
 
 			// case: ARCHITECTURE/boards.txt
-			// this is an unversioned Platform
+			version := semver.MustParse("")
 
 			// FIXME: this check is duplicated, find a better way to handle this
 			if exist, err := platformPath.Join("boards.txt").ExistCheck(); err != nil {
@@ -174,7 +174,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 			}
 
 			platform := targetPackage.GetOrCreatePlatform(architecure)
-			release, err := platform.GetOrCreateRelease(nil)
+			release, err := platform.GetOrCreateRelease(version)
 			if err != nil {
 				return fmt.Errorf("loading platform release: %s", err)
 			}
