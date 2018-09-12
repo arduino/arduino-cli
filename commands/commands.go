@@ -102,7 +102,7 @@ func InitLibraryManager(pm *packagemanager.PackageManager) *librariesmanager.Lib
 		Config.DownloadsDir())
 
 	// Add IDE builtin libraries dir
-	if bundledLibsDir := configs.IDEBundledLibrariesDir(); bundledLibsDir != nil {
+	if bundledLibsDir := Config.IDEBundledLibrariesDir(); bundledLibsDir != nil {
 		lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
 	}
 

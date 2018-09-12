@@ -21,7 +21,6 @@ import (
 	"errors"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/arduino/go-paths-helper"
@@ -30,15 +29,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var arduinoIDEDirectory *string
-
 // IsBundledInDesktopIDE returns true if the CLI is bundled with the Arduino IDE.
-func IsBundledInDesktopIDE() bool {
-	if arduinoIDEDirectory != nil {
-		return *arduinoIDEDirectory != ""
+func (config *Configuration) IsBundledInDesktopIDE() bool {
+	if config.IDEBundledCheckResult != nil {
+		return *config.IDEBundledCheckResult
 	}
-	empty := ""
-	arduinoIDEDirectory = &empty
+
+	res := false
+	config.IDEBundledCheckResult = &res
 
 	logrus.Info("Checking if CLI is Bundled into the IDE")
 	executable, err := os.Executable()
@@ -46,25 +44,27 @@ func IsBundledInDesktopIDE() bool {
 		logrus.WithError(err).Warn("Cannot get executable path")
 		return false
 	}
-	executable, err = filepath.EvalSymlinks(executable)
-	if err != nil {
-		logrus.WithError(err).Warn("Cannot get executable path (symlinks error)")
+	executablePath := paths.New(executable)
+	if err := executablePath.FollowSymLink(); err != nil {
+		logrus.WithError(err).Warn("Cannot get executable path")
 		return false
 	}
-	ideDir := filepath.Dir(executable)
+	ideDir := executablePath.Parent()
 	logrus.Info("Candidate IDE Directory: ", ideDir)
 
-	tests := []string{"tools-builder", "Examples/01.Basics/Blink"}
+	tests := []string{
+		"tools-builder",
+		"examples/01.Basics/Blink",
+	}
 	for _, test := range tests {
-		filePath := filepath.Join(ideDir, test)
-		_, err := os.Stat(filePath)
-		if !os.IsNotExist(err) {
-			arduinoIDEDirectory = &ideDir
-			break
+		if !ideDir.Join(test).Exist() {
+			return false
 		}
 	}
 
-	return *arduinoIDEDirectory != ""
+	config.ArduinoIDEDirectory = ideDir
+	res = true
+	return true
 }
 
 // LoadFromDesktopIDEPreferences loads the config from the Desktop IDE preferences.txt file
@@ -127,9 +127,9 @@ func proxyConfigsFromIDEPrefs(props properties.Map) error {
 // IDEBundledLibrariesDir returns the libraries directory bundled in
 // the Arduino IDE. If there is no Arduino IDE or the directory doesn't
 // exists then nil is returned
-func IDEBundledLibrariesDir() *paths.Path {
-	if IsBundledInDesktopIDE() {
-		libDir := paths.New(*arduinoIDEDirectory, "libraries")
+func (config *Configuration) IDEBundledLibrariesDir() *paths.Path {
+	if config.IsBundledInDesktopIDE() {
+		libDir := config.ArduinoIDEDirectory.Join("libraries")
 		if libDir.IsDir() {
 			return libDir
 		}

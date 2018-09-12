@@ -39,7 +39,7 @@ func (pm *PackageManager) LoadHardware(config *configs.Configuration) error {
 	if err := pm.LoadHardwareFromDirectories(dirs); err != nil {
 		return err
 	}
-	dirs, err = configs.BundleToolsDirectories()
+	dirs, err = config.BundleToolsDirectories()
 	if err != nil {
 		return fmt.Errorf("getting hardware directory: %s", err)
 	}

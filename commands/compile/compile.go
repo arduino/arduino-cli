@@ -31,7 +31,6 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-map"
 	"github.com/sirupsen/logrus"
@@ -163,7 +162,7 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrCoreConfig)
 	}
 
-	if toolsDir, err := configs.BundleToolsDirectories(); err == nil {
+	if toolsDir, err := commands.Config.BundleToolsDirectories(); err == nil {
 		ctx.ToolsDirs = toolsDir
 	} else {
 		formatter.PrintError(err, "Cannot get bundled tools directories.")
