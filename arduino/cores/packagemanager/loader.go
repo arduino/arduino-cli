@@ -164,6 +164,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 		} else if exist {
 
 			// case: ARCHITECTURE/boards.txt
+			// this is the general case for unversioned Platform
 			version := semver.MustParse("")
 
 			// FIXME: this check is duplicated, find a better way to handle this
@@ -171,6 +172,34 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 				return fmt.Errorf("opening boards.txt: %s", err)
 			} else if !exist {
 				continue
+			}
+
+			// check if package_bundled_index.json exists
+			packageBundledIndexPath := packageDir.Parent().Join("package_index_bundled.json")
+			if packageBundledIndexPath.Exist() {
+				// particular case: ARCHITECTURE/boards.txt with package_bundled_index.json
+
+				// this is an unversioned Platform with a package_index_bundled.json that
+				// gives information about the version and tools needed
+
+				// Parse the bundled index and merge to the general index
+				index, err := pm.LoadPackageIndexFromFile(packageBundledIndexPath)
+				if err != nil {
+					return fmt.Errorf("parsing IDE bundled index: %s", err)
+				}
+
+				// Now export the bundled index in a temporary core.Packages to retrieve the bundled package version
+				tmp := cores.NewPackages()
+				index.MergeIntoPackages(tmp)
+				if tmpPackage := tmp.GetOrCreatePackage(targetPackage.Name); tmpPackage == nil {
+					pm.Log.Warnf("Can't determine bundle platform version for %s", targetPackage.Name)
+				} else if tmpPlatform := tmpPackage.GetOrCreatePlatform(architecure); tmpPlatform == nil {
+					pm.Log.Warnf("Can't determine bundle platform version for %s:%s", targetPackage.Name, architecure)
+				} else if tmpPlatformRelease := tmpPlatform.GetLatestRelease(); tmpPlatformRelease == nil {
+					pm.Log.Warnf("Can't determine bundle platform version for %s:%s, no valid release found", targetPackage.Name, architecure)
+				} else {
+					version = tmpPlatformRelease.Version
+				}
 			}
 
 			platform := targetPackage.GetOrCreatePlatform(architecure)
