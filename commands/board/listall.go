@@ -45,7 +45,7 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 	list := &output.BoardList{}
 	for _, targetPackage := range pm.GetPackages().Packages {
 		for _, platform := range targetPackage.Platforms {
-			platformRelease := platform.GetInstalled()
+			platformRelease := pm.GetInstalledPlatformRelease(platform)
 			if platformRelease == nil {
 				continue
 			}

@@ -59,7 +59,7 @@ func uninstallPlatformByRef(pm *packagemanager.PackageManager, platformRef *pack
 			formatter.PrintErrorMessage("Platform not found " + platformRef.String())
 			os.Exit(commands.ErrBadCall)
 		}
-		platformRelease := platform.GetInstalled()
+		platformRelease := pm.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
 			formatter.PrintErrorMessage("Platform not installed " + platformRef.String())
 			os.Exit(commands.ErrBadCall)

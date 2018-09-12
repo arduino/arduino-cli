@@ -90,7 +90,7 @@ func (pm *PackageManager) FindBoardsWithVidPid(vid, pid string) []*cores.Board {
 	res := []*cores.Board{}
 	for _, targetPackage := range pm.packages.Packages {
 		for _, targetPlatform := range targetPackage.Platforms {
-			if platform := targetPlatform.GetInstalled(); platform != nil {
+			if platform := pm.GetInstalledPlatformRelease(targetPlatform); platform != nil {
 				for _, board := range platform.Boards {
 					if board.HasUsbID(vid, pid) {
 						res = append(res, board)
@@ -106,7 +106,7 @@ func (pm *PackageManager) FindBoardsWithID(id string) []*cores.Board {
 	res := []*cores.Board{}
 	for _, targetPackage := range pm.packages.Packages {
 		for _, targetPlatform := range targetPackage.Platforms {
-			if platform := targetPlatform.GetInstalled(); platform != nil {
+			if platform := pm.GetInstalledPlatformRelease(targetPlatform); platform != nil {
 				for _, board := range platform.Boards {
 					if board.BoardID == id {
 						res = append(res, board)
@@ -159,7 +159,7 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 		return targetPackage, nil, nil, nil, nil,
 			fmt.Errorf("unknown platform %s:%s", targetPackage, fqbn.PlatformArch)
 	}
-	platformRelease := platform.GetInstalled()
+	platformRelease := pm.GetInstalledPlatformRelease(platform)
 	if platformRelease == nil {
 		return targetPackage, nil, nil, nil, nil,
 			fmt.Errorf("platform %s is not installed", platformRelease)
@@ -189,7 +189,8 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 			return targetPackage, platformRelease, board, buildProperties, nil,
 				fmt.Errorf("missing package %s:%s required for build", referredPackage, platform)
 		}
-		buildPlatformRelease = buildPackage.Platforms[fqbn.PlatformArch].GetInstalled()
+		buildPlatform := buildPackage.Platforms[fqbn.PlatformArch]
+		buildPlatformRelease = pm.GetInstalledPlatformRelease(buildPlatform)
 	}
 
 	// No errors... phew!
@@ -314,6 +315,29 @@ func (tr *ToolReleaseActions) Get() (*cores.ToolRelease, error) {
 		return nil, tr.forwardError
 	}
 	return tr.release, nil
+}
+
+// GetInstalledPlatformRelease returns the PlatformRelease installed (it is choosen)
+func (pm *PackageManager) GetInstalledPlatformRelease(platform *cores.Platform) *cores.PlatformRelease {
+	releases := platform.GetAllInstalled()
+	if len(releases) == 0 {
+		return nil
+	}
+	best := releases[0]
+	bestIsManaged := pm.IsManagedPlatformRelease(best)
+	for _, candidate := range releases[1:] {
+		candidateIsManaged := pm.IsManagedPlatformRelease(candidate)
+		if bestIsManaged == candidateIsManaged {
+			if candidate.Version.GreaterThan(best.Version) {
+				best = candidate
+			}
+		}
+		if !bestIsManaged && candidateIsManaged {
+			best = candidate
+			bestIsManaged = true
+		}
+	}
+	return best
 }
 
 func (pm *PackageManager) GetAllInstalledToolsReleases() []*cores.ToolRelease {
