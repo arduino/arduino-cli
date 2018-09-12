@@ -40,10 +40,8 @@ func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelea
 	}
 
 	// Safety measure
-	if safe, err := platformRelease.InstallDir.IsInsideDir(pm.PackagesDir); err != nil {
-		return fmt.Errorf("checking if plaform is installed in data dir: %s", err)
-	} else if !safe {
-		return fmt.Errorf("platform is not installed inside data dir")
+	if !pm.IsManagedPlatformRelease(platformRelease) {
+		return fmt.Errorf("%s is not managed by package manager", platformRelease)
 	}
 
 	if err := platformRelease.InstallDir.RemoveAll(); err != nil {

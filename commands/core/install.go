@@ -95,6 +95,7 @@ func installPlatformRelease(pm *packagemanager.PackageManager, platformRelease *
 	}
 	if err != nil {
 		log.WithError(err).Error("Cannot install platform")
+		formatter.PrintError(err, "Cannot install platform")
 		os.Exit(commands.ErrGeneric)
 	}
 
