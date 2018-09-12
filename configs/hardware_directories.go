@@ -18,9 +18,6 @@
 package configs
 
 import (
-	"os"
-	"path/filepath"
-
 	"github.com/arduino/go-paths-helper"
 )
 
@@ -28,10 +25,10 @@ import (
 func (config *Configuration) HardwareDirectories() (paths.PathList, error) {
 	res := paths.PathList{}
 
-	if IsBundledInDesktopIDE() {
-		bundledHardwareDir := filepath.Join(*arduinoIDEDirectory, "hardware")
-		if info, err := os.Stat(bundledHardwareDir); err == nil && info.IsDir() {
-			res.Add(paths.New(bundledHardwareDir))
+	if config.IsBundledInDesktopIDE() {
+		bundledHardwareDir := config.ArduinoIDEDirectory.Join("hardware")
+		if bundledHardwareDir.IsDir() {
+			res.Add(bundledHardwareDir)
 		}
 	}
 
@@ -47,13 +44,13 @@ func (config *Configuration) HardwareDirectories() (paths.PathList, error) {
 }
 
 // BundleToolsDirectories returns all paths that may contains bundled-tools.
-func BundleToolsDirectories() (paths.PathList, error) {
+func (config *Configuration) BundleToolsDirectories() (paths.PathList, error) {
 	res := paths.PathList{}
 
-	if IsBundledInDesktopIDE() {
-		bundledToolsDir := filepath.Join(*arduinoIDEDirectory, "hardware", "tools")
-		if info, err := os.Stat(bundledToolsDir); err == nil && info.IsDir() {
-			res = append(res, paths.New(bundledToolsDir))
+	if config.IsBundledInDesktopIDE() {
+		bundledToolsDir := config.ArduinoIDEDirectory.Join("hardware", "tools")
+		if bundledToolsDir.IsDir() {
+			res = append(res, bundledToolsDir)
 		}
 	}
 

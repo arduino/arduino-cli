@@ -34,6 +34,14 @@ type Configuration struct {
 
 	// SketchbookDir represents the current root of the sketchbooks tree (defaulted to `$HOME/Arduino`).
 	SketchbookDir *paths.Path
+
+	// ArduinoIDEDirectory is the directory of the Arduino IDE if the CLI runs togheter with it.
+	ArduinoIDEDirectory *paths.Path
+
+	// IDEBundledCheckResult contains the result of the check to see if the CLI is bundled with the IDE:
+	// the field is true if the CLI is bundled with the Arduino IDE, false if the CLI is running
+	// standalone or nil if the detection has not been performed.
+	IDEBundledCheckResult *bool
 }
 
 // NewConfiguration returns a new Configuration with the default values

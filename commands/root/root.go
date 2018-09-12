@@ -114,7 +114,7 @@ func initConfigs() {
 	if err := commands.Config.LoadFromYAML(commands.Config.ConfigFile); err != nil {
 		logrus.WithError(err).Warn("Did not manage to get config file, using default configuration")
 	}
-	if configs.IsBundledInDesktopIDE() {
+	if commands.Config.IsBundledInDesktopIDE() {
 		logrus.Info("CLI is bundled into the IDE")
 		err := commands.Config.LoadFromDesktopIDEPreferences()
 		if err != nil {
