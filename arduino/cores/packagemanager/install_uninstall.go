@@ -33,6 +33,18 @@ func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease
 	return platformRelease.Resource.Install(pm.DownloadDir, pm.TempDir, destDir)
 }
 
+// IsManagedPlatformRelease returns true if the PlatforRelease is managed by the PackageManager
+func (pm *PackageManager) IsManagedPlatformRelease(platformRelease *cores.PlatformRelease) bool {
+	if pm.PackagesDir == nil {
+		return false
+	}
+	managed, err := platformRelease.InstallDir.IsInsideDir(pm.PackagesDir)
+	if err != nil {
+		return false
+	}
+	return managed
+}
+
 // UninstallPlatform remove a PlatformRelease.
 func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelease) error {
 	if platformRelease.InstallDir == nil {
