@@ -50,7 +50,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	res := output.InstalledPlatformReleases{}
 	for _, targetPackage := range pm.GetPackages().Packages {
 		for _, platform := range targetPackage.Platforms {
-			if platformRelease := platform.GetInstalled(); platformRelease != nil {
+			if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
 				if listFlags.updatableOnly {
 					if latest := platform.GetLatestRelease(); latest == nil || latest == platformRelease {
 						continue

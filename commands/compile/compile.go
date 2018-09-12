@@ -137,7 +137,7 @@ func run(cmd *cobra.Command, args []string) {
 		Package:              packageName,
 		PlatformArchitecture: coreName,
 	})
-	if targetPlatform == nil || targetPlatform.GetInstalled() == nil {
+	if targetPlatform == nil || pm.GetInstalledPlatformRelease(targetPlatform) == nil {
 		errorMessage := fmt.Sprintf(
 			"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
 				commands.AppName+" core install %[1]s:%[2]s\".", packageName, coreName)
@@ -146,7 +146,7 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	ctx := &types.Context{}
-
+	ctx.PackageManager = pm
 	if parsedFqbn, err := cores.ParseFQBN(fqbn); err != nil {
 		formatter.PrintError(err, "Error parsing FQBN.")
 		os.Exit(commands.ErrBadArgument)

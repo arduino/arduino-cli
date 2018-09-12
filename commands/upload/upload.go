@@ -140,7 +140,7 @@ func run(command *cobra.Command, args []string) {
 
 		referencedPlatform = referencedPackage.Platforms[board.PlatformRelease.Platform.Architecture]
 		if referencedPlatform != nil {
-			referencedPlatformRelease = referencedPlatform.GetInstalled()
+			referencedPlatformRelease = pm.GetInstalledPlatformRelease(referencedPlatform)
 		}
 	} else {
 		formatter.PrintErrorMessage("The board defines an invalid 'upload.tool': " + uploadToolID)

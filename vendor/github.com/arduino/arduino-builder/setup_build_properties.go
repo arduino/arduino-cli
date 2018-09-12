@@ -87,15 +87,16 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	if variant == "" {
 		buildProperties["build.variant.path"] = ""
 	} else {
-		var variantPlatform *cores.PlatformRelease
+		var variantPlatformRelease *cores.PlatformRelease
 		variantParts := strings.Split(variant, ":")
 		if len(variantParts) > 1 {
-			variantPlatform = packages.Packages[variantParts[0]].Platforms[targetPlatform.Platform.Architecture].GetInstalled()
+			variantPlatform := packages.Packages[variantParts[0]].Platforms[targetPlatform.Platform.Architecture]
+			variantPlatformRelease = ctx.PackageManager.GetInstalledPlatformRelease(variantPlatform)
 			variant = variantParts[1]
 		} else {
-			variantPlatform = targetPlatform
+			variantPlatformRelease = targetPlatform
 		}
-		buildProperties["build.variant.path"] = variantPlatform.InstallDir.Join("variants", variant).String()
+		buildProperties["build.variant.path"] = variantPlatformRelease.InstallDir.Join("variants", variant).String()
 	}
 
 	for _, tool := range ctx.AllTools {

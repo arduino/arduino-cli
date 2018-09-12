@@ -62,7 +62,7 @@ func upgradeAllPlatforms(pm *packagemanager.PackageManager) {
 
 	for _, targetPackage := range pm.GetPackages().Packages {
 		for _, platform := range targetPackage.Platforms {
-			installed := platform.GetInstalled()
+			installed := pm.GetInstalledPlatformRelease(platform)
 			if installed == nil {
 				continue
 			}
@@ -96,7 +96,7 @@ func upgrade(pm *packagemanager.PackageManager, platformsRefs []*packagemanager.
 			formatter.PrintErrorMessage("Platform " + platformRef.String() + " not found")
 			os.Exit(commands.ErrBadArgument)
 		}
-		installed := platform.GetInstalled()
+		installed := pm.GetInstalledPlatformRelease(platform)
 		if installed == nil {
 			formatter.PrintErrorMessage("Platform " + platformRef.String() + " is not installed")
 			os.Exit(commands.ErrBadArgument)

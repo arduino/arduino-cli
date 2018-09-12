@@ -103,7 +103,7 @@ func (pm *PackageManager) IsToolRequired(toolRelease *cores.ToolRelease) bool {
 	// Search in all installed platforms
 	for _, targetPackage := range pm.packages.Packages {
 		for _, platform := range targetPackage.Platforms {
-			if platformRelease := platform.GetInstalled(); platformRelease != nil {
+			if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
 				if platformRelease.RequiresToolRelease(toolRelease) {
 					return true
 				}

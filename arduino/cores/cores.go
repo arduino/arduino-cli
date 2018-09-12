@@ -154,16 +154,15 @@ func (platform *Platform) latestReleaseVersion() *semver.Version {
 	return max
 }
 
-// GetInstalled return one of the installed PlatformRelease
-// TODO: This is a temporary method to help incremental transition from
-// arduino-builder, it will be probably removed in the future
-func (platform *Platform) GetInstalled() *PlatformRelease {
+// GetAllInstalled returns all installed PlatformRelease
+func (platform *Platform) GetAllInstalled() []*PlatformRelease {
+	res := []*PlatformRelease{}
 	for _, release := range platform.Releases {
 		if release.InstallDir != nil {
-			return release
+			res = append(res, release)
 		}
 	}
-	return nil
+	return res
 }
 
 func (platform *Platform) String() string {

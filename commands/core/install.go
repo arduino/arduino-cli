@@ -78,7 +78,7 @@ func installPlatformRelease(pm *packagemanager.PackageManager, platformRelease *
 	log := pm.Log.WithField("platform", platformRelease)
 
 	platform := platformRelease.Platform
-	installed := platform.GetInstalled()
+	installed := pm.GetInstalledPlatformRelease(platform)
 	if installed == nil {
 		log.Info("Installing platform")
 		formatter.Print("Installing " + platformRelease.String() + "...")

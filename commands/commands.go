@@ -113,7 +113,7 @@ func InitLibraryManager(pm *packagemanager.PackageManager) *librariesmanager.Lib
 	if pm != nil {
 		for _, targetPackage := range pm.GetPackages().Packages {
 			for _, platform := range targetPackage.Platforms {
-				if platformRelease := platform.GetInstalled(); platformRelease != nil {
+				if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
 					lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
 				}
 			}
