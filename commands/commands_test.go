@@ -118,6 +118,10 @@ func makeTempDataDir(t *testing.T) func() {
 	os.Setenv("ARDUINO_DATA_DIR", tmp.String())
 	currDataDir = tmp
 	fmt.Printf("ARDUINO_DATA_DIR = %s\n", os.Getenv("ARDUINO_DATA_DIR"))
+
+	err = tmp.RemoveAll() // To test if the data dir is automatically created
+	require.NoError(t, err)
+
 	return func() {
 		os.Unsetenv("ARDUINO_DATA_DIR")
 		currDataDir = nil
