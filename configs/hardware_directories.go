@@ -36,8 +36,10 @@ func (config *Configuration) HardwareDirectories() (paths.PathList, error) {
 		res.Add(dir)
 	}
 
-	if dir := config.SketchbookDir.Join("hardware"); dir.IsDir() {
-		res.Add(dir)
+	if config.SketchbookDir != nil {
+		if dir := config.SketchbookDir.Join("hardware"); dir.IsDir() {
+			res.Add(dir)
+		}
 	}
 
 	return res, nil

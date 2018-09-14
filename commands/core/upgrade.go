@@ -46,7 +46,7 @@ func initUpgradeCommand() *cobra.Command {
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core upgrade`")
 
-	pm := commands.InitPackageManager()
+	pm := commands.InitPackageManagerWithoutBundles()
 
 	platformsRefs := parsePlatformReferenceArgs(args)
 	if len(platformsRefs) == 0 {
