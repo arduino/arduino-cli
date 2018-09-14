@@ -57,13 +57,7 @@ func (tp *TextFormatter) DownloadProgressBar(resp *grab.Response, prefix string)
 		case <-t.C:
 			bar.Set(int(resp.BytesComplete()))
 		case <-resp.Done:
-			bar.ShowCounters = false
-			bar.ShowPercent = false
-			bar.ShowFinalTime = false
-			bar.ShowBar = false
-			bar.Prefix(prefix + " downloaded")
-			bar.Set(int(resp.BytesComplete()))
-			bar.Finish()
+			bar.FinishPrintOver(prefix + " downloaded")
 			return
 		}
 	}
