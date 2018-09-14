@@ -317,7 +317,7 @@ func (tr *ToolReleaseActions) Get() (*cores.ToolRelease, error) {
 	return tr.release, nil
 }
 
-// GetInstalledPlatformRelease returns the PlatformRelease installed (it is choosen)
+// GetInstalledPlatformRelease returns the PlatformRelease installed (it is chosen)
 func (pm *PackageManager) GetInstalledPlatformRelease(platform *cores.Platform) *cores.PlatformRelease {
 	releases := platform.GetAllInstalled()
 	if len(releases) == 0 {
