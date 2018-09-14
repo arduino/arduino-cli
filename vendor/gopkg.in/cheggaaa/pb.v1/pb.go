@@ -13,7 +13,7 @@ import (
 )
 
 // Current version
-const Version = "1.0.23"
+const Version = "1.0.25"
 
 const (
 	// Default refresh rate - 200ms
@@ -159,16 +159,12 @@ func (pb *ProgressBar) Add64(add int64) int64 {
 
 // Set prefix string
 func (pb *ProgressBar) Prefix(prefix string) *ProgressBar {
-	pb.mu.Lock()
-	defer pb.mu.Unlock()
 	pb.prefix = prefix
 	return pb
 }
 
 // Set postfix string
 func (pb *ProgressBar) Postfix(postfix string) *ProgressBar {
-	pb.mu.Lock()
-	defer pb.mu.Unlock()
 	pb.postfix = postfix
 	return pb
 }
@@ -195,8 +191,6 @@ func (pb *ProgressBar) Format(format string) *ProgressBar {
 
 // Set bar refresh rate
 func (pb *ProgressBar) SetRefreshRate(rate time.Duration) *ProgressBar {
-	pb.mu.Lock()
-	defer pb.mu.Unlock()
 	pb.RefreshRate = rate
 	return pb
 }
@@ -205,16 +199,12 @@ func (pb *ProgressBar) SetRefreshRate(rate time.Duration) *ProgressBar {
 // bar.SetUnits(U_NO) - by default
 // bar.SetUnits(U_BYTES) - for Mb, Kb, etc
 func (pb *ProgressBar) SetUnits(units Units) *ProgressBar {
-	pb.mu.Lock()
-	defer pb.mu.Unlock()
 	pb.Units = units
 	return pb
 }
 
 // Set max width, if width is bigger than terminal width, will be ignored
 func (pb *ProgressBar) SetMaxWidth(width int) *ProgressBar {
-	pb.mu.Lock()
-	defer pb.mu.Unlock()
 	pb.Width = width
 	pb.ForceWidth = false
 	return pb
@@ -262,6 +252,19 @@ func (pb *ProgressBar) FinishPrint(str string) {
 	}
 }
 
+// FinishPrintOver prints the given string over the progress bar
+func (pb *ProgressBar) FinishPrintOver(str string) {
+	pb.mu.Lock()
+	pb.ShowCounters = false
+	pb.ShowPercent = false
+	pb.ShowFinalTime = false
+	pb.ShowBar = false
+	pb.Prefix(str)
+	pb.Postfix("")
+	pb.mu.Unlock()
+	pb.Finish()
+}
+
 // implement io.Writer
 func (pb *ProgressBar) Write(p []byte) (n int, err error) {
 	n = len(p)
@@ -286,9 +289,6 @@ func (pb *ProgressBar) write(total, current int64) {
 	width := pb.GetWidth()
 
 	var percentBox, countersBox, timeLeftBox, timeSpentBox, speedBox, barBox, end, out string
-	pb.mu.Lock()
-	prefix := pb.prefix
-	postfix := pb.postfix
 
 	// percents
 	if pb.ShowPercent {
@@ -313,6 +313,7 @@ func (pb *ProgressBar) write(total, current int64) {
 	}
 
 	// time left
+	pb.mu.Lock()
 	currentFromStart := current - pb.startValue
 	fromStart := time.Now().Sub(pb.startTime)
 	lastChangeTime := pb.changeTime
@@ -360,7 +361,7 @@ func (pb *ProgressBar) write(total, current int64) {
 		speedBox = " " + Format(int64(speed)).To(pb.Units).Width(pb.UnitsWidth).PerSec().String()
 	}
 
-	barWidth := escapeAwareRuneCountInString(countersBox + pb.BarStart + pb.BarEnd + percentBox + timeSpentBox + timeLeftBox + speedBox + prefix + postfix)
+	barWidth := escapeAwareRuneCountInString(countersBox + pb.BarStart + pb.BarEnd + percentBox + timeSpentBox + timeLeftBox + speedBox + pb.prefix + pb.postfix)
 	// bar
 	if pb.ShowBar {
 		size := width - barWidth
