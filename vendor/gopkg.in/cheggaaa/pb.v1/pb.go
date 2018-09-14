@@ -269,9 +269,9 @@ func (pb *ProgressBar) FinishPrintOver(str string) {
 	pb.ShowPercent = false
 	pb.ShowFinalTime = false
 	pb.ShowBar = false
+	pb.mu.Unlock()
 	pb.Prefix(str)
 	pb.Postfix("")
-	pb.mu.Unlock()
 	pb.Finish()
 }
 
