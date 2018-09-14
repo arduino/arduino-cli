@@ -67,10 +67,21 @@ var AppName = filepath.Base(os.Args[0])
 
 var Config *configs.Configuration
 
+// InitPackageManagerWithoutBundles initializes the PackageManager
+// but ignores bundles and user installed cores
+func InitPackageManagerWithoutBundles() *packagemanager.PackageManager {
+	logrus.Info("Package manager will scan only managed hardware folder")
+
+	fakeResult := false
+	Config.IDEBundledCheckResult = &fakeResult
+	Config.SketchbookDir = nil
+	return InitPackageManager()
+}
+
 // InitPackageManager initializes the PackageManager
 // TODO: for the daemon mode, this might be called at startup, but for now only commands needing the PM will call it
 func InitPackageManager() *packagemanager.PackageManager {
-	logrus.Info("Loading the default Package index")
+	logrus.Info("Initializing package manager")
 
 	pm := packagemanager.NewPackageManager(
 		Config.IndexesDir(),
