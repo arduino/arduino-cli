@@ -49,7 +49,7 @@ func InitCommand() *cobra.Command {
 		"Fully Qualified Board Name, e.g.: arduino:avr:uno")
 	uploadCommand.Flags().StringVarP(&flags.port, "port", "p", "",
 		"Upload port, e.g.: COM10 or /dev/ttyACM0")
-	uploadCommand.Flags().BoolVarP(&flags.verbose, "verify", "t", false,
+	uploadCommand.Flags().BoolVarP(&flags.verify, "verify", "t", false,
 		"Verify uploaded binary after the upload.")
 	uploadCommand.Flags().BoolVarP(&flags.verbose, "verbose", "v", false,
 		"Optional, turns on verbose mode.")
