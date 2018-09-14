@@ -57,7 +57,8 @@ func updateIndexes() {
 // TODO: This should be in packagemanager......
 func updateIndex(URL *url.URL) {
 	logrus.WithField("url", URL).Print("Updating index")
-	coreIndexPath := commands.Config.IndexesDir().Join(path.Base(URL.Path))
+	indexDirPath := commands.Config.IndexesDir()
+	coreIndexPath := indexDirPath.Join(path.Base(URL.Path))
 
 	tmpFile, err := ioutil.TempFile("", "")
 	if err != nil {
@@ -78,6 +79,11 @@ func updateIndex(URL *url.URL) {
 	if resp.Err() != nil {
 		formatter.PrintError(resp.Err(), "Error downloading index "+URL.String())
 		os.Exit(commands.ErrNetwork)
+	}
+
+	if err := indexDirPath.MkdirAll(); err != nil {
+		formatter.PrintError(err, "Can't create data directory "+indexDirPath.String())
+		os.Exit(commands.ErrGeneric)
 	}
 
 	if err := paths.New(tmpFile.Name()).CopyTo(coreIndexPath); err != nil {
