@@ -17,7 +17,7 @@ pipeline:
       # Check if the code is formatted
       -  $(exit $(go fmt ./... | wc -l))
       # Build
+      - golangci-lint run
       - go build
       - go test -timeout 20m -v ./... -race
-      - golangci-lint run
     secrets: [TEST_USERNAME, TEST_PASSWORD]
