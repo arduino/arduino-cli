@@ -113,7 +113,7 @@ func (pm *PackageManager) UninstallTool(toolRelease *cores.ToolRelease) error {
 
 	// Safety measure
 	if !pm.IsManagedToolRelease(toolRelease) {
-		return fmt.Errorf("Tool %s is not managed by package manager", toolRelease)
+		return fmt.Errorf("tool %s is not managed by package manager", toolRelease)
 	}
 
 	if err := toolRelease.InstallDir.RemoveAll(); err != nil {
