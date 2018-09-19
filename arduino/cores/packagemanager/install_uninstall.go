@@ -38,7 +38,15 @@ func (pm *PackageManager) IsManagedPlatformRelease(platformRelease *cores.Platfo
 	if pm.PackagesDir == nil {
 		return false
 	}
-	managed, err := platformRelease.InstallDir.IsInsideDir(pm.PackagesDir)
+	installDir := platformRelease.InstallDir.Clone()
+	if installDir.FollowSymLink() != nil {
+		return false
+	}
+	packagesDir := pm.PackagesDir.Clone()
+	if packagesDir.FollowSymLink() != nil {
+		return false
+	}
+	managed, err := installDir.IsInsideDir(packagesDir)
 	if err != nil {
 		return false
 	}
@@ -77,6 +85,26 @@ func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease) error {
 	return toolResource.Install(pm.DownloadDir, pm.TempDir, destDir)
 }
 
+// IsManagedToolRelease returns true if the ToolRelease is managed by the PackageManager
+func (pm *PackageManager) IsManagedToolRelease(toolRelease *cores.ToolRelease) bool {
+	if pm.PackagesDir == nil {
+		return false
+	}
+	installDir := toolRelease.InstallDir.Clone()
+	if installDir.FollowSymLink() != nil {
+		return false
+	}
+	packagesDir := pm.PackagesDir.Clone()
+	if packagesDir.FollowSymLink() != nil {
+		return false
+	}
+	managed, err := installDir.IsInsideDir(packagesDir)
+	if err != nil {
+		return false
+	}
+	return managed
+}
+
 // UninstallTool remove a ToolRelease.
 func (pm *PackageManager) UninstallTool(toolRelease *cores.ToolRelease) error {
 	if toolRelease.InstallDir == nil {
@@ -84,10 +112,8 @@ func (pm *PackageManager) UninstallTool(toolRelease *cores.ToolRelease) error {
 	}
 
 	// Safety measure
-	if safe, err := toolRelease.InstallDir.IsInsideDir(pm.PackagesDir); err != nil {
-		return fmt.Errorf("checking if tool is installed in data dir: %s", err)
-	} else if !safe {
-		return fmt.Errorf("tool is not installed inside data dir")
+	if !pm.IsManagedToolRelease(toolRelease) {
+		return fmt.Errorf("Tool %s is not managed by package manager", toolRelease)
 	}
 
 	if err := toolRelease.InstallDir.RemoveAll(); err != nil {
