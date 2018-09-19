@@ -80,7 +80,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	if passwordEmpty {
 		fmt.Print("Password: ")
-		pass, err := terminal.ReadPassword(int(syscall.Stdin))
+		pass, err := terminal.ReadPassword(int(syscall.Stdin)) // nolint:unconvert
 		if err != nil {
 			formatter.PrintError(err, "Cannot read password, login aborted.")
 			return
