@@ -1,4 +1,4 @@
-![Build status](https://drone.arduino.cc/api/badges/bcmi-labs/arduino-cli/status.svg)
+![Build status](https://drone.arduino.cc/api/badges/arduino/arduino-cli/status.svg)
 
 # arduino-cli
 
