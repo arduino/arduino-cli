@@ -47,7 +47,7 @@ void loop() {
 
 func runNewCommand(cmd *cobra.Command, args []string) {
 	sketchDir := commands.Config.SketchbookDir.Join(args[0])
-	if err := sketchDir.Mkdir(); err != nil {
+	if err := sketchDir.MkdirAll(); err != nil {
 		formatter.PrintError(err, "Could not create sketch directory.")
 		os.Exit(commands.ErrGeneric)
 	}

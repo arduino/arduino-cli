@@ -137,6 +137,9 @@ func makeTempSketchbookDir(t *testing.T) func() {
 	require.NoError(t, err, "making temporary staging dir")
 	os.Setenv("ARDUINO_SKETCHBOOK_DIR", tmp.String())
 	currSketchbookDir = tmp
+	err = tmp.RemoveAll() // To test if the sketchbook dir is automatically created
+	require.NoError(t, err)
+
 	fmt.Printf("ARDUINO_SKETCHBOOK_DIR = %s\n", os.Getenv("ARDUINO_SKETCHBOOK_DIR"))
 	return func() {
 		os.Unsetenv("ARDUINO_SKETCHBOOK_DIR")
@@ -210,6 +213,16 @@ func TestUserLibs(t *testing.T) {
 	exitCode, d = executeWithArgs(t, "lib", "list")
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "MyLibWithWrongVersion")
+}
+
+func TestSketchCommands(t *testing.T) {
+	defer makeTempDataDir(t)()
+	defer makeTempSketchbookDir(t)()
+	//var d []byte
+	var exitCode int
+
+	exitCode, _ = executeWithArgs(t, "sketch", "new", "Test")
+	require.Zero(t, exitCode, "exit code")
 }
 
 func TestLibDownloadAndInstall(t *testing.T) {
