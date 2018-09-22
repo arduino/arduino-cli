@@ -19,7 +19,7 @@ func (g *Group) NewGroup(path string) *Group {
 
 	checkPath(path)
 	path = g.path + path
-	//Don't want trailing slash as all sub-paths start with slash
+	// Don't want trailing slash as all sub-paths start with slash
 	if path[len(path)-1] == '/' {
 		path = path[:len(path)-1]
 	}

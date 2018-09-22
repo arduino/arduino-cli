@@ -54,7 +54,7 @@ type Sketch struct {
 	Types []string `form:"types,omitempty" json:"types,omitempty" xml:"types,omitempty"`
 }
 
-//ConvertFrom converts from a local sketch to an Arduino Create sketch.
+// ConvertFrom converts from a local sketch to an Arduino Create sketch.
 func ConvertFrom(sketch sketches.Sketch) *Sketch {
 	_, inoPath := filepath.Split(sketch.Ino.Path)
 	content, err := ioutil.ReadFile(filepath.Join(sketch.FullPath, inoPath))

@@ -42,7 +42,7 @@ func (c *Client) StartCompilations(ctx context.Context, path string, payload *Co
 	return c.Client.Do(ctx, req)
 }
 
-// NewStartCompilationsRequest create the request corresponding to the start action endpoint of the compilations resource.
+// NewStartCompilationsRequest creates the request corresponding to the start action endpoint of the compilations resource.
 func (c *Client) NewStartCompilationsRequest(ctx context.Context, path string, payload *Compilation) (*http.Request, error) {
 	var body bytes.Buffer
 	err := c.Encoder.Encode(payload, &body, "*/*")

@@ -92,11 +92,11 @@ func getPortDetails(item *ole.IDispatch, res *PortDetails) error {
 	}
 	res.Name = re[0][1]
 
-	//itemPnPDeviceID, err := item.GetProperty("PnPDeviceID")
-	//if err != nil {
-	//	return err
-	//}
-	//PnPDeviceID := itemPnPDeviceID.ToString()
+	// itemPnPDeviceID, err := item.GetProperty("PnPDeviceID")
+	// if err != nil {
+	// 	return err
+	// }
+	// PnPDeviceID := itemPnPDeviceID.ToString()
 
 	itemDeviceID, err := item.GetProperty("DeviceID")
 	if err != nil {

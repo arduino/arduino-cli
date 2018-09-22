@@ -79,7 +79,7 @@ type Context struct {
 	ImportedLibraries          libraries.List
 	LibrariesResolutionResults map[string]LibraryResolutionResult
 	IncludeFolders             paths.PathList
-	//OutputGccMinusM            string
+	// OutputGccMinusM            string
 
 	// C++ Parsing
 	CTagsOutput                 string

@@ -38,7 +38,7 @@ func (c *Client) ShowFiles(ctx context.Context, path string) (*http.Response, er
 	return c.Client.Do(ctx, req)
 }
 
-// NewShowFilesRequest create the request corresponding to the show action endpoint of the files resource.
+// NewShowFilesRequest creates the request corresponding to the show action endpoint of the files resource.
 func (c *Client) NewShowFilesRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
