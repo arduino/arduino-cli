@@ -71,7 +71,7 @@ type SerialDevice struct {
 	SerialNumber string `json:"serial_number"`
 	ProductID    string `json:"pid"`
 	VendorID     string `json:"vid"`
-	//Serial       *serial.Info `json:"-"`
+	// Serial       *serial.Info `json:"-"`
 }
 
 func (d SerialDevice) String() string {
@@ -85,7 +85,7 @@ func (d SerialDevice) String() string {
 	return ret
 }
 
-//SerialDevices is a list of currently connected devices to the computer
+// SerialDevices is a list of currently connected devices to the computer
 type SerialDevices map[string]*SerialDevice
 
 func (sds SerialDevices) String() string {
@@ -124,7 +124,7 @@ func (d NetworkDevice) String() string {
 		fmt.Sprintln("   PORT:", d.Port)
 }
 
-//NetworkDevices is a list of currently connected devices to the computer
+// NetworkDevices is a list of currently connected devices to the computer
 type NetworkDevices map[string]*NetworkDevice
 
 func (nds NetworkDevices) String() string {

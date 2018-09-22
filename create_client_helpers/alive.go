@@ -30,7 +30,7 @@ func PingAlivePath() string {
 	return fmt.Sprintf("/create/alive")
 }
 
-// Returns 200 if the instance is healthy
+// Returns 200 if the instance is healthy.
 func (c *Client) PingAlive(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewPingAliveRequest(ctx, path)
 	if err != nil {
@@ -39,7 +39,7 @@ func (c *Client) PingAlive(ctx context.Context, path string) (*http.Response, er
 	return c.Client.Do(ctx, req)
 }
 
-// NewPingAliveRequest create the request corresponding to the ping action endpoint of the alive resource.
+// NewPingAliveRequest creates the request corresponding to the ping action endpoint of the alive resource.
 func (c *Client) NewPingAliveRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {

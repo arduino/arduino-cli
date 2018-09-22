@@ -27,11 +27,11 @@ var test TestType{
 
 var testString = a.Format(test) 
 fmt.Println(testString) // Prints test.String()
-a.Print(test) //does the same.
+a.Print(test) // Does the same.
 
 testString = b.Format(test) 
 fmt.Println(testString) // Prints { field1 : "test", field2 : "42" }
-b.Print(test) //Does the same
+b.Print(test) // Does the same
 ----
 
 === The default formatter

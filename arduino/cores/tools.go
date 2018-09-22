@@ -30,7 +30,7 @@ import (
 // Tool represents a single Tool, part of a Package.
 type Tool struct {
 	Name     string                  `json:"name,required"` // The Name of the Tool.
-	Releases map[string]*ToolRelease `json:"releases"`      //Maps Version to Release.
+	Releases map[string]*ToolRelease `json:"releases"`      // Maps Version to Release.
 	Package  *Package                `json:"-"`
 }
 

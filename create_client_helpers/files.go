@@ -33,7 +33,7 @@ func ShowFilesPath(fileType string, id string, name string) string {
 	return fmt.Sprintf("/create/v1/files/%s/%s/%s", param0, param1, param2)
 }
 
-// Provides the content of the file identified by :name and :id
+// ShowFiles provides the content of the file identified by :name and :id.
 func (c *Client) ShowFiles(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewShowFilesRequest(ctx, path)
 	if err != nil {
@@ -42,7 +42,7 @@ func (c *Client) ShowFiles(ctx context.Context, path string) (*http.Response, er
 	return c.Client.Do(ctx, req)
 }
 
-// NewShowFilesRequest create the request corresponding to the show action endpoint of the files resource.
+// NewShowFilesRequest creates the request corresponding to the show action endpoint of the files resource.
 func (c *Client) NewShowFilesRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {

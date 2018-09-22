@@ -31,7 +31,7 @@ func AddPinnedLibrariesPath(id string) string {
 	return fmt.Sprintf("/builder/pinned/%s", param0)
 }
 
-//AddPinnedLibraries adds a new library to the list of libraries pinned by the user
+// AddPinnedLibraries adds a new library to the list of libraries pinned by the user
 func (c *Client) AddPinnedLibraries(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewAddPinnedLibrariesRequest(ctx, path)
 	if err != nil {
@@ -40,7 +40,7 @@ func (c *Client) AddPinnedLibraries(ctx context.Context, path string) (*http.Res
 	return c.Client.Do(ctx, req)
 }
 
-// NewAddPinnedLibrariesRequest create the request
+// NewAddPinnedLibrariesRequest creates the request
 // corresponding to the add action endpoint of the pinnedLibraries resource.
 func (c *Client) NewAddPinnedLibrariesRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
@@ -63,7 +63,7 @@ func ListPinnedLibrariesPath() string {
 	return fmt.Sprintf("/builder/pinned")
 }
 
-//ListPinnedLibraries provides a list of all the libraries pinned by the user
+// ListPinnedLibraries provides a list of all the libraries pinned by the user
 func (c *Client) ListPinnedLibraries(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewListPinnedLibrariesRequest(ctx, path)
 	if err != nil {
@@ -72,7 +72,7 @@ func (c *Client) ListPinnedLibraries(ctx context.Context, path string) (*http.Re
 	return c.Client.Do(ctx, req)
 }
 
-// NewListPinnedLibrariesRequest create the request corresponding to the list action endpoint of the pinnedLibraries resource.
+// NewListPinnedLibrariesRequest creates the request corresponding to the list action endpoint of the pinnedLibraries resource.
 func (c *Client) NewListPinnedLibrariesRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
@@ -96,7 +96,7 @@ func RemovePinnedLibrariesPath(id string) string {
 	return fmt.Sprintf("/builder/pinned/%s", param0)
 }
 
-//RemovePinnedLibraries removes a library to the list of libraries pinned by the user
+// RemovePinnedLibraries removes a library to the list of libraries pinned by the user
 func (c *Client) RemovePinnedLibraries(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewRemovePinnedLibrariesRequest(ctx, path)
 	if err != nil {
@@ -105,7 +105,7 @@ func (c *Client) RemovePinnedLibraries(ctx context.Context, path string) (*http.
 	return c.Client.Do(ctx, req)
 }
 
-// NewRemovePinnedLibrariesRequest create the request corresponding to the remove action endpoint of the pinnedLibraries resource.
+// NewRemovePinnedLibrariesRequest creates the request corresponding to the remove action endpoint of the pinnedLibraries resource.
 func (c *Client) NewRemovePinnedLibrariesRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {

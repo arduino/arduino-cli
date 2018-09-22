@@ -33,7 +33,7 @@ func ByVidPidBoardsV2Path(vid string, pid string) string {
 	return fmt.Sprintf("/builder/v2/boards/byVidPid/%s/%s", param0, param1)
 }
 
-// Provides the board identified by the :vid and :pid params. Doesn't require authentication.
+// ByVidPidBoardsV2 provides the board identified by the :vid and :pid params. Doesn't require authentication.
 func (c *Client) ByVidPidBoardsV2(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewByVidPidBoardsV2Request(ctx, path)
 	if err != nil {
@@ -42,7 +42,7 @@ func (c *Client) ByVidPidBoardsV2(ctx context.Context, path string) (*http.Respo
 	return c.Client.Do(ctx, req)
 }
 
-// NewByVidPidBoardsV2Request create the request corresponding to the byVidPid action endpoint of the boards_v2 resource.
+// NewByVidPidBoardsV2Request creates the request corresponding to the byVidPid action endpoint of the boards_v2 resource.
 func (c *Client) NewByVidPidBoardsV2Request(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
@@ -62,7 +62,7 @@ func ListBoardsV2Path() string {
 	return fmt.Sprintf("/builder/v2/boards")
 }
 
-// Provides a list of all the boards supported by Arduino Create. Doesn't require any authentication.
+// ListBoardsV2 provides a list of all the boards supported by Arduino Create. Doesn't require any authentication.
 func (c *Client) ListBoardsV2(ctx context.Context, path string, limit *int, offset *int) (*http.Response, error) {
 	req, err := c.NewListBoardsV2Request(ctx, path, limit, offset)
 	if err != nil {
@@ -71,7 +71,7 @@ func (c *Client) ListBoardsV2(ctx context.Context, path string, limit *int, offs
 	return c.Client.Do(ctx, req)
 }
 
-// NewListBoardsV2Request create the request corresponding to the list action endpoint of the boards_v2 resource.
+// NewListBoardsV2Request creates the request corresponding to the list action endpoint of the boards_v2 resource.
 func (c *Client) NewListBoardsV2Request(ctx context.Context, path string, limit *int, offset *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
@@ -102,7 +102,7 @@ func ShowBoardsV2Path(fqbn string) string {
 	return fmt.Sprintf("/builder/v2/boards/%s", param0)
 }
 
-// Provides the board identified by an fqbn. Doesn't require authentication.
+// ShowBoardsV2 provides the board identified by an fqbn. Doesn't require authentication.
 func (c *Client) ShowBoardsV2(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewShowBoardsV2Request(ctx, path)
 	if err != nil {
@@ -111,7 +111,7 @@ func (c *Client) ShowBoardsV2(ctx context.Context, path string) (*http.Response,
 	return c.Client.Do(ctx, req)
 }
 
-// NewShowBoardsV2Request create the request corresponding to the show action endpoint of the boards_v2 resource.
+// NewShowBoardsV2Request creates the request corresponding to the show action endpoint of the boards_v2 resource.
 func (c *Client) NewShowBoardsV2Request(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {

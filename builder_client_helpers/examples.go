@@ -38,7 +38,7 @@ func (c *Client) ListExamples(ctx context.Context, path string, maintainer *stri
 	return c.Client.Do(ctx, req)
 }
 
-// NewListExamplesRequest create the request corresponding to the list action endpoint of the examples resource.
+// NewListExamplesRequest creates the request corresponding to the list action endpoint of the examples resource.
 func (c *Client) NewListExamplesRequest(ctx context.Context, path string, maintainer *string, libType *string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
