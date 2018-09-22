@@ -510,7 +510,7 @@ func (s *Server) serviceTypeName(resp *dns.Msg, ttl uint32) {
 }
 
 // Perform probing & announcement
-//TODO: implement a proper probing & conflict resolution
+// TODO: implement a proper probing & conflict resolution
 func (s *Server) probe() {
 	q := new(dns.Msg)
 	q.SetQuestion(s.service.ServiceInstanceName(), dns.TypePTR)

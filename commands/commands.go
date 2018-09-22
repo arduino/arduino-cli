@@ -105,7 +105,7 @@ func InitPackageManager() *packagemanager.PackageManager {
 	return pm
 }
 
-// InitLibraryManager initialize the LibraryManager using the underlying packagemanager
+// InitLibraryManager initializes the LibraryManager using the underlying packagemanager
 func InitLibraryManager(pm *packagemanager.PackageManager) *librariesmanager.LibrariesManager {
 	logrus.Info("Starting libraries manager")
 	lm := librariesmanager.NewLibraryManager(

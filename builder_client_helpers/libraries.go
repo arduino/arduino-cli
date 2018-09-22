@@ -42,7 +42,7 @@ func (c *Client) ListLibraries(
 	return c.Client.Do(ctx, req)
 }
 
-// NewListLibrariesRequest create the request corresponding to the list action endpoint of the libraries resource.
+// NewListLibrariesRequest creates the request corresponding to the list action endpoint of the libraries resource.
 func (c *Client) NewListLibrariesRequest(ctx context.Context, path string, maintainer *string, libType *string, withoutType *string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
@@ -73,7 +73,7 @@ func ShowLibrariesPath(id string) string {
 }
 
 // ShowLibraries provides the library identified by the :id and :pid param. Doesn't require authentication.
-// Also contains a list of other versions of the library
+// Also contains a list of other versions of the library.
 func (c *Client) ShowLibraries(ctx context.Context, path string) (*http.Response, error) {
 	req, err := c.NewShowLibrariesRequest(ctx, path)
 	if err != nil {
@@ -82,7 +82,7 @@ func (c *Client) ShowLibraries(ctx context.Context, path string) (*http.Response
 	return c.Client.Do(ctx, req)
 }
 
-// NewShowLibrariesRequest create the request corresponding to the show action endpoint of the libraries resource.
+// NewShowLibrariesRequest creates the request corresponding to the show action endpoint of the libraries resource.
 func (c *Client) NewShowLibrariesRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {

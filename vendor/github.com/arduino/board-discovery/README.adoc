@@ -26,7 +26,7 @@ Then start, get data and stop it when you don't need it anymore:
 [source, go]
 ----
 monitor.Start()
-//Get devices connected
+// Get devices connected
 monitor.Stop()
 ----
 You can get connected devices (via Serial or Network ports) by using the following functions:

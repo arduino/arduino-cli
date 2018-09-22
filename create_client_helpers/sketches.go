@@ -36,7 +36,7 @@ const (
 	prod    = true
 )
 
-// CreateSketches Adds a new sketch.
+// CreateSketches adds a new sketch.
 func (c *Client) CreateSketches(ctx context.Context, path string, payload *Sketch, authorization string) (*http.Response, error) {
 	req, err := c.NewCreateSketchesRequest(ctx, path, payload, authorization)
 	if err != nil {
@@ -45,7 +45,7 @@ func (c *Client) CreateSketches(ctx context.Context, path string, payload *Sketc
 	return c.Client.Do(ctx, req)
 }
 
-// NewCreateSketchesRequest create the request corresponding to the create action endpoint of the sketches resource.
+// NewCreateSketchesRequest creates the request corresponding to the create action endpoint of the sketches resource.
 func (c *Client) NewCreateSketchesRequest(ctx context.Context, path string, payload *Sketch, authorization string) (*http.Request, error) {
 	var body bytes.Buffer
 	err := c.Encoder.Encode(payload, &body, "*/*")
@@ -79,7 +79,7 @@ func DeleteSketchesPath(id string) string {
 	return fmt.Sprintf("/create/v1/sketches/%s", id)
 }
 
-// DeleteSketches Removes the sketch identified by the :id param.
+// DeleteSketches removes the sketch identified by the :id param.
 func (c *Client) DeleteSketches(ctx context.Context, path string, authorization string) (*http.Response, error) {
 	req, err := c.NewDeleteSketchesRequest(ctx, path, authorization)
 	if err != nil {
@@ -88,7 +88,7 @@ func (c *Client) DeleteSketches(ctx context.Context, path string, authorization 
 	return c.Client.Do(ctx, req)
 }
 
-// NewDeleteSketchesRequest create the request corresponding to the delete action endpoint of the sketches resource.
+// NewDeleteSketchesRequest creates the request corresponding to the delete action endpoint of the sketches resource.
 func (c *Client) NewDeleteSketchesRequest(ctx context.Context, path string, authorization string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
@@ -118,7 +118,7 @@ func EditSketchesPath(id string) string {
 	return fmt.Sprintf("/create/v1/sketches/%s", param0)
 }
 
-// EditSketches Modifies the sketch identified by the :id param.
+// EditSketches modifies the sketch identified by the :id param.
 // If a file has a valid data field, it will be modified too.
 func (c *Client) EditSketches(ctx context.Context, path string, payload *Sketch, authorization string) (*http.Response, error) {
 	req, err := c.NewEditSketchesRequest(ctx, path, payload, authorization)
@@ -128,7 +128,7 @@ func (c *Client) EditSketches(ctx context.Context, path string, payload *Sketch,
 	return c.Client.Do(ctx, req)
 }
 
-// NewEditSketchesRequest create the request corresponding to the edit action endpoint of the sketches resource.
+// NewEditSketchesRequest creates the request corresponding to the edit action endpoint of the sketches resource.
 func (c *Client) NewEditSketchesRequest(ctx context.Context, path string, payload *Sketch, authorization string) (*http.Request, error) {
 	var body bytes.Buffer
 	err := c.Encoder.Encode(payload, &body, "*/*")
@@ -162,7 +162,7 @@ func SearchSketchesPath() string {
 	return fmt.Sprintf("/create/v1/sketches")
 }
 
-// SearchSketches Provides a paginated list of sketches filtered according to the params. The page size is 100 items.
+// SearchSketches provides a paginated list of sketches filtered according to the params. The page size is 100 items.
 func (c *Client) SearchSketches(ctx context.Context, path string, offset *string, owner *string, authorization *string) (*http.Response, error) {
 	req, err := c.NewSearchSketchesRequest(ctx, path, offset, owner, authorization)
 	if err != nil {
@@ -171,7 +171,7 @@ func (c *Client) SearchSketches(ctx context.Context, path string, offset *string
 	return c.Client.Do(ctx, req)
 }
 
-// NewSearchSketchesRequest create the request corresponding to the search action endpoint of the sketches resource.
+// NewSearchSketchesRequest creates the request corresponding to the search action endpoint of the sketches resource.
 func (c *Client) NewSearchSketchesRequest(ctx context.Context, path string, offset *string, owner *string, authorization *string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
@@ -209,7 +209,7 @@ func ShowSketchesPath(id string) string {
 	return fmt.Sprintf("/create/v1/sketches/%s", param0)
 }
 
-// ShowSketches Provides the sketch identified by the :id param.
+// ShowSketches provides the sketch identified by the :id param.
 func (c *Client) ShowSketches(ctx context.Context, path string, authorization *string) (*http.Response, error) {
 	req, err := c.NewShowSketchesRequest(ctx, path, authorization)
 	if err != nil {
@@ -218,7 +218,7 @@ func (c *Client) ShowSketches(ctx context.Context, path string, authorization *s
 	return c.Client.Do(ctx, req)
 }
 
-// NewShowSketchesRequest create the request corresponding to the show action endpoint of the sketches resource.
+// NewShowSketchesRequest creates the request corresponding to the show action endpoint of the sketches resource.
 func (c *Client) NewShowSketchesRequest(ctx context.Context, path string, authorization *string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {

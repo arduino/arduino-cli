@@ -65,7 +65,7 @@ func generateBashCompletions(cmd *cobra.Command, args []string) {
 	}
 }
 
-// Generate man pages for all commands and puts them in $PROJECT_DIR/docs/manpages.
+// Generates man pages for all commands and puts them in $PROJECT_DIR/docs/manpages.
 func generateManPages(cmd *cobra.Command, args []string) {
 	if outputDir == "" {
 		outputDir = "docs/manpages"

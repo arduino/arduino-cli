@@ -22,7 +22,7 @@ import (
 	"strings"
 )
 
-//ProcessResult contains info about a completed process.
+// ProcessResult contains info about a completed process.
 type ProcessResult struct {
 	ItemName string `json:"name,required"`
 	Status   string `json:"status,omitempty"`

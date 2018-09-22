@@ -38,7 +38,7 @@ func (c *Client) ListBoards(ctx context.Context, path string) (*http.Response, e
 	return c.Client.Do(ctx, req)
 }
 
-// NewListBoardsRequest create the request corresponding to the list action endpoint of the boards resource.
+// NewListBoardsRequest creates the request corresponding to the list action endpoint of the boards resource.
 func (c *Client) NewListBoardsRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
@@ -69,7 +69,7 @@ func (c *Client) ShowBoards(ctx context.Context, path string) (*http.Response, e
 	return c.Client.Do(ctx, req)
 }
 
-// NewShowBoardsRequest create the request corresponding to the show action endpoint of the boards resource.
+// NewShowBoardsRequest creates the request corresponding to the show action endpoint of the boards resource.
 func (c *Client) NewShowBoardsRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
