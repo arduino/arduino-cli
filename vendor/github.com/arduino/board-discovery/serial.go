@@ -88,7 +88,7 @@ func (m *Monitor) addSerial(port *enumerator.PortDetails) {
 		SerialNumber: port.SerialNumber,
 		ProductID:    "0x" + port.PID,
 		VendorID:     "0x" + port.VID,
-		// Serial:       port,
+		//Serial:       port,
 	}
 	for port, dev := range m.serial {
 		if port == device.Port {

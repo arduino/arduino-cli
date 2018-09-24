@@ -112,7 +112,7 @@ func (p *CTagsParser) toPrototypes() []*types.Prototype {
 				Prototype:    tag.Prototype,
 				Modifiers:    tag.PrototypeModifiers,
 				Line:         tag.Line,
-				// Fields:       tag,
+				//Fields:       tag,
 			}
 			prototypes = append(prototypes, prototype)
 		}

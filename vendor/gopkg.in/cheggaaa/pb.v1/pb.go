@@ -229,7 +229,7 @@ func (pb *ProgressBar) SetWidth(width int) *ProgressBar {
 
 // End print
 func (pb *ProgressBar) Finish() {
-	// Protect multiple calls
+	//Protect multiple calls
 	pb.finishOnce.Do(func() {
 		close(pb.finish)
 		pb.write(atomic.LoadInt64(&pb.Total), atomic.LoadInt64(&pb.current))
