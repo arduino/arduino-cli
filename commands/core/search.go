@@ -21,9 +21,11 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/arduino/arduino-cli/common/formatter/output"
+
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/common/formatter/output"
 	"github.com/spf13/cobra"
 )
 
@@ -40,13 +42,13 @@ func initSearchCommand() *cobra.Command {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	pm := commands.InitPackageManager()
+	pm := commands.InitPackageManagerWithoutBundles()
 
 	search := strings.ToLower(strings.Join(args, " "))
 	formatter.Print("Searching for platforms matching '" + search + "'")
 	formatter.Print("")
 
-	res := output.PlatformReleases{}
+	res := []*cores.PlatformRelease{}
 	if isUsb, _ := regexp.MatchString("[0-9a-f]{4}:[0-9a-f]{4}", search); isUsb {
 		vid, pid := search[:4], search[5:]
 		res = pm.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid)
@@ -77,6 +79,14 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	if len(res) == 0 {
 		formatter.Print("No platforms matching your search")
 	} else {
-		formatter.Print(res)
+		out := []*output.SearchedPlatform{}
+		for _, platformRelease := range res {
+			out = append(out, &output.SearchedPlatform{
+				ID:      platformRelease.Platform.String(),
+				Name:    platformRelease.Platform.Name,
+				Version: platformRelease.Version,
+			})
+		}
+		formatter.Print(output.SearchedPlatforms{Platforms: out})
 	}
 }

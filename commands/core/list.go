@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	semver "go.bug.st/relaxed-semver"
 )
 
 func initListCommand() *cobra.Command {
@@ -47,7 +48,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 	pm := commands.InitPackageManager()
 
-	res := output.InstalledPlatformReleases{}
+	installed := []*output.InstalledPlatform{}
 	for _, targetPackage := range pm.GetPackages().Packages {
 		for _, platform := range targetPackage.Platforms {
 			if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
@@ -56,12 +57,21 @@ func runListCommand(cmd *cobra.Command, args []string) {
 						continue
 					}
 				}
-				res = append(res, platformRelease)
+				var latestVersion *semver.Version
+				if latest := platformRelease.Platform.GetLatestRelease(); latest != nil {
+					latestVersion = latest.Version
+				}
+				installed = append(installed, &output.InstalledPlatform{
+					ID:        platformRelease.String(),
+					Installed: platformRelease.Version,
+					Latest:    latestVersion,
+					Name:      platformRelease.Platform.Name,
+				})
 			}
 		}
 	}
 
-	if len(res) > 0 {
-		formatter.Print(res)
+	if len(installed) > 0 {
+		formatter.Print(output.InstalledPlatforms{Platforms: installed})
 	}
 }
