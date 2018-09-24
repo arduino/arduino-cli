@@ -21,59 +21,65 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/gosuri/uitable"
 	semver "go.bug.st/relaxed-semver"
 )
 
-// InstalledPlatformReleases represents an output set of installed platforms.
-type InstalledPlatformReleases []*cores.PlatformRelease
-
-func (is InstalledPlatformReleases) Len() int      { return len(is) }
-func (is InstalledPlatformReleases) Swap(i, j int) { is[i], is[j] = is[j], is[i] }
-func (is InstalledPlatformReleases) Less(i, j int) bool {
-	return is[i].Platform.String() < is[j].Platform.String()
+// InstalledPlatforms represents an output of a set of installed platforms.
+type InstalledPlatforms struct {
+	Platforms []*InstalledPlatform
 }
 
-// PlatformReleases represents an output set of tools of platforms.
-type PlatformReleases []*cores.PlatformRelease
-
-func (is PlatformReleases) Len() int      { return len(is) }
-func (is PlatformReleases) Swap(i, j int) { is[i], is[j] = is[j], is[i] }
-func (is PlatformReleases) Less(i, j int) bool {
-	return is[i].Platform.String() < is[j].Platform.String()
+// InstalledPlatform represents an output of an installed plaform.
+type InstalledPlatform struct {
+	ID        string
+	Installed *semver.Version
+	Latest    *semver.Version
+	Name      string
 }
 
-func (is InstalledPlatformReleases) String() string {
+func (is InstalledPlatforms) less(i, j int) bool {
+	return is.Platforms[i].ID < is.Platforms[j].ID
+}
+
+func (is InstalledPlatforms) String() string {
 	table := uitable.New()
 	table.MaxColWidth = 100
 	table.Wrap = true
 
 	table.AddRow("ID", "Installed", "Latest", "Name")
-	sort.Sort(is)
-	for _, item := range is {
-		var latestVersion *semver.Version
-		if latest := item.Platform.GetLatestRelease(); latest != nil {
-			latestVersion = latest.Version
-		}
-		table.AddRow(item.Platform, item.Version, latestVersion, item.Platform.Name)
+	sort.Slice(is.Platforms, is.less)
+	for _, item := range is.Platforms {
+		table.AddRow(item.ID, item.Installed, item.Latest, item.Name)
 	}
 	return fmt.Sprintln(table)
 }
 
-func (is PlatformReleases) String() string {
+// SearchedPlatforms represents an output of a set of searched platforms
+type SearchedPlatforms struct {
+	Platforms []*SearchedPlatform
+}
+
+func (is SearchedPlatforms) less(i, j int) bool {
+	return is.Platforms[i].ID < is.Platforms[j].ID
+}
+
+// SearchedPlatform represents an output of a searched platform
+type SearchedPlatform struct {
+	ID      string
+	Version *semver.Version
+	Name    string
+}
+
+func (is SearchedPlatforms) String() string {
 	table := uitable.New()
 	table.MaxColWidth = 100
 	table.Wrap = true
 
-	table.AddRow("ID", "Version", "Installed", "Name")
-	sort.Sort(is)
-	for _, item := range is {
-		installed := "No"
-		if item.InstallDir != nil {
-			installed = "Yes"
-		}
-		table.AddRow(item.Platform.String(), item.Version, installed, item.Platform.Name)
+	sort.Slice(is.Platforms, is.less)
+	table.AddRow("ID", "Version", "Name")
+	for _, item := range is.Platforms {
+		table.AddRow(item.ID, item.Version, item.Name)
 	}
 	return fmt.Sprintln(table)
 }
