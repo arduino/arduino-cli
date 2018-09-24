@@ -362,7 +362,7 @@ message Term {
         APPEND = 29; // ARRAY, DATUM -> ARRAY
         // Prepend a single element to the end of an array (like `cons`).
         PREPEND = 80; // ARRAY, DATUM -> ARRAY
-        // Remove the elements of one array from another array.
+        //Remove the elements of one array from another array.
         DIFFERENCE = 95; // ARRAY, ARRAY -> ARRAY
 
         // DATUM Set Ops
