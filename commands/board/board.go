@@ -31,7 +31,7 @@ func InitCommand() *cobra.Command {
 		Example: "  # Lists all connected boards.\n" +
 			"  " + commands.AppName + " board list\n\n" +
 			"  # Attaches a sketch to a board.\n" +
-			"  " + commands.AppName + " board attach --board serial:///dev/tty/ACM0 --sketch mySketch",
+			"  " + commands.AppName + " board attach serial:///dev/tty/ACM0 mySketch",
 	}
 	boardCommand.AddCommand(initAttachCommand())
 	boardCommand.AddCommand(initListCommand())

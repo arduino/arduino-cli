@@ -40,7 +40,7 @@ func initAttachCommand() *cobra.Command {
 		Use:   "attach <port>|<FQBN> [sketchPath]",
 		Short: "Attaches a sketch to a board.",
 		Long:  "Attaches a sketch to a board.",
-		Example: "arduino board attach serial:///dev/tty/ACM0\n" +
+		Example: "  arduino board attach serial:///dev/tty/ACM0\n" +
 			"  " + commands.AppName + " board attach serial:///dev/tty/ACM0 HelloWorld\n" +
 			"  " + commands.AppName + " board attach arduino:samd:mkr1000",
 		Args: cobra.RangeArgs(1, 2),
