@@ -25,7 +25,7 @@ import (
 )
 
 // LibraryIndexURL is the URL where to get library index.
-var LibraryIndexURL, _ = url.Parse("http://downloads.arduino.cc/libraries/library_index.json")
+var LibraryIndexURL, _ = url.Parse("https://downloads.arduino.cc/libraries/library_index.json")
 
 // UpdateIndex downloads the libraries index file from Arduino repository.
 func (lm *LibrariesManager) UpdateIndex() (*grab.Response, error) {
