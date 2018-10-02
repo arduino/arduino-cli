@@ -49,10 +49,10 @@ func (s *RewriteHardwareKeys) Run(ctx *types.Context) error {
 	for _, aPackage := range packages.Packages {
 		for _, platform := range aPackage.Platforms {
 			for _, platformRelease := range platform.Releases {
-				if platformRelease.Properties[constants.REWRITING] != constants.REWRITING_DISABLED {
+				if platformRelease.Properties.Get(constants.REWRITING) != constants.REWRITING_DISABLED {
 					for _, rewrite := range platformKeysRewrite.Rewrites {
-						if platformRelease.Properties[rewrite.Key] != "" && platformRelease.Properties[rewrite.Key] == rewrite.OldValue {
-							platformRelease.Properties[rewrite.Key] = rewrite.NewValue
+						if platformRelease.Properties.Get(rewrite.Key) == rewrite.OldValue {
+							platformRelease.Properties.Set(rewrite.Key, rewrite.NewValue)
 							appliedRewrites := rewritesAppliedToPlatform(platformRelease, hardwareRewriteResults)
 							appliedRewrites = append(appliedRewrites, rewrite)
 							hardwareRewriteResults[platformRelease] = appliedRewrites

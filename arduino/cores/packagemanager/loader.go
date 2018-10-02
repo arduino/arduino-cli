@@ -26,7 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/go-paths-helper"
-	properties "github.com/arduino/go-properties-map"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"go.bug.st/relaxed-semver"
 )
 
@@ -274,7 +274,7 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 	// Create programmers properties
 	if programmersProperties, err := properties.SafeLoad(programmersTxtPath.String()); err == nil {
 		platform.Programmers = properties.MergeMapsOfProperties(
-			map[string]properties.Map{},
+			map[string]*properties.Map{},
 			platform.Programmers, // TODO: Very weird, why not an empty one?
 			programmersProperties.FirstLevelOf())
 	} else {
@@ -313,7 +313,7 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 	delete(propertiesByBoard, "menu") // TODO: check this one
 
 	for boardID, boardProperties := range propertiesByBoard {
-		boardProperties["_id"] = boardID // TODO: What is that for??
+		boardProperties.Set("_id", boardID) // TODO: What is that for??
 		board := platform.GetOrCreateBoard(boardID)
 		board.Properties.Merge(boardProperties)
 	}
@@ -419,7 +419,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) er
 		for packager, toolsData := range all.FirstLevelOf() {
 			targetPackage := pm.packages.GetOrCreatePackage(packager)
 
-			for toolName, toolVersion := range toolsData {
+			for toolName, toolVersion := range toolsData.AsMap() {
 				tool := targetPackage.GetOrCreateTool(toolName)
 				version := semver.ParseRelaxed(toolVersion)
 				release := tool.GetOrCreateRelease(version)

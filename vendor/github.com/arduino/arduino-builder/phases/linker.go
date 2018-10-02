@@ -38,7 +38,7 @@ import (
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 )
 
 type Linker struct{}
@@ -70,18 +70,18 @@ func (s *Linker) Run(ctx *types.Context) error {
 	return nil
 }
 
-func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties properties.Map) error {
+func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties *properties.Map) error {
 	optRelax := addRelaxTrickIfATMEGA2560(buildProperties)
 
 	quotedObjectFiles := utils.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes)
 	objectFileList := strings.Join(quotedObjectFiles, constants.SPACE)
 
 	properties := buildProperties.Clone()
-	properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS] + optRelax
-	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel]
-	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = coreDotARelPath.String()
-	properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = coreArchiveFilePath.String()
-	properties[constants.BUILD_PROPERTIES_OBJECT_FILES] = objectFileList
+	properties.Set(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS)+optRelax)
+	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel))
+	properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE, coreDotARelPath.String())
+	properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, coreArchiveFilePath.String())
+	properties.Set(constants.BUILD_PROPERTIES_OBJECT_FILES, objectFileList)
 
 	_, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_C_COMBINE_PATTERN, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
 	return err
@@ -91,8 +91,8 @@ func wrapWithDoubleQuotes(value string) string {
 	return "\"" + value + "\""
 }
 
-func addRelaxTrickIfATMEGA2560(buildProperties properties.Map) string {
-	if buildProperties[constants.BUILD_PROPERTIES_BUILD_MCU] == "atmega2560" {
+func addRelaxTrickIfATMEGA2560(buildProperties *properties.Map) string {
+	if buildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU) == "atmega2560" {
 		return ",--relax"
 	}
 	return constants.EMPTY_STRING

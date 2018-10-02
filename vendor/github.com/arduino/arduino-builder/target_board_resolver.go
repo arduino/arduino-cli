@@ -49,7 +49,7 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 
 	targetBoard.Properties = buildProperties // FIXME....
 
-	core := targetBoard.Properties["build.core"]
+	core := targetBoard.Properties.Get("build.core")
 	if core == "" {
 		core = "arduino"
 	}

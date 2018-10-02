@@ -21,13 +21,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 )
 
 // Board represents a board loaded from an installed platform
 type Board struct {
 	BoardID         string
-	Properties      properties.Map   `json:"-"`
+	Properties      *properties.Map  `json:"-"`
 	PlatformRelease *PlatformRelease `json:"-"`
 }
 
@@ -35,8 +35,8 @@ type Board struct {
 func (b *Board) HasUsbID(reqVid, reqPid string) bool {
 	vids := b.Properties.SubTree("vid")
 	pids := b.Properties.SubTree("pid")
-	for id, vid := range vids {
-		if pid, ok := pids[id]; ok {
+	for id, vid := range vids.AsMap() {
+		if pid, ok := pids.GetOk(id); ok {
 			if strings.EqualFold(vid, reqVid) && strings.EqualFold(pid, reqPid) {
 				return true
 			}
@@ -47,7 +47,7 @@ func (b *Board) HasUsbID(reqVid, reqPid string) bool {
 
 // Name returns the board name as defined in boards.txt properties
 func (b *Board) Name() string {
-	return b.Properties["name"]
+	return b.Properties.Get("name")
 }
 
 // FQBN return the Fully-Qualified-Board-Name for the default configuration of this board
@@ -62,26 +62,27 @@ func (b *Board) String() string {
 
 // GetBuildProperties returns the build properties and the build
 // platform for the Board with the configuration passed as parameter.
-func (b *Board) GetBuildProperties(configs properties.Map) (properties.Map, error) {
+func (b *Board) GetBuildProperties(configs *properties.Map) (*properties.Map, error) {
 	// Start with board's base properties
 	buildProperties := b.Properties.Clone()
 
 	// Add all sub-configurations one by one
 	menu := b.Properties.SubTree("menu")
-	for option, value := range configs {
+	for _, option := range configs.Keys() {
 		if option == "" {
 			return nil, fmt.Errorf("invalid empty option found")
 		}
 
 		optionMenu := menu.SubTree(option)
-		if len(optionMenu) == 0 {
+		if optionMenu.Size() == 0 {
 			return nil, fmt.Errorf("invalid option '%s'", option)
 		}
-		if _, ok := optionMenu[value]; !ok {
-			return nil, fmt.Errorf("invalid value '%s' for option '%s'", value, option)
+		optionValue := configs.Get(option)
+		if !optionMenu.ContainsKey(optionValue) {
+			return nil, fmt.Errorf("invalid value '%s' for option '%s'", optionValue, option)
 		}
 
-		optionsConf := optionMenu.SubTree(value)
+		optionsConf := optionMenu.SubTree(optionValue)
 		buildProperties.Merge(optionsConf)
 	}
 
@@ -93,7 +94,7 @@ func (b *Board) GetBuildProperties(configs properties.Map) (properties.Map, erro
 // the full FQBN is "arduino:avr:mega:cpu=atmega2560" the config part must be
 // "cpu=atmega2560".
 // FIXME: deprecated, use GetBuildProperties instead
-func (b *Board) GeneratePropertiesForConfiguration(config string) (properties.Map, error) {
+func (b *Board) GeneratePropertiesForConfiguration(config string) (*properties.Map, error) {
 	fqbn, err := ParseFQBN(b.String() + ":" + config)
 	if err != nil {
 		return nil, fmt.Errorf("parsing fqbn: %s", err)

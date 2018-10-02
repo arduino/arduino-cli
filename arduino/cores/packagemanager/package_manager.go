@@ -27,7 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/go-paths-helper"
-	properties "github.com/arduino/go-properties-map"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/relaxed-semver"
 )
@@ -144,7 +144,7 @@ func (pm *PackageManager) FindBoardWithFQBN(fqbnIn string) (*cores.Board, error)
 // returned together with the error.
 func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 	*cores.Package, *cores.PlatformRelease, *cores.Board,
-	properties.Map, *cores.PlatformRelease, error) {
+	*properties.Map, *cores.PlatformRelease, error) {
 
 	// Find package
 	targetPackage := pm.packages.Packages[fqbn.Package]
@@ -181,7 +181,7 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 	// Determine the platform used for the build (in case the board refers
 	// to a core contained in another platform)
 	buildPlatformRelease := platformRelease
-	coreParts := strings.Split(buildProperties["build.core"], ":")
+	coreParts := strings.Split(buildProperties.Get("build.core"), ":")
 	if len(coreParts) > 1 {
 		referredPackage := coreParts[1]
 		buildPackage := pm.packages.Packages[referredPackage]

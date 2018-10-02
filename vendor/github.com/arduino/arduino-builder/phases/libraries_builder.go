@@ -40,7 +40,7 @@ import (
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 )
 
 var PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC = map[string]bool{".a": true}
@@ -77,7 +77,7 @@ func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libs libraries.List) e
 		if library.Precompiled {
 			// add library src path to compiler.c.elf.extra_flags
 			// use library.Name as lib name and srcPath/{mcpu} as location
-			mcu := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
+			mcu := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
 			path := library.SourceDir.Join(mcu).String()
 			// find all library names in the folder and prepend -l
 			filePaths := []string{}
@@ -90,13 +90,15 @@ func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libs libraries.List) e
 				name = strings.Replace(name, "lib", "", 1)
 				libs_cmd += "-l" + name + " "
 			}
-			ctx.BuildProperties[constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS] += "\"-L" + path + "\" " + libs_cmd + " "
+
+			currLDFlags := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS)
+			ctx.BuildProperties.Set(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS, currLDFlags+"\"-L"+path+"\" "+libs_cmd+" ")
 		}
 	}
 	return nil
 }
 
-func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *paths.Path, buildProperties properties.Map, includes []string) (paths.PathList, error) {
+func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
 	objectFiles := paths.NewPathList()
 	for _, library := range libraries {
 		libraryObjectFiles, err := compileLibrary(ctx, library, buildPath, buildProperties, includes)
@@ -109,7 +111,7 @@ func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *p
 	return objectFiles, nil
 }
 
-func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *paths.Path, buildProperties properties.Map, includes []string) (paths.PathList, error) {
+func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
 	logger := ctx.GetLogger()
 	if ctx.Verbose {
 		logger.Println(constants.LOG_LEVEL_INFO, "Compiling library \"{0}\"", library.Name)
@@ -127,7 +129,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 		extensions := func(ext string) bool { return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext] }
 
 		filePaths := []string{}
-		mcu := buildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
+		mcu := buildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
 		err := utils.FindFilesInFolder(&filePaths, library.SourceDir.Join(mcu).String(), extensions, true)
 		if err != nil {
 			return nil, i18n.WrapError(err)

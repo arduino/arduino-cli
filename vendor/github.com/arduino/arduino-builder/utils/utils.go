@@ -324,11 +324,6 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 	return outbytes, errbytes, i18n.WrapError(err)
 }
 
-func MapStringStringHas(aMap map[string]string, key string) bool {
-	_, ok := aMap[key]
-	return ok
-}
-
 func AbsolutizePaths(files []string) ([]string, error) {
 	for idx, file := range files {
 		if file == "" {

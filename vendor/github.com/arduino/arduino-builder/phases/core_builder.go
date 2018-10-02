@@ -38,7 +38,7 @@ import (
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 )
 
 type CoreBuilder struct{}
@@ -69,7 +69,7 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 	return nil
 }
 
-func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *paths.Path, buildProperties properties.Map) (*paths.Path, paths.PathList, error) {
+func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *paths.Path, buildProperties *properties.Map) (*paths.Path, paths.PathList, error) {
 	logger := ctx.GetLogger()
 	coreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_CORE_PATH)
 	variantFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH)
@@ -98,7 +98,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 
 	var targetArchivedCore *paths.Path
 	if buildCachePath != nil {
-		archivedCoreName := builder_utils.GetCachedCoreArchiveFileName(buildProperties[constants.BUILD_PROPERTIES_FQBN], realCoreFolder)
+		archivedCoreName := builder_utils.GetCachedCoreArchiveFileName(buildProperties.Get(constants.BUILD_PROPERTIES_FQBN), realCoreFolder)
 		targetArchivedCore = buildCachePath.Join(archivedCoreName)
 		canUseArchivedCore := !builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, targetArchivedCore)
 

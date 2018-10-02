@@ -38,7 +38,7 @@ import (
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 )
 
 type WipeoutBuildPathIfBuildOptionsChanged struct{}
@@ -51,15 +51,15 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	previousBuildOptionsJson := ctx.BuildOptionsJsonPrevious
 	logger := ctx.GetLogger()
 
-	var opts properties.Map
-	var prevOpts properties.Map
+	var opts *properties.Map
+	var prevOpts *properties.Map
 	json.Unmarshal([]byte(buildOptionsJson), &opts)
 	json.Unmarshal([]byte(previousBuildOptionsJson), &prevOpts)
 
 	// If SketchLocation path is different but filename is the same, consider it equal
-	if filepath.Base(opts["sketchLocation"]) == filepath.Base(prevOpts["sketchLocation"]) {
-		delete(opts, "sketchLocation")
-		delete(prevOpts, "sketchLocation")
+	if filepath.Base(opts.Get("sketchLocation")) == filepath.Base(prevOpts.Get("sketchLocation")) {
+		opts.Remove("sketchLocation")
+		prevOpts.Remove("sketchLocation")
 	}
 
 	// If options are not changed check if core has

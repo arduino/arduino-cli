@@ -38,14 +38,13 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/arduino-builder/utils"
 )
 
 type MergeSketchWithBootloader struct{}
 
 func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
-	if !utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK) && !utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_FILE) {
+	if !buildProperties.ContainsKey(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK) && !buildProperties.ContainsKey(constants.BUILD_PROPERTIES_BOOTLOADER_FILE) {
 		return nil
 	}
 
@@ -67,10 +66,10 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 	}
 
 	bootloader := constants.EMPTY_STRING
-	if utils.MapStringStringHas(buildProperties, constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK) {
-		bootloader = buildProperties[constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK]
+	if bootloaderNoBlink, ok := buildProperties.GetOk(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK); ok {
+		bootloader = bootloaderNoBlink
 	} else {
-		bootloader = buildProperties[constants.BUILD_PROPERTIES_BOOTLOADER_FILE]
+		bootloader = buildProperties.Get(constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
 	}
 	bootloader = buildProperties.ExpandPropsInString(bootloader)
 

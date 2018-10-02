@@ -32,7 +32,7 @@ package builder
 import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 )
 
 type SetCustomBuildProperties struct{}
@@ -44,9 +44,7 @@ func (s *SetCustomBuildProperties) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 
-	for key, value := range customBuildProperties {
-		buildProperties[key] = value
-	}
+	buildProperties.Merge(customBuildProperties)
 
 	return nil
 }

@@ -130,7 +130,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	cache := readCache(cachePath)
 
 	appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_CORE_PATH))
-	if ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH] != "" {
+	if ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH) != "" {
 		appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH))
 	}
 

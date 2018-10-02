@@ -36,7 +36,7 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 )
 
 type LoadVIDPIDSpecificProperties struct{}
@@ -67,10 +67,10 @@ func (s *LoadVIDPIDSpecificProperties) Run(ctx *types.Context) error {
 	return nil
 }
 
-func findVIDPIDIndex(buildProperties properties.Map, vid, pid string) (int, error) {
-	for key, value := range buildProperties.SubTree(constants.BUILD_PROPERTIES_VID) {
+func findVIDPIDIndex(buildProperties *properties.Map, vid, pid string) (int, error) {
+	for key, value := range buildProperties.SubTree(constants.BUILD_PROPERTIES_VID).AsMap() {
 		if !strings.Contains(key, ".") {
-			if vid == strings.ToLower(value) && pid == strings.ToLower(buildProperties[constants.BUILD_PROPERTIES_PID+"."+key]) {
+			if vid == strings.ToLower(value) && pid == strings.ToLower(buildProperties.Get(constants.BUILD_PROPERTIES_PID+"."+key)) {
 				return strconv.Atoi(key)
 			}
 		}

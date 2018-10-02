@@ -45,7 +45,7 @@ func (s *DumpBuildProperties) Run(ctx *types.Context) error {
 	sort.Strings(keys)
 
 	for _, key := range keys {
-		fmt.Println(key + "=" + buildProperties[key])
+		fmt.Println(key + "=" + buildProperties.Get(key))
 	}
 
 	return nil

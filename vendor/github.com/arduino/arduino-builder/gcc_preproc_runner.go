@@ -75,11 +75,11 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths
 	properties.SetPath(constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH, targetFilePath)
 
 	includesStrings := utils.Map(includes.AsStrings(), utils.WrapWithHyphenI)
-	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includesStrings, constants.SPACE)
+	properties.Set(constants.BUILD_PROPERTIES_INCLUDES, strings.Join(includesStrings, constants.SPACE))
 
-	if properties[constants.RECIPE_PREPROC_MACROS] == constants.EMPTY_STRING {
+	if properties.Get(constants.RECIPE_PREPROC_MACROS) == "" {
 		//generate PREPROC_MACROS from RECIPE_CPP_PATTERN
-		properties[constants.RECIPE_PREPROC_MACROS] = GeneratePreprocPatternFromCompile(properties[constants.RECIPE_CPP_PATTERN])
+		properties.Set(constants.RECIPE_PREPROC_MACROS, GeneratePreprocPatternFromCompile(properties.Get(constants.RECIPE_CPP_PATTERN)))
 	}
 
 	cmd, err := builder_utils.PrepareCommandForRecipe(ctx, properties, constants.RECIPE_PREPROC_MACROS, true)
