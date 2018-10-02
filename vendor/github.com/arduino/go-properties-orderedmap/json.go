@@ -1,9 +1,9 @@
 /*
- * This file is part of PropertiesMap library.
+ * This file is part of PropertiesOrderedMap library.
  *
  * Copyright 2018 Arduino AG (http://www.arduino.cc/)
  *
- * PropertiesMap library is free software; you can redistribute it and/or modify
+ * PropertiesOrderedMap library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
@@ -30,41 +30,27 @@
 package properties
 
 import (
-	"github.com/arduino/go-paths-helper"
+	"encoding/json"
 )
 
-// GetBoolean returns true if the map contains the specified key and the value
-// equals to the string "true", in any other case returns false.
-func (m Map) GetBoolean(key string) bool {
-	value, ok := m[key]
-	return ok && value == "true"
+// XXX: no simple way to preserve ordering in JSON.
+
+// MarshalJSON implements json.Marshaler interface
+func (m *Map) MarshalJSON() ([]byte, error) {
+	return json.Marshal(m.kv)
 }
 
-// SetBoolean sets the specified key to the string "true" or "false" if the value
-// is respectively true or false.
-func (m Map) SetBoolean(key string, value bool) {
-	if value {
-		m[key] = "true"
-	} else {
-		m[key] = "false"
+// UnmarshalJSON implements json.Unmarshaler interface
+func (m *Map) UnmarshalJSON(d []byte) error {
+	var obj map[string]string
+	if err := json.Unmarshal(d, &obj); err != nil {
+		return err
 	}
-}
 
-// GetPath returns a paths.Path object using the map value as path. The function
-// returns nil if the key is not present.
-func (m Map) GetPath(key string) *paths.Path {
-	value, ok := m[key]
-	if !ok {
-		return nil
+	m.kv = map[string]string{}
+	m.o = []string{}
+	for k, v := range obj {
+		m.Set(k, v)
 	}
-	return paths.New(value)
-}
-
-// SetPath saves the paths.Path object in the map using the path as value of the map
-func (m Map) SetPath(key string, value *paths.Path) {
-	if value == nil {
-		m[key] = ""
-	} else {
-		m[key] = value.String()
-	}
+	return nil
 }

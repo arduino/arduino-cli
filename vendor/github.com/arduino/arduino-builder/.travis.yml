@@ -10,7 +10,7 @@ install:
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/mattn/goveralls
   - go get github.com/wadey/gocovmerge
-  - go get github.com/arduino/go-properties-map
+  - go get github.com/arduino/go-properties-orderedmap
   - go get github.com/arduino/go-timeutils
 
 script:

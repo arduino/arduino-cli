@@ -23,7 +23,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/go-paths-helper"
-	properties "github.com/arduino/go-properties-map"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"go.bug.st/relaxed-semver"
 )
 
@@ -133,11 +133,11 @@ func (tr *ToolRelease) String() string {
 }
 
 // RuntimeProperties returns the runtime properties for this tool
-func (tr *ToolRelease) RuntimeProperties() properties.Map {
-	return properties.Map{
-		"runtime.tools." + tr.Tool.Name + ".path":                             tr.InstallDir.String(),
-		"runtime.tools." + tr.Tool.Name + "-" + tr.Version.String() + ".path": tr.InstallDir.String(),
-	}
+func (tr *ToolRelease) RuntimeProperties() *properties.Map {
+	res := properties.NewMap()
+	res.Set("runtime.tools."+tr.Tool.Name+".path", tr.InstallDir.String())
+	res.Set("runtime.tools."+tr.Tool.Name+"-"+tr.Version.String()+".path", tr.InstallDir.String())
+	return res
 }
 
 var (

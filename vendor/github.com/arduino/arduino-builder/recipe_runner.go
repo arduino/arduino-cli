@@ -39,6 +39,7 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
+	properties "github.com/arduino/go-properties-orderedmap"
 )
 
 type RecipeByPrefixSuffixRunner struct {
@@ -70,10 +71,10 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 
 }
 
-func findRecipes(buildProperties map[string]string, patternPrefix string, patternSuffix string) []string {
+func findRecipes(buildProperties *properties.Map, patternPrefix string, patternSuffix string) []string {
 	var recipes []string
-	for key, _ := range buildProperties {
-		if strings.HasPrefix(key, patternPrefix) && strings.HasSuffix(key, patternSuffix) && buildProperties[key] != constants.EMPTY_STRING {
+	for _, key := range buildProperties.Keys() {
+		if strings.HasPrefix(key, patternPrefix) && strings.HasSuffix(key, patternSuffix) && buildProperties.Get(key) != "" {
 			recipes = append(recipes, key)
 		}
 	}

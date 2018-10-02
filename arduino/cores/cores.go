@@ -23,7 +23,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 
 	"github.com/arduino/arduino-cli/arduino/resources"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 	"go.bug.st/relaxed-semver"
 )
 
@@ -44,11 +44,11 @@ type PlatformRelease struct {
 	Dependencies   ToolDependencies // The Dependency entries to load tools.
 	Platform       *Platform        `json:"-"`
 
-	Properties  properties.Map            `json:"-"`
-	Boards      map[string]*Board         `json:"-"`
-	Programmers map[string]properties.Map `json:"-"`
-	Menus       map[string]string         `json:"-"`
-	InstallDir  *paths.Path               `json:"-"`
+	Properties  *properties.Map            `json:"-"`
+	Boards      map[string]*Board          `json:"-"`
+	Programmers map[string]*properties.Map `json:"-"`
+	Menus       *properties.Map            `json:"-"`
+	InstallDir  *paths.Path                `json:"-"`
 }
 
 // BoardManifest contains information about a board. These metadata are usually
@@ -103,8 +103,8 @@ func (platform *Platform) GetOrCreateRelease(version *semver.Version) (*Platform
 	release := &PlatformRelease{
 		Version:     version,
 		Boards:      map[string]*Board{},
-		Properties:  properties.Map{},
-		Programmers: map[string]properties.Map{},
+		Properties:  properties.NewMap(),
+		Programmers: map[string]*properties.Map{},
 		Platform:    platform,
 	}
 	platform.Releases[tag] = release
@@ -177,7 +177,7 @@ func (release *PlatformRelease) GetOrCreateBoard(boardID string) *Board {
 	}
 	board := &Board{
 		BoardID:         boardID,
-		Properties:      properties.Map{},
+		Properties:      properties.NewMap(),
 		PlatformRelease: release,
 	}
 	release.Boards[boardID] = board
@@ -198,10 +198,10 @@ func (release *PlatformRelease) RequiresToolRelease(toolRelease *ToolRelease) bo
 }
 
 // RuntimeProperties returns the runtime properties for this PlatformRelease
-func (release *PlatformRelease) RuntimeProperties() properties.Map {
-	return properties.Map{
-		"runtime.platform.path": release.InstallDir.String(),
-	}
+func (release *PlatformRelease) RuntimeProperties() *properties.Map {
+	res := properties.NewMap()
+	res.Set("runtime.platform.path", release.InstallDir.String())
+	return res
 }
 
 // GetLibrariesDir returns the path to the core libraries or nil if not

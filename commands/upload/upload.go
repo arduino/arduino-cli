@@ -29,7 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/go-paths-helper"
-	properties "github.com/arduino/go-properties-map"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	serial "go.bug.st/serial.v1"
@@ -105,7 +105,7 @@ func run(command *cobra.Command, args []string) {
 	}
 
 	// Create board configuration
-	var boardProperties properties.Map
+	var boardProperties *properties.Map
 	if len(fqbnParts) == 3 {
 		boardProperties = board.Properties
 	} else {
@@ -118,7 +118,7 @@ func run(command *cobra.Command, args []string) {
 	}
 
 	// Load programmer tool
-	uploadToolID, have := boardProperties["upload.tool"]
+	uploadToolID, have := boardProperties.GetOk("upload.tool")
 	if !have || uploadToolID == "" {
 		formatter.PrintErrorMessage("The board defines an invalid 'upload.tool': " + uploadToolID)
 		os.Exit(commands.ErrGeneric)
@@ -177,27 +177,27 @@ func run(command *cobra.Command, args []string) {
 
 	// Set properties for verbose upload
 	if flags.verbose {
-		if v, ok := uploadProperties["upload.params.verbose"]; ok {
-			uploadProperties["upload.verbose"] = v
+		if v, ok := uploadProperties.GetOk("upload.params.verbose"); ok {
+			uploadProperties.Set("upload.verbose", v)
 		}
 	} else {
-		if v, ok := uploadProperties["upload.params.quiet"]; ok {
-			uploadProperties["upload.verbose"] = v
+		if v, ok := uploadProperties.GetOk("upload.params.quiet"); ok {
+			uploadProperties.Set("upload.verbose", v)
 		}
 	}
 
 	// Set properties for verify
 	if flags.verify {
-		uploadProperties["upload.verify"] = uploadProperties["upload.params.verify"]
+		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.verify"))
 	} else {
-		uploadProperties["upload.verify"] = uploadProperties["upload.params.noverify"]
+		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.noverify"))
 	}
 
 	// Set path to compiled binary
 	// FIXME: refactor this should be made into a function
 	fqbn = strings.Replace(fqbn, ":", ".", -1)
-	uploadProperties["build.path"] = sketch.FullPath
-	uploadProperties["build.project_name"] = sketch.Name + "." + fqbn
+	uploadProperties.Set("build.path", sketch.FullPath)
+	uploadProperties.Set("build.project_name", sketch.Name+"."+fqbn)
 	ext := filepath.Ext(uploadProperties.ExpandPropsInString("{recipe.output.tmp_file}"))
 	if _, err := os.Stat(filepath.Join(sketch.FullPath, sketch.Name+"."+fqbn+ext)); err != nil {
 		if os.IsNotExist(err) {
@@ -251,15 +251,15 @@ func run(command *cobra.Command, args []string) {
 	}
 
 	// Set serial port property
-	uploadProperties["serial.port"] = actualPort
+	uploadProperties.Set("serial.port", actualPort)
 	if strings.HasPrefix(actualPort, "/dev/") {
-		uploadProperties["serial.port.file"] = actualPort[5:]
+		uploadProperties.Set("serial.port.file", actualPort[5:])
 	} else {
-		uploadProperties["serial.port.file"] = actualPort
+		uploadProperties.Set("serial.port.file", actualPort)
 	}
 
 	// Build recipe for upload
-	recipe := uploadProperties["upload.pattern"]
+	recipe := uploadProperties.Get("upload.pattern")
 	cmdLine := uploadProperties.ExpandPropsInString(recipe)
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 	if err != nil {

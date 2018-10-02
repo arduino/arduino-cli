@@ -42,7 +42,7 @@ import (
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 )
 
 func PrintProgressIfProgressEnabledAndMachineLogger(ctx *types.Context) {
@@ -58,7 +58,7 @@ func PrintProgressIfProgressEnabledAndMachineLogger(ctx *types.Context) {
 	}
 }
 
-func CompileFilesRecursive(ctx *types.Context, sourcePath *paths.Path, buildPath *paths.Path, buildProperties properties.Map, includes []string) (paths.PathList, error) {
+func CompileFilesRecursive(ctx *types.Context, sourcePath *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
 	objectFiles, err := CompileFiles(ctx, sourcePath, false, buildPath, buildProperties, includes)
 	if err != nil {
 		return nil, i18n.WrapError(err)
@@ -80,7 +80,7 @@ func CompileFilesRecursive(ctx *types.Context, sourcePath *paths.Path, buildPath
 	return objectFiles, nil
 }
 
-func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties properties.Map, includes []string) (paths.PathList, error) {
+func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
 	sObjectFiles, err := compileFilesWithExtensionWithRecipe(ctx, sourcePath, recurse, buildPath, buildProperties, includes, ".S", constants.RECIPE_S_PATTERN)
 	if err != nil {
 		return nil, i18n.WrapError(err)
@@ -100,7 +100,7 @@ func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buil
 	return objectFiles, nil
 }
 
-func compileFilesWithExtensionWithRecipe(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties properties.Map, includes []string, extension string, recipe string) (paths.PathList, error) {
+func compileFilesWithExtensionWithRecipe(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string, extension string, recipe string) (paths.PathList, error) {
 	sources, err := findFilesInFolder(sourcePath, extension, recurse)
 	if err != nil {
 		return nil, i18n.WrapError(err)
@@ -164,7 +164,7 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 	return sources, nil
 }
 
-func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources paths.PathList, buildPath *paths.Path, buildProperties properties.Map, includes []string, recipe string) (paths.PathList, error) {
+func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources paths.PathList, buildPath *paths.Path, buildProperties *properties.Map, includes []string, recipe string) (paths.PathList, error) {
 	objectFiles := paths.NewPathList()
 	if len(sources) == 0 {
 		return objectFiles, nil
@@ -212,19 +212,19 @@ func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources 
 	}
 }
 
-func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *paths.Path, buildPath *paths.Path, buildProperties properties.Map, includes []string, recipe string) (*paths.Path, error) {
+func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string, recipe string) (*paths.Path, error) {
 	logger := ctx.GetLogger()
 	properties := buildProperties.Clone()
-	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel]
-	properties[constants.BUILD_PROPERTIES_INCLUDES] = strings.Join(includes, constants.SPACE)
-	properties[constants.BUILD_PROPERTIES_SOURCE_FILE] = source.String()
+	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel))
+	properties.Set(constants.BUILD_PROPERTIES_INCLUDES, strings.Join(includes, constants.SPACE))
+	properties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, source)
 	relativeSource, err := sourcePath.RelTo(source)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
-	properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = buildPath.JoinPath(relativeSource).String() + ".o"
+	properties.Set(constants.BUILD_PROPERTIES_OBJECT_FILE, buildPath.JoinPath(relativeSource).String()+".o")
 
-	err = paths.New(properties[constants.BUILD_PROPERTIES_OBJECT_FILE]).Parent().MkdirAll()
+	err = properties.GetPath(constants.BUILD_PROPERTIES_OBJECT_FILE).Parent().MkdirAll()
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
@@ -240,10 +240,10 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 			return nil, i18n.WrapError(err)
 		}
 	} else if ctx.Verbose {
-		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, properties[constants.BUILD_PROPERTIES_OBJECT_FILE])
+		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, properties.Get(constants.BUILD_PROPERTIES_OBJECT_FILE))
 	}
 
-	return paths.New(properties[constants.BUILD_PROPERTIES_OBJECT_FILE]), nil
+	return properties.GetPath(constants.BUILD_PROPERTIES_OBJECT_FILE), nil
 }
 
 func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFile *paths.Path) (bool, error) {
@@ -430,7 +430,7 @@ func TXTBuildRulesHaveChanged(corePath, targetCorePath, targetFile *paths.Path) 
 	return true
 }
 
-func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile *paths.Path, objectFilesToArchive paths.PathList, buildProperties properties.Map) (*paths.Path, error) {
+func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile *paths.Path, objectFilesToArchive paths.PathList, buildProperties *properties.Map) (*paths.Path, error) {
 	logger := ctx.GetLogger()
 	archiveFilePath := buildPath.JoinPath(archiveFile)
 
@@ -463,9 +463,9 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 
 	for _, objectFile := range objectFilesToArchive {
 		properties := buildProperties.Clone()
-		properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE] = archiveFilePath.Base()
-		properties[constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH] = archiveFilePath.String()
-		properties[constants.BUILD_PROPERTIES_OBJECT_FILE] = objectFile.String()
+		properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE, archiveFilePath.Base())
+		properties.SetPath(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, archiveFilePath)
+		properties.SetPath(constants.BUILD_PROPERTIES_OBJECT_FILE, objectFile)
 
 		_, _, err := ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
 		if err != nil {
@@ -476,7 +476,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 	return archiveFilePath, nil
 }
 
-func ExecRecipe(ctx *types.Context, buildProperties properties.Map, recipe string, removeUnsetProperties bool, stdout int, stderr int) ([]byte, []byte, error) {
+func ExecRecipe(ctx *types.Context, buildProperties *properties.Map, recipe string, removeUnsetProperties bool, stdout int, stderr int) ([]byte, []byte, error) {
 	// See util.ExecCommand for stdout/stderr arguments
 	command, err := PrepareCommandForRecipe(ctx, buildProperties, recipe, removeUnsetProperties)
 	if err != nil {
@@ -488,9 +488,9 @@ func ExecRecipe(ctx *types.Context, buildProperties properties.Map, recipe strin
 
 const COMMANDLINE_LIMIT = 30000
 
-func PrepareCommandForRecipe(ctx *types.Context, buildProperties properties.Map, recipe string, removeUnsetProperties bool) (*exec.Cmd, error) {
+func PrepareCommandForRecipe(ctx *types.Context, buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*exec.Cmd, error) {
 	logger := ctx.GetLogger()
-	pattern := buildProperties[recipe]
+	pattern := buildProperties.Get(recipe)
 	if pattern == "" {
 		return nil, i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, recipe)
 	}
@@ -504,7 +504,7 @@ func PrepareCommandForRecipe(ctx *types.Context, buildProperties properties.Map,
 	relativePath := ""
 
 	if len(commandLine) > COMMANDLINE_LIMIT {
-		relativePath = buildProperties["build.path"]
+		relativePath = buildProperties.Get("build.path")
 	}
 
 	command, err := utils.PrepareCommand(commandLine, logger, relativePath)

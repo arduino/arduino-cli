@@ -22,7 +22,7 @@ import (
 	"strings"
 
 	"github.com/arduino/go-paths-helper"
-	properties "github.com/arduino/go-properties-map"
+	properties "github.com/arduino/go-properties-orderedmap"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -47,13 +47,13 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 		return nil, fmt.Errorf("loading library.properties: %s", err)
 	}
 
-	if libProperties["maintainer"] == "" && libProperties["email"] != "" {
-		libProperties["maintainer"] = libProperties["email"]
+	if libProperties.Get("maintainer") == "" && libProperties.Get("email") != "" {
+		libProperties.Set("maintainer", libProperties.Get("email"))
 	}
 
 	for _, propName := range MandatoryProperties {
-		if libProperties[propName] == "" {
-			libProperties[propName] = "-"
+		if libProperties.Get(propName) == "" {
+			libProperties.Set(propName, "-")
 		}
 	}
 
@@ -69,26 +69,26 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 		addUtilityDirectory(library)
 	}
 
-	if libProperties["architectures"] == "" {
-		libProperties["architectures"] = "*"
+	if libProperties.Get("architectures") == "" {
+		libProperties.Set("architectures", "*")
 	}
 	library.Architectures = []string{}
-	for _, arch := range strings.Split(libProperties["architectures"], ",") {
+	for _, arch := range strings.Split(libProperties.Get("architectures"), ",") {
 		library.Architectures = append(library.Architectures, strings.TrimSpace(arch))
 	}
 
-	libProperties["category"] = strings.TrimSpace(libProperties["category"])
-	if !ValidCategories[libProperties["category"]] {
-		libProperties["category"] = "Uncategorized"
+	libProperties.Set("category", strings.TrimSpace(libProperties.Get("category")))
+	if !ValidCategories[libProperties.Get("category")] {
+		libProperties.Set("category", "Uncategorized")
 	}
-	library.Category = libProperties["category"]
+	library.Category = libProperties.Get("category")
 
-	if libProperties["license"] == "" {
-		libProperties["license"] = "Unspecified"
+	if libProperties.Get("license") == "" {
+		libProperties.Set("license", "Unspecified")
 	}
-	library.License = libProperties["license"]
+	library.License = libProperties.Get("license")
 
-	version := strings.TrimSpace(libProperties["version"])
+	version := strings.TrimSpace(libProperties.Get("version"))
 	if v, err := semver.Parse(version); err != nil {
 		// FIXME: do it in linter?
 		//fmt.Printf("invalid version %s for library in %s: %s", version, libraryDir, err)
@@ -97,16 +97,16 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	}
 
 	library.Name = libraryDir.Base()
-	library.RealName = strings.TrimSpace(libProperties["name"])
-	library.Author = strings.TrimSpace(libProperties["author"])
-	library.Maintainer = strings.TrimSpace(libProperties["maintainer"])
-	library.Sentence = strings.TrimSpace(libProperties["sentence"])
-	library.Paragraph = strings.TrimSpace(libProperties["paragraph"])
-	library.Website = strings.TrimSpace(libProperties["url"])
+	library.RealName = strings.TrimSpace(libProperties.Get("name"))
+	library.Author = strings.TrimSpace(libProperties.Get("author"))
+	library.Maintainer = strings.TrimSpace(libProperties.Get("maintainer"))
+	library.Sentence = strings.TrimSpace(libProperties.Get("sentence"))
+	library.Paragraph = strings.TrimSpace(libProperties.Get("paragraph"))
+	library.Website = strings.TrimSpace(libProperties.Get("url"))
 	library.IsLegacy = false
-	library.DotALinkage = strings.TrimSpace(libProperties["dot_a_linkage"]) == "true"
-	library.Precompiled = strings.TrimSpace(libProperties["precompiled"]) == "true"
-	library.LDflags = strings.TrimSpace(libProperties["ldflags"])
+	library.DotALinkage = libProperties.GetBoolean("dot_a_linkage")
+	library.Precompiled = libProperties.GetBoolean("precompiled")
+	library.LDflags = strings.TrimSpace(libProperties.Get("ldflags"))
 	library.Properties = libProperties
 
 	return library, nil

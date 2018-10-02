@@ -32,7 +32,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/go-paths-helper"
-	properties "github.com/arduino/go-properties-map"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -215,13 +215,13 @@ func run(cmd *cobra.Command, args []string) {
 		lastIdeSubProperties := ideProperties.SubTree("last").SubTree("ide")
 		// Preferences can contain records from previous IDE versions. Find the latest one.
 		var pathVariants []string
-		for k := range lastIdeSubProperties {
+		for k := range lastIdeSubProperties.AsMap() {
 			if strings.HasSuffix(k, ".hardwarepath") {
 				pathVariants = append(pathVariants, k)
 			}
 		}
 		sort.Strings(pathVariants)
-		ideHardwarePath := lastIdeSubProperties[pathVariants[len(pathVariants)-1]]
+		ideHardwarePath := lastIdeSubProperties.Get(pathVariants[len(pathVariants)-1])
 		ideLibrariesPath := filepath.Join(filepath.Dir(ideHardwarePath), "libraries")
 		ctx.BuiltInLibrariesDirs = paths.NewPathList(ideLibrariesPath)
 	}

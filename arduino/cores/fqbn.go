@@ -19,10 +19,9 @@ package cores
 
 import (
 	"fmt"
-	"sort"
 	"strings"
 
-	properties "github.com/arduino/go-properties-map"
+	properties "github.com/arduino/go-properties-orderedmap"
 )
 
 // FQBN represents a Board with a specific configuration
@@ -30,7 +29,7 @@ type FQBN struct {
 	Package      string
 	PlatformArch string
 	BoardID      string
-	Configs      properties.Map
+	Configs      *properties.Map
 }
 
 // ParseFQBN extract an FQBN object from the input string
@@ -45,12 +44,12 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 		Package:      fqbnParts[0],
 		PlatformArch: fqbnParts[1],
 		BoardID:      fqbnParts[2],
+		Configs:      properties.NewMap(),
 	}
 	if fqbn.BoardID == "" {
 		return nil, fmt.Errorf("invalid fqbn: empty board identifier")
 	}
 	if len(fqbnParts) > 3 {
-		fqbn.Configs = properties.Map{}
 		for _, pair := range strings.Split(fqbnParts[3], ",") {
 			parts := strings.SplitN(pair, "=", 2)
 			if len(parts) != 2 {
@@ -61,7 +60,7 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 			if k == "" {
 				return nil, fmt.Errorf("invalid fqbn config: %s", pair)
 			}
-			fqbn.Configs[k] = v
+			fqbn.Configs.Set(k, v)
 		}
 	}
 	return fqbn, nil
@@ -69,12 +68,10 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 
 func (fqbn *FQBN) String() string {
 	res := fmt.Sprintf("%s:%s:%s", fqbn.Package, fqbn.PlatformArch, fqbn.BoardID)
-	if fqbn.Configs != nil {
+	if fqbn.Configs.Size() > 0 {
 		sep := ":"
-		keys := fqbn.Configs.Keys()
-		sort.Strings(keys)
-		for _, k := range keys {
-			res += sep + k + "=" + fqbn.Configs[k]
+		for _, k := range fqbn.Configs.Keys() {
+			res += sep + k + "=" + fqbn.Configs.Get(k)
 			sep = ","
 		}
 	}

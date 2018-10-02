@@ -57,7 +57,11 @@ func (s *WarnAboutPlatformRewrites) Run(ctx *types.Context) error {
 	for _, platform := range platforms {
 		if hardwareRewriteResults[platform] != nil {
 			for _, rewrite := range hardwareRewriteResults[platform] {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_WARNING_PLATFORM_OLD_VALUES, platform.Properties[constants.PLATFORM_NAME], rewrite.Key+"="+rewrite.OldValue, rewrite.Key+"="+rewrite.NewValue)
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN,
+					constants.MSG_WARNING_PLATFORM_OLD_VALUES,
+					platform.Properties.Get(constants.PLATFORM_NAME),
+					rewrite.Key+"="+rewrite.OldValue,
+					rewrite.Key+"="+rewrite.NewValue)
 			}
 		}
 	}

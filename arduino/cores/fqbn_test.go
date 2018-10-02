@@ -30,7 +30,7 @@ func TestFQBN(t *testing.T) {
 	require.Equal(t, a.Package, "arduino")
 	require.Equal(t, a.PlatformArch, "avr")
 	require.Equal(t, a.BoardID, "uno")
-	require.Nil(t, a.Configs)
+	require.Zero(t, a.Configs.Size())
 
 	// Allow empty plaforms or packages
 	b1, err := ParseFQBN("arduino::uno")
@@ -39,7 +39,7 @@ func TestFQBN(t *testing.T) {
 	require.Equal(t, b1.Package, "arduino")
 	require.Equal(t, b1.PlatformArch, "")
 	require.Equal(t, b1.BoardID, "uno")
-	require.Nil(t, b1.Configs)
+	require.Zero(t, b1.Configs.Size())
 
 	b2, err := ParseFQBN(":avr:uno")
 	require.Equal(t, ":avr:uno", b2.String())
@@ -47,7 +47,7 @@ func TestFQBN(t *testing.T) {
 	require.Equal(t, b2.Package, "")
 	require.Equal(t, b2.PlatformArch, "avr")
 	require.Equal(t, b2.BoardID, "uno")
-	require.Nil(t, b2.Configs)
+	require.Zero(t, b2.Configs.Size())
 
 	b3, err := ParseFQBN("::uno")
 	require.Equal(t, "::uno", b3.String())
@@ -55,7 +55,7 @@ func TestFQBN(t *testing.T) {
 	require.Equal(t, b3.Package, "")
 	require.Equal(t, b3.PlatformArch, "")
 	require.Equal(t, b3.BoardID, "uno")
-	require.Nil(t, b3.Configs)
+	require.Zero(t, b3.Configs.Size())
 
 	// Do not allow missing board identifier
 	_, err = ParseFQBN("arduino:avr:")
@@ -70,7 +70,7 @@ func TestFQBN(t *testing.T) {
 	// Sort keys in fbqn config
 	s, err := ParseFQBN("arduino:avr:uno:d=x,b=x,a=x,e=x,c=x")
 	require.NoError(t, err)
-	require.Equal(t, "arduino:avr:uno:a=x,b=x,c=x,d=x,e=x", s.String())
+	require.Equal(t, "arduino:avr:uno:d=x,b=x,a=x,e=x,c=x", s.String())
 
 	// Test configs
 	c, err := ParseFQBN("arduino:avr:uno:cpu=atmega")
@@ -114,12 +114,12 @@ func TestFQBN(t *testing.T) {
 
 	// Allow "=" in config values
 	f, err := ParseFQBN("arduino:avr:uno:cpu=atmega,speed=1000,extra=core=arduino")
-	require.Equal(t, "arduino:avr:uno:cpu=atmega,extra=core=arduino,speed=1000", f.String())
+	require.Equal(t, "arduino:avr:uno:cpu=atmega,speed=1000,extra=core=arduino", f.String())
 	require.NoError(t, err)
 	require.Equal(t, f.Package, "arduino")
 	require.Equal(t, f.PlatformArch, "avr")
 	require.Equal(t, f.BoardID, "uno")
 	require.Equal(t,
-		"properties.Map{\n  \"cpu\": \"atmega\",\n  \"extra\": \"core=arduino\",\n  \"speed\": \"1000\",\n}",
+		"properties.Map{\n  \"cpu\": \"atmega\",\n  \"speed\": \"1000\",\n  \"extra\": \"core=arduino\",\n}",
 		f.Configs.Dump())
 }
