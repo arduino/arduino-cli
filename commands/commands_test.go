@@ -369,6 +369,37 @@ func detectLatestAVRCore(t *testing.T) string {
 	return latest.String()
 }
 
+func TestCompileCommands(t *testing.T) {
+	defer makeTempDataDir(t)()
+	defer makeTempSketchbookDir(t)()
+
+	// Set staging dir to a temporary dir
+	tmp, err := ioutil.TempDir(os.TempDir(), "test")
+	require.NoError(t, err, "making temporary staging dir")
+	defer os.RemoveAll(tmp)
+
+	updateCoreIndex(t)
+
+	// Download latest AVR
+	exitCode, _ := executeWithArgs(t, "core", "install", "arduino:avr")
+	require.Zero(t, exitCode, "exit code")
+
+	// Create a test sketch
+	exitCode, d := executeWithArgs(t, "sketch", "new", "Test1")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Sketch created")
+
+	// Build sketch for arduino:avr:uno
+	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:uno", currSketchbookDir.Join("Test1").String())
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Sketch uses")
+
+	// Build sketch for arduino:avr:nano (without options)
+	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", currSketchbookDir.Join("Test1").String())
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "Sketch uses")
+}
+
 func TestCoreCommands(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
@@ -472,15 +503,6 @@ func TestCoreCommands(t *testing.T) {
 	exitCode, d = executeWithArgs(t, "core", "list")
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "arduino:avr")
-
-	// Build sketch for arduino:avr:uno
-	exitCode, d = executeWithArgs(t, "sketch", "new", "Test1")
-	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "Sketch created")
-
-	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:uno", currSketchbookDir.Join("Test1").String())
-	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "Sketch uses")
 
 	// Uninstall arduino:avr
 	exitCode, d = executeWithArgs(t, "core", "uninstall", "arduino:avr")
