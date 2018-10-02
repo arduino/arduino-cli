@@ -25,7 +25,7 @@ import (
 
 	"github.com/arduino/go-paths-helper"
 
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 )
 
@@ -81,10 +81,10 @@ func (config *Configuration) LoadFromDesktopIDEPreferences() error {
 		logrus.WithError(err).Warn("Error during unserialize from IDE preferences")
 		return err
 	}
-	if dir, has := props["sketchbook.path"]; has {
+	if dir, has := props.GetOk("sketchbook.path"); has {
 		config.SketchbookDir = paths.New(dir)
 	}
-	if URLs, has := props["boardsmanager.additional.urls"]; has {
+	if URLs, has := props.GetOk("boardsmanager.additional.urls"); has {
 		for _, URL := range strings.Split(URLs, ",") {
 			if newURL, err := url.Parse(URL); err == nil {
 				BoardManagerAdditionalUrls = append(BoardManagerAdditionalUrls, newURL)
@@ -94,21 +94,21 @@ func (config *Configuration) LoadFromDesktopIDEPreferences() error {
 	return nil
 }
 
-func proxyConfigsFromIDEPrefs(props properties.Map) error {
+func proxyConfigsFromIDEPrefs(props *properties.Map) error {
 	proxy := props.SubTree("proxy")
-	switch proxy["type"] {
+	switch proxy.Get("type") {
 	case "auto":
 		// Automatic proxy
 		break
 	case "manual":
 		// Manual proxy configuration
 		manualConfig := proxy.SubTree("manual")
-		hostname, exists := manualConfig["hostname"]
+		hostname, exists := manualConfig.GetOk("hostname")
 		if !exists {
 			return errors.New("proxy hostname not found in preferences.txt")
 		}
-		username := manualConfig["username"]
-		password := manualConfig["password"]
+		username := manualConfig.Get("username")
+		password := manualConfig.Get("password")
 
 		ProxyType = "manual"
 		ProxyHostname = hostname

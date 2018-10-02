@@ -47,8 +47,8 @@ func (*AddBuildBoardPropertyIfMissing) Run(ctx *types.Context) error {
 		for _, platform := range aPackage.Platforms {
 			for _, platformRelease := range platform.Releases {
 				for _, board := range platformRelease.Boards {
-					if board.Properties["build.board"] == "" {
-						board.Properties["build.board"] = strings.ToUpper(platform.Architecture + "_" + board.BoardID)
+					if board.Properties.Get("build.board") == "" {
+						board.Properties.Set("build.board", strings.ToUpper(platform.Architecture+"_"+board.BoardID))
 						logger.Fprintln(
 							os.Stdout,
 							constants.LOG_LEVEL_WARN,
@@ -56,7 +56,7 @@ func (*AddBuildBoardPropertyIfMissing) Run(ctx *types.Context) error {
 							aPackage.Name,
 							platform.Architecture,
 							board.BoardID,
-							board.Properties[constants.BUILD_PROPERTIES_BUILD_BOARD])
+							board.Properties.Get(constants.BUILD_PROPERTIES_BUILD_BOARD))
 					}
 				}
 			}

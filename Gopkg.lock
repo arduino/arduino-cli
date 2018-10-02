@@ -3,7 +3,7 @@
 
 [[projects]]
   branch = "cli-inception"
-  digest = "1:c55e3751a4bb29e7829188f51160472e5242c74a16996f38ac59dd5571c5e4b4"
+  digest = "1:95d51ed84745c25bb7a9ec3cc9e530cd611cad04645d00c21c5b8a1faccf2e4f"
   name = "github.com/arduino/arduino-builder"
   packages = [
     ".",
@@ -17,7 +17,7 @@
     "utils",
   ]
   pruneopts = "UT"
-  revision = "bb7d413ce08a6f05710f4a511680fbb1eee87720"
+  revision = "eb9e737c5c13f3dc7421e8a953f0414abbbb39a9"
   source = "github.com/arduino/arduino-builder"
 
 [[projects]]
@@ -38,11 +38,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:505743a6b828146f08595c5322781472c2fee0478f0569a4a3a98fe3ab3bbf3c"
-  name = "github.com/arduino/go-properties-map"
+  digest = "1:4abd23fb5076a0d6b83363a5f317714e30a2971c11184bbd8a546b71f89a9cc3"
+  name = "github.com/arduino/go-properties-orderedmap"
   packages = ["."]
   pruneopts = "UT"
-  revision = "ad37f0cfeff29fadeabe6b2f7f852d8db1fb5c41"
+  revision = "10dff422b3669aaa85870522fd0138a89fb244ca"
 
 [[projects]]
   branch = "master"
@@ -580,7 +580,7 @@
     "github.com/arduino/arduino-builder/types",
     "github.com/arduino/board-discovery",
     "github.com/arduino/go-paths-helper",
-    "github.com/arduino/go-properties-map",
+    "github.com/arduino/go-properties-orderedmap",
     "github.com/arduino/go-win32-utils",
     "github.com/bcmi-labs/arduino-modules/sketches",
     "github.com/bgentry/go-netrc/netrc",

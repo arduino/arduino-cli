@@ -41,18 +41,18 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	properties "github.com/arduino/go-properties-map"
+	properties "github.com/arduino/go-properties-orderedmap"
 )
 
 // ArduinoPreprocessorProperties are the platform properties needed to run arduino-preprocessor
-var ArduinoPreprocessorProperties = properties.Map{
+var ArduinoPreprocessorProperties = properties.NewFromHashmap(map[string]string{
 	// Ctags
 	"tools.arduino-preprocessor.path":     "{runtime.tools.arduino-preprocessor.path}",
 	"tools.arduino-preprocessor.cmd.path": "{path}/arduino-preprocessor",
 	"tools.arduino-preprocessor.pattern":  `"{cmd.path}" "{source_file}" "{codecomplete}" -- -std=gnu++11`,
 
 	"preproc.macros.flags": "-w -x c++ -E -CC",
-}
+})
 
 type PreprocessSketchArduino struct{}
 
@@ -107,12 +107,12 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 				ctx.CodeCompleteAt = strings.Join(splt[1:], ":")
 			}
 		}
-		properties["codecomplete"] = "-output-code-completions=" + ctx.CodeCompleteAt
+		properties.Set("codecomplete", "-output-code-completions="+ctx.CodeCompleteAt)
 	} else {
-		properties["codecomplete"] = ""
+		properties.Set("codecomplete", "")
 	}
 
-	pattern := properties[constants.BUILD_PROPERTIES_PATTERN]
+	pattern := properties.Get(constants.BUILD_PROPERTIES_PATTERN)
 	if pattern == constants.EMPTY_STRING {
 		return i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, "arduino-preprocessor")
 	}

@@ -29,10 +29,10 @@
 
 package ctags
 
-import properties "github.com/arduino/go-properties-map"
+import properties "github.com/arduino/go-properties-orderedmap"
 
 // CtagsProperties are the platform properties needed to run ctags
-var CtagsProperties = properties.Map{
+var CtagsProperties = properties.NewFromHashmap(map[string]string{
 	// Ctags
 	"tools.ctags.path":     "{runtime.tools.ctags.path}",
 	"tools.ctags.cmd.path": "{path}/ctags",
@@ -44,4 +44,4 @@ var CtagsProperties = properties.Map{
 	"preproc.macros.flags": "-w -x c++ -E -CC",
 	//"preproc.macros.compatibility_flags": `{build.mbed_api_include} {build.nRF51822_api_include} {build.ble_api_include} {compiler.libsam.c.flags} {compiler.arm.cmsis.path} {build.variant_system_include}`,
 	//"recipe.preproc.macros":              `"{compiler.path}{compiler.cpp.cmd}" {compiler.cpreprocessor.flags} {compiler.cpp.flags} {preproc.macros.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {preproc.macros.compatibility_flags} {includes} "{source_file}" -o "{preprocessed_file_path}"`,
-}
+})

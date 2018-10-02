@@ -39,7 +39,7 @@ import (
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 )
 
 type PlatformKeysRewriteLoader struct{}
@@ -73,8 +73,8 @@ func (s *PlatformKeysRewriteLoader) Run(ctx *types.Context) error {
 				return i18n.WrapError(err)
 			}
 			rewriteKey := strings.Join(keyParts[2:], ".")
-			oldValue := txt[key]
-			newValue := txt[constants.PLATFORM_REWRITE_NEW+"."+strings.Join(keyParts[1:], ".")]
+			oldValue := txt.Get(key)
+			newValue := txt.Get(constants.PLATFORM_REWRITE_NEW + "." + strings.Join(keyParts[1:], "."))
 			platformKeyRewrite := types.PlatforKeyRewrite{Key: rewriteKey, OldValue: oldValue, NewValue: newValue}
 			platformKeysRewrite.Rewrites = growSliceOfRewrites(platformKeysRewrite.Rewrites, index)
 			platformKeysRewrite.Rewrites[index] = platformKeyRewrite

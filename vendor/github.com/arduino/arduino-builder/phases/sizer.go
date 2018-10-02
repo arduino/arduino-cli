@@ -39,7 +39,7 @@ import (
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 )
 
 type Sizer struct {
@@ -62,14 +62,14 @@ func (s *Sizer) Run(ctx *types.Context) error {
 	return nil
 }
 
-func checkSize(ctx *types.Context, buildProperties properties.Map) error {
+func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 	logger := ctx.GetLogger()
 
 	properties := buildProperties.Clone()
-	properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS] = properties[constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel]
+	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel))
 
-	maxTextSizeString := properties[constants.PROPERTY_UPLOAD_MAX_SIZE]
-	maxDataSizeString := properties[constants.PROPERTY_UPLOAD_MAX_DATA_SIZE]
+	maxTextSizeString := properties.Get(constants.PROPERTY_UPLOAD_MAX_SIZE)
+	maxDataSizeString := properties.Get(constants.PROPERTY_UPLOAD_MAX_DATA_SIZE)
 
 	if maxTextSizeString == "" {
 		return nil
@@ -113,8 +113,8 @@ func checkSize(ctx *types.Context, buildProperties properties.Map) error {
 		return errors.New("")
 	}
 
-	if properties[constants.PROPERTY_WARN_DATA_PERCENT] != "" {
-		warnDataPercentage, err := strconv.Atoi(properties[constants.PROPERTY_WARN_DATA_PERCENT])
+	if properties.Get(constants.PROPERTY_WARN_DATA_PERCENT) != "" {
+		warnDataPercentage, err := strconv.Atoi(properties.Get(constants.PROPERTY_WARN_DATA_PERCENT))
 		if err != nil {
 			return err
 		}
@@ -126,7 +126,7 @@ func checkSize(ctx *types.Context, buildProperties properties.Map) error {
 	return nil
 }
 
-func execSizeRecipe(ctx *types.Context, properties properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
+func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
 	out, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_SIZE_PATTERN, false /* stdout */, utils.Capture /* stderr */, utils.Show)
 	if err != nil {
 		resErr = errors.New("Error while determining sketch size: " + err.Error())
@@ -136,7 +136,7 @@ func execSizeRecipe(ctx *types.Context, properties properties.Map) (textSize int
 	// force multiline match prepending "(?m)" to the actual regexp
 	// return an error if RECIPE_SIZE_REGEXP doesn't exist
 
-	textSize, err = computeSize(properties[constants.RECIPE_SIZE_REGEXP], out)
+	textSize, err = computeSize(properties.Get(constants.RECIPE_SIZE_REGEXP), out)
 	if err != nil {
 		resErr = errors.New("Invalid size regexp: " + err.Error())
 		return
@@ -146,13 +146,13 @@ func execSizeRecipe(ctx *types.Context, properties properties.Map) (textSize int
 		return
 	}
 
-	dataSize, err = computeSize(properties[constants.RECIPE_SIZE_REGEXP_DATA], out)
+	dataSize, err = computeSize(properties.Get(constants.RECIPE_SIZE_REGEXP_DATA), out)
 	if err != nil {
 		resErr = errors.New("Invalid data size regexp: " + err.Error())
 		return
 	}
 
-	eepromSize, err = computeSize(properties[constants.RECIPE_SIZE_REGEXP_EEPROM], out)
+	eepromSize, err = computeSize(properties.Get(constants.RECIPE_SIZE_REGEXP_EEPROM), out)
 	if err != nil {
 		resErr = errors.New("Invalid eeprom size regexp: " + err.Error())
 		return

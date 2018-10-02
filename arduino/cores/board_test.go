@@ -20,13 +20,13 @@ package cores
 import (
 	"testing"
 
-	properties "github.com/arduino/go-properties-map"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
 var boardUno = &Board{
 	BoardID: "uno",
-	Properties: properties.Map{
+	Properties: properties.NewFromHashmap(map[string]string{
 		"name":                      "Arduino/Genuino Uno",
 		"vid.0":                     "0x2341",
 		"pid.0":                     "0x0043",
@@ -53,7 +53,7 @@ var boardUno = &Board{
 		"build.board":               "AVR_UNO",
 		"build.core":                "arduino",
 		"build.variant":             "standard",
-	},
+	}),
 	PlatformRelease: &PlatformRelease{
 		Platform: &Platform{
 			Architecture: "avr",
@@ -66,7 +66,7 @@ var boardUno = &Board{
 
 var boardMega = &Board{
 	BoardID: "mega",
-	Properties: properties.Map{
+	Properties: properties.NewFromHashmap(map[string]string{
 		"name":                                          "Arduino/Genuino Mega or Mega 2560",
 		"vid.0":                                         "0x2341",
 		"pid.0":                                         "0x0010",
@@ -108,7 +108,7 @@ var boardMega = &Board{
 		"menu.cpu.atmega1280.bootloader.file":           "atmega/ATmegaBOOT_168_atmega1280.hex",
 		"menu.cpu.atmega1280.build.mcu":                 "atmega1280",
 		"menu.cpu.atmega1280.build.board":               "AVR_MEGA",
-	},
+	}),
 	PlatformRelease: &PlatformRelease{
 		Platform: &Platform{
 			Architecture: "avr",
@@ -121,7 +121,7 @@ var boardMega = &Board{
 
 var boardWatterottTiny841 = &Board{
 	BoardID: "attiny841",
-	Properties: properties.Map{
+	Properties: properties.NewFromHashmap(map[string]string{
 		"name":                                "ATtiny841 (8 MHz)",
 		"menu.core.arduino":                   "Standard Arduino",
 		"menu.core.arduino.build.core":        "arduino:arduino",
@@ -148,7 +148,7 @@ var boardWatterottTiny841 = &Board{
 		"build.mcu":                           "attiny841",
 		"build.f_cpu":                         "8000000L",
 		"build.board":                         "AVR_ATTINY841",
-	},
+	}),
 	PlatformRelease: &PlatformRelease{
 		Platform: &Platform{
 			Architecture: "avr",
@@ -188,7 +188,7 @@ func TestBoard(t *testing.T) {
 }
 
 func TestBoardOptions(t *testing.T) {
-	expConf2560 := properties.Map{
+	expConf2560 := properties.NewFromHashmap(map[string]string{
 		"bootloader.extended_fuses":                     "0xFD",
 		"bootloader.file":                               "stk500v2/stk500boot_v2_mega2560.hex",
 		"bootloader.high_fuses":                         "0xD8",
@@ -237,13 +237,13 @@ func TestBoardOptions(t *testing.T) {
 		"vid.3":                    "0x2A03",
 		"vid.4":                    "0x2341",
 		"vid.5":                    "0x2341",
-	}
+	})
 
 	conf2560, err := boardMega.GeneratePropertiesForConfiguration("cpu=atmega2560")
 	require.NoError(t, err, "generating cpu=atmega2560 configuration")
-	require.EqualValues(t, expConf2560, conf2560, "configuration for cpu=atmega2560")
+	require.EqualValues(t, expConf2560.AsMap(), conf2560.AsMap(), "configuration for cpu=atmega2560")
 
-	expConf1280 := properties.Map{
+	expConf1280 := properties.NewFromHashmap(map[string]string{
 		"bootloader.extended_fuses":                     "0xF5",
 		"bootloader.file":                               "atmega/ATmegaBOOT_168_atmega1280.hex",
 		"bootloader.high_fuses":                         "0xDA",
@@ -292,10 +292,10 @@ func TestBoardOptions(t *testing.T) {
 		"vid.3":                    "0x2A03",
 		"vid.4":                    "0x2341",
 		"vid.5":                    "0x2341",
-	}
+	})
 	conf1280, err := boardMega.GeneratePropertiesForConfiguration("cpu=atmega1280")
 	require.NoError(t, err, "generating cpu=atmega1280 configuration")
-	require.EqualValues(t, expConf1280, conf1280, "configuration for cpu=atmega1280")
+	require.EqualValues(t, expConf1280.AsMap(), conf1280.AsMap(), "configuration for cpu=atmega1280")
 
 	_, err = boardMega.GeneratePropertiesForConfiguration("cpu=atmegassss")
 	require.Error(t, err, "generating cpu=atmegassss configuration")
@@ -303,7 +303,7 @@ func TestBoardOptions(t *testing.T) {
 	_, err = boardUno.GeneratePropertiesForConfiguration("cpu=atmega1280")
 	require.Error(t, err, "generating cpu=atmega1280 configuration")
 
-	expWatterott := properties.Map{
+	expWatterott := properties.NewFromHashmap(map[string]string{
 		"bootloader.extended_fuses":           "0xFE",
 		"bootloader.file":                     "micronucleus-t841.hex",
 		"bootloader.high_fuses":               "0xDD",
@@ -332,10 +332,10 @@ func TestBoardOptions(t *testing.T) {
 		"upload.use_1200bps_touch":            "false",
 		"upload.wait_for_upload_port":         "false",
 		"vid.0": "0x16D0",
-	}
+	})
 	confWatterott, err := boardWatterottTiny841.GeneratePropertiesForConfiguration("core=spencekonde,info=info")
 	require.NoError(t, err, "generating core=spencekonde,info=info configuration")
-	require.EqualValues(t, expWatterott, confWatterott, "generating core=spencekonde,info=info configuration")
+	require.EqualValues(t, expWatterott.AsMap(), confWatterott.AsMap(), "generating core=spencekonde,info=info configuration")
 
 	// data, err := json.MarshalIndent(prop, "", "  ")
 	// require.NoError(t, err, "marshaling result")

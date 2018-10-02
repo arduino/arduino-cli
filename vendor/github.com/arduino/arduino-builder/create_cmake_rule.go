@@ -87,7 +87,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		}
 		// Remove stray folders contining incompatible libraries
 		staticLibsExtensions := func(ext string) bool { return DOTAEXTENSION[ext] }
-		mcu := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
+		mcu := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
 		var files []string
 		utils.FindFilesInFolder(&files, libDir.Join("src").String(), staticLibsExtensions, true)
 		for _, file := range files {
@@ -98,11 +98,11 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	}
 
 	// Copy core + variant in use + preprocessed sketch in the correct folders
-	err := utils.CopyDir(ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_CORE_PATH], coreFolder.String(), extensions)
+	err := utils.CopyDir(ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_CORE_PATH), coreFolder.String(), extensions)
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = utils.CopyDir(ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH], coreFolder.Join("variant").String(), extensions)
+	err = utils.CopyDir(ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH), coreFolder.Join("variant").String(), extensions)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -202,7 +202,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 }
 
 func canExportCmakeProject(ctx *types.Context) bool {
-	return ctx.BuildProperties["compiler.export_cmake"] != ""
+	return ctx.BuildProperties.Get("compiler.export_cmake") != ""
 }
 
 func extractCompileFlags(ctx *types.Context, receipe string, defines, libs, linkerflags, linkDirectories *[]string, logger i18n.Logger) {

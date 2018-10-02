@@ -10,7 +10,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-map"
+	"github.com/arduino/go-properties-orderedmap"
 )
 
 type ProgressStruct struct {
@@ -50,7 +50,7 @@ type Context struct {
 	PlatformKeyRewrites    PlatforKeysRewrite
 	HardwareRewriteResults map[*cores.PlatformRelease][]PlatforKeyRewrite
 
-	BuildProperties      properties.Map
+	BuildProperties      *properties.Map
 	BuildCore            string
 	BuildPath            *paths.Path
 	BuildCachePath       *paths.Path
@@ -112,13 +112,13 @@ type Context struct {
 	UseArduinoPreprocessor bool
 }
 
-func (ctx *Context) ExtractBuildOptions() properties.Map {
-	opts := make(properties.Map)
-	opts["hardwareFolders"] = strings.Join(ctx.HardwareDirs.AsStrings(), ",")
-	opts["toolsFolders"] = strings.Join(ctx.ToolsDirs.AsStrings(), ",")
-	opts["builtInLibrariesFolders"] = strings.Join(ctx.BuiltInLibrariesDirs.AsStrings(), ",")
-	opts["otherLibrariesFolders"] = strings.Join(ctx.OtherLibrariesDirs.AsStrings(), ",")
-	opts["sketchLocation"] = ctx.SketchLocation.String()
+func (ctx *Context) ExtractBuildOptions() *properties.Map {
+	opts := properties.NewMap()
+	opts.Set("hardwareFolders", strings.Join(ctx.HardwareDirs.AsStrings(), ","))
+	opts.Set("toolsFolders", strings.Join(ctx.ToolsDirs.AsStrings(), ","))
+	opts.Set("builtInLibrariesFolders", strings.Join(ctx.BuiltInLibrariesDirs.AsStrings(), ","))
+	opts.Set("otherLibrariesFolders", strings.Join(ctx.OtherLibrariesDirs.AsStrings(), ","))
+	opts.SetPath("sketchLocation", ctx.SketchLocation)
 	var additionalFilesRelative []string
 	if ctx.Sketch != nil {
 		for _, sketch := range ctx.Sketch.AdditionalFiles {
@@ -130,26 +130,26 @@ func (ctx *Context) ExtractBuildOptions() properties.Map {
 			additionalFilesRelative = append(additionalFilesRelative, relPath.String())
 		}
 	}
-	opts["fqbn"] = ctx.FQBN.String()
-	opts["runtime.ide.version"] = ctx.ArduinoAPIVersion
-	opts["customBuildProperties"] = strings.Join(ctx.CustomBuildProperties, ",")
-	opts["additionalFiles"] = strings.Join(additionalFilesRelative, ",")
+	opts.Set("fqbn", ctx.FQBN.String())
+	opts.Set("runtime.ide.version", ctx.ArduinoAPIVersion)
+	opts.Set("customBuildProperties", strings.Join(ctx.CustomBuildProperties, ","))
+	opts.Set("additionalFiles", strings.Join(additionalFilesRelative, ","))
 	return opts
 }
 
-func (ctx *Context) InjectBuildOptions(opts properties.Map) {
-	ctx.HardwareDirs = paths.NewPathList(strings.Split(opts["hardwareFolders"], ",")...)
-	ctx.ToolsDirs = paths.NewPathList(strings.Split(opts["toolsFolders"], ",")...)
-	ctx.BuiltInLibrariesDirs = paths.NewPathList(strings.Split(opts["builtInLibrariesFolders"], ",")...)
-	ctx.OtherLibrariesDirs = paths.NewPathList(strings.Split(opts["otherLibrariesFolders"], ",")...)
-	ctx.SketchLocation = paths.New(opts["sketchLocation"])
-	fqbn, err := cores.ParseFQBN(opts["fqbn"])
+func (ctx *Context) InjectBuildOptions(opts *properties.Map) {
+	ctx.HardwareDirs = paths.NewPathList(strings.Split(opts.Get("hardwareFolders"), ",")...)
+	ctx.ToolsDirs = paths.NewPathList(strings.Split(opts.Get("toolsFolders"), ",")...)
+	ctx.BuiltInLibrariesDirs = paths.NewPathList(strings.Split(opts.Get("builtInLibrariesFolders"), ",")...)
+	ctx.OtherLibrariesDirs = paths.NewPathList(strings.Split(opts.Get("otherLibrariesFolders"), ",")...)
+	ctx.SketchLocation = opts.GetPath("sketchLocation")
+	fqbn, err := cores.ParseFQBN(opts.Get("fqbn"))
 	if err != nil {
 		i18n.ErrorfWithLogger(ctx.GetLogger(), "Error in FQBN: %s", err)
 	}
 	ctx.FQBN = fqbn
-	ctx.ArduinoAPIVersion = opts["runtime.ide.version"]
-	ctx.CustomBuildProperties = strings.Split(opts["customBuildProperties"], ",")
+	ctx.ArduinoAPIVersion = opts.Get("runtime.ide.version")
+	ctx.CustomBuildProperties = strings.Split(opts.Get("customBuildProperties"), ",")
 }
 
 func (ctx *Context) GetLogger() i18n.Logger {

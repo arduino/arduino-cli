@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/go-paths-helper"
+	properties "github.com/arduino/go-properties-orderedmap"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -66,7 +67,7 @@ type Library struct {
 	IsLegacy          bool
 	Version           *semver.Version
 	License           string
-	Properties        map[string]string
+	Properties        *properties.Map
 }
 
 func (library *Library) String() string {

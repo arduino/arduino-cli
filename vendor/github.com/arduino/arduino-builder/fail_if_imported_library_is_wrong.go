@@ -51,7 +51,7 @@ func (s *FailIfImportedLibraryIsWrong) Run(ctx *types.Context) error {
 				return i18n.ErrorfWithLogger(logger, constants.MSG_ARCH_FOLDER_NOT_SUPPORTED)
 			}
 			for _, propName := range libraries.MandatoryProperties {
-				if _, ok := library.Properties[propName]; !ok {
+				if !library.Properties.ContainsKey(propName) {
 					return i18n.ErrorfWithLogger(logger, constants.MSG_PROP_IN_LIBRARY, propName, library.InstallDir)
 				}
 			}

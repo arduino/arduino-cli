@@ -37,10 +37,6 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/arduino/go-properties-map"
-
-[[constraint]]
-  branch = "master"
   name = "github.com/arduino/go-win32-utils"
 
 [[constraint]]
