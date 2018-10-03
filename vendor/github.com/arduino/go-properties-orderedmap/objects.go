@@ -30,6 +30,8 @@
 package properties
 
 import (
+	"strings"
+
 	"github.com/arduino/go-paths-helper"
 )
 
@@ -37,7 +39,7 @@ import (
 // equals to the string "true", in any other case returns false.
 func (m *Map) GetBoolean(key string) bool {
 	value, ok := m.GetOk(key)
-	return ok && value == "true"
+	return ok && strings.TrimSpace(value) == "true"
 }
 
 // SetBoolean sets the specified key to the string "true" or "false" if the value
