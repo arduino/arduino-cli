@@ -291,6 +291,43 @@ func (m *Map) FirstLevelOf() map[string]*Map {
 	return newMap
 }
 
+// FirstLevelKeys returns the keys in the first level of the hierarchy
+// of the current Map. For example the following Map:
+//
+//  properties.Map{
+//    "uno.name": "Arduino/Genuino Uno",
+//    "uno.upload.tool": "avrdude",
+//    "uno.upload.protocol": "arduino",
+//    "uno.upload.maximum_size": "32256",
+//    "diecimila.name": "Arduino Duemilanove or Diecimila",
+//    "diecimila.upload.tool": "avrdude",
+//    "diecimila.upload.protocol": "arduino",
+//    "diecimila.bootloader.tool": "avrdude",
+//    "diecimila.bootloader.low_fuses": "0xFF",
+//  }
+//
+// will produce the following result:
+//
+//  []string{
+//    "uno",
+//    "diecimila",
+//  }
+//
+// the order of the original map is preserved
+func (m *Map) FirstLevelKeys() []string {
+	res := []string{}
+	taken := map[string]bool{}
+	for _, k := range m.o {
+		first := strings.SplitN(k, ".", 2)[0]
+		if taken[first] {
+			continue
+		}
+		taken[first] = true
+		res = append(res, first)
+	}
+	return res
+}
+
 // SubTree extracts a sub Map from an existing map using the first level
 // of the keys hierarchy as selector.
 // For example the following Map:

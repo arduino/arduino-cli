@@ -38,11 +38,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4abd23fb5076a0d6b83363a5f317714e30a2971c11184bbd8a546b71f89a9cc3"
+  digest = "1:0ee4da82ad4588eec5fff9a3d2b954cfa37ee46fe6c2e6c7ee6da12111583211"
   name = "github.com/arduino/go-properties-orderedmap"
   packages = ["."]
   pruneopts = "UT"
-  revision = "10dff422b3669aaa85870522fd0138a89fb244ca"
+  revision = "89278049acd3b807d566b8290a71e73b7c12ce3d"
 
 [[projects]]
   branch = "master"

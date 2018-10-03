@@ -62,28 +62,38 @@ func (b *Board) String() string {
 
 // GetBuildProperties returns the build properties and the build
 // platform for the Board with the configuration passed as parameter.
-func (b *Board) GetBuildProperties(configs *properties.Map) (*properties.Map, error) {
+func (b *Board) GetBuildProperties(userConfigs *properties.Map) (*properties.Map, error) {
+	// Clone user configs because they are destroyed during iteration
+	userConfigs = userConfigs.Clone()
+
 	// Start with board's base properties
 	buildProperties := b.Properties.Clone()
 
-	// Add all sub-configurations one by one
+	// Add all sub-configurations one by one (a config is: option=value)
 	menu := b.Properties.SubTree("menu")
-	for _, option := range configs.Keys() {
-		if option == "" {
+	for _, option := range menu.FirstLevelKeys() {
+		optionMenu := menu.SubTree(option)
+		userValue, haveUserValue := userConfigs.GetOk(option)
+		if haveUserValue {
+			userConfigs.Remove(option)
+			if !optionMenu.ContainsKey(userValue) {
+				return nil, fmt.Errorf("invalid value '%s' for option '%s'", userValue, option)
+			}
+		} else {
+			// apply default
+			userValue = optionMenu.FirstLevelKeys()[0]
+		}
+
+		optionsConf := optionMenu.SubTree(userValue)
+		buildProperties.Merge(optionsConf)
+	}
+
+	// Check for residual invalid options...
+	for _, invalidOption := range userConfigs.Keys() {
+		if invalidOption == "" {
 			return nil, fmt.Errorf("invalid empty option found")
 		}
-
-		optionMenu := menu.SubTree(option)
-		if optionMenu.Size() == 0 {
-			return nil, fmt.Errorf("invalid option '%s'", option)
-		}
-		optionValue := configs.Get(option)
-		if !optionMenu.ContainsKey(optionValue) {
-			return nil, fmt.Errorf("invalid value '%s' for option '%s'", optionValue, option)
-		}
-
-		optionsConf := optionMenu.SubTree(optionValue)
-		buildProperties.Merge(optionsConf)
+		return nil, fmt.Errorf("invalid option '%s'", invalidOption)
 	}
 
 	return buildProperties, nil
