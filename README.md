@@ -24,6 +24,8 @@ Please note that these are **preview** build, they may have bugs, some features 
 - [Windows 0.2.2-alpha.preview](https://downloads.arduino.cc/arduino-cli/arduino-cli-0.2.2-alpha.preview-windows.zip)
 - [Mac OSX 0.2.2-alpha.preview](https://downloads.arduino.cc/arduino-cli/arduino-cli-0.2.2-alpha.preview-osx.zip)
 
+Once downloaded, place the executable into a directory which is in your `PATH` environment variable. To use the tool as it is presented in the Getting started guide below (`arduino-cli`), you should rename the executable from _arduino-cli-0.2.2-alpha.preview-XYZ_ to _arduino-cli_.
+
 ### Build the latest "bleeding-edge" from source
 
 * You should have a recent Go compiler installed.
