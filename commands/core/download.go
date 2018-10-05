@@ -35,8 +35,8 @@ func initDownloadCommand() *cobra.Command {
 		Short: "Downloads one or more cores and corresponding tool dependencies.",
 		Long:  "Downloads one or more cores and corresponding tool dependencies.",
 		Example: "" +
-			"  " + commands.AppName + "core download arduino:samd       # to download the latest version of arduino SAMD core.\n" +
-			"  " + commands.AppName + "core download arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
+			"  " + commands.AppName + " core download arduino:samd       # to download the latest version of arduino SAMD core.\n" +
+			"  " + commands.AppName + " core download arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 	}
