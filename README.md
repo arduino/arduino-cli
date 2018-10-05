@@ -272,3 +272,38 @@ Global Flags:
 Use "arduino-cli core [command] --help" for more information about a command.
 
 ```
+
+# FAQ
+
+#### Why the Arduino Uno/Mega/Duemilanove is not detected when I run `arduino-cli board list`?
+
+Because:
+
+- Your board is a cheaper clone, or
+- It mounts a USB2Serial converter like FT232 or CH320: these chips always reports the same USB VID/PID to the operating system, so the only thing that we know is that the board mounts that specific USB2Serial chip, but we don't know which board is.
+
+#### What is the core for the Uno/Mega/Nano/Duemilanove?
+
+`arduino:avr`
+
+#### What is the FQBN for ...?
+
+Arduino UNO: `arduino:avr:uno`
+Arduino Mega: `arduino:avr:mega`
+Arduino Nano: `arduino:avr:nano` or `arduino:avr:nano:cpu=atmega328old` if you have the old bootloader
+
+#### How can I find the core/FQBN for a board?
+
+You must first find the core, for example if you are interested in the Arduino Zero you can search the term `zero`:
+
+```
+$ arduino-cli core search zero
+Searching for platforms matching 'zero'
+
+ID          	Version	Name
+arduino:samd	1.6.19 	Arduino SAMD Boards (32-bits ARM Cortex-M0+)
+```
+
+once the core is determined you should install it with `arduino-cli core install arduino:samd` and, once installed, you can connect the board and detect it with `arduino-cli board list`.
+
+If the board is not detected for any reason, you can list all the supported boards with `arduino-cli board listall`
