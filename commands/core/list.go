@@ -31,7 +31,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "Shows the list of installed platforms.",
 		Long:    "Shows the list of installed platforms.",
-		Example: "  " + commands.AppName + "core list",
+		Example: "  " + commands.AppName + " core list",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}
