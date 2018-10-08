@@ -58,7 +58,6 @@ func (packages *Packages) GetOrCreatePackage(packager string) *Package {
 		Platforms: map[string]*Platform{},
 		Tools:     map[string]*Tool{},
 		Packages:  packages,
-		//Properties: properties.Map{},
 	}
 	packages.Packages[packager] = targetPackage
 	return targetPackage
