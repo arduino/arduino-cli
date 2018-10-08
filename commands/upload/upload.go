@@ -158,7 +158,7 @@ func run(command *cobra.Command, args []string) {
 	}
 
 	// Build configuration for upload
-	uploadProperties := properties.Map{}
+	uploadProperties := properties.NewMap()
 	if referencedPlatformRelease != nil {
 		uploadProperties.Merge(referencedPlatformRelease.Properties)
 	}
