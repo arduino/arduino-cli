@@ -306,4 +306,13 @@ arduino:samd	1.6.19 	Arduino SAMD Boards (32-bits ARM Cortex-M0+)
 
 once the core is determined you should install it with `arduino-cli core install arduino:samd` and, once installed, you can connect the board and detect it with `arduino-cli board list`.
 
-If the board is not detected for any reason, you can list all the supported boards with `arduino-cli board listall`
+If the board is not detected for any reason, you can list all the supported boards with `arduino-cli board listall` and also search for a specific board, in our example `arduino-cli board listall zero`.
+
+```
+$ arduino-cli board listall zero
+Board Name                              FQBN
+Arduino MKRZERO                         arduino:samd:mkrzero
+Arduino/Genuino Zero (Native USB Port)  arduino:samd:arduino_zero_native
+Arduino/Genuino Zero (Programming Port) arduino:samd:arduino_zero_edbg
+```
+

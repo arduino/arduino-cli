@@ -19,6 +19,7 @@ package board
 
 import (
 	"sort"
+	"strings"
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
@@ -28,12 +29,16 @@ import (
 
 func initListAllCommand() *cobra.Command {
 	listAllCommand := &cobra.Command{
-		Use:     "listall",
-		Short:   "List all known boards.",
-		Long:    "List all boards that have the support platform installed.",
-		Example: "  " + commands.AppName + " board listall",
-		Args:    cobra.NoArgs,
-		Run:     runListAllCommand,
+		Use:   "listall [boardname]",
+		Short: "List all known boards and their corresponding FQBN.",
+		Long: "" +
+			"List all boards that have the support platform installed. You can search\n" +
+			"for a specific board if you specify the board name",
+		Example: "" +
+			"  " + commands.AppName + " board listall\n" +
+			"  " + commands.AppName + " board listall zero",
+		Args: cobra.ArbitraryArgs,
+		Run:  runListAllCommand,
 	}
 	return listAllCommand
 }
@@ -41,6 +46,16 @@ func initListAllCommand() *cobra.Command {
 // runListAllCommand list all installed boards
 func runListAllCommand(cmd *cobra.Command, args []string) {
 	pm := commands.InitPackageManager()
+
+	match := func(name string) bool {
+		name = strings.ToLower(name)
+		for _, term := range args {
+			if !strings.Contains(name, strings.ToLower(term)) {
+				return false
+			}
+		}
+		return true
+	}
 
 	list := &output.BoardList{}
 	for _, targetPackage := range pm.GetPackages().Packages {
@@ -50,6 +65,9 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 				continue
 			}
 			for _, board := range platformRelease.Boards {
+				if !match(board.Name()) {
+					continue
+				}
 				list.Boards = append(list.Boards, &output.BoardListItem{
 					Name: board.Name(),
 					Fqbn: board.FQBN(),
