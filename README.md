@@ -288,9 +288,9 @@ Because:
 
 #### What is the FQBN for ...?
 
-Arduino UNO: `arduino:avr:uno`
-Arduino Mega: `arduino:avr:mega`
-Arduino Nano: `arduino:avr:nano` or `arduino:avr:nano:cpu=atmega328old` if you have the old bootloader
+* Arduino UNO: `arduino:avr:uno`
+* Arduino Mega: `arduino:avr:mega`
+* Arduino Nano: `arduino:avr:nano` or `arduino:avr:nano:cpu=atmega328old` if you have the old bootloader
 
 #### How can I find the core/FQBN for a board?
 
