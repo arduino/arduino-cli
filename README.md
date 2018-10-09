@@ -142,7 +142,20 @@ We can finally check if the board is now recognized as a MKR1000
     FQBN                    Port            ID              Board Name
     arduino:samd:mkr1000    /dev/ttyACM0    2341:804E       Arduino/Genuino MKR1000
 
-Great! Now the Board FQBN (Fully Qualified Board Name) and the Board Name look good, we are ready to compile and upload the sketch
+If the board is not detected for any reason, you can list all the supported boards
+with `arduino-cli board listall` and also search for a specific board:
+
+    $ arduino-cli board listall mkr
+    Board Name             	FQBN
+    Arduino MKR FOX 1200   	arduino:samd:mkrfox1200
+    Arduino MKR GSM 1400   	arduino:samd:mkrgsm1400
+    Arduino MKR WAN 1300   	arduino:samd:mkrwan1300
+    Arduino MKR WiFi 1010  	arduino:samd:mkrwifi1010
+    Arduino MKRZERO        	arduino:samd:mkrzero
+    Arduino/Genuino MKR1000	arduino:samd:mkr1000
+
+Great! Now we have the Board FQBN (Fully Qualified Board Name) `arduino:samd:mkr1000`
+and the Board Name look good, we are ready to compile and upload the sketch
 
 ### Step 5. Compile the sketch
 To compile the sketch we have to run the `compile` command with the proper FQBN we just got in the previous command.
@@ -294,25 +307,6 @@ Because:
 
 #### How can I find the core/FQBN for a board?
 
-You must first find the core, for example if you are interested in the Arduino Zero you can search the term `zero`:
+See: https://github.com/arduino/arduino-cli#step-4-find-and-install-the-right-core
 
-```
-$ arduino-cli core search zero
-Searching for platforms matching 'zero'
-
-ID          	Version	Name
-arduino:samd	1.6.19 	Arduino SAMD Boards (32-bits ARM Cortex-M0+)
-```
-
-once the core is determined you should install it with `arduino-cli core install arduino:samd` and, once installed, you can connect the board and detect it with `arduino-cli board list`.
-
-If the board is not detected for any reason, you can list all the supported boards with `arduino-cli board listall` and also search for a specific board, in our example `arduino-cli board listall zero`.
-
-```
-$ arduino-cli board listall zero
-Board Name                              FQBN
-Arduino MKRZERO                         arduino:samd:mkrzero
-Arduino/Genuino Zero (Native USB Port)  arduino:samd:arduino_zero_native
-Arduino/Genuino Zero (Programming Port) arduino:samd:arduino_zero_edbg
-```
 
