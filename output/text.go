@@ -19,6 +19,7 @@ package output
 
 import (
 	"fmt"
+	"unicode/utf8"
 
 	"github.com/fatih/color"
 )
@@ -27,6 +28,8 @@ var red = color.New(color.FgRed).SprintfFunc()
 var blue = color.New(color.FgBlue).SprintfFunc()
 var green = color.New(color.FgGreen).SprintfFunc()
 var yellow = color.New(color.FgYellow).SprintfFunc()
+var white = color.New(color.FgWhite).SprintfFunc()
+var hiWhite = color.New(color.FgHiWhite).SprintfFunc()
 
 func Red(in string) *Text {
 	return &Text{raw: red(in), clean: in}
@@ -44,6 +47,14 @@ func Yellow(in string) *Text {
 	return &Text{raw: yellow(in), clean: in}
 }
 
+func White(in string) *Text {
+	return &Text{raw: white(in), clean: in}
+}
+
+func HiWhite(in string) *Text {
+	return &Text{raw: hiWhite(in), clean: in}
+}
+
 type TextBox interface {
 	Len() int
 	Pad(availableWidth int) string
@@ -56,7 +67,7 @@ type Text struct {
 }
 
 func (t *Text) Len() int {
-	return len(t.clean)
+	return utf8.RuneCountInString(t.clean)
 }
 
 // func (t *Text) String() string {

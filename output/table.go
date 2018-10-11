@@ -139,7 +139,7 @@ func (t *Table) Render() string {
 				case Minimum:
 					selectedWidth = widths[x]
 				case Average:
-					selectedWidth = average[x] + variance[x]*2
+					selectedWidth = average[x] + variance[x]*3
 				}
 			}
 			res += separator
