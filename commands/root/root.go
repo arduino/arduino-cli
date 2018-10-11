@@ -21,6 +21,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/arduino/arduino-cli/output"
+
 	"golang.org/x/crypto/ssh/terminal"
 
 	"github.com/mattn/go-colorable"
@@ -96,6 +98,10 @@ func preRun(cmd *cobra.Command, args []string) {
 		commands.GlobalFlags.Format = "text"
 	}
 	formatter.SetFormatter(commands.GlobalFlags.Format)
+	if commands.GlobalFlags.Format != "text" {
+		output.SetOutputKind(output.JSON)
+	}
+
 	logrus.Info("Formatter set")
 	if !formatter.IsCurrentFormat("text") {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
