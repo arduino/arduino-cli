@@ -60,6 +60,29 @@ func (b *Board) String() string {
 	return b.FQBN()
 }
 
+// GetConfigOptions returns an OrderedMap of configuration options for this board.
+// The returned map will have key and value as option id and option name, respectively.
+func (b *Board) GetConfigOptions() *properties.Map {
+	res := properties.NewMap()
+	menu := b.Properties.SubTree("menu")
+	for _, option := range menu.FirstLevelKeys() {
+		res.Set(option, b.PlatformRelease.Menus.Get(option))
+	}
+	return res
+}
+
+// GetConfigOptionValues returns an OrderedMap of possible values for a specific configuratio options
+// for this board. The returned map will have key and value as option value and option value name,
+// respectively.
+func (b *Board) GetConfigOptionValues(option string) *properties.Map {
+	res := properties.NewMap()
+	menu := b.Properties.SubTree("menu").SubTree(option)
+	for _, value := range menu.FirstLevelKeys() {
+		res.Set(value, menu.Get(value))
+	}
+	return res
+}
+
 // GetBuildProperties returns the build properties and the build
 // platform for the Board with the configuration passed as parameter.
 func (b *Board) GetBuildProperties(userConfigs *properties.Map) (*properties.Map, error) {
