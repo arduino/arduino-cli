@@ -21,6 +21,10 @@ import (
 	"io/ioutil"
 	"os"
 
+	"golang.org/x/crypto/ssh/terminal"
+
+	"github.com/mattn/go-colorable"
+
 	"github.com/arduino/go-paths-helper"
 
 	"github.com/arduino/arduino-cli/commands"
@@ -75,7 +79,13 @@ func preRun(cmd *cobra.Command, args []string) {
 		logrus.SetOutput(ioutil.Discard)
 	} else {
 		// Else print on stderr.
-		commands.ErrLogrus.Out = os.Stderr
+
+		// Workaround to get colored output on windows
+		if terminal.IsTerminal(int(os.Stdout.Fd())) {
+			logrus.SetFormatter(&logrus.TextFormatter{ForceColors: true})
+		}
+		logrus.SetOutput(colorable.NewColorableStdout())
+		commands.ErrLogrus.Out = colorable.NewColorableStderr()
 		formatter.SetLogger(commands.ErrLogrus)
 	}
 	initConfigs()
