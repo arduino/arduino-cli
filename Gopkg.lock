@@ -588,6 +588,7 @@
     "github.com/briandowns/spinner",
     "github.com/codeclysm/cc",
     "github.com/codeclysm/extract",
+    "github.com/fatih/color",
     "github.com/goadesign/goa",
     "github.com/goadesign/goa/client",
     "github.com/goadesign/goa/uuid",
