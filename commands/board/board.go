@@ -34,6 +34,7 @@ func InitCommand() *cobra.Command {
 			"  " + commands.AppName + " board attach serial:///dev/tty/ACM0 mySketch",
 	}
 	boardCommand.AddCommand(initAttachCommand())
+	boardCommand.AddCommand(initDetailsCommand())
 	boardCommand.AddCommand(initListCommand())
 	boardCommand.AddCommand(initListAllCommand())
 	return boardCommand
