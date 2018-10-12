@@ -162,7 +162,7 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 	platformRelease := pm.GetInstalledPlatformRelease(platform)
 	if platformRelease == nil {
 		return targetPackage, nil, nil, nil, nil,
-			fmt.Errorf("platform %s is not installed", platformRelease)
+			fmt.Errorf("platform %s is not installed", platform)
 	}
 
 	// Find board
