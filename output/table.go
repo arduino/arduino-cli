@@ -110,9 +110,6 @@ func (t *Table) Render() string {
 	for x := range average {
 		average[x] = average[x] / count[x]
 	}
-	// fmt.Println("COUNT:", count)
-	// fmt.Println("MAX  :", widths)
-	// fmt.Println("AVG  :", average)
 	variance := make([]int, t.columnsCount)
 	for _, row := range t.rows {
 		for x, cell := range row.cells {
@@ -127,7 +124,6 @@ func (t *Table) Render() string {
 	for x := range variance {
 		variance[x] = int(math.Sqrt(float64(variance[x] / count[x])))
 	}
-	// fmt.Println("VAR  :", variance)
 
 	res := ""
 	for _, row := range t.rows {
