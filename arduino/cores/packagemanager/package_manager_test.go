@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
@@ -42,4 +43,45 @@ func TestFindBoardWithFQBN(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, board)
 	require.Equal(t, board.Name(), "Arduino/Genuino Mega or Mega 2560")
+}
+
+func TestBoardOptionsFunctions(t *testing.T) {
+	pm := packagemanager.NewPackageManager(
+		paths.New("testdata"),
+		paths.New("testdata"),
+		paths.New("testdata"),
+		paths.New("testdata"))
+	pm.LoadHardwareFromDirectory(paths.New("testdata"))
+
+	nano, err := pm.FindBoardWithFQBN("arduino:avr:nano")
+	require.Nil(t, err)
+	require.NotNil(t, nano)
+	require.Equal(t, nano.Name(), "Arduino Nano")
+
+	nanoOptions := nano.GetConfigOptions()
+	require.Equal(t, "Processor", nanoOptions.Get("cpu"))
+	require.Equal(t, 1, nanoOptions.Size())
+	nanoCPUValues := nano.GetConfigOptionValues("cpu")
+
+	expectedNanoCPUValues := properties.NewMap()
+	expectedNanoCPUValues.Set("atmega328", "ATmega328P")
+	expectedNanoCPUValues.Set("atmega328old", "ATmega328P (Old Bootloader)")
+	expectedNanoCPUValues.Set("atmega168", "ATmega168")
+	require.EqualValues(t, expectedNanoCPUValues, nanoCPUValues)
+
+	esp8266, err := pm.FindBoardWithFQBN("esp8266:esp8266:generic")
+	require.Nil(t, err)
+	require.NotNil(t, esp8266)
+	require.Equal(t, esp8266.Name(), "Generic ESP8266 Module")
+
+	esp8266Options := esp8266.GetConfigOptions()
+	require.Equal(t, 13, esp8266Options.Size())
+	require.Equal(t, "Builtin Led", esp8266Options.Get("led"))
+	require.Equal(t, "Upload Speed", esp8266Options.Get("UploadSpeed"))
+
+	esp8266UploadSpeedValues := esp8266.GetConfigOptionValues("UploadSpeed")
+	for k, v := range esp8266UploadSpeedValues.AsMap() {
+		// Some option values are missing for a particular OS: check that only the available options are listed
+		require.Equal(t, k, v)
+	}
 }

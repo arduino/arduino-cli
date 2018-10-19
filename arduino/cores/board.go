@@ -78,7 +78,9 @@ func (b *Board) GetConfigOptionValues(option string) *properties.Map {
 	res := properties.NewMap()
 	menu := b.Properties.SubTree("menu").SubTree(option)
 	for _, value := range menu.FirstLevelKeys() {
-		res.Set(value, menu.Get(value))
+		if label, ok := menu.GetOk(value); ok {
+			res.Set(value, label)
+		}
 	}
 	return res
 }
