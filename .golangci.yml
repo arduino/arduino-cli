@@ -21,6 +21,7 @@ linters-settings:
 linters:
   enable-all: true
   disable:
+  - gosec
   - deadcode
   - dupl
   - errcheck
