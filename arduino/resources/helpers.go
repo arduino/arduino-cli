@@ -22,7 +22,7 @@ import (
 	"os"
 
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/cavaliercoder/grab"
+	"go.bug.st/downloader"
 )
 
 // ArchivePath returns the path of the Archive of the specified DownloadResource relative
@@ -45,7 +45,7 @@ func (r *DownloadResource) IsCached(downloadDir *paths.Path) (bool, error) {
 }
 
 // Download a DownloadResource.
-func (r *DownloadResource) Download(downloadDir *paths.Path) (*grab.Response, error) {
+func (r *DownloadResource) Download(downloadDir *paths.Path) (*downloader.Downloader, error) {
 	cached, err := r.TestLocalArchiveIntegrity(downloadDir)
 	if err != nil {
 		return nil, fmt.Errorf("testing local archive integrity: %s", err)
@@ -73,10 +73,5 @@ func (r *DownloadResource) Download(downloadDir *paths.Path) (*grab.Response, er
 		return nil, fmt.Errorf("getting archive file info: %s", err)
 	}
 
-	req, err := grab.NewRequest(path.String(), r.URL)
-	if err != nil {
-		return nil, fmt.Errorf("creating HTTP request: %s", err)
-	}
-	client := grab.NewClient()
-	return client.Do(req), nil
+	return downloader.Download(path.String(), r.URL)
 }

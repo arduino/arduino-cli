@@ -18,24 +18,17 @@
 package librariesmanager
 
 import (
-	"fmt"
 	"net/url"
 
-	"github.com/cavaliercoder/grab"
+	"go.bug.st/downloader"
 )
 
 // LibraryIndexURL is the URL where to get library index.
 var LibraryIndexURL, _ = url.Parse("https://downloads.arduino.cc/libraries/library_index.json")
 
 // UpdateIndex downloads the libraries index file from Arduino repository.
-func (lm *LibrariesManager) UpdateIndex() (*grab.Response, error) {
-	req, err := grab.NewRequest(lm.IndexFile.String(), LibraryIndexURL.String())
-	req.NoResume = true
-	if err != nil {
-		return nil, fmt.Errorf("creating HTTP request: %s", err)
-	}
-	client := grab.NewClient()
-	return client.Do(req), nil
-
+func (lm *LibrariesManager) UpdateIndex() (*downloader.Downloader, error) {
+	lm.IndexFile.Remove()
 	// TODO: Download from gzipped URL index
+	return downloader.Download(lm.IndexFile.String(), LibraryIndexURL.String())
 }

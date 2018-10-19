@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/cavaliercoder/grab"
+	"go.bug.st/downloader"
 )
 
 // JSONFormatter is a Formatter that output JSON objects.
@@ -47,6 +47,6 @@ func (jf *JSONFormatter) Format(msg interface{}) (string, error) {
 }
 
 // DownloadProgressBar implements Formatter interface
-func (jf *JSONFormatter) DownloadProgressBar(resp *grab.Response, prefix string) {
-	resp.Wait()
+func (jf *JSONFormatter) DownloadProgressBar(d *downloader.Downloader, prefix string) {
+	d.Run()
 }

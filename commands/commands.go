@@ -155,14 +155,14 @@ func InitLibraryManager(pm *packagemanager.PackageManager) *librariesmanager.Lib
 // UpdateLibrariesIndex updates the library_index.json
 func UpdateLibrariesIndex(lm *librariesmanager.LibrariesManager) {
 	logrus.Info("Updating libraries index")
-	resp, err := lm.UpdateIndex()
+	d, err := lm.UpdateIndex()
 	if err != nil {
 		formatter.PrintError(err, "Error downloading librarires index")
 		os.Exit(ErrNetwork)
 	}
-	formatter.DownloadProgressBar(resp, "Updating index: library_index.json")
-	if resp.Err() != nil {
-		formatter.PrintError(resp.Err(), "Error downloading librarires index")
+	formatter.DownloadProgressBar(d, "Updating index: library_index.json")
+	if d.Error() != nil {
+		formatter.PrintError(d.Error(), "Error downloading librarires index")
 		os.Exit(ErrNetwork)
 	}
 }

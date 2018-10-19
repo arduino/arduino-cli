@@ -130,14 +130,6 @@
   version = "1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:46be43626bfc73383fed1e0f3e04cfcbb6ecb235037b4183059b3de41fed6369"
-  name = "github.com/cavaliercoder/grab"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "b7c6f788e7cbd3afa871543749c38b7a3abeb7e4"
-
-[[projects]]
   digest = "1:2209584c0f7c9b68c23374e659357ab546e1b70eec2761f03280f69a8fd23d77"
   name = "github.com/cenkalti/backoff"
   packages = ["."]
@@ -449,6 +441,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:7a2c02ec28ecf435bc94acb15d4cf6d6c40e3c46de281cc1d60dd362eaa1608f"
+  name = "go.bug.st/downloader"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "77ed6492017ac79225cd969265602fc6a8500aa4"
+
+[[projects]]
+  branch = "master"
   digest = "1:e39f0518cc8a9d0d35fdef12df30ddf1260424a8c8fa3909063b1673a21a7459"
   name = "go.bug.st/relaxed-semver"
   packages = ["."]
@@ -586,7 +586,6 @@
     "github.com/bgentry/go-netrc/netrc",
     "github.com/bouk/monkey",
     "github.com/briandowns/spinner",
-    "github.com/cavaliercoder/grab",
     "github.com/codeclysm/cc",
     "github.com/codeclysm/extract",
     "github.com/goadesign/goa",
@@ -601,6 +600,7 @@
     "github.com/spf13/cobra/doc",
     "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/require",
+    "go.bug.st/downloader",
     "go.bug.st/relaxed-semver",
     "go.bug.st/serial.v1",
     "golang.org/x/crypto/ssh/terminal",

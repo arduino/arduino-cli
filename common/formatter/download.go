@@ -18,10 +18,10 @@
 package formatter
 
 import (
-	"github.com/cavaliercoder/grab"
+	"go.bug.st/downloader"
 )
 
 // DownloadProgressBar prints a progress bar from a running download Request
-func DownloadProgressBar(resp *grab.Response, prefix string) {
-	defaultFormatter.DownloadProgressBar(resp, prefix)
+func DownloadProgressBar(d *downloader.Downloader, prefix string) {
+	defaultFormatter.DownloadProgressBar(d, prefix)
 }

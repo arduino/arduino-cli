@@ -23,11 +23,12 @@ import (
 	"os"
 	"path"
 
+	"go.bug.st/downloader"
+
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/go-paths-helper"
-	"github.com/cavaliercoder/grab"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -68,16 +69,14 @@ func updateIndex(URL *url.URL) {
 	defer os.Remove(tmpFile.Name())
 	tmpFile.Close()
 
-	req, err := grab.NewRequest(tmpFile.Name(), URL.String())
+	d, err := downloader.Download(tmpFile.Name(), URL.String())
 	if err != nil {
 		formatter.PrintError(err, "Error downloading index "+URL.String())
 		os.Exit(commands.ErrNetwork)
 	}
-	client := grab.NewClient()
-	resp := client.Do(req)
-	formatter.DownloadProgressBar(resp, "Updating index: "+coreIndexPath.Base())
-	if resp.Err() != nil {
-		formatter.PrintError(resp.Err(), "Error downloading index "+URL.String())
+	formatter.DownloadProgressBar(d, "Updating index: "+coreIndexPath.Base())
+	if d.Error() != nil {
+		formatter.PrintError(d.Error(), "Error downloading index "+URL.String())
 		os.Exit(commands.ErrNetwork)
 	}
 
