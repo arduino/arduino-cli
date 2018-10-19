@@ -20,11 +20,12 @@ package core
 import (
 	"os"
 
+	"go.bug.st/downloader"
+
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/cavaliercoder/grab"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -88,18 +89,18 @@ func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.T
 	download(resp, err, toolRelease.String())
 }
 
-func download(resp *grab.Response, err error, label string) {
+func download(d *downloader.Downloader, err error, label string) {
 	if err != nil {
 		formatter.PrintError(err, "Error downloading "+label)
 		os.Exit(commands.ErrNetwork)
 	}
-	if resp == nil {
+	if d == nil {
 		formatter.Print(label + " already downloaded")
 		return
 	}
-	formatter.DownloadProgressBar(resp, label)
-	if resp.Err() != nil {
-		formatter.PrintError(resp.Err(), "Error downloading "+label)
+	formatter.DownloadProgressBar(d, label)
+	if d.Error() != nil {
+		formatter.PrintError(d.Error(), "Error downloading "+label)
 		os.Exit(commands.ErrNetwork)
 	}
 }

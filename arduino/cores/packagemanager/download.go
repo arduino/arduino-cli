@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/cavaliercoder/grab"
+	"go.bug.st/downloader"
 	"go.bug.st/relaxed-semver"
 )
 
@@ -102,7 +102,7 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 
 // DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Response
 // is returned.
-func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease) (*grab.Response, error) {
+func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease) (*downloader.Downloader, error) {
 	resource := tool.GetCompatibleFlavour()
 	if resource == nil {
 		return nil, fmt.Errorf("tool not available for your OS")
@@ -112,6 +112,6 @@ func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease) (*grab.Re
 
 // DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
 // nil Response is returned.
-func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease) (*grab.Response, error) {
+func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease) (*downloader.Downloader, error) {
 	return platform.Resource.Download(pm.DownloadDir)
 }

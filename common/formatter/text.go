@@ -22,7 +22,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cavaliercoder/grab"
+	"go.bug.st/downloader"
+
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
@@ -45,20 +46,16 @@ func (tp *TextFormatter) Format(msg interface{}) (string, error) {
 }
 
 // DownloadProgressBar implements Formatter interface
-func (tp *TextFormatter) DownloadProgressBar(resp *grab.Response, prefix string) {
+func (tp *TextFormatter) DownloadProgressBar(d *downloader.Downloader, prefix string) {
 	t := time.NewTicker(250 * time.Millisecond)
 	defer t.Stop()
 
-	bar := pb.StartNew(int(resp.Size))
+	bar := pb.StartNew(int(d.Size()))
 	bar.SetUnits(pb.U_BYTES)
 	bar.Prefix(prefix)
-	for {
-		select {
-		case <-t.C:
-			bar.Set(int(resp.BytesComplete()))
-		case <-resp.Done:
-			bar.FinishPrintOver(prefix + " downloaded")
-			return
-		}
+	update := func(curr int64) {
+		bar.Set(int(curr))
 	}
+	d.RunAndPoll(update, 250*time.Millisecond)
+	bar.FinishPrintOver(prefix + " downloaded")
 }

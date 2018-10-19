@@ -121,11 +121,6 @@
   name = "github.com/bouk/monkey"
   revision = "5df1f207ff77e025801505ae4d903133a0b4353f"
 
-[[constraint]]
-  name = "github.com/cavaliercoder/grab"
-  branch = "master"
-
-
 [prune]
   go-tests = true
   unused-packages = true

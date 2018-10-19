@@ -72,14 +72,14 @@ func downloadLibrariesFromReferences(lm *librariesmanager.LibrariesManager, refs
 func downloadLibraries(lm *librariesmanager.LibrariesManager, libReleases []*librariesindex.Release) {
 	logrus.Info("Downloading libraries")
 	for _, libRelease := range libReleases {
-		resp, err := libRelease.Resource.Download(lm.DownloadsDir)
+		d, err := libRelease.Resource.Download(lm.DownloadsDir)
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+libRelease.String())
 			os.Exit(commands.ErrNetwork)
 		}
-		formatter.DownloadProgressBar(resp, libRelease.String())
-		if resp.Err() != nil {
-			formatter.PrintError(err, "Error downloading "+libRelease.String())
+		formatter.DownloadProgressBar(d, libRelease.String())
+		if d.Error() != nil {
+			formatter.PrintError(d.Error(), "Error downloading "+libRelease.String())
 			os.Exit(commands.ErrNetwork)
 		}
 	}
