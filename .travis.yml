@@ -19,7 +19,7 @@ script:
   - golangci-lint run
   # Build and test
   - go build
-  - go test -timeout 20m -v -coverprofile=coverage.txt -covermode=atomic ./...
+  - go test -timeout 20m -v -coverpkg=./... -coverprofile=coverage.txt -covermode=atomic ./...
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
