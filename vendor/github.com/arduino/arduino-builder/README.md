@@ -63,6 +63,7 @@ To build, run the following commands:
 go get github.com/go-errors/errors
 go get github.com/stretchr/testify
 go get github.com/jstemmer/go-junit-report
+go get -u github.com/arduino/go-paths-helper
 go get -u github.com/arduino/go-properties-orderedmap
 go get -u github.com/arduino/go-timeutils
 go get google.golang.org/grpc

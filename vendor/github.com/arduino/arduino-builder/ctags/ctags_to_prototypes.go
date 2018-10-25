@@ -72,8 +72,7 @@ func functionNameUsedAsFunctionPointerIn(tag *types.CTag, functionTags []*types.
 		if tag.Line != functionTag.Line && strings.Index(tag.Code, "&"+functionTag.FunctionName) != -1 {
 			return true
 		}
-		if tag.Line != functionTag.Line && strings.Index(tag.Code, functionTag.FunctionName) != -1 &&
-			(functionTag.Signature == "(void)" || functionTag.Signature == "()") {
+		if tag.Line != functionTag.Line && strings.Index(strings.TrimSpace(tag.Code), "("+functionTag.FunctionName+")") != -1 {
 			return true
 		}
 	}
