@@ -19,13 +19,20 @@ import (
 type Downloader struct {
 	URL       string
 	Done      chan bool
-	NoResume  bool
 	resp      *http.Response
 	out       io.Writer
 	completed int64
 	size      int64
 	err       error
 }
+
+// DownloadOptions are optional flags that can be passed to Download function
+type DownloadOptions int
+
+const (
+	// NoResume will not try to resume a partial download
+	NoResume DownloadOptions = iota
+)
 
 // Close the download
 func (d *Downloader) Close() error {
@@ -98,16 +105,24 @@ func (d *Downloader) Completed() int64 {
 // Download returns an asynchronous downloader that will donwload the specified url
 // in the specified file. A download resume is tried if a file shorter than the requested
 // url is already present.
-func Download(file string, url string) (*Downloader, error) {
+func Download(file string, url string, options ...DownloadOptions) (*Downloader, error) {
+	noResume := false
+	for _, opt := range options {
+		if opt == NoResume {
+			noResume = true
+		}
+	}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("setting up HTTP request: %s", err)
 	}
 
 	var completed int64
-	if info, err := os.Stat(file); err == nil {
-		completed = info.Size()
-		req.Header.Set("Range", fmt.Sprintf("bytes=%d-", completed))
+	if !noResume {
+		if info, err := os.Stat(file); err == nil {
+			completed = info.Size()
+			req.Header.Set("Range", fmt.Sprintf("bytes=%d-", completed))
+		}
 	}
 
 	client := &http.Client{}

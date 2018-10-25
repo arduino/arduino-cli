@@ -29,7 +29,6 @@ var LibraryIndexURL, _ = url.Parse("https://downloads.arduino.cc/libraries/libra
 // UpdateIndex downloads the libraries index file from Arduino repository.
 func (lm *LibrariesManager) UpdateIndex() (*downloader.Downloader, error) {
 	lm.IndexFile.Parent().MkdirAll()
-	lm.IndexFile.Remove()
 	// TODO: Download from gzipped URL index
-	return downloader.Download(lm.IndexFile.String(), LibraryIndexURL.String())
+	return downloader.Download(lm.IndexFile.String(), LibraryIndexURL.String(), downloader.NoResume)
 }
