@@ -153,7 +153,7 @@ func FilterFiles() filterFiles {
 	}
 }
 
-var SOURCE_CONTROL_FOLDERS = map[string]bool{"CVS": true, "RCS": true, ".git": true, ".github": true, ".svn": true, ".hg": true, ".bzr": true, ".vscode": true}
+var SOURCE_CONTROL_FOLDERS = map[string]bool{"CVS": true, "RCS": true, ".git": true, ".github": true, ".svn": true, ".hg": true, ".bzr": true, ".vscode": true, ".settings": true}
 
 func IsSCCSOrHiddenFile(file os.FileInfo) bool {
 	return IsSCCSFile(file) || IsHiddenFile(file)

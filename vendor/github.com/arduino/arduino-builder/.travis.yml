@@ -1,27 +1,39 @@
 language: go
 
+os:
+  - linux
+  - osx
+
 go:
-  - 1.9.2
+  - 1.11.x
 
 install:
   - go get github.com/go-errors/errors
   - go get github.com/stretchr/testify
   - go get github.com/jstemmer/go-junit-report
+  - go get github.com/arduino/go-paths-helper
+  - go get github.com/arduino/go-properties-orderedmap
+  - go get github.com/arduino/go-timeutils
+  - go get google.golang.org/grpc
+  - go get github.com/golang/protobuf/proto
+  - go get golang.org/x/net/context
+  - go get github.com/fsnotify/fsnotify
+  - go get github.com/arduino/arduino-cli
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/mattn/goveralls
   - go get github.com/wadey/gocovmerge
-  - go get github.com/arduino/go-properties-orderedmap
-  - go get github.com/arduino/go-timeutils
 
 script:
-  - go get github.com/arduino/arduino-builder/arduino-builder
+  - rm -r $GOPATH/src/github.com/arduino/arduino-cli/vendor/github.com/arduino/go-paths-helper
+  - rm -r $GOPATH/src/github.com/arduino/arduino-cli/vendor/github.com/arduino/go-properties-orderedmap
+  - rm -r $GOPATH/src/github.com/arduino/arduino-cli/vendor/github.com/arduino/go-timeutils
   - go build -o $HOME/arduino-builder -v github.com/arduino/arduino-builder/arduino-builder
   - export TEST_PACKAGES=`go list github.com/arduino/arduino-builder/...`
   - RES=0; I=0; for PKG in $TEST_PACKAGES; do go test -v -timeout 30m -covermode=count -coverprofile=coverage.$I.out $PKG; ((RES=RES+$?)); ((I++)); done; ( exit $RES )
 
 after_success:
-  - bin/gocovmerge coverage.*.out > coverage.out
-  - bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+  - $GOPATH/bin/gocovmerge coverage.*.out > coverage.out
+  - $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
 
 env:
   global:

@@ -109,10 +109,10 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 
 	// Use old ctags method to generate export file
 	commands := []types.Command{
-		&ContainerMergeCopySketchFiles{},
+		//&ContainerMergeCopySketchFiles{},
 		&ContainerAddPrototypes{},
-		&FilterSketchSource{Source: &ctx.Source, RemoveLineMarkers: true},
-		&SketchSaver{},
+		//&FilterSketchSource{Source: &ctx.Source, RemoveLineMarkers: true},
+		//&SketchSaver{},
 	}
 
 	for _, command := range commands {
