@@ -61,14 +61,6 @@
   revision = "ed041402e83b924251a5d65b4dfeb727c480c359"
 
 [[projects]]
-  branch = "master"
-  digest = "1:66dfcb33994918d290a70f58ef42bda92a7268facf17bd937f5748dec853a320"
-  name = "github.com/armon/go-metrics"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "783273d703149aaeb9897cf58613d5af48861c25"
-
-[[projects]]
   digest = "1:5978a502788ab7e2c0237bb65bdb2651a94d93733924701463af20717279fe6e"
   name = "github.com/aws/aws-sdk-go"
   packages = [
@@ -122,14 +114,6 @@
   revision = "5df1f207ff77e025801505ae4d903133a0b4353f"
 
 [[projects]]
-  digest = "1:889290ee5c1f1888baa7caa2b4cdfa8a6abcfb86dd772fe6470ad7925cc44bff"
-  name = "github.com/briandowns/spinner"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "48dbb65d7bd5c74ab50d53d04c949f20e3d14944"
-  version = "1.0"
-
-[[projects]]
   digest = "1:2209584c0f7c9b68c23374e659357ab546e1b70eec2761f03280f69a8fd23d77"
   name = "github.com/cenkalti/backoff"
   packages = ["."]
@@ -176,14 +160,6 @@
   pruneopts = "UT"
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
-
-[[projects]]
-  digest = "1:8d983343581370768675191a8695f52d663f50a9234c571128f3d146314892cf"
-  name = "github.com/dimfeld/httptreemux"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "7f532489e7739b3d49df5c602bf63549881fe753"
-  version = "v5.0.1"
 
 [[projects]]
   digest = "1:4bb94bb2d837b5c7489d9e5e1fcffbc81fa1cb43024cbb4fe827787378f01e3b"
@@ -236,18 +212,6 @@
   version = "v1.2.1"
 
 [[projects]]
-  digest = "1:408d3952c8a23aa0b8a78132a17bb34e1ceb66cb3b21d2246e83bc81e16ea78f"
-  name = "github.com/goadesign/goa"
-  packages = [
-    ".",
-    "client",
-    "uuid",
-  ]
-  pruneopts = "UT"
-  revision = "fc29b77a218fb9e190849c81911ed12d25e771de"
-  version = "v1.3.1"
-
-[[projects]]
   digest = "1:ffc060c551980d37ee9e428ef528ee2813137249ccebb0bfc412ef83071cac91"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
@@ -274,22 +238,6 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "e80d13ce29ede4452c43dea11e79b9bc8a15b478"
-
-[[projects]]
-  branch = "master"
-  digest = "1:2394f5a25132b3868eff44599cc28d44bdd0330806e34c495d754dd052df612b"
-  name = "github.com/hashicorp/go-immutable-radix"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "7f3cd4390caab3250a57f30efdb2a65dd7649ecf"
-
-[[projects]]
-  branch = "master"
-  digest = "1:e0e3eb7886110c57a7c103fbc5fc419b1651d3014655b47b71f26809c2daeb1c"
-  name = "github.com/hashicorp/golang-lru"
-  packages = ["simplelru"]
-  pruneopts = "UT"
-  revision = "0fb14efe8c47ae851c0034ed7a448854d3d34cf3"
 
 [[projects]]
   digest = "1:870d441fe217b8e689d7949fef6e43efbc787e50f200cb1e70dbca9204a1d6be"
@@ -482,7 +430,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4e56875285bc955bbd6503d5c46fb1bc30a621aaee0f8efdd37e7c50bc8d0e98"
+  digest = "1:efa7281b594f7efa2f2c1adda314f45f1cb58d5ba2fa2f9f63c6b0ce50e040ac"
   name = "golang.org/x/net"
   packages = [
     "bpf",
@@ -491,7 +439,6 @@
     "internal/socket",
     "ipv4",
     "ipv6",
-    "websocket",
   ]
   pruneopts = "UT"
   revision = "5f9ae10d9af5b1c89ae6904293b14b064d4ada23"
@@ -585,13 +532,9 @@
     "github.com/bcmi-labs/arduino-modules/sketches",
     "github.com/bgentry/go-netrc/netrc",
     "github.com/bouk/monkey",
-    "github.com/briandowns/spinner",
     "github.com/codeclysm/cc",
     "github.com/codeclysm/extract",
     "github.com/fatih/color",
-    "github.com/goadesign/goa",
-    "github.com/goadesign/goa/client",
-    "github.com/goadesign/goa/uuid",
     "github.com/gosuri/uitable",
     "github.com/mattn/go-colorable",
     "github.com/mitchellh/go-homedir",
