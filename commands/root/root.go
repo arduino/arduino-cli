@@ -92,6 +92,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	}
 	initConfigs()
 
+	logrus.Info(commands.AppName + "-" + commands.Version)
 	logrus.Info("Starting root command preparation (`arduino`)")
 	if !formatter.IsSupported(commands.GlobalFlags.Format) {
 		logrus.WithField("inserted format", commands.GlobalFlags.Format).Warn("Unsupported format, using text as default")
