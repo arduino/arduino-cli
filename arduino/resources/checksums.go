@@ -84,7 +84,7 @@ func (r *DownloadResource) TestLocalArchiveSize(downloadDir *paths.Path) (bool, 
 	if err != nil {
 		return false, fmt.Errorf("getting archive info: %s", err)
 	}
-	return info.Size() != r.Size, nil
+	return info.Size() == r.Size, nil
 }
 
 // TestLocalArchiveIntegrity checks for integrity of the local archive.
