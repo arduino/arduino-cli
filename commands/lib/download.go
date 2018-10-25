@@ -77,10 +77,14 @@ func downloadLibraries(lm *librariesmanager.LibrariesManager, libReleases []*lib
 			formatter.PrintError(err, "Error downloading "+libRelease.String())
 			os.Exit(commands.ErrNetwork)
 		}
-		formatter.DownloadProgressBar(d, libRelease.String())
-		if d.Error() != nil {
-			formatter.PrintError(d.Error(), "Error downloading "+libRelease.String())
-			os.Exit(commands.ErrNetwork)
+		if d == nil {
+			formatter.Print(libRelease.String() + " already downloaded")
+		} else {
+			formatter.DownloadProgressBar(d, libRelease.String())
+			if d.Error() != nil {
+				formatter.PrintError(d.Error(), "Error downloading "+libRelease.String())
+				os.Exit(commands.ErrNetwork)
+			}
 		}
 	}
 
