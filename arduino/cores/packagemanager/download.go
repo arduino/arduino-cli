@@ -100,7 +100,7 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 	return release, toolDeps, nil
 }
 
-// DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Response
+// DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Downloader
 // is returned.
 func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease) (*downloader.Downloader, error) {
 	resource := tool.GetCompatibleFlavour()
@@ -111,7 +111,7 @@ func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease) (*downloa
 }
 
 // DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
-// nil Response is returned.
+// nil Downloader is returned.
 func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease) (*downloader.Downloader, error) {
 	return platform.Resource.Download(pm.DownloadDir)
 }
