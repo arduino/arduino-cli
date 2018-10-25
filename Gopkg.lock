@@ -389,11 +389,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7a2c02ec28ecf435bc94acb15d4cf6d6c40e3c46de281cc1d60dd362eaa1608f"
+  digest = "1:800e8a12373d3ba53e397e356f83582722368aea8160167dfb646c26989e1f4d"
   name = "go.bug.st/downloader"
   packages = ["."]
   pruneopts = "UT"
-  revision = "77ed6492017ac79225cd969265602fc6a8500aa4"
+  revision = "6aab51b4c847ce8d86cff12649db295afc1739a9"
 
 [[projects]]
   branch = "master"
