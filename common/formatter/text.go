@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"go.bug.st/downloader"
-
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
