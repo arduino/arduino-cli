@@ -59,6 +59,9 @@ func InitCommand() *cobra.Command {
 	command.Flags().StringVar(
 		&flags.buildCachePath, "build-cache-path", "",
 		"Builds of 'core.a' are saved into this path to be cached and reused.")
+	command.Flags().StringVarP(
+		&flags.exportFile, "output", "o", "",
+		"Filename of the compile output.")
 	command.Flags().StringVar(
 		&flags.buildPath, "build-path", "",
 		"Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.")
@@ -91,6 +94,7 @@ var flags struct {
 	verbose         bool     // Turns on verbose mode.
 	quiet           bool     // Suppresses almost every output.
 	vidPid          string   // VID/PID specific build properties.
+	exportFile      string   // The compiled binary is written to this file
 }
 
 func run(cmd *cobra.Command, args []string) {
@@ -250,9 +254,22 @@ func run(cmd *cobra.Command, args []string) {
 	fqbn.Configs = properties.NewMap()
 	fqbnSuffix := strings.Replace(fqbn.String(), ":", ".", -1)
 
+	var exportPath *paths.Path
+	var exportFile string
+	if flags.exportFile == "" {
+		exportPath = paths.New(sketch.FullPath)
+		exportFile = sketch.Name + "." + fqbnSuffix
+	} else {
+		exportPath = paths.New(flags.exportFile).Parent()
+		exportFile = paths.New(flags.exportFile).Base()
+		if strings.HasSuffix(exportFile, ext) {
+			exportFile = exportFile[:len(exportFile)-len(ext)]
+		}
+	}
+
 	// Copy .hex file to sketch directory
 	srcHex := paths.New(outputPath)
-	dstHex := paths.New(sketch.FullPath).Join(sketch.Name + "." + fqbnSuffix + ext)
+	dstHex := exportPath.Join(exportFile + ext)
 	logrus.WithField("from", srcHex).WithField("to", dstHex).Print("copying sketch build output")
 	if err = srcHex.CopyTo(dstHex); err != nil {
 		formatter.PrintError(err, "Error copying output file.")
@@ -261,7 +278,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Copy .elf file to sketch directory
 	srcElf := paths.New(outputPath[:len(outputPath)-3] + "elf")
-	dstElf := paths.New(sketch.FullPath).Join(sketch.Name + "." + fqbnSuffix + ".elf")
+	dstElf := exportPath.Join(exportFile + ".elf")
 	logrus.WithField("from", srcElf).WithField("to", dstElf).Print("copying sketch build output")
 	if err = srcElf.CopyTo(dstElf); err != nil {
 		formatter.PrintError(err, "Error copying elf file.")
