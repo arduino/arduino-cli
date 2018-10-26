@@ -236,6 +236,8 @@ func run(cmd *cobra.Command, args []string) {
 	ext := filepath.Ext(outputPath)
 
 	// FIXME: Make a function to produce a better name...
+	// Make the filename without the FQBN configs part
+	fqbn.Configs = properties.NewMap()
 	fqbnSuffix := strings.Replace(fqbn.String(), ":", ".", -1)
 
 	// Copy .hex file to sketch directory
