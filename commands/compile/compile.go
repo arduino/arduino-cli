@@ -95,21 +95,18 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrGeneric)
 	}
 
-	fqbn := flags.fqbn
-	if fqbn == "" && sketch != nil {
-		fqbn = sketch.Metadata.CPU.Fqbn
+	if flags.fqbn == "" && sketch != nil {
+		flags.fqbn = sketch.Metadata.CPU.Fqbn
 	}
-	if fqbn == "" {
+	if flags.fqbn == "" {
 		formatter.PrintErrorMessage("No Fully Qualified Board Name provided.")
 		os.Exit(commands.ErrGeneric)
 	}
-	fqbnParts := strings.Split(fqbn, ":")
-	if len(fqbnParts) < 3 || len(fqbnParts) > 4 {
+	fqbn, err := cores.ParseFQBN(flags.fqbn)
+	if err != nil {
 		formatter.PrintErrorMessage("Fully Qualified Board Name has incorrect format.")
 		os.Exit(commands.ErrBadArgument)
 	}
-	packageName := fqbnParts[0]
-	coreName := fqbnParts[1]
 
 	pm := commands.InitPackageManager()
 
@@ -133,25 +130,20 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	targetPlatform := pm.FindPlatform(&packagemanager.PlatformReference{
-		Package:              packageName,
-		PlatformArchitecture: coreName,
+		Package:              fqbn.Package,
+		PlatformArchitecture: fqbn.PlatformArch,
 	})
 	if targetPlatform == nil || pm.GetInstalledPlatformRelease(targetPlatform) == nil {
 		errorMessage := fmt.Sprintf(
 			"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
-				commands.AppName+" core install %[1]s:%[2]s\".", packageName, coreName)
+				commands.AppName+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
 		formatter.PrintErrorMessage(errorMessage)
 		os.Exit(commands.ErrCoreConfig)
 	}
 
 	ctx := &types.Context{}
 	ctx.PackageManager = pm
-	if parsedFqbn, err := cores.ParseFQBN(fqbn); err != nil {
-		formatter.PrintError(err, "Error parsing FQBN.")
-		os.Exit(commands.ErrBadArgument)
-	} else {
-		ctx.FQBN = parsedFqbn
-	}
+	ctx.FQBN = fqbn
 	ctx.SketchLocation = paths.New(sketch.FullPath)
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
@@ -242,12 +234,13 @@ func run(cmd *cobra.Command, args []string) {
 	// FIXME: Make a function to obtain these info...
 	outputPath := ctx.BuildProperties.ExpandPropsInString("{build.path}/{recipe.output.tmp_file}")
 	ext := filepath.Ext(outputPath)
+
 	// FIXME: Make a function to produce a better name...
-	fqbn = strings.Replace(fqbn, ":", ".", -1)
+	fqbnSuffix := strings.Replace(fqbn.String(), ":", ".", -1)
 
 	// Copy .hex file to sketch directory
 	srcHex := paths.New(outputPath)
-	dstHex := paths.New(sketch.FullPath).Join(sketch.Name + "." + fqbn + ext)
+	dstHex := paths.New(sketch.FullPath).Join(sketch.Name + "." + fqbnSuffix + ext)
 	logrus.WithField("from", srcHex).WithField("to", dstHex).Print("copying sketch build output")
 	if err = srcHex.CopyTo(dstHex); err != nil {
 		formatter.PrintError(err, "Error copying output file.")
@@ -256,7 +249,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	// Copy .elf file to sketch directory
 	srcElf := paths.New(outputPath[:len(outputPath)-3] + "elf")
-	dstElf := paths.New(sketch.FullPath).Join(sketch.Name + "." + fqbn + ".elf")
+	dstElf := paths.New(sketch.FullPath).Join(sketch.Name + "." + fqbnSuffix + ".elf")
 	logrus.WithField("from", srcElf).WithField("to", dstElf).Print("copying sketch build output")
 	if err = srcElf.CopyTo(dstElf); err != nil {
 		formatter.PrintError(err, "Error copying elf file.")
