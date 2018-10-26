@@ -45,22 +45,30 @@ func InitCommand() *cobra.Command {
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}
-	uploadCommand.Flags().StringVarP(&flags.fqbn, "fqbn", "b", "",
+	uploadCommand.Flags().StringVarP(
+		&flags.fqbn, "fqbn", "b", "",
 		"Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	uploadCommand.Flags().StringVarP(&flags.port, "port", "p", "",
+	uploadCommand.Flags().StringVarP(
+		&flags.port, "port", "p", "",
 		"Upload port, e.g.: COM10 or /dev/ttyACM0")
-	uploadCommand.Flags().BoolVarP(&flags.verify, "verify", "t", false,
+	uploadCommand.Flags().StringVarP(
+		&flags.importFile, "input", "i", "",
+		"Input file to be uploaded.")
+	uploadCommand.Flags().BoolVarP(
+		&flags.verify, "verify", "t", false,
 		"Verify uploaded binary after the upload.")
-	uploadCommand.Flags().BoolVarP(&flags.verbose, "verbose", "v", false,
+	uploadCommand.Flags().BoolVarP(
+		&flags.verbose, "verbose", "v", false,
 		"Optional, turns on verbose mode.")
 	return uploadCommand
 }
 
 var flags struct {
-	fqbn    string
-	port    string
-	verbose bool
-	verify  bool
+	fqbn       string
+	port       string
+	verbose    bool
+	verify     bool
+	importFile string
 }
 
 func run(command *cobra.Command, args []string) {
@@ -81,40 +89,26 @@ func run(command *cobra.Command, args []string) {
 		os.Exit(commands.ErrBadCall)
 	}
 
-	fqbn := flags.fqbn
-	if fqbn == "" && sketch != nil {
-		fqbn = sketch.Metadata.CPU.Fqbn
+	if flags.fqbn == "" && sketch != nil {
+		flags.fqbn = sketch.Metadata.CPU.Fqbn
 	}
-	if fqbn == "" {
+	if flags.fqbn == "" {
 		formatter.PrintErrorMessage("No Fully Qualified Board Name provided.")
 		os.Exit(commands.ErrBadCall)
 	}
-	fqbnParts := strings.Split(fqbn, ":")
-	if len(fqbnParts) < 3 || len(fqbnParts) > 4 {
-		formatter.PrintErrorMessage("Fully Qualified Board Name has incorrect format.")
-		os.Exit(commands.ErrBadCall)
-	}
-
-	pm := commands.InitPackageManager()
-
-	// Find target board
-	board, err := pm.FindBoardWithFQBN(fqbn)
+	fqbn, err := cores.ParseFQBN(flags.fqbn)
 	if err != nil {
 		formatter.PrintError(err, "Invalid FQBN.")
 		os.Exit(commands.ErrBadCall)
 	}
 
-	// Create board configuration
-	var boardProperties *properties.Map
-	if len(fqbnParts) == 3 {
-		boardProperties = board.Properties
-	} else {
-		if props, err := board.GeneratePropertiesForConfiguration(fqbnParts[3]); err != nil {
-			formatter.PrintError(err, "Invalid FQBN.")
-			os.Exit(commands.ErrBadCall)
-		} else {
-			boardProperties = props
-		}
+	pm := commands.InitPackageManager()
+
+	// Find target board and board properties
+	_, _, board, boardProperties, _, err := pm.ResolveFQBN(fqbn)
+	if err != nil {
+		formatter.PrintError(err, "Invalid FQBN.")
+		os.Exit(commands.ErrBadCall)
 	}
 
 	// Load programmer tool
@@ -194,12 +188,27 @@ func run(command *cobra.Command, args []string) {
 	}
 
 	// Set path to compiled binary
-	// FIXME: refactor this should be made into a function
-	fqbn = strings.Replace(fqbn, ":", ".", -1)
-	uploadProperties.Set("build.path", sketch.FullPath)
-	uploadProperties.Set("build.project_name", sketch.Name+"."+fqbn)
+	// Make the filename without the FQBN configs part
+	fqbn.Configs = properties.NewMap()
+	fqbnSuffix := strings.Replace(fqbn.String(), ":", ".", -1)
 	ext := filepath.Ext(uploadProperties.ExpandPropsInString("{recipe.output.tmp_file}"))
-	if _, err := os.Stat(filepath.Join(sketch.FullPath, sketch.Name+"."+fqbn+ext)); err != nil {
+
+	var importPath *paths.Path
+	var importFile string
+	if flags.importFile == "" {
+		importPath = paths.New(sketch.FullPath)
+		importFile = sketch.Name + "." + fqbnSuffix
+	} else {
+		importPath = paths.New(flags.importFile).Parent()
+		importFile = paths.New(flags.importFile).Base()
+		if strings.HasSuffix(importFile, ext) {
+			importFile = importFile[:len(importFile)-len(ext)]
+		}
+	}
+
+	uploadProperties.SetPath("build.path", importPath)
+	uploadProperties.Set("build.project_name", importFile)
+	if _, err := os.Stat(filepath.Join(sketch.FullPath, importFile+ext)); err != nil {
 		if os.IsNotExist(err) {
 			formatter.PrintErrorMessage("Compiled sketch not found. Please compile first.")
 		} else {
