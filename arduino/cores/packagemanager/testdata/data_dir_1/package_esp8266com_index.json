@@ -1,0 +1,1301 @@
+{
+  "packages": [
+    {
+      "maintainer": "ESP8266 Community", 
+      "help": {
+        "online": "http://esp8266.com/arduino"
+      }, 
+      "websiteURL": "https://github.com/esp8266/Arduino", 
+      "platforms": [
+        {
+          "category": "ESP8266", 
+          "help": {
+            "online": "http://esp8266.github.io/Arduino/versions/2.0.0/"
+          }, 
+          "url": "https://github.com/esp8266/Arduino/releases/download/2.0.0/esp8266-2.0.0.zip", 
+          "checksum": "SHA-256:00911ee9f5d4802b279fd81a5a8177fd6fef4888d04ebe93fc3952bac85d909c", 
+          "name": "esp8266", 
+          "version": "2.0.0", 
+          "architecture": "esp8266", 
+          "archiveFileName": "esp8266-2.0.0.zip", 
+          "size": "5606497", 
+          "toolsDependencies": [
+            {
+              "packager": "esp8266", 
+              "version": "0.4.6", 
+              "name": "esptool"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "1.20.0-26-gb404fb9-2", 
+              "name": "xtensa-lx106-elf-gcc"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "0.1.2", 
+              "name": "mkspiffs"
+            }
+          ], 
+          "boards": [
+            {
+              "name": "Generic ESP8266 Module"
+            }, 
+            {
+              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+            }, 
+            {
+              "name": "NodeMCU 0.9 (ESP-12 Module)"
+            }, 
+            {
+              "name": "NodeMCU 1.0 (ESP-12E Module)"
+            }, 
+            {
+              "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
+            }, 
+            {
+              "name": "SparkFun Thing"
+            }, 
+            {
+              "name": "SweetPea ESP-210"
+            }, 
+            {
+              "name": "WeMos D1"
+            }, 
+            {
+              "name": "WeMos D1 mini"
+            }
+          ]
+        }, 
+        {
+          "category": "ESP8266", 
+          "help": {
+            "online": "http://esp8266.github.com/Arduino/versions/2.3.0/"
+          }, 
+          "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/esp8266-2.3.0.zip", 
+          "checksum": "SHA-256:884188a54bc75f1f2e7f827619f8cb1980dc3f430f92f9b07186ed7f4db8c738", 
+          "version": "2.3.0", 
+          "architecture": "esp8266", 
+          "archiveFileName": "esp8266-2.3.0.zip", 
+          "boards": [
+            {
+              "name": "Generic ESP8266 Module"
+            }, 
+            {
+              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+            }, 
+            {
+              "name": "NodeMCU 0.9 (ESP-12 Module)"
+            }, 
+            {
+              "name": "NodeMCU 1.0 (ESP-12E Module)"
+            }, 
+            {
+              "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
+            }, 
+            {
+              "name": "ESPresso Lite 1.0"
+            }, 
+            {
+              "name": "ESPresso Lite 2.0"
+            }, 
+            {
+              "name": "Phoenix 1.0"
+            }, 
+            {
+              "name": "Phoenix 2.0"
+            }, 
+            {
+              "name": "SparkFun Thing"
+            }, 
+            {
+              "name": "SweetPea ESP-210"
+            }, 
+            {
+              "name": "WeMos D1"
+            }, 
+            {
+              "name": "WeMos D1 mini"
+            }, 
+            {
+              "name": "ESPino (ESP-12 Module)"
+            }, 
+            {
+              "name": "ESPino (WROOM-02 Module)"
+            }, 
+            {
+              "name": "WifInfo"
+            }, 
+            {
+              "name": "ESPDuino"
+            }
+          ], 
+          "size": "8595050", 
+          "toolsDependencies": [
+            {
+              "packager": "esp8266", 
+              "version": "0.4.9", 
+              "name": "esptool"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "1.20.0-26-gb404fb9-2", 
+              "name": "xtensa-lx106-elf-gcc"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "0.1.2", 
+              "name": "mkspiffs"
+            }
+          ], 
+          "name": "esp8266"
+        }, 
+        {
+          "category": "ESP8266", 
+          "help": {
+            "online": "https://arduino-esp8266.readthedocs.io/en/2.4.0-rc2/"
+          }, 
+          "url": "https://github.com/esp8266/Arduino/releases/download/2.4.0-rc2/esp8266-2.4.0-rc2.zip", 
+          "checksum": "SHA-256:211244bf8caf4a8b0de70f8e9d50c3d3bcad640fac6bff836d52e60e0f236576", 
+          "name": "esp8266", 
+          "version": "2.4.0-rc2", 
+          "architecture": "esp8266", 
+          "archiveFileName": "esp8266-2.4.0-rc2.zip", 
+          "size": "10571318", 
+          "toolsDependencies": [
+            {
+              "packager": "esp8266", 
+              "version": "0.4.12", 
+              "name": "esptool"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "1.20.0-26-gb404fb9-2", 
+              "name": "xtensa-lx106-elf-gcc"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "0.2.0", 
+              "name": "mkspiffs"
+            }
+          ], 
+          "boards": [
+            {
+              "name": "Generic ESP8266 Module"
+            }, 
+            {
+              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+            }, 
+            {
+              "name": "NodeMCU 0.9 (ESP-12 Module)"
+            }, 
+            {
+              "name": "NodeMCU 1.0 (ESP-12E Module)"
+            }, 
+            {
+              "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
+            }, 
+            {
+              "name": "ESPresso Lite 1.0"
+            }, 
+            {
+              "name": "ESPresso Lite 2.0"
+            }, 
+            {
+              "name": "Phoenix 1.0"
+            }, 
+            {
+              "name": "Phoenix 2.0"
+            }, 
+            {
+              "name": "SparkFun Thing"
+            }, 
+            {
+              "name": "SweetPea ESP-210"
+            }, 
+            {
+              "name": "WeMos D1"
+            }, 
+            {
+              "name": "WeMos D1 mini"
+            }, 
+            {
+              "name": "ESPino (ESP-12 Module)"
+            }, 
+            {
+              "name": "ESPino (WROOM-02 Module)"
+            }, 
+            {
+              "name": "WifInfo"
+            }, 
+            {
+              "name": "ESPDuino"
+            }, 
+            {
+              "name": "4D Systems gen4 IoD Range"
+            }, 
+            {
+              "name": "DigiStump Oak"
+            }
+          ]
+        }, 
+        {
+          "category": "ESP8266", 
+          "help": {
+            "online": "https://arduino-esp8266.readthedocs.io/en/2.4.0-rc1/"
+          }, 
+          "url": "https://github.com/esp8266/Arduino/releases/download/2.4.0-rc1/esp8266-2.4.0-rc1.zip", 
+          "checksum": "SHA-256:e0145abc2c08b1fb070cc4eb8304f66719539041561db5191a998df6a6112999", 
+          "version": "2.4.0-rc1", 
+          "architecture": "esp8266", 
+          "archiveFileName": "esp8266-2.4.0-rc1.zip", 
+          "boards": [
+            {
+              "name": "Generic ESP8266 Module"
+            }, 
+            {
+              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+            }, 
+            {
+              "name": "NodeMCU 0.9 (ESP-12 Module)"
+            }, 
+            {
+              "name": "NodeMCU 1.0 (ESP-12E Module)"
+            }, 
+            {
+              "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
+            }, 
+            {
+              "name": "ESPresso Lite 1.0"
+            }, 
+            {
+              "name": "ESPresso Lite 2.0"
+            }, 
+            {
+              "name": "Phoenix 1.0"
+            }, 
+            {
+              "name": "Phoenix 2.0"
+            }, 
+            {
+              "name": "SparkFun Thing"
+            }, 
+            {
+              "name": "SweetPea ESP-210"
+            }, 
+            {
+              "name": "WeMos D1"
+            }, 
+            {
+              "name": "WeMos D1 mini"
+            }, 
+            {
+              "name": "ESPino (ESP-12 Module)"
+            }, 
+            {
+              "name": "ESPino (WROOM-02 Module)"
+            }, 
+            {
+              "name": "WifInfo"
+            }, 
+            {
+              "name": "ESPDuino"
+            }, 
+            {
+              "name": "4D Systems gen4 IoD Range"
+            }
+          ], 
+          "size": "10396896", 
+          "toolsDependencies": [
+            {
+              "packager": "esp8266", 
+              "version": "0.4.9", 
+              "name": "esptool"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "1.20.0-26-gb404fb9-2", 
+              "name": "xtensa-lx106-elf-gcc"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "0.1.2", 
+              "name": "mkspiffs"
+            }
+          ], 
+          "name": "esp8266"
+        }, 
+        {
+          "category": "ESP8266", 
+          "help": {
+            "online": "http://arduino.esp8266.com/versions/1.6.5-947-g39819f0/doc/reference.html"
+          }, 
+          "url": "http://arduino.esp8266.com/versions/1.6.5-947-g39819f0/esp8266-1.6.5-947-g39819f0.zip", 
+          "checksum": "SHA-256:79a395801a94c77f4855f3921b9cc127d679d961ec207e7fb89f90754123d66a", 
+          "name": "esp8266", 
+          "version": "1.6.5-947-g39819f0", 
+          "architecture": "esp8266", 
+          "archiveFileName": "esp8266-1.6.5-947-g39819f0.zip", 
+          "size": "2295584", 
+          "toolsDependencies": [
+            {
+              "packager": "esp8266", 
+              "version": "0.4.5", 
+              "name": "esptool"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "1.20.0-26-gb404fb9", 
+              "name": "xtensa-lx106-elf-gcc"
+            }
+          ], 
+          "boards": [
+            {
+              "name": "Generic ESP8266 Module"
+            }, 
+            {
+              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+            }, 
+            {
+              "name": "NodeMCU 0.9 (ESP-12 Module)"
+            }, 
+            {
+              "name": "NodeMCU 1.0 (ESP-12E Module)"
+            }, 
+            {
+              "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
+            }, 
+            {
+              "name": "SweetPea ESP-210"
+            }
+          ]
+        }, 
+        {
+          "category": "ESP8266", 
+          "help": {
+            "online": "http://esp8266.github.com/Arduino/versions/2.2.0/"
+          }, 
+          "url": "https://github.com/esp8266/Arduino/releases/download/2.2.0/esp8266-2.2.0.zip", 
+          "checksum": "SHA-256:c0b57abdcd9ad11c506f79e019a35abadb9ac7921972caaa336e08a35048c1db", 
+          "name": "esp8266", 
+          "version": "2.2.0", 
+          "architecture": "esp8266", 
+          "archiveFileName": "esp8266-2.2.0.zip", 
+          "size": "5981702", 
+          "toolsDependencies": [
+            {
+              "packager": "esp8266", 
+              "version": "0.4.8", 
+              "name": "esptool"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "1.20.0-26-gb404fb9-2", 
+              "name": "xtensa-lx106-elf-gcc"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "0.1.2", 
+              "name": "mkspiffs"
+            }
+          ], 
+          "boards": [
+            {
+              "name": "Generic ESP8266 Module"
+            }, 
+            {
+              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+            }, 
+            {
+              "name": "NodeMCU 0.9 (ESP-12 Module)"
+            }, 
+            {
+              "name": "NodeMCU 1.0 (ESP-12E Module)"
+            }, 
+            {
+              "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
+            }, 
+            {
+              "name": "ESPresso Lite 1.0"
+            }, 
+            {
+              "name": "ESPresso Lite 2.0"
+            }, 
+            {
+              "name": "SparkFun Thing"
+            }, 
+            {
+              "name": "SweetPea ESP-210"
+            }, 
+            {
+              "name": "WeMos D1"
+            }, 
+            {
+              "name": "WeMos D1 mini"
+            }, 
+            {
+              "name": "ESPino (ESP-12 Module)"
+            }, 
+            {
+              "name": "ESPino (WROOM-02 Module)"
+            }, 
+            {
+              "name": "WifInfo"
+            }, 
+            {
+              "name": "ESPDuino"
+            }
+          ]
+        }, 
+        {
+          "category": "ESP8266", 
+          "name": "esp8266", 
+          "url": "https://github.com/esp8266/Arduino/releases/download/2.4.2/esp8266-2.4.2.zip", 
+          "checksum": "SHA-256:890428f3a8f03b4224cec66e20df4ae34f9c63003ce0f5e9291f01356aac458d", 
+          "version": "2.4.2", 
+          "architecture": "esp8266", 
+          "archiveFileName": "esp8266-2.4.2.zip", 
+          "boards": [
+            {
+              "name": "Generic ESP8266 Module"
+            }, 
+            {
+              "name": "Generic ESP8285 Module"
+            }, 
+            {
+              "name": "ESPDuino (ESP-13 Module)"
+            }, 
+            {
+              "name": "Adafruit Feather HUZZAH ESP8266"
+            }, 
+            {
+              "name": "XinaBox CW01"
+            }, 
+            {
+              "name": "ESPresso Lite 1.0"
+            }, 
+            {
+              "name": "ESPresso Lite 2.0"
+            }, 
+            {
+              "name": "Phoenix 1.0"
+            }, 
+            {
+              "name": "Phoenix 2.0"
+            }, 
+            {
+              "name": "NodeMCU 0.9 (ESP-12 Module)"
+            }, 
+            {
+              "name": "NodeMCU 1.0 (ESP-12E Module)"
+            }, 
+            {
+              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+            }, 
+            {
+              "name": "SparkFun ESP8266 Thing"
+            }, 
+            {
+              "name": "SparkFun ESP8266 Thing Dev"
+            }, 
+            {
+              "name": "SweetPea ESP-210"
+            }, 
+            {
+              "name": "LOLIN(WEMOS) D1 R2 & mini"
+            }, 
+            {
+              "name": "LOLIN(WEMOS) D1 mini Pro"
+            }, 
+            {
+              "name": "LOLIN(WEMOS) D1 mini Lite"
+            }, 
+            {
+              "name": "WeMos D1 R1"
+            }, 
+            {
+              "name": "ESPino (ESP-12 Module)"
+            }, 
+            {
+              "name": "ThaiEasyElec's ESPino"
+            }, 
+            {
+              "name": "WifInfo"
+            }, 
+            {
+              "name": "Arduino"
+            }, 
+            {
+              "name": "4D Systems gen4 IoD Range"
+            }, 
+            {
+              "name": "Digistump Oak"
+            }, 
+            {
+              "name": "WiFiduino"
+            }, 
+            {
+              "name": "Amperka WiFi Slot"
+            }, 
+            {
+              "name": "Seeed Wio Link"
+            }
+          ], 
+          "size": "15762364", 
+          "toolsDependencies": [
+            {
+              "packager": "esp8266", 
+              "version": "0.4.13", 
+              "name": "esptool"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "1.20.0-26-gb404fb9-2", 
+              "name": "xtensa-lx106-elf-gcc"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "0.2.0", 
+              "name": "mkspiffs"
+            }
+          ], 
+          "help": {
+            "online": "https://arduino-esp8266.readthedocs.io/en/2.4.2/"
+          }
+        }, 
+        {
+          "category": "ESP8266", 
+          "name": "esp8266", 
+          "url": "https://github.com/esp8266/Arduino/releases/download/2.4.1/esp8266-2.4.1.zip", 
+          "checksum": "SHA-256:794f5e82fbc0490b68d45b2c63e8ece8f1fe3fe8ff51c78637823ca89a5a553c", 
+          "help": {
+            "online": "https://arduino-esp8266.readthedocs.io/en/2.4.1/"
+          }, 
+          "version": "2.4.1", 
+          "architecture": "esp8266", 
+          "archiveFileName": "esp8266-2.4.1.zip", 
+          "size": "13087845", 
+          "toolsDependencies": [
+            {
+              "packager": "esp8266", 
+              "version": "0.4.13", 
+              "name": "esptool"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "1.20.0-26-gb404fb9-2", 
+              "name": "xtensa-lx106-elf-gcc"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "0.2.0", 
+              "name": "mkspiffs"
+            }
+          ], 
+          "boards": [
+            {
+              "name": "Generic ESP8266 Module"
+            }, 
+            {
+              "name": "Generic ESP8285 Module"
+            }, 
+            {
+              "name": "ESPDuino (ESP-13 Module)"
+            }, 
+            {
+              "name": "Adafruit Feather HUZZAH ESP8266"
+            }, 
+            {
+              "name": "ESPresso Lite 1.0"
+            }, 
+            {
+              "name": "ESPresso Lite 2.0"
+            }, 
+            {
+              "name": "Phoenix 1.0"
+            }, 
+            {
+              "name": "Phoenix 2.0"
+            }, 
+            {
+              "name": "NodeMCU 0.9 (ESP-12 Module)"
+            }, 
+            {
+              "name": "NodeMCU 1.0 (ESP-12E Module)"
+            }, 
+            {
+              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+            }, 
+            {
+              "name": "SparkFun ESP8266 Thing"
+            }, 
+            {
+              "name": "SparkFun ESP8266 Thing Dev"
+            }, 
+            {
+              "name": "SweetPea ESP-210"
+            }, 
+            {
+              "name": "WeMos D1 R2 & mini"
+            }, 
+            {
+              "name": "WeMos D1 mini Pro"
+            }, 
+            {
+              "name": "WeMos D1 mini Lite"
+            }, 
+            {
+              "name": "WeMos D1 R1"
+            }, 
+            {
+              "name": "ESPino (ESP-12 Module)"
+            }, 
+            {
+              "name": "ThaiEasyElec's ESPino"
+            }, 
+            {
+              "name": "WifInfo"
+            }, 
+            {
+              "name": "Arduino"
+            }, 
+            {
+              "name": "4D Systems gen4 IoD Range"
+            }, 
+            {
+              "name": "Digistump Oak"
+            }
+          ]
+        }, 
+        {
+          "category": "ESP8266", 
+          "help": {
+            "online": "https://arduino-esp8266.readthedocs.io/en/2.4.0/"
+          }, 
+          "url": "https://github.com/esp8266/Arduino/releases/download/2.4.0/esp8266-2.4.0.zip", 
+          "checksum": "SHA-256:b2bca24701873678faafc27949473a255867ccb1a7d577370028f74817bcc532", 
+          "version": "2.4.0", 
+          "architecture": "esp8266", 
+          "archiveFileName": "esp8266-2.4.0.zip", 
+          "boards": [
+            {
+              "name": "Generic ESP8266 Module"
+            }, 
+            {
+              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+            }, 
+            {
+              "name": "NodeMCU 0.9 (ESP-12 Module)"
+            }, 
+            {
+              "name": "NodeMCU 1.0 (ESP-12E Module)"
+            }, 
+            {
+              "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
+            }, 
+            {
+              "name": "ESPresso Lite 1.0"
+            }, 
+            {
+              "name": "ESPresso Lite 2.0"
+            }, 
+            {
+              "name": "Phoenix 1.0"
+            }, 
+            {
+              "name": "Phoenix 2.0"
+            }, 
+            {
+              "name": "SparkFun Thing"
+            }, 
+            {
+              "name": "SweetPea ESP-210"
+            }, 
+            {
+              "name": "WeMos D1"
+            }, 
+            {
+              "name": "WeMos D1 mini"
+            }, 
+            {
+              "name": "ESPino (ESP-12 Module)"
+            }, 
+            {
+              "name": "ESPino (WROOM-02 Module)"
+            }, 
+            {
+              "name": "WifInfo"
+            }, 
+            {
+              "name": "ESPDuino"
+            }, 
+            {
+              "name": "4D Systems gen4 IoD Range"
+            }, 
+            {
+              "name": "DigiStump Oak"
+            }
+          ], 
+          "size": "11919873", 
+          "toolsDependencies": [
+            {
+              "packager": "esp8266", 
+              "version": "0.4.12", 
+              "name": "esptool"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "1.20.0-26-gb404fb9-2", 
+              "name": "xtensa-lx106-elf-gcc"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "0.2.0", 
+              "name": "mkspiffs"
+            }
+          ], 
+          "name": "esp8266"
+        }, 
+        {
+          "category": "ESP8266", 
+          "help": {
+            "online": "http://esp8266.github.com/Arduino/versions/2.1.0/"
+          }, 
+          "url": "https://github.com/esp8266/Arduino/releases/download/2.1.0/esp8266-2.1.0.zip", 
+          "checksum": "SHA-256:000818d500ea90bcb516d667c688387f34003247bb5592e795bc549e91f9ace0", 
+          "version": "2.1.0", 
+          "architecture": "esp8266", 
+          "archiveFileName": "esp8266-2.1.0.zip", 
+          "boards": [
+            {
+              "name": "Generic ESP8266 Module"
+            }, 
+            {
+              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+            }, 
+            {
+              "name": "NodeMCU 0.9 (ESP-12 Module)"
+            }, 
+            {
+              "name": "NodeMCU 1.0 (ESP-12E Module)"
+            }, 
+            {
+              "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
+            }, 
+            {
+              "name": "ESPresso Lite 1.0"
+            }, 
+            {
+              "name": "ESPresso Lite 2.0"
+            }, 
+            {
+              "name": "SparkFun Thing"
+            }, 
+            {
+              "name": "SweetPea ESP-210"
+            }, 
+            {
+              "name": "WeMos D1"
+            }, 
+            {
+              "name": "WeMos D1 mini"
+            }, 
+            {
+              "name": "ESPino (ESP-12 Module)"
+            }, 
+            {
+              "name": "ESPino (WROOM-02 Module)"
+            }, 
+            {
+              "name": "WifInfo"
+            }, 
+            {
+              "name": "ESPDuino"
+            }
+          ], 
+          "size": "5776332", 
+          "toolsDependencies": [
+            {
+              "packager": "esp8266", 
+              "version": "0.4.8", 
+              "name": "esptool"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "1.20.0-26-gb404fb9-2", 
+              "name": "xtensa-lx106-elf-gcc"
+            }, 
+            {
+              "packager": "esp8266", 
+              "version": "0.1.2", 
+              "name": "mkspiffs"
+            }
+          ], 
+          "name": "esp8266"
+        }
+      ], 
+      "tools": [
+        {
+          "version": "1.20.0-26-gb404fb9-2", 
+          "name": "xtensa-lx106-elf-gcc", 
+          "systems": [
+            {
+              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/win32-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
+              "checksum": "SHA-256:10476b9c11a7a90f40883413ddfb409f505b20692e316c4e597c4c175b4be09c", 
+              "host": "i686-mingw32", 
+              "archiveFileName": "win32-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
+              "size": "153527527"
+            }, 
+            {
+              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
+              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6", 
+              "host": "x86_64-apple-darwin", 
+              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
+              "size": "35385382"
+            }, 
+            {
+              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
+              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6", 
+              "host": "i386-apple-darwin", 
+              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
+              "size": "35385382"
+            }, 
+            {
+              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/linux64-xtensa-lx106-elf-gb404fb9.tgz", 
+              "checksum": "SHA-256:46f057fbd8b320889a26167daf325038912096d09940b2a95489db92431473b7", 
+              "host": "x86_64-pc-linux-gnu", 
+              "archiveFileName": "linux64-xtensa-lx106-elf-gb404fb9.tar.gz", 
+              "size": "30262903"
+            }, 
+            {
+              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/linux32-xtensa-lx106-elf.tar.gz", 
+              "checksum": "SHA-256:b24817819f0078fb05895a640e806e0aca9aa96b47b80d2390ac8e2d9ddc955a", 
+              "host": "i686-pc-linux-gnu", 
+              "archiveFileName": "linux32-xtensa-lx106-elf.tar.gz", 
+              "size": "32734156"
+            }, 
+            {
+              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz", 
+              "checksum": "SHA-256:f693946288f2ffa17288ef75ae16fa08573993f2b0a2a5e6bc35a68dc6087443", 
+              "host": "arm-linux-gnueabihf", 
+              "archiveFileName": "linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz", 
+              "size": "34938475"
+            }
+          ]
+        }, 
+        {
+          "version": "1.20.0-26-gb404fb9", 
+          "name": "xtensa-lx106-elf-gcc", 
+          "systems": [
+            {
+              "url": "http://arduino.esp8266.com/win32-xtensa-lx106-elf-gb404fb9.tar.gz", 
+              "checksum": "SHA-256:1561ec85cc58cab35cc48bfdb0d0087809f89c043112a2c36b54251a13bf781f", 
+              "host": "i686-mingw32", 
+              "archiveFileName": "win32-xtensa-lx106-elf-gb404fb9.tar.gz", 
+              "size": "153807368"
+            }, 
+            {
+              "url": "http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
+              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6", 
+              "host": "x86_64-apple-darwin", 
+              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
+              "size": "35385382"
+            }, 
+            {
+              "url": "http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
+              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6", 
+              "host": "i386-apple-darwin", 
+              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
+              "size": "35385382"
+            }, 
+            {
+              "url": "http://arduino.esp8266.com/linux64-xtensa-lx106-elf-gb404fb9.tar.gz", 
+              "checksum": "SHA-256:46f057fbd8b320889a26167daf325038912096d09940b2a95489db92431473b7", 
+              "host": "x86_64-pc-linux-gnu", 
+              "archiveFileName": "linux64-xtensa-lx106-elf-gb404fb9.tar.gz", 
+              "size": "30262903"
+            }, 
+            {
+              "url": "http://arduino.esp8266.com/linux32-xtensa-lx106-elf.tar.gz", 
+              "checksum": "SHA-256:b24817819f0078fb05895a640e806e0aca9aa96b47b80d2390ac8e2d9ddc955a", 
+              "host": "i686-pc-linux-gnu", 
+              "archiveFileName": "linux32-xtensa-lx106-elf.tar.gz", 
+              "size": "32734156"
+            }
+          ]
+        }, 
+        {
+          "version": "0.4.13", 
+          "name": "esptool", 
+          "systems": [
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-win32.zip", 
+              "checksum": "SHA-256:17c1035aacd8f6dbfbc04ed899f5db0ceba60820592705a9c6011476ab8d1687", 
+              "host": "i686-mingw32", 
+              "archiveFileName": "esptool-0.4.13-win32.zip", 
+              "size": "16660"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-osx.tar.gz", 
+              "checksum": "SHA-256:a24a973c3b2671992a8b66f4e7c9ffd24065972f241469f45e94a0a66d118d23", 
+              "host": "x86_64-apple-darwin", 
+              "archiveFileName": "esptool-0.4.13-osx.tar.gz", 
+              "size": "32362"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-osx.tar.gz", 
+              "checksum": "SHA-256:a24a973c3b2671992a8b66f4e7c9ffd24065972f241469f45e94a0a66d118d23", 
+              "host": "i386-apple-darwin", 
+              "archiveFileName": "esptool-0.4.13-osx.tar.gz", 
+              "size": "32362"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-linux64.tar.gz", 
+              "checksum": "SHA-256:3c35f366ffdaa1328b1e96e28c9a97f60c98109095ccc18352fb5615e582a786", 
+              "host": "x86_64-pc-linux-gnu", 
+              "archiveFileName": "esptool-0.4.13-linux64.tar.gz", 
+              "size": "15743"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-linux32.tar.gz", 
+              "checksum": "SHA-256:041f661a41a2efb40c89fc34acf0059bbb5e1eb1c050efaa69af677f79c966fb", 
+              "host": "i686-pc-linux-gnu", 
+              "archiveFileName": "esptool-0.4.13-linux32.tar.gz", 
+              "size": "14884"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-linux-armhf.tar.gz", 
+              "checksum": "SHA-256:3a627e2678e0c317122543883ae8a00e82149769414b9d5733f23526fb28a423", 
+              "host": "arm-linux-gnueabihf", 
+              "archiveFileName": "esptool-0.4.13-linux-armhf.tar.gz", 
+              "size": "13259"
+            }
+          ]
+        }, 
+        {
+          "version": "0.4.12", 
+          "name": "esptool", 
+          "systems": [
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-win32.zip", 
+              "checksum": "SHA-256:f47b3bcf7c29c7a184859bbea68c9d468cf3346ca41e202ed60a0a49d987f223", 
+              "host": "i686-mingw32", 
+              "archiveFileName": "esptool-0.4.12-win32.zip", 
+              "size": "16537"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-osx.tar.gz", 
+              "checksum": "SHA-256:8232a70611768dca49321f488e3ada29648e28aa83a6d826fcbb871aed4a9c08", 
+              "host": "x86_64-apple-darwin", 
+              "archiveFileName": "esptool-0.4.12-osx.tar.gz", 
+              "size": "31981"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-osx.tar.gz", 
+              "checksum": "SHA-256:8232a70611768dca49321f488e3ada29648e28aa83a6d826fcbb871aed4a9c08", 
+              "host": "i386-apple-darwin", 
+              "archiveFileName": "esptool-0.4.12-osx.tar.gz", 
+              "size": "31981"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-linux64.tar.gz", 
+              "checksum": "SHA-256:f7ca7666557139bda7b2130022623a004a30d20ea47e1612b9b365783f00d8cb", 
+              "host": "x86_64-pc-linux-gnu", 
+              "archiveFileName": "esptool-0.4.12-linux64.tar.gz", 
+              "size": "15542"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-linux32.tar.gz", 
+              "checksum": "SHA-256:2d9970c8574908c35656e35f433082aeb7d79c1967067d7d2cff83f5ed2acbaa", 
+              "host": "i686-pc-linux-gnu", 
+              "archiveFileName": "esptool-0.4.12-linux32.tar.gz", 
+              "size": "14668"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-linux-armhf.tar.gz", 
+              "checksum": "SHA-256:2ab4784c10020cdfc467175fe8885db702e7dd95fa5bdc428ec549257eae1a0e", 
+              "host": "arm-linux-gnueabihf", 
+              "archiveFileName": "esptool-0.4.12-linux-armhf.tar.gz", 
+              "size": "13097"
+            }
+          ]
+        }, 
+        {
+          "version": "0.4.9", 
+          "name": "esptool", 
+          "systems": [
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.9/esptool-0.4.9-win32.zip", 
+              "checksum": "SHA-256:9c4162cedf05fcb09fd829bfb90e34ae12458365980d79525a072ff5ca44751c", 
+              "host": "i686-mingw32", 
+              "archiveFileName": "esptool-0.4.9-win32.zip", 
+              "size": "32436"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.9/esptool-0.4.9-osx.tar.gz", 
+              "checksum": "SHA-256:57938b473765723a7e6602d55973017b7719bda69bdcff4250b24fcbf7a399f5", 
+              "host": "x86_64-apple-darwin", 
+              "archiveFileName": "esptool-0.4.9-osx.tar.gz", 
+              "size": "29310"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.9/esptool-0.4.9-osx.tar.gz", 
+              "checksum": "SHA-256:57938b473765723a7e6602d55973017b7719bda69bdcff4250b24fcbf7a399f5", 
+              "host": "i386-apple-darwin", 
+              "archiveFileName": "esptool-0.4.9-osx.tar.gz", 
+              "size": "29310"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.9/esptool-0.4.9-linux64.tar.gz", 
+              "checksum": "SHA-256:fab9d1be8a648bea6728ad5c9d18ce972508187700cf90baf1897ac9cdf4db15", 
+              "host": "x86_64-pc-linux-gnu", 
+              "archiveFileName": "esptool-0.4.9-linux64.tar.gz", 
+              "size": "15564"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.9/esptool-0.4.9-linux32.tar.gz", 
+              "checksum": "SHA-256:bc4444d73d59be74608be5e1431353a0a9ae9e308e99c76a271d68a6ae145b7b", 
+              "host": "i686-pc-linux-gnu", 
+              "archiveFileName": "esptool-0.4.9-linux32.tar.gz", 
+              "size": "15984"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.9/esptool-0.4.9-linux-armhf.tar.gz", 
+              "checksum": "SHA-256:d0364492599d90b8305125f8212de5be05397e4efde2fc7d0ed3676bb7018164", 
+              "host": "arm-linux-gnueabihf", 
+              "archiveFileName": "esptool-0.4.9-linux-armhf.tar.gz", 
+              "size": "13763"
+            }
+          ]
+        }, 
+        {
+          "version": "0.4.8", 
+          "name": "esptool", 
+          "systems": [
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-win32.zip", 
+              "checksum": "SHA-256:8d09cb0df6234c2a0562389ceedd11482b44a3f538695f9a4df80f9f10411ece", 
+              "host": "i686-mingw32", 
+              "archiveFileName": "esptool-0.4.8-win32.zip", 
+              "size": "32192"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-osx.tar.gz", 
+              "checksum": "SHA-256:2bcbf19934543fb06c505b2a595b68a76e4cab8e3d8968a4d1802195c87126cf", 
+              "host": "x86_64-apple-darwin", 
+              "archiveFileName": "esptool-0.4.8-osx.tar.gz", 
+              "size": "28798"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-osx.tar.gz", 
+              "checksum": "SHA-256:2bcbf19934543fb06c505b2a595b68a76e4cab8e3d8968a4d1802195c87126cf", 
+              "host": "i386-apple-darwin", 
+              "archiveFileName": "esptool-0.4.8-osx.tar.gz", 
+              "size": "28798"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-linux64.tar.gz", 
+              "checksum": "SHA-256:1cd9a6014bbbc37ba6dc249f4fc027f0ca9bbc6dd0e203ebc7d146dfd78a6e78", 
+              "host": "x86_64-pc-linux-gnu", 
+              "archiveFileName": "esptool-0.4.8-linux64.tar.gz", 
+              "size": "15479"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-linux32.tar.gz", 
+              "checksum": "SHA-256:b0d6e71e6f41d4ed7e167bb4b3f4f0b1b3e49d69af50ab7fbe952cbfed83f164", 
+              "host": "i686-pc-linux-gnu", 
+              "archiveFileName": "esptool-0.4.8-linux32.tar.gz", 
+              "size": "15444"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-linux-armhf.tar.gz", 
+              "checksum": "SHA-256:e9c4dfb81781610556a6af0377c8efc7cde359e0e2cda2fd48e0a32bae10f506", 
+              "host": "arm-linux-gnueabihf", 
+              "archiveFileName": "esptool-0.4.8-linux-armhf.tar.gz", 
+              "size": "13630"
+            }
+          ]
+        }, 
+        {
+          "version": "0.4.5", 
+          "name": "esptool", 
+          "systems": [
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.5/esptool-0.4.5-win32.zip", 
+              "checksum": "SHA-256:1b0a7d254e74942d820a09281aa5dc2af1c8314ae5ee1a5abb0653d0580e531b", 
+              "host": "i686-mingw32", 
+              "archiveFileName": "esptool-0.4.5-win32.zip", 
+              "size": "17408"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.5/esptool-0.4.5-osx.tar.gz", 
+              "checksum": "SHA-256:924d31c64f4bb9f748e70806dafbabb15e5eb80afcdde33715f3ec884be1652d", 
+              "host": "x86_64-apple-darwin", 
+              "archiveFileName": "esptool-0.4.5-osx.tar.gz", 
+              "size": "11359"
+            }, 
+            {
+              "url": "http://arduino.esp8266.com/esptool-0.4.5-1-gfaa5794-osx.tar.gz", 
+              "checksum": "SHA-256:722142071f6cf4d8c02dea42497a747e06abf583d86137a6a256b7db71dc61f6", 
+              "host": "i386-apple-darwin", 
+              "archiveFileName": "esptool-0.4.5-1-gfaa5794-osx.tar.gz", 
+              "size": "20751"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.5/esptool-0.4.5-linux64.tar.gz", 
+              "checksum": "SHA-256:4ce799e13fbd89f8a8f08a08db77dc3b1362c4486306fe1b3801dee80cfa3203", 
+              "host": "x86_64-pc-linux-gnu", 
+              "archiveFileName": "esptool-0.4.5-linux64.tar.gz", 
+              "size": "12789"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.5/esptool-0.4.5-linux32.tar.gz", 
+              "checksum": "SHA-256:a7a2c3200786d7396e8cafca1b9aefe56db8ec1dab5e9163d4a19358232a7d87", 
+              "host": "i686-pc-linux-gnu", 
+              "archiveFileName": "esptool-0.4.5-linux32.tar.gz", 
+              "size": "12055"
+            }
+          ]
+        }, 
+        {
+          "version": "0.4.6", 
+          "name": "esptool", 
+          "systems": [
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-win32.zip", 
+              "checksum": "SHA-256:0248bf78514a3195f583e29218ca7828a66e13c6e5545a078f1c1257033e4927", 
+              "host": "i686-mingw32", 
+              "archiveFileName": "esptool-0.4.6-win32.zip", 
+              "size": "17481"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-osx.tar.gz", 
+              "checksum": "SHA-256:0fe87ba7e29ee90a9fc72492aada8c0796f9e8f8a1c594b6b26cee2610d09bb3", 
+              "host": "x86_64-apple-darwin", 
+              "archiveFileName": "esptool-0.4.6-osx.tar.gz", 
+              "size": "20926"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-osx.tar.gz", 
+              "checksum": "SHA-256:0fe87ba7e29ee90a9fc72492aada8c0796f9e8f8a1c594b6b26cee2610d09bb3", 
+              "host": "i386-apple-darwin", 
+              "archiveFileName": "esptool-0.4.6-osx.tar.gz", 
+              "size": "20926"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-linux64.tar.gz", 
+              "checksum": "SHA-256:f9f456e9a42bb2597126c513cb8865f923fb978865d4838b9623d322216b74d0", 
+              "host": "x86_64-pc-linux-gnu", 
+              "archiveFileName": "esptool-0.4.6-linux64.tar.gz", 
+              "size": "12885"
+            }, 
+            {
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-linux32.tar.gz", 
+              "checksum": "SHA-256:85275ca03a82bfc456f5a84e86962ca1e470ea2e168829c38ca29ee668831d93", 
+              "host": "i686-pc-linux-gnu", 
+              "archiveFileName": "esptool-0.4.6-linux32.tar.gz", 
+              "size": "13417"
+            }
+          ]
+        }, 
+        {
+          "version": "0.1.2", 
+          "name": "mkspiffs", 
+          "systems": [
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-windows.zip", 
+              "checksum": "SHA-256:0a29119b8458b61a877408f7995e4944623a712e0d313a2c2f76af9ab55cc9f2", 
+              "host": "i686-mingw32", 
+              "archiveFileName": "mkspiffs-0.1.2-windows.zip", 
+              "size": "230802"
+            }, 
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-osx.tar.gz", 
+              "checksum": "SHA-256:df656fae21a41c1269ea50cb53752dcaf6a4e1437255f3a9fb50b4025549b58e", 
+              "host": "x86_64-apple-darwin", 
+              "archiveFileName": "mkspiffs-0.1.2-osx.tar.gz", 
+              "size": "115091"
+            }, 
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-osx.tar.gz", 
+              "checksum": "SHA-256:df656fae21a41c1269ea50cb53752dcaf6a4e1437255f3a9fb50b4025549b58e", 
+              "host": "i386-apple-darwin", 
+              "archiveFileName": "mkspiffs-0.1.2-osx.tar.gz", 
+              "size": "115091"
+            }, 
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-linux64.tar.gz", 
+              "checksum": "SHA-256:1a1dd81b51daf74c382db71b42251757ca4136e8762107e69feaa8617bac315f", 
+              "host": "x86_64-pc-linux-gnu", 
+              "archiveFileName": "mkspiffs-0.1.2-linux64.tar.gz", 
+              "size": "46281"
+            }, 
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-linux32.tar.gz", 
+              "checksum": "SHA-256:e990d545dfcae308aabaac5fa9e1db734cc2b08167969e7eedac88bd0839667c", 
+              "host": "i686-pc-linux-gnu", 
+              "archiveFileName": "mkspiffs-0.1.2-linux32.tar.gz", 
+              "size": "45272"
+            }, 
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-linux-armhf.tar.gz", 
+              "checksum": "SHA-256:5a8836932cd24325d69054cebdd46359eba02919ffaa87b130c54acfecc13f46", 
+              "host": "arm-linux-gnueabihf", 
+              "archiveFileName": "mkspiffs-0.1.2-linux-armhf.tar.gz", 
+              "size": "41685"
+            }
+          ]
+        }, 
+        {
+          "version": "0.2.0", 
+          "name": "mkspiffs", 
+          "systems": [
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-windows.zip", 
+              "checksum": "SHA-256:4fbe17d2be4229c0eebb3939d14e9d96e74ba17724ab34276eb6d019006ce900", 
+              "host": "i686-mingw32", 
+              "archiveFileName": "mkspiffs-0.2.0-no_magic_length-windows.zip", 
+              "size": "347038"
+            }, 
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-osx.tar.gz", 
+              "checksum": "SHA-256:e784d0b60c8b0ddc28e6467f5bffb7ae50db0a52c46b9ca18e71de0bf7f40a4d", 
+              "host": "x86_64-apple-darwin", 
+              "archiveFileName": "mkspiffs-0.2.0-no_magic_length-osx.tar.gz", 
+              "size": "119145"
+            }, 
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-osx.tar.gz", 
+              "checksum": "SHA-256:e784d0b60c8b0ddc28e6467f5bffb7ae50db0a52c46b9ca18e71de0bf7f40a4d", 
+              "host": "i386-apple-darwin", 
+              "archiveFileName": "mkspiffs-0.2.0-no_magic_length-osx.tar.gz", 
+              "size": "119145"
+            }, 
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-linux64.tar.gz", 
+              "checksum": "SHA-256:b63a99b844c3debeffe605ff2632d8b8a5c365431ee5a091fa0e6e3e1be1bc6c", 
+              "host": "x86_64-pc-linux-gnu", 
+              "archiveFileName": "mkspiffs-0.2.0-no_magic_length-linux64.tar.gz", 
+              "size": "48995"
+            }, 
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-linux32.tar.gz", 
+              "checksum": "SHA-256:dfed9bc40a88a2c89b78acc83181aff401abf1620b8041b136aa2ad6cd08779d", 
+              "host": "i686-pc-linux-gnu", 
+              "archiveFileName": "mkspiffs-0.2.0-no_magic_length-linux32.tar.gz", 
+              "size": "47659"
+            }, 
+            {
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-linux-armhf.tar.gz", 
+              "checksum": "SHA-256:42367eb960ac8e3af32a2b4c5dd93dcff94464964e30f483d58e8cb96a895eb5", 
+              "host": "arm-linux-gnueabihf", 
+              "archiveFileName": "mkspiffs-0.2.0-no_magic_length-linux-armhf.tar.gz", 
+              "size": "43609"
+            }
+          ]
+        }
+      ], 
+      "email": "ivan@esp8266.com", 
+      "name": "esp8266"
+    }
+  ]
+}
