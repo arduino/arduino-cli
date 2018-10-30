@@ -355,8 +355,9 @@ func (pm *PackageManager) GetAllInstalledToolsReleases() []*cores.ToolRelease {
 }
 
 func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.ToolRelease, error) {
-	// core := board.Properties["build.core"]
+	pm.Log.Infof("Searching tools required for board %s", board)
 
+	// core := board.Properties["build.core"]
 	platform := board.PlatformRelease
 
 	// maps "PACKAGER:TOOL" => ToolRelease
@@ -368,18 +369,19 @@ func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*core
 		for _, tool := range targetPackage.Tools {
 			rel := tool.GetLatestInstalled()
 			if rel != nil {
-				foundTools[rel.Tool.String()] = rel
+				foundTools[rel.Tool.Name] = rel
 			}
 		}
 	}
 
 	// replace the default tools above with the specific required by the current platform
 	for _, toolDep := range platform.Dependencies {
+		pm.Log.WithField("tool", toolDep).Infof("Required tool")
 		tool := pm.FindToolDependency(toolDep)
 		if tool == nil {
 			return nil, fmt.Errorf("tool release not found: %s", toolDep)
 		}
-		foundTools[tool.Tool.String()] = tool
+		foundTools[tool.Tool.Name] = tool
 	}
 
 	requiredTools := []*cores.ToolRelease{}
