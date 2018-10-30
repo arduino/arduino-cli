@@ -26,13 +26,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var customHardware = paths.New("testdata", "custom_hardware")
+
 func TestFindBoardWithFQBN(t *testing.T) {
-	pm := packagemanager.NewPackageManager(
-		paths.New("testdata"),
-		paths.New("testdata"),
-		paths.New("testdata"),
-		paths.New("testdata"))
-	pm.LoadHardwareFromDirectory(paths.New("testdata"))
+	pm := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
+	pm.LoadHardwareFromDirectory(customHardware)
 
 	board, err := pm.FindBoardWithFQBN("arduino:avr:uno")
 	require.Nil(t, err)
@@ -46,12 +44,8 @@ func TestFindBoardWithFQBN(t *testing.T) {
 }
 
 func TestBoardOptionsFunctions(t *testing.T) {
-	pm := packagemanager.NewPackageManager(
-		paths.New("testdata"),
-		paths.New("testdata"),
-		paths.New("testdata"),
-		paths.New("testdata"))
-	pm.LoadHardwareFromDirectory(paths.New("testdata"))
+	pm := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
+	pm.LoadHardwareFromDirectory(customHardware)
 
 	nano, err := pm.FindBoardWithFQBN("arduino:avr:nano")
 	require.Nil(t, err)
