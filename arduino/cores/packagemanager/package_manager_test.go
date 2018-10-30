@@ -18,15 +18,21 @@
 package packagemanager_test
 
 import (
+	"net/url"
 	"testing"
 
+	"go.bug.st/relaxed-semver"
+
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
 var customHardware = paths.New("testdata", "custom_hardware")
+var dataDir1 = paths.New("testdata", "data_dir_1")
 
 func TestFindBoardWithFQBN(t *testing.T) {
 	pm := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
@@ -78,4 +84,58 @@ func TestBoardOptionsFunctions(t *testing.T) {
 		// Some option values are missing for a particular OS: check that only the available options are listed
 		require.Equal(t, k, v)
 	}
+}
+
+func TestFindToolsRequiredForBoard(t *testing.T) {
+	pm := packagemanager.NewPackageManager(
+		dataDir1,
+		dataDir1.Join("packages"),
+		dataDir1.Join("staging"),
+		dataDir1)
+	conf := &configs.Configuration{
+		DataDir: dataDir1,
+	}
+	loadIndex := func(addr string) {
+		res, err := url.Parse(addr)
+		require.NoError(t, err)
+		require.NoError(t, pm.LoadPackageIndex(res))
+	}
+	loadIndex("https://dl.espressif.com/dl/package_esp32_index.json")
+	loadIndex("http://arduino.esp8266.com/stable/package_esp8266com_index.json")
+	require.NoError(t, pm.LoadHardware(conf))
+	esp32, err := pm.FindBoardWithFQBN("esp32:esp32:esp32")
+	require.NoError(t, err)
+	esptool231 := pm.FindToolDependency(&cores.ToolDependency{
+		ToolPackager: "esp32",
+		ToolName:     "esptool",
+		ToolVersion:  semver.ParseRelaxed("2.3.1"),
+	})
+	require.NotNil(t, esptool231)
+	esptool0413 := pm.FindToolDependency(&cores.ToolDependency{
+		ToolPackager: "esp8266",
+		ToolName:     "esptool",
+		ToolVersion:  semver.ParseRelaxed("0.4.13"),
+	})
+	require.NotNil(t, esptool0413)
+
+	testConflictingToolsInDifferentPackages := func() {
+		tools, err := pm.FindToolsRequiredForBoard(esp32)
+		require.NoError(t, err)
+		require.Contains(t, tools, esptool231)
+		require.NotContains(t, tools, esptool0413)
+	}
+
+	// As seen in https://github.com/arduino/arduino-cli/issues/73 the map randomess
+	// may make the function fail half of the times. Repeating the test 10 times
+	// greatly increases the chances to trigger the bad case.
+	testConflictingToolsInDifferentPackages()
+	testConflictingToolsInDifferentPackages()
+	testConflictingToolsInDifferentPackages()
+	testConflictingToolsInDifferentPackages()
+	testConflictingToolsInDifferentPackages()
+	testConflictingToolsInDifferentPackages()
+	testConflictingToolsInDifferentPackages()
+	testConflictingToolsInDifferentPackages()
+	testConflictingToolsInDifferentPackages()
+	testConflictingToolsInDifferentPackages()
 }
