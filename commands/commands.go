@@ -48,9 +48,10 @@ const (
 	// directories vital for the CLI to work.
 	ErrCoreConfig
 	ErrBadArgument
-
-	Version = "0.3.1-alpha.preview"
 )
+
+// Version is the current CLI version
+var Version = "0.3.2-alpha.preview"
 
 // ErrLogrus represents the logrus instance, which has the role to
 // log all non info messages.
