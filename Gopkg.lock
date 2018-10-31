@@ -471,11 +471,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3b39cca56c8d1e5a4a16d6c041d183e1ada936d8dd90e0fc24c091f611e08d3d"
+  digest = "1:6744c6d7a97ff6a89a54e88aea6e032dab293c34e8ea7c10a6e8414b65b015b3"
   name = "gopkg.in/cheggaaa/pb.v1"
   packages = ["."]
   pruneopts = "UT"
-  revision = "a3473a4838ba0678c66a8aca05ff97345f81b0ec"
+  revision = "291d751a997645784a6067bc8a4c528e819ee171"
   source = "github.com/cmaglie/pb"
 
 [[projects]]

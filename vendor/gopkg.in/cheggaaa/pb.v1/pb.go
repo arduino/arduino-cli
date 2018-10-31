@@ -13,7 +13,7 @@ import (
 )
 
 // Current version
-const Version = "1.0.25"
+const Version = "1.0.26"
 
 const (
 	// Default refresh rate - 200ms
@@ -296,12 +296,11 @@ func (pb *ProgressBar) NewProxyReader(r io.Reader) *Reader {
 }
 
 func (pb *ProgressBar) write(total, current int64) {
+	pb.mu.Lock()
+	defer pb.mu.Unlock()
 	width := pb.GetWidth()
 
 	var percentBox, countersBox, timeLeftBox, timeSpentBox, speedBox, barBox, end, out string
-	pb.mu.Lock()
-	prefix := pb.prefix
-	postfix := pb.postfix
 
 	// percents
 	if pb.ShowPercent {
@@ -330,7 +329,6 @@ func (pb *ProgressBar) write(total, current int64) {
 	fromStart := time.Now().Sub(pb.startTime)
 	lastChangeTime := pb.changeTime
 	fromChange := lastChangeTime.Sub(pb.startTime)
-	pb.mu.Unlock()
 
 	if pb.ShowElapsedTime {
 		timeSpentBox = fmt.Sprintf(" %s ", (fromStart/time.Second)*time.Second)
@@ -373,7 +371,7 @@ func (pb *ProgressBar) write(total, current int64) {
 		speedBox = " " + Format(int64(speed)).To(pb.Units).Width(pb.UnitsWidth).PerSec().String()
 	}
 
-	barWidth := escapeAwareRuneCountInString(countersBox + pb.BarStart + pb.BarEnd + percentBox + timeSpentBox + timeLeftBox + speedBox + prefix + postfix)
+	barWidth := escapeAwareRuneCountInString(countersBox + pb.BarStart + pb.BarEnd + percentBox + timeSpentBox + timeLeftBox + speedBox + pb.prefix + pb.postfix)
 	// bar
 	if pb.ShowBar {
 		size := width - barWidth
@@ -419,13 +417,12 @@ func (pb *ProgressBar) write(total, current int64) {
 
 	// check len
 	out = pb.prefix + timeSpentBox + countersBox + barBox + percentBox + speedBox + timeLeftBox + pb.postfix
+
 	if cl := escapeAwareRuneCountInString(out); cl < width {
 		end = strings.Repeat(" ", width-cl)
 	}
 
 	// and print!
-	pb.mu.Lock()
-	defer pb.mu.Unlock()
 	pb.lastPrint = out + end
 	isFinish := pb.isFinish
 
