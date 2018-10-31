@@ -20,7 +20,7 @@ type Downloader struct {
 	URL       string
 	Done      chan bool
 	resp      *http.Response
-	out       io.Writer
+	out       *os.File
 	completed int64
 	size      int64
 	err       error
@@ -36,7 +36,15 @@ const (
 
 // Close the download
 func (d *Downloader) Close() error {
-	return d.resp.Body.Close()
+	err1 := d.out.Close()
+	err2 := d.resp.Body.Close()
+	if err1 != nil {
+		return fmt.Errorf("closing output file: %s", err1)
+	}
+	if err2 != nil {
+		return fmt.Errorf("closing input stream: %s", err2)
+	}
+	return nil
 }
 
 // Size return the size of the download
@@ -81,8 +89,8 @@ func (d *Downloader) AsyncRun() {
 			break
 		}
 	}
-	d.Done <- true
 	d.Close()
+	d.Done <- true
 }
 
 // Run starts the downloader and waits until it completes the download.
