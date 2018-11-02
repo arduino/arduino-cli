@@ -60,31 +60,30 @@ func downloadPlatformByRef(pm *packagemanager.PackageManager, platformsRef *pack
 		formatter.PrintError(err, "Could not determine platform dependencies")
 		os.Exit(commands.ErrBadCall)
 	}
-
-	// Check if all tools have a flavor available for the current OS
+	downloadPlatform(pm, platform)
 	for _, tool := range tools {
-		if tool.GetCompatibleFlavour() == nil {
-			formatter.PrintErrorMessage("The tool " + tool.String() + " is not available for the current OS")
-			os.Exit(commands.ErrGeneric)
-		}
+		downloadTool(pm, tool)
+	}
+}
+
+func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) {
+	// Download platform
+	resp, err := pm.DownloadPlatformRelease(platformRelease)
+	download(resp, err, platformRelease.String())
+}
+
+func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease) {
+	// Check if tool has a flavor available for the current OS
+	if tool.GetCompatibleFlavour() == nil {
+		formatter.PrintErrorMessage("The tool " + tool.String() + " is not available for the current OS")
+		os.Exit(commands.ErrGeneric)
 	}
 
-	// Download tools
-	for _, tool := range tools {
-		DownloadToolRelease(pm, tool)
-	}
-
-	// Download cores
-	formatter.Print("Downloading " + platform.String() + "...")
-	resp, err := pm.DownloadPlatformRelease(platform)
-	download(resp, err, platform.String())
-
-	logrus.Info("Done")
+	DownloadToolRelease(pm, tool)
 }
 
 // DownloadToolRelease downloads a ToolRelease
 func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) {
-	formatter.Print("Downloading " + toolRelease.String() + "...")
 	resp, err := pm.DownloadToolRelease(toolRelease)
 	download(resp, err, toolRelease.String())
 }
@@ -98,6 +97,7 @@ func download(d *downloader.Downloader, err error, label string) {
 		formatter.Print(label + " already downloaded")
 		return
 	}
+	formatter.Print("Downloading " + label + "...")
 	formatter.DownloadProgressBar(d, label)
 	if d.Error() != nil {
 		formatter.PrintError(d.Error(), "Error downloading "+label)

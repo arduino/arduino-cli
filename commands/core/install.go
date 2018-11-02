@@ -50,7 +50,6 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	pm := commands.InitPackageManagerWithoutBundles()
 
 	for _, platformRef := range platformsRefs {
-		downloadPlatformByRef(pm, platformRef)
 		installPlatformByRef(pm, platformRef)
 	}
 
@@ -64,19 +63,39 @@ func installPlatformByRef(pm *packagemanager.PackageManager, platformRef *packag
 		os.Exit(commands.ErrBadCall)
 	}
 
-	// TODO: Check install prerequisites here
-
-	// TODO: Download here
-
-	for _, tool := range tools {
-		InstallToolRelease(pm, tool)
-	}
-	installPlatformRelease(pm, platform)
+	installPlatform(pm, platform, tools)
 }
 
-func installPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) {
+func installPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease) {
 	log := pm.Log.WithField("platform", platformRelease)
 
+	// Prerequisite checks before install
+	if platformRelease.IsInstalled() {
+		log.Warn("Platform already installed")
+		formatter.Print("Platform " + platformRelease.String() + " already installed")
+		return
+	}
+	toolsToInstall := []*cores.ToolRelease{}
+	for _, tool := range requiredTools {
+		if tool.IsInstalled() {
+			log.WithField("tool", tool).Warn("Tool already installed")
+			formatter.Print("Tool " + tool.String() + " already installed")
+		} else {
+			toolsToInstall = append(toolsToInstall, tool)
+		}
+	}
+
+	// Package download
+	for _, tool := range toolsToInstall {
+		downloadTool(pm, tool)
+	}
+	downloadPlatform(pm, platformRelease)
+
+	for _, tool := range toolsToInstall {
+		InstallToolRelease(pm, tool)
+	}
+
+	// Are we installing or upgrading?
 	platform := platformRelease.Platform
 	installed := pm.GetInstalledPlatformRelease(platform)
 	if installed == nil {
@@ -87,12 +106,8 @@ func installPlatformRelease(pm *packagemanager.PackageManager, platformRelease *
 		formatter.Print("Updating " + installed.String() + " with " + platformRelease.String() + "...")
 	}
 
+	// Install
 	err := pm.InstallPlatform(platformRelease)
-	if os.IsExist(err) {
-		log.Warn("Platform already installed")
-		formatter.Print("Platform " + platformRelease.String() + " already installed")
-		return
-	}
 	if err != nil {
 		log.WithError(err).Error("Cannot install platform")
 		formatter.PrintError(err, "Cannot install platform")
@@ -125,15 +140,15 @@ func installPlatformRelease(pm *packagemanager.PackageManager, platformRelease *
 func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) {
 	log := pm.Log.WithField("Tool", toolRelease)
 
-	log.Info("Installing tool")
-	formatter.Print("Installing " + toolRelease.String())
-
-	err := pm.InstallTool(toolRelease)
-	if os.IsExist(err) {
+	if toolRelease.IsInstalled() {
 		log.Warn("Tool already installed")
 		formatter.Print("Tool " + toolRelease.String() + " already installed")
 		return
 	}
+
+	log.Info("Installing tool")
+	formatter.Print("Installing " + toolRelease.String() + "...")
+	err := pm.InstallTool(toolRelease)
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
 		formatter.PrintError(err, "Cannot install tool: "+toolRelease.String())

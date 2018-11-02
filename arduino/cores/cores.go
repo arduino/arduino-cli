@@ -214,6 +214,11 @@ func (release *PlatformRelease) GetLibrariesDir() *paths.Path {
 	return nil
 }
 
+// IsInstalled returns true if the PlatformRelease is installed
+func (release *PlatformRelease) IsInstalled() bool {
+	return release.InstallDir != nil
+}
+
 func (release *PlatformRelease) String() string {
 	version := ""
 	if release.Version != nil {
