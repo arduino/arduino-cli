@@ -103,7 +103,7 @@ func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.
 	log := pm.Log.WithField("Tool", toolRelease)
 
 	log.Info("Uninstalling tool")
-	formatter.Print("Uninstalling " + toolRelease.String())
+	formatter.Print("Uninstalling " + toolRelease.String() + "...")
 
 	if err := pm.UninstallTool(toolRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
