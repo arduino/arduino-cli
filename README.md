@@ -157,6 +157,19 @@ with `arduino-cli board listall` and also search for a specific board:
 Great! Now we have the Board FQBN (Fully Qualified Board Name) `arduino:samd:mkr1000`
 and the Board Name look good, we are ready to compile and upload the sketch
 
+#### Adding 3rd party cores
+To add 3rd party core packages add  a link of the additional package to the file  `.cli-config.yml`
+
+If you want to add the ESP8266 core, for example:
+
+    board_manager:
+      additional_urls:
+        - http://arduino.esp8266.com/stable/package_esp8266com_index.json
+And then run:
+    
+    arduino-cli core update-index
+    arduino-cli core install esp8266:esp8266
+
 ### Step 5. Compile the sketch
 To compile the sketch we have to run the `compile` command with the proper FQBN we just got in the previous command.
 
@@ -308,5 +321,4 @@ Because:
 #### How can I find the core/FQBN for a board?
 
 See: https://github.com/arduino/arduino-cli#step-4-find-and-install-the-right-core
-
 
