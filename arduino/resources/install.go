@@ -18,11 +18,13 @@
 package resources
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract"
+	"go.bug.st/cleanup"
 )
 
 // Install installs the resource in three steps:
@@ -54,7 +56,9 @@ func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.P
 	defer file.Close()
 
 	// Extract into temp directory
-	if err := extract.Archive(file, tempDir.String(), nil); err != nil {
+	ctx, cancel := cleanup.InterruptableContext(context.Background())
+	defer cancel()
+	if err := extract.Archive(ctx, file, tempDir.String(), nil); err != nil {
 		return fmt.Errorf("extracting archive: %s", err)
 	}
 
