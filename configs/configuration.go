@@ -20,6 +20,7 @@ package configs
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/arduino/go-paths-helper"
 )
@@ -42,7 +43,12 @@ type Configuration struct {
 	// the field is true if the CLI is bundled with the Arduino IDE, false if the CLI is running
 	// standalone or nil if the detection has not been performed.
 	IDEBundledCheckResult *bool
+
+	// BoardManagerAdditionalUrls contains the additional URL for 3rd party packages
+	BoardManagerAdditionalUrls []*url.URL
 }
+
+var defaultPackageIndexURL, _ = url.Parse("https://downloads.arduino.cc/packages/package_index.json")
 
 // NewConfiguration returns a new Configuration with the default values
 func NewConfiguration() (*Configuration, error) {
@@ -56,9 +62,10 @@ func NewConfiguration() (*Configuration, error) {
 	}
 
 	return &Configuration{
-		ConfigFile:    getDefaultConfigFilePath(),
-		DataDir:       dataDir,
-		SketchbookDir: sketchbookDir,
+		ConfigFile:                 getDefaultConfigFilePath(),
+		DataDir:                    dataDir,
+		SketchbookDir:              sketchbookDir,
+		BoardManagerAdditionalUrls: []*url.URL{defaultPackageIndexURL},
 	}, nil
 }
 

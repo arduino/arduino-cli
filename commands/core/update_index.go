@@ -28,7 +28,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -51,7 +50,7 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 }
 
 func updateIndexes() {
-	for _, URL := range configs.BoardManagerAdditionalUrls {
+	for _, URL := range commands.Config.BoardManagerAdditionalUrls {
 		updateIndex(URL)
 	}
 }
