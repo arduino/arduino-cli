@@ -25,6 +25,7 @@ import (
 
 	"go.bug.st/downloader"
 
+	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
@@ -82,6 +83,11 @@ func updateIndex(URL *url.URL) {
 	if d.Error() != nil {
 		formatter.PrintError(d.Error(), "Error downloading index "+URL.String())
 		os.Exit(commands.ErrNetwork)
+	}
+
+	if _, err := packageindex.LoadIndex(tmp); err != nil {
+		formatter.PrintError(err, "Invalid package index in "+URL.String())
+		os.Exit(commands.ErrGeneric)
 	}
 
 	if err := indexDirPath.MkdirAll(); err != nil {
