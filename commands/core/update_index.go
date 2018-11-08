@@ -58,22 +58,26 @@ func updateIndexes() {
 // TODO: This should be in packagemanager......
 func updateIndex(URL *url.URL) {
 	logrus.WithField("url", URL).Print("Updating index")
-	indexDirPath := commands.Config.IndexesDir()
-	coreIndexPath := indexDirPath.Join(path.Base(URL.Path))
 
 	tmpFile, err := ioutil.TempFile("", "")
 	if err != nil {
 		formatter.PrintError(err, "Error creating temp file for download")
 		os.Exit(commands.ErrGeneric)
 	}
-	defer os.Remove(tmpFile.Name())
-	tmpFile.Close()
+	if err := tmpFile.Close(); err != nil {
+		formatter.PrintError(err, "Error creating temp file for download")
+		os.Exit(commands.ErrGeneric)
+	}
+	tmp := paths.New(tmpFile.Name())
+	defer tmp.Remove()
 
-	d, err := downloader.Download(tmpFile.Name(), URL.String())
+	d, err := downloader.Download(tmp.String(), URL.String())
 	if err != nil {
 		formatter.PrintError(err, "Error downloading index "+URL.String())
 		os.Exit(commands.ErrNetwork)
 	}
+	indexDirPath := commands.Config.IndexesDir()
+	coreIndexPath := indexDirPath.Join(path.Base(URL.Path))
 	formatter.DownloadProgressBar(d, "Updating index: "+coreIndexPath.Base())
 	if d.Error() != nil {
 		formatter.PrintError(d.Error(), "Error downloading index "+URL.String())
@@ -85,7 +89,7 @@ func updateIndex(URL *url.URL) {
 		os.Exit(commands.ErrGeneric)
 	}
 
-	if err := paths.New(tmpFile.Name()).CopyTo(coreIndexPath); err != nil {
+	if err := tmp.CopyTo(coreIndexPath); err != nil {
 		formatter.PrintError(err, "Error saving downloaded index "+URL.String())
 		os.Exit(commands.ErrGeneric)
 	}
