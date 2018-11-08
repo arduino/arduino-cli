@@ -426,6 +426,42 @@ func TestCompileCommands(t *testing.T) {
 	require.True(t, paths.New("anothertest", "test2.hex").Exist())
 }
 
+func TestInvalidCoreURL(t *testing.T) {
+	defer makeTempDataDir(t)()
+	defer makeTempSketchbookDir(t)()
+
+	tmp, err := paths.MkTempDir("", "")
+	require.NoError(t, err, "making temporary dir")
+	defer tmp.RemoveAll()
+
+	configFile := tmp.Join("cli-config.yml")
+	configFile.WriteFile([]byte(`
+board_manager:
+  additional_urls:
+    - http://www.example.com/package_example_index.json
+`))
+
+	require.NoError(t, currDataDir.MkdirAll())
+	err = currDataDir.Join("package_index.json").WriteFile([]byte(`{ "packages": [] }`))
+	require.NoError(t, err, "Writing empty json index file")
+	err = currDataDir.Join("package_example_index.json").WriteFile([]byte(`{ "packages": [] }`))
+	require.NoError(t, err, "Writing empty json index file")
+
+	// Empty cores list
+	exitCode, d := executeWithArgs(t, "--config-file", configFile.String(), "core", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.Empty(t, strings.TrimSpace(string(d)))
+
+	// Empty cores list
+	exitCode, _ = executeWithArgs(t, "--config-file", configFile.String(), "core", "update-index")
+	require.NotZero(t, exitCode, "exit code")
+
+	// Empty cores list
+	exitCode, d = executeWithArgs(t, "--config-file", configFile.String(), "core", "list")
+	require.Zero(t, exitCode, "exit code")
+	require.Empty(t, strings.TrimSpace(string(d)))
+}
+
 func TestCoreCommands(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
