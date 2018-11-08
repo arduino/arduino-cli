@@ -87,7 +87,7 @@ func (config *Configuration) LoadFromDesktopIDEPreferences() error {
 	if URLs, has := props.GetOk("boardsmanager.additional.urls"); has {
 		for _, URL := range strings.Split(URLs, ",") {
 			if newURL, err := url.Parse(URL); err == nil {
-				BoardManagerAdditionalUrls = append(BoardManagerAdditionalUrls, newURL)
+				config.BoardManagerAdditionalUrls = append(config.BoardManagerAdditionalUrls, newURL)
 			}
 		}
 	}

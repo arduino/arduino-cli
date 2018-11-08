@@ -81,7 +81,7 @@ func (config *Configuration) LoadFromYAML(path *paths.Path) error {
 				logrus.WithError(err).Warn("Error parsing config")
 				continue
 			}
-			BoardManagerAdditionalUrls = append(BoardManagerAdditionalUrls, url)
+			config.BoardManagerAdditionalUrls = append(config.BoardManagerAdditionalUrls, url)
 		}
 	}
 	return nil
@@ -104,9 +104,9 @@ func (config *Configuration) SerializeToYAML() ([]byte, error) {
 			Password: ProxyPassword,
 		}
 	}
-	if len(BoardManagerAdditionalUrls) > 1 {
+	if len(config.BoardManagerAdditionalUrls) > 1 {
 		c.BoardsManager = &yamlBoardsManagerConfig{AdditionalURLS: []string{}}
-		for _, URL := range BoardManagerAdditionalUrls[1:] {
+		for _, URL := range config.BoardManagerAdditionalUrls[1:] {
 			c.BoardsManager.AdditionalURLS = append(c.BoardsManager.AdditionalURLS, URL.String())
 		}
 	}
