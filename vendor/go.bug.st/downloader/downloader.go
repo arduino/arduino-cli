@@ -11,19 +11,20 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"sync/atomic"
+	"sync"
 	"time"
 )
 
 // Downloader is an asynchronous downloader
 type Downloader struct {
-	URL       string
-	Done      chan bool
-	resp      *http.Response
-	out       *os.File
-	completed int64
-	size      int64
-	err       error
+	URL           string
+	Done          chan bool
+	resp          *http.Response
+	out           *os.File
+	completed     int64
+	completedLock sync.Mutex
+	size          int64
+	err           error
 }
 
 // DownloadOptions are optional flags that can be passed to Download function
@@ -79,7 +80,9 @@ func (d *Downloader) AsyncRun() {
 		n, err := in.Read(buff[:])
 		if n > 0 {
 			d.out.Write(buff[:n])
-			atomic.AddInt64(&d.completed, int64(n))
+			d.completedLock.Lock()
+			d.completed += int64(n)
+			d.completedLock.Unlock()
 		}
 		if err == io.EOF {
 			break
@@ -107,7 +110,10 @@ func (d *Downloader) Error() error {
 
 // Completed returns the bytes read so far
 func (d *Downloader) Completed() int64 {
-	return atomic.LoadInt64(&d.completed)
+	d.completedLock.Lock()
+	res := d.completed
+	d.completedLock.Unlock()
+	return res
 }
 
 // Download returns an asynchronous downloader that will donwload the specified url
