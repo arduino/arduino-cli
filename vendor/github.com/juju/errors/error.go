@@ -52,7 +52,7 @@ func NewErr(format string, args ...interface{}) Err {
 	}
 }
 
-// NewErrWithCause is used to return an Err with case by other error for the purpose of embedding in other
+// NewErrWithCause is used to return an Err with cause by other error for the purpose of embedding in other
 // structures. The location is not specified, and needs to be set with a call
 // to SetLocation.
 //
@@ -143,6 +143,10 @@ func (e *Err) Format(s fmt.State, verb rune) {
 		fallthrough
 	case 's':
 		fmt.Fprintf(s, "%s", e.Error())
+	case 'q':
+		fmt.Fprintf(s, "%q", e.Error())
+	default:
+		fmt.Fprintf(s, "%%!%c(%T=%s)", verb, e, e.Error())
 	}
 }
 
