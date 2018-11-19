@@ -67,11 +67,11 @@ func (config *Configuration) LoadFromYAML(path *paths.Path) error {
 		config.SketchbookDir = paths.New(ret.SketchbookPath)
 	}
 	if ret.ProxyType != "" {
-		ProxyType = ret.ProxyType
+		config.ProxyType = ret.ProxyType
 		if ret.ProxyManualConfig != nil {
-			ProxyHostname = ret.ProxyManualConfig.Hostname
-			ProxyUsername = ret.ProxyManualConfig.Username
-			ProxyPassword = ret.ProxyManualConfig.Password
+			config.ProxyHostname = ret.ProxyManualConfig.Hostname
+			config.ProxyUsername = ret.ProxyManualConfig.Username
+			config.ProxyPassword = ret.ProxyManualConfig.Password
 		}
 	}
 	if ret.BoardsManager != nil {
@@ -96,12 +96,12 @@ func (config *Configuration) SerializeToYAML() ([]byte, error) {
 	if config.DataDir != nil {
 		c.ArduinoDataDir = config.DataDir.String()
 	}
-	c.ProxyType = ProxyType
-	if ProxyType == "manual" {
+	c.ProxyType = config.ProxyType
+	if config.ProxyType == "manual" {
 		c.ProxyManualConfig = &yamlProxyConfig{
-			Hostname: ProxyHostname,
-			Username: ProxyUsername,
-			Password: ProxyPassword,
+			Hostname: config.ProxyHostname,
+			Username: config.ProxyUsername,
+			Password: config.ProxyPassword,
 		}
 	}
 	if len(config.BoardManagerAdditionalUrls) > 1 {
