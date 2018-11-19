@@ -26,7 +26,7 @@ import (
 // LoadFromEnv read configurations from the environment variables
 func (config *Configuration) LoadFromEnv() {
 	if p, has := os.LookupEnv("PROXY_TYPE"); has {
-		ProxyType = p
+		config.ProxyType = p
 	}
 	if dir, has := os.LookupEnv("ARDUINO_SKETCHBOOK_DIR"); has {
 		config.SketchbookDir = paths.New(dir)

@@ -46,6 +46,18 @@ type Configuration struct {
 
 	// BoardManagerAdditionalUrls contains the additional URL for 3rd party packages
 	BoardManagerAdditionalUrls []*url.URL
+
+	// ProxyType is the type of proxy configured
+	ProxyType string
+
+	// ProxyHostname is the proxy hostname
+	ProxyHostname string
+
+	// ProxyUsername is the proxy user
+	ProxyUsername string
+
+	// ProxyPassword is the proxy password
+	ProxyPassword string
 }
 
 var defaultPackageIndexURL, _ = url.Parse("https://downloads.arduino.cc/packages/package_index.json")
@@ -66,6 +78,7 @@ func NewConfiguration() (*Configuration, error) {
 		DataDir:                    dataDir,
 		SketchbookDir:              sketchbookDir,
 		BoardManagerAdditionalUrls: []*url.URL{defaultPackageIndexURL},
+		ProxyType:                  "auto",
 	}, nil
 }
 

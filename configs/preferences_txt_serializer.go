@@ -76,7 +76,7 @@ func (config *Configuration) LoadFromDesktopIDEPreferences() error {
 		logrus.WithError(err).Warn("Error during unserialize from IDE preferences")
 		return err
 	}
-	err = proxyConfigsFromIDEPrefs(props)
+	err = config.proxyConfigsFromIDEPrefs(props)
 	if err != nil {
 		logrus.WithError(err).Warn("Error during unserialize from IDE preferences")
 		return err
@@ -94,7 +94,7 @@ func (config *Configuration) LoadFromDesktopIDEPreferences() error {
 	return nil
 }
 
-func proxyConfigsFromIDEPrefs(props *properties.Map) error {
+func (config *Configuration) proxyConfigsFromIDEPrefs(props *properties.Map) error {
 	proxy := props.SubTree("proxy")
 	switch proxy.Get("type") {
 	case "auto":
@@ -110,10 +110,10 @@ func proxyConfigsFromIDEPrefs(props *properties.Map) error {
 		username := manualConfig.Get("username")
 		password := manualConfig.Get("password")
 
-		ProxyType = "manual"
-		ProxyHostname = hostname
-		ProxyUsername = username
-		ProxyPassword = password
+		config.ProxyType = "manual"
+		config.ProxyHostname = hostname
+		config.ProxyUsername = username
+		config.ProxyPassword = password
 		break
 	case "none":
 		// No proxy
