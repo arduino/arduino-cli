@@ -95,8 +95,8 @@
     "sketches",
   ]
   pruneopts = "UT"
-  revision = "70b03afb360cbd7b6790aa831fdd92b30d1333fb"
-  version = "v1.1.5"
+  revision = "6b1b843e1bbd3ea041319152abde37dc744dc15e"
+  version = "v1.1.6"
 
 [[projects]]
   branch = "master"
