@@ -22,6 +22,7 @@ type File struct {
 	Mime         string    `json:"mimetype,omitempty" gorethink:"mime"`
 	Size         int64     `json:"size,omitempty" gorethink:"size"`
 	LastModified time.Time `json:"last_modified,omitempty" gorethink:"last_modified"`
+	IsDir        bool      `json:"-"`
 }
 
 // Reader allows to read the content of a file on a filesystem
@@ -70,10 +71,16 @@ type Lister interface {
 	List(prefix string) ([]File, error)
 }
 
+// DirReader allows to get a list of file or directory under a path
+type DirReader interface {
+	ReadDir(path string) ([]File, error)
+}
+
 // Manager combines all the interfaces
 type Manager interface {
 	Reader
 	Writer
 	Remover
 	Lister
+	DirReader
 }

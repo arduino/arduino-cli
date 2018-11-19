@@ -135,3 +135,8 @@ func (s *S3) List(prefix string) ([]File, error) {
 	}
 	return list, nil
 }
+
+// ReadDir is just a empty code in order to implement fs.Manager interface, until we deprecate S3
+func (s *S3) ReadDir(path string) ([]File, error) {
+	return nil, nil
+}

@@ -44,8 +44,8 @@
   name = "github.com/gosuri/uitable"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/bcmi-labs/arduino-modules"
+  version = "1.1.5"
 
 [[constraint]]
   branch = "master"

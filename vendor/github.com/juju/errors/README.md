@@ -129,6 +129,13 @@ For example:
 	}
 
 
+## func BadRequestf
+``` go
+func BadRequestf(format string, args ...interface{}) error
+```
+BadRequestf returns an error which satisfies IsBadRequest().
+
+
 ## func Cause
 ``` go
 func Cause(err error) error
@@ -202,12 +209,51 @@ For example:
 	return errors.Errorf("validation failed: %s", message)
 
 
+## func Forbiddenf
+``` go
+func Forbiddenf(format string, args ...interface{}) error
+```
+Forbiddenf returns an error which satistifes IsForbidden()
+
+
 ## func IsAlreadyExists
 ``` go
 func IsAlreadyExists(err error) bool
 ```
 IsAlreadyExists reports whether the error was created with
 AlreadyExistsf() or NewAlreadyExists().
+
+
+## func IsBadRequest
+``` go
+func IsBadRequest(err error) bool
+```
+IsBadRequest reports whether err was created with BadRequestf() or
+NewBadRequest().
+
+
+## func IsForbidden
+``` go
+func IsForbidden(err error) bool
+```
+IsForbidden reports whether err was created with Forbiddenf() or
+NewForbidden().
+
+
+## func IsMethodNotAllowed
+``` go
+func IsMethodNotAllowed(err error) bool
+```
+IsMethodNotAllowed reports whether err was created with MethodNotAllowedf() or
+NewMethodNotAllowed().
+
+
+## func IsNotAssigned
+``` go
+func IsNotAssigned(err error) bool
+```
+IsNotAssigned reports whether err was created with NotAssignedf() or
+NewNotAssigned().
 
 
 ## func IsNotFound
@@ -224,6 +270,14 @@ func IsNotImplemented(err error) bool
 ```
 IsNotImplemented reports whether err was created with
 NotImplementedf() or NewNotImplemented().
+
+
+## func IsNotProvisioned
+``` go
+func IsNotProvisioned(err error) bool
+```
+IsNotProvisioned reports whether err was created with NotProvisionedf() or
+NewNotProvisioned().
 
 
 ## func IsNotSupported
@@ -250,6 +304,14 @@ IsUnauthorized reports whether err was created with Unauthorizedf() or
 NewUnauthorized().
 
 
+## func IsUserNotFound
+``` go
+func IsUserNotFound(err error) bool
+```
+IsUserNotFound reports whether err was created with UserNotFoundf() or
+NewUserNotFound().
+
+
 ## func Mask
 ``` go
 func Mask(other error) error
@@ -267,11 +329,18 @@ hides the underlying error type.  The error string still contains the full
 annotations. If you want to hide the annotations, call Wrap.
 
 
+## func MethodNotAllowedf
+``` go
+func MethodNotAllowedf(format string, args ...interface{}) error
+```
+MethodNotAllowedf returns an error which satisfies IsMethodNotAllowed().
+
+
 ## func New
 ``` go
 func New(message string) error
 ```
-New is a drop in replacement for the standard libary errors module that records
+New is a drop in replacement for the standard library errors module that records
 the location that the error is created.
 
 For example:
@@ -288,6 +357,38 @@ NewAlreadyExists returns an error which wraps err and satisfies
 IsAlreadyExists().
 
 
+## func NewBadRequest
+``` go
+func NewBadRequest(err error, msg string) error
+```
+NewBadRequest returns an error which wraps err that satisfies
+IsBadRequest().
+
+
+## func NewForbidden
+``` go
+func NewForbidden(err error, msg string) error
+```
+NewForbidden returns an error which wraps err that satisfies
+IsForbidden().
+
+
+## func NewMethodNotAllowed
+``` go
+func NewMethodNotAllowed(err error, msg string) error
+```
+NewMethodNotAllowed returns an error which wraps err that satisfies
+IsMethodNotAllowed().
+
+
+## func NewNotAssigned
+``` go
+func NewNotAssigned(err error, msg string) error
+```
+NewNotAssigned returns an error which wraps err that satisfies
+IsNotAssigned().
+
+
 ## func NewNotFound
 ``` go
 func NewNotFound(err error, msg string) error
@@ -302,6 +403,14 @@ func NewNotImplemented(err error, msg string) error
 ```
 NewNotImplemented returns an error which wraps err and satisfies
 IsNotImplemented().
+
+
+## func NewNotProvisioned
+``` go
+func NewNotProvisioned(err error, msg string) error
+```
+NewNotProvisioned returns an error which wraps err that satisfies
+IsNotProvisioned().
 
 
 ## func NewNotSupported
@@ -327,6 +436,21 @@ NewUnauthorized returns an error which wraps err and satisfies
 IsUnauthorized().
 
 
+## func NewUserNotFound
+``` go
+func NewUserNotFound(err error, msg string) error
+```
+NewUserNotFound returns an error which wraps err and satisfies
+IsUserNotFound().
+
+
+## func NotAssignedf
+``` go
+func NotAssignedf(format string, args ...interface{}) error
+```
+NotAssignedf returns an error which satisfies IsNotAssigned().
+
+
 ## func NotFoundf
 ``` go
 func NotFoundf(format string, args ...interface{}) error
@@ -339,6 +463,13 @@ NotFoundf returns an error which satisfies IsNotFound().
 func NotImplementedf(format string, args ...interface{}) error
 ```
 NotImplementedf returns an error which satisfies IsNotImplemented().
+
+
+## func NotProvisionedf
+``` go
+func NotProvisionedf(format string, args ...interface{}) error
+```
+NotProvisionedf returns an error which satisfies IsNotProvisioned().
 
 
 ## func NotSupportedf
@@ -378,11 +509,11 @@ func Unauthorizedf(format string, args ...interface{}) error
 Unauthorizedf returns an error which satisfies IsUnauthorized().
 
 
-## func Forbiddenf
+## func UserNotFoundf
 ``` go
-func Forbiddenf(format string, args ...interface{}) error
+func UserNotFoundf(format string, args ...interface{}) error
 ```
-Forbiddenf returns an error which satisfies IsForbidden().
+UserNotFoundf returns an error which satisfies IsUserNotFound().
 
 
 ## func Wrap
@@ -460,6 +591,29 @@ For example:
 	}
 
 
+### func NewErrWithCause
+``` go
+func NewErrWithCause(other error, format string, args ...interface{}) Err
+```
+NewErrWithCause is used to return an Err with cause by other error for the purpose of embedding in other
+structures. The location is not specified, and needs to be set with a call
+to SetLocation.
+
+For example:
+
+
+	type FooError struct {
+	    errors.Err
+	    code int
+	}
+	
+	func (e *FooError) Annotate(format string, args ...interface{}) error {
+	    err := &FooError{errors.NewErrWithCause(e.Err, format, args...), e.code}
+	    err.SetLocation(1)
+	    return err
+	})
+
+
 
 
 ### func (\*Err) Cause
@@ -480,6 +634,16 @@ function.
 func (e *Err) Error() string
 ```
 Error implements error.Error.
+
+
+
+### func (\*Err) Format
+``` go
+func (e *Err) Format(s fmt.State, verb rune)
+```
+Format implements fmt.Formatter
+When printing errors with %+v it also prints the stack trace.
+%#v unsurprisingly will print the real underlying type.
 
 
 

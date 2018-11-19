@@ -2,6 +2,7 @@ package fs
 
 import (
 	"io/ioutil"
+	"mime"
 	"os"
 	"path/filepath"
 
@@ -108,4 +109,30 @@ func (d *Disk) replaceCharacters(filename string) string {
 		}
 	}
 	return filename
+}
+
+// ReadDir returns a list of file and directory in a directory
+func (d *Disk) ReadDir(path string) ([]File, error) {
+	path = d.replaceCharacters(path)
+	path = filepath.Join(d.Base, path)
+
+	list := []File{}
+
+	iofiles, err := ioutil.ReadDir(path)
+	if err != nil && os.IsNotExist(err) {
+		return nil, errors.NewNotFound(err, path)
+	}
+
+	for _, f := range iofiles {
+		file := File{
+			Path:         strings.Replace(path, d.Base+"/", "", 1),
+			Name:         f.Name(),
+			Size:         f.Size(),
+			LastModified: f.ModTime(),
+			IsDir:        f.IsDir(),
+			Mime:         mime.TypeByExtension(filepath.Ext(f.Name())),
+		}
+		list = append(list, file)
+	}
+	return list, err
 }

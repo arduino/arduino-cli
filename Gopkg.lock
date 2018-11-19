@@ -88,15 +88,15 @@
   version = "v1.12.70"
 
 [[projects]]
-  branch = "master"
-  digest = "1:6b3d113c33b20e4ad6fa722464d236342c8dded8a1de319b6fd0e7efc496ea3a"
+  digest = "1:3e4acbb4ac485fafdff3f474a16ebb8787b157234971294ec40a48a4c0695c26"
   name = "github.com/bcmi-labs/arduino-modules"
   packages = [
     "fs",
     "sketches",
   ]
   pruneopts = "UT"
-  revision = "61f5789e8c68edfe71adb6e2c7f529b43dbf3ce4"
+  revision = "70b03afb360cbd7b6790aa831fdd92b30d1333fb"
+  version = "v1.1.5"
 
 [[projects]]
   branch = "master"
@@ -212,6 +212,14 @@
   version = "v1.2.1"
 
 [[projects]]
+  digest = "1:70f34ee6d1b188cbd2dfcde62b0e2c600262eb5a03c8a3f3435ecf7c74790470"
+  name = "github.com/gofrs/flock"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "7f43ea2e6a643ad441fc12d0ecc0d3388b300c53"
+  version = "v0.7.0"
+
+[[projects]]
   digest = "1:ffc060c551980d37ee9e428ef528ee2813137249ccebb0bfc412ef83071cac91"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
@@ -255,11 +263,12 @@
   revision = "0b12d6b5"
 
 [[projects]]
-  digest = "1:70107cf7ee5eb9e3c3dabe65bcb220bff22ee42e32d9b7fca988e16b8727cacc"
+  branch = "master"
+  digest = "1:7d1a655e1f16ccaf1adb026bdeece28499ecb0ead32d32accc6ed6f2c40cacee"
   name = "github.com/juju/errors"
   packages = ["."]
   pruneopts = "UT"
-  revision = "c7d06af17c68cd34c835053720b21f6549d9b0ee"
+  revision = "089d3ea4e4d597bd98acac068193d341983326a3"
 
 [[projects]]
   digest = "1:c658e84ad3916da105a761660dcaeb01e63416c8ec7bc62256a9b411a05fcd67"
