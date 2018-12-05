@@ -83,12 +83,15 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 		details.ConfigOptions = append(details.ConfigOptions, configOption)
 	}
 
+	details.RequiredTools = board.PlatformRelease.Dependencies
+
 	output.Emit(details)
 }
 
 type boardDetails struct {
 	Name          string
 	ConfigOptions []*boardConfigOption
+	RequiredTools []*cores.ToolDependency
 }
 
 type boardConfigOption struct {
@@ -114,8 +117,16 @@ func (details *boardDetails) EmitJSON() string {
 
 func (details *boardDetails) EmitTerminal() string {
 	table := output.NewTable()
-	table.AddRow("Board name:", details.Name)
 	table.SetColumnWidthMode(1, output.Average)
+	table.AddRow("Board name:", details.Name)
+	for i, tool := range details.RequiredTools {
+		head := ""
+		if i == 0 {
+			table.AddRow()
+			head = "Required tools:"
+		}
+		table.AddRow(head, tool.ToolPackager+":"+tool.ToolName, "", tool.ToolVersion)
+	}
 	for _, option := range details.ConfigOptions {
 		table.AddRow()
 		table.AddRow("Option:",
