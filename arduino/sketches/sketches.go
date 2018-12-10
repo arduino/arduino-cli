@@ -19,8 +19,6 @@ package sketches
 
 import (
 	"github.com/arduino/go-paths-helper"
-
-	"github.com/bcmi-labs/arduino-modules/sketches"
 )
 
 // SketchBook is a sketchbook
