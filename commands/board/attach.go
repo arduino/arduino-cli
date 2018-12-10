@@ -30,7 +30,6 @@ import (
 	"github.com/arduino/arduino-cli/common/formatter"
 	discovery "github.com/arduino/board-discovery"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/bcmi-labs/arduino-modules/sketches"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
