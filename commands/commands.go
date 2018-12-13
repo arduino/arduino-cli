@@ -51,7 +51,7 @@ const (
 )
 
 // Version is the current CLI version
-var Version = "0.3.2-alpha.preview"
+var Version = "0.3.3-alpha.preview"
 
 // ErrLogrus represents the logrus instance, which has the role to
 // log all non info messages.
