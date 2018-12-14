@@ -208,7 +208,7 @@ func run(command *cobra.Command, args []string) {
 
 	uploadProperties.SetPath("build.path", importPath)
 	uploadProperties.Set("build.project_name", importFile)
-	if _, err := sketch.FullPath.Join(importFile + ext).Stat(); err != nil {
+	if _, err := importPath.Join(importFile + ext).Stat(); err != nil {
 		if os.IsNotExist(err) {
 			formatter.PrintErrorMessage("Compiled sketch not found. Please compile first.")
 		} else {
