@@ -28,7 +28,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/configs"
-	sk "github.com/bcmi-labs/arduino-modules/sketches"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/common/formatter"
@@ -168,7 +167,7 @@ func UpdateLibrariesIndex(lm *librariesmanager.LibrariesManager) {
 	}
 }
 
-func InitSketch(sketchPath *paths.Path) (*sk.Sketch, error) {
+func InitSketch(sketchPath *paths.Path) (*sketches.Sketch, error) {
 	if sketchPath != nil {
 		return sketches.NewSketchFromPath(sketchPath)
 	}

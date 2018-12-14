@@ -18,9 +18,10 @@
 package sketches
 
 import (
-	"github.com/arduino/go-paths-helper"
+	"encoding/json"
+	"fmt"
 
-	"github.com/bcmi-labs/arduino-modules/sketches"
+	"github.com/arduino/go-paths-helper"
 )
 
 // SketchBook is a sketchbook
@@ -30,15 +31,20 @@ type SketchBook struct {
 
 // Sketch is a sketch for Arduino
 type Sketch struct {
-	Name          string
-	Path          string
-	BoardMetadata *BoardMetadata `json:"board"`
+	Name     string
+	FullPath *paths.Path
+	Metadata *Metadata
+}
+
+// Metadata is the kind of data associated to a project such as the connected board
+type Metadata struct {
+	CPU BoardMetadata `json:"cpu,omitempty" gorethink:"cpu"`
 }
 
 // BoardMetadata represents the board metadata for the sketch
 type BoardMetadata struct {
 	Fqbn string `json:"fqbn,required"`
-	Name string `json:"name,required"`
+	Name string `json:"name,omitempty"`
 }
 
 // NewSketchBook returns a new SketchBook object
@@ -49,21 +55,56 @@ func NewSketchBook(path *paths.Path) *SketchBook {
 }
 
 // NewSketch loads a sketch from the sketchbook
-func (sketchbook *SketchBook) NewSketch(name string) (*sketches.Sketch, error) {
-	sketch := sketches.Sketch{
-		FullPath: sketchbook.Path.Join(name).String(),
+func (sketchbook *SketchBook) NewSketch(name string) (*Sketch, error) {
+	sketch := &Sketch{
+		FullPath: sketchbook.Path.Join(name),
 		Name:     name,
 	}
 	sketch.ImportMetadata()
-	return &sketch, nil
+	return sketch, nil
 }
 
 // NewSketchFromPath loads a sketch from the specified path
-func NewSketchFromPath(path *paths.Path) (*sketches.Sketch, error) {
-	sketch := sketches.Sketch{
-		FullPath: path.String(),
+func NewSketchFromPath(path *paths.Path) (*Sketch, error) {
+	sketch := &Sketch{
+		FullPath: path,
 		Name:     path.Base(),
 	}
 	sketch.ImportMetadata()
-	return &sketch, nil
+	return sketch, nil
+}
+
+// ImportMetadata imports metadata into the sketch from a sketch.json file in the root
+// path of the sketch.
+func (s *Sketch) ImportMetadata() error {
+	sketchJSON := s.FullPath.Join("sketch.json")
+	content, err := sketchJSON.ReadFile()
+	if err != nil {
+		return fmt.Errorf("reading sketch metadata %s: %s", sketchJSON, err)
+	}
+	var meta Metadata
+	err = json.Unmarshal(content, &meta)
+	if err != nil {
+		if s.Metadata == nil {
+			s.Metadata = new(Metadata)
+		}
+		return fmt.Errorf("encoding sketch metadata: %s", err)
+	}
+	s.Metadata = &meta
+	return nil
+}
+
+// ExportMetadata writes sketch metadata into a sketch.json file in the root path of
+// the sketch
+func (s *Sketch) ExportMetadata() error {
+	d, err := json.MarshalIndent(&s.Metadata, "", "  ")
+	if err != nil {
+		return fmt.Errorf("decoding sketch metadata: %s", err)
+	}
+
+	sketchJSON := s.FullPath.Join("sketch.json")
+	if err := sketchJSON.WriteFile(d); err != nil {
+		return fmt.Errorf("writing sketch metadata %s: %s", sketchJSON, err)
+	}
+	return nil
 }

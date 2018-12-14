@@ -26,11 +26,11 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	discovery "github.com/arduino/board-discovery"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/bcmi-labs/arduino-modules/sketches"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -79,7 +79,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	pm := commands.InitPackageManager()
 
 	if fqbn != nil {
-		sketch.Metadata.CPU = sketches.MetadataCPU{
+		sketch.Metadata.CPU = sketches.BoardMetadata{
 			Fqbn: fqbn.String(),
 		}
 	} else {
@@ -90,14 +90,11 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		}
 
 		var findBoardFunc func(*packagemanager.PackageManager, *discovery.Monitor, *url.URL) *cores.Board
-		var Type string
 		switch deviceURI.Scheme {
 		case "serial", "tty":
 			findBoardFunc = findSerialConnectedBoard
-			Type = "serial"
 		case "http", "https", "tcp", "udp":
 			findBoardFunc = findNetworkConnectedBoard
-			Type = "network"
 		default:
 			formatter.PrintErrorMessage("Invalid device port type provided. Accepted types are: serial://, tty://, http://, https://, tcp://, udp://.")
 			os.Exit(commands.ErrBadCall)
@@ -122,10 +119,9 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		}
 		formatter.Print("Board found: " + board.Name())
 
-		sketch.Metadata.CPU = sketches.MetadataCPU{
+		sketch.Metadata.CPU = sketches.BoardMetadata{
 			Fqbn: board.FQBN(),
 			Name: board.Name(),
-			Type: Type,
 		}
 	}
 
