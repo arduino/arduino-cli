@@ -61,44 +61,6 @@
   revision = "ed041402e83b924251a5d65b4dfeb727c480c359"
 
 [[projects]]
-  digest = "1:5978a502788ab7e2c0237bb65bdb2651a94d93733924701463af20717279fe6e"
-  name = "github.com/aws/aws-sdk-go"
-  packages = [
-    "aws",
-    "aws/awserr",
-    "aws/awsutil",
-    "aws/client",
-    "aws/client/metadata",
-    "aws/credentials",
-    "aws/endpoints",
-    "aws/request",
-    "aws/signer/v4",
-    "internal/shareddefaults",
-    "private/protocol",
-    "private/protocol/query",
-    "private/protocol/query/queryutil",
-    "private/protocol/rest",
-    "private/protocol/restxml",
-    "private/protocol/xml/xmlutil",
-    "service/s3",
-    "service/s3/s3iface",
-  ]
-  pruneopts = "UT"
-  revision = "1b176c5c6b57adb03bb982c21930e708ebca5a77"
-  version = "v1.12.70"
-
-[[projects]]
-  digest = "1:3e4acbb4ac485fafdff3f474a16ebb8787b157234971294ec40a48a4c0695c26"
-  name = "github.com/bcmi-labs/arduino-modules"
-  packages = [
-    "fs",
-    "sketches",
-  ]
-  pruneopts = "UT"
-  revision = "6b1b843e1bbd3ea041319152abde37dc744dc15e"
-  version = "v1.1.6"
-
-[[projects]]
   branch = "master"
   digest = "1:37011b20a70e205b93ebea5287e1afa5618db54bf3998c36ff5a8e4b146a170a"
   name = "github.com/bgentry/go-netrc"
@@ -112,14 +74,6 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "5df1f207ff77e025801505ae4d903133a0b4353f"
-
-[[projects]]
-  digest = "1:2209584c0f7c9b68c23374e659357ab546e1b70eec2761f03280f69a8fd23d77"
-  name = "github.com/cenkalti/backoff"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "2ea60e5f094469f9e65adb9cd103795b73ae743e"
-  version = "v2.0.0"
 
 [[projects]]
   digest = "1:be677f4dfba4c2ea3e2bd6178175a818197c2d592f2c367b1051146a26a2c5c4"
@@ -193,14 +147,6 @@
   version = "v1.0.1"
 
 [[projects]]
-  digest = "1:4afe9b10ebaf13d77f8bad44b2af5a55c17699b375601a6383a671b0713845b9"
-  name = "github.com/go-ini/ini"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "6529cf7c58879c08d927016dde4477f18a0634cb"
-  version = "v1.36.0"
-
-[[projects]]
   digest = "1:64a5a67c69b70c2420e607a8545d674a23778ed9c3e80607bfd17b77c6c87f6a"
   name = "github.com/go-ole/go-ole"
   packages = [
@@ -210,22 +156,6 @@
   pruneopts = "UT"
   revision = "a41e3c4b706f6ae8dfbff342b06e40fa4d2d0506"
   version = "v1.2.1"
-
-[[projects]]
-  digest = "1:70f34ee6d1b188cbd2dfcde62b0e2c600262eb5a03c8a3f3435ecf7c74790470"
-  name = "github.com/gofrs/flock"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "7f43ea2e6a643ad441fc12d0ecc0d3388b300c53"
-  version = "v0.7.0"
-
-[[projects]]
-  digest = "1:ffc060c551980d37ee9e428ef528ee2813137249ccebb0bfc412ef83071cac91"
-  name = "github.com/golang/protobuf"
-  packages = ["proto"]
-  pruneopts = "UT"
-  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
-  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -240,27 +170,12 @@
   revision = "36ee7e946282a3fb1cfecd476ddc9b35d8847e42"
 
 [[projects]]
-  branch = "master"
-  digest = "1:364b908b9b27b97ab838f2f6f1b1f46281fa29b978a037d72a9b1d4f6d940190"
-  name = "github.com/hailocab/go-hostpool"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "e80d13ce29ede4452c43dea11e79b9bc8a15b478"
-
-[[projects]]
   digest = "1:870d441fe217b8e689d7949fef6e43efbc787e50f200cb1e70dbca9204a1d6be"
   name = "github.com/inconshreveable/mousetrap"
   packages = ["."]
   pruneopts = "UT"
   revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
   version = "v1.0"
-
-[[projects]]
-  digest = "1:e22af8c7518e1eab6f2eab2b7d7558927f816262586cd6ed9f349c97a6c285c4"
-  name = "github.com/jmespath/go-jmespath"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "0b12d6b5"
 
 [[projects]]
   branch = "master"
@@ -351,14 +266,6 @@
   version = "v1.5.1"
 
 [[projects]]
-  branch = "master"
-  digest = "1:ff6b0586c0621a76832cf783eee58cbb9d9795d2ce8acbc199a4131db11c42a9"
-  name = "github.com/satori/go.uuid"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "36e9d2ebbde5e3f13ab2e25625fd453271d6522e"
-
-[[projects]]
   digest = "1:9e9193aa51197513b3abcb108970d831fbcf40ef96aa845c4f03276e1fa316d2"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
@@ -434,12 +341,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3bc78f0e07aee3740aa559cabcb7d0d7e7d2b0fc2bc0a609570b714ebe0ba763"
+  digest = "1:0faa1e97cfa78445bc4d20d70b40929e88040c8f3110eb497f965d41bb6e593a"
   name = "golang.org/x/crypto"
   packages = [
     "ed25519",
     "ed25519/internal/edwards25519",
-    "pbkdf2",
     "ssh/terminal",
   ]
   pruneopts = "UT"
@@ -447,11 +353,10 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:efa7281b594f7efa2f2c1adda314f45f1cb58d5ba2fa2f9f63c6b0ce50e040ac"
+  digest = "1:aa0c2ae711605fdabbf35d0b9c0c57c6a9eba8b32b88ebce4ff5e435929ddf57"
   name = "golang.org/x/net"
   packages = [
     "bpf",
-    "context",
     "internal/iana",
     "internal/socket",
     "ipv4",
@@ -496,27 +401,6 @@
   source = "github.com/cmaglie/pb"
 
 [[projects]]
-  digest = "1:546db0bd0542751aff1e75052dd1fa0b0a1cee681d43bfa9ffac7c22714c1070"
-  name = "gopkg.in/fatih/pool.v2"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "010e0b745d12eaf8426c95f9c3924d81dd0b668f"
-  version = "v2.0.0"
-
-[[projects]]
-  digest = "1:c1e51b14c1ea3026e578b73eefc560eb2ed7ae16911bbce03e22e755a37d5971"
-  name = "gopkg.in/gorethink/gorethink.v3"
-  packages = [
-    ".",
-    "encoding",
-    "ql2",
-    "types",
-  ]
-  pruneopts = "UT"
-  revision = "7f5bdfd858bb064d80559b2a32b86669c5de5d3b"
-  version = "v3.0.5"
-
-[[projects]]
   digest = "1:8b1a1e6d3dcef7c542f604f8b9f8013d1d13c3d61f8e9cbe368afa2735c898c2"
   name = "gopkg.in/h2non/filetype.v1"
   packages = [
@@ -546,7 +430,6 @@
     "github.com/arduino/go-paths-helper",
     "github.com/arduino/go-properties-orderedmap",
     "github.com/arduino/go-win32-utils",
-    "github.com/bcmi-labs/arduino-modules/sketches",
     "github.com/bgentry/go-netrc/netrc",
     "github.com/bouk/monkey",
     "github.com/codeclysm/cc",

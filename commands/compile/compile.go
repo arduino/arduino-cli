@@ -158,7 +158,7 @@ func run(cmd *cobra.Command, args []string) {
 	ctx := &types.Context{}
 	ctx.PackageManager = pm
 	ctx.FQBN = fqbn
-	ctx.SketchLocation = paths.New(sketch.FullPath)
+	ctx.SketchLocation = sketch.FullPath
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	if packagesDir, err := commands.Config.HardwareDirectories(); err == nil {
@@ -257,7 +257,7 @@ func run(cmd *cobra.Command, args []string) {
 	var exportPath *paths.Path
 	var exportFile string
 	if flags.exportFile == "" {
-		exportPath = paths.New(sketch.FullPath)
+		exportPath = sketch.FullPath
 		exportFile = sketch.Name + "." + fqbnSuffix
 	} else {
 		exportPath = paths.New(flags.exportFile).Parent()
