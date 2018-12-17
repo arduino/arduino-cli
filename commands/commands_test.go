@@ -189,7 +189,7 @@ func TestUserLibs(t *testing.T) {
 	require.NoError(t, err, "creating 'sketchbook/libraries' dir")
 
 	installLib := func(lib string) {
-		libPath := paths.New("testdata/" + lib)
+		libPath := paths.New("testdata", "libs", lib)
 		fmt.Printf("COPYING: %s in %s\n", libPath, libDir)
 		err = libPath.CopyDirTo(libDir.Join(lib))
 		require.NoError(t, err, "copying "+lib+" in sketchbook")
