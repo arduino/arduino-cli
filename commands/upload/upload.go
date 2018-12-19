@@ -28,7 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/executils"
-	"github.com/arduino/go-paths-helper"
+	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -208,9 +208,10 @@ func run(command *cobra.Command, args []string) {
 
 	uploadProperties.SetPath("build.path", importPath)
 	uploadProperties.Set("build.project_name", importFile)
-	if _, err := importPath.Join(importFile + ext).Stat(); err != nil {
+	uploadFile := importPath.Join(importFile + ext)
+	if _, err := uploadFile.Stat(); err != nil {
 		if os.IsNotExist(err) {
-			formatter.PrintErrorMessage("Compiled sketch not found. Please compile first.")
+			formatter.PrintErrorMessage("Compiled sketch not found: " + uploadFile.String() + ". Please compile first.")
 		} else {
 			formatter.PrintError(err, "Could not open compiled sketch.")
 		}
