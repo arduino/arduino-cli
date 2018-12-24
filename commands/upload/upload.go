@@ -178,7 +178,12 @@ func run(command *cobra.Command, args []string) {
 	// Make the filename without the FQBN configs part
 	fqbn.Configs = properties.NewMap()
 	fqbnSuffix := strings.Replace(fqbn.String(), ":", ".", -1)
-	ext := filepath.Ext(uploadProperties.ExpandPropsInString("{recipe.output.tmp_file}"))
+	outputTmpFile, ok := uploadProperties.GetOk("recipe.output.tmp_file")
+	if !ok {
+		formatter.PrintErrorMessage("The platform does not define the required property 'recipe.output.tmp_file'.")
+		os.Exit(commands.ErrGeneric)
+	}
+	ext := filepath.Ext(outputTmpFile)
 
 	var importPath *paths.Path
 	var importFile string

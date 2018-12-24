@@ -248,6 +248,10 @@ func TestUploadCommands(t *testing.T) {
 	// sketch without build
 	exitCode, d = executeWithArgs(t, "upload", currSketchbookDir.Join("TestSketch2").String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
 	require.NotZero(t, exitCode, "exit code")
+
+	// platform without 'recipe.output.tmp_file' property
+	exitCode, d = executeWithArgs(t, "upload", "-i", currSketchbookDir.Join("test.hex").String(), "-b", "test2:avr:testboard", "-p", "/dev/ttyACM0")
+	require.NotZero(t, exitCode, "exit code")
 }
 
 func TestLibSearch(t *testing.T) {
