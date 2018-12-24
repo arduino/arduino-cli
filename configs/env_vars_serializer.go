@@ -34,4 +34,7 @@ func (config *Configuration) LoadFromEnv() {
 	if dir, has := os.LookupEnv("ARDUINO_DATA_DIR"); has {
 		config.DataDir = paths.New(dir)
 	}
+	if dir, has := os.LookupEnv("ARDUINO_DOWNLOADS_DIR"); has {
+		config.downloadsDir = paths.New(dir)
+	}
 }
