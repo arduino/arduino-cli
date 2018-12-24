@@ -257,6 +257,7 @@ func TestUploadCommands(t *testing.T) {
 func TestLibSearch(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
+	defer useSharedDownloadDir(t)()
 
 	exitCode, output := executeWithArgs(t, "lib", "search", "audiozer", "--format", "json")
 	require.Zero(t, exitCode, "process exit code")
@@ -287,6 +288,7 @@ func TestLibSearch(t *testing.T) {
 func TestUserLibs(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
+	defer useSharedDownloadDir(t)()
 	libDir := currSketchbookDir.Join("libraries")
 	err := libDir.MkdirAll()
 	require.NoError(t, err, "creating 'sketchbook/libraries' dir")
@@ -323,6 +325,7 @@ func TestSketchCommands(t *testing.T) {
 	defer makeTempSketchbookDir(t)()
 	//var d []byte
 	var exitCode int
+	defer useSharedDownloadDir(t)()
 
 	exitCode, _ = executeWithArgs(t, "sketch", "new", "Test")
 	require.Zero(t, exitCode, "exit code")
@@ -333,6 +336,7 @@ func TestLibDownloadAndInstall(t *testing.T) {
 	defer makeTempSketchbookDir(t)()
 	var d []byte
 	var exitCode int
+	defer useSharedDownloadDir(t)()
 
 	exitCode, _ = executeWithArgs(t, "core", "update-index")
 	require.Zero(t, exitCode, "exit code")
@@ -475,6 +479,7 @@ func detectLatestAVRCore(t *testing.T) string {
 func TestCompileCommands(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
+	defer useSharedDownloadDir(t)()
 
 	// Set staging dir to a temporary dir
 	tmp, err := ioutil.TempDir(os.TempDir(), "test")
@@ -532,6 +537,7 @@ func TestCompileCommands(t *testing.T) {
 func TestInvalidCoreURL(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
+	defer useSharedDownloadDir(t)()
 
 	tmp, err := paths.MkTempDir("", "")
 	require.NoError(t, err, "making temporary dir")
@@ -568,6 +574,7 @@ board_manager:
 func TestCoreCommands(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
+	defer useSharedDownloadDir(t)()
 
 	// Set staging dir to a temporary dir
 	tmp, err := ioutil.TempDir(os.TempDir(), "test")
@@ -580,15 +587,15 @@ func TestCoreCommands(t *testing.T) {
 	// Download a specific core version
 	exitCode, d := executeWithArgs(t, "core", "download", "arduino:avr@1.6.16")
 	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "arduino:avr-gcc@4.9.2-atmel3.5.3-arduino2 downloaded")
-	require.Contains(t, string(d), "arduino:avrdude@6.3.0-arduino8 downloaded")
-	require.Contains(t, string(d), "arduino:arduinoOTA@1.0.0 downloaded")
-	require.Contains(t, string(d), "arduino:avr@1.6.16 downloaded")
+	require.Regexp(t, "arduino:avr-gcc@4.9.2-atmel3.5.3-arduino2 (already )?downloaded", string(d))
+	require.Regexp(t, "arduino:avrdude@6.3.0-arduino8 (already )?downloaded", string(d))
+	require.Regexp(t, "arduino:arduinoOTA@1.0.0 (already )?downloaded", string(d))
+	require.Regexp(t, "arduino:avr@1.6.16 (already )?downloaded", string(d))
 
 	// Download latest
 	exitCode, d = executeWithArgs(t, "core", "download", "arduino:avr")
 	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), AVR+" downloaded")
+	require.Regexp(t, AVR+" (already )?downloaded", string(d))
 
 	// Wrong downloads
 	exitCode, d = executeWithArgs(t, "core", "download", "arduino:samd@1.2.3-notexisting")
