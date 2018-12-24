@@ -166,7 +166,89 @@ func makeTempSketchbookDir(t *testing.T) func() {
 	}
 }
 
+func setSketchbookDir(t *testing.T, tmp *paths.Path) func() {
+	os.Setenv("ARDUINO_SKETCHBOOK_DIR", tmp.String())
+	currSketchbookDir = tmp
+
+	fmt.Printf("ARDUINO_SKETCHBOOK_DIR = %s\n", os.Getenv("ARDUINO_SKETCHBOOK_DIR"))
+	return func() {
+		os.Unsetenv("ARDUINO_SKETCHBOOK_DIR")
+		currSketchbookDir = nil
+		fmt.Printf("ARDUINO_SKETCHBOOK_DIR = %s\n", os.Getenv("ARDUINO_SKETCHBOOK_DIR"))
+	}
+}
+
 // END -- Utility functions
+
+func TestUploadCommands(t *testing.T) {
+	defer makeTempDataDir(t)()
+	defer useSharedDownloadDir(t)()
+	defer setSketchbookDir(t, paths.New("testdata", "sketchbook_with_custom_hardware"))()
+
+	updateCoreIndex(t)
+
+	exitCode, _ := executeWithArgs(t, "core", "install", "arduino:avr")
+	require.Zero(t, exitCode, "exit code")
+
+	// -i flag
+	exitCode, d := executeWithArgs(t, "upload", "-i", currSketchbookDir.Join("test.hex").String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "QUIET")
+	require.Contains(t, string(d), "NOVERIFY")
+	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/test.hex")
+
+	// -i flag with implicit extension
+	exitCode, d = executeWithArgs(t, "upload", "-i", currSketchbookDir.Join("test").String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "QUIET")
+	require.Contains(t, string(d), "NOVERIFY")
+	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/test.hex")
+
+	// -i with absolute path
+	fullPath, err := currSketchbookDir.Join("test.hex").Abs()
+	require.NoError(t, err, "absolute path of test.hex")
+	exitCode, d = executeWithArgs(t, "upload", "-i", fullPath.String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "QUIET")
+	require.Contains(t, string(d), "NOVERIFY")
+	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/test.hex")
+
+	// -v verbose
+	exitCode, d = executeWithArgs(t, "upload", "-v", "-i", currSketchbookDir.Join("test.hex").String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "VERBOSE")
+	require.Contains(t, string(d), "NOVERIFY")
+	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/test.hex")
+
+	// -t verify
+	exitCode, d = executeWithArgs(t, "upload", "-t", "-i", currSketchbookDir.Join("test.hex").String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "QUIET")
+	require.Contains(t, string(d), "VERIFY")
+	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/test.hex")
+
+	// -v -t verbose verify
+	exitCode, d = executeWithArgs(t, "upload", "-v", "-t", "-i", currSketchbookDir.Join("test.hex").String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "VERBOSE")
+	require.Contains(t, string(d), "VERIFY")
+	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/test.hex")
+
+	// non-existent file
+	exitCode, d = executeWithArgs(t, "upload", "-i", currSketchbookDir.Join("test123.hex").String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	require.NotZero(t, exitCode, "exit code")
+
+	// sketch
+	exitCode, d = executeWithArgs(t, "upload", currSketchbookDir.Join("TestSketch").String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "QUIET")
+	require.Contains(t, string(d), "NOVERIFY")
+	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/TestSketch/TestSketch.test.avr.testboard.hex")
+
+	// sketch without build
+	exitCode, d = executeWithArgs(t, "upload", currSketchbookDir.Join("TestSketch2").String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	require.NotZero(t, exitCode, "exit code")
+}
 
 func TestLibSearch(t *testing.T) {
 	defer makeTempDataDir(t)()
