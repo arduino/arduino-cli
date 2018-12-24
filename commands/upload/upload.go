@@ -112,43 +112,30 @@ func run(command *cobra.Command, args []string) {
 	}
 
 	// Load programmer tool
-	uploadToolID, have := boardProperties.GetOk("upload.tool")
-	if !have || uploadToolID == "" {
-		formatter.PrintErrorMessage("The board defines an invalid 'upload.tool': " + uploadToolID)
+	uploadToolPattern, have := boardProperties.GetOk("upload.tool")
+	if !have || uploadToolPattern == "" {
+		formatter.PrintErrorMessage("The board does not define an 'upload.tool' property.")
 		os.Exit(commands.ErrGeneric)
 	}
 
-	var referencedPackage *cores.Package
-	var referencedPlatform *cores.Platform
 	var referencedPlatformRelease *cores.PlatformRelease
-	var uploadTool *cores.Tool
-	if split := strings.Split(uploadToolID, ":"); len(split) == 1 {
-		uploadTool = board.PlatformRelease.Platform.Package.Tools[uploadToolID]
+	if split := strings.Split(uploadToolPattern, ":"); len(split) > 2 {
+		formatter.PrintErrorMessage("The board defines an invalid 'upload.tool' property: " + uploadToolPattern)
+		os.Exit(commands.ErrGeneric)
 	} else if len(split) == 2 {
-		referencedPackage = pm.GetPackages().Packages[split[0]]
-		if referencedPackage == nil {
-			formatter.PrintErrorMessage("The board requires a tool from package '" + split[0] + "' that is not installed: " + uploadToolID)
-			os.Exit(commands.ErrGeneric)
-		}
-		uploadTool = referencedPackage.Tools[split[1]]
+		referencedPackageName := split[0]
+		uploadToolPattern = split[1]
+		architecture := board.PlatformRelease.Platform.Architecture
 
-		referencedPlatform = referencedPackage.Platforms[board.PlatformRelease.Platform.Architecture]
-		if referencedPlatform != nil {
+		if referencedPackage := pm.GetPackages().Packages[referencedPackageName]; referencedPackage == nil {
+			formatter.PrintErrorMessage("The board requires platform '" + referencedPackageName + ":" + architecture + "' that is not installed.")
+			os.Exit(commands.ErrGeneric)
+		} else if referencedPlatform := referencedPackage.Platforms[architecture]; referencedPlatform == nil {
+			formatter.PrintErrorMessage("The board requires platform '" + referencedPackageName + ":" + architecture + "' that is not installed.")
+			os.Exit(commands.ErrGeneric)
+		} else {
 			referencedPlatformRelease = pm.GetInstalledPlatformRelease(referencedPlatform)
 		}
-	} else {
-		formatter.PrintErrorMessage("The board defines an invalid 'upload.tool': " + uploadToolID)
-		os.Exit(commands.ErrGeneric)
-	}
-	if uploadTool == nil {
-		formatter.PrintErrorMessage("Upload tool '" + uploadToolID + "' not found.")
-		os.Exit(commands.ErrGeneric)
-	}
-	// FIXME: Look into index if the platform requires a specific version
-	uploadToolRelease := uploadTool.GetLatestInstalled()
-	if uploadToolRelease == nil {
-		formatter.PrintErrorMessage("Upload tool '" + uploadToolID + "' not installed.")
-		os.Exit(commands.ErrGeneric)
 	}
 
 	// Build configuration for upload
@@ -160,7 +147,7 @@ func run(command *cobra.Command, args []string) {
 	uploadProperties.Merge(board.PlatformRelease.RuntimeProperties())
 	uploadProperties.Merge(boardProperties)
 
-	uploadToolProperties := uploadProperties.SubTree("tools." + uploadTool.Name)
+	uploadToolProperties := uploadProperties.SubTree("tools." + uploadToolPattern)
 	uploadProperties.Merge(uploadToolProperties)
 
 	if requiredTools, err := pm.FindToolsRequiredForBoard(board); err == nil {
