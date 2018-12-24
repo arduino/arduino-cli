@@ -26,11 +26,11 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/commands/root"
-	"github.com/arduino/go-paths-helper"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/bouk/monkey"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/relaxed-semver"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // Redirecting stdOut so we can analyze output line by
@@ -110,11 +110,28 @@ func executeWithArgs(t *testing.T, args ...string) (int, []byte) {
 	return exitCode, output
 }
 
+var currDownloadDir *paths.Path
+
+func useSharedDownloadDir(t *testing.T) func() {
+	tmp := paths.TempDir().Join("arduino-cli-test-staging")
+	err := tmp.MkdirAll()
+	require.NoError(t, err, "making shared staging dir")
+	os.Setenv("ARDUINO_DOWNLOADS_DIR", tmp.String())
+	currDownloadDir = tmp
+	fmt.Printf("ARDUINO_DOWNLOADS_DIR = %s\n", os.Getenv("ARDUINO_DOWNLOADS_DIR"))
+
+	return func() {
+		os.Unsetenv("ARDUINO_DOWNLOADS_DIR")
+		currDownloadDir = nil
+		fmt.Printf("ARDUINO_DOWNLOADS_DIR = %s\n", os.Getenv("ARDUINO_DOWNLOADS_DIR"))
+	}
+}
+
 var currDataDir *paths.Path
 
 func makeTempDataDir(t *testing.T) func() {
 	tmp, err := paths.MkTempDir("", "test")
-	require.NoError(t, err, "making temporary staging dir")
+	require.NoError(t, err, "making temporary data dir")
 	os.Setenv("ARDUINO_DATA_DIR", tmp.String())
 	currDataDir = tmp
 	fmt.Printf("ARDUINO_DATA_DIR = %s\n", os.Getenv("ARDUINO_DATA_DIR"))

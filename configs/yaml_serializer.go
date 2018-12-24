@@ -28,11 +28,12 @@ import (
 )
 
 type yamlConfig struct {
-	ProxyType         string                   `yaml:"proxy_type"`
-	ProxyManualConfig *yamlProxyConfig         `yaml:"manual_configs,omitempty"`
-	SketchbookPath    string                   `yaml:"sketchbook_path,omitempty"`
-	ArduinoDataDir    string                   `yaml:"arduino_data,omitempty"`
-	BoardsManager     *yamlBoardsManagerConfig `yaml:"board_manager"`
+	ProxyType           string                   `yaml:"proxy_type"`
+	ProxyManualConfig   *yamlProxyConfig         `yaml:"manual_configs,omitempty"`
+	SketchbookPath      string                   `yaml:"sketchbook_path,omitempty"`
+	ArduinoDataDir      string                   `yaml:"arduino_data,omitempty"`
+	ArduinoDownloadsDir string                   `yaml:"arduino_downloads_dir,omitempty"`
+	BoardsManager       *yamlBoardsManagerConfig `yaml:"board_manager"`
 }
 
 type yamlBoardsManagerConfig struct {
@@ -66,6 +67,11 @@ func (config *Configuration) LoadFromYAML(path *paths.Path) error {
 	if ret.SketchbookPath != "" {
 		config.SketchbookDir = paths.New(ret.SketchbookPath)
 	}
+	if ret.ArduinoDownloadsDir != "" {
+		config.downloadsDir = paths.New(ret.ArduinoDownloadsDir)
+	} else {
+		config.downloadsDir = nil
+	}
 	if ret.ProxyType != "" {
 		config.ProxyType = ret.ProxyType
 		if ret.ProxyManualConfig != nil {
@@ -95,6 +101,9 @@ func (config *Configuration) SerializeToYAML() ([]byte, error) {
 	}
 	if config.DataDir != nil {
 		c.ArduinoDataDir = config.DataDir.String()
+	}
+	if config.downloadsDir != nil {
+		c.ArduinoDownloadsDir = config.downloadsDir.String()
 	}
 	c.ProxyType = config.ProxyType
 	if config.ProxyType == "manual" {

@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/arduino/go-paths-helper"
+	paths "github.com/arduino/go-paths-helper"
 )
 
 // Configuration contains a running configuration
@@ -38,6 +38,10 @@ type Configuration struct {
 
 	// ArduinoIDEDirectory is the directory of the Arduino IDE if the CLI runs together with it.
 	ArduinoIDEDirectory *paths.Path
+
+	// downloadsDir is the directory where the package files are downloaded and cached.
+	// Use DownloadsDir() method to retrieve it.
+	downloadsDir *paths.Path
 
 	// IDEBundledCheckResult contains the result of the check to see if the CLI is bundled with the IDE:
 	// the field is true if the CLI is bundled with the Arduino IDE, false if the CLI is running
@@ -94,6 +98,9 @@ func (config *Configuration) PackagesDir() *paths.Path {
 
 // DownloadsDir returns the directory for archive downloads.
 func (config *Configuration) DownloadsDir() *paths.Path {
+	if config.downloadsDir != nil {
+		return config.downloadsDir
+	}
 	return config.DataDir.Join("staging")
 }
 
