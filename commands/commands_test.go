@@ -323,26 +323,22 @@ func TestUserLibs(t *testing.T) {
 func TestSketchCommands(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
-	//var d []byte
-	var exitCode int
 	defer useSharedDownloadDir(t)()
 
-	exitCode, _ = executeWithArgs(t, "sketch", "new", "Test")
+	exitCode, _ := executeWithArgs(t, "sketch", "new", "Test")
 	require.Zero(t, exitCode, "exit code")
 }
 
 func TestLibDownloadAndInstall(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
-	var d []byte
-	var exitCode int
 	defer useSharedDownloadDir(t)()
 
-	exitCode, _ = executeWithArgs(t, "core", "update-index")
+	exitCode, _ := executeWithArgs(t, "core", "update-index")
 	require.Zero(t, exitCode, "exit code")
 
 	// Download inexistent
-	exitCode, d = executeWithArgs(t, "lib", "download", "inexistentLibrary", "--format", "json")
+	exitCode, d := executeWithArgs(t, "lib", "download", "inexistentLibrary", "--format", "json")
 	require.NotZero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "library inexistentLibrary not found")
 
@@ -575,11 +571,6 @@ func TestCoreCommands(t *testing.T) {
 	defer makeTempDataDir(t)()
 	defer makeTempSketchbookDir(t)()
 	defer useSharedDownloadDir(t)()
-
-	// Set staging dir to a temporary dir
-	tmp, err := ioutil.TempDir(os.TempDir(), "test")
-	require.NoError(t, err, "making temporary staging dir")
-	defer os.RemoveAll(tmp)
 
 	updateCoreIndex(t)
 	AVR := "arduino:avr@" + detectLatestAVRCore(t)
