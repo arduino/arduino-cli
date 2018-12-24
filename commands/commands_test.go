@@ -235,7 +235,7 @@ func TestUploadCommands(t *testing.T) {
 	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/test.hex")
 
 	// non-existent file
-	exitCode, d = executeWithArgs(t, "upload", "-i", currSketchbookDir.Join("test123.hex").String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	exitCode, _ = executeWithArgs(t, "upload", "-i", currSketchbookDir.Join("test123.hex").String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
 	require.NotZero(t, exitCode, "exit code")
 
 	// sketch
@@ -246,11 +246,11 @@ func TestUploadCommands(t *testing.T) {
 	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/TestSketch/TestSketch.test.avr.testboard.hex")
 
 	// sketch without build
-	exitCode, d = executeWithArgs(t, "upload", currSketchbookDir.Join("TestSketch2").String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	exitCode, _ = executeWithArgs(t, "upload", currSketchbookDir.Join("TestSketch2").String(), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
 	require.NotZero(t, exitCode, "exit code")
 
 	// platform without 'recipe.output.tmp_file' property
-	exitCode, d = executeWithArgs(t, "upload", "-i", currSketchbookDir.Join("test.hex").String(), "-b", "test2:avr:testboard", "-p", "/dev/ttyACM0")
+	exitCode, _ = executeWithArgs(t, "upload", "-i", currSketchbookDir.Join("test.hex").String(), "-b", "test2:avr:testboard", "-p", "/dev/ttyACM0")
 	require.NotZero(t, exitCode, "exit code")
 }
 
