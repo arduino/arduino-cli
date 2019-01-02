@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os/exec"
 
 	properties "github.com/arduino/go-properties-orderedmap"
 
@@ -32,6 +33,7 @@ type Discovery struct {
 	in      io.WriteCloser
 	out     io.ReadCloser
 	outJSON *json.Decoder
+	cmd     *exec.Cmd
 }
 
 // BoardPort is a generic port descriptor
@@ -56,21 +58,27 @@ func NewFromCommandLine(args ...string) (*Discovery, error) {
 		return nil, fmt.Errorf("creating discovery process: %s", err)
 	}
 	disc := &Discovery{}
-	if in, err := cmd.StdinPipe(); err == nil {
-		disc.in = in
-	} else {
-		return nil, fmt.Errorf("creating stdin pipe for discovery: %s", err)
-	}
-	if out, err := cmd.StdoutPipe(); err == nil {
-		disc.out = out
-		disc.outJSON = json.NewDecoder(disc.out)
-	} else {
-		return nil, fmt.Errorf("creating stdout pipe for discovery: %s", err)
-	}
-	if err := cmd.Start(); err != nil {
-		return nil, fmt.Errorf("starting discovery: %s", err)
-	}
+	disc.cmd = cmd
 	return disc, nil
+}
+
+// Start starts the specified discovery
+func (d *Discovery) Start() error {
+	if in, err := d.cmd.StdinPipe(); err == nil {
+		d.in = in
+	} else {
+		return fmt.Errorf("creating stdin pipe for discovery: %s", err)
+	}
+	if out, err := d.cmd.StdoutPipe(); err == nil {
+		d.out = out
+		d.outJSON = json.NewDecoder(d.out)
+	} else {
+		return fmt.Errorf("creating stdout pipe for discovery: %s", err)
+	}
+	if err := d.cmd.Start(); err != nil {
+		return fmt.Errorf("starting discovery process: %s", err)
+	}
+	return nil
 }
 
 // List retrieve the port list from this discovery
@@ -87,11 +95,15 @@ func (d *Discovery) List() ([]*BoardPort, error) {
 
 // Close stops the Discovery and free the resources
 func (d *Discovery) Close() error {
+	// TODO: Send QUIT for safe close or terminate process after a small timeout
 	if err := d.in.Close(); err != nil {
 		return fmt.Errorf("closing stdin pipe: %s", err)
 	}
 	if err := d.out.Close(); err != nil {
 		return fmt.Errorf("closing stdout pipe: %s", err)
+	}
+	if d.cmd != nil {
+		d.cmd.Process.Kill()
 	}
 	return nil
 }
