@@ -22,6 +22,9 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"time"
+
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 
 	properties "github.com/arduino/go-properties-orderedmap"
 
@@ -87,9 +90,23 @@ func (d *Discovery) List() ([]*BoardPort, error) {
 		return nil, fmt.Errorf("sending LIST command to discovery: %s", err)
 	}
 	var event eventJSON
+	done := make(chan bool)
+	timeout := false
+	go func() {
+		select {
+		case <-done:
+		case <-time.After(5 * time.Second):
+			timeout = true
+			d.Close()
+		}
+	}()
 	if err := d.outJSON.Decode(&event); err != nil {
+		if timeout {
+			return nil, fmt.Errorf("decoding LIST command: timeout")
+		}
 		return nil, fmt.Errorf("decoding LIST command: %s", err)
 	}
+	done <- true
 	return event.Ports, nil
 }
 
