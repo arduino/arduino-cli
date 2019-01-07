@@ -37,6 +37,7 @@ type Discovery struct {
 	out     io.ReadCloser
 	outJSON *json.Decoder
 	cmd     *exec.Cmd
+	Timeout time.Duration
 }
 
 // BoardPort is a generic port descriptor
@@ -60,7 +61,7 @@ func NewFromCommandLine(args ...string) (*Discovery, error) {
 	if err != nil {
 		return nil, fmt.Errorf("creating discovery process: %s", err)
 	}
-	disc := &Discovery{}
+	disc := &Discovery{Timeout: time.Second}
 	disc.cmd = cmd
 	return disc, nil
 }
@@ -95,7 +96,7 @@ func (d *Discovery) List() ([]*BoardPort, error) {
 	go func() {
 		select {
 		case <-done:
-		case <-time.After(5 * time.Second):
+		case <-time.After(d.Timeout):
 			timeout = true
 			d.Close()
 		}
