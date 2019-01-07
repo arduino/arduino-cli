@@ -125,3 +125,28 @@ func (d *Discovery) Close() error {
 	}
 	return nil
 }
+
+// ExtractDiscoveriesFromPlatforms returns all Discovery from all the installed platforms.
+func ExtractDiscoveriesFromPlatforms(pm *packagemanager.PackageManager) map[string]*Discovery {
+	res := map[string]*Discovery{}
+
+	for _, platformRelease := range pm.InstalledPlatformReleases() {
+		discoveries := platformRelease.Properties.SubTree("discovery").FirstLevelOf()
+
+		for name, props := range discoveries {
+			if pattern, has := props.GetOk("pattern"); has {
+				props.Merge(platformRelease.Properties)
+				cmdLine := props.ExpandPropsInString(pattern)
+				if cmdArgs, err := properties.SplitQuotedString(cmdLine, `"`, false); err != nil {
+					// TODO
+				} else if disc, err := NewFromCommandLine(cmdArgs...); err != nil {
+					// TODO
+				} else {
+					res[name] = disc
+				}
+			}
+		}
+	}
+
+	return res
+}
