@@ -52,10 +52,6 @@
   name = "github.com/bgentry/go-netrc"
 
 [[constraint]]
-  name = "github.com/codeclysm/cc"
-  version = "1.2.1"
-
-[[constraint]]
   branch = "master"
   name = "github.com/mitchellh/go-homedir"
 
