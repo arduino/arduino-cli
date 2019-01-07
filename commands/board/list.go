@@ -62,8 +62,34 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrBadArgument)
 	}
 
+	// Check for bultin serial-discovery tool
+	loadBuiltinSerialDiscoveryMetadata(pm)
+	serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(pm)
+	if !serialDiscoveryTool.IsInstalled() {
+		formatter.Print("Downloading and installing missing tool: " + serialDiscoveryTool.String())
+		core.DownloadToolRelease(pm, serialDiscoveryTool)
+		core.InstallToolRelease(pm, serialDiscoveryTool)
 
+		if err := pm.LoadHardware(commands.Config); err != nil {
+			formatter.PrintError(err, "Could not load hardware packages.")
+			os.Exit(commands.ErrCoreConfig)
+		}
+		serialDiscoveryTool, _ = getBuiltinSerialDiscoveryTool(pm)
+		if !serialDiscoveryTool.IsInstalled() {
+			formatter.PrintErrorMessage("Missing serial-discovery tool.")
+			os.Exit(commands.ErrCoreConfig)
+		}
+	}
+
+	serialDiscovery, err := discovery.NewFromCommandLine(serialDiscoveryTool.InstallDir.Join("serial-discovery").String())
+	if err != nil {
+		formatter.PrintError(err, "Error setting up serial-discovery tool.")
+		os.Exit(commands.ErrCoreConfig)
+	}
+
+	// Find all installed discoveries
 	discoveries := discovery.ExtractDiscoveriesFromPlatforms(pm)
+	discoveries["serial"] = serialDiscovery
 
 	res := []*detectedPort{}
 	for discName, disc := range discoveries {
