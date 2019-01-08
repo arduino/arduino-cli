@@ -98,7 +98,7 @@
 
 [[constraint]]
   name = "github.com/bouk/monkey"
-  revision = "5df1f207ff77e025801505ae4d903133a0b4353f"
+  version = "^1.0.0"
 
 [prune]
   go-tests = true
