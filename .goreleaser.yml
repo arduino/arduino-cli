@@ -1,0 +1,51 @@
+project_name: arduino-cli
+
+release:
+  github:
+    owner: arduino
+    name: arduino-cli
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - 386
+      - amd64
+      - arm
+      - arm64
+checksum:
+  name_template: '{{ .ProjectName }}-{{ .Version }}-checksums.txt'
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^dev:'
+      - 'README'
+      - Merge pull request
+      - Merge branch
+git:
+  short_hash: true
+
+archive:
+  format: tar.gz
+  name_template: '{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  replacements:
+    darwin: osx
+    linux: linux
+    windows: windows
+    386: 32bit
+    amd64: 64bit
+  format_overrides:
+    - goos: windows
+      format: zip
+    - goos: darwin
+      format: zip
+  files:
+    - README.md
+    - LICENSE.txt
