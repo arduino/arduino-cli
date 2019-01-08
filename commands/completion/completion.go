@@ -15,28 +15,30 @@
  * a commercial license, send an email to license@arduino.cc.
  */
 
-package board
+package completion
 
 import (
-	"github.com/arduino/arduino-cli/commands"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
 // InitCommand prepares the command.
 func InitCommand() *cobra.Command {
-	boardCommand := &cobra.Command{
-		Use:   "board",
-		Short: "Arduino board commands.",
-		Long:  "Arduino board commands.",
-		Example: "  # Lists all connected boards.\n" +
-			"  " + commands.AppName + " board list\n\n" +
-			"  # Attaches a sketch to a board.\n" +
-			"  " + commands.AppName + " board attach serial:///dev/tty/ACM0 mySketch",
+	// completionCmd represents the completion command
+	var completionCmd = &cobra.Command{
+		Use:   "generate_autocomplete",
+		Short: "Generates bash completion scripts",
+		Long: `To load completion run
+			# arduino-cli generate_autocomplete > arduino-cli.sh
+			and then
+			# source arduino-cli.sh
+			or add the script to /etc/bash_completion.d/
+			`,
+		Run: func(cmd *cobra.Command, args []string) {
+			cmd.Root().GenBashCompletion(os.Stdout)
+		},
+		Hidden: true,
 	}
-	boardCommand.AddCommand(initAttachCommand())
-	boardCommand.AddCommand(initDetailsCommand())
-	boardCommand.AddCommand(initListCommand())
-	boardCommand.AddCommand(initListAllCommand())
-	boardCommand.AddCommand(initListAllCommandOnlyFqbn())
-	return boardCommand
+	return completionCmd
 }

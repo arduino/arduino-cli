@@ -32,6 +32,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
+	"github.com/arduino/arduino-cli/commands/completion"
 	"github.com/arduino/arduino-cli/commands/config"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/generatedocs"
@@ -45,14 +46,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	fqbn_bash_completion_func = `__arduino_cli_boards_listall_fqbn()
+{
+    local arduino_cli_output out
+    if arduino_cli_output=$(arduino-cli board listallfqbn 2>/dev/null); then
+        out=($(echo "${arduino_cli_output}" | cut -f1 -d":" | uniq | awk '{print $1}'))
+        COMPREPLY=( $( compgen -W "${out[*]}" -- "$cur" ) )
+    fi
+}
+`
+)
+
 // Init prepares the cobra root command.
 func Init() *cobra.Command {
 	command := &cobra.Command{
-		Use:              "arduino-cli",
-		Short:            "Arduino CLI.",
-		Long:             "Arduino Command Line Interface (arduino-cli).",
-		Example:          "  " + commands.AppName + " <command> [flags...]",
-		PersistentPreRun: preRun,
+		Use:                    "arduino-cli",
+		Short:                  "Arduino CLI.",
+		Long:                   "Arduino Command Line Interface (arduino-cli).",
+		Example:                "  " + commands.AppName + " <command> [flags...]",
+		PersistentPreRun:       preRun,
+		BashCompletionFunction: fqbn_bash_completion_func,
 	}
 	command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
 	command.PersistentFlags().StringVar(&commands.GlobalFlags.Format, "format", "text", "The output format, can be [text|json].")
@@ -69,6 +83,7 @@ func Init() *cobra.Command {
 	command.AddCommand(upload.InitCommand())
 	// command.AddCommand(validate.InitCommand())
 	command.AddCommand(version.InitCommand())
+	command.AddCommand(completion.InitCommand())
 	return command
 }
 

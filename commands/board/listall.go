@@ -18,6 +18,7 @@
 package board
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
@@ -77,4 +78,30 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 	}
 	sort.Sort(list)
 	formatter.Print(list)
+}
+
+func initListAllCommandOnlyFqbn() *cobra.Command {
+	listAllCommand := &cobra.Command{
+		Use:    "listallfqbn",
+		Run:    runListAllCommandOnlyFqbn,
+		Hidden: true,
+	}
+	return listAllCommand
+}
+
+// runListAllCommand list all installed boards
+func runListAllCommandOnlyFqbn(cmd *cobra.Command, args []string) {
+	pm := commands.InitPackageManager()
+
+	for _, targetPackage := range pm.GetPackages().Packages {
+		for _, platform := range targetPackage.Platforms {
+			platformRelease := pm.GetInstalledPlatformRelease(platform)
+			if platformRelease == nil {
+				continue
+			}
+			for _, board := range platformRelease.Boards {
+				fmt.Println(board.FQBN())
+			}
+		}
+	}
 }

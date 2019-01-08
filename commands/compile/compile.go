@@ -35,10 +35,12 @@ import (
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 // InitCommand prepares the command.
 func InitCommand() *cobra.Command {
+
 	command := &cobra.Command{
 		Use:     "compile",
 		Short:   "Compiles Arduino sketches.",
@@ -47,9 +49,21 @@ func InitCommand() *cobra.Command {
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}
-	command.Flags().StringVarP(
-		&flags.fqbn, "fqbn", "b", "",
-		"Fully Qualified Board Name, e.g.: arduino:avr:uno")
+
+	annotation := make(map[string][]string)
+	annotation[cobra.BashCompCustom] = []string{"__arduino_cli_boards_listall_fqbn"}
+
+	fqbn := &pflag.Flag{
+		Name:        "fqbn",
+		Shorthand:   "b",
+		DefValue:    "",
+		Value:       flags.fqbnWrapper,
+		Usage:       "Fully Qualified Board Name, e.g.: arduino:avr:uno",
+		Annotations: annotation,
+	}
+	command.Flags().AddFlag(fqbn)
+	command.MarkFlagRequired("fqbn")
+
 	command.Flags().BoolVar(
 		&flags.showProperties, "show-properties", false,
 		"Show all build properties used instead of compiling.")
@@ -83,18 +97,35 @@ func InitCommand() *cobra.Command {
 	return command
 }
 
+type localValue struct {
+}
+
+func (r localValue) Set(v string) error {
+	flags.fqbn = v
+	return nil
+}
+
+func (r localValue) String() string {
+	return flags.fqbn
+}
+
+func (r localValue) Type() string {
+	return "fqbn"
+}
+
 var flags struct {
-	fqbn            string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
-	showProperties  bool     // Show all build preferences used instead of compiling.
-	preprocess      bool     // Print preprocessed code to stdout.
-	buildCachePath  string   // Builds of 'core.a' are saved into this path to be cached and reused.
-	buildPath       string   // Path where to save compiled files.
-	buildProperties []string // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
-	warnings        string   // Used to tell gcc which warning level to use.
-	verbose         bool     // Turns on verbose mode.
-	quiet           bool     // Suppresses almost every output.
-	vidPid          string   // VID/PID specific build properties.
-	exportFile      string   // The compiled binary is written to this file
+	fqbnWrapper     localValue // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	fqbn            string     // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	showProperties  bool       // Show all build preferences used instead of compiling.
+	preprocess      bool       // Print preprocessed code to stdout.
+	buildCachePath  string     // Builds of 'core.a' are saved into this path to be cached and reused.
+	buildPath       string     // Path where to save compiled files.
+	buildProperties []string   // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
+	warnings        string     // Used to tell gcc which warning level to use.
+	verbose         bool       // Turns on verbose mode.
+	quiet           bool       // Suppresses almost every output.
+	vidPid          string     // VID/PID specific build properties.
+	exportFile      string     // The compiled binary is written to this file
 }
 
 func run(cmd *cobra.Command, args []string) {
@@ -109,7 +140,7 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrGeneric)
 	}
 
-	if flags.fqbn == "" && sketch != nil {
+	if flags.fqbn == "" && sketch != nil && sketch.Metadata != nil {
 		flags.fqbn = sketch.Metadata.CPU.Fqbn
 	}
 	if flags.fqbn == "" {
