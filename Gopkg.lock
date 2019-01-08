@@ -321,11 +321,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e39f0518cc8a9d0d35fdef12df30ddf1260424a8c8fa3909063b1673a21a7459"
+  digest = "1:ad7c27ec39e9523a7412cad155c414d0871cb02a8e975dcf269eb2e55edba224"
   name = "go.bug.st/relaxed-semver"
   packages = ["."]
   pruneopts = "UT"
-  revision = "634f2c8a7dad58007b2539ce542ba69f1e50893c"
+  revision = "0265409c585220cffdb70af2966e80044958b9a9"
 
 [[projects]]
   branch = "master"
