@@ -12,7 +12,8 @@ script:
   - cd $GOPATH/src/github.com/arduino/arduino-cli
   # Check the dependency, -skip-lock may be useful because the version are not fixed but depends
   # from the branch master of the libraries so they change very often
-  - dep check
+  - dep check -skip-vendor
+  - dep ensure
   # Check if the code is formatted
   - $(exit $(go fmt ./... | wc -l))
   # Run linter
