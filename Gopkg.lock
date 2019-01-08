@@ -21,6 +21,26 @@
   source = "github.com/arduino/arduino-builder"
 
 [[projects]]
+  digest = "1:885f53854ae0e4a5adc76ac2416f42f8ec9505bf524b52e3b80a9d635b08ae40"
+  name = "github.com/arduino/arduino-cli"
+  packages = [
+    "arduino/cores",
+    "arduino/cores/packageindex",
+    "arduino/cores/packagemanager",
+    "arduino/libraries",
+    "arduino/libraries/librariesindex",
+    "arduino/libraries/librariesmanager",
+    "arduino/libraries/librariesresolver",
+    "arduino/resources",
+    "arduino/utils",
+    "common/formatter",
+    "configs",
+  ]
+  pruneopts = "UT"
+  revision = "0031c6d985d6f11f68995e725083e603c0c77860"
+  version = "0.3.3-alpha.preview"
+
+[[projects]]
   branch = "master"
   digest = "1:16e26ae59d3dbd322a03511c1a56731aa4722743e5f8294f9fead841e6930b71"
   name = "github.com/arduino/board-discovery"
@@ -234,12 +254,12 @@
   revision = "5dcf00d8b228be86307f952f550f2191d956b9e2"
 
 [[projects]]
-  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
+  digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
   name = "github.com/pkg/errors"
   packages = ["."]
   pruneopts = "UT"
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
+  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
+  version = "v0.8.1"
 
 [[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
