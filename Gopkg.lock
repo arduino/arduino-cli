@@ -21,6 +21,26 @@
   source = "github.com/arduino/arduino-builder"
 
 [[projects]]
+  digest = "1:885f53854ae0e4a5adc76ac2416f42f8ec9505bf524b52e3b80a9d635b08ae40"
+  name = "github.com/arduino/arduino-cli"
+  packages = [
+    "arduino/cores",
+    "arduino/cores/packageindex",
+    "arduino/cores/packagemanager",
+    "arduino/libraries",
+    "arduino/libraries/librariesindex",
+    "arduino/libraries/librariesmanager",
+    "arduino/libraries/librariesresolver",
+    "arduino/resources",
+    "arduino/utils",
+    "common/formatter",
+    "configs",
+  ]
+  pruneopts = "UT"
+  revision = "0031c6d985d6f11f68995e725083e603c0c77860"
+  version = "0.3.3-alpha.preview"
+
+[[projects]]
   branch = "master"
   digest = "1:16e26ae59d3dbd322a03511c1a56731aa4722743e5f8294f9fead841e6930b71"
   name = "github.com/arduino/board-discovery"
@@ -274,15 +294,15 @@
   version = "v1.0.5"
 
 [[projects]]
-  digest = "1:f56a38901e3d06fb5c71219d4e5b48d546d845f776d6219097733ec27011dc60"
+  digest = "1:e01b05ba901239c783dfe56450bcde607fc858908529868259c9a8765dc176d0"
   name = "github.com/spf13/cobra"
   packages = [
     ".",
     "doc",
   ]
   pruneopts = "UT"
-  revision = "a1f051bc3eba734da4772d60e2d677f47cf93ef4"
-  version = "v0.0.2"
+  revision = "ef82de70bb3f60c65fb8eebacbb2d122ef517385"
+  version = "v0.0.3"
 
 [[projects]]
   digest = "1:9424f440bba8f7508b69414634aef3b2b3a877e522d8a4624692412805407bb7"
