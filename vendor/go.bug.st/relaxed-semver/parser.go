@@ -222,23 +222,26 @@ func Parse(inVersioin string) (*Version, error) {
 
 	// Builds parsing
 	buildIdx := currIdx + 1
-	for {
-		if hasNext := next(); !hasNext || curr == '.' {
-			if buildIdx == currIdx {
-				return nil, fmt.Errorf("empty build tag not allowed")
-			}
-			result.builds = append(result.builds, in[buildIdx:currIdx])
-			if !hasNext {
-				return result, nil
-			}
+	if curr == '+' {
+		for {
+			if hasNext := next(); !hasNext || curr == '.' {
+				if buildIdx == currIdx {
+					return nil, fmt.Errorf("empty build tag not allowed")
+				}
+				result.builds = append(result.builds, in[buildIdx:currIdx])
+				if !hasNext {
+					return result, nil
+				}
 
-			// Multiple builds
-			buildIdx = currIdx + 1
-			continue
+				// Multiple builds
+				buildIdx = currIdx + 1
+				continue
+			}
+			if identifier[curr] {
+				continue
+			}
+			return nil, fmt.Errorf("invalid separator for builds: '%c'", curr)
 		}
-		if identifier[curr] {
-			continue
-		}
-		return nil, fmt.Errorf("invalid separator for builds: '%c'", curr)
 	}
+	return nil, fmt.Errorf("invalid separator: '%c'", curr)
 }
