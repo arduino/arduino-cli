@@ -62,6 +62,12 @@ func (config *Configuration) IsBundledInDesktopIDE() bool {
 		}
 	}
 
+	portable := "portable"
+	if ideDir.Join(portable).Exist() {
+		logrus.Info("IDE is portable")
+		config.IsPortable = true
+	}
+
 	config.ArduinoIDEDirectory = ideDir
 	res = true
 	return true
@@ -70,6 +76,10 @@ func (config *Configuration) IsBundledInDesktopIDE() bool {
 // LoadFromDesktopIDEPreferences loads the config from the Desktop IDE preferences.txt file
 func (config *Configuration) LoadFromDesktopIDEPreferences() error {
 	logrus.Info("Unserializing from IDE preferences")
+	if config.IsPortable {
+		config.DataDir = config.ArduinoIDEDirectory.Join("portable")
+		config.SketchbookDir = config.ArduinoIDEDirectory.Join("portable").Join("sketchbook")
+	}
 	preferenceTxtPath := config.DataDir.Join("preferences.txt")
 	props, err := properties.LoadFromPath(preferenceTxtPath)
 	if err != nil {
