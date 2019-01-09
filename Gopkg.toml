@@ -96,10 +96,6 @@
   name = "gopkg.in/yaml.v2"
   version = "2.2.1"
 
-[[constraint]]
-  name = "github.com/bouk/monkey"
-  revision = "5df1f207ff77e025801505ae4d903133a0b4353f"
-
 [prune]
   go-tests = true
   unused-packages = true
