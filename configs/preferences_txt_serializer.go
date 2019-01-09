@@ -88,8 +88,7 @@ func (config *Configuration) LoadFromDesktopIDEPreferences() error {
 	}
 	err = config.proxyConfigsFromIDEPrefs(props)
 	if err != nil {
-		logrus.WithError(err).Warn("Error during unserialize from IDE preferences")
-		return err
+		logrus.WithError(err).Warn("Error loading proxy settings from IDE preferences")
 	}
 	if dir, has := props.GetOk("sketchbook.path"); has {
 		config.SketchbookDir = paths.New(dir)
