@@ -39,6 +39,9 @@ type Configuration struct {
 	// ArduinoIDEDirectory is the directory of the Arduino IDE if the CLI runs together with it.
 	ArduinoIDEDirectory *paths.Path
 
+	// IsPortable is set to true if the cli lives in IDE directory and the IDE is portable
+	IsPortable bool
+
 	// downloadsDir is the directory where the package files are downloaded and cached.
 	// Use DownloadsDir() method to retrieve it.
 	downloadsDir *paths.Path
