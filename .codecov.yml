@@ -6,5 +6,5 @@ coverage:
       default:
         target: 40%
         threshold: null
-    patch: false
-    changes: false
+    patch: off
+    changes: off
