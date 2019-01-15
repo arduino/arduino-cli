@@ -493,8 +493,13 @@ func TestCompileCommands(t *testing.T) {
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "Sketch created")
 
-	// Build sketch for arduino:avr:uno
+	// Build sketch without FQBN
 	test1 := currSketchbookDir.Join("Test1").String()
+	exitCode, d = executeWithArgs(t, "compile", test1)
+	require.NotZero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "No Fully Qualified Board Name provided")
+
+	// Build sketch for arduino:avr:uno
 	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:uno", test1)
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "Sketch uses")
