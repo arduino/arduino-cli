@@ -31,7 +31,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/go-paths-helper"
+	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -109,7 +109,7 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(commands.ErrGeneric)
 	}
 
-	if flags.fqbn == "" && sketch != nil {
+	if flags.fqbn == "" && sketch != nil && sketch.Metadata != nil {
 		flags.fqbn = sketch.Metadata.CPU.Fqbn
 	}
 	if flags.fqbn == "" {
