@@ -22,34 +22,34 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/resources"
-	"go.bug.st/relaxed-semver"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // Index represents the list of libraries available for download
 type Index struct {
-	Libraries map[string]*Library
+	Libraries map[string]*Library `json:"libraries"`
 }
 
 // Library is a library available for download
 type Library struct {
-	Name     string
-	Releases map[string]*Release
-	Latest   *Release `json:"-"`
-	Index    *Index   `json:"-"`
+	Name     string              `json:"name"`
+	Releases map[string]*Release `json:"releases"`
+	Latest   *Release            `json:"-"`
+	Index    *Index              `json:"-"`
 }
 
 // Release is a release of a library available for download
 type Release struct {
-	Author        string
-	Version       *semver.Version
-	Maintainer    string
-	Sentence      string
-	Paragraph     string
-	Website       string
-	Category      string
-	Architectures []string
-	Types         []string
-	Resource      *resources.DownloadResource
+	Author        string                      `json:"author"`
+	Version       *semver.Version             `json:"version"`
+	Maintainer    string                      `json:"maintainer"`
+	Sentence      string                      `json:"sentence"`
+	Paragraph     string                      `json:"paragraph"`
+	Website       string                      `json:"website"`
+	Category      string                      `json:"category"`
+	Architectures []string                    `json:"architectures"`
+	Types         []string                    `json:"types"`
+	Resource      *resources.DownloadResource `json:"resource"`
 
 	Library *Library `json:"-"`
 }
