@@ -2,7 +2,8 @@
 name=Test AVR Boards
 version=1.0.0
 
-recipe.output.tmp_file={build.project_name}.hex
+preferred_output_format=hex
+recipe.output.tmp_file={build.project_name}.{preferred_output_format}
 
 # Fake AVR programmer tool for testing
 # ------------------------------------
