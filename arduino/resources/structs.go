@@ -19,11 +19,11 @@ package resources
 
 // DownloadResource has all the information to download a file
 type DownloadResource struct {
-	URL             string
-	ArchiveFileName string
-	Checksum        string
-	Size            int64
-	CachePath       string
+	URL             string `json:"url"`
+	ArchiveFileName string `json:"archiveFileName"`
+	Checksum        string `json:"checksum"`
+	Size            int64  `json:"size"`
+	CachePath       string `json:"cachePath"`
 }
 
 // DownloadResult contains the result of a download
