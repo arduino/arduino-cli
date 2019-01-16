@@ -178,12 +178,6 @@ func run(command *cobra.Command, args []string) {
 	// Make the filename without the FQBN configs part
 	fqbn.Configs = properties.NewMap()
 	fqbnSuffix := strings.Replace(fqbn.String(), ":", ".", -1)
-	outputTmpFile, ok := uploadProperties.GetOk("recipe.output.tmp_file")
-	if !ok {
-		formatter.PrintErrorMessage("The platform does not define the required property 'recipe.output.tmp_file'.")
-		os.Exit(commands.ErrGeneric)
-	}
-	ext := filepath.Ext(outputTmpFile)
 
 	var importPath *paths.Path
 	var importFile string
@@ -193,9 +187,17 @@ func run(command *cobra.Command, args []string) {
 	} else {
 		importPath = paths.New(flags.importFile).Parent()
 		importFile = paths.New(flags.importFile).Base()
-		if strings.HasSuffix(importFile, ext) {
-			importFile = importFile[:len(importFile)-len(ext)]
-		}
+	}
+
+	outputTmpFile, ok := uploadProperties.GetOk("recipe.output.tmp_file")
+	outputTmpFile = uploadProperties.ExpandPropsInString(outputTmpFile)
+	if !ok {
+		formatter.PrintErrorMessage("The platform does not define the required property 'recipe.output.tmp_file'.")
+		os.Exit(commands.ErrGeneric)
+	}
+	ext := filepath.Ext(outputTmpFile)
+	if strings.HasSuffix(importFile, ext) {
+		importFile = importFile[:len(importFile)-len(ext)]
 	}
 
 	uploadProperties.SetPath("build.path", importPath)
