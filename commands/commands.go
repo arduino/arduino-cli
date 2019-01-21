@@ -22,7 +22,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/arduino/go-paths-helper"
+	paths "github.com/arduino/go-paths-helper"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -50,7 +50,7 @@ const (
 )
 
 // Version is the current CLI version
-var Version = "0.3.3-alpha.preview"
+var Version = "0.3.4-alpha.preview"
 
 // ErrLogrus represents the logrus instance, which has the role to
 // log all non info messages.

@@ -17,11 +17,12 @@ This is **not yet available** until the first stable version is released.
 #### Download the latest unstable "alpha" preview
 
 Please note that these are **preview** build, they may have bugs, some features may not work or may be changed without notice,
-the latest preview version is `0.3.3-alpha.preview`:
+the latest preview version is `0.3.4-alpha.preview`:
 
 - [Linux 64 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linux64.tar.bz2)
 - [Linux 32 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linux32.tar.bz2)
 - [Linux ARM](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linuxarm.tar.bz2)
+- [Linux ARM64](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linuxaarch64.tar.bz2)
 - [Windows](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-windows.zip)
 - [Mac OSX](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-osx.zip)
 
