@@ -26,7 +26,7 @@ the latest preview version is `0.3.5-alpha.preview`:
 - [Windows](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-windows.zip)
 - [Mac OSX](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-osx.zip)
 
-Once downloaded, place the executable into a directory which is in your `PATH` environment variable. To use the tool as it is presented in the Getting started guide below (`arduino-cli`), you should rename the executable from _arduino-cli-0.2.2-alpha.preview-XYZ_ to _arduino-cli_.
+Once downloaded, place the executable into a directory which is in your `PATH` environment variable. To use the tool as it is presented in the Getting started guide below (`arduino-cli`), you should rename the executable from _arduino-cli-X.Y.Z-alpha.preview-XYZ_ to _arduino-cli_.
 
 ### Build the latest "bleeding-edge" from source
 
