@@ -5,3 +5,4 @@
 /cmd/formatter/debug.test
 /.cli-config.yml
 /wiki
+/bin/arduino-cli
