@@ -3,4 +3,5 @@ COPY . /go/src/arduino-cli
 WORKDIR /go/src/arduino-cli
 RUN go get .
 RUN CGO_ENABLED=0 GOOS=linux go install -a -ldflags '-s -w -extldflags "-static"' .
+RUN cp -v /go/bin/arduino-cli /bin/arduino-cli
 ENTRYPOINT ["/bin/cp", "-v", "/go/bin/arduino-cli", "/out"]
