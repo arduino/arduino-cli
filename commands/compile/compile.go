@@ -257,7 +257,11 @@ func run(cmd *cobra.Command, args []string) {
 	var exportPath *paths.Path
 	var exportFile string
 	if flags.exportFile == "" {
-		exportPath = sketch.FullPath
+		if sketch.FullPath.IsDir() {
+			exportPath = sketch.FullPath
+		} else {
+			exportPath = sketch.FullPath.Parent()
+		}
 		exportFile = sketch.Name + "." + fqbnSuffix
 	} else {
 		exportPath = paths.New(flags.exportFile).Parent()
