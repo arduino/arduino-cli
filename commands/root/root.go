@@ -47,11 +47,12 @@ import (
 )
 
 const (
-	fqbn_bash_completion_func = `__arduino_cli_boards_listall_fqbn()
+	fqbn_bash_completion_func = `COMP_WORDBREAKS=" "
+__arduino_cli_boards_listall_fqbn()
 {
     local arduino_cli_output out
     if arduino_cli_output=$(arduino-cli board listallfqbn 2>/dev/null); then
-        out=($(echo "${arduino_cli_output}" | cut -f1 -d":" | uniq | awk '{print $1}'))
+        out=($(echo "${arduino_cli_output}" | uniq | awk '{print $1}'))
         COMPREPLY=( $( compgen -W "${out[*]}" -- "$cur" ) )
     fi
 }
