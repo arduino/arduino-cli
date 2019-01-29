@@ -47,7 +47,7 @@ import (
 )
 
 const (
-	fqbn_bash_completion_func = `COMP_WORDBREAKS=" "
+	fqbn_bash_completion_func = `COMP_WORDBREAKS="\"'><;|&( "
 __arduino_cli_boards_listall_fqbn()
 {
     local arduino_cli_output out
