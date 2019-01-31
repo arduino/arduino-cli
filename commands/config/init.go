@@ -65,7 +65,14 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	if filepath == "" {
 		filepath = commands.Config.ConfigFile.String()
 	}
-	err := commands.Config.SaveToYAML(filepath)
+
+	err := os.MkdirAll(commands.Config.ConfigFile.Parent().String(), 0766)
+	if err != nil {
+		formatter.PrintError(err, "Cannot create config file.")
+		os.Exit(commands.ErrGeneric)
+	}
+
+	err = commands.Config.SaveToYAML(filepath)
 	if err != nil {
 		formatter.PrintError(err, "Cannot create config file.")
 		os.Exit(commands.ErrGeneric)
