@@ -267,6 +267,14 @@
   version = "v1.5.1"
 
 [[projects]]
+  branch = "master"
+  digest = "1:8209ed8bf2336848aa760c11e809f93ba96fffa64d3c2948e970a362a46e534b"
+  name = "github.com/shibukawa/configdir"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "e180dbdc8da04c4fa04272e875ce64949f38bd3e"
+
+[[projects]]
   digest = "1:9e9193aa51197513b3abcb108970d831fbcf40ef96aa845c4f03276e1fa316d2"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
@@ -441,6 +449,7 @@
     "github.com/mitchellh/go-homedir",
     "github.com/pkg/errors",
     "github.com/pmylund/sortutil",
+    "github.com/shibukawa/configdir",
     "github.com/sirupsen/logrus",
     "github.com/spf13/cobra",
     "github.com/spf13/cobra/doc",

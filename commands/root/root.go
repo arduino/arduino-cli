@@ -56,7 +56,7 @@ func Init() *cobra.Command {
 	}
 	command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
 	command.PersistentFlags().StringVar(&commands.GlobalFlags.Format, "format", "text", "The output format, can be [text|json].")
-	command.PersistentFlags().StringVar(&yamlConfigFile, "config-file", "", "The custom config file (if not specified ./.cli-config.yml will be used).")
+	command.PersistentFlags().StringVar(&yamlConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 	command.AddCommand(board.InitCommand())
 	command.AddCommand(compile.InitCommand())
 	command.AddCommand(config.InitCommand())

@@ -19,23 +19,31 @@ package configs
 
 import (
 	"fmt"
-	"os"
 	"os/user"
 	"runtime"
 
 	"github.com/arduino/go-paths-helper"
-
 	"github.com/arduino/go-win32-utils"
+	"github.com/shibukawa/configdir"
 )
 
-// getDefaultConfigFilePath returns the default path for .cli-config.yml,
-// this is the directory where the arduino-cli executable resides.
+// getDefaultConfigFilePath returns the default path for .cli-config.yml. It searches the following directories for an existing .cli-config.yml file:
+// - User level configuration folder(e.g. $HOME/.config/<vendor-name>/<application-name>/setting.json in Linux)
+// - System level configuration folder(e.g. /etc/xdg/<vendor-name>/<application-name>/setting.json in Linux)
+// If it doesn't find one, it defaults to the user level configuration folder
 func getDefaultConfigFilePath() *paths.Path {
-	executablePath, err := os.Executable()
-	if err != nil {
-		executablePath = "."
+	configDirs := configdir.New("arduino", "arduino-cli")
+
+	// Search for a suitable configuration file
+	path := configDirs.QueryFolderContainsFile(".cli-config.yml")
+	if path != nil {
+		return paths.New(path.Path, ".cli-config.yml")
 	}
-	return paths.New(executablePath).Parent().Join(".cli-config.yml")
+	// Default to the global configuration
+	locals := configDirs.QueryFolders(configdir.Global)
+	return paths.New(locals[0].Path, ".cli-config.yml")
+
+	return nil
 }
 
 func getDefaultArduinoDataDir() (*paths.Path, error) {
