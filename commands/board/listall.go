@@ -85,8 +85,17 @@ func initListAllCommandOnlyFqbn() *cobra.Command {
 		Use:    "listallfqbn",
 		Run:    runListAllCommandOnlyFqbn,
 		Hidden: true,
+		Args:   cobra.ArbitraryArgs,
 	}
 	return listAllCommand
+}
+
+func userAskForOptions(str string) bool {
+	// one arg must contain 3 or more colons
+	if strings.Count(str, ":") >= 3 {
+		return true
+	}
+	return false
 }
 
 // runListAllCommand list all installed boards
@@ -100,7 +109,17 @@ func runListAllCommandOnlyFqbn(cmd *cobra.Command, args []string) {
 				continue
 			}
 			for _, board := range platformRelease.Boards {
-				fmt.Println(board.FQBN())
+				boardname := board.FQBN()
+				if board.GetConfigOptions() != nil && len(args) > 0 && userAskForOptions(args[0]) && strings.Contains(args[0], boardname) {
+					for _, option := range board.GetConfigOptions().FirstLevelKeys() {
+						str := boardname + ":" + option + "="
+						for _, value := range board.GetConfigOptionValues(option).FirstLevelKeys() {
+							fmt.Println(str + value)
+						}
+					}
+				} else {
+					fmt.Println(boardname)
+				}
 			}
 		}
 	}

@@ -51,7 +51,7 @@ const (
 __arduino_cli_boards_listall_fqbn()
 {
     local arduino_cli_output out
-    if arduino_cli_output=$(arduino-cli board listallfqbn 2>/dev/null); then
+    if arduino_cli_output=$(arduino-cli board listallfqbn $cur 2>/dev/null); then
         out=($(echo "${arduino_cli_output}" | uniq | awk '{print $1}'))
         COMPREPLY=( $( compgen -W "${out[*]}" -- "$cur" ) )
     fi
