@@ -30,7 +30,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Example: "  " + commands.AppName + " lib update-index",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			lm := commands.InitLibraryManager(nil)
+			lm := commands.InitLibraryManager(commands.Config, nil)
 			commands.UpdateLibrariesIndex(lm)
 		},
 	}

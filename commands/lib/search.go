@@ -50,7 +50,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib search`")
 	query := strings.ToLower(strings.Join(args, " "))
 
-	lm := commands.InitLibraryManager(nil)
+	lm := commands.InitLibraryManager(commands.Config, nil)
 
 	res := output.LibSearchResults{
 		Libraries: []*librariesindex.Library{},

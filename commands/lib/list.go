@@ -53,7 +53,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	if listFlags.all {
 		pm = commands.InitPackageManager()
 	}
-	lm := commands.InitLibraryManager(pm)
+	lm := commands.InitLibraryManager(commands.Config, pm)
 
 	res := listLibraries(lm, listFlags.updatable)
 	if len(res.Libraries) > 0 {
