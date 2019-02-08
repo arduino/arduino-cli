@@ -68,9 +68,9 @@ func (config *Configuration) LoadFromYAML(path *paths.Path) error {
 		config.SketchbookDir = paths.New(ret.SketchbookPath)
 	}
 	if ret.ArduinoDownloadsDir != "" {
-		config.downloadsDir = paths.New(ret.ArduinoDownloadsDir)
+		config.ArduinoDownloadsDir = paths.New(ret.ArduinoDownloadsDir)
 	} else {
-		config.downloadsDir = nil
+		config.ArduinoDownloadsDir = nil
 	}
 	if ret.ProxyType != "" {
 		config.ProxyType = ret.ProxyType
@@ -102,8 +102,8 @@ func (config *Configuration) SerializeToYAML() ([]byte, error) {
 	if config.DataDir != nil {
 		c.ArduinoDataDir = config.DataDir.String()
 	}
-	if config.downloadsDir != nil {
-		c.ArduinoDownloadsDir = config.downloadsDir.String()
+	if config.ArduinoDownloadsDir != nil {
+		c.ArduinoDownloadsDir = config.ArduinoDownloadsDir.String()
 	}
 	c.ProxyType = config.ProxyType
 	if config.ProxyType == "manual" {
