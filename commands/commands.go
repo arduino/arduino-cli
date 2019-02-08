@@ -106,10 +106,10 @@ func InitPackageManager() *packagemanager.PackageManager {
 }
 
 // InitLibraryManager initializes the LibraryManager using the underlying packagemanager
-func InitLibraryManager(pm *packagemanager.PackageManager) *librariesmanager.LibrariesManager {
+func InitLibraryManager(cfg *configs.Configuration, pm *packagemanager.PackageManager) *librariesmanager.LibrariesManager {
 	logrus.Info("Starting libraries manager")
 	lm := librariesmanager.NewLibraryManager(
-		Config.IndexesDir(),
+		cfg.IndexesDir(),
 		Config.DownloadsDir())
 
 	// Add IDE builtin libraries dir
