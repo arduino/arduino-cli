@@ -55,14 +55,16 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	}
 	lm := commands.InitLibraryManager(commands.Config, pm)
 
-	res := listLibraries(lm, listFlags.updatable)
+	res := ListLibraries(lm, listFlags.updatable)
 	if len(res.Libraries) > 0 {
 		formatter.Print(res)
 	}
 	logrus.Info("Done")
 }
 
-func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool) *output.InstalledLibraries {
+// ListLibraries returns the list of installed libraries. If updatable is true it
+// returns only the libraries that may be updated.
+func ListLibraries(lm *librariesmanager.LibrariesManager, updatable bool) *output.InstalledLibraries {
 	res := &output.InstalledLibraries{}
 	for _, libAlternatives := range lm.Libraries {
 		for _, lib := range libAlternatives.Alternatives {
