@@ -21,14 +21,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/arduino/arduino-cli/output"
-
-	"golang.org/x/crypto/ssh/terminal"
-
-	"github.com/mattn/go-colorable"
-
-	"github.com/arduino/go-paths-helper"
-
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
@@ -41,8 +33,12 @@ import (
 	"github.com/arduino/arduino-cli/commands/version"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
+	"github.com/arduino/arduino-cli/output"
+	paths "github.com/arduino/go-paths-helper"
+	colorable "github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 // Init prepares the cobra root command.
