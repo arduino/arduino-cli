@@ -1,0 +1,70 @@
+//
+
+syntax = "proto3";
+
+package arduino;
+
+// The main Arduino Platform Service
+service ArduinoCore {
+  // Start a new instance of the Arduino Platform
+  rpc Init(InitReq) returns (InitResp) {}
+  rpc Destroy(DestroyReq) returns (DestroyResp) {}
+
+  rpc ListLibraries(ListLibrariesReq) returns (ListLibrariesResp) {}
+
+  rpc Compile(CompileReq) returns (stream CompileResp) {}
+}
+
+message CompileReq {}
+message CompileResp {
+  string result = 1;
+  string outputLine = 2;
+}
+
+// Configuration contains information to instantiate an Arduino Platform Service
+message Configuration {
+  // dataDir represents the current root of the arduino tree (defaulted to
+  // `$HOME/.arduino15` on linux).
+  string dataDir = 1;
+
+  // sketchbookDir represents the current root of the sketchbooks tree
+  // (defaulted to `$HOME/Arduino`).
+  string sketchbookDir = 2;
+
+  // ArduinoIDEDirectory is the directory of the Arduino IDE if the CLI runs
+  // together with it.
+  string downloadsDir = 3;
+
+  // BoardManagerAdditionalUrls contains the additional URL for 3rd party
+  // packages
+  repeated string boardManagerAdditionalUrls = 4;
+}
+
+message Instance { int32 id = 1; }
+
+message Result {
+  bool error = 1;
+  string errorMessage = 2;
+}
+
+message Library {
+  string name = 1;
+  string paragraph = 2;
+  bool precompiled = 3;
+  Version version = 4;
+}
+
+message Version { string version = 1; }
+
+message InitReq { Configuration configuration = 1; }
+message InitResp { Instance instance = 1; }
+
+message DestroyReq { Instance instance = 1; }
+message DestroyResp { Result result = 1; }
+
+message ListLibrariesReq {
+  Instance instance = 1;
+  // Set to true to list only updatable libraries
+  bool updatable = 2;
+}
+message ListLibrariesResp { repeated Library libraries = 1; }
