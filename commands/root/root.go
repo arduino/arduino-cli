@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/config"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/commands/daemon"
 	"github.com/arduino/arduino-cli/commands/generatedocs"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/sketch"
@@ -57,6 +58,7 @@ func Init() *cobra.Command {
 	command.AddCommand(compile.InitCommand())
 	command.AddCommand(config.InitCommand())
 	command.AddCommand(core.InitCommand())
+	command.AddCommand(daemon.InitCommand())
 	command.AddCommand(generatedocs.InitCommand())
 	command.AddCommand(lib.InitCommand())
 	// command.AddCommand(login.InitCommand())
