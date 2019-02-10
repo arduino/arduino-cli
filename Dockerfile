@@ -4,8 +4,8 @@ WORKDIR /go/src/arduino-cli
 RUN go get .
 RUN CGO_ENABLED=0 GOOS=linux go install -a -ldflags '-s -w -extldflags "-static"' .
 
-FROM alpine:3.8 
-RUN apk add ca-certificates
+FROM frolvlad/alpine-glibc
+RUN apk add ca-certificates python
 WORKDIR /root
 COPY --from=0 /go/bin/arduino-cli /usr/bin/arduino-cli 
 ENV USER root
