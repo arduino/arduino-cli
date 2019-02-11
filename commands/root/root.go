@@ -18,8 +18,10 @@
 package root
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/arduino/arduino-cli/output"
 
@@ -115,6 +117,7 @@ func preRun(cmd *cobra.Command, args []string) {
 
 // initConfigs initializes the configuration from the specified file.
 func initConfigs() {
+	// Start with default configuration
 	if conf, err := configs.NewConfiguration(); err != nil {
 		logrus.WithError(err).Error("Error creating default configuration")
 		formatter.PrintError(err, "Error creating default configuration")
@@ -123,14 +126,25 @@ func initConfigs() {
 		commands.Config = conf
 	}
 
+	// Navigate through folders
+	pwd, err := filepath.Abs(".")
+	if err != nil {
+		logrus.WithError(err).Warn("Did not manage to find current path")
+	}
+
+	commands.Config.Navigate("/", pwd)
+
+	fmt.Println(yamlConfigFile)
+
 	if yamlConfigFile != "" {
 		commands.Config.ConfigFile = paths.New(yamlConfigFile)
+		if err := commands.Config.LoadFromYAML(commands.Config.ConfigFile); err != nil {
+			logrus.WithError(err).Warn("Did not manage to get config file, using default configuration")
+		}
 	}
 
 	logrus.Info("Initiating configuration")
-	if err := commands.Config.LoadFromYAML(commands.Config.ConfigFile); err != nil {
-		logrus.WithError(err).Warn("Did not manage to get config file, using default configuration")
-	}
+
 	if commands.Config.IsBundledInDesktopIDE() {
 		logrus.Info("CLI is bundled into the IDE")
 		err := commands.Config.LoadFromDesktopIDEPreferences()
