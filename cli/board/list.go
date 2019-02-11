@@ -22,10 +22,10 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/common/formatter/output"
-	"github.com/arduino/board-discovery"
+	discovery "github.com/arduino/board-discovery"
 	"github.com/codeclysm/cc"
 	"github.com/spf13/cobra"
 )
@@ -35,7 +35,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "List connected boards.",
 		Long:    "Detects and displays a list of connected boards to the current computer.",
-		Example: "  " + commands.AppName + " board list --timeout 10s",
+		Example: "  " + cli.AppName + " board list --timeout 10s",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}
@@ -52,7 +52,7 @@ var listFlags struct {
 // runListCommand detects and lists the connected arduino boards
 // (either via serial or network ports).
 func runListCommand(cmd *cobra.Command, args []string) {
-	pm := commands.InitPackageManager()
+	pm := cli.InitPackageManager()
 
 	monitor := discovery.New(time.Millisecond)
 	monitor.Start()

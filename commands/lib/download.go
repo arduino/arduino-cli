@@ -22,7 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -34,8 +34,8 @@ func initDownloadCommand() *cobra.Command {
 		Short: "Downloads one or more libraries without installing them.",
 		Long:  "Downloads one or more libraries without installing them.",
 		Example: "" +
-			"  " + commands.AppName + " lib download AudioZero       # for the latest version.\n" +
-			"  " + commands.AppName + " lib download AudioZero@1.0.0 # for a specific version.",
+			"  " + cli.AppName + " lib download AudioZero       # for the latest version.\n" +
+			"  " + cli.AppName + " lib download AudioZero@1.0.0 # for a specific version.",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 	}
@@ -45,13 +45,13 @@ func initDownloadCommand() *cobra.Command {
 func runDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib download`")
 
-	lm := commands.InitLibraryManager(commands.Config, nil)
+	lm := cli.InitLibraryManager(cli.Config, nil)
 
 	logrus.Info("Preparing download")
 	pairs, err := librariesindex.ParseArgs(args)
 	if err != nil {
 		formatter.PrintError(err, "Arguments error")
-		os.Exit(commands.ErrBadArgument)
+		os.Exit(cli.ErrBadArgument)
 	}
 	downloadLibrariesFromReferences(lm, pairs)
 }
@@ -61,7 +61,7 @@ func downloadLibrariesFromReferences(lm *librariesmanager.LibrariesManager, refs
 	for _, ref := range refs {
 		if lib := lm.Index.FindRelease(ref); lib == nil {
 			formatter.PrintErrorMessage("Error: library " + ref.String() + " not found")
-			os.Exit(commands.ErrBadCall)
+			os.Exit(cli.ErrBadCall)
 		} else {
 			libReleases = append(libReleases, lib)
 		}
@@ -75,7 +75,7 @@ func downloadLibraries(lm *librariesmanager.LibrariesManager, libReleases []*lib
 		d, err := libRelease.Resource.Download(lm.DownloadsDir)
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+libRelease.String())
-			os.Exit(commands.ErrNetwork)
+			os.Exit(cli.ErrNetwork)
 		}
 		if d == nil {
 			formatter.Print(libRelease.String() + " already downloaded")
@@ -83,7 +83,7 @@ func downloadLibraries(lm *librariesmanager.LibrariesManager, libReleases []*lib
 			formatter.DownloadProgressBar(d, libRelease.String())
 			if d.Error() != nil {
 				formatter.PrintError(d.Error(), "Error downloading "+libRelease.String())
-				os.Exit(commands.ErrNetwork)
+				os.Exit(cli.ErrNetwork)
 			}
 		}
 	}

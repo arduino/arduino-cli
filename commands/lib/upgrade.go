@@ -19,7 +19,7 @@ package lib
 
 import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -30,7 +30,7 @@ func initUpgradeCommand() *cobra.Command {
 		Short: "Upgrades installed libraries.",
 		Long: "This command ungrades all installed libraries to the latest available version." +
 			"To upgrade a single library use the 'install' command.",
-		Example: "  " + commands.AppName + " lib upgrade",
+		Example: "  " + cli.AppName + " lib upgrade",
 		Args:    cobra.NoArgs,
 		Run:     runUpgradeCommand,
 	}
@@ -38,7 +38,7 @@ func initUpgradeCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	lm := commands.InitLibraryManager(commands.Config, nil)
+	lm := cli.InitLibraryManager(cli.Config, nil)
 	list := ListLibraries(lm, true)
 	libReleases := []*librariesindex.Release{}
 	for _, upgradeDesc := range list.Libraries {

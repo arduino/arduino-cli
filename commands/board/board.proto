@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package arduino.board;
+
+option go_package = "github.com/arduino/arduino-cli/commands/board";
+
+import "commands.proto";
+
+service Board { rpc Details(DetailsReq) returns (DetailsResp); }
+
+message DetailsReq { string fqbn = 1; }
+
+message DetailsResp {
+  arduino.commands.Result result = 1;
+  string name = 2;
+  repeated ConfigOption config_options = 3;
+  repeated RequiredTool required_tools = 4;
+}
+
+message ConfigOption {
+  string option = 1;
+  string option_label = 2;
+  repeated ConfigValue values = 3;
+}
+
+message ConfigValue {
+  string value = 1;
+  string value_label = 2;
+  bool selected = 3;
+}
+
+message RequiredTool {
+  string name = 1;
+  string version = 2;
+  string packager = 3;
+}

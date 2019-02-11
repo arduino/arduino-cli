@@ -9,7 +9,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	pb "github.com/arduino/arduino-cli/daemon/arduino"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
@@ -21,7 +21,7 @@ func InitCommand() *cobra.Command {
 		Use:     "daemon",
 		Short:   "Run as a daemon",
 		Long:    "Running as a daemon the initialization of cores and libraries is done only once.",
-		Example: "  " + commands.AppName + " daemon",
+		Example: "  " + cli.AppName + " daemon",
 		Args:    cobra.NoArgs,
 		Run:     runDaemonCommand,
 		Hidden:  true,

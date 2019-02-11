@@ -24,7 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/common/formatter/output"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/spf13/cobra"
 )
@@ -34,7 +34,7 @@ func initSearchCommand() *cobra.Command {
 		Use:     "search <keywords...>",
 		Short:   "Search for a core in the package index.",
 		Long:    "Search for a core in the package index using the specified keywords.",
-		Example: "  " + commands.AppName + " core search MKRZero -v",
+		Example: "  " + cli.AppName + " core search MKRZero -v",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runSearchCommand,
 	}
@@ -42,7 +42,7 @@ func initSearchCommand() *cobra.Command {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	pm := commands.InitPackageManagerWithoutBundles()
+	pm := cli.InitPackageManagerWithoutBundles()
 
 	search := strings.ToLower(strings.Join(args, " "))
 	formatter.Print("Searching for platforms matching '" + search + "'")

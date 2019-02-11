@@ -15,7 +15,7 @@
  * a commercial license, send an email to license@arduino.cc.
  */
 
-package core
+package board
 
 import (
 	"github.com/arduino/arduino-cli/cli"
@@ -24,18 +24,18 @@ import (
 
 // InitCommand prepares the command.
 func InitCommand() *cobra.Command {
-	coreCommand := &cobra.Command{
-		Use:     "core",
-		Short:   "Arduino Core operations.",
-		Long:    "Arduino Core operations.",
-		Example: "  " + cli.AppName + " core update-index",
+	boardCommand := &cobra.Command{
+		Use:   "board",
+		Short: "Arduino board commands.",
+		Long:  "Arduino board commands.",
+		Example: "  # Lists all connected boards.\n" +
+			"  " + cli.AppName + " board list\n\n" +
+			"  # Attaches a sketch to a board.\n" +
+			"  " + cli.AppName + " board attach serial:///dev/tty/ACM0 mySketch",
 	}
-	coreCommand.AddCommand(initDownloadCommand())
-	coreCommand.AddCommand(initInstallCommand())
-	coreCommand.AddCommand(initListCommand())
-	coreCommand.AddCommand(initUpdateIndexCommand())
-	coreCommand.AddCommand(initUpgradeCommand())
-	coreCommand.AddCommand(initUninstallCommand())
-	coreCommand.AddCommand(initSearchCommand())
-	return coreCommand
+	boardCommand.AddCommand(initAttachCommand())
+	boardCommand.AddCommand(initDetailsCommand())
+	boardCommand.AddCommand(initListCommand())
+	boardCommand.AddCommand(initListAllCommand())
+	return boardCommand
 }

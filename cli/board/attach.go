@@ -27,7 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	discovery "github.com/arduino/board-discovery"
 	paths "github.com/arduino/go-paths-helper"
@@ -40,9 +40,9 @@ func initAttachCommand() *cobra.Command {
 		Use:   "attach <port>|<FQBN> [sketchPath]",
 		Short: "Attaches a sketch to a board.",
 		Long:  "Attaches a sketch to a board.",
-		Example: "  " + commands.AppName + " board attach serial:///dev/tty/ACM0\n" +
-			"  " + commands.AppName + " board attach serial:///dev/tty/ACM0 HelloWorld\n" +
-			"  " + commands.AppName + " board attach arduino:samd:mkr1000",
+		Example: "  " + cli.AppName + " board attach serial:///dev/tty/ACM0\n" +
+			"  " + cli.AppName + " board attach serial:///dev/tty/ACM0 HelloWorld\n" +
+			"  " + cli.AppName + " board attach arduino:samd:mkr1000",
 		Args: cobra.RangeArgs(1, 2),
 		Run:  runAttachCommand,
 	}
@@ -64,10 +64,10 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	if len(args) > 1 {
 		sketchPath = paths.New(args[1])
 	}
-	sketch, err := commands.InitSketch(sketchPath)
+	sketch, err := cli.InitSketch(sketchPath)
 	if err != nil {
 		formatter.PrintError(err, "Error opening sketch.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	logrus.WithField("fqbn", boardURI).Print("Parsing FQBN")
@@ -76,7 +76,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		boardURI = "serial://" + boardURI
 	}
 
-	pm := commands.InitPackageManager()
+	pm := cli.InitPackageManager()
 
 	if fqbn != nil {
 		sketch.Metadata.CPU = sketches.BoardMetadata{
@@ -86,7 +86,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		deviceURI, err := url.Parse(boardURI)
 		if err != nil {
 			formatter.PrintError(err, "The provided Device URL is not in a valid format.")
-			os.Exit(commands.ErrBadCall)
+			os.Exit(cli.ErrBadCall)
 		}
 
 		var findBoardFunc func(*packagemanager.PackageManager, *discovery.Monitor, *url.URL) *cores.Board
@@ -97,7 +97,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 			findBoardFunc = findNetworkConnectedBoard
 		default:
 			formatter.PrintErrorMessage("Invalid device port type provided. Accepted types are: serial://, tty://, http://, https://, tcp://, udp://.")
-			os.Exit(commands.ErrBadCall)
+			os.Exit(cli.ErrBadCall)
 		}
 
 		duration, err := time.ParseDuration(attachFlags.searchTimeout)
@@ -115,7 +115,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		board := findBoardFunc(pm, monitor, deviceURI)
 		if board == nil {
 			formatter.PrintErrorMessage("No supported board has been found at " + deviceURI.String() + ", try either install new cores or check your board URI.")
-			os.Exit(commands.ErrGeneric)
+			os.Exit(cli.ErrGeneric)
 		}
 		formatter.Print("Board found: " + board.Name())
 
@@ -152,7 +152,7 @@ func findSerialConnectedBoard(pm *packagemanager.PackageManager, monitor *discov
 
 	boards := pm.FindBoardsWithVidPid(serialDevice.VendorID, serialDevice.ProductID)
 	if len(boards) == 0 {
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	return boards[0]

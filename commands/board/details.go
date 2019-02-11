@@ -18,61 +18,43 @@
 package board
 
 import (
-	"encoding/json"
-	"os"
-
 	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/output"
-
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/spf13/cobra"
 )
 
-func initDetailsCommand() *cobra.Command {
-	detailsCommand := &cobra.Command{
-		Use:     "details <FQBN>",
-		Short:   "Print details about a board.",
-		Long:    "Show information about a board, in particular if the board has options to be specified in the FQBN.",
-		Example: "  " + commands.AppName + " board details arduino:avr:nano",
-		Args:    cobra.ExactArgs(1),
-		Run:     runDetailsCommand,
-	}
-	return detailsCommand
-}
-
-func runDetailsCommand(cmd *cobra.Command, args []string) {
-	pm := commands.InitPackageManager()
-	fqbn, err := cores.ParseFQBN(args[0])
+func Details(pm *packagemanager.PackageManager, req *DetailsReq) *DetailsResp {
+	fqbn, err := cores.ParseFQBN(req.GetFqbn())
 	if err != nil {
-		formatter.PrintError(err, "Error parsing fqbn")
-		os.Exit(commands.ErrBadArgument)
+		return &DetailsResp{
+			Result: commands.Error("Error parsing fqbn", commands.ErrBadArgument),
+		}
 	}
 
 	_, _, board, _, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		formatter.PrintError(err, "Error loading board data")
-		os.Exit(commands.ErrBadArgument)
+		return &DetailsResp{
+			Result: commands.Error("Error loading board data", commands.ErrBadArgument),
+		}
 	}
 
-	details := &boardDetails{}
+	details := &DetailsResp{}
 	details.Name = board.Name()
-	details.ConfigOptions = []*boardConfigOption{}
+	details.ConfigOptions = []*ConfigOption{}
 	options := board.GetConfigOptions()
-	t := true
 	for _, option := range options.Keys() {
-		configOption := &boardConfigOption{}
+		configOption := &ConfigOption{}
 		configOption.Option = option
 		configOption.OptionLabel = options.Get(option)
 		selected, hasSelected := fqbn.Configs.GetOk(option)
 
 		values := board.GetConfigOptionValues(option)
 		for i, value := range values.Keys() {
-			configValue := &boardConfigValue{}
+			configValue := &ConfigValue{}
 			if hasSelected && value == selected {
-				configValue.Selected = &t
+				configValue.Selected = true
 			} else if !hasSelected && i == 0 {
-				configValue.Selected = &t
+				configValue.Selected = true
 			}
 
 			configValue.Value = value
@@ -83,66 +65,14 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 		details.ConfigOptions = append(details.ConfigOptions, configOption)
 	}
 
-	details.RequiredTools = board.PlatformRelease.Dependencies
-
-	output.Emit(details)
-}
-
-type boardDetails struct {
-	Name          string
-	ConfigOptions []*boardConfigOption
-	RequiredTools []*cores.ToolDependency
-}
-
-type boardConfigOption struct {
-	Option      string
-	OptionLabel string
-	Values      []*boardConfigValue
-}
-
-type boardConfigValue struct {
-	Value      string
-	ValueLabel string
-	Selected   *bool `json:",omitempty"`
-}
-
-func (details *boardDetails) EmitJSON() string {
-	d, err := json.MarshalIndent(details, "", "  ")
-	if err != nil {
-		formatter.PrintError(err, "Error encoding json")
-		os.Exit(commands.ErrGeneric)
+	details.RequiredTools = []*RequiredTool{}
+	for _, reqTool := range board.PlatformRelease.Dependencies {
+		details.RequiredTools = append(details.RequiredTools, &RequiredTool{
+			Name:     reqTool.ToolName,
+			Packager: reqTool.ToolPackager,
+			Version:  reqTool.ToolVersion.String(),
+		})
 	}
-	return string(d)
-}
 
-func (details *boardDetails) EmitTerminal() string {
-	table := output.NewTable()
-	table.SetColumnWidthMode(1, output.Average)
-	table.AddRow("Board name:", details.Name)
-	for i, tool := range details.RequiredTools {
-		head := ""
-		if i == 0 {
-			table.AddRow()
-			head = "Required tools:"
-		}
-		table.AddRow(head, tool.ToolPackager+":"+tool.ToolName, "", tool.ToolVersion)
-	}
-	for _, option := range details.ConfigOptions {
-		table.AddRow()
-		table.AddRow("Option:",
-			option.OptionLabel,
-			"", option.Option)
-		for _, value := range option.Values {
-			if value.Selected != nil {
-				table.AddRow("",
-					output.Green(value.ValueLabel),
-					output.Green("✔"), output.Green(option.Option+"="+value.Value))
-			} else {
-				table.AddRow("",
-					value.ValueLabel,
-					"", option.Option+"="+value.Value)
-			}
-		}
-	}
-	return table.Render()
+	return details
 }

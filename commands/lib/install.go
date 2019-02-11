@@ -22,7 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -34,8 +34,8 @@ func initInstallCommand() *cobra.Command {
 		Short: "Installs one of more specified libraries into the system.",
 		Long:  "Installs one or more specified libraries into the system.",
 		Example: "" +
-			"  " + commands.AppName + " lib install AudioZero       # for the latest version.\n" +
-			"  " + commands.AppName + " lib install AudioZero@1.0.0 # for the specific version.",
+			"  " + cli.AppName + " lib install AudioZero       # for the latest version.\n" +
+			"  " + cli.AppName + " lib install AudioZero@1.0.0 # for the specific version.",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}
@@ -44,12 +44,12 @@ func initInstallCommand() *cobra.Command {
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib install`")
-	lm := commands.InitLibraryManager(commands.Config, nil)
+	lm := cli.InitLibraryManager(cli.Config, nil)
 
 	refs, err := librariesindex.ParseArgs(args)
 	if err != nil {
 		formatter.PrintError(err, "Arguments error")
-		os.Exit(commands.ErrBadArgument)
+		os.Exit(cli.ErrBadArgument)
 	}
 	downloadLibrariesFromReferences(lm, refs)
 	installLibrariesFromReferences(lm, refs)
@@ -61,7 +61,7 @@ func installLibrariesFromReferences(lm *librariesmanager.LibrariesManager, refs 
 		rel := lm.Index.FindRelease(ref)
 		if rel == nil {
 			formatter.PrintErrorMessage("Error: library " + ref.String() + " not found")
-			os.Exit(commands.ErrBadCall)
+			os.Exit(cli.ErrBadCall)
 		}
 		libReleases = append(libReleases, rel)
 	}
@@ -75,7 +75,7 @@ func installLibraries(lm *librariesmanager.LibrariesManager, libReleases []*libr
 		if _, err := lm.Install(libRelease); err != nil {
 			logrus.WithError(err).Warn("Error installing library ", libRelease)
 			formatter.PrintError(err, "Error installing library: "+libRelease.String())
-			os.Exit(commands.ErrGeneric)
+			os.Exit(cli.ErrGeneric)
 		}
 
 		formatter.Print("Installed " + libRelease.String())

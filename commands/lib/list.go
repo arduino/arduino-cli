@@ -21,7 +21,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
@@ -33,7 +33,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "Shows a list of all installed libraries.",
 		Long:    "Shows a list of all installed libraries.",
-		Example: "  " + commands.AppName + " lib list",
+		Example: "  " + cli.AppName + " lib list",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}
@@ -51,9 +51,9 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Listing")
 	var pm *packagemanager.PackageManager
 	if listFlags.all {
-		pm = commands.InitPackageManager()
+		pm = cli.InitPackageManager()
 	}
-	lm := commands.InitLibraryManager(commands.Config, pm)
+	lm := cli.InitLibraryManager(cli.Config, pm)
 
 	res := ListLibraries(lm, listFlags.updatable)
 	if len(res.Libraries) > 0 {

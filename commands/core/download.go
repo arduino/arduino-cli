@@ -24,7 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -36,8 +36,8 @@ func initDownloadCommand() *cobra.Command {
 		Short: "Downloads one or more cores and corresponding tool dependencies.",
 		Long:  "Downloads one or more cores and corresponding tool dependencies.",
 		Example: "" +
-			"  " + commands.AppName + " core download arduino:samd       # to download the latest version of arduino SAMD core.\n" +
-			"  " + commands.AppName + " core download arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
+			"  " + cli.AppName + " core download arduino:samd       # to download the latest version of arduino SAMD core.\n" +
+			"  " + cli.AppName + " core download arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 	}
@@ -48,7 +48,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
-	pm := commands.InitPackageManagerWithoutBundles()
+	pm := cli.InitPackageManagerWithoutBundles()
 	for _, platformRef := range platformsRefs {
 		downloadPlatformByRef(pm, platformRef)
 	}
@@ -58,7 +58,7 @@ func downloadPlatformByRef(pm *packagemanager.PackageManager, platformsRef *pack
 	platform, tools, err := pm.FindPlatformReleaseDependencies(platformsRef)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
-		os.Exit(commands.ErrBadCall)
+		os.Exit(cli.ErrBadCall)
 	}
 	downloadPlatform(pm, platform)
 	for _, tool := range tools {
@@ -76,7 +76,7 @@ func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease) {
 	// Check if tool has a flavor available for the current OS
 	if tool.GetCompatibleFlavour() == nil {
 		formatter.PrintErrorMessage("The tool " + tool.String() + " is not available for the current OS")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	DownloadToolRelease(pm, tool)
@@ -91,7 +91,7 @@ func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.T
 func download(d *downloader.Downloader, err error, label string) {
 	if err != nil {
 		formatter.PrintError(err, "Error downloading "+label)
-		os.Exit(commands.ErrNetwork)
+		os.Exit(cli.ErrNetwork)
 	}
 	if d == nil {
 		formatter.Print(label + " already downloaded")
@@ -101,6 +101,6 @@ func download(d *downloader.Downloader, err error, label string) {
 	formatter.DownloadProgressBar(d, label)
 	if d.Error() != nil {
 		formatter.PrintError(d.Error(), "Error downloading "+label)
-		os.Exit(commands.ErrNetwork)
+		os.Exit(cli.ErrNetwork)
 	}
 }
