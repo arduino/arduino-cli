@@ -15,6 +15,7 @@ func TestNavigate(t *testing.T) {
 	tests := []string{
 		"noconfig",
 		"local",
+		"inheritance",
 	}
 	for _, tt := range tests {
 		t.Run(tt, func(t *testing.T) {

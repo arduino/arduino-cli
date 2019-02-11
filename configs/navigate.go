@@ -1,14 +1,19 @@
 package configs
 
 import (
-	"fmt"
+	"path/filepath"
+	"strings"
 
 	paths "github.com/arduino/go-paths-helper"
 	homedir "github.com/mitchellh/go-homedir"
 )
 
 func Navigate(root, pwd string) Configuration {
-	fmt.Println("Navigate", root, pwd)
+	relativePath, err := filepath.Rel(root, pwd)
+	if err != nil {
+		panic(err)
+	}
+
 	home, err := homedir.Dir()
 	if err != nil {
 		panic(err) // Should never happen
@@ -20,8 +25,14 @@ func Navigate(root, pwd string) Configuration {
 		DataDir:       paths.New(home, ".arduino15"),
 	}
 
-	// Search for arduino-cli.yaml in current folder
-	_ = config.LoadFromYAML(paths.New(pwd, "arduino-cli.yaml"))
+	// From the root to the current folder, search for arduino-cli.yaml files
+	parts := strings.Split(relativePath, string(filepath.Separator))
+	for i := range parts {
+		path := paths.New(root)
+		path = path.Join(parts[:i+1]...)
+		path = path.Join("arduino-cli.yaml")
+		_ = config.LoadFromYAML(path)
+	}
 
 	return config
 }
