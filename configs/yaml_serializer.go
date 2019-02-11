@@ -23,7 +23,6 @@ import (
 	"net/url"
 
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -48,16 +47,13 @@ type yamlProxyConfig struct {
 
 // LoadFromYAML loads the configs from a yaml file.
 func (config *Configuration) LoadFromYAML(path *paths.Path) error {
-	logrus.Info("Unserializing configurations from ", path)
 	content, err := path.ReadFile()
 	if err != nil {
-		logrus.WithError(err).Warn("Error reading config, using default configuration")
 		return err
 	}
 	var ret yamlConfig
 	err = yaml.Unmarshal(content, &ret)
 	if err != nil {
-		logrus.WithError(err).Warn("Error parsing config, using default configuration")
 		return err
 	}
 
@@ -84,12 +80,12 @@ func (config *Configuration) LoadFromYAML(path *paths.Path) error {
 		for _, rawurl := range ret.BoardsManager.AdditionalURLS {
 			url, err := url.Parse(rawurl)
 			if err != nil {
-				logrus.WithError(err).Warn("Error parsing config")
 				continue
 			}
 			config.BoardManagerAdditionalUrls = append(config.BoardManagerAdditionalUrls, url)
 		}
 	}
+
 	return nil
 }
 
@@ -113,9 +109,9 @@ func (config *Configuration) SerializeToYAML() ([]byte, error) {
 			Password: config.ProxyPassword,
 		}
 	}
-	if len(config.BoardManagerAdditionalUrls) > 1 {
+	if len(config.BoardManagerAdditionalUrls) > 0 {
 		c.BoardsManager = &yamlBoardsManagerConfig{AdditionalURLS: []string{}}
-		for _, URL := range config.BoardManagerAdditionalUrls[1:] {
+		for _, URL := range config.BoardManagerAdditionalUrls {
 			c.BoardsManager.AdditionalURLS = append(c.BoardsManager.AdditionalURLS, URL.String())
 		}
 	}
