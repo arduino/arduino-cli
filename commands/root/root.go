@@ -18,7 +18,6 @@
 package root
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -133,8 +132,6 @@ func initConfigs() {
 	}
 
 	commands.Config.Navigate("/", pwd)
-
-	fmt.Println(yamlConfigFile)
 
 	if yamlConfigFile != "" {
 		commands.Config.ConfigFile = paths.New(yamlConfigFile)

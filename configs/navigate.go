@@ -10,7 +10,7 @@ import (
 func (c *Configuration) Navigate(root, pwd string) {
 	relativePath, err := filepath.Rel(root, pwd)
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	// From the root to the current folder, search for arduino-cli.yaml files
