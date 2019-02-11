@@ -23,8 +23,10 @@ func TestNavigate(t *testing.T) {
 			pwd := filepath.Join("testdata", "navigate", tt, "first", "second")
 			golden := filepath.Join("testdata", "navigate", tt, "golden.yaml")
 
-			got := configs.Navigate(root, pwd)
-			data, _ := got.SerializeToYAML()
+			config, _ := configs.NewConfiguration()
+
+			config.Navigate(root, pwd)
+			data, _ := config.SerializeToYAML()
 
 			diff(t, data, golden)
 		})
