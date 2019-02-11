@@ -15,7 +15,7 @@
  * a commercial license, send an email to license@arduino.cc.
  */
 
-package commands_test
+package cli_test
 
 import (
 	"encoding/json"

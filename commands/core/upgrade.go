@@ -21,8 +21,7 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -35,9 +34,9 @@ func initUpgradeCommand() *cobra.Command {
 		Long:  "Upgrades one or all installed platforms to the latest version.",
 		Example: "" +
 			"  # upgrade everything to the latest version\n" +
-			"  " + commands.AppName + " core upgrade\n\n" +
+			"  " + cli.AppName + " core upgrade\n\n" +
 			"  # upgrade arduino:samd to the latest version\n" +
-			"  " + commands.AppName + " core upgrade arduino:samd",
+			"  " + cli.AppName + " core upgrade arduino:samd",
 		Run: runUpgradeCommand,
 	}
 	return upgradeCommand
@@ -46,7 +45,7 @@ func initUpgradeCommand() *cobra.Command {
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core upgrade`")
 
-	pm := commands.InitPackageManagerWithoutBundles()
+	pm := cli.InitPackageManagerWithoutBundles()
 
 	platformsRefs := parsePlatformReferenceArgs(args)
 	if len(platformsRefs) == 0 {
@@ -84,7 +83,7 @@ func upgrade(pm *packagemanager.PackageManager, platformsRefs []*packagemanager.
 	for _, platformRef := range platformsRefs {
 		if platformRef.PlatformVersion != nil {
 			formatter.PrintErrorMessage("Invalid item " + platformRef.String() + ", upgrade doesn't accept parameters with version")
-			os.Exit(commands.ErrBadArgument)
+			os.Exit(cli.ErrBadArgument)
 		}
 	}
 
@@ -94,12 +93,12 @@ func upgrade(pm *packagemanager.PackageManager, platformsRefs []*packagemanager.
 		platform := pm.FindPlatform(platformRef)
 		if platform == nil {
 			formatter.PrintErrorMessage("Platform " + platformRef.String() + " not found")
-			os.Exit(commands.ErrBadArgument)
+			os.Exit(cli.ErrBadArgument)
 		}
 		installed := pm.GetInstalledPlatformRelease(platform)
 		if installed == nil {
 			formatter.PrintErrorMessage("Platform " + platformRef.String() + " is not installed")
-			os.Exit(commands.ErrBadArgument)
+			os.Exit(cli.ErrBadArgument)
 		}
 		latest := platform.GetLatestRelease()
 		if !latest.Version.GreaterThan(installed.Version) {

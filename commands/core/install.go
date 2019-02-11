@@ -22,7 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -34,9 +34,9 @@ func initInstallCommand() *cobra.Command {
 		Short: "Installs one or more cores and corresponding tool dependencies.",
 		Long:  "Installs one or more cores and corresponding tool dependencies.",
 		Example: "  # download the latest version of arduino SAMD core.\n" +
-			"  " + commands.AppName + " core install arduino:samd\n\n" +
+			"  " + cli.AppName + " core install arduino:samd\n\n" +
 			"  # download a specific version (in this case 1.6.9).\n" +
-			"  " + commands.AppName + " core install arduino:samd=1.6.9",
+			"  " + cli.AppName + " core install arduino:samd=1.6.9",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}
@@ -47,7 +47,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
-	pm := commands.InitPackageManagerWithoutBundles()
+	pm := cli.InitPackageManagerWithoutBundles()
 
 	for _, platformRef := range platformsRefs {
 		installPlatformByRef(pm, platformRef)
@@ -60,7 +60,7 @@ func installPlatformByRef(pm *packagemanager.PackageManager, platformRef *packag
 	platform, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
-		os.Exit(commands.ErrBadCall)
+		os.Exit(cli.ErrBadCall)
 	}
 
 	installPlatform(pm, platform, tools)
@@ -111,7 +111,7 @@ func installPlatform(pm *packagemanager.PackageManager, platformRelease *cores.P
 	if err != nil {
 		log.WithError(err).Error("Cannot install platform")
 		formatter.PrintError(err, "Cannot install platform")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	// If upgrading remove previous release
@@ -128,7 +128,7 @@ func installPlatform(pm *packagemanager.PackageManager, platformRelease *cores.P
 				log.WithError(err).Error("Error rolling-back changes.")
 				formatter.PrintError(err, "Error rolling-back changes.")
 			}
-			os.Exit(commands.ErrGeneric)
+			os.Exit(cli.ErrGeneric)
 		}
 	}
 
@@ -152,7 +152,7 @@ func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.To
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
 		formatter.PrintError(err, "Cannot install tool: "+toolRelease.String())
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	log.Info("Tool installed")

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package arduino.commands;
+
+option go_package = "github.com/arduino/arduino-cli/commands";
+
+message Result {
+  bool failed = 1;
+  int32 code = 2;
+  string message = 3;
+}

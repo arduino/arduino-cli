@@ -18,7 +18,7 @@
 package version
 
 import (
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
@@ -31,7 +31,7 @@ func InitCommand() *cobra.Command {
 		Use:     "version",
 		Short:   "Shows version number of arduino CLI.",
 		Long:    "Shows version number of arduino CLI which is installed on your system.",
-		Example: "  " + commands.AppName + " version",
+		Example: "  " + cli.AppName + " version",
 		Args:    cobra.NoArgs,
 		Run:     run,
 	}
@@ -42,7 +42,7 @@ func run(cmd *cobra.Command, args []string) {
 	logrus.Info("Calling version command on `arduino`")
 	versionInfo := output.VersionResult{
 		CommandName: cmd.Parent().Name(),
-		Version:     commands.Version,
+		Version:     cli.Version,
 	}
 	formatter.Print(versionInfo)
 }

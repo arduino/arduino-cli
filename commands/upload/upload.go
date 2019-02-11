@@ -25,7 +25,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/executils"
 	paths "github.com/arduino/go-paths-helper"
@@ -41,7 +41,7 @@ func InitCommand() *cobra.Command {
 		Use:     "upload",
 		Short:   "Upload Arduino sketches.",
 		Long:    "Upload Arduino sketches.",
-		Example: "  " + commands.AppName + " upload /home/user/Arduino/MySketch",
+		Example: "  " + cli.AppName + " upload /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}
@@ -76,17 +76,17 @@ func run(command *cobra.Command, args []string) {
 	if len(args) > 0 {
 		sketchPath = paths.New(args[0])
 	}
-	sketch, err := commands.InitSketch(sketchPath)
+	sketch, err := cli.InitSketch(sketchPath)
 	if err != nil {
 		formatter.PrintError(err, "Error opening sketch.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	// FIXME: make a specification on how a port is specified via command line
 	port := flags.port
 	if port == "" {
 		formatter.PrintErrorMessage("No port provided.")
-		os.Exit(commands.ErrBadCall)
+		os.Exit(cli.ErrBadCall)
 	}
 
 	if flags.fqbn == "" && sketch != nil {
@@ -94,34 +94,34 @@ func run(command *cobra.Command, args []string) {
 	}
 	if flags.fqbn == "" {
 		formatter.PrintErrorMessage("No Fully Qualified Board Name provided.")
-		os.Exit(commands.ErrBadCall)
+		os.Exit(cli.ErrBadCall)
 	}
 	fqbn, err := cores.ParseFQBN(flags.fqbn)
 	if err != nil {
 		formatter.PrintError(err, "Invalid FQBN.")
-		os.Exit(commands.ErrBadCall)
+		os.Exit(cli.ErrBadCall)
 	}
 
-	pm := commands.InitPackageManager()
+	pm := cli.InitPackageManager()
 
 	// Find target board and board properties
 	_, _, board, boardProperties, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
 		formatter.PrintError(err, "Invalid FQBN.")
-		os.Exit(commands.ErrBadCall)
+		os.Exit(cli.ErrBadCall)
 	}
 
 	// Load programmer tool
 	uploadToolPattern, have := boardProperties.GetOk("upload.tool")
 	if !have || uploadToolPattern == "" {
 		formatter.PrintErrorMessage("The board does not define an 'upload.tool' property.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	var referencedPlatformRelease *cores.PlatformRelease
 	if split := strings.Split(uploadToolPattern, ":"); len(split) > 2 {
 		formatter.PrintErrorMessage("The board defines an invalid 'upload.tool' property: " + uploadToolPattern)
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	} else if len(split) == 2 {
 		referencedPackageName := split[0]
 		uploadToolPattern = split[1]
@@ -129,10 +129,10 @@ func run(command *cobra.Command, args []string) {
 
 		if referencedPackage := pm.GetPackages().Packages[referencedPackageName]; referencedPackage == nil {
 			formatter.PrintErrorMessage("The board requires platform '" + referencedPackageName + ":" + architecture + "' that is not installed.")
-			os.Exit(commands.ErrGeneric)
+			os.Exit(cli.ErrGeneric)
 		} else if referencedPlatform := referencedPackage.Platforms[architecture]; referencedPlatform == nil {
 			formatter.PrintErrorMessage("The board requires platform '" + referencedPackageName + ":" + architecture + "' that is not installed.")
-			os.Exit(commands.ErrGeneric)
+			os.Exit(cli.ErrGeneric)
 		} else {
 			referencedPlatformRelease = pm.GetInstalledPlatformRelease(referencedPlatform)
 		}
@@ -193,7 +193,7 @@ func run(command *cobra.Command, args []string) {
 	outputTmpFile = uploadProperties.ExpandPropsInString(outputTmpFile)
 	if !ok {
 		formatter.PrintErrorMessage("The platform does not define the required property 'recipe.output.tmp_file'.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 	ext := filepath.Ext(outputTmpFile)
 	if strings.HasSuffix(importFile, ext) {
@@ -209,7 +209,7 @@ func run(command *cobra.Command, args []string) {
 		} else {
 			formatter.PrintError(err, "Could not open compiled sketch.")
 		}
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	// Perform reset via 1200bps touch if requested
@@ -217,13 +217,13 @@ func run(command *cobra.Command, args []string) {
 		ports, err := serial.GetPortsList()
 		if err != nil {
 			formatter.PrintError(err, "Can't get serial port list")
-			os.Exit(commands.ErrGeneric)
+			os.Exit(cli.ErrGeneric)
 		}
 		for _, p := range ports {
 			if p == port {
 				if err := touchSerialPortAt1200bps(p); err != nil {
 					formatter.PrintError(err, "Can't perform reset via 1200bps-touch on serial port")
-					os.Exit(commands.ErrGeneric)
+					os.Exit(cli.ErrGeneric)
 				}
 				break
 			}
@@ -241,7 +241,7 @@ func run(command *cobra.Command, args []string) {
 	if uploadProperties.GetBoolean("upload.wait_for_upload_port") {
 		if p, err := waitForNewSerialPort(); err != nil {
 			formatter.PrintError(err, "Could not detect serial ports")
-			os.Exit(commands.ErrGeneric)
+			os.Exit(cli.ErrGeneric)
 		} else if p == "" {
 			formatter.Print("No new serial port detected.")
 		} else {
@@ -268,14 +268,14 @@ func run(command *cobra.Command, args []string) {
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 	if err != nil {
 		formatter.PrintError(err, "Invalid recipe in platform.")
-		os.Exit(commands.ErrCoreConfig)
+		os.Exit(cli.ErrCoreConfig)
 	}
 
 	// Run Tool
 	cmd, err := executils.Command(cmdArgs)
 	if err != nil {
 		formatter.PrintError(err, "Could not execute upload tool.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	executils.AttachStdoutListener(cmd, executils.PrintToStdout)
@@ -283,11 +283,11 @@ func run(command *cobra.Command, args []string) {
 
 	if err := cmd.Start(); err != nil {
 		formatter.PrintError(err, "Could not execute upload tool.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 	if err := cmd.Wait(); err != nil {
 		formatter.PrintError(err, "Error during upload.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 }
 

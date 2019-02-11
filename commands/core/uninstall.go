@@ -23,7 +23,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -34,7 +34,7 @@ func initUninstallCommand() *cobra.Command {
 		Use:     "uninstall PACKAGER:ARCH[@VERSION] ...",
 		Short:   "Uninstalls one or more cores and corresponding tool dependencies if no more used.",
 		Long:    "Uninstalls one or more cores and corresponding tool dependencies if no more used.",
-		Example: "  " + commands.AppName + " core uninstall arduino:samd\n",
+		Example: "  " + cli.AppName + " core uninstall arduino:samd\n",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runUninstallCommand,
 	}
@@ -44,7 +44,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
-	pm := commands.InitPackageManagerWithoutBundles()
+	pm := cli.InitPackageManagerWithoutBundles()
 
 	for _, platformRef := range platformsRefs {
 		uninstallPlatformByRef(pm, platformRef)
@@ -57,12 +57,12 @@ func uninstallPlatformByRef(pm *packagemanager.PackageManager, platformRef *pack
 		platform := pm.FindPlatform(platformRef)
 		if platform == nil {
 			formatter.PrintErrorMessage("Platform not found " + platformRef.String())
-			os.Exit(commands.ErrBadCall)
+			os.Exit(cli.ErrBadCall)
 		}
 		platformRelease := pm.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
 			formatter.PrintErrorMessage("Platform not installed " + platformRef.String())
-			os.Exit(commands.ErrBadCall)
+			os.Exit(cli.ErrBadCall)
 		}
 		platformRef.PlatformVersion = platformRelease.Version
 	}
@@ -70,7 +70,7 @@ func uninstallPlatformByRef(pm *packagemanager.PackageManager, platformRef *pack
 	platform, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
-		os.Exit(commands.ErrBadCall)
+		os.Exit(cli.ErrBadCall)
 	}
 
 	uninstallPlatformRelease(pm, platform)
@@ -92,7 +92,7 @@ func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease
 	if err := pm.UninstallPlatform(platformRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
 		formatter.PrintError(err, "Error uninstalling "+platformRelease.String())
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	log.Info("Platform uninstalled")
@@ -108,7 +108,7 @@ func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.
 	if err := pm.UninstallTool(toolRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
 		formatter.PrintError(err, "Error uninstalling "+toolRelease.String())
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	log.Info("Tool uninstalled")

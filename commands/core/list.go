@@ -18,7 +18,7 @@
 package core
 
 import (
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
@@ -31,7 +31,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "Shows the list of installed platforms.",
 		Long:    "Shows the list of installed platforms.",
-		Example: "  " + commands.AppName + " core list",
+		Example: "  " + cli.AppName + " core list",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}
@@ -46,7 +46,7 @@ var listFlags struct {
 func runListCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core list`")
 
-	pm := commands.InitPackageManager()
+	pm := cli.InitPackageManager()
 
 	installed := []*output.InstalledPlatform{}
 	for _, targetPackage := range pm.GetPackages().Packages {

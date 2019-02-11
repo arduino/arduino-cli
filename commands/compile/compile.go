@@ -28,7 +28,7 @@ import (
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
 	paths "github.com/arduino/go-paths-helper"
@@ -43,7 +43,7 @@ func InitCommand() *cobra.Command {
 		Use:     "compile",
 		Short:   "Compiles Arduino sketches.",
 		Long:    "Compiles Arduino sketches.",
-		Example: "  " + commands.AppName + " compile -b arduino:avr:uno /home/user/Arduino/MySketch",
+		Example: "  " + cli.AppName + " compile -b arduino:avr:uno /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}
@@ -103,10 +103,10 @@ func run(cmd *cobra.Command, args []string) {
 	if len(args) > 0 {
 		sketchPath = paths.New(args[0])
 	}
-	sketch, err := commands.InitSketch(sketchPath)
+	sketch, err := cli.InitSketch(sketchPath)
 	if err != nil {
 		formatter.PrintError(err, "Error opening sketch.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	if flags.fqbn == "" && sketch != nil && sketch.Metadata != nil {
@@ -114,15 +114,15 @@ func run(cmd *cobra.Command, args []string) {
 	}
 	if flags.fqbn == "" {
 		formatter.PrintErrorMessage("No Fully Qualified Board Name provided.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 	fqbn, err := cores.ParseFQBN(flags.fqbn)
 	if err != nil {
 		formatter.PrintErrorMessage("Fully Qualified Board Name has incorrect format.")
-		os.Exit(commands.ErrBadArgument)
+		os.Exit(cli.ErrBadArgument)
 	}
 
-	pm := commands.InitPackageManager()
+	pm := cli.InitPackageManager()
 
 	// Check for ctags tool
 	loadBuiltinCtagsMetadata(pm)
@@ -132,14 +132,14 @@ func run(cmd *cobra.Command, args []string) {
 		core.DownloadToolRelease(pm, ctags)
 		core.InstallToolRelease(pm, ctags)
 
-		if err := pm.LoadHardware(commands.Config); err != nil {
+		if err := pm.LoadHardware(cli.Config); err != nil {
 			formatter.PrintError(err, "Could not load hardware packages.")
-			os.Exit(commands.ErrCoreConfig)
+			os.Exit(cli.ErrCoreConfig)
 		}
 		ctags, _ = getBuiltinCtagsTool(pm)
 		if !ctags.IsInstalled() {
 			formatter.PrintErrorMessage("Missing ctags tool.")
-			os.Exit(commands.ErrCoreConfig)
+			os.Exit(cli.ErrCoreConfig)
 		}
 	}
 
@@ -150,9 +150,9 @@ func run(cmd *cobra.Command, args []string) {
 	if targetPlatform == nil || pm.GetInstalledPlatformRelease(targetPlatform) == nil {
 		errorMessage := fmt.Sprintf(
 			"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
-				commands.AppName+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
+				cli.AppName+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
 		formatter.PrintErrorMessage(errorMessage)
-		os.Exit(commands.ErrCoreConfig)
+		os.Exit(cli.ErrCoreConfig)
 	}
 
 	ctx := &types.Context{}
@@ -161,29 +161,29 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.SketchLocation = sketch.FullPath
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
-	if packagesDir, err := commands.Config.HardwareDirectories(); err == nil {
+	if packagesDir, err := cli.Config.HardwareDirectories(); err == nil {
 		ctx.HardwareDirs = packagesDir
 	} else {
 		formatter.PrintError(err, "Cannot get hardware directories.")
-		os.Exit(commands.ErrCoreConfig)
+		os.Exit(cli.ErrCoreConfig)
 	}
 
-	if toolsDir, err := commands.Config.BundleToolsDirectories(); err == nil {
+	if toolsDir, err := cli.Config.BundleToolsDirectories(); err == nil {
 		ctx.ToolsDirs = toolsDir
 	} else {
 		formatter.PrintError(err, "Cannot get bundled tools directories.")
-		os.Exit(commands.ErrCoreConfig)
+		os.Exit(cli.ErrCoreConfig)
 	}
 
 	ctx.OtherLibrariesDirs = paths.NewPathList()
-	ctx.OtherLibrariesDirs.Add(commands.Config.LibrariesDir())
+	ctx.OtherLibrariesDirs.Add(cli.Config.LibrariesDir())
 
 	if flags.buildPath != "" {
 		ctx.BuildPath = paths.New(flags.buildPath)
 		err = ctx.BuildPath.MkdirAll()
 		if err != nil {
 			formatter.PrintError(err, "Cannot create the build directory.")
-			os.Exit(commands.ErrBadCall)
+			os.Exit(cli.ErrBadCall)
 		}
 	}
 
@@ -194,7 +194,7 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.USBVidPid = flags.vidPid
 	ctx.WarningsLevel = flags.warnings
 
-	if commands.GlobalFlags.Debug {
+	if cli.GlobalFlags.Debug {
 		ctx.DebugLevel = 100
 	} else {
 		ctx.DebugLevel = 5
@@ -207,7 +207,7 @@ func run(cmd *cobra.Command, args []string) {
 		err = ctx.BuildCachePath.MkdirAll()
 		if err != nil {
 			formatter.PrintError(err, "Cannot create the build cache directory.")
-			os.Exit(commands.ErrBadCall)
+			os.Exit(cli.ErrBadCall)
 		}
 	}
 
@@ -215,7 +215,7 @@ func run(cmd *cobra.Command, args []string) {
 	ctx.ArduinoAPIVersion = "10607"
 
 	// Check if Arduino IDE is installed and get it's libraries location.
-	preferencesTxt := commands.Config.DataDir.Join("preferences.txt")
+	preferencesTxt := cli.Config.DataDir.Join("preferences.txt")
 	ideProperties, err := properties.LoadFromPath(preferencesTxt)
 	if err == nil {
 		lastIdeSubProperties := ideProperties.SubTree("last").SubTree("ide")
@@ -242,7 +242,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	if err != nil {
 		formatter.PrintError(err, "Compilation failed.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	// FIXME: Make a function to obtain these info...
@@ -273,7 +273,7 @@ func run(cmd *cobra.Command, args []string) {
 	logrus.WithField("from", srcHex).WithField("to", dstHex).Print("copying sketch build output")
 	if err = srcHex.CopyTo(dstHex); err != nil {
 		formatter.PrintError(err, "Error copying output file.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	// Copy .elf file to sketch directory
@@ -282,6 +282,6 @@ func run(cmd *cobra.Command, args []string) {
 	logrus.WithField("from", srcElf).WithField("to", dstElf).Print("copying sketch build output")
 	if err = srcElf.CopyTo(dstElf); err != nil {
 		formatter.PrintError(err, "Error copying elf file.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 }

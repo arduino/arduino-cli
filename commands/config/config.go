@@ -18,7 +18,7 @@
 package config
 
 import (
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +27,7 @@ func InitCommand() *cobra.Command {
 	configCommand := &cobra.Command{
 		Use:     "config",
 		Short:   "Arduino Configuration Commands.",
-		Example: "  " + commands.AppName + " config init",
+		Example: "  " + cli.AppName + " config init",
 	}
 	configCommand.AddCommand(initDumpCommand())
 	configCommand.AddCommand(initInitCommand())

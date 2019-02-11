@@ -21,12 +21,11 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/cli/board"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/config"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/commands/daemon"
 	"github.com/arduino/arduino-cli/commands/generatedocs"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/sketch"
@@ -34,7 +33,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/version"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
-	"github.com/arduino/arduino-cli/output"
+	"github.com/arduino/arduino-cli/daemon"
 	paths "github.com/arduino/go-paths-helper"
 	colorable "github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
@@ -48,11 +47,11 @@ func Init() *cobra.Command {
 		Use:              "arduino-cli",
 		Short:            "Arduino CLI.",
 		Long:             "Arduino Command Line Interface (arduino-cli).",
-		Example:          "  " + commands.AppName + " <command> [flags...]",
+		Example:          "  " + cli.AppName + " <command> [flags...]",
 		PersistentPreRun: preRun,
 	}
-	command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
-	command.PersistentFlags().StringVar(&commands.GlobalFlags.Format, "format", "text", "The output format, can be [text|json].")
+	command.PersistentFlags().BoolVar(&cli.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
+	command.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be [text|json].")
 	command.PersistentFlags().StringVar(&yamlConfigFile, "config-file", "", "The custom config file (if not specified ./.cli-config.yml will be used).")
 	command.AddCommand(board.InitCommand())
 	command.AddCommand(compile.InitCommand())
@@ -70,11 +69,12 @@ func Init() *cobra.Command {
 	return command
 }
 
+var outputFormat string
 var yamlConfigFile string
 
 func preRun(cmd *cobra.Command, args []string) {
 	// Reset logrus if debug flag changed.
-	if !commands.GlobalFlags.Debug {
+	if !cli.GlobalFlags.Debug {
 		// Discard logrus output if no debug.
 		logrus.SetOutput(ioutil.Discard)
 	} else {
@@ -85,20 +85,23 @@ func preRun(cmd *cobra.Command, args []string) {
 			logrus.SetFormatter(&logrus.TextFormatter{ForceColors: true})
 		}
 		logrus.SetOutput(colorable.NewColorableStdout())
-		commands.ErrLogrus.Out = colorable.NewColorableStderr()
-		formatter.SetLogger(commands.ErrLogrus)
+		cli.ErrLogrus.Out = colorable.NewColorableStderr()
+		formatter.SetLogger(cli.ErrLogrus)
 	}
 	initConfigs()
 
-	logrus.Info(commands.AppName + "-" + commands.Version)
+	logrus.Info(cli.AppName + "-" + cli.Version)
 	logrus.Info("Starting root command preparation (`arduino`)")
-	if !formatter.IsSupported(commands.GlobalFlags.Format) {
-		logrus.WithField("inserted format", commands.GlobalFlags.Format).Warn("Unsupported format, using text as default")
-		commands.GlobalFlags.Format = "text"
-	}
-	formatter.SetFormatter(commands.GlobalFlags.Format)
-	if commands.GlobalFlags.Format != "text" {
-		output.SetOutputKind(output.JSON)
+	switch outputFormat {
+	case "text":
+		formatter.SetFormatter("text")
+		cli.GlobalFlags.OutputJSON = false
+	case "json":
+		formatter.SetFormatter("json")
+		cli.GlobalFlags.OutputJSON = true
+	default:
+		formatter.PrintErrorMessage("Invalid output format: " + outputFormat)
+		os.Exit(cli.ErrBadCall)
 	}
 
 	logrus.Info("Formatter set")
@@ -106,7 +109,7 @@ func preRun(cmd *cobra.Command, args []string) {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 			logrus.Warn("Calling help on JSON format")
 			formatter.PrintErrorMessage("Invalid Call : should show Help, but it is available only in TEXT mode.")
-			os.Exit(commands.ErrBadCall)
+			os.Exit(cli.ErrBadCall)
 		})
 	}
 }
@@ -116,28 +119,28 @@ func initConfigs() {
 	if conf, err := configs.NewConfiguration(); err != nil {
 		logrus.WithError(err).Error("Error creating default configuration")
 		formatter.PrintError(err, "Error creating default configuration")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	} else {
-		commands.Config = conf
+		cli.Config = conf
 	}
 
 	if yamlConfigFile != "" {
-		commands.Config.ConfigFile = paths.New(yamlConfigFile)
+		cli.Config.ConfigFile = paths.New(yamlConfigFile)
 	}
 
 	logrus.Info("Initiating configuration")
-	if err := commands.Config.LoadFromYAML(commands.Config.ConfigFile); err != nil {
+	if err := cli.Config.LoadFromYAML(cli.Config.ConfigFile); err != nil {
 		logrus.WithError(err).Warn("Did not manage to get config file, using default configuration")
 	}
-	if commands.Config.IsBundledInDesktopIDE() {
+	if cli.Config.IsBundledInDesktopIDE() {
 		logrus.Info("CLI is bundled into the IDE")
-		err := commands.Config.LoadFromDesktopIDEPreferences()
+		err := cli.Config.LoadFromDesktopIDEPreferences()
 		if err != nil {
 			logrus.WithError(err).Warn("Did not manage to get config file of IDE, using default configuration")
 		}
 	} else {
 		logrus.Info("CLI is not bundled into the IDE")
 	}
-	commands.Config.LoadFromEnv()
+	cli.Config.LoadFromEnv()
 	logrus.Info("Configuration set")
 }

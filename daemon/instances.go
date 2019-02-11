@@ -10,7 +10,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/configs"
 	pb "github.com/arduino/arduino-cli/daemon/arduino"
 	paths "github.com/arduino/go-paths-helper"
@@ -68,7 +68,7 @@ func (s *daemon) Init(ctx context.Context, req *pb.InitReq) (*pb.InitResp, error
 		return nil, fmt.Errorf("loading hardware packages: %s", err)
 	}
 
-	lm := commands.InitLibraryManager(config, nil)
+	lm := cli.InitLibraryManager(config, nil)
 
 	instance := &Instance{config: config, pm: pm, lm: lm}
 	handle := instancesCount

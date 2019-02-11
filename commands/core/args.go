@@ -22,12 +22,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands"
-
-	"github.com/arduino/arduino-cli/common/formatter"
-
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"go.bug.st/relaxed-semver"
+	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/common/formatter"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // parsePlatformReferenceArgs parses a sequence of "packager:arch@version" tokens and returns a platformReference slice.
@@ -37,7 +35,7 @@ func parsePlatformReferenceArgs(args []string) []*packagemanager.PlatformReferen
 		reference, err := parsePlatformReferenceArg(arg)
 		if err != nil {
 			formatter.PrintError(err, "Invalid item "+arg)
-			os.Exit(commands.ErrBadArgument)
+			os.Exit(cli.ErrBadArgument)
 		}
 		ret = append(ret, reference)
 	}

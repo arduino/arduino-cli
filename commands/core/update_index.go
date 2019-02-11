@@ -26,9 +26,9 @@ import (
 	"go.bug.st/downloader"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/go-paths-helper"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -38,7 +38,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Use:     "update-index",
 		Short:   "Updates the index of cores.",
 		Long:    "Updates the index of cores to the latest version.",
-		Example: "  " + commands.AppName + " core update-index",
+		Example: "  " + cli.AppName + " core update-index",
 		Args:    cobra.NoArgs,
 		Run:     runUpdateIndexCommand,
 	}
@@ -50,7 +50,7 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 }
 
 func updateIndexes() {
-	for _, URL := range commands.Config.BoardManagerAdditionalUrls {
+	for _, URL := range cli.Config.BoardManagerAdditionalUrls {
 		updateIndex(URL)
 	}
 }
@@ -62,11 +62,11 @@ func updateIndex(URL *url.URL) {
 	tmpFile, err := ioutil.TempFile("", "")
 	if err != nil {
 		formatter.PrintError(err, "Error creating temp file for download")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 	if err := tmpFile.Close(); err != nil {
 		formatter.PrintError(err, "Error creating temp file for download")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 	tmp := paths.New(tmpFile.Name())
 	defer tmp.Remove()
@@ -74,28 +74,28 @@ func updateIndex(URL *url.URL) {
 	d, err := downloader.Download(tmp.String(), URL.String())
 	if err != nil {
 		formatter.PrintError(err, "Error downloading index "+URL.String())
-		os.Exit(commands.ErrNetwork)
+		os.Exit(cli.ErrNetwork)
 	}
-	indexDirPath := commands.Config.IndexesDir()
+	indexDirPath := cli.Config.IndexesDir()
 	coreIndexPath := indexDirPath.Join(path.Base(URL.Path))
 	formatter.DownloadProgressBar(d, "Updating index: "+coreIndexPath.Base())
 	if d.Error() != nil {
 		formatter.PrintError(d.Error(), "Error downloading index "+URL.String())
-		os.Exit(commands.ErrNetwork)
+		os.Exit(cli.ErrNetwork)
 	}
 
 	if _, err := packageindex.LoadIndex(tmp); err != nil {
 		formatter.PrintError(err, "Invalid package index in "+URL.String())
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	if err := indexDirPath.MkdirAll(); err != nil {
 		formatter.PrintError(err, "Can't create data directory "+indexDirPath.String())
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	if err := tmp.CopyTo(coreIndexPath); err != nil {
 		formatter.PrintError(err, "Error saving downloaded index "+URL.String())
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 }

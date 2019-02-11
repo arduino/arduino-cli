@@ -21,7 +21,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/common/formatter/output"
 	"github.com/spf13/cobra"
@@ -35,8 +35,8 @@ func initListAllCommand() *cobra.Command {
 			"List all boards that have the support platform installed. You can search\n" +
 			"for a specific board if you specify the board name",
 		Example: "" +
-			"  " + commands.AppName + " board listall\n" +
-			"  " + commands.AppName + " board listall zero",
+			"  " + cli.AppName + " board listall\n" +
+			"  " + cli.AppName + " board listall zero",
 		Args: cobra.ArbitraryArgs,
 		Run:  runListAllCommand,
 	}
@@ -45,7 +45,7 @@ func initListAllCommand() *cobra.Command {
 
 // runListAllCommand list all installed boards
 func runListAllCommand(cmd *cobra.Command, args []string) {
-	pm := commands.InitPackageManager()
+	pm := cli.InitPackageManager()
 
 	match := func(name string) bool {
 		name = strings.ToLower(name)

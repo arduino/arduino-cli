@@ -24,7 +24,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/resources"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -36,7 +36,7 @@ func InitCommand() *cobra.Command {
 		Use:     "validate",
 		Short:   "Validates Arduino installation.",
 		Long:    "Checks installed cores and tools for corruption.",
-		Example: "  " + commands.AppName + " validate",
+		Example: "  " + cli.AppName + " validate",
 		Args:    cobra.NoArgs,
 		Run:     run,
 	}
@@ -45,7 +45,7 @@ func InitCommand() *cobra.Command {
 
 func run(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino validate`")
-	packagesDir := commands.Config.PackagesDir().String()
+	packagesDir := cli.Config.PackagesDir().String()
 	err := filepath.Walk(packagesDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -72,6 +72,6 @@ func run(cmd *cobra.Command, args []string) {
 	})
 	if err != nil {
 		formatter.PrintError(err, "Failed to perform validation.")
-		os.Exit(commands.ErrBadCall)
+		os.Exit(cli.ErrBadCall)
 	}
 }

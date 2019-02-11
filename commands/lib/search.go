@@ -22,7 +22,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
@@ -34,7 +34,7 @@ func initSearchCommand() *cobra.Command {
 		Use:     "search [LIBRARY_NAME]",
 		Short:   "Searchs for one or more libraries data.",
 		Long:    "Search for one or more libraries data (case insensitive search).",
-		Example: "  " + commands.AppName + " lib search audio",
+		Example: "  " + cli.AppName + " lib search audio",
 		Args:    cobra.ArbitraryArgs,
 		Run:     runSearchCommand,
 	}
@@ -50,7 +50,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib search`")
 	query := strings.ToLower(strings.Join(args, " "))
 
-	lm := commands.InitLibraryManager(commands.Config, nil)
+	lm := cli.InitLibraryManager(cli.Config, nil)
 
 	res := output.LibSearchResults{
 		Libraries: []*librariesindex.Library{},
