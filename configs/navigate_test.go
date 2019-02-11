@@ -1,27 +1,51 @@
 package configs_test
 
 import (
-	"reflect"
+	"io/ioutil"
+	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/arduino/arduino-cli/configs"
+	homedir "github.com/mitchellh/go-homedir"
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 func TestNavigate(t *testing.T) {
-	type args struct {
-		root string
-		pwd  string
-	}
-	tests := []struct {
-		name string
-		args args
-		want Configuration
-	}{
-		// TODO: Add test cases.
+	tests := []string{
+		"noconfig",
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := Navigate(tt.args.root, tt.args.pwd); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Navigate() = %v, want %v", got, tt.want)
-			}
+		t.Run(tt, func(t *testing.T) {
+			root := filepath.Join("testdata", "navigate", tt)
+			pwd := filepath.Join("testdata", "navigate", tt, "first", "second")
+			golden := filepath.Join("testdata", "navigate", tt, "golden.yaml")
+
+			got := configs.Navigate(root, pwd)
+			data, _ := got.SerializeToYAML()
+
+			diff(t, data, golden)
 		})
+	}
+}
+
+func diff(t *testing.T, data []byte, goldenFile string) {
+	golden, err := ioutil.ReadFile(goldenFile)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	dataStr := strings.TrimSpace(string(data))
+	goldenStr := strings.TrimSpace(string(golden))
+
+	// Substitute home folder
+	homedir, _ := homedir.Dir()
+	dataStr = strings.Replace(dataStr, homedir, "$HOME", -1)
+
+	if dataStr != goldenStr {
+		dmp := diffmatchpatch.New()
+		diffs := dmp.DiffMain(goldenStr, dataStr, false)
+		t.Errorf(dmp.DiffPrettyText(diffs))
 	}
 }
