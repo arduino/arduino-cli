@@ -267,6 +267,14 @@
   version = "v1.5.1"
 
 [[projects]]
+  digest = "1:d917313f309bda80d27274d53985bc65651f81a5b66b820749ac7f8ef061fd04"
+  name = "github.com/sergi/go-diff"
+  packages = ["diffmatchpatch"]
+  pruneopts = "UT"
+  revision = "1744e2970ca51c86172c8190fadad617561ed6e7"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   digest = "1:8209ed8bf2336848aa760c11e809f93ba96fffa64d3c2948e970a362a46e534b"
   name = "github.com/shibukawa/configdir"
@@ -449,6 +457,7 @@
     "github.com/mitchellh/go-homedir",
     "github.com/pkg/errors",
     "github.com/pmylund/sortutil",
+    "github.com/sergi/go-diff/diffmatchpatch",
     "github.com/shibukawa/configdir",
     "github.com/sirupsen/logrus",
     "github.com/spf13/cobra",
