@@ -112,7 +112,7 @@ func (config *Configuration) SerializeToYAML() ([]byte, error) {
 	if len(config.BoardManagerAdditionalUrls) > 0 {
 		c.BoardsManager = &yamlBoardsManagerConfig{AdditionalURLS: []string{}}
 		for _, URL := range config.BoardManagerAdditionalUrls {
-			c.BoardsManager.AdditionalURLS = append(c.BoardsManager.AdditionalURLS, URL.String())
+			c.BoardsManager.AdditionalURLS = appendIfMissing(c.BoardsManager.AdditionalURLS, URL.String())
 		}
 	}
 	return yaml.Marshal(c)
@@ -129,4 +129,13 @@ func (config *Configuration) SaveToYAML(path string) error {
 		return fmt.Errorf("writing configuration to %s: %s", path, err)
 	}
 	return nil
+}
+
+func appendIfMissing(slice []string, i string) []string {
+	for _, ele := range slice {
+		if ele == i {
+			return slice
+		}
+	}
+	return append(slice, i)
 }
