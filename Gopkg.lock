@@ -21,6 +21,26 @@
   source = "github.com/arduino/arduino-builder"
 
 [[projects]]
+  digest = "1:ab5037f4170f63c96d082f43fa92b02b660ac11536862c0fb4986d60a7af43b6"
+  name = "github.com/arduino/arduino-cli"
+  packages = [
+    "arduino/cores",
+    "arduino/cores/packageindex",
+    "arduino/cores/packagemanager",
+    "arduino/libraries",
+    "arduino/libraries/librariesindex",
+    "arduino/libraries/librariesmanager",
+    "arduino/libraries/librariesresolver",
+    "arduino/resources",
+    "arduino/utils",
+    "common/formatter",
+    "configs",
+  ]
+  pruneopts = "UT"
+  revision = "494bc9418c806283a2cb7b76073debc61fd76c6f"
+  version = "0.3.4-alpha.preview"
+
+[[projects]]
   branch = "master"
   digest = "1:16e26ae59d3dbd322a03511c1a56731aa4722743e5f8294f9fead841e6930b71"
   name = "github.com/arduino/board-discovery"
@@ -342,7 +362,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:cfd661f1a52594117f2a753bb640a86d4dbf3e0d778c2641bfbc750e6a1c8be7"
+  digest = "1:b998364b33ce263d8ca02293f140d4bcce95e400988c08fc85adb975b0748f03"
   name = "golang.org/x/crypto"
   packages = [
     "ed25519",
@@ -350,7 +370,7 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "ff983b9c42bc9fbf91556e191cc8efb585c16908"
+  revision = "74369b46fc6756741c016591724fd1cb8e26845f"
 
 [[projects]]
   branch = "master"
