@@ -162,7 +162,7 @@ Great! Now we have the Board FQBN (Fully Qualified Board Name) `arduino:samd:mkr
 and the Board Name look good, we are ready to compile and upload the sketch
 
 #### Adding 3rd party cores
-To add 3rd party core packages add  a link of the additional package to the file  `.cli-config.yml`
+To add 3rd party core packages add  a link of the additional package to the file  `arduino-cli.yaml`
 
 If you want to add the ESP8266 core, for example:
 
@@ -295,7 +295,7 @@ Flags:
   -h, --help   help for core
 
 Global Flags:
-      --config-file string   The custom config file (if not specified the default one will be used). (example  "/home/megabug/.config/arduino/arduino-cli/.cli-config.yml")
+      --config-file string   The custom config file (if not specified the default one will be used). (example  "/home/megabug/.config/arduino/arduino-cli/arduino-cli.yaml")
       --debug                Enables debug output (super verbose, used to debug the CLI).
       --format string        The output format, can be [text|json]. (default "text")
 

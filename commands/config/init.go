@@ -42,7 +42,7 @@ func initInitCommand() *cobra.Command {
 	initCommand.Flags().BoolVar(&initFlags._default, "default", false,
 		"If omitted, ask questions to the user about setting configuration properties, otherwise use default configuration.")
 	initCommand.Flags().StringVar(&initFlags.location, "save-as", "",
-		"Sets where to save the configuration file [default is ./.cli-config.yml].")
+		"Sets where to save the configuration file [default is ./arduino-cli.yaml].")
 	return initCommand
 }
 
