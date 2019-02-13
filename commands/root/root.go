@@ -18,6 +18,7 @@
 package root
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -116,6 +117,12 @@ func preRun(cmd *cobra.Command, args []string) {
 
 // initConfigs initializes the configuration from the specified file.
 func initConfigs() {
+	// Return error if an old configuration file is found
+	if paths.New(".cli-config.yml").Exist() {
+		logrus.Error("Old configuration file detected. Ensure you are using the new `arduino-cli.yaml` configuration")
+		formatter.PrintError(fmt.Errorf("old configuration file detected"), "Ensure you are using the new `arduino-cli.yaml` configuration")
+		os.Exit(commands.ErrGeneric)
+	}
 	// Start with default configuration
 	if conf, err := configs.NewConfiguration(); err != nil {
 		logrus.WithError(err).Error("Error creating default configuration")
