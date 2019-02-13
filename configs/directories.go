@@ -24,26 +24,32 @@ import (
 
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-win32-utils"
-	"github.com/shibukawa/configdir"
 )
 
-// getDefaultConfigFilePath returns the default path for arduino-cli.yaml. It searches the following directories for an existing arduino-cli.yaml file:
-// - User level configuration folder(e.g. $HOME/.config/<vendor-name>/<application-name>/setting.json in Linux)
-// - System level configuration folder(e.g. /etc/xdg/<vendor-name>/<application-name>/setting.json in Linux)
-// If it doesn't find one, it defaults to the user level configuration folder
+// getDefaultConfigFilePath returns the default path for arduino-cli.yaml
 func getDefaultConfigFilePath() *paths.Path {
-	configDirs := configdir.New("arduino", "arduino-cli")
-
-	// Search for a suitable configuration file
-	path := configDirs.QueryFolderContainsFile("arduino-cli.yaml")
-	if path != nil {
-		return paths.New(path.Path, "arduino-cli.yaml")
+	usr, err := user.Current()
+	if err != nil {
+		panic(fmt.Errorf("retrieving user home dir: %s", err))
 	}
-	// Default to the global configuration
-	locals := configDirs.QueryFolders(configdir.Global)
-	return paths.New(locals[0].Path, "arduino-cli.yaml")
+	arduinoDataDir := paths.New(usr.HomeDir)
 
-	return nil
+	switch runtime.GOOS {
+	case "linux":
+		arduinoDataDir = arduinoDataDir.Join(".arduino15")
+	case "darwin":
+		arduinoDataDir = arduinoDataDir.Join("Library", "arduino15")
+	case "windows":
+		localAppDataPath, err := win32.GetLocalAppDataFolder()
+		if err != nil {
+			panic(err)
+		}
+		arduinoDataDir = paths.New(localAppDataPath).Join("Arduino15")
+	default:
+		panic(fmt.Errorf("unsupported OS: %s", runtime.GOOS))
+	}
+
+	return arduinoDataDir
 }
 
 func getDefaultArduinoDataDir() (*paths.Path, error) {
