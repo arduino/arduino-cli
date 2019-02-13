@@ -66,7 +66,7 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 		filepath = commands.Config.ConfigFile.String()
 	}
 
-	err := os.MkdirAll(commands.Config.ConfigFile.Parent().String(), 0766)
+	err := commands.Config.ConfigFile.Parent().MkdirAll()
 	if err != nil {
 		formatter.PrintError(err, "Cannot create config file.")
 		os.Exit(commands.ErrGeneric)
