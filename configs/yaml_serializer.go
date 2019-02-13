@@ -109,9 +109,9 @@ func (config *Configuration) SerializeToYAML() ([]byte, error) {
 			Password: config.ProxyPassword,
 		}
 	}
-	if len(config.BoardManagerAdditionalUrls) > 0 {
-		c.BoardsManager = &yamlBoardsManagerConfig{AdditionalURLS: []string{}}
-		for _, URL := range config.BoardManagerAdditionalUrls {
+	c.BoardsManager = &yamlBoardsManagerConfig{AdditionalURLS: []string{}}
+	if len(config.BoardManagerAdditionalUrls) > 1 {
+		for _, URL := range config.BoardManagerAdditionalUrls[1:] {
 			c.BoardsManager.AdditionalURLS = appendIfMissing(c.BoardsManager.AdditionalURLS, URL.String())
 		}
 	}
