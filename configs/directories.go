@@ -27,7 +27,7 @@ import (
 	"github.com/shibukawa/configdir"
 )
 
-// getDefaultConfigFilePath returns the default path for .cli-config.yml. It searches the following directories for an existing .cli-config.yml file:
+// getDefaultConfigFilePath returns the default path for arduino-cli.yaml. It searches the following directories for an existing arduino-cli.yaml file:
 // - User level configuration folder(e.g. $HOME/.config/<vendor-name>/<application-name>/setting.json in Linux)
 // - System level configuration folder(e.g. /etc/xdg/<vendor-name>/<application-name>/setting.json in Linux)
 // If it doesn't find one, it defaults to the user level configuration folder
@@ -35,13 +35,13 @@ func getDefaultConfigFilePath() *paths.Path {
 	configDirs := configdir.New("arduino", "arduino-cli")
 
 	// Search for a suitable configuration file
-	path := configDirs.QueryFolderContainsFile(".cli-config.yml")
+	path := configDirs.QueryFolderContainsFile("arduino-cli.yaml")
 	if path != nil {
-		return paths.New(path.Path, ".cli-config.yml")
+		return paths.New(path.Path, "arduino-cli.yaml")
 	}
 	// Default to the global configuration
 	locals := configDirs.QueryFolders(configdir.Global)
-	return paths.New(locals[0].Path, ".cli-config.yml")
+	return paths.New(locals[0].Path, "arduino-cli.yaml")
 
 	return nil
 }
