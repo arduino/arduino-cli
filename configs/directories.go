@@ -49,7 +49,7 @@ func getDefaultConfigFilePath() *paths.Path {
 		panic(fmt.Errorf("unsupported OS: %s", runtime.GOOS))
 	}
 
-	return arduinoDataDir
+	return arduinoDataDir.Join("arduino-cli.yaml")
 }
 
 func getDefaultArduinoDataDir() (*paths.Path, error) {
