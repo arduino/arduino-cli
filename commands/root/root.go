@@ -132,6 +132,7 @@ func initConfigs() {
 	}
 
 	commands.Config.Navigate("/", pwd)
+	commands.Config.LoadFromYAML(commands.Config.ConfigFile)
 
 	if yamlConfigFile != "" {
 		commands.Config.ConfigFile = paths.New(yamlConfigFile)
