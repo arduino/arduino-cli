@@ -137,10 +137,7 @@ func initConfigs() {
 
 	// Read configuration from global config file
 	if commands.Config.ConfigFile.Exist() {
-		logrus.Infof("Reading configuration from %s", commands.Config.ConfigFile)
-		if err := commands.Config.LoadFromYAML(commands.Config.ConfigFile); err != nil {
-			logrus.WithError(err).Warnf("Could not read configuration from %s", commands.Config.ConfigFile)
-		}
+		readConfigFrom(commands.Config.ConfigFile)
 	}
 
 	if commands.Config.IsBundledInDesktopIDE() {
@@ -166,11 +163,15 @@ func initConfigs() {
 	// Read configuration from user specified file
 	if yamlConfigFile != "" {
 		commands.Config.ConfigFile = paths.New(yamlConfigFile)
-		logrus.Infof("Reading configuration from %s", commands.Config.ConfigFile)
-		if err := commands.Config.LoadFromYAML(commands.Config.ConfigFile); err != nil {
-			logrus.WithError(err).Warnf("Could not read configuration from %s", commands.Config.ConfigFile)
-		}
+		readConfigFrom(commands.Config.ConfigFile)
 	}
 
 	logrus.Info("Configuration set")
+}
+
+func readConfigFrom(path *paths.Path) {
+	logrus.Infof("Reading configuration from %s", path)
+	if err := commands.Config.LoadFromYAML(path); err != nil {
+		logrus.WithError(err).Warnf("Could not read configuration from %s", path)
+	}
 }
