@@ -27,9 +27,9 @@ import (
 
 	"golang.org/x/crypto/ssh/terminal"
 
-	"github.com/mattn/go-colorable"
+	colorable "github.com/mattn/go-colorable"
 
-	"github.com/arduino/go-paths-helper"
+	paths "github.com/arduino/go-paths-helper"
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
@@ -118,11 +118,15 @@ func preRun(cmd *cobra.Command, args []string) {
 // initConfigs initializes the configuration from the specified file.
 func initConfigs() {
 	// Return error if an old configuration file is found
-	if paths.New(".cli-config.yml").Exist() {
-		logrus.Error("Old configuration file detected. Ensure you are using the new `arduino-cli.yaml` configuration")
-		formatter.PrintError(fmt.Errorf("old configuration file detected"), "Ensure you are using the new `arduino-cli.yaml` configuration")
+	if old := paths.New(".cli-config.yml"); old.Exist() {
+		logrus.Errorf("Old configuration file detected: %s.", old)
+		logrus.Info("The name of this file has been changed to `arduino-cli.yaml`, please rename the file fix it.")
+		formatter.PrintError(
+			fmt.Errorf("old configuration file detected: %s", old),
+			"The name of this file has been changed to `arduino-cli.yaml`, please rename the file fix it.")
 		os.Exit(commands.ErrGeneric)
 	}
+
 	// Start with default configuration
 	if conf, err := configs.NewConfiguration(); err != nil {
 		logrus.WithError(err).Error("Error creating default configuration")
@@ -138,17 +142,13 @@ func initConfigs() {
 		logrus.WithError(err).Warn("Did not manage to find current path")
 	}
 
-	commands.Config.Navigate("/", pwd)
-	commands.Config.LoadFromYAML(commands.Config.ConfigFile)
-
-	if yamlConfigFile != "" {
-		commands.Config.ConfigFile = paths.New(yamlConfigFile)
+	// Read configuration from global config file
+	if commands.Config.ConfigFile.Exist() {
+		logrus.Infof("Reading configuration from %s", commands.Config.ConfigFile)
 		if err := commands.Config.LoadFromYAML(commands.Config.ConfigFile); err != nil {
-			logrus.WithError(err).Warn("Did not manage to get config file, using default configuration")
+			logrus.WithError(err).Warnf("Could not read configuration from %s", commands.Config.ConfigFile)
 		}
 	}
-
-	logrus.Info("Initiating configuration")
 
 	if commands.Config.IsBundledInDesktopIDE() {
 		logrus.Info("CLI is bundled into the IDE")
@@ -159,6 +159,21 @@ func initConfigs() {
 	} else {
 		logrus.Info("CLI is not bundled into the IDE")
 	}
+
+	// Read configuration from parent folders (project config)
+	commands.Config.Navigate("/", pwd)
+
+	// Read configuration from environment vars
 	commands.Config.LoadFromEnv()
+
+	// Read configuration from user specified file
+	if yamlConfigFile != "" {
+		commands.Config.ConfigFile = paths.New(yamlConfigFile)
+		logrus.Infof("Reading configuration from %s", commands.Config.ConfigFile)
+		if err := commands.Config.LoadFromYAML(commands.Config.ConfigFile); err != nil {
+			logrus.WithError(err).Warnf("Could not read configuration from %s", commands.Config.ConfigFile)
+		}
+	}
+
 	logrus.Info("Configuration set")
 }
