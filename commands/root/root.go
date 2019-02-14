@@ -153,6 +153,9 @@ func initConfigs() {
 	// Read configuration from parent folders (project config)
 	if pwd, err := paths.Getwd(); err != nil {
 		logrus.WithError(err).Warn("Did not manage to find current path")
+		if path := paths.New("arduino-cli.yaml"); path.Exist() {
+			readConfigFrom(path)
+		}
 	} else {
 		commands.Config.Navigate("/", pwd.String())
 	}
