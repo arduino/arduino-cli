@@ -77,6 +77,9 @@ func (config *Configuration) LoadFromYAML(path *paths.Path) error {
 		}
 	}
 	if ret.BoardsManager != nil {
+		if len(config.BoardManagerAdditionalUrls) > 1 {
+			config.BoardManagerAdditionalUrls = config.BoardManagerAdditionalUrls[:1]
+		}
 		for _, rawurl := range ret.BoardsManager.AdditionalURLS {
 			url, err := url.Parse(rawurl)
 			if err != nil {
