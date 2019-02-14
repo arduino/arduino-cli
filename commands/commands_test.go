@@ -521,27 +521,33 @@ func TestCompileCommands(t *testing.T) {
 	require.True(t, paths.New(test1).Join("Test1.arduino.avr.nano.hex").Exist())
 
 	// Build sketch with --output path
-	require.NoError(t, os.Chdir(tmp))
-	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", "test", test1)
-	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New("test.hex").Exist())
+	{
+		pwd, err := os.Getwd()
+		require.NoError(t, err)
+		defer func() { require.NoError(t, os.Chdir(pwd)) }()
+		require.NoError(t, os.Chdir(tmp))
 
-	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", "test2.hex", test1)
-	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New("test2.hex").Exist())
-	require.NoError(t, paths.New(tmp, "anothertest").MkdirAll())
+		exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", "test", test1)
+		require.Zero(t, exitCode, "exit code")
+		require.Contains(t, string(d), "Sketch uses")
+		require.True(t, paths.New("test.hex").Exist())
 
-	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", "anothertest/test", test1)
-	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New("anothertest", "test.hex").Exist())
+		exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", "test2.hex", test1)
+		require.Zero(t, exitCode, "exit code")
+		require.Contains(t, string(d), "Sketch uses")
+		require.True(t, paths.New("test2.hex").Exist())
+		require.NoError(t, paths.New(tmp, "anothertest").MkdirAll())
 
-	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", tmp+"/anothertest/test2", test1)
-	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New("anothertest", "test2.hex").Exist())
+		exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", "anothertest/test", test1)
+		require.Zero(t, exitCode, "exit code")
+		require.Contains(t, string(d), "Sketch uses")
+		require.True(t, paths.New("anothertest", "test.hex").Exist())
+
+		exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", tmp+"/anothertest/test2", test1)
+		require.Zero(t, exitCode, "exit code")
+		require.Contains(t, string(d), "Sketch uses")
+		require.True(t, paths.New("anothertest", "test2.hex").Exist())
+	}
 }
 
 func TestInvalidCoreURL(t *testing.T) {
