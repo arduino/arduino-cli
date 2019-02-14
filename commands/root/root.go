@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 
 	"github.com/arduino/arduino-cli/output"
 
@@ -136,12 +135,6 @@ func initConfigs() {
 		commands.Config = conf
 	}
 
-	// Navigate through folders
-	pwd, err := filepath.Abs(".")
-	if err != nil {
-		logrus.WithError(err).Warn("Did not manage to find current path")
-	}
-
 	// Read configuration from global config file
 	if commands.Config.ConfigFile.Exist() {
 		logrus.Infof("Reading configuration from %s", commands.Config.ConfigFile)
@@ -161,7 +154,11 @@ func initConfigs() {
 	}
 
 	// Read configuration from parent folders (project config)
-	commands.Config.Navigate("/", pwd)
+	if pwd, err := paths.Getwd(); err != nil {
+		logrus.WithError(err).Warn("Did not manage to find current path")
+	} else {
+		commands.Config.Navigate("/", pwd.String())
+	}
 
 	// Read configuration from environment vars
 	commands.Config.LoadFromEnv()
