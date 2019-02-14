@@ -74,6 +74,15 @@ func executeWithArgs(t *testing.T, args ...string) (int, []byte) {
 
 	// This closure is here because we won't that the defer are executed after the end of the "executeWithArgs" method
 	func() {
+		// Create an empty config for the CLI test
+		conf := paths.New("arduino-cli.yaml")
+		require.False(t, conf.Exist())
+		err := conf.WriteFile([]byte("board_manager:\n  additional_urls:\n"))
+		require.NoError(t, err)
+		defer func() {
+			require.NoError(t, conf.Remove())
+		}()
+
 		redirect := &stdOutRedirect{}
 		redirect.Open(t)
 		defer func() {
@@ -544,7 +553,7 @@ func TestInvalidCoreURL(t *testing.T) {
 	require.NoError(t, err, "making temporary dir")
 	defer tmp.RemoveAll()
 
-	configFile := tmp.Join("cli-config.yml")
+	configFile := tmp.Join("arduino-cli.yaml")
 	configFile.WriteFile([]byte(`
 board_manager:
   additional_urls:
