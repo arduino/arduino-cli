@@ -18,6 +18,7 @@
 package root
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -25,9 +26,9 @@ import (
 
 	"golang.org/x/crypto/ssh/terminal"
 
-	"github.com/mattn/go-colorable"
+	colorable "github.com/mattn/go-colorable"
 
-	"github.com/arduino/go-paths-helper"
+	paths "github.com/arduino/go-paths-helper"
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
@@ -56,7 +57,7 @@ func Init() *cobra.Command {
 	}
 	command.PersistentFlags().BoolVar(&commands.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
 	command.PersistentFlags().StringVar(&commands.GlobalFlags.Format, "format", "text", "The output format, can be [text|json].")
-	command.PersistentFlags().StringVar(&yamlConfigFile, "config-file", "", "The custom config file (if not specified ./.cli-config.yml will be used).")
+	command.PersistentFlags().StringVar(&yamlConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 	command.AddCommand(board.InitCommand())
 	command.AddCommand(compile.InitCommand())
 	command.AddCommand(config.InitCommand())
@@ -115,6 +116,17 @@ func preRun(cmd *cobra.Command, args []string) {
 
 // initConfigs initializes the configuration from the specified file.
 func initConfigs() {
+	// Return error if an old configuration file is found
+	if old := paths.New(".cli-config.yml"); old.Exist() {
+		logrus.Errorf("Old configuration file detected: %s.", old)
+		logrus.Info("The name of this file has been changed to `arduino-cli.yaml`, please rename the file fix it.")
+		formatter.PrintError(
+			fmt.Errorf("old configuration file detected: %s", old),
+			"The name of this file has been changed to `arduino-cli.yaml`, please rename the file fix it.")
+		os.Exit(commands.ErrGeneric)
+	}
+
+	// Start with default configuration
 	if conf, err := configs.NewConfiguration(); err != nil {
 		logrus.WithError(err).Error("Error creating default configuration")
 		formatter.PrintError(err, "Error creating default configuration")
@@ -123,14 +135,11 @@ func initConfigs() {
 		commands.Config = conf
 	}
 
-	if yamlConfigFile != "" {
-		commands.Config.ConfigFile = paths.New(yamlConfigFile)
+	// Read configuration from global config file
+	if commands.Config.ConfigFile.Exist() {
+		readConfigFrom(commands.Config.ConfigFile)
 	}
 
-	logrus.Info("Initiating configuration")
-	if err := commands.Config.LoadFromYAML(commands.Config.ConfigFile); err != nil {
-		logrus.WithError(err).Warn("Did not manage to get config file, using default configuration")
-	}
 	if commands.Config.IsBundledInDesktopIDE() {
 		logrus.Info("CLI is bundled into the IDE")
 		err := commands.Config.LoadFromDesktopIDEPreferences()
@@ -140,6 +149,32 @@ func initConfigs() {
 	} else {
 		logrus.Info("CLI is not bundled into the IDE")
 	}
+
+	// Read configuration from parent folders (project config)
+	if pwd, err := paths.Getwd(); err != nil {
+		logrus.WithError(err).Warn("Did not manage to find current path")
+		if path := paths.New("arduino-cli.yaml"); path.Exist() {
+			readConfigFrom(path)
+		}
+	} else {
+		commands.Config.Navigate("/", pwd.String())
+	}
+
+	// Read configuration from environment vars
 	commands.Config.LoadFromEnv()
+
+	// Read configuration from user specified file
+	if yamlConfigFile != "" {
+		commands.Config.ConfigFile = paths.New(yamlConfigFile)
+		readConfigFrom(commands.Config.ConfigFile)
+	}
+
 	logrus.Info("Configuration set")
+}
+
+func readConfigFrom(path *paths.Path) {
+	logrus.Infof("Reading configuration from %s", path)
+	if err := commands.Config.LoadFromYAML(path); err != nil {
+		logrus.WithError(err).Warnf("Could not read configuration from %s", path)
+	}
 }
