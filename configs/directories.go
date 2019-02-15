@@ -19,23 +19,37 @@ package configs
 
 import (
 	"fmt"
-	"os"
 	"os/user"
 	"runtime"
 
 	"github.com/arduino/go-paths-helper"
-
 	"github.com/arduino/go-win32-utils"
 )
 
-// getDefaultConfigFilePath returns the default path for .cli-config.yml,
-// this is the directory where the arduino-cli executable resides.
+// getDefaultConfigFilePath returns the default path for arduino-cli.yaml
 func getDefaultConfigFilePath() *paths.Path {
-	executablePath, err := os.Executable()
+	usr, err := user.Current()
 	if err != nil {
-		executablePath = "."
+		panic(fmt.Errorf("retrieving user home dir: %s", err))
 	}
-	return paths.New(executablePath).Parent().Join(".cli-config.yml")
+	arduinoDataDir := paths.New(usr.HomeDir)
+
+	switch runtime.GOOS {
+	case "linux":
+		arduinoDataDir = arduinoDataDir.Join(".arduino15")
+	case "darwin":
+		arduinoDataDir = arduinoDataDir.Join("Library", "arduino15")
+	case "windows":
+		localAppDataPath, err := win32.GetLocalAppDataFolder()
+		if err != nil {
+			panic(err)
+		}
+		arduinoDataDir = paths.New(localAppDataPath).Join("Arduino15")
+	default:
+		panic(fmt.Errorf("unsupported OS: %s", runtime.GOOS))
+	}
+
+	return arduinoDataDir.Join("arduino-cli.yaml")
 }
 
 func getDefaultArduinoDataDir() (*paths.Path, error) {

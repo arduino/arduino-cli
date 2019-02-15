@@ -30,11 +30,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:fd2ebfc02b6ad10599b226d2c0265f160e95e7c80e23f01dcf34a8aff0de98c9"
+  digest = "1:045d5ae3596598b9b9591042561fbcbf2d484d2a744fd007151cab3862a6b8f6"
   name = "github.com/arduino/go-paths-helper"
   packages = ["."]
   pruneopts = "UT"
-  revision = "751652ddd9f0a98650e681673c2c73937002e889"
+  revision = "c3c98d1bf2e1069f60ab84bff3a2eb3c5422f3b0"
 
 [[projects]]
   branch = "master"
@@ -267,6 +267,14 @@
   version = "v1.5.1"
 
 [[projects]]
+  digest = "1:d917313f309bda80d27274d53985bc65651f81a5b66b820749ac7f8ef061fd04"
+  name = "github.com/sergi/go-diff"
+  packages = ["diffmatchpatch"]
+  pruneopts = "UT"
+  revision = "1744e2970ca51c86172c8190fadad617561ed6e7"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:9e9193aa51197513b3abcb108970d831fbcf40ef96aa845c4f03276e1fa316d2"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
@@ -441,6 +449,7 @@
     "github.com/mitchellh/go-homedir",
     "github.com/pkg/errors",
     "github.com/pmylund/sortutil",
+    "github.com/sergi/go-diff/diffmatchpatch",
     "github.com/sirupsen/logrus",
     "github.com/spf13/cobra",
     "github.com/spf13/cobra/doc",
