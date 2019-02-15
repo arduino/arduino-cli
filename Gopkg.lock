@@ -21,6 +21,26 @@
   source = "github.com/arduino/arduino-builder"
 
 [[projects]]
+  digest = "1:ab5037f4170f63c96d082f43fa92b02b660ac11536862c0fb4986d60a7af43b6"
+  name = "github.com/arduino/arduino-cli"
+  packages = [
+    "arduino/cores",
+    "arduino/cores/packageindex",
+    "arduino/cores/packagemanager",
+    "arduino/libraries",
+    "arduino/libraries/librariesindex",
+    "arduino/libraries/librariesmanager",
+    "arduino/libraries/librariesresolver",
+    "arduino/resources",
+    "arduino/utils",
+    "common/formatter",
+    "configs",
+  ]
+  pruneopts = "UT"
+  revision = "494bc9418c806283a2cb7b76073debc61fd76c6f"
+  version = "0.3.4-alpha.preview"
+
+[[projects]]
   branch = "master"
   digest = "1:16e26ae59d3dbd322a03511c1a56731aa4722743e5f8294f9fead841e6930b71"
   name = "github.com/arduino/board-discovery"
@@ -187,6 +207,14 @@
   revision = "089d3ea4e4d597bd98acac068193d341983326a3"
 
 [[projects]]
+  digest = "1:0a69a1c0db3591fcefb47f115b224592c8dfa4368b7ba9fae509d5e16cdc95c8"
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
+  version = "v1.0.1"
+
+[[projects]]
   digest = "1:c658e84ad3916da105a761660dcaeb01e63416c8ec7bc62256a9b411a05fcd67"
   name = "github.com/mattn/go-colorable"
   packages = ["."]
@@ -275,12 +303,12 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:9e9193aa51197513b3abcb108970d831fbcf40ef96aa845c4f03276e1fa316d2"
+  digest = "1:87c2e02fb01c27060ccc5ba7c5a407cc91147726f8f40b70cceeedbc52b1f3a8"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   pruneopts = "UT"
-  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
-  version = "v1.0.5"
+  revision = "e1e72e9de974bd926e5c56f83753fba2df402ce5"
+  version = "v1.3.0"
 
 [[projects]]
   digest = "1:e01b05ba901239c783dfe56450bcde607fc858908529868259c9a8765dc176d0"
