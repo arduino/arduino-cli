@@ -116,16 +116,6 @@ func preRun(cmd *cobra.Command, args []string) {
 
 // initConfigs initializes the configuration from the specified file.
 func initConfigs() {
-	// Return error if an old configuration file is found
-	if old := paths.New(".cli-config.yml"); old.Exist() {
-		logrus.Errorf("Old configuration file detected: %s.", old)
-		logrus.Info("The name of this file has been changed to `arduino-cli.yaml`, please rename the file fix it.")
-		formatter.PrintError(
-			fmt.Errorf("old configuration file detected: %s", old),
-			"The name of this file has been changed to `arduino-cli.yaml`, please rename the file fix it.")
-		os.Exit(commands.ErrGeneric)
-	}
-
 	// Start with default configuration
 	if conf, err := configs.NewConfiguration(); err != nil {
 		logrus.WithError(err).Error("Error creating default configuration")
@@ -158,6 +148,17 @@ func initConfigs() {
 		}
 	} else {
 		commands.Config.Navigate("/", pwd.String())
+	}
+
+	// Read configuration from old configuration file if found, but output a warning.
+	if old := paths.New(".cli-config.yml"); old.Exist() {
+		logrus.Errorf("Old configuration file detected: %s.", old)
+		logrus.Info("The name of this file has been changed to `arduino-cli.yaml`, please rename the file fix it.")
+		formatter.PrintError(
+			fmt.Errorf("WARNING: Old configuration file detected: %s", old),
+			"The name of this file has been changed to `arduino-cli.yaml`, in a future release we will not support"+
+				"the old name `.cli-config.yml` anymore. Please rename the file to `arduino-cli.yaml` to silence this warning.")
+		readConfigFrom(old)
 	}
 
 	// Read configuration from environment vars
