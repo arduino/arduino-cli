@@ -295,7 +295,7 @@ Flags:
   -h, --help   help for core
 
 Global Flags:
-      --config-file string   The custom config file (if not specified the default one will be used). (example  "/home/megabug/.config/arduino/arduino-cli/arduino-cli.yaml")
+      --config-file string   The custom config file (if not specified the default one will be used). (example  "/home/user/.config/arduino/arduino-cli/arduino-cli.yaml")
       --debug                Enables debug output (super verbose, used to debug the CLI).
       --format string        The output format, can be [text|json]. (default "text")
 
