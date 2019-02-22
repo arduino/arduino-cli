@@ -1,24 +1,28 @@
-//
-
 syntax = "proto3";
 
 package arduino;
 
+option go_package = "github.com/arduino/arduino-cli/rpc";
+
+import "common.proto";
+import "board.proto";
+
 // The main Arduino Platform Service
 service ArduinoCore {
-  // Start a new instance of the Arduino Platform
+  // BOOTSTRAP COMMANDS
+  //-------------------
+
+  // Start a new instance of the Arduino Core Service
   rpc Init(InitReq) returns (InitResp) {}
+
+  // Destroy an instance of the Arduino Core Service
   rpc Destroy(DestroyReq) returns (DestroyResp) {}
 
-  rpc ListLibraries(ListLibrariesReq) returns (ListLibrariesResp) {}
+  // BOARD COMMANDS
+  // --------------
 
-  rpc Compile(CompileReq) returns (stream CompileResp) {}
-}
-
-message CompileReq {}
-message CompileResp {
-  string result = 1;
-  string outputLine = 2;
+  // Requests details about a board
+  rpc BoardDetails(BoardDetailsReq) returns (BoardDetailsResp);
 }
 
 // Configuration contains information to instantiate an Arduino Platform Service
@@ -40,31 +44,15 @@ message Configuration {
   repeated string boardManagerAdditionalUrls = 4;
 }
 
-message Instance { int32 id = 1; }
-
-message Result {
-  bool error = 1;
-  string errorMessage = 2;
+message InitReq {
+  Configuration configuration = 1;
+  bool library_manager_only = 2;
 }
 
-message Library {
-  string name = 1;
-  string paragraph = 2;
-  bool precompiled = 3;
-  Version version = 4;
+message InitResp {
+  Instance instance = 1;
+  Result result = 2;
 }
-
-message Version { string version = 1; }
-
-message InitReq { Configuration configuration = 1; }
-message InitResp { Instance instance = 1; }
 
 message DestroyReq { Instance instance = 1; }
 message DestroyResp { Result result = 1; }
-
-message ListLibrariesReq {
-  Instance instance = 1;
-  // Set to true to list only updatable libraries
-  bool updatable = 2;
-}
-message ListLibrariesResp { repeated Library libraries = 1; }

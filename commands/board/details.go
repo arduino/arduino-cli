@@ -18,39 +18,42 @@
 package board
 
 import (
+	"context"
+
 	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/rpc"
 )
 
-func Details(pm *packagemanager.PackageManager, req *DetailsReq) *DetailsResp {
+func BoardDetails(ctx context.Context, req *rpc.BoardDetailsReq) *rpc.BoardDetailsResp {
+	pm := commands.GetPackageManager(req)
 	fqbn, err := cores.ParseFQBN(req.GetFqbn())
 	if err != nil {
-		return &DetailsResp{
-			Result: commands.Error("Error parsing fqbn", commands.ErrBadArgument),
+		return &rpc.BoardDetailsResp{
+			Result: rpc.Error("Error parsing fqbn", rpc.ErrBadArgument),
 		}
 	}
 
 	_, _, board, _, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return &DetailsResp{
-			Result: commands.Error("Error loading board data", commands.ErrBadArgument),
+		return &rpc.BoardDetailsResp{
+			Result: rpc.Error("Error loading board data: "+err.Error(), rpc.ErrBadArgument),
 		}
 	}
 
-	details := &DetailsResp{}
+	details := &rpc.BoardDetailsResp{}
 	details.Name = board.Name()
-	details.ConfigOptions = []*ConfigOption{}
+	details.ConfigOptions = []*rpc.ConfigOption{}
 	options := board.GetConfigOptions()
 	for _, option := range options.Keys() {
-		configOption := &ConfigOption{}
+		configOption := &rpc.ConfigOption{}
 		configOption.Option = option
 		configOption.OptionLabel = options.Get(option)
 		selected, hasSelected := fqbn.Configs.GetOk(option)
 
 		values := board.GetConfigOptionValues(option)
 		for i, value := range values.Keys() {
-			configValue := &ConfigValue{}
+			configValue := &rpc.ConfigValue{}
 			if hasSelected && value == selected {
 				configValue.Selected = true
 			} else if !hasSelected && i == 0 {
@@ -65,9 +68,9 @@ func Details(pm *packagemanager.PackageManager, req *DetailsReq) *DetailsResp {
 		details.ConfigOptions = append(details.ConfigOptions, configOption)
 	}
 
-	details.RequiredTools = []*RequiredTool{}
+	details.RequiredTools = []*rpc.RequiredTool{}
 	for _, reqTool := range board.PlatformRelease.Dependencies {
-		details.RequiredTools = append(details.RequiredTools, &RequiredTool{
+		details.RequiredTools = append(details.RequiredTools, &rpc.RequiredTool{
 			Name:     reqTool.ToolName,
 			Packager: reqTool.ToolPackager,
 			Version:  reqTool.ToolVersion.String(),

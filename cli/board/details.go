@@ -18,11 +18,14 @@
 package board
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/cli"
-	b "github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
 )
 
@@ -39,15 +42,23 @@ func initDetailsCommand() *cobra.Command {
 }
 
 func runDetailsCommand(cmd *cobra.Command, args []string) {
-	pm := cli.InitPackageManager()
-	res := b.Details(pm, &b.DetailsReq{Fqbn: args[0]})
+	instance := cli.CreateInstance()
 
-	if !cli.OutputJSON(res) {
-		outputDetailsResp(res)
+	res := board.BoardDetails(context.Background(), &rpc.BoardDetailsReq{
+		Instance: instance,
+		Fqbn:     args[0],
+	})
+
+	if cli.OutputJSONOrElse(res) {
+		if res.GetResult().Success() {
+			outputDetailsResp(res)
+		} else {
+			formatter.PrintError(res.Result, "")
+		}
 	}
 }
 
-func outputDetailsResp(details *b.DetailsResp) {
+func outputDetailsResp(details *rpc.BoardDetailsResp) {
 	table := output.NewTable()
 	table.SetColumnWidthMode(1, output.Average)
 	table.AddRow("Board name:", details.Name)

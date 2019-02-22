@@ -18,20 +18,21 @@
 package cli
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 
-	paths "github.com/arduino/go-paths-helper"
-
-	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/arduino/sketches"
-	"github.com/arduino/arduino-cli/configs"
+	"github.com/arduino/arduino-cli/commands"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/configs"
+	"github.com/arduino/arduino-cli/rpc"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 )
 
@@ -63,12 +64,12 @@ var GlobalFlags struct {
 	OutputJSON bool // true output in JSON, false output as Text
 }
 
-// OutputJSON outputs the JSON encoding of v if the JSON output format has been
-// selected by the user and returns true. Otherwise no output is produced and the
-// function returns false.
-func OutputJSON(v interface{}) bool {
+// OutputJSONOrElse outputs the JSON encoding of v if the JSON output format has been
+// selected by the user and returns false. Otherwise no output is produced and the
+// function returns true.
+func OutputJSONOrElse(v interface{}) bool {
 	if !GlobalFlags.OutputJSON {
-		return false
+		return true
 	}
 	d, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
@@ -76,7 +77,7 @@ func OutputJSON(v interface{}) bool {
 		os.Exit(ErrGeneric)
 	}
 	fmt.Print(string(d))
-	return true
+	return false
 }
 
 // AppName is the command line name of the Arduino CLI executable
@@ -95,78 +96,60 @@ func InitPackageManagerWithoutBundles() *packagemanager.PackageManager {
 	return InitPackageManager()
 }
 
+func packageManagerInitReq() *rpc.InitReq {
+	urls := []string{}
+	for _, URL := range Config.BoardManagerAdditionalUrls {
+		urls = append(urls, URL.String())
+	}
+
+	req := &rpc.InitReq{
+		Configuration: &rpc.Configuration{
+			DataDir:                    Config.DataDir.String(),
+			DownloadsDir:               Config.DownloadsDir().String(),
+			BoardManagerAdditionalUrls: urls,
+		},
+	}
+	return req
+}
+
+// CreateInstance creates and return an instance of the Arduino Core engine
+func CreateInstance() *rpc.Instance {
+	logrus.Info("Initializing package manager")
+	resp, err := commands.Init(context.Background(), packageManagerInitReq())
+	if err != nil {
+		formatter.PrintError(err, "Error initializing package manager")
+		os.Exit(rpc.ErrGeneric)
+	}
+	return resp.GetInstance()
+}
+
 // InitPackageManager initializes the PackageManager
 // TODO: for the daemon mode, this might be called at startup, but for now only commands needing the PM will call it
 func InitPackageManager() *packagemanager.PackageManager {
 	logrus.Info("Initializing package manager")
-
-	pm := packagemanager.NewPackageManager(
-		Config.IndexesDir(),
-		Config.PackagesDir(),
-		Config.DownloadsDir(),
-		Config.DataDir.Join("tmp"))
-
-	for _, URL := range Config.BoardManagerAdditionalUrls {
-		if err := pm.LoadPackageIndex(URL); err != nil {
-			formatter.PrintError(err, "Failed to load "+URL.String()+" package index.\n"+
-				"Try updating all indexes with `"+AppName+" core update-index`.")
-			os.Exit(ErrCoreConfig)
-		}
+	resp, err := commands.Init(context.Background(), packageManagerInitReq())
+	if err != nil {
+		formatter.PrintError(err, "Error initializing package manager")
+		os.Exit(rpc.ErrGeneric)
 	}
-
-	if err := pm.LoadHardware(Config); err != nil {
-		formatter.PrintError(err, "Error loading hardware packages.")
-		os.Exit(ErrCoreConfig)
-	}
-
-	return pm
+	return commands.GetPackageManager(resp)
 }
 
-// InitLibraryManager initializes the LibraryManager using the underlying packagemanager
+// InitLibraryManager initializes the LibraryManager. If pm is nil, the library manager will not handle core-libraries.
+// TODO: for the daemon mode, this might be called at startup, but for now only commands needing the PM will call it
 func InitLibraryManager(cfg *configs.Configuration, pm *packagemanager.PackageManager) *librariesmanager.LibrariesManager {
-	logrus.Info("Starting libraries manager")
-	lm := librariesmanager.NewLibraryManager(
-		cfg.IndexesDir(),
-		Config.DownloadsDir())
-
-	// Add IDE builtin libraries dir
-	if bundledLibsDir := Config.IDEBundledLibrariesDir(); bundledLibsDir != nil {
-		lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
+	req := packageManagerInitReq()
+	if pm == nil {
+		req.LibraryManagerOnly = true
 	}
 
-	// Add sketchbook libraries dir
-	lm.AddLibrariesDir(Config.LibrariesDir(), libraries.Sketchbook)
-
-	// Add libraries dirs from installed platforms
-	if pm != nil {
-		for _, targetPackage := range pm.GetPackages().Packages {
-			for _, platform := range targetPackage.Platforms {
-				if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
-					lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
-				}
-			}
-		}
+	logrus.Info("Initializing library manager")
+	resp, err := commands.Init(context.Background(), req)
+	if err != nil {
+		formatter.PrintError(err, "Error initializing library manager")
+		os.Exit(rpc.ErrGeneric)
 	}
-
-	// Auto-update index if needed
-	if err := lm.LoadIndex(); err != nil {
-		logrus.WithError(err).Warn("Error during libraries index loading, trying to auto-update index")
-		UpdateLibrariesIndex(lm)
-	}
-	if err := lm.LoadIndex(); err != nil {
-		logrus.WithError(err).Error("Error during libraries index loading")
-		formatter.PrintError(err, "Error loading libraries index")
-		os.Exit(ErrGeneric)
-	}
-
-	// Scan for libraries
-	if err := lm.RescanLibraries(); err != nil {
-		logrus.WithError(err).Error("Error during libraries rescan")
-		formatter.PrintError(err, "Error during libraries rescan")
-		os.Exit(ErrGeneric)
-	}
-
-	return lm
+	return commands.GetLibraryManager(resp)
 }
 
 // UpdateLibrariesIndex updates the library_index.json

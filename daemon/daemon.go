@@ -5,29 +5,17 @@ package daemon
 //go:generate protoc -I arduino --go_out=plugins=grpc:arduino arduino/arduino.proto
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
 
-	"github.com/arduino/arduino-cli/cli"
-	pb "github.com/arduino/arduino-cli/daemon/arduino"
+	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
-
-// InitCommand initalize the command
-func InitCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "daemon",
-		Short:   "Run as a daemon",
-		Long:    "Running as a daemon the initialization of cores and libraries is done only once.",
-		Example: "  " + cli.AppName + " daemon",
-		Args:    cobra.NoArgs,
-		Run:     runDaemonCommand,
-		Hidden:  true,
-	}
-	return cmd
-}
 
 const (
 	port = ":50051"
@@ -39,12 +27,23 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	pb.RegisterArduinoCoreServer(s, &daemon{})
+	rpc.RegisterArduinoCoreServer(s, &ArduinoCoreServerImpl{})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 	fmt.Println("Done serving")
 }
 
-// daemon is used to implement the Arduino Core Service.
-type daemon struct{}
+type ArduinoCoreServerImpl struct{}
+
+func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
+	return board.BoardDetails(ctx, req), nil
+}
+
+func (s *ArduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error) {
+	return commands.Destroy(ctx, req)
+}
+
+func (s *ArduinoCoreServerImpl) Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
+	return commands.Init(ctx, req)
+}
