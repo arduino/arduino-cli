@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/configs"
+	paths "github.com/arduino/go-paths-helper"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/sergi/go-diff/diffmatchpatch"
 )
@@ -36,13 +37,12 @@ func TestNavigate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt, func(t *testing.T) {
-			root := filepath.Join("testdata", "navigate", tt)
-			pwd := filepath.Join("testdata", "navigate", tt, "first", "second")
+			pwd := paths.New("testdata", "navigate", tt, "first", "second")
 			golden := filepath.Join("testdata", "navigate", tt, "golden.yaml")
 
 			config, _ := configs.NewConfiguration()
 
-			config.Navigate(root, pwd)
+			config.Navigate(pwd)
 			data, _ := config.SerializeToYAML()
 
 			diff(t, data, golden)
