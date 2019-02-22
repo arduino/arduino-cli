@@ -1,17 +1,14 @@
 //
 
-package daemon
+package commands
 
+/*
 import (
-	"context"
 	"fmt"
-
-	"github.com/arduino/arduino-cli/commands/lib"
-
-	pb "github.com/arduino/arduino-cli/daemon/arduino"
+	"context"
 )
 
-func (s *daemon) ListLibraries(ctx context.Context, in *pb.ListLibrariesReq) (*pb.ListLibrariesResp, error) {
+func (s *Service) ListLibraries(ctx context.Context, in *ListLibrariesReq) (*ListLibrariesResp, error) {
 	if in.Instance == nil {
 		return nil, fmt.Errorf("invalid request")
 	}
@@ -33,3 +30,4 @@ func (s *daemon) ListLibraries(ctx context.Context, in *pb.ListLibrariesReq) (*p
 		Libraries: result,
 	}, nil
 }
+*/

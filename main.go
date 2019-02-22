@@ -20,7 +20,7 @@ package main
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/root"
 	"github.com/arduino/arduino-cli/common/formatter"
 )
@@ -29,6 +29,6 @@ func main() {
 	cmd := root.Init()
 	if err := cmd.Execute(); err != nil {
 		formatter.PrintError(err, "Bad exit.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 }

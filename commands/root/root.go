@@ -21,8 +21,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli/board"
 	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/board"
+	"github.com/arduino/arduino-cli/cli/daemon"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/config"
 	"github.com/arduino/arduino-cli/commands/core"
@@ -33,7 +34,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/version"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
-	"github.com/arduino/arduino-cli/daemon"
 	paths "github.com/arduino/go-paths-helper"
 	colorable "github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"

@@ -3,12 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 
+	"github.com/arduino/arduino-cli/rpc"
 	"google.golang.org/grpc"
-
-	pb "github.com/arduino/arduino-cli/daemon/arduino"
 )
 
 func main() {
@@ -16,21 +14,38 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	client := pb.NewArduinoCoreClient(conn)
-	compile, err := client.Compile(context.Background(), &pb.CompileReq{})
+	client := rpc.NewArduinoCoreClient(conn)
+
+	resp, err := client.Init(context.Background(), &rpc.InitReq{})
 	if err != nil {
 		log.Fatal(err)
 	}
-	for {
-		resp, err := compile.Recv()
-		if err == io.EOF {
-			break
-		}
+	fmt.Println(resp.GetInstance())
+
+	details, err := client.BoardDetails(context.Background(), &rpc.BoardDetailsReq{
+		Instance: resp.GetInstance(),
+		Fqbn:     "",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(details.GetName())
+	/*
+		compile, err := client.Compile(context.Background(), &pb.CompileReq{})
 		if err != nil {
-			fmt.Printf("%+v\n", err)
 			log.Fatal(err)
 		}
-		fmt.Println(resp)
-	}
+		for {
+			resp, err := compile.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				fmt.Printf("%+v\n", err)
+				log.Fatal(err)
+			}
+			fmt.Println(resp)
+		}
+	*/
 	fmt.Println("Done")
 }

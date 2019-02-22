@@ -1,17 +1,18 @@
 syntax = "proto3";
 
-package arduino.board;
+package arduino;
 
-option go_package = "github.com/arduino/arduino-cli/commands/board";
+option go_package = "github.com/arduino/arduino-cli/rpc";
 
-import "commands.proto";
+import "common.proto";
 
-service Board { rpc Details(DetailsReq) returns (DetailsResp); }
+message BoardDetailsReq {
+  Instance instance = 1;
+  string fqbn = 2;
+}
 
-message DetailsReq { string fqbn = 1; }
-
-message DetailsResp {
-  arduino.commands.Result result = 1;
+message BoardDetailsResp {
+  Result result = 1;
   string name = 2;
   repeated ConfigOption config_options = 3;
   repeated RequiredTool required_tools = 4;

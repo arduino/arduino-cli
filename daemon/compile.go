@@ -2,10 +2,11 @@
 
 package daemon
 
+/*
 import (
 	"time"
 
-	pb "github.com/arduino/arduino-cli/daemon/arduino"
+	pb "github.com/arduino/arduino-cli/commands"
 )
 
 func (d *daemon) Compile(req *pb.CompileReq, serv pb.ArduinoCore_CompileServer) error {
@@ -20,3 +21,4 @@ func (d *daemon) Compile(req *pb.CompileReq, serv pb.ArduinoCore_CompileServer) 
 	}
 	return nil
 }
+*/
