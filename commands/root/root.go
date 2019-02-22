@@ -126,6 +126,7 @@ func initConfigs() {
 	}
 
 	// Read configuration from global config file
+	logrus.Info("Checking for config file in: " + commands.Config.ConfigFile.String())
 	if commands.Config.ConfigFile.Exist() {
 		readConfigFrom(commands.Config.ConfigFile)
 	}
@@ -147,7 +148,7 @@ func initConfigs() {
 			readConfigFrom(path)
 		}
 	} else {
-		commands.Config.Navigate("/", pwd.String())
+		commands.Config.Navigate(pwd)
 	}
 
 	// Read configuration from old configuration file if found, but output a warning.
