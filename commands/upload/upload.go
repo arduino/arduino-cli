@@ -102,7 +102,7 @@ func run(command *cobra.Command, args []string) {
 		os.Exit(cli.ErrBadCall)
 	}
 
-	pm := cli.InitPackageManager()
+	pm, _ := cli.InitPackageAndLibraryManager()
 
 	// Find target board and board properties
 	_, _, board, boardProperties, _, err := pm.ResolveFQBN(fqbn)

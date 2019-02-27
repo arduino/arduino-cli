@@ -44,7 +44,7 @@ func initInstallCommand() *cobra.Command {
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib install`")
-	lm := cli.InitLibraryManager(cli.Config, nil)
+	lm := cli.InitLibraryManager(cli.Config)
 
 	refs, err := librariesindex.ParseArgs(args)
 	if err != nil {

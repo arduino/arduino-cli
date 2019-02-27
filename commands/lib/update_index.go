@@ -18,7 +18,10 @@
 package lib
 
 import (
+	"context"
+
 	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +33,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Example: "  " + cli.AppName + " lib update-index",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			lm := cli.InitLibraryManager(cli.Config, nil)
+			lm := cli.InitLibraryManager(cli.Config)
 			cli.UpdateLibrariesIndex(lm)
 		},
 	}
