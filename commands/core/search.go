@@ -42,7 +42,7 @@ func initSearchCommand() *cobra.Command {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	pm := cli.InitPackageManagerWithoutBundles()
+	pm, _ := cli.InitPackageAndLibraryManagerWithoutBundles()
 
 	search := strings.ToLower(strings.Join(args, " "))
 	formatter.Print("Searching for platforms matching '" + search + "'")

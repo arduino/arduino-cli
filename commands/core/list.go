@@ -46,7 +46,7 @@ var listFlags struct {
 func runListCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core list`")
 
-	pm := cli.InitPackageManager()
+	pm, _ := cli.InitPackageAndLibraryManager()
 
 	installed := []*output.InstalledPlatform{}
 	for _, targetPackage := range pm.GetPackages().Packages {

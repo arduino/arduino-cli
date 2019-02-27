@@ -76,7 +76,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		boardURI = "serial://" + boardURI
 	}
 
-	pm := cli.InitPackageManager()
+	pm, _ := cli.InitPackageAndLibraryManager()
 
 	if fqbn != nil {
 		sketch.Metadata.CPU = sketches.BoardMetadata{

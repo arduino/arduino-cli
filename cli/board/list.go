@@ -52,7 +52,7 @@ var listFlags struct {
 // runListCommand detects and lists the connected arduino boards
 // (either via serial or network ports).
 func runListCommand(cmd *cobra.Command, args []string) {
-	pm := cli.InitPackageManager()
+	pm, _ := cli.InitPackageAndLibraryManager()
 
 	monitor := discovery.New(time.Millisecond)
 	monitor.Start()

@@ -122,7 +122,7 @@ func run(cmd *cobra.Command, args []string) {
 		os.Exit(cli.ErrBadArgument)
 	}
 
-	pm := cli.InitPackageManager()
+	pm, _ := cli.InitPackageAndLibraryManager()
 
 	// Check for ctags tool
 	loadBuiltinCtagsMetadata(pm)

@@ -38,7 +38,7 @@ func initUpgradeCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	lm := cli.InitLibraryManager(cli.Config, nil)
+	lm := cli.InitLibraryManager(cli.Config)
 	list := ListLibraries(lm, true)
 	libReleases := []*librariesindex.Release{}
 	for _, upgradeDesc := range list.Libraries {

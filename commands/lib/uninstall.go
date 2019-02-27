@@ -42,7 +42,7 @@ func initUninstallCommand() *cobra.Command {
 func runUninstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib uninstall`")
 
-	lm := cli.InitLibraryManager(cli.Config, nil)
+	lm := cli.InitLibraryManager(cli.Config)
 	libRefs, err := librariesindex.ParseArgs(args)
 	if err != nil {
 		formatter.PrintError(err, "Arguments error")

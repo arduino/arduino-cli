@@ -45,7 +45,7 @@ func initListAllCommand() *cobra.Command {
 
 // runListAllCommand list all installed boards
 func runListAllCommand(cmd *cobra.Command, args []string) {
-	pm := cli.InitPackageManager()
+	pm, _ := cli.InitPackageAndLibraryManager()
 
 	match := func(name string) bool {
 		name = strings.ToLower(name)

@@ -84,15 +84,15 @@ var AppName = filepath.Base(os.Args[0])
 
 var Config *configs.Configuration
 
-// InitPackageManagerWithoutBundles initializes the PackageManager
-// but ignores bundles and user installed cores
-func InitPackageManagerWithoutBundles() *packagemanager.PackageManager {
+// InitPackageAndLibraryManagerWithoutBundles initializes the PackageManager
+// and the LibraryManager but ignores bundles and user installed cores
+func InitPackageAndLibraryManagerWithoutBundles() (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
 	logrus.Info("Package manager will scan only managed hardware folder")
 
 	fakeResult := false
 	Config.IDEBundledCheckResult = &fakeResult
 	Config.SketchbookDir = nil
-	return InitPackageManager()
+	return InitPackageAndLibraryManager()
 }
 
 func packageManagerInitReq() *rpc.InitReq {
@@ -123,25 +123,23 @@ func CreateInstance() *rpc.Instance {
 	return resp.GetInstance()
 }
 
-// InitPackageManager initializes the PackageManager
+// InitPackageAndLibraryManager initializes the PackageManager and the LibaryManager
 // TODO: for the daemon mode, this might be called at startup, but for now only commands needing the PM will call it
-func InitPackageManager() *packagemanager.PackageManager {
+func InitPackageAndLibraryManager() (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
 	logrus.Info("Initializing package manager")
 	resp, err := commands.Init(context.Background(), packageManagerInitReq())
 	if err != nil {
 		formatter.PrintError(err, "Error initializing package manager")
 		os.Exit(rpc.ErrGeneric)
 	}
-	return commands.GetPackageManager(resp)
+	return commands.GetPackageManager(resp), commands.GetLibraryManager(resp)
 }
 
 // InitLibraryManager initializes the LibraryManager. If pm is nil, the library manager will not handle core-libraries.
 // TODO: for the daemon mode, this might be called at startup, but for now only commands needing the PM will call it
-func InitLibraryManager(cfg *configs.Configuration, pm *packagemanager.PackageManager) *librariesmanager.LibrariesManager {
+func InitLibraryManager(cfg *configs.Configuration) *librariesmanager.LibrariesManager {
 	req := packageManagerInitReq()
-	if pm == nil {
-		req.LibraryManagerOnly = true
-	}
+	req.LibraryManagerOnly = true
 
 	logrus.Info("Initializing library manager")
 	resp, err := commands.Init(context.Background(), req)

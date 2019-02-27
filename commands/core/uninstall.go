@@ -44,7 +44,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core download`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
-	pm := cli.InitPackageManagerWithoutBundles()
+	pm, _ := cli.InitPackageAndLibraryManagerWithoutBundles()
 
 	for _, platformRef := range platformsRefs {
 		uninstallPlatformByRef(pm, platformRef)

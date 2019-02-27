@@ -18,7 +18,6 @@
 package lib
 
 import (
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/cli"
@@ -49,11 +48,13 @@ var listFlags struct {
 
 func runListCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Listing")
-	var pm *packagemanager.PackageManager
+
+	var lm *librariesmanager.LibrariesManager
 	if listFlags.all {
-		pm = cli.InitPackageManager()
+		_, lm = cli.InitPackageAndLibraryManager()
+	} else {
+		lm = cli.InitLibraryManager(cli.Config)
 	}
-	lm := cli.InitLibraryManager(cli.Config, pm)
 
 	res := ListLibraries(lm, listFlags.updatable)
 	if len(res.Libraries) > 0 {
