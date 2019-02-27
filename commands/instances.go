@@ -55,10 +55,12 @@ func Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 		return nil, fmt.Errorf("invalid request")
 	}
 
-	config := &configs.Configuration{
-		DataDir:       paths.New(inConfig.DataDir),
-		SketchbookDir: paths.New(inConfig.SketchbookDir),
+	config, err := configs.NewConfiguration()
+	if err != nil {
+		return nil, fmt.Errorf("getting default config values: %s", err)
 	}
+	config.DataDir = paths.New(inConfig.DataDir)
+	config.SketchbookDir = paths.New(inConfig.SketchbookDir)
 	if inConfig.DownloadsDir != "" {
 		config.ArduinoDownloadsDir = paths.New(inConfig.DownloadsDir)
 	}
