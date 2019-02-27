@@ -150,21 +150,6 @@ func InitLibraryManager(cfg *configs.Configuration) *librariesmanager.LibrariesM
 	return commands.GetLibraryManager(resp)
 }
 
-// UpdateLibrariesIndex updates the library_index.json
-func UpdateLibrariesIndex(lm *librariesmanager.LibrariesManager) {
-	logrus.Info("Updating libraries index")
-	d, err := lm.UpdateIndex()
-	if err != nil {
-		formatter.PrintError(err, "Error downloading librarires index")
-		os.Exit(ErrNetwork)
-	}
-	formatter.DownloadProgressBar(d, "Updating index: library_index.json")
-	if d.Error() != nil {
-		formatter.PrintError(d.Error(), "Error downloading librarires index")
-		os.Exit(ErrNetwork)
-	}
-}
-
 func InitSketch(sketchPath *paths.Path) (*sketches.Sketch, error) {
 	if sketchPath != nil {
 		return sketches.NewSketchFromPath(sketchPath)

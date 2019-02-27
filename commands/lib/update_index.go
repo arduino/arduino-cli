@@ -34,7 +34,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			lm := cli.InitLibraryManager(cli.Config)
-			cli.UpdateLibrariesIndex(lm)
+			commands.UpdateLibrariesIndex(context.Background(), lm)
 		},
 	}
 }

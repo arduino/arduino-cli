@@ -115,9 +115,12 @@ func Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 		}
 	}
 
-	// Load index
+	// Load index and auto-update it if needed
 	if err := lm.LoadIndex(); err != nil {
-		return nil, fmt.Errorf("loading libraries index: %s", err)
+		UpdateLibrariesIndex(ctx, lm)
+		if err := lm.LoadIndex(); err != nil {
+			return nil, fmt.Errorf("loading libraries index: %s", err)
+		}
 	}
 
 	// Scan for libraries
@@ -146,4 +149,20 @@ func Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error)
 	}
 	delete(instances, id)
 	return &rpc.DestroyResp{}, nil
+}
+
+// UpdateLibrariesIndex updates the library_index.json
+func UpdateLibrariesIndex(ctx context.Context, lm *librariesmanager.LibrariesManager) {
+	//logrus.Info("Updating libraries index")
+	d, err := lm.UpdateIndex()
+	if err != nil {
+		//formatter.PrintError(err, "Error downloading librarires index")
+		//os.Exit(ErrNetwork)
+	}
+	//formatter.DownloadProgressBar(d, "Updating index: library_index.json")
+	d.Run()
+	if d.Error() != nil {
+		//formatter.PrintError(d.Error(), "Error downloading librarires index")
+		//os.Exit(ErrNetwork)
+	}
 }
