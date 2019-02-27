@@ -24,11 +24,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/arduino/arduino-cli/commands"
-
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/arduino-cli/rpc"
@@ -102,14 +101,15 @@ func packageManagerInitReq() *rpc.InitReq {
 		urls = append(urls, URL.String())
 	}
 
-	req := &rpc.InitReq{
-		Configuration: &rpc.Configuration{
-			DataDir:                    Config.DataDir.String(),
-			DownloadsDir:               Config.DownloadsDir().String(),
-			BoardManagerAdditionalUrls: urls,
-		},
+	conf := &rpc.Configuration{}
+	conf.DataDir = Config.DataDir.String()
+	conf.DownloadsDir = Config.DownloadsDir().String()
+	conf.BoardManagerAdditionalUrls = urls
+	if Config.SketchbookDir != nil {
+		conf.SketchbookDir = Config.SketchbookDir.String()
 	}
-	return req
+
+	return &rpc.InitReq{Configuration: conf}
 }
 
 // CreateInstance creates and return an instance of the Arduino Core engine
