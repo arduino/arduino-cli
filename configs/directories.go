@@ -19,6 +19,7 @@ package configs
 
 import (
 	"fmt"
+	"os"
 	"os/user"
 	"runtime"
 
@@ -26,13 +27,24 @@ import (
 	"github.com/arduino/go-win32-utils"
 )
 
+// getUserHomeDir returns user's home directory from $HOME or then from os/user
+func getUserHomeDir() string {
+	home := os.Getenv("HOME")
+	if home == "" {
+		usr, err := user.Current()
+		if err != nil {
+			panic(fmt.Errorf("retrieving user home dir: %s", err))
+		}
+		home = usr.HomeDir
+	}
+	return home
+}
+
 // getDefaultConfigFilePath returns the default path for arduino-cli.yaml
 func getDefaultConfigFilePath() *paths.Path {
-	usr, err := user.Current()
-	if err != nil {
-		panic(fmt.Errorf("retrieving user home dir: %s", err))
-	}
-	arduinoDataDir := paths.New(usr.HomeDir)
+	userHomeDir := getUserHomeDir()
+
+	arduinoDataDir := paths.New(userHomeDir)
 
 	switch runtime.GOOS {
 	case "linux":
@@ -53,11 +65,9 @@ func getDefaultConfigFilePath() *paths.Path {
 }
 
 func getDefaultArduinoDataDir() (*paths.Path, error) {
-	usr, err := user.Current()
-	if err != nil {
-		return nil, fmt.Errorf("retrieving user home dir: %s", err)
-	}
-	arduinoDataDir := paths.New(usr.HomeDir)
+	userHomeDir := getUserHomeDir()
+
+	arduinoDataDir := paths.New(userHomeDir)
 
 	switch runtime.GOOS {
 	case "linux":
@@ -77,16 +87,13 @@ func getDefaultArduinoDataDir() (*paths.Path, error) {
 }
 
 func getDefaultSketchbookDir() (*paths.Path, error) {
-	usr, err := user.Current()
-	if err != nil {
-		return nil, fmt.Errorf("retrieving home dir: %s", err)
-	}
+	userHomeDir := getUserHomeDir()
 
 	switch runtime.GOOS {
 	case "linux":
-		return paths.New(usr.HomeDir).Join("Arduino"), nil
+		return paths.New(userHomeDir).Join("Arduino"), nil
 	case "darwin":
-		return paths.New(usr.HomeDir).Join("Documents", "Arduino"), nil
+		return paths.New(userHomeDir).Join("Documents", "Arduino"), nil
 	case "windows":
 		documentsPath, err := win32.GetDocumentsFolder()
 		if err != nil {
