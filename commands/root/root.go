@@ -23,8 +23,8 @@ import (
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/cli/board"
+	"github.com/arduino/arduino-cli/cli/compile"
 	"github.com/arduino/arduino-cli/cli/daemon"
-	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/config"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/generatedocs"
