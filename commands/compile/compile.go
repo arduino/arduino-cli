@@ -30,7 +30,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 	if err != nil {
 		return &rpc.CompileResp{
 			Result: rpc.Error("Error opening sketch", rpc.ErrGeneric),
-		}, nil
+		}, err
 	}
 
 	fqbnIn := req.GetFqbn()
@@ -41,14 +41,14 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 		formatter.PrintErrorMessage("No Fully Qualified Board Name provided.")
 		return &rpc.CompileResp{
 			Result: rpc.Error("No Fully Qualified Board Name provided.", rpc.ErrGeneric),
-		}, nil
+		}, rpc.Error("No Fully Qualified Board Name provided.", rpc.ErrGeneric)
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
 		formatter.PrintErrorMessage("Fully Qualified Board Name has incorrect format.")
 		return &rpc.CompileResp{
 			Result: rpc.Error("Fully Qualified Board Name has incorrect format.", rpc.ErrGeneric),
-		}, nil
+		}, err
 	}
 
 	pm, _ := cli.InitPackageAndLibraryManager()
@@ -64,14 +64,14 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 		if err := pm.LoadHardware(cli.Config); err != nil {
 			return &rpc.CompileResp{
 				Result: rpc.Error("Could not load hardware packages.", rpc.ErrGeneric),
-			}, nil
+			}, err
 		}
 		ctags, _ = getBuiltinCtagsTool(pm)
 		if !ctags.IsInstalled() {
 			formatter.PrintErrorMessage("Missing ctags tool.")
 			return &rpc.CompileResp{
 				Result: rpc.Error("Missing ctags tool.", rpc.ErrGeneric),
-			}, nil
+			}, rpc.Error("Missing ctags tool.", rpc.ErrGeneric)
 		}
 	}
 
@@ -86,7 +86,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 		formatter.PrintErrorMessage(errorMessage)
 		return &rpc.CompileResp{
 			Result: rpc.Error(errorMessage, rpc.ErrGeneric),
-		}, nil
+		}, rpc.Error(errorMessage, rpc.ErrGeneric)
 	}
 
 	builderCtx := &types.Context{}
@@ -100,7 +100,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 	} else {
 		return &rpc.CompileResp{
 			Result: rpc.Error("Cannot get hardware directories.", rpc.ErrGeneric),
-		}, nil
+		}, err
 	}
 
 	if toolsDir, err := cli.Config.BundleToolsDirectories(); err == nil {
@@ -108,7 +108,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 	} else {
 		return &rpc.CompileResp{
 			Result: rpc.Error("Cannot get bundled tools directories.", rpc.ErrGeneric),
-		}, nil
+		}, err
 	}
 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList()
@@ -120,7 +120,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 		if err != nil {
 			return &rpc.CompileResp{
 				Result: rpc.Error("Cannot create the build directory.", rpc.ErrGeneric),
-			}, nil
+			}, err
 		}
 	}
 
@@ -145,7 +145,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 		if err != nil {
 			return &rpc.CompileResp{
 				Result: rpc.Error("Cannot create the build cache directory.", rpc.ErrGeneric),
-			}, nil
+			}, err
 		}
 	}
 
@@ -181,7 +181,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 	if err != nil {
 		return &rpc.CompileResp{
 			Result: rpc.Error("Compilation failed.", rpc.ErrGeneric),
-		}, nil
+		}, err
 	}
 
 	// FIXME: Make a function to obtain these info...
@@ -213,7 +213,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 	if err = srcHex.CopyTo(dstHex); err != nil {
 		return &rpc.CompileResp{
 			Result: rpc.Error("Error copying output file.", rpc.ErrGeneric),
-		}, nil
+		}, err
 	}
 
 	// Copy .elf file to sketch directory
@@ -224,7 +224,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 		formatter.PrintError(err, "Error copying elf file.")
 		return &rpc.CompileResp{
 			Result: rpc.Error("Error copying elf file.", rpc.ErrGeneric),
-		}, nil
+		}, err
 	}
 
 	return &rpc.CompileResp{}, nil
