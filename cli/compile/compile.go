@@ -19,8 +19,11 @@ package compile
 
 import (
 	"context"
+	"os"
 
 	"github.com/arduino/arduino-cli/commands/compile"
+	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/rpc"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/spf13/cobra"
@@ -87,6 +90,36 @@ var flags struct {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	// TODO: fill request, parse response
-	compile.Compile(context.Background(), nil)
+	instance := cli.CreateInstance()
+	path := ""
+
+	if len(args) > 0 {
+		path = args[0]
+	}
+
+	compRes, err := compile.Compile(context.Background(), &rpc.CompileReq{
+		Instance:        instance,
+		Fqbn:            flags.fqbn,
+		SketchPath:      path,
+		ShowProperties:  flags.showProperties,
+		Preprocess:      flags.preprocess,
+		BuildCachePath:  flags.buildCachePath,
+		BuildPath:       flags.buildPath,
+		BuildProperties: flags.buildProperties,
+		Warnings:        flags.warnings,
+		Verbose:         flags.verbose,
+		Quiet:           flags.quiet,
+		VidPid:          flags.vidPid,
+		ExportFile:      flags.exportFile,
+	})
+	if err == nil {
+		outputCompileResp(compRes)
+	} else {
+		formatter.PrintError(err, compRes.GetResult().Message)
+		os.Exit(cli.ErrGeneric)
+	}
+}
+
+func outputCompileResp(details *rpc.CompileResp) {
+
 }
