@@ -12,6 +12,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
