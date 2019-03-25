@@ -47,3 +47,7 @@ func (s *ArduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyReq
 func (s *ArduinoCoreServerImpl) Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 	return commands.Init(ctx, req)
 }
+
+func (s *ArduinoCoreServerImpl) Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error) {
+	return compile.Compile(ctx, req)
+}
