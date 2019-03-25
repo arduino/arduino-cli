@@ -18,15 +18,14 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
-	flags "github.com/jessevdk/go-flags"
 	"github.com/sirupsen/logrus"
 )
 
 func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error) {
 	logrus.Info("Executing `arduino compile`")
 	var sketchPath *paths.Path
-	if len(args) > 0 {
-		sketchPath = paths.New(args[0])
+	if req.GetSketchPath() != "" {
+		sketchPath = paths.New(req.GetSketchPath())
 	}
 	sketch, err := cli.InitSketch(sketchPath)
 	if err != nil {
@@ -34,14 +33,15 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 		os.Exit(cli.ErrGeneric)
 	}
 
-	if flags.fqbn == "" && sketch != nil && sketch.Metadata != nil {
-		flags.fqbn = sketch.Metadata.CPU.Fqbn
+	fqbnIn := req.GetFqbn()
+	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
+		fqbnIn = sketch.Metadata.CPU.Fqbn
 	}
-	if flags.fqbn == "" {
+	if fqbnIn == "" {
 		formatter.PrintErrorMessage("No Fully Qualified Board Name provided.")
 		os.Exit(cli.ErrGeneric)
 	}
-	fqbn, err := cores.ParseFQBN(flags.fqbn)
+	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
 		formatter.PrintErrorMessage("Fully Qualified Board Name has incorrect format.")
 		os.Exit(cli.ErrBadArgument)
@@ -80,56 +80,56 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 		os.Exit(cli.ErrCoreConfig)
 	}
 
-	ctx := &types.Context{}
-	ctx.PackageManager = pm
-	ctx.FQBN = fqbn
-	ctx.SketchLocation = sketch.FullPath
+	builderCtx := &types.Context{}
+	builderCtx.PackageManager = pm
+	builderCtx.FQBN = fqbn
+	builderCtx.SketchLocation = sketch.FullPath
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	if packagesDir, err := cli.Config.HardwareDirectories(); err == nil {
-		ctx.HardwareDirs = packagesDir
+		builderCtx.HardwareDirs = packagesDir
 	} else {
 		formatter.PrintError(err, "Cannot get hardware directories.")
 		os.Exit(cli.ErrCoreConfig)
 	}
 
 	if toolsDir, err := cli.Config.BundleToolsDirectories(); err == nil {
-		ctx.ToolsDirs = toolsDir
+		builderCtx.ToolsDirs = toolsDir
 	} else {
 		formatter.PrintError(err, "Cannot get bundled tools directories.")
 		os.Exit(cli.ErrCoreConfig)
 	}
 
-	ctx.OtherLibrariesDirs = paths.NewPathList()
-	ctx.OtherLibrariesDirs.Add(cli.Config.LibrariesDir())
+	builderCtx.OtherLibrariesDirs = paths.NewPathList()
+	builderCtx.OtherLibrariesDirs.Add(cli.Config.LibrariesDir())
 
-	if flags.buildPath != "" {
-		ctx.BuildPath = paths.New(flags.buildPath)
-		err = ctx.BuildPath.MkdirAll()
+	if req.GetBuildPath() != "" {
+		builderCtx.BuildPath = paths.New(req.GetBuildPath())
+		err = builderCtx.BuildPath.MkdirAll()
 		if err != nil {
 			formatter.PrintError(err, "Cannot create the build directory.")
 			os.Exit(cli.ErrBadCall)
 		}
 	}
 
-	ctx.Verbose = flags.verbose
+	builderCtx.Verbose = req.GetVerbose()
 
-	ctx.CoreBuildCachePath = paths.TempDir().Join("arduino-core-cache")
+	builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino-core-cache")
 
-	ctx.USBVidPid = flags.vidPid
-	ctx.WarningsLevel = flags.warnings
+	builderCtx.USBVidPid = req.GetVidPid()
+	builderCtx.WarningsLevel = req.GetWarnings()
 
 	if cli.GlobalFlags.Debug {
-		ctx.DebugLevel = 100
+		builderCtx.DebugLevel = 100
 	} else {
-		ctx.DebugLevel = 5
+		builderCtx.DebugLevel = 5
 	}
 
-	ctx.CustomBuildProperties = append(flags.buildProperties, "build.warn_data_percentage=75")
+	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), "build.warn_data_percentage=75")
 
-	if flags.buildCachePath != "" {
-		ctx.BuildCachePath = paths.New(flags.buildCachePath)
-		err = ctx.BuildCachePath.MkdirAll()
+	if req.GetBuildCachePath() != "" {
+		builderCtx.BuildCachePath = paths.New(req.GetBuildCachePath())
+		err = builderCtx.BuildCachePath.MkdirAll()
 		if err != nil {
 			formatter.PrintError(err, "Cannot create the build cache directory.")
 			os.Exit(cli.ErrBadCall)
@@ -137,7 +137,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 	}
 
 	// Will be deprecated.
-	ctx.ArduinoAPIVersion = "10607"
+	builderCtx.ArduinoAPIVersion = "10607"
 
 	// Check if Arduino IDE is installed and get it's libraries location.
 	preferencesTxt := cli.Config.DataDir.Join("preferences.txt")
@@ -154,15 +154,15 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 		sort.Strings(pathVariants)
 		ideHardwarePath := lastIdeSubProperties.Get(pathVariants[len(pathVariants)-1])
 		ideLibrariesPath := filepath.Join(filepath.Dir(ideHardwarePath), "libraries")
-		ctx.BuiltInLibrariesDirs = paths.NewPathList(ideLibrariesPath)
+		builderCtx.BuiltInLibrariesDirs = paths.NewPathList(ideLibrariesPath)
 	}
 
-	if flags.showProperties {
-		err = builder.RunParseHardwareAndDumpBuildProperties(ctx)
-	} else if flags.preprocess {
-		err = builder.RunPreprocess(ctx)
+	if req.GetShowProperties() {
+		err = builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
+	} else if req.GetPreprocess() {
+		err = builder.RunPreprocess(builderCtx)
 	} else {
-		err = builder.RunBuilder(ctx)
+		err = builder.RunBuilder(builderCtx)
 	}
 
 	if err != nil {
@@ -171,7 +171,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 	}
 
 	// FIXME: Make a function to obtain these info...
-	outputPath := ctx.BuildProperties.ExpandPropsInString("{build.path}/{recipe.output.tmp_file}")
+	outputPath := builderCtx.BuildProperties.ExpandPropsInString("{build.path}/{recipe.output.tmp_file}")
 	ext := filepath.Ext(outputPath)
 
 	// FIXME: Make a function to produce a better name...
@@ -181,12 +181,12 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 
 	var exportPath *paths.Path
 	var exportFile string
-	if flags.exportFile == "" {
+	if req.GetExportFile() == "" {
 		exportPath = sketch.FullPath
 		exportFile = sketch.Name + "." + fqbnSuffix
 	} else {
-		exportPath = paths.New(flags.exportFile).Parent()
-		exportFile = paths.New(flags.exportFile).Base()
+		exportPath = paths.New(req.GetExportFile()).Parent()
+		exportFile = paths.New(req.GetExportFile()).Base()
 		if strings.HasSuffix(exportFile, ext) {
 			exportFile = exportFile[:len(exportFile)-len(ext)]
 		}
