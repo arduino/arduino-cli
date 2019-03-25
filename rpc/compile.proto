@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package arduino;
+
+option go_package = "github.com/arduino/arduino-cli/rpc";
+
+import "common.proto";
+
+message CompileReq {
+  Instance instance = 1;
+  string fqbn = 2;   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+  string sketchPath = 3;
+  bool showProperties = 4;  // Show all build preferences used instead of compiling.
+  bool preprocess = 5;      // Print preprocessed code to stdout.
+  string buildCachePath = 6;    // Builds of 'core.a' are saved into this path to be cached and reused.
+  string buildPath = 7;         // Path where to save compiled files.
+  repeated string buildProperties = 8; // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
+  string warnings = 9;   // Used to tell gcc which warning level to use.
+  bool verbose = 10;     // Turns on verbose mode.
+  bool quiet = 11;             // Suppresses almost every output.
+  string vidPid = 12;   // VID/PID specific build properties.
+  string exportFile = 13;   // The compiled binary is written to this file
+}
+
+message CompileResp {
+  Result result = 1;
+}
