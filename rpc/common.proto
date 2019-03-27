@@ -5,9 +5,3 @@ package arduino;
 option go_package = "github.com/arduino/arduino-cli/rpc";
 
 message Instance { int32 id = 1; }
-
-message Result {
-  bool failed = 1;
-  int32 code = 2;
-  string message = 3;
-}

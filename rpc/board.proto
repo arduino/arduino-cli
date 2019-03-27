@@ -12,7 +12,6 @@ message BoardDetailsReq {
 }
 
 message BoardDetailsResp {
-  Result result = 1;
   string name = 2;
   repeated ConfigOption config_options = 3;
   repeated RequiredTool required_tools = 4;

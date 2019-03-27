@@ -54,8 +54,7 @@ message InitReq {
 
 message InitResp {
   Instance instance = 1;
-  Result result = 2;
 }
 
 message DestroyReq { Instance instance = 1; }
-message DestroyResp { Result result = 1; }
+message DestroyResp {}
