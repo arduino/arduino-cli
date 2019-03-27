@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	if len(os.Args) != 2 {
+	if len(os.Args) != 3 {
 		fmt.Println("Please specify Arduino DATA_DIR as first argument")
 		os.Exit(1)
 	}
@@ -48,6 +48,17 @@ func main() {
 		fmt.Println("Error getting board data:", details.GetResult().GetMessage())
 	} else {
 		fmt.Println("Board name: ", details.GetName())
+	}
+
+	compResp, err := client.Compile(context.Background(), &rpc.CompileReq{
+		Instance:   instance,
+		Fqbn:       "arduino:samd:mkr1000",
+		SketchPath: os.Args[2],
+	})
+
+	if err != nil {
+		fmt.Println(compResp.GetResult().Message, err)
+		os.Exit(1)
 	}
 
 	destroyResp, err := client.Destroy(context.Background(), &rpc.DestroyReq{
