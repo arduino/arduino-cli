@@ -7,9 +7,6 @@ import (
 	"sort"
 	"strings"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	builder "github.com/arduino/arduino-builder"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -31,7 +28,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 	}
 	sketch, err := cli.InitSketch(sketchPath)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Error opening sketch: %s", err)
+		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
 
 	fqbnIn := req.GetFqbn()
@@ -39,11 +36,11 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 		fqbnIn = sketch.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
-		return nil, status.Error(codes.InvalidArgument, "No Fully Qualified Board Name provided")
+		return nil, fmt.Errorf("No Fully Qualified Board Name provided")
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "Fully Qualified Board Name has incorrect format")
+		return nil, fmt.Errorf("incorrect FQBN: %s", err)
 	}
 
 	pm, _ := cli.InitPackageAndLibraryManager()
@@ -57,12 +54,12 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 		core.InstallToolRelease(pm, ctags)
 
 		if err := pm.LoadHardware(cli.Config); err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not load hardware packages: %s", err)
+			return nil, fmt.Errorf("loading hardware packages: %s", err)
 		}
 		ctags, _ = getBuiltinCtagsTool(pm)
 		if !ctags.IsInstalled() {
 			formatter.PrintErrorMessage("Missing ctags tool.")
-			return nil, status.Error(codes.Internal, "Missing ctags tool")
+			return nil, fmt.Errorf("Missing ctags tool")
 		}
 	}
 
@@ -75,7 +72,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 			"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
 				cli.AppName+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
 		formatter.PrintErrorMessage(errorMessage)
-		return nil, status.Errorf(codes.Internal, "Platform not installed.")
+		return nil, fmt.Errorf("Platform not installed")
 	}
 
 	builderCtx := &types.Context{}
@@ -87,13 +84,13 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 	if packagesDir, err := cli.Config.HardwareDirectories(); err == nil {
 		builderCtx.HardwareDirs = packagesDir
 	} else {
-		return nil, status.Errorf(codes.Internal, "Cannot get hardware directories: %s", err)
+		return nil, fmt.Errorf("cannot get hardware directories: %s", err)
 	}
 
 	if toolsDir, err := cli.Config.BundleToolsDirectories(); err == nil {
 		builderCtx.ToolsDirs = toolsDir
 	} else {
-		return nil, status.Errorf(codes.Internal, "Cannot get bundled tools directories: %s", err)
+		return nil, fmt.Errorf("cannot get bundled tools directories: %s", err)
 	}
 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList()
@@ -103,7 +100,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 		builderCtx.BuildPath = paths.New(req.GetBuildPath())
 		err = builderCtx.BuildPath.MkdirAll()
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Cannot create the build directory: %s", err)
+			return nil, fmt.Errorf("cannot create build directory: %s", err)
 		}
 	}
 
@@ -126,7 +123,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 		builderCtx.BuildCachePath = paths.New(req.GetBuildCachePath())
 		err = builderCtx.BuildCachePath.MkdirAll()
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Cannot create the build cache directory: %s", err)
+			return nil, fmt.Errorf("cannot create build cache directory: %s", err)
 		}
 	}
 
@@ -160,7 +157,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 	}
 
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Build failed: %s", err)
+		return nil, fmt.Errorf("build failed: %s", err)
 	}
 
 	// FIXME: Make a function to obtain these info...
@@ -190,7 +187,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 	dstHex := exportPath.Join(exportFile + ext)
 	logrus.WithField("from", srcHex).WithField("to", dstHex).Print("copying sketch build output")
 	if err = srcHex.CopyTo(dstHex); err != nil {
-		return nil, status.Errorf(codes.Internal, "Error copying output file: %s", err)
+		return nil, fmt.Errorf("copying output file: %s", err)
 	}
 
 	// Copy .elf file to sketch directory
@@ -199,7 +196,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error)
 	logrus.WithField("from", srcElf).WithField("to", dstElf).Print("copying sketch build output")
 	if err = srcElf.CopyTo(dstElf); err != nil {
 		formatter.PrintError(err, "Error copying elf file.")
-		return nil, status.Errorf(codes.Internal, "Error copying elf file: %s", err)
+		return nil, fmt.Errorf("copying elf file: %s", err)
 	}
 
 	return &rpc.CompileResp{}, nil
