@@ -115,7 +115,7 @@ func run(cmd *cobra.Command, args []string) {
 	if err == nil {
 		outputCompileResp(compRes)
 	} else {
-		formatter.PrintError(err, compRes.GetResult().Message)
+		formatter.PrintError(err, "Error during build")
 		os.Exit(cli.ErrGeneric)
 	}
 }

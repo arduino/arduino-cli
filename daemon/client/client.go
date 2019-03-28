@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/arduino/arduino-cli/rpc"
@@ -18,7 +17,8 @@ func main() {
 	datadir := os.Args[1]
 	conn, err := grpc.Dial("127.0.0.1:50051", grpc.WithInsecure())
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("Error connecting to server: %s\n", err)
+		os.Exit(1)
 	}
 	client := rpc.NewArduinoCoreClient(conn)
 
@@ -28,26 +28,20 @@ func main() {
 		},
 	})
 	if err != nil {
-		log.Fatal(err)
-	}
-	if resp.GetResult().GetFailed() {
-		fmt.Println("Error opening server instance:", resp.GetResult().GetMessage())
+		fmt.Printf("Error creating server instance: %s\n", err)
 		os.Exit(1)
 	}
 	instance := resp.GetInstance()
-	fmt.Println("Opened new server instance:", instance)
+	fmt.Println("Created new server instance:", instance)
 
 	details, err := client.BoardDetails(context.Background(), &rpc.BoardDetailsReq{
 		Instance: instance,
 		Fqbn:     "arduino:samd:mkr1000",
 	})
 	if err != nil {
-		log.Fatal(err)
-	}
-	if details.GetResult().GetFailed() {
-		fmt.Println("Error getting board data:", details.GetResult().GetMessage())
+		fmt.Printf("Error getting board data: %s\n", err)
 	} else {
-		fmt.Println("Board name: ", details.GetName())
+		fmt.Printf("Board name: %s\n", details.GetName())
 	}
 
 	compResp, err := client.Compile(context.Background(), &rpc.CompileReq{
@@ -55,23 +49,11 @@ func main() {
 		Fqbn:       "arduino:samd:mkr1000",
 		SketchPath: os.Args[2],
 	})
-
 	if err != nil {
-		fmt.Println(compResp.GetResult().Message, err)
+		fmt.Printf("Compile error: %s\n", err)
 		os.Exit(1)
 	}
-
-	destroyResp, err := client.Destroy(context.Background(), &rpc.DestroyReq{
-		Instance: instance,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	if destroyResp.GetResult().GetFailed() {
-		fmt.Println("Error closing instance:", destroyResp.GetResult().GetMessage())
-	} else {
-		fmt.Println("Successfully closed server instance")
-	}
+	fmt.Printf("Compile response: %+v\n", compResp)
 	/*
 		compile, err := client.Compile(context.Background(), &pb.CompileReq{})
 		if err != nil {
@@ -89,5 +71,14 @@ func main() {
 			fmt.Println(resp)
 		}
 	*/
+
+	_, err = client.Destroy(context.Background(), &rpc.DestroyReq{
+		Instance: instance,
+	})
+	if err != nil {
+		fmt.Printf("Error closing server instance: %s\n", err)
+	} else {
+		fmt.Println("Successfully closed server instance")
+	}
 	fmt.Println("Done")
 }
