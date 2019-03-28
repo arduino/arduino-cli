@@ -19,9 +19,7 @@ package board
 
 import (
 	"context"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
@@ -32,12 +30,12 @@ func BoardDetails(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDeta
 	pm := commands.GetPackageManager(req)
 	fqbn, err := cores.ParseFQBN(req.GetFqbn())
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "Error parsing fqbn")
+		return nil, fmt.Errorf("parsing fqbn: %s", err)
 	}
 
 	_, _, board, _, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Error loading board data: %s", err)
+		return nil, fmt.Errorf("loading board data: %s", err)
 	}
 
 	details := &rpc.BoardDetailsResp{}
