@@ -38,7 +38,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 type ArduinoCoreServerImpl struct{}
 
 func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
-	return board.BoardDetails(ctx, req), nil
+	return board.BoardDetails(ctx, req)
 }
 
 func (s *ArduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error) {

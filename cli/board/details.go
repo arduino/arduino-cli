@@ -20,6 +20,7 @@ package board
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/board"
@@ -44,17 +45,17 @@ func initDetailsCommand() *cobra.Command {
 func runDetailsCommand(cmd *cobra.Command, args []string) {
 	instance := cli.CreateInstance()
 
-	res := board.BoardDetails(context.Background(), &rpc.BoardDetailsReq{
+	res, err := board.BoardDetails(context.Background(), &rpc.BoardDetailsReq{
 		Instance: instance,
 		Fqbn:     args[0],
 	})
 
+	if err != nil {
+		formatter.PrintError(err, "Error getting board details")
+		os.Exit(cli.ErrGeneric)
+	}
 	if cli.OutputJSONOrElse(res) {
-		if res.GetResult().Success() {
-			outputDetailsResp(res)
-		} else {
-			formatter.PrintError(res.Result, "")
-		}
+		outputDetailsResp(res)
 	}
 }
 

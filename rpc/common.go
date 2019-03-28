@@ -16,23 +16,3 @@ const (
 	ErrCoreConfig
 	ErrBadArgument
 )
-
-func Error(message string, code int) *Result {
-	return &Result{
-		Code:    int32(code),
-		Message: message,
-		Failed:  true,
-	}
-}
-
-func (r *Result) Error() string {
-	return r.Message
-}
-
-// Success returns true if the Result is successful
-func (r *Result) Success() bool {
-	if r == nil {
-		return true
-	}
-	return !r.Failed
-}
