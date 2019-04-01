@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/arduino/arduino-cli/rpc"
@@ -44,16 +45,27 @@ func main() {
 		fmt.Printf("Board name: %s\n", details.GetName())
 	}
 
-	compResp, err := client.Compile(context.Background(), &rpc.CompileReq{
+	compRespStream, err := client.Compile(context.Background(), &rpc.CompileReq{
 		Instance:   instance,
 		Fqbn:       "arduino:samd:mkr1000",
 		SketchPath: os.Args[2],
+		Verbose:    true,
 	})
 	if err != nil {
 		fmt.Printf("Compile error: %s\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("Compile response: %+v\n", compResp)
+	for {
+		compResp, err := compRespStream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Printf("Compile error: %s\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("%s", compResp.GetOutput())
+	}
 	/*
 		compile, err := client.Compile(context.Background(), &pb.CompileReq{})
 		if err != nil {
