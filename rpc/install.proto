@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package arduino;
+
+option go_package = "github.com/arduino/arduino-cli/rpc";
+
+import "common.proto";
+
+message InstallReq {
+    Instance instance =1;
+}
+
+message InstallResp {
+
+}

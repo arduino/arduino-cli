@@ -7,6 +7,7 @@ option go_package = "github.com/arduino/arduino-cli/rpc";
 import "common.proto";
 import "board.proto";
 import "compile.proto";
+import "install.proto";
 
 // The main Arduino Platform Service
 service ArduinoCore {
@@ -26,6 +27,8 @@ service ArduinoCore {
   rpc BoardDetails(BoardDetailsReq) returns (BoardDetailsResp);
 
   rpc Compile(CompileReq) returns (stream CompileResp);
+
+  rpc Install(InstallReq) returns (InstallResp);
 }
 
 // Configuration contains information to instantiate an Arduino Platform Service
