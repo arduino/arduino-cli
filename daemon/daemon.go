@@ -14,6 +14,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
+	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
@@ -65,4 +66,8 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoC
 	resp, err := compile.Compile(stream.Context(), req, w)
 	stream.Send(resp)
 	return err
+}
+
+func (s *ArduinoCoreServerImpl) Install(ctx context.Context, req *rpc.InstallReq) (*rpc.InstallResp, error) {
+	return core.Install(ctx, req)
 }
