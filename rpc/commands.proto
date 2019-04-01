@@ -25,7 +25,7 @@ service ArduinoCore {
   // Requests details about a board
   rpc BoardDetails(BoardDetailsReq) returns (BoardDetailsResp);
 
-  rpc Compile(CompileReq) returns (CompileResp);
+  rpc Compile(CompileReq) returns (stream CompileResp);
 }
 
 // Configuration contains information to instantiate an Arduino Platform Service

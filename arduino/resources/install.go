@@ -123,5 +123,8 @@ func findPackageRoot(parent *paths.Path) (*paths.Path, error) {
 			return nil, fmt.Errorf("no unique root dir in archive, found '%s' and '%s'", root, file)
 		}
 	}
+	if root == nil {
+		return nil, fmt.Errorf("package does not contains any subfolder")
+	}
 	return root, nil
 }

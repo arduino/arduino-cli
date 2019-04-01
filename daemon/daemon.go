@@ -7,6 +7,7 @@ package daemon
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net"
 
@@ -49,6 +50,19 @@ func (s *ArduinoCoreServerImpl) Init(ctx context.Context, req *rpc.InitReq) (*rp
 	return commands.Init(ctx, req)
 }
 
-func (s *ArduinoCoreServerImpl) Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error) {
-	return compile.Compile(ctx, req)
+func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoCore_CompileServer) error {
+	r, w := io.Pipe()
+	go func() {
+		data := make([]byte, 1024)
+		for {
+			if n, err := r.Read(data); err != nil {
+				return
+			} else {
+				stream.Send(&rpc.CompileResp{Output: data[:n]})
+			}
+		}
+	}()
+	resp, err := compile.Compile(stream.Context(), req, w)
+	stream.Send(resp)
+	return err
 }

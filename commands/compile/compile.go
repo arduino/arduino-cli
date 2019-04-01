@@ -3,6 +3,7 @@ package compile
 import (
 	"context"
 	"fmt"
+	"io"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -20,7 +21,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Compile(ctx context.Context, req *rpc.CompileReq) (*rpc.CompileResp, error) {
+func Compile(ctx context.Context, req *rpc.CompileReq, output io.Writer) (*rpc.CompileResp, error) {
 	logrus.Info("Executing `arduino compile`")
 	var sketchPath *paths.Path
 	if req.GetSketchPath() != "" {

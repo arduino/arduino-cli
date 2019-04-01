@@ -23,4 +23,5 @@ message CompileReq {
 }
 
 message CompileResp {
+  bytes output = 1;
 }
