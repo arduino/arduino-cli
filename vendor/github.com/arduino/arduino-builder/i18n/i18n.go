@@ -52,6 +52,34 @@ type Logger interface {
 	Flush() string
 }
 
+type LoggerToIoWriter struct {
+	Writer io.Writer
+}
+
+func (s LoggerToIoWriter) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+	fmt.Fprintln(s.Writer, Format(format, a...))
+}
+
+func (s LoggerToIoWriter) UnformattedFprintln(w io.Writer, str string) {
+	fmt.Fprintln(s.Writer, str)
+}
+
+func (s LoggerToIoWriter) UnformattedWrite(w io.Writer, data []byte) {
+	s.Writer.Write(data)
+}
+
+func (s LoggerToIoWriter) Println(level string, format string, a ...interface{}) {
+	s.Fprintln(nil, level, format, a...)
+}
+
+func (s LoggerToIoWriter) Flush() string {
+	return ""
+}
+
+func (s LoggerToIoWriter) Name() string {
+	return "LoggerToIoWriter"
+}
+
 type NoopLogger struct{}
 
 func (s NoopLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {}
