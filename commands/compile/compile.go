@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	builder "github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -149,6 +150,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, output io.Writer) (*rpc.C
 		builderCtx.BuiltInLibrariesDirs = paths.NewPathList(ideLibrariesPath)
 	}
 
+	builderCtx.SetLogger(i18n.LoggerToIoWriter{Writer: output})
 	if req.GetShowProperties() {
 		err = builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
 	} else if req.GetPreprocess() {
