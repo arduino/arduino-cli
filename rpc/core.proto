@@ -6,10 +6,13 @@ option go_package = "github.com/arduino/arduino-cli/rpc";
 
 import "common.proto";
 
-message InstallReq {
+message PlatformInstallReq {
     Instance instance =1;
+	string platform_package  = 2;
+	string architecture = 3;
+	string version = 4;
 }
 
-message InstallResp {
+message PlatformInstallResp {
 
 }
