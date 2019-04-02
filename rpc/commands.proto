@@ -29,6 +29,10 @@ service ArduinoCore {
   rpc Compile(CompileReq) returns (stream CompileResp);
 
   rpc PlatformInstall(PlatformInstallReq) returns (PlatformInstallResp);
+
+  rpc PlatformDownload(PlatformDownloadReq) returns (PlatformDownloadResp);
+
+  rpc PlatformUninstall(PlatformUninstallReq) returns (PlatformUninstallResp);
 }
 
 // Configuration contains information to instantiate an Arduino Platform Service
