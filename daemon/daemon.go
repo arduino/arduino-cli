@@ -71,3 +71,11 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoC
 func (s *ArduinoCoreServerImpl) PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq) (*rpc.PlatformInstallResp, error) {
 	return core.PlatformInstall(ctx, req)
 }
+
+func (s *ArduinoCoreServerImpl) PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq) (*rpc.PlatformDownloadResp, error) {
+	return core.PlatformDownload(ctx, req)
+}
+
+func (s *ArduinoCoreServerImpl) PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc.PlatformUninstallResp, error) {
+	return core.PlatformUninstall(ctx, req)
+}
