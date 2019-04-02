@@ -68,6 +68,6 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoC
 	return err
 }
 
-func (s *ArduinoCoreServerImpl) Install(ctx context.Context, req *rpc.InstallReq) (*rpc.InstallResp, error) {
-	return core.Install(ctx, req)
+func (s *ArduinoCoreServerImpl) PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq) (*rpc.PlatformInstallResp, error) {
+	return core.PlatformInstall(ctx, req)
 }
