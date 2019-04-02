@@ -18,13 +18,11 @@
 package core
 
 import (
-	"fmt"
-	"os"
+	"context"
 
-	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -41,76 +39,17 @@ func initUninstallCommand() *cobra.Command {
 }
 
 func runUninstallCommand(cmd *cobra.Command, args []string) {
+	instance := cli.CreateInstance()
 	logrus.Info("Executing `arduino core download`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
-	pm, _ := cli.InitPackageAndLibraryManagerWithoutBundles()
 
 	for _, platformRef := range platformsRefs {
-		uninstallPlatformByRef(pm, platformRef)
+		core.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
+			Instance:        instance,
+			PlatformPackage: platformRef.Package,
+			Architecture:    platformRef.PlatformArchitecture,
+			Version:         platformRef.PlatformVersion.String(),
+		})
 	}
-}
-
-func uninstallPlatformByRef(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference) {
-	// If no version is specified consider the installed
-	if platformRef.PlatformVersion == nil {
-		platform := pm.FindPlatform(platformRef)
-		if platform == nil {
-			formatter.PrintErrorMessage("Platform not found " + platformRef.String())
-			os.Exit(cli.ErrBadCall)
-		}
-		platformRelease := pm.GetInstalledPlatformRelease(platform)
-		if platformRelease == nil {
-			formatter.PrintErrorMessage("Platform not installed " + platformRef.String())
-			os.Exit(cli.ErrBadCall)
-		}
-		platformRef.PlatformVersion = platformRelease.Version
-	}
-
-	platform, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
-	if err != nil {
-		formatter.PrintError(err, "Could not determine platform dependencies")
-		os.Exit(cli.ErrBadCall)
-	}
-
-	uninstallPlatformRelease(pm, platform)
-
-	for _, tool := range tools {
-		if !pm.IsToolRequired(tool) {
-			fmt.Printf("Tool %s is no more required\n", tool)
-			uninstallToolRelease(pm, tool)
-		}
-	}
-}
-
-func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) {
-	log := pm.Log.WithField("platform", platformRelease)
-
-	log.Info("Uninstalling platform")
-	formatter.Print("Uninstalling " + platformRelease.String() + "...")
-
-	if err := pm.UninstallPlatform(platformRelease); err != nil {
-		log.WithError(err).Error("Error uninstalling")
-		formatter.PrintError(err, "Error uninstalling "+platformRelease.String())
-		os.Exit(cli.ErrGeneric)
-	}
-
-	log.Info("Platform uninstalled")
-	formatter.Print(platformRelease.String() + " uninstalled")
-}
-
-func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) {
-	log := pm.Log.WithField("Tool", toolRelease)
-
-	log.Info("Uninstalling tool")
-	formatter.Print("Uninstalling " + toolRelease.String() + "...")
-
-	if err := pm.UninstallTool(toolRelease); err != nil {
-		log.WithError(err).Error("Error uninstalling")
-		formatter.PrintError(err, "Error uninstalling "+toolRelease.String())
-		os.Exit(cli.ErrGeneric)
-	}
-
-	log.Info("Tool uninstalled")
-	formatter.Print(toolRelease.String() + " uninstalled")
 }
