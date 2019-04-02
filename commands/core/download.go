@@ -18,44 +18,31 @@
 package core
 
 import (
+	"context"
 	"os"
 
 	"go.bug.st/downloader"
+	semver "go.bug.st/relaxed-semver"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	"github.com/arduino/arduino-cli/rpc"
 )
 
-func initDownloadCommand() *cobra.Command {
-	downloadCommand := &cobra.Command{
-		Use:   "download [PACKAGER:ARCH[=VERSION]](S)",
-		Short: "Downloads one or more cores and corresponding tool dependencies.",
-		Long:  "Downloads one or more cores and corresponding tool dependencies.",
-		Example: "" +
-			"  " + cli.AppName + " core download arduino:samd       # to download the latest version of arduino SAMD core.\n" +
-			"  " + cli.AppName + " core download arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
-		Args: cobra.MinimumNArgs(1),
-		Run:  runDownloadCommand,
+func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq) (*rpc.PlatformDownloadResp, error) {
+	version, err := semver.Parse(req.Version)
+	if err != nil {
+		formatter.PrintError(err, "version not readable")
+		os.Exit(cli.ErrBadCall)
 	}
-	return downloadCommand
-}
-
-func runDownloadCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino core download`")
-
-	platformsRefs := parsePlatformReferenceArgs(args)
+	ref := &packagemanager.PlatformReference{
+		Package:              req.PlatformPackage,
+		PlatformArchitecture: req.Architecture,
+		PlatformVersion:      version}
 	pm, _ := cli.InitPackageAndLibraryManagerWithoutBundles()
-	for _, platformRef := range platformsRefs {
-		downloadPlatformByRef(pm, platformRef)
-	}
-}
-
-func downloadPlatformByRef(pm *packagemanager.PackageManager, platformsRef *packagemanager.PlatformReference) {
-	platform, tools, err := pm.FindPlatformReleaseDependencies(platformsRef)
+	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
 		os.Exit(cli.ErrBadCall)
@@ -64,6 +51,7 @@ func downloadPlatformByRef(pm *packagemanager.PackageManager, platformsRef *pack
 	for _, tool := range tools {
 		downloadTool(pm, tool)
 	}
+	return nil, nil
 }
 
 func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) {
