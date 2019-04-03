@@ -18,18 +18,11 @@
 package core
 
 import (
-	"io/ioutil"
-	"net/url"
 	"os"
-	"path"
-
-	"go.bug.st/downloader"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
-	paths "github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -46,56 +39,11 @@ func initUpdateIndexCommand() *cobra.Command {
 }
 
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
-	updateIndexes()
-}
-
-func updateIndexes() {
 	for _, URL := range cli.Config.BoardManagerAdditionalUrls {
-		updateIndex(URL)
-	}
-}
-
-// TODO: This should be in packagemanager......
-func updateIndex(URL *url.URL) {
-	logrus.WithField("url", URL).Print("Updating index")
-
-	tmpFile, err := ioutil.TempFile("", "")
-	if err != nil {
-		formatter.PrintError(err, "Error creating temp file for download")
-		os.Exit(cli.ErrGeneric)
-	}
-	if err := tmpFile.Close(); err != nil {
-		formatter.PrintError(err, "Error creating temp file for download")
-		os.Exit(cli.ErrGeneric)
-	}
-	tmp := paths.New(tmpFile.Name())
-	defer tmp.Remove()
-
-	d, err := downloader.Download(tmp.String(), URL.String())
-	if err != nil {
-		formatter.PrintError(err, "Error downloading index "+URL.String())
-		os.Exit(cli.ErrNetwork)
-	}
-	indexDirPath := cli.Config.IndexesDir()
-	coreIndexPath := indexDirPath.Join(path.Base(URL.Path))
-	formatter.DownloadProgressBar(d, "Updating index: "+coreIndexPath.Base())
-	if d.Error() != nil {
-		formatter.PrintError(d.Error(), "Error downloading index "+URL.String())
-		os.Exit(cli.ErrNetwork)
-	}
-
-	if _, err := packageindex.LoadIndex(tmp); err != nil {
-		formatter.PrintError(err, "Invalid package index in "+URL.String())
-		os.Exit(cli.ErrGeneric)
-	}
-
-	if err := indexDirPath.MkdirAll(); err != nil {
-		formatter.PrintError(err, "Can't create data directory "+indexDirPath.String())
-		os.Exit(cli.ErrGeneric)
-	}
-
-	if err := tmp.CopyTo(coreIndexPath); err != nil {
-		formatter.PrintError(err, "Error saving downloaded index "+URL.String())
-		os.Exit(cli.ErrGeneric)
+		err := packageindex.UpdateIndex(URL, cli.Config.IndexesDir())
+		if err != nil {
+			formatter.PrintError(err, "Error creating temp file for download")
+			os.Exit(cli.ErrGeneric)
+		}
 	}
 }

@@ -70,7 +70,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 			uninstallToolRelease(pm, tool)
 		}
 	}
-	return nil, nil
+	return &rpc.PlatformUninstallResp{}, nil
 }
 
 func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) {
