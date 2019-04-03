@@ -228,42 +228,35 @@ func UpdateIndex(URL *url.URL, clipath *paths.Path) error {
 
 	tmpFile, err := ioutil.TempFile("", "")
 	if err != nil {
-		formatter.PrintError(err, "Error creating temp file for download")
-		return err
+		return fmt.Errorf("Error creating temp file for download", err)
 
 	}
 	if err := tmpFile.Close(); err != nil {
-		formatter.PrintError(err, "Error creating temp file for download")
-		return err
+		return fmt.Errorf("Error creating temp file for download", err)
 	}
 	tmp := paths.New(tmpFile.Name())
 	defer tmp.Remove()
 
 	d, err := downloader.Download(tmp.String(), URL.String())
 	if err != nil {
-		formatter.PrintError(err, "Error downloading index "+URL.String())
-		return err
+		return fmt.Errorf("Error downloading index "+URL.String(), err)
 	}
 	coreIndexPath := clipath.Join(path.Base(URL.Path))
 	formatter.DownloadProgressBar(d, "Updating index: "+coreIndexPath.Base())
 	if d.Error() != nil {
-		formatter.PrintError(d.Error(), "Error downloading index "+URL.String())
-		return d.Error()
+		return fmt.Errorf("Error downloading index "+URL.String(), d.Error())
 	}
 
 	if _, err := LoadIndex(tmp); err != nil {
-		formatter.PrintError(err, "Invalid package index in "+URL.String())
-		return err
+		return fmt.Errorf("Invalid package index in "+URL.String(), err)
 	}
 
 	if err := clipath.MkdirAll(); err != nil {
-		formatter.PrintError(err, "Can't create data directory "+clipath.String())
-		return err
+		return fmt.Errorf("Can't create data directory "+clipath.String(), err)
 	}
 
 	if err := tmp.CopyTo(coreIndexPath); err != nil {
-		formatter.PrintError(err, "Error saving downloaded index "+URL.String())
-		return err
+		return fmt.Errorf("Error saving downloaded index "+URL.String(), err)
 	}
 	return nil
 }
