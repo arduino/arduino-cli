@@ -19,7 +19,7 @@ package core
 
 import (
 	"context"
-	"os"
+	"fmt"
 
 	"go.bug.st/downloader"
 	semver "go.bug.st/relaxed-semver"
@@ -34,8 +34,8 @@ import (
 func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq) (*rpc.PlatformDownloadResp, error) {
 	version, err := semver.Parse(req.Version)
 	if err != nil {
-		formatter.PrintError(err, "version not readable")
-		os.Exit(cli.ErrBadCall)
+		formatter.PrintError(err, "Error in version parsing")
+		return nil, fmt.Errorf("parse from string error: %s", err)
 	}
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
@@ -45,50 +45,63 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq) (*rpc.P
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
-		os.Exit(cli.ErrBadCall)
+		return nil, fmt.Errorf("find platform dependencies error: %s", err)
 	}
 	downloadPlatform(pm, platform)
 	for _, tool := range tools {
-		downloadTool(pm, tool)
+		err := downloadTool(pm, tool)
+		if err != nil {
+			formatter.PrintError(err, "Could not determine platform dependencies")
+			return nil, fmt.Errorf("find platform dependencies error: %s", err)
+		}
 	}
-	return nil, nil
+	return &rpc.PlatformDownloadResp{}, nil
 }
 
-func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) {
+func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) error {
 	// Download platform
 	resp, err := pm.DownloadPlatformRelease(platformRelease)
-	download(resp, err, platformRelease.String())
+	if err != nil {
+		formatter.PrintError(err, "Error downloading "+platformRelease.String())
+		return err
+	} else {
+		return download(resp, platformRelease.String())
+	}
 }
 
-func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease) {
+func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease) error {
 	// Check if tool has a flavor available for the current OS
 	if tool.GetCompatibleFlavour() == nil {
 		formatter.PrintErrorMessage("The tool " + tool.String() + " is not available for the current OS")
-		os.Exit(cli.ErrGeneric)
+		return fmt.Errorf("The tool " + tool.String() + " is not available")
 	}
 
-	DownloadToolRelease(pm, tool)
+	return DownloadToolRelease(pm, tool)
 }
 
 // DownloadToolRelease downloads a ToolRelease
-func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) {
+func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) error {
 	resp, err := pm.DownloadToolRelease(toolRelease)
-	download(resp, err, toolRelease.String())
+	if err != nil {
+		formatter.PrintError(err, "Error downloading "+toolRelease.String())
+		return err
+	} else {
+		return download(resp, toolRelease.String())
+
+	}
 }
 
-func download(d *downloader.Downloader, err error, label string) {
-	if err != nil {
-		formatter.PrintError(err, "Error downloading "+label)
-		os.Exit(cli.ErrNetwork)
-	}
+func download(d *downloader.Downloader, label string) error {
+
 	if d == nil {
+		return nil
 		formatter.Print(label + " already downloaded")
-		return
 	}
 	formatter.Print("Downloading " + label + "...")
 	formatter.DownloadProgressBar(d, label)
 	if d.Error() != nil {
 		formatter.PrintError(d.Error(), "Error downloading "+label)
-		os.Exit(cli.ErrNetwork)
+		return d.Error()
 	}
+	return nil
 }

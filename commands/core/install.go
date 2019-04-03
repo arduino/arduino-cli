@@ -32,7 +32,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq) (*rpc.Pla
 
 	installPlatform(pm, platform, tools)
 
-	return nil, nil
+	return &rpc.PlatformInstallResp{}, nil
 }
 
 func installPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease) {
