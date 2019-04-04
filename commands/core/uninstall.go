@@ -34,7 +34,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 	version, err := semver.Parse(req.Version)
 	if err != nil {
 		formatter.PrintError(err, "version not readable")
-		return fmt.Errorf("version not readable", err)
+		return nil, fmt.Errorf("version not readable", err)
 	}
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
@@ -45,13 +45,13 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 		platform := pm.FindPlatform(ref)
 		if platform == nil {
 			formatter.PrintErrorMessage("Platform not found " + ref.String())
-			return fmt.Errorf("Platform not found "+ref.String(), err)
+			return nil, fmt.Errorf("Platform not found "+ref.String(), err)
 
 		}
 		platformRelease := pm.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
 			formatter.PrintErrorMessage("Platform not installed " + ref.String())
-			return fmt.Errorf("Platform not installed "+ref.String(), err)
+			return nil, fmt.Errorf("Platform not installed "+ref.String(), err)
 
 		}
 		ref.PlatformVersion = platformRelease.Version
@@ -60,11 +60,15 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
-		return fmt.Errorf("Could not determine platform dependencies", err)
+		return nil, fmt.Errorf("Could not determine platform dependencies", err)
 
 	}
 
-	uninstallPlatformRelease(pm, platform)
+	err = uninstallPlatformRelease(pm, platform)
+	if err != nil {
+		formatter.PrintError(err, "Error uninstalling "+platform.String())
+		return nil, err
+	}
 
 	for _, tool := range tools {
 		if !pm.IsToolRequired(tool) {
@@ -75,7 +79,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 	return &rpc.PlatformUninstallResp{}, nil
 }
 
-func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) {
+func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) error {
 	log := pm.Log.WithField("platform", platformRelease)
 
 	log.Info("Uninstalling platform")
@@ -89,9 +93,10 @@ func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease
 
 	log.Info("Platform uninstalled")
 	formatter.Print(platformRelease.String() + " uninstalled")
+	return nil
 }
 
-func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) {
+func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) error {
 	log := pm.Log.WithField("Tool", toolRelease)
 
 	log.Info("Uninstalling tool")
@@ -105,4 +110,5 @@ func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.
 
 	log.Info("Tool uninstalled")
 	formatter.Print(toolRelease.String() + " uninstalled")
+	return nil
 }
