@@ -44,7 +44,7 @@ func initInstallCommand() *cobra.Command {
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	instance := cli.CreateInstance()
-	logrus.Info("Executing `arduino core download`")
+	logrus.Info("Executing `arduino core install`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
 
