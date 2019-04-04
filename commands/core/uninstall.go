@@ -20,11 +20,9 @@ package core
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
@@ -36,7 +34,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 	version, err := semver.Parse(req.Version)
 	if err != nil {
 		formatter.PrintError(err, "version not readable")
-
+		return fmt.Errorf("version not readable", err)
 	}
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
@@ -47,11 +45,13 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 		platform := pm.FindPlatform(ref)
 		if platform == nil {
 			formatter.PrintErrorMessage("Platform not found " + ref.String())
+			return fmt.Errorf("Platform not found "+ref.String(), err)
 
 		}
 		platformRelease := pm.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
 			formatter.PrintErrorMessage("Platform not installed " + ref.String())
+			return fmt.Errorf("Platform not installed "+ref.String(), err)
 
 		}
 		ref.PlatformVersion = platformRelease.Version
@@ -60,6 +60,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
+		return fmt.Errorf("Could not determine platform dependencies", err)
 
 	}
 
@@ -83,7 +84,7 @@ func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease
 	if err := pm.UninstallPlatform(platformRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
 		formatter.PrintError(err, "Error uninstalling "+platformRelease.String())
-		os.Exit(cli.ErrGeneric)
+		return fmt.Errorf("Error uninstalling "+platformRelease.String(), err)
 	}
 
 	log.Info("Platform uninstalled")
@@ -99,7 +100,7 @@ func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.
 	if err := pm.UninstallTool(toolRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
 		formatter.PrintError(err, "Error uninstalling "+toolRelease.String())
-		os.Exit(cli.ErrGeneric)
+		return fmt.Errorf("Error uninstalling "+toolRelease.String(), err)
 	}
 
 	log.Info("Tool uninstalled")
