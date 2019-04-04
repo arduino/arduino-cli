@@ -91,17 +91,19 @@ func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.T
 		return err
 	} else {
 		return download(resp, toolRelease.String(), progressCallback)
-
 	}
 }
 
+// TODO: Refactor this into output.*?
 func download(d *downloader.Downloader, label string, progressCallback func(*rpc.DownloadProgress)) error {
 	if d == nil {
 		// TODO: Already downloaded
+		progressCallback(&rpc.DownloadProgress{
+			File:      label,
+			Completed: true,
+		})
 		return nil
 	}
-	formatter.Print("Downloading " + label + "...")
-	formatter.DownloadProgressBar(d, label)
 	progressCallback(&rpc.DownloadProgress{
 		File:      label,
 		Url:       d.URL,
@@ -114,5 +116,6 @@ func download(d *downloader.Downloader, label string, progressCallback func(*rpc
 		formatter.PrintError(d.Error(), "Error downloading "+label)
 		return d.Error()
 	}
+	progressCallback(&rpc.DownloadProgress{Completed: true})
 	return nil
 }

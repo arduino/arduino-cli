@@ -12,7 +12,7 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq) (*rpc.PlatformInstallResp, error) {
+func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq, progress commands.ProgressCB) (*rpc.PlatformInstallResp, error) {
 	var version *semver.Version
 	if req.Version != "" {
 		if v, err := semver.Parse(req.Version); err == nil {
@@ -32,7 +32,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq) (*rpc.Pla
 		return nil, fmt.Errorf("Could not determine platform dependencies", err)
 	}
 
-	err = installPlatform(pm, platform, tools)
+	err = installPlatform(pm, platform, tools, progress)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,9 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq) (*rpc.Pla
 	return &rpc.PlatformInstallResp{}, nil
 }
 
-func installPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease) error {
+func installPlatform(pm *packagemanager.PackageManager,
+	platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease,
+	progress commands.ProgressCB) error {
 	log := pm.Log.WithField("platform", platformRelease)
 
 	// Prerequisite checks before install
@@ -60,13 +62,10 @@ func installPlatform(pm *packagemanager.PackageManager, platformRelease *cores.P
 	}
 
 	// Package download
-	print := func(curr *rpc.DownloadProgress) {
-		fmt.Printf(">> %v\n", curr)
-	}
 	for _, tool := range toolsToInstall {
-		downloadTool(pm, tool, print)
+		downloadTool(pm, tool, progress)
 	}
-	downloadPlatform(pm, platformRelease, print)
+	downloadPlatform(pm, platformRelease, progress)
 
 	for _, tool := range toolsToInstall {
 		InstallToolRelease(pm, tool)

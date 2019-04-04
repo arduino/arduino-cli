@@ -41,11 +41,11 @@ message PlatformUninstallResp {
 }
 
 message DownloadProgress {
-	int32 id = 1;
-	string url = 2;
-	string file = 3;
-	int64 total_size = 4;
-	int64 downloaded = 5;
+	string url = 1;
+	string file = 2;
+	int64 total_size = 3;
+	int64 downloaded = 4;
+	bool completed = 5;
 }
 
 message PlatformUpgradeReq {

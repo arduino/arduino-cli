@@ -28,7 +28,7 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq) (*rpc.PlatformUpgradeResp, error) {
+func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq, progress commands.ProgressCB) (*rpc.PlatformUpgradeResp, error) {
 	// Extract all PlatformReference to platforms that have updates
 	var version *semver.Version
 	if req.Version != "" {
@@ -44,14 +44,14 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq) (*rpc.Pla
 		PlatformVersion:      version}
 	pm := commands.GetPackageManager(req)
 
-	err := UpgradePlatform(pm, ref)
+	err := UpgradePlatform(pm, ref, progress)
 	if err != nil {
 		return nil, err
 	}
 	return &rpc.PlatformUpgradeResp{}, nil
 }
 
-func UpgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference) error {
+func UpgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference, progress commands.ProgressCB) error {
 
 	if platformRef.PlatformVersion != nil {
 		formatter.PrintErrorMessage("Invalid item " + platformRef.String() + ", upgrade doesn't accept parameters with version")
@@ -84,7 +84,7 @@ func UpgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 		if err != nil {
 			return fmt.Errorf("Platform " + platformRef.String() + " is not installed")
 		}
-		err = installPlatform(pm, platform, tools)
+		err = installPlatform(pm, platform, tools, progress)
 		if err != nil {
 			return err
 		}
