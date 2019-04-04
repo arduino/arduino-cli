@@ -13,11 +13,13 @@ import (
 )
 
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq) (*rpc.PlatformInstallResp, error) {
-	fmt.Println("AAAAA")
-	version, err := semver.Parse(req.Version)
-	if err != nil {
-		formatter.PrintError(err, "version not readable")
-		return nil, fmt.Errorf("version not readable", err)
+	var version *semver.Version
+	if req.Version != "" {
+		if v, err := semver.Parse(req.Version); err == nil {
+			version = v
+		} else {
+			return nil, fmt.Errorf("invalid version: %s", err)
+		}
 	}
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
