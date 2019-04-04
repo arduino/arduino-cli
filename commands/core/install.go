@@ -2,32 +2,31 @@ package core
 
 import (
 	"context"
-	"os"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
 	semver "go.bug.st/relaxed-semver"
 )
 
-//"packager:arch@version
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq) (*rpc.PlatformInstallResp, error) {
 	version, err := semver.Parse(req.Version)
 	if err != nil {
 		formatter.PrintError(err, "version not readable")
-		os.Exit(cli.ErrBadCall)
+		return nil, fmt.Errorf("version not readable", err)
 	}
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
 		PlatformVersion:      version}
-	pm, _ := cli.InitPackageAndLibraryManagerWithoutBundles()
+	pm := commands.GetPackageManager(req)
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
-		os.Exit(cli.ErrBadCall)
+		return nil, fmt.Errorf("Could not determine platform dependencies", err)
 	}
 
 	installPlatform(pm, platform, tools)
@@ -35,14 +34,14 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq) (*rpc.Pla
 	return &rpc.PlatformInstallResp{}, nil
 }
 
-func installPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease) {
+func installPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease) error {
 	log := pm.Log.WithField("platform", platformRelease)
 
 	// Prerequisite checks before install
 	if platformRelease.IsInstalled() {
 		log.Warn("Platform already installed")
 		formatter.Print("Platform " + platformRelease.String() + " already installed")
-		return
+		return fmt.Errorf("Platform " + platformRelease.String() + " already installed")
 	}
 	toolsToInstall := []*cores.ToolRelease{}
 	for _, tool := range requiredTools {
@@ -80,39 +79,41 @@ func installPlatform(pm *packagemanager.PackageManager, platformRelease *cores.P
 	if err != nil {
 		log.WithError(err).Error("Cannot install platform")
 		formatter.PrintError(err, "Cannot install platform")
-		os.Exit(cli.ErrGeneric)
+		return fmt.Errorf("Cannot install platform", err)
 	}
 
 	// If upgrading remove previous release
 	if installed != nil {
-		err := pm.UninstallPlatform(installed)
+		errUn := pm.UninstallPlatform(installed)
 
 		// In case of error try to rollback
-		if err != nil {
-			log.WithError(err).Error("Error updating platform.")
-			formatter.PrintError(err, "Error updating platform")
+		if errUn != nil {
+			log.WithError(errUn).Error("Error updating platform.")
+			formatter.PrintError(errUn, "Error updating platform")
 
 			// Rollback
 			if err := pm.UninstallPlatform(platformRelease); err != nil {
 				log.WithError(err).Error("Error rolling-back changes.")
 				formatter.PrintError(err, "Error rolling-back changes.")
+				return fmt.Errorf("Error rolling-back changes.", err)
 			}
-			os.Exit(cli.ErrGeneric)
+			return fmt.Errorf("Error updating platform", errUn)
 		}
 	}
 
 	log.Info("Platform installed")
 	formatter.Print(platformRelease.String() + " installed")
+	return nil
 }
 
 // InstallToolRelease installs a ToolRelease
-func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) {
+func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) error {
 	log := pm.Log.WithField("Tool", toolRelease)
 
 	if toolRelease.IsInstalled() {
 		log.Warn("Tool already installed")
 		formatter.Print("Tool " + toolRelease.String() + " already installed")
-		return
+		return fmt.Errorf("Tool " + toolRelease.String() + " already installed")
 	}
 
 	log.Info("Installing tool")
@@ -121,9 +122,10 @@ func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.To
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
 		formatter.PrintError(err, "Cannot install tool: "+toolRelease.String())
-		os.Exit(cli.ErrGeneric)
+		return fmt.Errorf("Cannot install tool: "+toolRelease.String(), err)
 	}
 
 	log.Info("Tool installed")
 	formatter.Print(toolRelease.String() + " installed")
+	return nil
 }

@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
 	semver "go.bug.st/relaxed-semver"
@@ -35,23 +36,23 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 	version, err := semver.Parse(req.Version)
 	if err != nil {
 		formatter.PrintError(err, "version not readable")
-		os.Exit(cli.ErrBadCall)
+
 	}
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
 		PlatformVersion:      version}
-	pm, _ := cli.InitPackageAndLibraryManagerWithoutBundles()
+	pm := commands.GetPackageManager(req)
 	if ref.PlatformVersion == nil {
 		platform := pm.FindPlatform(ref)
 		if platform == nil {
 			formatter.PrintErrorMessage("Platform not found " + ref.String())
-			os.Exit(cli.ErrBadCall)
+
 		}
 		platformRelease := pm.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
 			formatter.PrintErrorMessage("Platform not installed " + ref.String())
-			os.Exit(cli.ErrBadCall)
+
 		}
 		ref.PlatformVersion = platformRelease.Version
 	}
@@ -59,7 +60,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
-		os.Exit(cli.ErrBadCall)
+
 	}
 
 	uninstallPlatformRelease(pm, platform)
