@@ -32,7 +32,11 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq) (*rpc.Pla
 		return nil, fmt.Errorf("Could not determine platform dependencies", err)
 	}
 
-	installPlatform(pm, platform, tools)
+	err = installPlatform(pm, platform, tools)
+	if err != nil {
+		formatter.PrintError(err, "Error Installing "+platform.String())
+		return nil, err
+	}
 
 	return &rpc.PlatformInstallResp{}, nil
 }

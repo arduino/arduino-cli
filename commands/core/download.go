@@ -48,7 +48,11 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, progres
 		formatter.PrintError(err, "Could not determine platform dependencies")
 		return nil, fmt.Errorf("find platform dependencies error: %s", err)
 	}
-	downloadPlatform(pm, platform, progressCallback)
+	err = downloadPlatform(pm, platform, progressCallback)
+	if err != nil {
+		formatter.PrintError(err, "Error Installing "+platform.String())
+		return nil, err
+	}
 	for _, tool := range tools {
 		err := downloadTool(pm, tool, progressCallback)
 		if err != nil {
