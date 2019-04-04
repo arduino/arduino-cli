@@ -50,7 +50,6 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, progres
 	}
 	err = downloadPlatform(pm, platform, progressCallback)
 	if err != nil {
-		formatter.PrintError(err, "Error Installing "+platform.String())
 		return nil, err
 	}
 	for _, tool := range tools {

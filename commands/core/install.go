@@ -34,7 +34,6 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq) (*rpc.Pla
 
 	err = installPlatform(pm, platform, tools)
 	if err != nil {
-		formatter.PrintError(err, "Error Installing "+platform.String())
 		return nil, err
 	}
 
