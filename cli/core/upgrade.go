@@ -109,8 +109,11 @@ func upgrade(pm *packagemanager.PackageManager, platformsRefs []*packagemanager.
 		}
 	}
 
-	for _, platformRef := range toInstallRefs {
-		downloadPlatformByRef(pm, platformRef)
-		installPlatformByRef(pm, platformRef)
-	}
+	// TODO:
+	/*
+		for _, platformRef := range toInstallRefs {
+			downloadPlatformByRef(pm, platformRef)
+			installPlatformByRef(pm, platformRef)
+		}
+	*/
 }

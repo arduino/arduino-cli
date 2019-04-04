@@ -19,6 +19,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/core"
@@ -52,6 +53,8 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.PlatformArchitecture,
 			Version:         platformRef.PlatformVersion.String(),
+		}, func(curr *rpc.DownloadProgress) {
+			fmt.Printf(">> %+v\n", curr)
 		})
 	}
 }

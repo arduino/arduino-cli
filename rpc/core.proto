@@ -25,7 +25,7 @@ message PlatformDownloadReq {
 }
 
 message PlatformDownloadResp {
-
+	DownloadProgress progress = 1;
 }
 
 
@@ -38,4 +38,12 @@ message PlatformUninstallReq {
 
 message PlatformUninstallResp {
 
+}
+
+message DownloadProgress {
+	int32 id = 1;
+	string url = 2;
+	string file = 3;
+	int64 total_size = 4;
+	int64 downloaded = 5;
 }

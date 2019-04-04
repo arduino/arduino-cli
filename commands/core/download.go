@@ -20,18 +20,19 @@ package core
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.bug.st/downloader"
 	semver "go.bug.st/relaxed-semver"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
 )
 
-func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq) (*rpc.PlatformDownloadResp, error) {
+func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, progressCallback func(*rpc.DownloadProgress)) (*rpc.PlatformDownloadResp, error) {
 	version, err := semver.Parse(req.Version)
 	if err != nil {
 		formatter.PrintError(err, "Error in version parsing")
@@ -41,15 +42,15 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq) (*rpc.P
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
 		PlatformVersion:      version}
-	pm, _ := cli.InitPackageAndLibraryManagerWithoutBundles()
+	pm := commands.GetPackageManager(req)
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
 		return nil, fmt.Errorf("find platform dependencies error: %s", err)
 	}
-	downloadPlatform(pm, platform)
+	downloadPlatform(pm, platform, progressCallback)
 	for _, tool := range tools {
-		err := downloadTool(pm, tool)
+		err := downloadTool(pm, tool, progressCallback)
 		if err != nil {
 			formatter.PrintError(err, "Could not determine platform dependencies")
 			return nil, fmt.Errorf("find platform dependencies error: %s", err)
@@ -58,47 +59,54 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq) (*rpc.P
 	return &rpc.PlatformDownloadResp{}, nil
 }
 
-func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) error {
+func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, progressCallback func(*rpc.DownloadProgress)) error {
 	// Download platform
 	resp, err := pm.DownloadPlatformRelease(platformRelease)
 	if err != nil {
 		formatter.PrintError(err, "Error downloading "+platformRelease.String())
 		return err
 	} else {
-		return download(resp, platformRelease.String())
+		return download(resp, platformRelease.String(), progressCallback)
 	}
 }
 
-func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease) error {
+func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, progressCallback func(*rpc.DownloadProgress)) error {
 	// Check if tool has a flavor available for the current OS
 	if tool.GetCompatibleFlavour() == nil {
 		formatter.PrintErrorMessage("The tool " + tool.String() + " is not available for the current OS")
 		return fmt.Errorf("The tool " + tool.String() + " is not available")
 	}
 
-	return DownloadToolRelease(pm, tool)
+	return DownloadToolRelease(pm, tool, progressCallback)
 }
 
 // DownloadToolRelease downloads a ToolRelease
-func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) error {
+func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, progressCallback func(*rpc.DownloadProgress)) error {
 	resp, err := pm.DownloadToolRelease(toolRelease)
 	if err != nil {
 		formatter.PrintError(err, "Error downloading "+toolRelease.String())
 		return err
 	} else {
-		return download(resp, toolRelease.String())
+		return download(resp, toolRelease.String(), progressCallback)
 
 	}
 }
 
-func download(d *downloader.Downloader, label string) error {
-
+func download(d *downloader.Downloader, label string, progressCallback func(*rpc.DownloadProgress)) error {
 	if d == nil {
+		// TODO: Already downloaded
 		return nil
-		formatter.Print(label + " already downloaded")
 	}
 	formatter.Print("Downloading " + label + "...")
 	formatter.DownloadProgressBar(d, label)
+	progressCallback(&rpc.DownloadProgress{
+		File:      label,
+		Url:       d.URL,
+		TotalSize: d.Size(),
+	})
+	d.RunAndPoll(func(downloaded int64) {
+		progressCallback(&rpc.DownloadProgress{Downloaded: downloaded})
+	}, 250*time.Millisecond)
 	if d.Error() != nil {
 		formatter.PrintError(d.Error(), "Error downloading "+label)
 		return d.Error()

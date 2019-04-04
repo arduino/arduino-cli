@@ -13,6 +13,7 @@ import (
 )
 
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq) (*rpc.PlatformInstallResp, error) {
+	fmt.Println("AAAAA")
 	version, err := semver.Parse(req.Version)
 	if err != nil {
 		formatter.PrintError(err, "version not readable")
@@ -54,10 +55,13 @@ func installPlatform(pm *packagemanager.PackageManager, platformRelease *cores.P
 	}
 
 	// Package download
-	for _, tool := range toolsToInstall {
-		downloadTool(pm, tool)
+	print := func(curr *rpc.DownloadProgress) {
+		fmt.Printf(">> %v\n", curr)
 	}
-	downloadPlatform(pm, platformRelease)
+	for _, tool := range toolsToInstall {
+		downloadTool(pm, tool, print)
+	}
+	downloadPlatform(pm, platformRelease, print)
 
 	for _, tool := range toolsToInstall {
 		InstallToolRelease(pm, tool)
