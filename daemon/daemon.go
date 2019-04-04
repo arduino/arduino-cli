@@ -85,3 +85,7 @@ func (s *ArduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReq, s
 func (s *ArduinoCoreServerImpl) PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc.PlatformUninstallResp, error) {
 	return core.PlatformUninstall(ctx, req)
 }
+
+func (s *ArduinoCoreServerImpl) PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq) (*rpc.PlatformUpgradeResp, error) {
+	return core.PlatformUpgrade(ctx, req)
+}

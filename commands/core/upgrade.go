@@ -18,72 +18,70 @@
 package core
 
 import (
-	"os"
+	"context"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/rpc"
+	semver "go.bug.st/relaxed-semver"
 )
 
-func upgradeAllPlatforms(pm *packagemanager.PackageManager) {
+func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq) (*rpc.PlatformUpgradeResp, error) {
 	// Extract all PlatformReference to platforms that have updates
-	platformRefs := []*packagemanager.PlatformReference{}
-
-	for _, targetPackage := range pm.GetPackages().Packages {
-		for _, platform := range targetPackage.Platforms {
-			installed := pm.GetInstalledPlatformRelease(platform)
-			if installed == nil {
-				continue
-			}
-			latest := platform.GetLatestRelease()
-			if !latest.Version.GreaterThan(installed.Version) {
-				continue
-			}
-			platformRefs = append(platformRefs, &packagemanager.PlatformReference{
-				Package:              targetPackage.Name,
-				PlatformArchitecture: platform.Architecture,
-			})
+	var version *semver.Version
+	if req.Version != "" {
+		if v, err := semver.Parse(req.Version); err == nil {
+			version = v
+		} else {
+			return nil, fmt.Errorf("invalid version: %s", err)
 		}
 	}
+	ref := &packagemanager.PlatformReference{
+		Package:              req.PlatformPackage,
+		PlatformArchitecture: req.Architecture,
+		PlatformVersion:      version}
+	pm := commands.GetPackageManager(req)
 
-	upgrade(pm, platformRefs)
+	UpgradePlatform(pm, ref)
+	return &rpc.PlatformUpgradeResp{}, nil
 }
 
-func upgrade(pm *packagemanager.PackageManager, platformsRefs []*packagemanager.PlatformReference) {
-	for _, platformRef := range platformsRefs {
-		if platformRef.PlatformVersion != nil {
-			formatter.PrintErrorMessage("Invalid item " + platformRef.String() + ", upgrade doesn't accept parameters with version")
-			os.Exit(cli.ErrBadArgument)
-		}
+func UpgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference) error {
+
+	if platformRef.PlatformVersion != nil {
+		formatter.PrintErrorMessage("Invalid item " + platformRef.String() + ", upgrade doesn't accept parameters with version")
+		return fmt.Errorf("Invalid item " + platformRef.String() + ", upgrade doesn't accept parameters with version")
 	}
 
 	// Search the latest version for all specified platforms
 	toInstallRefs := []*packagemanager.PlatformReference{}
-	for _, platformRef := range platformsRefs {
-		platform := pm.FindPlatform(platformRef)
-		if platform == nil {
-			formatter.PrintErrorMessage("Platform " + platformRef.String() + " not found")
-			os.Exit(cli.ErrBadArgument)
-		}
-		installed := pm.GetInstalledPlatformRelease(platform)
-		if installed == nil {
-			formatter.PrintErrorMessage("Platform " + platformRef.String() + " is not installed")
-			os.Exit(cli.ErrBadArgument)
-		}
-		latest := platform.GetLatestRelease()
-		if !latest.Version.GreaterThan(installed.Version) {
-			formatter.PrintResult("Platform " + platformRef.String() + " is already at the latest version.")
-		} else {
-			platformRef.PlatformVersion = latest.Version
-			toInstallRefs = append(toInstallRefs, platformRef)
-		}
+	platform := pm.FindPlatform(platformRef)
+	if platform == nil {
+		formatter.PrintErrorMessage("Platform " + platformRef.String() + " not found")
+		return fmt.Errorf("Platform " + platformRef.String() + " not found")
+	}
+	installed := pm.GetInstalledPlatformRelease(platform)
+	if installed == nil {
+		formatter.PrintErrorMessage("Platform " + platformRef.String() + " is not installed")
+		return fmt.Errorf("Platform " + platformRef.String() + " is not installed")
+	}
+	latest := platform.GetLatestRelease()
+	if !latest.Version.GreaterThan(installed.Version) {
+		formatter.PrintResult("Platform " + platformRef.String() + " is already at the latest version.")
+		return fmt.Errorf("Platform " + platformRef.String() + " is already at the latest version.")
+	} else {
+		platformRef.PlatformVersion = latest.Version
+		toInstallRefs = append(toInstallRefs, platformRef)
 	}
 
-	// TODO:
-	/*
-		for _, platformRef := range toInstallRefs {
-			downloadPlatformByRef(pm, platformRef)
-			installPlatformByRef(pm, platformRef)
+	for _, platformRef := range toInstallRefs {
+		platform, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
+		if err != nil {
+			return fmt.Errorf("Platform " + platformRef.String() + " is not installed")
 		}
-	*/
+		installPlatform(pm, platform, tools)
+	}
+	return nil
 }

@@ -18,11 +18,11 @@
 package core
 
 import (
-	"os"
+	"context"
 
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -43,77 +43,16 @@ func initUpgradeCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
+	instance := cli.CreateInstance()
 	logrus.Info("Executing `arduino core upgrade`")
 
-	pm, _ := cli.InitPackageAndLibraryManagerWithoutBundles()
-
 	platformsRefs := parsePlatformReferenceArgs(args)
-	if len(platformsRefs) == 0 {
-		upgradeAllPlatforms(pm)
-	} else {
-		upgrade(pm, platformsRefs)
-	}
-}
-
-func upgradeAllPlatforms(pm *packagemanager.PackageManager) {
-	// Extract all PlatformReference to platforms that have updates
-	platformRefs := []*packagemanager.PlatformReference{}
-
-	for _, targetPackage := range pm.GetPackages().Packages {
-		for _, platform := range targetPackage.Platforms {
-			installed := pm.GetInstalledPlatformRelease(platform)
-			if installed == nil {
-				continue
-			}
-			latest := platform.GetLatestRelease()
-			if !latest.Version.GreaterThan(installed.Version) {
-				continue
-			}
-			platformRefs = append(platformRefs, &packagemanager.PlatformReference{
-				Package:              targetPackage.Name,
-				PlatformArchitecture: platform.Architecture,
-			})
-		}
-	}
-
-	upgrade(pm, platformRefs)
-}
-
-func upgrade(pm *packagemanager.PackageManager, platformsRefs []*packagemanager.PlatformReference) {
 	for _, platformRef := range platformsRefs {
-		if platformRef.PlatformVersion != nil {
-			formatter.PrintErrorMessage("Invalid item " + platformRef.String() + ", upgrade doesn't accept parameters with version")
-			os.Exit(cli.ErrBadArgument)
-		}
+		core.PlatformUpgrade(context.Background(), &rpc.PlatformUpgradeReq{
+			Instance:        instance,
+			PlatformPackage: platformRef.Package,
+			Architecture:    platformRef.PlatformArchitecture,
+			Version:         platformRef.PlatformVersion.String(),
+		})
 	}
-
-	// Search the latest version for all specified platforms
-	toInstallRefs := []*packagemanager.PlatformReference{}
-	for _, platformRef := range platformsRefs {
-		platform := pm.FindPlatform(platformRef)
-		if platform == nil {
-			formatter.PrintErrorMessage("Platform " + platformRef.String() + " not found")
-			os.Exit(cli.ErrBadArgument)
-		}
-		installed := pm.GetInstalledPlatformRelease(platform)
-		if installed == nil {
-			formatter.PrintErrorMessage("Platform " + platformRef.String() + " is not installed")
-			os.Exit(cli.ErrBadArgument)
-		}
-		latest := platform.GetLatestRelease()
-		if !latest.Version.GreaterThan(installed.Version) {
-			formatter.PrintResult("Platform " + platformRef.String() + " is already at the latest version.")
-		} else {
-			platformRef.PlatformVersion = latest.Version
-			toInstallRefs = append(toInstallRefs, platformRef)
-		}
-	}
-
-	// TODO:
-	/*
-		for _, platformRef := range toInstallRefs {
-			downloadPlatformByRef(pm, platformRef)
-			installPlatformByRef(pm, platformRef)
-		}
-	*/
 }
