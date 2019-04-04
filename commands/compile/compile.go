@@ -52,7 +52,9 @@ func Compile(ctx context.Context, req *rpc.CompileReq, output io.Writer) (*rpc.C
 	ctags, _ := getBuiltinCtagsTool(pm)
 	if !ctags.IsInstalled() {
 		formatter.Print("Downloading and installing missing tool: " + ctags.String())
-		core.DownloadToolRelease(pm, ctags)
+		core.DownloadToolRelease(pm, ctags, func(curr *rpc.DownloadProgress) {
+			fmt.Printf(">> %+v\n", curr)
+		})
 		core.InstallToolRelease(pm, ctags)
 
 		if err := pm.LoadHardware(cli.Config); err != nil {

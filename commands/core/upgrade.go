@@ -23,37 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 )
-
-func initUpgradeCommand() *cobra.Command {
-	upgradeCommand := &cobra.Command{
-		Use:   "upgrade [PACKAGER:ARCH] ...",
-		Short: "Upgrades one or all installed platforms to the latest version.",
-		Long:  "Upgrades one or all installed platforms to the latest version.",
-		Example: "" +
-			"  # upgrade everything to the latest version\n" +
-			"  " + cli.AppName + " core upgrade\n\n" +
-			"  # upgrade arduino:samd to the latest version\n" +
-			"  " + cli.AppName + " core upgrade arduino:samd",
-		Run: runUpgradeCommand,
-	}
-	return upgradeCommand
-}
-
-func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino core upgrade`")
-
-	pm, _ := cli.InitPackageAndLibraryManagerWithoutBundles()
-
-	platformsRefs := parsePlatformReferenceArgs(args)
-	if len(platformsRefs) == 0 {
-		upgradeAllPlatforms(pm)
-	} else {
-		upgrade(pm, platformsRefs)
-	}
-}
 
 func upgradeAllPlatforms(pm *packagemanager.PackageManager) {
 	// Extract all PlatformReference to platforms that have updates
@@ -109,8 +79,11 @@ func upgrade(pm *packagemanager.PackageManager, platformsRefs []*packagemanager.
 		}
 	}
 
-	for _, platformRef := range toInstallRefs {
-		downloadPlatformByRef(pm, platformRef)
-		installPlatformByRef(pm, platformRef)
-	}
+	// TODO:
+	/*
+		for _, platformRef := range toInstallRefs {
+			downloadPlatformByRef(pm, platformRef)
+			installPlatformByRef(pm, platformRef)
+		}
+	*/
 }
