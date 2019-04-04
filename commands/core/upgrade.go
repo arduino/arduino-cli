@@ -44,7 +44,10 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq) (*rpc.Pla
 		PlatformVersion:      version}
 	pm := commands.GetPackageManager(req)
 
-	UpgradePlatform(pm, ref)
+	err := UpgradePlatform(pm, ref)
+	if err != nil {
+		return nil, err
+	}
 	return &rpc.PlatformUpgradeResp{}, nil
 }
 
@@ -81,7 +84,10 @@ func UpgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 		if err != nil {
 			return fmt.Errorf("Platform " + platformRef.String() + " is not installed")
 		}
-		installPlatform(pm, platform, tools)
+		err = installPlatform(pm, platform, tools)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
