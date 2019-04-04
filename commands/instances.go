@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries"
@@ -13,6 +14,7 @@ import (
 	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/arduino-cli/rpc"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 )
 
 // this map contains all the running Arduino Core Services instances
@@ -119,7 +121,9 @@ func Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 
 	// Load index and auto-update it if needed
 	if err := lm.LoadIndex(); err != nil {
-		UpdateLibrariesIndex(ctx, lm)
+		UpdateLibrariesIndex(ctx, lm, func(curr *rpc.DownloadProgress) {
+			fmt.Printf(">> %+v\n", curr)
+		})
 		if err := lm.LoadIndex(); err != nil {
 			return nil, fmt.Errorf("loading libraries index: %s", err)
 		}
@@ -154,15 +158,24 @@ func Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error)
 }
 
 // UpdateLibrariesIndex updates the library_index.json
-func UpdateLibrariesIndex(ctx context.Context, lm *librariesmanager.LibrariesManager) {
-	//logrus.Info("Updating libraries index")
+func UpdateLibrariesIndex(ctx context.Context, lm *librariesmanager.LibrariesManager, progressCallback func(*rpc.DownloadProgress)) {
+	logrus.Info("Updating libraries index")
 	d, err := lm.UpdateIndex()
 	if err != nil {
 		//formatter.PrintError(err, "Error downloading librarires index")
 		//os.Exit(ErrNetwork)
 	}
 	//formatter.DownloadProgressBar(d, "Updating index: library_index.json")
-	d.Run()
+	//d.Run()
+	progressCallback(&rpc.DownloadProgress{
+		File:      "library_index.json",
+		Url:       d.URL,
+		TotalSize: d.Size(),
+	})
+	d.RunAndPoll(func(downloaded int64) {
+		progressCallback(&rpc.DownloadProgress{Downloaded: downloaded})
+	}, 250*time.Millisecond)
+
 	if d.Error() != nil {
 		//formatter.PrintError(d.Error(), "Error downloading librarires index")
 		//os.Exit(ErrNetwork)
