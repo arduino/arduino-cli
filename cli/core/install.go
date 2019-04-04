@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -54,7 +55,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.PlatformArchitecture,
 			Version:         platformRef.PlatformVersion.String(),
-		})
+		}, output.DownloadProgressBar())
 		// if err != nil {
 		// 	formatter.PrintError(err, "Error during build")
 		// 	os.Exit(cli.ErrGeneric)
