@@ -68,13 +68,19 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoC
 	return err
 }
 
-func (s *ArduinoCoreServerImpl) PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq) (*rpc.PlatformInstallResp, error) {
-	return core.PlatformInstall(ctx, req, func(*rpc.DownloadProgress) {})
+func (s *ArduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallReq, stream rpc.ArduinoCore_PlatformInstallServer) error {
+	resp, err := core.PlatformInstall(stream.Context(), req, func(progress *rpc.DownloadProgress) {
+		stream.Send(&rpc.PlatformInstallResp{Progress: progress})
+	})
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
 }
 
 func (s *ArduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReq, stream rpc.ArduinoCore_PlatformDownloadServer) error {
-	resp, err := core.PlatformDownload(stream.Context(), req, func(curr *rpc.DownloadProgress) {
-		stream.Send(&rpc.PlatformDownloadResp{Progress: curr})
+	resp, err := core.PlatformDownload(stream.Context(), req, func(progress *rpc.DownloadProgress) {
+		stream.Send(&rpc.PlatformDownloadResp{Progress: progress})
 	})
 	if err != nil {
 		return err
@@ -86,6 +92,12 @@ func (s *ArduinoCoreServerImpl) PlatformUninstall(ctx context.Context, req *rpc.
 	return core.PlatformUninstall(ctx, req)
 }
 
-func (s *ArduinoCoreServerImpl) PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq) (*rpc.PlatformUpgradeResp, error) {
-	return core.PlatformUpgrade(ctx, req, func(*rpc.DownloadProgress) {})
+func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeReq, stream rpc.ArduinoCore_PlatformUpgradeServer) error {
+	resp, err := core.PlatformUpgrade(stream.Context(), req, func(progress *rpc.DownloadProgress) {
+		stream.Send(&rpc.PlatformUpgradeResp{Progress: progress})
+	})
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
 }
