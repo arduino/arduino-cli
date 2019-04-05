@@ -14,7 +14,7 @@ message PlatformInstallReq {
 }
 
 message PlatformInstallResp {
-
+	DownloadProgress progress = 1;
 }
 
 message PlatformDownloadReq {
@@ -56,5 +56,5 @@ message PlatformUpgradeReq {
 }
 
 message PlatformUpgradeResp {
-
+	DownloadProgress progress = 1;
 }
