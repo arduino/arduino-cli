@@ -3,7 +3,7 @@
 
 [[projects]]
   branch = "cli-inception"
-  digest = "1:da33441fbc4cb624982fbb0bb8ec49d50fda8b0497953c710299c1533d8cc682"
+  digest = "1:0d5edeae1ccf461e7840cc49d2942f425325886af6a533141d47dccebeb364a9"
   name = "github.com/arduino/arduino-builder"
   packages = [
     ".",
@@ -17,8 +17,28 @@
     "utils",
   ]
   pruneopts = "UT"
-  revision = "8f0fb63d56c77aa3265ea387b777970df2442977"
+  revision = "6be83c9bf1f1c7c895d6fbb658a90053266d6ad5"
   source = "github.com/arduino/arduino-builder"
+
+[[projects]]
+  digest = "1:41e434054a23802b788df1a127f615e116480e71d1483b2673f4f15531339ae4"
+  name = "github.com/arduino/arduino-cli"
+  packages = [
+    "arduino/cores",
+    "arduino/cores/packageindex",
+    "arduino/cores/packagemanager",
+    "arduino/libraries",
+    "arduino/libraries/librariesindex",
+    "arduino/libraries/librariesmanager",
+    "arduino/libraries/librariesresolver",
+    "arduino/resources",
+    "arduino/utils",
+    "common/formatter",
+    "configs",
+  ]
+  pruneopts = "UT"
+  revision = "fac241911c49c69b67c05014501ba50a3a7d350f"
+  version = "0.3.6-alpha.preview"
 
 [[projects]]
   branch = "master"
