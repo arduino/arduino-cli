@@ -26,8 +26,6 @@ var Video = Map{
 
 func M4v(buf []byte) bool {
 	return len(buf) > 10 &&
-		buf[0] == 0x0 && buf[1] == 0x0 &&
-		buf[2] == 0x0 && buf[3] == 0x1C &&
 		buf[4] == 0x66 && buf[5] == 0x74 &&
 		buf[6] == 0x79 && buf[7] == 0x70 &&
 		buf[8] == 0x4D && buf[9] == 0x34 &&
@@ -58,11 +56,13 @@ func Webm(buf []byte) bool {
 }
 
 func Mov(buf []byte) bool {
-	return len(buf) > 7 &&
-		buf[0] == 0x0 && buf[1] == 0x0 &&
+	return len(buf) > 15 && ((buf[0] == 0x0 && buf[1] == 0x0 &&
 		buf[2] == 0x0 && buf[3] == 0x14 &&
 		buf[4] == 0x66 && buf[5] == 0x74 &&
-		buf[6] == 0x79 && buf[7] == 0x70
+		buf[6] == 0x79 && buf[7] == 0x70) ||
+		(buf[4] == 0x6d && buf[5] == 0x6f && buf[6] == 0x6f && buf[7] == 0x76) ||
+		(buf[4] == 0x6d && buf[5] == 0x64 && buf[6] == 0x61 && buf[7] == 0x74) ||
+		(buf[12] == 0x6d && buf[13] == 0x64 && buf[14] == 0x61 && buf[15] == 0x74))
 }
 
 func Avi(buf []byte) bool {
@@ -99,22 +99,31 @@ func Mp4(buf []byte) bool {
 	return len(buf) > 11 &&
 		(buf[4] == 'f' && buf[5] == 't' && buf[6] == 'y' && buf[7] == 'p') &&
 		((buf[8] == 'a' && buf[9] == 'v' && buf[10] == 'c' && buf[11] == '1') ||
+			(buf[8] == 'd' && buf[9] == 'a' && buf[10] == 's' && buf[11] == 'h') ||
 			(buf[8] == 'i' && buf[9] == 's' && buf[10] == 'o' && buf[11] == '2') ||
+			(buf[8] == 'i' && buf[9] == 's' && buf[10] == 'o' && buf[11] == '3') ||
+			(buf[8] == 'i' && buf[9] == 's' && buf[10] == 'o' && buf[11] == '4') ||
+			(buf[8] == 'i' && buf[9] == 's' && buf[10] == 'o' && buf[11] == '5') ||
+			(buf[8] == 'i' && buf[9] == 's' && buf[10] == 'o' && buf[11] == '6') ||
 			(buf[8] == 'i' && buf[9] == 's' && buf[10] == 'o' && buf[11] == 'm') ||
 			(buf[8] == 'm' && buf[9] == 'm' && buf[10] == 'p' && buf[11] == '4') ||
 			(buf[8] == 'm' && buf[9] == 'p' && buf[10] == '4' && buf[11] == '1') ||
 			(buf[8] == 'm' && buf[9] == 'p' && buf[10] == '4' && buf[11] == '2') ||
+			(buf[8] == 'm' && buf[9] == 'p' && buf[10] == '4' && buf[11] == 'v') ||
 			(buf[8] == 'm' && buf[9] == 'p' && buf[10] == '7' && buf[11] == '1') ||
-			(buf[8] == 'm' && buf[9] == 's' && buf[10] == 'n' && buf[11] == 'v') ||
-			(buf[8] == 'n' && buf[9] == 'd' && buf[10] == 'a' && buf[11] == 's') ||
-			(buf[8] == 'n' && buf[9] == 'd' && buf[10] == 's' && buf[11] == 'c') ||
-			(buf[8] == 'n' && buf[9] == 'd' && buf[10] == 's' && buf[11] == 'h') ||
-			(buf[8] == 'n' && buf[9] == 'd' && buf[10] == 's' && buf[11] == 'm') ||
-			(buf[8] == 'n' && buf[9] == 'd' && buf[10] == 's' && buf[11] == 'p') ||
-			(buf[8] == 'n' && buf[9] == 'd' && buf[10] == 's' && buf[11] == 's') ||
-			(buf[8] == 'n' && buf[9] == 'd' && buf[10] == 'x' && buf[11] == 'c') ||
-			(buf[8] == 'n' && buf[9] == 'd' && buf[10] == 'x' && buf[11] == 'h') ||
-			(buf[8] == 'n' && buf[9] == 'd' && buf[10] == 'x' && buf[11] == 'm') ||
-			(buf[8] == 'n' && buf[9] == 'd' && buf[10] == 'x' && buf[11] == 'p') ||
-			(buf[8] == 'n' && buf[9] == 'd' && buf[10] == 'x' && buf[11] == 's'))
+			(buf[8] == 'M' && buf[9] == 'S' && buf[10] == 'N' && buf[11] == 'V') ||
+			(buf[8] == 'N' && buf[9] == 'D' && buf[10] == 'A' && buf[11] == 'S') ||
+			(buf[8] == 'N' && buf[9] == 'D' && buf[10] == 'S' && buf[11] == 'C') ||
+			(buf[8] == 'N' && buf[9] == 'S' && buf[10] == 'D' && buf[11] == 'C') ||
+			(buf[8] == 'N' && buf[9] == 'D' && buf[10] == 'S' && buf[11] == 'H') ||
+			(buf[8] == 'N' && buf[9] == 'D' && buf[10] == 'S' && buf[11] == 'M') ||
+			(buf[8] == 'N' && buf[9] == 'D' && buf[10] == 'S' && buf[11] == 'P') ||
+			(buf[8] == 'N' && buf[9] == 'D' && buf[10] == 'S' && buf[11] == 'S') ||
+			(buf[8] == 'N' && buf[9] == 'D' && buf[10] == 'X' && buf[11] == 'C') ||
+			(buf[8] == 'N' && buf[9] == 'D' && buf[10] == 'X' && buf[11] == 'H') ||
+			(buf[8] == 'N' && buf[9] == 'D' && buf[10] == 'X' && buf[11] == 'M') ||
+			(buf[8] == 'N' && buf[9] == 'D' && buf[10] == 'X' && buf[11] == 'P') ||
+			(buf[8] == 'N' && buf[9] == 'D' && buf[10] == 'X' && buf[11] == 'S') ||
+			(buf[8] == 'F' && buf[9] == '4' && buf[10] == 'V' && buf[11] == ' ') ||
+			(buf[8] == 'F' && buf[9] == '4' && buf[10] == 'P' && buf[11] == ' '))
 }

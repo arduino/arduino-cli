@@ -85,12 +85,12 @@
   version = "v1.2.2"
 
 [[projects]]
-  digest = "1:db8e2f3c8cc717afe53c6941776312bd7046d45d9fb757c5f3f32fd3cc46562d"
+  digest = "1:359173d7e6eb3d35eeb3f2ef5c87bd2aff6e775dba5a1dcf8b2a53b86d0af79e"
   name = "github.com/codeclysm/extract"
   packages = ["."]
   pruneopts = "UT"
-  revision = "de8493db4b3e06921c3ee97fa0b200435a8a796d"
-  version = "v2.0.0"
+  revision = "cb78af9c8af24b50533f931fa83bdfd4170bf840"
+  version = "v2.2.0"
 
 [[projects]]
   digest = "1:7cb4fdca4c251b3ef8027c90ea35f70c7b661a593b9eeae34753c65499098bb1"
@@ -169,6 +169,19 @@
   ]
   pruneopts = "UT"
   revision = "36ee7e946282a3fb1cfecd476ddc9b35d8847e42"
+
+[[projects]]
+  digest = "1:4442692c7525ec403b23a5b3e169a089bb1e6ed3b69795be877d39578744bf7a"
+  name = "github.com/h2non/filetype"
+  packages = [
+    ".",
+    "matchers",
+    "matchers/isobmff",
+    "types",
+  ]
+  pruneopts = "UT"
+  revision = "2248f2e2f77cd8cf9694216e3f9589d71005de37"
+  version = "v1.0.8"
 
 [[projects]]
   digest = "1:870d441fe217b8e689d7949fef6e43efbc787e50f200cb1e70dbca9204a1d6be"
@@ -408,18 +421,6 @@
   pruneopts = "UT"
   revision = "291d751a997645784a6067bc8a4c528e819ee171"
   source = "github.com/cmaglie/pb"
-
-[[projects]]
-  digest = "1:8b1a1e6d3dcef7c542f604f8b9f8013d1d13c3d61f8e9cbe368afa2735c898c2"
-  name = "gopkg.in/h2non/filetype.v1"
-  packages = [
-    ".",
-    "matchers",
-    "types",
-  ]
-  pruneopts = "UT"
-  revision = "cc14fdc9ca0e4c2bafad7458f6ff79fd3947cfbb"
-  version = "v1.0.5"
 
 [[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"

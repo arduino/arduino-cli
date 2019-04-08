@@ -37,3 +37,27 @@ If you don't know which archive you're dealing with (life really is always a sur
 ```go
 extract.Archive(data, "/path/where/to/extract", nil)
 ```
+
+If you need more control over how your files will be extracted you can use an Extractor.
+
+It Needs a FS object that implements the FS interface:
+
+```
+type FS interface {
+		Link(string, string) error
+		MkdirAll(string, os.FileMode) error
+		OpenFile(name string, flag int, perm os.FileMode) (*os.File, error)
+		Symlink(string, string) error
+	}
+```
+
+which contains only the required function to perform an extraction. This way it's easy to wrap os functions to 
+chroot the path, or scramble the files, or send an event for each operation or even reimplementing them for an in-memory store, I don't know.
+
+```go
+extractor := extract.Extractor{
+    FS: fs,
+}
+
+extractor.Archive(data, "path/where/to/extract", nil)
+```

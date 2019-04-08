@@ -1,6 +1,8 @@
 package matchers
 
-import "gopkg.in/h2non/filetype.v1/types"
+import (
+	"github.com/h2non/filetype/types"
+)
 
 // Internal shortcut to NewType
 var newType = types.NewType
@@ -16,6 +18,7 @@ type TypeMatcher func([]byte) types.Type
 
 // Store registered file type matchers
 var Matchers = make(map[types.Type]TypeMatcher)
+var MatcherKeys []types.Type
 
 // Create and register a new type matcher function
 func NewMatcher(kind types.Type, fn Matcher) TypeMatcher {
@@ -27,10 +30,13 @@ func NewMatcher(kind types.Type, fn Matcher) TypeMatcher {
 	}
 
 	Matchers[kind] = matcher
+	// prepend here so any user defined matchers get added first
+	MatcherKeys = append([]types.Type{kind}, MatcherKeys...)
 	return matcher
 }
 
 func register(matchers ...Map) {
+	MatcherKeys = MatcherKeys[:0]
 	for _, m := range matchers {
 		for kind, matcher := range m {
 			NewMatcher(kind, matcher)
@@ -40,5 +46,6 @@ func register(matchers ...Map) {
 
 func init() {
 	// Arguments order is intentional
-	register(Image, Video, Audio, Font, Document, Archive)
+	// Archive files will be checked last due to prepend above in func NewMatcher
+	register(Archive, Document, Font, Audio, Video, Image, Application)
 }
