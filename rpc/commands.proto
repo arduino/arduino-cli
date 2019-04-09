@@ -76,5 +76,4 @@ message RescanReq {
 }
 
 message RescanResp {
-  Instance instance = 1;
 }
