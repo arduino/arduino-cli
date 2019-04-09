@@ -26,9 +26,10 @@ var instancesCount int32 = 1
 // instantiate as many as needed by providing a different configuration
 // for each one.
 type CoreInstance struct {
-	config *configs.Configuration
-	pm     *packagemanager.PackageManager
-	lm     *librariesmanager.LibrariesManager
+	config     *configs.Configuration
+	pm         *packagemanager.PackageManager
+	lm         *librariesmanager.LibrariesManager
+	getLibOnly bool
 }
 
 type InstanceContainer interface {
@@ -74,70 +75,15 @@ func Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 			return nil, fmt.Errorf("parsing url %s: %s", rawurl, err)
 		}
 	}
-
-	var pm *packagemanager.PackageManager
-	if !req.GetLibraryManagerOnly() {
-		pm = packagemanager.NewPackageManager(
-			config.IndexesDir(),
-			config.PackagesDir(),
-			config.DownloadsDir(),
-			config.DataDir.Join("tmp"))
-
-		for _, URL := range config.BoardManagerAdditionalUrls {
-			if err := pm.LoadPackageIndex(URL); err != nil {
-				return nil, fmt.Errorf("loading "+URL.String()+" package index: %s", err)
-			}
-		}
-
-		if err := pm.LoadHardware(config); err != nil {
-			return nil, fmt.Errorf("loading hardware packages: %s", err)
-		}
+	pm, lm, err := createInstance(ctx, config, req.GetLibraryManagerOnly())
+	if err != nil {
+		return nil, fmt.Errorf("Impossible create instance")
 	}
-
-	// Initialize library manager
-	// --------------------------
-	lm := librariesmanager.NewLibraryManager(
-		config.IndexesDir(),
-		config.DownloadsDir())
-
-	// Add IDE builtin libraries dir
-	if bundledLibsDir := config.IDEBundledLibrariesDir(); bundledLibsDir != nil {
-		lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
-	}
-
-	// Add sketchbook libraries dir
-	lm.AddLibrariesDir(config.LibrariesDir(), libraries.Sketchbook)
-
-	// Add libraries dirs from installed platforms
-	if pm != nil {
-		for _, targetPackage := range pm.GetPackages().Packages {
-			for _, platform := range targetPackage.Platforms {
-				if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
-					lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
-				}
-			}
-		}
-	}
-
-	// Load index and auto-update it if needed
-	if err := lm.LoadIndex(); err != nil {
-		UpdateLibrariesIndex(ctx, lm, func(curr *rpc.DownloadProgress) {
-			fmt.Printf(">> %+v\n", curr)
-		})
-		if err := lm.LoadIndex(); err != nil {
-			return nil, fmt.Errorf("loading libraries index: %s", err)
-		}
-	}
-
-	// Scan for libraries
-	if err := lm.RescanLibraries(); err != nil {
-		return nil, fmt.Errorf("libraries rescan: %s", err)
-	}
-
 	instance := &CoreInstance{
-		config: config,
-		pm:     pm,
-		lm:     lm}
+		config:     config,
+		pm:         pm,
+		lm:         lm,
+		getLibOnly: req.GetLibraryManagerOnly()}
 	handle := instancesCount
 	instancesCount++
 	instances[handle] = instance
@@ -193,22 +139,33 @@ func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
 	if config == nil {
 		return nil, fmt.Errorf("invalid request")
 	}
-
-	var pm *packagemanager.PackageManager
-	pm = packagemanager.NewPackageManager(
-		config.IndexesDir(),
-		config.PackagesDir(),
-		config.DownloadsDir(),
-		config.DataDir.Join("tmp"))
-
-	for _, URL := range config.BoardManagerAdditionalUrls {
-		if err := pm.LoadPackageIndex(URL); err != nil {
-			return nil, fmt.Errorf("loading "+URL.String()+" package index: %s", err)
-		}
+	pm, lm, err := createInstance(ctx, config, coreInstance.getLibOnly)
+	if err != nil {
+		return nil, fmt.Errorf("Impossible create")
 	}
+	coreInstance.pm = pm
+	coreInstance.lm = lm
+	return &rpc.RescanResp{}, nil
+}
 
-	if err := pm.LoadHardware(config); err != nil {
-		return nil, fmt.Errorf("loading hardware packages: %s", err)
+func createInstance(ctx context.Context, config *configs.Configuration, GetLibOnly bool) (*packagemanager.PackageManager, *librariesmanager.LibrariesManager, error) {
+	var pm *packagemanager.PackageManager
+	if !GetLibOnly {
+		pm = packagemanager.NewPackageManager(
+			config.IndexesDir(),
+			config.PackagesDir(),
+			config.DownloadsDir(),
+			config.DataDir.Join("tmp"))
+
+		for _, URL := range config.BoardManagerAdditionalUrls {
+			if err := pm.LoadPackageIndex(URL); err != nil {
+				return nil, nil, fmt.Errorf("loading "+URL.String()+" package index: %s", err)
+			}
+		}
+
+		if err := pm.LoadHardware(config); err != nil {
+			return nil, nil, fmt.Errorf("loading hardware packages: %s", err)
+		}
 	}
 
 	// Initialize library manager
@@ -242,19 +199,13 @@ func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
 			fmt.Printf(">> %+v\n", curr)
 		})
 		if err := lm.LoadIndex(); err != nil {
-			return nil, fmt.Errorf("loading libraries index: %s", err)
+			return nil, nil, fmt.Errorf("loading libraries index: %s", err)
 		}
 	}
 
 	// Scan for libraries
 	if err := lm.RescanLibraries(); err != nil {
-		return nil, fmt.Errorf("libraries rescan: %s", err)
+		return nil, nil, fmt.Errorf("libraries rescan: %s", err)
 	}
-
-	coreInstance.pm = pm
-	coreInstance.lm = lm
-	id = req.Instance.Id
-	return &rpc.RescanResp{
-		Instance: &rpc.Instance{Id: id},
-	}, nil
+	return pm, lm, nil
 }
