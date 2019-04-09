@@ -47,6 +47,10 @@ func (s *ArduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyReq
 	return commands.Destroy(ctx, req)
 }
 
+func (s *ArduinoCoreServerImpl) Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
+	return commands.Rescan(ctx, req)
+}
+
 func (s *ArduinoCoreServerImpl) Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 	return commands.Init(ctx, req)
 }
