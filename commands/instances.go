@@ -181,3 +181,80 @@ func UpdateLibrariesIndex(ctx context.Context, lm *librariesmanager.LibrariesMan
 		//os.Exit(ErrNetwork)
 	}
 }
+
+func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
+	id := req.Instance.Id
+	coreInstance, ok := instances[id]
+	if !ok {
+		return nil, fmt.Errorf("invalid handle")
+	}
+
+	config := coreInstance.config
+	if config == nil {
+		return nil, fmt.Errorf("invalid request")
+	}
+
+	var pm *packagemanager.PackageManager
+	pm = packagemanager.NewPackageManager(
+		config.IndexesDir(),
+		config.PackagesDir(),
+		config.DownloadsDir(),
+		config.DataDir.Join("tmp"))
+
+	for _, URL := range config.BoardManagerAdditionalUrls {
+		if err := pm.LoadPackageIndex(URL); err != nil {
+			return nil, fmt.Errorf("loading "+URL.String()+" package index: %s", err)
+		}
+	}
+
+	if err := pm.LoadHardware(config); err != nil {
+		return nil, fmt.Errorf("loading hardware packages: %s", err)
+	}
+
+	// Initialize library manager
+	// --------------------------
+	lm := librariesmanager.NewLibraryManager(
+		config.IndexesDir(),
+		config.DownloadsDir())
+
+	// Add IDE builtin libraries dir
+	if bundledLibsDir := config.IDEBundledLibrariesDir(); bundledLibsDir != nil {
+		lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
+	}
+
+	// Add sketchbook libraries dir
+	lm.AddLibrariesDir(config.LibrariesDir(), libraries.Sketchbook)
+
+	// Add libraries dirs from installed platforms
+	if pm != nil {
+		for _, targetPackage := range pm.GetPackages().Packages {
+			for _, platform := range targetPackage.Platforms {
+				if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
+					lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
+				}
+			}
+		}
+	}
+
+	// Load index and auto-update it if needed
+	if err := lm.LoadIndex(); err != nil {
+		UpdateLibrariesIndex(ctx, lm, func(curr *rpc.DownloadProgress) {
+			fmt.Printf(">> %+v\n", curr)
+		})
+		if err := lm.LoadIndex(); err != nil {
+			return nil, fmt.Errorf("loading libraries index: %s", err)
+		}
+	}
+
+	// Scan for libraries
+	if err := lm.RescanLibraries(); err != nil {
+		return nil, fmt.Errorf("libraries rescan: %s", err)
+	}
+
+	coreInstance.pm = pm
+	coreInstance.lm = lm
+	id = req.Instance.Id
+	return &rpc.RescanResp{
+		Instance: &rpc.Instance{Id: id},
+	}, nil
+}

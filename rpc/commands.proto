@@ -20,6 +20,9 @@ service ArduinoCore {
   // Destroy an instance of the Arduino Core Service
   rpc Destroy(DestroyReq) returns (DestroyResp) {}
 
+  // Rescan instance of the Arduino Core Service
+  rpc Rescan(RescanReq) returns (RescanResp) {}
+
   // BOARD COMMANDS
   // --------------
 
@@ -67,3 +70,11 @@ message InitResp {
 
 message DestroyReq { Instance instance = 1; }
 message DestroyResp {}
+
+message RescanReq {
+  Instance instance = 1;
+}
+
+message RescanResp {
+  Instance instance = 1;
+}
