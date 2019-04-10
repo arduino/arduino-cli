@@ -135,22 +135,18 @@ func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
 		return nil, fmt.Errorf("invalid handle")
 	}
 
-	config := coreInstance.config
-	if config == nil {
-		return nil, fmt.Errorf("invalid request")
-	}
-	pm, lm, err := createInstance(ctx, config, coreInstance.getLibOnly)
+	pm, lm, err := createInstance(ctx, coreInstance.config, coreInstance.getLibOnly)
 	if err != nil {
-		return nil, fmt.Errorf("Impossible create")
+		return nil, fmt.Errorf("rescanning: %s", err)
 	}
 	coreInstance.pm = pm
 	coreInstance.lm = lm
 	return &rpc.RescanResp{}, nil
 }
 
-func createInstance(ctx context.Context, config *configs.Configuration, GetLibOnly bool) (*packagemanager.PackageManager, *librariesmanager.LibrariesManager, error) {
+func createInstance(ctx context.Context, config *configs.Configuration, getLibOnly bool) (*packagemanager.PackageManager, *librariesmanager.LibrariesManager, error) {
 	var pm *packagemanager.PackageManager
-	if !GetLibOnly {
+	if !getLibOnly {
 		pm = packagemanager.NewPackageManager(
 			config.IndexesDir(),
 			config.PackagesDir(),
