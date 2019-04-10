@@ -37,6 +37,11 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq, progress 
 		return nil, err
 	}
 
+	_, err = commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance})
+	if err != nil {
+		return nil, err
+	}
+
 	return &rpc.PlatformInstallResp{}, nil
 }
 

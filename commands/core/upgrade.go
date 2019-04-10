@@ -48,6 +48,12 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq, progress 
 	if err != nil {
 		return nil, err
 	}
+
+	_, err = commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance})
+	if err != nil {
+		return nil, err
+	}
+
 	return &rpc.PlatformUpgradeResp{}, nil
 }
 
