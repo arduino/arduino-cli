@@ -34,18 +34,7 @@ func main() {
 	}
 	instance := resp.GetInstance()
 	fmt.Println("Created new server instance:", instance)
-	UninstalResp, err := client.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
-		Instance:        instance,
-		PlatformPackage: "arduino",
-		Architecture:    "samd",
-		Version:         "1.6.21",
-	})
-	if err != nil {
-		if UninstalResp != nil {
-		}
-		fmt.Printf("uninstall error: %s\n", err)
-		os.Exit(1)
-	}
+
 	install := func() {
 		installRespStream, err := client.PlatformInstall(context.Background(), &rpc.PlatformInstallReq{
 			Instance:        instance,
@@ -64,45 +53,37 @@ func main() {
 			}
 			if err != nil {
 				fmt.Printf("Install error: %s\n", err)
-				os.Exit(1)
+				return
 			}
 			fmt.Printf("%s\n", installResp.GetProgress())
 		}
 		fmt.Println("Installation completed!")
 	}
+
 	install()
-	respResc, err := client.Rescan(context.Background(), &rpc.RescanReq{
-		Instance: instance,
+	install()
+
+	upgradeRespStream, err := client.PlatformUpgrade(context.Background(), &rpc.PlatformUpgradeReq{
+		Instance:        instance,
+		PlatformPackage: "arduino",
+		Architecture:    "samd",
 	})
 	if err != nil {
-		fmt.Printf("Error creating server instance: %s\n", err)
+		fmt.Printf("Error Upgrade platform: %s\n", err)
 		os.Exit(1)
 	}
-	instance = respResc.GetInstance()
-	upgrade := func() {
-		upgradeRespStream, err := client.PlatformUpgrade(context.Background(), &rpc.PlatformUpgradeReq{
-			Instance:        instance,
-			PlatformPackage: "arduino",
-			Architecture:    "samd",
-		})
+	for {
+		upgradeResp, err := upgradeRespStream.Recv()
+		if err == io.EOF {
+			break
+		}
 		if err != nil {
-			fmt.Printf("Error Upgrade platform: %s\n", err)
+			fmt.Printf("Upgrade error: %s\n", err)
 			os.Exit(1)
 		}
-		for {
-			upgradeResp, err := upgradeRespStream.Recv()
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				fmt.Printf("Install error: %s\n", err)
-				os.Exit(1)
-			}
-			fmt.Printf("%s\n", upgradeResp.GetProgress())
-		}
-		fmt.Println("Upgrade completed!")
+		fmt.Printf("%s\n", upgradeResp.GetProgress())
 	}
-	upgrade()
+	fmt.Println("Upgrade completed!")
 
 	details, err := client.BoardDetails(context.Background(), &rpc.BoardDetailsReq{
 		Instance: instance,
@@ -152,6 +133,17 @@ func main() {
 			fmt.Println(resp)
 		}
 	*/
+
+	_, err = client.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
+		Instance:        instance,
+		PlatformPackage: "arduino",
+		Architecture:    "samd",
+		Version:         "1.6.21",
+	})
+	if err != nil {
+		fmt.Printf("uninstall error: %s\n", err)
+		// os.Exit(1)
+	}
 
 	_, err = client.Destroy(context.Background(), &rpc.DestroyReq{
 		Instance: instance,

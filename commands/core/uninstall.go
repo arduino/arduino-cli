@@ -76,6 +76,11 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 			uninstallToolRelease(pm, tool)
 		}
 	}
+
+	_, err = commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance})
+	if err != nil {
+		return nil, err
+	}
 	return &rpc.PlatformUninstallResp{}, nil
 }
 
