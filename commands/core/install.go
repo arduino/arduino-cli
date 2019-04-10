@@ -29,7 +29,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq, progress 
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
-		return nil, fmt.Errorf("Could not determine platform dependencies", err)
+		return nil, fmt.Errorf("Could not determine platform dependencies: %s", err)
 	}
 
 	err = installPlatform(pm, platform, tools, progress)
@@ -92,7 +92,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 	if err != nil {
 		log.WithError(err).Error("Cannot install platform")
 		formatter.PrintError(err, "Cannot install platform")
-		return fmt.Errorf("Cannot install platform", err)
+		return err
 	}
 
 	// If upgrading remove previous release
@@ -108,9 +108,9 @@ func installPlatform(pm *packagemanager.PackageManager,
 			if err := pm.UninstallPlatform(platformRelease); err != nil {
 				log.WithError(err).Error("Error rolling-back changes.")
 				formatter.PrintError(err, "Error rolling-back changes.")
-				return fmt.Errorf("Error rolling-back changes.", err)
+				return fmt.Errorf("rolling-back changes: %s", err)
 			}
-			return fmt.Errorf("Error updating platform", errUn)
+			return fmt.Errorf("updating platform: %s", errUn)
 		}
 	}
 

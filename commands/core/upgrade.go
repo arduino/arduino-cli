@@ -58,7 +58,6 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq, progress 
 }
 
 func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference, progress commands.ProgressCB) error {
-
 	if platformRef.PlatformVersion != nil {
 		formatter.PrintErrorMessage("Invalid item " + platformRef.String() + ", upgrade doesn't accept parameters with version")
 		return fmt.Errorf("Invalid item " + platformRef.String() + ", upgrade doesn't accept parameters with version")
@@ -80,10 +79,9 @@ func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 	if !latest.Version.GreaterThan(installed.Version) {
 		formatter.PrintResult("Platform " + platformRef.String() + " is already at the latest version.")
 		return fmt.Errorf("Platform " + platformRef.String() + " is already at the latest version.")
-	} else {
-		platformRef.PlatformVersion = latest.Version
-		toInstallRefs = append(toInstallRefs, platformRef)
 	}
+	platformRef.PlatformVersion = latest.Version
+	toInstallRefs = append(toInstallRefs, platformRef)
 
 	for _, platformRef := range toInstallRefs {
 		platform, tools, err := pm.FindPlatformReleaseDependencies(platformRef)

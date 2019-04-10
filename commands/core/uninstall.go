@@ -33,8 +33,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 	// If no version is specified consider the installed
 	version, err := semver.Parse(req.Version)
 	if err != nil {
-		formatter.PrintError(err, "version not readable")
-		return nil, fmt.Errorf("version not readable", err)
+		return nil, fmt.Errorf("invalid version: %s", err)
 	}
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
@@ -45,13 +44,13 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 		platform := pm.FindPlatform(ref)
 		if platform == nil {
 			formatter.PrintErrorMessage("Platform not found " + ref.String())
-			return nil, fmt.Errorf("Platform not found "+ref.String(), err)
+			return nil, fmt.Errorf("platform not found: %s", ref.String())
 
 		}
 		platformRelease := pm.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
 			formatter.PrintErrorMessage("Platform not installed " + ref.String())
-			return nil, fmt.Errorf("Platform not installed "+ref.String(), err)
+			return nil, fmt.Errorf("platform not installed: %s", ref.String())
 
 		}
 		ref.PlatformVersion = platformRelease.Version
@@ -60,8 +59,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		formatter.PrintError(err, "Could not determine platform dependencies")
-		return nil, fmt.Errorf("Could not determine platform dependencies", err)
-
+		return nil, fmt.Errorf("finding platform dependencies: %s", err)
 	}
 
 	err = uninstallPlatformRelease(pm, platform)

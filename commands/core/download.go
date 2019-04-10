@@ -68,9 +68,8 @@ func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.
 	if err != nil {
 		formatter.PrintError(err, "Error downloading "+platformRelease.String())
 		return err
-	} else {
-		return download(resp, platformRelease.String(), progressCallback)
 	}
+	return download(resp, platformRelease.String(), progressCallback)
 }
 
 func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, progressCallback func(*rpc.DownloadProgress)) error {
@@ -89,9 +88,8 @@ func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.T
 	if err != nil {
 		formatter.PrintError(err, "Error downloading "+toolRelease.String())
 		return err
-	} else {
-		return download(resp, toolRelease.String(), progressCallback)
 	}
+	return download(resp, toolRelease.String(), progressCallback)
 }
 
 // TODO: Refactor this into output.*?
