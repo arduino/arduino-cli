@@ -44,7 +44,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq, progress 
 		PlatformVersion:      version}
 	pm := commands.GetPackageManager(req)
 
-	err := UpgradePlatform(pm, ref, progress)
+	err := upgradePlatform(pm, ref, progress)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq, progress 
 	return &rpc.PlatformUpgradeResp{}, nil
 }
 
-func UpgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference, progress commands.ProgressCB) error {
+func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference, progress commands.ProgressCB) error {
 
 	if platformRef.PlatformVersion != nil {
 		formatter.PrintErrorMessage("Invalid item " + platformRef.String() + ", upgrade doesn't accept parameters with version")
