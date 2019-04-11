@@ -51,7 +51,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	// FIXME: make a specification on how a port is specified via command line
 	port := req.GetPort()
 	if port == "" {
-		return nil, fmt.Errorf("No port provided.")
+		return nil, fmt.Errorf("No port provided")
 	}
 
 	fqbnIn := req.GetFqbn()
@@ -71,27 +71,27 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	// Find target board and board properties
 	_, _, board, boardProperties, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid FQBN: %s", err)
+		return nil, fmt.Errorf("incorrect FQBN: %s", err)
 	}
 
 	// Load programmer tool
 	uploadToolPattern, have := boardProperties.GetOk("upload.tool")
 	if !have || uploadToolPattern == "" {
-		return nil, fmt.Errorf("The board does not define an 'upload.tool' property.")
+		return nil, fmt.Errorf("cannot get programmer tool: undefined 'upload.tool' property")
 	}
 
 	var referencedPlatformRelease *cores.PlatformRelease
 	if split := strings.Split(uploadToolPattern, ":"); len(split) > 2 {
-		return nil, fmt.Errorf("The board defines an invalid 'upload.tool' property: " + uploadToolPattern)
+		return nil, fmt.Errorf("invalid 'upload.tool' property: %s", uploadToolPattern)
 	} else if len(split) == 2 {
 		referencedPackageName := split[0]
 		uploadToolPattern = split[1]
 		architecture := board.PlatformRelease.Platform.Architecture
 
 		if referencedPackage := pm.GetPackages().Packages[referencedPackageName]; referencedPackage == nil {
-			return nil, fmt.Errorf("The board requires platform '" + referencedPackageName + ":" + architecture + "' that is not installed.")
+			return nil, fmt.Errorf("required platform %s:%s not installed", referencedPackageName, architecture)
 		} else if referencedPlatform := referencedPackage.Platforms[architecture]; referencedPlatform == nil {
-			return nil, fmt.Errorf("The board requires platform '" + referencedPackageName + ":" + architecture + "' that is not installed.")
+			return nil, fmt.Errorf("required platform %s:%s not installed", referencedPackageName, architecture)
 		} else {
 			referencedPlatformRelease = pm.GetInstalledPlatformRelease(referencedPlatform)
 		}
@@ -153,7 +153,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	outputTmpFile, ok := uploadProperties.GetOk("recipe.output.tmp_file")
 	outputTmpFile = uploadProperties.ExpandPropsInString(outputTmpFile)
 	if !ok {
-		return nil, fmt.Errorf("The platform does not define the required property 'recipe.output.tmp_file'.")
+		return nil, fmt.Errorf("property 'recipe.output.tmp_file' not defined")
 	}
 	ext := filepath.Ext(outputTmpFile)
 	if strings.HasSuffix(importFile, ext) {
@@ -165,9 +165,9 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	uploadFile := importPath.Join(importFile + ext)
 	if _, err := uploadFile.Stat(); err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("Compiled sketch not found: "+uploadFile.String()+". Please compile first.", err)
+			return nil, fmt.Errorf("compiled sketch %s not found", uploadFile.String())
 		} else {
-			return nil, fmt.Errorf("Could not open compiled sketch.", err)
+			return nil, fmt.Errorf("cannot open sketch: %s", err)
 		}
 	}
 
@@ -175,12 +175,12 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	if uploadProperties.GetBoolean("upload.use_1200bps_touch") {
 		ports, err := serial.GetPortsList()
 		if err != nil {
-			return nil, fmt.Errorf("Can't get serial port list", err)
+			return nil, fmt.Errorf("cannot get serial port list: %s", err)
 		}
 		for _, p := range ports {
 			if p == port {
 				if err := touchSerialPortAt1200bps(p); err != nil {
-					return nil, fmt.Errorf("Can't perform reset via 1200bps-touch on serial port", err)
+					return nil, fmt.Errorf("cannot perform reset: %s", err)
 				}
 				break
 			}
@@ -197,7 +197,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	actualPort := port // default
 	if uploadProperties.GetBoolean("upload.wait_for_upload_port") {
 		if p, err := waitForNewSerialPort(); err != nil {
-			return nil, fmt.Errorf("Could not detect serial ports", err)
+			return nil, fmt.Errorf("cannot detect serial ports: %s", err)
 		} else if p == "" {
 			formatter.Print("No new serial port detected.")
 		} else {
@@ -223,13 +223,13 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	cmdLine := uploadProperties.ExpandPropsInString(recipe)
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid recipe in platform.", err)
+		return nil, fmt.Errorf("invalid recipe '%s': %s", recipe, err)
 	}
 
 	// Run Tool
 	cmd, err := executils.Command(cmdArgs)
 	if err != nil {
-		return nil, fmt.Errorf("Could not execute upload tool.", err)
+		return nil, fmt.Errorf("cannot execute upload tool: %s", err)
 	}
 
 	executils.AttachStdoutListener(cmd, executils.PrintToStdout)
@@ -238,11 +238,11 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	cmd.Stderr = errStream
 
 	if err := cmd.Start(); err != nil {
-		return nil, fmt.Errorf("Could not execute upload tool.", err)
+		return nil, fmt.Errorf("cannot execute upload tool: %s", err)
 	}
 
 	if err := cmd.Wait(); err != nil {
-		return nil, fmt.Errorf("Error during upload.", err)
+		return nil, fmt.Errorf("uploading error: %s", err)
 	}
 	return &rpc.UploadResp{}, nil
 }
@@ -253,12 +253,12 @@ func touchSerialPortAt1200bps(port string) error {
 	// Open port
 	p, err := serial.Open(port, &serial.Mode{BaudRate: 1200})
 	if err != nil {
-		return fmt.Errorf("open port: %s", err)
+		return fmt.Errorf("opening port: %s", err)
 	}
 	defer p.Close()
 
 	if err = p.SetDTR(false); err != nil {
-		return fmt.Errorf("can't set DTR")
+		return fmt.Errorf("cannot set DTR")
 	}
 	return nil
 }
