@@ -19,6 +19,7 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -39,6 +40,10 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, progres
 	}
 
 	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
+	}
+
 	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,

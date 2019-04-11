@@ -19,6 +19,7 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -39,12 +40,15 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 			return nil, fmt.Errorf("invalid version: %s", err)
 		}
 	}
+	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
+	}
+
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
 		PlatformVersion:      version}
-	pm := commands.GetPackageManager(req)
-
 	err := upgradePlatform(pm, ref, progress, taskCB)
 	if err != nil {
 		return nil, err
