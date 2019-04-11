@@ -2,6 +2,7 @@ package compile
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -16,7 +17,6 @@ import (
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -25,6 +25,12 @@ import (
 
 func Compile(ctx context.Context, req *rpc.CompileReq,
 	output io.Writer, taskCB commands.TaskProgressCB) (*rpc.CompileResp, error) {
+
+	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
+	}
+
 	logrus.Info("Executing `arduino compile`")
 	var sketchPath *paths.Path
 	if req.GetSketchPath() != "" {
@@ -46,8 +52,6 @@ func Compile(ctx context.Context, req *rpc.CompileReq,
 	if err != nil {
 		return nil, fmt.Errorf("incorrect FQBN: %s", err)
 	}
-
-	pm, _ := cli.InitPackageAndLibraryManager()
 
 	// Check for ctags tool
 	loadBuiltinCtagsMetadata(pm)

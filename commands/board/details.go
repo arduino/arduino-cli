@@ -19,6 +19,7 @@ package board
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -28,6 +29,10 @@ import (
 
 func BoardDetails(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
 	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
+	}
+
 	fqbn, err := cores.ParseFQBN(req.GetFqbn())
 	if err != nil {
 		return nil, fmt.Errorf("parsing fqbn: %s", err)

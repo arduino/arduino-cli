@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -24,6 +25,10 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 	}
 
 	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
+	}
+
 	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
