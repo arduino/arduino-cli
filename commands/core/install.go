@@ -14,7 +14,7 @@ import (
 )
 
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
-	progress commands.ProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResp, error) {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResp, error) {
 	var version *semver.Version
 	if req.Version != "" {
 		if v, err := semver.Parse(req.Version); err == nil {
@@ -38,7 +38,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 		return nil, fmt.Errorf("finding platform dependencies: %s", err)
 	}
 
-	err = installPlatform(pm, platform, tools, progress, taskCB)
+	err = installPlatform(pm, platform, tools, downloadCB, taskCB)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 
 func installPlatform(pm *packagemanager.PackageManager,
 	platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease,
-	progress commands.ProgressCB, taskCB commands.TaskProgressCB) error {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 	log := pm.Log.WithField("platform", platformRelease)
 
 	// Prerequisite checks before install
@@ -75,9 +75,9 @@ func installPlatform(pm *packagemanager.PackageManager,
 	// Package download
 	taskCB(&rpc.TaskProgress{Name: "Downloading packages"})
 	for _, tool := range toolsToInstall {
-		downloadTool(pm, tool, progress)
+		downloadTool(pm, tool, downloadCB)
 	}
-	downloadPlatform(pm, platformRelease, progress)
+	downloadPlatform(pm, platformRelease, downloadCB)
 	taskCB(&rpc.TaskProgress{Completed: true})
 
 	// Install tools first

@@ -24,7 +24,8 @@ import (
 )
 
 func Compile(ctx context.Context, req *rpc.CompileReq,
-	output io.Writer, taskCB commands.TaskProgressCB, downloadCB commands.ProgressCB) (*rpc.CompileResp, error) {
+	outStream io.Writer,
+	taskCB commands.TaskProgressCB, downloadCB commands.DownloadProgressCB) (*rpc.CompileResp, error) {
 
 	pm := commands.GetPackageManager(req)
 	if pm == nil {
@@ -157,7 +158,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq,
 		builderCtx.BuiltInLibrariesDirs = paths.NewPathList(ideLibrariesPath)
 	}
 
-	builderCtx.SetLogger(i18n.LoggerToIoWriter{Writer: output})
+	builderCtx.SetLogger(i18n.LoggerToIoWriter{Writer: outStream})
 	if req.GetShowProperties() {
 		err = builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
 	} else if req.GetPreprocess() {
