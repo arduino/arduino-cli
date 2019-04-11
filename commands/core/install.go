@@ -12,7 +12,8 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq, progress commands.ProgressCB) (*rpc.PlatformInstallResp, error) {
+func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
+	progress commands.ProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResp, error) {
 	var version *semver.Version
 	if req.Version != "" {
 		if v, err := semver.Parse(req.Version); err == nil {
@@ -21,18 +22,18 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq, progress 
 			return nil, fmt.Errorf("invalid version: %s", err)
 		}
 	}
-	ref := &packagemanager.PlatformReference{
+
+	pm := commands.GetPackageManager(req)
+	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
-		PlatformVersion:      version}
-	pm := commands.GetPackageManager(req)
-	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
+		PlatformVersion:      version,
+	})
 	if err != nil {
-		formatter.PrintError(err, "Could not determine platform dependencies")
-		return nil, fmt.Errorf("Could not determine platform dependencies: %s", err)
+		return nil, fmt.Errorf("finding platform dependencies: %s", err)
 	}
 
-	err = installPlatform(pm, platform, tools, progress)
+	err = installPlatform(pm, platform, tools, progress, taskCB)
 	if err != nil {
 		return nil, err
 	}
@@ -47,33 +48,39 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq, progress 
 
 func installPlatform(pm *packagemanager.PackageManager,
 	platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease,
-	progress commands.ProgressCB) error {
+	progress commands.ProgressCB, taskCB commands.TaskProgressCB) error {
 	log := pm.Log.WithField("platform", platformRelease)
 
 	// Prerequisite checks before install
 	if platformRelease.IsInstalled() {
 		log.Warn("Platform already installed")
-		formatter.Print("Platform " + platformRelease.String() + " already installed")
-		return fmt.Errorf("Platform " + platformRelease.String() + " already installed")
+		taskCB(&rpc.TaskProgress{Name: "Platform " + platformRelease.String() + " already installed", Completed: true})
+		return nil
 	}
 	toolsToInstall := []*cores.ToolRelease{}
 	for _, tool := range requiredTools {
 		if tool.IsInstalled() {
 			log.WithField("tool", tool).Warn("Tool already installed")
-			formatter.Print("Tool " + tool.String() + " already installed")
+			taskCB(&rpc.TaskProgress{Name: "Tool " + tool.String() + " already installed", Completed: true})
 		} else {
 			toolsToInstall = append(toolsToInstall, tool)
 		}
 	}
 
 	// Package download
+	taskCB(&rpc.TaskProgress{Name: "Downloading packages"})
 	for _, tool := range toolsToInstall {
 		downloadTool(pm, tool, progress)
 	}
 	downloadPlatform(pm, platformRelease, progress)
+	taskCB(&rpc.TaskProgress{Completed: true})
 
+	// Install tools first
 	for _, tool := range toolsToInstall {
-		InstallToolRelease(pm, tool)
+		err := InstallToolRelease(pm, tool, taskCB)
+		if err != nil {
+			// TODO: handle error
+		}
 	}
 
 	// Are we installing or upgrading?
@@ -81,17 +88,16 @@ func installPlatform(pm *packagemanager.PackageManager,
 	installed := pm.GetInstalledPlatformRelease(platform)
 	if installed == nil {
 		log.Info("Installing platform")
-		formatter.Print("Installing " + platformRelease.String() + "...")
+		taskCB(&rpc.TaskProgress{Name: "Installing " + platformRelease.String()})
 	} else {
 		log.Info("Updating platform " + installed.String())
-		formatter.Print("Updating " + installed.String() + " with " + platformRelease.String() + "...")
+		taskCB(&rpc.TaskProgress{Name: "Updating " + installed.String() + " with " + platformRelease.String()})
 	}
 
 	// Install
 	err := pm.InstallPlatform(platformRelease)
 	if err != nil {
 		log.WithError(err).Error("Cannot install platform")
-		formatter.PrintError(err, "Cannot install platform")
 		return err
 	}
 
@@ -102,43 +108,44 @@ func installPlatform(pm *packagemanager.PackageManager,
 		// In case of error try to rollback
 		if errUn != nil {
 			log.WithError(errUn).Error("Error updating platform.")
-			formatter.PrintError(errUn, "Error updating platform")
+			taskCB(&rpc.TaskProgress{Message: "Error updating platform: " + err.Error()})
 
 			// Rollback
 			if err := pm.UninstallPlatform(platformRelease); err != nil {
 				log.WithError(err).Error("Error rolling-back changes.")
-				formatter.PrintError(err, "Error rolling-back changes.")
-				return fmt.Errorf("rolling-back changes: %s", err)
+				taskCB(&rpc.TaskProgress{Message: "Error rolling-back changes: " + err.Error()})
+				//return fmt.Errorf("rolling-back changes: %s", err)
 			}
+
 			return fmt.Errorf("updating platform: %s", errUn)
 		}
 	}
 
 	log.Info("Platform installed")
-	formatter.Print(platformRelease.String() + " installed")
+	taskCB(&rpc.TaskProgress{Message: platformRelease.String() + " installed", Completed: true})
 	return nil
 }
 
 // InstallToolRelease installs a ToolRelease
-func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) error {
+func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, taskCB commands.TaskProgressCB) error {
 	log := pm.Log.WithField("Tool", toolRelease)
 
 	if toolRelease.IsInstalled() {
 		log.Warn("Tool already installed")
-		formatter.Print("Tool " + toolRelease.String() + " already installed")
-		return fmt.Errorf("Tool " + toolRelease.String() + " already installed")
+		taskCB(&rpc.TaskProgress{Name: "Tool " + toolRelease.String() + " already installed", Completed: true})
+		return nil
 	}
 
 	log.Info("Installing tool")
-	formatter.Print("Installing " + toolRelease.String() + "...")
+	taskCB(&rpc.TaskProgress{Name: "Installing " + toolRelease.String()})
 	err := pm.InstallTool(toolRelease)
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
 		formatter.PrintError(err, "Cannot install tool: "+toolRelease.String())
 		return fmt.Errorf("Cannot install tool: "+toolRelease.String(), err)
 	}
-
 	log.Info("Tool installed")
-	formatter.Print(toolRelease.String() + " installed")
+	taskCB(&rpc.TaskProgress{Message: toolRelease.String() + " installed", Completed: true})
+
 	return nil
 }
