@@ -24,4 +24,5 @@ message CompileReq {
 
 message CompileResp {
   bytes output = 1;
+  TaskProgress task_progress = 2;
 }

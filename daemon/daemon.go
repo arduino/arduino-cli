@@ -68,7 +68,7 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoC
 		}
 	}()
 	resp, err := compile.Compile(stream.Context(), req, w, func(taskProgress *rpc.TaskProgress) {
-		// TODO
+		stream.Send(&rpc.CompileResp{TaskProgress: taskProgress})
 	})
 	stream.Send(resp)
 	return err
@@ -78,7 +78,7 @@ func (s *ArduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallReq, str
 	resp, err := core.PlatformInstall(stream.Context(), req, func(progress *rpc.DownloadProgress) {
 		stream.Send(&rpc.PlatformInstallResp{Progress: progress})
 	}, func(taskProgress *rpc.TaskProgress) {
-		// TODO
+		stream.Send(&rpc.PlatformInstallResp{TaskProgress: taskProgress})
 	})
 	if err != nil {
 		return err
@@ -104,7 +104,7 @@ func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeReq, str
 	resp, err := core.PlatformUpgrade(stream.Context(), req, func(progress *rpc.DownloadProgress) {
 		stream.Send(&rpc.PlatformUpgradeResp{Progress: progress})
 	}, func(taskProgress *rpc.TaskProgress) {
-		// TODO
+		stream.Send(&rpc.PlatformUpgradeResp{TaskProgress: taskProgress})
 	})
 	if err != nil {
 		return err

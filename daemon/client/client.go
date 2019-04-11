@@ -55,7 +55,12 @@ func main() {
 				fmt.Printf("Install error: %s\n", err)
 				return
 			}
-			fmt.Printf("%s\n", installResp.GetProgress())
+			if installResp.GetProgress() != nil {
+				fmt.Printf(">> DOWNLOAD: %s\n", installResp.GetProgress())
+			}
+			if installResp.GetTaskProgress() != nil {
+				fmt.Printf(">> TASK: %s\n", installResp.GetTaskProgress())
+			}
 		}
 		fmt.Println("Installation completed!")
 	}
@@ -81,7 +86,12 @@ func main() {
 			fmt.Printf("Upgrade error: %s\n", err)
 			os.Exit(1)
 		}
-		fmt.Printf("%s\n", upgradeResp.GetProgress())
+		if upgradeResp.GetProgress() != nil {
+			fmt.Printf(">> DOWNLOAD: %s\n", upgradeResp.GetProgress())
+		}
+		if upgradeResp.GetTaskProgress() != nil {
+			fmt.Printf(">> TASK: %s\n", upgradeResp.GetTaskProgress())
+		}
 	}
 	fmt.Println("Upgrade completed!")
 
@@ -114,25 +124,13 @@ func main() {
 			fmt.Printf("Compile error: %s\n", err)
 			os.Exit(1)
 		}
-		fmt.Printf("%s", compResp.GetOutput())
+		if compResp.GetOutput() != nil {
+			fmt.Printf("%s", compResp.GetOutput())
+		}
+		if compResp.GetTaskProgress() != nil {
+			fmt.Printf(">> TASK: %s\n", compResp.GetTaskProgress())
+		}
 	}
-	/*
-		compile, err := client.Compile(context.Background(), &pb.CompileReq{})
-		if err != nil {
-			log.Fatal(err)
-		}
-		for {
-			resp, err := compile.Recv()
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				fmt.Printf("%+v\n", err)
-				log.Fatal(err)
-			}
-			fmt.Println(resp)
-		}
-	*/
 
 	_, err = client.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
 		Instance:        instance,
