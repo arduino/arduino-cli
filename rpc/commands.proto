@@ -8,6 +8,7 @@ import "common.proto";
 import "board.proto";
 import "compile.proto";
 import "core.proto";
+import "upload.proto";
 
 // The main Arduino Platform Service
 service ArduinoCore {
@@ -38,6 +39,8 @@ service ArduinoCore {
   rpc PlatformUninstall(PlatformUninstallReq) returns (PlatformUninstallResp);
 
   rpc PlatformUpgrade(PlatformUpgradeReq) returns (stream PlatformUpgradeResp);
+
+  rpc Upload(UploadReq) returns (stream UploadResp);
 }
 
 // Configuration contains information to instantiate an Arduino Platform Service
