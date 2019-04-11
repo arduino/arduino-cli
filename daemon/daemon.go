@@ -57,32 +57,22 @@ func (s *ArduinoCoreServerImpl) Init(ctx context.Context, req *rpc.InitReq) (*rp
 }
 
 func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoCore_CompileServer) error {
-	r, w := io.Pipe()
-	go func() {
-		data := make([]byte, 1024)
-		for {
-			if n, err := r.Read(data); err != nil {
-				return
-			} else {
-				stream.Send(&rpc.CompileResp{Output: data[:n]})
-			}
-		}
-	}()
-	resp, err := compile.Compile(stream.Context(), req, w, func(taskProgress *rpc.TaskProgress) {
-		stream.Send(&rpc.CompileResp{TaskProgress: taskProgress})
-	}, func(downloadProgress *rpc.DownloadProgress) {
-		stream.Send(&rpc.CompileResp{DownloadProgress: downloadProgress})
-	})
+	resp, err := compile.Compile(
+		stream.Context(), req,
+		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{Output: data}) }),
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.CompileResp{TaskProgress: p}) },
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.CompileResp{DownloadProgress: p}) },
+	)
 	stream.Send(resp)
 	return err
 }
 
 func (s *ArduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallReq, stream rpc.ArduinoCore_PlatformInstallServer) error {
-	resp, err := core.PlatformInstall(stream.Context(), req, func(progress *rpc.DownloadProgress) {
-		stream.Send(&rpc.PlatformInstallResp{Progress: progress})
-	}, func(taskProgress *rpc.TaskProgress) {
-		stream.Send(&rpc.PlatformInstallResp{TaskProgress: taskProgress})
-	})
+	resp, err := core.PlatformInstall(
+		stream.Context(), req,
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.PlatformInstallResp{Progress: p}) },
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.PlatformInstallResp{TaskProgress: p}) },
+	)
 	if err != nil {
 		return err
 	}
@@ -90,9 +80,10 @@ func (s *ArduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallReq, str
 }
 
 func (s *ArduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReq, stream rpc.ArduinoCore_PlatformDownloadServer) error {
-	resp, err := core.PlatformDownload(stream.Context(), req, func(progress *rpc.DownloadProgress) {
-		stream.Send(&rpc.PlatformDownloadResp{Progress: progress})
-	})
+	resp, err := core.PlatformDownload(
+		stream.Context(), req,
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.PlatformDownloadResp{Progress: p}) },
+	)
 	if err != nil {
 		return err
 	}
@@ -100,9 +91,10 @@ func (s *ArduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReq, s
 }
 
 func (s *ArduinoCoreServerImpl) PlatformUninstall(req *rpc.PlatformUninstallReq, stream rpc.ArduinoCore_PlatformUninstallServer) error {
-	resp, err := core.PlatformUninstall(stream.Context(), req, func(taskProgress *rpc.TaskProgress) {
-		stream.Send(&rpc.PlatformUninstallResp{TaskProgress: taskProgress})
-	})
+	resp, err := core.PlatformUninstall(
+		stream.Context(), req,
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.PlatformUninstallResp{TaskProgress: p}) },
+	)
 	if err != nil {
 		return err
 	}
@@ -110,11 +102,11 @@ func (s *ArduinoCoreServerImpl) PlatformUninstall(req *rpc.PlatformUninstallReq,
 }
 
 func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeReq, stream rpc.ArduinoCore_PlatformUpgradeServer) error {
-	resp, err := core.PlatformUpgrade(stream.Context(), req, func(progress *rpc.DownloadProgress) {
-		stream.Send(&rpc.PlatformUpgradeResp{Progress: progress})
-	}, func(taskProgress *rpc.TaskProgress) {
-		stream.Send(&rpc.PlatformUpgradeResp{TaskProgress: taskProgress})
-	})
+	resp, err := core.PlatformUpgrade(
+		stream.Context(), req,
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.PlatformUpgradeResp{Progress: p}) },
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.PlatformUpgradeResp{TaskProgress: p}) },
+	)
 	if err != nil {
 		return err
 	}
@@ -122,26 +114,28 @@ func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeReq, str
 }
 
 func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadReq, stream rpc.ArduinoCore_UploadServer) error {
-	r, w := io.Pipe()
-	r2, w2 := io.Pipe()
-
-	feedStream(r, func(data []byte) { stream.Send(&rpc.UploadResp{OutStream: data}) })
-	feedStream(r2, func(data []byte) { stream.Send(&rpc.UploadResp{ErrStream: data}) })
-
-	resp, err := upload.Upload(stream.Context(), req, w, w2)
-	stream.Send(resp)
-	return err
+	resp, err := upload.Upload(
+		stream.Context(), req,
+		feedStream(func(data []byte) { stream.Send(&rpc.UploadResp{OutStream: data}) }),
+		feedStream(func(data []byte) { stream.Send(&rpc.UploadResp{ErrStream: data}) }),
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
 }
 
-func feedStream(out io.Reader, streamer func(data []byte)) {
+func feedStream(streamer func(data []byte)) io.Writer {
+	r, w := io.Pipe()
 	go func() {
 		data := make([]byte, 1024)
 		for {
-			if n, err := out.Read(data); err != nil {
+			if n, err := r.Read(data); err != nil {
 				return
 			} else {
 				streamer(data[:n])
 			}
 		}
 	}()
+	return w
 }
