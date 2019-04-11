@@ -127,6 +127,9 @@ func main() {
 		if compResp.GetOutput() != nil {
 			fmt.Printf("%s", compResp.GetOutput())
 		}
+		if compResp.GetDownloadProgress() != nil {
+			fmt.Printf(">> DOWNLOAD: %s\n", compResp.GetDownloadProgress())
+		}
 		if compResp.GetTaskProgress() != nil {
 			fmt.Printf(">> TASK: %s\n", compResp.GetTaskProgress())
 		}

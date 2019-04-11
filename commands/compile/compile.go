@@ -24,7 +24,7 @@ import (
 )
 
 func Compile(ctx context.Context, req *rpc.CompileReq,
-	output io.Writer, taskCB commands.TaskProgressCB) (*rpc.CompileResp, error) {
+	output io.Writer, taskCB commands.TaskProgressCB, downloadCB commands.ProgressCB) (*rpc.CompileResp, error) {
 
 	pm := commands.GetPackageManager(req)
 	if pm == nil {
@@ -58,9 +58,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq,
 	ctags, _ := getBuiltinCtagsTool(pm)
 	if !ctags.IsInstalled() {
 		taskCB(&rpc.TaskProgress{Name: "Downloading missing tool " + ctags.String()})
-		core.DownloadToolRelease(pm, ctags, func(curr *rpc.DownloadProgress) {
-			fmt.Printf(">> %+v\n", curr)
-		})
+		core.DownloadToolRelease(pm, ctags, downloadCB)
 		taskCB(&rpc.TaskProgress{Completed: true})
 		core.InstallToolRelease(pm, ctags, taskCB)
 

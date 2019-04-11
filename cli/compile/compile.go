@@ -111,7 +111,7 @@ func run(cmd *cobra.Command, args []string) {
 		Quiet:           flags.quiet,
 		VidPid:          flags.vidPid,
 		ExportFile:      flags.exportFile,
-	}, os.Stdout, output.NewTaskProgressCB())
+	}, os.Stdout, output.NewTaskProgressCB(), output.DownloadProgressBar())
 	if err == nil {
 		outputCompileResp(compRes)
 	} else {
