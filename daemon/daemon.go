@@ -70,6 +70,8 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoC
 	}()
 	resp, err := compile.Compile(stream.Context(), req, w, func(taskProgress *rpc.TaskProgress) {
 		stream.Send(&rpc.CompileResp{TaskProgress: taskProgress})
+	}, func(downloadProgress *rpc.DownloadProgress) {
+		stream.Send(&rpc.CompileResp{DownloadProgress: downloadProgress})
 	})
 	stream.Send(resp)
 	return err

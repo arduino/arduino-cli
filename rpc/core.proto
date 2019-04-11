@@ -41,14 +41,6 @@ message PlatformUninstallResp {
 	TaskProgress task_progress = 1;
 }
 
-message DownloadProgress {
-	string url = 1;
-	string file = 2;
-	int64 total_size = 3;
-	int64 downloaded = 4;
-	bool completed = 5;
-}
-
 message PlatformUpgradeReq {
     Instance instance =1;
 	string platform_package  = 2;
