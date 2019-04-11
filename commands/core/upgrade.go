@@ -24,7 +24,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -65,26 +64,22 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference,
 	progress commands.ProgressCB, taskCB commands.TaskProgressCB) error {
 	if platformRef.PlatformVersion != nil {
-		formatter.PrintErrorMessage("Invalid item " + platformRef.String() + ", upgrade doesn't accept parameters with version")
-		return fmt.Errorf("Invalid item " + platformRef.String() + ", upgrade doesn't accept parameters with version")
+		return fmt.Errorf("upgrade doesn't accept parameters with version")
 	}
 
 	// Search the latest version for all specified platforms
 	toInstallRefs := []*packagemanager.PlatformReference{}
 	platform := pm.FindPlatform(platformRef)
 	if platform == nil {
-		formatter.PrintErrorMessage("Platform " + platformRef.String() + " not found")
-		return fmt.Errorf("Platform " + platformRef.String() + " not found")
+		return fmt.Errorf("platform %s not found", platformRef)
 	}
 	installed := pm.GetInstalledPlatformRelease(platform)
 	if installed == nil {
-		formatter.PrintErrorMessage("Platform " + platformRef.String() + " is not installed")
-		return fmt.Errorf("Platform " + platformRef.String() + " is not installed")
+		return fmt.Errorf("platform %s is not installed", platformRef)
 	}
 	latest := platform.GetLatestRelease()
 	if !latest.Version.GreaterThan(installed.Version) {
-		formatter.PrintResult("Platform " + platformRef.String() + " is already at the latest version.")
-		return fmt.Errorf("Platform " + platformRef.String() + " is already at the latest version.")
+		return fmt.Errorf("platform %s is already at the latest version", platformRef)
 	}
 	platformRef.PlatformVersion = latest.Version
 	toInstallRefs = append(toInstallRefs, platformRef)
@@ -92,7 +87,7 @@ func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 	for _, platformRef := range toInstallRefs {
 		platform, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
 		if err != nil {
-			return fmt.Errorf("Platform " + platformRef.String() + " is not installed")
+			return fmt.Errorf("platform %s is not installed", platformRef)
 		}
 		err = installPlatform(pm, platform, tools, progress, taskCB)
 		if err != nil {

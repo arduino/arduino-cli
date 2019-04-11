@@ -38,7 +38,7 @@ message PlatformUninstallReq {
 }
 
 message PlatformUninstallResp {
-
+	TaskProgress task_progress = 1;
 }
 
 message DownloadProgress {

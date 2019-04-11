@@ -36,7 +36,7 @@ service ArduinoCore {
 
   rpc PlatformDownload(PlatformDownloadReq) returns (stream PlatformDownloadResp);
 
-  rpc PlatformUninstall(PlatformUninstallReq) returns (PlatformUninstallResp);
+  rpc PlatformUninstall(PlatformUninstallReq) returns (stream PlatformUninstallResp);
 
   rpc PlatformUpgrade(PlatformUpgradeReq) returns (stream PlatformUpgradeResp);
 

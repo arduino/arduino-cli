@@ -53,7 +53,7 @@ func main() {
 			}
 			if err != nil {
 				fmt.Printf("Install error: %s\n", err)
-				return
+				os.Exit(1)
 			}
 			if installResp.GetProgress() != nil {
 				fmt.Printf(">> DOWNLOAD: %s\n", installResp.GetProgress())
@@ -131,6 +131,7 @@ func main() {
 			fmt.Printf(">> TASK: %s\n", compResp.GetTaskProgress())
 		}
 	}
+
 	uplRespStream, err := client.Upload(context.Background(), &rpc.UploadReq{
 		Instance:   instance,
 		Fqbn:       "arduino:samd:mkr1000",
@@ -159,7 +160,8 @@ func main() {
 			fmt.Printf("error %s", resperr)
 		}
 	}
-	_, err = client.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
+
+	uninstallRespStream, err := client.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
 		Instance:        instance,
 		PlatformPackage: "arduino",
 		Architecture:    "samd",
@@ -167,7 +169,20 @@ func main() {
 	})
 	if err != nil {
 		fmt.Printf("uninstall error: %s\n", err)
-		// os.Exit(1)
+		os.Exit(1)
+	}
+	for {
+		uninstallResp, err := uninstallRespStream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Printf("uninstall error: %s\n", err)
+			os.Exit(1)
+		}
+		if uninstallResp.GetTaskProgress() != nil {
+			fmt.Printf(">> TASK: %s\n", uninstallResp.GetTaskProgress())
+		}
 	}
 
 	_, err = client.Destroy(context.Background(), &rpc.DestroyReq{
