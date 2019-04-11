@@ -156,7 +156,6 @@ func main() {
 			os.Exit(1)
 		}
 		if resp := uplResp.GetOutStream(); resp != nil {
-
 			fmt.Printf("output %s", resp)
 		}
 		if resperr := uplResp.GetErrStream(); resperr != nil {

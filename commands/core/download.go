@@ -31,7 +31,7 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, progress commands.ProgressCB) (*rpc.PlatformDownloadResp, error) {
+func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloadCB commands.DownloadProgressCB) (*rpc.PlatformDownloadResp, error) {
 	var version *semver.Version
 	if v, err := semver.Parse(req.Version); err == nil {
 		version = v
@@ -53,13 +53,13 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, progres
 		return nil, fmt.Errorf("find platform dependencies: %s", err)
 	}
 
-	err = downloadPlatform(pm, platform, progress)
+	err = downloadPlatform(pm, platform, downloadCB)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, tool := range tools {
-		err := downloadTool(pm, tool, progress)
+		err := downloadTool(pm, tool, downloadCB)
 		if err != nil {
 			return nil, fmt.Errorf("downloading tool %s: %s", tool, err)
 		}
@@ -68,53 +68,53 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, progres
 	return &rpc.PlatformDownloadResp{}, nil
 }
 
-func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, progress commands.ProgressCB) error {
+func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, downloadCB commands.DownloadProgressCB) error {
 	// Download platform
 	resp, err := pm.DownloadPlatformRelease(platformRelease)
 	if err != nil {
 		return err
 	}
-	return download(resp, platformRelease.String(), progress)
+	return download(resp, platformRelease.String(), downloadCB)
 }
 
-func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, progress commands.ProgressCB) error {
+func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB commands.DownloadProgressCB) error {
 	// Check if tool has a flavor available for the current OS
 	if tool.GetCompatibleFlavour() == nil {
 		return fmt.Errorf("tool %s not available for the current OS", tool)
 	}
 
-	return DownloadToolRelease(pm, tool, progress)
+	return DownloadToolRelease(pm, tool, downloadCB)
 }
 
 // DownloadToolRelease downloads a ToolRelease
-func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, progress commands.ProgressCB) error {
+func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, downloadCB commands.DownloadProgressCB) error {
 	resp, err := pm.DownloadToolRelease(toolRelease)
 	if err != nil {
 		return err
 	}
-	return download(resp, toolRelease.String(), progress)
+	return download(resp, toolRelease.String(), downloadCB)
 }
 
-func download(d *downloader.Downloader, label string, progress commands.ProgressCB) error {
+func download(d *downloader.Downloader, label string, downloadCB commands.DownloadProgressCB) error {
 	if d == nil {
 		// This signal means that the file is already downloaded
-		progress(&rpc.DownloadProgress{
+		downloadCB(&rpc.DownloadProgress{
 			File:      label,
 			Completed: true,
 		})
 		return nil
 	}
-	progress(&rpc.DownloadProgress{
+	downloadCB(&rpc.DownloadProgress{
 		File:      label,
 		Url:       d.URL,
 		TotalSize: d.Size(),
 	})
 	d.RunAndPoll(func(downloaded int64) {
-		progress(&rpc.DownloadProgress{Downloaded: downloaded})
+		downloadCB(&rpc.DownloadProgress{Downloaded: downloaded})
 	}, 250*time.Millisecond)
 	if d.Error() != nil {
 		return d.Error()
 	}
-	progress(&rpc.DownloadProgress{Completed: true})
+	downloadCB(&rpc.DownloadProgress{Completed: true})
 	return nil
 }

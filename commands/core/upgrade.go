@@ -29,7 +29,7 @@ import (
 )
 
 func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
-	progress commands.ProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformUpgradeResp, error) {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformUpgradeResp, error) {
 	// Extract all PlatformReference to platforms that have updates
 	var version *semver.Version
 	if req.Version != "" {
@@ -48,7 +48,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
 		PlatformVersion:      version}
-	err := upgradePlatform(pm, ref, progress, taskCB)
+	err := upgradePlatform(pm, ref, downloadCB, taskCB)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 }
 
 func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference,
-	progress commands.ProgressCB, taskCB commands.TaskProgressCB) error {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 	if platformRef.PlatformVersion != nil {
 		return fmt.Errorf("upgrade doesn't accept parameters with version")
 	}
@@ -89,7 +89,7 @@ func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 		if err != nil {
 			return fmt.Errorf("platform %s is not installed", platformRef)
 		}
-		err = installPlatform(pm, platform, tools, progress, taskCB)
+		err = installPlatform(pm, platform, tools, downloadCB, taskCB)
 		if err != nil {
 			return err
 		}
