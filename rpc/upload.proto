@@ -9,14 +9,14 @@ import "common.proto";
 message UploadReq {
     Instance instance = 1;
     string fqbn = 2;
-    string sketchPath = 3;
+    string sketch_path = 3;
 	string port = 4;
 	bool verbose = 5;
 	bool verify = 6;
-	string importFile = 7;
+	string import_file = 7;
 }
 
 message UploadResp {
-	bytes outStream = 1;
-	bytes errStream = 2;
+	bytes out_stream = 1;
+	bytes err_stream = 2;
 }
