@@ -15,6 +15,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
@@ -110,4 +111,29 @@ func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeReq, str
 		return err
 	}
 	return stream.Send(resp)
+}
+
+func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadReq, stream rpc.ArduinoCore_UploadServer) error {
+	r, w := io.Pipe()
+	r2, w2 := io.Pipe()
+
+	feedStream(r, func(data []byte) { stream.Send(&rpc.UploadResp{OutStream: data}) })
+	feedStream(r2, func(data []byte) { stream.Send(&rpc.UploadResp{ErrStream: data}) })
+
+	resp, err := upload.Upload(stream.Context(), req, w, w2)
+	stream.Send(resp)
+	return err
+}
+
+func feedStream(out io.Reader, streamer func(data []byte)) {
+	go func() {
+		data := make([]byte, 1024)
+		for {
+			if n, err := out.Read(data); err != nil {
+				return
+			} else {
+				streamer(data[:n])
+			}
+		}
+	}()
 }

@@ -131,7 +131,34 @@ func main() {
 			fmt.Printf(">> TASK: %s\n", compResp.GetTaskProgress())
 		}
 	}
+	uplRespStream, err := client.Upload(context.Background(), &rpc.UploadReq{
+		Instance:   instance,
+		Fqbn:       "arduino:samd:mkr1000",
+		SketchPath: os.Args[2],
+		Port:       "/dev/ttyACM0",
+		Verbose:    true,
+	})
+	if err != nil {
+		fmt.Printf("Upload error: %s\n", err)
+		os.Exit(1)
+	}
+	for {
+		uplResp, err := uplRespStream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Printf("Upload error: %s\n", err)
+			os.Exit(1)
+		}
+		if resp := uplResp.GetOutStream(); resp != nil {
 
+			fmt.Printf("output %s", resp)
+		}
+		if resperr := uplResp.GetErrStream(); resperr != nil {
+			fmt.Printf("error %s", resperr)
+		}
+	}
 	_, err = client.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
 		Instance:        instance,
 		PlatformPackage: "arduino",
