@@ -54,6 +54,6 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.PlatformArchitecture,
 			Version:         platformRef.PlatformVersion.String(),
-		}, output.DownloadProgressBar())
+		}, output.DownloadProgressBar(), output.NewTaskProgressCB())
 	}
 }

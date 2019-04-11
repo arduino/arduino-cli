@@ -14,6 +14,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
@@ -22,7 +23,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Compile(ctx context.Context, req *rpc.CompileReq, output io.Writer) (*rpc.CompileResp, error) {
+func Compile(ctx context.Context, req *rpc.CompileReq,
+	output io.Writer, taskCB commands.TaskProgressCB) (*rpc.CompileResp, error) {
 	logrus.Info("Executing `arduino compile`")
 	var sketchPath *paths.Path
 	if req.GetSketchPath() != "" {
@@ -55,7 +57,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, output io.Writer) (*rpc.C
 		core.DownloadToolRelease(pm, ctags, func(curr *rpc.DownloadProgress) {
 			fmt.Printf(">> %+v\n", curr)
 		})
-		core.InstallToolRelease(pm, ctags)
+		core.InstallToolRelease(pm, ctags, taskCB)
 
 		if err := pm.LoadHardware(cli.Config); err != nil {
 			return nil, fmt.Errorf("loading hardware packages: %s", err)

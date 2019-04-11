@@ -55,7 +55,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.PlatformArchitecture,
 			Version:         platformRef.PlatformVersion.String(),
-		}, output.DownloadProgressBar())
+		}, output.DownloadProgressBar(), output.NewTaskProgressCB())
 		// if err != nil {
 		// 	formatter.PrintError(err, "Error during build")
 		// 	os.Exit(cli.ErrGeneric)
