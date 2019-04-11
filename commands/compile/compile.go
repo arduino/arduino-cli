@@ -46,7 +46,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq,
 		fqbnIn = sketch.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
-		return nil, fmt.Errorf("No Fully Qualified Board Name provided")
+		return nil, fmt.Errorf("no FQBN provided")
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
@@ -81,7 +81,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq,
 		// 	"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
 		// 		cli.AppName+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
 		// formatter.PrintErrorMessage(errorMessage)
-		return nil, fmt.Errorf("Platform not installed")
+		return nil, fmt.Errorf("platform not installed")
 	}
 
 	builderCtx := &types.Context{}
