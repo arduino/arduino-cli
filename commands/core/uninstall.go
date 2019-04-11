@@ -25,12 +25,11 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
 	semver "go.bug.st/relaxed-semver"
 )
 
-func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc.PlatformUninstallResp, error) {
+func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq, taskCB commands.TaskProgressCB) (*rpc.PlatformUninstallResp, error) {
 	// If no version is specified consider the installed
 	version, err := semver.Parse(req.Version)
 	if err != nil {
@@ -47,14 +46,12 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 	if ref.PlatformVersion == nil {
 		platform := pm.FindPlatform(ref)
 		if platform == nil {
-			formatter.PrintErrorMessage("Platform not found " + ref.String())
-			return nil, fmt.Errorf("platform not found: %s", ref.String())
+			return nil, fmt.Errorf("platform not found: %s", ref)
 
 		}
 		platformRelease := pm.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
-			formatter.PrintErrorMessage("Platform not installed " + ref.String())
-			return nil, fmt.Errorf("platform not installed: %s", ref.String())
+			return nil, fmt.Errorf("platform not installed: %s", ref)
 
 		}
 		ref.PlatformVersion = platformRelease.Version
@@ -62,20 +59,17 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		formatter.PrintError(err, "Could not determine platform dependencies")
 		return nil, fmt.Errorf("finding platform dependencies: %s", err)
 	}
 
-	err = uninstallPlatformRelease(pm, platform)
+	err = uninstallPlatformRelease(pm, platform, taskCB)
 	if err != nil {
-		formatter.PrintError(err, "Error uninstalling "+platform.String())
 		return nil, err
 	}
 
 	for _, tool := range tools {
 		if !pm.IsToolRequired(tool) {
-			fmt.Printf("Tool %s is no more required\n", tool)
-			uninstallToolRelease(pm, tool)
+			uninstallToolReleasse(pm, tool, taskCB)
 		}
 	}
 
@@ -86,36 +80,34 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc
 	return &rpc.PlatformUninstallResp{}, nil
 }
 
-func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) error {
+func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, taskCB commands.TaskProgressCB) error {
 	log := pm.Log.WithField("platform", platformRelease)
 
 	log.Info("Uninstalling platform")
-	formatter.Print("Uninstalling " + platformRelease.String() + "...")
+	taskCB(&rpc.TaskProgress{Name: "Uninstalling " + platformRelease.String()})
 
 	if err := pm.UninstallPlatform(platformRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
-		formatter.PrintError(err, "Error uninstalling "+platformRelease.String())
-		return fmt.Errorf("Error uninstalling "+platformRelease.String(), err)
+		return err
 	}
 
 	log.Info("Platform uninstalled")
-	formatter.Print(platformRelease.String() + " uninstalled")
+	taskCB(&rpc.TaskProgress{Message: platformRelease.String() + " uninstalled", Completed: true})
 	return nil
 }
 
-func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) error {
+func uninstallToolReleasse(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, taskCB commands.TaskProgressCB) error {
 	log := pm.Log.WithField("Tool", toolRelease)
 
 	log.Info("Uninstalling tool")
-	formatter.Print("Uninstalling " + toolRelease.String() + "...")
+	taskCB(&rpc.TaskProgress{Name: "Uninstalling " + toolRelease.String() + ", tool is no more required"})
 
 	if err := pm.UninstallTool(toolRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
-		formatter.PrintError(err, "Error uninstalling "+toolRelease.String())
-		return fmt.Errorf("Error uninstalling "+toolRelease.String(), err)
+		return err
 	}
 
 	log.Info("Tool uninstalled")
-	formatter.Print(toolRelease.String() + " uninstalled")
+	taskCB(&rpc.TaskProgress{Message: toolRelease.String() + " uninstalled", Completed: true})
 	return nil
 }

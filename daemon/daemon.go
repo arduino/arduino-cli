@@ -97,8 +97,14 @@ func (s *ArduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReq, s
 	return stream.Send(resp)
 }
 
-func (s *ArduinoCoreServerImpl) PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq) (*rpc.PlatformUninstallResp, error) {
-	return core.PlatformUninstall(ctx, req)
+func (s *ArduinoCoreServerImpl) PlatformUninstall(req *rpc.PlatformUninstallReq, stream rpc.ArduinoCore_PlatformUninstallServer) error {
+	resp, err := core.PlatformUninstall(stream.Context(), req, func(taskProgress *rpc.TaskProgress) {
+		stream.Send(&rpc.PlatformUninstallResp{TaskProgress: taskProgress})
+	})
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
 }
 
 func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeReq, stream rpc.ArduinoCore_PlatformUpgradeServer) error {
