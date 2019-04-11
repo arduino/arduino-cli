@@ -57,10 +57,11 @@ func Compile(ctx context.Context, req *rpc.CompileReq,
 	loadBuiltinCtagsMetadata(pm)
 	ctags, _ := getBuiltinCtagsTool(pm)
 	if !ctags.IsInstalled() {
-		formatter.Print("Downloading and installing missing tool: " + ctags.String())
+		taskCB(&rpc.TaskProgress{Name: "Downloading missing tool " + ctags.String()})
 		core.DownloadToolRelease(pm, ctags, func(curr *rpc.DownloadProgress) {
 			fmt.Printf(">> %+v\n", curr)
 		})
+		taskCB(&rpc.TaskProgress{Completed: true})
 		core.InstallToolRelease(pm, ctags, taskCB)
 
 		if err := pm.LoadHardware(cli.Config); err != nil {
@@ -68,8 +69,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq,
 		}
 		ctags, _ = getBuiltinCtagsTool(pm)
 		if !ctags.IsInstalled() {
-			formatter.PrintErrorMessage("Missing ctags tool.")
-			return nil, fmt.Errorf("Missing ctags tool")
+			return nil, fmt.Errorf("missing ctags tool")
 		}
 	}
 
@@ -78,10 +78,11 @@ func Compile(ctx context.Context, req *rpc.CompileReq,
 		PlatformArchitecture: fqbn.PlatformArch,
 	})
 	if targetPlatform == nil || pm.GetInstalledPlatformRelease(targetPlatform) == nil {
-		errorMessage := fmt.Sprintf(
-			"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
-				cli.AppName+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
-		formatter.PrintErrorMessage(errorMessage)
+		// TODO: Move this error message in `cli` module
+		// errorMessage := fmt.Sprintf(
+		// 	"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
+		// 		cli.AppName+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
+		// formatter.PrintErrorMessage(errorMessage)
 		return nil, fmt.Errorf("Platform not installed")
 	}
 
@@ -206,7 +207,6 @@ func Compile(ctx context.Context, req *rpc.CompileReq,
 	dstElf := exportPath.Join(exportFile + ".elf")
 	logrus.WithField("from", srcElf).WithField("to", dstElf).Print("copying sketch build output")
 	if err = srcElf.CopyTo(dstElf); err != nil {
-		formatter.PrintError(err, "Error copying elf file.")
 		return nil, fmt.Errorf("copying elf file: %s", err)
 	}
 
