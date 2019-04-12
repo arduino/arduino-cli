@@ -18,11 +18,12 @@
 package core
 
 import (
-	"os"
+	"context"
 
-	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/output"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
 )
 
@@ -39,11 +40,9 @@ func initUpdateIndexCommand() *cobra.Command {
 }
 
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
-	for _, URL := range cli.Config.BoardManagerAdditionalUrls {
-		err := packageindex.UpdateIndex(URL, cli.Config.IndexesDir())
-		if err != nil {
-			formatter.PrintError(err, "Error creating temp file for download")
-			os.Exit(cli.ErrGeneric)
-		}
-	}
+	instance := cli.CreateInstance()
+	commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
+		Instance: instance,
+	}, output.DownloadProgressBar())
+
 }

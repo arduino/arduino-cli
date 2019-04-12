@@ -20,16 +20,10 @@ package packageindex
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/url"
-	"path"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/resources"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
-	"go.bug.st/downloader"
 	"go.bug.st/relaxed-semver"
 )
 
@@ -220,43 +214,4 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	}
 
 	return &index, nil
-}
-
-// TODO: This should be in packagemanager......
-func UpdateIndex(URL *url.URL, clipath *paths.Path) error {
-	logrus.WithField("url", URL).Print("Updating index")
-
-	tmpFile, err := ioutil.TempFile("", "")
-	if err != nil {
-		return fmt.Errorf("Error creating temp file for download", err)
-
-	}
-	if err := tmpFile.Close(); err != nil {
-		return fmt.Errorf("Error creating temp file for download", err)
-	}
-	tmp := paths.New(tmpFile.Name())
-	defer tmp.Remove()
-
-	d, err := downloader.Download(tmp.String(), URL.String())
-	if err != nil {
-		return fmt.Errorf("Error downloading index "+URL.String(), err)
-	}
-	coreIndexPath := clipath.Join(path.Base(URL.Path))
-	formatter.DownloadProgressBar(d, "Updating index: "+coreIndexPath.Base())
-	if d.Error() != nil {
-		return fmt.Errorf("Error downloading index "+URL.String(), d.Error())
-	}
-
-	if _, err := LoadIndex(tmp); err != nil {
-		return fmt.Errorf("Invalid package index in "+URL.String(), err)
-	}
-
-	if err := clipath.MkdirAll(); err != nil {
-		return fmt.Errorf("Can't create data directory "+clipath.String(), err)
-	}
-
-	if err := tmp.CopyTo(coreIndexPath); err != nil {
-		return fmt.Errorf("Error saving downloaded index "+URL.String(), err)
-	}
-	return nil
 }

@@ -24,6 +24,9 @@ service ArduinoCore {
   // Rescan instance of the Arduino Core Service
   rpc Rescan(RescanReq) returns (RescanResp) {}
 
+  // Update package index of the Arduino Core Service
+  rpc UpdateIndex(UpdateIndexReq) returns (stream UpdateIndexResp) {}
+
   // BOARD COMMANDS
   // --------------
 
@@ -79,4 +82,12 @@ message RescanReq {
 }
 
 message RescanResp {
+}
+
+message UpdateIndexReq {
+	Instance instance = 1;
+}
+
+message UpdateIndexResp {
+  DownloadProgress download_progress = 1;
 }

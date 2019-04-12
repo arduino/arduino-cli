@@ -5,8 +5,12 @@ package commands
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"net/url"
+	"path"
 	"time"
+
+	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries"
@@ -15,6 +19,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
+	"go.bug.st/downloader"
 )
 
 // this map contains all the running Arduino Core Services instances
@@ -128,6 +133,59 @@ func UpdateLibrariesIndex(ctx context.Context, lm *librariesmanager.LibrariesMan
 	}
 }
 
+func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResp, error) {
+	id := req.Instance.Id
+	coreInstance, ok := instances[id]
+
+	if !ok {
+		return nil, fmt.Errorf("invalid handle")
+	}
+	indexpath := coreInstance.config.IndexesDir()
+	for _, URL := range coreInstance.config.BoardManagerAdditionalUrls {
+		logrus.WithField("url", URL).Print("Updating index")
+
+		tmpFile, err := ioutil.TempFile("", "")
+		if err != nil {
+			return nil, fmt.Errorf("Error creating temp file for download", err)
+
+		}
+		if err := tmpFile.Close(); err != nil {
+			return nil, fmt.Errorf("Error creating temp file for download", err)
+		}
+		tmp := paths.New(tmpFile.Name())
+		defer tmp.Remove()
+
+		d, err := downloader.Download(tmp.String(), URL.String())
+		if err != nil {
+			return nil, fmt.Errorf("Error downloading index "+URL.String(), err)
+		}
+		coreIndexPath := indexpath.Join(path.Base(URL.Path))
+		Download(d, "Updating index: "+coreIndexPath.Base(), downloadCB)
+		if d.Error() != nil {
+			return nil, fmt.Errorf("Error downloading index "+URL.String(), d.Error())
+		}
+
+		if _, err := packageindex.LoadIndex(tmp); err != nil {
+			return nil, fmt.Errorf("Invalid package index in "+URL.String(), err)
+		}
+
+		if err := indexpath.MkdirAll(); err != nil {
+			return nil, fmt.Errorf("Can't create data directory "+indexpath.String(), err)
+		}
+
+		if err := tmp.CopyTo(coreIndexPath); err != nil {
+			return nil, fmt.Errorf("Error saving downloaded index "+URL.String(), err)
+		}
+
+		// err := packageindex.UpdateIndex(URL, coreInstance.config.IndexesDir())
+		// if err != nil {
+		// 	return nil, fmt.Errorf("cannot create file: %s", err)
+		// }
+	}
+	Rescan(ctx, &rpc.RescanReq{Instance: req.Instance})
+	return &rpc.UpdateIndexResp{}, nil
+}
+
 func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
 	id := req.Instance.Id
 	coreInstance, ok := instances[id]
@@ -204,4 +262,28 @@ func createInstance(ctx context.Context, config *configs.Configuration, getLibOn
 		return nil, nil, fmt.Errorf("libraries rescan: %s", err)
 	}
 	return pm, lm, nil
+}
+
+func Download(d *downloader.Downloader, label string, downloadCB DownloadProgressCB) error {
+	if d == nil {
+		// This signal means that the file is already downloaded
+		downloadCB(&rpc.DownloadProgress{
+			File:      label,
+			Completed: true,
+		})
+		return nil
+	}
+	downloadCB(&rpc.DownloadProgress{
+		File:      label,
+		Url:       d.URL,
+		TotalSize: d.Size(),
+	})
+	d.RunAndPoll(func(downloaded int64) {
+		downloadCB(&rpc.DownloadProgress{Downloaded: downloaded})
+	}, 250*time.Millisecond)
+	if d.Error() != nil {
+		return d.Error()
+	}
+	downloadCB(&rpc.DownloadProgress{Completed: true})
+	return nil
 }
