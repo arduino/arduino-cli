@@ -19,10 +19,11 @@ package core
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -48,13 +49,14 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	platformsRefs := parsePlatformReferenceArgs(args)
 	for _, platformRef := range platformsRefs {
-		core.PlatformDownload(context.Background(), &rpc.PlatformDownloadReq{
+		_, err := core.PlatformDownload(context.Background(), &rpc.PlatformDownloadReq{
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.PlatformArchitecture,
 			Version:         platformRef.PlatformVersion.String(),
-		}, func(curr *rpc.DownloadProgress) {
-			fmt.Printf(">> %+v\n", curr)
-		})
+		}, output.DownloadProgressBar())
+		if err != nil {
+			formatter.PrintError(err, "Error downloading "+platformRef.String())
+		}
 	}
 }
