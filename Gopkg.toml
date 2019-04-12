@@ -69,7 +69,7 @@
 
 [[constraint]]
   name = "github.com/sirupsen/logrus"
-  version = "v1.0.5"
+  version = "v1.4.1"
 
 [[constraint]]
   name = "github.com/spf13/cobra"
