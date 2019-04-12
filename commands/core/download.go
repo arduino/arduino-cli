@@ -21,13 +21,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
-	"go.bug.st/downloader"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -74,7 +72,7 @@ func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.
 	if err != nil {
 		return err
 	}
-	return download(resp, platformRelease.String(), downloadCB)
+	return commands.Download(resp, platformRelease.String(), downloadCB)
 }
 
 func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB commands.DownloadProgressCB) error {
@@ -92,29 +90,5 @@ func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.T
 	if err != nil {
 		return err
 	}
-	return download(resp, toolRelease.String(), downloadCB)
-}
-
-func download(d *downloader.Downloader, label string, downloadCB commands.DownloadProgressCB) error {
-	if d == nil {
-		// This signal means that the file is already downloaded
-		downloadCB(&rpc.DownloadProgress{
-			File:      label,
-			Completed: true,
-		})
-		return nil
-	}
-	downloadCB(&rpc.DownloadProgress{
-		File:      label,
-		Url:       d.URL,
-		TotalSize: d.Size(),
-	})
-	d.RunAndPoll(func(downloaded int64) {
-		downloadCB(&rpc.DownloadProgress{Downloaded: downloaded})
-	}, 250*time.Millisecond)
-	if d.Error() != nil {
-		return d.Error()
-	}
-	downloadCB(&rpc.DownloadProgress{Completed: true})
-	return nil
+	return commands.Download(resp, toolRelease.String(), downloadCB)
 }

@@ -52,6 +52,14 @@ func (s *ArduinoCoreServerImpl) Rescan(ctx context.Context, req *rpc.RescanReq) 
 	return commands.Rescan(ctx, req)
 }
 
+func (s *ArduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexReq, stream rpc.ArduinoCore_UpdateIndexServer) error {
+	resp, err := commands.UpdateIndex(stream.Context(), req,
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateIndexResp{DownloadProgress: p}) },
+	)
+	stream.Send(resp)
+	return err
+}
+
 func (s *ArduinoCoreServerImpl) Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 	return commands.Init(ctx, req)
 }

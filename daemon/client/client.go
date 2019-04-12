@@ -166,6 +166,27 @@ func main() {
 		}
 	}
 
+	uiRespStream, err := client.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
+		Instance: instance,
+	})
+	if err != nil {
+		fmt.Printf("Error Upgrade platform: %s\n", err)
+		os.Exit(1)
+	}
+	for {
+		uiResp, err := uiRespStream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Printf("Compile error: %s\n", err)
+			os.Exit(1)
+		}
+		if uiResp.GetDownloadProgress() != nil {
+			fmt.Printf(">> DOWNLOADc: %s\n", uiResp.GetDownloadProgress())
+		}
+	}
+
 	uninstallRespStream, err := client.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
 		Instance:        instance,
 		PlatformPackage: "arduino",
