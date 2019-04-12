@@ -48,7 +48,7 @@ import (
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/go-paths-helper"
+	paths "github.com/arduino/go-paths-helper"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
@@ -288,6 +288,13 @@ const (
 )
 
 func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) ([]byte, []byte, error) {
+	if ctx.ExecStdout == nil {
+		ctx.ExecStdout = os.Stdout
+	}
+	if ctx.ExecStderr == nil {
+		ctx.ExecStderr = os.Stderr
+	}
+
 	if ctx.Verbose {
 		ctx.GetLogger().UnformattedFprintln(os.Stdout, PrintableCommand(command.Args))
 	}
@@ -296,14 +303,14 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 		buffer := &bytes.Buffer{}
 		command.Stdout = buffer
 	} else if stdout == Show || stdout == ShowIfVerbose && ctx.Verbose {
-		command.Stdout = os.Stdout
+		command.Stdout = ctx.ExecStdout
 	}
 
 	if stderr == Capture {
 		buffer := &bytes.Buffer{}
 		command.Stderr = buffer
 	} else if stderr == Show || stderr == ShowIfVerbose && ctx.Verbose {
-		command.Stderr = os.Stderr
+		command.Stderr = ctx.ExecStderr
 	}
 
 	err := command.Start()
