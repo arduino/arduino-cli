@@ -139,7 +139,7 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 
 func findLibraryWithNameBestDistance(name string, libs libraries.List) *libraries.Library {
 	// Create closestmatch DB
-	var wordsToTest []string
+	wordsToTest := []string{}
 	for _, lib := range libs {
 		wordsToTest = append(wordsToTest, simplify(lib.Name))
 	}
