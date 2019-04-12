@@ -124,8 +124,11 @@ func main() {
 			fmt.Printf("Compile error: %s\n", err)
 			os.Exit(1)
 		}
-		if compResp.GetOutput() != nil {
-			fmt.Printf("%s", compResp.GetOutput())
+		if resp := compResp.GetOutStream(); resp != nil {
+			fmt.Printf(">> STDOUT: %s", resp)
+		}
+		if resperr := compResp.GetErrStream(); resperr != nil {
+			fmt.Printf(">> STDERR: %s", resperr)
 		}
 		if compResp.GetDownloadProgress() != nil {
 			fmt.Printf(">> DOWNLOAD: %s\n", compResp.GetDownloadProgress())
@@ -156,10 +159,10 @@ func main() {
 			os.Exit(1)
 		}
 		if resp := uplResp.GetOutStream(); resp != nil {
-			fmt.Printf("output %s", resp)
+			fmt.Printf(">> STDOUT: %s", resp)
 		}
 		if resperr := uplResp.GetErrStream(); resperr != nil {
-			fmt.Printf("error %s", resperr)
+			fmt.Printf(">> STDERR: %s", resperr)
 		}
 	}
 

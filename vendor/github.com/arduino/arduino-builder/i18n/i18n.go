@@ -52,32 +52,45 @@ type Logger interface {
 	Flush() string
 }
 
-type LoggerToIoWriter struct {
-	Writer io.Writer
+type LoggerToCustomStreams struct {
+	Stdout io.Writer
+	Stderr io.Writer
 }
 
-func (s LoggerToIoWriter) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
-	fmt.Fprintln(s.Writer, Format(format, a...))
+func (s LoggerToCustomStreams) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+	target := s.Stdout
+	if w == os.Stderr {
+		target = s.Stderr
+	}
+	fmt.Fprintln(target, Format(format, a...))
 }
 
-func (s LoggerToIoWriter) UnformattedFprintln(w io.Writer, str string) {
-	fmt.Fprintln(s.Writer, str)
+func (s LoggerToCustomStreams) UnformattedFprintln(w io.Writer, str string) {
+	target := s.Stdout
+	if w == os.Stderr {
+		target = s.Stderr
+	}
+	fmt.Fprintln(target, str)
 }
 
-func (s LoggerToIoWriter) UnformattedWrite(w io.Writer, data []byte) {
-	s.Writer.Write(data)
+func (s LoggerToCustomStreams) UnformattedWrite(w io.Writer, data []byte) {
+	target := s.Stdout
+	if w == os.Stderr {
+		target = s.Stderr
+	}
+	target.Write(data)
 }
 
-func (s LoggerToIoWriter) Println(level string, format string, a ...interface{}) {
+func (s LoggerToCustomStreams) Println(level string, format string, a ...interface{}) {
 	s.Fprintln(nil, level, format, a...)
 }
 
-func (s LoggerToIoWriter) Flush() string {
+func (s LoggerToCustomStreams) Flush() string {
 	return ""
 }
 
-func (s LoggerToIoWriter) Name() string {
-	return "LoggerToIoWriter"
+func (s LoggerToCustomStreams) Name() string {
+	return "LoggerToCustomStreams"
 }
 
 type NoopLogger struct{}

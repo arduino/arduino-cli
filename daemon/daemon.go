@@ -59,7 +59,8 @@ func (s *ArduinoCoreServerImpl) Init(ctx context.Context, req *rpc.InitReq) (*rp
 func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoCore_CompileServer) error {
 	resp, err := compile.Compile(
 		stream.Context(), req,
-		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{Output: data}) }),
+		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{OutStream: data}) }),
+		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{ErrStream: data}) }),
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.CompileResp{TaskProgress: p}) },
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.CompileResp{DownloadProgress: p}) },
 	)
