@@ -32,6 +32,7 @@ package builder
 import (
 	"fmt"
 
+	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 )
@@ -39,10 +40,12 @@ import (
 func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 	resolver := ctx.LibrariesResolver
 	importedLibraries := ctx.ImportedLibraries
+	logger := ctx.GetLogger()
 
 	candidates := resolver.AlternativesFor(header)
-	fmt.Printf("ResolveLibrary(%s)\n", header)
-	fmt.Printf("  -> candidates: %s\n", candidates)
+	logger.Println(constants.LOG_LEVEL_INFO, fmt.Sprintf("Alternatives for %s: %s", header, candidates))
+	logger.Println(constants.LOG_LEVEL_INFO, fmt.Sprintf("ResolveLibrary(%s)", header))
+	logger.Println(constants.LOG_LEVEL_INFO, fmt.Sprintf("  -> candidates: %s", candidates))
 
 	if candidates == nil || len(candidates) == 0 {
 		return nil
