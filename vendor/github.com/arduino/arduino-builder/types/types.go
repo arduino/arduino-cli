@@ -34,7 +34,7 @@ import (
 	"strconv"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/go-paths-helper"
+	paths "github.com/arduino/go-paths-helper"
 )
 
 type SourceFile struct {

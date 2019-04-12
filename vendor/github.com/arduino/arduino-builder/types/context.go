@@ -1,6 +1,7 @@
 package types
 
 import (
+	"io"
 	"strings"
 
 	"github.com/arduino/arduino-builder/i18n"
@@ -9,8 +10,8 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
-	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-orderedmap"
+	paths "github.com/arduino/go-paths-helper"
+	properties "github.com/arduino/go-properties-orderedmap"
 )
 
 type ProgressStruct struct {
@@ -110,6 +111,10 @@ type Context struct {
 
 	// Experimental: use arduino-preprocessor to create prototypes
 	UseArduinoPreprocessor bool
+
+	// Out and Err stream to redirect all Exec commands
+	ExecStdout io.Writer
+	ExecStderr io.Writer
 }
 
 func (ctx *Context) ExtractBuildOptions() *properties.Map {

@@ -52,6 +52,47 @@ type Logger interface {
 	Flush() string
 }
 
+type LoggerToCustomStreams struct {
+	Stdout io.Writer
+	Stderr io.Writer
+}
+
+func (s LoggerToCustomStreams) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+	target := s.Stdout
+	if w == os.Stderr {
+		target = s.Stderr
+	}
+	fmt.Fprintln(target, Format(format, a...))
+}
+
+func (s LoggerToCustomStreams) UnformattedFprintln(w io.Writer, str string) {
+	target := s.Stdout
+	if w == os.Stderr {
+		target = s.Stderr
+	}
+	fmt.Fprintln(target, str)
+}
+
+func (s LoggerToCustomStreams) UnformattedWrite(w io.Writer, data []byte) {
+	target := s.Stdout
+	if w == os.Stderr {
+		target = s.Stderr
+	}
+	target.Write(data)
+}
+
+func (s LoggerToCustomStreams) Println(level string, format string, a ...interface{}) {
+	s.Fprintln(nil, level, format, a...)
+}
+
+func (s LoggerToCustomStreams) Flush() string {
+	return ""
+}
+
+func (s LoggerToCustomStreams) Name() string {
+	return "LoggerToCustomStreams"
+}
+
 type NoopLogger struct{}
 
 func (s NoopLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {}

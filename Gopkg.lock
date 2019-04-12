@@ -3,7 +3,7 @@
 
 [[projects]]
   branch = "cli-inception"
-  digest = "1:da33441fbc4cb624982fbb0bb8ec49d50fda8b0497953c710299c1533d8cc682"
+  digest = "1:fa1b92ddb89f9a082ad65e6d31b0e9339c4fa397c9004d075eea8a678d503dde"
   name = "github.com/arduino/arduino-builder"
   packages = [
     ".",
@@ -17,7 +17,7 @@
     "utils",
   ]
   pruneopts = "UT"
-  revision = "8f0fb63d56c77aa3265ea387b777970df2442977"
+  revision = "a4859ca30383c04c355c67c3e594ac67cd89a125"
   source = "github.com/arduino/arduino-builder"
 
 [[projects]]
