@@ -176,11 +176,6 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 		if err := tmp.CopyTo(coreIndexPath); err != nil {
 			return nil, fmt.Errorf("Error saving downloaded index "+URL.String(), err)
 		}
-
-		// err := packageindex.UpdateIndex(URL, coreInstance.config.IndexesDir())
-		// if err != nil {
-		// 	return nil, fmt.Errorf("cannot create file: %s", err)
-		// }
 	}
 	Rescan(ctx, &rpc.RescanReq{Instance: req.Instance})
 	return &rpc.UpdateIndexResp{}, nil

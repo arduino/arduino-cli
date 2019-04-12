@@ -183,7 +183,7 @@ func main() {
 			os.Exit(1)
 		}
 		if uiResp.GetDownloadProgress() != nil {
-			fmt.Printf(">> DOWNLOADc: %s\n", uiResp.GetDownloadProgress())
+			fmt.Printf(">> DOWNLOAD: %s\n", uiResp.GetDownloadProgress())
 		}
 	}
 
