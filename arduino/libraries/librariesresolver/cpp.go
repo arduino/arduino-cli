@@ -107,7 +107,9 @@ func (resolver *Cpp) ResolveFor(header, architecture string) *libraries.Library 
 	// If more than one library qualifies use the "closestmatch" algorithm to
 	// find the best matching one (instead of choosing it randomly)
 	winner := findLibraryWithNameBestDistance(header, found)
-	logrus.WithField("lib", winner.Name).Info("  library with the best mathing name")
+	if winner != nil {
+		logrus.WithField("lib", winner.Name).Info("  library with the best mathing name")
+	}
 	return winner
 }
 
