@@ -151,10 +151,12 @@ func findLibraryWithNameBestDistance(name string, libs libraries.List) *librarie
 	closestName := cm.Closest(name)
 
 	// Return the closest-matching lib
+	var winner *libraries.Library
 	for _, lib := range libs {
 		if closestName == simplify(lib.Name) {
-			return lib
+			winner = lib
+			break
 		}
 	}
-	return nil
+	return winner
 }

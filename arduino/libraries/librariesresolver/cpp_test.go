@@ -48,6 +48,14 @@ func TestCppHeaderPriority(t *testing.T) {
 	require.True(t, r6 == r7)
 }
 
+func TestCppHeaderResolverWithNilResult(t *testing.T) {
+	resolver := NewCppResolver()
+	libraryList := libraries.List{}
+	libraryList.Add(l1)
+	resolver.headers["aaa.h"] = libraryList
+	require.Nil(t, resolver.ResolveFor("bbb.h", "avr"))
+}
+
 func TestCppHeaderResolver(t *testing.T) {
 	resolve := func(header string, libs ...*libraries.Library) string {
 		resolver := NewCppResolver()
