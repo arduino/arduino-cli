@@ -18,14 +18,15 @@
 package core
 
 import (
-	"regexp"
+	"context"
+
 	"strings"
 
-	"github.com/arduino/arduino-cli/common/formatter/output"
-
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/output"
+	"github.com/arduino/arduino-cli/rpc"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -42,51 +43,11 @@ func initSearchCommand() *cobra.Command {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	pm, _ := cli.InitPackageAndLibraryManagerWithoutBundles()
-
-	search := strings.ToLower(strings.Join(args, " "))
-	formatter.Print("Searching for platforms matching '" + search + "'")
-	formatter.Print("")
-
-	res := []*cores.PlatformRelease{}
-	if isUsb, _ := regexp.MatchString("[0-9a-f]{4}:[0-9a-f]{4}", search); isUsb {
-		vid, pid := search[:4], search[5:]
-		res = pm.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid)
-	} else {
-		match := func(line string) bool {
-			return strings.Contains(strings.ToLower(line), search)
-		}
-		for _, targetPackage := range pm.GetPackages().Packages {
-			for _, platform := range targetPackage.Platforms {
-				platformRelease := platform.GetLatestRelease()
-				if platformRelease == nil {
-					continue
-				}
-				if match(platform.Name) || match(platform.Architecture) {
-					res = append(res, platformRelease)
-					continue
-				}
-				for _, board := range platformRelease.BoardsManifest {
-					if match(board.Name) {
-						res = append(res, platformRelease)
-						break
-					}
-				}
-			}
-		}
-	}
-
-	if len(res) == 0 {
-		formatter.Print("No platforms matching your search")
-	} else {
-		out := []*output.SearchedPlatform{}
-		for _, platformRelease := range res {
-			out = append(out, &output.SearchedPlatform{
-				ID:      platformRelease.Platform.String(),
-				Name:    platformRelease.Platform.Name,
-				Version: platformRelease.Version,
-			})
-		}
-		formatter.Print(output.SearchedPlatforms{Platforms: out})
-	}
+	logrus.Info("Executing `arduino core search`")
+	instance := cli.CreateInstance()
+	arguments := strings.ToLower(strings.Join(args, " "))
+	core.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
+		Instance:   instance,
+		SearchArgs: arguments,
+	}, output.NewTaskProgressCB())
 }

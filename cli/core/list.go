@@ -18,12 +18,13 @@
 package core
 
 import (
+	"context"
+
 	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/common/formatter/output"
-	"github.com/sirupsen/logrus"
+	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/output"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
-	semver "go.bug.st/relaxed-semver"
 )
 
 func initListCommand() *cobra.Command {
@@ -44,34 +45,9 @@ var listFlags struct {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino core list`")
-
-	pm, _ := cli.InitPackageAndLibraryManager()
-
-	installed := []*output.InstalledPlatform{}
-	for _, targetPackage := range pm.GetPackages().Packages {
-		for _, platform := range targetPackage.Platforms {
-			if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
-				if listFlags.updatableOnly {
-					if latest := platform.GetLatestRelease(); latest == nil || latest == platformRelease {
-						continue
-					}
-				}
-				var latestVersion *semver.Version
-				if latest := platformRelease.Platform.GetLatestRelease(); latest != nil {
-					latestVersion = latest.Version
-				}
-				installed = append(installed, &output.InstalledPlatform{
-					ID:        platformRelease.String(),
-					Installed: platformRelease.Version,
-					Latest:    latestVersion,
-					Name:      platformRelease.Platform.Name,
-				})
-			}
-		}
-	}
-
-	if len(installed) > 0 {
-		formatter.Print(output.InstalledPlatforms{Platforms: installed})
-	}
+	instance := cli.CreateInstance()
+	core.PlatformList(context.Background(), &rpc.PlatformListReq{
+		Instance:      instance,
+		UpdatableOnly: listFlags.updatableOnly,
+	}, output.NewTaskProgressCB())
 }

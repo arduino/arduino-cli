@@ -52,3 +52,36 @@ message PlatformUpgradeResp {
 	DownloadProgress progress = 1;
 	TaskProgress task_progress = 2;
 }
+
+
+message PlatformSearchReq {
+	Instance instance = 1;
+	string search_args = 2;
+}
+
+message PlatformSearchResp {
+	repeated SearchOutput search_output = 1;
+	TaskProgress task_progress = 2;
+}
+message SearchOutput {
+	string ID = 1;
+	string Version = 2;
+	string Name = 3;
+}
+
+message PlatformListReq {
+	Instance instance = 1;
+	bool updatable_only = 2;
+}
+
+message PlatformListResp {
+	repeated InstalledPlatform installed_platform = 1;
+	TaskProgress task_progress = 2;
+}
+
+message InstalledPlatform {
+	string ID = 1;
+	string Installed = 2;
+	string Latest = 3;
+	string Name = 4;
+}

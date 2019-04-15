@@ -187,6 +187,63 @@ func main() {
 		}
 	}
 
+	searchRespStream, err := client.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
+		Instance:   instance,
+		SearchArgs: "uno",
+	})
+	if err != nil {
+		fmt.Printf("Search error: %s\n", err)
+		os.Exit(1)
+	}
+	for {
+		searchResp, err := searchRespStream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Printf("Compile error: %s\n", err)
+			os.Exit(1)
+		}
+		if searchResp.GetTaskProgress() != nil {
+			fmt.Printf(">> TASK: %s\n", searchResp.GetTaskProgress())
+		}
+		if searchResp.GetSearchOutput() != nil {
+			serchedOutput := searchResp.GetSearchOutput()
+			for _, outsearch := range serchedOutput {
+				fmt.Printf(">> OUTPUT: ID: %s\t Version: %s\t name: %s\n", outsearch.GetID(), outsearch.GetVersion(), outsearch.GetName())
+			}
+
+		}
+	}
+
+	listRespStream, err := client.PlatformList(context.Background(), &rpc.PlatformListReq{
+		Instance: instance,
+	})
+	if err != nil {
+		fmt.Printf("Search error: %s\n", err)
+		os.Exit(1)
+	}
+	for {
+		listResp, err := listRespStream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Printf("Compile error: %s\n", err)
+			os.Exit(1)
+		}
+		if listResp.GetTaskProgress() != nil {
+			fmt.Printf(">> TASK: %s\n", listResp.GetTaskProgress())
+		}
+		if listResp.GetInstalledPlatform() != nil {
+			Installedplatforms := listResp.GetInstalledPlatform()
+			for _, listpfm := range Installedplatforms {
+				fmt.Printf(">> OUTPUT: ID: %s\t Installed Version: %s\t Latest Version: %s\t name: %s\n", listpfm.GetID(), listpfm.GetInstalled(), listpfm.GetLatest(), listpfm.GetName())
+			}
+
+		}
+	}
+
 	uninstallRespStream, err := client.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
 		Instance:        instance,
 		PlatformPackage: "arduino",
