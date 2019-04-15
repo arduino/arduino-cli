@@ -122,6 +122,28 @@ func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeReq, str
 	return stream.Send(resp)
 }
 
+func (s *ArduinoCoreServerImpl) PlatformSearch(req *rpc.PlatformSearchReq, stream rpc.ArduinoCore_PlatformSearchServer) error {
+
+	resp, err := core.PlatformSearch(stream.Context(), req,
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.PlatformSearchResp{TaskProgress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
+}
+
+func (s *ArduinoCoreServerImpl) PlatformList(req *rpc.PlatformListReq, stream rpc.ArduinoCore_PlatformListServer) error {
+
+	resp, err := core.PlatformList(stream.Context(), req,
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.PlatformListResp{TaskProgress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
+}
+
 func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadReq, stream rpc.ArduinoCore_UploadServer) error {
 	resp, err := upload.Upload(
 		stream.Context(), req,

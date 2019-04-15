@@ -32,7 +32,7 @@ func (m *PlatformInstallReq) Reset()         { *m = PlatformInstallReq{} }
 func (m *PlatformInstallReq) String() string { return proto.CompactTextString(m) }
 func (*PlatformInstallReq) ProtoMessage()    {}
 func (*PlatformInstallReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e39d5ab7d60bc45d, []int{0}
+	return fileDescriptor_core_ad912864b1670524, []int{0}
 }
 func (m *PlatformInstallReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformInstallReq.Unmarshal(m, b)
@@ -92,7 +92,7 @@ func (m *PlatformInstallResp) Reset()         { *m = PlatformInstallResp{} }
 func (m *PlatformInstallResp) String() string { return proto.CompactTextString(m) }
 func (*PlatformInstallResp) ProtoMessage()    {}
 func (*PlatformInstallResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e39d5ab7d60bc45d, []int{1}
+	return fileDescriptor_core_ad912864b1670524, []int{1}
 }
 func (m *PlatformInstallResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformInstallResp.Unmarshal(m, b)
@@ -140,7 +140,7 @@ func (m *PlatformDownloadReq) Reset()         { *m = PlatformDownloadReq{} }
 func (m *PlatformDownloadReq) String() string { return proto.CompactTextString(m) }
 func (*PlatformDownloadReq) ProtoMessage()    {}
 func (*PlatformDownloadReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e39d5ab7d60bc45d, []int{2}
+	return fileDescriptor_core_ad912864b1670524, []int{2}
 }
 func (m *PlatformDownloadReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformDownloadReq.Unmarshal(m, b)
@@ -199,7 +199,7 @@ func (m *PlatformDownloadResp) Reset()         { *m = PlatformDownloadResp{} }
 func (m *PlatformDownloadResp) String() string { return proto.CompactTextString(m) }
 func (*PlatformDownloadResp) ProtoMessage()    {}
 func (*PlatformDownloadResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e39d5ab7d60bc45d, []int{3}
+	return fileDescriptor_core_ad912864b1670524, []int{3}
 }
 func (m *PlatformDownloadResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformDownloadResp.Unmarshal(m, b)
@@ -240,7 +240,7 @@ func (m *PlatformUninstallReq) Reset()         { *m = PlatformUninstallReq{} }
 func (m *PlatformUninstallReq) String() string { return proto.CompactTextString(m) }
 func (*PlatformUninstallReq) ProtoMessage()    {}
 func (*PlatformUninstallReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e39d5ab7d60bc45d, []int{4}
+	return fileDescriptor_core_ad912864b1670524, []int{4}
 }
 func (m *PlatformUninstallReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformUninstallReq.Unmarshal(m, b)
@@ -299,7 +299,7 @@ func (m *PlatformUninstallResp) Reset()         { *m = PlatformUninstallResp{} }
 func (m *PlatformUninstallResp) String() string { return proto.CompactTextString(m) }
 func (*PlatformUninstallResp) ProtoMessage()    {}
 func (*PlatformUninstallResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e39d5ab7d60bc45d, []int{5}
+	return fileDescriptor_core_ad912864b1670524, []int{5}
 }
 func (m *PlatformUninstallResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformUninstallResp.Unmarshal(m, b)
@@ -340,7 +340,7 @@ func (m *PlatformUpgradeReq) Reset()         { *m = PlatformUpgradeReq{} }
 func (m *PlatformUpgradeReq) String() string { return proto.CompactTextString(m) }
 func (*PlatformUpgradeReq) ProtoMessage()    {}
 func (*PlatformUpgradeReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e39d5ab7d60bc45d, []int{6}
+	return fileDescriptor_core_ad912864b1670524, []int{6}
 }
 func (m *PlatformUpgradeReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformUpgradeReq.Unmarshal(m, b)
@@ -400,7 +400,7 @@ func (m *PlatformUpgradeResp) Reset()         { *m = PlatformUpgradeResp{} }
 func (m *PlatformUpgradeResp) String() string { return proto.CompactTextString(m) }
 func (*PlatformUpgradeResp) ProtoMessage()    {}
 func (*PlatformUpgradeResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e39d5ab7d60bc45d, []int{7}
+	return fileDescriptor_core_ad912864b1670524, []int{7}
 }
 func (m *PlatformUpgradeResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformUpgradeResp.Unmarshal(m, b)
@@ -434,6 +434,306 @@ func (m *PlatformUpgradeResp) GetTaskProgress() *TaskProgress {
 	return nil
 }
 
+type PlatformSearchReq struct {
+	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	SearchArgs           string    `protobuf:"bytes,2,opt,name=search_args,json=searchArgs,proto3" json:"search_args,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *PlatformSearchReq) Reset()         { *m = PlatformSearchReq{} }
+func (m *PlatformSearchReq) String() string { return proto.CompactTextString(m) }
+func (*PlatformSearchReq) ProtoMessage()    {}
+func (*PlatformSearchReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_core_ad912864b1670524, []int{8}
+}
+func (m *PlatformSearchReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PlatformSearchReq.Unmarshal(m, b)
+}
+func (m *PlatformSearchReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PlatformSearchReq.Marshal(b, m, deterministic)
+}
+func (dst *PlatformSearchReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PlatformSearchReq.Merge(dst, src)
+}
+func (m *PlatformSearchReq) XXX_Size() int {
+	return xxx_messageInfo_PlatformSearchReq.Size(m)
+}
+func (m *PlatformSearchReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_PlatformSearchReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PlatformSearchReq proto.InternalMessageInfo
+
+func (m *PlatformSearchReq) GetInstance() *Instance {
+	if m != nil {
+		return m.Instance
+	}
+	return nil
+}
+
+func (m *PlatformSearchReq) GetSearchArgs() string {
+	if m != nil {
+		return m.SearchArgs
+	}
+	return ""
+}
+
+type PlatformSearchResp struct {
+	SearchOutput         []*SearchOutput `protobuf:"bytes,1,rep,name=search_output,json=searchOutput,proto3" json:"search_output,omitempty"`
+	TaskProgress         *TaskProgress   `protobuf:"bytes,2,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
+}
+
+func (m *PlatformSearchResp) Reset()         { *m = PlatformSearchResp{} }
+func (m *PlatformSearchResp) String() string { return proto.CompactTextString(m) }
+func (*PlatformSearchResp) ProtoMessage()    {}
+func (*PlatformSearchResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_core_ad912864b1670524, []int{9}
+}
+func (m *PlatformSearchResp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PlatformSearchResp.Unmarshal(m, b)
+}
+func (m *PlatformSearchResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PlatformSearchResp.Marshal(b, m, deterministic)
+}
+func (dst *PlatformSearchResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PlatformSearchResp.Merge(dst, src)
+}
+func (m *PlatformSearchResp) XXX_Size() int {
+	return xxx_messageInfo_PlatformSearchResp.Size(m)
+}
+func (m *PlatformSearchResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_PlatformSearchResp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PlatformSearchResp proto.InternalMessageInfo
+
+func (m *PlatformSearchResp) GetSearchOutput() []*SearchOutput {
+	if m != nil {
+		return m.SearchOutput
+	}
+	return nil
+}
+
+func (m *PlatformSearchResp) GetTaskProgress() *TaskProgress {
+	if m != nil {
+		return m.TaskProgress
+	}
+	return nil
+}
+
+type SearchOutput struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Version              string   `protobuf:"bytes,2,opt,name=Version,proto3" json:"Version,omitempty"`
+	Name                 string   `protobuf:"bytes,3,opt,name=Name,proto3" json:"Name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SearchOutput) Reset()         { *m = SearchOutput{} }
+func (m *SearchOutput) String() string { return proto.CompactTextString(m) }
+func (*SearchOutput) ProtoMessage()    {}
+func (*SearchOutput) Descriptor() ([]byte, []int) {
+	return fileDescriptor_core_ad912864b1670524, []int{10}
+}
+func (m *SearchOutput) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SearchOutput.Unmarshal(m, b)
+}
+func (m *SearchOutput) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SearchOutput.Marshal(b, m, deterministic)
+}
+func (dst *SearchOutput) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SearchOutput.Merge(dst, src)
+}
+func (m *SearchOutput) XXX_Size() int {
+	return xxx_messageInfo_SearchOutput.Size(m)
+}
+func (m *SearchOutput) XXX_DiscardUnknown() {
+	xxx_messageInfo_SearchOutput.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SearchOutput proto.InternalMessageInfo
+
+func (m *SearchOutput) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *SearchOutput) GetVersion() string {
+	if m != nil {
+		return m.Version
+	}
+	return ""
+}
+
+func (m *SearchOutput) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type PlatformListReq struct {
+	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	UpdatableOnly        bool      `protobuf:"varint,2,opt,name=updatable_only,json=updatableOnly,proto3" json:"updatable_only,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *PlatformListReq) Reset()         { *m = PlatformListReq{} }
+func (m *PlatformListReq) String() string { return proto.CompactTextString(m) }
+func (*PlatformListReq) ProtoMessage()    {}
+func (*PlatformListReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_core_ad912864b1670524, []int{11}
+}
+func (m *PlatformListReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PlatformListReq.Unmarshal(m, b)
+}
+func (m *PlatformListReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PlatformListReq.Marshal(b, m, deterministic)
+}
+func (dst *PlatformListReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PlatformListReq.Merge(dst, src)
+}
+func (m *PlatformListReq) XXX_Size() int {
+	return xxx_messageInfo_PlatformListReq.Size(m)
+}
+func (m *PlatformListReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_PlatformListReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PlatformListReq proto.InternalMessageInfo
+
+func (m *PlatformListReq) GetInstance() *Instance {
+	if m != nil {
+		return m.Instance
+	}
+	return nil
+}
+
+func (m *PlatformListReq) GetUpdatableOnly() bool {
+	if m != nil {
+		return m.UpdatableOnly
+	}
+	return false
+}
+
+type PlatformListResp struct {
+	InstalledPlatform    []*InstalledPlatform `protobuf:"bytes,1,rep,name=installed_platform,json=installedPlatform,proto3" json:"installed_platform,omitempty"`
+	TaskProgress         *TaskProgress        `protobuf:"bytes,2,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
+}
+
+func (m *PlatformListResp) Reset()         { *m = PlatformListResp{} }
+func (m *PlatformListResp) String() string { return proto.CompactTextString(m) }
+func (*PlatformListResp) ProtoMessage()    {}
+func (*PlatformListResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_core_ad912864b1670524, []int{12}
+}
+func (m *PlatformListResp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PlatformListResp.Unmarshal(m, b)
+}
+func (m *PlatformListResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PlatformListResp.Marshal(b, m, deterministic)
+}
+func (dst *PlatformListResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PlatformListResp.Merge(dst, src)
+}
+func (m *PlatformListResp) XXX_Size() int {
+	return xxx_messageInfo_PlatformListResp.Size(m)
+}
+func (m *PlatformListResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_PlatformListResp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PlatformListResp proto.InternalMessageInfo
+
+func (m *PlatformListResp) GetInstalledPlatform() []*InstalledPlatform {
+	if m != nil {
+		return m.InstalledPlatform
+	}
+	return nil
+}
+
+func (m *PlatformListResp) GetTaskProgress() *TaskProgress {
+	if m != nil {
+		return m.TaskProgress
+	}
+	return nil
+}
+
+type InstalledPlatform struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	Installed            string   `protobuf:"bytes,2,opt,name=Installed,proto3" json:"Installed,omitempty"`
+	Latest               string   `protobuf:"bytes,3,opt,name=Latest,proto3" json:"Latest,omitempty"`
+	Name                 string   `protobuf:"bytes,4,opt,name=Name,proto3" json:"Name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *InstalledPlatform) Reset()         { *m = InstalledPlatform{} }
+func (m *InstalledPlatform) String() string { return proto.CompactTextString(m) }
+func (*InstalledPlatform) ProtoMessage()    {}
+func (*InstalledPlatform) Descriptor() ([]byte, []int) {
+	return fileDescriptor_core_ad912864b1670524, []int{13}
+}
+func (m *InstalledPlatform) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_InstalledPlatform.Unmarshal(m, b)
+}
+func (m *InstalledPlatform) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_InstalledPlatform.Marshal(b, m, deterministic)
+}
+func (dst *InstalledPlatform) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InstalledPlatform.Merge(dst, src)
+}
+func (m *InstalledPlatform) XXX_Size() int {
+	return xxx_messageInfo_InstalledPlatform.Size(m)
+}
+func (m *InstalledPlatform) XXX_DiscardUnknown() {
+	xxx_messageInfo_InstalledPlatform.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_InstalledPlatform proto.InternalMessageInfo
+
+func (m *InstalledPlatform) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *InstalledPlatform) GetInstalled() string {
+	if m != nil {
+		return m.Installed
+	}
+	return ""
+}
+
+func (m *InstalledPlatform) GetLatest() string {
+	if m != nil {
+		return m.Latest
+	}
+	return ""
+}
+
+func (m *InstalledPlatform) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*PlatformInstallReq)(nil), "arduino.PlatformInstallReq")
 	proto.RegisterType((*PlatformInstallResp)(nil), "arduino.PlatformInstallResp")
@@ -443,31 +743,49 @@ func init() {
 	proto.RegisterType((*PlatformUninstallResp)(nil), "arduino.PlatformUninstallResp")
 	proto.RegisterType((*PlatformUpgradeReq)(nil), "arduino.PlatformUpgradeReq")
 	proto.RegisterType((*PlatformUpgradeResp)(nil), "arduino.PlatformUpgradeResp")
+	proto.RegisterType((*PlatformSearchReq)(nil), "arduino.PlatformSearchReq")
+	proto.RegisterType((*PlatformSearchResp)(nil), "arduino.PlatformSearchResp")
+	proto.RegisterType((*SearchOutput)(nil), "arduino.SearchOutput")
+	proto.RegisterType((*PlatformListReq)(nil), "arduino.PlatformListReq")
+	proto.RegisterType((*PlatformListResp)(nil), "arduino.PlatformListResp")
+	proto.RegisterType((*InstalledPlatform)(nil), "arduino.InstalledPlatform")
 }
 
-func init() { proto.RegisterFile("core.proto", fileDescriptor_core_e39d5ab7d60bc45d) }
+func init() { proto.RegisterFile("core.proto", fileDescriptor_core_ad912864b1670524) }
 
-var fileDescriptor_core_e39d5ab7d60bc45d = []byte{
-	// 328 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xd4, 0x54, 0xb1, 0x4e, 0xc3, 0x30,
-	0x10, 0x95, 0x0b, 0xa2, 0xe5, 0x28, 0x02, 0x0c, 0x95, 0x02, 0x13, 0xb2, 0x18, 0x60, 0x68, 0x2a,
-	0x81, 0x58, 0x18, 0x11, 0x4b, 0x07, 0xa4, 0x2a, 0xd0, 0x85, 0xa5, 0x72, 0x5d, 0x93, 0x5a, 0x4d,
-	0x6d, 0x63, 0xbb, 0xf0, 0x0b, 0x7c, 0x0c, 0xf0, 0x8d, 0x84, 0xd4, 0x31, 0x45, 0x61, 0x40, 0x2c,
-	0x94, 0x29, 0xba, 0x77, 0xef, 0x5d, 0x9e, 0x4f, 0x77, 0x07, 0xc0, 0x94, 0xe1, 0xb1, 0x36, 0xca,
-	0x29, 0x5c, 0xa7, 0x66, 0x34, 0x13, 0x52, 0x1d, 0x34, 0x99, 0x9a, 0x4e, 0x95, 0x9c, 0xc3, 0xe4,
-	0x05, 0x01, 0xee, 0x65, 0xd4, 0xdd, 0x2b, 0x33, 0xed, 0x4a, 0xeb, 0x68, 0x96, 0x25, 0xfc, 0x01,
-	0xb7, 0xa1, 0x21, 0x3e, 0x22, 0xc9, 0x78, 0x84, 0x0e, 0xd1, 0xf1, 0xc6, 0xe9, 0x4e, 0xec, 0x0b,
-	0xc4, 0x5d, 0x9f, 0x48, 0x02, 0x05, 0x9f, 0xc0, 0xb6, 0xf6, 0x45, 0x06, 0x9a, 0xb2, 0x09, 0x4d,
-	0x79, 0x54, 0xcb, 0x65, 0xeb, 0xc9, 0x56, 0x89, 0xf7, 0xe6, 0x30, 0x26, 0xd0, 0xa4, 0x86, 0x8d,
-	0x85, 0xe3, 0xcc, 0xcd, 0x0c, 0x8f, 0x56, 0x0a, 0xda, 0x17, 0x0c, 0x47, 0x50, 0x7f, 0xe4, 0xc6,
-	0x0a, 0x25, 0xa3, 0xd5, 0x22, 0x5d, 0x86, 0xe4, 0x19, 0xc1, 0x6e, 0xc5, 0xae, 0xd5, 0xf8, 0x1c,
-	0x1a, 0xf9, 0x7b, 0x52, 0xc3, 0xad, 0xf5, 0x7e, 0xf7, 0x83, 0xdf, 0x2b, 0xf5, 0x24, 0x33, 0x45,
-	0x47, 0x3d, 0x4f, 0x48, 0x02, 0x15, 0x5f, 0xc0, 0xa6, 0xa3, 0x76, 0x32, 0x08, 0xda, 0x5a, 0xa1,
-	0x6d, 0x05, 0xed, 0x6d, 0x9e, 0x0d, 0xba, 0xa6, 0x5b, 0x88, 0xc8, 0xeb, 0x82, 0x95, 0xf2, 0x17,
-	0xcb, 0xdc, 0xba, 0x6b, 0xd8, 0xab, 0xda, 0xfd, 0x75, 0xeb, 0xc8, 0x1b, 0xfa, 0xac, 0xd7, 0x97,
-	0x62, 0xf9, 0x47, 0xe7, 0x06, 0x5a, 0xdf, 0xf8, 0xcd, 0x1b, 0x50, 0x19, 0x02, 0xf4, 0xf3, 0x21,
-	0x58, 0x5c, 0x9f, 0xbe, 0x4e, 0x0d, 0x1d, 0xf1, 0xff, 0xb2, 0x3e, 0xc1, 0xee, 0x9f, 0xac, 0xcf,
-	0xe5, 0xd1, 0x1d, 0x49, 0x85, 0x1b, 0xcf, 0x86, 0x71, 0x7e, 0x8f, 0x3a, 0x5e, 0x50, 0x7e, 0xdb,
-	0x2c, 0x13, 0x1d, 0xa3, 0xd9, 0x70, 0xad, 0xb8, 0x52, 0x67, 0xef, 0x01, 0x00, 0x00, 0xff, 0xff,
-	0xcd, 0x20, 0x46, 0xcb, 0xca, 0x04, 0x00, 0x00,
+var fileDescriptor_core_ad912864b1670524 = []byte{
+	// 524 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xd4, 0x55, 0xcd, 0x6e, 0xd4, 0x30,
+	0x10, 0x56, 0xb6, 0xab, 0x76, 0x77, 0x9a, 0xfe, 0xac, 0xa1, 0x28, 0x54, 0x48, 0xa0, 0x08, 0x24,
+	0x38, 0x74, 0x2b, 0x81, 0xb8, 0x70, 0x03, 0xf5, 0xb2, 0xd2, 0x42, 0x57, 0x29, 0xe5, 0xc0, 0x25,
+	0xf2, 0x26, 0x26, 0xb5, 0x9a, 0xc4, 0xc1, 0x76, 0x40, 0xbc, 0x01, 0x07, 0x5e, 0x80, 0x77, 0x00,
+	0x9e, 0x11, 0xaf, 0x63, 0x7b, 0xb3, 0x84, 0x03, 0xda, 0x1e, 0x68, 0x4f, 0xc9, 0x7c, 0x9e, 0xcf,
+	0xf3, 0xcd, 0x37, 0xb6, 0x0c, 0x90, 0x30, 0x4e, 0xc6, 0x15, 0x67, 0x92, 0xa1, 0x2d, 0xcc, 0xd3,
+	0x9a, 0x96, 0xec, 0xd0, 0x4f, 0x58, 0x51, 0xb0, 0xb2, 0x81, 0xc3, 0x1f, 0x1e, 0xa0, 0x59, 0x8e,
+	0xe5, 0x07, 0xc6, 0x8b, 0x49, 0x29, 0x24, 0xce, 0xf3, 0x88, 0x7c, 0x44, 0x47, 0x30, 0xa0, 0x8b,
+	0xa8, 0x4c, 0x48, 0xe0, 0x3d, 0xf0, 0x1e, 0x6f, 0x3f, 0x1d, 0x8d, 0xcd, 0x06, 0xe3, 0x89, 0x59,
+	0x88, 0x5c, 0x0a, 0x7a, 0x02, 0xfb, 0x95, 0xd9, 0x24, 0xae, 0x70, 0x72, 0x89, 0x33, 0x12, 0xf4,
+	0x14, 0x6d, 0x18, 0xed, 0x59, 0x7c, 0xd6, 0xc0, 0x28, 0x04, 0x1f, 0xf3, 0xe4, 0x82, 0x4a, 0x92,
+	0xc8, 0x9a, 0x93, 0x60, 0x43, 0xa7, 0xad, 0x60, 0x28, 0x80, 0xad, 0x4f, 0x84, 0x0b, 0xca, 0xca,
+	0xa0, 0xaf, 0x97, 0x6d, 0x18, 0x7e, 0xf5, 0xe0, 0x56, 0x47, 0xae, 0xa8, 0xd0, 0x73, 0x18, 0xa8,
+	0x7e, 0x32, 0x4e, 0x84, 0x30, 0x7a, 0xef, 0x3a, 0xbd, 0x27, 0xec, 0x73, 0x99, 0x33, 0x9c, 0xce,
+	0x4c, 0x42, 0xe4, 0x52, 0xd1, 0x0b, 0xd8, 0x91, 0x58, 0x5c, 0xc6, 0x8e, 0xdb, 0xd3, 0xdc, 0x03,
+	0xc7, 0x7d, 0xab, 0x56, 0x1d, 0xcf, 0x97, 0xad, 0x28, 0xfc, 0xd9, 0x92, 0x62, 0x4b, 0x5c, 0x67,
+	0xeb, 0x5e, 0xc3, 0xed, 0xae, 0xdc, 0xb5, 0xad, 0x0b, 0x7f, 0x79, 0xcb, 0xfd, 0xce, 0x4b, 0x7a,
+	0xfd, 0x8f, 0xce, 0x19, 0x1c, 0xfc, 0x45, 0xaf, 0x32, 0xa0, 0x73, 0x08, 0xbc, 0x7f, 0x3f, 0x04,
+	0xed, 0xeb, 0x73, 0x5e, 0x65, 0x1c, 0xa7, 0xe4, 0xa6, 0x5c, 0x1f, 0x27, 0xf7, 0xff, 0x5c, 0x9f,
+	0x04, 0x46, 0x56, 0xc9, 0x19, 0x59, 0xc8, 0x5f, 0xc3, 0xb7, 0xfb, 0xb0, 0x2d, 0x34, 0x37, 0xc6,
+	0x3c, 0x13, 0xc6, 0x32, 0x68, 0xa0, 0x97, 0x0a, 0x09, 0xbf, 0xb5, 0xc6, 0x63, 0xab, 0x34, 0x13,
+	0x37, 0x3c, 0x56, 0xcb, 0xaa, 0x96, 0xaa, 0xd6, 0xc6, 0x8a, 0xee, 0x26, 0xf7, 0x54, 0x2f, 0x46,
+	0xbe, 0x68, 0x45, 0x57, 0xea, 0x79, 0x0a, 0x7e, 0x7b, 0x67, 0xb4, 0x0b, 0xbd, 0xc9, 0x89, 0x6e,
+	0x74, 0x18, 0xa9, 0xbf, 0xc5, 0xe0, 0xde, 0x99, 0xc1, 0x35, 0xbd, 0xd8, 0x10, 0x21, 0xe8, 0xbf,
+	0xc1, 0x85, 0x1d, 0xb7, 0xfe, 0x0f, 0x33, 0xd8, 0xb3, 0xbd, 0x4d, 0xa9, 0x90, 0x6b, 0xf8, 0xf7,
+	0x08, 0x76, 0xeb, 0x2a, 0xc5, 0x12, 0xcf, 0x73, 0x12, 0xb3, 0x32, 0xff, 0xa2, 0xcb, 0x0e, 0xa2,
+	0x1d, 0x87, 0x9e, 0x2a, 0x30, 0xfc, 0xee, 0xc1, 0xfe, 0x6a, 0x25, 0xe5, 0xe1, 0x04, 0x90, 0xb9,
+	0x44, 0x24, 0x8d, 0xed, 0x29, 0x35, 0x46, 0x1e, 0xae, 0x16, 0x5d, 0xa4, 0x58, 0x7e, 0x34, 0xa2,
+	0x7f, 0x42, 0x57, 0xb2, 0xb4, 0x80, 0x51, 0xa7, 0x46, 0xc7, 0xd7, 0x7b, 0x30, 0x74, 0x49, 0xc6,
+	0xd9, 0x25, 0x80, 0xee, 0xc0, 0xe6, 0x14, 0x4b, 0x22, 0xa4, 0x71, 0xd7, 0x44, 0xce, 0xf3, 0xfe,
+	0xd2, 0xf3, 0x57, 0x0f, 0xdf, 0x87, 0x19, 0x95, 0x17, 0xf5, 0x7c, 0xac, 0x5e, 0xd1, 0x63, 0xa3,
+	0xcf, 0x7e, 0x8f, 0x92, 0x9c, 0x1e, 0xf3, 0x2a, 0x99, 0x6f, 0xea, 0xb7, 0xf5, 0xd9, 0xef, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0xa2, 0xd3, 0x43, 0x7a, 0x80, 0x07, 0x00, 0x00,
 }
