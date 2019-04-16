@@ -25,36 +25,6 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-// InstalledPlatforms represents an output of a set of installed platforms.
-type InstalledPlatforms struct {
-	Platforms []*InstalledPlatform
-}
-
-// InstalledPlatform represents an output of an installed plaform.
-type InstalledPlatform struct {
-	ID        string
-	Installed *semver.Version
-	Latest    *semver.Version
-	Name      string
-}
-
-func (is InstalledPlatforms) less(i, j int) bool {
-	return is.Platforms[i].ID < is.Platforms[j].ID
-}
-
-func (is InstalledPlatforms) String() string {
-	table := uitable.New()
-	table.MaxColWidth = 100
-	table.Wrap = true
-
-	table.AddRow("ID", "Installed", "Latest", "Name")
-	sort.Slice(is.Platforms, is.less)
-	for _, item := range is.Platforms {
-		table.AddRow(item.ID, item.Installed, item.Latest, item.Name)
-	}
-	return fmt.Sprintln(table)
-}
-
 // SearchedPlatforms represents an output of a set of searched platforms
 type SearchedPlatforms struct {
 	Platforms []*SearchedPlatform
