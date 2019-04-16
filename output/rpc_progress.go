@@ -32,6 +32,10 @@ func DownloadProgressBar() func(*rpc.DownloadProgress) {
 	return func(curr *rpc.DownloadProgress) {
 		// fmt.Printf(">>> %v\n", curr)
 		if filename := curr.GetFile(); filename != "" {
+			if curr.GetCompleted() {
+				fmt.Println(filename + " already downloaded")
+				return
+			}
 			prefix = filename
 			bar = pb.StartNew(int(curr.GetTotalSize()))
 			bar.Prefix(prefix)
