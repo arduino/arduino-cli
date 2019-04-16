@@ -45,9 +45,9 @@ service ArduinoCore {
 
   rpc Upload(UploadReq) returns (stream UploadResp);
 
-  rpc PlatformSearch(PlatformSearchReq) returns (stream PlatformSearchResp);
+  rpc PlatformSearch(PlatformSearchReq) returns (PlatformSearchResp);
 
-  rpc PlatformList(PlatformListReq) returns (stream PlatformListResp);
+  rpc PlatformList(PlatformListReq) returns (PlatformListResp);
 }
 
 // Configuration contains information to instantiate an Arduino Platform Service

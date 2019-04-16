@@ -28,11 +28,10 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 )
 
-func PlatformSearch(ctx context.Context, req *rpc.PlatformSearchReq, taskCB commands.TaskProgressCB) (*rpc.PlatformSearchResp, error) {
+func PlatformSearch(ctx context.Context, req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error) {
 	pm := commands.GetPackageManager(req)
 
 	search := req.SearchArgs
-	taskCB(&rpc.TaskProgress{Name: "Searching for  matching '" + search + "'"})
 
 	res := []*cores.PlatformRelease{}
 	if isUsb, _ := regexp.MatchString("[0-9a-f]{4}:[0-9a-f]{4}", search); isUsb {
@@ -61,20 +60,14 @@ func PlatformSearch(ctx context.Context, req *rpc.PlatformSearchReq, taskCB comm
 			}
 		}
 	}
+
 	out := []*rpc.SearchOutput{}
-	if len(res) == 0 {
-		taskCB(&rpc.TaskProgress{Message: "No platforms matching your search", Completed: true})
-	} else {
-
-		for _, platformRelease := range res {
-			out = append(out, &rpc.SearchOutput{
-				ID:      platformRelease.Platform.String(),
-				Name:    platformRelease.Platform.Name,
-				Version: platformRelease.Version.String(),
-			})
-		}
-		taskCB(&rpc.TaskProgress{Completed: true})
+	for _, platformRelease := range res {
+		out = append(out, &rpc.SearchOutput{
+			ID:      platformRelease.Platform.String(),
+			Name:    platformRelease.Platform.Name,
+			Version: platformRelease.Version.String(),
+		})
 	}
-
 	return &rpc.PlatformSearchResp{SearchOutput: out}, nil
 }
