@@ -46,7 +46,7 @@ func (m *Configuration) Reset()         { *m = Configuration{} }
 func (m *Configuration) String() string { return proto.CompactTextString(m) }
 func (*Configuration) ProtoMessage()    {}
 func (*Configuration) Descriptor() ([]byte, []int) {
-	return fileDescriptor_commands_595e725b92afdfd7, []int{0}
+	return fileDescriptor_commands_50e9c77252441827, []int{0}
 }
 func (m *Configuration) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Configuration.Unmarshal(m, b)
@@ -106,7 +106,7 @@ func (m *InitReq) Reset()         { *m = InitReq{} }
 func (m *InitReq) String() string { return proto.CompactTextString(m) }
 func (*InitReq) ProtoMessage()    {}
 func (*InitReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_commands_595e725b92afdfd7, []int{1}
+	return fileDescriptor_commands_50e9c77252441827, []int{1}
 }
 func (m *InitReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_InitReq.Unmarshal(m, b)
@@ -151,7 +151,7 @@ func (m *InitResp) Reset()         { *m = InitResp{} }
 func (m *InitResp) String() string { return proto.CompactTextString(m) }
 func (*InitResp) ProtoMessage()    {}
 func (*InitResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_commands_595e725b92afdfd7, []int{2}
+	return fileDescriptor_commands_50e9c77252441827, []int{2}
 }
 func (m *InitResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_InitResp.Unmarshal(m, b)
@@ -189,7 +189,7 @@ func (m *DestroyReq) Reset()         { *m = DestroyReq{} }
 func (m *DestroyReq) String() string { return proto.CompactTextString(m) }
 func (*DestroyReq) ProtoMessage()    {}
 func (*DestroyReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_commands_595e725b92afdfd7, []int{3}
+	return fileDescriptor_commands_50e9c77252441827, []int{3}
 }
 func (m *DestroyReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DestroyReq.Unmarshal(m, b)
@@ -226,7 +226,7 @@ func (m *DestroyResp) Reset()         { *m = DestroyResp{} }
 func (m *DestroyResp) String() string { return proto.CompactTextString(m) }
 func (*DestroyResp) ProtoMessage()    {}
 func (*DestroyResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_commands_595e725b92afdfd7, []int{4}
+	return fileDescriptor_commands_50e9c77252441827, []int{4}
 }
 func (m *DestroyResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DestroyResp.Unmarshal(m, b)
@@ -257,7 +257,7 @@ func (m *RescanReq) Reset()         { *m = RescanReq{} }
 func (m *RescanReq) String() string { return proto.CompactTextString(m) }
 func (*RescanReq) ProtoMessage()    {}
 func (*RescanReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_commands_595e725b92afdfd7, []int{5}
+	return fileDescriptor_commands_50e9c77252441827, []int{5}
 }
 func (m *RescanReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RescanReq.Unmarshal(m, b)
@@ -294,7 +294,7 @@ func (m *RescanResp) Reset()         { *m = RescanResp{} }
 func (m *RescanResp) String() string { return proto.CompactTextString(m) }
 func (*RescanResp) ProtoMessage()    {}
 func (*RescanResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_commands_595e725b92afdfd7, []int{6}
+	return fileDescriptor_commands_50e9c77252441827, []int{6}
 }
 func (m *RescanResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RescanResp.Unmarshal(m, b)
@@ -325,7 +325,7 @@ func (m *UpdateIndexReq) Reset()         { *m = UpdateIndexReq{} }
 func (m *UpdateIndexReq) String() string { return proto.CompactTextString(m) }
 func (*UpdateIndexReq) ProtoMessage()    {}
 func (*UpdateIndexReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_commands_595e725b92afdfd7, []int{7}
+	return fileDescriptor_commands_50e9c77252441827, []int{7}
 }
 func (m *UpdateIndexReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateIndexReq.Unmarshal(m, b)
@@ -363,7 +363,7 @@ func (m *UpdateIndexResp) Reset()         { *m = UpdateIndexResp{} }
 func (m *UpdateIndexResp) String() string { return proto.CompactTextString(m) }
 func (*UpdateIndexResp) ProtoMessage()    {}
 func (*UpdateIndexResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_commands_595e725b92afdfd7, []int{8}
+	return fileDescriptor_commands_50e9c77252441827, []int{8}
 }
 func (m *UpdateIndexResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UpdateIndexResp.Unmarshal(m, b)
@@ -1070,9 +1070,9 @@ var _ArduinoCore_serviceDesc = grpc.ServiceDesc{
 	Metadata: "commands.proto",
 }
 
-func init() { proto.RegisterFile("commands.proto", fileDescriptor_commands_595e725b92afdfd7) }
+func init() { proto.RegisterFile("commands.proto", fileDescriptor_commands_50e9c77252441827) }
 
-var fileDescriptor_commands_595e725b92afdfd7 = []byte{
+var fileDescriptor_commands_50e9c77252441827 = []byte{
 	// 644 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x9c, 0x55, 0x5d, 0x4f, 0xdb, 0x30,
 	0x14, 0x5d, 0x07, 0xa2, 0x70, 0xdb, 0x02, 0x35, 0x68, 0x2b, 0x61, 0x9b, 0x50, 0xc4, 0xc3, 0x5e,

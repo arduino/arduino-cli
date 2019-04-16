@@ -30,7 +30,7 @@ func (m *BoardDetailsReq) Reset()         { *m = BoardDetailsReq{} }
 func (m *BoardDetailsReq) String() string { return proto.CompactTextString(m) }
 func (*BoardDetailsReq) ProtoMessage()    {}
 func (*BoardDetailsReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_board_1867118ca41410d3, []int{0}
+	return fileDescriptor_board_9f74b7f023ee43fb, []int{0}
 }
 func (m *BoardDetailsReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_BoardDetailsReq.Unmarshal(m, b)
@@ -77,7 +77,7 @@ func (m *BoardDetailsResp) Reset()         { *m = BoardDetailsResp{} }
 func (m *BoardDetailsResp) String() string { return proto.CompactTextString(m) }
 func (*BoardDetailsResp) ProtoMessage()    {}
 func (*BoardDetailsResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_board_1867118ca41410d3, []int{1}
+	return fileDescriptor_board_9f74b7f023ee43fb, []int{1}
 }
 func (m *BoardDetailsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_BoardDetailsResp.Unmarshal(m, b)
@@ -131,7 +131,7 @@ func (m *ConfigOption) Reset()         { *m = ConfigOption{} }
 func (m *ConfigOption) String() string { return proto.CompactTextString(m) }
 func (*ConfigOption) ProtoMessage()    {}
 func (*ConfigOption) Descriptor() ([]byte, []int) {
-	return fileDescriptor_board_1867118ca41410d3, []int{2}
+	return fileDescriptor_board_9f74b7f023ee43fb, []int{2}
 }
 func (m *ConfigOption) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ConfigOption.Unmarshal(m, b)
@@ -185,7 +185,7 @@ func (m *ConfigValue) Reset()         { *m = ConfigValue{} }
 func (m *ConfigValue) String() string { return proto.CompactTextString(m) }
 func (*ConfigValue) ProtoMessage()    {}
 func (*ConfigValue) Descriptor() ([]byte, []int) {
-	return fileDescriptor_board_1867118ca41410d3, []int{3}
+	return fileDescriptor_board_9f74b7f023ee43fb, []int{3}
 }
 func (m *ConfigValue) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ConfigValue.Unmarshal(m, b)
@@ -239,7 +239,7 @@ func (m *RequiredTool) Reset()         { *m = RequiredTool{} }
 func (m *RequiredTool) String() string { return proto.CompactTextString(m) }
 func (*RequiredTool) ProtoMessage()    {}
 func (*RequiredTool) Descriptor() ([]byte, []int) {
-	return fileDescriptor_board_1867118ca41410d3, []int{4}
+	return fileDescriptor_board_9f74b7f023ee43fb, []int{4}
 }
 func (m *RequiredTool) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RequiredTool.Unmarshal(m, b)
@@ -288,9 +288,9 @@ func init() {
 	proto.RegisterType((*RequiredTool)(nil), "arduino.RequiredTool")
 }
 
-func init() { proto.RegisterFile("board.proto", fileDescriptor_board_1867118ca41410d3) }
+func init() { proto.RegisterFile("board.proto", fileDescriptor_board_9f74b7f023ee43fb) }
 
-var fileDescriptor_board_1867118ca41410d3 = []byte{
+var fileDescriptor_board_9f74b7f023ee43fb = []byte{
 	// 365 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x5c, 0x52, 0x4d, 0x6f, 0xe2, 0x30,
 	0x10, 0x55, 0x16, 0x96, 0x8f, 0x49, 0xd8, 0x0f, 0x8b, 0x5d, 0x45, 0x5c, 0x96, 0x8d, 0x7a, 0xe0,
