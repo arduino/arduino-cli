@@ -43,10 +43,9 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	libReleases := []*librariesindex.Release{}
 	for _, upgradeDesc := range list.Libraries {
 		libReleases = append(libReleases, upgradeDesc.Available)
-		//downloadLibrary(lm, upgradeDesc.Available)
-
 	}
-	installLibraries(lm, libReleases)
 
+	//downloadLibraries(lm, libReleases)
+	installLibraries(lm, libReleases)
 	logrus.Info("Done")
 }
