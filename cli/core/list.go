@@ -19,9 +19,13 @@ package core
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"sort"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
@@ -46,8 +50,30 @@ var listFlags struct {
 
 func runListCommand(cmd *cobra.Command, args []string) {
 	instance := cli.CreateInstance()
-	core.PlatformList(context.Background(), &rpc.PlatformListReq{
+	resp, err := core.PlatformList(context.Background(), &rpc.PlatformListReq{
 		Instance:      instance,
 		UpdatableOnly: listFlags.updatableOnly,
 	}, output.NewTaskProgressCB())
+	if err != nil {
+		formatter.PrintError(err, "Error saerching for platforms")
+		os.Exit(cli.ErrGeneric)
+	}
+	installed := resp.GetInstalledPlatform()
+	if installed != nil && len(installed) > 0 {
+		if cli.OutputJSONOrElse(installed) {
+			outputInstalledCores(installed)
+		}
+	}
+}
+
+func outputInstalledCores(cores []*rpc.InstalledPlatform) {
+	table := output.NewTable()
+	table.AddRow("ID", "Installed", "Latest", "Name")
+	sort.Slice(cores, func(i, j int) bool {
+		return cores[i].ID < cores[j].ID
+	})
+	for _, item := range cores {
+		table.AddRow(item.GetID(), item.GetInstalled(), item.GetLatest(), item.GetName())
+	}
+	fmt.Print(table.Render())
 }

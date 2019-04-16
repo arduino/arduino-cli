@@ -53,8 +53,5 @@ func PlatformList(ctx context.Context, req *rpc.PlatformListReq, taskCB commands
 		}
 	}
 
-	// if len(installed) > 0 {
-	// 	//formatter.Print(output.InstalledPlatforms{Platforms: installed})
-	// }
 	return &rpc.PlatformListResp{InstalledPlatform: installed}, nil
 }
