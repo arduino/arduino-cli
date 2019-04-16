@@ -22,14 +22,10 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/sirupsen/logrus"
-	semver "go.bug.st/relaxed-semver"
 )
 
-func PlatformList(ctx context.Context, req *rpc.PlatformListReq, taskCB commands.TaskProgressCB) (*rpc.PlatformListResp, error) {
-	logrus.Info("Executing `arduino core list`")
+func PlatformList(ctx context.Context, req *rpc.PlatformListReq) (*rpc.PlatformListResp, error) {
 	pm := commands.GetPackageManager(req)
-	taskCB(&rpc.TaskProgress{Name: "List installed platform", Completed: true})
 	installed := []*rpc.InstalledPlatform{}
 	for _, targetPackage := range pm.GetPackages().Packages {
 		for _, platform := range targetPackage.Platforms {
@@ -39,16 +35,15 @@ func PlatformList(ctx context.Context, req *rpc.PlatformListReq, taskCB commands
 						continue
 					}
 				}
-				var latestVersion *semver.Version
-				if latest := platformRelease.Platform.GetLatestRelease(); latest != nil {
-					latestVersion = latest.Version
-				}
-				installed = append(installed, &rpc.InstalledPlatform{
+				p := &rpc.InstalledPlatform{
 					ID:        platformRelease.String(),
 					Installed: platformRelease.Version.String(),
-					Latest:    latestVersion.String(),
 					Name:      platformRelease.Platform.Name,
-				})
+				}
+				if latest := platformRelease.Platform.GetLatestRelease(); latest != nil {
+					p.Latest = latest.Version.String()
+				}
+				installed = append(installed, p)
 			}
 		}
 	}

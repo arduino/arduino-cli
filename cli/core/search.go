@@ -50,18 +50,23 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core search`")
 	instance := cli.CreateInstance()
 	arguments := strings.ToLower(strings.Join(args, " "))
+
+	formatter.Print("Searching for platforms matching '" + arguments + "'")
 	resp, err := core.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
 		Instance:   instance,
 		SearchArgs: arguments,
-	}, output.NewTaskProgressCB())
+	})
 	if err != nil {
 		formatter.PrintError(err, "Error saerching for platforms")
 		os.Exit(cli.ErrGeneric)
 	}
+
 	coreslist := resp.GetSearchOutput()
-	if coreslist != nil && len(coreslist) > 0 {
-		if cli.OutputJSONOrElse(coreslist) {
+	if cli.OutputJSONOrElse(coreslist) {
+		if len(coreslist) > 0 {
 			outputSearchCores(coreslist)
+		} else {
+			formatter.Print("No platforms matching your search.")
 		}
 	}
 }

@@ -53,7 +53,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	resp, err := core.PlatformList(context.Background(), &rpc.PlatformListReq{
 		Instance:      instance,
 		UpdatableOnly: listFlags.updatableOnly,
-	}, output.NewTaskProgressCB())
+	})
 	if err != nil {
 		formatter.PrintError(err, "Error saerching for platforms")
 		os.Exit(cli.ErrGeneric)
