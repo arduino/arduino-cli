@@ -35,7 +35,7 @@ func (m *UploadReq) Reset()         { *m = UploadReq{} }
 func (m *UploadReq) String() string { return proto.CompactTextString(m) }
 func (*UploadReq) ProtoMessage()    {}
 func (*UploadReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_upload_060816d7eb7b7600, []int{0}
+	return fileDescriptor_upload_4ca90a3ea6de6b3f, []int{0}
 }
 func (m *UploadReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UploadReq.Unmarshal(m, b)
@@ -116,7 +116,7 @@ func (m *UploadResp) Reset()         { *m = UploadResp{} }
 func (m *UploadResp) String() string { return proto.CompactTextString(m) }
 func (*UploadResp) ProtoMessage()    {}
 func (*UploadResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_upload_060816d7eb7b7600, []int{1}
+	return fileDescriptor_upload_4ca90a3ea6de6b3f, []int{1}
 }
 func (m *UploadResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UploadResp.Unmarshal(m, b)
@@ -155,9 +155,9 @@ func init() {
 	proto.RegisterType((*UploadResp)(nil), "arduino.UploadResp")
 }
 
-func init() { proto.RegisterFile("upload.proto", fileDescriptor_upload_060816d7eb7b7600) }
+func init() { proto.RegisterFile("upload.proto", fileDescriptor_upload_4ca90a3ea6de6b3f) }
 
-var fileDescriptor_upload_060816d7eb7b7600 = []byte{
+var fileDescriptor_upload_4ca90a3ea6de6b3f = []byte{
 	// 267 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x3c, 0x90, 0xcf, 0x4a, 0xc4, 0x30,
 	0x10, 0x87, 0xe9, 0xba, 0xb6, 0xdb, 0xd9, 0x5e, 0xcc, 0x41, 0x82, 0x20, 0x4a, 0xf1, 0xe0, 0x65,

@@ -29,7 +29,7 @@ func (m *Instance) Reset()         { *m = Instance{} }
 func (m *Instance) String() string { return proto.CompactTextString(m) }
 func (*Instance) ProtoMessage()    {}
 func (*Instance) Descriptor() ([]byte, []int) {
-	return fileDescriptor_common_b292d2ccd88efb9a, []int{0}
+	return fileDescriptor_common_5d77f9539a1bc267, []int{0}
 }
 func (m *Instance) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Instance.Unmarshal(m, b)
@@ -71,7 +71,7 @@ func (m *DownloadProgress) Reset()         { *m = DownloadProgress{} }
 func (m *DownloadProgress) String() string { return proto.CompactTextString(m) }
 func (*DownloadProgress) ProtoMessage()    {}
 func (*DownloadProgress) Descriptor() ([]byte, []int) {
-	return fileDescriptor_common_b292d2ccd88efb9a, []int{1}
+	return fileDescriptor_common_5d77f9539a1bc267, []int{1}
 }
 func (m *DownloadProgress) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DownloadProgress.Unmarshal(m, b)
@@ -139,7 +139,7 @@ func (m *TaskProgress) Reset()         { *m = TaskProgress{} }
 func (m *TaskProgress) String() string { return proto.CompactTextString(m) }
 func (*TaskProgress) ProtoMessage()    {}
 func (*TaskProgress) Descriptor() ([]byte, []int) {
-	return fileDescriptor_common_b292d2ccd88efb9a, []int{2}
+	return fileDescriptor_common_5d77f9539a1bc267, []int{2}
 }
 func (m *TaskProgress) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_TaskProgress.Unmarshal(m, b)
@@ -186,9 +186,9 @@ func init() {
 	proto.RegisterType((*TaskProgress)(nil), "arduino.TaskProgress")
 }
 
-func init() { proto.RegisterFile("common.proto", fileDescriptor_common_b292d2ccd88efb9a) }
+func init() { proto.RegisterFile("common.proto", fileDescriptor_common_5d77f9539a1bc267) }
 
-var fileDescriptor_common_b292d2ccd88efb9a = []byte{
+var fileDescriptor_common_5d77f9539a1bc267 = []byte{
 	// 245 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x5c, 0x90, 0xcd, 0x4a, 0xc4, 0x30,
 	0x14, 0x85, 0xe9, 0x74, 0xc6, 0x99, 0x5e, 0x06, 0x19, 0xee, 0x2a, 0x88, 0x8a, 0x14, 0x17, 0x6e,

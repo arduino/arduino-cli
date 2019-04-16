@@ -41,7 +41,7 @@ func (m *CompileReq) Reset()         { *m = CompileReq{} }
 func (m *CompileReq) String() string { return proto.CompactTextString(m) }
 func (*CompileReq) ProtoMessage()    {}
 func (*CompileReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_compile_b05aa4b7d1cad046, []int{0}
+	return fileDescriptor_compile_e75367584037a3c2, []int{0}
 }
 func (m *CompileReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CompileReq.Unmarshal(m, b)
@@ -166,7 +166,7 @@ func (m *CompileResp) Reset()         { *m = CompileResp{} }
 func (m *CompileResp) String() string { return proto.CompactTextString(m) }
 func (*CompileResp) ProtoMessage()    {}
 func (*CompileResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_compile_b05aa4b7d1cad046, []int{1}
+	return fileDescriptor_compile_e75367584037a3c2, []int{1}
 }
 func (m *CompileResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CompileResp.Unmarshal(m, b)
@@ -219,9 +219,9 @@ func init() {
 	proto.RegisterType((*CompileResp)(nil), "arduino.CompileResp")
 }
 
-func init() { proto.RegisterFile("compile.proto", fileDescriptor_compile_b05aa4b7d1cad046) }
+func init() { proto.RegisterFile("compile.proto", fileDescriptor_compile_e75367584037a3c2) }
 
-var fileDescriptor_compile_b05aa4b7d1cad046 = []byte{
+var fileDescriptor_compile_e75367584037a3c2 = []byte{
 	// 411 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x5c, 0x92, 0xc1, 0x8e, 0xd3, 0x30,
 	0x18, 0x84, 0xd5, 0x4d, 0xb7, 0x4d, 0xfe, 0xa6, 0xc0, 0x5a, 0x80, 0xcc, 0x0a, 0xd0, 0xaa, 0x42,

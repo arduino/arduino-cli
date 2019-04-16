@@ -32,7 +32,7 @@ func (m *PlatformInstallReq) Reset()         { *m = PlatformInstallReq{} }
 func (m *PlatformInstallReq) String() string { return proto.CompactTextString(m) }
 func (*PlatformInstallReq) ProtoMessage()    {}
 func (*PlatformInstallReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{0}
+	return fileDescriptor_core_91f658c98102ea78, []int{0}
 }
 func (m *PlatformInstallReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformInstallReq.Unmarshal(m, b)
@@ -92,7 +92,7 @@ func (m *PlatformInstallResp) Reset()         { *m = PlatformInstallResp{} }
 func (m *PlatformInstallResp) String() string { return proto.CompactTextString(m) }
 func (*PlatformInstallResp) ProtoMessage()    {}
 func (*PlatformInstallResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{1}
+	return fileDescriptor_core_91f658c98102ea78, []int{1}
 }
 func (m *PlatformInstallResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformInstallResp.Unmarshal(m, b)
@@ -140,7 +140,7 @@ func (m *PlatformDownloadReq) Reset()         { *m = PlatformDownloadReq{} }
 func (m *PlatformDownloadReq) String() string { return proto.CompactTextString(m) }
 func (*PlatformDownloadReq) ProtoMessage()    {}
 func (*PlatformDownloadReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{2}
+	return fileDescriptor_core_91f658c98102ea78, []int{2}
 }
 func (m *PlatformDownloadReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformDownloadReq.Unmarshal(m, b)
@@ -199,7 +199,7 @@ func (m *PlatformDownloadResp) Reset()         { *m = PlatformDownloadResp{} }
 func (m *PlatformDownloadResp) String() string { return proto.CompactTextString(m) }
 func (*PlatformDownloadResp) ProtoMessage()    {}
 func (*PlatformDownloadResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{3}
+	return fileDescriptor_core_91f658c98102ea78, []int{3}
 }
 func (m *PlatformDownloadResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformDownloadResp.Unmarshal(m, b)
@@ -240,7 +240,7 @@ func (m *PlatformUninstallReq) Reset()         { *m = PlatformUninstallReq{} }
 func (m *PlatformUninstallReq) String() string { return proto.CompactTextString(m) }
 func (*PlatformUninstallReq) ProtoMessage()    {}
 func (*PlatformUninstallReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{4}
+	return fileDescriptor_core_91f658c98102ea78, []int{4}
 }
 func (m *PlatformUninstallReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformUninstallReq.Unmarshal(m, b)
@@ -299,7 +299,7 @@ func (m *PlatformUninstallResp) Reset()         { *m = PlatformUninstallResp{} }
 func (m *PlatformUninstallResp) String() string { return proto.CompactTextString(m) }
 func (*PlatformUninstallResp) ProtoMessage()    {}
 func (*PlatformUninstallResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{5}
+	return fileDescriptor_core_91f658c98102ea78, []int{5}
 }
 func (m *PlatformUninstallResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformUninstallResp.Unmarshal(m, b)
@@ -340,7 +340,7 @@ func (m *PlatformUpgradeReq) Reset()         { *m = PlatformUpgradeReq{} }
 func (m *PlatformUpgradeReq) String() string { return proto.CompactTextString(m) }
 func (*PlatformUpgradeReq) ProtoMessage()    {}
 func (*PlatformUpgradeReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{6}
+	return fileDescriptor_core_91f658c98102ea78, []int{6}
 }
 func (m *PlatformUpgradeReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformUpgradeReq.Unmarshal(m, b)
@@ -400,7 +400,7 @@ func (m *PlatformUpgradeResp) Reset()         { *m = PlatformUpgradeResp{} }
 func (m *PlatformUpgradeResp) String() string { return proto.CompactTextString(m) }
 func (*PlatformUpgradeResp) ProtoMessage()    {}
 func (*PlatformUpgradeResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{7}
+	return fileDescriptor_core_91f658c98102ea78, []int{7}
 }
 func (m *PlatformUpgradeResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformUpgradeResp.Unmarshal(m, b)
@@ -446,7 +446,7 @@ func (m *PlatformSearchReq) Reset()         { *m = PlatformSearchReq{} }
 func (m *PlatformSearchReq) String() string { return proto.CompactTextString(m) }
 func (*PlatformSearchReq) ProtoMessage()    {}
 func (*PlatformSearchReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{8}
+	return fileDescriptor_core_91f658c98102ea78, []int{8}
 }
 func (m *PlatformSearchReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformSearchReq.Unmarshal(m, b)
@@ -491,7 +491,7 @@ func (m *PlatformSearchResp) Reset()         { *m = PlatformSearchResp{} }
 func (m *PlatformSearchResp) String() string { return proto.CompactTextString(m) }
 func (*PlatformSearchResp) ProtoMessage()    {}
 func (*PlatformSearchResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{9}
+	return fileDescriptor_core_91f658c98102ea78, []int{9}
 }
 func (m *PlatformSearchResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformSearchResp.Unmarshal(m, b)
@@ -531,7 +531,7 @@ func (m *SearchOutput) Reset()         { *m = SearchOutput{} }
 func (m *SearchOutput) String() string { return proto.CompactTextString(m) }
 func (*SearchOutput) ProtoMessage()    {}
 func (*SearchOutput) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{10}
+	return fileDescriptor_core_91f658c98102ea78, []int{10}
 }
 func (m *SearchOutput) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SearchOutput.Unmarshal(m, b)
@@ -584,7 +584,7 @@ func (m *PlatformListReq) Reset()         { *m = PlatformListReq{} }
 func (m *PlatformListReq) String() string { return proto.CompactTextString(m) }
 func (*PlatformListReq) ProtoMessage()    {}
 func (*PlatformListReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{11}
+	return fileDescriptor_core_91f658c98102ea78, []int{11}
 }
 func (m *PlatformListReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformListReq.Unmarshal(m, b)
@@ -629,7 +629,7 @@ func (m *PlatformListResp) Reset()         { *m = PlatformListResp{} }
 func (m *PlatformListResp) String() string { return proto.CompactTextString(m) }
 func (*PlatformListResp) ProtoMessage()    {}
 func (*PlatformListResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{12}
+	return fileDescriptor_core_91f658c98102ea78, []int{12}
 }
 func (m *PlatformListResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PlatformListResp.Unmarshal(m, b)
@@ -670,7 +670,7 @@ func (m *InstalledPlatform) Reset()         { *m = InstalledPlatform{} }
 func (m *InstalledPlatform) String() string { return proto.CompactTextString(m) }
 func (*InstalledPlatform) ProtoMessage()    {}
 func (*InstalledPlatform) Descriptor() ([]byte, []int) {
-	return fileDescriptor_core_e86c74e8f791f640, []int{13}
+	return fileDescriptor_core_91f658c98102ea78, []int{13}
 }
 func (m *InstalledPlatform) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_InstalledPlatform.Unmarshal(m, b)
@@ -735,9 +735,9 @@ func init() {
 	proto.RegisterType((*InstalledPlatform)(nil), "arduino.InstalledPlatform")
 }
 
-func init() { proto.RegisterFile("core.proto", fileDescriptor_core_e86c74e8f791f640) }
+func init() { proto.RegisterFile("core.proto", fileDescriptor_core_91f658c98102ea78) }
 
-var fileDescriptor_core_e86c74e8f791f640 = []byte{
+var fileDescriptor_core_91f658c98102ea78 = []byte{
 	// 513 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xd4, 0x55, 0xcf, 0x6f, 0xd3, 0x30,
 	0x18, 0x55, 0xba, 0x6a, 0x6b, 0xbf, 0x75, 0x3f, 0x6a, 0x18, 0x0a, 0x13, 0x12, 0xc8, 0x02, 0x09,
