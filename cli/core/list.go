@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -50,12 +51,14 @@ var listFlags struct {
 
 func runListCommand(cmd *cobra.Command, args []string) {
 	instance := cli.CreateInstance()
+	logrus.Info("Executing `arduino core list`")
+
 	resp, err := core.PlatformList(context.Background(), &rpc.PlatformListReq{
 		Instance:      instance,
 		UpdatableOnly: listFlags.updatableOnly,
 	})
 	if err != nil {
-		formatter.PrintError(err, "Error saerching for platforms")
+		formatter.PrintError(err, "Error listing platforms")
 		os.Exit(cli.ErrGeneric)
 	}
 	installed := resp.GetInstalledPlatform()

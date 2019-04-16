@@ -30,16 +30,16 @@ import (
 )
 
 func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloadCB commands.DownloadProgressCB) (*rpc.PlatformDownloadResp, error) {
+	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
+	}
+
 	var version *semver.Version
 	if v, err := semver.Parse(req.Version); err == nil {
 		version = v
 	} else {
 		return nil, fmt.Errorf("invalid version: %s", err)
-	}
-
-	pm := commands.GetPackageManager(req)
-	if pm == nil {
-		return nil, errors.New("invalid instance")
 	}
 
 	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{

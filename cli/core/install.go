@@ -19,9 +19,11 @@ package core
 
 import (
 	"context"
+	"os"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
@@ -50,18 +52,15 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	platformsRefs := parsePlatformReferenceArgs(args)
 
 	for _, platformRef := range platformsRefs {
-		core.PlatformInstall(context.Background(), &rpc.PlatformInstallReq{
+		_, err := core.PlatformInstall(context.Background(), &rpc.PlatformInstallReq{
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.PlatformArchitecture,
 			Version:         platformRef.PlatformVersion.String(),
 		}, output.DownloadProgressBar(), output.NewTaskProgressCB())
-		// if err != nil {
-		// 	formatter.PrintError(err, "Error during build")
-		// 	os.Exit(cli.ErrGeneric)
-		// }
-		// }
+		if err != nil {
+			formatter.PrintError(err, "Error during install")
+			os.Exit(cli.ErrGeneric)
+		}
 	}
-
-	// TODO: Cleanup unused tools
 }

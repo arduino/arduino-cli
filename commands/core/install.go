@@ -1,3 +1,20 @@
+/*
+ * This file is part of arduino-cli.
+ *
+ * Copyright 2018 ARDUINO SA (http://www.arduino.cc/)
+ *
+ * This software is released under the GNU General Public License version 3,
+ * which covers the main part of arduino-cli.
+ * The terms of this license can be found at:
+ * https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * You can be released from the requirements of the above licenses by purchasing
+ * a commercial license. Buying such a license is mandatory if you want to modify or
+ * otherwise use the software for commercial activities involving the Arduino
+ * software without disclosing the source code of your own applications. To purchase
+ * a commercial license, send an email to license@arduino.cc.
+ */
+
 package core
 
 import (
@@ -8,13 +25,18 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
 	semver "go.bug.st/relaxed-semver"
 )
 
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResp, error) {
+
+	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
+	}
+
 	var version *semver.Version
 	if req.Version != "" {
 		if v, err := semver.Parse(req.Version); err == nil {
@@ -22,11 +44,6 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 		} else {
 			return nil, fmt.Errorf("invalid version: %s", err)
 		}
-	}
-
-	pm := commands.GetPackageManager(req)
-	if pm == nil {
-		return nil, errors.New("invalid instance")
 	}
 
 	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{
@@ -119,7 +136,6 @@ func installPlatform(pm *packagemanager.PackageManager,
 			if err := pm.UninstallPlatform(platformRelease); err != nil {
 				log.WithError(err).Error("Error rolling-back changes.")
 				taskCB(&rpc.TaskProgress{Message: "Error rolling-back changes: " + err.Error()})
-				//return fmt.Errorf("rolling-back changes: %s", err)
 			}
 
 			return fmt.Errorf("updating platform: %s", errUn)
@@ -146,8 +162,7 @@ func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.To
 	err := pm.InstallTool(toolRelease)
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
-		formatter.PrintError(err, "Cannot install tool: "+toolRelease.String())
-		return fmt.Errorf("Cannot install tool: "+toolRelease.String(), err)
+		return fmt.Errorf("installing tool %s: %s", toolRelease, err)
 	}
 	log.Info("Tool installed")
 	taskCB(&rpc.TaskProgress{Message: toolRelease.String() + " installed", Completed: true})

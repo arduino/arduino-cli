@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"os"
 	"sort"
-
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -47,11 +46,12 @@ func initSearchCommand() *cobra.Command {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino core search`")
 	instance := cli.CreateInstance()
-	arguments := strings.ToLower(strings.Join(args, " "))
+	logrus.Info("Executing `arduino core search`")
 
+	arguments := strings.ToLower(strings.Join(args, " "))
 	formatter.Print("Searching for platforms matching '" + arguments + "'")
+
 	resp, err := core.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
 		Instance:   instance,
 		SearchArgs: arguments,
