@@ -253,6 +253,29 @@ func main() {
 		}
 	}
 
+	downloadRespStream, err := client.LibraryDownload(context.Background(), &rpc.LibraryDownloadReq{
+		Instance: instance,
+		Name:     "WiFi101",
+		Version:  "0.15.2",
+	})
+	if err != nil {
+		fmt.Printf("Error Upgrade platform: %s\n", err)
+		os.Exit(1)
+	}
+	for {
+		downloadResp, err := downloadRespStream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Printf("Download error: %s\n", err)
+			os.Exit(1)
+		}
+		if downloadResp.GetProgress() != nil {
+			fmt.Printf(">> DOWNLOAD: %s\n", downloadResp.GetProgress())
+		}
+	}
+
 	_, err = client.Destroy(context.Background(), &rpc.DestroyReq{
 		Instance: instance,
 	})

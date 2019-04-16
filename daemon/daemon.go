@@ -30,6 +30,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
@@ -170,4 +171,15 @@ func feedStream(streamer func(data []byte)) io.Writer {
 		}
 	}()
 	return w
+}
+
+func (s *ArduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadReq, stream rpc.ArduinoCore_LibraryDownloadServer) error {
+	resp, err := lib.LibraryDownload(
+		stream.Context(), req,
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryDownloadResp{Progress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
 }

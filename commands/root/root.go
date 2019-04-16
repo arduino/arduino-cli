@@ -26,10 +26,11 @@ import (
 	"github.com/arduino/arduino-cli/cli/compile"
 	"github.com/arduino/arduino-cli/cli/core"
 	"github.com/arduino/arduino-cli/cli/daemon"
+	"github.com/arduino/arduino-cli/cli/lib"
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/commands/config"
 	"github.com/arduino/arduino-cli/commands/generatedocs"
-	"github.com/arduino/arduino-cli/commands/lib"
+
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/version"
 	"github.com/arduino/arduino-cli/common/formatter"

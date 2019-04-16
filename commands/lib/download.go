@@ -18,75 +18,47 @@
 package lib
 
 import (
-	"os"
+	"context"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	semver "go.bug.st/relaxed-semver"
 )
 
-func initDownloadCommand() *cobra.Command {
-	downloadCommand := &cobra.Command{
-		Use:   "download [LIBRARY_NAME(S)]",
-		Short: "Downloads one or more libraries without installing them.",
-		Long:  "Downloads one or more libraries without installing them.",
-		Example: "" +
-			"  " + cli.AppName + " lib download AudioZero       # for the latest version.\n" +
-			"  " + cli.AppName + " lib download AudioZero@1.0.0 # for a specific version.",
-		Args: cobra.MinimumNArgs(1),
-		Run:  runDownloadCommand,
-	}
-	return downloadCommand
-}
-
-func runDownloadCommand(cmd *cobra.Command, args []string) {
+func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadCB commands.DownloadProgressCB) (*rpc.LibraryDownloadResp, error) {
 	logrus.Info("Executing `arduino lib download`")
 
-	lm := cli.InitLibraryManager(cli.Config)
+	lm := commands.GetLibraryManager(req)
 
 	logrus.Info("Preparing download")
-	pairs, err := librariesindex.ParseArgs(args)
-	if err != nil {
-		formatter.PrintError(err, "Arguments error")
-		os.Exit(cli.ErrBadArgument)
-	}
-	downloadLibrariesFromReferences(lm, pairs)
-}
 
-func downloadLibrariesFromReferences(lm *librariesmanager.LibrariesManager, refs []*librariesindex.Reference) {
-	libReleases := []*librariesindex.Release{}
-	for _, ref := range refs {
-		if lib := lm.Index.FindRelease(ref); lib == nil {
-			formatter.PrintErrorMessage("Error: library " + ref.String() + " not found")
-			os.Exit(cli.ErrBadCall)
-		} else {
-			libReleases = append(libReleases, lib)
-		}
+	var version *semver.Version
+	if v, err := semver.Parse(req.GetVersion()); err == nil {
+		version = v
+	} else {
+		return nil, fmt.Errorf("invalid version: %s", err)
 	}
-	downloadLibraries(lm, libReleases)
-}
-
-func downloadLibraries(lm *librariesmanager.LibrariesManager, libReleases []*librariesindex.Release) {
-	logrus.Info("Downloading libraries")
-	for _, libRelease := range libReleases {
-		d, err := libRelease.Resource.Download(lm.DownloadsDir)
+	ref := &librariesindex.Reference{Name: req.GetName(), Version: version}
+	if lib := lm.Index.FindRelease(ref); lib == nil {
+		return nil, fmt.Errorf("library not found: %s", ref.String())
+	} else {
+		err := downloadLibrary(lm, lib, downloadCB)
 		if err != nil {
-			formatter.PrintError(err, "Error downloading "+libRelease.String())
-			os.Exit(cli.ErrNetwork)
-		}
-		if d == nil {
-			formatter.Print(libRelease.String() + " already downloaded")
-		} else {
-			formatter.DownloadProgressBar(d, libRelease.String())
-			if d.Error() != nil {
-				formatter.PrintError(d.Error(), "Error downloading "+libRelease.String())
-				os.Exit(cli.ErrNetwork)
-			}
+			return nil, err
 		}
 	}
 
-	logrus.Info("Done")
+	return &rpc.LibraryDownloadResp{}, nil
+}
+
+func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release, downloadCB commands.DownloadProgressCB) error {
+	d, err := libRelease.Resource.Download(lm.DownloadsDir)
+	if err != nil {
+		return fmt.Errorf("download error: %s", err)
+	}
+	return commands.Download(d, libRelease.String(), downloadCB)
 }

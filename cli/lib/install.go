@@ -43,23 +43,16 @@ func initInstallCommand() *cobra.Command {
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
-	// 	instance := cli.CreateInstance()
-	// 	logrus.Info("Executing `arduino lib install`")
-	// 	lm := cli.InitLibraryManager(cli.Config)
+	logrus.Info("Executing `arduino lib install`")
+	lm := cli.InitLibraryManager(cli.Config)
 
-	// 	refs, err := librariesindex.ParseArgs(args)
-	// 	if err != nil {
-	// 		formatter.PrintError(err, "Arguments error")
-	// 		os.Exit(cli.ErrBadArgument)
-	// 	}
-	// 	for _, library := range refs {
-	// 		downloadLibrary(lm, &rpc.LibraryDownloadReq{
-	// 			Instance: instance,
-	// 			Name:     library.Name,
-	// 			Version:  library.Version.String(),
-	// 		}, downloadCB)
-	// 		installLibrariesFromReferences(lm, refs)
-	// 	}
+	refs, err := librariesindex.ParseArgs(args)
+	if err != nil {
+		formatter.PrintError(err, "Arguments error")
+		os.Exit(cli.ErrBadArgument)
+	}
+	//downloadLibrariesFromReferences(lm, refs)
+	installLibrariesFromReferences(lm, refs)
 }
 
 func installLibrariesFromReferences(lm *librariesmanager.LibrariesManager, refs []*librariesindex.Reference) {
