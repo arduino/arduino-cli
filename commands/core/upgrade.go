@@ -30,6 +30,12 @@ import (
 
 func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformUpgradeResp, error) {
+
+	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
+	}
+
 	// Extract all PlatformReference to platforms that have updates
 	var version *semver.Version
 	if req.Version != "" {
@@ -38,10 +44,6 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 		} else {
 			return nil, fmt.Errorf("invalid version: %s", err)
 		}
-	}
-	pm := commands.GetPackageManager(req)
-	if pm == nil {
-		return nil, errors.New("invalid instance")
 	}
 
 	ref := &packagemanager.PlatformReference{

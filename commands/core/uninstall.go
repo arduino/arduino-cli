@@ -30,15 +30,17 @@ import (
 )
 
 func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq, taskCB commands.TaskProgressCB) (*rpc.PlatformUninstallResp, error) {
+	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
+	}
+
 	// If no version is specified consider the installed
 	version, err := semver.Parse(req.Version)
 	if err != nil {
 		return nil, fmt.Errorf("invalid version: %s", err)
 	}
-	pm := commands.GetPackageManager(req)
-	if pm == nil {
-		return nil, errors.New("invalid instance")
-	}
+
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,

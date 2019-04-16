@@ -19,9 +19,11 @@ package core
 
 import (
 	"context"
+	"os"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
@@ -49,11 +51,15 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 	platformsRefs := parsePlatformReferenceArgs(args)
 	for _, platformRef := range platformsRefs {
-		core.PlatformUpgrade(context.Background(), &rpc.PlatformUpgradeReq{
+		_, err := core.PlatformUpgrade(context.Background(), &rpc.PlatformUpgradeReq{
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.PlatformArchitecture,
 			Version:         platformRef.PlatformVersion.String(),
 		}, output.DownloadProgressBar(), output.NewTaskProgressCB())
+		if err != nil {
+			formatter.PrintError(err, "Error during upgrade")
+			os.Exit(cli.ErrGeneric)
+		}
 	}
 }

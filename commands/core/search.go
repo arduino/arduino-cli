@@ -19,17 +19,20 @@ package core
 
 import (
 	"context"
+	"errors"
 	"regexp"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
-
-	"github.com/arduino/arduino-cli/arduino/cores"
 )
 
 func PlatformSearch(ctx context.Context, req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error) {
 	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
+	}
 
 	search := req.SearchArgs
 

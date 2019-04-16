@@ -136,10 +136,10 @@ func UpdateLibrariesIndex(ctx context.Context, lm *librariesmanager.LibrariesMan
 func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResp, error) {
 	id := req.Instance.Id
 	coreInstance, ok := instances[id]
-
 	if !ok {
 		return nil, fmt.Errorf("invalid handle")
 	}
+
 	indexpath := coreInstance.config.IndexesDir()
 	for _, URL := range coreInstance.config.BoardManagerAdditionalUrls {
 		logrus.WithField("url", URL).Print("Updating index")

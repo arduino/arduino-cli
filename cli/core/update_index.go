@@ -19,11 +19,14 @@ package core
 
 import (
 	"context"
+	"os"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -41,8 +44,13 @@ func initUpdateIndexCommand() *cobra.Command {
 
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 	instance := cli.CreateInstance()
-	commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
+	logrus.Info("Executing `arduino core update-index`")
+
+	_, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
 		Instance: instance,
 	}, output.DownloadProgressBar())
-
+	if err != nil {
+		formatter.PrintError(err, "Error during install")
+		os.Exit(cli.ErrGeneric)
+	}
 }
