@@ -97,7 +97,7 @@ func Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 	}
 	pm, lm, err := createInstance(ctx, config, req.GetLibraryManagerOnly())
 	if err != nil {
-		return nil, fmt.Errorf("Impossible create instance")
+		return nil, fmt.Errorf("cannot initialize package manager: %s", err)
 	}
 	instance := &CoreInstance{
 		config:     config,
@@ -161,35 +161,34 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 
 		tmpFile, err := ioutil.TempFile("", "")
 		if err != nil {
-			return nil, fmt.Errorf("Error creating temp file for download", err)
-
+			return nil, fmt.Errorf("creating temp file for download: %s", err)
 		}
 		if err := tmpFile.Close(); err != nil {
-			return nil, fmt.Errorf("Error creating temp file for download", err)
+			return nil, fmt.Errorf("creating temp file for download: %s", err)
 		}
 		tmp := paths.New(tmpFile.Name())
 		defer tmp.Remove()
 
 		d, err := downloader.Download(tmp.String(), URL.String())
 		if err != nil {
-			return nil, fmt.Errorf("Error downloading index "+URL.String(), err)
+			return nil, fmt.Errorf("downloading index %s: %s", URL, err)
 		}
 		coreIndexPath := indexpath.Join(path.Base(URL.Path))
 		Download(d, "Updating index: "+coreIndexPath.Base(), downloadCB)
 		if d.Error() != nil {
-			return nil, fmt.Errorf("Error downloading index "+URL.String(), d.Error())
+			return nil, fmt.Errorf("downloading index %s: %s", URL, d.Error())
 		}
 
 		if _, err := packageindex.LoadIndex(tmp); err != nil {
-			return nil, fmt.Errorf("Invalid package index in "+URL.String(), err)
+			return nil, fmt.Errorf("invalid package index in %s: %s", URL, err)
 		}
 
 		if err := indexpath.MkdirAll(); err != nil {
-			return nil, fmt.Errorf("Can't create data directory "+indexpath.String(), err)
+			return nil, fmt.Errorf("can't create data directory %s: %s", indexpath, err)
 		}
 
 		if err := tmp.CopyTo(coreIndexPath); err != nil {
-			return nil, fmt.Errorf("Error saving downloaded index "+URL.String(), err)
+			return nil, fmt.Errorf("saving downloaded index %s: %s", URL, err)
 		}
 	}
 	Rescan(ctx, &rpc.RescanReq{Instance: req.Instance})
@@ -205,7 +204,7 @@ func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
 
 	pm, lm, err := createInstance(ctx, coreInstance.config, coreInstance.getLibOnly)
 	if err != nil {
-		return nil, fmt.Errorf("rescanning: %s", err)
+		return nil, fmt.Errorf("rescanning filesystem: %s", err)
 	}
 	coreInstance.pm = pm
 	coreInstance.lm = lm
