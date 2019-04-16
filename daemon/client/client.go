@@ -1,3 +1,20 @@
+//
+// This file is part of arduino-cli.
+//
+// Copyright 2018 ARDUINO SA (http://www.arduino.cc/)
+//
+// This software is released under the GNU General Public License version 3,
+// which covers the main part of arduino-cli.
+// The terms of this license can be found at:
+// https://www.gnu.org/licenses/gpl-3.0.en.html
+//
+// You can be released from the requirements of the above licenses by purchasing
+// a commercial license. Buying such a license is mandatory if you want to modify or
+// otherwise use the software for commercial activities involving the Arduino
+// software without disclosing the source code of your own applications. To purchase
+// a commercial license, send an email to license@arduino.cc.
+//
+
 package main
 
 import (
@@ -187,7 +204,7 @@ func main() {
 		}
 	}
 
-	searchRespStream, err := client.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
+	searchResp, err := client.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
 		Instance:   instance,
 		SearchArgs: "uno",
 	})
@@ -195,53 +212,21 @@ func main() {
 		fmt.Printf("Search error: %s\n", err)
 		os.Exit(1)
 	}
-	for {
-		searchResp, err := searchRespStream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			fmt.Printf("Compile error: %s\n", err)
-			os.Exit(1)
-		}
-		if searchResp.GetTaskProgress() != nil {
-			fmt.Printf(">> TASK: %s\n", searchResp.GetTaskProgress())
-		}
-		if searchResp.GetSearchOutput() != nil {
-			serchedOutput := searchResp.GetSearchOutput()
-			for _, outsearch := range serchedOutput {
-				fmt.Printf(">> OUTPUT: ID: %s\t Version: %s\t name: %s\n", outsearch.GetID(), outsearch.GetVersion(), outsearch.GetName())
-			}
-
-		}
+	serchedOutput := searchResp.GetSearchOutput()
+	for _, outsearch := range serchedOutput {
+		fmt.Printf(">> SEARCH: %+v\n", outsearch)
 	}
 
-	listRespStream, err := client.PlatformList(context.Background(), &rpc.PlatformListReq{
+	listResp, err := client.PlatformList(context.Background(), &rpc.PlatformListReq{
 		Instance: instance,
 	})
 	if err != nil {
-		fmt.Printf("Search error: %s\n", err)
+		fmt.Printf("List error: %s\n", err)
 		os.Exit(1)
 	}
-	for {
-		listResp, err := listRespStream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			fmt.Printf("Compile error: %s\n", err)
-			os.Exit(1)
-		}
-		if listResp.GetTaskProgress() != nil {
-			fmt.Printf(">> TASK: %s\n", listResp.GetTaskProgress())
-		}
-		if listResp.GetInstalledPlatform() != nil {
-			Installedplatforms := listResp.GetInstalledPlatform()
-			for _, listpfm := range Installedplatforms {
-				fmt.Printf(">> OUTPUT: ID: %s\t Installed Version: %s\t Latest Version: %s\t name: %s\n", listpfm.GetID(), listpfm.GetInstalled(), listpfm.GetLatest(), listpfm.GetName())
-			}
-
-		}
+	Installedplatforms := listResp.GetInstalledPlatform()
+	for _, listpfm := range Installedplatforms {
+		fmt.Printf(">> LIST: %+v\n", listpfm)
 	}
 
 	uninstallRespStream, err := client.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
