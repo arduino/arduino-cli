@@ -19,11 +19,15 @@ package core
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"sort"
 
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
@@ -46,8 +50,30 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core search`")
 	instance := cli.CreateInstance()
 	arguments := strings.ToLower(strings.Join(args, " "))
-	core.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
+	resp, err := core.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
 		Instance:   instance,
 		SearchArgs: arguments,
 	}, output.NewTaskProgressCB())
+	if err != nil {
+		formatter.PrintError(err, "Error saerching for platforms")
+		os.Exit(cli.ErrGeneric)
+	}
+	coreslist := resp.GetSearchOutput()
+	if coreslist != nil && len(coreslist) > 0 {
+		if cli.OutputJSONOrElse(coreslist) {
+			outputSearchCores(coreslist)
+		}
+	}
+}
+
+func outputSearchCores(cores []*rpc.SearchOutput) {
+	table := output.NewTable()
+	table.AddRow("ID", "Version", "Name")
+	sort.Slice(cores, func(i, j int) bool {
+		return cores[i].ID < cores[j].ID
+	})
+	for _, item := range cores {
+		table.AddRow(item.GetID(), item.GetVersion(), item.GetName())
+	}
+	fmt.Print(table.Render())
 }
