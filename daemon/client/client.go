@@ -33,14 +33,19 @@ func main() {
 		os.Exit(1)
 	}
 	datadir := os.Args[1]
+
+	fmt.Println("=== Connecting to GRPC server")
 	conn, err := grpc.Dial("127.0.0.1:50051", grpc.WithInsecure())
 	if err != nil {
 		fmt.Printf("Error connecting to server: %s\n", err)
 		os.Exit(1)
 	}
 	client := rpc.NewArduinoCoreClient(conn)
+	fmt.Println()
 
-	resp, err := client.Init(context.Background(), &rpc.InitReq{
+	// INIT
+	fmt.Println("=== calling Init")
+	initResp, err := client.Init(context.Background(), &rpc.InitReq{
 		Configuration: &rpc.Configuration{
 			DataDir: datadir,
 		},
@@ -49,10 +54,55 @@ func main() {
 		fmt.Printf("Error creating server instance: %s\n", err)
 		os.Exit(1)
 	}
-	instance := resp.GetInstance()
-	fmt.Println("Created new server instance:", instance)
+	instance := initResp.GetInstance()
+	fmt.Printf("---> %+v\n", initResp)
+	fmt.Println()
 
+	// UPDATE-INDEX
+	fmt.Println("=== calling UpdateIndex")
+	uiRespStream, err := client.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
+		Instance: instance,
+	})
+	if err != nil {
+		fmt.Printf("Error Upgrade platform: %s\n", err)
+		os.Exit(1)
+	}
+	for {
+		uiResp, err := uiRespStream.Recv()
+		if err == io.EOF {
+			fmt.Printf("---> %+v\n", uiResp)
+			fmt.Println()
+			break
+		}
+		if err != nil {
+			fmt.Printf("Compile error: %s\n", err)
+			os.Exit(1)
+		}
+		if uiResp.GetDownloadProgress() != nil {
+			fmt.Printf(">> DOWNLOAD: %s\n", uiResp.GetDownloadProgress())
+		}
+	}
+
+	// PLATFORM SEARCH
+	fmt.Println("=== calling PlatformSearch(uno)")
+	searchResp, err := client.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
+		Instance:   instance,
+		SearchArgs: "uno",
+	})
+	if err != nil {
+		fmt.Printf("Search error: %s\n", err)
+		os.Exit(1)
+	}
+	serchedOutput := searchResp.GetSearchOutput()
+	for _, outsearch := range serchedOutput {
+		fmt.Printf(">> SEARCH: %+v\n", outsearch)
+	}
+	fmt.Printf("---> %+v\n", searchResp)
+	fmt.Println()
+
+	// PLATFORM INSTALL
 	install := func() {
+		fmt.Println("=== calling PlatformInstall(arduino:samd@1.6.19)")
 		installRespStream, err := client.PlatformInstall(context.Background(), &rpc.PlatformInstallReq{
 			Instance:        instance,
 			PlatformPackage: "arduino",
@@ -66,6 +116,8 @@ func main() {
 		for {
 			installResp, err := installRespStream.Recv()
 			if err == io.EOF {
+				fmt.Printf("---> %+v\n", installResp)
+				fmt.Println()
 				break
 			}
 			if err != nil {
@@ -79,12 +131,28 @@ func main() {
 				fmt.Printf(">> TASK: %s\n", installResp.GetTaskProgress())
 			}
 		}
-		fmt.Println("Installation completed!")
 	}
 
 	install()
 	install()
 
+	// PLATFORM LIST
+	fmt.Println("=== calling PlatformList()")
+	listResp, err := client.PlatformList(context.Background(), &rpc.PlatformListReq{
+		Instance: instance,
+	})
+	if err != nil {
+		fmt.Printf("List error: %s\n", err)
+		os.Exit(1)
+	}
+	Installedplatforms := listResp.GetInstalledPlatform()
+	for _, listpfm := range Installedplatforms {
+		fmt.Printf("---> LIST: %+v\n", listpfm)
+	}
+	fmt.Println()
+
+	// PLATFORM UPGRADE
+	fmt.Println("=== calling PlatformUpgrade(arduino:samd)")
 	upgradeRespStream, err := client.PlatformUpgrade(context.Background(), &rpc.PlatformUpgradeReq{
 		Instance:        instance,
 		PlatformPackage: "arduino",
@@ -97,6 +165,8 @@ func main() {
 	for {
 		upgradeResp, err := upgradeRespStream.Recv()
 		if err == io.EOF {
+			fmt.Printf("---> %+v\n", upgradeResp)
+			fmt.Println()
 			break
 		}
 		if err != nil {
@@ -110,18 +180,21 @@ func main() {
 			fmt.Printf(">> TASK: %s\n", upgradeResp.GetTaskProgress())
 		}
 	}
-	fmt.Println("Upgrade completed!")
 
+	// BOARDS DETAILS
+	fmt.Println("=== calling BoardDetails(arduino:samd:mkr1000)")
 	details, err := client.BoardDetails(context.Background(), &rpc.BoardDetailsReq{
 		Instance: instance,
 		Fqbn:     "arduino:samd:mkr1000",
 	})
 	if err != nil {
 		fmt.Printf("Error getting board data: %s\n", err)
-	} else {
-		fmt.Printf("Board name: %s\n", details.GetName())
 	}
+	fmt.Printf("---> %+v\n", details)
+	fmt.Println()
 
+	// COMPILE
+	fmt.Println("=== calling Compile(arduino:samd:mkr1000, VERBOSE, " + os.Args[2] + ")")
 	compRespStream, err := client.Compile(context.Background(), &rpc.CompileReq{
 		Instance:   instance,
 		Fqbn:       "arduino:samd:mkr1000",
@@ -135,6 +208,8 @@ func main() {
 	for {
 		compResp, err := compRespStream.Recv()
 		if err == io.EOF {
+			fmt.Printf("---> %+v\n", compResp)
+			fmt.Println()
 			break
 		}
 		if err != nil {
@@ -155,6 +230,8 @@ func main() {
 		}
 	}
 
+	// UPLOAD
+	fmt.Println("=== calling Upload(arduino:samd:mkr1000, /dev/ttyACM0, VERBOSE, " + os.Args[2] + ")")
 	uplRespStream, err := client.Upload(context.Background(), &rpc.UploadReq{
 		Instance:   instance,
 		Fqbn:       "arduino:samd:mkr1000",
@@ -169,6 +246,8 @@ func main() {
 	for {
 		uplResp, err := uplRespStream.Recv()
 		if err == io.EOF {
+			fmt.Printf("---> %+v\n", uplResp)
+			fmt.Println()
 			break
 		}
 		if err != nil {
@@ -183,52 +262,8 @@ func main() {
 		}
 	}
 
-	uiRespStream, err := client.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
-		Instance: instance,
-	})
-	if err != nil {
-		fmt.Printf("Error Upgrade platform: %s\n", err)
-		os.Exit(1)
-	}
-	for {
-		uiResp, err := uiRespStream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			fmt.Printf("Compile error: %s\n", err)
-			os.Exit(1)
-		}
-		if uiResp.GetDownloadProgress() != nil {
-			fmt.Printf(">> DOWNLOAD: %s\n", uiResp.GetDownloadProgress())
-		}
-	}
-
-	searchResp, err := client.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
-		Instance:   instance,
-		SearchArgs: "uno",
-	})
-	if err != nil {
-		fmt.Printf("Search error: %s\n", err)
-		os.Exit(1)
-	}
-	serchedOutput := searchResp.GetSearchOutput()
-	for _, outsearch := range serchedOutput {
-		fmt.Printf(">> SEARCH: %+v\n", outsearch)
-	}
-
-	listResp, err := client.PlatformList(context.Background(), &rpc.PlatformListReq{
-		Instance: instance,
-	})
-	if err != nil {
-		fmt.Printf("List error: %s\n", err)
-		os.Exit(1)
-	}
-	Installedplatforms := listResp.GetInstalledPlatform()
-	for _, listpfm := range Installedplatforms {
-		fmt.Printf(">> LIST: %+v\n", listpfm)
-	}
-
+	// PLATFORM UNINSTALL
+	fmt.Println("=== calling PlatformUninstall(arduino:samd@1.6.21)")
 	uninstallRespStream, err := client.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
 		Instance:        instance,
 		PlatformPackage: "arduino",
@@ -242,6 +277,8 @@ func main() {
 	for {
 		uninstallResp, err := uninstallRespStream.Recv()
 		if err == io.EOF {
+			fmt.Printf("---> %+v\n", uninstallResp)
+			fmt.Println()
 			break
 		}
 		if err != nil {
@@ -253,6 +290,8 @@ func main() {
 		}
 	}
 
+	// DESTROY
+	fmt.Println("=== calling Destroy()")
 	_, err = client.Destroy(context.Background(), &rpc.DestroyReq{
 		Instance: instance,
 	})
@@ -261,5 +300,4 @@ func main() {
 	} else {
 		fmt.Println("Successfully closed server instance")
 	}
-	fmt.Println("Done")
 }
