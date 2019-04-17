@@ -93,6 +93,8 @@ message InitReq {
 
 message InitResp {
   Instance instance = 1;
+  repeated string platforms_index_errors = 2;
+  string libraries_index_error = 3;
 }
 
 message DestroyReq { Instance instance = 1; }
@@ -103,6 +105,8 @@ message RescanReq {
 }
 
 message RescanResp {
+  repeated string platforms_index_errors = 1;
+  string libraries_index_error = 2;
 }
 
 message UpdateIndexReq {

@@ -95,7 +95,7 @@ func Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 			return nil, fmt.Errorf("parsing url %s: %s", rawurl, err)
 		}
 	}
-	pm, lm, err := createInstance(ctx, config, req.GetLibraryManagerOnly())
+	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(ctx, config, req.GetLibraryManagerOnly())
 	if err != nil {
 		return nil, fmt.Errorf("cannot initialize package manager: %s", err)
 	}
@@ -109,7 +109,9 @@ func Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 	instances[handle] = instance
 
 	return &rpc.InitResp{
-		Instance: &rpc.Instance{Id: handle},
+		Instance:             &rpc.Instance{Id: handle},
+		PlatformsIndexErrors: reqPltIndex,
+		LibrariesIndexError:  reqLibIndex,
 	}, nil
 }
 
@@ -202,17 +204,21 @@ func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
 		return nil, fmt.Errorf("invalid handle")
 	}
 
-	pm, lm, err := createInstance(ctx, coreInstance.config, coreInstance.getLibOnly)
+	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(ctx, coreInstance.config, coreInstance.getLibOnly)
 	if err != nil {
 		return nil, fmt.Errorf("rescanning filesystem: %s", err)
 	}
 	coreInstance.pm = pm
 	coreInstance.lm = lm
-	return &rpc.RescanResp{}, nil
+	return &rpc.RescanResp{
+		PlatformsIndexErrors: reqPltIndex,
+		LibrariesIndexError:  reqLibIndex,
+	}, nil
 }
 
-func createInstance(ctx context.Context, config *configs.Configuration, getLibOnly bool) (*packagemanager.PackageManager, *librariesmanager.LibrariesManager, error) {
+func createInstance(ctx context.Context, config *configs.Configuration, getLibOnly bool) (*packagemanager.PackageManager, *librariesmanager.LibrariesManager, []string, string, error) {
 	var pm *packagemanager.PackageManager
+	platformIndexErrors := []string{}
 	if !getLibOnly {
 		pm = packagemanager.NewPackageManager(
 			config.IndexesDir(),
@@ -222,13 +228,16 @@ func createInstance(ctx context.Context, config *configs.Configuration, getLibOn
 
 		for _, URL := range config.BoardManagerAdditionalUrls {
 			if err := pm.LoadPackageIndex(URL); err != nil {
-				return nil, nil, fmt.Errorf("loading "+URL.String()+" package index: %s", err)
+				platformIndexErrors = append(platformIndexErrors, err.Error())
 			}
 		}
 
 		if err := pm.LoadHardware(config); err != nil {
-			return nil, nil, fmt.Errorf("loading hardware packages: %s", err)
+			return nil, nil, nil, "", fmt.Errorf("loading hardware packages: %s", err)
 		}
+	}
+	if len(platformIndexErrors) == 0 {
+		platformIndexErrors = nil
 	}
 
 	// Initialize library manager
@@ -257,20 +266,16 @@ func createInstance(ctx context.Context, config *configs.Configuration, getLibOn
 	}
 
 	// Load index and auto-update it if needed
+	librariesIndexError := ""
 	if err := lm.LoadIndex(); err != nil {
-		UpdateLibrariesIndex(ctx, lm, func(curr *rpc.DownloadProgress) {
-			fmt.Printf(">> %+v\n", curr)
-		})
-		if err := lm.LoadIndex(); err != nil {
-			return nil, nil, fmt.Errorf("loading libraries index: %s", err)
-		}
+		librariesIndexError = err.Error()
 	}
 
 	// Scan for libraries
 	if err := lm.RescanLibraries(); err != nil {
-		return nil, nil, fmt.Errorf("libraries rescan: %s", err)
+		return nil, nil, nil, "", fmt.Errorf("libraries rescan: %s", err)
 	}
-	return pm, lm, nil
+	return pm, lm, platformIndexErrors, librariesIndexError, nil
 }
 
 func Download(d *downloader.Downloader, label string, downloadCB DownloadProgressCB) error {
