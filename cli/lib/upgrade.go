@@ -20,6 +20,7 @@ package lib
 import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -39,7 +40,7 @@ func initUpgradeCommand() *cobra.Command {
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	lm := cli.InitLibraryManager(cli.Config)
-	list := ListLibraries(lm, true)
+	list := lib.ListLibraries(lm, true)
 	libReleases := []*librariesindex.Release{}
 	for _, upgradeDesc := range list.Libraries {
 		libReleases = append(libReleases, upgradeDesc.Available)
