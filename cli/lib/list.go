@@ -18,11 +18,10 @@
 package lib
 
 import (
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/common/formatter/output"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -56,31 +55,9 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		lm = cli.InitLibraryManager(cli.Config)
 	}
 
-	res := ListLibraries(lm, listFlags.updatable)
+	res := lib.ListLibraries(lm, listFlags.updatable)
 	if len(res.Libraries) > 0 {
 		formatter.Print(res)
 	}
 	logrus.Info("Done")
-}
-
-// ListLibraries returns the list of installed libraries. If updatable is true it
-// returns only the libraries that may be updated.
-func ListLibraries(lm *librariesmanager.LibrariesManager, updatable bool) *output.InstalledLibraries {
-	res := &output.InstalledLibraries{}
-	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives.Alternatives {
-			var available *librariesindex.Release
-			if updatable {
-				available = lm.Index.FindLibraryUpdate(lib)
-				if available == nil {
-					continue
-				}
-			}
-			res.Libraries = append(res.Libraries, &output.InstalledLibary{
-				Library:   lib,
-				Available: available,
-			})
-		}
-	}
-	return res
 }

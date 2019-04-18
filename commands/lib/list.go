@@ -20,48 +20,8 @@ package lib
 import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/common/formatter/output"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 )
-
-func initListCommand() *cobra.Command {
-	listCommand := &cobra.Command{
-		Use:     "list",
-		Short:   "Shows a list of all installed libraries.",
-		Long:    "Shows a list of all installed libraries.",
-		Example: "  " + cli.AppName + " lib list",
-		Args:    cobra.NoArgs,
-		Run:     runListCommand,
-	}
-	listCommand.Flags().BoolVar(&listFlags.all, "all", false, "Include built-in libraries (from platforms and IDE) in listing.")
-	listCommand.Flags().BoolVar(&listFlags.updatable, "updatable", false, "List updatable libraries.")
-	return listCommand
-}
-
-var listFlags struct {
-	all       bool
-	updatable bool
-}
-
-func runListCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Listing")
-
-	var lm *librariesmanager.LibrariesManager
-	if listFlags.all {
-		_, lm = cli.InitPackageAndLibraryManager()
-	} else {
-		lm = cli.InitLibraryManager(cli.Config)
-	}
-
-	res := ListLibraries(lm, listFlags.updatable)
-	if len(res.Libraries) > 0 {
-		formatter.Print(res)
-	}
-	logrus.Info("Done")
-}
 
 // ListLibraries returns the list of installed libraries. If updatable is true it
 // returns only the libraries that may be updated.
