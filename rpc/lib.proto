@@ -33,3 +33,24 @@ message LibraryDownloadReq {
 message LibraryDownloadResp {
     DownloadProgress progress = 1;
 }
+
+message LibraryInstallReq {
+    Instance instance = 1;
+    string name = 2;
+    string version = 3;
+}
+
+message LibraryInstallResp {
+    DownloadProgress progress = 1;
+    TaskProgress task_progress = 2;
+}
+
+message LibraryUninstallReq {
+    Instance instance = 1;
+    string name = 2;
+    string version = 3;
+}
+
+message LibraryUninstallResp {
+
+}

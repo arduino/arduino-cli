@@ -18,11 +18,14 @@
 package lib
 
 import (
+	"context"
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -40,23 +43,18 @@ func initUninstallCommand() *cobra.Command {
 }
 
 func runUninstallCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino lib uninstall`")
-
-	lm := cli.InitLibraryManager(cli.Config)
+	instance := cli.CreateInstance()
 	libRefs, err := librariesindex.ParseArgs(args)
 	if err != nil {
 		formatter.PrintError(err, "Arguments error")
 		os.Exit(cli.ErrBadArgument)
 	}
-	for _, libRef := range libRefs {
-		lib := lm.FindByReference(libRef)
-		if lib == nil {
-			formatter.PrintErrorMessage("Library not installed: " + libRef.String())
-			os.Exit(cli.ErrGeneric)
-		} else {
-			formatter.Print("Uninstalling " + lib.String())
-			lm.Uninstall(lib)
-		}
+	for _, library := range libRefs {
+		lib.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{
+			Instance: instance,
+			Name:     library.Name,
+			Version:  library.Version.String(),
+		})
 	}
 
 	logrus.Info("Done")

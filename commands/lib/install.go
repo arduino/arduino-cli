@@ -18,73 +18,57 @@
 package lib
 
 import (
-	"os"
+	"context"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	semver "go.bug.st/relaxed-semver"
 )
 
-func initInstallCommand() *cobra.Command {
-	installCommand := &cobra.Command{
-		Use:   "install LIBRARY[@VERSION_NUMBER](S)",
-		Short: "Installs one of more specified libraries into the system.",
-		Long:  "Installs one or more specified libraries into the system.",
-		Example: "" +
-			"  " + cli.AppName + " lib install AudioZero       # for the latest version.\n" +
-			"  " + cli.AppName + " lib install AudioZero@1.0.0 # for the specific version.",
-		Args: cobra.MinimumNArgs(1),
-		Run:  runInstallCommand,
+func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq, downloadCB commands.DownloadProgressCB) (*rpc.LibraryInstallResp, error) {
+
+	lm := commands.GetLibraryManager(req)
+	var version *semver.Version
+	if v, err := semver.Parse(req.GetVersion()); err == nil {
+		version = v
+	} else {
+		return nil, fmt.Errorf("invalid version: %s", err)
 	}
-	return installCommand
+	ref := &librariesindex.Reference{Name: req.GetName(), Version: version}
+	library := lm.Index.FindRelease(ref)
+	if library == nil {
+		return nil, fmt.Errorf("library not found: %s", ref.String())
+	}
+	err := downloadLibrary(lm, library, downloadCB)
+	if err != nil {
+		return nil, err
+	}
+	err = installLibraries(lm, library)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance})
+	if err != nil {
+		return nil, err
+	}
+	return &rpc.LibraryInstallResp{}, nil
 }
 
-func runInstallCommand(cmd *cobra.Command, args []string) {
-	// 	instance := cli.CreateInstance()
-	// 	logrus.Info("Executing `arduino lib install`")
-	// 	lm := cli.InitLibraryManager(cli.Config)
+func installLibraries(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release) error {
 
-	// 	refs, err := librariesindex.ParseArgs(args)
-	// 	if err != nil {
-	// 		formatter.PrintError(err, "Arguments error")
-	// 		os.Exit(cli.ErrBadArgument)
-	// 	}
-	// 	for _, library := range refs {
-	// 		downloadLibrary(lm, &rpc.LibraryDownloadReq{
-	// 			Instance: instance,
-	// 			Name:     library.Name,
-	// 			Version:  library.Version.String(),
-	// 		}, downloadCB)
-	// 		installLibrariesFromReferences(lm, refs)
-	// 	}
-}
+	logrus.WithField("library", libRelease).Info("Installing library")
 
-func installLibrariesFromReferences(lm *librariesmanager.LibrariesManager, refs []*librariesindex.Reference) {
-	libReleases := []*librariesindex.Release{}
-	for _, ref := range refs {
-		rel := lm.Index.FindRelease(ref)
-		if rel == nil {
-			formatter.PrintErrorMessage("Error: library " + ref.String() + " not found")
-			os.Exit(cli.ErrBadCall)
-		}
-		libReleases = append(libReleases, rel)
+	if _, err := lm.Install(libRelease); err != nil {
+		//logrus.WithError(err).Warn("Error installing library ", libRelease)
+		//formatter.PrintError(err, "Error installing library: "+libRelease.String())
+		return fmt.Errorf("library not installed: %s", err)
 	}
-	installLibraries(lm, libReleases)
-}
 
-func installLibraries(lm *librariesmanager.LibrariesManager, libReleases []*librariesindex.Release) {
-	for _, libRelease := range libReleases {
-		logrus.WithField("library", libRelease).Info("Installing library")
-
-		if _, err := lm.Install(libRelease); err != nil {
-			logrus.WithError(err).Warn("Error installing library ", libRelease)
-			formatter.PrintError(err, "Error installing library: "+libRelease.String())
-			os.Exit(cli.ErrGeneric)
-		}
-
-		formatter.Print("Installed " + libRelease.String())
-	}
+	//formatter.Print("Installed " + libRelease.String())
+	return nil
 }

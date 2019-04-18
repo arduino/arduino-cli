@@ -67,6 +67,10 @@ service ArduinoCore {
   rpc PlatformList(PlatformListReq) returns (PlatformListResp);
 
   rpc LibraryDownload(LibraryDownloadReq) returns (stream LibraryDownloadResp);
+
+  rpc LibraryInstall(LibraryInstallReq) returns (stream LibraryInstallResp);
+
+  rpc LibraryUninstall(LibraryUninstallReq) returns (LibraryUninstallResp);
 }
 
 // Configuration contains information to instantiate an Arduino Platform Service

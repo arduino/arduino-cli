@@ -183,3 +183,18 @@ func (s *ArduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadReq, str
 	}
 	return stream.Send(resp)
 }
+
+func (s *ArduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallReq, stream rpc.ArduinoCore_LibraryInstallServer) error {
+	resp, err := lib.LibraryInstall(
+		stream.Context(), req,
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryInstallResp{Progress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
+}
+
+func (s *ArduinoCoreServerImpl) LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallReq) (*rpc.LibraryUninstallResp, error) {
+	return lib.LibraryUninstall(ctx, req)
+}

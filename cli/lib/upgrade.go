@@ -46,6 +46,6 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	}
 
 	//downloadLibraries(lm, libReleases)
-	installLibraries(lm, libReleases)
+	//installLibraries(lm, libReleases)
 	logrus.Info("Done")
 }
