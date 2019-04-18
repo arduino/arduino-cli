@@ -20,6 +20,7 @@ package cli
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -84,17 +85,6 @@ var AppName = filepath.Base(os.Args[0])
 
 var Config *configs.Configuration
 
-// InitPackageAndLibraryManagerWithoutBundles initializes the PackageManager
-// and the LibraryManager but ignores bundles and user installed cores
-func InitPackageAndLibraryManagerWithoutBundles() (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
-	logrus.Info("Package manager will scan only managed hardware folder")
-
-	fakeResult := false
-	Config.IDEBundledCheckResult = &fakeResult
-	Config.SketchbookDir = nil
-	return InitPackageAndLibraryManager()
-}
-
 func packageManagerInitReq() *rpc.InitReq {
 	urls := []string{}
 	for _, URL := range Config.BoardManagerAdditionalUrls {
@@ -112,13 +102,35 @@ func packageManagerInitReq() *rpc.InitReq {
 	return &rpc.InitReq{Configuration: conf}
 }
 
+func InitInstance(libManagerOnly bool) *rpc.InitResp {
+	if libManagerOnly {
+		logrus.Info("Initializing library manager")
+	} else {
+		logrus.Info("Initializing package manager")
+	}
+	req := packageManagerInitReq()
+	req.LibraryManagerOnly = libManagerOnly
+	resp, err := commands.Init(context.Background(), req)
+	if err != nil {
+		if libManagerOnly {
+			formatter.PrintError(err, "Error initializing library manager")
+		} else {
+			formatter.PrintError(err, "Error initializing package manager")
+		}
+		os.Exit(ErrGeneric)
+	}
+	return resp
+}
+
 // CreateInstance creates and return an instance of the Arduino Core engine
 func CreateInstance() *rpc.Instance {
-	logrus.Info("Initializing package manager")
-	resp, err := commands.Init(context.Background(), packageManagerInitReq())
-	if err != nil {
-		formatter.PrintError(err, "Error initializing package manager")
-		os.Exit(rpc.ErrGeneric)
+	resp := InitInstance(false)
+	if resp.GetPlatformsIndexErrors() != nil {
+		for _, err := range resp.GetPlatformsIndexErrors() {
+			formatter.PrintError(errors.New(err), "Error loading index")
+		}
+		formatter.PrintErrorMessage("Launch '" + AppName + " core update-index' to fix or download indexes.")
+		os.Exit(ErrGeneric)
 	}
 	return resp.GetInstance()
 }
@@ -126,27 +138,25 @@ func CreateInstance() *rpc.Instance {
 // InitPackageAndLibraryManager initializes the PackageManager and the LibaryManager
 // TODO: for the daemon mode, this might be called at startup, but for now only commands needing the PM will call it
 func InitPackageAndLibraryManager() (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
-	logrus.Info("Initializing package manager")
-	resp, err := commands.Init(context.Background(), packageManagerInitReq())
-	if err != nil {
-		formatter.PrintError(err, "Error initializing package manager")
-		os.Exit(rpc.ErrGeneric)
-	}
+	resp := InitInstance(false)
 	return commands.GetPackageManager(resp), commands.GetLibraryManager(resp)
+}
+
+// InitPackageAndLibraryManagerWithoutBundles initializes the PackageManager
+// and the LibraryManager but ignores bundles and user installed cores
+func InitPackageAndLibraryManagerWithoutBundles() (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
+	logrus.Info("Package manager will scan only managed hardware folder")
+
+	fakeResult := false
+	Config.IDEBundledCheckResult = &fakeResult
+	Config.SketchbookDir = nil
+	return InitPackageAndLibraryManager()
 }
 
 // InitLibraryManager initializes the LibraryManager. If pm is nil, the library manager will not handle core-libraries.
 // TODO: for the daemon mode, this might be called at startup, but for now only commands needing the PM will call it
 func InitLibraryManager(cfg *configs.Configuration) *librariesmanager.LibrariesManager {
-	req := packageManagerInitReq()
-	req.LibraryManagerOnly = true
-
-	logrus.Info("Initializing library manager")
-	resp, err := commands.Init(context.Background(), req)
-	if err != nil {
-		formatter.PrintError(err, "Error initializing library manager")
-		os.Exit(rpc.ErrGeneric)
-	}
+	resp := InitInstance(true)
 	return commands.GetLibraryManager(resp)
 }
 
