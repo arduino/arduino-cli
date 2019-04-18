@@ -18,13 +18,16 @@
 package lib
 
 import (
+	"context"
 	"os"
 
+	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/output"
+	"github.com/arduino/arduino-cli/rpc"
+
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -43,41 +46,17 @@ func initInstallCommand() *cobra.Command {
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino lib install`")
-	lm := cli.InitLibraryManager(cli.Config)
-
+	instance := cli.CreateInstance()
 	refs, err := librariesindex.ParseArgs(args)
 	if err != nil {
 		formatter.PrintError(err, "Arguments error")
 		os.Exit(cli.ErrBadArgument)
 	}
-	//downloadLibrariesFromReferences(lm, refs)
-	installLibrariesFromReferences(lm, refs)
-}
-
-func installLibrariesFromReferences(lm *librariesmanager.LibrariesManager, refs []*librariesindex.Reference) {
-	libReleases := []*librariesindex.Release{}
-	for _, ref := range refs {
-		rel := lm.Index.FindRelease(ref)
-		if rel == nil {
-			formatter.PrintErrorMessage("Error: library " + ref.String() + " not found")
-			os.Exit(cli.ErrBadCall)
-		}
-		libReleases = append(libReleases, rel)
-	}
-	installLibraries(lm, libReleases)
-}
-
-func installLibraries(lm *librariesmanager.LibrariesManager, libReleases []*librariesindex.Release) {
-	for _, libRelease := range libReleases {
-		logrus.WithField("library", libRelease).Info("Installing library")
-
-		if _, err := lm.Install(libRelease); err != nil {
-			logrus.WithError(err).Warn("Error installing library ", libRelease)
-			formatter.PrintError(err, "Error installing library: "+libRelease.String())
-			os.Exit(cli.ErrGeneric)
-		}
-
-		formatter.Print("Installed " + libRelease.String())
+	for _, library := range refs {
+		lib.LibraryInstall(context.Background(), &rpc.LibraryInstallReq{
+			Instance: instance,
+			Name:     library.Name,
+			Version:  library.Version.String(),
+		}, output.DownloadProgressBar())
 	}
 }

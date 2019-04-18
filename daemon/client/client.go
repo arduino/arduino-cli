@@ -315,6 +315,37 @@ func main() {
 
 	// DESTROY
 	fmt.Println("=== calling Destroy()")
+	_, err = client.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{
+		Instance: instance,
+		Name:     "WiFi101",
+		Version:  "0.15.3",
+	})
+	if err != nil {
+		fmt.Printf("Error Upgrade platform: %s\n", err)
+		os.Exit(1)
+	}
+	installRespStream, err := client.LibraryInstall(context.Background(), &rpc.LibraryInstallReq{
+		Instance: instance,
+		Name:     "WiFi101",
+		Version:  "0.15.3",
+	})
+	if err != nil {
+		fmt.Printf("Error Upgrade platform: %s\n", err)
+		os.Exit(1)
+	}
+	for {
+		installResp, err := installRespStream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Printf("install error: %s\n", err)
+			os.Exit(1)
+		}
+		if installResp.GetProgress() != nil {
+			fmt.Printf(">> INSTALL: %s\n", installResp.GetProgress())
+		}
+	}
 	_, err = client.Destroy(context.Background(), &rpc.DestroyReq{
 		Instance: instance,
 	})

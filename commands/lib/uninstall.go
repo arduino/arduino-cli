@@ -18,46 +18,34 @@
 package lib
 
 import (
-	"os"
+	"context"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	semver "go.bug.st/relaxed-semver"
 )
 
-func initUninstallCommand() *cobra.Command {
-	uninstallCommand := &cobra.Command{
-		Use:     "uninstall LIBRARY_NAME(S)",
-		Short:   "Uninstalls one or more libraries.",
-		Long:    "Uninstalls one or more libraries.",
-		Example: "  " + cli.AppName + " lib uninstall AudioZero",
-		Args:    cobra.MinimumNArgs(1),
-		Run:     runUninstallCommand,
-	}
-	return uninstallCommand
-}
-
-func runUninstallCommand(cmd *cobra.Command, args []string) {
+func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallReq) (*rpc.LibraryUninstallResp, error) {
 	logrus.Info("Executing `arduino lib uninstall`")
 
-	lm := cli.InitLibraryManager(cli.Config)
-	libRefs, err := librariesindex.ParseArgs(args)
-	if err != nil {
-		formatter.PrintError(err, "Arguments error")
-		os.Exit(cli.ErrBadArgument)
+	lm := commands.GetLibraryManager(req)
+	var version *semver.Version
+	if v, err := semver.Parse(req.GetVersion()); err == nil {
+		version = v
+	} else {
+		return nil, fmt.Errorf("invalid version: %s", err)
 	}
-	for _, libRef := range libRefs {
-		lib := lm.FindByReference(libRef)
-		if lib == nil {
-			formatter.PrintErrorMessage("Library not installed: " + libRef.String())
-			os.Exit(cli.ErrGeneric)
-		} else {
-			formatter.Print("Uninstalling " + lib.String())
-			lm.Uninstall(lib)
-		}
+	ref := &librariesindex.Reference{Name: req.GetName(), Version: version}
+	lib := lm.FindByReference(ref)
+	if lib == nil {
+		return nil, fmt.Errorf("library not installed: %s", ref.String())
+	} else {
+		//	formatter.Print("Uninstalling " + lib.String()) tramite il CBTAsk
+		lm.Uninstall(lib)
 	}
 
-	logrus.Info("Done")
+	return &rpc.LibraryUninstallResp{}, nil
 }
