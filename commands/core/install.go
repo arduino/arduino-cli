@@ -38,8 +38,8 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 	}
 
 	var version *semver.Version
-	if req.Version != "" {
-		if v, err := semver.Parse(req.Version); err == nil {
+	if req.GetVersion() != "" {
+		if v, err := semver.Parse(req.GetVersion()); err == nil {
 			version = v
 		} else {
 			return nil, fmt.Errorf("invalid version: %s", err)

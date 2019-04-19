@@ -36,10 +36,12 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloa
 	}
 
 	var version *semver.Version
-	if v, err := semver.Parse(req.Version); err == nil {
-		version = v
-	} else {
-		return nil, fmt.Errorf("invalid version: %s", err)
+	if req.GetVersion() != "" {
+		if v, err := semver.Parse(req.GetVersion()); err == nil {
+			version = v
+		} else {
+			return nil, fmt.Errorf("invalid version: %s", err)
+		}
 	}
 
 	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{

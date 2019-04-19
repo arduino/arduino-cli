@@ -132,7 +132,7 @@ func UpdateLibrariesIndex(ctx context.Context, lm *librariesmanager.LibrariesMan
 	if err != nil {
 		return err
 	}
-	Download(d, "library_index.json", downloadCB)
+	Download(d, "Updating index: library_index.json", downloadCB)
 	if d.Error() != nil {
 		return d.Error()
 	}

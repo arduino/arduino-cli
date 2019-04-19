@@ -49,7 +49,7 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 		Instance: instance,
 	}, cli.OutputProgressBar())
 	if err != nil {
-		formatter.PrintError(err, "Error during install")
+		formatter.PrintError(err, "Error updating index")
 		os.Exit(cli.ErrGeneric)
 	}
 }
