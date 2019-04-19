@@ -556,6 +556,8 @@ board_manager:
 	require.NoError(t, err, "Writing empty json index file")
 	err = currDataDir.Join("package_example_index.json").WriteFile([]byte(`{ "packages": [] }`))
 	require.NoError(t, err, "Writing empty json index file")
+	err = currDataDir.Join("library_index.json").WriteFile([]byte(`{ "libraries": [] }`))
+	require.NoError(t, err, "Writing empty json index file")
 
 	// Empty cores list
 	exitCode, d := executeWithArgs(t, "--config-file", configFile.String(), "core", "list")

@@ -19,9 +19,11 @@ package core
 
 import (
 	"context"
+	"os"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
@@ -46,11 +48,15 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	platformsRefs := parsePlatformReferenceArgs(args)
 
 	for _, platformRef := range platformsRefs {
-		core.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
+		_, err := core.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.PlatformArchitecture,
 			Version:         platformRef.PlatformVersion.String(),
 		}, output.NewTaskProgressCB())
+		if err != nil {
+			formatter.PrintError(err, "Error during uninstall")
+			os.Exit(cli.ErrGeneric)
+		}
 	}
 }
