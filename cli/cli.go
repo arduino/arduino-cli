@@ -150,15 +150,15 @@ func CreateInstance() *rpc.Instance {
 	return resp.GetInstance()
 }
 
-// InitPackageAndLibraryManager initializes the PackageManager and the LibaryManager
-// TODO: for the daemon mode, this might be called at startup, but for now only commands needing the PM will call it
+// InitPackageAndLibraryManager initializes the PackageManager and the
+// LibaryManager with the default configuration. (DEPRECATED)
 func InitPackageAndLibraryManager() (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
 	resp := InitInstance(false)
 	return commands.GetPackageManager(resp), commands.GetLibraryManager(resp)
 }
 
 // InitPackageAndLibraryManagerWithoutBundles initializes the PackageManager
-// and the LibraryManager but ignores bundles and user installed cores
+// and the LibraryManager but ignores bundles and platforms installed in sketchbook. (DEPRECATED)
 func InitPackageAndLibraryManagerWithoutBundles() (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
 	logrus.Info("Package manager will scan only managed hardware folder")
 
@@ -168,8 +168,8 @@ func InitPackageAndLibraryManagerWithoutBundles() (*packagemanager.PackageManage
 	return InitPackageAndLibraryManager()
 }
 
-// InitLibraryManager initializes the LibraryManager. If pm is nil, the library manager will not handle core-libraries.
-// TODO: for the daemon mode, this might be called at startup, but for now only commands needing the PM will call it
+// InitLibraryManager initializes the LibraryManager only. The library manager
+// will not handle core-libraries. (DEPRECATED)
 func InitLibraryManager(cfg *configs.Configuration) *librariesmanager.LibrariesManager {
 	resp := InitInstance(true)
 	return commands.GetLibraryManager(resp)
