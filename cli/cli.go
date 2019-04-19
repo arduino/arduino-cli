@@ -19,7 +19,6 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -31,7 +30,6 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
-	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -63,22 +61,6 @@ var ErrLogrus = logrus.New()
 var GlobalFlags struct {
 	Debug      bool // If true, dump debug output to stderr.
 	OutputJSON bool // true output in JSON, false output as Text
-}
-
-// OutputJSONOrElse outputs the JSON encoding of v if the JSON output format has been
-// selected by the user and returns false. Otherwise no output is produced and the
-// function returns true.
-func OutputJSONOrElse(v interface{}) bool {
-	if !GlobalFlags.OutputJSON {
-		return true
-	}
-	d, err := json.MarshalIndent(v, "", "  ")
-	if err != nil {
-		formatter.PrintError(err, "Error during JSON encoding of the output")
-		os.Exit(ErrGeneric)
-	}
-	fmt.Print(string(d))
-	return false
 }
 
 // AppName is the command line name of the Arduino CLI executable
@@ -121,7 +103,7 @@ func InitInstance(libManagerOnly bool) *rpc.InitResp {
 		os.Exit(ErrGeneric)
 	}
 	if resp.GetLibrariesIndexError() != "" {
-		commands.UpdateLibrariesIndex(context.Background(), commands.GetLibraryManager(resp), output.DownloadProgressBar())
+		commands.UpdateLibrariesIndex(context.Background(), commands.GetLibraryManager(resp), OutputProgressBar())
 		rescResp, err := commands.Rescan(context.Background(), &rpc.RescanReq{Instance: resp.GetInstance()})
 		if rescResp.GetLibrariesIndexError() != "" {
 			formatter.PrintErrorMessage("Error loading library index: " + rescResp.GetLibrariesIndexError())

@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
 )
@@ -111,7 +110,7 @@ func run(cmd *cobra.Command, args []string) {
 		Quiet:           flags.quiet,
 		VidPid:          flags.vidPid,
 		ExportFile:      flags.exportFile,
-	}, os.Stdout, os.Stderr, output.NewTaskProgressCB(), output.DownloadProgressBar())
+	}, os.Stdout, os.Stderr, cli.OutputTaskProgress(), cli.OutputProgressBar())
 	if err == nil {
 		outputCompileResp(compRes)
 	} else {

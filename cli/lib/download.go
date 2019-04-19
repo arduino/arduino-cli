@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/lib"
-	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
 )
@@ -55,7 +54,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version.String(),
-		}, output.DownloadProgressBar())
+		}, cli.OutputProgressBar())
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+library.String())
 		}

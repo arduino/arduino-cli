@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -48,7 +47,7 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 
 	_, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
 		Instance: instance,
-	}, output.DownloadProgressBar())
+	}, cli.OutputProgressBar())
 	if err != nil {
 		formatter.PrintError(err, "Error during install")
 		os.Exit(cli.ErrGeneric)
