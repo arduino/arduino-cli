@@ -37,19 +37,22 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadC
 	logrus.Info("Preparing download")
 
 	var version *semver.Version
-	if v, err := semver.Parse(req.GetVersion()); err == nil {
-		version = v
-	} else {
-		return nil, fmt.Errorf("invalid version: %s", err)
-	}
-	ref := &librariesindex.Reference{Name: req.GetName(), Version: version}
-	if lib := lm.Index.FindRelease(ref); lib == nil {
-		return nil, fmt.Errorf("library not found: %s", ref.String())
-	} else {
-		err := downloadLibrary(lm, lib, downloadCB)
-		if err != nil {
-			return nil, err
+	if req.GetVersion() != "" {
+		if v, err := semver.Parse(req.GetVersion()); err == nil {
+			version = v
+		} else {
+			return nil, fmt.Errorf("invalid version: %s", err)
 		}
+	}
+
+	ref := &librariesindex.Reference{Name: req.GetName(), Version: version}
+	lib := lm.Index.FindRelease(ref)
+	if lib == nil {
+		return nil, fmt.Errorf("library %s not found", ref.String())
+	}
+
+	if err := downloadLibrary(lm, lib, downloadCB); err != nil {
+		return nil, err
 	}
 
 	return &rpc.LibraryDownloadResp{}, nil
