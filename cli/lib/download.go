@@ -19,6 +19,7 @@ package lib
 
 import (
 	"context"
+	"os"
 
 	"github.com/arduino/arduino-cli/common/formatter"
 
@@ -57,6 +58,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		}, cli.OutputProgressBar())
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+library.String())
+			os.Exit(cli.ErrNetwork)
 		}
 	}
 }
