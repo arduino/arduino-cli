@@ -19,6 +19,7 @@ package core
 
 import (
 	"context"
+	"os"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/core"
@@ -56,6 +57,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		}, cli.OutputProgressBar())
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+platformRef.String())
+			os.Exit(cli.ErrNetwork)
 		}
 	}
 }
