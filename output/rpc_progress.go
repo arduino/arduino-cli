@@ -20,7 +20,6 @@ package output
 import (
 	"fmt"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
@@ -51,9 +50,14 @@ func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
 	}
 }
 
+// NewNullDownloadProgressCB returns a progress bar callback that outputs nothing.
+func NewNullDownloadProgressCB() func(*rpc.DownloadProgress) {
+	return func(*rpc.DownloadProgress) {}
+}
+
 // NewTaskProgressCB returns a commands.TaskProgressCB progress listener
 // that outputs to terminal
-func NewTaskProgressCB() commands.TaskProgressCB {
+func NewTaskProgressCB() func(curr *rpc.TaskProgress) {
 	var name string
 	return func(curr *rpc.TaskProgress) {
 		// fmt.Printf(">>> %v\n", curr)
@@ -73,4 +77,9 @@ func NewTaskProgressCB() commands.TaskProgressCB {
 			}
 		}
 	}
+}
+
+// NewNullTaskProgressCB returns a progress bar callback that outputs nothing.
+func NewNullTaskProgressCB() func(curr *rpc.TaskProgress) {
+	return func(curr *rpc.TaskProgress) {}
 }
