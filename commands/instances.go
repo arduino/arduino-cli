@@ -126,28 +126,17 @@ func Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error)
 }
 
 // UpdateLibrariesIndex updates the library_index.json
-func UpdateLibrariesIndex(ctx context.Context, lm *librariesmanager.LibrariesManager, progressCallback func(*rpc.DownloadProgress)) {
+func UpdateLibrariesIndex(ctx context.Context, lm *librariesmanager.LibrariesManager, downloadCB func(*rpc.DownloadProgress)) error {
 	logrus.Info("Updating libraries index")
 	d, err := lm.UpdateIndex()
 	if err != nil {
-		//formatter.PrintError(err, "Error downloading librarires index")
-		//os.Exit(ErrNetwork)
+		return err
 	}
-	//formatter.DownloadProgressBar(d, "Updating index: library_index.json")
-	//d.Run()
-	progressCallback(&rpc.DownloadProgress{
-		File:      "library_index.json",
-		Url:       d.URL,
-		TotalSize: d.Size(),
-	})
-	d.RunAndPoll(func(downloaded int64) {
-		progressCallback(&rpc.DownloadProgress{Downloaded: downloaded})
-	}, 250*time.Millisecond)
-
+	Download(d, "library_index.json", downloadCB)
 	if d.Error() != nil {
-		//formatter.PrintError(d.Error(), "Error downloading librarires index")
-		//os.Exit(ErrNetwork)
+		return d.Error()
 	}
+	return nil
 }
 
 func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResp, error) {

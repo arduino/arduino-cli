@@ -31,6 +31,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
+	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -118,6 +119,20 @@ func InitInstance(libManagerOnly bool) *rpc.InitResp {
 			formatter.PrintError(err, "Error initializing package manager")
 		}
 		os.Exit(ErrGeneric)
+	}
+	if resp.GetLibrariesIndexError() != "" {
+		commands.UpdateLibrariesIndex(context.Background(), commands.GetLibraryManager(resp), output.DownloadProgressBar())
+		rescResp, err := commands.Rescan(context.Background(), &rpc.RescanReq{Instance: resp.GetInstance()})
+		if rescResp.GetLibrariesIndexError() != "" {
+			formatter.PrintErrorMessage("Error loading library index: " + rescResp.GetLibrariesIndexError())
+			os.Exit(ErrGeneric)
+		}
+		if err != nil {
+			formatter.PrintError(err, "Error loading library index")
+			os.Exit(ErrGeneric)
+		}
+		resp.LibrariesIndexError = rescResp.LibrariesIndexError
+		resp.PlatformsIndexErrors = rescResp.PlatformsIndexErrors
 	}
 	return resp
 }
