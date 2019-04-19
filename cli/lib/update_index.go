@@ -22,7 +22,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/output"
 	"github.com/spf13/cobra"
 )
 
@@ -35,7 +34,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			lm := cli.InitLibraryManager(cli.Config)
-			commands.UpdateLibrariesIndex(context.Background(), lm, output.DownloadProgressBar())
+			commands.UpdateLibrariesIndex(context.Background(), lm, cli.OutputProgressBar())
 		},
 	}
 }

@@ -25,8 +25,9 @@ import (
 	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
-// DownloadProgressBar returns a progress bar callback
-func DownloadProgressBar() func(*rpc.DownloadProgress) {
+// NewDownloadProgressBarCB creates a progress bar callback that outputs a progress
+// bar on the terminal
+func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
 	var bar *pb.ProgressBar
 	var prefix string
 	return func(curr *rpc.DownloadProgress) {

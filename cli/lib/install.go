@@ -22,7 +22,6 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/commands/lib"
-	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
@@ -57,6 +56,6 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version.String(),
-		}, output.DownloadProgressBar())
+		}, cli.OutputProgressBar())
 	}
 }
