@@ -22,15 +22,20 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
-	semver "go.bug.st/relaxed-semver"
 )
 
-// parsePlatformReferenceArgs parses a sequence of "packager:arch@version" tokens and returns a platformReference slice.
-func parsePlatformReferenceArgs(args []string) []*packagemanager.PlatformReference {
-	ret := []*packagemanager.PlatformReference{}
+type platformReferenceArg struct {
+	Package      string
+	Architecture string
+	Version      string
+}
+
+// parsePlatformReferenceArgs parses a sequence of "packager:arch@version" tokens and
+// returns a platformReferenceArg slice.
+func parsePlatformReferenceArgs(args []string) []*platformReferenceArg {
+	ret := []*platformReferenceArg{}
 	for _, arg := range args {
 		reference, err := parsePlatformReferenceArg(arg)
 		if err != nil {
@@ -42,24 +47,21 @@ func parsePlatformReferenceArgs(args []string) []*packagemanager.PlatformReferen
 	return ret
 }
 
-func parsePlatformReferenceArg(arg string) (*packagemanager.PlatformReference, error) {
+func parsePlatformReferenceArg(arg string) (*platformReferenceArg, error) {
 	split := strings.SplitN(arg, "@", 2)
 	arg = split[0]
-	var version *semver.Version
+	version := ""
 	if len(split) > 1 {
-		if ver, err := semver.Parse(split[1]); err == nil {
-			version = ver
-		} else {
-			return nil, fmt.Errorf("invalid version: %s", err)
-		}
+		version = split[1]
 	}
+
 	split = strings.Split(arg, ":")
 	if len(split) != 2 {
 		return nil, fmt.Errorf("invalid item %s", arg)
 	}
-	return &packagemanager.PlatformReference{
-		Package:              split[0],
-		PlatformArchitecture: split[1],
-		PlatformVersion:      version,
+	return &platformReferenceArg{
+		Package:      split[0],
+		Architecture: split[1],
+		Version:      version,
 	}, nil
 }

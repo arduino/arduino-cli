@@ -53,8 +53,8 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 		_, err := core.PlatformUpgrade(context.Background(), &rpc.PlatformUpgradeReq{
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
-			Architecture:    platformRef.PlatformArchitecture,
-			Version:         platformRef.PlatformVersion.String(),
+			Architecture:    platformRef.Architecture,
+			Version:         platformRef.Version,
 		}, cli.OutputProgressBar(), cli.OutputTaskProgress())
 		if err != nil {
 			formatter.PrintError(err, "Error during upgrade")

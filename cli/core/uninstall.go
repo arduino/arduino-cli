@@ -51,8 +51,8 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 		_, err := core.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
-			Architecture:    platformRef.PlatformArchitecture,
-			Version:         platformRef.PlatformVersion.String(),
+			Architecture:    platformRef.Architecture,
+			Version:         platformRef.Version,
 		}, output.NewTaskProgressCB())
 		if err != nil {
 			formatter.PrintError(err, "Error during uninstall")
