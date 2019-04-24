@@ -52,10 +52,14 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		os.Exit(cli.ErrBadArgument)
 	}
 	for _, library := range refs {
-		lib.LibraryInstall(context.Background(), &rpc.LibraryInstallReq{
+		err := lib.LibraryInstall(context.Background(), &rpc.LibraryInstallReq{
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version.String(),
-		}, cli.OutputProgressBar())
+		}, cli.OutputProgressBar(), cli.OutputTaskProgress())
+		if err != nil {
+			formatter.PrintError(err, "Error installing "+library.String())
+			os.Exit(cli.ErrGeneric)
+		}
 	}
 }

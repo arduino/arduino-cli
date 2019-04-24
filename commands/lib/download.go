@@ -48,7 +48,7 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadC
 	ref := &librariesindex.Reference{Name: req.GetName(), Version: version}
 	lib := lm.Index.FindRelease(ref)
 	if lib == nil {
-		return nil, fmt.Errorf("library %s not found", ref.String())
+		return nil, fmt.Errorf("library %s not found", ref)
 	}
 
 	if err := downloadLibrary(lm, lib, downloadCB); err != nil {

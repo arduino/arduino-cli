@@ -290,18 +290,22 @@ func main() {
 		}
 	}
 
+	// LIB DOWNLOAD
+	fmt.Println("=== calling LibraryDownload(WiFi101@0.15.2)")
 	downloadRespStream, err := client.LibraryDownload(context.Background(), &rpc.LibraryDownloadReq{
 		Instance: instance,
 		Name:     "WiFi101",
 		Version:  "0.15.2",
 	})
 	if err != nil {
-		fmt.Printf("Error Upgrade platform: %s\n", err)
+		fmt.Printf("Error downloading library: %s\n", err)
 		os.Exit(1)
 	}
 	for {
 		downloadResp, err := downloadRespStream.Recv()
 		if err == io.EOF {
+			fmt.Printf("---> %+v\n", downloadResp)
+			fmt.Println()
 			break
 		}
 		if err != nil {
@@ -313,39 +317,57 @@ func main() {
 		}
 	}
 
-	// DESTROY
-	fmt.Println("=== calling Destroy()")
-	_, err = client.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{
-		Instance: instance,
-		Name:     "WiFi101",
-		Version:  "0.15.3",
-	})
-	if err != nil {
-		fmt.Printf("Error Upgrade platform: %s\n", err)
-		os.Exit(1)
-	}
-	installRespStream, err := client.LibraryInstall(context.Background(), &rpc.LibraryInstallReq{
-		Instance: instance,
-		Name:     "WiFi101",
-		Version:  "0.15.3",
-	})
-	if err != nil {
-		fmt.Printf("Error Upgrade platform: %s\n", err)
-		os.Exit(1)
-	}
-	for {
-		installResp, err := installRespStream.Recv()
-		if err == io.EOF {
-			break
-		}
+	libInstall := func(version string) {
+		// LIB INSTALL
+		fmt.Println("=== calling LibraryInstall(WiFi101@" + version + ")")
+		installRespStream, err := client.LibraryInstall(context.Background(), &rpc.LibraryInstallReq{
+			Instance: instance,
+			Name:     "WiFi101",
+			Version:  version,
+		})
 		if err != nil {
-			fmt.Printf("install error: %s\n", err)
+			fmt.Printf("Error installing library: %s\n", err)
 			os.Exit(1)
 		}
-		if installResp.GetProgress() != nil {
-			fmt.Printf(">> INSTALL: %s\n", installResp.GetProgress())
+		for {
+			installResp, err := installRespStream.Recv()
+			if err == io.EOF {
+				fmt.Printf("---> %+v\n", installResp)
+				fmt.Println()
+				break
+			}
+			if err != nil {
+				fmt.Printf("install error: %s\n", err)
+				os.Exit(1)
+			}
+			if installResp.GetProgress() != nil {
+				fmt.Printf(">> DOWNLOAD: %s\n", installResp.GetProgress())
+			}
+			if installResp.GetTaskProgress() != nil {
+				fmt.Printf(">> TASK: %s\n", installResp.GetTaskProgress())
+			}
 		}
 	}
+
+	libInstall("0.15.2") // Install
+	libInstall("0.15.3") // Replace
+
+	// LIB UNINSTALL
+	fmt.Println("=== calling LibraryUninstall(WiFi101@0.15.3)")
+	libUninstallResp, err := client.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{
+		Instance: instance,
+		Name:     "WiFi101",
+		Version:  "0.15.3",
+	})
+	if err != nil {
+		fmt.Printf("Error uninstalling: %s\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("---> %+v\n", libUninstallResp)
+	fmt.Println()
+
+	// DESTROY
+	fmt.Println("=== calling Destroy()")
 	_, err = client.Destroy(context.Background(), &rpc.DestroyReq{
 		Instance: instance,
 	})
