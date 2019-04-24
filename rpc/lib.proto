@@ -23,7 +23,6 @@ option go_package = "github.com/arduino/arduino-cli/rpc";
 
 import "common.proto";
 
-
 message LibraryDownloadReq {
     Instance instance = 1;
     string name = 2;
@@ -52,5 +51,5 @@ message LibraryUninstallReq {
 }
 
 message LibraryUninstallResp {
-
+    TaskProgress task_progress = 1;
 }

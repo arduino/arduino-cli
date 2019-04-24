@@ -24,28 +24,28 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
 
-func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallReq) (*rpc.LibraryUninstallResp, error) {
-	logrus.Info("Executing `arduino lib uninstall`")
-
+func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallReq, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req)
 	var version *semver.Version
-	if v, err := semver.Parse(req.GetVersion()); err == nil {
-		version = v
-	} else {
-		return nil, fmt.Errorf("invalid version: %s", err)
+	if req.GetVersion() != "" {
+		if v, err := semver.Parse(req.GetVersion()); err == nil {
+			version = v
+		} else {
+			return fmt.Errorf("invalid version: %s", err)
+		}
 	}
 	ref := &librariesindex.Reference{Name: req.GetName(), Version: version}
 	lib := lm.FindByReference(ref)
 	if lib == nil {
-		return nil, fmt.Errorf("library not installed: %s", ref.String())
-	} else {
-		//	formatter.Print("Uninstalling " + lib.String()) tramite il CBTAsk
-		lm.Uninstall(lib)
+		return fmt.Errorf("library not installed: %s", ref.String())
 	}
 
-	return &rpc.LibraryUninstallResp{}, nil
+	taskCB(&rpc.TaskProgress{Name: "Uninstalling " + lib.String()})
+	lm.Uninstall(lib)
+	taskCB(&rpc.TaskProgress{Completed: true})
+
+	return nil
 }

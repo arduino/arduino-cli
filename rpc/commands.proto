@@ -70,7 +70,7 @@ service ArduinoCore {
 
   rpc LibraryInstall(LibraryInstallReq) returns (stream LibraryInstallResp);
 
-  rpc LibraryUninstall(LibraryUninstallReq) returns (LibraryUninstallResp);
+  rpc LibraryUninstall(LibraryUninstallReq) returns (stream LibraryUninstallResp);
 }
 
 // Configuration contains information to instantiate an Arduino Platform Service
