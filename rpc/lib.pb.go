@@ -31,7 +31,7 @@ func (m *LibraryDownloadReq) Reset()         { *m = LibraryDownloadReq{} }
 func (m *LibraryDownloadReq) String() string { return proto.CompactTextString(m) }
 func (*LibraryDownloadReq) ProtoMessage()    {}
 func (*LibraryDownloadReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lib_0db037d7e67c9bfa, []int{0}
+	return fileDescriptor_lib_12805312db4ee020, []int{0}
 }
 func (m *LibraryDownloadReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_LibraryDownloadReq.Unmarshal(m, b)
@@ -83,7 +83,7 @@ func (m *LibraryDownloadResp) Reset()         { *m = LibraryDownloadResp{} }
 func (m *LibraryDownloadResp) String() string { return proto.CompactTextString(m) }
 func (*LibraryDownloadResp) ProtoMessage()    {}
 func (*LibraryDownloadResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lib_0db037d7e67c9bfa, []int{1}
+	return fileDescriptor_lib_12805312db4ee020, []int{1}
 }
 func (m *LibraryDownloadResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_LibraryDownloadResp.Unmarshal(m, b)
@@ -123,7 +123,7 @@ func (m *LibraryInstallReq) Reset()         { *m = LibraryInstallReq{} }
 func (m *LibraryInstallReq) String() string { return proto.CompactTextString(m) }
 func (*LibraryInstallReq) ProtoMessage()    {}
 func (*LibraryInstallReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lib_0db037d7e67c9bfa, []int{2}
+	return fileDescriptor_lib_12805312db4ee020, []int{2}
 }
 func (m *LibraryInstallReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_LibraryInstallReq.Unmarshal(m, b)
@@ -176,7 +176,7 @@ func (m *LibraryInstallResp) Reset()         { *m = LibraryInstallResp{} }
 func (m *LibraryInstallResp) String() string { return proto.CompactTextString(m) }
 func (*LibraryInstallResp) ProtoMessage()    {}
 func (*LibraryInstallResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lib_0db037d7e67c9bfa, []int{3}
+	return fileDescriptor_lib_12805312db4ee020, []int{3}
 }
 func (m *LibraryInstallResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_LibraryInstallResp.Unmarshal(m, b)
@@ -223,7 +223,7 @@ func (m *LibraryUninstallReq) Reset()         { *m = LibraryUninstallReq{} }
 func (m *LibraryUninstallReq) String() string { return proto.CompactTextString(m) }
 func (*LibraryUninstallReq) ProtoMessage()    {}
 func (*LibraryUninstallReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lib_0db037d7e67c9bfa, []int{4}
+	return fileDescriptor_lib_12805312db4ee020, []int{4}
 }
 func (m *LibraryUninstallReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_LibraryUninstallReq.Unmarshal(m, b)
@@ -265,16 +265,17 @@ func (m *LibraryUninstallReq) GetVersion() string {
 }
 
 type LibraryUninstallResp struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	TaskProgress         *TaskProgress `protobuf:"bytes,1,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
 }
 
 func (m *LibraryUninstallResp) Reset()         { *m = LibraryUninstallResp{} }
 func (m *LibraryUninstallResp) String() string { return proto.CompactTextString(m) }
 func (*LibraryUninstallResp) ProtoMessage()    {}
 func (*LibraryUninstallResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lib_0db037d7e67c9bfa, []int{5}
+	return fileDescriptor_lib_12805312db4ee020, []int{5}
 }
 func (m *LibraryUninstallResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_LibraryUninstallResp.Unmarshal(m, b)
@@ -294,6 +295,13 @@ func (m *LibraryUninstallResp) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_LibraryUninstallResp proto.InternalMessageInfo
 
+func (m *LibraryUninstallResp) GetTaskProgress() *TaskProgress {
+	if m != nil {
+		return m.TaskProgress
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*LibraryDownloadReq)(nil), "arduino.LibraryDownloadReq")
 	proto.RegisterType((*LibraryDownloadResp)(nil), "arduino.LibraryDownloadResp")
@@ -303,10 +311,10 @@ func init() {
 	proto.RegisterType((*LibraryUninstallResp)(nil), "arduino.LibraryUninstallResp")
 }
 
-func init() { proto.RegisterFile("lib.proto", fileDescriptor_lib_0db037d7e67c9bfa) }
+func init() { proto.RegisterFile("lib.proto", fileDescriptor_lib_12805312db4ee020) }
 
-var fileDescriptor_lib_0db037d7e67c9bfa = []byte{
-	// 268 bytes of a gzipped FileDescriptorProto
+var fileDescriptor_lib_12805312db4ee020 = []byte{
+	// 274 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xe2, 0xcc, 0xc9, 0x4c, 0xd2,
 	0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4f, 0x2c, 0x4a, 0x29, 0xcd, 0xcc, 0xcb, 0x97, 0xe2,
 	0x49, 0xce, 0xcf, 0xcd, 0xcd, 0xcf, 0x83, 0x08, 0x2b, 0x15, 0x72, 0x09, 0xf9, 0x64, 0x26, 0x15,
@@ -320,8 +328,9 @@ var fileDescriptor_lib_0db037d7e67c9bfa = []byte{
 	0x09, 0x42, 0x4d, 0x03, 0x3b, 0x2c, 0x27, 0x87, 0xe6, 0xee, 0x6f, 0x67, 0x84, 0x87, 0x19, 0xdc,
 	0x4a, 0xb2, 0xdd, 0x2f, 0x64, 0xc5, 0xc5, 0x5b, 0x92, 0x58, 0x9c, 0x1d, 0x0f, 0xd7, 0xcb, 0x04,
 	0xd6, 0x2b, 0x0a, 0xd7, 0x1b, 0x02, 0x94, 0x85, 0xeb, 0xe3, 0x29, 0x41, 0xe2, 0x29, 0x15, 0xc1,
-	0x43, 0x32, 0x34, 0x2f, 0x93, 0x4e, 0xbe, 0x17, 0xe3, 0x12, 0xc1, 0xb4, 0xb3, 0xb8, 0xc0, 0x49,
-	0x25, 0x4a, 0x29, 0x3d, 0xb3, 0x24, 0xa3, 0x34, 0x49, 0x0f, 0x98, 0xbe, 0xf4, 0xa1, 0xd6, 0xc1,
-	0x68, 0xdd, 0xe4, 0x9c, 0x4c, 0xfd, 0xa2, 0x82, 0xe4, 0x24, 0x36, 0x70, 0xaa, 0x33, 0x06, 0x04,
-	0x00, 0x00, 0xff, 0xff, 0xb9, 0x12, 0x46, 0x5a, 0x99, 0x02, 0x00, 0x00,
+	0x43, 0x32, 0x34, 0x2f, 0x93, 0x4e, 0xbe, 0x0f, 0xe2, 0x12, 0xc1, 0xb4, 0x13, 0xe8, 0x7d, 0x0c,
+	0x7f, 0x30, 0x12, 0xed, 0x0f, 0x27, 0x95, 0x28, 0xa5, 0xf4, 0xcc, 0x92, 0x8c, 0xd2, 0x24, 0x3d,
+	0x60, 0xda, 0xd4, 0x87, 0x6a, 0x80, 0xd1, 0xba, 0xc9, 0x39, 0x99, 0xfa, 0x45, 0x05, 0xc9, 0x49,
+	0x6c, 0xe0, 0x14, 0x6b, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0xa4, 0x71, 0xb7, 0x04, 0xd5, 0x02,
+	0x00, 0x00,
 }

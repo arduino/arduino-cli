@@ -354,7 +354,7 @@ func main() {
 
 	// LIB UNINSTALL
 	fmt.Println("=== calling LibraryUninstall(WiFi101@0.15.3)")
-	libUninstallResp, err := client.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{
+	libUninstallRespStream, err := client.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{
 		Instance: instance,
 		Name:     "WiFi101",
 		Version:  "0.15.3",
@@ -363,8 +363,21 @@ func main() {
 		fmt.Printf("Error uninstalling: %s\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("---> %+v\n", libUninstallResp)
-	fmt.Println()
+	for {
+		uninstallResp, err := libUninstallRespStream.Recv()
+		if err == io.EOF {
+			fmt.Printf("---> %+v\n", uninstallResp)
+			fmt.Println()
+			break
+		}
+		if err != nil {
+			fmt.Printf("uninstall error: %s\n", err)
+			os.Exit(1)
+		}
+		if uninstallResp.GetTaskProgress() != nil {
+			fmt.Printf(">> TASK: %s\n", uninstallResp.GetTaskProgress())
+		}
+	}
 
 	// DESTROY
 	fmt.Println("=== calling Destroy()")
