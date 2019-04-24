@@ -30,6 +30,9 @@ type Index struct {
 	Libraries map[string]*Library
 }
 
+// EmptyIndex is an empty library index
+var EmptyIndex = &Index{Libraries: map[string]*Library{}}
+
 // Library is a library available for download
 type Library struct {
 	Name     string
