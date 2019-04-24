@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
-	semver "go.bug.st/relaxed-semver"
 )
 
 func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
@@ -37,26 +36,20 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 	}
 
 	// Extract all PlatformReference to platforms that have updates
-	var version *semver.Version
-	if req.Version != "" {
-		if v, err := semver.Parse(req.Version); err == nil {
-			version = v
-		} else {
-			return nil, fmt.Errorf("invalid version: %s", err)
-		}
+	version, err := commands.ParseVersion(req)
+	if err != nil {
+		return nil, fmt.Errorf("invalid version: %s", err)
 	}
 
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
 		PlatformVersion:      version}
-	err := upgradePlatform(pm, ref, downloadCB, taskCB)
-	if err != nil {
+	if err := upgradePlatform(pm, ref, downloadCB, taskCB); err != nil {
 		return nil, err
 	}
 
-	_, err = commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance})
-	if err != nil {
+	if _, err := commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
 		return nil, err
 	}
 

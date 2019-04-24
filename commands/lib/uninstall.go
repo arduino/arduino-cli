@@ -24,19 +24,16 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
-	semver "go.bug.st/relaxed-semver"
 )
 
 func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallReq, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req)
-	var version *semver.Version
-	if req.GetVersion() != "" {
-		if v, err := semver.Parse(req.GetVersion()); err == nil {
-			version = v
-		} else {
-			return fmt.Errorf("invalid version: %s", err)
-		}
+
+	version, err := commands.ParseVersion(req)
+	if err != nil {
+		return fmt.Errorf("invalid version: %s", err)
 	}
+
 	ref := &librariesindex.Reference{Name: req.GetName(), Version: version}
 	lib := lm.FindByReference(ref)
 	if lib == nil {

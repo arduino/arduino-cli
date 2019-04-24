@@ -31,8 +31,8 @@ func TestParsePlatformReferenceArgs(t *testing.T) {
 		ref, err := parsePlatformReferenceArg(arg)
 		require.NoError(t, err)
 		require.Equal(t, pack, ref.Package)
-		require.Equal(t, arch, ref.PlatformArchitecture)
-		require.Equal(t, version, ref.PlatformVersion)
+		require.Equal(t, arch, ref.Architecture)
+		require.Equal(t, version.String(), ref.Version)
 	}
 	invalid := func(arg string) {
 		_, err := parsePlatformReferenceArg(arg)

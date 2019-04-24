@@ -25,21 +25,18 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
-	semver "go.bug.st/relaxed-semver"
 )
 
 func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 
 	lm := commands.GetLibraryManager(req)
-	var version *semver.Version
-	if req.GetVersion() != "" {
-		if v, err := semver.Parse(req.GetVersion()); err == nil {
-			version = v
-		} else {
-			return fmt.Errorf("invalid version: %s", err)
-		}
+
+	version, err := commands.ParseVersion(req)
+	if err != nil {
+		return fmt.Errorf("invalid version: %s", err)
 	}
+
 	ref := &librariesindex.Reference{Name: req.GetName(), Version: version}
 	libRelease := lm.Index.FindRelease(ref)
 	if libRelease == nil {

@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
-	semver "go.bug.st/relaxed-semver"
 )
 
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
@@ -37,13 +36,9 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 		return nil, errors.New("invalid instance")
 	}
 
-	var version *semver.Version
-	if req.GetVersion() != "" {
-		if v, err := semver.Parse(req.GetVersion()); err == nil {
-			version = v
-		} else {
-			return nil, fmt.Errorf("invalid version: %s", err)
-		}
+	version, err := commands.ParseVersion(req)
+	if err != nil {
+		return nil, fmt.Errorf("invalid version: %s", err)
 	}
 
 	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{

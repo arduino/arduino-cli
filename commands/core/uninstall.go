@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
-	semver "go.bug.st/relaxed-semver"
 )
 
 func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq, taskCB commands.TaskProgressCB) (*rpc.PlatformUninstallResp, error) {
@@ -36,7 +35,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq, taskC
 	}
 
 	// If no version is specified consider the installed
-	version, err := semver.Parse(req.Version)
+	version, err := commands.ParseVersion(req)
 	if err != nil {
 		return nil, fmt.Errorf("invalid version: %s", err)
 	}

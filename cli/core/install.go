@@ -54,8 +54,8 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		_, err := core.PlatformInstall(context.Background(), &rpc.PlatformInstallReq{
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
-			Architecture:    platformRef.PlatformArchitecture,
-			Version:         platformRef.PlatformVersion.String(),
+			Architecture:    platformRef.Architecture,
+			Version:         platformRef.Version,
 		}, cli.OutputProgressBar(), cli.OutputTaskProgress())
 		if err != nil {
 			formatter.PrintError(err, "Error during install")
