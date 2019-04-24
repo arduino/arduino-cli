@@ -104,6 +104,7 @@ func NewLibraryManager(indexDir *paths.Path, downloadsDir *paths.Path) *Librarie
 		Libraries:    map[string]*LibraryAlternatives{},
 		IndexFile:    indexFile,
 		DownloadsDir: downloadsDir,
+		Index:        librariesindex.EmptyIndex,
 	}
 }
 
@@ -111,8 +112,12 @@ func NewLibraryManager(indexDir *paths.Path, downloadsDir *paths.Path) *Librarie
 // the corresponding Index structure.
 func (sc *LibrariesManager) LoadIndex() error {
 	index, err := librariesindex.LoadIndex(sc.IndexFile)
+	if err != nil {
+		sc.Index = librariesindex.EmptyIndex
+		return err
+	}
 	sc.Index = index
-	return err
+	return nil
 }
 
 // AddLibrariesDir adds path to the list of directories
