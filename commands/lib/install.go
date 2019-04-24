@@ -22,53 +22,52 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
 
-func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq, downloadCB commands.DownloadProgressCB) (*rpc.LibraryInstallResp, error) {
+func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 
 	lm := commands.GetLibraryManager(req)
 	var version *semver.Version
-	if v, err := semver.Parse(req.GetVersion()); err == nil {
-		version = v
-	} else {
-		return nil, fmt.Errorf("invalid version: %s", err)
+	if req.GetVersion() != "" {
+		if v, err := semver.Parse(req.GetVersion()); err == nil {
+			version = v
+		} else {
+			return fmt.Errorf("invalid version: %s", err)
+		}
 	}
 	ref := &librariesindex.Reference{Name: req.GetName(), Version: version}
-	library := lm.Index.FindRelease(ref)
-	if library == nil {
-		return nil, fmt.Errorf("library not found: %s", ref.String())
-	}
-	err := downloadLibrary(lm, library, downloadCB)
-	if err != nil {
-		return nil, err
-	}
-	err = installLibraries(lm, library)
-	if err != nil {
-		return nil, err
+	libRelease := lm.Index.FindRelease(ref)
+	if libRelease == nil {
+		return fmt.Errorf("library not found: %s", ref.String())
 	}
 
-	_, err = commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance})
-	if err != nil {
-		return nil, err
+	taskCB(&rpc.TaskProgress{Name: "Downloading " + libRelease.String()})
+	if err := downloadLibrary(lm, libRelease, downloadCB); err != nil {
+		return err
 	}
-	return &rpc.LibraryInstallResp{}, nil
-}
+	taskCB(&rpc.TaskProgress{Completed: true})
 
-func installLibraries(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release) error {
-
+	taskCB(&rpc.TaskProgress{Name: "Installing " + libRelease.String()})
 	logrus.WithField("library", libRelease).Info("Installing library")
-
-	if _, err := lm.Install(libRelease); err != nil {
-		//logrus.WithError(err).Warn("Error installing library ", libRelease)
-		//formatter.PrintError(err, "Error installing library: "+libRelease.String())
-		return fmt.Errorf("library not installed: %s", err)
+	libPath, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease)
+	if err != nil {
+		return fmt.Errorf("checking lib install prerequisites: %s", err)
 	}
+	if libReplaced != nil {
+		taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("Replacing %s with %s", libReplaced, libRelease)})
+	}
+	if err := lm.Install(libRelease, libPath); err != nil {
+		return err
+	}
+	taskCB(&rpc.TaskProgress{Completed: true})
 
-	//formatter.Print("Installed " + libRelease.String())
+	if _, err := commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
+		return fmt.Errorf("rescanning libraries: %s", err)
+	}
 	return nil
 }
