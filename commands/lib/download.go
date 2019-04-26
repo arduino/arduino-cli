@@ -35,15 +35,9 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadC
 
 	logrus.Info("Preparing download")
 
-	version, err := commands.ParseVersion(req)
+	lib, err := findLibraryIndexRelease(lm, req)
 	if err != nil {
-		return nil, fmt.Errorf("invalid version: %s", err)
-	}
-
-	ref := &librariesindex.Reference{Name: req.GetName(), Version: version}
-	lib := lm.Index.FindRelease(ref)
-	if lib == nil {
-		return nil, fmt.Errorf("library %s not found", ref)
+		return nil, fmt.Errorf("looking for library: %s", err)
 	}
 
 	if err := downloadLibrary(lm, lib, downloadCB); err != nil {

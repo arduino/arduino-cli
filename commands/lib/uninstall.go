@@ -21,7 +21,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
 )
@@ -29,15 +28,9 @@ import (
 func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallReq, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req)
 
-	version, err := commands.ParseVersion(req)
+	lib, err := findLibrary(lm, req)
 	if err != nil {
-		return fmt.Errorf("invalid version: %s", err)
-	}
-
-	ref := &librariesindex.Reference{Name: req.GetName(), Version: version}
-	lib := lm.FindByReference(ref)
-	if lib == nil {
-		return fmt.Errorf("library not installed: %s", ref.String())
+		return fmt.Errorf("looking for library: %s", err)
 	}
 
 	taskCB(&rpc.TaskProgress{Name: "Uninstalling " + lib.String()})

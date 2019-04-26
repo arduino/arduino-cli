@@ -21,7 +21,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
@@ -32,15 +31,9 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
 
 	lm := commands.GetLibraryManager(req)
 
-	version, err := commands.ParseVersion(req)
+	libRelease, err := findLibraryIndexRelease(lm, req)
 	if err != nil {
-		return fmt.Errorf("invalid version: %s", err)
-	}
-
-	ref := &librariesindex.Reference{Name: req.GetName(), Version: version}
-	libRelease := lm.Index.FindRelease(ref)
-	if libRelease == nil {
-		return fmt.Errorf("library not found: %s", ref.String())
+		return fmt.Errorf("looking for library: %s", err)
 	}
 
 	taskCB(&rpc.TaskProgress{Name: "Downloading " + libRelease.String()})
