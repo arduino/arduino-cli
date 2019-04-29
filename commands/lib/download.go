@@ -40,17 +40,23 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadC
 		return nil, fmt.Errorf("looking for library: %s", err)
 	}
 
-	if err := downloadLibrary(lm, lib, downloadCB); err != nil {
+	if err := downloadLibrary(lm, lib, downloadCB, func(*rpc.TaskProgress) {}); err != nil {
 		return nil, err
 	}
 
 	return &rpc.LibraryDownloadResp{}, nil
 }
 
-func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release, downloadCB commands.DownloadProgressCB) error {
-	d, err := libRelease.Resource.Download(lm.DownloadsDir)
-	if err != nil {
-		return fmt.Errorf("download error: %s", err)
+func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release,
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
+
+	taskCB(&rpc.TaskProgress{Name: "Downloading " + libRelease.String()})
+	if d, err := libRelease.Resource.Download(lm.DownloadsDir); err != nil {
+		return err
+	} else if err := commands.Download(d, libRelease.String(), downloadCB); err != nil {
+		return err
 	}
-	return commands.Download(d, libRelease.String(), downloadCB)
+	taskCB(&rpc.TaskProgress{Completed: true})
+
+	return nil
 }
