@@ -18,11 +18,15 @@
 package lib
 
 import (
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
+	"os"
+
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"golang.org/x/net/context"
 )
 
 func initUpgradeCommand() *cobra.Command {
@@ -39,14 +43,15 @@ func initUpgradeCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	lm := cli.InitLibraryManager(cli.Config)
-	list := lib.ListLibraries(lm, true)
-	libReleases := []*librariesindex.Release{}
-	for _, upgradeDesc := range list.Libraries {
-		libReleases = append(libReleases, upgradeDesc.Available)
+	instance := cli.CreateInstance()
+
+	err := lib.LibraryUpgradeAll(context.Background(), &rpc.LibraryUpgradeAllReq{
+		Instance: instance,
+	}, cli.OutputProgressBar(), cli.OutputTaskProgress())
+	if err != nil {
+		formatter.PrintError(err, "Error upgrading libraries")
+		os.Exit(cli.ErrGeneric)
 	}
 
-	//downloadLibraries(lm, libReleases)
-	//installLibraries(lm, libReleases)
 	logrus.Info("Done")
 }

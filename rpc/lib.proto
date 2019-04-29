@@ -53,3 +53,12 @@ message LibraryUninstallReq {
 message LibraryUninstallResp {
     TaskProgress task_progress = 1;
 }
+
+message LibraryUpgradeAllReq {
+    Instance instance = 1;
+}
+
+message LibraryUpgradeAllResp {
+    DownloadProgress progress = 1;
+    TaskProgress task_progress = 2;
+}

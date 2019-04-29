@@ -252,7 +252,8 @@ func main() {
 		}
 		if err != nil {
 			fmt.Printf("Upload error: %s\n", err)
-			os.Exit(1)
+			// os.Exit(1)
+			break
 		}
 		if resp := uplResp.GetOutStream(); resp != nil {
 			fmt.Printf(">> STDOUT: %s", resp)
@@ -349,15 +350,42 @@ func main() {
 		}
 	}
 
-	libInstall("0.15.2") // Install
-	libInstall("0.15.3") // Replace
+	libInstall("0.15.1") // Install
+	libInstall("0.15.2") // Replace
+
+	// LIB UPGRADE
+	fmt.Println("=== calling LibraryUpgradeAll()")
+	libUpgradeAllRespStream, err := client.LibraryUpgradeAll(context.Background(), &rpc.LibraryUpgradeAllReq{
+		Instance: instance,
+	})
+	if err != nil {
+		fmt.Printf("Error upgrading all: %s\n", err)
+		os.Exit(1)
+	}
+	for {
+		resp, err := libUpgradeAllRespStream.Recv()
+		if err == io.EOF {
+			fmt.Printf("---> %+v\n", resp)
+			fmt.Println()
+			break
+		}
+		if err != nil {
+			fmt.Printf("upgrading error: %s\n", err)
+			os.Exit(1)
+		}
+		if resp.GetProgress() != nil {
+			fmt.Printf(">> DOWNLOAD: %s\n", resp.GetProgress())
+		}
+		if resp.GetTaskProgress() != nil {
+			fmt.Printf(">> TASK: %s\n", resp.GetTaskProgress())
+		}
+	}
 
 	// LIB UNINSTALL
-	fmt.Println("=== calling LibraryUninstall(WiFi101@0.15.3)")
+	fmt.Println("=== calling LibraryUninstall(WiFi101)")
 	libUninstallRespStream, err := client.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{
 		Instance: instance,
 		Name:     "WiFi101",
-		Version:  "0.15.3",
 	})
 	if err != nil {
 		fmt.Printf("Error uninstalling: %s\n", err)

@@ -21,6 +21,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
@@ -36,12 +38,21 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
 		return fmt.Errorf("looking for library: %s", err)
 	}
 
-	taskCB(&rpc.TaskProgress{Name: "Downloading " + libRelease.String()})
-	if err := downloadLibrary(lm, libRelease, downloadCB); err != nil {
+	if err := downloadLibrary(lm, libRelease, downloadCB, taskCB); err != nil {
+		return fmt.Errorf("downloading library: %s", err)
+	}
+
+	if err := installLibrary(lm, libRelease, taskCB); err != nil {
 		return err
 	}
-	taskCB(&rpc.TaskProgress{Completed: true})
 
+	if _, err := commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
+		return fmt.Errorf("rescanning libraries: %s", err)
+	}
+	return nil
+}
+
+func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release, taskCB commands.TaskProgressCB) error {
 	taskCB(&rpc.TaskProgress{Name: "Installing " + libRelease.String()})
 	logrus.WithField("library", libRelease).Info("Installing library")
 	libPath, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease)
@@ -56,8 +67,5 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 
-	if _, err := commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
-		return fmt.Errorf("rescanning libraries: %s", err)
-	}
 	return nil
 }
