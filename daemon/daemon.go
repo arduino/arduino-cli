@@ -203,5 +203,5 @@ func (s *ArduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallReq, s
 	if err != nil {
 		return err
 	}
-	return stream.Send(nil)
+	return stream.Send(&rpc.LibraryUninstallResp{})
 }
