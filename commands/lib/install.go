@@ -65,7 +65,7 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 	if err := lm.Install(libRelease, libPath); err != nil {
 		return err
 	}
-	taskCB(&rpc.TaskProgress{Completed: true})
+	taskCB(&rpc.TaskProgress{Message: "Installed " + libRelease.String(), Completed: true})
 
 	return nil
 }
