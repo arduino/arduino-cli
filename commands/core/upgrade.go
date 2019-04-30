@@ -36,15 +36,10 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 	}
 
 	// Extract all PlatformReference to platforms that have updates
-	version, err := commands.ParseVersion(req)
-	if err != nil {
-		return nil, fmt.Errorf("invalid version: %s", err)
-	}
-
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
-		PlatformVersion:      version}
+	}
 	if err := upgradePlatform(pm, ref, downloadCB, taskCB); err != nil {
 		return nil, err
 	}

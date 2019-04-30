@@ -49,12 +49,17 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core upgrade`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
+	for i, platformRef := range platformsRefs {
+		if platformRef.Version != "" {
+			formatter.PrintErrorMessage(("Invalid item " + args[i]))
+			os.Exit(cli.ErrBadArgument)
+		}
+	}
 	for _, platformRef := range platformsRefs {
 		_, err := core.PlatformUpgrade(context.Background(), &rpc.PlatformUpgradeReq{
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.Architecture,
-			Version:         platformRef.Version,
 		}, cli.OutputProgressBar(), cli.OutputTaskProgress())
 		if err != nil {
 			formatter.PrintError(err, "Error during upgrade")
