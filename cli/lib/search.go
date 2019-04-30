@@ -18,13 +18,15 @@
 package lib
 
 import (
-	"fmt"
+	"context"
+	"os"
+
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/common/formatter/output"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -47,30 +49,17 @@ var searchFlags struct {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
+	instance := cli.CreateInstance()
 	logrus.Info("Executing `arduino lib search`")
-	query := strings.ToLower(strings.Join(args, " "))
-
-	lm := cli.InitLibraryManager(cli.Config)
-
-	res := output.LibSearchResults{
-		Libraries: []*librariesindex.Library{},
-	}
-	for _, lib := range lm.Index.Libraries {
-		if strings.Contains(strings.ToLower(lib.Name), query) {
-			res.Libraries = append(res.Libraries, lib)
-		}
-	}
-
-	if searchFlags.names {
-		for _, lib := range res.Libraries {
-			formatter.Print(lib.Name)
-		}
-	} else {
-		if len(res.Libraries) == 0 {
-			formatter.Print(fmt.Sprintf("No library found matching `%s` search query", query))
-		} else {
-			formatter.Print(res)
-		}
+	arguments := strings.ToLower(strings.Join(args, " "))
+	_, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
+		Instance: instance,
+		Names:    searchFlags.names,
+		Query:    arguments,
+	})
+	if err != nil {
+		formatter.PrintError(err, "Error saerching for Library")
+		os.Exit(cli.ErrGeneric)
 	}
 	logrus.Info("Done")
 }
