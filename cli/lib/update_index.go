@@ -19,9 +19,11 @@ package lib
 
 import (
 	"context"
+	"os"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +36,11 @@ func initUpdateIndexCommand() *cobra.Command {
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			lm := cli.InitLibraryManager(cli.Config)
-			commands.UpdateLibrariesIndex(context.Background(), lm, cli.OutputProgressBar())
+			err := commands.UpdateLibrariesIndex(context.Background(), lm, cli.OutputProgressBar())
+			if err != nil {
+				formatter.PrintError(err, "Error updating library index")
+				os.Exit(cli.ErrGeneric)
+			}
 		},
 	}
 }

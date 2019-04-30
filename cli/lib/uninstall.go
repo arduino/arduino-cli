@@ -53,11 +53,15 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for _, library := range libRefs {
-		lib.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{
+		err := lib.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version.String(),
 		}, cli.OutputTaskProgress())
+		if err != nil {
+			formatter.PrintError(err, "Error uninstalling "+library.String())
+			os.Exit(cli.ErrGeneric)
+		}
 	}
 
 	logrus.Info("Done")
