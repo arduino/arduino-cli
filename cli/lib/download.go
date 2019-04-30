@@ -48,7 +48,8 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	instance := cli.CreateInstance()
 	pairs, err := librariesindex.ParseArgs(args)
 	if err != nil {
-		formatter.PrintError(err, "Error in oparsing arguments")
+		formatter.PrintError(err, "Arguments error")
+		os.Exit(cli.ErrBadArgument)
 	}
 	for _, library := range pairs {
 		_, err := lib.LibraryDownload(context.Background(), &rpc.LibraryDownloadReq{
