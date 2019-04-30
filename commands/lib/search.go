@@ -18,59 +18,51 @@
 package lib
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/common/formatter/output"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	"github.com/arduino/arduino-cli/rpc"
 )
 
-func initSearchCommand() *cobra.Command {
-	searchCommand := &cobra.Command{
-		Use:     "search [LIBRARY_NAME]",
-		Short:   "Searchs for one or more libraries data.",
-		Long:    "Search for one or more libraries data (case insensitive search).",
-		Example: "  " + cli.AppName + " lib search audio",
-		Args:    cobra.ArbitraryArgs,
-		Run:     runSearchCommand,
-	}
-	searchCommand.Flags().BoolVar(&searchFlags.names, "names", false, "Show library names only.")
-	return searchCommand
-}
+func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.LibrarySearchResp, error) {
 
-var searchFlags struct {
-	names bool // if true outputs lib names only.
-}
+	lm := commands.GetLibraryManager(req)
 
-func runSearchCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino lib search`")
-	query := strings.ToLower(strings.Join(args, " "))
+	res := []*rpc.SearchLibraryOutput{}
+	release, index string
 
-	lm := cli.InitLibraryManager(cli.Config)
-
-	res := output.LibSearchResults{
-		Libraries: []*librariesindex.Library{},
-	}
 	for _, lib := range lm.Index.Libraries {
-		if strings.Contains(strings.ToLower(lib.Name), query) {
-			res.Libraries = append(res.Libraries, lib)
+		if strings.Contains(strings.ToLower(lib.Name), req.GetQuery()) {
+			for rel := range lib.Releases {
+				release += rel;
+			}
+
+			for idx := range &lib.Libraries {
+				index = 
+			}
+			res = append(res, &rpc.SearchLibraryOutput{
+				Name:     lib.Name,
+				Releases: release,
+				Latest:   lib.Latest.String(),
+				Index:    index,
+			})
 		}
 	}
 
-	if searchFlags.names {
+	if req.GetNames() {
 		for _, lib := range res.Libraries {
 			formatter.Print(lib.Name)
 		}
 	} else {
 		if len(res.Libraries) == 0 {
-			formatter.Print(fmt.Sprintf("No library found matching `%s` search query", query))
+			formatter.Print(fmt.Sprintf("No library found matching `%s` search query", req.GetQuery()))
 		} else {
 			formatter.Print(res)
 		}
 	}
-	logrus.Info("Done")
+
+	return &rpc.LibrarySearchResp{}, nil
 }

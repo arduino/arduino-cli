@@ -216,3 +216,7 @@ func (s *ArduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllReq,
 	}
 	return stream.Send(&rpc.LibraryUpgradeAllResp{})
 }
+
+func (s *ArduinoCoreServerImpl) LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.LibrarySearchResp, error) {
+	return lib.LibrarySearch(ctx, req)
+}

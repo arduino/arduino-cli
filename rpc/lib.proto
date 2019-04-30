@@ -62,3 +62,20 @@ message LibraryUpgradeAllResp {
     DownloadProgress progress = 1;
     TaskProgress task_progress = 2;
 }
+
+message LibrarySearchReq {
+    Instance instance = 1;
+    bool names = 2;
+    string query = 3;
+}
+
+message LibrarySearchResp {
+    repeated SearchLibraryOutput search_output = 1;
+}
+
+message SearchLibraryOutput {
+    string name = 1;
+	string releases = 2;
+	string latest = 3;
+	string index = 4;
+}
