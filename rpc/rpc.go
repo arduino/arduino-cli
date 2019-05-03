@@ -17,4 +17,10 @@
 
 package rpc
 
+//go:generate protoc -I . -I .. --go_out=plugins=grpc:../../../.. board.proto
+//go:generate protoc -I . -I .. --go_out=plugins=grpc:../../../.. commands.proto
+//go:generate protoc -I . -I .. --go_out=plugins=grpc:../../../.. common.proto
 //go:generate protoc -I . -I .. --go_out=plugins=grpc:../../../.. compile.proto
+//go:generate protoc -I . -I .. --go_out=plugins=grpc:../../../.. core.proto
+//go:generate protoc -I . -I .. --go_out=plugins=grpc:../../../.. lib.proto
+//go:generate protoc -I . -I .. --go_out=plugins=grpc:../../../.. upload.proto
