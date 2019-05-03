@@ -19,7 +19,9 @@ package lib
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"sort"
 
 	"strings"
 
@@ -29,6 +31,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	semver "go.bug.st/relaxed-semver"
 )
 
 func initSearchCommand() *cobra.Command {
@@ -51,15 +54,56 @@ var searchFlags struct {
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	instance := cli.CreateInstance()
 	logrus.Info("Executing `arduino lib search`")
-	arguments := strings.ToLower(strings.Join(args, " "))
-	_, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
+	//arguments :=
+	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
 		Instance: instance,
 		Names:    searchFlags.names,
-		Query:    arguments,
+		Query:    (strings.Join(args, " ")),
 	})
 	if err != nil {
 		formatter.PrintError(err, "Error saerching for Library")
 		os.Exit(cli.ErrGeneric)
 	}
+
+	results := searchResp.GetSearchOutput()
+	if cli.OutputJSONOrElse(results) {
+		if len(results) > 0 {
+			for _, out := range results {
+				fmt.Println(SearchOutputToString(out, searchFlags.names))
+			}
+		} else {
+			formatter.Print("No libraries matching your search.")
+		}
+	}
 	logrus.Info("Done")
+}
+
+func SearchOutputToString(lsr *rpc.SearchLibraryOutput, names bool) string {
+	ret := ""
+
+	ret += fmt.Sprintf("Name: \"%s\"\n", lsr.Name)
+	if !names {
+		ret += fmt.Sprintln("  Author: ", lsr.GetLatest().Author) +
+			fmt.Sprintln("  Maintainer: ", lsr.GetLatest().Maintainer) +
+			fmt.Sprintln("  Sentence: ", lsr.GetLatest().Sentence) +
+			fmt.Sprintln("  Paragraph: ", lsr.GetLatest().Paragraph) +
+			fmt.Sprintln("  Website: ", lsr.GetLatest().Website) +
+			fmt.Sprintln("  Category: ", lsr.GetLatest().Category) +
+			fmt.Sprintln("  Architecture: ", strings.Join(lsr.GetLatest().Architectures, ", ")) +
+			fmt.Sprintln("  Types: ", strings.Join(lsr.GetLatest().Types, ", ")) +
+			fmt.Sprintln("  Versions: ", strings.Replace(fmt.Sprint(Versions(lsr.GetLatest(), lsr)), " ", ", ", -1))
+	}
+	return strings.TrimSpace(ret)
+}
+
+func Versions(l *rpc.LibraryRelease, library *rpc.SearchLibraryOutput) []*semver.Version {
+	res := []*semver.Version{}
+	for str, _ := range library.Releases {
+		v, err := semver.Parse(str)
+		if err == nil {
+			res = append(res, v)
+		}
+	}
+	sort.Sort(semver.List(res))
+	return res
 }

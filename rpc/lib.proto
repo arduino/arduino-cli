@@ -74,8 +74,28 @@ message LibrarySearchResp {
 }
 
 message SearchLibraryOutput {
-    string name = 1;
-	string releases = 2;
-	string latest = 3;
-	string index = 4;
+    string Name = 1;
+    map<string,LibraryRelease> Releases = 2;
+    LibraryRelease latest = 3;
+}
+
+message LibraryRelease {
+    string author = 1;
+    string version = 2;
+    string maintainer = 3;
+    string sentence = 4;
+    string paragraph = 5;
+    string website = 6;
+    string category = 7;
+    repeated string architectures = 8;
+    repeated string types = 9;
+    DownloadResource resources = 10;
+}
+
+message DownloadResource {
+    string url = 1;
+    string archivefilename = 2;
+    string checksum = 3;
+    int64  size = 4;
+    string cachepath = 5;
 }
