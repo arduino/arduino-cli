@@ -19,50 +19,75 @@ package lib
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
 )
 
 func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.LibrarySearchResp, error) {
 
 	lm := commands.GetLibraryManager(req)
+	if lm == nil {
+		return nil, errors.New("invalid instance")
+	}
 
 	res := []*rpc.SearchLibraryOutput{}
-	release, index string
 
 	for _, lib := range lm.Index.Libraries {
-		if strings.Contains(strings.ToLower(lib.Name), req.GetQuery()) {
-			for rel := range lib.Releases {
-				release += rel;
+		if strings.Contains(strings.ToLower(lib.Name), strings.ToLower(req.GetQuery())) {
+			releases := map[string]*rpc.LibraryRelease{}
+			for str, rel := range lib.Releases {
+				releases[str] = GetLibraryParameters(rel)
 			}
+			latest := GetLibraryParameters(lib.Latest)
 
-			for idx := range &lib.Libraries {
-				index = 
-			}
-			res = append(res, &rpc.SearchLibraryOutput{
+			searchedlib := &rpc.SearchLibraryOutput{
 				Name:     lib.Name,
-				Releases: release,
-				Latest:   lib.Latest.String(),
-				Index:    index,
-			})
+				Releases: releases,
+				Latest:   latest,
+			}
+			res = append(res, searchedlib)
 		}
 	}
 
 	if req.GetNames() {
-		for _, lib := range res.Libraries {
-			formatter.Print(lib.Name)
+		restmp := []*rpc.SearchLibraryOutput{}
+		for _, lib := range res {
+			searchedlib := &rpc.SearchLibraryOutput{
+				Name: lib.Name,
+			}
+			restmp = append(restmp, searchedlib)
 		}
+		res = restmp
 	} else {
-		if len(res.Libraries) == 0 {
-			formatter.Print(fmt.Sprintf("No library found matching `%s` search query", req.GetQuery()))
-		} else {
-			formatter.Print(res)
+		if len(res) == 0 {
+			return &rpc.LibrarySearchResp{}, nil
 		}
 	}
 
-	return &rpc.LibrarySearchResp{}, nil
+	return &rpc.LibrarySearchResp{SearchOutput: res}, nil
+}
+func GetLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
+
+	return &rpc.LibraryRelease{
+		Author:        rel.Author,
+		Version:       rel.Version.String(),
+		Maintainer:    rel.Maintainer,
+		Sentence:      rel.Sentence,
+		Paragraph:     rel.Paragraph,
+		Website:       rel.Website,
+		Category:      rel.Category,
+		Architectures: rel.Architectures,
+		Types:         rel.Types,
+		Resources: &rpc.DownloadResource{
+			Url:             rel.Resource.URL,
+			Archivefilename: rel.Resource.ArchiveFileName,
+			Checksum:        rel.Resource.Checksum,
+			Size:            rel.Resource.Size,
+			Cachepath:       rel.Resource.CachePath,
+		},
+	}
 }

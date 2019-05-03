@@ -23,6 +23,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
 	"google.golang.org/grpc"
 )
@@ -380,6 +381,20 @@ func main() {
 			fmt.Printf(">> TASK: %s\n", resp.GetTaskProgress())
 		}
 	}
+
+	// LIB SEARCH
+	fmt.Println("=== calling LibrarySearch(audio)")
+	outputsrc, err := client.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
+		Instance: instance,
+		Names:    true,
+		Query:    "audio",
+	})
+	if err != nil {
+		formatter.PrintError(err, "Error saerching for Library")
+		os.Exit(1)
+	}
+
+	fmt.Println(outputsrc)
 
 	// LIB UNINSTALL
 	fmt.Println("=== calling LibraryUninstall(WiFi101)")
