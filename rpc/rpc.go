@@ -24,3 +24,6 @@ package rpc
 //go:generate protoc -I . -I .. --go_out=plugins=grpc:../../../.. core.proto
 //go:generate protoc -I . -I .. --go_out=plugins=grpc:../../../.. lib.proto
 //go:generate protoc -I . -I .. --go_out=plugins=grpc:../../../.. upload.proto
+
+// protoc --plugin=protoc-gen-grpc-java=path/to/protoc-gen-grpc-java --grpc-java_out=java --proto_path=. board.proto
+// find . -name "*.proto" -exec protoc -I=. --java_out=java {} \;
