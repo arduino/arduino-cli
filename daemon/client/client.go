@@ -65,7 +65,7 @@ func main() {
 		Instance: instance,
 	})
 	if err != nil {
-		fmt.Printf("Error Upgrade platform: %s\n", err)
+		fmt.Printf("Error updating index: %s\n", err)
 		os.Exit(1)
 	}
 	for {
@@ -76,7 +76,7 @@ func main() {
 			break
 		}
 		if err != nil {
-			fmt.Printf("Compile error: %s\n", err)
+			fmt.Printf("Update error: %s\n", err)
 			os.Exit(1)
 		}
 		if uiResp.GetDownloadProgress() != nil {
@@ -160,7 +160,7 @@ func main() {
 		Architecture:    "samd",
 	})
 	if err != nil {
-		fmt.Printf("Error Upgrade platform: %s\n", err)
+		fmt.Printf("Error upgrading platform: %s\n", err)
 		os.Exit(1)
 	}
 	for {
@@ -273,7 +273,7 @@ func main() {
 		Version:         "1.6.21",
 	})
 	if err != nil {
-		fmt.Printf("uninstall error: %s\n", err)
+		fmt.Printf("Uninstall error: %s\n", err)
 		os.Exit(1)
 	}
 	for {
@@ -284,7 +284,7 @@ func main() {
 			break
 		}
 		if err != nil {
-			fmt.Printf("uninstall error: %s\n", err)
+			fmt.Printf("Uninstall error: %s\n", err)
 			os.Exit(1)
 		}
 		if uninstallResp.GetTaskProgress() != nil {
@@ -339,7 +339,7 @@ func main() {
 				break
 			}
 			if err != nil {
-				fmt.Printf("install error: %s\n", err)
+				fmt.Printf("Install error: %s\n", err)
 				os.Exit(1)
 			}
 			if installResp.GetProgress() != nil {
@@ -371,7 +371,7 @@ func main() {
 			break
 		}
 		if err != nil {
-			fmt.Printf("upgrading error: %s\n", err)
+			fmt.Printf("Upgrading error: %s\n", err)
 			os.Exit(1)
 		}
 		if resp.GetProgress() != nil {
@@ -390,7 +390,7 @@ func main() {
 		Query:    "audio",
 	})
 	if err != nil {
-		formatter.PrintError(err, "Error saerching for Library")
+		formatter.PrintError(err, "Error searching for library")
 		os.Exit(1)
 	}
 	fmt.Printf("---> %+v\n", libSearchResp)
@@ -428,7 +428,7 @@ func main() {
 			break
 		}
 		if err != nil {
-			fmt.Printf("uninstall error: %s\n", err)
+			fmt.Printf("Uninstall error: %s\n", err)
 			os.Exit(1)
 		}
 		if uninstallResp.GetTaskProgress() != nil {
