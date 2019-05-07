@@ -396,6 +396,20 @@ func main() {
 
 	fmt.Println(outputsrc)
 
+	// LIB SEARCH
+	fmt.Println("=== calling LibraryList")
+	outputlist, err := client.LibraryList(context.Background(), &rpc.LibraryListReq{
+		Instance:  instance,
+		All:       false,
+		Updatable: false,
+	})
+	if err != nil {
+		formatter.PrintError(err, "Error List Library")
+		os.Exit(1)
+	}
+
+	fmt.Println(outputlist)
+
 	// LIB UNINSTALL
 	fmt.Println("=== calling LibraryUninstall(WiFi101)")
 	libUninstallRespStream, err := client.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{

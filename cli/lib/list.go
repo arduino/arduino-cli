@@ -18,12 +18,17 @@
 package lib
 
 import (
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"fmt"
+	"os"
+
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/rpc"
+	"github.com/gosuri/uitable"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"golang.org/x/net/context"
 )
 
 func initListCommand() *cobra.Command {
@@ -46,18 +51,72 @@ var listFlags struct {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
+	instance := cli.CreateInstance()
 	logrus.Info("Listing")
 
-	var lm *librariesmanager.LibrariesManager
-	if listFlags.all {
-		_, lm = cli.InitPackageAndLibraryManager()
-	} else {
-		lm = cli.InitLibraryManager(cli.Config)
+	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
+		Instance:  instance,
+		All:       listFlags.all,
+		Updatable: listFlags.updatable,
+	})
+	if err != nil {
+		formatter.PrintError(err, "Error listing Libraries")
+		os.Exit(cli.ErrGeneric)
 	}
-
-	res := lib.ListLibraries(lm, listFlags.updatable)
-	if len(res.Libraries) > 0 {
-		formatter.Print(res)
+	if len(res.GetInstalledLibrary()) > 0 {
+		results := res.GetInstalledLibrary()
+		if cli.OutputJSONOrElse(results) {
+			if len(results) > 0 {
+				fmt.Println(outputListLibrary(results))
+			} else {
+				formatter.Print("Error listing Libraries")
+			}
+		}
 	}
 	logrus.Info("Done")
+}
+
+func outputListLibrary(il []*rpc.InstalledLibrary) string {
+	table := uitable.New()
+	table.MaxColWidth = 100
+	table.Wrap = true
+
+	hasUpdates := false
+	for _, libMeta := range il {
+		if libMeta.GetRelease() != nil {
+			hasUpdates = true
+		}
+	}
+
+	if hasUpdates {
+		table.AddRow("Name", "Installed", "Available", "Location")
+	} else {
+		table.AddRow("Name", "Installed", "Location")
+	}
+
+	lastName := ""
+	for _, libMeta := range il {
+		lib := libMeta.GetLibrary()
+		name := lib.Name
+		if name == lastName {
+			name = ` "`
+		} else {
+			lastName = name
+		}
+
+		location := lib.GetLocation()
+		if lib.ContainerPlatform != "" {
+			location = lib.GetContainerPlatform()
+		}
+		if hasUpdates {
+			var available string
+			if libMeta.GetRelease() != nil {
+				available = libMeta.GetRelease().GetVersion()
+			}
+			table.AddRow(name, lib.Version, available, location)
+		} else {
+			table.AddRow(name, lib.Version, location)
+		}
+	}
+	return fmt.Sprintln(table)
 }
