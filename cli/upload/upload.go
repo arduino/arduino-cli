@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
+	"github.com/arduino/go-paths-helper"
 	"github.com/spf13/cobra"
 )
 
@@ -66,16 +67,17 @@ var flags struct {
 
 func run(command *cobra.Command, args []string) {
 	instance := cli.CreateInstance()
-	path := ""
 
+	var path *paths.Path
 	if len(args) > 0 {
-		path = args[0]
+		path = paths.New(args[0])
 	}
+	sketchPath := cli.InitSketchPath(path)
 
 	uploadRes, err := upload.Upload(context.Background(), &rpc.UploadReq{
 		Instance:   instance,
 		Fqbn:       flags.fqbn,
-		SketchPath: path,
+		SketchPath: sketchPath.String(),
 		Port:       flags.port,
 		Verbose:    flags.verbose,
 		Verify:     flags.verify,

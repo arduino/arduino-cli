@@ -14,6 +14,7 @@ import (
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
@@ -33,11 +34,11 @@ func Compile(ctx context.Context, req *rpc.CompileReq,
 	}
 
 	logrus.Info("Executing `arduino compile`")
-	var sketchPath *paths.Path
-	if req.GetSketchPath() != "" {
-		sketchPath = paths.New(req.GetSketchPath())
+	if req.GetSketchPath() == "" {
+		return nil, fmt.Errorf("missing sketchPath")
 	}
-	sketch, err := cli.InitSketch(sketchPath)
+	sketchPath := paths.New(req.GetSketchPath())
+	sketch, err := sketches.NewSketchFromPath(sketchPath)
 	if err != nil {
 		return nil, fmt.Errorf("opening sketch: %s", err)
 	}

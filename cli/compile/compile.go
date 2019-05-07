@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
+	"github.com/arduino/go-paths-helper"
 	"github.com/spf13/cobra"
 )
 
@@ -90,16 +91,16 @@ var flags struct {
 
 func run(cmd *cobra.Command, args []string) {
 	instance := cli.CreateInstance()
-	path := ""
 
+	var path *paths.Path
 	if len(args) > 0 {
-		path = args[0]
+		path = paths.New(args[0])
 	}
-
+	sketchPath := cli.InitSketchPath(path)
 	compRes, err := compile.Compile(context.Background(), &rpc.CompileReq{
 		Instance:        instance,
 		Fqbn:            flags.fqbn,
-		SketchPath:      path,
+		SketchPath:      sketchPath.String(),
 		ShowProperties:  flags.showProperties,
 		Preprocess:      flags.preprocess,
 		BuildCachePath:  flags.buildCachePath,
