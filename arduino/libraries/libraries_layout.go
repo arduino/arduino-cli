@@ -27,7 +27,7 @@ type LibraryLayout uint16
 
 const (
 	// FlatLayout is a library without a `src` directory
-	FlatLayout LibraryLayout = 1 << iota
+	FlatLayout LibraryLayout = iota
 	// RecursiveLayout is a library with `src` directory (that allows recursive build)
 	RecursiveLayout
 )

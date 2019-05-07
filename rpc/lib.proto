@@ -99,3 +99,56 @@ message DownloadResource {
     int64  size = 4;
     string cachepath = 5;
 }
+
+message LibraryListReq {
+    Instance instance = 1;
+    bool all = 2;
+	bool updatable = 3;
+}
+
+message LibraryListResp {
+    repeated InstalledLibrary installed_library = 1;
+}
+
+message InstalledLibrary {
+    Library library = 1;
+    LibraryRelease release = 2;
+}
+
+message Library {
+    string Name = 1;
+	string  Author = 2;
+	string  Maintainer = 3;
+	string Sentence = 4;
+	string Paragraph = 5;
+	string Website = 6;
+	string Category = 7;
+	repeated string Architectures = 8;
+	repeated string Types = 9;
+	string InstallDir = 10;
+	string SourceDir = 11;
+	string UtilityDir = 12;
+	string Location = 13;
+	string ContainerPlatform = 14;
+	string Layout = 15;
+	string RealName = 16;
+	bool DotALinkage = 17;
+	bool Precompiled = 18;
+    string 	LDflags = 19;
+	bool IsLegacy = 20;
+	string Version = 21;
+	string License = 22;
+	map<string,string> Properties = 23;
+}
+
+enum LibraryLayout {
+    FlatLayout = 0;
+    RecursiveLayout = 1;
+}
+
+enum LibraryLocation {
+    IDEBuiltIn = 0;
+    PlatformBuiltIn = 1;
+    ReferencedPlatformBuiltIn = 2;
+    Sketchbook = 3;
+}

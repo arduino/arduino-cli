@@ -75,6 +75,8 @@ service ArduinoCore {
   rpc LibraryUpgradeAll(LibraryUpgradeAllReq) returns (stream LibraryUpgradeAllResp);
 
   rpc LibrarySearch(LibrarySearchReq) returns (LibrarySearchResp);
+
+  rpc LibraryList(LibraryListReq) returns (LibraryListResp);
 }
 
 // Configuration contains information to instantiate an Arduino Platform Service

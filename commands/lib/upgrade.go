@@ -29,14 +29,14 @@ func LibraryUpgradeAll(ctx context.Context, req *rpc.LibraryUpgradeAllReq, downl
 	lm := commands.GetLibraryManager(req)
 
 	// Obtain the list of upgradable libraries
-	list := ListLibraries(lm, true)
+	list := ListLibraries(lm, true, true)
 
-	for _, upgradeDesc := range list.Libraries {
+	for _, upgradeDesc := range list {
 		if err := downloadLibrary(lm, upgradeDesc.Available, downloadCB, taskCB); err != nil {
 			return err
 		}
 	}
-	for _, upgradeDesc := range list.Libraries {
+	for _, upgradeDesc := range list {
 		installLibrary(lm, upgradeDesc.Available, taskCB)
 	}
 

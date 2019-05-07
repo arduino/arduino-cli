@@ -18,17 +18,52 @@
 package lib
 
 import (
+	"context"
+
+	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/common/formatter/output"
+	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/rpc"
 )
+
+type InstalledLib struct {
+	Library   *libraries.Library      `json:"library"`
+	Available *librariesindex.Release `omitempy,json:"available"`
+}
+
+func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResp, error) {
+
+	lm := commands.GetLibraryManager(req)
+	instaledLib := []*rpc.InstalledLibrary{}
+	res := ListLibraries(lm, req.GetUpdatable(), req.GetAll())
+	if len(res) > 0 {
+		for _, lib := range res {
+			libtmp := GetOutputLibrary(lib.Library)
+			release := GetOutputRelease(lib.Available)
+			instaledLib = append(instaledLib, &rpc.InstalledLibrary{
+				Library: libtmp,
+				Release: release,
+			})
+		}
+
+		return &rpc.LibraryListResp{InstalledLibrary: instaledLib}, nil
+	}
+	return &rpc.LibraryListResp{}, nil
+}
 
 // ListLibraries returns the list of installed libraries. If updatable is true it
 // returns only the libraries that may be updated.
-func ListLibraries(lm *librariesmanager.LibrariesManager, updatable bool) *output.InstalledLibraries {
-	res := &output.InstalledLibraries{}
+func ListLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bool) []*InstalledLib {
+
+	res := []*InstalledLib{}
 	for _, libAlternatives := range lm.Libraries {
 		for _, lib := range libAlternatives.Alternatives {
+			if !all {
+				if lib.Location != libraries.Sketchbook {
+					continue
+				}
+			}
 			var available *librariesindex.Release
 			if updatable {
 				available = lm.Index.FindLibraryUpdate(lib)
@@ -36,11 +71,72 @@ func ListLibraries(lm *librariesmanager.LibrariesManager, updatable bool) *outpu
 					continue
 				}
 			}
-			res.Libraries = append(res.Libraries, &output.InstalledLibary{
+			res = append(res, &InstalledLib{
 				Library:   lib,
 				Available: available,
 			})
 		}
 	}
 	return res
+}
+
+func GetOutputLibrary(lib *libraries.Library) *rpc.Library {
+	insdir := ""
+	if lib.InstallDir != nil {
+		insdir = lib.InstallDir.String()
+	}
+	srcdir := ""
+	if lib.SourceDir != nil {
+		srcdir = lib.SourceDir.String()
+	}
+	utldir := ""
+	if lib.UtilityDir != nil {
+		utldir = lib.UtilityDir.String()
+	}
+	cntplat := ""
+	if lib.ContainerPlatform != nil {
+		cntplat = lib.ContainerPlatform.String()
+	}
+
+	return &rpc.Library{
+		Name:              lib.Name,
+		Author:            lib.Author,
+		Maintainer:        lib.Maintainer,
+		Sentence:          lib.Sentence,
+		Paragraph:         lib.Paragraph,
+		Website:           lib.Website,
+		Category:          lib.Category,
+		Architectures:     lib.Architectures,
+		Types:             lib.Types,
+		InstallDir:        insdir,
+		SourceDir:         srcdir,
+		UtilityDir:        utldir,
+		Location:          lib.Location.String(),
+		ContainerPlatform: cntplat,
+		Layout:            lib.Layout.String(),
+		RealName:          lib.RealName,
+		DotALinkage:       lib.DotALinkage,
+		Precompiled:       lib.Precompiled,
+		LDflags:           lib.LDflags,
+		IsLegacy:          lib.IsLegacy,
+		Version:           lib.Version.String(),
+		License:           lib.LDflags,
+	}
+}
+
+func GetOutputRelease(lib *librariesindex.Release) *rpc.LibraryRelease { //
+	if lib != nil {
+		return &rpc.LibraryRelease{
+			Author:        lib.Author,
+			Version:       lib.Version.String(),
+			Maintainer:    lib.Maintainer,
+			Sentence:      lib.Sentence,
+			Paragraph:     lib.Paragraph,
+			Website:       lib.Website,
+			Category:      lib.Category,
+			Architectures: lib.Architectures,
+			Types:         lib.Types,
+		}
+	}
+	return &rpc.LibraryRelease{}
 }
