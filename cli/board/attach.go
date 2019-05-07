@@ -60,11 +60,14 @@ var attachFlags struct {
 
 func runAttachCommand(cmd *cobra.Command, args []string) {
 	boardURI := args[0]
-	var sketchPath *paths.Path
-	if len(args) > 1 {
-		sketchPath = paths.New(args[1])
+
+	var path *paths.Path
+	if len(args) > 0 {
+		path = paths.New(args[0])
 	}
-	sketch, err := cli.InitSketch(sketchPath)
+	sketchPath := cli.InitSketchPath(path)
+
+	sketch, err := sketches.NewSketchFromPath(sketchPath)
 	if err != nil {
 		formatter.PrintError(err, "Error opening sketch.")
 		os.Exit(cli.ErrGeneric)

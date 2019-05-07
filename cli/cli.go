@@ -20,13 +20,11 @@ package cli
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
@@ -157,15 +155,18 @@ func InitLibraryManager(cfg *configs.Configuration) *librariesmanager.LibrariesM
 	return commands.GetLibraryManager(resp)
 }
 
-func InitSketch(sketchPath *paths.Path) (*sketches.Sketch, error) {
+// InitSketchPath returns sketchPath if specified or the current working
+// directory if sketchPath is nil.
+func InitSketchPath(sketchPath *paths.Path) *paths.Path {
 	if sketchPath != nil {
-		return sketches.NewSketchFromPath(sketchPath)
+		return sketchPath
 	}
 
 	wd, err := paths.Getwd()
 	if err != nil {
-		return nil, fmt.Errorf("getting current directory: %s", err)
+		formatter.PrintError(err, "Couldn't get current working directory")
+		os.Exit(ErrGeneric)
 	}
 	logrus.Infof("Reading sketch from dir: %s", wd)
-	return sketches.NewSketchFromPath(wd)
+	return wd
 }

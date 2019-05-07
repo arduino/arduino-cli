@@ -27,7 +27,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/executils"
@@ -40,14 +40,18 @@ import (
 
 func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStream io.Writer) (*rpc.UploadResp, error) {
 	logrus.Info("Executing `arduino upload`")
-	var sketchPath *paths.Path
-	if req.GetSketchPath() != "" {
-		sketchPath = paths.New(req.GetSketchPath())
+
+	// TODO: make a generic function to extract sketch from request
+	// and remove duplication in commands/compile.go
+	if req.GetSketchPath() == "" {
+		return nil, fmt.Errorf("missing sketchPath")
 	}
-	sketch, err := cli.InitSketch(sketchPath)
+	sketchPath := paths.New(req.GetSketchPath())
+	sketch, err := sketches.NewSketchFromPath(sketchPath)
 	if err != nil {
 		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
+
 	// FIXME: make a specification on how a port is specified via command line
 	port := req.GetPort()
 	if port == "" {
