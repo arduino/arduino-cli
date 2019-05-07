@@ -384,7 +384,7 @@ func main() {
 
 	// LIB SEARCH
 	fmt.Println("=== calling LibrarySearch(audio)")
-	outputsrc, err := client.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
+	libSearchResp, err := client.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
 		Instance: instance,
 		Names:    true,
 		Query:    "audio",
@@ -393,12 +393,12 @@ func main() {
 		formatter.PrintError(err, "Error saerching for Library")
 		os.Exit(1)
 	}
+	fmt.Printf("---> %+v\n", libSearchResp)
+	fmt.Println()
 
-	fmt.Println(outputsrc)
-
-	// LIB SEARCH
+	// LIB LIST
 	fmt.Println("=== calling LibraryList")
-	outputlist, err := client.LibraryList(context.Background(), &rpc.LibraryListReq{
+	libLstResp, err := client.LibraryList(context.Background(), &rpc.LibraryListReq{
 		Instance:  instance,
 		All:       false,
 		Updatable: false,
@@ -407,8 +407,8 @@ func main() {
 		formatter.PrintError(err, "Error List Library")
 		os.Exit(1)
 	}
-
-	fmt.Println(outputlist)
+	fmt.Printf("---> %+v\n", libLstResp)
+	fmt.Println()
 
 	// LIB UNINSTALL
 	fmt.Println("=== calling LibraryUninstall(WiFi101)")
@@ -438,7 +438,7 @@ func main() {
 
 	// DESTROY
 	fmt.Println("=== calling Destroy()")
-	_, err = client.Destroy(context.Background(), &rpc.DestroyReq{
+	destroyResp, err := client.Destroy(context.Background(), &rpc.DestroyReq{
 		Instance: instance,
 	})
 	if err != nil {
@@ -446,4 +446,6 @@ func main() {
 	} else {
 		fmt.Println("Successfully closed server instance")
 	}
+	fmt.Printf("---> %+v\n", destroyResp)
+	fmt.Println()
 }
