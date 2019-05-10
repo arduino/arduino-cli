@@ -76,6 +76,16 @@ func (s *ArduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexReq, stream rpc.
 	return err
 }
 
+func (s *ArduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesIndexReq, stream rpc.ArduinoCore_UpdateLibrariesIndexServer) error {
+	err := commands.UpdateLibrariesIndex(stream.Context(), req,
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateLibrariesIndexResp{DownloadProgress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(&rpc.UpdateLibrariesIndexResp{})
+}
+
 func (s *ArduinoCoreServerImpl) Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 	return commands.Init(ctx, req)
 }
@@ -88,8 +98,10 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoC
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.CompileResp{TaskProgress: p}) },
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.CompileResp{DownloadProgress: p}) },
 	)
-	stream.Send(resp)
-	return err
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
 }
 
 func (s *ArduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallReq, stream rpc.ArduinoCore_PlatformInstallServer) error {
