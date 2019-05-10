@@ -126,8 +126,12 @@ func Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error)
 }
 
 // UpdateLibrariesIndex updates the library_index.json
-func UpdateLibrariesIndex(ctx context.Context, lm *librariesmanager.LibrariesManager, downloadCB func(*rpc.DownloadProgress)) error {
+func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexReq, downloadCB func(*rpc.DownloadProgress)) error {
 	logrus.Info("Updating libraries index")
+	lm := GetLibraryManager(req)
+	if lm == nil {
+		return fmt.Errorf("invalid handle")
+	}
 	d, err := lm.UpdateIndex()
 	if err != nil {
 		return err
@@ -135,6 +139,9 @@ func UpdateLibrariesIndex(ctx context.Context, lm *librariesmanager.LibrariesMan
 	Download(d, "Updating index: library_index.json", downloadCB)
 	if d.Error() != nil {
 		return d.Error()
+	}
+	if _, err := Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
+		return fmt.Errorf("rescanning filesystem: %s", err)
 	}
 	return nil
 }
@@ -182,7 +189,9 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 			return nil, fmt.Errorf("saving downloaded index %s: %s", URL, err)
 		}
 	}
-	Rescan(ctx, &rpc.RescanReq{Instance: req.Instance})
+	if _, err := Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
+		return nil, fmt.Errorf("rescanning filesystem: %s", err)
+	}
 	return &rpc.UpdateIndexResp{}, nil
 }
 

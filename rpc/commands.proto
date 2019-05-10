@@ -27,6 +27,7 @@ import "compile.proto";
 import "core.proto";
 import "upload.proto";
 import "lib.proto";
+
 // The main Arduino Platform Service
 service ArduinoCore {
   // BOOTSTRAP COMMANDS
@@ -43,6 +44,9 @@ service ArduinoCore {
 
   // Update package index of the Arduino Core Service
   rpc UpdateIndex(UpdateIndexReq) returns (stream UpdateIndexResp) {}
+
+  // Update libraries index
+  rpc UpdateLibrariesIndex(UpdateLibrariesIndexReq) returns (stream UpdateLibrariesIndexResp) {}
 
   // BOARD COMMANDS
   // --------------
@@ -126,5 +130,13 @@ message UpdateIndexReq {
 }
 
 message UpdateIndexResp {
+  DownloadProgress download_progress = 1;
+}
+
+message UpdateLibrariesIndexReq {
+	Instance instance = 1;
+}
+
+message UpdateLibrariesIndexResp {
   DownloadProgress download_progress = 1;
 }

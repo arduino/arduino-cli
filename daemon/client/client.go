@@ -292,6 +292,29 @@ func main() {
 		}
 	}
 
+	// LIB UPDATE INDEX
+	fmt.Println("=== calling UpdateLibrariesIndex()")
+	libIdxUpdateStream, err := client.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexReq{Instance: instance})
+	if err != nil {
+		fmt.Printf("Error updating libraries index: %s\n", err)
+		os.Exit(1)
+	}
+	for {
+		resp, err := libIdxUpdateStream.Recv()
+		if err == io.EOF {
+			fmt.Printf("---> %+v\n", resp)
+			fmt.Println()
+			break
+		}
+		if err != nil {
+			fmt.Printf("Error updating libraries index: %s\n", err)
+			os.Exit(1)
+		}
+		if resp.GetDownloadProgress() != nil {
+			fmt.Printf(">> DOWNLOAD: %s\n", resp.GetDownloadProgress())
+		}
+	}
+
 	// LIB DOWNLOAD
 	fmt.Println("=== calling LibraryDownload(WiFi101@0.15.2)")
 	downloadRespStream, err := client.LibraryDownload(context.Background(), &rpc.LibraryDownloadReq{
