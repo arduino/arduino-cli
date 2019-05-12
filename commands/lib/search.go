@@ -70,8 +70,8 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 
 	return &rpc.LibrarySearchResp{SearchOutput: res}, nil
 }
-func GetLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
 
+func GetLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
 	return &rpc.LibraryRelease{
 		Author:        rel.Author,
 		Version:       rel.Version.String(),

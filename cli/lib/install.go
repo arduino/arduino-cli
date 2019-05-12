@@ -45,7 +45,7 @@ func initInstallCommand() *cobra.Command {
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := cli.CreateLibManagerOnlyInstace()
 	refs, err := librariesindex.ParseArgs(args)
 	if err != nil {
 		formatter.PrintError(err, "Arguments error")

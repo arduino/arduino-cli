@@ -45,7 +45,7 @@ func initDownloadCommand() *cobra.Command {
 }
 
 func runDownloadCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := cli.CreateLibManagerOnlyInstace()
 	pairs, err := librariesindex.ParseArgs(args)
 	if err != nil {
 		formatter.PrintError(err, "Arguments error")
