@@ -131,6 +131,13 @@ func CreateInstance() *rpc.Instance {
 	return resp.GetInstance()
 }
 
+// CreateLibManagerOnlyInstace creates and return an instance of the
+// Arduino Core Engine skipping the platform manager initialization (only
+// libraries management enabled).
+func CreateLibManagerOnlyInstace() *rpc.Instance {
+	return InitInstance(true).GetInstance()
+}
+
 // InitPackageAndLibraryManager initializes the PackageManager and the
 // LibaryManager with the default configuration. (DEPRECATED)
 func InitPackageAndLibraryManager() (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
