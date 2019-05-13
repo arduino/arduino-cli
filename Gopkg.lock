@@ -21,6 +21,26 @@
   source = "github.com/arduino/arduino-builder"
 
 [[projects]]
+  digest = "1:41e434054a23802b788df1a127f615e116480e71d1483b2673f4f15531339ae4"
+  name = "github.com/arduino/arduino-cli"
+  packages = [
+    "arduino/cores",
+    "arduino/cores/packageindex",
+    "arduino/cores/packagemanager",
+    "arduino/libraries",
+    "arduino/libraries/librariesindex",
+    "arduino/libraries/librariesmanager",
+    "arduino/libraries/librariesresolver",
+    "arduino/resources",
+    "arduino/utils",
+    "common/formatter",
+    "configs",
+  ]
+  pruneopts = "UT"
+  revision = "fac241911c49c69b67c05014501ba50a3a7d350f"
+  version = "0.3.6-alpha.preview"
+
+[[projects]]
   branch = "master"
   digest = "1:16e26ae59d3dbd322a03511c1a56731aa4722743e5f8294f9fead841e6930b71"
   name = "github.com/arduino/board-discovery"
@@ -160,7 +180,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4e08dc2383a46b3107f0b34ca338c4459e8fc8ee90e46a60e728aa8a2b21d558"
+  digest = "1:6bdfbe971cc7d2ae56a98985bead8fc4a21aee335f6b90e0ea6b50140701cfd0"
   name = "github.com/gosuri/uitable"
   packages = [
     ".",
@@ -168,7 +188,7 @@
     "util/wordwrap",
   ]
   pruneopts = "UT"
-  revision = "36ee7e946282a3fb1cfecd476ddc9b35d8847e42"
+  revision = "c5cca67ba631fc4df2d0344bd3512f964ca2f316"
 
 [[projects]]
   digest = "1:4442692c7525ec403b23a5b3e169a089bb1e6ed3b69795be877d39578744bf7a"
