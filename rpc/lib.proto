@@ -73,8 +73,8 @@ message LibrarySearchResp {
 }
 
 message SearchedLibrary {
-    string Name = 1;
-    map<string,LibraryRelease> Releases = 2;
+    string name = 1;
+    map<string, LibraryRelease> releases = 2;
     LibraryRelease latest = 3;
 }
 
@@ -115,39 +115,39 @@ message InstalledLibrary {
 }
 
 message Library {
-    string Name = 1;
-	string  Author = 2;
-	string  Maintainer = 3;
-	string Sentence = 4;
-	string Paragraph = 5;
-	string Website = 6;
-	string Category = 7;
-	repeated string Architectures = 8;
-	repeated string Types = 9;
-	string InstallDir = 10;
-	string SourceDir = 11;
-	string UtilityDir = 12;
-	string Location = 13;
-	string ContainerPlatform = 14;
-	string Layout = 15;
-	string RealName = 16;
-	bool DotALinkage = 17;
-	bool Precompiled = 18;
-    string 	LDflags = 19;
-	bool IsLegacy = 20;
-	string Version = 21;
-	string License = 22;
-	map<string,string> Properties = 23;
+    string name = 1;
+    string author = 2;
+    string maintainer = 3;
+    string sentence = 4;
+    string paragraph = 5;
+    string website = 6;
+    string category = 7;
+    repeated string architectures = 8;
+    repeated string types = 9;
+    string install_dir = 10;
+    string source_dir = 11;
+    string utility_dir = 12;
+    string location = 13;
+    string container_platform = 14;
+    string layout = 15;
+    string real_name = 16;
+    bool dot_a_linkage = 17;
+    bool precompiled = 18;
+    string ld_flags = 19;
+    bool is_legacy = 20;
+    string version = 21;
+    string license = 22;
+    map<string, string> properties = 23;
 }
 
 enum LibraryLayout {
-    FlatLayout = 0;
-    RecursiveLayout = 1;
+    flat_layout = 0;
+    recursive_layout = 1;
 }
 
 enum LibraryLocation {
-    IDEBuiltIn = 0;
-    PlatformBuiltIn = 1;
-    ReferencedPlatformBuiltIn = 2;
-    Sketchbook = 3;
+    ide_builtin = 0;
+    platform_builtin = 1;
+    referenced_platform_builtin = 2;
+    sketchbook = 3;
 }
