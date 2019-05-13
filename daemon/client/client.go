@@ -409,7 +409,6 @@ func main() {
 	fmt.Println("=== calling LibrarySearch(audio)")
 	libSearchResp, err := client.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
 		Instance: instance,
-		Names:    true,
 		Query:    "audio",
 	})
 	if err != nil {
