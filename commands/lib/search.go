@@ -28,7 +28,6 @@ import (
 )
 
 func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.LibrarySearchResp, error) {
-
 	lm := commands.GetLibraryManager(req)
 	if lm == nil {
 		return nil, errors.New("invalid instance")
@@ -50,21 +49,6 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 				Latest:   latest,
 			}
 			res = append(res, searchedlib)
-		}
-	}
-
-	if req.GetNames() {
-		restmp := []*rpc.SearchedLibrary{}
-		for _, lib := range res {
-			searchedlib := &rpc.SearchedLibrary{
-				Name: lib.Name,
-			}
-			restmp = append(restmp, searchedlib)
-		}
-		res = restmp
-	} else {
-		if len(res) == 0 {
-			return &rpc.LibrarySearchResp{}, nil
 		}
 	}
 

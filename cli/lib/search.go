@@ -43,21 +43,19 @@ func initSearchCommand() *cobra.Command {
 		Args:    cobra.ArbitraryArgs,
 		Run:     runSearchCommand,
 	}
-	searchCommand.Flags().BoolVar(&searchFlags.names, "names", false, "Show library names only.")
+	searchCommand.Flags().BoolVar(&searchFlags.namesOnly, "names", false, "Show library names only.")
 	return searchCommand
 }
 
 var searchFlags struct {
-	names bool // if true outputs lib names only.
+	namesOnly bool // if true outputs lib names only.
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	instance := cli.CreateLibManagerOnlyInstace()
 	logrus.Info("Executing `arduino lib search`")
-	//arguments :=
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
 		Instance: instance,
-		Names:    searchFlags.names,
 		Query:    (strings.Join(args, " ")),
 	})
 	if err != nil {
@@ -67,33 +65,37 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 
 	if cli.OutputJSONOrElse(searchResp) {
 		results := searchResp.GetLibraries()
-		if len(results) > 0 {
-			for _, out := range results {
-				fmt.Println(searchedLibraryToString(out, searchFlags.names))
+		sort.Slice(results, func(i, j int) bool {
+			return results[i].Name < results[j].Name
+		})
+		if searchFlags.namesOnly {
+			for _, result := range results {
+				fmt.Println(result.Name)
 			}
 		} else {
-			formatter.Print("No libraries matching your search.")
+			if len(results) > 0 {
+				for _, result := range results {
+					outputSearchedLibrary(result)
+				}
+			} else {
+				formatter.Print("No libraries matching your search.")
+			}
 		}
 	}
 	logrus.Info("Done")
 }
 
-func searchedLibraryToString(lsr *rpc.SearchedLibrary, names bool) string {
-	ret := ""
-
-	ret += fmt.Sprintf("Name: \"%s\"\n", lsr.Name)
-	if !names {
-		ret += fmt.Sprintln("  Author: ", lsr.GetLatest().Author) +
-			fmt.Sprintln("  Maintainer: ", lsr.GetLatest().Maintainer) +
-			fmt.Sprintln("  Sentence: ", lsr.GetLatest().Sentence) +
-			fmt.Sprintln("  Paragraph: ", lsr.GetLatest().Paragraph) +
-			fmt.Sprintln("  Website: ", lsr.GetLatest().Website) +
-			fmt.Sprintln("  Category: ", lsr.GetLatest().Category) +
-			fmt.Sprintln("  Architecture: ", strings.Join(lsr.GetLatest().Architectures, ", ")) +
-			fmt.Sprintln("  Types: ", strings.Join(lsr.GetLatest().Types, ", ")) +
-			fmt.Sprintln("  Versions: ", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lsr)), " ", ", ", -1))
-	}
-	return strings.TrimSpace(ret)
+func outputSearchedLibrary(lsr *rpc.SearchedLibrary) {
+	fmt.Printf("Name: \"%s\"\n", lsr.Name)
+	fmt.Printf("  Author: %s\n", lsr.GetLatest().Author)
+	fmt.Printf("  Maintainer: %s\n", lsr.GetLatest().Maintainer)
+	fmt.Printf("  Sentence: %s\n", lsr.GetLatest().Sentence)
+	fmt.Printf("  Paragraph: %s\n", lsr.GetLatest().Paragraph)
+	fmt.Printf("  Website: %s\n", lsr.GetLatest().Website)
+	fmt.Printf("  Category: %s\n", lsr.GetLatest().Category)
+	fmt.Printf("  Architecture: %s\n", strings.Join(lsr.GetLatest().Architectures, ", "))
+	fmt.Printf("  Types: %s\n", strings.Join(lsr.GetLatest().Types, ", "))
+	fmt.Printf("  Versions: %s\n", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lsr)), " ", ", ", -1))
 }
 
 func versionsFromSearchedLibrary(library *rpc.SearchedLibrary) []*semver.Version {
