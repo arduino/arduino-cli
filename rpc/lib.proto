@@ -65,8 +65,7 @@ message LibraryUpgradeAllResp {
 
 message LibrarySearchReq {
     Instance instance = 1;
-    bool names = 2;
-    string query = 3;
+    string query = 2;
 }
 
 message LibrarySearchResp {
