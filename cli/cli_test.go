@@ -545,11 +545,12 @@ func TestInvalidCoreURL(t *testing.T) {
 	defer tmp.RemoveAll()
 
 	configFile := tmp.Join("cli-config.yml")
-	configFile.WriteFile([]byte(`
+	err = configFile.WriteFile([]byte(`
 board_manager:
   additional_urls:
-    - http://www.example.com/package_example_index.json
+    - http://www.invalid-domain-asjkdakdhadjkh.com/package_example_index.json
 `))
+	require.NoError(t, err, "writing dummy config "+configFile.String())
 
 	require.NoError(t, currDataDir.MkdirAll())
 	err = currDataDir.Join("package_index.json").WriteFile([]byte(`{ "packages": [] }`))
@@ -564,7 +565,12 @@ board_manager:
 	require.Zero(t, exitCode, "exit code")
 	require.Empty(t, strings.TrimSpace(string(d)))
 
-	// Empty cores list
+	// Dump config with cmd-line specific file
+	exitCode, d = executeWithArgs(t, "--config-file", configFile.String(), "config", "dump")
+	require.Zero(t, exitCode, "exit code")
+	require.Contains(t, string(d), "- http://www.invalid-domain-asjkdakdhadjkh.com/package_example_index.json")
+
+	// Update inexistent index
 	exitCode, _ = executeWithArgs(t, "--config-file", configFile.String(), "core", "update-index")
 	require.NotZero(t, exitCode, "exit code")
 

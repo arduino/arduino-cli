@@ -95,6 +95,8 @@ func Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 			return nil, fmt.Errorf("parsing url %s: %s", rawurl, err)
 		}
 	}
+	config.BoardManagerAdditionalUrls = urls
+
 	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(ctx, config, req.GetLibraryManagerOnly())
 	if err != nil {
 		return nil, fmt.Errorf("cannot initialize package manager: %s", err)
