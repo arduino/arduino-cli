@@ -51,7 +51,7 @@ var listFlags struct {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateLibManagerOnlyInstace()
+	instance := cli.CreateInstaceIgnorePlatformIndexErrors()
 	logrus.Info("Listing")
 
 	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
