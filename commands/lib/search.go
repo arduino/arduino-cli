@@ -34,7 +34,7 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 		return nil, errors.New("invalid instance")
 	}
 
-	res := []*rpc.SearchLibraryOutput{}
+	res := []*rpc.SearchedLibrary{}
 
 	for _, lib := range lm.Index.Libraries {
 		if strings.Contains(strings.ToLower(lib.Name), strings.ToLower(req.GetQuery())) {
@@ -44,7 +44,7 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 			}
 			latest := GetLibraryParameters(lib.Latest)
 
-			searchedlib := &rpc.SearchLibraryOutput{
+			searchedlib := &rpc.SearchedLibrary{
 				Name:     lib.Name,
 				Releases: releases,
 				Latest:   latest,
@@ -54,9 +54,9 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 	}
 
 	if req.GetNames() {
-		restmp := []*rpc.SearchLibraryOutput{}
+		restmp := []*rpc.SearchedLibrary{}
 		for _, lib := range res {
-			searchedlib := &rpc.SearchLibraryOutput{
+			searchedlib := &rpc.SearchedLibrary{
 				Name: lib.Name,
 			}
 			restmp = append(restmp, searchedlib)
@@ -68,7 +68,7 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 		}
 	}
 
-	return &rpc.LibrarySearchResp{SearchOutput: res}, nil
+	return &rpc.LibrarySearchResp{Libraries: res}, nil
 }
 
 func GetLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
