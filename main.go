@@ -21,7 +21,7 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/commands/root"
+	"github.com/arduino/arduino-cli/cli/root"
 	"github.com/arduino/arduino-cli/common/formatter"
 )
 
