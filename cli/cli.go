@@ -83,21 +83,12 @@ func packageManagerInitReq() *rpc.InitReq {
 	return &rpc.InitReq{Configuration: conf}
 }
 
-func InitInstance(libManagerOnly bool) *rpc.InitResp {
-	if libManagerOnly {
-		logrus.Info("Initializing library manager")
-	} else {
-		logrus.Info("Initializing package manager")
-	}
+func InitInstance() *rpc.InitResp {
+	logrus.Info("Initializing package manager")
 	req := packageManagerInitReq()
-	req.LibraryManagerOnly = libManagerOnly
 	resp, err := commands.Init(context.Background(), req)
 	if err != nil {
-		if libManagerOnly {
-			formatter.PrintError(err, "Error initializing library manager")
-		} else {
-			formatter.PrintError(err, "Error initializing package manager")
-		}
+		formatter.PrintError(err, "Error initializing package manager")
 		os.Exit(ErrGeneric)
 	}
 	if resp.GetLibrariesIndexError() != "" {
@@ -120,7 +111,7 @@ func InitInstance(libManagerOnly bool) *rpc.InitResp {
 
 // CreateInstance creates and return an instance of the Arduino Core engine
 func CreateInstance() *rpc.Instance {
-	resp := InitInstance(false)
+	resp := InitInstance()
 	if resp.GetPlatformsIndexErrors() != nil {
 		for _, err := range resp.GetPlatformsIndexErrors() {
 			formatter.PrintError(errors.New(err), "Error loading index")
@@ -131,36 +122,17 @@ func CreateInstance() *rpc.Instance {
 	return resp.GetInstance()
 }
 
-// CreateLibManagerOnlyInstace creates and return an instance of the
-// Arduino Core Engine skipping the platform manager initialization (only
-// libraries management enabled).
-func CreateLibManagerOnlyInstace() *rpc.Instance {
-	return InitInstance(true).GetInstance()
+// CreateInstaceIgnorePlatformIndexErrors creates and return an instance of the
+// Arduino Core Engine, but won't stop on platforms index loading errors.
+func CreateInstaceIgnorePlatformIndexErrors() *rpc.Instance {
+	return InitInstance().GetInstance()
 }
 
 // InitPackageAndLibraryManager initializes the PackageManager and the
 // LibaryManager with the default configuration. (DEPRECATED)
 func InitPackageAndLibraryManager() (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
-	resp := InitInstance(false)
+	resp := InitInstance()
 	return commands.GetPackageManager(resp), commands.GetLibraryManager(resp)
-}
-
-// InitPackageAndLibraryManagerWithoutBundles initializes the PackageManager
-// and the LibraryManager but ignores bundles and platforms installed in sketchbook. (DEPRECATED)
-func InitPackageAndLibraryManagerWithoutBundles() (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
-	logrus.Info("Package manager will scan only managed hardware folder")
-
-	fakeResult := false
-	Config.IDEBundledCheckResult = &fakeResult
-	Config.SketchbookDir = nil
-	return InitPackageAndLibraryManager()
-}
-
-// InitLibraryManager initializes the LibraryManager only. The library manager
-// will not handle core-libraries. (DEPRECATED)
-func InitLibraryManager(cfg *configs.Configuration) *librariesmanager.LibrariesManager {
-	resp := InitInstance(true)
-	return commands.GetLibraryManager(resp)
 }
 
 // InitSketchPath returns sketchPath if specified or the current working
