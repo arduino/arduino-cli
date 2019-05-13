@@ -65,11 +65,11 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		os.Exit(cli.ErrGeneric)
 	}
 
-	results := searchResp.GetSearchOutput()
-	if cli.OutputJSONOrElse(results) {
+	if cli.OutputJSONOrElse(searchResp) {
+		results := searchResp.GetLibraries()
 		if len(results) > 0 {
 			for _, out := range results {
-				fmt.Println(SearchOutputToString(out, searchFlags.names))
+				fmt.Println(searchedLibraryToString(out, searchFlags.names))
 			}
 		} else {
 			formatter.Print("No libraries matching your search.")
@@ -78,7 +78,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Done")
 }
 
-func SearchOutputToString(lsr *rpc.SearchLibraryOutput, names bool) string {
+func searchedLibraryToString(lsr *rpc.SearchedLibrary, names bool) string {
 	ret := ""
 
 	ret += fmt.Sprintf("Name: \"%s\"\n", lsr.Name)
@@ -91,16 +91,15 @@ func SearchOutputToString(lsr *rpc.SearchLibraryOutput, names bool) string {
 			fmt.Sprintln("  Category: ", lsr.GetLatest().Category) +
 			fmt.Sprintln("  Architecture: ", strings.Join(lsr.GetLatest().Architectures, ", ")) +
 			fmt.Sprintln("  Types: ", strings.Join(lsr.GetLatest().Types, ", ")) +
-			fmt.Sprintln("  Versions: ", strings.Replace(fmt.Sprint(Versions(lsr.GetLatest(), lsr)), " ", ", ", -1))
+			fmt.Sprintln("  Versions: ", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lsr)), " ", ", ", -1))
 	}
 	return strings.TrimSpace(ret)
 }
 
-func Versions(l *rpc.LibraryRelease, library *rpc.SearchLibraryOutput) []*semver.Version {
+func versionsFromSearchedLibrary(library *rpc.SearchedLibrary) []*semver.Version {
 	res := []*semver.Version{}
-	for str, _ := range library.Releases {
-		v, err := semver.Parse(str)
-		if err == nil {
+	for str := range library.Releases {
+		if v, err := semver.Parse(str); err == nil {
 			res = append(res, v)
 		}
 	}
