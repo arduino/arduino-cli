@@ -27,16 +27,16 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
-type InstalledLib struct {
-	Library   *libraries.Library      `json:"library"`
-	Available *librariesindex.Release `omitempy,json:"available"`
+type installedLib struct {
+	Library   *libraries.Library
+	Available *librariesindex.Release
 }
 
 func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResp, error) {
-
 	lm := commands.GetLibraryManager(req)
+
 	instaledLib := []*rpc.InstalledLibrary{}
-	res := ListLibraries(lm, req.GetUpdatable(), req.GetAll())
+	res := listLibraries(lm, req.GetUpdatable(), req.GetAll())
 	if len(res) > 0 {
 		for _, lib := range res {
 			libtmp := GetOutputLibrary(lib.Library)
@@ -52,11 +52,10 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryList
 	return &rpc.LibraryListResp{}, nil
 }
 
-// ListLibraries returns the list of installed libraries. If updatable is true it
+// listLibraries returns the list of installed libraries. If updatable is true it
 // returns only the libraries that may be updated.
-func ListLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bool) []*InstalledLib {
-
-	res := []*InstalledLib{}
+func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bool) []*installedLib {
+	res := []*installedLib{}
 	for _, libAlternatives := range lm.Libraries {
 		for _, lib := range libAlternatives.Alternatives {
 			if !all {
@@ -71,7 +70,7 @@ func ListLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bo
 					continue
 				}
 			}
-			res = append(res, &InstalledLib{
+			res = append(res, &installedLib{
 				Library:   lib,
 				Available: available,
 			})
@@ -117,7 +116,7 @@ func GetOutputLibrary(lib *libraries.Library) *rpc.Library {
 		RealName:          lib.RealName,
 		DotALinkage:       lib.DotALinkage,
 		Precompiled:       lib.Precompiled,
-		LDflags:           lib.LDflags,
+		LdFlags:           lib.LDflags,
 		IsLegacy:          lib.IsLegacy,
 		Version:           lib.Version.String(),
 		License:           lib.LDflags,
