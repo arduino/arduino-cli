@@ -17,7 +17,7 @@ This is **not yet available** until the first stable version is released.
 #### Download the latest unstable "alpha" preview
 
 Please note that these are **preview** build, they may have bugs, some features may not work or may be changed without notice,
-the latest preview version is `0.3.4-alpha.preview`:
+the latest preview version is `0.3.6-alpha.preview`:
 
 - [Linux 64 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linux64.tar.bz2)
 - [Linux 32 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linux32.tar.bz2)
@@ -26,7 +26,7 @@ the latest preview version is `0.3.4-alpha.preview`:
 - [Windows](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-windows.zip)
 - [Mac OSX](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-osx.zip)
 
-Once downloaded, place the executable into a directory which is in your `PATH` environment variable. To use the tool as it is presented in the Getting started guide below (`arduino-cli`), you should rename the executable from _arduino-cli-0.2.2-alpha.preview-XYZ_ to _arduino-cli_.
+Once downloaded, place the executable into a directory which is in your `PATH` environment variable. To use the tool as it is presented in the Getting started guide below (`arduino-cli`), you should rename the executable from _arduino-cli-X.Y.Z-alpha.preview-XYZ_ to _arduino-cli_.
 
 ### Build the latest "bleeding-edge" from source
 
@@ -165,7 +165,7 @@ and the Board Name look good, we are ready to compile and upload the sketch
 
 #### Adding 3rd party cores
 
-To add 3rd party core packages add a link of the additional package to the file `.cli-config.yml`
+To add 3rd party core packages add a link of the additional package to the file `arduino-cli.yaml`
 
 If you want to add the ESP8266 core, for example:
 
@@ -174,9 +174,9 @@ If you want to add the ESP8266 core, for example:
         - http://arduino.esp8266.com/stable/package_esp8266com_index.json
 
 And then run:
-  
- arduino-cli core update-index
-arduino-cli core install esp8266:esp8266
+
+    arduino-cli core update-index
+    arduino-cli core install esp8266:esp8266
 
 ### Step 5. Compile the sketch
 
@@ -303,7 +303,7 @@ Flags:
   -h, --help   help for core
 
 Global Flags:
-      --config-file string   The custom config file (if not specified ./.cli-config.yml will be used). (default "/home/megabug/Workspace/go/src/github.com/arduino/arduino-cli/.cli-config.yml")
+      --config-file string   The custom config file (if not specified the default one will be used).
       --debug                Enables debug output (super verbose, used to debug the CLI).
       --format string        The output format, can be [text|json]. (default "text")
 

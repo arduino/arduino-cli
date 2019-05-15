@@ -444,6 +444,25 @@ func (p *Path) EquivalentTo(other *Path) bool {
 	return p.Clean().path == other.Clean().path
 }
 
+// Parents returns all the parents directories of the current path. If the path is absolute
+// it starts from the current path to the root, if the path is relative is starts from the
+// current path to the current directory.
+// The path should be clean for this method to work properly (no .. or . or other shortcuts).
+// This function does not performs any check on the returned paths.
+func (p *Path) Parents() []*Path {
+	res := []*Path{}
+	dir := p
+	for {
+		res = append(res, dir)
+		parent := dir.Parent()
+		if parent.EquivalentTo(dir) {
+			break
+		}
+		dir = parent
+	}
+	return res
+}
+
 func (p *Path) String() string {
 	return p.path
 }

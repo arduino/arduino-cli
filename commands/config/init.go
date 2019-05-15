@@ -42,7 +42,7 @@ func initInitCommand() *cobra.Command {
 	initCommand.Flags().BoolVar(&initFlags._default, "default", false,
 		"If omitted, ask questions to the user about setting configuration properties, otherwise use default configuration.")
 	initCommand.Flags().StringVar(&initFlags.location, "save-as", "",
-		"Sets where to save the configuration file [default is ./.cli-config.yml].")
+		"Sets where to save the configuration file [default is ./arduino-cli.yaml].")
 	return initCommand
 }
 
@@ -65,8 +65,13 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	if filepath == "" {
 		filepath = cli.Config.ConfigFile.String()
 	}
-	err := cli.Config.SaveToYAML(filepath)
-	if err != nil {
+
+	if err := cli.Config.ConfigFile.Parent().MkdirAll(); err != nil {
+		formatter.PrintError(err, "Cannot create config file.")
+		os.Exit(cli.ErrGeneric)
+	}
+
+	if err := cli.Config.SaveToYAML(filepath); err != nil {
 		formatter.PrintError(err, "Cannot create config file.")
 		os.Exit(cli.ErrGeneric)
 	}
