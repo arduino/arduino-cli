@@ -74,6 +74,15 @@ func executeWithArgs(t *testing.T, args ...string) (int, []byte) {
 
 	// This closure is here because we won't that the defer are executed after the end of the "executeWithArgs" method
 	func() {
+		// Create an empty config for the CLI test
+		conf := paths.New("arduino-cli.yaml")
+		require.False(t, conf.Exist())
+		err := conf.WriteFile([]byte("board_manager:\n  additional_urls:\n"))
+		require.NoError(t, err)
+		defer func() {
+			require.NoError(t, conf.Remove())
+		}()
+
 		redirect := &stdOutRedirect{}
 		redirect.Open(t)
 		defer func() {
@@ -512,27 +521,33 @@ func TestCompileCommands(t *testing.T) {
 	require.True(t, paths.New(test1).Join("Test1.arduino.avr.nano.hex").Exist())
 
 	// Build sketch with --output path
-	require.NoError(t, os.Chdir(tmp))
-	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", "test", test1)
-	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New("test.hex").Exist())
+	{
+		pwd, err := os.Getwd()
+		require.NoError(t, err)
+		defer func() { require.NoError(t, os.Chdir(pwd)) }()
+		require.NoError(t, os.Chdir(tmp))
 
-	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", "test2.hex", test1)
-	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New("test2.hex").Exist())
-	require.NoError(t, paths.New(tmp, "anothertest").MkdirAll())
+		exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", "test", test1)
+		require.Zero(t, exitCode, "exit code")
+		require.Contains(t, string(d), "Sketch uses")
+		require.True(t, paths.New("test.hex").Exist())
 
-	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", "anothertest/test", test1)
-	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New("anothertest", "test.hex").Exist())
+		exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", "test2.hex", test1)
+		require.Zero(t, exitCode, "exit code")
+		require.Contains(t, string(d), "Sketch uses")
+		require.True(t, paths.New("test2.hex").Exist())
+		require.NoError(t, paths.New(tmp, "anothertest").MkdirAll())
 
-	exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", tmp+"/anothertest/test2", test1)
-	require.Zero(t, exitCode, "exit code")
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New("anothertest", "test2.hex").Exist())
+		exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", "anothertest/test", test1)
+		require.Zero(t, exitCode, "exit code")
+		require.Contains(t, string(d), "Sketch uses")
+		require.True(t, paths.New("anothertest", "test.hex").Exist())
+
+		exitCode, d = executeWithArgs(t, "compile", "-b", "arduino:avr:nano", "-o", tmp+"/anothertest/test2", test1)
+		require.Zero(t, exitCode, "exit code")
+		require.Contains(t, string(d), "Sketch uses")
+		require.True(t, paths.New("anothertest", "test2.hex").Exist())
+	}
 }
 
 func TestInvalidCoreURL(t *testing.T) {
@@ -544,7 +559,7 @@ func TestInvalidCoreURL(t *testing.T) {
 	require.NoError(t, err, "making temporary dir")
 	defer tmp.RemoveAll()
 
-	configFile := tmp.Join("cli-config.yml")
+	configFile := tmp.Join("arduino-cli.yaml")
 	err = configFile.WriteFile([]byte(`
 board_manager:
   additional_urls:
