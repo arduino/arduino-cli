@@ -3,7 +3,7 @@
 
 [[projects]]
   branch = "cli-inception"
-  digest = "1:4cb1e811d65db933ba4d76d2defe6d0c88a2ab9cd3d4ae5f89818321fa42f0f7"
+  digest = "1:fa1b92ddb89f9a082ad65e6d31b0e9339c4fa397c9004d075eea8a678d503dde"
   name = "github.com/arduino/arduino-builder"
   packages = [
     ".",
@@ -17,7 +17,7 @@
     "utils",
   ]
   pruneopts = "UT"
-  revision = "63f49042802e011ec7a1e3193dc320dc25158d77"
+  revision = "a4859ca30383c04c355c67c3e594ac67cd89a125"
   source = "github.com/arduino/arduino-builder"
 
 [[projects]]
@@ -85,12 +85,12 @@
   version = "v1.2.2"
 
 [[projects]]
-  digest = "1:db8e2f3c8cc717afe53c6941776312bd7046d45d9fb757c5f3f32fd3cc46562d"
+  digest = "1:359173d7e6eb3d35eeb3f2ef5c87bd2aff6e775dba5a1dcf8b2a53b86d0af79e"
   name = "github.com/codeclysm/extract"
   packages = ["."]
   pruneopts = "UT"
-  revision = "de8493db4b3e06921c3ee97fa0b200435a8a796d"
-  version = "v2.0.0"
+  revision = "cb78af9c8af24b50533f931fa83bdfd4170bf840"
+  version = "v2.2.0"
 
 [[projects]]
   digest = "1:7cb4fdca4c251b3ef8027c90ea35f70c7b661a593b9eeae34753c65499098bb1"
@@ -183,6 +183,19 @@
   ]
   pruneopts = "UT"
   revision = "36ee7e946282a3fb1cfecd476ddc9b35d8847e42"
+
+[[projects]]
+  digest = "1:4442692c7525ec403b23a5b3e169a089bb1e6ed3b69795be877d39578744bf7a"
+  name = "github.com/h2non/filetype"
+  packages = [
+    ".",
+    "matchers",
+    "matchers/isobmff",
+    "types",
+  ]
+  pruneopts = "UT"
+  revision = "2248f2e2f77cd8cf9694216e3f9589d71005de37"
+  version = "v1.0.8"
 
 [[projects]]
   digest = "1:870d441fe217b8e689d7949fef6e43efbc787e50f200cb1e70dbca9204a1d6be"
@@ -279,6 +292,14 @@
   pruneopts = "UT"
   revision = "55d61fa8aa702f59229e6cff85793c22e580eaf5"
   version = "v1.5.1"
+
+[[projects]]
+  digest = "1:2b97fd8c3ebafa161b3cf34948a0dd7d1ec27ab3fed686eb3639ead64344e9e6"
+  name = "github.com/schollz/closestmatch"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "56fb6b15a5e88fbcbc21b196488e749fc176514c"
+  version = "v2.1.0"
 
 [[projects]]
   digest = "1:d917313f309bda80d27274d53985bc65651f81a5b66b820749ac7f8ef061fd04"
@@ -488,18 +509,6 @@
   source = "github.com/cmaglie/pb"
 
 [[projects]]
-  digest = "1:8b1a1e6d3dcef7c542f604f8b9f8013d1d13c3d61f8e9cbe368afa2735c898c2"
-  name = "gopkg.in/h2non/filetype.v1"
-  packages = [
-    ".",
-    "matchers",
-    "types",
-  ]
-  pruneopts = "UT"
-  revision = "cc14fdc9ca0e4c2bafad7458f6ff79fd3947cfbb"
-  version = "v1.0.5"
-
-[[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
@@ -529,6 +538,7 @@
     "github.com/mitchellh/go-homedir",
     "github.com/pkg/errors",
     "github.com/pmylund/sortutil",
+    "github.com/schollz/closestmatch",
     "github.com/sergi/go-diff/diffmatchpatch",
     "github.com/sirupsen/logrus",
     "github.com/spf13/cobra",

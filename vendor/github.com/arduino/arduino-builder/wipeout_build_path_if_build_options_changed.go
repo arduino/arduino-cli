@@ -38,7 +38,7 @@ import (
 	"github.com/arduino/arduino-builder/gohasissues"
 	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
-	"github.com/arduino/go-properties-orderedmap"
+	properties "github.com/arduino/go-properties-orderedmap"
 )
 
 type WipeoutBuildPathIfBuildOptionsChanged struct{}
@@ -85,12 +85,6 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	files, err := gohasissues.ReadDir(buildPath.String())
 	if err != nil {
 		return i18n.WrapError(err)
-	}
-	// if build path is inside the sketch folder, also wipe ctx.AdditionalFiles
-	if ctx.SketchLocation != nil {
-		if inside, _ := ctx.BuildPath.IsInsideDir(ctx.SketchLocation.Parent()); inside {
-			ctx.Sketch.AdditionalFiles = ctx.Sketch.AdditionalFiles[:0]
-		}
 	}
 	for _, file := range files {
 		buildPath.Join(file.Name()).RemoveAll()

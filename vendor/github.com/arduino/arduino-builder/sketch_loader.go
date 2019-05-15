@@ -33,7 +33,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/go-paths-helper"
+	paths "github.com/arduino/go-paths-helper"
 
 	"github.com/arduino/arduino-builder/constants"
 	"github.com/arduino/arduino-builder/i18n"
@@ -75,7 +75,7 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 		return i18n.ErrorfWithLogger(logger, constants.MSG_CANT_FIND_SKETCH_IN_PATH, sketchLocation, sketchLocation.Parent())
 	}
 
-	sketch, err := makeSketch(sketchLocation, allSketchFilePaths, logger)
+	sketch, err := makeSketch(sketchLocation, allSketchFilePaths, ctx.BuildPath, logger)
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -99,7 +99,7 @@ func collectAllSketchFiles(from *paths.Path) (paths.PathList, error) {
 	return paths.NewPathList(filePaths...), i18n.WrapError(err)
 }
 
-func makeSketch(sketchLocation *paths.Path, allSketchFilePaths paths.PathList, logger i18n.Logger) (*types.Sketch, error) {
+func makeSketch(sketchLocation *paths.Path, allSketchFilePaths paths.PathList, buildLocation *paths.Path, logger i18n.Logger) (*types.Sketch, error) {
 	sketchFilesMap := make(map[string]types.SketchFile)
 	for _, sketchFilePath := range allSketchFilePaths {
 		source, err := sketchFilePath.ReadFile()
@@ -122,7 +122,9 @@ func makeSketch(sketchLocation *paths.Path, allSketchFilePaths paths.PathList, l
 				otherSketchFiles = append(otherSketchFiles, sketchFile)
 			}
 		} else if ADDITIONAL_FILE_VALID_EXTENSIONS[ext] {
-			additionalFiles = append(additionalFiles, sketchFile)
+			if buildLocation == nil || !strings.Contains(sketchFile.Name.Parent().String(), buildLocation.String()) {
+				additionalFiles = append(additionalFiles, sketchFile)
+			}
 		} else {
 			return nil, i18n.ErrorfWithLogger(logger, constants.MSG_UNKNOWN_SKETCH_EXT, sketchFile.Name)
 		}

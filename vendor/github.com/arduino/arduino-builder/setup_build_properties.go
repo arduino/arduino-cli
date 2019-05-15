@@ -39,8 +39,8 @@ import (
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-builder/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/go-properties-orderedmap"
-	"github.com/arduino/go-timeutils"
+	properties "github.com/arduino/go-properties-orderedmap"
+	timeutils "github.com/arduino/go-timeutils"
 )
 
 type SetupBuildProperties struct{}
