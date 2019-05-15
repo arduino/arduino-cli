@@ -1,4 +1,4 @@
 package types
 
-// Unkown default type
+// Unknown default type
 var Unknown = NewType("unknown", "")

@@ -124,7 +124,7 @@ func findPackageRoot(parent *paths.Path) (*paths.Path, error) {
 		}
 	}
 	if root == nil {
-		return nil, fmt.Errorf("package does not contains any subfolder")
+		return nil, fmt.Errorf("files in archive must be placed in a subdirectory")
 	}
 	return root, nil
 }

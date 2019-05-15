@@ -14,14 +14,14 @@ For SVG file type checking, see [go-is-svg](https://github.com/h2non/go-is-svg) 
 - [Pluggable](#add-additional-file-type-matchers): add custom new types and matchers
 - Simple and semantic API
 - [Blazing fast](#benchmarks), even processing large files
-- Only first 261 bytes representing the max file header is required, so you can just [pass a slice](#file-header)
+- Only first 262 bytes representing the max file header is required, so you can just [pass a slice](#file-header)
 - Dependency free (just Go code, no C compilation needed)
 - Cross-platform file recognition
 
 ## Installation
 
 ```bash
-go get gopkg.in/h2non/filetype.v1
+go get github.com/h2non/filetype
 ```
 
 ## API
@@ -30,8 +30,8 @@ See [Godoc](https://godoc.org/github.com/h2non/filetype) reference.
 
 ### Subpackages
 
-- [`gopkg.in/h2non/filetype.v1/types`](https://godoc.org/github.com/h2non/filetype/types)
-- [`gopkg.in/h2non/filetype.v1/matchers`](https://godoc.org/github.com/h2non/filetype/matchers)
+- [`github.com/h2non/filetype/types`](https://godoc.org/github.com/h2non/filetype/types)
+- [`github.com/h2non/filetype/matchers`](https://godoc.org/github.com/h2non/filetype/matchers)
 
 ## Examples
 
@@ -42,16 +42,17 @@ package main
 
 import (
   "fmt"
-  "gopkg.in/h2non/filetype.v1"
   "io/ioutil"
+
+  "github.com/h2non/filetype"
 )
 
 func main() {
   buf, _ := ioutil.ReadFile("sample.jpg")
 
-  kind, unknown := filetype.Match(buf)
-  if unknown != nil {
-    fmt.Printf("Unknown: %s", unknown)
+  kind, _ := filetype.Match(buf)
+  if kind == filetype.Unknown {
+    fmt.Println("Unknown file type")
     return
   }
 
@@ -66,8 +67,9 @@ package main
 
 import (
   "fmt"
-  "gopkg.in/h2non/filetype.v1"
   "io/ioutil"
+
+  "github.com/h2non/filetype"
 )
 
 func main() {
@@ -88,7 +90,8 @@ package main
 
 import (
   "fmt"
-  "gopkg.in/h2non/filetype.v1"
+
+  "github.com/h2non/filetype"
 )
 
 func main() {
@@ -115,8 +118,9 @@ package main
 
 import (
   "fmt"
-  "gopkg.in/h2non/filetype.v1"
   "io/ioutil"
+  
+  "github.com/h2non/filetype"
 )
 
 func main() {
@@ -142,7 +146,8 @@ package main
 
 import (
   "fmt"
-  "gopkg.in/h2non/filetype.v1"
+  
+  "github.com/h2non/filetype"
 )
 
 var fooType = filetype.NewType("foo", "foo/foo")
@@ -187,6 +192,7 @@ func main() {
 - **cr2** - `image/x-canon-cr2`
 - **tif** - `image/tiff`
 - **bmp** - `image/bmp`
+- **heif** - `image/heif`
 - **jxr** - `image/vnd.ms-photo`
 - **psd** - `image/vnd.adobe.photoshop`
 - **ico** - `image/x-icon`
@@ -212,6 +218,7 @@ func main() {
 - **flac** - `audio/x-flac`
 - **wav** - `audio/x-wav`
 - **amr** - `audio/amr`
+- **aac** - `audio/aac`
 
 #### Archive
 
@@ -239,6 +246,7 @@ func main() {
 - **lz** - `application/x-lzip`
 - **rpm** - `application/x-rpm`
 - **elf** - `application/x-executable`
+- **dcm** - `application/dicom`
 
 #### Documents
 
@@ -255,6 +263,10 @@ func main() {
 - **woff2** - `application/font-woff`
 - **ttf** - `application/font-sfnt`
 - **otf** - `application/font-sfnt`
+
+#### Application
+
+- **wasm** - `application/wasm`
 
 ## Benchmarks
 

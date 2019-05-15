@@ -4,12 +4,15 @@ import (
 	"io"
 	"os"
 
-	"gopkg.in/h2non/filetype.v1/matchers"
-	"gopkg.in/h2non/filetype.v1/types"
+	"github.com/h2non/filetype/matchers"
+	"github.com/h2non/filetype/types"
 )
 
 // Matchers is an alias to matchers.Matchers
 var Matchers = matchers.Matchers
+
+// MatcherKeys is an alias to matchers.MatcherKeys
+var MatcherKeys = &matchers.MatcherKeys
 
 // NewMatcher is an alias to matchers.NewMatcher
 var NewMatcher = matchers.NewMatcher
@@ -21,7 +24,8 @@ func Match(buf []byte) (types.Type, error) {
 		return types.Unknown, ErrEmptyBuffer
 	}
 
-	for _, checker := range Matchers {
+	for _, kind := range *MatcherKeys {
+		checker := Matchers[kind]
 		match := checker(buf)
 		if match != types.Unknown && match.Extension != "" {
 			return match, nil
@@ -49,7 +53,7 @@ func MatchFile(filepath string) (types.Type, error) {
 
 // MatchReader is convenient wrapper to Match() any Reader
 func MatchReader(reader io.Reader) (types.Type, error) {
-	buffer := make([]byte, 512)
+	buffer := make([]byte, 8192) // 8K makes msooxml tests happy and allows for expanded custom file checks
 
 	_, err := reader.Read(buffer)
 	if err != nil && err != io.EOF {
@@ -70,7 +74,7 @@ func Matches(buf []byte) bool {
 	return kind != types.Unknown
 }
 
-// MatchMap performs a file matching againts a map of match functions
+// MatchMap performs a file matching against a map of match functions
 func MatchMap(buf []byte, matchers matchers.Map) types.Type {
 	for kind, matcher := range matchers {
 		if matcher(buf) {
@@ -80,7 +84,7 @@ func MatchMap(buf []byte, matchers matchers.Map) types.Type {
 	return types.Unknown
 }
 
-// MatchesMap is an alias to Matches() but using matching againts a map of match functions
+// MatchesMap is an alias to Matches() but using matching against a map of match functions
 func MatchesMap(buf []byte, matchers matchers.Map) bool {
 	return MatchMap(buf, matchers) != types.Unknown
 }
