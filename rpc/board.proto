@@ -51,3 +51,14 @@ message RequiredTool {
   string version = 2;
   string packager = 3;
 }
+
+message BoardAttachReq {
+  Instance instance = 1;
+  string boardURI = 2;
+  string sketchPath = 3;
+  string boardFlavour = 4;
+  string searchTimeout = 5;
+}
+
+message BoardAttachResp {
+}

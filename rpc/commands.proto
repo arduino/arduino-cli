@@ -54,6 +54,8 @@ service ArduinoCore {
   // Requests details about a board
   rpc BoardDetails(BoardDetailsReq) returns (BoardDetailsResp);
 
+  rpc BoardAttach(BoardAttachReq) returns (BoardAttachResp);
+
   rpc Compile(CompileReq) returns (stream CompileResp);
 
   rpc PlatformInstall(PlatformInstallReq) returns (stream PlatformInstallResp);

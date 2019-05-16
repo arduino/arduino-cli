@@ -85,10 +85,10 @@ func main() {
 	}
 
 	// PLATFORM SEARCH
-	fmt.Println("=== calling PlatformSearch(uno)")
+	fmt.Println("=== calling PlatformSearch(samd)")
 	searchResp, err := client.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
 		Instance:   instance,
-		SearchArgs: "uno",
+		SearchArgs: "samd",
 	})
 	if err != nil {
 		fmt.Printf("Search error: %s\n", err)
@@ -194,6 +194,18 @@ func main() {
 	fmt.Printf("---> %+v\n", details)
 	fmt.Println()
 
+	// BOARDS ATTACH
+	fmt.Println("=== calling BoardAttach(serial:///dev/ttyACM0)")
+	_, err = client.BoardAttach(context.Background(), &rpc.BoardAttachReq{
+		Instance:   instance,
+		BoardURI:   "serial:///dev/ttyACM0",
+		SketchPath: "/home/riccardo/Arduino/MyFirstSketch",
+	})
+	if err != nil {
+		fmt.Printf("attach error : %s\n", err)
+		os.Exit(1)
+	}
+
 	// COMPILE
 	fmt.Println("=== calling Compile(arduino:samd:mkr1000, VERBOSE, " + os.Args[2] + ")")
 	compRespStream, err := client.Compile(context.Background(), &rpc.CompileReq{
@@ -265,12 +277,12 @@ func main() {
 	}
 
 	// PLATFORM UNINSTALL
-	fmt.Println("=== calling PlatformUninstall(arduino:samd@1.6.21)")
+	fmt.Println("=== calling PlatformUninstall(arduino:samd@1.6.19)")
 	uninstallRespStream, err := client.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
 		Instance:        instance,
 		PlatformPackage: "arduino",
 		Architecture:    "samd",
-		Version:         "1.6.21",
+		Version:         "1.6.19",
 	})
 	if err != nil {
 		fmt.Printf("Uninstall error: %s\n", err)
