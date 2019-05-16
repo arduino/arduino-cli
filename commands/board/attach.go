@@ -104,7 +104,12 @@ func BoardAttach(ctx context.Context, req *rpc.BoardAttachReq) (*rpc.BoardAttach
 
 	err = sketch.ExportMetadata()
 	if err != nil {
+<<<<<<< HEAD
 		return nil, fmt.Errorf("cannot export sketch metadata: %s", err)
+=======
+		formatter.PrintError(err, "Cannot export sketch metadata.")
+		os.Exit(commands.ErrGeneric)
+>>>>>>> 5358b8ed08945f8db0242c77427e79e44f03c7d9
 	}
 	formatter.PrintResult("Selected fqbn: " + sketch.Metadata.CPU.Fqbn)
 	return &rpc.BoardAttachResp{}, nil
