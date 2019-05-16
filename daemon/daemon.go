@@ -60,6 +60,10 @@ func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.Board
 	return board.BoardDetails(ctx, req)
 }
 
+func (s *ArduinoCoreServerImpl) BoardAttach(ctx context.Context, req *rpc.BoardAttachReq) (*rpc.BoardAttachResp, error) {
+	return board.BoardAttach(ctx, req)
+}
+
 func (s *ArduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error) {
 	return commands.Destroy(ctx, req)
 }

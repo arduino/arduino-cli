@@ -18,20 +18,13 @@
 package board
 
 import (
-	"fmt"
-	"net/url"
+	"context"
 	"os"
-	"strings"
-	"time"
 
-	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/common/formatter"
-	discovery "github.com/arduino/board-discovery"
-	paths "github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
 )
 
@@ -59,131 +52,20 @@ var attachFlags struct {
 }
 
 func runAttachCommand(cmd *cobra.Command, args []string) {
-	boardURI := args[0]
-
-	var path *paths.Path
+	instance := cli.CreateInstance()
+	var path string
 	if len(args) > 0 {
-		path = paths.New(args[0])
+		path = args[1]
 	}
-	sketchPath := cli.InitSketchPath(path)
-
-	sketch, err := sketches.NewSketchFromPath(sketchPath)
+	_, err := board.BoardAttach(context.Background(), &rpc.BoardAttachReq{
+		Instance:      instance,
+		BoardURI:      args[0],
+		SketchPath:    path,
+		BoardFlavour:  attachFlags.boardFlavour,
+		SearchTimeout: attachFlags.searchTimeout,
+	})
 	if err != nil {
-		formatter.PrintError(err, "Error opening sketch.")
+		formatter.PrintError(err, "attach board error")
 		os.Exit(cli.ErrGeneric)
 	}
-
-	logrus.WithField("fqbn", boardURI).Print("Parsing FQBN")
-	fqbn, err := cores.ParseFQBN(boardURI)
-	if err != nil && !strings.HasPrefix(boardURI, "serial") {
-		boardURI = "serial://" + boardURI
-	}
-
-	pm, _ := cli.InitPackageAndLibraryManager()
-
-	if fqbn != nil {
-		sketch.Metadata.CPU = sketches.BoardMetadata{
-			Fqbn: fqbn.String(),
-		}
-	} else {
-		deviceURI, err := url.Parse(boardURI)
-		if err != nil {
-			formatter.PrintError(err, "The provided Device URL is not in a valid format.")
-			os.Exit(cli.ErrBadCall)
-		}
-
-		var findBoardFunc func(*packagemanager.PackageManager, *discovery.Monitor, *url.URL) *cores.Board
-		switch deviceURI.Scheme {
-		case "serial", "tty":
-			findBoardFunc = findSerialConnectedBoard
-		case "http", "https", "tcp", "udp":
-			findBoardFunc = findNetworkConnectedBoard
-		default:
-			formatter.PrintErrorMessage("Invalid device port type provided. Accepted types are: serial://, tty://, http://, https://, tcp://, udp://.")
-			os.Exit(cli.ErrBadCall)
-		}
-
-		duration, err := time.ParseDuration(attachFlags.searchTimeout)
-		if err != nil {
-			logrus.WithError(err).Warnf("Invalid interval `%s` provided, using default (5s).", attachFlags.searchTimeout)
-			duration = time.Second * 5
-		}
-
-		monitor := discovery.New(time.Second)
-		monitor.Start()
-
-		time.Sleep(duration)
-
-		// TODO: Handle the case when no board is found.
-		board := findBoardFunc(pm, monitor, deviceURI)
-		if board == nil {
-			formatter.PrintErrorMessage("No supported board has been found at " + deviceURI.String() + ", try either install new cores or check your board URI.")
-			os.Exit(cli.ErrGeneric)
-		}
-		formatter.Print("Board found: " + board.Name())
-
-		sketch.Metadata.CPU = sketches.BoardMetadata{
-			Fqbn: board.FQBN(),
-			Name: board.Name(),
-		}
-	}
-
-	err = sketch.ExportMetadata()
-	if err != nil {
-		formatter.PrintError(err, "Cannot export sketch metadata.")
-	}
-	formatter.PrintResult("Selected fqbn: " + sketch.Metadata.CPU.Fqbn)
-}
-
-// FIXME: Those should probably go in a "BoardManager" pkg or something
-// findSerialConnectedBoard find the board which is connected to the specified URI via serial port, using a monitor and a set of Boards
-// for the matching.
-func findSerialConnectedBoard(pm *packagemanager.PackageManager, monitor *discovery.Monitor, deviceURI *url.URL) *cores.Board {
-	found := false
-	location := deviceURI.Path
-	var serialDevice discovery.SerialDevice
-	for _, device := range monitor.Serial() {
-		if device.Port == location {
-			// Found the device !
-			found = true
-			serialDevice = *device
-		}
-	}
-	if !found {
-		return nil
-	}
-
-	boards := pm.FindBoardsWithVidPid(serialDevice.VendorID, serialDevice.ProductID)
-	if len(boards) == 0 {
-		os.Exit(cli.ErrGeneric)
-	}
-
-	return boards[0]
-}
-
-// findNetworkConnectedBoard find the board which is connected to the specified URI on the network, using a monitor and a set of Boards
-// for the matching.
-func findNetworkConnectedBoard(pm *packagemanager.PackageManager, monitor *discovery.Monitor, deviceURI *url.URL) *cores.Board {
-	found := false
-
-	var networkDevice discovery.NetworkDevice
-
-	for _, device := range monitor.Network() {
-		if device.Address == deviceURI.Host &&
-			fmt.Sprint(device.Port) == deviceURI.Port() {
-			// Found the device !
-			found = true
-			networkDevice = *device
-		}
-	}
-	if !found {
-		return nil
-	}
-
-	boards := pm.FindBoardsWithID(networkDevice.Name)
-	if len(boards) == 0 {
-		return nil
-	}
-
-	return boards[0]
 }
