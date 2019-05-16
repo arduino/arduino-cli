@@ -88,7 +88,7 @@ func main() {
 	fmt.Println("=== calling PlatformSearch(samd)")
 	searchResp, err := client.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
 		Instance:   instance,
-		SearchArgs: "samd",
+		SearchArgs: "uno",
 	})
 	if err != nil {
 		fmt.Printf("Search error: %s\n", err)
@@ -196,14 +196,29 @@ func main() {
 
 	// BOARDS ATTACH
 	fmt.Println("=== calling BoardAttach(serial:///dev/ttyACM0)")
-	_, err = client.BoardAttach(context.Background(), &rpc.BoardAttachReq{
+	boardattachresp, err := client.BoardAttach(context.Background(), &rpc.BoardAttachReq{
 		Instance:   instance,
-		BoardURI:   "serial:///dev/ttyACM0",
-		SketchPath: "/home/riccardo/Arduino/MyFirstSketch",
+		BoardUri:   "/dev/ttyACM0",
+		SketchPath: os.Args[2],
 	})
 	if err != nil {
-		fmt.Printf("attach error : %s\n", err)
+		fmt.Printf("Attach error: %s\n", err)
 		os.Exit(1)
+	}
+	for {
+		attachResp, err := boardattachresp.Recv()
+		if err == io.EOF {
+			fmt.Printf("---> %+v\n", attachResp)
+			fmt.Println()
+			break
+		}
+		if err != nil {
+			fmt.Printf("Attach error: %s\n", err)
+			os.Exit(1)
+		}
+		if attachResp.GetTaskProgress() != nil {
+			fmt.Printf(">> TASK: %s\n", attachResp.GetTaskProgress())
+		}
 	}
 
 	// COMPILE

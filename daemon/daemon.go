@@ -60,8 +60,15 @@ func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.Board
 	return board.BoardDetails(ctx, req)
 }
 
-func (s *ArduinoCoreServerImpl) BoardAttach(ctx context.Context, req *rpc.BoardAttachReq) (*rpc.BoardAttachResp, error) {
-	return board.BoardAttach(ctx, req)
+func (s *ArduinoCoreServerImpl) BoardAttach(req *rpc.BoardAttachReq, stream rpc.ArduinoCore_BoardAttachServer) error {
+
+	resp, err := board.BoardAttach(stream.Context(), req,
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.BoardAttachResp{TaskProgress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
 }
 
 func (s *ArduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error) {

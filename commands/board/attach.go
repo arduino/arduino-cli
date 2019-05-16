@@ -29,13 +29,12 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
 	discovery "github.com/arduino/board-discovery"
 	paths "github.com/arduino/go-paths-helper"
 )
 
-func BoardAttach(ctx context.Context, req *rpc.BoardAttachReq) (*rpc.BoardAttachResp, error) {
+func BoardAttach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskProgressCB) (*rpc.BoardAttachResp, error) {
 
 	pm := commands.GetPackageManager(req)
 	if pm == nil {
@@ -49,10 +48,8 @@ func BoardAttach(ctx context.Context, req *rpc.BoardAttachReq) (*rpc.BoardAttach
 	if err != nil {
 		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
-	if sketch.Metadata == nil {
-		formatter.Print("sketch errrorrrerereererer")
-	}
-	boardURI := req.GetBoardURI()
+
+	boardURI := req.GetBoardUri()
 	fqbn, err := cores.ParseFQBN(boardURI)
 	if err != nil && !strings.HasPrefix(boardURI, "serial") {
 		boardURI = "serial://" + boardURI
@@ -80,7 +77,6 @@ func BoardAttach(ctx context.Context, req *rpc.BoardAttachReq) (*rpc.BoardAttach
 
 		duration, err := time.ParseDuration(req.GetSearchTimeout())
 		if err != nil {
-			//logrus.WithError(err).Warnf("Invalid interval `%s` provided, using default (5s).", req.GetSearchTimeout())
 			duration = time.Second * 5
 		}
 
@@ -94,8 +90,10 @@ func BoardAttach(ctx context.Context, req *rpc.BoardAttachReq) (*rpc.BoardAttach
 		if board == nil {
 			return nil, fmt.Errorf("no supported board found at %s", deviceURI.String())
 		}
-		formatter.Print("Board found: " + board.Name())
+		taskCB(&rpc.TaskProgress{Name: "Board found: " + board.Name()})
 
+		// TODO: should be stoped the monitor: when running as a pure CLI  is released
+		// by the OS, when run as daemon the resource's state is unknown and could be leaked.
 		sketch.Metadata.CPU = sketches.BoardMetadata{
 			Fqbn: board.FQBN(),
 			Name: board.Name(),
@@ -104,14 +102,9 @@ func BoardAttach(ctx context.Context, req *rpc.BoardAttachReq) (*rpc.BoardAttach
 
 	err = sketch.ExportMetadata()
 	if err != nil {
-<<<<<<< HEAD
 		return nil, fmt.Errorf("cannot export sketch metadata: %s", err)
-=======
-		formatter.PrintError(err, "Cannot export sketch metadata.")
-		os.Exit(commands.ErrGeneric)
->>>>>>> 5358b8ed08945f8db0242c77427e79e44f03c7d9
 	}
-	formatter.PrintResult("Selected fqbn: " + sketch.Metadata.CPU.Fqbn)
+	taskCB(&rpc.TaskProgress{Name: "Selected fqbn: " + sketch.Metadata.CPU.Fqbn, Completed: true})
 	return &rpc.BoardAttachResp{}, nil
 }
 

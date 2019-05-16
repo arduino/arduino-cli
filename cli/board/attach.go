@@ -59,11 +59,11 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	}
 	_, err := board.BoardAttach(context.Background(), &rpc.BoardAttachReq{
 		Instance:      instance,
-		BoardURI:      args[0],
+		BoardUri:      args[0],
 		SketchPath:    path,
 		BoardFlavour:  attachFlags.boardFlavour,
 		SearchTimeout: attachFlags.searchTimeout,
-	})
+	}, cli.OutputTaskProgress())
 	if err != nil {
 		formatter.PrintError(err, "attach board error")
 		os.Exit(cli.ErrGeneric)
