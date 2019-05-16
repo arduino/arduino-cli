@@ -54,11 +54,12 @@ message RequiredTool {
 
 message BoardAttachReq {
   Instance instance = 1;
-  string boardURI = 2;
-  string sketchPath = 3;
-  string boardFlavour = 4;
-  string searchTimeout = 5;
+  string board_uri = 2;
+  string sketch_path = 3;
+  string board_flavour = 4;
+  string search_timeout = 5;
 }
 
 message BoardAttachResp {
+  TaskProgress task_progress = 1;
 }
