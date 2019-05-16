@@ -128,6 +128,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	err = sketch.ExportMetadata()
 	if err != nil {
 		formatter.PrintError(err, "Cannot export sketch metadata.")
+		os.Exit(commands.ErrGeneric)
 	}
 	formatter.PrintResult("Selected fqbn: " + sketch.Metadata.CPU.Fqbn)
 }
