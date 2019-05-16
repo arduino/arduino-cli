@@ -69,6 +69,7 @@ func NewSketchFromPath(path *paths.Path) (*Sketch, error) {
 	sketch := &Sketch{
 		FullPath: path,
 		Name:     path.Base(),
+		Metadata: &Metadata{},
 	}
 	sketch.ImportMetadata()
 	return sketch, nil
