@@ -87,15 +87,13 @@ func Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 	if inConfig.DownloadsDir != "" {
 		config.ArduinoDownloadsDir = paths.New(inConfig.DownloadsDir)
 	}
-	urls := []*url.URL{}
 	for _, rawurl := range inConfig.BoardManagerAdditionalUrls {
 		if u, err := url.Parse(rawurl); err == nil {
-			urls = append(urls, u)
+			config.BoardManagerAdditionalUrls = append(config.BoardManagerAdditionalUrls, u)
 		} else {
 			return nil, fmt.Errorf("parsing url %s: %s", rawurl, err)
 		}
 	}
-	config.BoardManagerAdditionalUrls = urls
 
 	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(ctx, config, req.GetLibraryManagerOnly())
 	if err != nil {

@@ -83,8 +83,10 @@ func (s *ArduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexReq, stream rpc.
 	resp, err := commands.UpdateIndex(stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateIndexResp{DownloadProgress: p}) },
 	)
-	stream.Send(resp)
-	return err
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
 }
 
 func (s *ArduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesIndexReq, stream rpc.ArduinoCore_UpdateLibrariesIndexServer) error {
