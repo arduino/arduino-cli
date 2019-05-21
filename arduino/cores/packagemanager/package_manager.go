@@ -26,10 +26,10 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
-	"github.com/arduino/go-paths-helper"
+	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
-	"go.bug.st/relaxed-semver"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // PackageManager defines the superior oracle which understands all about
@@ -352,6 +352,36 @@ func (pm *PackageManager) GetAllInstalledToolsReleases() []*cores.ToolRelease {
 		}
 	}
 	return tools
+}
+
+// InstalledPlatformReleases returns all installed PlatformReleases. This function is
+// useful to range all PlatformReleases in for loops.
+func (pm *PackageManager) InstalledPlatformReleases() []*cores.PlatformRelease {
+	platforms := []*cores.PlatformRelease{}
+	for _, targetPackage := range pm.packages.Packages {
+		for _, platform := range targetPackage.Platforms {
+			for _, release := range platform.GetAllInstalled() {
+				platforms = append(platforms, release)
+			}
+		}
+	}
+	return platforms
+}
+
+// InstalledBoards returns all installed Boards. This function is useful to range
+// all Boards in for loops.
+func (pm *PackageManager) InstalledBoards() []*cores.Board {
+	boards := []*cores.Board{}
+	for _, targetPackage := range pm.packages.Packages {
+		for _, platform := range targetPackage.Platforms {
+			for _, release := range platform.GetAllInstalled() {
+				for _, board := range release.Boards {
+					boards = append(boards, board)
+				}
+			}
+		}
+	}
+	return boards
 }
 
 func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.ToolRelease, error) {
