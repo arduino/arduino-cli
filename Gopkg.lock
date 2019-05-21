@@ -529,7 +529,6 @@
     "github.com/arduino/go-win32-utils",
     "github.com/bgentry/go-netrc/netrc",
     "github.com/bouk/monkey",
-    "github.com/codeclysm/cc",
     "github.com/codeclysm/extract",
     "github.com/fatih/color",
     "github.com/golang/protobuf/proto",
