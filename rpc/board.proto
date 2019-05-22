@@ -63,3 +63,23 @@ message BoardAttachReq {
 message BoardAttachResp {
   TaskProgress task_progress = 1;
 }
+
+message BoardListReq {
+  Instance instance = 1;
+}
+
+message BoardListResp {
+  repeated DetectedPort ports = 1;
+}
+
+message DetectedPort {
+  string address = 1;
+  string protocol = 2;
+  string protocol_label = 3;
+  repeated DetectedBoard boards = 4;
+}
+
+message DetectedBoard {
+	string name = 1;
+	string FQBN = 2;
+}
