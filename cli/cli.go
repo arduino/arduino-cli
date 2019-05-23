@@ -86,7 +86,7 @@ func packageManagerInitReq() *rpc.InitReq {
 func InitInstance() *rpc.InitResp {
 	logrus.Info("Initializing package manager")
 	req := packageManagerInitReq()
-	resp, err := commands.Init(context.Background(), req)
+	resp, err := commands.Init(context.Background(), req, OutputProgressBar(), OutputTaskProgress())
 	if err != nil {
 		formatter.PrintError(err, "Error initializing package manager")
 		os.Exit(ErrGeneric)

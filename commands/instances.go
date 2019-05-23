@@ -72,7 +72,7 @@ func GetLibraryManager(req InstanceContainer) *librariesmanager.LibrariesManager
 	return i.lm
 }
 
-func Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
+func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (*rpc.InitResp, error) {
 	inConfig := req.GetConfiguration()
 	if inConfig == nil {
 		return nil, fmt.Errorf("invalid request")
