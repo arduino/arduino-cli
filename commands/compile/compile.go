@@ -17,7 +17,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/rpc"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -60,9 +59,9 @@ func Compile(ctx context.Context, req *rpc.CompileReq,
 	ctags, _ := getBuiltinCtagsTool(pm)
 	if !ctags.IsInstalled() {
 		taskCB(&rpc.TaskProgress{Name: "Downloading missing tool " + ctags.String()})
-		core.DownloadToolRelease(pm, ctags, downloadCB)
+		commands.DownloadToolRelease(pm, ctags, downloadCB)
 		taskCB(&rpc.TaskProgress{Completed: true})
-		core.InstallToolRelease(pm, ctags, taskCB)
+		commands.InstallToolRelease(pm, ctags, taskCB)
 
 		if err := pm.LoadHardware(cli.Config); err != nil {
 			return nil, fmt.Errorf("loading hardware packages: %s", err)

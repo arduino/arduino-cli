@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
 )
@@ -42,8 +41,8 @@ func BoardList(ctx context.Context, req *rpc.BoardListReq) (*rpc.BoardListResp, 
 	serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(pm)
 	if !serialDiscoveryTool.IsInstalled() {
 		formatter.Print("Downloading and installing missing tool: " + serialDiscoveryTool.String())
-		core.DownloadToolRelease(pm, serialDiscoveryTool, cli.OutputProgressBar())
-		core.InstallToolRelease(pm, serialDiscoveryTool, cli.OutputTaskProgress())
+		commands.DownloadToolRelease(pm, serialDiscoveryTool, cli.OutputProgressBar())
+		commands.InstallToolRelease(pm, serialDiscoveryTool, cli.OutputTaskProgress())
 
 		if err := pm.LoadHardware(cli.Config); err != nil {
 			formatter.PrintError(err, "Could not load hardware packages.")
@@ -63,8 +62,7 @@ func BoardList(ctx context.Context, req *rpc.BoardListReq) (*rpc.BoardListResp, 
 	}
 
 	// Find all installed discoveries
-	discoveries := discovery.ExtractDiscoveriesFromPlatforms(pm)
-	discoveries["serial"] = serialDiscovery
+	discoveries := append(discovery.ExtractDiscoveriesFromPlatforms(pm), serialDiscovery)
 
 	resp := &rpc.BoardListResp{Ports: []*rpc.DetectedPort{}}
 	for _, disc := range discoveries {

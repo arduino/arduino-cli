@@ -94,7 +94,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 
 	// Install tools first
 	for _, tool := range toolsToInstall {
-		err := InstallToolRelease(pm, tool, taskCB)
+		err := commands.InstallToolRelease(pm, tool, taskCB)
 		if err != nil {
 			// TODO: handle error
 		}
@@ -139,28 +139,5 @@ func installPlatform(pm *packagemanager.PackageManager,
 
 	log.Info("Platform installed")
 	taskCB(&rpc.TaskProgress{Message: platformRelease.String() + " installed", Completed: true})
-	return nil
-}
-
-// InstallToolRelease installs a ToolRelease
-func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, taskCB commands.TaskProgressCB) error {
-	log := pm.Log.WithField("Tool", toolRelease)
-
-	if toolRelease.IsInstalled() {
-		log.Warn("Tool already installed")
-		taskCB(&rpc.TaskProgress{Name: "Tool " + toolRelease.String() + " already installed", Completed: true})
-		return nil
-	}
-
-	log.Info("Installing tool")
-	taskCB(&rpc.TaskProgress{Name: "Installing " + toolRelease.String()})
-	err := pm.InstallTool(toolRelease)
-	if err != nil {
-		log.WithError(err).Warn("Cannot install tool")
-		return fmt.Errorf("installing tool %s: %s", toolRelease, err)
-	}
-	log.Info("Tool installed")
-	taskCB(&rpc.TaskProgress{Message: toolRelease.String() + " installed", Completed: true})
-
 	return nil
 }
