@@ -72,26 +72,32 @@ func runListCommand(cmd *cobra.Command, args []string) {
 }
 
 func outputListResp(resp *rpc.BoardListResp) {
-	sort.Slice(resp.Ports, func(i, j int) bool {
-		x, y := resp.Ports[i], resp.Ports[j]
-		return x.Protocol < y.Protocol || (x.Protocol == y.Protocol && x.Address < y.Address)
+	ports := resp.GetPorts()
+	if len(ports) == 0 {
+		formatter.Print("No boards found.")
+		return
+	}
+	sort.Slice(ports, func(i, j int) bool {
+		x, y := ports[i], ports[j]
+		return x.GetProtocol() < y.GetProtocol() ||
+			(x.GetProtocol() == y.GetProtocol() && x.GetAddress() < y.GetAddress())
 	})
 	table := output.NewTable()
 	table.SetHeader("Port", "Type", "Board Name", "FQBN")
-	for _, port := range resp.Ports {
-		address := port.Protocol + "://" + port.Address
-		if port.Protocol == "serial" {
-			address = port.Address
+	for _, port := range resp.GetPorts() {
+		address := port.GetProtocol() + "://" + port.GetAddress()
+		if port.GetProtocol() == "serial" {
+			address = port.GetAddress()
 		}
-		protocol := port.ProtocolLabel
-		if len(port.Boards) > 0 {
-			sort.Slice(port.Boards, func(i, j int) bool {
-				x, y := port.Boards[i], port.Boards[j]
-				return x.Name < y.Name || (x.Name == y.Name && x.FQBN < y.FQBN)
+		protocol := port.GetProtocolLabel()
+		if boards := port.GetBoards(); len(boards) > 0 {
+			sort.Slice(boards, func(i, j int) bool {
+				x, y := boards[i], boards[j]
+				return x.GetName() < y.GetName() || (x.GetName() == y.GetName() && x.GetFQBN() < y.GetFQBN())
 			})
-			for _, b := range port.Boards {
-				board := b.Name
-				fqbn := b.FQBN
+			for _, b := range boards {
+				board := b.GetName()
+				fqbn := b.GetFQBN()
 				table.AddRow(address, protocol, board, fqbn)
 				// show address and protocol only on the first row
 				address = ""
