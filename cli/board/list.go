@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"time"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/board"
@@ -41,7 +42,7 @@ func initListCommand() *cobra.Command {
 		Run:     runListCommand,
 	}
 
-	listCommand.Flags().StringVar(&listFlags.timeout, "timeout", "1s",
+	listCommand.Flags().StringVar(&listFlags.timeout, "timeout", "0s",
 		"The timeout of the search of connected devices, try to increase it if your board is not found (e.g. to 10s).")
 	return listCommand
 }
@@ -54,11 +55,12 @@ var listFlags struct {
 func runListCommand(cmd *cobra.Command, args []string) {
 	instance := cli.CreateInstance()
 
-	// timeout, err := time.ParseDuration(listFlags.timeout)
-	// if err != nil {
-	// 	formatter.PrintError(err, "Invalid timeout.")
-	// 	os.Exit(cli.ErrBadArgument)
-	// }
+	if timeout, err := time.ParseDuration(listFlags.timeout); err != nil {
+		formatter.PrintError(err, "Invalid timeout.")
+		os.Exit(cli.ErrBadArgument)
+	} else {
+		time.Sleep(timeout)
+	}
 
 	resp, err := board.BoardList(context.Background(), &rpc.BoardListReq{Instance: instance})
 	if err != nil {
