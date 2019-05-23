@@ -22,17 +22,18 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strings"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-
-	properties "github.com/arduino/go-properties-orderedmap"
-
 	"github.com/arduino/arduino-cli/executils"
+	properties "github.com/arduino/go-properties-orderedmap"
 )
 
 // Discovery is an instance of a discovery tool
 type Discovery struct {
+	ID      string
 	in      io.WriteCloser
 	out     io.ReadCloser
 	outJSON *json.Decoder
@@ -60,7 +61,10 @@ func NewFromCommandLine(args ...string) (*Discovery, error) {
 	if err != nil {
 		return nil, fmt.Errorf("creating discovery process: %s", err)
 	}
-	return &Discovery{cmd: cmd}, nil
+	return &Discovery{
+		ID:  strings.Join(args, " "),
+		cmd: cmd,
+	}, nil
 }
 
 // Start starts the specified discovery
@@ -124,23 +128,36 @@ func (d *Discovery) Close() error {
 }
 
 // ExtractDiscoveriesFromPlatforms returns all Discovery from all the installed platforms.
-func ExtractDiscoveriesFromPlatforms(pm *packagemanager.PackageManager) map[string]*Discovery {
-	res := map[string]*Discovery{}
-
+func ExtractDiscoveriesFromPlatforms(pm *packagemanager.PackageManager) []*Discovery {
+	res := []*Discovery{}
+	taken := map[string]bool{}
 	for _, platformRelease := range pm.InstalledPlatformReleases() {
-		discoveries := platformRelease.Properties.SubTree("discovery").FirstLevelOf()
+		for _, disc := range ExtractDiscoveriesFromPlatform(platformRelease) {
+			if taken[disc.ID] {
+				continue
+			}
+			taken[disc.ID] = true
+			res = append(res, disc)
+		}
+	}
+	return res
+}
 
-		for name, props := range discoveries {
-			if pattern, has := props.GetOk("pattern"); has {
-				props.Merge(platformRelease.Properties)
-				cmdLine := props.ExpandPropsInString(pattern)
-				if cmdArgs, err := properties.SplitQuotedString(cmdLine, `"`, false); err != nil {
-					// TODO
-				} else if disc, err := NewFromCommandLine(cmdArgs...); err != nil {
-					// TODO
-				} else {
-					res[name] = disc
-				}
+// ExtractDiscoveriesFromPlatform returns all Discovery from the specified platform.
+func ExtractDiscoveriesFromPlatform(platformRelease *cores.PlatformRelease) []*Discovery {
+	discoveries := platformRelease.Properties.SubTree("discovery").FirstLevelOf()
+
+	res := []*Discovery{}
+	for _, props := range discoveries {
+		if pattern, has := props.GetOk("pattern"); has {
+			props.Merge(platformRelease.Properties)
+			cmdLine := props.ExpandPropsInString(pattern)
+			if cmdArgs, err := properties.SplitQuotedString(cmdLine, `"`, false); err != nil {
+				// TODO
+			} else if disc, err := NewFromCommandLine(cmdArgs...); err != nil {
+				// TODO
+			} else {
+				res = append(res, disc)
 			}
 		}
 	}
