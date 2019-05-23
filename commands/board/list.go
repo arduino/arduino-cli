@@ -21,12 +21,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 
-	"github.com/arduino/arduino-cli/arduino/discovery"
-	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
 )
 
@@ -34,32 +30,6 @@ func BoardList(ctx context.Context, req *rpc.BoardListReq) (*rpc.BoardListResp, 
 	pm := commands.GetPackageManager(req)
 	if pm == nil {
 		return nil, errors.New("invalid instance")
-	}
-
-	// Check for bultin serial-discovery tool
-	loadBuiltinSerialDiscoveryMetadata(pm)
-	serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(pm)
-	if !serialDiscoveryTool.IsInstalled() {
-		formatter.Print("Downloading and installing missing tool: " + serialDiscoveryTool.String())
-		commands.DownloadToolRelease(pm, serialDiscoveryTool, cli.OutputProgressBar())
-		commands.InstallToolRelease(pm, serialDiscoveryTool, cli.OutputTaskProgress())
-
-		if err := pm.LoadHardware(cli.Config); err != nil {
-			formatter.PrintError(err, "Could not load hardware packages.")
-			os.Exit(cli.ErrCoreConfig)
-		}
-		serialDiscoveryTool, _ = getBuiltinSerialDiscoveryTool(pm)
-		if !serialDiscoveryTool.IsInstalled() {
-			formatter.PrintErrorMessage("Missing serial-discovery tool.")
-			os.Exit(cli.ErrCoreConfig)
-		}
-	}
-
-	// TODO: move to 'commands' modules
-	_, err := discovery.NewFromCommandLine(serialDiscoveryTool.InstallDir.Join("serial-discovery").String())
-	if err != nil {
-		formatter.PrintError(err, "Error setting up serial-discovery tool.")
-		os.Exit(cli.ErrCoreConfig)
 	}
 
 	resp := &rpc.BoardListResp{Ports: []*rpc.DetectedPort{}}
