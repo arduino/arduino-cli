@@ -15,11 +15,14 @@
 // a commercial license, send an email to license@arduino.cc.
 //
 
-package board
+package commands
 
 import (
+	"fmt"
+
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/resources"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -86,4 +89,15 @@ func loadBuiltinSerialDiscoveryMetadata(pm *packagemanager.PackageManager) {
 
 func getBuiltinSerialDiscoveryTool(pm *packagemanager.PackageManager) (*cores.ToolRelease, error) {
 	return pm.Package("builtin").Tool("serial-discovery").Release(serialDiscoveryVersion).Get()
+}
+
+func newBuiltinSerialDiscovery(pm *packagemanager.PackageManager) (*discovery.Discovery, error) {
+	t, err := getBuiltinSerialDiscoveryTool(pm)
+	if err != nil {
+		return nil, err
+	}
+	if !t.IsInstalled() {
+		return nil, fmt.Errorf("missing serial-discovery tool")
+	}
+	return discovery.NewFromCommandLine(t.InstallDir.Join("serial-discovery").String())
 }

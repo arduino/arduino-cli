@@ -82,8 +82,35 @@ func GetDiscoveries(req InstanceContainer) []*discovery.Discovery {
 }
 
 func (instance *CoreInstance) startDiscoveries(downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
+	// Check for bultin serial-discovery tool
+	loadBuiltinSerialDiscoveryMetadata(instance.pm)
+
+	if downloadCB != nil {
+		serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(instance.pm)
+		if !serialDiscoveryTool.IsInstalled() {
+			//formatter.Print("Downloading and installing missing tool: " + serialDiscoveryTool.String())
+			if err := DownloadToolRelease(instance.pm, serialDiscoveryTool, downloadCB); err != nil {
+				return fmt.Errorf(("could not download serial-discovery tool"))
+			}
+			if err := InstallToolRelease(instance.pm, serialDiscoveryTool, taskCB); err != nil {
+				return fmt.Errorf(("could not install serial-discovery tool"))
+			}
+			if err := instance.pm.LoadHardware(instance.config); err != nil {
+				return fmt.Errorf("could not load hardware packages: %s", err)
+			}
+		}
+	}
+
+	serialDiscovery, err := newBuiltinSerialDiscovery(instance.pm)
+	if err != nil {
+		return fmt.Errorf("starting serial discovery: %s", err)
+	}
+
 	discoveriesToStop := instance.discoveries
-	discoveriesToStart := discovery.ExtractDiscoveriesFromPlatforms(instance.pm)
+	discoveriesToStart := append(
+		discovery.ExtractDiscoveriesFromPlatforms(instance.pm),
+		serialDiscovery,
+	)
 
 	instance.discoveries = []*discovery.Discovery{}
 	for _, disc := range discoveriesToStart {
