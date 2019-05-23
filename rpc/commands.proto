@@ -34,7 +34,7 @@ service ArduinoCore {
   //-------------------
 
   // Start a new instance of the Arduino Core Service
-  rpc Init(InitReq) returns (InitResp) {}
+  rpc Init(InitReq) returns (stream InitResp) {}
 
   // Destroy an instance of the Arduino Core Service
   rpc Destroy(DestroyReq) returns (DestroyResp) {}
@@ -115,6 +115,8 @@ message InitResp {
   Instance instance = 1;
   repeated string platforms_index_errors = 2;
   string libraries_index_error = 3;
+  DownloadProgress download_progress = 4;
+  TaskProgress task_progress = 5;
 }
 
 message DestroyReq { Instance instance = 1; }

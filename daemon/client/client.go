@@ -46,7 +46,7 @@ func main() {
 
 	// INIT
 	fmt.Println("=== calling Init")
-	initResp, err := client.Init(context.Background(), &rpc.InitReq{
+	initRespStream, err := client.Init(context.Background(), &rpc.InitReq{
 		Configuration: &rpc.Configuration{
 			DataDir: datadir,
 		},
@@ -55,9 +55,28 @@ func main() {
 		fmt.Printf("Error creating server instance: %s\n", err)
 		os.Exit(1)
 	}
-	instance := initResp.GetInstance()
-	fmt.Printf("---> %+v\n", initResp)
-	fmt.Println()
+	var instance *rpc.Instance
+	for {
+		initResp, err := initRespStream.Recv()
+		if err == io.EOF {
+			fmt.Println()
+			break
+		}
+		if err != nil {
+			fmt.Printf("Init error: %s\n", err)
+			os.Exit(1)
+		}
+		if initResp.GetInstance() != nil {
+			instance = initResp.GetInstance()
+			fmt.Printf("---> %+v\n", initResp)
+		}
+		if initResp.GetDownloadProgress() != nil {
+			fmt.Printf(">> DOWNLOAD: %s\n", initResp.GetDownloadProgress())
+		}
+		if initResp.GetTaskProgress() != nil {
+			fmt.Printf(">> TASK: %s\n", initResp.GetTaskProgress())
+		}
+	}
 
 	// UPDATE-INDEX
 	fmt.Println("=== calling UpdateIndex")

@@ -103,8 +103,16 @@ func (s *ArduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 	return stream.Send(&rpc.UpdateLibrariesIndexResp{})
 }
 
-func (s *ArduinoCoreServerImpl) Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
-	return commands.Init(ctx, req)
+func (s *ArduinoCoreServerImpl) Init(req *rpc.InitReq, stream rpc.ArduinoCore_InitServer) error {
+	resp, err := commands.Init(stream.Context(), req,
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.InitResp{DownloadProgress: p}) },
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.InitResp{TaskProgress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	fmt.Println(resp)
+	return stream.Send(resp)
 }
 
 func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoCore_CompileServer) error {
