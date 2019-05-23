@@ -67,13 +67,13 @@ func BoardList(ctx context.Context, req *rpc.BoardListReq) (*rpc.BoardListResp, 
 	discoveries["serial"] = serialDiscovery
 
 	resp := &rpc.BoardListResp{Ports: []*rpc.DetectedPort{}}
-	for discName, disc := range discoveries {
+	for _, disc := range discoveries {
 		disc.Start()
 		defer disc.Close()
 
 		ports, err := disc.List()
 		if err != nil {
-			fmt.Printf("Error getting port list from discovery %s: %s\n", discName, err)
+			fmt.Printf("Error getting port list from discovery %s: %s\n", disc.ID, err)
 			continue
 		}
 		for _, port := range ports {
