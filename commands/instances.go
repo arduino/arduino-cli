@@ -26,8 +26,8 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
-
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/configs"
@@ -46,10 +46,11 @@ var instancesCount int32 = 1
 // instantiate as many as needed by providing a different configuration
 // for each one.
 type CoreInstance struct {
-	config     *configs.Configuration
-	pm         *packagemanager.PackageManager
-	lm         *librariesmanager.LibrariesManager
-	getLibOnly bool
+	config      *configs.Configuration
+	pm          *packagemanager.PackageManager
+	lm          *librariesmanager.LibrariesManager
+	getLibOnly  bool
+	discoveries []*discovery.Discovery
 }
 
 type InstanceContainer interface {
@@ -70,6 +71,32 @@ func GetLibraryManager(req InstanceContainer) *librariesmanager.LibrariesManager
 		return nil
 	}
 	return i.lm
+}
+
+func GetDiscoveries(req InstanceContainer) []*discovery.Discovery {
+	i, ok := instances[req.GetInstance().GetId()]
+	if !ok {
+		return nil
+	}
+	return i.discoveries
+}
+
+func (instance *CoreInstance) startDiscoveries(downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
+	discoveriesToStop := instance.discoveries
+	discoveriesToStart := discovery.ExtractDiscoveriesFromPlatforms(instance.pm)
+
+	instance.discoveries = []*discovery.Discovery{}
+	for _, disc := range discoveriesToStart {
+		sharedDisc, err := StartSharedDiscovery(disc)
+		if err != nil {
+			return fmt.Errorf("starting discovery: %s", err)
+		}
+		instance.discoveries = append(instance.discoveries, sharedDisc)
+	}
+	for _, disc := range discoveriesToStop {
+		StopSharedDiscovery(disc)
+	}
+	return nil
 }
 
 func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (*rpc.InitResp, error) {
@@ -108,6 +135,10 @@ func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, 
 	instancesCount++
 	instances[handle] = instance
 
+	if err := instance.startDiscoveries(downloadCB, taskCB); err != nil {
+		// TODO: handle discovery errors
+		fmt.Println(err)
+	}
 	return &rpc.InitResp{
 		Instance:             &rpc.Instance{Id: handle},
 		PlatformsIndexErrors: reqPltIndex,
@@ -120,6 +151,11 @@ func Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error)
 	if _, ok := instances[id]; !ok {
 		return nil, fmt.Errorf("invalid handle")
 	}
+
+	for _, disc := range GetDiscoveries(req) {
+		StopSharedDiscovery(disc)
+	}
+
 	delete(instances, id)
 	return &rpc.DestroyResp{}, nil
 }
@@ -207,6 +243,9 @@ func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
 	}
 	coreInstance.pm = pm
 	coreInstance.lm = lm
+
+	coreInstance.startDiscoveries(nil, nil)
+
 	return &rpc.RescanResp{
 		PlatformsIndexErrors: reqPltIndex,
 		LibrariesIndexError:  reqLibIndex,
