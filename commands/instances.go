@@ -116,9 +116,8 @@ func Init(ctx context.Context, req *rpc.InitReq) (*rpc.InitResp, error) {
 }
 
 func Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error) {
-	id := req.Instance.Id
-	_, ok := instances[id]
-	if !ok {
+	id := req.GetInstance().GetId()
+	if _, ok := instances[id]; !ok {
 		return nil, fmt.Errorf("invalid handle")
 	}
 	delete(instances, id)
@@ -147,7 +146,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexReq,
 }
 
 func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResp, error) {
-	id := req.Instance.Id
+	id := req.GetInstance().GetId()
 	coreInstance, ok := instances[id]
 	if !ok {
 		return nil, fmt.Errorf("invalid handle")
@@ -196,7 +195,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 }
 
 func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
-	id := req.Instance.Id
+	id := req.GetInstance().GetId()
 	coreInstance, ok := instances[id]
 	if !ok {
 		return nil, fmt.Errorf("invalid handle")
