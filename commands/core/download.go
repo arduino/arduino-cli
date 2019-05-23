@@ -78,14 +78,6 @@ func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, do
 		return fmt.Errorf("tool %s not available for the current OS", tool)
 	}
 
-	return DownloadToolRelease(pm, tool, downloadCB)
+	return commands.DownloadToolRelease(pm, tool, downloadCB)
 }
 
-// DownloadToolRelease downloads a ToolRelease
-func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, downloadCB commands.DownloadProgressCB) error {
-	resp, err := pm.DownloadToolRelease(toolRelease)
-	if err != nil {
-		return err
-	}
-	return commands.Download(resp, toolRelease.String(), downloadCB)
-}
