@@ -55,20 +55,15 @@ func BoardList(ctx context.Context, req *rpc.BoardListReq) (*rpc.BoardListResp, 
 		}
 	}
 
-	serialDiscovery, err := discovery.NewFromCommandLine(serialDiscoveryTool.InstallDir.Join("serial-discovery").String())
+	// TODO: move to 'commands' modules
+	_, err := discovery.NewFromCommandLine(serialDiscoveryTool.InstallDir.Join("serial-discovery").String())
 	if err != nil {
 		formatter.PrintError(err, "Error setting up serial-discovery tool.")
 		os.Exit(cli.ErrCoreConfig)
 	}
 
-	// Find all installed discoveries
-	discoveries := append(discovery.ExtractDiscoveriesFromPlatforms(pm), serialDiscovery)
-
 	resp := &rpc.BoardListResp{Ports: []*rpc.DetectedPort{}}
-	for _, disc := range discoveries {
-		disc.Start()
-		defer disc.Close()
-
+	for _, disc := range commands.GetDiscoveries(req) {
 		ports, err := disc.List()
 		if err != nil {
 			fmt.Printf("Error getting port list from discovery %s: %s\n", disc.ID, err)
