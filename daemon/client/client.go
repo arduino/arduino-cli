@@ -311,12 +311,12 @@ func main() {
 	}
 
 	// PLATFORM UNINSTALL
-	fmt.Println("=== calling PlatformUninstall(arduino:samd@1.6.19)")
+	fmt.Println("=== calling PlatformUninstall(arduino:samd)")
 	uninstallRespStream, err := client.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
 		Instance:        instance,
 		PlatformPackage: "arduino",
 		Architecture:    "samd",
-		Version:         "1.6.19",
+		//Version:         "1.6.19",
 	})
 	if err != nil {
 		fmt.Printf("Uninstall error: %s\n", err)
