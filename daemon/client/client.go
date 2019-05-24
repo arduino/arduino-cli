@@ -278,12 +278,6 @@ func main() {
 		if resperr := compResp.GetErrStream(); resperr != nil {
 			fmt.Printf(">> STDERR: %s", resperr)
 		}
-		if compResp.GetDownloadProgress() != nil {
-			fmt.Printf(">> DOWNLOAD: %s\n", compResp.GetDownloadProgress())
-		}
-		if compResp.GetTaskProgress() != nil {
-			fmt.Printf(">> TASK: %s\n", compResp.GetTaskProgress())
-		}
 	}
 
 	// UPLOAD
