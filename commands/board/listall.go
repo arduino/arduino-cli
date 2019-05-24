@@ -20,42 +20,50 @@ package board
 import (
 	"context"
 	"errors"
-	"fmt"
+	"strings"
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
 )
 
-func BoardList(ctx context.Context, req *rpc.BoardListReq) (*rpc.BoardListResp, error) {
+func BoardListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllResp, error) {
 	pm := commands.GetPackageManager(req)
 	if pm == nil {
 		return nil, errors.New("invalid instance")
 	}
 
-	resp := &rpc.BoardListResp{Ports: []*rpc.DetectedPort{}}
-	for _, disc := range commands.GetDiscoveries(req) {
-		ports, err := disc.List()
-		if err != nil {
-			fmt.Printf("Error getting port list from discovery %s: %s\n", disc.ID, err)
-			continue
+	args := req.GetSearchArgs()
+	match := func(name string) bool {
+		if len(args) == 0 {
+			return true
 		}
-		for _, port := range ports {
-			b := []*rpc.BoardListItem{}
-			for _, board := range pm.IdentifyBoard(port.IdentificationPrefs) {
-				b = append(b, &rpc.BoardListItem{
+		name = strings.ToLower(name)
+		for _, term := range args {
+			if !strings.Contains(name, strings.ToLower(term)) {
+				return false
+			}
+		}
+		return true
+	}
+
+	list := &rpc.BoardListAllResp{Boards: []*rpc.BoardListItem{}}
+	for _, targetPackage := range pm.GetPackages().Packages {
+		for _, platform := range targetPackage.Platforms {
+			platformRelease := pm.GetInstalledPlatformRelease(platform)
+			if platformRelease == nil {
+				continue
+			}
+			for _, board := range platformRelease.Boards {
+				if !match(board.Name()) {
+					continue
+				}
+				list.Boards = append(list.Boards, &rpc.BoardListItem{
 					Name: board.Name(),
 					FQBN: board.FQBN(),
 				})
 			}
-			p := &rpc.DetectedPort{
-				Address:       port.Address,
-				Protocol:      port.Protocol,
-				ProtocolLabel: port.ProtocolLabel,
-				Boards:        b,
-			}
-			resp.Ports = append(resp.Ports, p)
 		}
 	}
 
-	return resp, nil
+	return list, nil
 }

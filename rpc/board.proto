@@ -76,10 +76,19 @@ message DetectedPort {
   string address = 1;
   string protocol = 2;
   string protocol_label = 3;
-  repeated DetectedBoard boards = 4;
+  repeated BoardListItem boards = 4;
 }
 
-message DetectedBoard {
+message BoardListAllReq {
+  Instance instance = 1;
+	repeated string search_args = 2;
+}
+
+message BoardListAllResp {
+  repeated BoardListItem boards = 1;
+}
+
+message BoardListItem {
 	string name = 1;
 	string FQBN = 2;
 }

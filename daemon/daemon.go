@@ -64,6 +64,10 @@ func (s *ArduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardLis
 	return board.BoardList(ctx, req)
 }
 
+func (s *ArduinoCoreServerImpl) BoardListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllResp, error) {
+	return board.BoardListAll(ctx, req)
+}
+
 func (s *ArduinoCoreServerImpl) BoardAttach(req *rpc.BoardAttachReq, stream rpc.ArduinoCore_BoardAttachServer) error {
 
 	resp, err := board.BoardAttach(stream.Context(), req,
