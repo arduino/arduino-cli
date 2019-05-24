@@ -48,6 +48,8 @@ service ArduinoCore {
   // Update libraries index
   rpc UpdateLibrariesIndex(UpdateLibrariesIndexReq) returns (stream UpdateLibrariesIndexResp) {}
 
+  rpc Version(VersionReq) returns (VersionResp) {}
+
   // BOARD COMMANDS
   // --------------
 
@@ -147,4 +149,10 @@ message UpdateLibrariesIndexReq {
 
 message UpdateLibrariesIndexResp {
   DownloadProgress download_progress = 1;
+}
+
+message VersionReq {}
+
+message VersionResp {
+  string version = 1;
 }
