@@ -120,8 +120,6 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoC
 		stream.Context(), req,
 		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{OutStream: data}) }),
 		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{ErrStream: data}) }),
-		func(p *rpc.TaskProgress) { stream.Send(&rpc.CompileResp{TaskProgress: p}) },
-		func(p *rpc.DownloadProgress) { stream.Send(&rpc.CompileResp{DownloadProgress: p}) },
 	)
 	if err != nil {
 		return err

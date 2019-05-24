@@ -40,10 +40,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Compile(ctx context.Context, req *rpc.CompileReq,
-	outStream io.Writer, errStream io.Writer,
-	taskCB commands.TaskProgressCB, downloadCB commands.DownloadProgressCB) (*rpc.CompileResp, error) {
-
+func Compile(ctx context.Context, req *rpc.CompileReq, outStream io.Writer, errStream io.Writer) (*rpc.CompileResp, error) {
 	pm := commands.GetPackageManager(req)
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -69,24 +66,6 @@ func Compile(ctx context.Context, req *rpc.CompileReq,
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
 		return nil, fmt.Errorf("incorrect FQBN: %s", err)
-	}
-
-	// Check for ctags tool
-	loadBuiltinCtagsMetadata(pm)
-	ctags, _ := getBuiltinCtagsTool(pm)
-	if !ctags.IsInstalled() {
-		taskCB(&rpc.TaskProgress{Name: "Downloading missing tool " + ctags.String()})
-		commands.DownloadToolRelease(pm, ctags, downloadCB)
-		taskCB(&rpc.TaskProgress{Completed: true})
-		commands.InstallToolRelease(pm, ctags, taskCB)
-
-		if err := pm.LoadHardware(cli.Config); err != nil {
-			return nil, fmt.Errorf("loading hardware packages: %s", err)
-		}
-		ctags, _ = getBuiltinCtagsTool(pm)
-		if !ctags.IsInstalled() {
-			return nil, fmt.Errorf("missing ctags tool")
-		}
 	}
 
 	targetPlatform := pm.FindPlatform(&packagemanager.PlatformReference{

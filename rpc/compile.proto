@@ -42,6 +42,4 @@ message CompileReq {
 message CompileResp {
   bytes out_stream = 1;
   bytes err_stream = 2;
-  DownloadProgress download_progress = 3;
-  TaskProgress task_progress = 4;
 }
