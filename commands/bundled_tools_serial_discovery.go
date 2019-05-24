@@ -88,6 +88,7 @@ func loadBuiltinSerialDiscoveryMetadata(pm *packagemanager.PackageManager) {
 }
 
 func getBuiltinSerialDiscoveryTool(pm *packagemanager.PackageManager) (*cores.ToolRelease, error) {
+	loadBuiltinSerialDiscoveryMetadata(pm)
 	return pm.Package("builtin").Tool("serial-discovery").Release(serialDiscoveryVersion).Get()
 }
 

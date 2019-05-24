@@ -25,6 +25,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/discovery"
@@ -81,26 +82,45 @@ func GetDiscoveries(req InstanceContainer) []*discovery.Discovery {
 	return i.discoveries
 }
 
-func (instance *CoreInstance) startDiscoveries(downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
-	// Check for bultin serial-discovery tool
-	loadBuiltinSerialDiscoveryMetadata(instance.pm)
+func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (bool, error) {
+	if tool.IsInstalled() {
+		return false, nil
+	}
+	taskCB(&rpc.TaskProgress{Name: "Downloading missing tool " + tool.String()})
+	if err := DownloadToolRelease(instance.pm, tool, downloadCB); err != nil {
+		return false, fmt.Errorf("downloading %s tool: %s", tool, err)
+	}
+	taskCB(&rpc.TaskProgress{Completed: true})
+	if err := InstallToolRelease(instance.pm, tool, taskCB); err != nil {
+		return false, fmt.Errorf("installing %s tool: %s", tool, err)
+	}
+	return true, nil
+}
 
-	if downloadCB != nil {
-		serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(instance.pm)
-		if !serialDiscoveryTool.IsInstalled() {
-			//formatter.Print("Downloading and installing missing tool: " + serialDiscoveryTool.String())
-			if err := DownloadToolRelease(instance.pm, serialDiscoveryTool, downloadCB); err != nil {
-				return fmt.Errorf(("could not download serial-discovery tool"))
-			}
-			if err := InstallToolRelease(instance.pm, serialDiscoveryTool, taskCB); err != nil {
-				return fmt.Errorf(("could not install serial-discovery tool"))
-			}
-			if err := instance.pm.LoadHardware(instance.config); err != nil {
-				return fmt.Errorf("could not load hardware packages: %s", err)
-			}
-		}
+func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
+	// Check for ctags tool
+	ctags, _ := getBuiltinCtagsTool(instance.pm)
+	ctagsInstalled, err := instance.installToolIfMissing(ctags, downloadCB, taskCB)
+	if err != nil {
+		return err
 	}
 
+	// Check for bultin serial-discovery tool
+	serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(instance.pm)
+	serialDiscoveryInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCB, taskCB)
+	if err != nil {
+		return err
+	}
+
+	if ctagsInstalled || serialDiscoveryInstalled {
+		if err := instance.pm.LoadHardware(instance.config); err != nil {
+			return fmt.Errorf("could not load hardware packages: %s", err)
+		}
+	}
+	return nil
+}
+
+func (instance *CoreInstance) startDiscoveries() error {
 	serialDiscovery, err := newBuiltinSerialDiscovery(instance.pm)
 	if err != nil {
 		return fmt.Errorf("starting serial discovery: %s", err)
@@ -162,10 +182,16 @@ func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, 
 	instancesCount++
 	instances[handle] = instance
 
-	if err := instance.startDiscoveries(downloadCB, taskCB); err != nil {
+	if err := instance.checkForBuiltinTools(downloadCB, taskCB); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	if err := instance.startDiscoveries(); err != nil {
 		// TODO: handle discovery errors
 		fmt.Println(err)
 	}
+
 	return &rpc.InitResp{
 		Instance:             &rpc.Instance{Id: handle},
 		PlatformsIndexErrors: reqPltIndex,
@@ -271,7 +297,7 @@ func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
 	coreInstance.pm = pm
 	coreInstance.lm = lm
 
-	coreInstance.startDiscoveries(nil, nil)
+	coreInstance.startDiscoveries()
 
 	return &rpc.RescanResp{
 		PlatformsIndexErrors: reqPltIndex,

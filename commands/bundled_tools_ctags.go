@@ -15,13 +15,13 @@
  * a commercial license, send an email to license@arduino.cc.
  */
 
-package compile
+package commands
 
 import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/resources"
-	"go.bug.st/relaxed-semver"
+	semver "go.bug.st/relaxed-semver"
 )
 
 func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
@@ -85,5 +85,6 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 var ctagsVersion = semver.ParseRelaxed("5.8-arduino11")
 
 func getBuiltinCtagsTool(pm *packagemanager.PackageManager) (*cores.ToolRelease, error) {
+	loadBuiltinCtagsMetadata(pm)
 	return pm.Package("builtin").Tool("ctags").Release(ctagsVersion).Get()
 }
