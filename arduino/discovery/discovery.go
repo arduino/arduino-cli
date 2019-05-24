@@ -114,17 +114,15 @@ func (d *Discovery) List() ([]*BoardPort, error) {
 
 // Close stops the Discovery and free the resources
 func (d *Discovery) Close() error {
-	// TODO: Send QUIT for safe close or terminate process after a small timeout
-	if err := d.in.Close(); err != nil {
-		return fmt.Errorf("closing stdin pipe: %s", err)
-	}
-	if err := d.out.Close(); err != nil {
-		return fmt.Errorf("closing stdout pipe: %s", err)
-	}
-	if d.cmd != nil {
-		d.cmd.Process.Kill()
-	}
-	return nil
+	_, _ = d.in.Write([]byte("QUIT\n"))
+	_ = d.in.Close()
+	_ = d.out.Close()
+	timer := time.AfterFunc(time.Second, func() {
+		_ = d.cmd.Process.Kill()
+	})
+	err := d.cmd.Wait()
+	_ = timer.Stop()
+	return err
 }
 
 // ExtractDiscoveriesFromPlatforms returns all Discovery from all the installed platforms.
