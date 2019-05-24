@@ -18,12 +18,16 @@
 package board
 
 import (
+	"context"
+	"fmt"
+	"os"
 	"sort"
-	"strings"
 
 	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/common/formatter/output"
+	"github.com/arduino/arduino-cli/output"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
 )
 
@@ -45,36 +49,30 @@ func initListAllCommand() *cobra.Command {
 
 // runListAllCommand list all installed boards
 func runListAllCommand(cmd *cobra.Command, args []string) {
-	pm, _ := cli.InitPackageAndLibraryManager()
+	instance := cli.CreateInstance()
 
-	match := func(name string) bool {
-		name = strings.ToLower(name)
-		for _, term := range args {
-			if !strings.Contains(name, strings.ToLower(term)) {
-				return false
-			}
-		}
-		return true
+	list, err := board.BoardListAll(context.Background(), &rpc.BoardListAllReq{
+		Instance:   instance,
+		SearchArgs: args,
+	})
+	if err != nil {
+		formatter.PrintError(err, "Error listing boards")
+		os.Exit(cli.ErrGeneric)
 	}
+	if cli.OutputJSONOrElse(list) {
+		outputBoardListAll(list)
+	}
+}
 
-	list := &output.BoardList{}
-	for _, targetPackage := range pm.GetPackages().Packages {
-		for _, platform := range targetPackage.Platforms {
-			platformRelease := pm.GetInstalledPlatformRelease(platform)
-			if platformRelease == nil {
-				continue
-			}
-			for _, board := range platformRelease.Boards {
-				if !match(board.Name()) {
-					continue
-				}
-				list.Boards = append(list.Boards, &output.BoardListItem{
-					Name: board.Name(),
-					Fqbn: board.FQBN(),
-				})
-			}
-		}
+func outputBoardListAll(list *rpc.BoardListAllResp) {
+	sort.Slice(list.Boards, func(i, j int) bool {
+		return list.Boards[i].GetName() < list.Boards[j].GetName()
+	})
+
+	table := output.NewTable()
+	table.SetHeader("Board Name", "FQBN")
+	for _, item := range list.GetBoards() {
+		table.AddRow(item.GetName(), item.GetFQBN())
 	}
-	sort.Sort(list)
-	formatter.Print(list)
+	fmt.Print(table.Render())
 }

@@ -58,6 +58,8 @@ service ArduinoCore {
 
   rpc BoardList(BoardListReq) returns (BoardListResp);
 
+  rpc BoardListAll(BoardListAllReq) returns (BoardListAllResp);
+
   rpc Compile(CompileReq) returns (stream CompileResp);
 
   rpc PlatformInstall(PlatformInstallReq) returns (stream PlatformInstallResp);
