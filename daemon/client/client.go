@@ -313,6 +313,29 @@ func main() {
 		}
 	}
 
+	// BOARD LIST ALL
+	fmt.Println("=== calling BoardListAll(mkr)")
+	boardListAllResp, err := client.BoardListAll(context.Background(), &rpc.BoardListAllReq{
+		Instance:   instance,
+		SearchArgs: []string{"mkr"},
+	})
+	if err != nil {
+		fmt.Printf("Board list-all error: %s\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("---> %+v\n", boardListAllResp)
+	fmt.Println()
+
+	// BOARD LIST
+	fmt.Println("=== calling BoardList()")
+	boardListResp, err := client.BoardList(context.Background(), &rpc.BoardListReq{Instance: instance})
+	if err != nil {
+		fmt.Printf("Board list error: %s\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("---> %+v\n", boardListResp)
+	fmt.Println()
+
 	// PLATFORM UNINSTALL
 	fmt.Println("=== calling PlatformUninstall(arduino:samd)")
 	uninstallRespStream, err := client.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
