@@ -18,10 +18,9 @@
 package version
 
 import (
+	"fmt"
+
 	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/common/formatter/output"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -38,11 +37,17 @@ func InitCommand() *cobra.Command {
 	return versionCommand
 }
 
+type versionOutput struct {
+	Command string `json:"command"`
+	Version string `json:"version"`
+}
+
 func run(cmd *cobra.Command, args []string) {
-	logrus.Info("Calling version command on `arduino`")
-	versionInfo := output.VersionResult{
-		CommandName: cmd.Parent().Name(),
-		Version:     cli.Version,
+	res := &versionOutput{
+		Command: cmd.Parent().Name(),
+		Version: cli.Version,
 	}
-	formatter.Print(versionInfo)
+	if cli.OutputJSONOrElse(res) {
+		fmt.Printf("%s version %s\n", res.Command, res.Version)
+	}
 }

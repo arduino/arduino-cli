@@ -44,6 +44,15 @@ func main() {
 	client := rpc.NewArduinoCoreClient(conn)
 	fmt.Println()
 
+	// VERSION
+	fmt.Println("=== calling Version")
+	versionResp, err := client.Version(context.Background(), &rpc.VersionReq{})
+	if err != nil {
+		fmt.Printf("Error getting version: %s\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("---> %+v\n\v", versionResp)
+
 	// INIT
 	fmt.Println("=== calling Init")
 	initRespStream, err := client.Init(context.Background(), &rpc.InitReq{

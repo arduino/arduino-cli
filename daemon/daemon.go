@@ -26,6 +26,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
@@ -117,6 +118,10 @@ func (s *ArduinoCoreServerImpl) Init(req *rpc.InitReq, stream rpc.ArduinoCore_In
 	}
 	fmt.Println(resp)
 	return stream.Send(resp)
+}
+
+func (s *ArduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionReq) (*rpc.VersionResp, error) {
+	return &rpc.VersionResp{Version: cli.Version}, nil
 }
 
 func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoCore_CompileServer) error {
