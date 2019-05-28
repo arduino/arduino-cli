@@ -27,7 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
-func BoardDetails(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
+func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
 	pm := commands.GetPackageManager(req)
 	if pm == nil {
 		return nil, errors.New("invalid instance")

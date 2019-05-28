@@ -26,7 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
-func BoardListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllResp, error) {
+func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllResp, error) {
 	pm := commands.GetPackageManager(req)
 	if pm == nil {
 		return nil, errors.New("invalid instance")

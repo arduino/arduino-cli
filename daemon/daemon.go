@@ -58,20 +58,20 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 type ArduinoCoreServerImpl struct{}
 
 func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
-	return board.BoardDetails(ctx, req)
+	return board.Details(ctx, req)
 }
 
 func (s *ArduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardListReq) (*rpc.BoardListResp, error) {
-	return board.BoardList(ctx, req)
+	return board.List(ctx, req)
 }
 
 func (s *ArduinoCoreServerImpl) BoardListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllResp, error) {
-	return board.BoardListAll(ctx, req)
+	return board.ListAll(ctx, req)
 }
 
 func (s *ArduinoCoreServerImpl) BoardAttach(req *rpc.BoardAttachReq, stream rpc.ArduinoCore_BoardAttachServer) error {
 
-	resp, err := board.BoardAttach(stream.Context(), req,
+	resp, err := board.Attach(stream.Context(), req,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.BoardAttachResp{TaskProgress: p}) },
 	)
 	if err != nil {
@@ -207,10 +207,10 @@ func feedStream(streamer func(data []byte)) io.Writer {
 	go func() {
 		data := make([]byte, 1024)
 		for {
-			if n, err := r.Read(data); err != nil {
-				return
-			} else {
+			if n, err := r.Read(data); err == nil {
 				streamer(data[:n])
+			} else {
+				return
 			}
 		}
 	}()

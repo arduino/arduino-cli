@@ -45,7 +45,7 @@ func initDetailsCommand() *cobra.Command {
 func runDetailsCommand(cmd *cobra.Command, args []string) {
 	instance := cli.CreateInstance()
 
-	res, err := board.BoardDetails(context.Background(), &rpc.BoardDetailsReq{
+	res, err := board.Details(context.Background(), &rpc.BoardDetailsReq{
 		Instance: instance,
 		Fqbn:     args[0],
 	})

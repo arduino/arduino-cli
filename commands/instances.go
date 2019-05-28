@@ -305,7 +305,8 @@ func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
 	}, nil
 }
 
-func createInstance(ctx context.Context, config *configs.Configuration, getLibOnly bool) (*packagemanager.PackageManager, *librariesmanager.LibrariesManager, []string, string, error) {
+func createInstance(ctx context.Context, config *configs.Configuration, getLibOnly bool) (
+	*packagemanager.PackageManager, *librariesmanager.LibrariesManager, []string, string, error) {
 	var pm *packagemanager.PackageManager
 	platformIndexErrors := []string{}
 	if !getLibOnly {

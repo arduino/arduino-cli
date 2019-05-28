@@ -576,11 +576,11 @@ board_manager:
 	require.NoError(t, err, "Writing empty json index file")
 
 	// Empty cores list
-	exitCode, d := executeWithArgs(t, "--config-file", configFile.String(), "core", "list")
+	exitCode, _ := executeWithArgs(t, "--config-file", configFile.String(), "core", "list")
 	require.Zero(t, exitCode, "exit code")
 
 	// Dump config with cmd-line specific file
-	exitCode, d = executeWithArgs(t, "--config-file", configFile.String(), "config", "dump")
+	exitCode, d := executeWithArgs(t, "--config-file", configFile.String(), "config", "dump")
 	require.Zero(t, exitCode, "exit code")
 	require.Contains(t, string(d), "- http://www.invalid-domain-asjkdakdhadjkh.com/package_example_index.json")
 

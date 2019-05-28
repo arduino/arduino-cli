@@ -55,7 +55,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	// FIXME: make a specification on how a port is specified via command line
 	port := req.GetPort()
 	if port == "" {
-		return nil, fmt.Errorf("No port provided")
+		return nil, fmt.Errorf("no upload port provided")
 	}
 
 	fqbnIn := req.GetFqbn()
@@ -63,7 +63,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		fqbnIn = sketch.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
-		return nil, fmt.Errorf("No Fully Qualified Board Name provided")
+		return nil, fmt.Errorf("no Fully Qualified Board Name provided")
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
@@ -170,9 +170,8 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	if _, err := uploadFile.Stat(); err != nil {
 		if os.IsNotExist(err) {
 			return nil, fmt.Errorf("compiled sketch %s not found", uploadFile.String())
-		} else {
-			return nil, fmt.Errorf("cannot open sketch: %s", err)
 		}
+		return nil, fmt.Errorf("cannot open sketch: %s", err)
 	}
 
 	// Perform reset via 1200bps touch if requested
