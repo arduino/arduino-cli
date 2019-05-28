@@ -29,7 +29,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-// InitCommand initalize the command
+// InitCommand initialize the command
 func InitCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "daemon",

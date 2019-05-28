@@ -62,7 +62,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		time.Sleep(timeout)
 	}
 
-	resp, err := board.BoardList(context.Background(), &rpc.BoardListReq{Instance: instance})
+	resp, err := board.List(context.Background(), &rpc.BoardListReq{Instance: instance})
 	if err != nil {
 		formatter.PrintError(err, "Error detecting boards")
 		os.Exit(cli.ErrNetwork)

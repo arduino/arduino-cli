@@ -51,7 +51,7 @@ func initListAllCommand() *cobra.Command {
 func runListAllCommand(cmd *cobra.Command, args []string) {
 	instance := cli.CreateInstance()
 
-	list, err := board.BoardListAll(context.Background(), &rpc.BoardListAllReq{
+	list, err := board.ListAll(context.Background(), &rpc.BoardListAllReq{
 		Instance:   instance,
 		SearchArgs: args,
 	})

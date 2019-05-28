@@ -21,4 +21,5 @@ import (
 	colorable "github.com/mattn/go-colorable"
 )
 
-var colorStdout = colorable.NewColorableStdout()
+// TODO: Feed text output into colorable stdOut
+var _ = colorable.NewColorableStdout()

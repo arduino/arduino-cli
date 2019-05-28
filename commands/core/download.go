@@ -80,4 +80,3 @@ func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, do
 
 	return commands.DownloadToolRelease(pm, tool, downloadCB)
 }
-

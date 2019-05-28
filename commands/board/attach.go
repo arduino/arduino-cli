@@ -34,7 +34,7 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 )
 
-func BoardAttach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskProgressCB) (*rpc.BoardAttachResp, error) {
+func Attach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskProgressCB) (*rpc.BoardAttachResp, error) {
 
 	pm := commands.GetPackageManager(req)
 	if pm == nil {

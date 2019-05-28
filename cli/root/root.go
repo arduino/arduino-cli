@@ -29,10 +29,10 @@ import (
 	"github.com/arduino/arduino-cli/cli/daemon"
 	"github.com/arduino/arduino-cli/cli/lib"
 	"github.com/arduino/arduino-cli/cli/upload"
+	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/commands/config"
 	"github.com/arduino/arduino-cli/commands/generatedocs"
 	"github.com/arduino/arduino-cli/commands/sketch"
-	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
 	paths "github.com/arduino/go-paths-helper"
@@ -42,7 +42,7 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-// Init prepares the cobra root command. 
+// Init prepares the cobra root command.
 func Init() *cobra.Command {
 	command := &cobra.Command{
 		Use:              "arduino-cli",
