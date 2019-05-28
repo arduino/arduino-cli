@@ -578,7 +578,6 @@ board_manager:
 	// Empty cores list
 	exitCode, d := executeWithArgs(t, "--config-file", configFile.String(), "core", "list")
 	require.Zero(t, exitCode, "exit code")
-	require.Empty(t, strings.TrimSpace(string(d)))
 
 	// Dump config with cmd-line specific file
 	exitCode, d = executeWithArgs(t, "--config-file", configFile.String(), "config", "dump")
