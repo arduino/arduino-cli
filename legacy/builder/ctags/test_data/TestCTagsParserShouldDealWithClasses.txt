@@ -1,0 +1,2 @@
+SleepCycle	/tmp/sketch9043227824785312266.cpp	/^        SleepCycle( const char* name );$/;"	kind:prototype	line:4	signature:( const char* name )
+SleepCycle	/tmp/sketch9043227824785312266.cpp	/^    SleepCycle::SleepCycle( const char* name )$/;"	kind:function	line:8	signature:( const char* name )

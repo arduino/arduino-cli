@@ -1,0 +1,7 @@
+BUG	/tmp/test547238273/preproc/bug_callback.ino	/^  public: BUG(void (*fn)(void)) {}$/;"	kind:function	line:6	class:BUG	signature:(void (*fn)(void))
+b	/tmp/test547238273/preproc/bug_callback.ino	/^BUG b(makeItBreak); \/\/this will break$/;"	kind:prototype	line:10	signature:(makeItBreak)returntype:BUG
+setup	/tmp/test547238273/preproc/bug_callback.ino	/^void setup() {$/;"	kind:function	line:12	signature:()	returntype:void
+loop	/tmp/test547238273/preproc/bug_callback.ino	/^void loop() {}$/;"	kind:function	line:16	signature:()	returntype:void
+makeItBreak	/tmp/test547238273/preproc/bug_callback.ino	/^void makeItBreak() {}$/;"	kind:function	line:18	signature:()	returntype:void
+caller	/tmp/test547238273/preproc/bug_callback.ino	/^void caller(int (*cc)(int ),int a) {$/;"	kind:function	line:20	signature:(int (*cc)(int ),int a)	returntype:void
+blub	/tmp/test547238273/preproc/bug_callback.ino	/^int blub(int a) {$/;"	kind:function	line:24	signature:(int a)	returntype:int
