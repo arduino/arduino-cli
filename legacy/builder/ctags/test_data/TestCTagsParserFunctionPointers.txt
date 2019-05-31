@@ -1,0 +1,5 @@
+setup	/tmp/test907446433/preproc/ctags_target.cpp	/^void setup(){$/;"	kind:function	line:2	signature:()	returntype:void
+loop	/tmp/test907446433/preproc/ctags_target.cpp	/^void loop(){}$/;"	kind:function	line:5	signature:()	returntype:void
+func	/tmp/test907446433/preproc/ctags_target.cpp	/^void (*func())(){$/;"	kind:function	line:7	signature:()	returntype:void
+funcArr	/tmp/test907446433/preproc/ctags_target.cpp	/^int (&funcArr())[5]{$/;"	kind:function	line:11	signature:()	returntype:int
+funcCombo	/tmp/test907446433/preproc/ctags_target.cpp	/^void (*(&funcCombo(void (*(&in)[5])(int)))[5])(int){$/;"	kind:function	line:15	signature:(void (*(&in)[5])(int))	returntype:void

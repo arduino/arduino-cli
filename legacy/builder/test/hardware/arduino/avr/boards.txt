@@ -1,0 +1,18 @@
+
+micro.vid.4=0x2341
+micro.pid.4=0x0237
+# If the board is a 2341:0237 use 2341:8237 for build and set
+# other parameters as well
+micro.vid.4.build.vid=0x2341
+micro.vid.4.build.pid=0x8237
+micro.vid.4.build.usb_product="Genuino Micro"
+micro.vid.4.bootloader.file=caterina/Caterina-Genuino-Micro.hex
+
+micro.vid.5=0x2341
+micro.pid.5=0x8237
+# If the board is a 2341:8237 use 2341:8237 for build and set
+# other paramters as well
+micro.vid.5.build.vid=0x2341
+micro.vid.5.build.pid=0x8237
+micro.vid.5.build.usb_product="Genuino Micro"
+micro.vid.5.bootloader.file=caterina/Caterina-Genuino-Micro.hex

@@ -3,11 +3,10 @@ module github.com/arduino/arduino-cli
 go 1.12
 
 require (
-	github.com/arduino/arduino-builder v0.0.0-20190412183451-a4859ca30383
 	github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c
 	github.com/arduino/go-paths-helper v0.0.0-20190214132331-c3c98d1bf2e1
 	github.com/arduino/go-properties-orderedmap v0.0.0-20181003091528-89278049acd3
-	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b // indirect
+	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
 	github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b
 	github.com/bouk/monkey v1.0.0
 	github.com/cmaglie/pb v1.0.27
@@ -18,7 +17,8 @@ require (
 	github.com/fatih/color v1.6.0
 	github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 // indirect
 	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
-	github.com/go-errors/errors v1.0.1 // indirect
+	github.com/fsnotify/fsnotify v1.4.7
+	github.com/go-errors/errors v1.0.1
 	github.com/golang/protobuf v1.3.1
 	github.com/gosuri/uitable v0.0.0-20160404203958-36ee7e946282
 	github.com/h2non/filetype v1.0.8 // indirect
@@ -49,6 +49,7 @@ require (
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45
 	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 	golang.org/x/net v0.0.0-20190311183353-d8887717615a
+	golang.org/x/text v0.3.0
 	google.golang.org/genproto v0.0.0-20190327125643-d831d65fe17d // indirect
 	google.golang.org/grpc v1.19.1
 	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
