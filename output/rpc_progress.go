@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/rpc"
-	pb "gopkg.in/cheggaaa/pb.v1"
+	"github.com/cmaglie/pb"
 )
 
 // NewDownloadProgressBarCB creates a progress bar callback that outputs a progress

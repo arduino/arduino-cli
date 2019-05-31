@@ -22,8 +22,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cmaglie/pb"
 	"go.bug.st/downloader"
-	pb "gopkg.in/cheggaaa/pb.v1"
 )
 
 // TextFormatter represents a Formatter for a text console
