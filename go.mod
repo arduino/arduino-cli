@@ -44,7 +44,7 @@ require (
 	github.com/spf13/pflag v1.0.1 // indirect
 	github.com/stretchr/testify v1.3.0
 	go.bug.st/cleanup v1.0.0
-	go.bug.st/downloader v0.0.0-20181116113543-9b8976a44d87
+	go.bug.st/downloader v1.1.0
 	go.bug.st/relaxed-semver v0.0.0-20181022103824-0265409c5852
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45
 	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
