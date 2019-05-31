@@ -1,0 +1,8 @@
+sensorData	/tmp/build7315640391316178285.tmp/preproc/ctags_target.cpp	/^struct sensorData {$/;"	kind:struct	line:2
+sensorData	/tmp/build7315640391316178285.tmp/preproc/ctags_target.cpp	/^  sensorData(int iStatus, float iTemp, float iMinTemp) : status(iStatus), temp(iTemp), minTemp(iMinTemp) {}$/;"	kind:function	line:3	struct:sensorData	signature:(int iStatus, float iTemp, float iMinTemp)
+sensorData	/tmp/build7315640391316178285.tmp/preproc/ctags_target.cpp	/^  sensorData() : status(-1), temp(1023.0), minTemp(1023.0) {}$/;"	kind:function	line:4	struct:sensorData	signature:()
+sensors	/tmp/build7315640391316178285.tmp/preproc/ctags_target.cpp	/^sensorData sensors[2];$/;"	kind:variable	line:10
+sensor1	/tmp/build7315640391316178285.tmp/preproc/ctags_target.cpp	/^sensorData sensor1; \/\/(-1,1023.0,1023.0);$/;"	kind:variable	line:12
+sensor2	/tmp/build7315640391316178285.tmp/preproc/ctags_target.cpp	/^sensorData sensor2; \/\/(-1,1023.0,1023.0);$/;"	kind:variable	line:13
+setup	/tmp/build7315640391316178285.tmp/preproc/ctags_target.cpp	/^void setup() {$/;"	kind:function	line:16	signature:()	returntype:void
+loop	/tmp/build7315640391316178285.tmp/preproc/ctags_target.cpp	/^void loop() {$/;"	kind:function	line:22	signature:()	returntype:void

@@ -1,0 +1,4 @@
+value	/tmp/test030883150/preproc/ctags_target.cpp	/^    int value() {$/;"	kind:function	line:3	namespace:Test	signature:()	returntype:int
+setup	/tmp/test030883150/preproc/ctags_target.cpp	/^void setup() {}$/;"	kind:function	line:8	signature:()	returntype:void
+loop	/tmp/test030883150/preproc/ctags_target.cpp	/^void loop() {}$/;"	kind:function	line:9	signature:()	returntype:void
+

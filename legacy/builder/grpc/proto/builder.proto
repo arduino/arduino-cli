@@ -1,0 +1,63 @@
+// Copyright 2015 gRPC authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// compile me with: protoc -I proto/ proto/builder.proto  --go_out=plugins=grpc:proto
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "cc.arduino.builder";
+option java_outer_classname = "BuilderProto";
+
+package proto;
+
+// Interface exported by the server.
+service Builder {
+
+  // A server-to-client streaming RPC.
+  //
+  // Obtains the Features available within the given Rectangle.  Results are
+  // streamed rather than returned at once (e.g. in a response message with a
+  // repeated field), as the rectangle may cover a large area and contain a
+  // huge number of features.
+  rpc Build(BuildParams) returns (stream Response) {}
+
+  rpc Autocomplete(BuildParams) returns (Response) {}
+
+  rpc DropCache(VerboseParams) returns (Response) {}
+}
+
+message BuildParams {
+  string hardwareFolders = 1;
+  string toolsFolders = 2;
+  string builtInLibrariesFolders = 3;
+  string otherLibrariesFolders = 4;
+  string sketchLocation = 5;
+  string fQBN = 6;
+  string arduinoAPIVersion = 7;
+  string customBuildProperties = 8;
+  string buildCachePath = 9;
+  string buildPath = 10;
+  string warningsLevel = 11;
+  string codeCompleteAt = 12;
+  bool verbose = 13;
+}
+
+message VerboseParams {
+  bool verbose = 1;
+}
+
+message Response {
+  string line = 1;
+}

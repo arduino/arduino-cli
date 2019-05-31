@@ -1,0 +1,6 @@
+set_values	/tmp/test834438754/preproc/ctags_target.cpp	/^    void set_values (int,int);$/;"	kind:prototype	line:5	class:Rectangle	signature:(int,int)	returntype:void
+area	/tmp/test834438754/preproc/ctags_target.cpp	/^    int area() {return width*height;}$/;"	kind:function	line:6	class:Rectangle	signature:()	returntype:int
+set_values	/tmp/test834438754/preproc/ctags_target.cpp	/^void Rectangle::set_values (int x, int y) {$/;"	kind:function	line:9	class:Rectangle	signature:(int x, int y)	returntype:void
+setup	/tmp/test834438754/preproc/ctags_target.cpp	/^void setup() {$/;"	kind:function	line:14	signature:()	returntype:void
+loop	/tmp/test834438754/preproc/ctags_target.cpp	/^void loop() {$/;"	kind:function	line:18	signature:()	returntype:void
+
