@@ -19,9 +19,12 @@ package resources
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+	"runtime"
 
-	paths "github.com/arduino/go-paths-helper"
+	"github.com/arduino/arduino-cli/global"
+	"github.com/arduino/go-paths-helper"
 	"go.bug.st/downloader"
 )
 
@@ -73,5 +76,18 @@ func (r *DownloadResource) Download(downloadDir *paths.Path) (*downloader.Downlo
 		return nil, fmt.Errorf("getting archive file info: %s", err)
 	}
 
-	return downloader.Download(path.String(), r.URL)
+	downloadConfig := r.ConfigureDownloader()
+	return downloader.DownloadWithConfig(path.String(), r.URL, downloadConfig)
+}
+
+// ConfigureDownloader adds additional config to the downloader helper
+func (r *DownloadResource) ConfigureDownloader() downloader.Config {
+	userAgentHeaderValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", global.GetApplication(),
+		global.GetVersion(), runtime.GOARCH, runtime.GOOS, runtime.Version(), global.GetCommit(), global.GetBuildDate())
+	downloadConfig := downloader.Config{
+		RequestHeaders: http.Header{
+			"User-Agent": []string{userAgentHeaderValue},
+		},
+	}
+	return downloadConfig
 }
