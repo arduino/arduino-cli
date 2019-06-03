@@ -18,34 +18,30 @@
 package lib
 
 import (
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
+	"context"
+	"fmt"
+
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	"github.com/arduino/arduino-cli/rpc"
 )
 
-func initUpgradeCommand() *cobra.Command {
-	listCommand := &cobra.Command{
-		Use:   "upgrade",
-		Short: "Upgrades installed libraries.",
-		Long: "This command ungrades all installed libraries to the latest available version." +
-			"To upgrade a single library use the 'install' command.",
-		Example: "  " + commands.AppName + " lib upgrade",
-		Args:    cobra.NoArgs,
-		Run:     runUpgradeCommand,
-	}
-	return listCommand
-}
+func LibraryUpgradeAll(ctx context.Context, req *rpc.LibraryUpgradeAllReq, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
+	lm := commands.GetLibraryManager(req)
 
-func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	lm := commands.InitLibraryManager(nil)
-	list := listLibraries(lm, true)
-	libReleases := []*librariesindex.Release{}
-	for _, upgradeDesc := range list.Libraries {
-		libReleases = append(libReleases, upgradeDesc.Available)
+	// Obtain the list of upgradable libraries
+	list := listLibraries(lm, true, true)
+
+	for _, upgradeDesc := range list {
+		if err := downloadLibrary(lm, upgradeDesc.Available, downloadCB, taskCB); err != nil {
+			return err
+		}
+	}
+	for _, upgradeDesc := range list {
+		installLibrary(lm, upgradeDesc.Available, taskCB)
 	}
 
-	downloadLibraries(lm, libReleases)
-	installLibraries(lm, libReleases)
-	logrus.Info("Done")
+	if _, err := commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
+		return fmt.Errorf("rescanning libraries: %s", err)
+	}
+	return nil
 }

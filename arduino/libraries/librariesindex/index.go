@@ -22,13 +22,16 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/resources"
-	"go.bug.st/relaxed-semver"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // Index represents the list of libraries available for download
 type Index struct {
 	Libraries map[string]*Library
 }
+
+// EmptyIndex is an empty library index
+var EmptyIndex = &Index{Libraries: map[string]*Library{}}
 
 // Library is a library available for download
 type Library struct {
@@ -59,7 +62,8 @@ func (r *Release) String() string {
 }
 
 // FindRelease search a library Release in the index. Returns nil if the
-// release is not found
+// release is not found. If the version is not specified returns the latest
+// version available.
 func (idx *Index) FindRelease(ref *Reference) *Release {
 	if library, exists := idx.Libraries[ref.Name]; exists {
 		if ref.Version == nil {

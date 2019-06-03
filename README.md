@@ -30,9 +30,9 @@ Once downloaded, place the executable into a directory which is in your `PATH` e
 
 ### Build the latest "bleeding-edge" from source
 
-* You should have a recent Go compiler installed.
-* Run `go get -u github.com/arduino/arduino-cli`
-* The `arduino-cli` executable will be produced in `$GOPATH/bin/arduino-cli`
+- You should have a recent Go compiler installed.
+- Run `go get -u github.com/arduino/arduino-cli`
+- The `arduino-cli` executable will be produced in `$GOPATH/bin/arduino-cli`
 
 You may want to copy the executable into a directory which is in your `PATH` environment variable
 (such as `/usr/local/bin/`).
@@ -45,7 +45,8 @@ The Arduino CLI aims to replace the majority of features the Arduino IDE has wit
 ## Getting Started
 
 ### Step 1. Create a new sketch
-The command will create a new empty sketch named MyFirstSketch in the default directory under $HOME/Arduino/
+
+The command will create a new empty sketch named MyFirstSketch in the default directory under \$HOME/Arduino/
 
     $ arduino-cli sketch new MyFirstSketch
     Sketch created in: /home/luca/Arduino/MyFirstSketch
@@ -58,6 +59,7 @@ The command will create a new empty sketch named MyFirstSketch in the default di
     }
 
 ### Step 2. Modify your sketch
+
 Use your favourite file editor or IDE to modify the .ino file under: `$HOME/Arduino/MyFirstSketch/MyFirstSketch.ino`
 and change the file to look like this one:
 
@@ -73,6 +75,7 @@ and change the file to look like this one:
     }
 
 ### Step 3. Connect the board to your PC
+
 If you are running a fresh install of the arduino-cli you probably need to update the platform indexes by running:
 
     $ arduino-cli core update-index
@@ -139,7 +142,6 @@ Now verify we have installed the core properly by running
     ID              Installed       Latest  Name
     arduino:samd    1.6.19          1.6.19  Arduino SAMD Boards (32-bits ARM Cortex-M0+)
 
-
 We can finally check if the board is now recognized as a MKR1000
 
     $ arduino-cli board list
@@ -162,25 +164,29 @@ Great! Now we have the Board FQBN (Fully Qualified Board Name) `arduino:samd:mkr
 and the Board Name look good, we are ready to compile and upload the sketch
 
 #### Adding 3rd party cores
-To add 3rd party core packages add  a link of the additional package to the file  `arduino-cli.yaml`
+
+To add 3rd party core packages add a link of the additional package to the file `arduino-cli.yaml`
 
 If you want to add the ESP8266 core, for example:
 
     board_manager:
       additional_urls:
         - http://arduino.esp8266.com/stable/package_esp8266com_index.json
+
 And then run:
-    
+
     arduino-cli core update-index
     arduino-cli core install esp8266:esp8266
 
 ### Step 5. Compile the sketch
+
 To compile the sketch we have to run the `compile` command with the proper FQBN we just got in the previous command.
 
     $ arduino-cli compile --fqbn arduino:samd:mkr1000 Arduino/MyFirstSketch
     Sketch uses 9600 bytes (3%) of program storage space. Maximum is 262144 bytes.
 
 ### Step 6. Upload your sketch
+
 We can finally upload the sketch and see our board blinking, we now have to specify the serial port used by our board other than the FQBN:
 
     $ arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:samd:mkr1000 Arduino/MyFirstSketch
@@ -216,6 +222,7 @@ We can finally upload the sketch and see our board blinking, we now have to spec
     CPU reset.
 
 ### Step 7. Add libraries
+
 Now we can try to add a useful library to our sketch. We can at first look at the name of a library, our favourite one is the wifi101, here the command to get more info
 
     $ arduino-cli lib search wifi101
@@ -250,6 +257,7 @@ We are now ready to install it! Please be sure to use the full name of the lib a
 ## Inline Help
 
 `arduino-cli` is a container of commands, to see the full list just run:
+
 ```bash
 $ arduino-cli
 Arduino Command Line Interface (arduino-cli).
@@ -295,7 +303,7 @@ Flags:
   -h, --help   help for core
 
 Global Flags:
-      --config-file string   The custom config file (if not specified the default one will be used). (example  "/home/user/.config/arduino/arduino-cli/arduino-cli.yaml")
+      --config-file string   The custom config file (if not specified the default one will be used).
       --debug                Enables debug output (super verbose, used to debug the CLI).
       --format string        The output format, can be [text|json]. (default "text")
 
@@ -318,11 +326,10 @@ Because:
 
 #### What is the FQBN for ...?
 
-* Arduino UNO: `arduino:avr:uno`
-* Arduino Mega: `arduino:avr:mega`
-* Arduino Nano: `arduino:avr:nano` or `arduino:avr:nano:cpu=atmega328old` if you have the old bootloader
+- Arduino UNO: `arduino:avr:uno`
+- Arduino Mega: `arduino:avr:mega`
+- Arduino Nano: `arduino:avr:nano` or `arduino:avr:nano:cpu=atmega328old` if you have the old bootloader
 
 #### How can I find the core/FQBN for a board?
 
 See: https://github.com/arduino/arduino-cli#step-4-find-and-install-the-right-core
-

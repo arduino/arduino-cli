@@ -18,54 +18,51 @@
 package lib
 
 import (
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"context"
+
+	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/common/formatter/output"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	"github.com/arduino/arduino-cli/rpc"
 )
 
-func initListCommand() *cobra.Command {
-	listCommand := &cobra.Command{
-		Use:     "list",
-		Short:   "Shows a list of all installed libraries.",
-		Long:    "Shows a list of all installed libraries.",
-		Example: "  " + commands.AppName + " lib list",
-		Args:    cobra.NoArgs,
-		Run:     runListCommand,
-	}
-	listCommand.Flags().BoolVar(&listFlags.all, "all", false, "Include built-in libraries (from platforms and IDE) in listing.")
-	listCommand.Flags().BoolVar(&listFlags.updatable, "updatable", false, "List updatable libraries.")
-	return listCommand
+type installedLib struct {
+	Library   *libraries.Library
+	Available *librariesindex.Release
 }
 
-var listFlags struct {
-	all       bool
-	updatable bool
+func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResp, error) {
+	lm := commands.GetLibraryManager(req)
+
+	instaledLib := []*rpc.InstalledLibrary{}
+	res := listLibraries(lm, req.GetUpdatable(), req.GetAll())
+	if len(res) > 0 {
+		for _, lib := range res {
+			libtmp := GetOutputLibrary(lib.Library)
+			release := GetOutputRelease(lib.Available)
+			instaledLib = append(instaledLib, &rpc.InstalledLibrary{
+				Library: libtmp,
+				Release: release,
+			})
+		}
+
+		return &rpc.LibraryListResp{InstalledLibrary: instaledLib}, nil
+	}
+	return &rpc.LibraryListResp{}, nil
 }
 
-func runListCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Listing")
-	var pm *packagemanager.PackageManager
-	if listFlags.all {
-		pm = commands.InitPackageManager()
-	}
-	lm := commands.InitLibraryManager(pm)
-
-	res := listLibraries(lm, listFlags.updatable)
-	if len(res.Libraries) > 0 {
-		formatter.Print(res)
-	}
-	logrus.Info("Done")
-}
-
-func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool) *output.InstalledLibraries {
-	res := &output.InstalledLibraries{}
+// listLibraries returns the list of installed libraries. If updatable is true it
+// returns only the libraries that may be updated.
+func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bool) []*installedLib {
+	res := []*installedLib{}
 	for _, libAlternatives := range lm.Libraries {
 		for _, lib := range libAlternatives.Alternatives {
+			if !all {
+				if lib.Location != libraries.Sketchbook {
+					continue
+				}
+			}
 			var available *librariesindex.Release
 			if updatable {
 				available = lm.Index.FindLibraryUpdate(lib)
@@ -73,11 +70,72 @@ func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool) *outpu
 					continue
 				}
 			}
-			res.Libraries = append(res.Libraries, &output.InstalledLibary{
+			res = append(res, &installedLib{
 				Library:   lib,
 				Available: available,
 			})
 		}
 	}
 	return res
+}
+
+func GetOutputLibrary(lib *libraries.Library) *rpc.Library {
+	insdir := ""
+	if lib.InstallDir != nil {
+		insdir = lib.InstallDir.String()
+	}
+	srcdir := ""
+	if lib.SourceDir != nil {
+		srcdir = lib.SourceDir.String()
+	}
+	utldir := ""
+	if lib.UtilityDir != nil {
+		utldir = lib.UtilityDir.String()
+	}
+	cntplat := ""
+	if lib.ContainerPlatform != nil {
+		cntplat = lib.ContainerPlatform.String()
+	}
+
+	return &rpc.Library{
+		Name:              lib.Name,
+		Author:            lib.Author,
+		Maintainer:        lib.Maintainer,
+		Sentence:          lib.Sentence,
+		Paragraph:         lib.Paragraph,
+		Website:           lib.Website,
+		Category:          lib.Category,
+		Architectures:     lib.Architectures,
+		Types:             lib.Types,
+		InstallDir:        insdir,
+		SourceDir:         srcdir,
+		UtilityDir:        utldir,
+		Location:          lib.Location.String(),
+		ContainerPlatform: cntplat,
+		Layout:            lib.Layout.String(),
+		RealName:          lib.RealName,
+		DotALinkage:       lib.DotALinkage,
+		Precompiled:       lib.Precompiled,
+		LdFlags:           lib.LDflags,
+		IsLegacy:          lib.IsLegacy,
+		Version:           lib.Version.String(),
+		License:           lib.LDflags,
+	}
+}
+
+func GetOutputRelease(lib *librariesindex.Release) *rpc.LibraryRelease { //
+	if lib != nil {
+		return &rpc.LibraryRelease{
+			Author:        lib.Author,
+			Version:       lib.Version.String(),
+			Maintainer:    lib.Maintainer,
+			Sentence:      lib.Sentence,
+			Paragraph:     lib.Paragraph,
+			Website:       lib.Website,
+			Category:      lib.Category,
+			Architectures: lib.Architectures,
+			Types:         lib.Types,
+		}
+	}
+	return &rpc.LibraryRelease{}
 }

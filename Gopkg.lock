@@ -159,6 +159,20 @@
   version = "v1.2.1"
 
 [[projects]]
+  digest = "1:239c4c7fd2159585454003d9be7207167970194216193a8a210b8d29576f19c9"
+  name = "github.com/golang/protobuf"
+  packages = [
+    "proto",
+    "ptypes",
+    "ptypes/any",
+    "ptypes/duration",
+    "ptypes/timestamp",
+  ]
+  pruneopts = "UT"
+  revision = "b5d812f8a3706043e23a9cd5babf2e5423744d30"
+  version = "v1.3.1"
+
+[[projects]]
   branch = "master"
   digest = "1:4e08dc2383a46b3107f0b34ca338c4459e8fc8ee90e46a60e728aa8a2b21d558"
   name = "github.com/gosuri/uitable"
@@ -383,14 +397,22 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:aa0c2ae711605fdabbf35d0b9c0c57c6a9eba8b32b88ebce4ff5e435929ddf57"
+  digest = "1:7aaf877ec665ba605352afe9ba98970f8b3efe0dbcb276cdeab4fbfc4e5fd4c5"
   name = "golang.org/x/net"
   packages = [
     "bpf",
+    "context",
+    "http/httpguts",
+    "http2",
+    "http2/hpack",
+    "idna",
     "internal/iana",
     "internal/socket",
+    "internal/timeseries",
     "ipv4",
     "ipv6",
+    "lex/httplex",
+    "trace",
   ]
   pruneopts = "UT"
   revision = "5f9ae10d9af5b1c89ae6904293b14b064d4ada23"
@@ -407,19 +429,75 @@
   revision = "bb9c189858d91f42db229b04d45a4c3d23a7662a"
 
 [[projects]]
-  digest = "1:8029e9743749d4be5bc9f7d42ea1659471767860f0cdc34d37c3111bd308a295"
+  digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
   name = "golang.org/x/text"
   packages = [
+    "collate",
+    "collate/build",
+    "internal/colltab",
     "internal/gen",
+    "internal/tag",
     "internal/triegen",
     "internal/ucd",
+    "language",
+    "secure/bidirule",
     "transform",
+    "unicode/bidi",
     "unicode/cldr",
     "unicode/norm",
+    "unicode/rangetable",
   ]
   pruneopts = "UT"
   revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
   version = "v0.3.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:c3076e7defee87de1236f1814beb588f40a75544c60121e6eb38b3b3721783e2"
+  name = "google.golang.org/genproto"
+  packages = ["googleapis/rpc/status"]
+  pruneopts = "UT"
+  revision = "d831d65fe17df2e52bcc4316d4a9f7a418701f43"
+
+[[projects]]
+  digest = "1:c00eb80d7b152379c3e94c38d82b29deca98b1d0f53e4e20362589b7fcbffa07"
+  name = "google.golang.org/grpc"
+  packages = [
+    ".",
+    "balancer",
+    "balancer/base",
+    "balancer/roundrobin",
+    "binarylog/grpc_binarylog_v1",
+    "codes",
+    "connectivity",
+    "credentials",
+    "credentials/internal",
+    "encoding",
+    "encoding/proto",
+    "grpclog",
+    "internal",
+    "internal/backoff",
+    "internal/binarylog",
+    "internal/channelz",
+    "internal/envconfig",
+    "internal/grpcrand",
+    "internal/grpcsync",
+    "internal/syscall",
+    "internal/transport",
+    "keepalive",
+    "metadata",
+    "naming",
+    "peer",
+    "resolver",
+    "resolver/dns",
+    "resolver/passthrough",
+    "stats",
+    "status",
+    "tap",
+  ]
+  pruneopts = "UT"
+  revision = "3507fb8e1a5ad030303c106fef3a47c9fdad16ad"
+  version = "v1.19.1"
 
 [[projects]]
   branch = "master"
@@ -443,6 +521,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/arduino/arduino-builder",
+    "github.com/arduino/arduino-builder/i18n",
     "github.com/arduino/arduino-builder/types",
     "github.com/arduino/board-discovery",
     "github.com/arduino/go-paths-helper",
@@ -450,9 +529,9 @@
     "github.com/arduino/go-win32-utils",
     "github.com/bgentry/go-netrc/netrc",
     "github.com/bouk/monkey",
-    "github.com/codeclysm/cc",
     "github.com/codeclysm/extract",
     "github.com/fatih/color",
+    "github.com/golang/protobuf/proto",
     "github.com/gosuri/uitable",
     "github.com/mattn/go-colorable",
     "github.com/mitchellh/go-homedir",
@@ -470,6 +549,8 @@
     "go.bug.st/relaxed-semver",
     "go.bug.st/serial.v1",
     "golang.org/x/crypto/ssh/terminal",
+    "golang.org/x/net/context",
+    "google.golang.org/grpc",
     "gopkg.in/cheggaaa/pb.v1",
     "gopkg.in/yaml.v2",
   ]

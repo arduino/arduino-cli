@@ -18,66 +18,54 @@
 package lib
 
 import (
-	"os"
+	"context"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 )
 
-func initInstallCommand() *cobra.Command {
-	installCommand := &cobra.Command{
-		Use:   "install LIBRARY[@VERSION_NUMBER](S)",
-		Short: "Installs one of more specified libraries into the system.",
-		Long:  "Installs one or more specified libraries into the system.",
-		Example: "" +
-			"  " + commands.AppName + " lib install AudioZero       # for the latest version.\n" +
-			"  " + commands.AppName + " lib install AudioZero@1.0.0 # for the specific version.",
-		Args: cobra.MinimumNArgs(1),
-		Run:  runInstallCommand,
-	}
-	return installCommand
-}
+func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 
-func runInstallCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino lib install`")
-	lm := commands.InitLibraryManager(nil)
+	lm := commands.GetLibraryManager(req)
 
-	refs, err := librariesindex.ParseArgs(args)
+	libRelease, err := findLibraryIndexRelease(lm, req)
 	if err != nil {
-		formatter.PrintError(err, "Arguments error")
-		os.Exit(commands.ErrBadArgument)
+		return fmt.Errorf("looking for library: %s", err)
 	}
-	downloadLibrariesFromReferences(lm, refs)
-	installLibrariesFromReferences(lm, refs)
+
+	if err := downloadLibrary(lm, libRelease, downloadCB, taskCB); err != nil {
+		return fmt.Errorf("downloading library: %s", err)
+	}
+
+	if err := installLibrary(lm, libRelease, taskCB); err != nil {
+		return err
+	}
+
+	if _, err := commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
+		return fmt.Errorf("rescanning libraries: %s", err)
+	}
+	return nil
 }
 
-func installLibrariesFromReferences(lm *librariesmanager.LibrariesManager, refs []*librariesindex.Reference) {
-	libReleases := []*librariesindex.Release{}
-	for _, ref := range refs {
-		rel := lm.Index.FindRelease(ref)
-		if rel == nil {
-			formatter.PrintErrorMessage("Error: library " + ref.String() + " not found")
-			os.Exit(commands.ErrBadCall)
-		}
-		libReleases = append(libReleases, rel)
+func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release, taskCB commands.TaskProgressCB) error {
+	taskCB(&rpc.TaskProgress{Name: "Installing " + libRelease.String()})
+	logrus.WithField("library", libRelease).Info("Installing library")
+	libPath, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease)
+	if err != nil {
+		return fmt.Errorf("checking lib install prerequisites: %s", err)
 	}
-	installLibraries(lm, libReleases)
-}
-
-func installLibraries(lm *librariesmanager.LibrariesManager, libReleases []*librariesindex.Release) {
-	for _, libRelease := range libReleases {
-		logrus.WithField("library", libRelease).Info("Installing library")
-
-		if _, err := lm.Install(libRelease); err != nil {
-			logrus.WithError(err).Warn("Error installing library ", libRelease)
-			formatter.PrintError(err, "Error installing library: "+libRelease.String())
-			os.Exit(commands.ErrGeneric)
-		}
-
-		formatter.Print("Installed " + libRelease.String())
+	if libReplaced != nil {
+		taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("Replacing %s with %s", libReplaced, libRelease)})
 	}
+	if err := lm.Install(libRelease, libPath); err != nil {
+		return err
+	}
+	taskCB(&rpc.TaskProgress{Message: "Installed " + libRelease.String(), Completed: true})
+
+	return nil
 }

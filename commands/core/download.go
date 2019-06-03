@@ -18,89 +18,65 @@
 package core
 
 import (
-	"os"
-
-	"go.bug.st/downloader"
+	"context"
+	"errors"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	"github.com/arduino/arduino-cli/rpc"
 )
 
-func initDownloadCommand() *cobra.Command {
-	downloadCommand := &cobra.Command{
-		Use:   "download [PACKAGER:ARCH[=VERSION]](S)",
-		Short: "Downloads one or more cores and corresponding tool dependencies.",
-		Long:  "Downloads one or more cores and corresponding tool dependencies.",
-		Example: "" +
-			"  " + commands.AppName + " core download arduino:samd       # to download the latest version of arduino SAMD core.\n" +
-			"  " + commands.AppName + " core download arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
-		Args: cobra.MinimumNArgs(1),
-		Run:  runDownloadCommand,
+func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloadCB commands.DownloadProgressCB) (*rpc.PlatformDownloadResp, error) {
+	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
 	}
-	return downloadCommand
-}
 
-func runDownloadCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino core download`")
-
-	platformsRefs := parsePlatformReferenceArgs(args)
-	pm := commands.InitPackageManagerWithoutBundles()
-	for _, platformRef := range platformsRefs {
-		downloadPlatformByRef(pm, platformRef)
-	}
-}
-
-func downloadPlatformByRef(pm *packagemanager.PackageManager, platformsRef *packagemanager.PlatformReference) {
-	platform, tools, err := pm.FindPlatformReleaseDependencies(platformsRef)
+	version, err := commands.ParseVersion(req)
 	if err != nil {
-		formatter.PrintError(err, "Could not determine platform dependencies")
-		os.Exit(commands.ErrBadCall)
+		return nil, fmt.Errorf("invalid version: %s", err)
 	}
-	downloadPlatform(pm, platform)
+
+	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{
+		Package:              req.PlatformPackage,
+		PlatformArchitecture: req.Architecture,
+		PlatformVersion:      version,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("find platform dependencies: %s", err)
+	}
+
+	err = downloadPlatform(pm, platform, downloadCB)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, tool := range tools {
-		downloadTool(pm, tool)
+		err := downloadTool(pm, tool, downloadCB)
+		if err != nil {
+			return nil, fmt.Errorf("downloading tool %s: %s", tool, err)
+		}
 	}
+
+	return &rpc.PlatformDownloadResp{}, nil
 }
 
-func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) {
+func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, downloadCB commands.DownloadProgressCB) error {
 	// Download platform
 	resp, err := pm.DownloadPlatformRelease(platformRelease)
-	download(resp, err, platformRelease.String())
+	if err != nil {
+		return err
+	}
+	return commands.Download(resp, platformRelease.String(), downloadCB)
 }
 
-func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease) {
+func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB commands.DownloadProgressCB) error {
 	// Check if tool has a flavor available for the current OS
 	if tool.GetCompatibleFlavour() == nil {
-		formatter.PrintErrorMessage("The tool " + tool.String() + " is not available for the current OS")
-		os.Exit(commands.ErrGeneric)
+		return fmt.Errorf("tool %s not available for the current OS", tool)
 	}
 
-	DownloadToolRelease(pm, tool)
-}
-
-// DownloadToolRelease downloads a ToolRelease
-func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) {
-	resp, err := pm.DownloadToolRelease(toolRelease)
-	download(resp, err, toolRelease.String())
-}
-
-func download(d *downloader.Downloader, err error, label string) {
-	if err != nil {
-		formatter.PrintError(err, "Error downloading "+label)
-		os.Exit(commands.ErrNetwork)
-	}
-	if d == nil {
-		formatter.Print(label + " already downloaded")
-		return
-	}
-	formatter.Print("Downloading " + label + "...")
-	formatter.DownloadProgressBar(d, label)
-	if d.Error() != nil {
-		formatter.PrintError(d.Error(), "Error downloading "+label)
-		os.Exit(commands.ErrNetwork)
-	}
+	return commands.DownloadToolRelease(pm, tool, downloadCB)
 }
