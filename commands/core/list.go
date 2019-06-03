@@ -18,60 +18,40 @@
 package core
 
 import (
+	"context"
+	"errors"
+
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/common/formatter/output"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
-	semver "go.bug.st/relaxed-semver"
+	"github.com/arduino/arduino-cli/rpc"
 )
 
-func initListCommand() *cobra.Command {
-	listCommand := &cobra.Command{
-		Use:     "list",
-		Short:   "Shows the list of installed platforms.",
-		Long:    "Shows the list of installed platforms.",
-		Example: "  " + commands.AppName + " core list",
-		Args:    cobra.NoArgs,
-		Run:     runListCommand,
+func PlatformList(ctx context.Context, req *rpc.PlatformListReq) (*rpc.PlatformListResp, error) {
+	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
 	}
-	listCommand.Flags().BoolVar(&listFlags.updatableOnly, "updatable", false, "List updatable platforms.")
-	return listCommand
-}
 
-var listFlags struct {
-	updatableOnly bool
-}
-
-func runListCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino core list`")
-
-	pm := commands.InitPackageManager()
-
-	installed := []*output.InstalledPlatform{}
+	installed := []*rpc.InstalledPlatform{}
 	for _, targetPackage := range pm.GetPackages().Packages {
 		for _, platform := range targetPackage.Platforms {
 			if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
-				if listFlags.updatableOnly {
+				if req.GetUpdatableOnly() {
 					if latest := platform.GetLatestRelease(); latest == nil || latest == platformRelease {
 						continue
 					}
 				}
-				var latestVersion *semver.Version
-				if latest := platformRelease.Platform.GetLatestRelease(); latest != nil {
-					latestVersion = latest.Version
-				}
-				installed = append(installed, &output.InstalledPlatform{
+				p := &rpc.InstalledPlatform{
 					ID:        platformRelease.String(),
-					Installed: platformRelease.Version,
-					Latest:    latestVersion,
+					Installed: platformRelease.Version.String(),
 					Name:      platformRelease.Platform.Name,
-				})
+				}
+				if latest := platformRelease.Platform.GetLatestRelease(); latest != nil {
+					p.Latest = latest.Version.String()
+				}
+				installed = append(installed, p)
 			}
 		}
 	}
 
-	if len(installed) > 0 {
-		formatter.Print(output.InstalledPlatforms{Platforms: installed})
-	}
+	return &rpc.PlatformListResp{InstalledPlatform: installed}, nil
 }

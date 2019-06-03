@@ -22,7 +22,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/bgentry/go-netrc/netrc"
 	homedir "github.com/mitchellh/go-homedir"
@@ -36,7 +36,7 @@ func InitCommand() *cobra.Command {
 		Use:     "logout",
 		Short:   "Clears credentials for the Arduino Create Session.",
 		Long:    "Clears credentials for the Arduino Create Session.",
-		Example: "  " + commands.AppName + " logout",
+		Example: "  " + cli.AppName + " logout",
 		Args:    cobra.NoArgs,
 		Run:     run,
 	}
@@ -50,7 +50,7 @@ func run(cmd *cobra.Command, args []string) {
 	netRCHome, err := homedir.Dir()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get current home directory.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	netRCFile := filepath.Join(netRCHome, ".netrc")
@@ -64,20 +64,20 @@ func run(cmd *cobra.Command, args []string) {
 	netRC, err := netrc.Parse(file)
 	if err != nil {
 		formatter.PrintError(err, "Cannot parse .netrc file.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	netRC.RemoveMachine("arduino.cc")
 	content, err := netRC.MarshalText()
 	if err != nil {
 		formatter.PrintError(err, "Cannot parse new .netrc file.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	err = ioutil.WriteFile(netRCFile, content, 0600)
 	if err != nil {
 		formatter.PrintError(err, "Cannot write new .netrc file.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	formatter.PrintResult("Successfully logged out.")

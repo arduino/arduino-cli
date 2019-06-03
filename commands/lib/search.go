@@ -18,59 +18,60 @@
 package lib
 
 import (
-	"fmt"
+	"context"
+	"errors"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/common/formatter/output"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	"github.com/arduino/arduino-cli/rpc"
 )
 
-func initSearchCommand() *cobra.Command {
-	searchCommand := &cobra.Command{
-		Use:     "search [LIBRARY_NAME]",
-		Short:   "Searchs for one or more libraries data.",
-		Long:    "Search for one or more libraries data (case insensitive search).",
-		Example: "  " + commands.AppName + " lib search audio",
-		Args:    cobra.ArbitraryArgs,
-		Run:     runSearchCommand,
+func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.LibrarySearchResp, error) {
+	lm := commands.GetLibraryManager(req)
+	if lm == nil {
+		return nil, errors.New("invalid instance")
 	}
-	searchCommand.Flags().BoolVar(&searchFlags.names, "names", false, "Show library names only.")
-	return searchCommand
-}
 
-var searchFlags struct {
-	names bool // if true outputs lib names only.
-}
+	res := []*rpc.SearchedLibrary{}
 
-func runSearchCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino lib search`")
-	query := strings.ToLower(strings.Join(args, " "))
-
-	lm := commands.InitLibraryManager(nil)
-
-	res := output.LibSearchResults{
-		Libraries: []*librariesindex.Library{},
-	}
 	for _, lib := range lm.Index.Libraries {
-		if strings.Contains(strings.ToLower(lib.Name), query) {
-			res.Libraries = append(res.Libraries, lib)
+		if strings.Contains(strings.ToLower(lib.Name), strings.ToLower(req.GetQuery())) {
+			releases := map[string]*rpc.LibraryRelease{}
+			for str, rel := range lib.Releases {
+				releases[str] = GetLibraryParameters(rel)
+			}
+			latest := GetLibraryParameters(lib.Latest)
+
+			searchedlib := &rpc.SearchedLibrary{
+				Name:     lib.Name,
+				Releases: releases,
+				Latest:   latest,
+			}
+			res = append(res, searchedlib)
 		}
 	}
 
-	if searchFlags.names {
-		for _, lib := range res.Libraries {
-			formatter.Print(lib.Name)
-		}
-	} else {
-		if len(res.Libraries) == 0 {
-			formatter.Print(fmt.Sprintf("No library found matching `%s` search query", query))
-		} else {
-			formatter.Print(res)
-		}
+	return &rpc.LibrarySearchResp{Libraries: res}, nil
+}
+
+func GetLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
+	return &rpc.LibraryRelease{
+		Author:        rel.Author,
+		Version:       rel.Version.String(),
+		Maintainer:    rel.Maintainer,
+		Sentence:      rel.Sentence,
+		Paragraph:     rel.Paragraph,
+		Website:       rel.Website,
+		Category:      rel.Category,
+		Architectures: rel.Architectures,
+		Types:         rel.Types,
+		Resources: &rpc.DownloadResource{
+			Url:             rel.Resource.URL,
+			Archivefilename: rel.Resource.ArchiveFileName,
+			Checksum:        rel.Resource.Checksum,
+			Size:            rel.Resource.Size,
+			Cachepath:       rel.Resource.CachePath,
+		},
 	}
-	logrus.Info("Done")
 }

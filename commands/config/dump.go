@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -32,7 +32,7 @@ func initDumpCommand() *cobra.Command {
 		Use:     "dump",
 		Short:   "Prints the current configuration",
 		Long:    "Prints the current configuration.",
-		Example: "  " + commands.AppName + " config dump",
+		Example: "  " + cli.AppName + " config dump",
 		Args:    cobra.NoArgs,
 		Run:     runDumpCommand,
 	}
@@ -41,10 +41,10 @@ func initDumpCommand() *cobra.Command {
 func runDumpCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config dump`")
 
-	data, err := commands.Config.SerializeToYAML()
+	data, err := cli.Config.SerializeToYAML()
 	if err != nil {
 		formatter.PrintError(err, "Error creating configuration")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	fmt.Println(string(data))

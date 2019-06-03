@@ -1,146 +1,71 @@
-/*
- * This file is part of arduino-cli.
- *
- * Copyright 2018 ARDUINO SA (http://www.arduino.cc/)
- *
- * This software is released under the GNU General Public License version 3,
- * which covers the main part of arduino-cli.
- * The terms of this license can be found at:
- * https://www.gnu.org/licenses/gpl-3.0.en.html
- *
- * You can be released from the requirements of the above licenses by purchasing
- * a commercial license. Buying such a license is mandatory if you want to modify or
- * otherwise use the software for commercial activities involving the Arduino
- * software without disclosing the source code of your own applications. To purchase
- * a commercial license, send an email to license@arduino.cc.
- */
+//
+// This file is part of arduino-cli.
+//
+// Copyright 2018 ARDUINO SA (http://www.arduino.cc/)
+//
+// This software is released under the GNU General Public License version 3,
+// which covers the main part of arduino-cli.
+// The terms of this license can be found at:
+// https://www.gnu.org/licenses/gpl-3.0.en.html
+//
+// You can be released from the requirements of the above licenses by purchasing
+// a commercial license. Buying such a license is mandatory if you want to modify or
+// otherwise use the software for commercial activities involving the Arduino
+// software without disclosing the source code of your own applications. To purchase
+// a commercial license, send an email to license@arduino.cc.
+//
 
 package compile
 
 import (
+	"context"
+	"errors"
 	"fmt"
-	"os"
+	"io"
 	"path/filepath"
 	"sort"
 	"strings"
 
 	builder "github.com/arduino/arduino-builder"
+	"github.com/arduino/arduino-builder/i18n"
 	"github.com/arduino/arduino-builder/types"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/sketches"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/rpc"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 )
 
-// InitCommand prepares the command.
-func InitCommand() *cobra.Command {
-	command := &cobra.Command{
-		Use:     "compile",
-		Short:   "Compiles Arduino sketches.",
-		Long:    "Compiles Arduino sketches.",
-		Example: "  " + commands.AppName + " compile -b arduino:avr:uno /home/user/Arduino/MySketch",
-		Args:    cobra.MaximumNArgs(1),
-		Run:     run,
+func Compile(ctx context.Context, req *rpc.CompileReq, outStream io.Writer, errStream io.Writer) (*rpc.CompileResp, error) {
+	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
 	}
-	command.Flags().StringVarP(
-		&flags.fqbn, "fqbn", "b", "",
-		"Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	command.Flags().BoolVar(
-		&flags.showProperties, "show-properties", false,
-		"Show all build properties used instead of compiling.")
-	command.Flags().BoolVar(
-		&flags.preprocess, "preprocess", false,
-		"Print preprocessed code to stdout instead of compiling.")
-	command.Flags().StringVar(
-		&flags.buildCachePath, "build-cache-path", "",
-		"Builds of 'core.a' are saved into this path to be cached and reused.")
-	command.Flags().StringVarP(
-		&flags.exportFile, "output", "o", "",
-		"Filename of the compile output.")
-	command.Flags().StringVar(
-		&flags.buildPath, "build-path", "",
-		"Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.")
-	command.Flags().StringSliceVar(
-		&flags.buildProperties, "build-properties", []string{},
-		"List of custom build properties separated by commas. Or can be used multiple times for multiple properties.")
-	command.Flags().StringVar(
-		&flags.warnings, "warnings", "none",
-		`Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
-	command.Flags().BoolVarP(
-		&flags.verbose, "verbose", "v", false,
-		"Optional, turns on verbose mode.")
-	command.Flags().BoolVar(
-		&flags.quiet, "quiet", false,
-		"Optional, supresses almost every output.")
-	command.Flags().StringVar(
-		&flags.vidPid, "vid-pid", "",
-		"When specified, VID/PID specific build properties are used, if boards supports them.")
-	return command
-}
 
-var flags struct {
-	fqbn            string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
-	showProperties  bool     // Show all build preferences used instead of compiling.
-	preprocess      bool     // Print preprocessed code to stdout.
-	buildCachePath  string   // Builds of 'core.a' are saved into this path to be cached and reused.
-	buildPath       string   // Path where to save compiled files.
-	buildProperties []string // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
-	warnings        string   // Used to tell gcc which warning level to use.
-	verbose         bool     // Turns on verbose mode.
-	quiet           bool     // Suppresses almost every output.
-	vidPid          string   // VID/PID specific build properties.
-	exportFile      string   // The compiled binary is written to this file
-}
-
-func run(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino compile`")
-	var sketchPath *paths.Path
-	if len(args) > 0 {
-		sketchPath = paths.New(args[0])
+	if req.GetSketchPath() == "" {
+		return nil, fmt.Errorf("missing sketchPath")
 	}
-	sketch, err := commands.InitSketch(sketchPath)
+	sketchPath := paths.New(req.GetSketchPath())
+	sketch, err := sketches.NewSketchFromPath(sketchPath)
 	if err != nil {
-		formatter.PrintError(err, "Error opening sketch.")
-		os.Exit(commands.ErrGeneric)
+		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
 
-	if flags.fqbn == "" && sketch != nil && sketch.Metadata != nil {
-		flags.fqbn = sketch.Metadata.CPU.Fqbn
+	fqbnIn := req.GetFqbn()
+	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
+		fqbnIn = sketch.Metadata.CPU.Fqbn
 	}
-	if flags.fqbn == "" {
-		formatter.PrintErrorMessage("No Fully Qualified Board Name provided.")
-		os.Exit(commands.ErrGeneric)
+	if fqbnIn == "" {
+		return nil, fmt.Errorf("no FQBN provided")
 	}
-	fqbn, err := cores.ParseFQBN(flags.fqbn)
+	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		formatter.PrintErrorMessage("Fully Qualified Board Name has incorrect format.")
-		os.Exit(commands.ErrBadArgument)
-	}
-
-	pm := commands.InitPackageManager()
-
-	// Check for ctags tool
-	loadBuiltinCtagsMetadata(pm)
-	ctags, _ := getBuiltinCtagsTool(pm)
-	if !ctags.IsInstalled() {
-		formatter.Print("Downloading and installing missing tool: " + ctags.String())
-		core.DownloadToolRelease(pm, ctags)
-		core.InstallToolRelease(pm, ctags)
-
-		if err := pm.LoadHardware(commands.Config); err != nil {
-			formatter.PrintError(err, "Could not load hardware packages.")
-			os.Exit(commands.ErrCoreConfig)
-		}
-		ctags, _ = getBuiltinCtagsTool(pm)
-		if !ctags.IsInstalled() {
-			formatter.PrintErrorMessage("Missing ctags tool.")
-			os.Exit(commands.ErrCoreConfig)
-		}
+		return nil, fmt.Errorf("incorrect FQBN: %s", err)
 	}
 
 	targetPlatform := pm.FindPlatform(&packagemanager.PlatformReference{
@@ -148,74 +73,71 @@ func run(cmd *cobra.Command, args []string) {
 		PlatformArchitecture: fqbn.PlatformArch,
 	})
 	if targetPlatform == nil || pm.GetInstalledPlatformRelease(targetPlatform) == nil {
-		errorMessage := fmt.Sprintf(
-			"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
-				commands.AppName+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
-		formatter.PrintErrorMessage(errorMessage)
-		os.Exit(commands.ErrCoreConfig)
+		// TODO: Move this error message in `cli` module
+		// errorMessage := fmt.Sprintf(
+		// 	"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
+		// 		cli.AppName+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
+		// formatter.PrintErrorMessage(errorMessage)
+		return nil, fmt.Errorf("platform not installed")
 	}
 
-	ctx := &types.Context{}
-	ctx.PackageManager = pm
-	ctx.FQBN = fqbn
-	ctx.SketchLocation = sketch.FullPath
+	builderCtx := &types.Context{}
+	builderCtx.PackageManager = pm
+	builderCtx.FQBN = fqbn
+	builderCtx.SketchLocation = sketch.FullPath
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
-	if packagesDir, err := commands.Config.HardwareDirectories(); err == nil {
-		ctx.HardwareDirs = packagesDir
+	if packagesDir, err := cli.Config.HardwareDirectories(); err == nil {
+		builderCtx.HardwareDirs = packagesDir
 	} else {
-		formatter.PrintError(err, "Cannot get hardware directories.")
-		os.Exit(commands.ErrCoreConfig)
+		return nil, fmt.Errorf("cannot get hardware directories: %s", err)
 	}
 
-	if toolsDir, err := commands.Config.BundleToolsDirectories(); err == nil {
-		ctx.ToolsDirs = toolsDir
+	if toolsDir, err := cli.Config.BundleToolsDirectories(); err == nil {
+		builderCtx.ToolsDirs = toolsDir
 	} else {
-		formatter.PrintError(err, "Cannot get bundled tools directories.")
-		os.Exit(commands.ErrCoreConfig)
+		return nil, fmt.Errorf("cannot get bundled tools directories: %s", err)
 	}
 
-	ctx.OtherLibrariesDirs = paths.NewPathList()
-	ctx.OtherLibrariesDirs.Add(commands.Config.LibrariesDir())
+	builderCtx.OtherLibrariesDirs = paths.NewPathList()
+	builderCtx.OtherLibrariesDirs.Add(cli.Config.LibrariesDir())
 
-	if flags.buildPath != "" {
-		ctx.BuildPath = paths.New(flags.buildPath)
-		err = ctx.BuildPath.MkdirAll()
+	if req.GetBuildPath() != "" {
+		builderCtx.BuildPath = paths.New(req.GetBuildPath())
+		err = builderCtx.BuildPath.MkdirAll()
 		if err != nil {
-			formatter.PrintError(err, "Cannot create the build directory.")
-			os.Exit(commands.ErrBadCall)
+			return nil, fmt.Errorf("cannot create build directory: %s", err)
 		}
 	}
 
-	ctx.Verbose = flags.verbose
+	builderCtx.Verbose = req.GetVerbose()
 
-	ctx.CoreBuildCachePath = paths.TempDir().Join("arduino-core-cache")
+	builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino-core-cache")
 
-	ctx.USBVidPid = flags.vidPid
-	ctx.WarningsLevel = flags.warnings
+	builderCtx.USBVidPid = req.GetVidPid()
+	builderCtx.WarningsLevel = req.GetWarnings()
 
-	if commands.GlobalFlags.Debug {
-		ctx.DebugLevel = 100
+	if cli.GlobalFlags.Debug {
+		builderCtx.DebugLevel = 100
 	} else {
-		ctx.DebugLevel = 5
+		builderCtx.DebugLevel = 5
 	}
 
-	ctx.CustomBuildProperties = append(flags.buildProperties, "build.warn_data_percentage=75")
+	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), "build.warn_data_percentage=75")
 
-	if flags.buildCachePath != "" {
-		ctx.BuildCachePath = paths.New(flags.buildCachePath)
-		err = ctx.BuildCachePath.MkdirAll()
+	if req.GetBuildCachePath() != "" {
+		builderCtx.BuildCachePath = paths.New(req.GetBuildCachePath())
+		err = builderCtx.BuildCachePath.MkdirAll()
 		if err != nil {
-			formatter.PrintError(err, "Cannot create the build cache directory.")
-			os.Exit(commands.ErrBadCall)
+			return nil, fmt.Errorf("cannot create build cache directory: %s", err)
 		}
 	}
 
 	// Will be deprecated.
-	ctx.ArduinoAPIVersion = "10607"
+	builderCtx.ArduinoAPIVersion = "10607"
 
 	// Check if Arduino IDE is installed and get it's libraries location.
-	preferencesTxt := commands.Config.DataDir.Join("preferences.txt")
+	preferencesTxt := cli.Config.DataDir.Join("preferences.txt")
 	ideProperties, err := properties.LoadFromPath(preferencesTxt)
 	if err == nil {
 		lastIdeSubProperties := ideProperties.SubTree("last").SubTree("ide")
@@ -229,24 +151,26 @@ func run(cmd *cobra.Command, args []string) {
 		sort.Strings(pathVariants)
 		ideHardwarePath := lastIdeSubProperties.Get(pathVariants[len(pathVariants)-1])
 		ideLibrariesPath := filepath.Join(filepath.Dir(ideHardwarePath), "libraries")
-		ctx.BuiltInLibrariesDirs = paths.NewPathList(ideLibrariesPath)
+		builderCtx.BuiltInLibrariesDirs = paths.NewPathList(ideLibrariesPath)
 	}
 
-	if flags.showProperties {
-		err = builder.RunParseHardwareAndDumpBuildProperties(ctx)
-	} else if flags.preprocess {
-		err = builder.RunPreprocess(ctx)
+	builderCtx.ExecStdout = outStream
+	builderCtx.ExecStderr = errStream
+	builderCtx.SetLogger(i18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
+	if req.GetShowProperties() {
+		err = builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
+	} else if req.GetPreprocess() {
+		err = builder.RunPreprocess(builderCtx)
 	} else {
-		err = builder.RunBuilder(ctx)
+		err = builder.RunBuilder(builderCtx)
 	}
 
 	if err != nil {
-		formatter.PrintError(err, "Compilation failed.")
-		os.Exit(commands.ErrGeneric)
+		return nil, fmt.Errorf("build failed: %s", err)
 	}
 
 	// FIXME: Make a function to obtain these info...
-	outputPath := ctx.BuildProperties.ExpandPropsInString("{build.path}/{recipe.output.tmp_file}")
+	outputPath := builderCtx.BuildProperties.ExpandPropsInString("{build.path}/{recipe.output.tmp_file}")
 	ext := filepath.Ext(outputPath)
 
 	// FIXME: Make a function to produce a better name...
@@ -256,12 +180,12 @@ func run(cmd *cobra.Command, args []string) {
 
 	var exportPath *paths.Path
 	var exportFile string
-	if flags.exportFile == "" {
+	if req.GetExportFile() == "" {
 		exportPath = sketch.FullPath
 		exportFile = sketch.Name + "." + fqbnSuffix
 	} else {
-		exportPath = paths.New(flags.exportFile).Parent()
-		exportFile = paths.New(flags.exportFile).Base()
+		exportPath = paths.New(req.GetExportFile()).Parent()
+		exportFile = paths.New(req.GetExportFile()).Base()
 		if strings.HasSuffix(exportFile, ext) {
 			exportFile = exportFile[:len(exportFile)-len(ext)]
 		}
@@ -272,8 +196,7 @@ func run(cmd *cobra.Command, args []string) {
 	dstHex := exportPath.Join(exportFile + ext)
 	logrus.WithField("from", srcHex).WithField("to", dstHex).Print("copying sketch build output")
 	if err = srcHex.CopyTo(dstHex); err != nil {
-		formatter.PrintError(err, "Error copying output file.")
-		os.Exit(commands.ErrGeneric)
+		return nil, fmt.Errorf("copying output file: %s", err)
 	}
 
 	// Copy .elf file to sketch directory
@@ -281,7 +204,8 @@ func run(cmd *cobra.Command, args []string) {
 	dstElf := exportPath.Join(exportFile + ".elf")
 	logrus.WithField("from", srcElf).WithField("to", dstElf).Print("copying sketch build output")
 	if err = srcElf.CopyTo(dstElf); err != nil {
-		formatter.PrintError(err, "Error copying elf file.")
-		os.Exit(commands.ErrGeneric)
+		return nil, fmt.Errorf("copying elf file: %s", err)
 	}
+
+	return &rpc.CompileResp{}, nil
 }

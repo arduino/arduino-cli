@@ -20,7 +20,7 @@ package config
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -33,9 +33,9 @@ func initInitCommand() *cobra.Command {
 		Long:  "Initializes a new config file into the default location ($EXE_DIR/cli-config.yml).",
 		Example: "" +
 			"  # Creates a config file by asking questions to the user into the default location.\n" +
-			"  " + commands.AppName + " config init\n\n" +
+			"  " + cli.AppName + " config init\n\n" +
 			"  # Creates a config file with default configuration into default location.\n" +
-			"  " + commands.AppName + " config init --default\n",
+			"  " + cli.AppName + " config init --default\n",
 		Args: cobra.NoArgs,
 		Run:  runInitCommand,
 	}
@@ -57,25 +57,23 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	if !initFlags._default {
 		if !formatter.IsCurrentFormat("text") {
 			formatter.PrintErrorMessage("The interactive mode is supported only in text mode.")
-			os.Exit(commands.ErrBadCall)
+			os.Exit(cli.ErrBadCall)
 		}
 	}
 
 	filepath := initFlags.location
 	if filepath == "" {
-		filepath = commands.Config.ConfigFile.String()
+		filepath = cli.Config.ConfigFile.String()
 	}
 
-	err := commands.Config.ConfigFile.Parent().MkdirAll()
-	if err != nil {
+	if err := cli.Config.ConfigFile.Parent().MkdirAll(); err != nil {
 		formatter.PrintError(err, "Cannot create config file.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
-	err = commands.Config.SaveToYAML(filepath)
-	if err != nil {
+	if err := cli.Config.SaveToYAML(filepath); err != nil {
 		formatter.PrintError(err, "Cannot create config file.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 	formatter.PrintResult("Config file PATH: " + filepath)
 	logrus.Info("Done")

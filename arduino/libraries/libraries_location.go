@@ -28,7 +28,7 @@ type LibraryLocation int
 // The enumeration is listed in ascending order of priority
 const (
 	// IDEBuiltIn are libraries bundled in the IDE
-	IDEBuiltIn = 1 << iota
+	IDEBuiltIn = iota
 	// PlatformBuiltIn are libraries bundled in a PlatformRelease
 	PlatformBuiltIn
 	// ReferencedPlatformBuiltIn are libraries bundled in a PlatformRelease referenced for build

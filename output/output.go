@@ -18,36 +18,8 @@
 package output
 
 import (
-	"fmt"
-
 	colorable "github.com/mattn/go-colorable"
 )
 
-var colorStdout = colorable.NewColorableStdout()
-
-type Output interface {
-	EmitTerminal() string
-	EmitJSON() string
-}
-
-type Kind int
-
-const (
-	Terminal Kind = iota
-	JSON
-)
-
-var defaultOutputKind = Terminal
-
-func SetOutputKind(kind Kind) {
-	defaultOutputKind = kind
-}
-
-func Emit(data Output) {
-	switch defaultOutputKind {
-	case Terminal:
-		fmt.Fprint(colorStdout, data.EmitTerminal())
-	case JSON:
-		fmt.Print(data.EmitJSON())
-	}
-}
+// TODO: Feed text output into colorable stdOut
+var _ = colorable.NewColorableStdout()

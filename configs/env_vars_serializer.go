@@ -35,6 +35,6 @@ func (config *Configuration) LoadFromEnv() {
 		config.DataDir = paths.New(dir)
 	}
 	if dir, has := os.LookupEnv("ARDUINO_DOWNLOADS_DIR"); has {
-		config.downloadsDir = paths.New(dir)
+		config.ArduinoDownloadsDir = paths.New(dir)
 	}
 }

@@ -18,99 +18,97 @@
 package core
 
 import (
+	"context"
+	"errors"
 	"fmt"
-	"os"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	"github.com/arduino/arduino-cli/rpc"
 )
 
-func initUninstallCommand() *cobra.Command {
-	return &cobra.Command{
-		Use:     "uninstall PACKAGER:ARCH[@VERSION] ...",
-		Short:   "Uninstalls one or more cores and corresponding tool dependencies if no more used.",
-		Long:    "Uninstalls one or more cores and corresponding tool dependencies if no more used.",
-		Example: "  " + commands.AppName + " core uninstall arduino:samd\n",
-		Args:    cobra.MinimumNArgs(1),
-		Run:     runUninstallCommand,
+func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq, taskCB commands.TaskProgressCB) (*rpc.PlatformUninstallResp, error) {
+	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
 	}
-}
 
-func runUninstallCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino core download`")
-
-	platformsRefs := parsePlatformReferenceArgs(args)
-	pm := commands.InitPackageManagerWithoutBundles()
-
-	for _, platformRef := range platformsRefs {
-		uninstallPlatformByRef(pm, platformRef)
-	}
-}
-
-func uninstallPlatformByRef(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference) {
 	// If no version is specified consider the installed
-	if platformRef.PlatformVersion == nil {
-		platform := pm.FindPlatform(platformRef)
+	version, err := commands.ParseVersion(req)
+	if err != nil {
+		return nil, fmt.Errorf("invalid version: %s", err)
+	}
+
+	ref := &packagemanager.PlatformReference{
+		Package:              req.PlatformPackage,
+		PlatformArchitecture: req.Architecture,
+		PlatformVersion:      version}
+	if ref.PlatformVersion == nil {
+		platform := pm.FindPlatform(ref)
 		if platform == nil {
-			formatter.PrintErrorMessage("Platform not found " + platformRef.String())
-			os.Exit(commands.ErrBadCall)
+			return nil, fmt.Errorf("platform not found: %s", ref)
+
 		}
 		platformRelease := pm.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
-			formatter.PrintErrorMessage("Platform not installed " + platformRef.String())
-			os.Exit(commands.ErrBadCall)
+			return nil, fmt.Errorf("platform not installed: %s", ref)
+
 		}
-		platformRef.PlatformVersion = platformRelease.Version
+		ref.PlatformVersion = platformRelease.Version
 	}
 
-	platform, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
+	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		formatter.PrintError(err, "Could not determine platform dependencies")
-		os.Exit(commands.ErrBadCall)
+		return nil, fmt.Errorf("finding platform dependencies: %s", err)
 	}
 
-	uninstallPlatformRelease(pm, platform)
+	err = uninstallPlatformRelease(pm, platform, taskCB)
+	if err != nil {
+		return nil, err
+	}
 
 	for _, tool := range tools {
 		if !pm.IsToolRequired(tool) {
-			fmt.Printf("Tool %s is no more required\n", tool)
-			uninstallToolRelease(pm, tool)
+			uninstallToolReleasse(pm, tool, taskCB)
 		}
 	}
+
+	_, err = commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance})
+	if err != nil {
+		return nil, err
+	}
+	return &rpc.PlatformUninstallResp{}, nil
 }
 
-func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease) {
+func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, taskCB commands.TaskProgressCB) error {
 	log := pm.Log.WithField("platform", platformRelease)
 
 	log.Info("Uninstalling platform")
-	formatter.Print("Uninstalling " + platformRelease.String() + "...")
+	taskCB(&rpc.TaskProgress{Name: "Uninstalling " + platformRelease.String()})
 
 	if err := pm.UninstallPlatform(platformRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
-		formatter.PrintError(err, "Error uninstalling "+platformRelease.String())
-		os.Exit(commands.ErrGeneric)
+		return err
 	}
 
 	log.Info("Platform uninstalled")
-	formatter.Print(platformRelease.String() + " uninstalled")
+	taskCB(&rpc.TaskProgress{Message: platformRelease.String() + " uninstalled", Completed: true})
+	return nil
 }
 
-func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) {
+func uninstallToolReleasse(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, taskCB commands.TaskProgressCB) error {
 	log := pm.Log.WithField("Tool", toolRelease)
 
 	log.Info("Uninstalling tool")
-	formatter.Print("Uninstalling " + toolRelease.String() + "...")
+	taskCB(&rpc.TaskProgress{Name: "Uninstalling " + toolRelease.String() + ", tool is no more required"})
 
 	if err := pm.UninstallTool(toolRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
-		formatter.PrintError(err, "Error uninstalling "+toolRelease.String())
-		os.Exit(commands.ErrGeneric)
+		return err
 	}
 
 	log.Info("Tool uninstalled")
-	formatter.Print(toolRelease.String() + " uninstalled")
+	taskCB(&rpc.TaskProgress{Message: toolRelease.String() + " uninstalled", Completed: true})
+	return nil
 }

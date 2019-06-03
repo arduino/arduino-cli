@@ -70,7 +70,6 @@ func (resolver *Cpp) ScanLibrary(lib *libraries.Library) error {
 
 // AlternativesFor returns all the libraries that provides the specified header
 func (resolver *Cpp) AlternativesFor(header string) libraries.List {
-	fmt.Printf("Alternatives for %s: %s\n", header, resolver.headers[header])
 	return resolver.headers[header]
 }
 

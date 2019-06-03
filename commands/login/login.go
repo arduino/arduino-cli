@@ -26,7 +26,7 @@ import (
 	"syscall"
 
 	"github.com/arduino/arduino-cli/auth"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/bgentry/go-netrc/netrc"
 	homedir "github.com/mitchellh/go-homedir"
@@ -42,9 +42,9 @@ func InitCommand() *cobra.Command {
 		Short: "Creates default credentials for an Arduino Create Session.",
 		Long:  "Creates default credentials for an Arduino Create Session.",
 		Example: "" +
-			"  " + commands.AppName + " login                          # Asks for all credentials.\n" +
-			"  " + commands.AppName + " login myUser MySecretPassword  # Provide all credentials.\n" +
-			"  " + commands.AppName + " login myUser                   # Asks for just the password instead of having it in clear.",
+			"  " + cli.AppName + " login                          # Asks for all credentials.\n" +
+			"  " + cli.AppName + " login myUser MySecretPassword  # Provide all credentials.\n" +
+			"  " + cli.AppName + " login myUser                   # Asks for just the password instead of having it in clear.",
 		Args: cobra.RangeArgs(0, 2),
 		Run:  run,
 	}
@@ -97,7 +97,7 @@ func run(cmd *cobra.Command, args []string) {
 	netRCHome, err := homedir.Dir()
 	if err != nil {
 		formatter.PrintError(err, "Cannot get current home directory.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	netRCFile := filepath.Join(netRCHome, ".netrc")
@@ -110,7 +110,7 @@ func run(cmd *cobra.Command, args []string) {
 	netRC, err := netrc.Parse(file)
 	if err != nil {
 		formatter.PrintError(err, "Cannot parse .netrc file.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	logrus.Info("Trying to login")
@@ -120,7 +120,7 @@ func run(cmd *cobra.Command, args []string) {
 	token, err := authConf.Token(user, password)
 	if err != nil {
 		formatter.PrintError(err, "Cannot login.")
-		os.Exit(commands.ErrNetwork)
+		os.Exit(cli.ErrNetwork)
 	}
 
 	netRC.RemoveMachine("arduino.cc")
@@ -128,13 +128,13 @@ func run(cmd *cobra.Command, args []string) {
 	content, err := netRC.MarshalText()
 	if err != nil {
 		formatter.PrintError(err, "Cannot parse new .netrc file.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	err = ioutil.WriteFile(netRCFile, content, 0600)
 	if err != nil {
 		formatter.PrintError(err, "Cannot write new .netrc file.")
-		os.Exit(commands.ErrGeneric)
+		os.Exit(cli.ErrGeneric)
 	}
 
 	formatter.PrintResult("" +
