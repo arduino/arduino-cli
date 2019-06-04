@@ -342,7 +342,6 @@ func main() {
 		Instance:        instance,
 		PlatformPackage: "arduino",
 		Architecture:    "samd",
-		//Version:         "1.6.19",
 	})
 	if err != nil {
 		fmt.Printf("Uninstall error: %s\n", err)

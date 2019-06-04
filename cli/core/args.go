@@ -32,6 +32,13 @@ type platformReferenceArg struct {
 	Version      string
 }
 
+func (pl *platformReferenceArg) String() string {
+	if pl.Version != "" {
+		return pl.Package + ":" + pl.Architecture + "@" + pl.Version
+	}
+	return pl.Package + ":" + pl.Architecture
+}
+
 // parsePlatformReferenceArgs parses a sequence of "packager:arch@version" tokens and
 // returns a platformReferenceArg slice.
 func parsePlatformReferenceArgs(args []string) []*platformReferenceArg {
