@@ -34,16 +34,10 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq, taskC
 		return nil, errors.New("invalid instance")
 	}
 
-	// If no version is specified consider the installed
-	version, err := commands.ParseVersion(req)
-	if err != nil {
-		return nil, fmt.Errorf("invalid version: %s", err)
-	}
-
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
-		PlatformVersion:      version}
+	}
 	if ref.PlatformVersion == nil {
 		platform := pm.FindPlatform(ref)
 		if platform == nil {

@@ -32,7 +32,7 @@ import (
 
 func initUninstallCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:     "uninstall PACKAGER:ARCH[@VERSION] ...",
+		Use:     "uninstall PACKAGER:ARCH ...",
 		Short:   "Uninstalls one or more cores and corresponding tool dependencies if no more used.",
 		Long:    "Uninstalls one or more cores and corresponding tool dependencies if no more used.",
 		Example: "  " + cli.AppName + " core uninstall arduino:samd\n",
@@ -48,11 +48,16 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	platformsRefs := parsePlatformReferenceArgs(args)
 
 	for _, platformRef := range platformsRefs {
+		if platformRef.Version != "" {
+			formatter.PrintErrorMessage("Invalid parameter " + platformRef.String() + ": version not allowed")
+			os.Exit(cli.ErrBadArgument)
+		}
+	}
+	for _, platformRef := range platformsRefs {
 		_, err := core.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.Architecture,
-			Version:         platformRef.Version,
 		}, output.NewTaskProgressCB())
 		if err != nil {
 			formatter.PrintError(err, "Error during uninstall")
