@@ -56,8 +56,7 @@ message BoardAttachReq {
   Instance instance = 1;
   string board_uri = 2;
   string sketch_path = 3;
-  string board_flavour = 4;
-  string search_timeout = 5;
+  string search_timeout = 4;
 }
 
 message BoardAttachResp {
