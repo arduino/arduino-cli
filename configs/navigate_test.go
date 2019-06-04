@@ -36,9 +36,10 @@ func TestNavigate(t *testing.T) {
 		"inheritance",
 	}
 	for _, tt := range tests {
-		t.Run(tt, func(t *testing.T) {
-			pwd := paths.New("testdata", "navigate", tt, "first", "second")
-			golden := filepath.Join("testdata", "navigate", tt, "golden.yaml")
+		_tt := tt
+		t.Run(_tt, func(t *testing.T) {
+			pwd := paths.New("testdata", "navigate", _tt, "first", "second")
+			golden := filepath.Join("testdata", "navigate", _tt, "golden.yaml")
 
 			config, _ := configs.NewConfiguration()
 
