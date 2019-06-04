@@ -1,3 +1,7 @@
+run:
+  skip-dirs:
+  - legacy
+
 linters-settings:
   govet:
     check-shadowing: true
@@ -21,6 +25,9 @@ linters-settings:
 linters:
   enable-all: true
   disable:
+  - goimports
+  - gocritic
+  - gochecknoglobals
   - gosec
   - deadcode
   - dupl

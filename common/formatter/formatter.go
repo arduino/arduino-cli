@@ -37,17 +37,13 @@ type Formatter interface {
 // PrintFunc represents a function used to print formatted data.
 type PrintFunc func(Formatter, interface{}) error
 
-var formatters map[string]Formatter
-var defaultFormatter Formatter
+var formatters = map[string]Formatter{
+	"text": &TextFormatter{},
+	"json": &JSONFormatter{},
+}
+var defaultFormatter = formatters["text"]
 
 var logger *logrus.Logger
-
-func init() {
-	formatters = make(map[string]Formatter, 2)
-	AddCustomFormatter("text", &TextFormatter{})
-	AddCustomFormatter("json", &JSONFormatter{})
-	defaultFormatter = formatters["text"]
-}
 
 // SetFormatter sets the defaults format to the one specified, if valid. Otherwise it returns an error.
 func SetFormatter(formatName string) error {
