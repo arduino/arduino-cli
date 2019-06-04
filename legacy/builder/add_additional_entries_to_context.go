@@ -30,10 +30,10 @@
 package builder
 
 import (
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/arduino/cores"
 )
 
 type AddAdditionalEntriesToContext struct{}

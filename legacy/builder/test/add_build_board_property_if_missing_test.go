@@ -33,9 +33,9 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )

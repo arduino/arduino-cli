@@ -32,9 +32,9 @@ package builder
 import (
 	"fmt"
 
+	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/arduino/libraries"
 )
 
 func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {

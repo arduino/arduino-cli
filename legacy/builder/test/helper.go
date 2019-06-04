@@ -37,10 +37,10 @@ import (
 	"testing"
 	"text/template"
 
+	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
-	"github.com/arduino/arduino-cli/arduino/libraries"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/go-errors/errors"
 	"github.com/stretchr/testify/assert"

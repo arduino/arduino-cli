@@ -32,11 +32,11 @@ package builder
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
+	"github.com/arduino/arduino-cli/legacy/builder/i18n"
+	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
 
 type LibrariesLoader struct{}

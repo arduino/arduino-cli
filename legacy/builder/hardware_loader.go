@@ -30,9 +30,9 @@
 package builder
 
 import (
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 )
 
 type HardwareLoader struct{}
