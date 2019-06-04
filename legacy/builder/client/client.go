@@ -70,16 +70,16 @@ func main() {
 	exampleParames := pb.BuildParams{
 		BuiltInLibrariesFolders: "/ssd/Arduino-master/build/linux/work/libraries",
 		CustomBuildProperties:   "build.warn_data_percentage=75",
-		FQBN:                  "arduino:avr:mega:cpu=atmega2560",
-		HardwareFolders:       "/ssd/Arduino-master/build/linux/work/hardware,/home/martino/.arduino15/packages,/home/martino/eslov-sk/hardware",
-		OtherLibrariesFolders: "/home/martino/eslov-sk/libraries",
-		ArduinoAPIVersion:     "10805",
-		SketchLocation:        "/home/martino/eslov-sk/libraries/WiFi101/examples/ScanNetworks/ScanNetworks.ino",
-		ToolsFolders:          "/ssd/Arduino-master/build/linux/work/tools-builder,/ssd/Arduino-master/build/linux/work/hardware/tools/avr,/home/martino/.arduino15/packages",
-		Verbose:               true,
-		WarningsLevel:         "all",
-		BuildCachePath:        "/tmp/arduino_cache_761418/",
-		CodeCompleteAt:        "/home/martino/eslov-sk/libraries/WiFi101/examples/ScanNetworks/ScanNetworks.ino:56:9",
+		FQBN:                    "arduino:avr:mega:cpu=atmega2560",
+		HardwareFolders:         "/ssd/Arduino-master/build/linux/work/hardware,/home/martino/.arduino15/packages,/home/martino/eslov-sk/hardware",
+		OtherLibrariesFolders:   "/home/martino/eslov-sk/libraries",
+		ArduinoAPIVersion:       "10805",
+		SketchLocation:          "/home/martino/eslov-sk/libraries/WiFi101/examples/ScanNetworks/ScanNetworks.ino",
+		ToolsFolders:            "/ssd/Arduino-master/build/linux/work/tools-builder,/ssd/Arduino-master/build/linux/work/hardware/tools/avr,/home/martino/.arduino15/packages",
+		Verbose:                 true,
+		WarningsLevel:           "all",
+		BuildCachePath:          "/tmp/arduino_cache_761418/",
+		CodeCompleteAt:          "/home/martino/eslov-sk/libraries/WiFi101/examples/ScanNetworks/ScanNetworks.ino:56:9",
 	}
 
 	//build(client, &exampleParames)

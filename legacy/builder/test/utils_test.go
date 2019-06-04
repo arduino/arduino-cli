@@ -109,8 +109,8 @@ func TestMapTrimSpace(t *testing.T) {
 
 func TestQuoteCppString(t *testing.T) {
 	cases := map[string]string{
-		`foo`:     `"foo"`,
-		`foo\bar`: `"foo\\bar"`,
+		`foo`:                                  `"foo"`,
+		`foo\bar`:                              `"foo\\bar"`,
 		`foo "is" quoted and \\bar"" escaped\`: `"foo \"is\" quoted and \\\\bar\"\" escaped\\"`,
 		// ASCII 0x20 - 0x7e, excluding `
 		` !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_abcdefghijklmnopqrstuvwxyz{|}~`: `" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_abcdefghijklmnopqrstuvwxyz{|}~"`,

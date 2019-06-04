@@ -23,9 +23,9 @@ func UnwrapError(err error) error {
 	// Perhaps go-errors can do this already in later versions?
 	// See https://github.com/go-errors/errors/issues/14
 	switch e := err.(type) {
-		case *errors.Error:
-			return e.Err
-		default:
-			return err
+	case *errors.Error:
+		return e.Err
+	default:
+		return err
 	}
 }
