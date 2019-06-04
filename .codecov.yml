@@ -1,5 +1,8 @@
 comment: off
 
+ignore:
+  - legacy/**/*
+
 coverage:
   status:
     project:
