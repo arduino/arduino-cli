@@ -20,6 +20,8 @@ package cli
 import (
 	"context"
 	"errors"
+	"os"
+
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
@@ -29,7 +31,6 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
-	"os"
 )
 
 // Error codes to be used for os.Exit().

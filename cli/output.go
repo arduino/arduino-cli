@@ -22,10 +22,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/output"
-
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 )
 

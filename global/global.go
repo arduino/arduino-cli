@@ -9,14 +9,13 @@ import (
 var appName = filepath.Base(os.Args[0])
 
 var (
-	application= "arduino-cli"
-	version    = "missing"
-	commit     = "missing"
-	cvsRef     = "missing"
-	buildDate  = "missing"
-	repository = "missing"
+	application = "arduino-cli"
+	version     = "missing"
+	commit      = "missing"
+	cvsRef      = "missing"
+	buildDate   = "missing"
+	repository  = "missing"
 )
-
 
 func GetAppName() string {
 	return appName
@@ -54,4 +53,3 @@ type Info struct {
 	BuildDate   string `json:"buildDate"`
 	Repository  string `json:"repository"`
 }
-
