@@ -19,7 +19,6 @@ package root
 
 import (
 	"fmt"
-	"github.com/arduino/arduino-cli/global"
 	"io/ioutil"
 	"os"
 
@@ -36,6 +35,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
+	"github.com/arduino/arduino-cli/global"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
@@ -92,7 +92,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	}
 	initConfigs()
 
-	logrus.Info(global.GetAppName() + "-" + cli.Version)
+	logrus.Info(global.GetAppName() + "-" + global.GetVersion())
 	logrus.Info("Starting root command preparation (`arduino`)")
 	switch outputFormat {
 	case "text":
