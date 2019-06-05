@@ -32,7 +32,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/commands/config"
 	"github.com/arduino/arduino-cli/commands/generatedocs"
-	"github.com/arduino/arduino-cli/commands/sketch"
+	"github.com/arduino/arduino-cli/cli/sketch"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
 	paths "github.com/arduino/go-paths-helper"
