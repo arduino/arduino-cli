@@ -19,6 +19,7 @@ package board
 
 import (
 	"context"
+	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"

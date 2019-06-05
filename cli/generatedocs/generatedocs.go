@@ -18,6 +18,7 @@
 package generatedocs
 
 import (
+	"github.com/arduino/arduino-cli/global"
 	"os"
 	"path/filepath"
 

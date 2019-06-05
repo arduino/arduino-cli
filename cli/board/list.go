@@ -20,6 +20,7 @@ package board
 import (
 	"context"
 	"fmt"
+	"github.com/arduino/arduino-cli/global"
 	"os"
 	"sort"
 	"time"
