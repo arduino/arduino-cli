@@ -18,6 +18,7 @@
 package config
 
 import (
+	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -33,9 +34,9 @@ func initInitCommand() *cobra.Command {
 		Long:  "Initializes a new config file into the default location ($EXE_DIR/cli-config.yml).",
 		Example: "" +
 			"  # Creates a config file by asking questions to the user into the default location.\n" +
-			"  " + cli.AppName + " config init\n\n" +
+			"  " + global.GetAppName() + " config init\n\n" +
 			"  # Creates a config file with default configuration into default location.\n" +
-			"  " + cli.AppName + " config init --default\n",
+			"  " + global.GetAppName() + " config init --default\n",
 		Args: cobra.NoArgs,
 		Run:  runInitCommand,
 	}

@@ -19,10 +19,10 @@ package daemon
 
 import (
 	"fmt"
+	"github.com/arduino/arduino-cli/global"
 	"log"
 	"net"
 
-	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/daemon"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
@@ -35,7 +35,7 @@ func InitCommand() *cobra.Command {
 		Use:     "daemon",
 		Short:   "Run as a daemon",
 		Long:    "Running as a daemon the initialization of cores and libraries is done only once.",
-		Example: "  " + cli.AppName + " daemon",
+		Example: "  " + global.GetAppName() + " daemon",
 		Args:    cobra.NoArgs,
 		Run:     runDaemonCommand,
 		Hidden:  true,

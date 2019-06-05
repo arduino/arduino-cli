@@ -19,6 +19,7 @@ package lib
 
 import (
 	"fmt"
+	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -36,7 +37,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "Shows a list of all installed libraries.",
 		Long:    "Shows a list of all installed libraries.",
-		Example: "  " + cli.AppName + " lib list",
+		Example: "  " + global.GetAppName() + " lib list",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}

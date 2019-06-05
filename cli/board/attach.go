@@ -19,6 +19,7 @@ package board
 
 import (
 	"context"
+	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -33,9 +34,9 @@ func initAttachCommand() *cobra.Command {
 		Use:   "attach <port>|<FQBN> [sketchPath]",
 		Short: "Attaches a sketch to a board.",
 		Long:  "Attaches a sketch to a board.",
-		Example: "  " + cli.AppName + " board attach serial:///dev/tty/ACM0\n" +
-			"  " + cli.AppName + " board attach serial:///dev/tty/ACM0 HelloWorld\n" +
-			"  " + cli.AppName + " board attach arduino:samd:mkr1000",
+		Example: "  " + global.GetAppName() + " board attach serial:///dev/tty/ACM0\n" +
+			"  " + global.GetAppName() + " board attach serial:///dev/tty/ACM0 HelloWorld\n" +
+			"  " + global.GetAppName() + " board attach arduino:samd:mkr1000",
 		Args: cobra.RangeArgs(1, 2),
 		Run:  runAttachCommand,
 	}

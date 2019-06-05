@@ -20,6 +20,7 @@ package board
 import (
 	"context"
 	"fmt"
+	"github.com/arduino/arduino-cli/global"
 	"os"
 	"sort"
 	"time"
@@ -37,7 +38,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "List connected boards.",
 		Long:    "Detects and displays a list of connected boards to the current computer.",
-		Example: "  " + cli.AppName + " board list --timeout 10s",
+		Example: "  " + global.GetAppName() + " board list --timeout 10s",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}

@@ -19,6 +19,7 @@ package upload
 
 import (
 	"context"
+	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -35,7 +36,7 @@ func InitCommand() *cobra.Command {
 		Use:     "upload",
 		Short:   "Upload Arduino sketches.",
 		Long:    "Upload Arduino sketches.",
-		Example: "  " + cli.AppName + " upload /home/user/Arduino/MySketch",
+		Example: "  " + global.GetAppName() + " upload /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}

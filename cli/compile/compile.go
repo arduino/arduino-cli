@@ -19,6 +19,7 @@ package compile
 
 import (
 	"context"
+	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -35,7 +36,7 @@ func InitCommand() *cobra.Command {
 		Use:     "compile",
 		Short:   "Compiles Arduino sketches.",
 		Long:    "Compiles Arduino sketches.",
-		Example: "  " + cli.AppName + " compile -b arduino:avr:uno /home/user/Arduino/MySketch",
+		Example: "  " + global.GetAppName() + " compile -b arduino:avr:uno /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}

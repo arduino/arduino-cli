@@ -19,6 +19,7 @@ package lib
 
 import (
 	"context"
+	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/common/formatter"
@@ -36,8 +37,8 @@ func initDownloadCommand() *cobra.Command {
 		Short: "Downloads one or more libraries without installing them.",
 		Long:  "Downloads one or more libraries without installing them.",
 		Example: "" +
-			"  " + cli.AppName + " lib download AudioZero       # for the latest version.\n" +
-			"  " + cli.AppName + " lib download AudioZero@1.0.0 # for a specific version.",
+			"  " + global.GetAppName() + " lib download AudioZero       # for the latest version.\n" +
+			"  " + global.GetAppName() + " lib download AudioZero@1.0.0 # for a specific version.",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 	}

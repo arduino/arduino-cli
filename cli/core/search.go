@@ -20,6 +20,7 @@ package core
 import (
 	"context"
 	"fmt"
+	"github.com/arduino/arduino-cli/global"
 	"os"
 	"sort"
 	"strings"
@@ -38,7 +39,7 @@ func initSearchCommand() *cobra.Command {
 		Use:     "search <keywords...>",
 		Short:   "Search for a core in the package index.",
 		Long:    "Search for a core in the package index using the specified keywords.",
-		Example: "  " + cli.AppName + " core search MKRZero -v",
+		Example: "  " + global.GetAppName() + " core search MKRZero -v",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runSearchCommand,
 	}

@@ -18,6 +18,7 @@
 package sketch
 
 import (
+	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -30,7 +31,7 @@ func initNewCommand() *cobra.Command {
 		Use:     "new",
 		Short:   "Create a new Sketch",
 		Long:    "Create a new Sketch",
-		Example: "  " + cli.AppName + " sketch new MultiBlinker",
+		Example: "  " + global.GetAppName() + " sketch new MultiBlinker",
 		Args:    cobra.ExactArgs(1),
 		Run:     runNewCommand,
 	}

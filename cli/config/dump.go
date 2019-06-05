@@ -19,6 +19,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -32,7 +33,7 @@ func initDumpCommand() *cobra.Command {
 		Use:     "dump",
 		Short:   "Prints the current configuration",
 		Long:    "Prints the current configuration.",
-		Example: "  " + cli.AppName + " config dump",
+		Example: "  " + global.GetAppName() + " config dump",
 		Args:    cobra.NoArgs,
 		Run:     runDumpCommand,
 	}

@@ -20,17 +20,16 @@ package cli
 import (
 	"context"
 	"errors"
-	"os"
-	"path/filepath"
-
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
+	"github.com/arduino/arduino-cli/global"
 	"github.com/arduino/arduino-cli/rpc"
-	paths "github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
+	"os"
 )
 
 // Error codes to be used for os.Exit().
@@ -60,9 +59,6 @@ var GlobalFlags struct {
 	Debug      bool // If true, dump debug output to stderr.
 	OutputJSON bool // true output in JSON, false output as Text
 }
-
-// AppName is the command line name of the Arduino CLI executable
-var AppName = filepath.Base(os.Args[0])
 
 var Config *configs.Configuration
 
@@ -116,7 +112,7 @@ func CreateInstance() *rpc.Instance {
 		for _, err := range resp.GetPlatformsIndexErrors() {
 			formatter.PrintError(errors.New(err), "Error loading index")
 		}
-		formatter.PrintErrorMessage("Launch '" + AppName + " core update-index' to fix or download indexes.")
+		formatter.PrintErrorMessage("Launch '" + global.GetAppName() + " core update-index' to fix or download indexes.")
 		os.Exit(ErrGeneric)
 	}
 	return resp.GetInstance()

@@ -20,6 +20,7 @@ package core
 import (
 	"context"
 	"fmt"
+	"github.com/arduino/arduino-cli/global"
 	"os"
 	"sort"
 
@@ -37,7 +38,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "Shows the list of installed platforms.",
 		Long:    "Shows the list of installed platforms.",
-		Example: "  " + cli.AppName + " core list",
+		Example: "  " + global.GetAppName() + " core list",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}

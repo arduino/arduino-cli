@@ -19,6 +19,7 @@ package version
 
 import (
 	"fmt"
+	"github.com/arduino/arduino-cli/global"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/spf13/cobra"
@@ -30,7 +31,7 @@ func InitCommand() *cobra.Command {
 		Use:     "version",
 		Short:   "Shows version number of arduino CLI.",
 		Long:    "Shows version number of arduino CLI which is installed on your system.",
-		Example: "  " + cli.AppName + " version",
+		Example: "  " + global.GetAppName() + " version",
 		Args:    cobra.NoArgs,
 		Run:     run,
 	}

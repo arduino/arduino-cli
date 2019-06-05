@@ -76,7 +76,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream io.Writer, errS
 		// TODO: Move this error message in `cli` module
 		// errorMessage := fmt.Sprintf(
 		// 	"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
-		// 		cli.AppName+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
+		// 		global.GetAppName()+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
 		// formatter.PrintErrorMessage(errorMessage)
 		return nil, fmt.Errorf("platform not installed")
 	}

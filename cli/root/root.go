@@ -19,6 +19,7 @@ package root
 
 import (
 	"fmt"
+	"github.com/arduino/arduino-cli/global"
 	"io/ioutil"
 	"os"
 
@@ -48,7 +49,7 @@ func Init() *cobra.Command {
 		Use:              "arduino-cli",
 		Short:            "Arduino CLI.",
 		Long:             "Arduino Command Line Interface (arduino-cli).",
-		Example:          "  " + cli.AppName + " <command> [flags...]",
+		Example:          "  " + global.GetAppName() + " <command> [flags...]",
 		PersistentPreRun: preRun,
 	}
 	command.PersistentFlags().BoolVar(&cli.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
@@ -91,7 +92,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	}
 	initConfigs()
 
-	logrus.Info(cli.AppName + "-" + cli.Version)
+	logrus.Info(global.GetAppName() + "-" + cli.Version)
 	logrus.Info("Starting root command preparation (`arduino`)")
 	switch outputFormat {
 	case "text":

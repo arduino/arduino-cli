@@ -18,7 +18,7 @@
 package lib
 
 import (
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/global"
 	"github.com/spf13/cobra"
 )
 
@@ -29,8 +29,8 @@ func InitCommand() *cobra.Command {
 		Short: "Arduino commands about libraries.",
 		Long:  "Arduino commands about libraries.",
 		Example: "" +
-			"  " + cli.AppName + " lib install AudioZero\n" +
-			"  " + cli.AppName + " lib update-index",
+			"  " + global.GetAppName() + " lib install AudioZero\n" +
+			"  " + global.GetAppName() + " lib update-index",
 	}
 	libCommand.AddCommand(initDownloadCommand())
 	libCommand.AddCommand(initInstallCommand())
