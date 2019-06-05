@@ -27,7 +27,7 @@ var appName = filepath.Base(os.Args[0])
 
 var (
 	application = "arduino-cli"
-	version     = "missing"
+	version     = "0.3.6-alpha.preview"
 	commit      = "missing"
 	cvsRef      = "missing"
 	buildDate   = "missing"
