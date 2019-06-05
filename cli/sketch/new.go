@@ -18,11 +18,11 @@
 package sketch
 
 import (
-	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/global"
 	"github.com/spf13/cobra"
 )
 

@@ -19,11 +19,11 @@ package daemon
 
 import (
 	"fmt"
-	"github.com/arduino/arduino-cli/global"
 	"log"
 	"net"
 
 	"github.com/arduino/arduino-cli/daemon"
+	"github.com/arduino/arduino-cli/global"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"

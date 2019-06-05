@@ -20,13 +20,13 @@ package core
 import (
 	"context"
 	"fmt"
-	"github.com/arduino/arduino-cli/global"
 	"os"
 	"sort"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/global"
 	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/sirupsen/logrus"

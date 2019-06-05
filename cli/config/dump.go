@@ -19,11 +19,11 @@ package config
 
 import (
 	"fmt"
-	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/global"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

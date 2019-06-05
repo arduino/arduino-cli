@@ -19,12 +19,12 @@ package lib
 
 import (
 	"fmt"
-	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/global"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/gosuri/uitable"
 	"github.com/sirupsen/logrus"

@@ -18,11 +18,11 @@
 package generatedocs
 
 import (
-	"github.com/arduino/arduino-cli/global"
 	"os"
 	"path/filepath"
 
 	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/global"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
