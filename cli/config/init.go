@@ -18,7 +18,6 @@
 package config
 
 import (
-	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"

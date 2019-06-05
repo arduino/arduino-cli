@@ -19,7 +19,6 @@ package lib
 
 import (
 	"fmt"
-	"github.com/arduino/arduino-cli/global"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"

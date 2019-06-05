@@ -19,7 +19,6 @@ package daemon
 
 import (
 	"fmt"
-	"github.com/arduino/arduino-cli/global"
 	"log"
 	"net"
 
