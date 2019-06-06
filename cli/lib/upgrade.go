@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
@@ -36,7 +35,7 @@ func initUpgradeCommand() *cobra.Command {
 		Short: "Upgrades installed libraries.",
 		Long: "This command ungrades all installed libraries to the latest available version." +
 			"To upgrade a single library use the 'install' command.",
-		Example: "  " + version.GetAppName() + " lib upgrade",
+		Example: "  " + cli.VersionInfo.Application + " lib upgrade",
 		Args:    cobra.NoArgs,
 		Run:     runUpgradeCommand,
 	}

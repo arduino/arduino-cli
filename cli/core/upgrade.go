@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -37,9 +36,9 @@ func initUpgradeCommand() *cobra.Command {
 		Long:  "Upgrades one or all installed platforms to the latest version.",
 		Example: "" +
 			"  # upgrade everything to the latest version\n" +
-			"  " + version.GetAppName() + " core upgrade\n\n" +
+			"  " + cli.VersionInfo.Application + " core upgrade\n\n" +
 			"  # upgrade arduino:samd to the latest version\n" +
-			"  " + version.GetAppName() + " core upgrade arduino:samd",
+			"  " + cli.VersionInfo.Application + " core upgrade arduino:samd",
 		Run: runUpgradeCommand,
 	}
 	return upgradeCommand

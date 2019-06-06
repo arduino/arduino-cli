@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/spf13/cobra"
 )
 
@@ -36,8 +35,8 @@ func initInstallCommand() *cobra.Command {
 		Short: "Installs one of more specified libraries into the system.",
 		Long:  "Installs one or more specified libraries into the system.",
 		Example: "" +
-			"  " + version.GetAppName() + " lib install AudioZero       # for the latest version.\n" +
-			"  " + version.GetAppName() + " lib install AudioZero@1.0.0 # for the specific version.",
+			"  " + cli.VersionInfo.Application + " lib install AudioZero       # for the latest version.\n" +
+			"  " + cli.VersionInfo.Application + " lib install AudioZero@1.0.0 # for the specific version.",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}

@@ -28,7 +28,6 @@ import (
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -38,7 +37,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "Shows the list of installed platforms.",
 		Long:    "Shows the list of installed platforms.",
-		Example: "  " + version.GetAppName() + " core list",
+		Example: "  " + cli.VersionInfo.Application + " core list",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}

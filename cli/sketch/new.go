@@ -22,7 +22,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +30,7 @@ func initNewCommand() *cobra.Command {
 		Use:     "new",
 		Short:   "Create a new Sketch",
 		Long:    "Create a new Sketch",
-		Example: "  " + version.GetAppName() + " sketch new MultiBlinker",
+		Example: "  " + cli.VersionInfo.Application + " sketch new MultiBlinker",
 		Args:    cobra.ExactArgs(1),
 		Run:     runNewCommand,
 	}

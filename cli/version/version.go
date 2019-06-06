@@ -32,7 +32,7 @@ func InitCommand() *cobra.Command {
 		Use:     "version",
 		Short:   "Shows version number of arduino CLI.",
 		Long:    "Shows version number of arduino CLI which is installed on your system.",
-		Example: "  " + version.GetAppName() + " version",
+		Example: "  " + cli.VersionInfo.Application + " version",
 		Args:    cobra.NoArgs,
 		Run:     run,
 	}

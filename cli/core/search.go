@@ -29,7 +29,6 @@ import (
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -39,7 +38,7 @@ func initSearchCommand() *cobra.Command {
 		Use:     "search <keywords...>",
 		Short:   "Search for a core in the package index.",
 		Long:    "Search for a core in the package index using the specified keywords.",
-		Example: "  " + version.GetAppName() + " core search MKRZero -v",
+		Example: "  " + cli.VersionInfo.Application + " core search MKRZero -v",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runSearchCommand,
 	}

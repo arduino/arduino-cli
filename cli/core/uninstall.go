@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -36,7 +35,7 @@ func initUninstallCommand() *cobra.Command {
 		Use:     "uninstall PACKAGER:ARCH ...",
 		Short:   "Uninstalls one or more cores and corresponding tool dependencies if no more used.",
 		Long:    "Uninstalls one or more cores and corresponding tool dependencies if no more used.",
-		Example: "  " + version.GetAppName() + " core uninstall arduino:samd\n",
+		Example: "  " + cli.VersionInfo.Application + " core uninstall arduino:samd\n",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runUninstallCommand,
 	}

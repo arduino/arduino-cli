@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/gosuri/uitable"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -37,7 +36,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "Shows a list of all installed libraries.",
 		Long:    "Shows a list of all installed libraries.",
-		Example: "  " + version.GetAppName() + " lib list",
+		Example: "  " + cli.VersionInfo.Application + " lib list",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}

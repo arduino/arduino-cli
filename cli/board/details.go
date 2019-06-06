@@ -27,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/spf13/cobra"
 )
 
@@ -36,7 +35,7 @@ func initDetailsCommand() *cobra.Command {
 		Use:     "details <FQBN>",
 		Short:   "Print details about a board.",
 		Long:    "Show information about a board, in particular if the board has options to be specified in the FQBN.",
-		Example: "  " + version.GetAppName() + " board details arduino:avr:nano",
+		Example: "  " + cli.VersionInfo.Application + " board details arduino:avr:nano",
 		Args:    cobra.ExactArgs(1),
 		Run:     runDetailsCommand,
 	}

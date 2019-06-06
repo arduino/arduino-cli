@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -36,7 +35,7 @@ func initUninstallCommand() *cobra.Command {
 		Use:     "uninstall LIBRARY_NAME(S)",
 		Short:   "Uninstalls one or more libraries.",
 		Long:    "Uninstalls one or more libraries.",
-		Example: "  " + version.GetAppName() + " lib uninstall AudioZero",
+		Example: "  " + cli.VersionInfo.Application + " lib uninstall AudioZero",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runUninstallCommand,
 	}

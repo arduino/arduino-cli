@@ -28,7 +28,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	semver "go.bug.st/relaxed-semver"
@@ -39,7 +38,7 @@ func initSearchCommand() *cobra.Command {
 		Use:     "search [LIBRARY_NAME]",
 		Short:   "Searchs for one or more libraries data.",
 		Long:    "Search for one or more libraries data (case insensitive search).",
-		Example: "  " + version.GetAppName() + " lib search audio",
+		Example: "  " + cli.VersionInfo.Application + " lib search audio",
 		Args:    cobra.ArbitraryArgs,
 		Run:     runSearchCommand,
 	}

@@ -22,7 +22,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -34,9 +33,9 @@ func initInitCommand() *cobra.Command {
 		Long:  "Initializes a new config file into the default location ($EXE_DIR/cli-config.yml).",
 		Example: "" +
 			"  # Creates a config file by asking questions to the user into the default location.\n" +
-			"  " + version.GetAppName() + " config init\n\n" +
+			"  " + cli.VersionInfo.Application + " config init\n\n" +
 			"  # Creates a config file with default configuration into default location.\n" +
-			"  " + version.GetAppName() + " config init --default\n",
+			"  " + cli.VersionInfo.Application + " config init --default\n",
 		Args: cobra.NoArgs,
 		Run:  runInitCommand,
 	}

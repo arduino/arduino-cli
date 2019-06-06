@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -35,7 +34,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Use:     "update-index",
 		Short:   "Updates the index of cores.",
 		Long:    "Updates the index of cores to the latest version.",
-		Example: "  " + version.GetAppName() + " core update-index",
+		Example: "  " + cli.VersionInfo.Application + " core update-index",
 		Args:    cobra.NoArgs,
 		Run:     runUpdateIndexCommand,
 	}

@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
 	"github.com/spf13/cobra"
 )
@@ -36,7 +35,7 @@ func InitCommand() *cobra.Command {
 		Use:     "compile",
 		Short:   "Compiles Arduino sketches.",
 		Long:    "Compiles Arduino sketches.",
-		Example: "  " + version.GetAppName() + " compile -b arduino:avr:uno /home/user/Arduino/MySketch",
+		Example: "  " + cli.VersionInfo.Application + " compile -b arduino:avr:uno /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}

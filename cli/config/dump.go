@@ -23,7 +23,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -33,7 +32,7 @@ func initDumpCommand() *cobra.Command {
 		Use:     "dump",
 		Short:   "Prints the current configuration",
 		Long:    "Prints the current configuration.",
-		Example: "  " + version.GetAppName() + " config dump",
+		Example: "  " + cli.VersionInfo.Application + " config dump",
 		Args:    cobra.NoArgs,
 		Run:     runDumpCommand,
 	}

@@ -117,7 +117,7 @@ func CreateInstance() *rpc.Instance {
 		for _, err := range resp.GetPlatformsIndexErrors() {
 			formatter.PrintError(errors.New(err), "Error loading index")
 		}
-		formatter.PrintErrorMessage("Launch '" + version.GetAppName() + " core update-index' to fix or download indexes.")
+		formatter.PrintErrorMessage("Launch '" + VersionInfo.Application + " core update-index' to fix or download indexes.")
 		os.Exit(ErrGeneric)
 	}
 	return resp.GetInstance()

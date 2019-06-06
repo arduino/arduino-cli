@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -36,9 +35,9 @@ func initInstallCommand() *cobra.Command {
 		Short: "Installs one or more cores and corresponding tool dependencies.",
 		Long:  "Installs one or more cores and corresponding tool dependencies.",
 		Example: "  # download the latest version of arduino SAMD core.\n" +
-			"  " + version.GetAppName() + " core install arduino:samd\n\n" +
+			"  " + cli.VersionInfo.Application + " core install arduino:samd\n\n" +
 			"  # download a specific version (in this case 1.6.9).\n" +
-			"  " + version.GetAppName() + " core install arduino:samd@1.6.9",
+			"  " + cli.VersionInfo.Application + " core install arduino:samd@1.6.9",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}

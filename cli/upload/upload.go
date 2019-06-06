@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
 	"github.com/spf13/cobra"
 )
@@ -36,7 +35,7 @@ func InitCommand() *cobra.Command {
 		Use:     "upload",
 		Short:   "Upload Arduino sketches.",
 		Long:    "Upload Arduino sketches.",
-		Example: "  " + version.GetAppName() + " upload /home/user/Arduino/MySketch",
+		Example: "  " + cli.VersionInfo.Application + " upload /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}

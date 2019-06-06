@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +33,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Use:     "update-index",
 		Short:   "Updates the libraries index.",
 		Long:    "Updates the libraries index to the latest version.",
-		Example: "  " + version.GetAppName() + " lib update-index",
+		Example: "  " + cli.VersionInfo.Application + " lib update-index",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			instance := cli.CreateInstaceIgnorePlatformIndexErrors()

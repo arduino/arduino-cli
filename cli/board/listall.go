@@ -28,7 +28,6 @@ import (
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/spf13/cobra"
 )
 
@@ -40,8 +39,8 @@ func initListAllCommand() *cobra.Command {
 			"List all boards that have the support platform installed. You can search\n" +
 			"for a specific board if you specify the board name",
 		Example: "" +
-			"  " + version.GetAppName() + " board listall\n" +
-			"  " + version.GetAppName() + " board listall zero",
+			"  " + cli.VersionInfo.Application + " board listall\n" +
+			"  " + cli.VersionInfo.Application + " board listall zero",
 		Args: cobra.ArbitraryArgs,
 		Run:  runListAllCommand,
 	}
