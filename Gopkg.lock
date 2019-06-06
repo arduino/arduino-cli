@@ -61,14 +61,6 @@
   revision = "ed041402e83b924251a5d65b4dfeb727c480c359"
 
 [[projects]]
-  branch = "master"
-  digest = "1:37011b20a70e205b93ebea5287e1afa5618db54bf3998c36ff5a8e4b146a170a"
-  name = "github.com/bgentry/go-netrc"
-  packages = ["netrc"]
-  pruneopts = "UT"
-  revision = "9fd32a8b3d3d3f9d43c341bfe098430e07609480"
-
-[[projects]]
   digest = "1:d8abdc866ebbe05fa3bce50863e23afd4c73c804b90c908caa864e86df1db8a1"
   name = "github.com/bouk/monkey"
   packages = ["."]
@@ -527,7 +519,6 @@
     "github.com/arduino/go-paths-helper",
     "github.com/arduino/go-properties-orderedmap",
     "github.com/arduino/go-win32-utils",
-    "github.com/bgentry/go-netrc/netrc",
     "github.com/bouk/monkey",
     "github.com/codeclysm/extract",
     "github.com/fatih/color",
