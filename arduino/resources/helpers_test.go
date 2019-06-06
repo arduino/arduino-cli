@@ -26,7 +26,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/arduino/arduino-cli/global"
+	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )

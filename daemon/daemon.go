@@ -32,8 +32,8 @@ import (
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/upload"
-	"github.com/arduino/arduino-cli/global"
 	"github.com/arduino/arduino-cli/rpc"
+	"github.com/arduino/arduino-cli/version"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )

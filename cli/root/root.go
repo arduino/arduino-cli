@@ -35,7 +35,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
-	"github.com/arduino/arduino-cli/global"
+	"github.com/arduino/arduino-cli/version"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
@@ -127,7 +127,7 @@ func initConfigs() {
 		cli.Config = conf
 	}
 
-	// Read configuration from global config file
+	// Read configuration from version config file
 	logrus.Info("Checking for config file in: " + cli.Config.ConfigFile.String())
 	if cli.Config.ConfigFile.Exist() {
 		readConfigFrom(cli.Config.ConfigFile)

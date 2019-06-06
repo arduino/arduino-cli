@@ -27,8 +27,8 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
-	"github.com/arduino/arduino-cli/global"
 	"github.com/arduino/arduino-cli/rpc"
+	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 )

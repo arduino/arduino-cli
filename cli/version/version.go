@@ -22,7 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/global"
 
 	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/global"
+	"github.com/arduino/arduino-cli/version"
 	"github.com/spf13/cobra"
 )
 

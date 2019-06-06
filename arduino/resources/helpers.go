@@ -23,7 +23,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/arduino/arduino-cli/global"
+	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
 	"go.bug.st/downloader"
 )
