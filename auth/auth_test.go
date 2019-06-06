@@ -57,7 +57,7 @@ func TestTokenIntegration(t *testing.T) {
 	}
 
 	// Obtain info
-	req, err := http.NewRequest("GET", "https://ddauth.arduino.cc/v1/users/byID/me", nil)
+	req, err := http.NewRequest("GET", "https://auth.arduino.cc/v1/users/byID/me", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
