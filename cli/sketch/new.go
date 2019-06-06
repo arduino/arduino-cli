@@ -31,7 +31,7 @@ func initNewCommand() *cobra.Command {
 		Use:     "new",
 		Short:   "Create a new Sketch",
 		Long:    "Create a new Sketch",
-		Example: "  " + global.GetAppName() + " sketch new MultiBlinker",
+		Example: "  " + version.GetAppName() + " sketch new MultiBlinker",
 		Args:    cobra.ExactArgs(1),
 		Run:     runNewCommand,
 	}

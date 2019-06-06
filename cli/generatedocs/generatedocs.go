@@ -34,7 +34,7 @@ func InitCommand() *cobra.Command {
 		Use:     "generate-docs",
 		Short:   "Generates bash completion and command manpages.",
 		Long:    "Generates bash completion and command manpages.",
-		Example: "  " + global.GetAppName() + " generate-docs bash-completions",
+		Example: "  " + version.GetAppName() + " generate-docs bash-completions",
 	}
 	command.PersistentFlags().StringVarP(&outputDir, "output-dir", "o", "",
 		"Directory where to save generated files. Default is './docs', the directory must exist.")

@@ -32,7 +32,7 @@ func InitCommand() *cobra.Command {
 		Use:     "version",
 		Short:   "Shows version number of arduino CLI.",
 		Long:    "Shows version number of arduino CLI which is installed on your system.",
-		Example: "  " + global.GetAppName() + " version",
+		Example: "  " + version.GetAppName() + " version",
 		Args:    cobra.NoArgs,
 		Run:     run,
 	}
@@ -47,7 +47,7 @@ type versionOutput struct {
 func run(cmd *cobra.Command, args []string) {
 	res := &versionOutput{
 		Command: cmd.Parent().Name(),
-		Version: global.GetVersion(),
+		Version: version.GetVersion(),
 	}
 	if cli.OutputJSONOrElse(res) {
 		fmt.Printf("%s version %s\n", res.Command, res.Version)

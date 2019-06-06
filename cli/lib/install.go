@@ -36,8 +36,8 @@ func initInstallCommand() *cobra.Command {
 		Short: "Installs one of more specified libraries into the system.",
 		Long:  "Installs one or more specified libraries into the system.",
 		Example: "" +
-			"  " + global.GetAppName() + " lib install AudioZero       # for the latest version.\n" +
-			"  " + global.GetAppName() + " lib install AudioZero@1.0.0 # for the specific version.",
+			"  " + version.GetAppName() + " lib install AudioZero       # for the latest version.\n" +
+			"  " + version.GetAppName() + " lib install AudioZero@1.0.0 # for the specific version.",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}

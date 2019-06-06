@@ -40,8 +40,8 @@ func initListAllCommand() *cobra.Command {
 			"List all boards that have the support platform installed. You can search\n" +
 			"for a specific board if you specify the board name",
 		Example: "" +
-			"  " + global.GetAppName() + " board listall\n" +
-			"  " + global.GetAppName() + " board listall zero",
+			"  " + version.GetAppName() + " board listall\n" +
+			"  " + version.GetAppName() + " board listall zero",
 		Args: cobra.ArbitraryArgs,
 		Run:  runListAllCommand,
 	}

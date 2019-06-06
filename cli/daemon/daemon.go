@@ -35,7 +35,7 @@ func InitCommand() *cobra.Command {
 		Use:     "daemon",
 		Short:   "Run as a daemon",
 		Long:    "Running as a daemon the initialization of cores and libraries is done only once.",
-		Example: "  " + global.GetAppName() + " daemon",
+		Example: "  " + version.GetAppName() + " daemon",
 		Args:    cobra.NoArgs,
 		Run:     runDaemonCommand,
 		Hidden:  true,

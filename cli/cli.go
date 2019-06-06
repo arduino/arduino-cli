@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"path/filepath"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -48,8 +49,11 @@ const (
 	ErrBadArgument
 )
 
-// Version is the current CLI version
-var Version = "0.3.6-alpha.preview"
+// appName is the command line name of the Arduino CLI executable on the user system (users may change it)
+var appName = filepath.Base(os.Args[0])
+
+// func NewInfo(application string, versionString string, commit string) *Info {
+var VersionInfo = version.NewInfo(appName)
 
 // ErrLogrus represents the logrus instance, which has the role to
 // log all non info messages.
@@ -113,7 +117,7 @@ func CreateInstance() *rpc.Instance {
 		for _, err := range resp.GetPlatformsIndexErrors() {
 			formatter.PrintError(errors.New(err), "Error loading index")
 		}
-		formatter.PrintErrorMessage("Launch '" + global.GetAppName() + " core update-index' to fix or download indexes.")
+		formatter.PrintErrorMessage("Launch '" + version.GetAppName() + " core update-index' to fix or download indexes.")
 		os.Exit(ErrGeneric)
 	}
 	return resp.GetInstance()

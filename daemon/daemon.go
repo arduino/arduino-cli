@@ -121,7 +121,7 @@ func (s *ArduinoCoreServerImpl) Init(req *rpc.InitReq, stream rpc.ArduinoCore_In
 }
 
 func (s *ArduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionReq) (*rpc.VersionResp, error) {
-	return &rpc.VersionResp{Version: global.GetVersion()}, nil
+	return &rpc.VersionResp{Version: version.GetVersion()}, nil
 }
 
 func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoCore_CompileServer) error {

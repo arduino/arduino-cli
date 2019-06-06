@@ -36,7 +36,7 @@ func initDetailsCommand() *cobra.Command {
 		Use:     "details <FQBN>",
 		Short:   "Print details about a board.",
 		Long:    "Show information about a board, in particular if the board has options to be specified in the FQBN.",
-		Example: "  " + global.GetAppName() + " board details arduino:avr:nano",
+		Example: "  " + version.GetAppName() + " board details arduino:avr:nano",
 		Args:    cobra.ExactArgs(1),
 		Run:     runDetailsCommand,
 	}

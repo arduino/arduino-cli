@@ -36,7 +36,7 @@ func InitCommand() *cobra.Command {
 		Use:     "compile",
 		Short:   "Compiles Arduino sketches.",
 		Long:    "Compiles Arduino sketches.",
-		Example: "  " + global.GetAppName() + " compile -b arduino:avr:uno /home/user/Arduino/MySketch",
+		Example: "  " + version.GetAppName() + " compile -b arduino:avr:uno /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}

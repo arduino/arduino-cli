@@ -28,7 +28,7 @@ func InitCommand() *cobra.Command {
 		Use:     "core",
 		Short:   "Arduino Core operations.",
 		Long:    "Arduino Core operations.",
-		Example: "  " + global.GetAppName() + " core update-index",
+		Example: "  " + version.GetAppName() + " core update-index",
 	}
 	coreCommand.AddCommand(initDownloadCommand())
 	coreCommand.AddCommand(initInstallCommand())

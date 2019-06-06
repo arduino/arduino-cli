@@ -36,8 +36,8 @@ func initDownloadCommand() *cobra.Command {
 		Short: "Downloads one or more libraries without installing them.",
 		Long:  "Downloads one or more libraries without installing them.",
 		Example: "" +
-			"  " + global.GetAppName() + " lib download AudioZero       # for the latest version.\n" +
-			"  " + global.GetAppName() + " lib download AudioZero@1.0.0 # for a specific version.",
+			"  " + version.GetAppName() + " lib download AudioZero       # for the latest version.\n" +
+			"  " + version.GetAppName() + " lib download AudioZero@1.0.0 # for a specific version.",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 	}

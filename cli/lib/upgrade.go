@@ -36,7 +36,7 @@ func initUpgradeCommand() *cobra.Command {
 		Short: "Upgrades installed libraries.",
 		Long: "This command ungrades all installed libraries to the latest available version." +
 			"To upgrade a single library use the 'install' command.",
-		Example: "  " + global.GetAppName() + " lib upgrade",
+		Example: "  " + version.GetAppName() + " lib upgrade",
 		Args:    cobra.NoArgs,
 		Run:     runUpgradeCommand,
 	}

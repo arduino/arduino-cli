@@ -82,8 +82,8 @@ func (r *DownloadResource) Download(downloadDir *paths.Path) (*downloader.Downlo
 
 // ConfigureDownloader adds additional config to the downloader helper
 func (r *DownloadResource) ConfigureDownloader() downloader.Config {
-	userAgentHeaderValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", global.GetApplication(),
-		global.GetVersion(), runtime.GOARCH, runtime.GOOS, runtime.Version(), global.GetCommit(), global.GetBuildDate())
+	userAgentHeaderValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", version.GetApplication(),
+		version.GetVersion(), runtime.GOARCH, runtime.GOOS, runtime.Version(), version.GetCommit(), version.GetBuildDate())
 	downloadConfig := downloader.Config{
 		RequestHeaders: http.Header{
 			"User-Agent": []string{userAgentHeaderValue},

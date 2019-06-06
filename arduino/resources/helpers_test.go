@@ -39,8 +39,8 @@ func (h *EchoHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 }
 
 func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
-	goldUserAgentString := "User-Agent: " + fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", global.GetApplication(),
-		global.GetVersion(), runtime.GOARCH, runtime.GOOS, runtime.Version(), global.GetCommit(), global.GetBuildDate())
+	goldUserAgentString := "User-Agent: " + fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", version.GetApplication(),
+		version.GetVersion(), runtime.GOARCH, runtime.GOOS, runtime.Version(), version.GetCommit(), version.GetBuildDate())
 
 	tmp, err := paths.MkTempDir("", "")
 	require.NoError(t, err)

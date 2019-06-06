@@ -29,8 +29,8 @@ func InitCommand() *cobra.Command {
 		Short: "Arduino commands about libraries.",
 		Long:  "Arduino commands about libraries.",
 		Example: "" +
-			"  " + global.GetAppName() + " lib install AudioZero\n" +
-			"  " + global.GetAppName() + " lib update-index",
+			"  " + version.GetAppName() + " lib install AudioZero\n" +
+			"  " + version.GetAppName() + " lib update-index",
 	}
 	libCommand.AddCommand(initDownloadCommand())
 	libCommand.AddCommand(initInstallCommand())

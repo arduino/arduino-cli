@@ -29,9 +29,9 @@ func InitCommand() *cobra.Command {
 		Short: "Arduino board commands.",
 		Long:  "Arduino board commands.",
 		Example: "  # Lists all connected boards.\n" +
-			"  " + global.GetAppName() + " board list\n\n" +
+			"  " + version.GetAppName() + " board list\n\n" +
 			"  # Attaches a sketch to a board.\n" +
-			"  " + global.GetAppName() + " board attach serial:///dev/tty/ACM0 mySketch",
+			"  " + version.GetAppName() + " board attach serial:///dev/tty/ACM0 mySketch",
 	}
 	boardCommand.AddCommand(initAttachCommand())
 	boardCommand.AddCommand(initDetailsCommand())
