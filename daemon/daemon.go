@@ -26,6 +26,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
@@ -33,7 +34,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
@@ -121,7 +121,7 @@ func (s *ArduinoCoreServerImpl) Init(req *rpc.InitReq, stream rpc.ArduinoCore_In
 }
 
 func (s *ArduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionReq) (*rpc.VersionResp, error) {
-	return &rpc.VersionResp{Version: version.GetVersion()}, nil
+	return &rpc.VersionResp{Version: cli.VersionInfo.VersionString}, nil
 }
 
 func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoCore_CompileServer) error {

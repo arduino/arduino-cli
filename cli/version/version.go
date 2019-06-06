@@ -22,7 +22,6 @@ import (
 	"github.com/arduino/arduino-cli/global"
 
 	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/version"
 	"github.com/spf13/cobra"
 )
 
@@ -47,7 +46,7 @@ type versionOutput struct {
 func run(cmd *cobra.Command, args []string) {
 	res := &versionOutput{
 		Command: cmd.Parent().Name(),
-		Version: version.GetVersion(),
+		Version: cli.VersionInfo.VersionString,
 	}
 	if cli.OutputJSONOrElse(res) {
 		fmt.Printf("%s version %s\n", res.Command, res.Version)
