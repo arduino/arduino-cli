@@ -49,10 +49,6 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/bgentry/go-netrc"
-
-[[constraint]]
-  branch = "master"
   name = "github.com/mitchellh/go-homedir"
 
 [[constraint]]
