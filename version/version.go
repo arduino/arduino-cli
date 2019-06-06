@@ -15,32 +15,26 @@
  * a commercial license, send an email to license@arduino.cc.
  */
 
-package global
+package version
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"time"
 )
 
-// appName is the command line name of the Arduino CLI executable on the user system (users may change it)
-var appName = filepath.Base(os.Args[0])
-
 var (
-	application          = "arduino-cli"
 	defaultVersionString = "0.3.6-alpha.preview"
 	versionString        = ""
-	commit               = "missing"
+	commit               = ""
 	buildDate            = time.Time{}
 )
 
 func GetAppName() string {
-	return appName
+	return ""
 }
 
 func GetApplication() string {
-	return application
+	return ""
 }
 
 func GetVersion() string {
@@ -62,7 +56,7 @@ type Info struct {
 	BuildDate     time.Time `json:"BuildDate"`
 }
 
-func NewInfo(application string, versionString string, commit string) *Info {
+func NewInfo(application string) *Info {
 	return &Info{
 		Application:   application,
 		VersionString: versionString,
