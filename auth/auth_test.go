@@ -19,13 +19,13 @@ package auth_test
 
 import (
 	"encoding/json"
-	"flag"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
 
 	"github.com/arduino/arduino-cli/auth"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -33,12 +33,20 @@ var (
 	testPass = os.Getenv("TEST_PASSWORD")
 )
 
-func TestMain(m *testing.M) {
-	flag.Parse()
-	os.Exit(m.Run())
+func TestNewConfig(t *testing.T) {
+	conf := auth.New()
+	require.Equal(t, "https://hydra.arduino.cc/oauth2/auth", conf.CodeURL)
+	require.Equal(t, "https://hydra.arduino.cc/oauth2/token", conf.TokenURL)
+	require.Equal(t, "cli", conf.ClientID)
+	require.Equal(t, "http://localhost:5000", conf.RedirectURI)
+	require.Equal(t, "profile:core offline", conf.Scopes)
 }
 
-func TestToken(t *testing.T) {
+func TestTokenIntegration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skip integration test")
+	}
+
 	if testUser == "" || testPass == "" {
 		t.Skip("Skipped because user and pass were not provided")
 	}

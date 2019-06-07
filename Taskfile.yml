@@ -1,0 +1,23 @@
+version: '2'
+
+tasks:
+  build:
+    desc: Build the project
+    cmds:
+      - go build -v -i
+
+  test:
+    desc: Run the full testsuite
+    cmds:
+      - task: test-unit
+      - task: test-integration
+
+  test-unit:
+    desc: Run unit tests only
+    cmds:
+      - go test -short {{ default "-v" .GOFLAGS }} {{ default "./..." .TARGETS }}
+
+  test-integration:
+    desc: Run integration tests only
+    cmds:
+      - go test -run Integration {{ default "-v" .GOFLAGS }} {{ default "./..." .TARGETS }}
