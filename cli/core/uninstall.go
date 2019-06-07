@@ -19,6 +19,7 @@ package core
 
 import (
 	"context"
+	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -42,7 +43,7 @@ func initUninstallCommand() *cobra.Command {
 }
 
 func runUninstallCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := cli.CreateInstance(http.Header{})
 	logrus.Info("Executing `arduino core uninstall`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)

@@ -19,6 +19,7 @@ package core
 
 import (
 	"context"
+	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -44,7 +45,7 @@ func initDownloadCommand() *cobra.Command {
 }
 
 func runDownloadCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := cli.CreateInstance(http.Header{})
 	logrus.Info("Executing `arduino core download`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
@@ -54,7 +55,9 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
-		}, cli.OutputProgressBar())
+		}, cli.OutputProgressBar(),
+			http.Header{},
+		)
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+args[i])
 			os.Exit(cli.ErrNetwork)

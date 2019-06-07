@@ -19,6 +19,7 @@ package core
 
 import (
 	"context"
+	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -42,7 +43,7 @@ func initUpdateIndexCommand() *cobra.Command {
 }
 
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstaceIgnorePlatformIndexErrors()
+	instance := cli.CreateInstaceIgnorePlatformIndexErrors(http.Header{})
 	logrus.Info("Executing `arduino core update-index`")
 
 	_, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{

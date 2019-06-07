@@ -20,6 +20,7 @@ package lib
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -29,7 +30,7 @@ import (
 )
 
 func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) error {
 
 	lm := commands.GetLibraryManager(req)
 
@@ -38,7 +39,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
 		return fmt.Errorf("looking for library: %s", err)
 	}
 
-	if err := downloadLibrary(lm, libRelease, downloadCB, taskCB); err != nil {
+	if err := downloadLibrary(lm, libRelease, downloadCB, taskCB, downloaderHeaders); err != nil {
 		return fmt.Errorf("downloading library: %s", err)
 	}
 

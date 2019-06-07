@@ -19,6 +19,7 @@ package board
 
 import (
 	"context"
+	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -49,7 +50,7 @@ var attachFlags struct {
 }
 
 func runAttachCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := cli.CreateInstance(http.Header{})
 	var path string
 	if len(args) > 0 {
 		path = args[1]

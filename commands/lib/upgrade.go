@@ -20,19 +20,20 @@ package lib
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc"
 )
 
-func LibraryUpgradeAll(ctx context.Context, req *rpc.LibraryUpgradeAllReq, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
+func LibraryUpgradeAll(ctx context.Context, req *rpc.LibraryUpgradeAllReq, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) error {
 	lm := commands.GetLibraryManager(req)
 
 	// Obtain the list of upgradable libraries
 	list := listLibraries(lm, true, true)
 
 	for _, upgradeDesc := range list {
-		if err := downloadLibrary(lm, upgradeDesc.Available, downloadCB, taskCB); err != nil {
+		if err := downloadLibrary(lm, upgradeDesc.Available, downloadCB, taskCB, downloaderHeaders); err != nil {
 			return err
 		}
 	}

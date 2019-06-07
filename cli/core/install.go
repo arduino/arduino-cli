@@ -19,6 +19,7 @@ package core
 
 import (
 	"context"
+	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -45,7 +46,7 @@ func initInstallCommand() *cobra.Command {
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := cli.CreateInstance(http.Header{})
 	logrus.Info("Executing `arduino core install`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
@@ -56,7 +57,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
-		}, cli.OutputProgressBar(), cli.OutputTaskProgress())
+		}, cli.OutputProgressBar(), cli.OutputTaskProgress(), http.Header{})
 		if err != nil {
 			formatter.PrintError(err, "Error during install")
 			os.Exit(cli.ErrGeneric)

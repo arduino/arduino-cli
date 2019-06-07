@@ -20,6 +20,7 @@ package resources
 import (
 	"crypto"
 	"encoding/hex"
+	"net/http"
 	"testing"
 
 	paths "github.com/arduino/go-paths-helper"
@@ -43,7 +44,7 @@ func TestDownloadAndChecksums(t *testing.T) {
 	require.NoError(t, err)
 
 	downloadAndTestChecksum := func() {
-		d, err := r.Download(tmp)
+		d, err := r.Download(tmp, http.Header{})
 		require.NoError(t, err)
 		err = d.Run()
 		require.NoError(t, err)
@@ -59,7 +60,7 @@ func TestDownloadAndChecksums(t *testing.T) {
 	downloadAndTestChecksum()
 
 	// Download with cached file
-	d, err := r.Download(tmp)
+	d, err := r.Download(tmp, http.Header{})
 	require.NoError(t, err)
 	require.Nil(t, d)
 

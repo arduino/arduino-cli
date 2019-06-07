@@ -19,6 +19,7 @@ package lib
 
 import (
 	"context"
+	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
@@ -44,7 +45,7 @@ func initInstallCommand() *cobra.Command {
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstaceIgnorePlatformIndexErrors()
+	instance := cli.CreateInstaceIgnorePlatformIndexErrors(http.Header{})
 	refs, err := librariesindex.ParseArgs(args)
 	if err != nil {
 		formatter.PrintError(err, "Arguments error")
@@ -55,7 +56,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version.String(),
-		}, cli.OutputProgressBar(), cli.OutputTaskProgress())
+		}, cli.OutputProgressBar(), cli.OutputTaskProgress(), http.Header{})
 		if err != nil {
 			formatter.PrintError(err, "Error installing "+library.String())
 			os.Exit(cli.ErrGeneric)

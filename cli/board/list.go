@@ -20,6 +20,7 @@ package board
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"sort"
 	"time"
@@ -53,7 +54,7 @@ var listFlags struct {
 
 // runListCommand detects and lists the connected arduino boards
 func runListCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := cli.CreateInstance(http.Header{})
 
 	if timeout, err := time.ParseDuration(listFlags.timeout); err != nil {
 		formatter.PrintError(err, "Invalid timeout.")

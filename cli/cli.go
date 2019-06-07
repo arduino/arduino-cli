@@ -20,6 +20,7 @@ package cli
 import (
 	"context"
 	"errors"
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -84,10 +85,10 @@ func packageManagerInitReq() *rpc.InitReq {
 	return &rpc.InitReq{Configuration: conf}
 }
 
-func InitInstance() *rpc.InitResp {
+func InitInstance(downloaderHeaders http.Header) *rpc.InitResp {
 	logrus.Info("Initializing package manager")
 	req := packageManagerInitReq()
-	resp, err := commands.Init(context.Background(), req, OutputProgressBar(), OutputTaskProgress())
+	resp, err := commands.Init(context.Background(), req, OutputProgressBar(), OutputTaskProgress(), downloaderHeaders)
 	if err != nil {
 		formatter.PrintError(err, "Error initializing package manager")
 		os.Exit(ErrGeneric)
@@ -111,8 +112,8 @@ func InitInstance() *rpc.InitResp {
 }
 
 // CreateInstance creates and return an instance of the Arduino Core engine
-func CreateInstance() *rpc.Instance {
-	resp := InitInstance()
+func CreateInstance(downloaderHeaders http.Header) *rpc.Instance {
+	resp := InitInstance(downloaderHeaders)
 	if resp.GetPlatformsIndexErrors() != nil {
 		for _, err := range resp.GetPlatformsIndexErrors() {
 			formatter.PrintError(errors.New(err), "Error loading index")
@@ -125,14 +126,14 @@ func CreateInstance() *rpc.Instance {
 
 // CreateInstaceIgnorePlatformIndexErrors creates and return an instance of the
 // Arduino Core Engine, but won't stop on platforms index loading errors.
-func CreateInstaceIgnorePlatformIndexErrors() *rpc.Instance {
-	return InitInstance().GetInstance()
+func CreateInstaceIgnorePlatformIndexErrors(downloaderHeaders http.Header) *rpc.Instance {
+	return InitInstance(downloaderHeaders).GetInstance()
 }
 
 // InitPackageAndLibraryManager initializes the PackageManager and the
 // LibaryManager with the default configuration. (DEPRECATED)
-func InitPackageAndLibraryManager() (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
-	resp := InitInstance()
+func InitPackageAndLibraryManager(downloaderHeaders http.Header) (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
+	resp := InitInstance(downloaderHeaders)
 	return commands.GetPackageManager(resp), commands.GetLibraryManager(resp)
 }
 

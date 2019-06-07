@@ -19,6 +19,7 @@ package core
 
 import (
 	"context"
+	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -45,7 +46,7 @@ func initUpgradeCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := cli.CreateInstance(http.Header{})
 	logrus.Info("Executing `arduino core upgrade`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
@@ -60,7 +61,8 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.Architecture,
-		}, cli.OutputProgressBar(), cli.OutputTaskProgress())
+		}, cli.OutputProgressBar(), cli.OutputTaskProgress(),
+			http.Header{})
 		if err != nil {
 			formatter.PrintError(err, "Error during upgrade")
 			os.Exit(cli.ErrGeneric)

@@ -20,6 +20,7 @@ package core
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"sort"
 
@@ -50,7 +51,7 @@ var listFlags struct {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := cli.CreateInstance(http.Header{})
 	logrus.Info("Executing `arduino core list`")
 
 	resp, err := core.PlatformList(context.Background(), &rpc.PlatformListReq{

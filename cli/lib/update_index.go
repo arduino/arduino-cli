@@ -19,6 +19,7 @@ package lib
 
 import (
 	"context"
+	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -36,7 +37,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Example: "  " + cli.VersionInfo.Application + " lib update-index",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			instance := cli.CreateInstaceIgnorePlatformIndexErrors()
+			instance := cli.CreateInstaceIgnorePlatformIndexErrors(http.Header{})
 			err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexReq{
 				Instance: instance,
 			}, cli.OutputProgressBar())

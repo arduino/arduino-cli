@@ -19,6 +19,7 @@ package compile
 
 import (
 	"context"
+	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -90,7 +91,7 @@ var flags struct {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := cli.CreateInstance(http.Header{})
 
 	var path *paths.Path
 	if len(args) > 0 {
