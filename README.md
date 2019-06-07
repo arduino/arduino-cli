@@ -1,4 +1,4 @@
-![Build status](https://drone.arduino.cc/api/badges/arduino/arduino-cli/status.svg)
+[![Build Status](https://travis-ci.org/arduino/arduino-cli.svg?branch=master)](https://travis-ci.org/arduino/arduino-cli)
 
 # arduino-cli
 
