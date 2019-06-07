@@ -40,7 +40,7 @@ require (
 	github.com/sergi/go-diff v1.0.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
-	github.com/spf13/cobra v0.0.3
+	github.com/spf13/cobra v0.0.4
 	github.com/spf13/pflag v1.0.1 // indirect
 	github.com/stretchr/testify v1.3.0
 	go.bug.st/cleanup v1.0.0
