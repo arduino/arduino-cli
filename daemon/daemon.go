@@ -23,8 +23,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
-	"net"
 	"net/http"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -35,28 +33,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/rpc"
-	"github.com/spf13/cobra"
-	"google.golang.org/grpc"
 )
-
-const (
-	port = ":50051"
-)
-
-func runDaemonCommand(cmd *cobra.Command, args []string) {
-	lis, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	s := grpc.NewServer()
-	rpc.RegisterArduinoCoreServer(s, &ArduinoCoreServerImpl{
-		downloaderHeaders: http.Header{},
-	})
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
-	fmt.Println("Done serving")
-}
 
 type ArduinoCoreServerImpl struct {
 	downloaderHeaders http.Header
