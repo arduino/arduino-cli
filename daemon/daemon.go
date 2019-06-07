@@ -25,6 +25,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"net/http"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
@@ -48,14 +49,18 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	rpc.RegisterArduinoCoreServer(s, &ArduinoCoreServerImpl{})
+	rpc.RegisterArduinoCoreServer(s, &ArduinoCoreServerImpl{
+		downloaderHeaders: http.Header{},
+	})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 	fmt.Println("Done serving")
 }
 
-type ArduinoCoreServerImpl struct{}
+type ArduinoCoreServerImpl struct {
+	downloaderHeaders http.Header
+}
 
 func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
 	return board.Details(ctx, req)
@@ -112,6 +117,7 @@ func (s *ArduinoCoreServerImpl) Init(req *rpc.InitReq, stream rpc.ArduinoCore_In
 	resp, err := commands.Init(stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.InitResp{DownloadProgress: p}) },
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.InitResp{TaskProgress: p}) },
+		s.downloaderHeaders,
 	)
 	if err != nil {
 		return err
@@ -141,6 +147,7 @@ func (s *ArduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallReq, str
 		stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.PlatformInstallResp{Progress: p}) },
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.PlatformInstallResp{TaskProgress: p}) },
+		s.downloaderHeaders,
 	)
 	if err != nil {
 		return err
@@ -152,6 +159,7 @@ func (s *ArduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReq, s
 	resp, err := core.PlatformDownload(
 		stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.PlatformDownloadResp{Progress: p}) },
+		s.downloaderHeaders,
 	)
 	if err != nil {
 		return err
@@ -175,6 +183,7 @@ func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeReq, str
 		stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.PlatformUpgradeResp{Progress: p}) },
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.PlatformUpgradeResp{TaskProgress: p}) },
+		s.downloaderHeaders,
 	)
 	if err != nil {
 		return err
@@ -221,6 +230,7 @@ func (s *ArduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadReq, str
 	resp, err := lib.LibraryDownload(
 		stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryDownloadResp{Progress: p}) },
+		s.downloaderHeaders,
 	)
 	if err != nil {
 		return err
@@ -233,6 +243,7 @@ func (s *ArduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallReq, strea
 		stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryInstallResp{Progress: p}) },
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryInstallResp{TaskProgress: p}) },
+		s.downloaderHeaders,
 	)
 	if err != nil {
 		return err
@@ -254,6 +265,7 @@ func (s *ArduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllReq,
 	err := lib.LibraryUpgradeAll(stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryUpgradeAllResp{Progress: p}) },
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryUpgradeAllResp{TaskProgress: p}) },
+		s.downloaderHeaders,
 	)
 	if err != nil {
 		return err
