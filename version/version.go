@@ -29,26 +29,6 @@ var (
 	buildDate            = time.Time{}
 )
 
-func GetAppName() string {
-	return ""
-}
-
-func GetApplication() string {
-	return ""
-}
-
-func GetVersion() string {
-	return defaultVersionString
-}
-
-func GetCommit() string {
-	return commit
-}
-
-func GetBuildDate() string {
-	return ""
-}
-
 type Info struct {
 	Application   string    `json:"Application"`
 	VersionString string    `json:"VersionString"`

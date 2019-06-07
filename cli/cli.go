@@ -91,8 +91,8 @@ func InitInstance() *rpc.InitResp {
 	logrus.Info("Initializing package manager")
 	req := packageManagerInitReq()
 
-	userAgentValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", version.GetApplication(),
-		version.GetVersion(), runtime.GOARCH, runtime.GOOS, runtime.Version(), version.GetCommit(), version.GetBuildDate())
+	userAgentValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", VersionInfo.Application,
+		VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), VersionInfo.Commit, VersionInfo.BuildDate)
 	downloaderHeaders := http.Header{"User-Agent": []string{userAgentValue}}
 
 	resp, err := commands.Init(context.Background(), req, OutputProgressBar(), OutputTaskProgress(), downloaderHeaders)

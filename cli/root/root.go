@@ -35,7 +35,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
-	ver "github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
 	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
@@ -49,7 +48,7 @@ func Init() *cobra.Command {
 		Use:              "arduino-cli",
 		Short:            "Arduino CLI.",
 		Long:             "Arduino Command Line Interface (arduino-cli).",
-		Example:          "  " + ver.GetAppName() + " <command> [flags...]",
+		Example:          "  " + cli.VersionInfo.Application + " <command> [flags...]",
 		PersistentPreRun: preRun,
 	}
 	command.PersistentFlags().BoolVar(&cli.GlobalFlags.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
@@ -92,7 +91,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	}
 	initConfigs()
 
-	logrus.Info(ver.GetAppName() + "-" + ver.GetVersion())
+	logrus.Info(cli.VersionInfo.Application + "-" + cli.VersionInfo.VersionString)
 	logrus.Info("Starting root command preparation (`arduino`)")
 	switch outputFormat {
 	case "text":
