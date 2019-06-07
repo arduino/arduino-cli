@@ -21,9 +21,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"runtime"
 
-	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
 	"go.bug.st/downloader"
 )
@@ -48,7 +46,7 @@ func (r *DownloadResource) IsCached(downloadDir *paths.Path) (bool, error) {
 }
 
 // Download a DownloadResource.
-func (r *DownloadResource) Download(downloadDir *paths.Path) (*downloader.Downloader, error) {
+func (r *DownloadResource) Download(downloadDir *paths.Path, downloaderHeaders http.Header) (*downloader.Downloader, error) {
 	cached, err := r.TestLocalArchiveIntegrity(downloadDir)
 	if err != nil {
 		return nil, fmt.Errorf("testing local archive integrity: %s", err)
@@ -76,18 +74,7 @@ func (r *DownloadResource) Download(downloadDir *paths.Path) (*downloader.Downlo
 		return nil, fmt.Errorf("getting archive file info: %s", err)
 	}
 
-	downloadConfig := r.ConfigureDownloader()
-	return downloader.DownloadWithConfig(path.String(), r.URL, downloadConfig)
-}
-
-// ConfigureDownloader adds additional config to the downloader helper
-func (r *DownloadResource) ConfigureDownloader() downloader.Config {
-	userAgentHeaderValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", version.GetApplication(),
-		version.GetVersion(), runtime.GOARCH, runtime.GOOS, runtime.Version(), version.GetCommit(), version.GetBuildDate())
 	downloadConfig := downloader.Config{
-		RequestHeaders: http.Header{
-			"User-Agent": []string{userAgentHeaderValue},
-		},
-	}
-	return downloadConfig
+		RequestHeaders: downloaderHeaders}
+	return downloader.DownloadWithConfig(path.String(), r.URL, downloadConfig)
 }
