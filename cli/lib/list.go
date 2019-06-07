@@ -19,7 +19,6 @@ package lib
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -52,7 +51,7 @@ var listFlags struct {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstaceIgnorePlatformIndexErrors(http.Header{})
+	instance := cli.CreateInstaceIgnorePlatformIndexErrors()
 	logrus.Info("Listing")
 
 	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{

@@ -20,7 +20,6 @@ package board
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -44,7 +43,7 @@ func initDetailsCommand() *cobra.Command {
 }
 
 func runDetailsCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance(http.Header{})
+	instance := cli.CreateInstance()
 
 	res, err := board.Details(context.Background(), &rpc.BoardDetailsReq{
 		Instance: instance,

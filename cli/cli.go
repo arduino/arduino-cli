@@ -20,9 +20,11 @@ package cli
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -85,9 +87,14 @@ func packageManagerInitReq() *rpc.InitReq {
 	return &rpc.InitReq{Configuration: conf}
 }
 
-func InitInstance(downloaderHeaders http.Header) *rpc.InitResp {
+func InitInstance() *rpc.InitResp {
 	logrus.Info("Initializing package manager")
 	req := packageManagerInitReq()
+
+	userAgentValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", version.GetApplication(),
+		version.GetVersion(), runtime.GOARCH, runtime.GOOS, runtime.Version(), version.GetCommit(), version.GetBuildDate())
+	downloaderHeaders := http.Header{"User-Agent": []string{userAgentValue}}
+
 	resp, err := commands.Init(context.Background(), req, OutputProgressBar(), OutputTaskProgress(), downloaderHeaders)
 	if err != nil {
 		formatter.PrintError(err, "Error initializing package manager")
@@ -112,8 +119,8 @@ func InitInstance(downloaderHeaders http.Header) *rpc.InitResp {
 }
 
 // CreateInstance creates and return an instance of the Arduino Core engine
-func CreateInstance(downloaderHeaders http.Header) *rpc.Instance {
-	resp := InitInstance(downloaderHeaders)
+func CreateInstance() *rpc.Instance {
+	resp := InitInstance()
 	if resp.GetPlatformsIndexErrors() != nil {
 		for _, err := range resp.GetPlatformsIndexErrors() {
 			formatter.PrintError(errors.New(err), "Error loading index")
@@ -126,14 +133,14 @@ func CreateInstance(downloaderHeaders http.Header) *rpc.Instance {
 
 // CreateInstaceIgnorePlatformIndexErrors creates and return an instance of the
 // Arduino Core Engine, but won't stop on platforms index loading errors.
-func CreateInstaceIgnorePlatformIndexErrors(downloaderHeaders http.Header) *rpc.Instance {
-	return InitInstance(downloaderHeaders).GetInstance()
+func CreateInstaceIgnorePlatformIndexErrors() *rpc.Instance {
+	return InitInstance().GetInstance()
 }
 
 // InitPackageAndLibraryManager initializes the PackageManager and the
 // LibaryManager with the default configuration. (DEPRECATED)
-func InitPackageAndLibraryManager(downloaderHeaders http.Header) (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
-	resp := InitInstance(downloaderHeaders)
+func InitPackageAndLibraryManager() (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
+	resp := InitInstance()
 	return commands.GetPackageManager(resp), commands.GetLibraryManager(resp)
 }
 

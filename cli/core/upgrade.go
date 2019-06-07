@@ -46,7 +46,7 @@ func initUpgradeCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance(http.Header{})
+	instance := cli.CreateInstance()
 	logrus.Info("Executing `arduino core upgrade`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)

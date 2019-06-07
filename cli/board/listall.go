@@ -20,7 +20,6 @@ package board
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"sort"
 
@@ -50,7 +49,7 @@ func initListAllCommand() *cobra.Command {
 
 // runListAllCommand list all installed boards
 func runListAllCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance(http.Header{})
+	instance := cli.CreateInstance()
 
 	list, err := board.ListAll(context.Background(), &rpc.BoardListAllReq{
 		Instance:   instance,

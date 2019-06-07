@@ -44,7 +44,7 @@ func initUpgradeCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstaceIgnorePlatformIndexErrors(http.Header{})
+	instance := cli.CreateInstaceIgnorePlatformIndexErrors()
 
 	err := lib.LibraryUpgradeAll(context.Background(), &rpc.LibraryUpgradeAllReq{
 		Instance: instance,

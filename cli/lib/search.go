@@ -20,7 +20,6 @@ package lib
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"sort"
 	"strings"
@@ -52,7 +51,7 @@ var searchFlags struct {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstaceIgnorePlatformIndexErrors(http.Header{})
+	instance := cli.CreateInstaceIgnorePlatformIndexErrors()
 	logrus.Info("Executing `arduino lib search`")
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
 		Instance: instance,

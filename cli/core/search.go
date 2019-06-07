@@ -20,7 +20,6 @@ package core
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"sort"
 	"strings"
@@ -47,7 +46,7 @@ func initSearchCommand() *cobra.Command {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance(http.Header{})
+	instance := cli.CreateInstance()
 	logrus.Info("Executing `arduino core search`")
 
 	arguments := strings.ToLower(strings.Join(args, " "))
