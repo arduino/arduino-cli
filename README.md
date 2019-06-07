@@ -333,3 +333,20 @@ Because:
 #### How can I find the core/FQBN for a board?
 
 See: https://github.com/arduino/arduino-cli#step-4-find-and-install-the-right-core
+
+# Testing
+
+Currently Unit and Integration test are available for launch in 2 ways:
+
+1. classic `go test ./...` to launch both unit and integration test
+
+2. via [task](https://taskfile.dev) that includes the following options:
+
+```
+* build:                Build the project
+* test:                 Run the full testsuite
+* test-integration:     Run integration tests only
+* test-unit:            Run unit tests only
+```
+
+For Example to launch unit tests only run: `task test-unit` 
