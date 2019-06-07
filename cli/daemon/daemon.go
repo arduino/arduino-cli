@@ -21,10 +21,13 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
+	"runtime"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/daemon"
 	"github.com/arduino/arduino-cli/rpc"
+	"github.com/arduino/arduino-cli/version"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
@@ -53,7 +56,14 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	rpc.RegisterArduinoCoreServer(s, &daemon.ArduinoCoreServerImpl{})
+
+	userAgentValue := fmt.Sprintf("%s daemon/%s (%s; %s; %s) Commit:%s/Build:%s ", version.GetApplication(),
+		version.GetVersion(), runtime.GOARCH, runtime.GOOS, runtime.Version(), version.GetCommit(), version.GetBuildDate())
+	headers := http.Header{"User-Agent": []string{userAgentValue}}
+
+	coreServer := daemon.ArduinoCoreServerImpl{DownloaderHeaders: headers}
+
+	rpc.RegisterArduinoCoreServer(s, &coreServer)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
