@@ -37,7 +37,7 @@ func initInstallCommand() *cobra.Command {
 		Example: "  # download the latest version of arduino SAMD core.\n" +
 			"  " + cli.AppName + " core install arduino:samd\n\n" +
 			"  # download a specific version (in this case 1.6.9).\n" +
-			"  " + cli.AppName + " core install arduino:samd=1.6.9",
+			"  " + cli.AppName + " core install arduino:samd@1.6.9",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}
