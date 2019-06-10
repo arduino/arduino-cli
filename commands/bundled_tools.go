@@ -27,7 +27,8 @@ import (
 )
 
 // DownloadToolRelease downloads a ToolRelease
-func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, downloadCB DownloadProgressCB, downloaderHeaders http.Header) error {
+func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease,
+	downloadCB DownloadProgressCB, downloaderHeaders http.Header) error {
 	resp, err := pm.DownloadToolRelease(toolRelease, downloaderHeaders)
 	if err != nil {
 		return err

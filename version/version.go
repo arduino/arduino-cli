@@ -49,6 +49,7 @@ func (i *Info) String() string {
 	return fmt.Sprintf("%s Version: %s Commit: %s BuildDate: %s", i.Application, i.VersionString, i.Commit, i.BuildDate)
 }
 
+//nolint:gochecknoinits
 func init() {
 	if versionString == "" {
 		versionString = defaultVersionString

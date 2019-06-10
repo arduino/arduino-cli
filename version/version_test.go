@@ -26,7 +26,9 @@ import (
 
 // TestIntegrationBuildInjectedInfo is an integration test that aims to test the Info strings passed to the binary at build time
 // in order to have this test green launch your testing using the provided task (see /Taskfile.yml) or use:
-// go test -run Integration -v ./... -ldflags '-X github.com/arduino/arduino-cli/version.versionString=0.0.0-test.preview -X github.com/arduino/arduino-cli/version.commit=deadbeef'
+//     go test -run Integration -v ./... -ldflags '
+//       -X github.com/arduino/arduino-cli/version.versionString=0.0.0-test.preview
+//       -X github.com/arduino/arduino-cli/version.commit=deadbeef'
 func TestIntegrationBuildInjectedInfo(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skip integration test")

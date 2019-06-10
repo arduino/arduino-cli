@@ -29,7 +29,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadCB commands.DownloadProgressCB, downloaderHeaders http.Header) (*rpc.LibraryDownloadResp, error) {
+func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadCB commands.DownloadProgressCB,
+	downloaderHeaders http.Header) (*rpc.LibraryDownloadResp, error) {
 	logrus.Info("Executing `arduino lib download`")
 
 	lm := commands.GetLibraryManager(req)

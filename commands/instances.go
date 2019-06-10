@@ -83,7 +83,8 @@ func GetDiscoveries(req InstanceContainer) []*discovery.Discovery {
 	return i.discoveries
 }
 
-func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, downloadCB DownloadProgressCB, taskCB TaskProgressCB, downloaderHeaders http.Header) (bool, error) {
+func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, downloadCB DownloadProgressCB,
+	taskCB TaskProgressCB, downloaderHeaders http.Header) (bool, error) {
 	if tool.IsInstalled() {
 		return false, nil
 	}
@@ -98,7 +99,8 @@ func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, down
 	return true, nil
 }
 
-func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB, taskCB TaskProgressCB, downloaderHeaders http.Header) error {
+func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB, taskCB TaskProgressCB,
+	downloaderHeaders http.Header) error {
 	// Check for ctags tool
 	ctags, _ := getBuiltinCtagsTool(instance.pm)
 	ctagsInstalled, err := instance.installToolIfMissing(ctags, downloadCB, taskCB, downloaderHeaders)

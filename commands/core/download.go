@@ -29,7 +29,8 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
-func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloadCB commands.DownloadProgressCB, downloaderHeaders http.Header) (*rpc.PlatformDownloadResp, error) {
+func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloadCB commands.DownloadProgressCB,
+	downloaderHeaders http.Header) (*rpc.PlatformDownloadResp, error) {
 	pm := commands.GetPackageManager(req)
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -64,7 +65,8 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloa
 	return &rpc.PlatformDownloadResp{}, nil
 }
 
-func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, downloadCB commands.DownloadProgressCB, downloaderHeaders http.Header) error {
+func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease,
+	downloadCB commands.DownloadProgressCB, downloaderHeaders http.Header) error {
 	// Download platform
 	resp, err := pm.DownloadPlatformRelease(platformRelease, downloaderHeaders)
 	if err != nil {
@@ -73,7 +75,8 @@ func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.
 	return commands.Download(resp, platformRelease.String(), downloadCB)
 }
 
-func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB commands.DownloadProgressCB, downloaderHeaders http.Header) error {
+func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB commands.DownloadProgressCB,
+	downloaderHeaders http.Header) error {
 	// Check if tool has a flavor available for the current OS
 	if tool.GetCompatibleFlavour() == nil {
 		return fmt.Errorf("tool %s not available for the current OS", tool)

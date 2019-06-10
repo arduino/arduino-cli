@@ -55,7 +55,7 @@ const (
 // appName is the command line name of the Arduino CLI executable on the user system (users may change it)
 var appName = filepath.Base(os.Args[0])
 
-// func NewInfo(application string, versionString string, commit string) *Info {
+// VersionInfo contains all info injected during build
 var VersionInfo = version.NewInfo(appName)
 
 // ErrLogrus represents the logrus instance, which has the role to
