@@ -22,11 +22,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"runtime"
 	"strings"
 	"testing"
 
-	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
@@ -39,9 +37,8 @@ func (h *EchoHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 }
 
 func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
-	userAgentValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", version.GetApplication(),
-		version.GetVersion(), runtime.GOARCH, runtime.GOOS, runtime.Version(), version.GetCommit(), version.GetBuildDate())
-	goldUserAgentString := "User-Agent: " + userAgentValue
+	goldUserAgentValue := fmt.Sprintf("arduino-cli/0.0.0-test.preview (amd64; linux; go1.12.4) Commit:deadbeef/Build:2019-06-12 11:11:11.111")
+	goldUserAgentString := "User-Agent: " + goldUserAgentValue
 
 	tmp, err := paths.MkTempDir("", "")
 	require.NoError(t, err)
@@ -57,7 +54,7 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 		URL:             srv.URL,
 	}
 
-	d, err := r.Download(tmp, http.Header{"User-Agent": []string{userAgentValue}})
+	d, err := r.Download(tmp, http.Header{"User-Agent": []string{goldUserAgentValue}})
 	require.NoError(t, err)
 	err = d.Run()
 	require.NoError(t, err)
@@ -67,7 +64,7 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 	// expect something like:
 	//    GET /echo HTTP/1.1
 	//    Host: 127.0.0.1:64999
-	//    User-Agent: arduino-cli/0.3.6-alpha.preview (amd64; linux; go1.10) Commit:missing/Build:missing
+	//    User-Agent: arduino-cli/0.0.0-test.preview  (amd64; linux; go1.12.4) Commit:deadbeef/Build:2019-06-12 11:11:11.111
 	//    Accept-Encoding: gzip
 
 	b, err := ioutil.ReadFile(tmp.String() + "/cache/echo.txt") // just pass the file name
