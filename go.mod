@@ -3,6 +3,7 @@ module github.com/arduino/arduino-cli
 go 1.12
 
 require (
+	bou.ke/monkey v1.0.1 // indirect
 	github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c
 	github.com/arduino/go-paths-helper v0.0.0-20190214132331-c3c98d1bf2e1
 	github.com/arduino/go-properties-orderedmap v0.0.0-20181003091528-89278049acd3
@@ -12,7 +13,6 @@ require (
 	github.com/cmaglie/pb v1.0.27
 	github.com/codeclysm/cc v1.2.2 // indirect
 	github.com/codeclysm/extract v2.2.0+incompatible
-	github.com/cpuguy83/go-md2man v1.0.8 // indirect
 	github.com/creack/goselect v0.0.0-20180328191401-176c667f75aa // indirect
 	github.com/fatih/color v1.6.0
 	github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 // indirect
@@ -22,7 +22,6 @@ require (
 	github.com/golang/protobuf v1.3.1
 	github.com/gosuri/uitable v0.0.0-20160404203958-36ee7e946282
 	github.com/h2non/filetype v1.0.8 // indirect
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5 // indirect
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
 	github.com/juju/testing v0.0.0-20190429233213-dfc56b8c09fc // indirect
@@ -31,17 +30,13 @@ require (
 	github.com/miekg/dns v1.0.5 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/oleksandr/bonjour v0.0.0-20160508152359-5dcf00d8b228 // indirect
-	github.com/onsi/ginkgo v1.8.0 // indirect
-	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/pmylund/sortutil v0.0.0-20120526081524-abeda66eb583
-	github.com/russross/blackfriday v1.5.1 // indirect
 	github.com/schollz/closestmatch v2.1.0+incompatible
 	github.com/sergi/go-diff v1.0.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
 	github.com/spf13/cobra v0.0.4
-	github.com/spf13/pflag v1.0.1 // indirect
 	github.com/stretchr/testify v1.3.0
 	go.bug.st/cleanup v1.0.0
 	go.bug.st/downloader v1.1.0
@@ -52,8 +47,6 @@ require (
 	golang.org/x/text v0.3.0
 	google.golang.org/genproto v0.0.0-20190327125643-d831d65fe17d // indirect
 	google.golang.org/grpc v1.21.1
-	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
-	gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.2 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
 	gopkg.in/yaml.v2 v2.2.2
 )
