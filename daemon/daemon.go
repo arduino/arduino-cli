@@ -29,7 +29,6 @@ import (
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
-	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/upload"
@@ -122,18 +121,6 @@ func (s *ArduinoCoreServerImpl) Init(req *rpc.InitReq, stream rpc.ArduinoCore_In
 
 func (s *ArduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionReq) (*rpc.VersionResp, error) {
 	return &rpc.VersionResp{Version: cli.Version}, nil
-}
-
-func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoCore_CompileServer) error {
-	resp, err := compile.Compile(
-		stream.Context(), req,
-		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{OutStream: data}) }),
-		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{ErrStream: data}) }),
-	)
-	if err != nil {
-		return err
-	}
-	return stream.Send(resp)
 }
 
 func (s *ArduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallReq, stream rpc.ArduinoCore_PlatformInstallServer) error {

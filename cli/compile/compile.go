@@ -19,12 +19,13 @@ package compile
 
 import (
 	"context"
+	"errors"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/rpc"
+	"github.com/arduino/arduino-cli/proto-gen/commands/rpc_v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/spf13/cobra"
 )
@@ -89,15 +90,28 @@ var flags struct {
 	exportFile      string   // The compiled binary is written to this file
 }
 
+// FIXME: temporary fix
+func createInstance() *rpc_v1.Instance {
+	resp := cli.InitInstance()
+	if resp.GetPlatformsIndexErrors() != nil {
+		for _, err := range resp.GetPlatformsIndexErrors() {
+			formatter.PrintError(errors.New(err), "Error loading index")
+		}
+		formatter.PrintErrorMessage("Launch 'core update-index' to fix or download indexes.")
+		os.Exit(cli.ErrGeneric)
+	}
+	return &rpc_v1.Instance{Id: resp.GetInstance().Id}
+}
+
 func run(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := createInstance()
 
 	var path *paths.Path
 	if len(args) > 0 {
 		path = paths.New(args[0])
 	}
 	sketchPath := cli.InitSketchPath(path)
-	compRes, err := compile.Compile(context.Background(), &rpc.CompileReq{
+	_, err := compile.Compile(context.Background(), &rpc_v1.CompileReq{
 		Instance:        instance,
 		Fqbn:            flags.fqbn,
 		SketchPath:      sketchPath.String(),
@@ -113,13 +127,14 @@ func run(cmd *cobra.Command, args []string) {
 		ExportFile:      flags.exportFile,
 	}, os.Stdout, os.Stderr)
 	if err == nil {
-		outputCompileResp(compRes)
+		// FIXME: re-enable
+		//outputCompileResp(compRes)
 	} else {
 		formatter.PrintError(err, "Error during build")
 		os.Exit(cli.ErrGeneric)
 	}
 }
 
-func outputCompileResp(details *rpc.CompileResp) {
+func outputCompileResp(details *rpc_v1.ExecResp) {
 
 }

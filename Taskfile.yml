@@ -1,6 +1,13 @@
 version: '2'
 
 tasks:
+  protoc:
+    desc: Compile protobuf definitions
+    cmds:
+      - protoc --proto_path=. --go_out=plugins=grpc,paths=source_relative:./proto-gen ./commands/rpc_v1/commands.proto
+      - protoc --proto_path=. --go_out=plugins=grpc,paths=source_relative:./proto-gen ./commands/rpc_v1/types.proto
+      - protoc --proto_path=. --go_out=plugins=grpc,paths=source_relative:./proto-gen ./commands/rpc_v1/compile.proto
+
   build:
     desc: Build the project
     cmds:

@@ -34,13 +34,31 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/proto-gen/commands/rpc_v1"
 	"github.com/arduino/arduino-cli/rpc"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 )
 
-func Compile(ctx context.Context, req *rpc.CompileReq, outStream io.Writer, errStream io.Writer) (*rpc.CompileResp, error) {
+func Compile(ctx context.Context, compile_req *rpc_v1.CompileReq, outStream io.Writer, errStream io.Writer) (*rpc.CompileResp, error) {
+	// FIXME: temprary fix to show alternative protobuf layout
+	req := &rpc.CompileReq{
+		Instance:        &rpc.Instance{Id: compile_req.Instance.Id},
+		Fqbn:            compile_req.Fqbn,
+		SketchPath:      compile_req.SketchPath,
+		ShowProperties:  compile_req.ShowProperties,
+		Preprocess:      compile_req.Preprocess,
+		BuildCachePath:  compile_req.BuildCachePath,
+		BuildPath:       compile_req.BuildPath,
+		BuildProperties: compile_req.BuildProperties,
+		Warnings:        compile_req.Warnings,
+		Verbose:         compile_req.Verbose,
+		Quiet:           compile_req.Quiet,
+		VidPid:          compile_req.VidPid,
+	}
+	// FIXME: end of fix
+
 	pm := commands.GetPackageManager(req)
 	if pm == nil {
 		return nil, errors.New("invalid instance")

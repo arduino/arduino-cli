@@ -1206,7 +1206,6 @@ type ArduinoCoreServer interface {
 	BoardAttach(*BoardAttachReq, ArduinoCore_BoardAttachServer) error
 	BoardList(context.Context, *BoardListReq) (*BoardListResp, error)
 	BoardListAll(context.Context, *BoardListAllReq) (*BoardListAllResp, error)
-	Compile(*CompileReq, ArduinoCore_CompileServer) error
 	PlatformInstall(*PlatformInstallReq, ArduinoCore_PlatformInstallServer) error
 	PlatformDownload(*PlatformDownloadReq, ArduinoCore_PlatformDownloadServer) error
 	PlatformUninstall(*PlatformUninstallReq, ArduinoCore_PlatformUninstallServer) error
@@ -1416,14 +1415,6 @@ func _ArduinoCore_BoardListAll_Handler(srv interface{}, ctx context.Context, dec
 		return srv.(ArduinoCoreServer).BoardListAll(ctx, req.(*BoardListAllReq))
 	}
 	return interceptor(ctx, in, info, handler)
-}
-
-func _ArduinoCore_Compile_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(CompileReq)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(ArduinoCoreServer).Compile(m, &arduinoCoreCompileServer{stream})
 }
 
 type ArduinoCore_CompileServer interface {
@@ -1764,11 +1755,6 @@ var _ArduinoCore_serviceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "BoardAttach",
 			Handler:       _ArduinoCore_BoardAttach_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "Compile",
-			Handler:       _ArduinoCore_Compile_Handler,
 			ServerStreams: true,
 		},
 		{
