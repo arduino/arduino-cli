@@ -34,6 +34,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fatih/color v1.6.0 h1:66qjqZk8kalYAvDRtM1AdAJQI0tj4Wrue3Eq3B3pmFU=
 github.com/fatih/color v1.6.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
+github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
+github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 h1:C6sOwknxwWfLBEQ91zhmptlfxf7pVEs5s6wOnDxNpS4=
 github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2/go.mod h1:c7sGIpDbBo0JZZ1tKyC1p5smWf8QcUjK4bFtZjHAecg=
 github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 h1:R8jFW6G/bjoXjWPFrEfw9G5YQDlYhwV4AC+Eonu6wmk=
