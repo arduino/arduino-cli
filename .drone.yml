@@ -6,4 +6,4 @@ steps:
   image: golang
   commands:
   - curl -sL https://taskfile.dev/install.sh | sh
-  - task test
+  - ./bin/task test
