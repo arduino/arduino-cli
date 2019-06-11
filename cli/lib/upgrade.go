@@ -18,7 +18,6 @@
 package lib
 
 import (
-	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -48,7 +47,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 	err := lib.LibraryUpgradeAll(context.Background(), &rpc.LibraryUpgradeAllReq{
 		Instance: instance,
-	}, cli.OutputProgressBar(), cli.OutputTaskProgress(), http.Header{})
+	}, cli.OutputProgressBar(), cli.OutputTaskProgress(), cli.HTTPClientHeader)
 	if err != nil {
 		formatter.PrintError(err, "Error upgrading libraries")
 		os.Exit(cli.ErrGeneric)

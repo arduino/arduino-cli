@@ -19,7 +19,6 @@ package core
 
 import (
 	"context"
-	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -62,7 +61,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.Architecture,
 		}, cli.OutputProgressBar(), cli.OutputTaskProgress(),
-			http.Header{})
+			cli.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error during upgrade")
 			os.Exit(cli.ErrGeneric)

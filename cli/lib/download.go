@@ -19,7 +19,6 @@ package lib
 
 import (
 	"context"
-	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
@@ -52,11 +51,13 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		os.Exit(cli.ErrBadArgument)
 	}
 	for _, library := range pairs {
-		_, err := lib.LibraryDownload(context.Background(), &rpc.LibraryDownloadReq{
+		libraryDownloadReq := &rpc.LibraryDownloadReq{
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version.String(),
-		}, cli.OutputProgressBar(), http.Header{})
+		}
+		_, err := lib.LibraryDownload(context.Background(), libraryDownloadReq, cli.OutputProgressBar(),
+			cli.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+library.String())
 			os.Exit(cli.ErrNetwork)

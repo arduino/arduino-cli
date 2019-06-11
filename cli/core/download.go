@@ -19,7 +19,6 @@ package core
 
 import (
 	"context"
-	"net/http"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -50,14 +49,14 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	platformsRefs := parsePlatformReferenceArgs(args)
 	for i, platformRef := range platformsRefs {
-		_, err := core.PlatformDownload(context.Background(), &rpc.PlatformDownloadReq{
+		platformDownloadreq := &rpc.PlatformDownloadReq{
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
-		}, cli.OutputProgressBar(),
-			http.Header{},
-		)
+		}
+		_, err := core.PlatformDownload(context.Background(), platformDownloadreq, cli.OutputProgressBar(),
+			cli.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+args[i])
 			os.Exit(cli.ErrNetwork)

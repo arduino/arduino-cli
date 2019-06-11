@@ -58,6 +58,8 @@ var appName = filepath.Base(os.Args[0])
 // VersionInfo contains all info injected during build
 var VersionInfo = version.NewInfo(appName)
 
+var HTTPClientHeader = getHTTPClientHeader()
+
 // ErrLogrus represents the logrus instance, which has the role to
 // log all non info messages.
 var ErrLogrus = logrus.New()
@@ -87,15 +89,18 @@ func packageManagerInitReq() *rpc.InitReq {
 	return &rpc.InitReq{Configuration: conf}
 }
 
+func getHTTPClientHeader() http.Header {
+	userAgentValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", VersionInfo.Application,
+		VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), VersionInfo.Commit, VersionInfo.BuildDate)
+	downloaderHeaders := http.Header{"User-Agent": []string{userAgentValue}}
+	return downloaderHeaders
+}
+
 func InitInstance() *rpc.InitResp {
 	logrus.Info("Initializing package manager")
 	req := packageManagerInitReq()
 
-	userAgentValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", VersionInfo.Application,
-		VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), VersionInfo.Commit, VersionInfo.BuildDate)
-	downloaderHeaders := http.Header{"User-Agent": []string{userAgentValue}}
-
-	resp, err := commands.Init(context.Background(), req, OutputProgressBar(), OutputTaskProgress(), downloaderHeaders)
+	resp, err := commands.Init(context.Background(), req, OutputProgressBar(), OutputTaskProgress(), HTTPClientHeader)
 	if err != nil {
 		formatter.PrintError(err, "Error initializing package manager")
 		os.Exit(ErrGeneric)
