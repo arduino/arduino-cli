@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/utils"
+	"github.com/schollz/closestmatch"
 	"github.com/sirupsen/logrus"
 )
 
@@ -69,7 +70,6 @@ func (resolver *Cpp) ScanLibrary(lib *libraries.Library) error {
 
 // AlternativesFor returns all the libraries that provides the specified header
 func (resolver *Cpp) AlternativesFor(header string) libraries.List {
-	fmt.Printf("Alternatives for %s: %s\n", header, resolver.headers[header])
 	return resolver.headers[header]
 }
 
@@ -77,31 +77,48 @@ func (resolver *Cpp) AlternativesFor(header string) libraries.List {
 // header and architecture. If no libraries provides the requested header, nil is returned
 func (resolver *Cpp) ResolveFor(header, architecture string) *libraries.Library {
 	logrus.Infof("Resolving include %s for arch %s", header, architecture)
-	var found *libraries.Library
+	var found libraries.List
 	var foundPriority int
 	for _, lib := range resolver.headers[header] {
 		libPriority := computePriority(lib, header, architecture)
 		msg := "  discarded"
 		if found == nil || foundPriority < libPriority {
-			found = lib
+			found = libraries.List{}
+			found.Add(lib)
 			foundPriority = libPriority
 			msg = "  found better lib"
+		} else if foundPriority == libPriority {
+			found.Add(lib)
+			msg = "  found another lib with same priority"
 		}
 		logrus.
 			WithField("lib", lib.Name).
 			WithField("prio", fmt.Sprintf("%03X", libPriority)).
 			Infof(msg)
 	}
-	return found
+	if found == nil {
+		return nil
+	}
+	if len(found) == 1 {
+		return found[0]
+	}
+
+	// If more than one library qualifies use the "closestmatch" algorithm to
+	// find the best matching one (instead of choosing it randomly)
+	winner := findLibraryWithNameBestDistance(header, found)
+	if winner != nil {
+		logrus.WithField("lib", winner.Name).Info("  library with the best mathing name")
+	}
+	return winner
+}
+
+func simplify(name string) string {
+	name = utils.SanitizeName(name)
+	name = strings.ToLower(name)
+	return name
 }
 
 func computePriority(lib *libraries.Library, header, arch string) int {
-	simplify := func(name string) string {
-		name = utils.SanitizeName(name)
-		name = strings.ToLower(name)
-		return name
-	}
-
 	header = strings.TrimSuffix(header, filepath.Ext(header))
 	header = simplify(header)
 	name := simplify(lib.Name)
@@ -119,4 +136,28 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 		priority += 0x100
 	}
 	return priority
+}
+
+func findLibraryWithNameBestDistance(name string, libs libraries.List) *libraries.Library {
+	// Create closestmatch DB
+	wordsToTest := []string{}
+	for _, lib := range libs {
+		wordsToTest = append(wordsToTest, simplify(lib.Name))
+	}
+	// Choose a set of bag sizes, more is more accurate but slower
+	bagSizes := []int{2}
+
+	// Create a closestmatch object and find the best matching name
+	cm := closestmatch.New(wordsToTest, bagSizes)
+	closestName := cm.Closest(name)
+
+	// Return the closest-matching lib
+	var winner *libraries.Library
+	for _, lib := range libs {
+		if closestName == simplify(lib.Name) {
+			winner = lib
+			break
+		}
+	}
+	return winner
 }

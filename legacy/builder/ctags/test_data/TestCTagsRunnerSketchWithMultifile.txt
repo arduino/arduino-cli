@@ -1,0 +1,77 @@
+allowed_ch	/tmp/apUNI8a/a7105.ino	/^const uint8_t allowed_ch[] = {0x14, 0x1e, 0x28, 0x32, 0x3c, 0x46, 0x50, 0x5a, 0x64, 0x6e, 0x78, 0x82};$/;"	kind:variable	line:21
+no_allowed_channels	/tmp/apUNI8a/a7105.ino	/^int no_allowed_channels = 12;$/;"	kind:variable	line:22
+A7105_Setup	/tmp/apUNI8a/a7105.ino	/^void A7105_Setup() {$/;"	kind:function	line:26	signature:()	returntype:void
+A7105_Reset	/tmp/apUNI8a/a7105.ino	/^void A7105_Reset()$/;"	kind:function	line:43	signature:()	returntype:void
+A7105_calibrate_IF	/tmp/apUNI8a/a7105.ino	/^int A7105_calibrate_IF() {$/;"kind:function	line:52	signature:()	returntype:int
+A7105_calibrate_VCB	/tmp/apUNI8a/a7105.ino	/^int A7105_calibrate_VCB(uint8_t channel) {$/;"	kind:function	line:87	signature:(uint8_t channel)	returntype:int
+A7105_SetPower	/tmp/apUNI8a/a7105.ino	/^void A7105_SetPower(int power)$/;"	kind:function	line:120	signature:(int power)	returntype:void
+A7105_Strobe	/tmp/apUNI8a/a7105.ino	/^void A7105_Strobe(enum A7105_State state);$/;"	kind:prototype	line:176	signature:(enum A7105_State state)	returntype:void
+A7105_Strobe	/tmp/apUNI8a/a7105.ino	/^void A7105_Strobe(enum A7105_State state)$/;"	kind:function	line:179	signature:(enum A7105_State state)	returntype:void
+A7105_WriteReg	/tmp/apUNI8a/a7105.ino	/^void A7105_WriteReg(uint8_t address, uint8_t data)$/;"	kind:function	line:190	signature:(uint8_t address, uint8_t data)	returntype:void
+A7105_ReadReg	/tmp/apUNI8a/a7105.ino	/^uint8_t A7105_ReadReg(uint8_t address)$/;"	kind:function	line:197	signature:(uint8_t address)	returntype:uint8_t
+A7105_WriteData	/tmp/apUNI8a/a7105.ino	/^void A7105_WriteData(uint8_t *dpbuffer, uint8_t len, uint8_t channel)$/;"	kind:function	line:211	signature:(uint8_t *dpbuffer, uint8_t len, uint8_t channel)	returntype:void
+A7105_ReadData	/tmp/apUNI8a/a7105.ino	/^void A7105_ReadData(uint8_t *dpbuffer, uint8_t len)$/;"	kind:function	line:229	signature:(uint8_t *dpbuffer, uint8_t len)	returntype:void
+A7105_WriteID	/tmp/apUNI8a/a7105.ino	/^void A7105_WriteID(unsigned long id)$/;"	kind:function	line:247	signature:(unsigned long id)	returntype:void
+A7105_ReadID	/tmp/apUNI8a/a7105.ino	/^void A7105_ReadID()$/;"	kind:function	line:258	signature:()	returntype:void
+k13	/tmp/apUNI8a/a7105.ino	/^unsigned char k13;$/;"	kind:variable	line:272
+make_test_packet	/tmp/apUNI8a/a7105.ino	/^void make_test_packet(uint8_t testpacket[]) {$/;"	kind:function	line:275	signature:(uint8_t testpacket[])	returntype:void
+printpacket	/tmp/apUNI8a/a7105.ino	/^void printpacket(uint8_t packet[]) {$/;"	kind:function	line:295	signature:(uint8_t packet[])	returntype:void
+A7105_shoutchannel	/tmp/apUNI8a/a7105.ino	/^void A7105_shoutchannel() {$/;"	kind:function	line:308	signature:()	returntype:void
+A7105_oneShout	/tmp/apUNI8a/a7105.ino	/^int A7105_oneShout() {$/;"	kind:function	line:337	signature:()	returntype:int
+A7105_oneShoutRAM	/tmp/apUNI8a/a7105.ino	/^int A7105_oneShoutRAM(unsigned char xState, unsigned char xType) {$/;"	kind:function	line:361	signature:(unsigned char xState, unsigned char xType)	returntype:int
+eavesdrop	/tmp/apUNI8a/a7105.ino	/^void eavesdrop() {$/;"	kind:function	line:391	signature:()	returntype:void
+A7105_findchannel	/tmp/apUNI8a/a7105.ino	/^uint8_t A7105_findchannel() {$/;"	kind:function	line:442	signature:()	returntype:uint8_t
+A7105_sniffchannel	/tmp/apUNI8a/a7105.ino	/^int A7105_sniffchannel() {$/;"kind:function	line:464	signature:()	returntype:int
+A7105_sniffchannel	/tmp/apUNI8a/a7105.ino	/^void A7105_sniffchannel(uint8_t _channel) {$/;"	kind:function	line:484	signature:(uint8_t _channel)	returntype:void
+A7105_scanchannels	/tmp/apUNI8a/a7105.ino	/^void A7105_scanchannels(const uint8_t channels[]) {$/;"	kind:function	line:498	signature:(const uint8_t channels[])	returntype:void
+Channels	/tmp/apUNI8a/hubsan.ino	/^volatile int16_t Channels[12];$/;"	kind:variable	line:6
+initialize	/tmp/apUNI8a/hubsan.ino	/^static void initialize() {$/;"	kind:function	line:8	signature:()	returntype:void
+hubsan_init	/tmp/apUNI8a/hubsan.ino	/^int hubsan_init()$/;"	kind:function	line:22	signature:()	returntype:int
+update_crc	/tmp/apUNI8a/hubsan.ino	/^static void update_crc()$/;"	kind:function	line:80	signature:()	returntype:void
+recdState	/tmp/apUNI8a/main.ino	/^unsigned char recdState, recdType;$/;"kind:variable	line:5
+recdType	/tmp/apUNI8a/main.ino	/^unsigned char recdState, recdType;$/;"kind:variable	line:5
+retries	/tmp/apUNI8a/main.ino	/^unsigned char retries;$/;"	kind:variable	line:6
+bwMap	/tmp/apUNI8a/main.ino	/^const unsigned char bwMap[4 \/* new cycle green yellow red blue (green) *\/] = {2, 6, 4, 1};$/;"	kind:variable	line:27
+bwButton	/tmp/apUNI8a/main.ino	/^unsigned char bwButton, bwCycle;$/;"	kind:variable	line:28
+bwCycle	/tmp/apUNI8a/main.ino	/^unsigned char bwButton, bwCycle;$/;"	kind:variable	line:28
+checkBW	/tmp/apUNI8a/main.ino	/^void checkBW(void); \/* watch button increment bwCycle *\/$/;"	kind:prototype	line:29	signature:(void)	returntype:void
+ledState	/tmp/apUNI8a/main.ino	/^unsigned char ledState;$/;"	kind:variable	line:31
+mySwitches	/tmp/apUNI8a/main.ino	/^unsigned char mySwitches;$/;"	kind:variable	line:32
+BWMODE	/tmp/apUNI8a/main.ino	/^unsigned char BWMODE, BLINKMODE;$/;"	kind:variable	line:34
+BLINKMODE	/tmp/apUNI8a/main.ino	/^unsigned char BWMODE, BLINKMODE;$/;"	kind:variable	line:34
+lightFSM	/tmp/apUNI8a/main.ino	/^void lightFSM(void);$/;"	kind:prototype	line:36	signature:(void)	returntype:void
+blinkLEDs	/tmp/apUNI8a/main.ino	/^void blinkLEDs(void);$/;"	kind:prototype	line:37	signature:(void)	returntype:void
+touchTimer	/tmp/apUNI8a/main.ino	/^unsigned touchTimer, lastTouch;$/;"	kind:variable	line:38
+lastTouch	/tmp/apUNI8a/main.ino	/^unsigned touchTimer, lastTouch;$/;"	kind:variable	line:38
+lightTimer	/tmp/apUNI8a/main.ino	/^unsigned char lightTimer;$/;"	kind:variable	line:40
+lamp	/tmp/apUNI8a/main.ino	/^unsigned int lamp;$/;"	kind:variable	line:45
+loops	/tmp/apUNI8a/main.ino	/^unsigned long loops;$/;"	kind:variable	line:46
+recFlag	/tmp/apUNI8a/main.ino	/^unsigned char recFlag; \/\/ have "we" asked for a packet?$/;"	kind:variable	line:48
+needAck	/tmp/apUNI8a/main.ino	/^unsigned char needAck;$/;"	kind:variable	line:49
+fsmFSM	/tmp/apUNI8a/main.ino	/^void fsmFSM(void);$/;"	kind:prototype	line:51	signature:(void)	returntype:void
+printFlag	/tmp/apUNI8a/main.ino	/^unsigned int printFlag;$/;"	kind:variable	line:52
+fsmTimer	/tmp/apUNI8a/main.ino	/^unsigned long fsmTimer;$/;"	kind:variable	line:53
+startval	/tmp/apUNI8a/main.ino	/^uint8_t startval, command;$/;"	kind:variable	line:57
+command	/tmp/apUNI8a/main.ino	/^uint8_t startval, command;$/;"	kind:variable	line:57
+iCnt	/tmp/apUNI8a/main.ino	/^int iCnt;$/;"	kind:variable	line:58
+myMessage	/tmp/apUNI8a/main.ino	/^char myMessage[8];$/;"	kind:variable	line:60
+ackMessage	/tmp/apUNI8a/main.ino	/^char ackMessage[8];$/;"	kind:variable	line:61
+setup	/tmp/apUNI8a/main.ino	/^void setup() {$/;"	kind:function	line:63signature:()	returntype:void
+valid	/tmp/apUNI8a/main.ino	/^unsigned char valid;$/;"	kind:variable	line:114
+loop	/tmp/apUNI8a/main.ino	/^void loop() {$/;"	kind:function	line:116signature:()	returntype:void
+listeni	/tmp/apUNI8a/main.ino	/^void listeni()$/;"	kind:function	line:165signature:()	returntype:void
+kickIt	/tmp/apUNI8a/main.ino	/^void kickIt(unsigned char xType)$/;"	kind:function	line:172	signature:(unsigned char xType)	returntype:void
+lightFSM	/tmp/apUNI8a/main.ino	/^void lightFSM()$/;"	kind:function	line:181	signature:()	returntype:void
+touchFSM	/tmp/apUNI8a/main.ino	/^void touchFSM()$/;"	kind:function	line:188	signature:()	returntype:void
+tween	/tmp/apUNI8a/main.ino	/^unsigned char tween[4] = {3, 5, 7, 11};$/;"	kind:variable	line:206
+fsmFSM	/tmp/apUNI8a/main.ino	/^void fsmFSM()$/;"	kind:function	line:207signature:()	returntype:void
+doBW	/tmp/apUNI8a/main.ino	/^void doBW(void) {$/;"	kind:function	line:243signature:(void)	returntype:void
+checkBW	/tmp/apUNI8a/main.ino	/^void checkBW()$/;"	kind:function	line:249signature:()	returntype:void
+getSwitches	/tmp/apUNI8a/main.ino	/^unsigned char getSwitches()$/;"	kind:function	line:260	signature:()	returntype:unsigned char
+xxLamp	/tmp/apUNI8a/main.ino	/^unsigned char xxLamp;$/;"	kind:variable	line:292
+setLEDs	/tmp/apUNI8a/main.ino	/^void setLEDs(unsigned char xx)$/;"	kind:function	line:294	signature:(unsigned char xx)	returntype:void
+blinks	/tmp/apUNI8a/main.ino	/^const unsigned char blinks[8] = {0, 1, 0, 1, 0, 0, 1, 1};$/;"	kind:variable	line:311
+blinkLEDs	/tmp/apUNI8a/main.ino	/^void blinkLEDs()$/;"	kind:function	line:312	signature:()	returntype:void
+proto_state	/tmp/apUNI8a/protocol.ino	/^static uint8_t proto_state;$/;"	kind:variable	line:4
+bind_time	/tmp/apUNI8a/protocol.ino	/^static uint32_t bind_time;$/;"kind:variable	line:5
+PROTOCOL_SetBindState	/tmp/apUNI8a/protocol.ino	/^void PROTOCOL_SetBindState(uint32_t msec)$/;"	kind:function	line:11	signature:(uint32_t msec)	returntype:void

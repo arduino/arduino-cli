@@ -20,11 +20,11 @@ package cores
 import (
 	"strings"
 
-	"github.com/arduino/go-paths-helper"
+	paths "github.com/arduino/go-paths-helper"
 
 	"github.com/arduino/arduino-cli/arduino/resources"
-	"github.com/arduino/go-properties-orderedmap"
-	"go.bug.st/relaxed-semver"
+	properties "github.com/arduino/go-properties-orderedmap"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // Platform represents a platform package.
@@ -158,7 +158,7 @@ func (platform *Platform) latestReleaseVersion() *semver.Version {
 func (platform *Platform) GetAllInstalled() []*PlatformRelease {
 	res := []*PlatformRelease{}
 	for _, release := range platform.Releases {
-		if release.InstallDir != nil {
+		if release.IsInstalled() {
 			res = append(res, release)
 		}
 	}

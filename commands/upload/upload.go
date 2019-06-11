@@ -18,121 +18,84 @@
 package upload
 
 import (
+	"context"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/executils"
+	"github.com/arduino/arduino-cli/rpc"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	serial "go.bug.st/serial.v1"
 )
 
-// InitCommand prepares the command.
-func InitCommand() *cobra.Command {
-	uploadCommand := &cobra.Command{
-		Use:     "upload",
-		Short:   "Upload Arduino sketches.",
-		Long:    "Upload Arduino sketches.",
-		Example: "  " + commands.AppName + " upload /home/user/Arduino/MySketch",
-		Args:    cobra.MaximumNArgs(1),
-		Run:     run,
-	}
-	uploadCommand.Flags().StringVarP(
-		&flags.fqbn, "fqbn", "b", "",
-		"Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	uploadCommand.Flags().StringVarP(
-		&flags.port, "port", "p", "",
-		"Upload port, e.g.: COM10 or /dev/ttyACM0")
-	uploadCommand.Flags().StringVarP(
-		&flags.importFile, "input", "i", "",
-		"Input file to be uploaded.")
-	uploadCommand.Flags().BoolVarP(
-		&flags.verify, "verify", "t", false,
-		"Verify uploaded binary after the upload.")
-	uploadCommand.Flags().BoolVarP(
-		&flags.verbose, "verbose", "v", false,
-		"Optional, turns on verbose mode.")
-	return uploadCommand
-}
+func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStream io.Writer) (*rpc.UploadResp, error) {
+	logrus.Info("Executing `arduino upload`")
 
-var flags struct {
-	fqbn       string
-	port       string
-	verbose    bool
-	verify     bool
-	importFile string
-}
-
-func run(command *cobra.Command, args []string) {
-	var sketchPath *paths.Path
-	if len(args) > 0 {
-		sketchPath = paths.New(args[0])
+	// TODO: make a generic function to extract sketch from request
+	// and remove duplication in commands/compile.go
+	if req.GetSketchPath() == "" {
+		return nil, fmt.Errorf("missing sketchPath")
 	}
-	sketch, err := commands.InitSketch(sketchPath)
+	sketchPath := paths.New(req.GetSketchPath())
+	sketch, err := sketches.NewSketchFromPath(sketchPath)
 	if err != nil {
-		formatter.PrintError(err, "Error opening sketch.")
-		os.Exit(commands.ErrGeneric)
+		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
 
 	// FIXME: make a specification on how a port is specified via command line
-	port := flags.port
+	port := req.GetPort()
 	if port == "" {
-		formatter.PrintErrorMessage("No port provided.")
-		os.Exit(commands.ErrBadCall)
+		return nil, fmt.Errorf("no upload port provided")
 	}
 
-	if flags.fqbn == "" && sketch != nil {
-		flags.fqbn = sketch.Metadata.CPU.Fqbn
+	fqbnIn := req.GetFqbn()
+	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
+		fqbnIn = sketch.Metadata.CPU.Fqbn
 	}
-	if flags.fqbn == "" {
-		formatter.PrintErrorMessage("No Fully Qualified Board Name provided.")
-		os.Exit(commands.ErrBadCall)
+	if fqbnIn == "" {
+		return nil, fmt.Errorf("no Fully Qualified Board Name provided")
 	}
-	fqbn, err := cores.ParseFQBN(flags.fqbn)
+	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		formatter.PrintError(err, "Invalid FQBN.")
-		os.Exit(commands.ErrBadCall)
+		return nil, fmt.Errorf("incorrect FQBN: %s", err)
 	}
 
-	pm := commands.InitPackageManager()
+	pm := commands.GetPackageManager(req)
 
 	// Find target board and board properties
 	_, _, board, boardProperties, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		formatter.PrintError(err, "Invalid FQBN.")
-		os.Exit(commands.ErrBadCall)
+		return nil, fmt.Errorf("incorrect FQBN: %s", err)
 	}
 
 	// Load programmer tool
 	uploadToolPattern, have := boardProperties.GetOk("upload.tool")
 	if !have || uploadToolPattern == "" {
-		formatter.PrintErrorMessage("The board does not define an 'upload.tool' property.")
-		os.Exit(commands.ErrGeneric)
+		return nil, fmt.Errorf("cannot get programmer tool: undefined 'upload.tool' property")
 	}
 
 	var referencedPlatformRelease *cores.PlatformRelease
 	if split := strings.Split(uploadToolPattern, ":"); len(split) > 2 {
-		formatter.PrintErrorMessage("The board defines an invalid 'upload.tool' property: " + uploadToolPattern)
-		os.Exit(commands.ErrGeneric)
+		return nil, fmt.Errorf("invalid 'upload.tool' property: %s", uploadToolPattern)
 	} else if len(split) == 2 {
 		referencedPackageName := split[0]
 		uploadToolPattern = split[1]
 		architecture := board.PlatformRelease.Platform.Architecture
 
 		if referencedPackage := pm.GetPackages().Packages[referencedPackageName]; referencedPackage == nil {
-			formatter.PrintErrorMessage("The board requires platform '" + referencedPackageName + ":" + architecture + "' that is not installed.")
-			os.Exit(commands.ErrGeneric)
+			return nil, fmt.Errorf("required platform %s:%s not installed", referencedPackageName, architecture)
 		} else if referencedPlatform := referencedPackage.Platforms[architecture]; referencedPlatform == nil {
-			formatter.PrintErrorMessage("The board requires platform '" + referencedPackageName + ":" + architecture + "' that is not installed.")
-			os.Exit(commands.ErrGeneric)
+			return nil, fmt.Errorf("required platform %s:%s not installed", referencedPackageName, architecture)
 		} else {
 			referencedPlatformRelease = pm.GetInstalledPlatformRelease(referencedPlatform)
 		}
@@ -157,7 +120,8 @@ func run(command *cobra.Command, args []string) {
 	}
 
 	// Set properties for verbose upload
-	if flags.verbose {
+	Verbose := req.GetVerbose()
+	if Verbose {
 		if v, ok := uploadProperties.GetOk("upload.params.verbose"); ok {
 			uploadProperties.Set("upload.verbose", v)
 		}
@@ -168,7 +132,8 @@ func run(command *cobra.Command, args []string) {
 	}
 
 	// Set properties for verify
-	if flags.verify {
+	Verify := req.GetVerify()
+	if Verify {
 		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.verify"))
 	} else {
 		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.noverify"))
@@ -181,19 +146,18 @@ func run(command *cobra.Command, args []string) {
 
 	var importPath *paths.Path
 	var importFile string
-	if flags.importFile == "" {
+	if req.GetImportFile() == "" {
 		importPath = sketch.FullPath
 		importFile = sketch.Name + "." + fqbnSuffix
 	} else {
-		importPath = paths.New(flags.importFile).Parent()
-		importFile = paths.New(flags.importFile).Base()
+		importPath = paths.New(req.GetImportFile()).Parent()
+		importFile = paths.New(req.GetImportFile()).Base()
 	}
 
 	outputTmpFile, ok := uploadProperties.GetOk("recipe.output.tmp_file")
 	outputTmpFile = uploadProperties.ExpandPropsInString(outputTmpFile)
 	if !ok {
-		formatter.PrintErrorMessage("The platform does not define the required property 'recipe.output.tmp_file'.")
-		os.Exit(commands.ErrGeneric)
+		return nil, fmt.Errorf("property 'recipe.output.tmp_file' not defined")
 	}
 	ext := filepath.Ext(outputTmpFile)
 	if strings.HasSuffix(importFile, ext) {
@@ -205,25 +169,21 @@ func run(command *cobra.Command, args []string) {
 	uploadFile := importPath.Join(importFile + ext)
 	if _, err := uploadFile.Stat(); err != nil {
 		if os.IsNotExist(err) {
-			formatter.PrintErrorMessage("Compiled sketch not found: " + uploadFile.String() + ". Please compile first.")
-		} else {
-			formatter.PrintError(err, "Could not open compiled sketch.")
+			return nil, fmt.Errorf("compiled sketch %s not found", uploadFile.String())
 		}
-		os.Exit(commands.ErrGeneric)
+		return nil, fmt.Errorf("cannot open sketch: %s", err)
 	}
 
 	// Perform reset via 1200bps touch if requested
 	if uploadProperties.GetBoolean("upload.use_1200bps_touch") {
 		ports, err := serial.GetPortsList()
 		if err != nil {
-			formatter.PrintError(err, "Can't get serial port list")
-			os.Exit(commands.ErrGeneric)
+			return nil, fmt.Errorf("cannot get serial port list: %s", err)
 		}
 		for _, p := range ports {
 			if p == port {
 				if err := touchSerialPortAt1200bps(p); err != nil {
-					formatter.PrintError(err, "Can't perform reset via 1200bps-touch on serial port")
-					os.Exit(commands.ErrGeneric)
+					return nil, fmt.Errorf("cannot perform reset: %s", err)
 				}
 				break
 			}
@@ -240,8 +200,7 @@ func run(command *cobra.Command, args []string) {
 	actualPort := port // default
 	if uploadProperties.GetBoolean("upload.wait_for_upload_port") {
 		if p, err := waitForNewSerialPort(); err != nil {
-			formatter.PrintError(err, "Could not detect serial ports")
-			os.Exit(commands.ErrGeneric)
+			return nil, fmt.Errorf("cannot detect serial ports: %s", err)
 		} else if p == "" {
 			formatter.Print("No new serial port detected.")
 		} else {
@@ -267,28 +226,28 @@ func run(command *cobra.Command, args []string) {
 	cmdLine := uploadProperties.ExpandPropsInString(recipe)
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 	if err != nil {
-		formatter.PrintError(err, "Invalid recipe in platform.")
-		os.Exit(commands.ErrCoreConfig)
+		return nil, fmt.Errorf("invalid recipe '%s': %s", recipe, err)
 	}
 
 	// Run Tool
 	cmd, err := executils.Command(cmdArgs)
 	if err != nil {
-		formatter.PrintError(err, "Could not execute upload tool.")
-		os.Exit(commands.ErrGeneric)
+		return nil, fmt.Errorf("cannot execute upload tool: %s", err)
 	}
 
 	executils.AttachStdoutListener(cmd, executils.PrintToStdout)
 	executils.AttachStderrListener(cmd, executils.PrintToStderr)
+	cmd.Stdout = outStream
+	cmd.Stderr = errStream
 
 	if err := cmd.Start(); err != nil {
-		formatter.PrintError(err, "Could not execute upload tool.")
-		os.Exit(commands.ErrGeneric)
+		return nil, fmt.Errorf("cannot execute upload tool: %s", err)
 	}
+
 	if err := cmd.Wait(); err != nil {
-		formatter.PrintError(err, "Error during upload.")
-		os.Exit(commands.ErrGeneric)
+		return nil, fmt.Errorf("uploading error: %s", err)
 	}
+	return &rpc.UploadResp{}, nil
 }
 
 func touchSerialPortAt1200bps(port string) error {
@@ -297,12 +256,12 @@ func touchSerialPortAt1200bps(port string) error {
 	// Open port
 	p, err := serial.Open(port, &serial.Mode{BaudRate: 1200})
 	if err != nil {
-		return fmt.Errorf("open port: %s", err)
+		return fmt.Errorf("opening port: %s", err)
 	}
 	defer p.Close()
 
 	if err = p.SetDTR(false); err != nil {
-		return fmt.Errorf("can't set DTR")
+		return fmt.Errorf("cannot set DTR")
 	}
 	return nil
 }

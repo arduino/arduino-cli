@@ -18,9 +18,10 @@
 package board
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
@@ -28,55 +29,31 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/rpc"
 	discovery "github.com/arduino/board-discovery"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 )
 
-func initAttachCommand() *cobra.Command {
-	attachCommand := &cobra.Command{
-		Use:   "attach <port>|<FQBN> [sketchPath]",
-		Short: "Attaches a sketch to a board.",
-		Long:  "Attaches a sketch to a board.",
-		Example: "  " + commands.AppName + " board attach serial:///dev/tty/ACM0\n" +
-			"  " + commands.AppName + " board attach serial:///dev/tty/ACM0 HelloWorld\n" +
-			"  " + commands.AppName + " board attach arduino:samd:mkr1000",
-		Args: cobra.RangeArgs(1, 2),
-		Run:  runAttachCommand,
+func Attach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskProgressCB) (*rpc.BoardAttachResp, error) {
+
+	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
 	}
-	attachCommand.Flags().StringVar(&attachFlags.boardFlavour, "flavour", "default",
-		"The Name of the CPU flavour, it is required for some boards (e.g. Arduino Nano).")
-	attachCommand.Flags().StringVar(&attachFlags.searchTimeout, "timeout", "5s",
-		"The timeout of the search of connected devices, try to high it if your board is not found (e.g. to 10s).")
-	return attachCommand
-}
-
-var attachFlags struct {
-	boardFlavour  string // The flavor of the chipset of the cpu of the connected board, if not specified it is set to "default".
-	searchTimeout string // Expressed in a parsable duration, is the timeout for the list and attach commands.
-}
-
-func runAttachCommand(cmd *cobra.Command, args []string) {
-	boardURI := args[0]
 	var sketchPath *paths.Path
-	if len(args) > 1 {
-		sketchPath = paths.New(args[1])
+	if req.GetSketchPath() != "" {
+		sketchPath = paths.New(req.GetSketchPath())
 	}
-	sketch, err := commands.InitSketch(sketchPath)
+	sketch, err := sketches.NewSketchFromPath(sketchPath)
 	if err != nil {
-		formatter.PrintError(err, "Error opening sketch.")
-		os.Exit(commands.ErrGeneric)
+		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
 
-	logrus.WithField("fqbn", boardURI).Print("Parsing FQBN")
+	boardURI := req.GetBoardUri()
 	fqbn, err := cores.ParseFQBN(boardURI)
 	if err != nil && !strings.HasPrefix(boardURI, "serial") {
 		boardURI = "serial://" + boardURI
 	}
-
-	pm := commands.InitPackageManager()
 
 	if fqbn != nil {
 		sketch.Metadata.CPU = sketches.BoardMetadata{
@@ -85,8 +62,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	} else {
 		deviceURI, err := url.Parse(boardURI)
 		if err != nil {
-			formatter.PrintError(err, "The provided Device URL is not in a valid format.")
-			os.Exit(commands.ErrBadCall)
+			return nil, fmt.Errorf("invalid Device URL format: %s", err)
 		}
 
 		var findBoardFunc func(*packagemanager.PackageManager, *discovery.Monitor, *url.URL) *cores.Board
@@ -96,13 +72,11 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		case "http", "https", "tcp", "udp":
 			findBoardFunc = findNetworkConnectedBoard
 		default:
-			formatter.PrintErrorMessage("Invalid device port type provided. Accepted types are: serial://, tty://, http://, https://, tcp://, udp://.")
-			os.Exit(commands.ErrBadCall)
+			return nil, fmt.Errorf("invalid device port type provided")
 		}
 
-		duration, err := time.ParseDuration(attachFlags.searchTimeout)
+		duration, err := time.ParseDuration(req.GetSearchTimeout())
 		if err != nil {
-			logrus.WithError(err).Warnf("Invalid interval `%s` provided, using default (5s).", attachFlags.searchTimeout)
 			duration = time.Second * 5
 		}
 
@@ -114,11 +88,12 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		// TODO: Handle the case when no board is found.
 		board := findBoardFunc(pm, monitor, deviceURI)
 		if board == nil {
-			formatter.PrintErrorMessage("No supported board has been found at " + deviceURI.String() + ", try either install new cores or check your board URI.")
-			os.Exit(commands.ErrGeneric)
+			return nil, fmt.Errorf("no supported board found at %s", deviceURI.String())
 		}
-		formatter.Print("Board found: " + board.Name())
+		taskCB(&rpc.TaskProgress{Name: "Board found: " + board.Name()})
 
+		// TODO: should be stoped the monitor: when running as a pure CLI  is released
+		// by the OS, when run as daemon the resource's state is unknown and could be leaked.
 		sketch.Metadata.CPU = sketches.BoardMetadata{
 			Fqbn: board.FQBN(),
 			Name: board.Name(),
@@ -127,9 +102,10 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 
 	err = sketch.ExportMetadata()
 	if err != nil {
-		formatter.PrintError(err, "Cannot export sketch metadata.")
+		return nil, fmt.Errorf("cannot export sketch metadata: %s", err)
 	}
-	formatter.PrintResult("Selected fqbn: " + sketch.Metadata.CPU.Fqbn)
+	taskCB(&rpc.TaskProgress{Name: "Selected fqbn: " + sketch.Metadata.CPU.Fqbn, Completed: true})
+	return &rpc.BoardAttachResp{}, nil
 }
 
 // FIXME: Those should probably go in a "BoardManager" pkg or something
@@ -152,7 +128,7 @@ func findSerialConnectedBoard(pm *packagemanager.PackageManager, monitor *discov
 
 	boards := pm.FindBoardsWithVidPid(serialDevice.VendorID, serialDevice.ProductID)
 	if len(boards) == 0 {
-		os.Exit(commands.ErrGeneric)
+		return nil
 	}
 
 	return boards[0]

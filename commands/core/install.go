@@ -18,81 +18,86 @@
 package core
 
 import (
-	"os"
+	"context"
+	"errors"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	"github.com/arduino/arduino-cli/rpc"
 )
 
-func initInstallCommand() *cobra.Command {
-	installCommand := &cobra.Command{
-		Use:   "install PACKAGER:ARCH[@VERSION] ...",
-		Short: "Installs one or more cores and corresponding tool dependencies.",
-		Long:  "Installs one or more cores and corresponding tool dependencies.",
-		Example: "  # download the latest version of arduino SAMD core.\n" +
-			"  " + commands.AppName + " core install arduino:samd\n\n" +
-			"  # download a specific version (in this case 1.6.9).\n" +
-			"  " + commands.AppName + " core install arduino:samd=1.6.9",
-		Args: cobra.MinimumNArgs(1),
-		Run:  runInstallCommand,
-	}
-	return installCommand
-}
+func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResp, error) {
 
-func runInstallCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino core download`")
-
-	platformsRefs := parsePlatformReferenceArgs(args)
-	pm := commands.InitPackageManagerWithoutBundles()
-
-	for _, platformRef := range platformsRefs {
-		installPlatformByRef(pm, platformRef)
+	pm := commands.GetPackageManager(req)
+	if pm == nil {
+		return nil, errors.New("invalid instance")
 	}
 
-	// TODO: Cleanup unused tools
-}
-
-func installPlatformByRef(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference) {
-	platform, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
+	version, err := commands.ParseVersion(req)
 	if err != nil {
-		formatter.PrintError(err, "Could not determine platform dependencies")
-		os.Exit(commands.ErrBadCall)
+		return nil, fmt.Errorf("invalid version: %s", err)
 	}
 
-	installPlatform(pm, platform, tools)
+	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{
+		Package:              req.PlatformPackage,
+		PlatformArchitecture: req.Architecture,
+		PlatformVersion:      version,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("finding platform dependencies: %s", err)
+	}
+
+	err = installPlatform(pm, platform, tools, downloadCB, taskCB)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance})
+	if err != nil {
+		return nil, err
+	}
+
+	return &rpc.PlatformInstallResp{}, nil
 }
 
-func installPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease) {
+func installPlatform(pm *packagemanager.PackageManager,
+	platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease,
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 	log := pm.Log.WithField("platform", platformRelease)
 
 	// Prerequisite checks before install
 	if platformRelease.IsInstalled() {
 		log.Warn("Platform already installed")
-		formatter.Print("Platform " + platformRelease.String() + " already installed")
-		return
+		taskCB(&rpc.TaskProgress{Name: "Platform " + platformRelease.String() + " already installed", Completed: true})
+		return nil
 	}
 	toolsToInstall := []*cores.ToolRelease{}
 	for _, tool := range requiredTools {
 		if tool.IsInstalled() {
 			log.WithField("tool", tool).Warn("Tool already installed")
-			formatter.Print("Tool " + tool.String() + " already installed")
+			taskCB(&rpc.TaskProgress{Name: "Tool " + tool.String() + " already installed", Completed: true})
 		} else {
 			toolsToInstall = append(toolsToInstall, tool)
 		}
 	}
 
 	// Package download
+	taskCB(&rpc.TaskProgress{Name: "Downloading packages"})
 	for _, tool := range toolsToInstall {
-		downloadTool(pm, tool)
+		downloadTool(pm, tool, downloadCB)
 	}
-	downloadPlatform(pm, platformRelease)
+	downloadPlatform(pm, platformRelease, downloadCB)
+	taskCB(&rpc.TaskProgress{Completed: true})
 
+	// Install tools first
 	for _, tool := range toolsToInstall {
-		InstallToolRelease(pm, tool)
+		err := commands.InstallToolRelease(pm, tool, taskCB)
+		if err != nil {
+			// TODO: handle error
+		}
 	}
 
 	// Are we installing or upgrading?
@@ -100,61 +105,39 @@ func installPlatform(pm *packagemanager.PackageManager, platformRelease *cores.P
 	installed := pm.GetInstalledPlatformRelease(platform)
 	if installed == nil {
 		log.Info("Installing platform")
-		formatter.Print("Installing " + platformRelease.String() + "...")
+		taskCB(&rpc.TaskProgress{Name: "Installing " + platformRelease.String()})
 	} else {
 		log.Info("Updating platform " + installed.String())
-		formatter.Print("Updating " + installed.String() + " with " + platformRelease.String() + "...")
+		taskCB(&rpc.TaskProgress{Name: "Updating " + installed.String() + " with " + platformRelease.String()})
 	}
 
 	// Install
 	err := pm.InstallPlatform(platformRelease)
 	if err != nil {
 		log.WithError(err).Error("Cannot install platform")
-		formatter.PrintError(err, "Cannot install platform")
-		os.Exit(commands.ErrGeneric)
+		return err
 	}
 
 	// If upgrading remove previous release
 	if installed != nil {
-		err := pm.UninstallPlatform(installed)
+		errUn := pm.UninstallPlatform(installed)
 
 		// In case of error try to rollback
-		if err != nil {
-			log.WithError(err).Error("Error updating platform.")
-			formatter.PrintError(err, "Error updating platform")
+		if errUn != nil {
+			log.WithError(errUn).Error("Error updating platform.")
+			taskCB(&rpc.TaskProgress{Message: "Error updating platform: " + err.Error()})
 
 			// Rollback
 			if err := pm.UninstallPlatform(platformRelease); err != nil {
 				log.WithError(err).Error("Error rolling-back changes.")
-				formatter.PrintError(err, "Error rolling-back changes.")
+				taskCB(&rpc.TaskProgress{Message: "Error rolling-back changes: " + err.Error()})
 			}
-			os.Exit(commands.ErrGeneric)
+
+			return fmt.Errorf("updating platform: %s", errUn)
 		}
 	}
 
 	log.Info("Platform installed")
-	formatter.Print(platformRelease.String() + " installed")
-}
-
-// InstallToolRelease installs a ToolRelease
-func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease) {
-	log := pm.Log.WithField("Tool", toolRelease)
-
-	if toolRelease.IsInstalled() {
-		log.Warn("Tool already installed")
-		formatter.Print("Tool " + toolRelease.String() + " already installed")
-		return
-	}
-
-	log.Info("Installing tool")
-	formatter.Print("Installing " + toolRelease.String() + "...")
-	err := pm.InstallTool(toolRelease)
-	if err != nil {
-		log.WithError(err).Warn("Cannot install tool")
-		formatter.PrintError(err, "Cannot install tool: "+toolRelease.String())
-		os.Exit(commands.ErrGeneric)
-	}
-
-	log.Info("Tool installed")
-	formatter.Print(toolRelease.String() + " installed")
+	taskCB(&rpc.TaskProgress{Message: platformRelease.String() + " installed", Completed: true})
+	return nil
 }

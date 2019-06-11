@@ -42,9 +42,9 @@ type Configuration struct {
 	// IsPortable is set to true if the cli lives in IDE directory and the IDE is portable
 	IsPortable bool
 
-	// downloadsDir is the directory where the package files are downloaded and cached.
+	// ArduinoDownloadsDir overrides the default directory where the package files are downloaded and cached.
 	// Use DownloadsDir() method to retrieve it.
-	downloadsDir *paths.Path
+	ArduinoDownloadsDir *paths.Path
 
 	// IDEBundledCheckResult contains the result of the check to see if the CLI is bundled with the IDE:
 	// the field is true if the CLI is bundled with the Arduino IDE, false if the CLI is running
@@ -101,8 +101,8 @@ func (config *Configuration) PackagesDir() *paths.Path {
 
 // DownloadsDir returns the directory for archive downloads.
 func (config *Configuration) DownloadsDir() *paths.Path {
-	if config.downloadsDir != nil {
-		return config.downloadsDir
+	if config.ArduinoDownloadsDir != nil {
+		return config.ArduinoDownloadsDir
 	}
 	return config.DataDir.Join("staging")
 }

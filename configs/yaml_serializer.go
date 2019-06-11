@@ -23,7 +23,6 @@ import (
 	"net/url"
 
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -48,16 +47,13 @@ type yamlProxyConfig struct {
 
 // LoadFromYAML loads the configs from a yaml file.
 func (config *Configuration) LoadFromYAML(path *paths.Path) error {
-	logrus.Info("Unserializing configurations from ", path)
 	content, err := path.ReadFile()
 	if err != nil {
-		logrus.WithError(err).Warn("Error reading config, using default configuration")
 		return err
 	}
 	var ret yamlConfig
 	err = yaml.Unmarshal(content, &ret)
 	if err != nil {
-		logrus.WithError(err).Warn("Error parsing config, using default configuration")
 		return err
 	}
 
@@ -68,9 +64,9 @@ func (config *Configuration) LoadFromYAML(path *paths.Path) error {
 		config.SketchbookDir = paths.New(ret.SketchbookPath)
 	}
 	if ret.ArduinoDownloadsDir != "" {
-		config.downloadsDir = paths.New(ret.ArduinoDownloadsDir)
+		config.ArduinoDownloadsDir = paths.New(ret.ArduinoDownloadsDir)
 	} else {
-		config.downloadsDir = nil
+		config.ArduinoDownloadsDir = nil
 	}
 	if ret.ProxyType != "" {
 		config.ProxyType = ret.ProxyType
@@ -81,15 +77,18 @@ func (config *Configuration) LoadFromYAML(path *paths.Path) error {
 		}
 	}
 	if ret.BoardsManager != nil {
+		if len(config.BoardManagerAdditionalUrls) > 1 {
+			config.BoardManagerAdditionalUrls = config.BoardManagerAdditionalUrls[:1]
+		}
 		for _, rawurl := range ret.BoardsManager.AdditionalURLS {
 			url, err := url.Parse(rawurl)
 			if err != nil {
-				logrus.WithError(err).Warn("Error parsing config")
 				continue
 			}
 			config.BoardManagerAdditionalUrls = append(config.BoardManagerAdditionalUrls, url)
 		}
 	}
+
 	return nil
 }
 
@@ -102,8 +101,8 @@ func (config *Configuration) SerializeToYAML() ([]byte, error) {
 	if config.DataDir != nil {
 		c.ArduinoDataDir = config.DataDir.String()
 	}
-	if config.downloadsDir != nil {
-		c.ArduinoDownloadsDir = config.downloadsDir.String()
+	if config.ArduinoDownloadsDir != nil {
+		c.ArduinoDownloadsDir = config.ArduinoDownloadsDir.String()
 	}
 	c.ProxyType = config.ProxyType
 	if config.ProxyType == "manual" {
@@ -113,10 +112,10 @@ func (config *Configuration) SerializeToYAML() ([]byte, error) {
 			Password: config.ProxyPassword,
 		}
 	}
+	c.BoardsManager = &yamlBoardsManagerConfig{AdditionalURLS: []string{}}
 	if len(config.BoardManagerAdditionalUrls) > 1 {
-		c.BoardsManager = &yamlBoardsManagerConfig{AdditionalURLS: []string{}}
 		for _, URL := range config.BoardManagerAdditionalUrls[1:] {
-			c.BoardsManager.AdditionalURLS = append(c.BoardsManager.AdditionalURLS, URL.String())
+			c.BoardsManager.AdditionalURLS = appendIfMissing(c.BoardsManager.AdditionalURLS, URL.String())
 		}
 	}
 	return yaml.Marshal(c)
@@ -133,4 +132,13 @@ func (config *Configuration) SaveToYAML(path string) error {
 		return fmt.Errorf("writing configuration to %s: %s", path, err)
 	}
 	return nil
+}
+
+func appendIfMissing(slice []string, i string) []string {
+	for _, ele := range slice {
+		if ele == i {
+			return slice
+		}
+	}
+	return append(slice, i)
 }

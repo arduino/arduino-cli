@@ -1,0 +1,3 @@
+test	/tmp/test179252494/preproc/ctags_target.cpp	/^void test(int x = 1) {$/;"	kind:function	line:2	signature:(int x = 1)	returntype:void
+setup	/tmp/test179252494/preproc/ctags_target.cpp	/^void setup() {$/;"	kind:function	line:5	signature:()	returntype:void
+loop	/tmp/test179252494/preproc/ctags_target.cpp	/^void loop() {$/;"	kind:function	line:8	signature:()	returntype:void

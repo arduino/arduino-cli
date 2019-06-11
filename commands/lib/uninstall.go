@@ -18,46 +18,24 @@
 package lib
 
 import (
-	"os"
+	"context"
+	"fmt"
 
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+	"github.com/arduino/arduino-cli/rpc"
 )
 
-func initUninstallCommand() *cobra.Command {
-	uninstallCommand := &cobra.Command{
-		Use:     "uninstall LIBRARY_NAME(S)",
-		Short:   "Uninstalls one or more libraries.",
-		Long:    "Uninstalls one or more libraries.",
-		Example: "  " + commands.AppName + " lib uninstall AudioZero",
-		Args:    cobra.MinimumNArgs(1),
-		Run:     runUninstallCommand,
-	}
-	return uninstallCommand
-}
+func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallReq, taskCB commands.TaskProgressCB) error {
+	lm := commands.GetLibraryManager(req)
 
-func runUninstallCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino lib uninstall`")
-
-	lm := commands.InitLibraryManager(nil)
-	libRefs, err := librariesindex.ParseArgs(args)
+	lib, err := findLibrary(lm, req)
 	if err != nil {
-		formatter.PrintError(err, "Arguments error")
-		os.Exit(commands.ErrBadArgument)
-	}
-	for _, libRef := range libRefs {
-		lib := lm.FindByReference(libRef)
-		if lib == nil {
-			formatter.PrintErrorMessage("Library not installed: " + libRef.String())
-			os.Exit(commands.ErrGeneric)
-		} else {
-			formatter.Print("Uninstalling " + lib.String())
-			lm.Uninstall(lib)
-		}
+		return fmt.Errorf("looking for library: %s", err)
 	}
 
-	logrus.Info("Done")
+	taskCB(&rpc.TaskProgress{Name: "Uninstalling " + lib.String()})
+	lm.Uninstall(lib)
+	taskCB(&rpc.TaskProgress{Completed: true})
+
+	return nil
 }

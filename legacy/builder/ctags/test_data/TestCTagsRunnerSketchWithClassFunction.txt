@@ -1,0 +1,4 @@
+asdf	/home/megabug/Workspace/arduino-builder/src/github.com/arduino/arduino-builder/test/sketch_class_function/sketch_class_function.ino	/^    void asdf() {}$/;"	kind:function	line:2	class:test	signature:()	returntype:void
+setup	/home/megabug/Workspace/arduino-builder/src/github.com/arduino/arduino-builder/test/sketch_class_function/sketch_class_function.ino	/^void setup() {$/;"	kind:function	line:4	signature:()	returntype:void
+loop	/home/megabug/Workspace/arduino-builder/src/github.com/arduino/arduino-builder/test/sketch_class_function/sketch_class_function.ino	/^void loop() {}$/;"	kind:function	line:7	signature:()	returntype:void
+asdf	/home/megabug/Workspace/arduino-builder/src/github.com/arduino/arduino-builder/test/sketch_class_function/sketch_class_function.ino	/^void asdf() {}$/;"	kind:function	line:8	signature:()	returntype:void
