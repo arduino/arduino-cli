@@ -1,17 +1,10 @@
 version: '2'
 
-vars:
-  TEST_VERSIONSTRING: "0.0.0-test.preview"
-  TEST_COMMIT: "deadbeef"
-  TEST_LDFLAGS_VALUE: >
-    '-X github.com/arduino/arduino-cli/version.versionString={{.TEST_VERSIONSTRING}}
-    -X github.com/arduino/arduino-cli/version.commit={{.TEST_COMMIT}}'
-
 tasks:
   build:
     desc: Build the project
     cmds:
-      - go build -v -i
+      - go build -v -i  -ldflags {{.LDFLAGS_VALUE}}
 
   test:
     desc: Run the full testsuite
@@ -28,3 +21,20 @@ tasks:
     desc: Run integration tests only
     cmds:
       - go test -run Integration {{ default "-v" .GOFLAGS }} {{ default "./..." .TARGETS }} -ldflags {{.TEST_LDFLAGS_VALUE}}
+
+
+vars:
+  # build flags
+  VERSIONSTRING: "0.3.6-alpha.preview"
+  COMMIT:
+    sh: echo ${TRAVIS_COMMIT:-`git log -n 1 --format=%h`}
+  LDFLAGS_VALUE: >
+      '-X github.com/arduino/arduino-cli/version.versionString={{.VERSIONSTRING}}
+      -X github.com/arduino/arduino-cli/version.commit={{.COMMIT}}'
+
+  # test flags
+  TEST_VERSIONSTRING: "0.0.0-test.preview"
+  TEST_COMMIT: "deadbeef"
+  TEST_LDFLAGS_VALUE: >
+    '-X github.com/arduino/arduino-cli/version.versionString={{.TEST_VERSIONSTRING}}
+    -X github.com/arduino/arduino-cli/version.commit={{.TEST_COMMIT}}'
