@@ -11,6 +11,8 @@ env:
 # Make sure golangci-lint is vendored.
 before_install:
   - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b $GOPATH/bin v1.16.0
+  - go install github.com/go-task/task/cmd/task
+
 
 install: true
 
@@ -20,9 +22,10 @@ script:
   # Run linter
   - golangci-lint run
   # Build and test
-  - go build
-  - go test -timeout 20m -v -coverpkg=./... -coverprofile=coverage.txt -covermode=atomic ./...
+  - task build
+  - task test
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -cF unittests,integration
+
 

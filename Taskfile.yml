@@ -4,7 +4,7 @@ tasks:
   build:
     desc: Build the project
     cmds:
-      - go build -v -i  -ldflags {{.LDFLAGS_VALUE}}
+      - go build -v -i {{.LDFLAGS}}
 
   test:
     desc: Run the full testsuite
@@ -15,26 +15,26 @@ tasks:
   test-unit:
     desc: Run unit tests only
     cmds:
-      - go test -short {{ default "-v" .GOFLAGS }} {{ default "./..." .TARGETS }}
+      - go test -short {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt {{ default "./..." .TARGETS }}
 
   test-integration:
     desc: Run integration tests only
     cmds:
-      - go test -run Integration {{ default "-v" .GOFLAGS }} {{ default "./..." .TARGETS }} -ldflags {{.TEST_LDFLAGS_VALUE}}
-
+      - go test -run Integration {{ default "-v" .GOFLAGS }} -coverprofile=coverage_integ.txt {{ default "./..." .TARGETS }} {{.TEST_LDFLAGS}}
 
 vars:
-  # build flags
+  # build vars
   VERSIONSTRING: "0.3.6-alpha.preview"
   COMMIT:
     sh: echo ${TRAVIS_COMMIT:-`git log -n 1 --format=%h`}
-  LDFLAGS_VALUE: >
-      '-X github.com/arduino/arduino-cli/version.versionString={{.VERSIONSTRING}}
+  LDFLAGS: >
+      -ldflags '-X github.com/arduino/arduino-cli/version.versionString={{.VERSIONSTRING}}
       -X github.com/arduino/arduino-cli/version.commit={{.COMMIT}}'
 
-  # test flags
+  # test vars
+  GOFLAGS: "-timeout 5m -v -coverpkg=./... -covermode=atomic"
   TEST_VERSIONSTRING: "0.0.0-test.preview"
   TEST_COMMIT: "deadbeef"
-  TEST_LDFLAGS_VALUE: >
-    '-X github.com/arduino/arduino-cli/version.versionString={{.TEST_VERSIONSTRING}}
+  TEST_LDFLAGS: >
+    -ldflags  '-X github.com/arduino/arduino-cli/version.versionString={{.TEST_VERSIONSTRING}}
     -X github.com/arduino/arduino-cli/version.commit={{.TEST_COMMIT}}'
