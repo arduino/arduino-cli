@@ -25,9 +25,9 @@ import (
 	"strings"
 	"testing"
 
+	"bou.ke/monkey"
 	"github.com/arduino/arduino-cli/cli/root"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/bouk/monkey"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	semver "go.bug.st/relaxed-semver"
