@@ -38,16 +38,20 @@ func InitCommand() *cobra.Command {
 }
 
 type versionOutput struct {
-	Command string `json:"command"`
-	Version string `json:"version"`
+	Command   string `json:"command"`
+	Version   string `json:"version"`
+	Commit    string `json:"commit"`
+	BuildDate string `json:"build_date"`
 }
 
 func run(cmd *cobra.Command, args []string) {
 	res := &versionOutput{
-		Command: cmd.Parent().Name(),
-		Version: cli.VersionInfo.VersionString,
+		Command:   cmd.Parent().Name(),
+		Version:   cli.VersionInfo.VersionString,
+		Commit:    cli.VersionInfo.Commit,
+		BuildDate: cli.VersionInfo.BuildDate.String(),
 	}
 	if cli.OutputJSONOrElse(res) {
-		fmt.Printf("%s version %s\n", res.Command, res.Version)
+		fmt.Printf("%s\n", cli.VersionInfo)
 	}
 }
