@@ -6,3 +6,4 @@
 /arduino-cli.yaml
 /wiki
 .idea
+coverage_*.txt
