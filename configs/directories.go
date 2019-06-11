@@ -19,7 +19,7 @@ package configs
 
 import (
 	"fmt"
-	"os/user"
+	"os"
 	"runtime"
 
 	"github.com/arduino/go-paths-helper"
@@ -28,65 +28,44 @@ import (
 
 // getDefaultConfigFilePath returns the default path for arduino-cli.yaml
 func getDefaultConfigFilePath() *paths.Path {
-	usr, err := user.Current()
+	arduinoDataDir, err := getDefaultArduinoDataDir()
 	if err != nil {
-		panic(fmt.Errorf("retrieving user home dir: %s", err))
+		panic(err)
 	}
-	arduinoDataDir := paths.New(usr.HomeDir)
-
-	switch runtime.GOOS {
-	case "linux":
-		arduinoDataDir = arduinoDataDir.Join(".arduino15")
-	case "darwin":
-		arduinoDataDir = arduinoDataDir.Join("Library", "arduino15")
-	case "windows":
-		localAppDataPath, err := win32.GetLocalAppDataFolder()
-		if err != nil {
-			panic(err)
-		}
-		arduinoDataDir = paths.New(localAppDataPath).Join("Arduino15")
-	default:
-		panic(fmt.Errorf("unsupported OS: %s", runtime.GOOS))
-	}
-
 	return arduinoDataDir.Join("arduino-cli.yaml")
 }
 
 func getDefaultArduinoDataDir() (*paths.Path, error) {
-	usr, err := user.Current()
+	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		return nil, fmt.Errorf("retrieving user home dir: %s", err)
+		return nil, err
 	}
-	arduinoDataDir := paths.New(usr.HomeDir)
-
 	switch runtime.GOOS {
 	case "linux":
-		arduinoDataDir = arduinoDataDir.Join(".arduino15")
+		return paths.New(userHomeDir).Join(".arduino15"), nil
 	case "darwin":
-		arduinoDataDir = arduinoDataDir.Join("Library", "arduino15")
+		return paths.New(userHomeDir).Join("Library", "arduino15"), nil
 	case "windows":
 		localAppDataPath, err := win32.GetLocalAppDataFolder()
 		if err != nil {
 			return nil, fmt.Errorf("getting LocalAppData path: %s", err)
 		}
-		arduinoDataDir = paths.New(localAppDataPath).Join("Arduino15")
+		return paths.New(localAppDataPath).Join("Arduino15"), nil
 	default:
 		return nil, fmt.Errorf("unsupported OS: %s", runtime.GOOS)
 	}
-	return arduinoDataDir, nil
 }
 
 func getDefaultSketchbookDir() (*paths.Path, error) {
-	usr, err := user.Current()
+	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		return nil, fmt.Errorf("retrieving home dir: %s", err)
+		return nil, err
 	}
-
 	switch runtime.GOOS {
 	case "linux":
-		return paths.New(usr.HomeDir).Join("Arduino"), nil
+		return paths.New(userHomeDir).Join("Arduino"), nil
 	case "darwin":
-		return paths.New(usr.HomeDir).Join("Documents", "Arduino"), nil
+		return paths.New(userHomeDir).Join("Documents", "Arduino"), nil
 	case "windows":
 		documentsPath, err := win32.GetDocumentsFolder()
 		if err != nil {
