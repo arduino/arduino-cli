@@ -126,7 +126,7 @@ func initConfigs() {
 		cli.Config = conf
 	}
 
-	// Read configuration from version config file
+	// Read configuration from global config file
 	logrus.Info("Checking for config file in: " + cli.Config.ConfigFile.String())
 	if cli.Config.ConfigFile.Exist() {
 		readConfigFrom(cli.Config.ConfigFile)
