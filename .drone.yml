@@ -1,0 +1,9 @@
+kind: pipeline
+name: default
+
+steps:
+- name: test
+  image: golang
+  commands:
+  - curl -sL https://taskfile.dev/install.sh | sh
+  - task test
