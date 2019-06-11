@@ -11,8 +11,7 @@ env:
 # Make sure golangci-lint is vendored.
 before_install:
   - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b $GOPATH/bin v1.16.0
-  - go install github.com/go-task/task/cmd/task
-
+  - curl -sL https://taskfile.dev/install.sh | sh
 
 install: true
 
