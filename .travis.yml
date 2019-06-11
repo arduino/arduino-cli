@@ -21,8 +21,8 @@ script:
   # Run linter
   - golangci-lint run
   # Build and test
-  - task build
-  - task test
+  - ./bin/task build
+  - ./bin/task test
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -cF unittests,integration
