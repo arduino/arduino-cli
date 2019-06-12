@@ -5,4 +5,4 @@ steps:
 - name: test
   image: arduino/arduino-cli:drone-0.0.1
   commands:
-  - task test TARGETS=$(go list ./... | grep -v /legacy/)
+  - task test
