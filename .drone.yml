@@ -3,7 +3,7 @@ name: default
 
 steps:
 - name: test
-  image: golang
+  image: arduino/arduino-cli:drone-0.0.0
   commands:
   - curl -sL https://taskfile.dev/install.sh | sh
   - ./bin/task test TARGETS=$(go list ./... | grep -v /legacy/)
