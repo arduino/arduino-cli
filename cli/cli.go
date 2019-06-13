@@ -20,8 +20,11 @@ package cli
 import (
 	"context"
 	"errors"
+	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -29,7 +32,8 @@ import (
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/arduino-cli/rpc"
-	paths "github.com/arduino/go-paths-helper"
+	"github.com/arduino/arduino-cli/version"
+	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 )
 
@@ -48,8 +52,13 @@ const (
 	ErrBadArgument
 )
 
-// Version is the current CLI version
-var Version = "0.3.6-alpha.preview"
+// appName is the command line name of the Arduino CLI executable on the user system (users may change it)
+var appName = filepath.Base(os.Args[0])
+
+// VersionInfo contains all info injected during build
+var VersionInfo = version.NewInfo(appName)
+
+var HTTPClientHeader = getHTTPClientHeader()
 
 // ErrLogrus represents the logrus instance, which has the role to
 // log all non info messages.
@@ -60,9 +69,6 @@ var GlobalFlags struct {
 	Debug      bool // If true, dump debug output to stderr.
 	OutputJSON bool // true output in JSON, false output as Text
 }
-
-// AppName is the command line name of the Arduino CLI executable
-var AppName = filepath.Base(os.Args[0])
 
 var Config *configs.Configuration
 
@@ -83,10 +89,18 @@ func packageManagerInitReq() *rpc.InitReq {
 	return &rpc.InitReq{Configuration: conf}
 }
 
+func getHTTPClientHeader() http.Header {
+	userAgentValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", VersionInfo.Application,
+		VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), VersionInfo.Commit, VersionInfo.BuildDate)
+	downloaderHeaders := http.Header{"User-Agent": []string{userAgentValue}}
+	return downloaderHeaders
+}
+
 func InitInstance() *rpc.InitResp {
 	logrus.Info("Initializing package manager")
 	req := packageManagerInitReq()
-	resp, err := commands.Init(context.Background(), req, OutputProgressBar(), OutputTaskProgress())
+
+	resp, err := commands.Init(context.Background(), req, OutputProgressBar(), OutputTaskProgress(), HTTPClientHeader)
 	if err != nil {
 		formatter.PrintError(err, "Error initializing package manager")
 		os.Exit(ErrGeneric)
@@ -116,7 +130,7 @@ func CreateInstance() *rpc.Instance {
 		for _, err := range resp.GetPlatformsIndexErrors() {
 			formatter.PrintError(errors.New(err), "Error loading index")
 		}
-		formatter.PrintErrorMessage("Launch '" + AppName + " core update-index' to fix or download indexes.")
+		formatter.PrintErrorMessage("Launch '" + VersionInfo.Application + " core update-index' to fix or download indexes.")
 		os.Exit(ErrGeneric)
 	}
 	return resp.GetInstance()

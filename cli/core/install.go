@@ -35,9 +35,9 @@ func initInstallCommand() *cobra.Command {
 		Short: "Installs one or more cores and corresponding tool dependencies.",
 		Long:  "Installs one or more cores and corresponding tool dependencies.",
 		Example: "  # download the latest version of arduino SAMD core.\n" +
-			"  " + cli.AppName + " core install arduino:samd\n\n" +
+			"  " + cli.VersionInfo.Application + " core install arduino:samd\n\n" +
 			"  # download a specific version (in this case 1.6.9).\n" +
-			"  " + cli.AppName + " core install arduino:samd@1.6.9",
+			"  " + cli.VersionInfo.Application + " core install arduino:samd@1.6.9",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}
@@ -51,12 +51,14 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	platformsRefs := parsePlatformReferenceArgs(args)
 
 	for _, platformRef := range platformsRefs {
-		_, err := core.PlatformInstall(context.Background(), &rpc.PlatformInstallReq{
+		plattformInstallReq := &rpc.PlatformInstallReq{
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
-		}, cli.OutputProgressBar(), cli.OutputTaskProgress())
+		}
+		_, err := core.PlatformInstall(context.Background(), plattformInstallReq, cli.OutputProgressBar(),
+			cli.OutputTaskProgress(), cli.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error during install")
 			os.Exit(cli.ErrGeneric)

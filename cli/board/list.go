@@ -37,7 +37,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "List connected boards.",
 		Long:    "Detects and displays a list of connected boards to the current computer.",
-		Example: "  " + cli.AppName + " board list --timeout 10s",
+		Example: "  " + cli.VersionInfo.Application + " board list --timeout 10s",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}

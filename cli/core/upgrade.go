@@ -36,9 +36,9 @@ func initUpgradeCommand() *cobra.Command {
 		Long:  "Upgrades one or all installed platforms to the latest version.",
 		Example: "" +
 			"  # upgrade everything to the latest version\n" +
-			"  " + cli.AppName + " core upgrade\n\n" +
+			"  " + cli.VersionInfo.Application + " core upgrade\n\n" +
 			"  # upgrade arduino:samd to the latest version\n" +
-			"  " + cli.AppName + " core upgrade arduino:samd",
+			"  " + cli.VersionInfo.Application + " core upgrade arduino:samd",
 		Run: runUpgradeCommand,
 	}
 	return upgradeCommand
@@ -60,7 +60,8 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.Architecture,
-		}, cli.OutputProgressBar(), cli.OutputTaskProgress())
+		}, cli.OutputProgressBar(), cli.OutputTaskProgress(),
+			cli.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error during upgrade")
 			os.Exit(cli.ErrGeneric)

@@ -35,7 +35,7 @@ func initUpgradeCommand() *cobra.Command {
 		Short: "Upgrades installed libraries.",
 		Long: "This command ungrades all installed libraries to the latest available version." +
 			"To upgrade a single library use the 'install' command.",
-		Example: "  " + cli.AppName + " lib upgrade",
+		Example: "  " + cli.VersionInfo.Application + " lib upgrade",
 		Args:    cobra.NoArgs,
 		Run:     runUpgradeCommand,
 	}
@@ -47,7 +47,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 	err := lib.LibraryUpgradeAll(context.Background(), &rpc.LibraryUpgradeAllReq{
 		Instance: instance,
-	}, cli.OutputProgressBar(), cli.OutputTaskProgress())
+	}, cli.OutputProgressBar(), cli.OutputTaskProgress(), cli.HTTPClientHeader)
 	if err != nil {
 		formatter.PrintError(err, "Error upgrading libraries")
 		os.Exit(cli.ErrGeneric)

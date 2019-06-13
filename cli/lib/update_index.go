@@ -33,7 +33,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Use:     "update-index",
 		Short:   "Updates the libraries index.",
 		Long:    "Updates the libraries index to the latest version.",
-		Example: "  " + cli.AppName + " lib update-index",
+		Example: "  " + cli.VersionInfo.Application + " lib update-index",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			instance := cli.CreateInstaceIgnorePlatformIndexErrors()

@@ -28,7 +28,7 @@ func InitCommand() *cobra.Command {
 		Use:     "sketch",
 		Short:   "Arduino CLI Sketch Commands.",
 		Long:    "Arduino CLI Sketch Commands.",
-		Example: "  " + cli.AppName + " sketch new MySketch",
+		Example: "  " + cli.VersionInfo.Application + " sketch new MySketch",
 	}
 	sketchCommand.AddCommand(initNewCommand())
 	//sketchCommand.AddCommand(initSyncCommand())

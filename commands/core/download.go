@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -28,7 +29,8 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
-func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloadCB commands.DownloadProgressCB) (*rpc.PlatformDownloadResp, error) {
+func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloadCB commands.DownloadProgressCB,
+	downloaderHeaders http.Header) (*rpc.PlatformDownloadResp, error) {
 	pm := commands.GetPackageManager(req)
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -48,13 +50,13 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloa
 		return nil, fmt.Errorf("find platform dependencies: %s", err)
 	}
 
-	err = downloadPlatform(pm, platform, downloadCB)
+	err = downloadPlatform(pm, platform, downloadCB, downloaderHeaders)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, tool := range tools {
-		err := downloadTool(pm, tool, downloadCB)
+		err := downloadTool(pm, tool, downloadCB, downloaderHeaders)
 		if err != nil {
 			return nil, fmt.Errorf("downloading tool %s: %s", tool, err)
 		}
@@ -63,20 +65,22 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloa
 	return &rpc.PlatformDownloadResp{}, nil
 }
 
-func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, downloadCB commands.DownloadProgressCB) error {
+func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease,
+	downloadCB commands.DownloadProgressCB, downloaderHeaders http.Header) error {
 	// Download platform
-	resp, err := pm.DownloadPlatformRelease(platformRelease)
+	resp, err := pm.DownloadPlatformRelease(platformRelease, downloaderHeaders)
 	if err != nil {
 		return err
 	}
 	return commands.Download(resp, platformRelease.String(), downloadCB)
 }
 
-func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB commands.DownloadProgressCB) error {
+func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB commands.DownloadProgressCB,
+	downloaderHeaders http.Header) error {
 	// Check if tool has a flavor available for the current OS
 	if tool.GetCompatibleFlavour() == nil {
 		return fmt.Errorf("tool %s not available for the current OS", tool)
 	}
 
-	return commands.DownloadToolRelease(pm, tool, downloadCB)
+	return commands.DownloadToolRelease(pm, tool, downloadCB, downloaderHeaders)
 }

@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"net/url"
 	"path"
 	"time"
@@ -82,12 +83,13 @@ func GetDiscoveries(req InstanceContainer) []*discovery.Discovery {
 	return i.discoveries
 }
 
-func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (bool, error) {
+func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, downloadCB DownloadProgressCB,
+	taskCB TaskProgressCB, downloaderHeaders http.Header) (bool, error) {
 	if tool.IsInstalled() {
 		return false, nil
 	}
 	taskCB(&rpc.TaskProgress{Name: "Downloading missing tool " + tool.String()})
-	if err := DownloadToolRelease(instance.pm, tool, downloadCB); err != nil {
+	if err := DownloadToolRelease(instance.pm, tool, downloadCB, downloaderHeaders); err != nil {
 		return false, fmt.Errorf("downloading %s tool: %s", tool, err)
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
@@ -97,17 +99,18 @@ func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, down
 	return true, nil
 }
 
-func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
+func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB, taskCB TaskProgressCB,
+	downloaderHeaders http.Header) error {
 	// Check for ctags tool
 	ctags, _ := getBuiltinCtagsTool(instance.pm)
-	ctagsInstalled, err := instance.installToolIfMissing(ctags, downloadCB, taskCB)
+	ctagsInstalled, err := instance.installToolIfMissing(ctags, downloadCB, taskCB, downloaderHeaders)
 	if err != nil {
 		return err
 	}
 
 	// Check for bultin serial-discovery tool
 	serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(instance.pm)
-	serialDiscoveryInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCB, taskCB)
+	serialDiscoveryInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCB, taskCB, downloaderHeaders)
 	if err != nil {
 		return err
 	}
@@ -146,7 +149,7 @@ func (instance *CoreInstance) startDiscoveries() error {
 	return nil
 }
 
-func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (*rpc.InitResp, error) {
+func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB, downloaderHeaders http.Header) (*rpc.InitResp, error) {
 	inConfig := req.GetConfiguration()
 	if inConfig == nil {
 		return nil, fmt.Errorf("invalid request")
@@ -182,7 +185,7 @@ func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, 
 	instancesCount++
 	instances[handle] = instance
 
-	if err := instance.checkForBuiltinTools(downloadCB, taskCB); err != nil {
+	if err := instance.checkForBuiltinTools(downloadCB, taskCB, downloaderHeaders); err != nil {
 		fmt.Println(err)
 		return nil, err
 	}

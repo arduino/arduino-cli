@@ -35,7 +35,7 @@ func initUninstallCommand() *cobra.Command {
 		Use:     "uninstall LIBRARY_NAME(S)",
 		Short:   "Uninstalls one or more libraries.",
 		Long:    "Uninstalls one or more libraries.",
-		Example: "  " + cli.AppName + " lib uninstall AudioZero",
+		Example: "  " + cli.VersionInfo.Application + " lib uninstall AudioZero",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runUninstallCommand,
 	}

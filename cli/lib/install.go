@@ -21,12 +21,11 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/commands/lib"
-	"github.com/arduino/arduino-cli/rpc"
-
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
 )
 
@@ -36,8 +35,8 @@ func initInstallCommand() *cobra.Command {
 		Short: "Installs one of more specified libraries into the system.",
 		Long:  "Installs one or more specified libraries into the system.",
 		Example: "" +
-			"  " + cli.AppName + " lib install AudioZero       # for the latest version.\n" +
-			"  " + cli.AppName + " lib install AudioZero@1.0.0 # for the specific version.",
+			"  " + cli.VersionInfo.Application + " lib install AudioZero       # for the latest version.\n" +
+			"  " + cli.VersionInfo.Application + " lib install AudioZero@1.0.0 # for the specific version.",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}
@@ -52,11 +51,13 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		os.Exit(cli.ErrBadArgument)
 	}
 	for _, library := range refs {
-		err := lib.LibraryInstall(context.Background(), &rpc.LibraryInstallReq{
+		libraryInstallReq := &rpc.LibraryInstallReq{
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version.String(),
-		}, cli.OutputProgressBar(), cli.OutputTaskProgress())
+		}
+		err := lib.LibraryInstall(context.Background(), libraryInstallReq, cli.OutputProgressBar(),
+			cli.OutputTaskProgress(), cli.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error installing "+library.String())
 			os.Exit(cli.ErrGeneric)

@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
+	"runtime"
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/daemon"
@@ -35,7 +37,7 @@ func InitCommand() *cobra.Command {
 		Use:     "daemon",
 		Short:   "Run as a daemon",
 		Long:    "Running as a daemon the initialization of cores and libraries is done only once.",
-		Example: "  " + cli.AppName + " daemon",
+		Example: "  " + cli.VersionInfo.Application + " daemon",
 		Args:    cobra.NoArgs,
 		Run:     runDaemonCommand,
 		Hidden:  true,
@@ -53,7 +55,13 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	rpc.RegisterArduinoCoreServer(s, &daemon.ArduinoCoreServerImpl{})
+
+	userAgentValue := fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s/Build:%s", cli.VersionInfo.Application,
+		cli.VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), cli.VersionInfo.Commit, cli.VersionInfo.BuildDate)
+	headers := http.Header{"User-Agent": []string{userAgentValue}}
+
+	coreServer := daemon.ArduinoCoreServerImpl{DownloaderHeaders: headers}
+	rpc.RegisterArduinoCoreServer(s, &coreServer)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
