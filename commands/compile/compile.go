@@ -28,11 +28,11 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/i18n"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/rpc"
 	paths "github.com/arduino/go-paths-helper"

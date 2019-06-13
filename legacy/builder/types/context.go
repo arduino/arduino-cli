@@ -9,7 +9,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
+	"github.com/arduino/arduino-cli/arduino/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 )

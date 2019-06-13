@@ -27,12 +27,12 @@
  * Copyright 2015 Arduino LLC (http://www.arduino.cc/)
  */
 
-package test
+package i18n_test
 
 import (
 	"fmt"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
+	"github.com/arduino/arduino-cli/arduino/i18n"
 	"github.com/stretchr/testify/require"
 	"testing"
 )

@@ -3,7 +3,7 @@ module github.com/arduino/arduino-cli
 go 1.12
 
 require (
-	bou.ke/monkey v1.0.1 // indirect
+	bou.ke/monkey v1.0.1
 	github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c
 	github.com/arduino/go-paths-helper v0.0.0-20190214132331-c3c98d1bf2e1
 	github.com/arduino/go-properties-orderedmap v0.0.0-20181003091528-89278049acd3
@@ -45,6 +45,7 @@ require (
 	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 	golang.org/x/net v0.0.0-20190311183353-d8887717615a
 	golang.org/x/text v0.3.2
+	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/genproto v0.0.0-20190327125643-d831d65fe17d // indirect
 	google.golang.org/grpc v1.21.1
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect

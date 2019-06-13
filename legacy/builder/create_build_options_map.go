@@ -32,7 +32,7 @@ package builder
 import (
 	"encoding/json"
 
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
+	"github.com/arduino/arduino-cli/arduino/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
 

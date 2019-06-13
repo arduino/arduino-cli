@@ -12,7 +12,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
+	"github.com/arduino/arduino-cli/arduino/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/fsnotify/fsnotify"

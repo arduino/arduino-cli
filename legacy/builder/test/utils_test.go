@@ -30,7 +30,7 @@
 package test
 
 import (
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
+	"github.com/arduino/arduino-cli/arduino/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/stretchr/testify/require"
 	"strings"
