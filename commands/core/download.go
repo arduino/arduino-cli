@@ -29,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
+// PlatformDownload FIXMEDOC
 func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloadCB commands.DownloadProgressCB,
 	downloaderHeaders http.Header) (*rpc.PlatformDownloadResp, error) {
 	pm := commands.GetPackageManager(req)

@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
+// LibrarySearch FIXMEDOC
 func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.LibrarySearchResp, error) {
 	lm := commands.GetLibraryManager(req)
 	if lm == nil {
@@ -55,6 +56,7 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 	return &rpc.LibrarySearchResp{Libraries: res}, nil
 }
 
+// GetLibraryParameters FIXMEDOC
 func GetLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
 	return &rpc.LibraryRelease{
 		Author:        rel.Author,

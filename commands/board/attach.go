@@ -34,6 +34,7 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 )
 
+// Attach FIXMEDOC
 func Attach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskProgressCB) (*rpc.BoardAttachResp, error) {
 
 	pm := commands.GetPackageManager(req)

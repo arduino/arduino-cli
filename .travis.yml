@@ -9,23 +9,21 @@ env:
 # Anything in before_script that returns a nonzero exit code will flunk the
 # build and immediately stop. It's sorta like having set -e enabled in bash.
 # Make sure golangci-lint is vendored.
-before_install:
-  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b $GOPATH/bin v1.16.0
+install:
   - curl -sL https://taskfile.dev/install.sh | sh
-
-install: true
+  - go get github.com/golangci/govet
+  - go get golang.org/x/lint/golint
 
 script:
-  # Check if the code is formatted
-  - $(exit $(go fmt ./... | wc -l))
-  # Run linter
-  - golangci-lint run
+  # Check if the code is formatted and run linter
+  - ./bin/task check
   # Build and test
   - ./bin/task build
   - ./bin/task test
   - ./bin/task test-legacy
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -cF unittests,integration
+  - bash <(curl -s https://codecov.io/bash) -cF unit -f '*_unit.txt'
+  - bash <(curl -s https://codecov.io/bash) -cF integ -f '*_integ.txt'
 
 

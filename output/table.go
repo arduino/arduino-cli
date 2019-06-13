@@ -22,6 +22,7 @@ import (
 	"math"
 )
 
+// Table FIXMEDOC
 type Table struct {
 	hasHeader        bool
 	columnsCount     int
@@ -29,23 +30,29 @@ type Table struct {
 	rows             []*TableRow
 }
 
+// TableRow FIXMEDOC
 type TableRow struct {
 	cells []TextBox
 }
 
+// NewTable FIXMEDOC
 func NewTable() *Table {
 	return &Table{
 		rows: []*TableRow{},
 	}
 }
 
+// TableColumnWidthMode FIXMEDOC
 type TableColumnWidthMode int
 
 const (
+	// Minimum FIXMEDOC
 	Minimum TableColumnWidthMode = iota
+	// Average FIXMEDOC
 	Average
 )
 
+// SetColumnWidthMode FIXMEDOC
 func (t *Table) SetColumnWidthMode(x int, mode TableColumnWidthMode) {
 	for len(t.columnsWidthMode) <= x {
 		t.columnsWidthMode = append(t.columnsWidthMode, Minimum)
@@ -74,6 +81,7 @@ func (t *Table) makeTableRow(columns ...interface{}) *TableRow {
 	return &TableRow{cells: cells}
 }
 
+// SetHeader FIXMEDOC
 func (t *Table) SetHeader(columns ...interface{}) {
 	row := t.makeTableRow(columns...)
 	if t.hasHeader {
@@ -84,11 +92,13 @@ func (t *Table) SetHeader(columns ...interface{}) {
 	}
 }
 
+// AddRow FIXMEDOC
 func (t *Table) AddRow(columns ...interface{}) {
 	row := t.makeTableRow(columns...)
 	t.rows = append(t.rows, row)
 }
 
+// Render FIXMEDOC
 func (t *Table) Render() string {
 	// find max width for each row
 	average := make([]int, t.columnsCount)

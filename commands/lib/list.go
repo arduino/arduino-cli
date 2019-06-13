@@ -32,6 +32,7 @@ type installedLib struct {
 	Available *librariesindex.Release
 }
 
+// LibraryList FIXMEDOC
 func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResp, error) {
 	lm := commands.GetLibraryManager(req)
 
@@ -79,6 +80,7 @@ func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bo
 	return res
 }
 
+// GetOutputLibrary FIXMEDOC
 func GetOutputLibrary(lib *libraries.Library) *rpc.Library {
 	insdir := ""
 	if lib.InstallDir != nil {
@@ -123,6 +125,7 @@ func GetOutputLibrary(lib *libraries.Library) *rpc.Library {
 	}
 }
 
+// GetOutputRelease FIXMEDOC
 func GetOutputRelease(lib *librariesindex.Release) *rpc.LibraryRelease { //
 	if lib != nil {
 		return &rpc.LibraryRelease{

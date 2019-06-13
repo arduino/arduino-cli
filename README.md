@@ -344,9 +344,13 @@ Currently Unit and Integration test are available for launch in 2 ways:
 
 ```
 * build:                Build the project
-* test:                 Run the full testsuite
+* check:                Check fmt and lint, `legacy` will be skipped
+* check-legacy:         Check fmt and lint for the `legacy` package
+* test:                 Run the full testsuite, `legacy` will be skipped
 * test-integration:     Run integration tests only
+* test-legacy:          Run tests for the `legacy` package
 * test-unit:            Run unit tests only
+* test-unit-race:       Run unit tests only with race condition detection
 ```
 
 For Example to launch unit tests only run: `task test-unit` 

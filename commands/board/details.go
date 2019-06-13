@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
+// Details FIXMEDOC
 func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
 	pm := commands.GetPackageManager(req)
 	if pm == nil {

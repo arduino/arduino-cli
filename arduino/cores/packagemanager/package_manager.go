@@ -59,14 +59,17 @@ func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) 
 	}
 }
 
+// Clear FIXMEDOC
 func (pm *PackageManager) Clear() {
 	pm.packages = cores.NewPackages()
 }
 
+// GetPackages FIXMEDOC
 func (pm *PackageManager) GetPackages() *cores.Packages {
 	return pm.packages
 }
 
+// FindPlatformReleaseProvidingBoardsWithVidPid FIXMEDOC
 func (pm *PackageManager) FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid string) []*cores.PlatformRelease {
 	res := []*cores.PlatformRelease{}
 	for _, targetPackage := range pm.packages.Packages {
@@ -86,6 +89,7 @@ func (pm *PackageManager) FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid 
 	return res
 }
 
+// FindBoardsWithVidPid FIXMEDOC
 func (pm *PackageManager) FindBoardsWithVidPid(vid, pid string) []*cores.Board {
 	res := []*cores.Board{}
 	for _, targetPackage := range pm.packages.Packages {
@@ -102,6 +106,7 @@ func (pm *PackageManager) FindBoardsWithVidPid(vid, pid string) []*cores.Board {
 	return res
 }
 
+// FindBoardsWithID FIXMEDOC
 func (pm *PackageManager) FindBoardsWithID(id string) []*cores.Board {
 	res := []*cores.Board{}
 	for _, targetPackage := range pm.packages.Packages {
@@ -290,6 +295,7 @@ func (ta *ToolActions) IsInstalled() (bool, error) {
 	return false, nil
 }
 
+// Release FIXMEDOC
 func (ta *ToolActions) Release(version *semver.RelaxedVersion) *ToolReleaseActions {
 	if ta.forwardError != nil {
 		return &ToolReleaseActions{forwardError: ta.forwardError}
@@ -310,6 +316,7 @@ type ToolReleaseActions struct {
 	forwardError error
 }
 
+// Get FIXMEDOC
 func (tr *ToolReleaseActions) Get() (*cores.ToolRelease, error) {
 	if tr.forwardError != nil {
 		return nil, tr.forwardError
@@ -340,6 +347,7 @@ func (pm *PackageManager) GetInstalledPlatformRelease(platform *cores.Platform) 
 	return best
 }
 
+// GetAllInstalledToolsReleases FIXMEDOC
 func (pm *PackageManager) GetAllInstalledToolsReleases() []*cores.ToolRelease {
 	tools := []*cores.ToolRelease{}
 	for _, targetPackage := range pm.packages.Packages {
@@ -384,6 +392,7 @@ func (pm *PackageManager) InstalledBoards() []*cores.Board {
 	return boards
 }
 
+// FindToolsRequiredForBoard FIXMEDOC
 func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.ToolRelease, error) {
 	pm.Log.Infof("Searching tools required for board %s", board)
 
@@ -421,6 +430,7 @@ func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*core
 	return requiredTools, nil
 }
 
+// FindToolDependency FIXMEDOC
 func (pm *PackageManager) FindToolDependency(dep *cores.ToolDependency) *cores.ToolRelease {
 	toolRelease, err := pm.Package(dep.ToolPackager).Tool(dep.ToolName).Release(dep.ToolVersion).Get()
 	if err != nil {
