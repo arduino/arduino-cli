@@ -50,6 +50,11 @@ tasks:
       - test -z $(go fmt ./legacy/...)
       - go vet ./legacy/...
 
+  rpc-client:
+    desc: Run the rpc client test routine (server must be already started)
+    cmds:
+      - go test -run TestWithClientE2E ./commands/daemon
+
 vars:
   # all modules of this project except for "legacy/..." module
   DEFAULT_TARGETS:

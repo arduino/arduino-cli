@@ -15,34 +15,40 @@
 // a commercial license, send an email to license@arduino.cc.
 //
 
-package main
+package daemon_test
 
 import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
+	"testing"
+	"time"
 
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"google.golang.org/grpc"
 )
 
-func main() {
-	if len(os.Args) != 3 {
-		fmt.Println("Please specify Arduino DATA_DIR as first argument")
-		os.Exit(1)
+func TestWithClientE2E(t *testing.T) {
+	if testing.Short() {
+		t.Skip("rpc client test must be run manually, skip...")
 	}
-	datadir := os.Args[1]
 
-	fmt.Println("=== Connecting to GRPC server")
-	conn, err := grpc.Dial("127.0.0.1:50051", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock(), grpc.WithTimeout(100*time.Millisecond))
 	if err != nil {
-		fmt.Printf("Error connecting to server: %s\n", err)
-		os.Exit(1)
+		t.Skip("error connecting to arduino-cli rpc server, skip...")
 	}
+	defer conn.Close()
+
+	datadir, err := ioutil.TempDir("", "arduino-rpc-client")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(datadir)
+
 	client := rpc.NewArduinoCoreClient(conn)
-	fmt.Println()
 
 	// VERSION
 	fmt.Println("=== calling Version")
