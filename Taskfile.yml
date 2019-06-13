@@ -15,7 +15,7 @@ tasks:
   test-unit:
     desc: Run unit tests only
     cmds:
-      - go test -short {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }}
+      - go test -race -short {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }}
 
   test-integration:
     desc: Run integration tests only
@@ -26,6 +26,23 @@ tasks:
     desc: Run tests for the `legacy` package
     cmds:
       - go test {{ default "-v" .GOFLAGS }} ./legacy/...
+
+  check:
+    desc: Run all the checks
+    cmds:
+    - task: check-fmt
+    - task: check-lint
+
+  check-fmt:
+    desc: Run go fmt as a test with return code
+    cmds:
+      - test -z $(go fmt {{ default "./..." .TARGETS }})
+
+  check-lint:
+    desc: Run linters
+    cmds:
+      - go vet {{ default "./..." .TARGETS }}
+      - golint {{.GOLINTFLAGS}} {{ default "./..." .TARGETS }}
 
 vars:
   DEFAULT_TARGETS: "./arduino/... ./auth/... ./cli/... ./commands/... ./executils/... ./version/..."
@@ -45,3 +62,6 @@ vars:
   TEST_LDFLAGS: >
     -ldflags  '-X github.com/arduino/arduino-cli/version.versionString={{.TEST_VERSIONSTRING}}
     -X github.com/arduino/arduino-cli/version.commit={{.TEST_COMMIT}}'
+
+  # check-lint vars
+  GOLINTFLAGS: "-min_confidence 0.8 -set_exit_status"
