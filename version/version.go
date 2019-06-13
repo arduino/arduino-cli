@@ -29,6 +29,7 @@ var (
 	buildDate            = time.Time{}
 )
 
+// Info FIXMEDOC
 type Info struct {
 	Application   string    `json:"Application"`
 	VersionString string    `json:"VersionString"`
@@ -36,6 +37,7 @@ type Info struct {
 	BuildDate     time.Time `json:"BuildDate"`
 }
 
+// NewInfo FIXMEDOC
 func NewInfo(application string) *Info {
 	return &Info{
 		Application:   application,

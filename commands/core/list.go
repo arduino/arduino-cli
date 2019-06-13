@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
+// PlatformList FIXMEDOC
 func PlatformList(ctx context.Context, req *rpc.PlatformListReq) (*rpc.PlatformListResp, error) {
 	pm := commands.GetPackageManager(req)
 	if pm == nil {

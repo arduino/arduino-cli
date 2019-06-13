@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
+// LibraryUninstall FIXMEDOC
 func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallReq, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req)
 

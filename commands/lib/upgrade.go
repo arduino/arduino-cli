@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
+// LibraryUpgradeAll FIXMEDOC
 func LibraryUpgradeAll(ctx context.Context, req *rpc.LibraryUpgradeAllReq, downloadCB commands.DownloadProgressCB,
 	taskCB commands.TaskProgressCB, downloaderHeaders http.Header) error {
 	lm := commands.GetLibraryManager(req)

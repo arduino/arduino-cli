@@ -55,10 +55,12 @@ type CoreInstance struct {
 	discoveries []*discovery.Discovery
 }
 
+// InstanceContainer FIXMEDOC
 type InstanceContainer interface {
 	GetInstance() *rpc.Instance
 }
 
+// GetPackageManager FIXMEDOC
 func GetPackageManager(req InstanceContainer) *packagemanager.PackageManager {
 	i, ok := instances[req.GetInstance().GetId()]
 	if !ok {
@@ -67,6 +69,7 @@ func GetPackageManager(req InstanceContainer) *packagemanager.PackageManager {
 	return i.pm
 }
 
+// GetLibraryManager FIXMEDOC
 func GetLibraryManager(req InstanceContainer) *librariesmanager.LibrariesManager {
 	i, ok := instances[req.GetInstance().GetId()]
 	if !ok {
@@ -75,6 +78,7 @@ func GetLibraryManager(req InstanceContainer) *librariesmanager.LibrariesManager
 	return i.lm
 }
 
+// GetDiscoveries FIXMEDOC
 func GetDiscoveries(req InstanceContainer) []*discovery.Discovery {
 	i, ok := instances[req.GetInstance().GetId()]
 	if !ok {
@@ -149,6 +153,7 @@ func (instance *CoreInstance) startDiscoveries() error {
 	return nil
 }
 
+// Init FIXMEDOC
 func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB, downloaderHeaders http.Header) (*rpc.InitResp, error) {
 	inConfig := req.GetConfiguration()
 	if inConfig == nil {
@@ -202,6 +207,7 @@ func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, 
 	}, nil
 }
 
+// Destroy FIXMEDOC
 func Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error) {
 	id := req.GetInstance().GetId()
 	if _, ok := instances[id]; !ok {
@@ -237,6 +243,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexReq,
 	return nil
 }
 
+// UpdateIndex FIXMEDOC
 func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResp, error) {
 	id := req.GetInstance().GetId()
 	coreInstance, ok := instances[id]
@@ -286,6 +293,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 	return &rpc.UpdateIndexResp{}, nil
 }
 
+// Rescan FIXMEDOC
 func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
 	id := req.GetInstance().GetId()
 	coreInstance, ok := instances[id]
@@ -371,6 +379,7 @@ func createInstance(ctx context.Context, config *configs.Configuration, getLibOn
 	return pm, lm, platformIndexErrors, librariesIndexError, nil
 }
 
+// Download FIXMEDOC
 func Download(d *downloader.Downloader, label string, downloadCB DownloadProgressCB) error {
 	if d == nil {
 		// This signal means that the file is already downloaded

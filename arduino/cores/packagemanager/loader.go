@@ -27,7 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
-	"go.bug.st/relaxed-semver"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // LoadHardware read all plaforms from the configured paths
@@ -361,6 +361,7 @@ func (pm *PackageManager) loadToolReleasesFromTool(tool *cores.Tool, toolPath *p
 	return nil
 }
 
+// LoadToolsFromBundleDirectories FIXMEDOC
 func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs paths.PathList) error {
 	for _, dir := range dirs {
 		if err := pm.LoadToolsFromBundleDirectory(dir); err != nil {
@@ -370,6 +371,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs paths.PathList) er
 	return nil
 }
 
+// LoadToolsFromBundleDirectory FIXMEDOC
 func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) error {
 	pm.Log.Infof("Loading tools from bundle dir: %s", toolsPath)
 

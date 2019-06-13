@@ -58,6 +58,7 @@ var appName = filepath.Base(os.Args[0])
 // VersionInfo contains all info injected during build
 var VersionInfo = version.NewInfo(appName)
 
+// HTTPClientHeader is the object that will be propagated to configure the clients inside the downloaders
 var HTTPClientHeader = getHTTPClientHeader()
 
 // ErrLogrus represents the logrus instance, which has the role to
@@ -70,6 +71,7 @@ var GlobalFlags struct {
 	OutputJSON bool // true output in JSON, false output as Text
 }
 
+// Config FIXMEDOC
 var Config *configs.Configuration
 
 func packageManagerInitReq() *rpc.InitReq {
@@ -96,6 +98,7 @@ func getHTTPClientHeader() http.Header {
 	return downloaderHeaders
 }
 
+// InitInstance FIXMEDOC
 func InitInstance() *rpc.InitResp {
 	logrus.Info("Initializing package manager")
 	req := packageManagerInitReq()
