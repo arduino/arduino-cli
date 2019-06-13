@@ -32,7 +32,7 @@ func initDumpCommand() *cobra.Command {
 		Use:     "dump",
 		Short:   "Prints the current configuration",
 		Long:    "Prints the current configuration.",
-		Example: "  " + cli.AppName + " config dump",
+		Example: "  " + cli.VersionInfo.Application + " config dump",
 		Args:    cobra.NoArgs,
 		Run:     runDumpCommand,
 	}

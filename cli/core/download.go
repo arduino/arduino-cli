@@ -35,8 +35,8 @@ func initDownloadCommand() *cobra.Command {
 		Short: "Downloads one or more cores and corresponding tool dependencies.",
 		Long:  "Downloads one or more cores and corresponding tool dependencies.",
 		Example: "" +
-			"  " + cli.AppName + " core download arduino:samd       # to download the latest version of arduino SAMD core.\n" +
-			"  " + cli.AppName + " core download arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
+			"  " + cli.VersionInfo.Application + " core download arduino:samd       # to download the latest version of arduino SAMD core.\n" +
+			"  " + cli.VersionInfo.Application + " core download arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 	}
@@ -49,12 +49,14 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	platformsRefs := parsePlatformReferenceArgs(args)
 	for i, platformRef := range platformsRefs {
-		_, err := core.PlatformDownload(context.Background(), &rpc.PlatformDownloadReq{
+		platformDownloadreq := &rpc.PlatformDownloadReq{
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
-		}, cli.OutputProgressBar())
+		}
+		_, err := core.PlatformDownload(context.Background(), platformDownloadreq, cli.OutputProgressBar(),
+			cli.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+args[i])
 			os.Exit(cli.ErrNetwork)

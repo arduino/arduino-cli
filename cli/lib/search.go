@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"os"
 	"sort"
-
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli"
@@ -39,7 +38,7 @@ func initSearchCommand() *cobra.Command {
 		Use:     "search [LIBRARY_NAME]",
 		Short:   "Searchs for one or more libraries data.",
 		Long:    "Search for one or more libraries data (case insensitive search).",
-		Example: "  " + cli.AppName + " lib search audio",
+		Example: "  " + cli.VersionInfo.Application + " lib search audio",
 		Args:    cobra.ArbitraryArgs,
 		Run:     runSearchCommand,
 	}

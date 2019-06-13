@@ -36,7 +36,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "Shows a list of all installed libraries.",
 		Long:    "Shows a list of all installed libraries.",
-		Example: "  " + cli.AppName + " lib list",
+		Example: "  " + cli.VersionInfo.Application + " lib list",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}

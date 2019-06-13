@@ -27,7 +27,7 @@ func InitCommand() *cobra.Command {
 	configCommand := &cobra.Command{
 		Use:     "config",
 		Short:   "Arduino Configuration Commands.",
-		Example: "  " + cli.AppName + " config init",
+		Example: "  " + cli.VersionInfo.Application + " config init",
 	}
 	configCommand.AddCommand(initDumpCommand())
 	configCommand.AddCommand(initInitCommand())

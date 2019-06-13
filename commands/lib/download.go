@@ -20,6 +20,7 @@ package lib
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -28,7 +29,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadCB commands.DownloadProgressCB) (*rpc.LibraryDownloadResp, error) {
+func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadCB commands.DownloadProgressCB,
+	downloaderHeaders http.Header) (*rpc.LibraryDownloadResp, error) {
 	logrus.Info("Executing `arduino lib download`")
 
 	lm := commands.GetLibraryManager(req)
@@ -40,7 +42,7 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadC
 		return nil, fmt.Errorf("looking for library: %s", err)
 	}
 
-	if err := downloadLibrary(lm, lib, downloadCB, func(*rpc.TaskProgress) {}); err != nil {
+	if err := downloadLibrary(lm, lib, downloadCB, func(*rpc.TaskProgress) {}, downloaderHeaders); err != nil {
 		return nil, err
 	}
 
@@ -48,10 +50,10 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadC
 }
 
 func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) error {
 
 	taskCB(&rpc.TaskProgress{Name: "Downloading " + libRelease.String()})
-	if d, err := libRelease.Resource.Download(lm.DownloadsDir); err != nil {
+	if d, err := libRelease.Resource.Download(lm.DownloadsDir, downloaderHeaders); err != nil {
 		return err
 	} else if err := commands.Download(d, libRelease.String(), downloadCB); err != nil {
 		return err

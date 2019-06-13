@@ -34,7 +34,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Use:     "update-index",
 		Short:   "Updates the index of cores.",
 		Long:    "Updates the index of cores to the latest version.",
-		Example: "  " + cli.AppName + " core update-index",
+		Example: "  " + cli.VersionInfo.Application + " core update-index",
 		Args:    cobra.NoArgs,
 		Run:     runUpdateIndexCommand,
 	}

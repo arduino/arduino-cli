@@ -21,11 +21,10 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/common/formatter"
-
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/rpc"
 	"github.com/spf13/cobra"
 )
@@ -36,8 +35,8 @@ func initDownloadCommand() *cobra.Command {
 		Short: "Downloads one or more libraries without installing them.",
 		Long:  "Downloads one or more libraries without installing them.",
 		Example: "" +
-			"  " + cli.AppName + " lib download AudioZero       # for the latest version.\n" +
-			"  " + cli.AppName + " lib download AudioZero@1.0.0 # for a specific version.",
+			"  " + cli.VersionInfo.Application + " lib download AudioZero       # for the latest version.\n" +
+			"  " + cli.VersionInfo.Application + " lib download AudioZero@1.0.0 # for a specific version.",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 	}
@@ -52,11 +51,13 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		os.Exit(cli.ErrBadArgument)
 	}
 	for _, library := range pairs {
-		_, err := lib.LibraryDownload(context.Background(), &rpc.LibraryDownloadReq{
+		libraryDownloadReq := &rpc.LibraryDownloadReq{
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version.String(),
-		}, cli.OutputProgressBar())
+		}
+		_, err := lib.LibraryDownload(context.Background(), libraryDownloadReq, cli.OutputProgressBar(),
+			cli.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+library.String())
 			os.Exit(cli.ErrNetwork)

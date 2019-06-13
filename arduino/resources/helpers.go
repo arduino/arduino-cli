@@ -19,9 +19,10 @@ package resources
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 
-	paths "github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-paths-helper"
 	"go.bug.st/downloader"
 )
 
@@ -45,7 +46,7 @@ func (r *DownloadResource) IsCached(downloadDir *paths.Path) (bool, error) {
 }
 
 // Download a DownloadResource.
-func (r *DownloadResource) Download(downloadDir *paths.Path) (*downloader.Downloader, error) {
+func (r *DownloadResource) Download(downloadDir *paths.Path, downloaderHeaders http.Header) (*downloader.Downloader, error) {
 	cached, err := r.TestLocalArchiveIntegrity(downloadDir)
 	if err != nil {
 		return nil, fmt.Errorf("testing local archive integrity: %s", err)
@@ -73,5 +74,7 @@ func (r *DownloadResource) Download(downloadDir *paths.Path) (*downloader.Downlo
 		return nil, fmt.Errorf("getting archive file info: %s", err)
 	}
 
-	return downloader.Download(path.String(), r.URL)
+	downloadConfig := downloader.Config{
+		RequestHeaders: downloaderHeaders}
+	return downloader.DownloadWithConfig(path.String(), r.URL, downloadConfig)
 }
