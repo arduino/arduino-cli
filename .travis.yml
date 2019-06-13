@@ -15,10 +15,8 @@ install:
   - go get golang.org/x/lint/golint
 
 script:
-  # Check if the code is formatted
-  - $(exit $(go fmt ./... | wc -l))
-  # Run linter
-  - golangci-lint run
+  # Check if the code is formatted and run linter
+  - ./bin/task check
   # Build and test
   - ./bin/task build
   - ./bin/task test
