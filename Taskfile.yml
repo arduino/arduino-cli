@@ -15,7 +15,7 @@ tasks:
   test-unit:
     desc: Run unit tests only
     cmds:
-      - go test -race -short {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }}
+      - go test -short {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }}
 
   test-integration:
     desc: Run integration tests only
@@ -23,9 +23,14 @@ tasks:
       - go test -run Integration {{ default "-v" .GOFLAGS }} -coverprofile=coverage_integ.txt {{ default .DEFAULT_TARGETS .TARGETS }} {{.TEST_LDFLAGS}}
 
   test-legacy:
-    desc: Run tests
+    desc: Run tests for the `legacy` package
     cmds:
       - go test {{ default "-v" .GOFLAGS }} ./legacy/...
+
+  test-unit-race:
+    desc: Run unit tests only with race condition detection
+    cmds:
+      - go test -short -race {{ default "-v" .GOFLAGS }} -coverprofile=coverage_race_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }}
 
   check:
     desc: Check fmt and lint, `legacy` will be skipped
