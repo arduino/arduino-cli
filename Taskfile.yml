@@ -41,7 +41,9 @@ tasks:
       - go vet ./legacy/...
 
 vars:
-  DEFAULT_TARGETS: "./arduino/... ./auth/... ./cli/... ./commands/... ./executils/... ./version/..."
+  # all modules of this project except for "legacy/..." module
+  DEFAULT_TARGETS:
+    sh: echo `go list ./... | grep -v legacy | tr '\n' ' '`
 
   # build vars
   VERSIONSTRING: "0.3.6-alpha.preview"
