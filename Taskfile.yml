@@ -54,7 +54,7 @@ vars:
       -X github.com/arduino/arduino-cli/version.commit={{.COMMIT}}'
 
   # test vars
-  GOFLAGS: "-timeout 5m -v -coverpkg=./... -covermode=atomic"
+  GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
   TEST_VERSIONSTRING: "0.0.0-test.preview"
   TEST_COMMIT: "deadbeef"
   TEST_LDFLAGS: >
