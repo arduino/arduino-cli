@@ -23,6 +23,7 @@ script:
   # Build and test
   - ./bin/task build
   - ./bin/task test
+  - ./bin/task test-legacy
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -cF unittests,integration
