@@ -7,7 +7,7 @@ tasks:
       - go build -v -i {{.LDFLAGS}}
 
   test:
-    desc: Run the full testsuite
+    desc: Run the full testsuite, `legacy` will be skipped
     cmds:
       - task: test-unit
       - task: test-integration
@@ -15,14 +15,21 @@ tasks:
   test-unit:
     desc: Run unit tests only
     cmds:
-      - go test -short {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt {{ default "./..." .TARGETS }}
+      - go test -short {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }}
 
   test-integration:
     desc: Run integration tests only
     cmds:
-      - go test -run Integration {{ default "-v" .GOFLAGS }} -coverprofile=coverage_integ.txt {{ default "./..." .TARGETS }} {{.TEST_LDFLAGS}}
+      - go test -run Integration {{ default "-v" .GOFLAGS }} -coverprofile=coverage_integ.txt {{ default .DEFAULT_TARGETS .TARGETS }} {{.TEST_LDFLAGS}}
+
+  test-legacy:
+    desc: Run tests for the `legacy` package
+    cmds:
+      - go test {{ default "-v" .GOFLAGS }} ./legacy/...
 
 vars:
+  DEFAULT_TARGETS: "./arduino/... ./auth/... ./cli/... ./commands/... ./executils/... ./version/..."
+
   # build vars
   VERSIONSTRING: "0.3.6-alpha.preview"
   COMMIT:
