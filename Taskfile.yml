@@ -23,26 +23,23 @@ tasks:
       - go test -run Integration {{ default "-v" .GOFLAGS }} -coverprofile=coverage_integ.txt {{ default .DEFAULT_TARGETS .TARGETS }} {{.TEST_LDFLAGS}}
 
   test-legacy:
-    desc: Run tests for the `legacy` package
+    desc: Run tests
     cmds:
       - go test {{ default "-v" .GOFLAGS }} ./legacy/...
 
   check:
-    desc: Run all the checks
+    desc: Check fmt and lint, `legacy` will be skipped
     cmds:
-    - task: check-fmt
-    - task: check-lint
+      - test -z $(go fmt {{ default .DEFAULT_TARGETS .TARGETS }})
+      - go vet {{ default .DEFAULT_TARGETS .TARGETS }}
+      - golint {{.GOLINTFLAGS}} {{ default .DEFAULT_TARGETS .TARGETS }}
 
-  check-fmt:
-    desc: Run go fmt as a test with return code
+  check-legacy:
+    desc: Check fmt and lint for the `legacy` package
     cmds:
-      - test -z $(go fmt {{ default "./..." .TARGETS }})
-
-  check-lint:
-    desc: Run linters
-    cmds:
-      - go vet {{ default "./..." .TARGETS }}
-      - golint {{.GOLINTFLAGS}} {{ default "./..." .TARGETS }}
+      - test -z $(go fmt ./legacy/...)
+      - go vet ./legacy/...
+      - golint {{.GOLINTFLAGS}} ./legacy/...
 
 vars:
   DEFAULT_TARGETS: "./arduino/... ./auth/... ./cli/... ./commands/... ./executils/... ./version/..."
