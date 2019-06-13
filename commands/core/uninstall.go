@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
+// PlatformUninstall FIXMEDOC
 func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq, taskCB commands.TaskProgressCB) (*rpc.PlatformUninstallResp, error) {
 	pm := commands.GetPackageManager(req)
 	if pm == nil {

@@ -31,41 +31,50 @@ var yellow = color.New(color.FgYellow).SprintfFunc()
 var white = color.New(color.FgWhite).SprintfFunc()
 var hiWhite = color.New(color.FgHiWhite).SprintfFunc()
 
+// Red FIXMEDOC
 func Red(in string) *Text {
 	return &Text{raw: red(in), clean: in}
 }
 
+// Blue FIXMEDOC
 func Blue(in string) *Text {
 	return &Text{raw: blue(in), clean: in}
 }
 
+// Green FIXMEDOC
 func Green(in string) *Text {
 	return &Text{raw: green(in), clean: in}
 }
 
+// Yellow FIXMEDOC
 func Yellow(in string) *Text {
 	return &Text{raw: yellow(in), clean: in}
 }
 
+// White FIXMEDOC
 func White(in string) *Text {
 	return &Text{raw: white(in), clean: in}
 }
 
+// HiWhite FIXMEDOC
 func HiWhite(in string) *Text {
 	return &Text{raw: hiWhite(in), clean: in}
 }
 
+// TextBox FIXMEDOC
 type TextBox interface {
 	Len() int
 	Pad(availableWidth int) string
 }
 
+// Text FIXMEDOC
 type Text struct {
 	clean   string
 	raw     string
 	justify int
 }
 
+// Len FIXMEDOC
 func (t *Text) Len() int {
 	return utf8.RuneCountInString(t.clean)
 }
@@ -74,18 +83,22 @@ func (t *Text) Len() int {
 // 	return t.raw
 // }
 
+// JustifyLeft FIXMEDOC
 func (t *Text) JustifyLeft() {
 	t.justify = 0
 }
 
+// JustifyCenter FIXMEDOC
 func (t *Text) JustifyCenter() {
 	t.justify = 1
 }
 
+// JustifyRight FIXMEDOC
 func (t *Text) JustifyRight() {
 	t.justify = 2
 }
 
+// Pad FIXMEDOC
 func (t *Text) Pad(totalLen int) string {
 	delta := totalLen - t.Len()
 	switch t.justify {
@@ -108,6 +121,7 @@ func spaces(n int) string {
 	return res
 }
 
+// Sprintf FIXMEDOC
 func Sprintf(format string, args ...interface{}) TextBox {
 	cleanArgs := make([]interface{}, len(args))
 	for i, arg := range args {

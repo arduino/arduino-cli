@@ -26,8 +26,13 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
+// MandatoryProperties FIXMEDOC
 var MandatoryProperties = []string{"name", "version", "author", "maintainer"}
+
+// OptionalProperties FIXMEDOC
 var OptionalProperties = []string{"sentence", "paragraph", "url"}
+
+// ValidCategories FIXMEDOC
 var ValidCategories = map[string]bool{
 	"Display":             true,
 	"Communication":       true,

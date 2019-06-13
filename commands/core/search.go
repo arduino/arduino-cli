@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
+// PlatformSearch FIXMEDOC
 func PlatformSearch(ctx context.Context, req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error) {
 	pm := commands.GetPackageManager(req)
 	if pm == nil {

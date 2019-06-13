@@ -29,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
+// PlatformInstall FIXMEDOC
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) (*rpc.PlatformInstallResp, error) {
 

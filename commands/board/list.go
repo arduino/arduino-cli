@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
+// List FIXMEDOC
 func List(ctx context.Context, req *rpc.BoardListReq) (*rpc.BoardListResp, error) {
 	pm := commands.GetPackageManager(req)
 	if pm == nil {

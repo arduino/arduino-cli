@@ -22,6 +22,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Navigate FIXMEDOC
 func (c *Configuration) Navigate(pwd *paths.Path) {
 	parents := pwd.Clean().Parents()
 

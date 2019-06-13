@@ -40,6 +40,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Compile FIXMEDOC
 func Compile(ctx context.Context, req *rpc.CompileReq, outStream io.Writer, errStream io.Writer) (*rpc.CompileResp, error) {
 	pm := commands.GetPackageManager(req)
 	if pm == nil {

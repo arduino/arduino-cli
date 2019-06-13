@@ -29,6 +29,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// LibraryInstall FIXMEDOC
 func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) error {
 

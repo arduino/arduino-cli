@@ -27,8 +27,28 @@ tasks:
     cmds:
       - go test {{ default "-v" .GOFLAGS }} ./legacy/...
 
+  test-unit-race:
+    desc: Run unit tests only with race condition detection
+    cmds:
+      - go test -short -race {{ default "-v" .GOFLAGS }} -coverprofile=coverage_race_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }}
+
+  check:
+    desc: Check fmt and lint, `legacy` will be skipped
+    cmds:
+      - test -z $(go fmt {{ default .DEFAULT_TARGETS .TARGETS }})
+      - go vet {{ default .DEFAULT_TARGETS .TARGETS }}
+      - golint {{.GOLINTFLAGS}} {{ default .DEFAULT_TARGETS .TARGETS }}
+
+  check-legacy:
+    desc: Check fmt and lint for the `legacy` package
+    cmds:
+      - test -z $(go fmt ./legacy/...)
+      - go vet ./legacy/...
+
 vars:
-  DEFAULT_TARGETS: "./arduino/... ./auth/... ./cli/... ./commands/... ./executils/... ./version/..."
+  # all modules of this project except for "legacy/..." module
+  DEFAULT_TARGETS:
+    sh: echo `go list ./... | grep -v legacy | tr '\n' ' '`
 
   # build vars
   VERSIONSTRING: "0.3.6-alpha.preview"
@@ -39,9 +59,12 @@ vars:
       -X github.com/arduino/arduino-cli/version.commit={{.COMMIT}}'
 
   # test vars
-  GOFLAGS: "-timeout 5m -v -coverpkg=./... -covermode=atomic"
+  GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
   TEST_VERSIONSTRING: "0.0.0-test.preview"
   TEST_COMMIT: "deadbeef"
   TEST_LDFLAGS: >
     -ldflags  '-X github.com/arduino/arduino-cli/version.versionString={{.TEST_VERSIONSTRING}}
     -X github.com/arduino/arduino-cli/version.commit={{.TEST_COMMIT}}'
+
+  # check-lint vars
+  GOLINTFLAGS: "-min_confidence 0.8 -set_exit_status"

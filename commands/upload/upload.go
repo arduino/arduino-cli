@@ -38,6 +38,7 @@ import (
 	serial "go.bug.st/serial.v1"
 )
 
+// Upload FIXMEDOC
 func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStream io.Writer) (*rpc.UploadResp, error) {
 	logrus.Info("Executing `arduino upload`")
 

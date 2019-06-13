@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/rpc"
 )
 
+// PlatformUpgrade FIXMEDOC
 func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) (*rpc.PlatformUpgradeResp, error) {
 
