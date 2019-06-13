@@ -23,6 +23,7 @@ script:
   - ./bin/task test-legacy
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -cF unittests,integration
+  - bash <(curl -s https://codecov.io/bash) -cF unit -f '*_unit.txt'
+  - bash <(curl -s https://codecov.io/bash) -cF integ -f '*_integ.txt'
 
 
