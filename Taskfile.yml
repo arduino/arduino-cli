@@ -39,7 +39,6 @@ tasks:
     cmds:
       - test -z $(go fmt ./legacy/...)
       - go vet ./legacy/...
-      - golint {{.GOLINTFLAGS}} ./legacy/...
 
 vars:
   DEFAULT_TARGETS: "./arduino/... ./auth/... ./cli/... ./commands/... ./executils/... ./version/..."
