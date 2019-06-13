@@ -24,7 +24,7 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/rpc"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"google.golang.org/grpc"
 )
 

@@ -27,7 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
-	"github.com/arduino/arduino-cli/rpc"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/spf13/cobra"
 )
 
