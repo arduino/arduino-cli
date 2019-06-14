@@ -5,9 +5,7 @@ go:
 
 env:
   - GO111MODULE=on
-
-before_install:
-    - export PATH=$HOME/protobuf/bin:$PATH
+  - PATH=$HOME/protobuf/bin:$PATH
 
 # Anything in before_script that returns a nonzero exit code will flunk the
 # build and immediately stop. It's sorta like having set -e enabled in bash.
@@ -22,7 +20,6 @@ install:
     unzip protoc-3.8.0-linux-x86_64.zip &&
     popd
 
-
 script:
   # Check if the code is formatted and run linter
   - ./bin/task check
@@ -35,5 +32,3 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash) -cF unit -f '*_unit.txt'
   - bash <(curl -s https://codecov.io/bash) -cF integ -f '*_integ.txt'
-
-
