@@ -6,6 +6,9 @@ go:
 env:
   - GO111MODULE=on
 
+before_install:
+    - export PATH=$HOME/protobuf/bin:$PATH
+
 # Anything in before_script that returns a nonzero exit code will flunk the
 # build and immediately stop. It's sorta like having set -e enabled in bash.
 # Make sure golangci-lint is vendored.
@@ -13,6 +16,12 @@ install:
   - curl -sL https://taskfile.dev/install.sh | sh
   - go get github.com/golangci/govet
   - go get golang.org/x/lint/golint
+  - |
+    mkdir -p $HOME/protobuf && pushd $HOME/protobuf &&
+    curl -LO 'https://github.com/google/protobuf/releases/download/v3.8.0/protoc-3.8.0-linux-x86_64.zip' &&
+    unzip protoc-3.8.0-linux-x86_64.zip &&
+    popd
+
 
 script:
   # Check if the code is formatted and run linter
