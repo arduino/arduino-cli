@@ -18,6 +18,7 @@ script:
   # Check if the code is formatted and run linter
   - ./bin/task check
   # Build and test
+  - ./bin/task protoc
   - ./bin/task build
   - ./bin/task test
   - ./bin/task test-legacy
