@@ -13,6 +13,7 @@ install:
   - curl -sL https://taskfile.dev/install.sh | sh
   - go get github.com/golangci/govet
   - go get golang.org/x/lint/golint
+  - go get -u github.com/golang/protobuf/protoc-gen-go
   - |
     mkdir -p $HOME/protobuf && pushd $HOME/protobuf &&
     curl -LO 'https://github.com/google/protobuf/releases/download/v3.8.0/protoc-3.8.0-linux-x86_64.zip' &&
