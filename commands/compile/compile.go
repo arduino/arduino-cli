@@ -34,7 +34,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/rpc"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"

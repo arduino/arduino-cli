@@ -25,8 +25,8 @@ import (
 	"runtime"
 
 	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/daemon"
-	"github.com/arduino/arduino-cli/rpc"
+	"github.com/arduino/arduino-cli/commands/daemon"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )

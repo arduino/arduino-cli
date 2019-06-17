@@ -27,7 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/output"
-	"github.com/arduino/arduino-cli/rpc"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

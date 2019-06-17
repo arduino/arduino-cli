@@ -29,7 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/rpc"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	discovery "github.com/arduino/board-discovery"
 	paths "github.com/arduino/go-paths-helper"
 )

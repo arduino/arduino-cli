@@ -20,7 +20,7 @@ package output
 import (
 	"fmt"
 
-	"github.com/arduino/arduino-cli/rpc"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/cmaglie/pb"
 )
 
