@@ -17,9 +17,9 @@
 
 syntax = "proto3";
 
-package cc.arduino.core.rpc;
+package cc.arduino.cli.commands;
 
-option go_package = "github.com/arduino/arduino-cli/rpc";
+option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 
 message Instance { int32 id = 1; }
 

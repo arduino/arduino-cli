@@ -17,16 +17,16 @@
 
 syntax = "proto3";
 
-package cc.arduino.core.rpc;
+package cc.arduino.cli.commands;
 
-option go_package = "github.com/arduino/arduino-cli/rpc";
+option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 
-import "common.proto";
-import "board.proto";
-import "compile.proto";
-import "core.proto";
-import "upload.proto";
-import "lib.proto";
+import "commands/common.proto";
+import "commands/board.proto";
+import "commands/compile.proto";
+import "commands/core.proto";
+import "commands/upload.proto";
+import "commands/lib.proto";
 
 // The main Arduino Platform Service
 service ArduinoCore {

@@ -1,6 +1,11 @@
 version: '2'
 
 tasks:
+  protoc:
+    desc: Compile protobuf definitions
+    cmds:
+      - protoc --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/commands/*.proto
+
   build:
     desc: Build the project
     cmds:
@@ -44,6 +49,11 @@ tasks:
     cmds:
       - test -z $(go fmt ./legacy/...)
       - go vet ./legacy/...
+
+  rpc-client:
+    desc: Run the rpc client test routine (server must be already started)
+    cmds:
+      - go test -run TestWithClientE2E ./commands/daemon
 
 vars:
   # all modules of this project except for "legacy/..." module

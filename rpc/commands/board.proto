@@ -17,11 +17,11 @@
 
 syntax = "proto3";
 
-package cc.arduino.core.rpc;
+package cc.arduino.cli.commands;
 
-option go_package = "github.com/arduino/arduino-cli/rpc";
+option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 
-import "common.proto";
+import "commands/common.proto";
 
 message BoardDetailsReq {
   Instance instance = 1;
