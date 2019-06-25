@@ -346,6 +346,8 @@ Currently Unit and Integration test are available for launch in 2 ways:
 * build:                Build the project
 * check:                Check fmt and lint, `legacy` will be skipped
 * check-legacy:         Check fmt and lint for the `legacy` package
+* protoc:               Compile protobuf definitions
+* rpc-client:           Run the rpc client test routine (server must be already started)
 * test:                 Run the full testsuite, `legacy` will be skipped
 * test-integration:     Run integration tests only
 * test-legacy:          Run tests for the `legacy` package
