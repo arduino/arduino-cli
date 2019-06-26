@@ -61,7 +61,7 @@ vars:
     sh: echo `go list ./... | grep -v legacy | tr '\n' ' '`
 
   # build vars
-  VERSIONSTRING: "0.3.6-alpha.preview"
+  VERSIONSTRING: "0.3.7-alpha.preview"
   COMMIT:
     sh: echo ${TRAVIS_COMMIT:-`git log -n 1 --format=%h`}
   LDFLAGS: >
