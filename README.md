@@ -17,7 +17,7 @@ This is **not yet available** until the first stable version is released.
 #### Download the latest unstable "alpha" preview
 
 Please note that these are **preview** build, they may have bugs, some features may not work or may be changed without notice,
-the latest preview version is `0.3.6-alpha.preview`:
+the latest preview version is `0.3.7-alpha.preview`:
 
 - [Linux 64 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linux64.tar.bz2)
 - [Linux 32 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linux32.tar.bz2)
@@ -346,6 +346,8 @@ Currently Unit and Integration test are available for launch in 2 ways:
 * build:                Build the project
 * check:                Check fmt and lint, `legacy` will be skipped
 * check-legacy:         Check fmt and lint for the `legacy` package
+* protoc:               Compile protobuf definitions
+* rpc-client:           Run the rpc client test routine (server must be already started)
 * test:                 Run the full testsuite, `legacy` will be skipped
 * test-integration:     Run integration tests only
 * test-legacy:          Run tests for the `legacy` package
