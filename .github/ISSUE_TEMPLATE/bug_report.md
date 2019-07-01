@@ -14,7 +14,7 @@ about: If something isn't working as expected 🤔.
 
 ### Environment
 
-- CLI version (output of `ardunio-cli version`):
+- CLI version (output of `arduino-cli version`):
 - Go version (if building from sources):
 - OS version:
 
