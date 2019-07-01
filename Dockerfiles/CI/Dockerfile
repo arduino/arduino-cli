@@ -16,5 +16,7 @@ RUN set -ex \
     && go get golang.org/x/lint/golint \
     # Protobuf tooling
     && go get github.com/golang/protobuf/protoc-gen-go \
+    && mkdir protobuf && cd protobuf \
     && curl -LO https://github.com/google/protobuf/releases/download/v$PROTOBUF_VER/protoc-$PROTOBUF_VER-linux-x86_64.zip \
-    && mkdir protobuf && unzip protoc-$PROTOBUF_VER-linux-x86_64.zip && cp protobuf/bin/* /bin/ && rm -rf protobuf
+    && unzip protoc-$PROTOBUF_VER-linux-x86_64.zip && cp ./bin/* /bin/ \
+    && cd .. &&  rm -rf protobuf
