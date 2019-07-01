@@ -5,4 +5,11 @@ steps:
 - name: test
   image: arduino/arduino-cli:drone-0.0.3
   commands:
-  - task test-legacy
+    # Check if the Go code is properly formatted and run the linter
+    - task check
+    # Ensure protobufs compile
+    - task protoc
+    # Build and test
+    - task build
+    - task test
+    - task test-legacy
