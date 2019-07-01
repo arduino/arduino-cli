@@ -24,7 +24,7 @@ the latest preview version is `0.3.7-alpha.preview`:
 - [Linux ARM](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linuxarm.tar.bz2)
 - [Linux ARM64](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linuxaarch64.tar.bz2)
 - [Windows](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-windows.zip)
-- [Mac OSX](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-osx.zip)
+- [Mac OSX](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-macosx.zip)
 
 Once downloaded, place the executable into a directory which is in your `PATH` environment variable. To use the tool as it is presented in the Getting started guide below (`arduino-cli`), you should rename the executable from _arduino-cli-X.Y.Z-alpha.preview-XYZ_ to _arduino-cli_.
 
