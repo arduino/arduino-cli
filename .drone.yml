@@ -3,6 +3,6 @@ name: default
 
 steps:
 - name: test
-  image: arduino/arduino-cli:drone-0.0.2
+  image: arduino/arduino-cli:drone-0.0.3
   commands:
   - task test-legacy
