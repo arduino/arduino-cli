@@ -3,7 +3,7 @@ name: default
 
 steps:
 - name: test
-  image: arduino/arduino-cli:drone-0.0.3
+  image: arduino/arduino-cli:drone-0.1.2
   commands:
     # Check if the Go code is properly formatted and run the linter
     - task check
