@@ -11,6 +11,8 @@ ENV PROTOBUF_VER 3.8.0
 RUN set -ex \
     # Task executor, will be installed in /bin
     && curl -sL https://taskfile.dev/install.sh | sh \
+    # Codecov uploader
+    && curl -o /bin/codecov -LO https://codecov.io/bash && chmod +x /bin/codecov \
     # Go runtime dependencies
     && go get github.com/golangci/govet \
     && go get golang.org/x/lint/golint \
