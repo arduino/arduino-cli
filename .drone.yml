@@ -2,14 +2,23 @@ kind: pipeline
 name: default
 
 steps:
-- name: test
+- name: lint
   image: arduino/arduino-cli:drone-0.1.2
   commands:
     # Check if the Go code is properly formatted and run the linter
     - task check
     # Ensure protobufs compile
     - task protoc
-    # Build and test
+
+- name: build
+  image: arduino/arduino-cli:drone-0.1.2
+  commands:
     - task build
+
+- name: test
+  image: arduino/arduino-cli:drone-0.1.2
+  commands:
     - task test
     - task test-legacy
+    - bash <(curl -s https://codecov.io/bash) -cF unit -f '*_unit.txt'
+    - bash <(curl -s https://codecov.io/bash) -cF integ -f '*_integ.txt'
