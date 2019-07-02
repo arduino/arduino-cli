@@ -1,0 +1,39 @@
+kind: pipeline
+name: default
+
+steps:
+- name: lint
+  image: arduino/arduino-cli:drone-0.2.0
+  commands:
+    # Check if the Go code is properly formatted and run the linter
+    - task check
+    # Ensure protobufs compile
+    - task protoc
+
+- name: build
+  image: arduino/arduino-cli:drone-0.2.0
+  commands:
+    - task build
+
+- name: test
+  image: arduino/arduino-cli:drone-0.2.0
+  commands:
+    - task test
+    - task test-legacy
+
+# Contrary to other CI platforms, uploading reports to Codecov requires Drone to provide a token.
+# To avoid exposing the Codecov token to external PRs, we only upload coverage when we merge on
+# `master`.
+- name: coverage
+  image: arduino/arduino-cli:drone-0.2.0
+  environment:
+    CODECOV_TOKEN:
+      from_secret: codecov_token
+  commands:
+    - codecov -cF unit -f coverage_unit.txt -t $CODECOV_TOKEN
+    - codecov -cF integ -f coverage_integ.txt -t $CODECOV_TOKEN
+  when:
+    branch:
+      - master
+    event:
+      - push
