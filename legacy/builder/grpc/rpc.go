@@ -13,7 +13,7 @@ import (
 
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/fsnotify/fsnotify"
 	"golang.org/x/net/context"

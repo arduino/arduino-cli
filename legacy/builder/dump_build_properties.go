@@ -33,7 +33,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 )
 
 type DumpBuildProperties struct{}

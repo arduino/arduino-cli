@@ -32,7 +32,7 @@ package builder
 import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 )
 
 type RewriteHardwareKeys struct{}

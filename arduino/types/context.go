@@ -1,3 +1,18 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2019 ARDUINO SA (http://www.arduino.cc/)
+//
+// This software is released under the GNU General Public License version 3,
+// which covers the main part of arduino-cli.
+// The terms of this license can be found at:
+// https://www.gnu.org/licenses/gpl-3.0.en.html
+//
+// You can be released from the requirements of the above licenses by purchasing
+// a commercial license. Buying such a license is mandatory if you want to modify or
+// otherwise use the software for commercial activities involving the Arduino
+// software without disclosing the source code of your own applications. To purchase
+// a commercial license, send an email to license@arduino.cc.
+
 package types
 
 import (
@@ -14,10 +29,17 @@ import (
 	properties "github.com/arduino/go-properties-orderedmap"
 )
 
+// ProgressStruct represents a progress state
 type ProgressStruct struct {
 	PrintEnabled bool
 	Steps        float64
 	Progress     float64
+}
+
+// LibraryResolutionResult contains the libraries resolution
+type LibraryResolutionResult struct {
+	Library          *libraries.Library
+	NotUsedLibraries []*libraries.Library
 }
 
 // Context structure
@@ -35,8 +57,8 @@ type Context struct {
 	CodeCompleteAt       string
 
 	// Build options are serialized here
-	BuildOptionsJson         string
-	BuildOptionsJsonPrevious string
+	BuildOptionsJSON         string
+	BuildOptionsJSONPrevious string
 
 	PackageManager *packagemanager.PackageManager
 	Hardware       *cores.Packages
@@ -117,6 +139,7 @@ type Context struct {
 	ExecStderr io.Writer
 }
 
+// ExtractBuildOptions returns a properties map containing build options
 func (ctx *Context) ExtractBuildOptions() *properties.Map {
 	opts := properties.NewMap()
 	opts.Set("hardwareFolders", strings.Join(ctx.HardwareDirs.AsStrings(), ","))
@@ -142,6 +165,7 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 	return opts
 }
 
+// InjectBuildOptions fill the context with fields from a properties map
 func (ctx *Context) InjectBuildOptions(opts *properties.Map) {
 	ctx.HardwareDirs = paths.NewPathList(strings.Split(opts.Get("hardwareFolders"), ",")...)
 	ctx.ToolsDirs = paths.NewPathList(strings.Split(opts.Get("toolsFolders"), ",")...)
@@ -157,6 +181,7 @@ func (ctx *Context) InjectBuildOptions(opts *properties.Map) {
 	ctx.CustomBuildProperties = strings.Split(opts.Get("customBuildProperties"), ",")
 }
 
+// GetLogger returns a logger
 func (ctx *Context) GetLogger() i18n.Logger {
 	if ctx.logger == nil {
 		return &i18n.HumanLogger{}
@@ -164,6 +189,7 @@ func (ctx *Context) GetLogger() i18n.Logger {
 	return ctx.logger
 }
 
+// SetLogger sets a logger
 func (ctx *Context) SetLogger(l i18n.Logger) {
 	ctx.logger = l
 }

@@ -31,12 +31,12 @@ package builder
 
 import (
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 )
 
 type StoreBuildOptionsMap struct{}
 
 func (s *StoreBuildOptionsMap) Run(ctx *types.Context) error {
-	ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE).WriteFile([]byte(ctx.BuildOptionsJson))
+	ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE).WriteFile([]byte(ctx.BuildOptionsJSON))
 	return nil
 }

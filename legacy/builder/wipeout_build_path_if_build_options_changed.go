@@ -37,18 +37,18 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 	properties "github.com/arduino/go-properties-orderedmap"
 )
 
 type WipeoutBuildPathIfBuildOptionsChanged struct{}
 
 func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
-	if ctx.BuildOptionsJsonPrevious == "" {
+	if ctx.BuildOptionsJSONPrevious == "" {
 		return nil
 	}
-	buildOptionsJson := ctx.BuildOptionsJson
-	previousBuildOptionsJson := ctx.BuildOptionsJsonPrevious
+	buildOptionsJson := ctx.BuildOptionsJSON
+	previousBuildOptionsJson := ctx.BuildOptionsJSONPrevious
 	logger := ctx.GetLogger()
 
 	var opts *properties.Map

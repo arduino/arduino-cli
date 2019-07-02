@@ -31,7 +31,7 @@ package builder
 
 import (
 	"github.com/arduino/arduino-cli/legacy/builder/ctags"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 )
 
 type AddMissingBuildPropertiesFromParentPlatformTxtFiles struct{}

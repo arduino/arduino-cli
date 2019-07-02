@@ -33,7 +33,7 @@ import (
 	"encoding/json"
 
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 )
 
 type CreateBuildOptionsMap struct{}
@@ -45,7 +45,7 @@ func (s *CreateBuildOptionsMap) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 
-	ctx.BuildOptionsJson = string(bytes)
+	ctx.BuildOptionsJSON = string(bytes)
 
 	return nil
 }

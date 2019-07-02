@@ -35,7 +35,7 @@ import (
 
 	"github.com/arduino/go-paths-helper"
 
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 )
 
 const KIND_PROTOTYPE = "prototype"

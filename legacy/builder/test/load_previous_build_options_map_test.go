@@ -34,7 +34,7 @@ import (
 
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -51,7 +51,7 @@ func TestLoadPreviousBuildOptionsMap(t *testing.T) {
 	err = command.Run(ctx)
 	NoError(t, err)
 
-	require.Equal(t, "test", ctx.BuildOptionsJsonPrevious)
+	require.Equal(t, "test", ctx.BuildOptionsJSONPrevious)
 }
 
 func TestLoadPreviousBuildOptionsMapMissingFile(t *testing.T) {
@@ -64,5 +64,5 @@ func TestLoadPreviousBuildOptionsMapMissingFile(t *testing.T) {
 	err := command.Run(ctx)
 	NoError(t, err)
 
-	require.Empty(t, ctx.BuildOptionsJsonPrevious)
+	require.Empty(t, ctx.BuildOptionsJSONPrevious)
 }

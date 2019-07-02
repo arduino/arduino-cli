@@ -34,7 +34,7 @@ import (
 
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -44,8 +44,8 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
 
-	ctx.BuildOptionsJsonPrevious = "{ \"old\":\"old\" }"
-	ctx.BuildOptionsJson = "{ \"new\":\"new\" }"
+	ctx.BuildOptionsJSONPrevious = "{ \"old\":\"old\" }"
+	ctx.BuildOptionsJSON = "{ \"new\":\"new\" }"
 
 	buildPath.Join("should_be_deleted.txt").Truncate()
 
@@ -77,7 +77,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
 
-	ctx.BuildOptionsJson = "{ \"new\":\"new\" }"
+	ctx.BuildOptionsJSON = "{ \"new\":\"new\" }"
 
 	require.NoError(t, buildPath.Join("should_not_be_deleted.txt").Truncate())
 

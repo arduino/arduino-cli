@@ -116,7 +116,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 
@@ -135,7 +135,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	}
 
 	sketch := ctx.Sketch
-	mergedfile, err := types.MakeSourceFile(ctx, sketch, paths.New(sketch.MainFile.Name.Base()+".cpp"))
+	mergedfile, err := types.NewSourceFile(ctx, sketch, paths.New(sketch.MainFile.Name.Base()+".cpp"))
 	if err != nil {
 		return i18n.WrapError(err)
 	}
@@ -398,7 +398,7 @@ func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFil
 	}
 
 	for _, filePath := range filePaths {
-		sourceFile, err := types.MakeSourceFile(ctx, origin, paths.New(filePath))
+		sourceFile, err := types.NewSourceFile(ctx, origin, paths.New(filePath))
 		if err != nil {
 			return i18n.WrapError(err)
 		}

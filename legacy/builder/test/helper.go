@@ -39,7 +39,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/go-errors/errors"

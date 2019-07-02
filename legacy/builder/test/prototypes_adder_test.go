@@ -36,7 +36,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"

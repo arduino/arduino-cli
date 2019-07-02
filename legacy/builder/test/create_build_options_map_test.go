@@ -33,7 +33,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
@@ -65,5 +65,5 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 		"  \"runtime.ide.version\": \"ideVersion\",\n"+
 		"  \"sketchLocation\": \"sketchLocation\",\n"+
 		"  \"toolsFolders\": \"tools\"\n"+
-		"}", ctx.BuildOptionsJson)
+		"}", ctx.BuildOptionsJSON)
 }

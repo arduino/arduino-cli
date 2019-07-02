@@ -32,7 +32,7 @@ package builder
 import (
 	"fmt"
 
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/types"
 )
 
 type PrintPreprocessedSource struct{}
