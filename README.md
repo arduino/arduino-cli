@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/arduino/arduino-cli.svg?branch=master)](https://travis-ci.org/arduino/arduino-cli)
-
 # arduino-cli
+
+[![Build Status](https://cloud.drone.io/api/badges/arduino/arduino-cli/status.svg)](https://cloud.drone.io/arduino/arduino-cli)
 
 `arduino-cli` is an all-in-one solution that provides builder, boards/library manager, uploader, discovery and many other tools needed to use any Arduino compatible board and platforms.
 
@@ -355,4 +355,4 @@ Currently Unit and Integration test are available for launch in 2 ways:
 * test-unit-race:       Run unit tests only with race condition detection
 ```
 
-For Example to launch unit tests only run: `task test-unit` 
+For Example to launch unit tests only run: `task test-unit`
