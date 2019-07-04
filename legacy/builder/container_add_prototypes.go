@@ -30,6 +30,7 @@
 package builder
 
 import (
+	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -56,7 +57,6 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 		&CTagsTargetFileSaver{Source: &ctx.SourceGccMinusE, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
 		&CTagsRunner{},
 		&PrototypesAdder{},
-		&SketchSaver{},
 	}
 
 	for _, command := range commands {
@@ -65,6 +65,10 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 		if err != nil {
 			return i18n.WrapError(err)
 		}
+	}
+
+	if err := bldr.SaveSketch(ctx.Sketch.MainFile.Name.Base(), ctx.Source, ctx.SketchBuildPath.String()); err != nil {
+		return i18n.WrapError(err)
 	}
 
 	return nil

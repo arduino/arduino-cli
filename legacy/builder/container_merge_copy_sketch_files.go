@@ -30,6 +30,7 @@
 package builder
 
 import (
+	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
@@ -37,20 +38,17 @@ import (
 type ContainerMergeCopySketchFiles struct{}
 
 func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
-	commands := []types.Command{
-		&SketchSourceMerger{},
-		&SketchSaver{},
-		&AdditionalSketchFilesCopier{},
+	if err := new(SketchSourceMerger).Run(ctx); err != nil {
+		return i18n.WrapError(err)
 	}
 
-	for _, command := range commands {
-		PrintRingNameIfDebug(ctx, command)
-		err := command.Run(ctx)
-		if err != nil {
-			return i18n.WrapError(err)
-		}
+	if err := bldr.SaveSketch(ctx.Sketch.MainFile.Name.Base(), ctx.Source, ctx.SketchBuildPath.String()); err != nil {
+		return i18n.WrapError(err)
+	}
+
+	if err := new(AdditionalSketchFilesCopier).Run(ctx); err != nil {
+		return i18n.WrapError(err)
 	}
 
 	return nil
-
 }
