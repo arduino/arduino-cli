@@ -37,6 +37,7 @@ import (
 	"runtime"
 	"strings"
 
+	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -66,12 +67,6 @@ func (s *PreprocessSketchArduino) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 
-	if ctx.CodeCompleteAt != "" {
-		commands = append(commands, &OutputCodeCompletions{})
-	} else {
-		commands = append(commands, &SketchSaver{})
-	}
-
 	GCCPreprocRunner(ctx, sourceFile, ctx.PreprocPath.Join(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), ctx.IncludeFolders)
 
 	for _, command := range commands {
@@ -82,7 +77,14 @@ func (s *PreprocessSketchArduino) Run(ctx *types.Context) error {
 		}
 	}
 
-	return nil
+	var err error
+	if ctx.CodeCompleteAt != "" {
+		err = new(OutputCodeCompletions).Run(ctx)
+	} else {
+		err = bldr.SaveSketch(ctx.Sketch.MainFile.Name.Base(), ctx.Source, ctx.SketchBuildPath.String())
+	}
+
+	return err
 }
 
 type ArduinoPreprocessorRunner struct{}
