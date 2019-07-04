@@ -35,12 +35,14 @@ import (
 	"strconv"
 	"time"
 
+	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
+	"github.com/arduino/go-paths-helper"
 )
 
 var MAIN_FILE_VALID_EXTENSIONS = map[string]bool{".ino": true, ".pde": true}
@@ -54,10 +56,15 @@ const DEFAULT_SOFTWARE = "ARDUINO"
 type Builder struct{}
 
 func (s *Builder) Run(ctx *types.Context) error {
-	commands := []types.Command{
-		&GenerateBuildPathIfMissing{},
-		&EnsureBuildPathExists{},
+	if ctx.BuildPath == nil {
+		ctx.BuildPath = paths.New(bldr.GenBuildPath(ctx.SketchLocation.String()))
+	}
 
+	if err := bldr.EnsureBuildPathExists(ctx.BuildPath.String()); err != nil {
+		return err
+	}
+
+	commands := []types.Command{
 		&ContainerSetupHardwareToolsLibsSketchAndProps{},
 
 		&ContainerBuildOptions{},
@@ -141,10 +148,15 @@ func (s *PreprocessSketch) Run(ctx *types.Context) error {
 type Preprocess struct{}
 
 func (s *Preprocess) Run(ctx *types.Context) error {
-	commands := []types.Command{
-		&GenerateBuildPathIfMissing{},
-		&EnsureBuildPathExists{},
+	if ctx.BuildPath == nil {
+		ctx.BuildPath = paths.New(bldr.GenBuildPath(ctx.SketchLocation.String()))
+	}
 
+	if err := bldr.EnsureBuildPathExists(ctx.BuildPath.String()); err != nil {
+		return err
+	}
+
+	commands := []types.Command{
 		&ContainerSetupHardwareToolsLibsSketchAndProps{},
 
 		&ContainerBuildOptions{},
@@ -168,9 +180,11 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 type ParseHardwareAndDumpBuildProperties struct{}
 
 func (s *ParseHardwareAndDumpBuildProperties) Run(ctx *types.Context) error {
-	commands := []types.Command{
-		&GenerateBuildPathIfMissing{},
+	if ctx.BuildPath == nil {
+		ctx.BuildPath = paths.New(bldr.GenBuildPath(ctx.SketchLocation.String()))
+	}
 
+	commands := []types.Command{
 		&ContainerSetupHardwareToolsLibsSketchAndProps{},
 
 		&DumpBuildProperties{},
