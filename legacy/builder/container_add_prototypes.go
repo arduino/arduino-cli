@@ -31,6 +31,7 @@ package builder
 
 import (
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -67,7 +68,7 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 		}
 	}
 
-	if err := bldr.SaveSketch(ctx.Sketch.MainFile.Name.Base(), ctx.Source, ctx.SketchBuildPath.String()); err != nil {
+	if err := bldr.SaveSketchItemCpp(&sketch.Item{ctx.Sketch.MainFile.Name.String(), []byte(ctx.Source)}, ctx.SketchBuildPath.String()); err != nil {
 		return i18n.WrapError(err)
 	}
 
