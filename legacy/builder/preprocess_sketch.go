@@ -38,6 +38,7 @@ import (
 	"strings"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -81,7 +82,7 @@ func (s *PreprocessSketchArduino) Run(ctx *types.Context) error {
 	if ctx.CodeCompleteAt != "" {
 		err = new(OutputCodeCompletions).Run(ctx)
 	} else {
-		err = bldr.SaveSketch(ctx.Sketch.MainFile.Name.Base(), ctx.Source, ctx.SketchBuildPath.String())
+		err = bldr.SaveSketchItemCpp(&sketch.Item{ctx.Sketch.MainFile.Name.String(), []byte(ctx.Source)}, ctx.SketchBuildPath.String())
 	}
 
 	return err
