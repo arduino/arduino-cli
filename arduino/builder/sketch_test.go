@@ -46,3 +46,40 @@ func TestSaveSketch(t *testing.T) {
 
 	assert.Equal(t, source, out)
 }
+
+func TestLoadSketchFolder(t *testing.T) {
+	// pass the path to the sketch folder
+	sketchPath := filepath.Join("testdata", t.Name())
+	mainFilePath := filepath.Join(sketchPath, t.Name()+".ino")
+	s, err := builder.LoadSketch(sketchPath, "")
+	assert.Nil(t, err)
+	assert.NotNil(t, s)
+	assert.Equal(t, mainFilePath, s.MainFile.Path)
+	assert.Len(t, s.OtherSketchFiles, 2) // [old.pde, other.ino]
+	assert.Len(t, s.AdditionalFiles, 3)  // [header.h, s_file.S, src/helper.h]
+
+	// pass the path to the main file
+	sketchPath = mainFilePath
+	s, err = builder.LoadSketch(sketchPath, "")
+	assert.Nil(t, err)
+	assert.NotNil(t, s)
+	assert.Equal(t, mainFilePath, s.MainFile.Path)
+	assert.Len(t, s.OtherSketchFiles, 2)
+	assert.Equal(t, "old.pde", filepath.Base(s.OtherSketchFiles[0].Path))
+	assert.Equal(t, "other.ino", filepath.Base(s.OtherSketchFiles[1].Path))
+	assert.Len(t, s.AdditionalFiles, 3)
+	assert.Equal(t, "header.h", filepath.Base(s.AdditionalFiles[0].Path))
+	assert.Equal(t, "s_file.S", filepath.Base(s.AdditionalFiles[1].Path))
+	assert.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
+}
+
+func TestLoadSketchFolderWrongMain(t *testing.T) {
+	sketchPath := filepath.Join("testdata", t.Name())
+	_, err := builder.LoadSketch(sketchPath, "")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "unable to find the main sketch file")
+
+	_, err = builder.LoadSketch("does/not/exist", "")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "no such file or directory")
+}
