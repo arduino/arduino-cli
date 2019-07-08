@@ -89,3 +89,21 @@ func TestLoadSketchFolderWrongMain(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "no such file or directory")
 }
+
+func TestMergeSketchSources(t *testing.T) {
+	// borrow the sketch from TestLoadSketchFolder to avoid boilerplate
+	s, err := builder.LoadSketch(filepath.Join("testdata", "TestLoadSketchFolder"), "")
+	assert.Nil(t, err)
+	assert.NotNil(t, s)
+
+	// load expected result
+	mergedPath := filepath.Join("testdata", t.Name()+".txt")
+	mergedBytes, err := ioutil.ReadFile(mergedPath)
+	if err != nil {
+		t.Fatalf("unable to read golden file %s: %v", mergedPath, err)
+	}
+
+	offset, source := builder.MergeSketchSources(s)
+	assert.Equal(t, 2, offset)
+	assert.Equal(t, string(mergedBytes), source)
+}
