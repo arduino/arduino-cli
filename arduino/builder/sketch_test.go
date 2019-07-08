@@ -19,6 +19,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
@@ -106,4 +107,14 @@ func TestMergeSketchSources(t *testing.T) {
 	offset, source := builder.MergeSketchSources(s)
 	assert.Equal(t, 2, offset)
 	assert.Equal(t, string(mergedBytes), source)
+}
+
+func TestMergeSketchSourcesArduinoIncluded(t *testing.T) {
+	s, err := builder.LoadSketch(filepath.Join("testdata", t.Name()), "")
+	assert.Nil(t, err)
+	assert.NotNil(t, s)
+
+	// ensure not to include Arduino.h when it's already there
+	_, source := builder.MergeSketchSources(s)
+	assert.Equal(t, 1, strings.Count(source, "<Arduino.h>"))
 }
