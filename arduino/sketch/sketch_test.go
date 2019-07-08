@@ -62,6 +62,7 @@ func TestNew(t *testing.T) {
 	sketch, err := sketch.New(sketchFolderPath, mainFilePath, "", allFilesPaths)
 	assert.Nil(t, err)
 	assert.Equal(t, mainFilePath, sketch.MainFile.Path)
+	assert.Equal(t, sketchFolderPath, sketch.LocationPath)
 	assert.Len(t, sketch.OtherSketchFiles, 0)
 	assert.Len(t, sketch.AdditionalFiles, 1)
 }

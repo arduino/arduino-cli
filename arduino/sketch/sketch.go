@@ -54,6 +54,7 @@ func (ibn ItemByPath) Less(i, j int) bool { return ibn[i].Path < ibn[j].Path }
 // Sketch holds all the files composing a sketch
 type Sketch struct {
 	MainFile         *Item
+	LocationPath     string
 	OtherSketchFiles []*Item
 	AdditionalFiles  []*Item
 }
@@ -108,6 +109,7 @@ func New(sketchFolderPath, mainFilePath, buildPath string, allFilesPaths []strin
 
 	return &Sketch{
 		MainFile:         mainFile,
+		LocationPath:     sketchFolderPath,
 		OtherSketchFiles: otherSketchFiles,
 		AdditionalFiles:  additionalFiles,
 	}, nil
