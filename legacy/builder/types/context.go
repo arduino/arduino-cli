@@ -86,7 +86,6 @@ type Context struct {
 	CTagsOutput                 string
 	CTagsTargetFile             *paths.Path
 	CTagsOfPreprocessedSource   []*CTag
-	IncludeSection              string
 	LineOffset                  int
 	PrototypesSection           string
 	PrototypesLineWhereToInsert int

@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #line 1 {{QuoteCppString .sketch.MainFile.Name}}
 #line 1 {{QuoteCppString .sketch.MainFile.Name}}
-#line 1 {{QuoteCppString .sketch.MainFile.Name}}
 void setup();
 #line 10 {{QuoteCppString .sketch.MainFile.Name}}
 void loop();
