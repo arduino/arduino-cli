@@ -19,6 +19,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/globals"
@@ -26,6 +27,17 @@ import (
 
 	"github.com/pkg/errors"
 )
+
+var includesArduinoH = regexp.MustCompile(`^\s*#\s*include\s*[<\"]Arduino\.h[>\"]`)
+
+// QuoteCppString returns the given string as a quoted string for use with the C
+// preprocessor. This adds double quotes around it and escapes any
+// double quotes and backslashes in the string.
+func QuoteCppString(str string) string {
+	str = strings.Replace(str, "\\", "\\\\", -1)
+	str = strings.Replace(str, "\"", "\\\"", -1)
+	return "\"" + str + "\""
+}
 
 // SaveSketchItemCpp saves a preprocessed .cpp sketch file on disk
 func SaveSketchItemCpp(item *sketch.Item, buildPath string) error {
@@ -119,4 +131,27 @@ func LoadSketch(sketchPath, buildPath string) (*sketch.Sketch, error) {
 	}
 
 	return sketch.New(sketchFolder, mainSketchFile, buildPath, files)
+}
+
+// MergeSketchSources merges all the source files included in a sketch
+func MergeSketchSources(sketch *sketch.Sketch) (int, string) {
+	lineOffset := 0
+	mergedSource := ""
+
+	// add Arduino.h inclusion directive if missing
+	if !includesArduinoH.MatchString(sketch.MainFile.GetSourceStr()) {
+		mergedSource += "#include <Arduino.h>\n"
+		lineOffset++
+	}
+
+	mergedSource += "#line 1 " + QuoteCppString(sketch.MainFile.Path) + "\n"
+	mergedSource += sketch.MainFile.GetSourceStr() + "\n"
+	lineOffset++
+
+	for _, item := range sketch.OtherSketchFiles {
+		mergedSource += "#line 1 " + QuoteCppString(item.Path) + "\n"
+		mergedSource += item.GetSourceStr() + "\n"
+	}
+
+	return lineOffset, mergedSource
 }
