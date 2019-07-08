@@ -39,6 +39,10 @@ import (
 type ContainerMergeCopySketchFiles struct{}
 
 func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
+	offset, source := bldr.MergeSketchSources(types.SketchFromLegacy(ctx.Sketch))
+	ctx.LineOffset = offset
+	ctx.Source = source
+
 	if err := new(SketchSourceMerger).Run(ctx); err != nil {
 		return i18n.WrapError(err)
 	}

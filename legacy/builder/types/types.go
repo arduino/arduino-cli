@@ -148,6 +148,32 @@ func SketchToLegacy(sketch *sketch.Sketch) *Sketch {
 	return s
 }
 
+func SketchFromLegacy(s *Sketch) *sketch.Sketch {
+	others := []*sketch.Item{}
+	for _, f := range s.OtherSketchFiles {
+		if i, err := sketch.NewItem(f.Name.String()); err == nil {
+			others = append(others, i)
+		}
+	}
+
+	additional := []*sketch.Item{}
+	for _, f := range s.AdditionalFiles {
+		if i, err := sketch.NewItem(f.Name.String()); err == nil {
+			additional = append(additional, i)
+		}
+	}
+
+	return &sketch.Sketch{
+		MainFile: &sketch.Item{
+			Path:   s.MainFile.Name.String(),
+			Source: []byte(s.MainFile.Source),
+		},
+		LocationPath:     s.MainFile.Name.Parent().String(),
+		OtherSketchFiles: others,
+		AdditionalFiles:  additional,
+	}
+}
+
 type PlatforKeysRewrite struct {
 	Rewrites []PlatforKeyRewrite
 }
