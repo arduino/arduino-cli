@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #line 1 {{QuoteCppString .sketch.MainFile.Name}}
-#line 1 {{QuoteCppString .sketch.MainFile.Name}}
 /*
  * The code is released under the GNU General Public License.
  * Developed by Kristian Lauszus, TKJ Electronics 2013
