@@ -55,6 +55,7 @@ func TestLoadSketchFolder(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, s)
 	assert.Equal(t, mainFilePath, s.MainFile.Path)
+	assert.Equal(t, sketchPath, s.LocationPath)
 	assert.Len(t, s.OtherSketchFiles, 2)
 	assert.Equal(t, "old.pde", filepath.Base(s.OtherSketchFiles[0].Path))
 	assert.Equal(t, "other.ino", filepath.Base(s.OtherSketchFiles[1].Path))
