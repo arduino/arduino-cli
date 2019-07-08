@@ -34,6 +34,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/go-errors/errors"
 )
 
 type ContainerMergeCopySketchFiles struct{}
@@ -41,7 +42,7 @@ type ContainerMergeCopySketchFiles struct{}
 func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
 	sk := types.SketchFromLegacy(ctx.Sketch)
 	if sk == nil {
-		return i18n.WrapError("unable to convert legacy sketch to the new type")
+		return i18n.WrapError(errors.New("unable to convert legacy sketch to the new type"))
 	}
 	offset, source := bldr.MergeSketchSources(sk)
 	ctx.LineOffset = offset
