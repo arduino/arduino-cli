@@ -39,13 +39,13 @@ import (
 type ContainerMergeCopySketchFiles struct{}
 
 func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
-	offset, source := bldr.MergeSketchSources(types.SketchFromLegacy(ctx.Sketch))
+	sk := types.SketchFromLegacy(ctx.Sketch)
+	if sk == nil {
+		return i18n.WrapError("unable to convert legacy sketch to the new type")
+	}
+	offset, source := bldr.MergeSketchSources(sk)
 	ctx.LineOffset = offset
 	ctx.Source = source
-
-	if err := new(SketchSourceMerger).Run(ctx); err != nil {
-		return i18n.WrapError(err)
-	}
 
 	if err := bldr.SaveSketchItemCpp(&sketch.Item{ctx.Sketch.MainFile.Name.String(), []byte(ctx.Source)}, ctx.SketchBuildPath.String()); err != nil {
 		return i18n.WrapError(err)
