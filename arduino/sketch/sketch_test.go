@@ -30,6 +30,7 @@ func TestNewItem(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, sketchItem, item.Path)
 	assert.Equal(t, []byte(`#include <testlib.h>`), item.Source)
+	assert.Equal(t, "#include <testlib.h>", item.GetSourceStr())
 
 	item, err = sketch.NewItem("doesnt/exist")
 	assert.Nil(t, item)

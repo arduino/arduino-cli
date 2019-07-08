@@ -43,6 +43,11 @@ func NewItem(itemPath string) (*Item, error) {
 	return &Item{itemPath, source}, nil
 }
 
+// GetSourceStr returns the Source contents in string format
+func (i *Item) GetSourceStr() string {
+	return string(i.Source)
+}
+
 // ItemByPath implements sort.Interface for []Item based on
 // lexicographic order of the path string.
 type ItemByPath []*Item
