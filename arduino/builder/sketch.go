@@ -28,7 +28,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var includesArduinoH = regexp.MustCompile(`^\s*#\s*include\s*[<\"]Arduino\.h[>\"]`)
+var includesArduinoH = regexp.MustCompile(`(?m)^\s*#\s*include\s*[<\"]Arduino\.h[>\"]`)
 
 // QuoteCppString returns the given string as a quoted string for use with the C
 // preprocessor. This adds double quotes around it and escapes any
