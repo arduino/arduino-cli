@@ -69,7 +69,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	}
 }
 
-func outputInstalledCores(cores []*rpc.InstalledPlatform) {
+func outputInstalledCores(cores []*rpc.Platform) {
 	table := output.NewTable()
 	table.AddRow("ID", "Installed", "Latest", "Name")
 	sort.Slice(cores, func(i, j int) bool {
