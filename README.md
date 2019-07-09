@@ -22,11 +22,22 @@ the latest preview version is `0.3.7-alpha.preview`:
 - [Linux 64 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linux64.tar.bz2)
 - [Linux 32 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linux32.tar.bz2)
 - [Linux ARM](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linuxarm.tar.bz2)
-- [Linux ARM64](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linuxaarch64.tar.bz2)
 - [Windows](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-windows.zip)
 - [Mac OSX](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-macosx.zip)
 
 Once downloaded, place the executable into a directory which is in your `PATH` environment variable. To use the tool as it is presented in the Getting started guide below (`arduino-cli`), you should rename the executable from _arduino-cli-X.Y.Z-alpha.preview-XYZ_ to _arduino-cli_.
+
+#### Download the nightly build
+
+These builds are generated once a day from `master` branch starting at 23:00 UTC
+
+- [Linux 64 bit](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-linux64.tar.bz2)
+- [Linux 32 bit](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-linux32.tar.bz2)
+- [Linux ARM](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-linuxarm.tar.bz2)
+- [Windows](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-windows.zip)
+- [Mac OSX](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-macosx.zip)
+
+Once downloaded, place the executable into a directory which is in your `PATH` environment variable. Launch the tool as it is presented in the Getting started guide below (`arduino-cli`).
 
 ### Build the latest "bleeding-edge" from source
 
