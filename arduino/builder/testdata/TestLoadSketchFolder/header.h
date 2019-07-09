@@ -1,1 +1,1 @@
-#define TRUE FALSE
+#define FOO "BAR"
