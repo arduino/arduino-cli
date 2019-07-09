@@ -65,13 +65,9 @@ func PlatformSearch(ctx context.Context, req *rpc.PlatformSearchReq) (*rpc.Platf
 		}
 	}
 
-	out := []*rpc.SearchOutput{}
-	for _, platformRelease := range res {
-		out = append(out, &rpc.SearchOutput{
-			ID:      platformRelease.Platform.String(),
-			Name:    platformRelease.Platform.Name,
-			Version: platformRelease.Version.String(),
-		})
+	out := make([]*rpc.Platform, len(res))
+	for i, platformRelease := range res {
+		out[i] = platformReleaseToRPC(platformRelease)
 	}
 	return &rpc.PlatformSearchResp{SearchOutput: out}, nil
 }

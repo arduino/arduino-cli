@@ -32,7 +32,7 @@ func PlatformList(ctx context.Context, req *rpc.PlatformListReq) (*rpc.PlatformL
 		return nil, errors.New("invalid instance")
 	}
 
-	installed := []*rpc.InstalledPlatform{}
+	installed := []*rpc.Platform{}
 	for _, targetPackage := range pm.GetPackages().Packages {
 		for _, platform := range targetPackage.Platforms {
 			if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
@@ -41,14 +41,9 @@ func PlatformList(ctx context.Context, req *rpc.PlatformListReq) (*rpc.PlatformL
 						continue
 					}
 				}
-				p := &rpc.InstalledPlatform{
-					ID:        platformRelease.String(),
-					Installed: platformRelease.Version.String(),
-					Name:      platformRelease.Platform.Name,
-				}
-				if latest := platformRelease.Platform.GetLatestRelease(); latest != nil {
-					p.Latest = latest.Version.String()
-				}
+
+				p := platformReleaseToRPC(platformRelease)
+				p.Installed = platformRelease.Version.String()
 				installed = append(installed, p)
 			}
 		}

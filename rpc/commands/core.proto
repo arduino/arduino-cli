@@ -73,13 +73,7 @@ message PlatformSearchReq {
 }
 
 message PlatformSearchResp {
-	repeated SearchOutput search_output = 1;
-}
-
-message SearchOutput {
-	string ID = 1;
-	string Version = 2;
-	string Name = 3;
+	repeated Platform search_output = 1;
 }
 
 message PlatformListReq {
@@ -88,12 +82,21 @@ message PlatformListReq {
 }
 
 message PlatformListResp {
-	repeated InstalledPlatform installed_platform = 1;
+	repeated Platform installed_platform = 1;
 }
 
-message InstalledPlatform {
+message Platform {
 	string ID = 1;
 	string Installed = 2;
 	string Latest = 3;
 	string Name = 4;
+	string Maintainer = 5;
+	string Website = 6;
+	string Email = 7;
+	repeated Board Boards = 8;
+}
+
+message Board {
+	string name = 1;
+	string fqbn = 2;
 }
