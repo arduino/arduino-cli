@@ -22,7 +22,10 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -35,8 +38,8 @@ func initInstallCommand() *cobra.Command {
 		Short: "Installs one of more specified libraries into the system.",
 		Long:  "Installs one or more specified libraries into the system.",
 		Example: "" +
-			"  " + cli.VersionInfo.Application + " lib install AudioZero       # for the latest version.\n" +
-			"  " + cli.VersionInfo.Application + " lib install AudioZero@1.0.0 # for the specific version.",
+			"  " + os.Args[0] + " lib install AudioZero       # for the latest version.\n" +
+			"  " + os.Args[0] + " lib install AudioZero@1.0.0 # for the specific version.",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}
@@ -44,11 +47,11 @@ func initInstallCommand() *cobra.Command {
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstaceIgnorePlatformIndexErrors()
+	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 	refs, err := librariesindex.ParseArgs(args)
 	if err != nil {
 		formatter.PrintError(err, "Arguments error")
-		os.Exit(cli.ErrBadArgument)
+		os.Exit(errorcodes.ErrBadArgument)
 	}
 	for _, library := range refs {
 		libraryInstallReq := &rpc.LibraryInstallReq{
@@ -56,11 +59,11 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			Name:     library.Name,
 			Version:  library.Version.String(),
 		}
-		err := lib.LibraryInstall(context.Background(), libraryInstallReq, cli.OutputProgressBar(),
-			cli.OutputTaskProgress(), cli.HTTPClientHeader)
+		err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.OutputProgressBar(),
+			output.OutputTaskProgress(), globals.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error installing "+library.String())
-			os.Exit(cli.ErrGeneric)
+			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
 }

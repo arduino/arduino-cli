@@ -21,7 +21,10 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -35,9 +38,9 @@ func initInstallCommand() *cobra.Command {
 		Short: "Installs one or more cores and corresponding tool dependencies.",
 		Long:  "Installs one or more cores and corresponding tool dependencies.",
 		Example: "  # download the latest version of arduino SAMD core.\n" +
-			"  " + cli.VersionInfo.Application + " core install arduino:samd\n\n" +
+			"  " + os.Args[0] + " core install arduino:samd\n\n" +
 			"  # download a specific version (in this case 1.6.9).\n" +
-			"  " + cli.VersionInfo.Application + " core install arduino:samd@1.6.9",
+			"  " + os.Args[0] + " core install arduino:samd@1.6.9",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}
@@ -45,7 +48,7 @@ func initInstallCommand() *cobra.Command {
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := instance.CreateInstance()
 	logrus.Info("Executing `arduino core install`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
@@ -57,11 +60,11 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
 		}
-		_, err := core.PlatformInstall(context.Background(), plattformInstallReq, cli.OutputProgressBar(),
-			cli.OutputTaskProgress(), cli.HTTPClientHeader)
+		_, err := core.PlatformInstall(context.Background(), plattformInstallReq, output.OutputProgressBar(),
+			output.OutputTaskProgress(), globals.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error during install")
-			os.Exit(cli.ErrGeneric)
+			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
 }

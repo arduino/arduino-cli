@@ -22,7 +22,10 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -35,8 +38,8 @@ func initDownloadCommand() *cobra.Command {
 		Short: "Downloads one or more libraries without installing them.",
 		Long:  "Downloads one or more libraries without installing them.",
 		Example: "" +
-			"  " + cli.VersionInfo.Application + " lib download AudioZero       # for the latest version.\n" +
-			"  " + cli.VersionInfo.Application + " lib download AudioZero@1.0.0 # for a specific version.",
+			"  " + os.Args[0] + " lib download AudioZero       # for the latest version.\n" +
+			"  " + os.Args[0] + " lib download AudioZero@1.0.0 # for a specific version.",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 	}
@@ -44,11 +47,11 @@ func initDownloadCommand() *cobra.Command {
 }
 
 func runDownloadCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstaceIgnorePlatformIndexErrors()
+	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 	pairs, err := librariesindex.ParseArgs(args)
 	if err != nil {
 		formatter.PrintError(err, "Arguments error")
-		os.Exit(cli.ErrBadArgument)
+		os.Exit(errorcodes.ErrBadArgument)
 	}
 	for _, library := range pairs {
 		libraryDownloadReq := &rpc.LibraryDownloadReq{
@@ -56,11 +59,11 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			Name:     library.Name,
 			Version:  library.Version.String(),
 		}
-		_, err := lib.LibraryDownload(context.Background(), libraryDownloadReq, cli.OutputProgressBar(),
-			cli.HTTPClientHeader)
+		_, err := lib.LibraryDownload(context.Background(), libraryDownloadReq, output.OutputProgressBar(),
+			globals.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+library.String())
-			os.Exit(cli.ErrNetwork)
+			os.Exit(errorcodes.ErrNetwork)
 		}
 	}
 }

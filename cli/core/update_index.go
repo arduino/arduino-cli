@@ -21,7 +21,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -34,7 +36,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Use:     "update-index",
 		Short:   "Updates the index of cores.",
 		Long:    "Updates the index of cores to the latest version.",
-		Example: "  " + cli.VersionInfo.Application + " core update-index",
+		Example: "  " + os.Args[0] + " core update-index",
 		Args:    cobra.NoArgs,
 		Run:     runUpdateIndexCommand,
 	}
@@ -42,14 +44,14 @@ func initUpdateIndexCommand() *cobra.Command {
 }
 
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstaceIgnorePlatformIndexErrors()
+	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 	logrus.Info("Executing `arduino core update-index`")
 
 	_, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
 		Instance: instance,
-	}, cli.OutputProgressBar())
+	}, output.OutputProgressBar())
 	if err != nil {
 		formatter.PrintError(err, "Error updating index")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 }

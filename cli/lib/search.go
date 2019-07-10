@@ -24,7 +24,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -38,7 +40,7 @@ func initSearchCommand() *cobra.Command {
 		Use:     "search [LIBRARY_NAME]",
 		Short:   "Searchs for one or more libraries data.",
 		Long:    "Search for one or more libraries data (case insensitive search).",
-		Example: "  " + cli.VersionInfo.Application + " lib search audio",
+		Example: "  " + os.Args[0] + " lib search audio",
 		Args:    cobra.ArbitraryArgs,
 		Run:     runSearchCommand,
 	}
@@ -51,7 +53,7 @@ var searchFlags struct {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstaceIgnorePlatformIndexErrors()
+	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 	logrus.Info("Executing `arduino lib search`")
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
 		Instance: instance,
@@ -59,10 +61,10 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	})
 	if err != nil {
 		formatter.PrintError(err, "Error saerching for Library")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if cli.OutputJSONOrElse(searchResp) {
+	if output.OutputJSONOrElse(searchResp) {
 		results := searchResp.GetLibraries()
 		sort.Slice(results, func(i, j int) bool {
 			return results[i].Name < results[j].Name

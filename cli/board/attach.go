@@ -21,7 +21,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -33,9 +35,9 @@ func initAttachCommand() *cobra.Command {
 		Use:   "attach <port>|<FQBN> [sketchPath]",
 		Short: "Attaches a sketch to a board.",
 		Long:  "Attaches a sketch to a board.",
-		Example: "  " + cli.VersionInfo.Application + " board attach serial:///dev/tty/ACM0\n" +
-			"  " + cli.VersionInfo.Application + " board attach serial:///dev/tty/ACM0 HelloWorld\n" +
-			"  " + cli.VersionInfo.Application + " board attach arduino:samd:mkr1000",
+		Example: "  " + os.Args[0] + " board attach serial:///dev/tty/ACM0\n" +
+			"  " + os.Args[0] + " board attach serial:///dev/tty/ACM0 HelloWorld\n" +
+			"  " + os.Args[0] + " board attach arduino:samd:mkr1000",
 		Args: cobra.RangeArgs(1, 2),
 		Run:  runAttachCommand,
 	}
@@ -49,7 +51,7 @@ var attachFlags struct {
 }
 
 func runAttachCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := instance.CreateInstance()
 	var path string
 	if len(args) > 0 {
 		path = args[1]
@@ -59,9 +61,9 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		BoardUri:      args[0],
 		SketchPath:    path,
 		SearchTimeout: attachFlags.searchTimeout,
-	}, cli.OutputTaskProgress())
+	}, output.OutputTaskProgress())
 	if err != nil {
 		formatter.PrintError(err, "attach board error")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 }

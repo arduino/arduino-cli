@@ -24,10 +24,11 @@ import (
 	"sort"
 	"time"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/output"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/spf13/cobra"
 )
@@ -37,7 +38,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "List connected boards.",
 		Long:    "Detects and displays a list of connected boards to the current computer.",
-		Example: "  " + cli.VersionInfo.Application + " board list --timeout 10s",
+		Example: "  " + os.Args[0] + " board list --timeout 10s",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}
@@ -53,22 +54,20 @@ var listFlags struct {
 
 // runListCommand detects and lists the connected arduino boards
 func runListCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
-
 	if timeout, err := time.ParseDuration(listFlags.timeout); err != nil {
 		formatter.PrintError(err, "Invalid timeout.")
-		os.Exit(cli.ErrBadArgument)
+		os.Exit(errorcodes.ErrBadArgument)
 	} else {
 		time.Sleep(timeout)
 	}
 
-	resp, err := board.List(context.Background(), &rpc.BoardListReq{Instance: instance})
+	resp, err := board.List(context.Background(), &rpc.BoardListReq{Instance: instance.CreateInstance()})
 	if err != nil {
 		formatter.PrintError(err, "Error detecting boards")
-		os.Exit(cli.ErrNetwork)
+		os.Exit(errorcodes.ErrNetwork)
 	}
 
-	if cli.OutputJSONOrElse(resp) {
+	if output.OutputJSONOrElse(resp) {
 		outputListResp(resp)
 	}
 }

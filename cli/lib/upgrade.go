@@ -20,7 +20,10 @@ package lib
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -35,7 +38,7 @@ func initUpgradeCommand() *cobra.Command {
 		Short: "Upgrades installed libraries.",
 		Long: "This command ungrades all installed libraries to the latest available version." +
 			"To upgrade a single library use the 'install' command.",
-		Example: "  " + cli.VersionInfo.Application + " lib upgrade",
+		Example: "  " + os.Args[0] + " lib upgrade",
 		Args:    cobra.NoArgs,
 		Run:     runUpgradeCommand,
 	}
@@ -43,14 +46,14 @@ func initUpgradeCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstaceIgnorePlatformIndexErrors()
+	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 
 	err := lib.LibraryUpgradeAll(context.Background(), &rpc.LibraryUpgradeAllReq{
 		Instance: instance,
-	}, cli.OutputProgressBar(), cli.OutputTaskProgress(), cli.HTTPClientHeader)
+	}, output.OutputProgressBar(), output.OutputTaskProgress(), globals.HTTPClientHeader)
 	if err != nil {
 		formatter.PrintError(err, "Error upgrading libraries")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	logrus.Info("Done")

@@ -26,7 +26,7 @@ import (
 	"testing"
 
 	"bou.ke/monkey"
-	"github.com/arduino/arduino-cli/cli/root"
+	"github.com/arduino/arduino-cli/cli"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -111,9 +111,8 @@ func executeWithArgs(t *testing.T, args ...string) (int, []byte) {
 		}()
 
 		// Execute the CLI command, in this process
-		cmd := root.Init()
-		cmd.SetArgs(args)
-		cmd.Execute()
+		cli.ArduinoCli.SetArgs(args)
+		cli.ArduinoCli.Execute()
 	}()
 
 	return exitCode, output

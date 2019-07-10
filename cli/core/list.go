@@ -23,10 +23,11 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/output"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -37,7 +38,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "Shows the list of installed platforms.",
 		Long:    "Shows the list of installed platforms.",
-		Example: "  " + cli.VersionInfo.Application + " core list",
+		Example: "  " + os.Args[0] + " core list",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}
@@ -50,7 +51,7 @@ var listFlags struct {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := instance.CreateInstance()
 	logrus.Info("Executing `arduino core list`")
 
 	resp, err := core.PlatformList(context.Background(), &rpc.PlatformListReq{
@@ -59,11 +60,11 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	})
 	if err != nil {
 		formatter.PrintError(err, "Error listing platforms")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 	installed := resp.GetInstalledPlatform()
 	if installed != nil && len(installed) > 0 {
-		if cli.OutputJSONOrElse(installed) {
+		if output.OutputJSONOrElse(installed) {
 			outputInstalledCores(installed)
 		}
 	}

@@ -22,39 +22,35 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/output"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/spf13/cobra"
 )
 
-func initDetailsCommand() *cobra.Command {
-	detailsCommand := &cobra.Command{
-		Use:     "details <FQBN>",
-		Short:   "Print details about a board.",
-		Long:    "Show information about a board, in particular if the board has options to be specified in the FQBN.",
-		Example: "  " + cli.VersionInfo.Application + " board details arduino:avr:nano",
-		Args:    cobra.ExactArgs(1),
-		Run:     runDetailsCommand,
-	}
-	return detailsCommand
+var detailsCommand = &cobra.Command{
+	Use:     "details <FQBN>",
+	Short:   "Print details about a board.",
+	Long:    "Show information about a board, in particular if the board has options to be specified in the FQBN.",
+	Example: "  " + os.Args[0] + " board details arduino:avr:nano",
+	Args:    cobra.ExactArgs(1),
+	Run:     runDetailsCommand,
 }
 
 func runDetailsCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
-
 	res, err := board.Details(context.Background(), &rpc.BoardDetailsReq{
-		Instance: instance,
+		Instance: instance.CreateInstance(),
 		Fqbn:     args[0],
 	})
 
 	if err != nil {
 		formatter.PrintError(err, "Error getting board details")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
-	if cli.OutputJSONOrElse(res) {
+	if output.OutputJSONOrElse(res) {
 		outputDetailsResp(res)
 	}
 }

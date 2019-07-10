@@ -61,11 +61,8 @@ func Init() *cobra.Command {
 	command.AddCommand(daemon.InitCommand())
 	command.AddCommand(generatedocs.InitCommand())
 	command.AddCommand(lib.InitCommand())
-	// command.AddCommand(login.InitCommand())
-	// command.AddCommand(logout.InitCommand())
 	command.AddCommand(sketch.InitCommand())
 	command.AddCommand(upload.InitCommand())
-	// command.AddCommand(validate.InitCommand())
 	command.AddCommand(version.InitCommand())
 	return command
 }

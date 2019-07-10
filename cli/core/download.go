@@ -21,7 +21,10 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -35,8 +38,8 @@ func initDownloadCommand() *cobra.Command {
 		Short: "Downloads one or more cores and corresponding tool dependencies.",
 		Long:  "Downloads one or more cores and corresponding tool dependencies.",
 		Example: "" +
-			"  " + cli.VersionInfo.Application + " core download arduino:samd       # to download the latest version of arduino SAMD core.\n" +
-			"  " + cli.VersionInfo.Application + " core download arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
+			"  " + os.Args[0] + " core download arduino:samd       # to download the latest version of arduino SAMD core.\n" +
+			"  " + os.Args[0] + " core download arduino:samd=1.6.9 # for a specific version (in this case 1.6.9).",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 	}
@@ -44,7 +47,7 @@ func initDownloadCommand() *cobra.Command {
 }
 
 func runDownloadCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := instance.CreateInstance()
 	logrus.Info("Executing `arduino core download`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
@@ -55,11 +58,11 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
 		}
-		_, err := core.PlatformDownload(context.Background(), platformDownloadreq, cli.OutputProgressBar(),
-			cli.HTTPClientHeader)
+		_, err := core.PlatformDownload(context.Background(), platformDownloadreq, output.OutputProgressBar(),
+			globals.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+args[i])
-			os.Exit(cli.ErrNetwork)
+			os.Exit(errorcodes.ErrNetwork)
 		}
 	}
 }

@@ -23,33 +23,31 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/output"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/spf13/cobra"
 )
 
-func initListAllCommand() *cobra.Command {
-	listAllCommand := &cobra.Command{
-		Use:   "listall [boardname]",
-		Short: "List all known boards and their corresponding FQBN.",
-		Long: "" +
-			"List all boards that have the support platform installed. You can search\n" +
-			"for a specific board if you specify the board name",
-		Example: "" +
-			"  " + cli.VersionInfo.Application + " board listall\n" +
-			"  " + cli.VersionInfo.Application + " board listall zero",
-		Args: cobra.ArbitraryArgs,
-		Run:  runListAllCommand,
-	}
-	return listAllCommand
+var listAllCommand = &cobra.Command{
+	Use:   "listall [boardname]",
+	Short: "List all known boards and their corresponding FQBN.",
+	Long: "" +
+		"List all boards that have the support platform installed. You can search\n" +
+		"for a specific board if you specify the board name",
+	Example: "" +
+		"  " + os.Args[0] + " board listall\n" +
+		"  " + os.Args[0] + " board listall zero",
+	Args: cobra.ArbitraryArgs,
+	Run:  runListAllCommand,
 }
 
 // runListAllCommand list all installed boards
 func runListAllCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := instance.CreateInstance()
 
 	list, err := board.ListAll(context.Background(), &rpc.BoardListAllReq{
 		Instance:   instance,
@@ -57,9 +55,10 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 	})
 	if err != nil {
 		formatter.PrintError(err, "Error listing boards")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
-	if cli.OutputJSONOrElse(list) {
+
+	if output.OutputJSONOrElse(list) {
 		outputBoardListAll(list)
 	}
 }

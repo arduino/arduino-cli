@@ -18,19 +18,17 @@
 package sketch
 
 import (
-	"github.com/arduino/arduino-cli/cli"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
-// InitCommand prepares the command.
-func InitCommand() *cobra.Command {
-	sketchCommand := &cobra.Command{
+// NewCommand created a new `sketch` command
+func NewCommand() *cobra.Command {
+	return &cobra.Command{
 		Use:     "sketch",
 		Short:   "Arduino CLI Sketch Commands.",
 		Long:    "Arduino CLI Sketch Commands.",
-		Example: "  " + cli.VersionInfo.Application + " sketch new MySketch",
+		Example: "  " + os.Args[0] + " sketch new MySketch",
 	}
-	sketchCommand.AddCommand(initNewCommand())
-	//sketchCommand.AddCommand(initSyncCommand())
-	return sketchCommand
 }

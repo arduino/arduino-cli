@@ -18,20 +18,22 @@
 package lib
 
 import (
-	"github.com/arduino/arduino-cli/cli"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
-// InitCommand prepares the command.
-func InitCommand() *cobra.Command {
+// NewCommand created a new `lib` command
+func NewCommand() *cobra.Command {
 	libCommand := &cobra.Command{
 		Use:   "lib",
 		Short: "Arduino commands about libraries.",
 		Long:  "Arduino commands about libraries.",
 		Example: "" +
-			"  " + cli.VersionInfo.Application + " lib install AudioZero\n" +
-			"  " + cli.VersionInfo.Application + " lib update-index",
+			"  " + os.Args[0] + " lib install AudioZero\n" +
+			"  " + os.Args[0] + " lib update-index",
 	}
+
 	libCommand.AddCommand(initDownloadCommand())
 	libCommand.AddCommand(initInstallCommand())
 	libCommand.AddCommand(initListCommand())
@@ -39,5 +41,6 @@ func InitCommand() *cobra.Command {
 	libCommand.AddCommand(initUninstallCommand())
 	libCommand.AddCommand(initUpgradeCommand())
 	libCommand.AddCommand(initUpdateIndexCommand())
+
 	return libCommand
 }

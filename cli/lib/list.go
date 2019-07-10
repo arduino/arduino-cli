@@ -21,7 +21,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -36,7 +38,7 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   "Shows a list of all installed libraries.",
 		Long:    "Shows a list of all installed libraries.",
-		Example: "  " + cli.VersionInfo.Application + " lib list",
+		Example: "  " + os.Args[0] + " lib list",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}
@@ -51,7 +53,7 @@ var listFlags struct {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstaceIgnorePlatformIndexErrors()
+	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 	logrus.Info("Listing")
 
 	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
@@ -61,11 +63,11 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	})
 	if err != nil {
 		formatter.PrintError(err, "Error listing Libraries")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 	if len(res.GetInstalledLibrary()) > 0 {
 		results := res.GetInstalledLibrary()
-		if cli.OutputJSONOrElse(results) {
+		if output.OutputJSONOrElse(results) {
 			if len(results) > 0 {
 				fmt.Println(outputListLibrary(results))
 			} else {

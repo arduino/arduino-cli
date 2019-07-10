@@ -19,39 +19,27 @@ package version
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/spf13/cobra"
 )
 
-// InitCommand prepares the command.
-func InitCommand() *cobra.Command {
-	versionCommand := &cobra.Command{
+// NewCommand created a new `version` command
+func NewCommand() *cobra.Command {
+	return &cobra.Command{
 		Use:     "version",
 		Short:   "Shows version number of arduino CLI.",
 		Long:    "Shows version number of arduino CLI which is installed on your system.",
-		Example: "  " + cli.VersionInfo.Application + " version",
+		Example: "  " + os.Args[0] + " version",
 		Args:    cobra.NoArgs,
 		Run:     run,
 	}
-	return versionCommand
-}
-
-type versionOutput struct {
-	Command   string `json:"command"`
-	Version   string `json:"version"`
-	Commit    string `json:"commit"`
-	BuildDate string `json:"build_date"`
 }
 
 func run(cmd *cobra.Command, args []string) {
-	res := &versionOutput{
-		Command:   cmd.Parent().Name(),
-		Version:   cli.VersionInfo.VersionString,
-		Commit:    cli.VersionInfo.Commit,
-		BuildDate: cli.VersionInfo.BuildDate.String(),
-	}
-	if cli.OutputJSONOrElse(res) {
-		fmt.Printf("%s\n", cli.VersionInfo)
+	if output.OutputJSONOrElse(globals.VersionInfo) {
+		fmt.Printf("%s\n", globals.VersionInfo)
 	}
 }

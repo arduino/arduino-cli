@@ -21,7 +21,10 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -36,23 +39,23 @@ func initUpgradeCommand() *cobra.Command {
 		Long:  "Upgrades one or all installed platforms to the latest version.",
 		Example: "" +
 			"  # upgrade everything to the latest version\n" +
-			"  " + cli.VersionInfo.Application + " core upgrade\n\n" +
+			"  " + os.Args[0] + " core upgrade\n\n" +
 			"  # upgrade arduino:samd to the latest version\n" +
-			"  " + cli.VersionInfo.Application + " core upgrade arduino:samd",
+			"  " + os.Args[0] + " core upgrade arduino:samd",
 		Run: runUpgradeCommand,
 	}
 	return upgradeCommand
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := instance.CreateInstance()
 	logrus.Info("Executing `arduino core upgrade`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
 	for i, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
 			formatter.PrintErrorMessage(("Invalid item " + args[i]))
-			os.Exit(cli.ErrBadArgument)
+			os.Exit(errorcodes.ErrBadArgument)
 		}
 	}
 	for _, platformRef := range platformsRefs {
@@ -60,11 +63,11 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.Architecture,
-		}, cli.OutputProgressBar(), cli.OutputTaskProgress(),
-			cli.HTTPClientHeader)
+		}, output.OutputProgressBar(), output.OutputTaskProgress(),
+			globals.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error during upgrade")
-			os.Exit(cli.ErrGeneric)
+			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
 }

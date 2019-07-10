@@ -21,14 +21,13 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/cli/root"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/common/formatter"
 )
 
 func main() {
-	cmd := root.Init()
-	if err := cmd.Execute(); err != nil {
+	if err := cli.ArduinoCli.Execute(); err != nil {
 		formatter.PrintError(err, "Bad exit.")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 }

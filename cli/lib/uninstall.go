@@ -22,7 +22,9 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -35,7 +37,7 @@ func initUninstallCommand() *cobra.Command {
 		Use:     "uninstall LIBRARY_NAME(S)",
 		Short:   "Uninstalls one or more libraries.",
 		Long:    "Uninstalls one or more libraries.",
-		Example: "  " + cli.VersionInfo.Application + " lib uninstall AudioZero",
+		Example: "  " + os.Args[0] + " lib uninstall AudioZero",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runUninstallCommand,
 	}
@@ -45,11 +47,11 @@ func initUninstallCommand() *cobra.Command {
 func runUninstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib uninstall`")
 
-	instance := cli.CreateInstaceIgnorePlatformIndexErrors()
+	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 	libRefs, err := librariesindex.ParseArgs(args)
 	if err != nil {
 		formatter.PrintError(err, "Arguments error")
-		os.Exit(cli.ErrBadArgument)
+		os.Exit(errorcodes.ErrBadArgument)
 	}
 
 	for _, library := range libRefs {
@@ -57,10 +59,10 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version.String(),
-		}, cli.OutputTaskProgress())
+		}, output.OutputTaskProgress())
 		if err != nil {
 			formatter.PrintError(err, "Error uninstalling "+library.String())
-			os.Exit(cli.ErrGeneric)
+			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
 

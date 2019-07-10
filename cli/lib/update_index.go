@@ -21,7 +21,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -33,16 +35,16 @@ func initUpdateIndexCommand() *cobra.Command {
 		Use:     "update-index",
 		Short:   "Updates the libraries index.",
 		Long:    "Updates the libraries index to the latest version.",
-		Example: "  " + cli.VersionInfo.Application + " lib update-index",
+		Example: "  " + os.Args[0] + " lib update-index",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			instance := cli.CreateInstaceIgnorePlatformIndexErrors()
+			instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 			err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexReq{
 				Instance: instance,
-			}, cli.OutputProgressBar())
+			}, output.OutputProgressBar())
 			if err != nil {
 				formatter.PrintError(err, "Error updating library index")
-				os.Exit(cli.ErrGeneric)
+				os.Exit(errorcodes.ErrGeneric)
 			}
 		},
 	}

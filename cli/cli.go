@@ -1,10 +1,10 @@
 /*
- * This file is part of arduino-cli.
+ * This file is part of arduino-
  *
  * Copyright 2018 ARDUINO SA (http://www.arduino.cc/)
  *
  * This software is released under the GNU General Public License version 3,
- * which covers the main part of arduino-cli.
+ * which covers the main part of arduino-
  * The terms of this license can be found at:
  * https://www.gnu.org/licenses/gpl-3.0.en.html
  *
@@ -18,152 +18,101 @@
 package cli
 
 import (
-	"context"
-	"errors"
-	"fmt"
-	"net/http"
+	"io/ioutil"
 	"os"
-	"path/filepath"
-	"runtime"
 
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/cli/board"
+	"github.com/arduino/arduino-cli/cli/compile"
+	"github.com/arduino/arduino-cli/cli/config"
+	"github.com/arduino/arduino-cli/cli/core"
+	"github.com/arduino/arduino-cli/cli/daemon"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/generatedocs"
+	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/cli/lib"
+	"github.com/arduino/arduino-cli/cli/sketch"
+	"github.com/arduino/arduino-cli/cli/upload"
+	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/configs"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/arduino/arduino-cli/version"
-	"github.com/arduino/go-paths-helper"
+	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
-// Error codes to be used for os.Exit().
-const (
-	_          = iota // 0 is not a valid exit error code
-	ErrGeneric        // 1 is the reserved "catchall" code in Unix
-	_                 // 2 is reserved in Unix
-	ErrNoConfigFile
-	ErrBadCall
-	ErrNetwork
-	// ErrCoreConfig represents an error in the cli core config, for example some basic
-	// files shipped with the installation are missing, or cannot create or get basic
-	// directories vital for the CLI to work.
-	ErrCoreConfig
-	ErrBadArgument
+var (
+	// ArduinoCli is the root command
+	ArduinoCli = &cobra.Command{
+		Use:              "arduino-cli",
+		Short:            "Arduino CLI.",
+		Long:             "Arduino Command Line Interface (arduino-cli).",
+		Example:          "  " + os.Args[0] + " <command> [flags...]",
+		PersistentPreRun: preRun,
+	}
+
+	// ErrLogrus represents the logrus instance, which has the role to
+	// log all non info messages.
+	ErrLogrus = logrus.New()
+
+	outputFormat string
 )
 
-// appName is the command line name of the Arduino CLI executable on the user system (users may change it)
-var appName = filepath.Base(os.Args[0])
+// Init the cobra root command
+func init() {
+	ArduinoCli.AddCommand(board.NewCommand())
+	ArduinoCli.AddCommand(compile.NewCommand())
+	ArduinoCli.AddCommand(config.NewCommand())
+	ArduinoCli.AddCommand(core.NewCommand())
+	ArduinoCli.AddCommand(daemon.NewCommand())
+	ArduinoCli.AddCommand(generatedocs.NewCommand())
+	ArduinoCli.AddCommand(lib.NewCommand())
+	ArduinoCli.AddCommand(sketch.NewCommand())
+	ArduinoCli.AddCommand(upload.NewCommand())
+	ArduinoCli.AddCommand(version.NewCommand())
 
-// VersionInfo contains all info injected during build
-var VersionInfo = version.NewInfo(appName)
-
-// HTTPClientHeader is the object that will be propagated to configure the clients inside the downloaders
-var HTTPClientHeader = getHTTPClientHeader()
-
-// ErrLogrus represents the logrus instance, which has the role to
-// log all non info messages.
-var ErrLogrus = logrus.New()
-
-// GlobalFlags represents flags available in all the program.
-var GlobalFlags struct {
-	Debug      bool // If true, dump debug output to stderr.
-	OutputJSON bool // true output in JSON, false output as Text
+	ArduinoCli.PersistentFlags().BoolVar(&globals.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
+	ArduinoCli.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be [text|json].")
+	ArduinoCli.PersistentFlags().StringVar(&globals.YAMLConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 }
 
-// Config FIXMEDOC
-var Config *configs.Configuration
+func preRun(cmd *cobra.Command, args []string) {
+	// Reset logrus if debug flag changed.
+	if !globals.Debug {
+		// Discard logrus output if no debug.
+		logrus.SetOutput(ioutil.Discard)
+	} else {
+		// Else print on stderr.
 
-func packageManagerInitReq() *rpc.InitReq {
-	urls := []string{}
-	for _, URL := range Config.BoardManagerAdditionalUrls {
-		urls = append(urls, URL.String())
-	}
-
-	conf := &rpc.Configuration{}
-	conf.DataDir = Config.DataDir.String()
-	conf.DownloadsDir = Config.DownloadsDir().String()
-	conf.BoardManagerAdditionalUrls = urls
-	if Config.SketchbookDir != nil {
-		conf.SketchbookDir = Config.SketchbookDir.String()
-	}
-
-	return &rpc.InitReq{Configuration: conf}
-}
-
-func getHTTPClientHeader() http.Header {
-	userAgentValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", VersionInfo.Application,
-		VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), VersionInfo.Commit, VersionInfo.BuildDate)
-	downloaderHeaders := http.Header{"User-Agent": []string{userAgentValue}}
-	return downloaderHeaders
-}
-
-// InitInstance FIXMEDOC
-func InitInstance() *rpc.InitResp {
-	logrus.Info("Initializing package manager")
-	req := packageManagerInitReq()
-
-	resp, err := commands.Init(context.Background(), req, OutputProgressBar(), OutputTaskProgress(), HTTPClientHeader)
-	if err != nil {
-		formatter.PrintError(err, "Error initializing package manager")
-		os.Exit(ErrGeneric)
-	}
-	if resp.GetLibrariesIndexError() != "" {
-		commands.UpdateLibrariesIndex(context.Background(),
-			&rpc.UpdateLibrariesIndexReq{Instance: resp.GetInstance()}, OutputProgressBar())
-		rescResp, err := commands.Rescan(context.Background(), &rpc.RescanReq{Instance: resp.GetInstance()})
-		if rescResp.GetLibrariesIndexError() != "" {
-			formatter.PrintErrorMessage("Error loading library index: " + rescResp.GetLibrariesIndexError())
-			os.Exit(ErrGeneric)
+		// Workaround to get colored output on windows
+		if terminal.IsTerminal(int(os.Stdout.Fd())) {
+			logrus.SetFormatter(&logrus.TextFormatter{ForceColors: true})
 		}
-		if err != nil {
-			formatter.PrintError(err, "Error loading library index")
-			os.Exit(ErrGeneric)
-		}
-		resp.LibrariesIndexError = rescResp.LibrariesIndexError
-		resp.PlatformsIndexErrors = rescResp.PlatformsIndexErrors
+		logrus.SetOutput(colorable.NewColorableStdout())
+		ErrLogrus.Out = colorable.NewColorableStderr()
+		formatter.SetLogger(ErrLogrus)
 	}
-	return resp
-}
+	globals.InitConfigs()
 
-// CreateInstance creates and return an instance of the Arduino Core engine
-func CreateInstance() *rpc.Instance {
-	resp := InitInstance()
-	if resp.GetPlatformsIndexErrors() != nil {
-		for _, err := range resp.GetPlatformsIndexErrors() {
-			formatter.PrintError(errors.New(err), "Error loading index")
-		}
-		formatter.PrintErrorMessage("Launch '" + VersionInfo.Application + " core update-index' to fix or download indexes.")
-		os.Exit(ErrGeneric)
-	}
-	return resp.GetInstance()
-}
-
-// CreateInstaceIgnorePlatformIndexErrors creates and return an instance of the
-// Arduino Core Engine, but won't stop on platforms index loading errors.
-func CreateInstaceIgnorePlatformIndexErrors() *rpc.Instance {
-	return InitInstance().GetInstance()
-}
-
-// InitPackageAndLibraryManager initializes the PackageManager and the
-// LibaryManager with the default configuration. (DEPRECATED)
-func InitPackageAndLibraryManager() (*packagemanager.PackageManager, *librariesmanager.LibrariesManager) {
-	resp := InitInstance()
-	return commands.GetPackageManager(resp), commands.GetLibraryManager(resp)
-}
-
-// InitSketchPath returns sketchPath if specified or the current working
-// directory if sketchPath is nil.
-func InitSketchPath(sketchPath *paths.Path) *paths.Path {
-	if sketchPath != nil {
-		return sketchPath
+	logrus.Info(globals.VersionInfo.Application + "-" + globals.VersionInfo.VersionString)
+	logrus.Info("Starting root command preparation (`arduino`)")
+	switch outputFormat {
+	case "text":
+		formatter.SetFormatter("text")
+		globals.OutputJSON = false
+	case "json":
+		formatter.SetFormatter("json")
+		globals.OutputJSON = true
+	default:
+		formatter.PrintErrorMessage("Invalid output format: " + outputFormat)
+		os.Exit(errorcodes.ErrBadCall)
 	}
 
-	wd, err := paths.Getwd()
-	if err != nil {
-		formatter.PrintError(err, "Couldn't get current working directory")
-		os.Exit(ErrGeneric)
+	logrus.Info("Formatter set")
+	if !formatter.IsCurrentFormat("text") {
+		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+			logrus.Warn("Calling help on JSON format")
+			formatter.PrintErrorMessage("Invalid Call : should show Help, but it is available only in TEXT mode.")
+			os.Exit(errorcodes.ErrBadCall)
+		})
 	}
-	logrus.Infof("Reading sketch from dir: %s", wd)
-	return wd
 }

@@ -24,10 +24,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/output"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -38,7 +39,7 @@ func initSearchCommand() *cobra.Command {
 		Use:     "search <keywords...>",
 		Short:   "Search for a core in the package index.",
 		Long:    "Search for a core in the package index using the specified keywords.",
-		Example: "  " + cli.VersionInfo.Application + " core search MKRZero -v",
+		Example: "  " + os.Args[0] + " core search MKRZero -v",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runSearchCommand,
 	}
@@ -46,7 +47,7 @@ func initSearchCommand() *cobra.Command {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := instance.CreateInstance()
 	logrus.Info("Executing `arduino core search`")
 
 	arguments := strings.ToLower(strings.Join(args, " "))
@@ -58,11 +59,11 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	})
 	if err != nil {
 		formatter.PrintError(err, "Error saerching for platforms")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	coreslist := resp.GetSearchOutput()
-	if cli.OutputJSONOrElse(coreslist) {
+	if output.OutputJSONOrElse(coreslist) {
 		if len(coreslist) > 0 {
 			outputSearchCores(coreslist)
 		} else {
