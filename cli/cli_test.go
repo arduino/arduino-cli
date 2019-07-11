@@ -25,7 +25,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"bou.ke/monkey"
@@ -544,10 +543,6 @@ board_manager:
 	err = ioutil.WriteFile(filepath.Join(currDataDir, "library_index.json"), []byte(`{ "libraries": [] }`), os.FileMode(0644))
 	require.NoError(t, err, "Writing empty json index file")
 
-	// Empty cores list
-	exitCode, _ := executeWithArgs("--config-file", configFile, "core", "list")
-	require.Zero(t, exitCode)
-
 	// Dump config with cmd-line specific file
 	exitCode, d := executeWithArgs("--config-file", configFile, "config", "dump")
 	require.Zero(t, exitCode)
@@ -556,11 +551,6 @@ board_manager:
 	// Update inexistent index
 	exitCode, _ = executeWithArgs("--config-file", configFile, "core", "update-index")
 	require.NotZero(t, exitCode)
-
-	// Empty cores list
-	exitCode, d = executeWithArgs("--config-file", configFile, "core", "list")
-	require.Zero(t, exitCode)
-	require.Empty(t, strings.TrimSpace(string(d)))
 }
 
 func TestCoreCommandsIntegration(t *testing.T) {
@@ -600,11 +590,6 @@ func TestCoreCommandsIntegration(t *testing.T) {
 	exitCode, d = executeWithArgs("core", "download", "wrongparameter")
 	require.NotZero(t, exitCode)
 	require.Contains(t, string(d), "invalid item")
-
-	// Empty cores list
-	exitCode, d = executeWithArgs("core", "list")
-	require.Zero(t, exitCode)
-	require.Empty(t, strings.TrimSpace(string(d)))
 
 	// Install avr 1.6.16
 	exitCode, d = executeWithArgs("core", "install", "arduino:avr@1.6.16")
@@ -671,9 +656,4 @@ func TestCoreCommandsIntegration(t *testing.T) {
 	exitCode, d = executeWithArgs("core", "uninstall", "arduino:avr")
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), AVR+" uninstalled")
-
-	// Empty cores list
-	exitCode, d = executeWithArgs("core", "list")
-	require.Zero(t, exitCode)
-	require.Empty(t, strings.TrimSpace(string(d)))
 }
