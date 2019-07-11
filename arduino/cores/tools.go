@@ -24,7 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
-	"go.bug.st/relaxed-semver"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // Tool represents a single Tool, part of a Package.
@@ -141,13 +141,14 @@ func (tr *ToolRelease) RuntimeProperties() *properties.Map {
 }
 
 var (
-	regexpArmLinux = regexp.MustCompile("arm.*-linux-gnueabihf")
-	regexpAmd64    = regexp.MustCompile("x86_64-.*linux-gnu")
-	regexpi386     = regexp.MustCompile("i[3456]86-.*linux-gnu")
-	regexpWindows  = regexp.MustCompile("i[3456]86-.*(mingw32|cygwin)")
-	regexpMac64Bit = regexp.MustCompile("(i[3456]86|x86_64)-apple-darwin.*")
-	regexpmac32Bit = regexp.MustCompile("i[3456]86-apple-darwin.*")
-	regexpArmBSD   = regexp.MustCompile("arm.*-freebsd[0-9]*")
+	regexpArmLinux   = regexp.MustCompile("arm.*-linux-gnueabihf")
+	regexpArm64Linux = regexp.MustCompile("(aarch64|arm64)-linux-gnu")
+	regexpAmd64      = regexp.MustCompile("x86_64-.*linux-gnu")
+	regexpi386       = regexp.MustCompile("i[3456]86-.*linux-gnu")
+	regexpWindows    = regexp.MustCompile("i[3456]86-.*(mingw32|cygwin)")
+	regexpMac64Bit   = regexp.MustCompile("(i[3456]86|x86_64)-apple-darwin.*")
+	regexpmac32Bit   = regexp.MustCompile("i[3456]86-apple-darwin.*")
+	regexpArmBSD     = regexp.MustCompile("arm.*-freebsd[0-9]*")
 )
 
 func (f *Flavor) isCompatibleWithCurrentMachine() bool {
@@ -162,6 +163,8 @@ func (f *Flavor) isCompatibleWith(osName, osArch string) bool {
 	switch osName + "," + osArch {
 	case "linux,arm", "linux,armbe":
 		return regexpArmLinux.MatchString(f.OS)
+	case "linux,arm64":
+		return regexpArm64Linux.MatchString(f.OS)
 	case "linux,amd64":
 		return regexpAmd64.MatchString(f.OS)
 	case "linux,386":

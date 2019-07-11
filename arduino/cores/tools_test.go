@@ -34,8 +34,9 @@ func TestFlavorCompatibility(t *testing.T) {
 	linuxamd64 := &os{"linux", "amd64"}
 	linuxarm := &os{"linux", "arm"}
 	linuxarmbe := &os{"linux", "armbe"}
+	linuxarm64 := &os{"linux", "arm64"}
 	darwini386 := &os{"darwin", "386"}
-	darwinamd646 := &os{"darwin", "amd64"}
+	darwinamd64 := &os{"darwin", "amd64"}
 	freebsdi386 := &os{"freebsd", "386"}
 	freebsdamd64 := &os{"freebsd", "amd64"}
 	oses := []*os{
@@ -45,8 +46,9 @@ func TestFlavorCompatibility(t *testing.T) {
 		linuxamd64,
 		linuxarm,
 		linuxarmbe,
+		linuxarm64,
 		darwini386,
-		darwinamd646,
+		darwinamd64,
 		freebsdi386,
 		freebsdamd64,
 	}
@@ -57,8 +59,8 @@ func TestFlavorCompatibility(t *testing.T) {
 	}
 	tests := []*test{
 		{&Flavor{OS: "i686-mingw32"}, []*os{windowsi386, windowsx8664}},
-		{&Flavor{OS: "i386-apple-darwin11"}, []*os{darwini386, darwinamd646}},
-		{&Flavor{OS: "x86_64-apple-darwin"}, []*os{darwinamd646}},
+		{&Flavor{OS: "i386-apple-darwin11"}, []*os{darwini386, darwinamd64}},
+		{&Flavor{OS: "x86_64-apple-darwin"}, []*os{darwinamd64}},
 
 		// Raspberry PI, BBB or other ARM based host
 		// PI: "arm-linux-gnueabihf"
@@ -74,6 +76,8 @@ func TestFlavorCompatibility(t *testing.T) {
 		{&Flavor{OS: "i686-pc-linux-gnu"}, []*os{linuxi386}},
 		{&Flavor{OS: "x86_64-linux-gnu"}, []*os{linuxamd64}},
 		{&Flavor{OS: "x86_64-pc-linux-gnu"}, []*os{linuxamd64}},
+		{&Flavor{OS: "aarch64-linux-gnu"}, []*os{linuxarm64}},
+		{&Flavor{OS: "arm64-linux-gnu"}, []*os{linuxarm64}},
 	}
 
 	check := func(test *test, os *os) {
