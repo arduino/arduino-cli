@@ -63,7 +63,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.Architecture,
-		}, output.OutputProgressBar(), output.OutputTaskProgress(),
+		}, output.ProgressBar(), output.TaskProgress(),
 			globals.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error during upgrade")

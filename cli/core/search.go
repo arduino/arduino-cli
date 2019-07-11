@@ -63,7 +63,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	}
 
 	coreslist := resp.GetSearchOutput()
-	if output.OutputJSONOrElse(coreslist) {
+	if output.JSONOrElse(coreslist) {
 		if len(coreslist) > 0 {
 			outputSearchCores(coreslist)
 		} else {

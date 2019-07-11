@@ -67,7 +67,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	}
 	if len(res.GetInstalledLibrary()) > 0 {
 		results := res.GetInstalledLibrary()
-		if output.OutputJSONOrElse(results) {
+		if output.JSONOrElse(results) {
 			if len(results) > 0 {
 				fmt.Println(outputListLibrary(results))
 			} else {

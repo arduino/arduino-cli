@@ -67,7 +67,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrNetwork)
 	}
 
-	if output.OutputJSONOrElse(resp) {
+	if output.JSONOrElse(resp) {
 		outputListResp(resp)
 	}
 }

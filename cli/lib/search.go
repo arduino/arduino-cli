@@ -64,7 +64,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if output.OutputJSONOrElse(searchResp) {
+	if output.JSONOrElse(searchResp) {
 		results := searchResp.GetLibraries()
 		sort.Slice(results, func(i, j int) bool {
 			return results[i].Name < results[j].Name

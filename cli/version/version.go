@@ -39,7 +39,7 @@ func NewCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	if output.OutputJSONOrElse(globals.VersionInfo) {
+	if output.JSONOrElse(globals.VersionInfo) {
 		fmt.Printf("%s\n", globals.VersionInfo)
 	}
 }

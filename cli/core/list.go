@@ -64,7 +64,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	}
 	installed := resp.GetInstalledPlatform()
 	if installed != nil && len(installed) > 0 {
-		if output.OutputJSONOrElse(installed) {
+		if output.JSONOrElse(installed) {
 			outputInstalledCores(installed)
 		}
 	}

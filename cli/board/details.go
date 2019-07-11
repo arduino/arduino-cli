@@ -50,7 +50,7 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 		formatter.PrintError(err, "Error getting board details")
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	if output.OutputJSONOrElse(res) {
+	if output.JSONOrElse(res) {
 		outputDetailsResp(res)
 	}
 }

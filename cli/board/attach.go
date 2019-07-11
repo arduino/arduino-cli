@@ -61,7 +61,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		BoardUri:      args[0],
 		SketchPath:    path,
 		SearchTimeout: attachFlags.searchTimeout,
-	}, output.OutputTaskProgress())
+	}, output.TaskProgress())
 	if err != nil {
 		formatter.PrintError(err, "attach board error")
 		os.Exit(errorcodes.ErrGeneric)

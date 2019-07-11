@@ -50,7 +50,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 	err := lib.LibraryUpgradeAll(context.Background(), &rpc.LibraryUpgradeAllReq{
 		Instance: instance,
-	}, output.OutputProgressBar(), output.OutputTaskProgress(), globals.HTTPClientHeader)
+	}, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
 	if err != nil {
 		formatter.PrintError(err, "Error upgrading libraries")
 		os.Exit(errorcodes.ErrGeneric)

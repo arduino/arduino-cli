@@ -59,7 +59,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version.String(),
-		}, output.OutputTaskProgress())
+		}, output.TaskProgress())
 		if err != nil {
 			formatter.PrintError(err, "Error uninstalling "+library.String())
 			os.Exit(errorcodes.ErrGeneric)

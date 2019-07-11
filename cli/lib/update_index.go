@@ -41,7 +41,7 @@ func initUpdateIndexCommand() *cobra.Command {
 			instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 			err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexReq{
 				Instance: instance,
-			}, output.OutputProgressBar())
+			}, output.ProgressBar())
 			if err != nil {
 				formatter.PrintError(err, "Error updating library index")
 				os.Exit(errorcodes.ErrGeneric)

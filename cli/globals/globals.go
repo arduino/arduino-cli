@@ -26,7 +26,7 @@ var (
 	VersionInfo = version.NewInfo(filepath.Base(os.Args[0]))
 	// Config FIXMEDOC
 	Config *configs.Configuration
-
+	// YAMLConfigFile contains the path to the config file
 	YAMLConfigFile string
 )
 

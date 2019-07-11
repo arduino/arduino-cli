@@ -59,8 +59,8 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			Name:     library.Name,
 			Version:  library.Version.String(),
 		}
-		err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.OutputProgressBar(),
-			output.OutputTaskProgress(), globals.HTTPClientHeader)
+		err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.ProgressBar(),
+			output.TaskProgress(), globals.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error installing "+library.String())
 			os.Exit(errorcodes.ErrGeneric)

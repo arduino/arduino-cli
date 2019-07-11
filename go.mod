@@ -41,9 +41,19 @@ require (
 	go.bug.st/downloader v1.1.0
 	go.bug.st/relaxed-semver v0.0.0-20181022103824-0265409c5852
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45
+<<<<<<< HEAD
 	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 	golang.org/x/net v0.0.0-20190311183353-d8887717615a
 	golang.org/x/text v0.3.0
+=======
+	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
+	golang.org/x/lint v0.0.0-20190409202823-959b441ac422 // indirect
+	golang.org/x/net v0.0.0-20190628185345-da137c7871d7
+	golang.org/x/sys v0.0.0-20190710143415-6ec70d6a5542 // indirect
+	golang.org/x/text v0.3.2
+	golang.org/x/tools v0.0.0-20190710184609-286818132824 // indirect
+	google.golang.org/appengine v1.4.0 // indirect
+>>>>>>> use a better naming for output functions
 	google.golang.org/genproto v0.0.0-20190327125643-d831d65fe17d // indirect
 	google.golang.org/grpc v1.21.1
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect

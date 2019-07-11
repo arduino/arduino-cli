@@ -59,7 +59,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			Name:     library.Name,
 			Version:  library.Version.String(),
 		}
-		_, err := lib.LibraryDownload(context.Background(), libraryDownloadReq, output.OutputProgressBar(),
+		_, err := lib.LibraryDownload(context.Background(), libraryDownloadReq, output.ProgressBar(),
 			globals.HTTPClientHeader)
 		if err != nil {
 			formatter.PrintError(err, "Error downloading "+library.String())

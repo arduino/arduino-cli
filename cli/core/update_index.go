@@ -49,7 +49,7 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 
 	_, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
 		Instance: instance,
-	}, output.OutputProgressBar())
+	}, output.ProgressBar())
 	if err != nil {
 		formatter.PrintError(err, "Error updating index")
 		os.Exit(errorcodes.ErrGeneric)

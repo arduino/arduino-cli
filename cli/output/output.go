@@ -33,10 +33,10 @@ import (
 // TODO: Feed text output into colorable stdOut
 var _ = colorable.NewColorableStdout()
 
-// OutputJSONOrElse outputs the JSON encoding of v if the JSON output format has been
+// JSONOrElse outputs the JSON encoding of v if the JSON output format has been
 // selected by the user and returns false. Otherwise no output is produced and the
 // function returns true.
-func OutputJSONOrElse(v interface{}) bool {
+func JSONOrElse(v interface{}) bool {
 	if !globals.OutputJSON {
 		return true
 	}
@@ -49,9 +49,9 @@ func OutputJSONOrElse(v interface{}) bool {
 	return false
 }
 
-// OutputProgressBar returns a DownloadProgressCB that prints a progress bar.
+// ProgressBar returns a DownloadProgressCB that prints a progress bar.
 // If JSON output format has been selected, the callback outputs nothing.
-func OutputProgressBar() commands.DownloadProgressCB {
+func ProgressBar() commands.DownloadProgressCB {
 	if !globals.OutputJSON {
 		return NewDownloadProgressBarCB()
 	}
@@ -60,9 +60,9 @@ func OutputProgressBar() commands.DownloadProgressCB {
 	}
 }
 
-// OutputTaskProgress returns a TaskProgressCB that prints the task progress.
+// TaskProgress returns a TaskProgressCB that prints the task progress.
 // If JSON output format has been selected, the callback outputs nothing.
-func OutputTaskProgress() commands.TaskProgressCB {
+func TaskProgress() commands.TaskProgressCB {
 	if !globals.OutputJSON {
 		return NewTaskProgressCB()
 	}

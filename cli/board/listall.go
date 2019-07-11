@@ -58,7 +58,7 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if output.OutputJSONOrElse(list) {
+	if output.JSONOrElse(list) {
 		outputBoardListAll(list)
 	}
 }

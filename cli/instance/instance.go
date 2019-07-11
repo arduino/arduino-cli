@@ -37,14 +37,14 @@ func initInstance() *rpc.InitResp {
 	logrus.Info("Initializing package manager")
 	req := packageManagerInitReq()
 
-	resp, err := commands.Init(context.Background(), req, output.OutputProgressBar(), output.OutputTaskProgress(), globals.HTTPClientHeader)
+	resp, err := commands.Init(context.Background(), req, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
 	if err != nil {
 		formatter.PrintError(err, "Error initializing package manager")
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	if resp.GetLibrariesIndexError() != "" {
 		commands.UpdateLibrariesIndex(context.Background(),
-			&rpc.UpdateLibrariesIndexReq{Instance: resp.GetInstance()}, output.OutputProgressBar())
+			&rpc.UpdateLibrariesIndexReq{Instance: resp.GetInstance()}, output.ProgressBar())
 		rescResp, err := commands.Rescan(context.Background(), &rpc.RescanReq{Instance: resp.GetInstance()})
 		if rescResp.GetLibrariesIndexError() != "" {
 			formatter.PrintErrorMessage("Error loading library index: " + rescResp.GetLibrariesIndexError())
