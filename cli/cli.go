@@ -59,20 +59,25 @@ var (
 
 // Init the cobra root command
 func init() {
-	ArduinoCli.AddCommand(board.NewCommand())
-	ArduinoCli.AddCommand(compile.NewCommand())
-	ArduinoCli.AddCommand(config.NewCommand())
-	ArduinoCli.AddCommand(core.NewCommand())
-	ArduinoCli.AddCommand(daemon.NewCommand())
-	ArduinoCli.AddCommand(generatedocs.NewCommand())
-	ArduinoCli.AddCommand(lib.NewCommand())
-	ArduinoCli.AddCommand(sketch.NewCommand())
-	ArduinoCli.AddCommand(upload.NewCommand())
-	ArduinoCli.AddCommand(version.NewCommand())
+	createCliCommandTree(ArduinoCli)
+}
 
-	ArduinoCli.PersistentFlags().BoolVar(&globals.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
-	ArduinoCli.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be [text|json].")
-	ArduinoCli.PersistentFlags().StringVar(&globals.YAMLConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
+// this is here only for testing
+func createCliCommandTree(cmd *cobra.Command) {
+	cmd.AddCommand(board.NewCommand())
+	cmd.AddCommand(compile.NewCommand())
+	cmd.AddCommand(config.NewCommand())
+	cmd.AddCommand(core.NewCommand())
+	cmd.AddCommand(daemon.NewCommand())
+	cmd.AddCommand(generatedocs.NewCommand())
+	cmd.AddCommand(lib.NewCommand())
+	cmd.AddCommand(sketch.NewCommand())
+	cmd.AddCommand(upload.NewCommand())
+	cmd.AddCommand(version.NewCommand())
+
+	cmd.PersistentFlags().BoolVar(&globals.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
+	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be [text|json].")
+	cmd.PersistentFlags().StringVar(&globals.YAMLConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 }
 
 func preRun(cmd *cobra.Command, args []string) {
