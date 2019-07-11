@@ -343,7 +343,16 @@ Because:
 
 #### How can I find the core/FQBN for a board?
 
+Update the core index to have latest boards informations:
+
+    $ arduino-cli core update-index
+    Updating index: package_index.json downloaded
+
 See: https://github.com/arduino/arduino-cli#step-4-find-and-install-the-right-core
+
+Further help can be found in [this comment](https://github.com/arduino/arduino-cli/issues/138#issuecomment-459169051) in [#138](https://github.com/arduino/arduino-cli/issues/138).
+
+For a deeper understanding of how FQBN works, you should understand Arduino Hardware specification. You can find more information in this [arduino/Arduino wiki page](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification)
 
 # Testing
 
