@@ -2,6 +2,7 @@ bou.ke/monkey v1.0.1 h1:zEMLInw9xvNakzUUPjfS4Ds6jYPqCFx3m7bRmG5NH2U=
 bou.ke/monkey v1.0.1/go.mod h1:FgHuK96Rv2Nlf+0u1OOVDpCMdsWyOFmeeketDHE7LIg=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
+github.com/arduino/arduino v0.0.0-20190521072917-00a7546fb43e h1:5TJufBg+nZAFruNEALBVHDPRMtMDbRg7Hox/WA4ZI40=
 github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c h1:agh2JT96G8egU7FEb13L4dq3fnCN7lxXhJ86t69+W7s=
 github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c/go.mod h1:HK7SpkEax/3P+0w78iRQx1sz1vCDYYw9RXwHjQTB5i8=
 github.com/arduino/go-paths-helper v0.0.0-20190214132331-c3c98d1bf2e1 h1:S0NpDSqjlkNA510vmRCP5Cq9mPgu3rWDSdeN4SI1Mwc=

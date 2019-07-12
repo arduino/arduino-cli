@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #line 1 {{QuoteCppString .sketch.MainFile.Name}}
-#line 1 {{QuoteCppString .sketch.MainFile.Name}}
 const char *foo = "\
 hello \
 world\n";

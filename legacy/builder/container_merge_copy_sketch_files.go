@@ -30,27 +30,31 @@
 package builder
 
 import (
+	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/go-errors/errors"
 )
 
 type ContainerMergeCopySketchFiles struct{}
 
 func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
-	commands := []types.Command{
-		&SketchSourceMerger{},
-		&SketchSaver{},
-		&AdditionalSketchFilesCopier{},
+	sk := types.SketchFromLegacy(ctx.Sketch)
+	if sk == nil {
+		return i18n.WrapError(errors.New("unable to convert legacy sketch to the new type"))
+	}
+	offset, source := bldr.MergeSketchSources(sk)
+	ctx.LineOffset = offset
+	ctx.Source = source
+
+	if err := bldr.SaveSketchItemCpp(&sketch.Item{ctx.Sketch.MainFile.Name.String(), []byte(ctx.Source)}, ctx.SketchBuildPath.String()); err != nil {
+		return i18n.WrapError(err)
 	}
 
-	for _, command := range commands {
-		PrintRingNameIfDebug(ctx, command)
-		err := command.Run(ctx)
-		if err != nil {
-			return i18n.WrapError(err)
-		}
+	if err := new(AdditionalSketchFilesCopier).Run(ctx); err != nil {
+		return i18n.WrapError(err)
 	}
 
 	return nil
-
 }
