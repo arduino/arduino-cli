@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #line 1 {{QuoteCppString .sketch.MainFile.Name}}
-#line 1 {{QuoteCppString .sketch.MainFile.Name}}
 #if __SAM3X8E__
 #line 2 {{QuoteCppString .sketch.MainFile.Name}}
 void ifBranch();
