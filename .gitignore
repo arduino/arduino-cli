@@ -7,3 +7,6 @@
 /wiki
 .idea
 coverage_*.txt
+/venv-linux
+/venv
+__pycache__/
