@@ -9,6 +9,7 @@ cli_path = os.path.join(this_test_path, '..', 'arduino-cli')
 # Useful reference: 
 # http://docs.pyinvoke.org/en/1.2/api/runners.html#invoke.runners.Result
 
+
 def cli_line(*args):
     # Accept a list of arguments cli_line('lib list --format json')
     # Return a full command line string e.g. 'arduino-cli help --format json'
@@ -21,7 +22,7 @@ def run_command(*args):
     # Accept a list of arguments
     # Resource: http://docs.pyinvoke.org/en/1.2/api/runners.html#invoke.runners.Runner
     # result = run(cli_line(*args), echo=False)  # , hide='out')
-    print("Running: {}".format(cli_line(*args)))
+    # print("Running: {}".format(cli_line(*args)))
     result = run(cli_line(*args), echo=False, hide='out')
     return result
 
@@ -35,7 +36,6 @@ def test_command_help():
 
 def test_command_lib_list():
     result = run_command('lib list')
-    assert result.ok
     assert result.stderr == ''
     result = run_command('lib list', '--format json')
     assert '{}' == result.stdout
@@ -44,7 +44,13 @@ def test_command_lib_list():
 
 def test_command_lib_install():
     libs = ['\"AzureIoTProtocol_MQTT\"', '\"CMMC MQTT Connector\"', '\"WiFiNINA\"']
-    result1 = run_command('lib install {}'.format(' '.join(libs)))
-    result2 = run_command('lib install {}'.format(' '.join(libs)))
+    result_1 = run_command('lib install {}'.format(' '.join(libs)))
+    result_2 = run_command('lib install {}'.format(' '.join(libs)))
     # Installation should be idempotent
-    assert result1 == result2
+    assert result_1 == result_2
+
+
+def test_command_lib_remove():
+    libs = ['\"AzureIoTProtocol_MQTT\"', '\"CMMC MQTT Connector\"', '\"WiFiNINA\"']
+    result = run_command('lib uninstall {}'.format(' '.join(libs)))
+    
