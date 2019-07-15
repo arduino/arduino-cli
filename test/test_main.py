@@ -1,6 +1,6 @@
 from invoke import run, Responder
 import os
-# import json
+import json
 
 this_test_path = os.path.dirname(os.path.realpath(__file__))
 # Calculate absolute path of the CLI
@@ -32,6 +32,7 @@ def test_command_help():
     assert result.ok
     assert result.stderr == ''
     assert 'Usage' in result.stdout
+    # result.out
 
 
 def test_command_lib_list():
@@ -53,4 +54,14 @@ def test_command_lib_install():
 def test_command_lib_remove():
     libs = ['\"AzureIoTProtocol_MQTT\"', '\"CMMC MQTT Connector\"', '\"WiFiNINA\"']
     result = run_command('lib uninstall {}'.format(' '.join(libs)))
-    
+
+
+def test_command_board_list():
+    result = run_command('board list --format json')
+    # check is a valid json and contains a list of ports
+    ports = json.loads(result.stdout).get('ports')
+    assert isinstance(ports, list)
+    for port in ports:
+        assert 'protocol' in port
+        assert 'protocol_label' in port
+

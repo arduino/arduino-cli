@@ -1,0 +1,25 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Pytest",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/test",
+            "program": "/mnt/c/Users/LucaCipriani/gdrive/Dropbox/Development/src/github.com/arduino/arduino-cli/venv-linux/bin/pytest",
+            "console": "integratedTerminal",
+        },
+        {
+            "name": "Pytest board list",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/test",
+            "program": "/mnt/c/Users/LucaCipriani/gdrive/Dropbox/Development/src/github.com/arduino/arduino-cli/venv-linux/bin/pytest",
+            "args": ["-k test_command_board_list"],
+            "console": "integratedTerminal",
+        }
+    ]
+}
