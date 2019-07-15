@@ -19,7 +19,9 @@ def cli_line(*args):
 
 def run_command(*args):
     # Resource: http://docs.pyinvoke.org/en/1.2/api/runners.html#invoke.runners.Runner
-    result = run(cli_line(*args), echo=False)  # , hide='out')
+    # result = run(cli_line(*args), echo=False)  # , hide='out')
+    print("Running: {}".format(cli_line(*args)))
+    result = run(cli_line(*args), echo=False, hide='out')
     return result
 
 

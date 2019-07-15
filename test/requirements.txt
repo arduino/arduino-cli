@@ -4,6 +4,7 @@ importlib-metadata==0.18
 invoke==1.2.0
 more-itertools==7.1.0
 packaging==19.0
+pep8==1.7.1
 pluggy==0.12.0
 py==1.8.0
 pyparsing==2.4.0
