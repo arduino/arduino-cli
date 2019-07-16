@@ -18,7 +18,7 @@
             "request": "launch",
             "cwd": "${workspaceFolder}/test",
             "program": "/mnt/c/Users/LucaCipriani/gdrive/Dropbox/Development/src/github.com/arduino/arduino-cli/venv-linux/bin/pytest",
-            "args": ["-k test_command_board_list"],
+            "args": ["-k test_command_board_listall"],
             "console": "integratedTerminal",
         }
     ]

@@ -10,3 +10,5 @@ coverage_*.txt
 /venv-linux
 /venv
 __pycache__/
+.pytest_cache/
+.vscode/*
