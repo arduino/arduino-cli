@@ -36,16 +36,15 @@ def test_command_lib_list():
     assert result.stderr == ''
     result = run_command('lib list', '--format json')
     assert '{}' == result.stdout
-    # assert json.loads('{}') == json.loads(result.stdout)
 
 
 def test_command_lib_install():
     libs = ['\"AzureIoTProtocol_MQTT\"', '\"CMMC MQTT Connector\"', '\"WiFiNINA\"']
+    # Should be safe to run install multiple times
     result_1 = run_command('lib install {}'.format(' '.join(libs)))
     assert result_1.ok
     result_2 = run_command('lib install {}'.format(' '.join(libs)))
     assert result_2.ok
-    # Installation should be idempotent
 
 
 def test_command_lib_remove():
