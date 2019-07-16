@@ -7,3 +7,5 @@
 /wiki
 .idea
 coverage_*.txt
+__pycache__
+venv
