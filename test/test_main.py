@@ -2,6 +2,7 @@ from invoke import run, Responder
 import os
 import json
 import pytest
+import semver
 
 this_test_path = os.path.dirname(os.path.realpath(__file__))
 # Calculate absolute path of the CLI
@@ -36,6 +37,9 @@ def test_command_lib_list():
     result = run_command('lib list', '--format json')
     assert '{}' == result.stdout
 
+# def test_command_lib_download():
+#     result = run_command('lib download')
+
 
 def test_command_lib_install():
     libs = ['\"AzureIoTProtocol_MQTT\"', '\"CMMC MQTT Connector\"', '\"WiFiNINA\"']
@@ -45,6 +49,9 @@ def test_command_lib_install():
     result_2 = run_command('lib install {}'.format(' '.join(libs)))
     assert result_2.ok
 
+def test_command_lib_update_index():
+    result = run_command('lib update-index')
+    assert 'Updating index: library_index.json downloaded' == result.stdout.splitlines()[-1].strip()
 
 def test_command_lib_remove():
     libs = ['\"AzureIoTProtocol_MQTT\"', '\"CMMC MQTT Connector\"', '\"WiFiNINA\"']
@@ -83,11 +90,13 @@ def test_command_board_listall():
     result = run_command('board listall')
     assert ['Board', 'Name', 'FQBN'] == result.stdout.splitlines()[0].strip().split()
 
+
 def test_command_version():
     result = run_command('version --format json')
     parsed_out = json.loads(result.stdout)
 
     assert parsed_out.get('command', False) == 'arduino-cli'
-    assert parsed_out.get('version', False)
-    assert parsed_out.get('commit', False)
+    assert isinstance(semver.parse(parsed_out.get('version', False)), dict)
+    assert isinstance(parsed_out.get('commit', False), str)
     assert parsed_out.get('build_date', False)
+
