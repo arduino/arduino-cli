@@ -1,8 +1,8 @@
 FROM golang:1.12
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-		bzip2 \
-        unzip \
+    bzip2 \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PROTOBUF_VER 3.8.0
@@ -20,5 +20,8 @@ RUN set -ex \
     && go get github.com/golang/protobuf/protoc-gen-go \
     && mkdir protobuf && cd protobuf \
     && curl -LO https://github.com/google/protobuf/releases/download/v$PROTOBUF_VER/protoc-$PROTOBUF_VER-linux-x86_64.zip \
-    && unzip protoc-$PROTOBUF_VER-linux-x86_64.zip && cp ./bin/* /bin/ \
+    && unzip protoc-$PROTOBUF_VER-linux-x86_64.zip \
+    && cp ./bin/* /bin/  \
+    # protoc will search for default includes in the path of the binary
+    && cp -r ./include /bin/ \
     && cd .. &&  rm -rf protobuf
