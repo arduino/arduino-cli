@@ -18,7 +18,6 @@ package daemon
 import (
 	"fmt"
 	"io"
-	"log"
 
 	"github.com/arduino/arduino-cli/arduino/monitors"
 	rpc "github.com/arduino/arduino-cli/rpc/monitor"
@@ -69,42 +68,68 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 		}
 	}
 
-	// now we can stream the other messages and re-route to the monitor
+	// we'll use these channels to communicate with the goroutines
+	// handling the stream and the target respectively
+	streamClosed := make(chan error)
+	targetClosed := make(chan error)
+
+	// now we can read the other messages and re-route to the monitor...
 	go func() {
 		for {
 			msg, err := stream.Recv()
 			if err == io.EOF {
-				// connection closed, exit
+				// stream was closed
+				streamClosed <- nil
 				break
 			}
 
 			if err != nil {
-				// error, exit
-				log.Fatal(err)
+				// error reading from stream
+				streamClosed <- err
 				break
 			}
 
-			mon.Write(msg.GetData())
+			if _, err := mon.Write(msg.GetData()); err != nil {
+				// error writing to target
+				targetClosed <- err
+				break
+			}
 		}
 	}()
 
-	// read from the monitor and forward to the output stream
+	// ...and read from the monitor and forward to the output stream
+	go func() {
+		buf := make([]byte, 8)
+		for {
+			n, err := mon.Read(buf)
+			if err != nil {
+				// error reading from target
+				targetClosed <- err
+				break
+			}
 
-	buf := make([]byte, 8)
+			if n == 0 {
+				// target was closed
+				targetClosed <- nil
+				break
+			}
+
+			if err = stream.Send(&rpc.StreamingOpenResp{
+				Data: buf[:n],
+			}); err != nil {
+				// error sending to stream
+				streamClosed <- err
+				break
+			}
+		}
+	}()
+
 	for {
-		n, err := mon.Read(buf)
-		if err != nil {
+		select {
+		case err := <-streamClosed:
+			mon.Close()
 			return err
-		}
-
-		if n == 0 {
-			// port was closed
-			return nil
-		}
-
-		if err = stream.Send(&rpc.StreamingOpenResp{
-			Data: buf[:n],
-		}); err != nil {
+		case err := <-targetClosed:
 			return err
 		}
 	}
