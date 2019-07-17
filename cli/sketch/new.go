@@ -20,7 +20,8 @@ package sketch
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/spf13/cobra"
 )
@@ -30,7 +31,7 @@ func initNewCommand() *cobra.Command {
 		Use:     "new",
 		Short:   "Create a new Sketch",
 		Long:    "Create a new Sketch",
-		Example: "  " + cli.VersionInfo.Application + " sketch new MultiBlinker",
+		Example: "  " + os.Args[0] + " sketch new MultiBlinker",
 		Args:    cobra.ExactArgs(1),
 		Run:     runNewCommand,
 	}
@@ -46,16 +47,16 @@ void loop() {
 `)
 
 func runNewCommand(cmd *cobra.Command, args []string) {
-	sketchDir := cli.Config.SketchbookDir.Join(args[0])
+	sketchDir := globals.Config.SketchbookDir.Join(args[0])
 	if err := sketchDir.MkdirAll(); err != nil {
 		formatter.PrintError(err, "Could not create sketch directory.")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	sketchFile := sketchDir.Join(args[0] + ".ino")
 	if err := sketchFile.WriteFile(emptySketch); err != nil {
 		formatter.PrintError(err, "Error creating sketch.")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	formatter.Print("Sketch created in: " + sketchDir.String())

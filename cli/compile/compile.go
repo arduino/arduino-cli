@@ -21,61 +21,19 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/globals"
+
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-// InitCommand prepares the command.
-func InitCommand() *cobra.Command {
-	command := &cobra.Command{
-		Use:     "compile",
-		Short:   "Compiles Arduino sketches.",
-		Long:    "Compiles Arduino sketches.",
-		Example: "  " + cli.VersionInfo.Application + " compile -b arduino:avr:uno /home/user/Arduino/MySketch",
-		Args:    cobra.MaximumNArgs(1),
-		Run:     run,
-	}
-	command.Flags().StringVarP(
-		&flags.fqbn, "fqbn", "b", "",
-		"Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	command.Flags().BoolVar(
-		&flags.showProperties, "show-properties", false,
-		"Show all build properties used instead of compiling.")
-	command.Flags().BoolVar(
-		&flags.preprocess, "preprocess", false,
-		"Print preprocessed code to stdout instead of compiling.")
-	command.Flags().StringVar(
-		&flags.buildCachePath, "build-cache-path", "",
-		"Builds of 'core.a' are saved into this path to be cached and reused.")
-	command.Flags().StringVarP(
-		&flags.exportFile, "output", "o", "",
-		"Filename of the compile output.")
-	command.Flags().StringVar(
-		&flags.buildPath, "build-path", "",
-		"Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.")
-	command.Flags().StringSliceVar(
-		&flags.buildProperties, "build-properties", []string{},
-		"List of custom build properties separated by commas. Or can be used multiple times for multiple properties.")
-	command.Flags().StringVar(
-		&flags.warnings, "warnings", "none",
-		`Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
-	command.Flags().BoolVarP(
-		&flags.verbose, "verbose", "v", false,
-		"Optional, turns on verbose mode.")
-	command.Flags().BoolVar(
-		&flags.quiet, "quiet", false,
-		"Optional, supresses almost every output.")
-	command.Flags().StringVar(
-		&flags.vidPid, "vid-pid", "",
-		"When specified, VID/PID specific build properties are used, if boards supports them.")
-	return command
-}
-
-var flags struct {
+var (
 	fqbn            string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
 	showProperties  bool     // Show all build preferences used instead of compiling.
 	preprocess      bool     // Print preprocessed code to stdout.
@@ -87,39 +45,80 @@ var flags struct {
 	quiet           bool     // Suppresses almost every output.
 	vidPid          string   // VID/PID specific build properties.
 	exportFile      string   // The compiled binary is written to this file
+)
+
+// NewCommand created a new `compile` command
+func NewCommand() *cobra.Command {
+	command := &cobra.Command{
+		Use:     "compile",
+		Short:   "Compiles Arduino sketches.",
+		Long:    "Compiles Arduino sketches.",
+		Example: "  " + os.Args[0] + " compile -b arduino:avr:uno /home/user/Arduino/MySketch",
+		Args:    cobra.MaximumNArgs(1),
+		Run:     run,
+	}
+
+	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	command.Flags().BoolVar(&showProperties, "show-properties", false, "Show all build properties used instead of compiling.")
+	command.Flags().BoolVar(&preprocess, "preprocess", false, "Print preprocessed code to stdout instead of compiling.")
+	command.Flags().StringVar(&buildCachePath, "build-cache-path", "", "Builds of 'core.a' are saved into this path to be cached and reused.")
+	command.Flags().StringVarP(&exportFile, "output", "o", "", "Filename of the compile output.")
+	command.Flags().StringVar(&buildPath, "build-path", "",
+		"Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.")
+	command.Flags().StringSliceVar(&buildProperties, "build-properties", []string{},
+		"List of custom build properties separated by commas. Or can be used multiple times for multiple properties.")
+	command.Flags().StringVar(&warnings, "warnings", "none",
+		`Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
+	command.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
+	command.Flags().BoolVar(&quiet, "quiet", false, "Optional, supresses almost every output.")
+	command.Flags().StringVar(&vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if boards supports them.")
+
+	return command
 }
 
 func run(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := instance.CreateInstance()
 
 	var path *paths.Path
 	if len(args) > 0 {
 		path = paths.New(args[0])
 	}
-	sketchPath := cli.InitSketchPath(path)
-	compRes, err := compile.Compile(context.Background(), &rpc.CompileReq{
+
+	sketchPath := initSketchPath(path)
+
+	_, err := compile.Compile(context.Background(), &rpc.CompileReq{
 		Instance:        instance,
-		Fqbn:            flags.fqbn,
+		Fqbn:            fqbn,
 		SketchPath:      sketchPath.String(),
-		ShowProperties:  flags.showProperties,
-		Preprocess:      flags.preprocess,
-		BuildCachePath:  flags.buildCachePath,
-		BuildPath:       flags.buildPath,
-		BuildProperties: flags.buildProperties,
-		Warnings:        flags.warnings,
-		Verbose:         flags.verbose,
-		Quiet:           flags.quiet,
-		VidPid:          flags.vidPid,
-		ExportFile:      flags.exportFile,
-	}, os.Stdout, os.Stderr)
-	if err == nil {
-		outputCompileResp(compRes)
-	} else {
+		ShowProperties:  showProperties,
+		Preprocess:      preprocess,
+		BuildCachePath:  buildCachePath,
+		BuildPath:       buildPath,
+		BuildProperties: buildProperties,
+		Warnings:        warnings,
+		Verbose:         verbose,
+		Quiet:           quiet,
+		VidPid:          vidPid,
+		ExportFile:      exportFile,
+	}, os.Stdout, os.Stderr, globals.Config, globals.Debug)
+
+	if err != nil {
 		formatter.PrintError(err, "Error during build")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 }
 
-func outputCompileResp(details *rpc.CompileResp) {
+// initSketchPath returns the current working directory
+func initSketchPath(sketchPath *paths.Path) *paths.Path {
+	if sketchPath != nil {
+		return sketchPath
+	}
 
+	wd, err := paths.Getwd()
+	if err != nil {
+		formatter.PrintError(err, "Couldn't get current working directory")
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	logrus.Infof("Reading sketch from dir: %s", wd)
+	return wd
 }

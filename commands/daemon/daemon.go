@@ -25,19 +25,21 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/upload"
+	"github.com/arduino/arduino-cli/configs"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
 // ArduinoCoreServerImpl FIXMEDOC
 type ArduinoCoreServerImpl struct {
 	DownloaderHeaders http.Header
+	VersionString     string
+	Config            *configs.Configuration
 }
 
 // BoardDetails FIXMEDOC
@@ -115,7 +117,7 @@ func (s *ArduinoCoreServerImpl) Init(req *rpc.InitReq, stream rpc.ArduinoCore_In
 
 // Version FIXMEDOC
 func (s *ArduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionReq) (*rpc.VersionResp, error) {
-	return &rpc.VersionResp{Version: cli.VersionInfo.VersionString}, nil
+	return &rpc.VersionResp{Version: s.VersionString}, nil
 }
 
 // Compile FIXMEDOC
@@ -124,7 +126,8 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoC
 		stream.Context(), req,
 		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{OutStream: data}) }),
 		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{ErrStream: data}) }),
-	)
+		s.Config,
+		false) // set debug to false
 	if err != nil {
 		return err
 	}

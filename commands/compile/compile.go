@@ -29,8 +29,8 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
-	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -41,7 +41,7 @@ import (
 )
 
 // Compile FIXMEDOC
-func Compile(ctx context.Context, req *rpc.CompileReq, outStream io.Writer, errStream io.Writer) (*rpc.CompileResp, error) {
+func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.Writer, config *configs.Configuration, debug bool) (*rpc.CompileResp, error) {
 	pm := commands.GetPackageManager(req)
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -88,20 +88,20 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream io.Writer, errS
 	builderCtx.SketchLocation = sketch.FullPath
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
-	if packagesDir, err := cli.Config.HardwareDirectories(); err == nil {
+	if packagesDir, err := config.HardwareDirectories(); err == nil {
 		builderCtx.HardwareDirs = packagesDir
 	} else {
 		return nil, fmt.Errorf("cannot get hardware directories: %s", err)
 	}
 
-	if toolsDir, err := cli.Config.BundleToolsDirectories(); err == nil {
+	if toolsDir, err := config.BundleToolsDirectories(); err == nil {
 		builderCtx.ToolsDirs = toolsDir
 	} else {
 		return nil, fmt.Errorf("cannot get bundled tools directories: %s", err)
 	}
 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList()
-	builderCtx.OtherLibrariesDirs.Add(cli.Config.LibrariesDir())
+	builderCtx.OtherLibrariesDirs.Add(config.LibrariesDir())
 
 	if req.GetBuildPath() != "" {
 		builderCtx.BuildPath = paths.New(req.GetBuildPath())
@@ -118,7 +118,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream io.Writer, errS
 	builderCtx.USBVidPid = req.GetVidPid()
 	builderCtx.WarningsLevel = req.GetWarnings()
 
-	if cli.GlobalFlags.Debug {
+	if debug {
 		builderCtx.DebugLevel = 100
 	} else {
 		builderCtx.DebugLevel = 5
@@ -138,7 +138,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream io.Writer, errS
 	builderCtx.ArduinoAPIVersion = "10607"
 
 	// Check if Arduino IDE is installed and get it's libraries location.
-	preferencesTxt := cli.Config.DataDir.Join("preferences.txt")
+	preferencesTxt := config.DataDir.Join("preferences.txt")
 	ideProperties, err := properties.LoadFromPath(preferencesTxt)
 	if err == nil {
 		lastIdeSubProperties := ideProperties.SubTree("last").SubTree("ide")

@@ -15,51 +15,56 @@
 // a commercial license, send an email to license@arduino.cc.
 //
 
-package cli
+package output
 
 import (
 	"encoding/json"
 	"fmt"
 	"os"
 
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/output"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	colorable "github.com/mattn/go-colorable"
 )
 
-// OutputJSONOrElse outputs the JSON encoding of v if the JSON output format has been
+// TODO: Feed text output into colorable stdOut
+var _ = colorable.NewColorableStdout()
+
+// JSONOrElse outputs the JSON encoding of v if the JSON output format has been
 // selected by the user and returns false. Otherwise no output is produced and the
 // function returns true.
-func OutputJSONOrElse(v interface{}) bool {
-	if !GlobalFlags.OutputJSON {
+func JSONOrElse(v interface{}) bool {
+	if !globals.OutputJSON {
 		return true
 	}
 	d, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
 		formatter.PrintError(err, "Error during JSON encoding of the output")
-		os.Exit(ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 	fmt.Print(string(d))
 	return false
 }
 
-// OutputProgressBar returns a DownloadProgressCB that prints a progress bar.
+// ProgressBar returns a DownloadProgressCB that prints a progress bar.
 // If JSON output format has been selected, the callback outputs nothing.
-func OutputProgressBar() commands.DownloadProgressCB {
-	if !GlobalFlags.OutputJSON {
-		return output.NewDownloadProgressBarCB()
+func ProgressBar() commands.DownloadProgressCB {
+	if !globals.OutputJSON {
+		return NewDownloadProgressBarCB()
 	}
 	return func(curr *rpc.DownloadProgress) {
 		// XXX: Output progress in JSON?
 	}
 }
 
-// OutputTaskProgress returns a TaskProgressCB that prints the task progress.
+// TaskProgress returns a TaskProgressCB that prints the task progress.
 // If JSON output format has been selected, the callback outputs nothing.
-func OutputTaskProgress() commands.TaskProgressCB {
-	if !GlobalFlags.OutputJSON {
-		return output.NewTaskProgressCB()
+func TaskProgress() commands.TaskProgressCB {
+	if !globals.OutputJSON {
+		return NewTaskProgressCB()
 	}
 	return func(curr *rpc.TaskProgress) {
 		// XXX: Output progress in JSON?

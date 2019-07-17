@@ -21,20 +21,24 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
 )
 
-// InitCommand prepares the command.
-func InitCommand() *cobra.Command {
-	var command = &cobra.Command{
+var outputDir = ""
+
+// NewCommand created a new `generatedocs` command
+func NewCommand() *cobra.Command {
+	command := &cobra.Command{
 		Use:     "generate-docs",
 		Short:   "Generates bash completion and command manpages.",
 		Long:    "Generates bash completion and command manpages.",
-		Example: "  " + cli.VersionInfo.Application + " generate-docs bash-completions",
+		Example: "  " + os.Args[0] + " generate-docs bash-completions",
+		Hidden:  true,
 	}
+
 	command.PersistentFlags().StringVarP(&outputDir, "output-dir", "o", "",
 		"Directory where to save generated files. Default is './docs', the directory must exist.")
 	command.AddCommand(&cobra.Command{
@@ -47,11 +51,9 @@ func InitCommand() *cobra.Command {
 		Args: cobra.NoArgs,
 		Run:  generateBashCompletions,
 	})
-	command.Hidden = true
+
 	return command
 }
-
-var outputDir = ""
 
 func generateBashCompletions(cmd *cobra.Command, args []string) {
 	if outputDir == "" {
@@ -61,7 +63,7 @@ func generateBashCompletions(cmd *cobra.Command, args []string) {
 	err := cmd.Root().GenBashCompletionFile(filepath.Join(outputDir, "arduino"))
 	if err != nil {
 		logrus.WithError(err).Warn("Error Generating bash autocompletions")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 }
 
@@ -78,6 +80,6 @@ func generateManPages(cmd *cobra.Command, args []string) {
 	err := doc.GenManTree(cmd.Root(), header, outputDir)
 	if err != nil {
 		logrus.WithError(err).Warn("Error Generating manpages")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 }
