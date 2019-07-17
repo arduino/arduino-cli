@@ -22,32 +22,31 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"runtime"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands/daemon"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
 
-// InitCommand initialize the command
-func InitCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:     "daemon",
-		Short:   "Run as a daemon",
-		Long:    "Running as a daemon the initialization of cores and libraries is done only once.",
-		Example: "  " + cli.VersionInfo.Application + " daemon",
-		Args:    cobra.NoArgs,
-		Run:     runDaemonCommand,
-		Hidden:  true,
-	}
-	return cmd
-}
-
 const (
 	port = ":50051"
 )
+
+// NewCommand created a new `daemon` command
+func NewCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:     "daemon",
+		Short:   "Run as a daemon",
+		Long:    "Running as a daemon the initialization of cores and libraries is done only once.",
+		Example: "  " + os.Args[0] + " daemon",
+		Args:    cobra.NoArgs,
+		Run:     runDaemonCommand,
+	}
+}
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
 	lis, err := net.Listen("tcp", port)
@@ -56,11 +55,15 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	}
 	s := grpc.NewServer()
 
-	userAgentValue := fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s/Build:%s", cli.VersionInfo.Application,
-		cli.VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), cli.VersionInfo.Commit, cli.VersionInfo.BuildDate)
+	userAgentValue := fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s/Build:%s", globals.VersionInfo.Application,
+		globals.VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), globals.VersionInfo.Commit, globals.VersionInfo.BuildDate)
 	headers := http.Header{"User-Agent": []string{userAgentValue}}
 
-	coreServer := daemon.ArduinoCoreServerImpl{DownloaderHeaders: headers}
+	coreServer := daemon.ArduinoCoreServerImpl{
+		DownloaderHeaders: headers,
+		VersionString:     globals.VersionInfo.VersionString,
+		Config:            globals.Config,
+	}
 	rpc.RegisterArduinoCoreServer(s, &coreServer)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

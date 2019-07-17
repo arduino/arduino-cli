@@ -18,24 +18,27 @@
 package board
 
 import (
-	"github.com/arduino/arduino-cli/cli"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
-// InitCommand prepares the command.
-func InitCommand() *cobra.Command {
+// NewCommand created a new `board` command
+func NewCommand() *cobra.Command {
 	boardCommand := &cobra.Command{
 		Use:   "board",
 		Short: "Arduino board commands.",
 		Long:  "Arduino board commands.",
 		Example: "  # Lists all connected boards.\n" +
-			"  " + cli.VersionInfo.Application + " board list\n\n" +
+			"  " + os.Args[0] + " board list\n\n" +
 			"  # Attaches a sketch to a board.\n" +
-			"  " + cli.VersionInfo.Application + " board attach serial:///dev/tty/ACM0 mySketch",
+			"  " + os.Args[0] + " board attach serial:///dev/tty/ACM0 mySketch",
 	}
+
 	boardCommand.AddCommand(initAttachCommand())
-	boardCommand.AddCommand(initDetailsCommand())
+	boardCommand.AddCommand(detailsCommand)
 	boardCommand.AddCommand(initListCommand())
-	boardCommand.AddCommand(initListAllCommand())
+	boardCommand.AddCommand(listAllCommand)
+
 	return boardCommand
 }

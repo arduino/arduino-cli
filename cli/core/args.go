@@ -22,7 +22,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/common/formatter"
 )
 
@@ -47,7 +47,7 @@ func parsePlatformReferenceArgs(args []string) []*platformReferenceArg {
 		reference, err := parsePlatformReferenceArg(arg)
 		if err != nil {
 			formatter.PrintError(err, "Invalid item "+arg)
-			os.Exit(cli.ErrBadArgument)
+			os.Exit(errorcodes.ErrBadArgument)
 		}
 		ret = append(ret, reference)
 	}

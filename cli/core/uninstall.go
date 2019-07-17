@@ -21,10 +21,11 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/arduino/arduino-cli/output"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -35,14 +36,14 @@ func initUninstallCommand() *cobra.Command {
 		Use:     "uninstall PACKAGER:ARCH ...",
 		Short:   "Uninstalls one or more cores and corresponding tool dependencies if no more used.",
 		Long:    "Uninstalls one or more cores and corresponding tool dependencies if no more used.",
-		Example: "  " + cli.VersionInfo.Application + " core uninstall arduino:samd\n",
+		Example: "  " + os.Args[0] + " core uninstall arduino:samd\n",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runUninstallCommand,
 	}
 }
 
 func runUninstallCommand(cmd *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := instance.CreateInstance()
 	logrus.Info("Executing `arduino core uninstall`")
 
 	platformsRefs := parsePlatformReferenceArgs(args)
@@ -50,7 +51,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	for _, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
 			formatter.PrintErrorMessage("Invalid parameter " + platformRef.String() + ": version not allowed")
-			os.Exit(cli.ErrBadArgument)
+			os.Exit(errorcodes.ErrBadArgument)
 		}
 	}
 	for _, platformRef := range platformsRefs {
@@ -61,7 +62,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 		}, output.NewTaskProgressCB())
 		if err != nil {
 			formatter.PrintError(err, "Error during uninstall")
-			os.Exit(cli.ErrGeneric)
+			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
 }

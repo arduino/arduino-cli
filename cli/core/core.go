@@ -18,18 +18,20 @@
 package core
 
 import (
-	"github.com/arduino/arduino-cli/cli"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
-// InitCommand prepares the command.
-func InitCommand() *cobra.Command {
+// NewCommand created a new `core` command
+func NewCommand() *cobra.Command {
 	coreCommand := &cobra.Command{
 		Use:     "core",
 		Short:   "Arduino Core operations.",
 		Long:    "Arduino Core operations.",
-		Example: "  " + cli.VersionInfo.Application + " core update-index",
+		Example: "  " + os.Args[0] + " core update-index",
 	}
+
 	coreCommand.AddCommand(initDownloadCommand())
 	coreCommand.AddCommand(initInstallCommand())
 	coreCommand.AddCommand(initListCommand())
@@ -37,5 +39,6 @@ func InitCommand() *cobra.Command {
 	coreCommand.AddCommand(initUpgradeCommand())
 	coreCommand.AddCommand(initUninstallCommand())
 	coreCommand.AddCommand(initSearchCommand())
+
 	return coreCommand
 }

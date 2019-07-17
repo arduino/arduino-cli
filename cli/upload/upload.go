@@ -21,76 +21,80 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-// InitCommand prepares the command.
-func InitCommand() *cobra.Command {
-	uploadCommand := &cobra.Command{
-		Use:     "upload",
-		Short:   "Upload Arduino sketches.",
-		Long:    "Upload Arduino sketches.",
-		Example: "  " + cli.VersionInfo.Application + " upload /home/user/Arduino/MySketch",
-		Args:    cobra.MaximumNArgs(1),
-		Run:     run,
-	}
-	uploadCommand.Flags().StringVarP(
-		&flags.fqbn, "fqbn", "b", "",
-		"Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	uploadCommand.Flags().StringVarP(
-		&flags.port, "port", "p", "",
-		"Upload port, e.g.: COM10 or /dev/ttyACM0")
-	uploadCommand.Flags().StringVarP(
-		&flags.importFile, "input", "i", "",
-		"Input file to be uploaded.")
-	uploadCommand.Flags().BoolVarP(
-		&flags.verify, "verify", "t", false,
-		"Verify uploaded binary after the upload.")
-	uploadCommand.Flags().BoolVarP(
-		&flags.verbose, "verbose", "v", false,
-		"Optional, turns on verbose mode.")
-	return uploadCommand
-}
-
-var flags struct {
+var (
 	fqbn       string
 	port       string
 	verbose    bool
 	verify     bool
 	importFile string
+)
+
+// NewCommand created a new `upload` command
+func NewCommand() *cobra.Command {
+	uploadCommand := &cobra.Command{
+		Use:     "upload",
+		Short:   "Upload Arduino sketches.",
+		Long:    "Upload Arduino sketches.",
+		Example: "  " + os.Args[0] + " upload /home/user/Arduino/MySketch",
+		Args:    cobra.MaximumNArgs(1),
+		Run:     run,
+	}
+
+	uploadCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	uploadCommand.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
+	uploadCommand.Flags().StringVarP(&importFile, "input", "i", "", "Input file to be uploaded.")
+	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
+	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
+
+	return uploadCommand
 }
 
 func run(command *cobra.Command, args []string) {
-	instance := cli.CreateInstance()
+	instance := instance.CreateInstance()
 
 	var path *paths.Path
 	if len(args) > 0 {
 		path = paths.New(args[0])
 	}
-	sketchPath := cli.InitSketchPath(path)
+	sketchPath := initSketchPath(path)
 
-	uploadRes, err := upload.Upload(context.Background(), &rpc.UploadReq{
+	_, err := upload.Upload(context.Background(), &rpc.UploadReq{
 		Instance:   instance,
-		Fqbn:       flags.fqbn,
+		Fqbn:       fqbn,
 		SketchPath: sketchPath.String(),
-		Port:       flags.port,
-		Verbose:    flags.verbose,
-		Verify:     flags.verify,
-		ImportFile: flags.importFile,
+		Port:       port,
+		Verbose:    verbose,
+		Verify:     verify,
+		ImportFile: importFile,
 	}, os.Stdout, os.Stderr)
-	if err == nil {
-		outputUploadResp(uploadRes)
-	} else {
+
+	if err != nil {
 		formatter.PrintError(err, "Error during Upload")
-		os.Exit(cli.ErrGeneric)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 }
 
-func outputUploadResp(details *rpc.UploadResp) {
+// initSketchPath returns the current working directory
+func initSketchPath(sketchPath *paths.Path) *paths.Path {
+	if sketchPath != nil {
+		return sketchPath
+	}
 
+	wd, err := paths.Getwd()
+	if err != nil {
+		formatter.PrintError(err, "Couldn't get current working directory")
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	logrus.Infof("Reading sketch from dir: %s", wd)
+	return wd
 }
