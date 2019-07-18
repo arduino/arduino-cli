@@ -1,9 +1,12 @@
 /debug
 /arduino-cli
 /main
-/.vscode/settings.json
+/.vscode/
 /cmd/formatter/debug.test
 /arduino-cli.yaml
 /wiki
 .idea
 coverage_*.txt
+__pycache__
+venv
+.pytest_cache
