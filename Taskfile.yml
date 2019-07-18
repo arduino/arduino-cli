@@ -30,7 +30,7 @@ tasks:
   test-legacy:
     desc: Run tests for the `legacy` package
     cmds:
-      - go test {{ default "-v" .GOFLAGS }} ./legacy/...
+      - go test {{ default "-v -failfast" .GOFLAGS }} ./legacy/...
 
   test-unit-race:
     desc: Run unit tests only with race condition detection
