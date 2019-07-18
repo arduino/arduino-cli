@@ -39,9 +39,6 @@ def test_command_lib_list():
     result = run_command('lib list', '--format json')
     assert '{}' == result.stdout
 
-# def test_command_lib_download():
-#     result = run_command('lib download')
-
 
 def test_command_lib_install():
     libs = ['\"AzureIoTProtocol_MQTT\"', '\"CMMC MQTT Connector\"', '\"WiFiNINA\"']
