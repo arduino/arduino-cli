@@ -18,6 +18,7 @@
 package cores
 
 import (
+	"encoding/json"
 	"strings"
 
 	paths "github.com/arduino/go-paths-helper"
@@ -41,14 +42,13 @@ type PlatformRelease struct {
 	Resource       *resources.DownloadResource
 	Version        *semver.Version
 	BoardsManifest []*BoardManifest
-	Dependencies   ToolDependencies // The Dependency entries to load tools.
-	Platform       *Platform        `json:"-"`
-
-	Properties  *properties.Map            `json:"-"`
-	Boards      map[string]*Board          `json:"-"`
-	Programmers map[string]*properties.Map `json:"-"`
-	Menus       *properties.Map            `json:"-"`
-	InstallDir  *paths.Path                `json:"-"`
+	Dependencies   ToolDependencies           // The Dependency entries to load tools.
+	Platform       *Platform                  `json:"-"`
+	Properties     *properties.Map            `json:"-"`
+	Boards         map[string]*Board          `json:"-"`
+	Programmers    map[string]*properties.Map `json:"-"`
+	Menus          *properties.Map            `json:"-"`
+	InstallDir     *paths.Path                `json:"-"`
 }
 
 // BoardManifest contains information about a board. These metadata are usually
@@ -225,4 +225,26 @@ func (release *PlatformRelease) String() string {
 		version = release.Version.String()
 	}
 	return release.Platform.String() + "@" + version
+}
+
+// MarshalJSON provides a more user friendly serialization for
+// PlatformRelease objects.
+func (release *PlatformRelease) MarshalJSON() ([]byte, error) {
+	latestStr := ""
+	latest := release.Platform.GetLatestRelease()
+	if latest != nil {
+		latestStr = latest.Version.String()
+	}
+
+	return json.Marshal(&struct {
+		ID        string `json:"ID,omitempty"`
+		Installed string `json:"Installed,omitempty"`
+		Latest    string `json:"Latest,omitempty"`
+		Name      string `json:"Name,omitempty"`
+	}{
+		ID:        release.Platform.String(),
+		Installed: release.Version.String(),
+		Latest:    latestStr,
+		Name:      release.Platform.Name,
+	})
 }
