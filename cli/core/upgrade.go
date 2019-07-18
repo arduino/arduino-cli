@@ -71,10 +71,12 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	}
 
 	// proceed upgrading, if anything is upgradable
+	exitErr := false
 	platformsRefs := parsePlatformReferenceArgs(args)
 	for i, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
 			formatter.PrintErrorMessage(("Invalid item " + args[i]))
+			exitErr = true
 			continue
 		}
 
@@ -91,5 +93,9 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			formatter.PrintError(err, "Error during upgrade")
 			os.Exit(errorcodes.ErrGeneric)
 		}
+	}
+
+	if exitErr {
+		os.Exit(errorcodes.ErrBadArgument)
 	}
 }
