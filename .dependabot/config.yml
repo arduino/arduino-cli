@@ -6,3 +6,5 @@ update_configs:
     allowed_updates:
       - match:
           update_type: "security"
+    default_labels:
+      - "component/dependencies"
