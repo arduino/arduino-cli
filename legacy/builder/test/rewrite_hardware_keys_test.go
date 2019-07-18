@@ -42,10 +42,9 @@ import (
 func TestRewriteHardwareKeys(t *testing.T) {
 	ctx := &types.Context{}
 
-	packages := &cores.Packages{}
-	packages.Packages = map[string]*cores.Package{}
+	packages := cores.Packages{}
 	aPackage := &cores.Package{Name: "dummy"}
-	packages.Packages["dummy"] = aPackage
+	packages["dummy"] = aPackage
 	aPackage.Platforms = map[string]*cores.Platform{}
 
 	platform := &cores.PlatformRelease{
@@ -83,10 +82,9 @@ func TestRewriteHardwareKeys(t *testing.T) {
 func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 	ctx := &types.Context{}
 
-	packages := &cores.Packages{}
-	packages.Packages = make(map[string]*cores.Package)
+	packages := cores.Packages{}
 	aPackage := &cores.Package{Name: "dummy"}
-	packages.Packages["dummy"] = aPackage
+	packages["dummy"] = aPackage
 	aPackage.Platforms = make(map[string]*cores.Platform)
 
 	platform := &cores.PlatformRelease{
