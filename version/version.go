@@ -26,15 +26,27 @@ var (
 	defaultVersionString = "0.3.7-alpha.preview"
 	versionString        = ""
 	commit               = ""
-	buildDate            = time.Time{}
+	buildDate            = rfc3339Time{}
 )
+
+type rfc3339Time struct {
+	time.Time
+}
+
+func (r rfc3339Time) format() string {
+	return r.Time.Format(time.RFC3339)
+}
+
+func (r rfc3339Time) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + r.format() + `"`), nil
+}
 
 // Info FIXMEDOC
 type Info struct {
-	Application   string    `json:"Application"`
-	VersionString string    `json:"VersionString"`
-	Commit        string    `json:"Commit"`
-	BuildDate     time.Time `json:"BuildDate"`
+	Application   string      `json:"Application"`
+	VersionString string      `json:"VersionString"`
+	Commit        string      `json:"Commit"`
+	BuildDate     rfc3339Time `json:"BuildDate"`
 }
 
 // NewInfo FIXMEDOC
@@ -48,7 +60,7 @@ func NewInfo(application string) *Info {
 }
 
 func (i *Info) String() string {
-	return fmt.Sprintf("%s Version: %s Commit: %s BuildDate: %s", i.Application, i.VersionString, i.Commit, i.BuildDate)
+	return fmt.Sprintf("%s Version: %s Commit: %s BuildDate: %s", i.Application, i.VersionString, i.Commit, i.BuildDate.format())
 }
 
 //nolint:gochecknoinits
@@ -56,5 +68,5 @@ func init() {
 	if versionString == "" {
 		versionString = defaultVersionString
 	}
-	buildDate = time.Now().UTC()
+	buildDate = rfc3339Time{time.Now().UTC()}
 }

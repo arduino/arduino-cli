@@ -38,12 +38,12 @@ func TestIntegrationBuildInjectedInfo(t *testing.T) {
 		Application:   goldenAppName,
 		VersionString: "0.0.0-test.preview",
 		Commit:        "deadbeef",
-		BuildDate:     time.Time{},
+		BuildDate:     rfc3339Time{time.Time{}},
 	}
 	info := NewInfo(goldenAppName)
 	require.Equal(t, goldenInfo.Application, info.Application)
 	require.Equal(t, goldenInfo.VersionString, info.VersionString)
 	require.Equal(t, goldenInfo.Commit, info.Commit)
-	require.IsType(t, time.Time{}, info.BuildDate)
+	require.IsType(t, rfc3339Time{time.Time{}}, info.BuildDate)
 	require.False(t, info.BuildDate.IsZero())
 }
