@@ -69,8 +69,8 @@ def test_command_lib_search():
         if 'Name: ' in line:
             libs.append(line.split()[1].strip('\"'))
     number_of_libs = len(libs)
-    # It would be strange to have less than 2000 Arduino Libs published
-    assert number_of_libs > 2000
+    assert sorted(libs) == libs
+    assert ['WiFi101', 'WiFi101OTA'] == [lib for lib in libs if 'WiFi101' in lib]
     result = run_command('lib search --format json')
     assert result.ok
     libs_found_from_json = json.loads(result.stdout)
