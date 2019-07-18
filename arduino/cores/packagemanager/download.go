@@ -23,7 +23,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"go.bug.st/downloader"
-	"go.bug.st/relaxed-semver"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // PlatformReference represents a tuple to identify a Platform
@@ -44,7 +44,7 @@ func (platform *PlatformReference) String() string {
 // FindPlatform returns the Platform matching the PlatformReference or nil if not found.
 // The PlatformVersion field of the reference is ignored.
 func (pm *PackageManager) FindPlatform(ref *PlatformReference) *cores.Platform {
-	targetPackage, ok := pm.GetPackages().Packages[ref.Package]
+	targetPackage, ok := pm.Packages[ref.Package]
 	if !ok {
 		return nil
 	}
@@ -71,7 +71,7 @@ func (pm *PackageManager) FindPlatformRelease(ref *PlatformReference) *cores.Pla
 // FindPlatformReleaseDependencies takes a PlatformReference and returns a set of items to download and
 // a set of outputs for non existing platforms.
 func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReference) (*cores.PlatformRelease, []*cores.ToolRelease, error) {
-	targetPackage, exists := pm.packages.Packages[item.Package]
+	targetPackage, exists := pm.Packages[item.Package]
 	if !exists {
 		return nil, nil, fmt.Errorf("package %s not found", item.Package)
 	}
@@ -94,7 +94,7 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 	}
 
 	// replaces "latest" with latest version too
-	toolDeps, err := pm.packages.GetDepsOfPlatformRelease(release)
+	toolDeps, err := pm.Packages.GetDepsOfPlatformRelease(release)
 	if err != nil {
 		return nil, nil, fmt.Errorf("getting tool dependencies for platform %s: %s", release.String(), err)
 	}

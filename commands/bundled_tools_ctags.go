@@ -25,7 +25,7 @@ import (
 )
 
 func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
-	builtinPackage := pm.GetPackages().GetOrCreatePackage("builtin")
+	builtinPackage := pm.Packages.GetOrCreatePackage("builtin")
 	ctagsTool := builtinPackage.GetOrCreateTool("ctags")
 	ctagsRel := ctagsTool.GetOrCreateRelease(semver.ParseRelaxed("5.8-arduino11"))
 	ctagsRel.Flavors = []*cores.Flavor{

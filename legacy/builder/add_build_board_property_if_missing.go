@@ -43,7 +43,7 @@ func (*AddBuildBoardPropertyIfMissing) Run(ctx *types.Context) error {
 	packages := ctx.Hardware
 	logger := ctx.GetLogger()
 
-	for _, aPackage := range packages.Packages {
+	for _, aPackage := range packages {
 		for _, platform := range aPackage.Platforms {
 			for _, platformRelease := range platform.Releases {
 				for _, board := range platformRelease.Boards {

@@ -22,10 +22,10 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
-// platformReleaseToRPC converts our internal structure to the RPC structure.
+// PlatformReleaseToRPC converts our internal structure to the RPC structure.
 // Note: this function does not touch the "Installed" field of rpc.Platform as it's not always clear that the
 // platformRelease we're currently converting is actually installed.
-func platformReleaseToRPC(platformRelease *cores.PlatformRelease) *rpc.Platform {
+func PlatformReleaseToRPC(platformRelease *cores.PlatformRelease) *rpc.Platform {
 	boards := make([]*rpc.Board, len(platformRelease.Boards))
 	i := 0
 	for _, b := range platformRelease.Boards {

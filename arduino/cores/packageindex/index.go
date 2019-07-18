@@ -24,7 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/go-paths-helper"
-	"go.bug.st/relaxed-semver"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // Index represents Cores and Tools struct as seen from package_index.json file.
@@ -97,13 +97,13 @@ type indexHelp struct {
 
 // MergeIntoPackages converts the Index data into a cores.Packages and merge them
 // with the existing conents of the cores.Packages passed as parameter.
-func (index Index) MergeIntoPackages(outPackages *cores.Packages) {
+func (index Index) MergeIntoPackages(outPackages cores.Packages) {
 	for _, inPackage := range index.Packages {
 		inPackage.extractPackageIn(outPackages)
 	}
 }
 
-func (inPackage indexPackage) extractPackageIn(outPackages *cores.Packages) {
+func (inPackage indexPackage) extractPackageIn(outPackages cores.Packages) {
 	outPackage := outPackages.GetOrCreatePackage(inPackage.Name)
 	outPackage.Maintainer = inPackage.Maintainer
 	outPackage.WebsiteURL = inPackage.WebsiteURL

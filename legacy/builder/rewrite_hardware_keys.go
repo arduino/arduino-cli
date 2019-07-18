@@ -46,7 +46,7 @@ func (s *RewriteHardwareKeys) Run(ctx *types.Context) error {
 	platformKeysRewrite := ctx.PlatformKeyRewrites
 	hardwareRewriteResults := ctx.HardwareRewriteResults
 
-	for _, aPackage := range packages.Packages {
+	for _, aPackage := range packages {
 		for _, platform := range aPackage.Platforms {
 			for _, platformRelease := range platform.Releases {
 				if platformRelease.Properties.Get(constants.REWRITING) != constants.REWRITING_DISABLED {
