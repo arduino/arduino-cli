@@ -52,7 +52,7 @@ func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 
-	if err := new(AdditionalSketchFilesCopier).Run(ctx); err != nil {
+	if err := bldr.SketchCopyAdditionalFiles(sk, ctx.SketchBuildPath.String()); err != nil {
 		return i18n.WrapError(err)
 	}
 
