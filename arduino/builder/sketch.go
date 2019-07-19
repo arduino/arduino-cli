@@ -39,8 +39,8 @@ func QuoteCppString(str string) string {
 	return "\"" + str + "\""
 }
 
-// SaveSketchItemCpp saves a preprocessed .cpp sketch file on disk
-func SaveSketchItemCpp(item *sketch.Item, buildPath string) error {
+// SketchSaveItemCpp saves a preprocessed .cpp sketch file on disk
+func SketchSaveItemCpp(item *sketch.Item, buildPath string) error {
 
 	sketchName := filepath.Base(item.Path)
 
@@ -57,10 +57,10 @@ func SaveSketchItemCpp(item *sketch.Item, buildPath string) error {
 	return nil
 }
 
-// LoadSketch collects all the files composing a sketch.
+// SketchLoad collects all the files composing a sketch.
 // The parameter `sketchPath` holds a path pointing to a single sketch file or a sketch folder,
 // the path must be absolute.
-func LoadSketch(sketchPath, buildPath string) (*sketch.Sketch, error) {
+func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 	stat, err := os.Stat(sketchPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to stat Sketch location")
@@ -133,8 +133,8 @@ func LoadSketch(sketchPath, buildPath string) (*sketch.Sketch, error) {
 	return sketch.New(sketchFolder, mainSketchFile, buildPath, files)
 }
 
-// MergeSketchSources merges all the source files included in a sketch
-func MergeSketchSources(sketch *sketch.Sketch) (int, string) {
+// SketchMergeSources merges all the source files included in a sketch
+func SketchMergeSources(sketch *sketch.Sketch) (int, string) {
 	lineOffset := 0
 	mergedSource := ""
 

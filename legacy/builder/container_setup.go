@@ -70,7 +70,7 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 	}
 
 	// load sketch
-	sketch, err := bldr.LoadSketch(sketchLocation.String(), ctx.BuildPath.String())
+	sketch, err := bldr.SketchLoad(sketchLocation.String(), ctx.BuildPath.String())
 	if err != nil {
 		return i18n.WrapError(err)
 	}

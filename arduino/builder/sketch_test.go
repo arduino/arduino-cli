@@ -38,7 +38,7 @@ func TestSaveSketch(t *testing.T) {
 		t.Fatalf("unable to read golden file %s: %v", sketchFile, err)
 	}
 
-	builder.SaveSketchItemCpp(&sketch.Item{Path: sketchName, Source: source}, tmp)
+	builder.SketchSaveItemCpp(&sketch.Item{Path: sketchName, Source: source}, tmp)
 
 	out, err := ioutil.ReadFile(filepath.Join(tmp, outName))
 	if err != nil {
@@ -52,7 +52,7 @@ func TestLoadSketchFolder(t *testing.T) {
 	// pass the path to the sketch folder
 	sketchPath := filepath.Join("testdata", t.Name())
 	mainFilePath := filepath.Join(sketchPath, t.Name()+".ino")
-	s, err := builder.LoadSketch(sketchPath, "")
+	s, err := builder.SketchLoad(sketchPath, "")
 	assert.Nil(t, err)
 	assert.NotNil(t, s)
 	assert.Equal(t, mainFilePath, s.MainFile.Path)
@@ -67,7 +67,7 @@ func TestLoadSketchFolder(t *testing.T) {
 
 	// pass the path to the main file
 	sketchPath = mainFilePath
-	s, err = builder.LoadSketch(sketchPath, "")
+	s, err = builder.SketchLoad(sketchPath, "")
 	assert.Nil(t, err)
 	assert.NotNil(t, s)
 	assert.Equal(t, mainFilePath, s.MainFile.Path)
@@ -82,18 +82,18 @@ func TestLoadSketchFolder(t *testing.T) {
 
 func TestLoadSketchFolderWrongMain(t *testing.T) {
 	sketchPath := filepath.Join("testdata", t.Name())
-	_, err := builder.LoadSketch(sketchPath, "")
+	_, err := builder.SketchLoad(sketchPath, "")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "unable to find the main sketch file")
 
-	_, err = builder.LoadSketch("does/not/exist", "")
+	_, err = builder.SketchLoad("does/not/exist", "")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "no such file or directory")
 }
 
 func TestMergeSketchSources(t *testing.T) {
 	// borrow the sketch from TestLoadSketchFolder to avoid boilerplate
-	s, err := builder.LoadSketch(filepath.Join("testdata", "TestLoadSketchFolder"), "")
+	s, err := builder.SketchLoad(filepath.Join("testdata", "TestLoadSketchFolder"), "")
 	assert.Nil(t, err)
 	assert.NotNil(t, s)
 
@@ -104,17 +104,17 @@ func TestMergeSketchSources(t *testing.T) {
 		t.Fatalf("unable to read golden file %s: %v", mergedPath, err)
 	}
 
-	offset, source := builder.MergeSketchSources(s)
+	offset, source := builder.SketchMergeSources(s)
 	assert.Equal(t, 2, offset)
 	assert.Equal(t, string(mergedBytes), source)
 }
 
 func TestMergeSketchSourcesArduinoIncluded(t *testing.T) {
-	s, err := builder.LoadSketch(filepath.Join("testdata", t.Name()), "")
+	s, err := builder.SketchLoad(filepath.Join("testdata", t.Name()), "")
 	assert.Nil(t, err)
 	assert.NotNil(t, s)
 
 	// ensure not to include Arduino.h when it's already there
-	_, source := builder.MergeSketchSources(s)
+	_, source := builder.SketchMergeSources(s)
 	assert.Equal(t, 1, strings.Count(source, "<Arduino.h>"))
 }

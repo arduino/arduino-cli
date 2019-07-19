@@ -68,7 +68,7 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 		}
 	}
 
-	if err := bldr.SaveSketchItemCpp(&sketch.Item{ctx.Sketch.MainFile.Name.String(), []byte(ctx.Source)}, ctx.SketchBuildPath.String()); err != nil {
+	if err := bldr.SketchSaveItemCpp(&sketch.Item{ctx.Sketch.MainFile.Name.String(), []byte(ctx.Source)}, ctx.SketchBuildPath.String()); err != nil {
 		return i18n.WrapError(err)
 	}
 
