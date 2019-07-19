@@ -18,17 +18,16 @@
 package core
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"sort"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -54,30 +53,29 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstance()
 	logrus.Info("Executing `arduino core list`")
 
-	resp, err := core.PlatformList(context.Background(), &rpc.PlatformListReq{
-		Instance:      instance,
-		UpdatableOnly: listFlags.updatableOnly,
-	})
+	platforms, err := core.GetPlatforms(instance.Id, listFlags.updatableOnly)
 	if err != nil {
 		formatter.PrintError(err, "Error listing platforms")
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	installed := resp.GetInstalledPlatform()
-	if installed != nil && len(installed) > 0 {
-		if output.JSONOrElse(installed) {
-			outputInstalledCores(installed)
-		}
+
+	if output.JSONOrElse(platforms) {
+		outputInstalledCores(platforms)
 	}
 }
 
-func outputInstalledCores(cores []*rpc.Platform) {
+func outputInstalledCores(platforms []*cores.PlatformRelease) {
+	if platforms == nil || len(platforms) == 0 {
+		return
+	}
+
 	table := output.NewTable()
 	table.AddRow("ID", "Installed", "Latest", "Name")
-	sort.Slice(cores, func(i, j int) bool {
-		return cores[i].ID < cores[j].ID
+	sort.Slice(platforms, func(i, j int) bool {
+		return platforms[i].Platform.String() < platforms[j].Platform.String()
 	})
-	for _, item := range cores {
-		table.AddRow(item.GetID(), item.GetInstalled(), item.GetLatest(), item.GetName())
+	for _, p := range platforms {
+		table.AddRow(p.Platform.String(), p.Version.String(), p.Platform.GetLatestRelease().Version.String(), p.Platform.Name)
 	}
 	fmt.Print(table.Render())
 }

@@ -19,6 +19,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -51,23 +52,50 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstance()
 	logrus.Info("Executing `arduino core upgrade`")
 
+	// if no platform was passed, upgrade allthethings
+	if len(args) == 0 {
+		targets, err := core.GetPlatforms(instance.Id, true)
+		if err != nil {
+			formatter.PrintError(err, "Error retrieving core list")
+			os.Exit(errorcodes.ErrGeneric)
+		}
+
+		if len(targets) == 0 {
+			formatter.PrintResult("All the cores are already at the latest version")
+			return
+		}
+
+		for _, t := range targets {
+			args = append(args, t.Platform.String())
+		}
+	}
+
+	// proceed upgrading, if anything is upgradable
+	exitErr := false
 	platformsRefs := parsePlatformReferenceArgs(args)
 	for i, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
 			formatter.PrintErrorMessage(("Invalid item " + args[i]))
-			os.Exit(errorcodes.ErrBadArgument)
+			exitErr = true
+			continue
 		}
-	}
-	for _, platformRef := range platformsRefs {
-		_, err := core.PlatformUpgrade(context.Background(), &rpc.PlatformUpgradeReq{
+
+		r := &rpc.PlatformUpgradeReq{
 			Instance:        instance,
 			PlatformPackage: platformRef.Package,
 			Architecture:    platformRef.Architecture,
-		}, output.ProgressBar(), output.TaskProgress(),
-			globals.HTTPClientHeader)
-		if err != nil {
+		}
+
+		_, err := core.PlatformUpgrade(context.Background(), r, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
+		if err == core.ErrAlreadyLatest {
+			formatter.PrintResult(fmt.Sprintf("Platform %s is already at the latest version", platformRef))
+		} else if err != nil {
 			formatter.PrintError(err, "Error during upgrade")
 			os.Exit(errorcodes.ErrGeneric)
 		}
+	}
+
+	if exitErr {
+		os.Exit(errorcodes.ErrBadArgument)
 	}
 }

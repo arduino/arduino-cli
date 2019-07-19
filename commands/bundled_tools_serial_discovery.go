@@ -30,7 +30,7 @@ import (
 var serialDiscoveryVersion = semver.ParseRelaxed("0.5.0")
 
 func loadBuiltinSerialDiscoveryMetadata(pm *packagemanager.PackageManager) {
-	builtinPackage := pm.GetPackages().GetOrCreatePackage("builtin")
+	builtinPackage := pm.Packages.GetOrCreatePackage("builtin")
 	ctagsTool := builtinPackage.GetOrCreateTool("serial-discovery")
 	ctagsRel := ctagsTool.GetOrCreateRelease(serialDiscoveryVersion)
 	ctagsRel.Flavors = []*cores.Flavor{

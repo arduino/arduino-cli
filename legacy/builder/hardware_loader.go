@@ -45,6 +45,6 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 		}
 		ctx.PackageManager = pm
 	}
-	ctx.Hardware = ctx.PackageManager.GetPackages()
+	ctx.Hardware = ctx.PackageManager.Packages
 	return nil
 }

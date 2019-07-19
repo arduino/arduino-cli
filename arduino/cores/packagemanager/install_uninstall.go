@@ -127,7 +127,7 @@ func (pm *PackageManager) UninstallTool(toolRelease *cores.ToolRelease) error {
 // passed as parameter
 func (pm *PackageManager) IsToolRequired(toolRelease *cores.ToolRelease) bool {
 	// Search in all installed platforms
-	for _, targetPackage := range pm.packages.Packages {
+	for _, targetPackage := range pm.Packages {
 		for _, platform := range targetPackage.Platforms {
 			if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
 				if platformRelease.RequiresToolRelease(toolRelease) {

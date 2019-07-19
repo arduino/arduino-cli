@@ -48,16 +48,22 @@ var instancesCount int32 = 1
 // instantiate as many as needed by providing a different configuration
 // for each one.
 type CoreInstance struct {
-	config      *configs.Configuration
-	pm          *packagemanager.PackageManager
-	lm          *librariesmanager.LibrariesManager
-	getLibOnly  bool
-	discoveries []*discovery.Discovery
+	config         *configs.Configuration
+	PackageManager *packagemanager.PackageManager
+	lm             *librariesmanager.LibrariesManager
+	getLibOnly     bool
+	discoveries    []*discovery.Discovery
 }
 
 // InstanceContainer FIXMEDOC
 type InstanceContainer interface {
 	GetInstance() *rpc.Instance
+}
+
+// GetInstance returns a CoreInstance for the given ID, or nil if ID
+// doesn't exist
+func GetInstance(id int32) *CoreInstance {
+	return instances[id]
 }
 
 // GetPackageManager FIXMEDOC
@@ -66,7 +72,7 @@ func GetPackageManager(req InstanceContainer) *packagemanager.PackageManager {
 	if !ok {
 		return nil
 	}
-	return i.pm
+	return i.PackageManager
 }
 
 // GetLibraryManager FIXMEDOC
@@ -93,11 +99,11 @@ func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, down
 		return false, nil
 	}
 	taskCB(&rpc.TaskProgress{Name: "Downloading missing tool " + tool.String()})
-	if err := DownloadToolRelease(instance.pm, tool, downloadCB, downloaderHeaders); err != nil {
+	if err := DownloadToolRelease(instance.PackageManager, tool, downloadCB, downloaderHeaders); err != nil {
 		return false, fmt.Errorf("downloading %s tool: %s", tool, err)
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
-	if err := InstallToolRelease(instance.pm, tool, taskCB); err != nil {
+	if err := InstallToolRelease(instance.PackageManager, tool, taskCB); err != nil {
 		return false, fmt.Errorf("installing %s tool: %s", tool, err)
 	}
 	return true, nil
@@ -106,21 +112,21 @@ func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, down
 func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB, taskCB TaskProgressCB,
 	downloaderHeaders http.Header) error {
 	// Check for ctags tool
-	ctags, _ := getBuiltinCtagsTool(instance.pm)
+	ctags, _ := getBuiltinCtagsTool(instance.PackageManager)
 	ctagsInstalled, err := instance.installToolIfMissing(ctags, downloadCB, taskCB, downloaderHeaders)
 	if err != nil {
 		return err
 	}
 
 	// Check for bultin serial-discovery tool
-	serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(instance.pm)
+	serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(instance.PackageManager)
 	serialDiscoveryInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCB, taskCB, downloaderHeaders)
 	if err != nil {
 		return err
 	}
 
 	if ctagsInstalled || serialDiscoveryInstalled {
-		if err := instance.pm.LoadHardware(instance.config); err != nil {
+		if err := instance.PackageManager.LoadHardware(instance.config); err != nil {
 			return fmt.Errorf("could not load hardware packages: %s", err)
 		}
 	}
@@ -128,14 +134,14 @@ func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB
 }
 
 func (instance *CoreInstance) startDiscoveries() error {
-	serialDiscovery, err := newBuiltinSerialDiscovery(instance.pm)
+	serialDiscovery, err := newBuiltinSerialDiscovery(instance.PackageManager)
 	if err != nil {
 		return fmt.Errorf("starting serial discovery: %s", err)
 	}
 
 	discoveriesToStop := instance.discoveries
 	discoveriesToStart := append(
-		discovery.ExtractDiscoveriesFromPlatforms(instance.pm),
+		discovery.ExtractDiscoveriesFromPlatforms(instance.PackageManager),
 		serialDiscovery,
 	)
 
@@ -182,10 +188,10 @@ func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, 
 		return nil, fmt.Errorf("cannot initialize package manager: %s", err)
 	}
 	instance := &CoreInstance{
-		config:     config,
-		pm:         pm,
-		lm:         lm,
-		getLibOnly: req.GetLibraryManagerOnly()}
+		config:         config,
+		PackageManager: pm,
+		lm:             lm,
+		getLibOnly:     req.GetLibraryManagerOnly()}
 	handle := instancesCount
 	instancesCount++
 	instances[handle] = instance
@@ -305,7 +311,7 @@ func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
 	if err != nil {
 		return nil, fmt.Errorf("rescanning filesystem: %s", err)
 	}
-	coreInstance.pm = pm
+	coreInstance.PackageManager = pm
 	coreInstance.lm = lm
 
 	coreInstance.startDiscoveries()
@@ -357,7 +363,7 @@ func createInstance(ctx context.Context, config *configs.Configuration, getLibOn
 
 	// Add libraries dirs from installed platforms
 	if pm != nil {
-		for _, targetPackage := range pm.GetPackages().Packages {
+		for _, targetPackage := range pm.Packages {
 			for _, platform := range targetPackage.Platforms {
 				if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
 					lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)

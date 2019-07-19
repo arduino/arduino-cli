@@ -45,7 +45,7 @@ func PlatformSearch(ctx context.Context, req *rpc.PlatformSearchReq) (*rpc.Platf
 		match := func(line string) bool {
 			return strings.Contains(strings.ToLower(line), search)
 		}
-		for _, targetPackage := range pm.GetPackages().Packages {
+		for _, targetPackage := range pm.Packages {
 			for _, platform := range targetPackage.Platforms {
 				platformRelease := platform.GetLatestRelease()
 				if platformRelease == nil {
@@ -67,7 +67,7 @@ func PlatformSearch(ctx context.Context, req *rpc.PlatformSearchReq) (*rpc.Platf
 
 	out := make([]*rpc.Platform, len(res))
 	for i, platformRelease := range res {
-		out[i] = platformReleaseToRPC(platformRelease)
+		out[i] = PlatformReleaseToRPC(platformRelease)
 	}
 	return &rpc.PlatformSearchResp{SearchOutput: out}, nil
 }

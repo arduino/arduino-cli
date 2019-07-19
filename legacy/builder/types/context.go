@@ -39,7 +39,7 @@ type Context struct {
 	BuildOptionsJsonPrevious string
 
 	PackageManager *packagemanager.PackageManager
-	Hardware       *cores.Packages
+	Hardware       cores.Packages
 	AllTools       []*cores.ToolRelease
 	RequiredTools  []*cores.ToolRelease
 	TargetBoard    *cores.Board

@@ -90,7 +90,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 		var variantPlatformRelease *cores.PlatformRelease
 		variantParts := strings.Split(variant, ":")
 		if len(variantParts) > 1 {
-			variantPlatform := packages.Packages[variantParts[0]].Platforms[targetPlatform.Platform.Architecture]
+			variantPlatform := packages[variantParts[0]].Platforms[targetPlatform.Platform.Architecture]
 			variantPlatformRelease = ctx.PackageManager.GetInstalledPlatformRelease(variantPlatform)
 			variant = variantParts[1]
 		} else {

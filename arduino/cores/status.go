@@ -25,15 +25,11 @@ import (
 )
 
 // Packages represents a set of Packages
-type Packages struct {
-	Packages map[string]*Package // Maps packager name to Package
-}
+type Packages map[string]*Package // Maps packager name to Package
 
 // NewPackages creates a new Packages object
-func NewPackages() *Packages {
-	return &Packages{
-		Packages: map[string]*Package{},
-	}
+func NewPackages() Packages {
+	return map[string]*Package{}
 }
 
 // Package represents a package in the system.
@@ -44,13 +40,13 @@ type Package struct {
 	Email      string               // Email of maintainer.
 	Platforms  map[string]*Platform // The platforms in the system.
 	Tools      map[string]*Tool     // The tools in the system.
-	Packages   *Packages            `json:"-"`
+	Packages   Packages             `json:"-"`
 }
 
 // GetOrCreatePackage returns the specified Package or create an empty one
 // filling all the cross-references
-func (packages *Packages) GetOrCreatePackage(packager string) *Package {
-	if targetPackage, ok := packages.Packages[packager]; ok {
+func (packages Packages) GetOrCreatePackage(packager string) *Package {
+	if targetPackage, ok := packages[packager]; ok {
 		return targetPackage
 	}
 	targetPackage := &Package{
@@ -59,20 +55,44 @@ func (packages *Packages) GetOrCreatePackage(packager string) *Package {
 		Tools:     map[string]*Tool{},
 		Packages:  packages,
 	}
-	packages.Packages[packager] = targetPackage
+	packages[packager] = targetPackage
 	return targetPackage
 }
 
 // Names returns the array containing the name of the packages.
-func (packages *Packages) Names() []string {
-	res := make([]string, len(packages.Packages))
+func (packages Packages) Names() []string {
+	res := make([]string, len(packages))
 	i := 0
-	for n := range packages.Packages {
+	for n := range packages {
 		res[i] = n
 		i++
 	}
 	sortutil.CiAsc(res)
 	return res
+}
+
+// GetDepsOfPlatformRelease returns the deps of a specified release of a core.
+func (packages Packages) GetDepsOfPlatformRelease(release *PlatformRelease) ([]*ToolRelease, error) {
+	if release == nil {
+		return nil, errors.New("release cannot be nil")
+	}
+	ret := []*ToolRelease{}
+	for _, dep := range release.Dependencies {
+		pkg, exists := packages[dep.ToolPackager]
+		if !exists {
+			return nil, fmt.Errorf("package %s not found", dep.ToolPackager)
+		}
+		tool, exists := pkg.Tools[dep.ToolName]
+		if !exists {
+			return nil, fmt.Errorf("tool %s not found", dep.ToolName)
+		}
+		toolRelease, exists := tool.Releases[dep.ToolVersion.String()]
+		if !exists {
+			return nil, fmt.Errorf("tool version %s not found", dep.ToolVersion)
+		}
+		ret = append(ret, toolRelease)
+	}
+	return ret, nil
 }
 
 // GetOrCreatePlatform returns the Platform object with the specified architecture
@@ -110,7 +130,7 @@ func (targetPackage *Package) String() string {
 }
 
 func (tdep ToolDependency) extractTool(sc Packages) (*Tool, error) {
-	pkg, exists := sc.Packages[tdep.ToolPackager]
+	pkg, exists := sc[tdep.ToolPackager]
 	if !exists {
 		return nil, errors.New("package not found")
 	}
@@ -131,28 +151,4 @@ func (tdep ToolDependency) extractRelease(sc Packages) (*ToolRelease, error) {
 		return nil, errors.New("release not found")
 	}
 	return release, nil
-}
-
-// GetDepsOfPlatformRelease returns the deps of a specified release of a core.
-func (packages *Packages) GetDepsOfPlatformRelease(release *PlatformRelease) ([]*ToolRelease, error) {
-	if release == nil {
-		return nil, errors.New("release cannot be nil")
-	}
-	ret := []*ToolRelease{}
-	for _, dep := range release.Dependencies {
-		pkg, exists := packages.Packages[dep.ToolPackager]
-		if !exists {
-			return nil, fmt.Errorf("package %s not found", dep.ToolPackager)
-		}
-		tool, exists := pkg.Tools[dep.ToolName]
-		if !exists {
-			return nil, fmt.Errorf("tool %s not found", dep.ToolName)
-		}
-		toolRelease, exists := tool.Releases[dep.ToolVersion.String()]
-		if !exists {
-			return nil, fmt.Errorf("tool version %s not found", dep.ToolVersion)
-		}
-		ret = append(ret, toolRelease)
-	}
-	return ret, nil
 }

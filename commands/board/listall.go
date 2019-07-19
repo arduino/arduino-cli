@@ -48,7 +48,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllRe
 	}
 
 	list := &rpc.BoardListAllResp{Boards: []*rpc.BoardListItem{}}
-	for _, targetPackage := range pm.GetPackages().Packages {
+	for _, targetPackage := range pm.Packages {
 		for _, platform := range targetPackage.Platforms {
 			platformRelease := pm.GetInstalledPlatformRelease(platform)
 			if platformRelease == nil {

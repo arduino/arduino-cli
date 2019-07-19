@@ -93,7 +93,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		uploadToolPattern = split[1]
 		architecture := board.PlatformRelease.Platform.Architecture
 
-		if referencedPackage := pm.GetPackages().Packages[referencedPackageName]; referencedPackage == nil {
+		if referencedPackage := pm.Packages[referencedPackageName]; referencedPackage == nil {
 			return nil, fmt.Errorf("required platform %s:%s not installed", referencedPackageName, architecture)
 		} else if referencedPlatform := referencedPackage.Platforms[architecture]; referencedPlatform == nil {
 			return nil, fmt.Errorf("required platform %s:%s not installed", referencedPackageName, architecture)

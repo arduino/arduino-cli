@@ -28,6 +28,12 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
+var (
+	// ErrAlreadyLatest is returned when an upgrade is not possible because
+	// already at latest version.
+	ErrAlreadyLatest = errors.New("platform already at latest version")
+)
+
 // PlatformUpgrade FIXMEDOC
 func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) (*rpc.PlatformUpgradeResp, error) {
@@ -71,7 +77,7 @@ func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 	}
 	latest := platform.GetLatestRelease()
 	if !latest.Version.GreaterThan(installed.Version) {
-		return fmt.Errorf("platform %s is already at the latest version", platformRef)
+		return ErrAlreadyLatest
 	}
 	platformRef.PlatformVersion = latest.Version
 	toInstallRefs = append(toInstallRefs, platformRef)
