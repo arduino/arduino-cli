@@ -16,6 +16,7 @@
 package builder
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -40,15 +41,15 @@ func QuoteCppString(str string) string {
 }
 
 // SketchSaveItemCpp saves a preprocessed .cpp sketch file on disk
-func SketchSaveItemCpp(item *sketch.Item, buildPath string) error {
+func SketchSaveItemCpp(item *sketch.Item, destPath string) error {
 
 	sketchName := filepath.Base(item.Path)
 
-	if err := os.MkdirAll(buildPath, os.FileMode(0755)); err != nil {
+	if err := os.MkdirAll(destPath, os.FileMode(0755)); err != nil {
 		return errors.Wrap(err, "unable to create a folder to save the sketch")
 	}
 
-	destFile := filepath.Join(buildPath, sketchName+".cpp")
+	destFile := filepath.Join(destPath, sketchName+".cpp")
 
 	if err := ioutil.WriteFile(destFile, item.Source, os.FileMode(0644)); err != nil {
 		return errors.Wrap(err, "unable to save the sketch on disk")
@@ -154,4 +155,61 @@ func SketchMergeSources(sketch *sketch.Sketch) (int, string) {
 	}
 
 	return lineOffset, mergedSource
+}
+
+// SketchCopyAdditionalFiles copies the additional files for a sketch to the
+// specified destination directory.
+func SketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath string) error {
+	if err := os.MkdirAll(destPath, os.FileMode(0755)); err != nil {
+		return errors.Wrap(err, "unable to create a folder to save the sketch files")
+	}
+
+	for _, item := range sketch.AdditionalFiles {
+		relpath, err := filepath.Rel(sketch.LocationPath, item.Path)
+		if err != nil {
+			return errors.Wrap(err, "unable to compute relative path to the sketch for the item")
+		}
+
+		targetPath := filepath.Join(destPath, relpath)
+		// create the directory containing the target
+		if err = os.MkdirAll(filepath.Dir(targetPath), os.FileMode(0755)); err != nil {
+			return errors.Wrap(err, "unable to create the folder containing the item")
+		}
+
+		err = writeIfDifferent(item.Path, targetPath)
+		if err != nil {
+			return errors.Wrap(err, "unable to write to destination file")
+		}
+	}
+
+	return nil
+}
+
+func writeIfDifferent(sourcePath, destPath string) error {
+	// read the source file
+	newbytes, err := ioutil.ReadFile(sourcePath)
+	if err != nil {
+		return errors.Wrap(err, "unable to read contents of the source item")
+	}
+
+	// check whether the destination file exists
+	_, err = os.Stat(destPath)
+	if os.IsNotExist(err) {
+		// write directly
+		return ioutil.WriteFile(destPath, newbytes, os.FileMode(0644))
+	}
+
+	// read the destination file if it ex
+	existingBytes, err := ioutil.ReadFile(destPath)
+	if err != nil {
+		return errors.Wrap(err, "unable to read contents of the destination item")
+	}
+
+	// overwrite if contents are different
+	if bytes.Compare(existingBytes, newbytes) != 0 {
+		return ioutil.WriteFile(destPath, newbytes, os.FileMode(0644))
+	}
+
+	// source and destination are the same, don't write anything
+	return nil
 }

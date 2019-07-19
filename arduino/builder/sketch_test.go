@@ -16,6 +16,7 @@
 package builder_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -24,7 +25,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSaveSketch(t *testing.T) {
@@ -45,7 +46,7 @@ func TestSaveSketch(t *testing.T) {
 		t.Fatalf("unable to read output file %s: %v", outName, err)
 	}
 
-	assert.Equal(t, source, out)
+	require.Equal(t, source, out)
 }
 
 func TestLoadSketchFolder(t *testing.T) {
@@ -53,49 +54,49 @@ func TestLoadSketchFolder(t *testing.T) {
 	sketchPath := filepath.Join("testdata", t.Name())
 	mainFilePath := filepath.Join(sketchPath, t.Name()+".ino")
 	s, err := builder.SketchLoad(sketchPath, "")
-	assert.Nil(t, err)
-	assert.NotNil(t, s)
-	assert.Equal(t, mainFilePath, s.MainFile.Path)
-	assert.Equal(t, sketchPath, s.LocationPath)
-	assert.Len(t, s.OtherSketchFiles, 2)
-	assert.Equal(t, "old.pde", filepath.Base(s.OtherSketchFiles[0].Path))
-	assert.Equal(t, "other.ino", filepath.Base(s.OtherSketchFiles[1].Path))
-	assert.Len(t, s.AdditionalFiles, 3)
-	assert.Equal(t, "header.h", filepath.Base(s.AdditionalFiles[0].Path))
-	assert.Equal(t, "s_file.S", filepath.Base(s.AdditionalFiles[1].Path))
-	assert.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
+	require.Nil(t, err)
+	require.NotNil(t, s)
+	require.Equal(t, mainFilePath, s.MainFile.Path)
+	require.Equal(t, sketchPath, s.LocationPath)
+	require.Len(t, s.OtherSketchFiles, 2)
+	require.Equal(t, "old.pde", filepath.Base(s.OtherSketchFiles[0].Path))
+	require.Equal(t, "other.ino", filepath.Base(s.OtherSketchFiles[1].Path))
+	require.Len(t, s.AdditionalFiles, 3)
+	require.Equal(t, "header.h", filepath.Base(s.AdditionalFiles[0].Path))
+	require.Equal(t, "s_file.S", filepath.Base(s.AdditionalFiles[1].Path))
+	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
 
 	// pass the path to the main file
 	sketchPath = mainFilePath
 	s, err = builder.SketchLoad(sketchPath, "")
-	assert.Nil(t, err)
-	assert.NotNil(t, s)
-	assert.Equal(t, mainFilePath, s.MainFile.Path)
-	assert.Len(t, s.OtherSketchFiles, 2)
-	assert.Equal(t, "old.pde", filepath.Base(s.OtherSketchFiles[0].Path))
-	assert.Equal(t, "other.ino", filepath.Base(s.OtherSketchFiles[1].Path))
-	assert.Len(t, s.AdditionalFiles, 3)
-	assert.Equal(t, "header.h", filepath.Base(s.AdditionalFiles[0].Path))
-	assert.Equal(t, "s_file.S", filepath.Base(s.AdditionalFiles[1].Path))
-	assert.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
+	require.Nil(t, err)
+	require.NotNil(t, s)
+	require.Equal(t, mainFilePath, s.MainFile.Path)
+	require.Len(t, s.OtherSketchFiles, 2)
+	require.Equal(t, "old.pde", filepath.Base(s.OtherSketchFiles[0].Path))
+	require.Equal(t, "other.ino", filepath.Base(s.OtherSketchFiles[1].Path))
+	require.Len(t, s.AdditionalFiles, 3)
+	require.Equal(t, "header.h", filepath.Base(s.AdditionalFiles[0].Path))
+	require.Equal(t, "s_file.S", filepath.Base(s.AdditionalFiles[1].Path))
+	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
 }
 
 func TestLoadSketchFolderWrongMain(t *testing.T) {
 	sketchPath := filepath.Join("testdata", t.Name())
 	_, err := builder.SketchLoad(sketchPath, "")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "unable to find the main sketch file")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "unable to find the main sketch file")
 
 	_, err = builder.SketchLoad("does/not/exist", "")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "no such file or directory")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "no such file or directory")
 }
 
 func TestMergeSketchSources(t *testing.T) {
 	// borrow the sketch from TestLoadSketchFolder to avoid boilerplate
 	s, err := builder.SketchLoad(filepath.Join("testdata", "TestLoadSketchFolder"), "")
-	assert.Nil(t, err)
-	assert.NotNil(t, s)
+	require.Nil(t, err)
+	require.NotNil(t, s)
 
 	// load expected result
 	mergedPath := filepath.Join("testdata", t.Name()+".txt")
@@ -105,16 +106,50 @@ func TestMergeSketchSources(t *testing.T) {
 	}
 
 	offset, source := builder.SketchMergeSources(s)
-	assert.Equal(t, 2, offset)
-	assert.Equal(t, string(mergedBytes), source)
+	require.Equal(t, 2, offset)
+	require.Equal(t, string(mergedBytes), source)
 }
 
 func TestMergeSketchSourcesArduinoIncluded(t *testing.T) {
 	s, err := builder.SketchLoad(filepath.Join("testdata", t.Name()), "")
-	assert.Nil(t, err)
-	assert.NotNil(t, s)
+	require.Nil(t, err)
+	require.NotNil(t, s)
 
 	// ensure not to include Arduino.h when it's already there
 	_, source := builder.SketchMergeSources(s)
-	assert.Equal(t, 1, strings.Count(source, "<Arduino.h>"))
+	require.Equal(t, 1, strings.Count(source, "<Arduino.h>"))
+}
+
+func TestCopyAdditionalFiles(t *testing.T) {
+	tmp := tmpDirOrDie()
+	defer os.RemoveAll(tmp)
+
+	// load the golden sketch
+	s1, err := builder.SketchLoad(filepath.Join("testdata", t.Name()), "")
+	require.Nil(t, err)
+	require.Len(t, s1.AdditionalFiles, 1)
+
+	// copy the sketch over, create a fake main file we don't care about it
+	// but we need it for `SketchLoad` to suceed later
+	err = builder.SketchCopyAdditionalFiles(s1, tmp)
+	require.Nil(t, err)
+	fakeIno := filepath.Join(tmp, fmt.Sprintf("%s.ino", filepath.Base(tmp)))
+	require.Nil(t, ioutil.WriteFile(fakeIno, []byte{}, os.FileMode(0644)))
+
+	// compare
+	s2, err := builder.SketchLoad(tmp, "")
+	require.Nil(t, err)
+	require.Len(t, s2.AdditionalFiles, 1)
+
+	// save file info
+	info1, err := os.Stat(s2.AdditionalFiles[0].Path)
+	require.Nil(t, err)
+
+	// copy again
+	err = builder.SketchCopyAdditionalFiles(s1, tmp)
+	require.Nil(t, err)
+
+	// verify file hasn't changed
+	info2, err := os.Stat(s2.AdditionalFiles[0].Path)
+	require.Equal(t, info1.ModTime(), info2.ModTime())
 }
