@@ -20,12 +20,13 @@ tasks:
   test-unit:
     desc: Run unit tests only
     cmds:
-      - go test -short {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }}
+      - go test -short {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }} {{.TEST_LDFLAGS}}
 
   test-integration:
     desc: Run integration tests only
     cmds:
       - go test -run Integration {{ default "-v" .GOFLAGS }} -coverprofile=coverage_integ.txt {{ default .DEFAULT_TARGETS .TARGETS }} {{.TEST_LDFLAGS}}
+      - pytest test/
 
   test-legacy:
     desc: Run tests for the `legacy` package
