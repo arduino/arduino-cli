@@ -21,7 +21,7 @@ steps:
     - task test
     - task test-legacy
 
-- name: test
+- name: integration
   image: arduino/arduino-cli:drone-0.2.0
   failure: ignore  # work in progress, we know some tests will fail at the moment
   commands:
