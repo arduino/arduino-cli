@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PROTOBUF_VER 3.8.0
+ENV PATH="/miniconda/bin:${PATH}"
 
 # NOTE: most of the following assume WORDKIR is '/'
 RUN set -ex \
@@ -24,4 +25,7 @@ RUN set -ex \
     && cp ./bin/* /bin/  \
     # protoc will search for default includes in the path of the binary
     && cp -r ./include /bin/ \
-    && cd .. &&  rm -rf protobuf
+    && cd .. &&  rm -rf protobuf \
+    # Install a recent version of Python
+    && curl -o $HOME/miniconda.sh -LO https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    && chmod +x $HOME/miniconda.sh  && bash ~/miniconda.sh -b -p /miniconda && rm -f $HOME/miniconda.sh
