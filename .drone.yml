@@ -3,7 +3,7 @@ name: default
 
 steps:
 - name: lint
-  image: arduino/arduino-cli:drone-0.2.0
+  image: arduino/arduino-cli:drone-1.0
   commands:
     # Check if the Go code is properly formatted and run the linter
     - task check
@@ -20,6 +20,12 @@ steps:
   commands:
     - task test
     - task test-legacy
+
+- name: test
+  image: arduino/arduino-cli:drone-0.2.0
+  failure: ignore  # work in progress, we know some tests will fail at the moment
+  commands:
+    - task test-integration
 
 # Contrary to other CI platforms, uploading reports to Codecov requires Drone to provide a token.
 # To avoid exposing the Codecov token to external PRs, we only upload coverage when we merge on
