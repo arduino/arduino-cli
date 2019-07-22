@@ -288,33 +288,6 @@ func TestUploadIntegration(t *testing.T) {
 	require.NotZero(t, exitCode)
 }
 
-func TestLibSearchIntegration(t *testing.T) {
-	exitCode, output := executeWithArgs("lib", "search", "audiozer", "--format", "json")
-	require.Zero(t, exitCode)
-	var res struct {
-		Libraries []struct {
-			Name string
-		}
-	}
-	err := json.Unmarshal(output, &res)
-	require.NoError(t, err, "decoding json output")
-	require.NotNil(t, res.Libraries)
-	require.Len(t, res.Libraries, 1)
-	require.Equal(t, res.Libraries[0].Name, "AudioZero")
-
-	exitCode, output = executeWithArgs("lib", "search", "audiozero", "--names")
-	require.Zero(t, exitCode, "process exit code")
-	require.Equal(t, "AudioZero\n", string(output))
-
-	exitCode, output = executeWithArgs("lib", "search", "audiozer", "--names")
-	require.Zero(t, exitCode, "process exit code")
-	require.Equal(t, "AudioZero\n", string(output))
-
-	exitCode, output = executeWithArgs("lib", "search", "audiozerooooo", "--names")
-	require.Zero(t, exitCode, "process exit code")
-	require.Equal(t, "", string(output))
-}
-
 func TestLibUserIntegration(t *testing.T) {
 	// source of test custom libs
 	libDir := filepath.Join("testdata", "libs")
