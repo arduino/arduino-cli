@@ -25,6 +25,7 @@ steps:
   image: arduino/arduino-cli:drone-0.2.0
   failure: ignore  # work in progress, we know some tests will fail at the moment
   commands:
+    - pip install -r test/requirements.txt
     - task test-integration
 
 # Contrary to other CI platforms, uploading reports to Codecov requires Drone to provide a token.
