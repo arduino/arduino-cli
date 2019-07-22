@@ -24,15 +24,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestIntegrationBuildInjectedInfo is an integration test that aims to test the Info strings passed to the binary at build time
+// TestBuildInjectedInfo tests the Info strings passed to the binary at build time
 // in order to have this test green launch your testing using the provided task (see /Taskfile.yml) or use:
-//     go test -run Integration -v ./... -ldflags '
+//     go test -run TestBuildInjectedInfo -v ./... -ldflags '
 //       -X github.com/arduino/arduino-cli/version.versionString=0.0.0-test.preview
 //       -X github.com/arduino/arduino-cli/version.commit=deadbeef'
-func TestIntegrationBuildInjectedInfo(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skip integration test")
-	}
+func TestBuildInjectedInfo(t *testing.T) {
 	goldenAppName := "arduino-cli"
 	goldenInfo := Info{
 		Application:   goldenAppName,
