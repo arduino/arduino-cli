@@ -33,11 +33,14 @@ def test_command_help():
 
 
 def test_command_lib_list():
+    """
+    When ouput is empty, nothing is printed out, no matter the output format
+    """
     result = run_command('lib list')
     assert result.ok
-    assert result.stderr == ''
+    assert '' == result.stderr
     result = run_command('lib list', '--format json')
-    assert '{}' == result.stdout
+    assert '' == result.stdout
 
 
 def test_command_lib_install():
