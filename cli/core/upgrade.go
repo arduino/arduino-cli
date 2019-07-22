@@ -72,7 +72,12 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 	// proceed upgrading, if anything is upgradable
 	exitErr := false
-	platformsRefs := parsePlatformReferenceArgs(args)
+	platformsRefs, err := globals.ParseReferenceArgs(args, true)
+	if err != nil {
+		formatter.PrintError(err, "Invalid argument passed")
+		os.Exit(errorcodes.ErrBadArgument)
+	}
+
 	for i, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
 			formatter.PrintErrorMessage(("Invalid item " + args[i]))
@@ -82,7 +87,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 		r := &rpc.PlatformUpgradeReq{
 			Instance:        instance,
-			PlatformPackage: platformRef.Package,
+			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 		}
 

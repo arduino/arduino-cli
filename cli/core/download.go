@@ -50,11 +50,16 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstance()
 	logrus.Info("Executing `arduino core download`")
 
-	platformsRefs := parsePlatformReferenceArgs(args)
+	platformsRefs, err := globals.ParseReferenceArgs(args, true)
+	if err != nil {
+		formatter.PrintError(err, "Invalid argument passed")
+		os.Exit(errorcodes.ErrBadArgument)
+	}
+
 	for i, platformRef := range platformsRefs {
 		platformDownloadreq := &rpc.PlatformDownloadReq{
 			Instance:        instance,
-			PlatformPackage: platformRef.Package,
+			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
 		}

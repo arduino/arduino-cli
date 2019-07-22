@@ -21,8 +21,8 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
@@ -48,17 +48,17 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib uninstall`")
 
 	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
-	libRefs, err := librariesindex.ParseArgs(args)
+	refs, err := globals.ParseReferenceArgs(args, false)
 	if err != nil {
-		formatter.PrintError(err, "Arguments error")
+		formatter.PrintError(err, "Invalid argument passed")
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
-	for _, library := range libRefs {
+	for _, library := range refs {
 		err := lib.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{
 			Instance: instance,
-			Name:     library.Name,
-			Version:  library.Version.String(),
+			Name:     library.PackageName,
+			Version:  library.Version,
 		}, output.TaskProgress())
 		if err != nil {
 			formatter.PrintError(err, "Error uninstalling "+library.String())

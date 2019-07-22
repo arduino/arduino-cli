@@ -51,12 +51,16 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstance()
 	logrus.Info("Executing `arduino core install`")
 
-	platformsRefs := parsePlatformReferenceArgs(args)
+	platformsRefs, err := globals.ParseReferenceArgs(args, true)
+	if err != nil {
+		formatter.PrintError(err, "Invalid argument passed")
+		os.Exit(errorcodes.ErrBadArgument)
+	}
 
 	for _, platformRef := range platformsRefs {
 		plattformInstallReq := &rpc.PlatformInstallReq{
 			Instance:        instance,
-			PlatformPackage: platformRef.Package,
+			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
 		}

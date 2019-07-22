@@ -21,7 +21,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -48,16 +47,17 @@ func initInstallCommand() *cobra.Command {
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
-	refs, err := librariesindex.ParseArgs(args)
+	refs, err := globals.ParseReferenceArgs(args, false)
 	if err != nil {
 		formatter.PrintError(err, "Arguments error")
 		os.Exit(errorcodes.ErrBadArgument)
 	}
+
 	for _, library := range refs {
 		libraryInstallReq := &rpc.LibraryInstallReq{
 			Instance: instance,
-			Name:     library.Name,
-			Version:  library.Version.String(),
+			Name:     library.PackageName,
+			Version:  library.Version,
 		}
 		err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.ProgressBar(),
 			output.TaskProgress(), globals.HTTPClientHeader)

@@ -18,6 +18,7 @@
 package librariesmanager
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
@@ -26,18 +27,26 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 )
 
+var (
+	// ErrAlreadyInstalled is returned when a library is already installed and task
+	// cannot proceed.
+	ErrAlreadyInstalled = errors.New("library already installed")
+)
+
 // InstallPrerequisiteCheck performs prequisite checks to install a library. It returns the
 // install path, where the library should be installed and the possible library that is already
 // installed on the same folder and it's going to be replaced by the new one.
 func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesindex.Release) (*paths.Path, *libraries.Library, error) {
+	saneName := utils.SanitizeName(indexLibrary.Library.Name)
+
 	var replaced *libraries.Library
-	if installedLibs, have := lm.Libraries[indexLibrary.Library.Name]; have {
+	if installedLibs, have := lm.Libraries[saneName]; have {
 		for _, installedLib := range installedLibs.Alternatives {
 			if installedLib.Location != libraries.Sketchbook {
 				continue
 			}
 			if installedLib.Version.Equal(indexLibrary.Version) {
-				return installedLib.InstallDir, nil, fmt.Errorf("%s is already installed", indexLibrary.String())
+				return installedLib.InstallDir, nil, ErrAlreadyInstalled
 			}
 			replaced = installedLib
 		}
@@ -48,7 +57,7 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 		return nil, nil, fmt.Errorf("sketchbook directory not set")
 	}
 
-	libPath := libsDir.Join(utils.SanitizeName(indexLibrary.Library.Name))
+	libPath := libsDir.Join(saneName)
 	if replaced != nil && replaced.InstallDir.EquivalentTo(libPath) {
 
 	} else if libPath.IsDir() {
