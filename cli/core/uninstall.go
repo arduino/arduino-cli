@@ -22,6 +22,7 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
@@ -46,7 +47,11 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstance()
 	logrus.Info("Executing `arduino core uninstall`")
 
-	platformsRefs := parsePlatformReferenceArgs(args)
+	platformsRefs, err := globals.ParseReferenceArgs(args, true)
+	if err != nil {
+		formatter.PrintError(err, "Invalid argument passed")
+		os.Exit(errorcodes.ErrBadArgument)
+	}
 
 	for _, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
@@ -57,7 +62,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	for _, platformRef := range platformsRefs {
 		_, err := core.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
 			Instance:        instance,
-			PlatformPackage: platformRef.Package,
+			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 		}, output.NewTaskProgressCB())
 		if err != nil {

@@ -18,9 +18,6 @@
 package librariesindex
 
 import (
-	"fmt"
-	"strings"
-
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -35,24 +32,4 @@ func (r *Reference) String() string {
 		return r.Name
 	}
 	return r.Name + "@" + r.Version.String()
-}
-
-// ParseArgs parses a sequence of "item@version" tokens and returns a Name-Version slice.
-//
-// If version is not present it is assumed as "latest" version.
-func ParseArgs(args []string) ([]*Reference, error) {
-	res := []*Reference{}
-	for _, item := range args {
-		tokens := strings.SplitN(item, "@", 2)
-		if len(tokens) == 2 {
-			version, err := semver.Parse(tokens[1])
-			if err != nil {
-				return nil, fmt.Errorf("invalid version %s: %s", version, err)
-			}
-			res = append(res, &Reference{Name: tokens[0], Version: version})
-		} else {
-			res = append(res, &Reference{Name: tokens[0]})
-		}
-	}
-	return res, nil
 }

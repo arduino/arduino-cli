@@ -21,7 +21,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -48,16 +47,17 @@ func initDownloadCommand() *cobra.Command {
 
 func runDownloadCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
-	pairs, err := librariesindex.ParseArgs(args)
+	refs, err := globals.ParseReferenceArgs(args, false)
 	if err != nil {
-		formatter.PrintError(err, "Arguments error")
+		formatter.PrintError(err, "Invalid argument passed")
 		os.Exit(errorcodes.ErrBadArgument)
 	}
-	for _, library := range pairs {
+
+	for _, library := range refs {
 		libraryDownloadReq := &rpc.LibraryDownloadReq{
 			Instance: instance,
-			Name:     library.Name,
-			Version:  library.Version.String(),
+			Name:     library.PackageName,
+			Version:  library.Version,
 		}
 		_, err := lib.LibraryDownload(context.Background(), libraryDownloadReq, output.ProgressBar(),
 			globals.HTTPClientHeader)
