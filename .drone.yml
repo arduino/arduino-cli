@@ -11,18 +11,18 @@ steps:
     - task protoc
 
 - name: build
-  image: arduino/arduino-cli:drone-0.2.0
+  image: arduino/arduino-cli:drone-1.0
   commands:
     - task build
 
 - name: test
-  image: arduino/arduino-cli:drone-0.2.0
+  image: arduino/arduino-cli:drone-1.0
   commands:
     - task test-unit
     - task test-legacy
 
 - name: integration
-  image: arduino/arduino-cli:drone-0.2.0
+  image: arduino/arduino-cli:drone-1.0
   failure: ignore  # work in progress, we know some tests will fail at the moment
   commands:
     - pip install -r test/requirements.txt
@@ -32,7 +32,7 @@ steps:
 # To avoid exposing the Codecov token to external PRs, we only upload coverage when we merge on
 # `master`.
 - name: coverage
-  image: arduino/arduino-cli:drone-0.2.0
+  image: arduino/arduino-cli:drone-1.0
   environment:
     CODECOV_TOKEN:
       from_secret: codecov_token
