@@ -58,16 +58,23 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 	taskCB(&rpc.TaskProgress{Name: "Installing " + libRelease.String()})
 	logrus.WithField("library", libRelease).Info("Installing library")
 	libPath, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease)
+	if err == librariesmanager.ErrAlreadyInstalled {
+		taskCB(&rpc.TaskProgress{Message: "Alredy installed " + libRelease.String(), Completed: true})
+		return nil
+	}
+
 	if err != nil {
 		return fmt.Errorf("checking lib install prerequisites: %s", err)
 	}
+
 	if libReplaced != nil {
 		taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("Replacing %s with %s", libReplaced, libRelease)})
 	}
+
 	if err := lm.Install(libRelease, libPath); err != nil {
 		return err
 	}
-	taskCB(&rpc.TaskProgress{Message: "Installed " + libRelease.String(), Completed: true})
 
+	taskCB(&rpc.TaskProgress{Message: "Installed " + libRelease.String(), Completed: true})
 	return nil
 }
