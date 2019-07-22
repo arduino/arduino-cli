@@ -38,7 +38,7 @@ def test_command_lib_list():
     """
     result = run_command('lib list')
     assert result.ok
-    assert result.stderr == ''
+    assert '' == result.stderr
     result = run_command('lib list', '--format json')
     assert '' == result.stdout
 
