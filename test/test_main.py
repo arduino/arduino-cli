@@ -5,45 +5,26 @@ import pytest
 import semver
 from datetime import datetime
 
-this_test_path = os.path.dirname(os.path.realpath(__file__))
-# Calculate absolute path of the CLI
-cli_path = os.path.join(this_test_path, '..', 'arduino-cli')
 
-# Useful reference: 
-# http://docs.pyinvoke.org/en/1.2/api/runners.html#invoke.runners.Result
-
-
-def cli_line(*args):
-    # Accept a list of arguments cli_line('lib list --format json')
-    # Return a full command line string e.g. 'arduino-cli help --format json'
-    cli_full_line = ' '.join([cli_path, ' '.join(str(arg) for arg in args)])
-    return cli_full_line
-
-
-def run_command(*args):
-    result = run(cli_line(*args), echo=False, hide=True, warn=True)
-    return result
-
-
-def test_command_help():
+def test_command_help(run_command):
     result = run_command('help')
     assert result.ok
     assert result.stderr == ''
     assert 'Usage' in result.stdout
 
 
-def test_command_lib_list():
+def test_command_lib_list(run_command):
     """
     When ouput is empty, nothing is printed out, no matter the output format
     """
     result = run_command('lib list')
     assert result.ok
     assert '' == result.stderr
-    result = run_command('lib list', '--format json')
+    result = run_command('lib list --format json')
     assert '' == result.stdout
 
 
-def test_command_lib_install():
+def test_command_lib_install(run_command):
     libs = ['\"AzureIoTProtocol_MQTT\"', '\"CMMC MQTT Connector\"', '\"WiFiNINA\"']
     # Should be safe to run install multiple times
     result_1 = run_command('lib install {}'.format(' '.join(libs)))
@@ -51,18 +32,18 @@ def test_command_lib_install():
     result_2 = run_command('lib install {}'.format(' '.join(libs)))
     assert result_2.ok
 
-def test_command_lib_update_index():
+def test_command_lib_update_index(run_command):
     result = run_command('lib update-index')
     assert result.ok
     assert 'Updating index: library_index.json downloaded' == result.stdout.splitlines()[-1].strip()
 
-def test_command_lib_remove():
+def test_command_lib_remove(run_command):
     libs = ['\"AzureIoTProtocol_MQTT\"', '\"CMMC MQTT Connector\"', '\"WiFiNINA\"']
     result = run_command('lib uninstall {}'.format(' '.join(libs)))
     assert result.ok
 
 @pytest.mark.slow
-def test_command_lib_search():
+def test_command_lib_search(run_command):
     result = run_command('lib search')
     assert result.ok
     out_lines = result.stdout.splitlines()
@@ -81,7 +62,7 @@ def test_command_lib_search():
     assert number_of_libs == number_of_libs_from_json
 
 
-def test_command_board_list():
+def test_command_board_list(run_command):
     result = run_command('board list --format json')
     assert result.ok
     # check is a valid json and contains a list of ports
@@ -92,13 +73,13 @@ def test_command_board_list():
         assert 'protocol_label' in port
 
 
-def test_command_board_listall():
+def test_command_board_listall(run_command):
     result = run_command('board listall')
     assert result.ok
     assert ['Board', 'Name', 'FQBN'] == result.stdout.splitlines()[0].strip().split()
 
 
-def test_command_version():
+def test_command_version(run_command):
     result = run_command('version --format json')
     assert result.ok
     parsed_out = json.loads(result.stdout)
