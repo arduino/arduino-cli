@@ -25,8 +25,8 @@ def run_command(*args):
     return result
 
 
-def test_command_help():
-    result = run_command('help')
+def test_command_help(runner):
+    result = runner.run('help')
     assert result.ok
     assert result.stderr == ''
     assert 'Usage' in result.stdout
