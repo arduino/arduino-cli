@@ -19,7 +19,6 @@ package version
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -35,12 +34,9 @@ func TestBuildInjectedInfo(t *testing.T) {
 		Application:   goldenAppName,
 		VersionString: "0.0.0-test.preview",
 		Commit:        "deadbeef",
-		BuildDate:     rfc3339Time{time.Time{}},
 	}
 	info := NewInfo(goldenAppName)
 	require.Equal(t, goldenInfo.Application, info.Application)
 	require.Equal(t, goldenInfo.VersionString, info.VersionString)
 	require.Equal(t, goldenInfo.Commit, info.Commit)
-	require.IsType(t, rfc3339Time{time.Time{}}, info.BuildDate)
-	require.False(t, info.BuildDate.IsZero())
 }

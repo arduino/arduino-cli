@@ -55,8 +55,8 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	}
 	s := grpc.NewServer()
 
-	userAgentValue := fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s/Build:%s", globals.VersionInfo.Application,
-		globals.VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), globals.VersionInfo.Commit, globals.VersionInfo.BuildDate)
+	userAgentValue := fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s", globals.VersionInfo.Application,
+		globals.VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), globals.VersionInfo.Commit)
 	headers := http.Header{"User-Agent": []string{userAgentValue}}
 
 	coreServer := daemon.ArduinoCoreServerImpl{
