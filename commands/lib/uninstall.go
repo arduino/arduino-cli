@@ -28,15 +28,20 @@ import (
 // LibraryUninstall FIXMEDOC
 func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallReq, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req)
-
-	lib, err := findLibrary(lm, req)
+	ref, err := createLibIndexReference(lm, req)
 	if err != nil {
-		return fmt.Errorf("looking for library: %s", err)
+		return err
 	}
 
-	taskCB(&rpc.TaskProgress{Name: "Uninstalling " + lib.String()})
-	lm.Uninstall(lib)
-	taskCB(&rpc.TaskProgress{Completed: true})
+	lib := lm.FindByReference(ref)
+
+	if lib == nil {
+		taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("Library %s is not installed", req.Name), Completed: true})
+	} else {
+		taskCB(&rpc.TaskProgress{Name: "Uninstalling " + lib.String()})
+		lm.Uninstall(lib)
+		taskCB(&rpc.TaskProgress{Completed: true})
+	}
 
 	return nil
 }
