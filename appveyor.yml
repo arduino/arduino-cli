@@ -31,8 +31,15 @@ install:
   - 7z e protoc.zip -o%PROTOC_PATH%
 
 test_script:
+  # Check if the Go code is properly formatted and run the linter
+  - task.exe check
+  # Ensure protobufs compile
+  - task.exe protoc
   # re-enable after fixing go tests
   # - task.exe test-integration
+  # build the binary
+  - task.exe build
+  # run e2e tests
   - pytest test
 
 # uncomment to debug builds
