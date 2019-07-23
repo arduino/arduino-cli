@@ -64,8 +64,8 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: "ctags-5.8-arduino11-pm-x86_64-apple-darwin.zip",
 				URL:             "https://downloads.arduino.cc/tools/ctags-5.8-arduino11-pm-x86_64-apple-darwin.zip",
-				Size:            107801,
-				Checksum:        "SHA-256:e8c5db45867fb5987ad0fc429d8bbbcf5549f4b7c2b5ade863e76ac77255144d",
+				Size:            118296,
+				Checksum:        "SHA-256:bf74807260ddf0e1fc94d67e9cd8a41b7c0a2f0bee03e254e6975139b37ef250",
 				CachePath:       "tools",
 			},
 		},
