@@ -63,6 +63,8 @@ def test_command_lib_search(run_command):
 
 
 def test_command_board_list(run_command):
+    result = run_command('core update-index')
+    assert result.ok
     result = run_command('board list --format json')
     assert result.ok
     # check is a valid json and contains a list of ports
