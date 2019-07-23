@@ -10,6 +10,7 @@ skip_branch_with_pr: true
 environment:
   GOPATH: c:\gopath
   PROTOC_PATH: c:\protoc
+  PROTOC_BINARY: protoc.exe
   # add protoc, gopath and override default Python 2.7
   PATH: $(PROTOC_PATH)\bin;$(GOPATH)\bin;C:\Python37;C:\Python37\Scripts;$(PATH)
 
