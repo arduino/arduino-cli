@@ -106,4 +106,3 @@ def test_command_version():
     assert parsed_out.get('Application', False) == 'arduino-cli'
     assert isinstance(semver.parse(parsed_out.get('VersionString', False)), dict)
     assert isinstance(parsed_out.get('Commit', False), str)
-    assert datetime.strptime(parsed_out.get('BuildDate')[:-2], '%Y-%m-%dT%H:%M:%S.%f')

@@ -42,8 +42,8 @@ var (
 )
 
 func getHTTPClientHeader() http.Header {
-	userAgentValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s/Build:%s", VersionInfo.Application,
-		VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), VersionInfo.Commit, VersionInfo.BuildDate)
+	userAgentValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s", VersionInfo.Application,
+		VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), VersionInfo.Commit)
 	downloaderHeaders := http.Header{"User-Agent": []string{userAgentValue}}
 	return downloaderHeaders
 }
