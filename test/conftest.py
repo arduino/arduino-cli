@@ -44,10 +44,8 @@ def run_command(data_dir):
 	        "ARDUINO_SKETCHBOOK_DIR": data_dir
     }
 
-    def _run(*args):
-        # Accept a list of arguments cli_line('lib list --format json')
-        # Return a full command line string e.g. 'arduino-cli help --format json'
-        cli_full_line = ' '.join([cli_path, ' '.join(str(arg) for arg in args)])
+    def _run(cmd_string):
+        cli_full_line = "{} {}".format(cli_path, cmd_string)
         return run(cli_full_line, echo=False, hide=True, warn=True, env=env)
 
     return _run

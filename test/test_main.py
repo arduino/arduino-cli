@@ -20,7 +20,7 @@ def test_command_lib_list(run_command):
     result = run_command('lib list')
     assert result.ok
     assert '' == result.stderr
-    result = run_command('lib list', '--format json')
+    result = run_command('lib list --format json')
     assert '' == result.stdout
 
 
