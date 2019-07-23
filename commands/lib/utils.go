@@ -20,7 +20,6 @@ package lib
 import (
 	"fmt"
 
-	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
@@ -48,18 +47,6 @@ func findLibraryIndexRelease(lm *librariesmanager.LibrariesManager, req libraryR
 	lib := lm.Index.FindRelease(ref)
 	if lib == nil {
 		return nil, fmt.Errorf("library %s not found", ref)
-	}
-	return lib, nil
-}
-
-func findLibrary(lm *librariesmanager.LibrariesManager, req libraryReferencer) (*libraries.Library, error) {
-	ref, err := createLibIndexReference(lm, req)
-	if err != nil {
-		return nil, err
-	}
-	lib := lm.FindByReference(ref)
-	if lib == nil {
-		return nil, fmt.Errorf("library %s is not installed", ref)
 	}
 	return lib, nil
 }
