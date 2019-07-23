@@ -19,7 +19,7 @@ from invoke import run
 
 
 @pytest.fixture(scope="session")
-def sketchbook_path(tmpdir_factory):
+def data_dir(tmpdir_factory):
     """
     A tmp folder will be created before running
     the tests and deleted at the end.
@@ -29,20 +29,25 @@ def sketchbook_path(tmpdir_factory):
 
 
 @pytest.fixture(scope="session")
-def runner(sketchbook_path):
-    return Runner(sketchbook_path)
+def run_command(data_dir):
+    """
+    Provide a wrapper around invoke's `run` API so that every test
+    will work in the same temporary folder.
 
+    Useful reference:
+        http://docs.pyinvoke.org/en/1.2/api/runners.html#invoke.runners.Result
+    """
+    cli_path = os.path.join(pytest.config.rootdir, '..', 'arduino-cli')
+    env = {
+            "ARDUINO_DATA_DIR": data_dir,
+	        "ARDUINO_DOWNLOADS_DIR": data_dir,
+	        "ARDUINO_SKETCHBOOK_DIR": data_dir
+    }
 
-class Runner:
-    def __init__(self, sketchbook_path):
-        self.sketchbook_path = None
-        self.cli_path = os.path.join(pytest.config.rootdir, '..', 'arduino-cli')
-
-    def _cli_line(self, *args):
+    def _run(*args):
         # Accept a list of arguments cli_line('lib list --format json')
         # Return a full command line string e.g. 'arduino-cli help --format json'
-        cli_full_line = ' '.join([self.cli_path, ' '.join(str(arg) for arg in args), "--sketchbook-path {}".format(self.sketchbook_path)])
-        return cli_full_line
-    
-    def run(self, *args):
-        return run(self._cli_line(*args), echo=False, hide=True, warn=True)
+        cli_full_line = ' '.join([cli_path, ' '.join(str(arg) for arg in args)])
+        return run(cli_full_line, echo=False, hide=True, warn=True, env=env)
+
+    return _run
