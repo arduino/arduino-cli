@@ -12,7 +12,7 @@ environment:
   PROTOC_PATH: c:\protoc
   PROTOC_BINARY: protoc.exe
   # add protoc, gopath and override default Python 2.7
-  PATH: $(PROTOC_PATH)\bin;$(GOPATH)\bin;C:\Python37;C:\Python37\Scripts;$(PATH)
+  PATH: $(PROTOC_PATH);$(PROTOC_PATH)\bin;$(GOPATH)\bin;C:\Python37;C:\Python37\Scripts;$(PATH)
 
 stack: go 1.12
 
@@ -26,9 +26,10 @@ install:
   # Python dependencies needed at test time
   - python -V
   - pip install -r test\requirements.txt
-  # protobuf tooling needed at test time
+  # protobuf tooling needed at test time. We use a very old version of the compiler
+  # because of this: https://github.com/protocolbuffers/protobuf/issues/3957
   - go get github.com/golang/protobuf/protoc-gen-go
-  - curl -o protoc.zip -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.8.0/protoc-3.8.0-win64.zip
+  - curl -o protoc.zip -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.4.0/protoc-3.4.0-win32.zip
   - 7z e protoc.zip -o%PROTOC_PATH%
 
 test_script:
