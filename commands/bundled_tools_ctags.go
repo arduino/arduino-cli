@@ -79,6 +79,16 @@ func loadBuiltinCtagsMetadata(pm *packagemanager.PackageManager) {
 				CachePath:       "tools",
 			},
 		},
+		{
+			OS: "aarch64-linux-gnu",
+			Resource: &resources.DownloadResource{
+				ArchiveFileName: "ctags-5.8-arduino11-pm-aarch64-linux-gnu.tar.bz2",
+				URL:             "https://downloads.arduino.cc/tools/ctags-5.8-arduino11-pm-aarch64-linux-gnu.tar.bz2",
+				Size:            100819,
+				Checksum:        "SHA-256:89b6f8adb7b7124ebe2eb30970ea77c754cd2239e0d8a6b0102ae2a36416c6ef",
+				CachePath:       "tools",
+			},
+		},
 	}
 }
 
