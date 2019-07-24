@@ -23,6 +23,7 @@ import (
 	"io"
 	"os/exec"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -33,6 +34,7 @@ import (
 
 // Discovery is an instance of a discovery tool
 type Discovery struct {
+	sync.Mutex
 	ID      string
 	in      io.WriteCloser
 	out     io.ReadCloser
@@ -88,6 +90,7 @@ func (d *Discovery) Start() error {
 
 // List retrieve the port list from this discovery
 func (d *Discovery) List() ([]*BoardPort, error) {
+	d.Lock()
 	if _, err := d.in.Write([]byte("LIST\n")); err != nil {
 		return nil, fmt.Errorf("sending LIST command to discovery: %s", err)
 	}
@@ -109,6 +112,7 @@ func (d *Discovery) List() ([]*BoardPort, error) {
 		return nil, fmt.Errorf("decoding LIST command: %s", err)
 	}
 	done <- true
+	d.Unlock()
 	return event.Ports, nil
 }
 
