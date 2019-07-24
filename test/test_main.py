@@ -7,7 +7,8 @@ from datetime import datetime
 
 
 def running_on_ci():
-    return os.getenv('APPVEYOR') or os.getenv('DRONE')
+    val = os.getenv('APPVEYOR') or os.getenv('DRONE')
+    return val is not None
 
 
 def test_command_help(run_command):
