@@ -21,7 +21,8 @@ the latest preview version is `0.3.7-alpha.preview`:
 
 - [Linux 64 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linux64.tar.bz2)
 - [Linux 32 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linux32.tar.bz2)
-- [Linux ARM](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linuxarm.tar.bz2)
+- [Linux ARM 64 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linuxarm32.tar.bz2)
+- [Linux ARM 32 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-linuxarm64.tar.bz2)
 - [Windows](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-windows.zip)
 - [Mac OSX](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-macosx.zip)
 
@@ -33,7 +34,8 @@ These builds are generated once a day from `master` branch starting at 23:00 UTC
 
 - [Linux 64 bit](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-linux64.tar.bz2)
 - [Linux 32 bit](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-linux32.tar.bz2)
-- [Linux ARM](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-linuxarm.tar.bz2)
+- [Linux ARM 64 bit](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-linuxarm32.tar.bz2)
+- [Linux ARM 32 bit](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-linuxarm64.tar.bz2)
 - [Windows](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-windows.zip)
 - [Mac OSX](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-macosx.zip)
 
