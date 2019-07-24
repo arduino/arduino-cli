@@ -62,6 +62,7 @@ def test_command_lib_search(run_command):
     assert number_of_libs == number_of_libs_from_json
 
 
+@pytest.mark.skipif(os.getenv('APPVEYOR'), reason="Appveyor VMs have no serial ports")
 def test_command_board_list(run_command):
     result = run_command('core update-index')
     assert result.ok
@@ -75,6 +76,7 @@ def test_command_board_list(run_command):
         assert 'protocol_label' in port
 
 
+@pytest.mark.skipif(os.getenv('APPVEYOR'), reason="Appveyor VMs have no serial ports")
 def test_command_board_listall(run_command):
     result = run_command('board listall')
     assert result.ok
