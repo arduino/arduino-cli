@@ -4,7 +4,7 @@ tasks:
   protoc:
     desc: Compile protobuf definitions
     cmds:
-      - protoc --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/commands/*.proto
+      - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/commands/*.proto'
 
   build:
     desc: Build the project
@@ -26,7 +26,7 @@ tasks:
     desc: Run integration tests only
     cmds:
       - go test -run Integration {{ default "-v" .GOFLAGS }} -coverprofile=coverage_integ.txt {{ default .DEFAULT_TARGETS .TARGETS }} {{.TEST_LDFLAGS}}
-      - pytest test/
+      - pytest test
 
   test-legacy:
     desc: Run tests for the `legacy` package

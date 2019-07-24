@@ -24,8 +24,7 @@ def data_dir(tmpdir_factory):
     A tmp folder will be created before running
     the tests and deleted at the end.
     """
-    fn = tmpdir_factory.mktemp('ArduinoTest')
-    return fn
+    return str(tmpdir_factory.mktemp('ArduinoTest'))
 
 
 @pytest.fixture(scope="session")
