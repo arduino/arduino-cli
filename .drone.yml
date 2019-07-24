@@ -23,7 +23,6 @@ steps:
 
 - name: integration
   image: arduino/arduino-cli:drone-1.0
-  failure: ignore  # work in progress, we know some tests will fail at the moment
   commands:
     - pip install -r test/requirements.txt
     - task test-integration
