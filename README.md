@@ -26,7 +26,7 @@ the latest preview version is `0.3.7-alpha.preview`:
 - [Windows](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-windows.zip)
 - [Mac OSX](https://downloads.arduino.cc/arduino-cli/arduino-cli-latest-macosx.zip)
 
-Once downloaded, place the executable into a directory which is in your `PATH` environment variable. To use the tool as it is presented in the Getting started guide below (`arduino-cli`), you should rename the executable from _arduino-cli-X.Y.Z-alpha.preview-XYZ_ to _arduino-cli_.
+Once downloaded, place the executable `arduino-cli` into a directory which is in your `PATH` environment variable.
 
 #### Download the nightly build
 
@@ -39,7 +39,7 @@ These builds are generated once a day from `master` branch starting at 23:00 UTC
 - [Windows](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-windows.zip)
 - [Mac OSX](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli-nightly-latest-macosx.zip)
 
-Once downloaded, place the executable into a directory which is in your `PATH` environment variable. Launch the tool as it is presented in the Getting started guide below (`arduino-cli`).
+Once downloaded, place the executable `arduino-cli` into a directory which is in your `PATH` environment variable.
 
 ### Build the latest "bleeding-edge" from source
 
