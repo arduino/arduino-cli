@@ -19,7 +19,7 @@ stack: go 1.12
 install:
   # install the task executor
   - curl -o task.zip -LO https://github.com/go-task/task/releases/download/v2.6.0/task_windows_amd64.zip
-  - 7z e task.zip -o%GOPATH%\bin
+  - 7z x task.zip -o%GOPATH%\bin
   # golang dependencies needed at test time
   - go get github.com/golangci/govet
   - go get golang.org/x/lint/golint
@@ -30,7 +30,7 @@ install:
   # because of this: https://github.com/protocolbuffers/protobuf/issues/3957
   - go get github.com/golang/protobuf/protoc-gen-go
   - curl -o protoc.zip -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.4.0/protoc-3.4.0-win32.zip
-  - 7z e protoc.zip -o%PROTOC_PATH%
+  - 7z x protoc.zip -o%PROTOC_PATH%
 
 test_script:
   # Check if the Go code is properly formatted and run the linter
