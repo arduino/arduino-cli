@@ -20,6 +20,10 @@ import (
 	serial "go.bug.st/serial.v1"
 )
 
+const (
+	defaultBaudRate = 9600
+)
+
 // SerialMonitor is a monitor for serial ports
 type SerialMonitor struct {
 	port serial.Port
@@ -27,6 +31,11 @@ type SerialMonitor struct {
 
 // OpenSerialMonitor creates a monitor instance for a serial port
 func OpenSerialMonitor(portName string, baudRate int) (*SerialMonitor, error) {
+	// use default baud rate if not provided
+	if baudRate == 0 {
+		baudRate = defaultBaudRate
+	}
+
 	port, err := serial.Open(portName, &serial.Mode{BaudRate: baudRate})
 	if err != nil {
 		return nil, errors.Wrap(err, "error opening serial monitor")

@@ -24,8 +24,7 @@ import (
 )
 
 // MonitorService implements the `Monitor` service
-type MonitorService struct {
-}
+type MonitorService struct{}
 
 // StreamingOpen returns a stream response that can be used to fetch data from the
 // monitor target. The first message passed through the `StreamingOpenReq` must
@@ -57,11 +56,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 			}
 		}
 
-		// default baud rate if not provided
-		if baudRate == 0 {
-			baudRate = 9600
-		}
-
+		// get the Monitor instance
 		var err error
 		if mon, err = monitors.OpenSerialMonitor(config.GetTarget(), int(baudRate)); err != nil {
 			return err
@@ -124,6 +119,9 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 		}
 	}()
 
+	// let goroutines route messages from/to the monitor
+	// until either the client closes the stream or the
+	// monitor target is closed
 	for {
 		select {
 		case err := <-streamClosed:
