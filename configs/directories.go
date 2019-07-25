@@ -44,7 +44,7 @@ func getDefaultArduinoDataDir() (*paths.Path, error) {
 	case "linux":
 		return paths.New(userHomeDir).Join(".arduino15"), nil
 	case "darwin":
-		return paths.New(userHomeDir).Join("Library", "arduino15"), nil
+		return paths.New(userHomeDir).Join("Library", "Arduino15"), nil
 	case "windows":
 		localAppDataPath, err := win32.GetLocalAppDataFolder()
 		if err != nil {
