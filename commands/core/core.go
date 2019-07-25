@@ -26,14 +26,30 @@ import (
 // Note: this function does not touch the "Installed" field of rpc.Platform as it's not always clear that the
 // platformRelease we're currently converting is actually installed.
 func PlatformReleaseToRPC(platformRelease *cores.PlatformRelease) *rpc.Platform {
-	boards := make([]*rpc.Board, len(platformRelease.Boards))
-	i := 0
-	for _, b := range platformRelease.Boards {
-		boards[i] = &rpc.Board{
-			Name: b.Name(),
-			Fqbn: b.FQBN(),
+	// If the boards are not installed yet, the `platformRelease.Boards` will be a zero length slice.
+	// In such case, we have to use the `platformRelease.BoardsManifest` instead.
+	// So that we can retrieve the name of the boards at least.
+	var boards []*rpc.Board
+	if len(platformRelease.Boards) > 0 {
+		boards = make([]*rpc.Board, len(platformRelease.Boards))
+		i := 0
+		for _, b := range platformRelease.Boards {
+			boards[i] = &rpc.Board{
+				Name: b.Name(),
+				Fqbn: b.FQBN(),
+			}
+			i++
 		}
-		i++
+	} else {
+		boards = make([]*rpc.Board, len(platformRelease.BoardsManifest))
+		i := 0
+		for _, m := range platformRelease.BoardsManifest {
+			boards[i] = &rpc.Board{
+				Name: m.Name,
+				// FQBN is not available. Boards have to be installed first (-> `boards.txt`).
+			}
+			i++
+		}
 	}
 
 	result := &rpc.Platform{
