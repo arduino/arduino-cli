@@ -15,9 +15,11 @@
 
 package monitors
 
+import (
+	"io"
+)
+
 // Monitor is the interface implemented by different device monitors
 type Monitor interface {
-	Close() error
-	Read(bytes []byte) (int, error)
-	Write(bytes []byte) (int, error)
+	io.ReadWriteCloser
 }
