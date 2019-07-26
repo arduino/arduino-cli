@@ -1,0 +1,90 @@
+# Global section
+env:
+  - CGO_ENABLED=1
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^[skip changelog]'
+
+# We have multiple builds in order to fine tune
+# cross compilations.
+builds:
+  -
+    # OSX 
+    id: arduino_cli_osx
+    binary: arduino-cli
+    env:
+      - CC=o64-clang
+    goos:
+      - darwin
+    goarch:
+      - amd64
+    ldflags:
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit=={{ .ShortCommit }}
+  -
+    # ARM
+    id: arduino_cli_arm
+    binary: arduino-cli
+    env:
+      - CC=arm-linux-gnueabihf-gcc
+    goos:
+      - linux
+    goarch:
+      - arm
+    goarm:
+      - 7
+    ldflags:
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit=={{ .ShortCommit }}
+      - "-extldflags '-static'"
+  -
+    # ARM64
+    id: arduino_cli_arm64
+    binary: arduino-cli
+    env:
+      - CC=aarch64-linux-gnu-gcc
+    goos:
+      - linux
+    goarch:
+      - arm64
+    ldflags:
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit=={{ .ShortCommit }}
+      - "-extldflags '-static'"
+  -
+    # All the other platforms
+    id: arduino_cli
+    binary: arduino-cli
+    goos:
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - 386
+    ldflags:
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit=={{ .ShortCommit }}
+      - "-extldflags '-static'"
+
+archives:
+  -
+    id: "arduino_cli"
+    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    replacements:
+      amd64: 64bit
+      darwin: macOS
+      386: 32bit
+      arm: ARM
+      arm64: ARM64
+      linux: Linux
+      windows: Windows
+    files:
+      - README.md
+      - LICENSE.txt
