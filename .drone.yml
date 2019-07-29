@@ -1,5 +1,6 @@
+---
 kind: pipeline
-name: default
+name: test
 
 steps:
 - name: lint
@@ -44,12 +45,25 @@ steps:
     event:
       - push
 
+---
+kind: pipeline
+name: release
+
+steps:
+name: test
 - name: release
   image: arduino/arduino-cli:builder-0.1
+  environment:
+    GITHUB_TOKEN:
+      from_secret: github_token
   commands:
-    # FIXME: run the real options
-    - goreleaser --snapshot --skip-publish --skip-validation
-  when:
-    event:
-    - push
+    - goreleaser
+
+trigger:
+  event:
     - tag
+  status:
+    - success
+
+depends_on:
+  - test
