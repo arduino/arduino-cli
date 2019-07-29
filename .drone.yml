@@ -45,10 +45,11 @@ steps:
       - push
 
 - name: release
-  image: arduino/arduino-cli:builder-1.0
+  image: arduino/arduino-cli:builder-0.1
   commands:
     # FIXME: run the real options
     - goreleaser --snapshot --skip-publish --skip-validation
   when:
-    ref:
-      - refs/tags/v*
+    event:
+    - push
+    - tag
