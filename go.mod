@@ -18,7 +18,7 @@ require (
 	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-errors/errors v1.0.1
-	github.com/golang/protobuf v1.3.1
+	github.com/golang/protobuf v1.3.2
 	github.com/gosuri/uitable v0.0.0-20160404203958-36ee7e946282
 	github.com/h2non/filetype v1.0.8 // indirect
 	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5 // indirect
