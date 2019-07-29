@@ -50,7 +50,6 @@ kind: pipeline
 name: release
 
 steps:
-name: test
 - name: release
   image: arduino/arduino-cli:builder-0.1
   environment:
