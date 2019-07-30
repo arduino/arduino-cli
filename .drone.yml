@@ -61,6 +61,11 @@ steps:
   environment:
     GITHUB_TOKEN:
       from_secret: github_token
+    AWS_ACCESS_KEY_ID:
+      from_secret: downloads_drone_io_aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: downloads_drone_io_aws_secret_access_key
+    AWS_DEFAULT_REGION: 'us-east-1'
   commands:
     - goreleaser
 
