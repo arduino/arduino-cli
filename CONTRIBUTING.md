@@ -117,7 +117,7 @@ you can check before submitting a PR:
 * PR titles indirectly become part of the CHANGELOG so it's crucial to provide a good
   record of **what** change is being made in the title; **why** it was made will go in the
   PR description, along with a link to a GitHub issue if it exists.
-* write tests for the code you wrote.
+* Write tests for the code you wrote.
 * open your PR against the `master` branch.
 * Maintain **clean commit history** and use **meaningful commit messages**.
   PRs with messy commit history are difficult to review and require a lot of work to be merged.
