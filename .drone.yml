@@ -50,6 +50,11 @@ kind: pipeline
 name: release
 
 steps:
+- name: fetch
+  image: docker:git
+  commands:
+  - git fetch --tags
+
 - name: release
   image: arduino/arduino-cli:builder-0.1
   environment:
