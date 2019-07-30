@@ -44,15 +44,15 @@ func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
 	if sk == nil {
 		return i18n.WrapError(errors.New("unable to convert legacy sketch to the new type"))
 	}
-	offset, source := bldr.MergeSketchSources(sk)
+	offset, source := bldr.SketchMergeSources(sk)
 	ctx.LineOffset = offset
 	ctx.Source = source
 
-	if err := bldr.SaveSketchItemCpp(&sketch.Item{ctx.Sketch.MainFile.Name.String(), []byte(ctx.Source)}, ctx.SketchBuildPath.String()); err != nil {
+	if err := bldr.SketchSaveItemCpp(&sketch.Item{ctx.Sketch.MainFile.Name.String(), []byte(ctx.Source)}, ctx.SketchBuildPath.String()); err != nil {
 		return i18n.WrapError(err)
 	}
 
-	if err := new(AdditionalSketchFilesCopier).Run(ctx); err != nil {
+	if err := bldr.SketchCopyAdditionalFiles(sk, ctx.SketchBuildPath.String()); err != nil {
 		return i18n.WrapError(err)
 	}
 
