@@ -102,7 +102,7 @@ environment, so you can proceed installing the dependencies required with:
 pip install -r test/requirements.txt
 ```
 
-If the last step was successfull, you should be able to run the tests with:
+If the last step was successful, you should be able to run the tests with:
 
 ```shell
 task test-integration
