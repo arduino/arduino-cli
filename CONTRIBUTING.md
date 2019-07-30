@@ -118,7 +118,7 @@ you can check before submitting a PR:
   record of **what** change is being made in the title; **why** it was made will go in the
   PR description, along with a link to a GitHub issue if it exists.
 * Write tests for the code you wrote.
-* open your PR against the `master` branch.
+* Open your PR against the `master` branch.
 * Maintain **clean commit history** and use **meaningful commit messages**.
   PRs with messy commit history are difficult to review and require a lot of work to be merged.
 * Your PR must pass all CI tests before we will merge it. If you're seeing an error and don't think
