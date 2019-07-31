@@ -92,3 +92,11 @@ archives:
     files:
       - README.md
       - LICENSE.txt
+
+blob:
+  -
+    provider: s3
+    bucket: arduino-downloads-prod-beagle
+    ids:
+      - arduino_cli
+    folder: "{{ .ProjectName }}"
