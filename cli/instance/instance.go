@@ -45,7 +45,7 @@ func initInstance() *rpc.InitResp {
 	if resp.GetLibrariesIndexError() != "" {
 		commands.UpdateLibrariesIndex(context.Background(),
 			&rpc.UpdateLibrariesIndexReq{Instance: resp.GetInstance()}, output.ProgressBar())
-		rescResp, err := commands.Rescan(context.Background(), &rpc.RescanReq{Instance: resp.GetInstance()})
+		rescResp, err := commands.Rescan(resp.GetInstance().GetId())
 		if rescResp.GetLibrariesIndexError() != "" {
 			formatter.PrintErrorMessage("Error loading library index: " + rescResp.GetLibrariesIndexError())
 			os.Exit(errorcodes.ErrGeneric)

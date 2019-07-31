@@ -243,7 +243,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexReq,
 	if d.Error() != nil {
 		return d.Error()
 	}
-	if _, err := Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
+	if _, err := Rescan(req.GetInstance().GetId()); err != nil {
 		return fmt.Errorf("rescanning filesystem: %s", err)
 	}
 	return nil
@@ -293,21 +293,20 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 			return nil, fmt.Errorf("saving downloaded index %s: %s", URL, err)
 		}
 	}
-	if _, err := Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
+	if _, err := Rescan(id); err != nil {
 		return nil, fmt.Errorf("rescanning filesystem: %s", err)
 	}
 	return &rpc.UpdateIndexResp{}, nil
 }
 
-// Rescan FIXMEDOC
-func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
-	id := req.GetInstance().GetId()
-	coreInstance, ok := instances[id]
+// Rescan restart discoveries for the given instance
+func Rescan(instanceID int32) (*rpc.RescanResp, error) {
+	coreInstance, ok := instances[instanceID]
 	if !ok {
 		return nil, fmt.Errorf("invalid handle")
 	}
 
-	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(ctx, coreInstance.config, coreInstance.getLibOnly)
+	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(context.Background(), coreInstance.config, coreInstance.getLibOnly)
 	if err != nil {
 		return nil, fmt.Errorf("rescanning filesystem: %s", err)
 	}
