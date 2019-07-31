@@ -64,12 +64,9 @@ func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bo
 					continue
 				}
 			}
-			var available *librariesindex.Release
-			if updatable {
-				available = lm.Index.FindLibraryUpdate(lib)
-				if available == nil {
-					continue
-				}
+			available := lm.Index.FindLibraryUpdate(lib)
+			if updatable && available == nil {
+				continue
 			}
 			res = append(res, &installedLib{
 				Library:   lib,
