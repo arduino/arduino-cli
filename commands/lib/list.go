@@ -34,7 +34,7 @@ type installedLib struct {
 
 // LibraryList FIXMEDOC
 func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResp, error) {
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 
 	instaledLib := []*rpc.InstalledLibrary{}
 	res := listLibraries(lm, req.GetUpdatable(), req.GetAll())

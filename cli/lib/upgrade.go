@@ -48,12 +48,14 @@ func initUpgradeCommand() *cobra.Command {
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 
-	err := lib.LibraryUpgradeAll(context.Background(), &rpc.LibraryUpgradeAllReq{
-		Instance: instance,
-	}, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
-	if err != nil {
-		formatter.PrintError(err, "Error upgrading libraries")
-		os.Exit(errorcodes.ErrGeneric)
+	if len(args) == 0 {
+		err := lib.LibraryUpgradeAll(context.Background(), &rpc.LibraryUpgradeAllReq{
+			Instance: instance,
+		}, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
+		if err != nil {
+			formatter.PrintError(err, "Error upgrading libraries")
+			os.Exit(errorcodes.ErrGeneric)
+		}
 	}
 
 	logrus.Info("Done")

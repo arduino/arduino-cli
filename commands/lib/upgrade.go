@@ -29,7 +29,7 @@ import (
 // LibraryUpgradeAll FIXMEDOC
 func LibraryUpgradeAll(ctx context.Context, req *rpc.LibraryUpgradeAllReq, downloadCB commands.DownloadProgressCB,
 	taskCB commands.TaskProgressCB, downloaderHeaders http.Header) error {
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 
 	// Obtain the list of upgradable libraries
 	list := listLibraries(lm, true, true)

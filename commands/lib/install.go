@@ -33,7 +33,7 @@ import (
 func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) error {
 
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 
 	libRelease, err := findLibraryIndexRelease(lm, req)
 	if err != nil {
