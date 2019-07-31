@@ -1,5 +1,6 @@
+---
 kind: pipeline
-name: default
+name: test
 
 steps:
 - name: lint
@@ -7,7 +8,7 @@ steps:
   commands:
     # Check if the Go code is properly formatted and run the linter
     - task check
-    # Ensure protobufs compile
+    # Ensure protobufs compile without errors
     - task protoc
 
 - name: build
@@ -27,10 +28,10 @@ steps:
     - pip install -r test/requirements.txt
     - task test-integration
 
-# Contrary to other CI platforms, uploading reports to Codecov requires Drone to provide a token.
-# To avoid exposing the Codecov token to external PRs, we only upload coverage when we merge on
-# `master`.
 - name: coverage
+  # Contrary to other CI platforms, uploading reports to Codecov requires Drone to provide a token.
+  # To avoid exposing the Codecov token to external PRs, we only upload coverage when we merge on
+  # `master`.
   image: arduino/arduino-cli:drone-1.0
   environment:
     CODECOV_TOKEN:
@@ -43,3 +44,38 @@ steps:
       - master
     event:
       - push
+
+---
+kind: pipeline
+name: release
+
+steps:
+- name: fetch
+  # extra step needed to fetch tags after cloning
+  image: docker:git
+  commands:
+  - git fetch --tags
+
+- name: release
+  image: arduino/arduino-cli:builder-0.1
+  environment:
+    GITHUB_TOKEN:
+      from_secret: github_token
+  commands:
+    - goreleaser
+
+trigger:
+  event:
+    # releases are triggered by tags only
+    - tag
+  status:
+    # skip the release if the previous build failed
+    - success
+  ref:
+    exclude:
+    # exclude the tags used to build Docker images for drone
+    - refs/tags/builder-*
+    - refs/tags/drone-*
+
+depends_on:
+  - test

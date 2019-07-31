@@ -10,3 +10,4 @@ coverage_*.txt
 __pycache__
 venv
 .pytest_cache
+/dist
