@@ -34,11 +34,14 @@ func initUpgradeCommand() *cobra.Command {
 	listCommand := &cobra.Command{
 		Use:   "upgrade",
 		Short: "Upgrades installed libraries.",
-		Long: "This command ungrades all installed libraries to the latest available version." +
-			"To upgrade a single library use the 'install' command.",
-		Example: "  " + os.Args[0] + " lib upgrade",
-		Args:    cobra.ArbitraryArgs,
-		Run:     runUpgradeCommand,
+		Long: "This command upgrades an installed library to the latest available version. " +
+			"If no arguments are provided, the command will upgrade all the installed libraries " +
+			"where an update is available.",
+		Example: "  " + os.Args[0] + " lib upgrade \n" +
+			"  " + os.Args[0] + " lib upgrade Audio\n" +
+			"  " + os.Args[0] + " lib upgrade Audio ArduinoJson",
+		Args: cobra.ArbitraryArgs,
+		Run:  runUpgradeCommand,
 	}
 	return listCommand
 }
