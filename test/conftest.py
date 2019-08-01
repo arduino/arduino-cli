@@ -18,17 +18,27 @@ import pytest
 from invoke import run
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def data_dir(tmpdir_factory):
     """
     A tmp folder will be created before running
-    the tests and deleted at the end.
+    each test and deleted at the end, this way all the
+    tests work in isolation.
     """
-    return str(tmpdir_factory.mktemp('ArduinoTest'))
+    return str(tmpdir_factory.mktemp("ArduinoTest"))
 
 
 @pytest.fixture(scope="session")
-def run_command(data_dir):
+def downloads_dir(tmpdir_factory):
+    """
+    To save time and bandwidth, all the tests will access
+    the same download cache folder.
+    """
+    return str(tmpdir_factory.mktemp("ArduinoTest"))
+
+
+@pytest.fixture(scope="function")
+def run_command(data_dir, downloads_dir):
     """
     Provide a wrapper around invoke's `run` API so that every test
     will work in the same temporary folder.
@@ -36,11 +46,11 @@ def run_command(data_dir):
     Useful reference:
         http://docs.pyinvoke.org/en/1.2/api/runners.html#invoke.runners.Result
     """
-    cli_path = os.path.join(pytest.config.rootdir, '..', 'arduino-cli')
+    cli_path = os.path.join(pytest.config.rootdir, "..", "arduino-cli")
     env = {
-            "ARDUINO_DATA_DIR": data_dir,
-	        "ARDUINO_DOWNLOADS_DIR": data_dir,
-	        "ARDUINO_SKETCHBOOK_DIR": data_dir
+        "ARDUINO_DATA_DIR": data_dir,
+        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+        "ARDUINO_SKETCHBOOK_DIR": data_dir,
     }
 
     def _run(cmd_string):
