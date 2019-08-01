@@ -34,7 +34,7 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadC
 	downloaderHeaders http.Header) (*rpc.LibraryDownloadResp, error) {
 	logrus.Info("Executing `arduino lib download`")
 
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 
 	logrus.Info("Preparing download")
 

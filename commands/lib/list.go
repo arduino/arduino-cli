@@ -34,7 +34,7 @@ type installedLib struct {
 
 // LibraryList FIXMEDOC
 func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResp, error) {
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 
 	instaledLib := []*rpc.InstalledLibrary{}
 	res := listLibraries(lm, req.GetUpdatable(), req.GetAll())
@@ -64,12 +64,9 @@ func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bo
 					continue
 				}
 			}
-			var available *librariesindex.Release
-			if updatable {
-				available = lm.Index.FindLibraryUpdate(lib)
-				if available == nil {
-					continue
-				}
+			available := lm.Index.FindLibraryUpdate(lib)
+			if updatable && available == nil {
+				continue
 			}
 			res = append(res, &installedLib{
 				Library:   lib,

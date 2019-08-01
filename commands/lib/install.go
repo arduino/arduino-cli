@@ -33,7 +33,7 @@ import (
 func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) error {
 
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 
 	libRelease, err := findLibraryIndexRelease(lm, req)
 	if err != nil {
@@ -48,7 +48,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
 		return err
 	}
 
-	if _, err := commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
+	if _, err := commands.Rescan(req.GetInstance().GetId()); err != nil {
 		return fmt.Errorf("rescanning libraries: %s", err)
 	}
 	return nil

@@ -26,21 +26,22 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/common/formatter"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"golang.org/x/net/context"
 )
 
 func initUpgradeCommand() *cobra.Command {
 	listCommand := &cobra.Command{
 		Use:   "upgrade",
 		Short: "Upgrades installed libraries.",
-		Long: "This command ungrades all installed libraries to the latest available version." +
-			"To upgrade a single library use the 'install' command.",
-		Example: "  " + os.Args[0] + " lib upgrade",
-		Args:    cobra.NoArgs,
-		Run:     runUpgradeCommand,
+		Long: "This command upgrades an installed library to the latest available version. " +
+			"Multiple libraries can be passed separated by a space. If no arguments are provided, " +
+			"the command will upgrade all the installed libraries where an update is available.",
+		Example: "  " + os.Args[0] + " lib upgrade \n" +
+			"  " + os.Args[0] + " lib upgrade Audio\n" +
+			"  " + os.Args[0] + " lib upgrade Audio ArduinoJson",
+		Args: cobra.ArbitraryArgs,
+		Run:  runUpgradeCommand,
 	}
 	return listCommand
 }
@@ -48,12 +49,18 @@ func initUpgradeCommand() *cobra.Command {
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 
-	err := lib.LibraryUpgradeAll(context.Background(), &rpc.LibraryUpgradeAllReq{
-		Instance: instance,
-	}, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
-	if err != nil {
-		formatter.PrintError(err, "Error upgrading libraries")
-		os.Exit(errorcodes.ErrGeneric)
+	if len(args) == 0 {
+		err := lib.LibraryUpgradeAll(instance.Id, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
+		if err != nil {
+			formatter.PrintError(err, "Error upgrading libraries")
+			os.Exit(errorcodes.ErrGeneric)
+		}
+	} else {
+		err := lib.LibraryUpgrade(instance.Id, args, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
+		if err != nil {
+			formatter.PrintError(err, "Error upgrading libraries")
+			os.Exit(errorcodes.ErrGeneric)
+		}
 	}
 
 	logrus.Info("Done")

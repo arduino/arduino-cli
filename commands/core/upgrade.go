@@ -52,7 +52,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 		return nil, err
 	}
 
-	if _, err := commands.Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
+	if _, err := commands.Rescan(req.GetInstance().GetId()); err != nil {
 		return nil, err
 	}
 

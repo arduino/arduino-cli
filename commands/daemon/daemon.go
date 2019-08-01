@@ -76,7 +76,7 @@ func (s *ArduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyReq
 
 // Rescan FIXMEDOC
 func (s *ArduinoCoreServerImpl) Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
-	return commands.Rescan(ctx, req)
+	return commands.Rescan(req.GetInstance().GetId())
 }
 
 // UpdateIndex FIXMEDOC
@@ -277,7 +277,7 @@ func (s *ArduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallReq, s
 
 // LibraryUpgradeAll FIXMEDOC
 func (s *ArduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllReq, stream rpc.ArduinoCore_LibraryUpgradeAllServer) error {
-	err := lib.LibraryUpgradeAll(stream.Context(), req,
+	err := lib.LibraryUpgradeAll(req.GetInstance().GetId(),
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryUpgradeAllResp{Progress: p}) },
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryUpgradeAllResp{TaskProgress: p}) },
 		s.DownloaderHeaders,

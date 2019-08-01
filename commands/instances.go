@@ -75,9 +75,9 @@ func GetPackageManager(req InstanceContainer) *packagemanager.PackageManager {
 	return i.PackageManager
 }
 
-// GetLibraryManager FIXMEDOC
-func GetLibraryManager(req InstanceContainer) *librariesmanager.LibrariesManager {
-	i, ok := instances[req.GetInstance().GetId()]
+// GetLibraryManager returns the library manager for the given instance ID
+func GetLibraryManager(instanceID int32) *librariesmanager.LibrariesManager {
+	i, ok := instances[instanceID]
 	if !ok {
 		return nil
 	}
@@ -231,7 +231,7 @@ func Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error)
 // UpdateLibrariesIndex updates the library_index.json
 func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexReq, downloadCB func(*rpc.DownloadProgress)) error {
 	logrus.Info("Updating libraries index")
-	lm := GetLibraryManager(req)
+	lm := GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
 		return fmt.Errorf("invalid handle")
 	}
@@ -243,7 +243,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexReq,
 	if d.Error() != nil {
 		return d.Error()
 	}
-	if _, err := Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
+	if _, err := Rescan(req.GetInstance().GetId()); err != nil {
 		return fmt.Errorf("rescanning filesystem: %s", err)
 	}
 	return nil
@@ -293,21 +293,20 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 			return nil, fmt.Errorf("saving downloaded index %s: %s", URL, err)
 		}
 	}
-	if _, err := Rescan(ctx, &rpc.RescanReq{Instance: req.Instance}); err != nil {
+	if _, err := Rescan(id); err != nil {
 		return nil, fmt.Errorf("rescanning filesystem: %s", err)
 	}
 	return &rpc.UpdateIndexResp{}, nil
 }
 
-// Rescan FIXMEDOC
-func Rescan(ctx context.Context, req *rpc.RescanReq) (*rpc.RescanResp, error) {
-	id := req.GetInstance().GetId()
-	coreInstance, ok := instances[id]
+// Rescan restart discoveries for the given instance
+func Rescan(instanceID int32) (*rpc.RescanResp, error) {
+	coreInstance, ok := instances[instanceID]
 	if !ok {
 		return nil, fmt.Errorf("invalid handle")
 	}
 
-	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(ctx, coreInstance.config, coreInstance.getLibOnly)
+	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(context.Background(), coreInstance.config, coreInstance.getLibOnly)
 	if err != nil {
 		return nil, fmt.Errorf("rescanning filesystem: %s", err)
 	}
