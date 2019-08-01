@@ -78,6 +78,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.PersistentFlags().BoolVar(&globals.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
 	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be [text|json].")
 	cmd.PersistentFlags().StringVar(&globals.YAMLConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
+	cmd.PersistentFlags().StringSliceVar(&globals.AdditionalUrls, "additional-urls", []string{}, "Additional URLs for the board manager.")
 }
 
 func preRun(cmd *cobra.Command, args []string) {

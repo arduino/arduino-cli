@@ -62,6 +62,11 @@ func initInstance() *rpc.InitResp {
 
 func packageManagerInitReq() *rpc.InitReq {
 	urls := []string{}
+
+	for _, urlString := range globals.AdditionalUrls {
+		urls = append(urls, urlString)
+	}
+
 	for _, URL := range globals.Config.BoardManagerAdditionalUrls {
 		urls = append(urls, URL.String())
 	}

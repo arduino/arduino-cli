@@ -1,0 +1,35 @@
+{
+    "packages": [
+        {
+            "maintainer": "Arduino",
+            "help": {
+                "online": "https://github.com/Arduino/arduino-cli"
+            },
+            "websiteURL": "https://github.com/Arduino/arduino-cli",
+            "platforms": [
+                {
+                    "category": "Test Category",
+                    "help": {
+                        "online": "https://github.com/Arduino/arduino-cli"
+                    },
+                    "url": "https://raw.githubusercontent.com/arduino/arduino-cli/massi/additional-urls/test/testdata/core.txt",
+                    "checksum": "SHA-256:1ba93f6aea56842dfef065c0f5eb0a34c1f78b72b3f2426c94e47ba3a359c9ff",
+                    "name": "test_core",
+                    "version": "1.0.0",
+                    "architecture": "x86",
+                    "archiveFileName": "core.txt",
+                    "size": "2799",
+                    "toolsDependencies": [],
+                    "boards": [
+                        {
+                            "name": "Test Board"
+                        }
+                    ]
+                }
+            ],
+            "tools": [],
+            "email": "test@example.com",
+            "name": "test"
+        }
+    ]
+}

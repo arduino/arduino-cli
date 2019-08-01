@@ -19,7 +19,7 @@ from .common import running_on_ci
 
 
 @pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
-def test_board_list(run_command):
+def test_core_list(run_command):
     result = run_command("core update-index")
     assert result.ok
     result = run_command("board list --format json")
@@ -33,9 +33,29 @@ def test_board_list(run_command):
 
 
 @pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
-def test_board_listall(run_command):
+def test_core_listall(run_command):
     assert run_command("core update-index")
     result = run_command("board listall")
     print(result.stderr, result.stdout)
     assert result.ok
     assert ["Board", "Name", "FQBN"] == result.stdout.splitlines()[0].strip().split()
+
+
+def test_core_search(run_command):
+    url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
+    assert run_command("core update-index --additional-urls={}".format(url))
+    # default search
+    result = run_command("core search avr")
+    assert result.ok
+    assert 2 < len(result.stdout.splitlines())
+    result = run_command("core search avr --format json")
+    assert result.ok
+    data = json.loads(result.stdout)
+    assert 0 < len(data)
+    # additional URL
+    result = run_command(
+        "core search test_core --format json --additional-urls={}".format(url)
+    )
+    assert result.ok
+    data = json.loads(result.stdout)
+    assert 1 == len(data)

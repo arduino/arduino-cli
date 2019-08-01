@@ -39,6 +39,8 @@ var (
 	Config *configs.Configuration
 	// YAMLConfigFile contains the path to the config file
 	YAMLConfigFile string
+	// AdditionalUrls contains the list of additional urls the boards manager can use
+	AdditionalUrls []string
 )
 
 func getHTTPClientHeader() http.Header {
