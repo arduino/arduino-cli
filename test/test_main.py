@@ -1,98 +1,38 @@
-from invoke import run, Responder, exceptions
-import os
+# This file is part of arduino-cli.
+
+# Copyright 2019 ARDUINO SA (http://www.arduino.cc/)
+
+# This software is released under the GNU General Public License version 3,
+# which covers the main part of arduino-cli.
+# The terms of this license can be found at:
+# https://www.gnu.org/licenses/gpl-3.0.en.html
+
+# You can be released from the requirements of the above licenses by purchasing
+# a commercial license. Buying such a license is mandatory if you want to modify or
+# otherwise use the software for commercial activities involving the Arduino
+# software without disclosing the source code of your own applications. To purchase
+# a commercial license, send an email to license@arduino.cc.
 import json
-import pytest
 import semver
-from datetime import datetime
 
 
-def running_on_ci():
-    val = os.getenv('APPVEYOR') or os.getenv('DRONE')
-    return val is not None
-
-
-def test_command_help(run_command):
-    result = run_command('help')
+def test_help(run_command):
+    result = run_command("help")
     assert result.ok
-    assert result.stderr == ''
-    assert 'Usage' in result.stdout
+    assert result.stderr == ""
+    assert "Usage" in result.stdout
 
 
-def test_command_lib_list(run_command):
-    """
-    When ouput is empty, nothing is printed out, no matter the output format
-    """
-    result = run_command('lib list')
+def test_version(run_command):
+    result = run_command("version")
     assert result.ok
-    assert '' == result.stderr
-    result = run_command('lib list --format json')
-    assert '' == result.stdout
+    assert "Version:" in result.stdout
+    assert "Commit:" in result.stdout
+    assert "" == result.stderr
 
-
-def test_command_lib_install(run_command):
-    libs = ['\"AzureIoTProtocol_MQTT\"', '\"CMMC MQTT Connector\"', '\"WiFiNINA\"']
-    # Should be safe to run install multiple times
-    result_1 = run_command('lib install {}'.format(' '.join(libs)))
-    assert result_1.ok
-    result_2 = run_command('lib install {}'.format(' '.join(libs)))
-    assert result_2.ok
-
-def test_command_lib_update_index(run_command):
-    result = run_command('lib update-index')
-    assert result.ok
-    assert 'Updating index: library_index.json downloaded' == result.stdout.splitlines()[-1].strip()
-
-def test_command_lib_remove(run_command):
-    libs = ['\"AzureIoTProtocol_MQTT\"', '\"CMMC MQTT Connector\"', '\"WiFiNINA\"']
-    result = run_command('lib uninstall {}'.format(' '.join(libs)))
-    assert result.ok
-
-@pytest.mark.slow
-def test_command_lib_search(run_command):
-    result = run_command('lib search')
-    assert result.ok
-    out_lines = result.stdout.splitlines()
-    libs = []
-    # Create an array with just the name of the vars
-    for line in out_lines:
-        if 'Name: ' in line:
-            libs.append(line.split()[1].strip('\"'))
-    number_of_libs = len(libs)
-    assert sorted(libs) == libs
-    assert ['WiFi101', 'WiFi101OTA'] == [lib for lib in libs if 'WiFi101' in lib]
-    result = run_command('lib search --format json')
-    assert result.ok
-    libs_found_from_json = json.loads(result.stdout)
-    number_of_libs_from_json = len(libs_found_from_json.get('libraries'))
-    assert number_of_libs == number_of_libs_from_json
-
-
-@pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
-def test_command_board_list(run_command):
-    result = run_command('core update-index')
-    assert result.ok
-    result = run_command('board list --format json')
-    assert result.ok
-    # check is a valid json and contains a list of ports
-    ports = json.loads(result.stdout).get('ports')
-    assert isinstance(ports, list)
-    for port in ports:
-        assert 'protocol' in port
-        assert 'protocol_label' in port
-
-
-@pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
-def test_command_board_listall(run_command):
-    result = run_command('board listall')
-    assert result.ok
-    assert ['Board', 'Name', 'FQBN'] == result.stdout.splitlines()[0].strip().split()
-
-
-def test_command_version(run_command):
-    result = run_command('version --format json')
+    result = run_command("version --format json")
     assert result.ok
     parsed_out = json.loads(result.stdout)
-
-    assert parsed_out.get('Application', False) == 'arduino-cli'
-    assert isinstance(semver.parse(parsed_out.get('VersionString', False)), dict)
-    assert isinstance(parsed_out.get('Commit', False), str)
+    assert parsed_out.get("Application", False) == "arduino-cli"
+    assert isinstance(semver.parse(parsed_out.get("VersionString", False)), dict)
+    assert isinstance(parsed_out.get("Commit", False), str)
