@@ -114,7 +114,7 @@ steps:
     target: /${DRONE_REPO_NAME}/nightly
     strip_prefix: dist/
     exclude:
-      - '**/config.yml'
+      - dist/config.yaml
 
 trigger:
   status:
