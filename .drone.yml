@@ -107,7 +107,16 @@ steps:
     target: /${DRONE_REPO_NAME}/nightly
 
 trigger:
-  cron: [ nightly ]
+  event:
+    # releases are triggered by tags only
+    - tag
+  status:
+    # skip the release if the previous build failed
+    - success
+  ref:
+    include:
+      # exclude the tags used to build Docker images for drone
+      - refs/tags/nightly
 
 depends_on:
   - test
