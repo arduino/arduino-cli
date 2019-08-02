@@ -90,6 +90,12 @@ kind: pipeline
 name: nightly
 
 steps:
+- name: fetch
+  # extra step needed to fetch tags after cloning
+  image: docker:git
+  commands:
+    - git fetch --tags
+
 - name: build
   image: arduino/arduino-cli:builder-0.1
   commands:
@@ -107,16 +113,11 @@ steps:
     target: /${DRONE_REPO_NAME}/nightly
 
 trigger:
-  event:
-    # releases are triggered by tags only
-    - tag
   status:
     # skip the release if the previous build failed
     - success
   ref:
-    include:
-      # exclude the tags used to build Docker images for drone
-      - refs/tags/nightly
+    - refs/tags/nightly
 
 depends_on:
   - test
