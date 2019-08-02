@@ -81,6 +81,7 @@ trigger:
     # exclude the tags used to build Docker images for drone
     - refs/tags/builder-*
     - refs/tags/drone-*
+    - refs/tags/nightly
 
 depends_on:
   - test
