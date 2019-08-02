@@ -5,6 +5,9 @@ checksum:
 snapshot:
   name_template: '{{ .Tag }}-{{ time "20060102" }}'
 
+release:
+  prerelease: auto
+
 changelog:
   sort: asc
   filters:
@@ -15,7 +18,7 @@ changelog:
 # cross compilations.
 builds:
   -
-    # OSX 
+    # OSX
     id: arduino_cli_osx
     binary: arduino-cli
     env:
