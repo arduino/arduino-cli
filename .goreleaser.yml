@@ -1,9 +1,9 @@
 # Global section
 checksum:
-  name_template: 'checksums.txt'
+  name_template: '{{ .Tag }}-{{ time "20060102" }}-checksums.txt'
 
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  name_template: '{{ .Tag }}-{{ time "20060102" }}'
 
 changelog:
   sort: asc
