@@ -84,3 +84,30 @@ trigger:
 
 depends_on:
   - test
+
+---
+kind: pipeline
+name: nightly
+
+steps:
+- name: build
+  image: arduino/arduino-cli:builder-0.1
+  commands:
+    - goreleaser --snapshot
+
+- name: upload
+  image: plugins/s3
+  settings:
+    bucket: arduino-downloads-prod-beagle
+    access_key:
+      from_secret: downloads_drone_io_aws_access_key_id
+    secret_key:
+      from_secret: downloads_drone_io_aws_secret_access_key
+    source: dist/*
+    target: /${DRONE_REPO_NAME}/nightly
+
+trigger:
+  cron: [ nightly ]
+
+depends_on:
+  - test
