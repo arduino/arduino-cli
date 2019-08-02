@@ -112,6 +112,7 @@ steps:
       from_secret: downloads_drone_io_aws_secret_access_key
     source: dist/*
     target: /${DRONE_REPO_NAME}/nightly
+    strip_prefix: dist/
 
 trigger:
   status:
