@@ -142,7 +142,7 @@ installFile() {
 bye() {
 	result=$?
 	if [ "$result" != "0" ]; then
-		echo "Fail to install $PROJECT_NAME"
+		echo "Failed to install $PROJECT_NAME"
 	fi
 	exit $result
 }
