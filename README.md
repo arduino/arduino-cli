@@ -68,7 +68,7 @@ the current source tree.
 
 If you're familiar with Golang or if you want to contribute to the project, you will probably
 build the `arduino-cli` locally with your Go compiler. Please refer to the
-[contritubing](CONTRIBUTING.md) doc for setup instructions.
+[contributing](CONTRIBUTING.md) doc for setup instructions.
 
 ## Getting Started
 
