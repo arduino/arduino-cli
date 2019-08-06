@@ -121,7 +121,7 @@ downloadFile() {
 		DOWNLOAD_URL=$(echo "$LATEST_RELEASE_JSON" | grep 'browser_' | cut -d\" -f4 | grep "$CLI_DIST") || true
 		if [ -z "$DOWNLOAD_URL" ]; then
 			echo "Sorry, we dont have a dist for your system: $OS $ARCH"
-			fail "You can ask one here: https://github.com/Arduino/$PROJECT_NAME/issues"
+			fail "You can request one here: https://github.com/Arduino/$PROJECT_NAME/issues"
 		else
 			echo "Downloading $DOWNLOAD_URL"
 			getFile "$DOWNLOAD_URL" "$CLI_TMP_FILE"
