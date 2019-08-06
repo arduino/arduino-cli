@@ -102,7 +102,7 @@ getFile() {
 
 downloadFile() {
 	get TAG_JSON https://api.github.com/repos/arduino/arduino-cli/releases/latest
-	TAG=$(echo $TAG_JSON | python -c 'import json,sys;obj=json.load(sys.stdin);sys.stdout.write(obj["tag_name"])')
+	TAG=$(echo $TAG_JSON | python -c 'import json,sys;obj=json.load(sys.stdin, strict=False);sys.stdout.write(obj["tag_name"])')
 	echo "TAG=$TAG"
 	#  arduino-cli_0.4.0-rc1_Linux_64bit.tar.gz
 	CLI_DIST="arduino-cli_${TAG}_${OS}_${ARCH}.tar.gz"
