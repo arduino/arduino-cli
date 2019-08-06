@@ -18,7 +18,7 @@ fail() {
 initDestination() {
 	if [ -n "$BINDIR" ]; then
 		if [ ! -d "$BINDIR" ]; then
-			fail "$BINDIR "'($BINDIR)'" folder not found. Please create it before continue."
+			fail "$BINDIR "'($BINDIR)'" folder not found. Please create it before continuing."
 		fi
 		LBINDIR="$BINDIR"
 	else
