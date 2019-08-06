@@ -30,7 +30,7 @@ import (
 
 // PlatformUninstall FIXMEDOC
 func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq, taskCB commands.TaskProgressCB) (*rpc.PlatformUninstallResp, error) {
-	pm := commands.GetPackageManager(req)
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
 	}

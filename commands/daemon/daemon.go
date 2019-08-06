@@ -49,7 +49,7 @@ func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.Board
 
 // BoardList FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardListReq) (*rpc.BoardListResp, error) {
-	return board.List(ctx, req)
+	return board.List(req.GetInstance().GetId())
 }
 
 // BoardListAll FIXMEDOC

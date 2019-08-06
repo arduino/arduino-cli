@@ -30,7 +30,7 @@ import (
 
 // PlatformSearch FIXMEDOC
 func PlatformSearch(ctx context.Context, req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error) {
-	pm := commands.GetPackageManager(req)
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
 	}

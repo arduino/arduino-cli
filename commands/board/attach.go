@@ -37,7 +37,7 @@ import (
 // Attach FIXMEDOC
 func Attach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskProgressCB) (*rpc.BoardAttachResp, error) {
 
-	pm := commands.GetPackageManager(req)
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
 	}

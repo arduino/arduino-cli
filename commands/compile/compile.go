@@ -42,7 +42,7 @@ import (
 
 // Compile FIXMEDOC
 func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.Writer, config *configs.Configuration, debug bool) (*rpc.CompileResp, error) {
-	pm := commands.GetPackageManager(req)
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
 	}

@@ -18,7 +18,6 @@
 package board
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"sort"
@@ -61,7 +60,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		time.Sleep(timeout)
 	}
 
-	resp, err := board.List(context.Background(), &rpc.BoardListReq{Instance: instance.CreateInstance()})
+	resp, err := board.List(instance.CreateInstance().GetId())
 	if err != nil {
 		formatter.PrintError(err, "Error detecting boards")
 		os.Exit(errorcodes.ErrNetwork)

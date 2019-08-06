@@ -71,7 +71,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		return nil, fmt.Errorf("incorrect FQBN: %s", err)
 	}
 
-	pm := commands.GetPackageManager(req)
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
 	// Find target board and board properties
 	_, _, board, boardProperties, _, err := pm.ResolveFQBN(fqbn)
