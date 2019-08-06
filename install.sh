@@ -62,7 +62,7 @@ initDownloadTool() {
 	elif type "wget" > /dev/null; then
 		DOWNLOAD_TOOL="wget"
 	else
-		fail "You need curl or wget as download tool. Please install it first before continue"
+		fail "You need curl or wget as download tool. Please install it first before continuing"
 	fi
 	echo "Using $DOWNLOAD_TOOL as download tool"
 }
