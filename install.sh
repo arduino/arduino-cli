@@ -82,7 +82,7 @@ get() {
 		httpStatusCode=$(cat $tmpFile | awk '/^  HTTP/{print $2}')
 	fi
 	if [ "$httpStatusCode" != 200 ]; then
-		echo "Request fail with http status code $httpStatusCode"
+		echo "Request failed with HTTP status code $httpStatusCode"
 		fail "Body: $body"
 	fi
 	eval "$1='$body'"
