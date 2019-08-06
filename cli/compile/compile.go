@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/compile"
+	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/go-paths-helper"
@@ -34,17 +35,20 @@ import (
 )
 
 var (
-	fqbn            string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
-	showProperties  bool     // Show all build preferences used instead of compiling.
-	preprocess      bool     // Print preprocessed code to stdout.
-	buildCachePath  string   // Builds of 'core.a' are saved into this path to be cached and reused.
-	buildPath       string   // Path where to save compiled files.
-	buildProperties []string // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
-	warnings        string   // Used to tell gcc which warning level to use.
-	verbose         bool     // Turns on verbose mode.
-	quiet           bool     // Suppresses almost every output.
-	vidPid          string   // VID/PID specific build properties.
-	exportFile      string   // The compiled binary is written to this file
+	fqbn               string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	showProperties     bool     // Show all build preferences used instead of compiling.
+	preprocess         bool     // Print preprocessed code to stdout.
+	buildCachePath     string   // Builds of 'core.a' are saved into this path to be cached and reused.
+	buildPath          string   // Path where to save compiled files.
+	buildProperties    []string // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
+	warnings           string   // Used to tell gcc which warning level to use.
+	verbose            bool     // Turns on verbose mode.
+	quiet              bool     // Suppresses almost every output.
+	vidPid             string   // VID/PID specific build properties.
+	uploadAfterCompile bool     // Upload the binary after the compilation.
+	port               string   // Upload port, e.g.: COM10 or /dev/ttyACM0.
+	verify             bool     // Upload, verify uploaded binary after the upload.
+	exportFile         string   // The compiled binary is written to this file
 )
 
 // NewCommand created a new `compile` command
@@ -71,6 +75,9 @@ func NewCommand() *cobra.Command {
 		`Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
 	command.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
 	command.Flags().BoolVar(&quiet, "quiet", false, "Optional, supresses almost every output.")
+	command.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, "Upload the binary after the compilation.")
+	command.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
+	command.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	command.Flags().StringVar(&vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if boards supports them.")
 
 	return command
@@ -105,6 +112,23 @@ func run(cmd *cobra.Command, args []string) {
 	if err != nil {
 		formatter.PrintError(err, "Error during build")
 		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	if uploadAfterCompile {
+		_, err := upload.Upload(context.Background(), &rpc.UploadReq{
+			Instance:   instance,
+			Fqbn:       fqbn,
+			SketchPath: sketchPath.String(),
+			Port:       port,
+			Verbose:    verbose,
+			Verify:     verify,
+			ImportFile: exportFile,
+		}, os.Stdout, os.Stderr)
+
+		if err != nil {
+			formatter.PrintError(err, "Error during Upload")
+			os.Exit(errorcodes.ErrGeneric)
+		}
 	}
 }
 
