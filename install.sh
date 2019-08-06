@@ -113,7 +113,7 @@ downloadFile() {
 	httpStatusCode=$(getFile "$DOWNLOAD_URL" "$CLI_TMP_FILE")
 	if [ "$httpStatusCode" -ne 200 ]; then
 		echo "Did not find a release for your system: $OS $ARCH"
-		echo "Trying to find a release on the github api."
+		echo "Trying to find a release using the GitHub API."
 		LATEST_RELEASE_URL="https://api.github.com/repos/arduino/$PROJECT_NAME/releases/tags/$TAG"
 		echo "LATEST_RELEASE_URL=$LATEST_RELEASE_URL"
 		get LATEST_RELEASE_JSON $LATEST_RELEASE_URL
