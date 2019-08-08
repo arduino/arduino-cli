@@ -60,19 +60,18 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		time.Sleep(timeout)
 	}
 
-	resp, err := board.List(instance.CreateInstance().GetId())
+	ports, err := board.List(instance.CreateInstance().GetId())
 	if err != nil {
 		formatter.PrintError(err, "Error detecting boards")
 		os.Exit(errorcodes.ErrNetwork)
 	}
 
-	if output.JSONOrElse(resp) {
-		outputListResp(resp)
+	if output.JSONOrElse(ports) {
+		outputListResp(ports)
 	}
 }
 
-func outputListResp(resp *rpc.BoardListResp) {
-	ports := resp.GetPorts()
+func outputListResp(ports []*rpc.DetectedPort) {
 	if len(ports) == 0 {
 		formatter.Print("No boards found.")
 		return
@@ -84,7 +83,7 @@ func outputListResp(resp *rpc.BoardListResp) {
 	})
 	table := output.NewTable()
 	table.SetHeader("Port", "Type", "Board Name", "FQBN")
-	for _, port := range resp.GetPorts() {
+	for _, port := range ports {
 		address := port.GetProtocol() + "://" + port.GetAddress()
 		if port.GetProtocol() == "serial" {
 			address = port.GetAddress()

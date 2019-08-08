@@ -18,13 +18,18 @@
 package board
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/pkg/errors"
 )
 
 // List FIXMEDOC
-func List(instanceID int32) (*rpc.BoardListResp, error) {
+func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 	pm := commands.GetPackageManager(instanceID)
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -40,29 +45,55 @@ func List(instanceID int32) (*rpc.BoardListResp, error) {
 	}
 	defer serialDiscovery.Close()
 
-	resp := &rpc.BoardListResp{Ports: []*rpc.DetectedPort{}}
-
 	ports, err := serialDiscovery.List()
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting port list from serial-discovery")
 	}
 
+	retVal := []*rpc.DetectedPort{}
 	for _, port := range ports {
 		b := []*rpc.BoardListItem{}
+
+		// first query installed cores through the Package Manager
 		for _, board := range pm.IdentifyBoard(port.IdentificationPrefs) {
 			b = append(b, &rpc.BoardListItem{
 				Name: board.Name(),
 				FQBN: board.FQBN(),
 			})
 		}
+
+		// if installed cores didn't recognize the board, try querying
+		// the builder API
+		if len(b) == 0 {
+			url := fmt.Sprintf("https://builder.arduino.cc/v3/boards/byVidPid/%s/%s",
+				port.IdentificationPrefs.Get("vid"),
+				port.IdentificationPrefs.Get("pid"))
+			req, _ := http.NewRequest("GET", url, nil)
+			if res, err := http.DefaultClient.Do(req); err == nil {
+				body, _ := ioutil.ReadAll(res.Body)
+				res.Body.Close()
+
+				var dat map[string]interface{}
+
+				if err := json.Unmarshal(body, &dat); err == nil {
+					b = append(b, &rpc.BoardListItem{
+						Name: dat["name"].(string),
+						FQBN: dat["fqbn"].(string),
+					})
+				}
+			}
+		}
+
+		// boards slice can be empty at this point if neither the cores nor the
+		// API managed to recognize the connected board
 		p := &rpc.DetectedPort{
 			Address:       port.Address,
 			Protocol:      port.Protocol,
 			ProtocolLabel: port.ProtocolLabel,
 			Boards:        b,
 		}
-		resp.Ports = append(resp.Ports, p)
+		retVal = append(retVal, p)
 	}
 
-	return resp, nil
+	return retVal, nil
 }

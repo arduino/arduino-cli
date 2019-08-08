@@ -24,7 +24,7 @@ import (
 	properties "github.com/arduino/go-properties-orderedmap"
 )
 
-// IdentifyBoard returns a list of baords matching the provided identification properties.
+// IdentifyBoard returns a list of boards matching the provided identification properties.
 func (pm *PackageManager) IdentifyBoard(idProps *properties.Map) []*cores.Board {
 	if idProps.Size() == 0 {
 		return []*cores.Board{}
