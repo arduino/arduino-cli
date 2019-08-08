@@ -49,7 +49,6 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	}
 	buildOptionsJson := ctx.BuildOptionsJson
 	previousBuildOptionsJson := ctx.BuildOptionsJsonPrevious
-	logger := ctx.GetLogger()
 
 	var opts *properties.Map
 	var prevOpts *properties.Map
