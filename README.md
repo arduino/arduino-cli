@@ -42,7 +42,7 @@ Alternatively you can download one of the pre-built binaries for the supported p
 
 These builds are generated once a day from `master` branch starting at 01:00 GMT
 
-In order to get the latest nightly build for your platform use the following links replacing `<DATE>` with the current 
+In order to get the latest nightly build for your platform use the following links replacing `<DATE>` with the current
 date, using the format YYYYMMDD (i.e for 2019/Aug/06 use `20190806` )
 
 - **Linux 64 bit**: `https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-<DATE>_Linux_64bit.tar.gz`
@@ -53,7 +53,7 @@ date, using the format YYYYMMDD (i.e for 2019/Aug/06 use `20190806` )
 - **Windows 32 bit**: `https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-<DATE>_Windows_32bit.zip`
 - **Mac OSX**: `https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-<DATE>_macOS_64bit.tar.gz`
 
-Checksums for the nightly builds are available at 
+Checksums for the nightly builds are available at
 `https://downloads.arduino.cc/arduino-cli/nightly/nightly-<DATE>-checksums.txt`
 
 Once downloaded, place the executable `arduino-cli` into a directory which is in your `PATH`.
@@ -147,15 +147,17 @@ available cores matching the name arduino:
 ```console
 $ arduino-cli core search arduino
 Searching for platforms matching 'arduino'
-
-ID              Version Installed       Name
-Intel:arc32     2.0.2   No              Intel Curie Boards
-arduino:avr     1.6.21  No              Arduino AVR Boards
-arduino:nrf52   1.0.2   No              Arduino nRF52 Boards
-arduino:sam     1.6.11  No              Arduino SAM Boards (32-bits ARM Cortex-M3)
-arduino:samd    1.6.18  No              Arduino SAMD Boards (32-bits ARM Cortex-M0+)
-arduino:stm32f4 1.0.1   No              Arduino STM32F4 Boards
-littleBits:avr  1.0.0   No              littleBits Arduino AVR Modules
+ID                Version Name
+Intel:arc32       2.0.4   Intel Curie Boards
+arduino:avr       1.6.23  Arduino AVR Boards
+arduino:mbed      1.1.0   Arduino nRF528x Boards (Mbed OS)
+arduino:megaavr   1.8.3   Arduino megaAVR Boards
+arduino:nrf52     1.0.2   Arduino nRF52 Boards
+arduino:sam       1.6.12  Arduino SAM Boards (32-bits ARM Cortex-M3)
+arduino:samd      1.8.3   Arduino SAMD Boards (32-bits ARM Cortex-M0+)
+arduino:samd_beta 1.6.25  Arduino SAMD Beta Boards (32-bits ARM Cortex-M0+)
+arduino:stm32f4   1.0.1   Arduino STM32F4 Boards
+littleBits:avr    1.0.0   littleBits Arduino AVR Modules
 ```
 
 If you're unsure you can try to refine the search with the board name
@@ -163,9 +165,8 @@ If you're unsure you can try to refine the search with the board name
 ```console
 $ arduino-cli core search mkr1000
 Searching for platforms matching 'mkr1000'
-
-ID              Version Installed   Name
-arduino:samd    1.6.19  No          Arduino SAMD Boards (32-bits ARM Cortex-M0+)
+ID           Version Name
+arduino:samd 1.8.3   Arduino SAMD Boards (32-bits ARM Cortex-M0+)
 ```
 
 So, the right platform for the Arduino MKR1000 is arduino:samd, now we can install it
