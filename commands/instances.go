@@ -29,7 +29,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/configs"
@@ -52,7 +51,6 @@ type CoreInstance struct {
 	PackageManager *packagemanager.PackageManager
 	lm             *librariesmanager.LibrariesManager
 	getLibOnly     bool
-	discoveries    []*discovery.Discovery
 }
 
 // InstanceContainer FIXMEDOC
@@ -66,9 +64,10 @@ func GetInstance(id int32) *CoreInstance {
 	return instances[id]
 }
 
-// GetPackageManager FIXMEDOC
-func GetPackageManager(req InstanceContainer) *packagemanager.PackageManager {
-	i, ok := instances[req.GetInstance().GetId()]
+// GetPackageManager returns a PackageManager for the given ID, or nil if
+// ID doesn't exist
+func GetPackageManager(id int32) *packagemanager.PackageManager {
+	i, ok := instances[id]
 	if !ok {
 		return nil
 	}
@@ -82,15 +81,6 @@ func GetLibraryManager(instanceID int32) *librariesmanager.LibrariesManager {
 		return nil
 	}
 	return i.lm
-}
-
-// GetDiscoveries FIXMEDOC
-func GetDiscoveries(req InstanceContainer) []*discovery.Discovery {
-	i, ok := instances[req.GetInstance().GetId()]
-	if !ok {
-		return nil
-	}
-	return i.discoveries
 }
 
 func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, downloadCB DownloadProgressCB,
@@ -129,32 +119,6 @@ func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB
 		if err := instance.PackageManager.LoadHardware(instance.config); err != nil {
 			return fmt.Errorf("could not load hardware packages: %s", err)
 		}
-	}
-	return nil
-}
-
-func (instance *CoreInstance) startDiscoveries() error {
-	serialDiscovery, err := newBuiltinSerialDiscovery(instance.PackageManager)
-	if err != nil {
-		return fmt.Errorf("starting serial discovery: %s", err)
-	}
-
-	discoveriesToStop := instance.discoveries
-	discoveriesToStart := append(
-		discovery.ExtractDiscoveriesFromPlatforms(instance.PackageManager),
-		serialDiscovery,
-	)
-
-	instance.discoveries = []*discovery.Discovery{}
-	for _, disc := range discoveriesToStart {
-		sharedDisc, err := StartSharedDiscovery(disc)
-		if err != nil {
-			return fmt.Errorf("starting discovery: %s", err)
-		}
-		instance.discoveries = append(instance.discoveries, sharedDisc)
-	}
-	for _, disc := range discoveriesToStop {
-		StopSharedDiscovery(disc)
 	}
 	return nil
 }
@@ -201,11 +165,6 @@ func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, 
 		return nil, err
 	}
 
-	if err := instance.startDiscoveries(); err != nil {
-		// TODO: handle discovery errors
-		fmt.Println(err)
-	}
-
 	return &rpc.InitResp{
 		Instance:             &rpc.Instance{Id: handle},
 		PlatformsIndexErrors: reqPltIndex,
@@ -218,10 +177,6 @@ func Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error)
 	id := req.GetInstance().GetId()
 	if _, ok := instances[id]; !ok {
 		return nil, fmt.Errorf("invalid handle")
-	}
-
-	for _, disc := range GetDiscoveries(req) {
-		StopSharedDiscovery(disc)
 	}
 
 	delete(instances, id)
@@ -312,8 +267,6 @@ func Rescan(instanceID int32) (*rpc.RescanResp, error) {
 	}
 	coreInstance.PackageManager = pm
 	coreInstance.lm = lm
-
-	coreInstance.startDiscoveries()
 
 	return &rpc.RescanResp{
 		PlatformsIndexErrors: reqPltIndex,
