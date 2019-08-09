@@ -161,7 +161,10 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	if req.GetShowProperties() {
 		err = builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
 	} else if req.GetPreprocess() {
-		err = builder.RunPreprocess(builderCtx)
+		if err = builder.RunPreprocess(builderCtx); err != nil {
+			return nil, fmt.Errorf("preprocessing sketch: %s", err)
+		}
+		return &rpc.CompileResp{}, nil
 	} else {
 		err = builder.RunBuilder(builderCtx)
 	}
