@@ -30,6 +30,7 @@
 package builder
 
 import (
+	"fmt"
 	"os"
 	"reflect"
 	"strconv"
@@ -170,11 +171,15 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 		&WarnAboutArchIncompatibleLibraries{},
 
 		&PreprocessSketch{},
-
-		&PrintPreprocessedSource{},
 	}
 
-	return runCommands(ctx, commands, true)
+	if err := runCommands(ctx, commands, true); err != nil {
+		return err
+	}
+
+	// Output arduino-preprocessed source
+	fmt.Println(ctx.Source)
+	return nil
 }
 
 type ParseHardwareAndDumpBuildProperties struct{}
