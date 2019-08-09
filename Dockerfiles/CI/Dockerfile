@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-ENV PROTOBUF_VER 3.8.0
+ENV PROTOBUF_VER 3.9.1
 ENV PATH="/miniconda/bin:${PATH}"
 
 # NOTE: most of the following assume WORDKIR is '/'
