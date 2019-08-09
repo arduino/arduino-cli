@@ -104,8 +104,12 @@ downloadFile() {
 	get TAG_JSON https://api.github.com/repos/arduino/arduino-cli/releases/latest
 	TAG=$(echo $TAG_JSON | python -c 'import json,sys;obj=json.load(sys.stdin, strict=False);sys.stdout.write(obj["tag_name"])')
 	echo "TAG=$TAG"
-	#  arduino-cli_0.4.0-rc1_Linux_64bit.tar.gz
-	CLI_DIST="arduino-cli_${TAG}_${OS}_${ARCH}.tar.gz"
+	#  arduino-cli_0.4.0-rc1_Linux_64bit.[tar.gz, zip]
+	if [ "$OS" == "Windows" ]; then
+		CLI_DIST="arduino-cli_${TAG}_${OS}_${ARCH}.zip"
+	else
+		CLI_DIST="arduino-cli_${TAG}_${OS}_${ARCH}.tar.gz"
+	fi
 	echo "CLI_DIST=$CLI_DIST"
 	DOWNLOAD_URL="https://downloads.arduino.cc/arduino-cli/$CLI_DIST"
 	CLI_TMP_FILE="/tmp/$CLI_DIST"
