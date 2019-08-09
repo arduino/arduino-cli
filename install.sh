@@ -35,7 +35,7 @@ initArch() {
 	case $ARCH in
 		armv5*) ARCH="armv5";;
 		armv6*) ARCH="armv6";;
-		armv7*) ARCH="ARM";;
+		armv7*) ARCH="ARMv7";;
 		aarch64) ARCH="ARM64";;
 		x86) ARCH="32bit";;
 		x86_64) ARCH="64bit";;
