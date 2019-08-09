@@ -71,9 +71,9 @@ func (t *Table) makeTableRow(columns ...interface{}) *TableRow {
 		case TextBox:
 			cells[i] = text
 		case string:
-			cells[i] = Sprintf("%s", text)
+			cells[i] = sprintf("%s", text)
 		case fmt.Stringer:
-			cells[i] = Sprintf("%s", text.String())
+			cells[i] = sprintf("%s", text.String())
 		default:
 			panic(fmt.Sprintf("invalid column argument type: %t", col))
 		}
