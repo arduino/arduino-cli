@@ -121,8 +121,7 @@ func spaces(n int) string {
 	return res
 }
 
-// Sprintf FIXMEDOC
-func Sprintf(format string, args ...interface{}) TextBox {
+func sprintf(format string, args ...interface{}) TextBox {
 	cleanArgs := make([]interface{}, len(args))
 	for i, arg := range args {
 		if text, ok := arg.(*Text); ok {

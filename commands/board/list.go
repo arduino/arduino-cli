@@ -23,15 +23,31 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/pkg/errors"
 )
 
+var (
+	// ErrNotFound is returned when the API returns 404
+	ErrNotFound = errors.New("board not found")
+)
+
 func apiByVidPid(url string) ([]*rpc.BoardListItem, error) {
 	retVal := []*rpc.BoardListItem{}
 	req, _ := http.NewRequest("GET", url, nil)
+	req.Header = globals.HTTPClientHeader
+	req.Header.Set("Content-Type", "application/json")
+
 	if res, err := http.DefaultClient.Do(req); err == nil {
+		if res.StatusCode >= 400 {
+			if res.StatusCode == 404 {
+				return nil, ErrNotFound
+			}
+			return nil, errors.Errorf("the server responded with status %s", res.Status)
+		}
+
 		body, _ := ioutil.ReadAll(res.Body)
 		res.Body.Close()
 
@@ -100,7 +116,11 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 				port.IdentificationPrefs.Get("vid"),
 				port.IdentificationPrefs.Get("pid"))
 			items, err := apiByVidPid(url)
-			if err != nil {
+			if err == ErrNotFound {
+				// the board couldn't be detected, keep going with the next port
+				continue
+			} else if err != nil {
+				// this is bad, bail out
 				return nil, errors.Wrap(err, "error getting bard info from Arduino Cloud")
 			}
 

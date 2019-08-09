@@ -51,6 +51,31 @@ func TestGetByVidPid(t *testing.T) {
 	require.NotNil(t, err)
 }
 
+func TestGetByVidPidNotFound(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	res, err := apiByVidPid(ts.URL)
+	require.NotNil(t, err)
+	require.Equal(t, "board not found", err.Error())
+	require.Len(t, res, 0)
+}
+
+func TestGetByVidPid5xx(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 - Ooooops!"))
+	}))
+	defer ts.Close()
+
+	res, err := apiByVidPid(ts.URL)
+	require.NotNil(t, err)
+	require.Equal(t, "the server responded with status 500 Internal Server Error", err.Error())
+	require.Len(t, res, 0)
+}
+
 func TestGetByVidPidMalformedResponse(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "{}")
