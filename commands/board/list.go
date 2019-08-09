@@ -28,6 +28,37 @@ import (
 	"github.com/pkg/errors"
 )
 
+func apiByVidPid(url string) ([]*rpc.BoardListItem, error) {
+	retVal := []*rpc.BoardListItem{}
+	req, _ := http.NewRequest("GET", url, nil)
+	if res, err := http.DefaultClient.Do(req); err == nil {
+		body, _ := ioutil.ReadAll(res.Body)
+		res.Body.Close()
+
+		var dat map[string]interface{}
+		err = json.Unmarshal(body, &dat)
+		if err != nil {
+			return nil, errors.Wrap(err, "error processing response from server")
+		}
+
+		name, nameFound := dat["name"].(string)
+		fqbn, fbqnFound := dat["fqbn"].(string)
+
+		if !nameFound || !fbqnFound {
+			return nil, errors.New("wrong format in server response")
+		}
+
+		retVal = append(retVal, &rpc.BoardListItem{
+			Name: name,
+			FQBN: fqbn,
+		})
+	} else {
+		return nil, errors.Wrap(err, "error querying Arduino Cloud Api")
+	}
+
+	return retVal, nil
+}
+
 // List FIXMEDOC
 func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 	pm := commands.GetPackageManager(instanceID)
@@ -68,20 +99,12 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 			url := fmt.Sprintf("https://builder.arduino.cc/v3/boards/byVidPid/%s/%s",
 				port.IdentificationPrefs.Get("vid"),
 				port.IdentificationPrefs.Get("pid"))
-			req, _ := http.NewRequest("GET", url, nil)
-			if res, err := http.DefaultClient.Do(req); err == nil {
-				body, _ := ioutil.ReadAll(res.Body)
-				res.Body.Close()
-
-				var dat map[string]interface{}
-
-				if err := json.Unmarshal(body, &dat); err == nil {
-					b = append(b, &rpc.BoardListItem{
-						Name: dat["name"].(string),
-						FQBN: dat["fqbn"].(string),
-					})
-				}
+			items, err := apiByVidPid(url)
+			if err != nil {
+				return nil, errors.Wrap(err, "error getting bard info from Arduino Cloud")
 			}
+
+			b = items
 		}
 
 		// boards slice can be empty at this point if neither the cores nor the
