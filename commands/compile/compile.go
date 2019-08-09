@@ -158,18 +158,16 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.ExecStdout = outStream
 	builderCtx.ExecStderr = errStream
 	builderCtx.SetLogger(i18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
+
+	// if --preprocess or --show-properties were passed, we can stop here
 	if req.GetShowProperties() {
-		err = builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
+		return &rpc.CompileResp{}, builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
 	} else if req.GetPreprocess() {
-		if err = builder.RunPreprocess(builderCtx); err != nil {
-			return nil, fmt.Errorf("preprocessing sketch: %s", err)
-		}
-		return &rpc.CompileResp{}, nil
-	} else {
-		err = builder.RunBuilder(builderCtx)
+		return &rpc.CompileResp{}, builder.RunPreprocess(builderCtx)
 	}
 
-	if err != nil {
+	// if it's a regular build, go on...
+	if err := builder.RunBuilder(builderCtx); err != nil {
 		return nil, fmt.Errorf("build failed: %s", err)
 	}
 
