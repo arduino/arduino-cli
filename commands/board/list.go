@@ -121,7 +121,7 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 				continue
 			} else if err != nil {
 				// this is bad, bail out
-				return nil, errors.Wrap(err, "error getting bard info from Arduino Cloud")
+				return nil, errors.Wrap(err, "error getting board info from Arduino Cloud")
 			}
 
 			b = items
