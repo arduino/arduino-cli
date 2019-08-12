@@ -19,7 +19,6 @@ package board
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -28,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
 )
 
@@ -56,33 +56,41 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 }
 
 func outputDetailsResp(details *rpc.BoardDetailsResp) {
-	table := output.NewTable()
-	table.SetColumnWidthMode(1, output.Average)
-	table.AddRow("Board name:", details.Name)
+	// Table is 5 columns wide:
+	// |               |                             | |                       |
+	// Board name:     Arduino Nano
+	//
+	// Required tools: arduino:avr-gcc                 5.4.0-atmel3.6.1-arduino2
+	//                 arduino:avrdude                 6.3.0-arduino14
+	//                 arduino:arduinoOTA              1.2.1
+	//
+	// Option:         Processor                       cpu
+	//                 ATmega328P                    * cpu=atmega328
+	//                 ATmega328P (Old Bootloader)     cpu=atmega328old
+	//                 ATmega168                       cpu=atmega168
+	table := tabby.New()
+
+	table.AddLine("Board name:", details.Name, "")
+
 	for i, tool := range details.RequiredTools {
-		head := ""
 		if i == 0 {
-			table.AddRow()
-			head = "Required tools:"
+			table.AddLine("", "", "", "") // get some space from above
+			table.AddLine("Required tools:", tool.Packager+":"+tool.Name, "", tool.Version)
+			continue
 		}
-		table.AddRow(head, tool.Packager+":"+tool.Name, "", tool.Version)
+		table.AddLine("", tool.Packager+":"+tool.Name, "", tool.Version)
 	}
+
 	for _, option := range details.ConfigOptions {
-		table.AddRow()
-		table.AddRow("Option:",
-			option.OptionLabel,
-			"", option.Option)
+		table.AddLine("", "", "", "") // get some space from above
+		table.AddLine("Option:", option.OptionLabel, "", option.Option)
 		for _, value := range option.Values {
+			checked := ""
 			if value.Selected {
-				table.AddRow("",
-					output.Green(value.ValueLabel),
-					output.Green("✔"), output.Green(option.Option+"="+value.Value))
-			} else {
-				table.AddRow("",
-					value.ValueLabel,
-					"", option.Option+"="+value.Value)
+				checked = "✔"
 			}
+			table.AddLine("", value.ValueLabel, checked, option.Option+"="+value.Value)
 		}
 	}
-	fmt.Print(table.Render())
+	table.Print()
 }

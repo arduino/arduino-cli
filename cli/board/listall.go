@@ -19,7 +19,6 @@ package board
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"sort"
 
@@ -29,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
 )
 
@@ -68,10 +68,10 @@ func outputBoardListAll(list *rpc.BoardListAllResp) {
 		return list.Boards[i].GetName() < list.Boards[j].GetName()
 	})
 
-	table := output.NewTable()
-	table.SetHeader("Board Name", "FQBN")
+	table := tabby.New()
+	table.AddHeader("Board Name", "FQBN")
 	for _, item := range list.GetBoards() {
-		table.AddRow(item.GetName(), item.GetFQBN())
+		table.AddLine(item.GetName(), item.GetFQBN())
 	}
-	fmt.Print(table.Render())
+	table.Print()
 }

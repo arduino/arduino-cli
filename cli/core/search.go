@@ -19,7 +19,6 @@ package core
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"sort"
 	"strings"
@@ -30,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/cheynewallace/tabby"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -73,13 +73,13 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 }
 
 func outputSearchCores(cores []*rpc.Platform) {
-	table := output.NewTable()
-	table.AddRow("ID", "Version", "Name")
+	table := tabby.New()
+	table.AddHeader("ID", "Version", "Name")
 	sort.Slice(cores, func(i, j int) bool {
 		return cores[i].ID < cores[j].ID
 	})
 	for _, item := range cores {
-		table.AddRow(item.GetID(), item.GetLatest(), item.GetName())
+		table.AddLine(item.GetID(), item.GetLatest(), item.GetName())
 	}
-	fmt.Print(table.Render())
+	table.Print()
 }

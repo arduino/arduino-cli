@@ -18,7 +18,6 @@
 package board
 
 import (
-	"fmt"
 	"os"
 	"sort"
 	"time"
@@ -29,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
 )
 
@@ -81,8 +81,9 @@ func outputListResp(ports []*rpc.DetectedPort) {
 		return x.GetProtocol() < y.GetProtocol() ||
 			(x.GetProtocol() == y.GetProtocol() && x.GetAddress() < y.GetAddress())
 	})
-	table := output.NewTable()
-	table.SetHeader("Port", "Type", "Board Name", "FQBN")
+
+	table := tabby.New()
+	table.AddHeader("Port", "Type", "Board Name", "FQBN")
 	for _, port := range ports {
 		address := port.GetProtocol() + "://" + port.GetAddress()
 		if port.GetProtocol() == "serial" {
@@ -97,7 +98,7 @@ func outputListResp(ports []*rpc.DetectedPort) {
 			for _, b := range boards {
 				board := b.GetName()
 				fqbn := b.GetFQBN()
-				table.AddRow(address, protocol, board, fqbn)
+				table.AddLine(address, protocol, board, fqbn)
 				// show address and protocol only on the first row
 				address = ""
 				protocol = ""
@@ -105,8 +106,8 @@ func outputListResp(ports []*rpc.DetectedPort) {
 		} else {
 			board := "Unknown"
 			fqbn := ""
-			table.AddRow(address, protocol, board, fqbn)
+			table.AddLine(address, protocol, board, fqbn)
 		}
 	}
-	fmt.Print(table.Render())
+	table.Print()
 }

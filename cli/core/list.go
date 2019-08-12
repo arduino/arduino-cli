@@ -18,7 +18,6 @@
 package core
 
 import (
-	"fmt"
 	"os"
 	"sort"
 
@@ -28,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/cheynewallace/tabby"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -69,13 +69,14 @@ func outputInstalledCores(platforms []*cores.PlatformRelease) {
 		return
 	}
 
-	table := output.NewTable()
-	table.AddRow("ID", "Installed", "Latest", "Name")
+	table := tabby.New()
+	table.AddHeader("ID", "Installed", "Latest", "Name")
 	sort.Slice(platforms, func(i, j int) bool {
 		return platforms[i].Platform.String() < platforms[j].Platform.String()
 	})
 	for _, p := range platforms {
-		table.AddRow(p.Platform.String(), p.Version.String(), p.Platform.GetLatestRelease().Version.String(), p.Platform.Name)
+		table.AddLine(p.Platform.String(), p.Version.String(), p.Platform.GetLatestRelease().Version.String(), p.Platform.Name)
 	}
-	fmt.Print(table.Render())
+
+	table.Print()
 }
