@@ -107,7 +107,7 @@ func run(cmd *cobra.Command, args []string) {
 		Quiet:           quiet,
 		VidPid:          vidPid,
 		ExportFile:      exportFile,
-	}, os.Stdout, os.Stderr, globals.Config, globals.Debug)
+	}, os.Stdout, os.Stderr, globals.Config, globals.LogLevel == "debug")
 
 	if err != nil {
 		formatter.PrintError(err, "Error during build")

@@ -18,6 +18,8 @@
 package cli
 
 import (
+	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 
@@ -34,10 +36,8 @@ import (
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/common/formatter"
-	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 var (
@@ -55,6 +55,12 @@ var (
 	ErrLogrus = logrus.New()
 
 	outputFormat string
+	verbose      bool
+	logFile      string
+)
+
+const (
+	defaultLogLevel = "warn"
 )
 
 // Init the cobra root command
@@ -75,28 +81,66 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(upload.NewCommand())
 	cmd.AddCommand(version.NewCommand())
 
-	cmd.PersistentFlags().BoolVar(&globals.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
+	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
+	cmd.PersistentFlags().StringVar(&globals.LogLevel, "log-level", defaultLogLevel, "Messages with this level and above will be logged (default: warn).")
+	cmd.PersistentFlags().StringVar(&logFile, "log-file", "", "Path to the file where logs will be written.")
 	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be [text|json].")
 	cmd.PersistentFlags().StringVar(&globals.YAMLConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 	cmd.PersistentFlags().StringSliceVar(&globals.AdditionalUrls, "additional-urls", []string{}, "Additional URLs for the board manager.")
+
+}
+
+// convert the string passed to the `--log-level` option to the corresponding
+// logrus formal level.
+func toLogLevel(s string) (t logrus.Level, found bool) {
+	t, found = map[string]logrus.Level{
+		"trace": logrus.TraceLevel,
+		"debug": logrus.DebugLevel,
+		"info":  logrus.InfoLevel,
+		"warn":  logrus.WarnLevel,
+		"error": logrus.ErrorLevel,
+		"fatal": logrus.FatalLevel,
+		"panic": logrus.PanicLevel,
+	}[s]
+
+	return
 }
 
 func preRun(cmd *cobra.Command, args []string) {
-	// Reset logrus if debug flag changed.
-	if !globals.Debug {
-		// Discard logrus output if no debug.
-		logrus.SetOutput(ioutil.Discard)
-	} else {
-		// Else print on stderr.
+	// configure where to put logs
+	writers := []io.Writer{}
 
-		// Workaround to get colored output on windows
-		if terminal.IsTerminal(int(os.Stdout.Fd())) {
-			logrus.SetFormatter(&logrus.TextFormatter{ForceColors: true})
+	// should we log to file?
+	if logFile != "" {
+		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		if err != nil {
+			fmt.Printf("Unable to open file for logging: %s", logFile)
+			os.Exit(errorcodes.ErrBadCall)
 		}
-		logrus.SetOutput(colorable.NewColorableStdout())
-		ErrLogrus.Out = colorable.NewColorableStderr()
-		formatter.SetLogger(ErrLogrus)
+		writers = append(writers, file)
 	}
+
+	// should we log to stdout?
+	if verbose {
+		writers = append(writers, os.Stdout)
+	}
+
+	// configure logging filter
+	if lvl, found := toLogLevel(globals.LogLevel); !found {
+		fmt.Printf("Invalid option for --log-level: %s", globals.LogLevel)
+		os.Exit(errorcodes.ErrBadArgument)
+	} else {
+		logrus.SetLevel(lvl)
+	}
+
+	// configure logrus
+	if len(writers) > 0 {
+		logrus.SetOutput(io.MultiWriter(writers...))
+	} else {
+		// Discard logrus output if no writer was set
+		logrus.SetOutput(ioutil.Discard)
+	}
+
 	globals.InitConfigs()
 
 	logrus.Info(globals.VersionInfo.Application + "-" + globals.VersionInfo.VersionString)

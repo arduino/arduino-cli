@@ -41,6 +41,9 @@ var (
 	YAMLConfigFile string
 	// AdditionalUrls contains the list of additional urls the boards manager can use
 	AdditionalUrls []string
+	// LogLevel is temporarily exported because the compile command will
+	// forward this information to the underlying legacy package
+	LogLevel string
 )
 
 func getHTTPClientHeader() http.Header {
