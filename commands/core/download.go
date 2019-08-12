@@ -32,7 +32,7 @@ import (
 // PlatformDownload FIXMEDOC
 func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloadCB commands.DownloadProgressCB,
 	downloaderHeaders http.Header) (*rpc.PlatformDownloadResp, error) {
-	pm := commands.GetPackageManager(req)
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
 	}

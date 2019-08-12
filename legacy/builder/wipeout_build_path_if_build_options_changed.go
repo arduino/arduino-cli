@@ -49,7 +49,6 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	}
 	buildOptionsJson := ctx.BuildOptionsJson
 	previousBuildOptionsJson := ctx.BuildOptionsJsonPrevious
-	logger := ctx.GetLogger()
 
 	var opts *properties.Map
 	var prevOpts *properties.Map
@@ -79,7 +78,9 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 		}
 	}
 
-	logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED)
+	// FIXME: this should go outside legacy and behind a `logrus` call so users can
+	// control when this should be printed.
+	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED)
 
 	buildPath := ctx.BuildPath
 	files, err := gohasissues.ReadDir(buildPath.String())

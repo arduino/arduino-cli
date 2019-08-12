@@ -33,7 +33,7 @@ import (
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) (*rpc.PlatformInstallResp, error) {
 
-	pm := commands.GetPackageManager(req)
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
 	}

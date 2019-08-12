@@ -29,7 +29,7 @@ install:
   # protobuf tooling needed at test time. We use a very old version of the compiler
   # because of this: https://github.com/protocolbuffers/protobuf/issues/3957
   - go get github.com/golang/protobuf/protoc-gen-go
-  - curl -o protoc.zip -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.4.0/protoc-3.4.0-win32.zip
+  - curl -o protoc.zip -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.9.1/protoc-3.9.1-win32.zip
   - 7z x protoc.zip -o%PROTOC_PATH%
 
 test_script:

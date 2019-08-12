@@ -42,7 +42,7 @@ import (
 
 // Compile FIXMEDOC
 func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.Writer, config *configs.Configuration, debug bool) (*rpc.CompileResp, error) {
-	pm := commands.GetPackageManager(req)
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
 	}
@@ -158,15 +158,16 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.ExecStdout = outStream
 	builderCtx.ExecStderr = errStream
 	builderCtx.SetLogger(i18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
+
+	// if --preprocess or --show-properties were passed, we can stop here
 	if req.GetShowProperties() {
-		err = builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
+		return &rpc.CompileResp{}, builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
 	} else if req.GetPreprocess() {
-		err = builder.RunPreprocess(builderCtx)
-	} else {
-		err = builder.RunBuilder(builderCtx)
+		return &rpc.CompileResp{}, builder.RunPreprocess(builderCtx)
 	}
 
-	if err != nil {
+	// if it's a regular build, go on...
+	if err := builder.RunBuilder(builderCtx); err != nil {
 		return nil, fmt.Errorf("build failed: %s", err)
 	}
 
