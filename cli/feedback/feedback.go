@@ -51,32 +51,31 @@ func (fb *Feedback) ErrorWriter() io.Writer {
 	return fb.out
 }
 
-// Printf behaves like fmt.Printf but writes on the out writer
+// Printf behaves like fmt.Printf but writes on the out writer and adds a newline.
 func (fb *Feedback) Printf(format string, v ...interface{}) {
-	fmt.Fprintf(fb.out, format, v...)
+	fb.Print(fmt.Sprintf(format, v...))
 }
 
-// Print behaves like fmt.Print but writes on the out writer.
+// Print behaves like fmt.Print but writes on the out writer and adds a newline.
 func (fb *Feedback) Print(v ...interface{}) {
-	fmt.Fprint(fb.out, v...)
+	fmt.Fprintln(fb.out, v...)
 }
 
-// Errorf behaves like fmt.Printf but writes on the error writer. It also logs
-// the error.
+// Errorf behaves like fmt.Printf but writes on the error writer and adds a
+// newline. It also logs the error.
 func (fb *Feedback) Errorf(format string, v ...interface{}) {
-	fmt.Fprintf(fb.err, format, v...)
-	logrus.Errorf(fmt.Sprintf(format, v...))
+	fb.Error(fmt.Sprintf(format, v...))
 }
 
-// Error behaves like fmt.Print but writes on the error writer. It also logs
-// the error.
+// Error behaves like fmt.Print but writes on the error writer and adds a
+// newline. It also logs the error.
 func (fb *Feedback) Error(v ...interface{}) {
-	fmt.Fprint(fb.err, v...)
+	fmt.Fprintln(fb.err, v...)
 	logrus.Error(fmt.Sprint(v...))
 }
 
 // PrintJSON is a convenient wrapper to provide feedback by printing the
-// desired output in a pretty JSON format.
+// desired output in a pretty JSON format. It adds a newline to the output.
 func (fb *Feedback) PrintJSON(v interface{}) {
 	if d, err := json.MarshalIndent(v, "", "  "); err != nil {
 		fb.Errorf("Error during JSON encoding of the output: %v", err)

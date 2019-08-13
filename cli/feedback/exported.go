@@ -35,30 +35,30 @@ func ErrorWriter() io.Writer {
 	return fb.ErrorWriter()
 }
 
-// Printf behaves like fmt.Printf but writes on the out writer
+// Printf behaves like fmt.Printf but writes on the out writer and adds a newline.
 func Printf(format string, v ...interface{}) {
 	fb.Printf(format, v...)
 }
 
-// Print behaves like fmt.Print but writes on the out writer
+// Print behaves like fmt.Print but writes on the out writer and adds a newline.
 func Print(v ...interface{}) {
 	fb.Print(v...)
 }
 
-// Errorf behaves like fmt.Printf but writes on the error writer. It also logs
-// the error.
+// Errorf behaves like fmt.Printf but writes on the error writer and adds a
+// newline. It also logs the error.
 func Errorf(format string, v ...interface{}) {
 	fb.Errorf(format, v...)
 }
 
-// Error behaves like fmt.Print but writes on the error writer. It also logs
-// the error.
+// Error behaves like fmt.Print but writes on the error writer and adds a
+// newline. It also logs the error.
 func Error(v ...interface{}) {
 	fb.Error(v...)
 }
 
 // PrintJSON is a convenient wrapper to provide feedback by printing the
-// desired output in a pretty JSON format.
+// desired output in a pretty JSON format. It adds a newline to the output.
 func PrintJSON(v interface{}) {
 	fb.PrintJSON(v)
 }
