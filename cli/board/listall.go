@@ -21,11 +21,12 @@ import (
 	"context"
 	"os"
 	"sort"
+	"text/tabwriter"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/cheynewallace/tabby"
@@ -58,7 +59,9 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if output.JSONOrElse(list) {
+	if globals.OutputFormat == "json" {
+		feedback.PrintJSON(list)
+	} else {
 		outputBoardListAll(list)
 	}
 }
@@ -68,7 +71,8 @@ func outputBoardListAll(list *rpc.BoardListAllResp) {
 		return list.Boards[i].GetName() < list.Boards[j].GetName()
 	})
 
-	table := tabby.New()
+	w := tabwriter.NewWriter(feedback.OutputWriter(), 0, 0, 2, ' ', 0)
+	table := tabby.NewCustom(w)
 	table.AddHeader("Board Name", "FQBN")
 	for _, item := range list.GetBoards() {
 		table.AddLine(item.GetName(), item.GetFQBN())

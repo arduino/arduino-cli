@@ -20,12 +20,13 @@ package board
 import (
 	"os"
 	"sort"
+	"text/tabwriter"
 	"time"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/cheynewallace/tabby"
@@ -66,7 +67,9 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrNetwork)
 	}
 
-	if output.JSONOrElse(ports) {
+	if globals.OutputFormat == "json" {
+		feedback.PrintJSON(ports)
+	} else {
 		outputListResp(ports)
 	}
 }
@@ -82,7 +85,8 @@ func outputListResp(ports []*rpc.DetectedPort) {
 			(x.GetProtocol() == y.GetProtocol() && x.GetAddress() < y.GetAddress())
 	})
 
-	table := tabby.New()
+	w := tabwriter.NewWriter(feedback.OutputWriter(), 0, 0, 2, ' ', 0)
+	table := tabby.NewCustom(w)
 	table.AddHeader("Port", "Type", "Board Name", "FQBN")
 	for _, port := range ports {
 		address := port.GetProtocol() + "://" + port.GetAddress()

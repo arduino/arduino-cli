@@ -18,32 +18,10 @@
 package output
 
 import (
-	"encoding/json"
-	"fmt"
-	"os"
-
-	"github.com/arduino/arduino-cli/cli/errorcodes"
-	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
-
-// JSONOrElse outputs the JSON encoding of v if the JSON output format has been
-// selected by the user and returns false. Otherwise no output is produced and the
-// function returns true.
-func JSONOrElse(v interface{}) bool {
-	if globals.OutputFormat != "json" {
-		return true
-	}
-	d, err := json.MarshalIndent(v, "", "  ")
-	if err != nil {
-		feedback.Error(err, "Error during JSON encoding of the output")
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	fmt.Print(string(d))
-	return false
-}
 
 // ProgressBar returns a DownloadProgressCB that prints a progress bar.
 // If JSON output format has been selected, the callback outputs nothing.

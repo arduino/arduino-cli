@@ -18,16 +18,16 @@
 package lib
 
 import (
-	"fmt"
 	"os"
+	"text/tabwriter"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/gosuri/uitable"
+	"github.com/cheynewallace/tabby"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
@@ -65,36 +65,26 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		feedback.Errorf("Error listing Libraries: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	if len(res.GetInstalledLibrary()) > 0 {
-		results := res.GetInstalledLibrary()
-		if output.JSONOrElse(results) {
-			if len(results) > 0 {
-				fmt.Println(outputListLibrary(results))
-			} else {
-				feedback.Print("Error listing Libraries")
-			}
-		}
+
+	libs := res.GetInstalledLibrary()
+
+	if globals.OutputFormat == "json" {
+		feedback.PrintJSON(libs)
+	} else {
+		outputListLibrary(libs)
 	}
+
 	logrus.Info("Done")
 }
 
-func outputListLibrary(il []*rpc.InstalledLibrary) string {
-	table := uitable.New()
-	table.MaxColWidth = 100
-	table.Wrap = true
-
-	hasUpdates := false
-	for _, libMeta := range il {
-		if libMeta.GetRelease() != nil {
-			hasUpdates = true
-		}
+func outputListLibrary(il []*rpc.InstalledLibrary) {
+	if il == nil || len(il) == 0 {
+		return
 	}
 
-	if hasUpdates {
-		table.AddRow("Name", "Installed", "Available", "Location")
-	} else {
-		table.AddRow("Name", "Installed", "Location")
-	}
+	w := tabwriter.NewWriter(feedback.OutputWriter(), 0, 0, 2, ' ', 0)
+	table := tabby.NewCustom(w)
+	table.AddHeader("Name", "Installed", "Available", "Location")
 
 	lastName := ""
 	for _, libMeta := range il {
@@ -110,15 +100,16 @@ func outputListLibrary(il []*rpc.InstalledLibrary) string {
 		if lib.ContainerPlatform != "" {
 			location = lib.GetContainerPlatform()
 		}
-		if hasUpdates {
-			var available string
-			if libMeta.GetRelease() != nil {
-				available = libMeta.GetRelease().GetVersion()
+
+		if libMeta.GetRelease() != nil {
+			available := libMeta.GetRelease().GetVersion()
+			if available != "" {
+				table.AddLine(name, lib.Version, available, location)
+			} else {
+				table.AddLine(name, lib.Version, "-", location)
 			}
-			table.AddRow(name, lib.Version, available, location)
-		} else {
-			table.AddRow(name, lib.Version, location)
 		}
 	}
-	return fmt.Sprintln(table)
+
+	table.Print()
 }

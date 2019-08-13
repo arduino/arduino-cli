@@ -51,16 +51,12 @@ var (
 		PersistentPreRun: preRun,
 	}
 
-	// ErrLogrus represents the logrus instance, which has the role to
-	// log all non info messages.
-	ErrLogrus = logrus.New()
-
 	verbose bool
 	logFile string
 )
 
 const (
-	defaultLogLevel = "warn"
+	defaultLogLevel = "info"
 )
 
 // Init the cobra root command
@@ -87,7 +83,6 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVar(&globals.OutputFormat, "format", "text", "The output format, can be [text|json].")
 	cmd.PersistentFlags().StringVar(&globals.YAMLConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 	cmd.PersistentFlags().StringSliceVar(&globals.AdditionalUrls, "additional-urls", []string{}, "Additional URLs for the board manager.")
-
 }
 
 // convert the string passed to the `--log-level` option to the corresponding

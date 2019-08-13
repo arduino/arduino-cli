@@ -20,12 +20,13 @@ package core
 import (
 	"os"
 	"sort"
+	"text/tabwriter"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/cheynewallace/tabby"
 	"github.com/sirupsen/logrus"
@@ -59,7 +60,9 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if output.JSONOrElse(platforms) {
+	if globals.OutputFormat == "json" {
+		feedback.PrintJSON(platforms)
+	} else {
 		outputInstalledCores(platforms)
 	}
 }
@@ -69,7 +72,8 @@ func outputInstalledCores(platforms []*cores.PlatformRelease) {
 		return
 	}
 
-	table := tabby.New()
+	w := tabwriter.NewWriter(feedback.OutputWriter(), 0, 0, 2, ' ', 0)
+	table := tabby.NewCustom(w)
 	table.AddHeader("ID", "Installed", "Latest", "Name")
 	sort.Slice(platforms, func(i, j int) bool {
 		return platforms[i].Platform.String() < platforms[j].Platform.String()

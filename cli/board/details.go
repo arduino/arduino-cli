@@ -20,11 +20,12 @@ package board
 import (
 	"context"
 	"os"
+	"text/tabwriter"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/cheynewallace/tabby"
@@ -50,7 +51,10 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 		feedback.Errorf("Error getting board details: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	if output.JSONOrElse(res) {
+
+	if globals.OutputFormat == "json" {
+		feedback.PrintJSON(res)
+	} else {
 		outputDetailsResp(res)
 	}
 }
@@ -68,7 +72,8 @@ func outputDetailsResp(details *rpc.BoardDetailsResp) {
 	//                 ATmega328P                    * cpu=atmega328
 	//                 ATmega328P (Old Bootloader)     cpu=atmega328old
 	//                 ATmega168                       cpu=atmega168
-	table := tabby.New()
+	w := tabwriter.NewWriter(feedback.OutputWriter(), 0, 0, 2, ' ', 0)
+	table := tabby.NewCustom(w)
 
 	table.AddLine("Board name:", details.Name, "")
 
