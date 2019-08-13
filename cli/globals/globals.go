@@ -29,8 +29,8 @@ import (
 var (
 	// Debug determines whether to dump debug output to stderr or not
 	Debug bool
-	// OutputJSON is true output in JSON, false output as Text
-	OutputJSON bool
+	// OutputFormat can be "text" or "json"
+	OutputFormat string
 	// HTTPClientHeader is the object that will be propagated to configure the clients inside the downloaders
 	HTTPClientHeader = getHTTPClientHeader()
 	// VersionInfo contains all info injected during build

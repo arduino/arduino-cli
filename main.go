@@ -22,12 +22,12 @@ import (
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
-	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/cli/feedback"
 )
 
 func main() {
 	if err := cli.ArduinoCli.Execute(); err != nil {
-		formatter.PrintError(err, "Bad exit.")
+		feedback.Errorf("Bad exit: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

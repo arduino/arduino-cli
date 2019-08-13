@@ -28,8 +28,8 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketches"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/arduino/arduino-cli/executils"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
@@ -203,7 +203,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		if p, err := waitForNewSerialPort(); err != nil {
 			return nil, fmt.Errorf("cannot detect serial ports: %s", err)
 		} else if p == "" {
-			formatter.Print("No new serial port detected.")
+			feedback.Print("No new serial port detected.")
 		} else {
 			actualPort = p
 		}

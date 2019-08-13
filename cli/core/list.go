@@ -23,10 +23,10 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/cheynewallace/tabby"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -55,7 +55,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 	platforms, err := core.GetPlatforms(instance.Id, listFlags.updatableOnly)
 	if err != nil {
-		formatter.PrintError(err, "Error listing platforms")
+		feedback.Errorf("Error listing platforms: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 

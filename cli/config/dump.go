@@ -22,8 +22,8 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -42,7 +42,7 @@ func runDumpCommand(cmd *cobra.Command, args []string) {
 
 	data, err := globals.Config.SerializeToYAML()
 	if err != nil {
-		formatter.PrintError(err, "Error creating configuration")
+		feedback.Errorf("Error creating configuration: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 

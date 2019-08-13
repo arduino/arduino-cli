@@ -22,11 +22,11 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/spf13/cobra"
 )
@@ -49,7 +49,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 	refs, err := globals.ParseReferenceArgs(args, false)
 	if err != nil {
-		formatter.PrintError(err, "Arguments error")
+		feedback.Errorf("Arguments error: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
@@ -62,7 +62,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.ProgressBar(),
 			output.TaskProgress(), globals.HTTPClientHeader)
 		if err != nil {
-			formatter.PrintError(err, "Error installing "+library.String())
+			feedback.Errorf("Error installing %s: %v", library, err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}

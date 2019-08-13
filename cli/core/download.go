@@ -22,11 +22,11 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -52,7 +52,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	platformsRefs, err := globals.ParseReferenceArgs(args, true)
 	if err != nil {
-		formatter.PrintError(err, "Invalid argument passed")
+		feedback.Errorf("Invalid argument passed: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
@@ -66,7 +66,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		_, err := core.PlatformDownload(context.Background(), platformDownloadreq, output.ProgressBar(),
 			globals.HTTPClientHeader)
 		if err != nil {
-			formatter.PrintError(err, "Error downloading "+args[i])
+			feedback.Errorf("Error downloading %s: %v", args[i], err)
 			os.Exit(errorcodes.ErrNetwork)
 		}
 	}

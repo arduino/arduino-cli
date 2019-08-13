@@ -78,7 +78,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		// errorMessage := fmt.Sprintf(
 		// 	"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
 		// 		version.GetAppName()+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
-		// formatter.PrintErrorMessage(errorMessage)
+		// feedback.Error(errorMessage)
 		return nil, fmt.Errorf("platform not installed")
 	}
 

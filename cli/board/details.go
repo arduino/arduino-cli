@@ -22,10 +22,10 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
@@ -47,7 +47,7 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 	})
 
 	if err != nil {
-		formatter.PrintError(err, "Error getting board details")
+		feedback.Errorf("Error getting board details: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	if output.JSONOrElse(res) {

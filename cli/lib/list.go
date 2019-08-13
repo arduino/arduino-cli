@@ -22,10 +22,10 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/gosuri/uitable"
 	"github.com/sirupsen/logrus"
@@ -62,7 +62,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		Updatable: listFlags.updatable,
 	})
 	if err != nil {
-		formatter.PrintError(err, "Error listing Libraries")
+		feedback.Errorf("Error listing Libraries: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	if len(res.GetInstalledLibrary()) > 0 {
@@ -71,7 +71,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 			if len(results) > 0 {
 				fmt.Println(outputListLibrary(results))
 			} else {
-				formatter.Print("Error listing Libraries")
+				feedback.Print("Error listing Libraries")
 			}
 		}
 	}

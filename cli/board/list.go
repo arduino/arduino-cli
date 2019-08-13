@@ -23,10 +23,10 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
@@ -54,7 +54,7 @@ var listFlags struct {
 // runListCommand detects and lists the connected arduino boards
 func runListCommand(cmd *cobra.Command, args []string) {
 	if timeout, err := time.ParseDuration(listFlags.timeout); err != nil {
-		formatter.PrintError(err, "Invalid timeout.")
+		feedback.Errorf("Invalid timeout: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
 	} else {
 		time.Sleep(timeout)
@@ -62,7 +62,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 	ports, err := board.List(instance.CreateInstance().GetId())
 	if err != nil {
-		formatter.PrintError(err, "Error detecting boards")
+		feedback.Errorf("Error detecting boards: %v", err)
 		os.Exit(errorcodes.ErrNetwork)
 	}
 
@@ -73,7 +73,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 func outputListResp(ports []*rpc.DetectedPort) {
 	if len(ports) == 0 {
-		formatter.Print("No boards found.")
+		feedback.Print("No boards found.")
 		return
 	}
 	sort.Slice(ports, func(i, j int) bool {

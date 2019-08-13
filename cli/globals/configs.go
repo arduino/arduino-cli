@@ -20,7 +20,7 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
-	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -31,7 +31,7 @@ func InitConfigs() {
 	// Start with default configuration
 	if conf, err := configs.NewConfiguration(); err != nil {
 		logrus.WithError(err).Error("Error creating default configuration")
-		formatter.PrintError(err, "Error creating default configuration")
+		feedback.Errorf("Error creating default configuration: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	} else {
 		Config = conf
@@ -67,7 +67,7 @@ func InitConfigs() {
 	if old := paths.New(".cli-config.yml"); old.Exist() {
 		logrus.Errorf("Old configuration file detected: %s.", old)
 		logrus.Info("The name of this file has been changed to `arduino-yaml`, please rename the file fix it.")
-		formatter.PrintError(
+		feedback.Error(
 			fmt.Errorf("WARNING: Old configuration file detected: %s", old),
 			"The name of this file has been changed to `arduino-yaml`, in a future release we will not support"+
 				"the old name `.cli-config.yml` anymore. Please rename the file to `arduino-yaml` to silence this warning.")

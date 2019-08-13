@@ -28,13 +28,13 @@ import (
 	"github.com/arduino/arduino-cli/cli/core"
 	"github.com/arduino/arduino-cli/cli/daemon"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/generatedocs"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/lib"
 	"github.com/arduino/arduino-cli/cli/sketch"
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
@@ -55,9 +55,8 @@ var (
 	// log all non info messages.
 	ErrLogrus = logrus.New()
 
-	outputFormat string
-	verbose      bool
-	logFile      string
+	verbose bool
+	logFile string
 )
 
 const (
@@ -85,7 +84,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
 	cmd.PersistentFlags().StringVar(&globals.LogLevel, "log-level", defaultLogLevel, "Messages with this level and above will be logged (default: warn).")
 	cmd.PersistentFlags().StringVar(&logFile, "log-file", "", "Path to the file where logs will be written.")
-	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be [text|json].")
+	cmd.PersistentFlags().StringVar(&globals.OutputFormat, "format", "text", "The output format, can be [text|json].")
 	cmd.PersistentFlags().StringVar(&globals.YAMLConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 	cmd.PersistentFlags().StringSliceVar(&globals.AdditionalUrls, "additional-urls", []string{}, "Additional URLs for the board manager.")
 
@@ -105,6 +104,13 @@ func toLogLevel(s string) (t logrus.Level, found bool) {
 	}[s]
 
 	return
+}
+
+func isValidFormat(arg string) bool {
+	return map[string]bool{
+		"json": true,
+		"text": true,
+	}[arg]
 }
 
 func preRun(cmd *cobra.Command, args []string) {
@@ -139,27 +145,22 @@ func preRun(cmd *cobra.Command, args []string) {
 		logrus.SetLevel(lvl)
 	}
 
+	// check the right format was passed
+	if !isValidFormat(globals.OutputFormat) {
+		feedback.Error("Invalid output format: " + globals.OutputFormat)
+		os.Exit(errorcodes.ErrBadCall)
+	}
+
 	globals.InitConfigs()
 
 	logrus.Info(globals.VersionInfo.Application + "-" + globals.VersionInfo.VersionString)
 	logrus.Info("Starting root command preparation (`arduino`)")
-	switch outputFormat {
-	case "text":
-		formatter.SetFormatter("text")
-		globals.OutputJSON = false
-	case "json":
-		formatter.SetFormatter("json")
-		globals.OutputJSON = true
-	default:
-		formatter.PrintErrorMessage("Invalid output format: " + outputFormat)
-		os.Exit(errorcodes.ErrBadCall)
-	}
 
 	logrus.Info("Formatter set")
-	if !formatter.IsCurrentFormat("text") {
+	if globals.OutputFormat != "text" {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 			logrus.Warn("Calling help on JSON format")
-			formatter.PrintErrorMessage("Invalid Call : should show Help, but it is available only in TEXT mode.")
+			feedback.Error("Invalid Call : should show Help, but it is available only in TEXT mode.")
 			os.Exit(errorcodes.ErrBadCall)
 		})
 	}

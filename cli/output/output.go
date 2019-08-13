@@ -23,9 +23,9 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
@@ -33,12 +33,12 @@ import (
 // selected by the user and returns false. Otherwise no output is produced and the
 // function returns true.
 func JSONOrElse(v interface{}) bool {
-	if !globals.OutputJSON {
+	if globals.OutputFormat != "json" {
 		return true
 	}
 	d, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
-		formatter.PrintError(err, "Error during JSON encoding of the output")
+		feedback.Error(err, "Error during JSON encoding of the output")
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	fmt.Print(string(d))
@@ -48,7 +48,7 @@ func JSONOrElse(v interface{}) bool {
 // ProgressBar returns a DownloadProgressCB that prints a progress bar.
 // If JSON output format has been selected, the callback outputs nothing.
 func ProgressBar() commands.DownloadProgressCB {
-	if !globals.OutputJSON {
+	if globals.OutputFormat != "json" {
 		return NewDownloadProgressBarCB()
 	}
 	return func(curr *rpc.DownloadProgress) {
@@ -59,7 +59,7 @@ func ProgressBar() commands.DownloadProgressCB {
 // TaskProgress returns a TaskProgressCB that prints the task progress.
 // If JSON output format has been selected, the callback outputs nothing.
 func TaskProgress() commands.TaskProgressCB {
-	if !globals.OutputJSON {
+	if globals.OutputFormat != "json" {
 		return NewTaskProgressCB()
 	}
 	return func(curr *rpc.TaskProgress) {

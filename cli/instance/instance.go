@@ -2,14 +2,13 @@ package instance
 
 import (
 	"context"
-	"errors"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 )
@@ -25,9 +24,9 @@ func CreateInstance() *rpc.Instance {
 	resp := initInstance()
 	if resp.GetPlatformsIndexErrors() != nil {
 		for _, err := range resp.GetPlatformsIndexErrors() {
-			formatter.PrintError(errors.New(err), "Error loading index")
+			feedback.Errorf("Error loading index: %v", err)
 		}
-		formatter.PrintErrorMessage("Launch '" + os.Args[0] + " core update-index' to fix or download indexes.")
+		feedback.Errorf("Launch '%s core update-index' to fix or download indexes.", os.Args[0])
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	return resp.GetInstance()
@@ -39,7 +38,7 @@ func initInstance() *rpc.InitResp {
 
 	resp, err := commands.Init(context.Background(), req, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
 	if err != nil {
-		formatter.PrintError(err, "Error initializing package manager")
+		feedback.Errorf("Error initializing package manager: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	if resp.GetLibrariesIndexError() != "" {
@@ -47,11 +46,11 @@ func initInstance() *rpc.InitResp {
 			&rpc.UpdateLibrariesIndexReq{Instance: resp.GetInstance()}, output.ProgressBar())
 		rescResp, err := commands.Rescan(resp.GetInstance().GetId())
 		if rescResp.GetLibrariesIndexError() != "" {
-			formatter.PrintErrorMessage("Error loading library index: " + rescResp.GetLibrariesIndexError())
+			feedback.Errorf("Error loading library index: %v", rescResp.GetLibrariesIndexError())
 			os.Exit(errorcodes.ErrGeneric)
 		}
 		if err != nil {
-			formatter.PrintError(err, "Error loading library index")
+			feedback.Errorf("Error loading library index: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 		resp.LibrariesIndexError = rescResp.LibrariesIndexError

@@ -22,10 +22,10 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/spf13/cobra"
 )
@@ -43,7 +43,7 @@ func initUpdateIndexCommand() *cobra.Command {
 				Instance: instance,
 			}, output.ProgressBar())
 			if err != nil {
-				formatter.PrintError(err, "Error updating library index")
+				feedback.Errorf("Error updating library index: %v", err)
 				os.Exit(errorcodes.ErrGeneric)
 			}
 		},

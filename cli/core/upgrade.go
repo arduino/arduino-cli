@@ -19,15 +19,14 @@ package core
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -56,12 +55,12 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
 		targets, err := core.GetPlatforms(instance.Id, true)
 		if err != nil {
-			formatter.PrintError(err, "Error retrieving core list")
+			feedback.Errorf("Error retrieving core list: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 
 		if len(targets) == 0 {
-			formatter.PrintResult("All the cores are already at the latest version")
+			feedback.Print("All the cores are already at the latest version")
 			return
 		}
 
@@ -74,13 +73,13 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	exitErr := false
 	platformsRefs, err := globals.ParseReferenceArgs(args, true)
 	if err != nil {
-		formatter.PrintError(err, "Invalid argument passed")
+		feedback.Errorf("Invalid argument passed: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
 	for i, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
-			formatter.PrintErrorMessage(("Invalid item " + args[i]))
+			feedback.Error(("Invalid item " + args[i]))
 			exitErr = true
 			continue
 		}
@@ -93,9 +92,9 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 		_, err := core.PlatformUpgrade(context.Background(), r, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
 		if err == core.ErrAlreadyLatest {
-			formatter.PrintResult(fmt.Sprintf("Platform %s is already at the latest version", platformRef))
+			feedback.Printf("Platform %s is already at the latest version", platformRef)
 		} else if err != nil {
-			formatter.PrintError(err, "Error during upgrade")
+			feedback.Errorf("Error during upgrade: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}

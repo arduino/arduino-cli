@@ -24,10 +24,10 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/cheynewallace/tabby"
 	"github.com/sirupsen/logrus"
@@ -51,14 +51,14 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core search`")
 
 	arguments := strings.ToLower(strings.Join(args, " "))
-	formatter.Print("Searching for platforms matching '" + arguments + "'")
+	feedback.Printf("Searching for platforms matching '%s'", arguments)
 
 	resp, err := core.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
 		Instance:   instance,
 		SearchArgs: arguments,
 	})
 	if err != nil {
-		formatter.PrintError(err, "Error saerching for platforms")
+		feedback.Errorf("Error saerching for platforms: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -67,7 +67,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		if len(coreslist) > 0 {
 			outputSearchCores(coreslist)
 		} else {
-			formatter.Print("No platforms matching your search.")
+			feedback.Print("No platforms matching your search.")
 		}
 	}
 }
