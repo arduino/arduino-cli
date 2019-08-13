@@ -27,6 +27,8 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/arduino/arduino-cli/cli/feedback"
+
 	"bou.ke/monkey"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -145,6 +147,8 @@ func executeWithArgs(args ...string) (int, []byte) {
 
 		redirect := &stdOutRedirect{}
 		redirect.Open()
+		// re-init feedback so it'll write to our grabber
+		feedback.SetDefaultFeedback(feedback.New(os.Stdout, os.Stdout))
 		defer func() {
 			output = redirect.GetOutput()
 			redirect.Close()
@@ -293,8 +297,9 @@ func TestUploadIntegration(t *testing.T) {
 }
 
 func TestSketchCommandsIntegration(t *testing.T) {
-	exitCode, _ := executeWithArgs("sketch", "new", "Test")
+	exitCode, d := executeWithArgs("sketch", "new", "Test")
 	require.Zero(t, exitCode)
+	require.Contains(t, string(d), "Sketch created")
 }
 
 func TestCompileCommandsIntegration(t *testing.T) {
@@ -316,7 +321,6 @@ func TestCompileCommandsIntegration(t *testing.T) {
 	// Create a test sketch
 	exitCode, d := executeWithArgs("sketch", "new", "Test1")
 	require.Zero(t, exitCode)
-	require.Contains(t, string(d), "Sketch created")
 
 	// Build sketch without FQBN
 	test1 := filepath.Join(currSketchbookDir, "Test1")

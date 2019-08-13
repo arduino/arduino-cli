@@ -31,12 +31,17 @@ type Feedback struct {
 	err io.Writer
 }
 
+// New creates a Feedback instance
+func New(out, err io.Writer) *Feedback {
+	return &Feedback{
+		out: out,
+		err: err,
+	}
+}
+
 // DefaultFeedback provides a basic feedback object to be used as default.
 func DefaultFeedback() *Feedback {
-	return &Feedback{
-		out: os.Stdout,
-		err: os.Stderr,
-	}
+	return New(os.Stdout, os.Stderr)
 }
 
 // OutputWriter returns the underlying io.Writer to be used when the Print*

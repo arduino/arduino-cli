@@ -23,6 +23,12 @@ var (
 	fb = DefaultFeedback()
 )
 
+// SetDefaultFeedback lets callers override the default feedback object. Mostly
+// useful for testing.
+func SetDefaultFeedback(f *Feedback) {
+	fb = f
+}
+
 // OutputWriter returns the underlying io.Writer to be used when the Print*
 // api is not enough
 func OutputWriter() io.Writer {
