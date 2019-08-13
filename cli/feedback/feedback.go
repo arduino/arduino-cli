@@ -16,6 +16,7 @@
 package feedback
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -72,4 +73,14 @@ func (fb *Feedback) Errorf(format string, v ...interface{}) {
 func (fb *Feedback) Error(v ...interface{}) {
 	fmt.Fprint(fb.err, v...)
 	logrus.Error(fmt.Sprint(v...))
+}
+
+// PrintJSON is a convenient wrapper to provide feedback by printing the
+// desired output in a pretty JSON format.
+func (fb *Feedback) PrintJSON(v interface{}) {
+	if d, err := json.MarshalIndent(v, "", "  "); err != nil {
+		fb.Errorf("Error during JSON encoding of the output: %v", err)
+	} else {
+		fb.Print(string(d))
+	}
 }

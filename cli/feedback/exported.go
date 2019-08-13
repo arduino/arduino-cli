@@ -56,3 +56,9 @@ func Errorf(format string, v ...interface{}) {
 func Error(v ...interface{}) {
 	fb.Error(v...)
 }
+
+// PrintJSON is a convenient wrapper to provide feedback by printing the
+// desired output in a pretty JSON format.
+func PrintJSON(v interface{}) {
+	fb.PrintJSON(v)
+}
