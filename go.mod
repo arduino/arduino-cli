@@ -39,7 +39,7 @@ require (
 	github.com/stretchr/testify v1.3.0
 	go.bug.st/cleanup v1.0.0
 	go.bug.st/downloader v1.1.0
-	go.bug.st/relaxed-semver v0.0.0-20181022103824-0265409c5852
+	go.bug.st/relaxed-semver v0.0.0-20190820131229-5407d65c50bd
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45
 	golang.org/x/net v0.0.0-20190311183353-d8887717615a
 	golang.org/x/text v0.3.0

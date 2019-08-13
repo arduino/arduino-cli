@@ -45,6 +45,7 @@ type Library struct {
 type Release struct {
 	Author        string
 	Version       *semver.Version
+	Dependencies  []*Dependency
 	Maintainer    string
 	Sentence      string
 	Paragraph     string
@@ -55,6 +56,22 @@ type Release struct {
 	Resource      *resources.DownloadResource
 
 	Library *Library `json:"-"`
+}
+
+// Dependency is a library dependency
+type Dependency struct {
+	Name              string
+	VersionConstraint semver.Constraint
+}
+
+// GetName returns the name of the dependency
+func (r *Dependency) GetName() string {
+	return r.Name
+}
+
+// GetConstraint returns the version Constraint of the dependecy
+func (r *Dependency) GetConstraint() semver.Constraint {
+	return r.VersionConstraint
 }
 
 func (r *Release) String() string {
