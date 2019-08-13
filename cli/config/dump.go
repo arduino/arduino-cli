@@ -18,7 +18,7 @@
 package config
 
 import (
-	"fmt"
+	"net/url"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -27,6 +27,27 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
+
+// FIXME: The way the Config objects is marshalled into JSON shouldn't be here,
+// this is a temporary fix for the command `arduino-cli config dump --format json`
+type jsonConfig struct {
+	ProxyType           string                   `json:"proxy_type"`
+	ProxyManualConfig   *jsonProxyConfig         `json:"manual_configs,omitempty"`
+	SketchbookPath      string                   `json:"sketchbook_path,omitempty"`
+	ArduinoDataDir      string                   `json:"arduino_data,omitempty"`
+	ArduinoDownloadsDir string                   `json:"arduino_downloads_dir,omitempty"`
+	BoardsManager       *jsonBoardsManagerConfig `json:"board_manager"`
+}
+
+type jsonBoardsManagerConfig struct {
+	AdditionalURLS []*url.URL `json:"additional_urls,omitempty"`
+}
+
+type jsonProxyConfig struct {
+	Hostname string `json:"hostname"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"` // can be encrypted, see issue #71
+}
 
 var dumpCmd = &cobra.Command{
 	Use:     "dump",
@@ -46,5 +67,39 @@ func runDumpCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	fmt.Println(string(data))
+	c := globals.Config
+
+	if globals.OutputFormat == "json" {
+		sketchbookDir := ""
+		if c.SketchbookDir != nil {
+			sketchbookDir = c.SketchbookDir.String()
+		}
+
+		arduinoDataDir := ""
+		if c.DataDir != nil {
+			arduinoDataDir = c.DataDir.String()
+		}
+
+		arduinoDownloadsDir := ""
+		if c.ArduinoDownloadsDir != nil {
+			arduinoDownloadsDir = c.ArduinoDownloadsDir.String()
+		}
+
+		feedback.PrintJSON(jsonConfig{
+			ProxyType: c.ProxyType,
+			ProxyManualConfig: &jsonProxyConfig{
+				Hostname: c.ProxyHostname,
+				Username: c.ProxyUsername,
+				Password: c.ProxyPassword,
+			},
+			SketchbookPath:      sketchbookDir,
+			ArduinoDataDir:      arduinoDataDir,
+			ArduinoDownloadsDir: arduinoDownloadsDir,
+			BoardsManager: &jsonBoardsManagerConfig{
+				AdditionalURLS: c.BoardManagerAdditionalUrls,
+			},
+		})
+	} else {
+		feedback.Print(string(data))
+	}
 }
