@@ -19,7 +19,6 @@ package cli
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 
@@ -36,6 +35,8 @@ import (
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/mattn/go-colorable"
+	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -107,9 +108,6 @@ func toLogLevel(s string) (t logrus.Level, found bool) {
 }
 
 func preRun(cmd *cobra.Command, args []string) {
-	// configure where to put logs
-	writers := []io.Writer{}
-
 	// should we log to file?
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
@@ -117,12 +115,20 @@ func preRun(cmd *cobra.Command, args []string) {
 			fmt.Printf("Unable to open file for logging: %s", logFile)
 			os.Exit(errorcodes.ErrBadCall)
 		}
-		writers = append(writers, file)
+
+		// we use a hook so we don't get color codes in the log file
+		logrus.AddHook(lfshook.NewHook(file, &logrus.TextFormatter{}))
 	}
 
 	// should we log to stdout?
 	if verbose {
-		writers = append(writers, os.Stdout)
+		logrus.SetOutput(colorable.NewColorableStdout())
+		logrus.SetFormatter(&logrus.TextFormatter{
+			ForceColors: true,
+		})
+	} else {
+		// Discard logrus output if no writer was set
+		logrus.SetOutput(ioutil.Discard)
 	}
 
 	// configure logging filter
@@ -131,14 +137,6 @@ func preRun(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrBadArgument)
 	} else {
 		logrus.SetLevel(lvl)
-	}
-
-	// configure logrus
-	if len(writers) > 0 {
-		logrus.SetOutput(io.MultiWriter(writers...))
-	} else {
-		// Discard logrus output if no writer was set
-		logrus.SetOutput(ioutil.Discard)
 	}
 
 	globals.InitConfigs()

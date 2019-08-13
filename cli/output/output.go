@@ -27,11 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	colorable "github.com/mattn/go-colorable"
 )
-
-// TODO: Feed text output into colorable stdOut
-var _ = colorable.NewColorableStdout()
 
 // JSONOrElse outputs the JSON encoding of v if the JSON output format has been
 // selected by the user and returns false. Otherwise no output is produced and the
