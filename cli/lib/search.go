@@ -65,7 +65,26 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if globals.OutputFormat == "json" {
-		feedback.PrintJSON(searchResp)
+		if searchFlags.namesOnly {
+			type LibName struct {
+				Name string `json:"name,required"`
+			}
+
+			type NamesOnly struct {
+				Libraries []LibName `json:"libraries,required"`
+			}
+
+			names := []LibName{}
+			results := searchResp.GetLibraries()
+			for _, lsr := range results {
+				names = append(names, LibName{lsr.Name})
+			}
+			feedback.PrintJSON(NamesOnly{
+				names,
+			})
+		} else {
+			feedback.PrintJSON(searchResp)
+		}
 	} else {
 		// get a sorted slice of results
 		results := searchResp.GetLibraries()
@@ -87,7 +106,7 @@ func outputSearchedLibrary(results []*rpc.SearchedLibrary, namesOnly bool) {
 	}
 
 	for _, lsr := range results {
-		feedback.Printf("Name: '%s'", lsr.Name)
+		feedback.Printf(`Name: "%s"`, lsr.Name)
 		if namesOnly {
 			continue
 		}
