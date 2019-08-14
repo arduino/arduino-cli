@@ -71,11 +71,12 @@ checkLatestVersion() {
 	# Use the GitHub releases webpage to find the latest version for this project
 	# so we don't get rate-limited.
 	local tag
+	local regex="[0-9][A-Za-z0-9\.-]*"
 	local latest_url="https://github.com/arduino/arduino-cli/releases/latest"
 	if [ "$DOWNLOAD_TOOL" = "curl" ]; then
-		tag=$(curl -SsL $latest_url | grep -oP "Release \K([A-Za-z0-9\.-]*)(?= · arduino/arduino-cli)")
+		tag=$(curl -SsL $latest_url | grep -o "Release $regex · arduino/arduino-cli" | grep -o "$regex")
 	elif [ "$DOWNLOAD_TOOL" = "wget" ]; then
-		tag=$(wget -q -O - $latest_url | grep -oP "Release \K([A-Za-z0-9\.-]*)(?= · arduino/arduino-cli)")
+		tag=$(wget -q -O - $latest_url | grep -o "Release $regex · arduino/arduino-cli" | grep -o "$regex")
 	fi
 	if [ "x$tag" == "x" ]; then
 		echo "Cannot determine latest tag."
@@ -118,7 +119,7 @@ getFile() {
 }
 
 downloadFile() {
-	checkLatestVersion TAG https://github.com/arduino/arduino-cli/releases/latest
+	checkLatestVersion TAG
 	echo "TAG=$TAG"
 	#  arduino-cli_0.4.0-rc1_Linux_64bit.[tar.gz, zip]
 	if [ "$OS" == "Windows" ]; then
