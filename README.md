@@ -35,6 +35,9 @@ for example `~/local/bin`, set the `BINDIR` environment variable like this:
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/local/bin sh
 ```
 
+**Deprecation notice:** Links in the form `http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-<platform>.tar.bz2`
+won't be further updated.
+
 Alternatively you can download one of the pre-built binaries for the supported platforms from the
 [release page](https://github.com/arduino/arduino-cli/releases). Once downloaded, place the executable
 `arduino-cli` into a directory which is in your `PATH`.
