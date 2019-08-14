@@ -66,11 +66,12 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	}
 
 	libs := res.GetInstalledLibrary()
-
-	if globals.OutputFormat == "json" {
-		feedback.PrintJSON(libs)
-	} else {
-		outputListLibrary(libs)
+	if libs != nil {
+		if globals.OutputFormat == "json" {
+			feedback.PrintJSON(libs)
+		} else {
+			outputListLibrary(libs)
+		}
 	}
 
 	logrus.Info("Done")
