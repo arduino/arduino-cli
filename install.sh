@@ -118,8 +118,6 @@ getFile() {
 }
 
 downloadFile() {
-	# Use the GitHub releases webpage to find the latest version for this project
-	# so we don't get rate-limited.
 	checkLatestVersion TAG https://github.com/arduino/arduino-cli/releases/latest
 	echo "TAG=$TAG"
 	#  arduino-cli_0.4.0-rc1_Linux_64bit.[tar.gz, zip]
