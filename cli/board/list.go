@@ -20,7 +20,6 @@ package board
 import (
 	"os"
 	"sort"
-	"text/tabwriter"
 	"time"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -29,7 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/cheynewallace/tabby"
+	"github.com/arduino/arduino-cli/table"
 	"github.com/spf13/cobra"
 )
 
@@ -85,9 +84,8 @@ func outputListResp(ports []*rpc.DetectedPort) {
 			(x.GetProtocol() == y.GetProtocol() && x.GetAddress() < y.GetAddress())
 	})
 
-	w := tabwriter.NewWriter(feedback.OutputWriter(), 0, 0, 2, ' ', 0)
-	table := tabby.NewCustom(w)
-	table.AddHeader("Port", "Type", "Board Name", "FQBN")
+	t := table.New()
+	t.SetHeader("Port", "Type", "Board Name", "FQBN")
 	for _, port := range ports {
 		address := port.GetProtocol() + "://" + port.GetAddress()
 		if port.GetProtocol() == "serial" {
@@ -102,7 +100,7 @@ func outputListResp(ports []*rpc.DetectedPort) {
 			for _, b := range boards {
 				board := b.GetName()
 				fqbn := b.GetFQBN()
-				table.AddLine(address, protocol, board, fqbn)
+				t.AddRow(address, protocol, board, fqbn)
 				// show address and protocol only on the first row
 				address = ""
 				protocol = ""
@@ -110,8 +108,8 @@ func outputListResp(ports []*rpc.DetectedPort) {
 		} else {
 			board := "Unknown"
 			fqbn := ""
-			table.AddLine(address, protocol, board, fqbn)
+			t.AddRow(address, protocol, board, fqbn)
 		}
 	}
-	table.Print()
+	feedback.Print(t.Render())
 }

@@ -21,7 +21,6 @@ import (
 	"context"
 	"os"
 	"sort"
-	"text/tabwriter"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -29,7 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/cheynewallace/tabby"
+	"github.com/arduino/arduino-cli/table"
 	"github.com/spf13/cobra"
 )
 
@@ -71,11 +70,10 @@ func outputBoardListAll(list *rpc.BoardListAllResp) {
 		return list.Boards[i].GetName() < list.Boards[j].GetName()
 	})
 
-	w := tabwriter.NewWriter(feedback.OutputWriter(), 0, 0, 2, ' ', 0)
-	table := tabby.NewCustom(w)
-	table.AddHeader("Board Name", "FQBN")
+	t := table.New()
+	t.SetHeader("Board Name", "FQBN")
 	for _, item := range list.GetBoards() {
-		table.AddLine(item.GetName(), item.GetFQBN())
+		t.AddRow(item.GetName(), item.GetFQBN())
 	}
-	table.Print()
+	feedback.Print(t.Render())
 }

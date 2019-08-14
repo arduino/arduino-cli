@@ -20,7 +20,6 @@ package board
 import (
 	"context"
 	"os"
-	"text/tabwriter"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -28,7 +27,8 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/cheynewallace/tabby"
+	"github.com/arduino/arduino-cli/table"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -60,7 +60,7 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 }
 
 func outputDetailsResp(details *rpc.BoardDetailsResp) {
-	// Table is 5 columns wide:
+	// Table is 4 columns wide:
 	// |               |                             | |                       |
 	// Board name:     Arduino Nano
 	//
@@ -69,33 +69,40 @@ func outputDetailsResp(details *rpc.BoardDetailsResp) {
 	//                 arduino:arduinoOTA              1.2.1
 	//
 	// Option:         Processor                       cpu
-	//                 ATmega328P                    * cpu=atmega328
+	//                 ATmega328P                    ✔ cpu=atmega328
 	//                 ATmega328P (Old Bootloader)     cpu=atmega328old
 	//                 ATmega168                       cpu=atmega168
-	w := tabwriter.NewWriter(feedback.OutputWriter(), 0, 0, 2, ' ', 0)
-	table := tabby.NewCustom(w)
-
-	table.AddLine("Board name:", details.Name, "")
+	t := table.New()
+	t.SetColumnWidthMode(1, table.Average)
+	t.AddRow("Board name:", details.Name)
 
 	for i, tool := range details.RequiredTools {
 		if i == 0 {
-			table.AddLine("", "", "", "") // get some space from above
-			table.AddLine("Required tools:", tool.Packager+":"+tool.Name, "", tool.Version)
+			t.AddRow() // get some space from above
+			t.AddRow("Required tools:", tool.Packager+":"+tool.Name, "", tool.Version)
 			continue
 		}
-		table.AddLine("", tool.Packager+":"+tool.Name, "", tool.Version)
+		t.AddRow("", tool.Packager+":"+tool.Name, "", tool.Version)
 	}
 
 	for _, option := range details.ConfigOptions {
-		table.AddLine("", "", "", "") // get some space from above
-		table.AddLine("Option:", option.OptionLabel, "", option.Option)
+		t.AddRow() // get some space from above
+		t.AddRow("Option:", option.OptionLabel, "", option.Option)
 		for _, value := range option.Values {
-			checked := ""
+			green := color.New(color.FgGreen)
 			if value.Selected {
-				checked = "✔"
+				t.AddRow("",
+					table.NewCell(value.ValueLabel, green),
+					table.NewCell("✔", green),
+					table.NewCell(option.Option+"="+value.Value, green))
+			} else {
+				t.AddRow("",
+					value.ValueLabel,
+					"",
+					option.Option+"="+value.Value)
 			}
-			table.AddLine("", value.ValueLabel, checked, option.Option+"="+value.Value)
 		}
 	}
-	table.Print()
+
+	feedback.Print(t.Render())
 }

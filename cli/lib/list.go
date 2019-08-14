@@ -19,7 +19,6 @@ package lib
 
 import (
 	"os"
-	"text/tabwriter"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -27,7 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/cheynewallace/tabby"
+	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
@@ -82,9 +81,8 @@ func outputListLibrary(il []*rpc.InstalledLibrary) {
 		return
 	}
 
-	w := tabwriter.NewWriter(feedback.OutputWriter(), 0, 0, 2, ' ', 0)
-	table := tabby.NewCustom(w)
-	table.AddHeader("Name", "Installed", "Available", "Location")
+	t := table.New()
+	t.SetHeader("Name", "Installed", "Available", "Location")
 
 	lastName := ""
 	for _, libMeta := range il {
@@ -104,12 +102,12 @@ func outputListLibrary(il []*rpc.InstalledLibrary) {
 		if libMeta.GetRelease() != nil {
 			available := libMeta.GetRelease().GetVersion()
 			if available != "" {
-				table.AddLine(name, lib.Version, available, location)
+				t.AddRow(name, lib.Version, available, location)
 			} else {
-				table.AddLine(name, lib.Version, "-", location)
+				t.AddRow(name, lib.Version, "-", location)
 			}
 		}
 	}
 
-	table.Print()
+	feedback.Print(t.Render())
 }

@@ -22,7 +22,6 @@ import (
 	"os"
 	"sort"
 	"strings"
-	"text/tabwriter"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -30,7 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/core"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/cheynewallace/tabby"
+	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -73,16 +72,15 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 
 func outputSearchCores(cores []*rpc.Platform) {
 	if len(cores) > 0 {
-		w := tabwriter.NewWriter(feedback.OutputWriter(), 0, 0, 2, ' ', 0)
-		table := tabby.NewCustom(w)
-		table.AddHeader("ID", "Version", "Name")
+		t := table.New()
+		t.SetHeader("ID", "Version", "Name")
 		sort.Slice(cores, func(i, j int) bool {
 			return cores[i].ID < cores[j].ID
 		})
 		for _, item := range cores {
-			table.AddLine(item.GetID(), item.GetLatest(), item.GetName())
+			t.AddRow(item.GetID(), item.GetLatest(), item.GetName())
 		}
-		table.Print()
+		feedback.Print(t.Render())
 	} else {
 		feedback.Print("No platforms matching your search.")
 	}

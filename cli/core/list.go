@@ -20,7 +20,6 @@ package core
 import (
 	"os"
 	"sort"
-	"text/tabwriter"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -28,7 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/cheynewallace/tabby"
+	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -72,15 +71,14 @@ func outputInstalledCores(platforms []*cores.PlatformRelease) {
 		return
 	}
 
-	w := tabwriter.NewWriter(feedback.OutputWriter(), 0, 0, 2, ' ', 0)
-	table := tabby.NewCustom(w)
-	table.AddHeader("ID", "Installed", "Latest", "Name")
+	t := table.New()
+	t.SetHeader("ID", "Installed", "Latest", "Name")
 	sort.Slice(platforms, func(i, j int) bool {
 		return platforms[i].Platform.String() < platforms[j].Platform.String()
 	})
 	for _, p := range platforms {
-		table.AddLine(p.Platform.String(), p.Version.String(), p.Platform.GetLatestRelease().Version.String(), p.Platform.Name)
+		t.AddRow(p.Platform.String(), p.Version.String(), p.Platform.GetLatestRelease().Version.String(), p.Platform.Name)
 	}
 
-	table.Print()
+	feedback.Print(t.Render())
 }
