@@ -148,7 +148,7 @@ func executeWithArgs(args ...string) (int, []byte) {
 		redirect := &stdOutRedirect{}
 		redirect.Open()
 		// re-init feedback so it'll write to our grabber
-		feedback.SetDefaultFeedback(feedback.New(os.Stdout, os.Stdout))
+		feedback.SetDefaultFeedback(feedback.New(os.Stdout, os.Stdout, feedback.Text))
 		defer func() {
 			output = redirect.GetOutput()
 			redirect.Close()
