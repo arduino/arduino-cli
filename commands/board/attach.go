@@ -36,15 +36,16 @@ import (
 
 // Attach FIXMEDOC
 func Attach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskProgressCB) (*rpc.BoardAttachResp, error) {
-
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
 	}
-	var sketchPath *paths.Path
-	if req.GetSketchPath() != "" {
-		sketchPath = paths.New(req.GetSketchPath())
+
+	if req.GetSketchPath() == "" {
+		return nil, errors.New("sketch path can't be empty")
 	}
+
+	sketchPath := paths.New(req.GetSketchPath())
 	sketch, err := sketches.NewSketchFromPath(sketchPath)
 	if err != nil {
 		return nil, fmt.Errorf("opening sketch: %s", err)

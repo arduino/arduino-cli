@@ -32,13 +32,13 @@ import (
 
 func initAttachCommand() *cobra.Command {
 	attachCommand := &cobra.Command{
-		Use:   "attach <port>|<FQBN> [sketchPath]",
+		Use:   "attach <port>|<FQBN> <sketchPath>",
 		Short: "Attaches a sketch to a board.",
 		Long:  "Attaches a sketch to a board.",
-		Example: "  " + os.Args[0] + " board attach serial:///dev/tty/ACM0\n" +
+		Example: "  " + os.Args[0] + " board attach serial:///dev/tty/ACM0 HelloWorld\n" +
 			"  " + os.Args[0] + " board attach serial:///dev/tty/ACM0 HelloWorld\n" +
-			"  " + os.Args[0] + " board attach arduino:samd:mkr1000",
-		Args: cobra.RangeArgs(1, 2),
+			"  " + os.Args[0] + " board attach arduino:samd:mkr1000 HelloWorld",
+		Args: cobra.ExactArgs(2),
 		Run:  runAttachCommand,
 	}
 	attachCommand.Flags().StringVar(&attachFlags.searchTimeout, "timeout", "5s",
@@ -52,16 +52,15 @@ var attachFlags struct {
 
 func runAttachCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstance()
-	var path string
-	if len(args) > 0 {
-		path = args[1]
-	}
+	path := args[1]
+
 	_, err := board.Attach(context.Background(), &rpc.BoardAttachReq{
 		Instance:      instance,
 		BoardUri:      args[0],
 		SketchPath:    path,
 		SearchTimeout: attachFlags.searchTimeout,
 	}, output.TaskProgress())
+
 	if err != nil {
 		formatter.PrintError(err, "attach board error")
 		os.Exit(errorcodes.ErrGeneric)
