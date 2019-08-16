@@ -29,6 +29,11 @@ func SetDefaultFeedback(f *Feedback) {
 	fb = f
 }
 
+// SetFormat can be used to change the output format at runtime
+func SetFormat(f OutputFormat) {
+	fb.SetFormat(f)
+}
+
 // OutputWriter returns the underlying io.Writer to be used when the Print*
 // api is not enough
 func OutputWriter() io.Writer {
@@ -67,4 +72,9 @@ func Error(v ...interface{}) {
 // desired output in a pretty JSON format. It adds a newline to the output.
 func PrintJSON(v interface{}) {
 	fb.PrintJSON(v)
+}
+
+// PrintResult is a convenient wrapper...
+func PrintResult(res Result) {
+	fb.PrintResult(res)
 }

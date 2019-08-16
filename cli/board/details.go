@@ -23,7 +23,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -52,14 +51,21 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if globals.OutputFormat == "json" {
-		feedback.PrintJSON(res)
-	} else {
-		outputDetailsResp(res)
-	}
+	feedback.PrintResult(detailsResult{details: res})
 }
 
-func outputDetailsResp(details *rpc.BoardDetailsResp) {
+// ouput from this command requires special formatting, let's create a dedicated
+// feedback.Result implementation
+type detailsResult struct {
+	details *rpc.BoardDetailsResp
+}
+
+func (dr detailsResult) Data() interface{} {
+	return dr.details
+}
+
+func (dr detailsResult) String() string {
+	details := dr.details
 	// Table is 4 columns wide:
 	// |               |                             | |                       |
 	// Board name:     Arduino Nano
@@ -104,5 +110,5 @@ func outputDetailsResp(details *rpc.BoardDetailsResp) {
 		}
 	}
 
-	feedback.Print(t.Render())
+	return t.Render()
 }

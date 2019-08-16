@@ -24,24 +24,48 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// OutputFormat is used to determine the output format
+type OutputFormat int
+
+const (
+	// Text means plain text format, suitable for ansi terminals
+	Text OutputFormat = iota
+	// JSON means JSON format
+	JSON
+)
+
+// Result is anything more complex than a sentence that needs to be printed
+// for the user.
+type Result interface {
+	fmt.Stringer
+	Data() interface{}
+}
+
 // Feedback wraps an io.Writer and provides an uniform API the CLI can use to
 // provide feedback to the users.
 type Feedback struct {
-	out io.Writer
-	err io.Writer
+	out    io.Writer
+	err    io.Writer
+	format OutputFormat
 }
 
 // New creates a Feedback instance
-func New(out, err io.Writer) *Feedback {
+func New(out, err io.Writer, format OutputFormat) *Feedback {
 	return &Feedback{
-		out: out,
-		err: err,
+		out:    out,
+		err:    err,
+		format: format,
 	}
 }
 
 // DefaultFeedback provides a basic feedback object to be used as default.
 func DefaultFeedback() *Feedback {
-	return New(os.Stdout, os.Stderr)
+	return New(os.Stdout, os.Stderr, Text)
+}
+
+// SetFormat can be used to change the output format at runtime
+func (fb *Feedback) SetFormat(f OutputFormat) {
+	fb.format = f
 }
 
 // OutputWriter returns the underlying io.Writer to be used when the Print*
@@ -86,5 +110,18 @@ func (fb *Feedback) PrintJSON(v interface{}) {
 		fb.Errorf("Error during JSON encoding of the output: %v", err)
 	} else {
 		fb.Print(string(d))
+	}
+}
+
+// PrintResult is a convenient wrapper...
+func (fb *Feedback) PrintResult(res Result) {
+	if fb.format == JSON {
+		if d, err := json.MarshalIndent(res.Data(), "", "  "); err != nil {
+			fb.Errorf("Error during JSON encoding of the output: %v", err)
+		} else {
+			fb.Print(string(d))
+		}
+	} else {
+		fb.Print(fmt.Sprintf("%s", res))
 	}
 }
