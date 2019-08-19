@@ -36,7 +36,7 @@ curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.
 ```
 
 **Deprecation notice:** Links in the form `http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-<platform>.tar.bz2`
-won't be further updated. That URL will always provide arduino-cli 0.3.7-alpha.preview, regardless of further releases.
+won't be further updated. That URL will provide arduino-cli 0.3.7-alpha.preview, regardless of further releases.
 
 Alternatively you can download one of the pre-built binaries for the supported platforms from the
 [release page](https://github.com/arduino/arduino-cli/releases). Once downloaded, place the executable
