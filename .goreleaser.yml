@@ -37,6 +37,22 @@ builds:
     binary: arduino-cli
     env:
       - CGO_ENABLED=1
+      - CC=/usr/arm-linux-gnueabi/bin/cc
+    goos:
+      - linux
+    goarch:
+      - arm
+    goarm:
+      - 6
+    ldflags:
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit=={{ .ShortCommit }}
+      - "-extldflags '-static'"
+  -
+    # ARMv7
+    id: arduino_cli_armv7
+    binary: arduino-cli
+    env:
+      - CGO_ENABLED=1
       - CC=/usr/arm-linux-gnueabihf/bin/cc
     goos:
       - linux

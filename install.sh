@@ -34,7 +34,7 @@ initArch() {
 	ARCH=$(uname -m)
 	case $ARCH in
 		armv5*) ARCH="armv5";;
-		armv6*) ARCH="armv6";;
+		armv6*) ARCH="ARMv6";;
 		armv7*) ARCH="ARMv7";;
 		aarch64) ARCH="ARM64";;
 		x86) ARCH="32bit";;
@@ -65,6 +65,24 @@ initDownloadTool() {
 		fail "You need curl or wget as download tool. Please install it first before continuing"
 	fi
 	echo "Using $DOWNLOAD_TOOL as download tool"
+}
+
+checkLatestVersion() {
+	# Use the GitHub releases webpage to find the latest version for this project
+	# so we don't get rate-limited.
+	local tag
+	local regex="[0-9][A-Za-z0-9\.-]*"
+	local latest_url="https://github.com/arduino/arduino-cli/releases/latest"
+	if [ "$DOWNLOAD_TOOL" = "curl" ]; then
+		tag=$(curl -SsL $latest_url | grep -o "Release $regex · arduino/arduino-cli" | grep -o "$regex")
+	elif [ "$DOWNLOAD_TOOL" = "wget" ]; then
+		tag=$(wget -q -O - $latest_url | grep -o "Release $regex · arduino/arduino-cli" | grep -o "$regex")
+	fi
+	if [ "x$tag" == "x" ]; then
+		echo "Cannot determine latest tag."
+		exit 1
+	fi
+	eval "$1='$tag'"
 }
 
 get() {
@@ -101,11 +119,14 @@ getFile() {
 }
 
 downloadFile() {
-	get TAG_JSON https://api.github.com/repos/arduino/arduino-cli/releases/latest
-	TAG=$(echo $TAG_JSON | python -c 'import json,sys;obj=json.load(sys.stdin, strict=False);sys.stdout.write(obj["tag_name"])')
+	checkLatestVersion TAG
 	echo "TAG=$TAG"
-	#  arduino-cli_0.4.0-rc1_Linux_64bit.tar.gz
-	CLI_DIST="arduino-cli_${TAG}_${OS}_${ARCH}.tar.gz"
+	#  arduino-cli_0.4.0-rc1_Linux_64bit.[tar.gz, zip]
+	if [ "$OS" == "Windows" ]; then
+		CLI_DIST="arduino-cli_${TAG}_${OS}_${ARCH}.zip"
+	else
+		CLI_DIST="arduino-cli_${TAG}_${OS}_${ARCH}.tar.gz"
+	fi
 	echo "CLI_DIST=$CLI_DIST"
 	DOWNLOAD_URL="https://downloads.arduino.cc/arduino-cli/$CLI_DIST"
 	CLI_TMP_FILE="/tmp/$CLI_DIST"
