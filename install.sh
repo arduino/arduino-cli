@@ -67,6 +67,24 @@ initDownloadTool() {
 	echo "Using $DOWNLOAD_TOOL as download tool"
 }
 
+checkLatestVersion() {
+	# Use the GitHub releases webpage to find the latest version for this project
+	# so we don't get rate-limited.
+	local tag
+	local regex="[0-9][A-Za-z0-9\.-]*"
+	local latest_url="https://github.com/arduino/arduino-cli/releases/latest"
+	if [ "$DOWNLOAD_TOOL" = "curl" ]; then
+		tag=$(curl -SsL $latest_url | grep -o "Release $regex · arduino/arduino-cli" | grep -o "$regex")
+	elif [ "$DOWNLOAD_TOOL" = "wget" ]; then
+		tag=$(wget -q -O - $latest_url | grep -o "Release $regex · arduino/arduino-cli" | grep -o "$regex")
+	fi
+	if [ "x$tag" == "x" ]; then
+		echo "Cannot determine latest tag."
+		exit 1
+	fi
+	eval "$1='$tag'"
+}
+
 get() {
 	local url="$2"
 	local body
@@ -101,8 +119,7 @@ getFile() {
 }
 
 downloadFile() {
-	get TAG_JSON https://api.github.com/repos/arduino/arduino-cli/releases/latest
-	TAG=$(echo $TAG_JSON | python -c 'import json,sys;obj=json.load(sys.stdin, strict=False);sys.stdout.write(obj["tag_name"])')
+	checkLatestVersion TAG
 	echo "TAG=$TAG"
 	#  arduino-cli_0.4.0-rc1_Linux_64bit.[tar.gz, zip]
 	if [ "$OS" == "Windows" ]; then
