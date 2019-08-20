@@ -19,5 +19,5 @@ def running_on_ci():
     """
     Returns whether the program is running on a CI environment
     """
-    val = os.getenv("APPVEYOR") or os.getenv("DRONE")
+    val = os.getenv("APPVEYOR") or os.getenv("DRONE") or os.getenv("GITHUB_WORKFLOW")
     return val is not None

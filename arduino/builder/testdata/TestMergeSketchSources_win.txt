@@ -1,0 +1,15 @@
+#include <Arduino.h>
+#line 1 "testdata\\TestLoadSketchFolder\\TestLoadSketchFolder.ino"
+void setup() {
+
+}
+
+void loop() {
+
+}
+#line 1 "testdata\\TestLoadSketchFolder\\old.pde"
+
+#line 1 "testdata\\TestLoadSketchFolder\\other.ino"
+String hello() {
+  return "world";
+}

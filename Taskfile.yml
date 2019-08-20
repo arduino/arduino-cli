@@ -44,7 +44,7 @@ tasks:
     cmds:
       - test -z $(go fmt {{ default .DEFAULT_TARGETS .TARGETS }})
       - go vet {{ default .DEFAULT_TARGETS .TARGETS }}
-      - golint {{.GOLINTFLAGS}} {{ default .DEFAULT_TARGETS .TARGETS }}
+      - "'{{.GOLINTBIN}}' {{.GOLINTFLAGS}} {{ default .DEFAULT_TARGETS .TARGETS }}"
 
   check-legacy:
     desc: Check fmt and lint for the `legacy` package
@@ -79,4 +79,6 @@ vars:
     -X github.com/arduino/arduino-cli/version.commit={{.TEST_COMMIT}}'
 
   # check-lint vars
+  GOLINTBIN:
+    sh: go list -f {{"{{"}}".Target{{"}}"}}" golang.org/x/lint/golint
   GOLINTFLAGS: "-min_confidence 0.8 -set_exit_status"

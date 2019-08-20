@@ -20,6 +20,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -89,7 +90,7 @@ func TestLoadSketchFolderWrongMain(t *testing.T) {
 
 	_, err = builder.SketchLoad("does/not/exist", "")
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "no such file or directory")
+	require.Contains(t, err.Error(), "does/not/exist")
 }
 
 func TestMergeSketchSources(t *testing.T) {
@@ -99,7 +100,11 @@ func TestMergeSketchSources(t *testing.T) {
 	require.NotNil(t, s)
 
 	// load expected result
-	mergedPath := filepath.Join("testdata", t.Name()+".txt")
+	suffix := ".txt"
+	if runtime.GOOS == "windows" {
+		suffix = "_win.txt"
+	}
+	mergedPath := filepath.Join("testdata", t.Name()+suffix)
 	mergedBytes, err := ioutil.ReadFile(mergedPath)
 	if err != nil {
 		t.Fatalf("unable to read golden file %s: %v", mergedPath, err)

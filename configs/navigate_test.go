@@ -20,6 +20,7 @@ package configs_test
 import (
 	"io/ioutil"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -30,6 +31,10 @@ import (
 )
 
 func TestNavigate(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("Test only runs on Linux")
+	}
+
 	tests := []string{
 		"noconfig",
 		"local",
