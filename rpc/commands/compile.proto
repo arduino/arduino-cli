@@ -37,6 +37,7 @@ message CompileReq {
   bool quiet = 11;             // Suppresses almost every output.
   string vidPid = 12;   // VID/PID specific build properties.
   string exportFile = 13;   // The compiled binary is written to this file
+  int32 jobs = 14;   // The max number of concurrent compiler instances to run (as make -jx)
 }
 
 message CompileResp {
