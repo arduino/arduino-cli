@@ -175,20 +175,30 @@ func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources 
 
 	ctx.Progress.Steps = ctx.Progress.Steps / float64(len(sources))
 	var wg sync.WaitGroup
-	wg.Add(len(sources))
 
-	for _, source := range sources {
-		go func(source *paths.Path) {
-			defer wg.Done()
-			PrintProgressIfProgressEnabledAndMachineLogger(ctx)
-			objectFile, err := compileFileWithRecipe(ctx, sourcePath, source, buildPath, buildProperties, includes, recipe)
-			if err != nil {
-				errorsChan <- err
-			} else {
-				objectFilesChan <- objectFile
+	// Split jobs into batches of N jobs each; wait for the completion of a batch to start the next
+	par := ctx.Jobs
+
+	go func() {
+		for total := 0; total < len(sources); total += par {
+			for i := total; i < total+par && i < len(sources); i++ {
+				wg.Add(1)
+				go func(source *paths.Path) {
+					defer wg.Done()
+					PrintProgressIfProgressEnabledAndMachineLogger(ctx)
+					objectFile, err := compileFileWithRecipe(ctx, sourcePath, source, buildPath, buildProperties, includes, recipe)
+					if err != nil {
+						errorsChan <- err
+					} else {
+						objectFilesChan <- objectFile
+					}
+				}(sources[i])
 			}
-		}(source)
-	}
+			wg.Wait()
+		}
+
+		doneChan <- struct{}{}
+	}()
 
 	go func() {
 		wg.Wait()
