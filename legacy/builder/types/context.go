@@ -111,6 +111,9 @@ type Context struct {
 	// Experimental: use arduino-preprocessor to create prototypes
 	UseArduinoPreprocessor bool
 
+	// Parallel processes
+	Jobs int
+
 	// Out and Err stream to redirect all Exec commands
 	ExecStdout io.Writer
 	ExecStderr io.Writer
