@@ -33,6 +33,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -192,7 +193,11 @@ func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources 
 
 	// Spawn jobs runners
 	var wg sync.WaitGroup
-	for i := 0; i < ctx.Jobs; i++ {
+	jobs := ctx.Jobs
+	if jobs == 0 {
+		jobs = runtime.NumCPU()
+	}
+	for i := 0; i < jobs; i++ {
 		wg.Add(1)
 		go func() {
 			for source := range queue {
