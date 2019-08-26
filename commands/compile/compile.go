@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
-	"runtime"
 	"sort"
 	"strings"
 
@@ -116,11 +115,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 	builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino-core-cache")
 
-	jobs := runtime.NumCPU()
-	if req.GetJobs() > 0 {
-		jobs = int(req.GetJobs())
-	}
-	builderCtx.Jobs = jobs
+	builderCtx.Jobs = int(req.GetJobs())
 
 	builderCtx.USBVidPid = req.GetVidPid()
 	builderCtx.WarningsLevel = req.GetWarnings()
