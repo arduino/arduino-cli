@@ -78,7 +78,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 
 	includes := []string{}
 	includes = append(includes, coreFolder.String())
-	if variantFolder != nil {
+	if variantFolder != nil && variantFolder.IsDir() {
 		includes = append(includes, variantFolder.String())
 	}
 	includes = utils.Map(includes, utils.WrapWithHyphenI)
@@ -86,7 +86,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 	var err error
 
 	variantObjectFiles := paths.NewPathList()
-	if variantFolder != nil {
+	if variantFolder != nil && variantFolder.IsDir() {
 		variantObjectFiles, err = builder_utils.CompileFiles(ctx, variantFolder, true, buildPath, buildProperties, includes)
 		if err != nil {
 			return nil, nil, i18n.WrapError(err)
