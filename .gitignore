@@ -11,3 +11,8 @@ __pycache__
 venv
 .pytest_cache
 /dist
+
+# gRPC client example folder
+/client_example/client_example
+*.bin
+*.elf
