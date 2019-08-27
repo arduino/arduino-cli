@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"bou.ke/monkey"
@@ -217,6 +218,10 @@ func detectLatestAVRCore(t *testing.T) string {
 // END -- Utility functions
 
 func TestUploadIntegration(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("This test runs only on Linux")
+	}
+
 	exitCode, _ := executeWithArgs("core", "update-index")
 	require.Zero(t, exitCode)
 
