@@ -446,3 +446,8 @@ Further help can be found in [this comment](https://github.com/arduino/arduino-c
 
 For a deeper understanding of how FQBN works, you should understand Arduino Hardware specification.
 You can find more information in this [arduino/Arduino wiki page](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification)
+
+## Using the gRPC interface
+
+The [client_example](./client_example) folder contains a sample program that
+shows how to use gRPC interface of the CLI.
