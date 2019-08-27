@@ -63,6 +63,7 @@ jobs:
           task test-integration
 
       - name: Send unit tests coverage to Codecov
+        if: matrix.operating-system != 'windows-2019'
         uses: codecov/codecov-action@v1.0.2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
@@ -70,6 +71,7 @@ jobs:
           flags: unit
 
       - name: Send integration tests coverage to Codecov
+        if: matrix.operating-system != 'windows-2019'
         uses: codecov/codecov-action@v1.0.2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
