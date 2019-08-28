@@ -194,7 +194,7 @@ func (d *SerialDiscovery) List() ([]*BoardPort, error) {
 	go func() {
 		select {
 		case <-done:
-		case <-time.After(2000 * time.Millisecond):
+		case <-time.After(10 * time.Second):
 			timeout = true
 			d.close()
 		}
