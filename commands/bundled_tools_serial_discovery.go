@@ -153,7 +153,7 @@ func NewBuiltinSerialDiscovery(pm *packagemanager.PackageManager) (*SerialDiscov
 }
 
 // Start starts the specified discovery
-func (d *SerialDiscovery) Start() error {
+func (d *SerialDiscovery) start() error {
 	if in, err := d.cmd.StdinPipe(); err == nil {
 		d.in = in
 	} else {
@@ -181,8 +181,8 @@ func (d *SerialDiscovery) List() ([]*BoardPort, error) {
 	d.Lock()
 	defer d.Unlock()
 
-	if d.cmd.Process == nil {
-		return nil, fmt.Errorf("discovery hasn't started")
+	if err := d.start(); err != nil {
+		return nil, fmt.Errorf("discovery hasn't started: %v", err)
 	}
 
 	if _, err := d.in.Write([]byte("LIST\n")); err != nil {
@@ -194,9 +194,9 @@ func (d *SerialDiscovery) List() ([]*BoardPort, error) {
 	go func() {
 		select {
 		case <-done:
-		case <-time.After(2000 * time.Millisecond):
+		case <-time.After(10 * time.Second):
 			timeout = true
-			d.Close()
+			d.close()
 		}
 	}()
 	if err := d.outJSON.Decode(&event); err != nil {
@@ -206,11 +206,11 @@ func (d *SerialDiscovery) List() ([]*BoardPort, error) {
 		return nil, fmt.Errorf("decoding LIST command: %s", err)
 	}
 	done <- true
-	return event.Ports, nil
+	return event.Ports, d.close()
 }
 
 // Close stops the Discovery and free the resources
-func (d *SerialDiscovery) Close() error {
+func (d *SerialDiscovery) close() error {
 	_, _ = d.in.Write([]byte("QUIT\n"))
 	_ = d.in.Close()
 	_ = d.out.Close()
