@@ -20,9 +20,33 @@ package output
 import (
 	"fmt"
 
+	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/cmaglie/pb"
 )
+
+// ProgressBar returns a DownloadProgressCB that prints a progress bar.
+// If JSON output format has been selected, the callback outputs nothing.
+func ProgressBar() commands.DownloadProgressCB {
+	if globals.OutputFormat != "json" {
+		return NewDownloadProgressBarCB()
+	}
+	return func(curr *rpc.DownloadProgress) {
+		// XXX: Output progress in JSON?
+	}
+}
+
+// TaskProgress returns a TaskProgressCB that prints the task progress.
+// If JSON output format has been selected, the callback outputs nothing.
+func TaskProgress() commands.TaskProgressCB {
+	if globals.OutputFormat != "json" {
+		return NewTaskProgressCB()
+	}
+	return func(curr *rpc.TaskProgress) {
+		// XXX: Output progress in JSON?
+	}
+}
 
 // NewDownloadProgressBarCB creates a progress bar callback that outputs a progress
 // bar on the terminal

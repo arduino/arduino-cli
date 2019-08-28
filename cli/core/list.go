@@ -18,16 +18,16 @@
 package core
 
 import (
-	"fmt"
 	"os"
 	"sort"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/common/formatter"
+	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -55,11 +55,13 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 	platforms, err := core.GetPlatforms(instance.Id, listFlags.updatableOnly)
 	if err != nil {
-		formatter.PrintError(err, "Error listing platforms")
+		feedback.Errorf("Error listing platforms: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if output.JSONOrElse(platforms) {
+	if globals.OutputFormat == "json" {
+		feedback.PrintJSON(platforms)
+	} else {
 		outputInstalledCores(platforms)
 	}
 }
@@ -69,13 +71,14 @@ func outputInstalledCores(platforms []*cores.PlatformRelease) {
 		return
 	}
 
-	table := output.NewTable()
-	table.AddRow("ID", "Installed", "Latest", "Name")
+	t := table.New()
+	t.SetHeader("ID", "Installed", "Latest", "Name")
 	sort.Slice(platforms, func(i, j int) bool {
 		return platforms[i].Platform.String() < platforms[j].Platform.String()
 	})
 	for _, p := range platforms {
-		table.AddRow(p.Platform.String(), p.Version.String(), p.Platform.GetLatestRelease().Version.String(), p.Platform.Name)
+		t.AddRow(p.Platform.String(), p.Version.String(), p.Platform.GetLatestRelease().Version.String(), p.Platform.Name)
 	}
-	fmt.Print(table.Render())
+
+	feedback.Print(t.Render())
 }

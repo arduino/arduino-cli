@@ -19,17 +19,17 @@ package core
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -51,35 +51,40 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core search`")
 
 	arguments := strings.ToLower(strings.Join(args, " "))
-	formatter.Print("Searching for platforms matching '" + arguments + "'")
+
+	if globals.OutputFormat != "json" {
+		feedback.Printf("Searching for platforms matching '%s'", arguments)
+	}
 
 	resp, err := core.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
 		Instance:   instance,
 		SearchArgs: arguments,
 	})
 	if err != nil {
-		formatter.PrintError(err, "Error saerching for platforms")
+		feedback.Errorf("Error saerching for platforms: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	coreslist := resp.GetSearchOutput()
-	if output.JSONOrElse(coreslist) {
-		if len(coreslist) > 0 {
-			outputSearchCores(coreslist)
-		} else {
-			formatter.Print("No platforms matching your search.")
-		}
+	if globals.OutputFormat == "json" {
+		feedback.PrintJSON(coreslist)
+	} else {
+		outputSearchCores(coreslist)
 	}
 }
 
 func outputSearchCores(cores []*rpc.Platform) {
-	table := output.NewTable()
-	table.AddRow("ID", "Version", "Name")
-	sort.Slice(cores, func(i, j int) bool {
-		return cores[i].ID < cores[j].ID
-	})
-	for _, item := range cores {
-		table.AddRow(item.GetID(), item.GetLatest(), item.GetName())
+	if len(cores) > 0 {
+		t := table.New()
+		t.SetHeader("ID", "Version", "Name")
+		sort.Slice(cores, func(i, j int) bool {
+			return cores[i].ID < cores[j].ID
+		})
+		for _, item := range cores {
+			t.AddRow(item.GetID(), item.GetLatest(), item.GetName())
+		}
+		feedback.Print(t.Render())
+	} else {
+		feedback.Print("No platforms matching your search.")
 	}
-	fmt.Print(table.Render())
 }

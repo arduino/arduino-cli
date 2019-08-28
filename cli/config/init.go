@@ -21,8 +21,8 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -56,8 +56,8 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config init`")
 
 	if !initFlags._default {
-		if !formatter.IsCurrentFormat("text") {
-			formatter.PrintErrorMessage("The interactive mode is supported only in text mode.")
+		if globals.OutputFormat != "text" {
+			feedback.Error("The interactive mode is supported only in text mode.")
 			os.Exit(errorcodes.ErrBadCall)
 		}
 	}
@@ -68,14 +68,14 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if err := globals.Config.ConfigFile.Parent().MkdirAll(); err != nil {
-		formatter.PrintError(err, "Cannot create config file.")
+		feedback.Errorf("Cannot create config file: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	if err := globals.Config.SaveToYAML(filepath); err != nil {
-		formatter.PrintError(err, "Cannot create config file.")
+		feedback.Errorf("Cannot create config file: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	formatter.PrintResult("Config file PATH: " + filepath)
+	feedback.Print("Config file PATH: " + filepath)
 	logrus.Info("Done")
 }

@@ -21,11 +21,11 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -52,13 +52,13 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
 		err := lib.LibraryUpgradeAll(instance.Id, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
 		if err != nil {
-			formatter.PrintError(err, "Error upgrading libraries")
+			feedback.Errorf("Error upgrading libraries: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	} else {
 		err := lib.LibraryUpgrade(instance.Id, args, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
 		if err != nil {
-			formatter.PrintError(err, "Error upgrading libraries")
+			feedback.Errorf("Error upgrading libraries: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}

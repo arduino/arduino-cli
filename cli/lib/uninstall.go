@@ -22,11 +22,11 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -50,7 +50,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 	refs, err := globals.ParseReferenceArgs(args, false)
 	if err != nil {
-		formatter.PrintError(err, "Invalid argument passed")
+		feedback.Errorf("Invalid argument passed: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
@@ -61,7 +61,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 			Version:  library.Version,
 		}, output.TaskProgress())
 		if err != nil {
-			formatter.PrintError(err, "Error uninstalling "+library.String())
+			feedback.Errorf("Error uninstalling %s: %v", library, err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}

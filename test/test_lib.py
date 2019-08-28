@@ -12,7 +12,6 @@
 # otherwise use the software for commercial activities involving the Arduino
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
-import pytest
 import simplejson as json
 
 
@@ -40,7 +39,7 @@ def test_list(run_command):
     assert "" == result.stderr
     lines = result.stdout.strip().splitlines()
     assert 2 == len(lines)
-    toks = lines[1].split("\t")
+    toks = [t.strip() for t in lines[1].split()]
     # be sure line contain the current version AND the available version
     assert "" != toks[1]
     assert "" != toks[2]
@@ -79,22 +78,22 @@ def test_remove(run_command):
     assert result.ok
 
 
-@pytest.mark.slow
 def test_search(run_command):
-    result = run_command("lib search")
+    assert run_command("lib update-index")
+
+    result = run_command("lib search --names")
     assert result.ok
     out_lines = result.stdout.splitlines()
     # Create an array with just the name of the vars
     libs = []
     for line in out_lines:
-        if line.startswith("Name: "):
-            start = line.find('"') + 1
-            libs.append(line[start:-1])
+        start = line.find('"') + 1
+        libs.append(line[start:-1])
 
     expected = {"WiFi101", "WiFi101OTA", "Firebase Arduino based on WiFi101"}
     assert expected == {lib for lib in libs if "WiFi101" in lib}
 
-    result = run_command("lib search --format json")
+    result = run_command("lib search --names --format json")
     assert result.ok
     libs_json = json.loads(result.stdout)
     assert len(libs) == len(libs_json.get("libraries"))

@@ -18,6 +18,7 @@
 package cli
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -27,17 +28,17 @@ import (
 	"github.com/arduino/arduino-cli/cli/core"
 	"github.com/arduino/arduino-cli/cli/daemon"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/generatedocs"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/lib"
 	"github.com/arduino/arduino-cli/cli/sketch"
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/mattn/go-colorable"
+	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 var (
@@ -50,11 +51,12 @@ var (
 		PersistentPreRun: preRun,
 	}
 
-	// ErrLogrus represents the logrus instance, which has the role to
-	// log all non info messages.
-	ErrLogrus = logrus.New()
+	verbose bool
+	logFile string
+)
 
-	outputFormat string
+const (
+	defaultLogLevel = "info"
 )
 
 // Init the cobra root command
@@ -75,49 +77,90 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(upload.NewCommand())
 	cmd.AddCommand(version.NewCommand())
 
-	cmd.PersistentFlags().BoolVar(&globals.Debug, "debug", false, "Enables debug output (super verbose, used to debug the CLI).")
-	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be [text|json].")
+	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
+	cmd.PersistentFlags().StringVar(&globals.LogLevel, "log-level", defaultLogLevel, "Messages with this level and above will be logged (default: warn).")
+	cmd.PersistentFlags().StringVar(&logFile, "log-file", "", "Path to the file where logs will be written.")
+	cmd.PersistentFlags().StringVar(&globals.OutputFormat, "format", "text", "The output format, can be [text|json].")
 	cmd.PersistentFlags().StringVar(&globals.YAMLConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 	cmd.PersistentFlags().StringSliceVar(&globals.AdditionalUrls, "additional-urls", []string{}, "Additional URLs for the board manager.")
 }
 
-func preRun(cmd *cobra.Command, args []string) {
-	// Reset logrus if debug flag changed.
-	if !globals.Debug {
-		// Discard logrus output if no debug.
-		logrus.SetOutput(ioutil.Discard)
-	} else {
-		// Else print on stderr.
+// convert the string passed to the `--log-level` option to the corresponding
+// logrus formal level.
+func toLogLevel(s string) (t logrus.Level, found bool) {
+	t, found = map[string]logrus.Level{
+		"trace": logrus.TraceLevel,
+		"debug": logrus.DebugLevel,
+		"info":  logrus.InfoLevel,
+		"warn":  logrus.WarnLevel,
+		"error": logrus.ErrorLevel,
+		"fatal": logrus.FatalLevel,
+		"panic": logrus.PanicLevel,
+	}[s]
 
-		// Workaround to get colored output on windows
-		if terminal.IsTerminal(int(os.Stdout.Fd())) {
-			logrus.SetFormatter(&logrus.TextFormatter{ForceColors: true})
+	return
+}
+
+func parseFormatString(arg string) (feedback.OutputFormat, bool) {
+	f, found := map[string]feedback.OutputFormat{
+		"json": feedback.JSON,
+		"text": feedback.Text,
+	}[arg]
+
+	return f, found
+}
+
+func preRun(cmd *cobra.Command, args []string) {
+	// should we log to file?
+	if logFile != "" {
+		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		if err != nil {
+			fmt.Printf("Unable to open file for logging: %s", logFile)
+			os.Exit(errorcodes.ErrBadCall)
 		}
-		logrus.SetOutput(colorable.NewColorableStdout())
-		ErrLogrus.Out = colorable.NewColorableStderr()
-		formatter.SetLogger(ErrLogrus)
+
+		// we use a hook so we don't get color codes in the log file
+		logrus.AddHook(lfshook.NewHook(file, &logrus.TextFormatter{}))
 	}
+
+	// should we log to stdout?
+	if verbose {
+		logrus.SetOutput(colorable.NewColorableStdout())
+		logrus.SetFormatter(&logrus.TextFormatter{
+			ForceColors: true,
+		})
+	} else {
+		// Discard logrus output if no writer was set
+		logrus.SetOutput(ioutil.Discard)
+	}
+
+	// configure logging filter
+	if lvl, found := toLogLevel(globals.LogLevel); !found {
+		fmt.Printf("Invalid option for --log-level: %s", globals.LogLevel)
+		os.Exit(errorcodes.ErrBadArgument)
+	} else {
+		logrus.SetLevel(lvl)
+	}
+
+	// check the right format was passed
+	if f, found := parseFormatString(globals.OutputFormat); !found {
+		feedback.Error("Invalid output format: " + globals.OutputFormat)
+		os.Exit(errorcodes.ErrBadCall)
+	} else {
+		// use the format to configure the Feedback
+		feedback.SetFormat(f)
+	}
+
 	globals.InitConfigs()
 
 	logrus.Info(globals.VersionInfo.Application + "-" + globals.VersionInfo.VersionString)
 	logrus.Info("Starting root command preparation (`arduino`)")
-	switch outputFormat {
-	case "text":
-		formatter.SetFormatter("text")
-		globals.OutputJSON = false
-	case "json":
-		formatter.SetFormatter("json")
-		globals.OutputJSON = true
-	default:
-		formatter.PrintErrorMessage("Invalid output format: " + outputFormat)
-		os.Exit(errorcodes.ErrBadCall)
-	}
 
 	logrus.Info("Formatter set")
-	if !formatter.IsCurrentFormat("text") {
+	if globals.OutputFormat != "text" {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 			logrus.Warn("Calling help on JSON format")
-			formatter.PrintErrorMessage("Invalid Call : should show Help, but it is available only in TEXT mode.")
+			feedback.Error("Invalid Call : should show Help, but it is available only in TEXT mode.")
 			os.Exit(errorcodes.ErrBadCall)
 		})
 	}

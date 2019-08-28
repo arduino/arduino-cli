@@ -22,10 +22,10 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/spf13/cobra"
 )
@@ -63,7 +63,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		SearchTimeout: attachFlags.searchTimeout,
 	}, output.TaskProgress())
 	if err != nil {
-		formatter.PrintError(err, "attach board error")
+		feedback.Errorf("Attach board error: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

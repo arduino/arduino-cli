@@ -22,11 +22,11 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -53,7 +53,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 	platformsRefs, err := globals.ParseReferenceArgs(args, true)
 	if err != nil {
-		formatter.PrintError(err, "Invalid argument passed")
+		feedback.Errorf("Invalid argument passed: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
@@ -67,7 +67,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		_, err := core.PlatformInstall(context.Background(), plattformInstallReq, output.ProgressBar(),
 			output.TaskProgress(), globals.HTTPClientHeader)
 		if err != nil {
-			formatter.PrintError(err, "Error during install")
+			feedback.Errorf("Error during install: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}

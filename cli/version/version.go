@@ -18,11 +18,10 @@
 package version
 
 import (
-	"fmt"
 	"os"
 
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/spf13/cobra"
 )
 
@@ -39,7 +38,9 @@ func NewCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	if output.JSONOrElse(globals.VersionInfo) {
-		fmt.Printf("%s\n", globals.VersionInfo)
+	if globals.OutputFormat == "json" {
+		feedback.PrintJSON(globals.VersionInfo)
+	} else {
+		feedback.Print(globals.VersionInfo)
 	}
 }

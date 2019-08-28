@@ -19,15 +19,15 @@ package board
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/arduino/arduino-cli/table"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -47,42 +47,68 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 	})
 
 	if err != nil {
-		formatter.PrintError(err, "Error getting board details")
+		feedback.Errorf("Error getting board details: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	if output.JSONOrElse(res) {
-		outputDetailsResp(res)
-	}
+
+	feedback.PrintResult(detailsResult{details: res})
 }
 
-func outputDetailsResp(details *rpc.BoardDetailsResp) {
-	table := output.NewTable()
-	table.SetColumnWidthMode(1, output.Average)
-	table.AddRow("Board name:", details.Name)
+// ouput from this command requires special formatting, let's create a dedicated
+// feedback.Result implementation
+type detailsResult struct {
+	details *rpc.BoardDetailsResp
+}
+
+func (dr detailsResult) Data() interface{} {
+	return dr.details
+}
+
+func (dr detailsResult) String() string {
+	details := dr.details
+	// Table is 4 columns wide:
+	// |               |                             | |                       |
+	// Board name:     Arduino Nano
+	//
+	// Required tools: arduino:avr-gcc                 5.4.0-atmel3.6.1-arduino2
+	//                 arduino:avrdude                 6.3.0-arduino14
+	//                 arduino:arduinoOTA              1.2.1
+	//
+	// Option:         Processor                       cpu
+	//                 ATmega328P                    ✔ cpu=atmega328
+	//                 ATmega328P (Old Bootloader)     cpu=atmega328old
+	//                 ATmega168                       cpu=atmega168
+	t := table.New()
+	t.SetColumnWidthMode(1, table.Average)
+	t.AddRow("Board name:", details.Name)
+
 	for i, tool := range details.RequiredTools {
-		head := ""
 		if i == 0 {
-			table.AddRow()
-			head = "Required tools:"
+			t.AddRow() // get some space from above
+			t.AddRow("Required tools:", tool.Packager+":"+tool.Name, "", tool.Version)
+			continue
 		}
-		table.AddRow(head, tool.Packager+":"+tool.Name, "", tool.Version)
+		t.AddRow("", tool.Packager+":"+tool.Name, "", tool.Version)
 	}
+
 	for _, option := range details.ConfigOptions {
-		table.AddRow()
-		table.AddRow("Option:",
-			option.OptionLabel,
-			"", option.Option)
+		t.AddRow() // get some space from above
+		t.AddRow("Option:", option.OptionLabel, "", option.Option)
 		for _, value := range option.Values {
+			green := color.New(color.FgGreen)
 			if value.Selected {
-				table.AddRow("",
-					output.Green(value.ValueLabel),
-					output.Green("✔"), output.Green(option.Option+"="+value.Value))
+				t.AddRow("",
+					table.NewCell(value.ValueLabel, green),
+					table.NewCell("✔", green),
+					table.NewCell(option.Option+"="+value.Value, green))
 			} else {
-				table.AddRow("",
+				t.AddRow("",
 					value.ValueLabel,
-					"", option.Option+"="+value.Value)
+					"",
+					option.Option+"="+value.Value)
 			}
 		}
 	}
-	fmt.Print(table.Render())
+
+	return t.Render()
 }

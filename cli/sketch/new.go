@@ -21,8 +21,8 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
-	"github.com/arduino/arduino-cli/common/formatter"
 	"github.com/spf13/cobra"
 )
 
@@ -49,15 +49,15 @@ void loop() {
 func runNewCommand(cmd *cobra.Command, args []string) {
 	sketchDir := globals.Config.SketchbookDir.Join(args[0])
 	if err := sketchDir.MkdirAll(); err != nil {
-		formatter.PrintError(err, "Could not create sketch directory.")
+		feedback.Errorf("Could not create sketch directory: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	sketchFile := sketchDir.Join(args[0] + ".ino")
 	if err := sketchFile.WriteFile(emptySketch); err != nil {
-		formatter.PrintError(err, "Error creating sketch.")
+		feedback.Errorf("Error creating sketch: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	formatter.Print("Sketch created in: " + sketchDir.String())
+	feedback.Print("Sketch created in: " + sketchDir.String())
 }

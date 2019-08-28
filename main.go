@@ -22,12 +22,10 @@ import (
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
-	"github.com/arduino/arduino-cli/common/formatter"
 )
 
 func main() {
 	if err := cli.ArduinoCli.Execute(); err != nil {
-		formatter.PrintError(err, "Bad exit.")
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

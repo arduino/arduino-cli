@@ -26,7 +26,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"google.golang.org/grpc"
 )
@@ -489,7 +488,7 @@ func TestWithClientE2E(t *testing.T) {
 		Query:    "audio",
 	})
 	if err != nil {
-		formatter.PrintError(err, "Error searching for library")
+		fmt.Printf("Error searching for library: %v", err)
 		os.Exit(1)
 	}
 	fmt.Printf("---> %+v\n", libSearchResp)
@@ -503,7 +502,7 @@ func TestWithClientE2E(t *testing.T) {
 		Updatable: false,
 	})
 	if err != nil {
-		formatter.PrintError(err, "Error List Library")
+		fmt.Printf("Error List Library: %v", err)
 		os.Exit(1)
 	}
 	fmt.Printf("---> %+v\n", libLstResp)

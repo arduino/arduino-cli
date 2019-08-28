@@ -25,7 +25,7 @@ def test_core_list(run_command):
     result = run_command("board list --format json")
     assert result.ok
     # check is a valid json and contains a list of ports
-    ports = json.loads(result.stdout).get("ports")
+    ports = json.loads(result.stdout)
     assert isinstance(ports, list)
     for port in ports:
         assert "protocol" in port

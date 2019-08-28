@@ -18,17 +18,17 @@
 package board
 
 import (
-	"fmt"
 	"os"
 	"sort"
 	"time"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/arduino/arduino-cli/table"
 	"github.com/spf13/cobra"
 )
 
@@ -54,7 +54,7 @@ var listFlags struct {
 // runListCommand detects and lists the connected arduino boards
 func runListCommand(cmd *cobra.Command, args []string) {
 	if timeout, err := time.ParseDuration(listFlags.timeout); err != nil {
-		formatter.PrintError(err, "Invalid timeout.")
+		feedback.Errorf("Invalid timeout: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
 	} else {
 		time.Sleep(timeout)
@@ -62,18 +62,20 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 	ports, err := board.List(instance.CreateInstance().GetId())
 	if err != nil {
-		formatter.PrintError(err, "Error detecting boards")
+		feedback.Errorf("Error detecting boards: %v", err)
 		os.Exit(errorcodes.ErrNetwork)
 	}
 
-	if output.JSONOrElse(ports) {
+	if globals.OutputFormat == "json" {
+		feedback.PrintJSON(ports)
+	} else {
 		outputListResp(ports)
 	}
 }
 
 func outputListResp(ports []*rpc.DetectedPort) {
 	if len(ports) == 0 {
-		formatter.Print("No boards found.")
+		feedback.Print("No boards found.")
 		return
 	}
 	sort.Slice(ports, func(i, j int) bool {
@@ -81,8 +83,9 @@ func outputListResp(ports []*rpc.DetectedPort) {
 		return x.GetProtocol() < y.GetProtocol() ||
 			(x.GetProtocol() == y.GetProtocol() && x.GetAddress() < y.GetAddress())
 	})
-	table := output.NewTable()
-	table.SetHeader("Port", "Type", "Board Name", "FQBN")
+
+	t := table.New()
+	t.SetHeader("Port", "Type", "Board Name", "FQBN")
 	for _, port := range ports {
 		address := port.GetProtocol() + "://" + port.GetAddress()
 		if port.GetProtocol() == "serial" {
@@ -97,7 +100,7 @@ func outputListResp(ports []*rpc.DetectedPort) {
 			for _, b := range boards {
 				board := b.GetName()
 				fqbn := b.GetFQBN()
-				table.AddRow(address, protocol, board, fqbn)
+				t.AddRow(address, protocol, board, fqbn)
 				// show address and protocol only on the first row
 				address = ""
 				protocol = ""
@@ -105,8 +108,8 @@ func outputListResp(ports []*rpc.DetectedPort) {
 		} else {
 			board := "Unknown"
 			fqbn := ""
-			table.AddRow(address, protocol, board, fqbn)
+			t.AddRow(address, protocol, board, fqbn)
 		}
 	}
-	fmt.Print(table.Render())
+	feedback.Print(t.Render())
 }

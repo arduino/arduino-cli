@@ -25,10 +25,10 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
-	"github.com/arduino/arduino-cli/common/formatter"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -60,43 +60,67 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		Query:    (strings.Join(args, " ")),
 	})
 	if err != nil {
-		formatter.PrintError(err, "Error saerching for Library")
+		feedback.Errorf("Error saerching for Library: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if output.JSONOrElse(searchResp) {
+	if globals.OutputFormat == "json" {
+		if searchFlags.namesOnly {
+			type LibName struct {
+				Name string `json:"name,required"`
+			}
+
+			type NamesOnly struct {
+				Libraries []LibName `json:"libraries,required"`
+			}
+
+			names := []LibName{}
+			results := searchResp.GetLibraries()
+			for _, lsr := range results {
+				names = append(names, LibName{lsr.Name})
+			}
+			feedback.PrintJSON(NamesOnly{
+				names,
+			})
+		} else {
+			feedback.PrintJSON(searchResp)
+		}
+	} else {
+		// get a sorted slice of results
 		results := searchResp.GetLibraries()
 		sort.Slice(results, func(i, j int) bool {
 			return results[i].Name < results[j].Name
 		})
-		if searchFlags.namesOnly {
-			for _, result := range results {
-				fmt.Println(result.Name)
-			}
-		} else {
-			if len(results) > 0 {
-				for _, result := range results {
-					outputSearchedLibrary(result)
-				}
-			} else {
-				formatter.Print("No libraries matching your search.")
-			}
-		}
+
+		// print all the things
+		outputSearchedLibrary(results, searchFlags.namesOnly)
 	}
+
 	logrus.Info("Done")
 }
 
-func outputSearchedLibrary(lsr *rpc.SearchedLibrary) {
-	fmt.Printf("Name: \"%s\"\n", lsr.Name)
-	fmt.Printf("  Author: %s\n", lsr.GetLatest().Author)
-	fmt.Printf("  Maintainer: %s\n", lsr.GetLatest().Maintainer)
-	fmt.Printf("  Sentence: %s\n", lsr.GetLatest().Sentence)
-	fmt.Printf("  Paragraph: %s\n", lsr.GetLatest().Paragraph)
-	fmt.Printf("  Website: %s\n", lsr.GetLatest().Website)
-	fmt.Printf("  Category: %s\n", lsr.GetLatest().Category)
-	fmt.Printf("  Architecture: %s\n", strings.Join(lsr.GetLatest().Architectures, ", "))
-	fmt.Printf("  Types: %s\n", strings.Join(lsr.GetLatest().Types, ", "))
-	fmt.Printf("  Versions: %s\n", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lsr)), " ", ", ", -1))
+func outputSearchedLibrary(results []*rpc.SearchedLibrary, namesOnly bool) {
+	if len(results) == 0 {
+		feedback.Print("No libraries matching your search.")
+		return
+	}
+
+	for _, lsr := range results {
+		feedback.Printf(`Name: "%s"`, lsr.Name)
+		if namesOnly {
+			continue
+		}
+
+		feedback.Printf("  Author: %s", lsr.GetLatest().Author)
+		feedback.Printf("  Maintainer: %s", lsr.GetLatest().Maintainer)
+		feedback.Printf("  Sentence: %s", lsr.GetLatest().Sentence)
+		feedback.Printf("  Paragraph: %s", lsr.GetLatest().Paragraph)
+		feedback.Printf("  Website: %s", lsr.GetLatest().Website)
+		feedback.Printf("  Category: %s", lsr.GetLatest().Category)
+		feedback.Printf("  Architecture: %s", strings.Join(lsr.GetLatest().Architectures, ", "))
+		feedback.Printf("  Types: %s", strings.Join(lsr.GetLatest().Types, ", "))
+		feedback.Printf("  Versions: %s", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lsr)), " ", ", ", -1))
+	}
 }
 
 func versionsFromSearchedLibrary(library *rpc.SearchedLibrary) []*semver.Version {
