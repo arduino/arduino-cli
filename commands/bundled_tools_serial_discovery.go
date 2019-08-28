@@ -206,7 +206,7 @@ func (d *SerialDiscovery) List() ([]*BoardPort, error) {
 		return nil, fmt.Errorf("decoding LIST command: %s", err)
 	}
 	done <- true
-	return event.Ports, nil
+	return event.Ports, d.close()
 }
 
 // Close stops the Discovery and free the resources
