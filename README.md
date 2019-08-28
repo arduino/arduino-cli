@@ -1,7 +1,6 @@
 # arduino-cli
 
-[![Build Status](https://cloud.drone.io/api/badges/arduino/arduino-cli/status.svg)](https://cloud.drone.io/arduino/arduino-cli)
-[![Build status](https://ci.appveyor.com/api/projects/status/obclpbgsafum2wml/branch/master?svg=true)](https://ci.appveyor.com/project/Arduino/arduino-cli/branch/master)
+![Workflow Status](https://github.com/Arduino/arduino-cli/workflows/test/badge.svg)
 [![codecov](https://codecov.io/gh/arduino/arduino-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/arduino/arduino-cli)
 
 `arduino-cli` is an all-in-one solution that provides builder, boards/library manager, uploader,
