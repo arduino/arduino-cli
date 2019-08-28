@@ -32,7 +32,6 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
@@ -159,7 +158,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 	builderCtx.ExecStdout = outStream
 	builderCtx.ExecStderr = errStream
-	builderCtx.SetLogger(i18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
+	builderCtx.SetLogger(commands.LegacyLogger{})
 
 	// if --preprocess or --show-properties were passed, we can stop here
 	if req.GetShowProperties() {
