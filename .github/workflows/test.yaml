@@ -1,0 +1,79 @@
+name: test
+
+on: [push]
+
+jobs:
+  test-matrix:
+
+    strategy:
+      matrix:
+        operating-system: [ubuntu-18.04, windows-2019]
+
+    runs-on: ${{ matrix.operating-system }}
+
+    steps:
+      - name: Disable EOL conversions
+        run: git config --global core.autocrlf false
+
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Install Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.12.x'
+
+      - name: Install Go deps
+        run: |
+          go get github.com/golangci/govet
+          go get golang.org/x/lint/golint
+          go get github.com/golang/protobuf/protoc-gen-go
+
+      - name: Install Taskfile
+        uses: Arduino/actions/setup-taskfile@master
+
+      - name: Check the code is good
+        run: task check
+
+      - name: Install protoc compiler
+        uses: Arduino/actions/setup-protoc@master
+
+      - name: Check protocol buffers compile correctly
+        run: task protoc
+
+      - name: Build the CLI
+        run: task build
+
+      - name: Run unit tests
+        run: task test-unit
+
+      - name: Run unit tests on the legacy package
+        if: matrix.operating-system != 'windows-2019'
+        run: task test-legacy
+
+      - name: Install Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+
+      - name: Run integration tests
+        run: |
+          pip install -r test/requirements.txt
+          task test-integration
+
+      - name: Send unit tests coverage to Codecov
+        if: matrix.operating-system != 'windows-2019'
+        uses: codecov/codecov-action@v1.0.2
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+          file: ./coverage_unit.txt
+          flags: unit
+
+      - name: Send integration tests coverage to Codecov
+        if: matrix.operating-system != 'windows-2019'
+        uses: codecov/codecov-action@v1.0.2
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+          file: ./coverage_integ.txt
+          flags: integ
