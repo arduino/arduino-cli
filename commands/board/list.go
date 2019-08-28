@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -87,11 +88,6 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 		return nil, errors.Wrap(err, "unable to instance serial-discovery")
 	}
 
-	if err := serialDiscovery.Start(); err != nil {
-		return nil, errors.Wrap(err, "unable to start serial-discovery")
-	}
-	defer serialDiscovery.Close()
-
 	ports, err := serialDiscovery.List()
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting port list from serial-discovery")
@@ -102,6 +98,7 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 		b := []*rpc.BoardListItem{}
 
 		// first query installed cores through the Package Manager
+		logrus.Info("Querying installed cores for board identification...")
 		for _, board := range pm.IdentifyBoard(port.IdentificationPrefs) {
 			b = append(b, &rpc.BoardListItem{
 				Name: board.Name(),
@@ -112,12 +109,14 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 		// if installed cores didn't recognize the board, try querying
 		// the builder API
 		if len(b) == 0 {
+			logrus.Info("Querying builder API for board identification...")
 			url := fmt.Sprintf("https://builder.arduino.cc/v3/boards/byVidPid/%s/%s",
 				port.IdentificationPrefs.Get("vid"),
 				port.IdentificationPrefs.Get("pid"))
 			items, err := apiByVidPid(url)
 			if err == ErrNotFound {
 				// the board couldn't be detected, keep going with the next port
+				logrus.Info("Board not recognized")
 				continue
 			} else if err != nil {
 				// this is bad, bail out
