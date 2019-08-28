@@ -237,28 +237,29 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
-	properties.Set(constants.BUILD_PROPERTIES_OBJECT_FILE, buildPath.JoinPath(relativeSource).String()+".o")
+	depsFile := buildPath.Join(relativeSource.String() + ".d")
+	objectFile := buildPath.Join(relativeSource.String() + ".o")
 
-	err = properties.GetPath(constants.BUILD_PROPERTIES_OBJECT_FILE).Parent().MkdirAll()
+	properties.SetPath(constants.BUILD_PROPERTIES_OBJECT_FILE, objectFile)
+	err = objectFile.Parent().MkdirAll()
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
 
-	objIsUpToDate, err := ObjFileIsUpToDate(ctx, properties.GetPath(constants.BUILD_PROPERTIES_SOURCE_FILE), properties.GetPath(constants.BUILD_PROPERTIES_OBJECT_FILE), buildPath.Join(relativeSource.String()+".d"))
+	objIsUpToDate, err := ObjFileIsUpToDate(ctx, source, objectFile, depsFile)
 	if err != nil {
 		return nil, i18n.WrapError(err)
 	}
-
 	if !objIsUpToDate {
 		_, _, err = ExecRecipe(ctx, properties, recipe, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
 	} else if ctx.Verbose {
-		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, properties.Get(constants.BUILD_PROPERTIES_OBJECT_FILE))
+		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, objectFile)
 	}
 
-	return properties.GetPath(constants.BUILD_PROPERTIES_OBJECT_FILE), nil
+	return objectFile, nil
 }
 
 func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFile *paths.Path) (bool, error) {
