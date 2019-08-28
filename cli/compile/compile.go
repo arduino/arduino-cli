@@ -73,7 +73,6 @@ func NewCommand() *cobra.Command {
 		"List of custom build properties separated by commas. Or can be used multiple times for multiple properties.")
 	command.Flags().StringVar(&warnings, "warnings", "none",
 		`Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
-	command.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
 	command.Flags().BoolVar(&quiet, "quiet", false, "Optional, supresses almost every output.")
 	command.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, "Upload the binary after the compilation.")
 	command.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
