@@ -8,6 +8,8 @@ github.com/arduino/go-paths-helper v0.0.0-20190214132331-c3c98d1bf2e1 h1:S0NpDSq
 github.com/arduino/go-paths-helper v0.0.0-20190214132331-c3c98d1bf2e1/go.mod h1:OGL+FS3aTrS01YsBAJJhkGuxtEGsFRSgZYo8b3vefdc=
 github.com/arduino/go-properties-orderedmap v0.0.0-20181003091528-89278049acd3 h1:aWZoiBr2fCXtZzY4e/TOyQHEFyFpsF9eph7rEDZRv0Y=
 github.com/arduino/go-properties-orderedmap v0.0.0-20181003091528-89278049acd3/go.mod h1:kiSuHm7yz3chiy8rb2MphC7ECn3MlkQFAIe4SXmQg6o=
+github.com/arduino/go-properties-orderedmap v0.0.0-20190828172252-05018b28ff6c h1:4z4PJqNH8WGXtm9ix2muUOAP7gxTGBOdQTuKEDyCnsA=
+github.com/arduino/go-properties-orderedmap v0.0.0-20190828172252-05018b28ff6c/go.mod h1:kiSuHm7yz3chiy8rb2MphC7ECn3MlkQFAIe4SXmQg6o=
 github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b h1:9hDi4F2st6dbLC3y4i02zFT5quS4X6iioWifGlVwfy4=
 github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b/go.mod h1:uwGy5PpN4lqW97FiLnbcx+xx8jly5YuPMJWfVwwjJiQ=
 github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b h1:3PjgYG5gVPA7cipp7vIR2lF96KkEJIFBJ+ANnuv6J20=
