@@ -16,3 +16,6 @@ venv
 /client_example/client_example
 *.bin
 *.elf
+
+# Misc.
+.DS_Store
