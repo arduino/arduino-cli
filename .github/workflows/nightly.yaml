@@ -6,13 +6,14 @@ on:
     - cron:  '0 1 * * *'
 
 jobs:
-  runs-on: ubuntu-latest
+  publish-nightly:
+    runs-on: ubuntu-latest
 
-  container:
-    image: arduino/arduino-cli:builder-0.1
-    volumes:
-      # cache go dependencies across pipeline's steps
-      - $PWD/go:/go
+    container:
+      image: arduino/arduino-cli:builder-0.1
+      volumes:
+        # cache go dependencies across pipeline's steps
+        - $PWD/go:/go
 
     steps:
       - name: checkout
