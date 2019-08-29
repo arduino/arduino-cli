@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/arduino/arduino-cli/cli/board"
 	"github.com/arduino/arduino-cli/cli/compile"
@@ -51,8 +52,9 @@ var (
 		PersistentPreRun: preRun,
 	}
 
-	verbose bool
-	logFile string
+	verbose   bool
+	logFile   string
+	logFormat string
 )
 
 const (
@@ -80,6 +82,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
 	cmd.PersistentFlags().StringVar(&globals.LogLevel, "log-level", defaultLogLevel, "Messages with this level and above will be logged (default: warn).")
 	cmd.PersistentFlags().StringVar(&logFile, "log-file", "", "Path to the file where logs will be written.")
+	cmd.PersistentFlags().StringVar(&logFormat, "log-format", "text", "The output format for the logs, can be [text|json].")
 	cmd.PersistentFlags().StringVar(&globals.OutputFormat, "format", "text", "The output format, can be [text|json].")
 	cmd.PersistentFlags().StringVar(&globals.YAMLConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 	cmd.PersistentFlags().StringSliceVar(&globals.AdditionalUrls, "additional-urls", []string{}, "Additional URLs for the board manager.")
@@ -102,6 +105,7 @@ func toLogLevel(s string) (t logrus.Level, found bool) {
 }
 
 func parseFormatString(arg string) (feedback.OutputFormat, bool) {
+	arg = strings.ToLower(arg)
 	f, found := map[string]feedback.OutputFormat{
 		"json": feedback.JSON,
 		"text": feedback.Text,
@@ -149,6 +153,11 @@ func preRun(cmd *cobra.Command, args []string) {
 	} else {
 		// use the format to configure the Feedback
 		feedback.SetFormat(f)
+	}
+
+	// set the Logger format
+	if strings.ToLower(logFormat) == "json" {
+		logrus.SetFormatter(&logrus.JSONFormatter{})
 	}
 
 	globals.InitConfigs()
