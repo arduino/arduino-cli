@@ -25,6 +25,7 @@ jobs:
 
       - name: Install Go deps
         run: |
+          echo ${{secrets.CODECOV_TOKEN}}
           go get github.com/golangci/govet
           go get golang.org/x/lint/golint
           go get github.com/golang/protobuf/protoc-gen-go
