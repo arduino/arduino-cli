@@ -105,7 +105,6 @@ func toLogLevel(s string) (t logrus.Level, found bool) {
 }
 
 func parseFormatString(arg string) (feedback.OutputFormat, bool) {
-	arg = strings.ToLower(arg)
 	f, found := map[string]feedback.OutputFormat{
 		"json": feedback.JSON,
 		"text": feedback.Text,
@@ -115,6 +114,10 @@ func parseFormatString(arg string) (feedback.OutputFormat, bool) {
 }
 
 func preRun(cmd *cobra.Command, args []string) {
+	// normalize the format strings
+	globals.OutputFormat = strings.ToLower(globals.OutputFormat)
+	logFormat = strings.ToLower(logFormat)
+
 	// should we log to file?
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
@@ -124,7 +127,11 @@ func preRun(cmd *cobra.Command, args []string) {
 		}
 
 		// we use a hook so we don't get color codes in the log file
-		logrus.AddHook(lfshook.NewHook(file, &logrus.TextFormatter{}))
+		if logFormat == "json" {
+			logrus.AddHook(lfshook.NewHook(file, &logrus.JSONFormatter{}))
+		} else {
+			logrus.AddHook(lfshook.NewHook(file, &logrus.TextFormatter{}))
+		}
 	}
 
 	// should we log to stdout?
@@ -146,19 +153,20 @@ func preRun(cmd *cobra.Command, args []string) {
 		logrus.SetLevel(lvl)
 	}
 
-	// check the right format was passed
-	if f, found := parseFormatString(globals.OutputFormat); !found {
-		feedback.Error("Invalid output format: " + globals.OutputFormat)
-		os.Exit(errorcodes.ErrBadCall)
-	} else {
-		// use the format to configure the Feedback
-		feedback.SetFormat(f)
-	}
-
 	// set the Logger format
-	if strings.ToLower(logFormat) == "json" {
+	if logFormat == "json" {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
 	}
+
+	// check the right output format was passed
+	format, found := parseFormatString(globals.OutputFormat)
+	if !found {
+		feedback.Error("Invalid output format: " + globals.OutputFormat)
+		os.Exit(errorcodes.ErrBadCall)
+	}
+
+	// use the output format to configure the Feedback
+	feedback.SetFormat(format)
 
 	globals.InitConfigs()
 
