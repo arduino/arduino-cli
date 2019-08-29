@@ -30,7 +30,7 @@ builds:
     goarch:
       - amd64
     ldflags:
-      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit=={{ .ShortCommit }}
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
   -
     # ARM
     id: arduino_cli_arm
@@ -45,7 +45,7 @@ builds:
     goarm:
       - 6
     ldflags:
-      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit=={{ .ShortCommit }}
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
       - "-extldflags '-static'"
   -
     # ARMv7
@@ -61,7 +61,7 @@ builds:
     goarm:
       - 7
     ldflags:
-      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit=={{ .ShortCommit }}
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
       - "-extldflags '-static'"
   -
     # ARM64
@@ -75,7 +75,7 @@ builds:
     goarch:
       - arm64
     ldflags:
-      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit=={{ .ShortCommit }}
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
       - "-extldflags '-static'"
   -
     # All the other platforms
@@ -90,7 +90,7 @@ builds:
       - amd64
       - 386
     ldflags:
-      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit=={{ .ShortCommit }}
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
       - "-extldflags '-static'"
 
 archives:
