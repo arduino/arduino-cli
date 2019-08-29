@@ -1,9 +1,11 @@
 name: nightly
 
-on:
-  schedule:
-    # run every day at 1AM
-    - cron:  '0 1 * * *'
+# on:
+#   schedule:
+#     # run every day at 1AM
+#     - cron:  '0 1 * * *'
+
+on: push
 
 jobs:
   publish-nightly:
@@ -23,6 +25,7 @@ jobs:
         run: goreleaser --snapshot
 
       - name: upload
+        if: github.actor == 'masci'
         uses: docker://plugins/s3
         env:
           PLUGIN_SOURCE: 'dist/*'
