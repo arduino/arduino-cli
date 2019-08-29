@@ -83,12 +83,7 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 		return nil, errors.New("invalid instance")
 	}
 
-	serialDiscovery, err := commands.NewBuiltinSerialDiscovery(pm)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to instance serial-discovery")
-	}
-
-	ports, err := serialDiscovery.List()
+	ports, err := commands.ListBoards(pm)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting port list from serial-discovery")
 	}

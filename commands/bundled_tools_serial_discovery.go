@@ -20,9 +20,6 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"os/exec"
-	"strings"
 	"sync"
 	"time"
 
@@ -36,6 +33,7 @@ import (
 )
 
 var (
+	mutex     = sync.Mutex{}
 	sdVersion = semver.ParseRelaxed("1.0.0")
 	flavors   = []*cores.Flavor{
 		{
@@ -101,16 +99,6 @@ var (
 	}
 )
 
-// SerialDiscovery is an instance of a discovery tool
-type SerialDiscovery struct {
-	sync.Mutex
-	ID      string
-	in      io.WriteCloser
-	out     io.ReadCloser
-	outJSON *json.Decoder
-	cmd     *exec.Cmd
-}
-
 // BoardPort is a generic port descriptor
 type BoardPort struct {
 	Address             string          `json:"address"`
@@ -126,100 +114,86 @@ type eventJSON struct {
 	Ports     []*BoardPort `json:"ports"`
 }
 
-// NewBuiltinSerialDiscovery returns a wrapper to control the serial-discovery program
-func NewBuiltinSerialDiscovery(pm *packagemanager.PackageManager) (*SerialDiscovery, error) {
+// ListBoards foo
+func ListBoards(pm *packagemanager.PackageManager) ([]*BoardPort, error) {
+	// ensure the connection to the discoverer is unique to avoid messing up
+	// the messages exchanged
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	// get the bundled tool
 	t, err := getBuiltinSerialDiscoveryTool(pm)
 	if err != nil {
 		return nil, err
 	}
 
+	// determine if it's installed
 	if !t.IsInstalled() {
 		return nil, fmt.Errorf("missing serial-discovery tool")
 	}
 
-	cmdArgs := []string{
-		t.InstallDir.Join("serial-discovery").String(),
-	}
-
-	cmd, err := executils.Command(cmdArgs)
+	// build the command to be executed
+	args := []string{t.InstallDir.Join("serial-discovery").String()}
+	cmd, err := executils.Command(args)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating discovery process")
 	}
 
-	return &SerialDiscovery{
-		ID:  strings.Join(cmdArgs, " "),
-		cmd: cmd,
-	}, nil
-}
-
-// Start starts the specified discovery
-func (d *SerialDiscovery) start() error {
-	if in, err := d.cmd.StdinPipe(); err == nil {
-		d.in = in
-	} else {
-		return fmt.Errorf("creating stdin pipe for discovery: %s", err)
+	// attach in/out pipes to the process
+	in, err := cmd.StdinPipe()
+	if err != nil {
+		return nil, fmt.Errorf("creating stdin pipe for discovery: %s", err)
 	}
 
-	if out, err := d.cmd.StdoutPipe(); err == nil {
-		d.out = out
-		d.outJSON = json.NewDecoder(d.out)
-	} else {
-		return fmt.Errorf("creating stdout pipe for discovery: %s", err)
+	out, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, fmt.Errorf("creating stdout pipe for discovery: %s", err)
+	}
+	outJSON := json.NewDecoder(out)
+
+	// start the process
+	if err := cmd.Start(); err != nil {
+		return nil, fmt.Errorf("starting discovery process: %s", err)
 	}
 
-	if err := d.cmd.Start(); err != nil {
-		return fmt.Errorf("starting discovery process: %s", err)
-	}
-
-	return nil
-}
-
-// List retrieve the port list from this discovery
-func (d *SerialDiscovery) List() ([]*BoardPort, error) {
-	// ensure the connection to the discoverer is unique to avoid messing up
-	// the messages exchanged
-	d.Lock()
-	defer d.Unlock()
-
-	if err := d.start(); err != nil {
-		return nil, fmt.Errorf("discovery hasn't started: %v", err)
-	}
-
-	if _, err := d.in.Write([]byte("LIST\n")); err != nil {
+	// send the LIST command
+	if _, err := in.Write([]byte("LIST\n")); err != nil {
 		return nil, fmt.Errorf("sending LIST command to discovery: %s", err)
 	}
-	var event eventJSON
-	done := make(chan bool)
-	timeout := false
-	go func() {
-		select {
-		case <-done:
-		case <-time.After(10 * time.Second):
-			timeout = true
-			d.close()
-		}
-	}()
-	if err := d.outJSON.Decode(&event); err != nil {
-		if timeout {
-			return nil, fmt.Errorf("decoding LIST command: timeout")
-		}
-		return nil, fmt.Errorf("decoding LIST command: %s", err)
-	}
-	done <- true
-	return event.Ports, d.close()
-}
 
-// Close stops the Discovery and free the resources
-func (d *SerialDiscovery) close() error {
-	_, _ = d.in.Write([]byte("QUIT\n"))
-	_ = d.in.Close()
-	_ = d.out.Close()
-	timer := time.AfterFunc(time.Second, func() {
-		_ = d.cmd.Process.Kill()
+	// read the response from the pipe
+	decodeResult := make(chan error)
+	var event eventJSON
+	go func() {
+		decodeResult <- outJSON.Decode(&event)
+	}()
+
+	var finalError error
+	var retVal []*BoardPort
+
+	// wait for the response
+	select {
+	case err := <-decodeResult:
+		if err == nil {
+			retVal = event.Ports
+		} else {
+			finalError = err
+		}
+	case <-time.After(10 * time.Second):
+		finalError = fmt.Errorf("decoding LIST command: timeout")
+	}
+
+	// tell the process to quit
+	in.Write([]byte("QUIT\n"))
+	in.Close()
+	out.Close()
+	// kill the process if it takes too long to quit
+	time.AfterFunc(time.Second, func() {
+		cmd.Process.Kill()
 	})
-	err := d.cmd.Wait()
-	_ = timer.Stop()
-	return err
+	cmd.Wait()
+
+	return retVal, finalError
 }
 
 func getBuiltinSerialDiscoveryTool(pm *packagemanager.PackageManager) (*cores.ToolRelease, error) {
