@@ -1,0 +1,31 @@
+name: nightly
+
+on:
+  schedule:
+    # run every day at 1AM
+    - cron:  '0 1 * * *'
+
+jobs:
+  runs-on: ubuntu-latest
+
+  container:
+    image: arduino/arduino-cli:builder-0.1
+    volumes:
+      # cache go dependencies across pipeline's steps
+      - $PWD/go:/go
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v1
+
+      - name: build
+        run: goreleaser --snapshot
+
+      - name: upload
+        uses: docker://plugins/s3
+        env:
+          PLUGIN_SOURCE: 'dist/*'
+          PLUGIN_TARGET: '/arduino-cli/nightly'
+          PLUGIN_BUCKET: 'arduino-downloads-prod-beagle'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
