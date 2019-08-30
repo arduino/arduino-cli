@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sync"
 
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands"
@@ -33,6 +34,7 @@ import (
 var (
 	// ErrNotFound is returned when the API returns 404
 	ErrNotFound = errors.New("board not found")
+	m           sync.Mutex
 )
 
 func apiByVidPid(url string) ([]*rpc.BoardListItem, error) {
@@ -78,6 +80,9 @@ func apiByVidPid(url string) ([]*rpc.BoardListItem, error) {
 
 // List FIXMEDOC
 func List(instanceID int32) ([]*rpc.DetectedPort, error) {
+	m.Lock()
+	defer m.Unlock()
+
 	pm := commands.GetPackageManager(instanceID)
 	if pm == nil {
 		return nil, errors.New("invalid instance")
