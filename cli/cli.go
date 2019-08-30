@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/arduino/arduino-cli/cli/board"
 	"github.com/arduino/arduino-cli/cli/compile"
@@ -51,8 +52,9 @@ var (
 		PersistentPreRun: preRun,
 	}
 
-	verbose bool
-	logFile string
+	verbose   bool
+	logFile   string
+	logFormat string
 )
 
 const (
@@ -80,6 +82,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
 	cmd.PersistentFlags().StringVar(&globals.LogLevel, "log-level", defaultLogLevel, "Messages with this level and above will be logged (default: warn).")
 	cmd.PersistentFlags().StringVar(&logFile, "log-file", "", "Path to the file where logs will be written.")
+	cmd.PersistentFlags().StringVar(&logFormat, "log-format", "text", "The output format for the logs, can be [text|json].")
 	cmd.PersistentFlags().StringVar(&globals.OutputFormat, "format", "text", "The output format, can be [text|json].")
 	cmd.PersistentFlags().StringVar(&globals.YAMLConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 	cmd.PersistentFlags().StringSliceVar(&globals.AdditionalUrls, "additional-urls", []string{}, "Additional URLs for the board manager.")
@@ -111,6 +114,10 @@ func parseFormatString(arg string) (feedback.OutputFormat, bool) {
 }
 
 func preRun(cmd *cobra.Command, args []string) {
+	// normalize the format strings
+	globals.OutputFormat = strings.ToLower(globals.OutputFormat)
+	logFormat = strings.ToLower(logFormat)
+
 	// should we log to file?
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
@@ -120,7 +127,11 @@ func preRun(cmd *cobra.Command, args []string) {
 		}
 
 		// we use a hook so we don't get color codes in the log file
-		logrus.AddHook(lfshook.NewHook(file, &logrus.TextFormatter{}))
+		if logFormat == "json" {
+			logrus.AddHook(lfshook.NewHook(file, &logrus.JSONFormatter{}))
+		} else {
+			logrus.AddHook(lfshook.NewHook(file, &logrus.TextFormatter{}))
+		}
 	}
 
 	// should we log to stdout?
@@ -142,14 +153,20 @@ func preRun(cmd *cobra.Command, args []string) {
 		logrus.SetLevel(lvl)
 	}
 
-	// check the right format was passed
-	if f, found := parseFormatString(globals.OutputFormat); !found {
+	// set the Logger format
+	if logFormat == "json" {
+		logrus.SetFormatter(&logrus.JSONFormatter{})
+	}
+
+	// check the right output format was passed
+	format, found := parseFormatString(globals.OutputFormat)
+	if !found {
 		feedback.Error("Invalid output format: " + globals.OutputFormat)
 		os.Exit(errorcodes.ErrBadCall)
-	} else {
-		// use the format to configure the Feedback
-		feedback.SetFormat(f)
 	}
+
+	// use the output format to configure the Feedback
+	feedback.SetFormat(format)
 
 	globals.InitConfigs()
 
