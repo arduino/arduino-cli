@@ -45,16 +45,18 @@ Alternatively you can download one of the pre-built binaries for the supported p
 
 These builds are generated once a day from `master` branch starting at 01:00 GMT
 
-In order to get the latest nightly build for your platform use the following links replacing `<DATE>` with the current
-date, using the format YYYYMMDD (i.e for 2019/Aug/06 use `20190806` )
+In order to get the latest nightly build for your platform use the following links: 
 
-- **Linux 64 bit**: `https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-<DATE>_Linux_64bit.tar.gz`
-- **Linux 32 bit**: `https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-<DATE>_Linux_32bit.tar.gz`
-- **Linux ARM 64 bit**: `https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-<DATE>_Linux_ARM64.tar.gz`
-- **Linux ARM 32 bit**: `https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-<DATE>_Linux_ARMv7.tar.gz`
-- **Windows 64 bit**: `https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-<DATE>_Windows_64bit.zip`
-- **Windows 32 bit**: `https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-<DATE>_Windows_32bit.zip`
-- **Mac OSX**: `https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-<DATE>_macOS_64bit.tar.gz`
+- **Linux 64 bit**: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_64bit.tar.gz
+- **Linux 32 bit**: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_32bit.tar.gz
+- **Linux ARM 64 bit**: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARM64.tar.gz
+- **Linux ARM 32 bit**: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARMv7.tar.gz
+- **Windows 64 bit**: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_64bit.zip
+- **Windows 32 bit**: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_32bit.zip
+- **Mac OSX**: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_macOS_64bit.tar.gz
+
+These links redirect to latest generated builds replacing `latest` with the latest available build
+date, using the format YYYYMMDD (i.e for 2019/Aug/06 `latest` is replaced with `20190806` )
 
 Checksums for the nightly builds are available at
 `https://downloads.arduino.cc/arduino-cli/nightly/nightly-<DATE>-checksums.txt`
