@@ -55,8 +55,8 @@ In order to get the latest nightly build for your platform use the following lin
 - [Windows 32 bit](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_32bit.zip)
 - [Mac OSX](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_macOS_64bit.tar.gz)
 
-These links redirect to latest generated builds replacing `latest` with the latest available build
-date, using the format YYYYMMDD (i.e for 2019/Aug/06 `latest` is replaced with `20190806` )
+These links return a `302: Found` response, redirecting to latest generated builds by replacing `latest` with the latest 
+available build date, using the format YYYYMMDD (i.e for 2019/Aug/06 `latest` is replaced with `20190806` )
 
 Checksums for the nightly builds are available at
 `https://downloads.arduino.cc/arduino-cli/nightly/nightly-<DATE>-checksums.txt`
