@@ -9,10 +9,12 @@ release:
   prerelease: auto
 
 changelog:
-  sort: asc
   filters:
     exclude:
-    - '^[skip changelog]'
+      - '^\[skip changelog\].*'
+      - '^\[changelog skip\].*'
+      - '^\[skip ci\].*'
+      - '^\[ci skip\].*'
 
 # We have multiple builds in order to fine tune
 # cross compilations.
