@@ -154,11 +154,13 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 		}
 
 		for _, folder := range folders {
-			otherSources, err := findAllFilesInFolder(filepath.Join(sourcePath, folder.Name()), recurse)
-			if err != nil {
-				return nil, i18n.WrapError(err)
+			if !utils.IsSCCSOrHiddenFile(folder) {
+				otherSources, err := findAllFilesInFolder(filepath.Join(sourcePath, folder.Name()), recurse)
+				if err != nil {
+					return nil, i18n.WrapError(err)
+				}
+				sources = append(sources, otherSources...)
 			}
-			sources = append(sources, otherSources...)
 		}
 	}
 
