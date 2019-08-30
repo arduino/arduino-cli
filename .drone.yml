@@ -35,6 +35,3 @@ trigger:
     - refs/tags/builder-*
     - refs/tags/drone-*
     - refs/tags/nightly
-
-depends_on:
-  - test
