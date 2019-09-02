@@ -1,11 +1,9 @@
 name: nightly
 
-# on:
-#   schedule:
-#     # run every day at 1AM
-#     - cron:  '0 1 * * *'
-
-on: push
+on:
+  schedule:
+    # run every day at 1AM
+    - cron:  '0 1 * * *'
 
 jobs:
   publish-nightly:
