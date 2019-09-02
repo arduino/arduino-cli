@@ -63,7 +63,13 @@ jobs:
           task test-integration
 
       - name: Send unit tests coverage to Codecov
-        if: matrix.operating-system != 'windows-2019'
+        # Since secrets aren't available on forks, we only
+        # upload coverage on `push`. This might change if
+        # Codecov whitelists GitHub, lifting the need
+        # for a token.
+        if: >
+          matrix.operating-system != 'windows-2019' &&
+          github.event_name == 'push'
         uses: codecov/codecov-action@v1.0.2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
