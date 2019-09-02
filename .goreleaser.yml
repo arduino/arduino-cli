@@ -3,7 +3,7 @@ checksum:
   name_template: '{{ .Tag }}-{{ time "20060102" }}-checksums.txt'
 
 snapshot:
-  name_template: '{{ .Tag }}-{{ time "20060102" }}'
+  name_template: '{{ .Env.PACKAGE_NAME_PREFIX }}-{{ time "20060102" }}'
 
 release:
   prerelease: auto
