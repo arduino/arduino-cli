@@ -155,6 +155,7 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 
 		for _, folder := range folders {
 			if !utils.IsSCCSOrHiddenFile(folder) {
+				// Skip SCCS directories as they do not influence the build and can be very large
 				otherSources, err := findAllFilesInFolder(filepath.Join(sourcePath, folder.Name()), recurse)
 				if err != nil {
 					return nil, i18n.WrapError(err)
