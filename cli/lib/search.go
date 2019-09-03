@@ -63,14 +63,8 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	// get a sorted slice of results
-	results := searchResp.GetLibraries()
-	sort.Slice(results, func(i, j int) bool {
-		return results[i].Name < results[j].Name
-	})
-
 	feedback.PrintResult(result{
-		results:   results,
+		results:   searchResp,
 		namesOnly: searchFlags.namesOnly,
 	})
 
@@ -80,7 +74,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 // ouput from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type result struct {
-	results   []*rpc.SearchedLibrary
+	results   *rpc.LibrarySearchResp
 	namesOnly bool
 }
 
@@ -95,7 +89,8 @@ func (res result) Data() interface{} {
 		}
 
 		names := []LibName{}
-		for _, lsr := range res.results {
+		results := res.results.GetLibraries()
+		for _, lsr := range results {
 			names = append(names, LibName{lsr.Name})
 		}
 
@@ -108,13 +103,19 @@ func (res result) Data() interface{} {
 }
 
 func (res result) String() string {
-	if len(res.results) == 0 {
+	results := res.results.GetLibraries()
+	if len(results) == 0 {
 		return "No libraries matching your search."
 	}
 
+	// get a sorted slice of results
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Name < results[j].Name
+	})
+
 	var out strings.Builder
 
-	for _, lsr := range res.results {
+	for _, lsr := range results {
 		out.WriteString(fmt.Sprintf("Name: \"%s\"\n", lsr.Name))
 		if res.namesOnly {
 			continue
