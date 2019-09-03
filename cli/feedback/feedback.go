@@ -88,7 +88,7 @@ func (fb *Feedback) Printf(format string, v ...interface{}) {
 // Print behaves like fmt.Print but writes on the out writer and adds a newline.
 func (fb *Feedback) Print(v interface{}) {
 	if fb.format == JSON {
-		fb.PrintJSON(v)
+		fb.printJSON(v)
 	} else {
 		fmt.Fprintln(fb.out, v)
 	}
@@ -107,9 +107,9 @@ func (fb *Feedback) Error(v ...interface{}) {
 	logrus.Error(fmt.Sprint(v...))
 }
 
-// PrintJSON is a convenient wrapper to provide feedback by printing the
+// printJSON is a convenient wrapper to provide feedback by printing the
 // desired output in a pretty JSON format. It adds a newline to the output.
-func (fb *Feedback) PrintJSON(v interface{}) {
+func (fb *Feedback) printJSON(v interface{}) {
 	if d, err := json.MarshalIndent(v, "", "  "); err != nil {
 		fb.Errorf("Error during JSON encoding of the output: %v", err)
 	} else {
@@ -122,7 +122,7 @@ func (fb *Feedback) PrintJSON(v interface{}) {
 // structure.
 func (fb *Feedback) PrintResult(res Result) {
 	if fb.format == JSON {
-		fb.PrintJSON(res.Data())
+		fb.printJSON(res.Data())
 	} else {
 		fb.Print(fmt.Sprintf("%s", res))
 	}

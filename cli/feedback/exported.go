@@ -68,12 +68,6 @@ func Error(v ...interface{}) {
 	fb.Error(v...)
 }
 
-// PrintJSON is a convenient wrapper to provide feedback by printing the
-// desired output in a pretty JSON format. It adds a newline to the output.
-func PrintJSON(v interface{}) {
-	fb.PrintJSON(v)
-}
-
 // PrintResult is a convenient wrapper to provide feedback for complex data,
 // where the contents can't be just serialized to JSON but requires more
 // structure.
