@@ -1,7 +1,7 @@
 comment: off
 
-ignore:
-  - legacy/**/*
+# ignore:
+#   - legacy/**/*
 
 coverage:
   status:
