@@ -22,7 +22,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -66,27 +65,31 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	}
 
 	libs := res.GetInstalledLibrary()
-	if libs != nil {
-		if globals.OutputFormat == "json" {
-			feedback.PrintJSON(libs)
-		} else {
-			outputListLibrary(libs)
-		}
-	}
+	feedback.PrintResult(installedResult{libs})
 
 	logrus.Info("Done")
 }
 
-func outputListLibrary(il []*rpc.InstalledLibrary) {
-	if il == nil || len(il) == 0 {
-		return
+// ouput from this command requires special formatting, let's create a dedicated
+// feedback.Result implementation
+type installedResult struct {
+	installedLibs []*rpc.InstalledLibrary
+}
+
+func (ir installedResult) Data() interface{} {
+	return ir.installedLibs
+}
+
+func (ir installedResult) String() string {
+	if ir.installedLibs == nil || len(ir.installedLibs) == 0 {
+		return ""
 	}
 
 	t := table.New()
 	t.SetHeader("Name", "Installed", "Available", "Location")
 
 	lastName := ""
-	for _, libMeta := range il {
+	for _, libMeta := range ir.installedLibs {
 		lib := libMeta.GetLibrary()
 		name := lib.Name
 		if name == lastName {
@@ -110,5 +113,5 @@ func outputListLibrary(il []*rpc.InstalledLibrary) {
 		}
 	}
 
-	feedback.Print(t.Render())
+	return t.Render()
 }
