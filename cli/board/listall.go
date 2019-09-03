@@ -24,7 +24,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -58,22 +57,28 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if globals.OutputFormat == "json" {
-		feedback.PrintJSON(list)
-	} else {
-		outputBoardListAll(list)
-	}
+	feedback.PrintResult(resultAll{list})
 }
 
-func outputBoardListAll(list *rpc.BoardListAllResp) {
-	sort.Slice(list.Boards, func(i, j int) bool {
-		return list.Boards[i].GetName() < list.Boards[j].GetName()
+// ouput from this command requires special formatting, let's create a dedicated
+// feedback.Result implementation
+type resultAll struct {
+	list *rpc.BoardListAllResp
+}
+
+func (dr resultAll) Data() interface{} {
+	return dr.list
+}
+
+func (dr resultAll) String() string {
+	sort.Slice(dr.list.Boards, func(i, j int) bool {
+		return dr.list.Boards[i].GetName() < dr.list.Boards[j].GetName()
 	})
 
 	t := table.New()
 	t.SetHeader("Board Name", "FQBN")
-	for _, item := range list.GetBoards() {
+	for _, item := range dr.list.GetBoards() {
 		t.AddRow(item.GetName(), item.GetFQBN())
 	}
-	feedback.Print(t.Render())
+	return t.Render()
 }
