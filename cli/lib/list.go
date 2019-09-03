@@ -82,7 +82,7 @@ func (ir installedResult) Data() interface{} {
 
 func (ir installedResult) String() string {
 	if ir.installedLibs == nil || len(ir.installedLibs) == 0 {
-		return ""
+		return "No libraries installed."
 	}
 
 	t := table.New()
