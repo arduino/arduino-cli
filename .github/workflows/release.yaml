@@ -1,0 +1,28 @@
+name: release
+
+on:
+  push:
+    tags:
+      - '[0-9].[0-9].[0-9]*'
+
+jobs:
+  publish-release:
+    runs-on: ubuntu-latest
+
+    container:
+      image: arduino/arduino-cli:builder-0.1
+      volumes:
+        # cache go dependencies across pipeline's steps
+        - $PWD/go:/go
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v1
+
+      - name: build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'
+        run: goreleaser
