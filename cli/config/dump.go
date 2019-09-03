@@ -58,6 +58,21 @@ var dumpCmd = &cobra.Command{
 	Run:     runDumpCommand,
 }
 
+// ouput from this command requires special formatting, let's create a dedicated
+// feedback.Result implementation
+type dumpResult struct {
+	structured *jsonConfig
+	plain      string
+}
+
+func (dr dumpResult) Data() interface{} {
+	return dr.structured
+}
+
+func (dr dumpResult) String() string {
+	return dr.plain
+}
+
 func runDumpCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config dump`")
 
@@ -69,23 +84,23 @@ func runDumpCommand(cmd *cobra.Command, args []string) {
 
 	c := globals.Config
 
-	if globals.OutputFormat == "json" {
-		sketchbookDir := ""
-		if c.SketchbookDir != nil {
-			sketchbookDir = c.SketchbookDir.String()
-		}
+	sketchbookDir := ""
+	if c.SketchbookDir != nil {
+		sketchbookDir = c.SketchbookDir.String()
+	}
 
-		arduinoDataDir := ""
-		if c.DataDir != nil {
-			arduinoDataDir = c.DataDir.String()
-		}
+	arduinoDataDir := ""
+	if c.DataDir != nil {
+		arduinoDataDir = c.DataDir.String()
+	}
 
-		arduinoDownloadsDir := ""
-		if c.ArduinoDownloadsDir != nil {
-			arduinoDownloadsDir = c.ArduinoDownloadsDir.String()
-		}
+	arduinoDownloadsDir := ""
+	if c.ArduinoDownloadsDir != nil {
+		arduinoDownloadsDir = c.ArduinoDownloadsDir.String()
+	}
 
-		feedback.PrintJSON(jsonConfig{
+	feedback.PrintResult(&dumpResult{
+		structured: &jsonConfig{
 			ProxyType: c.ProxyType,
 			ProxyManualConfig: &jsonProxyConfig{
 				Hostname: c.ProxyHostname,
@@ -98,8 +113,7 @@ func runDumpCommand(cmd *cobra.Command, args []string) {
 			BoardsManager: &jsonBoardsManagerConfig{
 				AdditionalURLS: c.BoardManagerAdditionalUrls,
 			},
-		})
-	} else {
-		feedback.Print(string(data))
-	}
+		},
+		plain: string(data),
+	})
 }
