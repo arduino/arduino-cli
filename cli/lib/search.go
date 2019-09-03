@@ -26,7 +26,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -64,63 +63,75 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if globals.OutputFormat == "json" {
-		if searchFlags.namesOnly {
-			type LibName struct {
-				Name string `json:"name,required"`
-			}
+	// get a sorted slice of results
+	results := searchResp.GetLibraries()
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Name < results[j].Name
+	})
 
-			type NamesOnly struct {
-				Libraries []LibName `json:"libraries,required"`
-			}
-
-			names := []LibName{}
-			results := searchResp.GetLibraries()
-			for _, lsr := range results {
-				names = append(names, LibName{lsr.Name})
-			}
-			feedback.PrintJSON(NamesOnly{
-				names,
-			})
-		} else {
-			feedback.PrintJSON(searchResp)
-		}
-	} else {
-		// get a sorted slice of results
-		results := searchResp.GetLibraries()
-		sort.Slice(results, func(i, j int) bool {
-			return results[i].Name < results[j].Name
-		})
-
-		// print all the things
-		outputSearchedLibrary(results, searchFlags.namesOnly)
-	}
+	feedback.PrintResult(result{
+		results:   results,
+		namesOnly: searchFlags.namesOnly,
+	})
 
 	logrus.Info("Done")
 }
 
-func outputSearchedLibrary(results []*rpc.SearchedLibrary, namesOnly bool) {
-	if len(results) == 0 {
-		feedback.Print("No libraries matching your search.")
-		return
+// ouput from this command requires special formatting, let's create a dedicated
+// feedback.Result implementation
+type result struct {
+	results   []*rpc.SearchedLibrary
+	namesOnly bool
+}
+
+func (res result) Data() interface{} {
+	if res.namesOnly {
+		type LibName struct {
+			Name string `json:"name,required"`
+		}
+
+		type NamesOnly struct {
+			Libraries []LibName `json:"libraries,required"`
+		}
+
+		names := []LibName{}
+		for _, lsr := range res.results {
+			names = append(names, LibName{lsr.Name})
+		}
+
+		return NamesOnly{
+			names,
+		}
 	}
 
-	for _, lsr := range results {
-		feedback.Printf(`Name: "%s"`, lsr.Name)
-		if namesOnly {
+	return res.results
+}
+
+func (res result) String() string {
+	if len(res.results) == 0 {
+		return "No libraries matching your search."
+	}
+
+	var out strings.Builder
+
+	for _, lsr := range res.results {
+		out.WriteString(fmt.Sprintf("Name: \"%s\"\n", lsr.Name))
+		if res.namesOnly {
 			continue
 		}
 
-		feedback.Printf("  Author: %s", lsr.GetLatest().Author)
-		feedback.Printf("  Maintainer: %s", lsr.GetLatest().Maintainer)
-		feedback.Printf("  Sentence: %s", lsr.GetLatest().Sentence)
-		feedback.Printf("  Paragraph: %s", lsr.GetLatest().Paragraph)
-		feedback.Printf("  Website: %s", lsr.GetLatest().Website)
-		feedback.Printf("  Category: %s", lsr.GetLatest().Category)
-		feedback.Printf("  Architecture: %s", strings.Join(lsr.GetLatest().Architectures, ", "))
-		feedback.Printf("  Types: %s", strings.Join(lsr.GetLatest().Types, ", "))
-		feedback.Printf("  Versions: %s", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lsr)), " ", ", ", -1))
+		out.WriteString(fmt.Sprintf("  Author: %s\n", lsr.GetLatest().Author))
+		out.WriteString(fmt.Sprintf("  Maintainer: %s\n", lsr.GetLatest().Maintainer))
+		out.WriteString(fmt.Sprintf("  Sentence: %s\n", lsr.GetLatest().Sentence))
+		out.WriteString(fmt.Sprintf("  Paragraph: %s\n", lsr.GetLatest().Paragraph))
+		out.WriteString(fmt.Sprintf("  Website: %s\n", lsr.GetLatest().Website))
+		out.WriteString(fmt.Sprintf("  Category: %s\n", lsr.GetLatest().Category))
+		out.WriteString(fmt.Sprintf("  Architecture: %s\n", strings.Join(lsr.GetLatest().Architectures, ", ")))
+		out.WriteString(fmt.Sprintf("  Types: %s\n", strings.Join(lsr.GetLatest().Types, ", ")))
+		out.WriteString(fmt.Sprintf("  Versions: %s\n", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lsr)), " ", ", ", -1)))
 	}
+
+	return fmt.Sprintf("%s", out.String())
 }
 
 func versionsFromSearchedLibrary(library *rpc.SearchedLibrary) []*semver.Version {
