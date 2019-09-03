@@ -52,8 +52,8 @@ func Printf(format string, v ...interface{}) {
 }
 
 // Print behaves like fmt.Print but writes on the out writer and adds a newline.
-func Print(v ...interface{}) {
-	fb.Print(v...)
+func Print(v interface{}) {
+	fb.Print(v)
 }
 
 // Errorf behaves like fmt.Printf but writes on the error writer and adds a
@@ -74,7 +74,9 @@ func PrintJSON(v interface{}) {
 	fb.PrintJSON(v)
 }
 
-// PrintResult is a convenient wrapper...
+// PrintResult is a convenient wrapper to provide feedback for complex data,
+// where the contents can't be just serialized to JSON but requires more
+// structure.
 func PrintResult(res Result) {
 	fb.PrintResult(res)
 }
