@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/table"
@@ -59,26 +58,32 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if globals.OutputFormat == "json" {
-		feedback.PrintJSON(platforms)
-	} else {
-		outputInstalledCores(platforms)
-	}
+	feedback.PrintResult(installedResult{platforms})
 }
 
-func outputInstalledCores(platforms []*cores.PlatformRelease) {
-	if platforms == nil || len(platforms) == 0 {
-		return
+// ouput from this command requires special formatting, let's create a dedicated
+// feedback.Result implementation
+type installedResult struct {
+	platforms []*cores.PlatformRelease
+}
+
+func (ir installedResult) Data() interface{} {
+	return ir.platforms
+}
+
+func (ir installedResult) String() string {
+	if ir.platforms == nil || len(ir.platforms) == 0 {
+		return ""
 	}
 
 	t := table.New()
 	t.SetHeader("ID", "Installed", "Latest", "Name")
-	sort.Slice(platforms, func(i, j int) bool {
-		return platforms[i].Platform.String() < platforms[j].Platform.String()
+	sort.Slice(ir.platforms, func(i, j int) bool {
+		return ir.platforms[i].Platform.String() < ir.platforms[j].Platform.String()
 	})
-	for _, p := range platforms {
+	for _, p := range ir.platforms {
 		t.AddRow(p.Platform.String(), p.Version.String(), p.Platform.GetLatestRelease().Version.String(), p.Platform.Name)
 	}
 
-	feedback.Print(t.Render())
+	return t.Render()
 }
