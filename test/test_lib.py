@@ -23,11 +23,11 @@ def test_list(run_command):
     result = run_command("lib list")
     assert result.ok
     assert "" == result.stderr
-    assert "" == result.stdout
+    assert "No libraries installed." == result.stdout.strip()
     result = run_command("lib list --format json")
     assert result.ok
     assert "" == result.stderr
-    assert "" == result.stdout
+    assert "null" == result.stdout
 
     # Install something we can list at a version older than latest
     result = run_command("lib install ArduinoJson@6.11.0")
@@ -83,7 +83,7 @@ def test_search(run_command):
 
     result = run_command("lib search --names")
     assert result.ok
-    out_lines = result.stdout.splitlines()
+    out_lines = result.stdout.strip().splitlines()
     # Create an array with just the name of the vars
     libs = []
     for line in out_lines:
