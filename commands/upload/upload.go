@@ -248,6 +248,9 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	if err := cmd.Wait(); err != nil {
 		return nil, fmt.Errorf("uploading error: %s", err)
 	}
+
+	logrus.Infof("Upload %s on %s successful", sketch.Name, fqbnIn)
+
 	return &rpc.UploadResp{}, nil
 }
 

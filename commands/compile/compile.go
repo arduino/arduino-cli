@@ -215,5 +215,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		return nil, fmt.Errorf("copying elf file: %s", err)
 	}
 
+	logrus.Infof("Compile %s for %s successful", sketch.Name, fqbnIn)
+
 	return &rpc.CompileResp{}, nil
 }

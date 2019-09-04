@@ -42,17 +42,31 @@ def test_compile_with_simple_sketch(run_command, data_dir):
     result = run_command("core install arduino:avr")
     assert result.ok
 
-    sketch_path = os.path.join(data_dir, "CompileIntegrationTest")
+    sketch_name = "CompileIntegrationTest"
+    sketch_path = os.path.join(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    result = run_command("sketch new CompileIntegrationTest")
+    result = run_command("sketch new {}".format(sketch_name))
     assert result.ok
     assert "Sketch created in: {}".format(sketch_path) in result.stdout
 
     # Build sketch for arduino:avr:uno
-    result = run_command("compile -b arduino:avr:uno {}".format(sketch_path))
+    log_file_name = "compile.log"
+    log_file_path = os.path.join(data_dir, log_file_name)
+    result = run_command(
+        "compile -b {fqbn} {sketch_path} --log-format json --log-file {log_file} --log-level trace".format(
+            fqbn=fqbn, sketch_path=sketch_path, log_file=log_file_path))
     assert result.ok
-    assert "Sketch uses" in result.stdout
+
+    # let's test from the logs if the hex file produced by successful compile is moved to our sketch folder
+    log_json = open(log_file_path, 'r')
+    json_log_lines = log_json.readlines()
+    assert is_message_in_json_log_lines("Executing `arduino compile`", json_log_lines)
+    assert is_message_in_json_log_lines(
+        "Compile {sketch} for {fqbn} successful".format(sketch=sketch_name,
+                                                        fqbn=fqbn),
+        json_log_lines)
 
 
 @pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
@@ -110,20 +124,33 @@ def test_compile_and_compile_combo(run_command, data_dir):
 
     # Build sketch for each detected board
     for board in detected_boards:
-        log_file = "compile.log"
+        log_file_name = "{fqbn}-compile.log".format(fqbn=board.get('fqbn'))
+        log_file_path = os.path.join(data_dir, log_file_name)
         result = run_command(
             "compile -b {fqbn} --upload -p {address} {sketch_path} --log-format json --log-file {log_file} --log-level trace".format(
                 fqbn=board.get('fqbn'),
                 address=board.get('address'),
                 sketch_path=sketch_path,
-                log_file=log_file
+                log_file=log_file_path
             )
         )
-        log_json = open(log_file,'r')
-        log_json_lines = log_json.readlines()
-        assert is_value_in_any_json_log_message("copying sketch build output",log_json_lines)
-        assert is_value_in_any_json_log_message("Executing `arduino upload`",log_json_lines)
         assert result.ok
+        # check from the logs if the bin file were uploaded on the current board
+        log_json = open(log_file_path, 'r')
+        json_log_lines = log_json.readlines()
+        assert is_message_in_json_log_lines("Executing `arduino compile`", json_log_lines)
+        assert is_message_in_json_log_lines(
+            "Compile {sketch} for {fqbn} successful".format(sketch=sketch_name,
+                                                            fqbn=board.get(
+                                                                'fqbn')),
+            json_log_lines)
+        assert is_message_in_json_log_lines("Executing `arduino upload`", json_log_lines)
+        assert is_message_in_json_log_lines(
+            "Upload {sketch} on {fqbn} successful".format(sketch=sketch_name,
+                                                          fqbn=board.get(
+                                                              'fqbn')),
+            json_log_lines)
 
-def is_value_in_any_json_log_message(value,log_json_lines ):
-    return bool([index for index, line in enumerate(log_json_lines) if json.loads(line).get("msg") == value])
+
+def is_message_in_json_log_lines(message, log_json_lines):
+    return len([index for index, entry in enumerate(log_json_lines) if json.loads(entry).get("msg") == message]) == 1
