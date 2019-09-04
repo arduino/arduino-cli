@@ -57,7 +57,6 @@ def test_compile_with_simple_sketch(run_command, data_dir):
 
 @pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
 def test_compile_and_compile_combo(run_command, data_dir):
-
     # Init the environment explicitly
     result = run_command("core update-index")
     assert result.ok
@@ -68,7 +67,8 @@ def test_compile_and_compile_combo(run_command, data_dir):
     assert result.ok
 
     # Create a test sketch
-    sketch_path = os.path.join(data_dir, "CompileAndUploadIntegrationTest")
+    sketch_name = "CompileAndUploadIntegrationTest"
+    sketch_path = os.path.join(data_dir, sketch_name)
     result = run_command("sketch new CompileAndUploadIntegrationTest")
     assert result.ok
     assert "Sketch created in: {}".format(sketch_path) in result.stdout
@@ -96,7 +96,7 @@ def test_compile_and_compile_combo(run_command, data_dir):
     #     }
     #   ]
 
-    detected_boards = []    
+    detected_boards = []
 
     ports = json.loads(result.stdout)
     assert isinstance(ports, list)
@@ -109,12 +109,21 @@ def test_compile_and_compile_combo(run_command, data_dir):
     assert len(detected_boards) >= 1, "There are no boards available for testing"
 
     # Build sketch for each detected board
-    for board in detected_boards:  
+    for board in detected_boards:
+        log_file = "compile.log"
         result = run_command(
-            "compile -b {fqbn} --upload -p {address} {sketch_path}".format(
+            "compile -b {fqbn} --upload -p {address} {sketch_path} --log-format json --log-file {log_file} --log-level trace".format(
                 fqbn=board.get('fqbn'),
                 address=board.get('address'),
-                sketch_path=sketch_path)
+                sketch_path=sketch_path,
+                log_file=log_file
+            )
         )
+        log_json = open(log_file,'r')
+        log_json_lines = log_json.readlines()
+        assert is_value_in_any_json_log_message("copying sketch build output",log_json_lines)
+        assert is_value_in_any_json_log_message("Executing `arduino upload`",log_json_lines)
         assert result.ok
-        assert "Verify successful" in result.stdout
+
+def is_value_in_any_json_log_message(value,log_json_lines ):
+    return bool([index for index, line in enumerate(log_json_lines) if json.loads(line).get("msg") == value])
