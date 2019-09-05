@@ -47,7 +47,7 @@ def test_compile_with_simple_sketch(run_command, data_dir):
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    result = run_command("sketch new {}".format(sketch_name))
+    result = run_command("sketch new {}".format(sketch_path))
     assert result.ok
     assert "Sketch created in: {}".format(sketch_path) in result.stdout
 
@@ -83,7 +83,7 @@ def test_compile_and_compile_combo(run_command, data_dir):
     # Create a test sketch
     sketch_name = "CompileAndUploadIntegrationTest"
     sketch_path = os.path.join(data_dir, sketch_name)
-    result = run_command("sketch new CompileAndUploadIntegrationTest")
+    result = run_command("sketch new {}".format(sketch_path))
     assert result.ok
     assert "Sketch created in: {}".format(sketch_path) in result.stdout
 
