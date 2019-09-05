@@ -22,7 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/go-paths-helper"
 	"github.com/spf13/cobra"
 )
 
@@ -47,13 +47,14 @@ void loop() {
 `)
 
 func runNewCommand(cmd *cobra.Command, args []string) {
-	sketchDir := globals.Config.SketchbookDir.Join(args[0])
+	sketchDir := paths.New(args[0])
+	sketchDir.ToAbs()
 	if err := sketchDir.MkdirAll(); err != nil {
 		feedback.Errorf("Could not create sketch directory: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-
-	sketchFile := sketchDir.Join(args[0] + ".ino")
+	sketchName := sketchDir.Base()
+	sketchFile := sketchDir.Join(sketchName + ".ino")
 	if err := sketchFile.WriteFile(emptySketch); err != nil {
 		feedback.Errorf("Error creating sketch: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
