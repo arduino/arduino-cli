@@ -296,12 +296,6 @@ func TestUploadIntegration(t *testing.T) {
 	require.NotZero(t, exitCode)
 }
 
-func TestSketchCommandsIntegration(t *testing.T) {
-	exitCode, d := executeWithArgs("sketch", "new", "Test")
-	require.Zero(t, exitCode)
-	require.Contains(t, string(d), "Sketch created")
-}
-
 func TestCompileCommandsIntegration(t *testing.T) {
 	// Set staging dir to a temporary dir
 	tmp := tmpDirOrDie()
