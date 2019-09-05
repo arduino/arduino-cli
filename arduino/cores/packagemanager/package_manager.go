@@ -404,6 +404,7 @@ func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*core
 
 	// replace the default tools above with the specific required by the current platform
 	requiredTools := []*cores.ToolRelease{}
+	platform.Dependencies.Sort()
 	for _, toolDep := range platform.Dependencies {
 		pm.Log.WithField("tool", toolDep).Infof("Required tool")
 		tool := pm.FindToolDependency(toolDep)
