@@ -403,16 +403,17 @@ func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*core
 	}
 
 	// replace the default tools above with the specific required by the current platform
+	requiredTools := []*cores.ToolRelease{}
 	for _, toolDep := range platform.Dependencies {
 		pm.Log.WithField("tool", toolDep).Infof("Required tool")
 		tool := pm.FindToolDependency(toolDep)
 		if tool == nil {
 			return nil, fmt.Errorf("tool release not found: %s", toolDep)
 		}
-		foundTools[tool.Tool.Name] = tool
+		requiredTools = append(requiredTools, tool)
+		delete(foundTools, tool.Tool.Name)
 	}
 
-	requiredTools := []*cores.ToolRelease{}
 	for _, toolRel := range foundTools {
 		requiredTools = append(requiredTools, toolRel)
 	}
