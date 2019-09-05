@@ -3935,12 +3935,16 @@
             {
               "packager": "arduino",
               "name": "bossac",
-              "version": "1.7.0"
+              "version": "1.8.0-48-gb176eee"
             },
             {
+	      "_warning":
+
+                   "*** bossac@1.7.0 is listed after bossac@1.8.0-48-gb176eee to test if the runtime propoerty `runtime.tools.bossac.path` is correctly set to the path of bossac@1.8.0-48-gb176eee ***",
+
               "packager": "arduino",
               "name": "bossac",
-              "version": "1.8.0-48-gb176eee"
+              "version": "1.7.0"
             },
             {
               "packager": "arduino",

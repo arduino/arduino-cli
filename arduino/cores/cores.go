@@ -19,11 +19,11 @@ package cores
 
 import (
 	"encoding/json"
+	"sort"
 	"strings"
 
-	paths "github.com/arduino/go-paths-helper"
-
 	"github.com/arduino/arduino-cli/arduino/resources"
+	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -78,6 +78,20 @@ func (bm *BoardManifest) HasUsbID(vid, pid string) bool {
 
 // ToolDependencies is a set of tool dependency
 type ToolDependencies []*ToolDependency
+
+// Sort sorts the ToolDependencies by name and (if multiple instance of the same
+// tool is required) by version.
+func (deps ToolDependencies) Sort() {
+	sort.Slice(deps, func(i, j int) bool {
+		if deps[i].ToolPackager != deps[j].ToolPackager {
+			return deps[i].ToolPackager < deps[j].ToolPackager
+		}
+		if deps[i].ToolName != deps[j].ToolName {
+			return deps[i].ToolName < deps[j].ToolName
+		}
+		return deps[i].ToolVersion.LessThan(deps[j].ToolVersion)
+	})
+}
 
 // ToolDependency is a tuple that uniquely identifies a specific version of a Tool
 type ToolDependency struct {

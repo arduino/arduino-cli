@@ -162,4 +162,11 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	require.NotNil(t, bossac18)
 	require.Contains(t, featherTools, bossac17)
 	require.Contains(t, featherTools, bossac18)
+
+	// Check if the runtime variable is set correctly to the latest version
+	uploadProperties := properties.NewMap()
+	for _, requiredTool := range featherTools {
+		uploadProperties.Merge(requiredTool.RuntimeProperties())
+	}
+	require.Equal(t, bossac18.InstallDir.String(), uploadProperties.Get("runtime.tools.bossac.path"))
 }
