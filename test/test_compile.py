@@ -39,10 +39,10 @@ def test_sketch_new(run_command):
     assert os.path.isfile(os.path.join(current_sketch_path, sketch_name + ".ino"))
 
     # Create a test sketch in current directory subpath but using an absolute path
-    sketch_name = "SketchNewIntegrationTestAbsolute"
+    sketch_name = "SketchNewIntegrationTestSubpath"
     sketch_subpath = os.path.join("subpath", sketch_name)
     current_sketch_path = os.path.join(current_path, sketch_subpath)
-    result = run_command("sketch new {}".format(current_sketch_path))
+    result = run_command("sketch new {}".format(sketch_subpath))
     assert result.ok
     assert "Sketch created in: {}".format(current_sketch_path) in result.stdout
     assert os.path.isfile(os.path.join(current_sketch_path, sketch_name + ".ino"))
