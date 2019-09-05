@@ -420,7 +420,8 @@ func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*core
 	return requiredTools, nil
 }
 
-// FindToolDependency FIXMEDOC
+// FindToolDependency returns the ToolRelease referenced by the ToolDependency or nil if
+// the referenced tool doesn't exists.
 func (pm *PackageManager) FindToolDependency(dep *cores.ToolDependency) *cores.ToolRelease {
 	toolRelease, err := pm.Package(dep.ToolPackager).Tool(dep.ToolName).Release(dep.ToolVersion).Get()
 	if err != nil {
