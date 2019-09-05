@@ -40,7 +40,7 @@ import (
 
 // Upload FIXMEDOC
 func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStream io.Writer) (*rpc.UploadResp, error) {
-	logrus.Info("Executing `arduino upload`")
+	logrus.Tracef("Upload %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
@@ -249,7 +249,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		return nil, fmt.Errorf("uploading error: %s", err)
 	}
 
-	logrus.Infof("Upload %s on %s successful", sketch.Name, fqbnIn)
+	logrus.Tracef("Upload %s on %s successful", sketch.Name, fqbnIn)
 
 	return &rpc.UploadResp{}, nil
 }

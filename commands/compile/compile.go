@@ -47,7 +47,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		return nil, errors.New("invalid instance")
 	}
 
-	logrus.Info("Executing `arduino compile`")
+	logrus.Tracef("Compile %s for %s started", req.GetSketchPath(), req.GetFqbn())
 	if req.GetSketchPath() == "" {
 		return nil, fmt.Errorf("missing sketchPath")
 	}
@@ -202,7 +202,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	// Copy .hex file to sketch directory
 	srcHex := paths.New(outputPath)
 	dstHex := exportPath.Join(exportFile + ext)
-	logrus.WithField("from", srcHex).WithField("to", dstHex).Print("copying sketch build output")
+	logrus.WithField("from", srcHex).WithField("to", dstHex).Debug("copying sketch build output")
 	if err = srcHex.CopyTo(dstHex); err != nil {
 		return nil, fmt.Errorf("copying output file: %s", err)
 	}
@@ -210,12 +210,12 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	// Copy .elf file to sketch directory
 	srcElf := paths.New(outputPath[:len(outputPath)-3] + "elf")
 	dstElf := exportPath.Join(exportFile + ".elf")
-	logrus.WithField("from", srcElf).WithField("to", dstElf).Print("copying sketch build output")
+	logrus.WithField("from", srcElf).WithField("to", dstElf).Debug("copying sketch build output")
 	if err = srcElf.CopyTo(dstElf); err != nil {
 		return nil, fmt.Errorf("copying elf file: %s", err)
 	}
 
-	logrus.Infof("Compile %s for %s successful", sketch.Name, fqbnIn)
+	logrus.Tracef("Compile %s for %s successful", sketch.Name, fqbnIn)
 
 	return &rpc.CompileResp{}, nil
 }
