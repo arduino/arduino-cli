@@ -20,7 +20,7 @@ import pytest
 from .common import running_on_ci
 
 
-def test_sketch_new_(run_command):
+def test_sketch_new(run_command):
     # Create a test sketch in current directory
     current_path = os.getcwd()
     sketch_name = "SketchNewIntegrationTest"
@@ -38,7 +38,14 @@ def test_sketch_new_(run_command):
     assert "Sketch created in: {}".format(current_sketch_path) in result.stdout
     assert os.path.isfile(os.path.join(current_sketch_path, sketch_name + ".ino"))
 
-
+    # Create a test sketch in current directory subpath but using an absolute path
+    sketch_name = "SketchNewIntegrationTestAbsolute"
+    sketch_subpath = os.path.join("subpath", sketch_name)
+    current_sketch_path = os.path.join(current_path, sketch_subpath)
+    result = run_command("sketch new {}".format(current_sketch_path))
+    assert result.ok
+    assert "Sketch created in: {}".format(current_sketch_path) in result.stdout
+    assert os.path.isfile(os.path.join(current_sketch_path, sketch_name + ".ino"))
 
 
 def test_compile_without_fqbn(run_command):
