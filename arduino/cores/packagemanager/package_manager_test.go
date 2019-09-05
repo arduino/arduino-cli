@@ -21,14 +21,13 @@ import (
 	"net/url"
 	"testing"
 
-	"go.bug.st/relaxed-semver"
-
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
+	semver "go.bug.st/relaxed-semver"
 )
 
 var customHardware = paths.New("testdata", "custom_hardware")
@@ -102,6 +101,7 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	}
 	loadIndex("https://dl.espressif.com/dl/package_esp32_index.json")
 	loadIndex("http://arduino.esp8266.com/stable/package_esp8266com_index.json")
+	loadIndex("https://adafruit.github.io/arduino-board-index/package_adafruit_index.json")
 	require.NoError(t, pm.LoadHardware(conf))
 	esp32, err := pm.FindBoardWithFQBN("esp32:esp32:esp32")
 	require.NoError(t, err)
@@ -138,4 +138,28 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	testConflictingToolsInDifferentPackages()
 	testConflictingToolsInDifferentPackages()
 	testConflictingToolsInDifferentPackages()
+
+	feather, err := pm.FindBoardWithFQBN("adafruit:samd:adafruit_feather_m0_express")
+	require.NoError(t, err)
+	require.NotNil(t, feather)
+	featherTools, err := pm.FindToolsRequiredForBoard(feather)
+	require.NoError(t, err)
+	require.NotNil(t, featherTools)
+
+	// Test when a package index requires two different version of the same tool
+	// See: https://github.com/arduino/arduino-cli/issues/166#issuecomment-528295989
+	bossac17 := pm.FindToolDependency(&cores.ToolDependency{
+		ToolPackager: "arduino",
+		ToolName:     "bossac",
+		ToolVersion:  semver.ParseRelaxed("1.7.0"),
+	})
+	require.NotNil(t, bossac17)
+	bossac18 := pm.FindToolDependency(&cores.ToolDependency{
+		ToolPackager: "arduino",
+		ToolName:     "bossac",
+		ToolVersion:  semver.ParseRelaxed("1.8.0-48-gb176eee"),
+	})
+	require.NotNil(t, bossac18)
+	require.Contains(t, featherTools, bossac17)
+	require.Contains(t, featherTools, bossac18)
 }

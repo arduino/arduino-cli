@@ -116,6 +116,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 
 	if requiredTools, err := pm.FindToolsRequiredForBoard(board); err == nil {
 		for _, requiredTool := range requiredTools {
+			logrus.WithField("tool", requiredTool).Info("Tool required for upload")
 			uploadProperties.Merge(requiredTool.RuntimeProperties())
 		}
 	}
