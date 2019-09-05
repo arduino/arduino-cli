@@ -20,6 +20,7 @@ package board
 import (
 	"os"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -85,7 +86,7 @@ func outputListResp(ports []*rpc.DetectedPort) {
 	})
 
 	t := table.New()
-	t.SetHeader("Port", "Type", "Board Name", "FQBN")
+	t.SetHeader("Port", "Type", "Board Name", "FQBN", "Core")
 	for _, port := range ports {
 		address := port.GetProtocol() + "://" + port.GetAddress()
 		if port.GetProtocol() == "serial" {
@@ -100,7 +101,8 @@ func outputListResp(ports []*rpc.DetectedPort) {
 			for _, b := range boards {
 				board := b.GetName()
 				fqbn := b.GetFQBN()
-				t.AddRow(address, protocol, board, fqbn)
+				core := fqbn[:strings.LastIndex(fqbn, ":")]
+				t.AddRow(address, protocol, board, fqbn, core)
 				// show address and protocol only on the first row
 				address = ""
 				protocol = ""
@@ -108,7 +110,8 @@ func outputListResp(ports []*rpc.DetectedPort) {
 		} else {
 			board := "Unknown"
 			fqbn := ""
-			t.AddRow(address, protocol, board, fqbn)
+			core := ""
+			t.AddRow(address, protocol, board, fqbn, core)
 		}
 	}
 	feedback.Print(t.Render())
