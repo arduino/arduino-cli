@@ -18,11 +18,12 @@
 package board
 
 import (
+	"fmt"
 	"os"
 	"sort"
-	"strings"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
@@ -100,18 +101,26 @@ func outputListResp(ports []*rpc.DetectedPort) {
 			})
 			for _, b := range boards {
 				board := b.GetName()
-				fqbn := b.GetFQBN()
-				core := fqbn[:strings.LastIndex(fqbn, ":")]
-				t.AddRow(address, protocol, board, fqbn, core)
-				// show address and protocol only on the first row
+
+				// to improve the user experience, show on a dedicated column
+				// the name of the core supporting the board detected
+				var coreName = ""
+				fqbn, err := cores.ParseFQBN(b.GetFQBN())
+				if err == nil {
+					coreName = fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch)
+				}
+
+				t.AddRow(address, protocol, board, fqbn, coreName)
+
+				// reset address and protocol, we only show them on the first row
 				address = ""
 				protocol = ""
 			}
 		} else {
 			board := "Unknown"
 			fqbn := ""
-			core := ""
-			t.AddRow(address, protocol, board, fqbn, core)
+			coreName := ""
+			t.AddRow(address, protocol, board, fqbn, coreName)
 		}
 	}
 	feedback.Print(t.Render())
