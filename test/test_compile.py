@@ -14,38 +14,9 @@
 # a commercial license, send an email to license@arduino.cc.
 import json
 import os
-
 import pytest
 
 from .common import running_on_ci
-
-
-def test_sketch_new(run_command):
-    # Create a test sketch in current directory
-    current_path = os.getcwd()
-    sketch_name = "SketchNewIntegrationTest"
-    current_sketch_path = os.path.join(current_path, sketch_name)
-    result = run_command("sketch new {}".format(sketch_name))
-    assert result.ok
-    assert "Sketch created in: {}".format(current_sketch_path) in result.stdout
-    assert os.path.isfile(os.path.join(current_sketch_path, sketch_name + ".ino"))
-
-    # Create a test sketch in current directory but using an absolute path
-    sketch_name = "SketchNewIntegrationTestAbsolute"
-    current_sketch_path = os.path.join(current_path, sketch_name)
-    result = run_command("sketch new {}".format(current_sketch_path))
-    assert result.ok
-    assert "Sketch created in: {}".format(current_sketch_path) in result.stdout
-    assert os.path.isfile(os.path.join(current_sketch_path, sketch_name + ".ino"))
-
-    # Create a test sketch in current directory subpath but using an absolute path
-    sketch_name = "SketchNewIntegrationTestSubpath"
-    sketch_subpath = os.path.join("subpath", sketch_name)
-    current_sketch_path = os.path.join(current_path, sketch_subpath)
-    result = run_command("sketch new {}".format(sketch_subpath))
-    assert result.ok
-    assert "Sketch created in: {}".format(current_sketch_path) in result.stdout
-    assert os.path.isfile(os.path.join(current_sketch_path, sketch_name + ".ino"))
 
 
 def test_compile_without_fqbn(run_command):
