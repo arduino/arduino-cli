@@ -15,9 +15,9 @@
 import os
 
 
-def test_sketch_new(run_command):
+def test_sketch_new(run_command, working_dir):
     # Create a test sketch in current directory
-    current_path = os.getcwd()
+    current_path = working_dir
     sketch_name = "SketchNewIntegrationTest"
     current_sketch_path = os.path.join(current_path, sketch_name)
     result = run_command("sketch new {}".format(sketch_name))
@@ -38,6 +38,14 @@ def test_sketch_new(run_command):
     sketch_subpath = os.path.join("subpath", sketch_name)
     current_sketch_path = os.path.join(current_path, sketch_subpath)
     result = run_command("sketch new {}".format(sketch_subpath))
+    assert result.ok
+    assert "Sketch created in: {}".format(current_sketch_path) in result.stdout
+    assert os.path.isfile(os.path.join(current_sketch_path, sketch_name + ".ino"))
+
+    # Create a test sketch in current directory using .ino extension
+    sketch_name = "SketchNewIntegrationTestDotIno"
+    current_sketch_path = os.path.join(current_path, sketch_name)
+    result = run_command("sketch new {}".format(sketch_name + ".ino"))
     assert result.ok
     assert "Sketch created in: {}".format(current_sketch_path) in result.stdout
     assert os.path.isfile(os.path.join(current_sketch_path, sketch_name + ".ino"))
