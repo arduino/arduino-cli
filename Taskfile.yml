@@ -27,7 +27,7 @@ tasks:
     desc: Run integration tests only
     cmds:
       - go test -run Integration {{ default "-v" .GOFLAGS }} -coverprofile=coverage_integ.txt {{ default .DEFAULT_TARGETS .TARGETS }} {{.TEST_LDFLAGS}}
-      - pytest test
+      - pytest --basetemp=.pytest-tmp-dir test
 
   test-legacy:
     desc: Run tests for the `legacy` package
