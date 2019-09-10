@@ -15,7 +15,7 @@
 import os
 
 import pytest
-from invoke import run
+from invoke.context import Context
 
 
 @pytest.fixture(scope="function")
@@ -38,7 +38,17 @@ def downloads_dir(tmpdir_factory):
 
 
 @pytest.fixture(scope="function")
-def run_command(data_dir, downloads_dir):
+def working_dir(tmpdir_factory):
+    """
+    A tmp folder to work in
+    will be created before running each test and deleted
+    at the end, this way all the tests work in isolation.
+    """
+    return str(tmpdir_factory.mktemp("ArduinoTestWork"))
+
+
+@pytest.fixture(scope="function")
+def run_command(data_dir, downloads_dir, working_dir):
     """
     Provide a wrapper around invoke's `run` API so that every test
     will work in the same temporary folder.
@@ -55,6 +65,8 @@ def run_command(data_dir, downloads_dir):
 
     def _run(cmd_string):
         cli_full_line = "{} {}".format(cli_path, cmd_string)
-        return run(cli_full_line, echo=False, hide=True, warn=True, env=env)
+        run_context = Context()
+        with run_context.cd(working_dir):
+            return run_context.run(cli_full_line, echo=False, hide=True, warn=True, env=env)
 
     return _run
