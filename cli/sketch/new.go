@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -48,7 +49,9 @@ void loop() {
 `)
 
 func runNewCommand(cmd *cobra.Command, args []string) {
-	sketchDir, err := filepath.Abs(args[0])
+	// Trim to avoid issues if user creates a sketch adding the .ino extesion to the name
+	trimmedSketchName := strings.TrimSuffix(args[0], ".ino")
+	sketchDir, err := filepath.Abs(trimmedSketchName)
 	if err != nil {
 		feedback.Errorf("Error creating sketch: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
