@@ -13,8 +13,15 @@
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
 import os
+import platform
+
+import pytest
+
+from test.common import running_on_ci
 
 
+@pytest.mark.skipif(running_on_ci() and platform.system() == "Windows",
+                    reason="Test disabled on Github Actions Win VM until tmpdir inconsistent behavior bug is fixed")
 def test_sketch_new(run_command, working_dir):
     # Create a test sketch in current directory
     current_path = working_dir

@@ -57,21 +57,7 @@ jobs:
           python-version: '3.x'
           architecture: 'x64'
 
-      - name: Run integration tests on windows-2019
-        # Since GH windows VM do not handle well tmpdirs,
-        # we create the pytest temp folder in current dir
-        if: matrix.operating-system == 'windows-2019'
-        env:
-          PYTEST_DEBUG_TEMPROOT: '.pytest-tmp-dir'
-        run: |
-          if not exist %PYTEST_DEBUG_TEMPROOT% mkdir %PYTEST_DEBUG_TEMPROOT%
-          pip install -r test/requirements.txt
-          task test-integration
-          rmdir %PYTEST_DEBUG_TEMPROOT% /Q /S
-        shell: cmd
-
       - name: Run integration tests
-        if: matrix.operating-system != 'windows-2019'
         run: |
           pip install -r test/requirements.txt
           task test-integration
