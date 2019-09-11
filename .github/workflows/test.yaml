@@ -58,6 +58,17 @@ jobs:
           architecture: 'x64'
 
       - name: Run integration tests
+        # Since windows VM do not handle well tmpdirs,
+        # we create the pytest temp folder in current dir
+        if: matrix.operating-system == 'windows-2019'
+        run: |
+          pip install -r test/requirements.txt
+          task test-integration
+        env:
+          PYTEST_DEBUG_TEMPROOT: '.pytest-tmp-dir'
+
+      - name: Run integration tests
+        if: matrix.operating-system != 'windows-2019'
         run: |
           pip install -r test/requirements.txt
           task test-integration
