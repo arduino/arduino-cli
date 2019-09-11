@@ -18,11 +18,13 @@
 package sketch
 
 import (
+	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/spf13/cobra"
 )
 
@@ -47,17 +49,23 @@ void loop() {
 `)
 
 func runNewCommand(cmd *cobra.Command, args []string) {
-	sketchDir := globals.Config.SketchbookDir.Join(args[0])
-	if err := sketchDir.MkdirAll(); err != nil {
+	// Trim to avoid issues if user creates a sketch adding the .ino extesion to the name
+	trimmedSketchName := strings.TrimSuffix(args[0], ".ino")
+	sketchDir, err := filepath.Abs(trimmedSketchName)
+	if err != nil {
+		feedback.Errorf("Error creating sketch: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	if err := os.MkdirAll(sketchDir, os.FileMode(0755)); err != nil {
 		feedback.Errorf("Could not create sketch directory: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-
-	sketchFile := sketchDir.Join(args[0] + ".ino")
-	if err := sketchFile.WriteFile(emptySketch); err != nil {
+	sketchName := filepath.Base(sketchDir)
+	sketchFile := filepath.Join(sketchDir, sketchName+".ino")
+	if err := ioutil.WriteFile(sketchFile, emptySketch, os.FileMode(0644)); err != nil {
 		feedback.Errorf("Error creating sketch: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	feedback.Print("Sketch created in: " + sketchDir.String())
+	feedback.Print("Sketch created in: " + sketchDir)
 }

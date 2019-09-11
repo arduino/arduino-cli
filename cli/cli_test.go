@@ -296,12 +296,6 @@ func TestUploadIntegration(t *testing.T) {
 	require.NotZero(t, exitCode)
 }
 
-func TestSketchCommandsIntegration(t *testing.T) {
-	exitCode, d := executeWithArgs("sketch", "new", "Test")
-	require.Zero(t, exitCode)
-	require.Contains(t, string(d), "Sketch created")
-}
-
 func TestCompileCommandsIntegration(t *testing.T) {
 	// Set staging dir to a temporary dir
 	tmp := tmpDirOrDie()
@@ -319,11 +313,11 @@ func TestCompileCommandsIntegration(t *testing.T) {
 	require.Zero(t, exitCode)
 
 	// Create a test sketch
-	exitCode, d := executeWithArgs("sketch", "new", "Test1")
+	test1 := filepath.Join(currSketchbookDir, "Test1")
+	exitCode, d := executeWithArgs("sketch", "new", test1)
 	require.Zero(t, exitCode)
 
 	// Build sketch without FQBN
-	test1 := filepath.Join(currSketchbookDir, "Test1")
 	exitCode, d = executeWithArgs("compile", test1)
 	require.NotZero(t, exitCode)
 	require.Contains(t, string(d), "no FQBN provided")
