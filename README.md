@@ -90,13 +90,13 @@ IDE has without the graphical UI.
 
 ### Step 1. Create a new sketch
 
-The command will create a new empty sketch named MyFirstSketch in the default directory under \$HOME/Arduino/
+The command will create a new empty sketch named `MyFirstSketch` in the current directory
 
 ```console
 $ arduino-cli sketch new MyFirstSketch
-Sketch created in: /home/luca/Arduino/MyFirstSketch
+Sketch created in: /home/luca/MyFirstSketch
 
-$ cat /home/luca/Arduino/MyFirstSketch/MyFirstSketch.ino
+$ cat /home/luca/MyFirstSketch/MyFirstSketch.ino
 void setup() {
 }
 
@@ -106,7 +106,8 @@ void loop() {
 
 ### Step 2. Modify your sketch
 
-Use your favourite file editor or IDE to modify the .ino file under: `$HOME/Arduino/MyFirstSketch/MyFirstSketch.ino`
+Use your favourite file editor or IDE to modify the .ino file, in this example 
+under: `$HOME/MyFirstSketch/MyFirstSketch.ino`
 and change the file to look like this one:
 
 ```C
@@ -237,7 +238,7 @@ To compile the sketch we have to run the `compile` command with the proper FQBN 
 previous command.
 
 ```console
-$ arduino-cli compile --fqbn arduino:samd:mkr1000 Arduino/MyFirstSketch
+$ arduino-cli compile --fqbn arduino:samd:mkr1000 MyFirstSketch
 Sketch uses 9600 bytes (3%) of program storage space. Maximum is 262144 bytes.
 ```
 
@@ -247,7 +248,7 @@ We can finally upload the sketch and see our board blinking, we now have to spec
 used by our board other than the FQBN:
 
 ```console
-$ arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:samd:mkr1000 Arduino/MyFirstSketch
+$ arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:samd:mkr1000 MyFirstSketch
 No new serial port detected.
 Atmel SMART device 0x10010005 found
 Device       : ATSAMD21G18A
