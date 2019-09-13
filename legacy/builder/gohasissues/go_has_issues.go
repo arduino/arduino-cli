@@ -34,8 +34,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
-	"strings"
 )
 
 func Walk(root string, walkFn filepath.WalkFunc) error {
@@ -126,20 +124,4 @@ func resolveSymlink(parentFolder string, info os.FileInfo) (os.FileInfo, error) 
 
 func isSymlink(info os.FileInfo) bool {
 	return info.Mode()&os.ModeSymlink != 0
-}
-
-func Unquote(s string) (string, error) {
-	if stringStartsEndsWith(s, "'") {
-		s = s[1 : len(s)-1]
-	}
-
-	if !stringStartsEndsWith(s, "\"") {
-		return s, nil
-	}
-
-	return strconv.Unquote(s)
-}
-
-func stringStartsEndsWith(s string, c string) bool {
-	return strings.HasPrefix(s, c) && strings.HasSuffix(s, c)
 }
