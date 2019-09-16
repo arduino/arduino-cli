@@ -46,6 +46,7 @@ jobs:
             }
 
       - name: Mark active
+        if: github.event_name == 'issue_comment'
         uses: actions/github-script@0.2.0
         with:
           github-token: ${{github.token}}
