@@ -172,14 +172,14 @@ testVersion() {
 	set +e
 	CLI="$(which $PROJECT_NAME)"
 	if [ "$?" = "1" ]; then
-		fail "$PROJECT_NAME not found. Did you add "$LBINDIR" to your "'$PATH?'
-	fi
-	if [ $CLI != "$LBINDIR/$PROJECT_NAME" ]; then
+		echo "$PROJECT_NAME not found. You might want to add "$LBINDIR" to your "'$PATH'
+	elif [ $CLI != "$LBINDIR/$PROJECT_NAME" ]; then
 		fail "An existing $PROJECT_NAME was found at $CLI. Please prepend "$LBINDIR" to your "'$PATH'" or remove the existing one."
 	fi
+
 	set -e
-	CLI_VERSION=$($PROJECT_NAME version)
-	echo "$CLI_VERSION installed successfully"
+	CLI_VERSION=$($LBINDIR/$PROJECT_NAME version)
+	echo "$CLI_VERSION installed successfully in $LBINDIR"
 }
 
 
