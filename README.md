@@ -70,7 +70,7 @@ different platforms, you can use Docker to get a binary directly from sources. F
 folder run:
 
 ```console
-docker run -v $PWD:/arduino-cli -w /arduino-cli arduino/arduino-cli:builder-0.1 goreleaser --rm-dist --snapshot --skip-publish
+docker run -v $PWD:/arduino-cli -w /arduino-cli -e PACKAGE_NAME_PREFIX='snapshot' arduino/arduino-cli:builder-1 goreleaser --rm-dist --snapshot --skip-publish
 ```
 
 Once the build is over, you will find a `./dist/` folder containing the packages built out of
