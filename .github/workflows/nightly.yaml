@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: arduino/arduino-cli:builder-0.1
+      image: arduino/arduino-cli:builder-1
       volumes:
         # cache go dependencies across pipeline's steps
         - $PWD/go:/go
