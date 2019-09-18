@@ -58,7 +58,7 @@ In order to get the latest nightly build for your platform use the following lin
 These links return a `302: Found` response, redirecting to latest generated builds by replacing `latest` with the latest
 available build date, using the format YYYYMMDD (i.e for 2019/Aug/06 `latest` is replaced with `20190806` )
 
-Checksums for the nightly builds are available at
+Checksums for the nightly builds are available at 
 `https://downloads.arduino.cc/arduino-cli/nightly/nightly-<DATE>-checksums.txt`
 
 Once downloaded, place the executable `arduino-cli` into a directory which is in your `PATH`.
