@@ -29,7 +29,7 @@ jobs:
             let elapsedDays = 15
 
             let elapsed = elapsedDays * 24 * 60 * 60 * 1000;
-            let now = new Date();
+            let now = new Date().getTime();
             for (const issue of issues) {
               // If an issue was active in the past 15 days, leave it alone.
               if (now - new Date(issue.updated_at).getTime() < elapsedDays) {
@@ -91,7 +91,7 @@ jobs:
             let elapsedDays = 30;
 
             let elapsed = elapsedDays * 24 * 60 * 60 * 1000;
-            let now = new Date();
+            let now = new Date().getTime();
             for (const issue of issues) {
               // If an issue was stale for less than elapsed time, leave it alone.
               if (now - new Date(issue.updated_at).getTime() < elapsed) {
