@@ -18,10 +18,12 @@
 package board
 
 import (
+	"fmt"
 	"os"
 	"sort"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
