@@ -32,7 +32,7 @@ jobs:
             let now = new Date().getTime();
             for (const issue of issues) {
               // If an issue was active in the past 15 days, leave it alone.
-              if (now - new Date(issue.updated_at).getTime() < elapsedDays) {
+              if (now - new Date(issue.updated_at).getTime() < elapsed) {
                 continue;
               }
 
