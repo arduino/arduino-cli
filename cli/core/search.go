@@ -40,7 +40,7 @@ func initSearchCommand() *cobra.Command {
 		Short:   "Search for a core in the package index.",
 		Long:    "Search for a core in the package index using the specified keywords.",
 		Example: "  " + os.Args[0] + " core search MKRZero -v",
-		Args:    cobra.MinimumNArgs(1),
+		Args:    cobra.ArbitraryArgs,
 		Run:     runSearchCommand,
 	}
 	return searchCommand
