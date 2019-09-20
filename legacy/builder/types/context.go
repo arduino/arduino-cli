@@ -24,7 +24,6 @@ type ProgressStruct struct {
 type Context struct {
 	// Build options
 	HardwareDirs         paths.PathList
-	ToolsDirs            paths.PathList
 	BuiltInToolsDirs     paths.PathList
 	BuiltInLibrariesDirs paths.PathList
 	OtherLibrariesDirs   paths.PathList
@@ -122,7 +121,7 @@ type Context struct {
 func (ctx *Context) ExtractBuildOptions() *properties.Map {
 	opts := properties.NewMap()
 	opts.Set("hardwareFolders", strings.Join(ctx.HardwareDirs.AsStrings(), ","))
-	opts.Set("toolsFolders", strings.Join(ctx.ToolsDirs.AsStrings(), ","))
+	opts.Set("builtInToolsFolders", strings.Join(ctx.BuiltInToolsDirs.AsStrings(), ","))
 	opts.Set("builtInLibrariesFolders", strings.Join(ctx.BuiltInLibrariesDirs.AsStrings(), ","))
 	opts.Set("otherLibrariesFolders", strings.Join(ctx.OtherLibrariesDirs.AsStrings(), ","))
 	opts.SetPath("sketchLocation", ctx.SketchLocation)
@@ -146,7 +145,7 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 
 func (ctx *Context) InjectBuildOptions(opts *properties.Map) {
 	ctx.HardwareDirs = paths.NewPathList(strings.Split(opts.Get("hardwareFolders"), ",")...)
-	ctx.ToolsDirs = paths.NewPathList(strings.Split(opts.Get("toolsFolders"), ",")...)
+	ctx.BuiltInToolsDirs = paths.NewPathList(strings.Split(opts.Get("builtInToolsFolders"), ",")...)
 	ctx.BuiltInLibrariesDirs = paths.NewPathList(strings.Split(opts.Get("builtInLibrariesFolders"), ",")...)
 	ctx.OtherLibrariesDirs = paths.NewPathList(strings.Split(opts.Get("otherLibrariesFolders"), ",")...)
 	ctx.SketchLocation = opts.GetPath("sketchLocation")

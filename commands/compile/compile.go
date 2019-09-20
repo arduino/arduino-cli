@@ -95,7 +95,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	}
 
 	if toolsDir, err := config.BundleToolsDirectories(); err == nil {
-		builderCtx.ToolsDirs = toolsDir
+		builderCtx.BuiltInToolsDirs = toolsDir
 	} else {
 		return nil, fmt.Errorf("cannot get bundled tools directories: %s", err)
 	}
