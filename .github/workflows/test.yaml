@@ -21,7 +21,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v1
         with:
-          go-version: '1.12.x'
+          go-version: '1.13'
 
       - name: Install Go deps
         run: |
