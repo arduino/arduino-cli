@@ -126,6 +126,33 @@ func (idx *Index) FindLibraryUpdate(lib *libraries.Library) *Release {
 	return nil
 }
 
+// ResolveDependencies returns the dependencies of a library release.
+func (idx *Index) ResolveDependencies(lib *Release) []*Release {
+	// Box lib index *Release to be digested by dep-resolver
+	// (TODO: There is a better use of golang interfaces to avoid this?)
+	allReleases := map[string]semver.Releases{}
+	for _, indexLib := range idx.Libraries {
+		releases := semver.Releases{}
+		for _, indexLibRelease := range indexLib.Releases {
+			releases = append(releases, indexLibRelease)
+		}
+		allReleases[indexLib.Name] = releases
+	}
+
+	// Perform lib resolution
+	archive := &semver.Archive{
+		Releases: allReleases,
+	}
+	deps := archive.Resolve(lib)
+
+	// Unbox resolved deps back into *Release
+	res := []*Release{}
+	for _, dep := range deps {
+		res = append(res, dep.(*Release))
+	}
+	return res
+}
+
 // Versions returns an array of all versions available of the library
 func (library *Library) Versions() []*semver.Version {
 	res := []*semver.Version{}

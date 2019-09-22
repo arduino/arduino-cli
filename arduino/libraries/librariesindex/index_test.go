@@ -85,4 +85,29 @@ func TestIndexer(t *testing.T) {
 
 	rtcInexistent2 := index.FindLibraryUpdate(&libraries.Library{Name: "RTCZero-blah", Version: semver.MustParse("1.0.0")})
 	require.Nil(t, rtcInexistent2)
+
+	resolve1 := index.ResolveDependencies(alp.Releases["1.2.1"])
+	require.Len(t, resolve1, 2)
+	require.Contains(t, resolve1, alp.Releases["1.2.1"])
+	require.Contains(t, resolve1, rtc.Releases["1.6.0"])
+
+	oauth010 := index.FindRelease(&Reference{Name: "Arduino_OAuth", Version: semver.MustParse("0.1.0")})
+	require.NotNil(t, oauth010)
+	require.Equal(t, "Arduino_OAuth@0.1.0", oauth010.String())
+	eccx133 := index.FindRelease(&Reference{Name: "ArduinoECCX08", Version: semver.MustParse("1.3.3")})
+	require.NotNil(t, eccx133)
+	require.Equal(t, "ArduinoECCX08@1.3.3", eccx133.String())
+	bear130 := index.FindRelease(&Reference{Name: "ArduinoBearSSL", Version: semver.MustParse("1.3.0")})
+	require.NotNil(t, bear130)
+	require.Equal(t, "ArduinoBearSSL@1.3.0", bear130.String())
+	http040 := index.FindRelease(&Reference{Name: "ArduinoHttpClient", Version: semver.MustParse("0.4.0")})
+	require.NotNil(t, http040)
+	require.Equal(t, "ArduinoHttpClient@0.4.0", http040.String())
+
+	resolve2 := index.ResolveDependencies(oauth010)
+	require.Len(t, resolve2, 4)
+	require.Contains(t, resolve2, oauth010)
+	require.Contains(t, resolve2, eccx133)
+	require.Contains(t, resolve2, bear130)
+	require.Contains(t, resolve2, http040)
 }
