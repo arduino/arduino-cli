@@ -74,7 +74,7 @@ func SimpleLocalWalk(root string, walkFn func(path string, info os.FileInfo, err
 		files, err := ioutil.ReadDir(root)
 		if err == nil {
 			for _, file := range files {
-				err = SimpleLocalWalk(root + string(os.PathSeparator) + file.Name(), walkFn)
+				err = SimpleLocalWalk(root+string(os.PathSeparator)+file.Name(), walkFn)
 				if err == filepath.SkipDir {
 					return nil
 				}
