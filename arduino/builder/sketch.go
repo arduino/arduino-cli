@@ -58,6 +58,35 @@ func SketchSaveItemCpp(item *sketch.Item, destPath string) error {
 	return nil
 }
 
+// SimpleLocalWalk locally replaces filepath.Walk and/but goes through symlinks
+func SimpleLocalWalk(root string, walkFn func(path string, info os.FileInfo, err error) error) error {
+
+	info, err := os.Stat(root)
+
+	if err != nil {
+		return walkFn(root, nil, err)
+	}
+
+	err = walkFn(root, info, err)
+	if err == filepath.SkipDir {
+		return nil
+	}
+
+	if info.IsDir() {
+		files, err := ioutil.ReadDir(root)
+		if err == nil {
+			for _, file := range files {
+				err = SimpleLocalWalk(root+string(os.PathSeparator)+file.Name(), walkFn)
+				if err == filepath.SkipDir {
+					return nil
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 // SketchLoad collects all the files composing a sketch.
 // The parameter `sketchPath` holds a path pointing to a single sketch file or a sketch folder,
 // the path must be absolute.
@@ -86,7 +115,7 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 
 	// collect all the sketch files
 	var files []string
-	err = filepath.Walk(sketchFolder, func(path string, info os.FileInfo, err error) error {
+	err = SimpleLocalWalk(sketchFolder, func(path string, info os.FileInfo, err error) error {
 		// ignore hidden files and skip hidden directories
 		if strings.HasPrefix(info.Name(), ".") {
 			if info.IsDir() {
