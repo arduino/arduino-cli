@@ -118,8 +118,8 @@ func (indexLib *indexRelease) extractReleaseIn(library *Library) {
 	}
 }
 
-func (indexLib *indexRelease) extractDependencies() []*Dependency {
-	res := []*Dependency{}
+func (indexLib *indexRelease) extractDependencies() []semver.Dependency {
+	res := []semver.Dependency{}
 	if indexLib.Dependencies == nil || len(indexLib.Dependencies) == 0 {
 		return res
 	}
