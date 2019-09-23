@@ -1,12 +1,12 @@
 # This file is part of arduino-cli.
-#
+
 # Copyright 2019 ARDUINO SA (http://www.arduino.cc/)
-#
+
 # This software is released under the GNU General Public License version 3,
 # which covers the main part of arduino-cli.
 # The terms of this license can be found at:
 # https://www.gnu.org/licenses/gpl-3.0.en.html
-#
+
 # You can be released from the requirements of the above licenses by purchasing
 # a commercial license. Buying such a license is mandatory if you want to modify or
 # otherwise use the software for commercial activities involving the Arduino
@@ -48,7 +48,7 @@ def working_dir(tmpdir_factory):
 
 
 @pytest.fixture(scope="function")
-def run_command(data_dir, downloads_dir, working_dir):
+def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
     """
     Provide a wrapper around invoke's `run` API so that every test
     will work in the same temporary folder.
@@ -56,7 +56,7 @@ def run_command(data_dir, downloads_dir, working_dir):
     Useful reference:
         http://docs.pyinvoke.org/en/1.2/api/runners.html#invoke.runners.Result
     """
-    cli_path = os.path.join(pytest.config.rootdir, "..", "arduino-cli")
+    cli_path = os.path.join(pytestconfig.rootdir, "..", "arduino-cli")
     env = {
         "ARDUINO_DATA_DIR": data_dir,
         "ARDUINO_DOWNLOADS_DIR": downloads_dir,
