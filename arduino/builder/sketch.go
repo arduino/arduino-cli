@@ -60,7 +60,6 @@ func SketchSaveItemCpp(item *sketch.Item, destPath string) error {
 
 // SimpleLocalWalk locally replaces filepath.Walk and/but goes through symlinks
 func SimpleLocalWalk(root string, walkFn func(path string, info os.FileInfo, err error) error) error {
-
 	info, err := os.Stat(root)
 
 	if err != nil {
