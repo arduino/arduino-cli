@@ -43,6 +43,7 @@ require (
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45
 	golang.org/x/net v0.0.0-20190311183353-d8887717615a
 	golang.org/x/text v0.3.0
+	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/genproto v0.0.0-20190327125643-d831d65fe17d // indirect
 	google.golang.org/grpc v1.21.1
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
