@@ -103,11 +103,13 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 		sketchFolder = sketchPath
 		mainSketchFile = filepath.Join(sketchPath, stat.Name()+".ino")
 		// in the case a dir was passed, ensure the main file exists and is readable
-		f, err := os.Open(mainSketchFile)
+		info, err := os.Stat(mainSketchFile)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to find the main sketch file")
 		}
-		f.Close()
+		if info.IsDir() {
+			return nil, errors.Wrap(errors.New(mainSketchFile), "sketch must be a file")
+		}
 	} else {
 		sketchFolder = filepath.Dir(sketchPath)
 		mainSketchFile = sketchPath
