@@ -5,7 +5,7 @@ go 1.13
 require (
 	bou.ke/monkey v1.0.1
 	github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c
-	github.com/arduino/go-paths-helper v0.0.0-20190214132331-c3c98d1bf2e1
+	github.com/arduino/go-paths-helper v1.0.1
 	github.com/arduino/go-properties-orderedmap v0.0.0-20190828172252-05018b28ff6c
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
 	github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b
@@ -43,6 +43,7 @@ require (
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45
 	golang.org/x/net v0.0.0-20190311183353-d8887717615a
 	golang.org/x/text v0.3.0
+	google.golang.org/appengine v1.4.0 // indirect
 	google.golang.org/genproto v0.0.0-20190327125643-d831d65fe17d // indirect
 	google.golang.org/grpc v1.21.1
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
