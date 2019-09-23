@@ -44,7 +44,15 @@ def test_core_listall(run_command):
 def test_core_search(run_command):
     url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
     assert run_command("core update-index --additional-urls={}".format(url))
-    # default search
+    # list all
+    result = run_command("core search")
+    assert result.ok
+    assert 3 < len(result.stdout.splitlines())
+    result = run_command("core search --format json")
+    assert result.ok
+    data = json.loads(result.stdout)
+    assert 1 < len(data)
+    # search a specific core
     result = run_command("core search avr")
     assert result.ok
     assert 2 < len(result.stdout.splitlines())

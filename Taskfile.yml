@@ -63,12 +63,10 @@ vars:
     sh: echo `go list ./... | grep -v legacy | tr '\n' ' '`
 
   # build vars
-  VERSIONSTRING: "0.3.7-alpha.preview"
   COMMIT:
     sh: echo ${TRAVIS_COMMIT:-`git log -n 1 --format=%h`}
   LDFLAGS: >
-      -ldflags '-X github.com/arduino/arduino-cli/version.versionString={{.VERSIONSTRING}}
-      -X github.com/arduino/arduino-cli/version.commit={{.COMMIT}}'
+      -ldflags '-X github.com/arduino/arduino-cli/version.commit={{.COMMIT}}'
 
   # test vars
   GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
