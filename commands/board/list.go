@@ -115,14 +115,16 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 				port.IdentificationPrefs.Get("pid"))
 			items, err := apiByVidPid(url)
 			if err == ErrNotFound {
-				// the board couldn't be detected, keep going with the next port
+				// the board couldn't be detected, print a warning
 				logrus.Debug("Board not recognized")
-				continue
 			} else if err != nil {
 				// this is bad, bail out
 				return nil, errors.Wrap(err, "error getting board info from Arduino Cloud")
 			}
 
+			// add a DetectedPort entry in any case: the `Boards` field will
+			// be empty but the port will be shown anyways (useful for 3rd party
+			// boards)
 			b = items
 		}
 
