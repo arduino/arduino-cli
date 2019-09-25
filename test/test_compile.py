@@ -71,15 +71,7 @@ def test_compile_with_simple_sketch(run_command, data_dir):
 
 
 @pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
-def test_compile_and_compile_combo(run_command, data_dir):
-    # Init the environment explicitly
-    result = run_command("core update-index")
-    assert result.ok
-
-    # Install required core(s)
-    result = run_command("core install arduino:avr")
-    result = run_command("core install arduino:samd")
-    assert result.ok
+def test_compile_and_compile_combo(run_command, detected_boards, data_dir):
 
     # Create a test sketch
     sketch_name = "CompileAndUploadIntegrationTest"
@@ -88,49 +80,23 @@ def test_compile_and_compile_combo(run_command, data_dir):
     assert result.ok
     assert "Sketch created in: {}".format(sketch_path) in result.stdout
 
-    #
-    # Build a list of detected boards to test, if any.
-    #
-    result = run_command("board list --format json")
-    assert result.ok
-
-    #
-    # The `board list --format json` returns a JSON that looks like to the following:
-    #
-    # [
-    #     {
-    #       "address": "/dev/cu.usbmodem14201",
-    #       "protocol": "serial",
-    #       "protocol_label": "Serial Port (USB)",
-    #       "boards": [
-    #         {
-    #           "name": "Arduino NANO 33 IoT",
-    #           "FQBN": "arduino:samd:nano_33_iot"
-    #         }
-    #       ]
-    #     }
-    #   ]
-
-    detected_boards = []
-
-    ports = json.loads(result.stdout)
-    assert isinstance(ports, list)
-    for port in ports:
-        boards = port.get('boards')
-        assert isinstance(boards, list)
-        for board in boards:
-            detected_boards.append(dict(address=port.get('address'), fqbn=board.get('FQBN')))
-
-    assert len(detected_boards) >= 1, "There are no boards available for testing"
-
     # Build sketch for each detected board
     for board in detected_boards:
-        log_file_name = "{fqbn}-compile.log".format(fqbn=board.get('fqbn').replace(":", "-"))
+
+        # Init the environment explicitly
+        result = run_command("core update-index")
+        assert result.ok
+
+        # Install required core(s)
+        result = run_command("core install {}".format(board.core))
+        assert result.ok
+
+        log_file_name = "{fqbn}-compile.log".format(fqbn=board.fqbn.replace(":", "-"))
         log_file_path = os.path.join(data_dir, log_file_name)
         command_log_flags = "--log-format json --log-file {} --log-level trace".format(log_file_path)
         result = run_command("compile -b {fqbn} --upload -p {address} {sketch_path} {log_flags}".format(
-            fqbn=board.get('fqbn'),
-            address=board.get('address'),
+            fqbn=board.fqbn,
+            address=board.address,
             sketch_path=sketch_path,
             log_flags=command_log_flags
         ))
@@ -139,10 +105,10 @@ def test_compile_and_compile_combo(run_command, data_dir):
         log_json = open(log_file_path, 'r')
         json_log_lines = log_json.readlines()
         expected_trace_sequence = [
-            "Compile {sketch} for {fqbn} started".format(sketch=sketch_path, fqbn=board.get('fqbn')),
-            "Compile {sketch} for {fqbn} successful".format(sketch=sketch_name, fqbn=board.get('fqbn')),
-            "Upload {sketch} on {fqbn} started".format(sketch=sketch_path, fqbn=board.get('fqbn')),
-            "Upload {sketch} on {fqbn} successful".format(sketch=sketch_name, fqbn=board.get('fqbn'))
+            "Compile {sketch} for {fqbn} started".format(sketch=sketch_path, fqbn=board.fqbn),
+            "Compile {sketch} for {fqbn} successful".format(sketch=sketch_name, fqbn=board.fqbn),
+            "Upload {sketch} on {fqbn} started".format(sketch=sketch_path, fqbn=board.fqbn),
+            "Upload {sketch} on {fqbn} successful".format(sketch=sketch_name, fqbn=board.fqbn)
         ]
         assert is_message_sequence_in_json_log_traces(expected_trace_sequence, json_log_lines)
 
