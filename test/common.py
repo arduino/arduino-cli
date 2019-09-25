@@ -14,8 +14,6 @@
 # a commercial license, send an email to license@arduino.cc.
 import collections
 import os
-import pytest
-import invoke
 
 from invoke.context import Context
 
@@ -50,6 +48,6 @@ def build_runner(cli_path, env, working_dir):
         cli_full_line = "{} {}".format(cli_path, cmd_string)
         run_context = Context()
         with run_context.cd(working_dir):
-            return invoke.run(cli_full_line, echo=False, hide=True, warn=True, env=env)
+            return run_context.run(cli_full_line, echo=False, hide=True, warn=True, env=env)
 
     return _run

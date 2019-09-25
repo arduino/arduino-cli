@@ -77,7 +77,10 @@ def _run_session_command(pytestconfig, tmpdir_factory, downloads_dir):
         "ARDUINO_DOWNLOADS_DIR": downloads_dir,
         "ARDUINO_SKETCHBOOK_DIR": data_dir,
     }
-    working_dir = tmpdir_factory.mktemp("SessionTestWork")
+    # it looks like the pyinvoke library has a few problems in dealing with the path
+    # object, so to avoid this issue we can convert them to str.
+    # Take a look at https://github.com/pyinvoke/invoke/issues/454 for more details.
+    working_dir = str(tmpdir_factory.mktemp("SessionTestWork"))
 
     return build_runner(cli_path, env, working_dir)
 
