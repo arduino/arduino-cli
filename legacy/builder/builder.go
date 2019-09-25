@@ -43,7 +43,6 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
-	"github.com/arduino/go-paths-helper"
 )
 
 var MAIN_FILE_VALID_EXTENSIONS = map[string]bool{".ino": true, ".pde": true}
@@ -58,7 +57,7 @@ type Builder struct{}
 
 func (s *Builder) Run(ctx *types.Context) error {
 	if ctx.BuildPath == nil {
-		ctx.BuildPath = paths.New(bldr.GenBuildPath(ctx.SketchLocation.String()))
+		ctx.BuildPath = bldr.GenBuildPath(ctx.SketchLocation)
 	}
 
 	if err := bldr.EnsureBuildPathExists(ctx.BuildPath.String()); err != nil {
@@ -150,7 +149,7 @@ type Preprocess struct{}
 
 func (s *Preprocess) Run(ctx *types.Context) error {
 	if ctx.BuildPath == nil {
-		ctx.BuildPath = paths.New(bldr.GenBuildPath(ctx.SketchLocation.String()))
+		ctx.BuildPath = bldr.GenBuildPath(ctx.SketchLocation)
 	}
 
 	if err := bldr.EnsureBuildPathExists(ctx.BuildPath.String()); err != nil {
@@ -186,7 +185,7 @@ type ParseHardwareAndDumpBuildProperties struct{}
 
 func (s *ParseHardwareAndDumpBuildProperties) Run(ctx *types.Context) error {
 	if ctx.BuildPath == nil {
-		ctx.BuildPath = paths.New(bldr.GenBuildPath(ctx.SketchLocation.String()))
+		ctx.BuildPath = bldr.GenBuildPath(ctx.SketchLocation)
 	}
 
 	commands := []types.Command{
