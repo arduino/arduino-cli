@@ -42,7 +42,7 @@ import (
 func TestStoreBuildOptionsMap(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:          paths.NewPathList("hardware"),
-		ToolsDirs:             paths.NewPathList("tools"),
+		BuiltInToolsDirs:      paths.NewPathList("tools"),
 		BuiltInLibrariesDirs:  paths.NewPathList("built-in libraries"),
 		OtherLibrariesDirs:    paths.NewPathList("libraries"),
 		SketchLocation:        paths.New("sketchLocation"),
@@ -73,15 +73,15 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 	bytes, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).ReadFile()
 	NoError(t, err)
 
-	require.Equal(t, "{\n"+
-		"  \"additionalFiles\": \"\",\n"+
-		"  \"builtInLibrariesFolders\": \"built-in libraries\",\n"+
-		"  \"customBuildProperties\": \"custom=prop\",\n"+
-		"  \"fqbn\": \"my:nice:fqbn\",\n"+
-		"  \"hardwareFolders\": \"hardware\",\n"+
-		"  \"otherLibrariesFolders\": \"libraries\",\n"+
-		"  \"runtime.ide.version\": \"ideVersion\",\n"+
-		"  \"sketchLocation\": \"sketchLocation\",\n"+
-		"  \"toolsFolders\": \"tools\"\n"+
-		"}", string(bytes))
+	require.Equal(t, `{
+  "additionalFiles": "",
+  "builtInLibrariesFolders": "built-in libraries",
+  "builtInToolsFolders": "tools",
+  "customBuildProperties": "custom=prop",
+  "fqbn": "my:nice:fqbn",
+  "hardwareFolders": "hardware",
+  "otherLibrariesFolders": "libraries",
+  "runtime.ide.version": "ideVersion",
+  "sketchLocation": "sketchLocation"
+}`, string(bytes))
 }
