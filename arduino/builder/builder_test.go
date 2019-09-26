@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,7 +37,10 @@ func tmpDirOrDie() string {
 
 func TestGenBuildPath(t *testing.T) {
 	want := filepath.Join(os.TempDir(), "arduino-sketch-ACBD18DB4CC2F85CEDEF654FCCC4A4D8")
-	assert.Equal(t, want, builder.GenBuildPath("foo"))
+	assert.Equal(t, want, builder.GenBuildPath(paths.New("foo")).String())
+
+	want = filepath.Join(os.TempDir(), "arduino-sketch-D41D8CD98F00B204E9800998ECF8427E")
+	assert.Equal(t, want, builder.GenBuildPath(nil).String())
 }
 
 func TestEnsureBuildPathExists(t *testing.T) {

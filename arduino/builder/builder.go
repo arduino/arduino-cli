@@ -19,18 +19,22 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"os"
-	"path/filepath"
 	"strings"
 
+	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
 
-// GenBuildPath generates a suitable name for the build folder
-func GenBuildPath(sketchPath string) string {
-	md5SumBytes := md5.Sum([]byte(sketchPath))
+// GenBuildPath generates a suitable name for the build folder.
+// The sketchPath, if not nil, is also used to furhter differentiate build paths.
+func GenBuildPath(sketchPath *paths.Path) *paths.Path {
+	path := ""
+	if sketchPath != nil {
+		path = sketchPath.String()
+	}
+	md5SumBytes := md5.Sum([]byte(path))
 	md5Sum := strings.ToUpper(hex.EncodeToString(md5SumBytes[:]))
-
-	return filepath.Join(os.TempDir(), "arduino-sketch-"+md5Sum)
+	return paths.TempDir().Join("arduino-sketch-" + md5Sum)
 }
 
 // EnsureBuildPathExists creates the build path if doesn't already exists.
