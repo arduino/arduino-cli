@@ -63,19 +63,21 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		}
 	}
 
-	// get abs path to sketch
-	sketchLocation, err := ctx.SketchLocation.Abs()
-	if err != nil {
-		return i18n.WrapError(err)
-	}
+	if ctx.SketchLocation != nil {
+		// get abs path to sketch
+		sketchLocation, err := ctx.SketchLocation.Abs()
+		if err != nil {
+			return i18n.WrapError(err)
+		}
 
-	// load sketch
-	sketch, err := bldr.SketchLoad(sketchLocation.String(), ctx.BuildPath.String())
-	if err != nil {
-		return i18n.WrapError(err)
+		// load sketch
+		sketch, err := bldr.SketchLoad(sketchLocation.String(), ctx.BuildPath.String())
+		if err != nil {
+			return i18n.WrapError(err)
+		}
+		ctx.SketchLocation = paths.New(sketch.MainFile.Path)
+		ctx.Sketch = types.SketchToLegacy(sketch)
 	}
-	ctx.SketchLocation = paths.New(sketch.MainFile.Path)
-	ctx.Sketch = types.SketchToLegacy(sketch)
 
 	commands = []types.Command{
 		&SetupBuildProperties{},
