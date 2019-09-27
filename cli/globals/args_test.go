@@ -40,7 +40,6 @@ var goodLibs = []struct {
 }{
 	{"mylib", &globals.LibraryReferenceArg{"mylib", ""}},
 	{"mylib@1.0", &globals.LibraryReferenceArg{"mylib", "1.0"}},
-	{"mylib@", &globals.LibraryReferenceArg{"mylib", ""}},
 }
 
 var badCores = []struct {
@@ -50,6 +49,14 @@ var badCores = []struct {
 	{"arduino:avr:avr", nil},
 	{"arduino@1.6.20:avr", nil},
 	{"arduino:avr:avr@1.6.20", nil},
+}
+
+var badLibs = []struct {
+	in       string
+	expected *globals.LibraryReferenceArg
+}{
+	{"", nil},
+	{"mylib@", nil},
 }
 
 func TestArgsStringify(t *testing.T) {
@@ -70,19 +77,18 @@ func TestParseReferenceArgCores(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Equal(t, tt.expected, actual)
 	}
-
-	// library refs are not good as core's
-	for _, tt := range goodLibs {
-		_, err := globals.ParseReferenceArg(tt.in, true)
-		assert.NotNil(t, err)
-	}
 }
 
 func TestParseReferenceArgLibs(t *testing.T) {
 	for _, tt := range goodLibs {
 		actual, err := globals.ParseLibraryReferenceArg(tt.in)
-		assert.Nil(t, err)
-		assert.Equal(t, tt.expected, actual)
+		assert.Nil(t, err, "Testing good arg '%s'", tt.in)
+		assert.Equal(t, tt.expected, actual, "Testing good arg '%s'", tt.in)
+	}
+	for _, tt := range badLibs {
+		res, err := globals.ParseLibraryReferenceArg(tt.in)
+		require.Nil(t, res, "Testing bad arg '%s'", tt.in)
+		require.NotNil(t, err, "Testing bad arg '%s'", tt.in)
 	}
 }
 
