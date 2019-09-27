@@ -31,7 +31,6 @@ var goodCores = []struct {
 }{
 	{"arduino:avr", &globals.ReferenceArg{"arduino", "avr", ""}},
 	{"arduino:avr@1.6.20", &globals.ReferenceArg{"arduino", "avr", "1.6.20"}},
-	{"arduino:avr@", &globals.ReferenceArg{"arduino", "avr", ""}},
 }
 
 var goodLibs = []struct {
@@ -49,6 +48,11 @@ var badCores = []struct {
 	{"arduino:avr:avr", nil},
 	{"arduino@1.6.20:avr", nil},
 	{"arduino:avr:avr@1.6.20", nil},
+	{"arduino:@1.6.20", nil},
+	{":avr@1.5.0", nil},
+	{"@1.5.0", nil},
+	{"arduino:avr@", nil},
+	{"", nil},
 }
 
 var badLibs = []struct {
@@ -63,6 +67,9 @@ func TestArgsStringify(t *testing.T) {
 	for _, lib := range goodLibs {
 		require.Equal(t, lib.in, lib.expected.String())
 	}
+	for _, core := range goodCores {
+		require.Equal(t, core.in, core.expected.String())
+	}
 }
 
 func TestParseReferenceArgCores(t *testing.T) {
@@ -74,8 +81,8 @@ func TestParseReferenceArgCores(t *testing.T) {
 
 	for _, tt := range badCores {
 		actual, err := globals.ParseReferenceArg(tt.in, true)
-		assert.NotNil(t, err)
-		assert.Equal(t, tt.expected, actual)
+		require.NotNil(t, err, "Testing bad core '%s'", tt.in)
+		require.Equal(t, tt.expected, actual, "Testing bad core '%s'", tt.in)
 	}
 }
 

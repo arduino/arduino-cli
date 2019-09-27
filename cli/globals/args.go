@@ -54,10 +54,18 @@ func ParseReferenceArgs(args []string, parseArch bool) ([]*ReferenceArg, error) 
 // "packager:arch@version", useful to represent a platform (or core) name.
 func ParseReferenceArg(arg string, parseArch bool) (*ReferenceArg, error) {
 	ret := &ReferenceArg{}
-
+	if arg == "" {
+		return nil, fmt.Errorf("invalid empry core argument")
+	}
 	toks := strings.SplitN(arg, "@", 2)
+	if toks[0] == "" {
+		return nil, fmt.Errorf("invalid empty core reference '%s'", arg)
+	}
 	ret.PackageName = toks[0]
 	if len(toks) > 1 {
+		if toks[1] == "" {
+			return nil, fmt.Errorf("invalid empty core version: '%s'", arg)
+		}
 		ret.Version = toks[1]
 	}
 
@@ -66,7 +74,13 @@ func ParseReferenceArg(arg string, parseArch bool) (*ReferenceArg, error) {
 		if len(toks) != 2 {
 			return nil, fmt.Errorf("invalid item %s", arg)
 		}
+		if toks[0] == "" {
+			return nil, fmt.Errorf("invalid empty core name '%s'", arg)
+		}
 		ret.PackageName = toks[0]
+		if toks[1] == "" {
+			return nil, fmt.Errorf("invalid empty core architecture '%s'", arg)
+		}
 		ret.Architecture = toks[1]
 	}
 
@@ -100,7 +114,7 @@ func ParseLibraryReferenceArg(arg string) (*LibraryReferenceArg, error) {
 	ret.Name = tokens[0]
 	if len(tokens) > 1 {
 		if tokens[1] == "" {
-			return nil, fmt.Errorf("invalid empty library version")
+			return nil, fmt.Errorf("invalid empty library version: %s", arg)
 		}
 		ret.Version = tokens[1]
 	}
