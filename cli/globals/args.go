@@ -72,3 +72,45 @@ func ParseReferenceArg(arg string, parseArch bool) (*ReferenceArg, error) {
 
 	return ret, nil
 }
+
+// LibraryReferenceArg is a command line argument that reference a library.
+type LibraryReferenceArg struct {
+	Name    string
+	Version string
+}
+
+func (r *LibraryReferenceArg) String() string {
+	if r.Version != "" {
+		return r.Name + "@" + r.Version
+	}
+	return r.Name
+}
+
+// ParseLibraryReferenceArg parse a command line argument that reference a
+// library in the form "LibName@Version" or just "LibName".
+func ParseLibraryReferenceArg(arg string) (*LibraryReferenceArg, error) {
+	tokens := strings.SplitN(arg, "@", 2)
+
+	ret := &LibraryReferenceArg{}
+	// TODO: check library Name constraints
+	// TODO: check library Version constraints
+	ret.Name = tokens[0]
+	if len(tokens) > 1 {
+		ret.Version = tokens[1]
+	}
+	return ret, nil
+}
+
+// ParseLibraryReferenceArgs is a convenient wrapper that operates on a slice of strings and
+// calls ParseLibraryReferenceArg for each of them. It returns at the first invalid argument.
+func ParseLibraryReferenceArgs(args []string) ([]*LibraryReferenceArg, error) {
+	ret := []*LibraryReferenceArg{}
+	for _, arg := range args {
+		if reference, err := ParseLibraryReferenceArg(arg); err == nil {
+			ret = append(ret, reference)
+		} else {
+			return nil, err
+		}
+	}
+	return ret, nil
+}

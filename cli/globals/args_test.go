@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var goodCores = []struct {
@@ -35,11 +36,11 @@ var goodCores = []struct {
 
 var goodLibs = []struct {
 	in       string
-	expected *globals.ReferenceArg
+	expected *globals.LibraryReferenceArg
 }{
-	{"mylib", &globals.ReferenceArg{"mylib", "", ""}},
-	{"mylib@1.0", &globals.ReferenceArg{"mylib", "", "1.0"}},
-	{"mylib@", &globals.ReferenceArg{"mylib", "", ""}},
+	{"mylib", &globals.LibraryReferenceArg{"mylib", ""}},
+	{"mylib@1.0", &globals.LibraryReferenceArg{"mylib", "1.0"}},
+	{"mylib@", &globals.LibraryReferenceArg{"mylib", ""}},
 }
 
 var badCores = []struct {
@@ -49,6 +50,12 @@ var badCores = []struct {
 	{"arduino:avr:avr", nil},
 	{"arduino@1.6.20:avr", nil},
 	{"arduino:avr:avr@1.6.20", nil},
+}
+
+func TestArgsStringify(t *testing.T) {
+	for _, lib := range goodLibs {
+		require.Equal(t, lib.in, lib.expected.String())
+	}
 }
 
 func TestParseReferenceArgCores(t *testing.T) {
@@ -73,15 +80,22 @@ func TestParseReferenceArgCores(t *testing.T) {
 
 func TestParseReferenceArgLibs(t *testing.T) {
 	for _, tt := range goodLibs {
-		actual, err := globals.ParseReferenceArg(tt.in, false)
+		actual, err := globals.ParseLibraryReferenceArg(tt.in)
 		assert.Nil(t, err)
 		assert.Equal(t, tt.expected, actual)
 	}
+}
 
-	// good libs are bad when requiring Arch to be present
+func TestParseLibraryReferenceArgs(t *testing.T) {
+	args := []string{}
 	for _, tt := range goodLibs {
-		_, err := globals.ParseReferenceArg(tt.in, true)
-		assert.NotNil(t, err)
+		args = append(args, tt.in)
+	}
+	refs, err := globals.ParseLibraryReferenceArgs(args)
+	require.Nil(t, err)
+	require.Len(t, refs, len(goodLibs))
+	for i, tt := range goodLibs {
+		assert.Equal(t, tt.expected, refs[i])
 	}
 }
 
