@@ -47,7 +47,7 @@ func initInstallCommand() *cobra.Command {
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
-	refs, err := globals.ParseReferenceArgs(args, false)
+	refs, err := globals.ParseLibraryReferenceArgs(args)
 	if err != nil {
 		feedback.Errorf("Arguments error: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
@@ -56,7 +56,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	for _, library := range refs {
 		libraryInstallReq := &rpc.LibraryInstallReq{
 			Instance: instance,
-			Name:     library.PackageName,
+			Name:     library.Name,
 			Version:  library.Version,
 		}
 		err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.ProgressBar(),

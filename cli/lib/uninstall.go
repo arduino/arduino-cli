@@ -48,7 +48,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib uninstall`")
 
 	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
-	refs, err := globals.ParseReferenceArgs(args, false)
+	refs, err := globals.ParseLibraryReferenceArgs(args)
 	if err != nil {
 		feedback.Errorf("Invalid argument passed: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
@@ -57,7 +57,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	for _, library := range refs {
 		err := lib.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{
 			Instance: instance,
-			Name:     library.PackageName,
+			Name:     library.Name,
 			Version:  library.Version,
 		}, output.TaskProgress())
 		if err != nil {
