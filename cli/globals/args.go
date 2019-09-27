@@ -94,8 +94,14 @@ func ParseLibraryReferenceArg(arg string) (*LibraryReferenceArg, error) {
 	ret := &LibraryReferenceArg{}
 	// TODO: check library Name constraints
 	// TODO: check library Version constraints
+	if tokens[0] == "" {
+		return nil, fmt.Errorf("invalid empty library name")
+	}
 	ret.Name = tokens[0]
 	if len(tokens) > 1 {
+		if tokens[1] == "" {
+			return nil, fmt.Errorf("invalid empty library version")
+		}
 		ret.Version = tokens[1]
 	}
 	return ret, nil
