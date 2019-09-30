@@ -47,17 +47,42 @@ func initInstallCommand() *cobra.Command {
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
-	refs, err := globals.ParseLibraryReferenceArgs(args)
+	libRefs, err := globals.ParseLibraryReferenceArgs(args)
 	if err != nil {
 		feedback.Errorf("Arguments error: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
-	for _, library := range refs {
+	toInstall := map[string]*rpc.LibraryDependencyStatus{}
+	for _, libRef := range libRefs {
+		depsResp, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesReq{
+			Instance: instance,
+			Name:     libRef.Name,
+			Version:  libRef.Version,
+		})
+		if err != nil {
+			feedback.Errorf("Error resolving dependencies for %s: %s", libRef, err)
+		}
+		for _, dep := range depsResp.GetDependencies() {
+			feedback.Printf("%s depends on %s@%s", libRef, dep.GetName(), dep.GetVersionRequired())
+			if existingDep, has := toInstall[dep.GetName()]; has {
+				if existingDep.GetVersionRequired() != dep.GetVersionRequired() {
+					// TODO: make a better error
+					feedback.Errorf("The library %s is required in two different versions: %s and %s",
+						dep.GetName(), dep.GetVersionRequired(), existingDep.GetVersionRequired())
+					os.Exit(errorcodes.ErrGeneric)
+				}
+			}
+			toInstall[dep.GetName()] = dep
+		}
+		feedback.Print()
+	}
+
+	for _, library := range toInstall {
 		libraryInstallReq := &rpc.LibraryInstallReq{
 			Instance: instance,
 			Name:     library.Name,
-			Version:  library.Version,
+			Version:  library.VersionRequired,
 		}
 		err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.ProgressBar(),
 			output.TaskProgress(), globals.NewHTTPClientHeader())
