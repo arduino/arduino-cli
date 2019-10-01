@@ -197,12 +197,12 @@ type includeCacheEntry struct {
 	Includepath *paths.Path
 }
 
-func (entry includeCacheEntry) String() string {
+func (entry *includeCacheEntry) String() string {
 	return fmt.Sprintf("SourceFile: %s; Include: %s; IncludePath: %s",
 		entry.Sourcefile, entry.Include, entry.Includepath)
 }
 
-func (entry includeCacheEntry) Equals(other includeCacheEntry) bool {
+func (entry *includeCacheEntry) Equals(other *includeCacheEntry) bool {
 	return entry.String() == other.String()
 }
 
@@ -212,13 +212,13 @@ type includeCache struct {
 	// Index into entries of the next entry to be processed. Unused
 	// when the cache is invalid.
 	next    int
-	entries []includeCacheEntry // XXX: Convert to pointers
+	entries []*includeCacheEntry
 }
 
 // Return the next cache entry. Should only be called when the cache is
 // valid and a next entry is available (the latter can be checked with
 // ExpectFile). Does not advance the cache.
-func (cache *includeCache) Next() includeCacheEntry {
+func (cache *includeCache) Next() *includeCacheEntry {
 	return cache.entries[cache.next]
 }
 
@@ -237,7 +237,7 @@ func (cache *includeCache) ExpectFile(sourcefile *paths.Path) {
 // invalidated, or was already invalid, an entry with the given values
 // is appended.
 func (cache *includeCache) ExpectEntry(sourcefile *paths.Path, include string, librarypath *paths.Path) {
-	entry := includeCacheEntry{Sourcefile: sourcefile, Include: include, Includepath: librarypath}
+	entry := &includeCacheEntry{Sourcefile: sourcefile, Include: include, Includepath: librarypath}
 	if cache.valid {
 		if cache.next < len(cache.entries) && cache.Next().Equals(entry) {
 			cache.next++
