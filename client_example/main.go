@@ -167,7 +167,9 @@ func initInstance(client rpc.ArduinoCoreClient) *rpc.Instance {
 	// the data folder.
 	initRespStream, err := client.Init(context.Background(), &rpc.InitReq{
 		Configuration: &rpc.Configuration{
-			DataDir: dataDir,
+			DataDir:       dataDir,
+			SketchbookDir: dataDir,
+			DownloadsDir:  dataDir,
 		},
 	})
 	if err != nil {
@@ -368,11 +370,12 @@ func callBoardsDetails(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 }
 
 func callBoardAttach(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
+	currDir, _ := os.Getwd()
 	boardattachresp, err := client.BoardAttach(context.Background(),
 		&rpc.BoardAttachReq{
 			Instance:   instance,
 			BoardUri:   "/dev/ttyACM0",
-			SketchPath: filepath.Join(dataDir, "hello.ino"),
+			SketchPath: filepath.Join(currDir, "hello.ino"),
 		})
 
 	if err != nil {
@@ -402,11 +405,12 @@ func callBoardAttach(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 }
 
 func callCompile(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
+	currDir, _ := os.Getwd()
 	compRespStream, err := client.Compile(context.Background(),
 		&rpc.CompileReq{
 			Instance:   instance,
 			Fqbn:       "arduino:samd:mkr1000",
-			SketchPath: "hello.ino",
+			SketchPath: filepath.Join(currDir, "hello.ino"),
 			Verbose:    true,
 		})
 
@@ -440,11 +444,12 @@ func callCompile(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 }
 
 func callUpload(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
+	currDir, _ := os.Getwd()
 	uplRespStream, err := client.Upload(context.Background(),
 		&rpc.UploadReq{
 			Instance:   instance,
 			Fqbn:       "arduino:samd:mkr1000",
-			SketchPath: "hello.ino",
+			SketchPath: filepath.Join(currDir, "hello.ino"),
 			Port:       "/dev/ttyACM0",
 			Verbose:    true,
 		})
