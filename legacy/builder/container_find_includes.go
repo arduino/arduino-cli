@@ -108,6 +108,7 @@ package builder
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"time"
@@ -196,13 +197,22 @@ type includeCacheEntry struct {
 	Includepath *paths.Path
 }
 
+func (entry includeCacheEntry) String() string {
+	return fmt.Sprintf("SourceFile: %s; Include: %s; IncludePath: %s",
+		entry.Sourcefile, entry.Include, entry.Includepath)
+}
+
+func (entry includeCacheEntry) Equals(other includeCacheEntry) bool {
+	return entry.String() == other.String()
+}
+
 type includeCache struct {
 	// Are the cache contents valid so far?
 	valid bool
 	// Index into entries of the next entry to be processed. Unused
 	// when the cache is invalid.
 	next    int
-	entries []includeCacheEntry
+	entries []includeCacheEntry // XXX: Convert to pointers
 }
 
 // Return the next cache entry. Should only be called when the cache is
@@ -229,7 +239,7 @@ func (cache *includeCache) ExpectFile(sourcefile *paths.Path) {
 func (cache *includeCache) ExpectEntry(sourcefile *paths.Path, include string, librarypath *paths.Path) {
 	entry := includeCacheEntry{Sourcefile: sourcefile, Include: include, Includepath: librarypath}
 	if cache.valid {
-		if cache.next < len(cache.entries) && cache.Next() == entry {
+		if cache.next < len(cache.entries) && cache.Next().Equals(entry) {
 			cache.next++
 		} else {
 			cache.valid = false
