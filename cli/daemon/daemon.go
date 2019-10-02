@@ -41,7 +41,7 @@ const (
 func NewCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:     "daemon",
-		Short:   "Run as a daemon",
+		Short:   fmt.Sprintf("Run as a daemon on port %s", port),
 		Long:    "Running as a daemon the initialization of cores and libraries is done only once.",
 		Example: "  " + os.Args[0] + " daemon",
 		Args:    cobra.NoArgs,
