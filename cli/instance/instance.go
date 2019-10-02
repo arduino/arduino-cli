@@ -36,7 +36,7 @@ func initInstance() *rpc.InitResp {
 	logrus.Info("Initializing package manager")
 	req := packageManagerInitReq()
 
-	resp, err := commands.Init(context.Background(), req, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
+	resp, err := commands.Init(context.Background(), req, output.ProgressBar(), output.TaskProgress(), globals.NewHTTPClientHeader())
 	if err != nil {
 		feedback.Errorf("Error initializing package manager: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
