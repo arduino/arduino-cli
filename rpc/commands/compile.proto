@@ -38,6 +38,7 @@ message CompileReq {
   string vidPid = 12;   // VID/PID specific build properties.
   string exportFile = 13;   // The compiled binary is written to this file
   int32 jobs = 14;   // The max number of concurrent compiler instances to run (as make -jx)
+  repeated string libraries = 15; // List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
 }
 
 message CompileResp {

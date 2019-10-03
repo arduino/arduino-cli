@@ -100,7 +100,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		return nil, fmt.Errorf("cannot get bundled tools directories: %s", err)
 	}
 
-	builderCtx.OtherLibrariesDirs = paths.NewPathList()
+	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(config.LibrariesDir())
 
 	if req.GetBuildPath() != "" {

@@ -49,6 +49,7 @@ var (
 	port               string   // Upload port, e.g.: COM10 or /dev/ttyACM0.
 	verify             bool     // Upload, verify uploaded binary after the upload.
 	exportFile         string   // The compiled binary is written to this file
+	libraries          []string // List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
 )
 
 // NewCommand created a new `compile` command
@@ -79,6 +80,8 @@ func NewCommand() *cobra.Command {
 	command.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
 	command.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	command.Flags().StringVar(&vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if boards supports them.")
+	command.Flags().StringSliceVar(&libraries, "libraries", []string{},
+		"List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.")
 
 	return command
 }
@@ -107,6 +110,7 @@ func run(cmd *cobra.Command, args []string) {
 		Quiet:           quiet,
 		VidPid:          vidPid,
 		ExportFile:      exportFile,
+		Libraries:       libraries,
 	}, os.Stdout, os.Stderr, globals.Config, globals.LogLevel == "debug")
 
 	if err != nil {
