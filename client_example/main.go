@@ -168,8 +168,8 @@ func initInstance(client rpc.ArduinoCoreClient) *rpc.Instance {
 	initRespStream, err := client.Init(context.Background(), &rpc.InitReq{
 		Configuration: &rpc.Configuration{
 			DataDir:       dataDir,
-			SketchbookDir: dataDir,
-			DownloadsDir:  dataDir,
+			SketchbookDir: filepath.Join(dataDir, "sketchbook"),
+			DownloadsDir:  filepath.Join(dataDir, "staging"),
 		},
 	})
 	if err != nil {
