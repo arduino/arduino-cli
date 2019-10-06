@@ -18,6 +18,12 @@ build the source code, run the tests, and contribute your changes to the project
 
 ## How to install
 
+### macOS/Linux installation via HomeBrew
+
+Thanks to @Efrat19, arduino-cli is now availabe as a brew formula:
+```
+brew install arduino-cli
+```
 ### Get the latest package
 
 #### Using the install script
