@@ -50,13 +50,13 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
 
 	if len(args) == 0 {
-		err := lib.LibraryUpgradeAll(instance.Id, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
+		err := lib.LibraryUpgradeAll(instance.Id, output.ProgressBar(), output.TaskProgress(), globals.NewHTTPClientHeader())
 		if err != nil {
 			feedback.Errorf("Error upgrading libraries: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	} else {
-		err := lib.LibraryUpgrade(instance.Id, args, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
+		err := lib.LibraryUpgrade(instance.Id, args, output.ProgressBar(), output.TaskProgress(), globals.NewHTTPClientHeader())
 		if err != nil {
 			feedback.Errorf("Error upgrading libraries: %v", err)
 			os.Exit(errorcodes.ErrGeneric)

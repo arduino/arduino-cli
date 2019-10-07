@@ -31,8 +31,6 @@ var (
 	Debug bool
 	// OutputFormat can be "text" or "json"
 	OutputFormat string
-	// HTTPClientHeader is the object that will be propagated to configure the clients inside the downloaders
-	HTTPClientHeader = getHTTPClientHeader()
 	// VersionInfo contains all info injected during build
 	VersionInfo = version.NewInfo(filepath.Base(os.Args[0]))
 	// Config FIXMEDOC
@@ -46,9 +44,9 @@ var (
 	LogLevel string
 )
 
-func getHTTPClientHeader() http.Header {
+// NewHTTPClientHeader returns the http.Header object that must be used by the clients inside the downloaders
+func NewHTTPClientHeader() http.Header {
 	userAgentValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s", VersionInfo.Application,
 		VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), VersionInfo.Commit)
-	downloaderHeaders := http.Header{"User-Agent": []string{userAgentValue}}
-	return downloaderHeaders
+	return http.Header{"User-Agent": []string{userAgentValue}}
 }

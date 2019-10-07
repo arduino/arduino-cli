@@ -60,7 +60,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			Version:  library.Version,
 		}
 		err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.ProgressBar(),
-			output.TaskProgress(), globals.HTTPClientHeader)
+			output.TaskProgress(), globals.NewHTTPClientHeader())
 		if err != nil {
 			feedback.Errorf("Error installing %s: %v", library, err)
 			os.Exit(errorcodes.ErrGeneric)
