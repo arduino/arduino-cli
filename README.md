@@ -20,7 +20,7 @@ build the source code, run the tests, and contribute your changes to the project
 
 ### macOS/Linux installation via Homebrew
 
-Thanks to [Efrat19](https://github.com/efrat19), arduino-cli is now availabe as a brew formula:
+Thanks to [Efrat19](https://github.com/efrat19), arduino-cli is availabe as a brew formula since version `0.5.0`:
 ```
 brew update
 brew install arduino-cli
