@@ -86,8 +86,12 @@ func (fb *Feedback) Printf(format string, v ...interface{}) {
 }
 
 // Print behaves like fmt.Print but writes on the out writer and adds a newline.
-func (fb *Feedback) Print(v ...interface{}) {
-	fmt.Fprintln(fb.out, v...)
+func (fb *Feedback) Print(v interface{}) {
+	if fb.format == JSON {
+		fb.printJSON(v)
+	} else {
+		fmt.Fprintln(fb.out, v)
+	}
 }
 
 // Errorf behaves like fmt.Printf but writes on the error writer and adds a
@@ -103,24 +107,22 @@ func (fb *Feedback) Error(v ...interface{}) {
 	logrus.Error(fmt.Sprint(v...))
 }
 
-// PrintJSON is a convenient wrapper to provide feedback by printing the
+// printJSON is a convenient wrapper to provide feedback by printing the
 // desired output in a pretty JSON format. It adds a newline to the output.
-func (fb *Feedback) PrintJSON(v interface{}) {
+func (fb *Feedback) printJSON(v interface{}) {
 	if d, err := json.MarshalIndent(v, "", "  "); err != nil {
 		fb.Errorf("Error during JSON encoding of the output: %v", err)
 	} else {
-		fb.Print(string(d))
+		fmt.Fprint(fb.out, string(d))
 	}
 }
 
-// PrintResult is a convenient wrapper...
+// PrintResult is a convenient wrapper to provide feedback for complex data,
+// where the contents can't be just serialized to JSON but requires more
+// structure.
 func (fb *Feedback) PrintResult(res Result) {
 	if fb.format == JSON {
-		if d, err := json.MarshalIndent(res.Data(), "", "  "); err != nil {
-			fb.Errorf("Error during JSON encoding of the output: %v", err)
-		} else {
-			fb.Print(string(d))
-		}
+		fb.printJSON(res.Data())
 	} else {
 		fb.Print(fmt.Sprintf("%s", res))
 	}

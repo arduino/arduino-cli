@@ -29,8 +29,6 @@ import (
 var (
 	// Debug determines whether to dump debug output to stderr or not
 	Debug bool
-	// OutputFormat can be "text" or "json"
-	OutputFormat string
 	// VersionInfo contains all info injected during build
 	VersionInfo = version.NewInfo(filepath.Base(os.Args[0]))
 	// Config FIXMEDOC

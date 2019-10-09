@@ -40,8 +40,6 @@ func initInitCommand() *cobra.Command {
 		Args: cobra.NoArgs,
 		Run:  runInitCommand,
 	}
-	initCommand.Flags().BoolVar(&initFlags._default, "default", false,
-		"If omitted, ask questions to the user about setting configuration properties, otherwise use default configuration.")
 	initCommand.Flags().StringVar(&initFlags.location, "save-as", "",
 		"Sets where to save the configuration file [default is ./arduino-cli.yaml].")
 	return initCommand
@@ -54,13 +52,6 @@ var initFlags struct {
 
 func runInitCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config init`")
-
-	if !initFlags._default {
-		if globals.OutputFormat != "text" {
-			feedback.Error("The interactive mode is supported only in text mode.")
-			os.Exit(errorcodes.ErrBadCall)
-		}
-	}
 
 	filepath := initFlags.location
 	if filepath == "" {

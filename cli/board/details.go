@@ -54,7 +54,7 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 	feedback.PrintResult(detailsResult{details: res})
 }
 
-// ouput from this command requires special formatting, let's create a dedicated
+// output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type detailsResult struct {
 	details *rpc.BoardDetailsResp
