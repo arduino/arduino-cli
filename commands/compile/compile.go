@@ -95,7 +95,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	}
 
 	if toolsDir, err := config.BundleToolsDirectories(); err == nil {
-		builderCtx.ToolsDirs = toolsDir
+		builderCtx.BuiltInToolsDirs = toolsDir
 	} else {
 		return nil, fmt.Errorf("cannot get bundled tools directories: %s", err)
 	}
@@ -209,10 +209,12 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 	// Copy .elf file to sketch directory
 	srcElf := paths.New(outputPath[:len(outputPath)-3] + "elf")
-	dstElf := exportPath.Join(exportFile + ".elf")
-	logrus.WithField("from", srcElf).WithField("to", dstElf).Debug("copying sketch build output")
-	if err = srcElf.CopyTo(dstElf); err != nil {
-		return nil, fmt.Errorf("copying elf file: %s", err)
+	if srcElf.Exist() {
+		dstElf := exportPath.Join(exportFile + ".elf")
+		logrus.WithField("from", srcElf).WithField("to", dstElf).Debug("copying sketch build output")
+		if err = srcElf.CopyTo(dstElf); err != nil {
+			return nil, fmt.Errorf("copying elf file: %s", err)
+		}
 	}
 
 	logrus.Tracef("Compile %s for %s successful", sketch.Name, fqbnIn)

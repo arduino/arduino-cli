@@ -30,9 +30,6 @@
 package builder
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
 )
@@ -45,28 +42,9 @@ func (s *ToolsLoader) Run(ctx *types.Context) error {
 		return nil
 	}
 
-	folders := paths.NewPathList()
 	builtinFolders := paths.NewPathList()
-
-	if ctx.BuiltInToolsDirs != nil || len(ctx.BuiltInLibrariesDirs) == 0 {
-		folders = ctx.ToolsDirs
+	if ctx.BuiltInToolsDirs != nil {
 		builtinFolders = ctx.BuiltInToolsDirs
-	} else {
-		// Auto-detect built-in tools folders (for arduino-builder backward compatibility)
-		// this is a deprecated feature and will be removed in the future
-		builtinHardwareFolder, err := ctx.BuiltInLibrariesDirs[0].Join("..").Abs()
-
-		if err != nil {
-			fmt.Println("Error detecting ")
-		}
-
-		for _, folder := range ctx.ToolsDirs {
-			if !strings.Contains(folder.String(), builtinHardwareFolder.String()) { // TODO: make a function to check for subfolders
-				folders = append(folders, folder)
-			} else {
-				builtinFolders = append(builtinFolders, folder)
-			}
-		}
 	}
 
 	pm := ctx.PackageManager

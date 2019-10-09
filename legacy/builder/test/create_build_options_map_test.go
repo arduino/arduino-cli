@@ -41,7 +41,7 @@ import (
 func TestCreateBuildOptionsMap(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:       paths.NewPathList("hardware", "hardware2"),
-		ToolsDirs:          paths.NewPathList("tools"),
+		BuiltInToolsDirs:   paths.NewPathList("tools"),
 		OtherLibrariesDirs: paths.NewPathList("libraries"),
 		SketchLocation:     paths.New("sketchLocation"),
 		FQBN:               parseFQBN(t, "my:nice:fqbn"),
@@ -55,15 +55,15 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 	err := create.Run(ctx)
 	NoError(t, err)
 
-	require.Equal(t, "{\n"+
-		"  \"additionalFiles\": \"\",\n"+
-		"  \"builtInLibrariesFolders\": \"\",\n"+
-		"  \"customBuildProperties\": \"\",\n"+
-		"  \"fqbn\": \"my:nice:fqbn\",\n"+
-		"  \"hardwareFolders\": \"hardware,hardware2\",\n"+
-		"  \"otherLibrariesFolders\": \"libraries\",\n"+
-		"  \"runtime.ide.version\": \"ideVersion\",\n"+
-		"  \"sketchLocation\": \"sketchLocation\",\n"+
-		"  \"toolsFolders\": \"tools\"\n"+
-		"}", ctx.BuildOptionsJson)
+	require.Equal(t, `{
+  "additionalFiles": "",
+  "builtInLibrariesFolders": "",
+  "builtInToolsFolders": "tools",
+  "customBuildProperties": "",
+  "fqbn": "my:nice:fqbn",
+  "hardwareFolders": "hardware,hardware2",
+  "otherLibrariesFolders": "libraries",
+  "runtime.ide.version": "ideVersion",
+  "sketchLocation": "sketchLocation"
+}`, ctx.BuildOptionsJson)
 }

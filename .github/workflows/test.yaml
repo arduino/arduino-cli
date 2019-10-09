@@ -58,11 +58,6 @@ jobs:
           architecture: 'x64'
 
       - name: Run integration tests
-        # Since we are investigating issues emerged
-        # with python integration tests on windows
-        # this step is disabled for windows-2019
-        # platform ATM
-        if: matrix.operating-system != 'windows-2019'
         run: |
           pip install -r test/requirements.txt
           task test-integration

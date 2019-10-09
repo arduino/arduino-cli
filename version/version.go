@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	defaultVersionString = "0.3.7-alpha.preview"
+	defaultVersionString = "0.0.0-git"
 	versionString        = ""
 	commit               = ""
 )

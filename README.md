@@ -20,6 +20,8 @@ build the source code, run the tests, and contribute your changes to the project
 
 ### Get the latest package
 
+#### Using the install script
+
 The easiest way to get the latest version of `arduino-cli` on any supported platform is using the
 `install.sh` script:
 
@@ -34,8 +36,25 @@ for example `~/local/bin`, set the `BINDIR` environment variable like this:
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/local/bin sh
 ```
 
+#### Using the latest release links
+
+In order to get the latest stable release for your platform use the following links:
+
+- [Linux 64 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz)
+- [Linux 32 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_32bit.tar.gz)
+- [Linux ARM 64 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARM64.tar.gz)
+- [Linux ARM 32 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARMv7.tar.gz)
+- [Windows 64 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_64bit.zip)
+- [Windows 32 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_32bit.zip)
+- [Mac OSX](https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_64bit.tar.gz)
+
+These links return a `302: Found` response, redirecting to latest generated builds by replacing `latest` with the latest
+available stable release. Once downloaded, place the executable `arduino-cli` into a directory which is in your `PATH`.
+
 **Deprecation notice:** Links in the form `http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-<platform>.tar.bz2`
 won't be further updated. That URL will provide arduino-cli 0.3.7-alpha.preview, regardless of further releases.
+
+#### Using the Github release page
 
 Alternatively you can download one of the pre-built binaries for the supported platforms from the
 [release page](https://github.com/arduino/arduino-cli/releases). Once downloaded, place the executable

@@ -46,7 +46,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		ToolsDirs:            paths.NewPathList("downloaded_tools"),
+		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		SketchLocation:       paths.New("sketch1", "sketch.ino"),
@@ -88,7 +88,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		ToolsDirs:            paths.NewPathList("downloaded_tools"),
+		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		SketchLocation:       paths.New("sketch1", "sketch.ino"),
@@ -130,7 +130,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
-		ToolsDirs:            paths.NewPathList("downloaded_tools"),
+		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		SketchLocation:       paths.New("sketch1", "sketch.ino"),
@@ -168,7 +168,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
-		ToolsDirs:            paths.NewPathList("downloaded_tools"),
+		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		SketchLocation:       paths.New("sketch1", "sketch.ino"),
