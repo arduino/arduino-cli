@@ -70,7 +70,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	feedback.PrintResult(result{ports})
 }
 
-// ouput from this command requires special formatting, let's create a dedicated
+// output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type result struct {
 	ports []*rpc.DetectedPort

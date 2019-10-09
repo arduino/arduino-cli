@@ -71,7 +71,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Done")
 }
 
-// ouput from this command requires special formatting, let's create a dedicated
+// output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type result struct {
 	results   *rpc.LibrarySearchResp

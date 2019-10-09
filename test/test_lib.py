@@ -19,7 +19,7 @@ def test_list(run_command):
     # Init the environment explicitly
     assert run_command("core update-index")
 
-    # When ouput is empty, nothing is printed out, no matter the output format
+    # When output is empty, nothing is printed out, no matter the output format
     result = run_command("lib list")
     assert result.ok
     assert "" == result.stderr

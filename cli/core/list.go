@@ -61,7 +61,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	feedback.PrintResult(installedResult{platforms})
 }
 
-// ouput from this command requires special formatting, let's create a dedicated
+// output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type installedResult struct {
 	platforms []*cores.PlatformRelease

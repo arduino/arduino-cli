@@ -60,7 +60,7 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 	feedback.PrintResult(resultAll{list})
 }
 
-// ouput from this command requires special formatting, let's create a dedicated
+// output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type resultAll struct {
 	list *rpc.BoardListAllResp

@@ -63,7 +63,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	feedback.PrintResult(searchResults{coreslist})
 }
 
-// ouput from this command requires special formatting, let's create a dedicated
+// output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type searchResults struct {
 	platforms []*rpc.Platform
