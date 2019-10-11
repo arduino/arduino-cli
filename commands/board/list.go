@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"sync"
 
 	"github.com/arduino/arduino-cli/cli/globals"
@@ -35,9 +36,18 @@ var (
 	// ErrNotFound is returned when the API returns 404
 	ErrNotFound = errors.New("board not found")
 	m           sync.Mutex
+	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
 )
 
-func apiByVidPid(url string) ([]*rpc.BoardListItem, error) {
+func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
+	// ensure vid and pid are valid before hitting the API
+	_, vidErr := strconv.ParseInt(vid, 0, 64)
+	_, pidErr := strconv.ParseInt(pid, 0, 64)
+	if vidErr != nil || pidErr != nil {
+		return nil, errors.Errorf("Invalid vid/pid value: '%s:%s'", vid, pid)
+	}
+
+	url := fmt.Sprintf("%s/%s/%s", vidPidURL, vid, pid)
 	retVal := []*rpc.BoardListItem{}
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header = globals.NewHTTPClientHeader()
@@ -110,10 +120,10 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 		// the builder API
 		if len(b) == 0 {
 			logrus.Debug("Querying builder API for board identification...")
-			url := fmt.Sprintf("https://builder.arduino.cc/v3/boards/byVidPid/%s/%s",
+			items, err := apiByVidPid(
 				port.IdentificationPrefs.Get("vid"),
-				port.IdentificationPrefs.Get("pid"))
-			items, err := apiByVidPid(url)
+				port.IdentificationPrefs.Get("pid"),
+			)
 			if err == ErrNotFound {
 				// the board couldn't be detected, print a warning
 				logrus.Debug("Board not recognized")
