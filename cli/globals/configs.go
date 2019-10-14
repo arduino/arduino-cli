@@ -66,11 +66,11 @@ func InitConfigs() {
 	// Read configuration from old configuration file if found, but output a warning.
 	if old := paths.New(".cli-config.yml"); old.Exist() {
 		logrus.Errorf("Old configuration file detected: %s.", old)
-		logrus.Info("The name of this file has been changed to `arduino-yaml`, please rename the file fix it.")
+		logrus.Info("The name of this file has been changed to `arduino-cli.yaml`, please rename the file fix it.")
 		feedback.Error(
 			fmt.Errorf("WARNING: Old configuration file detected: %s", old),
 			"The name of this file has been changed to `arduino-yaml`, in a future release we will not support"+
-				"the old name `.cli-config.yml` anymore. Please rename the file to `arduino-yaml` to silence this warning.")
+				"the old name `.cli-config.yml` anymore. Please rename the file to `arduino-cli.yaml` to silence this warning.")
 		readConfigFrom(old)
 	}
 
