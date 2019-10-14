@@ -78,7 +78,7 @@ checkLatestVersion() {
 	elif [ "$DOWNLOAD_TOOL" = "wget" ]; then
 		tag=$(wget -q -O - $latest_url | grep -o "Release $regex · arduino/arduino-cli" | grep -o "$regex")
 	fi
-	if [ "x$tag" == "x" ]; then
+	if [ "x$tag" = "x" ]; then
 		echo "Cannot determine latest tag."
 		exit 1
 	fi
@@ -122,7 +122,7 @@ downloadFile() {
 	checkLatestVersion TAG
 	echo "TAG=$TAG"
 	#  arduino-cli_0.4.0-rc1_Linux_64bit.[tar.gz, zip]
-	if [ "$OS" == "Windows" ]; then
+	if [ "$OS" = "Windows" ]; then
 		CLI_DIST="arduino-cli_${TAG}_${OS}_${ARCH}.zip"
 	else
 		CLI_DIST="arduino-cli_${TAG}_${OS}_${ARCH}.tar.gz"
