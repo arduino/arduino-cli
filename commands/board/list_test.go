@@ -40,14 +40,15 @@ func TestGetByVidPid(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	res, err := apiByVidPid(ts.URL)
+	vidPidURL = ts.URL
+	res, err := apiByVidPid("0xf420", "0XF069")
 	require.Nil(t, err)
 	require.Len(t, res, 1)
 	require.Equal(t, "Arduino/Genuino MKR1000", res[0].Name)
 	require.Equal(t, "arduino:samd:mkr1000", res[0].FQBN)
 
-	// wrong url
-	res, err = apiByVidPid("http://0.0.0.0")
+	// wrong vid (too long), wrong pid (not an hex value)
+	res, err = apiByVidPid("0xfffff", "0xDEFG")
 	require.NotNil(t, err)
 }
 
@@ -57,7 +58,8 @@ func TestGetByVidPidNotFound(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	res, err := apiByVidPid(ts.URL)
+	vidPidURL = ts.URL
+	res, err := apiByVidPid("0x0420", "0x0069")
 	require.NotNil(t, err)
 	require.Equal(t, "board not found", err.Error())
 	require.Len(t, res, 0)
@@ -70,7 +72,8 @@ func TestGetByVidPid5xx(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	res, err := apiByVidPid(ts.URL)
+	vidPidURL = ts.URL
+	res, err := apiByVidPid("0x0420", "0x0069")
 	require.NotNil(t, err)
 	require.Equal(t, "the server responded with status 500 Internal Server Error", err.Error())
 	require.Len(t, res, 0)
@@ -82,7 +85,8 @@ func TestGetByVidPidMalformedResponse(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	res, err := apiByVidPid(ts.URL)
+	vidPidURL = ts.URL
+	res, err := apiByVidPid("0x0420", "0x0069")
 	require.NotNil(t, err)
 	require.Equal(t, "wrong format in server response", err.Error())
 	require.Len(t, res, 0)
