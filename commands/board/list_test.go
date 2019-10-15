@@ -41,14 +41,14 @@ func TestGetByVidPid(t *testing.T) {
 	defer ts.Close()
 
 	vidPidURL = ts.URL
-	res, err := apiByVidPid("0x0420", "0x0069")
+	res, err := apiByVidPid("0xf420", "0XF069")
 	require.Nil(t, err)
 	require.Len(t, res, 1)
 	require.Equal(t, "Arduino/Genuino MKR1000", res[0].Name)
 	require.Equal(t, "arduino:samd:mkr1000", res[0].FQBN)
 
-	// wrong vid/pid
-	res, err = apiByVidPid("foo", "")
+	// wrong vid (too long), wrong pid (not an hex value)
+	res, err = apiByVidPid("0xfffff", "0xDEFG")
 	require.NotNil(t, err)
 }
 

@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
+	"regexp"
 	"sync"
 
 	"github.com/arduino/arduino-cli/cli/globals"
@@ -37,14 +37,16 @@ var (
 	ErrNotFound = errors.New("board not found")
 	m           sync.Mutex
 	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
+	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
 
 func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	// ensure vid and pid are valid before hitting the API
-	_, vidErr := strconv.ParseInt(vid, 0, 64)
-	_, pidErr := strconv.ParseInt(pid, 0, 64)
-	if vidErr != nil || pidErr != nil {
-		return nil, errors.Errorf("Invalid vid/pid value: '%s:%s'", vid, pid)
+	if !validVidPid.MatchString(vid) {
+		return nil, errors.Errorf("Invalid vid value: '%s'", vid)
+	}
+	if !validVidPid.MatchString(pid) {
+		return nil, errors.Errorf("Invalid pid value: '%s'", pid)
 	}
 
 	url := fmt.Sprintf("%s/%s/%s", vidPidURL, vid, pid)
