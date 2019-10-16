@@ -24,7 +24,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
 	timeutils "github.com/arduino/go-timeutils"
 )
@@ -67,7 +66,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	buildProperties.Set("runtime.ide.path", exPath)
 	buildProperties.Set("build.fqbn", ctx.FQBN.String())
 	buildProperties.Set("ide_version", ctx.ArduinoAPIVersion)
-	buildProperties.Set("runtime.os", utils.PrettyOSName())
+	buildProperties.Set("runtime.os", properties.GetOSSuffix())
 
 	if ctx.OptimizeForDebug {
 		if buildProperties.ContainsKey("compiler.optimization_flags.debug") {

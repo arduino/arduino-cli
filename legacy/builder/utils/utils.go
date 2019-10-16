@@ -25,7 +25,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -39,21 +38,6 @@ import (
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
-
-func PrettyOSName() string {
-	switch osName := runtime.GOOS; osName {
-	case "darwin":
-		return "macosx"
-	case "freebsd":
-		return "freebsd"
-	case "linux":
-		return "linux"
-	case "windows":
-		return "windows"
-	default:
-		return "other"
-	}
-}
 
 func ParseCommandLine(input string, logger i18n.Logger) ([]string, error) {
 	var parts []string
