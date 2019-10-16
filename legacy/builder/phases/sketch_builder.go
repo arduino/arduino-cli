@@ -17,7 +17,6 @@ package phases
 
 import (
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/pkg/errors"
@@ -40,7 +39,7 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 	}
 
 	// The "src/" subdirectory of a sketch is compiled recursively
-	sketchSrcPath := sketchBuildPath.Join(constants.SKETCH_FOLDER_SRC)
+	sketchSrcPath := sketchBuildPath.Join("src")
 	if sketchSrcPath.IsDir() {
 		srcObjectFiles, err := builder_utils.CompileFiles(ctx, sketchSrcPath, true, sketchSrcPath, buildProperties, includes)
 		if err != nil {

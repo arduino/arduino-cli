@@ -111,12 +111,12 @@ import (
 type ContainerFindIncludes struct{}
 
 func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
-	cachePath := ctx.BuildPath.Join(constants.FILE_INCLUDES_CACHE)
+	cachePath := ctx.BuildPath.Join("includes.cache")
 	cache := readCache(cachePath)
 
-	appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_CORE_PATH))
-	if ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH) != "" {
-		appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH))
+	appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath("build.core.path"))
+	if ctx.BuildProperties.Get("build.variant.path") != "" {
+		appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath("build.variant.path"))
 	}
 
 	sketch := ctx.Sketch
@@ -128,7 +128,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 
 	sourceFilePaths := ctx.CollectedSourceFiles
 	queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, ctx.SketchBuildPath, false /* recurse */)
-	srcSubfolderPath := ctx.SketchBuildPath.Join(constants.SKETCH_FOLDER_SRC)
+	srcSubfolderPath := ctx.SketchBuildPath.Join("src")
 	if srcSubfolderPath.IsDir() {
 		queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, srcSubfolderPath, true /* recurse */)
 	}

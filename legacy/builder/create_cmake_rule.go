@@ -104,11 +104,11 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	}
 
 	// Copy core + variant in use + preprocessed sketch in the correct folders
-	err := utils.CopyDir(ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_CORE_PATH), coreFolder.String(), extensions)
+	err := utils.CopyDir(ctx.BuildProperties.Get("build.core.path"), coreFolder.String(), extensions)
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = utils.CopyDir(ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH), coreFolder.Join("variant").String(), extensions)
+	err = utils.CopyDir(ctx.BuildProperties.Get("build.variant.path"), coreFolder.Join("variant").String(), extensions)
 	if err != nil {
 		fmt.Println(err)
 	}

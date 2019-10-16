@@ -54,7 +54,7 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 		// if so, trigger a "safety" wipe
 		buildProperties := ctx.BuildProperties
 		targetCoreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH)
-		coreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_CORE_PATH)
+		coreFolder := buildProperties.GetPath("build.core.path")
 		realCoreFolder := coreFolder.Parent().Parent()
 		jsonPath := ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE)
 		coreHasChanged := builder_utils.TXTBuildRulesHaveChanged(realCoreFolder, targetCoreFolder, jsonPath)
