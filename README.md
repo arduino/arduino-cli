@@ -20,19 +20,24 @@ build the source code, run the tests, and contribute your changes to the project
 
 ## How to install
 
-### macOS/Linux installation via Homebrew
+### Get the latest package
 
-The arduino-cli is available as a brew formula since version `0.5.0`:
-```
+You have several options to install the latest version of the Arduino CLI
+on your system.
+
+#### Install via Homebrew (macOS/Linux)
+
+The Arduino CLI is available as a Homebrew formula since version `0.5.0`:
+
+```console
 brew update
 brew install arduino-cli
 ```
-### Get the latest package
 
-#### Using the install script
+#### Use the install script
 
-The easiest way to get the latest version of `arduino-cli` on any supported platform is using the
-`install.sh` script:
+The easiest way to get the latest version of `arduino-cli` on any supported
+platform is using the `install.sh` script:
 
 ```console
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
@@ -45,9 +50,10 @@ for example `~/local/bin`, set the `BINDIR` environment variable like this:
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/local/bin sh
 ```
 
-#### Using the latest release links
+### Download the latest packages from Arduino CDN
 
-In order to get the latest stable release for your platform use the following links:
+In order to get the latest stable release for your platform you can use the
+following links:
 
 - [Linux 64 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz)
 - [Linux 32 bit](https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_32bit.tar.gz)
@@ -63,17 +69,17 @@ available stable release. Once downloaded, place the executable `arduino-cli` in
 **Deprecation notice:** Links in the form `http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-<platform>.tar.bz2`
 won't be further updated. That URL will provide arduino-cli 0.3.7-alpha.preview, regardless of further releases.
 
-#### Using the Github release page
+#### Download the latest package from the release page on GitHub
 
-Alternatively you can download one of the pre-built binaries for the supported platforms from the
-[release page](https://github.com/arduino/arduino-cli/releases). Once downloaded, place the executable
-`arduino-cli` into a directory which is in your `PATH`.
+Alternatively you can download one of the pre-built binaries for the supported
+platforms from the
+[release page](https://github.com/arduino/arduino-cli/releases). Once downloaded,
+place the executable `arduino-cli` into a directory which is in your `PATH`.
 
 ### Download a nightly build
 
-These builds are generated once a day from `master` branch starting at 01:00 GMT
-
-In order to get the latest nightly build for your platform use the following links:
+These builds are generated once a day from `master` branch starting at 01:00 GMT.
+In order to get the latest nightly build for your platform, use the following links:
 
 - [Linux 64 bit](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_64bit.tar.gz)
 - [Linux 32 bit](https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_32bit.tar.gz)
@@ -86,16 +92,16 @@ In order to get the latest nightly build for your platform use the following lin
 These links return a `302: Found` response, redirecting to latest generated builds by replacing `latest` with the latest
 available build date, using the format YYYYMMDD (i.e for 2019/Aug/06 `latest` is replaced with `20190806` )
 
-Checksums for the nightly builds are available at 
+Checksums for the nightly builds are available at
 `https://downloads.arduino.cc/arduino-cli/nightly/nightly-<DATE>-checksums.txt`
 
 Once downloaded, place the executable `arduino-cli` into a directory which is in your `PATH`.
 
 ### Build from source with Docker
 
-If you don't have a working Golang environment or if you want to build `arduino-cli` targeting
-different platforms, you can use Docker to get a binary directly from sources. From the project
-folder run:
+If you don't have a working Golang environment or if you want to build
+`arduino-cli` targeting different platforms, you can use Docker to get a binary
+directly from sources. From the project folder run:
 
 ```console
 docker run -v $PWD:/arduino-cli -w /arduino-cli -e PACKAGE_NAME_PREFIX='snapshot' arduino/arduino-cli:builder-1 goreleaser --rm-dist --snapshot --skip-publish
@@ -134,7 +140,7 @@ void loop() {
 
 ### Step 2. Modify your sketch
 
-Use your favourite file editor or IDE to modify the .ino file, in this example 
+Use your favourite file editor or IDE to modify the .ino file, in this example
 under: `$HOME/MyFirstSketch/MyFirstSketch.ino`
 and change the file to look like this one:
 
