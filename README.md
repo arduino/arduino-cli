@@ -50,7 +50,7 @@ for example `~/local/bin`, set the `BINDIR` environment variable like this:
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/local/bin sh
 ```
 
-### Download the latest packages from Arduino CDN
+#### Download the latest packages from Arduino CDN
 
 In order to get the latest stable release for your platform you can use the
 following links:
@@ -76,7 +76,7 @@ platforms from the
 [release page](https://github.com/arduino/arduino-cli/releases). Once downloaded,
 place the executable `arduino-cli` into a directory which is in your `PATH`.
 
-### Download a nightly build
+### Get a nightly build
 
 These builds are generated once a day from `master` branch starting at 01:00 GMT.
 In order to get the latest nightly build for your platform, use the following links:
@@ -97,7 +97,7 @@ Checksums for the nightly builds are available at
 
 Once downloaded, place the executable `arduino-cli` into a directory which is in your `PATH`.
 
-### Build from source with Docker
+### Build from source using Docker
 
 If you don't have a working Golang environment or if you want to build
 `arduino-cli` targeting different platforms, you can use Docker to get a binary
