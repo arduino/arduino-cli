@@ -63,8 +63,6 @@ func (*AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
 		ctx.WarningsLevel = DEFAULT_WARNINGS_LEVEL
 	}
 
-	ctx.CollectedSourceFiles = &types.UniqueSourceFileQueue{}
-
 	ctx.LibrariesResolutionResults = map[string]types.LibraryResolutionResult{}
 	ctx.HardwareRewriteResults = map[*cores.PlatformRelease][]types.PlatforKeyRewrite{}
 

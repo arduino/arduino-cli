@@ -102,8 +102,6 @@ type Context struct {
 	PreprocPath          *paths.Path
 	SketchObjectFiles    paths.PathList
 
-	CollectedSourceFiles *UniqueSourceFileQueue
-
 	Sketch          *Sketch
 	Source          string
 	SourceGccMinusE string
