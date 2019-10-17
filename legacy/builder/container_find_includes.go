@@ -487,12 +487,12 @@ func (f *SourceFile) DepfilePath(ctx *types.Context) *paths.Path {
 
 type UniqueSourceFileQueue []SourceFile
 
-func (queue UniqueSourceFileQueue) Len() int           { return len(queue) }
-func (queue UniqueSourceFileQueue) Less(i, j int) bool { return false }
-func (queue UniqueSourceFileQueue) Swap(i, j int)      { panic("Who called me?!?") }
+func (queue UniqueSourceFileQueue) Len() int {
+	return len(queue)
+}
 
 func (queue *UniqueSourceFileQueue) Push(value SourceFile) {
-	if !sliceContainsSourceFile(*queue, value) {
+	if !queue.Contains(value) {
 		*queue = append(*queue, value)
 	}
 }
@@ -508,8 +508,8 @@ func (queue *UniqueSourceFileQueue) Empty() bool {
 	return queue.Len() == 0
 }
 
-func sliceContainsSourceFile(slice []SourceFile, target SourceFile) bool {
-	for _, elem := range slice {
+func (queue *UniqueSourceFileQueue) Contains(target SourceFile) bool {
+	for _, elem := range *queue {
 		if elem.Origin == target.Origin && elem.RelativePath.EqualsTo(target.RelativePath) {
 			return true
 		}
