@@ -122,45 +122,63 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 }
 
 func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
-	cache := loadCacheFrom(ctx.BuildPath.Join("includes.cache"))
-
-	appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath("build.core.path"))
-	if ctx.BuildProperties.Get("build.variant.path") != "" {
-		appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath("build.variant.path"))
+	finder := &CppIncludesFinder{
+		ctx: ctx,
+	}
+	if err := finder.DetectLibraries(); err != nil {
+		return err
+	}
+	if err := runCommand(ctx, &FailIfImportedLibraryIsWrong{}); err != nil {
+		return errors.WithStack(err)
 	}
 
-	sketch := ctx.Sketch
-	mergedfile, err := MakeSourceFilee(ctx, sketch, paths.New(sketch.MainFile.Base()+".cpp"))
+	return nil
+}
+
+// CppIncludesFinder implements an algorithm to automatically detect
+// libraries used in a sketch and a way to cache this result for
+// increasing detection speed on already processed sketches.
+type CppIncludesFinder struct {
+	ctx    *types.Context
+	cache  *includeCache
+	sketch *sketch.Sketch
+	queue  *UniqueSourceFileQueue
+}
+
+func (f *CppIncludesFinder) DetectLibraries() error {
+	f.cache = loadCacheFrom(f.ctx.BuildPath.Join("includes.cache"))
+	f.sketch = f.ctx.Sketch
+	f.queue = &UniqueSourceFileQueue{}
+
+	f.appendIncludeFolder(nil, "", f.ctx.BuildProperties.GetPath("build.core.path"))
+	if f.ctx.BuildProperties.Get("build.variant.path") != "" {
+		f.appendIncludeFolder(nil, "", f.ctx.BuildProperties.GetPath("build.variant.path"))
+	}
+
+	mergedfile, err := MakeSourceFile(f.ctx, f.sketch, paths.New(f.sketch.MainFile.Base()+".cpp"))
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	queue := &UniqueSourceFileQueue{}
-	queue.Push(mergedfile)
+	f.queue.Push(mergedfile)
 
-	queueSourceFilesFromFolder(ctx, queue, sketch, ctx.SketchBuildPath, false /* recurse */)
-	srcSubfolderPath := ctx.SketchBuildPath.Join("src")
+	f.queueSourceFilesFromFolder(f.sketch, f.ctx.SketchBuildPath, false /* recurse */)
+	srcSubfolderPath := f.ctx.SketchBuildPath.Join("src")
 	if srcSubfolderPath.IsDir() {
-		queueSourceFilesFromFolder(ctx, queue, sketch, srcSubfolderPath, true /* recurse */)
+		f.queueSourceFilesFromFolder(f.sketch, srcSubfolderPath, true /* recurse */)
 	}
 
-	for !queue.Empty() {
-		if err := findIncludesUntilDone(ctx, cache, queue, queue.Pop()); err != nil {
-			cache.Remove()
+	for !f.queue.Empty() {
+		if err := f.findIncludesUntilDone(f.queue.Pop()); err != nil {
+			f.cache.Remove()
 			return errors.WithStack(err)
 		}
 	}
 
 	// Finalize the cache
-	cache.ExpectEnd()
-	if err := cache.WriteToFile(); err != nil {
+	f.cache.ExpectEnd()
+	if err := f.cache.WriteToFile(); err != nil {
 		return errors.WithStack(err)
 	}
-
-	err = runCommand(ctx, &FailIfImportedLibraryIsWrong{})
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
 	return nil
 }
 
@@ -169,9 +187,9 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 // include (e.g. what #include line in what file it was resolved from)
 // and should be the empty string for the default include folders, like
 // the core or variant.
-func appendIncludeFolder(ctx *types.Context, cache *includeCache, sourceFilePath *paths.Path, include string, folder *paths.Path) {
-	ctx.IncludeFolders = append(ctx.IncludeFolders, folder)
-	cache.ExpectEntry(sourceFilePath, include, folder)
+func (f *CppIncludesFinder) appendIncludeFolder(sourceFilePath *paths.Path, include string, folder *paths.Path) {
+	f.ctx.IncludeFolders = append(f.ctx.IncludeFolders, folder)
+	f.cache.ExpectEntry(sourceFilePath, include, folder)
 }
 
 func runCommand(ctx *types.Context, command types.Command) error {
@@ -296,11 +314,11 @@ func (cache *includeCache) WriteToFile() error {
 	return nil
 }
 
-func findIncludesUntilDone(ctx *types.Context, cache *includeCache, queue *UniqueSourceFileQueue, sourceFile SourceFile) error {
-	sourcePath := sourceFile.SourcePath(ctx)
+func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
+	sourcePath := sourceFile.SourcePath(f.ctx)
 	targetFilePath := paths.NullPath()
-	depPath := sourceFile.DepfilePath(ctx)
-	objPath := sourceFile.ObjectPath(ctx)
+	depPath := sourceFile.DepfilePath(f.ctx)
+	objPath := sourceFile.ObjectPath(f.ctx)
 
 	// TODO: This should perhaps also compare against the
 	// include.cache file timestamp. Now, it only checks if the file
@@ -314,7 +332,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, queue *Uniqu
 	// TODO: This reads the dependency file, but the actual building
 	// does it again. Should the result be somehow cached? Perhaps
 	// remove the object file if it is found to be stale?
-	unchanged, err := builder_utils.ObjFileIsUpToDate(ctx, sourcePath, objPath, depPath)
+	unchanged, err := builder_utils.ObjFileIsUpToDate(f.ctx, sourcePath, objPath, depPath)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -322,23 +340,22 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, queue *Uniqu
 	first := true
 	for {
 		var include string
-		cache.ExpectFile(sourcePath)
+		f.cache.ExpectFile(sourcePath)
 
-		includes := ctx.IncludeFolders
+		includes := f.ctx.IncludeFolders
 		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityDir != nil {
 			includes = append(includes, library.UtilityDir)
 		}
 
 		var preproc_err error
 		var preproc_stderr []byte
-
-		if unchanged && cache.valid {
-			include = cache.Next().Include
-			if first && ctx.Verbose {
-				ctx.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
+		if unchanged && f.cache.valid {
+			include = f.cache.Next().Include
+			if first && f.ctx.Verbose {
+				f.ctx.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 		} else {
-			preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
+			preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, includes)
 			// Unwrap error and see if it is an ExitError.
 			_, is_exit_error := errors.Cause(preproc_err).(*exec.ExitError)
 			if preproc_err == nil {
@@ -351,26 +368,26 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, queue *Uniqu
 				return errors.WithStack(preproc_err)
 			} else {
 				include = IncludesFinderWithRegExp(string(preproc_stderr))
-				if include == "" && ctx.Verbose {
-					ctx.Info(tr("Error while detecting libraries included by %[1]s", sourcePath))
+				if include == "" && f.ctx.Verbose {
+					f.ctx.Info(tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
 			}
 		}
 
 		if include == "" {
 			// No missing includes found, we're done
-			cache.ExpectEntry(sourcePath, "", nil)
+			f.cache.ExpectEntry(sourcePath, "", nil)
 			return nil
 		}
 
-		library := ResolveLibrary(ctx, include)
+		library := ResolveLibrary(f.ctx, include)
 		if library == nil {
 			// Library could not be resolved, show error
 			// err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: paths.New(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), Includes: includes})
 			// return errors.WithStack(err)
 			if preproc_err == nil || preproc_stderr == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
-				preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
+				preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, includes)
 				if preproc_err == nil {
 					// If there is a missing #include in the cache, but running
 					// gcc does not reproduce that, there is something wrong.
@@ -379,32 +396,32 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, queue *Uniqu
 					return errors.New(tr("Internal error in cache"))
 				}
 			}
-			ctx.Stderr.Write(preproc_stderr)
+			f.ctx.Stderr.Write(preproc_stderr)
 			return errors.WithStack(preproc_err)
 		}
 
 		// Add this library to the list of libraries, the
 		// include path and queue its source files for further
 		// include scanning
-		ctx.ImportedLibraries = append(ctx.ImportedLibraries, library)
-		appendIncludeFolder(ctx, cache, sourcePath, include, library.SourceDir)
+		f.ctx.ImportedLibraries = append(f.ctx.ImportedLibraries, library)
+		f.appendIncludeFolder(sourcePath, include, library.SourceDir)
 		sourceDirs := library.SourceDirs()
 		for _, sourceDir := range sourceDirs {
 			if library.Precompiled && library.PrecompiledWithSources {
 				// Fully precompiled libraries should have no dependencies
 				// to avoid ABI breakage
-				if ctx.Verbose {
-					ctx.Info(tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
+				if f.ctx.Verbose {
+					f.ctx.Info(tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
 				}
 			} else {
-				queueSourceFilesFromFolder(ctx, queue, library, sourceDir.Dir, sourceDir.Recurse)
+				f.queueSourceFilesFromFolder(library, sourceDir.Dir, sourceDir.Recurse)
 			}
 		}
 		first = false
 	}
 }
 
-func queueSourceFilesFromFolder(ctx *types.Context, queue *UniqueSourceFileQueue, origin interface{}, folder *paths.Path, recurse bool) error {
+func (f *CppIncludesFinder) queueSourceFilesFromFolder(origin interface{}, folder *paths.Path, recurse bool) error {
 	extensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] }
 
 	filePaths := []string{}
@@ -414,11 +431,11 @@ func queueSourceFilesFromFolder(ctx *types.Context, queue *UniqueSourceFileQueue
 	}
 
 	for _, filePath := range filePaths {
-		sourceFile, err := MakeSourceFilee(ctx, origin, paths.New(filePath))
+		sourceFile, err := MakeSourceFile(f.ctx, origin, paths.New(filePath))
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		queue.Push(sourceFile)
+		f.queue.Push(sourceFile)
 	}
 
 	return nil
@@ -434,7 +451,7 @@ type SourceFile struct {
 // Create a SourceFile containing the given source file path within the
 // given origin. The given path can be absolute, or relative within the
 // origin's root source folder
-func MakeSourceFilee(ctx *types.Context, origin interface{}, path *paths.Path) (SourceFile, error) {
+func MakeSourceFile(ctx *types.Context, origin interface{}, path *paths.Path) (SourceFile, error) {
 	if path.IsAbs() {
 		var err error
 		path, err = sourceRoot(ctx, origin).RelTo(path)
