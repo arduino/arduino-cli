@@ -485,31 +485,33 @@ func (f *SourceFile) DepfilePath(ctx *types.Context) *paths.Path {
 	return buildRoot(ctx, f.Origin).Join(f.RelativePath.String() + ".d")
 }
 
-type UniqueSourceFileQueue []SourceFile
-
-func (queue UniqueSourceFileQueue) Len() int {
-	return len(queue)
+type UniqueSourceFileQueue struct {
+	queue []SourceFile
+	curr  int
 }
 
-func (queue *UniqueSourceFileQueue) Push(value SourceFile) {
-	if !queue.Contains(value) {
-		*queue = append(*queue, value)
+func (q *UniqueSourceFileQueue) Len() int {
+	return len(q.queue) - q.curr
+}
+
+func (q *UniqueSourceFileQueue) Push(value SourceFile) {
+	if !q.Contains(value) {
+		q.queue = append(q.queue, value)
 	}
 }
 
-func (queue *UniqueSourceFileQueue) Pop() SourceFile {
-	old := *queue
-	x := old[0]
-	*queue = old[1:]
-	return x
+func (q *UniqueSourceFileQueue) Pop() SourceFile {
+	res := q.queue[q.curr]
+	q.curr++
+	return res
 }
 
-func (queue *UniqueSourceFileQueue) Empty() bool {
-	return queue.Len() == 0
+func (q *UniqueSourceFileQueue) Empty() bool {
+	return q.Len() == 0
 }
 
-func (queue *UniqueSourceFileQueue) Contains(target SourceFile) bool {
-	for _, elem := range *queue {
+func (q *UniqueSourceFileQueue) Contains(target SourceFile) bool {
+	for _, elem := range q.queue {
 		if elem.Origin == target.Origin && elem.RelativePath.EqualsTo(target.RelativePath) {
 			return true
 		}
