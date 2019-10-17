@@ -16,74 +16,11 @@
 package types
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	paths "github.com/arduino/go-paths-helper"
 )
-
-type SourceFile struct {
-	// Sketch or Library pointer that this source file lives in
-	Origin interface{}
-	// Path to the source file within the sketch/library root folder
-	RelativePath *paths.Path
-}
-
-// Create a SourceFile containing the given source file path within the
-// given origin. The given path can be absolute, or relative within the
-// origin's root source folder
-func MakeSourceFile(ctx *Context, origin interface{}, path *paths.Path) (SourceFile, error) {
-	if path.IsAbs() {
-		var err error
-		path, err = sourceRoot(ctx, origin).RelTo(path)
-		if err != nil {
-			return SourceFile{}, err
-		}
-	}
-	return SourceFile{Origin: origin, RelativePath: path}, nil
-}
-
-// Return the build root for the given origin, where build products will
-// be placed. Any directories inside SourceFile.RelativePath will be
-// appended here.
-func buildRoot(ctx *Context, origin interface{}) *paths.Path {
-	switch o := origin.(type) {
-	case *sketch.Sketch:
-		return ctx.SketchBuildPath
-	case *libraries.Library:
-		return ctx.LibrariesBuildPath.Join(o.Name)
-	default:
-		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
-	}
-}
-
-// Return the source root for the given origin, where its source files
-// can be found. Prepending this to SourceFile.RelativePath will give
-// the full path to that source file.
-func sourceRoot(ctx *Context, origin interface{}) *paths.Path {
-	switch o := origin.(type) {
-	case *sketch.Sketch:
-		return ctx.SketchBuildPath
-	case *libraries.Library:
-		return o.SourceDir
-	default:
-		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
-	}
-}
-
-func (f *SourceFile) SourcePath(ctx *Context) *paths.Path {
-	return sourceRoot(ctx, f.Origin).JoinPath(f.RelativePath)
-}
-
-func (f *SourceFile) ObjectPath(ctx *Context) *paths.Path {
-	return buildRoot(ctx, f.Origin).Join(f.RelativePath.String() + ".o")
-}
-
-func (f *SourceFile) DepfilePath(ctx *Context) *paths.Path {
-	return buildRoot(ctx, f.Origin).Join(f.RelativePath.String() + ".d")
-}
 
 type SketchFile struct {
 	Name *paths.Path

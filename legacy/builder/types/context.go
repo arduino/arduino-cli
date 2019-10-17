@@ -111,8 +111,6 @@ type Context struct {
 	SketchObjectFiles            paths.PathList
 	IgnoreSketchFolderNameErrors bool
 
-	CollectedSourceFiles *UniqueSourceFileQueue
-
 	Sketch          *sketch.Sketch
 	Source          string
 	SourceGccMinusE string

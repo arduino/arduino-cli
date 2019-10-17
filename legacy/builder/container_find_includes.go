@@ -99,6 +99,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
@@ -129,21 +130,21 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 	}
 
 	sketch := ctx.Sketch
-	mergedfile, err := types.MakeSourceFile(ctx, sketch, paths.New(sketch.MainFile.Base()+".cpp"))
+	mergedfile, err := MakeSourceFilee(ctx, sketch, paths.New(sketch.MainFile.Base()+".cpp"))
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	ctx.CollectedSourceFiles.Push(mergedfile)
+	queue := &UniqueSourceFileQueue{}
+	queue.Push(mergedfile)
 
-	sourceFilePaths := ctx.CollectedSourceFiles
-	queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, ctx.SketchBuildPath, false /* recurse */)
+	queueSourceFilesFromFolder(ctx, queue, sketch, ctx.SketchBuildPath, false /* recurse */)
 	srcSubfolderPath := ctx.SketchBuildPath.Join("src")
 	if srcSubfolderPath.IsDir() {
-		queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, srcSubfolderPath, true /* recurse */)
+		queueSourceFilesFromFolder(ctx, queue, sketch, srcSubfolderPath, true /* recurse */)
 	}
 
-	for !sourceFilePaths.Empty() {
-		if err := findIncludesUntilDone(ctx, cache, sourceFilePaths.Pop()); err != nil {
+	for !queue.Empty() {
+		if err := findIncludesUntilDone(ctx, cache, queue, queue.Pop()); err != nil {
 			cache.Remove()
 			return errors.WithStack(err)
 		}
@@ -295,7 +296,7 @@ func (cache *includeCache) WriteToFile() error {
 	return nil
 }
 
-func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile types.SourceFile) error {
+func findIncludesUntilDone(ctx *types.Context, cache *includeCache, queue *UniqueSourceFileQueue, sourceFile SourceFile) error {
 	sourcePath := sourceFile.SourcePath(ctx)
 	targetFilePath := paths.NullPath()
 	depPath := sourceFile.DepfilePath(ctx)
@@ -396,14 +397,14 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 					ctx.Info(tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
 				}
 			} else {
-				queueSourceFilesFromFolder(ctx, ctx.CollectedSourceFiles, library, sourceDir.Dir, sourceDir.Recurse)
+				queueSourceFilesFromFolder(ctx, queue, library, sourceDir.Dir, sourceDir.Recurse)
 			}
 		}
 		first = false
 	}
 }
 
-func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFileQueue, origin interface{}, folder *paths.Path, recurse bool) error {
+func queueSourceFilesFromFolder(ctx *types.Context, queue *UniqueSourceFileQueue, origin interface{}, folder *paths.Path, recurse bool) error {
 	extensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] }
 
 	filePaths := []string{}
@@ -413,7 +414,7 @@ func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFil
 	}
 
 	for _, filePath := range filePaths {
-		sourceFile, err := types.MakeSourceFile(ctx, origin, paths.New(filePath))
+		sourceFile, err := MakeSourceFilee(ctx, origin, paths.New(filePath))
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -421,4 +422,97 @@ func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFil
 	}
 
 	return nil
+}
+
+type SourceFile struct {
+	// Sketch or Library pointer that this source file lives in
+	Origin interface{}
+	// Path to the source file within the sketch/library root folder
+	RelativePath *paths.Path
+}
+
+// Create a SourceFile containing the given source file path within the
+// given origin. The given path can be absolute, or relative within the
+// origin's root source folder
+func MakeSourceFilee(ctx *types.Context, origin interface{}, path *paths.Path) (SourceFile, error) {
+	if path.IsAbs() {
+		var err error
+		path, err = sourceRoot(ctx, origin).RelTo(path)
+		if err != nil {
+			return SourceFile{}, err
+		}
+	}
+	return SourceFile{Origin: origin, RelativePath: path}, nil
+}
+
+// Return the build root for the given origin, where build products will
+// be placed. Any directories inside SourceFile.RelativePath will be
+// appended here.
+func buildRoot(ctx *types.Context, origin interface{}) *paths.Path {
+	switch o := origin.(type) {
+	case *sketch.Sketch:
+		return ctx.SketchBuildPath
+	case *libraries.Library:
+		return ctx.LibrariesBuildPath.Join(o.Name)
+	default:
+		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
+	}
+}
+
+// Return the source root for the given origin, where its source files
+// can be found. Prepending this to SourceFile.RelativePath will give
+// the full path to that source file.
+func sourceRoot(ctx *types.Context, origin interface{}) *paths.Path {
+	switch o := origin.(type) {
+	case *sketch.Sketch:
+		return ctx.SketchBuildPath
+	case *libraries.Library:
+		return o.SourceDir
+	default:
+		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
+	}
+}
+
+func (f *SourceFile) SourcePath(ctx *types.Context) *paths.Path {
+	return sourceRoot(ctx, f.Origin).JoinPath(f.RelativePath)
+}
+
+func (f *SourceFile) ObjectPath(ctx *types.Context) *paths.Path {
+	return buildRoot(ctx, f.Origin).Join(f.RelativePath.String() + ".o")
+}
+
+func (f *SourceFile) DepfilePath(ctx *types.Context) *paths.Path {
+	return buildRoot(ctx, f.Origin).Join(f.RelativePath.String() + ".d")
+}
+
+type UniqueSourceFileQueue []SourceFile
+
+func (queue UniqueSourceFileQueue) Len() int           { return len(queue) }
+func (queue UniqueSourceFileQueue) Less(i, j int) bool { return false }
+func (queue UniqueSourceFileQueue) Swap(i, j int)      { panic("Who called me?!?") }
+
+func (queue *UniqueSourceFileQueue) Push(value SourceFile) {
+	if !sliceContainsSourceFile(*queue, value) {
+		*queue = append(*queue, value)
+	}
+}
+
+func (queue *UniqueSourceFileQueue) Pop() SourceFile {
+	old := *queue
+	x := old[0]
+	*queue = old[1:]
+	return x
+}
+
+func (queue *UniqueSourceFileQueue) Empty() bool {
+	return queue.Len() == 0
+}
+
+func sliceContainsSourceFile(slice []SourceFile, target SourceFile) bool {
+	for _, elem := range slice {
+		if elem.Origin == target.Origin && elem.RelativePath.EqualsTo(target.RelativePath) {
+			return true
+		}
+	}
+	return false
 }
