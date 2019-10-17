@@ -155,16 +155,16 @@ func (f *CppIncludesFinder) DetectLibraries() error {
 		f.appendIncludeFolder(nil, "", f.ctx.BuildProperties.GetPath("build.variant.path"))
 	}
 
-	mergedfile, err := MakeSourceFile(f.ctx, f.sketch, paths.New(f.sketch.MainFile.Base()+".cpp"))
+	mergedfile, err := MakeSourceFile(f.ctx, nil, paths.New(f.sketch.MainFile.Base()+".cpp"))
 	if err != nil {
 		return errors.WithStack(err)
 	}
 	f.queue.Push(mergedfile)
 
-	f.queueSourceFilesFromFolder(f.sketch, f.ctx.SketchBuildPath, false /* recurse */)
+	f.queueSourceFilesFromFolder(nil, f.ctx.SketchBuildPath, false /* recurse */)
 	srcSubfolderPath := f.ctx.SketchBuildPath.Join("src")
 	if srcSubfolderPath.IsDir() {
-		f.queueSourceFilesFromFolder(f.sketch, srcSubfolderPath, true /* recurse */)
+		f.queueSourceFilesFromFolder(nil, srcSubfolderPath, true /* recurse */)
 	}
 
 	for !f.queue.Empty() {
@@ -343,8 +343,8 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
 		f.cache.ExpectFile(sourcePath)
 
 		includes := f.ctx.IncludeFolders
-		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityDir != nil {
-			includes = append(includes, library.UtilityDir)
+		if sourceFile.Library != nil && sourceFile.Library.UtilityDir != nil {
+			includes = append(includes, sourceFile.Library.UtilityDir)
 		}
 
 		var preproc_err error
@@ -421,7 +421,7 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
 	}
 }
 
-func (f *CppIncludesFinder) queueSourceFilesFromFolder(origin interface{}, folder *paths.Path, recurse bool) error {
+func (f *CppIncludesFinder) queueSourceFilesFromFolder(lib *libraries.Library, folder *paths.Path, recurse bool) error {
 	extensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] }
 
 	filePaths := []string{}
@@ -431,7 +431,7 @@ func (f *CppIncludesFinder) queueSourceFilesFromFolder(origin interface{}, folde
 	}
 
 	for _, filePath := range filePaths {
-		sourceFile, err := MakeSourceFile(f.ctx, origin, paths.New(filePath))
+		sourceFile, err := MakeSourceFile(f.ctx, lib, paths.New(filePath))
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -442,8 +442,9 @@ func (f *CppIncludesFinder) queueSourceFilesFromFolder(origin interface{}, folde
 }
 
 type SourceFile struct {
-	// Sketch or Library pointer that this source file lives in
-	Origin interface{}
+	// Library pointer that this source file lives in or nil if not part of a library
+	Library *libraries.Library
+
 	// Path to the source file within the sketch/library root folder
 	RelativePath *paths.Path
 }
@@ -451,55 +452,47 @@ type SourceFile struct {
 // Create a SourceFile containing the given source file path within the
 // given origin. The given path can be absolute, or relative within the
 // origin's root source folder
-func MakeSourceFile(ctx *types.Context, origin interface{}, path *paths.Path) (SourceFile, error) {
+func MakeSourceFile(ctx *types.Context, lib *libraries.Library, path *paths.Path) (SourceFile, error) {
 	if path.IsAbs() {
 		var err error
-		path, err = sourceRoot(ctx, origin).RelTo(path)
+		path, err = sourceRoot(ctx, lib).RelTo(path)
 		if err != nil {
 			return SourceFile{}, err
 		}
 	}
-	return SourceFile{Origin: origin, RelativePath: path}, nil
+	return SourceFile{Library: lib, RelativePath: path}, nil
 }
 
 // Return the build root for the given origin, where build products will
 // be placed. Any directories inside SourceFile.RelativePath will be
 // appended here.
-func buildRoot(ctx *types.Context, origin interface{}) *paths.Path {
-	switch o := origin.(type) {
-	case *sketch.Sketch:
+func buildRoot(ctx *types.Context, lib *libraries.Library) *paths.Path {
+	if lib == nil {
 		return ctx.SketchBuildPath
-	case *libraries.Library:
-		return ctx.LibrariesBuildPath.Join(o.Name)
-	default:
-		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
 	}
+	return ctx.LibrariesBuildPath.Join(lib.Name)
 }
 
 // Return the source root for the given origin, where its source files
 // can be found. Prepending this to SourceFile.RelativePath will give
 // the full path to that source file.
-func sourceRoot(ctx *types.Context, origin interface{}) *paths.Path {
-	switch o := origin.(type) {
-	case *sketch.Sketch:
+func sourceRoot(ctx *types.Context, lib *libraries.Library) *paths.Path {
+	if lib == nil {
 		return ctx.SketchBuildPath
-	case *libraries.Library:
-		return o.SourceDir
-	default:
-		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
 	}
+	return lib.SourceDir
 }
 
 func (f *SourceFile) SourcePath(ctx *types.Context) *paths.Path {
-	return sourceRoot(ctx, f.Origin).JoinPath(f.RelativePath)
+	return sourceRoot(ctx, f.Library).JoinPath(f.RelativePath)
 }
 
 func (f *SourceFile) ObjectPath(ctx *types.Context) *paths.Path {
-	return buildRoot(ctx, f.Origin).Join(f.RelativePath.String() + ".o")
+	return buildRoot(ctx, f.Library).Join(f.RelativePath.String() + ".o")
 }
 
 func (f *SourceFile) DepfilePath(ctx *types.Context) *paths.Path {
-	return buildRoot(ctx, f.Origin).Join(f.RelativePath.String() + ".d")
+	return buildRoot(ctx, f.Library).Join(f.RelativePath.String() + ".d")
 }
 
 type UniqueSourceFileQueue struct {
@@ -529,7 +522,7 @@ func (q *UniqueSourceFileQueue) Empty() bool {
 
 func (q *UniqueSourceFileQueue) Contains(target SourceFile) bool {
 	for _, elem := range q.queue {
-		if elem.Origin == target.Origin && elem.RelativePath.EqualsTo(target.RelativePath) {
+		if elem.Library == target.Library && elem.RelativePath.EqualsTo(target.RelativePath) {
 			return true
 		}
 	}
