@@ -121,8 +121,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 }
 
 func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
-	cachePath := ctx.BuildPath.Join("includes.cache")
-	cache := readCache(cachePath)
+	cache := loadCacheFrom(ctx.BuildPath.Join("includes.cache"))
 
 	appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath("build.core.path"))
 	if ctx.BuildProperties.Get("build.variant.path") != "" {
@@ -144,17 +143,15 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 	}
 
 	for !sourceFilePaths.Empty() {
-		err := findIncludesUntilDone(ctx, cache, sourceFilePaths.Pop())
-		if err != nil {
-			cachePath.Remove()
+		if err := findIncludesUntilDone(ctx, cache, sourceFilePaths.Pop()); err != nil {
+			cache.Remove()
 			return errors.WithStack(err)
 		}
 	}
 
 	// Finalize the cache
 	cache.ExpectEnd()
-	err = writeCache(cache, cachePath)
-	if err != nil {
+	if err := cache.WriteToFile(); err != nil {
 		return errors.WithStack(err)
 	}
 
@@ -203,6 +200,10 @@ func (entry *includeCacheEntry) Equals(other *includeCacheEntry) bool {
 type includeCache struct {
 	// Are the cache contents valid so far?
 	valid bool
+
+	// The file where to save the cache
+	cacheFilePath *paths.Path
+
 	// Index into entries of the next entry to be processed. Unused
 	// when the cache is invalid.
 	next    int
@@ -255,39 +256,39 @@ func (cache *includeCache) ExpectEnd() {
 	}
 }
 
-// Read the cache from the given file
-func readCache(path *paths.Path) *includeCache {
-	bytes, err := path.ReadFile()
-	if err != nil {
-		// Return an empty, invalid cache
-		return &includeCache{}
+// Remove removes the cache file from disk.
+func (cache *includeCache) Remove() error {
+	return cache.cacheFilePath.Remove()
+}
+
+// loadCacheFrom read the cache from the given file
+func loadCacheFrom(path *paths.Path) *includeCache {
+	result := &includeCache{
+		cacheFilePath: path,
+		valid:         false,
 	}
-	result := &includeCache{}
-	err = json.Unmarshal(bytes, &result.entries)
-	if err != nil {
-		// Return an empty, invalid cache
-		return &includeCache{}
+	if bytes, err := path.ReadFile(); err != nil {
+		return result
+	} else if err = json.Unmarshal(bytes, &result.entries); err != nil {
+		return result
 	}
 	result.valid = true
 	return result
 }
 
-// Write the given cache to the given file if it is invalidated. If the
+// WriteToFile the cache file if it is invalidated. If the
 // cache is still valid, just update the timestamps of the file.
-func writeCache(cache *includeCache, path *paths.Path) error {
+func (cache *includeCache) WriteToFile() error {
 	// If the cache was still valid all the way, just touch its file
 	// (in case any source file changed without influencing the
 	// includes). If it was invalidated, overwrite the cache with
 	// the new contents.
 	if cache.valid {
-		path.Chtimes(time.Now(), time.Now())
+		cache.cacheFilePath.Chtimes(time.Now(), time.Now())
 	} else {
-		bytes, err := json.MarshalIndent(cache.entries, "", "  ")
-		if err != nil {
+		if bytes, err := json.MarshalIndent(cache.entries, "", "  "); err != nil {
 			return errors.WithStack(err)
-		}
-		err = path.WriteFile(bytes)
-		if err != nil {
+		} else if err := cache.cacheFilePath.WriteFile(bytes); err != nil {
 			return errors.WithStack(err)
 		}
 	}
