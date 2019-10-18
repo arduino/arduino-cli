@@ -119,8 +119,11 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 		}
 
 		// if installed cores didn't recognize the board, try querying
-		// the builder API
-		if len(b) == 0 {
+		// the builder API if the board is a USB device port
+		if len(b) == 0 &&
+			port.IdentificationPrefs.ContainsKey("vid") &&
+			port.IdentificationPrefs.ContainsKey("pid") {
+
 			logrus.Debug("Querying builder API for board identification...")
 			items, err := apiByVidPid(
 				port.IdentificationPrefs.Get("vid"),
