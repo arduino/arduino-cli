@@ -90,6 +90,17 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	return retVal, nil
 }
 
+func identifyViaCloudAPI(port *commands.BoardPort) ([]*rpc.BoardListItem, error) {
+	// If the port is not USB do not try identification via cloud
+	id := port.IdentificationPrefs
+	if !id.ContainsKey("vid") || !id.ContainsKey("pid") {
+		return nil, ErrNotFound
+	}
+
+	logrus.Debug("Querying builder API for board identification...")
+	return apiByVidPid(id.Get("vid"), id.Get("pid"))
+}
+
 // List FIXMEDOC
 func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 	m.Lock()
@@ -120,15 +131,8 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 
 		// if installed cores didn't recognize the board, try querying
 		// the builder API if the board is a USB device port
-		if len(b) == 0 &&
-			port.IdentificationPrefs.ContainsKey("vid") &&
-			port.IdentificationPrefs.ContainsKey("pid") {
-
-			logrus.Debug("Querying builder API for board identification...")
-			items, err := apiByVidPid(
-				port.IdentificationPrefs.Get("vid"),
-				port.IdentificationPrefs.Get("pid"),
-			)
+		if len(b) == 0 {
+			items, err := identifyViaCloudAPI(port)
 			if err == ErrNotFound {
 				// the board couldn't be detected, print a warning
 				logrus.Debug("Board not recognized")
