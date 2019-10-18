@@ -35,6 +35,9 @@ import (
 var (
 	// ErrNotFound is returned when the API returns 404
 	ErrNotFound = errors.New("board not found")
+	// ErrInvalidParams is returned when invalid VID or PID are passed to the API
+	ErrInvalidParams = errors.New("Invalid VID/PID parameters")
+
 	m           sync.Mutex
 	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
@@ -42,11 +45,8 @@ var (
 
 func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	// ensure vid and pid are valid before hitting the API
-	if !validVidPid.MatchString(vid) {
-		return nil, errors.Errorf("Invalid vid value: '%s'", vid)
-	}
-	if !validVidPid.MatchString(pid) {
-		return nil, errors.Errorf("Invalid pid value: '%s'", pid)
+	if !validVidPid.MatchString(vid) || !validVidPid.MatchString(pid) {
+		return nil, ErrInvalidParams
 	}
 
 	url := fmt.Sprintf("%s/%s/%s", vidPidURL, vid, pid)
@@ -126,7 +126,7 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 				port.IdentificationPrefs.Get("vid"),
 				port.IdentificationPrefs.Get("pid"),
 			)
-			if err == ErrNotFound {
+			if err == ErrNotFound || err == ErrInvalidParams {
 				// the board couldn't be detected, print a warning
 				logrus.Debug("Board not recognized")
 			} else if err != nil {
