@@ -342,8 +342,6 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
 		var include string
 		f.cache.ExpectFile(sourcePath)
 
-		includes := f.ctx.IncludeFolders
-
 		var preprocErr error
 		var preprocStderr []byte
 		if unchanged && f.cache.valid {
@@ -352,7 +350,7 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
 				f.ctx.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 		} else {
-			preprocStderr, preprocErr = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, includes)
+			preprocStderr, preprocErr = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, f.ctx.IncludeFolders)
 			// Unwrap error and see if it is an ExitError.
 			_, isExitError := errors.Cause(preprocErr).(*exec.ExitError)
 			if preprocErr == nil {
@@ -384,7 +382,7 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
 			// return errors.WithStack(err)
 			if preprocErr == nil || preprocStderr == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
-				preprocStderr, preprocErr = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, includes)
+				preprocStderr, preprocErr = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, f.ctx.IncludeFolders)
 				if preprocErr == nil {
 					// If there is a missing #include in the cache, but running
 					// gcc does not reproduce that, there is something wrong.
@@ -404,7 +402,7 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
 		f.appendIncludeFolder(sourcePath, include, library.SourceDir)
 		if library.UtilityDir != nil {
 			// TODO: Use library.SourceDirs() instead?
-			includes = append(includes, library.UtilityDir)
+			f.ctx.IncludeFolders = append(f.ctx.IncludeFolders, library.UtilityDir)
 		}
 		sourceDirs := library.SourceDirs()
 		for _, sourceDir := range sourceDirs {
