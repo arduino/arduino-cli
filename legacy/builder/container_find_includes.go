@@ -501,31 +501,42 @@ func (f *SourceFile) Equals(other *SourceFile) bool {
 		f.RelativePath.EqualsTo(other.RelativePath)
 }
 
+// UniqueSourceFileQueue is a queue of SourceFile. A SourceFile
+// can be pushed in the queue only once.
 type UniqueSourceFileQueue struct {
 	queue []*SourceFile
 	curr  int
 }
 
+// Len returns the number of element waiting in the queue
 func (q *UniqueSourceFileQueue) Len() int {
 	return len(q.queue) - q.curr
 }
 
+// Push insert a new element in the queue
 func (q *UniqueSourceFileQueue) Push(value *SourceFile) {
 	if !q.Contains(value) {
 		q.queue = append(q.queue, value)
 	}
 }
 
+// Pop return the first element in the queue or nil if the queue is empty
 func (q *UniqueSourceFileQueue) Pop() *SourceFile {
+	if q.Empty() {
+		return nil
+	}
 	res := q.queue[q.curr]
 	q.curr++
 	return res
 }
 
+// Empty returns true if the queue is empty
 func (q *UniqueSourceFileQueue) Empty() bool {
 	return q.Len() == 0
 }
 
+// Contains return true if the target elemen has been already added
+// in the queue (even if the element has been alread popped out)
 func (q *UniqueSourceFileQueue) Contains(target *SourceFile) bool {
 	for _, elem := range q.queue {
 		if elem.Equals(target) {
