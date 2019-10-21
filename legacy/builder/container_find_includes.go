@@ -105,6 +105,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type ContainerFindIncludes struct{}
@@ -143,12 +144,14 @@ type CppIncludesFinder struct {
 	cache  *includeCache
 	sketch *sketch.Sketch
 	queue  *UniqueSourceFileQueue
+	log    *logrus.Entry
 }
 
 func (f *CppIncludesFinder) DetectLibraries() error {
 	f.cache = loadCacheFrom(f.ctx.BuildPath.Join("includes.cache"))
 	f.sketch = f.ctx.Sketch
 	f.queue = &UniqueSourceFileQueue{}
+	f.log = logrus.WithField("task", "DetectingLibraries")
 
 	f.appendIncludeFolder(nil, "", f.ctx.BuildProperties.GetPath("build.core.path"))
 	if f.ctx.BuildProperties.Get("build.variant.path") != "" {
@@ -159,6 +162,7 @@ func (f *CppIncludesFinder) DetectLibraries() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	f.log.Debugf("Queueing merged sketch: %s", mergedfile)
 	f.queue.Push(mergedfile)
 
 	f.queueSourceFilesFromFolder(nil, f.ctx.SketchBuildPath, false /* recurse */)
@@ -188,6 +192,7 @@ func (f *CppIncludesFinder) DetectLibraries() error {
 // and should be the empty string for the default include folders, like
 // the core or variant.
 func (f *CppIncludesFinder) appendIncludeFolder(sourceFilePath *paths.Path, include string, folder *paths.Path) {
+	f.log.Debugf("Using include folder: %s", folder)
 	f.ctx.IncludeFolders = append(f.ctx.IncludeFolders, folder)
 	f.cache.ExpectEntry(sourceFilePath, include, folder)
 }
@@ -422,7 +427,7 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
 
 func (f *CppIncludesFinder) queueSourceFilesFromFolder(lib *libraries.Library, folder *paths.Path, recurse bool) error {
 	extensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] }
-
+	f.log.Debugf("  Queueing source files from %s (recurse %v)", folder, recurse)
 	filePaths := []string{}
 	err := utils.FindFilesInFolder(&filePaths, folder.String(), extensions, recurse)
 	if err != nil {
@@ -434,6 +439,7 @@ func (f *CppIncludesFinder) queueSourceFilesFromFolder(lib *libraries.Library, f
 		if err != nil {
 			return errors.WithStack(err)
 		}
+		f.log.Debugf("    Queuing %s", sourceFile)
 		f.queue.Push(sourceFile)
 	}
 
@@ -446,6 +452,13 @@ type SourceFile struct {
 
 	// Path to the source file within the sketch/library root folder
 	RelativePath *paths.Path
+
+	ctx *types.Context
+}
+
+func (f SourceFile) String() string {
+	return fmt.Sprintf("Root: %s - Path: %s - BuildPath: %s",
+		sourceRoot(f.ctx, f.Library), f.RelativePath, buildRoot(f.ctx, f.Library))
 }
 
 // Create a SourceFile containing the given source file path within the
@@ -459,7 +472,7 @@ func MakeSourceFile(ctx *types.Context, lib *libraries.Library, path *paths.Path
 			return SourceFile{}, err
 		}
 	}
-	return SourceFile{Library: lib, RelativePath: path}, nil
+	return SourceFile{Library: lib, RelativePath: path, ctx: ctx}, nil
 }
 
 // Return the build root for the given origin, where build products will

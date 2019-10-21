@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
@@ -297,6 +298,7 @@ func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
 		Verbose:              true,
 	}
 
+	logrus.SetLevel(logrus.DebugLevel)
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
 
