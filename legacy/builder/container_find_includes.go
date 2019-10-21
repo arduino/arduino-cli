@@ -446,6 +446,8 @@ func (f *CppIncludesFinder) queueSourceFilesFromFolder(srcDir, buildDir *paths.P
 	return nil
 }
 
+// SourceFile represent a source file, it keeps a reference to the root source
+// directory and the corresponding build root directory.
 type SourceFile struct {
 	// SourceRoot is the path to the source code root directory
 	SourceRoot *paths.Path
@@ -463,26 +465,30 @@ func (f SourceFile) String() string {
 }
 
 // MakeSourceFile creates a SourceFile containing the given source file path
-// within the given sourceRoot.
-func MakeSourceFile(sourceRoot, buildRoot, path *paths.Path) (SourceFile, error) {
-	if path.IsAbs() {
-		if relPath, err := sourceRoot.RelTo(path); err == nil {
-			path = relPath
+// within the given sourceRoot. If srcPath is absolute it is transformed to
+// relative to sourceRoot.
+func MakeSourceFile(sourceRoot, buildRoot, srcPath *paths.Path) (SourceFile, error) {
+	if srcPath.IsAbs() {
+		if relPath, err := sourceRoot.RelTo(srcPath); err == nil {
+			srcPath = relPath
 		} else {
 			return SourceFile{}, err
 		}
 	}
-	return SourceFile{SourceRoot: sourceRoot, BuildRoot: buildRoot, RelativePath: path}, nil
+	return SourceFile{SourceRoot: sourceRoot, BuildRoot: buildRoot, RelativePath: srcPath}, nil
 }
 
+// SourcePath returns the path to the source file
 func (f *SourceFile) SourcePath() *paths.Path {
 	return f.SourceRoot.JoinPath(f.RelativePath)
 }
 
+// ObjectPath returns the path to the object file (.o)
 func (f *SourceFile) ObjectPath() *paths.Path {
 	return f.BuildRoot.Join(f.RelativePath.String() + ".o")
 }
 
+// DepfilePath returns the path to the dependencies file (.d)
 func (f *SourceFile) DepfilePath() *paths.Path {
 	return f.BuildRoot.Join(f.RelativePath.String() + ".d")
 }
