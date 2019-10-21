@@ -332,9 +332,6 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
 		f.cache.ExpectFile(sourcePath)
 
 		includes := f.ctx.IncludeFolders
-		if sourceFile.Library != nil && sourceFile.Library.UtilityDir != nil {
-			includes = append(includes, sourceFile.Library.UtilityDir)
-		}
 		var preproc_err error
 		var preproc_stderr []byte
 		if unchanged && f.cache.valid {
@@ -393,6 +390,10 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
 		// include scanning
 		f.ctx.ImportedLibraries = append(f.ctx.ImportedLibraries, library)
 		f.appendIncludeFolder(sourcePath, include, library.SourceDir)
+		if library.UtilityDir != nil {
+			// TODO: Use library.SourceDirs() instead?
+			includes = append(includes, library.UtilityDir)
+		}
 		sourceDirs := library.SourceDirs()
 		for _, sourceDir := range sourceDirs {
 			f.queueSourceFilesFromFolder(library, sourceDir.Dir, sourceDir.Recurse)
