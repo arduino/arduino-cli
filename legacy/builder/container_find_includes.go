@@ -318,7 +318,7 @@ func (cache *includeCache) WriteToFile() error {
 	return nil
 }
 
-func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
+func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile *SourceFile) error {
 	sourcePath := sourceFile.SourcePath()
 	targetFilePath := paths.NullPath()
 	depPath := sourceFile.DepfilePath()
@@ -459,7 +459,7 @@ type SourceFile struct {
 	RelativePath *paths.Path
 }
 
-func (f SourceFile) String() string {
+func (f *SourceFile) String() string {
 	return fmt.Sprintf("Root: %s - Path: %s - BuildPath: %s",
 		f.SourceRoot, f.RelativePath, f.BuildRoot)
 }
@@ -467,15 +467,15 @@ func (f SourceFile) String() string {
 // MakeSourceFile creates a SourceFile containing the given source file path
 // within the given sourceRoot. If srcPath is absolute it is transformed to
 // relative to sourceRoot.
-func MakeSourceFile(sourceRoot, buildRoot, srcPath *paths.Path) (SourceFile, error) {
+func MakeSourceFile(sourceRoot, buildRoot, srcPath *paths.Path) (*SourceFile, error) {
 	if srcPath.IsAbs() {
 		if relPath, err := sourceRoot.RelTo(srcPath); err == nil {
 			srcPath = relPath
 		} else {
-			return SourceFile{}, err
+			return nil, err
 		}
 	}
-	return SourceFile{SourceRoot: sourceRoot, BuildRoot: buildRoot, RelativePath: srcPath}, nil
+	return &SourceFile{SourceRoot: sourceRoot, BuildRoot: buildRoot, RelativePath: srcPath}, nil
 }
 
 // SourcePath returns the path to the source file
@@ -493,8 +493,16 @@ func (f *SourceFile) DepfilePath() *paths.Path {
 	return f.BuildRoot.Join(f.RelativePath.String() + ".d")
 }
 
+// Equals return true if the SourceFile equals to the SourceFile
+// passed as parameter
+func (f *SourceFile) Equals(other *SourceFile) bool {
+	return f.BuildRoot.EqualsTo(other.BuildRoot) &&
+		f.SourceRoot.EqualsTo(other.SourceRoot) &&
+		f.RelativePath.EqualsTo(other.RelativePath)
+}
+
 type UniqueSourceFileQueue struct {
-	queue []SourceFile
+	queue []*SourceFile
 	curr  int
 }
 
@@ -502,13 +510,13 @@ func (q *UniqueSourceFileQueue) Len() int {
 	return len(q.queue) - q.curr
 }
 
-func (q *UniqueSourceFileQueue) Push(value SourceFile) {
+func (q *UniqueSourceFileQueue) Push(value *SourceFile) {
 	if !q.Contains(value) {
 		q.queue = append(q.queue, value)
 	}
 }
 
-func (q *UniqueSourceFileQueue) Pop() SourceFile {
+func (q *UniqueSourceFileQueue) Pop() *SourceFile {
 	res := q.queue[q.curr]
 	q.curr++
 	return res
@@ -518,11 +526,9 @@ func (q *UniqueSourceFileQueue) Empty() bool {
 	return q.Len() == 0
 }
 
-func (q *UniqueSourceFileQueue) Contains(target SourceFile) bool {
+func (q *UniqueSourceFileQueue) Contains(target *SourceFile) bool {
 	for _, elem := range q.queue {
-		if elem.BuildRoot.EqualsTo(target.BuildRoot) &&
-			elem.SourceRoot.EqualsTo(target.SourceRoot) &&
-			elem.RelativePath.EqualsTo(target.RelativePath) {
+		if elem.Equals(target) {
 			return true
 		}
 	}
