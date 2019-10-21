@@ -259,7 +259,8 @@ func FindAllSubdirectories(folder string, output *[]string) error {
 	return gohasissues.Walk(folder, walkFunc)
 }
 
-func FindFilesInFolder(files *[]string, folder string, extensions CheckExtensionFunc, recurse bool) error {
+func FindFilesInFolder(folder string, extensions CheckExtensionFunc, recurse bool) ([]string, error) {
+	files := []string{}
 	walkFunc := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -295,10 +296,11 @@ func FindFilesInFolder(files *[]string, folder string, extensions CheckExtension
 		}
 		currentFile.Close()
 
-		*files = append(*files, path)
+		files = append(files, path)
 		return nil
 	}
-	return gohasissues.Walk(folder, walkFunc)
+	err := gohasissues.Walk(folder, walkFunc)
+	return files, err
 }
 
 func AppendIfNotPresent(target []string, elements ...string) []string {

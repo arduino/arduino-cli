@@ -428,8 +428,7 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile *SourceFile) error 
 func (f *CppIncludesFinder) queueSourceFilesFromFolder(srcDir, buildDir *paths.Path, recurse bool) error {
 	extensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] }
 	f.log.Debugf("  Queueing source files from %s (recurse %v)", srcDir, recurse)
-	filePaths := []string{}
-	err := utils.FindFilesInFolder(&filePaths, srcDir.String(), extensions, recurse)
+	filePaths, err := utils.FindFilesInFolder(srcDir.String(), extensions, recurse)
 	if err != nil {
 		return errors.WithStack(err)
 	}

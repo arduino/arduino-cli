@@ -89,8 +89,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		}
 
 		// Remove stray folders contining incompatible or not needed libraries archives
-		var files []string
-		utils.FindFilesInFolder(&files, libDir.Join("src").String(), staticLibsExtensions, true)
+		files, _ := utils.FindFilesInFolder(libDir.Join("src").String(), staticLibsExtensions, true)
 		for _, file := range files {
 			staticLibDir := filepath.Dir(file)
 			if !isStaticLib || !strings.Contains(staticLibDir, mcu) {
@@ -126,8 +125,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	}
 
 	// remove "#line 1 ..." from exported c_make folder sketch
-	var sketchFiles []string
-	utils.FindFilesInFolder(&sketchFiles, cmakeFolder.Join("sketch").String(), extensions, false)
+	sketchFiles, _ := utils.FindFilesInFolder(cmakeFolder.Join("sketch").String(), extensions, false)
 
 	for _, file := range sketchFiles {
 		input, err := ioutil.ReadFile(file)
@@ -161,14 +159,12 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	extractCompileFlags(ctx, constants.RECIPE_CPP_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
 
 	// Extract folders with .h in them for adding in include list
-	var headerFiles []string
 	isHeader := func(ext string) bool { return DOTHEXTENSION[ext] }
-	utils.FindFilesInFolder(&headerFiles, cmakeFolder.String(), isHeader, true)
+	headerFiles, _ := utils.FindFilesInFolder(cmakeFolder.String(), isHeader, true)
 	foldersContainingDotH := findUniqueFoldersRelative(headerFiles, cmakeFolder.String())
 
 	// Extract folders with .a in them for adding in static libs paths list
-	var staticLibs []string
-	utils.FindFilesInFolder(&staticLibs, cmakeFolder.String(), staticLibsExtensions, true)
+	staticLibs, _ := utils.FindFilesInFolder(cmakeFolder.String(), staticLibsExtensions, true)
 
 	// Generate the CMakeLists global file
 
