@@ -344,27 +344,27 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
 
 		includes := f.ctx.IncludeFolders
 
-		var preproc_err error
-		var preproc_stderr []byte
+		var preprocErr error
+		var preprocStderr []byte
 		if unchanged && f.cache.valid {
 			include = f.cache.Next().Include
 			if first && f.ctx.Verbose {
 				f.ctx.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 		} else {
-			preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, includes)
+			preprocStderr, preprocErr = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, includes)
 			// Unwrap error and see if it is an ExitError.
-			_, is_exit_error := errors.Cause(preproc_err).(*exec.ExitError)
-			if preproc_err == nil {
+			_, isExitError := errors.Cause(preprocErr).(*exec.ExitError)
+			if preprocErr == nil {
 				// Preprocessor successful, done
 				include = ""
-			} else if !is_exit_error || preproc_stderr == nil {
+			} else if !isExitError || preprocStderr == nil {
 				// Ignore ExitErrors (e.g. gcc returning
 				// non-zero status), but bail out on
 				// other errors
-				return errors.WithStack(preproc_err)
+				return errors.WithStack(preprocErr)
 			} else {
-				include = IncludesFinderWithRegExp(string(preproc_stderr))
+				include = IncludesFinderWithRegExp(string(preprocStderr))
 				if include == "" && f.ctx.Verbose {
 					f.ctx.Info(tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
@@ -382,10 +382,10 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
 			// Library could not be resolved, show error
 			// err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: paths.New(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), Includes: includes})
 			// return errors.WithStack(err)
-			if preproc_err == nil || preproc_stderr == nil {
+			if preprocErr == nil || preprocStderr == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
-				preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, includes)
-				if preproc_err == nil {
+				preprocStderr, preprocErr = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, includes)
+				if preprocErr == nil {
 					// If there is a missing #include in the cache, but running
 					// gcc does not reproduce that, there is something wrong.
 					// Returning an error here will cause the cache to be
@@ -393,8 +393,8 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile SourceFile) error {
 					return errors.New(tr("Internal error in cache"))
 				}
 			}
-			f.ctx.Stderr.Write(preproc_stderr)
-			return errors.WithStack(preproc_err)
+			f.ctx.Stderr.Write(preprocStderr)
+			return errors.WithStack(preprocErr)
 		}
 
 		// Add this library to the list of libraries, the
