@@ -340,7 +340,7 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile *SourceFile) error 
 		if unchanged && f.cache.valid {
 			include = f.cache.Next().Include
 			if first && f.ctx.Verbose {
-				f.ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_CACHED_INCLUDES, sourcePath)
+				f.ctx.GetLogger().Println("info", "Using cached library dependencies for file: {0}", sourcePath)
 			}
 		} else {
 			preprocStderr, preprocErr = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, f.ctx.IncludeFolders)
