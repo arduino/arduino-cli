@@ -212,8 +212,13 @@ type includeCacheEntry struct {
 }
 
 func (entry *includeCacheEntry) String() string {
-	return fmt.Sprintf("SourceFile: %s; Include: %s; IncludePath: %s",
-		entry.Sourcefile, entry.Include, entry.Includepath)
+	if entry.Sourcefile == nil {
+		return fmt.Sprintf("Include path added: %s", entry.Includepath)
+	}
+	if entry.Include == "" {
+		return fmt.Sprintf("%s successfully compiled", entry.Sourcefile)
+	}
+	return fmt.Sprintf("%s requires %s: include path added %s", entry.Sourcefile, entry.Include, entry.Includepath)
 }
 
 func (entry *includeCacheEntry) Equals(other *includeCacheEntry) bool {
@@ -316,6 +321,14 @@ func (cache *includeCache) WriteToFile() error {
 		}
 	}
 	return nil
+}
+
+func (cache *includeCache) String() string {
+	res := "[\n"
+	for _, entry := range cache.entries {
+		res = res + "  " + entry.String() + "\n"
+	}
+	return res + "]"
 }
 
 func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile *SourceFile) error {
