@@ -1,6 +1,7 @@
 # arduino-cli
 
-![Workflow Status](https://github.com/Arduino/arduino-cli/workflows/test/badge.svg)
+[![Tests passing](https://github.com/Arduino/arduino-cli/workflows/test/badge.svg)](https://github.com/Arduino/arduino-cli/actions?workflow=test)
+[![Nightly build](https://github.com/Arduino/arduino-cli/workflows/nightly/badge.svg)](https://github.com/Arduino/arduino-cli/actions?workflow=nightly)
 [![codecov](https://codecov.io/gh/arduino/arduino-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/arduino/arduino-cli)
 
 `arduino-cli` is an all-in-one solution that provides builder, boards/library manager, uploader,
