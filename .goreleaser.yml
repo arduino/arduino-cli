@@ -11,10 +11,10 @@ release:
 changelog:
   filters:
     exclude:
-      - '^\[skip changelog\].*'
-      - '^\[changelog skip\].*'
-      - '^\[skip ci\].*'
-      - '^\[ci skip\].*'
+      # [skip changelog], [skip-changelog], [changelog skip], [changelog-skip]
+      - '^(?i)\[(skip|changelog)[ ,-](skip|changelog)\].*'
+      # [skip ci], [skip-ci], [ci skip], [ci-skip]
+      - '^(?i)\[(skip|ci)[ ,-](skip|ci)\].*'
 
 # We have multiple builds in order to fine tune
 # cross compilations.
