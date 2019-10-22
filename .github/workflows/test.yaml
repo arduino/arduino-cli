@@ -40,7 +40,7 @@ jobs:
         run: task check
 
       - name: Install protoc compiler
-        uses: arduino/setup-protoc@v1.0.0
+        uses: arduino/setup-protoc@v1.1.0
 
       - name: Check protocol buffers compile correctly
         run: task protoc
