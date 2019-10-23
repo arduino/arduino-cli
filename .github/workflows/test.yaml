@@ -1,13 +1,17 @@
 name: test
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   test-matrix:
 
     strategy:
       matrix:
-        operating-system: [ubuntu-18.04, windows-2019]
+        operating-system: [ubuntu-18.04, windows-2019, macOS-10.14]
 
     runs-on: ${{ matrix.operating-system }}
 
@@ -36,7 +40,9 @@ jobs:
         run: task check
 
       - name: Install protoc compiler
-        uses: Arduino/actions/setup-protoc@master
+        uses: arduino/setup-protoc@v1.1.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check protocol buffers compile correctly
         run: task protoc
@@ -48,7 +54,8 @@ jobs:
         run: task test-unit
 
       - name: Run unit tests on the legacy package
-        if: matrix.operating-system != 'windows-2019'
+        # Run legacy tests on one platform only
+        if: matrix.operating-system == 'ubuntu-18.04'
         run: task test-legacy
 
       - name: Install Python
@@ -68,7 +75,7 @@ jobs:
         # Codecov whitelists GitHub, lifting the need
         # for a token.
         if: >
-          matrix.operating-system != 'windows-2019' &&
+          matrix.operating-system == 'ubuntu-18.04' &&
           github.event_name == 'push'
         uses: codecov/codecov-action@v1.0.2
         with:
@@ -82,7 +89,7 @@ jobs:
         # Codecov whitelists GitHub, lifting the need
         # for a token.
         if: >
-          matrix.operating-system != 'windows-2019' &&
+          matrix.operating-system == 'ubuntu-18.04' &&
           github.event_name == 'push'
         uses: codecov/codecov-action@v1.0.2
         with:
@@ -96,7 +103,7 @@ jobs:
         # Codecov whitelists GitHub, lifting the need
         # for a token.
         if: >
-          matrix.operating-system != 'windows-2019' &&
+          matrix.operating-system == 'ubuntu-18.04' &&
           github.event_name == 'push'
         uses: codecov/codecov-action@v1.0.2
         with:
