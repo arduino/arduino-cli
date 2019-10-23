@@ -14,6 +14,7 @@
 # a commercial license, send an email to license@arduino.cc.
 import json
 import os
+
 import pytest
 
 from .common import running_on_ci
@@ -124,7 +125,7 @@ def test_compile_and_compile_combo(run_command, data_dir):
 
     # Build sketch for each detected board
     for board in detected_boards:
-        log_file_name = "{fqbn}-compile.log".format(fqbn=board.get('fqbn'))
+        log_file_name = "{fqbn}-compile.log".format(fqbn=board.get('fqbn').replace(":", "-"))
         log_file_path = os.path.join(data_dir, log_file_name)
         command_log_flags = "--log-format json --log-file {} --log-level trace".format(log_file_path)
         result = run_command("compile -b {fqbn} --upload -p {address} {sketch_path} {log_flags}".format(

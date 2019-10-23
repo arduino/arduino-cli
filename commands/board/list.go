@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 	"sync"
 
 	"github.com/arduino/arduino-cli/cli/globals"
@@ -35,12 +36,23 @@ var (
 	// ErrNotFound is returned when the API returns 404
 	ErrNotFound = errors.New("board not found")
 	m           sync.Mutex
+	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
+	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
 
-func apiByVidPid(url string) ([]*rpc.BoardListItem, error) {
+func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
+	// ensure vid and pid are valid before hitting the API
+	if !validVidPid.MatchString(vid) {
+		return nil, errors.Errorf("Invalid vid value: '%s'", vid)
+	}
+	if !validVidPid.MatchString(pid) {
+		return nil, errors.Errorf("Invalid pid value: '%s'", pid)
+	}
+
+	url := fmt.Sprintf("%s/%s/%s", vidPidURL, vid, pid)
 	retVal := []*rpc.BoardListItem{}
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header = globals.HTTPClientHeader
+	req.Header = globals.NewHTTPClientHeader()
 	req.Header.Set("Content-Type", "application/json")
 
 	if res, err := http.DefaultClient.Do(req); err == nil {
@@ -78,6 +90,17 @@ func apiByVidPid(url string) ([]*rpc.BoardListItem, error) {
 	return retVal, nil
 }
 
+func identifyViaCloudAPI(port *commands.BoardPort) ([]*rpc.BoardListItem, error) {
+	// If the port is not USB do not try identification via cloud
+	id := port.IdentificationPrefs
+	if !id.ContainsKey("vid") || !id.ContainsKey("pid") {
+		return nil, ErrNotFound
+	}
+
+	logrus.Debug("Querying builder API for board identification...")
+	return apiByVidPid(id.Get("vid"), id.Get("pid"))
+}
+
 // List FIXMEDOC
 func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 	m.Lock()
@@ -107,22 +130,20 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 		}
 
 		// if installed cores didn't recognize the board, try querying
-		// the builder API
+		// the builder API if the board is a USB device port
 		if len(b) == 0 {
-			logrus.Debug("Querying builder API for board identification...")
-			url := fmt.Sprintf("https://builder.arduino.cc/v3/boards/byVidPid/%s/%s",
-				port.IdentificationPrefs.Get("vid"),
-				port.IdentificationPrefs.Get("pid"))
-			items, err := apiByVidPid(url)
+			items, err := identifyViaCloudAPI(port)
 			if err == ErrNotFound {
-				// the board couldn't be detected, keep going with the next port
+				// the board couldn't be detected, print a warning
 				logrus.Debug("Board not recognized")
-				continue
 			} else if err != nil {
 				// this is bad, bail out
 				return nil, errors.Wrap(err, "error getting board info from Arduino Cloud")
 			}
 
+			// add a DetectedPort entry in any case: the `Boards` field will
+			// be empty but the port will be shown anyways (useful for 3rd party
+			// boards)
 			b = items
 		}
 
