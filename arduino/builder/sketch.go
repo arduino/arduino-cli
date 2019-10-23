@@ -17,12 +17,12 @@ package builder
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
-	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -59,8 +59,7 @@ func SketchSaveItemCpp(item *sketch.Item, destPath string) error {
 	return nil
 }
 
-// SimpleLocalWalk locally replaces filepath.Walk and/but goes through symlinks
-func SimpleLocalWalkRecursive(root string, maxDepth int, walkFn func(path string, info os.FileInfo, err error) error) error {
+func simpleLocalWalkRecursive(root string, maxDepth int, walkFn func(path string, info os.FileInfo, err error) error) error {
 
 	info, err := os.Stat(root)
 
@@ -75,13 +74,13 @@ func SimpleLocalWalkRecursive(root string, maxDepth int, walkFn func(path string
 
 	if info.IsDir() {
 		if maxDepth <= 0 {
-			return walkFn(root, info, errors.New("Filesystem bottom is too deep (directory recursion or filesystem really deep): " + root))
+			return walkFn(root, info, errors.New("Filesystem bottom is too deep (directory recursion or filesystem really deep): "+root))
 		}
 		maxDepth--
 		files, err := ioutil.ReadDir(root)
 		if err == nil {
 			for _, file := range files {
-				err = SimpleLocalWalkRecursive(root+string(os.PathSeparator)+file.Name(), maxDepth, walkFn)
+				err = simpleLocalWalkRecursive(root+string(os.PathSeparator)+file.Name(), maxDepth, walkFn)
 				if err == filepath.SkipDir {
 					return nil
 				}
@@ -92,9 +91,10 @@ func SimpleLocalWalkRecursive(root string, maxDepth int, walkFn func(path string
 	return nil
 }
 
+// SimpleLocalWalk locally replaces filepath.Walk and/but goes through symlinks
 func SimpleLocalWalk(root string, walkFn func(path string, info os.FileInfo, err error) error) error {
 	// see discussion in https://github.com/arduino/arduino-cli/pull/421
-	return SimpleLocalWalkRecursive(root, 40, walkFn)
+	return simpleLocalWalkRecursive(root, 40, walkFn)
 }
 
 // SketchLoad collects all the files composing a sketch.
@@ -137,7 +137,7 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 
 		if err != nil {
 			fmt.Printf("\nerror: %+v\n\n", err)
-			return filepath.SkipDir;
+			return filepath.SkipDir
 		}
 
 		// ignore hidden files and skip hidden directories
