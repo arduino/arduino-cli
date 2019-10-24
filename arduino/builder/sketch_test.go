@@ -114,7 +114,7 @@ func TestLoadSketchFolderSymlink(t *testing.T) {
 	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
 }
 
-// the sketch folder contains "loop" symlink that refers to itself causing a symlink loop
+//the sketch folder contains both "loop" symlink that refers to itself causing a symlink loop and a multilevel folder symlink
 func TestLoadSketchFolderSymlinkLoop(t *testing.T) {
 	// pass the path to the sketch folder
 	sketchPath := filepath.Join("testdata", t.Name())
@@ -149,7 +149,7 @@ func TestLoadSketchFolderSymlinkLoop(t *testing.T) {
 
 func TestLoadSketchFolderDotIno(t *testing.T) {
 	// pass the path to the sketch folder
-	sketchPath := filepath.Join("testdata", "TestLoadSketchFolder.ino")
+	sketchPath := filepath.Join("testdata", "TestLoadSketchFolder")
 	s, err := builder.SketchLoad(sketchPath, "")
 	require.Nil(t, s)
 	require.NotNil(t, err)
