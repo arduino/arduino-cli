@@ -149,8 +149,9 @@ func TestLoadSketchFolderSymlinkLoop(t *testing.T) {
 
 func TestLoadSketchFolderDotIno(t *testing.T) {
 	// pass the path to the sketch folder
-	sketchPath := filepath.Join("testdata", "TestLoadSketchFolder")
+	sketchPath := filepath.Join("testdata", "TestLoadSketchFolderIno")
 	s, err := builder.SketchLoad(sketchPath, "")
+	require.Contains(t, err.Error(), "sketch must not be a directory")
 	require.Nil(t, s)
 	require.NotNil(t, err)
 }

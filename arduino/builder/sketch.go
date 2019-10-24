@@ -78,12 +78,12 @@ func SimpleLocalWalk(root string, walkFn func(path string, info os.FileInfo, err
 		files, err := ioutil.ReadDir(root)
 		if err == nil {
 			for _, file := range files {
-				dirFileInfo, _ := os.Lstat(root + string(os.PathSeparator) + file.Name())
+				dirFileInfo, _ := os.Lstat(filepath.Join(root + file.Name()))
 				if (dirFileInfo.Mode()&os.ModeSymlink == os.ModeSymlink) && !shouldTraverse(root, dirFileInfo) {
 					logrus.Warnf("Symlink loop detected in %s %s", root, file.Name())
 					continue
 				}
-				err = SimpleLocalWalk(root+string(os.PathSeparator)+file.Name(), walkFn)
+				err = SimpleLocalWalk(filepath.Join(root+file.Name()), walkFn)
 				if err == filepath.SkipDir {
 					return nil
 				}
