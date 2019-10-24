@@ -17,11 +17,14 @@ package builder
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -60,7 +63,6 @@ func SketchSaveItemCpp(item *sketch.Item, destPath string) error {
 
 // SimpleLocalWalk locally replaces filepath.Walk and/but goes through symlinks
 func SimpleLocalWalk(root string, walkFn func(path string, info os.FileInfo, err error) error) error {
-
 	info, err := os.Stat(root)
 
 	if err != nil {
@@ -76,6 +78,11 @@ func SimpleLocalWalk(root string, walkFn func(path string, info os.FileInfo, err
 		files, err := ioutil.ReadDir(root)
 		if err == nil {
 			for _, file := range files {
+				dirFileInfo, _ := os.Lstat(root + string(os.PathSeparator) + file.Name())
+				if (dirFileInfo.Mode()&os.ModeSymlink == os.ModeSymlink) && !shouldTraverse(root, dirFileInfo) {
+					logrus.Warnf("Symlink loop detected in %s %s", root, file.Name())
+					continue
+				}
 				err = SimpleLocalWalk(root+string(os.PathSeparator)+file.Name(), walkFn)
 				if err == filepath.SkipDir {
 					return nil
@@ -85,6 +92,45 @@ func SimpleLocalWalk(root string, walkFn func(path string, info os.FileInfo, err
 	}
 
 	return nil
+}
+
+// shouldTraverse reports whether the symlink fi, found in dir,
+// should be followed.  It makes sure symlinks were never visited
+// before to avoid symlink loops.
+func shouldTraverse(dir string, fi os.FileInfo) bool {
+	path := filepath.Join(dir, fi.Name())
+	target, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		return false
+	}
+	ts, err := os.Stat(target)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return false
+	}
+	if !ts.IsDir() {
+		return false
+	}
+	// Check for symlink loops by statting each directory component
+	// and seeing if any are the same file as ts.
+	for {
+		parent := filepath.Dir(path)
+		if parent == path {
+			// Made it to the root without seeing a cycle.
+			// Use this symlink.
+			return true
+		}
+		parentInfo, err := os.Stat(parent)
+		if err != nil {
+			return false
+		}
+		if os.SameFile(ts, parentInfo) {
+			// Cycle. Don't traverse.
+			return false
+		}
+		path = parent
+	}
+
 }
 
 // SketchLoad collects all the files composing a sketch.
@@ -108,6 +154,14 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 			return nil, errors.Wrap(err, "unable to find the main sketch file")
 		}
 		f.Close()
+		// ensure it is not a directory
+		info, err := os.Stat(mainSketchFile)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to check the main sketch file")
+		}
+		if info.IsDir() {
+			return nil, errors.Wrap(errors.New(mainSketchFile), "sketch must not be a directory")
+		}
 	} else {
 		sketchFolder = filepath.Dir(sketchPath)
 		mainSketchFile = sketchPath
