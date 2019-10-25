@@ -11,7 +11,8 @@ jobs:
 
     strategy:
       matrix:
-        operating-system: [ubuntu-18.04, windows-2019, macOS-10.14]
+        operating-system: [windows-2019]
+        # operating-system: [ubuntu-18.04, windows-2019, macOS-10.14]
 
     runs-on: ${{ matrix.operating-system }}
 
