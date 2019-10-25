@@ -96,6 +96,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskPr
 		sketch.Metadata.CPU = sketches.BoardMetadata{
 			Fqbn: board.FQBN(),
 			Name: board.Name(),
+			Port: deviceURI.String(),
 		}
 	}
 

@@ -38,6 +38,7 @@ type Metadata struct {
 type BoardMetadata struct {
 	Fqbn string `json:"fqbn,required"`
 	Name string `json:"name,omitempty"`
+	Port string `json:"port,omitepty"`
 }
 
 // NewSketchFromPath loads a sketch from the specified path
