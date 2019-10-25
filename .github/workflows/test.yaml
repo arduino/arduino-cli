@@ -32,6 +32,8 @@ jobs:
           go get github.com/golangci/govet
           go get golang.org/x/lint/golint
           go get github.com/golang/protobuf/protoc-gen-go
+        if: matrix.operating-system == 'windows-2019'
+        shell: cmd
 
       - name: Install Taskfile
         uses: Arduino/actions/setup-taskfile@master
