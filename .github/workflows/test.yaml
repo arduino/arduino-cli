@@ -28,11 +28,11 @@ jobs:
           go-version: '1.13'
 
       - name: Install Go deps
-          if: matrix.operating-system != 'windows-2019'
-          run: |
-            go get github.com/golangci/govet
-            go get golang.org/x/lint/golint
-            go get github.com/golang/protobuf/protoc-gen-go
+        if: matrix.operating-system != 'windows-2019'
+        run: |
+          go get github.com/golangci/govet
+          go get golang.org/x/lint/golint
+          go get github.com/golang/protobuf/protoc-gen-go
 
       - name: Install Go deps on windows
         # since 10/23/2019 pwsh is the default shell
