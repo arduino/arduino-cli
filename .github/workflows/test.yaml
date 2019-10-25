@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        operating-system: [ubuntu-18.04, windows-2019] #, macOS-10.14]
+        operating-system: [ubuntu-18.04, windows-2019, macOS-10.14]
 
     runs-on: ${{ matrix.operating-system }}
 
@@ -28,12 +28,22 @@ jobs:
           go-version: '1.13'
 
       - name: Install Go deps
+          if: matrix.operating-system != 'windows-2019'
+          run: |
+            go get github.com/golangci/govet
+            go get golang.org/x/lint/golint
+            go get github.com/golang/protobuf/protoc-gen-go
+
+      - name: Install Go deps on windows
+        # since 10/23/2019 pwsh is the default shell
+        # on Windows, but pwsh fails to install protoc-gen-go
+        # so we force cmd as default shell for this task
+        if: matrix.operating-system == 'windows-2019'
+        shell: cmd
         run: |
           go get github.com/golangci/govet
           go get golang.org/x/lint/golint
           go get github.com/golang/protobuf/protoc-gen-go
-        if: matrix.operating-system == 'windows-2019'
-        shell: cmd
 
       - name: Install Taskfile
         uses: Arduino/actions/setup-taskfile@master
