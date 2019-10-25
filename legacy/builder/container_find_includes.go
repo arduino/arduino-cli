@@ -193,7 +193,7 @@ func (f *CppIncludesFinder) DetectLibraries() error {
 func (f *CppIncludesFinder) appendIncludeFolder(sourceFilePath *paths.Path, include string, folder *paths.Path) {
 	f.log.Debugf("Using include folder: %s", folder)
 	f.ctx.IncludeFolders = append(f.ctx.IncludeFolders, folder)
-	f.cache.ExpectEntry(sourceFilePath, include, folder)
+	f.cache.AddAndCheckEntry(sourceFilePath, include, folder)
 }
 
 func runCommand(ctx *types.Context, command types.Command) error {
@@ -238,49 +238,53 @@ type includeCache struct {
 	entries []*includeCacheEntry
 }
 
-// Return the next cache entry. Should only be called when the cache is
-// valid and a next entry is available (the latter can be checked with
-// ExpectFile). Does not advance the cache.
-func (cache *includeCache) Next() *includeCacheEntry {
+// Peek returns the next cache entry if the cache is valid and the next
+// entry exists, otherwise it returns nil. Does not advance the cache.
+func (cache *includeCache) Peek() *includeCacheEntry {
+	if !cache.valid || cache.next >= len(cache.entries) {
+		return nil
+	}
 	return cache.entries[cache.next]
 }
 
-// Check that the next cache entry is about the given file. If it is
-// not, or no entry is available, the cache is invalidated. Does not
-// advance the cache.
+// Invalidate invalidates the cache.
+func (cache *includeCache) Invalidate() {
+	cache.valid = false
+	cache.entries = cache.entries[:cache.next]
+}
+
+// ExpectFile check that the next cache entry is about the given file.
+// If it is not, or no entry is available, the cache is invalidated.
+// Does not advance the cache.
 func (cache *includeCache) ExpectFile(sourcefile *paths.Path) {
-	if cache.valid && (cache.next >= len(cache.entries) || !cache.Next().Sourcefile.EqualsTo(sourcefile)) {
-		cache.valid = false
-		cache.entries = cache.entries[:cache.next]
+	if next := cache.Peek(); next == nil || !next.Sourcefile.EqualsTo(sourcefile) {
+		cache.Invalidate()
 	}
 }
 
-// Check that the next entry matches the given values. If so, advance
-// the cache. If not, the cache is invalidated. If the cache is
-// invalidated, or was already invalid, an entry with the given values
-// is appended.
-func (cache *includeCache) ExpectEntry(sourcefile *paths.Path, include string, librarypath *paths.Path) {
-	entry := &includeCacheEntry{Sourcefile: sourcefile, Include: include, Includepath: librarypath}
-	if cache.valid {
-		if cache.next < len(cache.entries) && cache.Next().Equals(entry) {
-			cache.next++
-		} else {
-			cache.valid = false
-			cache.entries = cache.entries[:cache.next]
-		}
+// AddAndCheckEntry check that the next entry matches the given values.
+// If so, advance the cache. If not, the cache is invalidated. If the
+// cache is invalidated, or was already invalid, an entry with the given
+// values is appended.
+func (cache *includeCache) AddAndCheckEntry(sourcefile *paths.Path, include string, librarypath *paths.Path) {
+	expected := &includeCacheEntry{Sourcefile: sourcefile, Include: include, Includepath: librarypath}
+	if next := cache.Peek(); next == nil || !next.Equals(expected) {
+		cache.Invalidate()
+	} else {
+		cache.next++
 	}
 
 	if !cache.valid {
-		cache.entries = append(cache.entries, entry)
+		cache.entries = append(cache.entries, expected)
+		cache.next++
 	}
 }
 
-// Check that the cache is completely consumed. If not, the cache is
-// invalidated.
+// ExpectEnd check that the cache is completely consumed. If not, the
+// cache is invalidated.
 func (cache *includeCache) ExpectEnd() {
 	if cache.valid && cache.next < len(cache.entries) {
-		cache.valid = false
-		cache.entries = cache.entries[:cache.next]
+		cache.Invalidate()
 	}
 }
 
@@ -362,7 +366,7 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile *SourceFile) error 
 		var preprocStderr []byte
 		var include string
 		if unchanged && f.cache.valid {
-			include = f.cache.Next().Include
+			include = f.cache.Peek().Include
 			if first && f.ctx.Verbose {
 				f.ctx.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
@@ -388,7 +392,7 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile *SourceFile) error 
 
 		if include == "" {
 			// No missing includes found, we're done
-			f.cache.ExpectEntry(sourcePath, "", nil)
+			f.cache.AddAndCheckEntry(sourcePath, "", nil)
 			return nil
 		}
 
