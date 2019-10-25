@@ -24,7 +24,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/sirupsen/logrus"
+	"github.com/arduino/arduino-cli/cli/feedback"
 
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -62,6 +62,7 @@ func SketchSaveItemCpp(item *sketch.Item, destPath string) error {
 }
 
 // SimpleLocalWalk locally replaces filepath.Walk and/but goes through symlinks
+// detecting and skipping symlink loops
 func SimpleLocalWalk(root string, walkFn func(path string, info os.FileInfo, err error) error) error {
 	info, err := os.Stat(root)
 
@@ -78,12 +79,13 @@ func SimpleLocalWalk(root string, walkFn func(path string, info os.FileInfo, err
 		files, err := ioutil.ReadDir(root)
 		if err == nil {
 			for _, file := range files {
-				dirFileInfo, _ := os.Lstat(filepath.Join(root + file.Name()))
+				filePath := filepath.Join(root, file.Name())
+				dirFileInfo, _ := os.Lstat(filePath)
 				if (dirFileInfo.Mode()&os.ModeSymlink == os.ModeSymlink) && !shouldTraverse(root, dirFileInfo) {
-					logrus.Warnf("Symlink loop detected in %s %s", root, file.Name())
+					feedback.Printf("Symlink loop detected and skipped in %s", filePath)
 					continue
 				}
-				err = SimpleLocalWalk(filepath.Join(root+file.Name()), walkFn)
+				err = SimpleLocalWalk(filePath, walkFn)
 				if err == filepath.SkipDir {
 					return nil
 				}
