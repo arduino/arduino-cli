@@ -122,12 +122,15 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 }
 
 func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
-	finder := &CppIncludesFinder{
-		ctx: ctx,
+	finder := NewCppIncludesFinder(ctx)
+	finder.UseIncludeDir(ctx.BuildProperties.GetPath("build.core.path"))
+	if variantPath := ctx.BuildProperties.GetPath("build.variant.path"); variantPath != nil {
+		finder.UseIncludeDir(variantPath)
 	}
 	if err := finder.DetectLibraries(); err != nil {
 		return err
 	}
+	ctx.IncludeFolders.AddAllMissing(finder.IncludeDirsFound)
 	if err := runCommand(ctx, &FailIfImportedLibraryIsWrong{}); err != nil {
 		return errors.WithStack(err)
 	}
@@ -139,22 +142,30 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 // libraries used in a sketch and a way to cache this result for
 // increasing detection speed on already processed sketches.
 type CppIncludesFinder struct {
-	ctx    *types.Context
-	cache  *includeCache
-	sketch *sketch.Sketch
-	queue  *UniqueSourceFileQueue
-	log    *logrus.Entry
+	IncludeDirsFound paths.PathList
+	ctx              *types.Context
+	cache            *includeCache
+	sketch           *sketch.Sketch
+	queue            *UniqueSourceFileQueue
+	log              *logrus.Entry
 }
 
-func (f *CppIncludesFinder) DetectLibraries() error {
-	f.cache = loadCacheFrom(f.ctx.BuildPath.Join("includes.cache"))
-	f.sketch = f.ctx.Sketch
-	f.queue = &UniqueSourceFileQueue{}
-	f.log = logrus.WithField("task", "DetectingLibraries")
+// NewCppIncludesFinder create a new include
+func NewCppIncludesFinder(ctx *types.Context) *CppIncludesFinder {
+	return &CppIncludesFinder{
+		ctx:    ctx,
+		cache:  loadCacheFrom(ctx.BuildPath.Join("includes.cache")),
+		sketch: ctx.Sketch,
+		queue:  &UniqueSourceFileQueue{},
+		log:    logrus.WithField("task", "DetectingLibraries"),
+	}
+}
 
-	f.appendIncludeFolder(nil, "", f.ctx.BuildProperties.GetPath("build.core.path"))
-	if f.ctx.BuildProperties.Get("build.variant.path") != "" {
-		f.appendIncludeFolder(nil, "", f.ctx.BuildProperties.GetPath("build.variant.path"))
+// DetectLibraries runs a library detection algorithm
+func (f *CppIncludesFinder) DetectLibraries() error {
+	for _, includeDir := range f.IncludeDirsFound {
+		f.log.Debugf("Using include directory: %s", includeDir)
+		f.cache.AddAndCheckEntry(nil, "", includeDir)
 	}
 
 	mergedfile, err := MakeSourceFile(f.ctx.SketchBuildPath, f.ctx.SketchBuildPath, paths.New(f.sketch.MainFile.Base()+".cpp"))
@@ -185,15 +196,9 @@ func (f *CppIncludesFinder) DetectLibraries() error {
 	return nil
 }
 
-// Append the given folder to the include path and match or append it to
-// the cache. sourceFilePath and include indicate the source of this
-// include (e.g. what #include line in what file it was resolved from)
-// and should be the empty string for the default include folders, like
-// the core or variant.
-func (f *CppIncludesFinder) appendIncludeFolder(sourceFilePath *paths.Path, include string, folder *paths.Path) {
-	f.log.Debugf("Using include folder: %s", folder)
-	f.ctx.IncludeFolders = append(f.ctx.IncludeFolders, folder)
-	f.cache.AddAndCheckEntry(sourceFilePath, include, folder)
+// UseIncludeDir adds an include directory to the current library discovery
+func (f *CppIncludesFinder) UseIncludeDir(includeDir *paths.Path) {
+	f.IncludeDirsFound.Add(includeDir)
 }
 
 func runCommand(ctx *types.Context, command types.Command) error {
@@ -371,7 +376,7 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile *SourceFile) error 
 				f.ctx.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 		} else {
-			preprocStderr, preprocErr = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, f.ctx.IncludeFolders)
+			preprocStderr, preprocErr = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, f.IncludeDirsFound)
 			// Unwrap error and see if it is an ExitError.
 			_, isExitError := errors.Cause(preprocErr).(*exec.ExitError)
 			if preprocErr == nil {
@@ -403,7 +408,7 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile *SourceFile) error 
 			// return errors.WithStack(err)
 			if preprocErr == nil || preprocStderr == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
-				preprocStderr, preprocErr = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, f.ctx.IncludeFolders)
+				preprocStderr, preprocErr = GCCPreprocRunnerForDiscoveringIncludes(f.ctx, sourcePath, targetFilePath, f.IncludeDirsFound)
 				if preprocErr == nil {
 					// If there is a missing #include in the cache, but running
 					// gcc does not reproduce that, there is something wrong.
@@ -420,10 +425,14 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile *SourceFile) error 
 		// include path and queue its source files for further
 		// include scanning
 		f.ctx.ImportedLibraries = append(f.ctx.ImportedLibraries, library)
-		f.appendIncludeFolder(sourcePath, include, library.SourceDir)
+
+		f.log.Debugf("Using library include folder: %s", library.SourceDir)
+		f.IncludeDirsFound.Add(library.SourceDir)
+		f.cache.AddAndCheckEntry(sourcePath, include, library.SourceDir)
+
 		if library.UtilityDir != nil {
 			// TODO: Use library.SourceDirs() instead?
-			f.ctx.IncludeFolders = append(f.ctx.IncludeFolders, library.UtilityDir)
+			f.IncludeDirsFound.Add(library.UtilityDir)
 		}
 		sourceDirs := library.SourceDirs()
 		buildDir := f.ctx.LibrariesBuildPath.Join(library.Name)
