@@ -116,9 +116,16 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	if variantPath := ctx.BuildProperties.GetPath("build.variant.path"); variantPath != nil {
 		finder.UseIncludeDir(variantPath)
 	}
+	finder.AddSourceFile(ctx.SketchBuildPath, ctx.SketchBuildPath, paths.New(ctx.Sketch.MainFile.Name.Base()+".cpp"))
+	finder.AddSourceDir(ctx.SketchBuildPath, ctx.SketchBuildPath, false /* recurse */)
+	if srcSubfolderPath := ctx.SketchBuildPath.Join("src"); srcSubfolderPath.IsDir() {
+		finder.AddSourceDir(srcSubfolderPath, ctx.SketchBuildPath, true /* recurse */)
+	}
+
 	if err := finder.DetectLibraries(); err != nil {
 		return err
 	}
+
 	ctx.IncludeFolders.AddAllMissing(finder.IncludeDirsFound)
 	if err := runCommand(ctx, &FailIfImportedLibraryIsWrong{}); err != nil {
 		return errors.WithStack(err)
@@ -134,7 +141,6 @@ type CppIncludesFinder struct {
 	IncludeDirsFound paths.PathList
 	ctx              *types.Context
 	cache            *includeCache
-	sketch           *types.Sketch
 	queue            *UniqueSourceFileQueue
 	log              *logrus.Entry
 }
@@ -142,11 +148,10 @@ type CppIncludesFinder struct {
 // NewCppIncludesFinder create a new include
 func NewCppIncludesFinder(ctx *types.Context) *CppIncludesFinder {
 	return &CppIncludesFinder{
-		ctx:    ctx,
-		cache:  loadCacheFrom(ctx.BuildPath.Join("includes.cache")),
-		sketch: ctx.Sketch,
-		queue:  &UniqueSourceFileQueue{},
-		log:    logrus.WithField("task", "DetectingLibraries"),
+		ctx:   ctx,
+		cache: loadCacheFrom(ctx.BuildPath.Join("includes.cache")),
+		queue: &UniqueSourceFileQueue{},
+		log:   logrus.WithField("task", "DetectingLibraries"),
 	}
 }
 
@@ -155,19 +160,6 @@ func (f *CppIncludesFinder) DetectLibraries() error {
 	for _, includeDir := range f.IncludeDirsFound {
 		f.log.Debugf("Using include directory: %s", includeDir)
 		f.cache.AddAndCheckEntry(nil, "", includeDir)
-	}
-
-	mergedfile, err := MakeSourceFile(f.ctx.SketchBuildPath, f.ctx.SketchBuildPath, paths.New(f.sketch.MainFile.Name.Base()+".cpp"))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	f.log.Debugf("Queueing merged sketch: %s", mergedfile)
-	f.queue.Push(mergedfile)
-
-	f.queueSourceFilesFromFolder(f.ctx.SketchBuildPath, f.ctx.SketchBuildPath, false /* recurse */)
-	srcSubfolderPath := f.ctx.SketchBuildPath.Join("src")
-	if srcSubfolderPath.IsDir() {
-		f.queueSourceFilesFromFolder(srcSubfolderPath, f.ctx.SketchBuildPath, true /* recurse */)
 	}
 
 	for !f.queue.Empty() {
@@ -188,6 +180,38 @@ func (f *CppIncludesFinder) DetectLibraries() error {
 // UseIncludeDir adds an include directory to the current library discovery
 func (f *CppIncludesFinder) UseIncludeDir(includeDir *paths.Path) {
 	f.IncludeDirsFound.Add(includeDir)
+}
+
+// AddSourceFile adds a source file to be examined to look for library imports
+func (f *CppIncludesFinder) AddSourceFile(sourceRoot, buildRoot, srcPath *paths.Path) error {
+	if file, err := MakeSourceFile(sourceRoot, buildRoot, srcPath); err == nil {
+		f.log.Debugf("Queueing source file: %s", file)
+		f.queue.Push(file)
+	} else {
+		return errors.WithStack(err)
+	}
+	return nil
+}
+
+// AddSourceDir adds a directory of source file to be examined to look for library imports
+func (f *CppIncludesFinder) AddSourceDir(srcDir, buildDir *paths.Path, recurse bool) error {
+	extensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] }
+	f.log.Debugf("  Queueing source files from %s (recurse %v)", srcDir, recurse)
+	filePaths, err := utils.FindFilesInFolder(srcDir.String(), extensions, recurse)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	for _, filePath := range filePaths {
+		sourceFile, err := MakeSourceFile(srcDir, buildDir, paths.New(filePath))
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		f.log.Debugf("    Queuing %s", sourceFile)
+		f.queue.Push(sourceFile)
+	}
+
+	return nil
 }
 
 func runCommand(ctx *types.Context, command types.Command) error {
@@ -426,30 +450,10 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile *SourceFile) error 
 		sourceDirs := library.SourceDirs()
 		buildDir := f.ctx.LibrariesBuildPath.Join(library.Name)
 		for _, sourceDir := range sourceDirs {
-			f.queueSourceFilesFromFolder(buildDir, sourceDir.Dir, sourceDir.Recurse)
+			f.AddSourceDir(buildDir, sourceDir.Dir, sourceDir.Recurse)
 		}
 		first = false
 	}
-}
-
-func (f *CppIncludesFinder) queueSourceFilesFromFolder(srcDir, buildDir *paths.Path, recurse bool) error {
-	extensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] }
-	f.log.Debugf("  Queueing source files from %s (recurse %v)", srcDir, recurse)
-	filePaths, err := utils.FindFilesInFolder(srcDir.String(), extensions, recurse)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	for _, filePath := range filePaths {
-		sourceFile, err := MakeSourceFile(srcDir, buildDir, paths.New(filePath))
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		f.log.Debugf("    Queuing %s", sourceFile)
-		f.queue.Push(sourceFile)
-	}
-
-	return nil
 }
 
 // SourceFile represent a source file, it keeps a reference to the root source
