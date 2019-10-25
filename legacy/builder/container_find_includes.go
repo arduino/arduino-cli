@@ -448,18 +448,13 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile *SourceFile) error 
 		// include path and queue its source files for further
 		// include scanning
 		f.ctx.ImportedLibraries = append(f.ctx.ImportedLibraries, library)
-
-		f.log.Debugf("Using library include folder: %s", library.SourceDir)
-		f.IncludeDirsFound.Add(library.SourceDir)
 		f.cache.AddAndCheckEntry(sourcePath, include, library.SourceDir)
 
-		if library.UtilityDir != nil {
-			// TODO: Use library.SourceDirs() instead?
-			f.IncludeDirsFound.Add(library.UtilityDir)
-		}
 		sourceDirs := library.SourceDirs()
 		buildDir := f.ctx.LibrariesBuildPath.Join(library.Name)
 		for _, sourceDir := range sourceDirs {
+			f.log.Debugf("Using library include folder: %s", sourceDir.Dir)
+			f.IncludeDirsFound.Add(sourceDir.Dir)
 			if library.Precompiled && library.PrecompiledWithSources {
 				// Fully precompiled libraries should have no dependencies
 				// to avoid ABI breakage
