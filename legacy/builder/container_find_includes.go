@@ -99,6 +99,7 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -126,6 +127,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 		return err
 	}
 
+	ctx.ImportedLibraries.Add(finder.LibrariesFound...)
 	ctx.IncludeFolders.AddAllMissing(finder.IncludeDirsFound)
 	if err := runCommand(ctx, &FailIfImportedLibraryIsWrong{}); err != nil {
 		return errors.WithStack(err)
@@ -138,6 +140,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 // libraries used in a sketch and a way to cache this result for
 // increasing detection speed on already processed sketches.
 type CppIncludesFinder struct {
+	LibrariesFound   libraries.List
 	IncludeDirsFound paths.PathList
 	ctx              *types.Context
 	cache            *includeCache
@@ -434,10 +437,9 @@ func (f *CppIncludesFinder) findIncludesUntilDone(sourceFile *SourceFile) error 
 			return errors.WithStack(preprocErr)
 		}
 
-		// Add this library to the list of libraries, the
-		// include path and queue its source files for further
-		// include scanning
-		f.ctx.ImportedLibraries = append(f.ctx.ImportedLibraries, library)
+		// Add this library to the list of libraries found, add the include path
+		// and queue its source files for further include scanning
+		f.LibrariesFound.Add(library)
 		f.cache.AddAndCheckEntry(sourcePath, include, library.SourceDir)
 
 		sourceDirs := library.SourceDirs()
