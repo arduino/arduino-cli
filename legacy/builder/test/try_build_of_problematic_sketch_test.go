@@ -17,12 +17,15 @@
 package test
 
 import (
+	"fmt"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTryBuild001(t *testing.T) {
@@ -225,7 +228,21 @@ func makeDefaultContext(t *testing.T) *types.Context {
 
 func tryBuild(t *testing.T, sketchPath ...string) {
 	ctx := makeDefaultContext(t)
+	ctx.DebugLevel = 999
+	s1 := time.Now()
 	tryBuildWithContext(t, ctx, sketchPath...)
+	t1 := time.Now().Sub(s1)
+
+	ctx2 := makeDefaultContext(t)
+	ctx2.DebugLevel = 999
+	ctx2.BuildPath = ctx.BuildPath
+	s2 := time.Now()
+	tryBuildWithContext(t, ctx2, sketchPath...)
+	t2 := time.Now().Sub(s2)
+
+	fmt.Println("Build time non-cached:", t1)
+	fmt.Println("Build time cached:", t2)
+	require.True(t, t1.Microseconds() > t2.Microseconds()*9/10, "cached build time should be much lower")
 }
 
 func tryBuildWithContext(t *testing.T, ctx *types.Context, sketchPath ...string) {
