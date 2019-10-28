@@ -28,10 +28,14 @@ jobs:
           go-version: '1.13'
 
       - name: Install Go deps
+        # Since 10/23/2019 pwsh is the default shell
+        # on Windows, but pwsh fails to install protoc-gen-go so
+        # we force bash as default shell for all OSes in this task
         run: |
           go get github.com/golangci/govet
           go get golang.org/x/lint/golint
           go get github.com/golang/protobuf/protoc-gen-go
+        shell: bash
 
       - name: Install Taskfile
         uses: Arduino/actions/setup-taskfile@master
