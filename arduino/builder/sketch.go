@@ -17,18 +17,22 @@ package builder
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 
 	"github.com/pkg/errors"
 )
+
+// As currently implemented on Linux,
+// the maximum number of symbolic links that will be followed while resolving a pathname is 40
+const maxFileSystemDepth = 40
 
 var includesArduinoH = regexp.MustCompile(`(?m)^\s*#\s*include\s*[<\"]Arduino\.h[>\"]`)
 
@@ -59,7 +63,8 @@ func SketchSaveItemCpp(item *sketch.Item, destPath string) error {
 	return nil
 }
 
-func simpleLocalWalkRecursive(root string, maxDepth int, walkFn func(path string, info os.FileInfo, err error) error) error {
+// simpleLocalWalk locally replaces filepath.Walk and/but goes through symlinks
+func simpleLocalWalk(root string, maxDepth int, walkFn func(path string, info os.FileInfo, err error) error) error {
 
 	info, err := os.Stat(root)
 
@@ -80,7 +85,7 @@ func simpleLocalWalkRecursive(root string, maxDepth int, walkFn func(path string
 		files, err := ioutil.ReadDir(root)
 		if err == nil {
 			for _, file := range files {
-				err = simpleLocalWalkRecursive(root+string(os.PathSeparator)+file.Name(), maxDepth, walkFn)
+				err = simpleLocalWalk(root+string(os.PathSeparator)+file.Name(), maxDepth, walkFn)
 				if err == filepath.SkipDir {
 					return nil
 				}
@@ -89,12 +94,6 @@ func simpleLocalWalkRecursive(root string, maxDepth int, walkFn func(path string
 	}
 
 	return nil
-}
-
-// SimpleLocalWalk locally replaces filepath.Walk and/but goes through symlinks
-func SimpleLocalWalk(root string, walkFn func(path string, info os.FileInfo, err error) error) error {
-	// see discussion in https://github.com/arduino/arduino-cli/pull/421
-	return simpleLocalWalkRecursive(root, 40, walkFn)
 }
 
 // SketchLoad collects all the files composing a sketch.
@@ -133,10 +132,10 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 
 	// collect all the sketch files
 	var files []string
-	err = SimpleLocalWalk(sketchFolder, func(path string, info os.FileInfo, err error) error {
+	err = simpleLocalWalk(sketchFolder, maxFileSystemDepth, func(path string, info os.FileInfo, err error) error {
 
 		if err != nil {
-			fmt.Printf("\nerror: %+v\n\n", err)
+			feedback.Printf("\nerror: %+v\n\n", err)
 			return filepath.SkipDir
 		}
 
