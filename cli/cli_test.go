@@ -396,6 +396,39 @@ board_manager:
 	require.NotZero(t, exitCode)
 }
 
+func Test3rdPartyCoreIntegration(t *testing.T) {
+	// override SetUp dirs
+	tmp := tmpDirOrDie()
+	defer os.RemoveAll(tmp)
+	os.Setenv("ARDUINO_SKETCHBOOK_DIR", tmp)
+	currSketchbookDir = tmp
+
+	configFile := filepath.Join(currDataDir, "arduino-cli.yaml")
+	err := ioutil.WriteFile(configFile, []byte(`
+board_manager:
+  additional_urls:
+    - https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+`), os.FileMode(0644))
+	require.NoError(t, err, "writing dummy config "+configFile)
+
+	// Update index and install esp32:esp32
+	exitCode, _ := executeWithArgs("--config-file", configFile, "core", "update-index")
+	require.Zero(t, exitCode)
+	exitCode, d := executeWithArgs("--config-file", configFile, "core", "install", "esp32:esp32")
+	require.Zero(t, exitCode)
+	require.Contains(t, string(d), "installed")
+
+	// Build a simple sketch and check if all artifacts are copied
+	tmpSketch := paths.New(currSketchbookDir).Join("Blink")
+	err = paths.New("testdata/Blink").CopyDirTo(tmpSketch)
+	require.NoError(t, err, "copying test sketch into temp dir")
+	exitCode, d = executeWithArgs("--config-file", configFile, "compile", "-b", "esp32:esp32:esp32", tmpSketch.String())
+	require.Zero(t, exitCode)
+	require.True(t, tmpSketch.Join("Blink.esp32.esp32.esp32.bin").Exist())
+	require.True(t, tmpSketch.Join("Blink.esp32.esp32.esp32.elf").Exist())
+	require.True(t, tmpSketch.Join("Blink.esp32.esp32.esp32.partitions.bin").Exist()) // https://github.com/arduino/arduino-cli/issues/163
+}
+
 func TestCoreCommandsIntegration(t *testing.T) {
 	// override SetUp dirs
 	tmp := tmpDirOrDie()
