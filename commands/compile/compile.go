@@ -174,8 +174,11 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	}
 
 	// FIXME: Make a function to obtain these info...
-	outputPath := builderCtx.BuildProperties.ExpandPropsInString("{build.path}/{recipe.output.tmp_file}")
-	ext := filepath.Ext(outputPath)
+	outputPath := paths.New(
+		builderCtx.BuildProperties.ExpandPropsInString("{build.path}/{recipe.output.tmp_file}")) // "/build/path/sketch.ino.bin"
+	ext := outputPath.Ext()          // ".hex" | ".bin"
+	base := outputPath.Base()        // "sketch.ino.hex"
+	base = base[:len(base)-len(ext)] // "sketch.ino"
 
 	// FIXME: Make a function to produce a better name...
 	// Make the filename without the FQBN configs part
@@ -190,7 +193,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		} else {
 			exportPath = sketch.FullPath.Parent()
 		}
-		exportFile = sketch.Name + "." + fqbnSuffix
+		exportFile = sketch.Name + "." + fqbnSuffix // "sketch.arduino.avr.uno"
 	} else {
 		exportPath = paths.New(req.GetExportFile()).Parent()
 		exportFile = paths.New(req.GetExportFile()).Base()
@@ -199,16 +202,25 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		}
 	}
 
-	// Copy .hex file to sketch directory
-	srcHex := paths.New(outputPath)
-	dstHex := exportPath.Join(exportFile + ext)
-	logrus.WithField("from", srcHex).WithField("to", dstHex).Debug("copying sketch build output")
-	if err = srcHex.CopyTo(dstHex); err != nil {
-		return nil, fmt.Errorf("copying output file: %s", err)
+	// Copy "sketch.ino.*.hex" / "sketch.ino.*.bin" artifacts to sketch directory
+	srcDir, err := outputPath.Parent().ReadDir() // read "/build/path/*"
+	if err != nil {
+		return nil, fmt.Errorf("reading build directory: %s", err)
+	}
+	srcDir.FilterPrefix(base + ".")
+	srcDir.FilterSuffix(ext)
+	for _, srcOutput := range srcDir {
+		srcFilename := srcOutput.Base()       // "sketch.ino.*.bin"
+		srcFilename = srcFilename[len(base):] // ".*.bin"
+		dstOutput := exportPath.Join(exportFile + srcFilename)
+		logrus.WithField("from", srcOutput).WithField("to", dstOutput).Debug("copying sketch build output")
+		if err = srcOutput.CopyTo(dstOutput); err != nil {
+			return nil, fmt.Errorf("copying output file: %s", err)
+		}
 	}
 
 	// Copy .elf file to sketch directory
-	srcElf := paths.New(outputPath[:len(outputPath)-3] + "elf")
+	srcElf := outputPath.Parent().Join(base + ".elf")
 	if srcElf.Exist() {
 		dstElf := exportPath.Join(exportFile + ".elf")
 		logrus.WithField("from", srcElf).WithField("to", dstElf).Debug("copying sketch build output")
