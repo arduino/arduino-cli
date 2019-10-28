@@ -121,7 +121,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 }
 
 func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
-	finder := NewCppIncludesFinder(ctx)
+	finder := NewCppIncludesFinder(ctx, ctx.BuildPath.Join("includes.cache"))
 	finder.UseIncludeDir(ctx.BuildProperties.GetPath("build.core.path"))
 	if variantPath := ctx.BuildProperties.GetPath("build.variant.path"); variantPath != nil {
 		finder.UseIncludeDir(variantPath)
@@ -156,10 +156,10 @@ type CppIncludesFinder struct {
 }
 
 // NewCppIncludesFinder create a new include
-func NewCppIncludesFinder(ctx *types.Context) *CppIncludesFinder {
+func NewCppIncludesFinder(ctx *types.Context, cachePath *paths.Path) *CppIncludesFinder {
 	return &CppIncludesFinder{
 		ctx:   ctx,
-		cache: loadCacheFrom(ctx.BuildPath.Join("includes.cache")),
+		cache: loadCacheFrom(cachePath),
 		queue: &UniqueSourceFileQueue{},
 		log:   logrus.WithField("task", "DetectingLibraries"),
 	}
