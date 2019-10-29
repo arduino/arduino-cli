@@ -25,6 +25,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 
 	"github.com/pkg/errors"
@@ -137,7 +138,6 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 		if err != nil {
 			feedback.Errorf("Error during sketch processing: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
-			return filepath.SkipDir
 		}
 
 		// ignore hidden files and skip hidden directories
