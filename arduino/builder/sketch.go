@@ -23,9 +23,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/cli/feedback"
 
 	"github.com/pkg/errors"
 )
