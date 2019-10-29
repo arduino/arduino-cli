@@ -39,6 +39,8 @@ jobs:
 
       - name: Install Taskfile
         uses: Arduino/actions/setup-taskfile@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check the code is good
         run: task check
