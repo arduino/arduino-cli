@@ -135,7 +135,8 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 	err = simpleLocalWalk(sketchFolder, maxFileSystemDepth, func(path string, info os.FileInfo, err error) error {
 
 		if err != nil {
-			feedback.Printf("\nerror: %+v\n\n", err)
+			feedback.Errorf("Error during sketch processing: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
 			return filepath.SkipDir
 		}
 
