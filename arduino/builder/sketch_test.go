@@ -82,6 +82,48 @@ func TestLoadSketchFolder(t *testing.T) {
 	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
 }
 
+func TestLoadSketchFolderSymlink(t *testing.T) {
+	// pass the path to the sketch folder
+	symlinkSketchPath := filepath.Join("testdata", t.Name())
+	srcSketchPath := t.Name() + "Src"
+	os.Symlink(srcSketchPath, symlinkSketchPath)
+	mainFilePath := filepath.Join(symlinkSketchPath, t.Name()+".ino")
+	s, err := builder.SketchLoad(symlinkSketchPath, "")
+	require.Nil(t, err)
+	require.NotNil(t, s)
+	require.Equal(t, mainFilePath, s.MainFile.Path)
+	require.Equal(t, symlinkSketchPath, s.LocationPath)
+	require.Len(t, s.OtherSketchFiles, 2)
+	require.Equal(t, "old.pde", filepath.Base(s.OtherSketchFiles[0].Path))
+	require.Equal(t, "other.ino", filepath.Base(s.OtherSketchFiles[1].Path))
+	require.Len(t, s.AdditionalFiles, 3)
+	require.Equal(t, "header.h", filepath.Base(s.AdditionalFiles[0].Path))
+	require.Equal(t, "s_file.S", filepath.Base(s.AdditionalFiles[1].Path))
+	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
+
+	// pass the path to the main file
+	symlinkSketchPath = mainFilePath
+	s, err = builder.SketchLoad(symlinkSketchPath, "")
+	require.Nil(t, err)
+	require.NotNil(t, s)
+	require.Equal(t, mainFilePath, s.MainFile.Path)
+	require.Len(t, s.OtherSketchFiles, 2)
+	require.Equal(t, "old.pde", filepath.Base(s.OtherSketchFiles[0].Path))
+	require.Equal(t, "other.ino", filepath.Base(s.OtherSketchFiles[1].Path))
+	require.Len(t, s.AdditionalFiles, 3)
+	require.Equal(t, "header.h", filepath.Base(s.AdditionalFiles[0].Path))
+	require.Equal(t, "s_file.S", filepath.Base(s.AdditionalFiles[1].Path))
+	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
+}
+
+func TestLoadSketchFolderIno(t *testing.T) {
+	// pass the path to the sketch folder
+	sketchPath := filepath.Join("testdata", t.Name())
+	_, err := builder.SketchLoad(sketchPath, "")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "sketch must not be a directory")
+}
+
 func TestLoadSketchFolderWrongMain(t *testing.T) {
 	sketchPath := filepath.Join("testdata", t.Name())
 	_, err := builder.SketchLoad(sketchPath, "")
