@@ -55,7 +55,7 @@ func (pm *PackageManager) IdentifyBoard(idProps *properties.Map) []*cores.Board 
 			if found {
 				foundBoards = append(foundBoards, board)
 			}
-			if !again {
+			if !again && id > 0 { // Always check id 0 and 1 (https://github.com/arduino/arduino-cli/issues/456)
 				break
 			}
 			id++
