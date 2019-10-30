@@ -39,7 +39,7 @@ def test_compile_with_simple_sketch(run_command, data_dir):
     result = run_command("core update-index")
     assert result.ok
 
-    # # Download latest AVR
+    # Download latest AVR
     result = run_command("core install arduino:avr")
     assert result.ok
 
@@ -75,7 +75,7 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     result = run_command("core update-index")
     assert result.ok
 
-    # # Download latest AVR
+    # Download latest AVR
     result = run_command("core install arduino:avr")
     assert result.ok
 
@@ -98,9 +98,7 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
             fqbn=fqbn, sketch_path=sketch_path))
     # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
     # returning a different error detailed message
-    assert "Error during sketch processing" \
-           "".format(
-        loop_file_path=loop_file_path) in result.stderr
+    assert "Error during sketch processing" in result.stderr
     assert not result.ok
 
     sketch_name = "CompileIntegrationTestSymlinkDirLoop"
