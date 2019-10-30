@@ -84,13 +84,15 @@ func TestLoadSketchFolder(t *testing.T) {
 
 func TestLoadSketchFolderSymlink(t *testing.T) {
 	// pass the path to the sketch folder
-	sketchPath := filepath.Join("testdata", t.Name())
-	mainFilePath := filepath.Join(sketchPath, t.Name()+".ino")
-	s, err := builder.SketchLoad(sketchPath, "")
+	symlinkSketchPath := filepath.Join("testdata", t.Name())
+	srcSketchPath := t.Name() + "Src"
+	os.Symlink(srcSketchPath, symlinkSketchPath)
+	mainFilePath := filepath.Join(symlinkSketchPath, t.Name()+".ino")
+	s, err := builder.SketchLoad(symlinkSketchPath, "")
 	require.Nil(t, err)
 	require.NotNil(t, s)
 	require.Equal(t, mainFilePath, s.MainFile.Path)
-	require.Equal(t, sketchPath, s.LocationPath)
+	require.Equal(t, symlinkSketchPath, s.LocationPath)
 	require.Len(t, s.OtherSketchFiles, 2)
 	require.Equal(t, "old.pde", filepath.Base(s.OtherSketchFiles[0].Path))
 	require.Equal(t, "other.ino", filepath.Base(s.OtherSketchFiles[1].Path))
@@ -100,8 +102,8 @@ func TestLoadSketchFolderSymlink(t *testing.T) {
 	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
 
 	// pass the path to the main file
-	sketchPath = mainFilePath
-	s, err = builder.SketchLoad(sketchPath, "")
+	symlinkSketchPath = mainFilePath
+	s, err = builder.SketchLoad(symlinkSketchPath, "")
 	require.Nil(t, err)
 	require.NotNil(t, s)
 	require.Equal(t, mainFilePath, s.MainFile.Path)
