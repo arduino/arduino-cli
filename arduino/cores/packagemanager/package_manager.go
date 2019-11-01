@@ -177,7 +177,7 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 	buildPlatformRelease := platformRelease
 	coreParts := strings.Split(buildProperties.Get("build.core"), ":")
 	if len(coreParts) > 1 {
-		referredPackage := coreParts[1]
+		referredPackage := coreParts[0]
 		buildPackage := pm.Packages[referredPackage]
 		if buildPackage == nil {
 			return targetPackage, platformRelease, board, buildProperties, nil,
