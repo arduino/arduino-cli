@@ -181,7 +181,7 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 		buildPackage := pm.Packages[referredPackage]
 		if buildPackage == nil {
 			return targetPackage, platformRelease, board, buildProperties, nil,
-				fmt.Errorf("missing package %s:%s required for build", referredPackage, platform)
+				fmt.Errorf("missing package %s referenced by board %s", referredPackage, fqbn)
 		}
 		buildPlatform := buildPackage.Platforms[fqbn.PlatformArch]
 		buildPlatformRelease = pm.GetInstalledPlatformRelease(buildPlatform)
