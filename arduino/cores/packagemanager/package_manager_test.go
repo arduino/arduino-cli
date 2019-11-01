@@ -33,6 +33,9 @@ import (
 var customHardware = paths.New("testdata", "custom_hardware")
 var dataDir1 = paths.New("testdata", "data_dir_1")
 
+// Intended to be used alongside dataDir1
+var extraHardware = paths.New("testdata", "extra_hardware")
+
 func TestFindBoardWithFQBN(t *testing.T) {
 	pm := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
 	pm.LoadHardwareFromDirectory(customHardware)
@@ -46,6 +49,128 @@ func TestFindBoardWithFQBN(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, board)
 	require.Equal(t, board.Name(), "Arduino/Genuino Mega or Mega 2560")
+}
+
+func TestResolveFQBN(t *testing.T) {
+	// Pass nil, since these paths are only used for installing
+	pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
+	// Hardware from main packages directory
+	pm.LoadHardwareFromDirectory(dataDir1.Join("packages"))
+	// This contains the arduino:avr core
+	pm.LoadHardwareFromDirectory(customHardware)
+	// This contains the referenced:avr core
+	pm.LoadHardwareFromDirectory(extraHardware)
+
+	fqbn, err := cores.ParseFQBN("arduino:avr:uno")
+	require.Nil(t, err)
+	require.NotNil(t, fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err := pm.ResolveFQBN(fqbn)
+	require.Nil(t, err)
+	require.Equal(t, pkg, platformRelease.Platform.Package)
+	require.NotNil(t, platformRelease)
+	require.NotNil(t, platformRelease.Platform)
+	require.Equal(t, platformRelease.Platform.String(), "arduino:avr")
+	require.NotNil(t, board)
+	require.Equal(t, board.Name(), "Arduino/Genuino Uno")
+	require.NotNil(t, props)
+	require.Equal(t, platformRelease, buildPlatformRelease)
+
+	fqbn, err = cores.ParseFQBN("arduino:avr:mega")
+	require.Nil(t, err)
+	require.NotNil(t, fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err = pm.ResolveFQBN(fqbn)
+	require.Nil(t, err)
+	require.Equal(t, pkg, platformRelease.Platform.Package)
+	require.NotNil(t, platformRelease)
+	require.NotNil(t, platformRelease.Platform)
+	require.Equal(t, platformRelease.Platform.String(), "arduino:avr")
+	require.NotNil(t, board)
+	require.Equal(t, board.Name(), "Arduino/Genuino Mega or Mega 2560")
+	require.NotNil(t, props)
+	require.Equal(t, platformRelease, buildPlatformRelease)
+
+	// Test a board referenced from the main AVR arduino platform
+	fqbn, err = cores.ParseFQBN("referenced:avr:uno")
+	require.Nil(t, err)
+	require.NotNil(t, fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err = pm.ResolveFQBN(fqbn)
+	require.Nil(t, err)
+	require.Equal(t, pkg, platformRelease.Platform.Package)
+	require.NotNil(t, platformRelease)
+	require.NotNil(t, platformRelease.Platform)
+	require.Equal(t, platformRelease.Platform.String(), "referenced:avr")
+	require.NotNil(t, board)
+	require.Equal(t, board.Name(), "Referenced Uno")
+	require.NotNil(t, props)
+	require.NotNil(t, buildPlatformRelease)
+	require.NotNil(t, buildPlatformRelease.Platform)
+	require.Equal(t, buildPlatformRelease.Platform.String(), "arduino:avr")
+
+	// Test a board referenced from the Adafruit SAMD core (this tests
+	// deriving where the package and core name are different)
+	fqbn, err = cores.ParseFQBN("referenced:samd:feather_m0")
+	require.Nil(t, err)
+	require.NotNil(t, fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err = pm.ResolveFQBN(fqbn)
+	require.Nil(t, err)
+	require.Equal(t, pkg, platformRelease.Platform.Package)
+	require.NotNil(t, platformRelease)
+	require.NotNil(t, platformRelease.Platform)
+	require.Equal(t, platformRelease.Platform.String(), "referenced:samd")
+	require.NotNil(t, board)
+	require.Equal(t, board.Name(), "Referenced Feather M0")
+	require.NotNil(t, props)
+	require.NotNil(t, buildPlatformRelease)
+	require.NotNil(t, buildPlatformRelease.Platform)
+	require.Equal(t, buildPlatformRelease.Platform.String(), "adafruit:samd")
+
+	// Test a board referenced from a non-existent package
+	fqbn, err = cores.ParseFQBN("referenced:avr:dummy_invalid_package")
+	require.Nil(t, err)
+	require.NotNil(t, fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err = pm.ResolveFQBN(fqbn)
+	require.NotNil(t, err)
+	require.Equal(t, pkg, platformRelease.Platform.Package)
+	require.NotNil(t, platformRelease)
+	require.NotNil(t, platformRelease.Platform)
+	require.Equal(t, platformRelease.Platform.String(), "referenced:avr")
+	require.NotNil(t, board)
+	require.Equal(t, board.Name(), "Referenced dummy with invalid package")
+	require.NotNil(t, props)
+	require.Nil(t, buildPlatformRelease)
+
+	// Test a board referenced from a non-existent platform/architecture
+	fqbn, err = cores.ParseFQBN("referenced:avr:dummy_invalid_platform")
+	require.Nil(t, err)
+	require.NotNil(t, fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err = pm.ResolveFQBN(fqbn)
+	require.NotNil(t, err)
+	require.Equal(t, pkg, platformRelease.Platform.Package)
+	require.NotNil(t, platformRelease)
+	require.NotNil(t, platformRelease.Platform)
+	require.Equal(t, platformRelease.Platform.String(), "referenced:avr")
+	require.NotNil(t, board)
+	require.Equal(t, board.Name(), "Referenced dummy with invalid platform")
+	require.NotNil(t, props)
+	require.Nil(t, buildPlatformRelease)
+
+	// Test a board referenced from a non-existent core
+	// Note that ResolveFQBN does not actually check this currently
+	fqbn, err = cores.ParseFQBN("referenced:avr:dummy_invalid_core")
+	require.Nil(t, err)
+	require.NotNil(t, fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err = pm.ResolveFQBN(fqbn)
+	require.Nil(t, err)
+	require.Equal(t, pkg, platformRelease.Platform.Package)
+	require.NotNil(t, platformRelease)
+	require.NotNil(t, platformRelease.Platform)
+	require.Equal(t, platformRelease.Platform.String(), "referenced:avr")
+	require.NotNil(t, board)
+	require.Equal(t, board.Name(), "Referenced dummy with invalid core")
+	require.NotNil(t, props)
+	require.NotNil(t, buildPlatformRelease)
+	require.NotNil(t, buildPlatformRelease.Platform)
+	require.Equal(t, buildPlatformRelease.Platform.String(), "arduino:avr")
 }
 
 func TestBoardOptionsFunctions(t *testing.T) {
