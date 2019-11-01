@@ -59,6 +59,26 @@ see following paragraph):
 ```shell
 task test-integration
 ```
+### Running only some tests
+By default, all tests from all go packages are run. To run only unit
+tests from one or more specific packages, you can set the TARGETS
+environment variable, e.g.:
+
+    TARGETS=./arduino/cores/packagemanager task test-unit
+
+Alternatively, to run only some specific test(s), you can specify a regex
+to match against the test function name:
+
+    TEST_REGEX='^TestTryBuild.*' task test-unit
+
+Both can be combined as well, typically to run only a specific test:
+
+    TEST_REGEX='^TestFindBoardWithFQBN$' TARGETS=./arduino/cores/packagemanager task test-unit
+
+For integration test, the same options are supported. Note that when not
+specified, `TEST_REGEX` defaults to "Integration" to select only
+integration tests, so if you specify a broader regex, this could cause
+non-integration tests to be run as well.
 
 ### Integration tests
 
