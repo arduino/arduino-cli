@@ -30,7 +30,7 @@ func (pm *PackageManager) IdentifyBoard(idProps *properties.Map) []*cores.Board 
 		return []*cores.Board{}
 	}
 
-	checkSuffix := func(props *properties.Map, s string) (checked bool, found bool) {
+	checkSuffix := func(props *properties.Map, s string) (present bool, matched bool) {
 		for k, v1 := range idProps.AsMap() {
 			v2, ok := props.GetOk(k + s)
 			if !ok {
@@ -45,17 +45,17 @@ func (pm *PackageManager) IdentifyBoard(idProps *properties.Map) []*cores.Board 
 
 	foundBoards := []*cores.Board{}
 	for _, board := range pm.InstalledBoards() {
-		if _, found := checkSuffix(board.Properties, ""); found {
+		if _, matched := checkSuffix(board.Properties, ""); matched {
 			foundBoards = append(foundBoards, board)
 			continue
 		}
 		id := 0
 		for {
-			again, found := checkSuffix(board.Properties, fmt.Sprintf(".%d", id))
-			if found {
+			present, matched := checkSuffix(board.Properties, fmt.Sprintf(".%d", id))
+			if matched {
 				foundBoards = append(foundBoards, board)
 			}
-			if !again && id > 0 { // Always check id 0 and 1 (https://github.com/arduino/arduino-cli/issues/456)
+			if !present && id > 0 { // Always check id 0 and 1 (https://github.com/arduino/arduino-cli/issues/456)
 				break
 			}
 			id++
