@@ -18,6 +18,7 @@
 package packagemanager_test
 
 import (
+	"fmt"
 	"net/url"
 	"testing"
 
@@ -294,4 +295,24 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 		uploadProperties.Merge(requiredTool.RuntimeProperties())
 	}
 	require.Equal(t, bossac18.InstallDir.String(), uploadProperties.Get("runtime.tools.bossac.path"))
+}
+
+func TestIdentifyBoard(t *testing.T) {
+	pm := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
+	pm.LoadHardwareFromDirectory(customHardware)
+
+	identify := func(vid, pid string) []*cores.Board {
+		return pm.IdentifyBoard(properties.NewFromHashmap(map[string]string{
+			"vid": vid, "pid": pid,
+		}))
+	}
+	require.Equal(t, "[arduino:avr:uno]", fmt.Sprintf("%v", identify("0x2341", "0x0001")))
+
+	// Check indexed vid/pid format (vid.0/pid.0)
+	require.Equal(t, "[test:avr:a]", fmt.Sprintf("%v", identify("0x9999", "0x0001")))
+	require.Equal(t, "[test:avr:b]", fmt.Sprintf("%v", identify("0x9999", "0x0002")))
+	require.Equal(t, "[test:avr:c]", fmt.Sprintf("%v", identify("0x9999", "0x0003")))
+	require.Equal(t, "[test:avr:c]", fmt.Sprintf("%v", identify("0x9999", "0x0004")))
+	// https://github.com/arduino/arduino-cli/issues/456
+	require.Equal(t, "[test:avr:d]", fmt.Sprintf("%v", identify("0x9999", "0x0005")))
 }
