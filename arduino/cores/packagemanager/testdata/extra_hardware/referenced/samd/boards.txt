@@ -1,0 +1,27 @@
+# Dummy board that is pretty much identical to the feather m0, but
+# defined in a different package (to test using a core from a different
+# package where the package name and core name are different).
+feather_m0.name=Referenced Feather M0
+feather_m0.upload.tool=bossac
+feather_m0.upload.protocol=sam-ba
+feather_m0.upload.maximum_size=262144
+feather_m0.upload.offset=0x2000
+feather_m0.upload.use_1200bps_touch=true
+feather_m0.upload.wait_for_upload_port=true
+feather_m0.upload.native_usb=true
+feather_m0.build.mcu=cortex-m0plus
+feather_m0.build.f_cpu=48000000L
+feather_m0.build.usb_product="Feather M0"
+feather_m0.build.usb_manufacturer="Adafruit"
+feather_m0.build.board=SAMD_ZERO
+feather_m0.build.core=adafruit:arduino
+feather_m0.build.extra_flags=-DARDUINO_SAMD_ZERO -DARM_MATH_CM0PLUS -DADAFRUIT_FEATHER_M0 -D__SAMD21G18A__ {build.usb_flags}
+feather_m0.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+feather_m0.build.openocdscript=openocd_scripts/feather_m0.cfg
+feather_m0.build.variant=feather_m0
+feather_m0.build.variant_system_lib=
+feather_m0.build.vid=0x239A
+feather_m0.build.pid=0x800B
+feather_m0.bootloader.tool=openocd
+feather_m0.bootloader.file=featherM0/bootloader-feather_m0-v2.0.0-adafruit.5.bin
+

@@ -1,0 +1,38 @@
+# Dummy board that is pretty much identical to the Uno, but defined in a
+# different package (to test using a core from a different package where
+# the package name and core name are the same).
+uno.name=Referenced Uno
+
+uno.upload.tool=avrdude
+uno.upload.protocol=arduino
+uno.upload.maximum_size=32256
+uno.upload.maximum_data_size=2048
+uno.upload.speed=115200
+
+uno.bootloader.tool=avrdude
+uno.bootloader.low_fuses=0xFF
+uno.bootloader.high_fuses=0xDE
+uno.bootloader.extended_fuses=0xFD
+uno.bootloader.unlock_bits=0x3F
+uno.bootloader.lock_bits=0x0F
+uno.bootloader.file=optiboot/optiboot_atmega328.hex
+
+uno.build.mcu=atmega328p
+uno.build.f_cpu=16000000L
+uno.build.board=AVR_UNO
+uno.build.core=arduino:arduino
+uno.build.variant=standard
+
+# Dummy board derived from a non-existent package
+dummy_invalid_package.name=Referenced dummy with invalid package
+dummy_invalid_package.build.core=nonexistent:arduino
+
+# Dummy board derived from a non-existent core
+dummy_invalid_core.name=Referenced dummy with invalid core
+dummy_invalid_core.build.core=arduino:nonexistent
+
+# Dummy board derived from a non-existent platform/architecture. The
+# platform is avr, which is implied by the directory this file is in. The
+# adafruit package in this test data only supplies a samd platform.
+dummy_invalid_platform.name=Referenced dummy with invalid platform
+dummy_invalid_platform.build.core=adafruit:arduino
