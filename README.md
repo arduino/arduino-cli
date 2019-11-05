@@ -168,7 +168,7 @@ $ arduino-cli core update-index
 Updating index: package_index.json downloaded
 ```
 
-Now, just connect the board to your PCs by using the USB cable. In this example we will use the
+Now, just connect the board to your PCs by using the USB cable. (**Note**: Connecting through an FTDI adapter chip will show Unknown for the Board Name because the VID/PID is generic. Uploading should still work as long as you identify the correct FQBN). In this example we will use the
 MKR1000 board:
 
 ```console
