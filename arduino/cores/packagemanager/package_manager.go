@@ -38,23 +38,25 @@ import (
 // The manager also keeps track of the status of the Packages (their Platform Releases, actually)
 // installed in the system.
 type PackageManager struct {
-	Log         logrus.FieldLogger
-	Packages    cores.Packages
-	IndexDir    *paths.Path
-	PackagesDir *paths.Path
-	DownloadDir *paths.Path
-	TempDir     *paths.Path
+	Log                    logrus.FieldLogger
+	Packages               cores.Packages
+	IndexDir               *paths.Path
+	PackagesDir            *paths.Path
+	DownloadDir            *paths.Path
+	TempDir                *paths.Path
+	CustomGlobalProperties *properties.Map
 }
 
 // NewPackageManager returns a new instance of the PackageManager
 func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) *PackageManager {
 	return &PackageManager{
-		Log:         logrus.StandardLogger(),
-		Packages:    cores.NewPackages(),
-		IndexDir:    indexDir,
-		PackagesDir: packagesDir,
-		DownloadDir: downloadDir,
-		TempDir:     tempDir,
+		Log:                    logrus.StandardLogger(),
+		Packages:               cores.NewPackages(),
+		IndexDir:               indexDir,
+		PackagesDir:            packagesDir,
+		DownloadDir:            downloadDir,
+		TempDir:                tempDir,
+		CustomGlobalProperties: properties.NewMap(),
 	}
 }
 
