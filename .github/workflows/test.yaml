@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        operating-system: [ubuntu-18.04, windows-2019, macOS-10.14]
+        operating-system: [ubuntu-latest, windows-latest, macOS-latest]
 
     runs-on: ${{ matrix.operating-system }}
 
@@ -61,7 +61,7 @@ jobs:
 
       - name: Run unit tests on the legacy package
         # Run legacy tests on one platform only
-        if: matrix.operating-system == 'ubuntu-18.04'
+        if: matrix.operating-system == 'ubuntu-latest'
         run: task test-legacy
 
       - name: Install Python
@@ -81,7 +81,7 @@ jobs:
         # Codecov whitelists GitHub, lifting the need
         # for a token.
         if: >
-          matrix.operating-system == 'ubuntu-18.04' &&
+          matrix.operating-system == 'ubuntu-latest' &&
           github.event_name == 'push'
         uses: codecov/codecov-action@v1.0.2
         with:
@@ -95,7 +95,7 @@ jobs:
         # Codecov whitelists GitHub, lifting the need
         # for a token.
         if: >
-          matrix.operating-system == 'ubuntu-18.04' &&
+          matrix.operating-system == 'ubuntu-latest' &&
           github.event_name == 'push'
         uses: codecov/codecov-action@v1.0.2
         with:
@@ -109,7 +109,7 @@ jobs:
         # Codecov whitelists GitHub, lifting the need
         # for a token.
         if: >
-          matrix.operating-system == 'ubuntu-18.04' &&
+          matrix.operating-system == 'ubuntu-latest' &&
           github.event_name == 'push'
         uses: codecov/codecov-action@v1.0.2
         with:
