@@ -32,6 +32,18 @@ var l5 = &libraries.Library{Name: "Yet Another Calculus Lib Improved", Location:
 var l6 = &libraries.Library{Name: "Calculus Unified Lib", Location: libraries.Sketchbook}
 var l7 = &libraries.Library{Name: "AnotherLib", Location: libraries.Sketchbook}
 
+func TestClosestMatchWithTotallyDifferentNames(t *testing.T) {
+	libraryList := libraries.List{}
+	libraryList.Add(l5)
+	libraryList.Add(l6)
+	libraryList.Add(l7)
+	resolver := NewCppResolver()
+	resolver.headers["XYZ.h"] = libraryList
+	res := resolver.ResolveFor("XYZ.h", "xyz")
+	require.NotNil(t, res)
+	require.Equal(t, l7, res, "selected library")
+}
+
 func TestCppHeaderPriority(t *testing.T) {
 	r1 := computePriority(l1, "calculus_lib.h", "avr")
 	r2 := computePriority(l2, "calculus_lib.h", "avr")
