@@ -77,6 +77,17 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) error {
 	for _, packagerPath := range files {
 		packager := packagerPath.Base()
 
+		// Load custom platform properties if available
+		if packager == "platform.txt" {
+			pm.Log.Infof("Loading custom platform properties: %s", packagerPath)
+			if p, err := properties.LoadFromPath(packagerPath); err != nil {
+				pm.Log.WithError(err).Errorf("Error loading properties.")
+			} else {
+				pm.CustomGlobalProperties.Merge(p)
+			}
+			continue
+		}
+
 		// First exclude all "tools" directory
 		if packager == "tools" {
 			pm.Log.Infof("Excluding directory: %s", packagerPath)

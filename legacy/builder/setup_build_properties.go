@@ -127,6 +127,8 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	buildProperties.Set("extra.time.zone", strconv.Itoa(timeutils.TimezoneOffsetNoDST(now)))
 	buildProperties.Set("extra.time.dst", strconv.Itoa(timeutils.DaylightSavingsOffset(now)))
 
+	buildProperties.Merge(ctx.PackageManager.CustomGlobalProperties)
+
 	ctx.BuildProperties = buildProperties
 
 	return nil
