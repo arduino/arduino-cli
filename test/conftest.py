@@ -56,7 +56,7 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
     Useful reference:
         http://docs.pyinvoke.org/en/1.2/api/runners.html#invoke.runners.Result
     """
-    cli_path = os.path.join(pytestconfig.rootdir, "..", "arduino-cli")
+    cli_path = os.path.join(str(pytestconfig.rootdir), "..", "arduino-cli")
     env = {
         "ARDUINO_DATA_DIR": data_dir,
         "ARDUINO_DOWNLOADS_DIR": downloads_dir,

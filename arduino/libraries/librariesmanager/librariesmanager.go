@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/arduino/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/pmylund/sortutil"
 	"github.com/sirupsen/logrus"
@@ -209,7 +210,8 @@ func (sc *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) err
 // name and version or, if the version is nil, the library installed
 // in the sketchbook.
 func (sc *LibrariesManager) FindByReference(libRef *librariesindex.Reference) *libraries.Library {
-	alternatives, have := sc.Libraries[libRef.Name]
+	saneName := utils.SanitizeName(libRef.Name)
+	alternatives, have := sc.Libraries[saneName]
 	if !have {
 		return nil
 	}
