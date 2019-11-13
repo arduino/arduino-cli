@@ -30,13 +30,11 @@ import (
 func initInitCommand() *cobra.Command {
 	initCommand := &cobra.Command{
 		Use:   "init",
-		Short: "Initializes a new config file into the default location.",
-		Long:  "Initializes a new config file into the default location ($EXE_DIR/cli-config.yml).",
+		Short: "Initializes a new configuration file into the default location.",
+		Long:  "Initializes a new configuration file into the default location ($EXE_DIR/cli-config.yml).",
 		Example: "" +
-			"  # Creates a config file by asking questions to the user into the default location.\n" +
-			"  " + os.Args[0] + " config init\n\n" +
-			"  # Creates a config file with default configuration into default location.\n" +
-			"  " + os.Args[0] + " config init --default\n",
+			"  # Creates a default configuration file into the default location.\n" +
+			"  " + os.Args[0] + " config init",
 		Args: cobra.NoArgs,
 		Run:  runInitCommand,
 	}
@@ -46,7 +44,6 @@ func initInitCommand() *cobra.Command {
 }
 
 var initFlags struct {
-	_default bool   // If false, ask questions to the user about setting configuration properties, otherwise use default configuration.
 	location string // The custom location of the file to create.
 }
 
