@@ -70,6 +70,7 @@ message PlatformUpgradeResp {
 message PlatformSearchReq {
 	Instance instance = 1;
 	string search_args = 2;
+	bool all_versions = 3;
 }
 
 message PlatformSearchResp {

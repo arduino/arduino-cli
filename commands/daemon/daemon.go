@@ -196,7 +196,7 @@ func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeReq, str
 
 // PlatformSearch FIXMEDOC
 func (s *ArduinoCoreServerImpl) PlatformSearch(ctx context.Context, req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error) {
-	return core.PlatformSearch(req.GetInstance().GetId(), req.GetSearchArgs(), false)
+	return core.PlatformSearch(req.GetInstance().GetId(), req.GetSearchArgs(), req.GetAllVersions())
 }
 
 // PlatformList FIXMEDOC
