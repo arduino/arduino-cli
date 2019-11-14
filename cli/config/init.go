@@ -17,12 +17,15 @@ package config
 
 import (
 	"os"
+	"path/filepath"
+
+	"github.com/arduino/arduino-cli/configuration"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func initInitCommand() *cobra.Command {
@@ -48,20 +51,13 @@ var initFlags struct {
 func runInitCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config init`")
 
-	filepath := initFlags.location
-	if filepath == "" {
-		filepath = globals.Config.ConfigFile.String()
-	}
-
-	if err := globals.Config.ConfigFile.Parent().MkdirAll(); err != nil {
+	configFile := filepath.Join(configuration.GetDefaultArduinoDataDir(), "arduino-cli.yaml")
+	err := viper.WriteConfigAs(configFile)
+	if err != nil {
 		feedback.Errorf("Cannot create config file: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if err := globals.Config.SaveToYAML(filepath); err != nil {
-		feedback.Errorf("Cannot create config file: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	feedback.Print("Config file PATH: " + filepath)
+	feedback.Print("Config file written: " + configFile)
 	logrus.Info("Done")
 }

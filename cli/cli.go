@@ -37,6 +37,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/sketch"
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
@@ -172,7 +173,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	// use the output format to configure the Feedback
 	feedback.SetFormat(format)
 
-	globals.InitConfigs()
+	configuration.Init()
 
 	logrus.Info(globals.VersionInfo.Application + "-" + globals.VersionInfo.VersionString)
 	logrus.Info("Starting root command preparation (`arduino`)")
