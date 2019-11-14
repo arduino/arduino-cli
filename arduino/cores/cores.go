@@ -142,7 +142,8 @@ func (platform *Platform) GetLatestRelease() *PlatformRelease {
 	return platform.FindReleaseWithVersion(latestVersion)
 }
 
-// GetAllReleases TODO
+// GetAllReleases returns all the releases of this platform, or an empty
+// slice if no releases are available
 func (platform *Platform) GetAllReleases() []*PlatformRelease {
 	retVal := []*PlatformRelease{}
 	for _, v := range platform.GetAllReleasesVersions() {
