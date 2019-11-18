@@ -22,7 +22,6 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/arduino-cli/version"
 )
 
@@ -31,10 +30,6 @@ var (
 	Debug bool
 	// VersionInfo contains all info injected during build
 	VersionInfo = version.NewInfo(filepath.Base(os.Args[0]))
-	// Config FIXMEDOC
-	Config *configs.Configuration
-	// YAMLConfigFile contains the path to the config file
-	YAMLConfigFile string
 	// AdditionalUrls contains the list of additional urls the boards manager can use
 	AdditionalUrls []string
 	// LogLevel is temporarily exported because the compile command will

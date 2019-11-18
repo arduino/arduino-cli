@@ -19,8 +19,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/arduino/arduino-cli/configuration"
-
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/sirupsen/logrus"
@@ -51,7 +49,7 @@ var initFlags struct {
 func runInitCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config init`")
 
-	configFile := filepath.Join(configuration.GetDefaultArduinoDataDir(), "arduino-cli.yaml")
+	configFile := filepath.Join(viper.GetString("directories.Data"), "arduino-cli.yaml")
 	err := viper.WriteConfigAs(configFile)
 	if err != nil {
 		feedback.Errorf("Cannot create config file: %v", err)

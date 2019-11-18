@@ -68,7 +68,6 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	srv_commands.RegisterArduinoCoreServer(s, &daemon.ArduinoCoreServerImpl{
 		DownloaderHeaders: headers,
 		VersionString:     globals.VersionInfo.VersionString,
-		Config:            globals.Config,
 	})
 
 	// register the monitors service

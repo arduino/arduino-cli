@@ -31,10 +31,11 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/configs"
+	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"go.bug.st/downloader"
 )
 
@@ -47,7 +48,6 @@ var instancesCount int32 = 1
 // instantiate as many as needed by providing a different configuration
 // for each one.
 type CoreInstance struct {
-	config         *configs.Configuration
 	PackageManager *packagemanager.PackageManager
 	lm             *librariesmanager.LibrariesManager
 	getLibOnly     bool
@@ -116,7 +116,7 @@ func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB
 	}
 
 	if ctagsInstalled || serialDiscoveryInstalled {
-		if err := instance.PackageManager.LoadHardware(instance.config); err != nil {
+		if err := instance.PackageManager.LoadHardware(); err != nil {
 			return fmt.Errorf("could not load hardware packages: %s", err)
 		}
 	}
@@ -130,29 +130,11 @@ func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, 
 		return nil, fmt.Errorf("invalid request")
 	}
 
-	config, err := configs.NewConfiguration()
-	if err != nil {
-		return nil, fmt.Errorf("getting default config values: %s", err)
-	}
-	config.DataDir = paths.New(inConfig.DataDir)
-	config.SketchbookDir = paths.New(inConfig.SketchbookDir)
-	if inConfig.DownloadsDir != "" {
-		config.ArduinoDownloadsDir = paths.New(inConfig.DownloadsDir)
-	}
-	for _, rawurl := range inConfig.BoardManagerAdditionalUrls {
-		if u, err := url.Parse(rawurl); err == nil {
-			config.BoardManagerAdditionalUrls = append(config.BoardManagerAdditionalUrls, u)
-		} else {
-			return nil, fmt.Errorf("parsing url %s: %s", rawurl, err)
-		}
-	}
-
-	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(ctx, config, req.GetLibraryManagerOnly())
+	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(ctx, req.GetLibraryManagerOnly())
 	if err != nil {
 		return nil, fmt.Errorf("cannot initialize package manager: %s", err)
 	}
 	instance := &CoreInstance{
-		config:         config,
 		PackageManager: pm,
 		lm:             lm,
 		getLibOnly:     req.GetLibraryManagerOnly()}
@@ -207,13 +189,19 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexReq,
 // UpdateIndex FIXMEDOC
 func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResp, error) {
 	id := req.GetInstance().GetId()
-	coreInstance, ok := instances[id]
+	_, ok := instances[id]
 	if !ok {
 		return nil, fmt.Errorf("invalid handle")
 	}
 
-	indexpath := coreInstance.config.IndexesDir()
-	for _, URL := range coreInstance.config.BoardManagerAdditionalUrls {
+	indexpath := paths.New(viper.GetString("directories.Data"))
+	for _, u := range viper.GetStringSlice("board_manager.additional_urls") {
+		URL, err := url.Parse(u)
+		if err != nil {
+			logrus.Warnf("unable to parse additional URL: %s", u)
+			continue
+		}
+
 		logrus.WithField("url", URL).Print("Updating index")
 
 		tmpFile, err := ioutil.TempFile("", "")
@@ -261,7 +249,7 @@ func Rescan(instanceID int32) (*rpc.RescanResp, error) {
 		return nil, fmt.Errorf("invalid handle")
 	}
 
-	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(context.Background(), coreInstance.config, coreInstance.getLibOnly)
+	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(context.Background(), coreInstance.getLibOnly)
 	if err != nil {
 		return nil, fmt.Errorf("rescanning filesystem: %s", err)
 	}
@@ -274,24 +262,31 @@ func Rescan(instanceID int32) (*rpc.RescanResp, error) {
 	}, nil
 }
 
-func createInstance(ctx context.Context, config *configs.Configuration, getLibOnly bool) (
+func createInstance(ctx context.Context, getLibOnly bool) (
 	*packagemanager.PackageManager, *librariesmanager.LibrariesManager, []string, string, error) {
 	var pm *packagemanager.PackageManager
 	platformIndexErrors := []string{}
+	dataDir := paths.New(viper.GetString("directories.Data"))
+	downloadsDir := paths.New(viper.GetString("directories.Downloads"))
 	if !getLibOnly {
 		pm = packagemanager.NewPackageManager(
-			config.IndexesDir(),
-			config.PackagesDir(),
-			config.DownloadsDir(),
-			config.DataDir.Join("tmp"))
+			dataDir,
+			paths.New(viper.GetString("directories.Packages")),
+			downloadsDir,
+			dataDir.Join("tmp"))
 
-		for _, URL := range config.BoardManagerAdditionalUrls {
+		for _, u := range viper.GetStringSlice("board_manager.additional_urls") {
+			URL, err := url.Parse(u)
+			if err != nil {
+				logrus.Warnf("unable to parse additional URL: %s", u)
+				continue
+			}
 			if err := pm.LoadPackageIndex(URL); err != nil {
 				platformIndexErrors = append(platformIndexErrors, err.Error())
 			}
 		}
 
-		if err := pm.LoadHardware(config); err != nil {
+		if err := pm.LoadHardware(); err != nil {
 			return nil, nil, nil, "", fmt.Errorf("loading hardware packages: %s", err)
 		}
 	}
@@ -301,17 +296,16 @@ func createInstance(ctx context.Context, config *configs.Configuration, getLibOn
 
 	// Initialize library manager
 	// --------------------------
-	lm := librariesmanager.NewLibraryManager(
-		config.IndexesDir(),
-		config.DownloadsDir())
+	lm := librariesmanager.NewLibraryManager(dataDir, downloadsDir)
 
 	// Add IDE builtin libraries dir
-	if bundledLibsDir := config.IDEBundledLibrariesDir(); bundledLibsDir != nil {
+	if bundledLibsDir := configuration.IDEBundledLibrariesDir(); bundledLibsDir != nil {
 		lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
 	}
 
 	// Add sketchbook libraries dir
-	lm.AddLibrariesDir(config.LibrariesDir(), libraries.Sketchbook)
+	libDir := paths.New(viper.GetString("directories.Libraries"))
+	lm.AddLibrariesDir(libDir, libraries.Sketchbook)
 
 	// Add libraries dirs from installed platforms
 	if pm != nil {

@@ -24,9 +24,10 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/configs"
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -212,14 +213,15 @@ func TestBoardOptionsFunctions(t *testing.T) {
 }
 
 func TestFindToolsRequiredForBoard(t *testing.T) {
+	configuration.Init(dataDir1.String())
+	fmt.Println(viper.AllSettings())
 	pm := packagemanager.NewPackageManager(
 		dataDir1,
-		dataDir1.Join("packages"),
-		dataDir1.Join("staging"),
-		dataDir1)
-	conf := &configs.Configuration{
-		DataDir: dataDir1,
-	}
+		paths.New(viper.GetString("directories.Packages")),
+		paths.New(viper.GetString("directories.Downloads")),
+		dataDir1,
+	)
+
 	loadIndex := func(addr string) {
 		res, err := url.Parse(addr)
 		require.NoError(t, err)
@@ -228,7 +230,7 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	loadIndex("https://dl.espressif.com/dl/package_esp32_index.json")
 	loadIndex("http://arduino.esp8266.com/stable/package_esp8266com_index.json")
 	loadIndex("https://adafruit.github.io/arduino-board-index/package_adafruit_index.json")
-	require.NoError(t, pm.LoadHardware(conf))
+	require.NoError(t, pm.LoadHardware())
 	esp32, err := pm.FindBoardWithFQBN("esp32:esp32:esp32")
 	require.NoError(t, err)
 	esptool231 := pm.FindToolDependency(&cores.ToolDependency{

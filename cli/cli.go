@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/board"
@@ -58,6 +59,7 @@ var (
 	logFile      string
 	logFormat    string
 	outputFormat string
+	configFile   string
 )
 
 const (
@@ -87,7 +89,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVar(&logFile, "log-file", "", "Path to the file where logs will be written.")
 	cmd.PersistentFlags().StringVar(&logFormat, "log-format", "text", "The output format for the logs, can be [text|json].")
 	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be [text|json].")
-	cmd.PersistentFlags().StringVar(&globals.YAMLConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
+	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 	cmd.PersistentFlags().StringSliceVar(&globals.AdditionalUrls, "additional-urls", []string{}, "Additional URLs for the board manager.")
 }
 
@@ -173,7 +175,12 @@ func preRun(cmd *cobra.Command, args []string) {
 	// use the output format to configure the Feedback
 	feedback.SetFormat(format)
 
-	configuration.Init()
+	// override the config path if --config-file was passed
+	configPath := ""
+	if configFile != "" {
+		configPath = filepath.Dir(configFile)
+	}
+	configuration.Init(configPath)
 
 	logrus.Info(globals.VersionInfo.Application + "-" + globals.VersionInfo.VersionString)
 	logrus.Info("Starting root command preparation (`arduino`)")

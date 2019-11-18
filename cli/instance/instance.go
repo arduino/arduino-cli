@@ -11,6 +11,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 // CreateInstaceIgnorePlatformIndexErrors creates and return an instance of the
@@ -66,17 +67,15 @@ func packageManagerInitReq() *rpc.InitReq {
 		urls = append(urls, urlString)
 	}
 
-	for _, URL := range globals.Config.BoardManagerAdditionalUrls {
-		urls = append(urls, URL.String())
+	for _, URL := range viper.GetStringSlice("board_manager.additional_urls") {
+		urls = append(urls, URL)
 	}
 
 	conf := &rpc.Configuration{}
-	conf.DataDir = globals.Config.DataDir.String()
-	conf.DownloadsDir = globals.Config.DownloadsDir().String()
+	conf.DataDir = viper.GetString("directories.Data")
+	conf.DownloadsDir = viper.GetString("directories.Downloads")
 	conf.BoardManagerAdditionalUrls = urls
-	if globals.Config.SketchbookDir != nil {
-		conf.SketchbookDir = globals.Config.SketchbookDir.String()
-	}
+	conf.SketchbookDir = viper.GetString("directories.SketchBook")
 
 	return &rpc.InitReq{Configuration: conf}
 }
