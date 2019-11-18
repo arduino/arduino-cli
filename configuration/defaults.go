@@ -21,11 +21,14 @@ import (
 	"github.com/spf13/viper"
 )
 
-func setDefaults() {
-	urls := []string{"https://downloads.arduino.cc/packages/package_index.json"}
-	viper.SetDefault("BoardManagerAdditionalUrls", urls)
+func setDefaults(dataDir, sketchBookDir string) {
+	// board manager settings
+	viper.SetDefault("board_manager.additional_urls", []string{})
 
-	dataDir := GetDefaultArduinoDataDir()
-	viper.SetDefault("DataDir", dataDir)
-	viper.SetDefault("DownloadsDir", filepath.Join(dataDir, "staging"))
+	// arduino directories
+	viper.SetDefault("directories.Data", dataDir)
+	viper.SetDefault("directories.Downloads", filepath.Join(dataDir, "staging"))
+	viper.SetDefault("directories.Packages", filepath.Join(dataDir, "packages"))
+	viper.SetDefault("directories.SketchBook", sketchBookDir)
+	viper.SetDefault("directories.Libraries", filepath.Join(sketchBookDir, "libraries"))
 }
