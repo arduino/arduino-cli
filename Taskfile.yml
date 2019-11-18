@@ -1,4 +1,4 @@
-version: '2'
+version: "2"
 
 tasks:
   docs:gen:commands:
@@ -64,6 +64,15 @@ tasks:
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,monitor.md --proto_path=rpc ./rpc/monitor/*.proto'
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,settings.md --proto_path=rpc ./rpc/settings/*.proto'
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,debug.md --proto_path=rpc ./rpc/debug/*.proto'
+
+  protoc-java:
+    desc: Compile protobuf java bindings
+    cmds:
+      # look here https://github.com/grpc/grpc-java/tree/master/compiler for protoc-gen-grpc-java
+      - '{{ default "protoc" .PROTOC_BINARY }} --plugin={{ default "protoc-gen-grpc-java" .PROTOC_GEN_GRPC_JAVA_BINARY }} --grpc-java_out=rpc/java --proto_path=rpc --java_out=rpc/java ./rpc/commands/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --plugin={{ default "protoc-gen-grpc-java" .PROTOC_GEN_GRPC_JAVA_BINARY }} --grpc-java_out=rpc/java --proto_path=rpc --java_out=rpc/java ./rpc/monitor/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --plugin={{ default "protoc-gen-grpc-java" .PROTOC_GEN_GRPC_JAVA_BINARY }} --grpc-java_out=rpc/java --proto_path=rpc --java_out=rpc/java ./rpc/settings/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --plugin={{ default "protoc-gen-grpc-java" .PROTOC_GEN_GRPC_JAVA_BINARY }} --grpc-java_out=rpc/java --proto_path=rpc --java_out=rpc/java ./rpc/debug/*.proto'
 
   build:
     desc: Build the project
