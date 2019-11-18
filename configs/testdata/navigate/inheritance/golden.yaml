@@ -1,6 +1,0 @@
-proxy_type: auto
-sketchbook_path: /tmp
-arduino_data: $HOME/.arduino15
-board_manager:
-  additional_urls:
-  - https://downloads.arduino.cc/package_index_mraa.json

@@ -1,4 +1,0 @@
-proxy_type: auto
-sketchbook_path: $HOME/Arduino
-arduino_data: $HOME/.arduino15
-board_manager: {}
