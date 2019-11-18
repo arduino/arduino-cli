@@ -50,27 +50,28 @@ func NewCommand() *cobra.Command {
 }
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
-	lis, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
 	s := grpc.NewServer()
 
-	userAgentValue := fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s", globals.VersionInfo.Application,
-		globals.VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), globals.VersionInfo.Commit)
-	headers := http.Header{"User-Agent": []string{userAgentValue}}
-
 	// register the commands service
-	coreServer := daemon.ArduinoCoreServerImpl{
+	headers := http.Header{"User-Agent": []string{
+		fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s",
+			globals.VersionInfo.Application,
+			globals.VersionInfo.VersionString,
+			runtime.GOARCH, runtime.GOOS,
+			runtime.Version(), globals.VersionInfo.Commit)}}
+	srv_commands.RegisterArduinoCoreServer(s, &daemon.ArduinoCoreServerImpl{
 		DownloaderHeaders: headers,
 		VersionString:     globals.VersionInfo.VersionString,
 		Config:            globals.Config,
-	}
-	srv_commands.RegisterArduinoCoreServer(s, &coreServer)
+	})
 
 	// register the monitors service
 	srv_monitor.RegisterMonitorServer(s, &daemon.MonitorService{})
 
+	lis, err := net.Listen("tcp", port)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
