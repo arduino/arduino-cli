@@ -31,6 +31,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
@@ -195,7 +196,9 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 	}
 
 	indexpath := paths.New(viper.GetString("directories.Data"))
-	for _, u := range viper.GetStringSlice("board_manager.additional_urls") {
+	urls := []string{globals.DefaultIndexURL}
+	urls = append(urls, viper.GetStringSlice("board_manager.additional_urls")...)
+	for _, u := range urls {
 		URL, err := url.Parse(u)
 		if err != nil {
 			logrus.Warnf("unable to parse additional URL: %s", u)
@@ -275,7 +278,9 @@ func createInstance(ctx context.Context, getLibOnly bool) (
 			downloadsDir,
 			dataDir.Join("tmp"))
 
-		for _, u := range viper.GetStringSlice("board_manager.additional_urls") {
+		urls := []string{globals.DefaultIndexURL}
+		urls = append(urls, viper.GetStringSlice("board_manager.additional_urls")...)
+		for _, u := range urls {
 			URL, err := url.Parse(u)
 			if err != nil {
 				logrus.Warnf("unable to parse additional URL: %s", u)

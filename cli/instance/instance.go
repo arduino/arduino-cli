@@ -61,11 +61,7 @@ func initInstance() *rpc.InitResp {
 }
 
 func packageManagerInitReq() *rpc.InitReq {
-	urls := []string{}
-
-	for _, urlString := range globals.AdditionalUrls {
-		urls = append(urls, urlString)
-	}
+	urls := []string{globals.DefaultIndexURL}
 
 	for _, URL := range viper.GetStringSlice("board_manager.additional_urls") {
 		urls = append(urls, URL)

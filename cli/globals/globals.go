@@ -30,8 +30,8 @@ var (
 	Debug bool
 	// VersionInfo contains all info injected during build
 	VersionInfo = version.NewInfo(filepath.Base(os.Args[0]))
-	// AdditionalUrls contains the list of additional urls the boards manager can use
-	AdditionalUrls []string
+	// DefaultIndexURL is the default index url
+	DefaultIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
 	// LogLevel is temporarily exported because the compile command will
 	// forward this information to the underlying legacy package
 	LogLevel string
