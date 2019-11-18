@@ -43,6 +43,7 @@ import (
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -90,7 +91,8 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVar(&logFormat, "log-format", "text", "The output format for the logs, can be [text|json].")
 	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be [text|json].")
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", "The custom config file (if not specified the default will be used).")
-	cmd.PersistentFlags().StringSliceVar(&globals.AdditionalUrls, "additional-urls", []string{}, "Additional URLs for the board manager.")
+	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, "Additional URLs for the board manager.")
+	viper.BindPFlag("board_manager.additional_urls", cmd.PersistentFlags().Lookup("additional-urls"))
 }
 
 // convert the string passed to the `--log-level` option to the corresponding
