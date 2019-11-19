@@ -26,8 +26,6 @@ import (
 )
 
 var (
-	// Debug determines whether to dump debug output to stderr or not
-	Debug bool
 	// VersionInfo contains all info injected during build
 	VersionInfo = version.NewInfo(filepath.Base(os.Args[0]))
 	// DefaultIndexURL is the default index url
