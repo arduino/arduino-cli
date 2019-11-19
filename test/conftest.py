@@ -62,11 +62,14 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
         "ARDUINO_DOWNLOADS_DIR": downloads_dir,
         "ARDUINO_SKETCHBOOK_DIR": data_dir,
     }
+    os.makedirs(os.path.join(data_dir, "packages"))
 
     def _run(cmd_string):
         cli_full_line = "{} {}".format(cli_path, cmd_string)
         run_context = Context()
         with run_context.cd(working_dir):
-            return run_context.run(cli_full_line, echo=False, hide=True, warn=True, env=env)
+            return run_context.run(
+                cli_full_line, echo=False, hide=True, warn=True, env=env
+            )
 
     return _run
