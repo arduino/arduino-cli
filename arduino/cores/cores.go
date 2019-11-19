@@ -142,6 +142,17 @@ func (platform *Platform) GetLatestRelease() *PlatformRelease {
 	return platform.FindReleaseWithVersion(latestVersion)
 }
 
+// GetAllReleases returns all the releases of this platform, or an empty
+// slice if no releases are available
+func (platform *Platform) GetAllReleases() []*PlatformRelease {
+	retVal := []*PlatformRelease{}
+	for _, v := range platform.GetAllReleasesVersions() {
+		retVal = append(retVal, platform.FindReleaseWithVersion(v))
+	}
+
+	return retVal
+}
+
 // GetAllReleasesVersions returns all the version numbers in this Platform Package.
 func (platform *Platform) GetAllReleasesVersions() []*semver.Version {
 	versions := []*semver.Version{}

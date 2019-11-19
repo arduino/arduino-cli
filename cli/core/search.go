@@ -18,7 +18,6 @@
 package core
 
 import (
-	"context"
 	"os"
 	"sort"
 	"strings"
@@ -33,15 +32,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	allVersions bool
+)
+
 func initSearchCommand() *cobra.Command {
 	searchCommand := &cobra.Command{
 		Use:     "search <keywords...>",
 		Short:   "Search for a core in the package index.",
 		Long:    "Search for a core in the package index using the specified keywords.",
-		Example: "  " + os.Args[0] + " core search MKRZero -v",
+		Example: "  " + os.Args[0] + " core search MKRZero -a -v",
 		Args:    cobra.ArbitraryArgs,
 		Run:     runSearchCommand,
 	}
+	searchCommand.Flags().BoolVarP(&allVersions, "all", "a", false, "Show all available core versions.")
+
 	return searchCommand
 }
 
@@ -50,10 +55,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core search`")
 
 	arguments := strings.ToLower(strings.Join(args, " "))
-	resp, err := core.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
-		Instance:   instance,
-		SearchArgs: arguments,
-	})
+	resp, err := core.PlatformSearch(instance.GetId(), arguments, allVersions)
 	if err != nil {
 		feedback.Errorf("Error saerching for platforms: %v", err)
 		os.Exit(errorcodes.ErrGeneric)

@@ -59,11 +59,7 @@ func PlatformReleaseToRPC(platformRelease *cores.PlatformRelease) *rpc.Platform 
 		Website:    platformRelease.Platform.Package.WebsiteURL,
 		Email:      platformRelease.Platform.Package.Email,
 		Boards:     boards,
-	}
-
-	latest := platformRelease.Platform.GetLatestRelease()
-	if latest != nil {
-		result.Latest = latest.Version.String()
+		Latest:     platformRelease.Version.String(),
 	}
 
 	return result
