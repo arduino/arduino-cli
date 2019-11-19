@@ -41,18 +41,6 @@ func Init(configPath string) {
 	logrus.Infof("Checking for config file in: %s", configPath)
 	viper.AddConfigPath(configPath)
 
-	// Set configuration defaults
-	setDefaults(configPath, getDefaultSketchbookDir())
-
-	// Attempt to read config file
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			logrus.Info("Config file not found, using default values")
-		} else {
-			feedback.Errorf("Error reading config file: %v", err)
-		}
-	}
-
 	// Bind env vars
 	viper.SetEnvPrefix("ARDUINO")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -62,6 +50,29 @@ func Init(configPath string) {
 	viper.BindEnv("directories.Sketchbook", "ARDUINO_SKETCHBOOK_DIR")
 	viper.BindEnv("directories.Downloads", "ARDUINO_DOWNLOADS_DIR")
 	viper.BindEnv("directories.Data", "ARDUINO_DATA_DIR")
+
+	// Early access directories.Data and directories.Sketchbookin case
+	// those were set through env vars or cli flags
+	dataDir := viper.GetString("directories.Data")
+	if dataDir == "" {
+		dataDir = getDefaultArduinoDataDir()
+	}
+	sketchbookDir := viper.GetString("directories.Sketchbook")
+	if sketchbookDir == "" {
+		sketchbookDir = getDefaultSketchbookDir()
+	}
+
+	// Set default values for all the settings
+	setDefaults(dataDir, sketchbookDir)
+
+	// Attempt to read config file
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			logrus.Info("Config file not found, using default values")
+		} else {
+			feedback.Errorf("Error reading config file: %v", err)
+		}
+	}
 }
 
 // getDefaultArduinoDataDir returns the full path to the default arduino folder

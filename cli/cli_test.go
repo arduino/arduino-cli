@@ -92,6 +92,7 @@ func TestMain(m *testing.M) {
 
 	// SetUp
 	currDataDir = tmpDirOrDie()
+	os.MkdirAll(filepath.Join(currDataDir, "packages"), 0755)
 	os.Setenv("ARDUINO_DATA_DIR", currDataDir)
 	currDownloadDir = tmpDirOrDie()
 	os.Setenv("ARDUINO_DOWNLOADS_DIR", currDownloadDir)
