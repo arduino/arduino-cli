@@ -27,7 +27,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Init initialize defaults and read the configuration file
+// Init initialize defaults and read the configuration file.
+// Please note the logging system hasn't been configured yet,
+// so logging shouldn't be used here.
 func Init(configPath string) {
 	// Config file metadata
 	viper.SetConfigName("arduino-cli")
@@ -38,7 +40,6 @@ func Init(configPath string) {
 	}
 
 	// Add paths where to search for a config file
-	logrus.Infof("Checking for config file in: %s", configPath)
 	viper.AddConfigPath(configPath)
 
 	// Bind env vars
@@ -67,9 +68,9 @@ func Init(configPath string) {
 
 	// Attempt to read config file
 	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			logrus.Info("Config file not found, using default values")
-		} else {
+		// ConfigFileNotFoundError is acceptable, anything else
+		// should be reported to the user
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
 			feedback.Errorf("Error reading config file: %v", err)
 		}
 	}
@@ -79,7 +80,7 @@ func Init(configPath string) {
 func getDefaultArduinoDataDir() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		logrus.Errorf("Unable to get user home dir: %v", err)
+		feedback.Errorf("Unable to get user home dir: %v", err)
 		return "."
 	}
 
@@ -91,7 +92,7 @@ func getDefaultArduinoDataDir() string {
 	case "windows":
 		localAppDataPath, err := win32.GetLocalAppDataFolder()
 		if err != nil {
-			logrus.Errorf("Unable to get Local App Data Folder: %v", err)
+			feedback.Errorf("Unable to get Local App Data Folder: %v", err)
 			return "."
 		}
 		return filepath.Join(localAppDataPath, "Arduino15")
@@ -104,7 +105,7 @@ func getDefaultArduinoDataDir() string {
 func getDefaultSketchbookDir() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		logrus.Errorf("Unable to get user home dir: %v", err)
+		feedback.Errorf("Unable to get user home dir: %v", err)
 		return "."
 	}
 
@@ -116,7 +117,7 @@ func getDefaultSketchbookDir() string {
 	case "windows":
 		documentsPath, err := win32.GetDocumentsFolder()
 		if err != nil {
-			logrus.Errorf("Unable to get Documents Folder: %v", err)
+			feedback.Errorf("Unable to get Documents Folder: %v", err)
 			return "."
 		}
 		return filepath.Join(documentsPath, "Arduino")
@@ -138,18 +139,17 @@ func IsBundledInDesktopIDE() bool {
 	logrus.Info("Checking if CLI is Bundled into the IDE")
 	executable, err := os.Executable()
 	if err != nil {
-		logrus.WithError(err).Warn("Cannot get executable path")
+		feedback.Errorf("Cannot get executable path: %v", err)
 		return viper.GetBool("IDE.Bundled")
 	}
 
 	executablePath, err := filepath.EvalSymlinks(executable)
 	if err != nil {
-		logrus.WithError(err).Warn("Cannot get executable path")
+		feedback.Errorf("Cannot get executable path: %v", err)
 		return viper.GetBool("IDE.Bundled")
 	}
 
 	ideDir := filepath.Dir(executablePath)
-	logrus.Info("Candidate IDE Directory: ", ideDir)
 
 	// We check an arbitrary number of folders that are part of the IDE
 	// install tree
@@ -166,7 +166,6 @@ func IsBundledInDesktopIDE() bool {
 		}
 
 		if test == "portable" {
-			logrus.Info("IDE is portable")
 			viper.Set("IDE.Portable", true)
 		}
 	}

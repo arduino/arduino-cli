@@ -118,7 +118,22 @@ func parseFormatString(arg string) (feedback.OutputFormat, bool) {
 }
 
 func preRun(cmd *cobra.Command, args []string) {
-	// before doing anything, decide whether we should log to stdout
+	//
+	// Prepare the configuration system
+	//
+	configPath := ""
+	if configFile != "" {
+		// override the config path if --config-file was passed
+		configPath = filepath.Dir(configFile)
+	}
+	configuration.Init(configPath)
+	configFile := viper.ConfigFileUsed()
+
+	//
+	// Prepare logging
+	//
+
+	// decide whether we should log to stdout
 	if verbose {
 		// if we print on stdout, do it in full colors
 		logrus.SetOutput(colorable.NewColorableStdout())
@@ -129,23 +144,14 @@ func preRun(cmd *cobra.Command, args []string) {
 		logrus.SetOutput(ioutil.Discard)
 	}
 
-	// setup the configuration system
-	configPath := ""
-	if configFile != "" {
-		// override the config path if --config-file was passed
-		configPath = filepath.Dir(configFile)
-	}
-	configuration.Init(configPath)
-
-	// normalize the format strings
-	outputFormat = strings.ToLower(outputFormat)
-	// configure the output package
-	output.OutputFormat = outputFormat
-	// configure log format
+	// set the Logger format
 	logFormat := strings.ToLower(viper.GetString("logging.format"))
+	if logFormat == "json" {
+		logrus.SetFormatter(&logrus.JSONFormatter{})
+	}
 
 	// should we log to file?
-	logFile := viper.GetString("log.file")
+	logFile := viper.GetString("logging.file")
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
@@ -169,11 +175,14 @@ func preRun(cmd *cobra.Command, args []string) {
 		logrus.SetLevel(lvl)
 	}
 
-	// set the Logger format
-	if logFormat == "json" {
-		logrus.SetFormatter(&logrus.JSONFormatter{})
-	}
+	//
+	// Prepare the Feedback system
+	//
 
+	// normalize the format strings
+	outputFormat = strings.ToLower(outputFormat)
+	// configure the output package
+	output.OutputFormat = outputFormat
 	// check the right output format was passed
 	format, found := parseFormatString(outputFormat)
 	if !found {
@@ -184,10 +193,18 @@ func preRun(cmd *cobra.Command, args []string) {
 	// use the output format to configure the Feedback
 	feedback.SetFormat(format)
 
-	logrus.Info(globals.VersionInfo.Application + "-" + globals.VersionInfo.VersionString)
-	logrus.Info("Starting root command preparation (`arduino`)")
+	//
+	// Print some status info and check command is consistent
+	//
 
-	logrus.Info("Formatter set")
+	if configFile != "" {
+		logrus.Infof("Using config file: %s", configFile)
+	} else {
+		logrus.Info("Config file not found, using default values")
+	}
+
+	logrus.Info(globals.VersionInfo.Application + " version " + globals.VersionInfo.VersionString)
+
 	if outputFormat != "text" {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 			logrus.Warn("Calling help on JSON format")
