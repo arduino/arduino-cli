@@ -22,7 +22,10 @@ import (
 )
 
 func setDefaults(dataDir, sketchBookDir string) {
-	// board manager settings
+	// logging
+	viper.SetDefault("logging.level", "info")
+	viper.SetDefault("logging.format", "text")
+	// board manager
 	viper.SetDefault("board_manager.additional_urls", []string{})
 
 	// arduino directories

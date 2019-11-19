@@ -22,7 +22,6 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -32,6 +31,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -107,7 +107,7 @@ func run(cmd *cobra.Command, args []string) {
 		Quiet:           quiet,
 		VidPid:          vidPid,
 		ExportFile:      exportFile,
-	}, os.Stdout, os.Stderr, globals.LogLevel == "debug")
+	}, os.Stdout, os.Stderr, viper.GetString("logging.level") == "debug")
 
 	if err != nil {
 		feedback.Errorf("Error during build: %v", err)

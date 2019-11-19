@@ -32,9 +32,6 @@ var (
 	VersionInfo = version.NewInfo(filepath.Base(os.Args[0]))
 	// DefaultIndexURL is the default index url
 	DefaultIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
-	// LogLevel is temporarily exported because the compile command will
-	// forward this information to the underlying legacy package
-	LogLevel string
 )
 
 // NewHTTPClientHeader returns the http.Header object that must be used by the clients inside the downloaders

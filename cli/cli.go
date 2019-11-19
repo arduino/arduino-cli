@@ -57,14 +57,8 @@ var (
 	}
 
 	verbose      bool
-	logFile      string
-	logFormat    string
 	outputFormat string
 	configFile   string
-)
-
-const (
-	defaultLogLevel = "info"
 )
 
 // Init the cobra root command
@@ -86,9 +80,12 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(version.NewCommand())
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
-	cmd.PersistentFlags().StringVar(&globals.LogLevel, "log-level", defaultLogLevel, "Messages with this level and above will be logged.")
-	cmd.PersistentFlags().StringVar(&logFile, "log-file", "", "Path to the file where logs will be written.")
-	cmd.PersistentFlags().StringVar(&logFormat, "log-format", "text", "The output format for the logs, can be [text|json].")
+	cmd.PersistentFlags().String("log-level", "", "Messages with this level and above will be logged.")
+	viper.BindPFlag("logging.level", cmd.PersistentFlags().Lookup("log-level"))
+	cmd.PersistentFlags().String("log-file", "", "Path to the file where logs will be written.")
+	viper.BindPFlag("logging.file", cmd.PersistentFlags().Lookup("log-file"))
+	cmd.PersistentFlags().String("log-format", "", "The output format for the logs, can be [text|json].")
+	viper.BindPFlag("logging.format", cmd.PersistentFlags().Lookup("log-format"))
 	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be [text|json].")
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, "Additional URLs for the board manager.")
@@ -121,13 +118,34 @@ func parseFormatString(arg string) (feedback.OutputFormat, bool) {
 }
 
 func preRun(cmd *cobra.Command, args []string) {
+	// before doing anything, decide whether we should log to stdout
+	if verbose {
+		// if we print on stdout, do it in full colors
+		logrus.SetOutput(colorable.NewColorableStdout())
+		logrus.SetFormatter(&logrus.TextFormatter{
+			ForceColors: true,
+		})
+	} else {
+		logrus.SetOutput(ioutil.Discard)
+	}
+
+	// setup the configuration system
+	configPath := ""
+	if configFile != "" {
+		// override the config path if --config-file was passed
+		configPath = filepath.Dir(configFile)
+	}
+	configuration.Init(configPath)
+
 	// normalize the format strings
 	outputFormat = strings.ToLower(outputFormat)
 	// configure the output package
 	output.OutputFormat = outputFormat
-	logFormat = strings.ToLower(logFormat)
+	// configure log format
+	logFormat := strings.ToLower(viper.GetString("logging.format"))
 
 	// should we log to file?
+	logFile := viper.GetString("log.file")
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
@@ -143,20 +161,9 @@ func preRun(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	// should we log to stdout?
-	if verbose {
-		logrus.SetOutput(colorable.NewColorableStdout())
-		logrus.SetFormatter(&logrus.TextFormatter{
-			ForceColors: true,
-		})
-	} else {
-		// Discard logrus output if no writer was set
-		logrus.SetOutput(ioutil.Discard)
-	}
-
 	// configure logging filter
-	if lvl, found := toLogLevel(globals.LogLevel); !found {
-		fmt.Printf("Invalid option for --log-level: %s", globals.LogLevel)
+	if lvl, found := toLogLevel(viper.GetString("logging.level")); !found {
+		feedback.Errorf("Invalid option for --log-level: %s", viper.GetString("logging.level"))
 		os.Exit(errorcodes.ErrBadArgument)
 	} else {
 		logrus.SetLevel(lvl)
@@ -176,13 +183,6 @@ func preRun(cmd *cobra.Command, args []string) {
 
 	// use the output format to configure the Feedback
 	feedback.SetFormat(format)
-
-	// override the config path if --config-file was passed
-	configPath := ""
-	if configFile != "" {
-		configPath = filepath.Dir(configFile)
-	}
-	configuration.Init(configPath)
 
 	logrus.Info(globals.VersionInfo.Application + "-" + globals.VersionInfo.VersionString)
 	logrus.Info("Starting root command preparation (`arduino`)")
