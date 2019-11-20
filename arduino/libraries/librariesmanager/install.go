@@ -77,6 +77,9 @@ func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPat
 
 // Uninstall removes a Library
 func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
+	if lib == nil || lib.InstallDir == nil {
+		return fmt.Errorf("install directory not set")
+	}
 	if err := lib.InstallDir.RemoveAll(); err != nil {
 		return fmt.Errorf("removing lib directory: %s", err)
 	}

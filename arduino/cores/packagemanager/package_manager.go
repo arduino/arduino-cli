@@ -191,6 +191,10 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 				fmt.Errorf("missing platform %s:%s referenced by board %s", referredPackage, fqbn.PlatformArch, fqbn)
 		}
 		buildPlatformRelease = pm.GetInstalledPlatformRelease(buildPlatform)
+		if buildPlatformRelease == nil {
+			return targetPackage, platformRelease, board, buildProperties, nil,
+				fmt.Errorf("missing platform release %s:%s referenced by board %s", referredPackage, fqbn.PlatformArch, fqbn)
+		}
 	}
 
 	// No errors... phew!
