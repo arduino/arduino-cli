@@ -19,6 +19,8 @@ package daemon
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -39,7 +41,7 @@ const (
 
 // NewCommand created a new `daemon` command
 func NewCommand() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "daemon",
 		Short:   fmt.Sprintf("Run as a daemon on port %s", port),
 		Long:    "Running as a daemon the initialization of cores and libraries is done only once.",
@@ -47,33 +49,45 @@ func NewCommand() *cobra.Command {
 		Args:    cobra.NoArgs,
 		Run:     runDaemonCommand,
 	}
+	cmd.Flags().BoolVar(&daemonize, "daemonize", false, "Do not terminate daemon process if the parent process dies")
+	return cmd
 }
 
+var daemonize bool
+
 func runDaemonCommand(cmd *cobra.Command, args []string) {
-	lis, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
 	s := grpc.NewServer()
 
-	userAgentValue := fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s", globals.VersionInfo.Application,
-		globals.VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), globals.VersionInfo.Commit)
-	headers := http.Header{"User-Agent": []string{userAgentValue}}
-
 	// register the commands service
-	coreServer := daemon.ArduinoCoreServerImpl{
+	headers := http.Header{"User-Agent": []string{
+		fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s",
+			globals.VersionInfo.Application,
+			globals.VersionInfo.VersionString,
+			runtime.GOARCH, runtime.GOOS,
+			runtime.Version(), globals.VersionInfo.Commit)}}
+	srv_commands.RegisterArduinoCoreServer(s, &daemon.ArduinoCoreServerImpl{
 		DownloaderHeaders: headers,
 		VersionString:     globals.VersionInfo.VersionString,
 		Config:            globals.Config,
-	}
-	srv_commands.RegisterArduinoCoreServer(s, &coreServer)
+	})
 
 	// register the monitors service
 	srv_monitor.RegisterMonitorServer(s, &daemon.MonitorService{})
 
+	if !daemonize {
+		// When parent process ends terminate also the daemon
+		go func() {
+			// stdin is closed when the controlling parent process ends
+			_, _ = io.Copy(ioutil.Discard, os.Stdin)
+			os.Exit(0)
+		}()
+	}
+
+	lis, err := net.Listen("tcp", port)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-
-	fmt.Println("Done serving")
 }
