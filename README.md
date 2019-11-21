@@ -234,9 +234,33 @@ Great! Now we are ready to compile and upload the sketch.
 
 #### Adding 3rd party cores
 
-To add 3rd party core packages add a link of the additional package to the file `arduino-cli.yaml`
+To use 3rd party core packages, pass a link to the the additional package index
+file with the `--additional-urls` option to any command that supports additional
+cores:
 
-If you want to add the ESP8266 core, for example:
+```console
+$ arduino-cli core update-index --additional-urls http://arduino.esp8266.com/stable/package_esp8266com_index.json
+$
+$ arduino-cli core search esp8266 --additional-urls http://arduino.esp8266.com/stable/package_esp8266com_index.json
+ID              Version Name
+esp8266:esp8266 2.5.2   esp8266
+```
+
+To avoid passing the `--additional-urls` option every time you run a command,
+you can list the URLs to additional package indexes in the CLI configuration
+file. If you don't have a configuration file yet (it's the case of a fresh
+install) you can create one with the command:
+
+```console
+$ arduino-cli config init
+Config file PATH: /home/user/.arduino15/arduino-cli.yaml
+```
+
+This will create a configuration file in its default location for the current
+operating system and will print the full path to the file.
+
+For example, to add the ESP8266 core, edit the configration file and add the
+following:
 
 ```yaml
 board_manager:
@@ -244,7 +268,8 @@ board_manager:
     - http://arduino.esp8266.com/stable/package_esp8266com_index.json
 ```
 
-And then run:
+From now on, commands supporting custom cores will automatically use the
+additional URL from the configuration file:
 
 ```console
 $ arduino-cli core update-index
@@ -253,16 +278,6 @@ Updating index: package_esp8266com_index.json downloaded
 Updating index: package_index.json downloaded
 
 $ arduino-cli core search esp8266
-ID              Version Name
-esp8266:esp8266 2.5.2   esp8266
-```
-
-Alternatively, you can pass the `--additional-urls` to any command involving the additional cores:
-
-```console
-$ arduino-cli core update-index --additional-urls http://arduino.esp8266.com/stable/package_esp8266com_index.json
-$
-$ arduino-cli core search esp8266 --additional-urls http://arduino.esp8266.com/stable/package_esp8266com_index.json
 ID              Version Name
 esp8266:esp8266 2.5.2   esp8266
 ```
