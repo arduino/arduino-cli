@@ -37,7 +37,7 @@ func TestDownloadAndChecksums(t *testing.T) {
 		ArchiveFileName: "index.html",
 		CachePath:       "cache",
 		Checksum:        "SHA-256:e021e1a223d03069d5f08dea25a58ca445a7376d9bdf980f756034f118449e66",
-		Size:            2263,
+		Size:            1119,
 		URL:             "https://downloads.arduino.cc/index.html",
 	}
 	digest, err := hex.DecodeString("e021e1a223d03069d5f08dea25a58ca445a7376d9bdf980f756034f118449e66")
