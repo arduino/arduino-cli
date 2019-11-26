@@ -23,7 +23,7 @@ import (
 	"net/http"
 	"testing"
 
-	paths "github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,16 +31,16 @@ func TestDownloadAndChecksums(t *testing.T) {
 	tmp, err := paths.MkTempDir("", "")
 	require.NoError(t, err)
 	defer tmp.RemoveAll()
-	testFile := tmp.Join("cache", "asciilogo.txt")
+	testFile := tmp.Join("cache", "index.html")
 
 	r := &DownloadResource{
-		ArchiveFileName: "asciilogo.txt",
+		ArchiveFileName: "index.html",
 		CachePath:       "cache",
-		Checksum:        "SHA-256:618d6c3d3f02388d4ddbe13c893902422a8656365b67ba19ef80873bf1da0f1f",
-		Size:            2263,
-		URL:             "https://arduino.cc/asciilogo.txt",
+		Checksum:        "SHA-256:e021e1a223d03069d5f08dea25a58ca445a7376d9bdf980f756034f118449e66",
+		Size:            1119,
+		URL:             "https://downloads.arduino.cc/index.html",
 	}
-	digest, err := hex.DecodeString("618d6c3d3f02388d4ddbe13c893902422a8656365b67ba19ef80873bf1da0f1f")
+	digest, err := hex.DecodeString("e021e1a223d03069d5f08dea25a58ca445a7376d9bdf980f756034f118449e66")
 	require.NoError(t, err)
 
 	downloadAndTestChecksum := func() {
@@ -91,12 +91,12 @@ func TestDownloadAndChecksums(t *testing.T) {
 	_, err = r.TestLocalArchiveChecksum(tmp)
 	require.Error(t, err)
 
-	r.Checksum = "SHA-1:960f50b4326ba28304039f3d2c0fb30a0463372f"
+	r.Checksum = "SHA-1:c007e47637cc6ad6176e7d94aeffc232ee34c1c1"
 	res, err := r.TestLocalArchiveChecksum(tmp)
 	require.NoError(t, err)
 	require.True(t, res)
 
-	r.Checksum = "MD5:667cf48afcc12c38c8c1637947a04224"
+	r.Checksum = "MD5:2e388576eefd92a15967868d5f566f29"
 	res, err = r.TestLocalArchiveChecksum(tmp)
 	require.NoError(t, err)
 	require.True(t, res)
