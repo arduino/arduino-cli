@@ -20,11 +20,10 @@ package resources
 import (
 	"crypto"
 	"encoding/hex"
-	"fmt"
 	"net/http"
 	"testing"
 
-	paths "github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -52,31 +51,29 @@ func TestDownloadAndChecksums(t *testing.T) {
 
 		data, err := testFile.ReadFile()
 		require.NoError(t, err)
-		fmt.Println(string(data))
-		fmt.Println("==========================================================================")
 		algo := crypto.SHA256.New()
 		algo.Write(data)
 		require.EqualValues(t, digest, algo.Sum(nil))
 	}
 
-	//// Normal download
+	// Normal download
 	downloadAndTestChecksum()
-	//
-	//// Download with cached file
-	//d, err := r.Download(tmp, http.Header{})
-	//require.NoError(t, err)
-	//require.Nil(t, d)
-	//
-	//// Download if cached file has data in excess (redownload)
-	//data, err := testFile.ReadFile()
-	//require.NoError(t, err)
-	//data = append(data, []byte("123123123")...)
-	//err = testFile.WriteFile(data)
-	//require.NoError(t, err)
-	//downloadAndTestChecksum()
+
+	// Download with cached file
+	d, err := r.Download(tmp, http.Header{})
+	require.NoError(t, err)
+	require.Nil(t, d)
+
+	// Download if cached file has data in excess (redownload)
+	data, err := testFile.ReadFile()
+	require.NoError(t, err)
+	data = append(data, []byte("123123123")...)
+	err = testFile.WriteFile(data)
+	require.NoError(t, err)
+	downloadAndTestChecksum()
 
 	// Download if cached file has less data (resume)
-	data, err := testFile.ReadFile()
+	data, err = testFile.ReadFile()
 	require.NoError(t, err)
 	err = testFile.WriteFile(data[:1000])
 	require.NoError(t, err)
