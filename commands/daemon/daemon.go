@@ -295,6 +295,11 @@ func (s *ArduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllReq,
 	return stream.Send(&rpc.LibraryUpgradeAllResp{})
 }
 
+// LibraryResolveDependencies FIXMEDOC
+func (s *ArduinoCoreServerImpl) LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesReq) (*rpc.LibraryResolveDependenciesResp, error) {
+	return lib.LibraryResolveDependencies(ctx, req)
+}
+
 // LibrarySearch FIXMEDOC
 func (s *ArduinoCoreServerImpl) LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.LibrarySearchResp, error) {
 	return lib.LibrarySearch(ctx, req)

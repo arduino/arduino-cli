@@ -21,10 +21,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/go-paths-helper"
 	semver "go.bug.st/relaxed-semver"
-
-	"github.com/arduino/arduino-cli/arduino/resources"
 )
 
 type indexJSON struct {
@@ -32,20 +31,26 @@ type indexJSON struct {
 }
 
 type indexRelease struct {
-	Name            string          `json:"name,required"`
-	Version         *semver.Version `json:"version,required"`
-	Author          string          `json:"author"`
-	Maintainer      string          `json:"maintainer"`
-	Sentence        string          `json:"sentence"`
-	Paragraph       string          `json:"paragraph"`
-	Website         string          `json:"website"`
-	Category        string          `json:"category"`
-	Architectures   []string        `json:"architectures"`
-	Types           []string        `json:"types"`
-	URL             string          `json:"url"`
-	ArchiveFileName string          `json:"archiveFileName"`
-	Size            int64           `json:"size"`
-	Checksum        string          `json:"checksum"`
+	Name            string             `json:"name,required"`
+	Version         *semver.Version    `json:"version,required"`
+	Author          string             `json:"author"`
+	Maintainer      string             `json:"maintainer"`
+	Sentence        string             `json:"sentence"`
+	Paragraph       string             `json:"paragraph"`
+	Website         string             `json:"website"`
+	Category        string             `json:"category"`
+	Architectures   []string           `json:"architectures"`
+	Types           []string           `json:"types"`
+	URL             string             `json:"url"`
+	ArchiveFileName string             `json:"archiveFileName"`
+	Size            int64              `json:"size"`
+	Checksum        string             `json:"checksum"`
+	Dependencies    []*indexDependency `json:"dependencies,omitempty"`
+}
+
+type indexDependency struct {
+	Name    string `json:"name"`
+	Version string `json:"version,omitempty"`
 }
 
 // LoadIndex reads a library_index.json and create the corresponding Index
@@ -104,10 +109,35 @@ func (indexLib *indexRelease) extractReleaseIn(library *Library) {
 			Checksum:        indexLib.Checksum,
 			CachePath:       "libraries",
 		},
-		Library: library,
+		Library:      library,
+		Dependencies: indexLib.extractDependencies(),
 	}
 	library.Releases[indexLib.Version.String()] = release
 	if library.Latest == nil || library.Latest.Version.LessThan(release.Version) {
 		library.Latest = release
+	}
+}
+
+func (indexLib *indexRelease) extractDependencies() []semver.Dependency {
+	res := []semver.Dependency{}
+	if indexLib.Dependencies == nil || len(indexLib.Dependencies) == 0 {
+		return res
+	}
+	for _, indexDep := range indexLib.Dependencies {
+		res = append(res, indexDep.extractDependency())
+	}
+	return res
+}
+
+func (indexDep *indexDependency) extractDependency() *Dependency {
+	var constraint semver.Constraint
+	if c, err := semver.ParseConstraint(indexDep.Version); err == nil {
+		constraint = c
+	} else {
+		// FIXME: report invalid constraint
+	}
+	return &Dependency{
+		Name:              indexDep.Name,
+		VersionConstraint: constraint,
 	}
 }

@@ -86,6 +86,8 @@ service ArduinoCore {
 
   rpc LibraryUpgradeAll(LibraryUpgradeAllReq) returns (stream LibraryUpgradeAllResp);
 
+  rpc LibraryResolveDependencies(LibraryResolveDependenciesReq) returns (LibraryResolveDependenciesResp);
+
   rpc LibrarySearch(LibrarySearchReq) returns (LibrarySearchResp);
 
   rpc LibraryList(LibraryListReq) returns (LibraryListResp);

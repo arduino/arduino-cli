@@ -41,6 +41,6 @@ func NewCommand() *cobra.Command {
 	libCommand.AddCommand(initUninstallCommand())
 	libCommand.AddCommand(initUpgradeCommand())
 	libCommand.AddCommand(initUpdateIndexCommand())
-
+	libCommand.AddCommand(initDepsCommand())
 	return libCommand
 }

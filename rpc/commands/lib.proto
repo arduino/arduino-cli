@@ -63,6 +63,22 @@ message LibraryUpgradeAllResp {
     TaskProgress task_progress = 2;
 }
 
+message LibraryResolveDependenciesReq {
+    Instance instance = 1;
+    string name = 2;
+    string version = 3;
+}
+
+message LibraryResolveDependenciesResp {
+    repeated LibraryDependencyStatus dependencies = 1;
+}
+
+message LibraryDependencyStatus {
+    string name = 1;
+    string versionRequired = 2;
+    string versionInstalled = 3;
+}
+
 message LibrarySearchReq {
     Instance instance = 1;
     string query = 2;

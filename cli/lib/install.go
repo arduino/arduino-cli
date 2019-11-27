@@ -42,22 +42,60 @@ func initInstallCommand() *cobra.Command {
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}
+	installCommand.Flags().BoolVar(&installFlags.noDeps, "no-deps", false, "Do not install dependencies.")
 	return installCommand
+}
+
+var installFlags struct {
+	noDeps bool
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
-	refs, err := globals.ParseReferenceArgs(args, false)
+	libRefs, err := globals.ParseLibraryReferenceArgs(args)
 	if err != nil {
 		feedback.Errorf("Arguments error: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
-	for _, library := range refs {
+	toInstall := map[string]*rpc.LibraryDependencyStatus{}
+	if installFlags.noDeps {
+		for _, libRef := range libRefs {
+			toInstall[libRef.Name] = &rpc.LibraryDependencyStatus{
+				Name:            libRef.Name,
+				VersionRequired: libRef.Version,
+			}
+		}
+	} else {
+		for _, libRef := range libRefs {
+			depsResp, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesReq{
+				Instance: instance,
+				Name:     libRef.Name,
+				Version:  libRef.Version,
+			})
+			if err != nil {
+				feedback.Errorf("Error resolving dependencies for %s: %s", libRef, err)
+			}
+			for _, dep := range depsResp.GetDependencies() {
+				feedback.Printf("%s depends on %s@%s", libRef, dep.GetName(), dep.GetVersionRequired())
+				if existingDep, has := toInstall[dep.GetName()]; has {
+					if existingDep.GetVersionRequired() != dep.GetVersionRequired() {
+						// TODO: make a better error
+						feedback.Errorf("The library %s is required in two different versions: %s and %s",
+							dep.GetName(), dep.GetVersionRequired(), existingDep.GetVersionRequired())
+						os.Exit(errorcodes.ErrGeneric)
+					}
+				}
+				toInstall[dep.GetName()] = dep
+			}
+		}
+	}
+
+	for _, library := range toInstall {
 		libraryInstallReq := &rpc.LibraryInstallReq{
 			Instance: instance,
-			Name:     library.PackageName,
-			Version:  library.Version,
+			Name:     library.Name,
+			Version:  library.VersionRequired,
 		}
 		err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.ProgressBar(),
 			output.TaskProgress(), globals.NewHTTPClientHeader())
