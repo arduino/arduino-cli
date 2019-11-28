@@ -153,7 +153,11 @@ downloadFile() {
 installFile() {
 	CLI_TMP="/tmp/$PROJECT_NAME"
 	mkdir -p "$CLI_TMP"
-	tar xf "$CLI_TMP_FILE" -C "$CLI_TMP"
+	if [ "$OS" = "Windows" ]; then
+		unzip -d "$CLI_TMP" "$CLI_TMP_FILE"
+	else
+		tar xf "$CLI_TMP_FILE" -C "$CLI_TMP"
+	fi
 	CLI_TMP_BIN="$CLI_TMP/$PROJECT_NAME"
 	cp "$CLI_TMP_BIN" "$LBINDIR"
 	rm -rf $CLI_TMP
