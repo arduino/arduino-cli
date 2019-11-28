@@ -20,6 +20,7 @@ package packagemanager_test
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -213,7 +214,8 @@ func TestBoardOptionsFunctions(t *testing.T) {
 }
 
 func TestFindToolsRequiredForBoard(t *testing.T) {
-	configuration.Init(dataDir1.String())
+	os.Setenv("ARDUINO_DATA_DIR", dataDir1.String())
+	configuration.Init("")
 	fmt.Println(viper.AllSettings())
 	pm := packagemanager.NewPackageManager(
 		dataDir1,

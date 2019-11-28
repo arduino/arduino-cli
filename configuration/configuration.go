@@ -52,7 +52,7 @@ func Init(configPath string) {
 	viper.BindEnv("directories.Downloads", "ARDUINO_DOWNLOADS_DIR")
 	viper.BindEnv("directories.Data", "ARDUINO_DATA_DIR")
 
-	// Early access directories.Data and directories.Sketchbookin case
+	// Early access directories.Data and directories.Sketchbook in case
 	// those were set through env vars or cli flags
 	dataDir := viper.GetString("directories.Data")
 	if dataDir == "" {
