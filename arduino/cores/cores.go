@@ -182,10 +182,13 @@ func (platform *Platform) latestReleaseVersion() *semver.Version {
 // GetAllInstalled returns all installed PlatformRelease
 func (platform *Platform) GetAllInstalled() []*PlatformRelease {
 	res := []*PlatformRelease{}
-	for _, release := range platform.Releases {
-		if release.IsInstalled() {
-			res = append(res, release)
+	if platform.Releases != nil {
+		for _, release := range platform.Releases {
+			if release.IsInstalled() {
+				res = append(res, release)
+			}
 		}
+
 	}
 	return res
 }
@@ -225,17 +228,23 @@ func (release *PlatformRelease) RequiresToolRelease(toolRelease *ToolRelease) bo
 // RuntimeProperties returns the runtime properties for this PlatformRelease
 func (release *PlatformRelease) RuntimeProperties() *properties.Map {
 	res := properties.NewMap()
-	res.Set("runtime.platform.path", release.InstallDir.String())
+	if release.InstallDir != nil {
+		res.Set("runtime.platform.path", release.InstallDir.String())
+	}
+
 	return res
 }
 
 // GetLibrariesDir returns the path to the core libraries or nil if not
 // present
 func (release *PlatformRelease) GetLibrariesDir() *paths.Path {
-	libDir := release.InstallDir.Join("libraries")
-	if libDir.IsDir() {
-		return libDir
+	if release.InstallDir != nil {
+		libDir := release.InstallDir.Join("libraries")
+		if libDir.IsDir() {
+			return libDir
+		}
 	}
+
 	return nil
 }
 
