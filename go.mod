@@ -12,6 +12,7 @@ require (
 	github.com/cmaglie/pb v1.0.27
 	github.com/codeclysm/cc v1.2.2 // indirect
 	github.com/codeclysm/extract v2.2.0+incompatible
+	github.com/creack/goselect v0.0.0-20180328191401-176c667f75aa // indirect
 	github.com/fatih/color v1.7.0
 	github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 // indirect
 	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
@@ -36,6 +37,8 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
 	github.com/spf13/cobra v0.0.5
+	github.com/spf13/viper v1.3.2
+	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.4.0
 	go.bug.st/cleanup v1.0.0
 	go.bug.st/downloader v1.1.0
