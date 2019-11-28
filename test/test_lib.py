@@ -106,3 +106,17 @@ def test_search(run_command):
     assert result.ok
     libs_json = json.loads(result.stdout)
     assert 1 == len(libs_json.get("libraries"))
+
+
+def test_search_paragraph(run_command):
+    """
+    Search for a string that's only present in the `paragraph` field
+    within the index file.
+    """
+    assert run_command("lib update-index")
+    result = run_command(
+        'lib search "An efficient and elegant JSON library" --format json'
+    )
+    assert result.ok
+    libs_json = json.loads(result.stdout)
+    assert 1 == len(libs_json.get("libraries"))

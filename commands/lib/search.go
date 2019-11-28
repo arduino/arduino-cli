@@ -37,7 +37,10 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 	res := []*rpc.SearchedLibrary{}
 
 	for _, lib := range lm.Index.Libraries {
-		if strings.Contains(strings.ToLower(lib.Name), strings.ToLower(req.GetQuery())) {
+		qry := strings.ToLower(req.GetQuery())
+		if strings.Contains(strings.ToLower(lib.Name), qry) ||
+			strings.Contains(strings.ToLower(lib.Latest.Paragraph), qry) ||
+			strings.Contains(strings.ToLower(lib.Latest.Sentence), qry) {
 			releases := map[string]*rpc.LibraryRelease{}
 			for str, rel := range lib.Releases {
 				releases[str] = GetLibraryParameters(rel)
