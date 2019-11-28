@@ -82,6 +82,34 @@ func TestLoadSketchFolder(t *testing.T) {
 	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
 }
 
+func TestLoadSketchFolderPde(t *testing.T) {
+	// pass the path to the sketch folder
+	sketchPath := filepath.Join("testdata", t.Name())
+	mainFilePath := filepath.Join(sketchPath, t.Name()+".pde")
+	s, err := builder.SketchLoad(sketchPath, "")
+	require.Nil(t, err)
+	require.NotNil(t, s)
+	require.Equal(t, mainFilePath, s.MainFile.Path)
+	require.Equal(t, sketchPath, s.LocationPath)
+	require.Len(t, s.OtherSketchFiles, 2)
+	require.Equal(t, "old.pde", filepath.Base(s.OtherSketchFiles[0].Path))
+	require.Equal(t, "other.ino", filepath.Base(s.OtherSketchFiles[1].Path))
+	require.Len(t, s.AdditionalFiles, 3)
+	require.Equal(t, "header.h", filepath.Base(s.AdditionalFiles[0].Path))
+	require.Equal(t, "s_file.S", filepath.Base(s.AdditionalFiles[1].Path))
+	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
+}
+
+func TestLoadSketchFolderBothInoAndPde(t *testing.T) {
+	// pass the path to the sketch folder containing two main sketches, .ino and .pde
+	sketchPath := filepath.Join("testdata", t.Name())
+	_, err := builder.SketchLoad(sketchPath, "")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "more than one main sketch file found")
+	require.Contains(t, err.Error(), t.Name()+".ino")
+	require.Contains(t, err.Error(), t.Name()+".pde")
+}
+
 func TestLoadSketchFolderSymlink(t *testing.T) {
 	// pass the path to the sketch folder
 	symlinkSketchPath := filepath.Join("testdata", t.Name())
@@ -128,7 +156,7 @@ func TestLoadSketchFolderWrongMain(t *testing.T) {
 	sketchPath := filepath.Join("testdata", t.Name())
 	_, err := builder.SketchLoad(sketchPath, "")
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "unable to find the main sketch file")
+	require.Contains(t, err.Error(), "unable to find an sketch file in directory testdata")
 
 	_, err = builder.SketchLoad("does/not/exist", "")
 	require.Error(t, err)

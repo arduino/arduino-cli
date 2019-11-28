@@ -108,14 +108,31 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 
 	var sketchFolder, mainSketchFile string
 
-	// if a sketch folder was passed, save the parent and point sketchPath to the main .ino file
+	// if a sketch folder was passed, save the parent and point sketchPath to the main sketch file
 	if stat.IsDir() {
 		sketchFolder = sketchPath
-		mainSketchFile = filepath.Join(sketchPath, stat.Name()+".ino")
+		// allowed extensions are .ino and .pde (but not both)
+		allowedSketchExtensions := [...]string{".ino", ".pde"}
+		for _, extension := range allowedSketchExtensions {
+			candidateSketchFile := filepath.Join(sketchPath, stat.Name()+extension)
+			if _, err := os.Stat(candidateSketchFile); !os.IsNotExist(err) {
+				if mainSketchFile == "" {
+					mainSketchFile = candidateSketchFile
+				} else {
+					return nil, errors.Errorf("more than one main sketch file found (%v,%v)",
+						filepath.Base(mainSketchFile),
+						filepath.Base(candidateSketchFile))
+				}
+			}
+		}
+		// check that .pde or .ino was found
+		if mainSketchFile == "" {
+			return nil, errors.Errorf("unable to find an sketch file in directory %v", sketchFolder)
+		}
 		// in the case a dir was passed, ensure the main file exists and is readable
 		f, err := os.Open(mainSketchFile)
 		if err != nil {
-			return nil, errors.Wrap(err, "unable to find the main sketch file")
+			return nil, errors.Wrap(err, "unable to open the main sketch file")
 		}
 		f.Close()
 		// ensure it is not a directory
