@@ -105,7 +105,7 @@ def test_search(run_command):
     result = run_command("lib search ArduinoJson --format json")
     assert result.ok
     libs_json = json.loads(result.stdout)
-    assert 1 == len(libs_json.get("libraries"))
+    assert len(libs_json.get("libraries")) >= 1
 
 
 def test_search_paragraph(run_command):
