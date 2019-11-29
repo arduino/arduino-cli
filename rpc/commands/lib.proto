@@ -160,6 +160,7 @@ message Library {
     string version = 21;
     string license = 22;
     map<string, string> properties = 23;
+    string additional_include_paths = 24;
 }
 
 enum LibraryLayout {

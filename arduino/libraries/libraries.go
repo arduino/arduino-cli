@@ -55,20 +55,21 @@ type Library struct {
 
 	Types []string `json:"types,omitempty"`
 
-	InstallDir        *paths.Path
-	SourceDir         *paths.Path
-	UtilityDir        *paths.Path
-	Location          LibraryLocation
-	ContainerPlatform *cores.PlatformRelease `json:""`
-	Layout            LibraryLayout
-	RealName          string
-	DotALinkage       bool
-	Precompiled       bool
-	LDflags           string
-	IsLegacy          bool
-	Version           *semver.Version
-	License           string
-	Properties        *properties.Map
+	InstallDir             *paths.Path
+	SourceDir              *paths.Path
+	UtilityDir             *paths.Path
+	Location               LibraryLocation
+	ContainerPlatform      *cores.PlatformRelease `json:""`
+	Layout                 LibraryLayout
+	RealName               string
+	DotALinkage            bool
+	Precompiled            bool
+	LDflags                string
+	IsLegacy               bool
+	Version                *semver.Version
+	License                string
+	AdditionalIncludePaths []*paths.Path
+	Properties             *properties.Map
 }
 
 func (library *Library) String() string {

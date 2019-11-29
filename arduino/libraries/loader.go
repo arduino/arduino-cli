@@ -105,6 +105,14 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	library.DotALinkage = libProperties.GetBoolean("dot_a_linkage")
 	library.Precompiled = libProperties.GetBoolean("precompiled")
 	library.LDflags = strings.TrimSpace(libProperties.Get("ldflags"))
+	additionalIncludePathsList := libProperties.Get("additional_include_paths")
+	if additionalIncludePathsList != "" {
+		temp := strings.Split(additionalIncludePathsList, ",")
+		for _, el := range temp {
+			dir := paths.New(libraryDir.Join(el).String())
+			library.AdditionalIncludePaths = append(library.AdditionalIncludePaths, dir)
+		}
+	}
 	library.Properties = libProperties
 
 	return library, nil

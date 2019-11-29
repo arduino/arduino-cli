@@ -192,6 +192,11 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 	}
 
 	if library.Layout == libraries.RecursiveLayout {
+		if library.AdditionalIncludePaths != nil {
+			for _, el := range library.AdditionalIncludePaths {
+				includes = append(includes, utils.WrapWithHyphenI(el.String()))
+			}
+		}
 		libObjectFiles, err := builder_utils.CompileFilesRecursive(ctx, library.SourceDir, libraryBuildPath, buildProperties, includes)
 		if err != nil {
 			return nil, i18n.WrapError(err)
