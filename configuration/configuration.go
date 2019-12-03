@@ -151,12 +151,11 @@ func IsBundledInDesktopIDE() bool {
 
 	ideDir := filepath.Dir(executablePath)
 
-	// We check an arbitrary number of folders that are part of the IDE
-	// install tree
+	// To determine if the CLI is bundled with an IDE, We check an arbitrary
+	// number of folders that are part of the IDE install tree
 	tests := []string{
 		"tools-builder",
 		"examples/01.Basics/Blink",
-		"portable",
 	}
 
 	for _, test := range tests {
@@ -164,12 +163,15 @@ func IsBundledInDesktopIDE() bool {
 			// the test folder doesn't exist or is not accessible
 			return viper.GetBool("IDE.Bundled")
 		}
-
-		if test == "portable" {
-			viper.Set("IDE.Portable", true)
-		}
 	}
 
+	// Check whether this is a portable install
+	if _, err := os.Stat(filepath.Join(ideDir, "portable")); err != nil {
+		viper.Set("IDE.Portable", true)
+	}
+
+	// Persist IDE-related config settings and return true
+	viper.Set("IDE.Bundled", false)
 	viper.Set("IDE.Directory", ideDir)
 	return true
 }
