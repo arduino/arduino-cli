@@ -35,7 +35,7 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
-	serial "go.bug.st/serial.v1"
+	"go.bug.st/serial"
 )
 
 // Upload FIXMEDOC
