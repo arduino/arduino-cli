@@ -40,7 +40,7 @@ require (
 	go.bug.st/cleanup v1.0.0
 	go.bug.st/downloader v1.1.0
 	go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18
-	go.bug.st/serial v0.0.0-20191203192603-6a673bf917a6
+	go.bug.st/serial v1.0.0
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect
 	golang.org/x/net v0.0.0-20190311183353-d8887717615a
 	golang.org/x/text v0.3.0
