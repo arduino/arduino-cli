@@ -12,7 +12,6 @@ require (
 	github.com/cmaglie/pb v1.0.27
 	github.com/codeclysm/cc v1.2.2 // indirect
 	github.com/codeclysm/extract v2.2.0+incompatible
-	github.com/creack/goselect v0.0.0-20180328191401-176c667f75aa // indirect
 	github.com/fatih/color v1.7.0
 	github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 // indirect
 	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
@@ -23,6 +22,7 @@ require (
 	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5 // indirect
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
 	github.com/juju/testing v0.0.0-20190429233213-dfc56b8c09fc // indirect
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.2
 	github.com/mattn/go-runewidth v0.0.2 // indirect
 	github.com/miekg/dns v1.0.5 // indirect
@@ -36,12 +36,12 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
 	github.com/spf13/cobra v0.0.5
-	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.4.0
 	go.bug.st/cleanup v1.0.0
 	go.bug.st/downloader v1.1.0
 	go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18
-	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45
+	go.bug.st/serial v1.0.0
+	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect
 	golang.org/x/net v0.0.0-20190311183353-d8887717615a
 	golang.org/x/text v0.3.0
 	google.golang.org/genproto v0.0.0-20190327125643-d831d65fe17d // indirect
