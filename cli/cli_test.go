@@ -535,3 +535,25 @@ func TestCoreCommandsIntegration(t *testing.T) {
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), AVR+" uninstalled")
 }
+
+func TestSearchConfigTreeNotFound(t *testing.T) {
+	tmp := tmpDirOrDie()
+	require.Empty(t, searchConfigTree(tmp))
+}
+
+func TestSearchConfigTreeSameFolder(t *testing.T) {
+	tmp := tmpDirOrDie()
+	_, err := os.Create(filepath.Join(tmp, "arduino-cli.yaml"))
+	require.Nil(t, err)
+	require.Equal(t, searchConfigTree(tmp), tmp)
+}
+
+func TestSearchConfigTreeInParent(t *testing.T) {
+	tmp := tmpDirOrDie()
+	target := filepath.Join(tmp, "foo", "bar")
+	err := os.MkdirAll(target, os.ModePerm)
+	require.Nil(t, err)
+	_, err = os.Create(filepath.Join(tmp, "arduino-cli.yaml"))
+	require.Nil(t, err)
+	require.Equal(t, searchConfigTree(target), tmp)
+}

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -117,15 +118,43 @@ func parseFormatString(arg string) (feedback.OutputFormat, bool) {
 	return f, found
 }
 
+// This function is here to replicate the old logic looking for a config
+// file in the parent tree of the CWD, aka "project config".
+// Please
+func searchConfigTree(cwd string) string {
+	// go back up to root and search for the config file
+	for {
+		if _, err := os.Stat(path.Join(cwd, "arduino-cli.yaml")); os.IsNotExist(err) {
+			// no config file found
+			next := path.Join(cwd, "..")
+			if filepath.Clean(next) == filepath.Clean(cwd) {
+				return ""
+			}
+			cwd = next
+		} else {
+			return cwd
+		}
+	}
+}
+
 func preRun(cmd *cobra.Command, args []string) {
 	//
 	// Prepare the configuration system
 	//
 	configPath := ""
+
+	// get cwd, if something is wrong don't do anything and let
+	// configuration init proceed
+	if cwd, err := os.Getwd(); err == nil {
+		configPath = searchConfigTree(cwd)
+	}
+
+	// override the config path if --config-file was passed
 	if configFile != "" {
-		// override the config path if --config-file was passed
 		configPath = filepath.Dir(configFile)
 	}
+
+	// initialize the config system
 	configuration.Init(configPath)
 	configFile := viper.ConfigFileUsed()
 
