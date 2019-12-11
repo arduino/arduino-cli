@@ -16,7 +16,6 @@
 package configuration
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -25,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/go-win32-utils"
 	"github.com/sirupsen/logrus"
+	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
 )
 
@@ -33,6 +33,7 @@ import (
 // so logging shouldn't be used here.
 func Init(configPath string) {
 	// Config file metadata
+	jww.SetStdoutThreshold(jww.LevelFatal)
 	viper.SetConfigName("arduino-cli")
 
 	// Get default data path if none was provided
@@ -41,7 +42,6 @@ func Init(configPath string) {
 	}
 
 	// Add paths where to search for a config file
-	fmt.Println(configPath)
 	viper.AddConfigPath(configPath)
 
 	// Bind env vars

@@ -28,7 +28,6 @@ def test_core_search(run_command):
     platforms_count = len([l for l in result.stdout.splitlines() if l]) - 1
     result = run_command("core search --format json")
     assert result.ok
-    print(result.stdout)
     assert len(json.loads(result.stdout)) == platforms_count
     # search a specific core
     result = run_command("core search avr")
