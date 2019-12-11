@@ -13,24 +13,25 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package config
+package configuration
 
 import (
-	"os"
+	"path/filepath"
 
-	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-// NewCommand created a new `config` command
-func NewCommand() *cobra.Command {
-	configCommand := &cobra.Command{
-		Use:     "config",
-		Short:   "Arduino Configuration Commands.",
-		Example: "  " + os.Args[0] + " config init",
-	}
+func setDefaults(dataDir, sketchBookDir string) {
+	// logging
+	viper.SetDefault("logging.level", "info")
+	viper.SetDefault("logging.format", "text")
+	// board manager
+	viper.SetDefault("board_manager.additional_urls", []string{})
 
-	configCommand.AddCommand(dumpCmd)
-	configCommand.AddCommand(initInitCommand())
-
-	return configCommand
+	// arduino directories
+	viper.SetDefault("directories.Data", dataDir)
+	viper.SetDefault("directories.Downloads", filepath.Join(dataDir, "staging"))
+	viper.SetDefault("directories.Packages", filepath.Join(dataDir, "packages"))
+	viper.SetDefault("directories.SketchBook", sketchBookDir)
+	viper.SetDefault("directories.Libraries", filepath.Join(sketchBookDir, "libraries"))
 }

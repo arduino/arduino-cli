@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/board"
@@ -37,10 +39,12 @@ import (
 	"github.com/arduino/arduino-cli/cli/sketch"
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -54,13 +58,8 @@ var (
 	}
 
 	verbose      bool
-	logFile      string
-	logFormat    string
 	outputFormat string
-)
-
-const (
-	defaultLogLevel = "info"
+	configFile   string
 )
 
 // Init the cobra root command
@@ -82,12 +81,16 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(version.NewCommand())
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
-	cmd.PersistentFlags().StringVar(&globals.LogLevel, "log-level", defaultLogLevel, "Messages with this level and above will be logged.")
-	cmd.PersistentFlags().StringVar(&logFile, "log-file", "", "Path to the file where logs will be written.")
-	cmd.PersistentFlags().StringVar(&logFormat, "log-format", "text", "The output format for the logs, can be [text|json].")
+	cmd.PersistentFlags().String("log-level", "", "Messages with this level and above will be logged.")
+	viper.BindPFlag("logging.level", cmd.PersistentFlags().Lookup("log-level"))
+	cmd.PersistentFlags().String("log-file", "", "Path to the file where logs will be written.")
+	viper.BindPFlag("logging.file", cmd.PersistentFlags().Lookup("log-file"))
+	cmd.PersistentFlags().String("log-format", "", "The output format for the logs, can be [text|json].")
+	viper.BindPFlag("logging.format", cmd.PersistentFlags().Lookup("log-format"))
 	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be [text|json].")
-	cmd.PersistentFlags().StringVar(&globals.YAMLConfigFile, "config-file", "", "The custom config file (if not specified the default will be used).")
-	cmd.PersistentFlags().StringSliceVar(&globals.AdditionalUrls, "additional-urls", []string{}, "Additional URLs for the board manager.")
+	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", "The custom config file (if not specified the default will be used).")
+	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, "Additional URLs for the board manager.")
+	viper.BindPFlag("board_manager.additional_urls", cmd.PersistentFlags().Lookup("additional-urls"))
 }
 
 // convert the string passed to the `--log-level` option to the corresponding
@@ -115,14 +118,73 @@ func parseFormatString(arg string) (feedback.OutputFormat, bool) {
 	return f, found
 }
 
+// This function is here to replicate the old logic looking for a config
+// file in the parent tree of the CWD, aka "project config".
+// Please
+func searchConfigTree(cwd string) string {
+	// go back up to root and search for the config file
+	for {
+		if _, err := os.Stat(path.Join(cwd, "arduino-cli.yaml")); os.IsNotExist(err) {
+			// no config file found
+			next := path.Join(cwd, "..")
+			if filepath.Clean(next) == filepath.Clean(cwd) {
+				return ""
+			}
+			cwd = next
+		} else {
+			return cwd
+		}
+	}
+}
+
 func preRun(cmd *cobra.Command, args []string) {
-	// normalize the format strings
-	outputFormat = strings.ToLower(outputFormat)
-	// configure the output package
-	output.OutputFormat = outputFormat
-	logFormat = strings.ToLower(logFormat)
+	//
+	// Prepare the configuration system
+	//
+	configPath := ""
+
+	// get cwd, if something is wrong don't do anything and let
+	// configuration init proceed
+	if cwd, err := os.Getwd(); err == nil {
+		configPath = searchConfigTree(cwd)
+	}
+
+	// override the config path if --config-file was passed
+	if fi, err := os.Stat(configFile); err == nil {
+		if fi.IsDir() {
+			configPath = configFile
+		} else {
+			configPath = filepath.Dir(configFile)
+		}
+	}
+
+	// initialize the config system
+	configuration.Init(configPath)
+	configFile := viper.ConfigFileUsed()
+
+	//
+	// Prepare logging
+	//
+
+	// decide whether we should log to stdout
+	if verbose {
+		// if we print on stdout, do it in full colors
+		logrus.SetOutput(colorable.NewColorableStdout())
+		logrus.SetFormatter(&logrus.TextFormatter{
+			ForceColors: true,
+		})
+	} else {
+		logrus.SetOutput(ioutil.Discard)
+	}
+
+	// set the Logger format
+	logFormat := strings.ToLower(viper.GetString("logging.format"))
+	if logFormat == "json" {
+		logrus.SetFormatter(&logrus.JSONFormatter{})
+	}
 
 	// should we log to file?
+	logFile := viper.GetString("logging.file")
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
@@ -138,30 +200,22 @@ func preRun(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	// should we log to stdout?
-	if verbose {
-		logrus.SetOutput(colorable.NewColorableStdout())
-		logrus.SetFormatter(&logrus.TextFormatter{
-			ForceColors: true,
-		})
-	} else {
-		// Discard logrus output if no writer was set
-		logrus.SetOutput(ioutil.Discard)
-	}
-
 	// configure logging filter
-	if lvl, found := toLogLevel(globals.LogLevel); !found {
-		fmt.Printf("Invalid option for --log-level: %s", globals.LogLevel)
+	if lvl, found := toLogLevel(viper.GetString("logging.level")); !found {
+		feedback.Errorf("Invalid option for --log-level: %s", viper.GetString("logging.level"))
 		os.Exit(errorcodes.ErrBadArgument)
 	} else {
 		logrus.SetLevel(lvl)
 	}
 
-	// set the Logger format
-	if logFormat == "json" {
-		logrus.SetFormatter(&logrus.JSONFormatter{})
-	}
+	//
+	// Prepare the Feedback system
+	//
 
+	// normalize the format strings
+	outputFormat = strings.ToLower(outputFormat)
+	// configure the output package
+	output.OutputFormat = outputFormat
 	// check the right output format was passed
 	format, found := parseFormatString(outputFormat)
 	if !found {
@@ -172,12 +226,18 @@ func preRun(cmd *cobra.Command, args []string) {
 	// use the output format to configure the Feedback
 	feedback.SetFormat(format)
 
-	globals.InitConfigs()
+	//
+	// Print some status info and check command is consistent
+	//
 
-	logrus.Info(globals.VersionInfo.Application + "-" + globals.VersionInfo.VersionString)
-	logrus.Info("Starting root command preparation (`arduino`)")
+	if configFile != "" {
+		logrus.Infof("Using config file: %s", configFile)
+	} else {
+		logrus.Info("Config file not found, using default values")
+	}
 
-	logrus.Info("Formatter set")
+	logrus.Info(globals.VersionInfo.Application + " version " + globals.VersionInfo.VersionString)
+
 	if outputFormat != "text" {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 			logrus.Warn("Calling help on JSON format")

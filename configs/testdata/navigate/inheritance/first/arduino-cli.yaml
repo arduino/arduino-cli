@@ -1,5 +1,0 @@
-sketchbook_path: /tmp
-board_manager:
-  additional_urls:
-    - https://downloads.arduino.cc/package_index_mraa.json
-    

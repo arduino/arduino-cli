@@ -24,25 +24,20 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/configs"
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	semver "go.bug.st/relaxed-semver"
 )
 
 // LoadHardware read all plaforms from the configured paths
-func (pm *PackageManager) LoadHardware(config *configs.Configuration) error {
-	dirs, err := config.HardwareDirectories()
-	if err != nil {
-		return fmt.Errorf("getting hardware directory: %s", err)
-	}
+func (pm *PackageManager) LoadHardware() error {
+	dirs := configuration.HardwareDirectories()
 	if err := pm.LoadHardwareFromDirectories(dirs); err != nil {
 		return err
 	}
-	dirs, err = config.BundleToolsDirectories()
-	if err != nil {
-		return fmt.Errorf("getting hardware directory: %s", err)
-	}
+
+	dirs = configuration.BundleToolsDirectories()
 	return pm.LoadToolsFromBundleDirectories(dirs)
 }
 
