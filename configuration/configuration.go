@@ -16,6 +16,7 @@
 package configuration
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -40,6 +41,7 @@ func Init(configPath string) {
 	}
 
 	// Add paths where to search for a config file
+	fmt.Println(configPath)
 	viper.AddConfigPath(configPath)
 
 	// Bind env vars
