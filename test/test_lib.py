@@ -27,7 +27,7 @@ def test_list(run_command):
     result = run_command("lib list --format json")
     assert result.ok
     assert "" == result.stderr
-    assert "null" == result.stdout
+    assert 0 == len(json.loads(result.stdout))
 
     # Install something we can list at a version older than latest
     result = run_command("lib install ArduinoJson@6.11.0")
