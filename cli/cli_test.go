@@ -28,6 +28,8 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/spf13/viper"
+
 	"github.com/arduino/arduino-cli/cli/feedback"
 
 	"bou.ke/monkey"
@@ -128,25 +130,10 @@ func executeWithArgs(args ...string) (int, []byte) {
 	var output []byte
 	var exitCode int
 	fmt.Printf("RUNNING: %s\n", args)
+	viper.Reset()
 
 	// This closure is here because we won't that the defer are executed after the end of the "executeWithArgs" method
 	func() {
-		// Create an empty config for the CLI test in the same dir of the test
-		conf := paths.New("arduino-cli.yaml")
-		if conf.Exist() {
-			panic("config file must not exist already")
-		}
-
-		if err := conf.WriteFile([]byte("board_manager:\n  additional_urls:\n")); err != nil {
-			panic(err)
-		}
-
-		defer func() {
-			if err := conf.Remove(); err != nil {
-				panic(err)
-			}
-		}()
-
 		redirect := &stdOutRedirect{}
 		redirect.Open()
 		// re-init feedback so it'll write to our grabber
@@ -365,28 +352,7 @@ func TestCompileCommandsIntegration(t *testing.T) {
 }
 
 func TestInvalidCoreURLIntegration(t *testing.T) {
-	// override SetUp dirs
-	tmp := tmpDirOrDie()
-	defer os.RemoveAll(tmp)
-	os.Setenv("ARDUINO_SKETCHBOOK_DIR", tmp)
-	currSketchbookDir = tmp
-
-	configFile := filepath.Join(currDataDir, "arduino-cli.yaml")
-	err := ioutil.WriteFile(configFile, []byte(`
-board_manager:
-  additional_urls:
-    - http://www.invalid-domain-asjkdakdhadjkh.com/package_example_index.json
-`), os.FileMode(0644))
-	require.NoError(t, err, "writing dummy config "+configFile)
-
-	err = ioutil.WriteFile(filepath.Join(currDataDir, "package_index.json"), []byte(`{ "packages": [] }`), os.FileMode(0644))
-	require.NoError(t, err, "Writing empty json index file")
-
-	err = ioutil.WriteFile(filepath.Join(currDataDir, "package_example_index.json"), []byte(`{ "packages": [] }`), os.FileMode(0644))
-	require.NoError(t, err, "Writing empty json index file")
-
-	err = ioutil.WriteFile(filepath.Join(currDataDir, "library_index.json"), []byte(`{ "libraries": [] }`), os.FileMode(0644))
-	require.NoError(t, err, "Writing empty json index file")
+	configFile := filepath.Join("testdata", t.Name())
 
 	// Dump config with cmd-line specific file
 	exitCode, d := executeWithArgs("--config-file", configFile, "config", "dump")
@@ -399,19 +365,7 @@ board_manager:
 }
 
 func Test3rdPartyCoreIntegration(t *testing.T) {
-	// override SetUp dirs
-	tmp := tmpDirOrDie()
-	defer os.RemoveAll(tmp)
-	os.Setenv("ARDUINO_SKETCHBOOK_DIR", tmp)
-	currSketchbookDir = tmp
-
-	configFile := filepath.Join(currDataDir, "arduino-cli.yaml")
-	err := ioutil.WriteFile(configFile, []byte(`
-board_manager:
-  additional_urls:
-    - https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-`), os.FileMode(0644))
-	require.NoError(t, err, "writing dummy config "+configFile)
+	configFile := filepath.Join("testdata", t.Name())
 
 	// Update index and install esp32:esp32
 	exitCode, _ := executeWithArgs("--config-file", configFile, "core", "update-index")
@@ -422,7 +376,7 @@ board_manager:
 
 	// Build a simple sketch and check if all artifacts are copied
 	tmpSketch := paths.New(currSketchbookDir).Join("Blink")
-	err = paths.New("testdata/Blink").CopyDirTo(tmpSketch)
+	err := paths.New("testdata/Blink").CopyDirTo(tmpSketch)
 	require.NoError(t, err, "copying test sketch into temp dir")
 	exitCode, d = executeWithArgs("--config-file", configFile, "compile", "-b", "esp32:esp32:esp32", tmpSketch.String())
 	require.Zero(t, exitCode)
@@ -543,6 +497,7 @@ func TestSearchConfigTreeNotFound(t *testing.T) {
 
 func TestSearchConfigTreeSameFolder(t *testing.T) {
 	tmp := tmpDirOrDie()
+	defer os.RemoveAll(tmp)
 	_, err := os.Create(filepath.Join(tmp, "arduino-cli.yaml"))
 	require.Nil(t, err)
 	require.Equal(t, searchConfigTree(tmp), tmp)
@@ -550,6 +505,7 @@ func TestSearchConfigTreeSameFolder(t *testing.T) {
 
 func TestSearchConfigTreeInParent(t *testing.T) {
 	tmp := tmpDirOrDie()
+	defer os.RemoveAll(tmp)
 	target := filepath.Join(tmp, "foo", "bar")
 	err := os.MkdirAll(target, os.ModePerm)
 	require.Nil(t, err)

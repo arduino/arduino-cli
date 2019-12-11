@@ -150,8 +150,12 @@ func preRun(cmd *cobra.Command, args []string) {
 	}
 
 	// override the config path if --config-file was passed
-	if configFile != "" {
-		configPath = filepath.Dir(configFile)
+	if fi, err := os.Stat(configFile); err == nil {
+		if fi.IsDir() {
+			configPath = configFile
+		} else {
+			configPath = filepath.Dir(configFile)
+		}
 	}
 
 	// initialize the config system
