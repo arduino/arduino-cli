@@ -32,12 +32,12 @@ func HardwareDirectories() paths.PathList {
 		}
 	}
 
-	if viper.IsSet("directories.Packages") {
-		res.Add(paths.New(viper.GetString("directories.Packages")))
+	if viper.IsSet("directories.Data") {
+		res.Add(PackagesDir())
 	}
 
-	if viper.IsSet("directories.Sketchbook") {
-		skDir := paths.New(viper.GetString("directories.Sketchbook"))
+	if viper.IsSet("directories.User") {
+		skDir := paths.New(viper.GetString("directories.User"))
 		hwDir := skDir.Join("hardware")
 		if hwDir.IsDir() {
 			res.Add(hwDir)
@@ -75,4 +75,15 @@ func IDEBundledLibrariesDir() *paths.Path {
 	}
 
 	return nil
+}
+
+// LibrariesDir returns the full path to the user directory containing
+// custom libraries
+func LibrariesDir() *paths.Path {
+	return paths.New(viper.GetString("directories.User"))
+}
+
+// PackagesDir returns the full path to the packages folder
+func PackagesDir() *paths.Path {
+	return paths.New(viper.GetString("directories.Data")).Join("packages")
 }

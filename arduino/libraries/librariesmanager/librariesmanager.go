@@ -168,9 +168,9 @@ func (sc *LibrariesManager) RescanLibraries() error {
 	return nil
 }
 
-func (sc *LibrariesManager) getSketchbookLibrariesDir() *paths.Path {
+func (sc *LibrariesManager) getUserLibrariesDir() *paths.Path {
 	for _, dir := range sc.LibrariesDir {
-		if dir.Location == libraries.Sketchbook {
+		if dir.Location == libraries.User {
 			return dir.Path
 		}
 	}
@@ -208,17 +208,17 @@ func (sc *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) err
 
 // FindByReference return the installed library matching the Reference
 // name and version or, if the version is nil, the library installed
-// in the sketchbook.
+// in the User folder.
 func (sc *LibrariesManager) FindByReference(libRef *librariesindex.Reference) *libraries.Library {
 	saneName := utils.SanitizeName(libRef.Name)
 	alternatives, have := sc.Libraries[saneName]
 	if !have {
 		return nil
 	}
-	// TODO: Move "search into sketchbook" into another method...
+	// TODO: Move "search into user" into another method...
 	if libRef.Version == nil {
 		for _, candidate := range alternatives.Alternatives {
-			if candidate.Location == libraries.Sketchbook {
+			if candidate.Location == libraries.User {
 				return candidate
 			}
 		}

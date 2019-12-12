@@ -219,7 +219,7 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	fmt.Println(viper.AllSettings())
 	pm := packagemanager.NewPackageManager(
 		dataDir1,
-		paths.New(viper.GetString("directories.Packages")),
+		configuration.PackagesDir(),
 		paths.New(viper.GetString("directories.Downloads")),
 		dataDir1,
 	)

@@ -60,7 +60,7 @@ func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bo
 	for _, libAlternatives := range lm.Libraries {
 		for _, lib := range libAlternatives.Alternatives {
 			if !all {
-				if lib.Location != libraries.Sketchbook {
+				if lib.Location != libraries.User {
 					continue
 				}
 			}
