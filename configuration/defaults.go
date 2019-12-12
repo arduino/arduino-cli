@@ -34,4 +34,7 @@ func setDefaults(dataDir, sketchBookDir string) {
 	viper.SetDefault("directories.Packages", filepath.Join(dataDir, "packages"))
 	viper.SetDefault("directories.SketchBook", sketchBookDir)
 	viper.SetDefault("directories.Libraries", filepath.Join(sketchBookDir, "libraries"))
+
+	// daemon settings
+	viper.SetDefault("daemon.port", "50051")
 }
