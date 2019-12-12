@@ -129,7 +129,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		//&ContainerMergeCopySketchFiles{},
 		&ContainerAddPrototypes{},
-		//&FilterSketchSource{Source: &ctx.Source, RemoveLineMarkers: true},
+		&FilterSketchSource{Source: &ctx.Source, RemoveLineMarkers: true},
 	}
 
 	for _, command := range commands {
