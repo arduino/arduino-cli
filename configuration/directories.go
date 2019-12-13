@@ -80,7 +80,7 @@ func IDEBundledLibrariesDir() *paths.Path {
 // LibrariesDir returns the full path to the user directory containing
 // custom libraries
 func LibrariesDir() *paths.Path {
-	return paths.New(viper.GetString("directories.User"))
+	return paths.New(viper.GetString("directories.User")).Join("libraries")
 }
 
 // PackagesDir returns the full path to the packages folder
