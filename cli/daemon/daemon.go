@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"os"
@@ -31,24 +30,24 @@ import (
 	"github.com/arduino/arduino-cli/commands/daemon"
 	srv_commands "github.com/arduino/arduino-cli/rpc/commands"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/monitor"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
-)
-
-const (
-	port = ":50051"
 )
 
 // NewCommand created a new `daemon` command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "daemon",
-		Short:   fmt.Sprintf("Run as a daemon on port %s", port),
+		Short:   fmt.Sprintf("Run as a daemon on port %s", viper.GetString("daemon.port")),
 		Long:    "Running as a daemon the initialization of cores and libraries is done only once.",
 		Example: "  " + os.Args[0] + " daemon",
 		Args:    cobra.NoArgs,
 		Run:     runDaemonCommand,
 	}
+	cmd.PersistentFlags().String("port", "", "The TCP port the daemon will listen to")
+	viper.BindPFlag("daemon.port", cmd.PersistentFlags().Lookup("port"))
 	cmd.Flags().BoolVar(&daemonize, "daemonize", false, "Do not terminate daemon process if the parent process dies")
 	return cmd
 }
@@ -56,6 +55,7 @@ func NewCommand() *cobra.Command {
 var daemonize bool
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
+	port := viper.GetString("daemon.port")
 	s := grpc.NewServer()
 
 	// register the commands service
@@ -82,11 +82,12 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		}()
 	}
 
-	lis, err := net.Listen("tcp", port)
+	logrus.Infof("Starting daemon on TCP port %s", port)
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		logrus.Fatalf("failed to listen: %v", err)
 	}
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		logrus.Fatalf("failed to serve: %v", err)
 	}
 }
