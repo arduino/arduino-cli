@@ -27,7 +27,7 @@ def test_list(run_command):
     result = run_command("lib list --format json")
     assert result.ok
     assert "" == result.stderr
-    assert "null" == result.stdout
+    assert 0 == len(json.loads(result.stdout))
 
     # Install something we can list at a version older than latest
     result = run_command("lib install ArduinoJson@6.11.0")
@@ -70,12 +70,20 @@ def test_update_index(run_command):
     )
 
 
-def test_remove(run_command):
-    libs = ['"AzureIoTProtocol_MQTT"', '"CMMC MQTT Connector"', '"WiFiNINA"']
+def test_uninstall(run_command):
+    libs = ['"AzureIoTProtocol_MQTT"', '"WiFiNINA"']
     assert run_command("lib install {}".format(" ".join(libs)))
 
     result = run_command("lib uninstall {}".format(" ".join(libs)))
     assert result.ok
+
+def test_uninstall_spaces(run_command):
+    key = '"LiquidCrystal I2C"'
+    assert run_command("lib install {}".format(key))
+    assert run_command("lib uninstall {}".format(key))
+    result = run_command("lib list --format json")
+    assert result.ok
+    assert len(json.loads(result.stdout)) == 0
 
 
 def test_search(run_command):

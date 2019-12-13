@@ -65,8 +65,14 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	}
 
 	libs := res.GetInstalledLibrary()
-	feedback.PrintResult(installedResult{libs})
 
+	// To uniform the output to other commands, when there are no result
+	// print out an empty slice.
+	if libs == nil {
+		libs = []*rpc.InstalledLibrary{}
+	}
+
+	feedback.PrintResult(installedResult{libs})
 	logrus.Info("Done")
 }
 
