@@ -513,3 +513,18 @@ func TestSearchConfigTreeInParent(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, searchConfigTree(target), tmp)
 }
+
+var result string
+
+func BenchmarkSearchConfigTree(b *testing.B) {
+	tmp := tmpDirOrDie()
+	defer os.RemoveAll(tmp)
+	target := filepath.Join(tmp, "foo", "bar", "baz")
+	os.MkdirAll(target, os.ModePerm)
+
+	var s string
+	for n := 0; n < b.N; n++ {
+		s = searchConfigTree(target)
+	}
+	result = s
+}

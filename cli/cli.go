@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -124,15 +123,19 @@ func parseFormatString(arg string) (feedback.OutputFormat, bool) {
 func searchConfigTree(cwd string) string {
 	// go back up to root and search for the config file
 	for {
-		if _, err := os.Stat(path.Join(cwd, "arduino-cli.yaml")); os.IsNotExist(err) {
+		if _, err := os.Stat(filepath.Join(cwd, "arduino-cli.yaml")); err == nil {
+			// config file found
+			return cwd
+		} else if os.IsNotExist(err) {
 			// no config file found
-			next := path.Join(cwd, "..")
-			if filepath.Clean(next) == filepath.Clean(cwd) {
+			next := filepath.Dir(cwd)
+			if next == cwd {
 				return ""
 			}
 			cwd = next
 		} else {
-			return cwd
+			// some error we can't handle happened
+			return ""
 		}
 	}
 }
