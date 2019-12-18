@@ -30,6 +30,7 @@ import (
 
 	"github.com/spf13/viper"
 
+	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 
 	"bou.ke/monkey"
@@ -168,7 +169,9 @@ func executeWithArgs(args ...string) (int, []byte) {
 		ArduinoCli.ResetFlags()
 		createCliCommandTree(ArduinoCli)
 		ArduinoCli.SetArgs(args)
-		ArduinoCli.Execute()
+		if err := ArduinoCli.Execute(); err != nil {
+			exitCode = errorcodes.ErrGeneric
+		}
 	}()
 
 	return exitCode, output
@@ -309,7 +312,7 @@ func TestCompileCommandsIntegration(t *testing.T) {
 	// Build sketch without FQBN
 	exitCode, d = executeWithArgs("compile", test1)
 	require.NotZero(t, exitCode)
-	require.Contains(t, string(d), "no FQBN provided")
+	require.Contains(t, string(d), "required flag(s) \"fqbn\" not set")
 
 	// Build sketch for arduino:avr:uno
 	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:uno", test1)
