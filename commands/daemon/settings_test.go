@@ -17,8 +17,8 @@ package daemon
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -43,7 +43,7 @@ func TestGetAll(t *testing.T) {
 	resp, err := svc.GetAll(context.Background(), &rpc.GetAllRequest{})
 	require.Nil(t, err)
 
-	content, err := ioutil.ReadFile("testdata/all.json")
+	content, err := json.Marshal(viper.AllSettings())
 	require.Nil(t, err)
 
 	require.Equal(t, string(content), resp.GetJsonData())
