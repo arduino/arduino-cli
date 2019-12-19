@@ -20,13 +20,13 @@ package cc.arduino.cli.settings;
 option go_package = "github.com/arduino/arduino-cli/rpc/settings";
 
 service Settings {
-  rpc GetAll(GetAllRequest) returns (AllSettings);
-  rpc SetAll(AllSettings) returns (SetAllResponse);
+  rpc GetAll(GetAllRequest) returns (RawData);
+  rpc Merge(RawData) returns (MergeResponse);
   rpc GetValue(GetValueRequest) returns (Value);
   rpc SetValue(Value) returns (SetValueResponse);
 }
 
-message AllSettings {
+message RawData {
     string jsonData = 1;
 }
 
@@ -37,5 +37,5 @@ message Value {
 
 message GetAllRequest {}
 message GetValueRequest { string key = 1; }
-message SetAllResponse {}
+message MergeResponse {}
 message SetValueResponse {}
