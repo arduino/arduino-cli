@@ -61,7 +61,7 @@ tasks:
 vars:
   # all modules of this project except for "legacy/..." module
   DEFAULT_TARGETS:
-    sh: echo `go list ./... | grep -v legacy | tr '\n' ' '`
+    sh: echo `go list ./... | grep -v '/legacy/\|/rpc/' | tr '\n' ' '`
 
   # build vars
   COMMIT:
