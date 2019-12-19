@@ -33,8 +33,8 @@ const (
 	PlatformBuiltIn
 	// ReferencedPlatformBuiltIn are libraries bundled in a PlatformRelease referenced for build
 	ReferencedPlatformBuiltIn
-	// Sketchbook are user installed libraries
-	Sketchbook
+	// User are user installed libraries
+	User
 )
 
 func (d *LibraryLocation) String() string {
@@ -45,8 +45,8 @@ func (d *LibraryLocation) String() string {
 		return "platform"
 	case ReferencedPlatformBuiltIn:
 		return "ref-platform"
-	case Sketchbook:
-		return "sketchbook"
+	case User:
+		return "user"
 	}
 	panic(fmt.Sprintf("invalid LibraryLocation value %d", *d))
 }
@@ -60,8 +60,8 @@ func (d *LibraryLocation) MarshalJSON() ([]byte, error) {
 		return json.Marshal("platform")
 	case ReferencedPlatformBuiltIn:
 		return json.Marshal("ref-platform")
-	case Sketchbook:
-		return json.Marshal("sketchbook")
+	case User:
+		return json.Marshal("user")
 	}
 	return nil, fmt.Errorf("invalid library location value: %d", *d)
 }
@@ -79,8 +79,8 @@ func (d *LibraryLocation) UnmarshalJSON(b []byte) error {
 		*d = PlatformBuiltIn
 	case "ref-platform":
 		*d = ReferencedPlatformBuiltIn
-	case "sketchbook":
-		*d = Sketchbook
+	case "user":
+		*d = User
 	}
 	return fmt.Errorf("invalid library location: %s", s)
 }

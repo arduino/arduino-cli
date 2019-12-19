@@ -402,7 +402,7 @@ func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*core
 	foundTools := map[string]*cores.ToolRelease{}
 
 	// a Platform may not specify required tools (because it's a platform that comes from a
-	// sketchbook/hardware dir without a package_index.json) then add all available tools
+	// user/hardware dir without a package_index.json) then add all available tools
 	for _, targetPackage := range pm.Packages {
 		for _, tool := range targetPackage.Tools {
 			rel := tool.GetLatestInstalled()

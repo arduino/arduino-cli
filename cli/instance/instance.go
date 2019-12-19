@@ -71,7 +71,7 @@ func packageManagerInitReq() *rpc.InitReq {
 	conf.DataDir = viper.GetString("directories.Data")
 	conf.DownloadsDir = viper.GetString("directories.Downloads")
 	conf.BoardManagerAdditionalUrls = urls
-	conf.SketchbookDir = viper.GetString("directories.SketchBook")
+	conf.SketchbookDir = viper.GetString("directories.User")
 
 	return &rpc.InitReq{Configuration: conf}
 }

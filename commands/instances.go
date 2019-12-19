@@ -274,7 +274,7 @@ func createInstance(ctx context.Context, getLibOnly bool) (
 	if !getLibOnly {
 		pm = packagemanager.NewPackageManager(
 			dataDir,
-			paths.New(viper.GetString("directories.Packages")),
+			configuration.PackagesDir(),
 			downloadsDir,
 			dataDir.Join("tmp"))
 
@@ -308,9 +308,9 @@ func createInstance(ctx context.Context, getLibOnly bool) (
 		lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
 	}
 
-	// Add sketchbook libraries dir
-	libDir := paths.New(viper.GetString("directories.Libraries"))
-	lm.AddLibrariesDir(libDir, libraries.Sketchbook)
+	// Add user libraries dir
+	libDir := configuration.LibrariesDir()
+	lm.AddLibrariesDir(libDir, libraries.User)
 
 	// Add libraries dirs from installed platforms
 	if pm != nil {

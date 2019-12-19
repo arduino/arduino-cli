@@ -93,7 +93,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.BuiltInToolsDirs = configuration.BundleToolsDirectories()
 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList()
-	builderCtx.OtherLibrariesDirs.Add(paths.New(viper.GetString("directories.Libraries")))
+	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir())
 
 	if req.GetBuildPath() != "" {
 		builderCtx.BuildPath = paths.New(req.GetBuildPath())

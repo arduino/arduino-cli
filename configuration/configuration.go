@@ -50,23 +50,23 @@ func Init(configPath string) {
 	viper.AutomaticEnv()
 
 	// Bind env aliases to keep backward compatibility
-	viper.BindEnv("directories.Sketchbook", "ARDUINO_SKETCHBOOK_DIR")
+	viper.BindEnv("directories.User", "ARDUINO_SKETCHBOOK_DIR")
 	viper.BindEnv("directories.Downloads", "ARDUINO_DOWNLOADS_DIR")
 	viper.BindEnv("directories.Data", "ARDUINO_DATA_DIR")
 
-	// Early access directories.Data and directories.Sketchbook in case
+	// Early access directories.Data and directories.User in case
 	// those were set through env vars or cli flags
 	dataDir := viper.GetString("directories.Data")
 	if dataDir == "" {
 		dataDir = getDefaultArduinoDataDir()
 	}
-	sketchbookDir := viper.GetString("directories.Sketchbook")
-	if sketchbookDir == "" {
-		sketchbookDir = getDefaultSketchbookDir()
+	userDir := viper.GetString("directories.User")
+	if userDir == "" {
+		userDir = getDefaultUserDir()
 	}
 
 	// Set default values for all the settings
-	setDefaults(dataDir, sketchbookDir)
+	setDefaults(dataDir, userDir)
 
 	// Attempt to read config file
 	if err := viper.ReadInConfig(); err != nil {
@@ -103,8 +103,8 @@ func getDefaultArduinoDataDir() string {
 	}
 }
 
-// getDefaultSketchbookDir returns the full path to the default sketchbook folder
-func getDefaultSketchbookDir() string {
+// getDefaultUserDir returns the full path to the default user folder
+func getDefaultUserDir() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		feedback.Errorf("Unable to get user home dir: %v", err)
