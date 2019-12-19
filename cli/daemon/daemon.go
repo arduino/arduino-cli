@@ -30,6 +30,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/daemon"
 	srv_commands "github.com/arduino/arduino-cli/rpc/commands"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/monitor"
+	srv_settings "github.com/arduino/arduino-cli/rpc/settings"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -72,6 +73,9 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 
 	// register the monitors service
 	srv_monitor.RegisterMonitorServer(s, &daemon.MonitorService{})
+
+	// register the settings service
+	srv_settings.RegisterSettingsServer(s, &daemon.SettingsService{})
 
 	if !daemonize {
 		// When parent process ends terminate also the daemon

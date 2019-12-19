@@ -1,0 +1,16 @@
+board_manager:
+  additional_urls:
+    - http://foobar.com
+    - http://example.com
+
+daemon:
+  port: "50051"
+
+directories:
+  data: /home/massi/.arduino15
+  downloads: /home/massi/.arduino15/staging
+
+logging:
+  file: ""
+  format: text
+  level: info
