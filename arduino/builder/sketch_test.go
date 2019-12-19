@@ -115,6 +115,7 @@ func TestLoadSketchFolderSymlink(t *testing.T) {
 	symlinkSketchPath := filepath.Join("testdata", t.Name())
 	srcSketchPath := t.Name() + "Src"
 	os.Symlink(srcSketchPath, symlinkSketchPath)
+	defer os.Remove(symlinkSketchPath)
 	mainFilePath := filepath.Join(symlinkSketchPath, t.Name()+".ino")
 	s, err := builder.SketchLoad(symlinkSketchPath, "")
 	require.Nil(t, err)

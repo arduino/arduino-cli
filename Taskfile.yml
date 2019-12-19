@@ -6,6 +6,7 @@ tasks:
     cmds:
       - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/commands/*.proto'
       - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/monitor/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/settings/*.proto'
 
   build:
     desc: Build the project
