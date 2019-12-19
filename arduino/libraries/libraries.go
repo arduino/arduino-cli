@@ -141,7 +141,7 @@ func (library *Library) PriorityForArchitecture(arch string) uint8 {
 		return bonus + 0x01
 	case PlatformBuiltIn:
 		return bonus + 0x02
-	case Sketchbook:
+	case User:
 		return bonus + 0x03
 	}
 	panic(fmt.Sprintf("Invalid library location: %d", library.Location))

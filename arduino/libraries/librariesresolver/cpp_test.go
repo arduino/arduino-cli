@@ -24,13 +24,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var l1 = &libraries.Library{Name: "Calculus Lib", Location: libraries.Sketchbook}
-var l2 = &libraries.Library{Name: "Calculus Lib-master", Location: libraries.Sketchbook}
-var l3 = &libraries.Library{Name: "Calculus Lib Improved", Location: libraries.Sketchbook}
-var l4 = &libraries.Library{Name: "Another Calculus Lib", Location: libraries.Sketchbook}
-var l5 = &libraries.Library{Name: "Yet Another Calculus Lib Improved", Location: libraries.Sketchbook}
-var l6 = &libraries.Library{Name: "Calculus Unified Lib", Location: libraries.Sketchbook}
-var l7 = &libraries.Library{Name: "AnotherLib", Location: libraries.Sketchbook}
+var l1 = &libraries.Library{Name: "Calculus Lib", Location: libraries.User}
+var l2 = &libraries.Library{Name: "Calculus Lib-master", Location: libraries.User}
+var l3 = &libraries.Library{Name: "Calculus Lib Improved", Location: libraries.User}
+var l4 = &libraries.Library{Name: "Another Calculus Lib", Location: libraries.User}
+var l5 = &libraries.Library{Name: "Yet Another Calculus Lib Improved", Location: libraries.User}
+var l6 = &libraries.Library{Name: "Calculus Unified Lib", Location: libraries.User}
+var l7 = &libraries.Library{Name: "AnotherLib", Location: libraries.User}
 
 func TestClosestMatchWithTotallyDifferentNames(t *testing.T) {
 	libraryList := libraries.List{}

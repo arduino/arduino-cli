@@ -21,7 +21,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func setDefaults(dataDir, sketchBookDir string) {
+func setDefaults(dataDir, userDir string) {
 	// logging
 	viper.SetDefault("logging.level", "info")
 	viper.SetDefault("logging.format", "text")
@@ -31,9 +31,7 @@ func setDefaults(dataDir, sketchBookDir string) {
 	// arduino directories
 	viper.SetDefault("directories.Data", dataDir)
 	viper.SetDefault("directories.Downloads", filepath.Join(dataDir, "staging"))
-	viper.SetDefault("directories.Packages", filepath.Join(dataDir, "packages"))
-	viper.SetDefault("directories.SketchBook", sketchBookDir)
-	viper.SetDefault("directories.Libraries", filepath.Join(sketchBookDir, "libraries"))
+	viper.SetDefault("directories.User", userDir)
 
 	// daemon settings
 	viper.SetDefault("daemon.port", "50051")

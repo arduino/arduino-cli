@@ -43,9 +43,9 @@ var (
 	// line and check with what we want.
 	stdOut = os.Stdout
 
-	currDownloadDir   string
-	currDataDir       string
-	currSketchbookDir string
+	currDownloadDir string
+	currDataDir     string
+	currUserDir     string
 )
 
 type stdOutRedirect struct {
@@ -95,21 +95,23 @@ func TestMain(m *testing.M) {
 	// SetUp
 	currDataDir = tmpDirOrDie()
 	os.MkdirAll(filepath.Join(currDataDir, "packages"), 0755)
-	os.Setenv("ARDUINO_DATA_DIR", currDataDir)
+	os.Setenv("ARDUINO_DIRECTORIES_DATA", currDataDir)
 	currDownloadDir = tmpDirOrDie()
-	os.Setenv("ARDUINO_DOWNLOADS_DIR", currDownloadDir)
-	currSketchbookDir = filepath.Join("testdata", "sketchbook_with_custom_hardware")
-	os.Setenv("ARDUINO_SKETCHBOOK_DIR", currSketchbookDir)
+	os.Setenv("ARDUINO_DIRECTORIES_DOWNLOADS", currDownloadDir)
+	currUserDir = filepath.Join("testdata", "custom_hardware")
+	// use ARDUINO_SKETCHBOOK_DIR instead of ARDUINO_DIRECTORIES_USER to
+	// ensure the backward compat code is working
+	os.Setenv("ARDUINO_SKETCHBOOK_DIR", currUserDir)
 
 	// Run
 	res := m.Run()
 
 	// TearDown
 	os.RemoveAll(currDataDir)
-	os.Unsetenv("ARDUINO_DATA_DIR")
+	os.Unsetenv("ARDUINO_DIRECTORIES_DATA")
 	currDataDir = ""
 	os.RemoveAll(currDownloadDir)
-	os.Unsetenv("ARDUINO_DOWNLOADS_DIR")
+	os.Unsetenv("ARDUINO_DIRECTORIES_DOWNLOADS")
 	currDownloadDir = ""
 	os.Unsetenv("ARDUINO_SKETCHBOOK_DIR")
 
@@ -222,66 +224,66 @@ func TestUploadIntegration(t *testing.T) {
 	require.Zero(t, exitCode)
 
 	// -i flag
-	exitCode, d := executeWithArgs("upload", "-i", filepath.Join(currSketchbookDir, "test.hex"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	exitCode, d := executeWithArgs("upload", "-i", filepath.Join(currUserDir, "test.hex"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), "QUIET")
 	require.Contains(t, string(d), "NOVERIFY")
-	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/test.hex")
+	require.Contains(t, string(d), "testdata/custom_hardware/test.hex")
 
 	// -i flag with implicit extension
-	exitCode, d = executeWithArgs("upload", "-i", filepath.Join(currSketchbookDir, "test"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	exitCode, d = executeWithArgs("upload", "-i", filepath.Join(currUserDir, "test"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), "QUIET")
 	require.Contains(t, string(d), "NOVERIFY")
-	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/test.hex")
+	require.Contains(t, string(d), "testdata/custom_hardware/test.hex")
 
 	// -i with absolute path
-	fullPath, err := filepath.Abs(filepath.Join(currSketchbookDir, "test.hex"))
+	fullPath, err := filepath.Abs(filepath.Join(currUserDir, "test.hex"))
 	require.NoError(t, err)
 	exitCode, d = executeWithArgs("upload", "-i", fullPath, "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), "QUIET")
 	require.Contains(t, string(d), "NOVERIFY")
-	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/test.hex")
+	require.Contains(t, string(d), "testdata/custom_hardware/test.hex")
 
 	// -v verbose
-	exitCode, d = executeWithArgs("upload", "-v", "-t", "-i", filepath.Join(currSketchbookDir, "test.hex"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	exitCode, d = executeWithArgs("upload", "-v", "-t", "-i", filepath.Join(currUserDir, "test.hex"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), "VERBOSE")
 	require.Contains(t, string(d), "VERIFY")
-	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/test.hex")
+	require.Contains(t, string(d), "testdata/custom_hardware/test.hex")
 
 	// -t verify
-	exitCode, d = executeWithArgs("upload", "-i", filepath.Join(currSketchbookDir, "test.hex"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	exitCode, d = executeWithArgs("upload", "-i", filepath.Join(currUserDir, "test.hex"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), "QUIET")
 	require.Contains(t, string(d), "NOVERIFY")
-	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/test.hex")
+	require.Contains(t, string(d), "testdata/custom_hardware/test.hex")
 
 	// -v -t verbose verify
-	exitCode, d = executeWithArgs("upload", "-v", "-t", "-i", filepath.Join(currSketchbookDir, "test.hex"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	exitCode, d = executeWithArgs("upload", "-v", "-t", "-i", filepath.Join(currUserDir, "test.hex"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), "VERBOSE")
 	require.Contains(t, string(d), "VERIFY")
-	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/test.hex")
+	require.Contains(t, string(d), "testdata/custom_hardware/test.hex")
 
 	// non-existent file
-	exitCode, _ = executeWithArgs("upload", "-i", filepath.Join(currSketchbookDir, "test123.hex"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	exitCode, _ = executeWithArgs("upload", "-i", filepath.Join(currUserDir, "test123.hex"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
 	require.NotZero(t, exitCode)
 
 	// sketch
-	exitCode, d = executeWithArgs("upload", filepath.Join(currSketchbookDir, "TestSketch"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	exitCode, d = executeWithArgs("upload", filepath.Join(currUserDir, "TestSketch"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), "QUIET")
 	require.Contains(t, string(d), "NOVERIFY")
-	require.Contains(t, string(d), "testdata/sketchbook_with_custom_hardware/TestSketch/TestSketch.test.avr.testboard.hex")
+	require.Contains(t, string(d), "testdata/custom_hardware/TestSketch/TestSketch.test.avr.testboard.hex")
 
 	// sketch without build
-	exitCode, _ = executeWithArgs("upload", filepath.Join(currSketchbookDir, "TestSketch2"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
+	exitCode, _ = executeWithArgs("upload", filepath.Join(currUserDir, "TestSketch2"), "-b", "test:avr:testboard", "-p", "/dev/ttyACM0")
 	require.NotZero(t, exitCode)
 
 	// platform without 'recipe.output.tmp_file' property
-	exitCode, _ = executeWithArgs("upload", "-i", filepath.Join(currSketchbookDir, "test.hex"), "-b", "test2:avr:testboard", "-p", "/dev/ttyACM0")
+	exitCode, _ = executeWithArgs("upload", "-i", filepath.Join(currUserDir, "test.hex"), "-b", "test2:avr:testboard", "-p", "/dev/ttyACM0")
 	require.NotZero(t, exitCode)
 }
 
@@ -289,10 +291,6 @@ func TestCompileCommandsIntegration(t *testing.T) {
 	// Set staging dir to a temporary dir
 	tmp := tmpDirOrDie()
 	defer os.RemoveAll(tmp)
-
-	// override SetUp dirs
-	os.Setenv("ARDUINO_SKETCHBOOK_DIR", tmp)
-	currSketchbookDir = tmp
 
 	exitCode, _ := executeWithArgs("core", "update-index")
 	require.Zero(t, exitCode)
@@ -302,26 +300,26 @@ func TestCompileCommandsIntegration(t *testing.T) {
 	require.Zero(t, exitCode)
 
 	// Create a test sketch
-	test1 := filepath.Join(currSketchbookDir, "Test1")
-	exitCode, d := executeWithArgs("sketch", "new", test1)
+	sketchPath := filepath.Join(tmp, "Test1")
+	exitCode, d := executeWithArgs("sketch", "new", sketchPath)
 	require.Zero(t, exitCode)
 
 	// Build sketch without FQBN
-	exitCode, d = executeWithArgs("compile", test1)
+	exitCode, d = executeWithArgs("compile", sketchPath)
 	require.NotZero(t, exitCode)
 	require.Contains(t, string(d), "no FQBN provided")
 
 	// Build sketch for arduino:avr:uno
-	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:uno", test1)
+	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:uno", sketchPath)
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New(test1).Join("Test1.arduino.avr.uno.hex").Exist())
+	require.True(t, paths.New(sketchPath).Join("Test1.arduino.avr.uno.hex").Exist())
 
 	// Build sketch for arduino:avr:nano (without options)
-	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", test1)
+	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", sketchPath)
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New(test1).Join("Test1.arduino.avr.nano.hex").Exist())
+	require.True(t, paths.New(sketchPath).Join("Test1.arduino.avr.nano.hex").Exist())
 
 	// Build sketch with --output path
 	pwd, err := os.Getwd()
@@ -329,23 +327,23 @@ func TestCompileCommandsIntegration(t *testing.T) {
 	defer func() { require.NoError(t, os.Chdir(pwd)) }()
 	require.NoError(t, os.Chdir(tmp))
 
-	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", "-o", "test", test1)
+	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", "-o", "test", sketchPath)
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), "Sketch uses")
 	require.True(t, paths.New("test.hex").Exist())
 
-	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", "-o", "test2.hex", test1)
+	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", "-o", "test2.hex", sketchPath)
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), "Sketch uses")
 	require.True(t, paths.New("test2.hex").Exist())
 	require.NoError(t, paths.New(tmp, "anothertest").MkdirAll())
 
-	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", "-o", "anothertest/test", test1)
+	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", "-o", "anothertest/test", sketchPath)
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), "Sketch uses")
 	require.True(t, paths.New("anothertest", "test.hex").Exist())
 
-	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", "-o", tmp+"/anothertest/test2", test1)
+	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", "-o", tmp+"/anothertest/test2", sketchPath)
 	require.Zero(t, exitCode)
 	require.Contains(t, string(d), "Sketch uses")
 	require.True(t, paths.New("anothertest", "test2.hex").Exist())
@@ -375,7 +373,9 @@ func Test3rdPartyCoreIntegration(t *testing.T) {
 	require.Contains(t, string(d), "installed")
 
 	// Build a simple sketch and check if all artifacts are copied
-	tmpSketch := paths.New(currSketchbookDir).Join("Blink")
+	tmp := tmpDirOrDie()
+	defer os.RemoveAll(tmp)
+	tmpSketch := paths.New(tmp).Join("Blink")
 	err := paths.New("testdata/Blink").CopyDirTo(tmpSketch)
 	require.NoError(t, err, "copying test sketch into temp dir")
 	exitCode, d = executeWithArgs("--config-file", configFile, "compile", "-b", "esp32:esp32:esp32", tmpSketch.String())
@@ -386,12 +386,6 @@ func Test3rdPartyCoreIntegration(t *testing.T) {
 }
 
 func TestCoreCommandsIntegration(t *testing.T) {
-	// override SetUp dirs
-	tmp := tmpDirOrDie()
-	defer os.RemoveAll(tmp)
-	os.Setenv("ARDUINO_SKETCHBOOK_DIR", tmp)
-	currSketchbookDir = tmp
-
 	exitCode, _ := executeWithArgs("core", "update-index")
 	require.Zero(t, exitCode)
 
