@@ -64,11 +64,13 @@ target a different directory, for example ``~/local/bin``, set the
 
    curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/local/bin sh
 
-Download the latest packages from Arduino CDN
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Download the latest packages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In order to get the latest stable release for your platform you can use
-the following links:
+You can download the latest version of the pre-built binaries for the supported
+platforms from the `release page <https://github.com/arduino/arduino-cli/releases>`__
+or following the links in the following table. Once downloaded, extract the
+binary ``arduino-cli`` into a directory which is in your ``PATH``.
 
 +---------------+---------------------+---------------------+
 | **Linux**     | `Linux 32 bit`_     | `Linux 64 bit`_     |
@@ -88,31 +90,17 @@ the following links:
 .. _`Windows 32 bit`: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_32bit.zip
 .. _`Mac OSX`: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_64bit.tar.gz
 
-These links return a ``302: Found`` response, redirecting to latest
-generated builds by replacing ``latest`` with the latest available
-stable release. Once downloaded, place the executable ``arduino-cli``
-into a directory which is in your ``PATH``.
-
 **Deprecation notice:** Links in the form
 ``http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-<platform>.tar.bz2``
-won’t be further updated. That URL will provide arduino-cli
-0.3.7-alpha.preview, regardless of further releases.
+won’t be further updated. That URL will provide the version
+``0.3.7-alpha.preview``, regardless of further releases.
 
-Download the latest package from the release page on GitHub
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Download a nightly build
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-Alternatively you can download one of the pre-built binaries for the
-supported platforms from the `release
-page <https://github.com/arduino/arduino-cli/releases>`__. Once
-downloaded, place the executable ``arduino-cli`` into a directory which
-is in your ``PATH``.
-
-Get a nightly build
-~~~~~~~~~~~~~~~~~~~
-
-These builds are generated once a day from ``master`` branch starting at
-01:00 GMT. In order to get the latest nightly build for your platform,
-use the following links:
+These builds are generated everyday at 01:00 GMT from the ``master`` branch and
+should be considered unstable. In order to get the latest nightly build
+available for the supported platform, use the following links:
 
 +---------------+-----------------------------+-----------------------------+
 | **Linux**     | `Nightly Linux 32 bit`_     | `Nightly Linux 64 bit`_     |
@@ -140,7 +128,7 @@ replaced with ``20190806`` )
 Checksums for the nightly builds are available at
 ``https://downloads.arduino.cc/arduino-cli/nightly/nightly-<DATE>-checksums.txt``
 
-Once downloaded, place the executable ``arduino-cli`` into a directory
+Once downloaded, extract the executable ``arduino-cli`` into a directory
 which is in your ``PATH``.
 
 Build from source
