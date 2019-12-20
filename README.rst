@@ -90,10 +90,10 @@ binary ``arduino-cli`` into a directory which is in your ``PATH``.
 .. _`Windows 32 bit`: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_32bit.zip
 .. _`Mac OSX`: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_64bit.tar.gz
 
-**Deprecation notice:** Links in the form
-``http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-<platform>.tar.bz2``
-won’t be further updated. That URL will provide the version
-``0.3.7-alpha.preview``, regardless of further releases.
+  Deprecation notice: links in the form
+  ``http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-<platform>.tar.bz2``
+  won’t be further updated. That URL will provide the version
+  ``0.3.7-alpha.preview``, regardless of further releases.
 
 Get a nightly build
 ~~~~~~~~~~~~~~~~~~~
