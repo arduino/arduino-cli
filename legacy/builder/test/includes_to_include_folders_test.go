@@ -30,7 +30,6 @@
 package test
 
 import (
-	"fmt"
 	"path/filepath"
 	"sort"
 	"testing"
@@ -331,7 +330,6 @@ func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
 
 	importedLibraries := ctx.ImportedLibraries
 	sort.Sort(ByLibraryName(importedLibraries))
-	fmt.Println(importedLibraries)
 	require.Equal(t, 3, len(importedLibraries))
 	require.Equal(t, "testlib1", importedLibraries[0].Name)
 	require.Equal(t, "testlib2", importedLibraries[1].Name)

@@ -21,7 +21,6 @@ package daemon
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -116,7 +115,6 @@ func (s *ArduinoCoreServerImpl) Init(req *rpc.InitReq, stream rpc.ArduinoCore_In
 	if err != nil {
 		return err
 	}
-	fmt.Println(resp)
 	return stream.Send(resp)
 }
 

@@ -206,7 +206,6 @@ func detectLatestAVRCore(t *testing.T) string {
 		}
 	}
 	require.NotEmpty(t, latest, "latest avr core version")
-	fmt.Println("Latest AVR core version:", latest)
 	return latest.String()
 }
 

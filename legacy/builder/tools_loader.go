@@ -38,7 +38,6 @@ type ToolsLoader struct{}
 
 func (s *ToolsLoader) Run(ctx *types.Context) error {
 	if ctx.CanUseCachedTools {
-		//fmt.Println("no fs modification, can use cached ctx")
 		return nil
 	}
 
