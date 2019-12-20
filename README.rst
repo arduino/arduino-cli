@@ -19,9 +19,7 @@ Please read the document `How to contribute <CONTRIBUTING.md>`__ which
 will guide you through how to build the source code, run the tests, and
 contribute your changes to the project.
 
-:sparkles: Thanks to all our
-`contributors <https://github.com/arduino/arduino-cli/graphs/contributors>`__!
-:sparkles:
+:sparkles: Thanks to all our `contributors <https://github.com/arduino/arduino-cli/graphs/contributors>`__! :sparkles:
 
 How to install
 --------------
