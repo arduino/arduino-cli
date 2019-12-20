@@ -13,6 +13,7 @@ to use any Arduino compatible board and platforms.
 
 .. contents:: **Table of Contents**
     :backlinks: none
+    :depth: 2
 
 How to contribute
 -----------------
@@ -113,20 +114,23 @@ These builds are generated once a day from ``master`` branch starting at
 01:00 GMT. In order to get the latest nightly build for your platform,
 use the following links:
 
--  `Linux 64
-   bit <https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_64bit.tar.gz>`__
--  `Linux 32
-   bit <https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_32bit.tar.gz>`__
--  `Linux ARM 64
-   bit <https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARM64.tar.gz>`__
--  `Linux ARM 32
-   bit <https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARMv7.tar.gz>`__
--  `Windows 64
-   bit <https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_64bit.zip>`__
--  `Windows 32
-   bit <https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_32bit.zip>`__
--  `Mac
-   OSX <https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_macOS_64bit.tar.gz>`__
++---------------+-----------------------------+-----------------------------+
+| **Linux**     | `Nightly Linux 32 bit`_     | `Nightly Linux 64 bit`_     |
++---------------+-----------------------------+-----------------------------+
+| **Linux ARM** | `Nightly Linux ARM 32 bit`_ | `Nightly Linux ARM 64 bit`_ |
++---------------+-----------------------------+-----------------------------+
+| **Windows**   | `Nightly Windows 32 bit`_   | `Nightly Windows 64 bit`_   |
++---------------+-----------------------------+-----------------------------+
+| **Mac OSX**   |                             | `Nightly Mac OSX`_          |
++---------------+-----------------------------+-----------------------------+
+
+.. _`Nightly Linux 64 bit`: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_64bit.tar.gz
+.. _`Nightly Linux 32 bit`: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_32bit.tar.gz
+.. _`Nightly Linux ARM 64 bit`: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARM64.tar.gz
+.. _`Nightly Linux ARM 32 bit`: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARMv7.tar.gz
+.. _`Nightly Windows 64 bit`: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_64bit.zip
+.. _`Nightly Windows 32 bit`: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_32bit.zip
+.. _`Nightly Mac OSX`: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_macOS_64bit.tar.gz
 
 These links return a ``302: Found`` response, redirecting to latest
 generated builds by replacing ``latest`` with the latest available build
@@ -139,8 +143,13 @@ Checksums for the nightly builds are available at
 Once downloaded, place the executable ``arduino-cli`` into a directory
 which is in your ``PATH``.
 
-Build from source using Docker
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Build from source
+~~~~~~~~~~~~~~~~~
+
+If you’re familiar with Golang or if you want to contribute to the
+project, you will probably build the ``arduino-cli`` locally with your
+Go compiler. Please refer to the `contributing <CONTRIBUTING.md>`__ doc
+for setup instructions.
 
 If you don’t have a working Golang environment or if you want to build
 ``arduino-cli`` targeting different platforms, you can use Docker to get
@@ -153,46 +162,54 @@ a binary directly from sources. From the project folder run:
 Once the build is over, you will find a ``./dist/`` folder containing
 the packages built out of the current source tree.
 
-Build from source
-~~~~~~~~~~~~~~~~~
+How to use
+----------
 
-If you’re familiar with Golang or if you want to contribute to the
-project, you will probably build the ``arduino-cli`` locally with your
-Go compiler. Please refer to the `contributing <CONTRIBUTING.md>`__ doc
-for setup instructions.
+Despite there's no feature parity at the moment, Arduino CLI provides many of
+the features you can find in the Arduino IDE, let's see some examples.
 
-Getting Started
----------------
-
-The goal of the Arduino CLI is to be used by either including it in
-Makefile or in any kind of script for the Command Line. The Arduino CLI
-aims to replace the majority of features the Arduino IDE has without the
-graphical UI.
-
-Step 1. Create a new sketch
+Create a configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The command will create a new empty sketch named ``MyFirstSketch`` in
-the current directory
+Arduino CLI doesn't strictly require a configuration file to work because the
+command line interface any possible functionality. However, having one
+can spare you a lot of typing when issuing a command, so let's create it
+right ahead with:
 
 .. code:: console
 
-   $ arduino-cli sketch new MyFirstSketch
-   Sketch created in: /home/luca/MyFirstSketch
+  $ arduino-cli config init
+  Config file written: /home/luca/.arduino15/arduino-cli.yaml
 
-   $ cat /home/luca/MyFirstSketch/MyFirstSketch.ino
-   void setup() {
-   }
+If you inspect ``arduino-cli.yaml`` contents, you'll find out the available
+options with their respective default values.
 
-   void loop() {
-   }
+Create a new sketch
+~~~~~~~~~~~~~~~~~~~
 
-Step 2. Modify your sketch
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+To create a new sketch named ``MyFirstSketch`` in the current directory, run
+the following command:
 
-Use your favourite file editor or IDE to modify the .ino file, in this
-example under: ``$HOME/MyFirstSketch/MyFirstSketch.ino`` and change the
-file to look like this one:
+.. code:: console
+
+  $ arduino-cli sketch new MyFirstSketch
+  Sketch created in: /home/luca/MyFirstSketch
+
+A sketch is a folder containing assets like source files and libraries; the
+``new`` command creates for you a .ino file called ``MyFirstSketch.ino``
+containing Arduino boilerplate code:
+
+.. code:: console
+
+    $ cat $HOME/MyFirstSketch/MyFirstSketch.ino
+    void setup() {
+    }
+
+    void loop() {
+    }
+
+At this point you can use your favourite file editor or IDE to open the
+file ``$HOME/MyFirstSketch/MyFirstSketch.ino`` and change the code like this:
 
 .. code:: c
 
@@ -207,22 +224,19 @@ file to look like this one:
      delay(1000);
    }
 
-Step 3. Connect the board to your PC
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Connect the board to your PC
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are running a fresh install of the arduino-cli you probably need
-to update the platform indexes by running:
+The first thing to do upon a fresh install is to update the local cache of
+available platforms and libraries by running:
 
 .. code:: console
 
    $ arduino-cli core update-index
    Updating index: package_index.json downloaded
 
-Now, just connect the board to your PCs by using the USB cable.
-(**Note**: Connecting through an FTDI adapter chip will show Unknown for
-the Board Name because the VID/PID is generic. Uploading should still
-work as long as you identify the correct FQBN). In this example we will
-use the MKR1000 board:
+After connecting the board to your PCs by using the USB cable, you should be
+able to check whether it's been recognized by running:
 
 .. code:: console
 
@@ -230,14 +244,30 @@ use the MKR1000 board:
    Port         Type              Board Name              FQBN                 Core
    /dev/ttyACM1 Serial Port (USB) Arduino/Genuino MKR1000 arduino:samd:mkr1000 arduino:samd
 
-the board has been discovered but we need the correct core to program
-it, let’s install it!
+In this example, the MKR1000 board was recognized and from the output of the
+command you see the platform core called ``arduino:samd`` is the one that needs
+to be installed to make it work.
 
-Step 4. Install the core for your board
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you see an ``Unknown`` board listed, uploading
+should still work as long as you identify the platform core and use the correct
+FQBN string. When a board is not detected for whatever reason, you can list all
+the supported boards and their FQBN strings by running the following:
 
-From the output of the ``board list`` command, the right platform for
-the Arduino MKR1000 is ``arduino:samd``, we can install it with:
+.. code:: console
+
+   $ arduino-cli board listall mkr
+   Board Name              FQBN
+   Arduino MKR FOX 1200    arduino:samd:mkrfox1200
+   Arduino MKR GSM 1400    arduino:samd:mkrgsm1400
+   Arduino MKR WAN 1300    arduino:samd:mkrwan1300
+   Arduino MKR WiFi 1010   arduino:samd:mkrwifi1010
+   Arduino MKRZERO         arduino:samd:mkrzero
+   Arduino/Genuino MKR1000 arduino:samd:mkr1000
+
+Install the core for your board
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To install the ``arduino:samd`` platform core, run the following:
 
 .. code:: console
 
@@ -262,7 +292,7 @@ the Arduino MKR1000 is ``arduino:samd``, we can install it with:
    arduino:CMSIS-Atmel@1.1.0 - Installed
    arduino:arduinoOTA@1.2.0 - Installed
 
-Now verify we have installed the core properly by running
+Now verify we have installed the core properly by running:
 
 .. code:: console
 
@@ -270,29 +300,14 @@ Now verify we have installed the core properly by running
    ID              Installed       Latest  Name
    arduino:samd    1.6.19          1.6.19  Arduino SAMD Boards (32-bits ARM Cortex-M0+)
 
-If the board is not detected for any reason, you can list all the
-supported boards with ``arduino-cli board listall`` and also search for
-a specific board:
-
-.. code:: console
-
-   $ arduino-cli board listall mkr
-   Board Name              FQBN
-   Arduino MKR FOX 1200    arduino:samd:mkrfox1200
-   Arduino MKR GSM 1400    arduino:samd:mkrgsm1400
-   Arduino MKR WAN 1300    arduino:samd:mkrwan1300
-   Arduino MKR WiFi 1010   arduino:samd:mkrwifi1010
-   Arduino MKRZERO         arduino:samd:mkrzero
-   Arduino/Genuino MKR1000 arduino:samd:mkr1000
-
 Great! Now we are ready to compile and upload the sketch.
 
 Adding 3rd party cores
 ^^^^^^^^^^^^^^^^^^^^^^
 
-To use 3rd party core packages, pass a link to the the additional
-package index file with the ``--additional-urls`` option to any command
-that supports additional cores:
+If your board requires 3rd party core packages to work, you can pass a link to
+the the additional package index file with the ``--additional-urls`` option to
+any command that require a platform core to work:
 
 .. code:: console
 
@@ -302,21 +317,12 @@ that supports additional cores:
    ID              Version Name
    esp8266:esp8266 2.5.2   esp8266
 
-To avoid passing the ``--additional-urls`` option every time you run a
-command, you can list the URLs to additional package indexes in the CLI
-configuration file. If you don’t have a configuration file yet (it’s the
-case of a fresh install) you can create one with the command:
+To avoid passing the ``--additional-urls`` option every time you run a command,
+you can list the URLs to additional package indexes in the Arduino CLI
+configuration file.
 
-.. code:: console
-
-   $ arduino-cli config init
-   Config file PATH: /home/user/.arduino15/arduino-cli.yaml
-
-This will create a configuration file in its default location for the
-current operating system and will print the full path to the file.
-
-For example, to add the ESP8266 core, edit the configration file and add
-the following:
+For example, to add the ESP8266 core, edit the configration file and change the
+``board_manager`` settings as follows:
 
 .. code:: yaml
 
@@ -338,22 +344,19 @@ additional URL from the configuration file:
    ID              Version Name
    esp8266:esp8266 2.5.2   esp8266
 
-Step 5. Compile the sketch
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Compile and upload the sketch
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To compile the sketch we have to run the ``compile`` command with the
-proper FQBN we just got in the previous command.
+To compile the sketch you run the ``compile`` command passing the proper FQBN
+string:
 
 .. code:: console
 
    $ arduino-cli compile --fqbn arduino:samd:mkr1000 MyFirstSketch
    Sketch uses 9600 bytes (3%) of program storage space. Maximum is 262144 bytes.
 
-Step 6. Upload your sketch
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-We can finally upload the sketch and see our board blinking, we now have
-to specify the serial port used by our board other than the FQBN:
+To upload the sketch to your board, run the following command, this time also
+providing the serial port where the board is connected:
 
 .. code:: console
 
@@ -389,113 +392,106 @@ to specify the serial port used by our board other than the FQBN:
    done in 0.009 seconds
    CPU reset.
 
-Step 7. Add libraries
-~~~~~~~~~~~~~~~~~~~~~
+Add libraries
+~~~~~~~~~~~~~
 
-Now we can try to add a useful library to our sketch. We can at first
-look at the name of a library, our favourite one is the wifi101, here
-the command to get more info:
-
-.. code:: console
-
-   $ arduino-cli lib search wifi101
-   Name: "WiFi101OTA"
-     Author:  Arduino
-     Maintainer:  Arduino <info@arduino.cc>
-     Sentence:  Update sketches to your board over WiFi
-     Paragraph:  Requires an SD card and SAMD board
-     Website:  http://www.arduino.cc/en/Reference/WiFi101OTA
-     Category:  Other
-     Architecture:  samd
-     Types:  Arduino
-     Versions:  [1.0.2, 1.0.0, 1.0.1]
-   Name: "WiFi101"
-     Author:  Arduino
-     Maintainer:  Arduino <info@arduino.cc>
-     Sentence:  Network driver for ATMEL WINC1500 module (used on Arduino/Genuino Wifi Shield 101 and MKR1000 boards)
-     Paragraph:  This library implements a network driver for devices based on the ATMEL WINC1500 wifi module
-     Website:  http://www.arduino.cc/en/Reference/WiFi101
-     Category:  Communication
-     Architecture:  *
-     Types:  Arduino
-     Versions:  [0.5.0, 0.6.0, 0.10.0, 0.11.0, 0.11.1, 0.11.2, 0.12.0, 0.15.2, 0.8.0, 0.9.0, 0.12.1, 0.14.1, 0.14.4, 0.14.5, 0.15.1, 0.7.0, 0.14.0, 0.14.2, 0.14.3, 0.9.1, 0.13.0, 0.15.0, 0.5.1]
-
-We are now ready to install it! Please be sure to use the full name of
-the lib as specified in the “Name:” section previously seen:
+If you need to add more functionalities to your sketch, chances are some of the
+libraries available in the Arduino ecosystem already provide what you need.
+For example, if you need a debouncing strategy to better handle button inputs,
+you can try searching for the ``debouncer`` keyword:
 
 .. code:: console
 
-   $ arduino-cli lib install "WiFi101"
-   Downloading libraries...
-   WiFi101@0.15.2 downloaded
-   Installed WiFi101@0.15.2
+  $ arduino-cli lib search debouncer
+    Name: "Debouncer"
+      Author: hideakitai
+      Maintainer: hideakitai
+      Sentence: Debounce library for Arduino
+      Paragraph: Debounce library for Arduino
+      Website: https://github.com/hideakitai
+      Category: Timing
+      Architecture: *
+      Types: Contributed
+      Versions: [0.1.0]
+    Name: "FTDebouncer"
+      Author: Ubi de Feo
+      Maintainer: Ubi de Feo, Sebastian Hunkeler
+      Sentence: An efficient, low footprint, fast pin debouncing library for Arduino
+      Paragraph: This pin state supervisor manages debouncing of buttons and handles transitions between LOW and HIGH state, calling a function and notifying your code of which pin has been activated or deactivated.
+      Website: https://github.com/ubidefeo/FTDebouncer
+      Category: Uncategorized
+      Architecture: *
+      Types: Contributed
+      Versions: [1.3.0]
+    Name: "SoftTimer"
+      Author: Balazs Kelemen <prampec+arduino@gmail.com>
+      Maintainer: Balazs Kelemen <prampec+arduino@gmail.com>
+      Sentence: SoftTimer is a lightweight pseudo multitasking solution for Arduino.
+      Paragraph: SoftTimer enables higher level Arduino programing, yet easy to use, and lightweight. You are often faced with the problem that you need to do multiple tasks at the same time. In SoftTimer, the programmer creates Tasks that runs periodically. This library comes with a collection of handy tools like blinker, pwm, debouncer.
+      Website: https://github.com/prampec/arduino-softtimer
+      Category: Timing
+      Architecture: *
+      Types: Contributed
+      Versions: [3.0.0, 3.1.0, 3.1.1, 3.1.2, 3.1.3, 3.1.5, 3.2.0]
 
-Inline Help
------------
-
-``arduino-cli`` is a container of commands, to see the full list just
-run:
-
-.. code:: console
-
-   $ arduino-cli
-   Arduino Command Line Interface (arduino-cli).
-
-   Usage:
-     arduino-cli [command]
-
-   Examples:
-   arduino <command> [flags...]
-
-   Available Commands:
-     board         Arduino board commands.
-     compile       Compiles Arduino sketches.
-     config        Arduino Configuration Commands.
-     core          Arduino Core operations.
-     help          Help about any command
-     lib           Arduino commands about libraries.
-     sketch        Arduino CLI Sketch Commands.
-     upload        Upload Arduino sketches.
-     version       Shows version number of Arduino CLI.
-     ....
-
-Each command has his own specific help that can be obtained with the
-``help`` command, for example:
+Our favourite is ``FTDebouncer``, can install it by running:
 
 .. code:: console
 
-   $ arduino-cli help core
-   Arduino Core operations.
+    $ arduino-cli lib install FTDebouncer
+      FTDebouncer depends on FTDebouncer@1.3.0
+      Downloading FTDebouncer@1.3.0...
+      FTDebouncer@1.3.0 downloaded
+      Installing FTDebouncer@1.3.0...
+      Installed FTDebouncer@1.3.0
 
-   Usage:
-     arduino-cli core [command]
+Getting help
+------------
 
-   Examples:
-   arduino-cli core update-index # to update the package index file.
+``arduino-cli`` is a container of commands and each command has its own
+dedicated help text that can be shown with the ``help`` command like this:
 
-   Available Commands:
-     download     Downloads one or more cores and corresponding tool dependencies.
-     install      Installs one or more cores and corresponding tool dependencies.
-     list         Shows the list of installed cores.
-     update-index Updates the index of cores.
+.. code:: console
 
-   Flags:
-     -h, --help   help for core
+  $ arduino-cli help core
+    Arduino Core operations.
 
-   Global Flags:
-         --config-file string   The custom config file (if not specified the default one will be used).
-         --debug                Enables debug output (super verbose, used to debug the CLI).
-         --format string        The output format, can be [text|json]. (default "text")
+    Usage:
+      arduino-cli core [command]
 
-   Use "arduino-cli core [command] --help" for more information about a command.
+    Examples:
+      ./arduino-cli core update-index
 
-FAQ
----
+    Available Commands:
+      download     Downloads one or more cores and corresponding tool dependencies.
+      install      Installs one or more cores and corresponding tool dependencies.
+      list         Shows the list of installed platforms.
+      search       Search for a core in the package index.
+      uninstall    Uninstalls one or more cores and corresponding tool dependencies if no more used.
+      update-index Updates the index of cores.
+      upgrade      Upgrades one or all installed platforms to the latest version.
 
-Why the Arduino Uno/Mega/Duemilanove is not detected when I run ``arduino-cli board list``?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Flags:
+      -h, --help   help for core
 
-Because:
+    Global Flags:
+          --additional-urls strings   Additional URLs for the board manager.
+          --config-file string        The custom config file (if not specified the default will be used).
+          --format string             The output format, can be [text|json]. (default "text")
+          --log-file string           Path to the file where logs will be written.
+          --log-format string         The output format for the logs, can be [text|json].
+          --log-level string          Messages with this level and above will be logged.
+      -v, --verbose                   Print the logs on the standard output.
+
+    Use "arduino-cli core [command] --help" for more information about a command.
+
+Troubleshooting
+---------------
+
+  Arduino Uno/Mega/Duemilanove is not detected when you
+  run ``arduino-cli board list``
+
+Possible causes:
 
 -  Your board is a cheaper clone, or
 -  It mounts a USB2Serial converter like FT232 or CH320: these chips
@@ -503,35 +499,7 @@ Because:
    only thing that we know is that the board mounts that specific
    USB2Serial chip, but we don’t know which board is.
 
-What is the core for the Uno/Mega/Nano/Duemilanove?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-``arduino:avr``
-
-What is the FQBN for …?
-~~~~~~~~~~~~~~~~~~~~~~~
-
--  Arduino UNO: ``arduino:avr:uno``
--  Arduino Mega: ``arduino:avr:mega``
--  Arduino Nano: ``arduino:avr:nano`` or
-   ``arduino:avr:nano:cpu=atmega328old`` if you have the old bootloader
-
-How can I find the core/FQBN for a board?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Update the core index to have latest boards informations:
-
-.. code:: console
-
-   $ arduino-cli core update-index
-   Updating index: package_index.json downloaded
-
-See:
-https://github.com/arduino/arduino-cli#step-4-find-and-install-the-right-core
-
-Further help can be found in `this
-comment <https://github.com/arduino/arduino-cli/issues/138#issuecomment-459169051>`__
-in `#138 <https://github.com/arduino/arduino-cli/issues/138>`__.
+  What's the FQBN string?
 
 For a deeper understanding of how FQBN works, you should understand
 Arduino Hardware specification. You can find more information in this
