@@ -29,7 +29,7 @@ contribute your changes to the project.
 How to install
 --------------
 
-Get the latest package
+Get the latest version
 ~~~~~~~~~~~~~~~~~~~~~~
 
 You have several options to install the latest version of the Arduino
@@ -95,8 +95,8 @@ binary ``arduino-cli`` into a directory which is in your ``PATH``.
 won’t be further updated. That URL will provide the version
 ``0.3.7-alpha.preview``, regardless of further releases.
 
-Download a nightly build
-~~~~~~~~~~~~~~~~~~~~~~~~
+Get a nightly build
+~~~~~~~~~~~~~~~~~~~
 
 These builds are generated everyday at 01:00 GMT from the ``master`` branch and
 should be considered unstable. In order to get the latest nightly build
