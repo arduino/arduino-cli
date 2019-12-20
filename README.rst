@@ -160,7 +160,7 @@ Create a configuration file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Arduino CLI doesn't strictly require a configuration file to work because the
-command line interface any possible functionality. However, having one
+command line interface provides any possible functionality. However, having one
 can spare you a lot of typing when issuing a command, so let's create it
 right ahead with:
 
