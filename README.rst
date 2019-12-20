@@ -7,8 +7,12 @@ arduino-cli
 boards/library manager, uploader, discovery and many other tools needed
 to use any Arduino compatible board and platforms.
 
-This software is currently under active development: anything can change
-at any time, API and UI must be considered unstable.
+  This software is currently under active development: anything can change
+  at any time, API and UI must be considered unstable until we release version
+  1.0.0.
+
+.. contents:: **Table of Contents**
+    :backlinks: none
 
 How to contribute
 -----------------
@@ -65,20 +69,23 @@ Download the latest packages from Arduino CDN
 In order to get the latest stable release for your platform you can use
 the following links:
 
--  `Linux 64
-   bit <https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz>`__
--  `Linux 32
-   bit <https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_32bit.tar.gz>`__
--  `Linux ARM 64
-   bit <https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARM64.tar.gz>`__
--  `Linux ARM 32
-   bit <https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARMv7.tar.gz>`__
--  `Windows 64
-   bit <https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_64bit.zip>`__
--  `Windows 32
-   bit <https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_32bit.zip>`__
--  `Mac
-   OSX <https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_64bit.tar.gz>`__
++---------------+---------------------+---------------------+
+| **Linux**     | `Linux 32 bit`_     | `Linux 64 bit`_     |
++---------------+---------------------+---------------------+
+| **Linux ARM** | `Linux ARM 32 bit`_ | `Linux ARM 64 bit`_ |
++---------------+---------------------+---------------------+
+| **Windows**   | `Windows 32 bit`_   | `Windows 64 bit`_   |
++---------------+---------------------+---------------------+
+| **Mac OSX**   |                     | `Mac OSX`_          |
++---------------+---------------------+---------------------+
+
+.. _`Linux 64 bit`: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz
+.. _`Linux 32 bit`: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_32bit.tar.gz
+.. _`Linux ARM 64 bit`: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARM64.tar.gz
+.. _`Linux ARM 32 bit`: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARMv7.tar.gz
+.. _`Windows 64 bit`: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_64bit.zip
+.. _`Windows 32 bit`: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_32bit.zip
+.. _`Mac OSX`: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_64bit.tar.gz
 
 These links return a ``302: Found`` response, redirecting to latest
 generated builds by replacing ``latest`` with the latest available
