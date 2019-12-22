@@ -68,7 +68,7 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 	for _, folder := range librariesFolders {
-		lm.AddLibrariesDir(folder, libraries.Sketchbook)
+		lm.AddLibrariesDir(folder, libraries.User)
 	}
 
 	if err := lm.RescanLibraries(); err != nil {

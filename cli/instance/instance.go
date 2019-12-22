@@ -11,6 +11,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 // CreateInstaceIgnorePlatformIndexErrors creates and return an instance of the
@@ -36,7 +37,7 @@ func initInstance() *rpc.InitResp {
 	logrus.Info("Initializing package manager")
 	req := packageManagerInitReq()
 
-	resp, err := commands.Init(context.Background(), req, output.ProgressBar(), output.TaskProgress(), globals.HTTPClientHeader)
+	resp, err := commands.Init(context.Background(), req, output.ProgressBar(), output.TaskProgress(), globals.NewHTTPClientHeader())
 	if err != nil {
 		feedback.Errorf("Error initializing package manager: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
@@ -60,23 +61,17 @@ func initInstance() *rpc.InitResp {
 }
 
 func packageManagerInitReq() *rpc.InitReq {
-	urls := []string{}
+	urls := []string{globals.DefaultIndexURL}
 
-	for _, urlString := range globals.AdditionalUrls {
-		urls = append(urls, urlString)
-	}
-
-	for _, URL := range globals.Config.BoardManagerAdditionalUrls {
-		urls = append(urls, URL.String())
+	for _, URL := range viper.GetStringSlice("board_manager.additional_urls") {
+		urls = append(urls, URL)
 	}
 
 	conf := &rpc.Configuration{}
-	conf.DataDir = globals.Config.DataDir.String()
-	conf.DownloadsDir = globals.Config.DownloadsDir().String()
+	conf.DataDir = viper.GetString("directories.Data")
+	conf.DownloadsDir = viper.GetString("directories.Downloads")
 	conf.BoardManagerAdditionalUrls = urls
-	if globals.Config.SketchbookDir != nil {
-		conf.SketchbookDir = globals.Config.SketchbookDir.String()
-	}
+	conf.SketchbookDir = viper.GetString("directories.User")
 
 	return &rpc.InitReq{Configuration: conf}
 }

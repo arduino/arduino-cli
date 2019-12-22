@@ -39,7 +39,7 @@ def test_compile_with_simple_sketch(run_command, data_dir):
     result = run_command("core update-index")
     assert result.ok
 
-    # # Download latest AVR
+    # Download latest AVR
     result = run_command("core install arduino:avr")
     assert result.ok
 
@@ -68,6 +68,62 @@ def test_compile_with_simple_sketch(run_command, data_dir):
         "Compile {sketch} for {fqbn} successful".format(sketch=sketch_name, fqbn=fqbn)
     ]
     assert is_message_sequence_in_json_log_traces(expected_trace_sequence, json_log_lines)
+
+
+def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
+    # Init the environment explicitly
+    result = run_command("core update-index")
+    assert result.ok
+
+    # Download latest AVR
+    result = run_command("core install arduino:avr")
+    assert result.ok
+
+    sketch_name = "CompileIntegrationTestSymlinkSelfLoop"
+    sketch_path = os.path.join(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    # Create a test sketch
+    result = run_command("sketch new {}".format(sketch_path))
+    assert result.ok
+    assert "Sketch created in: {}".format(sketch_path) in result.stdout
+
+    # create a symlink that loops on himself
+    loop_file_path = os.path.join(sketch_path, "loop")
+    os.symlink(loop_file_path, loop_file_path)
+
+    # Build sketch for arduino:avr:uno
+    result = run_command(
+        "compile -b {fqbn} {sketch_path}".format(
+            fqbn=fqbn, sketch_path=sketch_path))
+    # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
+    # returning a different error detailed message
+    assert "Error during sketch processing" in result.stderr
+    assert not result.ok
+
+    sketch_name = "CompileIntegrationTestSymlinkDirLoop"
+    sketch_path = os.path.join(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    # Create a test sketch
+    result = run_command("sketch new {}".format(sketch_path))
+    assert result.ok
+    assert "Sketch created in: {}".format(sketch_path) in result.stdout
+
+    # create a symlink that loops on the upper level
+    loop_dir_path = os.path.join(sketch_path, "loop_dir")
+    os.mkdir(loop_dir_path)
+    loop_dir_symlink_path = os.path.join(loop_dir_path, "loop_dir_symlink")
+    os.symlink(loop_dir_path, loop_dir_symlink_path)
+
+    # Build sketch for arduino:avr:uno
+    result = run_command(
+        "compile -b {fqbn} {sketch_path}".format(
+            fqbn=fqbn, sketch_path=sketch_path))
+    # The assertion is a bit relaxed also in this case because macOS behaves differently from win and linux:
+    # the cli does not follow recursively the symlink til breaking
+    assert "Error during sketch processing" in result.stderr
+    assert not result.ok
 
 
 @pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")

@@ -22,33 +22,19 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/arduino/arduino-cli/configs"
 	"github.com/arduino/arduino-cli/version"
 )
 
 var (
-	// Debug determines whether to dump debug output to stderr or not
-	Debug bool
-	// OutputFormat can be "text" or "json"
-	OutputFormat string
-	// HTTPClientHeader is the object that will be propagated to configure the clients inside the downloaders
-	HTTPClientHeader = getHTTPClientHeader()
 	// VersionInfo contains all info injected during build
 	VersionInfo = version.NewInfo(filepath.Base(os.Args[0]))
-	// Config FIXMEDOC
-	Config *configs.Configuration
-	// YAMLConfigFile contains the path to the config file
-	YAMLConfigFile string
-	// AdditionalUrls contains the list of additional urls the boards manager can use
-	AdditionalUrls []string
-	// LogLevel is temporarily exported because the compile command will
-	// forward this information to the underlying legacy package
-	LogLevel string
+	// DefaultIndexURL is the default index url
+	DefaultIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
 )
 
-func getHTTPClientHeader() http.Header {
+// NewHTTPClientHeader returns the http.Header object that must be used by the clients inside the downloaders
+func NewHTTPClientHeader() http.Header {
 	userAgentValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s", VersionInfo.Application,
 		VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), VersionInfo.Commit)
-	downloaderHeaders := http.Header{"User-Agent": []string{userAgentValue}}
-	return downloaderHeaders
+	return http.Header{"User-Agent": []string{userAgentValue}}
 }

@@ -58,6 +58,9 @@ func (s *PrintUsedAndNotUsedLibraries) Run(ctx *types.Context) error {
 	libraryResolutionResults := ctx.LibrariesResolutionResults
 
 	for header, libResResult := range libraryResolutionResults {
+		if len(libResResult.NotUsedLibraries) == 0 {
+			continue
+		}
 		logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
 		logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_USED, libResResult.Library.InstallDir)
 		for _, notUsedLibrary := range libResResult.NotUsedLibraries {

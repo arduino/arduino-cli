@@ -18,7 +18,6 @@
 package core
 
 import (
-	"context"
 	"errors"
 	"regexp"
 	"strings"
@@ -28,37 +27,48 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
+func match(line, searchArgs string) bool {
+	return strings.Contains(strings.ToLower(line), searchArgs)
+}
+
 // PlatformSearch FIXMEDOC
-func PlatformSearch(ctx context.Context, req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error) {
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
+func PlatformSearch(instanceID int32, searchArgs string, allVersions bool) (*rpc.PlatformSearchResp, error) {
+	pm := commands.GetPackageManager(instanceID)
 	if pm == nil {
 		return nil, errors.New("invalid instance")
 	}
 
-	search := req.SearchArgs
-
 	res := []*cores.PlatformRelease{}
-	if isUsb, _ := regexp.MatchString("[0-9a-f]{4}:[0-9a-f]{4}", search); isUsb {
-		vid, pid := search[:4], search[5:]
+	if isUsb, _ := regexp.MatchString("[0-9a-f]{4}:[0-9a-f]{4}", searchArgs); isUsb {
+		vid, pid := searchArgs[:4], searchArgs[5:]
 		res = pm.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid)
 	} else {
-		match := func(line string) bool {
-			return strings.Contains(strings.ToLower(line), search)
-		}
 		for _, targetPackage := range pm.Packages {
 			for _, platform := range targetPackage.Platforms {
 				platformRelease := platform.GetLatestRelease()
 				if platformRelease == nil {
 					continue
 				}
-				if match(platform.Name) || match(platform.Architecture) {
-					res = append(res, platformRelease)
-					continue
-				}
-				for _, board := range platformRelease.BoardsManifest {
-					if match(board.Name) {
+
+				// platform has a release, check if it matches the search arguments
+				if match(platform.Name, searchArgs) || match(platform.Architecture, searchArgs) {
+					if allVersions {
+						res = append(res, platform.GetAllReleases()...)
+					} else {
 						res = append(res, platformRelease)
-						break
+					}
+				} else {
+					// if we didn't find a match in the platform data, search for
+					// a match in the boards manifest
+					for _, board := range platformRelease.BoardsManifest {
+						if match(board.Name, searchArgs) {
+							if allVersions {
+								res = append(res, platform.GetAllReleases()...)
+							} else {
+								res = append(res, platformRelease)
+							}
+							break
+						}
 					}
 				}
 			}

@@ -18,14 +18,12 @@
 package core
 
 import (
-	"context"
 	"os"
 	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/core"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -34,15 +32,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	allVersions bool
+)
+
 func initSearchCommand() *cobra.Command {
 	searchCommand := &cobra.Command{
 		Use:     "search <keywords...>",
 		Short:   "Search for a core in the package index.",
 		Long:    "Search for a core in the package index using the specified keywords.",
-		Example: "  " + os.Args[0] + " core search MKRZero -v",
+		Example: "  " + os.Args[0] + " core search MKRZero -a -v",
 		Args:    cobra.ArbitraryArgs,
 		Run:     runSearchCommand,
 	}
+	searchCommand.Flags().BoolVarP(&allVersions, "all", "a", false, "Show all available core versions.")
+
 	return searchCommand
 }
 
@@ -51,40 +55,37 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino core search`")
 
 	arguments := strings.ToLower(strings.Join(args, " "))
-
-	if globals.OutputFormat != "json" {
-		feedback.Printf("Searching for platforms matching '%s'", arguments)
-	}
-
-	resp, err := core.PlatformSearch(context.Background(), &rpc.PlatformSearchReq{
-		Instance:   instance,
-		SearchArgs: arguments,
-	})
+	resp, err := core.PlatformSearch(instance.GetId(), arguments, allVersions)
 	if err != nil {
 		feedback.Errorf("Error saerching for platforms: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	coreslist := resp.GetSearchOutput()
-	if globals.OutputFormat == "json" {
-		feedback.PrintJSON(coreslist)
-	} else {
-		outputSearchCores(coreslist)
-	}
+	feedback.PrintResult(searchResults{coreslist})
 }
 
-func outputSearchCores(cores []*rpc.Platform) {
-	if len(cores) > 0 {
+// output from this command requires special formatting, let's create a dedicated
+// feedback.Result implementation
+type searchResults struct {
+	platforms []*rpc.Platform
+}
+
+func (sr searchResults) Data() interface{} {
+	return sr.platforms
+}
+
+func (sr searchResults) String() string {
+	if len(sr.platforms) > 0 {
 		t := table.New()
 		t.SetHeader("ID", "Version", "Name")
-		sort.Slice(cores, func(i, j int) bool {
-			return cores[i].ID < cores[j].ID
+		sort.Slice(sr.platforms, func(i, j int) bool {
+			return sr.platforms[i].ID < sr.platforms[j].ID
 		})
-		for _, item := range cores {
+		for _, item := range sr.platforms {
 			t.AddRow(item.GetID(), item.GetLatest(), item.GetName())
 		}
-		feedback.Print(t.Render())
-	} else {
-		feedback.Print("No platforms matching your search.")
+		return t.Render()
 	}
+	return "No platforms matching your search."
 }

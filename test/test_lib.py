@@ -19,15 +19,15 @@ def test_list(run_command):
     # Init the environment explicitly
     assert run_command("core update-index")
 
-    # When ouput is empty, nothing is printed out, no matter the output format
+    # When output is empty, nothing is printed out, no matter the output format
     result = run_command("lib list")
     assert result.ok
     assert "" == result.stderr
-    assert "" == result.stdout
+    assert "No libraries installed." == result.stdout.strip()
     result = run_command("lib list --format json")
     assert result.ok
     assert "" == result.stderr
-    assert "" == result.stdout
+    assert 0 == len(json.loads(result.stdout))
 
     # Install something we can list at a version older than latest
     result = run_command("lib install ArduinoJson@6.11.0")
@@ -70,12 +70,20 @@ def test_update_index(run_command):
     )
 
 
-def test_remove(run_command):
-    libs = ['"AzureIoTProtocol_MQTT"', '"CMMC MQTT Connector"', '"WiFiNINA"']
+def test_uninstall(run_command):
+    libs = ['"AzureIoTProtocol_MQTT"', '"WiFiNINA"']
     assert run_command("lib install {}".format(" ".join(libs)))
 
     result = run_command("lib uninstall {}".format(" ".join(libs)))
     assert result.ok
+
+def test_uninstall_spaces(run_command):
+    key = '"LiquidCrystal I2C"'
+    assert run_command("lib install {}".format(key))
+    assert run_command("lib uninstall {}".format(key))
+    result = run_command("lib list --format json")
+    assert result.ok
+    assert len(json.loads(result.stdout)) == 0
 
 
 def test_search(run_command):
@@ -83,7 +91,7 @@ def test_search(run_command):
 
     result = run_command("lib search --names")
     assert result.ok
-    out_lines = result.stdout.splitlines()
+    out_lines = result.stdout.strip().splitlines()
     # Create an array with just the name of the vars
     libs = []
     for line in out_lines:
@@ -103,6 +111,20 @@ def test_search(run_command):
 
     # Search for a specific target
     result = run_command("lib search ArduinoJson --format json")
+    assert result.ok
+    libs_json = json.loads(result.stdout)
+    assert len(libs_json.get("libraries")) >= 1
+
+
+def test_search_paragraph(run_command):
+    """
+    Search for a string that's only present in the `paragraph` field
+    within the index file.
+    """
+    assert run_command("lib update-index")
+    result = run_command(
+        'lib search "An efficient and elegant JSON library" --format json'
+    )
     assert result.ok
     libs_json = json.loads(result.stdout)
     assert 1 == len(libs_json.get("libraries"))

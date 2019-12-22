@@ -1,13 +1,17 @@
 name: test
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   test-matrix:
 
     strategy:
       matrix:
-        operating-system: [ubuntu-18.04, windows-2019]
+        operating-system: [ubuntu-latest, windows-latest, macOS-latest]
 
     runs-on: ${{ matrix.operating-system }}
 
@@ -24,19 +28,27 @@ jobs:
           go-version: '1.13'
 
       - name: Install Go deps
+        # Since 10/23/2019 pwsh is the default shell
+        # on Windows, but pwsh fails to install protoc-gen-go so
+        # we force bash as default shell for all OSes in this task
         run: |
           go get github.com/golangci/govet
           go get golang.org/x/lint/golint
           go get github.com/golang/protobuf/protoc-gen-go
+        shell: bash
 
       - name: Install Taskfile
         uses: Arduino/actions/setup-taskfile@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check the code is good
         run: task check
 
       - name: Install protoc compiler
-        uses: Arduino/actions/setup-protoc@master
+        uses: arduino/setup-protoc@v1.1.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check protocol buffers compile correctly
         run: task protoc
@@ -48,13 +60,14 @@ jobs:
         run: task test-unit
 
       - name: Run unit tests on the legacy package
-        if: matrix.operating-system != 'windows-2019'
+        # Run legacy tests on one platform only
+        if: matrix.operating-system == 'ubuntu-latest'
         run: task test-legacy
 
       - name: Install Python
         uses: actions/setup-python@v1
         with:
-          python-version: '3.x'
+          python-version: '3.8'
           architecture: 'x64'
 
       - name: Run integration tests
@@ -68,7 +81,7 @@ jobs:
         # Codecov whitelists GitHub, lifting the need
         # for a token.
         if: >
-          matrix.operating-system != 'windows-2019' &&
+          matrix.operating-system == 'ubuntu-latest' &&
           github.event_name == 'push'
         uses: codecov/codecov-action@v1.0.2
         with:
@@ -82,7 +95,7 @@ jobs:
         # Codecov whitelists GitHub, lifting the need
         # for a token.
         if: >
-          matrix.operating-system != 'windows-2019' &&
+          matrix.operating-system == 'ubuntu-latest' &&
           github.event_name == 'push'
         uses: codecov/codecov-action@v1.0.2
         with:
@@ -96,7 +109,7 @@ jobs:
         # Codecov whitelists GitHub, lifting the need
         # for a token.
         if: >
-          matrix.operating-system != 'windows-2019' &&
+          matrix.operating-system == 'ubuntu-latest' &&
           github.event_name == 'push'
         uses: codecov/codecov-action@v1.0.2
         with:

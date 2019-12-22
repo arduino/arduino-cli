@@ -19,7 +19,8 @@ package daemon
 
 import (
 	"fmt"
-	"log"
+	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -29,51 +30,68 @@ import (
 	"github.com/arduino/arduino-cli/commands/daemon"
 	srv_commands "github.com/arduino/arduino-cli/rpc/commands"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/monitor"
+	srv_settings "github.com/arduino/arduino-cli/rpc/settings"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
-)
-
-const (
-	port = ":50051"
 )
 
 // NewCommand created a new `daemon` command
 func NewCommand() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "daemon",
-		Short:   fmt.Sprintf("Run as a daemon on port %s", port),
+		Short:   fmt.Sprintf("Run as a daemon on port %s", viper.GetString("daemon.port")),
 		Long:    "Running as a daemon the initialization of cores and libraries is done only once.",
 		Example: "  " + os.Args[0] + " daemon",
 		Args:    cobra.NoArgs,
 		Run:     runDaemonCommand,
 	}
+	cmd.PersistentFlags().String("port", "", "The TCP port the daemon will listen to")
+	viper.BindPFlag("daemon.port", cmd.PersistentFlags().Lookup("port"))
+	cmd.Flags().BoolVar(&daemonize, "daemonize", false, "Do not terminate daemon process if the parent process dies")
+	return cmd
 }
 
+var daemonize bool
+
 func runDaemonCommand(cmd *cobra.Command, args []string) {
-	lis, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
+	port := viper.GetString("daemon.port")
 	s := grpc.NewServer()
 
-	userAgentValue := fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s", globals.VersionInfo.Application,
-		globals.VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), globals.VersionInfo.Commit)
-	headers := http.Header{"User-Agent": []string{userAgentValue}}
-
 	// register the commands service
-	coreServer := daemon.ArduinoCoreServerImpl{
+	headers := http.Header{"User-Agent": []string{
+		fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s",
+			globals.VersionInfo.Application,
+			globals.VersionInfo.VersionString,
+			runtime.GOARCH, runtime.GOOS,
+			runtime.Version(), globals.VersionInfo.Commit)}}
+	srv_commands.RegisterArduinoCoreServer(s, &daemon.ArduinoCoreServerImpl{
 		DownloaderHeaders: headers,
 		VersionString:     globals.VersionInfo.VersionString,
-		Config:            globals.Config,
-	}
-	srv_commands.RegisterArduinoCoreServer(s, &coreServer)
+	})
 
 	// register the monitors service
 	srv_monitor.RegisterMonitorServer(s, &daemon.MonitorService{})
 
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+	// register the settings service
+	srv_settings.RegisterSettingsServer(s, &daemon.SettingsService{})
+
+	if !daemonize {
+		// When parent process ends terminate also the daemon
+		go func() {
+			// stdin is closed when the controlling parent process ends
+			_, _ = io.Copy(ioutil.Discard, os.Stdin)
+			os.Exit(0)
+		}()
 	}
 
-	fmt.Println("Done serving")
+	logrus.Infof("Starting daemon on TCP port %s", port)
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
+	if err != nil {
+		logrus.Fatalf("failed to listen: %v", err)
+	}
+	if err := s.Serve(lis); err != nil {
+		logrus.Fatalf("failed to serve: %v", err)
+	}
 }

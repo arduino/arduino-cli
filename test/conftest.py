@@ -56,17 +56,20 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
     Useful reference:
         http://docs.pyinvoke.org/en/1.2/api/runners.html#invoke.runners.Result
     """
-    cli_path = os.path.join(pytestconfig.rootdir, "..", "arduino-cli")
+    cli_path = os.path.join(str(pytestconfig.rootdir), "..", "arduino-cli")
     env = {
         "ARDUINO_DATA_DIR": data_dir,
         "ARDUINO_DOWNLOADS_DIR": downloads_dir,
         "ARDUINO_SKETCHBOOK_DIR": data_dir,
     }
+    os.makedirs(os.path.join(data_dir, "packages"))
 
     def _run(cmd_string):
         cli_full_line = "{} {}".format(cli_path, cmd_string)
         run_context = Context()
         with run_context.cd(working_dir):
-            return run_context.run(cli_full_line, echo=False, hide=True, warn=True, env=env)
+            return run_context.run(
+                cli_full_line, echo=False, hide=True, warn=True, env=env
+            )
 
     return _run

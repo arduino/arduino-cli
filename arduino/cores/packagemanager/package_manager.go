@@ -38,23 +38,25 @@ import (
 // The manager also keeps track of the status of the Packages (their Platform Releases, actually)
 // installed in the system.
 type PackageManager struct {
-	Log         logrus.FieldLogger
-	Packages    cores.Packages
-	IndexDir    *paths.Path
-	PackagesDir *paths.Path
-	DownloadDir *paths.Path
-	TempDir     *paths.Path
+	Log                    logrus.FieldLogger
+	Packages               cores.Packages
+	IndexDir               *paths.Path
+	PackagesDir            *paths.Path
+	DownloadDir            *paths.Path
+	TempDir                *paths.Path
+	CustomGlobalProperties *properties.Map
 }
 
 // NewPackageManager returns a new instance of the PackageManager
 func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) *PackageManager {
 	return &PackageManager{
-		Log:         logrus.StandardLogger(),
-		Packages:    cores.NewPackages(),
-		IndexDir:    indexDir,
-		PackagesDir: packagesDir,
-		DownloadDir: downloadDir,
-		TempDir:     tempDir,
+		Log:                    logrus.StandardLogger(),
+		Packages:               cores.NewPackages(),
+		IndexDir:               indexDir,
+		PackagesDir:            packagesDir,
+		DownloadDir:            downloadDir,
+		TempDir:                tempDir,
+		CustomGlobalProperties: properties.NewMap(),
 	}
 }
 
@@ -177,14 +179,22 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 	buildPlatformRelease := platformRelease
 	coreParts := strings.Split(buildProperties.Get("build.core"), ":")
 	if len(coreParts) > 1 {
-		referredPackage := coreParts[1]
+		referredPackage := coreParts[0]
 		buildPackage := pm.Packages[referredPackage]
 		if buildPackage == nil {
 			return targetPackage, platformRelease, board, buildProperties, nil,
-				fmt.Errorf("missing package %s:%s required for build", referredPackage, platform)
+				fmt.Errorf("missing package %s referenced by board %s", referredPackage, fqbn)
 		}
 		buildPlatform := buildPackage.Platforms[fqbn.PlatformArch]
+		if buildPlatform == nil {
+			return targetPackage, platformRelease, board, buildProperties, nil,
+				fmt.Errorf("missing platform %s:%s referenced by board %s", referredPackage, fqbn.PlatformArch, fqbn)
+		}
 		buildPlatformRelease = pm.GetInstalledPlatformRelease(buildPlatform)
+		if buildPlatformRelease == nil {
+			return targetPackage, platformRelease, board, buildProperties, nil,
+				fmt.Errorf("missing platform release %s:%s referenced by board %s", referredPackage, fqbn.PlatformArch, fqbn)
+		}
 	}
 
 	// No errors... phew!
@@ -392,7 +402,7 @@ func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*core
 	foundTools := map[string]*cores.ToolRelease{}
 
 	// a Platform may not specify required tools (because it's a platform that comes from a
-	// sketchbook/hardware dir without a package_index.json) then add all available tools
+	// user/hardware dir without a package_index.json) then add all available tools
 	for _, targetPackage := range pm.Packages {
 		for _, tool := range targetPackage.Tools {
 			rel := tool.GetLatestInstalled()

@@ -38,9 +38,5 @@ func NewCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	if globals.OutputFormat == "json" {
-		feedback.PrintJSON(globals.VersionInfo)
-	} else {
-		feedback.Print(globals.VersionInfo)
-	}
+	feedback.Print(globals.VersionInfo)
 }

@@ -25,9 +25,15 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 
 	"github.com/pkg/errors"
 )
+
+// As currently implemented on Linux,
+// the maximum number of symbolic links that will be followed while resolving a pathname is 40
+const maxFileSystemDepth = 40
 
 var includesArduinoH = regexp.MustCompile(`(?m)^\s*#\s*include\s*[<\"]Arduino\.h[>\"]`)
 
@@ -58,6 +64,39 @@ func SketchSaveItemCpp(item *sketch.Item, destPath string) error {
 	return nil
 }
 
+// simpleLocalWalk locally replaces filepath.Walk and/but goes through symlinks
+func simpleLocalWalk(root string, maxDepth int, walkFn func(path string, info os.FileInfo, err error) error) error {
+
+	info, err := os.Stat(root)
+
+	if err != nil {
+		return walkFn(root, nil, err)
+	}
+
+	err = walkFn(root, info, err)
+	if err == filepath.SkipDir {
+		return nil
+	}
+
+	if info.IsDir() {
+		if maxDepth <= 0 {
+			return walkFn(root, info, errors.New("Filesystem bottom is too deep (directory recursion or filesystem really deep): "+root))
+		}
+		maxDepth--
+		files, err := ioutil.ReadDir(root)
+		if err == nil {
+			for _, file := range files {
+				err = simpleLocalWalk(root+string(os.PathSeparator)+file.Name(), maxDepth, walkFn)
+				if err == filepath.SkipDir {
+					return nil
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 // SketchLoad collects all the files composing a sketch.
 // The parameter `sketchPath` holds a path pointing to a single sketch file or a sketch folder,
 // the path must be absolute.
@@ -69,16 +108,41 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 
 	var sketchFolder, mainSketchFile string
 
-	// if a sketch folder was passed, save the parent and point sketchPath to the main .ino file
+	// if a sketch folder was passed, save the parent and point sketchPath to the main sketch file
 	if stat.IsDir() {
 		sketchFolder = sketchPath
-		mainSketchFile = filepath.Join(sketchPath, stat.Name()+".ino")
+		// allowed extensions are .ino and .pde (but not both)
+		allowedSketchExtensions := [...]string{".ino", ".pde"}
+		for _, extension := range allowedSketchExtensions {
+			candidateSketchFile := filepath.Join(sketchPath, stat.Name()+extension)
+			if _, err := os.Stat(candidateSketchFile); !os.IsNotExist(err) {
+				if mainSketchFile == "" {
+					mainSketchFile = candidateSketchFile
+				} else {
+					return nil, errors.Errorf("more than one main sketch file found (%v,%v)",
+						filepath.Base(mainSketchFile),
+						filepath.Base(candidateSketchFile))
+				}
+			}
+		}
+		// check that .pde or .ino was found
+		if mainSketchFile == "" {
+			return nil, errors.Errorf("unable to find an sketch file in directory %v", sketchFolder)
+		}
 		// in the case a dir was passed, ensure the main file exists and is readable
 		f, err := os.Open(mainSketchFile)
 		if err != nil {
-			return nil, errors.Wrap(err, "unable to find the main sketch file")
+			return nil, errors.Wrap(err, "unable to open the main sketch file")
 		}
 		f.Close()
+		// ensure it is not a directory
+		info, err := os.Stat(mainSketchFile)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to check the main sketch file")
+		}
+		if info.IsDir() {
+			return nil, errors.Wrap(errors.New(mainSketchFile), "sketch must not be a directory")
+		}
 	} else {
 		sketchFolder = filepath.Dir(sketchPath)
 		mainSketchFile = sketchPath
@@ -86,7 +150,13 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 
 	// collect all the sketch files
 	var files []string
-	err = filepath.Walk(sketchFolder, func(path string, info os.FileInfo, err error) error {
+	err = simpleLocalWalk(sketchFolder, maxFileSystemDepth, func(path string, info os.FileInfo, err error) error {
+
+		if err != nil {
+			feedback.Errorf("Error during sketch processing: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+
 		// ignore hidden files and skip hidden directories
 		if strings.HasPrefix(info.Name(), ".") {
 			if info.IsDir() {

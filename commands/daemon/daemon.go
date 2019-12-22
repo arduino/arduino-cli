@@ -31,7 +31,6 @@ import (
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/upload"
-	"github.com/arduino/arduino-cli/configs"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
@@ -39,7 +38,6 @@ import (
 type ArduinoCoreServerImpl struct {
 	DownloaderHeaders http.Header
 	VersionString     string
-	Config            *configs.Configuration
 }
 
 // BoardDetails FIXMEDOC
@@ -133,7 +131,6 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoC
 		stream.Context(), req,
 		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{OutStream: data}) }),
 		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{ErrStream: data}) }),
-		s.Config,
 		false) // set debug to false
 	if err != nil {
 		return err
@@ -196,7 +193,7 @@ func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeReq, str
 
 // PlatformSearch FIXMEDOC
 func (s *ArduinoCoreServerImpl) PlatformSearch(ctx context.Context, req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error) {
-	return core.PlatformSearch(ctx, req)
+	return core.PlatformSearch(req.GetInstance().GetId(), req.GetSearchArgs(), req.GetAllVersions())
 }
 
 // PlatformList FIXMEDOC
@@ -293,6 +290,11 @@ func (s *ArduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllReq,
 		return err
 	}
 	return stream.Send(&rpc.LibraryUpgradeAllResp{})
+}
+
+// LibraryResolveDependencies FIXMEDOC
+func (s *ArduinoCoreServerImpl) LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesReq) (*rpc.LibraryResolveDependenciesResp, error) {
+	return lib.LibraryResolveDependencies(ctx, req)
 }
 
 // LibrarySearch FIXMEDOC

@@ -6,6 +6,7 @@ tasks:
     cmds:
       - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/commands/*.proto'
       - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/monitor/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/settings/*.proto'
 
   build:
     desc: Build the project
@@ -21,12 +22,12 @@ tasks:
   test-unit:
     desc: Run unit tests only
     cmds:
-      - go test -short {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }} {{.TEST_LDFLAGS}}
+      - go test -short -run '{{ default ".*" .TEST_REGEX }}' {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }} {{.TEST_LDFLAGS}}
 
   test-integration:
     desc: Run integration tests only
     cmds:
-      - go test -run Integration {{ default "-v" .GOFLAGS }} -coverprofile=coverage_integ.txt {{ default .DEFAULT_TARGETS .TARGETS }} {{.TEST_LDFLAGS}}
+      - go test -run '{{ default "Integration" .TEST_REGEX }}' {{ default "-v" .GOFLAGS }} -coverprofile=coverage_integ.txt {{ default .DEFAULT_TARGETS .TARGETS }} {{.TEST_LDFLAGS}}
       - pytest test
 
   test-legacy:

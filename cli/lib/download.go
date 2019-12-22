@@ -47,7 +47,7 @@ func initDownloadCommand() *cobra.Command {
 
 func runDownloadCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
-	refs, err := globals.ParseReferenceArgs(args, false)
+	refs, err := globals.ParseLibraryReferenceArgs(args)
 	if err != nil {
 		feedback.Errorf("Invalid argument passed: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
@@ -56,11 +56,11 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	for _, library := range refs {
 		libraryDownloadReq := &rpc.LibraryDownloadReq{
 			Instance: instance,
-			Name:     library.PackageName,
+			Name:     library.Name,
 			Version:  library.Version,
 		}
 		_, err := lib.LibraryDownload(context.Background(), libraryDownloadReq, output.ProgressBar(),
-			globals.HTTPClientHeader)
+			globals.NewHTTPClientHeader())
 		if err != nil {
 			feedback.Errorf("Error downloading %s: %v", library, err)
 			os.Exit(errorcodes.ErrNetwork)

@@ -53,7 +53,13 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 	}
 
 	if coreBuildCachePath != nil {
-		if err := coreBuildCachePath.MkdirAll(); err != nil {
+		if _, err := coreBuildCachePath.RelTo(ctx.BuildPath); err != nil {
+			logger := ctx.GetLogger()
+			logger.Println(constants.LOG_LEVEL_INFO, "Couldn't deeply cache core build: {0}", err)
+			logger.Println(constants.LOG_LEVEL_INFO, "Running normal build of the core...")
+			coreBuildCachePath = nil
+			ctx.CoreBuildCachePath = nil
+		} else if err := coreBuildCachePath.MkdirAll(); err != nil {
 			return i18n.WrapError(err)
 		}
 	}

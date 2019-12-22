@@ -24,11 +24,6 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
-// SketchBook is a sketchbook
-type SketchBook struct {
-	Path *paths.Path
-}
-
 // Sketch is a sketch for Arduino
 type Sketch struct {
 	Name     string
@@ -45,23 +40,6 @@ type Metadata struct {
 type BoardMetadata struct {
 	Fqbn string `json:"fqbn,required"`
 	Name string `json:"name,omitempty"`
-}
-
-// NewSketchBook returns a new SketchBook object
-func NewSketchBook(path *paths.Path) *SketchBook {
-	return &SketchBook{
-		Path: path,
-	}
-}
-
-// NewSketch loads a sketch from the sketchbook
-func (sketchbook *SketchBook) NewSketch(name string) (*Sketch, error) {
-	sketch := &Sketch{
-		FullPath: sketchbook.Path.Join(name),
-		Name:     name,
-	}
-	sketch.ImportMetadata()
-	return sketch, nil
 }
 
 // NewSketchFromPath loads a sketch from the specified path

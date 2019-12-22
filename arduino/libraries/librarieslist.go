@@ -61,6 +61,14 @@ func (list *List) SortByArchitecturePriority(arch string) {
 	})
 }
 
+// SortByName sorts the libraries by name
+func (list *List) SortByName() {
+	sort.Slice(*list, func(i, j int) bool {
+		a, b := (*list)[i], (*list)[j]
+		return a.Name < b.Name
+	})
+}
+
 /*
 // HasHigherPriority returns true if library x has higher priority compared to library
 // y for the given header and architecture.

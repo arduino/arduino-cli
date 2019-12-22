@@ -17,7 +17,7 @@ package monitors
 
 import (
 	"github.com/pkg/errors"
-	serial "go.bug.st/serial.v1"
+	"go.bug.st/serial"
 )
 
 const (

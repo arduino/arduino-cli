@@ -42,7 +42,7 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 	var replaced *libraries.Library
 	if installedLibs, have := lm.Libraries[saneName]; have {
 		for _, installedLib := range installedLibs.Alternatives {
-			if installedLib.Location != libraries.Sketchbook {
+			if installedLib.Location != libraries.User {
 				continue
 			}
 			if installedLib.Version.Equal(indexLibrary.Version) {
@@ -52,9 +52,9 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 		}
 	}
 
-	libsDir := lm.getSketchbookLibrariesDir()
+	libsDir := lm.getUserLibrariesDir()
 	if libsDir == nil {
-		return nil, nil, fmt.Errorf("sketchbook directory not set")
+		return nil, nil, fmt.Errorf("User directory not set")
 	}
 
 	libPath := libsDir.Join(saneName)
@@ -68,15 +68,18 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 
 // Install installs a library on the specified path.
 func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path) error {
-	libsDir := lm.getSketchbookLibrariesDir()
+	libsDir := lm.getUserLibrariesDir()
 	if libsDir == nil {
-		return fmt.Errorf("sketchbook directory not set")
+		return fmt.Errorf("User directory not set")
 	}
 	return indexLibrary.Resource.Install(lm.DownloadsDir, libsDir, libPath)
 }
 
 // Uninstall removes a Library
 func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
+	if lib == nil || lib.InstallDir == nil {
+		return fmt.Errorf("install directory not set")
+	}
 	if err := lib.InstallDir.RemoveAll(); err != nil {
 		return fmt.Errorf("removing lib directory: %s", err)
 	}

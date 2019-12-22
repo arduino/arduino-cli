@@ -64,7 +64,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			Version:         platformRef.Version,
 		}
 		_, err := core.PlatformDownload(context.Background(), platformDownloadreq, output.ProgressBar(),
-			globals.HTTPClientHeader)
+			globals.NewHTTPClientHeader())
 		if err != nil {
 			feedback.Errorf("Error downloading %s: %v", args[i], err)
 			os.Exit(errorcodes.ErrNetwork)
