@@ -111,7 +111,6 @@ archives:
       linux: Linux
       windows: Windows
     files:
-      - README.md
       - LICENSE.txt
 
 blob:
