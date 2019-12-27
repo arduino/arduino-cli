@@ -56,6 +56,9 @@ func NewCommand() *cobra.Command {
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
 
+	uploadCommand.MarkFlagRequired("fqbn")
+	uploadCommand.MarkFlagRequired("port")
+
 	return uploadCommand
 }
 

@@ -30,6 +30,7 @@ import (
 
 	"github.com/spf13/viper"
 
+	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 
 	"bou.ke/monkey"
@@ -42,26 +43,28 @@ var (
 	// Redirecting stdOut so we can analyze output line by
 	// line and check with what we want.
 	stdOut = os.Stdout
+	stdErr = os.Stderr
 
 	currDownloadDir string
 	currDataDir     string
 	currUserDir     string
 )
 
-type stdOutRedirect struct {
+type outputRedirect struct {
 	tempFile *os.File
 }
 
-func (grabber *stdOutRedirect) Open() {
+func (grabber *outputRedirect) Open() {
 	tempFile, err := ioutil.TempFile(os.TempDir(), "test")
 	if err != nil {
 		panic("Opening temp output file")
 	}
 	os.Stdout = tempFile
+	os.Stderr = tempFile
 	grabber.tempFile = tempFile
 }
 
-func (grabber *stdOutRedirect) GetOutput() []byte {
+func (grabber *outputRedirect) GetOutput() []byte {
 	_, err := grabber.tempFile.Seek(0, 0)
 	if err != nil {
 		panic("Rewinding temp output file")
@@ -75,13 +78,14 @@ func (grabber *stdOutRedirect) GetOutput() []byte {
 	return output
 }
 
-func (grabber *stdOutRedirect) Close() {
+func (grabber *outputRedirect) Close() {
 	grabber.tempFile.Close()
 	err := os.Remove(grabber.tempFile.Name())
 	if err != nil {
 		panic("Removing temp output file")
 	}
 	os.Stdout = stdOut
+	os.Stderr = stdErr
 }
 
 func TestMain(m *testing.M) {
@@ -136,7 +140,7 @@ func executeWithArgs(args ...string) (int, []byte) {
 
 	// This closure is here because we won't that the defer are executed after the end of the "executeWithArgs" method
 	func() {
-		redirect := &stdOutRedirect{}
+		redirect := &outputRedirect{}
 		redirect.Open()
 		// re-init feedback so it'll write to our grabber
 		feedback.SetDefaultFeedback(feedback.New(os.Stdout, os.Stdout, feedback.Text))
@@ -170,7 +174,9 @@ func executeWithArgs(args ...string) (int, []byte) {
 		ArduinoCli.ResetFlags()
 		createCliCommandTree(ArduinoCli)
 		ArduinoCli.SetArgs(args)
-		ArduinoCli.Execute()
+		if err := ArduinoCli.Execute(); err != nil {
+			exitCode = errorcodes.ErrGeneric
+		}
 	}()
 
 	return exitCode, output
@@ -307,7 +313,7 @@ func TestCompileCommandsIntegration(t *testing.T) {
 	// Build sketch without FQBN
 	exitCode, d = executeWithArgs("compile", sketchPath)
 	require.NotZero(t, exitCode)
-	require.Contains(t, string(d), "no FQBN provided")
+	require.Contains(t, string(d), "required flag(s) \"fqbn\" not set")
 
 	// Build sketch for arduino:avr:uno
 	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:uno", sketchPath)

@@ -80,6 +80,8 @@ func NewCommand() *cobra.Command {
 	command.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	command.Flags().StringVar(&vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if boards supports them.")
 
+	command.MarkFlagRequired("fqbn")
+
 	return command
 }
 
