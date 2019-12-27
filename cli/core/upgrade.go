@@ -48,12 +48,17 @@ func initUpgradeCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateInstance()
+	inst, err := instance.CreateInstance()
+	if err != nil {
+		feedback.Errorf("Error upgrading: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
 	logrus.Info("Executing `arduino core upgrade`")
 
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
-		targets, err := core.GetPlatforms(instance.Id, true)
+		targets, err := core.GetPlatforms(inst.Id, true)
 		if err != nil {
 			feedback.Errorf("Error retrieving core list: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
@@ -85,7 +90,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 		}
 
 		r := &rpc.PlatformUpgradeReq{
-			Instance:        instance,
+			Instance:        inst,
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 		}

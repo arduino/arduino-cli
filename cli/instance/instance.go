@@ -17,16 +17,13 @@ package instance
 
 import (
 	"context"
-	"os"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
-	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 // CreateInstanceIgnorePlatformIndexErrors creates and return an instance of the
@@ -37,57 +34,67 @@ func CreateInstanceIgnorePlatformIndexErrors() *rpc.Instance {
 }
 
 // CreateInstance creates and return an instance of the Arduino Core engine
-func CreateInstance() *rpc.Instance {
-	resp := initInstance()
-	if resp.GetPlatformsIndexErrors() != nil {
-		for _, err := range resp.GetPlatformsIndexErrors() {
-			feedback.Errorf("Error loading index: %v", err)
-		}
-		feedback.Errorf("Launch '%s core update-index' to fix or download indexes.", os.Args[0])
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	return resp.GetInstance()
-}
-
-func initInstance() *rpc.InitResp {
-	logrus.Info("Initializing package manager")
-	req := packageManagerInitReq()
-
-	resp, err := commands.Init(context.Background(), req, output.ProgressBar(), output.TaskProgress(), globals.NewHTTPClientHeader())
+func CreateInstance() (*rpc.Instance, error) {
+	resp, err := getInitResponse()
 	if err != nil {
-		feedback.Errorf("Error initializing package manager: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
+		return nil, err
 	}
-	if resp.GetLibrariesIndexError() != "" {
-		commands.UpdateLibrariesIndex(context.Background(),
-			&rpc.UpdateLibrariesIndexReq{Instance: resp.GetInstance()}, output.ProgressBar())
-		rescResp, err := commands.Rescan(resp.GetInstance().GetId())
-		if rescResp.GetLibrariesIndexError() != "" {
-			feedback.Errorf("Error loading library index: %v", rescResp.GetLibrariesIndexError())
-			os.Exit(errorcodes.ErrGeneric)
-		}
-		if err != nil {
-			feedback.Errorf("Error loading library index: %v", err)
-			os.Exit(errorcodes.ErrGeneric)
-		}
-		resp.LibrariesIndexError = rescResp.LibrariesIndexError
-		resp.PlatformsIndexErrors = rescResp.PlatformsIndexErrors
-	}
-	return resp
+
+	return resp.GetInstance(), checkPlatformErrors(resp)
 }
 
-func packageManagerInitReq() *rpc.InitReq {
-	urls := []string{globals.DefaultIndexURL}
+func getInitResponse() (*rpc.InitResp, error) {
+	// invoke Init()
+	resp, err := commands.Init(context.Background(), &rpc.InitReq{},
+		output.ProgressBar(), output.TaskProgress(), globals.NewHTTPClientHeader())
 
-	for _, URL := range viper.GetStringSlice("board_manager.additional_urls") {
-		urls = append(urls, URL)
+	// Init() failed
+	if err != nil {
+		return nil, errors.Wrap(err, "creating instance")
 	}
 
-	conf := &rpc.Configuration{}
-	conf.DataDir = viper.GetString("directories.Data")
-	conf.DownloadsDir = viper.GetString("directories.Downloads")
-	conf.BoardManagerAdditionalUrls = urls
-	conf.SketchbookDir = viper.GetString("directories.User")
+	// Init() succeeded but there were errors loading library indexes,
+	// let's rescan and try again
+	if resp.GetLibrariesIndexError() != "" {
+		logrus.Warnf("There were errors loading the library index, trying again...")
 
-	return &rpc.InitReq{Configuration: conf}
+		// update all indexes
+		err := commands.UpdateLibrariesIndex(context.Background(),
+			&rpc.UpdateLibrariesIndexReq{Instance: resp.GetInstance()}, output.ProgressBar())
+		if err != nil {
+			return nil, errors.Wrap(err, "updating the library index")
+		}
+
+		// rescan libraries
+		rescanResp, err := commands.Rescan(resp.GetInstance().GetId())
+		if err != nil {
+			return nil, errors.Wrap(err, "during rescan")
+		}
+
+		// errors persist
+		if rescanResp.GetLibrariesIndexError() != "" {
+			return nil, errors.New("still errors after rescan: " + rescanResp.GetLibrariesIndexError())
+		}
+
+		// succeeded, copy over PlatformsIndexErrors in case errors occurred
+		// during rescan
+		resp.LibrariesIndexError = ""
+		resp.PlatformsIndexErrors = rescanResp.PlatformsIndexErrors
+	}
+
+	return resp, nil
+}
+
+func checkPlatformErrors(resp *rpc.InitResp) error {
+	// Init() and/or rescan succeeded, but there were errors loading platform indexes
+	if resp.GetPlatformsIndexErrors() != nil {
+		// log each error
+		for _, err := range resp.GetPlatformsIndexErrors() {
+			logrus.Errorf("Error loading platform index: %v", err)
+		}
+		// return
+		return errors.New("There were errors loading platform indexes")
+	}
+
+	return nil
 }

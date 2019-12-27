@@ -86,7 +86,11 @@ func NewCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	instance := instance.CreateInstance()
+	inst, err := instance.CreateInstance()
+	if err != nil {
+		feedback.Errorf("Error during build: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 
 	var path *paths.Path
 	if len(args) > 0 {
@@ -95,8 +99,8 @@ func run(cmd *cobra.Command, args []string) {
 
 	sketchPath := initSketchPath(path)
 
-	_, err := compile.Compile(context.Background(), &rpc.CompileReq{
-		Instance:        instance,
+	_, err = compile.Compile(context.Background(), &rpc.CompileReq{
+		Instance:        inst,
 		Fqbn:            fqbn,
 		SketchPath:      sketchPath.String(),
 		ShowProperties:  showProperties,
@@ -118,7 +122,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	if uploadAfterCompile {
 		_, err := upload.Upload(context.Background(), &rpc.UploadReq{
-			Instance:   instance,
+			Instance:   inst,
 			Fqbn:       fqbn,
 			SketchPath: sketchPath.String(),
 			Port:       port,

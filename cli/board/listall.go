@@ -46,10 +46,14 @@ var listAllCommand = &cobra.Command{
 
 // runListAllCommand list all installed boards
 func runListAllCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateInstance()
+	inst, err := instance.CreateInstance()
+	if err != nil {
+		feedback.Errorf("Error listing boards: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 
 	list, err := board.ListAll(context.Background(), &rpc.BoardListAllReq{
-		Instance:   instance,
+		Instance:   inst,
 		SearchArgs: args,
 	})
 	if err != nil {
