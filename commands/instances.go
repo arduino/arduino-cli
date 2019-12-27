@@ -126,10 +126,6 @@ func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB
 
 // Init FIXMEDOC
 func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB, downloaderHeaders http.Header) (*rpc.InitResp, error) {
-	inConfig := req.GetConfiguration()
-	if inConfig == nil {
-		return nil, fmt.Errorf("invalid request")
-	}
 
 	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(ctx, req.GetLibraryManagerOnly())
 	if err != nil {
