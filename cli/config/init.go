@@ -49,7 +49,13 @@ var initFlags struct {
 func runInitCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config init`")
 
-	configFile := filepath.Join(viper.GetString("directories.Data"), "arduino-cli.yaml")
+	dataDir := viper.GetString("directories.Data")
+	if err := os.MkdirAll(dataDir, os.FileMode(0755)); err != nil {
+		feedback.Errorf("Cannot create data directory: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	configFile := filepath.Join(dataDir, "arduino-cli.yaml")
 	err := viper.WriteConfigAs(configFile)
 	if err != nil {
 		feedback.Errorf("Cannot create config file: %v", err)
