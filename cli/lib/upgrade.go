@@ -47,7 +47,7 @@ func initUpgradeCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
+	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
 
 	if len(args) == 0 {
 		err := lib.LibraryUpgradeAll(instance.Id, output.ProgressBar(), output.TaskProgress(), globals.NewHTTPClientHeader())

@@ -52,7 +52,7 @@ var searchFlags struct {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
+	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
 	logrus.Info("Executing `arduino lib search`")
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
 		Instance: instance,

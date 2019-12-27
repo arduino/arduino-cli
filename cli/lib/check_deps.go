@@ -53,7 +53,7 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
-	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
+	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
 	deps, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesReq{
 		Instance: instance,
 		Name:     libRef.Name,
