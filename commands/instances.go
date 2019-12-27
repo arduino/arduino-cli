@@ -59,6 +59,13 @@ type InstanceContainer interface {
 	GetInstance() *rpc.Instance
 }
 
+type createInstanceResult struct {
+	Pm                  *packagemanager.PackageManager
+	Lm                  *librariesmanager.LibrariesManager
+	PlatformIndexErrors []string
+	LibrariesIndexError string
+}
+
 // GetInstance returns a CoreInstance for the given ID, or nil if ID
 // doesn't exist
 func GetInstance(id int32) *CoreInstance {
@@ -125,16 +132,19 @@ func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB
 }
 
 // Init FIXMEDOC
-func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB, downloaderHeaders http.Header) (*rpc.InitResp, error) {
+func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB,
+	downloaderHeaders http.Header) (*rpc.InitResp, error) {
 
-	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(ctx, req.GetLibraryManagerOnly())
+	res, err := createInstance(ctx, req.GetLibraryManagerOnly())
 	if err != nil {
 		return nil, fmt.Errorf("cannot initialize package manager: %s", err)
 	}
+
 	instance := &CoreInstance{
-		PackageManager: pm,
-		lm:             lm,
-		getLibOnly:     req.GetLibraryManagerOnly()}
+		PackageManager: res.Pm,
+		lm:             res.Lm,
+		getLibOnly:     req.GetLibraryManagerOnly(),
+	}
 	handle := instancesCount
 	instancesCount++
 	instances[handle] = instance
@@ -146,8 +156,8 @@ func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, 
 
 	return &rpc.InitResp{
 		Instance:             &rpc.Instance{Id: handle},
-		PlatformsIndexErrors: reqPltIndex,
-		LibrariesIndexError:  reqLibIndex,
+		PlatformsIndexErrors: res.PlatformIndexErrors,
+		LibrariesIndexError:  res.LibrariesIndexError,
 	}, nil
 }
 
@@ -248,88 +258,103 @@ func Rescan(instanceID int32) (*rpc.RescanResp, error) {
 		return nil, fmt.Errorf("invalid handle")
 	}
 
-	pm, lm, reqPltIndex, reqLibIndex, err := createInstance(context.Background(), coreInstance.getLibOnly)
+	res, err := createInstance(context.Background(), coreInstance.getLibOnly)
 	if err != nil {
 		return nil, fmt.Errorf("rescanning filesystem: %s", err)
 	}
-	coreInstance.PackageManager = pm
-	coreInstance.lm = lm
+	coreInstance.PackageManager = res.Pm
+	coreInstance.lm = res.Lm
 
 	return &rpc.RescanResp{
-		PlatformsIndexErrors: reqPltIndex,
-		LibrariesIndexError:  reqLibIndex,
+		PlatformsIndexErrors: res.PlatformIndexErrors,
+		LibrariesIndexError:  res.LibrariesIndexError,
 	}, nil
 }
 
-func createInstance(ctx context.Context, getLibOnly bool) (
-	*packagemanager.PackageManager, *librariesmanager.LibrariesManager, []string, string, error) {
-	var pm *packagemanager.PackageManager
-	platformIndexErrors := []string{}
-	dataDir := paths.New(viper.GetString("directories.Data"))
+func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult, error) {
+	res := &createInstanceResult{}
+
+	// setup downloads directory
 	downloadsDir := paths.New(viper.GetString("directories.Downloads"))
+	if downloadsDir.NotExist() {
+		err := downloadsDir.MkdirAll()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// setup data directory
+	dataDir := paths.New(viper.GetString("directories.Data"))
+	packagesDir := configuration.PackagesDir()
+	if packagesDir.NotExist() {
+		err := packagesDir.MkdirAll()
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if !getLibOnly {
-		pm = packagemanager.NewPackageManager(
-			dataDir,
-			configuration.PackagesDir(),
-			downloadsDir,
-			dataDir.Join("tmp"))
+		res.Pm = packagemanager.NewPackageManager(dataDir, configuration.PackagesDir(),
+			downloadsDir, dataDir.Join("tmp"))
 
 		urls := []string{globals.DefaultIndexURL}
 		urls = append(urls, viper.GetStringSlice("board_manager.additional_urls")...)
 		for _, u := range urls {
 			URL, err := url.Parse(u)
 			if err != nil {
-				logrus.Warnf("unable to parse additional URL: %s", u)
+				logrus.Warnf("Unable to parse index URL: %s, skip...", u)
 				continue
 			}
-			if err := pm.LoadPackageIndex(URL); err != nil {
-				platformIndexErrors = append(platformIndexErrors, err.Error())
+
+			if err := res.Pm.LoadPackageIndex(URL); err != nil {
+				res.PlatformIndexErrors = append(res.PlatformIndexErrors, err.Error())
 			}
 		}
 
-		if err := pm.LoadHardware(); err != nil {
-			return nil, nil, nil, "", fmt.Errorf("loading hardware packages: %s", err)
+		if err := res.Pm.LoadHardware(); err != nil {
+			return res, fmt.Errorf("error loading hardware packages: %s", err)
 		}
 	}
-	if len(platformIndexErrors) == 0 {
-		platformIndexErrors = nil
+
+	if len(res.PlatformIndexErrors) == 0 {
+		res.PlatformIndexErrors = nil
 	}
 
 	// Initialize library manager
 	// --------------------------
-	lm := librariesmanager.NewLibraryManager(dataDir, downloadsDir)
+	res.Lm = librariesmanager.NewLibraryManager(dataDir, downloadsDir)
 
 	// Add IDE builtin libraries dir
 	if bundledLibsDir := configuration.IDEBundledLibrariesDir(); bundledLibsDir != nil {
-		lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
+		res.Lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
 	}
 
 	// Add user libraries dir
 	libDir := configuration.LibrariesDir()
-	lm.AddLibrariesDir(libDir, libraries.User)
+	res.Lm.AddLibrariesDir(libDir, libraries.User)
 
 	// Add libraries dirs from installed platforms
-	if pm != nil {
-		for _, targetPackage := range pm.Packages {
+	if res.Pm != nil {
+		for _, targetPackage := range res.Pm.Packages {
 			for _, platform := range targetPackage.Platforms {
-				if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
-					lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
+				if platformRelease := res.Pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
+					res.Lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
 				}
 			}
 		}
 	}
 
 	// Load index and auto-update it if needed
-	librariesIndexError := ""
-	if err := lm.LoadIndex(); err != nil {
-		librariesIndexError = err.Error()
+	if err := res.Lm.LoadIndex(); err != nil {
+		res.LibrariesIndexError = err.Error()
 	}
 
 	// Scan for libraries
-	if err := lm.RescanLibraries(); err != nil {
-		return nil, nil, nil, "", fmt.Errorf("libraries rescan: %s", err)
+	if err := res.Lm.RescanLibraries(); err != nil {
+		return res, fmt.Errorf("libraries rescan: %s", err)
 	}
-	return pm, lm, platformIndexErrors, librariesIndexError, nil
+
+	return res, nil
 }
 
 // Download FIXMEDOC
