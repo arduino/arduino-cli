@@ -33,7 +33,10 @@ func HardwareDirectories() paths.PathList {
 	}
 
 	if viper.IsSet("directories.Data") {
-		res.Add(PackagesDir())
+		packagesDir := PackagesDir()
+		if packagesDir.IsDir() {
+			res.Add(packagesDir)
+		}
 	}
 
 	if viper.IsSet("directories.User") {
