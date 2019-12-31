@@ -47,7 +47,12 @@ func initDownloadCommand() *cobra.Command {
 }
 
 func runDownloadCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateInstance()
+	inst, err := instance.CreateInstance()
+	if err != nil {
+		feedback.Errorf("Error downloading: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
 	logrus.Info("Executing `arduino core download`")
 
 	platformsRefs, err := globals.ParseReferenceArgs(args, true)
@@ -58,7 +63,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	for i, platformRef := range platformsRefs {
 		platformDownloadreq := &rpc.PlatformDownloadReq{
-			Instance:        instance,
+			Instance:        inst,
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,

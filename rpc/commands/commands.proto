@@ -93,27 +93,17 @@ service ArduinoCore {
   rpc LibraryList(LibraryListReq) returns (LibraryListResp);
 }
 
-// Configuration contains information to instantiate an Arduino Platform Service
+// DEPRECATED
+// Configuration is deprecated, use the Settings Service instead
 message Configuration {
-  // dataDir represents the current root of the arduino tree (defaulted to
-  // `$HOME/.arduino15` on linux).
   string dataDir = 1;
-
-  // sketchbookDir represents the current root of the sketchbooks tree
-  // (defaulted to `$HOME/Arduino`).
   string sketchbookDir = 2;
-
-  // ArduinoIDEDirectory is the directory of the Arduino IDE if the CLI runs
-  // together with it.
   string downloadsDir = 3;
-
-  // BoardManagerAdditionalUrls contains the additional URL for 3rd party
-  // packages
   repeated string boardManagerAdditionalUrls = 4;
 }
 
 message InitReq {
-  Configuration configuration = 1;
+  Configuration configuration = 1; // DEPRECATED this field will be ignored
   bool library_manager_only = 2;
 }
 
