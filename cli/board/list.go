@@ -61,7 +61,13 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		time.Sleep(timeout)
 	}
 
-	ports, err := board.List(instance.CreateInstance().GetId())
+	inst, err := instance.CreateInstance()
+	if err != nil {
+		feedback.Errorf("Error detecting boards: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	ports, err := board.List(inst.GetId())
 	if err != nil {
 		feedback.Errorf("Error detecting boards: %v", err)
 		os.Exit(errorcodes.ErrNetwork)

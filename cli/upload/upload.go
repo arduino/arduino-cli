@@ -60,7 +60,11 @@ func NewCommand() *cobra.Command {
 }
 
 func run(command *cobra.Command, args []string) {
-	instance := instance.CreateInstance()
+	instance, err := instance.CreateInstance()
+	if err != nil {
+		feedback.Errorf("Error during Upload: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 
 	var path *paths.Path
 	if len(args) > 0 {
@@ -68,7 +72,7 @@ func run(command *cobra.Command, args []string) {
 	}
 	sketchPath := initSketchPath(path)
 
-	_, err := upload.Upload(context.Background(), &rpc.UploadReq{
+	if _, err := upload.Upload(context.Background(), &rpc.UploadReq{
 		Instance:   instance,
 		Fqbn:       fqbn,
 		SketchPath: sketchPath.String(),
@@ -76,9 +80,7 @@ func run(command *cobra.Command, args []string) {
 		Verbose:    verbose,
 		Verify:     verify,
 		ImportFile: importFile,
-	}, os.Stdout, os.Stderr)
-
-	if err != nil {
+	}, os.Stdout, os.Stderr); err != nil {
 		feedback.Errorf("Error during Upload: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}

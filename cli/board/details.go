@@ -41,8 +41,14 @@ var detailsCommand = &cobra.Command{
 }
 
 func runDetailsCommand(cmd *cobra.Command, args []string) {
+	inst, err := instance.CreateInstance()
+	if err != nil {
+		feedback.Errorf("Error getting board details: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
 	res, err := board.Details(context.Background(), &rpc.BoardDetailsReq{
-		Instance: instance.CreateInstance(),
+		Instance: inst,
 		Fqbn:     args[0],
 	})
 

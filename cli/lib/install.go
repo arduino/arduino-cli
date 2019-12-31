@@ -51,7 +51,7 @@ var installFlags struct {
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateInstaceIgnorePlatformIndexErrors()
+	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
 	libRefs, err := globals.ParseLibraryReferenceArgs(args)
 	if err != nil {
 		feedback.Errorf("Arguments error: %v", err)
