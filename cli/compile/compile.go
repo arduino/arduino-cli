@@ -19,6 +19,7 @@ package compile
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -88,7 +89,7 @@ func NewCommand() *cobra.Command {
 func run(cmd *cobra.Command, args []string) {
 	inst, err := instance.CreateInstance()
 	if err != nil {
-		feedback.Errorf("Error during build: %v", err)
+		feedback.Errorf("Error creating instance: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -116,7 +117,11 @@ func run(cmd *cobra.Command, args []string) {
 	}, os.Stdout, os.Stderr, viper.GetString("logging.level") == "debug")
 
 	if err != nil {
-		feedback.Errorf("Error during build: %v", err)
+		errMsg := "Error during build"
+		if err.Error() != "" {
+			errMsg = fmt.Sprintf("%s: %v", errMsg, err)
+		}
+		feedback.Errorf("%s.", errMsg)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
