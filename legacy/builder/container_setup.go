@@ -30,6 +30,8 @@
 package builder
 
 import (
+	"fmt"
+
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
@@ -74,6 +76,9 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		sketch, err := bldr.SketchLoad(sketchLocation.String(), ctx.BuildPath.String())
 		if err != nil {
 			return i18n.WrapError(err)
+		}
+		if sketch.MainFile == nil {
+			return fmt.Errorf("main file missing from sketch")
 		}
 		ctx.SketchLocation = paths.New(sketch.MainFile.Path)
 		ctx.Sketch = types.SketchToLegacy(sketch)
