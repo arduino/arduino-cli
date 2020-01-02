@@ -19,7 +19,6 @@ package compile
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -117,11 +116,7 @@ func run(cmd *cobra.Command, args []string) {
 	}, os.Stdout, os.Stderr, viper.GetString("logging.level") == "debug")
 
 	if err != nil {
-		errMsg := "Error during build"
-		if err.Error() != "" {
-			errMsg = fmt.Sprintf("%s: %v", errMsg, err)
-		}
-		feedback.Errorf("%s.", errMsg)
+		feedback.Errorf("Error during build: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
