@@ -57,17 +57,21 @@ def test_compile_with_simple_sketch(run_command, data_dir):
     log_file_path = os.path.join(data_dir, log_file_name)
     result = run_command(
         "compile -b {fqbn} {sketch_path} --log-format json --log-file {log_file} --log-level trace".format(
-            fqbn=fqbn, sketch_path=sketch_path, log_file=log_file_path))
+            fqbn=fqbn, sketch_path=sketch_path, log_file=log_file_path
+        )
+    )
     assert result.ok
 
     # let's test from the logs if the hex file produced by successful compile is moved to our sketch folder
-    log_json = open(log_file_path, 'r')
+    log_json = open(log_file_path, "r")
     json_log_lines = log_json.readlines()
     expected_trace_sequence = [
         "Compile {sketch} for {fqbn} started".format(sketch=sketch_path, fqbn=fqbn),
-        "Compile {sketch} for {fqbn} successful".format(sketch=sketch_name, fqbn=fqbn)
+        "Compile {sketch} for {fqbn} successful".format(sketch=sketch_name, fqbn=fqbn),
     ]
-    assert is_message_sequence_in_json_log_traces(expected_trace_sequence, json_log_lines)
+    assert is_message_sequence_in_json_log_traces(
+        expected_trace_sequence, json_log_lines
+    )
 
 
 def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
@@ -94,8 +98,8 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
 
     # Build sketch for arduino:avr:uno
     result = run_command(
-        "compile -b {fqbn} {sketch_path}".format(
-            fqbn=fqbn, sketch_path=sketch_path))
+        "compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path)
+    )
     # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
     # returning a different error detailed message
     assert "Error during sketch processing" in result.stderr
@@ -118,8 +122,8 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
 
     # Build sketch for arduino:avr:uno
     result = run_command(
-        "compile -b {fqbn} {sketch_path}".format(
-            fqbn=fqbn, sketch_path=sketch_path))
+        "compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path)
+    )
     # The assertion is a bit relaxed also in this case because macOS behaves differently from win and linux:
     # the cli does not follow recursively the symlink til breaking
     assert "Error during sketch processing" in result.stderr
@@ -172,35 +176,53 @@ def test_compile_and_compile_combo(run_command, data_dir):
     ports = json.loads(result.stdout)
     assert isinstance(ports, list)
     for port in ports:
-        boards = port.get('boards')
+        boards = port.get("boards")
         assert isinstance(boards, list)
         for board in boards:
-            detected_boards.append(dict(address=port.get('address'), fqbn=board.get('FQBN')))
+            detected_boards.append(
+                dict(address=port.get("address"), fqbn=board.get("FQBN"))
+            )
 
     assert len(detected_boards) >= 1, "There are no boards available for testing"
 
     # Build sketch for each detected board
     for board in detected_boards:
-        log_file_name = "{fqbn}-compile.log".format(fqbn=board.get('fqbn').replace(":", "-"))
+        log_file_name = "{fqbn}-compile.log".format(
+            fqbn=board.get("fqbn").replace(":", "-")
+        )
         log_file_path = os.path.join(data_dir, log_file_name)
-        command_log_flags = "--log-format json --log-file {} --log-level trace".format(log_file_path)
-        result = run_command("compile -b {fqbn} --upload -p {address} {sketch_path} {log_flags}".format(
-            fqbn=board.get('fqbn'),
-            address=board.get('address'),
-            sketch_path=sketch_path,
-            log_flags=command_log_flags
-        ))
+        command_log_flags = "--log-format json --log-file {} --log-level trace".format(
+            log_file_path
+        )
+        result = run_command(
+            "compile -b {fqbn} --upload -p {address} {sketch_path} {log_flags}".format(
+                fqbn=board.get("fqbn"),
+                address=board.get("address"),
+                sketch_path=sketch_path,
+                log_flags=command_log_flags,
+            )
+        )
         assert result.ok
         # check from the logs if the bin file were uploaded on the current board
-        log_json = open(log_file_path, 'r')
+        log_json = open(log_file_path, "r")
         json_log_lines = log_json.readlines()
         expected_trace_sequence = [
-            "Compile {sketch} for {fqbn} started".format(sketch=sketch_path, fqbn=board.get('fqbn')),
-            "Compile {sketch} for {fqbn} successful".format(sketch=sketch_name, fqbn=board.get('fqbn')),
-            "Upload {sketch} on {fqbn} started".format(sketch=sketch_path, fqbn=board.get('fqbn')),
-            "Upload {sketch} on {fqbn} successful".format(sketch=sketch_name, fqbn=board.get('fqbn'))
+            "Compile {sketch} for {fqbn} started".format(
+                sketch=sketch_path, fqbn=board.get("fqbn")
+            ),
+            "Compile {sketch} for {fqbn} successful".format(
+                sketch=sketch_name, fqbn=board.get("fqbn")
+            ),
+            "Upload {sketch} on {fqbn} started".format(
+                sketch=sketch_path, fqbn=board.get("fqbn")
+            ),
+            "Upload {sketch} on {fqbn} successful".format(
+                sketch=sketch_name, fqbn=board.get("fqbn")
+            ),
         ]
-        assert is_message_sequence_in_json_log_traces(expected_trace_sequence, json_log_lines)
+        assert is_message_sequence_in_json_log_traces(
+            expected_trace_sequence, json_log_lines
+        )
 
 
 def is_message_sequence_in_json_log_traces(message_sequence, log_json_lines):
@@ -211,3 +233,34 @@ def is_message_sequence_in_json_log_traces(message_sequence, log_json_lines):
             if entry.get("msg") in message_sequence:
                 trace_entries.append(entry.get("msg"))
     return message_sequence == trace_entries
+
+
+def test_compile_blacklisted_sketchname(run_command, data_dir):
+    """
+    Compile should ignore folders named `RCS`, `.git` and the likes, but
+    it should be ok for a sketch to be named like RCS.ino
+    """
+    # Init the environment explicitly
+    result = run_command("core update-index")
+    assert result.ok
+
+    # Download latest AVR
+    result = run_command("core install arduino:avr")
+    assert result.ok
+
+    sketch_name = "RCS"
+    sketch_path = os.path.join(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    # Create a test sketch
+    result = run_command("sketch new {}".format(sketch_path))
+    assert result.ok
+    assert "Sketch created in: {}".format(sketch_path) in result.stdout
+
+    # Build sketch for arduino:avr:uno
+    log_file_name = "compile.log"
+    log_file_path = os.path.join(data_dir, log_file_name)
+    result = run_command(
+        "compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path)
+    )
+    assert result.ok
