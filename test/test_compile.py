@@ -173,6 +173,8 @@ def test_compile_and_compile_combo(run_command, data_dir):
     assert isinstance(ports, list)
     for port in ports:
         boards = port.get('boards')
+        if boards is None:
+            continue
         assert isinstance(boards, list)
         for board in boards:
             detected_boards.append(dict(address=port.get('address'), fqbn=board.get('FQBN')))
