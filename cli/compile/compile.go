@@ -19,6 +19,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/arduino/arduino-cli/arduino/sketches"
+
 	"github.com/arduino/arduino-cli/cli/feedback"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -94,6 +96,15 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	sketchPath := initSketchPath(path)
+	sketch, err := sketches.NewSketchFromPath(sketchPath)
+	if err != nil {
+		feedback.Errorf("Error opening sketch: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	if fqbn == "" && sketch.Metadata.CPU.Fqbn == "" {
+		feedback.Errorf("Error: no FQBN provided. Set --fqbn flag or attach board to sketch")
+		os.Exit(errorcodes.ErrGeneric)
+	}
 
 	_, err = compile.Compile(context.Background(), &rpc.CompileReq{
 		Instance:        inst,
