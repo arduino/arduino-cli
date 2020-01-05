@@ -118,7 +118,7 @@ func GetOutputLibrary(lib *libraries.Library) *rpc.Library {
 		LdFlags:           lib.LDflags,
 		IsLegacy:          lib.IsLegacy,
 		Version:           lib.Version.String(),
-		License:           lib.LDflags,
+		License:           lib.License,
 	}
 }
 
