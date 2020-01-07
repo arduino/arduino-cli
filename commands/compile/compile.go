@@ -161,7 +161,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 	// if it's a regular build, go on...
 	if err := builder.RunBuilder(builderCtx); err != nil {
-		return nil, fmt.Errorf("build failed: %s", err)
+		return nil, err
 	}
 
 	// FIXME: Make a function to obtain these info...
