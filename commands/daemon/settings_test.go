@@ -18,7 +18,6 @@ package daemon
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -54,7 +53,6 @@ func TestMerge(t *testing.T) {
 	_, err := svc.Merge(context.Background(), &rpc.RawData{JsonData: bulkSettings})
 	require.Nil(t, err)
 
-	fmt.Println(viper.AllSettings())
 	require.Equal(t, "420", viper.GetString("daemon.port"))
 	require.Equal(t, "bar", viper.GetString("foo"))
 

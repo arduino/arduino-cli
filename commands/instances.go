@@ -148,7 +148,6 @@ func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, 
 	instances[handle] = instance
 
 	if err := instance.checkForBuiltinTools(downloadCB, taskCB, downloaderHeaders); err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

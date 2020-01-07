@@ -19,7 +19,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	rpc "github.com/arduino/arduino-cli/rpc/settings"
 	"github.com/spf13/viper"
@@ -61,8 +60,6 @@ func (s *SettingsService) Merge(ctx context.Context, req *rpc.RawData) (*rpc.Mer
 func (s *SettingsService) GetValue(ctx context.Context, req *rpc.GetValueRequest) (*rpc.Value, error) {
 	key := req.GetKey()
 	value := &rpc.Value{}
-
-	fmt.Println(viper.AllKeys())
 
 	if !viper.InConfig(key) {
 		return nil, errors.New("key not found in settings")

@@ -204,7 +204,6 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	if err != nil {
 		return nil, err
 	}
-	//fmt.Println(string(buff))
 	var index Index
 	err = json.Unmarshal(buff, &index)
 	if err != nil {

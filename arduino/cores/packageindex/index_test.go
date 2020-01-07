@@ -16,7 +16,6 @@
 package packageindex
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/arduino/go-paths-helper"
@@ -33,7 +32,6 @@ func TestIndexParsing(t *testing.T) {
 		if indexFile.Ext() != ".json" {
 			continue
 		}
-		fmt.Println("Loading:", indexFile)
 		_, err := LoadIndex(indexFile)
 		require.NoError(t, err)
 	}
