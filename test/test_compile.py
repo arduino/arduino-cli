@@ -1,6 +1,6 @@
 # This file is part of arduino-cli.
 #
-# Copyright 2019 ARDUINO SA (http://www.arduino.cc/)
+# Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
 #
 # This software is released under the GNU General Public License version 3,
 # which covers the main part of arduino-cli.
@@ -176,7 +176,9 @@ def test_compile_and_compile_combo(run_command, data_dir):
     ports = json.loads(result.stdout)
     assert isinstance(ports, list)
     for port in ports:
-        boards = port.get("boards")
+        boards = port.get('boards')
+        if boards is None:
+            continue
         assert isinstance(boards, list)
         for board in boards:
             detected_boards.append(
