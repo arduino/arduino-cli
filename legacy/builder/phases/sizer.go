@@ -105,12 +105,12 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 
 	if textSize > maxTextSize {
 		logger.Println(constants.LOG_LEVEL_ERROR, constants.MSG_SIZER_TEXT_TOO_BIG)
-		return errors.New("")
+		return errors.New("text section exceeds available space in board")
 	}
 
 	if maxDataSize > 0 && dataSize > maxDataSize {
 		logger.Println(constants.LOG_LEVEL_ERROR, constants.MSG_SIZER_DATA_TOO_BIG)
-		return errors.New("")
+		return errors.New("data section exceeds available space in board")
 	}
 
 	if properties.Get(constants.PROPERTY_WARN_DATA_PERCENT) != "" {
