@@ -299,7 +299,7 @@ any command that require a platform core to work:
 
 .. code:: console
 
-   $ arduino-cli core search esp8266 --additional-urls http://arduino.esp8266.com/stable/package_esp8266com_index.json
+   $ arduino-cli core search esp8266 --additional-urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
    ID              Version Name
    esp8266:esp8266 2.5.2   esp8266
 
@@ -314,7 +314,7 @@ For example, to add the ESP8266 core, edit the configration file and change the
 
    board_manager:
      additional_urls:
-       - http://arduino.esp8266.com/stable/package_esp8266com_index.json
+       - https://arduino.esp8266.com/stable/package_esp8266com_index.json
 
 From now on, commands supporting custom cores will automatically use the
 additional URL from the configuration file:
