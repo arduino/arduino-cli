@@ -312,7 +312,7 @@ func TestCompileCommandsIntegration(t *testing.T) {
 	// Build sketch without FQBN
 	exitCode, d = executeWithArgs("compile", sketchPath)
 	require.NotZero(t, exitCode)
-	require.Contains(t, string(d), "required flag(s) \"fqbn\" not set")
+	require.Contains(t, string(d), "no FQBN provided")
 
 	// Build sketch for arduino:avr:uno
 	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:uno", sketchPath)
