@@ -321,7 +321,7 @@ additional URL from the configuration file:
 
 Alternatively, you can pass a link to the the additional package index file with
 the ``--additional-urls`` option, that has to be specified every time and for every
-command that operates on a platform core, for example:
+command that operates on a 3rd party platform core, for example:
 
 .. code:: console
 
