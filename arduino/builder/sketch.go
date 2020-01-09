@@ -112,29 +112,31 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 	if stat.IsDir() {
 		sketchFolder = sketchPath
 		// allowed extensions are .ino and .pde (but not both)
-		allowedSketchExtensions := [...]string{".ino", ".pde"}
-		for _, extension := range allowedSketchExtensions {
+		for extension := range globals.MainFileValidExtensions {
 			candidateSketchFile := filepath.Join(sketchPath, stat.Name()+extension)
 			if _, err := os.Stat(candidateSketchFile); !os.IsNotExist(err) {
 				if mainSketchFile == "" {
 					mainSketchFile = candidateSketchFile
 				} else {
-					return nil, errors.Errorf("more than one main sketch file found (%v,%v)",
+					return nil, errors.Errorf("multiple main sketch files found (%v,%v)",
 						filepath.Base(mainSketchFile),
 						filepath.Base(candidateSketchFile))
 				}
 			}
 		}
-		// check that .pde or .ino was found
+
+		// check main file was found
 		if mainSketchFile == "" {
-			return nil, errors.Errorf("unable to find an sketch file in directory %v", sketchFolder)
+			return nil, errors.Errorf("unable to find a sketch file in directory %v", sketchFolder)
 		}
-		// in the case a dir was passed, ensure the main file exists and is readable
+
+		// check main file is readable
 		f, err := os.Open(mainSketchFile)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to open the main sketch file")
 		}
 		f.Close()
+
 		// ensure it is not a directory
 		info, err := os.Stat(mainSketchFile)
 		if err != nil {
@@ -150,28 +152,37 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 
 	// collect all the sketch files
 	var files []string
+	rootVisited := false
 	err = simpleLocalWalk(sketchFolder, maxFileSystemDepth, func(path string, info os.FileInfo, err error) error {
-
 		if err != nil {
 			feedback.Errorf("Error during sketch processing: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 
-		// ignore hidden files and skip hidden directories
-		if strings.HasPrefix(info.Name(), ".") {
-			if info.IsDir() {
-				return filepath.SkipDir
+		if info.IsDir() {
+			// Filters in this if-block are NOT applied to the sketch folder itself.
+			// Since the sketch folder is the first one processed by simpleLocalWalk,
+			// we can set the `rootVisited` guard to exclude it.
+			if rootVisited {
+				// skip hidden folders
+				if strings.HasPrefix(info.Name(), ".") {
+					return filepath.SkipDir
+				}
+
+				// skip legacy SCM directories
+				if info.Name() == "CVS" || info.Name() == "RCS" {
+					return filepath.SkipDir
+				}
+			} else {
+				rootVisited = true
 			}
+
+			// ignore (don't skip) directory
 			return nil
 		}
 
-		// skip legacy SCM directories
-		if info.IsDir() && strings.HasPrefix(info.Name(), "CVS") || strings.HasPrefix(info.Name(), "RCS") {
-			return filepath.SkipDir
-		}
-
-		// ignore directory entries
-		if info.IsDir() {
+		// ignore hidden files
+		if strings.HasPrefix(info.Name(), ".") {
 			return nil
 		}
 

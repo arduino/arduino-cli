@@ -105,7 +105,7 @@ func TestLoadSketchFolderBothInoAndPde(t *testing.T) {
 	sketchPath := filepath.Join("testdata", t.Name())
 	_, err := builder.SketchLoad(sketchPath, "")
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "more than one main sketch file found")
+	require.Contains(t, err.Error(), "multiple main sketch files found")
 	require.Contains(t, err.Error(), t.Name()+".ino")
 	require.Contains(t, err.Error(), t.Name()+".pde")
 }
@@ -157,7 +157,7 @@ func TestLoadSketchFolderWrongMain(t *testing.T) {
 	sketchPath := filepath.Join("testdata", t.Name())
 	_, err := builder.SketchLoad(sketchPath, "")
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "unable to find an sketch file in directory testdata")
+	require.Contains(t, err.Error(), "unable to find a sketch file in directory testdata")
 
 	_, err = builder.SketchLoad("does/not/exist", "")
 	require.Error(t, err)
