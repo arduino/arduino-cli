@@ -293,21 +293,10 @@ Great! Now we are ready to compile and upload the sketch.
 Adding 3rd party cores
 ^^^^^^^^^^^^^^^^^^^^^^
 
-If your board requires 3rd party core packages to work, you can pass a link to
-the the additional package index file with the ``--additional-urls`` option to
-any command that require a platform core to work:
+If your board requires 3rd party core packages to work, you can list the URLs
+to additional package indexes in the Arduino CLI configuration file.
 
-.. code:: console
-
-   $ arduino-cli core search esp8266 --additional-urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
-   ID              Version Name
-   esp8266:esp8266 2.5.2   esp8266
-
-To avoid passing the ``--additional-urls`` option every time you run a command,
-you can list the URLs to additional package indexes in the Arduino CLI
-configuration file.
-
-For example, to add the ESP8266 core, edit the configration file and change the
+For example, to add the ESP8266 core, edit the configuration file and change the
 ``board_manager`` settings as follows:
 
 .. code:: yaml
@@ -329,6 +318,19 @@ additional URL from the configuration file:
    $ arduino-cli core search esp8266
    ID              Version Name
    esp8266:esp8266 2.5.2   esp8266
+
+Alternatively you can pass a link to the the additional package index file with the ``--additional-urls`` option to
+every command that require a platform core to work:
+
+.. code:: console
+
+   $ arduino-cli  core update-index --additional-urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
+   Updating index: package_esp8266com_index.json downloaded
+
+   $ arduino-cli core search esp8266 --additional-urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
+   ID              Version Name
+   esp8266:esp8266 2.5.2   esp8266
+
 
 Compile and upload the sketch
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
