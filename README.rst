@@ -319,8 +319,9 @@ additional URL from the configuration file:
    ID              Version Name
    esp8266:esp8266 2.5.2   esp8266
 
-Alternatively you can pass a link to the the additional package index file with the ``--additional-urls`` option to
-every command that require a platform core to work:
+Alternatively, you can pass a link to the the additional package index file with
+the ``--additional-urls`` option, that has to be specified every time and for every
+command that operates on a platform core, for example:
 
 .. code:: console
 
