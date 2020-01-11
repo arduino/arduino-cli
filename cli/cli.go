@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/board"
+	"github.com/arduino/arduino-cli/cli/cache"
 	"github.com/arduino/arduino-cli/cli/compile"
 	"github.com/arduino/arduino-cli/cli/config"
 	"github.com/arduino/arduino-cli/cli/core"
@@ -67,6 +68,7 @@ func init() {
 // this is here only for testing
 func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(board.NewCommand())
+	cmd.AddCommand(cache.NewCommand())
 	cmd.AddCommand(compile.NewCommand())
 	cmd.AddCommand(config.NewCommand())
 	cmd.AddCommand(core.NewCommand())
