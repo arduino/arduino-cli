@@ -51,13 +51,13 @@ func initSearchCommand() *cobra.Command {
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	inst, err := instance.CreateInstance()
 	if err != nil {
-		feedback.Errorf("Error saerching for platforms: %v", err)
+		feedback.Errorf("Error searching for platforms: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	logrus.Info("Executing `arduino core search`")
-
 	arguments := strings.ToLower(strings.Join(args, " "))
+	logrus.Infof("Executing `arduino core search` with args: '%s'", arguments)
+
 	resp, err := core.PlatformSearch(inst.GetId(), arguments, allVersions)
 	if err != nil {
 		feedback.Errorf("Error saerching for platforms: %v", err)
