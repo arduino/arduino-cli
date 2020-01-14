@@ -78,7 +78,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(version.NewCommand())
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
-	cmd.PersistentFlags().String("log-level", "", "Messages with this level and above will be logged.")
+	cmd.PersistentFlags().String("log-level", "", "Messages with this level and above will be logged. Valid levels are: Trace, Debug, Info, Warning, Error, Fatal, Panic")
 	viper.BindPFlag("logging.level", cmd.PersistentFlags().Lookup("log-level"))
 	cmd.PersistentFlags().String("log-file", "", "Path to the file where logs will be written.")
 	viper.BindPFlag("logging.file", cmd.PersistentFlags().Lookup("log-file"))

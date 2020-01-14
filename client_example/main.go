@@ -21,10 +21,12 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"time"
 
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/arduino/arduino-cli/rpc/settings"
 	"google.golang.org/grpc"
 )
 
@@ -51,16 +53,34 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	dataDir = filepath.ToSlash(dataDir)
 	defer os.RemoveAll(dataDir)
 
 	// Create an instance of the gRPC client.
 	client := rpc.NewArduinoCoreClient(conn)
+	settingsClient := settings.NewSettingsClient(conn)
 
 	// Now we can call various methods of the API...
 
 	// `Version` can be called without any setup or init procedure.
 	log.Println("calling Version")
 	callVersion(client)
+
+	// Use SetValue to configure the arduino-cli directories.
+	log.Println("calling SetValue")
+	callSetValue(settingsClient)
+
+	// List all the settings.
+	log.Println("calling GetAll()")
+	callGetAll(settingsClient)
+
+	// Merge applies multiple settings values at once.
+	log.Println("calling Merge(`{\"foo\": \"bar\", \"daemon\":{\"port\":\"422\"}}`)")
+	callMerge(settingsClient)
+
+	// Get the value of the foo key.
+	log.Println("calling GetValue(foo)")
+	callGetValue(settingsClient)
 
 	// Before we can do anything with the CLI, an "instance" must be created.
 	// We keep a reference to the created instance because we will need it to
@@ -166,16 +186,57 @@ func callVersion(client rpc.ArduinoCoreClient) {
 	log.Printf("arduino-cli version: %v", versionResp.GetVersion())
 }
 
+func callSetValue(client settings.SettingsClient) {
+	_, err := client.SetValue(context.Background(),
+		&settings.Value{
+			Key:      "directories",
+			JsonData: `{"data": "` + dataDir + `", "downloads": "` + path.Join(dataDir, "staging") + `", "user": "` + path.Join(dataDir, "sketchbook") + `"}`,
+		})
+
+	if err != nil {
+		log.Fatalf("Error setting settings value: %s", err)
+	}
+}
+
+func callMerge(client settings.SettingsClient) {
+	bulkSettings := `{"foo": "bar", "daemon":{"port":"422"}}`
+	_, err := client.Merge(context.Background(),
+		&settings.RawData{
+			JsonData: bulkSettings,
+		})
+
+	if err != nil {
+		log.Fatalf("Error merging settings: %s", err)
+	}
+}
+
+func callGetValue(client settings.SettingsClient) {
+	getValueResp, err := client.GetValue(context.Background(),
+		&settings.GetValueRequest{
+			Key: "foo",
+		})
+
+	if err != nil {
+		log.Fatalf("Error getting settings value: %s", err)
+	}
+
+	log.Printf("Value: %s: %s", getValueResp.GetKey(), getValueResp.GetJsonData())
+}
+
+func callGetAll(client settings.SettingsClient) {
+	getAllResp, err := client.GetAll(context.Background(), &settings.GetAllRequest{})
+
+	if err != nil {
+		log.Fatalf("Error getting settings: %s", err)
+	}
+
+	log.Printf("Settings: %s", getAllResp.GetJsonData())
+}
+
 func initInstance(client rpc.ArduinoCoreClient) *rpc.Instance {
 	// The configuration for this example client only contains the path to
 	// the data folder.
-	initRespStream, err := client.Init(context.Background(), &rpc.InitReq{
-		Configuration: &rpc.Configuration{
-			DataDir:       dataDir,
-			SketchbookDir: filepath.Join(dataDir, "sketchbook"),
-			DownloadsDir:  filepath.Join(dataDir, "staging"),
-		},
-	})
+	initRespStream, err := client.Init(context.Background(), &rpc.InitReq{})
 	if err != nil {
 		log.Fatalf("Error creating server instance: %s", err)
 
