@@ -164,6 +164,10 @@ func main() {
 	log.Println("calling LibrarySearch(audio)")
 	callLibSearch(client, instance)
 
+	// List the dependencies of the ArduinoIoTCloud library
+	log.Println("calling LibraryResolveDependencies(ArduinoIoTCloud)")
+	callLibraryResolveDependencies(client, instance)
+
 	// List installed libraries
 	log.Println("calling LibraryList")
 	callLibList(client, instance)
@@ -731,6 +735,26 @@ func callLibSearch(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 
 	for _, res := range libSearchResp.GetLibraries() {
 		log.Printf("Result: %s - %s", res.GetName(), res.GetLatest().GetVersion())
+	}
+}
+
+func callLibraryResolveDependencies(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
+	libraryResolveDependenciesResp, err := client.LibraryResolveDependencies(context.Background(),
+		&rpc.LibraryResolveDependenciesReq{
+			Instance: instance,
+			Name:     "ArduinoIoTCloud",
+		})
+
+	if err != nil {
+		log.Fatalf("Error listing library dependencies: %s", err)
+	}
+
+	for _, resp := range libraryResolveDependenciesResp.GetDependencies() {
+		log.Printf("Dependency Name: %s", resp.GetName())
+		log.Printf("Version Required: %s", resp.GetVersionRequired())
+		if resp.GetVersionInstalled() != "" {
+			log.Printf("Version Installed: %s\n", resp.GetVersionInstalled())
+		}
 	}
 }
 
