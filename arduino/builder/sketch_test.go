@@ -25,7 +25,6 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/stretchr/testify/require"
 )
 
@@ -40,7 +39,7 @@ func TestSaveSketch(t *testing.T) {
 		t.Fatalf("unable to read golden file %s: %v", sketchFile, err)
 	}
 
-	builder.SketchSaveItemCpp(&sketch.Item{Path: sketchName, Source: source}, tmp)
+	builder.SketchSaveItemCpp(sketchName, source, tmp)
 
 	out, err := ioutil.ReadFile(filepath.Join(tmp, outName))
 	if err != nil {
