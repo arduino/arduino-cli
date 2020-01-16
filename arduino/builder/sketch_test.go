@@ -180,7 +180,8 @@ func TestMergeSketchSources(t *testing.T) {
 		t.Fatalf("unable to read golden file %s: %v", mergedPath, err)
 	}
 
-	offset, source := builder.SketchMergeSources(s)
+	offset, source, err := builder.SketchMergeSources(s)
+	require.Nil(t, err)
 	require.Equal(t, 2, offset)
 	require.Equal(t, string(mergedBytes), source)
 }
@@ -191,7 +192,8 @@ func TestMergeSketchSourcesArduinoIncluded(t *testing.T) {
 	require.NotNil(t, s)
 
 	// ensure not to include Arduino.h when it's already there
-	_, source := builder.SketchMergeSources(s)
+	_, source, err := builder.SketchMergeSources(s)
+	require.Nil(t, err)
 	require.Equal(t, 1, strings.Count(source, "<Arduino.h>"))
 }
 

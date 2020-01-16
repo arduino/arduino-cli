@@ -216,7 +216,7 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 }
 
 // SketchMergeSources merges all the source files included in a sketch
-func SketchMergeSources(sketch *sketch.Sketch) (int, string) {
+func SketchMergeSources(sketch *sketch.Sketch) (int, string, error) {
 	lineOffset := 0
 	mergedSource := ""
 
@@ -235,7 +235,7 @@ func SketchMergeSources(sketch *sketch.Sketch) (int, string) {
 		mergedSource += item.GetSourceStr() + "\n"
 	}
 
-	return lineOffset, mergedSource
+	return lineOffset, mergedSource, nil
 }
 
 // SketchCopyAdditionalFiles copies the additional files for a sketch to the

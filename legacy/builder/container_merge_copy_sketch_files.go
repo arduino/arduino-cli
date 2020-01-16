@@ -29,7 +29,10 @@ func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
 	if sk == nil {
 		return i18n.WrapError(errors.New("unable to convert legacy sketch to the new type"))
 	}
-	offset, source := bldr.SketchMergeSources(sk)
+	offset, source, err := bldr.SketchMergeSources(sk)
+	if err != nil {
+		return err
+	}
 	ctx.LineOffset = offset
 	ctx.Source = source
 
