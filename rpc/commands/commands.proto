@@ -91,17 +91,7 @@ service ArduinoCore {
   rpc LibraryList(LibraryListReq) returns (LibraryListResp);
 }
 
-// DEPRECATED
-// Configuration is deprecated, use the Settings Service instead
-message Configuration {
-  string dataDir = 1;
-  string sketchbookDir = 2;
-  string downloadsDir = 3;
-  repeated string boardManagerAdditionalUrls = 4;
-}
-
 message InitReq {
-  Configuration configuration = 1; // DEPRECATED this field will be ignored
   bool library_manager_only = 2;
 }
 
