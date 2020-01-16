@@ -26,22 +26,26 @@ import (
 
 func TestNewItem(t *testing.T) {
 	sketchItem := filepath.Join("testdata", t.Name()+".ino")
-	item, err := sketch.NewItem(sketchItem)
-	assert.Nil(t, err)
+	item := sketch.NewItem(sketchItem)
 	assert.Equal(t, sketchItem, item.Path)
-	assert.Equal(t, []byte(`#include <testlib.h>`), item.Source)
-	assert.Equal(t, "#include <testlib.h>", item.GetSourceStr())
+	sourceBytes, err := item.GetSourceBytes()
+	assert.Nil(t, err)
+	assert.Equal(t, []byte(`#include <testlib.h>`), sourceBytes)
+	sourceStr, err := item.GetSourceStr()
+	assert.Nil(t, err)
+	assert.Equal(t, "#include <testlib.h>", sourceStr)
 
-	item, err = sketch.NewItem("doesnt/exist")
-	assert.Nil(t, item)
+	item = sketch.NewItem("doesnt/exist")
+	sourceBytes, err = item.GetSourceBytes()
+	assert.Nil(t, sourceBytes)
 	assert.NotNil(t, err)
 }
 
 func TestSort(t *testing.T) {
 	items := []*sketch.Item{
-		&sketch.Item{"foo", nil},
-		&sketch.Item{"baz", nil},
-		&sketch.Item{"bar", nil},
+		&sketch.Item{"foo"},
+		&sketch.Item{"baz"},
+		&sketch.Item{"bar"},
 	}
 
 	sort.Sort(sketch.ItemByPath(items))

@@ -86,8 +86,7 @@ func (f *SourceFile) DepfilePath(ctx *Context) *paths.Path {
 }
 
 type SketchFile struct {
-	Name   *paths.Path
-	Source string
+	Name *paths.Path
 }
 
 type SketchFileSortByName []SketchFile
@@ -114,20 +113,17 @@ func SketchToLegacy(sketch *sketch.Sketch) *Sketch {
 	s := &Sketch{}
 	s.MainFile = SketchFile{
 		paths.New(sketch.MainFile.Path),
-		string(sketch.MainFile.Source),
 	}
 
 	for _, item := range sketch.OtherSketchFiles {
 		s.OtherSketchFiles = append(s.OtherSketchFiles, SketchFile{
 			paths.New(item.Path),
-			string(item.Source),
 		})
 	}
 
 	for _, item := range sketch.AdditionalFiles {
 		s.AdditionalFiles = append(s.AdditionalFiles, SketchFile{
 			paths.New(item.Path),
-			string(item.Source),
 		})
 	}
 
@@ -137,22 +133,19 @@ func SketchToLegacy(sketch *sketch.Sketch) *Sketch {
 func SketchFromLegacy(s *Sketch) *sketch.Sketch {
 	others := []*sketch.Item{}
 	for _, f := range s.OtherSketchFiles {
-		if i, err := sketch.NewItem(f.Name.String()); err == nil {
-			others = append(others, i)
-		}
+		i := sketch.NewItem(f.Name.String())
+		others = append(others, i)
 	}
 
 	additional := []*sketch.Item{}
 	for _, f := range s.AdditionalFiles {
-		if i, err := sketch.NewItem(f.Name.String()); err == nil {
-			additional = append(additional, i)
-		}
+		i := sketch.NewItem(f.Name.String())
+		additional = append(additional, i)
 	}
 
 	return &sketch.Sketch{
 		MainFile: &sketch.Item{
-			Path:   s.MainFile.Name.String(),
-			Source: []byte(s.MainFile.Source),
+			Path: s.MainFile.Name.String(),
 		},
 		LocationPath:     s.MainFile.Name.Parent().String(),
 		OtherSketchFiles: others,

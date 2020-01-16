@@ -27,25 +27,32 @@ import (
 
 // Item holds the source and the path for a single sketch file
 type Item struct {
-	Path   string
-	Source []byte
+	Path string
 }
 
 // NewItem reads the source code for a sketch item and returns an
 // Item instance
-func NewItem(itemPath string) (*Item, error) {
+func NewItem(itemPath string) *Item {
+	return &Item{itemPath}
+}
+
+// GetSourceBytes reads the item file contents and returns it as bytes
+func (i *Item) GetSourceBytes() ([]byte, error) {
 	// read the file
-	source, err := ioutil.ReadFile(itemPath)
+	source, err := ioutil.ReadFile(i.Path)
 	if err != nil {
 		return nil, errors.Wrap(err, "error reading source file")
 	}
-
-	return &Item{itemPath, source}, nil
+	return source, nil
 }
 
-// GetSourceStr returns the Source contents in string format
+// GetSourceStr reads the item file contents and returns it as a string
 func (i *Item) GetSourceStr() (string, error) {
-	return string(i.Source), nil
+	source, err := i.GetSourceBytes()
+	if err != nil {
+		return "", err
+	}
+	return string(source), nil
 }
 
 // ItemByPath implements sort.Interface for []Item based on
@@ -73,10 +80,7 @@ func New(sketchFolderPath, mainFilePath, buildPath string, allFilesPaths []strin
 	pathToItem := make(map[string]*Item)
 	for _, p := range allFilesPaths {
 		// create an Item
-		item, err := NewItem(p)
-		if err != nil {
-			return nil, errors.Wrap(err, "error creating the sketch")
-		}
+		item := NewItem(p)
 
 		if p == mainFilePath {
 			// store the main sketch file
