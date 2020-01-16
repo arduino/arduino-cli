@@ -44,8 +44,8 @@ func NewItem(itemPath string) (*Item, error) {
 }
 
 // GetSourceStr returns the Source contents in string format
-func (i *Item) GetSourceStr() string {
-	return string(i.Source)
+func (i *Item) GetSourceStr() (string, error) {
+	return string(i.Source), nil
 }
 
 // ItemByPath implements sort.Interface for []Item based on

@@ -221,18 +221,26 @@ func SketchMergeSources(sketch *sketch.Sketch) (int, string, error) {
 	mergedSource := ""
 
 	// add Arduino.h inclusion directive if missing
-	if !includesArduinoH.MatchString(sketch.MainFile.GetSourceStr()) {
+	mainSrc, err := sketch.MainFile.GetSourceStr()
+	if err != nil {
+		return 0, "", err
+	}
+	if !includesArduinoH.MatchString(mainSrc) {
 		mergedSource += "#include <Arduino.h>\n"
 		lineOffset++
 	}
 
 	mergedSource += "#line 1 " + QuoteCppString(sketch.MainFile.Path) + "\n"
-	mergedSource += sketch.MainFile.GetSourceStr() + "\n"
+	mergedSource += mainSrc + "\n"
 	lineOffset++
 
 	for _, item := range sketch.OtherSketchFiles {
+		src, err := item.GetSourceStr()
+		if err != nil {
+			return 0, "", err
+		}
 		mergedSource += "#line 1 " + QuoteCppString(item.Path) + "\n"
-		mergedSource += item.GetSourceStr() + "\n"
+		mergedSource += src + "\n"
 	}
 
 	return lineOffset, mergedSource, nil
