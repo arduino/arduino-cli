@@ -88,11 +88,7 @@ func collectAllSketchFiles(from *paths.Path) (paths.PathList, error) {
 func makeSketch(sketchLocation *paths.Path, allSketchFilePaths paths.PathList, buildLocation *paths.Path, logger i18n.Logger) (*types.Sketch, error) {
 	sketchFilesMap := make(map[string]types.SketchFile)
 	for _, sketchFilePath := range allSketchFilePaths {
-		source, err := sketchFilePath.ReadFile()
-		if err != nil {
-			return nil, i18n.WrapError(err)
-		}
-		sketchFilesMap[sketchFilePath.String()] = types.SketchFile{Name: sketchFilePath, Source: string(source)}
+		sketchFilesMap[sketchFilePath.String()] = types.SketchFile{Name: sketchFilePath}
 	}
 
 	mainFile := sketchFilesMap[sketchLocation.String()]

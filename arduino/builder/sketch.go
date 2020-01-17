@@ -47,9 +47,9 @@ func QuoteCppString(str string) string {
 }
 
 // SketchSaveItemCpp saves a preprocessed .cpp sketch file on disk
-func SketchSaveItemCpp(item *sketch.Item, destPath string) error {
+func SketchSaveItemCpp(path string, contents []byte, destPath string) error {
 
-	sketchName := filepath.Base(item.Path)
+	sketchName := filepath.Base(path)
 
 	if err := os.MkdirAll(destPath, os.FileMode(0755)); err != nil {
 		return errors.Wrap(err, "unable to create a folder to save the sketch")
@@ -57,7 +57,7 @@ func SketchSaveItemCpp(item *sketch.Item, destPath string) error {
 
 	destFile := filepath.Join(destPath, sketchName+".cpp")
 
-	if err := ioutil.WriteFile(destFile, item.Source, os.FileMode(0644)); err != nil {
+	if err := ioutil.WriteFile(destFile, contents, os.FileMode(0644)); err != nil {
 		return errors.Wrap(err, "unable to save the sketch on disk")
 	}
 
@@ -216,26 +216,34 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 }
 
 // SketchMergeSources merges all the source files included in a sketch
-func SketchMergeSources(sketch *sketch.Sketch) (int, string) {
+func SketchMergeSources(sketch *sketch.Sketch) (int, string, error) {
 	lineOffset := 0
 	mergedSource := ""
 
 	// add Arduino.h inclusion directive if missing
-	if !includesArduinoH.MatchString(sketch.MainFile.GetSourceStr()) {
+	mainSrc, err := sketch.MainFile.GetSourceStr()
+	if err != nil {
+		return 0, "", err
+	}
+	if !includesArduinoH.MatchString(mainSrc) {
 		mergedSource += "#include <Arduino.h>\n"
 		lineOffset++
 	}
 
 	mergedSource += "#line 1 " + QuoteCppString(sketch.MainFile.Path) + "\n"
-	mergedSource += sketch.MainFile.GetSourceStr() + "\n"
+	mergedSource += mainSrc + "\n"
 	lineOffset++
 
 	for _, item := range sketch.OtherSketchFiles {
+		src, err := item.GetSourceStr()
+		if err != nil {
+			return 0, "", err
+		}
 		mergedSource += "#line 1 " + QuoteCppString(item.Path) + "\n"
-		mergedSource += item.GetSourceStr() + "\n"
+		mergedSource += src + "\n"
 	}
 
-	return lineOffset, mergedSource
+	return lineOffset, mergedSource, nil
 }
 
 // SketchCopyAdditionalFiles copies the additional files for a sketch to the
