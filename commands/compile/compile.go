@@ -90,7 +90,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.HardwareDirs = configuration.HardwareDirectories()
 	builderCtx.BuiltInToolsDirs = configuration.BundleToolsDirectories()
 
-	builderCtx.OtherLibrariesDirs = paths.NewPathList()
+	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir())
 
 	if req.GetBuildPath() != "" {
