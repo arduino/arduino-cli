@@ -9,8 +9,6 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -323,14 +321,6 @@ func (x *monitorStreamingOpenClient) Recv() (*StreamingOpenResp, error) {
 // MonitorServer is the server API for Monitor service.
 type MonitorServer interface {
 	StreamingOpen(Monitor_StreamingOpenServer) error
-}
-
-// UnimplementedMonitorServer can be embedded to have forward compatible implementations.
-type UnimplementedMonitorServer struct {
-}
-
-func (*UnimplementedMonitorServer) StreamingOpen(srv Monitor_StreamingOpenServer) error {
-	return status.Errorf(codes.Unimplemented, "method StreamingOpen not implemented")
 }
 
 func RegisterMonitorServer(s *grpc.Server, srv MonitorServer) {
