@@ -17,14 +17,12 @@ package cache
 
 import (
 	"os"
-	"path/filepath"
-	"runtime"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/go-win32-utils"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func initCleanCommand() *cobra.Command {
@@ -42,34 +40,10 @@ func initCleanCommand() *cobra.Command {
 func runCleanCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino cache clean`")
 
-	cachePath := getDefaultArduinoDataDir() + "/staging"
+	cachePath := viper.GetString("directories.Downloads")
 	err := os.RemoveAll(cachePath)
 	if err != nil {
 		feedback.Errorf("Error cleaning caches: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
-	}
-}
-
-func getDefaultArduinoDataDir() string {
-	userHomeDir, err := os.UserHomeDir()
-	if err != nil {
-		feedback.Errorf("Unable to get user home dir: %v", err)
-		return "."
-	}
-
-	switch runtime.GOOS {
-	case "linux":
-		return filepath.Join(userHomeDir, ".arduino15")
-	case "darwin":
-		return filepath.Join(userHomeDir, "Library", "Arduino15")
-	case "windows":
-		localAppDataPath, err := win32.GetLocalAppDataFolder()
-		if err != nil {
-			feedback.Errorf("Unable to get Local App Data Folder: %v", err)
-			return "."
-		}
-		return filepath.Join(localAppDataPath, "Arduino15")
-	default:
-		return "."
 	}
 }
