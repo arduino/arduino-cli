@@ -146,12 +146,12 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 	}
 
 	for _, file := range files {
-		architecure := file.Base()
-		if strings.HasPrefix(architecure, ".") || architecure == "tools" ||
-			architecure == "platform.txt" { // TODO: Check if this "platform.txt" condition should be here....
+		architecture := file.Base()
+		if strings.HasPrefix(architecture, ".") || architecture == "tools" ||
+			architecture == "platform.txt" { // TODO: Check if this "platform.txt" condition should be here....
 			continue
 		}
-		platformPath := packageDir.Join(architecure)
+		platformPath := packageDir.Join(architecture)
 		if !platformPath.IsDir() {
 			continue
 		}
@@ -197,16 +197,16 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 				index.MergeIntoPackages(tmp)
 				if tmpPackage := tmp.GetOrCreatePackage(targetPackage.Name); tmpPackage == nil {
 					pm.Log.Warnf("Can't determine bundle platform version for %s", targetPackage.Name)
-				} else if tmpPlatform := tmpPackage.GetOrCreatePlatform(architecure); tmpPlatform == nil {
-					pm.Log.Warnf("Can't determine bundle platform version for %s:%s", targetPackage.Name, architecure)
+				} else if tmpPlatform := tmpPackage.GetOrCreatePlatform(architecture); tmpPlatform == nil {
+					pm.Log.Warnf("Can't determine bundle platform version for %s:%s", targetPackage.Name, architecture)
 				} else if tmpPlatformRelease := tmpPlatform.GetLatestRelease(); tmpPlatformRelease == nil {
-					pm.Log.Warnf("Can't determine bundle platform version for %s:%s, no valid release found", targetPackage.Name, architecure)
+					pm.Log.Warnf("Can't determine bundle platform version for %s:%s, no valid release found", targetPackage.Name, architecture)
 				} else {
 					version = tmpPlatformRelease.Version
 				}
 			}
 
-			platform := targetPackage.GetOrCreatePlatform(architecure)
+			platform := targetPackage.GetOrCreatePlatform(architecture)
 			release, err := platform.GetOrCreateRelease(version)
 			if err != nil {
 				return fmt.Errorf("loading platform release: %s", err)
@@ -221,7 +221,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 			// case: ARCHITECTURE/VERSION/boards.txt
 			// let's dive into VERSION directories
 
-			platform := targetPackage.GetOrCreatePlatform(architecure)
+			platform := targetPackage.GetOrCreatePlatform(architecture)
 			versionDirs, err := platformPath.ReadDir()
 			if err != nil {
 				return fmt.Errorf("reading dir %s: %s", platformPath, err)

@@ -95,16 +95,16 @@ func (packages Packages) GetDepsOfPlatformRelease(release *PlatformRelease) ([]*
 
 // GetOrCreatePlatform returns the Platform object with the specified architecture
 // or creates a new one if not found
-func (targetPackage *Package) GetOrCreatePlatform(architecure string) *Platform {
-	if platform, ok := targetPackage.Platforms[architecure]; ok {
+func (targetPackage *Package) GetOrCreatePlatform(architecture string) *Platform {
+	if platform, ok := targetPackage.Platforms[architecture]; ok {
 		return platform
 	}
 	targetPlatform := &Platform{
-		Architecture: architecure,
+		Architecture: architecture,
 		Releases:     map[string]*PlatformRelease{},
 		Package:      targetPackage,
 	}
-	targetPackage.Platforms[architecure] = targetPlatform
+	targetPackage.Platforms[architecture] = targetPlatform
 	return targetPlatform
 }
 
