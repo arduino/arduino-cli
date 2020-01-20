@@ -35,7 +35,7 @@ import (
 func initSearchCommand() *cobra.Command {
 	searchCommand := &cobra.Command{
 		Use:     "search [LIBRARY_NAME]",
-		Short:   "Searchs for one or more libraries data.",
+		Short:   "Searches for one or more libraries data.",
 		Long:    "Search for one or more libraries data (case insensitive search).",
 		Example: "  " + os.Args[0] + " lib search audio",
 		Args:    cobra.ArbitraryArgs,
