@@ -51,7 +51,7 @@ def test_core_search_no_args(run_command):
     are passed (i.e. all results are shown).
     """
     # update custom index and install test core (installed cores affect `core search`)
-    url = "https://raw.githubusercontent.com/arduino/arduino-cli/massi/506/test/testdata/test_index.json"
+    url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
     assert run_command("core update-index --additional-urls={}".format(url))
     assert run_command("core install test:x86 --additional-urls={}".format(url))
 
