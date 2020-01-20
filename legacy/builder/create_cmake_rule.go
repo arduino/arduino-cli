@@ -127,6 +127,17 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		fmt.Println(err)
 	}
 
+	// Use old ctags method to generate export file
+	commands := []types.Command{
+		//&ContainerMergeCopySketchFiles{},
+		&ContainerAddPrototypes{},
+		&FilterSketchSource{Source: &ctx.Source, RemoveLineMarkers: true},
+	}
+
+	for _, command := range commands {
+		command.Run(ctx)
+	}
+
 	err = utils.CopyDir(ctx.SketchBuildPath.String(), cmakeFolder.Join("sketch").String(), extensions)
 	if err != nil {
 		fmt.Println(err)
@@ -156,7 +167,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 			fmt.Println(err)
 		}
 	}
-	
+
 	// Extract CFLAGS, CPPFLAGS and LDFLAGS
 	var defines []string
 	var linkerflags []string
@@ -279,4 +290,3 @@ func findUniqueFoldersRelative(slice []string, base string) string {
 	}
 	return strings.Join(out, " ")
 }
-
