@@ -12,12 +12,12 @@
                     "help": {
                         "online": "https://github.com/Arduino/arduino-cli"
                     },
-                    "url": "https://raw.githubusercontent.com/arduino/arduino-cli/massi/additional-urls/test/testdata/core.txt",
+                    "url": "https://raw.githubusercontent.com/arduino/arduino-cli/massi/506/test/testdata/core.zip",
                     "checksum": "SHA-256:1ba93f6aea56842dfef065c0f5eb0a34c1f78b72b3f2426c94e47ba3a359c9ff",
                     "name": "test_core",
                     "version": "1.0.0",
                     "architecture": "x86",
-                    "archiveFileName": "core.txt",
+                    "archiveFileName": "core.zip",
                     "size": "2799",
                     "toolsDependencies": [],
                     "boards": [
@@ -31,12 +31,12 @@
                     "help": {
                         "online": "https://github.com/Arduino/arduino-cli"
                     },
-                    "url": "https://raw.githubusercontent.com/arduino/arduino-cli/massi/additional-urls/test/testdata/core.txt",
+                    "url": "https://raw.githubusercontent.com/arduino/arduino-cli/massi/506/test/testdata/core.zip",
                     "checksum": "SHA-256:1ba93f6aea56842dfef065c0f5eb0a34c1f78b72b3f2426c94e47ba3a359c9ff",
                     "name": "test_core",
                     "version": "2.0.0",
                     "architecture": "x86",
-                    "archiveFileName": "core.txt",
+                    "archiveFileName": "core.zip",
                     "size": "2799",
                     "toolsDependencies": [],
                     "boards": [

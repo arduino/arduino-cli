@@ -21,14 +21,6 @@ from .common import running_on_ci
 def test_core_search(run_command):
     url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
     assert run_command("core update-index --additional-urls={}".format(url))
-    # list all
-    result = run_command("core search")
-    assert result.ok
-    # filter out empty lines and subtract 1 for the header line
-    platforms_count = len([l for l in result.stdout.splitlines() if l]) - 1
-    result = run_command("core search --format json")
-    assert result.ok
-    assert len(json.loads(result.stdout)) == platforms_count
     # search a specific core
     result = run_command("core search avr")
     assert result.ok
@@ -51,3 +43,55 @@ def test_core_search(run_command):
     assert result.ok
     data = json.loads(result.stdout)
     assert 2 == len(data)
+
+
+def test_core_search_no_args(run_command):
+    """
+    This tests `core search` with and without additional URLs in case no args
+    are passed (i.e. all results are shown).
+    """
+    # update custom index and install test core (installed cores affect `core search`)
+    url = "https://raw.githubusercontent.com/arduino/arduino-cli/massi/506/test/testdata/test_index.json"
+    assert run_command("core update-index --additional-urls={}".format(url))
+    assert run_command("core install test:x86 --additional-urls={}".format(url))
+
+    # list all with no additional urls, ensure the test core won't show up
+    result = run_command("core search")
+    assert result.ok
+    num_platforms = 0
+    for l in result.stdout.splitlines()[1:]:  # ignore the header on first line
+        if l:  # ignore empty lines
+            assert not l.startswith("test:x86")
+            num_platforms += 1
+
+    # same thing in JSON format, also check the number of platforms found is the same
+    result = run_command("core search --format json")
+    assert result.ok
+    platforms = json.loads(result.stdout)
+    for elem in platforms:
+        assert elem.get("Name") != "test_core"
+    assert len(platforms) == num_platforms
+
+    # list all with additional urls, check the test core is there
+    result = run_command("core search --additional-urls={}".format(url))
+    assert result.ok
+    num_platforms = 0
+    found = False
+    for l in result.stdout.splitlines()[1:]:  # ignore the header on first line
+        if l:  # ignore empty lines
+            if l.startswith("test:x86"):
+                found = True
+            num_platforms += 1
+    assert found
+
+    # same thing in JSON format, also check the number of platforms found is the same
+    result = run_command("core search --format json --additional-urls={}".format(url))
+    assert result.ok
+    found = False
+    platforms = json.loads(result.stdout)
+    for elem in platforms:
+        if elem.get("Name") == "test_core":
+            found = True
+            break
+    assert found
+    assert len(platforms) == num_platforms

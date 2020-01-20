@@ -26,7 +26,7 @@ import (
 )
 
 func match(line, searchArgs string) bool {
-	return strings.Contains(strings.ToLower(line), searchArgs)
+	return strings.Contains(strings.ToLower(line), strings.ToLower(searchArgs))
 }
 
 // PlatformSearch FIXMEDOC
@@ -43,12 +43,18 @@ func PlatformSearch(instanceID int32, searchArgs string, allVersions bool) (*rpc
 	} else {
 		for _, targetPackage := range pm.Packages {
 			for _, platform := range targetPackage.Platforms {
+				// discard invalid platforms
+				if platform == nil || platform.Name == "" {
+					continue
+				}
+
+				// discard invalid releases
 				platformRelease := platform.GetLatestRelease()
 				if platformRelease == nil {
 					continue
 				}
 
-				// platform has a release, check if it matches the search arguments
+				// platform has a valid release, check if it matches the search arguments
 				if match(platform.Name, searchArgs) || match(platform.Architecture, searchArgs) {
 					if allVersions {
 						res = append(res, platform.GetAllReleases()...)
