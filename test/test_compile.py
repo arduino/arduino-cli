@@ -34,7 +34,7 @@ def test_compile_without_fqbn(run_command):
     assert result.failed
 
 
-def test_compile_with_simple_sketch(run_command, data_dir):
+def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
     # Init the environment explicitly
     result = run_command("core update-index")
     assert result.ok
@@ -72,6 +72,34 @@ def test_compile_with_simple_sketch(run_command, data_dir):
     assert is_message_sequence_in_json_log_traces(
         expected_trace_sequence, json_log_lines
     )
+
+    # Test the --output flag with absolute path
+    target = os.path.join(data_dir, "test.hex")
+    result = run_command(
+        "compile -b {fqbn} {sketch_path} -o {target}".format(
+            fqbn=fqbn, sketch_path=sketch_path, target=target
+        )
+    )
+    assert result.ok
+    assert os.path.exists(target)
+
+    # Test the --output flag defaulting to current working dir
+    result = run_command(
+        "compile -b {fqbn} {sketch_path} -o test".format(
+            fqbn=fqbn, sketch_path=sketch_path
+        )
+    )
+    assert result.ok
+    assert os.path.exists(os.path.join(working_dir, "test.hex"))
+
+    # Test extention won't be added if already present
+    result = run_command(
+        "compile -b {fqbn} {sketch_path} -o test2.hex".format(
+            fqbn=fqbn, sketch_path=sketch_path
+        )
+    )
+    assert result.ok
+    assert os.path.exists(os.path.join(working_dir, "test2.hex"))
 
 
 def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
@@ -176,7 +204,7 @@ def test_compile_and_compile_combo(run_command, data_dir):
     ports = json.loads(result.stdout)
     assert isinstance(ports, list)
     for port in ports:
-        boards = port.get('boards')
+        boards = port.get("boards")
         if boards is None:
             continue
         assert isinstance(boards, list)

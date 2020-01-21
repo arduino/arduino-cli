@@ -292,68 +292,6 @@ func TestUploadIntegration(t *testing.T) {
 	require.NotZero(t, exitCode)
 }
 
-func TestCompileCommandsIntegration(t *testing.T) {
-	// Set staging dir to a temporary dir
-	tmp := tmpDirOrDie()
-	defer os.RemoveAll(tmp)
-
-	exitCode, _ := executeWithArgs("core", "update-index")
-	require.Zero(t, exitCode)
-
-	// Download latest AVR
-	exitCode, _ = executeWithArgs("core", "install", "arduino:avr")
-	require.Zero(t, exitCode)
-
-	// Create a test sketch
-	sketchPath := filepath.Join(tmp, "Test1")
-	exitCode, d := executeWithArgs("sketch", "new", sketchPath)
-	require.Zero(t, exitCode)
-
-	// Build sketch without FQBN
-	exitCode, d = executeWithArgs("compile", sketchPath)
-	require.NotZero(t, exitCode)
-	require.Contains(t, string(d), "no FQBN provided")
-
-	// Build sketch for arduino:avr:uno
-	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:uno", sketchPath)
-	require.Zero(t, exitCode)
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New(sketchPath).Join("Test1.arduino.avr.uno.hex").Exist())
-
-	// Build sketch for arduino:avr:nano (without options)
-	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", sketchPath)
-	require.Zero(t, exitCode)
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New(sketchPath).Join("Test1.arduino.avr.nano.hex").Exist())
-
-	// Build sketch with --output path
-	pwd, err := os.Getwd()
-	require.NoError(t, err)
-	defer func() { require.NoError(t, os.Chdir(pwd)) }()
-	require.NoError(t, os.Chdir(tmp))
-
-	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", "-o", "test", sketchPath)
-	require.Zero(t, exitCode)
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New("test.hex").Exist())
-
-	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", "-o", "test2.hex", sketchPath)
-	require.Zero(t, exitCode)
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New("test2.hex").Exist())
-	require.NoError(t, paths.New(tmp, "anothertest").MkdirAll())
-
-	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", "-o", "anothertest/test", sketchPath)
-	require.Zero(t, exitCode)
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New("anothertest", "test.hex").Exist())
-
-	exitCode, d = executeWithArgs("compile", "-b", "arduino:avr:nano", "-o", tmp+"/anothertest/test2", sketchPath)
-	require.Zero(t, exitCode)
-	require.Contains(t, string(d), "Sketch uses")
-	require.True(t, paths.New("anothertest", "test2.hex").Exist())
-}
-
 func TestInvalidCoreURLIntegration(t *testing.T) {
 	configFile := filepath.Join("testdata", t.Name())
 
