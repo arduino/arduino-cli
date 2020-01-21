@@ -16,6 +16,9 @@ import os
 
 import pytest
 from invoke.context import Context
+import simplejson as json
+
+from .common import Board
 
 
 @pytest.fixture(scope="function")
@@ -73,3 +76,35 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
             )
 
     return _run
+
+
+@pytest.fixture(scope="function")
+def detected_boards(run_command):
+    """
+    This fixture provides a list of all the boards attached to the host.
+    This fixture will parse the JSON output of `arduino-cli board list --format json`
+    to extract all the connected boards data.
+
+    :returns a list `Board` objects.
+    """
+    assert run_command("core update-index")
+    result = run_command("board list --format json")
+    assert result.ok
+
+    detected_boards = []
+    for port in json.loads(result.stdout):
+        for board in port.get("boards", []):
+            fqbn = board.get("FQBN")
+            package, architecture, _id = fqbn.split(":")
+            detected_boards.append(
+                Board(
+                    address=port.get("address"),
+                    fqbn=fqbn,
+                    package=package,
+                    architecture=architecture,
+                    id=_id,
+                    core="{}:{}".format(package, architecture),
+                )
+            )
+
+    return detected_boards

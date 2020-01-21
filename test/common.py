@@ -13,6 +13,10 @@
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
 import os
+import collections
+
+
+Board = collections.namedtuple("Board", "address fqbn package architecture id core")
 
 
 def running_on_ci():
