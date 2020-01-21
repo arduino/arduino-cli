@@ -34,7 +34,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 
 	"bou.ke/monkey"
-	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -290,42 +289,6 @@ func TestUploadIntegration(t *testing.T) {
 	// platform without 'recipe.output.tmp_file' property
 	exitCode, _ = executeWithArgs("upload", "-i", filepath.Join(currUserDir, "test.hex"), "-b", "test2:avr:testboard", "-p", "/dev/ttyACM0")
 	require.NotZero(t, exitCode)
-}
-
-func TestInvalidCoreURLIntegration(t *testing.T) {
-	configFile := filepath.Join("testdata", t.Name())
-
-	// Dump config with cmd-line specific file
-	exitCode, d := executeWithArgs("--config-file", configFile, "config", "dump")
-	require.Zero(t, exitCode)
-	require.Contains(t, string(d), "- http://www.invalid-domain-asjkdakdhadjkh.com/package_example_index.json")
-
-	// Update inexistent index
-	exitCode, _ = executeWithArgs("--config-file", configFile, "core", "update-index")
-	require.NotZero(t, exitCode)
-}
-
-func Test3rdPartyCoreIntegration(t *testing.T) {
-	configFile := filepath.Join("testdata", t.Name())
-
-	// Update index and install esp32:esp32
-	exitCode, _ := executeWithArgs("--config-file", configFile, "core", "update-index")
-	require.Zero(t, exitCode)
-	exitCode, d := executeWithArgs("--config-file", configFile, "core", "install", "esp32:esp32")
-	require.Zero(t, exitCode)
-	require.Contains(t, string(d), "installed")
-
-	// Build a simple sketch and check if all artifacts are copied
-	tmp := tmpDirOrDie()
-	defer os.RemoveAll(tmp)
-	tmpSketch := paths.New(tmp).Join("Blink")
-	err := paths.New("testdata/Blink").CopyDirTo(tmpSketch)
-	require.NoError(t, err, "copying test sketch into temp dir")
-	exitCode, d = executeWithArgs("--config-file", configFile, "compile", "-b", "esp32:esp32:esp32", tmpSketch.String())
-	require.Zero(t, exitCode)
-	require.True(t, tmpSketch.Join("Blink.esp32.esp32.esp32.bin").Exist())
-	require.True(t, tmpSketch.Join("Blink.esp32.esp32.esp32.elf").Exist())
-	require.True(t, tmpSketch.Join("Blink.esp32.esp32.esp32.partitions.bin").Exist()) // https://github.com/arduino/arduino-cli/issues/163
 }
 
 func TestCoreCommandsIntegration(t *testing.T) {

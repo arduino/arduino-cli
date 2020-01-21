@@ -12,6 +12,8 @@
 # otherwise use the software for commercial activities involving the Arduino
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
+import os
+
 import pytest
 import simplejson as json
 
@@ -95,3 +97,32 @@ def test_core_search_no_args(run_command):
             break
     assert found
     assert len(platforms) == num_platforms
+
+
+def test_core_updateindex_invalid_url(run_command):
+    url = "http://www.invalid-domain-asjkdakdhadjkh.com/package_example_index.json"
+    result = run_command("core update-index --additional-urls={}".format(url))
+    assert result.failed
+
+
+def test_core_install_esp32(run_command, data_dir):
+    # update index
+    url = "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+    result = run_command("core update-index --additional-urls={}".format(url))
+    assert result.ok
+    # install 3rd-party core
+    result = run_command("core install esp32:esp32 --additional-urls={}".format(url))
+    assert result.ok
+
+    # create a sketch and compile to double check the core was successfully installed
+    sketch_path = os.path.join(data_dir, "test_core_install_esp32")
+    result = run_command("sketch new {}".format(sketch_path))
+    assert result.ok
+    result = run_command("compile -b esp32:esp32:esp32 {}".format(sketch_path))
+    assert result.ok
+    # prevent regressions for https://github.com/arduino/arduino-cli/issues/163
+    assert os.path.exists(
+        os.path.join(
+            sketch_path, "test_core_install_esp32.esp32.esp32.esp32.partitions.bin"
+        )
+    )
