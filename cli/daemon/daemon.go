@@ -34,6 +34,8 @@ import (
 	srv_debug "github.com/arduino/arduino-cli/rpc/debug"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/monitor"
 	srv_settings "github.com/arduino/arduino-cli/rpc/settings"
+	stats "github.com/segmentio/stats/v4"
+	"github.com/segmentio/stats/v4/prometheus"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -59,16 +61,40 @@ func NewCommand() *cobra.Command {
 var daemonize bool
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
+
+	logrus.Infof("configure telemetry")
+
+	// Configure telemetry engine
+	ph := prometheus.DefaultHandler
+
+	// Register the client so it receives metrics from the default engine.
+	stats.Register(ph)
+
+	// Flush the default stats engine on return to ensure all buffered
+	// metrics are sent to the server.
+	defer stats.Flush()
+	http.Handle("/metrics", ph)
+	go http.ListenAndServe(":2112", nil)
+	logrus.Infof("Prometheus telemetry is available on /metrics, TCP port 2112")
+	// Set a tag on a counter increment.
+	stats.Incr("user.login", stats.Tag{"user", "luke"})
+
 	port := viper.GetString("daemon.port")
 	s := grpc.NewServer()
 
-	// register the commands service
-	headers := http.Header{"User-Agent": []string{
-		fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s",
-			globals.VersionInfo.Application,
-			globals.VersionInfo.VersionString,
-			runtime.GOARCH, runtime.GOOS,
-			runtime.Version(), globals.VersionInfo.Commit)}}
+	// Compose user agent header
+	headers := http.Header{
+		"User-Agent": []string{
+			fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s",
+				globals.VersionInfo.Application,
+				globals.VersionInfo.VersionString,
+				runtime.GOARCH,
+				runtime.GOOS,
+				runtime.Version(),
+				globals.VersionInfo.Commit),
+		},
+	}
+	// Register the commands service
 	srv_commands.RegisterArduinoCoreServer(s, &daemon.ArduinoCoreServerImpl{
 		DownloaderHeaders: headers,
 		VersionString:     globals.VersionInfo.VersionString,
@@ -121,4 +147,5 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	if err := s.Serve(lis); err != nil {
 		logrus.Fatalf("Failed to serve: %v", err)
 	}
+
 }
