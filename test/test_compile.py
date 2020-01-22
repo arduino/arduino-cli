@@ -90,9 +90,6 @@ def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
         )
     )
     assert result.ok
-    print(os.listdir(working_dir))
-    print(result.stdout)
-    print(result.stderr)
     assert os.path.exists(os.path.join(working_dir, "test.hex"))
 
     # Test extention won't be added if already present
