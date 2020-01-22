@@ -14,6 +14,7 @@
 # a commercial license, send an email to license@arduino.cc.
 import json
 import os
+import platform
 
 import pytest
 
@@ -83,6 +84,26 @@ def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
     assert result.ok
     assert os.path.exists(target)
 
+
+@pytest.mark.skipif(
+    running_on_ci() and platform.system() == "Windows",
+    reason="Test disabled on Github Actions Win VM until tmpdir inconsistent behavior bug is fixed",
+)
+def test_output_flag_default_path(run_command, data_dir, working_dir):
+    # Init the environment explicitly
+    result = run_command("core update-index")
+    assert result.ok
+
+    # Download latest AVR
+    result = run_command("core install arduino:avr")
+    assert result.ok
+
+    # Create a test sketch
+    sketch_path = os.path.join(data_dir, "test_output_flag_default_path")
+    fqbn = "arduino:avr:uno"
+    result = run_command("sketch new {}".format(sketch_path))
+    assert result.ok
+
     # Test the --output flag defaulting to current working dir
     result = run_command(
         "compile -b {fqbn} {sketch_path} -o test".format(
@@ -92,7 +113,7 @@ def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
     assert result.ok
     assert os.path.exists(os.path.join(working_dir, "test.hex"))
 
-    # Test extention won't be added if already present
+    # Test extension won't be added if already present
     result = run_command(
         "compile -b {fqbn} {sketch_path} -o test2.hex".format(
             fqbn=fqbn, sketch_path=sketch_path

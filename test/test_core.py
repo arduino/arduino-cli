@@ -13,7 +13,7 @@
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
 import os
-
+import platform
 import pytest
 import simplejson as json
 
@@ -105,9 +105,13 @@ def test_core_updateindex_invalid_url(run_command):
     assert result.failed
 
 
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="core fails with fatal error: bits/c++config.h: No such file or directory",
+)
 def test_core_install_esp32(run_command, data_dir):
     # update index
-    url = "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+    url = "https://dl.espressif.com/dl/package_esp32_index.json"
     assert run_command("core update-index --additional-urls={}".format(url))
     # install 3rd-party core
     assert run_command("core install esp32:esp32 --additional-urls={}".format(url))
