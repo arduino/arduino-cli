@@ -29,6 +29,36 @@ var l4 = &libraries.Library{Name: "Another Calculus Lib", Location: libraries.Us
 var l5 = &libraries.Library{Name: "Yet Another Calculus Lib Improved", Location: libraries.User}
 var l6 = &libraries.Library{Name: "Calculus Unified Lib", Location: libraries.User}
 var l7 = &libraries.Library{Name: "AnotherLib", Location: libraries.User}
+var bundleServo = &libraries.Library{Name: "Servo", Location: libraries.IDEBuiltIn, Architectures: []string{"avr", "sam", "samd"}}
+var userServo = &libraries.Library{Name: "Servo", Location: libraries.User, Architectures: []string{"avr", "sam", "samd"}}
+var userServoNonavr = &libraries.Library{Name: "Servo", Location: libraries.User, Architectures: []string{"sam", "samd"}}
+var userAnotherServo = &libraries.Library{Name: "AnotherServo", Location: libraries.User, Architectures: []string{"avr", "sam", "samd", "esp32"}}
+
+func runResolver(include string, arch string, libs ...*libraries.Library) *libraries.Library {
+	libraryList := libraries.List{}
+	libraryList.Add(libs...)
+	resolver := NewCppResolver()
+	resolver.headers[include] = libraryList
+	return resolver.ResolveFor(include, arch)
+}
+
+func TestArchitecturePriority(t *testing.T) {
+	res := runResolver("Servo.h", "avr", bundleServo, userServo)
+	require.NotNil(t, res)
+	require.Equal(t, userServo, res, "selected library")
+
+	res = runResolver("Servo.h", "avr", bundleServo, userServoNonavr)
+	require.NotNil(t, res)
+	require.Equal(t, bundleServo, res, "selected library")
+
+	res = runResolver("Servo.h", "avr", bundleServo, userAnotherServo)
+	require.NotNil(t, res)
+	require.Equal(t, bundleServo, res, "selected library")
+
+	res = runResolver("Servo.h", "esp32", bundleServo, userAnotherServo)
+	require.NotNil(t, res)
+	require.Equal(t, userAnotherServo, res, "selected library")
+}
 
 func TestClosestMatchWithTotallyDifferentNames(t *testing.T) {
 	libraryList := libraries.List{}
