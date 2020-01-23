@@ -50,15 +50,6 @@ func (list *List) FindByName(name string) *Library {
 	return nil
 }
 
-// SortByArchitecturePriority sorts the libraries in descending order using
-// the Arduino lib priority ordering (the first has the higher priority)
-func (list *List) SortByArchitecturePriority(arch string) {
-	sort.Slice(*list, func(i, j int) bool {
-		a, b := (*list)[i], (*list)[j]
-		return a.PriorityForArchitecture(arch) > b.PriorityForArchitecture(arch)
-	})
-}
-
 // SortByName sorts the libraries by name
 func (list *List) SortByName() {
 	sort.Slice(*list, func(i, j int) bool {
