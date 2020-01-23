@@ -18,6 +18,7 @@ package board
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/segmentio/stats/v4"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -106,11 +107,13 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 
 	pm := commands.GetPackageManager(instanceID)
 	if pm == nil {
+		stats.Incr("board.list", stats.Tag{"success", "false"})
 		return nil, errors.New("invalid instance")
 	}
 
 	ports, err := commands.ListBoards(pm)
 	if err != nil {
+		stats.Incr("board.list", stats.Tag{"success", "false"})
 		return nil, errors.Wrap(err, "error getting port list from serial-discovery")
 	}
 
@@ -136,6 +139,7 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 				logrus.Debug("Board not recognized")
 			} else if err != nil {
 				// this is bad, bail out
+				stats.Incr("board.list", stats.Tag{"success", "false"})
 				return nil, errors.Wrap(err, "error getting board info from Arduino Cloud")
 			}
 
@@ -156,5 +160,6 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 		retVal = append(retVal, p)
 	}
 
+	stats.Incr("board.list", stats.Tag{"success", "true"})
 	return retVal, nil
 }
