@@ -29,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/upload"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/segmentio/stats/v4"
 )
 
 // ArduinoCoreServerImpl FIXMEDOC
@@ -46,9 +47,12 @@ func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.Board
 func (s *ArduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardListReq) (*rpc.BoardListResp, error) {
 	ports, err := board.List(req.GetInstance().GetId())
 	if err != nil {
+		// helper function from grpc req to tags
+		stats.Incr("board.list", stats.Tag{"success", "false"})
 		return nil, err
 	}
 
+	stats.Incr("board.list", stats.Tag{"success", "true"})
 	return &rpc.BoardListResp{
 		Ports: ports,
 	}, nil

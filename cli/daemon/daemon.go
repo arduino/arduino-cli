@@ -62,23 +62,27 @@ var daemonize bool
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
 
-	logrus.Infof("configure telemetry")
-
 	// Configure telemetry engine
 	ph := prometheus.DefaultHandler
 
 	// Register the client so it receives metrics from the default engine.
-	stats.Register(ph)
+	engine := stats.WithPrefix("daemon")
+	engine.Register(ph)
 
 	// Flush the default stats engine on return to ensure all buffered
 	// metrics are sent to the server.
 	defer stats.Flush()
-	http.Handle("/metrics", ph)
-	go http.ListenAndServe(":2112", nil)
-	logrus.Infof("Prometheus telemetry is available on /metrics, TCP port 2112")
-	// Set a tag on a counter increment.
-	stats.Incr("user.login", stats.Tag{"user", "luke"})
 
+	// move everything inside commands and search for setting up a common prefix for all metrics sent!
+	logrus.Infof("Setting up Prometheus telemetry on /metrics, TCP port 2112")
+	go func() {
+		http.Handle("/metrics", ph)
+		logrus.Error(http.ListenAndServe(":2112", nil))
+	}()
+
+	engine.Incr("board.yes", stats.Tag{"success", "false"})
+	stats.Flush()
+	engine.Flush()
 	port := viper.GetString("daemon.port")
 	s := grpc.NewServer()
 

@@ -31,6 +31,7 @@ require (
 	github.com/pmylund/sortutil v0.0.0-20120526081524-abeda66eb583
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/schollz/closestmatch v2.1.0+incompatible
+	github.com/segmentio/stats/v4 v4.5.3
 	github.com/sirupsen/logrus v1.4.2
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
 	github.com/spf13/cobra v0.0.5
