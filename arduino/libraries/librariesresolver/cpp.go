@@ -124,17 +124,36 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 	header = simplify(header)
 	name := simplify(lib.Name)
 
-	priority := int(lib.PriorityForArchitecture(arch)) // between 0..255
+	priority := 0
+
+	// Bonus for core-optimized libraries
+	if lib.IsOptimizedForArchitecture(arch) || lib.IsArchitectureIndependent() {
+		priority += 0x0100
+	}
+
+	switch lib.Location {
+	case libraries.IDEBuiltIn:
+		priority += 0x0000
+	case libraries.ReferencedPlatformBuiltIn:
+		priority += 0x0001
+	case libraries.PlatformBuiltIn:
+		priority += 0x0002
+	case libraries.User:
+		priority += 0x0003
+	default:
+		panic(fmt.Sprintf("Invalid library location: %d", lib.Location))
+	}
+
 	if name == header {
-		priority += 0x500
+		priority += 0x0050
 	} else if name == header+"-master" {
-		priority += 0x400
+		priority += 0x0040
 	} else if strings.HasPrefix(name, header) {
-		priority += 0x300
+		priority += 0x0030
 	} else if strings.HasSuffix(name, header) {
-		priority += 0x200
+		priority += 0x0020
 	} else if strings.Contains(name, header) {
-		priority += 0x100
+		priority += 0x0010
 	}
 	return priority
 }
