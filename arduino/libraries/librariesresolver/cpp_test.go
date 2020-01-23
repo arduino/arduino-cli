@@ -31,6 +31,7 @@ var l6 = &libraries.Library{Name: "Calculus Unified Lib", Location: libraries.Us
 var l7 = &libraries.Library{Name: "AnotherLib", Location: libraries.User}
 var bundleServo = &libraries.Library{Name: "Servo", Location: libraries.IDEBuiltIn, Architectures: []string{"avr", "sam", "samd"}}
 var userServo = &libraries.Library{Name: "Servo", Location: libraries.User, Architectures: []string{"avr", "sam", "samd"}}
+var userServoAllArch = &libraries.Library{Name: "Servo", Location: libraries.User, Architectures: []string{"*"}}
 var userServoNonavr = &libraries.Library{Name: "Servo", Location: libraries.User, Architectures: []string{"sam", "samd"}}
 var userAnotherServo = &libraries.Library{Name: "AnotherServo", Location: libraries.User, Architectures: []string{"avr", "sam", "samd", "esp32"}}
 
@@ -58,6 +59,10 @@ func TestArchitecturePriority(t *testing.T) {
 	res = runResolver("Servo.h", "esp32", bundleServo, userAnotherServo)
 	require.NotNil(t, res)
 	require.Equal(t, userAnotherServo, res, "selected library")
+
+	res = runResolver("Servo.h", "esp32", userServoAllArch, userAnotherServo)
+	require.NotNil(t, res)
+	require.Equal(t, userServoAllArch, res, "selected library")
 }
 
 func TestClosestMatchWithTotallyDifferentNames(t *testing.T) {

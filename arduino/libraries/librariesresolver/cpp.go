@@ -127,7 +127,7 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 	priority := 0
 
 	// Bonus for core-optimized libraries
-	if lib.IsOptimizedForArchitecture(arch) {
+	if lib.IsOptimizedForArchitecture(arch) || lib.IsArchitectureIndependent() {
 		priority += 0x0100
 	}
 
