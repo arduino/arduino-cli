@@ -12,6 +12,8 @@
 # otherwise use the software for commercial activities involving the Arduino
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
+import os
+import platform
 import pytest
 import simplejson as json
 
@@ -95,3 +97,101 @@ def test_core_search_no_args(run_command):
             break
     assert found
     assert len(platforms) == num_platforms
+
+
+def test_core_updateindex_invalid_url(run_command):
+    url = "http://www.invalid-domain-asjkdakdhadjkh.com/package_example_index.json"
+    result = run_command("core update-index --additional-urls={}".format(url))
+    assert result.failed
+
+
+@pytest.mark.skipif(
+    platform.system() == "Windows",
+    reason="core fails with fatal error: bits/c++config.h: No such file or directory",
+)
+def test_core_install_esp32(run_command, data_dir):
+    # update index
+    url = "https://dl.espressif.com/dl/package_esp32_index.json"
+    assert run_command("core update-index --additional-urls={}".format(url))
+    # install 3rd-party core
+    assert run_command("core install esp32:esp32 --additional-urls={}".format(url))
+    # create a sketch and compile to double check the core was successfully installed
+    sketch_path = os.path.join(data_dir, "test_core_install_esp32")
+    assert run_command("sketch new {}".format(sketch_path))
+    assert run_command("compile -b esp32:esp32:esp32 {}".format(sketch_path))
+    # prevent regressions for https://github.com/arduino/arduino-cli/issues/163
+    assert os.path.exists(
+        os.path.join(
+            sketch_path, "test_core_install_esp32.esp32.esp32.esp32.partitions.bin"
+        )
+    )
+
+
+def test_core_download(run_command, downloads_dir):
+    assert run_command("core update-index")
+
+    # Download a specific core version
+    assert run_command("core download arduino:avr@1.6.16")
+    assert os.path.exists(os.path.join(downloads_dir, "packages", "avr-1.6.16.tar.bz2"))
+
+    # Wrong core version
+    result = run_command("core download arduino:avr@69.42.0")
+    assert result.failed
+
+    # Wrong core
+    result = run_command("core download bananas:avr")
+    assert result.failed
+
+
+def _in(jsondata, name, version=None):
+    installed_cores = json.loads(jsondata)
+    for c in installed_cores:
+        if name == c.get("ID"):
+            if version is None:
+                return True
+            elif version == c.get("Installed"):
+                return True
+    return False
+
+
+def test_core_install(run_command):
+    assert run_command("core update-index")
+
+    # Install a specific core version
+    assert run_command("core install arduino:avr@1.6.16")
+    result = run_command("core list --format json")
+    assert result.ok
+    assert _in(result.stdout, "arduino:avr", "1.6.16")
+
+    # Replace it with a more recent one
+    assert run_command("core install arduino:avr@1.6.17")
+    result = run_command("core list --format json")
+    assert result.ok
+    assert _in(result.stdout, "arduino:avr", "1.6.17")
+
+    # Confirm core is listed as "updatable"
+    result = run_command("core list --updatable --format json")
+    assert result.ok
+    assert _in(result.stdout, "arduino:avr", "1.6.17")
+
+    # Upgrade the core to latest version
+    assert run_command("core upgrade arduino:avr")
+    result = run_command("core list --format json")
+    assert result.ok
+    assert not _in(result.stdout, "arduino:avr", "1.6.17")
+    # double check the code isn't updatable anymore
+    result = run_command("core list --updatable --format json")
+    assert result.ok
+    assert not _in(result.stdout, "arduino:avr")
+
+
+def test_core_uninstall(run_command):
+    assert run_command("core update-index")
+    assert run_command("core install arduino:avr")
+    result = run_command("core list --format json")
+    assert result.ok
+    assert _in(result.stdout, "arduino:avr")
+    assert run_command("core uninstall arduino:avr")
+    result = run_command("core list --format json")
+    assert result.ok
+    assert not _in(result.stdout, "arduino:avr")

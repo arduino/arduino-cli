@@ -60,6 +60,7 @@ see following paragraph):
 task test-integration
 ```
 ### Running only some tests
+
 By default, all tests from all go packages are run. To run only unit
 tests from one or more specific packages, you can set the TARGETS
 environment variable, e.g.:
@@ -74,11 +75,6 @@ to match against the test function name:
 Both can be combined as well, typically to run only a specific test:
 
     TEST_REGEX='^TestFindBoardWithFQBN$' TARGETS=./arduino/cores/packagemanager task test-unit
-
-For integration test, the same options are supported. Note that when not
-specified, `TEST_REGEX` defaults to "Integration" to select only
-integration tests, so if you specify a broader regex, this could cause
-non-integration tests to be run as well.
 
 ### Integration tests
 
@@ -95,7 +91,8 @@ assess the options are correctly understood and the output is what we expect.
 To run the full suite of integration tests you need an Arduino device attached
 to a serial port and a working Python environment. Chances are that you already
 have Python installed in your system, if this is not the case you can
-[download][3] the official distribution or use the package manager provided by your Operating System.
+[download][3] the official distribution or use the package manager provided by
+your Operating System.
 
 Some dependencies need to be installed before running the tests and to avoid
 polluting your global Python enviroment with dependencies that might be only
@@ -151,7 +148,8 @@ a list of items you can check before submitting a PR:
 * Maintain **clean commit history** and use **meaningful commit messages**.
   PRs with messy commit history are difficult to review and require a lot of
   work to be merged.
-* Your PR must pass all CI tests before we will merge it. If you're seeing an      error and don't think
+* Your PR must pass all CI tests before we will merge it. If you're seeing an
+  error and don't think
   it's your fault, it may not be! The reviewer will help you if there are test
   failures that seem
   not related to the change you are making.
