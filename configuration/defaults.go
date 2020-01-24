@@ -18,7 +18,6 @@ package configuration
 import (
 	"path/filepath"
 
-	"github.com/gofrs/uuid"
 	"github.com/spf13/viper"
 )
 
@@ -41,12 +40,5 @@ func setDefaults(dataDir, userDir string) {
 	viper.SetDefault("telemetry.enabled", true)
 	viper.SetDefault("telemetry.addr", ":2112")
 	viper.SetDefault("telemetry.pattern", "/metrics")
-
-	//Installation ID
-	// FIXME: how should I treat this error?
-	installationID, _ := uuid.NewV4()
-	installationSecret, _ := uuid.NewV4()
-	viper.SetDefault("installation.id", installationID.String())
-	viper.SetDefault("installation.secret", installationSecret.String())
 
 }

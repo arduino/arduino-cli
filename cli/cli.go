@@ -17,6 +17,7 @@ package cli
 
 import (
 	"fmt"
+	"github.com/arduino/arduino-cli/repertory"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -166,6 +167,9 @@ func preRun(cmd *cobra.Command, args []string) {
 	// initialize the config system
 	configuration.Init(configPath)
 	configFile := viper.ConfigFileUsed()
+
+	// initialize repertory
+	repertory.Init()
 
 	//
 	// Prepare logging

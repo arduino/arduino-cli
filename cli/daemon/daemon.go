@@ -18,6 +18,7 @@ package daemon
 import (
 	"errors"
 	"fmt"
+	"github.com/segmentio/stats/v4"
 	"io"
 	"io/ioutil"
 	"net"
@@ -62,8 +63,8 @@ var daemonize bool
 func runDaemonCommand(cmd *cobra.Command, args []string) {
 
 	if viper.GetBool("telemetry.enabled") {
-		telemetry.Activate("daemon", viper.GetString("installation.id"))
-		defer telemetry.Engine.Flush()
+		telemetry.Activate("daemon")
+		defer stats.Flush()
 	}
 
 	port := viper.GetString("daemon.port")
@@ -102,7 +103,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 			// Stdin is closed when the controlling parent process ends
 			_, _ = io.Copy(ioutil.Discard, os.Stdin)
 			if viper.GetBool("telemetry.enabled") {
-				telemetry.Engine.Flush()
+				stats.Flush()
 			}
 			os.Exit(0)
 		}()

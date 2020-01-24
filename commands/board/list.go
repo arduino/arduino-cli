@@ -18,7 +18,6 @@ package board
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/arduino/arduino-cli/telemetry"
 	"github.com/segmentio/stats/v4"
 	"io/ioutil"
 	"net/http"
@@ -108,13 +107,13 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 
 	pm := commands.GetPackageManager(instanceID)
 	if pm == nil {
-		telemetry.Engine.Incr("board.list", stats.T("success", "false"))
+		stats.Incr("board.list", stats.T("success", "false"))
 		return nil, errors.New("invalid instance")
 	}
 
 	ports, err := commands.ListBoards(pm)
 	if err != nil {
-		telemetry.Engine.Incr("board.list", stats.T("success", "false"))
+		stats.Incr("board.list", stats.T("success", "false"))
 		return nil, errors.Wrap(err, "error getting port list from serial-discovery")
 	}
 
@@ -140,7 +139,7 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 				logrus.Debug("Board not recognized")
 			} else if err != nil {
 				// this is bad, bail out
-				telemetry.Engine.Incr("board.list", stats.T("success", "false"))
+				stats.Incr("board.list", stats.T("success", "false"))
 				return nil, errors.Wrap(err, "error getting board info from Arduino Cloud")
 			}
 
@@ -161,6 +160,6 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 		retVal = append(retVal, p)
 	}
 
-	telemetry.Engine.Incr("board.list", stats.T("success", "true"))
+	stats.Incr("board.list", stats.T("success", "true"))
 	return retVal, nil
 }
