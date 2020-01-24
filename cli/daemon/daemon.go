@@ -61,8 +61,10 @@ var daemonize bool
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
 
-	telemetry.Activate("daemon")
-	defer telemetry.Engine.Flush()
+	if viper.GetBool("telemetry.enabled") {
+		telemetry.Activate("daemon", viper.GetString("installation.id"))
+		defer telemetry.Engine.Flush()
+	}
 
 	port := viper.GetString("daemon.port")
 	s := grpc.NewServer()
@@ -99,7 +101,6 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		go func() {
 			// Stdin is closed when the controlling parent process ends
 			_, _ = io.Copy(ioutil.Discard, os.Stdin)
-			telemetry.Engine.Flush()
 			os.Exit(0)
 		}()
 	}

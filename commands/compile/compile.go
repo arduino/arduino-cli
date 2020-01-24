@@ -47,7 +47,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 	tags := map[string]string{
 		"fqbn":            req.Fqbn,
-		"sketchPath":      req.SketchPath,
+		"sketchPath":      telemetry.SanitizeSketchPath(req.SketchPath),
 		"showProperties":  strconv.FormatBool(req.ShowProperties),
 		"preprocess":      strconv.FormatBool(req.Preprocess),
 		"buildProperties": strings.Join(req.BuildProperties, ","),
