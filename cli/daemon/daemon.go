@@ -34,8 +34,7 @@ import (
 	srv_debug "github.com/arduino/arduino-cli/rpc/debug"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/monitor"
 	srv_settings "github.com/arduino/arduino-cli/rpc/settings"
-	stats "github.com/segmentio/stats/v4"
-	"github.com/segmentio/stats/v4/prometheus"
+	"github.com/arduino/arduino-cli/telemetry"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -62,22 +61,8 @@ var daemonize bool
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
 
-	// Configure telemetry engine
-	// Create a Prometheus default handler
-	ph := prometheus.DefaultHandler
-	// Replace the default stats engine with an engine that prepends the "daemon" prefix to all metrics
-	stats.DefaultEngine = stats.WithPrefix("daemon")
-	// Register the handler so it receives metrics from the default engine.
-	stats.Register(ph)
-	// Flush the default stats engine on return to ensure all buffered
-	// metrics are sent to the server.
-	defer stats.Flush()
-	// move everything inside commands and search for setting up a common prefix for all metrics sent!
-	logrus.Infof("Setting up Prometheus telemetry on /metrics, TCP port 2112")
-	go func() {
-		http.Handle("/metrics", ph)
-		logrus.Error(http.ListenAndServe(":2112", nil))
-	}()
+	telemetry.Activate("daemon")
+	defer telemetry.Engine.Flush()
 
 	port := viper.GetString("daemon.port")
 	s := grpc.NewServer()
@@ -114,6 +99,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		go func() {
 			// Stdin is closed when the controlling parent process ends
 			_, _ = io.Copy(ioutil.Discard, os.Stdin)
+			telemetry.Engine.Flush()
 			os.Exit(0)
 		}()
 	}
@@ -147,5 +133,4 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	if err := s.Serve(lis); err != nil {
 		logrus.Fatalf("Failed to serve: %v", err)
 	}
-
 }

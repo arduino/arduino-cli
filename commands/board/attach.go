@@ -28,13 +28,12 @@ import (
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	discovery "github.com/arduino/board-discovery"
-	paths "github.com/arduino/go-paths-helper"
+	"github.com/arduino/board-discovery"
+	"github.com/arduino/go-paths-helper"
 )
 
 // Attach FIXMEDOC
 func Attach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskProgressCB) (*rpc.BoardAttachResp, error) {
-
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")

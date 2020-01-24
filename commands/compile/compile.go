@@ -22,6 +22,7 @@ import (
 	"io"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -33,26 +34,48 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/arduino/arduino-cli/telemetry"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 // Compile FIXMEDOC
 func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.Writer, debug bool) (*rpc.CompileResp, error) {
+
+	tags := map[string]string{
+		"fqbn":            req.Fqbn,
+		"sketchPath":      req.SketchPath,
+		"showProperties":  strconv.FormatBool(req.ShowProperties),
+		"preprocess":      strconv.FormatBool(req.Preprocess),
+		"buildProperties": strings.Join(req.BuildProperties, ","),
+		"warnings":        req.Warnings,
+		"verbose":         strconv.FormatBool(req.Verbose),
+		"quiet":           strconv.FormatBool(req.Quiet),
+		"vidPid":          req.VidPid,
+		"exportFile":      req.ExportFile,
+		"jobs":            strconv.FormatInt(int64(req.Jobs), 10),
+		"libraries":       strings.Join(req.Libraries, ","),
+		"success":         "false",
+	}
+
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
+		telemetry.Engine.Incr("compile", stats.M(tags)...)
 		return nil, errors.New("invalid instance")
 	}
 
 	logrus.Tracef("Compile %s for %s started", req.GetSketchPath(), req.GetFqbn())
 	if req.GetSketchPath() == "" {
+		telemetry.Engine.Incr("compile", stats.M(tags)...)
 		return nil, fmt.Errorf("missing sketchPath")
 	}
 	sketchPath := paths.New(req.GetSketchPath())
 	sketch, err := sketches.NewSketchFromPath(sketchPath)
 	if err != nil {
+		telemetry.Engine.Incr("compile", stats.M(tags)...)
 		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
 
@@ -61,10 +84,12 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		fqbnIn = sketch.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
+		telemetry.Engine.Incr("compile", stats.M(tags)...)
 		return nil, fmt.Errorf("no FQBN provided")
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
+		telemetry.Engine.Incr("compile", stats.M(tags)...)
 		return nil, fmt.Errorf("incorrect FQBN: %s", err)
 	}
 
@@ -78,6 +103,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		// 	"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
 		// 		version.GetAppName()+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
 		// feedback.Error(errorMessage)
+		telemetry.Engine.Incr("compile", stats.M(tags)...)
 		return nil, fmt.Errorf("platform not installed")
 	}
 
@@ -97,6 +123,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		builderCtx.BuildPath = paths.New(req.GetBuildPath())
 		err = builderCtx.BuildPath.MkdirAll()
 		if err != nil {
+			telemetry.Engine.Incr("compile", stats.M(tags)...)
 			return nil, fmt.Errorf("cannot create build directory: %s", err)
 		}
 	}
@@ -125,6 +152,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		builderCtx.BuildCachePath = paths.New(req.GetBuildCachePath())
 		err = builderCtx.BuildCachePath.MkdirAll()
 		if err != nil {
+			telemetry.Engine.Incr("compile", stats.M(tags)...)
 			return nil, fmt.Errorf("cannot create build cache directory: %s", err)
 		}
 	}
@@ -157,13 +185,18 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 	// if --preprocess or --show-properties were passed, we can stop here
 	if req.GetShowProperties() {
+		tags["success"] = "true"
+		telemetry.Engine.Incr("compile", stats.M(tags)...)
 		return &rpc.CompileResp{}, builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
 	} else if req.GetPreprocess() {
+		tags["success"] = "true"
+		telemetry.Engine.Incr("compile", stats.M(tags)...)
 		return &rpc.CompileResp{}, builder.RunPreprocess(builderCtx)
 	}
 
 	// if it's a regular build, go on...
 	if err := builder.RunBuilder(builderCtx); err != nil {
+		telemetry.Engine.Incr("compile", stats.M(tags)...)
 		return nil, err
 	}
 
@@ -199,6 +232,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	// Copy "sketch.ino.*.hex" / "sketch.ino.*.bin" artifacts to sketch directory
 	srcDir, err := outputPath.Parent().ReadDir() // read "/build/path/*"
 	if err != nil {
+		telemetry.Engine.Incr("compile", stats.M(tags)...)
 		return nil, fmt.Errorf("reading build directory: %s", err)
 	}
 	srcDir.FilterPrefix(base + ".")
@@ -209,6 +243,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		dstOutput := exportPath.Join(exportFile + srcFilename)
 		logrus.WithField("from", srcOutput).WithField("to", dstOutput).Debug("copying sketch build output")
 		if err = srcOutput.CopyTo(dstOutput); err != nil {
+			telemetry.Engine.Incr("compile", stats.M(tags)...)
 			return nil, fmt.Errorf("copying output file: %s", err)
 		}
 	}
@@ -219,11 +254,13 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		dstElf := exportPath.Join(exportFile + ".elf")
 		logrus.WithField("from", srcElf).WithField("to", dstElf).Debug("copying sketch build output")
 		if err = srcElf.CopyTo(dstElf); err != nil {
+			telemetry.Engine.Incr("compile", stats.M(tags)...)
 			return nil, fmt.Errorf("copying elf file: %s", err)
 		}
 	}
 
 	logrus.Tracef("Compile %s for %s successful", sketch.Name, fqbnIn)
-
+	tags["success"] = "true"
+	telemetry.Engine.Incr("compile", stats.M(tags)...)
 	return &rpc.CompileResp{}, nil
 }
