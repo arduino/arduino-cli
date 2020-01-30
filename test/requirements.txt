@@ -17,6 +17,7 @@ prometheus-client==0.7.1
 py==1.8.0                 # via pytest
 pyparsing==2.4.0          # via packaging
 pyserial==3.4
+pytest-timeout==1.3.4
 pytest==5.3.4
 pyyaml==5.3
 requests==2.22.0
