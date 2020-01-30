@@ -12,10 +12,11 @@
 # otherwise use the software for commercial activities involving the Arduino
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
-import os
 import json
+import os
 
 import semver
+import yaml
 
 
 def test_help(run_command):
@@ -72,3 +73,19 @@ def test_log_options(run_command, data_dir):
     with open(log_file) as f:
         for line in f.readlines():
             json.loads(line)
+
+
+def test_repertory_creation(run_command, data_dir):
+    """
+    using `version` as a test command
+    """
+
+    # no logs
+    out_lines = run_command("version").stdout.strip().split("\n")
+    assert len(out_lines) == 1
+
+    # json on file
+    repertory_file = os.path.join(data_dir, "repertory.yaml")
+    with open(repertory_file, 'r') as stream:
+        repertory = yaml.safe_load(stream)
+        assert "installation" in repertory
