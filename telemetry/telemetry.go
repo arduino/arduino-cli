@@ -19,10 +19,10 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"github.com/arduino/arduino-cli/repertory"
 	"net/http"
 	"path/filepath"
 
+	"github.com/arduino/arduino-cli/repertory"
 	"github.com/segmentio/stats/v4"
 	"github.com/segmentio/stats/v4/prometheus"
 	"github.com/sirupsen/logrus"
@@ -51,8 +51,8 @@ func Activate(metricPrefix string) {
 
 }
 
-// SanitizeSketchPath uses config generated UUID (installation.secret) as an HMAC secret to sanitize and anonymize the sketch
-// name maintaining it distinguishable from a different sketch from the same Installation
+// SanitizeSketchPath uses config generated UUID (installation.secret) as an HMAC secret to sanitize and anonymize
+// the sketch name maintaining it distinguishable from a different sketch from the same Installation
 func SanitizeSketchPath(sketchPath string) string {
 	logrus.Infof("repertory.Store.ConfigFileUsed() %s", repertory.Store.ConfigFileUsed())
 	installationSecret := repertory.Store.GetString("installation.secret")
