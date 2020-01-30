@@ -169,7 +169,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	configFile := viper.ConfigFileUsed()
 
 	// initialize repertory
-	repertory.Init()
+	repertory.Init(viper.GetString("directories.Data"))
 
 	//
 	// Prepare logging

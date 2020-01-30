@@ -16,10 +16,10 @@
 package repertory
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/configuration"
 	"github.com/gofrs/uuid"
 	"github.com/spf13/viper"
 )
@@ -33,22 +33,18 @@ var (
 )
 
 // Configure configures the Read Only config storage
-func Init() {
-	configPath := configuration.GetDefaultArduinoDataDir()
+func Init(configPath string) {
+	configFilePath := filepath.Join(configPath, Name)
 	Store.SetConfigName(Name)
 	Store.SetConfigType(Type)
 	Store.AddConfigPath(configPath)
-	configFilePath := filepath.Join(configPath, Name)
 	// Attempt to read config file
 	if err := Store.ReadInConfig(); err != nil {
 		// ConfigFileNotFoundError is acceptable, anything else
 		// should be reported to the user
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			generateInstallationData()
-			err := Store.WriteConfigAs(configFilePath)
-			if err != nil {
-				feedback.Errorf("Error writing repertory file: %v", err)
-			}
+			writeStore(configFilePath)
 		} else {
 			feedback.Errorf("Error reading repertory file: %v", err)
 		}
@@ -68,4 +64,17 @@ func generateInstallationData() {
 		feedback.Errorf("Error generating installation.secret: %v", err)
 	}
 	Store.Set("installation.secret", installationSecret.String())
+}
+
+func writeStore(configFilePath string) {
+	configPath := filepath.Dir(configFilePath)
+	// Create dir if not present
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		os.MkdirAll(configPath, 0755)
+	}
+	// Create file if not present
+	err := Store.WriteConfigAs(configFilePath)
+	if err != nil {
+		feedback.Errorf("Error writing repertory file: %v", err)
+	}
 }
