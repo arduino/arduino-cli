@@ -84,7 +84,7 @@ def test_repertory_creation(run_command, data_dir):
     out_lines = run_command("version").stdout.strip().split("\n")
     assert len(out_lines) == 1
 
-    # json on file
+    # parse repertory file
     repertory_file = os.path.join(data_dir, "repertory.yaml")
     with open(repertory_file, 'r') as stream:
         repertory = yaml.safe_load(stream)
