@@ -42,6 +42,20 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 
 	// Resolve all dependencies...
 	deps := lm.Index.ResolveDependencies(reqLibRelease)
+
+	// If no solution has been found
+	if len(deps) == 0 {
+		// Check if there is a problem with the first level deps
+		for _, directDep := range reqLibRelease.GetDependencies() {
+			if _, ok := lm.Index.Libraries[directDep.GetName()]; !ok {
+				return nil, fmt.Errorf("dependency '%s' is not available", directDep.GetName())
+			}
+		}
+
+		// Otherwise there is no possible solution, the depends field has an invalid formula
+		return nil, fmt.Errorf("no valid solution found")
+	}
+
 	res := []*rpc.LibraryDependencyStatus{}
 	for _, dep := range deps {
 		// ...and add information on currently installed versions of the libraries

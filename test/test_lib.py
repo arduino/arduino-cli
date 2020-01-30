@@ -60,6 +60,13 @@ def test_install(run_command):
     assert run_command("lib install {}".format(" ".join(libs)))
     assert run_command("lib install {}".format(" ".join(libs)))
 
+    # Test failing-install of library with wrong dependency
+    # (https://github.com/arduino/arduino-cli/issues/534)
+    result = run_command("lib install MD_Parola@3.2.0")
+    assert (
+        "Error resolving dependencies for MD_Parola@3.2.0: dependency 'MD_MAX72xx' is not available"
+        in result.stderr
+    )
 
 def test_update_index(run_command):
     result = run_command("lib update-index")
