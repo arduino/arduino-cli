@@ -28,11 +28,13 @@ import (
 var Store = viper.New()
 
 var (
+	// Type is the repertory file type
 	Type = "yaml"
+	// Name is the repertory file Name with Type as extension
 	Name = "repertory" + "." + Type
 )
 
-// Configure configures the Read Only config storage
+// Init configures the Read Only config storage
 func Init(configPath string) {
 	configFilePath := filepath.Join(configPath, Name)
 	Store.SetConfigName(Name)
