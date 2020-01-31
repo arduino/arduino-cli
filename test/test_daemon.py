@@ -14,27 +14,18 @@
 # a commercial license, send an email to license@arduino.cc.
 
 import os
-import subprocess
 import time
+
 import pytest
 import requests
 import yaml
 from prometheus_client.parser import text_string_to_metric_families
 
-@pytest.mark.timeout(30)
-def test_telemetry_prometheus_endpoint(pytestconfig, data_dir, downloads_dir):
 
-    # Use raw subprocess here due to a missing functionality in pinned pyinvoke ver,
-    # in order to launch and detach the cli process in daemon mode
-    cli_path = os.path.join(str(pytestconfig.rootdir), "..", "arduino-cli")
-    env = os.environ.copy()
-    env["ARDUINO_DATA_DIR"] = data_dir
-    env["ARDUINO_DOWNLOADS_DIR"] = downloads_dir
-    env["ARDUINO_SKETCHBOOK_DIR"] = data_dir
-    daemon = subprocess.Popen([cli_path, "daemon"], env=env)
-
-
-    # wait for and then parse repertory file
+@pytest.mark.timeout(100)
+def test_telemetry_prometheus_endpoint(daemon_runner, data_dir):
+    # Wait for the repertory file to be created and then parse it
+    # in order to check the generated ids
     repertory_file = os.path.join(data_dir, "repertory.yaml")
     while not os.path.exists(repertory_file):
         time.sleep(1)
@@ -47,5 +38,6 @@ def test_telemetry_prometheus_endpoint(pytestconfig, data_dir, downloads_dir):
         family = next(text_string_to_metric_families(metrics))
         sample = family.samples[0]
         assert repertory["installation"]["id"] == sample.labels["installationID"]
-    #add a fixture here!
-    daemon.kill()
+
+    # Kill the runner's process as we finished our test
+    daemon_runner.kill()
