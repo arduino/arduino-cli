@@ -23,7 +23,6 @@ import (
 )
 
 func main() {
-
 	if err := cli.ArduinoCli.Execute(); err != nil {
 		os.Exit(errorcodes.ErrGeneric)
 	}
