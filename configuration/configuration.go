@@ -38,7 +38,7 @@ func Init(configPath string) {
 
 	// Get default data path if none was provided
 	if configPath == "" {
-		configPath = GetDefaultArduinoDataDir()
+		configPath = getDefaultArduinoDataDir()
 	}
 
 	// Add paths where to search for a config file
@@ -58,7 +58,7 @@ func Init(configPath string) {
 	// those were set through env vars or cli flags
 	dataDir := viper.GetString("directories.Data")
 	if dataDir == "" {
-		dataDir = GetDefaultArduinoDataDir()
+		dataDir = getDefaultArduinoDataDir()
 	}
 	userDir := viper.GetString("directories.User")
 	if userDir == "" {
@@ -79,8 +79,8 @@ func Init(configPath string) {
 
 }
 
-// GetDefaultArduinoDataDir returns the full path to the default arduino folder
-func GetDefaultArduinoDataDir() string {
+// getDefaultArduinoDataDir returns the full path to the default arduino folder
+func getDefaultArduinoDataDir() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		feedback.Errorf("Unable to get user home dir: %v", err)
