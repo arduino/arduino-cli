@@ -76,7 +76,6 @@ func Init(configPath string) {
 			feedback.Errorf("Error reading config file: %v", err)
 		}
 	}
-
 }
 
 // getDefaultArduinoDataDir returns the full path to the default arduino folder
