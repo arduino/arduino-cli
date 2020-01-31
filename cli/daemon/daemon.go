@@ -18,8 +18,6 @@ package daemon
 import (
 	"errors"
 	"fmt"
-	"github.com/arduino/arduino-cli/telemetry"
-	"github.com/segmentio/stats/v4"
 	"io"
 	"io/ioutil"
 	"net"
@@ -36,6 +34,8 @@ import (
 	srv_debug "github.com/arduino/arduino-cli/rpc/debug"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/monitor"
 	srv_settings "github.com/arduino/arduino-cli/rpc/settings"
+	"github.com/arduino/arduino-cli/telemetry"
+	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

@@ -17,7 +17,6 @@ package cli
 
 import (
 	"fmt"
-	"github.com/arduino/arduino-cli/repertory"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -40,6 +39,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/repertory"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"

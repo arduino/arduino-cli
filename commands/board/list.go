@@ -18,7 +18,6 @@ package board
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/segmentio/stats/v4"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -28,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/pkg/errors"
+	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 )
 
