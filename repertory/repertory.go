@@ -52,7 +52,6 @@ func Init(configPath string) {
 }
 
 func generateInstallationData() {
-
 	installationID, err := uuid.NewV4()
 	if err != nil {
 		feedback.Errorf("Error generating installation.id: %v", err)
