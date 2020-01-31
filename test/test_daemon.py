@@ -22,7 +22,7 @@ import yaml
 from prometheus_client.parser import text_string_to_metric_families
 
 
-@pytest.mark.timeout(100)
+@pytest.mark.timeout(60)
 def test_telemetry_prometheus_endpoint(daemon_runner, data_dir):
     # Wait for the repertory file to be created and then parse it
     # in order to check the generated ids
