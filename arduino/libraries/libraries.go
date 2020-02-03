@@ -83,9 +83,6 @@ func (library *Library) String() string {
 // - the library is architecture independent
 // - the library doesn't specify any `architecture` field in library.properties
 func (library *Library) SupportsAnyArchitectureIn(archs ...string) bool {
-	if len(library.Architectures) == 0 {
-		return true
-	}
 	if library.IsArchitectureIndependent() {
 		return true
 	}
@@ -113,7 +110,7 @@ func (library *Library) IsOptimizedForArchitecture(arch string) bool {
 // compatible with all architectures (the `architecture` field in
 // library.properties contains the `*` item)
 func (library *Library) IsArchitectureIndependent() bool {
-	return library.IsOptimizedForArchitecture("*")
+	return library.IsOptimizedForArchitecture("*") || library.Architectures == nil || len(library.Architectures) == 0
 }
 
 // SourceDir represents a source dir of a library
