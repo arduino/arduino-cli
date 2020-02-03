@@ -127,33 +127,41 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 	priority := 0
 
 	// Bonus for core-optimized libraries
-	if lib.IsOptimizedForArchitecture(arch) || lib.IsArchitectureIndependent() {
-		priority += 0x0100
+	if lib.IsOptimizedForArchitecture(arch) {
+		// give a slightly better bonus for libraries that have specific optimization
+		// (it is more important than Location but less important than Name)
+		priority += 1010
+	} else if lib.IsArchitectureIndependent() {
+		// standard bonus for architecture independent (vanilla) libraries
+		priority += 1000
+	} else {
+		// the library is not architecture compatible
+		priority += 0
+	}
+
+	if name == header {
+		priority += 500
+	} else if name == header+"-master" {
+		priority += 400
+	} else if strings.HasPrefix(name, header) {
+		priority += 300
+	} else if strings.HasSuffix(name, header) {
+		priority += 200
+	} else if strings.Contains(name, header) {
+		priority += 100
 	}
 
 	switch lib.Location {
 	case libraries.IDEBuiltIn:
-		priority += 0x0000
+		priority += 0
 	case libraries.ReferencedPlatformBuiltIn:
-		priority += 0x0001
+		priority += 1
 	case libraries.PlatformBuiltIn:
-		priority += 0x0002
+		priority += 2
 	case libraries.User:
-		priority += 0x0003
+		priority += 3
 	default:
 		panic(fmt.Sprintf("Invalid library location: %d", lib.Location))
-	}
-
-	if name == header {
-		priority += 0x0050
-	} else if name == header+"-master" {
-		priority += 0x0040
-	} else if strings.HasPrefix(name, header) {
-		priority += 0x0030
-	} else if strings.HasSuffix(name, header) {
-		priority += 0x0020
-	} else if strings.Contains(name, header) {
-		priority += 0x0010
 	}
 	return priority
 }

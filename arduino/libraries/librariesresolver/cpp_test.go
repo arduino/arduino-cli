@@ -76,6 +76,17 @@ func TestArchitecturePriority(t *testing.T) {
 	res = runResolver("Servo.h", "esp32", userServoAllArch, userAnotherServo)
 	require.NotNil(t, res)
 	require.Equal(t, userServoAllArch, res, "selected library")
+
+	userSDAllArch := &libraries.Library{
+		Name:          "SD",
+		Location:      libraries.User,
+		Architectures: []string{"*"}}
+	builtinSDesp := &libraries.Library{
+		Name:          "SD",
+		Location:      libraries.PlatformBuiltIn,
+		Architectures: []string{"esp8266"}}
+	res = runResolver("SD.h", "esp8266", userSDAllArch, builtinSDesp)
+	require.Equal(t, builtinSDesp, res, "selected library")
 }
 
 func TestClosestMatchWithTotallyDifferentNames(t *testing.T) {
