@@ -155,7 +155,7 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 	case libraries.IDEBuiltIn:
 		priority += 0
 	case libraries.ReferencedPlatformBuiltIn:
-		priority += 1
+		priority++
 	case libraries.PlatformBuiltIn:
 		priority += 2
 	case libraries.User:
