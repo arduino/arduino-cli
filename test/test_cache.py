@@ -13,10 +13,9 @@
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
 import os
-import platform
 
 
-def test_cache_clean(run_command):
+def test_cache_clean(run_command, data_dir):
     """
     Clean the cache under arduino caching file directory which is
     "<Arduino configure file path>/staging"
@@ -31,11 +30,4 @@ def test_cache_clean(run_command):
     result = run_command("cache clean")
     assert result.ok
 
-    running_platform = platform.system()
-    homeDir = os.path.expanduser("~")
-    if running_platform == "Linux":
-        assert not (os.path.isdir(homeDir + ".arduino15/staging"))
-    elif running_platform == "Darwin":
-        assert not (os.path.isdir(homeDir + "Library/Arduino15/staging"))
-    elif running_platform == "Windows":
-        assert not (os.path.isdir(homeDir + "Arduino15/staging"))
+    assert not os.path.isdir(os.path.join(data_dir, "staging"))
