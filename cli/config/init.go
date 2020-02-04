@@ -26,6 +26,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+var destDir string
+
+const defaultFileName = "arduino-cli.yaml"
+
 func initInitCommand() *cobra.Command {
 	initCommand := &cobra.Command{
 		Use:   "init",
@@ -37,31 +41,28 @@ func initInitCommand() *cobra.Command {
 		Args: cobra.NoArgs,
 		Run:  runInitCommand,
 	}
-	initCommand.Flags().StringVar(&initFlags.location, "save-as", "",
-		"Sets where to save the configuration file [default is ./arduino-cli.yaml].")
+	initCommand.Flags().StringVar(&destDir, "dest-dir", "", "Sets where to save the configuration file.")
 	return initCommand
 }
 
-var initFlags struct {
-	location string // The custom location of the file to create.
-}
-
 func runInitCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino config init`")
+	if destDir == "" {
+		destDir = viper.GetString("directories.Data")
+	}
+	logrus.Infof("Writing config file to: %s", destDir)
 
-	dataDir := viper.GetString("directories.Data")
-	if err := os.MkdirAll(dataDir, os.FileMode(0755)); err != nil {
-		feedback.Errorf("Cannot create data directory: %v", err)
+	if err := os.MkdirAll(destDir, os.FileMode(0755)); err != nil {
+		feedback.Errorf("Cannot create config file directory: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	configFile := filepath.Join(dataDir, "arduino-cli.yaml")
-	err := viper.WriteConfigAs(configFile)
-	if err != nil {
+	configFile := filepath.Join(destDir, defaultFileName)
+	if err := viper.WriteConfigAs(configFile); err != nil {
 		feedback.Errorf("Cannot create config file: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	feedback.Print("Config file written: " + configFile)
-	logrus.Info("Done")
+	msg := "Config file written to: " + configFile
+	logrus.Info(msg)
+	feedback.Print(msg)
 }
