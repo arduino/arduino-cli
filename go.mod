@@ -17,7 +17,7 @@ require (
 	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-errors/errors v1.0.1
-	github.com/golang/protobuf v1.3.2
+	github.com/golang/protobuf v1.3.3
 	github.com/h2non/filetype v1.0.8 // indirect
 	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5 // indirect
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
@@ -42,10 +42,11 @@ require (
 	go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18
 	go.bug.st/serial v1.0.0
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect
-	golang.org/x/net v0.0.0-20190311183353-d8887717615a
-	golang.org/x/text v0.3.0
-	google.golang.org/genproto v0.0.0-20190327125643-d831d65fe17d // indirect
-	google.golang.org/grpc v1.21.1
+	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
+	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect
+	golang.org/x/text v0.3.2
+	google.golang.org/genproto v0.0.0-20200204135345-fa8e72b47b90 // indirect
+	google.golang.org/grpc v1.27.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
 	gopkg.in/yaml.v2 v2.2.2
