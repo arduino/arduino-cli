@@ -45,4 +45,4 @@ def test_telemetry_prometheus_endpoint(daemon_runner, data_dir):
     os_signal = signal.SIGTERM
     if platform.system() != "Windows":
         os_signal = signal.SIGKILL
-    os.kill(daemon_runner.pid, os_signal)
+    os.kill(daemon_runner.process.pid, os_signal)
