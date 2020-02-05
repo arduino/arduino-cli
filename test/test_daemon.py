@@ -14,7 +14,9 @@
 # a commercial license, send an email to license@arduino.cc.
 
 import os
+import signal
 import time
+from sys import platform
 
 import pytest
 import requests
@@ -39,5 +41,8 @@ def test_telemetry_prometheus_endpoint(daemon_runner, data_dir):
         sample = family.samples[0]
         assert repertory["installation"]["id"] == sample.labels["installationID"]
 
-    # Kill the runner's process as we finished our test
-    daemon_runner.kill()
+    # Kill the runner's process as we finished our test (platform dependent)
+    os_signal = signal.SIGKILL
+    if platform.system() == "Windows":
+        os_signal = signal.SIGTERM
+    os.kill(daemon_runner.pid, os_signal)
