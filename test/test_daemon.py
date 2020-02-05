@@ -42,7 +42,7 @@ def test_telemetry_prometheus_endpoint(daemon_runner, data_dir):
         assert repertory["installation"]["id"] == sample.labels["installationID"]
 
     # Kill the runner's process as we finished our test (platform dependent)
-    os_signal = signal.SIGKILL
-    if platform.system() == "Windows":
-        os_signal = signal.SIGTERM
+    os_signal = signal.SIGTERM
+    if platform.system() != "Windows":
+        os_signal = signal.SIGKILL
     os.kill(daemon_runner.pid, os_signal)
