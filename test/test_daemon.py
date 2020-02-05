@@ -14,9 +14,9 @@
 # a commercial license, send an email to license@arduino.cc.
 
 import os
+import platform
 import signal
 import time
-from sys import platform
 
 import pytest
 import requests
