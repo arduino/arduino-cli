@@ -38,62 +38,62 @@ builds:
     id: arduino_cli_arm
     binary: arduino-cli
     env:
-     - CGO_ENABLED=1
-     - CC=/usr/arm-linux-gnueabi/bin/cc
+      - CGO_ENABLED=1
+      - CC=/usr/arm-linux-gnueabi/bin/cc
     goos:
-     - linux
+      - linux
     goarch:
-     - arm
+      - arm
     goarm:
-     - 6
+      - 6
     ldflags:
-     - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
-     - "-extldflags '-static'"
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - "-extldflags '-static'"
   -
     # ARMv7
     id: arduino_cli_armv7
     binary: arduino-cli
     env:
-     - CGO_ENABLED=1
-     - CC=/usr/arm-linux-gnueabihf/bin/cc
+      - CGO_ENABLED=1
+      - CC=/usr/arm-linux-gnueabihf/bin/cc
     goos:
-     - linux
+      - linux
     goarch:
-     - arm
+      - arm
     goarm:
-     - 7
+      - 7
     ldflags:
-     - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
-     - "-extldflags '-static'"
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - "-extldflags '-static'"
   -
     # ARM64
     id: arduino_cli_arm64
     binary: arduino-cli
     env:
-     - CGO_ENABLED=1
-     - CC=/usr/aarch64-linux-gnu/bin/cc
+      - CGO_ENABLED=1
+      - CC=/usr/aarch64-linux-gnu/bin/cc
     goos:
-     - linux
+      - linux
     goarch:
-     - arm64
+      - arm64
     ldflags:
-     - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
-     - "-extldflags '-static'"
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - "-extldflags '-static'"
   -
     # All the other platforms
     id: arduino_cli
     binary: arduino-cli
     env:
-     - CGO_ENABLED=0
+      - CGO_ENABLED=0
     goos:
-     - linux
-     - windows
+      - linux
+      - windows
     goarch:
-     - amd64
-     - 386
+      - amd64
+      - 386
     ldflags:
-     - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
-     - "-extldflags '-static'"
+      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - "-extldflags '-static'"
 
 archives:
   -
