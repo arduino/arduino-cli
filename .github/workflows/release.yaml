@@ -6,7 +6,8 @@ on:
       - '[0-9].[0-9].[0-9]*'
 
 jobs:
-  publish-release:
+
+  create-release-artifacts:
     runs-on: ubuntu-latest
 
     container:
@@ -16,13 +17,120 @@ jobs:
         - $PWD/go:/go
 
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v1
 
-      - name: build
+      - name: Build
+        run: goreleaser
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: dist
+          path: dist
+
+  notarize-macos:
+    runs-on: macos-latest
+    needs: create-release-artifacts
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: dist
+
+      - name: Get the current release tag
+        id: get_tag
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+      - name: Download Gon
+        run: |
+          wget -q https://github.com/mitchellh/gon/releases/download/v0.2.2/gon_0.2.2_macos.zip
+          unzip gon_0.2.2_macos.zip -d /usr/local/bin
+          rm -f gon_0.2.2_macos.zip
+
+      - name: Notarize binary, re-package it and update checksum
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          TAG: ${{ steps.get_tag.outputs.VERSION }}
+          AC_USERNAME: ${{ secrets.AC_USERNAME }}
+          AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
+        # This step performs the following:
+        # 1. Download keychain from GH secrets and decode it from base64
+        # 2. Add the keychain to the system keychains and unlock it
+        # 3. Call Gon to start notarization process (using AC_USERNAME and AC_PASSWORD)
+        # 4. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
+        # 5. Recalculate package checksum and replace it in the goreleaser nnnnnn-checksums.txt file
+        # 6. Remove the keychain from disk
+        run: |
+          echo "${{ secrets.KEYCHAIN }}" | base64 --decode  > ~/Library/Keychains/apple-developer.keychain-db
+          security list-keychains -s ~/Library/Keychains/apple-developer.keychain-db
+          security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" ~/Library/Keychains/apple-developer.keychain-db
+          gon gon.config.hcl
+          tar -czvf dist/arduino-cli_${TAG}_macOS_64bit.tar.gz \
+          -C dist/arduino_cli_osx_darwin_amd64/  arduino-cli   \
+          -C ../../ LICENSE.txt
+          CLI_CHECKSUM=$(shasum -a 256 dist/arduino-cli_${TAG}_macOS_64bit.tar.gz | cut -d " " -f 1)
+          perl -pi -w -e "s/.*arduino-cli_${TAG}_macOS_64bit.tar.gz/${CLI_CHECKSUM}  arduino-cli_${TAG}_macOS_64bit.tar.gz/g;" dist/*-checksums.txt
+          rm -f apple-developer.keychain-db
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: dist
+          path: dist
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: notarize-macos
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Download artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: dist
+
+      - name: Read CHANGELOG
+        id: changelog
+        run: |
+          body=$(cat dist/CHANGELOG.md)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}"
+          echo $body
+          echo "::set-output name=BODY::$body"
+
+      - name: Create Github Release
+        id: create_release
+        uses: actions/create-release@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body: ${{ steps.changelog.outputs.BODY }}
+          draft: false
+          prerelease: false
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dist/*
+          tag: ${{ github.ref }}
+          file_glob: true
+
+      - name: Downloads upload
+        uses: docker://plugins/s3
+        env:
+          PLUGIN_SOURCE: 'dist/*'
+          PLUGIN_TARGET: '/arduino-cli/__tmp/'
+          PLUGIN_STRIP_PREFIX: 'dist/'
+          PLUGIN_BUCKET: 'arduino-downloads-prod-beagle'
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: 'us-east-1'
-        run: goreleaser
