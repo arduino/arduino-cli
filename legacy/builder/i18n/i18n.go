@@ -20,7 +20,6 @@ import (
 	"io"
 	"net/url"
 	"os"
-	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -209,9 +208,10 @@ func (s MachineLogger) UnformattedWrite(w io.Writer, data []byte) {
 func printMachineFormattedLogLine(w io.Writer, level string, format string, a []interface{}) {
 	a = append([]interface{}(nil), a...)
 	for idx, value := range a {
-		typeof := reflect.Indirect(reflect.ValueOf(value)).Kind()
-		if typeof == reflect.String {
-			a[idx] = url.QueryEscape(value.(string))
+		if str, ok := value.(string); ok {
+			a[idx] = url.QueryEscape(str)
+		} else if stringer, ok := value.(fmt.Stringer); ok {
+			a[idx] = url.QueryEscape(stringer.String())
 		}
 	}
 	fprintf(w, "===%s ||| %s ||| %s\n", level, format, a)
