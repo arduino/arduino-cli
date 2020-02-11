@@ -16,6 +16,7 @@
 package phases
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -31,6 +32,8 @@ import (
 
 var PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC = map[string]bool{".a": true}
 var PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_DYNAMIC = map[string]bool{".so": true}
+var FLOAT_ABI_CFLAG = "float-abi"
+var FPU_CFLAG = "fpu"
 
 type LibrariesBuilder struct{}
 
@@ -57,28 +60,83 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	return nil
 }
 
+func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Library) *paths.Path {
+	mcu := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
+	// Add fpu specifications if they exist
+	// To do so, resolve recipe.cpp.o.pattern,
+	// search for -mfpu=xxx -mfloat-abi=yyy and add to a subfolder
+	command, _ := builder_utils.PrepareCommandForRecipe(ctx, ctx.BuildProperties, constants.RECIPE_CPP_PATTERN, true)
+	fpuSpecs := ""
+	for _, el := range strings.Split(command.String(), " ") {
+		if strings.Contains(el, FPU_CFLAG) {
+			toAdd := strings.Split(el, "=")
+			if len(toAdd) > 1 {
+				fpuSpecs += strings.TrimSpace(toAdd[1]) + "-"
+				break
+			}
+		}
+	}
+	for _, el := range strings.Split(command.String(), " ") {
+		if strings.Contains(el, FLOAT_ABI_CFLAG) {
+			toAdd := strings.Split(el, "=")
+			if len(toAdd) > 1 {
+				fpuSpecs += strings.TrimSpace(toAdd[1]) + "-"
+				break
+			}
+		}
+	}
+
+	logger := ctx.GetLogger()
+	if len(fpuSpecs) > 0 {
+		fpuSpecs = strings.TrimRight(fpuSpecs, "-")
+		if library.SourceDir.Join(mcu).Join(fpuSpecs).Exist() {
+			return library.SourceDir.Join(mcu).Join(fpuSpecs)
+		} else {
+			// we are unsure, compile from sources
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO,
+				constants.MSG_PRECOMPILED_LIBRARY_NOT_FOUND_FOR, library.Name, library.SourceDir.Join(mcu).Join(fpuSpecs))
+			return nil
+		}
+	}
+
+	if library.SourceDir.Join(mcu).Exist() {
+		return library.SourceDir.Join(mcu)
+	}
+
+	logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO,
+		constants.MSG_PRECOMPILED_LIBRARY_NOT_FOUND_FOR, library.Name, library.SourceDir.Join(mcu))
+
+	return nil
+}
+
 func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libs libraries.List) error {
 
 	for _, library := range libs {
 		if library.Precompiled {
 			// add library src path to compiler.c.elf.extra_flags
 			// use library.Name as lib name and srcPath/{mcpu} as location
-			mcu := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
-			path := library.SourceDir.Join(mcu).String()
+			path := findExpectedPrecompiledLibFolder(ctx, library)
+			if path == nil {
+				break
+			}
 			// find all library names in the folder and prepend -l
 			filePaths := []string{}
 			libs_cmd := library.LDflags + " "
-			extensions := func(ext string) bool { return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_DYNAMIC[ext] }
-			utils.FindFilesInFolder(&filePaths, path, extensions, true)
+			extensions := func(ext string) bool {
+				return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_DYNAMIC[ext] || PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext]
+			}
+			utils.FindFilesInFolder(&filePaths, path.String(), extensions, false)
 			for _, lib := range filePaths {
 				name := strings.TrimSuffix(filepath.Base(lib), filepath.Ext(lib))
 				// strip "lib" first occurrence
-				name = strings.Replace(name, "lib", "", 1)
-				libs_cmd += "-l" + name + " "
+				if strings.HasPrefix(name, "lib") {
+					name = strings.Replace(name, "lib", "", 1)
+					libs_cmd += "-l" + name + " "
+				}
 			}
 
 			currLDFlags := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS)
-			ctx.BuildProperties.Set(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS, currLDFlags+"\"-L"+path+"\" "+libs_cmd+" ")
+			ctx.BuildProperties.Set(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS, currLDFlags+"\"-L"+path.String()+"\" "+libs_cmd+" ")
 		}
 	}
 	return nil
@@ -115,15 +173,21 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 		extensions := func(ext string) bool { return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext] }
 
 		filePaths := []string{}
-		mcu := buildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
-		err := utils.FindFilesInFolder(&filePaths, library.SourceDir.Join(mcu).String(), extensions, true)
-		if err != nil {
-			return nil, i18n.WrapError(err)
-		}
-		for _, path := range filePaths {
-			if strings.Contains(filepath.Base(path), library.RealName) {
-				objectFiles.Add(paths.New(path))
+		precompiledPath := findExpectedPrecompiledLibFolder(ctx, library)
+		if precompiledPath != nil {
+			// TODO: This codepath is just taken for .a with unusual names that would
+			// be ignored by -L / -l methods.
+			// Should we force precompiled libraries to start with "lib" ?
+			err := utils.FindFilesInFolder(&filePaths, precompiledPath.String(), extensions, false)
+			if err != nil {
+				return nil, i18n.WrapError(err)
 			}
+			for _, path := range filePaths {
+				if !strings.HasPrefix(filepath.Base(path), "lib") {
+					objectFiles.Add(paths.New(path))
+				}
+			}
+			return objectFiles, nil
 		}
 	}
 
