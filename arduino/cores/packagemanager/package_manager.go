@@ -323,16 +323,34 @@ func (tr *ToolReleaseActions) Get() (*cores.ToolRelease, error) {
 
 // GetInstalledPlatformRelease returns the PlatformRelease installed (it is chosen)
 func (pm *PackageManager) GetInstalledPlatformRelease(platform *cores.Platform) *cores.PlatformRelease {
+	pm.Log.Infof("Selecting installed platform release for %s", platform)
 	releases := platform.GetAllInstalled()
 	if len(releases) == 0 {
 		return nil
 	}
+
+	log := func(msg string, pl *cores.PlatformRelease) {
+		pm.Log.WithField("bundle", pl.IsIDEBundled).
+			WithField("version", pl.Version).
+			WithField("managed", pm.IsManagedPlatformRelease(pl)).
+			Infof("%s: %s", msg, pl)
+	}
+
 	best := releases[0]
 	bestIsManaged := pm.IsManagedPlatformRelease(best)
+	log("current best", best)
+
 	for _, candidate := range releases[1:] {
 		candidateIsManaged := pm.IsManagedPlatformRelease(candidate)
+		log("candidate", candidate)
+		// TODO: Disentangle this algorithm and make it more straightforward
 		if bestIsManaged == candidateIsManaged {
-			if candidate.Version.GreaterThan(best.Version) {
+			if best.IsIDEBundled == candidate.IsIDEBundled {
+				if candidate.Version.GreaterThan(best.Version) {
+					best = candidate
+				}
+			}
+			if best.IsIDEBundled && !candidate.IsIDEBundled {
 				best = candidate
 			}
 		}
@@ -340,6 +358,7 @@ func (pm *PackageManager) GetInstalledPlatformRelease(platform *cores.Platform) 
 			best = candidate
 			bestIsManaged = true
 		}
+		log("current best", best)
 	}
 	return best
 }

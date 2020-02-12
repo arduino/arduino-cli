@@ -179,6 +179,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 			}
 
 			// check if package_bundled_index.json exists
+			isIDEBundled := false
 			packageBundledIndexPath := packageDir.Parent().Join("package_index_bundled.json")
 			if packageBundledIndexPath.Exist() {
 				// particular case: ARCHITECTURE/boards.txt with package_bundled_index.json
@@ -204,12 +205,18 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 				} else {
 					version = tmpPlatformRelease.Version
 				}
+
+				isIDEBundled = true
 			}
 
 			platform := targetPackage.GetOrCreatePlatform(architecture)
 			release, err := platform.GetOrCreateRelease(version)
 			if err != nil {
 				return fmt.Errorf("loading platform release: %s", err)
+			}
+			release.IsIDEBundled = isIDEBundled
+			if isIDEBundled {
+				pm.Log.Infof("Package is built-in")
 			}
 			if err := pm.loadPlatformRelease(release, platformPath); err != nil {
 				return fmt.Errorf("loading platform release: %s", err)
