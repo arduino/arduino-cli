@@ -61,7 +61,7 @@ jobs:
         # 1. Download keychain from GH secrets and decode it from base64
         # 2. Add the keychain to the system keychains and unlock it
         # 3. Call Gon to start notarization process (using AC_USERNAME and AC_PASSWORD)
-        # 4. Repackage the signed binary replaced in place by Gon
+        # 4. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
         # 5. Recalculate package checksum and replace it in the goreleaser nnnnnn-checksums.txt file
         run: |
           echo "${{ secrets.KEYCHAIN }}" | base64 --decode  > ~/Library/Keychains/apple-developer.keychain-db
