@@ -61,9 +61,8 @@ jobs:
         # 1. Download keychain from GH secrets and decode it from base64
         # 2. Add the keychain to the system keychains and unlock it
         # 3. Call Gon to start notarization process (using AC_USERNAME and AC_PASSWORD)
-        # 4. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
+        # 4. Repackage the signed binary replaced in place by Gon
         # 5. Recalculate package checksum and replace it in the goreleaser nnnnnn-checksums.txt file
-        # 6. Remove the keychain from disk
         run: |
           echo "${{ secrets.KEYCHAIN }}" | base64 --decode  > ~/Library/Keychains/apple-developer.keychain-db
           security list-keychains -s ~/Library/Keychains/apple-developer.keychain-db
@@ -74,7 +73,6 @@ jobs:
           -C ../../ LICENSE.txt
           CLI_CHECKSUM=$(shasum -a 256 dist/arduino-cli_${TAG}_macOS_64bit.tar.gz | cut -d " " -f 1)
           perl -pi -w -e "s/.*arduino-cli_${TAG}_macOS_64bit.tar.gz/${CLI_CHECKSUM}  arduino-cli_${TAG}_macOS_64bit.tar.gz/g;" dist/*-checksums.txt
-          rm -f apple-developer.keychain-db
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v1
@@ -117,7 +115,7 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload binaries to release
+      - name: Upload release files on Github
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -125,7 +123,7 @@ jobs:
           tag: ${{ github.ref }}
           file_glob: true
 
-      - name: Downloads upload
+      - name: Upload release files on Arduino downloads servers
         uses: docker://plugins/s3
         env:
           PLUGIN_SOURCE: 'dist/*'
