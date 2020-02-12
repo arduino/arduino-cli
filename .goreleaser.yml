@@ -6,7 +6,7 @@ snapshot:
   name_template: '{{ .Env.PACKAGE_NAME_PREFIX }}-{{ time "20060102" }}'
 
 release:
-  prerelease: auto
+  disable: true
 
 changelog:
   filters:
@@ -112,11 +112,3 @@ archives:
       windows: Windows
     files:
       - LICENSE.txt
-
-blob:
-  -
-    provider: s3
-    bucket: arduino-downloads-prod-beagle
-    ids:
-      - arduino_cli
-    folder: "{{ .ProjectName }}"
