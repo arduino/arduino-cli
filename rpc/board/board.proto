@@ -15,14 +15,14 @@
 
 syntax = "proto3";
 
-package cc.arduino.cli.commands;
+package cc.arduino.cli.board;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/commands";
+option go_package = "github.com/arduino/arduino-cli/rpc/board";
 
 import "commands/common.proto";
 
 message BoardDetailsReq {
-  Instance instance = 1;
+  cc.arduino.cli.commands.Instance instance = 1;
   string fqbn = 2;
 }
 
@@ -51,18 +51,18 @@ message RequiredTool {
 }
 
 message BoardAttachReq {
-  Instance instance = 1;
+  cc.arduino.cli.commands.Instance instance = 1;
   string board_uri = 2;
   string sketch_path = 3;
   string search_timeout = 4;
 }
 
 message BoardAttachResp {
-  TaskProgress task_progress = 1;
+  cc.arduino.cli.commands.TaskProgress task_progress = 1;
 }
 
 message BoardListReq {
-  Instance instance = 1;
+  cc.arduino.cli.commands.Instance instance = 1;
 }
 
 message BoardListResp {
@@ -77,7 +77,7 @@ message DetectedPort {
 }
 
 message BoardListAllReq {
-  Instance instance = 1;
+  cc.arduino.cli.commands.Instance instance = 1;
 	repeated string search_args = 2;
 }
 

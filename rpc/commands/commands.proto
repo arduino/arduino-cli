@@ -20,7 +20,6 @@ package cc.arduino.cli.commands;
 option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 
 import "commands/common.proto";
-import "commands/board.proto";
 import "commands/compile.proto";
 import "commands/core.proto";
 import "commands/upload.proto";
@@ -47,18 +46,6 @@ service ArduinoCore {
   rpc UpdateLibrariesIndex(UpdateLibrariesIndexReq) returns (stream UpdateLibrariesIndexResp) {}
 
   rpc Version(VersionReq) returns (VersionResp) {}
-
-  // BOARD COMMANDS
-  // --------------
-
-  // Requests details about a board
-  rpc BoardDetails(BoardDetailsReq) returns (BoardDetailsResp);
-
-  rpc BoardAttach(BoardAttachReq) returns (stream BoardAttachResp);
-
-  rpc BoardList(BoardListReq) returns (BoardListResp);
-
-  rpc BoardListAll(BoardListAllReq) returns (BoardListAllResp);
 
   rpc Compile(CompileReq) returns (stream CompileResp);
 

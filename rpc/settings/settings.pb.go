@@ -277,11 +277,11 @@ var fileDescriptor_a4bfd59e429426d0 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConnInterface
+var _ grpc.ClientConn
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion6
+const _ = grpc.SupportPackageIsVersion4
 
 // SettingsClient is the client API for Settings service.
 //
@@ -294,10 +294,10 @@ type SettingsClient interface {
 }
 
 type settingsClient struct {
-	cc grpc.ClientConnInterface
+	cc *grpc.ClientConn
 }
 
-func NewSettingsClient(cc grpc.ClientConnInterface) SettingsClient {
+func NewSettingsClient(cc *grpc.ClientConn) SettingsClient {
 	return &settingsClient{cc}
 }
 

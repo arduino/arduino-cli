@@ -25,7 +25,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/board"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )

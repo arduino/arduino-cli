@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/board"
 )
 
 // ListAll FIXMEDOC

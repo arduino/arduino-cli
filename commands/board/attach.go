@@ -27,7 +27,8 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/board"
+	commonrpc "github.com/arduino/arduino-cli/rpc/commands"
 	discovery "github.com/arduino/board-discovery"
 	paths "github.com/arduino/go-paths-helper"
 )
@@ -89,7 +90,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskPr
 		if board == nil {
 			return nil, fmt.Errorf("no supported board found at %s", deviceURI.String())
 		}
-		taskCB(&rpc.TaskProgress{Name: "Board found: " + board.Name()})
+		taskCB(&commonrpc.TaskProgress{Name: "Board found: " + board.Name()})
 
 		// TODO: should be stoped the monitor: when running as a pure CLI  is released
 		// by the OS, when run as daemon the resource's state is unknown and could be leaked.
@@ -103,7 +104,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskPr
 	if err != nil {
 		return nil, fmt.Errorf("cannot export sketch metadata: %s", err)
 	}
-	taskCB(&rpc.TaskProgress{Name: "Selected fqbn: " + sketch.Metadata.CPU.Fqbn, Completed: true})
+	taskCB(&commonrpc.TaskProgress{Name: "Selected fqbn: " + sketch.Metadata.CPU.Fqbn, Completed: true})
 	return &rpc.BoardAttachResp{}, nil
 }
 

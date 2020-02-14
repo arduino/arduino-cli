@@ -23,7 +23,6 @@ import (
 	"net/http"
 
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
@@ -35,40 +34,6 @@ import (
 type ArduinoCoreServerImpl struct {
 	DownloaderHeaders http.Header
 	VersionString     string
-}
-
-// BoardDetails FIXMEDOC
-func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
-	return board.Details(ctx, req)
-}
-
-// BoardList FIXMEDOC
-func (s *ArduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardListReq) (*rpc.BoardListResp, error) {
-	ports, err := board.List(req.GetInstance().GetId())
-	if err != nil {
-		return nil, err
-	}
-
-	return &rpc.BoardListResp{
-		Ports: ports,
-	}, nil
-}
-
-// BoardListAll FIXMEDOC
-func (s *ArduinoCoreServerImpl) BoardListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllResp, error) {
-	return board.ListAll(ctx, req)
-}
-
-// BoardAttach FIXMEDOC
-func (s *ArduinoCoreServerImpl) BoardAttach(req *rpc.BoardAttachReq, stream rpc.ArduinoCore_BoardAttachServer) error {
-
-	resp, err := board.Attach(stream.Context(), req,
-		func(p *rpc.TaskProgress) { stream.Send(&rpc.BoardAttachResp{TaskProgress: p}) },
-	)
-	if err != nil {
-		return err
-	}
-	return stream.Send(resp)
 }
 
 // Destroy FIXMEDOC
