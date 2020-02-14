@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands/daemon"
 	srv_commands "github.com/arduino/arduino-cli/rpc/commands"
+	srv_debug "github.com/arduino/arduino-cli/rpc/debug"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/monitor"
 	srv_settings "github.com/arduino/arduino-cli/rpc/settings"
 	"github.com/sirupsen/logrus"
@@ -74,6 +75,9 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 
 	// register the settings service
 	srv_settings.RegisterSettingsServer(s, &daemon.SettingsService{})
+
+	// register the debug session service
+	srv_debug.RegisterDebugServer(s, &daemon.DebugService{})
 
 	if !daemonize {
 		// When parent process ends terminate also the daemon
