@@ -17,8 +17,10 @@ package builder
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -115,7 +117,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		//&ContainerMergeCopySketchFiles{},
 		&ContainerAddPrototypes{},
-		//&FilterSketchSource{Source: &ctx.Source, RemoveLineMarkers: true},
+		&FilterSketchSource{Source: &ctx.Source, RemoveLineMarkers: true},
 	}
 
 	for _, command := range commands {
@@ -125,6 +127,31 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	err = utils.CopyDir(ctx.SketchBuildPath.String(), cmakeFolder.Join("sketch").String(), extensions)
 	if err != nil {
 		fmt.Println(err)
+	}
+
+	// remove "#line 1 ..." from exported c_make folder sketch
+	var sketchFiles []string
+	utils.FindFilesInFolder(&sketchFiles, cmakeFolder.Join("sketch").String(), extensions, false)
+
+	for _, file := range sketchFiles {
+		input, err := ioutil.ReadFile(file)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		lines := strings.Split(string(input), "\n")
+
+		for i, line := range lines {
+			if lineToRemove, _ := regexp.MatchString(`^#line\s\d+\s"`, line); lineToRemove == true {
+				lines[i] = ""
+			}
+		}
+		output := strings.Join(lines, "\n")
+		err = ioutil.WriteFile(file, []byte(output), 0644)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	// Extract CFLAGS, CPPFLAGS and LDFLAGS
