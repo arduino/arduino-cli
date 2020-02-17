@@ -80,7 +80,7 @@ func main() {
 	err = debugStreamingOpenClient.Send(&dbg.DebugReq{
 		DebugReq: &dbg.DebugConfigReq{
 			Instance:   &dbg.Instance{Id: instance.GetId()},
-			Fqbn:       "arduino-sadsadasd:samd:arduino_zero_edbg",
+			Fqbn:       "arduino-pippo:samd:arduino_zero_edbg",
 			SketchPath: os.Args[1],
 			Port:       "none",
 		}})
@@ -88,8 +88,8 @@ func main() {
 		log.Fatalf("Send error: %s\n", err)
 	}
 	log.Println("calling StreamingOpenReq_DebugReq")
-
-	err = debugStreamingOpenClient.Send(&dbg.DebugReq{Data: []byte("\n")})
+	time.Sleep(time.Second * 3)
+	err = debugStreamingOpenClient.Send(&dbg.DebugReq{Data: []byte("info registers\n")})
 	if err != nil {
 		log.Fatalf("Send error: %s\n", err)
 	}
@@ -112,10 +112,10 @@ func main() {
 
 		// When an operation is ongoing you can get its output
 		if resp := compResp.GetData(); resp != nil {
-			fmt.Printf(">>%s<<", resp)
-			if string(resp) == "(gdb) " {
-				break
-			}
+			fmt.Printf("%s", resp)
+			//if string(resp) == "(gdb) " {
+			//	break
+			//}
 		}
 
 	}
