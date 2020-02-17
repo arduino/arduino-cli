@@ -37,16 +37,15 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream dbg.Debug_Debu
 	in, err := cmd.StdinPipe()
 	if err != nil {
 		fmt.Printf("%v\n", err)
-		return &dbg.DebugResp{}, nil // TODO: send error in response
+		return &dbg.DebugResp{Error: err.Error()}, nil
 	}
 	defer in.Close()
 
 	cmd.Stdout = out
 
-	err = cmd.Start()
-	if err != nil {
+	if err := cmd.Start(); err != nil {
 		fmt.Printf("%v\n", err)
-		return &dbg.DebugResp{}, nil // TODO: send error in response
+		return &dbg.DebugResp{Error: err.Error()}, nil
 	}
 
 	// now we can read the other commands and re-route to the Debug Client...
@@ -58,10 +57,15 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream dbg.Debug_Debu
 				break
 			}
 		}
+
+		// In any case, try process termination after a second to avoid leaving
+		// zombie process.
 		time.Sleep(time.Second)
 		cmd.Process.Kill()
 	}()
 
-	err = cmd.Wait() // TODO: handle err
+	if err := cmd.Wait(); err != nil {
+		return &dbg.DebugResp{Error: err.Error()}, nil
+	}
 	return &dbg.DebugResp{}, nil
 }
