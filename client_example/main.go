@@ -63,7 +63,7 @@ func main() {
 
 	// Create an instance of the gRPC client.
 	client := rpc.NewArduinoCoreClient(conn)
-	//settingsClient := settings.NewSettingsClient(conn)
+	instance := initInstance(client)
 	/////////////////////////////////////////////////////////////////////////
 	debugClient := dbg.NewDebugClient(conn)
 
@@ -72,18 +72,24 @@ func main() {
 	callVersion(client)
 
 	// debug calls
-	debugStreamingOpenClient, err := debugClient.StreamingOpen(context.Background())
+	debugStreamingOpenClient, err := debugClient.Debug(context.Background())
 	if err != nil {
 		log.Fatalf("steraming open  error: %s\n", err)
 	}
 
-	err = debugStreamingOpenClient.Send(&dbg.StreamingOpenReq{Content: &dbg.StreamingOpenReq_DebugReq{DebugReq: &dbg.DebugReq{Instance: &dbg.Instance{Id: 1}}}})
+	err = debugStreamingOpenClient.Send(&dbg.DebugReq{
+		DebugReq: &dbg.DebugConfigReq{
+			Instance:   &dbg.Instance{Id: instance.GetId()},
+			Fqbn:       "arduino-sadsadasd:samd:arduino_zero_edbg",
+			SketchPath: os.Args[1],
+			Port:       "none",
+		}})
 	if err != nil {
 		log.Fatalf("Send error: %s\n", err)
 	}
 	log.Println("calling StreamingOpenReq_DebugReq")
 
-	err = debugStreamingOpenClient.Send(&dbg.StreamingOpenReq{Content: &dbg.StreamingOpenReq_Data{Data: []byte("\n")}})
+	err = debugStreamingOpenClient.Send(&dbg.DebugReq{Data: []byte("\n")})
 	if err != nil {
 		log.Fatalf("Send error: %s\n", err)
 	}
@@ -114,7 +120,7 @@ func main() {
 
 	}
 
-	err = debugStreamingOpenClient.Send(&dbg.StreamingOpenReq{Content: &dbg.StreamingOpenReq_Data{Data: []byte("quit\n")}})
+	err = debugStreamingOpenClient.Send(&dbg.DebugReq{Data: []byte("quit\n")})
 	if err != nil {
 		log.Fatalf("Send error: %s\n", err)
 	}
@@ -300,48 +306,49 @@ func callVersion(client rpc.ArduinoCoreClient) {
 //	log.Printf("Settings: %s", getAllResp.GetJsonData())
 //}
 //
-//func initInstance(client rpc.ArduinoCoreClient) *rpc.Instance {
-//	// The configuration for this example client only contains the path to
-//	// the data folder.
-//	initRespStream, err := client.Init(context.Background(), &rpc.InitReq{})
-//	if err != nil {
-//		log.Fatalf("Error creating server instance: %s", err)
-//
-//	}
-//
-//	var instance *rpc.Instance
-//	// Loop and consume the server stream until all the setup procedures are done.
-//	for {
-//		initResp, err := initRespStream.Recv()
-//		// The server is done.
-//		if err == io.EOF {
-//			break
-//		}
-//
-//		// There was an error.
-//		if err != nil {
-//			log.Fatalf("Init error: %s", err)
-//		}
-//
-//		// The server sent us a valid instance, let's print its ID.
-//		if initResp.GetInstance() != nil {
-//			instance = initResp.GetInstance()
-//			log.Printf("Got a new instance with ID: %v", instance.GetId())
-//		}
-//
-//		// When a download is ongoing, log the progress
-//		if initResp.GetDownloadProgress() != nil {
-//			log.Printf("DOWNLOAD: %s", initResp.GetDownloadProgress())
-//		}
-//
-//		// When an overall task is ongoing, log the progress
-//		if initResp.GetTaskProgress() != nil {
-//			log.Printf("TASK: %s", initResp.GetTaskProgress())
-//		}
-//	}
-//
-//	return instance
-//}
+func initInstance(client rpc.ArduinoCoreClient) *rpc.Instance {
+	// The configuration for this example client only contains the path to
+	// the data folder.
+	initRespStream, err := client.Init(context.Background(), &rpc.InitReq{})
+	if err != nil {
+		log.Fatalf("Error creating server instance: %s", err)
+
+	}
+
+	var instance *rpc.Instance
+	// Loop and consume the server stream until all the setup procedures are done.
+	for {
+		initResp, err := initRespStream.Recv()
+		// The server is done.
+		if err == io.EOF {
+			break
+		}
+
+		// There was an error.
+		if err != nil {
+			log.Fatalf("Init error: %s", err)
+		}
+
+		// The server sent us a valid instance, let's print its ID.
+		if initResp.GetInstance() != nil {
+			instance = initResp.GetInstance()
+			log.Printf("Got a new instance with ID: %v", instance.GetId())
+		}
+
+		// When a download is ongoing, log the progress
+		if initResp.GetDownloadProgress() != nil {
+			log.Printf("DOWNLOAD: %s", initResp.GetDownloadProgress())
+		}
+
+		// When an overall task is ongoing, log the progress
+		if initResp.GetTaskProgress() != nil {
+			log.Printf("TASK: %s", initResp.GetTaskProgress())
+		}
+	}
+
+	return instance
+}
+
 //
 //func callUpdateIndex(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 //	uiRespStream, err := client.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{

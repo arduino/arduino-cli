@@ -18,17 +18,18 @@ package debug
 import (
 	"context"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
-	"io"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
 
 	"github.com/arduino/arduino-cli/executils"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
@@ -75,17 +76,17 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream dbg.Debug_Debu
 	}
 
 	// Load programmer tool
-	uploadToolPattern, have := boardProperties.GetOk("debug.tool")
-	if !have || uploadToolPattern == "" {
+	toolName, have := boardProperties.GetOk("debug.tool")
+	if !have || toolName == "" {
 		return nil, fmt.Errorf("cannot get programmer tool: undefined 'debug.tool' property")
 	}
 
 	var referencedPlatformRelease *cores.PlatformRelease
-	if split := strings.Split(uploadToolPattern, ":"); len(split) > 2 {
-		return nil, fmt.Errorf("invalid 'debug.tool' property: %s", uploadToolPattern)
+	if split := strings.Split(toolName, ":"); len(split) > 2 {
+		return nil, fmt.Errorf("invalid 'debug.tool' property: %s", toolName)
 	} else if len(split) == 2 {
 		referencedPackageName := split[0]
-		uploadToolPattern = split[1]
+		toolName = split[1]
 		architecture := board.PlatformRelease.Platform.Architecture
 
 		if referencedPackage := pm.Packages[referencedPackageName]; referencedPackage == nil {
@@ -98,33 +99,33 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream dbg.Debug_Debu
 	}
 
 	// Build configuration for upload
-	debugProperties := properties.NewMap()
+	toolProperties := properties.NewMap()
 	if referencedPlatformRelease != nil {
-		debugProperties.Merge(referencedPlatformRelease.Properties)
+		toolProperties.Merge(referencedPlatformRelease.Properties)
 	}
-	debugProperties.Merge(board.PlatformRelease.Properties)
-	debugProperties.Merge(board.PlatformRelease.RuntimeProperties())
-	debugProperties.Merge(boardProperties)
+	toolProperties.Merge(board.PlatformRelease.Properties)
+	toolProperties.Merge(board.PlatformRelease.RuntimeProperties())
+	toolProperties.Merge(boardProperties)
 
-	uploadToolProperties := debugProperties.SubTree("tools." + uploadToolPattern)
-	debugProperties.Merge(uploadToolProperties)
+	requestedToolProperties := toolProperties.SubTree("tools." + toolName)
+	toolProperties.Merge(requestedToolProperties)
 
 	if requiredTools, err := pm.FindToolsRequiredForBoard(board); err == nil {
 		for _, requiredTool := range requiredTools {
 			logrus.WithField("tool", requiredTool).Info("Tool required for upload")
-			debugProperties.Merge(requiredTool.RuntimeProperties())
+			toolProperties.Merge(requiredTool.RuntimeProperties())
 		}
 	}
 
 	// Set properties for verbose upload
-	Verbose := req.GetVerbose()
-	if Verbose {
-		if v, ok := debugProperties.GetOk("debug.params.verbose"); ok {
-			debugProperties.Set("debug.verbose", v)
+	verbose := req.GetVerbose()
+	if verbose {
+		if v, ok := toolProperties.GetOk("debug.params.verbose"); ok {
+			toolProperties.Set("debug.verbose", v)
 		}
 	} else {
-		if v, ok := debugProperties.GetOk("debug.params.quiet"); ok {
-			debugProperties.Set("debug.verbose", v)
+		if v, ok := toolProperties.GetOk("debug.params.quiet"); ok {
+			toolProperties.Set("debug.verbose", v)
 		}
 	}
 
@@ -143,8 +144,8 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream dbg.Debug_Debu
 		importFile = paths.New(req.GetImportFile()).Base()
 	}
 
-	outputTmpFile, ok := debugProperties.GetOk("recipe.output.tmp_file")
-	outputTmpFile = debugProperties.ExpandPropsInString(outputTmpFile)
+	outputTmpFile, ok := toolProperties.GetOk("recipe.output.tmp_file")
+	outputTmpFile = toolProperties.ExpandPropsInString(outputTmpFile)
 	if !ok {
 		return nil, fmt.Errorf("property 'recipe.output.tmp_file' not defined")
 	}
@@ -153,8 +154,8 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream dbg.Debug_Debu
 		importFile = importFile[:len(importFile)-len(ext)]
 	}
 
-	debugProperties.SetPath("build.path", importPath)
-	debugProperties.Set("build.project_name", importFile)
+	toolProperties.SetPath("build.path", importPath)
+	toolProperties.Set("build.project_name", importFile)
 	uploadFile := importPath.Join(importFile + ext)
 	if _, err := uploadFile.Stat(); err != nil {
 		if os.IsNotExist(err) {
@@ -163,21 +164,26 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream dbg.Debug_Debu
 		return nil, fmt.Errorf("cannot open sketch: %s", err)
 	}
 
-	// Set serial port property
-	debugProperties.Set("serial.port", port)
+	// Set debug port property
+	toolProperties.Set("debug.port", port)
 	if strings.HasPrefix(port, "/dev/") {
-		debugProperties.Set("serial.port.file", port[5:])
+		toolProperties.Set("debug.port.file", port[5:])
 	} else {
-		debugProperties.Set("serial.port.file", port)
+		toolProperties.Set("debug.port.file", port)
 	}
 
-	// Build recipe for upload
-	recipe := debugProperties.Get("debug.pattern")
-	cmdLine := debugProperties.ExpandPropsInString(recipe)
+	// Build recipe for tool
+	recipe := toolProperties.Get("debug.pattern")
+	cmdLine := toolProperties.ExpandPropsInString(recipe)
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 	if err != nil {
 		return nil, fmt.Errorf("invalid recipe '%s': %s", recipe, err)
 	}
+
+	// for _, arg := range cmdArgs {
+	// 	fmt.Println(">>", arg)
+	// }
+	// time.Sleep(time.Hour)
 
 	// Run Tool
 	cmd, err := executils.Command(cmdArgs)

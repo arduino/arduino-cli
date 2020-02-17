@@ -32,15 +32,14 @@ service Debug {
 // and must not contain a `DebugReq` message.
 message DebugReq {
     // Content must be either a debug session config or data to be sent.
-    oneof content {
-        // Provides information to the debug that specifies which is the target.
-        // The first `StreamingOpenReq` message must contain a `DebugReq`
-        // message.
-        DebugConfigReq debugReq = 1;
 
-        // The data to be sent to the target being monitored.
-        bytes data = 2;
-    }
+    // Provides information to the debug that specifies which is the target.
+    // The first `StreamingOpenReq` message must contain a `DebugReq`
+    // message.
+    DebugConfigReq debugReq = 1;
+
+    // The data to be sent to the target being monitored.
+    bytes data = 2;
 }
 
 message DebugConfigReq {
