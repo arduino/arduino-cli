@@ -18,6 +18,7 @@ package main
 import (
 	"context"
 	"fmt"
+
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
 
@@ -25,6 +26,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+
 	//	"path"
 	"path/filepath"
 	"time"
@@ -104,8 +106,8 @@ func main() {
 
 		// When an operation is ongoing you can get its output
 		if resp := compResp.GetData(); resp != nil {
-			fmt.Printf("%s", resp)
-			if string(resp) == " (gdb) " {
+			fmt.Printf(">>%s<<", resp)
+			if string(resp) == "(gdb) " {
 				break
 			}
 		}
