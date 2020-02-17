@@ -25,10 +25,10 @@ import (
 // DebugService implements the `Debug` service
 type DebugService struct{}
 
-// StreamingOpen returns a stream response that can be used to fetch data from the
-// Debug target. The first message passed through the `StreamingOpenReq` must
-// contain Debug configuration params, not data.
-func (s *DebugService) StreamingOpen(stream dbg.Debug_StreamingOpenServer) error {
+// Debug returns a stream response that can be used to fetch data from the
+// target. The first message passed through the `Debug` request must
+// contain DebugConfigReq configuration params, not data.
+func (s *DebugService) Debug(stream dbg.Debug_DebugServer) error {
 
 	// grab the first message
 	msg, err := stream.Recv()
@@ -44,7 +44,7 @@ func (s *DebugService) StreamingOpen(stream dbg.Debug_StreamingOpenServer) error
 
 	// launch debug recipe attaching stdin and out to grpc streaming
 	resp, err := cmd.Debug(stream.Context(), req, stream, feedStream(func(data []byte) {
-		stream.Send(&dbg.StreamingOpenResp{Data: data})
+		stream.Send(&dbg.DebugResp{Data: data})
 	}))
 	if err != nil {
 		return (err)

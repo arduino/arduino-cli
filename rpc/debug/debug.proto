@@ -22,29 +22,28 @@ option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 
 // Service that abstract a debug Session usage
 service Debug {
-    rpc StreamingOpen (stream StreamingOpenReq) returns (stream StreamingOpenResp) {
-    }
+    rpc Debug(stream DebugReq) returns (stream DebugResp) { }
 }
 
-// The top-level message sent by the client for the `StreamingOpen` method.
-// Multiple `StreamingOpenReq` messages can be sent but the first message
+// The top-level message sent by the client for the `Debug` method.
+// Multiple `DebugReq` messages can be sent but the first message
 // must contain a `DebugReq` message to initialize the debug session.
 // All subsequent messages must contain bytes to be sent to the debug session
 // and must not contain a `DebugReq` message.
-message StreamingOpenReq {
+message DebugReq {
     // Content must be either a debug session config or data to be sent.
     oneof content {
         // Provides information to the debug that specifies which is the target.
         // The first `StreamingOpenReq` message must contain a `DebugReq`
         // message.
-        DebugReq debugReq = 1;
+        DebugConfigReq debugReq = 1;
 
         // The data to be sent to the target being monitored.
         bytes data = 2;
     }
 }
 
-message DebugReq {
+message DebugConfigReq {
     Instance instance = 1;
 //    string fqbn = 2;
 //    string sketch_path = 3;
@@ -56,8 +55,9 @@ message DebugReq {
 
 
 //
-message StreamingOpenResp {
+message DebugResp {
     bytes data = 1;
+    string error = 2;
 }
 
 // duplicate from commands/common.proto
