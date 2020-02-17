@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/arduino/arduino-cli/executils"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
@@ -35,7 +36,7 @@ func Debug(ctx context.Context, req *dbg.DebugReq, inStream dbg.Debug_StreamingO
 
 	in, err := cmd.StdinPipe()
 	if err != nil {
-		fmt.Println("%v\n", err)
+		fmt.Printf("%v\n", err)
 		return &dbg.StreamingOpenResp{}, nil // TODO: send error in response
 	}
 	defer in.Close()
@@ -44,61 +45,23 @@ func Debug(ctx context.Context, req *dbg.DebugReq, inStream dbg.Debug_StreamingO
 
 	err = cmd.Start()
 	if err != nil {
-		fmt.Println("%v\n", err)
+		fmt.Printf("%v\n", err)
 		return &dbg.StreamingOpenResp{}, nil // TODO: send error in response
 	}
-
-	// we'll use these channels to communicate with the goroutines
-	// handling the stream and the target respectively
-	streamClosed := make(chan error)
-	targetClosed := make(chan error)
-	defer close(streamClosed)
-	defer close(targetClosed)
 
 	// now we can read the other commands and re-route to the Debug Client...
 	go func() {
 		for {
-			command, err := inStream.Recv()
-			if err == io.EOF {
-				// stream was closed
-				streamClosed <- nil
+			if command, err := inStream.Recv(); err != nil {
 				break
-			}
-
-			if err != nil {
-				// error reading from stream
-				streamClosed <- err
-				break
-			}
-
-			if _, err := in.Write(command.GetData()); err != nil {
-				// error writing to target
-				targetClosed <- err
+			} else if _, err := in.Write(command.GetData()); err != nil {
 				break
 			}
 		}
+		time.Sleep(time.Second)
+		cmd.Process.Kill()
 	}()
 
-	// let goroutines route messages from/to the Debug
-	// until either the client closes the stream or the
-	// Debug target is closed
-	for {
-		select {
-		case <-ctx.Done():
-			cmd.Process.Kill()
-			cmd.Wait()
-		case err := <-streamClosed:
-			fmt.Println("streamClosed")
-			cmd.Process.Kill()
-			cmd.Wait()
-			return &dbg.StreamingOpenResp{}, err // TODO: send error in response
-		case err := <-targetClosed:
-			fmt.Println("targetClosed")
-			cmd.Process.Kill()
-			cmd.Wait()
-			return &dbg.StreamingOpenResp{}, err // TODO: send error in response
-		}
-	}
-
+	err = cmd.Wait() // TODO: handle err
 	return &dbg.StreamingOpenResp{}, nil
 }
