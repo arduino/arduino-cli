@@ -26,7 +26,7 @@ import (
 )
 
 // Debug FIXMEDOC
-func Debug(ctx context.Context, req *dbg.DebugReq, inStream dbg.Debug_StreamingOpenServer, out io.Writer) (*dbg.StreamingOpenResp, error) {
+func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream dbg.Debug_DebugServer, out io.Writer) (*dbg.DebugResp, error) {
 	cmdArgs := []string{"gdb"}
 	// Run Tool
 	cmd, err := executils.Command(cmdArgs)
@@ -37,7 +37,7 @@ func Debug(ctx context.Context, req *dbg.DebugReq, inStream dbg.Debug_StreamingO
 	in, err := cmd.StdinPipe()
 	if err != nil {
 		fmt.Printf("%v\n", err)
-		return &dbg.StreamingOpenResp{}, nil // TODO: send error in response
+		return &dbg.DebugResp{}, nil // TODO: send error in response
 	}
 	defer in.Close()
 
@@ -46,7 +46,7 @@ func Debug(ctx context.Context, req *dbg.DebugReq, inStream dbg.Debug_StreamingO
 	err = cmd.Start()
 	if err != nil {
 		fmt.Printf("%v\n", err)
-		return &dbg.StreamingOpenResp{}, nil // TODO: send error in response
+		return &dbg.DebugResp{}, nil // TODO: send error in response
 	}
 
 	// now we can read the other commands and re-route to the Debug Client...
@@ -63,5 +63,5 @@ func Debug(ctx context.Context, req *dbg.DebugReq, inStream dbg.Debug_StreamingO
 	}()
 
 	err = cmd.Wait() // TODO: handle err
-	return &dbg.StreamingOpenResp{}, nil
+	return &dbg.DebugResp{}, nil
 }
