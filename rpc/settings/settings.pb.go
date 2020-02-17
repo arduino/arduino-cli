@@ -8,8 +8,6 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -277,11 +275,11 @@ var fileDescriptor_a4bfd59e429426d0 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConnInterface
+var _ grpc.ClientConn
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion6
+const _ = grpc.SupportPackageIsVersion4
 
 // SettingsClient is the client API for Settings service.
 //
@@ -294,10 +292,10 @@ type SettingsClient interface {
 }
 
 type settingsClient struct {
-	cc grpc.ClientConnInterface
+	cc *grpc.ClientConn
 }
 
-func NewSettingsClient(cc grpc.ClientConnInterface) SettingsClient {
+func NewSettingsClient(cc *grpc.ClientConn) SettingsClient {
 	return &settingsClient{cc}
 }
 
@@ -343,23 +341,6 @@ type SettingsServer interface {
 	Merge(context.Context, *RawData) (*MergeResponse, error)
 	GetValue(context.Context, *GetValueRequest) (*Value, error)
 	SetValue(context.Context, *Value) (*SetValueResponse, error)
-}
-
-// UnimplementedSettingsServer can be embedded to have forward compatible implementations.
-type UnimplementedSettingsServer struct {
-}
-
-func (*UnimplementedSettingsServer) GetAll(ctx context.Context, req *GetAllRequest) (*RawData, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
-}
-func (*UnimplementedSettingsServer) Merge(ctx context.Context, req *RawData) (*MergeResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Merge not implemented")
-}
-func (*UnimplementedSettingsServer) GetValue(ctx context.Context, req *GetValueRequest) (*Value, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetValue not implemented")
-}
-func (*UnimplementedSettingsServer) SetValue(ctx context.Context, req *Value) (*SetValueResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetValue not implemented")
 }
 
 func RegisterSettingsServer(s *grpc.Server, srv SettingsServer) {
