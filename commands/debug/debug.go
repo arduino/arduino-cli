@@ -199,6 +199,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream dbg.Debug_Debu
 	defer in.Close()
 
 	cmd.Stdout = out
+	cmd.Stderr = out
 
 	if err := cmd.Start(); err != nil {
 		fmt.Printf("%v\n", err)
