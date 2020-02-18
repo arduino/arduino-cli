@@ -19,13 +19,14 @@ import (
 	"fmt"
 	"strings"
 
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	semver "go.bug.st/relaxed-semver"
 )
 
 // Load loads a library from the given LibraryLocation
-func Load(libDir *paths.Path, location LibraryLocation) (*Library, error) {
+func Load(libDir *paths.Path, location rpc.LibraryLocation) (*Library, error) {
 	if libDir.Join("library.properties").Exist() {
 		return makeNewLibrary(libDir, location)
 	}
@@ -39,7 +40,7 @@ func addUtilityDirectory(library *Library) {
 	}
 }
 
-func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library, error) {
+func makeNewLibrary(libraryDir *paths.Path, location rpc.LibraryLocation) (*Library, error) {
 	libProperties, err := properties.Load(libraryDir.Join("library.properties").String())
 	if err != nil {
 		return nil, fmt.Errorf("loading library.properties: %s", err)
@@ -110,7 +111,7 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	return library, nil
 }
 
-func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, error) {
+func makeLegacyLibrary(path *paths.Path, location rpc.LibraryLocation) (*Library, error) {
 	library := &Library{
 		InstallDir:    path,
 		Location:      location,

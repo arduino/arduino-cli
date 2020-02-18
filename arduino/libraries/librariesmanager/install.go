@@ -22,6 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/utils"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
 )
 
@@ -40,7 +41,7 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 	var replaced *libraries.Library
 	if installedLibs, have := lm.Libraries[saneName]; have {
 		for _, installedLib := range installedLibs.Alternatives {
-			if installedLib.Location != libraries.User {
+			if installedLib.Location != rpc.LibraryLocation_user {
 				continue
 			}
 			if installedLib.Version.Equal(indexLibrary.Version) {

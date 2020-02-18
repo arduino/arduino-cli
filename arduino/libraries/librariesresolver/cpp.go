@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/utils"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/schollz/closestmatch"
 	"github.com/sirupsen/logrus"
 )
@@ -152,13 +153,13 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 	}
 
 	switch lib.Location {
-	case libraries.IDEBuiltIn:
+	case rpc.LibraryLocation_ide_builtin:
 		priority += 0
-	case libraries.ReferencedPlatformBuiltIn:
+	case rpc.LibraryLocation_referenced_platform_builtin:
 		priority++
-	case libraries.PlatformBuiltIn:
+	case rpc.LibraryLocation_platform_builtin:
 		priority += 2
-	case libraries.User:
+	case rpc.LibraryLocation_user:
 		priority += 3
 	default:
 		panic(fmt.Sprintf("Invalid library location: %d", lib.Location))

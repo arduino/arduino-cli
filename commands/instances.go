@@ -27,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/configuration"
@@ -323,19 +322,19 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 
 	// Add IDE builtin libraries dir
 	if bundledLibsDir := configuration.IDEBundledLibrariesDir(); bundledLibsDir != nil {
-		res.Lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
+		res.Lm.AddLibrariesDir(bundledLibsDir, rpc.LibraryLocation_ide_builtin)
 	}
 
 	// Add user libraries dir
 	libDir := configuration.LibrariesDir()
-	res.Lm.AddLibrariesDir(libDir, libraries.User)
+	res.Lm.AddLibrariesDir(libDir, rpc.LibraryLocation_user)
 
 	// Add libraries dirs from installed platforms
 	if res.Pm != nil {
 		for _, targetPackage := range res.Pm.Packages {
 			for _, platform := range targetPackage.Platforms {
 				if platformRelease := res.Pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
-					res.Lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
+					res.Lm.AddPlatformReleaseLibrariesDir(platformRelease, rpc.LibraryLocation_platform_builtin)
 				}
 			}
 		}

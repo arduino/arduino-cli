@@ -149,7 +149,6 @@ message Library {
     string install_dir = 10;
     string source_dir = 11;
     string utility_dir = 12;
-    string location = 13;
     string container_platform = 14;
     string layout = 15;
     string real_name = 16;
@@ -160,6 +159,7 @@ message Library {
     string version = 21;
     string license = 22;
     map<string, string> properties = 23;
+    LibraryLocation location = 24;
 }
 
 enum LibraryLayout {
@@ -169,7 +169,7 @@ enum LibraryLayout {
 
 enum LibraryLocation {
     ide_builtin = 0;
-    platform_builtin = 1;
-    referenced_platform_builtin = 2;
-    sketchbook = 3;
+    user = 1; // (sketchbook)
+    platform_builtin = 2;
+    referenced_platform_builtin = 3;
 }

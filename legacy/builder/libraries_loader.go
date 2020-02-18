@@ -18,11 +18,11 @@ package builder
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
 type LibrariesLoader struct{}
@@ -36,7 +36,7 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 		return i18n.WrapError(err)
 	}
 	for _, folder := range builtInLibrariesFolders {
-		lm.AddLibrariesDir(folder, libraries.IDEBuiltIn)
+		lm.AddLibrariesDir(folder, rpc.LibraryLocation_ide_builtin)
 	}
 
 	debugLevel := ctx.DebugLevel
@@ -45,16 +45,16 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	actualPlatform := ctx.ActualPlatform
 	platform := ctx.TargetPlatform
 	if actualPlatform != platform {
-		lm.AddPlatformReleaseLibrariesDir(actualPlatform, libraries.ReferencedPlatformBuiltIn)
+		lm.AddPlatformReleaseLibrariesDir(actualPlatform, rpc.LibraryLocation_referenced_platform_builtin)
 	}
-	lm.AddPlatformReleaseLibrariesDir(platform, libraries.PlatformBuiltIn)
+	lm.AddPlatformReleaseLibrariesDir(platform, rpc.LibraryLocation_platform_builtin)
 
 	librariesFolders := ctx.OtherLibrariesDirs
 	if err := librariesFolders.ToAbs(); err != nil {
 		return i18n.WrapError(err)
 	}
 	for _, folder := range librariesFolders {
-		lm.AddLibrariesDir(folder, libraries.User)
+		lm.AddLibrariesDir(folder, rpc.LibraryLocation_user)
 	}
 
 	if err := lm.RescanLibraries(); err != nil {

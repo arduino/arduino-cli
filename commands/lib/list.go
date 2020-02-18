@@ -58,7 +58,7 @@ func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bo
 	for _, libAlternatives := range lm.Libraries {
 		for _, lib := range libAlternatives.Alternatives {
 			if !all {
-				if lib.Location != libraries.User {
+				if lib.Location != rpc.LibraryLocation_user {
 					continue
 				}
 			}
@@ -107,7 +107,7 @@ func GetOutputLibrary(lib *libraries.Library) *rpc.Library {
 		InstallDir:        insdir,
 		SourceDir:         srcdir,
 		UtilityDir:        utldir,
-		Location:          lib.Location.String(),
+		Location:          lib.Location,
 		ContainerPlatform: cntplat,
 		Layout:            lib.Layout.String(),
 		RealName:          lib.RealName,

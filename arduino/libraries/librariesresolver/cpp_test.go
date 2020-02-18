@@ -19,17 +19,18 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/stretchr/testify/require"
 )
 
-var l1 = &libraries.Library{Name: "Calculus Lib", Location: libraries.User}
-var l2 = &libraries.Library{Name: "Calculus Lib-master", Location: libraries.User}
-var l3 = &libraries.Library{Name: "Calculus Lib Improved", Location: libraries.User}
-var l4 = &libraries.Library{Name: "Another Calculus Lib", Location: libraries.User}
-var l5 = &libraries.Library{Name: "Yet Another Calculus Lib Improved", Location: libraries.User}
-var l6 = &libraries.Library{Name: "Calculus Unified Lib", Location: libraries.User}
-var l7 = &libraries.Library{Name: "AnotherLib", Location: libraries.User}
-var bundleServo = &libraries.Library{Name: "Servo", Location: libraries.IDEBuiltIn, Architectures: []string{"avr", "sam", "samd"}}
+var l1 = &libraries.Library{Name: "Calculus Lib", Location: rpc.LibraryLocation_user}
+var l2 = &libraries.Library{Name: "Calculus Lib-master", Location: rpc.LibraryLocation_user}
+var l3 = &libraries.Library{Name: "Calculus Lib Improved", Location: rpc.LibraryLocation_user}
+var l4 = &libraries.Library{Name: "Another Calculus Lib", Location: rpc.LibraryLocation_user}
+var l5 = &libraries.Library{Name: "Yet Another Calculus Lib Improved", Location: rpc.LibraryLocation_user}
+var l6 = &libraries.Library{Name: "Calculus Unified Lib", Location: rpc.LibraryLocation_user}
+var l7 = &libraries.Library{Name: "AnotherLib", Location: rpc.LibraryLocation_user}
+var bundleServo = &libraries.Library{Name: "Servo", Location: rpc.LibraryLocation_ide_builtin, Architectures: []string{"avr", "sam", "samd"}}
 
 func runResolver(include string, arch string, libs ...*libraries.Library) *libraries.Library {
 	libraryList := libraries.List{}
@@ -42,19 +43,19 @@ func runResolver(include string, arch string, libs ...*libraries.Library) *libra
 func TestArchitecturePriority(t *testing.T) {
 	userServo := &libraries.Library{
 		Name:          "Servo",
-		Location:      libraries.User,
+		Location:      rpc.LibraryLocation_user,
 		Architectures: []string{"avr", "sam", "samd"}}
 	userServoAllArch := &libraries.Library{
 		Name:          "Servo",
-		Location:      libraries.User,
+		Location:      rpc.LibraryLocation_user,
 		Architectures: []string{"*"}}
 	userServoNonavr := &libraries.Library{
 		Name:          "Servo",
-		Location:      libraries.User,
+		Location:      rpc.LibraryLocation_user,
 		Architectures: []string{"sam", "samd"}}
 	userAnotherServo := &libraries.Library{
 		Name:          "AnotherServo",
-		Location:      libraries.User,
+		Location:      rpc.LibraryLocation_user,
 		Architectures: []string{"avr", "sam", "samd", "esp32"}}
 
 	res := runResolver("Servo.h", "avr", bundleServo, userServo)
@@ -79,11 +80,11 @@ func TestArchitecturePriority(t *testing.T) {
 
 	userSDAllArch := &libraries.Library{
 		Name:          "SD",
-		Location:      libraries.User,
+		Location:      rpc.LibraryLocation_user,
 		Architectures: []string{"*"}}
 	builtinSDesp := &libraries.Library{
 		Name:          "SD",
-		Location:      libraries.PlatformBuiltIn,
+		Location:      rpc.LibraryLocation_platform_builtin,
 		Architectures: []string{"esp8266"}}
 	res = runResolver("SD.h", "esp8266", userSDAllArch, builtinSDesp)
 	require.Equal(t, builtinSDesp, res, "selected library")

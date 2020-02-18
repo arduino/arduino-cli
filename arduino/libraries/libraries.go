@@ -17,6 +17,7 @@ package libraries
 
 import (
 	"github.com/arduino/arduino-cli/arduino/cores"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	semver "go.bug.st/relaxed-semver"
@@ -58,7 +59,7 @@ type Library struct {
 	InstallDir        *paths.Path
 	SourceDir         *paths.Path
 	UtilityDir        *paths.Path
-	Location          LibraryLocation
+	Location          rpc.LibraryLocation
 	ContainerPlatform *cores.PlatformRelease `json:""`
 	Layout            LibraryLayout
 	RealName          string

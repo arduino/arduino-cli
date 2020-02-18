@@ -102,9 +102,9 @@ func (ir installedResult) String() string {
 			lastName = name
 		}
 
-		location := lib.GetLocation()
+		location := lib.GetLocation().String()
 		if lib.ContainerPlatform != "" {
-			location = lib.GetContainerPlatform()
+			location += " " + lib.GetContainerPlatform()
 		}
 
 		if libMeta.GetRelease() != nil {

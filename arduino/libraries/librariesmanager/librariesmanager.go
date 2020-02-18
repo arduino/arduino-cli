@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/utils"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/pmylund/sortutil"
 	"github.com/sirupsen/logrus"
@@ -43,7 +44,7 @@ type LibrariesManager struct {
 // LibrariesDir is a directory containing libraries
 type LibrariesDir struct {
 	Path            *paths.Path
-	Location        libraries.LibraryLocation
+	Location        rpc.LibraryLocation
 	PlatformRelease *cores.PlatformRelease
 }
 
@@ -122,7 +123,7 @@ func (sc *LibrariesManager) LoadIndex() error {
 // AddLibrariesDir adds path to the list of directories
 // to scan when searching for libraries. If a path is already
 // in the list it is ignored.
-func (sc *LibrariesManager) AddLibrariesDir(path *paths.Path, location libraries.LibraryLocation) {
+func (sc *LibrariesManager) AddLibrariesDir(path *paths.Path, location rpc.LibraryLocation) {
 	for _, dir := range sc.LibrariesDir {
 		if dir.Path.EquivalentTo(path) {
 			return
@@ -138,7 +139,7 @@ func (sc *LibrariesManager) AddLibrariesDir(path *paths.Path, location libraries
 // AddPlatformReleaseLibrariesDir add the libraries directory in the
 // specified PlatformRelease to the list of directories to scan when
 // searching for libraries.
-func (sc *LibrariesManager) AddPlatformReleaseLibrariesDir(plaftormRelease *cores.PlatformRelease, location libraries.LibraryLocation) {
+func (sc *LibrariesManager) AddPlatformReleaseLibrariesDir(plaftormRelease *cores.PlatformRelease, location rpc.LibraryLocation) {
 	path := plaftormRelease.GetLibrariesDir()
 	if path == nil {
 		return
@@ -168,7 +169,7 @@ func (sc *LibrariesManager) RescanLibraries() error {
 
 func (sc *LibrariesManager) getUserLibrariesDir() *paths.Path {
 	for _, dir := range sc.LibrariesDir {
-		if dir.Location == libraries.User {
+		if dir.Location == rpc.LibraryLocation_user {
 			return dir.Path
 		}
 	}
@@ -216,7 +217,7 @@ func (sc *LibrariesManager) FindByReference(libRef *librariesindex.Reference) *l
 	// TODO: Move "search into user" into another method...
 	if libRef.Version == nil {
 		for _, candidate := range alternatives.Alternatives {
-			if candidate.Location == libraries.User {
+			if candidate.Location == rpc.LibraryLocation_user {
 				return candidate
 			}
 		}
