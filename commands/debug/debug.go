@@ -35,9 +35,62 @@ import (
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
 )
 
-// Debug FIXMEDOC
+// Debug command launches a debug tool for a sketch.
+// It also implements streams routing:
+// gRPC In -> tool stdIn
+// grpc Out <- tool stdOut
+// grpc Out <- tool stdErr
+// It also implements tool process lifecycle management
 func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out io.Writer) (*dbg.DebugResp, error) {
 
+	// get tool commandLine from core recipe
+	commandLine, err := getCommandLine(req)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get command line for tool: %s", err)
+	}
+
+	// Run Tool
+	cmd, err := executils.Command(commandLine)
+	if err != nil {
+		return nil, fmt.Errorf("cannot execute debug tool: %s", err)
+	}
+
+	// Get stdIn pipe from tool
+	in, err := cmd.StdinPipe()
+	if err != nil {
+		fmt.Printf("%v\n", err)
+		return &dbg.DebugResp{Error: err.Error()}, nil
+	}
+	defer in.Close()
+
+	// Merge tool StdOut and StdErr to stream them in the io.Writer passed stream
+	cmd.Stdout = out
+	cmd.Stderr = out
+
+	// Start the debug command
+	if err := cmd.Start(); err != nil {
+		fmt.Printf("%v\n", err)
+		return &dbg.DebugResp{Error: err.Error()}, nil
+	}
+
+	go func() {
+		// copy data from passed inStream into command stdIn
+		io.Copy(in, inStream)
+		// In any case, try process termination after a second to avoid leaving
+		// zombie process.
+		time.Sleep(time.Second)
+		cmd.Process.Kill()
+	}()
+
+	// Wait for process to finish
+	if err := cmd.Wait(); err != nil {
+		return &dbg.DebugResp{Error: err.Error()}, nil
+	}
+	return &dbg.DebugResp{}, nil
+}
+
+// getCommandLine compose a debug command represented by a core recipe
+func getCommandLine(req *dbg.DebugConfigReq) ([]string, error) {
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
 	if req.GetSketchPath() == "" {
@@ -52,7 +105,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 	// FIXME: make a specification on how a port is specified via command line
 	port := req.GetPort()
 	if port == "" {
-		return nil, fmt.Errorf("no upload port provided")
+		return nil, fmt.Errorf("no debug port provided")
 	}
 
 	fqbnIn := req.GetFqbn()
@@ -98,7 +151,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 		}
 	}
 
-	// Build configuration for upload
+	// Build configuration for debug
 	toolProperties := properties.NewMap()
 	if referencedPlatformRelease != nil {
 		toolProperties.Merge(referencedPlatformRelease.Properties)
@@ -109,23 +162,10 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 
 	requestedToolProperties := toolProperties.SubTree("tools." + toolName)
 	toolProperties.Merge(requestedToolProperties)
-
 	if requiredTools, err := pm.FindToolsRequiredForBoard(board); err == nil {
 		for _, requiredTool := range requiredTools {
-			logrus.WithField("tool", requiredTool).Info("Tool required for upload")
+			logrus.WithField("tool", requiredTool).Info("Tool required for debug")
 			toolProperties.Merge(requiredTool.RuntimeProperties())
-		}
-	}
-
-	// Set properties for verbose upload
-	verbose := req.GetVerbose()
-	if verbose {
-		if v, ok := toolProperties.GetOk("debug.params.verbose"); ok {
-			toolProperties.Set("debug.verbose", v)
-		}
-	} else {
-		if v, ok := toolProperties.GetOk("debug.params.quiet"); ok {
-			toolProperties.Set("debug.verbose", v)
 		}
 	}
 
@@ -179,44 +219,5 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 	if err != nil {
 		return nil, fmt.Errorf("invalid recipe '%s': %s", recipe, err)
 	}
-
-	// for _, arg := range cmdArgs {
-	// 	fmt.Println(">>", arg)
-	// }
-	// time.Sleep(time.Hour)
-
-	// Run Tool
-	cmd, err := executils.Command(cmdArgs)
-	if err != nil {
-		return nil, fmt.Errorf("cannot execute upload tool: %s", err)
-	}
-
-	in, err := cmd.StdinPipe()
-	if err != nil {
-		fmt.Printf("%v\n", err)
-		return &dbg.DebugResp{Error: err.Error()}, nil
-	}
-	defer in.Close()
-
-	cmd.Stdout = out
-	cmd.Stderr = out
-
-	if err := cmd.Start(); err != nil {
-		fmt.Printf("%v\n", err)
-		return &dbg.DebugResp{Error: err.Error()}, nil
-	}
-
-	// now we can read the other commands and re-route to the Debug Client...
-	go func() {
-		io.Copy(in, inStream)
-		// In any case, try process termination after a second to avoid leaving
-		// zombie process.
-		time.Sleep(time.Second)
-		cmd.Process.Kill()
-	}()
-
-	if err := cmd.Wait(); err != nil {
-		return &dbg.DebugResp{Error: err.Error()}, nil
-	}
-	return &dbg.DebugResp{}, nil
+	return cmdArgs, nil
 }
