@@ -17,6 +17,7 @@ package cli
 
 import (
 	"fmt"
+	"github.com/arduino/arduino-cli/cli/debug"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -77,6 +78,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(lib.NewCommand())
 	cmd.AddCommand(sketch.NewCommand())
 	cmd.AddCommand(upload.NewCommand())
+	cmd.AddCommand(debug.NewCommand())
 	cmd.AddCommand(version.NewCommand())
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")

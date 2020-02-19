@@ -36,7 +36,7 @@ import (
 )
 
 // Debug FIXMEDOC
-func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream dbg.Debug_DebugServer, out io.Writer) (*dbg.DebugResp, error) {
+func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out io.Writer) (*dbg.DebugResp, error) {
 
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
@@ -208,14 +208,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream dbg.Debug_Debu
 
 	// now we can read the other commands and re-route to the Debug Client...
 	go func() {
-		for {
-			if command, err := inStream.Recv(); err != nil {
-				break
-			} else if _, err := in.Write(command.GetData()); err != nil {
-				break
-			}
-		}
-
+		io.Copy(in, inStream)
 		// In any case, try process termination after a second to avoid leaving
 		// zombie process.
 		time.Sleep(time.Second)

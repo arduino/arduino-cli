@@ -17,8 +17,9 @@ package daemon
 
 import (
 	"fmt"
-
 	cmd "github.com/arduino/arduino-cli/commands/debug"
+	"io"
+
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
 )
 
@@ -42,8 +43,19 @@ func (s *DebugService) Debug(stream dbg.Debug_DebugServer) error {
 		return fmt.Errorf("first message must contain debug request, not data")
 	}
 
+	r, w := io.Pipe()
+	go func() {
+		for {
+			if command, err := stream.Recv(); err != nil {
+				return
+			} else if _, err := w.Write(command.GetData()); err != nil {
+				return
+			}
+		}
+	}()
+
 	// launch debug recipe attaching stdin and out to grpc streaming
-	resp, err := cmd.Debug(stream.Context(), req, stream, feedStream(func(data []byte) {
+	resp, err := cmd.Debug(stream.Context(), req, r, feedStream(func(data []byte) {
 		stream.Send(&dbg.DebugResp{Data: data})
 	}))
 	if err != nil {
