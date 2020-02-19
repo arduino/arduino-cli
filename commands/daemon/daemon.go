@@ -19,9 +19,9 @@ package daemon
 
 import (
 	"context"
-	"io"
 	"net/http"
 
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
@@ -125,8 +125,8 @@ func (s *ArduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionReq
 func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoCore_CompileServer) error {
 	resp, err := compile.Compile(
 		stream.Context(), req,
-		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{OutStream: data}) }),
-		feedStream(func(data []byte) { stream.Send(&rpc.CompileResp{ErrStream: data}) }),
+		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResp{OutStream: data}) }),
+		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResp{ErrStream: data}) }),
 		false) // set debug to false
 	if err != nil {
 		return err
@@ -220,21 +220,6 @@ func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadReq, stream rpc.ArduinoCor
 		return err
 	}
 	return stream.Send(resp)
-}
-
-func feedStream(streamer func(data []byte)) io.Writer {
-	r, w := io.Pipe()
-	go func() {
-		data := make([]byte, 1024)
-		for {
-			if n, err := r.Read(data); err == nil {
-				streamer(data[:n])
-			} else {
-				return
-			}
-		}
-	}()
-	return w
 }
 
 // LibraryDownload FIXMEDOC

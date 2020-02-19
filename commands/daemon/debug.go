@@ -17,9 +17,8 @@ package daemon
 
 import (
 	"fmt"
+	"github.com/arduino/arduino-cli/arduino/utils"
 	cmd "github.com/arduino/arduino-cli/commands/debug"
-	"io"
-
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
 )
 
@@ -45,30 +44,15 @@ func (s *DebugService) Debug(stream dbg.Debug_DebugServer) error {
 
 	// launch debug recipe attaching stdin and out to grpc streaming
 	resp, err := cmd.Debug(stream.Context(), req,
-		copyStream(func() ([]byte, error) {
+		utils.ConsumeStreamFrom(func() ([]byte, error) {
 			command, err := stream.Recv()
 			return command.GetData(), err
 		}),
-		feedStream(func(data []byte) {
+		utils.FeedStreamTo(func(data []byte) {
 			stream.Send(&dbg.DebugResp{Data: data})
 		}))
 	if err != nil {
 		return (err)
 	}
 	return stream.Send(resp)
-}
-
-func copyStream(streamIn func() ([]byte, error)) io.Reader {
-
-	r, w := io.Pipe()
-	go func() {
-		for {
-			if data, err := streamIn(); err != nil {
-				return
-			} else if _, err := w.Write(data); err != nil {
-				return
-			}
-		}
-	}()
-	return r
 }
