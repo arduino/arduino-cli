@@ -68,6 +68,9 @@ jobs:
           security list-keychains -s ~/Library/Keychains/apple-developer.keychain-db
           security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" ~/Library/Keychains/apple-developer.keychain-db
           gon gon.config.hcl
+          # GitHub's upload/download-artifact@v1 actions don't preserve file permissions,
+          # so we need to add execution permission back until @v2 actions are released.
+          chmod +x dist/arduino_cli_osx_darwin_amd64/arduino-cli 
           tar -czvf dist/arduino-cli_${TAG}_macOS_64bit.tar.gz \
           -C dist/arduino_cli_osx_darwin_amd64/  arduino-cli   \
           -C ../../ LICENSE.txt
