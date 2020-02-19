@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/go-paths-helper"
@@ -44,7 +45,8 @@ import (
 func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out io.Writer) (*dbg.DebugResp, error) {
 
 	// get tool commandLine from core recipe
-	commandLine, err := getCommandLine(req)
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
+	commandLine, err := getCommandLine(req, pm)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get command line for tool: %s", err)
 	}
@@ -90,7 +92,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 }
 
 // getCommandLine compose a debug command represented by a core recipe
-func getCommandLine(req *dbg.DebugConfigReq) ([]string, error) {
+func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) ([]string, error) {
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
 	if req.GetSketchPath() == "" {
@@ -119,8 +121,6 @@ func getCommandLine(req *dbg.DebugConfigReq) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("incorrect FQBN: %s", err)
 	}
-
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
 	// Find target board and board properties
 	_, _, board, boardProperties, _, err := pm.ResolveFQBN(fqbn)
