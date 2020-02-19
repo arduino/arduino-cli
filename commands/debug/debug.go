@@ -28,12 +28,11 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/executils"
+	dbg "github.com/arduino/arduino-cli/rpc/debug"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
-
-	"github.com/arduino/arduino-cli/executils"
-	dbg "github.com/arduino/arduino-cli/rpc/debug"
 )
 
 // Debug command launches a debug tool for a sketch.
@@ -44,7 +43,7 @@ import (
 // It also implements tool process lifecycle management
 func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out io.Writer) (*dbg.DebugResp, error) {
 
-	// get tool commandLine from core recipe
+	// Get tool commandLine from core recipe
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	commandLine, err := getCommandLine(req, pm)
 	if err != nil {

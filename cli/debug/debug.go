@@ -42,17 +42,15 @@ func NewCommand() *cobra.Command {
 	debugCommand := &cobra.Command{
 		Use:     "debug",
 		Short:   "Debug Arduino sketches.",
-		Long:    "Debug Arduino sketches.",
-		Example: "  " + os.Args[0] + " debug /home/user/Arduino/MySketch",
+		Long:    "Debug Arduino sketches. (this command opens an interactive gdb session)",
+		Example: "  " + os.Args[0] + " debug -b arduino:samd:mkr1000  /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}
 
 	debugCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
 	debugCommand.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
-	debugCommand.Flags().StringVarP(&importFile, "input", "i", "", "Input file to be uploaded.")
-
-	debugCommand.MarkFlagRequired("port")
+	debugCommand.Flags().StringVarP(&importFile, "input", "i", "", "Input file to be uploaded for debug.")
 
 	return debugCommand
 }
@@ -77,7 +75,7 @@ func run(command *cobra.Command, args []string) {
 		Port:       port,
 		ImportFile: importFile,
 	}, os.Stdin, os.Stdout); err != nil {
-		feedback.Errorf("Error during Upload: %v", err)
+		feedback.Errorf("Error during Debug: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

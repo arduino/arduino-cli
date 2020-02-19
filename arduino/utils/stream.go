@@ -37,7 +37,6 @@ func FeedStreamTo(writer func(data []byte)) io.Writer {
 // ConsumeStreamFrom creates a pipe to consume data from the reader function.
 // ConsumeStreamFrom returns the io.Reader side of the pipe, which the user can use to consume the data
 func ConsumeStreamFrom(reader func() ([]byte, error)) io.Reader {
-
 	r, w := io.Pipe()
 	go func() {
 		for {

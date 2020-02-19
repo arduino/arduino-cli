@@ -17,7 +17,6 @@ package cli
 
 import (
 	"fmt"
-	"github.com/arduino/arduino-cli/cli/debug"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -29,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/config"
 	"github.com/arduino/arduino-cli/cli/core"
 	"github.com/arduino/arduino-cli/cli/daemon"
+	"github.com/arduino/arduino-cli/cli/debug"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/generatedocs"
