@@ -43,23 +43,32 @@ func (s *DebugService) Debug(stream dbg.Debug_DebugServer) error {
 		return fmt.Errorf("first message must contain debug request, not data")
 	}
 
-	r, w := io.Pipe()
-	go func() {
-		for {
-			if command, err := stream.Recv(); err != nil {
-				return
-			} else if _, err := w.Write(command.GetData()); err != nil {
-				return
-			}
-		}
-	}()
-
 	// launch debug recipe attaching stdin and out to grpc streaming
-	resp, err := cmd.Debug(stream.Context(), req, r, feedStream(func(data []byte) {
-		stream.Send(&dbg.DebugResp{Data: data})
-	}))
+	resp, err := cmd.Debug(stream.Context(), req,
+		copyStream(func() ([]byte, error) {
+			command, err := stream.Recv()
+			return command.GetData(), err
+		}),
+		feedStream(func(data []byte) {
+			stream.Send(&dbg.DebugResp{Data: data})
+		}))
 	if err != nil {
 		return (err)
 	}
 	return stream.Send(resp)
+}
+
+func copyStream(streamIn func() ([]byte, error)) io.Reader {
+
+	r, w := io.Pipe()
+	go func() {
+		for {
+			if data, err := streamIn(); err != nil {
+				return
+			} else if _, err := w.Write(data); err != nil {
+				return
+			}
+		}
+	}()
+	return r
 }
