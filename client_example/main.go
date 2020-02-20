@@ -94,9 +94,9 @@ func main() {
 
 	// With a brand new instance, the first operation should always be updatating
 	// the index.
-	//log.Println("calling UpdateIndex")
-	//callUpdateIndex(client, instance)
-	//
+	log.Println("calling UpdateIndex")
+	callUpdateIndex(client, instance)
+
 	// Let's search for a platform (also known as 'core') called 'samd'.
 	log.Println("calling PlatformSearch(samd)")
 	callPlatformSearch(client, instance)
@@ -120,17 +120,17 @@ func main() {
 
 	// Attach a board to a sketch.
 	// Uncomment if you do have an actual board connected.
-	// log.Println("calling BoardAttach(serial:///dev/ttyACM0)")
-	// callBoardAttach(client, instance)
+	//log.Println("calling BoardAttach(serial:///dev/ttyACM0)")
+	//callBoardAttach(client, instance)
 
 	// Compile a sketch
-	log.Println("calling Compile(arduino-pippo:samd:mkr1000, VERBOSE, hello.ino)")
+	log.Println("calling Compile(arduino:samd:mkr1000, VERBOSE, hello.ino)")
 	callCompile(client, instance)
 
 	// Upload a sketch
 	// Uncomment if you do have an actual board connected.
-	// log.Println("calling Upload(arduino:samd:mkr1000, /dev/ttyACM0, VERBOSE, hello.ino)")
-	// callUpload(client, instance)
+	//log.Println("calling Upload(arduino:samd:mkr1000, /dev/ttyACM0, VERBOSE, hello.ino)")
+	//callUpload(client, instance)
 
 	// Debug a sketch on a board
 	// Uncomment if you do have an actual board connected via debug port,
@@ -140,8 +140,8 @@ func main() {
 	//if err != nil {
 	//	log.Fatalf("debug steraming open  error: %s\n", err)
 	//}
-	// log.Println("calling Debug(arduino:samd:mkr1000, hello.ino)")
-	// callDebugger(debugStreamingClient, instance)
+	//log.Println("calling Debug(arduino:samd:mkr1000, hello.ino)")
+	//callDebugger(debugStreamingClient, instance)
 
 	// List all boards
 	log.Println("calling BoardListAll(mkr)")
@@ -489,7 +489,7 @@ func callCompile(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 	compRespStream, err := client.Compile(context.Background(),
 		&rpc.CompileReq{
 			Instance:   instance,
-			Fqbn:       "arduino-pippo:samd:mkr1000",
+			Fqbn:       "arduino:samd:mkr1000",
 			SketchPath: filepath.Join(currDir, "hello"),
 			Verbose:    true,
 		})
@@ -824,7 +824,7 @@ func callDebugger(debugStreamingOpenClient dbg.Debug_DebugClient, instance *rpc.
 	err := debugStreamingOpenClient.Send(&dbg.DebugReq{
 		DebugReq: &dbg.DebugConfigReq{
 			Instance:   &dbg.Instance{Id: instance.GetId()},
-			Fqbn:       "arduino-pippo:samd:mkr1000",
+			Fqbn:       "arduino:samd:mkr1000",
 			SketchPath: filepath.Join(currDir, "hello"),
 			Port:       "none",
 		}})
