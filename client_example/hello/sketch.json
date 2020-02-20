@@ -1,6 +1,0 @@
-{
-  "cpu": {
-    "fqbn": "arduino:samd:mkr1000",
-    "name": "Arduino MKR1000"
-  }
-}
