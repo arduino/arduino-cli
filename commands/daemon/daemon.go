@@ -213,8 +213,8 @@ func (s *ArduinoCoreServerImpl) PlatformList(ctx context.Context, req *rpc.Platf
 func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadReq, stream rpc.ArduinoCore_UploadServer) error {
 	resp, err := upload.Upload(
 		stream.Context(), req,
-		feedStream(func(data []byte) { stream.Send(&rpc.UploadResp{OutStream: data}) }),
-		feedStream(func(data []byte) { stream.Send(&rpc.UploadResp{ErrStream: data}) }),
+		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadResp{OutStream: data}) }),
+		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadResp{ErrStream: data}) }),
 	)
 	if err != nil {
 		return err
