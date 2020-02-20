@@ -58,6 +58,5 @@ message DebugResp {
     string error = 2;
 }
 
-// duplicate from commands/common.proto
-// as module imports seems not to work
+// TODO remove this in next proto refactoring because is a duplicate from commands/common.proto
 message Instance { int32 id = 1; }

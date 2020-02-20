@@ -127,7 +127,7 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoC
 		stream.Context(), req,
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResp{OutStream: data}) }),
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResp{ErrStream: data}) }),
-		false) // set debug to false
+		false) // Set debug to false
 	if err != nil {
 		return err
 	}

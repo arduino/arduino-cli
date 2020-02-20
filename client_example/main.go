@@ -120,8 +120,8 @@ func main() {
 
 	// Attach a board to a sketch.
 	// Uncomment if you do have an actual board connected.
-	//log.Println("calling BoardAttach(serial:///dev/ttyACM0)")
-	//callBoardAttach(client, instance)
+	// log.Println("calling BoardAttach(serial:///dev/ttyACM0)")
+	// callBoardAttach(client, instance)
 
 	// Compile a sketch
 	log.Println("calling Compile(arduino:samd:mkr1000, VERBOSE, hello.ino)")
@@ -129,19 +129,19 @@ func main() {
 
 	// Upload a sketch
 	// Uncomment if you do have an actual board connected.
-	//log.Println("calling Upload(arduino:samd:mkr1000, /dev/ttyACM0, VERBOSE, hello.ino)")
-	//callUpload(client, instance)
+	// log.Println("calling Upload(arduino:samd:mkr1000, /dev/ttyACM0, VERBOSE, hello.ino)")
+	// callUpload(client, instance)
 
 	// Debug a sketch on a board
 	// Uncomment if you do have an actual board connected via debug port,
 	// or a board connected to a debugger.
-	//debugClient := dbg.NewDebugClient(conn)
-	//debugStreamingClient, err := debugClient.Debug(context.Background())
-	//if err != nil {
-	//	log.Fatalf("debug steraming open  error: %s\n", err)
-	//}
-	//log.Println("calling Debug(arduino:samd:mkr1000, hello.ino)")
-	//callDebugger(debugStreamingClient, instance)
+	// debugClient := dbg.NewDebugClient(conn)
+	// debugStreamingClient, err := debugClient.Debug(context.Background())
+	// if err != nil {
+	// 	 log.Fatalf("debug steraming open  error: %s\n", err)
+	// }
+	// log.Println("calling Debug(arduino:samd:mkr1000, hello.ino)")
+	// callDebugger(debugStreamingClient, instance)
 
 	// List all boards
 	log.Println("calling BoardListAll(mkr)")
@@ -833,7 +833,7 @@ func callDebugger(debugStreamingOpenClient dbg.Debug_DebugClient, instance *rpc.
 	}
 	// Loop and consume the server stream until all the operations are done.
 	waitForPrompt(debugStreamingOpenClient, "(gdb)")
-	// wait for gdb to init and show the prompt
+	// Wait for gdb to init and show the prompt
 	log.Printf("Send 'info registers' rcommand")
 	err = debugStreamingOpenClient.Send(&dbg.DebugReq{Data: []byte("info registers\n")})
 	if err != nil {

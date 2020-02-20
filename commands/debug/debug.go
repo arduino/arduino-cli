@@ -75,7 +75,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 	}
 
 	go func() {
-		// copy data from passed inStream into command stdIn
+		// Copy data from passed inStream into command stdIn
 		io.Copy(in, inStream)
 		// In any case, try process termination after a second to avoid leaving
 		// zombie process.

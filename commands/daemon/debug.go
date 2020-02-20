@@ -17,6 +17,7 @@ package daemon
 
 import (
 	"fmt"
+
 	"github.com/arduino/arduino-cli/arduino/utils"
 	cmd "github.com/arduino/arduino-cli/commands/debug"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
@@ -27,22 +28,22 @@ type DebugService struct{}
 
 // Debug returns a stream response that can be used to fetch data from the
 // target. The first message passed through the `Debug` request must
-// contain DebugConfigReq configuration params, not data.
+// contain DebugReq configuration params, not data.
 func (s *DebugService) Debug(stream dbg.Debug_DebugServer) error {
 
-	// grab the first message
+	// Grab the first message
 	msg, err := stream.Recv()
 	if err != nil {
 		return err
 	}
 
-	// ensure it's a config message and not data
+	// Ensure it's a config message and not data
 	req := msg.GetDebugReq()
 	if req == nil {
-		return fmt.Errorf("first message must contain debug request, not data")
+		return fmt.Errorf("First message must contain debug request, not data")
 	}
 
-	// launch debug recipe attaching stdin and out to grpc streaming
+	// Launch debug recipe attaching stdin and out to grpc streaming
 	resp, err := cmd.Debug(stream.Context(), req,
 		utils.ConsumeStreamFrom(func() ([]byte, error) {
 			command, err := stream.Recv()
