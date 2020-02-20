@@ -323,7 +323,6 @@ func (tr *ToolReleaseActions) Get() (*cores.ToolRelease, error) {
 
 // GetInstalledPlatformRelease returns the PlatformRelease installed (it is chosen)
 func (pm *PackageManager) GetInstalledPlatformRelease(platform *cores.Platform) *cores.PlatformRelease {
-	pm.Log.Infof("Selecting installed platform release for %s", platform)
 	releases := platform.GetAllInstalled()
 	if len(releases) == 0 {
 		return nil
