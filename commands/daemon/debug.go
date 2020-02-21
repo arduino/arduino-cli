@@ -16,11 +16,10 @@
 package daemon
 
 import (
-	"fmt"
-
 	"github.com/arduino/arduino-cli/arduino/utils"
 	cmd "github.com/arduino/arduino-cli/commands/debug"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
+	"github.com/pkg/errors"
 )
 
 // DebugService implements the `Debug` service
@@ -40,7 +39,7 @@ func (s *DebugService) Debug(stream dbg.Debug_DebugServer) error {
 	// Ensure it's a config message and not data
 	req := msg.GetDebugReq()
 	if req == nil {
-		return fmt.Errorf("First message must contain debug request, not data")
+		return errors.Errorf("First message must contain debug request, not data")
 	}
 
 	// Launch debug recipe attaching stdin and out to grpc streaming

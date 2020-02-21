@@ -18,6 +18,7 @@ package debug
 import (
 	"context"
 	"fmt"
+	"github.com/pkg/errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -47,19 +48,18 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	commandLine, err := getCommandLine(req, pm)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get command line for tool: %s", err)
+		return nil, errors.Wrap(err, "Cannot get command line for tool")
 	}
 
 	// Run Tool
 	cmd, err := executils.Command(commandLine)
 	if err != nil {
-		return nil, fmt.Errorf("cannot execute debug tool: %s", err)
+		return nil, errors.Wrap(err, "Cannot execute debug tool")
 	}
 
 	// Get stdIn pipe from tool
 	in, err := cmd.StdinPipe()
 	if err != nil {
-		fmt.Printf("%v\n", err)
 		return &dbg.DebugResp{Error: err.Error()}, nil
 	}
 	defer in.Close()
@@ -70,7 +70,6 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 
 	// Start the debug command
 	if err := cmd.Start(); err != nil {
-		fmt.Printf("%v\n", err)
 		return &dbg.DebugResp{Error: err.Error()}, nil
 	}
 
