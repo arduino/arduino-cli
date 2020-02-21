@@ -16,6 +16,7 @@
 package daemon
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -23,7 +24,10 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"syscall"
 
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands/daemon"
 	srv_commands "github.com/arduino/arduino-cli/rpc/commands"
@@ -87,8 +91,29 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	logrus.Infof("Starting daemon on TCP port %s", port)
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
-		logrus.Fatalf("failed to listen: %v", err)
+		// Invalid port, such as "Foo"
+		var dnsError *net.DNSError
+		if errors.As(err, &dnsError) {
+			feedback.Errorf("Failed to listen on TCP port: %s. %s is unknown name.", port, dnsError.Name)
+			os.Exit(errorcodes.ErrCoreConfig)
+		}
+		// Invalid port number, such as -1
+		var addrError *net.AddrError
+		if errors.As(err, &addrError) {
+			feedback.Errorf("Failed to listen on TCP port: %s. %s is an invalid port.", port, addrError.Addr)
+			os.Exit(errorcodes.ErrCoreConfig)
+		}
+		// Port is already in use
+		var syscallErr *os.SyscallError
+		if errors.As(err, &syscallErr) && errors.Is(syscallErr.Err, syscall.EADDRINUSE) {
+			feedback.Errorf("Failed to listen on TCP port: %s. Address already in use.", port)
+			os.Exit(errorcodes.ErrNetwork)
+		}
+		feedback.Errorf("Failed to listen on TCP port: %s. Unexpected error: %v", port, err)
+		os.Exit(errorcodes.ErrGeneric)
 	}
+	// This message will show up on the stdout of the daemon process so that gRPC clients know it is time to connect.
+	logrus.Infof("Daemon is listening on TCP port %s...", port)
 	if err := s.Serve(lis); err != nil {
 		logrus.Fatalf("failed to serve: %v", err)
 	}
