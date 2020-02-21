@@ -37,6 +37,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 		CustomBuildProperties: []string{"custom=prop"},
 		Verbose:               true,
 		DebugLevel:            5,
+		OptimizationFlags:     "-Os",
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -63,6 +64,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
   "additionalFiles": "",
   "builtInLibrariesFolders": "built-in libraries",
   "builtInToolsFolders": "tools",
+  "compiler.optimization_flags": "-Os",
   "customBuildProperties": "custom=prop",
   "fqbn": "my:nice:fqbn",
   "hardwareFolders": "hardware",

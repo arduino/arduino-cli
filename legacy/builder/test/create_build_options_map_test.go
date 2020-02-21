@@ -35,6 +35,7 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 		Verbose:            true,
 		BuildPath:          paths.New("buildPath"),
 		DebugLevel:         5,
+		OptimizationFlags:  "-Os",
 	}
 
 	create := builder.CreateBuildOptionsMap{}
@@ -45,6 +46,7 @@ func TestCreateBuildOptionsMap(t *testing.T) {
   "additionalFiles": "",
   "builtInLibrariesFolders": "",
   "builtInToolsFolders": "tools",
+  "compiler.optimization_flags": "-Os",
   "customBuildProperties": "",
   "fqbn": "my:nice:fqbn",
   "hardwareFolders": "hardware,hardware2",

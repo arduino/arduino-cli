@@ -91,7 +91,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 
 	var targetArchivedCore *paths.Path
 	if buildCachePath != nil {
-		archivedCoreName := getCachedCoreArchiveFileName(buildProperties.Get(constants.BUILD_PROPERTIES_FQBN),
+		archivedCoreName := GetCachedCoreArchiveFileName(buildProperties.Get(constants.BUILD_PROPERTIES_FQBN),
 			buildProperties.Get("compiler.optimization_flags"), realCoreFolder)
 		targetArchivedCore = buildCachePath.Join(archivedCoreName)
 		canUseArchivedCore := !builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, targetArchivedCore)
@@ -134,7 +134,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 
 // GetCachedCoreArchiveFileName returns the filename to be used to store
 // the global cached core.a.
-func getCachedCoreArchiveFileName(fqbn string, optimizationFlags string, coreFolder *paths.Path) string {
+func GetCachedCoreArchiveFileName(fqbn string, optimizationFlags string, coreFolder *paths.Path) string {
 	fqbnToUnderscore := strings.Replace(fqbn, ":", "_", -1)
 	fqbnToUnderscore = strings.Replace(fqbnToUnderscore, "=", "_", -1)
 	if absCoreFolder, err := coreFolder.Abs(); err == nil {
