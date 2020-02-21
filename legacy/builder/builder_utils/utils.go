@@ -519,20 +519,3 @@ func PrepareCommandForRecipe(ctx *types.Context, buildProperties *properties.Map
 
 	return command, nil
 }
-
-// GetCachedCoreArchiveFileName returns the filename to be used to store
-// the global cached core.a.
-func GetCachedCoreArchiveFileName(fqbn string, coreFolder *paths.Path) string {
-	fqbnToUnderscore := strings.Replace(fqbn, ":", "_", -1)
-	fqbnToUnderscore = strings.Replace(fqbnToUnderscore, "=", "_", -1)
-	if absCoreFolder, err := coreFolder.Abs(); err == nil {
-		coreFolder = absCoreFolder
-	} // silently continue if absolute path can't be detected
-	hash := utils.MD5Sum([]byte(coreFolder.String()))
-	realName := "core_" + fqbnToUnderscore + "_" + hash + ".a"
-	if len(realName) > 100 {
-		// avoid really long names, simply hash the final part
-		realName = "core_" + utils.MD5Sum([]byte(fqbnToUnderscore+"_"+hash)) + ".a"
-	}
-	return realName
-}

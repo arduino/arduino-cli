@@ -24,8 +24,8 @@ import (
 	"github.com/arduino/go-paths-helper"
 
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
+	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/stretchr/testify/require"
 )
@@ -379,7 +379,7 @@ func TestBuilderCacheCoreAFile(t *testing.T) {
 
 	// Pick timestamp of cached core
 	coreFolder := paths.New("downloaded_hardware", "arduino", "avr")
-	coreFileName := builder_utils.GetCachedCoreArchiveFileName(ctx.FQBN.String(), coreFolder)
+	coreFileName := phases.GetCachedCoreArchiveFileName(ctx.FQBN.String(), ctx.OptimizationFlags, coreFolder)
 	cachedCoreFile := ctx.CoreBuildCachePath.Join(coreFileName)
 	coreStatBefore, err := cachedCoreFile.Stat()
 	require.NoError(t, err)

@@ -17,7 +17,6 @@ package builder
 
 import (
 	"encoding/json"
-
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
@@ -30,7 +29,6 @@ func (s *CreateBuildOptionsMap) Run(ctx *types.Context) error {
 	if err != nil {
 		return i18n.WrapError(err)
 	}
-
 	ctx.BuildOptionsJson = string(bytes)
 
 	return nil
