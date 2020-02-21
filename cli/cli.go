@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/config"
 	"github.com/arduino/arduino-cli/cli/core"
 	"github.com/arduino/arduino-cli/cli/daemon"
+	"github.com/arduino/arduino-cli/cli/debug"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/generatedocs"
@@ -77,6 +78,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(lib.NewCommand())
 	cmd.AddCommand(sketch.NewCommand())
 	cmd.AddCommand(upload.NewCommand())
+	cmd.AddCommand(debug.NewCommand())
 	cmd.AddCommand(version.NewCommand())
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")

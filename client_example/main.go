@@ -16,16 +16,19 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
 	"path/filepath"
-	"time"
+	"strings"
 
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	dbg "github.com/arduino/arduino-cli/rpc/debug"
 	"github.com/arduino/arduino-cli/rpc/settings"
 	"google.golang.org/grpc"
 )
@@ -40,7 +43,7 @@ func main() {
 
 	// Establish a connection with the gRPC server, started with the command:
 	// arduino-cli daemon
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock(), grpc.WithTimeout(100*time.Millisecond))
+	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatal("error connecting to arduino-cli rpc server, you can start it by running `arduino-cli daemon`")
 	}
@@ -56,8 +59,9 @@ func main() {
 	dataDir = filepath.ToSlash(dataDir)
 	defer os.RemoveAll(dataDir)
 
-	// Create an instance of the gRPC client.
+	// Create an instance of the gRPC clients.
 	client := rpc.NewArduinoCoreClient(conn)
+
 	settingsClient := settings.NewSettingsClient(conn)
 
 	// Now we can call various methods of the API...
@@ -127,6 +131,17 @@ func main() {
 	// Uncomment if you do have an actual board connected.
 	// log.Println("calling Upload(arduino:samd:mkr1000, /dev/ttyACM0, VERBOSE, hello.ino)")
 	// callUpload(client, instance)
+
+	// Debug a sketch on a board
+	// Uncomment if you do have an actual board connected via debug port,
+	// or a board connected to a debugger.
+	// debugClient := dbg.NewDebugClient(conn)
+	// debugStreamingClient, err := debugClient.Debug(context.Background())
+	// if err != nil {
+	// 	 log.Fatalf("debug steraming open  error: %s\n", err)
+	// }
+	// log.Println("calling Debug(arduino:samd:mkr1000, hello.ino)")
+	// callDebugger(debugStreamingClient, instance)
 
 	// List all boards
 	log.Println("calling BoardListAll(mkr)")
@@ -440,7 +455,7 @@ func callBoardAttach(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 		&rpc.BoardAttachReq{
 			Instance:   instance,
 			BoardUri:   "/dev/ttyACM0",
-			SketchPath: filepath.Join(currDir, "hello.ino"),
+			SketchPath: filepath.Join(currDir, "hello"),
 		})
 
 	if err != nil {
@@ -475,7 +490,7 @@ func callCompile(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 		&rpc.CompileReq{
 			Instance:   instance,
 			Fqbn:       "arduino:samd:mkr1000",
-			SketchPath: filepath.Join(currDir, "hello.ino"),
+			SketchPath: filepath.Join(currDir, "hello"),
 			Verbose:    true,
 		})
 
@@ -514,7 +529,7 @@ func callUpload(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 		&rpc.UploadReq{
 			Instance:   instance,
 			Fqbn:       "arduino:samd:mkr1000",
-			SketchPath: filepath.Join(currDir, "hello.ino"),
+			SketchPath: filepath.Join(currDir, "hello"),
 			Port:       "/dev/ttyACM0",
 			Verbose:    true,
 		})
@@ -799,6 +814,67 @@ func callLibUninstall(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 
 		if uninstallResp.GetTaskProgress() != nil {
 			log.Printf("TASK: %s", uninstallResp.GetTaskProgress())
+		}
+	}
+}
+
+func callDebugger(debugStreamingOpenClient dbg.Debug_DebugClient, instance *rpc.Instance) {
+	currDir, _ := os.Getwd()
+	log.Printf("Send debug request")
+	err := debugStreamingOpenClient.Send(&dbg.DebugReq{
+		DebugReq: &dbg.DebugConfigReq{
+			Instance:   &dbg.Instance{Id: instance.GetId()},
+			Fqbn:       "arduino:samd:mkr1000",
+			SketchPath: filepath.Join(currDir, "hello"),
+			Port:       "none",
+		}})
+	if err != nil {
+		log.Fatalf("Send error: %s\n", err)
+	}
+	// Loop and consume the server stream until all the operations are done.
+	waitForPrompt(debugStreamingOpenClient, "(gdb)")
+	// Wait for gdb to init and show the prompt
+	log.Printf("Send 'info registers' rcommand")
+	err = debugStreamingOpenClient.Send(&dbg.DebugReq{Data: []byte("info registers\n")})
+	if err != nil {
+		log.Fatalf("Send error: %s\n", err)
+	}
+
+	// Loop and consume the server stream until all the operations are done.
+	waitForPrompt(debugStreamingOpenClient, "(gdb)")
+
+	// Send quit command to gdb
+	log.Printf("Send 'quit' command")
+	err = debugStreamingOpenClient.Send(&dbg.DebugReq{Data: []byte("quit\n")})
+	if err != nil {
+		log.Fatalf("Send error: %s\n", err)
+	}
+
+	// Close connection with the debug server
+	log.Printf("Close session")
+	err = debugStreamingOpenClient.CloseSend()
+	if err != nil {
+		log.Fatalf("Send error: %s\n", err)
+	}
+}
+
+func waitForPrompt(debugStreamingOpenClient dbg.Debug_DebugClient, prompt string) {
+	var buffer bytes.Buffer
+	for {
+		compResp, err := debugStreamingOpenClient.Recv()
+
+		// There was an error.
+		if err != nil {
+			log.Fatalf("debug error: %s\n", err)
+		}
+
+		// Consume output and search for the gdb prompt to exit the loop
+		if resp := compResp.GetData(); resp != nil {
+			fmt.Printf("%s", resp)
+			buffer.Write(resp)
+			if strings.Contains(buffer.String(), prompt) {
+				break
+			}
 		}
 	}
 }

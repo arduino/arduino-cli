@@ -31,6 +31,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands/daemon"
 	srv_commands "github.com/arduino/arduino-cli/rpc/commands"
+	srv_debug "github.com/arduino/arduino-cli/rpc/debug"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/monitor"
 	srv_settings "github.com/arduino/arduino-cli/rpc/settings"
 	"github.com/sirupsen/logrus"
@@ -73,16 +74,19 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		VersionString:     globals.VersionInfo.VersionString,
 	})
 
-	// register the monitors service
+	// Register the monitors service
 	srv_monitor.RegisterMonitorServer(s, &daemon.MonitorService{})
 
-	// register the settings service
+	// Register the settings service
 	srv_settings.RegisterSettingsServer(s, &daemon.SettingsService{})
+
+	// Register the debug session service
+	srv_debug.RegisterDebugServer(s, &daemon.DebugService{})
 
 	if !daemonize {
 		// When parent process ends terminate also the daemon
 		go func() {
-			// stdin is closed when the controlling parent process ends
+			// Stdin is closed when the controlling parent process ends
 			_, _ = io.Copy(ioutil.Discard, os.Stdin)
 			os.Exit(0)
 		}()
@@ -115,6 +119,6 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	// This message will show up on the stdout of the daemon process so that gRPC clients know it is time to connect.
 	logrus.Infof("Daemon is listening on TCP port %s...", port)
 	if err := s.Serve(lis); err != nil {
-		logrus.Fatalf("failed to serve: %v", err)
+		logrus.Fatalf("Failed to serve: %v", err)
 	}
 }
