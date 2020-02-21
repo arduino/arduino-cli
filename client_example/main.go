@@ -872,7 +872,7 @@ func waitForPrompt(debugStreamingOpenClient dbg.Debug_DebugClient, prompt string
 		if resp := compResp.GetData(); resp != nil {
 			fmt.Printf("%s", resp)
 			buffer.Write(resp)
-			if strings.HasSuffix(strings.TrimRight(buffer.String(), " "), prompt) {
+			if strings.Contains(buffer.String(), prompt) {
 				break
 			}
 		}
