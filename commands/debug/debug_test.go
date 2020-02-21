@@ -16,6 +16,7 @@ package debug
 
 import (
 	"fmt"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
@@ -36,6 +37,12 @@ func TestGetCommandLine(t *testing.T) {
 	pm.LoadHardwareFromDirectory(customHardware)
 	pm.LoadHardwareFromDirectory(dataDir)
 
+	// Windows tools have .exe extension
+	var toolExtension = ""
+	if runtime.GOOS == "windows" {
+		toolExtension = ".exe"
+	}
+
 	// Arduino Zero has an integrated debugger port, anc it could be debugged directly using USB
 	req := &dbg.DebugConfigReq{
 		Instance:   &dbg.Instance{Id: 1},
@@ -44,25 +51,17 @@ func TestGetCommandLine(t *testing.T) {
 		Port:       "none",
 	}
 
-	goldCommand := fmt.Sprintf("%s/arduino-test/tools/arm-none-eabi-gcc/7-2017q4/bin//arm-none-eabi-gdb", dataDir) +
+	goldCommand := fmt.Sprintf("%s/arduino-test/tools/arm-none-eabi-gcc/7-2017q4/bin//arm-none-eabi-gdb%s", dataDir, toolExtension) +
 		" -ex target extended-remote |" +
-		fmt.Sprintf(" %s/arduino-test/tools/openocd/0.10.0-arduino7/bin/openocd", dataDir) +
+		fmt.Sprintf(" %s/arduino-test/tools/openocd/0.10.0-arduino7/bin/openocd%s", dataDir, toolExtension) +
 		fmt.Sprintf(" -s \"%s/arduino-test/tools/openocd/0.10.0-arduino7/share/openocd/scripts/\"", dataDir) +
 		fmt.Sprintf(" --file \"%s/arduino-test/samd/variants/arduino_zero/openocd_scripts/arduino_zero.cfg\"", customHardware) +
 		fmt.Sprintf(" -c \"gdb_port pipe\" -c \"telnet_port 0\" -c init -c halt %s/hello.arduino-test.samd.arduino_zero_edbg.elf", sketchPath)
 
-	if runtime.GOOS == "windows" {
-		goldCommand = fmt.Sprintf("%s\\arduino-test\\tools\\arm-none-eabi-gcc\\7-2017q4/bin//arm-none-eabi-gdb.exe", dataDir) +
-			" -ex target extended-remote |" +
-			fmt.Sprintf(" %s\\arduino-test\\tools\\openocd\\0.10.0-arduino7/bin/openocd.exe", dataDir) +
-			fmt.Sprintf(" -s \"%s\\arduino-test\\tools\\openocd\\0.10.0-arduino7/share/openocd/scripts/\"", dataDir) +
-			fmt.Sprintf(" --file \"%s\\arduino-test\\samd/variants/arduino_zero/openocd_scripts/arduino_zero.cfg\"", customHardware) +
-			fmt.Sprintf(" -c \"gdb_port pipe\" -c \"telnet_port 0\" -c init -c halt %s/hello.arduino-test.samd.arduino_zero_edbg.elf", sketchPath)
-	}
-
 	command, err := getCommandLine(req, pm)
 	assert.Nil(t, err)
-	assert.Equal(t, goldCommand, strings.Join(command[:], " "))
+	commandToTest := strings.Join(command[:], " ")
+	assert.Equal(t, filepath.FromSlash(goldCommand), filepath.FromSlash(commandToTest))
 
 	// Other samd boards such as mkr1000 can be debugged using an external tool such as Atmel ICE connected to
 	// the board debug port
@@ -73,23 +72,16 @@ func TestGetCommandLine(t *testing.T) {
 		Port:       "none",
 	}
 
-	goldCommand2 := fmt.Sprintf("%s/arduino-test/tools/arm-none-eabi-gcc/7-2017q4/bin//arm-none-eabi-gdb", dataDir) +
+	goldCommand2 := fmt.Sprintf("%s/arduino-test/tools/arm-none-eabi-gcc/7-2017q4/bin//arm-none-eabi-gdb%s", dataDir, toolExtension) +
 		" -ex target extended-remote |" +
-		fmt.Sprintf(" %s/arduino-test/tools/openocd/0.10.0-arduino7/bin/openocd", dataDir) +
+		fmt.Sprintf(" %s/arduino-test/tools/openocd/0.10.0-arduino7/bin/openocd%s", dataDir, toolExtension) +
 		fmt.Sprintf(" -s \"%s/arduino-test/tools/openocd/0.10.0-arduino7/share/openocd/scripts/\"", dataDir) +
 		fmt.Sprintf(" --file \"%s/arduino-test/samd/variants/mkr1000/openocd_scripts/arduino_zero.cfg\"", customHardware) +
 		fmt.Sprintf(" -c \"gdb_port pipe\" -c \"telnet_port 0\" -c init -c halt %s/hello.arduino-test.samd.mkr1000.elf", sketchPath)
 
-	if runtime.GOOS == "windows" {
-		goldCommand2 = fmt.Sprintf("%s\\arduino-test\\tools\\arm-none-eabi-gcc\\7-2017q4/bin//arm-none-eabi-gdb.exe", dataDir) +
-			" -ex target extended-remote |" +
-			fmt.Sprintf(" %s\\arduino-test\\tools\\openocd\\0.10.0-arduino7/bin/openocd.exe", dataDir) +
-			fmt.Sprintf(" -s \"%s\\arduino-test\\tools\\openocd\\0.10.0-arduino7/share/openocd/scripts/\"", dataDir) +
-			fmt.Sprintf(" --file \"%s\\arduino-test\\samd/variants/mkr1000/openocd_scripts/arduino_zero.cfg\"", customHardware) +
-			fmt.Sprintf(" -c \"gdb_port pipe\" -c \"telnet_port 0\" -c init -c halt %s/hello.arduino-test.samd.mkr1000.elf", sketchPath)
-	}
-
 	command2, err := getCommandLine(req2, pm)
 	assert.Nil(t, err)
-	assert.Equal(t, goldCommand2, strings.Join(command2[:], " "))
+	commandToTest2 := strings.Join(command2[:], " ")
+	assert.Equal(t, filepath.FromSlash(goldCommand2), filepath.FromSlash(commandToTest2))
+
 }
