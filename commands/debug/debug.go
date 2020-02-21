@@ -117,13 +117,13 @@ func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) 
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, fmt.Errorf("incorrect FQBN: %s", err)
+		return nil, errors.Wrap(err, "error parsing FQBN")
 	}
 
 	// Find target board and board properties
 	_, _, board, boardProperties, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, fmt.Errorf("incorrect FQBN: %s", err)
+		return nil, errors.Wrap(err, "error resolving FQBN")
 	}
 
 	// Load programmer tool
@@ -199,7 +199,7 @@ func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) 
 		if os.IsNotExist(err) {
 			return nil, fmt.Errorf("compiled sketch %s not found", uploadFile.String())
 		}
-		return nil, fmt.Errorf("cannot open sketch: %s", err)
+		return nil, errors.Wrap(err, "cannot open sketch")
 	}
 
 	// Set debug port property
