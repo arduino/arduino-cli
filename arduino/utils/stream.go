@@ -27,6 +27,7 @@ func FeedStreamTo(writer func(data []byte)) io.Writer {
 			if n, err := r.Read(data); err == nil {
 				writer(data[:n])
 			} else {
+				r.Close()
 				return
 			}
 		}
@@ -41,8 +42,14 @@ func ConsumeStreamFrom(reader func() ([]byte, error)) io.Reader {
 	go func() {
 		for {
 			if data, err := reader(); err != nil {
+				if err == io.EOF {
+					w.Close()
+				} else {
+					w.CloseWithError(err)
+				}
 				return
 			} else if _, err := w.Write(data); err != nil {
+				w.Close()
 				return
 			}
 		}
