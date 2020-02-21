@@ -99,7 +99,7 @@ func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) 
 	sketchPath := paths.New(req.GetSketchPath())
 	sketch, err := sketches.NewSketchFromPath(sketchPath)
 	if err != nil {
-		return nil, fmt.Errorf("opening sketch: %s", err)
+		return nil, errors.Wrap(err, "opening sketch")
 	}
 
 	// FIXME: make a specification on how a port is specified via command line
