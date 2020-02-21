@@ -205,8 +205,7 @@ func (m *DebugResp) GetError() string {
 	return ""
 }
 
-// duplicate from commands/common.proto
-// as module imports seems not to work
+// TODO remove this in next proto refactoring because is a duplicate from commands/common.proto
 type Instance struct {
 	Id                   int32    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`

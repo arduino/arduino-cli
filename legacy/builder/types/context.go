@@ -94,6 +94,10 @@ type Context struct {
 	Verbose           bool
 	DebugPreprocessor bool
 
+	// Compile optimization settings
+	OptimizeForDebug  bool
+	OptimizationFlags string
+
 	// Dry run, only create progress map
 	Progress ProgressStruct
 
@@ -140,6 +144,7 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 	opts.Set("runtime.ide.version", ctx.ArduinoAPIVersion)
 	opts.Set("customBuildProperties", strings.Join(ctx.CustomBuildProperties, ","))
 	opts.Set("additionalFiles", strings.Join(additionalFilesRelative, ","))
+	opts.Set("compiler.optimization_flags", ctx.OptimizationFlags)
 	return opts
 }
 
@@ -156,6 +161,7 @@ func (ctx *Context) InjectBuildOptions(opts *properties.Map) {
 	ctx.FQBN = fqbn
 	ctx.ArduinoAPIVersion = opts.Get("runtime.ide.version")
 	ctx.CustomBuildProperties = strings.Split(opts.Get("customBuildProperties"), ",")
+	ctx.OptimizationFlags = opts.Get("compiler.optimization_flags")
 }
 
 func (ctx *Context) GetLogger() i18n.Logger {

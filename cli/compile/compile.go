@@ -48,6 +48,7 @@ var (
 	verify             bool     // Upload, verify uploaded binary after the upload.
 	exportFile         string   // The compiled binary is written to this file
 	libraries          []string // List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
+	optimizeForDebug   bool     // Optimize compile output for debug, not for release
 )
 
 // NewCommand created a new `compile` command
@@ -80,6 +81,7 @@ func NewCommand() *cobra.Command {
 	command.Flags().StringVar(&vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if boards supports them.")
 	command.Flags().StringSliceVar(&libraries, "libraries", []string{},
 		"List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.")
+	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, "Optional, optimize compile output for debug, not for release.")
 
 	return command
 }
@@ -99,20 +101,21 @@ func run(cmd *cobra.Command, args []string) {
 	sketchPath := initSketchPath(path)
 
 	_, err = compile.Compile(context.Background(), &rpc.CompileReq{
-		Instance:        inst,
-		Fqbn:            fqbn,
-		SketchPath:      sketchPath.String(),
-		ShowProperties:  showProperties,
-		Preprocess:      preprocess,
-		BuildCachePath:  buildCachePath,
-		BuildPath:       buildPath,
-		BuildProperties: buildProperties,
-		Warnings:        warnings,
-		Verbose:         verbose,
-		Quiet:           quiet,
-		VidPid:          vidPid,
-		ExportFile:      exportFile,
-		Libraries:       libraries,
+		Instance:         inst,
+		Fqbn:             fqbn,
+		SketchPath:       sketchPath.String(),
+		ShowProperties:   showProperties,
+		Preprocess:       preprocess,
+		BuildCachePath:   buildCachePath,
+		BuildPath:        buildPath,
+		BuildProperties:  buildProperties,
+		Warnings:         warnings,
+		Verbose:          verbose,
+		Quiet:            quiet,
+		VidPid:           vidPid,
+		ExportFile:       exportFile,
+		Libraries:        libraries,
+		OptimizeForDebug: optimizeForDebug,
 	}, os.Stdout, os.Stderr, viper.GetString("logging.level") == "debug")
 
 	if err != nil {

@@ -69,6 +69,17 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	buildProperties.Set("ide_version", ctx.ArduinoAPIVersion)
 	buildProperties.Set("runtime.os", utils.PrettyOSName())
 
+	if ctx.OptimizeForDebug {
+		if buildProperties.ContainsKey("compiler.optimization_flags.debug") {
+			buildProperties.Set("compiler.optimization_flags", buildProperties.Get("compiler.optimization_flags.debug"))
+		}
+	} else {
+		if buildProperties.ContainsKey("compiler.optimization_flags.release") {
+			buildProperties.Set("compiler.optimization_flags", buildProperties.Get("compiler.optimization_flags.release"))
+		}
+	}
+	ctx.OptimizationFlags = buildProperties.Get("compiler.optimization_flags")
+
 	variant := buildProperties.Get("build.variant")
 	if variant == "" {
 		buildProperties.Set("build.variant.path", "")
