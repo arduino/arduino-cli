@@ -18,7 +18,6 @@ package debug
 import (
 	"context"
 	"fmt"
-	"github.com/pkg/errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -33,6 +32,7 @@ import (
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -42,7 +42,7 @@ import (
 // grpc Out <- tool stdOut
 // grpc Out <- tool stdErr
 // It also implements tool process lifecycle management
-func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out io.Writer) (*dbg.DebugResp, error) {
+func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*dbg.DebugResp, error) {
 
 	// Get tool commandLine from core recipe
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
@@ -71,6 +71,17 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 	// Start the debug command
 	if err := cmd.Start(); err != nil {
 		return &dbg.DebugResp{Error: err.Error()}, nil
+	}
+
+	if interrupt != nil {
+		go func() {
+			for {
+				if _, ok := <-interrupt; !ok {
+					break
+				}
+				cmd.Process.Signal(os.Interrupt)
+			}
+		}()
 	}
 
 	go func() {

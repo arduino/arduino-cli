@@ -18,6 +18,7 @@ package debug
 import (
 	"context"
 	"os"
+	"os/signal"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -68,13 +69,17 @@ func run(command *cobra.Command, args []string) {
 	}
 	sketchPath := initSketchPath(path)
 
+	// Intercept SIGINT and forward them to debug process
+	ctrlc := make(chan os.Signal, 1)
+	signal.Notify(ctrlc, os.Interrupt)
+
 	if _, err := debug.Debug(context.Background(), &dbg.DebugConfigReq{
 		Instance:   &dbg.Instance{Id: instance.GetId()},
 		Fqbn:       fqbn,
 		SketchPath: sketchPath.String(),
 		Port:       port,
 		ImportFile: importFile,
-	}, os.Stdin, os.Stdout); err != nil {
+	}, os.Stdin, os.Stdout, ctrlc); err != nil {
 		feedback.Errorf("Error during Debug: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
