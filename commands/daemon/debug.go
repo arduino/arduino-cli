@@ -16,6 +16,8 @@
 package daemon
 
 import (
+	"os"
+
 	"github.com/arduino/arduino-cli/arduino/utils"
 	cmd "github.com/arduino/arduino-cli/commands/debug"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
@@ -43,14 +45,20 @@ func (s *DebugService) Debug(stream dbg.Debug_DebugServer) error {
 	}
 
 	// Launch debug recipe attaching stdin and out to grpc streaming
+	signalChan := make(chan os.Signal)
+	defer close(signalChan)
 	resp, err := cmd.Debug(stream.Context(), req,
 		utils.ConsumeStreamFrom(func() ([]byte, error) {
 			command, err := stream.Recv()
+			if command.GetSendInterrupt() {
+				signalChan <- os.Interrupt
+			}
 			return command.GetData(), err
 		}),
 		utils.FeedStreamTo(func(data []byte) {
 			stream.Send(&dbg.DebugResp{Data: data})
-		}))
+		}),
+		signalChan)
 	if err != nil {
 		return (err)
 	}
