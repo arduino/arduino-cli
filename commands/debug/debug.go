@@ -76,10 +76,11 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 	if interrupt != nil {
 		go func() {
 			for {
-				if _, ok := <-interrupt; !ok {
+				if sig, ok := <-interrupt; !ok {
 					break
+				} else {
+					cmd.Process.Signal(sig)
 				}
-				cmd.Process.Signal(os.Interrupt)
 			}
 		}()
 	}
