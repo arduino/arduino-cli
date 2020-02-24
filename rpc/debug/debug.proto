@@ -40,6 +40,9 @@ message DebugReq {
 
     // The data to be sent to the target being monitored.
     bytes data = 2;
+
+    // Set this to true to send and Interrupt signal to the debugger process
+    bool send_interrupt = 3;
 }
 
 message DebugConfigReq {
