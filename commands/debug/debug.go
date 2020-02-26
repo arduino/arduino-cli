@@ -51,6 +51,12 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 		return nil, errors.Wrap(err, "Cannot get command line for tool")
 	}
 
+	// Transform every path to forward slashes (on Windows some tools further
+	// escapes the command line so the backslash "\" gets in the way).
+	for i, param := range commandLine {
+		commandLine[i] = filepath.ToSlash(param)
+	}
+
 	// Run Tool
 	cmd, err := executils.Command(commandLine)
 	if err != nil {
