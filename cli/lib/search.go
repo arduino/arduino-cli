@@ -88,8 +88,8 @@ func (res result) Data() interface{} {
 
 		names := []LibName{}
 		results := res.results.GetLibraries()
-		for _, lsr := range results {
-			names = append(names, LibName{lsr.Name})
+		for _, lib := range results {
+			names = append(names, LibName{lib.Name})
 		}
 
 		return NamesOnly{
@@ -113,9 +113,18 @@ func (res result) String() string {
 
 	var out strings.Builder
 
+	if res.results.GetStatus() == rpc.LibrarySearchStatus_failed {
+		out.WriteString("No libraries matching your search.\nDid you mean...\n")
+	}
+
 	for _, lib := range results {
-		out.WriteString(fmt.Sprintf("Name: \"%s\"\n", lib.Name))
-		if res.namesOnly {
+		if res.results.GetStatus() == rpc.LibrarySearchStatus_success {
+			out.WriteString(fmt.Sprintf("Name: \"%s\"\n", lib.Name))
+			if res.namesOnly {
+				continue
+			}
+		} else {
+			out.WriteString(fmt.Sprintf("%s\n", lib.Name))
 			continue
 		}
 

@@ -20,6 +20,31 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+type LibrarySearchStatus int32
+
+const (
+	LibrarySearchStatus_failed  LibrarySearchStatus = 0
+	LibrarySearchStatus_success LibrarySearchStatus = 1
+)
+
+var LibrarySearchStatus_name = map[int32]string{
+	0: "failed",
+	1: "success",
+}
+
+var LibrarySearchStatus_value = map[string]int32{
+	"failed":  0,
+	"success": 1,
+}
+
+func (x LibrarySearchStatus) String() string {
+	return proto.EnumName(LibrarySearchStatus_name, int32(x))
+}
+
+func (LibrarySearchStatus) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_9feed0d29806df6c, []int{0}
+}
+
 type LibraryLayout int32
 
 const (
@@ -42,7 +67,7 @@ func (x LibraryLayout) String() string {
 }
 
 func (LibraryLayout) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_9feed0d29806df6c, []int{0}
+	return fileDescriptor_9feed0d29806df6c, []int{1}
 }
 
 type LibraryLocation int32
@@ -73,7 +98,7 @@ func (x LibraryLocation) String() string {
 }
 
 func (LibraryLocation) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_9feed0d29806df6c, []int{1}
+	return fileDescriptor_9feed0d29806df6c, []int{2}
 }
 
 type LibraryDownloadReq struct {
@@ -649,10 +674,11 @@ func (m *LibrarySearchReq) GetQuery() string {
 }
 
 type LibrarySearchResp struct {
-	Libraries            []*SearchedLibrary `protobuf:"bytes,1,rep,name=libraries,proto3" json:"libraries,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
-	XXX_unrecognized     []byte             `json:"-"`
-	XXX_sizecache        int32              `json:"-"`
+	Libraries            []*SearchedLibrary  `protobuf:"bytes,1,rep,name=libraries,proto3" json:"libraries,omitempty"`
+	Status               LibrarySearchStatus `protobuf:"varint,2,opt,name=status,proto3,enum=cc.arduino.cli.commands.LibrarySearchStatus" json:"status,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
+	XXX_unrecognized     []byte              `json:"-"`
+	XXX_sizecache        int32               `json:"-"`
 }
 
 func (m *LibrarySearchResp) Reset()         { *m = LibrarySearchResp{} }
@@ -685,6 +711,13 @@ func (m *LibrarySearchResp) GetLibraries() []*SearchedLibrary {
 		return m.Libraries
 	}
 	return nil
+}
+
+func (m *LibrarySearchResp) GetStatus() LibrarySearchStatus {
+	if m != nil {
+		return m.Status
+	}
+	return LibrarySearchStatus_failed
 }
 
 type SearchedLibrary struct {
@@ -1352,6 +1385,7 @@ func (m *Library) GetLayout() LibraryLayout {
 }
 
 func init() {
+	proto.RegisterEnum("cc.arduino.cli.commands.LibrarySearchStatus", LibrarySearchStatus_name, LibrarySearchStatus_value)
 	proto.RegisterEnum("cc.arduino.cli.commands.LibraryLayout", LibraryLayout_name, LibraryLayout_value)
 	proto.RegisterEnum("cc.arduino.cli.commands.LibraryLocation", LibraryLocation_name, LibraryLocation_value)
 	proto.RegisterType((*LibraryDownloadReq)(nil), "cc.arduino.cli.commands.LibraryDownloadReq")
