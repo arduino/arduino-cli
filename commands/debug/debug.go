@@ -58,6 +58,12 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 	}
 
 	// Run Tool
+	entry := logrus.NewEntry(logrus.StandardLogger())
+	for i, param := range commandLine {
+		entry = entry.WithField(fmt.Sprintf("param%d", i), param)
+	}
+	entry.Debug("Executing debugger")
+
 	cmd, err := executils.Command(commandLine)
 	if err != nil {
 		return nil, errors.Wrap(err, "Cannot execute debug tool")
