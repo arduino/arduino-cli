@@ -51,7 +51,19 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 		return nil, errors.Wrap(err, "Cannot get command line for tool")
 	}
 
+	// Transform every path to forward slashes (on Windows some tools further
+	// escapes the command line so the backslash "\" gets in the way).
+	for i, param := range commandLine {
+		commandLine[i] = filepath.ToSlash(param)
+	}
+
 	// Run Tool
+	entry := logrus.NewEntry(logrus.StandardLogger())
+	for i, param := range commandLine {
+		entry = entry.WithField(fmt.Sprintf("param%d", i), param)
+	}
+	entry.Debug("Executing debugger")
+
 	cmd, err := executils.Command(commandLine)
 	if err != nil {
 		return nil, errors.Wrap(err, "Cannot execute debug tool")
@@ -224,6 +236,10 @@ func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) 
 
 	// Build recipe for tool
 	recipe := toolProperties.Get("debug.pattern")
+	// REMOVEME: hotfix for samd core 1.8.5
+	if recipe == `"{path}/{cmd}" --interpreter=mi2 -ex "set pagination off" -ex 'target extended-remote | {tools.openocd.path}/{tools.openocd.cmd} -s "{tools.openocd.path}/share/openocd/scripts/" --file "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "gdb_port pipe" -c "telnet_port 0"' {build.path}/{build.project_name}.elf` {
+		recipe = `"{path}/{cmd}" --interpreter=mi2 -ex "set remotetimeout 5" -ex "set pagination off" -ex 'target extended-remote | "{tools.openocd.path}/{tools.openocd.cmd}" -s "{tools.openocd.path}/share/openocd/scripts/" --file "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "gdb_port pipe" -c "telnet_port 0"' "{build.path}/{build.project_name}.elf"`
+	}
 	cmdLine := toolProperties.ExpandPropsInString(recipe)
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 	if err != nil {
