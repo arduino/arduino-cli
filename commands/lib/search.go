@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // LibrarySearch FIXMEDOC
@@ -71,6 +72,7 @@ func GetLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
 		Types:            rel.Types,
 		License:          rel.License,
 		ProvidesIncludes: rel.ProvidesIncludes,
+		Dependencies:     getLibraryDependenciesParameter(rel.GetDependencies()),
 		Resources: &rpc.DownloadResource{
 			Url:             rel.Resource.URL,
 			Archivefilename: rel.Resource.ArchiveFileName,
@@ -79,4 +81,15 @@ func GetLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
 			Cachepath:       rel.Resource.CachePath,
 		},
 	}
+}
+
+func getLibraryDependenciesParameter(deps []semver.Dependency) []*rpc.LibraryDependency {
+	res := []*rpc.LibraryDependency{}
+	for _, dep := range deps {
+		res = append(res, &rpc.LibraryDependency{
+			Name:              dep.GetName(),
+			VersionConstraint: dep.GetConstraint().String(),
+		})
+	}
+	return res
 }

@@ -119,6 +119,15 @@ func (res result) String() string {
 			continue
 		}
 
+		deps := []string{}
+		for _, dep := range lsr.GetLatest().GetDependencies() {
+			if dep.GetVersionConstraint() == "" {
+				deps = append(deps, dep.GetName())
+			} else {
+				deps = append(deps, dep.GetName()+" ("+dep.GetVersionConstraint()+")")
+			}
+		}
+
 		out.WriteString(fmt.Sprintf("  Author: %s\n", lsr.GetLatest().Author))
 		out.WriteString(fmt.Sprintf("  Maintainer: %s\n", lsr.GetLatest().Maintainer))
 		out.WriteString(fmt.Sprintf("  Sentence: %s\n", lsr.GetLatest().Sentence))
@@ -130,6 +139,7 @@ func (res result) String() string {
 		out.WriteString(fmt.Sprintf("  Types: %s\n", strings.Join(lsr.GetLatest().Types, ", ")))
 		out.WriteString(fmt.Sprintf("  Versions: %s\n", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lsr)), " ", ", ", -1)))
 		out.WriteString(fmt.Sprintf("  Provides includes: %s\n", strings.Join(lsr.GetLatest().ProvidesIncludes, ", ")))
+		out.WriteString(fmt.Sprintf("  Dependencies: %s\n", strings.Join(deps, ", ")))
 	}
 
 	return fmt.Sprintf("%s", out.String())
