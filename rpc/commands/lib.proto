@@ -103,6 +103,8 @@ message LibraryRelease {
     repeated string architectures = 8;
     repeated string types = 9;
     DownloadResource resources = 10;
+    string license = 11;
+    repeated string provides_includes = 12;
 }
 
 message DownloadResource {

@@ -60,15 +60,17 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 // GetLibraryParameters FIXMEDOC
 func GetLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
 	return &rpc.LibraryRelease{
-		Author:        rel.Author,
-		Version:       rel.Version.String(),
-		Maintainer:    rel.Maintainer,
-		Sentence:      rel.Sentence,
-		Paragraph:     rel.Paragraph,
-		Website:       rel.Website,
-		Category:      rel.Category,
-		Architectures: rel.Architectures,
-		Types:         rel.Types,
+		Author:           rel.Author,
+		Version:          rel.Version.String(),
+		Maintainer:       rel.Maintainer,
+		Sentence:         rel.Sentence,
+		Paragraph:        rel.Paragraph,
+		Website:          rel.Website,
+		Category:         rel.Category,
+		Architectures:    rel.Architectures,
+		Types:            rel.Types,
+		License:          rel.License,
+		ProvidesIncludes: rel.ProvidesIncludes,
 		Resources: &rpc.DownloadResource{
 			Url:             rel.Resource.URL,
 			Archivefilename: rel.Resource.ArchiveFileName,

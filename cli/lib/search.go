@@ -124,10 +124,12 @@ func (res result) String() string {
 		out.WriteString(fmt.Sprintf("  Sentence: %s\n", lsr.GetLatest().Sentence))
 		out.WriteString(fmt.Sprintf("  Paragraph: %s\n", lsr.GetLatest().Paragraph))
 		out.WriteString(fmt.Sprintf("  Website: %s\n", lsr.GetLatest().Website))
+		out.WriteString(fmt.Sprintf("  License: %s\n", lsr.GetLatest().License))
 		out.WriteString(fmt.Sprintf("  Category: %s\n", lsr.GetLatest().Category))
 		out.WriteString(fmt.Sprintf("  Architecture: %s\n", strings.Join(lsr.GetLatest().Architectures, ", ")))
 		out.WriteString(fmt.Sprintf("  Types: %s\n", strings.Join(lsr.GetLatest().Types, ", ")))
 		out.WriteString(fmt.Sprintf("  Versions: %s\n", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lsr)), " ", ", ", -1)))
+		out.WriteString(fmt.Sprintf("  Provides includes: %s\n", strings.Join(lsr.GetLatest().ProvidesIncludes, ", ")))
 	}
 
 	return fmt.Sprintf("%s", out.String())

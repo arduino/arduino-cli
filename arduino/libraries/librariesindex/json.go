@@ -29,21 +29,23 @@ type indexJSON struct {
 }
 
 type indexRelease struct {
-	Name            string             `json:"name,required"`
-	Version         *semver.Version    `json:"version,required"`
-	Author          string             `json:"author"`
-	Maintainer      string             `json:"maintainer"`
-	Sentence        string             `json:"sentence"`
-	Paragraph       string             `json:"paragraph"`
-	Website         string             `json:"website"`
-	Category        string             `json:"category"`
-	Architectures   []string           `json:"architectures"`
-	Types           []string           `json:"types"`
-	URL             string             `json:"url"`
-	ArchiveFileName string             `json:"archiveFileName"`
-	Size            int64              `json:"size"`
-	Checksum        string             `json:"checksum"`
-	Dependencies    []*indexDependency `json:"dependencies,omitempty"`
+	Name             string             `json:"name,required"`
+	Version          *semver.Version    `json:"version,required"`
+	Author           string             `json:"author"`
+	Maintainer       string             `json:"maintainer"`
+	Sentence         string             `json:"sentence"`
+	Paragraph        string             `json:"paragraph"`
+	Website          string             `json:"website"`
+	Category         string             `json:"category"`
+	Architectures    []string           `json:"architectures"`
+	Types            []string           `json:"types"`
+	URL              string             `json:"url"`
+	ArchiveFileName  string             `json:"archiveFileName"`
+	Size             int64              `json:"size"`
+	Checksum         string             `json:"checksum"`
+	Dependencies     []*indexDependency `json:"dependencies,omitempty"`
+	License          string             `json:"license"`
+	ProvidesIncludes []string           `json:"providesIncludes"`
 }
 
 type indexDependency struct {
@@ -107,8 +109,10 @@ func (indexLib *indexRelease) extractReleaseIn(library *Library) {
 			Checksum:        indexLib.Checksum,
 			CachePath:       "libraries",
 		},
-		Library:      library,
-		Dependencies: indexLib.extractDependencies(),
+		Library:          library,
+		Dependencies:     indexLib.extractDependencies(),
+		License:          indexLib.License,
+		ProvidesIncludes: indexLib.ProvidesIncludes,
 	}
 	library.Releases[indexLib.Version.String()] = release
 	if library.Latest == nil || library.Latest.Version.LessThan(release.Version) {
