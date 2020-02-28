@@ -41,17 +41,19 @@ type Library struct {
 
 // Release is a release of a library available for download
 type Release struct {
-	Author        string
-	Version       *semver.Version
-	Dependencies  []semver.Dependency
-	Maintainer    string
-	Sentence      string
-	Paragraph     string
-	Website       string
-	Category      string
-	Architectures []string
-	Types         []string
-	Resource      *resources.DownloadResource
+	Author           string
+	Version          *semver.Version
+	Dependencies     []semver.Dependency
+	Maintainer       string
+	Sentence         string
+	Paragraph        string
+	Website          string
+	Category         string
+	Architectures    []string
+	Types            []string
+	Resource         *resources.DownloadResource
+	License          string
+	ProvidesIncludes []string
 
 	Library *Library `json:"-"`
 }

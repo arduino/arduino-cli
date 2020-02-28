@@ -113,21 +113,41 @@ func (res result) String() string {
 
 	var out strings.Builder
 
-	for _, lsr := range results {
-		out.WriteString(fmt.Sprintf("Name: \"%s\"\n", lsr.Name))
+	for _, lib := range results {
+		out.WriteString(fmt.Sprintf("Name: \"%s\"\n", lib.Name))
 		if res.namesOnly {
 			continue
 		}
 
-		out.WriteString(fmt.Sprintf("  Author: %s\n", lsr.GetLatest().Author))
-		out.WriteString(fmt.Sprintf("  Maintainer: %s\n", lsr.GetLatest().Maintainer))
-		out.WriteString(fmt.Sprintf("  Sentence: %s\n", lsr.GetLatest().Sentence))
-		out.WriteString(fmt.Sprintf("  Paragraph: %s\n", lsr.GetLatest().Paragraph))
-		out.WriteString(fmt.Sprintf("  Website: %s\n", lsr.GetLatest().Website))
-		out.WriteString(fmt.Sprintf("  Category: %s\n", lsr.GetLatest().Category))
-		out.WriteString(fmt.Sprintf("  Architecture: %s\n", strings.Join(lsr.GetLatest().Architectures, ", ")))
-		out.WriteString(fmt.Sprintf("  Types: %s\n", strings.Join(lsr.GetLatest().Types, ", ")))
-		out.WriteString(fmt.Sprintf("  Versions: %s\n", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lsr)), " ", ", ", -1)))
+		latest := lib.GetLatest()
+
+		deps := []string{}
+		for _, dep := range latest.GetDependencies() {
+			if dep.GetVersionConstraint() == "" {
+				deps = append(deps, dep.GetName())
+			} else {
+				deps = append(deps, dep.GetName()+" ("+dep.GetVersionConstraint()+")")
+			}
+		}
+
+		out.WriteString(fmt.Sprintf("  Author: %s\n", latest.Author))
+		out.WriteString(fmt.Sprintf("  Maintainer: %s\n", latest.Maintainer))
+		out.WriteString(fmt.Sprintf("  Sentence: %s\n", latest.Sentence))
+		out.WriteString(fmt.Sprintf("  Paragraph: %s\n", latest.Paragraph))
+		out.WriteString(fmt.Sprintf("  Website: %s\n", latest.Website))
+		if latest.License != "" {
+			out.WriteString(fmt.Sprintf("  License: %s\n", latest.License))
+		}
+		out.WriteString(fmt.Sprintf("  Category: %s\n", latest.Category))
+		out.WriteString(fmt.Sprintf("  Architecture: %s\n", strings.Join(latest.Architectures, ", ")))
+		out.WriteString(fmt.Sprintf("  Types: %s\n", strings.Join(latest.Types, ", ")))
+		out.WriteString(fmt.Sprintf("  Versions: %s\n", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lib)), " ", ", ", -1)))
+		if len(latest.ProvidesIncludes) > 0 {
+			out.WriteString(fmt.Sprintf("  Provides includes: %s\n", strings.Join(latest.ProvidesIncludes, ", ")))
+		}
+		if len(latest.Dependencies) > 0 {
+			out.WriteString(fmt.Sprintf("  Dependencies: %s\n", strings.Join(deps, ", ")))
+		}
 	}
 
 	return fmt.Sprintf("%s", out.String())
