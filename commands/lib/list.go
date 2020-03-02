@@ -109,7 +109,7 @@ func GetOutputLibrary(lib *libraries.Library) *rpc.Library {
 		UtilityDir:        utldir,
 		Location:          lib.Location,
 		ContainerPlatform: cntplat,
-		Layout:            lib.Layout.String(),
+		Layout:            lib.Layout,
 		RealName:          lib.RealName,
 		DotALinkage:       lib.DotALinkage,
 		Precompiled:       lib.Precompiled,

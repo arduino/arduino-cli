@@ -60,10 +60,10 @@ func makeNewLibrary(libraryDir *paths.Path, location rpc.LibraryLocation) (*Libr
 	library.Location = location
 	library.InstallDir = libraryDir
 	if libraryDir.Join("src").Exist() {
-		library.Layout = RecursiveLayout
+		library.Layout = rpc.LibraryLayout_recursive_layout
 		library.SourceDir = libraryDir.Join("src")
 	} else {
-		library.Layout = FlatLayout
+		library.Layout = rpc.LibraryLayout_flat_layout
 		library.SourceDir = libraryDir
 		addUtilityDirectory(library)
 	}
@@ -116,7 +116,7 @@ func makeLegacyLibrary(path *paths.Path, location rpc.LibraryLocation) (*Library
 		InstallDir:    path,
 		Location:      location,
 		SourceDir:     path,
-		Layout:        FlatLayout,
+		Layout:        rpc.LibraryLayout_flat_layout,
 		Name:          path.Base(),
 		Architectures: []string{"*"},
 		IsLegacy:      true,

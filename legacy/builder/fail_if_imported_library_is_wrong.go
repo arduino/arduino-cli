@@ -20,6 +20,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
 type FailIfImportedLibraryIsWrong struct{}
@@ -41,7 +42,7 @@ func (s *FailIfImportedLibraryIsWrong) Run(ctx *types.Context) error {
 					return i18n.ErrorfWithLogger(logger, constants.MSG_PROP_IN_LIBRARY, propName, library.InstallDir)
 				}
 			}
-			if library.Layout == libraries.RecursiveLayout {
+			if library.Layout == rpc.LibraryLayout_recursive_layout {
 				if library.UtilityDir != nil {
 					return i18n.ErrorfWithLogger(logger, constants.MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS, library.InstallDir)
 				}

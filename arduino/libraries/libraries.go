@@ -61,7 +61,7 @@ type Library struct {
 	UtilityDir        *paths.Path
 	Location          rpc.LibraryLocation
 	ContainerPlatform *cores.PlatformRelease `json:""`
-	Layout            LibraryLayout
+	Layout            rpc.LibraryLayout
 	RealName          string
 	DotALinkage       bool
 	Precompiled       bool
@@ -126,7 +126,7 @@ func (library *Library) SourceDirs() []SourceDir {
 	dirs = append(dirs,
 		SourceDir{
 			Dir:     library.SourceDir,
-			Recurse: library.Layout == RecursiveLayout,
+			Recurse: library.Layout == rpc.LibraryLayout_recursive_layout,
 		})
 	if library.UtilityDir != nil {
 		dirs = append(dirs,

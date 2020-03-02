@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 )
@@ -191,7 +192,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 		}
 	}
 
-	if library.Layout == libraries.RecursiveLayout {
+	if library.Layout == rpc.LibraryLayout_recursive_layout {
 		libObjectFiles, err := builder_utils.CompileFilesRecursive(ctx, library.SourceDir, libraryBuildPath, buildProperties, includes)
 		if err != nil {
 			return nil, i18n.WrapError(err)

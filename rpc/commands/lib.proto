@@ -150,7 +150,6 @@ message Library {
     string source_dir = 11;
     string utility_dir = 12;
     string container_platform = 14;
-    string layout = 15;
     string real_name = 16;
     bool dot_a_linkage = 17;
     bool precompiled = 18;
@@ -160,6 +159,7 @@ message Library {
     string license = 22;
     map<string, string> properties = 23;
     LibraryLocation location = 24;
+    LibraryLayout layout = 25;
 }
 
 enum LibraryLayout {
