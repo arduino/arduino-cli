@@ -147,5 +147,21 @@
      <loc>https://arduino.github.io/arduino-cli/commands/arduino-cli_version/</loc>
      <lastmod>2020-03-04</lastmod>
      <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://arduino.github.io/arduino-cli/rpc/commands/</loc>
+     <lastmod>2020-03-04</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://arduino.github.io/arduino-cli/rpc/monitor/</loc>
+     <lastmod>2020-03-04</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://arduino.github.io/arduino-cli/rpc/settings/</loc>
+     <lastmod>2020-03-04</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://arduino.github.io/arduino-cli/rpc/debug/</loc>
+     <lastmod>2020-03-04</lastmod>
+     <changefreq>daily</changefreq>
     </url>
 </urlset>
