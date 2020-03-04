@@ -1,6 +1,49 @@
 version: '2'
 
+includes:
+  docsgen: ./docsgen
+
 tasks:
+  docs:gen:commands:
+    desc: Generate command reference files
+    dir: ./docsgen
+    cmds:
+      # docs will generate examples using os.Args[0] so we need to call
+      # the generator `arduino-cli`
+      - go build -o arduino-cli
+      # we invoke `arduino-cli` like this instead of `./arduino-cli` to remove
+      # the `./` chars from the examples
+      - PATH=. arduino-cli ../docs/commands
+
+  docs:gen:protobuf:
+    desc: Generate markdown contents for protobuffers
+    cmds:
+      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,commands.md --proto_path=rpc ./rpc/commands/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,monitor.md --proto_path=rpc ./rpc/monitor/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,settings.md --proto_path=rpc ./rpc/settings/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,debug.md --proto_path=rpc ./rpc/debug/*.proto'
+
+  docs:gen:
+    desc: Generate documentation files
+    cmds:
+      - task: docs:gen:commands
+      - task: docs:gen:protobuf
+
+  docs:build:
+    desc: Build documentation website contents
+    deps:
+      - docs:gen:commands
+      - docs:gen:protobuf
+    cmds:
+      - mkdocs build -s
+
+  docs:serve:
+    desc: Run documentation website locally
+    deps:
+      - docs:build
+    cmds:
+      - mkdocs serve
+
   protoc:
     desc: Compile protobuf definitions
     cmds:

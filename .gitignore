@@ -24,3 +24,5 @@ venv
 # Mkdocs
 /public/
 /docsgen/arduino-cli
+/docs/rpc/*.md
+/docs/commands/*.md

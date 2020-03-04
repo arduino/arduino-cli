@@ -53,15 +53,8 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install -r ./requirements_docs.txt
 
-      - name: Generate command reference
-        working-directory: docsgen
-        run: task gen:commands
-
-      - name: Generate protocol buffers reference
-        run: task protoc:docs
-
       - name: Build docs website
-        run: mkdocs build -s
+        run: task docs:build
 
       - name: Deploy
         # publish docs only when PR is merged
