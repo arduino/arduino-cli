@@ -23,7 +23,12 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v2-beta
+        with:
+          go-version: '1.13'
+
+      - name: Print Go version
+        run: go version
 
       - name: Setup Python
         uses: actions/setup-python@v1
