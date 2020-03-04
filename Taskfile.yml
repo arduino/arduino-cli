@@ -1,8 +1,5 @@
 version: '2'
 
-includes:
-  docsgen: ./docsgen
-
 tasks:
   docs:gen:commands:
     desc: Generate command reference files
