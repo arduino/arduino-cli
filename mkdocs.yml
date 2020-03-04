@@ -18,6 +18,7 @@ edit_uri: ""
 # Theme
 theme:
   name: material
+  logo: img/icon_mac_light.png
   palette:
     primary: teal
     accent: orange
