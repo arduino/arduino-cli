@@ -24,8 +24,15 @@ jobs:
         with:
           go-version: '1.13'
 
-      - name: Print Go version
-        run: go version
+      - name: Install Go dependencies
+        run: |
+          go version
+          go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
+
+      - name: Install protoc compiler
+        uses: arduino/setup-protoc@v1.1.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Python
         uses: actions/setup-python@v1
@@ -41,7 +48,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install -r ./requirements_docs.txt
@@ -49,6 +56,9 @@ jobs:
       - name: Generate command reference
         working-directory: docsgen
         run: task gen:commands
+
+      - name: Generate protocol buffers reference
+        run: task protoc:docs
 
       - name: Build docs website
         run: mkdocs build -s
