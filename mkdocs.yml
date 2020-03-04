@@ -94,3 +94,8 @@ nav:
     - sketch new: commands/arduino-cli_sketch_new.md
     - upload: commands/arduino-cli_upload.md
     - version: commands/arduino-cli_version.md
+  - gRPC services:
+    - commands: rpc/commands.md
+    - monitor: rpc/monitor.md
+    - settings: rpc/settings.md
+    - debug: rpc/debug.md
