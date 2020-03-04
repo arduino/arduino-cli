@@ -1,0 +1,12 @@
+version: '2'
+
+tasks:
+  gen:commands:
+    desc: Generate commands reference
+    cmds:
+      # docs will generate examples using os.Args[0] so we need to call
+      # the generator `arduino-cli`
+      - go build -o arduino-cli
+      # we invoke `arduino-cli` like this instead of `./arduino-cli` to remove
+      # the `./` chars from the examples
+      - PATH=. arduino-cli ../docs/commands
