@@ -142,13 +142,13 @@ func IsBundledInDesktopIDE() bool {
 	executable, err := os.Executable()
 	if err != nil {
 		feedback.Errorf("Cannot get executable path: %v", err)
-		return viper.GetBool("IDE.Bundled")
+		return false
 	}
 
 	executablePath, err := filepath.EvalSymlinks(executable)
 	if err != nil {
 		feedback.Errorf("Cannot get executable path: %v", err)
-		return viper.GetBool("IDE.Bundled")
+		return false
 	}
 
 	ideDir := filepath.Dir(executablePath)
@@ -163,17 +163,20 @@ func IsBundledInDesktopIDE() bool {
 	for _, test := range tests {
 		if _, err := os.Stat(filepath.Join(ideDir, test)); err != nil {
 			// the test folder doesn't exist or is not accessible
-			return viper.GetBool("IDE.Bundled")
+			return false
 		}
 	}
+
+	// the CLI is bundled in the Arduino IDE
+
+	// Persist IDE-related config settings
+	viper.Set("IDE.Bundled", true)
+	viper.Set("IDE.Directory", ideDir)
 
 	// Check whether this is a portable install
 	if _, err := os.Stat(filepath.Join(ideDir, "portable")); err != nil {
 		viper.Set("IDE.Portable", true)
 	}
 
-	// Persist IDE-related config settings and return true
-	viper.Set("IDE.Bundled", false)
-	viper.Set("IDE.Directory", ideDir)
 	return true
 }
