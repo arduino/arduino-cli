@@ -35,14 +35,14 @@ func initAttachCommand() *cobra.Command {
 		Use:   "attach <port>|<FQBN> [sketchPath]",
 		Short: "Attaches a sketch to a board.",
 		Long:  "Attaches a sketch to a board.",
-		Example: "  " + os.Args[0] + " board attach serial:///dev/tty/ACM0\n" +
-			"  " + os.Args[0] + " board attach serial:///dev/tty/ACM0 HelloWorld\n" +
+		Example: "  " + os.Args[0] + " board attach serial:///dev/ttyACM0\n" +
+			"  " + os.Args[0] + " board attach serial:///dev/ttyACM0 HelloWorld\n" +
 			"  " + os.Args[0] + " board attach arduino:samd:mkr1000",
 		Args: cobra.RangeArgs(1, 2),
 		Run:  runAttachCommand,
 	}
 	attachCommand.Flags().StringVar(&attachFlags.searchTimeout, "timeout", "5s",
-		"The timeout of the search of connected devices, try to high it if your board is not found (e.g. to 10s).")
+		"The connected devices search timeout, raise it if your board doesn't show up (e.g. to 10s).")
 	return attachCommand
 }
 
