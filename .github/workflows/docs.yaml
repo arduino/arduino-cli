@@ -2,6 +2,10 @@ name: docs
 
 on:
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - closed
     paths:
       - 'docs/**'
       - 'docsgen/**'
