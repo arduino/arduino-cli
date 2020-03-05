@@ -59,6 +59,7 @@ markdown_extensions:
 nav:
   - Documentation Home: 'index.md'
   - getting-started.md
+  - CONTRIBUTING.md
   - Command reference:
     - commands/arduino-cli.md
     - board: commands/arduino-cli_board.md
