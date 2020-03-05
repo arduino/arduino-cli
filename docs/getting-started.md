@@ -341,7 +341,6 @@ in the CLI configuration:
 telemetry:
   enabled: true
   addr: :9090
-  pattern: /metrics
 ```
 
 [client_example]: https://github.com/arduino/arduino-cli/blob/master/client_example
