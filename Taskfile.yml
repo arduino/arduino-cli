@@ -1,6 +1,46 @@
 version: '2'
 
 tasks:
+  docs:gen:commands:
+    desc: Generate command reference files
+    dir: ./docsgen
+    cmds:
+      # docs will generate examples using os.Args[0] so we need to call
+      # the generator `arduino-cli`
+      - go build -o arduino-cli
+      # we invoke `arduino-cli` like this instead of `./arduino-cli` to remove
+      # the `./` chars from the examples
+      - PATH=. arduino-cli ../docs/commands
+
+  docs:gen:protobuf:
+    desc: Generate markdown contents for protobuffers
+    cmds:
+      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,commands.md --proto_path=rpc ./rpc/commands/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,monitor.md --proto_path=rpc ./rpc/monitor/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,settings.md --proto_path=rpc ./rpc/settings/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,debug.md --proto_path=rpc ./rpc/debug/*.proto'
+
+  docs:gen:
+    desc: Generate documentation files
+    cmds:
+      - task: docs:gen:commands
+      - task: docs:gen:protobuf
+
+  docs:build:
+    desc: Build documentation website contents
+    deps:
+      - docs:gen:commands
+      - docs:gen:protobuf
+    cmds:
+      - mkdocs build -s
+
+  docs:serve:
+    desc: Run documentation website locally
+    deps:
+      - docs:build
+    cmds:
+      - mkdocs serve
+
   protoc:
     desc: Compile protobuf definitions
     cmds:
@@ -8,6 +48,14 @@ tasks:
       - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/monitor/*.proto'
       - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/settings/*.proto'
       - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/debug/*.proto'
+
+  protoc:docs:
+    desc: Generate docs for protobuf definitions
+    cmds:
+      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,commands.md --proto_path=rpc ./rpc/commands/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,monitor.md --proto_path=rpc ./rpc/monitor/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,settings.md --proto_path=rpc ./rpc/settings/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,debug.md --proto_path=rpc ./rpc/debug/*.proto'
 
   build:
     desc: Build the project
@@ -62,13 +110,11 @@ vars:
   # all modules of this project except for "legacy/..." module
   DEFAULT_TARGETS:
     sh: echo `go list ./... | grep -v legacy | tr '\n' ' '`
-
   # build vars
   COMMIT:
     sh: echo ${TRAVIS_COMMIT:-`git log -n 1 --format=%h`}
   LDFLAGS: >
-      -ldflags '-X github.com/arduino/arduino-cli/version.commit={{.COMMIT}}'
-
+    -ldflags '-X github.com/arduino/arduino-cli/version.commit={{.COMMIT}}'
   # test vars
   GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
   TEST_VERSIONSTRING: "0.0.0-test.preview"
@@ -76,7 +122,6 @@ vars:
   TEST_LDFLAGS: >
     -ldflags  '-X github.com/arduino/arduino-cli/version.versionString={{.TEST_VERSIONSTRING}}
     -X github.com/arduino/arduino-cli/version.commit={{.TEST_COMMIT}}'
-
   # check-lint vars
   GOLINTBIN:
     sh: go list -f {{"{{"}}".Target{{"}}"}}" golang.org/x/lint/golint

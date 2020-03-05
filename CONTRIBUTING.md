@@ -22,6 +22,11 @@ If you want to run integration tests you will also need:
 * A serial port with an Arduino device attached
 * A working [Python][3] environment, version 3.5 or later
 
+If you're working on the gRPC interface you will also have to:
+
+* download the [protoc][6] compiler
+* run `go get -U github.com/golang/protobuf/protoc-gen-go`
+
 ## Building the source code
 
 From the project folder root, just run:
@@ -133,6 +138,36 @@ If the last step was successful, you should be able to run the tests with:
 task test-integration
 ```
 
+## Working on docs
+
+Documentation consists of several Markdown files stored under the `docs` folder
+at the root of the repo. Some of those files are automatically generated in the
+CI pipeline that builds the documentation website so you won't find them in the
+git repository and you need to generate them locally.
+
+If you're working on docs and your changes are not trivial, you might want to
+preview the documentation website locally, before opening a Pull Request. To run
+the docs toolchain locally you need to have:
+
+* [Go][1] version 1.12 or later
+* [Taskfile][2] to help you run the most common tasks from the command line
+* A working [Python][3] environment, version 3.5 or later
+
+Before running the toolchain, perform the following operations:
+
+* go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
+
+When working on docs, you can launch a command that will take care of
+generating the docs, build the static website and start a local server you can
+access with your browser to see a preview of your changes - to launch this
+command do:
+
+```shell
+task docs:serve
+```
+
+If you dont' see any error, hit http://127.0.0.1:8000 with your browser.
+
 ## Pull Requests
 
 In order to ease code reviews and have your contributions merged faster, here is
@@ -170,3 +205,4 @@ title with the string **[skip changelog]**
 [3]: https://www.python.org/downloads/
 [4]: https://docs.python.org/3/tutorial/venv.html
 [5]: https://github.com/ofek/hatch
+[6]: https://github.com/protocolbuffers/protobuf/releases

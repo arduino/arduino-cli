@@ -20,3 +20,9 @@ venv
 
 # Misc.
 .DS_Store
+
+# Mkdocs
+/public/
+/docsgen/arduino-cli
+/docs/rpc/*.md
+/docs/commands/*.md
