@@ -1,6 +1,45 @@
 Despite there's no feature parity at the moment, Arduino CLI provides many of
 the features you can find in the Arduino IDE, let's see some examples.
 
+## Before you start
+
+`arduino-cli` is a container of commands and each command has its own
+dedicated help text that can be shown with the `help` command like this:
+
+```console
+$ arduino-cli help core
+Arduino Core operations.
+
+Usage:
+    arduino-cli core [command]
+
+Examples:
+    ./arduino-cli core update-index
+
+Available Commands:
+    download     Downloads one or more cores and corresponding tool dependencies.
+    install      Installs one or more cores and corresponding tool dependencies.
+    list         Shows the list of installed platforms.
+    search       Search for a core in the package index.
+    uninstall    Uninstalls one or more cores and corresponding tool dependencies if no more used.
+    update-index Updates the index of cores.
+    upgrade      Upgrades one or all installed platforms to the latest version.
+
+Flags:
+    -h, --help   help for core
+
+Global Flags:
+        --additional-urls strings   Additional URLs for the board manager.
+        --config-file string        The custom config file (if not specified the default will be used).
+        --format string             The output format, can be [text|json]. (default "text")
+        --log-file string           Path to the file where logs will be written.
+        --log-format string         The output format for the logs, can be [text|json].
+        --log-level string          Messages with this level and above will be logged.
+    -v, --verbose                   Print the logs on the standard output.
+
+Use "arduino-cli core [command] --help" for more information about a command.
+```
+
 ## Create a configuration file
 
 Arduino CLI doesn't strictly require a configuration file to work because the
