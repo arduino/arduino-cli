@@ -6,12 +6,12 @@ Arduino CLI is an all-in-one solution that provides builder, boards/library mana
 uploader, discovery and many other tools needed to use any Arduino compatible
 board and platforms.
 
-> **Note:** this software is currently under active development: anything can change
-  at any time, API and UI must be considered unstable until we release version 1.0.0.
-
 [![tests-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=test)
 [![nightly-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=nightly)
 [![codecov-badge]](https://codecov.io/gh/arduino/arduino-cli)
+
+> **Note:** this software is currently under active development: anything can change
+  at any time, API and UI must be considered unstable until we release version 1.0.0.
 
 ## Docs
 
