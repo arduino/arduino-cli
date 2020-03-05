@@ -69,10 +69,13 @@ func generateInstallationData() {
 
 func writeStore(configFilePath string) {
 	configPath := filepath.Dir(configFilePath)
-	// Create dir if not present
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		os.MkdirAll(configPath, 0755)
+
+	// Create config dir if not present,
+	// MkdirAll will retrun no error if the path already exists
+	if err := os.MkdirAll(configPath, os.FileMode(0755)); err != nil {
+		feedback.Errorf("Error creating repertory dir: %v", err)
 	}
+
 	// Create file if not present
 	err := Store.WriteConfigAs(configFilePath)
 	if err != nil {
