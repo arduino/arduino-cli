@@ -37,9 +37,10 @@ the source code, run the tests, and contribute your changes to the project.
 [tests-badge]: https://github.com/Arduino/arduino-cli/workflows/test/badge.svg
 [nightly-badge]: https://github.com/Arduino/arduino-cli/workflows/nightly/badge.svg
 [codecov-badge]: https://codecov.io/gh/arduino/arduino-cli/branch/master/graph/badge.svg
+[Install]: https://arduino.github.io/arduino-cli/installation
 [User documentation]: https://arduino.github.io/arduino-cli/
 [Getting Started]: https://arduino.github.io/arduino-cli/getting-started/
-[Commands reference]: https://arduino.github.io/arduino-cli/commands/
+[Commands reference]: https://arduino.github.io/arduino-cli/commands/arduino-cli
 [FAQ]: https://arduino.github.io/arduino-cli/FAQ/
 [How to contribute]: https://arduino.github.io/arduino-cli/CONTRIBUTING/
 [contributors]: https://github.com/arduino/arduino-cli/graphs/contributors
