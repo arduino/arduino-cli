@@ -39,6 +39,4 @@ func setDefaults(dataDir, userDir string) {
 	//telemetry settings
 	viper.SetDefault("telemetry.enabled", true)
 	viper.SetDefault("telemetry.addr", ":9090")
-	viper.SetDefault("telemetry.pattern", "/metrics")
-
 }

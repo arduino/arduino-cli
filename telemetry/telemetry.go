@@ -29,6 +29,9 @@ import (
 	"github.com/spf13/viper"
 )
 
+// serverPattern is the telemetry endpoint resource path for consume metrics
+var serverPattern = "/metrics"
+
 // Activate configures and starts the telemetry server exposing a Prometheus resource
 func Activate(metricPrefix string) {
 	// Create a Prometheus default handler
@@ -42,7 +45,6 @@ func Activate(metricPrefix string) {
 
 	// Configure using viper settings
 	serverAddr := viper.GetString("telemetry.addr")
-	serverPattern := viper.GetString("telemetry.pattern")
 	logrus.Infof("Setting up Prometheus telemetry on %s%s", serverAddr, serverPattern)
 	go func() {
 		http.Handle(serverPattern, ph)
