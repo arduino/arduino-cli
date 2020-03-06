@@ -42,7 +42,7 @@ func initListCommand() *cobra.Command {
 	}
 
 	listCommand.Flags().StringVar(&listFlags.timeout, "timeout", "0s",
-		"The timeout of the search of connected devices, try to increase it if your board is not found (e.g. to 10s).")
+		"The connected devices search timeout, raise it if your board doesn't show up (e.g. to 10s).")
 	return listCommand
 }
 
