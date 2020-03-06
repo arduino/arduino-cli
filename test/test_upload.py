@@ -38,9 +38,35 @@ def test_upload(run_command, data_dir, detected_boards):
                 fqbn=board.fqbn, sketch_path=sketch_path
             )
         )
+        # Upload without port must fail
+        result = run_command(
+            "upload -b {fqbn} {sketch_path}".format(
+                sketch_path=sketch_path, fqbn=board.fqbn, port=board.address
+            )
+        )
+        assert result.failed
         # Upload
         assert run_command(
             "upload -b {fqbn} -p {port} {sketch_path}".format(
                 sketch_path=sketch_path, fqbn=board.fqbn, port=board.address
             )
         )
+
+
+def test_upload_after_attach(run_command, data_dir, detected_boards):
+    # Init the environment explicitly
+    assert run_command("core update-index")
+
+    for board in detected_boards:
+        # Download core
+        assert run_command("core install {}".format(board.core))
+        # Create a sketch
+        sketch_path = os.path.join(data_dir, "foo")
+        assert run_command("sketch new {}".format(sketch_path))
+        assert run_command(
+            "board attach serial://{port} {sketch_path}".format(port=board.address, sketch_path=sketch_path)
+        )
+        # Build sketch
+        assert run_command("compile {sketch_path}".format(sketch_path=sketch_path))
+        # Upload
+        assert run_command("upload  {sketch_path}".format(sketch_path=sketch_path))
