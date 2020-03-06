@@ -103,9 +103,8 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		go func() {
 			// Stdin is closed when the controlling parent process ends
 			_, _ = io.Copy(ioutil.Discard, os.Stdin)
-			if viper.GetBool("telemetry.enabled") {
-				stats.Flush()
-			}
+			// Flush telemetry stats (this is a no-op if telemetry is disabled)
+			stats.Flush()
 			os.Exit(0)
 		}()
 	}
