@@ -263,5 +263,14 @@ func preRun(cmd *cobra.Command, args []string) {
 	netConf := downloader.Config{
 		RequestHeaders: globals.NewHTTPClientHeader(),
 	}
+	if viper.IsSet("network.proxy") {
+		proxy := viper.GetString("network.proxy")
+		if _, err := url.Parse(proxy); err != nil {
+			feedback.Error("Invalid network.proxy '" + proxy + "': " + err.Error())
+			os.Exit(errorcodes.ErrBadArgument)
+		}
+		netConf.ProxyURL = proxy
+		logrus.Infof("Using proxy %s", proxy)
+	}
 	downloader.SetDefaultConfig(netConf)
 }
