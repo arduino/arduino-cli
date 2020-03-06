@@ -18,6 +18,7 @@ package cli
 import (
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -45,6 +46,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"go.bug.st/downloader"
 )
 
 var (
@@ -254,4 +256,12 @@ func preRun(cmd *cobra.Command, args []string) {
 			os.Exit(errorcodes.ErrBadCall)
 		})
 	}
+
+	//
+	// Configure network
+	//
+	netConf := downloader.Config{
+		RequestHeaders: globals.NewHTTPClientHeader(),
+	}
+	downloader.SetDefaultConfig(netConf)
 }

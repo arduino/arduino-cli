@@ -17,7 +17,6 @@ package lib
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
@@ -25,11 +24,11 @@ import (
 
 // LibraryUpgradeAll upgrades all the available libraries
 func LibraryUpgradeAll(instanceID int32, downloadCB commands.DownloadProgressCB,
-	taskCB commands.TaskProgressCB, headers http.Header) error {
+	taskCB commands.TaskProgressCB) error {
 	// get the library manager
 	lm := commands.GetLibraryManager(instanceID)
 
-	if err := upgrade(lm, listLibraries(lm, true, true), downloadCB, taskCB, headers); err != nil {
+	if err := upgrade(lm, listLibraries(lm, true, true), downloadCB, taskCB); err != nil {
 		return err
 	}
 
@@ -42,7 +41,7 @@ func LibraryUpgradeAll(instanceID int32, downloadCB commands.DownloadProgressCB,
 
 // LibraryUpgrade upgrades only the given libraries
 func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB commands.DownloadProgressCB,
-	taskCB commands.TaskProgressCB, headers http.Header) error {
+	taskCB commands.TaskProgressCB) error {
 	// get the library manager
 	lm := commands.GetLibraryManager(instanceID)
 
@@ -50,16 +49,16 @@ func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB commands
 	libs := filterByName(listLibraries(lm, true, true), libraryNames)
 
 	// do it
-	return upgrade(lm, libs, downloadCB, taskCB, headers)
+	return upgrade(lm, libs, downloadCB, taskCB)
 }
 
 func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downloadCB commands.DownloadProgressCB,
-	taskCB commands.TaskProgressCB, downloaderHeaders http.Header) error {
+	taskCB commands.TaskProgressCB) error {
 
 	// Go through the list and download them
 
 	for _, lib := range libs {
-		if err := downloadLibrary(lm, lib.Available, downloadCB, taskCB, downloaderHeaders); err != nil {
+		if err := downloadLibrary(lm, lib.Available, downloadCB, taskCB); err != nil {
 			return err
 		}
 	}

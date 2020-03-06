@@ -19,7 +19,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
@@ -34,7 +33,7 @@ var (
 
 // PlatformUpgrade FIXMEDOC
 func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) (*rpc.PlatformUpgradeResp, error) {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformUpgradeResp, error) {
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
@@ -46,7 +45,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
 	}
-	if err := upgradePlatform(pm, ref, downloadCB, taskCB, downloaderHeaders); err != nil {
+	if err := upgradePlatform(pm, ref, downloadCB, taskCB); err != nil {
 		return nil, err
 	}
 
@@ -58,7 +57,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 }
 
 func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) error {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 	if platformRef.PlatformVersion != nil {
 		return fmt.Errorf("upgrade doesn't accept parameters with version")
 	}
@@ -85,7 +84,7 @@ func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 		if err != nil {
 			return fmt.Errorf("platform %s is not installed", platformRef)
 		}
-		err = installPlatform(pm, platform, tools, downloadCB, taskCB, downloaderHeaders)
+		err = installPlatform(pm, platform, tools, downloadCB, taskCB)
 		if err != nil {
 			return err
 		}

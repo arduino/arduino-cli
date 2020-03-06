@@ -17,7 +17,6 @@ package commands
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -25,9 +24,8 @@ import (
 )
 
 // DownloadToolRelease downloads a ToolRelease
-func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease,
-	downloadCB DownloadProgressCB, downloaderHeaders http.Header) error {
-	resp, err := pm.DownloadToolRelease(toolRelease, downloaderHeaders)
+func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, downloadCB DownloadProgressCB) error {
+	resp, err := pm.DownloadToolRelease(toolRelease)
 	if err != nil {
 		return err
 	}

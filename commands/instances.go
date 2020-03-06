@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"net/url"
 	"path"
 	"time"
@@ -89,13 +88,12 @@ func GetLibraryManager(instanceID int32) *librariesmanager.LibrariesManager {
 	return i.lm
 }
 
-func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, downloadCB DownloadProgressCB,
-	taskCB TaskProgressCB, downloaderHeaders http.Header) (bool, error) {
+func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (bool, error) {
 	if tool.IsInstalled() {
 		return false, nil
 	}
 	taskCB(&rpc.TaskProgress{Name: "Downloading missing tool " + tool.String()})
-	if err := DownloadToolRelease(instance.PackageManager, tool, downloadCB, downloaderHeaders); err != nil {
+	if err := DownloadToolRelease(instance.PackageManager, tool, downloadCB); err != nil {
 		return false, fmt.Errorf("downloading %s tool: %s", tool, err)
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
@@ -105,18 +103,17 @@ func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, down
 	return true, nil
 }
 
-func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB, taskCB TaskProgressCB,
-	downloaderHeaders http.Header) error {
+func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
 	// Check for ctags tool
 	ctags, _ := getBuiltinCtagsTool(instance.PackageManager)
-	ctagsInstalled, err := instance.installToolIfMissing(ctags, downloadCB, taskCB, downloaderHeaders)
+	ctagsInstalled, err := instance.installToolIfMissing(ctags, downloadCB, taskCB)
 	if err != nil {
 		return err
 	}
 
 	// Check for bultin serial-discovery tool
 	serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(instance.PackageManager)
-	serialDiscoveryInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCB, taskCB, downloaderHeaders)
+	serialDiscoveryInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCB, taskCB)
 	if err != nil {
 		return err
 	}
@@ -130,9 +127,7 @@ func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB
 }
 
 // Init FIXMEDOC
-func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB,
-	downloaderHeaders http.Header) (*rpc.InitResp, error) {
-
+func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (*rpc.InitResp, error) {
 	res, err := createInstance(ctx, req.GetLibraryManagerOnly())
 	if err != nil {
 		return nil, fmt.Errorf("cannot initialize package manager: %s", err)
@@ -147,7 +142,7 @@ func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, 
 	instancesCount++
 	instances[handle] = instance
 
-	if err := instance.checkForBuiltinTools(downloadCB, taskCB, downloaderHeaders); err != nil {
+	if err := instance.checkForBuiltinTools(downloadCB, taskCB); err != nil {
 		return nil, err
 	}
 

@@ -17,7 +17,6 @@ package packagemanager
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"go.bug.st/downloader"
@@ -101,16 +100,16 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 
 // DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Downloader
 // is returned.
-func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, downloaderHeaders http.Header) (*downloader.Downloader, error) {
+func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease) (*downloader.Downloader, error) {
 	resource := tool.GetCompatibleFlavour()
 	if resource == nil {
 		return nil, fmt.Errorf("tool not available for your OS")
 	}
-	return resource.Download(pm.DownloadDir, downloaderHeaders)
+	return resource.Download(pm.DownloadDir)
 }
 
 // DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
 // nil Downloader is returned.
-func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, downloaderHeaders http.Header) (*downloader.Downloader, error) {
-	return platform.Resource.Download(pm.DownloadDir, downloaderHeaders)
+func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease) (*downloader.Downloader, error) {
+	return platform.Resource.Download(pm.DownloadDir)
 }

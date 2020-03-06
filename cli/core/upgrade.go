@@ -93,7 +93,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			Architecture:    platformRef.Architecture,
 		}
 
-		_, err := core.PlatformUpgrade(context.Background(), r, output.ProgressBar(), output.TaskProgress(), globals.NewHTTPClientHeader())
+		_, err := core.PlatformUpgrade(context.Background(), r, output.ProgressBar(), output.TaskProgress())
 		if err == core.ErrAlreadyLatest {
 			feedback.Printf("Platform %s is already at the latest version", platformRef)
 		} else if err != nil {

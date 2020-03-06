@@ -19,7 +19,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -29,7 +28,7 @@ import (
 
 // PlatformInstall FIXMEDOC
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) (*rpc.PlatformInstallResp, error) {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResp, error) {
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
@@ -50,7 +49,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 		return nil, fmt.Errorf("finding platform dependencies: %s", err)
 	}
 
-	err = installPlatform(pm, platform, tools, downloadCB, taskCB, downloaderHeaders)
+	err = installPlatform(pm, platform, tools, downloadCB, taskCB)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +64,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 
 func installPlatform(pm *packagemanager.PackageManager,
 	platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, downloaderHeaders http.Header) error {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 	log := pm.Log.WithField("platform", platformRelease)
 
 	// Prerequisite checks before install
@@ -87,9 +86,9 @@ func installPlatform(pm *packagemanager.PackageManager,
 	// Package download
 	taskCB(&rpc.TaskProgress{Name: "Downloading packages"})
 	for _, tool := range toolsToInstall {
-		downloadTool(pm, tool, downloadCB, downloaderHeaders)
+		downloadTool(pm, tool, downloadCB)
 	}
-	downloadPlatform(pm, platformRelease, downloadCB, downloaderHeaders)
+	downloadPlatform(pm, platformRelease, downloadCB)
 	taskCB(&rpc.TaskProgress{Completed: true})
 
 	// Install tools first

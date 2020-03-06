@@ -21,7 +21,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net"
-	"net/http"
 	"os"
 	"runtime"
 	"syscall"
@@ -39,6 +38,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"go.bug.st/downloader"
 	"google.golang.org/grpc"
 )
 
@@ -71,22 +71,19 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	port := viper.GetString("daemon.port")
 	s := grpc.NewServer()
 
-	// Compose user agent header
-	headers := http.Header{
-		"User-Agent": []string{
-			fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s",
-				globals.VersionInfo.Application,
-				globals.VersionInfo.VersionString,
-				runtime.GOARCH,
-				runtime.GOOS,
-				runtime.Version(),
-				globals.VersionInfo.Commit),
-		},
-	}
-	// Register the commands service
+	// Set specific user-agent for the daemon
+	netConf := downloader.GetDefaultConfig()
+	netConf.RequestHeaders.Set("User-Agent",
+		fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s",
+			globals.VersionInfo.Application,
+			globals.VersionInfo.VersionString,
+			runtime.GOARCH, runtime.GOOS,
+			runtime.Version(), globals.VersionInfo.Commit))
+	downloader.SetDefaultConfig(netConf)
+
+	// register the commands service
 	srv_commands.RegisterArduinoCoreServer(s, &daemon.ArduinoCoreServerImpl{
-		DownloaderHeaders: headers,
-		VersionString:     globals.VersionInfo.VersionString,
+		VersionString: globals.VersionInfo.VersionString,
 	})
 
 	// Register the monitors service
