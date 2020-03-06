@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -53,6 +54,15 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 
 	// FIXME: make a specification on how a port is specified via command line
 	port := req.GetPort()
+	if port == "" && sketch != nil && sketch.Metadata != nil {
+		deviceURI, err := url.Parse(sketch.Metadata.CPU.Port)
+		if err != nil {
+			return nil, fmt.Errorf("invalid Device URL format: %s", err)
+		}
+		if deviceURI.Scheme == "serial" {
+			port = deviceURI.Host + deviceURI.Path
+		}
+	}
 	if port == "" {
 		return nil, fmt.Errorf("no upload port provided")
 	}
