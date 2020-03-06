@@ -22,7 +22,6 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
-	"runtime"
 	"syscall"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -73,12 +72,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 
 	// Set specific user-agent for the daemon
 	netConf := downloader.GetDefaultConfig()
-	netConf.RequestHeaders.Set("User-Agent",
-		fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s",
-			globals.VersionInfo.Application,
-			globals.VersionInfo.VersionString,
-			runtime.GOARCH, runtime.GOOS,
-			runtime.Version(), globals.VersionInfo.Commit))
+	netConf.RequestHeaders = globals.NewHTTPClientHeader("daemon")
 	downloader.SetDefaultConfig(netConf)
 
 	// register the commands service

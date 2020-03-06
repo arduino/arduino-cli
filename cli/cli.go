@@ -261,7 +261,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	// Configure network
 	//
 	netConf := downloader.Config{
-		RequestHeaders: globals.NewHTTPClientHeader(),
+		RequestHeaders: globals.NewHTTPClientHeader(""),
 	}
 	if viper.IsSet("network.proxy") {
 		proxy := viper.GetString("network.proxy")
