@@ -7,8 +7,14 @@ on:
       - synchronize
       - closed
     paths:
+      # existing docs
       - 'docs/**'
+      # changes to the cli reference generator
       - 'docsgen/**'
+      # potential changes to commands documentation
+      - 'cli/**'
+      # potential changes to gRPC documentation
+      - 'rpc/**'
 
 jobs:
   build:
