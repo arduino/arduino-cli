@@ -19,14 +19,12 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"net/http"
-	"path/filepath"
-
-	"github.com/arduino/arduino-cli/repertory"
+	"github.com/arduino/arduino-cli/inventory"
 	"github.com/segmentio/stats/v4"
 	"github.com/segmentio/stats/v4/prometheus"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"net/http"
 )
 
 // serverPattern is the telemetry endpoint resource path for consume metrics
@@ -39,7 +37,7 @@ func Activate(metricPrefix string) {
 	// Create a new stats engine with an engine that prepends the "daemon" prefix to all metrics
 	// and includes the installationID as a tag, then replace the default stats engine
 	stats.DefaultEngine = stats.WithPrefix(metricPrefix, stats.T("installationID",
-		repertory.Store.GetString("installation.id")))
+		inventory.Store.GetString("installation.id")))
 	// Register the handler so it receives metrics from the default engine.
 	stats.Register(ph)
 
@@ -53,16 +51,15 @@ func Activate(metricPrefix string) {
 
 }
 
-// SanitizeSketchPath uses config generated UUID (installation.secret) as an HMAC secret to sanitize and anonymize
-// the sketch name maintaining it distinguishable from a different sketch from the same Installation
-func SanitizeSketchPath(sketchPath string) string {
-	logrus.Infof("repertory.Store.ConfigFileUsed() %s", repertory.Store.ConfigFileUsed())
-	installationSecret := repertory.Store.GetString("installation.secret")
-	sketchName := filepath.Base(sketchPath)
+// Sanitize uses config generated UUID (installation.secret) as an HMAC secret to sanitize and anonymize
+// a string, maintaining it distinguishable from a different string from the same Installation
+func Sanitize(s string) string {
+	logrus.Infof("inventory.Store.ConfigFileUsed() %s", inventory.Store.ConfigFileUsed())
+	installationSecret := inventory.Store.GetString("installation.secret")
 	// Create a new HMAC by defining the hash type and the key (as byte array)
 	h := hmac.New(sha256.New, []byte(installationSecret))
 	// Write Data to it
-	h.Write([]byte(sketchName))
+	h.Write([]byte(s))
 	// Get result and encode as hexadecimal string
 	return hex.EncodeToString(h.Sum(nil))
 }

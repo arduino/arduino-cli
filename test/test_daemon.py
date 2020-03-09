@@ -26,20 +26,20 @@ from prometheus_client.parser import text_string_to_metric_families
 
 @pytest.mark.timeout(60)
 def test_telemetry_prometheus_endpoint(daemon_runner, data_dir):
-    # Wait for the repertory file to be created and then parse it
+    # Wait for the inventory file to be created and then parse it
     # in order to check the generated ids
-    repertory_file = os.path.join(data_dir, "repertory.yaml")
-    while not os.path.exists(repertory_file):
+    inventory_file = os.path.join(data_dir, "inventory.yaml")
+    while not os.path.exists(inventory_file):
         time.sleep(1)
-    with open(repertory_file, 'r') as stream:
-        repertory = yaml.safe_load(stream)
+    with open(inventory_file, 'r') as stream:
+        inventory = yaml.safe_load(stream)
 
         # Check if :9090/metrics endpoint is alive,
         # telemetry is enabled by default in daemon mode
         metrics = requests.get("http://localhost:9090/metrics").text
         family = next(text_string_to_metric_families(metrics))
         sample = family.samples[0]
-        assert repertory["installation"]["id"] == sample.labels["installationID"]
+        assert inventory["installation"]["id"] == sample.labels["installationID"]
 
     # Kill the runner's process as we finished our test (platform dependent)
     os_signal = signal.SIGTERM

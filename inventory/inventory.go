@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package repertory
+package inventory
 
 import (
 	"os"
@@ -28,10 +28,10 @@ import (
 var Store = viper.New()
 
 var (
-	// Type is the repertory file type
+	// Type is the inventory file type
 	Type = "yaml"
-	// Name is the repertory file Name with Type as extension
-	Name = "repertory" + "." + Type
+	// Name is the inventory file Name with Type as extension
+	Name = "inventory" + "." + Type
 )
 
 // Init configures the Read Only config storage
@@ -48,7 +48,7 @@ func Init(configPath string) {
 			generateInstallationData()
 			writeStore(configFilePath)
 		} else {
-			feedback.Errorf("Error reading repertory file: %v", err)
+			feedback.Errorf("Error reading inventory file: %v", err)
 		}
 	}
 }
@@ -73,12 +73,12 @@ func writeStore(configFilePath string) {
 	// Create config dir if not present,
 	// MkdirAll will retrun no error if the path already exists
 	if err := os.MkdirAll(configPath, os.FileMode(0755)); err != nil {
-		feedback.Errorf("Error creating repertory dir: %v", err)
+		feedback.Errorf("Error creating inventory dir: %v", err)
 	}
 
 	// Create file if not present
 	err := Store.WriteConfigAs(configFilePath)
 	if err != nil {
-		feedback.Errorf("Error writing repertory file: %v", err)
+		feedback.Errorf("Error writing inventory file: %v", err)
 	}
 }

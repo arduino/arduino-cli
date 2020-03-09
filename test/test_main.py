@@ -75,7 +75,7 @@ def test_log_options(run_command, data_dir):
             json.loads(line)
 
 
-def test_repertory_creation(run_command, data_dir):
+def test_inventory_creation(run_command, data_dir):
     """
     using `version` as a test command
     """
@@ -84,8 +84,8 @@ def test_repertory_creation(run_command, data_dir):
     out_lines = run_command("version").stdout.strip().split("\n")
     assert len(out_lines) == 1
 
-    # parse repertory file
-    repertory_file = os.path.join(data_dir, "repertory.yaml")
-    with open(repertory_file, 'r') as stream:
-        repertory = yaml.safe_load(stream)
-        assert "installation" in repertory
+    # parse inventory file
+    inventory_file = os.path.join(data_dir, "inventory.yaml")
+    with open(inventory_file, 'r') as stream:
+        inventory = yaml.safe_load(stream)
+        assert "installation" in inventory
