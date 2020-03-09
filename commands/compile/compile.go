@@ -55,7 +55,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		"verbose":         strconv.FormatBool(req.Verbose),
 		"quiet":           strconv.FormatBool(req.Quiet),
 		"vidPid":          req.VidPid,
-		"exportFile":      req.ExportFile,
+		"exportFile":      telemetry.Sanitize(req.ExportFile),
 		"jobs":            strconv.FormatInt(int64(req.Jobs), 10),
 		"libraries":       strings.Join(req.Libraries, ","),
 	}
