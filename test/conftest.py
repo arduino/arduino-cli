@@ -13,6 +13,8 @@
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
 import os
+import platform
+import signal
 
 import pytest
 import simplejson as json
@@ -105,7 +107,14 @@ def daemon_runner(pytestconfig, data_dir, downloads_dir, working_dir):
         cli_full_line, echo=False, hide=True, warn=True, env=env, asynchronous=True
     )
 
-    return runner
+    # we block here until the test function using this fixture has returned
+    yield runner
+
+    # Kill the runner's process as we finished our test (platform dependent)
+    os_signal = signal.SIGTERM
+    if platform.system() != "Windows":
+        os_signal = signal.SIGKILL
+    os.kill(runner.process.pid, os_signal)
 
 
 @pytest.fixture(scope="function")
