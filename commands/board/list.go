@@ -105,15 +105,19 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 	m.Lock()
 	defer m.Unlock()
 
+	tags := map[string]string{}
+	// Use defer func() to evaluate tags map when function returns
+	defer func() { stats.Incr("board.list", stats.M(tags)...) }()
+
 	pm := commands.GetPackageManager(instanceID)
 	if pm == nil {
-		stats.Incr("board.list", stats.T("success", "false"))
+		tags["success"] = "false"
 		return nil, errors.New("invalid instance")
 	}
 
 	ports, err := commands.ListBoards(pm)
 	if err != nil {
-		stats.Incr("board.list", stats.T("success", "false"))
+		tags["success"] = "false"
 		return nil, errors.Wrap(err, "error getting port list from serial-discovery")
 	}
 
@@ -139,7 +143,7 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 				logrus.Debug("Board not recognized")
 			} else if err != nil {
 				// this is bad, bail out
-				stats.Incr("board.list", stats.T("success", "false"))
+				tags["success"] = "false"
 				return nil, errors.Wrap(err, "error getting board info from Arduino Cloud")
 			}
 
@@ -160,6 +164,6 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 		retVal = append(retVal, p)
 	}
 
-	stats.Incr("board.list", stats.T("success", "true"))
+	tags["success"] = "true"
 	return retVal, nil
 }

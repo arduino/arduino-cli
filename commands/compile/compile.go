@@ -60,10 +60,12 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		"libraries":       strings.Join(req.Libraries, ","),
 	}
 
-	defer stats.Incr("compile", stats.M(tags)...)
+	// Use defer func() to evaluate tags map when function returns
+	defer func() { stats.Incr("compile", stats.M(tags)...) }()
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
+		tags["success"] = "false"
 		return nil, errors.New("invalid instance")
 	}
 
