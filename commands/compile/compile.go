@@ -191,14 +191,24 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 	// if --preprocess or --show-properties were passed, we can stop here
 	if req.GetShowProperties() {
-		return &rpc.CompileResp{}, builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
-	} else if req.GetPreprocess() {
-		return &rpc.CompileResp{}, builder.RunPreprocess(builderCtx)
+		if err := builder.RunParseHardwareAndDumpBuildProperties(builderCtx); err != nil {
+			fmt.Fprintf(errStream, "error: %s", err)
+			return &rpc.CompileResp{Result: rpc.CompileResult_compile_error}, nil
+		}
+		return &rpc.CompileResp{Result: rpc.CompileResult_compile_success}, nil
+	}
+	if req.GetPreprocess() {
+		if err := builder.RunPreprocess(builderCtx); err != nil {
+			fmt.Fprintf(errStream, "error: %s", err)
+			return &rpc.CompileResp{Result: rpc.CompileResult_compile_error}, nil
+		}
+		return &rpc.CompileResp{Result: rpc.CompileResult_compile_success}, nil
 	}
 
 	// if it's a regular build, go on...
 	if err := builder.RunBuilder(builderCtx); err != nil {
-		return nil, err
+		fmt.Fprintf(errStream, "error: %s", err)
+		return &rpc.CompileResp{Result: rpc.CompileResult_compile_error}, nil
 	}
 
 	if !req.GetDryRun() {
@@ -239,5 +249,5 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	}
 
 	logrus.Tracef("Compile %s for %s successful", sketch.Name, fqbnIn)
-	return &rpc.CompileResp{}, nil
+	return &rpc.CompileResp{Result: rpc.CompileResult_compile_success}, nil
 }

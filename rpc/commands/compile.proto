@@ -46,4 +46,10 @@ message CompileReq {
 message CompileResp {
   bytes out_stream = 1; // The output of the compilation process.
   bytes err_stream = 2; // The error output of the compilation process.
+  CompileResult result = 3;
+}
+
+enum CompileResult {
+  compile_success = 0;
+  compile_error = 1;
 }
