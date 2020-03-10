@@ -13,10 +13,13 @@
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
 import os
+import platform
+import signal
 
 import pytest
-from invoke.context import Context
 import simplejson as json
+from invoke import Local
+from invoke.context import Context
 
 from .common import Board
 
@@ -57,7 +60,7 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
     will work in the same temporary folder.
 
     Useful reference:
-        http://docs.pyinvoke.org/en/1.2/api/runners.html#invoke.runners.Result
+        http://docs.pyinvoke.org/en/1.4/api/runners.html#invoke.runners.Result
     """
     cli_path = os.path.join(str(pytestconfig.rootdir), "..", "arduino-cli")
     env = {
@@ -76,6 +79,42 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
             )
 
     return _run
+
+
+@pytest.fixture(scope="function")
+def daemon_runner(pytestconfig, data_dir, downloads_dir, working_dir):
+    """
+    Provide an invoke's `Local` object that has started the arduino-cli in daemon mode.
+    This way is simple to start and kill the daemon when the test is finished
+    via the kill() function
+
+    Useful reference:
+        http://docs.pyinvoke.org/en/1.4/api/runners.html#invoke.runners.Local
+        http://docs.pyinvoke.org/en/1.4/api/runners.html
+    """
+    cli_full_line = os.path.join(str(pytestconfig.rootdir), "..", "arduino-cli daemon")
+    env = {
+        "ARDUINO_DATA_DIR": data_dir,
+        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+        "ARDUINO_SKETCHBOOK_DIR": data_dir,
+    }
+    os.makedirs(os.path.join(data_dir, "packages"))
+    run_context = Context()
+    run_context.cd(working_dir)
+    # Local Class is the implementation of a Runner abstract class
+    runner = Local(run_context)
+    runner.run(
+        cli_full_line, echo=False, hide=True, warn=True, env=env, asynchronous=True
+    )
+
+    # we block here until the test function using this fixture has returned
+    yield runner
+
+    # Kill the runner's process as we finished our test (platform dependent)
+    os_signal = signal.SIGTERM
+    if platform.system() != "Windows":
+        os_signal = signal.SIGKILL
+    os.kill(runner.process.pid, os_signal)
 
 
 @pytest.fixture(scope="function")

@@ -34,6 +34,8 @@ import (
 	srv_debug "github.com/arduino/arduino-cli/rpc/debug"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/monitor"
 	srv_settings "github.com/arduino/arduino-cli/rpc/settings"
+	"github.com/arduino/arduino-cli/telemetry"
+	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -59,16 +61,29 @@ func NewCommand() *cobra.Command {
 var daemonize bool
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
+
+	if viper.GetBool("telemetry.enabled") {
+		telemetry.Activate("daemon")
+		stats.Incr("daemon", stats.T("success", "true"))
+		defer stats.Flush()
+	}
+
 	port := viper.GetString("daemon.port")
 	s := grpc.NewServer()
 
-	// register the commands service
-	headers := http.Header{"User-Agent": []string{
-		fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s",
-			globals.VersionInfo.Application,
-			globals.VersionInfo.VersionString,
-			runtime.GOARCH, runtime.GOOS,
-			runtime.Version(), globals.VersionInfo.Commit)}}
+	// Compose user agent header
+	headers := http.Header{
+		"User-Agent": []string{
+			fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s",
+				globals.VersionInfo.Application,
+				globals.VersionInfo.VersionString,
+				runtime.GOARCH,
+				runtime.GOOS,
+				runtime.Version(),
+				globals.VersionInfo.Commit),
+		},
+	}
+	// Register the commands service
 	srv_commands.RegisterArduinoCoreServer(s, &daemon.ArduinoCoreServerImpl{
 		DownloaderHeaders: headers,
 		VersionString:     globals.VersionInfo.VersionString,
@@ -88,6 +103,8 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		go func() {
 			// Stdin is closed when the controlling parent process ends
 			_, _ = io.Copy(ioutil.Discard, os.Stdin)
+			// Flush telemetry stats (this is a no-op if telemetry is disabled)
+			stats.Flush()
 			os.Exit(0)
 		}()
 	}

@@ -36,6 +36,5 @@ def test_board_list(run_command):
 def test_board_listall(run_command):
     assert run_command("core update-index")
     result = run_command("board listall")
-    print(result.stderr, result.stdout)
     assert result.ok
     assert ["Board", "Name", "FQBN"] == result.stdout.splitlines()[0].strip().split()

@@ -35,4 +35,8 @@ func setDefaults(dataDir, userDir string) {
 
 	// daemon settings
 	viper.SetDefault("daemon.port", "50051")
+
+	//telemetry settings
+	viper.SetDefault("telemetry.enabled", true)
+	viper.SetDefault("telemetry.addr", ":9090")
 }

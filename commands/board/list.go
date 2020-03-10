@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/pkg/errors"
+	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 )
 
@@ -100,9 +101,20 @@ func identifyViaCloudAPI(port *commands.BoardPort) ([]*rpc.BoardListItem, error)
 }
 
 // List FIXMEDOC
-func List(instanceID int32) ([]*rpc.DetectedPort, error) {
+func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 	m.Lock()
 	defer m.Unlock()
+
+	tags := map[string]string{}
+	// Use defer func() to evaluate tags map when function returns
+	// and set success flag inspecting the error named return parameter
+	defer func() {
+		tags["success"] = "true"
+		if e != nil {
+			tags["success"] = "false"
+		}
+		stats.Incr("compile", stats.M(tags)...)
+	}()
 
 	pm := commands.GetPackageManager(instanceID)
 	if pm == nil {

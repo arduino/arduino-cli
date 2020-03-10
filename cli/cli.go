@@ -39,6 +39,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/inventory"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
@@ -166,6 +167,9 @@ func preRun(cmd *cobra.Command, args []string) {
 	// initialize the config system
 	configuration.Init(configPath)
 	configFile := viper.ConfigFileUsed()
+
+	// initialize inventory
+	inventory.Init(viper.GetString("directories.Data"))
 
 	//
 	// Prepare logging

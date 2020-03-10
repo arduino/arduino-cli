@@ -22,6 +22,7 @@ import (
 	"io"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -33,14 +34,42 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/arduino/arduino-cli/telemetry"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 // Compile FIXMEDOC
-func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.Writer, debug bool) (*rpc.CompileResp, error) {
+func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.Writer, debug bool) (r *rpc.CompileResp, e error) {
+
+	tags := map[string]string{
+		"fqbn":            req.Fqbn,
+		"sketchPath":      telemetry.Sanitize(req.SketchPath),
+		"showProperties":  strconv.FormatBool(req.ShowProperties),
+		"preprocess":      strconv.FormatBool(req.Preprocess),
+		"buildProperties": strings.Join(req.BuildProperties, ","),
+		"warnings":        req.Warnings,
+		"verbose":         strconv.FormatBool(req.Verbose),
+		"quiet":           strconv.FormatBool(req.Quiet),
+		"vidPid":          req.VidPid,
+		"exportFile":      telemetry.Sanitize(req.ExportFile),
+		"jobs":            strconv.FormatInt(int64(req.Jobs), 10),
+		"libraries":       strings.Join(req.Libraries, ","),
+	}
+
+	// Use defer func() to evaluate tags map when function returns
+	// and set success flag inspecting the error named return parameter
+	defer func() {
+		tags["success"] = "true"
+		if e != nil {
+			tags["success"] = "false"
+		}
+		stats.Incr("compile", stats.M(tags)...)
+	}()
+
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -224,6 +253,5 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	}
 
 	logrus.Tracef("Compile %s for %s successful", sketch.Name, fqbnIn)
-
 	return &rpc.CompileResp{}, nil
 }
