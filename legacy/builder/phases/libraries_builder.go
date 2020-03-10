@@ -55,7 +55,7 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	ctx.LibrariesObjectFiles = objectFiles
 
 	// Search for precompiled libraries
-	fixLDFLAGforPrecompiledLibraries(ctx, libs)
+	fixLDFLAG(ctx, libs)
 
 	return nil
 }
@@ -109,35 +109,33 @@ func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Lib
 	return nil
 }
 
-func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libs libraries.List) error {
+func fixLDFLAG(ctx *types.Context, libs libraries.List) error {
 
 	for _, library := range libs {
-		if library.Precompiled {
-			// add library src path to compiler.c.elf.extra_flags
-			// use library.Name as lib name and srcPath/{mcpu} as location
-			path := findExpectedPrecompiledLibFolder(ctx, library)
-			if path == nil {
-				break
-			}
-			// find all library names in the folder and prepend -l
-			filePaths := []string{}
-			libs_cmd := library.LDflags + " "
-			extensions := func(ext string) bool {
-				return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_DYNAMIC[ext] || PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext]
-			}
-			utils.FindFilesInFolder(&filePaths, path.String(), extensions, false)
-			for _, lib := range filePaths {
-				name := strings.TrimSuffix(filepath.Base(lib), filepath.Ext(lib))
-				// strip "lib" first occurrence
-				if strings.HasPrefix(name, "lib") {
-					name = strings.Replace(name, "lib", "", 1)
-					libs_cmd += "-l" + name + " "
-				}
-			}
-
-			currLDFlags := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS)
-			ctx.BuildProperties.Set(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS, currLDFlags+"\"-L"+path.String()+"\" "+libs_cmd+" ")
+		// add library src path to compiler.c.elf.extra_flags
+		// use library.Name as lib name and srcPath/{mcpu} as location
+		path := findExpectedPrecompiledLibFolder(ctx, library)
+		if path == nil {
+			break
 		}
+		// find all library names in the folder and prepend -l
+		filePaths := []string{}
+		libs_cmd := library.LDflags + " "
+		extensions := func(ext string) bool {
+			return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_DYNAMIC[ext] || PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext]
+		}
+		utils.FindFilesInFolder(&filePaths, path.String(), extensions, false)
+		for _, lib := range filePaths {
+			name := strings.TrimSuffix(filepath.Base(lib), filepath.Ext(lib))
+			// strip "lib" first occurrence
+			if strings.HasPrefix(name, "lib") {
+				name = strings.Replace(name, "lib", "", 1)
+				libs_cmd += "-l" + name + " "
+			}
+		}
+
+		currLDFlags := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS)
+		ctx.BuildProperties.Set(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS, currLDFlags+"\"-L"+path.String()+"\" "+libs_cmd+" ")
 	}
 	return nil
 }
