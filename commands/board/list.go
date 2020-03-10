@@ -101,23 +101,28 @@ func identifyViaCloudAPI(port *commands.BoardPort) ([]*rpc.BoardListItem, error)
 }
 
 // List FIXMEDOC
-func List(instanceID int32) ([]*rpc.DetectedPort, error) {
+func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 	m.Lock()
 	defer m.Unlock()
 
 	tags := map[string]string{}
 	// Use defer func() to evaluate tags map when function returns
-	defer func() { stats.Incr("board.list", stats.M(tags)...) }()
+	// and set success flag inspecting the error named return parameter
+	defer func() {
+		tags["success"] = "true"
+		if e != nil {
+			tags["success"] = "false"
+		}
+		stats.Incr("compile", stats.M(tags)...)
+	}()
 
 	pm := commands.GetPackageManager(instanceID)
 	if pm == nil {
-		tags["success"] = "false"
 		return nil, errors.New("invalid instance")
 	}
 
 	ports, err := commands.ListBoards(pm)
 	if err != nil {
-		tags["success"] = "false"
 		return nil, errors.Wrap(err, "error getting port list from serial-discovery")
 	}
 
@@ -143,7 +148,6 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 				logrus.Debug("Board not recognized")
 			} else if err != nil {
 				// this is bad, bail out
-				tags["success"] = "false"
 				return nil, errors.Wrap(err, "error getting board info from Arduino Cloud")
 			}
 
@@ -164,6 +168,5 @@ func List(instanceID int32) ([]*rpc.DetectedPort, error) {
 		retVal = append(retVal, p)
 	}
 
-	tags["success"] = "true"
 	return retVal, nil
 }
