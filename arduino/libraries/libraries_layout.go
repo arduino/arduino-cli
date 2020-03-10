@@ -18,6 +18,8 @@ package libraries
 import (
 	"encoding/json"
 	"fmt"
+
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
 // LibraryLayout represents how the library source code is laid out in the library
@@ -64,4 +66,15 @@ func (d *LibraryLayout) UnmarshalJSON(b []byte) error {
 		*d = RecursiveLayout
 	}
 	return fmt.Errorf("invalid library layout: %s", s)
+}
+
+// ToRPCLibraryLayout converts this LibraryLayout to rpc.LibraryLayout
+func (d *LibraryLayout) ToRPCLibraryLayout() rpc.LibraryLayout {
+	switch *d {
+	case FlatLayout:
+		return rpc.LibraryLayout_flat_layout
+	case RecursiveLayout:
+		return rpc.LibraryLayout_recursive_layout
+	}
+	panic(fmt.Sprintf("invalid LibraryLayout value %d", *d))
 }

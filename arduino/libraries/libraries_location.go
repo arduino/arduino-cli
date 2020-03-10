@@ -18,6 +18,8 @@ package libraries
 import (
 	"encoding/json"
 	"fmt"
+
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
 // LibraryLocation represents where the library is installed
@@ -81,4 +83,34 @@ func (d *LibraryLocation) UnmarshalJSON(b []byte) error {
 		*d = User
 	}
 	return fmt.Errorf("invalid library location: %s", s)
+}
+
+// ToRPCLibraryLocation converts this LibraryLocation to rpc.LibraryLocation
+func (d *LibraryLocation) ToRPCLibraryLocation() rpc.LibraryLocation {
+	switch *d {
+	case IDEBuiltIn:
+		return rpc.LibraryLocation_ide_builtin
+	case PlatformBuiltIn:
+		return rpc.LibraryLocation_platform_builtin
+	case ReferencedPlatformBuiltIn:
+		return rpc.LibraryLocation_referenced_platform_builtin
+	case User:
+		return rpc.LibraryLocation_user
+	}
+	panic(fmt.Sprintf("invalid LibraryLocation value %d", *d))
+}
+
+// FromRPCLibraryLocation converts a rpc.LibraryLocation to a LibraryLocation
+func FromRPCLibraryLocation(l rpc.LibraryLocation) LibraryLocation {
+	switch l {
+	case rpc.LibraryLocation_ide_builtin:
+		return IDEBuiltIn
+	case rpc.LibraryLocation_platform_builtin:
+		return PlatformBuiltIn
+	case rpc.LibraryLocation_referenced_platform_builtin:
+		return ReferencedPlatformBuiltIn
+	case rpc.LibraryLocation_user:
+		return User
+	}
+	panic(fmt.Sprintf("invalid rpc.LibraryLocation value %d", l))
 }
