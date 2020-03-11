@@ -14,6 +14,110 @@ public final class Compile {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+  /**
+   * Protobuf enum {@code cc.arduino.cli.commands.CompileResult}
+   */
+  public enum CompileResult
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>success = 0;</code>
+     */
+    success(0),
+    /**
+     * <code>error = 1;</code>
+     */
+    error(1),
+    UNRECOGNIZED(-1),
+    ;
+
+    /**
+     * <code>success = 0;</code>
+     */
+    public static final int success_VALUE = 0;
+    /**
+     * <code>error = 1;</code>
+     */
+    public static final int error_VALUE = 1;
+
+
+    public final int getNumber() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalArgumentException(
+            "Can't get the number of an unknown enum value.");
+      }
+      return value;
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     * @deprecated Use {@link #forNumber(int)} instead.
+     */
+    @java.lang.Deprecated
+    public static CompileResult valueOf(int value) {
+      return forNumber(value);
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     */
+    public static CompileResult forNumber(int value) {
+      switch (value) {
+        case 0: return success;
+        case 1: return error;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<CompileResult>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        CompileResult> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<CompileResult>() {
+            public CompileResult findValueByNumber(int number) {
+              return CompileResult.forNumber(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(ordinal());
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return cc.arduino.cli.commands.Compile.getDescriptor().getEnumTypes().get(0);
+    }
+
+    private static final CompileResult[] VALUES = values();
+
+    public static CompileResult valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      if (desc.getIndex() == -1) {
+        return UNRECOGNIZED;
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int value;
+
+    private CompileResult(int value) {
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:cc.arduino.cli.commands.CompileResult)
+  }
+
   public interface CompileReqOrBuilder extends
       // @@protoc_insertion_point(interface_extends:cc.arduino.cli.commands.CompileReq)
       com.google.protobuf.MessageOrBuilder {
@@ -3005,6 +3109,17 @@ public final class Compile {
      * @return The errStream.
      */
     com.google.protobuf.ByteString getErrStream();
+
+    /**
+     * <code>.cc.arduino.cli.commands.CompileResult result = 3;</code>
+     * @return The enum numeric value on the wire for result.
+     */
+    int getResultValue();
+    /**
+     * <code>.cc.arduino.cli.commands.CompileResult result = 3;</code>
+     * @return The result.
+     */
+    cc.arduino.cli.commands.Compile.CompileResult getResult();
   }
   /**
    * Protobuf type {@code cc.arduino.cli.commands.CompileResp}
@@ -3021,6 +3136,7 @@ public final class Compile {
     private CompileResp() {
       outStream_ = com.google.protobuf.ByteString.EMPTY;
       errStream_ = com.google.protobuf.ByteString.EMPTY;
+      result_ = 0;
     }
 
     @java.lang.Override
@@ -3061,6 +3177,12 @@ public final class Compile {
             case 18: {
 
               errStream_ = input.readBytes();
+              break;
+            }
+            case 24: {
+              int rawValue = input.readEnum();
+
+              result_ = rawValue;
               break;
             }
             default: {
@@ -3115,6 +3237,25 @@ public final class Compile {
       return errStream_;
     }
 
+    public static final int RESULT_FIELD_NUMBER = 3;
+    private int result_;
+    /**
+     * <code>.cc.arduino.cli.commands.CompileResult result = 3;</code>
+     * @return The enum numeric value on the wire for result.
+     */
+    public int getResultValue() {
+      return result_;
+    }
+    /**
+     * <code>.cc.arduino.cli.commands.CompileResult result = 3;</code>
+     * @return The result.
+     */
+    public cc.arduino.cli.commands.Compile.CompileResult getResult() {
+      @SuppressWarnings("deprecation")
+      cc.arduino.cli.commands.Compile.CompileResult result = cc.arduino.cli.commands.Compile.CompileResult.valueOf(result_);
+      return result == null ? cc.arduino.cli.commands.Compile.CompileResult.UNRECOGNIZED : result;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3135,6 +3276,9 @@ public final class Compile {
       if (!errStream_.isEmpty()) {
         output.writeBytes(2, errStream_);
       }
+      if (result_ != cc.arduino.cli.commands.Compile.CompileResult.success.getNumber()) {
+        output.writeEnum(3, result_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3151,6 +3295,10 @@ public final class Compile {
       if (!errStream_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(2, errStream_);
+      }
+      if (result_ != cc.arduino.cli.commands.Compile.CompileResult.success.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(3, result_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3171,6 +3319,7 @@ public final class Compile {
           .equals(other.getOutStream())) return false;
       if (!getErrStream()
           .equals(other.getErrStream())) return false;
+      if (result_ != other.result_) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3186,6 +3335,8 @@ public final class Compile {
       hash = (53 * hash) + getOutStream().hashCode();
       hash = (37 * hash) + ERR_STREAM_FIELD_NUMBER;
       hash = (53 * hash) + getErrStream().hashCode();
+      hash = (37 * hash) + RESULT_FIELD_NUMBER;
+      hash = (53 * hash) + result_;
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3323,6 +3474,8 @@ public final class Compile {
 
         errStream_ = com.google.protobuf.ByteString.EMPTY;
 
+        result_ = 0;
+
         return this;
       }
 
@@ -3351,6 +3504,7 @@ public final class Compile {
         cc.arduino.cli.commands.Compile.CompileResp result = new cc.arduino.cli.commands.Compile.CompileResp(this);
         result.outStream_ = outStream_;
         result.errStream_ = errStream_;
+        result.result_ = result_;
         onBuilt();
         return result;
       }
@@ -3404,6 +3558,9 @@ public final class Compile {
         }
         if (other.getErrStream() != com.google.protobuf.ByteString.EMPTY) {
           setErrStream(other.getErrStream());
+        }
+        if (other.result_ != 0) {
+          setResultValue(other.getResultValue());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3499,6 +3656,58 @@ public final class Compile {
         onChanged();
         return this;
       }
+
+      private int result_ = 0;
+      /**
+       * <code>.cc.arduino.cli.commands.CompileResult result = 3;</code>
+       * @return The enum numeric value on the wire for result.
+       */
+      public int getResultValue() {
+        return result_;
+      }
+      /**
+       * <code>.cc.arduino.cli.commands.CompileResult result = 3;</code>
+       * @param value The enum numeric value on the wire for result to set.
+       * @return This builder for chaining.
+       */
+      public Builder setResultValue(int value) {
+        result_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.cc.arduino.cli.commands.CompileResult result = 3;</code>
+       * @return The result.
+       */
+      public cc.arduino.cli.commands.Compile.CompileResult getResult() {
+        @SuppressWarnings("deprecation")
+        cc.arduino.cli.commands.Compile.CompileResult result = cc.arduino.cli.commands.Compile.CompileResult.valueOf(result_);
+        return result == null ? cc.arduino.cli.commands.Compile.CompileResult.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>.cc.arduino.cli.commands.CompileResult result = 3;</code>
+       * @param value The result to set.
+       * @return This builder for chaining.
+       */
+      public Builder setResult(cc.arduino.cli.commands.Compile.CompileResult value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        result_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.cc.arduino.cli.commands.CompileResult result = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearResult() {
+        
+        result_ = 0;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -3581,10 +3790,12 @@ public final class Compile {
       "\030\010 \003(\t\022\020\n\010warnings\030\t \001(\t\022\017\n\007verbose\030\n \001(" +
       "\010\022\r\n\005quiet\030\013 \001(\010\022\016\n\006vidPid\030\014 \001(\t\022\022\n\nexpo" +
       "rtFile\030\r \001(\t\022\014\n\004jobs\030\016 \001(\005\022\021\n\tlibraries\030" +
-      "\017 \003(\t\022\030\n\020optimizeForDebug\030\020 \001(\010\"5\n\013Compi" +
+      "\017 \003(\t\022\030\n\020optimizeForDebug\030\020 \001(\010\"m\n\013Compi" +
       "leResp\022\022\n\nout_stream\030\001 \001(\014\022\022\n\nerr_stream" +
-      "\030\002 \001(\014B-Z+github.com/arduino/arduino-cli" +
-      "/rpc/commandsb\006proto3"
+      "\030\002 \001(\014\0226\n\006result\030\003 \001(\0162&.cc.arduino.cli." +
+      "commands.CompileResult*\'\n\rCompileResult\022" +
+      "\013\n\007success\020\000\022\t\n\005error\020\001B-Z+github.com/ar" +
+      "duino/arduino-cli/rpc/commandsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -3602,7 +3813,7 @@ public final class Compile {
     internal_static_cc_arduino_cli_commands_CompileResp_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_cc_arduino_cli_commands_CompileResp_descriptor,
-        new java.lang.String[] { "OutStream", "ErrStream", });
+        new java.lang.String[] { "OutStream", "ErrStream", "Result", });
     cc.arduino.cli.commands.Common.getDescriptor();
   }
 
