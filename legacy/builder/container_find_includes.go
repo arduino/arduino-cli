@@ -318,11 +318,6 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityDir != nil {
 			includes = append(includes, library.UtilityDir)
 		}
-		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.AdditionalIncludePaths != nil {
-			for _, el := range library.AdditionalIncludePaths {
-				includes = append(includes, el)
-			}
-		}
 		var preproc_err error
 		var preproc_stderr []byte
 		if unchanged && cache.valid {
@@ -374,6 +369,10 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 			}
 			os.Stderr.Write(preproc_stderr)
 			return i18n.WrapError(preproc_err)
+		}
+
+		for _, el := range library.AdditionalIncludePaths {
+			appendIncludeFolder(ctx, cache, sourcePath, include, el)
 		}
 
 		// Add this library to the list of libraries, the
