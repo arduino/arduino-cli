@@ -53,7 +53,7 @@ We can specify an OS-specific value for a property. For example the following fi
     tools.bossac.cmd=bossac
     tools.bossac.cmd.windows=bossac.exe
 
-will set the property **tools.bossac.cmd** to the value **bossac** on Linux and Mac OS and **bossac.exe** on Windows. Suffixes [supported](https://github.com/arduino/Arduino/blob/1.8.10/arduino-core/src/processing/app/helpers/PreferencesMap.java#L110-L112) are `.linux`, `.windows` and `.macosx`.
+will set the property **tools.bossac.cmd** to the value **bossac** on Linux and Mac OS and **bossac.exe** on Windows. Suffixes [supported](https://github.com/arduino/Arduino/blob/1.8.12/arduino-core/src/processing/app/helpers/PreferencesMap.java#L110-L112) are `.linux`, `.windows` and `.macosx`.
 
 #### Global Predefined properties
 
@@ -584,4 +584,4 @@ Introduced in Arduino IDE 1.6.6. This file can be used to override properties de
 
 ## keywords.txt
 
-As of Arduino IDE 1.6.6, per-platform keywords can be defined by adding a keywords.txt file to the platform's architecture folder. These keywords are only highlighted when one of the boards of that platform are selected. This file follows the [same format](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification#keywords) as the keywords.txt used in libraries. Each keyword must be separated from the keyword identifier by a tab.
+As of Arduino IDE 1.6.6, per-platform keywords can be defined by adding a keywords.txt file to the platform's architecture folder. These keywords are only highlighted when one of the boards of that platform are selected. This file follows the [same format](library-specification.md#keywords) as the keywords.txt used in libraries. Each keyword must be separated from the keyword identifier by a tab.

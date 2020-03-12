@@ -57,7 +57,7 @@ The root of the JSON index is an array of `packages`:
 
 The metadata fields are:
 
-* `name`: the folder used for the installed cores. The [vendor folder](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification#hardware-folders-structure) name of the installed package is determined by this field
+* `name`: the folder used for the installed cores. The [vendor folder](platform-specification.md#hardware-folders-structure) name of the installed package is determined by this field
 * `maintainer`: the extended name of the vendor that is displayed on the Boards Manager GUI
 * `websiteURL`: the URL to the vendor's website, appears on the Boards Manager as a "More info" link
 * `email`: the email of the vendor/maintainer
@@ -188,7 +188,7 @@ Finally, let's see how `PLATFORMS` are made.
 
 Each PLATFORM describes a core for a specific architecture. The fields needed are:
 * `name`: the extended name of the platform that is displayed on the Boards Manager GUI
-* `architecture`: is the architecture of the plaftorm (avr, sam, etc...). It must match the architecture of the core as explained in the [3rd party cores specification](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification#hardware-folders-structure)
+* `architecture`: is the architecture of the plaftorm (avr, sam, etc...). It must match the architecture of the core as explained in the [Arduino platform specification](platform-specification.md#hardware-folders-structure)
 * `version`: the version of the platform.
 * `category`: this field is reserved, a 3rd party core must set it to `Contributed`
 * `help`/`online`: is a URL that is displayed on the Boards Manager as an "Online Help" link
@@ -286,7 +286,7 @@ Note: if you miss a bracket in the JSON index, then add the URL to your Preferen
 In the example there is one `PACKAGE`, My Board. The package is compatible with the AVR architecture. There are two versions of the `PACKAGE`, 1.0.0 and 1.0.1. No `TOOLS` needed to be installed so that section was left blank.
 
 Here is the Boards Manager entry created by the example:
-![Boards Manager screenshot](https://per1234.github.io/misc/boards-manager-screenshot.gif)
+![Boards Manager screenshot](img/boards-manager-screenshot.png)
 
 ## Installation archive structure
 

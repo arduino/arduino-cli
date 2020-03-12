@@ -162,7 +162,7 @@ RSYNTAXTEXTAREA_TOKENTYPE | Theme property | KEYWORD_TOKENTYPE equivalent
 
 ### Development flag file
 
-Normally the Arduino IDE treats the contents of the library folder as read-only. This is to prevent users from accidentally modifying example sketches. During the library development process you may want to edit example sketches in place using the Arduino IDE. With Arduino IDE 1.6.6 and newer, the read-only behavior can be disabled by adding a file named .development to the root of the library folder. A [library.properties](libraryproperties-file-format) file must also be present. The [Library Manager indexer](https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ) will not pick up releases that contain a .development file so be sure not to push this file to your remote repository.
+Normally the Arduino IDE treats the contents of the library folder as read-only. This is to prevent users from accidentally modifying example sketches. During the library development process you may want to edit example sketches in place using the Arduino IDE. With Arduino IDE 1.6.6 and newer, the read-only behavior can be disabled by adding a file named .development to the root of the library folder. A [library.properties](#libraryproperties-file-format) file must also be present. The [Library Manager indexer](https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ) will not pick up releases that contain a .development file so be sure not to push this file to your remote repository.
 
 ### A complete example
 

@@ -1,4 +1,4 @@
-The process the Arduino environment uses to build a sketch. More useful information can be found in the [Arduino IDE 1.5 3rd party Hardware specification](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification). Note that the following refers specifically to the build process for AVR targets. Other architectures will have a similar build process.
+The process the Arduino environment uses to build a sketch. More useful information can be found in the [Arduino platform specification](platform-specification.md). Note that the following refers specifically to the build process for AVR targets. Other architectures will have a similar build process.
 
 ## Overview
 
@@ -18,12 +18,12 @@ No pre-processing is done to files in a sketch with any extension other than .in
 
 The sketch is scanned recursively for dependencies. There are predefined include search paths:
 
-1. Core library folder (as defined by [`{build.core}`](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification#boardstxt))
-1. Variant folder (as defined by [`{build.variant}`](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification#boardstxt))
-1. Standard system directories (e.g., [`{runtime.tools.avr-gcc.path}/avr/include`](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification#tools))
+1. Core library folder (as defined by [`{build.core}`](platform-specification.md#boardstxt))
+1. Variant folder (as defined by [`{build.variant}`](platform-specification.md#boardstxt))
+1. Standard system directories (e.g., [`{runtime.tools.avr-gcc.path}/avr/include`](platform-specification.md#tools))
 1. Include search paths added to resolve prior dependencies
 
-If the dependency is not present in any of those locations, the installed libraries are then searched (see the [**Location Priority** table](#location-priority) below for library locations). For information on the allowed library sub-folder structures see https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification#source-code. `-I` options are generated for the path to each library dependency and appended to the [`includes` property](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification#recipes-to-compile-source-code), to be used in [compilation recipes](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification#recipes-to-compile-source-code) in platform.txt.
+If the dependency is not present in any of those locations, the installed libraries are then searched (see the [**Location Priority** table](#location-priority) below for library locations). For information on the allowed library sub-folder structures see [the Arduino library specification](library-specification.md#source-code). `-I` options are generated for the path to each library dependency and appended to the [`includes` property](platform-specification.md#recipes-to-compile-source-code), to be used in [compilation recipes](platform-specification.md#recipes-to-compile-source-code) in platform.txt.
 
 If multiple libraries contain a file that matches the `#include` directive, the priority is determined by applying the following rules, one by one in this order, until a rule determines a winner:
 
@@ -36,7 +36,7 @@ If multiple libraries contain a file that matches the `#include` directive, the 
 
 ### Architecture Matching
 
-A library is considered **compatible** with architecture `X` if the `architectures` field in [library.properties](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification#library-metadata):
+A library is considered **compatible** with architecture `X` if the `architectures` field in [library.properties](library-specification.md#library-metadata):
 - explicitly contains the architecture `X`
 - contains the catch-all `*`
 - is not specified at all.
@@ -72,13 +72,13 @@ The folder name contains the include | `AnAwesomeServoForWhatever`
 The "location priority" is determined as follows (in order of highest to lowest priority):
 
 1. The library is in the sketchbook (`{sketchbook path}/libraries`)
-1. The library is bundled with the board platform/core ([`{runtime.platform.path}/libraries`](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification#global-predefined-properties))
-1. The library is bundled with the [referenced](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification#referencing-another-core-variant-or-tool) board platform/core
-1. The library is bundled with the IDE ([`{runtime.ide.path}/libraries`](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification#global-predefined-properties))
+1. The library is bundled with the board platform/core ([`{runtime.platform.path}/libraries`](platform-specification.md#global-predefined-properties))
+1. The library is bundled with the [referenced](platform-specification.md#referencing-another-core-variant-or-tool) board platform/core
+1. The library is bundled with the IDE ([`{runtime.ide.path}/libraries`](platform-specification.md#global-predefined-properties))
 
 ## Compilation
 
-Sketches are compiled by avr-gcc and avr-g++ according to the variables in the boards.txt file of the selected board's [platform](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification).
+Sketches are compiled by avr-gcc and avr-g++ according to the variables in the boards.txt file of the selected board's [platform](platform-specification.md).
 
 The sketch is built in a temporary directory in the system-wide temporary directory (e.g. /tmp on Linux).
 
@@ -95,6 +95,6 @@ If verbose output during compilation is checked in the Preferences dialog, the c
 
 ## Uploading
 
-Sketches are uploaded by avrdude. The upload process is also controlled by variables in the boards and main preferences files. See the [Arduino IDE 1.5 3rd party Hardware specification](https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification) page for details.
+Sketches are uploaded by avrdude. The upload process is also controlled by variables in the boards and main preferences files. See the [Arduino platform specification](platform-specification.md) page for details.
 
 If verbose output during upload is checked in the Preferences dialog, debugging information will be output to the editor console, including avrdude command lines and verbose output.
