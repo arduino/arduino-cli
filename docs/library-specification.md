@@ -10,21 +10,21 @@ More information about how Library Manager works are available [here](https://gi
 
 Arduino IDE 1.5.x+ supports multiple microcontroller architectures (e.g. AVR, SAM, etc), meaning that libraries may need to work on multiple architectures. The new 1.5 library format doesn’t contain special support for cross-architecture libraries, but it does provide a preprocessor based mechanism for libraries to target sections of code to specific architectures.
 
-### See also
+## See also
 
 The Arduino library style guide is here : http://arduino.cc/en/Reference/APIStyleGuide
 
 The style guide for examples is here : http://arduino.cc/en/Reference/StyleGuide
 
-# 1.5 library format (rev. 2.2)
+## 1.5 library format (rev. 2.2)
 
-## Library metadata
+### Library metadata
 
 The most significant addition to the format is the ability to add information about the library itself through a properties file called **library.properties**.
 
 This file allows the *Library Manager* to search and install a library and its dependencies in an easy and automated way. It must be located in the root of the library folder.
 
-### library.properties file format
+#### library.properties file format
 
 The library.properties file is a key=value properties list. Every field in this file is UTF-8 encoded. Unless noted otherwise below, **all fields are required**. The available fields are:
 
@@ -69,15 +69,15 @@ Example:
     includes=WebServer.h
     depends=ArduinoHttpClient
 
-## Layout of folders and files
+### Layout of folders and files
 
 Each folder has a specific purpose (sources, examples, documentation, etc). Folders not covered in this specification may be added as needed to future revisions.
 
-### Library Root folder
+#### Library Root folder
 
 The library root folder name must start with a basic letter (`A`-`Z` or `a`-`z`) or number (`0`-`9`), followed by basic letters, numbers, spaces (` `), underscores (`_`), dots (`.`) and dashes (`-`). The maximum length is 63 characters.
 
-### Source code
+#### Source code
 
 For 1.5.x+-only libraries, the source code resides in the **src** folder. For example:
 
@@ -95,7 +95,7 @@ For backward compatibility with Arduino 1.0.x, the library author may opt to pla
 
 This will allow existing 1.0.x libraries to compile under 1.5.x+ as well and vice-versa. If a library only needs to run on 1.5.x+, we recommend placing all source code in the src/ folder. If a library requires recursive compilation of nested source folders, its code must be in the src/ folder (since 1.0.x doesn’t support recursive compilation, backwards compatibility wouldn’t be possible anyway).
 
-### Library Examples
+#### Library Examples
 
 Library examples must be placed in the **examples** folder. Note that the **examples** folder must be written exactly like that (with lower case letters).
 
@@ -103,7 +103,7 @@ Library examples must be placed in the **examples** folder. Note that the **exam
 
 Sketches contained inside the examples folder will be shown in the Examples menu of the IDE.
 
-### Extra documentation
+#### Extra documentation
 
 An **extras** folder can be used by the developer to put documentation or other items to be bundled with the library. Remember that files placed inside this folder will increase the size of the library, so putting a 20MB PDF in a library that weights a few kilobytes may not be such a good idea.
 
@@ -181,7 +181,7 @@ A hypothetical library named "Servo" that adheres to the specification follows:
     Servo/extras/
     Servo/extras/Servo_Connectors.pdf
 
-# Working with multiple architectures
+## Working with multiple architectures
 
 In 1.5.x+, libraries placed in the user’s sketchbook folder (in the libraries/ subfolder) will be made available for all boards, which may include multiple different processor architectures. To provide architecture-specific code or optimizations, library authors can use the ARDUINO_ARCH_XXX preprocessor macro (#define), where XXX is the name of the architecture (as determined by the name of the folder containing it), e.g. ARDUINO_ARCH_AVR will be defined when compiling for AVR-based boards. For example,
 
@@ -203,6 +203,6 @@ Alternatively, if a library only works on certain architectures, you can provide
       #error “This library only supports boards with an AVR or SAM processor.”
     #endif
 
-# Old library format (pre-1.5)
+## Old library format (pre-1.5)
 
 In order to support old libraries (from Arduino 1.0.x), Arduino 1.5.x+ will also compile libraries missing a library.properties metadata file. As a result, these libraries should behave as they did in Arduino 1.0.x, although they will be available for all boards, including non-AVR ones (which wouldn’t have been present in 1.0.x).
