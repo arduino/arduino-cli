@@ -29,6 +29,10 @@ func match(line, searchArgs string) bool {
 	return strings.Contains(strings.ToLower(line), strings.ToLower(searchArgs))
 }
 
+func exactMatch(line, searchArgs string) bool {
+	return strings.Compare(strings.ToLower(line), strings.ToLower(searchArgs)) == 0
+}
+
 // PlatformSearch FIXMEDOC
 func PlatformSearch(instanceID int32, searchArgs string, allVersions bool) (*rpc.PlatformSearchResp, error) {
 	pm := commands.GetPackageManager(instanceID)
@@ -55,7 +59,7 @@ func PlatformSearch(instanceID int32, searchArgs string, allVersions bool) (*rpc
 				}
 
 				// platform has a valid release, check if it matches the search arguments
-				if match(platform.Name, searchArgs) || match(platform.Architecture, searchArgs) {
+				if match(platform.Name, searchArgs) || match(platform.Architecture, searchArgs) || exactMatch(platform.String(), searchArgs) {
 					if allVersions {
 						res = append(res, platform.GetAllReleases()...)
 					} else {
