@@ -11,7 +11,7 @@ We suggest using a domain name owned by the packager. For example:
 
 `package_arduino.cc_index.json`
 
-or 
+or
 
 `package_example.com_avr_boards_index.json`
 

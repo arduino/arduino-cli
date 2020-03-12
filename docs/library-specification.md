@@ -46,7 +46,7 @@ The library.properties file is a key=value properties list. Every field in this 
    * Other
  * **url** - the URL of the library project, for a person to visit. For example, the library's GitHub page. This is used for the "More info" links in Library Manager
  * **architectures** - (defaults to `*`) a comma separated list of architectures supported by the library. If the library doesn’t contain architecture specific code use `*` to match all architectures. This field is used as one factor in determining priority when multiple libraries match an `#include` directive and to provide a warning message when the library is compiled for a board of an architecture that doesn't match any on the list.
- * **depends** - **(available from Arduino IDE 1.8.10)** (optional) a comma-separated list of dependencies (libraries that are needed to build the current library). Library Manager will offer to install the dependencies during installation of the library. Since spaces are allowed in the `name` of a library, but not commas, you can refer to libraries containing spaces in the name without ambiguity for example: 
+ * **depends** - **(available from Arduino IDE 1.8.10)** (optional) a comma-separated list of dependencies (libraries that are needed to build the current library). Library Manager will offer to install the dependencies during installation of the library. Since spaces are allowed in the `name` of a library, but not commas, you can refer to libraries containing spaces in the name without ambiguity for example:
 
    `depends=Very long library name, Another library with long-name`
 
