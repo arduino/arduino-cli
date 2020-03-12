@@ -1,5 +1,5 @@
-This specification is a 3rd party Hardware format to be used in Arduino IDE starting from 1.5.x series. \
-This specification allows a 3rd party vendor/maintainer to add support for new boards inside the Arduino IDE by providing a file to unzip into the *hardware* folder of Arduino's sketchbook folder. \
+This specification is a 3rd party Hardware format to be used in Arduino IDE starting from 1.5.x series.<br>
+This specification allows a 3rd party vendor/maintainer to add support for new boards inside the Arduino IDE by providing a file to unzip into the *hardware* folder of Arduino's sketchbook folder.<br>
 It is also possible to add new 3rd party boards by providing just one configuration file.
 
 ## Hardware Folders structure
@@ -78,7 +78,7 @@ The following meta-data must be defined:
     name=Arduino AVR Boards
     version=1.5.3
 
-The **name** will be shown in the Boards menu of the Arduino IDE. \
+The **name** will be shown in the Boards menu of the Arduino IDE.<br>
 The **version** is currently unused, it is reserved for future use (probably together with the libraries manager to handle dependencies on cores).
 
 ### Build process
@@ -356,7 +356,7 @@ instead, the Arduino Leonardo board needs the *leonardo* variant:
     leonardo.build.variant=leonardo
     [.....]
 
-In the example above, both Uno and Leonardo share the same core but use different variants. \
+In the example above, both Uno and Leonardo share the same core but use different variants.<br>
 In any case, the contents of the selected variant folder path is added to the include search path and its contents are compiled and linked with the sketch.
 
 The parameter **build.variant.path** is automatically found by the IDE.
@@ -385,7 +385,7 @@ Each action has its own recipe and its configuration is done through a set of pr
     tools.avrdude.bootloader.pattern=[......]
     [.....]
 
-A tool may have some actions not defined (it's not mandatory to define all four actions). \
+A tool may have some actions not defined (it's not mandatory to define all four actions).<br>
 Let's look at how the **upload** action is defined for avrdude:
 
     tools.avrdude.path={runtime.tools.avrdude.path}
@@ -400,7 +400,7 @@ The Arduino IDE makes the tool configuration properties available globally witho
 
 #### Verbose parameter
 
-It is possible for the user to enable verbosity from the Arduino IDE's Preferences panel. This preference is transferred to the command line by the IDE using the **ACTION.verbose** property (where ACTION is the action we are considering). \
+It is possible for the user to enable verbosity from the Arduino IDE's Preferences panel. This preference is transferred to the command line by the IDE using the **ACTION.verbose** property (where ACTION is the action we are considering).<br>
 When the verbose mode is enabled the **tools.TOOL_ID.ACTION.params.verbose** property is copied into **ACTION.verbose**. When the verbose mode is disabled, the **tools.TOOL_ID.ACTION.params.quiet** property is copied into **ACTION.verbose**. Confused? Maybe an example will clear things:
 
     tools.avrdude.upload.params.verbose=-v -v -v -v
@@ -480,7 +480,7 @@ The platform.txt associated with the selected board will be used.
 The Arduino IDE allows adding extra menu items under the Tools menu. With these sub-menus the user can select different configurations for a specific board (for example a board could be provided in two or more variants with different CPUs, or may have different crystal speed based on the board model, and so on...).
 
 Let's see an example of how a custom menu is implemented.
-The board used in the example is the Arduino Duemilanove. This board was produced in two models, one with an ATmega168 CPU and another with an ATmega328P. \
+The board used in the example is the Arduino Duemilanove. This board was produced in two models, one with an ATmega168 CPU and another with an ATmega328P.<br>
 We are going then to define a custom menu "Processor" that allows the user to choose between the two
 different microcontrollers.
 
@@ -489,7 +489,7 @@ We must first define a set of **menu.MENU_ID=Text** properties. Text is what is 
     menu.cpu=Processor
     [.....]
 
-in this case we declare only one custom menu "Processor" which we refer using the "cpu" MENU_ID. \
+in this case we declare only one custom menu "Processor" which we refer using the "cpu" MENU_ID.<br>
 Now let's add, always in the boards.txt file, the default configuration (common to all processors) for the duemilanove board:
 
     menu.cpu=Processor
@@ -511,8 +511,8 @@ Now let's define the options to show in the "Processor" menu:
     duemilanove.menu.cpu.atmega168=ATmega168
     [.....]
 
-We have defined two options: "ATmega328P" and "ATmega168". \
-Note that the property keys must follow the format **BOARD_ID.menu.MENU_ID.OPTION_ID=Text**. \
+We have defined two options: "ATmega328P" and "ATmega168".<br>
+Note that the property keys must follow the format **BOARD_ID.menu.MENU_ID.OPTION_ID=Text**.<br>
 Finally, the specific configuration for every option:
 
     [.....]

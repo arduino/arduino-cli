@@ -134,7 +134,7 @@ Each tool version may come in different build flavours for different OS. Each fl
 * Windows (`i686-mingw32`),
 * Mac (`i386-apple-darwin11`)
 
-The IDE will take care to install the right flavour based on the `host` value, or fail if a needed flavour is missing. \
+The IDE will take care to install the right flavour based on the `host` value, or fail if a needed flavour is missing.<br>
 Note that the IDE does not use this information to select the toolchain during verify. If you want the IDE to use this specific version you should use the notation {runtime.tools.TOOLNAME-VERSION.path} in the platform.txt.
 
 The other fields are:
