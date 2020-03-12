@@ -410,6 +410,16 @@ public final class Compile {
      * @return The optimizeForDebug.
      */
     boolean getOptimizeForDebug();
+
+    /**
+     * <pre>
+     * When set to true the compiled binary will not be copied to the export directory
+     * </pre>
+     *
+     * <code>bool dryRun = 17;</code>
+     * @return The dryRun.
+     */
+    boolean getDryRun();
   }
   /**
    * Protobuf type {@code cc.arduino.cli.commands.CompileReq}
@@ -567,6 +577,11 @@ public final class Compile {
             case 128: {
 
               optimizeForDebug_ = input.readBool();
+              break;
+            }
+            case 136: {
+
+              dryRun_ = input.readBool();
               break;
             }
             default: {
@@ -1116,6 +1131,20 @@ public final class Compile {
       return optimizeForDebug_;
     }
 
+    public static final int DRYRUN_FIELD_NUMBER = 17;
+    private boolean dryRun_;
+    /**
+     * <pre>
+     * When set to true the compiled binary will not be copied to the export directory
+     * </pre>
+     *
+     * <code>bool dryRun = 17;</code>
+     * @return The dryRun.
+     */
+    public boolean getDryRun() {
+      return dryRun_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1177,6 +1206,9 @@ public final class Compile {
       }
       if (optimizeForDebug_ != false) {
         output.writeBool(16, optimizeForDebug_);
+      }
+      if (dryRun_ != false) {
+        output.writeBool(17, dryRun_);
       }
       unknownFields.writeTo(output);
     }
@@ -1252,6 +1284,10 @@ public final class Compile {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(16, optimizeForDebug_);
       }
+      if (dryRun_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(17, dryRun_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -1302,6 +1338,8 @@ public final class Compile {
           .equals(other.getLibrariesList())) return false;
       if (getOptimizeForDebug()
           != other.getOptimizeForDebug()) return false;
+      if (getDryRun()
+          != other.getDryRun()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1356,6 +1394,9 @@ public final class Compile {
       hash = (37 * hash) + OPTIMIZEFORDEBUG_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getOptimizeForDebug());
+      hash = (37 * hash) + DRYRUN_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getDryRun());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1525,6 +1566,8 @@ public final class Compile {
         bitField0_ = (bitField0_ & ~0x00000002);
         optimizeForDebug_ = false;
 
+        dryRun_ = false;
+
         return this;
       }
 
@@ -1580,6 +1623,7 @@ public final class Compile {
         }
         result.libraries_ = libraries_;
         result.optimizeForDebug_ = optimizeForDebug_;
+        result.dryRun_ = dryRun_;
         onBuilt();
         return result;
       }
@@ -1696,6 +1740,9 @@ public final class Compile {
         }
         if (other.getOptimizeForDebug() != false) {
           setOptimizeForDebug(other.getOptimizeForDebug());
+        }
+        if (other.getDryRun() != false) {
+          setDryRun(other.getDryRun());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3041,6 +3088,48 @@ public final class Compile {
         onChanged();
         return this;
       }
+
+      private boolean dryRun_ ;
+      /**
+       * <pre>
+       * When set to true the compiled binary will not be copied to the export directory
+       * </pre>
+       *
+       * <code>bool dryRun = 17;</code>
+       * @return The dryRun.
+       */
+      public boolean getDryRun() {
+        return dryRun_;
+      }
+      /**
+       * <pre>
+       * When set to true the compiled binary will not be copied to the export directory
+       * </pre>
+       *
+       * <code>bool dryRun = 17;</code>
+       * @param value The dryRun to set.
+       * @return This builder for chaining.
+       */
+      public Builder setDryRun(boolean value) {
+        
+        dryRun_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * When set to true the compiled binary will not be copied to the export directory
+       * </pre>
+       *
+       * <code>bool dryRun = 17;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearDryRun() {
+        
+        dryRun_ = false;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -3781,7 +3870,7 @@ public final class Compile {
   static {
     java.lang.String[] descriptorData = {
       "\n\026commands/compile.proto\022\027cc.arduino.cli" +
-      ".commands\032\025commands/common.proto\"\344\002\n\nCom" +
+      ".commands\032\025commands/common.proto\"\364\002\n\nCom" +
       "pileReq\0223\n\010instance\030\001 \001(\0132!.cc.arduino.c" +
       "li.commands.Instance\022\014\n\004fqbn\030\002 \001(\t\022\022\n\nsk" +
       "etchPath\030\003 \001(\t\022\026\n\016showProperties\030\004 \001(\010\022\022" +
@@ -3790,12 +3879,13 @@ public final class Compile {
       "\030\010 \003(\t\022\020\n\010warnings\030\t \001(\t\022\017\n\007verbose\030\n \001(" +
       "\010\022\r\n\005quiet\030\013 \001(\010\022\016\n\006vidPid\030\014 \001(\t\022\022\n\nexpo" +
       "rtFile\030\r \001(\t\022\014\n\004jobs\030\016 \001(\005\022\021\n\tlibraries\030" +
-      "\017 \003(\t\022\030\n\020optimizeForDebug\030\020 \001(\010\"m\n\013Compi" +
-      "leResp\022\022\n\nout_stream\030\001 \001(\014\022\022\n\nerr_stream" +
-      "\030\002 \001(\014\0226\n\006result\030\003 \001(\0162&.cc.arduino.cli." +
-      "commands.CompileResult*\'\n\rCompileResult\022" +
-      "\013\n\007success\020\000\022\t\n\005error\020\001B-Z+github.com/ar" +
-      "duino/arduino-cli/rpc/commandsb\006proto3"
+      "\017 \003(\t\022\030\n\020optimizeForDebug\030\020 \001(\010\022\016\n\006dryRu" +
+      "n\030\021 \001(\010\"m\n\013CompileResp\022\022\n\nout_stream\030\001 \001" +
+      "(\014\022\022\n\nerr_stream\030\002 \001(\014\0226\n\006result\030\003 \001(\0162&" +
+      ".cc.arduino.cli.commands.CompileResult*\'" +
+      "\n\rCompileResult\022\013\n\007success\020\000\022\t\n\005error\020\001B" +
+      "-Z+github.com/arduino/arduino-cli/rpc/co" +
+      "mmandsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -3807,7 +3897,7 @@ public final class Compile {
     internal_static_cc_arduino_cli_commands_CompileReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_cc_arduino_cli_commands_CompileReq_descriptor,
-        new java.lang.String[] { "Instance", "Fqbn", "SketchPath", "ShowProperties", "Preprocess", "BuildCachePath", "BuildPath", "BuildProperties", "Warnings", "Verbose", "Quiet", "VidPid", "ExportFile", "Jobs", "Libraries", "OptimizeForDebug", });
+        new java.lang.String[] { "Instance", "Fqbn", "SketchPath", "ShowProperties", "Preprocess", "BuildCachePath", "BuildPath", "BuildProperties", "Warnings", "Verbose", "Quiet", "VidPid", "ExportFile", "Jobs", "Libraries", "OptimizeForDebug", "DryRun", });
     internal_static_cc_arduino_cli_commands_CompileResp_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_cc_arduino_cli_commands_CompileResp_fieldAccessorTable = new
