@@ -129,6 +129,7 @@ Each tool is uniquely identified by the triple (`vendor`, `name`, `version`) and
 *  .....
 
 Each tool version may come in different build flavours for different OS. Each flavour is listed under the `systems` array. In the example above `avr-gcc` comes with builds for:
+
 * Linux 64-bit (`x86_64-linux-gnu`),
 * Linux 32-bit (`i686-linux-gnu`),
 * Windows (`i686-mingw32`),
@@ -138,6 +139,7 @@ The IDE will take care to install the right flavour based on the `host` value, o
 Note that the IDE does not use this information to select the toolchain during verify. If you want the IDE to use this specific version you should use the notation {runtime.tools.TOOLNAME-VERSION.path} in the platform.txt.
 
 The other fields are:
+
 * `url`: the download URL of the tool's archive
 * `archiveFileName`: the name of the file saved to disk after the download (some web servers don't provide the filename through the HTTP request)
 * `size`: the size of the archive in bytes
@@ -187,6 +189,7 @@ Finally, let's see how `PLATFORMS` are made.
 ```
 
 Each PLATFORM describes a core for a specific architecture. The fields needed are:
+
 * `name`: the extended name of the platform that is displayed on the Boards Manager GUI
 * `architecture`: is the architecture of the plaftorm (avr, sam, etc...). It must match the architecture of the core as explained in the [Arduino platform specification](platform-specification.md#hardware-folders-structure)
 * `version`: the version of the platform.

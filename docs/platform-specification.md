@@ -206,6 +206,7 @@ For AVR we have:
 When you do a **Sketch > Export compiled Binary**, the compiled binary is copied from the build folder to the sketch folder. Two binaries are copied; the standard binary, and a binary that has been merged with the bootloader file (identified by the `.with_bootloader` in the filename).
 
 Two recipes affect how **Export compiled Binary** works:
+
 * **recipe.output.tmp_file**: Defines the binary's filename in the build folder.
 * **recipe.output.save_file**: Defines the filename to use when copying the binary file to the sketch folder.
 
@@ -236,6 +237,7 @@ Note that older IDE versions used the **recipe.preproc.includes** recipe to dete
 #### Pre and post build hooks (since IDE 1.6.5)
 
 You can specify pre and post actions around each recipe. These are called "hooks". Here is the complete list of available hooks:
+
 * `recipe.hooks.sketch.prebuild.NUMBER.pattern` (called before sketch compilation)
 * `recipe.hooks.sketch.postbuild.NUMBER.pattern` (called after sketch compilation)
 * `recipe.hooks.libraries.prebuild.NUMBER.pattern` (called before libraries compilation)
