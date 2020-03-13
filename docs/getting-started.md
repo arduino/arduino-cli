@@ -344,5 +344,5 @@ telemetry:
 ```
 
 [client_example]: https://github.com/arduino/arduino-cli/blob/master/client_example
-[gRPC reference]: /rpc/commands
+[gRPC reference]: ../rpc/commands
 [Prometheus]: https://prometheus.io/
