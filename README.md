@@ -8,6 +8,7 @@ board and platforms.
 
 [![tests-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=test)
 [![nightly-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=nightly)
+[![docs-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=docs)
 [![codecov-badge]](https://codecov.io/gh/arduino/arduino-cli)
 
 > **Note:** this software is currently under active development: anything can change
@@ -36,6 +37,7 @@ the source code, run the tests, and contribute your changes to the project.
 
 [tests-badge]: https://github.com/Arduino/arduino-cli/workflows/test/badge.svg
 [nightly-badge]: https://github.com/Arduino/arduino-cli/workflows/nightly/badge.svg
+[docs-badge]: https://github.com/Arduino/arduino-cli/workflows/docs/badge.svg
 [codecov-badge]: https://codecov.io/gh/arduino/arduino-cli/branch/master/graph/badge.svg
 [Install]: https://arduino.github.io/arduino-cli/installation
 [User documentation]: https://arduino.github.io/arduino-cli/
