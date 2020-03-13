@@ -68,7 +68,7 @@ func NewCommand() *cobra.Command {
 	command.Flags().BoolVar(&preprocess, "preprocess", false, "Print preprocessed code to stdout instead of compiling.")
 	command.Flags().StringVar(&buildCachePath, "build-cache-path", "", "Builds of 'core.a' are saved into this path to be cached and reused.")
 	command.Flags().StringVarP(&exportFile, "output", "o", "", "Filename of the compile output.")
-	command.Flags().BoolVarP(&dryRun, "dry-run", "n", false, "Perform the build but do not copy the compile output.")
+	command.Flags().BoolVarP(&dryRun, "dry-run", "n", false, "Perform the build but do not copy the compile output file.")
 	command.Flags().StringVar(&buildPath, "build-path", "",
 		"Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.")
 	command.Flags().StringSliceVar(&buildProperties, "build-properties", []string{},
