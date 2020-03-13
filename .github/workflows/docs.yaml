@@ -2,10 +2,6 @@ name: docs
 
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - closed
     paths:
       # existing docs
       - 'docs/**'
@@ -14,6 +10,15 @@ on:
       # potential changes to commands documentation
       - 'cli/**'
       # potential changes to gRPC documentation
+      - 'rpc/**'
+  push:
+    branches:
+      - master
+    # At this day, GitHub doesn't support YAML anchors, d'oh!
+    paths:
+      - 'docs/**'
+      - 'docsgen/**'
+      - 'cli/**'
       - 'rpc/**'
 
 jobs:
@@ -67,8 +72,8 @@ jobs:
         run: task docs:build
 
       - name: Deploy
-        # publish docs only when PR is merged
-        if: github.event.pull_request.merged == true
+        # publish docs only when PR is merged on master
+        if: github.event_name == 'push'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
