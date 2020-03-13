@@ -3199,6 +3199,12 @@
 <td></td>
 <td>Optimize compile output for debug, not for release</td>
 </tr>
+<tr>
+<td>dryRun</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>When set to true the compiled binary will not be copied to the export directory</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.CompileResp"></a></p>
@@ -3806,19 +3812,7 @@
 <td></td>
 </tr>
 <tr>
-<td>location</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
 <td>container_platform</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>layout</td>
 <td><a href="#string">string</a></td>
 <td></td>
 <td></td>
@@ -3869,6 +3863,18 @@
 <td>properties</td>
 <td><a href="#cc.arduino.cli.commands.Library.PropertiesEntry">Library.PropertiesEntry</a></td>
 <td>repeated</td>
+<td></td>
+</tr>
+<tr>
+<td>location</td>
+<td><a href="#cc.arduino.cli.commands.LibraryLocation">LibraryLocation</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>layout</td>
+<td><a href="#cc.arduino.cli.commands.LibraryLayout">LibraryLayout</a></td>
+<td></td>
 <td></td>
 </tr>
 </tbody>
@@ -4505,17 +4511,17 @@
 <td></td>
 </tr>
 <tr>
-<td>platform_builtin</td>
+<td>user</td>
 <td>1</td>
-<td></td>
+<td>(sketchbook)</td>
 </tr>
 <tr>
-<td>referenced_platform_builtin</td>
+<td>platform_builtin</td>
 <td>2</td>
 <td></td>
 </tr>
 <tr>
-<td>sketchbook</td>
+<td>referenced_platform_builtin</td>
 <td>3</td>
 <td></td>
 </tr>
