@@ -35,6 +35,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/pkg/errors"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
@@ -100,7 +101,7 @@ type filterFiles func([]os.FileInfo) []os.FileInfo
 func ReadDirFiltered(folder string, fn filterFiles) ([]os.FileInfo, error) {
 	files, err := gohasissues.ReadDir(folder)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 	return fn(files), nil
 }
@@ -209,7 +210,7 @@ type argFilterFunc func(int, string, []string) bool
 func PrepareCommandFilteredArgs(pattern string, filter argFilterFunc, logger i18n.Logger, relativePath string) (*exec.Cmd, error) {
 	parts, err := ParseCommandLine(pattern, logger)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 	command := parts[0]
 	parts = parts[1:]
@@ -301,7 +302,7 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 
 	err := command.Start()
 	if err != nil {
-		return nil, nil, i18n.WrapError(err)
+		return nil, nil, errors.WithStack(err)
 	}
 
 	err = command.Wait()
@@ -314,7 +315,7 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 		errbytes = buf.Bytes()
 	}
 
-	return outbytes, errbytes, i18n.WrapError(err)
+	return outbytes, errbytes, errors.WithStack(err)
 }
 
 func AbsolutizePaths(files []string) ([]string, error) {
@@ -324,7 +325,7 @@ func AbsolutizePaths(files []string) ([]string, error) {
 		}
 		absFile, err := filepath.Abs(file)
 		if err != nil {
-			return nil, i18n.WrapError(err)
+			return nil, errors.WithStack(err)
 		}
 		files[idx] = absFile
 	}

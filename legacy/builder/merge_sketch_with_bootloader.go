@@ -19,11 +19,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/go-paths-helper"
-
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/go-paths-helper"
+	"github.com/pkg/errors"
 )
 
 type MergeSketchWithBootloader struct{}
@@ -115,13 +114,13 @@ func extractActualBootloader(bootloader []string) []string {
 func merge(builtSketchPath, bootloaderPath, mergedSketchPath *paths.Path) error {
 	sketch, err := builtSketchPath.ReadFileAsLines()
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	sketch = sketch[:len(sketch)-2]
 
 	bootloader, err := bootloaderPath.ReadFileAsLines()
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	realBootloader := extractActualBootloader(bootloader)

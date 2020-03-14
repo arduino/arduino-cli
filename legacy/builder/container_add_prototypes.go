@@ -18,8 +18,8 @@ package builder
 import (
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/pkg/errors"
 )
 
 type ContainerAddPrototypes struct{}
@@ -27,14 +27,14 @@ type ContainerAddPrototypes struct{}
 func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 	// Generate the full pathname for the preproc output file
 	if err := ctx.PreprocPath.MkdirAll(); err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	targetFilePath := ctx.PreprocPath.Join(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E)
 
 	// Run preprocessor
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Name.Base() + ".cpp")
 	if err := GCCPreprocRunner(ctx, sourceFile, targetFilePath, ctx.IncludeFolders); err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	commands := []types.Command{
@@ -49,12 +49,12 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 		PrintRingNameIfDebug(ctx, command)
 		err := command.Run(ctx)
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 	}
 
 	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile.Name.String(), []byte(ctx.Source), ctx.SketchBuildPath.String()); err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	return nil

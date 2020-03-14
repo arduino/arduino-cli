@@ -16,16 +16,15 @@
 package phases
 
 import (
-	"errors"
 	"regexp"
 	"strconv"
 
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 )
 
 type Sizer struct {
@@ -42,7 +41,7 @@ func (s *Sizer) Run(ctx *types.Context) error {
 
 	err := checkSize(ctx, buildProperties)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	return nil

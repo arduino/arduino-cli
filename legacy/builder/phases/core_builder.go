@@ -21,11 +21,11 @@ import (
 
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 )
 
 type CoreBuilder struct{}
@@ -36,7 +36,7 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
 
 	if err := coreBuildPath.MkdirAll(); err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	if coreBuildCachePath != nil {
@@ -47,13 +47,13 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 			coreBuildCachePath = nil
 			ctx.CoreBuildCachePath = nil
 		} else if err := coreBuildCachePath.MkdirAll(); err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 	}
 
 	archiveFile, objectFiles, err := compileCore(ctx, coreBuildPath, coreBuildCachePath, buildProperties)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	ctx.CoreArchiveFilePath = archiveFile
@@ -82,7 +82,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 	if variantFolder != nil && variantFolder.IsDir() {
 		variantObjectFiles, err = builder_utils.CompileFiles(ctx, variantFolder, true, buildPath, buildProperties, includes)
 		if err != nil {
-			return nil, nil, i18n.WrapError(err)
+			return nil, nil, errors.WithStack(err)
 		}
 	}
 
@@ -107,12 +107,12 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 
 	coreObjectFiles, err := builder_utils.CompileFiles(ctx, coreFolder, true, buildPath, buildProperties, includes)
 	if err != nil {
-		return nil, nil, i18n.WrapError(err)
+		return nil, nil, errors.WithStack(err)
 	}
 
 	archiveFile, err := builder_utils.ArchiveCompiledFiles(ctx, buildPath, paths.New("core.a"), coreObjectFiles, buildProperties)
 	if err != nil {
-		return nil, nil, i18n.WrapError(err)
+		return nil, nil, errors.WithStack(err)
 	}
 
 	// archive core.a

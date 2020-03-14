@@ -25,10 +25,10 @@ import (
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
+	"github.com/pkg/errors"
 )
 
 var MAIN_FILE_VALID_EXTENSIONS = map[string]bool{".ino": true, ".pde": true}
@@ -194,7 +194,7 @@ func runCommands(ctx *types.Context, commands []types.Command, progressEnabled b
 		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
 		err := command.Run(ctx)
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 	}
 	return nil

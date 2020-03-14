@@ -20,9 +20,9 @@ import (
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
+	"github.com/pkg/errors"
 )
 
 type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
@@ -47,7 +47,7 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		PrintRingNameIfDebug(ctx, command)
 		err := command.Run(ctx)
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 	}
 
@@ -55,13 +55,13 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		// get abs path to sketch
 		sketchLocation, err := ctx.SketchLocation.Abs()
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 
 		// load sketch
 		sketch, err := bldr.SketchLoad(sketchLocation.String(), ctx.BuildPath.String())
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 		if sketch.MainFile == nil {
 			return fmt.Errorf("main file missing from sketch")
@@ -84,7 +84,7 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		PrintRingNameIfDebug(ctx, command)
 		err := command.Run(ctx)
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 	}
 

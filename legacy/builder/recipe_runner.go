@@ -22,10 +22,10 @@ import (
 
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 )
 
 type RecipeByPrefixSuffixRunner struct {
@@ -49,7 +49,7 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 		}
 		_, _, err := builder_utils.ExecRecipe(ctx, properties, recipe, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 	}
 

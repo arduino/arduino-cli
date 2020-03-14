@@ -21,21 +21,21 @@ import (
 
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
+	"github.com/pkg/errors"
 )
 
 func GCCPreprocRunner(ctx *types.Context, sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList) error {
 	cmd, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	_, _, err = utils.ExecCommand(ctx, cmd /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -44,12 +44,12 @@ func GCCPreprocRunner(ctx *types.Context, sourceFilePath *paths.Path, targetFile
 func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList) ([]byte, error) {
 	cmd, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 
 	_, stderr, err := utils.ExecCommand(ctx, cmd /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Capture)
 	if err != nil {
-		return stderr, i18n.WrapError(err)
+		return stderr, errors.WithStack(err)
 	}
 
 	return stderr, nil
@@ -70,7 +70,7 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths
 
 	cmd, err := builder_utils.PrepareCommandForRecipe(ctx, properties, constants.RECIPE_PREPROC_MACROS, true)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 
 	// Remove -MMD argument if present. Leaving it will make gcc try

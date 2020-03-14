@@ -19,12 +19,12 @@ import (
 	"sort"
 	"strings"
 
-	paths "github.com/arduino/go-paths-helper"
-
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
+	"github.com/arduino/go-paths-helper"
+	"github.com/pkg/errors"
 )
 
 type SketchLoader struct{}
@@ -38,11 +38,11 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 
 	sketchLocation, err := sketchLocation.Abs()
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	mainSketchStat, err := sketchLocation.Stat()
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	if mainSketchStat.IsDir() {
 		sketchLocation = sketchLocation.Join(mainSketchStat.Name() + ".ino")
@@ -52,7 +52,7 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 
 	allSketchFilePaths, err := collectAllSketchFiles(sketchLocation.Parent())
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	logger := ctx.GetLogger()
@@ -63,7 +63,7 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 
 	sketch, err := makeSketch(sketchLocation, allSketchFilePaths, ctx.BuildPath, logger)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	ctx.SketchLocation = sketchLocation
@@ -79,10 +79,10 @@ func collectAllSketchFiles(from *paths.Path) (paths.PathList, error) {
 	rootExtensions := func(ext string) bool { return MAIN_FILE_VALID_EXTENSIONS[ext] || ADDITIONAL_FILE_VALID_EXTENSIONS[ext] }
 	err := utils.FindFilesInFolder(&filePaths, from.String(), rootExtensions, true /* recurse */)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 
-	return paths.NewPathList(filePaths...), i18n.WrapError(err)
+	return paths.NewPathList(filePaths...), errors.WithStack(err)
 }
 
 func makeSketch(sketchLocation *paths.Path, allSketchFilePaths paths.PathList, buildLocation *paths.Path, logger i18n.Logger) (*types.Sketch, error) {

@@ -18,8 +18,8 @@ package builder
 import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/pkg/errors"
 )
 
 type AddAdditionalEntriesToContext struct{}
@@ -29,19 +29,19 @@ func (*AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
 		buildPath := ctx.BuildPath
 		preprocPath, err := buildPath.Join(constants.FOLDER_PREPROC).Abs()
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 		sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 		librariesBuildPath, err := buildPath.Join("libraries").Abs()
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 		coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 
 		ctx.PreprocPath = preprocPath
@@ -53,7 +53,7 @@ func (*AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
 	if ctx.BuildCachePath != nil {
 		coreBuildCachePath, err := ctx.BuildCachePath.Join(constants.FOLDER_CORE).Abs()
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 
 		ctx.CoreBuildCachePath = coreBuildCachePath

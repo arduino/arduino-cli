@@ -102,12 +102,10 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
-
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 )
 
 type ContainerFindIncludes struct{}
@@ -124,7 +122,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	sketch := ctx.Sketch
 	mergedfile, err := types.MakeSourceFile(ctx, sketch, paths.New(sketch.MainFile.Name.Base()+".cpp"))
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	ctx.CollectedSourceFiles.Push(mergedfile)
 
@@ -139,7 +137,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 		err := findIncludesUntilDone(ctx, cache, sourceFilePaths.Pop())
 		if err != nil {
 			cachePath.Remove()
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 	}
 
@@ -147,12 +145,12 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	cache.ExpectEnd()
 	err = writeCache(cache, cachePath)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	err = runCommand(ctx, &FailIfImportedLibraryIsWrong{})
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -172,7 +170,7 @@ func runCommand(ctx *types.Context, command types.Command) error {
 	PrintRingNameIfDebug(ctx, command)
 	err := command.Run(ctx)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -276,11 +274,11 @@ func writeCache(cache *includeCache, path *paths.Path) error {
 	} else {
 		bytes, err := json.MarshalIndent(cache.entries, "", "  ")
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 		err = path.WriteFile(bytes)
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 	}
 	return nil
@@ -306,7 +304,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 	// remove the object file if it is found to be stale?
 	unchanged, err := builder_utils.ObjFileIsUpToDate(ctx, sourcePath, objPath, depPath)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	first := true
@@ -328,7 +326,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		} else {
 			preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
 			// Unwrap error and see if it is an ExitError.
-			_, is_exit_error := i18n.UnwrapError(preproc_err).(*exec.ExitError)
+			_, is_exit_error := errors.Cause(preproc_err).(*exec.ExitError)
 			if preproc_err == nil {
 				// Preprocessor successful, done
 				include = ""
@@ -336,7 +334,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 				// Ignore ExitErrors (e.g. gcc returning
 				// non-zero status), but bail out on
 				// other errors
-				return i18n.WrapError(preproc_err)
+				return errors.WithStack(preproc_err)
 			} else {
 				include = IncludesFinderWithRegExp(ctx, string(preproc_stderr))
 				if include == "" && ctx.Verbose {
@@ -355,7 +353,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		if library == nil {
 			// Library could not be resolved, show error
 			// err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: paths.New(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), Includes: includes})
-			// return i18n.WrapError(err)
+			// return errors.WithStack(err)
 			if preproc_err == nil || preproc_stderr == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
 				preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
@@ -368,7 +366,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 				}
 			}
 			os.Stderr.Write(preproc_stderr)
-			return i18n.WrapError(preproc_err)
+			return errors.WithStack(preproc_err)
 		}
 
 		// Add this library to the list of libraries, the
@@ -390,13 +388,13 @@ func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFil
 	filePaths := []string{}
 	err := utils.FindFilesInFolder(&filePaths, folder.String(), extensions, recurse)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	for _, filePath := range filePaths {
 		sourceFile, err := types.MakeSourceFile(ctx, origin, paths.New(filePath))
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 		queue.Push(sourceFile)
 	}

@@ -21,6 +21,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
+	"github.com/pkg/errors"
 )
 
 type CTagsRunner struct{}
@@ -42,12 +43,12 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 	commandLine := properties.ExpandPropsInString(pattern)
 	command, err := utils.PrepareCommand(commandLine, logger, "")
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	sourceBytes, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Ignore /* stderr */)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	ctx.CTagsOutput = string(sourceBytes)

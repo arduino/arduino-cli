@@ -27,7 +27,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.2 // indirect
 	github.com/miekg/dns v1.0.5 // indirect
 	github.com/oleksandr/bonjour v0.0.0-20160508152359-5dcf00d8b228 // indirect
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.1
 	github.com/pmylund/sortutil v0.0.0-20120526081524-abeda66eb583
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/schollz/closestmatch v2.1.0+incompatible

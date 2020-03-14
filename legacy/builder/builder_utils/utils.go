@@ -30,6 +30,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 )
 
 func PrintProgressIfProgressEnabledAndMachineLogger(ctx *types.Context) {
@@ -48,18 +49,18 @@ func PrintProgressIfProgressEnabledAndMachineLogger(ctx *types.Context) {
 func CompileFilesRecursive(ctx *types.Context, sourcePath *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
 	objectFiles, err := CompileFiles(ctx, sourcePath, false, buildPath, buildProperties, includes)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 
 	folders, err := utils.ReadDirFiltered(sourcePath.String(), utils.FilterDirs)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 
 	for _, folder := range folders {
 		subFolderObjectFiles, err := CompileFilesRecursive(ctx, sourcePath.Join(folder.Name()), buildPath.Join(folder.Name()), buildProperties, includes)
 		if err != nil {
-			return nil, i18n.WrapError(err)
+			return nil, errors.WithStack(err)
 		}
 		objectFiles.AddAll(subFolderObjectFiles)
 	}
@@ -70,15 +71,15 @@ func CompileFilesRecursive(ctx *types.Context, sourcePath *paths.Path, buildPath
 func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
 	sObjectFiles, err := compileFilesWithExtensionWithRecipe(ctx, sourcePath, recurse, buildPath, buildProperties, includes, ".S", constants.RECIPE_S_PATTERN)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 	cObjectFiles, err := compileFilesWithExtensionWithRecipe(ctx, sourcePath, recurse, buildPath, buildProperties, includes, ".c", constants.RECIPE_C_PATTERN)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 	cppObjectFiles, err := compileFilesWithExtensionWithRecipe(ctx, sourcePath, recurse, buildPath, buildProperties, includes, ".cpp", constants.RECIPE_CPP_PATTERN)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 	objectFiles := paths.NewPathList()
 	objectFiles.AddAll(sObjectFiles)
@@ -90,7 +91,7 @@ func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buil
 func compileFilesWithExtensionWithRecipe(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string, extension string, recipe string) (paths.PathList, error) {
 	sources, err := findFilesInFolder(sourcePath, extension, recurse)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 	return compileFilesWithRecipe(ctx, sourcePath, sources, buildPath, buildProperties, includes, recipe)
 }
@@ -98,7 +99,7 @@ func compileFilesWithExtensionWithRecipe(ctx *types.Context, sourcePath *paths.P
 func findFilesInFolder(sourcePath *paths.Path, extension string, recurse bool) (paths.PathList, error) {
 	files, err := utils.ReadDirFiltered(sourcePath.String(), utils.FilterFilesWithExtensions(extension))
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 	var sources paths.PathList
 	for _, file := range files {
@@ -108,13 +109,13 @@ func findFilesInFolder(sourcePath *paths.Path, extension string, recurse bool) (
 	if recurse {
 		folders, err := utils.ReadDirFiltered(sourcePath.String(), utils.FilterDirs)
 		if err != nil {
-			return nil, i18n.WrapError(err)
+			return nil, errors.WithStack(err)
 		}
 
 		for _, folder := range folders {
 			otherSources, err := findFilesInFolder(sourcePath.Join(folder.Name()), extension, recurse)
 			if err != nil {
-				return nil, i18n.WrapError(err)
+				return nil, errors.WithStack(err)
 			}
 			sources = append(sources, otherSources...)
 		}
@@ -126,7 +127,7 @@ func findFilesInFolder(sourcePath *paths.Path, extension string, recurse bool) (
 func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 	files, err := utils.ReadDirFiltered(sourcePath, utils.FilterFiles())
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 	var sources []string
 	for _, file := range files {
@@ -136,7 +137,7 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 	if recurse {
 		folders, err := utils.ReadDirFiltered(sourcePath, utils.FilterDirs)
 		if err != nil {
-			return nil, i18n.WrapError(err)
+			return nil, errors.WithStack(err)
 		}
 
 		for _, folder := range folders {
@@ -144,7 +145,7 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 				// Skip SCCS directories as they do not influence the build and can be very large
 				otherSources, err := findAllFilesInFolder(filepath.Join(sourcePath, folder.Name()), recurse)
 				if err != nil {
-					return nil, i18n.WrapError(err)
+					return nil, errors.WithStack(err)
 				}
 				sources = append(sources, otherSources...)
 			}
@@ -160,7 +161,7 @@ func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources 
 		return objectFiles, nil
 	}
 	var objectFilesMux sync.Mutex
-	var errors []error
+	var errorsList []error
 	var errorsMux sync.Mutex
 
 	ctx.Progress.Steps = ctx.Progress.Steps / float64(len(sources))
@@ -171,7 +172,7 @@ func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources 
 		objectFile, err := compileFileWithRecipe(ctx, sourcePath, source, buildPath, buildProperties, includes, recipe)
 		if err != nil {
 			errorsMux.Lock()
-			errors = append(errors, err)
+			errorsList = append(errorsList, err)
 			errorsMux.Unlock()
 		} else {
 			objectFilesMux.Lock()
@@ -199,7 +200,7 @@ func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources 
 	// Feed jobs until error or done
 	for _, source := range sources {
 		errorsMux.Lock()
-		gotError := len(errors) > 0
+		gotError := len(errorsList) > 0
 		errorsMux.Unlock()
 		if gotError {
 			break
@@ -208,9 +209,9 @@ func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources 
 	}
 	close(queue)
 	wg.Wait()
-	if len(errors) > 0 {
+	if len(errorsList) > 0 {
 		// output the first error
-		return nil, i18n.WrapError(errors[0])
+		return nil, errors.WithStack(errorsList[0])
 	}
 	objectFiles.Sort()
 	return objectFiles, nil
@@ -224,7 +225,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 	properties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, source)
 	relativeSource, err := sourcePath.RelTo(source)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 	depsFile := buildPath.Join(relativeSource.String() + ".d")
 	objectFile := buildPath.Join(relativeSource.String() + ".o")
@@ -232,17 +233,17 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 	properties.SetPath(constants.BUILD_PROPERTIES_OBJECT_FILE, objectFile)
 	err = objectFile.Parent().MkdirAll()
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 
 	objIsUpToDate, err := ObjFileIsUpToDate(ctx, source, objectFile, depsFile)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 	if !objIsUpToDate {
 		_, _, err = ExecRecipe(ctx, properties, recipe, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
 		if err != nil {
-			return nil, i18n.WrapError(err)
+			return nil, errors.WithStack(err)
 		}
 	} else if ctx.Verbose {
 		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, objectFile)
@@ -267,7 +268,7 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 	sourceFile = sourceFile.Clean()
 	sourceFileStat, err := sourceFile.Stat()
 	if err != nil {
-		return false, i18n.WrapError(err)
+		return false, errors.WithStack(err)
 	}
 
 	objectFile = objectFile.Clean()
@@ -279,7 +280,7 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 			}
 			return false, nil
 		} else {
-			return false, i18n.WrapError(err)
+			return false, errors.WithStack(err)
 		}
 	}
 
@@ -292,7 +293,7 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 			}
 			return false, nil
 		} else {
-			return false, i18n.WrapError(err)
+			return false, errors.WithStack(err)
 		}
 	}
 
@@ -311,7 +312,7 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 
 	rows, err := dependencyFile.ReadFileAsLines()
 	if err != nil {
-		return false, i18n.WrapError(err)
+		return false, errors.WithStack(err)
 	}
 
 	rows = utils.Map(rows, removeEndingBackSlash)
@@ -346,7 +347,7 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 			// Ignore the error and trigger a full rebuild anyway
 			if debugLevel >= 20 {
 				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Failed to read: {0}", row)
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, i18n.WrapError(err).Error())
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, err.Error())
 			}
 			return false, nil
 		}
@@ -454,9 +455,8 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 
 		// something changed, rebuild the core archive
 		if rebuildArchive {
-			err = archiveFilePath.Remove()
-			if err != nil {
-				return nil, i18n.WrapError(err)
+			if err := archiveFilePath.Remove(); err != nil {
+				return nil, errors.WithStack(err)
 			}
 		} else {
 			if ctx.Verbose {
@@ -472,9 +472,8 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 		properties.SetPath(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, archiveFilePath)
 		properties.SetPath(constants.BUILD_PROPERTIES_OBJECT_FILE, objectFile)
 
-		_, _, err := ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
-		if err != nil {
-			return nil, i18n.WrapError(err)
+		if _, _, err := ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show); err != nil {
+			return nil, errors.WithStack(err)
 		}
 	}
 
@@ -485,7 +484,7 @@ func ExecRecipe(ctx *types.Context, buildProperties *properties.Map, recipe stri
 	// See util.ExecCommand for stdout/stderr arguments
 	command, err := PrepareCommandForRecipe(ctx, buildProperties, recipe, removeUnsetProperties)
 	if err != nil {
-		return nil, nil, i18n.WrapError(err)
+		return nil, nil, errors.WithStack(err)
 	}
 
 	return utils.ExecCommand(ctx, command, stdout, stderr)
@@ -514,7 +513,7 @@ func PrepareCommandForRecipe(ctx *types.Context, buildProperties *properties.Map
 
 	command, err := utils.PrepareCommand(commandLine, logger, relativePath)
 	if err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 
 	return command, nil
