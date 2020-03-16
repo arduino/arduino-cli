@@ -23,7 +23,6 @@ import (
 	"time"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -194,7 +193,7 @@ func runCommands(ctx *types.Context, commands []types.Command) error {
 			return errors.WithStack(err)
 		}
 		ctx.Progress.CompleteStep()
-		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
+		ctx.PushProgress()
 	}
 	return nil
 }

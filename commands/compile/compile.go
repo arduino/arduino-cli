@@ -43,7 +43,7 @@ import (
 )
 
 // Compile FIXMEDOC
-func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.Writer, debug bool) (r *rpc.CompileResp, e error) {
+func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.Writer, taskCB commands.TaskProgressCB, debug bool) (r *rpc.CompileResp, e error) {
 
 	tags := map[string]string{
 		"fqbn":            req.Fqbn,
@@ -119,6 +119,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.PackageManager = pm
 	builderCtx.FQBN = fqbn
 	builderCtx.SketchLocation = sketch.FullPath
+	builderCtx.ProgressCB = taskCB
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories()

@@ -104,7 +104,6 @@ const MSG_MISSING_CORE_FOR_BOARD = "Selected board depends on '{0}' core (not in
 const MSG_PACKAGE_UNKNOWN = "{0}: Unknown package"
 const MSG_PATTERN_MISSING = "{0} pattern is missing"
 const MSG_PLATFORM_UNKNOWN = "Platform {0} (package {1}) is unknown"
-const MSG_PROGRESS = "Progress {0}"
 const MSG_PROP_IN_LIBRARY = "Missing '{0}' from library in {1}"
 const MSG_RUNNING_COMMAND = "Ts: {0} - Running: {1}"
 const MSG_RUNNING_RECIPE = "Running recipe: {0}"

@@ -121,7 +121,7 @@ func run(cmd *cobra.Command, args []string) {
 		DryRun:           dryRun,
 		Libraries:        libraries,
 		OptimizeForDebug: optimizeForDebug,
-	}, os.Stdout, os.Stderr, viper.GetString("logging.level") == "debug")
+	}, os.Stdout, os.Stderr, nil, viper.GetString("logging.level") == "debug")
 
 	if err != nil {
 		feedback.Errorf("Error during build: %v", err)

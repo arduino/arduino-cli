@@ -12,6 +12,7 @@ github.com/akavel/rsrc v0.8.0 h1:zjWn7ukO9Kc5Q62DOJCcxGpXC18RawVtYAGdz2aLlfw=
 github.com/akavel/rsrc v0.8.0/go.mod h1:uLoCtb9J+EyAqh+26kdrTgmzRBFPGOolLWKpdxkKq+c=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
+github.com/arduino/arduino-builder v0.0.0-20200212104243-d59b903f9ee8 h1:QMta31FSrmmLdu9GqHy6gH7rJQ/kOz4chkUA0L25h80=
 github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c h1:agh2JT96G8egU7FEb13L4dq3fnCN7lxXhJ86t69+W7s=
 github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c/go.mod h1:HK7SpkEax/3P+0w78iRQx1sz1vCDYYw9RXwHjQTB5i8=
 github.com/arduino/go-paths-helper v1.0.1 h1:utYXLM2RfFlc9qp/MJTIYp3t6ux/xM6mWjeEb/WLK4Q=

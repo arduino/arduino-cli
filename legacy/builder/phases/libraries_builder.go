@@ -115,7 +115,7 @@ func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *p
 		objectFiles = append(objectFiles, libraryObjectFiles...)
 
 		ctx.Progress.CompleteStep()
-		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
+		ctx.PushProgress()
 	}
 
 	return objectFiles, nil
