@@ -16,9 +16,9 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
+	"github.com/pkg/errors"
 )
 
 type ReadFileAndStoreInContext struct {
@@ -29,7 +29,7 @@ type ReadFileAndStoreInContext struct {
 func (s *ReadFileAndStoreInContext) Run(ctx *types.Context) error {
 	bytes, err := s.FileToRead.ReadFile()
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	*s.Target = string(bytes)

@@ -17,8 +17,8 @@ package builder
 
 import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/pkg/errors"
 )
 
 type HardwareLoader struct{}
@@ -27,7 +27,7 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 	if ctx.PackageManager == nil {
 		pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
 		if err := pm.LoadHardwareFromDirectories(ctx.HardwareDirs); err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 		ctx.PackageManager = pm
 	}

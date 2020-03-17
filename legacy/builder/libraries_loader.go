@@ -21,8 +21,8 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/pkg/errors"
 )
 
 type LibrariesLoader struct{}
@@ -33,7 +33,7 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 
 	builtInLibrariesFolders := ctx.BuiltInLibrariesDirs
 	if err := builtInLibrariesFolders.ToAbs(); err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	for _, folder := range builtInLibrariesFolders {
 		lm.AddLibrariesDir(folder, libraries.IDEBuiltIn)
@@ -51,14 +51,14 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 
 	librariesFolders := ctx.OtherLibrariesDirs
 	if err := librariesFolders.ToAbs(); err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	for _, folder := range librariesFolders {
 		lm.AddLibrariesDir(folder, libraries.User)
 	}
 
 	if err := lm.RescanLibraries(); err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	if debugLevel > 0 {
@@ -66,7 +66,7 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 			for _, libAlt := range lib.Alternatives {
 				warnings, err := libAlt.Lint()
 				if err != nil {
-					return i18n.WrapError(err)
+					return errors.WithStack(err)
 				}
 				for _, warning := range warnings {
 					logger.Fprintln(os.Stdout, "warn", warning)
@@ -77,7 +77,7 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 
 	resolver := librariesresolver.NewCppResolver()
 	if err := resolver.ScanFromLibrariesManager(lm); err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	ctx.LibrariesResolver = resolver
 

@@ -19,6 +19,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/pkg/errors"
 )
 
 type FailIfBuildPathEqualsSketchPath struct{}
@@ -30,12 +31,12 @@ func (s *FailIfBuildPathEqualsSketchPath) Run(ctx *types.Context) error {
 
 	buildPath, err := ctx.BuildPath.Abs()
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	sketchPath, err := ctx.SketchLocation.Abs()
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	sketchPath = sketchPath.Parent()
 

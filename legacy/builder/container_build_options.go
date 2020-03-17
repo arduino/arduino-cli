@@ -16,8 +16,8 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/pkg/errors"
 )
 
 type ContainerBuildOptions struct{}
@@ -34,7 +34,7 @@ func (s *ContainerBuildOptions) Run(ctx *types.Context) error {
 		PrintRingNameIfDebug(ctx, command)
 		err := command.Run(ctx)
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 	}
 

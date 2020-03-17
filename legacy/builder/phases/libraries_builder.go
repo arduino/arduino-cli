@@ -23,11 +23,11 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 )
 
 var PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC = map[string]bool{".a": true}
@@ -44,12 +44,12 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	libs := ctx.ImportedLibraries
 
 	if err := librariesBuildPath.MkdirAll(); err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	objectFiles, err := compileLibraries(ctx, libs, librariesBuildPath, buildProperties, includes)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	ctx.LibrariesObjectFiles = objectFiles
@@ -147,7 +147,7 @@ func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *p
 	for _, library := range libraries {
 		libraryObjectFiles, err := compileLibrary(ctx, library, buildPath, buildProperties, includes)
 		if err != nil {
-			return nil, i18n.WrapError(err)
+			return nil, errors.WithStack(err)
 		}
 		objectFiles = append(objectFiles, libraryObjectFiles...)
 	}
@@ -163,7 +163,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 	libraryBuildPath := buildPath.Join(library.Name)
 
 	if err := libraryBuildPath.MkdirAll(); err != nil {
-		return nil, i18n.WrapError(err)
+		return nil, errors.WithStack(err)
 	}
 
 	objectFiles := paths.NewPathList()
@@ -180,7 +180,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 			// Should we force precompiled libraries to start with "lib" ?
 			err := utils.FindFilesInFolder(&filePaths, precompiledPath.String(), extensions, false)
 			if err != nil {
-				return nil, i18n.WrapError(err)
+				return nil, errors.WithStack(err)
 			}
 			for _, path := range filePaths {
 				if !strings.HasPrefix(filepath.Base(path), "lib") {
@@ -194,12 +194,12 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 	if library.Layout == libraries.RecursiveLayout {
 		libObjectFiles, err := builder_utils.CompileFilesRecursive(ctx, library.SourceDir, libraryBuildPath, buildProperties, includes)
 		if err != nil {
-			return nil, i18n.WrapError(err)
+			return nil, errors.WithStack(err)
 		}
 		if library.DotALinkage {
 			archiveFile, err := builder_utils.ArchiveCompiledFiles(ctx, libraryBuildPath, paths.New(library.Name+".a"), libObjectFiles, buildProperties)
 			if err != nil {
-				return nil, i18n.WrapError(err)
+				return nil, errors.WithStack(err)
 			}
 			objectFiles.Add(archiveFile)
 		} else {
@@ -211,7 +211,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 		}
 		libObjectFiles, err := builder_utils.CompileFiles(ctx, library.SourceDir, false, libraryBuildPath, buildProperties, includes)
 		if err != nil {
-			return nil, i18n.WrapError(err)
+			return nil, errors.WithStack(err)
 		}
 		objectFiles.AddAll(libObjectFiles)
 
@@ -219,7 +219,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 			utilityBuildPath := libraryBuildPath.Join("utility")
 			utilityObjectFiles, err := builder_utils.CompileFiles(ctx, library.UtilityDir, false, utilityBuildPath, buildProperties, includes)
 			if err != nil {
-				return nil, i18n.WrapError(err)
+				return nil, errors.WithStack(err)
 			}
 			objectFiles.AddAll(utilityObjectFiles)
 		}

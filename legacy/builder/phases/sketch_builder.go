@@ -18,9 +18,9 @@ package phases
 import (
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
+	"github.com/pkg/errors"
 )
 
 type SketchBuilder struct{}
@@ -31,12 +31,12 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 	includes := utils.Map(ctx.IncludeFolders.AsStrings(), utils.WrapWithHyphenI)
 
 	if err := sketchBuildPath.MkdirAll(); err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	objectFiles, err := builder_utils.CompileFiles(ctx, sketchBuildPath, false, sketchBuildPath, buildProperties, includes)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	// The "src/" subdirectory of a sketch is compiled recursively
@@ -44,7 +44,7 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 	if sketchSrcPath.IsDir() {
 		srcObjectFiles, err := builder_utils.CompileFiles(ctx, sketchSrcPath, true, sketchSrcPath, buildProperties, includes)
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 		objectFiles.AddAll(srcObjectFiles)
 	}

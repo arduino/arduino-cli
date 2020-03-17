@@ -16,7 +16,6 @@
 package builder
 
 import (
-	"errors"
 	"fmt"
 	"os/exec"
 	"path/filepath"
@@ -29,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 )
 
 // ArduinoPreprocessorProperties are the platform properties needed to run arduino-preprocessor
@@ -50,7 +50,7 @@ func (s *PreprocessSketchArduino) Run(ctx *types.Context) error {
 	}
 
 	if err := ctx.PreprocPath.MkdirAll(); err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	GCCPreprocRunner(ctx, sourceFile, ctx.PreprocPath.Join(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), ctx.IncludeFolders)
@@ -59,7 +59,7 @@ func (s *PreprocessSketchArduino) Run(ctx *types.Context) error {
 		PrintRingNameIfDebug(ctx, command)
 		err := command.Run(ctx)
 		if err != nil {
-			return i18n.WrapError(err)
+			return errors.WithStack(err)
 		}
 	}
 
@@ -108,7 +108,7 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 	commandLine := properties.ExpandPropsInString(pattern)
 	command, err := utils.PrepareCommand(commandLine, logger, "")
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	if runtime.GOOS == "windows" {
@@ -124,7 +124,7 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 
 	buf, err := command.Output()
 	if err != nil {
-		return errors.New(i18n.WrapError(err).Error() + string(err.(*exec.ExitError).Stderr))
+		return errors.New(errors.WithStack(err).Error() + string(err.(*exec.ExitError).Stderr))
 	}
 
 	result := utils.NormalizeUTF8(buf)

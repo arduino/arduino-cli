@@ -28,7 +28,6 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/go-errors/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -57,10 +56,7 @@ func Abs(t *testing.T, rel *paths.Path) *paths.Path {
 
 func NoError(t *testing.T, err error, msgAndArgs ...interface{}) {
 	if !assert.NoError(t, err, msgAndArgs...) {
-		switch err.(type) {
-		case *errors.Error:
-			fmt.Println(err.(*errors.Error).ErrorStack())
-		}
+		fmt.Printf("%+v\n", err) // Outputs stack trace in case of wrapped error
 		t.FailNow()
 	}
 }

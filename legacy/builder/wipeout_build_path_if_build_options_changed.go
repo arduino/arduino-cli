@@ -22,9 +22,9 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 )
 
 type WipeoutBuildPathIfBuildOptionsChanged struct{}
@@ -71,7 +71,7 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	buildPath := ctx.BuildPath
 	files, err := gohasissues.ReadDir(buildPath.String())
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	for _, file := range files {
 		buildPath.Join(file.Name()).RemoveAll()

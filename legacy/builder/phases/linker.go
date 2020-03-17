@@ -20,11 +20,11 @@ import (
 
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 )
 
 type Linker struct{}
@@ -43,14 +43,14 @@ func (s *Linker) Run(ctx *types.Context) error {
 	buildPath := ctx.BuildPath
 	coreDotARelPath, err := buildPath.RelTo(coreArchiveFilePath)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	buildProperties := ctx.BuildProperties
 
 	err = link(ctx, objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	return nil

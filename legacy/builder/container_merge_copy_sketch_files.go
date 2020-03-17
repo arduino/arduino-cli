@@ -17,9 +17,8 @@ package builder
 
 import (
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 )
 
 type ContainerMergeCopySketchFiles struct{}
@@ -27,7 +26,7 @@ type ContainerMergeCopySketchFiles struct{}
 func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
 	sk := types.SketchFromLegacy(ctx.Sketch)
 	if sk == nil {
-		return i18n.WrapError(errors.New("unable to convert legacy sketch to the new type"))
+		return errors.New("unable to convert legacy sketch to the new type")
 	}
 	offset, source, err := bldr.SketchMergeSources(sk)
 	if err != nil {
@@ -37,11 +36,11 @@ func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
 	ctx.Source = source
 
 	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile.Name.String(), []byte(ctx.Source), ctx.SketchBuildPath.String()); err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	if err := bldr.SketchCopyAdditionalFiles(sk, ctx.SketchBuildPath.String()); err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	return nil

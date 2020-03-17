@@ -20,12 +20,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/arduino/go-paths-helper"
-
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 )
 
 type PlatformKeysRewriteLoader struct{}
@@ -35,7 +34,7 @@ func (s *PlatformKeysRewriteLoader) Run(ctx *types.Context) error {
 
 	platformKeysRewriteTxtPath, err := findPlatformKeysRewriteTxt(folders)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	if platformKeysRewriteTxtPath == nil {
 		return nil
@@ -46,7 +45,7 @@ func (s *PlatformKeysRewriteLoader) Run(ctx *types.Context) error {
 
 	txt, err := properties.LoadFromPath(platformKeysRewriteTxtPath)
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	keys := txt.Keys()
 	sort.Strings(keys)
@@ -56,7 +55,7 @@ func (s *PlatformKeysRewriteLoader) Run(ctx *types.Context) error {
 		if keyParts[0] == constants.PLATFORM_REWRITE_OLD {
 			index, err := strconv.Atoi(keyParts[1])
 			if err != nil {
-				return i18n.WrapError(err)
+				return errors.WithStack(err)
 			}
 			rewriteKey := strings.Join(keyParts[2:], ".")
 			oldValue := txt.Get(key)
@@ -78,7 +77,7 @@ func findPlatformKeysRewriteTxt(folders paths.PathList) (*paths.Path, error) {
 		if exist, err := txtPath.ExistCheck(); exist {
 			return txtPath, nil
 		} else if err != nil {
-			return nil, i18n.WrapError(err)
+			return nil, errors.WithStack(err)
 		}
 	}
 

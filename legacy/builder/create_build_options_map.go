@@ -17,8 +17,9 @@ package builder
 
 import (
 	"encoding/json"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
+
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/pkg/errors"
 )
 
 type CreateBuildOptionsMap struct{}
@@ -27,7 +28,7 @@ func (s *CreateBuildOptionsMap) Run(ctx *types.Context) error {
 	buildOptions := ctx.ExtractBuildOptions()
 	bytes, err := json.MarshalIndent(buildOptions, "", "  ")
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 	ctx.BuildOptionsJson = string(bytes)
 

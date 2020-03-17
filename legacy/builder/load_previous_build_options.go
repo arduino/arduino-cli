@@ -17,8 +17,8 @@ package builder
 
 import (
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/pkg/errors"
 )
 
 type LoadPreviousBuildOptionsMap struct{}
@@ -32,7 +32,7 @@ func (s *LoadPreviousBuildOptionsMap) Run(ctx *types.Context) error {
 
 	bytes, err := buildOptionsFile.ReadFile()
 	if err != nil {
-		return i18n.WrapError(err)
+		return errors.WithStack(err)
 	}
 
 	ctx.BuildOptionsJsonPrevious = string(bytes)
