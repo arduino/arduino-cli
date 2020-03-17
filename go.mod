@@ -16,7 +16,6 @@ require (
 	github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 // indirect
 	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
-	github.com/go-errors/errors v1.0.1
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang/protobuf v1.3.3
 	github.com/h2non/filetype v1.0.8 // indirect
