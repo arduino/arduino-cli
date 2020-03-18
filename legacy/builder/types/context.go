@@ -31,8 +31,31 @@ import (
 
 type ProgressStruct struct {
 	PrintEnabled bool
-	Steps        float64
-	Progress     float64
+	Progress     float32
+	StepAmount   float32
+	Parent       *ProgressStruct
+}
+
+func (p *ProgressStruct) AddSubSteps(steps int) {
+	p.Parent = &ProgressStruct{
+		Progress:   p.Progress,
+		StepAmount: p.StepAmount,
+		Parent:     p.Parent,
+	}
+	if p.StepAmount == 0.0 {
+		p.StepAmount = 100.0
+	}
+	p.StepAmount /= float32(steps)
+}
+
+func (p *ProgressStruct) RemoveSubSteps() {
+	p.Progress = p.Parent.Progress
+	p.StepAmount = p.Parent.StepAmount
+	p.Parent = p.Parent.Parent
+}
+
+func (p *ProgressStruct) CompleteStep() {
+	p.Progress += p.StepAmount
 }
 
 // Context structure

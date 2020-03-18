@@ -28,6 +28,10 @@ import (
 type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
 
 func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) error {
+	// total number of steps in this container: 14
+	ctx.Progress.AddSubSteps(14)
+	defer ctx.Progress.RemoveSubSteps()
+
 	commands := []types.Command{
 		&AddAdditionalEntriesToContext{},
 		&FailIfBuildPathEqualsSketchPath{},
@@ -40,15 +44,14 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		&LibrariesLoader{},
 	}
 
-	ctx.Progress.Steps = ctx.Progress.Steps / float64(len(commands))
-
 	for _, command := range commands {
-		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
 		PrintRingNameIfDebug(ctx, command)
 		err := command.Run(ctx)
 		if err != nil {
 			return errors.WithStack(err)
 		}
+		ctx.Progress.CompleteStep()
+		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
 	}
 
 	if ctx.SketchLocation != nil {
@@ -69,6 +72,8 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		ctx.SketchLocation = paths.New(sketch.MainFile.Path)
 		ctx.Sketch = types.SketchToLegacy(sketch)
 	}
+	ctx.Progress.CompleteStep()
+	builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
 
 	commands = []types.Command{
 		&SetupBuildProperties{},
@@ -77,15 +82,14 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		&AddMissingBuildPropertiesFromParentPlatformTxtFiles{},
 	}
 
-	ctx.Progress.Steps = ctx.Progress.Steps / float64(len(commands))
-
 	for _, command := range commands {
-		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
 		PrintRingNameIfDebug(ctx, command)
 		err := command.Run(ctx)
 		if err != nil {
 			return errors.WithStack(err)
 		}
+		ctx.Progress.CompleteStep()
+		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
 	}
 
 	return nil

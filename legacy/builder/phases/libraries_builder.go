@@ -143,6 +143,9 @@ func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libs libraries.List) e
 }
 
 func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
+	ctx.Progress.AddSubSteps(len(libraries))
+	defer ctx.Progress.RemoveSubSteps()
+
 	objectFiles := paths.NewPathList()
 	for _, library := range libraries {
 		libraryObjectFiles, err := compileLibrary(ctx, library, buildPath, buildProperties, includes)
@@ -150,6 +153,9 @@ func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *p
 			return nil, errors.WithStack(err)
 		}
 		objectFiles = append(objectFiles, libraryObjectFiles...)
+
+		ctx.Progress.CompleteStep()
+		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
 	}
 
 	return objectFiles, nil

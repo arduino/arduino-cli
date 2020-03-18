@@ -41,8 +41,7 @@ func PrintProgressIfProgressEnabledAndMachineLogger(ctx *types.Context) {
 
 	log := ctx.GetLogger()
 	if log.Name() == "machine" {
-		log.Println(constants.LOG_LEVEL_INFO, constants.MSG_PROGRESS, strconv.FormatFloat(ctx.Progress.Progress, 'f', 2, 32))
-		ctx.Progress.Progress += ctx.Progress.Steps
+		log.Println(constants.LOG_LEVEL_INFO, constants.MSG_PROGRESS, strconv.FormatFloat(float64(ctx.Progress.Progress), 'f', 2, 32))
 	}
 }
 
@@ -81,6 +80,9 @@ func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buil
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
+	ctx.Progress.AddSubSteps(len(sSources) + len(cSources) + len(cppSources))
+	defer ctx.Progress.RemoveSubSteps()
 
 	sObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, sSources, buildPath, buildProperties, includes, constants.RECIPE_S_PATTERN)
 	if err != nil {
@@ -170,11 +172,8 @@ func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources 
 	var errorsList []error
 	var errorsMux sync.Mutex
 
-	ctx.Progress.Steps = ctx.Progress.Steps / float64(len(sources))
-
 	queue := make(chan *paths.Path)
 	job := func(source *paths.Path) {
-		PrintProgressIfProgressEnabledAndMachineLogger(ctx)
 		objectFile, err := compileFileWithRecipe(ctx, sourcePath, source, buildPath, buildProperties, includes, recipe)
 		if err != nil {
 			errorsMux.Lock()
@@ -212,6 +211,9 @@ func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources 
 			break
 		}
 		queue <- source
+
+		ctx.Progress.CompleteStep()
+		PrintProgressIfProgressEnabledAndMachineLogger(ctx)
 	}
 	close(queue)
 	wg.Wait()
