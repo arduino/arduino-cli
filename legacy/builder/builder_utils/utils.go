@@ -69,31 +69,37 @@ func CompileFilesRecursive(ctx *types.Context, sourcePath *paths.Path, buildPath
 }
 
 func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	sObjectFiles, err := compileFilesWithExtensionWithRecipe(ctx, sourcePath, recurse, buildPath, buildProperties, includes, ".S", constants.RECIPE_S_PATTERN)
+	sSources, err := findFilesInFolder(sourcePath, ".S", recurse)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	cObjectFiles, err := compileFilesWithExtensionWithRecipe(ctx, sourcePath, recurse, buildPath, buildProperties, includes, ".c", constants.RECIPE_C_PATTERN)
+	cSources, err := findFilesInFolder(sourcePath, ".c", recurse)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	cppObjectFiles, err := compileFilesWithExtensionWithRecipe(ctx, sourcePath, recurse, buildPath, buildProperties, includes, ".cpp", constants.RECIPE_CPP_PATTERN)
+	cppSources, err := findFilesInFolder(sourcePath, ".cpp", recurse)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
+	sObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, sSources, buildPath, buildProperties, includes, constants.RECIPE_S_PATTERN)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	cObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, cSources, buildPath, buildProperties, includes, constants.RECIPE_C_PATTERN)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	cppObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, cppSources, buildPath, buildProperties, includes, constants.RECIPE_CPP_PATTERN)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
 	objectFiles := paths.NewPathList()
 	objectFiles.AddAll(sObjectFiles)
 	objectFiles.AddAll(cObjectFiles)
 	objectFiles.AddAll(cppObjectFiles)
 	return objectFiles, nil
-}
-
-func compileFilesWithExtensionWithRecipe(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string, extension string, recipe string) (paths.PathList, error) {
-	sources, err := findFilesInFolder(sourcePath, extension, recurse)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	return compileFilesWithRecipe(ctx, sourcePath, sources, buildPath, buildProperties, includes, recipe)
 }
 
 func findFilesInFolder(sourcePath *paths.Path, extension string, recurse bool) (paths.PathList, error) {
