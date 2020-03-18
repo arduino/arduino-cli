@@ -99,7 +99,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 	}
 
-	mainErr := runCommands(ctx, commands, true)
+	mainErr := runCommands(ctx, commands)
 
 	commands = []types.Command{
 		&PrintUsedAndNotUsedLibraries{SketchError: mainErr != nil},
@@ -110,7 +110,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&phases.Sizer{SketchError: mainErr != nil},
 	}
-	otherErr := runCommands(ctx, commands, false)
+	otherErr := runCommands(ctx, commands)
 
 	if mainErr != nil {
 		return mainErr
@@ -128,7 +128,7 @@ func (s *PreprocessSketch) Run(ctx *types.Context) error {
 	} else {
 		commands = append(commands, &ContainerAddPrototypes{})
 	}
-	return runCommands(ctx, commands, true)
+	return runCommands(ctx, commands)
 }
 
 type Preprocess struct{}
@@ -158,7 +158,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 		&PreprocessSketch{},
 	}
 
-	if err := runCommands(ctx, commands, true); err != nil {
+	if err := runCommands(ctx, commands); err != nil {
 		return err
 	}
 
@@ -180,22 +180,21 @@ func (s *ParseHardwareAndDumpBuildProperties) Run(ctx *types.Context) error {
 		&DumpBuildProperties{},
 	}
 
-	return runCommands(ctx, commands, true)
+	return runCommands(ctx, commands)
 }
 
-func runCommands(ctx *types.Context, commands []types.Command, progressEnabled bool) error {
-
-	ctx.Progress.PrintEnabled = progressEnabled
-	ctx.Progress.Progress = 0
+func runCommands(ctx *types.Context, commands []types.Command) error {
+	ctx.Progress.AddSubSteps(len(commands))
+	defer ctx.Progress.RemoveSubSteps()
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
-		ctx.Progress.Steps = 100.0 / float64(len(commands))
-		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
 		err := command.Run(ctx)
 		if err != nil {
 			return errors.WithStack(err)
 		}
+		ctx.Progress.CompleteStep()
+		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
 	}
 	return nil
 }
