@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/debug"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -31,11 +32,12 @@ import (
 )
 
 var (
-	fqbn       string
-	port       string
-	verbose    bool
-	verify     bool
-	importFile string
+	fqbn        string
+	port        string
+	verbose     bool
+	verify      bool
+	interpreter string
+	importFile  string
 )
 
 // NewCommand created a new `upload` command
@@ -50,7 +52,8 @@ func NewCommand() *cobra.Command {
 	}
 
 	debugCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	debugCommand.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
+	debugCommand.Flags().StringVarP(&port, "port", "p", "", "Debug port, e.g.: COM10 or /dev/ttyACM0")
+	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", "Debug interpreter e.g.: console, mi, mi1, mi2, mi3")
 	debugCommand.Flags().StringVarP(&importFile, "input", "i", "", "Input file to be uploaded for debug.")
 
 	return debugCommand
@@ -74,11 +77,12 @@ func run(command *cobra.Command, args []string) {
 	signal.Notify(ctrlc, os.Interrupt)
 
 	if _, err := debug.Debug(context.Background(), &dbg.DebugConfigReq{
-		Instance:   &dbg.Instance{Id: instance.GetId()},
-		Fqbn:       fqbn,
-		SketchPath: sketchPath.String(),
-		Port:       port,
-		ImportFile: importFile,
+		Instance:    &rpc.Instance{Id: instance.GetId()},
+		Fqbn:        fqbn,
+		SketchPath:  sketchPath.String(),
+		Port:        port,
+		Interpreter: interpreter,
+		ImportFile:  importFile,
 	}, os.Stdin, os.Stdout, ctrlc); err != nil {
 		feedback.Errorf("Error during Debug: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
