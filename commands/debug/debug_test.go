@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/assert"
@@ -45,7 +46,7 @@ func TestGetCommandLine(t *testing.T) {
 
 	// Arduino Zero has an integrated debugger port, anc it could be debugged directly using USB
 	req := &dbg.DebugConfigReq{
-		Instance:   &dbg.Instance{Id: 1},
+		Instance:   &rpc.Instance{Id: 1},
 		Fqbn:       "arduino-test:samd:arduino_zero_edbg",
 		SketchPath: sketchPath.String(),
 		Port:       "none",
@@ -66,7 +67,7 @@ func TestGetCommandLine(t *testing.T) {
 	// Other samd boards such as mkr1000 can be debugged using an external tool such as Atmel ICE connected to
 	// the board debug port
 	req2 := &dbg.DebugConfigReq{
-		Instance:   &dbg.Instance{Id: 1},
+		Instance:   &rpc.Instance{Id: 1},
 		Fqbn:       "arduino-test:samd:mkr1000",
 		SketchPath: sketchPath.String(),
 		Port:       "none",
