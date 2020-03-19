@@ -1,0 +1,2085 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="Arduino Command Line Interface">
+      
+      
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/platform-specification/">
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1, mkdocs-material-4.6.3">
+    
+    
+      
+        <title>Platform specification - Arduino CLI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.adb8469c.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.a8b3c06d.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#009688">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.86422ebf.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="teal" data-md-color-accent="orange">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#hardware-folders-structure" tabindex="0" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://arduino.github.io/arduino-cli/" title="Arduino CLI" aria-label="Arduino CLI" class="md-header-nav__button md-logo">
+          
+            <img alt="logo" src="../img/icon_mac_light.png" width="24" height="24">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Arduino CLI
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Platform specification
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" aria-label="search" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+<a href="https://github.com/arduino/arduino-cli" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    arduino/arduino-cli
+  </div>
+</a>
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main" role="main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://arduino.github.io/arduino-cli/" title="Arduino CLI" class="md-nav__button md-logo">
+      
+        <img alt="logo" src="../img/icon_mac_light.png" width="48" height="48">
+      
+    </a>
+    Arduino CLI
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+<a href="https://github.com/arduino/arduino-cli" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    arduino/arduino-cli
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Documentation Home" class="md-nav__link">
+      Documentation Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../installation/" title="Installation" class="md-nav__link">
+      Installation
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../getting-started/" title="Getting started" class="md-nav__link">
+      Getting started
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../CONTRIBUTING/" title="How to contribute" class="md-nav__link">
+      How to contribute
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../FAQ/" title="FAQ" class="md-nav__link">
+      FAQ
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+    
+    <label class="md-nav__link" for="nav-6">
+      Command reference
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-6">
+        Command reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli/" title="Arduino cli" class="md-nav__link">
+      Arduino cli
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board/" title="board" class="md-nav__link">
+      board
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_attach/" title="board attach" class="md-nav__link">
+      board attach
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_details/" title="board details" class="md-nav__link">
+      board details
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_list/" title="board list" class="md-nav__link">
+      board list
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_listall/" title="board listall" class="md-nav__link">
+      board listall
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_cache/" title="cache" class="md-nav__link">
+      cache
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_cache_clean/" title="cache clean" class="md-nav__link">
+      cache clean
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_compile/" title="compile" class="md-nav__link">
+      compile
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_config/" title="config" class="md-nav__link">
+      config
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_config_dump/" title="config dump" class="md-nav__link">
+      config dump
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_config_init/" title="config init" class="md-nav__link">
+      config init
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core/" title="core" class="md-nav__link">
+      core
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_download/" title="core download" class="md-nav__link">
+      core download
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_install/" title="core install" class="md-nav__link">
+      core install
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_list/" title="core list" class="md-nav__link">
+      core list
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_search/" title="core search" class="md-nav__link">
+      core search
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_uninstall/" title="core uninstall" class="md-nav__link">
+      core uninstall
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_update-index/" title="core update index" class="md-nav__link">
+      core update index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_upgrade/" title="core upgrade" class="md-nav__link">
+      core upgrade
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_daemon/" title="daemon" class="md-nav__link">
+      daemon
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_debug/" title="debug" class="md-nav__link">
+      debug
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib/" title="lib" class="md-nav__link">
+      lib
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_deps/" title="lib deps" class="md-nav__link">
+      lib deps
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_download/" title="lib download" class="md-nav__link">
+      lib download
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_install/" title="lib install" class="md-nav__link">
+      lib install
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_list/" title="lib list" class="md-nav__link">
+      lib list
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_search/" title="lib search" class="md-nav__link">
+      lib search
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_uninstall/" title="lib uninstall" class="md-nav__link">
+      lib uninstall
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_update-index/" title="lib update-index" class="md-nav__link">
+      lib update-index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_upgrade/" title="lib upgrade" class="md-nav__link">
+      lib upgrade
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_sketch/" title="sketch" class="md-nav__link">
+      sketch
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_sketch_new/" title="sketch new" class="md-nav__link">
+      sketch new
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_upload/" title="upload" class="md-nav__link">
+      upload
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_version/" title="version" class="md-nav__link">
+      version
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
+    
+    <label class="md-nav__link" for="nav-7">
+      gRPC reference
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-7">
+        gRPC reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../rpc/commands/" title="commands" class="md-nav__link">
+      commands
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../rpc/monitor/" title="monitor" class="md-nav__link">
+      monitor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../rpc/settings/" title="settings" class="md-nav__link">
+      settings
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../rpc/debug/" title="debug" class="md-nav__link">
+      debug
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../sketch-build-process/" title="Sketch build process" class="md-nav__link">
+      Sketch build process
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../library-specification/" title="Library specification" class="md-nav__link">
+      Library specification
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Platform specification
+      </label>
+    
+    <a href="./" title="Platform specification" class="md-nav__link md-nav__link--active">
+      Platform specification
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#hardware-folders-structure" class="md-nav__link">
+    Hardware Folders structure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-configurations" class="md-nav__link">
+    Architecture configurations
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-files-format" class="md-nav__link">
+    Configuration files format
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#comments" class="md-nav__link">
+    Comments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#automatic-property-override-for-specific-os" class="md-nav__link">
+    Automatic property override for specific OS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#global-predefined-properties" class="md-nav__link">
+    Global Predefined properties
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platformtxt" class="md-nav__link">
+    platform.txt
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-process" class="md-nav__link">
+    Build process
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recipes-to-compile-source-code" class="md-nav__link">
+    Recipes to compile source code
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipes-to-build-the-corea-archive-file" class="md-nav__link">
+    Recipes to build the core.a archive file
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipes-for-linking" class="md-nav__link">
+    Recipes for linking
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipes-for-extraction-of-executable-files-and-other-binary-data" class="md-nav__link">
+    Recipes for extraction of executable files and other binary data
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipes-to-compute-binary-sketch-size" class="md-nav__link">
+    Recipes to compute binary sketch size
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipes-to-export-compiled-binary" class="md-nav__link">
+    Recipes to export compiled binary
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipe-to-run-the-preprocessor" class="md-nav__link">
+    Recipe to run the preprocessor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pre-and-post-build-hooks-since-ide-165" class="md-nav__link">
+    Pre and post build hooks (since IDE 1.6.5)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-platformtxt" class="md-nav__link">
+    Global platform.txt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platformlocaltxt" class="md-nav__link">
+    platform.local.txt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boardstxt" class="md-nav__link">
+    boards.txt
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cores" class="md-nav__link">
+    Cores
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-variants" class="md-nav__link">
+    Core Variants
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tools" class="md-nav__link">
+    Tools
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verbose-parameter" class="md-nav__link">
+    Verbose parameter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sketch-upload-configuration" class="md-nav__link">
+    Sketch upload configuration
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1200bps-bootloader-reset" class="md-nav__link">
+    1200bps bootloader reset
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serial-port" class="md-nav__link">
+    Serial port
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upload-using-an-external-programmer" class="md-nav__link">
+    Upload using an external programmer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#burn-bootloader" class="md-nav__link">
+    Burn Bootloader
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-board-menus" class="md-nav__link">
+    Custom board menus
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referencing-another-core-variant-or-tool" class="md-nav__link">
+    Referencing another core, variant or tool
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#platform-terminology" class="md-nav__link">
+    Platform Terminology
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boardslocaltxt" class="md-nav__link">
+    boards.local.txt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#keywordstxt" class="md-nav__link">
+    keywords.txt
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../package_index_json-specification/" title="package_index.json specification" class="md-nav__link">
+      package_index.json specification
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#hardware-folders-structure" class="md-nav__link">
+    Hardware Folders structure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture-configurations" class="md-nav__link">
+    Architecture configurations
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-files-format" class="md-nav__link">
+    Configuration files format
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#comments" class="md-nav__link">
+    Comments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#automatic-property-override-for-specific-os" class="md-nav__link">
+    Automatic property override for specific OS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#global-predefined-properties" class="md-nav__link">
+    Global Predefined properties
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platformtxt" class="md-nav__link">
+    platform.txt
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-process" class="md-nav__link">
+    Build process
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#recipes-to-compile-source-code" class="md-nav__link">
+    Recipes to compile source code
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipes-to-build-the-corea-archive-file" class="md-nav__link">
+    Recipes to build the core.a archive file
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipes-for-linking" class="md-nav__link">
+    Recipes for linking
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipes-for-extraction-of-executable-files-and-other-binary-data" class="md-nav__link">
+    Recipes for extraction of executable files and other binary data
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipes-to-compute-binary-sketch-size" class="md-nav__link">
+    Recipes to compute binary sketch size
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipes-to-export-compiled-binary" class="md-nav__link">
+    Recipes to export compiled binary
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipe-to-run-the-preprocessor" class="md-nav__link">
+    Recipe to run the preprocessor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pre-and-post-build-hooks-since-ide-165" class="md-nav__link">
+    Pre and post build hooks (since IDE 1.6.5)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-platformtxt" class="md-nav__link">
+    Global platform.txt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platformlocaltxt" class="md-nav__link">
+    platform.local.txt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boardstxt" class="md-nav__link">
+    boards.txt
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cores" class="md-nav__link">
+    Cores
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-variants" class="md-nav__link">
+    Core Variants
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tools" class="md-nav__link">
+    Tools
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verbose-parameter" class="md-nav__link">
+    Verbose parameter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sketch-upload-configuration" class="md-nav__link">
+    Sketch upload configuration
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1200bps-bootloader-reset" class="md-nav__link">
+    1200bps bootloader reset
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serial-port" class="md-nav__link">
+    Serial port
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upload-using-an-external-programmer" class="md-nav__link">
+    Upload using an external programmer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#burn-bootloader" class="md-nav__link">
+    Burn Bootloader
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-board-menus" class="md-nav__link">
+    Custom board menus
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referencing-another-core-variant-or-tool" class="md-nav__link">
+    Referencing another core, variant or tool
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#platform-terminology" class="md-nav__link">
+    Platform Terminology
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boardslocaltxt" class="md-nav__link">
+    boards.local.txt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#keywordstxt" class="md-nav__link">
+    keywords.txt
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                  <h1>Platform specification</h1>
+                
+                <p>This specification is a 3<sup>rd</sup> party Hardware format to be used in Arduino IDE starting from 1.5.x series.<br>
+This specification allows a 3<sup>rd</sup> party vendor/maintainer to add support for new boards inside the Arduino IDE by providing a file to unzip into the <em>hardware</em> folder of Arduino's sketchbook folder.<br>
+It is also possible to add new 3<sup>rd</sup> party boards by providing just one configuration file.</p>
+<h2 id="hardware-folders-structure">Hardware Folders structure<a class="headerlink" href="#hardware-folders-structure" title="Permanent link">&para;</a></h2>
+<p>The new hardware folders have a hierarchical structure organized in two levels:
+  - the first level is the vendor/maintainer
+  - the second level is the supported architecture</p>
+<p>A vendor/maintainer can have multiple supported architectures. For example, below we have three hardware vendors called "arduino", "yyyyy" and "xxxxx":</p>
+<div class="codehilite"><pre><span></span><code>hardware/arduino/avr/...     - Arduino - AVR Boards
+hardware/arduino/sam/...     - Arduino - SAM (32bit ARM) Boards
+hardware/yyyyy/avr/...       - Yyy - AVR
+hardware/xxxxx/avr/...       - Xxx - AVR
+</code></pre></div>
+
+
+<p>The vendor "arduino" has two supported architectures (AVR and SAM), while "xxxxx" and "yyyyy" have only AVR.</p>
+<p>If possible, follow existing architecture name conventions when creating hardware packages. The architecture folder name is used to determine library compatibility and also to permit referencing resources from another core of the same architecture so using a non-standard architecture name can only be harmful to your users. Architecture values are case sensitive (e.g. <code>AVR</code> != <code>avr</code>). Use the vendor folder name to differentiate your package, <strong>NOT</strong> the architecture name.</p>
+<h2 id="architecture-configurations">Architecture configurations<a class="headerlink" href="#architecture-configurations" title="Permanent link">&para;</a></h2>
+<p>Each architecture must be configured through a set of configuration files:</p>
+<ul>
+<li><strong>platform.txt</strong> contains definitions for the CPU architecture used (compiler, build process parameters, tools used for upload, etc.)</li>
+<li><strong>boards.txt</strong> contains definitions for the boards (board name, parameters for building and uploading sketches, etc.)</li>
+<li><strong>programmers.txt</strong> contains definitions for external programmers (typically used to burn bootloaders or sketches on a blank CPU/board)</li>
+</ul>
+<h3 id="configuration-files-format">Configuration files format<a class="headerlink" href="#configuration-files-format" title="Permanent link">&para;</a></h3>
+<p>A configuration file is a list of "key=value" properties. The <strong>value</strong> of a property can be expressed using the value of another property by putting its name inside brackets "{" "}". For example:</p>
+<div class="codehilite"><pre><span></span><code>compiler.path=/tools/g++_arm_none_eabi/bin/
+compiler.c.cmd=arm-none-eabi-gcc
+[....]
+recipe.c.o.pattern={compiler.path}{compiler.c.cmd}
+</code></pre></div>
+
+
+<p>In this example the property <strong>recipe.c.o.pattern</strong> will be set to <strong>/tools/g++_arm_none_eabi/bin/arm-none-eabi-gcc</strong> that is the composition of the two properties <strong>compiler.path</strong> and <strong>compiler.c.cmd</strong>.</p>
+<h4 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">&para;</a></h4>
+<p>Lines starting with <strong>#</strong> are treated as comments and will be ignored.</p>
+<div class="codehilite"><pre><span></span><code># Like in this example
+# --------------------
+# I&#39;m a comment!
+</code></pre></div>
+
+
+<h4 id="automatic-property-override-for-specific-os">Automatic property override for specific OS<a class="headerlink" href="#automatic-property-override-for-specific-os" title="Permanent link">&para;</a></h4>
+<p>We can specify an OS-specific value for a property. For example the following file:</p>
+<div class="codehilite"><pre><span></span><code>tools.bossac.cmd=bossac
+tools.bossac.cmd.windows=bossac.exe
+</code></pre></div>
+
+
+<p>will set the property <strong>tools.bossac.cmd</strong> to the value <strong>bossac</strong> on Linux and Mac OS and <strong>bossac.exe</strong> on Windows. Suffixes <a href="https://github.com/arduino/Arduino/blob/1.8.12/arduino-core/src/processing/app/helpers/PreferencesMap.java#L110-L112">supported</a> are <code>.linux</code>, <code>.windows</code> and <code>.macosx</code>.</p>
+<h4 id="global-predefined-properties">Global Predefined properties<a class="headerlink" href="#global-predefined-properties" title="Permanent link">&para;</a></h4>
+<p>The Arduino IDE sets the following properties that can be used globally in all configurations files:</p>
+<ul>
+<li><code>{runtime.platform.path}</code>: the absolute path of the <a href="#platform-terminology">board platform</a> folder (i.e. the folder containing boards.txt)</li>
+<li><code>{runtime.hardware.path}</code>: the absolute path of the hardware folder (i.e. the folder containing the <a href="#platform-terminology">board platform</a> folder)</li>
+<li><code>{runtime.ide.path}</code>: the absolute path of the Arduino IDE folder</li>
+<li><code>{runtime.ide.version}</code>: the version number of the Arduino IDE as a number (this uses two digits per version number component, and removes the points and leading zeroes, so Arduino IDE 1.8.3 becomes <code>01.08.03</code> which becomes <code>runtime.ide.version=10803</code>).</li>
+<li><code>{ide_version}</code>: Compatibility alias for <code>{runtime.ide.version}</code></li>
+<li><code>{runtime.os}</code>: the running OS ("linux", "windows", "macosx")</li>
+</ul>
+<p>Compatibility note: Versions before 1.6.0 only used one digit per version number component in <code>{runtime.ide.version}</code> (so 1.5.9 was <code>159</code>, not <code>10509</code>).</p>
+<h2 id="platformtxt">platform.txt<a class="headerlink" href="#platformtxt" title="Permanent link">&para;</a></h2>
+<p>The platform.txt file contains information about a platform's specific aspects (compilers
+command line flags, paths, system libraries, etc.).</p>
+<p>The following meta-data must be defined:</p>
+<div class="codehilite"><pre><span></span><code>name=Arduino AVR Boards
+version=1.5.3
+</code></pre></div>
+
+
+<p>The <strong>name</strong> will be shown in the Boards menu of the Arduino IDE.<br>
+The <strong>version</strong> is currently unused, it is reserved for future use (probably together with the libraries manager to handle dependencies on cores).</p>
+<h3 id="build-process">Build process<a class="headerlink" href="#build-process" title="Permanent link">&para;</a></h3>
+<p>The platform.txt file is used to configure the build process performed by the Arduino IDE. This is done through a list of <strong>recipes</strong>. Each recipe is a command line expression that explains how to call the compiler (or other tools) for every build step and which parameter should be passed.</p>
+<p>The Arduino IDE, before starting the build, determines the list of files to compile. The list is composed by:
+- the user's Sketch
+- source code in the selected board's Core
+- source code in the Libraries used in the sketch</p>
+<p>The IDE creates a temporary folder to store the build artifacts whose path is available through the global property <strong>{build.path}</strong>. A property <strong>{build.project_name}</strong> with the name of the project and a property <strong>{build.arch}</strong> with the name of the architecture is set as well.</p>
+<ul>
+<li><code>{build.path}</code>: The path to the temporary folder to store build artifacts</li>
+<li><code>{build.project_name}</code>: The project name</li>
+<li><code>{build.arch}</code>: The MCU architecture (avr, sam, etc...)</li>
+</ul>
+<p>There are some other <strong>{build.xxx}</strong> properties available, that are explained in the boards.txt section of this guide.</p>
+<h4 id="recipes-to-compile-source-code">Recipes to compile source code<a class="headerlink" href="#recipes-to-compile-source-code" title="Permanent link">&para;</a></h4>
+<p>We said that the Arduino IDE determines a list of files to compile. Each file can be source code written in C (.c files), C++ (.cpp files) or Assembly (.S files). Every language is compiled using its respective <strong>recipe</strong>:</p>
+<ul>
+<li><code>recipe.c.o.pattern</code>: for C files</li>
+<li><code>recipe.cpp.o.pattern</code>: for CPP files</li>
+<li><code>recipe.S.o.pattern</code>: for Assembly files</li>
+</ul>
+<p>The recipes can be built concatenating other properties set by the IDE (for each file compiled):</p>
+<ul>
+<li><code>{includes}</code>: the list of include paths in the format "-I/include/path -I/another/path...."</li>
+<li><code>{source_file}</code>: the path to the source file</li>
+<li><code>{object_file}</code>: the path to the output file</li>
+</ul>
+<p>For example the following is used for AVR:</p>
+<div class="codehilite"><pre><span></span><code>## Compiler global definitions
+compiler.path={runtime.ide.path}/tools/avr/bin/
+compiler.c.cmd=avr-gcc
+compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -MMD
+
+[......]
+
+## Compile c files
+recipe.c.o.pattern=&quot;{compiler.path}{compiler.c.cmd}&quot; {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {build.extra_flags} {includes} &quot;{source_file}&quot; -o &quot;{object_file}&quot;
+</code></pre></div>
+
+
+<p>Note that some properties, like <strong>{build.mcu}</strong> for example, are taken from the <strong>boards.txt</strong> file which is documented later in this specification.</p>
+<h4 id="recipes-to-build-the-corea-archive-file">Recipes to build the core.a archive file<a class="headerlink" href="#recipes-to-build-the-corea-archive-file" title="Permanent link">&para;</a></h4>
+<p>The core of the selected board is compiled as described in the previous paragraph, but the object files obtained from the compile are also archived into a static library named <em>core.a</em> using the <strong>recipe.ar.pattern</strong>.</p>
+<p>The recipe can be built concatenating the following properties set by the IDE:</p>
+<ul>
+<li><code>{object_file}</code>: the object file to include in the archive</li>
+<li><code>{archive_file_path}</code>: fully qualified archive file (ex. "/path/to/core.a"). This property was added in Arduino IDE 1.6.6/arduino builder 1.0.0-beta12 as a replacement for <code>{build.path}/{archive_file}</code>.</li>
+<li><code>{archive_file}</code>: the name of the resulting archive (ex. "core.a")</li>
+</ul>
+<p>For example, Arduino provides the following for AVR:</p>
+<div class="codehilite"><pre><span></span><code>compiler.ar.cmd=avr-ar
+compiler.ar.flags=rcs
+
+[......]
+
+## Create archives
+recipe.ar.pattern=&quot;{compiler.path}{compiler.ar.cmd}&quot; {compiler.ar.flags} &quot;{archive_file_path}&quot; &quot;{object_file}&quot;
+</code></pre></div>
+
+
+<h4 id="recipes-for-linking">Recipes for linking<a class="headerlink" href="#recipes-for-linking" title="Permanent link">&para;</a></h4>
+<p>All the artifacts produced by the previous steps (sketch object files, libraries object files and core.a archive) are linked together using the <strong>recipe.c.combine.pattern</strong>.</p>
+<p>The recipe can be built concatenating the following properties set by the IDE:</p>
+<ul>
+<li><code>{object_files}</code>: the list of object files to include in the archive ("file1.o file2.o ....")</li>
+<li><code>{archive_file_path}</code>: fully qualified archive file (ex. "/path/to/core.a"). This property was added in Arduino IDE 1.6.6/arduino builder 1.0.0-beta12 as a replacement for <code>{build.path}/{archive_file}</code>.</li>
+<li><code>{archive_file}</code>: the name of the core archive file (ex. "core.a")</li>
+</ul>
+<p>For example the following is used for AVR:</p>
+<div class="codehilite"><pre><span></span><code>compiler.c.elf.flags=-Os -Wl,--gc-sections
+compiler.c.elf.cmd=avr-gcc
+
+[......]
+
+## Combine gc-sections, archives, and objects
+recipe.c.combine.pattern=&quot;{compiler.path}{compiler.c.elf.cmd}&quot; {compiler.c.elf.flags} -mmcu={build.mcu} -o &quot;{build.path}/{build.project_name}.elf&quot; {object_files} &quot;{archive_file_path}&quot; &quot;-L{build.path}&quot; -lm
+</code></pre></div>
+
+
+<h4 id="recipes-for-extraction-of-executable-files-and-other-binary-data">Recipes for extraction of executable files and other binary data<a class="headerlink" href="#recipes-for-extraction-of-executable-files-and-other-binary-data" title="Permanent link">&para;</a></h4>
+<p>An arbitrary number of extra steps can be performed by the IDE at the end of objects linking.
+These steps can be used to extract binary data used for upload and they are defined by a set of recipes with the following format:</p>
+<div class="codehilite"><pre><span></span><code>recipe.objcopy.FILE_EXTENSION_1.pattern=[.....]
+recipe.objcopy.FILE_EXTENSION_2.pattern=[.....]
+[.....]
+</code></pre></div>
+
+
+<p><code>FILE_EXTENSION_x</code> must be replaced with the extension of the extracted file, for example the AVR platform needs two files a <code>.hex</code> and a <code>.eep</code>, so we made two recipes like:</p>
+<div class="codehilite"><pre><span></span><code>recipe.objcopy.eep.pattern=[.....]
+recipe.objcopy.hex.pattern=[.....]
+</code></pre></div>
+
+
+<p>There are no specific properties set by the IDE here.
+A full example for the AVR platform can be:</p>
+<div class="codehilite"><pre><span></span><code>## Create eeprom
+recipe.objcopy.eep.pattern=&quot;{compiler.path}{compiler.objcopy.cmd}&quot; {compiler.objcopy.eep.flags} &quot;{build.path}/{build.project_name}.elf&quot; &quot;{build.path}/{build.project_name}.eep&quot;
+
+## Create hex
+recipe.objcopy.hex.pattern=&quot;{compiler.path}{compiler.elf2hex.cmd}&quot; {compiler.elf2hex.flags} &quot;{build.path}/{build.project_name}.elf&quot; &quot;{build.path}/{build.project_name}.hex&quot;
+</code></pre></div>
+
+
+<h4 id="recipes-to-compute-binary-sketch-size">Recipes to compute binary sketch size<a class="headerlink" href="#recipes-to-compute-binary-sketch-size" title="Permanent link">&para;</a></h4>
+<p>At the end of the build the Arduino IDE shows the final binary sketch size to the user. The size is calculated using the recipe <strong>recipe.size.pattern</strong>. The output of the command executed using the recipe is parsed through the regular expression set in the property <strong>recipe.size.regex</strong>. The regular expression must match the sketch size.</p>
+<p>For AVR we have:</p>
+<div class="codehilite"><pre><span></span><code>compiler.size.cmd=avr-size
+[....]
+## Compute size
+recipe.size.pattern=&quot;{compiler.path}{compiler.size.cmd}&quot; -A &quot;{build.path}/{build.project_name}.hex&quot;
+recipe.size.regex=Total\s+([0-9]+).*
+</code></pre></div>
+
+
+<h4 id="recipes-to-export-compiled-binary">Recipes to export compiled binary<a class="headerlink" href="#recipes-to-export-compiled-binary" title="Permanent link">&para;</a></h4>
+<p>When you do a <strong>Sketch &gt; Export compiled Binary</strong>, the compiled binary is copied from the build folder to the sketch folder. Two binaries are copied; the standard binary, and a binary that has been merged with the bootloader file (identified by the <code>.with_bootloader</code> in the filename).</p>
+<p>Two recipes affect how <strong>Export compiled Binary</strong> works:</p>
+<ul>
+<li><strong>recipe.output.tmp_file</strong>: Defines the binary's filename in the build folder.</li>
+<li><strong>recipe.output.save_file</strong>: Defines the filename to use when copying the binary file to the sketch folder.</li>
+</ul>
+<p>As with other processes, there are pre and post build hooks for <strong>Export compiled Binary</strong>.</p>
+<p>The <strong>recipe.hooks.savehex.presavehex.NUMBER.pattern</strong> and <strong>recipe.hooks.savehex.postsavehex.NUMBER.pattern</strong> hooks (but not <strong>recipe.output.tmp_file</strong> and <strong>recipe.output.save_file</strong>) can be built concatenating the following properties set by the IDE:</p>
+<div class="codehilite"><pre><span></span><code>{sketch_path}              - the absolute path of the sketch folder
+</code></pre></div>
+
+
+<h4 id="recipe-to-run-the-preprocessor">Recipe to run the preprocessor<a class="headerlink" href="#recipe-to-run-the-preprocessor" title="Permanent link">&para;</a></h4>
+<p>For detecting what libraries to include in the build, and for generating function prototypes, the Arduino IDE must be able to run (just) the preprocessor. For this, the <strong>recipe.preproc.macros</strong> recipe exists. This recipe must run the preprocessor on a given source file, writing the preprocessed output to a given output file, and generate (only) preprocessor errors on standard output. This preprocessor run should happen with the same defines and other preprocessor-influencing-options as for normally compiling the source files.</p>
+<p>The recipes can be built concatenating other properties set by the IDE (for each file compiled):</p>
+<ul>
+<li><code>{includes}</code>: the list of include paths in the format "-I/include/path -I/another/path...."</li>
+<li><code>{source_file}</code>: the path to the source file</li>
+<li><code>{preprocessed_file_path}</code>: the path to the output file</li>
+</ul>
+<p>For example the following is used for AVR:</p>
+<div class="codehilite"><pre><span></span><code>preproc.macros.flags=-w -x c++ -E -CC
+recipe.preproc.macros=&quot;{compiler.path}{compiler.cpp.cmd}&quot; {compiler.cpp.flags} {preproc.macros.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} &quot;{source_file}&quot; -o &quot;{preprocessed_file_path}&quot;
+</code></pre></div>
+
+
+<p>Note that the <code>{preprocessed_file_path}</code> might point to (your operating system's equivalent) of <code>/dev/null</code>. In this case, also passing <code>-MMD</code> to gcc is problematic, as it will try to generate a dependency file called <code>/dev/null.d</code>, which will usually result in a permission error. Since platforms typically include <code>{compiler.cpp.flags}</code> here, which includes <code>-MMD</code>, the Arduino IDE automatically filters out the <code>-MMD</code> option from the <code>recipe.preproc.macros</code> recipe to prevent this error.</p>
+<p>Note that older IDE versions used the <strong>recipe.preproc.includes</strong> recipe to determine includes, which is undocumented here. Since Arduino IDE 1.6.7 (arduino-builder 1.2.0) this was changed and <strong>recipe.preproc.includes</strong> is no longer used.</p>
+<h4 id="pre-and-post-build-hooks-since-ide-165">Pre and post build hooks (since IDE 1.6.5)<a class="headerlink" href="#pre-and-post-build-hooks-since-ide-165" title="Permanent link">&para;</a></h4>
+<p>You can specify pre and post actions around each recipe. These are called "hooks". Here is the complete list of available hooks:</p>
+<ul>
+<li><code>recipe.hooks.sketch.prebuild.NUMBER.pattern</code> (called before sketch compilation)</li>
+<li><code>recipe.hooks.sketch.postbuild.NUMBER.pattern</code> (called after sketch compilation)</li>
+<li><code>recipe.hooks.libraries.prebuild.NUMBER.pattern</code> (called before libraries compilation)</li>
+<li><code>recipe.hooks.libraries.postbuild.NUMBER.pattern</code> (called after libraries compilation)</li>
+<li><code>recipe.hooks.core.prebuild.NUMBER.pattern</code> (called before core compilation)</li>
+<li><code>recipe.hooks.core.postbuild.NUMBER.pattern</code> (called after core compilation)</li>
+<li><code>recipe.hooks.linking.prelink.NUMBER.pattern</code> (called before linking)</li>
+<li><code>recipe.hooks.linking.postlink.NUMBER.pattern</code> (called after linking)</li>
+<li><code>recipe.hooks.objcopy.preobjcopy.NUMBER.pattern</code> (called before objcopy recipes execution)</li>
+<li><code>recipe.hooks.objcopy.postobjcopy.NUMBER.pattern</code> (called after objcopy recipes execution)</li>
+<li><code>recipe.hooks.savehex.presavehex.NUMBER.pattern</code> (called before savehex recipe execution)</li>
+<li><code>recipe.hooks.savehex.postsavehex.NUMBER.pattern</code> (called after savehex recipe execution)</li>
+</ul>
+<p>Example: you want to execute 2 commands before sketch compilation and 1 after linking. You'll add to your platform.txt
+<div class="codehilite"><pre><span></span><code>recipe.hooks.sketch.prebuild.1.pattern=echo sketch compilation started at
+recipe.hooks.sketch.prebuild.2.pattern=date
+
+recipe.hooks.linking.postlink.1.pattern=echo linking is complete
+</code></pre></div></p>
+<p>Warning: hooks recipes are sorted before execution. If you need to write more than 10 recipes for a single hook, pad the number with a zero, for example:
+<div class="codehilite"><pre><span></span><code>recipe.hooks.sketch.prebuild.01.pattern=echo 1
+recipe.hooks.sketch.prebuild.02.pattern=echo 2
+...
+recipe.hooks.sketch.prebuild.11.pattern=echo 11
+</code></pre></div></p>
+<h2 id="global-platformtxt">Global platform.txt<a class="headerlink" href="#global-platformtxt" title="Permanent link">&para;</a></h2>
+<p>Properties defined in a platform.txt created in the <strong>hardware</strong> subfolder of the IDE installation folder will be used for all platforms and will override local properties.</p>
+<h2 id="platformlocaltxt">platform.local.txt<a class="headerlink" href="#platformlocaltxt" title="Permanent link">&para;</a></h2>
+<p>Introduced in Arduino IDE 1.5.7. This file can be used to override properties defined in platform.txt or define new properties without modifying platform.txt (e.g. when platform.txt is tracked by a version control system). It should be placed in the architecture folder.</p>
+<h2 id="boardstxt">boards.txt<a class="headerlink" href="#boardstxt" title="Permanent link">&para;</a></h2>
+<p>This file contains definitions and meta-data for the boards supported. Every board must be referred through its short name, the board ID. The settings for a board are defined through a set of properties
+with keys having the board ID as prefix.</p>
+<p>For example the board ID chosen for the Arduino Uno board is "uno". An extract of the Uno board configuration in boards.txt looks like:</p>
+<div class="codehilite"><pre><span></span><code>[......]
+uno.name=Arduino Uno
+uno.build.mcu=atmega328p
+uno.build.f_cpu=16000000L
+uno.build.board=AVR_UNO
+uno.build.core=arduino
+uno.build.variant=standard
+[......]
+</code></pre></div>
+
+
+<p>Note that all the relevant keys start with the board ID <strong>uno.xxxxx</strong>.</p>
+<p>The <strong>uno.name</strong> property contains the name of the board shown in the Board menu of the Arduino IDE.</p>
+<p>The <strong>uno.build.board</strong> property is used to set a compile-time variable <strong>ARDUINO_{build.board}</strong> to allow use of conditional code between <code>#ifdef</code>s. The Arduino IDE automatically generates a <strong>build.board</strong> value if not defined. In this case the variable defined at compile time will be <code>ARDUINO_AVR_UNO</code>.</p>
+<p>The other properties will override the corresponding global properties of the IDE when the user selects the board. These properties will be globally available, in other configuration files too, without the board ID prefix:</p>
+<div class="codehilite"><pre><span></span><code>uno.build.mcu           =&gt;   build.mcu
+uno.build.f_cpu         =&gt;   build.f_cpu
+uno.build.board         =&gt;   build.board
+uno.build.core          =&gt;   build.core
+uno.build.variant       =&gt;   build.variant
+</code></pre></div>
+
+
+<p>This explains the presence of <strong>{build.mcu}</strong> or <strong>{build.board}</strong> in the platform.txt recipes: their value is overwritten respectively by <strong>{uno.build.mcu}</strong> and <strong>{uno.build.board}</strong> when the Uno board is selected!
+Moreover the IDE automatically provides the following properties:</p>
+<ul>
+<li><code>{build.core.path}</code>: The path to the selected board's core folder (inside the <a href="#platform-terminology">core platform</a>, for example hardware/arduino/avr/core/arduino)</li>
+<li><code>{build.system.path}</code>: The path to the <a href="#platform-terminology">core platform</a>'s system folder if available (for example hardware/arduino/sam/system)</li>
+<li><code>{build.variant.path}</code>: The path to the selected board variant folder (inside the <a href="#platform-terminology">variant platform</a>, for example hardware/arduino/avr/variants/micro)</li>
+</ul>
+<h3 id="cores">Cores<a class="headerlink" href="#cores" title="Permanent link">&para;</a></h3>
+<p>Cores are placed inside the <strong>cores</strong> subfolder. Many different cores can be provided within a single platform. For example the following could be a valid platform layout:</p>
+<ul>
+<li><code>hardware/arduino/avr/cores/</code>: Cores folder for "avr" architecture, package "arduino"</li>
+<li><code>hardware/arduino/avr/cores/arduino</code>: the Arduino Core</li>
+<li><code>hardware/arduino/avr/cores/rtos</code>: an hypothetical RTOS Core</li>
+</ul>
+<p>The board's property <strong>build.core</strong> is used by the Arduino IDE to find the core that must be compiled and linked when the board is selected. For example if a board needs the Arduino core the <strong>build.core</strong> variable should be set to:</p>
+<div class="codehilite"><pre><span></span><code>uno.build.core=arduino
+</code></pre></div>
+
+
+<p>or if the RTOS core is needed, to:</p>
+<div class="codehilite"><pre><span></span><code>uno.build.core=rtos
+</code></pre></div>
+
+
+<p>In any case the contents of the selected core folder are compiled and the core folder path is added to the include files search path.</p>
+<h3 id="core-variants">Core Variants<a class="headerlink" href="#core-variants" title="Permanent link">&para;</a></h3>
+<p>Sometimes a board needs some tweaking on default core configuration (different pin mapping is a typical example). A core variant folder is an additional folder that is compiled together with the core and allows to easily add specific configurations.</p>
+<p>Variants must be placed inside the <strong>variants</strong> folder in the current architecture.
+For example, Arduino AVR Boards uses:</p>
+<ul>
+<li><code>hardware/arduino/avr/cores</code>: Core folder for "avr" architecture, "arduino" package</li>
+<li><code>hardware/arduino/avr/cores/arduino</code>: The Arduino core</li>
+<li><code>hardware/arduino/avr/variants/</code>: Variant folder for "avr" architecture, "arduino" package</li>
+<li><code>hardware/arduino/avr/variants/standard</code>: ATmega328 based variants</li>
+<li><code>hardware/arduino/avr/variants/leonardo</code>: ATmega32U4 based variants</li>
+</ul>
+<p>In this example, the Arduino Uno board needs the <em>standard</em> variant so the <strong>build.variant</strong> property is set to <em>standard</em>:</p>
+<div class="codehilite"><pre><span></span><code>[.....]
+uno.build.core=arduino
+uno.build.variant=standard
+[.....]
+</code></pre></div>
+
+
+<p>instead, the Arduino Leonardo board needs the <em>leonardo</em> variant:</p>
+<div class="codehilite"><pre><span></span><code>[.....]
+leonardo.build.core=arduino
+leonardo.build.variant=leonardo
+[.....]
+</code></pre></div>
+
+
+<p>In the example above, both Uno and Leonardo share the same core but use different variants.<br>
+In any case, the contents of the selected variant folder path is added to the include search path and its contents are compiled and linked with the sketch.</p>
+<p>The parameter <strong>build.variant.path</strong> is automatically found by the IDE.</p>
+<h2 id="tools">Tools<a class="headerlink" href="#tools" title="Permanent link">&para;</a></h2>
+<p>The Arduino IDE uses external command line tools to upload the compiled sketch to the board or to burn bootloaders using external programmers. Currently <em>avrdude</em> is used for AVR based boards and <em>bossac</em> for SAM based boards, but there is no limit, any command line executable can be used. The command line parameters are specified using <strong>recipes</strong> in the same way used for platform build process.</p>
+<p>Tools are configured inside the platform.txt file. Every Tool is identified by a short name, the Tool ID.
+A tool can be used for different purposes:</p>
+<ul>
+<li><strong>upload</strong> a sketch to the target board (using a bootloader preinstalled on the board)</li>
+<li><strong>program</strong> a sketch to the target board using an external programmer</li>
+<li><strong>erase</strong> the target board's flash memory using an external programmer</li>
+<li>burn a <strong>bootloader</strong> into the target board using an external programmer</li>
+</ul>
+<p>Each action has its own recipe and its configuration is done through a set of properties having key starting with <strong>tools</strong> prefix followed by the tool ID and the action:</p>
+<div class="codehilite"><pre><span></span><code>[....]
+tools.avrdude.upload.pattern=[......]
+[....]
+tools.avrdude.program.pattern=[......]
+[....]
+tools.avrdude.erase.pattern=[......]
+[....]
+tools.avrdude.bootloader.pattern=[......]
+[.....]
+</code></pre></div>
+
+
+<p>A tool may have some actions not defined (it's not mandatory to define all four actions).<br>
+Let's look at how the <strong>upload</strong> action is defined for avrdude:</p>
+<div class="codehilite"><pre><span></span><code>tools.avrdude.path={runtime.tools.avrdude.path}
+tools.avrdude.cmd.path={path}/bin/avrdude
+tools.avrdude.config.path={path}/etc/avrdude.conf
+
+tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D &quot;-Uflash:w:{build.path}/{build.project_name}.hex:i&quot;
+</code></pre></div>
+
+
+<p>A <strong>{runtime.tools.TOOL_NAME.path}</strong> and <strong>{runtime.tools.TOOL_NAME-TOOL_VERSION.path}</strong> property is generated for the tools of Arduino AVR Boards and any other platform installed via Boards Manager. <strong>{runtime.tools.TOOL_NAME.path}</strong> points to the latest version of the tool available.</p>
+<p>The Arduino IDE makes the tool configuration properties available globally without the prefix. For example, the <strong>tools.avrdude.cmd.path</strong> property can be used as <strong>{cmd.path}</strong> inside the recipe, and the same happens for all the other avrdude configuration variables.</p>
+<h4 id="verbose-parameter">Verbose parameter<a class="headerlink" href="#verbose-parameter" title="Permanent link">&para;</a></h4>
+<p>It is possible for the user to enable verbosity from the Arduino IDE's Preferences panel. This preference is transferred to the command line by the IDE using the <strong>ACTION.verbose</strong> property (where ACTION is the action we are considering).<br>
+When the verbose mode is enabled the <strong>tools.TOOL_ID.ACTION.params.verbose</strong> property is copied into <strong>ACTION.verbose</strong>. When the verbose mode is disabled, the <strong>tools.TOOL_ID.ACTION.params.quiet</strong> property is copied into <strong>ACTION.verbose</strong>. Confused? Maybe an example will clear things:</p>
+<div class="codehilite"><pre><span></span><code>tools.avrdude.upload.params.verbose=-v -v -v -v
+tools.avrdude.upload.params.quiet=-q -q
+tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D &quot;-Uflash:w:{build.path}/{build.project_name}.hex:i&quot;
+</code></pre></div>
+
+
+<p>In this example if the user enables verbose mode, then <strong>{upload.params.verbose}</strong> is used in <strong>{upload.verbose}</strong>:</p>
+<div class="codehilite"><pre><span></span><code>tools.avrdude.upload.params.verbose    =&gt;    upload.verbose
+</code></pre></div>
+
+
+<p>If the user didn't enable verbose mode, the <strong>{upload.params.quiet}</strong> is used in <strong>{upload.verbose}</strong>:</p>
+<div class="codehilite"><pre><span></span><code>tools.avrdude.upload.params.quiet      =&gt;    upload.verbose
+</code></pre></div>
+
+
+<h3 id="sketch-upload-configuration">Sketch upload configuration<a class="headerlink" href="#sketch-upload-configuration" title="Permanent link">&para;</a></h3>
+<p>The Upload action is triggered when the user clicks on the "Upload" button on the IDE toolbar.
+The Arduino IDE selects the tool to be used for upload by looking at the <strong>upload.tool</strong> property.
+A specific <strong>upload.tool</strong> property should be defined for every board in boards.txt:</p>
+<div class="codehilite"><pre><span></span><code>[......]
+uno.upload.tool=avrdude
+[......]
+leonardo.upload.tool=avrdude
+[......]
+</code></pre></div>
+
+
+<p>Also other upload parameters can be defined together, for example in the Arduino boards.txt we have:</p>
+<div class="codehilite"><pre><span></span><code>[.....]
+uno.name=Arduino Uno
+uno.upload.tool=avrdude
+uno.upload.protocol=arduino
+uno.upload.maximum_size=32256
+uno.upload.speed=115200
+[.....]
+leonardo.name=Arduino Leonardo
+leonardo.upload.tool=avrdude
+leonardo.upload.protocol=avr109
+leonardo.upload.maximum_size=28672
+leonardo.upload.speed=57600
+leonardo.upload.use_1200bps_touch=true
+leonardo.upload.wait_for_upload_port=true
+[.....]
+</code></pre></div>
+
+
+<p>Most <strong>{upload.XXXX}</strong> variables are used later in the avrdude upload recipe in platform.txt:</p>
+<div class="codehilite"><pre><span></span><code>[.....]
+tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D &quot;-Uflash:w:{build.path}/{build.project_name}.hex:i&quot;
+[.....]
+</code></pre></div>
+
+
+<h4 id="1200bps-bootloader-reset">1200bps bootloader reset<a class="headerlink" href="#1200bps-bootloader-reset" title="Permanent link">&para;</a></h4>
+<p>Most Arduino boards use a dedicated USB-to-serial chip, that takes care of restarting the main MCU (starting the bootloader) when the serial port is opened. However, boards that have a native USB connection (such as the Leonardo or Zero) will have to disconnect from USB when rebooting into the bootloader (after which the bootloader reconnects to USB and offers a new serial port for uploading). After the upload is complete, the bootloader disconnects from USB again, starts the sketch, which then reconnects to USB. Because of these reconnections, the standard restart-on-serial open will not work, since that would cause the serial port to disappear and be closed again. Instead, the sketch running on these boards interpret a bitrate of 1200bps as a signal the bootloader should be started.</p>
+<p>To let the IDE perform these steps, two board parameters can be set:</p>
+<ul>
+<li><code>use_1200bps_touch</code> causes the IDE to briefly open the selected serial port at 1200bps (8N1) before starting the upload.</li>
+<li><code>wait_for_upload_port</code> causes the IDE to wait for the serial port to (re)appear before and after the upload. This is only used when <code>use_1200bps_touch</code> is also set.  When set, after doing the 1200bps touch, the IDE will wait for a new serial port to appear and use that as the port for uploads. Alternatively, if the original port does not disappear within a few seconds, the upload continues with the original port (which can be the case if the board was already put into bootloader manually, or the IDE missed the disconnect and reconnect). Additionally, after the upload is complete, the IDE again waits for a new port to appear (or the originally selected port to be present).</li>
+</ul>
+<p>Note that the IDE implementation of this 1200bps touch has some peculiarities, and the newer <code>arduino-cli</code> implementation also seems different (does not wait for the port after the reset, which is probably only needed in the IDE to prevent opening the wrong port on the serial monitor, and does not have a shorter timeout when the port never disappears).</p>
+<h3 id="serial-port">Serial port<a class="headerlink" href="#serial-port" title="Permanent link">&para;</a></h3>
+<p>The Arduino IDE auto-detects all available serial ports on the running system and lets the user choose one from the GUI. The selected port is available as a configuration property <strong>{serial.port}</strong>.</p>
+<h3 id="upload-using-an-external-programmer">Upload using an external programmer<a class="headerlink" href="#upload-using-an-external-programmer" title="Permanent link">&para;</a></h3>
+<p><strong>TODO...</strong>
+The platform.txt associated with the selected programmer will be used.</p>
+<h3 id="burn-bootloader">Burn Bootloader<a class="headerlink" href="#burn-bootloader" title="Permanent link">&para;</a></h3>
+<p><strong>TODO...</strong>
+The platform.txt associated with the selected board will be used.</p>
+<h2 id="custom-board-menus">Custom board menus<a class="headerlink" href="#custom-board-menus" title="Permanent link">&para;</a></h2>
+<p>The Arduino IDE allows adding extra menu items under the Tools menu. With these sub-menus the user can select different configurations for a specific board (for example a board could be provided in two or more variants with different CPUs, or may have different crystal speed based on the board model, and so on...).</p>
+<p>Let's see an example of how a custom menu is implemented.
+The board used in the example is the Arduino Duemilanove. This board was produced in two models, one with an ATmega168 CPU and another with an ATmega328P.<br>
+We are going then to define a custom menu "Processor" that allows the user to choose between the two
+different microcontrollers.</p>
+<p>We must first define a set of <strong>menu.MENU_ID=Text</strong> properties. Text is what is displayed on the GUI for every custom menu we are going to create and must be declared at the beginning of the boards.txt file:</p>
+<div class="codehilite"><pre><span></span><code>menu.cpu=Processor
+[.....]
+</code></pre></div>
+
+
+<p>in this case we declare only one custom menu "Processor" which we refer using the "cpu" MENU_ID.<br>
+Now let's add, always in the boards.txt file, the default configuration (common to all processors) for the duemilanove board:</p>
+<div class="codehilite"><pre><span></span><code>menu.cpu=Processor
+[.....]
+duemilanove.name=Arduino Duemilanove
+duemilanove.upload.tool=avrdude
+duemilanove.upload.protocol=arduino
+duemilanove.build.f_cpu=16000000L
+duemilanove.build.board=AVR_DUEMILANOVE
+duemilanove.build.core=arduino
+duemilanove.build.variant=standard
+[.....]
+</code></pre></div>
+
+
+<p>Now let's define the options to show in the "Processor" menu:</p>
+<div class="codehilite"><pre><span></span><code>[.....]
+duemilanove.menu.cpu.atmega328=ATmega328P
+[.....]
+duemilanove.menu.cpu.atmega168=ATmega168
+[.....]
+</code></pre></div>
+
+
+<p>We have defined two options: "ATmega328P" and "ATmega168".<br>
+Note that the property keys must follow the format <strong>BOARD_ID.menu.MENU_ID.OPTION_ID=Text</strong>.<br>
+Finally, the specific configuration for every option:</p>
+<div class="codehilite"><pre><span></span><code>[.....]
+## Arduino Duemilanove w/ ATmega328P
+duemilanove.menu.cpu.atmega328=ATmega328P
+duemilanove.menu.cpu.atmega328.upload.maximum_size=30720
+duemilanove.menu.cpu.atmega328.upload.speed=57600
+duemilanove.menu.cpu.atmega328.build.mcu=atmega328p
+
+## Arduino Duemilanove w/ ATmega168
+duemilanove.menu.cpu.atmega168=ATmega168
+duemilanove.menu.cpu.atmega168.upload.maximum_size=14336
+duemilanove.menu.cpu.atmega168.upload.speed=19200
+duemilanove.menu.cpu.atmega168.build.mcu=atmega168
+[.....]
+</code></pre></div>
+
+
+<p>Note that when the user selects an option, all the "sub properties" of that option are copied in the global configuration. For example when the user selects "ATmega168" from the "Processor" menu the Arduino IDE makes the configuration under atmega168 available globally:</p>
+<div class="codehilite"><pre><span></span><code>duemilanove.menu.cpu.atmega168.upload.maximum_size     =&gt;   upload.maximum_size
+duemilanove.menu.cpu.atmega168.upload.speed            =&gt;   upload.speed
+duemilanove.menu.cpu.atmega168.build.mcu               =&gt;   build.mcu
+</code></pre></div>
+
+
+<p>There is no limit to the number of custom menus that can be defined.</p>
+<p><strong>TODO: add an example with more than one submenu</strong></p>
+<h2 id="referencing-another-core-variant-or-tool">Referencing another core, variant or tool<a class="headerlink" href="#referencing-another-core-variant-or-tool" title="Permanent link">&para;</a></h2>
+<p>Inside the boards.txt we can define a board that uses a core provided by another vendor/mantainer using the syntax <strong>VENDOR_ID:CORE_ID</strong>. For example, if we want to define a board that uses the "arduino" core from the "arduino" vendor we should write:</p>
+<div class="codehilite"><pre><span></span><code>[....]
+myboard.name=My Wonderful Arduino Compatible board
+myboard.build.core=arduino:arduino
+[....]
+</code></pre></div>
+
+
+<p>Note that we don't need to specify any architecture since the same architecture of "myboard" is used, so we just say "arduino:arduino" instead of "arduino:avr:arduino".</p>
+<p>The platform.txt settings are inherited from the referenced core platform, thus there is no need to provide a platform.txt unless there are some specific properties that need to be overridden.</p>
+<p>The libraries from the referenced platform are used, thus there is no need to provide a libraries. If libraries are provided the list of available libraries are the sum of the 2 libraries where the referencing platform has priority over the referenced platform.</p>
+<p>In the same way we can use variants and tools defined on another platform:</p>
+<div class="codehilite"><pre><span></span><code>[....]
+myboard.build.variant=arduino:standard
+myboard.upload.tool=arduino:avrdude
+myboard.bootloader.tool=arduino:avrdude
+[....]
+</code></pre></div>
+
+
+<p>Using this syntax allows us to reduce the minimum set of files needed to define a new "hardware" to just the boards.txt file.</p>
+<p>Note that referencing a variant in another platform does <em>not</em> inherit any properties from that platform's platform.txt (like referencing a core does).</p>
+<h3 id="platform-terminology">Platform Terminology<a class="headerlink" href="#platform-terminology" title="Permanent link">&para;</a></h3>
+<p>Because boards can reference cores, variants and tools in different platforms, this means that a single build or upload can use data from up to four different platforms. To keep this clear, the following terminology is used:
+* The "board platform" is the platform that defines the currently selected board (e.g. the platform that contains the board.txt the board is defined in.
+* The "core platform" is the the platform that contains the core to be used.
+* The "variant platform" is the platform that contains the variant to be used.
+* The "tool platform" is the platform that contains the tool used for the current operation.</p>
+<p>In the most common case, without any references, all of these will refer to the same platform.</p>
+<p>Note that the above terminology is not in widespread use, but was invented for clarity within this document. In the actual arduino-cli code, the "board platform" is called <code>targetPlatform</code>, the "core platform" is called <code>actualPlatform</code>, the others are pretty much nameless.</p>
+<h2 id="boardslocaltxt">boards.local.txt<a class="headerlink" href="#boardslocaltxt" title="Permanent link">&para;</a></h2>
+<p>Introduced in Arduino IDE 1.6.6. This file can be used to override properties defined in boards.txt or define new properties without modifying boards.txt.</p>
+<h2 id="keywordstxt">keywords.txt<a class="headerlink" href="#keywordstxt" title="Permanent link">&para;</a></h2>
+<p>As of Arduino IDE 1.6.6, per-platform keywords can be defined by adding a keywords.txt file to the platform's architecture folder. These keywords are only highlighted when one of the boards of that platform are selected. This file follows the <a href="../library-specification/#keywords">same format</a> as the keywords.txt used in libraries. Each keyword must be separated from the keyword identifier by a tab.</p>
+                
+                  
+                
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../library-specification/" title="Library specification" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Library specification
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../package_index_json-specification/" title="package_index.json specification" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                package_index.json specification
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+          </div>
+        
+        powered by
+        <a href="https://www.mkdocs.org" target="_blank" rel="noopener">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.c33a9706.js"></script>
+      
+      <script>app.initialize({version:"1.1",url:{base:".."}})</script>
+      
+    
+  </body>
+</html>

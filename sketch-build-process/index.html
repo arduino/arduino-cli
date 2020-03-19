@@ -13,7 +13,7 @@
         <meta name="description" content="Arduino Command Line Interface">
       
       
-        <link rel="canonical" href="https://arduino.github.io/arduino-cli/CONTRIBUTING/">
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/sketch-build-process/">
       
       
       
@@ -40,7 +40,7 @@
     
     
       
-        <title>How to contribute - Arduino CLI</title>
+        <title>Sketch build process - Arduino CLI</title>
       
     
     
@@ -89,7 +89,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#how-to-contribute" tabindex="0" class="md-skip">
+      <a href="#overview" tabindex="0" class="md-skip">
         Skip to content
       </a>
     
@@ -115,7 +115,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                How to contribute
+                Sketch build process
               
             </span>
           
@@ -260,111 +260,11 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        How to contribute
-      </label>
-    
-    <a href="./" title="How to contribute" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../CONTRIBUTING/" title="How to contribute" class="md-nav__link">
       How to contribute
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#legal-requirements" class="md-nav__link">
-    Legal requirements
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
-    Prerequisites
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#building-the-source-code" class="md-nav__link">
-    Building the source code
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#running-the-tests" class="md-nav__link">
-    Running the tests
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#running-only-some-tests" class="md-nav__link">
-    Running only some tests
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#integration-tests" class="md-nav__link">
-    Integration tests
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#working-on-docs" class="md-nav__link">
-    Working on docs
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pull-requests" class="md-nav__link">
-    Pull Requests
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#additional-settings" class="md-nav__link">
-    Additional settings
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
     
@@ -900,11 +800,100 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href="../sketch-build-process/" title="Sketch build process" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Sketch build process
+      </label>
+    
+    <a href="./" title="Sketch build process" class="md-nav__link md-nav__link--active">
       Sketch build process
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pre-processing" class="md-nav__link">
+    Pre-Processing
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-resolution" class="md-nav__link">
+    Dependency Resolution
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture-matching" class="md-nav__link">
+    Architecture Matching
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#folder-name-priority" class="md-nav__link">
+    Folder Name Priority
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#location-priority" class="md-nav__link">
+    Location Priority
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compilation" class="md-nav__link">
+    Compilation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uploading" class="md-nav__link">
+    Uploading
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
     
@@ -958,51 +947,49 @@
 <nav class="md-nav md-nav--secondary">
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">Table of contents</label>
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#legal-requirements" class="md-nav__link">
-    Legal requirements
+  <a href="#overview" class="md-nav__link">
+    Overview
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
-    Prerequisites
+  <a href="#pre-processing" class="md-nav__link">
+    Pre-Processing
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#building-the-source-code" class="md-nav__link">
-    Building the source code
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#running-the-tests" class="md-nav__link">
-    Running the tests
+  <a href="#dependency-resolution" class="md-nav__link">
+    Dependency Resolution
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#running-only-some-tests" class="md-nav__link">
-    Running only some tests
+  <a href="#architecture-matching" class="md-nav__link">
+    Architecture Matching
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#integration-tests" class="md-nav__link">
-    Integration tests
+  <a href="#folder-name-priority" class="md-nav__link">
+    Folder Name Priority
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#location-priority" class="md-nav__link">
+    Location Priority
   </a>
   
 </li>
@@ -1013,22 +1000,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#working-on-docs" class="md-nav__link">
-    Working on docs
+  <a href="#compilation" class="md-nav__link">
+    Compilation
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#pull-requests" class="md-nav__link">
-    Pull Requests
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#additional-settings" class="md-nav__link">
-    Additional settings
+  <a href="#uploading" class="md-nav__link">
+    Uploading
   </a>
   
 </li>
@@ -1050,169 +1030,141 @@
               
                 
                 
-                <h1 id="how-to-contribute">How to contribute<a class="headerlink" href="#how-to-contribute" title="Permanent link">&para;</a></h1>
-<p>First of all, thanks for contributing!</p>
-<p>This document provides some basic guidelines for contributing to this
-repository. To propose improvements or fix a bug, feel free to submit a PR.</p>
-<h2 id="legal-requirements">Legal requirements<a class="headerlink" href="#legal-requirements" title="Permanent link">&para;</a></h2>
-<p>Before we can accept your contributions you have to sign the <a href="https://cla-assistant.io/arduino/arduino-cli">Contributor License Agreement</a></p>
-<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
-<p>To build the Arduino CLI from sources you need the following tools to be
-available in your local enviroment:</p>
-<ul>
-<li><a href="https://golang.org/doc/install">Go</a> version 1.12 or later</li>
-<li><a href="https://taskfile.dev/#/installation">Taskfile</a> to help you run the most common tasks from the command line</li>
-</ul>
-<p>If you want to run integration tests you will also need:</p>
-<ul>
-<li>A serial port with an Arduino device attached</li>
-<li>A working <a href="https://www.python.org/downloads/">Python</a> environment, version 3.5 or later</li>
-</ul>
-<p>If you're working on the gRPC interface you will also have to:</p>
-<ul>
-<li>download the <a href="https://github.com/protocolbuffers/protobuf/releases">protoc</a> compiler</li>
-<li>run <code>go get -U github.com/golang/protobuf/protoc-gen-go</code></li>
-</ul>
-<h2 id="building-the-source-code">Building the source code<a class="headerlink" href="#building-the-source-code" title="Permanent link">&para;</a></h2>
-<p>From the project folder root, just run:</p>
-<div class="codehilite"><pre><span></span><code>task build
-</code></pre></div>
-
-<p>The project uses Go modules so dependencies will be downloaded automatically;
-at the end of the build, you should find an <code>arduino-cli</code> executable in the
-same folder.</p>
-<h2 id="running-the-tests">Running the tests<a class="headerlink" href="#running-the-tests" title="Permanent link">&para;</a></h2>
-<p>There are several checks and test suites in place to ensure the code works as
-expected but it's also written in a way that's consistent across the whole
-codebase. To avoid pushing changes that will cause the CI system to fail, you
-can run most of the tests locally.</p>
-<p>To ensure code style is consistent, run:</p>
-<div class="codehilite"><pre><span></span><code>task check
-</code></pre></div>
-
-<p>To run unit tests:</p>
-<div class="codehilite"><pre><span></span><code>task test-unit
-</code></pre></div>
-
-<p>To run integration tests (these will take some time and require special setup,
-see following paragraph):</p>
-<div class="codehilite"><pre><span></span><code>task test-integration
-</code></pre></div>
-
-<h3 id="running-only-some-tests">Running only some tests<a class="headerlink" href="#running-only-some-tests" title="Permanent link">&para;</a></h3>
-<p>By default, all tests from all go packages are run. To run only unit
-tests from one or more specific packages, you can set the TARGETS
-environment variable, e.g.:</p>
-<div class="codehilite"><pre><span></span><code>TARGETS=./arduino/cores/packagemanager task test-unit
-</code></pre></div>
-
-
-<p>Alternatively, to run only some specific test(s), you can specify a regex
-to match against the test function name:</p>
-<div class="codehilite"><pre><span></span><code>TEST_REGEX=&#39;^TestTryBuild.*&#39; task test-unit
-</code></pre></div>
-
-
-<p>Both can be combined as well, typically to run only a specific test:</p>
-<div class="codehilite"><pre><span></span><code>TEST_REGEX=&#39;^TestFindBoardWithFQBN$&#39; TARGETS=./arduino/cores/packagemanager task test-unit
-</code></pre></div>
-
-
-<h3 id="integration-tests">Integration tests<a class="headerlink" href="#integration-tests" title="Permanent link">&para;</a></h3>
-<p>Being a command line interface, Arduino CLI is heavily interactive and it has to
-stay consistent in accepting the user input and providing the expected output
-and proper exit codes. On top of this, many Arduino CLI features involve
-communicating with external devices, most likely through a serial
-port, so unit tests can only put our confidence that the code is working so far.</p>
-<p>For these reasons, in addition to regular unit tests the project has a suite of
-integration tests that actually run Arduino CLI in a different process and
-assess the options are correctly understood and the output is what we expect.</p>
-<p>To run the full suite of integration tests you need an Arduino device attached
-to a serial port and a working Python environment. Chances are that you already
-have Python installed in your system, if this is not the case you can
-<a href="https://www.python.org/downloads/">download</a> the official distribution or use the package manager provided by
-your Operating System.</p>
-<p>Some dependencies need to be installed before running the tests and to avoid
-polluting your global Python enviroment with dependencies that might be only
-used by the Arduino CLI, you can use a <a href="https://docs.python.org/3/tutorial/venv.html">virtual environment</a>. There are many
-ways to manage virtual environments, for example you can use a productivity tool
-called <a href="https://github.com/ofek/hatch">hatch</a>. First you need to install it (you might need to <code>sudo</code>
-the following command):</p>
-<div class="codehilite"><pre><span></span><code>pip3 install --user hatch
-</code></pre></div>
-
-<p>Then you can create a virtual environment to be used while working on Arduino
-CLI:</p>
-<div class="codehilite"><pre><span></span><code>hatch env arduino-cli
-</code></pre></div>
-
-<p>At this point the virtual environment was created and you need to make it active
-every time you open a new terminal session with the following command:</p>
-<div class="codehilite"><pre><span></span><code>hatch shell arduino-cli
-</code></pre></div>
-
-<p>From now on, every package installed by Python will be confined to the
-<code>arduino-cli</code> virtual environment, so you can proceed installing the
-dependencies required with:</p>
-<div class="codehilite"><pre><span></span><code>pip install -r test/requirements.txt
-</code></pre></div>
-
-<p>If the last step was successful, you should be able to run the tests with:</p>
-<div class="codehilite"><pre><span></span><code>task test-integration
-</code></pre></div>
-
-<h2 id="working-on-docs">Working on docs<a class="headerlink" href="#working-on-docs" title="Permanent link">&para;</a></h2>
-<p>Documentation consists of several Markdown files stored under the <code>docs</code> folder
-at the root of the repo. Some of those files are automatically generated in the
-CI pipeline that builds the documentation website so you won't find them in the
-git repository and you need to generate them locally.</p>
-<p>If you're working on docs and your changes are not trivial, you might want to
-preview the documentation website locally, before opening a Pull Request. To run
-the docs toolchain locally you need to have:</p>
-<ul>
-<li><a href="https://golang.org/doc/install">Go</a> version 1.12 or later</li>
-<li><a href="https://taskfile.dev/#/installation">Taskfile</a> to help you run the most common tasks from the command line</li>
-<li>A working <a href="https://www.python.org/downloads/">Python</a> environment, version 3.5 or later</li>
-</ul>
-<p>Before running the toolchain, perform the following operations:</p>
-<ul>
-<li>go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc</li>
-</ul>
-<p>When working on docs, you can launch a command that will take care of
-generating the docs, build the static website and start a local server you can
-access with your browser to see a preview of your changes - to launch this
-command do:</p>
-<div class="codehilite"><pre><span></span><code>task docs:serve
-</code></pre></div>
-
-<p>If you dont' see any error, hit <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> with your browser.</p>
-<h2 id="pull-requests">Pull Requests<a class="headerlink" href="#pull-requests" title="Permanent link">&para;</a></h2>
-<p>In order to ease code reviews and have your contributions merged faster, here is
-a list of items you can check before submitting a PR:</p>
-<ul>
-<li>Create small PRs that are narrowly focused on addressing a single concern.</li>
-<li>PR titles indirectly become part of the CHANGELOG so it's crucial to provide a
-  good record of <strong>what</strong> change is being made in the title; <strong>why</strong> it was made
-  will go in the PR description, along with a link to a GitHub issue if it
-  exists.</li>
-<li>Write tests for the code you wrote.</li>
-<li>Open your PR against the <code>master</code> branch.</li>
-<li>Maintain <strong>clean commit history</strong> and use <strong>meaningful commit messages</strong>.
-  PRs with messy commit history are difficult to review and require a lot of
-  work to be merged.</li>
-<li>Your PR must pass all CI tests before we will merge it. If you're seeing an
-  error and don't think
-  it's your fault, it may not be! The reviewer will help you if there are test
-  failures that seem
-  not related to the change you are making.</li>
-</ul>
-<h2 id="additional-settings">Additional settings<a class="headerlink" href="#additional-settings" title="Permanent link">&para;</a></h2>
-<p>If you need to push a commit that's only shipping documentation changes or
-example files, thus a complete no-op for the test suite, please start the commit
-message with the string <strong>[skip ci]</strong> to skip the build and give that slot to
-someone else who does need it.</p>
-<p>If your PR doesn't need to be included in the changelog, please start the PR
-title with the string <strong>[skip changelog]</strong></p>
+                  <h1>Sketch build process</h1>
+                
+                <p>The process the Arduino environment uses to build a sketch. More useful information can be found in the <a href="../platform-specification/">Arduino platform specification</a>. Note that the following refers specifically to the build process for AVR targets. Other architectures will have a similar build process.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>A number of things have to happen for your Arduino code to get onto the Arduino board. First, the Arduino environment performs some minor pre-processing to turn your sketch into a C++ program. Next, dependencies of the sketch are located. It then gets passed to a compiler (avr-gcc), which turns the human readable code into machine readable instructions (or object files). Then your code gets combined with (linked against) the standard Arduino libraries that provide basic functions like <code>digitalWrite()</code> or <code>Serial.print()</code>. The result is a single Intel hex file, which contains the specific bytes that need to be written to the program memory of the chip on the Arduino board. This file is then uploaded to the board: transmitted over the USB or serial connection via the bootloader already on the chip or with external programming hardware.</p>
+<h2 id="pre-processing">Pre-Processing<a class="headerlink" href="#pre-processing" title="Permanent link">&para;</a></h2>
+<p>The Arduino environment performs a few transformations to your sketch before passing it to the avr-gcc compiler:
+- All .ino and .pde files in the sketch folder (shown in the IDE as tabs with no extension) are concatenated together, starting with the file that matches the folder name followed by the others in alphabetical order, and the .cpp extension is added to the filename.
+- If not already present, <code>#include &lt;Arduino.h&gt;</code> is added to the sketch. This header file (found in the core folder for the currently selected board) includes all the definitions needed for the standard Arduino core.
+- Prototypes are generated for all function definitions in .ino/.pde files that don't already have prototypes. In some rare cases prototype generation may fail for some functions. To work around this, you can provide your own prototypes for these functions.
+- <code>#line</code> directives are added to make warning or error messages reflect the original sketch layout.</p>
+<p>No pre-processing is done to files in a sketch with any extension other than .ino or .pde. Additionally, .h files in the sketch are not automatically #included from the main sketch file. Further, if you want to call functions defined in a .c file from a .cpp file (like one generated from your sketch), you'll need to wrap its declarations in an 'extern "C" {}' block that is defined only inside of C++ files.</p>
+<h2 id="dependency-resolution">Dependency Resolution<a class="headerlink" href="#dependency-resolution" title="Permanent link">&para;</a></h2>
+<p>The sketch is scanned recursively for dependencies. There are predefined include search paths:</p>
+<ol>
+<li>Core library folder (as defined by <a href="../platform-specification/#boardstxt"><code>{build.core}</code></a>)</li>
+<li>Variant folder (as defined by <a href="../platform-specification/#boardstxt"><code>{build.variant}</code></a>)</li>
+<li>Standard system directories (e.g., <a href="../platform-specification/#tools"><code>{runtime.tools.avr-gcc.path}/avr/include</code></a>)</li>
+<li>Include search paths added to resolve prior dependencies</li>
+</ol>
+<p>If the dependency is not present in any of those locations, the installed libraries are then searched (see the <a href="#location-priority"><strong>Location Priority</strong> table</a> below for library locations). For information on the allowed library sub-folder structures see <a href="../library-specification/#source-code">the Arduino library specification</a>. <code>-I</code> options are generated for the path to each library dependency and appended to the <a href="../platform-specification/#recipes-to-compile-source-code"><code>includes</code> property</a>, to be used in <a href="../platform-specification/#recipes-to-compile-source-code">compilation recipes</a> in platform.txt.</p>
+<p>If multiple libraries contain a file that matches the <code>#include</code> directive, the priority is determined by applying the following rules, one by one in this order, until a rule determines a winner:</p>
+<ol>
+<li>A library that is architecture compatible wins against a library that is not architecture compatible (see <a href="#architecture-matching"><strong>Architecture Matching</strong></a>)</li>
+<li>A library that has better "folder name priority" wins (see <a href="#folder-name-priority"><strong>Folder Name Priority</strong></a>)</li>
+<li>A library that is architecture optimized wins against a library that is not architecture optimized (see <a href="#architecture-matching"><strong>Architecture Matching</strong></a>)</li>
+<li>A library that has a better "location priority" wins (see <a href="#location-priority"><strong>Location Priority</strong></a>)</li>
+<li>A library that has a folder name with a better score using the "closest-match" algorithm wins</li>
+<li>A library that has a folder name that comes first in alphanumeric order wins</li>
+</ol>
+<h3 id="architecture-matching">Architecture Matching<a class="headerlink" href="#architecture-matching" title="Permanent link">&para;</a></h3>
+<p>A library is considered <strong>compatible</strong> with architecture <code>X</code> if the <code>architectures</code> field in <a href="../library-specification/#library-metadata">library.properties</a>:
+- explicitly contains the architecture <code>X</code>
+- contains the catch-all <code>*</code>
+- is not specified at all.</p>
+<p>A library is considered <strong>optimized</strong> for architecture <code>X</code> only if the <code>architectures</code> field in library.properties explicitly contains the architecture <code>X</code>. This means that a library that is optimized for architecture <code>X</code> is also compatible with it.</p>
+<p>Examples:</p>
+<table>
+<thead>
+<tr>
+<th><code>architectures</code> field in <code>library.properties</code></th>
+<th>Compatible with <code>avr</code></th>
+<th>Optimized for <code>avr</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>not specified</td>
+<td>YES</td>
+<td>NO</td>
+</tr>
+<tr>
+<td><code>architectures=*</code></td>
+<td>YES</td>
+<td>NO</td>
+</tr>
+<tr>
+<td><code>architectures=avr</code></td>
+<td>YES</td>
+<td>YES</td>
+</tr>
+<tr>
+<td><code>architectures=*,avr</code></td>
+<td>YES</td>
+<td>YES</td>
+</tr>
+<tr>
+<td><code>architectures=*,esp8266</code></td>
+<td>YES</td>
+<td>NO</td>
+</tr>
+<tr>
+<td><code>architectures=avr,esp8266</code></td>
+<td>YES</td>
+<td>YES</td>
+</tr>
+<tr>
+<td><code>architectures=samd</code></td>
+<td>NO</td>
+<td>NO</td>
+</tr>
+</tbody>
+</table>
+<h3 id="folder-name-priority">Folder Name Priority<a class="headerlink" href="#folder-name-priority" title="Permanent link">&para;</a></h3>
+<p>The "folder name priority" is determined as follows (in order of highest to lowest priority):</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Example for <code>Servo.h</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The folder name matches the include 100%</td>
+<td><code>Servo</code></td>
+</tr>
+<tr>
+<td>The folder name matches the include 100%, except with a <code>-master</code> suffix</td>
+<td><code>Servo-master</code></td>
+</tr>
+<tr>
+<td>The folder name has a matching prefix</td>
+<td><code>ServoWhatever</code></td>
+</tr>
+<tr>
+<td>The folder name has a matching suffix</td>
+<td><code>AwesomeServo</code></td>
+</tr>
+<tr>
+<td>The folder name contains the include</td>
+<td><code>AnAwesomeServoForWhatever</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="location-priority">Location Priority<a class="headerlink" href="#location-priority" title="Permanent link">&para;</a></h3>
+<p>The "location priority" is determined as follows (in order of highest to lowest priority):</p>
+<ol>
+<li>The library is in the sketchbook (<code>{sketchbook path}/libraries</code>)</li>
+<li>The library is bundled with the board platform/core (<a href="../platform-specification/#global-predefined-properties"><code>{runtime.platform.path}/libraries</code></a>)</li>
+<li>The library is bundled with the <a href="../platform-specification/#referencing-another-core-variant-or-tool">referenced</a> board platform/core</li>
+<li>The library is bundled with the IDE (<a href="../platform-specification/#global-predefined-properties"><code>{runtime.ide.path}/libraries</code></a>)</li>
+</ol>
+<h2 id="compilation">Compilation<a class="headerlink" href="#compilation" title="Permanent link">&para;</a></h2>
+<p>Sketches are compiled by avr-gcc and avr-g++ according to the variables in the boards.txt file of the selected board's <a href="../platform-specification/">platform</a>.</p>
+<p>The sketch is built in a temporary directory in the system-wide temporary directory (e.g. /tmp on Linux).</p>
+<p>Files taken as source files for the build process are .S, .c and .cpp files (including the .cpp file generated from the sketch's .ino and .pde files during the sketch pre-processing step).
+Source files of the target are compiled and output with .o extensions to this build directory, as are the main sketch files and any other source files in the sketch and any source files in any libraries which are #included in the sketch.</p>
+<p>Before compiling a source file, an attempt is made to reuse the previously compiled .o file, which speeds up the build process. A special .d (dependency) file provides a list of all other files included by the source. The compile step is skipped if the .o and .d files exist and have timestamps newer than the source and all the dependent files. If the source or any dependent file has been modified, or any error occurs verifying the files, the compiler is run normally, writing a new .o &amp; .d file. After a new board is selected from the Tools menu, all source files are rebuilt on the next compile.</p>
+<p>These .o files are then linked together into a static library and the main sketch file is linked against this library. Only the parts of the library needed for your sketch are included in the final .hex file, reducing the size of most sketches.</p>
+<p>The .hex file is the final output of the compilation which is then uploaded to the board.</p>
+<p>If verbose output during compilation is checked in the Preferences dialog, the complete command line of each external command executed as part of the build process will be printed in the editor console.</p>
+<h2 id="uploading">Uploading<a class="headerlink" href="#uploading" title="Permanent link">&para;</a></h2>
+<p>Sketches are uploaded by avrdude. The upload process is also controlled by variables in the boards and main preferences files. See the <a href="../platform-specification/">Arduino platform specification</a> page for details.</p>
+<p>If verbose output during upload is checked in the Preferences dialog, debugging information will be output to the editor console, including avrdude command lines and verbose output.</p>
                 
                   
                 
@@ -1234,7 +1186,7 @@ title with the string <strong>[skip changelog]</strong></p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../getting-started/" title="Getting started" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../rpc/debug/" title="debug" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -1243,19 +1195,19 @@ title with the string <strong>[skip changelog]</strong></p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Getting started
+                debug
               </span>
             </div>
           </a>
         
         
-          <a href="../FAQ/" title="FAQ" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../library-specification/" title="Library specification" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                FAQ
+                Library specification
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

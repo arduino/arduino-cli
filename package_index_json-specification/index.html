@@ -1,0 +1,1366 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="Arduino Command Line Interface">
+      
+      
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/package_index_json-specification/">
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1, mkdocs-material-4.6.3">
+    
+    
+      
+        <title>package_index.json specification - Arduino CLI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.adb8469c.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.a8b3c06d.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#009688">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.86422ebf.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="teal" data-md-color-accent="orange">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#naming-of-the-json-index-file" tabindex="0" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://arduino.github.io/arduino-cli/" title="Arduino CLI" aria-label="Arduino CLI" class="md-header-nav__button md-logo">
+          
+            <img alt="logo" src="../img/icon_mac_light.png" width="24" height="24">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Arduino CLI
+            </span>
+            <span class="md-header-nav__topic">
+              
+                package_index.json specification
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" aria-label="search" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+<a href="https://github.com/arduino/arduino-cli" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    arduino/arduino-cli
+  </div>
+</a>
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main" role="main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://arduino.github.io/arduino-cli/" title="Arduino CLI" class="md-nav__button md-logo">
+      
+        <img alt="logo" src="../img/icon_mac_light.png" width="48" height="48">
+      
+    </a>
+    Arduino CLI
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+<a href="https://github.com/arduino/arduino-cli" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    arduino/arduino-cli
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Documentation Home" class="md-nav__link">
+      Documentation Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../installation/" title="Installation" class="md-nav__link">
+      Installation
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../getting-started/" title="Getting started" class="md-nav__link">
+      Getting started
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../CONTRIBUTING/" title="How to contribute" class="md-nav__link">
+      How to contribute
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../FAQ/" title="FAQ" class="md-nav__link">
+      FAQ
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+    
+    <label class="md-nav__link" for="nav-6">
+      Command reference
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-6">
+        Command reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli/" title="Arduino cli" class="md-nav__link">
+      Arduino cli
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board/" title="board" class="md-nav__link">
+      board
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_attach/" title="board attach" class="md-nav__link">
+      board attach
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_details/" title="board details" class="md-nav__link">
+      board details
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_list/" title="board list" class="md-nav__link">
+      board list
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_listall/" title="board listall" class="md-nav__link">
+      board listall
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_cache/" title="cache" class="md-nav__link">
+      cache
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_cache_clean/" title="cache clean" class="md-nav__link">
+      cache clean
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_compile/" title="compile" class="md-nav__link">
+      compile
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_config/" title="config" class="md-nav__link">
+      config
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_config_dump/" title="config dump" class="md-nav__link">
+      config dump
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_config_init/" title="config init" class="md-nav__link">
+      config init
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core/" title="core" class="md-nav__link">
+      core
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_download/" title="core download" class="md-nav__link">
+      core download
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_install/" title="core install" class="md-nav__link">
+      core install
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_list/" title="core list" class="md-nav__link">
+      core list
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_search/" title="core search" class="md-nav__link">
+      core search
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_uninstall/" title="core uninstall" class="md-nav__link">
+      core uninstall
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_update-index/" title="core update index" class="md-nav__link">
+      core update index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_upgrade/" title="core upgrade" class="md-nav__link">
+      core upgrade
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_daemon/" title="daemon" class="md-nav__link">
+      daemon
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_debug/" title="debug" class="md-nav__link">
+      debug
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib/" title="lib" class="md-nav__link">
+      lib
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_deps/" title="lib deps" class="md-nav__link">
+      lib deps
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_download/" title="lib download" class="md-nav__link">
+      lib download
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_install/" title="lib install" class="md-nav__link">
+      lib install
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_list/" title="lib list" class="md-nav__link">
+      lib list
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_search/" title="lib search" class="md-nav__link">
+      lib search
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_uninstall/" title="lib uninstall" class="md-nav__link">
+      lib uninstall
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_update-index/" title="lib update-index" class="md-nav__link">
+      lib update-index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_upgrade/" title="lib upgrade" class="md-nav__link">
+      lib upgrade
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_sketch/" title="sketch" class="md-nav__link">
+      sketch
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_sketch_new/" title="sketch new" class="md-nav__link">
+      sketch new
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_upload/" title="upload" class="md-nav__link">
+      upload
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_version/" title="version" class="md-nav__link">
+      version
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
+    
+    <label class="md-nav__link" for="nav-7">
+      gRPC reference
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-7">
+        gRPC reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../rpc/commands/" title="commands" class="md-nav__link">
+      commands
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../rpc/monitor/" title="monitor" class="md-nav__link">
+      monitor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../rpc/settings/" title="settings" class="md-nav__link">
+      settings
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../rpc/debug/" title="debug" class="md-nav__link">
+      debug
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../sketch-build-process/" title="Sketch build process" class="md-nav__link">
+      Sketch build process
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../library-specification/" title="Library specification" class="md-nav__link">
+      Library specification
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../platform-specification/" title="Platform specification" class="md-nav__link">
+      Platform specification
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        package_index.json specification
+      </label>
+    
+    <a href="./" title="package_index.json specification" class="md-nav__link md-nav__link--active">
+      package_index.json specification
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#naming-of-the-json-index-file" class="md-nav__link">
+    Naming of the JSON index file
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#json-index-file-contents" class="md-nav__link">
+    JSON Index file contents
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tools-definitions" class="md-nav__link">
+    Tools definitions
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-a-tools-path-is-determined-in-platformtxt" class="md-nav__link">
+    How a tool's path is determined in platform.txt
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#platforms-definitions" class="md-nav__link">
+    Platforms definitions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-json-index-file" class="md-nav__link">
+    Example JSON index file
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-archive-structure" class="md-nav__link">
+    Installation archive structure
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#naming-of-the-json-index-file" class="md-nav__link">
+    Naming of the JSON index file
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#json-index-file-contents" class="md-nav__link">
+    JSON Index file contents
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tools-definitions" class="md-nav__link">
+    Tools definitions
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-a-tools-path-is-determined-in-platformtxt" class="md-nav__link">
+    How a tool's path is determined in platform.txt
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#platforms-definitions" class="md-nav__link">
+    Platforms definitions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-json-index-file" class="md-nav__link">
+    Example JSON index file
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-archive-structure" class="md-nav__link">
+    Installation archive structure
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                  <h1>package_index.json specification</h1>
+                
+                <p>Starting from version 1.6.4 the Boards Manager of the Arduino IDE can be used to automatically install support for <strong>3<sup>rd</sup> party hardware</strong> by simply entering an URL in the <strong>File &gt; Preferences</strong> dialog. The URL must be provided by the 3<sup>rd</sup> party hardware producer and should point to a JSON file that contains an index of the boards available to install and the location of the installation archives. Boards Manager also allows easy updates of installed Boards when new versions are released.</p>
+<h2 id="naming-of-the-json-index-file">Naming of the JSON index file<a class="headerlink" href="#naming-of-the-json-index-file" title="Permanent link">&para;</a></h2>
+<p>The IDE may use many different index files coming from different vendors, so each vendor should name his own index file in a way that won't conflict with others. The file must be named as follows:</p>
+<p><code>package_YOURNAME_PACKAGENAME_index.json</code></p>
+<p>The prefix <code>package_</code> and the postfix <code>_index.json</code> are <strong>mandatory</strong> (otherwise the index file is not recognised by the IDE) while the choice of <code>YOURNAME_PACKAGENAME</code> is left to the packager.
+We suggest using a domain name owned by the packager. For example:</p>
+<p><code>package_arduino.cc_index.json</code></p>
+<p>or</p>
+<p><code>package_example.com_avr_boards_index.json</code></p>
+<p>The index URL is periodically checked for updates so expect a constant flow of downloads (proportional to the number of active users).</p>
+<h2 id="json-index-file-contents">JSON Index file contents<a class="headerlink" href="#json-index-file-contents" title="Permanent link">&para;</a></h2>
+<p>The root of the JSON index is an array of <code>packages</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;packages&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="err">PACKAGE_XXXX</span>
+   <span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>3<sup>rd</sup> party vendors should use a single <code>PACKAGE_XXXX</code> that is a dictionary map with the vendor's metadata, a list of <code>PLATFORMS</code> and a list of <code>TOOLS</code>. For example:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;maintainer&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino LLC&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;websiteURL&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.arduino.cc/&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;packages@arduino.cc&quot;</span><span class="p">,</span>
+
+  <span class="nt">&quot;platforms&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="err">PLATFORM_AVR</span><span class="p">,</span>
+      <span class="err">PLATFORM_ARM</span><span class="p">,</span>
+      <span class="err">PLATFORM_XXXXX</span><span class="p">,</span>
+      <span class="err">PLATFORM_YYYYY</span><span class="p">,</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;tools&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="err">TOOLS_COMPILER_AVR</span><span class="p">,</span>
+      <span class="err">TOOLS_UPLOADER_AVR</span><span class="p">,</span>
+      <span class="err">TOOLS_COMPILER_ARM</span><span class="p">,</span>
+      <span class="err">TOOLS_XXXXXXX</span><span class="p">,</span>
+      <span class="err">TOOLS_YYYYYYY</span><span class="p">,</span>
+   <span class="p">],</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The metadata fields are:</p>
+<ul>
+<li><code>name</code>: the folder used for the installed cores. The <a href="../platform-specification/#hardware-folders-structure">vendor folder</a> name of the installed package is determined by this field</li>
+<li><code>maintainer</code>: the extended name of the vendor that is displayed on the Boards Manager GUI</li>
+<li><code>websiteURL</code>: the URL to the vendor's website, appears on the Boards Manager as a "More info" link</li>
+<li><code>email</code>: the email of the vendor/maintainer</li>
+</ul>
+<p>Now, before looking at <code>PLATFORMS</code>, let's explore first how <code>TOOLS</code> are made.</p>
+<h3 id="tools-definitions">Tools definitions<a class="headerlink" href="#tools-definitions" title="Permanent link">&para;</a></h3>
+<p>Each tool describes a binary distribution of a command line tool. A tool can be:</p>
+<ul>
+<li>a compiler toolchain</li>
+<li>an uploader</li>
+<li>a file preprocessor</li>
+<li>a debugger</li>
+<li>a program that performs a firmware upgrade</li>
+</ul>
+<p>basically anything that can run on the user's host PC and do something useful.</p>
+<p>For example, Arduino uses two command line tools for the AVR boards: avr-gcc (the compiler) and avrdude (the uploader).</p>
+<p>Tools are mapped as JSON in this way:</p>
+<div class="codehilite"><pre><span></span><code>        <span class="p">{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;avr-gcc&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;4.8.1-arduino5&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;systems&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;i386-apple-darwin11&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://downloads.arduino.cc/tools/avr-gcc-4.8.1-arduino5-i386-apple-darwin11.tar.bz2&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;archiveFileName&quot;</span><span class="p">:</span> <span class="s2">&quot;avr-gcc-4.8.1-arduino5-i386-apple-darwin11.tar.bz2&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="s2">&quot;24437400&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;checksum&quot;</span><span class="p">:</span> <span class="s2">&quot;SHA-256:111b3ef00d737d069eb237a8933406cbb928e4698689e24663cffef07688a901&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;x86_64-linux-gnu&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://downloads.arduino.cc/tools/avr-gcc-4.8.1-arduino5-x86_64-pc-linux-gnu.tar.bz2&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;archiveFileName&quot;</span><span class="p">:</span> <span class="s2">&quot;avr-gcc-4.8.1-arduino5-x86_64-pc-linux-gnu.tar.bz2&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="s2">&quot;27093036&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;checksum&quot;</span><span class="p">:</span> <span class="s2">&quot;SHA-256:9054fcc174397a419ba56c4ce1bfcbcad275a6a080cc144905acc9b0351ee9cc&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;i686-linux-gnu&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://downloads.arduino.cc/tools/avr-gcc-4.8.1-arduino5-i686-pc-linux-gnu.tar.bz2&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;archiveFileName&quot;</span><span class="p">:</span> <span class="s2">&quot;avr-gcc-4.8.1-arduino5-i686-pc-linux-gnu.tar.bz2&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="s2">&quot;25882375&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;checksum&quot;</span><span class="p">:</span> <span class="s2">&quot;SHA-256:7648b7f549b37191da0b0be53bae791b652f82ac3cb4e7877f85075aaf32141f&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;i686-mingw32&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://downloads.arduino.cc/tools/avr-gcc-4.8.1-arduino5-i686-mingw32.zip&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;archiveFileName&quot;</span><span class="p">:</span> <span class="s2">&quot;avr-gcc-4.8.1-arduino5-i686-mingw32.zip&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="s2">&quot;46044779&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;checksum&quot;</span><span class="p">:</span> <span class="s2">&quot;SHA-256:d4303226a7b41d3c445d901b5aa5903458def3fc7b7ff4ffef37cabeb37d424d&quot;</span>
+            <span class="p">}</span>
+          <span class="p">]</span>
+        <span class="p">}</span><span class="err">,</span>
+</code></pre></div>
+
+<p>The field <code>name</code> and <code>version</code> are respectively the name and version of the tool.
+Each tool is uniquely identified by the triple (<code>vendor</code>, <code>name</code>, <code>version</code>) and there can be many different versions of the same tool available at the same time, for example:</p>
+<ul>
+<li>(<code>arduino</code>, <code>avr-gcc</code>, <code>4.8.1-arduino2</code>)</li>
+<li>(<code>arduino</code>, <code>avr-gcc</code>, <code>4.8.1-arduino3</code>)</li>
+<li>(<code>arduino</code>, <code>avr-gcc</code>, <code>4.8.1-arduino5</code>)</li>
+<li>(<code>arduino</code>, <code>avrdude</code>, <code>5.11</code>)</li>
+<li>(<code>arduino</code>, <code>avrdude</code>, <code>6.0</code>)</li>
+<li>(<code>arduino</code>, <code>avrdude</code>, <code>6.1</code>)</li>
+<li>.....</li>
+</ul>
+<p>Each tool version may come in different build flavours for different OS. Each flavour is listed under the <code>systems</code> array. In the example above <code>avr-gcc</code> comes with builds for:</p>
+<ul>
+<li>Linux 64-bit (<code>x86_64-linux-gnu</code>),</li>
+<li>Linux 32-bit (<code>i686-linux-gnu</code>),</li>
+<li>Windows (<code>i686-mingw32</code>),</li>
+<li>Mac (<code>i386-apple-darwin11</code>)</li>
+</ul>
+<p>The IDE will take care to install the right flavour based on the <code>host</code> value, or fail if a needed flavour is missing.<br>
+Note that the IDE does not use this information to select the toolchain during verify. If you want the IDE to use this specific version you should use the notation {runtime.tools.TOOLNAME-VERSION.path} in the platform.txt.</p>
+<p>The other fields are:</p>
+<ul>
+<li><code>url</code>: the download URL of the tool's archive</li>
+<li><code>archiveFileName</code>: the name of the file saved to disk after the download (some web servers don't provide the filename through the HTTP request)</li>
+<li><code>size</code>: the size of the archive in bytes</li>
+<li><code>checksum</code>: the checksum of the archive, used to check if the file has been corrupted. The format is <code>ALGORITHM:CHECKSUM</code>, currently <code>MD5</code>, <code>SHA-1</code>,<code>SHA-256</code> algorithm are supported, we recommend <code>SHA-256</code>.  On *nix or MacOSX you may be able to use the command <code>shasum -a 256 filename</code> to generate SHA-256 checksums. There are many free options for Windows including md5deep, there are also online utilities for generating checksums.</li>
+</ul>
+<h5 id="how-a-tools-path-is-determined-in-platformtxt">How a tool's path is determined in platform.txt<a class="headerlink" href="#how-a-tools-path-is-determined-in-platformtxt" title="Permanent link">&para;</a></h5>
+<p>When the IDE needs a tool it downloads the corresponding archive file and unpacks the content into
+a private folder that can be referenced from <code>platform.txt</code> using one of the following properties:</p>
+<ul>
+<li><code>{runtime.tools.TOOLNAME-VERSION.path}</code></li>
+<li><code>{runtime.tools.TOOLNAME.path}</code></li>
+</ul>
+<p>For example to obtain the avr-gcc 4.8.1 folder we can use <code>{runtime.tools.avr-gcc-4.8.1-arduino5.path}</code> or <code>{runtime.tools.avr-gcc.path}</code>.</p>
+<h3 id="platforms-definitions">Platforms definitions<a class="headerlink" href="#platforms-definitions" title="Permanent link">&para;</a></h3>
+<p>Finally, let's see how <code>PLATFORMS</code> are made.</p>
+<div class="codehilite"><pre><span></span><code>        <span class="p">{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino AVR Boards&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;architecture&quot;</span><span class="p">:</span> <span class="s2">&quot;avr&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.6.6&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;category&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;help&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;online&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.arduino.cc/en/Reference/HomePage&quot;</span>
+          <span class="p">},</span>
+          <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://downloads.arduino.cc/cores/avr-1.6.6.tar.bz2&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;archiveFileName&quot;</span><span class="p">:</span> <span class="s2">&quot;avr-1.6.6.tar.bz2&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;checksum&quot;</span><span class="p">:</span> <span class="s2">&quot;SHA-256:08ad5db4978ebea22344edc5d77dce0923d8a644da7a14dc8072e883c76058d8&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="s2">&quot;4876916&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;boards&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino Yún&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino Uno&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino Diecimila&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino Nano&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino Mega&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino MegaADK&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino Leonardo&quot;</span><span class="p">},</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;toolsDependencies&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span> <span class="nt">&quot;packager&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;avr-gcc&quot;</span><span class="p">,</span> <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;4.8.1-arduino5&quot;</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="nt">&quot;packager&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;avrdude&quot;</span><span class="p">,</span> <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;6.0.1-arduino5&quot;</span> <span class="p">}</span>
+          <span class="p">]</span>
+        <span class="p">}</span><span class="err">,</span>
+</code></pre></div>
+
+<p>Each PLATFORM describes a core for a specific architecture. The fields needed are:</p>
+<ul>
+<li><code>name</code>: the extended name of the platform that is displayed on the Boards Manager GUI</li>
+<li><code>architecture</code>: is the architecture of the plaftorm (avr, sam, etc...). It must match the architecture of the core as explained in the <a href="../platform-specification/#hardware-folders-structure">Arduino platform specification</a></li>
+<li><code>version</code>: the version of the platform.</li>
+<li><code>category</code>: this field is reserved, a 3<sup>rd</sup> party core must set it to <code>Contributed</code></li>
+<li><code>help</code>/<code>online</code>: is a URL that is displayed on the Boards Manager as an "Online Help" link</li>
+<li><code>url</code>, <code>archiveFileName</code>, <code>size</code> and <code>checksum</code>: metadata of the core archive file. The meaning is the same as for the TOOLS</li>
+<li><code>boards</code>: the list of boards supported (note: just the names to display on the GUI! the real boards definitions are inside <code>boards.txt</code> inside the core archive file)</li>
+<li><code>toolsDependencies</code>: the tools needed by this core. Each tool is referenced by the triple (<code>packager</code>, <code>name</code>, <code>version</code>) as previously said. Note that you can reference tools available in other packages as well.</li>
+</ul>
+<p>The <code>version</code> field is validated by both Arduino IDE and <a href="https://github.com/zafarkhaja/jsemver">JSemVer</a>. Here are the rules Arduino IDE follows for parsing versions (<a href="https://github.com/arduino/Arduino/blob/master/arduino-core/src/cc/arduino/contributions/VersionHelper.java">source</a>):</p>
+<ul>
+<li>Split the version at the - character and continue with the first part.</li>
+<li>If there are no dots (<code>.</code>), parse <code>version</code> as an integer and form a Version from that integer using <code>Version.forIntegers</code></li>
+<li>If there is one dot, split <code>version</code> into two, parse each part as an integer, and form a Version from those integers using <code>Version.forIntegers</code></li>
+<li>Otherwise, simply parse <code>version</code> into a Version using <code>Version.valueOf</code></li>
+</ul>
+<p>Note: if you miss a bracket in the JSON index, then add the URL to your Preferences, and open Boards Manager it can cause the Arduino IDE to no longer load until you have deleted the file from your arduino15 folder.</p>
+<h3 id="example-json-index-file">Example JSON index file<a class="headerlink" href="#example-json-index-file" title="Permanent link">&para;</a></h3>
+<p><div class="codehilite"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;packages&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;myboard&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;maintainer&quot;</span><span class="p">:</span> <span class="s2">&quot;Jane Developer&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;websiteURL&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/janedeveloper/myboard&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;jane@janedeveloper.org&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;help&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;online&quot;</span><span class="p">:</span> <span class="s2">&quot;http://janedeveloper.org/forum/myboard&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;platforms&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;architecture&quot;</span><span class="p">:</span> <span class="s2">&quot;avr&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;category&quot;</span><span class="p">:</span> <span class="s2">&quot;Contributed&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;help&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;online&quot;</span><span class="p">:</span> <span class="s2">&quot;http://janedeveloper.org/forum/myboard&quot;</span>
+          <span class="p">},</span>
+          <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://janedeveloper.github.io/myboard/myboard-1.0.0.zip&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;archiveFileName&quot;</span><span class="p">:</span> <span class="s2">&quot;myboard-1.0.0.zip&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;checksum&quot;</span><span class="p">:</span> <span class="s2">&quot;SHA-256:ec3ff8a1dc96d3ba6f432b9b837a35fd4174a34b3d2927de1d51010e8b94f9f1&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="s2">&quot;15005&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;boards&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board Pro&quot;</span><span class="p">}</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;toolsDependencies&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;packager&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;avr-gcc&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;4.8.1-arduino5&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;packager&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;avrdude&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;6.0.1-arduino5&quot;</span>
+            <span class="p">}</span>
+          <span class="p">]</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;architecture&quot;</span><span class="p">:</span> <span class="s2">&quot;avr&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.1&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;category&quot;</span><span class="p">:</span> <span class="s2">&quot;Contributed&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;help&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;online&quot;</span><span class="p">:</span> <span class="s2">&quot;http://janedeveloper.org/forum/myboard&quot;</span>
+          <span class="p">},</span>
+          <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://janedeveloper.github.io/myboard/myboard-1.0.1.zip&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;archiveFileName&quot;</span><span class="p">:</span> <span class="s2">&quot;myboard-1.0.1.zip&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;checksum&quot;</span><span class="p">:</span> <span class="s2">&quot;SHA-256:9c86ee28a7ce9fe33e8b07ec643316131e0031b0d22e63bb398902a5fdadbca9&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="s2">&quot;15125&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;boards&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board&quot;</span><span class="p">},</span>
+            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board Pro&quot;</span><span class="p">}</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;toolsDependencies&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;packager&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;avr-gcc&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;4.8.1-arduino5&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;packager&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;avrdude&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;6.0.1-arduino5&quot;</span>
+            <span class="p">}</span>
+          <span class="p">]</span>
+        <span class="p">}</span>
+      <span class="p">],</span>
+      <span class="nt">&quot;tools&quot;</span><span class="p">:[]</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+In the example there is one <code>PACKAGE</code>, My Board. The package is compatible with the AVR architecture. There are two versions of the <code>PACKAGE</code>, 1.0.0 and 1.0.1. No <code>TOOLS</code> needed to be installed so that section was left blank.</p>
+<p>Here is the Boards Manager entry created by the example:
+<img alt="Boards Manager screenshot" src="../img/boards-manager-screenshot.png" /></p>
+<h2 id="installation-archive-structure">Installation archive structure<a class="headerlink" href="#installation-archive-structure" title="Permanent link">&para;</a></h2>
+<p>The installation archives contain the Board support files. Supported formats are .zip, .tar.bz2, and .tar.gz.</p>
+<p>The folder structure of the core archive is slightly different from the standard manually installed Arduino 1.5+ compatible hardware folder structure. You must remove the architecture folder(e.g., <code>avr</code> or <code>arm</code>), moving all the files and folders within the architecture folder up a level.</p>
+<hr />
+<p>After adding Boards Manager support for your boards, please share the JSON index file URL on the <a href="https://github.com/arduino/Arduino/wiki/Unofficial-list-of-3rd-party-boards-support-urls">Unofficial list of 3<sup>rd</sup> party boards support urls</a>.</p>
+                
+                  
+                
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../platform-specification/" title="Platform specification" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Platform specification
+              </span>
+            </div>
+          </a>
+        
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+          </div>
+        
+        powered by
+        <a href="https://www.mkdocs.org" target="_blank" rel="noopener">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.c33a9706.js"></script>
+      
+      <script>app.initialize({version:"1.1",url:{base:".."}})</script>
+      
+    
+  </body>
+</html>
