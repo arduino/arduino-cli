@@ -823,7 +823,7 @@ func callDebugger(debugStreamingOpenClient dbg.Debug_DebugClient, instance *rpc.
 	log.Printf("Send debug request")
 	err := debugStreamingOpenClient.Send(&dbg.DebugReq{
 		DebugReq: &dbg.DebugConfigReq{
-			Instance:   &dbg.Instance{Id: instance.GetId()},
+			Instance:   &rpc.Instance{Id: instance.GetId()},
 			Fqbn:       "arduino:samd:mkr1000",
 			SketchPath: filepath.Join(currDir, "hello"),
 			Port:       "none",
