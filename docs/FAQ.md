@@ -11,8 +11,8 @@ When you run `arduino-cli board list`, your board doesn't show up. Possible caus
 ##  What's the FQBN string?
 
 For a deeper understanding of how FQBN works, you should understand
-Arduino Hardware specification. You can find more information in this
-[arduino/Arduino wiki page][0].
+Arduino Hardware specification. You can find more information in the
+[Arduino platform specification][0].
 
 
-[0]: https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification
+[0]: platform-specification.md
