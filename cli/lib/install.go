@@ -18,6 +18,7 @@ package lib
 import (
 	"context"
 	"os"
+	"strings"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -48,12 +49,36 @@ var installFlags struct {
 	noDeps bool
 }
 
+func adjustLibraryReferenceArgCaseSensitivty(instance *rpc.Instance, libRef *globals.LibraryReferenceArg) {
+	res, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
+		Instance: instance,
+		Query:    libRef.Name,
+	})
+	if err != nil {
+		return
+	}
+	candidates := []*rpc.SearchedLibrary{}
+	for _, foundLib := range res.GetLibraries() {
+		if strings.ToLower(foundLib.GetName()) == strings.ToLower(libRef.Name) {
+			candidates = append(candidates, foundLib)
+		}
+	}
+	if len(candidates) != 1 {
+		return
+	}
+	libRef.Name = candidates[0].GetName()
+}
+
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
 	libRefs, err := globals.ParseLibraryReferenceArgs(args)
 	if err != nil {
 		feedback.Errorf("Arguments error: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
+	}
+
+	for _, libRef := range libRefs {
+		adjustLibraryReferenceArgCaseSensitivty(instance, libRef)
 	}
 
 	toInstall := map[string]*rpc.LibraryDependencyStatus{}
