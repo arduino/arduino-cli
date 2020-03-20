@@ -49,7 +49,7 @@ var installFlags struct {
 	noDeps bool
 }
 
-func adjustLibraryReferenceArgCaseSensitivty(instance *rpc.Instance, libRef *globals.LibraryReferenceArg) {
+func adjustLibraryReferenceArgCaseSensitivty(instance *rpc.Instance, libRef *LibraryReferenceArg) {
 	res, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
 		Instance: instance,
 		Query:    libRef.Name,
@@ -71,7 +71,7 @@ func adjustLibraryReferenceArgCaseSensitivty(instance *rpc.Instance, libRef *glo
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
-	libRefs, err := globals.ParseLibraryReferenceArgs(args)
+	libRefs, err := ParseLibraryReferenceArgs(args)
 	if err != nil {
 		feedback.Errorf("Arguments error: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
