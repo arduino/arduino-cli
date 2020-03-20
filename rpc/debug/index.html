@@ -850,13 +850,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance" class="md-nav__link">
-    Instance
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#debug" class="md-nav__link">
     Debug
   </a>
@@ -996,13 +989,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#instance" class="md-nav__link">
-    Instance
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#debug" class="md-nav__link">
     Debug
   </a>
@@ -1047,9 +1033,8 @@
 <ul>
 <li><a href="#cc.arduino.cli.debug.DebugConfigReq">DebugConfigReq</a></li>
 <li><a href="#cc.arduino.cli.debug.DebugReq">DebugReq</a></li>
-<li><a href="#cc.arduino.cli.debug.DebugResp">DebugResp</a></li>
 <li>
-<p><a href="#cc.arduino.cli.debug.Instance">Instance</a></p>
+<p><a href="#cc.arduino.cli.debug.DebugResp">DebugResp</a></p>
 </li>
 <li>
 <p><a href="#cc.arduino.cli.debug.Debug">Debug</a></p>
@@ -1077,7 +1062,7 @@
 <tbody>
 <tr>
 <td>instance</td>
-<td><a href="#cc.arduino.cli.debug.Instance">Instance</a></td>
+<td><a href="#cc.arduino.cli.commands.Instance">cc.arduino.cli.commands.Instance</a></td>
 <td></td>
 <td></td>
 </tr>
@@ -1095,6 +1080,12 @@
 </tr>
 <tr>
 <td>port</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>interpreter</td>
 <td><a href="#string">string</a></td>
 <td></td>
 <td></td>
@@ -1172,27 +1163,6 @@ and must not contain a <code>DebugReq</code> message.</p>
 <tr>
 <td>error</td>
 <td><a href="#string">string</a></td>
-<td></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.debug.Instance"></a></p>
-<h3 id="instance">Instance<a class="headerlink" href="#instance" title="Permanent link">&para;</a></h3>
-<p>TODO remove this in next proto refactoring because is a duplicate from commands/common.proto</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>id</td>
-<td><a href="#int32">int32</a></td>
 <td></td>
 <td></td>
 </tr>
