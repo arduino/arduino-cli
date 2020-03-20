@@ -92,6 +92,13 @@ def test_uninstall_spaces(run_command):
     assert result.ok
     assert len(json.loads(result.stdout)) == 0
 
+def test_lib_ops_caseinsensitive(run_command):
+    key = 'pcm'
+    assert run_command("lib install {}".format(key))
+    assert run_command("lib uninstall {}".format(key))
+    result = run_command("lib list --format json")
+    assert result.ok
+    assert len(json.loads(result.stdout)) == 0
 
 def test_search(run_command):
     assert run_command("lib update-index")
