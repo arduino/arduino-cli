@@ -44,13 +44,13 @@ func initDepsCommand() *cobra.Command {
 }
 
 func runDepsCommand(cmd *cobra.Command, args []string) {
-	libRef, err := ParseLibraryReferenceArg(args[0])
+	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
+	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance, args[0])
 	if err != nil {
 		feedback.Errorf("Arguments error: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
-	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
 	deps, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesReq{
 		Instance: instance,
 		Name:     libRef.Name,

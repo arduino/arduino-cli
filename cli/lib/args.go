@@ -16,8 +16,12 @@
 package lib
 
 import (
+	"context"
 	"fmt"
 	"strings"
+
+	"github.com/arduino/arduino-cli/commands/lib"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
 // LibraryReferenceArg is a command line argument that reference a library.
@@ -60,6 +64,44 @@ func ParseLibraryReferenceArgs(args []string) ([]*LibraryReferenceArg, error) {
 	ret := []*LibraryReferenceArg{}
 	for _, arg := range args {
 		if reference, err := ParseLibraryReferenceArg(arg); err == nil {
+			ret = append(ret, reference)
+		} else {
+			return nil, err
+		}
+	}
+	return ret, nil
+}
+
+// ParseLibraryReferenceArgAndAdjustCase parse a command line argument that reference a
+// library and possibly adjust the case of the name to match a library in the index
+func ParseLibraryReferenceArgAndAdjustCase(instance *rpc.Instance, arg string) (*LibraryReferenceArg, error) {
+	libRef, err := ParseLibraryReferenceArg(arg)
+	res, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
+		Instance: instance,
+		Query:    libRef.Name,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	candidates := []*rpc.SearchedLibrary{}
+	for _, foundLib := range res.GetLibraries() {
+		if strings.ToLower(foundLib.GetName()) == strings.ToLower(libRef.Name) {
+			candidates = append(candidates, foundLib)
+		}
+	}
+	if len(candidates) == 1 {
+		libRef.Name = candidates[0].GetName()
+	}
+	return libRef, nil
+}
+
+// ParseLibraryReferenceArgsAndAdjustCase is a convenient wrapper that operates on a slice of
+// strings and calls ParseLibraryReferenceArgAndAdjustCase for each of them. It returns at the first invalid argument.
+func ParseLibraryReferenceArgsAndAdjustCase(instance *rpc.Instance, args []string) ([]*LibraryReferenceArg, error) {
+	ret := []*LibraryReferenceArg{}
+	for _, arg := range args {
+		if reference, err := ParseLibraryReferenceArgAndAdjustCase(instance, arg); err == nil {
 			ret = append(ret, reference)
 		} else {
 			return nil, err
