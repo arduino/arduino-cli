@@ -126,12 +126,6 @@ func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) 
 		return nil, errors.Wrap(err, "opening sketch")
 	}
 
-	// FIXME: make a specification on how a port is specified via command line
-	port := req.GetPort()
-	if port == "" {
-		return nil, fmt.Errorf("no debug port provided")
-	}
-
 	fqbnIn := req.GetFqbn()
 	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
 		fqbnIn = sketch.Metadata.CPU.Fqbn
@@ -227,19 +221,32 @@ func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) 
 	}
 
 	// Set debug port property
-	toolProperties.Set("debug.port", port)
-	if strings.HasPrefix(port, "/dev/") {
-		toolProperties.Set("debug.port.file", port[5:])
+	port := req.GetPort()
+	if port != "" {
+		toolProperties.Set("debug.port", port)
+		if strings.HasPrefix(port, "/dev/") {
+			toolProperties.Set("debug.port.file", port[5:])
+		} else {
+			toolProperties.Set("debug.port.file", port)
+		}
+	}
+
+	// Set debugger interpreter (default value should be "console")
+	interpreter := req.GetInterpreter()
+	if interpreter != "" {
+		toolProperties.Set("interpreter", interpreter)
 	} else {
-		toolProperties.Set("debug.port.file", port)
+		toolProperties.Set("interpreter", "console")
 	}
 
 	// Build recipe for tool
 	recipe := toolProperties.Get("debug.pattern")
-	// REMOVEME: hotfix for samd core 1.8.5
+
+	// REMOVEME: hotfix for samd core 1.8.5/1.8.6
 	if recipe == `"{path}/{cmd}" --interpreter=mi2 -ex "set pagination off" -ex 'target extended-remote | {tools.openocd.path}/{tools.openocd.cmd} -s "{tools.openocd.path}/share/openocd/scripts/" --file "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "gdb_port pipe" -c "telnet_port 0"' {build.path}/{build.project_name}.elf` {
-		recipe = `"{path}/{cmd}" --interpreter=mi2 -ex "set remotetimeout 5" -ex "set pagination off" -ex 'target extended-remote | "{tools.openocd.path}/{tools.openocd.cmd}" -s "{tools.openocd.path}/share/openocd/scripts/" --file "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "gdb_port pipe" -c "telnet_port 0"' "{build.path}/{build.project_name}.elf"`
+		recipe = `"{path}/{cmd}" --interpreter={interpreter} -ex "set remotetimeout 5" -ex "set pagination off" -ex 'target extended-remote | "{tools.openocd.path}/{tools.openocd.cmd}" -s "{tools.openocd.path}/share/openocd/scripts/" --file "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "gdb_port pipe" -c "telnet_port 0"' "{build.path}/{build.project_name}.elf"`
 	}
+
 	cmdLine := toolProperties.ExpandPropsInString(recipe)
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 	if err != nil {

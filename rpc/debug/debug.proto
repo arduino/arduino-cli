@@ -19,10 +19,12 @@ package cc.arduino.cli.debug;
 
 option go_package = "github.com/arduino/arduino-cli/rpc/debug";
 
+import "commands/common.proto";
 
 // Service that abstract a debug Session usage
 service Debug {
-    rpc Debug(stream DebugReq) returns (stream DebugResp) { }
+    rpc Debug (stream DebugReq) returns (stream DebugResp) {
+    }
 }
 
 // The top-level message sent by the client for the `Debug` method.
@@ -46,20 +48,17 @@ message DebugReq {
 }
 
 message DebugConfigReq {
-    Instance instance = 1;
+    cc.arduino.cli.commands.Instance instance = 1;
     string fqbn = 2;
     string sketch_path = 3;
     string port = 4;
-    bool verbose = 5;
+    string interpreter = 5;
+    bool verbose = 6;
     string import_file = 7;
 }
-
 
 //
 message DebugResp {
     bytes data = 1;
     string error = 2;
 }
-
-// TODO remove this in next proto refactoring because is a duplicate from commands/common.proto
-message Instance { int32 id = 1; }

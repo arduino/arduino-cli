@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/assert"
@@ -45,14 +46,13 @@ func TestGetCommandLine(t *testing.T) {
 
 	// Arduino Zero has an integrated debugger port, anc it could be debugged directly using USB
 	req := &dbg.DebugConfigReq{
-		Instance:   &dbg.Instance{Id: 1},
+		Instance:   &rpc.Instance{Id: 1},
 		Fqbn:       "arduino-test:samd:arduino_zero_edbg",
 		SketchPath: sketchPath.String(),
-		Port:       "none",
 	}
 
 	goldCommand := fmt.Sprintf("%s/arduino-test/tools/arm-none-eabi-gcc/7-2017q4/bin//arm-none-eabi-gdb%s", dataDir, toolExtension) +
-		" -ex target extended-remote |" +
+		" --interpreter=console -ex target extended-remote |" +
 		fmt.Sprintf(" %s/arduino-test/tools/openocd/0.10.0-arduino7/bin/openocd%s", dataDir, toolExtension) +
 		fmt.Sprintf(" -s \"%s/arduino-test/tools/openocd/0.10.0-arduino7/share/openocd/scripts/\"", dataDir) +
 		fmt.Sprintf(" --file \"%s/arduino-test/samd/variants/arduino_zero/openocd_scripts/arduino_zero.cfg\"", customHardware) +
@@ -66,14 +66,14 @@ func TestGetCommandLine(t *testing.T) {
 	// Other samd boards such as mkr1000 can be debugged using an external tool such as Atmel ICE connected to
 	// the board debug port
 	req2 := &dbg.DebugConfigReq{
-		Instance:   &dbg.Instance{Id: 1},
-		Fqbn:       "arduino-test:samd:mkr1000",
-		SketchPath: sketchPath.String(),
-		Port:       "none",
+		Instance:    &rpc.Instance{Id: 1},
+		Fqbn:        "arduino-test:samd:mkr1000",
+		SketchPath:  sketchPath.String(),
+		Interpreter: "mi1",
 	}
 
 	goldCommand2 := fmt.Sprintf("%s/arduino-test/tools/arm-none-eabi-gcc/7-2017q4/bin//arm-none-eabi-gdb%s", dataDir, toolExtension) +
-		" -ex target extended-remote |" +
+		" --interpreter=mi1 -ex target extended-remote |" +
 		fmt.Sprintf(" %s/arduino-test/tools/openocd/0.10.0-arduino7/bin/openocd%s", dataDir, toolExtension) +
 		fmt.Sprintf(" -s \"%s/arduino-test/tools/openocd/0.10.0-arduino7/share/openocd/scripts/\"", dataDir) +
 		fmt.Sprintf(" --file \"%s/arduino-test/samd/variants/mkr1000/openocd_scripts/arduino_zero.cfg\"", customHardware) +
