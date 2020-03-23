@@ -123,7 +123,12 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir())
 
 	if req.GetBuildPath() != "" {
-		builderCtx.BuildPath = paths.New(req.GetBuildPath())
+		if req.GetBuildPath() != "/" {
+			builderCtx.BuildPath = paths.New(req.GetSketchPath() + strings.TrimPrefix(req.GetBuildPath(), "."))
+		} else {
+			builderCtx.BuildPath = paths.New(req.GetBuildPath())
+		}
+
 		err = builderCtx.BuildPath.MkdirAll()
 		if err != nil {
 			return nil, fmt.Errorf("cannot create build directory: %s", err)

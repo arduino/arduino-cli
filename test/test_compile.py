@@ -84,6 +84,42 @@ def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
     assert result.ok
     assert os.path.exists(target)
 
+def test_build_path_flag(run_command, data_dir, working_dir):
+    # Init the environment explicitly
+    result = run_command("core update-index")
+    assert result.ok
+
+    # Download latest AVR
+    result = run_command("core install arduino:avr")
+    assert result.ok
+
+    # Create a test sketch
+    sketch_path = os.path.join(data_dir, "test_output_flag_default_path")
+    fqbn = "arduino:avr:uno"
+    result = run_command("sketch new {}".format(sketch_path))
+    assert result.ok
+
+    build_file_path = os.path.join(data_dir, "test_output_flag_default_path","build","test_output_flag_default_path.ino.hex")
+
+    # Test the --build-path flag for a relative build path
+    result = run_command(
+        "compile -b {fqbn} {sketch_path} --build-path ./build".format(
+            fqbn=fqbn, sketch_path=sketch_path
+        )
+    )
+    assert result.ok
+    assert os.path.exists(build_file_path)
+
+    abs_build_path = os.path.join(sketch_path, "/build")
+
+    # Test the --build-path flag for a absolute build path
+    result = run_command(
+        "compile -b {fqbn} {sketch_path} --build-path {abs_build_path}".format(
+            fqbn=fqbn, sketch_path=sketch_path, abs_build_path=abs_build_path
+        )
+    )
+    assert result.ok
+    assert os.path.exists(build_file_path)
 
 @pytest.mark.skipif(
     running_on_ci() and platform.system() == "Windows",
