@@ -182,28 +182,28 @@
               "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/JLink_MacOSX_V630c.pkg",
               "archiveFileName": "JLink_MacOSX_V630c.pkg",
               "checksum": "SHA-256:",
-              "size": ""
+              "size": "0"
             },
             {
               "host": "x86_64-pc-linux-gnu",
               "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/JLink_Linux_V630c_x86_64.tgz",
               "archiveFileName": "JLink_Linux_V630c_x86_64.tgz",
               "checksum": "SHA-256:",
-              "size": ""
+              "size": "0"
             },
             {
               "host": "i686-pc-linux-gnu",
               "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/JLink_Linux_V630c_i386.tgz",
               "archiveFileName": "JLink_Linux_V630c_i386.tgz",
               "checksum": "SHA-256:",
-              "size": ""
+              "size": "0"
             },
             {
               "host": "arm-linux-gnueabihf",
               "url": "http://zoubworld.hd.free.fr/~zoubworld_Arduino/files/Release/JLink_Linux_V630c_arm.tgz",
               "archiveFileName": "JLink_Linux_V630c_arm.tgz",
               "checksum": "SHA-256:",
-              "size": ""
+              "size": "0"
             },
             {
               "host": "all",
