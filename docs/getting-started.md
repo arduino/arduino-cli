@@ -1,5 +1,5 @@
-Despite there's no feature parity at the moment, Arduino CLI provides many of
-the features you can find in the Arduino IDE, let's see some examples.
+Despite the lack of feature parity at the moment, Arduino CLI provides many of
+the features you can find in the Arduino IDE. Let's see some examples.
 
 ## Before you start
 
@@ -44,15 +44,15 @@ Use "arduino-cli core [command] --help" for more information about a command.
 
 Arduino CLI doesn't strictly require a configuration file to work because the
 command line interface provides any possible functionality. However, having one
-can spare you a lot of typing when issuing a command, so let's create it
-right ahead with:
+can spare you a lot of typing when issuing a command, so let's go ahead and
+create it with:
 
 ```sh
 $ arduino-cli config init
 Config file written: /home/luca/.arduino15/arduino-cli.yaml
 ```
 
-If you inspect `arduino-cli.yaml` contents, you'll find out the available
+If you inspect the contents of `arduino-cli.yaml`, you'll find the available
 options with their respective default values.
 
 ## Create a new sketch
@@ -104,7 +104,7 @@ $ arduino-cli core update-index
 Updating index: package_index.json downloaded
 ```
 
-After connecting the board to your PCs by using the USB cable, you should be
+After connecting the board to your PC by using the USB cable, you should be
 able to check whether it's been recognized by running:
 
 ```sh
@@ -198,8 +198,8 @@ ID              Version Name
 esp8266:esp8266 2.5.2   esp8266
 ```
 
-Alternatively, you can pass a link to the the additional package index file with
-the `--additional-urls` option, that has to be specified every time and for every
+Alternatively, you can pass a link to the additional package index file with the
+`--additional-urls` option, that has to be specified every time and for every
 command that operates on a 3rd party platform core, for example:
 
 ```sh
@@ -213,7 +213,7 @@ esp8266:esp8266 2.5.2   esp8266
 
 ## Compile and upload the sketch
 
-To compile the sketch you run the `compile` command passing the proper FQBN
+To compile the sketch you run the `compile` command, passing the proper FQBN
 string:
 
 ```sh

@@ -30,7 +30,7 @@ curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.
 You can download the latest version of the pre-built binaries for the supported
 platforms from the [release page](https://github.com/arduino/arduino-cli/releases)
 or following the links in the following table. Once downloaded, extract the
-binary `arduino-cli` into a directory that's is in your `PATH`.
+binary `arduino-cli` into a directory that is in your `PATH`.
 
 Platform  |                    |                    |
 --------- | ------------------ | ------------------ |

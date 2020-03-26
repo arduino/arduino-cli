@@ -1,10 +1,11 @@
-This specification is a 3rd party Hardware format to be used in Arduino IDE starting from 1.5.x series.<br>
+This specification is a 3rd party hardware format to be used in Arduino IDE starting from 1.5.x series.<br>
 This specification allows a 3rd party vendor/maintainer to add support for new boards inside the Arduino IDE by providing a file to unzip into the *hardware* folder of Arduino's sketchbook folder.<br>
 It is also possible to add new 3rd party boards by providing just one configuration file.
 
 ## Hardware Folders structure
 
 The new hardware folders have a hierarchical structure organized in two levels:
+
   - the first level is the vendor/maintainer
   - the second level is the supported architecture
 
@@ -57,7 +58,7 @@ will set the property **tools.bossac.cmd** to the value **bossac** on Linux and 
 
 #### Global Predefined properties
 
-The Arduino IDE sets the following properties that can be used globally in all configurations files:
+The Arduino IDE sets the following properties that can be used globally in all configuration files:
 
 * `{runtime.platform.path}`: the absolute path of the [board platform](#platform-terminology) folder (i.e. the folder containing boards.txt)
 * `{runtime.hardware.path}`: the absolute path of the hardware folder (i.e. the folder containing the [board platform](#platform-terminology) folder)
@@ -79,13 +80,14 @@ The following meta-data must be defined:
     version=1.5.3
 
 The **name** will be shown in the Boards menu of the Arduino IDE.<br>
-The **version** is currently unused, it is reserved for future use (probably together with the libraries manager to handle dependencies on cores).
+The **version** is currently unused, it is reserved for future use (probably together with the Boards Manager to handle dependencies on cores).
 
 ### Build process
 
 The platform.txt file is used to configure the build process performed by the Arduino IDE. This is done through a list of **recipes**. Each recipe is a command line expression that explains how to call the compiler (or other tools) for every build step and which parameter should be passed.
 
-The Arduino IDE, before starting the build, determines the list of files to compile. The list is composed by:
+The Arduino IDE, before starting the build, determines the list of files to compile. The list is composed of:
+
 - the user's Sketch
 - source code in the selected board's Core
 - source code in the Libraries used in the sketch
@@ -413,7 +415,7 @@ In this example if the user enables verbose mode, then **{upload.params.verbose}
 
     tools.avrdude.upload.params.verbose    =>    upload.verbose
 
-If the user didn't enable verbose mode, the **{upload.params.quiet}** is used in **{upload.verbose}**:
+If the user didn't enable verbose mode, then **{upload.params.quiet}** is used in **{upload.verbose}**:
 
     tools.avrdude.upload.params.quiet      =>    upload.verbose
 
@@ -429,7 +431,7 @@ A specific **upload.tool** property should be defined for every board in boards.
     leonardo.upload.tool=avrdude
     [......]
 
-Also other upload parameters can be defined together, for example in the Arduino boards.txt we have:
+Also other upload parameters can be defined together, for example in the Arduino AVR Boards boards.txt we have:
 
     [.....]
     uno.name=Arduino Uno
@@ -453,15 +455,15 @@ Most **{upload.XXXX}** variables are used later in the avrdude upload recipe in 
     tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
     [.....]
 
-#### 1200bps bootloader reset
-Most Arduino boards use a dedicated USB-to-serial chip, that takes care of restarting the main MCU (starting the bootloader) when the serial port is opened. However, boards that have a native USB connection (such as the Leonardo or Zero) will have to disconnect from USB when rebooting into the bootloader (after which the bootloader reconnects to USB and offers a new serial port for uploading). After the upload is complete, the bootloader disconnects from USB again, starts the sketch, which then reconnects to USB. Because of these reconnections, the standard restart-on-serial open will not work, since that would cause the serial port to disappear and be closed again. Instead, the sketch running on these boards interpret a bitrate of 1200bps as a signal the bootloader should be started.
+#### 1200 bps bootloader reset
+Most Arduino boards use a dedicated USB-to-serial chip, that takes care of restarting the main MCU (starting the bootloader) when the serial port is opened. However, boards that have a native USB connection (such as the Leonardo or Zero) will have to disconnect from USB when rebooting into the bootloader (after which the bootloader reconnects to USB and offers a new serial port for uploading). After the upload is complete, the bootloader disconnects from USB again, starts the sketch, which then reconnects to USB. Because of these reconnections, the standard restart-on-serial open will not work, since that would cause the serial port to disappear and be closed again. Instead, the sketch running on these boards interprets a bitrate of 1200 bps as a signal the bootloader should be started.
 
 To let the IDE perform these steps, two board parameters can be set:
 
-* `use_1200bps_touch` causes the IDE to briefly open the selected serial port at 1200bps (8N1) before starting the upload.
-* `wait_for_upload_port` causes the IDE to wait for the serial port to (re)appear before and after the upload. This is only used when `use_1200bps_touch` is also set.  When set, after doing the 1200bps touch, the IDE will wait for a new serial port to appear and use that as the port for uploads. Alternatively, if the original port does not disappear within a few seconds, the upload continues with the original port (which can be the case if the board was already put into bootloader manually, or the IDE missed the disconnect and reconnect). Additionally, after the upload is complete, the IDE again waits for a new port to appear (or the originally selected port to be present).
+* `use_1200bps_touch` causes the IDE to briefly open the selected serial port at 1200 bps (8N1) before starting the upload.
+* `wait_for_upload_port` causes the IDE to wait for the serial port to (re)appear before and after the upload. This is only used when `use_1200bps_touch` is also set.  When set, after doing the 1200 bps touch, the IDE will wait for a new serial port to appear and use that as the port for uploads. Alternatively, if the original port does not disappear within a few seconds, the upload continues with the original port (which can be the case if the board was already put into bootloader manually, or the IDE missed the disconnect and reconnect). Additionally, after the upload is complete, the IDE again waits for a new port to appear (or the originally selected port to be present).
 
-Note that the IDE implementation of this 1200bps touch has some peculiarities, and the newer `arduino-cli` implementation also seems different (does not wait for the port after the reset, which is probably only needed in the IDE to prevent opening the wrong port on the serial monitor, and does not have a shorter timeout when the port never disappears).
+Note that the IDE implementation of this 1200 bps touch has some peculiarities, and the newer `arduino-cli` implementation also seems different (does not wait for the port after the reset, which is probably only needed in the IDE to prevent opening the wrong port on the serial monitor, and does not have a shorter timeout when the port never disappears).
 
 ### Serial port
 
@@ -554,7 +556,7 @@ Note that we don't need to specify any architecture since the same architecture 
 
 The platform.txt settings are inherited from the referenced core platform, thus there is no need to provide a platform.txt unless there are some specific properties that need to be overridden.
 
-The libraries from the referenced platform are used, thus there is no need to provide a libraries. If libraries are provided the list of available libraries are the sum of the 2 libraries where the referencing platform has priority over the referenced platform.
+The libraries from the referenced platform are used, thus there is no need to provide those libraries. If libraries are provided the list of available libraries are the sum of the 2 libraries where the referencing platform has priority over the referenced platform.
 
 In the same way we can use variants and tools defined on another platform:
 
@@ -570,6 +572,7 @@ Note that referencing a variant in another platform does *not* inherit any prope
 
 ### Platform Terminology
 Because boards can reference cores, variants and tools in different platforms, this means that a single build or upload can use data from up to four different platforms. To keep this clear, the following terminology is used:
+
 * The "board platform" is the platform that defines the currently selected board (e.g. the platform that contains the board.txt the board is defined in.
 * The "core platform" is the the platform that contains the core to be used.
 * The "variant platform" is the platform that contains the variant to be used.
