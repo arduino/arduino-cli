@@ -1049,8 +1049,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1200bps-bootloader-reset" class="md-nav__link">
-    1200bps bootloader reset
+  <a href="#1200-bps-bootloader-reset" class="md-nav__link">
+    1200 bps bootloader reset
   </a>
   
 </li>
@@ -1369,8 +1369,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1200bps-bootloader-reset" class="md-nav__link">
-    1200bps bootloader reset
+  <a href="#1200-bps-bootloader-reset" class="md-nav__link">
+    1200 bps bootloader reset
   </a>
   
 </li>
@@ -1466,13 +1466,15 @@
                 
                   <h1>Platform specification</h1>
                 
-                <p>This specification is a 3<sup>rd</sup> party Hardware format to be used in Arduino IDE starting from 1.5.x series.<br>
+                <p>This specification is a 3<sup>rd</sup> party hardware format to be used in Arduino IDE starting from 1.5.x series.<br>
 This specification allows a 3<sup>rd</sup> party vendor/maintainer to add support for new boards inside the Arduino IDE by providing a file to unzip into the <em>hardware</em> folder of Arduino's sketchbook folder.<br>
 It is also possible to add new 3<sup>rd</sup> party boards by providing just one configuration file.</p>
 <h2 id="hardware-folders-structure">Hardware Folders structure<a class="headerlink" href="#hardware-folders-structure" title="Permanent link">&para;</a></h2>
-<p>The new hardware folders have a hierarchical structure organized in two levels:
-  - the first level is the vendor/maintainer
-  - the second level is the supported architecture</p>
+<p>The new hardware folders have a hierarchical structure organized in two levels:</p>
+<ul>
+<li>the first level is the vendor/maintainer</li>
+<li>the second level is the supported architecture</li>
+</ul>
 <p>A vendor/maintainer can have multiple supported architectures. For example, below we have three hardware vendors called "arduino", "yyyyy" and "xxxxx":</p>
 <div class="codehilite"><pre><span></span><code>hardware/arduino/avr/...     - Arduino - AVR Boards
 hardware/arduino/sam/...     - Arduino - SAM (32bit ARM) Boards
@@ -1517,7 +1519,7 @@ tools.bossac.cmd.windows=bossac.exe
 
 <p>will set the property <strong>tools.bossac.cmd</strong> to the value <strong>bossac</strong> on Linux and Mac OS and <strong>bossac.exe</strong> on Windows. Suffixes <a href="https://github.com/arduino/Arduino/blob/1.8.12/arduino-core/src/processing/app/helpers/PreferencesMap.java#L110-L112">supported</a> are <code>.linux</code>, <code>.windows</code> and <code>.macosx</code>.</p>
 <h4 id="global-predefined-properties">Global Predefined properties<a class="headerlink" href="#global-predefined-properties" title="Permanent link">&para;</a></h4>
-<p>The Arduino IDE sets the following properties that can be used globally in all configurations files:</p>
+<p>The Arduino IDE sets the following properties that can be used globally in all configuration files:</p>
 <ul>
 <li><code>{runtime.platform.path}</code>: the absolute path of the <a href="#platform-terminology">board platform</a> folder (i.e. the folder containing boards.txt)</li>
 <li><code>{runtime.hardware.path}</code>: the absolute path of the hardware folder (i.e. the folder containing the <a href="#platform-terminology">board platform</a> folder)</li>
@@ -1537,13 +1539,15 @@ version=1.5.3
 
 
 <p>The <strong>name</strong> will be shown in the Boards menu of the Arduino IDE.<br>
-The <strong>version</strong> is currently unused, it is reserved for future use (probably together with the libraries manager to handle dependencies on cores).</p>
+The <strong>version</strong> is currently unused, it is reserved for future use (probably together with the Boards Manager to handle dependencies on cores).</p>
 <h3 id="build-process">Build process<a class="headerlink" href="#build-process" title="Permanent link">&para;</a></h3>
 <p>The platform.txt file is used to configure the build process performed by the Arduino IDE. This is done through a list of <strong>recipes</strong>. Each recipe is a command line expression that explains how to call the compiler (or other tools) for every build step and which parameter should be passed.</p>
-<p>The Arduino IDE, before starting the build, determines the list of files to compile. The list is composed by:
-- the user's Sketch
-- source code in the selected board's Core
-- source code in the Libraries used in the sketch</p>
+<p>The Arduino IDE, before starting the build, determines the list of files to compile. The list is composed of:</p>
+<ul>
+<li>the user's Sketch</li>
+<li>source code in the selected board's Core</li>
+<li>source code in the Libraries used in the sketch</li>
+</ul>
 <p>The IDE creates a temporary folder to store the build artifacts whose path is available through the global property <strong>{build.path}</strong>. A property <strong>{build.project_name}</strong> with the name of the project and a property <strong>{build.arch}</strong> with the name of the architecture is set as well.</p>
 <ul>
 <li><code>{build.path}</code>: The path to the temporary folder to store build artifacts</li>
@@ -1844,7 +1848,7 @@ tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; 
 </code></pre></div>
 
 
-<p>If the user didn't enable verbose mode, the <strong>{upload.params.quiet}</strong> is used in <strong>{upload.verbose}</strong>:</p>
+<p>If the user didn't enable verbose mode, then <strong>{upload.params.quiet}</strong> is used in <strong>{upload.verbose}</strong>:</p>
 <div class="codehilite"><pre><span></span><code>tools.avrdude.upload.params.quiet      =&gt;    upload.verbose
 </code></pre></div>
 
@@ -1861,7 +1865,7 @@ leonardo.upload.tool=avrdude
 </code></pre></div>
 
 
-<p>Also other upload parameters can be defined together, for example in the Arduino boards.txt we have:</p>
+<p>Also other upload parameters can be defined together, for example in the Arduino AVR Boards boards.txt we have:</p>
 <div class="codehilite"><pre><span></span><code>[.....]
 uno.name=Arduino Uno
 uno.upload.tool=avrdude
@@ -1887,14 +1891,14 @@ tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; 
 </code></pre></div>
 
 
-<h4 id="1200bps-bootloader-reset">1200bps bootloader reset<a class="headerlink" href="#1200bps-bootloader-reset" title="Permanent link">&para;</a></h4>
-<p>Most Arduino boards use a dedicated USB-to-serial chip, that takes care of restarting the main MCU (starting the bootloader) when the serial port is opened. However, boards that have a native USB connection (such as the Leonardo or Zero) will have to disconnect from USB when rebooting into the bootloader (after which the bootloader reconnects to USB and offers a new serial port for uploading). After the upload is complete, the bootloader disconnects from USB again, starts the sketch, which then reconnects to USB. Because of these reconnections, the standard restart-on-serial open will not work, since that would cause the serial port to disappear and be closed again. Instead, the sketch running on these boards interpret a bitrate of 1200bps as a signal the bootloader should be started.</p>
+<h4 id="1200-bps-bootloader-reset">1200 bps bootloader reset<a class="headerlink" href="#1200-bps-bootloader-reset" title="Permanent link">&para;</a></h4>
+<p>Most Arduino boards use a dedicated USB-to-serial chip, that takes care of restarting the main MCU (starting the bootloader) when the serial port is opened. However, boards that have a native USB connection (such as the Leonardo or Zero) will have to disconnect from USB when rebooting into the bootloader (after which the bootloader reconnects to USB and offers a new serial port for uploading). After the upload is complete, the bootloader disconnects from USB again, starts the sketch, which then reconnects to USB. Because of these reconnections, the standard restart-on-serial open will not work, since that would cause the serial port to disappear and be closed again. Instead, the sketch running on these boards interprets a bitrate of 1200 bps as a signal the bootloader should be started.</p>
 <p>To let the IDE perform these steps, two board parameters can be set:</p>
 <ul>
-<li><code>use_1200bps_touch</code> causes the IDE to briefly open the selected serial port at 1200bps (8N1) before starting the upload.</li>
-<li><code>wait_for_upload_port</code> causes the IDE to wait for the serial port to (re)appear before and after the upload. This is only used when <code>use_1200bps_touch</code> is also set.  When set, after doing the 1200bps touch, the IDE will wait for a new serial port to appear and use that as the port for uploads. Alternatively, if the original port does not disappear within a few seconds, the upload continues with the original port (which can be the case if the board was already put into bootloader manually, or the IDE missed the disconnect and reconnect). Additionally, after the upload is complete, the IDE again waits for a new port to appear (or the originally selected port to be present).</li>
+<li><code>use_1200bps_touch</code> causes the IDE to briefly open the selected serial port at 1200 bps (8N1) before starting the upload.</li>
+<li><code>wait_for_upload_port</code> causes the IDE to wait for the serial port to (re)appear before and after the upload. This is only used when <code>use_1200bps_touch</code> is also set.  When set, after doing the 1200 bps touch, the IDE will wait for a new serial port to appear and use that as the port for uploads. Alternatively, if the original port does not disappear within a few seconds, the upload continues with the original port (which can be the case if the board was already put into bootloader manually, or the IDE missed the disconnect and reconnect). Additionally, after the upload is complete, the IDE again waits for a new port to appear (or the originally selected port to be present).</li>
 </ul>
-<p>Note that the IDE implementation of this 1200bps touch has some peculiarities, and the newer <code>arduino-cli</code> implementation also seems different (does not wait for the port after the reset, which is probably only needed in the IDE to prevent opening the wrong port on the serial monitor, and does not have a shorter timeout when the port never disappears).</p>
+<p>Note that the IDE implementation of this 1200 bps touch has some peculiarities, and the newer <code>arduino-cli</code> implementation also seems different (does not wait for the port after the reset, which is probably only needed in the IDE to prevent opening the wrong port on the serial monitor, and does not have a shorter timeout when the port never disappears).</p>
 <h3 id="serial-port">Serial port<a class="headerlink" href="#serial-port" title="Permanent link">&para;</a></h3>
 <p>The Arduino IDE auto-detects all available serial ports on the running system and lets the user choose one from the GUI. The selected port is available as a configuration property <strong>{serial.port}</strong>.</p>
 <h3 id="upload-using-an-external-programmer">Upload using an external programmer<a class="headerlink" href="#upload-using-an-external-programmer" title="Permanent link">&para;</a></h3>
@@ -1978,7 +1982,7 @@ myboard.build.core=arduino:arduino
 
 <p>Note that we don't need to specify any architecture since the same architecture of "myboard" is used, so we just say "arduino:arduino" instead of "arduino:avr:arduino".</p>
 <p>The platform.txt settings are inherited from the referenced core platform, thus there is no need to provide a platform.txt unless there are some specific properties that need to be overridden.</p>
-<p>The libraries from the referenced platform are used, thus there is no need to provide a libraries. If libraries are provided the list of available libraries are the sum of the 2 libraries where the referencing platform has priority over the referenced platform.</p>
+<p>The libraries from the referenced platform are used, thus there is no need to provide those libraries. If libraries are provided the list of available libraries are the sum of the 2 libraries where the referencing platform has priority over the referenced platform.</p>
 <p>In the same way we can use variants and tools defined on another platform:</p>
 <div class="codehilite"><pre><span></span><code>[....]
 myboard.build.variant=arduino:standard
@@ -1991,11 +1995,13 @@ myboard.bootloader.tool=arduino:avrdude
 <p>Using this syntax allows us to reduce the minimum set of files needed to define a new "hardware" to just the boards.txt file.</p>
 <p>Note that referencing a variant in another platform does <em>not</em> inherit any properties from that platform's platform.txt (like referencing a core does).</p>
 <h3 id="platform-terminology">Platform Terminology<a class="headerlink" href="#platform-terminology" title="Permanent link">&para;</a></h3>
-<p>Because boards can reference cores, variants and tools in different platforms, this means that a single build or upload can use data from up to four different platforms. To keep this clear, the following terminology is used:
-* The "board platform" is the platform that defines the currently selected board (e.g. the platform that contains the board.txt the board is defined in.
-* The "core platform" is the the platform that contains the core to be used.
-* The "variant platform" is the platform that contains the variant to be used.
-* The "tool platform" is the platform that contains the tool used for the current operation.</p>
+<p>Because boards can reference cores, variants and tools in different platforms, this means that a single build or upload can use data from up to four different platforms. To keep this clear, the following terminology is used:</p>
+<ul>
+<li>The "board platform" is the platform that defines the currently selected board (e.g. the platform that contains the board.txt the board is defined in.</li>
+<li>The "core platform" is the the platform that contains the core to be used.</li>
+<li>The "variant platform" is the platform that contains the variant to be used.</li>
+<li>The "tool platform" is the platform that contains the tool used for the current operation.</li>
+</ul>
 <p>In the most common case, without any references, all of these will refer to the same platform.</p>
 <p>Note that the above terminology is not in widespread use, but was invented for clarity within this document. In the actual arduino-cli code, the "board platform" is called <code>targetPlatform</code>, the "core platform" is called <code>actualPlatform</code>, the others are pretty much nameless.</p>
 <h2 id="boardslocaltxt">boards.local.txt<a class="headerlink" href="#boardslocaltxt" title="Permanent link">&para;</a></h2>

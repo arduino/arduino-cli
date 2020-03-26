@@ -1083,9 +1083,9 @@ at the end of the build, you should find an <code>arduino-cli</code> executable 
 same folder.</p>
 <h2 id="running-the-tests">Running the tests<a class="headerlink" href="#running-the-tests" title="Permanent link">&para;</a></h2>
 <p>There are several checks and test suites in place to ensure the code works as
-expected but it's also written in a way that's consistent across the whole
-codebase. To avoid pushing changes that will cause the CI system to fail, you
-can run most of the tests locally.</p>
+expected and is written in a way that's consistent across the whole codebase.
+To avoid pushing changes that will cause the CI system to fail, you can run most
+of the tests locally.</p>
 <p>To ensure code style is consistent, run:</p>
 <div class="codehilite"><pre><span></span><code>task check
 </code></pre></div>
@@ -1123,7 +1123,8 @@ to match against the test function name:</p>
 stay consistent in accepting the user input and providing the expected output
 and proper exit codes. On top of this, many Arduino CLI features involve
 communicating with external devices, most likely through a serial
-port, so unit tests can only put our confidence that the code is working so far.</p>
+port, so unit tests can only go so far in giving us confidence that the code is
+working.</p>
 <p>For these reasons, in addition to regular unit tests the project has a suite of
 integration tests that actually run Arduino CLI in a different process and
 assess the options are correctly understood and the output is what we expect.</p>
@@ -1185,7 +1186,7 @@ command do:</p>
 <div class="codehilite"><pre><span></span><code>task docs:serve
 </code></pre></div>
 
-<p>If you dont' see any error, hit <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> with your browser.</p>
+<p>If you don't see any error, hit <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> with your browser.</p>
 <h2 id="pull-requests">Pull Requests<a class="headerlink" href="#pull-requests" title="Permanent link">&para;</a></h2>
 <p>In order to ease code reviews and have your contributions merged faster, here is
 a list of items you can check before submitting a PR:</p>

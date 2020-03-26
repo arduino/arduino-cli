@@ -1034,8 +1034,8 @@
                 
                   <h1>Getting started</h1>
                 
-                <p>Despite there's no feature parity at the moment, Arduino CLI provides many of
-the features you can find in the Arduino IDE, let's see some examples.</p>
+                <p>Despite the lack of feature parity at the moment, Arduino CLI provides many of
+the features you can find in the Arduino IDE. Let's see some examples.</p>
 <h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
 <p><code>arduino-cli</code> is a container of commands and each command has its own
 dedicated help text that can be shown with the <code>help</code> command like this:</p>
@@ -1075,13 +1075,13 @@ dedicated help text that can be shown with the <code>help</code> command like th
 <h2 id="create-a-configuration-file">Create a configuration file<a class="headerlink" href="#create-a-configuration-file" title="Permanent link">&para;</a></h2>
 <p>Arduino CLI doesn't strictly require a configuration file to work because the
 command line interface provides any possible functionality. However, having one
-can spare you a lot of typing when issuing a command, so let's create it
-right ahead with:</p>
+can spare you a lot of typing when issuing a command, so let's go ahead and
+create it with:</p>
 <div class="codehilite"><pre><span></span><code>$ arduino-cli config init
 Config file written: /home/luca/.arduino15/arduino-cli.yaml
 </code></pre></div>
 
-<p>If you inspect <code>arduino-cli.yaml</code> contents, you'll find out the available
+<p>If you inspect the contents of <code>arduino-cli.yaml</code>, you'll find the available
 options with their respective default values.</p>
 <h2 id="create-a-new-sketch">Create a new sketch<a class="headerlink" href="#create-a-new-sketch" title="Permanent link">&para;</a></h2>
 <p>To create a new sketch named <code>MyFirstSketch</code> in the current directory, run
@@ -1122,7 +1122,7 @@ available platforms and libraries by running:</p>
 Updating index: package_index.json downloaded
 </code></pre></div>
 
-<p>After connecting the board to your PCs by using the USB cable, you should be
+<p>After connecting the board to your PC by using the USB cable, you should be
 able to check whether it's been recognized by running:</p>
 <div class="codehilite"><pre><span></span><code>$ arduino-cli board list
 Port         Type              Board Name              FQBN                 Core
@@ -1199,8 +1199,8 @@ ID              Version Name
 esp8266:esp8266 <span class="m">2</span>.5.2   esp8266
 </code></pre></div>
 
-<p>Alternatively, you can pass a link to the the additional package index file with
-the <code>--additional-urls</code> option, that has to be specified every time and for every
+<p>Alternatively, you can pass a link to the additional package index file with the
+<code>--additional-urls</code> option, that has to be specified every time and for every
 command that operates on a 3<sup>rd</sup> party platform core, for example:</p>
 <div class="codehilite"><pre><span></span><code>$ arduino-cli  core update-index --additional-urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
 Updating index: package_esp8266com_index.json downloaded
@@ -1211,7 +1211,7 @@ esp8266:esp8266 <span class="m">2</span>.5.2   esp8266
 </code></pre></div>
 
 <h2 id="compile-and-upload-the-sketch">Compile and upload the sketch<a class="headerlink" href="#compile-and-upload-the-sketch" title="Permanent link">&para;</a></h2>
-<p>To compile the sketch you run the <code>compile</code> command passing the proper FQBN
+<p>To compile the sketch you run the <code>compile</code> command, passing the proper FQBN
 string:</p>
 <div class="codehilite"><pre><span></span><code>$ arduino-cli compile --fqbn arduino:samd:mkr1000 MyFirstSketch
 Sketch uses <span class="m">9600</span> bytes <span class="o">(</span><span class="m">3</span>%<span class="o">)</span> of program storage space. Maximum is <span class="m">262144</span> bytes.
