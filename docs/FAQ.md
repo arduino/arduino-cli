@@ -3,16 +3,15 @@
 When you run `arduino-cli board list`, your board doesn't show up. Possible causes:
 
 -  Your board is a cheaper clone, or
--  It mounts a USB2Serial converter like FT232 or CH320: these chips
-   always reports the same USB VID/PID to the operating system, so the
-   only thing that we know is that the board mounts that specific
-   USB2Serial chip, but we don’t know which board is.
+-  It mounts a USB2Serial converter like FT232 or CH340: these chips
+   always report the same USB VID/PID to the operating system, so the
+   only thing we know is that the board mounts that specific
+   USB2Serial chip, but we don’t know which board that chip is on.
 
 ##  What's the FQBN string?
 
 For a deeper understanding of how FQBN works, you should understand
-Arduino Hardware specification. You can find more information in the
-[Arduino platform specification][0].
+the [Arduino platform specification][0].
 
 
 [0]: platform-specification.md

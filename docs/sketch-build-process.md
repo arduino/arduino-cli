@@ -7,12 +7,13 @@ A number of things have to happen for your Arduino code to get onto the Arduino 
 ## Pre-Processing
 
 The Arduino environment performs a few transformations to your sketch before passing it to the avr-gcc compiler:
+
 - All .ino and .pde files in the sketch folder (shown in the IDE as tabs with no extension) are concatenated together, starting with the file that matches the folder name followed by the others in alphabetical order, and the .cpp extension is added to the filename.
 - If not already present, `#include <Arduino.h>` is added to the sketch. This header file (found in the core folder for the currently selected board) includes all the definitions needed for the standard Arduino core.
 - Prototypes are generated for all function definitions in .ino/.pde files that don't already have prototypes. In some rare cases prototype generation may fail for some functions. To work around this, you can provide your own prototypes for these functions.
 - `#line` directives are added to make warning or error messages reflect the original sketch layout.
 
-No pre-processing is done to files in a sketch with any extension other than .ino or .pde. Additionally, .h files in the sketch are not automatically #included from the main sketch file. Further, if you want to call functions defined in a .c file from a .cpp file (like one generated from your sketch), you'll need to wrap its declarations in an 'extern "C" {}' block that is defined only inside of C++ files.
+No pre-processing is done to files in a sketch with any extension other than .ino or .pde. Additionally, .h files in the sketch are not automatically #included from the main sketch file. Further, if you want to call functions defined in a .c file from a .cpp file (like one generated from your sketch), you'll need to wrap its declarations in an `extern "C" {}` block that is defined only inside of C++ files.
 
 ## Dependency Resolution
 
@@ -37,6 +38,7 @@ If multiple libraries contain a file that matches the `#include` directive, the 
 ### Architecture Matching
 
 A library is considered **compatible** with architecture `X` if the `architectures` field in [library.properties](library-specification.md#library-metadata):
+
 - explicitly contains the architecture `X`
 - contains the catch-all `*`
 - is not specified at all.
@@ -83,7 +85,7 @@ Sketches are compiled by avr-gcc and avr-g++ according to the variables in the b
 The sketch is built in a temporary directory in the system-wide temporary directory (e.g. /tmp on Linux).
 
 Files taken as source files for the build process are .S, .c and .cpp files (including the .cpp file generated from the sketch's .ino and .pde files during the sketch pre-processing step).
-Source files of the target are compiled and output with .o extensions to this build directory, as are the main sketch files and any other source files in the sketch and any source files in any libraries which are #included in the sketch.
+Source files of the target are compiled and output with .o extensions to this build directory, as are the main sketch files and any other source files in the sketch and any source files in any libraries which are `#include`d in the sketch.
 
 Before compiling a source file, an attempt is made to reuse the previously compiled .o file, which speeds up the build process. A special .d (dependency) file provides a list of all other files included by the source. The compile step is skipped if the .o and .d files exist and have timestamps newer than the source and all the dependent files. If the source or any dependent file has been modified, or any error occurs verifying the files, the compiler is run normally, writing a new .o & .d file. After a new board is selected from the Tools menu, all source files are rebuilt on the next compile.
 

@@ -42,9 +42,9 @@ same folder.
 ## Running the tests
 
 There are several checks and test suites in place to ensure the code works as
-expected but it's also written in a way that's consistent across the whole
-codebase. To avoid pushing changes that will cause the CI system to fail, you
-can run most of the tests locally.
+expected and is written in a way that's consistent across the whole codebase.
+To avoid pushing changes that will cause the CI system to fail, you can run most
+of the tests locally.
 
 To ensure code style is consistent, run:
 
@@ -87,7 +87,8 @@ Being a command line interface, Arduino CLI is heavily interactive and it has to
 stay consistent in accepting the user input and providing the expected output
 and proper exit codes. On top of this, many Arduino CLI features involve
 communicating with external devices, most likely through a serial
-port, so unit tests can only put our confidence that the code is working so far.
+port, so unit tests can only go so far in giving us confidence that the code is
+working.
 
 For these reasons, in addition to regular unit tests the project has a suite of
 integration tests that actually run Arduino CLI in a different process and
@@ -166,7 +167,7 @@ command do:
 task docs:serve
 ```
 
-If you dont' see any error, hit http://127.0.0.1:8000 with your browser.
+If you don't see any error, hit http://127.0.0.1:8000 with your browser.
 
 ## Pull Requests
 
