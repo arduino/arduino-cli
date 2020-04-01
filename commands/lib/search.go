@@ -27,6 +27,8 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
+var similarityThreshold = 0.7
+
 // LibrarySearch FIXMEDOC
 func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.LibrarySearchResp, error) {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
@@ -60,7 +62,7 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 	if len(res) == 0 {
 		status = rpc.LibrarySearchStatus_failed
 		for _, lib := range lm.Index.Libraries {
-			if godice.CompareString(req.GetQuery(), lib.Name) > 0.7 {
+			if godice.CompareString(req.GetQuery(), lib.Name) > similarityThreshold {
 				res = append(res, &rpc.SearchedLibrary{
 					Name: lib.Name,
 				})
