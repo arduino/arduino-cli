@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -28,8 +29,8 @@ func TestSearchLibrary(t *testing.T) {
 	assert := assert.New(t)
 	assert.Equal(resp.GetStatus(), rpc.LibrarySearchStatus_success)
 	assert.Equal(len(resp.GetLibraries()), 2)
-	assert.Equal(resp.GetLibraries()[0].Name, "ArduinoTestPackage")
-	assert.Equal(resp.GetLibraries()[1].Name, "Test")
+	assert.True(strings.Contains(resp.GetLibraries()[0].Name, "Test"))
+	assert.True(strings.Contains(resp.GetLibraries()[1].Name, "Test"))
 }
 
 func TestSearchLibrarySimilar(t *testing.T) {
