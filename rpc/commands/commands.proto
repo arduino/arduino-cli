@@ -65,6 +65,12 @@ service ArduinoCore {
   // List all the boards provided by installed platforms.
   rpc BoardListAll(BoardListAllReq) returns (BoardListAllResp);
 
+  rpc BoardInstall(BoardInstallReq) returns (stream BoardInstallResp);
+
+  rpc BoardUninstall(BoardUninstallReq) returns (stream BoardUninstallResp);
+
+  rpc BoardSearch(BoardSearchReq) returns (BoardSearchResp);
+
   rpc Compile(CompileReq) returns (stream CompileResp);
 
   // Download and install a platform and its tool dependencies.

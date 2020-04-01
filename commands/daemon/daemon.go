@@ -69,6 +69,34 @@ func (s *ArduinoCoreServerImpl) BoardAttach(req *rpc.BoardAttachReq, stream rpc.
 	return stream.Send(resp)
 }
 
+// BoardInstall FIXMEDOC
+func (s *ArduinoCoreServerImpl) BoardInstall(req *rpc.BoardInstallReq, stream rpc.ArduinoCore_BoardInstallServer) error {
+	resp, err := board.Install(stream.Context(), req,
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.BoardInstallResp{DownloadProgress: p}) },
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.BoardInstallResp{TaskProgress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
+}
+
+// BoardUninstall FIXMEDOC
+func (s *ArduinoCoreServerImpl) BoardUninstall(req *rpc.BoardUninstallReq, stream rpc.ArduinoCore_BoardUninstallServer) error {
+	resp, err := board.Uninstall(stream.Context(), req,
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.BoardUninstallResp{TaskProgress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
+}
+
+// BoardSearch FIXMEDOC
+func (s *ArduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResp, error) {
+	return board.Search(ctx, req)
+}
+
 // Destroy FIXMEDOC
 func (s *ArduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error) {
 	return commands.Destroy(ctx, req)

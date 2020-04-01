@@ -179,6 +179,34 @@ message BoardListResp {
     repeated DetectedPort ports = 1;
 }
 
+message BoardInstallReq {
+  Instance instance = 1;
+  string board = 2; // Board FQBN or Board alias
+}
+
+message BoardInstallResp {
+	DownloadProgress download_progress = 1;
+	TaskProgress task_progress = 2;
+}
+
+message BoardUninstallReq {
+  Instance instance = 1;
+  string board = 2; // Board FQBN or Board alias
+}
+
+message BoardUninstallResp {
+	TaskProgress task_progress = 1;
+}
+
+message BoardSearchReq {
+  Instance instance = 1;
+  string query = 2;
+}
+
+message BoardSearchResp {
+  repeated string fqbn = 1;
+}
+
 message DetectedPort {
     // Address of the port (e.g., `serial:///dev/ttyACM0`).
     string address = 1;
