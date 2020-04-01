@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/imjasonmiller/godice"
@@ -36,6 +37,10 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 		return nil, errors.New("invalid instance")
 	}
 
+	return searchLibrary(req, lm)
+}
+
+func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesManager) (*rpc.LibrarySearchResp, error) {
 	res := []*rpc.SearchedLibrary{}
 	status := rpc.LibrarySearchStatus_success
 
