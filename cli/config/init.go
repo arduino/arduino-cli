@@ -49,20 +49,27 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	if destDir == "" {
 		destDir = viper.GetString("directories.Data")
 	}
-	logrus.Infof("Writing config file to: %s", destDir)
 
-	if err := os.MkdirAll(destDir, os.FileMode(0755)); err != nil {
+	absPath, err := filepath.Abs(destDir)
+	if err != nil {
+		feedback.Errorf("Cannot find absolute path: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	configFileAbsPath := filepath.Join(absPath, defaultFileName)
+
+	logrus.Infof("Writing config file to: %s", absPath)
+
+	if err := os.MkdirAll(absPath, os.FileMode(0755)); err != nil {
 		feedback.Errorf("Cannot create config file directory: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	configFile := filepath.Join(destDir, defaultFileName)
-	if err := viper.WriteConfigAs(configFile); err != nil {
+	if err := viper.WriteConfigAs(configFileAbsPath); err != nil {
 		feedback.Errorf("Cannot create config file: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	msg := "Config file written to: " + configFile
+	msg := "Config file written to: " + configFileAbsPath
 	logrus.Info(msg)
 	feedback.Print(msg)
 }
