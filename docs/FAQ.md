@@ -13,5 +13,11 @@ When you run `arduino-cli board list`, your board doesn't show up. Possible caus
 For a deeper understanding of how FQBN works, you should understand
 the [Arduino platform specification][0].
 
+##  How to set multiple board options?
+
+Additional board options have to be separated by commas (instead of colon):
+
+`$ arduino-cli compile -b "LGT8fx Boards:avr:328:clock=16MHz,variant=modelP" test-sketch`
+
 
 [0]: platform-specification.md
