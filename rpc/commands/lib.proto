@@ -82,8 +82,14 @@ message LibrarySearchReq {
     string query = 2;
 }
 
+enum LibrarySearchStatus {
+    failed = 0;
+    success = 1;
+}
+
 message LibrarySearchResp {
     repeated SearchedLibrary libraries = 1;
+    LibrarySearchStatus status = 2;
 }
 
 message SearchedLibrary {

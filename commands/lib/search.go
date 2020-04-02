@@ -21,10 +21,14 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/imjasonmiller/godice"
 	semver "go.bug.st/relaxed-semver"
 )
+
+var similarityThreshold = 0.7
 
 // LibrarySearch FIXMEDOC
 func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.LibrarySearchResp, error) {
@@ -33,7 +37,12 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 		return nil, errors.New("invalid instance")
 	}
 
+	return searchLibrary(req, lm)
+}
+
+func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesManager) (*rpc.LibrarySearchResp, error) {
 	res := []*rpc.SearchedLibrary{}
+	status := rpc.LibrarySearchStatus_success
 
 	for _, lib := range lm.Index.Libraries {
 		qry := strings.ToLower(req.GetQuery())
@@ -46,16 +55,27 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 			}
 			latest := GetLibraryParameters(lib.Latest)
 
-			searchedlib := &rpc.SearchedLibrary{
+			searchedLib := &rpc.SearchedLibrary{
 				Name:     lib.Name,
 				Releases: releases,
 				Latest:   latest,
 			}
-			res = append(res, searchedlib)
+			res = append(res, searchedLib)
 		}
 	}
 
-	return &rpc.LibrarySearchResp{Libraries: res}, nil
+	if len(res) == 0 {
+		status = rpc.LibrarySearchStatus_failed
+		for _, lib := range lm.Index.Libraries {
+			if godice.CompareString(req.GetQuery(), lib.Name) > similarityThreshold {
+				res = append(res, &rpc.SearchedLibrary{
+					Name: lib.Name,
+				})
+			}
+		}
+	}
+
+	return &rpc.LibrarySearchResp{Libraries: res, Status: status}, nil
 }
 
 // GetLibraryParameters FIXMEDOC
