@@ -17,7 +17,7 @@ the [Arduino platform specification][0].
 
 Additional board options have to be separated by commas (instead of colon):
 
-`$ arduino-cli compile -b "LGT8fx Boards:avr:328:clock=16MHz,variant=modelP" test-sketch`
+`$ arduino-cli compile --fqbn "esp8266:esp8266:generic:xtal=160,baud=57600" TestSketch`
 
 
 [0]: platform-specification.md
