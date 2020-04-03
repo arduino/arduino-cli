@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
@@ -53,15 +52,14 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	boardArg := args[1]
+	boardArg := args[0]
 	logrus.WithField("board", boardArg).Info("Executing `board install`")
 
 	boardInstallReq := &rpc.BoardInstallReq{
 		Instance: inst,
 		Board:    boardArg,
 	}
-	_, err = board.Install(context.Background(), boardInstallReq, output.ProgressBar(),
-		output.TaskProgress(), globals.NewHTTPClientHeader())
+	_, err = board.Install(context.Background(), boardInstallReq, output.ProgressBar(), output.TaskProgress())
 	if err != nil {
 		feedback.Errorf("Error installing board: %v", err)
 		os.Exit(errorcodes.ErrGeneric)

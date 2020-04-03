@@ -19,14 +19,32 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/core"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/pkg/errors"
 )
 
 // Install FIXMEDOC
 func Install(ctx context.Context, req *rpc.BoardInstallReq,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (r *rpc.BoardInstallResp, e error) {
 
-	// TODO
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
+	if pm == nil {
+		return nil, errors.New("invalid instance")
+	}
 
-	return nil, nil
+	board := pm.Registry.FindBoard(req.GetBoard())
+	if board == nil {
+		return nil, errors.Errorf("board '%s' not found", req.GetBoard())
+	}
+
+	platformInstallReq := &rpc.PlatformInstallReq{
+		Instance:        req.GetInstance(),
+		PlatformPackage: board.FQBN.Package,
+		Architecture:    board.FQBN.PlatformArch,
+	}
+	if _, err := core.PlatformInstall(ctx, platformInstallReq, downloadCB, taskCB); err != nil {
+		return nil, errors.WithMessage(err, "installing board platforms")
+	}
+	return &rpc.BoardInstallResp{}, nil
 }
