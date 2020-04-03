@@ -13,5 +13,11 @@ When you run `arduino-cli board list`, your board doesn't show up. Possible caus
 For a deeper understanding of how FQBN works, you should understand
 the [Arduino platform specification][0].
 
+##  How to set multiple board options?
+
+Additional board options have to be separated by commas (instead of colon):
+
+`$ arduino-cli compile --fqbn "esp8266:esp8266:generic:xtal=160,baud=57600" TestSketch`
+
 
 [0]: platform-specification.md
