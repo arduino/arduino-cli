@@ -32,7 +32,7 @@ import (
 func initInstallCommand() *cobra.Command {
 	installCommand := &cobra.Command{
 		Use:   "install LIBRARY[@VERSION_NUMBER](S)",
-		Short: "Installs one of more specified libraries into the system.",
+		Short: "Installs one or more specified libraries into the system.",
 		Long:  "Installs one or more specified libraries into the system.",
 		Example: "" +
 			"  " + os.Args[0] + " lib install AudioZero       # for the latest version.\n" +
