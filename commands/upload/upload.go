@@ -203,7 +203,14 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 			return nil, fmt.Errorf("cannot open sketch: %s", err)
 		}
 		// Built sketch not found in the provided path, let's fallback to the temp compile path
-		fallbackBuildPath := builder.GenBuildPath(sketchPath)
+		var fallbackBuildPath *paths.Path
+		if req.GetBuildPath() != "" {
+			fallbackBuildPath = paths.New(req.GetBuildPath())
+		} else {
+
+			fallbackBuildPath = builder.GenBuildPath(sketchPath)
+		}
+
 		logrus.Warnf("Built sketch not found in %s, let's fallback to %s", uploadFile, fallbackBuildPath)
 		uploadProperties.SetPath("build.path", fallbackBuildPath)
 		// If we search inside the build.path, compile artifact do not have the fqbnSuffix in the filename

@@ -29,6 +29,7 @@ message UploadReq {
 	bool verbose = 5;
 	bool verify = 6;
 	string import_file = 7;
+	string buildPath = 8;         // Path where to find saved compiled files.
 }
 
 message UploadResp {

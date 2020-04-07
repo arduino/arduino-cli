@@ -135,6 +135,7 @@ func run(cmd *cobra.Command, args []string) {
 			Verbose:    verbose,
 			Verify:     verify,
 			ImportFile: exportFile,
+			BuildPath:  buildPath,
 		}, os.Stdout, os.Stderr)
 
 		if err != nil {
