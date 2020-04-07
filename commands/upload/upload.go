@@ -25,6 +25,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -156,6 +157,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 
 	var importPath *paths.Path
 	var importFile string
+	// If no importFile is passed, use sketch path
 	if req.GetImportFile() == "" {
 		importPath = sketch.FullPath
 		importFile = sketch.Name + "." + fqbnSuffix
@@ -169,19 +171,52 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	if !ok {
 		return nil, fmt.Errorf("property 'recipe.output.tmp_file' not defined")
 	}
+
 	ext := filepath.Ext(outputTmpFile)
 	if strings.HasSuffix(importFile, ext) {
 		importFile = importFile[:len(importFile)-len(ext)]
 	}
 
+	// Check if the file ext we calculate is the same that is needed by the upload recipe
+	recipet := uploadProperties.Get("upload.pattern")
+	cmdLinet := uploadProperties.ExpandPropsInString(recipet)
+	cmdArgst, err := properties.SplitQuotedString(cmdLinet, `"'`, false)
+	var tPath *paths.Path
+	if err != nil {
+		return nil, fmt.Errorf("invalid recipe '%s': %s", recipet, err)
+	}
+	for _, t := range cmdArgst {
+		if strings.Contains(t, "build.project_name") {
+			tPath = paths.New(t)
+		}
+	}
+
+	if ext != tPath.Ext() {
+		ext = tPath.Ext()
+	}
+	//uploadRecipeInputFileExt :=
 	uploadProperties.SetPath("build.path", importPath)
 	uploadProperties.Set("build.project_name", importFile)
 	uploadFile := importPath.Join(importFile + ext)
 	if _, err := uploadFile.Stat(); err != nil {
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("compiled sketch %s not found", uploadFile.String())
+		if !os.IsNotExist(err) {
+			return nil, fmt.Errorf("cannot open sketch: %s", err)
 		}
-		return nil, fmt.Errorf("cannot open sketch: %s", err)
+		// Built sketch not found in the provided path, let's fallback to the temp compile path
+		fallbackBuildPath := builder.GenBuildPath(sketchPath)
+		logrus.Warnf("Built sketch not found in %s, let's fallback to %s", uploadFile, fallbackBuildPath)
+		uploadProperties.SetPath("build.path", fallbackBuildPath)
+		// If we search inside the build.path, compile artifact do not have the fqbnSuffix in the filename
+		uploadFile = fallbackBuildPath.Join(sketch.Name + ".ino" + ext)
+		if _, err := uploadFile.Stat(); err != nil {
+			if os.IsNotExist(err) {
+				return nil, fmt.Errorf("compiled sketch %s not found", uploadFile.String())
+			}
+			return nil, fmt.Errorf("cannot open sketch: %s", err)
+		}
+		// Clean from extension
+		uploadProperties.Set("build.project_name", sketch.Name+".ino")
+
 	}
 
 	// Perform reset via 1200bps touch if requested
