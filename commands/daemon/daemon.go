@@ -356,3 +356,13 @@ func (s *ArduinoCoreServerImpl) LibraryList(ctx context.Context, req *rpc.Librar
 func (s *ArduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchReq) (*rpc.ArchiveSketchResp, error) {
 	return sketch.ArchiveSketch(ctx, req)
 }
+
+//ZipLibraryInstall FIXMEDOC
+func (s *ArduinoCoreServerImpl) ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallReq) (*rpc.ZipLibraryInstallResp, error) {
+	return lib.ZipLibraryInstall(ctx, req)
+}
+
+//GitLibraryInstall FIXMEDOC
+func (s *ArduinoCoreServerImpl) GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallReq) (*rpc.GitLibraryInstallResp, error) {
+	return lib.GitLibraryInstall(ctx, req)
+}

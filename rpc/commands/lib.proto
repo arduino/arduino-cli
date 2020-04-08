@@ -294,3 +294,22 @@ enum LibraryLocation {
     // platform referenced by the board's platform.
     referenced_platform_builtin = 3;
 }
+
+message ZipLibraryInstallReq {
+    Instance instance = 1;
+    string Path = 2;
+}
+
+message ZipLibraryInstallResp {
+    string status = 1;
+}
+
+message GitLibraryInstallReq {
+    Instance instance = 1;
+    string name = 2;
+    string url = 3;
+}
+
+message GitLibraryInstallResp {
+    string status = 1;
+} 

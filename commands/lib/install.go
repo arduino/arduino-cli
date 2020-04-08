@@ -75,3 +75,44 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 	taskCB(&rpc.TaskProgress{Message: "Installed " + libRelease.String(), Completed: true})
 	return nil
 }
+
+//ZipLibraryInstall FIXMEDOC
+func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallReq) (*rpc.ZipLibraryInstallResp, error) {
+	res := &rpc.ZipLibraryInstallResp{}
+	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	Path := req.GetPath()
+	if err := installZipLibrary(lm, Path); err != nil {
+		res.Status = "Error installing Zip Library"
+		return res, err
+	}
+	res.Status = "Success! Installed Zip Library"
+	return res, nil
+}
+
+func installZipLibrary(lm *librariesmanager.LibrariesManager, libPath string) error {
+	if err := lm.InstallZipLib(libPath); err != nil {
+		return err
+	}
+	return nil
+}
+
+//GitLibraryInstall FIXMEDOC
+func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallReq) (*rpc.GitLibraryInstallResp, error) {
+	res := &rpc.GitLibraryInstallResp{}
+	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	URL := req.GetUrl()
+	Name := req.GetName()
+	if err := installGitLibrary(lm, Name, URL); err != nil {
+		res.Status = "Error installing Git Library"
+		return res, err
+	}
+	res.Status = "Success! Installed Git Library"
+	return res, nil
+}
+
+func installGitLibrary(lm *librariesmanager.LibrariesManager, Name string, gitURL string) error {
+	if err := lm.InstallGitLib(Name, gitURL); err != nil {
+		return err
+	}
+	return nil
+}
