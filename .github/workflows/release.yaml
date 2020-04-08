@@ -102,6 +102,15 @@ jobs:
           echo $body
           echo "::set-output name=BODY::$body"
 
+      - name: Identify Prerelease
+        # This is a workaround while waiting for create-release action
+        # to implement auto pre-release based on tag
+        id: prerelease
+        run: |
+          wget -q -P /tmp https://github.com/fsaintjacques/semver-tool/archive/3.0.0.zip
+          unzip -p /tmp/3.0.0.zip semver-tool-3.0.0/src/semver >/tmp/semver && chmod +x /tmp/semver
+          if [[ $(/tmp/semver get prerel ${GITHUB_REF/refs\/tags\//}) ]]; then echo "::set-output name=IS_PRE::true"; fi
+
       - name: Create Github Release
         id: create_release
         uses: actions/create-release@master
@@ -112,7 +121,7 @@ jobs:
           release_name: ${{ github.ref }}
           body: ${{ steps.changelog.outputs.BODY }}
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.prerelease.outputs.IS_PRE }}
 
       - name: Upload release files on Github
         uses: svenstaro/upload-release-action@v1-release
