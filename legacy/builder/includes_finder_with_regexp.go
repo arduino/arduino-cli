@@ -16,20 +16,18 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"regexp"
 	"strings"
 )
 
 var INCLUDE_REGEXP = regexp.MustCompile("(?ms)^\\s*#[ \t]*include\\s*[<\"](\\S+)[\">]")
 
-func IncludesFinderWithRegExp(ctx *types.Context, source string) string {
+func IncludesFinderWithRegExp(source string) string {
 	match := INCLUDE_REGEXP.FindStringSubmatch(source)
 	if match != nil {
 		return strings.TrimSpace(match[1])
-	} else {
-		return findIncludeForOldCompilers(source)
 	}
+	return findIncludeForOldCompilers(source)
 }
 
 func findIncludeForOldCompilers(source string) string {

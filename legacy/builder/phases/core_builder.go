@@ -64,8 +64,8 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 
 func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *paths.Path, buildProperties *properties.Map) (*paths.Path, paths.PathList, error) {
 	logger := ctx.GetLogger()
-	coreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_CORE_PATH)
-	variantFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_BUILD_VARIANT_PATH)
+	coreFolder := buildProperties.GetPath("build.core.path")
+	variantFolder := buildProperties.GetPath("build.variant.path")
 
 	targetCoreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH)
 
