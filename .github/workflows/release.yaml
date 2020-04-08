@@ -42,10 +42,6 @@ jobs:
         with:
           name: dist
 
-      - name: Get the current release tag
-        id: get_tag
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-
       - name: Download Gon
         run: |
           wget -q https://github.com/mitchellh/gon/releases/download/v0.2.2/gon_0.2.2_macos.zip
@@ -54,7 +50,6 @@ jobs:
 
       - name: Notarize binary, re-package it and update checksum
         env:
-          TAG: ${{ steps.get_tag.outputs.VERSION }}
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
         # This step performs the following:
@@ -71,6 +66,7 @@ jobs:
           # GitHub's upload/download-artifact@v1 actions don't preserve file permissions,
           # so we need to add execution permission back until @v2 actions are released.
           chmod +x dist/arduino_cli_osx_darwin_amd64/arduino-cli
+          TAG=${GITHUB_REF/refs\/tags\//}
           tar -czvf dist/arduino-cli_${TAG}_macOS_64bit.tar.gz \
           -C dist/arduino_cli_osx_darwin_amd64/  arduino-cli   \
           -C ../../ LICENSE.txt
