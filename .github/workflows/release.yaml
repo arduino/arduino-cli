@@ -14,7 +14,7 @@ jobs:
       image: arduino/arduino-cli:builder-1
       volumes:
         # cache go dependencies across pipeline's steps
-        - $PWD/go:/go
+        - ${{ github.workspace }}/go:/go
 
     steps:
       - name: Checkout
@@ -42,10 +42,6 @@ jobs:
         with:
           name: dist
 
-      - name: Get the current release tag
-        id: get_tag
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-
       - name: Download Gon
         run: |
           wget -q https://github.com/mitchellh/gon/releases/download/v0.2.2/gon_0.2.2_macos.zip
@@ -54,7 +50,6 @@ jobs:
 
       - name: Notarize binary, re-package it and update checksum
         env:
-          TAG: ${{ steps.get_tag.outputs.VERSION }}
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
         # This step performs the following:
@@ -70,7 +65,8 @@ jobs:
           gon gon.config.hcl
           # GitHub's upload/download-artifact@v1 actions don't preserve file permissions,
           # so we need to add execution permission back until @v2 actions are released.
-          chmod +x dist/arduino_cli_osx_darwin_amd64/arduino-cli 
+          chmod +x dist/arduino_cli_osx_darwin_amd64/arduino-cli
+          TAG=${GITHUB_REF/refs\/tags\//}
           tar -czvf dist/arduino-cli_${TAG}_macOS_64bit.tar.gz \
           -C dist/arduino_cli_osx_darwin_amd64/  arduino-cli   \
           -C ../../ LICENSE.txt
@@ -106,6 +102,15 @@ jobs:
           echo $body
           echo "::set-output name=BODY::$body"
 
+      - name: Identify Prerelease
+        # This is a workaround while waiting for create-release action
+        # to implement auto pre-release based on tag
+        id: prerelease
+        run: |
+          wget -q -P /tmp https://github.com/fsaintjacques/semver-tool/archive/3.0.0.zip
+          unzip -p /tmp/3.0.0.zip semver-tool-3.0.0/src/semver >/tmp/semver && chmod +x /tmp/semver
+          if [[ $(/tmp/semver get prerel ${GITHUB_REF/refs\/tags\//}) ]]; then echo "::set-output name=IS_PRE::true"; fi
+
       - name: Create Github Release
         id: create_release
         uses: actions/create-release@master
@@ -116,7 +121,7 @@ jobs:
           release_name: ${{ github.ref }}
           body: ${{ steps.changelog.outputs.BODY }}
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.prerelease.outputs.IS_PRE }}
 
       - name: Upload release files on Github
         uses: svenstaro/upload-release-action@v1-release

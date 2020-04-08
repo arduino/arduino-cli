@@ -13,7 +13,7 @@ jobs:
       image: arduino/arduino-cli:builder-1
       volumes:
         # cache go dependencies across pipeline's steps
-        - $PWD/go:/go
+        - ${{ github.workspace }}/go:/go
 
     steps:
       - name: checkout
