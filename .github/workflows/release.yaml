@@ -14,7 +14,7 @@ jobs:
       image: arduino/arduino-cli:builder-1
       volumes:
         # cache go dependencies across pipeline's steps
-        - $PWD/go:/go
+        - ${{ github.workspace }}/go:/go
 
     steps:
       - name: Checkout
@@ -70,7 +70,7 @@ jobs:
           gon gon.config.hcl
           # GitHub's upload/download-artifact@v1 actions don't preserve file permissions,
           # so we need to add execution permission back until @v2 actions are released.
-          chmod +x dist/arduino_cli_osx_darwin_amd64/arduino-cli 
+          chmod +x dist/arduino_cli_osx_darwin_amd64/arduino-cli
           tar -czvf dist/arduino-cli_${TAG}_macOS_64bit.tar.gz \
           -C dist/arduino_cli_osx_darwin_amd64/  arduino-cli   \
           -C ../../ LICENSE.txt
