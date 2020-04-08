@@ -22,7 +22,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -45,13 +44,13 @@ func initDepsCommand() *cobra.Command {
 }
 
 func runDepsCommand(cmd *cobra.Command, args []string) {
-	libRef, err := globals.ParseLibraryReferenceArg(args[0])
+	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
+	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance, args[0])
 	if err != nil {
 		feedback.Errorf("Arguments error: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
-	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
 	deps, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesReq{
 		Instance: instance,
 		Name:     libRef.Name,

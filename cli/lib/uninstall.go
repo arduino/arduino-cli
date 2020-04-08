@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
@@ -46,7 +45,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino lib uninstall`")
 
 	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
-	refs, err := globals.ParseLibraryReferenceArgs(args)
+	refs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
 	if err != nil {
 		feedback.Errorf("Invalid argument passed: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
