@@ -152,7 +152,7 @@ def test_search_paragraph(run_command):
     """
     assert run_command("lib update-index")
     result = run_command(
-        'lib search "An efficient and elegant JSON library" --format json'
+        'lib search "A simple and efficient JSON library" --format json'
     )
     assert result.ok
     libs_json = json.loads(result.stdout)
