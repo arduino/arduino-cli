@@ -20,8 +20,6 @@ import (
 	"fmt"
 	"io"
 	"net/url"
-	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -150,6 +148,18 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.noverify"))
 	}
 
+	// Extract the final file extension from the upload recipe
+	ext, err := getExtensionFromRecipe(uploadProperties, err)
+	if err != nil {
+		return nil, fmt.Errorf("recipe parsing unsuccessful: %s", err)
+	}
+
+	// Start smart fetch process for the built sketch
+	var uploadPaths []*paths.Path
+
+	// Search for built sketch to upload in CLI param importFile (if passed)...
+	// ...or in the Export path (the Sketch Path)
+
 	// Set path to compiled binary
 	// Make the filename without the FQBN configs part
 	fqbn.Configs = properties.NewMap()
@@ -166,64 +176,42 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		importFile = paths.New(req.GetImportFile()).Base()
 	}
 
-	outputTmpFile, ok := uploadProperties.GetOk("recipe.output.tmp_file")
-	outputTmpFile = uploadProperties.ExpandPropsInString(outputTmpFile)
-	if !ok {
-		return nil, fmt.Errorf("property 'recipe.output.tmp_file' not defined")
+	// Remove file extension if any from input
+	importFileExt := paths.New(importFile).Ext()
+	if strings.HasSuffix(importFile, importFileExt) {
+		importFile = importFile[:len(importFile)-len(importFileExt)]
 	}
 
-	ext := filepath.Ext(outputTmpFile)
-	if strings.HasSuffix(importFile, ext) {
-		importFile = importFile[:len(importFile)-len(ext)]
-	}
+	uploadPaths = append(uploadPaths, importPath.Join(importFile+ext))
 
-	// Check if the file ext we calculate is the same that is needed by the upload recipe
-	recipet := uploadProperties.Get("upload.pattern")
-	cmdLinet := uploadProperties.ExpandPropsInString(recipet)
-	cmdArgst, err := properties.SplitQuotedString(cmdLinet, `"'`, false)
-	var tPath *paths.Path
-	if err != nil {
-		return nil, fmt.Errorf("invalid recipe '%s': %s", recipet, err)
-	}
-	for _, t := range cmdArgst {
-		if strings.Contains(t, "build.project_name") {
-			tPath = paths.New(t)
-		}
-	}
-
-	if ext != tPath.Ext() {
-		ext = tPath.Ext()
-	}
-	//uploadRecipeInputFileExt :=
-	uploadProperties.SetPath("build.path", importPath)
-	uploadProperties.Set("build.project_name", importFile)
-	uploadFile := importPath.Join(importFile + ext)
-	if _, err := uploadFile.Stat(); err != nil {
-		if !os.IsNotExist(err) {
-			return nil, fmt.Errorf("cannot open sketch: %s", err)
-		}
-		// Built sketch not found in the provided path, let's fallback to the temp compile path
-		var fallbackBuildPath *paths.Path
-		if req.GetBuildPath() != "" {
-			fallbackBuildPath = paths.New(req.GetBuildPath())
-		} else {
-
-			fallbackBuildPath = builder.GenBuildPath(sketchPath)
-		}
-
-		logrus.Warnf("Built sketch not found in %s, let's fallback to %s", uploadFile, fallbackBuildPath)
-		uploadProperties.SetPath("build.path", fallbackBuildPath)
+	// Try fetch the file to upload using CLI param buildPath
+	if req.GetBuildPath() != "" {
+		buildPath := paths.New(req.GetBuildPath())
 		// If we search inside the build.path, compile artifact do not have the fqbnSuffix in the filename
-		uploadFile = fallbackBuildPath.Join(sketch.Name + ".ino" + ext)
-		if _, err := uploadFile.Stat(); err != nil {
-			if os.IsNotExist(err) {
-				return nil, fmt.Errorf("compiled sketch %s not found", uploadFile.String())
-			}
-			return nil, fmt.Errorf("cannot open sketch: %s", err)
-		}
-		// Clean from extension
-		uploadProperties.Set("build.project_name", sketch.Name+".ino")
+		uploadPaths = append(uploadPaths, buildPath.Join(sketch.Name+".ino"+ext))
+	}
 
+	// Try fetch the file to upload using builder.GenBuildPath(sketchPath)
+	fallbackBuildPath := builder.GenBuildPath(sketchPath)
+	// If we search inside the build.path, compile artifact do not have the fqbnSuffix in the filename
+	uploadPaths = append(uploadPaths, fallbackBuildPath.Join(sketch.Name+".ino"+ext))
+	for _, p := range uploadPaths {
+		if _, err := p.Stat(); err == nil {
+			uploadProperties.SetPath("build.path", p.Parent())
+			name := p.Base()
+			name = name[:len(name)-len(ext)]
+			uploadProperties.Set("build.project_name", name)
+
+		} else {
+			logrus.Warnf("Built sketch opening error in %s: %s", p, err)
+		}
+	}
+
+	if n, nOK := uploadProperties.GetOk("build.project_name"); n == "" || !nOK {
+		return nil, fmt.Errorf("cannot find file to upload")
+	}
+	if p, pOK := uploadProperties.GetOk("build.path"); p == "" || !pOK {
+		return nil, fmt.Errorf("cannot find file to upload")
 	}
 
 	// Perform reset via 1200bps touch if requested
@@ -303,6 +291,28 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	logrus.Tracef("Upload %s on %s successful", sketch.Name, fqbnIn)
 
 	return &rpc.UploadResp{}, nil
+}
+
+func getExtensionFromRecipe(uploadProperties *properties.Map, err error) (string, error) {
+	recipe := uploadProperties.Get("upload.pattern")
+	cmdLine := uploadProperties.ExpandPropsInString(recipe)
+	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
+	if err != nil {
+		return "", err
+	}
+
+	var uploadInputPath *paths.Path
+	for _, t := range cmdArgs {
+		if strings.Contains(t, "build.project_name") {
+			uploadInputPath = paths.New(t)
+		}
+	}
+
+	if uploadInputPath == nil {
+		return "", fmt.Errorf("cannot find upload file extension in upload recipe")
+	}
+
+	return uploadInputPath.Ext(), nil
 }
 
 func touchSerialPortAt1200bps(port string) error {
