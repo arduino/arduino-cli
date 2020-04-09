@@ -157,9 +157,6 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	// Start smart fetch process for the built sketch
 	var uploadPaths []*paths.Path
 
-	// Search for built sketch to upload in CLI param importFile (if passed)...
-	// ...or in the Export path (the Sketch Path)
-
 	// Set path to compiled binary
 	// Make the filename without the FQBN configs part
 	fqbn.Configs = properties.NewMap()
@@ -167,19 +164,19 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 
 	var importPath *paths.Path
 	var importFile string
-	// If no importFile is passed, use sketch path
 	if req.GetImportFile() == "" {
+		// Search for built sketch to upload in CLI param importFile (if passed)...
 		importPath = sketch.FullPath
 		importFile = sketch.Name + "." + fqbnSuffix
 	} else {
+		// ...or in the Export path (the Sketch Path)
 		importPath = paths.New(req.GetImportFile()).Parent()
 		importFile = paths.New(req.GetImportFile()).Base()
 	}
 
 	// Remove file extension if any from input
-	importFileExt := paths.New(importFile).Ext()
-	if strings.HasSuffix(importFile, importFileExt) {
-		importFile = importFile[:len(importFile)-len(importFileExt)]
+	if strings.HasSuffix(importFile, ext) {
+		importFile = importFile[:len(importFile)-len(ext)]
 	}
 
 	uploadPaths = append(uploadPaths, importPath.Join(importFile+ext))
@@ -195,13 +192,14 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	fallbackBuildPath := builder.GenBuildPath(sketchPath)
 	// If we search inside the build.path, compile artifact do not have the fqbnSuffix in the filename
 	uploadPaths = append(uploadPaths, fallbackBuildPath.Join(sketch.Name+".ino"+ext))
+
 	for _, p := range uploadPaths {
 		if _, err := p.Stat(); err == nil {
 			uploadProperties.SetPath("build.path", p.Parent())
 			name := p.Base()
 			name = name[:len(name)-len(ext)]
 			uploadProperties.Set("build.project_name", name)
-
+			break
 		} else {
 			logrus.Warnf("Built sketch opening error in %s: %s", p, err)
 		}
@@ -305,14 +303,16 @@ func getExtensionFromRecipe(uploadProperties *properties.Map, err error) (string
 	for _, t := range cmdArgs {
 		if strings.Contains(t, "build.project_name") {
 			uploadInputPath = paths.New(t)
+			break
 		}
 	}
 
 	if uploadInputPath == nil {
 		return "", fmt.Errorf("cannot find upload file extension in upload recipe")
 	}
-
-	return uploadInputPath.Ext(), nil
+	// trim extension from "}" and following recipe tokens as they could be erroneously included by the Ext() func
+	trimmedExt := strings.Split(uploadInputPath.Ext(), "}")[0]
+	return trimmedExt, nil
 }
 
 func touchSerialPortAt1200bps(port string) error {
