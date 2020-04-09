@@ -358,11 +358,25 @@ func (s *ArduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.Arch
 }
 
 //ZipLibraryInstall FIXMEDOC
-func (s *ArduinoCoreServerImpl) ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallReq) (*rpc.ZipLibraryInstallResp, error) {
-	return lib.ZipLibraryInstall(ctx, req)
+func (s *ArduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallReq, stream rpc.ArduinoCore_ZipLibraryInstallServer) error {
+	err := lib.ZipLibraryInstall(
+		stream.Context(), req,
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.ZipLibraryInstallResp{TaskProgress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(&rpc.ZipLibraryInstallResp{})
 }
 
 //GitLibraryInstall FIXMEDOC
-func (s *ArduinoCoreServerImpl) GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallReq) (*rpc.GitLibraryInstallResp, error) {
-	return lib.GitLibraryInstall(ctx, req)
+func (s *ArduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallReq, stream rpc.ArduinoCore_GitLibraryInstallServer) error {
+	err := lib.GitLibraryInstall(
+		stream.Context(), req,
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.GitLibraryInstallResp{TaskProgress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(&rpc.GitLibraryInstallResp{})
 }

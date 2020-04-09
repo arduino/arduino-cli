@@ -12,6 +12,7 @@
 # otherwise use the software for commercial activities involving the Arduino
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
+import os
 import simplejson as json
 
 
@@ -140,6 +141,21 @@ def test_list_with_fqbn(run_command):
     assert data[0]["library"]["compatible_with"]["arduino:avr:uno"]
 
 
+def test_lib_download(run_command, downloads_dir):
+
+    # Download a specific lib version
+    assert run_command("lib download AudioZero@1.0.0")
+    assert os.path.exists(os.path.join(downloads_dir, "libraries", "AudioZero-1.0.0.zip"))
+
+    # Wrong lib version
+    result = run_command("lib download AudioZero@69.42.0")
+    assert result.failed
+
+    # Wrong lib
+    result = run_command("lib download AudioZ")
+    assert result.failed
+
+
 def test_install(run_command):
     libs = ['"AzureIoTProtocol_MQTT"', '"CMMC MQTT Connector"', '"WiFiNINA"']
     # Should be safe to run install multiple times
@@ -150,6 +166,25 @@ def test_install(run_command):
     # (https://github.com/arduino/arduino-cli/issues/534)
     result = run_command("lib install MD_Parola@3.2.0")
     assert "Error resolving dependencies for MD_Parola@3.2.0: dependency 'MD_MAX72xx' is not available" in result.stderr
+
+
+def test_install_with_git_url(run_command):
+    # Test git-url library install
+    assert run_command("lib install --git-url https://github.com/arduino-libraries/WiFi101.git")
+
+    # Test failing-install as repository already exists
+    result = run_command("lib install --git-url https://github.com/arduino-libraries/WiFi101.git")
+    assert "Error installing Git Library: repository already exists" in result.stderr
+
+
+def test_install_with_zip_path(run_command, downloads_dir):
+    # Download a specific lib version
+    assert run_command("lib download AudioZero@1.0.0")
+    assert os.path.exists(os.path.join(downloads_dir, "libraries", "AudioZero-1.0.0.zip"))
+
+    zip_path = os.path.join(downloads_dir, "libraries", "AudioZero-1.0.0.zip")
+    # Test zip-path install
+    assert run_command("lib install --zip-path {zip_path}".format(zip_path=zip_path))
 
 
 def test_update_index(run_command):

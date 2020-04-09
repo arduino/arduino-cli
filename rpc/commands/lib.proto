@@ -296,20 +296,25 @@ enum LibraryLocation {
 }
 
 message ZipLibraryInstallReq {
+    // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
+    //Path to the archived library
     string Path = 2;
 }
 
 message ZipLibraryInstallResp {
-    string status = 1;
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 1;
 }
 
 message GitLibraryInstallReq {
+    // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
-    string name = 2;
-    string url = 3;
+    // URL to the repository containing the library
+    string url = 2;
 }
 
 message GitLibraryInstallResp {
-    string status = 1;
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 1;
 } 

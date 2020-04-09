@@ -123,10 +123,10 @@ service ArduinoCore {
   rpc LibraryInstall(LibraryInstallReq) returns (stream LibraryInstallResp);
 
   // Install a library from a Zip File 
-  rpc ZipLibraryInstall(ZipLibraryInstallReq) returns (ZipLibraryInstallResp);
+  rpc ZipLibraryInstall(ZipLibraryInstallReq) returns (stream ZipLibraryInstallResp);
 
   // Download and install a library from a git url
-  rpc GitLibraryInstall(GitLibraryInstallReq) returns (GitLibraryInstallResp);
+  rpc GitLibraryInstall(GitLibraryInstallReq) returns (stream GitLibraryInstallResp);
 
   // Uninstall an Arduino library.
   rpc LibraryUninstall(LibraryUninstallReq) returns (stream LibraryUninstallResp);

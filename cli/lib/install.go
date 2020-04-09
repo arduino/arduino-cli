@@ -40,38 +40,37 @@ func initInstallCommand() *cobra.Command {
 		Run:  runInstallCommand,
 	}
 	installCommand.Flags().BoolVar(&installFlags.noDeps, "no-deps", false, "Do not install dependencies.")
-	installCommand.Flags().StringVarP(&installFlags.gitURL, "git-url", "g", "", "Enter git url for libraries hosted on repositories")
-	installCommand.Flags().StringVarP(&installFlags.zipPath, "zip-path", "z", "", "Enter a path to zip file")
+	installCommand.Flags().BoolVar(&installFlags.gitURL, "git-url", false, "Enter git url for libraries hosted on repositories")
+	installCommand.Flags().BoolVar(&installFlags.zipPath, "zip-path", false, "Enter a path to zip file")
 	return installCommand
 }
 
 var installFlags struct {
 	noDeps  bool
-	gitURL  string
-	zipPath string
+	gitURL  bool
+	zipPath bool
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
-	if installFlags.zipPath != "" {
-		ZiplibraryInstallReq := &rpc.ZipLibraryInstallReq{
+	if installFlags.zipPath {
+		ziplibraryInstallReq := &rpc.ZipLibraryInstallReq{
 			Instance: instance,
-			Path:     installFlags.zipPath,
+			Path:     args[0],
 		}
-		_, err := lib.ZipLibraryInstall(context.Background(), ZiplibraryInstallReq)
+		err := lib.ZipLibraryInstall(context.Background(), ziplibraryInstallReq, output.TaskProgress())
 		if err != nil {
-			feedback.Errorf("Error installing Zip Library %v", err)
+			feedback.Errorf("Error installing Zip Library: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
-	} else if installFlags.gitURL != "" {
-		GitlibraryInstallReq := &rpc.GitLibraryInstallReq{
+	} else if installFlags.gitURL {
+		gitlibraryInstallReq := &rpc.GitLibraryInstallReq{
 			Instance: instance,
-			Name:     args[0],
-			Url:      installFlags.gitURL,
+			Url:      args[0],
 		}
-		_, err := lib.GitLibraryInstall(context.Background(), GitlibraryInstallReq)
+		err := lib.GitLibraryInstall(context.Background(), gitlibraryInstallReq, output.TaskProgress())
 		if err != nil {
-			feedback.Errorf("Error installing Git Library %v", err)
+			feedback.Errorf("Error installing Git Library: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	} else {
