@@ -17,7 +17,6 @@ package compile
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -25,7 +24,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
@@ -37,6 +35,7 @@ import (
 	"github.com/arduino/arduino-cli/telemetry"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -46,6 +45,7 @@ import (
 func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.Writer, debug bool) (r *rpc.CompileResp, e error) {
 
 	tags := map[string]string{
+		"board":           req.Board,
 		"fqbn":            req.Fqbn,
 		"sketchPath":      telemetry.Sanitize(req.SketchPath),
 		"showProperties":  strconv.FormatBool(req.ShowProperties),
@@ -85,16 +85,20 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
 
-	fqbnIn := req.GetFqbn()
-	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
-		fqbnIn = sketch.Metadata.CPU.Fqbn
+	boardArg := req.GetBoard()
+	if boardArg == "" {
+		boardArg = req.GetFqbn() // DEPRECATED: Keep Fqbn field working for old clients.
 	}
-	if fqbnIn == "" {
-		return nil, fmt.Errorf("no FQBN provided")
+	if boardArg == "" && sketch != nil && sketch.Metadata != nil {
+		boardArg = sketch.Metadata.CPU.Fqbn
 	}
-	fqbn, err := cores.ParseFQBN(fqbnIn)
+	if boardArg == "" {
+		return nil, errors.Errorf("no board provided")
+	}
+
+	fqbn, _, _, err := pm.FindBoard(boardArg)
 	if err != nil {
-		return nil, fmt.Errorf("incorrect FQBN: %s", err)
+		return nil, errors.Errorf("board '%s' not found: %s", req.GetBoard(), err)
 	}
 
 	targetPlatform := pm.FindPlatform(&packagemanager.PlatformReference{
@@ -249,6 +253,6 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		}
 	}
 
-	logrus.Tracef("Compile %s for %s successful", sketch.Name, fqbnIn)
+	logrus.Tracef("Compile %s for %s successful", sketch.Name, boardArg)
 	return &rpc.CompileResp{}, nil
 }

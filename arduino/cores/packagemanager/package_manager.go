@@ -116,13 +116,20 @@ func (pm *PackageManager) FindBoardsWithID(id string) []*cores.Board {
 	return res
 }
 
-// FindBoardWithFQBN returns the board identified by the fqbn, or an error
-func (pm *PackageManager) FindBoardWithFQBN(fqbnIn string) (*cores.Board, error) {
-	fqbn, err := cores.ParseFQBN(fqbnIn)
+// FindBoard search the board identified by boardArg (board alias or board fqbn).
+// It returns FQBN, RegistereBoard and Board or an error if not found.
+// The board may be present in registry but not installed, in this case o
+func (pm *PackageManager) FindBoard(boardArg string) (*cores.FQBN, *RegisteredBoard, *cores.Board, error) {
+	fqbn, registeredBoard, err := pm.Registry.FindBoard(boardArg)
 	if err != nil {
-		return nil, fmt.Errorf("parsing fqbn: %s", err)
+		return fqbn, registeredBoard, nil, err
 	}
+	board, err := pm.FindBoardWithFQBN(fqbn)
+	return fqbn, registeredBoard, board, err
+}
 
+// FindBoardWithFQBN returns the board identified by the fqbn, or an error
+func (pm *PackageManager) FindBoardWithFQBN(fqbn *cores.FQBN) (*cores.Board, error) {
 	_, _, board, _, _, err := pm.ResolveFQBN(fqbn)
 	return board, err
 }

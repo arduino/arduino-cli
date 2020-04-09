@@ -41,12 +41,12 @@ func TestFindBoardWithFQBN(t *testing.T) {
 	pm := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
 	pm.LoadHardwareFromDirectory(customHardware)
 
-	board, err := pm.FindBoardWithFQBN("arduino:avr:uno")
+	_, _, board, err := pm.FindBoard("arduino:avr:uno")
 	require.Nil(t, err)
 	require.NotNil(t, board)
 	require.Equal(t, board.Name(), "Arduino/Genuino Uno")
 
-	board, err = pm.FindBoardWithFQBN("arduino:avr:mega")
+	_, _, board, err = pm.FindBoard("arduino:avr:mega")
 	require.Nil(t, err)
 	require.NotNil(t, board)
 	require.Equal(t, board.Name(), "Arduino/Genuino Mega or Mega 2560")
@@ -178,7 +178,7 @@ func TestBoardOptionsFunctions(t *testing.T) {
 	pm := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
 	pm.LoadHardwareFromDirectory(customHardware)
 
-	nano, err := pm.FindBoardWithFQBN("arduino:avr:nano")
+	_, _, nano, err := pm.FindBoard("arduino:avr:nano")
 	require.Nil(t, err)
 	require.NotNil(t, nano)
 	require.Equal(t, nano.Name(), "Arduino Nano")
@@ -194,7 +194,7 @@ func TestBoardOptionsFunctions(t *testing.T) {
 	expectedNanoCPUValues.Set("atmega168", "ATmega168")
 	require.EqualValues(t, expectedNanoCPUValues, nanoCPUValues)
 
-	esp8266, err := pm.FindBoardWithFQBN("esp8266:esp8266:generic")
+	_, _, esp8266, err := pm.FindBoard("esp8266:esp8266:generic")
 	require.Nil(t, err)
 	require.NotNil(t, esp8266)
 	require.Equal(t, esp8266.Name(), "Generic ESP8266 Module")
@@ -230,7 +230,7 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	loadIndex("http://arduino.esp8266.com/stable/package_esp8266com_index.json")
 	loadIndex("https://adafruit.github.io/arduino-board-index/package_adafruit_index.json")
 	require.NoError(t, pm.LoadHardware())
-	esp32, err := pm.FindBoardWithFQBN("esp32:esp32:esp32")
+	_, _, esp32, err := pm.FindBoard("esp32:esp32:esp32")
 	require.NoError(t, err)
 	esptool231 := pm.FindToolDependency(&cores.ToolDependency{
 		ToolPackager: "esp32",
@@ -266,7 +266,7 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	testConflictingToolsInDifferentPackages()
 	testConflictingToolsInDifferentPackages()
 
-	feather, err := pm.FindBoardWithFQBN("adafruit:samd:adafruit_feather_m0_express")
+	_, _, feather, err := pm.FindBoard("adafruit:samd:adafruit_feather_m0_express")
 	require.NoError(t, err)
 	require.NotNil(t, feather)
 	featherTools, err := pm.FindToolsRequiredForBoard(feather)

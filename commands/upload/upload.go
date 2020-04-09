@@ -33,6 +33,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/serial"
 )
@@ -67,19 +68,22 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		return nil, fmt.Errorf("no upload port provided")
 	}
 
-	fqbnIn := req.GetFqbn()
-	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
-		fqbnIn = sketch.Metadata.CPU.Fqbn
+	boardArg := req.GetBoard()
+	if boardArg == "" {
+		boardArg = req.GetFqbn() // DEPRECATION: Keep compatiblity with old clients using Fqbn
 	}
-	if fqbnIn == "" {
-		return nil, fmt.Errorf("no Fully Qualified Board Name provided")
+	if boardArg == "" && sketch != nil && sketch.Metadata != nil {
+		boardArg = sketch.Metadata.CPU.Fqbn
 	}
-	fqbn, err := cores.ParseFQBN(fqbnIn)
-	if err != nil {
-		return nil, fmt.Errorf("incorrect FQBN: %s", err)
+	if boardArg == "" {
+		return nil, errors.Errorf("no board specified")
 	}
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
+	fqbn, _, _, err := pm.FindBoard(boardArg)
+	if err != nil {
+		return nil, errors.Errorf("board '%s' not found: %s", req.GetBoard(), err)
+	}
 
 	// Find target board and board properties
 	_, _, board, boardProperties, _, err := pm.ResolveFQBN(fqbn)
@@ -266,7 +270,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		return nil, fmt.Errorf("uploading error: %s", err)
 	}
 
-	logrus.Tracef("Upload %s on %s successful", sketch.Name, fqbnIn)
+	logrus.Tracef("Upload %s on %s successful", sketch.Name, boardArg)
 
 	return &rpc.UploadResp{}, nil
 }

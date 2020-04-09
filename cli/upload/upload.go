@@ -30,7 +30,7 @@ import (
 )
 
 var (
-	fqbn       string
+	boardArg   string
 	port       string
 	verbose    bool
 	verify     bool
@@ -48,7 +48,9 @@ func NewCommand() *cobra.Command {
 		Run:     run,
 	}
 
-	uploadCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	uploadCommand.Flags().StringVarP(&boardArg, "board", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	uploadCommand.Flags().StringVarP(&boardArg, "fqbn", "", "", "")
+	uploadCommand.Flags().MarkDeprecated("fqbn", "use --board instead.")
 	uploadCommand.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
 	uploadCommand.Flags().StringVarP(&importFile, "input", "i", "", "Input file to be uploaded.")
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
@@ -72,7 +74,7 @@ func run(command *cobra.Command, args []string) {
 
 	if _, err := upload.Upload(context.Background(), &rpc.UploadReq{
 		Instance:   instance,
-		Fqbn:       fqbn,
+		Board:      boardArg,
 		SketchPath: sketchPath.String(),
 		Port:       port,
 		Verbose:    verbose,

@@ -33,7 +33,7 @@ import (
 )
 
 var (
-	fqbn               string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	boardArg           string   // Board Alias or Board FQBN
 	showProperties     bool     // Show all build preferences used instead of compiling.
 	preprocess         bool     // Print preprocessed code to stdout.
 	buildCachePath     string   // Builds of 'core.a' are saved into this path to be cached and reused.
@@ -63,7 +63,9 @@ func NewCommand() *cobra.Command {
 		Run:     run,
 	}
 
-	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	command.Flags().StringVarP(&boardArg, "board", "b", "", "Board Alias or Board FQBN (e.g. 'arduino:avr:uno')")
+	command.Flags().StringVarP(&boardArg, "fqbn", "", "", "")
+	command.Flags().MarkDeprecated("fqbn", "use --board instead.")
 	command.Flags().BoolVar(&showProperties, "show-properties", false, "Show all build properties used instead of compiling.")
 	command.Flags().BoolVar(&preprocess, "preprocess", false, "Print preprocessed code to stdout instead of compiling.")
 	command.Flags().StringVar(&buildCachePath, "build-cache-path", "", "Builds of 'core.a' are saved into this path to be cached and reused.")
@@ -104,7 +106,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	_, err = compile.Compile(context.Background(), &rpc.CompileReq{
 		Instance:         inst,
-		Fqbn:             fqbn,
+		Board:            boardArg,
 		SketchPath:       sketchPath.String(),
 		ShowProperties:   showProperties,
 		Preprocess:       preprocess,
@@ -129,7 +131,7 @@ func run(cmd *cobra.Command, args []string) {
 	if uploadAfterCompile {
 		_, err := upload.Upload(context.Background(), &rpc.UploadReq{
 			Instance:   inst,
-			Fqbn:       fqbn,
+			Board:      boardArg,
 			SketchPath: sketchPath.String(),
 			Port:       port,
 			Verbose:    verbose,

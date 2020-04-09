@@ -23,12 +23,13 @@ import "commands/common.proto";
 
 message UploadReq {
     Instance instance = 1;
-    string fqbn = 2;
+    string fqbn = 2 [deprecated=true];
     string sketch_path = 3;
 	string port = 4;
 	bool verbose = 5;
 	bool verify = 6;
 	string import_file = 7;
+	string board = 8;
 }
 
 message UploadResp {

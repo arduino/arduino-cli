@@ -50,14 +50,18 @@ func (r *BoardsRegistry) addBoard(board *RegisteredBoard) {
 	r.aliastToBoard[board.Alias] = board
 }
 
-func (r *BoardsRegistry) FindBoard(fqbnOrAlias string) *RegisteredBoard {
+func (r *BoardsRegistry) FindBoard(fqbnOrAlias string) (*cores.FQBN, *RegisteredBoard, error) {
 	if found, ok := r.aliastToBoard[fqbnOrAlias]; ok {
-		return found
+		return found.FQBN, found, nil
 	}
-	if found, ok := r.fqbnToBoard[fqbnOrAlias]; ok {
-		return found
+	fqbn, err := cores.ParseFQBN(fqbnOrAlias)
+	if err != nil {
+		return nil, nil, err
 	}
-	return nil
+	if found, ok := r.fqbnToBoard[fqbn.StringWithoutConfig()]; ok {
+		return fqbn, found, nil
+	}
+	return fqbn, nil, nil
 }
 
 func (r *BoardsRegistry) SearchBoards(query string) []*RegisteredBoard {

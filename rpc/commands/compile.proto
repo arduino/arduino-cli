@@ -23,7 +23,7 @@ import "commands/common.proto";
 
 message CompileReq {
   Instance instance = 1;
-  string fqbn = 2;   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+  string fqbn = 2 [deprecated=true]; // Fully Qualified Board Name, e.g.: arduino:avr:uno. DEPRECATED: use "board" field instead.
   string sketchPath = 3;
   bool showProperties = 4;  // Show all build preferences used instead of compiling.
   bool preprocess = 5;      // Print preprocessed code to stdout.
@@ -39,6 +39,7 @@ message CompileReq {
   repeated string libraries = 15; // List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
   bool optimizeForDebug = 16; // Optimize compile output for debug, not for release
   bool dryRun = 17; // When set to true the compiled binary will not be copied to the export directory
+  string board = 18; // Board FQBN or Board alias
 }
 
 message CompileResp {

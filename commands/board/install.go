@@ -33,15 +33,15 @@ func Install(ctx context.Context, req *rpc.BoardInstallReq,
 		return nil, errors.New("invalid instance")
 	}
 
-	board := pm.Registry.FindBoard(req.GetBoard())
-	if board == nil {
-		return nil, errors.Errorf("board '%s' not found", req.GetBoard())
+	fqbn, _, _, err := pm.FindBoard(req.GetBoard())
+	if err != nil {
+		return nil, errors.Errorf("board '%s' not found: %s", req.GetBoard(), err)
 	}
 
 	platformInstallReq := &rpc.PlatformInstallReq{
 		Instance:        req.GetInstance(),
-		PlatformPackage: board.FQBN.Package,
-		Architecture:    board.FQBN.PlatformArch,
+		PlatformPackage: fqbn.Package,
+		Architecture:    fqbn.PlatformArch,
 	}
 	if _, err := core.PlatformInstall(ctx, platformInstallReq, downloadCB, taskCB); err != nil {
 		return nil, errors.WithMessage(err, "installing board platforms")
