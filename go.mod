@@ -23,16 +23,21 @@ require (
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
 	github.com/leonelquinteros/gotext v1.4.0
 	github.com/marcinbor85/gohex v0.0.0-20200531163658-baab2527a9a2
+	github.com/juju/testing v0.0.0-20190429233213-dfc56b8c09fc // indirect
+	github.com/kr/pretty v0.2.0 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.2
 	github.com/mattn/go-isatty v0.0.8
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/miekg/dns v1.0.5 // indirect
+	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/oleksandr/bonjour v0.0.0-20160508152359-5dcf00d8b228 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/pmylund/sortutil v0.0.0-20120526081524-abeda66eb583
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/schollz/closestmatch v2.1.0+incompatible
 	github.com/segmentio/stats/v4 v4.5.3
+	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v1.0.1-0.20200710201246-675ae5f5a98c
 	github.com/spf13/jwalterweatherman v1.0.0
@@ -43,12 +48,17 @@ require (
 	go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18
 	go.bug.st/serial v1.1.1
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect
-	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
-	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
+	golang.org/x/crypto v0.0.0-20200406173513-056763e48d71 // indirect
+	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
+	golang.org/x/sys v0.0.0-20200408040146-ea54a3c99b9b // indirect
 	golang.org/x/text v0.3.2
 	google.golang.org/grpc v1.27.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1
 	gopkg.in/yaml.v2 v2.3.0
+	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
+	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
+	gopkg.in/src-d/go-git.v4 v4.13.1
+	gopkg.in/yaml.v2 v2.2.4
 )

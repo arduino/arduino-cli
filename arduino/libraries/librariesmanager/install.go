@@ -20,7 +20,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -101,7 +100,7 @@ func (lm *LibrariesManager) InstallZipLib(libPath string) error {
 	}
 	err := Unzip(libPath, libsDir.String())
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	return nil
 }
