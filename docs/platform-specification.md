@@ -1,5 +1,5 @@
-This specification is a 3rd party hardware format to be used in Arduino IDE starting from 1.5.x series.<br>
-This specification allows a 3rd party vendor/maintainer to add support for new boards inside the Arduino IDE by providing a file to unzip into the *hardware* folder of Arduino's sketchbook folder.<br>
+This specification is a 3rd party hardware format to be used in Arduino development software starting from the Arduino IDE 1.5.x series.<br>
+This specification allows a 3rd party vendor/maintainer to add support for new boards to the Arduino development software by providing a file to unzip into the *hardware* folder of Arduino's sketchbook folder.<br>
 It is also possible to add new 3rd party boards by providing just one configuration file.
 
 ## Hardware Folders structure
@@ -58,16 +58,16 @@ will set the property **tools.bossac.cmd** to the value **bossac** on Linux and 
 
 #### Global Predefined properties
 
-The Arduino IDE sets the following properties that can be used globally in all configuration files:
+The following automatically generated properties can be used globally in all configuration files:
 
 * `{runtime.platform.path}`: the absolute path of the [board platform](#platform-terminology) folder (i.e. the folder containing boards.txt)
 * `{runtime.hardware.path}`: the absolute path of the hardware folder (i.e. the folder containing the [board platform](#platform-terminology) folder)
-* `{runtime.ide.path}`: the absolute path of the Arduino IDE folder
-* `{runtime.ide.version}`: the version number of the Arduino IDE as a number (this uses two digits per version number component, and removes the points and leading zeroes, so Arduino IDE 1.8.3 becomes `01.08.03` which becomes `runtime.ide.version=10803`).
+* `{runtime.ide.path}`: the absolute path of the Arduino IDE or Arduino CLI folder
+* `{runtime.ide.version}`: the version number of the Arduino IDE as a number (this uses two digits per version number component, and removes the points and leading zeroes, so Arduino IDE 1.8.3 becomes `01.08.03` which becomes `runtime.ide.version=10803`). When using Arduino development software other than the Arduino IDE, this is set to a meaningless version number.
 * `{ide_version}`: Compatibility alias for `{runtime.ide.version}`
 * `{runtime.os}`: the running OS ("linux", "windows", "macosx")
 
-Compatibility note: Versions before 1.6.0 only used one digit per version number component in `{runtime.ide.version}` (so 1.5.9 was `159`, not `10509`).
+Compatibility note: Versions before Arduino IDE 1.6.0 only used one digit per version number component in `{runtime.ide.version}` (so 1.5.9 was `159`, not `10509`).
 
 ## platform.txt
 
@@ -79,20 +79,20 @@ The following meta-data must be defined:
     name=Arduino AVR Boards
     version=1.5.3
 
-The **name** will be shown in the Boards menu of the Arduino IDE.<br>
+The **name** will be shown in the Arduino IDE's Board menu or the Name field of [`arduino-cli core`](https://arduino.github.io/arduino-cli/commands/arduino-cli_core/)'s output.<br>
 The **version** is currently unused, it is reserved for future use (probably together with the Boards Manager to handle dependencies on cores).
 
 ### Build process
 
-The platform.txt file is used to configure the build process performed by the Arduino IDE. This is done through a list of **recipes**. Each recipe is a command line expression that explains how to call the compiler (or other tools) for every build step and which parameter should be passed.
+The platform.txt file is used to configure the build process. This is done through a list of **recipes**. Each recipe is a command line expression that explains how to call the compiler (or other tools) for every build step and which parameter should be passed.
 
-The Arduino IDE, before starting the build, determines the list of files to compile. The list is composed of:
+The Arduino development software, before starting the build, determines the list of files to compile. The list is composed of:
 
 - the user's Sketch
 - source code in the selected board's Core
 - source code in the Libraries used in the sketch
 
-The IDE creates a temporary folder to store the build artifacts whose path is available through the global property **{build.path}**. A property **{build.project_name}** with the name of the project and a property **{build.arch}** with the name of the architecture is set as well.
+A temporary folder is created to store the build artifacts whose path is available through the global property **{build.path}**. A property **{build.project_name}** with the name of the project and a property **{build.arch}** with the name of the architecture is set as well.
 
 * `{build.path}`: The path to the temporary folder to store build artifacts
 * `{build.project_name}`: The project name
@@ -102,13 +102,13 @@ There are some other **{build.xxx}** properties available, that are explained in
 
 #### Recipes to compile source code
 
-We said that the Arduino IDE determines a list of files to compile. Each file can be source code written in C (.c files), C++ (.cpp files) or Assembly (.S files). Every language is compiled using its respective **recipe**:
+We said that the Arduino development software determines a list of files to compile. Each file can be source code written in C (.c files), C++ (.cpp files) or Assembly (.S files). Every language is compiled using its respective **recipe**:
 
 * `recipe.c.o.pattern`: for C files
 * `recipe.cpp.o.pattern`: for CPP files
 * `recipe.S.o.pattern`: for Assembly files
 
-The recipes can be built concatenating other properties set by the IDE (for each file compiled):
+The recipes can be built concatenating the following automatically generated properties (for each file compiled):
 
 * `{includes}`: the list of include paths in the format "-I/include/path -I/another/path...."
 * `{source_file}`: the path to the source file
@@ -132,7 +132,7 @@ Note that some properties, like **{build.mcu}** for example, are taken from the 
 
 The core of the selected board is compiled as described in the previous paragraph, but the object files obtained from the compile are also archived into a static library named *core.a* using the **recipe.ar.pattern**.
 
-The recipe can be built concatenating the following properties set by the IDE:
+The recipe can be built concatenating the following automatically generated properties:
 
 * `{object_file}`: the object file to include in the archive
 * `{archive_file_path}`: fully qualified archive file (ex. "/path/to/core.a"). This property was added in Arduino IDE 1.6.6/arduino builder 1.0.0-beta12 as a replacement for `{build.path}/{archive_file}`.
@@ -152,7 +152,7 @@ For example, Arduino provides the following for AVR:
 
 All the artifacts produced by the previous steps (sketch object files, libraries object files and core.a archive) are linked together using the **recipe.c.combine.pattern**.
 
-The recipe can be built concatenating the following properties set by the IDE:
+The recipe can be built concatenating the following automatically generated properties:
 
 * `{object_files}`: the list of object files to include in the archive ("file1.o file2.o ....")
 * `{archive_file_path}`: fully qualified archive file (ex. "/path/to/core.a"). This property was added in Arduino IDE 1.6.6/arduino builder 1.0.0-beta12 as a replacement for `{build.path}/{archive_file}`.
@@ -170,7 +170,7 @@ For example the following is used for AVR:
 
 #### Recipes for extraction of executable files and other binary data
 
-An arbitrary number of extra steps can be performed by the IDE at the end of objects linking.
+An arbitrary number of extra steps can be performed at the end of objects linking.
 These steps can be used to extract binary data used for upload and they are defined by a set of recipes with the following format:
 
     recipe.objcopy.FILE_EXTENSION_1.pattern=[.....]
@@ -182,7 +182,7 @@ These steps can be used to extract binary data used for upload and they are defi
     recipe.objcopy.eep.pattern=[.....]
     recipe.objcopy.hex.pattern=[.....]
 
-There are no specific properties set by the IDE here.
+There are no specific properties set by the Arduino development software here.
 A full example for the AVR platform can be:
 
     ## Create eeprom
@@ -193,7 +193,7 @@ A full example for the AVR platform can be:
 
 #### Recipes to compute binary sketch size
 
-At the end of the build the Arduino IDE shows the final binary sketch size to the user. The size is calculated using the recipe **recipe.size.pattern**. The output of the command executed using the recipe is parsed through the regular expression set in the property **recipe.size.regex**. The regular expression must match the sketch size.
+At the end of the build the Arduino development software shows the final binary sketch size to the user. The size is calculated using the recipe **recipe.size.pattern**. The output of the command executed using the recipe is parsed through the regular expression set in the property **recipe.size.regex**. The regular expression must match the sketch size.
 
 For AVR we have:
 
@@ -205,7 +205,7 @@ For AVR we have:
 
 #### Recipes to export compiled binary
 
-When you do a **Sketch > Export compiled Binary**, the compiled binary is copied from the build folder to the sketch folder. Two binaries are copied; the standard binary, and a binary that has been merged with the bootloader file (identified by the `.with_bootloader` in the filename).
+When you do a **Sketch > Export compiled Binary** in the Arduino IDE, the compiled binary is copied from the build folder to the sketch folder. Two binaries are copied; the standard binary, and a binary that has been merged with the bootloader file (identified by the `.with_bootloader` in the filename).
 
 Two recipes affect how **Export compiled Binary** works:
 
@@ -214,14 +214,14 @@ Two recipes affect how **Export compiled Binary** works:
 
 As with other processes, there are pre and post build hooks for **Export compiled Binary**.
 
-The **recipe.hooks.savehex.presavehex.NUMBER.pattern** and **recipe.hooks.savehex.postsavehex.NUMBER.pattern** hooks (but not **recipe.output.tmp_file** and **recipe.output.save_file**) can be built concatenating the following properties set by the IDE:
+The **recipe.hooks.savehex.presavehex.NUMBER.pattern** and **recipe.hooks.savehex.postsavehex.NUMBER.pattern** hooks (but not **recipe.output.tmp_file** and **recipe.output.save_file**) can be built concatenating the following automatically generated properties:
 
     {sketch_path}              - the absolute path of the sketch folder
 
 #### Recipe to run the preprocessor
-For detecting what libraries to include in the build, and for generating function prototypes, the Arduino IDE must be able to run (just) the preprocessor. For this, the **recipe.preproc.macros** recipe exists. This recipe must run the preprocessor on a given source file, writing the preprocessed output to a given output file, and generate (only) preprocessor errors on standard output. This preprocessor run should happen with the same defines and other preprocessor-influencing-options as for normally compiling the source files.
+For detecting what libraries to include in the build, and for generating function prototypes, (just) the preprocessor is run. For this, the **recipe.preproc.macros** recipe exists. This recipe must run the preprocessor on a given source file, writing the preprocessed output to a given output file, and generate (only) preprocessor errors on standard output. This preprocessor run should happen with the same defines and other preprocessor-influencing-options as for normally compiling the source files.
 
-The recipes can be built concatenating other properties set by the IDE (for each file compiled):
+The recipes can be built concatenating other automatically generated properties (for each file compiled):
 
 * `{includes}`: the list of include paths in the format "-I/include/path -I/another/path...."
 * `{source_file}`: the path to the source file
@@ -232,11 +232,11 @@ For example the following is used for AVR:
     preproc.macros.flags=-w -x c++ -E -CC
     recipe.preproc.macros="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.macros.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{preprocessed_file_path}"
 
-Note that the `{preprocessed_file_path}` might point to (your operating system's equivalent) of `/dev/null`. In this case, also passing `-MMD` to gcc is problematic, as it will try to generate a dependency file called `/dev/null.d`, which will usually result in a permission error. Since platforms typically include `{compiler.cpp.flags}` here, which includes `-MMD`, the Arduino IDE automatically filters out the `-MMD` option from the `recipe.preproc.macros` recipe to prevent this error.
+Note that the `{preprocessed_file_path}` might point to (your operating system's equivalent) of `/dev/null`. In this case, also passing `-MMD` to gcc is problematic, as it will try to generate a dependency file called `/dev/null.d`, which will usually result in a permission error. Since platforms typically include `{compiler.cpp.flags}` here, which includes `-MMD`, the `-MMD` option is automatically filtered out of the `recipe.preproc.macros` recipe to prevent this error.
 
-Note that older IDE versions used the **recipe.preproc.includes** recipe to determine includes, which is undocumented here. Since Arduino IDE 1.6.7 (arduino-builder 1.2.0) this was changed and **recipe.preproc.includes** is no longer used.
+Note that older Arduino IDE versions used the **recipe.preproc.includes** recipe to determine includes, which is undocumented here. Since Arduino IDE 1.6.7 (arduino-builder 1.2.0) this was changed and **recipe.preproc.includes** is no longer used.
 
-#### Pre and post build hooks (since IDE 1.6.5)
+#### Pre and post build hooks (since Arduino IDE 1.6.5)
 
 You can specify pre and post actions around each recipe. These are called "hooks". Here is the complete list of available hooks:
 
@@ -271,7 +271,7 @@ recipe.hooks.sketch.prebuild.11.pattern=echo 11
 
 ## Global platform.txt
 
-Properties defined in a platform.txt created in the **hardware** subfolder of the IDE installation folder will be used for all platforms and will override local properties.
+Properties defined in a platform.txt created in the **hardware** subfolder of the Arduino IDE installation folder will be used for all platforms and will override local properties. This feature is currently only available when using the Arduino IDE.
 
 ## platform.local.txt
 
@@ -296,11 +296,11 @@ For example the board ID chosen for the Arduino Uno board is "uno". An extract o
 
 Note that all the relevant keys start with the board ID **uno.xxxxx**.
 
-The **uno.name** property contains the name of the board shown in the Board menu of the Arduino IDE.
+The **uno.name** property contains the human-friendly name of the board. This is shown in the Board menu of the IDEs, the "Board Name" field of Arduino CLI's text output, or the "name" key of Arduino CLI's JSON output.
 
-The **uno.build.board** property is used to set a compile-time variable **ARDUINO_{build.board}** to allow use of conditional code between `#ifdef`s. The Arduino IDE automatically generates a **build.board** value if not defined. In this case the variable defined at compile time will be `ARDUINO_AVR_UNO`.
+The **uno.build.board** property is used to set a compile-time variable **ARDUINO_{build.board}** to allow use of conditional code between `#ifdef`s. A **build.board** value is automatically generated if not defined. In this case the variable defined at compile time will be `ARDUINO_AVR_UNO`.
 
-The other properties will override the corresponding global properties of the IDE when the user selects the board. These properties will be globally available, in other configuration files too, without the board ID prefix:
+The other properties will override the corresponding global properties when the user selects the board. These properties will be globally available, in other configuration files too, without the board ID prefix:
 
     uno.build.mcu           =>   build.mcu
     uno.build.f_cpu         =>   build.f_cpu
@@ -309,7 +309,7 @@ The other properties will override the corresponding global properties of the ID
     uno.build.variant       =>   build.variant
 
 This explains the presence of **{build.mcu}** or **{build.board}** in the platform.txt recipes: their value is overwritten respectively by **{uno.build.mcu}** and **{uno.build.board}** when the Uno board is selected!
-Moreover the IDE automatically provides the following properties:
+Moreover the following properties are automatically generated:
 
 * `{build.core.path}`: The path to the selected board's core folder (inside the [core platform](#platform-terminology), for example hardware/arduino/avr/core/arduino)
 * `{build.system.path}`: The path to the [core platform](#platform-terminology)'s system folder if available (for example hardware/arduino/sam/system)
@@ -323,7 +323,7 @@ Cores are placed inside the **cores** subfolder. Many different cores can be pro
 * `hardware/arduino/avr/cores/arduino`: the Arduino Core
 * `hardware/arduino/avr/cores/rtos`: an hypothetical RTOS Core
 
-The board's property **build.core** is used by the Arduino IDE to find the core that must be compiled and linked when the board is selected. For example if a board needs the Arduino core the **build.core** variable should be set to:
+The board's property **build.core** is used to find the core that must be compiled and linked when the board is selected. For example if a board needs the Arduino core the **build.core** variable should be set to:
 
     uno.build.core=arduino
 
@@ -363,11 +363,11 @@ instead, the Arduino Leonardo board needs the *leonardo* variant:
 In the example above, both Uno and Leonardo share the same core but use different variants.<br>
 In any case, the contents of the selected variant folder path is added to the include search path and its contents are compiled and linked with the sketch.
 
-The parameter **build.variant.path** is automatically found by the IDE.
+The parameter **build.variant.path** is automatically generated.
 
 ## Tools
 
-The Arduino IDE uses external command line tools to upload the compiled sketch to the board or to burn bootloaders using external programmers. Currently *avrdude* is used for AVR based boards and *bossac* for SAM based boards, but there is no limit, any command line executable can be used. The command line parameters are specified using **recipes** in the same way used for platform build process.
+The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn bootloaders using external programmers. Currently *avrdude* is used for AVR based boards and *bossac* for SAM based boards, but there is no limit, any command line executable can be used. The command line parameters are specified using **recipes** in the same way used for platform build process.
 
 Tools are configured inside the platform.txt file. Every Tool is identified by a short name, the Tool ID.
 A tool can be used for different purposes:
@@ -400,11 +400,11 @@ Let's look at how the **upload** action is defined for avrdude:
 
 A **{runtime.tools.TOOL_NAME.path}** and **{runtime.tools.TOOL_NAME-TOOL_VERSION.path}** property is generated for the tools of Arduino AVR Boards and any other platform installed via Boards Manager. **{runtime.tools.TOOL_NAME.path}** points to the latest version of the tool available.
 
-The Arduino IDE makes the tool configuration properties available globally without the prefix. For example, the **tools.avrdude.cmd.path** property can be used as **{cmd.path}** inside the recipe, and the same happens for all the other avrdude configuration variables.
+The tool configuration properties are available globally without the prefix. For example, the **tools.avrdude.cmd.path** property can be used as **{cmd.path}** inside the recipe, and the same happens for all the other avrdude configuration variables.
 
 #### Verbose parameter
 
-It is possible for the user to enable verbosity from the Arduino IDE's Preferences panel. This preference is transferred to the command line by the IDE using the **ACTION.verbose** property (where ACTION is the action we are considering).<br>
+It is possible for the user to enable verbosity from the Preferences panel of the IDEs or Arduino CLI's `--verbose` flag. This preference is transferred to the command line using the **ACTION.verbose** property (where ACTION is the action we are considering).<br>
 When the verbose mode is enabled the **tools.TOOL_ID.ACTION.params.verbose** property is copied into **ACTION.verbose**. When the verbose mode is disabled, the **tools.TOOL_ID.ACTION.params.quiet** property is copied into **ACTION.verbose**. Confused? Maybe an example will clear things:
 
     tools.avrdude.upload.params.verbose=-v -v -v -v
@@ -421,8 +421,8 @@ If the user didn't enable verbose mode, then **{upload.params.quiet}** is used i
 
 ### Sketch upload configuration
 
-The Upload action is triggered when the user clicks on the "Upload" button on the IDE toolbar.
-The Arduino IDE selects the tool to be used for upload by looking at the **upload.tool** property.
+The Upload action is triggered when the user clicks on the "Upload" button on the IDE toolbar or uses [`arduino-cli upload`](https://arduino.github.io/arduino-cli/commands/arduino-cli_upload/).
+The **upload.tool** property determines the tool to be used for upload.
 A specific **upload.tool** property should be defined for every board in boards.txt:
 
     [......]
@@ -458,16 +458,16 @@ Most **{upload.XXXX}** variables are used later in the avrdude upload recipe in 
 #### 1200 bps bootloader reset
 Most Arduino boards use a dedicated USB-to-serial chip, that takes care of restarting the main MCU (starting the bootloader) when the serial port is opened. However, boards that have a native USB connection (such as the Leonardo or Zero) will have to disconnect from USB when rebooting into the bootloader (after which the bootloader reconnects to USB and offers a new serial port for uploading). After the upload is complete, the bootloader disconnects from USB again, starts the sketch, which then reconnects to USB. Because of these reconnections, the standard restart-on-serial open will not work, since that would cause the serial port to disappear and be closed again. Instead, the sketch running on these boards interprets a bitrate of 1200 bps as a signal the bootloader should be started.
 
-To let the IDE perform these steps, two board parameters can be set:
+To let the Arduino development software perform these steps, two board parameters can be set:
 
-* `use_1200bps_touch` causes the IDE to briefly open the selected serial port at 1200 bps (8N1) before starting the upload.
-* `wait_for_upload_port` causes the IDE to wait for the serial port to (re)appear before and after the upload. This is only used when `use_1200bps_touch` is also set.  When set, after doing the 1200 bps touch, the IDE will wait for a new serial port to appear and use that as the port for uploads. Alternatively, if the original port does not disappear within a few seconds, the upload continues with the original port (which can be the case if the board was already put into bootloader manually, or the IDE missed the disconnect and reconnect). Additionally, after the upload is complete, the IDE again waits for a new port to appear (or the originally selected port to be present).
+* `use_1200bps_touch` causes the selected serial port to be briefly opened at 1200 bps (8N1) before starting the upload.
+* `wait_for_upload_port` causes the upload procedure to wait for the serial port to (re)appear before and after the upload. This is only used when `use_1200bps_touch` is also set.  When set, after doing the 1200 bps touch, the development software will wait for a new serial port to appear and use that as the port for uploads. Alternatively, if the original port does not disappear within a few seconds, the upload continues with the original port (which can be the case if the board was already put into bootloader manually, or the the disconnect and reconnect was missed). Additionally, after the upload is complete, the IDE again waits for a new port to appear (or the originally selected port to be present).
 
 Note that the IDE implementation of this 1200 bps touch has some peculiarities, and the newer `arduino-cli` implementation also seems different (does not wait for the port after the reset, which is probably only needed in the IDE to prevent opening the wrong port on the serial monitor, and does not have a shorter timeout when the port never disappears).
 
 ### Serial port
 
-The Arduino IDE auto-detects all available serial ports on the running system and lets the user choose one from the GUI. The selected port is available as a configuration property **{serial.port}**.
+The port selected via the IDE or [`arduino-cli upload`](https://arduino.github.io/arduino-cli/commands/arduino-cli_upload/)'s `--port` option is available as a configuration property **{serial.port}**.
 
 ### Upload using an external programmer
 
@@ -479,13 +479,19 @@ The platform.txt associated with the selected programmer will be used.
 **TODO...**
 The platform.txt associated with the selected board will be used.
 
-## Custom board menus
+## Custom board options
 
-The Arduino IDE allows adding extra menu items under the Tools menu. With these sub-menus the user can select different configurations for a specific board (for example a board could be provided in two or more variants with different CPUs, or may have different crystal speed based on the board model, and so on...).
+It can sometimes be useful to provide user selectable configuration options for a specific board. For example, a board could be provided in two or more variants with different CPUs, or may have different crystal speed based on the board model, and so on...
 
-Let's see an example of how a custom menu is implemented.
+When using Arduino CLI, the option can be selected via the FQBN.
+
+In the Arduino IDE the options add extra menu items under the "Tools" menu.
+
+In Arduino Web Editor, the options are displayed in the "Flavours" menu.
+
+Let's see an example of how a custom option is implemented.
 The board used in the example is the Arduino Duemilanove. This board was produced in two models, one with an ATmega168 CPU and another with an ATmega328P.<br>
-We are going then to define a custom menu "Processor" that allows the user to choose between the two
+We are going then to define a custom option, using the "cpu" MENU_ID, that allows the user to choose between the two
 different microcontrollers.
 
 We must first define a set of **menu.MENU_ID=Text** properties. Text is what is displayed on the GUI for every custom menu we are going to create and must be declared at the beginning of the boards.txt file:
@@ -493,7 +499,7 @@ We must first define a set of **menu.MENU_ID=Text** properties. Text is what is 
     menu.cpu=Processor
     [.....]
 
-in this case we declare only one custom menu "Processor" which we refer using the "cpu" MENU_ID.<br>
+in this case, the menu name is "Processor".<br>
 Now let's add, always in the boards.txt file, the default configuration (common to all processors) for the duemilanove board:
 
     menu.cpu=Processor
@@ -507,7 +513,7 @@ Now let's add, always in the boards.txt file, the default configuration (common 
     duemilanove.build.variant=standard
     [.....]
 
-Now let's define the options to show in the "Processor" menu:
+Now let's define the possible values of the "cpu" option:
 
     [.....]
     duemilanove.menu.cpu.atmega328=ATmega328P
@@ -515,9 +521,9 @@ Now let's define the options to show in the "Processor" menu:
     duemilanove.menu.cpu.atmega168=ATmega168
     [.....]
 
-We have defined two options: "ATmega328P" and "ATmega168".<br>
-Note that the property keys must follow the format **BOARD_ID.menu.MENU_ID.OPTION_ID=Text**.<br>
-Finally, the specific configuration for every option:
+We have defined two values: "atmega328" and "atmega168".<br>
+Note that the property keys must follow the format **BOARD_ID.menu.MENU_ID.OPTION_ID=Text**, where Text is what is displayed under the "Processor" menu in the IDE's GUI.<br>
+Finally, the specific configuration for each option value:
 
     [.....]
     ## Arduino Duemilanove w/ ATmega328P
@@ -533,7 +539,7 @@ Finally, the specific configuration for every option:
     duemilanove.menu.cpu.atmega168.build.mcu=atmega168
     [.....]
 
-Note that when the user selects an option, all the "sub properties" of that option are copied in the global configuration. For example when the user selects "ATmega168" from the "Processor" menu the Arduino IDE makes the configuration under atmega168 available globally:
+Note that when the user selects an option value, all the "sub properties" of that value are copied in the global configuration. For example when the user selects "ATmega168" from the "Processor" menu, or uses the FQBN `arduino:avr:duemilanove:cpu=atmega168` with Arduino CLI, the configuration under atmega168 is made available globally:
 
     duemilanove.menu.cpu.atmega168.upload.maximum_size     =>   upload.maximum_size
     duemilanove.menu.cpu.atmega168.upload.speed            =>   upload.speed
@@ -589,4 +595,4 @@ Introduced in Arduino IDE 1.6.6. This file can be used to override properties de
 
 ## keywords.txt
 
-As of Arduino IDE 1.6.6, per-platform keywords can be defined by adding a keywords.txt file to the platform's architecture folder. These keywords are only highlighted when one of the boards of that platform are selected. This file follows the [same format](library-specification.md#keywords) as the keywords.txt used in libraries. Each keyword must be separated from the keyword identifier by a tab.
+As of Arduino IDE 1.6.6, per-platform keywords can be defined by adding a keywords.txt file to the platform's architecture folder. These keywords are only highlighted in the Arduino IDE when one of the boards of that platform are selected. This file follows the [same format](library-specification.md#keywords) as the keywords.txt used in libraries. Each keyword must be separated from the keyword identifier by a tab.

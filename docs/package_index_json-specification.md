@@ -1,12 +1,14 @@
-Starting from version 1.6.4 the Boards Manager of the Arduino IDE can be used to automatically install support for **3rd party hardware** by simply entering an URL in the **File > Preferences** dialog. The URL must be provided by the 3rd party hardware producer and should point to a JSON file that contains an index of the boards available to install and the location of the installation archives. Boards Manager also allows easy updates of installed Boards when new versions are released.
+Introduced in Arduino IDE 1.6.4, Boards Manager makes it easy to install and update Arduino platforms. In order to provide Boards Manager installation support for a platform, a JSON formatted index file must be published. This is the specification for that file.
+
+Boards Manager functionality is provided by [Arduino CLI](getting-started.md#adding-3rd-party-cores), [Arduino IDE](https://www.arduino.cc/en/Guide/Cores), and Arduino Pro IDE.
 
 ## Naming of the JSON index file
 
-The IDE may use many different index files coming from different vendors, so each vendor should name his own index file in a way that won't conflict with others. The file must be named as follows:
+Many different index files coming from different vendors may be in use, so each vendor should name his own index file in a way that won't conflict with others. The file must be named as follows:
 
 `package_YOURNAME_PACKAGENAME_index.json`
 
-The prefix `package_` and the postfix `_index.json` are **mandatory** (otherwise the index file is not recognised by the IDE) while the choice of `YOURNAME_PACKAGENAME` is left to the packager.
+The prefix `package_` and the postfix `_index.json` are **mandatory** (otherwise the index file is not recognised by the Arduino development software) while the choice of `YOURNAME_PACKAGENAME` is left to the packager.
 We suggest using a domain name owned by the packager. For example:
 
 `package_arduino.cc_index.json`
@@ -58,8 +60,8 @@ The root of the JSON index is an array of `packages`:
 The metadata fields are:
 
 * `name`: the folder used for the installed cores. The [vendor folder](platform-specification.md#hardware-folders-structure) name of the installed package is determined by this field
-* `maintainer`: the extended name of the vendor that is displayed on the Boards Manager GUI
-* `websiteURL`: the URL to the vendor's website, appears on the Boards Manager as a "More info" link
+* `maintainer`: the extended name of the vendor that is displayed on the Arduino IDE/Pro IDE's Boards Manager GUI
+* `websiteURL`: the URL to the vendor's website, appears on the Arduino IDE/Pro IDE's Boards Manager as a "More info" link
 * `email`: the email of the vendor/maintainer
 
 Now, before looking at `PLATFORMS`, let's explore first how `TOOLS` are made.
@@ -136,7 +138,7 @@ Each tool version may come in different build flavours for different OS. Each fl
 * Mac (`i386-apple-darwin11`)
 
 The IDE will take care to install the right flavour based on the `host` value, or fail if a needed flavour is missing.<br>
-Note that the IDE does not use this information to select the toolchain during verify. If you want the IDE to use this specific version you should use the notation {runtime.tools.TOOLNAME-VERSION.path} in the platform.txt.
+Note that this information is not used to select the toolchain during compilation. If you want this specific version to be used, you should use the notation {runtime.tools.TOOLNAME-VERSION.path} in the platform.txt.
 
 The other fields are:
 
@@ -194,9 +196,9 @@ Each PLATFORM describes a core for a specific architecture. The fields needed ar
 * `architecture`: is the architecture of the plaftorm (avr, sam, etc...). It must match the architecture of the core as explained in the [Arduino platform specification](platform-specification.md#hardware-folders-structure)
 * `version`: the version of the platform.
 * `category`: this field is reserved, a 3rd party core must set it to `Contributed`
-* `help`/`online`: is a URL that is displayed on the Boards Manager as an "Online Help" link
+* `help`/`online`: is a URL that is displayed on the Arduino IDE's Boards Manager as an "Online Help" link
 * `url`, `archiveFileName`, `size` and `checksum`: metadata of the core archive file. The meaning is the same as for the TOOLS
-* `boards`: the list of boards supported (note: just the names to display on the GUI! the real boards definitions are inside `boards.txt` inside the core archive file)
+* `boards`: the list of boards supported (note: just the names to display on the Arduino IDE and Arduino Pro IDE's Boards Manager GUI! the real boards definitions are inside `boards.txt` inside the core archive file)
 * `toolsDependencies`: the tools needed by this core. Each tool is referenced by the triple (`packager`, `name`, `version`) as previously said. Note that you can reference tools available in other packages as well.
 
 The `version` field is validated by both Arduino IDE and [JSemVer](https://github.com/zafarkhaja/jsemver). Here are the rules Arduino IDE follows for parsing versions ([source](https://github.com/arduino/Arduino/blob/master/arduino-core/src/cc/arduino/contributions/VersionHelper.java)):
@@ -295,7 +297,7 @@ Here is the Boards Manager entry created by the example:
 
 The installation archives contain the Board support files. Supported formats are .zip, .tar.bz2, and .tar.gz.
 
-The folder structure of the core archive is slightly different from the standard manually installed Arduino 1.5+ compatible hardware folder structure. You must remove the architecture folder(e.g., `avr` or `arm`), moving all the files and folders within the architecture folder up a level.
+The folder structure of the core archive is slightly different from the standard manually installed Arduino IDE 1.5+ compatible hardware folder structure. You must remove the architecture folder(e.g., `avr` or `arm`), moving all the files and folders within the architecture folder up a level.
 
 ***
 
