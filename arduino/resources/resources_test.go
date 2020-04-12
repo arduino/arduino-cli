@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/downloader"
 )
 
 func TestDownloadAndChecksums(t *testing.T) {
@@ -41,7 +42,7 @@ func TestDownloadAndChecksums(t *testing.T) {
 	require.NoError(t, err)
 
 	downloadAndTestChecksum := func() {
-		d, err := r.Download(tmp)
+		d, err := r.Download(tmp, &downloader.Config{})
 		require.NoError(t, err)
 		err = d.Run()
 		require.NoError(t, err)
@@ -57,7 +58,7 @@ func TestDownloadAndChecksums(t *testing.T) {
 	downloadAndTestChecksum()
 
 	// Download with cached file
-	d, err := r.Download(tmp)
+	d, err := r.Download(tmp, &downloader.Config{})
 	require.NoError(t, err)
 	require.Nil(t, d)
 

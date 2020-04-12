@@ -100,16 +100,16 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 
 // DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Downloader
 // is returned.
-func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease) (*downloader.Downloader, error) {
+func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config) (*downloader.Downloader, error) {
 	resource := tool.GetCompatibleFlavour()
 	if resource == nil {
 		return nil, fmt.Errorf("tool not available for your OS")
 	}
-	return resource.Download(pm.DownloadDir)
+	return resource.Download(pm.DownloadDir, config)
 }
 
 // DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
 // nil Downloader is returned.
-func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease) (*downloader.Downloader, error) {
-	return platform.Resource.Download(pm.DownloadDir)
+func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config) (*downloader.Downloader, error) {
+	return platform.Resource.Download(pm.DownloadDir, config)
 }

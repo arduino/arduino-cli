@@ -50,7 +50,11 @@ func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librarie
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 
 	taskCB(&rpc.TaskProgress{Name: "Downloading " + libRelease.String()})
-	if d, err := libRelease.Resource.Download(lm.DownloadsDir); err != nil {
+	config, err := commands.GetDownloaderConfig()
+	if err != nil {
+		return err
+	}
+	if d, err := libRelease.Resource.Download(lm.DownloadsDir, config); err != nil {
 		return err
 	} else if err := commands.Download(d, libRelease.String(), downloadCB); err != nil {
 		return err

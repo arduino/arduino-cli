@@ -37,7 +37,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"go.bug.st/downloader"
 	"google.golang.org/grpc"
 )
 
@@ -66,14 +65,11 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		stats.Incr("daemon", stats.T("success", "true"))
 		defer stats.Flush()
 	}
-
 	port := viper.GetString("daemon.port")
 	s := grpc.NewServer()
 
 	// Set specific user-agent for the daemon
-	netConf := downloader.GetDefaultConfig()
-	netConf.RequestHeaders = globals.NewHTTPClientHeader("daemon")
-	downloader.SetDefaultConfig(netConf)
+	viper.Set("network.user_agent_ext", "daemon")
 
 	// register the commands service
 	srv_commands.RegisterArduinoCoreServer(s, &daemon.ArduinoCoreServerImpl{

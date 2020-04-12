@@ -53,10 +53,7 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 		URL:             srv.URL,
 	}
 
-	prev := downloader.GetDefaultConfig()
-	downloader.SetDefaultConfig(downloader.Config{RequestHeaders: http.Header{"User-Agent": []string{goldUserAgentValue}}})
-	d, err := r.Download(tmp)
-	downloader.SetDefaultConfig(prev)
+	d, err := r.Download(tmp, &downloader.Config{RequestHeaders: http.Header{"User-Agent": []string{goldUserAgentValue}}})
 	require.NoError(t, err)
 	err = d.Run()
 	require.NoError(t, err)

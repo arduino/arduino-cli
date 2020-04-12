@@ -25,7 +25,11 @@ import (
 
 // DownloadToolRelease downloads a ToolRelease
 func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, downloadCB DownloadProgressCB) error {
-	resp, err := pm.DownloadToolRelease(toolRelease)
+	config, err := GetDownloaderConfig()
+	if err != nil {
+		return err
+	}
+	resp, err := pm.DownloadToolRelease(toolRelease, config)
 	if err != nil {
 		return err
 	}

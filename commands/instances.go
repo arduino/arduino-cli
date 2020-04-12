@@ -21,7 +21,6 @@ import (
 	"io/ioutil"
 	"net/url"
 	"path"
-	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
@@ -171,7 +170,11 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexReq,
 	if lm == nil {
 		return fmt.Errorf("invalid handle")
 	}
-	d, err := lm.UpdateIndex()
+	config, err := GetDownloaderConfig()
+	if err != nil {
+		return err
+	}
+	d, err := lm.UpdateIndex(config)
 	if err != nil {
 		return err
 	}
@@ -215,7 +218,11 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 		tmp := paths.New(tmpFile.Name())
 		defer tmp.Remove()
 
-		d, err := downloader.Download(tmp.String(), URL.String())
+		config, err := GetDownloaderConfig()
+		if err != nil {
+			return nil, fmt.Errorf("downloading index %s: %s", URL, err)
+		}
+		d, err := downloader.DownloadWithConfig(tmp.String(), URL.String(), *config)
 		if err != nil {
 			return nil, fmt.Errorf("downloading index %s: %s", URL, err)
 		}
@@ -347,29 +354,4 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 	}
 
 	return res, nil
-}
-
-// Download FIXMEDOC
-func Download(d *downloader.Downloader, label string, downloadCB DownloadProgressCB) error {
-	if d == nil {
-		// This signal means that the file is already downloaded
-		downloadCB(&rpc.DownloadProgress{
-			File:      label,
-			Completed: true,
-		})
-		return nil
-	}
-	downloadCB(&rpc.DownloadProgress{
-		File:      label,
-		Url:       d.URL,
-		TotalSize: d.Size(),
-	})
-	d.RunAndPoll(func(downloaded int64) {
-		downloadCB(&rpc.DownloadProgress{Downloaded: downloaded})
-	}, 250*time.Millisecond)
-	if d.Error() != nil {
-		return d.Error()
-	}
-	downloadCB(&rpc.DownloadProgress{Completed: true})
-	return nil
 }

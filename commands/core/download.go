@@ -64,7 +64,11 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadReq, downloa
 
 func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, downloadCB commands.DownloadProgressCB) error {
 	// Download platform
-	resp, err := pm.DownloadPlatformRelease(platformRelease)
+	config, err := commands.GetDownloaderConfig()
+	if err != nil {
+		return err
+	}
+	resp, err := pm.DownloadPlatformRelease(platformRelease, config)
 	if err != nil {
 		return err
 	}
