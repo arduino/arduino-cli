@@ -25,7 +25,7 @@ import (
 func NewCommand() *cobra.Command {
 	configCommand := &cobra.Command{
 		Use:     "config",
-		Short:   "Arduino Configuration Commands.",
+		Short:   "Arduino configuration commands.",
 		Example: "  " + os.Args[0] + " config init",
 	}
 

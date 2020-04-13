@@ -25,8 +25,8 @@ import (
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "sketch",
-		Short:   "Arduino CLI Sketch Commands.",
-		Long:    "Arduino CLI Sketch Commands.",
+		Short:   "Arduino CLI sketch commands.",
+		Long:    "Arduino CLI sketch commands.",
 		Example: "  " + os.Args[0] + " sketch new MySketch",
 	}
 

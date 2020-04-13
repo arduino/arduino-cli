@@ -25,8 +25,8 @@ import (
 func NewCommand() *cobra.Command {
 	coreCommand := &cobra.Command{
 		Use:     "core",
-		Short:   "Arduino Core operations.",
-		Long:    "Arduino Core operations.",
+		Short:   "Arduino core operations.",
+		Long:    "Arduino core operations.",
 		Example: "  " + os.Args[0] + " core update-index",
 	}
 

@@ -76,11 +76,11 @@ func NewCommand() *cobra.Command {
 	command.Flags().StringVar(&warnings, "warnings", "none",
 		`Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
 	command.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
-	command.Flags().BoolVar(&quiet, "quiet", false, "Optional, supresses almost every output.")
+	command.Flags().BoolVar(&quiet, "quiet", false, "Optional, suppresses almost every output.")
 	command.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, "Upload the binary after the compilation.")
 	command.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
 	command.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
-	command.Flags().StringVar(&vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if boards supports them.")
+	command.Flags().StringVar(&vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if board supports them.")
 	command.Flags().StringSliceVar(&libraries, "libraries", []string{},
 		"List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.")
 	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, "Optional, optimize compile output for debug, not for release.")
