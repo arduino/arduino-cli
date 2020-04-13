@@ -18,6 +18,8 @@ package board
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -26,14 +28,11 @@ import (
 	"github.com/arduino/arduino-cli/table"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"os"
 )
-
-var showFullDetails bool
 
 func initDetailsCommand() *cobra.Command {
 	var detailsCommand = &cobra.Command{
-		Use:     "details <FQBN>",
+		Use:     "details <FQBN | BOARD_ALIAS>",
 		Short:   "Print details about a board.",
 		Long:    "Show information about a board, in particular if the board has options to be specified in the FQBN.",
 		Example: "  " + os.Args[0] + " board details arduino:avr:nano",
@@ -41,9 +40,15 @@ func initDetailsCommand() *cobra.Command {
 		Run:     runDetailsCommand,
 	}
 
-	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, "Include full details in text output")
-
+	detailsCommand.Flags().BoolVarP(&detailsFlags.showFullDetails, "full", "f", false, "Include full details in text output")
+	detailsFlags.boardConfig =
+		detailsCommand.Flags().StringSliceP("board-conf", "c", nil, "set a board configuration value. The flag can be used multiple times.\n"+"Example: "+os.Args[0]+" board details arduino:avr:nano -c cpu=atmega168")
 	return detailsCommand
+}
+
+var detailsFlags struct {
+	showFullDetails bool
+	boardConfig     *[]string
 }
 
 func runDetailsCommand(cmd *cobra.Command, args []string) {
@@ -54,8 +59,9 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 	}
 
 	res, err := board.Details(context.Background(), &rpc.BoardDetailsReq{
-		Instance: inst,
-		Fqbn:     args[0],
+		Instance:    inst,
+		Board:       args[0],
+		BoardConfig: *detailsFlags.boardConfig,
 	})
 
 	if err != nil {
@@ -131,7 +137,7 @@ func (dr detailsResult) String() string {
 	t.AddRow() // get some space from above
 	for _, tool := range details.ToolsDependencies {
 		t.AddRow("Required tools:", tool.Packager+":"+tool.Name, "", tool.Version)
-		if showFullDetails {
+		if detailsFlags.showFullDetails {
 			for _, sys := range tool.Systems {
 				t.AddRow("", "OS:", "", sys.Host)
 				t.AddRow("", "File:", "", sys.ArchiveFileName)

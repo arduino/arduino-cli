@@ -80,7 +80,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	}
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	fqbn, _, _, err := pm.FindBoard(boardArg)
+	fqbn, _, _, err := pm.FindBoard(boardArg, req.GetBoardConfig())
 	if err != nil {
 		return nil, errors.Errorf("board '%s' not found: %s", req.GetBoard(), err)
 	}

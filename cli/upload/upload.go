@@ -30,7 +30,9 @@ import (
 )
 
 var (
-	boardArg   string
+	boardArg    string
+	boardConfig *[]string
+
 	port       string
 	verbose    bool
 	verify     bool
@@ -49,6 +51,8 @@ func NewCommand() *cobra.Command {
 	}
 
 	uploadCommand.Flags().StringVarP(&boardArg, "board", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	boardConfig =
+		uploadCommand.Flags().StringSliceP("board-conf", "c", nil, "set a board configuration value. The flag can be used multiple times.\n"+"Example: "+os.Args[0]+" board details arduino:avr:nano -c cpu=atmega168")
 	uploadCommand.Flags().StringVarP(&boardArg, "fqbn", "", "", "")
 	uploadCommand.Flags().MarkDeprecated("fqbn", "use --board instead.")
 	uploadCommand.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")

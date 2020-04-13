@@ -33,7 +33,9 @@ import (
 )
 
 var (
-	boardArg           string   // Board Alias or Board FQBN
+	boardArg    string    // Board Alias or Board FQBN
+	boardConfig *[]string // Board Configuration
+
 	showProperties     bool     // Show all build preferences used instead of compiling.
 	preprocess         bool     // Print preprocessed code to stdout.
 	buildCachePath     string   // Builds of 'core.a' are saved into this path to be cached and reused.
@@ -64,6 +66,8 @@ func NewCommand() *cobra.Command {
 	}
 
 	command.Flags().StringVarP(&boardArg, "board", "b", "", "Board Alias or Board FQBN (e.g. 'arduino:avr:uno')")
+	boardConfig =
+		command.Flags().StringSliceP("board-conf", "c", nil, "set a board configuration value. The flag can be used multiple times.\n"+"Example: "+os.Args[0]+" board details arduino:avr:nano -c cpu=atmega168")
 	command.Flags().StringVarP(&boardArg, "fqbn", "", "", "")
 	command.Flags().MarkDeprecated("fqbn", "use --board instead.")
 	command.Flags().BoolVar(&showProperties, "show-properties", false, "Show all build properties used instead of compiling.")
@@ -107,6 +111,7 @@ func run(cmd *cobra.Command, args []string) {
 	_, err = compile.Compile(context.Background(), &rpc.CompileReq{
 		Instance:         inst,
 		Board:            boardArg,
+		BoardConfig:      *boardConfig,
 		SketchPath:       sketchPath.String(),
 		ShowProperties:   showProperties,
 		Preprocess:       preprocess,

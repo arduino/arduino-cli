@@ -18,9 +18,7 @@ package board
 import (
 	"context"
 	"errors"
-	"fmt"
 
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
@@ -33,14 +31,18 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		return nil, errors.New("invalid instance")
 	}
 
-	fqbn, err := cores.ParseFQBN(req.GetFqbn())
-	if err != nil {
-		return nil, fmt.Errorf("parsing fqbn: %s", err)
+	boardArg := req.GetBoard()
+	if boardArg == "" {
+		boardArg = req.GetFqbn() // Deprecated: use FQBN for old client.
 	}
 
-	boardPackage, boardPlatform, board, _, _, err := pm.ResolveFQBN(fqbn)
+	fqbn, _, board, err := pm.FindBoard(boardArg, req.GetBoardConfig())
+	boardPlatform := board.PlatformRelease
+	boardPackage := boardPlatform.Platform.Package
+
+	// TODO: do not ignore *RegisteredBoard result, but output data from it?
 	if err != nil {
-		return nil, fmt.Errorf("loading board data: %s", err)
+		return nil, err
 	}
 
 	details := &rpc.BoardDetailsResp{}

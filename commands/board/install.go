@@ -33,7 +33,7 @@ func Install(ctx context.Context, req *rpc.BoardInstallReq,
 		return nil, errors.New("invalid instance")
 	}
 
-	fqbn, _, _, err := pm.FindBoard(req.GetBoard())
+	fqbn, _, _, err := pm.FindBoard(req.GetBoard(), nil)
 	if err != nil {
 		return nil, errors.Errorf("board '%s' not found: %s", req.GetBoard(), err)
 	}

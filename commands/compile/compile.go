@@ -96,7 +96,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		return nil, errors.Errorf("no board provided")
 	}
 
-	fqbn, _, _, err := pm.FindBoard(boardArg)
+	fqbn, _, _, err := pm.FindBoard(boardArg, req.GetBoardConfig())
 	if err != nil {
 		return nil, errors.Errorf("board '%s' not found: %s", req.GetBoard(), err)
 	}

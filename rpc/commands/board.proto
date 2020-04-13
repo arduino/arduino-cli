@@ -24,9 +24,12 @@ import "commands/common.proto";
 message BoardDetailsReq {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
+    // DEPRECATED: use "board" and "board_config" fields instead.
+    string fqbn = 2 [deprecated=true];
     // The fully qualified board name of the board you want information about
-    // (e.g., `arduino:avr:uno`).
-    string fqbn = 2;
+    // (e.g., `arduino:avr:uno`) or the board alias.
+    string board = 3;
+    repeated string board_config = 4;
 }
 
 message BoardDetailsResp {

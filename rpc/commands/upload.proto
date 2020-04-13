@@ -22,14 +22,15 @@ option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 import "commands/common.proto";
 
 message UploadReq {
-    Instance instance = 1;
-    string fqbn = 2 [deprecated=true];
-    string sketch_path = 3;
+	Instance instance = 1;
+	string fqbn = 2 [deprecated=true]; // DEPRECATED: use "board" and "board_config" fields instead.
+	string sketch_path = 3;
 	string port = 4;
 	bool verbose = 5;
 	bool verify = 6;
 	string import_file = 7;
 	string board = 8;
+	repeated string board_config = 9;
 }
 
 message UploadResp {
