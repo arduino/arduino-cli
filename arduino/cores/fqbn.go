@@ -48,20 +48,29 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 		return nil, fmt.Errorf("invalid fqbn: empty board identifier")
 	}
 	if len(fqbnParts) > 3 {
-		for _, pair := range strings.Split(fqbnParts[3], ",") {
-			parts := strings.SplitN(pair, "=", 2)
-			if len(parts) != 2 {
-				return nil, fmt.Errorf("invalid fqbn config: %s", pair)
-			}
-			k := strings.TrimSpace(parts[0])
-			v := strings.TrimSpace(parts[1])
-			if k == "" {
-				return nil, fmt.Errorf("invalid fqbn config: %s", pair)
-			}
-			fqbn.Configs.Set(k, v)
+		if err := fqbn.SetConfigs(strings.Split(fqbnParts[3], ",")); err != nil {
+			return nil, err
 		}
 	}
 	return fqbn, nil
+}
+
+// SetConfigs set the configs part of the FQBN with the provided config strings.
+// Each config string must be a pair "config=value".
+func (fqbn *FQBN) SetConfigs(configs []string) error {
+	for _, pair := range configs {
+		parts := strings.SplitN(pair, "=", 2)
+		if len(parts) != 2 {
+			return fmt.Errorf("invalid fqbn config: %s", pair)
+		}
+		k := strings.TrimSpace(parts[0])
+		v := strings.TrimSpace(parts[1])
+		if k == "" {
+			return fmt.Errorf("invalid fqbn config: %s", pair)
+		}
+		fqbn.Configs.Set(k, v)
+	}
+	return nil
 }
 
 // MustParseFQBN extract an FQBN object from the input string or panics
