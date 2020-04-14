@@ -30,7 +30,7 @@ func NewCommand() *cobra.Command {
 		Example: "  # Lists all connected boards.\n" +
 			"  " + os.Args[0] + " board list\n\n" +
 			"  # Attaches a sketch to a board.\n" +
-			"  " + os.Args[0] + " board attach serial:///dev/tty/ACM0 mySketch",
+			"  " + os.Args[0] + " board attach serial:///dev/ttyACM0 mySketch",
 	}
 
 	boardCommand.AddCommand(initAttachCommand())

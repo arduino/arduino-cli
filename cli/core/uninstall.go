@@ -33,8 +33,8 @@ import (
 func initUninstallCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:     "uninstall PACKAGER:ARCH ...",
-		Short:   "Uninstalls one or more cores and corresponding tool dependencies if no more used.",
-		Long:    "Uninstalls one or more cores and corresponding tool dependencies if no more used.",
+		Short:   "Uninstalls one or more cores and corresponding tool dependencies if no longer used.",
+		Long:    "Uninstalls one or more cores and corresponding tool dependencies if no longer used.",
 		Example: "  " + os.Args[0] + " core uninstall arduino:samd\n",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runUninstallCommand,

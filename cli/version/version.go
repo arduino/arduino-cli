@@ -27,8 +27,8 @@ import (
 func NewCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:     "version",
-		Short:   "Shows version number of arduino CLI.",
-		Long:    "Shows version number of arduino CLI which is installed on your system.",
+		Short:   "Shows version number of Arduino CLI.",
+		Long:    "Shows the version number of Arduino CLI which is installed on your system.",
 		Example: "  " + os.Args[0] + " version",
 		Args:    cobra.NoArgs,
 		Run:     run,

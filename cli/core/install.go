@@ -35,7 +35,7 @@ func initInstallCommand() *cobra.Command {
 		Use:   "install PACKAGER:ARCH[@VERSION] ...",
 		Short: "Installs one or more cores and corresponding tool dependencies.",
 		Long:  "Installs one or more cores and corresponding tool dependencies.",
-		Example: "  # download the latest version of arduino SAMD core.\n" +
+		Example: "  # download the latest version of Arduino SAMD core.\n" +
 			"  " + os.Args[0] + " core install arduino:samd\n\n" +
 			"  # download a specific version (in this case 1.6.9).\n" +
 			"  " + os.Args[0] + " core install arduino:samd@1.6.9",
