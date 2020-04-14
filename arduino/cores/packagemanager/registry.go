@@ -23,12 +23,14 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
+// BoardsRegistry is a database with a list of registered boards
 type BoardsRegistry struct {
 	Boards        []*RegisteredBoard
 	fqbnToBoard   map[string]*RegisteredBoard
 	aliastToBoard map[string]*RegisteredBoard
 }
 
+// RegisteredBoard contains manifest information for a board
 type RegisteredBoard struct {
 	FQBN                *cores.FQBN
 	Alias               string
@@ -36,6 +38,7 @@ type RegisteredBoard struct {
 	ExternalPlatformURL *url.URL
 }
 
+// NewBoardRegistry creates a new BoardsRegistry instance
 func NewBoardRegistry() *BoardsRegistry {
 	return &BoardsRegistry{
 		Boards:        []*RegisteredBoard{},
@@ -50,6 +53,7 @@ func (r *BoardsRegistry) addBoard(board *RegisteredBoard) {
 	r.aliastToBoard[board.Alias] = board
 }
 
+// FindBoard gets a RegisteredBoard using FQBN or Board Alias
 func (r *BoardsRegistry) FindBoard(fqbnOrAlias string) (*cores.FQBN, *RegisteredBoard, error) {
 	if found, ok := r.aliastToBoard[fqbnOrAlias]; ok {
 		return found.FQBN, found, nil
@@ -64,6 +68,7 @@ func (r *BoardsRegistry) FindBoard(fqbnOrAlias string) (*cores.FQBN, *Registered
 	return fqbn, nil, nil
 }
 
+// SearchBoards search for a RegisteredBoard using a query string
 func (r *BoardsRegistry) SearchBoards(query string) []*RegisteredBoard {
 	found := []*RegisteredBoard{}
 	contains := func(a string, b string) bool {
@@ -77,6 +82,7 @@ func (r *BoardsRegistry) SearchBoards(query string) []*RegisteredBoard {
 	return found
 }
 
+// LoadBoardRegistry retrieve a board registry from a file. WIP...
 func LoadBoardRegistry(file *paths.Path) (*BoardsRegistry, error) {
 
 	// TODO...
