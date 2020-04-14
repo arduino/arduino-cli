@@ -88,6 +88,11 @@ func LoadBoardRegistry(file *paths.Path) (*BoardsRegistry, error) {
 		Alias: "uno",
 	})
 	fake.addBoard(&RegisteredBoard{
+		Name:  "Arduino Nano",
+		FQBN:  cores.MustParseFQBN("arduino:avr:nano"),
+		Alias: "nano",
+	})
+	fake.addBoard(&RegisteredBoard{
 		Name:  "Arduino Zero",
 		FQBN:  cores.MustParseFQBN("arduino:samd:arduino_zero_edbg"),
 		Alias: "zero",
