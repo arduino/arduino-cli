@@ -75,7 +75,12 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		return nil, errors.New("invalid instance")
 	}
 
-	logrus.Tracef("Compile %s for %s started", req.GetSketchPath(), req.GetFqbn())
+	boardArg := req.GetBoard()
+	if boardArg == "" {
+		boardArg = req.GetFqbn() // DEPRECATED: Keep Fqbn field working for old clients.
+	}
+
+	logrus.Tracef("Compile %s for %s started", req.GetSketchPath(), boardArg)
 	if req.GetSketchPath() == "" {
 		return nil, fmt.Errorf("missing sketchPath")
 	}
@@ -85,10 +90,6 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
 
-	boardArg := req.GetBoard()
-	if boardArg == "" {
-		boardArg = req.GetFqbn() // DEPRECATED: Keep Fqbn field working for old clients.
-	}
 	if boardArg == "" && sketch != nil && sketch.Metadata != nil {
 		boardArg = sketch.Metadata.CPU.Fqbn
 	}
