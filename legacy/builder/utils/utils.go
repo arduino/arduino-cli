@@ -207,7 +207,7 @@ func PrepareCommandFilteredArgs(pattern string, filter argFilterFunc, logger i18
 			if relativePath != "" {
 				if _, err := os.Stat(part); !os.IsNotExist(err) {
 					tmp, err := filepath.Rel(relativePath, part)
-					if err == nil {
+					if err == nil && !strings.Contains(tmp, "..") && len(tmp) < len(part) {
 						part = tmp
 					}
 				}
