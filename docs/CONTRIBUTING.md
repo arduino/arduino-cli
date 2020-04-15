@@ -12,7 +12,7 @@ Before we can accept your contributions you have to sign the [Contributor Licens
 ## Prerequisites
 
 To build the Arduino CLI from sources you need the following tools to be
-available in your local enviroment:
+available in your local environment:
 
 * [Go][1] version 1.12 or later
 * [Taskfile][2] to help you run the most common tasks from the command line
@@ -25,7 +25,7 @@ If you want to run integration tests you will also need:
 If you're working on the gRPC interface you will also have to:
 
 * download the [protoc][6] compiler
-* run `go get -U github.com/golang/protobuf/protoc-gen-go`
+* run `go get -u github.com/golang/protobuf/protoc-gen-go`
 
 ## Building the source code
 
@@ -101,7 +101,7 @@ have Python installed in your system, if this is not the case you can
 your Operating System.
 
 Some dependencies need to be installed before running the tests and to avoid
-polluting your global Python enviroment with dependencies that might be only
+polluting your global Python environment with dependencies that might be only
 used by the Arduino CLI, you can use a [virtual environment][4]. There are many
 ways to manage virtual environments, for example you can use a productivity tool
 called [hatch][5]. First you need to install it (you might need to `sudo`
