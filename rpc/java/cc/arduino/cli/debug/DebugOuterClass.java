@@ -924,19 +924,19 @@ public final class DebugOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+     * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      * @return Whether the instance field is set.
      */
     boolean hasInstance();
     /**
-     * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+     * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      * @return The instance.
      */
-    cc.arduino.cli.debug.DebugOuterClass.Instance getInstance();
+    cc.arduino.cli.commands.Common.Instance getInstance();
     /**
-     * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+     * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      */
-    cc.arduino.cli.debug.DebugOuterClass.InstanceOrBuilder getInstanceOrBuilder();
+    cc.arduino.cli.commands.Common.InstanceOrBuilder getInstanceOrBuilder();
 
     /**
      * <code>string fqbn = 2;</code>
@@ -975,7 +975,19 @@ public final class DebugOuterClass {
         getPortBytes();
 
     /**
-     * <code>bool verbose = 5;</code>
+     * <code>string interpreter = 5;</code>
+     * @return The interpreter.
+     */
+    java.lang.String getInterpreter();
+    /**
+     * <code>string interpreter = 5;</code>
+     * @return The bytes for interpreter.
+     */
+    com.google.protobuf.ByteString
+        getInterpreterBytes();
+
+    /**
+     * <code>bool verbose = 6;</code>
      * @return The verbose.
      */
     boolean getVerbose();
@@ -1008,6 +1020,7 @@ public final class DebugOuterClass {
       fqbn_ = "";
       sketchPath_ = "";
       port_ = "";
+      interpreter_ = "";
       importFile_ = "";
     }
 
@@ -1042,11 +1055,11 @@ public final class DebugOuterClass {
               done = true;
               break;
             case 10: {
-              cc.arduino.cli.debug.DebugOuterClass.Instance.Builder subBuilder = null;
+              cc.arduino.cli.commands.Common.Instance.Builder subBuilder = null;
               if (instance_ != null) {
                 subBuilder = instance_.toBuilder();
               }
-              instance_ = input.readMessage(cc.arduino.cli.debug.DebugOuterClass.Instance.parser(), extensionRegistry);
+              instance_ = input.readMessage(cc.arduino.cli.commands.Common.Instance.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom(instance_);
                 instance_ = subBuilder.buildPartial();
@@ -1072,7 +1085,13 @@ public final class DebugOuterClass {
               port_ = s;
               break;
             }
-            case 40: {
+            case 42: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              interpreter_ = s;
+              break;
+            }
+            case 48: {
 
               verbose_ = input.readBool();
               break;
@@ -1116,25 +1135,25 @@ public final class DebugOuterClass {
     }
 
     public static final int INSTANCE_FIELD_NUMBER = 1;
-    private cc.arduino.cli.debug.DebugOuterClass.Instance instance_;
+    private cc.arduino.cli.commands.Common.Instance instance_;
     /**
-     * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+     * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      * @return Whether the instance field is set.
      */
     public boolean hasInstance() {
       return instance_ != null;
     }
     /**
-     * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+     * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      * @return The instance.
      */
-    public cc.arduino.cli.debug.DebugOuterClass.Instance getInstance() {
-      return instance_ == null ? cc.arduino.cli.debug.DebugOuterClass.Instance.getDefaultInstance() : instance_;
+    public cc.arduino.cli.commands.Common.Instance getInstance() {
+      return instance_ == null ? cc.arduino.cli.commands.Common.Instance.getDefaultInstance() : instance_;
     }
     /**
-     * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+     * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      */
-    public cc.arduino.cli.debug.DebugOuterClass.InstanceOrBuilder getInstanceOrBuilder() {
+    public cc.arduino.cli.commands.Common.InstanceOrBuilder getInstanceOrBuilder() {
       return getInstance();
     }
 
@@ -1246,10 +1265,46 @@ public final class DebugOuterClass {
       }
     }
 
-    public static final int VERBOSE_FIELD_NUMBER = 5;
+    public static final int INTERPRETER_FIELD_NUMBER = 5;
+    private volatile java.lang.Object interpreter_;
+    /**
+     * <code>string interpreter = 5;</code>
+     * @return The interpreter.
+     */
+    public java.lang.String getInterpreter() {
+      java.lang.Object ref = interpreter_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        interpreter_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string interpreter = 5;</code>
+     * @return The bytes for interpreter.
+     */
+    public com.google.protobuf.ByteString
+        getInterpreterBytes() {
+      java.lang.Object ref = interpreter_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        interpreter_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int VERBOSE_FIELD_NUMBER = 6;
     private boolean verbose_;
     /**
-     * <code>bool verbose = 5;</code>
+     * <code>bool verbose = 6;</code>
      * @return The verbose.
      */
     public boolean getVerbose() {
@@ -1318,8 +1373,11 @@ public final class DebugOuterClass {
       if (!getPortBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 4, port_);
       }
+      if (!getInterpreterBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, interpreter_);
+      }
       if (verbose_ != false) {
-        output.writeBool(5, verbose_);
+        output.writeBool(6, verbose_);
       }
       if (!getImportFileBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 7, importFile_);
@@ -1346,9 +1404,12 @@ public final class DebugOuterClass {
       if (!getPortBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, port_);
       }
+      if (!getInterpreterBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, interpreter_);
+      }
       if (verbose_ != false) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(5, verbose_);
+          .computeBoolSize(6, verbose_);
       }
       if (!getImportFileBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, importFile_);
@@ -1379,6 +1440,8 @@ public final class DebugOuterClass {
           .equals(other.getSketchPath())) return false;
       if (!getPort()
           .equals(other.getPort())) return false;
+      if (!getInterpreter()
+          .equals(other.getInterpreter())) return false;
       if (getVerbose()
           != other.getVerbose()) return false;
       if (!getImportFile()
@@ -1404,6 +1467,8 @@ public final class DebugOuterClass {
       hash = (53 * hash) + getSketchPath().hashCode();
       hash = (37 * hash) + PORT_FIELD_NUMBER;
       hash = (53 * hash) + getPort().hashCode();
+      hash = (37 * hash) + INTERPRETER_FIELD_NUMBER;
+      hash = (53 * hash) + getInterpreter().hashCode();
       hash = (37 * hash) + VERBOSE_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getVerbose());
@@ -1554,6 +1619,8 @@ public final class DebugOuterClass {
 
         port_ = "";
 
+        interpreter_ = "";
+
         verbose_ = false;
 
         importFile_ = "";
@@ -1592,6 +1659,7 @@ public final class DebugOuterClass {
         result.fqbn_ = fqbn_;
         result.sketchPath_ = sketchPath_;
         result.port_ = port_;
+        result.interpreter_ = interpreter_;
         result.verbose_ = verbose_;
         result.importFile_ = importFile_;
         onBuilt();
@@ -1657,6 +1725,10 @@ public final class DebugOuterClass {
           port_ = other.port_;
           onChanged();
         }
+        if (!other.getInterpreter().isEmpty()) {
+          interpreter_ = other.interpreter_;
+          onChanged();
+        }
         if (other.getVerbose() != false) {
           setVerbose(other.getVerbose());
         }
@@ -1693,31 +1765,31 @@ public final class DebugOuterClass {
         return this;
       }
 
-      private cc.arduino.cli.debug.DebugOuterClass.Instance instance_;
+      private cc.arduino.cli.commands.Common.Instance instance_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          cc.arduino.cli.debug.DebugOuterClass.Instance, cc.arduino.cli.debug.DebugOuterClass.Instance.Builder, cc.arduino.cli.debug.DebugOuterClass.InstanceOrBuilder> instanceBuilder_;
+          cc.arduino.cli.commands.Common.Instance, cc.arduino.cli.commands.Common.Instance.Builder, cc.arduino.cli.commands.Common.InstanceOrBuilder> instanceBuilder_;
       /**
-       * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+       * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        * @return Whether the instance field is set.
        */
       public boolean hasInstance() {
         return instanceBuilder_ != null || instance_ != null;
       }
       /**
-       * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+       * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        * @return The instance.
        */
-      public cc.arduino.cli.debug.DebugOuterClass.Instance getInstance() {
+      public cc.arduino.cli.commands.Common.Instance getInstance() {
         if (instanceBuilder_ == null) {
-          return instance_ == null ? cc.arduino.cli.debug.DebugOuterClass.Instance.getDefaultInstance() : instance_;
+          return instance_ == null ? cc.arduino.cli.commands.Common.Instance.getDefaultInstance() : instance_;
         } else {
           return instanceBuilder_.getMessage();
         }
       }
       /**
-       * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+       * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
-      public Builder setInstance(cc.arduino.cli.debug.DebugOuterClass.Instance value) {
+      public Builder setInstance(cc.arduino.cli.commands.Common.Instance value) {
         if (instanceBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -1731,10 +1803,10 @@ public final class DebugOuterClass {
         return this;
       }
       /**
-       * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+       * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public Builder setInstance(
-          cc.arduino.cli.debug.DebugOuterClass.Instance.Builder builderForValue) {
+          cc.arduino.cli.commands.Common.Instance.Builder builderForValue) {
         if (instanceBuilder_ == null) {
           instance_ = builderForValue.build();
           onChanged();
@@ -1745,13 +1817,13 @@ public final class DebugOuterClass {
         return this;
       }
       /**
-       * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+       * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
-      public Builder mergeInstance(cc.arduino.cli.debug.DebugOuterClass.Instance value) {
+      public Builder mergeInstance(cc.arduino.cli.commands.Common.Instance value) {
         if (instanceBuilder_ == null) {
           if (instance_ != null) {
             instance_ =
-              cc.arduino.cli.debug.DebugOuterClass.Instance.newBuilder(instance_).mergeFrom(value).buildPartial();
+              cc.arduino.cli.commands.Common.Instance.newBuilder(instance_).mergeFrom(value).buildPartial();
           } else {
             instance_ = value;
           }
@@ -1763,7 +1835,7 @@ public final class DebugOuterClass {
         return this;
       }
       /**
-       * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+       * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public Builder clearInstance() {
         if (instanceBuilder_ == null) {
@@ -1777,33 +1849,33 @@ public final class DebugOuterClass {
         return this;
       }
       /**
-       * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+       * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
-      public cc.arduino.cli.debug.DebugOuterClass.Instance.Builder getInstanceBuilder() {
+      public cc.arduino.cli.commands.Common.Instance.Builder getInstanceBuilder() {
         
         onChanged();
         return getInstanceFieldBuilder().getBuilder();
       }
       /**
-       * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+       * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
-      public cc.arduino.cli.debug.DebugOuterClass.InstanceOrBuilder getInstanceOrBuilder() {
+      public cc.arduino.cli.commands.Common.InstanceOrBuilder getInstanceOrBuilder() {
         if (instanceBuilder_ != null) {
           return instanceBuilder_.getMessageOrBuilder();
         } else {
           return instance_ == null ?
-              cc.arduino.cli.debug.DebugOuterClass.Instance.getDefaultInstance() : instance_;
+              cc.arduino.cli.commands.Common.Instance.getDefaultInstance() : instance_;
         }
       }
       /**
-       * <code>.cc.arduino.cli.debug.Instance instance = 1;</code>
+       * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          cc.arduino.cli.debug.DebugOuterClass.Instance, cc.arduino.cli.debug.DebugOuterClass.Instance.Builder, cc.arduino.cli.debug.DebugOuterClass.InstanceOrBuilder> 
+          cc.arduino.cli.commands.Common.Instance, cc.arduino.cli.commands.Common.Instance.Builder, cc.arduino.cli.commands.Common.InstanceOrBuilder> 
           getInstanceFieldBuilder() {
         if (instanceBuilder_ == null) {
           instanceBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              cc.arduino.cli.debug.DebugOuterClass.Instance, cc.arduino.cli.debug.DebugOuterClass.Instance.Builder, cc.arduino.cli.debug.DebugOuterClass.InstanceOrBuilder>(
+              cc.arduino.cli.commands.Common.Instance, cc.arduino.cli.commands.Common.Instance.Builder, cc.arduino.cli.commands.Common.InstanceOrBuilder>(
                   getInstance(),
                   getParentForChildren(),
                   isClean());
@@ -2040,16 +2112,92 @@ public final class DebugOuterClass {
         return this;
       }
 
+      private java.lang.Object interpreter_ = "";
+      /**
+       * <code>string interpreter = 5;</code>
+       * @return The interpreter.
+       */
+      public java.lang.String getInterpreter() {
+        java.lang.Object ref = interpreter_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          interpreter_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string interpreter = 5;</code>
+       * @return The bytes for interpreter.
+       */
+      public com.google.protobuf.ByteString
+          getInterpreterBytes() {
+        java.lang.Object ref = interpreter_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          interpreter_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string interpreter = 5;</code>
+       * @param value The interpreter to set.
+       * @return This builder for chaining.
+       */
+      public Builder setInterpreter(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        interpreter_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string interpreter = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearInterpreter() {
+        
+        interpreter_ = getDefaultInstance().getInterpreter();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string interpreter = 5;</code>
+       * @param value The bytes for interpreter to set.
+       * @return This builder for chaining.
+       */
+      public Builder setInterpreterBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        interpreter_ = value;
+        onChanged();
+        return this;
+      }
+
       private boolean verbose_ ;
       /**
-       * <code>bool verbose = 5;</code>
+       * <code>bool verbose = 6;</code>
        * @return The verbose.
        */
       public boolean getVerbose() {
         return verbose_;
       }
       /**
-       * <code>bool verbose = 5;</code>
+       * <code>bool verbose = 6;</code>
        * @param value The verbose to set.
        * @return This builder for chaining.
        */
@@ -2060,7 +2208,7 @@ public final class DebugOuterClass {
         return this;
       }
       /**
-       * <code>bool verbose = 5;</code>
+       * <code>bool verbose = 6;</code>
        * @return This builder for chaining.
        */
       public Builder clearVerbose() {
@@ -2842,500 +2990,6 @@ public final class DebugOuterClass {
 
   }
 
-  public interface InstanceOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:cc.arduino.cli.debug.Instance)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>int32 id = 1;</code>
-     * @return The id.
-     */
-    int getId();
-  }
-  /**
-   * <pre>
-   * TODO remove this in next proto refactoring because is a duplicate from commands/common.proto
-   * </pre>
-   *
-   * Protobuf type {@code cc.arduino.cli.debug.Instance}
-   */
-  public  static final class Instance extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:cc.arduino.cli.debug.Instance)
-      InstanceOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use Instance.newBuilder() to construct.
-    private Instance(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private Instance() {
-    }
-
-    @java.lang.Override
-    @SuppressWarnings({"unused"})
-    protected java.lang.Object newInstance(
-        UnusedPrivateParameter unused) {
-      return new Instance();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private Instance(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 8: {
-
-              id_ = input.readInt32();
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return cc.arduino.cli.debug.DebugOuterClass.internal_static_cc_arduino_cli_debug_Instance_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return cc.arduino.cli.debug.DebugOuterClass.internal_static_cc_arduino_cli_debug_Instance_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              cc.arduino.cli.debug.DebugOuterClass.Instance.class, cc.arduino.cli.debug.DebugOuterClass.Instance.Builder.class);
-    }
-
-    public static final int ID_FIELD_NUMBER = 1;
-    private int id_;
-    /**
-     * <code>int32 id = 1;</code>
-     * @return The id.
-     */
-    public int getId() {
-      return id_;
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (id_ != 0) {
-        output.writeInt32(1, id_);
-      }
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (id_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, id_);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof cc.arduino.cli.debug.DebugOuterClass.Instance)) {
-        return super.equals(obj);
-      }
-      cc.arduino.cli.debug.DebugOuterClass.Instance other = (cc.arduino.cli.debug.DebugOuterClass.Instance) obj;
-
-      if (getId()
-          != other.getId()) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + ID_FIELD_NUMBER;
-      hash = (53 * hash) + getId();
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static cc.arduino.cli.debug.DebugOuterClass.Instance parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static cc.arduino.cli.debug.DebugOuterClass.Instance parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static cc.arduino.cli.debug.DebugOuterClass.Instance parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static cc.arduino.cli.debug.DebugOuterClass.Instance parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static cc.arduino.cli.debug.DebugOuterClass.Instance parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static cc.arduino.cli.debug.DebugOuterClass.Instance parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static cc.arduino.cli.debug.DebugOuterClass.Instance parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static cc.arduino.cli.debug.DebugOuterClass.Instance parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static cc.arduino.cli.debug.DebugOuterClass.Instance parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static cc.arduino.cli.debug.DebugOuterClass.Instance parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static cc.arduino.cli.debug.DebugOuterClass.Instance parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static cc.arduino.cli.debug.DebugOuterClass.Instance parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(cc.arduino.cli.debug.DebugOuterClass.Instance prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * <pre>
-     * TODO remove this in next proto refactoring because is a duplicate from commands/common.proto
-     * </pre>
-     *
-     * Protobuf type {@code cc.arduino.cli.debug.Instance}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:cc.arduino.cli.debug.Instance)
-        cc.arduino.cli.debug.DebugOuterClass.InstanceOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return cc.arduino.cli.debug.DebugOuterClass.internal_static_cc_arduino_cli_debug_Instance_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return cc.arduino.cli.debug.DebugOuterClass.internal_static_cc_arduino_cli_debug_Instance_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                cc.arduino.cli.debug.DebugOuterClass.Instance.class, cc.arduino.cli.debug.DebugOuterClass.Instance.Builder.class);
-      }
-
-      // Construct using cc.arduino.cli.debug.DebugOuterClass.Instance.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        id_ = 0;
-
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return cc.arduino.cli.debug.DebugOuterClass.internal_static_cc_arduino_cli_debug_Instance_descriptor;
-      }
-
-      @java.lang.Override
-      public cc.arduino.cli.debug.DebugOuterClass.Instance getDefaultInstanceForType() {
-        return cc.arduino.cli.debug.DebugOuterClass.Instance.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public cc.arduino.cli.debug.DebugOuterClass.Instance build() {
-        cc.arduino.cli.debug.DebugOuterClass.Instance result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public cc.arduino.cli.debug.DebugOuterClass.Instance buildPartial() {
-        cc.arduino.cli.debug.DebugOuterClass.Instance result = new cc.arduino.cli.debug.DebugOuterClass.Instance(this);
-        result.id_ = id_;
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof cc.arduino.cli.debug.DebugOuterClass.Instance) {
-          return mergeFrom((cc.arduino.cli.debug.DebugOuterClass.Instance)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(cc.arduino.cli.debug.DebugOuterClass.Instance other) {
-        if (other == cc.arduino.cli.debug.DebugOuterClass.Instance.getDefaultInstance()) return this;
-        if (other.getId() != 0) {
-          setId(other.getId());
-        }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        cc.arduino.cli.debug.DebugOuterClass.Instance parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (cc.arduino.cli.debug.DebugOuterClass.Instance) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-
-      private int id_ ;
-      /**
-       * <code>int32 id = 1;</code>
-       * @return The id.
-       */
-      public int getId() {
-        return id_;
-      }
-      /**
-       * <code>int32 id = 1;</code>
-       * @param value The id to set.
-       * @return This builder for chaining.
-       */
-      public Builder setId(int value) {
-        
-        id_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 id = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearId() {
-        
-        id_ = 0;
-        onChanged();
-        return this;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:cc.arduino.cli.debug.Instance)
-    }
-
-    // @@protoc_insertion_point(class_scope:cc.arduino.cli.debug.Instance)
-    private static final cc.arduino.cli.debug.DebugOuterClass.Instance DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new cc.arduino.cli.debug.DebugOuterClass.Instance();
-    }
-
-    public static cc.arduino.cli.debug.DebugOuterClass.Instance getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<Instance>
-        PARSER = new com.google.protobuf.AbstractParser<Instance>() {
-      @java.lang.Override
-      public Instance parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Instance(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<Instance> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Instance> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public cc.arduino.cli.debug.DebugOuterClass.Instance getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_cc_arduino_cli_debug_DebugReq_descriptor;
   private static final 
@@ -3351,11 +3005,6 @@ public final class DebugOuterClass {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_cc_arduino_cli_debug_DebugResp_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_cc_arduino_cli_debug_Instance_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_cc_arduino_cli_debug_Instance_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -3366,22 +3015,24 @@ public final class DebugOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n\021debug/debug.proto\022\024cc.arduino.cli.debu" +
-      "g\"h\n\010DebugReq\0226\n\010debugReq\030\001 \001(\0132$.cc.ard" +
-      "uino.cli.debug.DebugConfigReq\022\014\n\004data\030\002 " +
-      "\001(\014\022\026\n\016send_interrupt\030\003 \001(\010\"\231\001\n\016DebugCon" +
-      "figReq\0220\n\010instance\030\001 \001(\0132\036.cc.arduino.cl" +
-      "i.debug.Instance\022\014\n\004fqbn\030\002 \001(\t\022\023\n\013sketch" +
-      "_path\030\003 \001(\t\022\014\n\004port\030\004 \001(\t\022\017\n\007verbose\030\005 \001" +
-      "(\010\022\023\n\013import_file\030\007 \001(\t\"(\n\tDebugResp\022\014\n\004" +
-      "data\030\001 \001(\014\022\r\n\005error\030\002 \001(\t\"\026\n\010Instance\022\n\n" +
-      "\002id\030\001 \001(\0052W\n\005Debug\022N\n\005Debug\022\036.cc.arduino" +
-      ".cli.debug.DebugReq\032\037.cc.arduino.cli.deb" +
-      "ug.DebugResp\"\000(\0010\001B*Z(github.com/arduino" +
-      "/arduino-cli/rpc/debugb\006proto3"
+      "g\032\025commands/common.proto\"h\n\010DebugReq\0226\n\010" +
+      "debugReq\030\001 \001(\0132$.cc.arduino.cli.debug.De" +
+      "bugConfigReq\022\014\n\004data\030\002 \001(\014\022\026\n\016send_inter" +
+      "rupt\030\003 \001(\010\"\261\001\n\016DebugConfigReq\0223\n\010instanc" +
+      "e\030\001 \001(\0132!.cc.arduino.cli.commands.Instan" +
+      "ce\022\014\n\004fqbn\030\002 \001(\t\022\023\n\013sketch_path\030\003 \001(\t\022\014\n" +
+      "\004port\030\004 \001(\t\022\023\n\013interpreter\030\005 \001(\t\022\017\n\007verb" +
+      "ose\030\006 \001(\010\022\023\n\013import_file\030\007 \001(\t\"(\n\tDebugR" +
+      "esp\022\014\n\004data\030\001 \001(\014\022\r\n\005error\030\002 \001(\t2W\n\005Debu" +
+      "g\022N\n\005Debug\022\036.cc.arduino.cli.debug.DebugR" +
+      "eq\032\037.cc.arduino.cli.debug.DebugResp\"\000(\0010" +
+      "\001B*Z(github.com/arduino/arduino-cli/rpc/" +
+      "debugb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          cc.arduino.cli.commands.Common.getDescriptor(),
         });
     internal_static_cc_arduino_cli_debug_DebugReq_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -3394,19 +3045,14 @@ public final class DebugOuterClass {
     internal_static_cc_arduino_cli_debug_DebugConfigReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_cc_arduino_cli_debug_DebugConfigReq_descriptor,
-        new java.lang.String[] { "Instance", "Fqbn", "SketchPath", "Port", "Verbose", "ImportFile", });
+        new java.lang.String[] { "Instance", "Fqbn", "SketchPath", "Port", "Interpreter", "Verbose", "ImportFile", });
     internal_static_cc_arduino_cli_debug_DebugResp_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_cc_arduino_cli_debug_DebugResp_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_cc_arduino_cli_debug_DebugResp_descriptor,
         new java.lang.String[] { "Data", "Error", });
-    internal_static_cc_arduino_cli_debug_Instance_descriptor =
-      getDescriptor().getMessageTypes().get(3);
-    internal_static_cc_arduino_cli_debug_Instance_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_cc_arduino_cli_debug_Instance_descriptor,
-        new java.lang.String[] { "Id", });
+    cc.arduino.cli.commands.Common.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

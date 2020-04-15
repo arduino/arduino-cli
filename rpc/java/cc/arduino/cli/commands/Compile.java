@@ -20,24 +20,24 @@ public final class Compile {
   public enum CompileResult
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
-     * <code>success = 0;</code>
+     * <code>compile_success = 0;</code>
      */
-    success(0),
+    compile_success(0),
     /**
-     * <code>error = 1;</code>
+     * <code>compile_error = 1;</code>
      */
-    error(1),
+    compile_error(1),
     UNRECOGNIZED(-1),
     ;
 
     /**
-     * <code>success = 0;</code>
+     * <code>compile_success = 0;</code>
      */
-    public static final int success_VALUE = 0;
+    public static final int compile_success_VALUE = 0;
     /**
-     * <code>error = 1;</code>
+     * <code>compile_error = 1;</code>
      */
-    public static final int error_VALUE = 1;
+    public static final int compile_error_VALUE = 1;
 
 
     public final int getNumber() {
@@ -64,8 +64,8 @@ public final class Compile {
      */
     public static CompileResult forNumber(int value) {
       switch (value) {
-        case 0: return success;
-        case 1: return error;
+        case 0: return compile_success;
+        case 1: return compile_error;
         default: return null;
       }
     }
@@ -3419,7 +3419,7 @@ public final class Compile {
       if (taskProgress_ != null) {
         output.writeMessage(3, getTaskProgress());
       }
-      if (result_ != cc.arduino.cli.commands.Compile.CompileResult.success.getNumber()) {
+      if (result_ != cc.arduino.cli.commands.Compile.CompileResult.compile_success.getNumber()) {
         output.writeEnum(4, result_);
       }
       unknownFields.writeTo(output);
@@ -3443,7 +3443,7 @@ public final class Compile {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, getTaskProgress());
       }
-      if (result_ != cc.arduino.cli.commands.Compile.CompileResult.success.getNumber()) {
+      if (result_ != cc.arduino.cli.commands.Compile.CompileResult.compile_success.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(4, result_);
       }
@@ -4084,9 +4084,10 @@ public final class Compile {
       "\001(\014\022\022\n\nerr_stream\030\002 \001(\014\022<\n\rtask_progress" +
       "\030\003 \001(\0132%.cc.arduino.cli.commands.TaskPro" +
       "gress\0226\n\006result\030\004 \001(\0162&.cc.arduino.cli.c" +
-      "ommands.CompileResult*\'\n\rCompileResult\022\013" +
-      "\n\007success\020\000\022\t\n\005error\020\001B-Z+github.com/ard" +
-      "uino/arduino-cli/rpc/commandsb\006proto3"
+      "ommands.CompileResult*7\n\rCompileResult\022\023" +
+      "\n\017compile_success\020\000\022\021\n\rcompile_error\020\001B-" +
+      "Z+github.com/arduino/arduino-cli/rpc/com" +
+      "mandsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
