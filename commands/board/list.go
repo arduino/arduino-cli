@@ -51,8 +51,10 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	url := fmt.Sprintf("%s/%s/%s", vidPidURL, vid, pid)
 	retVal := []*rpc.BoardListItem{}
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header = globals.NewHTTPClientHeader()
+	req.Header = globals.NewHTTPClientHeader("")
 	req.Header.Set("Content-Type", "application/json")
+
+	// TODO: use proxy if set
 
 	if res, err := http.DefaultClient.Do(req); err == nil {
 		if res.StatusCode >= 400 {

@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
@@ -95,8 +94,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			Name:     library.Name,
 			Version:  library.VersionRequired,
 		}
-		err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.ProgressBar(),
-			output.TaskProgress(), globals.NewHTTPClientHeader())
+		err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
 			feedback.Errorf("Error installing %s: %v", library, err)
 			os.Exit(errorcodes.ErrGeneric)

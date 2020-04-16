@@ -67,8 +67,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
 		}
-		_, err := core.PlatformInstall(context.Background(), plattformInstallReq, output.ProgressBar(),
-			output.TaskProgress(), globals.NewHTTPClientHeader())
+		_, err := core.PlatformInstall(context.Background(), plattformInstallReq, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
 			feedback.Errorf("Error during install: %v", err)
 			os.Exit(errorcodes.ErrGeneric)

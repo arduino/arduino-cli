@@ -18,7 +18,6 @@ package instance
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -45,8 +44,7 @@ func CreateInstance() (*rpc.Instance, error) {
 
 func getInitResponse() (*rpc.InitResp, error) {
 	// invoke Init()
-	resp, err := commands.Init(context.Background(), &rpc.InitReq{},
-		output.ProgressBar(), output.TaskProgress(), globals.NewHTTPClientHeader())
+	resp, err := commands.Init(context.Background(), &rpc.InitReq{}, output.ProgressBar(), output.TaskProgress())
 
 	// Init() failed
 	if err != nil {
