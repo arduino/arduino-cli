@@ -112,7 +112,10 @@ func Attach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskPr
 // for the matching.
 func findSerialConnectedBoard(pm *packagemanager.PackageManager, monitor *discovery.Monitor, deviceURI *url.URL) *cores.Board {
 	found := false
-	location := deviceURI.Path
+	// to support both cases:
+	// serial:///dev/ttyACM2 parsing gives: deviceURI.Host = ""      and deviceURI.Path = /dev/ttyACM2
+	// serial://COM3 parsing gives:         deviceURI.Host = "COM3"  and deviceURI.Path = ""
+	location := deviceURI.Host + deviceURI.Path
 	var serialDevice discovery.SerialDevice
 	for _, device := range monitor.Serial() {
 		if device.Port == location {
