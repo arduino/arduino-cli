@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
@@ -57,8 +56,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			Name:     library.Name,
 			Version:  library.Version,
 		}
-		_, err := lib.LibraryDownload(context.Background(), libraryDownloadReq, output.ProgressBar(),
-			globals.NewHTTPClientHeader())
+		_, err := lib.LibraryDownload(context.Background(), libraryDownloadReq, output.ProgressBar())
 		if err != nil {
 			feedback.Errorf("Error downloading %s: %v", library, err)
 			os.Exit(errorcodes.ErrNetwork)

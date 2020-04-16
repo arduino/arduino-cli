@@ -25,6 +25,7 @@ import (
 
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/downloader"
 )
 
 type EchoHandler struct{}
@@ -52,7 +53,7 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 		URL:             srv.URL,
 	}
 
-	d, err := r.Download(tmp, http.Header{"User-Agent": []string{goldUserAgentValue}})
+	d, err := r.Download(tmp, &downloader.Config{RequestHeaders: http.Header{"User-Agent": []string{goldUserAgentValue}}})
 	require.NoError(t, err)
 	err = d.Run()
 	require.NoError(t, err)

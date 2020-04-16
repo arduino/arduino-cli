@@ -21,9 +21,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net"
-	"net/http"
 	"os"
-	"runtime"
 	"syscall"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -67,26 +65,15 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		stats.Incr("daemon", stats.T("success", "true"))
 		defer stats.Flush()
 	}
-
 	port := viper.GetString("daemon.port")
 	s := grpc.NewServer()
 
-	// Compose user agent header
-	headers := http.Header{
-		"User-Agent": []string{
-			fmt.Sprintf("%s/%s daemon (%s; %s; %s) Commit:%s",
-				globals.VersionInfo.Application,
-				globals.VersionInfo.VersionString,
-				runtime.GOARCH,
-				runtime.GOOS,
-				runtime.Version(),
-				globals.VersionInfo.Commit),
-		},
-	}
-	// Register the commands service
+	// Set specific user-agent for the daemon
+	viper.Set("network.user_agent_ext", "daemon")
+
+	// register the commands service
 	srv_commands.RegisterArduinoCoreServer(s, &daemon.ArduinoCoreServerImpl{
-		DownloaderHeaders: headers,
-		VersionString:     globals.VersionInfo.VersionString,
+		VersionString: globals.VersionInfo.VersionString,
 	})
 
 	// Register the monitors service

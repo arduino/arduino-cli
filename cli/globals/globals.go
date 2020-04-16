@@ -33,8 +33,16 @@ var (
 )
 
 // NewHTTPClientHeader returns the http.Header object that must be used by the clients inside the downloaders
-func NewHTTPClientHeader() http.Header {
-	userAgentValue := fmt.Sprintf("%s/%s (%s; %s; %s) Commit:%s", VersionInfo.Application,
-		VersionInfo.VersionString, runtime.GOARCH, runtime.GOOS, runtime.Version(), VersionInfo.Commit)
+// and adds the subComponent if specified
+func NewHTTPClientHeader(subComponent string) http.Header {
+	if subComponent != "" {
+		subComponent = " " + subComponent
+	}
+	userAgentValue := fmt.Sprintf("%s/%s%s (%s; %s; %s) Commit:%s",
+		VersionInfo.Application,
+		VersionInfo.VersionString,
+		subComponent,
+		runtime.GOARCH, runtime.GOOS, runtime.Version(),
+		VersionInfo.Commit)
 	return http.Header{"User-Agent": []string{userAgentValue}}
 }
