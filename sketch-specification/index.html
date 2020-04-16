@@ -11,7 +11,7 @@
         <meta name="description" content="Arduino Command Line Interface">
       
       
-        <link rel="canonical" href="https://arduino.github.io/arduino-cli/library-specification/">
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/sketch-specification/">
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
@@ -19,7 +19,7 @@
     
     
       
-        <title>Library specification - Arduino CLI</title>
+        <title>Sketch specification - Arduino CLI</title>
       
     
     
@@ -60,7 +60,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#see-also" class="md-skip">
+        <a href="#sketch-folders-and-files" class="md-skip">
           Skip to content
         </a>
       
@@ -87,7 +87,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              Library specification
+              Sketch specification
             
           </span>
         </div>
@@ -784,18 +784,6 @@
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../sketch-specification/" title="Sketch specification" class="md-nav__link">
-      Sketch specification
-    </a>
-  </li>
-
-    
-      
-      
-      
-
   
 
 
@@ -805,14 +793,14 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        Library specification
+        Sketch specification
         <span class="md-nav__icon md-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3,9H17V7H3V9M3,13H17V11H3V13M3,17H17V15H3V17M19,17H21V15H19V17M19,7V9H21V7H19M19,13H21V11H19V13Z" /></svg>
         </span>
       </label>
     
-    <a href="./" title="Library specification" class="md-nav__link md-nav__link--active">
-      Library specification
+    <a href="./" title="Sketch specification" class="md-nav__link md-nav__link--active">
+      Sketch specification
     </a>
     
       
@@ -829,157 +817,111 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#sketch-folders-and-files" class="md-nav__link">
+    Sketch folders and files
+  </a>
+  
+    <nav class="md-nav" aria-label="Sketch folders and files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sketch-root-folder" class="md-nav__link">
+    Sketch root folder
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#primary-sketch-file" class="md-nav__link">
+    Primary sketch file
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-code-files" class="md-nav__link">
+    Additional code files
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src-subfolder" class="md-nav__link">
+    src subfolder
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-subfolder" class="md-nav__link">
+    data subfolder
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    Metadata
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secrets" class="md-nav__link">
+    Secrets
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    Documentation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sketch-file-structure-example" class="md-nav__link">
+    Sketch file structure example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sketchbook" class="md-nav__link">
+    Sketchbook
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#libraryboards-manager-links" class="md-nav__link">
+    Library/Boards Manager links
+  </a>
+  
+    <nav class="md-nav" aria-label="Library/Boards Manager links">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#see-also" class="md-nav__link">
     See also
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#15-library-format-rev-22" class="md-nav__link">
-    1.5 library format (rev. 2.2)
-  </a>
-  
-    <nav class="md-nav" aria-label="1.5 library format (rev. 2.2)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#library-metadata" class="md-nav__link">
-    Library metadata
-  </a>
-  
-    <nav class="md-nav" aria-label="Library metadata">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#libraryproperties-file-format" class="md-nav__link">
-    library.properties file format
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#layout-of-folders-and-files" class="md-nav__link">
-    Layout of folders and files
-  </a>
-  
-    <nav class="md-nav" aria-label="Layout of folders and files">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#library-root-folder" class="md-nav__link">
-    Library Root folder
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#source-code" class="md-nav__link">
-    Source code
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#library-examples" class="md-nav__link">
-    Library Examples
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#extra-documentation" class="md-nav__link">
-    Extra documentation
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#keywords" class="md-nav__link">
-    Keywords
-  </a>
-  
-    <nav class="md-nav" aria-label="Keywords">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#keywordstxt-format" class="md-nav__link">
-    keywords.txt format
-  </a>
-  
-    <nav class="md-nav" aria-label="keywords.txt format">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#keyword_tokentype" class="md-nav__link">
-    KEYWORD_TOKENTYPE
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#reference_link" class="md-nav__link">
-    REFERENCE_LINK
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rsyntaxtextarea_tokentype" class="md-nav__link">
-    RSYNTAXTEXTAREA_TOKENTYPE
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#development-flag-file" class="md-nav__link">
-    Development flag file
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#a-complete-example" class="md-nav__link">
-    A complete example
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#working-with-multiple-architectures" class="md-nav__link">
-    Working with multiple architectures
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#old-library-format-pre-15" class="md-nav__link">
-    Old library format (pre-1.5)
   </a>
   
 </li>
@@ -988,6 +930,18 @@
   
 </nav>
     
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../library-specification/" title="Library specification" class="md-nav__link">
+      Library specification
+    </a>
   </li>
 
     
@@ -1039,157 +993,111 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#sketch-folders-and-files" class="md-nav__link">
+    Sketch folders and files
+  </a>
+  
+    <nav class="md-nav" aria-label="Sketch folders and files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sketch-root-folder" class="md-nav__link">
+    Sketch root folder
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#primary-sketch-file" class="md-nav__link">
+    Primary sketch file
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-code-files" class="md-nav__link">
+    Additional code files
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src-subfolder" class="md-nav__link">
+    src subfolder
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-subfolder" class="md-nav__link">
+    data subfolder
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metadata" class="md-nav__link">
+    Metadata
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secrets" class="md-nav__link">
+    Secrets
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    Documentation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sketch-file-structure-example" class="md-nav__link">
+    Sketch file structure example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sketchbook" class="md-nav__link">
+    Sketchbook
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#libraryboards-manager-links" class="md-nav__link">
+    Library/Boards Manager links
+  </a>
+  
+    <nav class="md-nav" aria-label="Library/Boards Manager links">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#see-also" class="md-nav__link">
     See also
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#15-library-format-rev-22" class="md-nav__link">
-    1.5 library format (rev. 2.2)
-  </a>
-  
-    <nav class="md-nav" aria-label="1.5 library format (rev. 2.2)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#library-metadata" class="md-nav__link">
-    Library metadata
-  </a>
-  
-    <nav class="md-nav" aria-label="Library metadata">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#libraryproperties-file-format" class="md-nav__link">
-    library.properties file format
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#layout-of-folders-and-files" class="md-nav__link">
-    Layout of folders and files
-  </a>
-  
-    <nav class="md-nav" aria-label="Layout of folders and files">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#library-root-folder" class="md-nav__link">
-    Library Root folder
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#source-code" class="md-nav__link">
-    Source code
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#library-examples" class="md-nav__link">
-    Library Examples
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#extra-documentation" class="md-nav__link">
-    Extra documentation
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#keywords" class="md-nav__link">
-    Keywords
-  </a>
-  
-    <nav class="md-nav" aria-label="Keywords">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#keywordstxt-format" class="md-nav__link">
-    keywords.txt format
-  </a>
-  
-    <nav class="md-nav" aria-label="keywords.txt format">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#keyword_tokentype" class="md-nav__link">
-    KEYWORD_TOKENTYPE
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#reference_link" class="md-nav__link">
-    REFERENCE_LINK
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rsyntaxtextarea_tokentype" class="md-nav__link">
-    RSYNTAXTEXTAREA_TOKENTYPE
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#development-flag-file" class="md-nav__link">
-    Development flag file
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#a-complete-example" class="md-nav__link">
-    A complete example
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#working-with-multiple-architectures" class="md-nav__link">
-    Working with multiple architectures
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#old-library-format-pre-15" class="md-nav__link">
-    Old library format (pre-1.5)
   </a>
   
 </li>
@@ -1210,247 +1118,95 @@
                   
                 
                 
-                  <h1>Library specification</h1>
+                  <h1>Sketch specification</h1>
                 
-                <p>This is the specification for the 3<sup>rd</sup> party library format to be used with Arduino IDE 1.5.x onwards.</p>
+                <p>This is the specification for Arduino sketches.</p>
+<p>The programs that run on Arduino boards are called "sketches". This term was inherited from <a href="https://processing.org/">Processing</a>, upon which the Arduino IDE and the core API were based.</p>
+<h2 id="sketch-folders-and-files">Sketch folders and files<a class="headerlink" href="#sketch-folders-and-files" title="Permanent link">&para;</a></h2>
+<h3 id="sketch-root-folder">Sketch root folder<a class="headerlink" href="#sketch-root-folder" title="Permanent link">&para;</a></h3>
+<p>Because many Arduino sketches only contain a single .ino file, it's easy to think of that file as the sketch. However, it is the folder that is the sketch. The reason is that sketches may consist of multiple code files and the folder is what groups those files into a single program.</p>
+<p>The sketch root folder name must start with a basic letter (<code>A</code>-<code>Z</code> or <code>a</code>-<code>z</code>) or number (<code>0</code>-<code>9</code>), followed by basic letters, numbers, spaces (<code></code>), underscores (<code>_</code>), dots (<code>.</code>) and dashes (<code>-</code>). The maximum length is 63 characters.</p>
+<p>Support for sketch folder name starting with a number was added in Arduino IDE 1.8.4.</p>
+<h3 id="primary-sketch-file">Primary sketch file<a class="headerlink" href="#primary-sketch-file" title="Permanent link">&para;</a></h3>
+<p>Every sketch must contain a .ino or .pde file with a file name matching the sketch root folder name.</p>
+<h3 id="additional-code-files">Additional code files<a class="headerlink" href="#additional-code-files" title="Permanent link">&para;</a></h3>
+<p>Sketches may consist of multiple code files.</p>
+<p>The following extensions are supported:</p>
 <ul>
-<li>rev.1 has been implemented starting with IDE version 1.5.3 (now superseded by rev.2)</li>
-<li>rev.2 will be implemented starting from version 1.5.6</li>
-<li>rev.2.1 will be implemented starting from version 1.6.10</li>
-<li>rev.2.2 will be implemented starting from version 1.8.10</li>
+<li>.ino - <a href="https://www.arduino.cc/reference/en/">Arduino language</a> files.</li>
+<li>.pde - Alternate extension for Arduino language files. This file extension is also used by Processing sketches. .ino is recommended to avoid confusion.</li>
+<li>.cpp - C++ files.</li>
+<li>.c - C Files.</li>
+<li>.S - Assembly language files.</li>
+<li>.h - Header files.</li>
 </ul>
-<p>This new library format is intended to be used in tandem with the Arduino IDE's <strong>Library Manager</strong>, available since version 1.6.2. The Library Manager allows users to automatically download and install libraries needed in their projects, with an easy to use graphic interface. It doesn't yet take care of dependencies between libraries.
-More information about how Library Manager works is available <a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">here</a>.</p>
-<p>Arduino IDE 1.5.x+ supports multiple microcontroller architectures (e.g. AVR, SAM, etc), meaning that libraries may need to work on multiple architectures. The new 1.5 library format doesn’t contain special support for cross-architecture libraries, but it does provide a preprocessor based mechanism for libraries to target sections of code to specific architectures.</p>
+<p>For information about how each of these files and other parts of the sketch are used during compilation, see the <a href="../sketch-build-process/">Sketch build process documentation</a>.</p>
+<h3 id="src-subfolder"><code>src</code> subfolder<a class="headerlink" href="#src-subfolder" title="Permanent link">&para;</a></h3>
+<p>The contents of the <code>src</code> subfolder are compiled recursively. Unlike the code files in the sketch root folder, these files are not shown as tabs in the IDEs.</p>
+<p>This is useful for files you don't want to expose to the sketch user via the IDE's interface. It can be used to bundle libraries with the sketch in order to make it a self-contained project.</p>
+<p>Arduino language files under the <code>src</code> folder are not supported.</p>
+<ul>
+<li>In Arduino IDE 1.6.5-r5 and older, no recursive compilation was done.</li>
+<li>In Arduino IDE 1.6.6 - 1.6.9, recursive compilation was done of all subfolders of the sketch folder.</li>
+<li>In Arduino IDE 1.6.10 and newer, recursive compilation is limited to the <code>src</code> subfolder of the sketch folder.</li>
+</ul>
+<h3 id="data-subfolder"><code>data</code> subfolder<a class="headerlink" href="#data-subfolder" title="Permanent link">&para;</a></h3>
+<p>The <code>data</code> folder is used to add additional files to the sketch, which will not be compiled.</p>
+<p>Files added to the sketch via the Arduino IDE's <strong>Sketch &gt; Add File...</strong> are placed in the <code>data</code> folder.</p>
+<p>The Arduino IDE's <strong>File &gt; Save As...</strong> only copies the code files in the sketch root folder and the full contents of the <code>data</code> folder, so any non-code files outside the <code>data</code> folder are stripped.</p>
+<h3 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h3>
+<p>Arduino CLI and Arduino Web Editor use a file named sketch.json, located in the sketch root folder, to store sketch metadata.</p>
+<p>The <code>cpu</code> key contains the board configuration information. This can be set via <a href="https://arduino.github.io/arduino-cli/commands/arduino-cli_board_attach/"><code>arduino-cli board attach</code></a> or by selecting a board in the Arduino Web Editor while the sketch is open. With this configuration set, it is not necessary to specify the <code>--fqbn</code> flag to the <a href="https://arduino.github.io/arduino-cli/commands/arduino-cli_compile/"><code>arduino-cli compile</code></a> or <a href="https://arduino.github.io/arduino-cli/commands/arduino-cli_upload/"><code>arduino-cli upload</code></a> commands when compiling or uploading the sketch.</p>
+<p>The <code>included_libs</code> key defines the library versions the Arduino Web Editor uses when the sketch is compiled. This is Arduino Web Editor specific because all versions of all the Library Manager libraries are pre-installed in Arduino Web Editor, while only one version of each library may be installed when using the other Arduino development software.</p>
+<h3 id="secrets">Secrets<a class="headerlink" href="#secrets" title="Permanent link">&para;</a></h3>
+<p>Arduino Web Editor has a <a href="https://create.arduino.cc/projecthub/Arduino_Genuino/store-your-sensitive-data-safely-when-sharing-a-sketch-e7d0f0">"Secret tab" feature</a> that makes it easy to share sketches without accidentally exposing sensitive data (e.g., password, token). The Arduino Web Editor automatically generates macros for any identifier in the sketch which starts with <code>SECRET_</code>and contains all uppercase characters.</p>
+<p>When you download a sketch from Arduino Web Editor that contains a Secret tab, the empty <code>#define</code> directives for the secrets are in a file named arduino_secrets.h, with an <code>#include</code> directive to that file at the top of the primary sketch file. This is hidden when viewing the sketch in Arduino Web Editor.</p>
+<h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
+<p>Image and text files in common formats which are present in the sketch root folder are displayed in tabs in the Arduino Web Editor.</p>
+<h3 id="sketch-file-structure-example">Sketch file structure example<a class="headerlink" href="#sketch-file-structure-example" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>Foo
+|_ arduino_secrets.h
+|_ Abc.ino
+|_ Def.cpp
+|_ Def.h
+|_ Foo.ino
+|_ Ghi.c
+|_ Ghi.h
+|_ Jkl.h
+|_ Jkl.S
+|_ sketch.json
+|_ data
+|  |_ Schematic.pdf
+|_ src
+   |_ SomeLib
+      |_ library.properties
+      |_ src
+         |_ SomeLib.h
+         |_ SomeLib.cpp
+</code></pre></div>
+
+<h2 id="sketchbook">Sketchbook<a class="headerlink" href="#sketchbook" title="Permanent link">&para;</a></h2>
+<p>The Arduino IDE provides a "sketchbook" folder (analogous to Arduino CLI's "user directory"). In addition to being the place where user libraries and manually installed platforms are installed, the sketchbook is a convenient place to store sketches. Sketches in the sketchbook folder appear under the Arduino IDE's <strong>File &gt; Sketchbook</strong> menu. However, there is no requirement to store sketches in the sketchbook folder.</p>
+<h2 id="libraryboards-manager-links">Library/Boards Manager links<a class="headerlink" href="#libraryboards-manager-links" title="Permanent link">&para;</a></h2>
+<p>A URI in a comment in the form <code>http://librarymanager#SEARCH_TERM</code> will open a search for SEARCH_TERM in <a href="https://www.arduino.cc/en/guide/libraries#toc3">Library Manager</a> when clicked in the Arduino IDE.</p>
+<p>A URI in a comment in the form <code>http://boardsmanager#SEARCH_TERM</code> will open a search for SEARCH_TERM in <a href="https://www.arduino.cc/en/Guide/Cores">Boards Manager</a> when clicked in the Arduino IDE.</p>
+<p>This can be used to offer the user an easy way to install dependencies of the sketch.</p>
+<p>This feature is only available when using the Arduino IDE, so be sure to provide supplementary documentation to help the users of other development software install the sketch dependencies.</p>
+<p>This feature was added in Arduino IDE 1.6.9.</p>
+<h3 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// install the Arduino SAMD Boards platform to add support for your MKR WiFi 1010 board</span>
+<span class="c1">// if using the Arduino IDE, click here: http://boardsmanager#SAMD</span>
+
+<span class="c1">// install the WiFiNINA library via Library Manager</span>
+<span class="c1">// if using the Arduino IDE, click here: http://librarymanager#WiFiNINA</span>
+<span class="cp">#include</span> <span class="cpf">&lt;WiFiNINA.h&gt;</span><span class="cp"></span>
+</code></pre></div>
+
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
-<p>The Arduino library style guide is here : <a href="http://arduino.cc/en/Reference/APIStyleGuide">http://arduino.cc/en/Reference/APIStyleGuide</a></p>
-<p>The style guide for examples is here : <a href="http://arduino.cc/en/Reference/StyleGuide">http://arduino.cc/en/Reference/StyleGuide</a></p>
-<h2 id="15-library-format-rev-22">1.5 library format (rev. 2.2)<a class="headerlink" href="#15-library-format-rev-22" title="Permanent link">&para;</a></h2>
-<h3 id="library-metadata">Library metadata<a class="headerlink" href="#library-metadata" title="Permanent link">&para;</a></h3>
-<p>The most significant addition to the format is the ability to add information about the library itself through a properties file called <strong>library.properties</strong>.</p>
-<p>This file allows the <em>Library Manager</em> to search and install a library and its dependencies in an easy and automated way. It must be located in the root of the library folder.</p>
-<h4 id="libraryproperties-file-format">library.properties file format<a class="headerlink" href="#libraryproperties-file-format" title="Permanent link">&para;</a></h4>
-<p>The library.properties file is a key=value properties list. Every field in this file is UTF-8 encoded. Unless noted otherwise below, <strong>all fields are required</strong>. The available fields are:</p>
 <ul>
-<li><strong>name</strong> - the name of the library. Library names must contain only basic letters (<code>A</code>-<code>Z</code> or <code>a</code>-<code>z</code>) and numbers (<code>0</code>-<code>9</code>), spaces (<code></code>), underscores (<code>_</code>), dots (<code>.</code>) and dashes (<code>-</code>). It cannot start or end with a space, and also it cannot start with a number. Note that libraries with a <code>name</code> value starting with <code>Arduino</code> will no longer be allowed <a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">addition to the Library Manager index</a> as these names are now reserved for official Arduino libraries.</li>
-<li><strong>version</strong> - version of the library. Version should be <a href="http://semver.org/">semver</a> compliant. 1.2.0 is correct; 1.2 is accepted; r5, 003, 1.1c are invalid</li>
-<li><strong>author</strong> - name/nickname of the authors and their email addresses (not mandatory) separated by comma ","</li>
-<li><strong>maintainer</strong> - name and email of the maintainer</li>
-<li><strong>sentence</strong> - a sentence explaining the purpose of the library</li>
-<li><strong>paragraph</strong> - a longer description of the library. The value of <strong>sentence</strong> always will be prepended, so you should start by writing the second sentence here</li>
-<li><strong>category</strong> - (defaults to <code>Uncategorized</code>) if present, one of these:<ul>
-<li>Display</li>
-<li>Communication</li>
-<li>Signal Input/Output</li>
-<li>Sensors</li>
-<li>Device Control</li>
-<li>Timing</li>
-<li>Data Storage</li>
-<li>Data Processing</li>
-<li>Other</li>
+<li><a href="../sketch-build-process/">Sketch build process documentation</a></li>
+<li><a href="http://arduino.cc/en/Reference/StyleGuide">Style guide for example sketches</a></li>
 </ul>
-</li>
-<li><strong>url</strong> - the URL of the library project, for a person to visit. For example, the library's GitHub page. This is used for the "More info" links in Library Manager</li>
-<li><strong>architectures</strong> - (defaults to <code>*</code>) a comma separated list of architectures supported by the library. If the library doesn’t contain architecture specific code use <code>*</code> to match all architectures. This field is used as one factor in determining priority when multiple libraries match an <code>#include</code> directive and to provide a warning message when the library is compiled for a board of an architecture that doesn't match any on the list.</li>
-<li><strong>depends</strong> - <strong>(available from Arduino IDE 1.8.10)</strong> (optional) a comma-separated list of dependencies (libraries that are needed to build the current library). Library Manager will offer to install the dependencies during installation of the library. Since spaces are allowed in the <code>name</code> of a library, but not commas, you can refer to libraries containing spaces in the name without ambiguity for example:<br>
-<code>depends=Very long library name, Another library with long-name</code></li>
-<li><strong>dot_a_linkage</strong> - <strong>(available from Arduino IDE 1.6.0 / arduino-builder 1.0.0-beta13)</strong> (optional) when set to <code>true</code>, the library will be compiled using a .a (archive) file. First, all source files are compiled into .o files as normal. Then instead of including all .o files in the linker command directly, all .o files are saved into a .a file, which is then included in the linker command. <a href="#layout-of-folders-and-files">1.5 format library folder structure</a> is required.</li>
-<li><strong>includes</strong> - <strong>(available from Arduino IDE 1.6.10)</strong> (optional) a comma separated list of files to be added to the sketch as <code>#include &lt;...&gt;</code> lines. This property is used with the "Include library" command in the IDE. If the <code>includes</code> property is missing, all the header files (.h) on the root source folder are included.</li>
-<li><strong>precompiled</strong> - <strong>(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)</strong> (optional) set to <code>true</code> to allow the use of .a (archive) and .so (shared object) files. The .a/.so file must be located at <code>src/{build.mcu}</code> where <code>{build.mcu}</code> is the architecture name of the target the file was compiled for. Ex: <code>cortex-m3</code> for the Arduino DUE. The static library should be linked as an ldflag.</li>
-<li><strong>ldflags</strong> - <strong>(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)</strong> (optional) the linker flags to be added. Ex: <code>ldflags=-lm</code></li>
-</ul>
-<p>Example:</p>
-<div class="codehilite"><pre><span></span><code>name=WebServer
-version=1.0.0
-author=Cristian Maglie &lt;c.maglie@example.com&gt;, Pippo Pluto &lt;pippo@example.com&gt;
-maintainer=Cristian Maglie &lt;c.maglie@example.com&gt;
-sentence=A library that makes coding a Webserver a breeze.
-paragraph=Supports HTTP1.1 and you can do GET and POST.
-category=Communication
-url=http://example.com/
-architectures=avr
-includes=WebServer.h
-depends=ArduinoHttpClient
-</code></pre></div>
-
-
-<h3 id="layout-of-folders-and-files">Layout of folders and files<a class="headerlink" href="#layout-of-folders-and-files" title="Permanent link">&para;</a></h3>
-<p>Each folder has a specific purpose (sources, examples, documentation, etc). Folders not covered in this specification may be added as needed to future revisions.</p>
-<h4 id="library-root-folder">Library Root folder<a class="headerlink" href="#library-root-folder" title="Permanent link">&para;</a></h4>
-<p>The library root folder name must start with a basic letter (<code>A</code>-<code>Z</code> or <code>a</code>-<code>z</code>) or number (<code>0</code>-<code>9</code>), followed by basic letters, numbers, spaces (<code></code>), underscores (<code>_</code>), dots (<code>.</code>) and dashes (<code>-</code>). The maximum length is 63 characters.</p>
-<h4 id="source-code">Source code<a class="headerlink" href="#source-code" title="Permanent link">&para;</a></h4>
-<p>For 1.5.x+-only libraries, the source code resides in the <strong>src</strong> folder. For example:</p>
-<div class="codehilite"><pre><span></span><code>Servo/src/Servo.h
-Servo/src/Servo.cpp
-</code></pre></div>
-
-
-<p>The source code found in <strong>src</strong> folder and <em>all its subfolders</em> is compiled and linked in the user’s sketch. Only the <em>src</em> folder is added to the include search path (both when compiling the sketch and the library). When the user imports a library into their sketch (from the "Sketch &gt; Include Library" menu), an <code>#include</code> statement will be added for all header (.h) files in the src/ directory (but not its subfolders). As a result, these header files form something of a de facto interface to your library; in general, the only header files in the root src/ folder should be those that you want to expose to the user's sketch and plan to maintain compatibility with in future versions of the library. Place internal header files in a subfolder of the src/ folder.</p>
-<p>For backward compatibility with Arduino 1.0.x, the library author may opt to place source code into the root folder, instead of the folder called <strong>src</strong>. In this case the 1.0 library format is applied and the source code is searched from the <strong>library root folder</strong> and the <strong>utility</strong> folder, for example:</p>
-<div class="codehilite"><pre><span></span><code>Servo/Servo.h
-Servo/Servo.cpp
-Servo/utility/ServoTimers.h
-Servo/utility/ServoTimers.cpp
-</code></pre></div>
-
-
-<p>This will allow existing 1.0.x libraries to compile under 1.5.x+ as well and vice-versa. If a library only needs to run on 1.5.x+, we recommend placing all source code in the src/ folder. If a library requires recursive compilation of nested source folders, its code must be in the src/ folder (since 1.0.x doesn’t support recursive compilation, backwards compatibility wouldn’t be possible anyway).</p>
-<h4 id="library-examples">Library Examples<a class="headerlink" href="#library-examples" title="Permanent link">&para;</a></h4>
-<p>Library examples must be placed in the <strong>examples</strong> folder. Note that the <strong>examples</strong> folder must be written exactly like that (with lower case letters).</p>
-<div class="codehilite"><pre><span></span><code>Servo/examples/...
-</code></pre></div>
-
-
-<p>Sketches contained inside the examples folder will be shown in the Examples menu of the IDE.</p>
-<h4 id="extra-documentation">Extra documentation<a class="headerlink" href="#extra-documentation" title="Permanent link">&para;</a></h4>
-<p>An <strong>extras</strong> folder can be used by the developer to put documentation or other items to be bundled with the library. Remember that files placed inside this folder will increase the size of the library, so putting a 20MB PDF in a library that weights a few kilobytes may not be such a good idea.</p>
-<p>The content of the <em>extras</em> folder is totally ignored by the IDE; you are free to put anything inside such as supporting documentation, etc.</p>
-<h3 id="keywords">Keywords<a class="headerlink" href="#keywords" title="Permanent link">&para;</a></h3>
-<p>A list of keywords for the library may be specified in a file named keywords.txt located in the root of the library folder. When a keyword of any installed library is used in a sketch the Arduino IDE colors it.</p>
-<div class="codehilite"><pre><span></span><code>Servo/keywords.txt
-</code></pre></div>
-
-
-<p>An example keywords.txt file:
-<div class="highlight"><pre><span></span><code># Syntax Coloring Map For ExampleLibrary
-
-# Datatypes (KEYWORD1)
-Test    KEYWORD1
-
-# Methods and Functions (KEYWORD2)
-doSomething KEYWORD2
-
-# Instances (KEYWORD2)
-
-# Constants (LITERAL1)
-</code></pre></div>
-This file would cause the Arduino IDE to highlight <code>Test</code> as a DataType, and <code>doSomething</code> as a method / function.</p>
-<h4 id="keywordstxt-format">keywords.txt format<a class="headerlink" href="#keywordstxt-format" title="Permanent link">&para;</a></h4>
-<p>keywords.txt is formatted in four fields which are separated by a single true tab (not spaces):
-<div class="highlight"><pre><span></span><code>KEYWORD KEYWORD_TOKENTYPE   REFERENCE_LINK  RSYNTAXTEXTAREA_TOKENTYPE
-</code></pre></div>
-It is permitted to leave a field empty.</p>
-<h5 id="keyword_tokentype"><code>KEYWORD_TOKENTYPE</code><a class="headerlink" href="#keyword_tokentype" title="Permanent link">&para;</a></h5>
-<table>
-<thead>
-<tr>
-<th>KEYWORD_TOKENTYPE</th>
-<th>Use for</th>
-<th>Theme property</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>KEYWORD1</code></td>
-<td>datatypes</td>
-<td><code>editor.data_type.style</code></td>
-</tr>
-<tr>
-<td><code>KEYWORD2</code></td>
-<td>functions</td>
-<td><code>editor.function.style</code></td>
-</tr>
-<tr>
-<td><code>KEYWORD3</code></td>
-<td>structures</td>
-<td><code>editor.function.style</code></td>
-</tr>
-<tr>
-<td><code>LITERAL1</code></td>
-<td>constants</td>
-<td><code>editor.reserved_word_2.style</code></td>
-</tr>
-<tr>
-<td><code>LITERAL2</code></td>
-<td>?</td>
-<td><code>editor.function.style</code></td>
-</tr>
-</tbody>
-</table>
-<h5 id="reference_link"><code>REFERENCE_LINK</code><a class="headerlink" href="#reference_link" title="Permanent link">&para;</a></h5>
-<p>This field specifies the <a href="https://www.arduino.cc/reference/en">Arduino Language Reference</a> page to open via <strong>Right Click &gt; Find in Reference</strong> or <strong>Help &gt; Find in Reference</strong> when the cursor is on that keyword. Generally it does not make sense to define the <code>REFERENCE_LINK</code> field for 3<sup>rd</sup> party library keywords since they are not likely to be in the Arduino Language Reference.</p>
-<h5 id="rsyntaxtextarea_tokentype"><code>RSYNTAXTEXTAREA_TOKENTYPE</code><a class="headerlink" href="#rsyntaxtextarea_tokentype" title="Permanent link">&para;</a></h5>
-<p>In Arduino IDE 1.6.5 and newer this field overrides <code>KEYWORD_TOKENTYPE</code>. In previous IDE versions the <code>RSYNTAXTEXTAREA_TOKENTYPE</code> field is ignored and <code>KEYWORD_TOKENTYPE</code> is used instead.</p>
-<table>
-<thead>
-<tr>
-<th>RSYNTAXTEXTAREA_TOKENTYPE</th>
-<th>Theme property</th>
-<th>KEYWORD_TOKENTYPE equivalent</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>RESERVED_WORD</code></td>
-<td><code>editor.reserved_word.style</code></td>
-<td><code>KEYWORD3</code></td>
-</tr>
-<tr>
-<td><code>RESERVED_WORD_2</code></td>
-<td><code>editor.reserved_word_2.style</code></td>
-<td><code>LITERAL1</code></td>
-</tr>
-<tr>
-<td><code>DATA_TYPE</code></td>
-<td><code>editor.data_type.style</code></td>
-<td><code>KEYWORD1</code></td>
-</tr>
-<tr>
-<td><code>PREPROCESSOR</code></td>
-<td><code>editor.preprocessor.style</code></td>
-<td><code>KEYWORD3</code></td>
-</tr>
-<tr>
-<td><code>LITERAL_BOOLEAN</code></td>
-<td><code>editor.literal_boolean.style</code></td>
-<td><code>LITERAL1</code></td>
-</tr>
-</tbody>
-</table>
-<h3 id="development-flag-file">Development flag file<a class="headerlink" href="#development-flag-file" title="Permanent link">&para;</a></h3>
-<p>Normally the Arduino IDE treats the contents of the library folder as read-only. This is to prevent users from accidentally modifying example sketches. During the library development process you may want to edit example sketches in place using the Arduino IDE. With Arduino IDE 1.6.6 and newer, the read-only behavior can be disabled by adding a file named .development to the root of the library folder. A <a href="#libraryproperties-file-format">library.properties</a> file must also be present. The <a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">Library Manager indexer</a> will not pick up releases that contain a .development file so be sure not to push this file to your remote repository.</p>
-<h3 id="a-complete-example">A complete example<a class="headerlink" href="#a-complete-example" title="Permanent link">&para;</a></h3>
-<p>A hypothetical library named "Servo" that adheres to the specification follows:</p>
-<div class="codehilite"><pre><span></span><code>Servo/
-Servo/library.properties
-Servo/keywords.txt
-Servo/src/
-Servo/src/Servo.h
-Servo/src/Servo.cpp
-Servo/src/ServoTimers.h
-Servo/examples/
-Servo/examples/Sweep/Sweep.ino
-Servo/examples/Pot/Pot.ino
-Servo/extras/
-Servo/extras/Servo_Connectors.pdf
-</code></pre></div>
-
-
-<h2 id="working-with-multiple-architectures">Working with multiple architectures<a class="headerlink" href="#working-with-multiple-architectures" title="Permanent link">&para;</a></h2>
-<p>In 1.5.x+, libraries placed in the user’s sketchbook folder (in the libraries/ subfolder) will be made available for all boards, which may include multiple different processor architectures. To provide architecture-specific code or optimizations, library authors can use the <code>ARDUINO_ARCH_XXX</code> preprocessor macro (<code>#define</code>), where XXX is the name of the architecture (as determined by the name of the folder containing it), e.g. <code>ARDUINO_ARCH_AVR</code> will be defined when compiling for AVR-based boards. For example,</p>
-<div class="codehilite"><pre><span></span><code>#if defined(ARDUINO_ARCH_AVR)
-  // AVR-specific code
-#elif defined(ARDUINO_ARCH_SAM)
-  // SAM-specific code
-#else
-  // generic, non-platform specific code
-#endif
-</code></pre></div>
-
-
-<p>Alternatively, if a library only works on certain architectures, you can provide an explicit error message (instead of allowing the compilation to fail in a difficult to understand way):</p>
-<div class="codehilite"><pre><span></span><code>#if defined(ARDUINO_ARCH_AVR)
-  // AVR-specific code
-#elif defined(ARDUINO_ARCH_SAM)
-  // SAM-specific code
-#else
-  #error “This library only supports boards with an AVR or SAM processor.”
-#endif
-</code></pre></div>
-
-
-<h2 id="old-library-format-pre-15">Old library format (pre-1.5)<a class="headerlink" href="#old-library-format-pre-15" title="Permanent link">&para;</a></h2>
-<p>In order to support old libraries (from Arduino 1.0.x), Arduino 1.5.x+ will also compile libraries missing a library.properties metadata file. As a result, these libraries should behave as they did in Arduino 1.0.x, although they will be available for all boards, including non-AVR ones (which wouldn’t have been present in 1.0.x).</p>
                 
               
               
@@ -1469,7 +1225,7 @@ Servo/extras/Servo_Connectors.pdf
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../sketch-specification/" title="Sketch specification" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../sketch-build-process/" title="Sketch build process" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg>
             </div>
@@ -1478,19 +1234,19 @@ Servo/extras/Servo_Connectors.pdf
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Sketch specification
+                Sketch build process
               </div>
             </div>
           </a>
         
         
-          <a href="../platform-specification/" title="Platform specification" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../library-specification/" title="Library specification" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Platform specification
+                Library specification
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">
