@@ -1022,11 +1022,12 @@
                 
                   <h1>package_index.json specification</h1>
                 
-                <p>Starting from version 1.6.4 the Boards Manager of the Arduino IDE can be used to automatically install support for <strong>3<sup>rd</sup> party hardware</strong> by simply entering an URL in the <strong>File &gt; Preferences</strong> dialog. The URL must be provided by the 3<sup>rd</sup> party hardware producer and should point to a JSON file that contains an index of the boards available to install and the location of the installation archives. Boards Manager also allows easy updates of installed Boards when new versions are released.</p>
+                <p>Introduced in Arduino IDE 1.6.4, Boards Manager makes it easy to install and update Arduino platforms. In order to provide Boards Manager installation support for a platform, a JSON formatted index file must be published. This is the specification for that file.</p>
+<p>Boards Manager functionality is provided by <a href="../getting-started/#adding-3rd-party-cores">Arduino CLI</a>, <a href="https://www.arduino.cc/en/Guide/Cores">Arduino IDE</a>, and Arduino Pro IDE.</p>
 <h2 id="naming-of-the-json-index-file">Naming of the JSON index file<a class="headerlink" href="#naming-of-the-json-index-file" title="Permanent link">&para;</a></h2>
-<p>The IDE may use many different index files coming from different vendors, so each vendor should name his own index file in a way that won't conflict with others. The file must be named as follows:</p>
+<p>Many different index files coming from different vendors may be in use, so each vendor should name his own index file in a way that won't conflict with others. The file must be named as follows:</p>
 <p><code>package_YOURNAME_PACKAGENAME_index.json</code></p>
-<p>The prefix <code>package_</code> and the postfix <code>_index.json</code> are <strong>mandatory</strong> (otherwise the index file is not recognised by the IDE) while the choice of <code>YOURNAME_PACKAGENAME</code> is left to the packager.
+<p>The prefix <code>package_</code> and the postfix <code>_index.json</code> are <strong>mandatory</strong> (otherwise the index file is not recognised by the Arduino development software) while the choice of <code>YOURNAME_PACKAGENAME</code> is left to the packager.
 We suggest using a domain name owned by the packager. For example:</p>
 <p><code>package_arduino.cc_index.json</code></p>
 <p>or</p>
@@ -1068,8 +1069,8 @@ We suggest using a domain name owned by the packager. For example:</p>
 <p>The metadata fields are:</p>
 <ul>
 <li><code>name</code>: the folder used for the installed cores. The <a href="../platform-specification/#hardware-folders-structure">vendor folder</a> name of the installed package is determined by this field</li>
-<li><code>maintainer</code>: the extended name of the vendor that is displayed on the Boards Manager GUI</li>
-<li><code>websiteURL</code>: the URL to the vendor's website, appears on the Boards Manager as a "More info" link</li>
+<li><code>maintainer</code>: the extended name of the vendor that is displayed on the Arduino IDE/Pro IDE's Boards Manager GUI</li>
+<li><code>websiteURL</code>: the URL to the vendor's website, appears on the Arduino IDE/Pro IDE's Boards Manager as a "More info" link</li>
 <li><code>email</code>: the email of the vendor/maintainer</li>
 </ul>
 <p>Now, before looking at <code>PLATFORMS</code>, let's explore first how <code>TOOLS</code> are made.</p>
@@ -1140,7 +1141,7 @@ Each tool is uniquely identified by the triple (<code>vendor</code>, <code>name<
 <li>Mac (<code>i386-apple-darwin11</code>)</li>
 </ul>
 <p>The IDE will take care to install the right flavour based on the <code>host</code> value, or fail if a needed flavour is missing.<br>
-Note that the IDE does not use this information to select the toolchain during verify. If you want the IDE to use this specific version you should use the notation {runtime.tools.TOOLNAME-VERSION.path} in the platform.txt.</p>
+Note that this information is not used to select the toolchain during compilation. If you want this specific version to be used, you should use the notation {runtime.tools.TOOLNAME-VERSION.path} in the platform.txt.</p>
 <p>The other fields are:</p>
 <ul>
 <li><code>url</code>: the download URL of the tool's archive</li>
@@ -1192,9 +1193,9 @@ a private folder that can be referenced from <code>platform.txt</code> using one
 <li><code>architecture</code>: is the architecture of the plaftorm (avr, sam, etc...). It must match the architecture of the core as explained in the <a href="../platform-specification/#hardware-folders-structure">Arduino platform specification</a></li>
 <li><code>version</code>: the version of the platform.</li>
 <li><code>category</code>: this field is reserved, a 3<sup>rd</sup> party core must set it to <code>Contributed</code></li>
-<li><code>help</code>/<code>online</code>: is a URL that is displayed on the Boards Manager as an "Online Help" link</li>
+<li><code>help</code>/<code>online</code>: is a URL that is displayed on the Arduino IDE's Boards Manager as an "Online Help" link</li>
 <li><code>url</code>, <code>archiveFileName</code>, <code>size</code> and <code>checksum</code>: metadata of the core archive file. The meaning is the same as for the TOOLS</li>
-<li><code>boards</code>: the list of boards supported (note: just the names to display on the GUI! the real boards definitions are inside <code>boards.txt</code> inside the core archive file)</li>
+<li><code>boards</code>: the list of boards supported (note: just the names to display on the Arduino IDE and Arduino Pro IDE's Boards Manager GUI! the real boards definitions are inside <code>boards.txt</code> inside the core archive file)</li>
 <li><code>toolsDependencies</code>: the tools needed by this core. Each tool is referenced by the triple (<code>packager</code>, <code>name</code>, <code>version</code>) as previously said. Note that you can reference tools available in other packages as well.</li>
 </ul>
 <p>The <code>version</code> field is validated by both Arduino IDE and <a href="https://github.com/zafarkhaja/jsemver">JSemVer</a>. Here are the rules Arduino IDE follows for parsing versions (<a href="https://github.com/arduino/Arduino/blob/master/arduino-core/src/cc/arduino/contributions/VersionHelper.java">source</a>):</p>
@@ -1286,7 +1287,7 @@ In the example there is one <code>PACKAGE</code>, My Board. The package is compa
 <img alt="Boards Manager screenshot" src="../img/boards-manager-screenshot.png" /></p>
 <h2 id="installation-archive-structure">Installation archive structure<a class="headerlink" href="#installation-archive-structure" title="Permanent link">&para;</a></h2>
 <p>The installation archives contain the Board support files. Supported formats are .zip, .tar.bz2, and .tar.gz.</p>
-<p>The folder structure of the core archive is slightly different from the standard manually installed Arduino 1.5+ compatible hardware folder structure. You must remove the architecture folder(e.g., <code>avr</code> or <code>arm</code>), moving all the files and folders within the architecture folder up a level.</p>
+<p>The folder structure of the core archive is slightly different from the standard manually installed Arduino IDE 1.5+ compatible hardware folder structure. You must remove the architecture folder(e.g., <code>avr</code> or <code>arm</code>), moving all the files and folders within the architecture folder up a level.</p>
 <hr />
 <p>After adding Boards Manager support for your boards, please share the JSON index file URL on the <a href="https://github.com/arduino/Arduino/wiki/Unofficial-list-of-3rd-party-boards-support-urls">Unofficial list of 3<sup>rd</sup> party boards support urls</a>.</p>
                 
