@@ -23,6 +23,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type RawData struct {
+	// The settings, in JSON format.
 	JsonData             string   `protobuf:"bytes,1,opt,name=jsonData,proto3" json:"jsonData,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -62,7 +63,9 @@ func (m *RawData) GetJsonData() string {
 }
 
 type Value struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	// The key of the setting.
+	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	// The setting, in JSON format.
 	JsonData             string   `protobuf:"bytes,2,opt,name=jsonData,proto3" json:"jsonData,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -140,6 +143,7 @@ func (m *GetAllRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_GetAllRequest proto.InternalMessageInfo
 
 type GetValueRequest struct {
+	// The key of the setting.
 	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -285,9 +289,13 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type SettingsClient interface {
+	// List all the settings.
 	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*RawData, error)
+	// Set multiple settings values at once.
 	Merge(ctx context.Context, in *RawData, opts ...grpc.CallOption) (*MergeResponse, error)
+	// Get the value of a specific setting.
 	GetValue(ctx context.Context, in *GetValueRequest, opts ...grpc.CallOption) (*Value, error)
+	// Set the value of a specific setting.
 	SetValue(ctx context.Context, in *Value, opts ...grpc.CallOption) (*SetValueResponse, error)
 }
 
@@ -337,9 +345,13 @@ func (c *settingsClient) SetValue(ctx context.Context, in *Value, opts ...grpc.C
 
 // SettingsServer is the server API for Settings service.
 type SettingsServer interface {
+	// List all the settings.
 	GetAll(context.Context, *GetAllRequest) (*RawData, error)
+	// Set multiple settings values at once.
 	Merge(context.Context, *RawData) (*MergeResponse, error)
+	// Get the value of a specific setting.
 	GetValue(context.Context, *GetValueRequest) (*Value, error)
+	// Set the value of a specific setting.
 	SetValue(context.Context, *Value) (*SetValueResponse, error)
 }
 
