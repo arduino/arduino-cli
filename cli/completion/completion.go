@@ -24,18 +24,27 @@ import (
 // NewCommand created a new `version` command
 func NewCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:   "completion",
-		Short: "Generates bash completion scripts",
-		Long: `To load completion run
-				# arduino-cli completion > arduino-cli.sh
-				and then
-				# source arduino-cli.sh
-				or add the script to /etc/bash_completion.d/
-				`,
+		Use:       "completion [bash|zsh|fish] ",
+		ValidArgs: []string{"bash\t", "zsh", "fish"},
+		Args:      cobra.ExactArgs(1),
+		Short:     "Generates completion scripts",
+		Long:      "Generates completion scripts for various shells",
+		Example: "  " + os.Args[0] + " completion bash > completion.sh\n" +
+			"  " + "source completion.sh",
 		Run: run,
 	}
 }
 
 func run(cmd *cobra.Command, args []string) {
-	cmd.Root().GenBashCompletion(os.Stdout)
+	switch args[0] {
+	case "bash":
+		cmd.Root().GenBashCompletion(os.Stdout)
+		break
+	case "zsh":
+		cmd.Root().GenZshCompletion(os.Stdout)
+		break
+	case "fish":
+		cmd.Root().GenFishCompletion(os.Stdout, true)
+		break
+	}
 }
