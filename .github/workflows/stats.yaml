@@ -14,6 +14,7 @@ jobs:
 
     steps:
       - name: Fetch downloads count
+        id: fetch
         uses: actions/github-script@0.2.0
         with:
           github-token: ${{github.token}}
@@ -40,8 +41,8 @@ jobs:
               const assets = await github.paginate(opts)
 
               for (const asset of assets) {
-                // Ignore checksums file
-                if (asset.name.endsWith(".txt")) {
+                // Ignore files that are not arduino-cli packages
+                if (!asset.name.startsWith(baseName)) {
                   continue
                 }
 
@@ -55,6 +56,7 @@ jobs:
                   "value": asset.download_count,
                   "host": "${{ github.repository }}",
                   "tags": [
+                    `version:${rel.name}`,
                     `os:${systemArch[0]}`,
                     `arch:${systemArch[1]}`,
                     "cdn:github.com",
@@ -64,4 +66,10 @@ jobs:
               }
             }
 
-            console.log(`::set-output name=metrics::${metrics}`)
+            return metrics
+
+      - name: Send metrics
+        uses: masci/datadog@v1
+        with:
+          api-key: ${{ secrets.DD_API_KEY }}
+          metrics: ${{steps.fetch.outputs.result}}
