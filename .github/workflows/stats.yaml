@@ -1,0 +1,67 @@
+name: download-stats
+
+on:
+  push:
+    branches:
+      - massi/stats
+  schedule:
+    # run every 5 minutes
+    - cron:  '*/5 * * * *'
+
+jobs:
+  push-stats:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fetch downloads count
+        uses: actions/github-script@0.2.0
+        with:
+          github-token: ${{github.token}}
+          script: |
+            let metrics = []
+
+            // Get a list of releases
+            const opts = github.repos.listReleases.endpoint.merge({
+              ...context.repo
+            })
+            const releases = await github.paginate(opts)
+
+            // Get download stats for every release
+            for (const rel of releases) {
+              // Names for assets are like `arduino-cli_0.4.0_Linux_32bit.tar.gz`,
+              // we'll use this later to split the asset file name more easily
+              const baseName = `arduino-cli_${rel.name}_`
+
+              // Get a list of assets for this release
+              const opts = github.repos.listAssetsForRelease.endpoint.merge({
+                ...context.repo,
+                release_id: rel.id
+              })
+              const assets = await github.paginate(opts)
+
+              for (const asset of assets) {
+                // Ignore checksums file
+                if (asset.name.endsWith(".txt")) {
+                  continue
+                }
+
+                // Strip the base and remove file extension to get `Linux_32bit`
+                systemArch = asset.name.replace(baseName, "").split(".")[0].split("_")
+
+                // Add a metric object to the list of gathered metrics
+                metrics.push({
+                  "type": "gauge",
+                  "name": "arduino.downloads.total",
+                  "value": asset.download_count,
+                  "host": "${{ github.repository }}",
+                  "tags": [
+                    `os:${systemArch[0]}`,
+                    `arch:${systemArch[1]}`,
+                    "cdn:github.com",
+                    "project:arduino-cli"
+                  ]
+                })
+              }
+            }
+
+            console.log(`::set-output name=metrics::${metrics}`)
