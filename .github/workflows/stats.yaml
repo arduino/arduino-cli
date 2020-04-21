@@ -66,10 +66,28 @@ jobs:
               }
             }
 
+            // The action will put whatever we return from this function in
+            // `outputs.result`, JSON encoded. So we just return the array
+            // of objects and GitHub will do the rest.
             return metrics
 
       - name: Send metrics
         uses: masci/datadog@v1
         with:
           api-key: ${{ secrets.DD_API_KEY }}
+          // metrics input expects YAML but JSON will do the job
           metrics: ${{steps.fetch.outputs.result}}
+
+      - name: Report failure
+        if: failure()
+        uses: masci/datadog@v1
+        with:
+          api-key: ${{ secrets.DD_API_KEY }}
+          events: |
+            - title: "Arduino CLI stats failing"
+              text: "Stats collection failed"
+              alert_type: "error"
+              host: ${{ github.repository }}
+              tags:
+                - "project:arduino-cli"
+                - "cdn:github.com"
