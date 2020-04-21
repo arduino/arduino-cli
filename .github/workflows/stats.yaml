@@ -74,7 +74,7 @@ jobs:
       - name: Send metrics
         uses: masci/datadog@v1
         with:
-          api-key: ${{ secrets.DD_API_KEY }}
+          api-key: ${{ secrets._DD_API_KEY }}
           # Metrics input expects YAML but JSON will work just right.
           metrics: ${{steps.fetch.outputs.result}}
 
