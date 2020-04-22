@@ -26,9 +26,9 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           # Fetch jq 1.6 as VM has only 1.5 ATM
-          wget -q https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
-          chmod +x jq-linux64
-          alias jq="${{ github.workspace }}/jq-linux64"
+          wget -q https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O jq
+          chmod +x jq
+          PATH=${{ github.workspace }}:$PATH${{ github.workspace }}
           .github/tools/fetch_athena_stats.sh
 
       - name: Send metrics
