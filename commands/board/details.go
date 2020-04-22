@@ -37,6 +37,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		return nil, fmt.Errorf("parsing fqbn: %s", err)
 	}
 
+	//boardPackage, platformRelease, board, buildProperties, buildPlatformRelease, err := pm.ResolveFQBN(fqbn)
 	boardPackage, _, board, _, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, fmt.Errorf("loading board data: %s", err)
@@ -48,12 +49,22 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 	details.Official = fqbn.Package == "arduino"
 
 	details.Package = &rpc.Package{
-		Name:boardPackage.Name,
-		Maintainer:boardPackage.Maintainer,
+		Name:       boardPackage.Name,
+		Maintainer: boardPackage.Maintainer,
 		WebsiteURL: boardPackage.WebsiteURL,
-		Email: boardPackage.Email,
-		Help: &rpc.Help{Online:""},
-		Url:"TBD",
+		Email:      boardPackage.Email,
+		Help:       &rpc.Help{Online: ""},
+		Url:        "TBD",
+	}
+
+	details.IdentificationPref = []*rpc.IdentificationPref{}
+	vids := board.Properties.SubTree("vid")
+	pids := board.Properties.SubTree("pid")
+	for id, vid := range vids.AsMap() {
+		if pid, ok := pids.GetOk(id); ok {
+			idPref := rpc.IdentificationPref{UsbID: &rpc.USBID{VID: vid, PID: pid}}
+			details.IdentificationPref = append(details.IdentificationPref, &idPref)
+		}
 	}
 
 	details.ConfigOptions = []*rpc.ConfigOption{}
@@ -92,3 +103,4 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 
 	return details, nil
 }
+
