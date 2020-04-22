@@ -19,10 +19,10 @@ jobs:
       - name: Fetch downloads count form Arduino CDN using AWS Athena
         id: fetch
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_ATHENA_SOURCE_TABLE: ${{ secrets.AWS_ATHENA_SOURCE_TABLE }}
-          AWS_ATHENA_OUTPUT_LOCATION: ${{ secrets.AWS_ATHENA_OUTPUT_LOCATION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.STATS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.STATS_AWS_SECRET_ACCESS_KEY }}
+          AWS_ATHENA_SOURCE_TABLE: ${{ secrets.STATS_AWS_ATHENA_SOURCE_TABLE }}
+          AWS_ATHENA_OUTPUT_LOCATION: ${{ secrets.STATS_AWS_ATHENA_OUTPUT_LOCATION }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: .github/tools/fetch_athena_stats.sh
 
