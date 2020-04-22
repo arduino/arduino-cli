@@ -33,3 +33,16 @@ jobs:
           PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Report failure
+        if: failure()
+        uses: masci/datadog@v1
+        with:
+          api-key: ${{ secrets.DD_API_KEY }}
+          events: |
+            - title: "Arduino CLI nighly build failed"
+              text: "Nightly build worfklow has failed"
+              alert_type: "error"
+              host: ${{ github.repository }}
+              tags:
+                - "project:arduino-cli"
