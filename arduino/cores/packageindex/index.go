@@ -1,4 +1,4 @@
-// This file is part of arduino-cli.
+    // This file is part of arduino-cli.
 //
 // Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
 //

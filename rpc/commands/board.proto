@@ -22,70 +22,127 @@ option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 import "commands/common.proto";
 
 message BoardDetailsReq {
-  Instance instance = 1;
-  string fqbn = 2;
+    Instance instance = 1;
+    string fqbn = 2;
 }
 
 message BoardDetailsResp {
-  string name = 2;
-  repeated ConfigOption config_options = 3;
-  repeated RequiredTool required_tools = 4;
+    string fqbn = 1;
+    string name = 2;
+    repeated ConfigOption config_options = 3;
+    repeated Tool _tools = 4;
+    repeated IdentificationPref identification_pref = 5;
+    bool official = 6;
+    string pinout = 7;
+    Package package = 8;
+    BoardPlatform platform = 9;
+    repeated ToolsDependencies toolsDependencies = 10;
+
 }
 
+message IdentificationPref {
+    USBID usbID = 1;
+}
+
+message USBID {
+    string VID = 1;
+    string PID = 2;
+}
+
+message Package {
+    string maintainer = 1;
+    string url = 2;
+    string websiteURL = 3;
+    string email = 4;
+    string name = 5;
+    Help help = 6;
+}
+
+message Help {
+    string online = 1;
+}
+
+message BoardPlatform {
+    string architecture = 1;
+    string category = 2;
+    string url = 3;
+    string archiveFileName = 4;
+    string checksum = 5;
+    string size = 6;
+    string name = 7;
+}
+
+
+message ToolsDependencies {
+    string packager = 1;
+    string name = 2;
+    string version = 3;
+    repeated Systems systems = 4;
+}
+
+message Systems {
+    string checksum = 1;
+    string host = 2;
+    string archiveFileName = 3;
+    string url = 4;
+    string size = 5;
+}
+
+
 message ConfigOption {
-  string option = 1;
-  string option_label = 2;
-  repeated ConfigValue values = 3;
+    string option = 1;
+    string option_label = 2;
+    repeated ConfigValue values = 3;
 }
 
 message ConfigValue {
-  string value = 1;
-  string value_label = 2;
-  bool selected = 3;
+    string value = 1;
+    string value_label = 2;
+    bool selected = 3;
 }
 
-message RequiredTool {
-  string name = 1;
-  string version = 2;
-  string packager = 3;
+message Tool {
+    string name = 1;
+    string version = 2;
+    string packager = 3;
 }
 
 message BoardAttachReq {
-  Instance instance = 1;
-  string board_uri = 2;
-  string sketch_path = 3;
-  string search_timeout = 4;
+    Instance instance = 1;
+    string board_uri = 2;
+    string sketch_path = 3;
+    string search_timeout = 4;
 }
 
 message BoardAttachResp {
-  TaskProgress task_progress = 1;
+    TaskProgress task_progress = 1;
 }
 
 message BoardListReq {
-  Instance instance = 1;
+    Instance instance = 1;
 }
 
 message BoardListResp {
-  repeated DetectedPort ports = 1;
+    repeated DetectedPort ports = 1;
 }
 
 message DetectedPort {
-  string address = 1;
-  string protocol = 2;
-  string protocol_label = 3;
-  repeated BoardListItem boards = 4;
+    string address = 1;
+    string protocol = 2;
+    string protocol_label = 3;
+    repeated BoardListItem boards = 4;
 }
 
 message BoardListAllReq {
-  Instance instance = 1;
-	repeated string search_args = 2;
+    Instance instance = 1;
+    repeated string search_args = 2;
 }
 
 message BoardListAllResp {
-  repeated BoardListItem boards = 1;
+    repeated BoardListItem boards = 1;
 }
 
 message BoardListItem {
-	string name = 1;
-	string FQBN = 2;
+    string name = 1;
+    string FQBN = 2;
 }

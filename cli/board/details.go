@@ -86,7 +86,7 @@ func (dr detailsResult) String() string {
 	t.SetColumnWidthMode(1, table.Average)
 	t.AddRow("Board name:", details.Name)
 
-	for i, tool := range details.RequiredTools {
+	for i, tool := range details.ToolsDependencies {
 		if i == 0 {
 			t.AddRow() // get some space from above
 			t.AddRow("Required tools:", tool.Packager+":"+tool.Name, "", tool.Version)

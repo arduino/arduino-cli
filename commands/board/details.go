@@ -37,13 +37,25 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		return nil, fmt.Errorf("parsing fqbn: %s", err)
 	}
 
-	_, _, board, _, _, err := pm.ResolveFQBN(fqbn)
+	boardPackage, _, board, _, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, fmt.Errorf("loading board data: %s", err)
 	}
 
 	details := &rpc.BoardDetailsResp{}
 	details.Name = board.Name()
+	details.Fqbn = board.FQBN()
+	details.Official = fqbn.Package == "arduino"
+
+	details.Package = &rpc.Package{
+		Name:boardPackage.Name,
+		Maintainer:boardPackage.Maintainer,
+		WebsiteURL: boardPackage.WebsiteURL,
+		Email: boardPackage.Email,
+		Help: &rpc.Help{Online:""},
+		Url:"TBD",
+	}
+
 	details.ConfigOptions = []*rpc.ConfigOption{}
 	options := board.GetConfigOptions()
 	for _, option := range options.Keys() {
@@ -69,9 +81,9 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		details.ConfigOptions = append(details.ConfigOptions, configOption)
 	}
 
-	details.RequiredTools = []*rpc.RequiredTool{}
+	details.ToolsDependencies = []*rpc.ToolsDependencies{}
 	for _, reqTool := range board.PlatformRelease.Dependencies {
-		details.RequiredTools = append(details.RequiredTools, &rpc.RequiredTool{
+		details.ToolsDependencies = append(details.ToolsDependencies, &rpc.ToolsDependencies{
 			Name:     reqTool.ToolName,
 			Packager: reqTool.ToolPackager,
 			Version:  reqTool.ToolVersion.String(),
