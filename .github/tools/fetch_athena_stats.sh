@@ -77,7 +77,7 @@ queryResult=$( aws athena get-query-results \
 EOM
 
 datapoints="["
-for row in $(echo "${queryResult}" |jq 'del(.ResultSet.Rows[0])' | jq -r '.ResultSet.Rows[] | .Data' --compact-output); do
+for row in $(echo "${queryResult}" | jq 'del(.ResultSet.Rows[0])' | jq -r '.ResultSet.Rows[] | .Data' --compact-output); do
   value=$(jq -r ".[1].VarCharValue" <<< "${row}")
   tag=$(jq -r ".[0].VarCharValue" <<< "${row}")
   # Some splitting to obtain 0.6.0, Windows, 32bit elements from string 0.6.0_Windows_32bit.zip
