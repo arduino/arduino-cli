@@ -46,7 +46,9 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 	details := &rpc.BoardDetailsResp{}
 	details.Name = board.Name()
 	details.Fqbn = board.FQBN()
+	details.Id = board.BoardID
 	details.Official = fqbn.Package == "arduino"
+	details.Version = board.PlatformRelease.Version.String()
 
 	details.Package = &rpc.Package{
 		Name:       boardPackage.Name,
@@ -54,7 +56,17 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		WebsiteURL: boardPackage.WebsiteURL,
 		Email:      boardPackage.Email,
 		Help:       &rpc.Help{Online: ""},
-		Url:        "TBD",
+		Url:        board.BoardID,
+	}
+
+	details.Platform = &rpc.BoardPlatform{
+		Architecture:         board.PlatformRelease.Platform.Architecture,
+		Category:             board.PlatformRelease.Platform.Category,
+		Url:                  board.PlatformRelease.Resource.URL,
+		ArchiveFileName:      board.PlatformRelease.Resource.ArchiveFileName,
+		Checksum:             board.PlatformRelease.Resource.Checksum,
+		Size:                 board.PlatformRelease.Resource.Size,
+		Name:                 "TBD",
 	}
 
 	details.IdentificationPref = []*rpc.IdentificationPref{}
