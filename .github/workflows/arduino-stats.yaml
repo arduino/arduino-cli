@@ -21,7 +21,7 @@ jobs:
           AWS_ATHENA_SOURCE_TABLE: ${{ secrets.AWS_ATHENA_SOURCE_TABLE }}
           AWS_ATHENA_OUTPUT_LOCATION: ${{ secrets.AWS_ATHENA_OUTPUT_LOCATION }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: ./.github/tools/fetch_athena_stats.sh
+        run: sh .github/tools/fetch_athena_stats.sh
 
       - name: Send metrics
         uses: masci/datadog@v1
