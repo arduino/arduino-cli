@@ -13,6 +13,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
       - name: Fetch downloads count form Arduino CDN using AWS Athena
         id: fetch
         env:
@@ -21,7 +24,7 @@ jobs:
           AWS_ATHENA_SOURCE_TABLE: ${{ secrets.AWS_ATHENA_SOURCE_TABLE }}
           AWS_ATHENA_OUTPUT_LOCATION: ${{ secrets.AWS_ATHENA_OUTPUT_LOCATION }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: sh .github/tools/fetch_athena_stats.sh
+        run: .github/tools/fetch_athena_stats.sh
 
       - name: Send metrics
         uses: masci/datadog@v1
