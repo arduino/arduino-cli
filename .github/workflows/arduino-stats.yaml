@@ -1,0 +1,50 @@
+name: download-stats
+
+on:
+  schedule:
+    # run every day at 12:00:00
+    - cron:  '* 12 * * *'
+
+jobs:
+  push-stats:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Fetch downloads count form Arduino CDN using AWS Athena
+        id: fetch
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.STATS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.STATS_AWS_SECRET_ACCESS_KEY }}
+          AWS_ATHENA_SOURCE_TABLE: ${{ secrets.STATS_AWS_ATHENA_SOURCE_TABLE }}
+          AWS_ATHENA_OUTPUT_LOCATION: ${{ secrets.STATS_AWS_ATHENA_OUTPUT_LOCATION }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          # Fetch jq 1.6 as VM has only 1.5 ATM
+          wget -q https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O jq
+          chmod +x jq
+          PATH=${{ github.workspace }}:$PATH
+          .github/tools/fetch_athena_stats.sh
+
+      - name: Send metrics
+        uses: masci/datadog@v1
+        with:
+          api-key: ${{ secrets.DD_API_KEY }}
+          # Metrics input expects YAML but JSON will work just right.
+          metrics: ${{steps.fetch.outputs.result}}
+
+      - name: Report failure
+        if: failure()
+        uses: masci/datadog@v1
+        with:
+          api-key: ${{ secrets.DD_API_KEY }}
+          events: |
+            - title: "Arduino CLI stats failing"
+              text: "Stats collection failed"
+              alert_type: "error"
+              host: ${{ github.repository }}
+              tags:
+                - "project:arduino-cli"
+                - "cdn:downloads.arduino.cc"
