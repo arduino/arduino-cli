@@ -1,0 +1,45 @@
+name: download-stats
+
+on:
+  push:
+    branches:
+      - rsora/downloads-stats-action
+  schedule:
+    # run every day at 12:00:00
+    - cron:  '* 12 * * *'
+
+jobs:
+  push-stats:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fetch downloads count form Arduino CDN using AWS Athena
+        id: fetch
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ATHENA_SOURCE_TABLE: ${{ secrets.AWS_ATHENA_SOURCE_TABLE }}
+          AWS_ATHENA_OUTPUT_LOCATION: ${{ secrets.AWS_ATHENA_OUTPUT_LOCATION }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: ./tools/fetch_athena_stats.sh
+
+      - name: Send metrics
+        uses: masci/datadog@v1
+        with:
+          api-key: ${{ secrets.DD_API_KEY }}
+          # Metrics input expects YAML but JSON will work just right.
+          metrics: ${{steps.fetch.outputs.result}}
+
+      - name: Report failure
+        if: failure()
+        uses: masci/datadog@v1
+        with:
+          api-key: ${{ secrets.DD_API_KEY }}
+          events: |
+            - title: "Arduino CLI stats failing"
+              text: "Stats collection failed"
+              alert_type: "error"
+              host: ${{ github.repository }}
+              tags:
+                - "project:arduino-cli"
+                - "cdn:downloads.arduino.cc"
