@@ -16,12 +16,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Get latest jq version
-        run: |
-          wget -q https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
-          chmod +x jq-linux64
-          alias jq="${{ github.workspace }}/jq-linux64"
-
       - name: Fetch downloads count form Arduino CDN using AWS Athena
         id: fetch
         env:
@@ -30,7 +24,12 @@ jobs:
           AWS_ATHENA_SOURCE_TABLE: ${{ secrets.STATS_AWS_ATHENA_SOURCE_TABLE }}
           AWS_ATHENA_OUTPUT_LOCATION: ${{ secrets.STATS_AWS_ATHENA_OUTPUT_LOCATION }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: .github/tools/fetch_athena_stats.sh
+        run: |
+          # Fetch jq 1.6 as VM has only 1.5 ATM
+          wget -q https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+          chmod +x jq-linux64
+          alias jq="${{ github.workspace }}/jq-linux64"
+          .github/tools/fetch_athena_stats.sh
 
       - name: Send metrics
         uses: masci/datadog@v1
