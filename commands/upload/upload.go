@@ -88,17 +88,17 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	}
 
 	// Load programmer tool
-	uploadToolPattern, have := boardProperties.GetOk("upload.tool")
-	if !have || uploadToolPattern == "" {
+	uploadToolName, have := boardProperties.GetOk("upload.tool")
+	if !have || uploadToolName == "" {
 		return nil, fmt.Errorf("cannot get programmer tool: undefined 'upload.tool' property")
 	}
 
 	var referencedPlatformRelease *cores.PlatformRelease
-	if split := strings.Split(uploadToolPattern, ":"); len(split) > 2 {
-		return nil, fmt.Errorf("invalid 'upload.tool' property: %s", uploadToolPattern)
+	if split := strings.Split(uploadToolName, ":"); len(split) > 2 {
+		return nil, fmt.Errorf("invalid 'upload.tool' property: %s", uploadToolName)
 	} else if len(split) == 2 {
 		referencedPackageName := split[0]
-		uploadToolPattern = split[1]
+		uploadToolName = split[1]
 		architecture := board.PlatformRelease.Platform.Architecture
 
 		if referencedPackage := pm.Packages[referencedPackageName]; referencedPackage == nil {
@@ -119,7 +119,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	uploadProperties.Merge(board.PlatformRelease.RuntimeProperties())
 	uploadProperties.Merge(boardProperties)
 
-	uploadToolProperties := uploadProperties.SubTree("tools." + uploadToolPattern)
+	uploadToolProperties := uploadProperties.SubTree("tools." + uploadToolName)
 	uploadProperties.Merge(uploadToolProperties)
 
 	if requiredTools, err := pm.FindToolsRequiredForBoard(board); err == nil {
