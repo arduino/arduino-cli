@@ -40,9 +40,6 @@ message BoardDetailsResp {
     repeated ConfigOption config_options = 11;
     repeated Tool _tools = 12;
     repeated IdentificationPref identification_pref = 13;
-
-
-
 }
 
 message IdentificationPref {

@@ -106,10 +106,23 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 
 	details.ToolsDependencies = []*rpc.ToolsDependencies{}
 	for _, reqTool := range board.PlatformRelease.Dependencies {
+
+		toolRelease := board.PlatformRelease.Platform.Package.Tools[reqTool.ToolName].Releases[reqTool.ToolVersion.String()]
+		var systems []*rpc.Systems
+		for _, f := range toolRelease.Flavors {
+			systems = append(systems, &rpc.Systems{
+				Checksum:        f.Resource.Checksum,
+				Host:            f.OS,
+				ArchiveFileName: f.Resource.ArchiveFileName,
+				Url:             f.Resource.URL,
+			})
+		}
+
 		details.ToolsDependencies = append(details.ToolsDependencies, &rpc.ToolsDependencies{
 			Name:     reqTool.ToolName,
 			Packager: reqTool.ToolPackager,
 			Version:  reqTool.ToolVersion.String(),
+			Systems:  systems,
 		})
 	}
 
