@@ -2,8 +2,8 @@ name: arduino-stats
 
 on:
   schedule:
-    # run every day at 12:00:00
-    - cron:  '0 12 * * *'
+    # run every day at 12:30:00
+    - cron:  '30 12 * * *'
 
 jobs:
   push-stats:
