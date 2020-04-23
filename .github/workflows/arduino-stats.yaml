@@ -1,9 +1,9 @@
-name: download-stats
+name: arduino-stats
 
 on:
   schedule:
     # run every day at 12:00:00
-    - cron:  '* 12 * * *'
+    - cron:  '0 12 * * *'
 
 jobs:
   push-stats:
