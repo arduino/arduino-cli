@@ -16,10 +16,11 @@
 package commands
 
 import (
+	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/httpclient"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -31,7 +32,9 @@ import (
 // current settings.
 func GetDownloaderConfig() (*downloader.Config, error) {
 	res := &downloader.Config{
-		RequestHeaders: globals.NewHTTPClientHeader(viper.GetString("network.user_agent_ext")),
+		RequestHeaders: http.Header{
+			"User-Agent": []string{httpclient.UserAgent()},
+		},
 	}
 	if viper.IsSet("network.proxy") {
 		proxy := viper.GetString("network.proxy")
