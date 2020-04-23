@@ -163,10 +163,10 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	}
 
 	outputTmpFile, ok := uploadProperties.GetOk("recipe.output.tmp_file")
-	outputTmpFile = uploadProperties.ExpandPropsInString(outputTmpFile)
 	if !ok {
 		return nil, fmt.Errorf("property 'recipe.output.tmp_file' not defined")
 	}
+	outputTmpFile = uploadProperties.ExpandPropsInString(outputTmpFile)
 	ext := filepath.Ext(outputTmpFile)
 	if strings.HasSuffix(importFile, ext) {
 		importFile = importFile[:len(importFile)-len(ext)]
