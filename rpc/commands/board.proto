@@ -30,8 +30,8 @@ message BoardDetailsResp {
     string fqbn = 1;
     string name = 2;
     string version = 3;
-    string id = 4;
-    repeated IdentificationPref identification_pref = 5;
+    string propertiesId = 4;
+    string alias =5;
     bool official = 6;
     string pinout = 7;
     Package package = 8;
@@ -39,6 +39,8 @@ message BoardDetailsResp {
     repeated ToolsDependencies toolsDependencies = 10;
     repeated ConfigOption config_options = 11;
     repeated Tool _tools = 12;
+    repeated IdentificationPref identification_pref = 13;
+
 
 
 }

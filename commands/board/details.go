@@ -46,7 +46,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 	details := &rpc.BoardDetailsResp{}
 	details.Name = board.Name()
 	details.Fqbn = board.FQBN()
-	details.Id = board.BoardID
+	details.PropertiesId = board.BoardID
 	details.Official = fqbn.Package == "arduino"
 	details.Version = board.PlatformRelease.Version.String()
 
@@ -68,6 +68,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		Size:                 board.PlatformRelease.Resource.Size,
 		Name:                 "TBD",
 	}
+
 
 	details.IdentificationPref = []*rpc.IdentificationPref{}
 	vids := board.Properties.SubTree("vid")
