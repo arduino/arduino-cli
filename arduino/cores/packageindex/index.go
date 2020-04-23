@@ -94,7 +94,7 @@ type indexHelp struct {
 }
 
 // MergeIntoPackages converts the Index data into a cores.Packages and merge them
-// with the existing conents of the cores.Packages passed as parameter.
+// with the existing contents of the cores.Packages passed as parameter.
 func (index Index) MergeIntoPackages(outPackages cores.Packages) {
 	for _, inPackage := range index.Packages {
 		inPackage.extractPackageIn(outPackages)
@@ -106,6 +106,7 @@ func (inPackage indexPackage) extractPackageIn(outPackages cores.Packages) {
 	outPackage.Maintainer = inPackage.Maintainer
 	outPackage.WebsiteURL = inPackage.WebsiteURL
 	outPackage.Email = inPackage.Email
+	outPackage.Help = cores.PackageHelp{Online:inPackage.Help.Online}
 
 	for _, inTool := range inPackage.Tools {
 		inTool.extractToolIn(outPackage)

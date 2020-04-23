@@ -55,8 +55,8 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		Maintainer: boardPackage.Maintainer,
 		WebsiteURL: boardPackage.WebsiteURL,
 		Email:      boardPackage.Email,
-		Help:       &rpc.Help{Online: ""},
-		Url:        board.BoardID,
+		Help:       &rpc.Help{Online: boardPackage.Help.Online},
+		Url:        "TBD",
 	}
 
 	details.Platform = &rpc.BoardPlatform{
@@ -66,7 +66,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		ArchiveFileName:      board.PlatformRelease.Resource.ArchiveFileName,
 		Checksum:             board.PlatformRelease.Resource.Checksum,
 		Size:                 board.PlatformRelease.Resource.Size,
-		Name:                 "TBD",
+		Name:                 board.PlatformRelease.Platform.Name,
 	}
 
 
