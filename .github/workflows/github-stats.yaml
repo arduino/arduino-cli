@@ -1,9 +1,9 @@
-name: download-stats
+name: github-stats
 
 on:
   schedule:
-    # run every 5 minutes
-    - cron:  '*/5 * * * *'
+    # run every 30 minutes
+    - cron:  '*/30 * * * *'
 
 jobs:
   push-stats:
