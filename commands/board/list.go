@@ -23,8 +23,8 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/httpclient"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/pkg/errors"
 	"github.com/segmentio/stats/v4"
@@ -51,12 +51,17 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	url := fmt.Sprintf("%s/%s/%s", vidPidURL, vid, pid)
 	retVal := []*rpc.BoardListItem{}
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header = globals.NewHTTPClientHeader("")
 	req.Header.Set("Content-Type", "application/json")
 
 	// TODO: use proxy if set
 
-	if res, err := http.DefaultClient.Do(req); err == nil {
+	httpClient, err := httpclient.New()
+
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to initialize http client")
+	}
+
+	if res, err := httpClient.Do(req); err == nil {
 		if res.StatusCode >= 400 {
 			if res.StatusCode == 404 {
 				return nil, ErrNotFound
