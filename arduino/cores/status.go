@@ -39,6 +39,7 @@ type Package struct {
 	Name       string               // Name of the package.
 	Maintainer string               // Name of the maintainer.
 	WebsiteURL string               // Website of maintainer.
+	URL        string               // origin URL for package index json file.
 	Email      string               // Email of maintainer.
 	Platforms  map[string]*Platform // The platforms in the system.
 	Tools      map[string]*Tool     // The tools in the system.

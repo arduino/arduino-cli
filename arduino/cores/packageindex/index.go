@@ -1,4 +1,4 @@
-    // This file is part of arduino-cli.
+// This file is part of arduino-cli.
 //
 // Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
 //
@@ -35,6 +35,7 @@ type indexPackage struct {
 	Name       string                  `json:"name,required"`
 	Maintainer string                  `json:"maintainer,required"`
 	WebsiteURL string                  `json:"websiteUrl"`
+	URL        string                  `json:"Url"`
 	Email      string                  `json:"email"`
 	Platforms  []*indexPlatformRelease `json:"platforms,required"`
 	Tools      []*indexToolRelease     `json:"tools,required"`
@@ -105,8 +106,9 @@ func (inPackage indexPackage) extractPackageIn(outPackages cores.Packages) {
 	outPackage := outPackages.GetOrCreatePackage(inPackage.Name)
 	outPackage.Maintainer = inPackage.Maintainer
 	outPackage.WebsiteURL = inPackage.WebsiteURL
+	outPackage.URL = inPackage.URL
 	outPackage.Email = inPackage.Email
-	outPackage.Help = cores.PackageHelp{Online:inPackage.Help.Online}
+	outPackage.Help = cores.PackageHelp{Online: inPackage.Help.Online}
 
 	for _, inTool := range inPackage.Tools {
 		inTool.extractToolIn(outPackage)

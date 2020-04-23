@@ -201,8 +201,18 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 
 // LoadPackageIndex loads a package index by looking up the local cached file from the specified URL
 func (pm *PackageManager) LoadPackageIndex(URL *url.URL) error {
-	_, err := pm.LoadPackageIndexFromFile(pm.IndexDir.Join(path.Base(URL.Path)))
-	return err
+	indexPath := pm.IndexDir.Join(path.Base(URL.Path))
+	index, err := packageindex.LoadIndex(indexPath)
+	if err != nil {
+		return fmt.Errorf("loading json index file %s: %s", indexPath, err)
+	}
+
+	for _, p := range index.Packages {
+		p.URL = URL.String()
+	}
+
+	index.MergeIntoPackages(pm.Packages)
+	return nil
 }
 
 // LoadPackageIndexFromFile load a package index from the specified file

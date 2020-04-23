@@ -56,19 +56,18 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		WebsiteURL: boardPackage.WebsiteURL,
 		Email:      boardPackage.Email,
 		Help:       &rpc.Help{Online: boardPackage.Help.Online},
-		Url:        "TBD",
+		Url:        boardPackage.URL,
 	}
 
 	details.Platform = &rpc.BoardPlatform{
-		Architecture:         board.PlatformRelease.Platform.Architecture,
-		Category:             board.PlatformRelease.Platform.Category,
-		Url:                  board.PlatformRelease.Resource.URL,
-		ArchiveFileName:      board.PlatformRelease.Resource.ArchiveFileName,
-		Checksum:             board.PlatformRelease.Resource.Checksum,
-		Size:                 board.PlatformRelease.Resource.Size,
-		Name:                 board.PlatformRelease.Platform.Name,
+		Architecture:    board.PlatformRelease.Platform.Architecture,
+		Category:        board.PlatformRelease.Platform.Category,
+		Url:             board.PlatformRelease.Resource.URL,
+		ArchiveFileName: board.PlatformRelease.Resource.ArchiveFileName,
+		Checksum:        board.PlatformRelease.Resource.Checksum,
+		Size:            board.PlatformRelease.Resource.Size,
+		Name:            board.PlatformRelease.Platform.Name,
 	}
-
 
 	details.IdentificationPref = []*rpc.IdentificationPref{}
 	vids := board.Properties.SubTree("vid")
@@ -116,4 +115,3 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 
 	return details, nil
 }
-
