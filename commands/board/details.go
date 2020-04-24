@@ -105,16 +105,18 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 
 	details.ToolsDependencies = []*rpc.ToolsDependencies{}
 	for _, tool := range boardPlatform.Dependencies {
-		toolRelease := boardPackage.Tools[tool.ToolName].Releases[tool.ToolVersion.String()]
+		toolRelease := pm.FindToolDependency(tool)
 		var systems []*rpc.Systems
-		for _, f := range toolRelease.Flavors {
-			systems = append(systems, &rpc.Systems{
-				Checksum:        f.Resource.Checksum,
-				Size:            f.Resource.Size,
-				Host:            f.OS,
-				ArchiveFileName: f.Resource.ArchiveFileName,
-				Url:             f.Resource.URL,
-			})
+		if toolRelease != nil {
+			for _, f := range toolRelease.Flavors {
+				systems = append(systems, &rpc.Systems{
+					Checksum:        f.Resource.Checksum,
+					Size:            f.Resource.Size,
+					Host:            f.OS,
+					ArchiveFileName: f.Resource.ArchiveFileName,
+					Url:             f.Resource.URL,
+				})
+			}
 		}
 		details.ToolsDependencies = append(details.ToolsDependencies, &rpc.ToolsDependencies{
 			Name:     tool.ToolName,
