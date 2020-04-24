@@ -25,7 +25,8 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
-// Details returns all details for a board including tools and HW identifiers
+// Details returns all details for a board including tools and HW identifiers.
+// This command basically gather al the information and translates it into the required grpc struct properties
 func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
@@ -37,7 +38,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		return nil, fmt.Errorf("parsing fqbn: %s", err)
 	}
 
-	boardPackage, _, board, _, _, err := pm.ResolveFQBN(fqbn)
+	boardPackage, boardPlatform, board, _, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, fmt.Errorf("loading board data: %s", err)
 	}
@@ -59,13 +60,13 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 	}
 
 	details.Platform = &rpc.BoardPlatform{
-		Architecture:    board.PlatformRelease.Platform.Architecture,
-		Category:        board.PlatformRelease.Platform.Category,
-		Url:             board.PlatformRelease.Resource.URL,
-		ArchiveFileName: board.PlatformRelease.Resource.ArchiveFileName,
-		Checksum:        board.PlatformRelease.Resource.Checksum,
-		Size:            board.PlatformRelease.Resource.Size,
-		Name:            board.PlatformRelease.Platform.Name,
+		Architecture:    boardPlatform.Platform.Architecture,
+		Category:        boardPlatform.Platform.Category,
+		Url:             boardPlatform.Resource.URL,
+		ArchiveFileName: boardPlatform.Resource.ArchiveFileName,
+		Checksum:        boardPlatform.Resource.Checksum,
+		Size:            boardPlatform.Resource.Size,
+		Name:            boardPlatform.Platform.Name,
 	}
 
 	details.IdentificationPref = []*rpc.IdentificationPref{}
@@ -103,8 +104,8 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 	}
 
 	details.ToolsDependencies = []*rpc.ToolsDependencies{}
-	for _, tool := range board.PlatformRelease.Dependencies {
-		toolRelease := board.PlatformRelease.Platform.Package.Tools[tool.ToolName].Releases[tool.ToolVersion.String()]
+	for _, tool := range boardPlatform.Dependencies {
+		toolRelease := boardPackage.Tools[tool.ToolName].Releases[tool.ToolVersion.String()]
 		var systems []*rpc.Systems
 		for _, f := range toolRelease.Flavors {
 			systems = append(systems, &rpc.Systems{
