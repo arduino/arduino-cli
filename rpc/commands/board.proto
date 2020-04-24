@@ -31,7 +31,7 @@ message BoardDetailsResp {
     string name = 2;
     string version = 3;
     string propertiesId = 4;
-    string alias =5;
+    string alias = 5;
     bool official = 6;
     string pinout = 7;
     Package package = 8;
