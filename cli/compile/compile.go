@@ -47,7 +47,7 @@ var (
 	port               string   // Upload port, e.g.: COM10 or /dev/ttyACM0.
 	verify             bool     // Upload, verify uploaded binary after the upload.
 	exportFile         string   // The compiled binary is written to this file
-	dryRun             bool     // Use this flag to now write the output file
+	dryRun             bool     // Use this flag to not write the output file
 	libraries          []string // List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
 	optimizeForDebug   bool     // Optimize compile output for debug, not for release
 )
