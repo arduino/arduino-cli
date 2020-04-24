@@ -17,8 +17,7 @@ package board
 
 import (
 	"context"
-	"os"
-
+	"fmt"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -27,15 +26,24 @@ import (
 	"github.com/arduino/arduino-cli/table"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+	"os"
 )
 
-var detailsCommand = &cobra.Command{
-	Use:     "details <FQBN>",
-	Short:   "Print details about a board.",
-	Long:    "Show information about a board, in particular if the board has options to be specified in the FQBN.",
-	Example: "  " + os.Args[0] + " board details arduino:avr:nano",
-	Args:    cobra.ExactArgs(1),
-	Run:     runDetailsCommand,
+var showFullDetails bool
+
+func initDetailsCommand() *cobra.Command {
+	var detailsCommand = &cobra.Command{
+		Use:     "details <FQBN>",
+		Short:   "Print details about a board.",
+		Long:    "Show information about a board, in particular if the board has options to be specified in the FQBN.",
+		Example: "  " + os.Args[0] + " board details arduino:avr:nano",
+		Args:    cobra.ExactArgs(1),
+		Run:     runDetailsCommand,
+	}
+
+	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, "Include full details in text output")
+
+	return detailsCommand
 }
 
 func runDetailsCommand(cmd *cobra.Command, args []string) {
@@ -85,18 +93,58 @@ func (dr detailsResult) String() string {
 	t := table.New()
 	t.SetColumnWidthMode(1, table.Average)
 	t.AddRow("Board name:", details.Name)
+	t.AddRow("Board fqbn:", details.Fqbn)
+	t.AddRow("Board propertiesId:", details.PropertiesId)
+	t.AddRow("Board version:", details.Version)
 
-	for i, tool := range details.RequiredTools {
+	if details.Official {
+		t.AddRow() // get some space from above
+		t.AddRow("Official Arduino board:",
+			table.NewCell("✔", color.New(color.FgGreen)))
+	}
+
+	for i, idp := range details.IdentificationPref {
 		if i == 0 {
 			t.AddRow() // get some space from above
-			t.AddRow("Required tools:", tool.Packager+":"+tool.Name, "", tool.Version)
+			t.AddRow("Identification Preferences:", "VID:"+idp.UsbID.VID+" PID:"+idp.UsbID.PID)
 			continue
 		}
-		t.AddRow("", tool.Packager+":"+tool.Name, "", tool.Version)
+		t.AddRow("", "VID:"+idp.UsbID.VID+" PID:"+idp.UsbID.PID)
+	}
+
+	t.AddRow() // get some space from above
+	t.AddRow("Package name:", details.Package.Name)
+	t.AddRow("Package maintainer:", details.Package.Maintainer)
+	t.AddRow("Package URL:", details.Package.Url)
+	t.AddRow("Package websiteURL:", details.Package.WebsiteURL)
+	t.AddRow("Package online help:", details.Package.Help.Online)
+
+	t.AddRow() // get some space from above
+	t.AddRow("Platform name:", details.Platform.Name)
+	t.AddRow("Platform category:", details.Platform.Category)
+	t.AddRow("Platform architecture:", details.Platform.Architecture)
+	t.AddRow("Platform URL:", details.Platform.Url)
+	t.AddRow("Platform file name:", details.Platform.ArchiveFileName)
+	t.AddRow("Platform size (bytes):", fmt.Sprint(details.Platform.Size))
+	t.AddRow("Platform checksum:", details.Platform.Checksum)
+
+	t.AddRow() // get some space from above
+	for _, tool := range details.ToolsDependencies {
+		t.AddRow("Required tools:", tool.Packager+":"+tool.Name, "", tool.Version)
+		if showFullDetails {
+			for _, sys := range tool.Systems {
+				t.AddRow("", "OS:", "", sys.Host)
+				t.AddRow("", "File:", "", sys.ArchiveFileName)
+				t.AddRow("", "Size (bytes):", "", fmt.Sprint(sys.Size))
+				t.AddRow("", "Checksum:", "", sys.Checksum)
+				t.AddRow("", "URL:", "", sys.Url)
+				t.AddRow() // get some space from above
+			}
+		}
+		t.AddRow() // get some space from above
 	}
 
 	for _, option := range details.ConfigOptions {
-		t.AddRow() // get some space from above
 		t.AddRow("Option:", option.OptionLabel, "", option.Option)
 		for _, value := range option.Values {
 			green := color.New(color.FgGreen)

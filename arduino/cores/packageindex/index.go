@@ -35,6 +35,7 @@ type indexPackage struct {
 	Name       string                  `json:"name,required"`
 	Maintainer string                  `json:"maintainer,required"`
 	WebsiteURL string                  `json:"websiteUrl"`
+	URL        string                  `json:"Url"`
 	Email      string                  `json:"email"`
 	Platforms  []*indexPlatformRelease `json:"platforms,required"`
 	Tools      []*indexToolRelease     `json:"tools,required"`
@@ -94,7 +95,7 @@ type indexHelp struct {
 }
 
 // MergeIntoPackages converts the Index data into a cores.Packages and merge them
-// with the existing conents of the cores.Packages passed as parameter.
+// with the existing contents of the cores.Packages passed as parameter.
 func (index Index) MergeIntoPackages(outPackages cores.Packages) {
 	for _, inPackage := range index.Packages {
 		inPackage.extractPackageIn(outPackages)
@@ -105,7 +106,9 @@ func (inPackage indexPackage) extractPackageIn(outPackages cores.Packages) {
 	outPackage := outPackages.GetOrCreatePackage(inPackage.Name)
 	outPackage.Maintainer = inPackage.Maintainer
 	outPackage.WebsiteURL = inPackage.WebsiteURL
+	outPackage.URL = inPackage.URL
 	outPackage.Email = inPackage.Email
+	outPackage.Help = cores.PackageHelp{Online: inPackage.Help.Online}
 
 	for _, inTool := range inPackage.Tools {
 		inTool.extractToolIn(outPackage)

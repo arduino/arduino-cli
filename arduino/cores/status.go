@@ -30,14 +30,21 @@ func NewPackages() Packages {
 	return map[string]*Package{}
 }
 
+// PackageHelp contains info on how to reach maintainers for help
+type PackageHelp struct {
+	Online string `json:"online,omitempty"`
+}
+
 // Package represents a package in the system.
 type Package struct {
 	Name       string               // Name of the package.
 	Maintainer string               // Name of the maintainer.
 	WebsiteURL string               // Website of maintainer.
+	URL        string               // origin URL for package index json file.
 	Email      string               // Email of maintainer.
 	Platforms  map[string]*Platform // The platforms in the system.
 	Tools      map[string]*Tool     // The tools in the system.
+	Help       PackageHelp          `json:"-"`
 	Packages   Packages             `json:"-"`
 }
 

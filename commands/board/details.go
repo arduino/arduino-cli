@@ -25,7 +25,8 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
-// Details FIXMEDOC
+// Details returns all details for a board including tools and HW identifiers.
+// This command basically gather al the information and translates it into the required grpc struct properties
 func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
@@ -37,13 +38,47 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		return nil, fmt.Errorf("parsing fqbn: %s", err)
 	}
 
-	_, _, board, _, _, err := pm.ResolveFQBN(fqbn)
+	boardPackage, boardPlatform, board, _, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, fmt.Errorf("loading board data: %s", err)
 	}
 
 	details := &rpc.BoardDetailsResp{}
 	details.Name = board.Name()
+	details.Fqbn = board.FQBN()
+	details.PropertiesId = board.BoardID
+	details.Official = fqbn.Package == "arduino"
+	details.Version = board.PlatformRelease.Version.String()
+
+	details.Package = &rpc.Package{
+		Name:       boardPackage.Name,
+		Maintainer: boardPackage.Maintainer,
+		WebsiteURL: boardPackage.WebsiteURL,
+		Email:      boardPackage.Email,
+		Help:       &rpc.Help{Online: boardPackage.Help.Online},
+		Url:        boardPackage.URL,
+	}
+
+	details.Platform = &rpc.BoardPlatform{
+		Architecture:    boardPlatform.Platform.Architecture,
+		Category:        boardPlatform.Platform.Category,
+		Url:             boardPlatform.Resource.URL,
+		ArchiveFileName: boardPlatform.Resource.ArchiveFileName,
+		Checksum:        boardPlatform.Resource.Checksum,
+		Size:            boardPlatform.Resource.Size,
+		Name:            boardPlatform.Platform.Name,
+	}
+
+	details.IdentificationPref = []*rpc.IdentificationPref{}
+	vids := board.Properties.SubTree("vid")
+	pids := board.Properties.SubTree("pid")
+	for id, vid := range vids.AsMap() {
+		if pid, ok := pids.GetOk(id); ok {
+			idPref := rpc.IdentificationPref{UsbID: &rpc.USBID{VID: vid, PID: pid}}
+			details.IdentificationPref = append(details.IdentificationPref, &idPref)
+		}
+	}
+
 	details.ConfigOptions = []*rpc.ConfigOption{}
 	options := board.GetConfigOptions()
 	for _, option := range options.Keys() {
@@ -60,7 +95,6 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 			} else if !hasSelected && i == 0 {
 				configValue.Selected = true
 			}
-
 			configValue.Value = value
 			configValue.ValueLabel = values.Get(value)
 			configOption.Values = append(configOption.Values, configValue)
@@ -69,12 +103,26 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		details.ConfigOptions = append(details.ConfigOptions, configOption)
 	}
 
-	details.RequiredTools = []*rpc.RequiredTool{}
-	for _, reqTool := range board.PlatformRelease.Dependencies {
-		details.RequiredTools = append(details.RequiredTools, &rpc.RequiredTool{
-			Name:     reqTool.ToolName,
-			Packager: reqTool.ToolPackager,
-			Version:  reqTool.ToolVersion.String(),
+	details.ToolsDependencies = []*rpc.ToolsDependencies{}
+	for _, tool := range boardPlatform.Dependencies {
+		toolRelease := pm.FindToolDependency(tool)
+		var systems []*rpc.Systems
+		if toolRelease != nil {
+			for _, f := range toolRelease.Flavors {
+				systems = append(systems, &rpc.Systems{
+					Checksum:        f.Resource.Checksum,
+					Size:            f.Resource.Size,
+					Host:            f.OS,
+					ArchiveFileName: f.Resource.ArchiveFileName,
+					Url:             f.Resource.URL,
+				})
+			}
+		}
+		details.ToolsDependencies = append(details.ToolsDependencies, &rpc.ToolsDependencies{
+			Name:     tool.ToolName,
+			Packager: tool.ToolPackager,
+			Version:  tool.ToolVersion.String(),
+			Systems:  systems,
 		})
 	}
 
