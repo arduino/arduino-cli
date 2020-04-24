@@ -30,6 +30,7 @@ func NewPackages() Packages {
 	return map[string]*Package{}
 }
 
+// PackageHelp contains info on how to reach maintainers for help
 type PackageHelp struct {
 	Online string `json:"online,omitempty"`
 }
