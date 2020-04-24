@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	bou.ke/monkey v1.0.1
+	github.com/GeertJohan/go.rice v1.0.0
 	github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c
 	github.com/arduino/go-paths-helper v1.0.1
 	github.com/arduino/go-properties-orderedmap v1.0.0
@@ -23,6 +24,7 @@ require (
 	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5 // indirect
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
 	github.com/juju/testing v0.0.0-20190429233213-dfc56b8c09fc // indirect
+	github.com/leonelquinteros/gotext v1.4.0
 	github.com/mattn/go-colorable v0.1.2
 	github.com/mattn/go-runewidth v0.0.2 // indirect
 	github.com/miekg/dns v1.0.5 // indirect
