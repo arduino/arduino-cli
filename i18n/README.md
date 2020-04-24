@@ -6,6 +6,13 @@ In the source code, use the function `i18n.Tr("message", ...args)` to get a loca
 
 ## Updating messages to reflect code changes
 
+Install [go-rice](https://github.com/GeertJohan/go.rice)
+
+```sh
+go get github.com/GeertJohan/go.rice
+go get github.com/GeertJohan/go.rice/rice
+```
+
 The following command updates the locales present in the source code to reflect addition/removal of messages.
 
 ```sh
