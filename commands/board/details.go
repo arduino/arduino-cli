@@ -25,7 +25,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
 
-// Details FIXMEDOC
+// Details returns all details for a board including tools and HW identifiers
 func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
@@ -37,7 +37,6 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		return nil, fmt.Errorf("parsing fqbn: %s", err)
 	}
 
-	//boardPackage, platformRelease, board, buildProperties, buildPlatformRelease, err := pm.ResolveFQBN(fqbn)
 	boardPackage, _, board, _, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, fmt.Errorf("loading board data: %s", err)
@@ -95,7 +94,6 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 			} else if !hasSelected && i == 0 {
 				configValue.Selected = true
 			}
-
 			configValue.Value = value
 			configValue.ValueLabel = values.Get(value)
 			configOption.Values = append(configOption.Values, configValue)
@@ -105,9 +103,8 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 	}
 
 	details.ToolsDependencies = []*rpc.ToolsDependencies{}
-	for _, reqTool := range board.PlatformRelease.Dependencies {
-
-		toolRelease := board.PlatformRelease.Platform.Package.Tools[reqTool.ToolName].Releases[reqTool.ToolVersion.String()]
+	for _, tool := range board.PlatformRelease.Dependencies {
+		toolRelease := board.PlatformRelease.Platform.Package.Tools[tool.ToolName].Releases[tool.ToolVersion.String()]
 		var systems []*rpc.Systems
 		for _, f := range toolRelease.Flavors {
 			systems = append(systems, &rpc.Systems{
@@ -117,11 +114,10 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 				Url:             f.Resource.URL,
 			})
 		}
-
 		details.ToolsDependencies = append(details.ToolsDependencies, &rpc.ToolsDependencies{
-			Name:     reqTool.ToolName,
-			Packager: reqTool.ToolPackager,
-			Version:  reqTool.ToolVersion.String(),
+			Name:     tool.ToolName,
+			Packager: tool.ToolPackager,
+			Version:  tool.ToolVersion.String(),
 			Systems:  systems,
 		})
 	}
