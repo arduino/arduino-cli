@@ -30,11 +30,13 @@ import (
 )
 
 var (
-	fqbn       string
-	port       string
-	verbose    bool
-	verify     bool
-	importFile string
+	fqbn                string
+	port                string
+	verbose             bool
+	verify              bool
+	importFile          string
+	buildPath           string
+	importFromBuildPath bool
 )
 
 // NewCommand created a new `upload` command
@@ -53,6 +55,8 @@ func NewCommand() *cobra.Command {
 	uploadCommand.Flags().StringVarP(&importFile, "input", "i", "", "Input file to be uploaded.")
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
+	uploadCommand.Flags().StringVarP(&buildPath, "build-path", "", "", "Optional, specify build path (can be used with --upload-from-build-path).")
+	uploadCommand.Flags().BoolVarP(&importFromBuildPath, "upload-from-build-path", "n", false, "Optional, use binaries produced in build path for uploading.")
 
 	return uploadCommand
 }
@@ -71,13 +75,15 @@ func run(command *cobra.Command, args []string) {
 	sketchPath := initSketchPath(path)
 
 	if _, err := upload.Upload(context.Background(), &rpc.UploadReq{
-		Instance:   instance,
-		Fqbn:       fqbn,
-		SketchPath: sketchPath.String(),
-		Port:       port,
-		Verbose:    verbose,
-		Verify:     verify,
-		ImportFile: importFile,
+		Instance:            instance,
+		Fqbn:                fqbn,
+		SketchPath:          sketchPath.String(),
+		Port:                port,
+		Verbose:             verbose,
+		Verify:              verify,
+		ImportFile:          importFile,
+		ImportFromBuildPath: importFromBuildPath,
+		BuildPath:           buildPath,
 	}, os.Stdout, os.Stderr); err != nil {
 		feedback.Errorf("Error during Upload: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
