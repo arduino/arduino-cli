@@ -29,6 +29,8 @@ message UploadReq {
 	bool verbose = 5;
 	bool verify = 6;
 	string import_file = 7;
+	string build_path = 8;
+	bool import_from_build_path = 9;
 }
 
 message UploadResp {

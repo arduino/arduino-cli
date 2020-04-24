@@ -25,6 +25,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -148,38 +149,58 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	}
 
 	// Set path to compiled binary
-	// Make the filename without the FQBN configs part
-	fqbn.Configs = properties.NewMap()
-	fqbnSuffix := strings.Replace(fqbn.String(), ":", ".", -1)
 
-	var importPath *paths.Path
-	var importFile string
-	if req.GetImportFile() == "" {
-		importPath = sketch.FullPath
-		importFile = sketch.Name + "." + fqbnSuffix
-	} else {
-		importPath = paths.New(req.GetImportFile()).Parent()
-		importFile = paths.New(req.GetImportFile()).Base()
-	}
+	// The upload recipes uses "{build.path}/{build.project_name}.hex" to
+	// obtain the path to the binary to upload. This works without well if
+	// the {build.path} directory used for the build is still available (for
+	// example if the upload is run straight after the compile)...
+	if req.GetImportFromBuildPath() {
 
-	outputTmpFile, ok := uploadProperties.GetOk("recipe.output.tmp_file")
-	if !ok {
-		return nil, fmt.Errorf("property 'recipe.output.tmp_file' not defined")
-	}
-	outputTmpFile = uploadProperties.ExpandPropsInString(outputTmpFile)
-	ext := filepath.Ext(outputTmpFile)
-	if strings.HasSuffix(importFile, ext) {
-		importFile = importFile[:len(importFile)-len(ext)]
-	}
-
-	uploadProperties.SetPath("build.path", importPath)
-	uploadProperties.Set("build.project_name", importFile)
-	uploadFile := importPath.Join(importFile + ext)
-	if _, err := uploadFile.Stat(); err != nil {
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("compiled sketch %s not found", uploadFile.String())
+		if p := req.GetBuildPath(); p == "" {
+			uploadProperties.SetPath("build.path", builder.GenBuildPath(sketch.FullPath))
+		} else {
+			uploadProperties.Set("build.path", p)
 		}
-		return nil, fmt.Errorf("cannot open sketch: %s", err)
+		uploadProperties.Set("build.project_name", sketch.Name+".ino")
+
+	} else {
+		// ...otherwise {build.path} and {build.project_name} should be
+		// tweaked so the upload tool will point to the sketch folder or
+		// the import files specified by the user.
+
+		var importPath *paths.Path
+		var importFile string
+		if req.GetImportFile() == "" {
+			// Make the filename without the FQBN configs part
+			fqbn.Configs = properties.NewMap()
+			fqbnSuffix := strings.Replace(fqbn.String(), ":", ".", -1)
+			importPath = sketch.FullPath
+			importFile = sketch.Name + "." + fqbnSuffix
+		} else {
+			// Use the import file specified by the user
+			importPath = paths.New(req.GetImportFile()).Parent()
+			importFile = paths.New(req.GetImportFile()).Base()
+		}
+
+		outputTmpFile, ok := uploadProperties.GetOk("recipe.output.tmp_file")
+		if !ok {
+			return nil, fmt.Errorf("property 'recipe.output.tmp_file' not defined")
+		}
+		outputTmpFile = uploadProperties.ExpandPropsInString(outputTmpFile)
+		ext := filepath.Ext(outputTmpFile)
+		if strings.HasSuffix(importFile, ext) {
+			importFile = importFile[:len(importFile)-len(ext)]
+		}
+
+		uploadProperties.SetPath("build.path", importPath)
+		uploadProperties.Set("build.project_name", importFile)
+		uploadFile := importPath.Join(importFile + ext)
+		if _, err := uploadFile.Stat(); err != nil {
+			if os.IsNotExist(err) {
+				return nil, fmt.Errorf("compiled sketch %s not found", uploadFile.String())
+			}
+			return nil, fmt.Errorf("cannot open sketch: %s", err)
+		}
 	}
 
 	// Perform reset via 1200bps touch if requested

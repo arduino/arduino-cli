@@ -128,13 +128,15 @@ func run(cmd *cobra.Command, args []string) {
 
 	if uploadAfterCompile {
 		_, err := upload.Upload(context.Background(), &rpc.UploadReq{
-			Instance:   inst,
-			Fqbn:       fqbn,
-			SketchPath: sketchPath.String(),
-			Port:       port,
-			Verbose:    verbose,
-			Verify:     verify,
-			ImportFile: exportFile,
+			Instance:            inst,
+			Fqbn:                fqbn,
+			SketchPath:          sketchPath.String(),
+			Port:                port,
+			Verbose:             verbose,
+			Verify:              verify,
+			ImportFile:          exportFile,
+			BuildPath:           buildPath,
+			ImportFromBuildPath: true,
 		}, os.Stdout, os.Stderr)
 
 		if err != nil {
