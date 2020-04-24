@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Parse parses the PO file into a MessageCatalog
 func Parse(filename string) MessageCatalog {
 	if !fileExists(filename) {
 		return MessageCatalog{}

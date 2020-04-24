@@ -19,6 +19,7 @@ func init() {
 	po = new(gotext.Po)
 }
 
+// SetLocale sets the locate used for i18n
 func SetLocale(locale string) {
 	box := rice.MustFindBox("./data")
 	poFile, err := box.Bytes(locale + ".po")

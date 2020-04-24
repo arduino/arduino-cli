@@ -2,6 +2,7 @@ package catalog
 
 import "github.com/spf13/cobra"
 
+// Command is the catalog command
 var Command = &cobra.Command{
 	Use:   "catalog",
 	Short: "catalog",

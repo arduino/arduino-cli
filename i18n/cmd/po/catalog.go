@@ -8,16 +8,19 @@ import (
 )
 
 type (
+	// MessageCatalog is the catalog of i18n messages for a given locale
 	MessageCatalog struct {
 		Messages map[string]*Message
 	}
 
+	// Message represents a i18n message
 	Message struct {
 		Comments []string
 		Value    string
 	}
 )
 
+// Add adds a new message in the i18n catalog
 func (catalog *MessageCatalog) Add(id, value string, comment []string) {
 	if catalog.Messages == nil {
 		catalog.Messages = map[string]*Message{}
@@ -32,10 +35,12 @@ func (catalog *MessageCatalog) Add(id, value string, comment []string) {
 	}
 }
 
+// AddMessage adds a new message in the i18n catalog
 func (catalog *MessageCatalog) AddMessage(id string, message Message) {
 	catalog.Add(id, message.Value, message.Comments)
 }
 
+// SortedKeys returns the sorted keys in the catalog
 func (catalog *MessageCatalog) SortedKeys() []string {
 	keys := []string{}
 	for k := range catalog.Messages {
@@ -46,6 +51,7 @@ func (catalog *MessageCatalog) SortedKeys() []string {
 	return keys
 }
 
+// Write writes the catalog in PO file format into w
 func (catalog *MessageCatalog) Write(w io.Writer) {
 	keys := []string{}
 	for k := range catalog.Messages {

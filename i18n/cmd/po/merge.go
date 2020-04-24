@@ -1,5 +1,6 @@
 package po
 
+// Merge merges two message catalogs, preserving only keys present in source
 func Merge(source MessageCatalog, destination MessageCatalog) MessageCatalog {
 	catalog := MessageCatalog{}
 	for _, k := range source.SortedKeys() {

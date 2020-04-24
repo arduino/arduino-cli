@@ -11,6 +11,7 @@ import (
 	"github.com/arduino/arduino-cli/i18n/cmd/po"
 )
 
+// GenerateCatalog generates the i18n message catalog for the go source files
 func GenerateCatalog(files []string) po.MessageCatalog {
 	fset := token.NewFileSet()
 	catalog := po.MessageCatalog{}
