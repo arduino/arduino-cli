@@ -25,6 +25,7 @@ import (
 	"strconv"
 	"strings"
 
+	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
@@ -114,6 +115,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.PackageManager = pm
 	builderCtx.FQBN = fqbn
 	builderCtx.SketchLocation = sketch.FullPath
+	builderCtx.BuildPath = bldr.GenBuildPath(sketch.FullPath)
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories()
