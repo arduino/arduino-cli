@@ -29,13 +29,21 @@ import (
 	"os"
 )
 
-var detailsCommand = &cobra.Command{
-	Use:     "details <FQBN>",
-	Short:   "Print details about a board.",
-	Long:    "Show information about a board, in particular if the board has options to be specified in the FQBN.",
-	Example: "  " + os.Args[0] + " board details arduino:avr:nano",
-	Args:    cobra.ExactArgs(1),
-	Run:     runDetailsCommand,
+var showFullDetails bool
+
+func initDetailsCommand() *cobra.Command {
+	var detailsCommand = &cobra.Command{
+		Use:     "details <FQBN>",
+		Short:   "Print details about a board.",
+		Long:    "Show information about a board, in particular if the board has options to be specified in the FQBN.",
+		Example: "  " + os.Args[0] + " board details arduino:avr:nano",
+		Args:    cobra.ExactArgs(1),
+		Run:     runDetailsCommand,
+	}
+
+	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, "Include full details in text output")
+
+	return detailsCommand
 }
 
 func runDetailsCommand(cmd *cobra.Command, args []string) {
@@ -89,8 +97,8 @@ func (dr detailsResult) String() string {
 	t.AddRow("Board propertiesId:", details.PropertiesId)
 	t.AddRow("Board version:", details.Version)
 
-	t.AddRow() // get some space from above
 	if details.Official {
+		t.AddRow() // get some space from above
 		t.AddRow("Official Arduino board:",
 			table.NewCell("✔", color.New(color.FgGreen)))
 	}
@@ -122,14 +130,16 @@ func (dr detailsResult) String() string {
 
 	t.AddRow() // get some space from above
 	for _, tool := range details.ToolsDependencies {
-		t.AddRow("Required tool: " + tool.Packager + ":" + tool.Name + "  ver: " + tool.Version)
-		for _, sys := range tool.Systems {
-			t.AddRow("OS: " + sys.Host)
-			t.AddRow("File: " + sys.ArchiveFileName)
-			t.AddRow("Size (bytes): " + fmt.Sprint(sys.Size))
-			t.AddRow("Checksum: " + sys.Checksum)
-			t.AddRow("URL: " + sys.Url)
-			t.AddRow() // get some space from above
+		t.AddRow("Required tools:", tool.Packager+":"+tool.Name, "", tool.Version)
+		if showFullDetails {
+			for _, sys := range tool.Systems {
+				t.AddRow("", "OS:", "", sys.Host)
+				t.AddRow("", "File:", "", sys.ArchiveFileName)
+				t.AddRow("", "Size (bytes):", "", fmt.Sprint(sys.Size))
+				t.AddRow("", "Checksum:", "", sys.Checksum)
+				t.AddRow("", "URL:", "", sys.Url)
+				t.AddRow() // get some space from above
+			}
 		}
 		t.AddRow() // get some space from above
 	}
