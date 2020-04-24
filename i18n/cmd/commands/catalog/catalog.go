@@ -9,4 +9,5 @@ var Command = &cobra.Command{
 
 func init() {
 	Command.AddCommand(generateCatalogCommand)
+	Command.AddCommand(updateCatalogCommand)
 }
