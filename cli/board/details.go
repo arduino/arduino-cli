@@ -98,10 +98,10 @@ func (dr detailsResult) String() string {
 	for i, idp := range details.IdentificationPref {
 		if i == 0 {
 			t.AddRow() // get some space from above
-			t.AddRow("Identification Preferences:", "VID:"+idp.UsbID.VID + " PID:"+idp.UsbID.PID)
+			t.AddRow("Identification Preferences:", "VID:"+idp.UsbID.VID+" PID:"+idp.UsbID.PID)
 			continue
 		}
-		t.AddRow("", "VID:"+idp.UsbID.VID + " PID:"+idp.UsbID.PID)
+		t.AddRow("", "VID:"+idp.UsbID.VID+" PID:"+idp.UsbID.PID)
 	}
 
 	t.AddRow() // get some space from above
@@ -122,13 +122,13 @@ func (dr detailsResult) String() string {
 
 	t.AddRow() // get some space from above
 	for _, tool := range details.ToolsDependencies {
-		t.AddRow("Required tool: "+ tool.Packager+":"+tool.Name+"  ver: "+tool.Version)
+		t.AddRow("Required tool: " + tool.Packager + ":" + tool.Name + "  ver: " + tool.Version)
 		for _, sys := range tool.Systems {
-			t.AddRow("OS: "+sys.Host)
-			t.AddRow("File: "+sys.ArchiveFileName)
-			t.AddRow("Size (bytes): "+fmt.Sprint(sys.Size))
-			t.AddRow("Checksum: "+sys.Checksum)
-			t.AddRow("URL: "+sys.Url)
+			t.AddRow("OS: " + sys.Host)
+			t.AddRow("File: " + sys.ArchiveFileName)
+			t.AddRow("Size (bytes): " + fmt.Sprint(sys.Size))
+			t.AddRow("Checksum: " + sys.Checksum)
+			t.AddRow("URL: " + sys.Url)
 			t.AddRow() // get some space from above
 		}
 		t.AddRow() // get some space from above
