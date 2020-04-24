@@ -52,6 +52,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	if err != nil {
 		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
+	logrus.WithField("sketchPath", sketchPath).Trace("Sketch to upload")
 
 	// FIXME: make a specification on how a port is specified via command line
 	port := req.GetPort()
@@ -67,6 +68,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	if port == "" {
 		return nil, fmt.Errorf("no upload port provided")
 	}
+	logrus.WithField("port", port).Trace("Port used for upload")
 
 	fqbnIn := req.GetFqbn()
 	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
@@ -79,6 +81,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	if err != nil {
 		return nil, fmt.Errorf("incorrect FQBN: %s", err)
 	}
+	logrus.WithField("fqbn", fqbn).Trace("FQBN used for upload")
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
@@ -93,6 +96,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	if !have || uploadToolName == "" {
 		return nil, fmt.Errorf("cannot get programmer tool: undefined 'upload.tool' property")
 	}
+	logrus.WithField("upload.tool", uploadToolName).Trace("Tool to use for upload")
 
 	var referencedPlatformRelease *cores.PlatformRelease
 	if split := strings.Split(uploadToolName, ":"); len(split) > 2 {
@@ -109,6 +113,10 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		} else {
 			referencedPlatformRelease = pm.GetInstalledPlatformRelease(referencedPlatform)
 		}
+		logrus.
+			WithField("upload.tool", uploadToolName).
+			WithField("referencedPlatform", referencedPlatformRelease).
+			Trace("Tool to use for upload")
 	}
 
 	// Build configuration for upload
@@ -134,10 +142,12 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	if req.GetVerbose() {
 		if v, ok := uploadProperties.GetOk("upload.params.verbose"); ok {
 			uploadProperties.Set("upload.verbose", v)
+			logrus.WithField("upload.verbose", v).Trace("Setting verbosity")
 		}
 	} else {
 		if v, ok := uploadProperties.GetOk("upload.params.quiet"); ok {
 			uploadProperties.Set("upload.verbose", v)
+			logrus.WithField("upload.verbose", v).Trace("Setting verbosity")
 		}
 	}
 
@@ -147,6 +157,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	} else {
 		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.noverify"))
 	}
+	logrus.WithField("upload.verify", uploadProperties.Get("upload.verify")).Trace("Setting verify")
 
 	// Set path to compiled binary
 
@@ -176,10 +187,12 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 			fqbnSuffix := strings.Replace(fqbn.String(), ":", ".", -1)
 			importPath = sketch.FullPath
 			importFile = sketch.Name + "." + fqbnSuffix
+			logrus.WithField("importPath", importPath).WithField("importFile", importFile).Trace("Import binary from sketch")
 		} else {
 			// Use the import file specified by the user
 			importPath = paths.New(req.GetImportFile()).Parent()
 			importFile = paths.New(req.GetImportFile()).Base()
+			logrus.WithField("importPath", importPath).WithField("importFile", importFile).Trace("Import binary from user provided path")
 		}
 
 		outputTmpFile, ok := uploadProperties.GetOk("recipe.output.tmp_file")
@@ -187,13 +200,17 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 			return nil, fmt.Errorf("property 'recipe.output.tmp_file' not defined")
 		}
 		outputTmpFile = uploadProperties.ExpandPropsInString(outputTmpFile)
+		logrus.WithField("recipe.output.tmp_file", outputTmpFile).Trace("Platform variable value")
 		ext := filepath.Ext(outputTmpFile)
 		if strings.HasSuffix(importFile, ext) {
 			importFile = importFile[:len(importFile)-len(ext)]
+			logrus.WithField("importPath", importPath).WithField("importFile", importFile).Trace("Adjusted importFile value (removed extension)")
 		}
 
 		uploadProperties.SetPath("build.path", importPath)
 		uploadProperties.Set("build.project_name", importFile)
+		logrus.WithField("build.path", importPath).Trace("Set build.path value")
+		logrus.WithField("build.project_name", importFile).Trace("Set build.project_name value")
 		uploadFile := importPath.Join(importFile + ext)
 		if _, err := uploadFile.Stat(); err != nil {
 			if os.IsNotExist(err) {
@@ -205,6 +222,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 
 	// Perform reset via 1200bps touch if requested
 	if uploadProperties.GetBoolean("upload.use_1200bps_touch") {
+		logrus.WithField("upload.use_1200bps_touch", "true").Trace("Performing 1200 bps touch")
 		ports, err := serial.GetPortsList()
 		if err != nil {
 			return nil, fmt.Errorf("cannot get serial port list: %s", err)
@@ -228,6 +246,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	// Wait for upload port if requested
 	actualPort := port // default
 	if uploadProperties.GetBoolean("upload.wait_for_upload_port") {
+		logrus.WithField("upload.wait_for_upload_port", "true").Trace("Waiting for upload port...")
 		if p, err := waitForNewSerialPort(); err != nil {
 			return nil, fmt.Errorf("cannot detect serial ports: %s", err)
 		} else if p == "" {
@@ -235,6 +254,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		} else {
 			actualPort = p
 		}
+		logrus.WithField("port", actualPort).Trace("...new serial port found!")
 
 		// on OS X, if the port is opened too quickly after it is detected,
 		// a "Resource busy" error occurs, add a delay to workaround.
@@ -249,13 +269,22 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	} else {
 		uploadProperties.Set("serial.port.file", actualPort)
 	}
+	logrus.
+		WithField("serial.port", actualPort).                                    //
+		WithField("serial.port.file", uploadProperties.Get("serial.port.file")). //
+		Trace("Set property")
 
 	// Build recipe for upload
 	recipe := uploadProperties.Get("upload.pattern")
 	cmdLine := uploadProperties.ExpandPropsInString(recipe)
+	logrus.WithField("upload.pattern", recipe).Trace("Upload Recipe")
+	logrus.WithField("cmdline", cmdLine).Trace("Expanded command line")
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 	if err != nil {
 		return nil, fmt.Errorf("invalid recipe '%s': %s", recipe, err)
+	}
+	for i, arg := range cmdArgs {
+		logrus.WithField(fmt.Sprintf("arg %d", i), arg).Trace("Split command line arguments")
 	}
 
 	// Run Tool
