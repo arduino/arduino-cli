@@ -15,7 +15,7 @@
       
       
       <link rel="shortcut icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1, mkdocs-material-5.1.0">
+      <meta name="generator" content="mkdocs-1.1, mkdocs-material-5.1.1">
     
     
       
@@ -23,9 +23,9 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.89dc9fe3.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.a676eddb.min.css">
       
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ecd4686e.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.b302131d.min.css">
       
       
         
@@ -836,6 +836,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#boardplatform" class="md-nav__link">
+    BoardPlatform
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#configoption" class="md-nav__link">
     ConfigOption
   </a>
@@ -857,8 +864,50 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#requiredtool" class="md-nav__link">
-    RequiredTool
+  <a href="#help" class="md-nav__link">
+    Help
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#identificationpref" class="md-nav__link">
+    IdentificationPref
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#package" class="md-nav__link">
+    Package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#systems" class="md-nav__link">
+    Systems
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool" class="md-nav__link">
+    Tool
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#toolsdependencies" class="md-nav__link">
+    ToolsDependencies
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usbid" class="md-nav__link">
+    USBID
   </a>
   
 </li>
@@ -1592,6 +1641,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#boardplatform" class="md-nav__link">
+    BoardPlatform
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#configoption" class="md-nav__link">
     ConfigOption
   </a>
@@ -1613,8 +1669,50 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#requiredtool" class="md-nav__link">
-    RequiredTool
+  <a href="#help" class="md-nav__link">
+    Help
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#identificationpref" class="md-nav__link">
+    IdentificationPref
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#package" class="md-nav__link">
+    Package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#systems" class="md-nav__link">
+    Systems
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool" class="md-nav__link">
+    Tool
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#toolsdependencies" class="md-nav__link">
+    ToolsDependencies
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#usbid" class="md-nav__link">
+    USBID
   </a>
   
 </li>
@@ -2168,10 +2266,17 @@
 <li><a href="#cc.arduino.cli.commands.BoardListItem">BoardListItem</a></li>
 <li><a href="#cc.arduino.cli.commands.BoardListReq">BoardListReq</a></li>
 <li><a href="#cc.arduino.cli.commands.BoardListResp">BoardListResp</a></li>
+<li><a href="#cc.arduino.cli.commands.BoardPlatform">BoardPlatform</a></li>
 <li><a href="#cc.arduino.cli.commands.ConfigOption">ConfigOption</a></li>
 <li><a href="#cc.arduino.cli.commands.ConfigValue">ConfigValue</a></li>
 <li><a href="#cc.arduino.cli.commands.DetectedPort">DetectedPort</a></li>
-<li><a href="#cc.arduino.cli.commands.RequiredTool">RequiredTool</a></li>
+<li><a href="#cc.arduino.cli.commands.Help">Help</a></li>
+<li><a href="#cc.arduino.cli.commands.IdentificationPref">IdentificationPref</a></li>
+<li><a href="#cc.arduino.cli.commands.Package">Package</a></li>
+<li><a href="#cc.arduino.cli.commands.Systems">Systems</a></li>
+<li><a href="#cc.arduino.cli.commands.Tool">Tool</a></li>
+<li><a href="#cc.arduino.cli.commands.ToolsDependencies">ToolsDependencies</a></li>
+<li><a href="#cc.arduino.cli.commands.USBID">USBID</a></li>
 </ul>
 </li>
 <li>
@@ -2376,9 +2481,63 @@
 </thead>
 <tbody>
 <tr>
+<td>fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
+<td></td>
+</tr>
+<tr>
+<td>version</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>propertiesId</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>alias</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>official</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>pinout</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>package</td>
+<td><a href="#cc.arduino.cli.commands.Package">Package</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>platform</td>
+<td><a href="#cc.arduino.cli.commands.BoardPlatform">BoardPlatform</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>toolsDependencies</td>
+<td><a href="#cc.arduino.cli.commands.ToolsDependencies">ToolsDependencies</a></td>
+<td>repeated</td>
 <td></td>
 </tr>
 <tr>
@@ -2388,8 +2547,14 @@
 <td></td>
 </tr>
 <tr>
-<td>required_tools</td>
-<td><a href="#cc.arduino.cli.commands.RequiredTool">RequiredTool</a></td>
+<td>_tools</td>
+<td><a href="#cc.arduino.cli.commands.Tool">Tool</a></td>
+<td>repeated</td>
+<td></td>
+</tr>
+<tr>
+<td>identification_pref</td>
+<td><a href="#cc.arduino.cli.commands.IdentificationPref">IdentificationPref</a></td>
 <td>repeated</td>
 <td></td>
 </tr>
@@ -2507,6 +2672,62 @@
 </tr>
 </tbody>
 </table>
+<p><a name="cc.arduino.cli.commands.BoardPlatform"></a></p>
+<h3 id="boardplatform">BoardPlatform<a class="headerlink" href="#boardplatform" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>architecture</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>category</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>url</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>archiveFileName</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>checksum</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>size</td>
+<td><a href="#int64">int64</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.ConfigOption"></a></p>
 <h3 id="configoption">ConfigOption<a class="headerlink" href="#configoption" title="Permanent link">&para;</a></h3>
 <table>
@@ -2609,8 +2830,142 @@
 </tr>
 </tbody>
 </table>
-<p><a name="cc.arduino.cli.commands.RequiredTool"></a></p>
-<h3 id="requiredtool">RequiredTool<a class="headerlink" href="#requiredtool" title="Permanent link">&para;</a></h3>
+<p><a name="cc.arduino.cli.commands.Help"></a></p>
+<h3 id="help">Help<a class="headerlink" href="#help" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>online</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.IdentificationPref"></a></p>
+<h3 id="identificationpref">IdentificationPref<a class="headerlink" href="#identificationpref" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>usbID</td>
+<td><a href="#cc.arduino.cli.commands.USBID">USBID</a></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.Package"></a></p>
+<h3 id="package">Package<a class="headerlink" href="#package" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>maintainer</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>url</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>websiteURL</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>email</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>help</td>
+<td><a href="#cc.arduino.cli.commands.Help">Help</a></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.Systems"></a></p>
+<h3 id="systems">Systems<a class="headerlink" href="#systems" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>checksum</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>host</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>archiveFileName</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>url</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>size</td>
+<td><a href="#int64">int64</a></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.Tool"></a></p>
+<h3 id="tool">Tool<a class="headerlink" href="#tool" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2635,6 +2990,70 @@
 </tr>
 <tr>
 <td>packager</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.ToolsDependencies"></a></p>
+<h3 id="toolsdependencies">ToolsDependencies<a class="headerlink" href="#toolsdependencies" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>packager</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>version</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>systems</td>
+<td><a href="#cc.arduino.cli.commands.Systems">Systems</a></td>
+<td>repeated</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.USBID"></a></p>
+<h3 id="usbid">USBID<a class="headerlink" href="#usbid" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VID</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>PID</td>
 <td><a href="#string">string</a></td>
 <td></td>
 <td></td>
@@ -4949,15 +5368,15 @@
       
     </div>
     
-      <script src="../../assets/javascripts/vendor.36cbf620.min.js"></script>
-      <script src="../../assets/javascripts/bundle.00c583dd.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      <script src="../../assets/javascripts/vendor.c51dfa35.min.js"></script>
+      <script src="../../assets/javascripts/bundle.eaaa3931.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
       
       <script>
         app = initialize({
           base: "../..",
           features: [],
           search: Object.assign({
-            worker: "../../assets/javascripts/worker/search.7f7c8775.min.js"
+            worker: "../../assets/javascripts/worker/search.58d22e8e.min.js"
           }, typeof search !== "undefined" && search)
         })
       </script>
