@@ -87,7 +87,7 @@ message Systems {
     string host = 2;
     string archiveFileName = 3;
     string url = 4;
-    string size = 5;
+    int64 size = 5;
 }
 
 

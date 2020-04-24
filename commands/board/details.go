@@ -110,6 +110,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		for _, f := range toolRelease.Flavors {
 			systems = append(systems, &rpc.Systems{
 				Checksum:        f.Resource.Checksum,
+				Size:            f.Resource.Size,
 				Host:            f.OS,
 				ArchiveFileName: f.Resource.ArchiveFileName,
 				Url:             f.Resource.URL,
