@@ -21,10 +21,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	completionNoDesc bool //Disable completion description for shells that support it
+)
+
 // NewCommand created a new `version` command
 func NewCommand() *cobra.Command {
-	return &cobra.Command{
-		Use:       "completion [bash|zsh|fish] ",
+	command := &cobra.Command{
+		Use:       "completion [bash|zsh|fish] [--no-descriptions]",
 		ValidArgs: []string{"bash\t", "zsh", "fish"},
 		Args:      cobra.ExactArgs(1),
 		Short:     "Generates completion scripts",
@@ -33,6 +37,9 @@ func NewCommand() *cobra.Command {
 			"  " + "source completion.sh",
 		Run: run,
 	}
+	command.Flags().BoolVar(&completionNoDesc, "no-descriptions", false, "Disable completion description for shells that support it")
+
+	return command
 }
 
 func run(cmd *cobra.Command, args []string) {
@@ -44,7 +51,7 @@ func run(cmd *cobra.Command, args []string) {
 		cmd.Root().GenZshCompletion(os.Stdout)
 		break
 	case "fish":
-		cmd.Root().GenFishCompletion(os.Stdout, true)
+		cmd.Root().GenFishCompletion(os.Stdout, !completionNoDesc)
 		break
 	}
 }
