@@ -16,7 +16,9 @@
 package completion
 
 import (
+	"bytes"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -51,7 +53,10 @@ func run(cmd *cobra.Command, args []string) {
 		cmd.Root().GenZshCompletion(os.Stdout)
 		break
 	case "fish":
-		cmd.Root().GenFishCompletion(os.Stdout, !completionNoDesc)
+		buf := new(bytes.Buffer)
+		cmd.Root().GenFishCompletion(buf, !completionNoDesc)
+		newstring := strings.ReplaceAll(buf.String(), "arduino-cli_comp", "arduino_cli_comp") //required because fish does not support env variables with "-" in the name
+		os.Stdout.WriteString(newstring)
 		break
 	}
 }
