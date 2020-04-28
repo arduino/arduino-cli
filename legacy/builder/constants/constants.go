@@ -95,7 +95,6 @@ const MSG_FIND_INCLUDES_FAILED = "Error while detecting libraries included by {0
 const MSG_INVALID_QUOTING = "Invalid quoting: no closing [{0}] char found."
 const MSG_LIB_LEGACY = "(legacy)"
 const MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR = "Multiple libraries were found for \"{0}\""
-const MSG_PRECOMPILED_LIBRARY_NOT_FOUND_FOR = "Library \"{0}\" declared precompiled but folder \"{1}\" does not exist"
 const MSG_LIBRARIES_NOT_USED = " Not used: {0}"
 const MSG_LIBRARIES_USED = " Used: {0}"
 const MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS = "Library can't use both 'src' and 'utility' folders. Double check {0}"

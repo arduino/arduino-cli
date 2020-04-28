@@ -87,25 +87,25 @@ func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Lib
 	}
 
 	logger := ctx.GetLogger()
+	logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Library {0} has been declared precompiled:", library.Name)
+
+	// Try directory with full fpuSpecs first, if available
 	if len(fpuSpecs) > 0 {
 		fpuSpecs = strings.TrimRight(fpuSpecs, "-")
-		if library.SourceDir.Join(mcu).Join(fpuSpecs).Exist() {
-			return library.SourceDir.Join(mcu).Join(fpuSpecs)
-		} else {
-			// we are unsure, compile from sources
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO,
-				constants.MSG_PRECOMPILED_LIBRARY_NOT_FOUND_FOR, library.Name, library.SourceDir.Join(mcu).Join(fpuSpecs))
-			return nil
+		fullPrecompDir := library.SourceDir.Join(mcu).Join(fpuSpecs)
+		if fullPrecompDir.Exist() {
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Using precompiled library in {0}", fullPrecompDir)
+			return fullPrecompDir
 		}
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Precompiled library in \"{0}\" not found", fullPrecompDir)
 	}
 
-	if library.SourceDir.Join(mcu).Exist() {
-		return library.SourceDir.Join(mcu)
+	precompDir := library.SourceDir.Join(mcu)
+	if precompDir.Exist() {
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Using precompiled library in {0}", precompDir)
+		return precompDir
 	}
-
-	logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO,
-		constants.MSG_PRECOMPILED_LIBRARY_NOT_FOUND_FOR, library.Name, library.SourceDir.Join(mcu))
-
+	logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Precompiled library in \"{0}\" not found", precompDir)
 	return nil
 }
 
