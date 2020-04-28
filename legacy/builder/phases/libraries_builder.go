@@ -120,7 +120,7 @@ func fixLDFLAG(ctx *types.Context, libs libraries.List) error {
 		}
 		// find all library names in the folder and prepend -l
 		filePaths := []string{}
-		libs_cmd := library.LDflags + " "
+		libsCmd := library.LDflags + " "
 		extensions := func(ext string) bool {
 			return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_DYNAMIC[ext] || PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext]
 		}
@@ -130,12 +130,12 @@ func fixLDFLAG(ctx *types.Context, libs libraries.List) error {
 			// strip "lib" first occurrence
 			if strings.HasPrefix(name, "lib") {
 				name = strings.Replace(name, "lib", "", 1)
-				libs_cmd += "-l" + name + " "
+				libsCmd += "-l" + name + " "
 			}
 		}
 
 		currLDFlags := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS)
-		ctx.BuildProperties.Set(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS, currLDFlags+"\"-L"+path.String()+"\" "+libs_cmd+" ")
+		ctx.BuildProperties.Set(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS, currLDFlags+"\"-L"+path.String()+"\" "+libsCmd+" ")
 	}
 	return nil
 }
