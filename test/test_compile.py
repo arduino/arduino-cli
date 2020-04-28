@@ -282,10 +282,6 @@ def test_compile_without_precompiled_libraries(run_command, data_dir):
     result = run_command("core update-index --additional-urls={}".format(url))
     assert result.ok
 
-    # Try build problematic sketch
-    result = run_command("core install arduino:mbed --additional-urls={}".format(url))
-    assert result.ok
-
     # Install pre-release version of Arduino_TensorFlowLite (will be officially released
     # via lib manager after https://github.com/arduino/arduino-builder/issues/353 is in)
     import zipfile
@@ -293,10 +289,17 @@ def test_compile_without_precompiled_libraries(run_command, data_dir):
         zip_ref.extractall("{}/libraries/".format(data_dir))
     #result = run_command("lib install Arduino_TensorflowLite@1.15.0-ALPHA-precompiled")
     #assert result.ok
-
     result = run_command("lib install Arduino_LSM9DS1@1.1.0")
     assert result.ok
+    result = run_command("lib install \"BSEC Software Library@1.5.1474\"")
+    assert result.ok
+
+    # Try build problematic sketch
+    result = run_command("core install arduino:mbed --additional-urls={}".format(url))
+    assert result.ok
     result = run_command("compile -b arduino:mbed:nano33ble {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/ -v".format(data_dir))
+    assert result.ok
+    result = run_command("compile -b arduino:mbed:nano33ble {}/libraries/BSEC_Software_Library/examples/basic/ -v".format(data_dir))
     assert result.ok
 
     result = run_command("core install adafruit:samd --additional-urls={}".format(url))
