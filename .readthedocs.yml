@@ -1,0 +1,17 @@
+version: 2
+
+# Build documentation with MkDocs
+mkdocs:
+  configuration: mkdocs.yml
+
+# No additional formats other than HTML
+formats: []
+
+# Build settings
+build:
+  image: latest
+
+python:
+  version: 3.8
+  install:
+    - requirements: requirements_docs.txt
