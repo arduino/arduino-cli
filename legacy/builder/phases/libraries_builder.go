@@ -53,10 +53,6 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	}
 
 	ctx.LibrariesObjectFiles = objectFiles
-
-	// Search for precompiled libraries
-	fixLDFLAG(ctx, libs)
-
 	return nil
 }
 
@@ -109,35 +105,25 @@ func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Lib
 	return nil
 }
 
-func fixLDFLAG(ctx *types.Context, libs libraries.List) error {
-
-	for _, library := range libs {
-		// add library src path to compiler.c.elf.extra_flags
-		// use library.Name as lib name and srcPath/{mcpu} as location
-		path := findExpectedPrecompiledLibFolder(ctx, library)
-		if path == nil {
-			break
-		}
-		// find all library names in the folder and prepend -l
-		filePaths := []string{}
-		libsCmd := library.LDflags + " "
-		extensions := func(ext string) bool {
-			return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_DYNAMIC[ext] || PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext]
-		}
-		utils.FindFilesInFolder(&filePaths, path.String(), extensions, false)
-		for _, lib := range filePaths {
-			name := strings.TrimSuffix(filepath.Base(lib), filepath.Ext(lib))
-			// strip "lib" first occurrence
-			if strings.HasPrefix(name, "lib") {
-				name = strings.Replace(name, "lib", "", 1)
-				libsCmd += "-l" + name + " "
-			}
-		}
-
-		currLDFlags := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS)
-		ctx.BuildProperties.Set(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS, currLDFlags+"\"-L"+path.String()+"\" "+libsCmd+" ")
+func fixLDFLAG(ctx *types.Context, library *libraries.Library, path *paths.Path) {
+	// find all library names in the folder and prepend -l
+	filePaths := []string{}
+	libsCmd := library.LDflags + " "
+	extensions := func(ext string) bool {
+		return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_DYNAMIC[ext] || PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext]
 	}
-	return nil
+	utils.FindFilesInFolder(&filePaths, path.String(), extensions, false)
+	for _, lib := range filePaths {
+		name := strings.TrimSuffix(filepath.Base(lib), filepath.Ext(lib))
+		// strip "lib" first occurrence
+		if strings.HasPrefix(name, "lib") {
+			name = strings.Replace(name, "lib", "", 1)
+			libsCmd += "-l" + name + " "
+		}
+	}
+
+	currLDFlags := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS)
+	ctx.BuildProperties.Set(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS, currLDFlags+"\"-L"+path.String()+"\" "+libsCmd+" ")
 }
 
 func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
@@ -173,15 +159,15 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 	objectFiles := paths.NewPathList()
 
 	if library.Precompiled {
-		// search for files with PRECOMPILED_LIBRARIES_VALID_EXTENSIONS
-		extensions := func(ext string) bool { return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext] }
+		if precompiledPath := findExpectedPrecompiledLibFolder(ctx, library); precompiledPath != nil {
+			// Add required LD flags
+			fixLDFLAG(ctx, library, precompiledPath)
 
-		filePaths := []string{}
-		precompiledPath := findExpectedPrecompiledLibFolder(ctx, library)
-		if precompiledPath != nil {
 			// TODO: This codepath is just taken for .a with unusual names that would
 			// be ignored by -L / -l methods.
 			// Should we force precompiled libraries to start with "lib" ?
+			extensions := func(ext string) bool { return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext] }
+			filePaths := []string{}
 			err := utils.FindFilesInFolder(&filePaths, precompiledPath.String(), extensions, false)
 			if err != nil {
 				return nil, errors.WithStack(err)
