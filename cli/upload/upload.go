@@ -128,9 +128,9 @@ func (p *programmersList) Data() interface{} {
 
 func (p *programmersList) String() string {
 	t := table.New()
-	t.SetHeader("Programmer Name", "ID", "Platform")
+	t.SetHeader("ID", "Programmer Name", "Platform")
 	for _, prog := range p.Programmers {
-		t.AddRow(prog.GetName(), prog.GetId(), prog.GetPlatform())
+		t.AddRow(prog.GetId(), prog.GetName(), prog.GetPlatform())
 	}
 	return t.Render()
 }
