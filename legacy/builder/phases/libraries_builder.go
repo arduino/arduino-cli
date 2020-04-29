@@ -135,7 +135,14 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 	objectFiles := paths.NewPathList()
 
 	if library.Precompiled {
-		if precompiledPath := findExpectedPrecompiledLibFolder(ctx, library); precompiledPath != nil {
+		coreSupportPrecompiled := ctx.BuildProperties.ContainsKey("compiler.libraries.ldflags")
+		precompiledPath := findExpectedPrecompiledLibFolder(ctx, library)
+
+		if !coreSupportPrecompiled {
+			logger := ctx.GetLogger()
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "The plaform does not support 'compiler.libraries.ldflags' for precompiled libraries.")
+
+		} else if precompiledPath != nil {
 			// Find all libraries in precompiledPath
 			libs, err := precompiledPath.ReadDir()
 			if err != nil {
@@ -166,7 +173,10 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 					objectFiles.Add(lib)
 				}
 			}
-			return objectFiles, nil
+
+			if library.PrecompiledWithSources {
+				return objectFiles, nil
+			}
 		}
 	}
 

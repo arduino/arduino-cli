@@ -103,7 +103,8 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	library.Website = strings.TrimSpace(libProperties.Get("url"))
 	library.IsLegacy = false
 	library.DotALinkage = libProperties.GetBoolean("dot_a_linkage")
-	library.Precompiled = libProperties.GetBoolean("precompiled")
+	library.PrecompiledWithSources = libProperties.Get("precompiled") == "full"
+	library.Precompiled = libProperties.Get("precompiled") == "true" || library.PrecompiledWithSources
 	library.LDflags = strings.TrimSpace(libProperties.Get("ldflags"))
 	library.Properties = libProperties
 
