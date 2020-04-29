@@ -85,6 +85,8 @@ service ArduinoCore {
   // Upload a compiled sketch to an Arduino board.
   rpc Upload(UploadReq) returns (stream UploadResp);
 
+  rpc ListProgrammersAvailableForUpload(ListProgrammersAvailableForUploadReq) returns (ListProgrammersAvailableForUploadResp);
+
   // Search for a platform in the platforms indexes.
   rpc PlatformSearch(PlatformSearchReq) returns (PlatformSearchResp);
 

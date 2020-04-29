@@ -216,6 +216,11 @@ func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadReq, stream rpc.ArduinoCor
 	return stream.Send(resp)
 }
 
+// ListProgrammersAvailableForUpload FIXMEDOC
+func (s *ArduinoCoreServerImpl) ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadReq) (*rpc.ListProgrammersAvailableForUploadResp, error) {
+	return upload.ListProgrammersAvailableForUpload(ctx, req)
+}
+
 // LibraryDownload FIXMEDOC
 func (s *ArduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadReq, stream rpc.ArduinoCore_LibraryDownloadServer) error {
 	resp, err := lib.LibraryDownload(

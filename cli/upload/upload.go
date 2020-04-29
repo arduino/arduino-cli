@@ -24,17 +24,19 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/upload"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/arduino/arduino-cli/table"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 var (
-	fqbn      string
-	port      string
-	verbose   bool
-	verify    bool
-	importDir string
+	fqbn       string
+	port       string
+	verbose    bool
+	verify     bool
+	importDir  string
+	programmer string
 )
 
 // NewCommand created a new `upload` command
@@ -53,6 +55,7 @@ func NewCommand() *cobra.Command {
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", "Direcory containing binaries to upload.")
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
+	uploadCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload or 'list' to list supported programmers.")
 
 	return uploadCommand
 }
@@ -62,6 +65,21 @@ func run(command *cobra.Command, args []string) {
 	if err != nil {
 		feedback.Errorf("Error during Upload: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	if programmer == "list" {
+		resp, err := upload.ListProgrammersAvailableForUpload(context.Background(), &rpc.ListProgrammersAvailableForUploadReq{
+			Instance: instance,
+			Fqbn:     fqbn,
+		})
+		if err != nil {
+			feedback.Errorf("Error listing programmers: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		feedback.PrintResult(&programmersList{
+			Programmers: resp.GetProgrammers(),
+		})
+		os.Exit(0)
 	}
 
 	var path *paths.Path
@@ -78,6 +96,7 @@ func run(command *cobra.Command, args []string) {
 		Verbose:    verbose,
 		Verify:     verify,
 		ImportDir:  importDir,
+		Programmer: programmer,
 	}, os.Stdout, os.Stderr); err != nil {
 		feedback.Errorf("Error during Upload: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
@@ -97,4 +116,21 @@ func initSketchPath(sketchPath *paths.Path) *paths.Path {
 	}
 	logrus.Infof("Reading sketch from dir: %s", wd)
 	return wd
+}
+
+type programmersList struct {
+	Programmers []*rpc.Programmer
+}
+
+func (p *programmersList) Data() interface{} {
+	return p.Programmers
+}
+
+func (p *programmersList) String() string {
+	t := table.New()
+	t.SetHeader("Programmer Name", "ID", "Platform")
+	for _, prog := range p.Programmers {
+		t.AddRow(prog.GetName(), prog.GetId(), prog.GetPlatform())
+	}
+	return t.Render()
 }

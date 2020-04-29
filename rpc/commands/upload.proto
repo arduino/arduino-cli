@@ -43,6 +43,7 @@ message UploadReq {
 	// Custom path to a directory containing compiled files. When `import_dir` is
 	// not specified, the standard build directory under `sketch_path` is used.
 	string import_dir = 8;
+	string programmer = 9;
 }
 
 message UploadResp {
@@ -50,4 +51,19 @@ message UploadResp {
 	bytes out_stream = 1;
 	// The error output of the upload process.
 	bytes err_stream = 2;
+}
+
+message ListProgrammersAvailableForUploadReq {
+	Instance instance = 1;
+	string fqbn = 2;
+}
+
+message ListProgrammersAvailableForUploadResp {
+	repeated Programmer programmers = 1;
+}
+
+message Programmer {
+	string platform = 1;
+	string id = 2;
+	string name = 3;
 }
