@@ -40,14 +40,14 @@ type PlatformRelease struct {
 	Resource       *resources.DownloadResource
 	Version        *semver.Version
 	BoardsManifest []*BoardManifest
-	Dependencies   ToolDependencies           // The Dependency entries to load tools.
-	Platform       *Platform                  `json:"-"`
-	Properties     *properties.Map            `json:"-"`
-	Boards         map[string]*Board          `json:"-"`
-	Programmers    map[string]*properties.Map `json:"-"`
-	Menus          *properties.Map            `json:"-"`
-	InstallDir     *paths.Path                `json:"-"`
-	IsIDEBundled   bool                       `json:"-"`
+	Dependencies   ToolDependencies       // The Dependency entries to load tools.
+	Platform       *Platform              `json:"-"`
+	Properties     *properties.Map        `json:"-"`
+	Boards         map[string]*Board      `json:"-"`
+	Programmers    map[string]*Programmer `json:"-"`
+	Menus          *properties.Map        `json:"-"`
+	InstallDir     *paths.Path            `json:"-"`
+	IsIDEBundled   bool                   `json:"-"`
 }
 
 // BoardManifest contains information about a board. These metadata are usually
@@ -117,7 +117,7 @@ func (platform *Platform) GetOrCreateRelease(version *semver.Version) (*Platform
 		Version:     version,
 		Boards:      map[string]*Board{},
 		Properties:  properties.NewMap(),
-		Programmers: map[string]*properties.Map{},
+		Programmers: map[string]*Programmer{},
 		Platform:    platform,
 	}
 	platform.Releases[tag] = release
