@@ -17,7 +17,6 @@ package phases
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
@@ -137,25 +136,20 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 
 	if library.Precompiled {
 		if precompiledPath := findExpectedPrecompiledLibFolder(ctx, library); precompiledPath != nil {
-			var staticLibExts = map[string]bool{".a": true}
-			var dynamixLibExts = map[string]bool{".so": true}
-			dynAndStatic := func(ext string) bool { return dynamixLibExts[ext] || staticLibExts[ext] }
-			staticOnly := func(ext string) bool { return staticLibExts[ext] }
-
-			// Add required LD flags
-
-			// find all library names in the folder and prepend -l
-			dynAndStaticLibs := []string{}
-			libsCmd := library.LDflags + " "
-			if err := utils.FindFilesInFolder(&dynAndStaticLibs, precompiledPath.String(), dynAndStatic, false); err != nil {
+			// Find all libraries in precompiledPath
+			libs, err := precompiledPath.ReadDir()
+			if err != nil {
 				return nil, errors.WithStack(err)
 			}
+
+			// Add required LD flags
+			libsCmd := library.LDflags + " "
+			dynAndStaticLibs := libs.Clone()
+			dynAndStaticLibs.FilterSuffix(".a", ".so")
 			for _, lib := range dynAndStaticLibs {
-				name := strings.TrimSuffix(filepath.Base(lib), filepath.Ext(lib))
-				// strip "lib" first occurrence
+				name := strings.TrimSuffix(lib.Base(), lib.Ext())
 				if strings.HasPrefix(name, "lib") {
-					name = strings.Replace(name, "lib", "", 1)
-					libsCmd += "-l" + name + " "
+					libsCmd += "-l" + name[3:] + " "
 				}
 			}
 
@@ -165,13 +159,11 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 			// TODO: This codepath is just taken for .a with unusual names that would
 			// be ignored by -L / -l methods.
 			// Should we force precompiled libraries to start with "lib" ?
-			staticLibs := []string{}
-			if err := utils.FindFilesInFolder(&staticLibs, precompiledPath.String(), staticOnly, false); err != nil {
-				return nil, errors.WithStack(err)
-			}
-			for _, path := range staticLibs {
-				if !strings.HasPrefix(filepath.Base(path), "lib") {
-					objectFiles.Add(paths.New(path))
+			staticLibs := libs.Clone()
+			staticLibs.FilterSuffix(".a")
+			for _, lib := range staticLibs {
+				if !strings.HasPrefix(lib.Base(), "lib") {
+					objectFiles.Add(lib)
 				}
 			}
 			return objectFiles, nil
