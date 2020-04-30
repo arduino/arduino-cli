@@ -222,6 +222,9 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	// Build recipe for upload
 	recipe := uploadProperties.Get("upload.pattern")
 	cmdLine := uploadProperties.ExpandPropsInString(recipe)
+	if req.GetVerbose() {
+		outStream.Write([]byte(fmt.Sprintln(cmdLine)))
+	}
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 	if err != nil {
 		return nil, fmt.Errorf("invalid recipe '%s': %s", recipe, err)
