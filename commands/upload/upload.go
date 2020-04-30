@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/commands"
@@ -80,45 +81,62 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
 	// Find target board and board properties
-	_, _, board, boardProperties, _, err := pm.ResolveFQBN(fqbn)
+	_, boardPlatform, board, boardProperties, buildPlatform, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, fmt.Errorf("incorrect FQBN: %s", err)
 	}
 
-	// Load programmer tool
-	uploadToolPattern, have := boardProperties.GetOk("upload.tool")
-	if !have || uploadToolPattern == "" {
-		return nil, fmt.Errorf("cannot get programmer tool: undefined 'upload.tool' property")
-	}
-
-	var referencedPlatformRelease *cores.PlatformRelease
-	if split := strings.Split(uploadToolPattern, ":"); len(split) > 2 {
-		return nil, fmt.Errorf("invalid 'upload.tool' property: %s", uploadToolPattern)
-	} else if len(split) == 2 {
-		referencedPackageName := split[0]
-		uploadToolPattern = split[1]
-		architecture := board.PlatformRelease.Platform.Architecture
-
-		if referencedPackage := pm.Packages[referencedPackageName]; referencedPackage == nil {
-			return nil, fmt.Errorf("required platform %s:%s not installed", referencedPackageName, architecture)
-		} else if referencedPlatform := referencedPackage.Platforms[architecture]; referencedPlatform == nil {
-			return nil, fmt.Errorf("required platform %s:%s not installed", referencedPackageName, architecture)
-		} else {
-			referencedPlatformRelease = pm.GetInstalledPlatformRelease(referencedPlatform)
+	// Load upload tool definitions
+	var uploadToolName string
+	var uploadToolPlatform *cores.PlatformRelease
+	var programmer *cores.Programmer
+	if programmerID := req.GetProgrammer(); programmerID != "" {
+		programmer = boardPlatform.Programmers[programmerID]
+		if programmer == nil {
+			// Try to find the programmer in the referenced build platform
+			programmer = buildPlatform.Programmers[programmerID]
+		}
+		if programmer == nil {
+			return nil, fmt.Errorf("programmer '%s' not available", programmerID)
+		}
+		uploadToolName = programmer.Properties.Get("program.tool")
+		uploadToolPlatform = programmer.PlatformRelease
+		if uploadToolName == "" {
+			return nil, fmt.Errorf("cannot get programmer tool: undefined 'program.tool' property")
+		}
+	} else {
+		uploadToolName = boardProperties.Get("upload.tool")
+		uploadToolPlatform = boardPlatform
+		if uploadToolName == "" {
+			return nil, fmt.Errorf("cannot get upload tool: undefined 'upload.tool' property")
+		}
+		if split := strings.Split(uploadToolName, ":"); len(split) > 2 {
+			return nil, fmt.Errorf("invalid 'upload.tool' property: %s", uploadToolName)
+		} else if len(split) == 2 {
+			uploadToolName = split[1]
+			uploadToolPlatform = pm.GetInstalledPlatformRelease(
+				pm.FindPlatform(&packagemanager.PlatformReference{
+					Package:              split[0],
+					PlatformArchitecture: boardPlatform.Platform.Architecture,
+				}),
+			)
 		}
 	}
 
 	// Build configuration for upload
 	uploadProperties := properties.NewMap()
-	if referencedPlatformRelease != nil {
-		uploadProperties.Merge(referencedPlatformRelease.Properties)
+	if uploadToolPlatform != nil {
+		uploadProperties.Merge(uploadToolPlatform.Properties)
 	}
-	uploadProperties.Merge(board.PlatformRelease.Properties)
-	uploadProperties.Merge(board.PlatformRelease.RuntimeProperties())
+	uploadProperties.Merge(boardPlatform.Properties)
+	uploadProperties.Merge(boardPlatform.RuntimeProperties())
 	uploadProperties.Merge(boardProperties)
 
-	uploadToolProperties := uploadProperties.SubTree("tools." + uploadToolPattern)
+	uploadToolProperties := uploadProperties.SubTree("tools." + uploadToolName)
 	uploadProperties.Merge(uploadToolProperties)
+	if programmer != nil {
+		uploadProperties.Merge(programmer.Properties)
+	}
 
 	if requiredTools, err := pm.FindToolsRequiredForBoard(board); err == nil {
 		for _, requiredTool := range requiredTools {
@@ -132,17 +150,25 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		if v, ok := uploadProperties.GetOk("upload.params.verbose"); ok {
 			uploadProperties.Set("upload.verbose", v)
 		}
+		if v, ok := uploadProperties.GetOk("program.params.verbose"); ok {
+			uploadProperties.Set("program.verbose", v)
+		}
 	} else {
 		if v, ok := uploadProperties.GetOk("upload.params.quiet"); ok {
 			uploadProperties.Set("upload.verbose", v)
+		}
+		if v, ok := uploadProperties.GetOk("program.params.quiet"); ok {
+			uploadProperties.Set("program.verbose", v)
 		}
 	}
 
 	// Set properties for verify
 	if req.GetVerify() {
 		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.verify"))
+		uploadProperties.Set("program.verify", uploadProperties.Get("program.params.verify"))
 	} else {
 		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.noverify"))
+		uploadProperties.Set("program.verify", uploadProperties.Get("program.params.noverify"))
 	}
 
 	var importPath *paths.Path
@@ -165,50 +191,54 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	uploadProperties.SetPath("build.path", importPath)
 	uploadProperties.Set("build.project_name", sketch.Name+".ino")
 
-	// Perform reset via 1200bps touch if requested
-	if uploadProperties.GetBoolean("upload.use_1200bps_touch") {
-		ports, err := serial.GetPortsList()
-		if err != nil {
-			return nil, fmt.Errorf("cannot get serial port list: %s", err)
-		}
-		for _, p := range ports {
-			if p == port {
-				if req.GetVerbose() {
-					outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", p)))
-					outStream.Write([]byte(fmt.Sprintln()))
-				}
-				if err := touchSerialPortAt1200bps(p); err != nil {
-					return nil, fmt.Errorf("cannot perform reset: %s", err)
-				}
-				break
+	// If not using programmer perform some action required
+	// to set the board in bootloader mode
+	actualPort := port
+	if programmer == nil {
+		// Perform reset via 1200bps touch if requested
+		if uploadProperties.GetBoolean("upload.use_1200bps_touch") {
+			ports, err := serial.GetPortsList()
+			if err != nil {
+				return nil, fmt.Errorf("cannot get serial port list: %s", err)
 			}
+			for _, p := range ports {
+				if p == port {
+					if req.GetVerbose() {
+						outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", p)))
+						outStream.Write([]byte(fmt.Sprintln()))
+					}
+					if err := touchSerialPortAt1200bps(p); err != nil {
+						return nil, fmt.Errorf("cannot perform reset: %s", err)
+					}
+					break
+				}
+			}
+
+			// Scanning for available ports seems to open the port or
+			// otherwise assert DTR, which would cancel the WDT reset if
+			// it happened within 250 ms. So we wait until the reset should
+			// have already occurred before we start scanning.
+			time.Sleep(500 * time.Millisecond)
 		}
 
-		// Scanning for available ports seems to open the port or
-		// otherwise assert DTR, which would cancel the WDT reset if
-		// it happened within 250 ms. So we wait until the reset should
-		// have already occurred before we start scanning.
-		time.Sleep(500 * time.Millisecond)
-	}
+		// Wait for upload port if requested
+		if uploadProperties.GetBoolean("upload.wait_for_upload_port") {
+			if req.GetVerbose() {
+				outStream.Write([]byte(fmt.Sprintln("Waiting for upload port...")))
+			}
+			if p, err := waitForNewSerialPort(); err != nil {
+				return nil, fmt.Errorf("cannot detect serial ports: %s", err)
+			} else if p == "" {
+				feedback.Print("No new serial port detected.")
+			} else {
+				actualPort = p
+			}
 
-	// Wait for upload port if requested
-	actualPort := port // default
-	if uploadProperties.GetBoolean("upload.wait_for_upload_port") {
-		if req.GetVerbose() {
-			outStream.Write([]byte(fmt.Sprintln("Waiting for upload port...")))
+			// on OS X, if the port is opened too quickly after it is detected,
+			// a "Resource busy" error occurs, add a delay to workaround.
+			// This apply to other platforms as well.
+			time.Sleep(500 * time.Millisecond)
 		}
-		if p, err := waitForNewSerialPort(); err != nil {
-			return nil, fmt.Errorf("cannot detect serial ports: %s", err)
-		} else if p == "" {
-			feedback.Print("No new serial port detected.")
-		} else {
-			actualPort = p
-		}
-
-		// on OS X, if the port is opened too quickly after it is detected,
-		// a "Resource busy" error occurs, add a delay to workaround.
-		// This apply to other platforms as well.
-		time.Sleep(500 * time.Millisecond)
 	}
 
 	// Set serial port property
@@ -220,7 +250,12 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	}
 
 	// Build recipe for upload
-	recipe := uploadProperties.Get("upload.pattern")
+	var recipe string
+	if programmer != nil {
+		recipe = uploadProperties.Get("program.pattern")
+	} else {
+		recipe = uploadProperties.Get("upload.pattern")
+	}
 	cmdLine := uploadProperties.ExpandPropsInString(recipe)
 	if req.GetVerbose() {
 		outStream.Write([]byte(fmt.Sprintln(cmdLine)))
