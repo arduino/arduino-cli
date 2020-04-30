@@ -130,8 +130,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	}
 
 	// Set properties for verbose upload
-	Verbose := req.GetVerbose()
-	if Verbose {
+	if req.GetVerbose() {
 		if v, ok := uploadProperties.GetOk("upload.params.verbose"); ok {
 			uploadProperties.Set("upload.verbose", v)
 		}
@@ -142,8 +141,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	}
 
 	// Set properties for verify
-	Verify := req.GetVerify()
-	if Verify {
+	if req.GetVerify() {
 		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.verify"))
 	} else {
 		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.noverify"))
