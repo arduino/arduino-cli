@@ -400,6 +400,15 @@ def test_board_details(run_command):
     result = run_command("board details arduino:samd:nano_33_iot --format json")
     assert result.ok
     # Sort everything before compare
-    sorted_result = json.dumps(json.loads(result.stdout), sort_keys=True)
-    sorted_gold_board_details = json.dumps(json.loads(gold_board_details), sort_keys=True)
-    assert sorted_result == sorted_gold_board_details
+    result = json.loads(result.stdout)
+    gold_board_details = json.loads(gold_board_details)
+
+    assert result["fqbn"] == gold_board_details["fqbn"]
+    assert result["name"] == gold_board_details["name"]
+    assert result["version"] == gold_board_details["version"]
+    assert result["propertiesId"] == gold_board_details["propertiesId"]
+    assert result["official"] == gold_board_details["official"]
+    assert result["package"] == gold_board_details["package"]
+    assert result["platform"] == gold_board_details["platform"]
+    for usb_id in gold_board_details["identification_pref"]:
+        assert usb_id in result["identification_pref"]
