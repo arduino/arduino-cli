@@ -31,7 +31,7 @@ var (
 func NewCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:       "completion [bash|zsh|fish] [--no-descriptions]",
-		ValidArgs: []string{"bash\t", "zsh", "fish"},
+		ValidArgs: []string{"bash", "zsh", "fish"},
 		Args:      cobra.ExactArgs(1),
 		Short:     "Generates completion scripts",
 		Long:      "Generates completion scripts for various shells",
@@ -50,13 +50,19 @@ func run(cmd *cobra.Command, args []string) {
 		cmd.Root().GenBashCompletion(os.Stdout)
 		break
 	case "zsh":
-		cmd.Root().GenZshCompletion(os.Stdout)
+		buf := new(bytes.Buffer)
+		cmd.Root().GenZshCompletion(buf)
+		s := strings.Replace(buf.String(), "#", "", 1)   //remove the comment from compdef
+		r := strings.NewReplacer("[", "\\[", "]", "\\]") //insert escaping before [ and ]
+		s = r.Replace(s)
+		s = strings.ReplaceAll(s, "\\[1\\]", "[1]") // revert the case
+		os.Stdout.WriteString(s)
 		break
 	case "fish":
 		buf := new(bytes.Buffer)
 		cmd.Root().GenFishCompletion(buf, !completionNoDesc)
-		newstring := strings.ReplaceAll(buf.String(), "arduino-cli_comp", "arduino_cli_comp") //required because fish does not support env variables with "-" in the name
-		os.Stdout.WriteString(newstring)
+		s := strings.ReplaceAll(buf.String(), "arduino-cli_comp", "arduino_cli_comp") //required because fish does not support env variables with "-" in the name
+		os.Stdout.WriteString(s)
 		break
 	}
 }
