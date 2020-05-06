@@ -85,6 +85,8 @@ github.com/h2non/filetype v1.0.8 h1:le8gpf+FQA0/DlDABbtisA1KiTS0Xi+YSC/E8yY3Y14=
 github.com/h2non/filetype v1.0.8/go.mod h1:isekKqOuhMj+s/7r3rIeTErIRy4Rub5uBWHfvMusLMU=
 github.com/hashicorp/hcl v1.0.0 h1:0Anlzjpi4vEasTeNFn2mLJgTSwt0+6sfsiTG8qcWGx4=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
+github.com/hdiniz/go-downloader/v2 v2.0.1 h1:8+yB5gwlJJSri5wPatCuCDb3dnFDMROiLGQfb7fbFBA=
+github.com/hdiniz/go-downloader/v2 v2.0.1/go.mod h1:VZW2V1iGKV8rJL2ZEGIDzzBeKowYv34AedJz13RzVII=
 github.com/imjasonmiller/godice v0.1.2 h1:T1/sW/HoDzFeuwzOOuQjmeMELz9CzZ53I2CnD+08zD4=
 github.com/imjasonmiller/godice v0.1.2/go.mod h1:8cTkdnVI+NglU2d6sv+ilYcNaJ5VSTBwvMbFULJd/QQ=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
@@ -205,8 +207,6 @@ github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
 go.bug.st/cleanup v1.0.0 h1:XVj1HZxkBXeq3gMT7ijWUpHyIC1j8XAoNSyQ06CskgA=
 go.bug.st/cleanup v1.0.0/go.mod h1:EqVmTg2IBk4znLbPD28xne3abjsJftMdqqJEjhn70bk=
-go.bug.st/downloader v1.2.0 h1:YmXFTcTnm0v8WzAWHn2DyV46c/Izlc/gReXubc2oBho=
-go.bug.st/downloader v1.2.0/go.mod h1:l+RPbNbrTB+MoAIp8nrZsP22nRPDy26XJZQqmm4gNT4=
 go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18 h1:F1qxtaFuewctYc/SsHRn+Q7Dtwi+yJGPgVq8YLtQz98=
 go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18/go.mod h1:Cx1VqMtEhE9pIkEyUj3LVVVPkv89dgW8aCKrRPDR/uE=
 go.bug.st/serial v1.0.0 h1:ogEPzrllCsnG00EqKRjeYvPRsO7NJW6DqykzkdD6E/k=

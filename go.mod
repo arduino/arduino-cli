@@ -38,7 +38,7 @@ require (
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/testify v1.4.0
 	go.bug.st/cleanup v1.0.0
-	go.bug.st/downloader v1.2.0
+	go.bug.st/downloader/v2 v2.0.1
 	go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18
 	go.bug.st/serial v1.0.0
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect
@@ -51,3 +51,5 @@ require (
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
 	gopkg.in/yaml.v2 v2.2.4
 )
+
+replace go.bug.st/downloader/v2 v2.0.1 => github.com/hdiniz/go-downloader/v2 v2.0.1

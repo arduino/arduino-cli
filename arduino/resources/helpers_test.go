@@ -23,9 +23,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/arduino/arduino-cli/httpclient"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/downloader"
+	"go.bug.st/downloader/v2"
 )
 
 type EchoHandler struct{}
@@ -53,7 +54,9 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 		URL:             srv.URL,
 	}
 
-	d, err := r.Download(tmp, &downloader.Config{RequestHeaders: http.Header{"User-Agent": []string{goldUserAgentValue}}})
+	httpClient := httpclient.NewWithConfig(&httpclient.Config{UserAgent: goldUserAgentValue})
+
+	d, err := r.Download(tmp, &downloader.Config{HttpClient: *httpClient})
 	require.NoError(t, err)
 	err = d.Run()
 	require.NoError(t, err)

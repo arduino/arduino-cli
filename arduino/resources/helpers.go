@@ -20,7 +20,7 @@ import (
 	"os"
 
 	"github.com/arduino/go-paths-helper"
-	"go.bug.st/downloader"
+	"go.bug.st/downloader/v2"
 )
 
 // ArchivePath returns the path of the Archive of the specified DownloadResource relative
