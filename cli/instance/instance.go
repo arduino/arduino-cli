@@ -20,7 +20,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
