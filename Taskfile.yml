@@ -121,6 +121,17 @@ tasks:
       - go run ./i18n/cmd/main.go catalog update -l {{.I18N_LANGS}} ./i18n/data
       - go generate ./i18n
 
+  i18n:pull:
+    desc: Pull i18n files from transifex
+    cmds:
+      - go run ./i18n/cmd/main.go transifex pull -l {{.I18N_LANGS}} ./i18n/data
+      - go generate ./i18n
+
+  i18n:push:
+    desc: Push i18n files to transifex
+    cmds:
+      - go run ./i18n/cmd/main.go transifex push -l {{.I18N_LANGS}} ./i18n/data
+
 vars:
   # all modules of this project except for "legacy/..." module
   DEFAULT_TARGETS:
