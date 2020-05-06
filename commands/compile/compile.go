@@ -17,7 +17,6 @@ package compile
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -37,6 +36,7 @@ import (
 	"github.com/arduino/arduino-cli/telemetry"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -55,9 +55,14 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		"verbose":         strconv.FormatBool(req.Verbose),
 		"quiet":           strconv.FormatBool(req.Quiet),
 		"vidPid":          req.VidPid,
-		"exportFile":      telemetry.Sanitize(req.ExportFile),
+		"exportFile":      telemetry.Sanitize(req.ExportFile), // deprecated
+		"exportDir":       telemetry.Sanitize(req.GetExportDir()),
 		"jobs":            strconv.FormatInt(int64(req.Jobs), 10),
 		"libraries":       strings.Join(req.Libraries, ","),
+	}
+
+	if req.GetExportFile() != "" {
+		outStream.Write([]byte(fmt.Sprintln("Compile.ExportFile has been deprecated. The ExportFile parameter will be ignored, use ExportDir instead.")))
 	}
 
 	// Use defer func() to evaluate tags map when function returns
@@ -197,54 +202,38 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	}
 
 	if !req.GetDryRun() {
-		// FIXME: Make a function to obtain these info...
-		outputPath := paths.New(
-			builderCtx.BuildProperties.ExpandPropsInString("{build.path}/{recipe.output.tmp_file}")) // "/build/path/sketch.ino.bin"
-		ext := outputPath.Ext()          // ".hex" | ".bin"
-		base := outputPath.Base()        // "sketch.ino.hex"
-		base = base[:len(base)-len(ext)] // "sketch.ino"
-
-		// FIXME: Make a function to produce a better name...
-		// Make the filename without the FQBN configs part
-		fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
-
 		var exportPath *paths.Path
-		var exportFile string
-		if req.GetExportFile() == "" {
-			exportPath = sketch.FullPath
-			exportFile = sketch.Name + "." + fqbnSuffix // "sketch.arduino.avr.uno"
+		if exportDir := req.GetExportDir(); exportDir != "" {
+			exportPath = paths.New(exportDir)
 		} else {
-			exportPath = paths.New(req.GetExportFile()).Parent()
-			exportFile = paths.New(req.GetExportFile()).Base()
-			if strings.HasSuffix(exportFile, ext) {
-				exportFile = exportFile[:len(exportFile)-len(ext)]
-			}
+			exportPath = sketch.FullPath
+			// Add FQBN (without configs part) to export path
+			fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
+			exportPath = exportPath.Join("build").Join(fqbnSuffix)
+		}
+		logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
+		if err := exportPath.MkdirAll(); err != nil {
+			return nil, errors.Wrap(err, "creating output dir")
 		}
 
-		// Copy "sketch.ino.*.hex" / "sketch.ino.*.bin" artifacts to sketch directory
-		srcDir, err := outputPath.Parent().ReadDir() // read "/build/path/*"
+		// Copy all "sketch.ino.*" artifacts to the export directory
+		baseName, ok := builderCtx.BuildProperties.GetOk("build.project_name") // == "sketch.ino"
+		if !ok {
+			return nil, errors.New("missing 'build.project_name' build property")
+		}
+		buildFiles, err := builderCtx.BuildPath.ReadDir()
 		if err != nil {
-			return nil, fmt.Errorf("reading build directory: %s", err)
+			return nil, errors.Errorf("reading build directory: %s", err)
 		}
-		srcDir.FilterPrefix(base + ".")
-		srcDir.FilterSuffix(ext)
-		for _, srcOutput := range srcDir {
-			srcFilename := srcOutput.Base()       // "sketch.ino.*.bin"
-			srcFilename = srcFilename[len(base):] // ".*.bin"
-			dstOutput := exportPath.Join(exportFile + srcFilename)
-			logrus.WithField("from", srcOutput).WithField("to", dstOutput).Debug("copying sketch build output")
-			if err = srcOutput.CopyTo(dstOutput); err != nil {
-				return nil, fmt.Errorf("copying output file: %s", err)
-			}
-		}
-
-		// Copy .elf file to sketch directory
-		srcElf := outputPath.Parent().Join(base + ".elf")
-		if srcElf.Exist() {
-			dstElf := exportPath.Join(exportFile + ".elf")
-			logrus.WithField("from", srcElf).WithField("to", dstElf).Debug("copying sketch build output")
-			if err = srcElf.CopyTo(dstElf); err != nil {
-				return nil, fmt.Errorf("copying elf file: %s", err)
+		buildFiles.FilterPrefix(baseName)
+		for _, buildFile := range buildFiles {
+			exportedFile := exportPath.Join(buildFile.Base())
+			logrus.
+				WithField("src", buildFile).
+				WithField("dest", exportedFile).
+				Trace("Copying artifact.")
+			if err = buildFile.CopyTo(exportedFile); err != nil {
+				return nil, errors.Wrapf(err, "copying output file %s", buildFile)
 			}
 		}
 	}
