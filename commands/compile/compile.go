@@ -206,8 +206,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 		// FIXME: Make a function to produce a better name...
 		// Make the filename without the FQBN configs part
-		fqbn.Configs = properties.NewMap()
-		fqbnSuffix := strings.Replace(fqbn.String(), ":", ".", -1)
+		fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
 
 		var exportPath *paths.Path
 		var exportFile string
