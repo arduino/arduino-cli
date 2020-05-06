@@ -30,11 +30,11 @@ import (
 )
 
 var (
-	fqbn       string
-	port       string
-	verbose    bool
-	verify     bool
-	importFile string
+	fqbn      string
+	port      string
+	verbose   bool
+	verify    bool
+	importDir string
 )
 
 // NewCommand created a new `upload` command
@@ -50,7 +50,7 @@ func NewCommand() *cobra.Command {
 
 	uploadCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
 	uploadCommand.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
-	uploadCommand.Flags().StringVarP(&importFile, "input", "i", "", "Input file to be uploaded.")
+	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", "Direcory containing binaries to upload.")
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
 
@@ -77,7 +77,7 @@ func run(command *cobra.Command, args []string) {
 		Port:       port,
 		Verbose:    verbose,
 		Verify:     verify,
-		ImportFile: importFile,
+		ImportDir:  importDir,
 	}, os.Stdout, os.Stderr); err != nil {
 		feedback.Errorf("Error during Upload: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
