@@ -46,6 +46,7 @@ service ArduinoCore {
   // Update libraries index
   rpc UpdateLibrariesIndex(UpdateLibrariesIndexReq) returns (stream UpdateLibrariesIndexResp) {}
 
+  // Get the version of Arduino CLI in use.
   rpc Version(VersionReq) returns (VersionResp) {}
 
   // BOARD COMMANDS
@@ -92,47 +93,69 @@ service ArduinoCore {
 }
 
 message InitReq {
+  // Start a Arduino Core Service instance that will provide only Library
+  // Manager functionality.
   bool library_manager_only = 2;
 }
 
 message InitResp {
+  // An Arduino Core Service instance.
   Instance instance = 1;
+  // Error messages related to any problems encountered while parsing the
+  // platforms index files.
   repeated string platforms_index_errors = 2;
+  // Error message if a problem was encountered while parsing the libraries
+  // index file.
   string libraries_index_error = 3;
+  // Progress of the downloads of platforms and libraries index files.
   DownloadProgress download_progress = 4;
+  // Describes the current stage of the initialization.
   TaskProgress task_progress = 5;
 }
 
-message DestroyReq { Instance instance = 1; }
+message DestroyReq {
+  // The Arduino Core Service instance to destroy.
+  Instance instance = 1;
+}
 message DestroyResp {}
 
 message RescanReq {
+  // Arduino Core Service instance from the Init response.
   Instance instance = 1;
 }
 
 message RescanResp {
+  // Error messages related to any problems encountered while parsing the
+  // platforms index file.
   repeated string platforms_index_errors = 1;
+  // Error message if a problem was encountered while parsing the libraries
+  // index file.
   string libraries_index_error = 2;
 }
 
 message UpdateIndexReq {
+  // Arduino Core Service instance from the Init response.
 	Instance instance = 1;
 }
 
 message UpdateIndexResp {
+  // Progress of the platforms index download.
   DownloadProgress download_progress = 1;
 }
 
 message UpdateLibrariesIndexReq {
+  // Arduino Core Service instance from the Init response.
 	Instance instance = 1;
 }
 
 message UpdateLibrariesIndexResp {
+  // Progress of the libraries index download.
   DownloadProgress download_progress = 1;
 }
 
 message VersionReq {}
 
 message VersionResp {
+  // The version of Arduino CLI in use.
   string version = 1;
 }
