@@ -668,12 +668,21 @@ type ArduinoCoreClient interface {
 	PlatformSearch(ctx context.Context, in *PlatformSearchReq, opts ...grpc.CallOption) (*PlatformSearchResp, error)
 	// List all installed platforms.
 	PlatformList(ctx context.Context, in *PlatformListReq, opts ...grpc.CallOption) (*PlatformListResp, error)
+	// Download the archive file of an Arduino library in the libraries index to
+	// the staging directory.
 	LibraryDownload(ctx context.Context, in *LibraryDownloadReq, opts ...grpc.CallOption) (ArduinoCore_LibraryDownloadClient, error)
+	// Download and install an Arduino library from the libraries index.
 	LibraryInstall(ctx context.Context, in *LibraryInstallReq, opts ...grpc.CallOption) (ArduinoCore_LibraryInstallClient, error)
+	// Uninstall an Arduino library.
 	LibraryUninstall(ctx context.Context, in *LibraryUninstallReq, opts ...grpc.CallOption) (ArduinoCore_LibraryUninstallClient, error)
+	// Upgrade all installed Arduino libraries to the newest version available.
 	LibraryUpgradeAll(ctx context.Context, in *LibraryUpgradeAllReq, opts ...grpc.CallOption) (ArduinoCore_LibraryUpgradeAllClient, error)
+	// List the recursive dependencies of a library, as defined by the `depends`
+	// field of the library.properties files.
 	LibraryResolveDependencies(ctx context.Context, in *LibraryResolveDependenciesReq, opts ...grpc.CallOption) (*LibraryResolveDependenciesResp, error)
+	// Search the Arduino libraries index for libraries.
 	LibrarySearch(ctx context.Context, in *LibrarySearchReq, opts ...grpc.CallOption) (*LibrarySearchResp, error)
+	// List the installed libraries.
 	LibraryList(ctx context.Context, in *LibraryListReq, opts ...grpc.CallOption) (*LibraryListResp, error)
 }
 
@@ -1273,12 +1282,21 @@ type ArduinoCoreServer interface {
 	PlatformSearch(context.Context, *PlatformSearchReq) (*PlatformSearchResp, error)
 	// List all installed platforms.
 	PlatformList(context.Context, *PlatformListReq) (*PlatformListResp, error)
+	// Download the archive file of an Arduino library in the libraries index to
+	// the staging directory.
 	LibraryDownload(*LibraryDownloadReq, ArduinoCore_LibraryDownloadServer) error
+	// Download and install an Arduino library from the libraries index.
 	LibraryInstall(*LibraryInstallReq, ArduinoCore_LibraryInstallServer) error
+	// Uninstall an Arduino library.
 	LibraryUninstall(*LibraryUninstallReq, ArduinoCore_LibraryUninstallServer) error
+	// Upgrade all installed Arduino libraries to the newest version available.
 	LibraryUpgradeAll(*LibraryUpgradeAllReq, ArduinoCore_LibraryUpgradeAllServer) error
+	// List the recursive dependencies of a library, as defined by the `depends`
+	// field of the library.properties files.
 	LibraryResolveDependencies(context.Context, *LibraryResolveDependenciesReq) (*LibraryResolveDependenciesResp, error)
+	// Search the Arduino libraries index for libraries.
 	LibrarySearch(context.Context, *LibrarySearchReq) (*LibrarySearchResp, error)
+	// List the installed libraries.
 	LibraryList(context.Context, *LibraryListReq) (*LibraryListResp, error)
 }
 

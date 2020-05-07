@@ -23,7 +23,9 @@ const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 type LibrarySearchStatus int32
 
 const (
-	LibrarySearchStatus_failed  LibrarySearchStatus = 0
+	// No search results were found.
+	LibrarySearchStatus_failed LibrarySearchStatus = 0
+	// Search results were found.
 	LibrarySearchStatus_success LibrarySearchStatus = 1
 )
 
@@ -48,7 +50,9 @@ func (LibrarySearchStatus) EnumDescriptor() ([]byte, []int) {
 type LibraryLayout int32
 
 const (
-	LibraryLayout_flat_layout      LibraryLayout = 0
+	// Library is in the 1.0 Arduino library format.
+	LibraryLayout_flat_layout LibraryLayout = 0
+	// Library is in the 1.5 Arduino library format.
 	LibraryLayout_recursive_layout LibraryLayout = 1
 )
 
@@ -73,9 +77,15 @@ func (LibraryLayout) EnumDescriptor() ([]byte, []int) {
 type LibraryLocation int32
 
 const (
-	LibraryLocation_ide_builtin                 LibraryLocation = 0
-	LibraryLocation_user                        LibraryLocation = 1
-	LibraryLocation_platform_builtin            LibraryLocation = 2
+	// In the `libraries` subdirectory of the Arduino IDE installation.
+	LibraryLocation_ide_builtin LibraryLocation = 0
+	// In the `libraries` subdirectory of the user directory (sketchbook).
+	LibraryLocation_user LibraryLocation = 1
+	// In the `libraries` subdirectory of a platform.
+	LibraryLocation_platform_builtin LibraryLocation = 2
+	// When `LibraryLocation` is used in a context where a board is specified,
+	// this indicates the library is in the `libraries` subdirectory of a
+	// platform referenced by the board's platform.
 	LibraryLocation_referenced_platform_builtin LibraryLocation = 3
 )
 
@@ -102,12 +112,15 @@ func (LibraryLocation) EnumDescriptor() ([]byte, []int) {
 }
 
 type LibraryDownloadReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	Name                 string    `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string    `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Name of the library.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// The version of the library to download.
+	Version              string   `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *LibraryDownloadReq) Reset()         { *m = LibraryDownloadReq{} }
@@ -157,6 +170,7 @@ func (m *LibraryDownloadReq) GetVersion() string {
 }
 
 type LibraryDownloadResp struct {
+	// Progress of the library download.
 	Progress             *DownloadProgress `protobuf:"bytes,1,opt,name=progress,proto3" json:"progress,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
@@ -196,12 +210,15 @@ func (m *LibraryDownloadResp) GetProgress() *DownloadProgress {
 }
 
 type LibraryInstallReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	Name                 string    `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string    `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Name of the library.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// The version of the library to install.
+	Version              string   `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *LibraryInstallReq) Reset()         { *m = LibraryInstallReq{} }
@@ -251,11 +268,13 @@ func (m *LibraryInstallReq) GetVersion() string {
 }
 
 type LibraryInstallResp struct {
-	Progress             *DownloadProgress `protobuf:"bytes,1,opt,name=progress,proto3" json:"progress,omitempty"`
-	TaskProgress         *TaskProgress     `protobuf:"bytes,2,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	// Progress of the library download.
+	Progress *DownloadProgress `protobuf:"bytes,1,opt,name=progress,proto3" json:"progress,omitempty"`
+	// Description of the current stage of the installation.
+	TaskProgress         *TaskProgress `protobuf:"bytes,2,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
 }
 
 func (m *LibraryInstallResp) Reset()         { *m = LibraryInstallResp{} }
@@ -298,12 +317,15 @@ func (m *LibraryInstallResp) GetTaskProgress() *TaskProgress {
 }
 
 type LibraryUninstallReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	Name                 string    `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string    `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Name of the library.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// The version of the library to uninstall.
+	Version              string   `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *LibraryUninstallReq) Reset()         { *m = LibraryUninstallReq{} }
@@ -353,6 +375,7 @@ func (m *LibraryUninstallReq) GetVersion() string {
 }
 
 type LibraryUninstallResp struct {
+	// Arduino Core Service instance from the `Init` response.
 	TaskProgress         *TaskProgress `protobuf:"bytes,1,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
@@ -392,6 +415,7 @@ func (m *LibraryUninstallResp) GetTaskProgress() *TaskProgress {
 }
 
 type LibraryUpgradeAllReq struct {
+	// Arduino Core Service instance from the `Init` response.
 	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
@@ -431,11 +455,13 @@ func (m *LibraryUpgradeAllReq) GetInstance() *Instance {
 }
 
 type LibraryUpgradeAllResp struct {
-	Progress             *DownloadProgress `protobuf:"bytes,1,opt,name=progress,proto3" json:"progress,omitempty"`
-	TaskProgress         *TaskProgress     `protobuf:"bytes,2,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	// Progress of the downloads of files needed for the upgrades.
+	Progress *DownloadProgress `protobuf:"bytes,1,opt,name=progress,proto3" json:"progress,omitempty"`
+	// Description of the current stage of the upgrade.
+	TaskProgress         *TaskProgress `protobuf:"bytes,2,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
 }
 
 func (m *LibraryUpgradeAllResp) Reset()         { *m = LibraryUpgradeAllResp{} }
@@ -478,12 +504,16 @@ func (m *LibraryUpgradeAllResp) GetTaskProgress() *TaskProgress {
 }
 
 type LibraryResolveDependenciesReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	Name                 string    `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string    `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Name of the library.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// The version of the library to check dependencies of. If no version is
+	// specified, dependencies of the newest version will be listed.
+	Version              string   `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *LibraryResolveDependenciesReq) Reset()         { *m = LibraryResolveDependenciesReq{} }
@@ -533,6 +563,7 @@ func (m *LibraryResolveDependenciesReq) GetVersion() string {
 }
 
 type LibraryResolveDependenciesResp struct {
+	// Dependencies of the library.
 	Dependencies         []*LibraryDependencyStatus `protobuf:"bytes,1,rep,name=dependencies,proto3" json:"dependencies,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
 	XXX_unrecognized     []byte                     `json:"-"`
@@ -572,8 +603,11 @@ func (m *LibraryResolveDependenciesResp) GetDependencies() []*LibraryDependencyS
 }
 
 type LibraryDependencyStatus struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	VersionRequired      string   `protobuf:"bytes,2,opt,name=versionRequired,proto3" json:"versionRequired,omitempty"`
+	// The name of the library dependency.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The required version of the library dependency.
+	VersionRequired string `protobuf:"bytes,2,opt,name=versionRequired,proto3" json:"versionRequired,omitempty"`
+	// Version of the library dependency currently installed.
 	VersionInstalled     string   `protobuf:"bytes,3,opt,name=versionInstalled,proto3" json:"versionInstalled,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -627,11 +661,13 @@ func (m *LibraryDependencyStatus) GetVersionInstalled() string {
 }
 
 type LibrarySearchReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	Query                string    `protobuf:"bytes,2,opt,name=query,proto3" json:"query,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// The search query.
+	Query                string   `protobuf:"bytes,2,opt,name=query,proto3" json:"query,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *LibrarySearchReq) Reset()         { *m = LibrarySearchReq{} }
@@ -674,7 +710,9 @@ func (m *LibrarySearchReq) GetQuery() string {
 }
 
 type LibrarySearchResp struct {
-	Libraries            []*SearchedLibrary  `protobuf:"bytes,1,rep,name=libraries,proto3" json:"libraries,omitempty"`
+	// The results of the search.
+	Libraries []*SearchedLibrary `protobuf:"bytes,1,rep,name=libraries,proto3" json:"libraries,omitempty"`
+	// Whether the search yielded results.
 	Status               LibrarySearchStatus `protobuf:"varint,2,opt,name=status,proto3,enum=cc.arduino.cli.commands.LibrarySearchStatus" json:"status,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
 	XXX_unrecognized     []byte              `json:"-"`
@@ -721,12 +759,15 @@ func (m *LibrarySearchResp) GetStatus() LibrarySearchStatus {
 }
 
 type SearchedLibrary struct {
-	Name                 string                     `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Releases             map[string]*LibraryRelease `protobuf:"bytes,2,rep,name=releases,proto3" json:"releases,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Latest               *LibraryRelease            `protobuf:"bytes,3,opt,name=latest,proto3" json:"latest,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
-	XXX_unrecognized     []byte                     `json:"-"`
-	XXX_sizecache        int32                      `json:"-"`
+	// Library name.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The index data for the available versions of the library.
+	Releases map[string]*LibraryRelease `protobuf:"bytes,2,rep,name=releases,proto3" json:"releases,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// The index data for the latest version of the library.
+	Latest               *LibraryRelease `protobuf:"bytes,3,opt,name=latest,proto3" json:"latest,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
 func (m *SearchedLibrary) Reset()         { *m = SearchedLibrary{} }
@@ -776,18 +817,34 @@ func (m *SearchedLibrary) GetLatest() *LibraryRelease {
 }
 
 type LibraryRelease struct {
-	Author               string               `protobuf:"bytes,1,opt,name=author,proto3" json:"author,omitempty"`
-	Version              string               `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
-	Maintainer           string               `protobuf:"bytes,3,opt,name=maintainer,proto3" json:"maintainer,omitempty"`
-	Sentence             string               `protobuf:"bytes,4,opt,name=sentence,proto3" json:"sentence,omitempty"`
-	Paragraph            string               `protobuf:"bytes,5,opt,name=paragraph,proto3" json:"paragraph,omitempty"`
-	Website              string               `protobuf:"bytes,6,opt,name=website,proto3" json:"website,omitempty"`
-	Category             string               `protobuf:"bytes,7,opt,name=category,proto3" json:"category,omitempty"`
-	Architectures        []string             `protobuf:"bytes,8,rep,name=architectures,proto3" json:"architectures,omitempty"`
-	Types                []string             `protobuf:"bytes,9,rep,name=types,proto3" json:"types,omitempty"`
-	Resources            *DownloadResource    `protobuf:"bytes,10,opt,name=resources,proto3" json:"resources,omitempty"`
-	License              string               `protobuf:"bytes,11,opt,name=license,proto3" json:"license,omitempty"`
-	ProvidesIncludes     []string             `protobuf:"bytes,12,rep,name=provides_includes,json=providesIncludes,proto3" json:"provides_includes,omitempty"`
+	// Value of the `author` field in library.properties.
+	Author string `protobuf:"bytes,1,opt,name=author,proto3" json:"author,omitempty"`
+	// Value of the `version` field in library.properties.
+	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
+	// Value of the `maintainer` field in library.properties.
+	Maintainer string `protobuf:"bytes,3,opt,name=maintainer,proto3" json:"maintainer,omitempty"`
+	// Value of the `sentence` field in library.properties.
+	Sentence string `protobuf:"bytes,4,opt,name=sentence,proto3" json:"sentence,omitempty"`
+	// Value of the `paragraph` field in library.properties.
+	Paragraph string `protobuf:"bytes,5,opt,name=paragraph,proto3" json:"paragraph,omitempty"`
+	// Value of the `url` field in library.properties.
+	Website string `protobuf:"bytes,6,opt,name=website,proto3" json:"website,omitempty"`
+	// Value of the `category` field in library.properties.
+	Category string `protobuf:"bytes,7,opt,name=category,proto3" json:"category,omitempty"`
+	// Value of the `architectures` field in library.properties.
+	Architectures []string `protobuf:"bytes,8,rep,name=architectures,proto3" json:"architectures,omitempty"`
+	// The type categories of the library, as defined in the libraries index.
+	// Possible values: `Arduino`, `Partner`, `Recommended`, `Contributed`,
+	// `Retired`.
+	Types []string `protobuf:"bytes,9,rep,name=types,proto3" json:"types,omitempty"`
+	// Information about the library archive file.
+	Resources *DownloadResource `protobuf:"bytes,10,opt,name=resources,proto3" json:"resources,omitempty"`
+	// Value of the `license` field in library.properties.
+	License string `protobuf:"bytes,11,opt,name=license,proto3" json:"license,omitempty"`
+	// Value of the `includes` field in library.properties.
+	ProvidesIncludes []string `protobuf:"bytes,12,rep,name=provides_includes,json=providesIncludes,proto3" json:"provides_includes,omitempty"`
+	// The names of the library's dependencies, as defined by the 'depends'
+	// field of library.properties.
 	Dependencies         []*LibraryDependency `protobuf:"bytes,13,rep,name=dependencies,proto3" json:"dependencies,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
@@ -911,7 +968,9 @@ func (m *LibraryRelease) GetDependencies() []*LibraryDependency {
 }
 
 type LibraryDependency struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Library name of the dependency.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Version constraint of the dependency.
 	VersionConstraint    string   `protobuf:"bytes,2,opt,name=version_constraint,json=versionConstraint,proto3" json:"version_constraint,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -958,10 +1017,16 @@ func (m *LibraryDependency) GetVersionConstraint() string {
 }
 
 type DownloadResource struct {
-	Url                  string   `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
-	Archivefilename      string   `protobuf:"bytes,2,opt,name=archivefilename,proto3" json:"archivefilename,omitempty"`
-	Checksum             string   `protobuf:"bytes,3,opt,name=checksum,proto3" json:"checksum,omitempty"`
-	Size                 int64    `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`
+	// Download URL of the library archive.
+	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	// Filename of the library archive.
+	Archivefilename string `protobuf:"bytes,2,opt,name=archivefilename,proto3" json:"archivefilename,omitempty"`
+	// Checksum of the library archive.
+	Checksum string `protobuf:"bytes,3,opt,name=checksum,proto3" json:"checksum,omitempty"`
+	// File size of the library archive.
+	Size int64 `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`
+	// The directory under the staging subdirectory of the data directory the
+	// library archive file will be downloaded to.
 	Cachepath            string   `protobuf:"bytes,5,opt,name=cachepath,proto3" json:"cachepath,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1029,12 +1094,17 @@ func (m *DownloadResource) GetCachepath() string {
 }
 
 type LibraryListReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	All                  bool      `protobuf:"varint,2,opt,name=all,proto3" json:"all,omitempty"`
-	Updatable            bool      `protobuf:"varint,3,opt,name=updatable,proto3" json:"updatable,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Whether to include built-in libraries (from platforms and the Arduino
+	// IDE) in the listing.
+	All bool `protobuf:"varint,2,opt,name=all,proto3" json:"all,omitempty"`
+	// Whether to list only libraries for which there is a newer version than
+	// the installed version available in the libraries index.
+	Updatable            bool     `protobuf:"varint,3,opt,name=updatable,proto3" json:"updatable,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *LibraryListReq) Reset()         { *m = LibraryListReq{} }
@@ -1084,6 +1154,7 @@ func (m *LibraryListReq) GetUpdatable() bool {
 }
 
 type LibraryListResp struct {
+	// List of installed libraries.
 	InstalledLibrary     []*InstalledLibrary `protobuf:"bytes,1,rep,name=installed_library,json=installedLibrary,proto3" json:"installed_library,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
 	XXX_unrecognized     []byte              `json:"-"`
@@ -1123,7 +1194,11 @@ func (m *LibraryListResp) GetInstalledLibrary() []*InstalledLibrary {
 }
 
 type InstalledLibrary struct {
-	Library              *Library        `protobuf:"bytes,1,opt,name=library,proto3" json:"library,omitempty"`
+	// Information about the library.
+	Library *Library `protobuf:"bytes,1,opt,name=library,proto3" json:"library,omitempty"`
+	// When the `updatable` field of the `LibraryList` request is set to `true`,
+	// this will contain information on the latest version of the library in the
+	// libraries index.
 	Release              *LibraryRelease `protobuf:"bytes,2,opt,name=release,proto3" json:"release,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
@@ -1170,32 +1245,61 @@ func (m *InstalledLibrary) GetRelease() *LibraryRelease {
 }
 
 type Library struct {
-	Name                 string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Author               string            `protobuf:"bytes,2,opt,name=author,proto3" json:"author,omitempty"`
-	Maintainer           string            `protobuf:"bytes,3,opt,name=maintainer,proto3" json:"maintainer,omitempty"`
-	Sentence             string            `protobuf:"bytes,4,opt,name=sentence,proto3" json:"sentence,omitempty"`
-	Paragraph            string            `protobuf:"bytes,5,opt,name=paragraph,proto3" json:"paragraph,omitempty"`
-	Website              string            `protobuf:"bytes,6,opt,name=website,proto3" json:"website,omitempty"`
-	Category             string            `protobuf:"bytes,7,opt,name=category,proto3" json:"category,omitempty"`
-	Architectures        []string          `protobuf:"bytes,8,rep,name=architectures,proto3" json:"architectures,omitempty"`
-	Types                []string          `protobuf:"bytes,9,rep,name=types,proto3" json:"types,omitempty"`
-	InstallDir           string            `protobuf:"bytes,10,opt,name=install_dir,json=installDir,proto3" json:"install_dir,omitempty"`
-	SourceDir            string            `protobuf:"bytes,11,opt,name=source_dir,json=sourceDir,proto3" json:"source_dir,omitempty"`
-	UtilityDir           string            `protobuf:"bytes,12,opt,name=utility_dir,json=utilityDir,proto3" json:"utility_dir,omitempty"`
-	ContainerPlatform    string            `protobuf:"bytes,14,opt,name=container_platform,json=containerPlatform,proto3" json:"container_platform,omitempty"`
-	RealName             string            `protobuf:"bytes,16,opt,name=real_name,json=realName,proto3" json:"real_name,omitempty"`
-	DotALinkage          bool              `protobuf:"varint,17,opt,name=dot_a_linkage,json=dotALinkage,proto3" json:"dot_a_linkage,omitempty"`
-	Precompiled          bool              `protobuf:"varint,18,opt,name=precompiled,proto3" json:"precompiled,omitempty"`
-	LdFlags              string            `protobuf:"bytes,19,opt,name=ld_flags,json=ldFlags,proto3" json:"ld_flags,omitempty"`
-	IsLegacy             bool              `protobuf:"varint,20,opt,name=is_legacy,json=isLegacy,proto3" json:"is_legacy,omitempty"`
-	Version              string            `protobuf:"bytes,21,opt,name=version,proto3" json:"version,omitempty"`
-	License              string            `protobuf:"bytes,22,opt,name=license,proto3" json:"license,omitempty"`
-	Properties           map[string]string `protobuf:"bytes,23,rep,name=properties,proto3" json:"properties,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Location             LibraryLocation   `protobuf:"varint,24,opt,name=location,proto3,enum=cc.arduino.cli.commands.LibraryLocation" json:"location,omitempty"`
-	Layout               LibraryLayout     `protobuf:"varint,25,opt,name=layout,proto3,enum=cc.arduino.cli.commands.LibraryLayout" json:"layout,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	// The library's directory name.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Value of the `author` field in library.properties.
+	Author string `protobuf:"bytes,2,opt,name=author,proto3" json:"author,omitempty"`
+	// Value of the `maintainer` field in library.properties.
+	Maintainer string `protobuf:"bytes,3,opt,name=maintainer,proto3" json:"maintainer,omitempty"`
+	// Value of the `sentence` field in library.properties.
+	Sentence string `protobuf:"bytes,4,opt,name=sentence,proto3" json:"sentence,omitempty"`
+	// Value of the `paragraph` field in library.properties.
+	Paragraph string `protobuf:"bytes,5,opt,name=paragraph,proto3" json:"paragraph,omitempty"`
+	// Value of the `url` field in library.properties.
+	Website string `protobuf:"bytes,6,opt,name=website,proto3" json:"website,omitempty"`
+	// Value of the `category` field in library.properties.
+	Category string `protobuf:"bytes,7,opt,name=category,proto3" json:"category,omitempty"`
+	// Value of the `architectures` field in library.properties.
+	Architectures []string `protobuf:"bytes,8,rep,name=architectures,proto3" json:"architectures,omitempty"`
+	// The type categories of the library. Possible values: `Arduino`,
+	// `Partner`, `Recommended`, `Contributed`, `Retired`.
+	Types []string `protobuf:"bytes,9,rep,name=types,proto3" json:"types,omitempty"`
+	// The location of the library, relative to the libraries directory that
+	// contains it.
+	InstallDir string `protobuf:"bytes,10,opt,name=install_dir,json=installDir,proto3" json:"install_dir,omitempty"`
+	// The location of the library's source files, relative to the libraries
+	// directory that contains it.
+	SourceDir string `protobuf:"bytes,11,opt,name=source_dir,json=sourceDir,proto3" json:"source_dir,omitempty"`
+	// The location of the library's `utility` directory, relative to the
+	// libraries directory that contains it.
+	UtilityDir string `protobuf:"bytes,12,opt,name=utility_dir,json=utilityDir,proto3" json:"utility_dir,omitempty"`
+	// If `location` is `platform_builtin` or `referenced_platform_builtin`, the
+	// identifying string for the core package (e.g., `arduino:avr@1.8.2`).
+	ContainerPlatform string `protobuf:"bytes,14,opt,name=container_platform,json=containerPlatform,proto3" json:"container_platform,omitempty"`
+	// Value of the `name` field in library.properties.
+	RealName string `protobuf:"bytes,16,opt,name=real_name,json=realName,proto3" json:"real_name,omitempty"`
+	// Value of the `dot_a_linkage` field in library.properties.
+	DotALinkage bool `protobuf:"varint,17,opt,name=dot_a_linkage,json=dotALinkage,proto3" json:"dot_a_linkage,omitempty"`
+	// Value of the `precompiled` field in library.properties.
+	Precompiled bool `protobuf:"varint,18,opt,name=precompiled,proto3" json:"precompiled,omitempty"`
+	// Value of the `ldflags` field in library.properties.
+	LdFlags string `protobuf:"bytes,19,opt,name=ld_flags,json=ldFlags,proto3" json:"ld_flags,omitempty"`
+	// A library.properties file is not present in the library's root directory.
+	IsLegacy bool `protobuf:"varint,20,opt,name=is_legacy,json=isLegacy,proto3" json:"is_legacy,omitempty"`
+	// Value of the `version` field in library.properties.
+	Version string `protobuf:"bytes,21,opt,name=version,proto3" json:"version,omitempty"`
+	// Value of the `license` field in library.properties.
+	License string `protobuf:"bytes,22,opt,name=license,proto3" json:"license,omitempty"`
+	// The data from the library's library.properties file, including unused
+	// fields.
+	Properties map[string]string `protobuf:"bytes,23,rep,name=properties,proto3" json:"properties,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// The location type of the library installation.
+	Location LibraryLocation `protobuf:"varint,24,opt,name=location,proto3,enum=cc.arduino.cli.commands.LibraryLocation" json:"location,omitempty"`
+	// The library format type.
+	Layout               LibraryLayout `protobuf:"varint,25,opt,name=layout,proto3,enum=cc.arduino.cli.commands.LibraryLayout" json:"layout,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
 }
 
 func (m *Library) Reset()         { *m = Library{} }

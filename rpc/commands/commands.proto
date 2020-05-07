@@ -91,18 +91,27 @@ service ArduinoCore {
   // List all installed platforms.
   rpc PlatformList(PlatformListReq) returns (PlatformListResp);
 
+  // Download the archive file of an Arduino library in the libraries index to
+  // the staging directory.
   rpc LibraryDownload(LibraryDownloadReq) returns (stream LibraryDownloadResp);
 
+  // Download and install an Arduino library from the libraries index.
   rpc LibraryInstall(LibraryInstallReq) returns (stream LibraryInstallResp);
 
+  // Uninstall an Arduino library.
   rpc LibraryUninstall(LibraryUninstallReq) returns (stream LibraryUninstallResp);
 
+  // Upgrade all installed Arduino libraries to the newest version available.
   rpc LibraryUpgradeAll(LibraryUpgradeAllReq) returns (stream LibraryUpgradeAllResp);
 
+  // List the recursive dependencies of a library, as defined by the `depends`
+  // field of the library.properties files.
   rpc LibraryResolveDependencies(LibraryResolveDependenciesReq) returns (LibraryResolveDependenciesResp);
 
+  // Search the Arduino libraries index for libraries.
   rpc LibrarySearch(LibrarySearchReq) returns (LibrarySearchResp);
 
+  // List the installed libraries.
   rpc LibraryList(LibraryListReq) returns (LibraryListResp);
 }
 
