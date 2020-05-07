@@ -65,7 +65,7 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 }
 
 func (fqbn *FQBN) String() string {
-	res := fmt.Sprintf("%s:%s:%s", fqbn.Package, fqbn.PlatformArch, fqbn.BoardID)
+	res := fqbn.StringWithoutConfig()
 	if fqbn.Configs.Size() > 0 {
 		sep := ":"
 		for _, k := range fqbn.Configs.Keys() {
@@ -74,4 +74,9 @@ func (fqbn *FQBN) String() string {
 		}
 	}
 	return res
+}
+
+// StringWithoutConfig returns the FQBN without the Config part
+func (fqbn *FQBN) StringWithoutConfig() string {
+	return fqbn.Package + ":" + fqbn.PlatformArch + ":" + fqbn.BoardID
 }
