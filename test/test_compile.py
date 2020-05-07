@@ -74,15 +74,15 @@ def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
         expected_trace_sequence, json_log_lines
     )
 
-    # Test the --output flag with absolute path
-    target = os.path.join(data_dir, "test.hex")
+    # Test the --output-dir flag with absolute path
+    target = os.path.join(data_dir, "test_dir")
     result = run_command(
-        "compile -b {fqbn} {sketch_path} -o {target}".format(
+        "compile -b {fqbn} {sketch_path} --output-dir {target}".format(
             fqbn=fqbn, sketch_path=sketch_path, target=target
         )
     )
     assert result.ok
-    assert os.path.exists(target)
+    assert os.path.exists(target) and os.path.isdir(target)
 
 
 @pytest.mark.skipif(
