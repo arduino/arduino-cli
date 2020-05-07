@@ -53,7 +53,9 @@ message DebugConfigReq {
     string sketch_path = 3;
     string port = 4;
     string interpreter = 5;
-    string import_file = 6;
+    // DEPRECATED: use import_dir instead
+    string import_file = 7 [deprecated = true];
+    string import_dir = 8;
 }
 
 //
