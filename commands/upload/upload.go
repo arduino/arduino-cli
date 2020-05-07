@@ -189,6 +189,10 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 			return nil, fmt.Errorf("cannot get serial port list: %s", err)
 		}
 		for _, p := range ports {
+			if req.GetVerbose() {
+				outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", p)))
+				outStream.Write([]byte(fmt.Sprintln()))
+			}
 			if p == port {
 				if err := touchSerialPortAt1200bps(p); err != nil {
 					return nil, fmt.Errorf("cannot perform reset: %s", err)
@@ -207,6 +211,9 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	// Wait for upload port if requested
 	actualPort := port // default
 	if uploadProperties.GetBoolean("upload.wait_for_upload_port") {
+		if req.GetVerbose() {
+			outStream.Write([]byte(fmt.Sprintln("Waiting for upload port...")))
+		}
 		if p, err := waitForNewSerialPort(); err != nil {
 			return nil, fmt.Errorf("cannot detect serial ports: %s", err)
 		} else if p == "" {
@@ -238,6 +245,9 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	}
 
 	// Run Tool
+	if req.GetVerbose() {
+		outStream.Write([]byte(fmt.Sprintln(cmdLine)))
+	}
 	cmd, err := executils.Command(cmdArgs)
 	if err != nil {
 		return nil, fmt.Errorf("cannot execute upload tool: %s", err)
