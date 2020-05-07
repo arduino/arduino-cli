@@ -16,6 +16,7 @@
 package sketches
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/arduino/go-paths-helper"
@@ -30,13 +31,15 @@ func TestSketchLoadingFromFolderOrMainFile(t *testing.T) {
 		sk, err := NewSketchFromPath(skFolder)
 		require.NoError(t, err)
 		require.Equal(t, sk.Name, "Sketch1")
-		require.True(t, sk.FullPath.EqualsTo(skFolder))
+		fmt.Println(sk.FullPath.String(), "==", skFolder.String())
+		require.True(t, sk.FullPath.EquivalentTo(skFolder))
 	}
 
 	{
 		sk, err := NewSketchFromPath(skMainIno)
 		require.NoError(t, err)
 		require.Equal(t, sk.Name, "Sketch1")
-		require.True(t, sk.FullPath.EqualsTo(skFolder))
+		fmt.Println(sk.FullPath.String(), "==", skFolder.String())
+		require.True(t, sk.FullPath.EquivalentTo(skFolder))
 	}
 }
