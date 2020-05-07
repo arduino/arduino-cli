@@ -20,8 +20,6 @@ import (
 	"fmt"
 	"io"
 	"net/url"
-	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -147,40 +145,25 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.noverify"))
 	}
 
-	// Set path to compiled binary
-	// Make the filename without the FQBN configs part
-	fqbn.Configs = properties.NewMap()
-	fqbnSuffix := strings.Replace(fqbn.String(), ":", ".", -1)
-
 	var importPath *paths.Path
-	var importFile string
-	if req.GetImportFile() == "" {
-		importPath = sketch.FullPath
-		importFile = sketch.Name + "." + fqbnSuffix
+	if importDir := req.GetImportDir(); importDir != "" {
+		importPath = paths.New(importDir)
 	} else {
-		importPath = paths.New(req.GetImportFile()).Parent()
-		importFile = paths.New(req.GetImportFile()).Base()
+		// TODO: Create a function to obtain importPath from sketch
+		importPath = sketch.FullPath
+		// Add FQBN (without configs part) to export path
+		fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
+		importPath = importPath.Join("build").Join(fqbnSuffix)
 	}
 
-	outputTmpFile, ok := uploadProperties.GetOk("recipe.output.tmp_file")
-	outputTmpFile = uploadProperties.ExpandPropsInString(outputTmpFile)
-	if !ok {
-		return nil, fmt.Errorf("property 'recipe.output.tmp_file' not defined")
+	if !importPath.Exist() {
+		return nil, fmt.Errorf("compiled sketch not found in %s", importPath)
 	}
-	ext := filepath.Ext(outputTmpFile)
-	if strings.HasSuffix(importFile, ext) {
-		importFile = importFile[:len(importFile)-len(ext)]
+	if !importPath.IsDir() {
+		return nil, fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
 	}
-
 	uploadProperties.SetPath("build.path", importPath)
-	uploadProperties.Set("build.project_name", importFile)
-	uploadFile := importPath.Join(importFile + ext)
-	if _, err := uploadFile.Stat(); err != nil {
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("compiled sketch %s not found", uploadFile.String())
-		}
-		return nil, fmt.Errorf("cannot open sketch: %s", err)
-	}
+	uploadProperties.Set("build.project_name", sketch.Name+".ino")
 
 	// Perform reset via 1200bps touch if requested
 	if uploadProperties.GetBoolean("upload.use_1200bps_touch") {
