@@ -661,6 +661,7 @@ type ArduinoCoreClient interface {
 	PlatformUninstall(ctx context.Context, in *PlatformUninstallReq, opts ...grpc.CallOption) (ArduinoCore_PlatformUninstallClient, error)
 	// Upgrade an installed platform to the latest version.
 	PlatformUpgrade(ctx context.Context, in *PlatformUpgradeReq, opts ...grpc.CallOption) (ArduinoCore_PlatformUpgradeClient, error)
+	// Upload a compiled sketch to an Arduino board.
 	Upload(ctx context.Context, in *UploadReq, opts ...grpc.CallOption) (ArduinoCore_UploadClient, error)
 	// Search for a platform in the platforms indexes.
 	PlatformSearch(ctx context.Context, in *PlatformSearchReq, opts ...grpc.CallOption) (*PlatformSearchResp, error)
@@ -1264,6 +1265,7 @@ type ArduinoCoreServer interface {
 	PlatformUninstall(*PlatformUninstallReq, ArduinoCore_PlatformUninstallServer) error
 	// Upgrade an installed platform to the latest version.
 	PlatformUpgrade(*PlatformUpgradeReq, ArduinoCore_PlatformUpgradeServer) error
+	// Upload a compiled sketch to an Arduino board.
 	Upload(*UploadReq, ArduinoCore_UploadServer) error
 	// Search for a platform in the platforms indexes.
 	PlatformSearch(context.Context, *PlatformSearchReq) (*PlatformSearchResp, error)

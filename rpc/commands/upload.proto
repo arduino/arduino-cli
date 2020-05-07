@@ -22,17 +22,32 @@ option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 import "commands/common.proto";
 
 message UploadReq {
+	// Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
+	// Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+	// If this field is not defined, the FQBN of the board attached to the sketch
+	// via the `BoardAttach` method is used.
     string fqbn = 2;
+	// Path where the sketch to be uploaded is stored. Unless the `import_file`
+	// field is defined, the compiled binary is assumed to be at the location and
+	// filename under this path where it is saved by the `Compile` method.
     string sketch_path = 3;
+	// The port of the board.
 	string port = 4;
+	// Whether to turn on verbose output during the upload.
 	bool verbose = 5;
+	// After upload, verify that the contents of the memory on the board match the
+	// uploaded binary.
 	bool verify = 6;
-	string import_file = 7 [deprecated = true]; // DEPRECTAED: Use import_dir instead
+	string import_file = 7 [deprecated = true]; // DEPRECATED: Use import_dir instead
+	// Custom path to a directory containing compiled files. When `import_dir` is
+	// not specified, the standard build directory under `sketch_path` is used.
 	string import_dir = 8;
 }
 
 message UploadResp {
+	// The output of the upload process.
 	bytes out_stream = 1;
+	// The error output of the upload process.
 	bytes err_stream = 2;
 }

@@ -21,17 +21,30 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type UploadReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	Fqbn                 string    `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
-	SketchPath           string    `protobuf:"bytes,3,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
-	Port                 string    `protobuf:"bytes,4,opt,name=port,proto3" json:"port,omitempty"`
-	Verbose              bool      `protobuf:"varint,5,opt,name=verbose,proto3" json:"verbose,omitempty"`
-	Verify               bool      `protobuf:"varint,6,opt,name=verify,proto3" json:"verify,omitempty"`
-	ImportFile           string    `protobuf:"bytes,7,opt,name=import_file,json=importFile,proto3" json:"import_file,omitempty"` // Deprecated: Do not use.
-	ImportDir            string    `protobuf:"bytes,8,opt,name=import_dir,json=importDir,proto3" json:"import_dir,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+	// If this field is not defined, the FQBN of the board attached to the sketch
+	// via the `BoardAttach` method is used.
+	Fqbn string `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
+	// Path where the sketch to be uploaded is stored. Unless the `import_file`
+	// field is defined, the compiled binary is assumed to be at the location and
+	// filename under this path where it is saved by the `Compile` method.
+	SketchPath string `protobuf:"bytes,3,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
+	// The port of the board.
+	Port string `protobuf:"bytes,4,opt,name=port,proto3" json:"port,omitempty"`
+	// Whether to turn on verbose output during the upload.
+	Verbose bool `protobuf:"varint,5,opt,name=verbose,proto3" json:"verbose,omitempty"`
+	// After upload, verify that the contents of the memory on the board match the
+	// uploaded binary.
+	Verify     bool   `protobuf:"varint,6,opt,name=verify,proto3" json:"verify,omitempty"`
+	ImportFile string `protobuf:"bytes,7,opt,name=import_file,json=importFile,proto3" json:"import_file,omitempty"` // Deprecated: Do not use.
+	// Custom path to a directory containing compiled files. When `import_dir` is
+	// not specified, the standard build directory under `sketch_path` is used.
+	ImportDir            string   `protobuf:"bytes,8,opt,name=import_dir,json=importDir,proto3" json:"import_dir,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *UploadReq) Reset()         { *m = UploadReq{} }
@@ -117,7 +130,9 @@ func (m *UploadReq) GetImportDir() string {
 }
 
 type UploadResp struct {
-	OutStream            []byte   `protobuf:"bytes,1,opt,name=out_stream,json=outStream,proto3" json:"out_stream,omitempty"`
+	// The output of the upload process.
+	OutStream []byte `protobuf:"bytes,1,opt,name=out_stream,json=outStream,proto3" json:"out_stream,omitempty"`
+	// The error output of the upload process.
 	ErrStream            []byte   `protobuf:"bytes,2,opt,name=err_stream,json=errStream,proto3" json:"err_stream,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

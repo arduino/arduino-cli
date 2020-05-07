@@ -81,6 +81,7 @@ service ArduinoCore {
   // Upgrade an installed platform to the latest version.
   rpc PlatformUpgrade(PlatformUpgradeReq) returns (stream PlatformUpgradeResp);
 
+  // Upload a compiled sketch to an Arduino board.
   rpc Upload(UploadReq) returns (stream UploadResp);
 
   // Search for a platform in the platforms indexes.
