@@ -38,8 +38,7 @@ message BoardDetailsResp {
     BoardPlatform platform = 9;
     repeated ToolsDependencies toolsDependencies = 10;
     repeated ConfigOption config_options = 11;
-    repeated Tool _tools = 12;
-    repeated IdentificationPref identification_pref = 13;
+    repeated IdentificationPref identification_pref = 12;
 }
 
 message IdentificationPref {
@@ -101,12 +100,6 @@ message ConfigValue {
     string value = 1;
     string value_label = 2;
     bool selected = 3;
-}
-
-message Tool {
-    string name = 1;
-    string version = 2;
-    string packager = 3;
 }
 
 message BoardAttachReq {
