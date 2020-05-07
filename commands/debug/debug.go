@@ -115,6 +115,10 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 
 // getCommandLine compose a debug command represented by a core recipe
 func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) ([]string, error) {
+	if req.GetImportFile() != "" {
+		return nil, errors.New("the ImportFile parameter has been deprecated, use ImportDir instead")
+	}
+
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
 	if req.GetSketchPath() == "" {
@@ -185,40 +189,24 @@ func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) 
 		}
 	}
 
-	// Set path to compiled binary
-	// Make the filename without the FQBN configs part
-	fqbn.Configs = properties.NewMap()
-	fqbnSuffix := strings.Replace(fqbn.String(), ":", ".", -1)
-
 	var importPath *paths.Path
-	var importFile string
-	if req.GetImportFile() == "" {
-		importPath = sketch.FullPath
-		importFile = sketch.Name + "." + fqbnSuffix
+	if importDir := req.GetImportDir(); importDir != "" {
+		importPath = paths.New(importDir)
 	} else {
-		importPath = paths.New(req.GetImportFile()).Parent()
-		importFile = paths.New(req.GetImportFile()).Base()
+		// TODO: Create a function to obtain importPath from sketch
+		importPath = sketch.FullPath
+		// Add FQBN (without configs part) to export path
+		fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
+		importPath = importPath.Join("build").Join(fqbnSuffix)
 	}
-
-	outputTmpFile, ok := toolProperties.GetOk("recipe.output.tmp_file")
-	outputTmpFile = toolProperties.ExpandPropsInString(outputTmpFile)
-	if !ok {
-		return nil, fmt.Errorf("property 'recipe.output.tmp_file' not defined")
+	if !importPath.Exist() {
+		return nil, fmt.Errorf("compiled sketch not found in %s", importPath)
 	}
-	ext := filepath.Ext(outputTmpFile)
-	if strings.HasSuffix(importFile, ext) {
-		importFile = importFile[:len(importFile)-len(ext)]
+	if !importPath.IsDir() {
+		return nil, fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
 	}
-
 	toolProperties.SetPath("build.path", importPath)
-	toolProperties.Set("build.project_name", importFile)
-	uploadFile := importPath.Join(importFile + ext)
-	if _, err := uploadFile.Stat(); err != nil {
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("compiled sketch %s not found", uploadFile.String())
-		}
-		return nil, errors.Wrap(err, "cannot open sketch")
-	}
+	toolProperties.Set("build.project_name", sketch.Name+".ino")
 
 	// Set debug port property
 	port := req.GetPort()
