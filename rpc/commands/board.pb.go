@@ -21,11 +21,14 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type BoardDetailsReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	Fqbn                 string    `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// The fully qualified board name of the board you want information about
+	// (e.g., `arduino:avr:uno`).
+	Fqbn                 string   `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *BoardDetailsReq) Reset()         { *m = BoardDetailsReq{} }
@@ -68,17 +71,30 @@ func (m *BoardDetailsReq) GetFqbn() string {
 }
 
 type BoardDetailsResp struct {
-	Fqbn                 string                `protobuf:"bytes,1,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
-	Name                 string                `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string                `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
-	PropertiesId         string                `protobuf:"bytes,4,opt,name=propertiesId,proto3" json:"propertiesId,omitempty"`
-	Alias                string                `protobuf:"bytes,5,opt,name=alias,proto3" json:"alias,omitempty"`
-	Official             bool                  `protobuf:"varint,6,opt,name=official,proto3" json:"official,omitempty"`
-	Pinout               string                `protobuf:"bytes,7,opt,name=pinout,proto3" json:"pinout,omitempty"`
-	Package              *Package              `protobuf:"bytes,8,opt,name=package,proto3" json:"package,omitempty"`
-	Platform             *BoardPlatform        `protobuf:"bytes,9,opt,name=platform,proto3" json:"platform,omitempty"`
-	ToolsDependencies    []*ToolsDependencies  `protobuf:"bytes,10,rep,name=toolsDependencies,proto3" json:"toolsDependencies,omitempty"`
-	ConfigOptions        []*ConfigOption       `protobuf:"bytes,11,rep,name=config_options,json=configOptions,proto3" json:"config_options,omitempty"`
+	// The fully qualified board name of the board.
+	Fqbn string `protobuf:"bytes,1,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
+	// Name used to identify the board to humans (e.g., Arduino/Genuino Uno).
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Installed version of the board's platform.
+	Version string `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	// The board ID component of the FQBN (e.g., `uno`).
+	PropertiesId string `protobuf:"bytes,4,opt,name=propertiesId,proto3" json:"propertiesId,omitempty"`
+	// Board alias that can be used as a more user friendly alternative to the
+	// FQBN.
+	Alias string `protobuf:"bytes,5,opt,name=alias,proto3" json:"alias,omitempty"`
+	// Whether this is an official or 3rd party board.
+	Official bool `protobuf:"varint,6,opt,name=official,proto3" json:"official,omitempty"`
+	// URL of the board's pinout documentation.
+	Pinout string `protobuf:"bytes,7,opt,name=pinout,proto3" json:"pinout,omitempty"`
+	// Data about the package that contains the board's platform.
+	Package *Package `protobuf:"bytes,8,opt,name=package,proto3" json:"package,omitempty"`
+	// Data about the board's platform.
+	Platform *BoardPlatform `protobuf:"bytes,9,opt,name=platform,proto3" json:"platform,omitempty"`
+	// Tool dependencies of the board.
+	ToolsDependencies []*ToolsDependencies `protobuf:"bytes,10,rep,name=toolsDependencies,proto3" json:"toolsDependencies,omitempty"`
+	// The board's custom configuration options.
+	ConfigOptions []*ConfigOption `protobuf:"bytes,11,rep,name=config_options,json=configOptions,proto3" json:"config_options,omitempty"`
+	// Identifying information for the board (e.g., USB VID/PID).
 	IdentificationPref   []*IdentificationPref `protobuf:"bytes,12,rep,name=identification_pref,json=identificationPref,proto3" json:"identification_pref,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
 	XXX_unrecognized     []byte                `json:"-"`
@@ -195,6 +211,7 @@ func (m *BoardDetailsResp) GetIdentificationPref() []*IdentificationPref {
 }
 
 type IdentificationPref struct {
+	// Identifying information for USB-connected boards.
 	UsbID                *USBID   `protobuf:"bytes,1,opt,name=usbID,proto3" json:"usbID,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -234,7 +251,9 @@ func (m *IdentificationPref) GetUsbID() *USBID {
 }
 
 type USBID struct {
-	VID                  string   `protobuf:"bytes,1,opt,name=VID,proto3" json:"VID,omitempty"`
+	// USB vendor ID.
+	VID string `protobuf:"bytes,1,opt,name=VID,proto3" json:"VID,omitempty"`
+	// USB product ID.
 	PID                  string   `protobuf:"bytes,2,opt,name=PID,proto3" json:"PID,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -281,11 +300,18 @@ func (m *USBID) GetPID() string {
 }
 
 type Package struct {
-	Maintainer           string   `protobuf:"bytes,1,opt,name=maintainer,proto3" json:"maintainer,omitempty"`
-	Url                  string   `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
-	WebsiteURL           string   `protobuf:"bytes,3,opt,name=websiteURL,proto3" json:"websiteURL,omitempty"`
-	Email                string   `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
-	Name                 string   `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
+	// Maintainer of the package.
+	Maintainer string `protobuf:"bytes,1,opt,name=maintainer,proto3" json:"maintainer,omitempty"`
+	// The URL of the platforms index file
+	// (e.g., https://downloads.arduino.cc/packages/package_index.json).
+	Url string `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	// A URL provided by the package author, intended to point to their website.
+	WebsiteURL string `protobuf:"bytes,3,opt,name=websiteURL,proto3" json:"websiteURL,omitempty"`
+	// Email address of the package maintainer.
+	Email string `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	// Package vendor name.
+	Name string `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
+	// Resources for getting help about using the package.
 	Help                 *Help    `protobuf:"bytes,6,opt,name=help,proto3" json:"help,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -360,6 +386,7 @@ func (m *Package) GetHelp() *Help {
 }
 
 type Help struct {
+	// URL for getting online help.
 	Online               string   `protobuf:"bytes,1,opt,name=online,proto3" json:"online,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -399,12 +426,19 @@ func (m *Help) GetOnline() string {
 }
 
 type BoardPlatform struct {
-	Architecture         string   `protobuf:"bytes,1,opt,name=architecture,proto3" json:"architecture,omitempty"`
-	Category             string   `protobuf:"bytes,2,opt,name=category,proto3" json:"category,omitempty"`
-	Url                  string   `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
-	ArchiveFileName      string   `protobuf:"bytes,4,opt,name=archiveFileName,proto3" json:"archiveFileName,omitempty"`
-	Checksum             string   `protobuf:"bytes,5,opt,name=checksum,proto3" json:"checksum,omitempty"`
-	Size                 int64    `protobuf:"varint,6,opt,name=size,proto3" json:"size,omitempty"`
+	// Architecture of the platform (e.g., `avr`).
+	Architecture string `protobuf:"bytes,1,opt,name=architecture,proto3" json:"architecture,omitempty"`
+	// Category of the platform. Set to `Contributed` for 3rd party platforms.
+	Category string `protobuf:"bytes,2,opt,name=category,proto3" json:"category,omitempty"`
+	// Download URL of the platform archive file.
+	Url string `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
+	// File name of the platform archive.
+	ArchiveFileName string `protobuf:"bytes,4,opt,name=archiveFileName,proto3" json:"archiveFileName,omitempty"`
+	// Checksum of the platform archive.
+	Checksum string `protobuf:"bytes,5,opt,name=checksum,proto3" json:"checksum,omitempty"`
+	// File size of the platform archive.
+	Size int64 `protobuf:"varint,6,opt,name=size,proto3" json:"size,omitempty"`
+	// Name used to identify the platform to humans.
 	Name                 string   `protobuf:"bytes,7,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -486,9 +520,13 @@ func (m *BoardPlatform) GetName() string {
 }
 
 type ToolsDependencies struct {
-	Packager             string     `protobuf:"bytes,1,opt,name=packager,proto3" json:"packager,omitempty"`
-	Name                 string     `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string     `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	// Vendor name of the package containing the tool definition.
+	Packager string `protobuf:"bytes,1,opt,name=packager,proto3" json:"packager,omitempty"`
+	// Tool name.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Tool version.
+	Version string `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	// Data for the operating system-specific builds of the tool.
 	Systems              []*Systems `protobuf:"bytes,4,rep,name=systems,proto3" json:"systems,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_unrecognized     []byte     `json:"-"`
@@ -549,10 +587,15 @@ func (m *ToolsDependencies) GetSystems() []*Systems {
 }
 
 type Systems struct {
-	Checksum             string   `protobuf:"bytes,1,opt,name=checksum,proto3" json:"checksum,omitempty"`
-	Host                 string   `protobuf:"bytes,2,opt,name=host,proto3" json:"host,omitempty"`
-	ArchiveFileName      string   `protobuf:"bytes,3,opt,name=archiveFileName,proto3" json:"archiveFileName,omitempty"`
-	Url                  string   `protobuf:"bytes,4,opt,name=url,proto3" json:"url,omitempty"`
+	// Checksum of the tool archive.
+	Checksum string `protobuf:"bytes,1,opt,name=checksum,proto3" json:"checksum,omitempty"`
+	// Operating system identifier.
+	Host string `protobuf:"bytes,2,opt,name=host,proto3" json:"host,omitempty"`
+	// File name of the tool archive.
+	ArchiveFileName string `protobuf:"bytes,3,opt,name=archiveFileName,proto3" json:"archiveFileName,omitempty"`
+	// Download URL of the tool archive.
+	Url string `protobuf:"bytes,4,opt,name=url,proto3" json:"url,omitempty"`
+	// File size of the tool archive.
 	Size                 int64    `protobuf:"varint,5,opt,name=size,proto3" json:"size,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -620,8 +663,11 @@ func (m *Systems) GetSize() int64 {
 }
 
 type ConfigOption struct {
-	Option               string         `protobuf:"bytes,1,opt,name=option,proto3" json:"option,omitempty"`
-	OptionLabel          string         `protobuf:"bytes,2,opt,name=option_label,json=optionLabel,proto3" json:"option_label,omitempty"`
+	// ID of the configuration option. For identifying the option to machines.
+	Option string `protobuf:"bytes,1,opt,name=option,proto3" json:"option,omitempty"`
+	// Name of the configuration option for identifying the option to humans.
+	OptionLabel string `protobuf:"bytes,2,opt,name=option_label,json=optionLabel,proto3" json:"option_label,omitempty"`
+	// Possible values of the configuration option.
 	Values               []*ConfigValue `protobuf:"bytes,3,rep,name=values,proto3" json:"values,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_unrecognized     []byte         `json:"-"`
@@ -675,8 +721,11 @@ func (m *ConfigOption) GetValues() []*ConfigValue {
 }
 
 type ConfigValue struct {
-	Value                string   `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
-	ValueLabel           string   `protobuf:"bytes,2,opt,name=value_label,json=valueLabel,proto3" json:"value_label,omitempty"`
+	// The configuration option value.
+	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	// Label to identify the configuration option to humans.
+	ValueLabel string `protobuf:"bytes,2,opt,name=value_label,json=valueLabel,proto3" json:"value_label,omitempty"`
+	// Whether the configuration option is selected.
 	Selected             bool     `protobuf:"varint,3,opt,name=selected,proto3" json:"selected,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -730,13 +779,19 @@ func (m *ConfigValue) GetSelected() bool {
 }
 
 type BoardAttachReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	BoardUri             string    `protobuf:"bytes,2,opt,name=board_uri,json=boardUri,proto3" json:"board_uri,omitempty"`
-	SketchPath           string    `protobuf:"bytes,3,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
-	SearchTimeout        string    `protobuf:"bytes,4,opt,name=search_timeout,json=searchTimeout,proto3" json:"search_timeout,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// The board's URI (e.g., /dev/ttyACM0).
+	BoardUri string `protobuf:"bytes,2,opt,name=board_uri,json=boardUri,proto3" json:"board_uri,omitempty"`
+	// Path of the sketch to attach the board to. The board attachment
+	// metadata will be saved to `{sketch_path}/sketch.json`.
+	SketchPath string `protobuf:"bytes,3,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
+	// Duration in seconds to search the given URI for a connected board before
+	// timing out. The default value is 5 seconds.
+	SearchTimeout        string   `protobuf:"bytes,4,opt,name=search_timeout,json=searchTimeout,proto3" json:"search_timeout,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *BoardAttachReq) Reset()         { *m = BoardAttachReq{} }
@@ -793,6 +848,7 @@ func (m *BoardAttachReq) GetSearchTimeout() string {
 }
 
 type BoardAttachResp struct {
+	// Description of the current stage of the board attachment.
 	TaskProgress         *TaskProgress `protobuf:"bytes,1,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
@@ -832,6 +888,7 @@ func (m *BoardAttachResp) GetTaskProgress() *TaskProgress {
 }
 
 type BoardListReq struct {
+	// Arduino Core Service instance from the `Init` response.
 	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
@@ -871,6 +928,7 @@ func (m *BoardListReq) GetInstance() *Instance {
 }
 
 type BoardListResp struct {
+	// List of ports and the boards detected on those ports.
 	Ports                []*DetectedPort `protobuf:"bytes,1,rep,name=ports,proto3" json:"ports,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
@@ -910,9 +968,13 @@ func (m *BoardListResp) GetPorts() []*DetectedPort {
 }
 
 type DetectedPort struct {
-	Address              string           `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	Protocol             string           `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"`
-	ProtocolLabel        string           `protobuf:"bytes,3,opt,name=protocol_label,json=protocolLabel,proto3" json:"protocol_label,omitempty"`
+	// Address of the port (e.g., `serial:///dev/ttyACM0`).
+	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	// Protocol of the port (e.g., `serial`).
+	Protocol string `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"`
+	// A human friendly description of the protocol (e.g., "Serial Port (USB)").
+	ProtocolLabel string `protobuf:"bytes,3,opt,name=protocol_label,json=protocolLabel,proto3" json:"protocol_label,omitempty"`
+	// The boards attached to the port.
 	Boards               []*BoardListItem `protobuf:"bytes,4,rep,name=boards,proto3" json:"boards,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
@@ -973,11 +1035,13 @@ func (m *DetectedPort) GetBoards() []*BoardListItem {
 }
 
 type BoardListAllReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	SearchArgs           []string  `protobuf:"bytes,2,rep,name=search_args,json=searchArgs,proto3" json:"search_args,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// The search query to filter the board list by.
+	SearchArgs           []string `protobuf:"bytes,2,rep,name=search_args,json=searchArgs,proto3" json:"search_args,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *BoardListAllReq) Reset()         { *m = BoardListAllReq{} }
@@ -1020,6 +1084,7 @@ func (m *BoardListAllReq) GetSearchArgs() []string {
 }
 
 type BoardListAllResp struct {
+	// List of installed boards.
 	Boards               []*BoardListItem `protobuf:"bytes,1,rep,name=boards,proto3" json:"boards,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
@@ -1059,7 +1124,9 @@ func (m *BoardListAllResp) GetBoards() []*BoardListItem {
 }
 
 type BoardListItem struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The name for use when identifying the board to a human.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The fully qualified board name. Used to identify the board to a machine.
 	FQBN                 string   `protobuf:"bytes,2,opt,name=FQBN,proto3" json:"FQBN,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
