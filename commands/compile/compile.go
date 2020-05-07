@@ -211,11 +211,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		var exportPath *paths.Path
 		var exportFile string
 		if req.GetExportFile() == "" {
-			if sketch.FullPath.IsDir() {
-				exportPath = sketch.FullPath
-			} else {
-				exportPath = sketch.FullPath.Parent()
-			}
+			exportPath = sketch.FullPath
 			exportFile = sketch.Name + "." + fqbnSuffix // "sketch.arduino.avr.uno"
 		} else {
 			exportPath = paths.New(req.GetExportFile()).Parent()

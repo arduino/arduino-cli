@@ -43,6 +43,9 @@ type BoardMetadata struct {
 
 // NewSketchFromPath loads a sketch from the specified path
 func NewSketchFromPath(path *paths.Path) (*Sketch, error) {
+	if !path.IsDir() {
+		path = path.Parent()
+	}
 	sketch := &Sketch{
 		FullPath: path,
 		Name:     path.Base(),
