@@ -160,8 +160,8 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 				}
 			}
 
-			currLDFlags := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS)
-			ctx.BuildProperties.Set(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS, currLDFlags+"\"-L"+precompiledPath.String()+"\" "+libsCmd+" ")
+			currLDFlags := ctx.BuildProperties.Get("compiler.libraries.ldflags")
+			ctx.BuildProperties.Set("compiler.libraries.ldflags", currLDFlags+"\"-L"+precompiledPath.String()+"\" "+libsCmd+" ")
 
 			// TODO: This codepath is just taken for .a with unusual names that would
 			// be ignored by -L / -l methods.
