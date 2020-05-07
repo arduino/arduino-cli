@@ -180,7 +180,7 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
 
 
 @pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
-def test_compile_and_compile_combo(run_command, data_dir, detected_boards):
+def test_compile_and_upload_combo(run_command, data_dir, detected_boards):
     # Init the environment explicitly
     result = run_command("core update-index")
     assert result.ok
@@ -193,6 +193,7 @@ def test_compile_and_compile_combo(run_command, data_dir, detected_boards):
     # Create a test sketch
     sketch_name = "CompileAndUploadIntegrationTest"
     sketch_path = os.path.join(data_dir, sketch_name)
+    sketch_main_file = os.path.join(sketch_path, sketch_name+".ino")
     result = run_command("sketch new {}".format(sketch_path))
     assert result.ok
     assert "Sketch created in: {}".format(sketch_path) in result.stdout
@@ -204,35 +205,41 @@ def test_compile_and_compile_combo(run_command, data_dir, detected_boards):
         command_log_flags = "--log-format json --log-file {} --log-level trace".format(
             log_file_path
         )
-        result = run_command(
-            "compile -b {fqbn} --upload -p {address} {sketch_path} {log_flags}".format(
-                fqbn=board.fqbn,
-                address=board.address,
-                sketch_path=sketch_path,
-                log_flags=command_log_flags,
+
+        def run_test(s):
+            result = run_command(
+                "compile -b {fqbn} --upload -p {address} {sketch_path} {log_flags}".format(
+                    fqbn=board.fqbn,
+                    address=board.address,
+                    sketch_path=s,
+                    log_flags=command_log_flags,
+                )
             )
-        )
-        assert result.ok
-        # check from the logs if the bin file were uploaded on the current board
-        log_json = open(log_file_path, "r")
-        json_log_lines = log_json.readlines()
-        expected_trace_sequence = [
-            "Compile {sketch} for {fqbn} started".format(
-                sketch=sketch_path, fqbn=board.fqbn
-            ),
-            "Compile {sketch} for {fqbn} successful".format(
-                sketch=sketch_name, fqbn=board.fqbn
-            ),
-            "Upload {sketch} on {fqbn} started".format(
-                sketch=sketch_path, fqbn=board.fqbn
-            ),
-            "Upload {sketch} on {fqbn} successful".format(
-                sketch=sketch_name, fqbn=board.fqbn
-            ),
-        ]
-        assert is_message_sequence_in_json_log_traces(
-            expected_trace_sequence, json_log_lines
-        )
+            assert result.ok
+
+            # check from the logs if the bin file were uploaded on the current board
+            log_json = open(log_file_path, "r")
+            json_log_lines = log_json.readlines()
+            expected_trace_sequence = [
+                "Compile {sketch} for {fqbn} started".format(
+                    sketch=sketch_path, fqbn=board.fqbn
+                ),
+                "Compile {sketch} for {fqbn} successful".format(
+                    sketch=sketch_name, fqbn=board.fqbn
+                ),
+                "Upload {sketch} on {fqbn} started".format(
+                    sketch=sketch_path, fqbn=board.fqbn
+                ),
+                "Upload {sketch} on {fqbn} successful".format(
+                    sketch=sketch_name, fqbn=board.fqbn
+                ),
+            ]
+            assert is_message_sequence_in_json_log_traces(
+                expected_trace_sequence, json_log_lines
+            )
+
+        run_test(sketch_path)
+        run_test(sketch_main_file)
 
 
 def is_message_sequence_in_json_log_traces(message_sequence, log_json_lines):
