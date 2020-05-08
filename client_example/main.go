@@ -445,7 +445,7 @@ func callBoardsDetails(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 	}
 
 	log.Printf("Board details for %s", details.GetName())
-	log.Printf("Required tools: %s", details.GetRequiredTools())
+	log.Printf("Required tools: %s", details.GetToolsDependencies())
 	log.Printf("Config options: %s", details.GetConfigOptions())
 }
 
