@@ -17,7 +17,6 @@ package phases
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
@@ -30,8 +29,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-var PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC = map[string]bool{".a": true}
-var PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_DYNAMIC = map[string]bool{".so": true}
 var FLOAT_ABI_CFLAG = "float-abi"
 var FPU_CFLAG = "fpu"
 
@@ -53,10 +50,6 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	}
 
 	ctx.LibrariesObjectFiles = objectFiles
-
-	// Search for precompiled libraries
-	fixLDFLAGforPrecompiledLibraries(ctx, libs)
-
 	return nil
 }
 
@@ -87,58 +80,25 @@ func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Lib
 	}
 
 	logger := ctx.GetLogger()
+	logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Library {0} has been declared precompiled:", library.Name)
+
+	// Try directory with full fpuSpecs first, if available
 	if len(fpuSpecs) > 0 {
 		fpuSpecs = strings.TrimRight(fpuSpecs, "-")
-		if library.SourceDir.Join(mcu).Join(fpuSpecs).Exist() {
-			return library.SourceDir.Join(mcu).Join(fpuSpecs)
-		} else {
-			// we are unsure, compile from sources
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO,
-				constants.MSG_PRECOMPILED_LIBRARY_NOT_FOUND_FOR, library.Name, library.SourceDir.Join(mcu).Join(fpuSpecs))
-			return nil
+		fullPrecompDir := library.SourceDir.Join(mcu).Join(fpuSpecs)
+		if fullPrecompDir.Exist() {
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Using precompiled library in {0}", fullPrecompDir)
+			return fullPrecompDir
 		}
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Precompiled library in \"{0}\" not found", fullPrecompDir)
 	}
 
-	if library.SourceDir.Join(mcu).Exist() {
-		return library.SourceDir.Join(mcu)
+	precompDir := library.SourceDir.Join(mcu)
+	if precompDir.Exist() {
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Using precompiled library in {0}", precompDir)
+		return precompDir
 	}
-
-	logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO,
-		constants.MSG_PRECOMPILED_LIBRARY_NOT_FOUND_FOR, library.Name, library.SourceDir.Join(mcu))
-
-	return nil
-}
-
-func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libs libraries.List) error {
-
-	for _, library := range libs {
-		if library.Precompiled {
-			// add library src path to compiler.c.elf.extra_flags
-			// use library.Name as lib name and srcPath/{mcpu} as location
-			path := findExpectedPrecompiledLibFolder(ctx, library)
-			if path == nil {
-				break
-			}
-			// find all library names in the folder and prepend -l
-			filePaths := []string{}
-			libs_cmd := library.LDflags + " "
-			extensions := func(ext string) bool {
-				return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_DYNAMIC[ext] || PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext]
-			}
-			utils.FindFilesInFolder(&filePaths, path.String(), extensions, false)
-			for _, lib := range filePaths {
-				name := strings.TrimSuffix(filepath.Base(lib), filepath.Ext(lib))
-				// strip "lib" first occurrence
-				if strings.HasPrefix(name, "lib") {
-					name = strings.Replace(name, "lib", "", 1)
-					libs_cmd += "-l" + name + " "
-				}
-			}
-
-			currLDFlags := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS)
-			ctx.BuildProperties.Set(constants.BUILD_PROPERTIES_COMPILER_LIBRARIES_LDFLAGS, currLDFlags+"\"-L"+path.String()+"\" "+libs_cmd+" ")
-		}
-	}
+	logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Precompiled library in \"{0}\" not found", precompDir)
 	return nil
 }
 
@@ -175,25 +135,48 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 	objectFiles := paths.NewPathList()
 
 	if library.Precompiled {
-		// search for files with PRECOMPILED_LIBRARIES_VALID_EXTENSIONS
-		extensions := func(ext string) bool { return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext] }
-
-		filePaths := []string{}
+		coreSupportPrecompiled := ctx.BuildProperties.ContainsKey("compiler.libraries.ldflags")
 		precompiledPath := findExpectedPrecompiledLibFolder(ctx, library)
-		if precompiledPath != nil {
-			// TODO: This codepath is just taken for .a with unusual names that would
-			// be ignored by -L / -l methods.
-			// Should we force precompiled libraries to start with "lib" ?
-			err := utils.FindFilesInFolder(&filePaths, precompiledPath.String(), extensions, false)
+
+		if !coreSupportPrecompiled {
+			logger := ctx.GetLogger()
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "The plaform does not support 'compiler.libraries.ldflags' for precompiled libraries.")
+
+		} else if precompiledPath != nil {
+			// Find all libraries in precompiledPath
+			libs, err := precompiledPath.ReadDir()
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}
-			for _, path := range filePaths {
-				if !strings.HasPrefix(filepath.Base(path), "lib") {
-					objectFiles.Add(paths.New(path))
+
+			// Add required LD flags
+			libsCmd := library.LDflags + " "
+			dynAndStaticLibs := libs.Clone()
+			dynAndStaticLibs.FilterSuffix(".a", ".so")
+			for _, lib := range dynAndStaticLibs {
+				name := strings.TrimSuffix(lib.Base(), lib.Ext())
+				if strings.HasPrefix(name, "lib") {
+					libsCmd += "-l" + name[3:] + " "
 				}
 			}
-			return objectFiles, nil
+
+			currLDFlags := ctx.BuildProperties.Get("compiler.libraries.ldflags")
+			ctx.BuildProperties.Set("compiler.libraries.ldflags", currLDFlags+" \"-L"+precompiledPath.String()+"\" "+libsCmd+" ")
+
+			// TODO: This codepath is just taken for .a with unusual names that would
+			// be ignored by -L / -l methods.
+			// Should we force precompiled libraries to start with "lib" ?
+			staticLibs := libs.Clone()
+			staticLibs.FilterSuffix(".a")
+			for _, lib := range staticLibs {
+				if !strings.HasPrefix(lib.Base(), "lib") {
+					objectFiles.Add(lib)
+				}
+			}
+
+			if library.PrecompiledWithSources {
+				return objectFiles, nil
+			}
 		}
 	}
 

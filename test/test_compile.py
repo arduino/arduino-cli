@@ -281,3 +281,44 @@ def test_compile_blacklisted_sketchname(run_command, data_dir):
         "compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path)
     )
     assert result.ok
+
+
+def test_compile_without_precompiled_libraries(run_command, data_dir):
+    # Init the environment explicitly
+    url = "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json"
+    result = run_command("core update-index --additional-urls={}".format(url))
+    assert result.ok
+    result = run_command("core install arduino:mbed --additional-urls={}".format(url))
+    assert result.ok
+    result = run_command("core install arduino:samd --additional-urls={}".format(url))
+    assert result.ok
+    result = run_command("core install adafruit:samd --additional-urls={}".format(url))
+    assert result.ok
+
+    # Install pre-release version of Arduino_TensorFlowLite (will be officially released
+    # via lib manager after https://github.com/arduino/arduino-builder/issues/353 is in)
+    import zipfile
+    with zipfile.ZipFile("test/testdata/Arduino_TensorFlowLite.zip", 'r') as zip_ref:
+        zip_ref.extractall("{}/libraries/".format(data_dir))
+    result = run_command("lib install Arduino_LSM9DS1@1.1.0")
+    assert result.ok
+    result = run_command("compile -b arduino:mbed:nano33ble {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir))
+    assert result.ok
+    result = run_command("compile -b adafruit:samd:adafruit_feather_m4 {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir))
+    assert result.ok
+
+    # Non-precompiled version of Arduino_TensorflowLite
+    result = run_command("lib install Arduino_TensorflowLite@1.15.0-ALPHA")
+    assert result.ok
+    result = run_command("compile -b arduino:mbed:nano33ble {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir))
+    assert result.ok
+    result = run_command("compile -b adafruit:samd:adafruit_feather_m4 {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir))
+    assert result.ok
+
+    # Bosch sensor library
+    result = run_command("lib install \"BSEC Software Library@1.5.1474\"")
+    assert result.ok
+    result = run_command("compile -b arduino:samd:mkr1000 {}/libraries/BSEC_Software_Library/examples/basic/".format(data_dir))
+    assert result.ok
+    result = run_command("compile -b arduino:mbed:nano33ble {}/libraries/BSEC_Software_Library/examples/basic/".format(data_dir))
+    assert result.ok
