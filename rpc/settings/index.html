@@ -1103,7 +1103,7 @@
 <td>key</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The key of the setting.</td>
 </tr>
 </tbody>
 </table>
@@ -1125,7 +1125,7 @@
 <td>jsonData</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The settings, in JSON format.</td>
 </tr>
 </tbody>
 </table>
@@ -1147,18 +1147,20 @@
 <td>key</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The key of the setting.</td>
 </tr>
 <tr>
 <td>jsonData</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The setting, in JSON format.</td>
 </tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.settings.Settings"></a></p>
 <h3 id="settings">Settings<a class="headerlink" href="#settings" title="Permanent link">&para;</a></h3>
+<p>The Settings service provides an interface to Arduino CLI&#39;s configuration
+options</p>
 <table>
 <thead>
 <tr>
@@ -1173,25 +1175,25 @@
 <td>GetAll</td>
 <td><a href="#cc.arduino.cli.settings.GetAllRequest">GetAllRequest</a></td>
 <td><a href="#cc.arduino.cli.settings.RawData">RawData</a></td>
-<td></td>
+<td>List all the settings.</td>
 </tr>
 <tr>
 <td>Merge</td>
 <td><a href="#cc.arduino.cli.settings.RawData">RawData</a></td>
 <td><a href="#cc.arduino.cli.settings.MergeResponse">MergeResponse</a></td>
-<td></td>
+<td>Set multiple settings values at once.</td>
 </tr>
 <tr>
 <td>GetValue</td>
 <td><a href="#cc.arduino.cli.settings.GetValueRequest">GetValueRequest</a></td>
 <td><a href="#cc.arduino.cli.settings.Value">Value</a></td>
-<td></td>
+<td>Get the value of a specific setting.</td>
 </tr>
 <tr>
 <td>SetValue</td>
 <td><a href="#cc.arduino.cli.settings.Value">Value</a></td>
 <td><a href="#cc.arduino.cli.settings.SetValueResponse">SetValueResponse</a></td>
-<td></td>
+<td>Set the value of a specific setting.</td>
 </tr>
 </tbody>
 </table>
