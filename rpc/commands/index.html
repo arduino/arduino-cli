@@ -3026,7 +3026,7 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>The Arduino Core Service instance to destroy.</td>
 </tr>
 </tbody>
 </table>
@@ -3048,7 +3048,7 @@
 <td>library_manager_only</td>
 <td><a href="#bool">bool</a></td>
 <td></td>
-<td></td>
+<td>Start a Arduino Core Service instance that will provide only Library Manager functionality.</td>
 </tr>
 </tbody>
 </table>
@@ -3068,31 +3068,31 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>An Arduino Core Service instance.</td>
 </tr>
 <tr>
 <td>platforms_index_errors</td>
 <td><a href="#string">string</a></td>
 <td>repeated</td>
-<td></td>
+<td>Error messages related to any problems encountered while parsing the platforms index files.</td>
 </tr>
 <tr>
 <td>libraries_index_error</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Error message if a problem was encountered while parsing the libraries index file.</td>
 </tr>
 <tr>
 <td>download_progress</td>
 <td><a href="#cc.arduino.cli.commands.DownloadProgress">DownloadProgress</a></td>
 <td></td>
-<td></td>
+<td>Progress of the downloads of platforms and libraries index files.</td>
 </tr>
 <tr>
 <td>task_progress</td>
 <td><a href="#cc.arduino.cli.commands.TaskProgress">TaskProgress</a></td>
 <td></td>
-<td></td>
+<td>Describes the current stage of the initialization.</td>
 </tr>
 </tbody>
 </table>
@@ -3112,7 +3112,7 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the Init response.</td>
 </tr>
 </tbody>
 </table>
@@ -3132,13 +3132,13 @@
 <td>platforms_index_errors</td>
 <td><a href="#string">string</a></td>
 <td>repeated</td>
-<td></td>
+<td>Error messages related to any problems encountered while parsing the platforms index file.</td>
 </tr>
 <tr>
 <td>libraries_index_error</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Error message if a problem was encountered while parsing the libraries index file.</td>
 </tr>
 </tbody>
 </table>
@@ -3158,7 +3158,7 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the Init response.</td>
 </tr>
 </tbody>
 </table>
@@ -3178,7 +3178,7 @@
 <td>download_progress</td>
 <td><a href="#cc.arduino.cli.commands.DownloadProgress">DownloadProgress</a></td>
 <td></td>
-<td></td>
+<td>Progress of the platforms index download.</td>
 </tr>
 </tbody>
 </table>
@@ -3198,7 +3198,7 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the Init response.</td>
 </tr>
 </tbody>
 </table>
@@ -3218,7 +3218,7 @@
 <td>download_progress</td>
 <td><a href="#cc.arduino.cli.commands.DownloadProgress">DownloadProgress</a></td>
 <td></td>
-<td></td>
+<td>Progress of the libraries index download.</td>
 </tr>
 </tbody>
 </table>
@@ -3240,7 +3240,7 @@
 <td>version</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The version of Arduino CLI in use.</td>
 </tr>
 </tbody>
 </table>
@@ -3292,7 +3292,7 @@
 <td>Version</td>
 <td><a href="#cc.arduino.cli.commands.VersionReq">VersionReq</a></td>
 <td><a href="#cc.arduino.cli.commands.VersionResp">VersionResp</a></td>
-<td></td>
+<td>Get the version of Arduino CLI in use.</td>
 </tr>
 <tr>
 <td>BoardDetails</td>
@@ -3429,31 +3429,31 @@
 <td>url</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>URL of the download.</td>
 </tr>
 <tr>
 <td>file</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The file being downloaded.</td>
 </tr>
 <tr>
 <td>total_size</td>
 <td><a href="#int64">int64</a></td>
 <td></td>
-<td></td>
+<td>Total size of the file being downloaded.</td>
 </tr>
 <tr>
 <td>downloaded</td>
 <td><a href="#int64">int64</a></td>
 <td></td>
-<td></td>
+<td>Size of the downloaded portion of the file.</td>
 </tr>
 <tr>
 <td>completed</td>
 <td><a href="#bool">bool</a></td>
 <td></td>
-<td></td>
+<td>Whether the download is complete.</td>
 </tr>
 </tbody>
 </table>
@@ -3473,7 +3473,7 @@
 <td>id</td>
 <td><a href="#int32">int32</a></td>
 <td></td>
-<td></td>
+<td>The ID of the instance.</td>
 </tr>
 </tbody>
 </table>
@@ -3493,19 +3493,19 @@
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Description of the task.</td>
 </tr>
 <tr>
 <td>message</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Additional information about the task.</td>
 </tr>
 <tr>
 <td>completed</td>
 <td><a href="#bool">bool</a></td>
 <td></td>
-<td></td>
+<td>Whether the task is complete.</td>
 </tr>
 </tbody>
 </table>
