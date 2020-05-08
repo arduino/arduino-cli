@@ -23,6 +23,8 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type InitReq struct {
+	// Start a Arduino Core Service instance that will provide only Library
+	// Manager functionality.
 	LibraryManagerOnly   bool     `protobuf:"varint,2,opt,name=library_manager_only,json=libraryManagerOnly,proto3" json:"library_manager_only,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -62,14 +64,21 @@ func (m *InitReq) GetLibraryManagerOnly() bool {
 }
 
 type InitResp struct {
-	Instance             *Instance         `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	PlatformsIndexErrors []string          `protobuf:"bytes,2,rep,name=platforms_index_errors,json=platformsIndexErrors,proto3" json:"platforms_index_errors,omitempty"`
-	LibrariesIndexError  string            `protobuf:"bytes,3,opt,name=libraries_index_error,json=librariesIndexError,proto3" json:"libraries_index_error,omitempty"`
-	DownloadProgress     *DownloadProgress `protobuf:"bytes,4,opt,name=download_progress,json=downloadProgress,proto3" json:"download_progress,omitempty"`
-	TaskProgress         *TaskProgress     `protobuf:"bytes,5,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	// An Arduino Core Service instance.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Error messages related to any problems encountered while parsing the
+	// platforms index files.
+	PlatformsIndexErrors []string `protobuf:"bytes,2,rep,name=platforms_index_errors,json=platformsIndexErrors,proto3" json:"platforms_index_errors,omitempty"`
+	// Error message if a problem was encountered while parsing the libraries
+	// index file.
+	LibrariesIndexError string `protobuf:"bytes,3,opt,name=libraries_index_error,json=librariesIndexError,proto3" json:"libraries_index_error,omitempty"`
+	// Progress of the downloads of platforms and libraries index files.
+	DownloadProgress *DownloadProgress `protobuf:"bytes,4,opt,name=download_progress,json=downloadProgress,proto3" json:"download_progress,omitempty"`
+	// Describes the current stage of the initialization.
+	TaskProgress         *TaskProgress `protobuf:"bytes,5,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
 }
 
 func (m *InitResp) Reset()         { *m = InitResp{} }
@@ -133,6 +142,7 @@ func (m *InitResp) GetTaskProgress() *TaskProgress {
 }
 
 type DestroyReq struct {
+	// The Arduino Core Service instance to destroy.
 	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
@@ -203,6 +213,7 @@ func (m *DestroyResp) XXX_DiscardUnknown() {
 var xxx_messageInfo_DestroyResp proto.InternalMessageInfo
 
 type RescanReq struct {
+	// Arduino Core Service instance from the Init response.
 	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
@@ -242,7 +253,11 @@ func (m *RescanReq) GetInstance() *Instance {
 }
 
 type RescanResp struct {
+	// Error messages related to any problems encountered while parsing the
+	// platforms index file.
 	PlatformsIndexErrors []string `protobuf:"bytes,1,rep,name=platforms_index_errors,json=platformsIndexErrors,proto3" json:"platforms_index_errors,omitempty"`
+	// Error message if a problem was encountered while parsing the libraries
+	// index file.
 	LibrariesIndexError  string   `protobuf:"bytes,2,opt,name=libraries_index_error,json=librariesIndexError,proto3" json:"libraries_index_error,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -289,6 +304,7 @@ func (m *RescanResp) GetLibrariesIndexError() string {
 }
 
 type UpdateIndexReq struct {
+	// Arduino Core Service instance from the Init response.
 	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
@@ -328,6 +344,7 @@ func (m *UpdateIndexReq) GetInstance() *Instance {
 }
 
 type UpdateIndexResp struct {
+	// Progress of the platforms index download.
 	DownloadProgress     *DownloadProgress `protobuf:"bytes,1,opt,name=download_progress,json=downloadProgress,proto3" json:"download_progress,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
@@ -367,6 +384,7 @@ func (m *UpdateIndexResp) GetDownloadProgress() *DownloadProgress {
 }
 
 type UpdateLibrariesIndexReq struct {
+	// Arduino Core Service instance from the Init response.
 	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
@@ -406,6 +424,7 @@ func (m *UpdateLibrariesIndexReq) GetInstance() *Instance {
 }
 
 type UpdateLibrariesIndexResp struct {
+	// Progress of the libraries index download.
 	DownloadProgress     *DownloadProgress `protobuf:"bytes,1,opt,name=download_progress,json=downloadProgress,proto3" json:"download_progress,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
@@ -476,6 +495,7 @@ func (m *VersionReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_VersionReq proto.InternalMessageInfo
 
 type VersionResp struct {
+	// The version of Arduino CLI in use.
 	Version              string   `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -617,6 +637,7 @@ type ArduinoCoreClient interface {
 	UpdateIndex(ctx context.Context, in *UpdateIndexReq, opts ...grpc.CallOption) (ArduinoCore_UpdateIndexClient, error)
 	// Update libraries index
 	UpdateLibrariesIndex(ctx context.Context, in *UpdateLibrariesIndexReq, opts ...grpc.CallOption) (ArduinoCore_UpdateLibrariesIndexClient, error)
+	// Get the version of Arduino CLI in use.
 	Version(ctx context.Context, in *VersionReq, opts ...grpc.CallOption) (*VersionResp, error)
 	// Requests details about a board
 	BoardDetails(ctx context.Context, in *BoardDetailsReq, opts ...grpc.CallOption) (*BoardDetailsResp, error)
@@ -1207,6 +1228,7 @@ type ArduinoCoreServer interface {
 	UpdateIndex(*UpdateIndexReq, ArduinoCore_UpdateIndexServer) error
 	// Update libraries index
 	UpdateLibrariesIndex(*UpdateLibrariesIndexReq, ArduinoCore_UpdateLibrariesIndexServer) error
+	// Get the version of Arduino CLI in use.
 	Version(context.Context, *VersionReq) (*VersionResp, error)
 	// Requests details about a board
 	BoardDetails(context.Context, *BoardDetailsReq) (*BoardDetailsResp, error)

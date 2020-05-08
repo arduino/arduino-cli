@@ -19,18 +19,29 @@ package cc.arduino.cli.commands;
 
 option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 
-message Instance { int32 id = 1; }
+message Instance {
+	// The ID of the instance.
+	int32 id = 1;
+}
 
 message DownloadProgress {
+	// URL of the download.
 	string url = 1;
+	// The file being downloaded.
 	string file = 2;
+	// Total size of the file being downloaded.
 	int64 total_size = 3;
+	// Size of the downloaded portion of the file.
 	int64 downloaded = 4;
+	// Whether the download is complete.
 	bool completed = 5;
 }
 
 message TaskProgress {
+    // Description of the task.
     string name = 1;
+    // Additional information about the task.
     string message = 2;
+    // Whether the task is complete.
     bool completed = 3;
 }

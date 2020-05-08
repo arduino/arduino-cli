@@ -21,6 +21,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Instance struct {
+	// The ID of the instance.
 	Id                   int32    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -60,10 +61,15 @@ func (m *Instance) GetId() int32 {
 }
 
 type DownloadProgress struct {
-	Url                  string   `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
-	File                 string   `protobuf:"bytes,2,opt,name=file,proto3" json:"file,omitempty"`
-	TotalSize            int64    `protobuf:"varint,3,opt,name=total_size,json=totalSize,proto3" json:"total_size,omitempty"`
-	Downloaded           int64    `protobuf:"varint,4,opt,name=downloaded,proto3" json:"downloaded,omitempty"`
+	// URL of the download.
+	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	// The file being downloaded.
+	File string `protobuf:"bytes,2,opt,name=file,proto3" json:"file,omitempty"`
+	// Total size of the file being downloaded.
+	TotalSize int64 `protobuf:"varint,3,opt,name=total_size,json=totalSize,proto3" json:"total_size,omitempty"`
+	// Size of the downloaded portion of the file.
+	Downloaded int64 `protobuf:"varint,4,opt,name=downloaded,proto3" json:"downloaded,omitempty"`
+	// Whether the download is complete.
 	Completed            bool     `protobuf:"varint,5,opt,name=completed,proto3" json:"completed,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -131,8 +137,11 @@ func (m *DownloadProgress) GetCompleted() bool {
 }
 
 type TaskProgress struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Message              string   `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	// Description of the task.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Additional information about the task.
+	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	// Whether the task is complete.
 	Completed            bool     `protobuf:"varint,3,opt,name=completed,proto3" json:"completed,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
