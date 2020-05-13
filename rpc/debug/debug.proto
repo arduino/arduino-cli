@@ -53,8 +53,7 @@ message DebugConfigReq {
     string sketch_path = 3;
     string port = 4;
     string interpreter = 5;
-    bool verbose = 6;
-    string import_file = 7;
+    string import_file = 6;
 }
 
 //
