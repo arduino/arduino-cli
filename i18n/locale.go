@@ -1,6 +1,6 @@
 package i18n
 
-//go:generate rice embed-go
+//go:generate ./embed-i18n.sh
 
 import (
 	"sync"
