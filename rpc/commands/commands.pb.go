@@ -645,12 +645,20 @@ type ArduinoCoreClient interface {
 	BoardList(ctx context.Context, in *BoardListReq, opts ...grpc.CallOption) (*BoardListResp, error)
 	BoardListAll(ctx context.Context, in *BoardListAllReq, opts ...grpc.CallOption) (*BoardListAllResp, error)
 	Compile(ctx context.Context, in *CompileReq, opts ...grpc.CallOption) (ArduinoCore_CompileClient, error)
+	// Download and install a platform and its tool dependencies.
 	PlatformInstall(ctx context.Context, in *PlatformInstallReq, opts ...grpc.CallOption) (ArduinoCore_PlatformInstallClient, error)
+	// Download a platform and its tool dependencies to the `staging/packages`
+	// subdirectory of the data directory.
 	PlatformDownload(ctx context.Context, in *PlatformDownloadReq, opts ...grpc.CallOption) (ArduinoCore_PlatformDownloadClient, error)
+	// Uninstall a platform as well as its tool dependencies that are not used by
+	// other installed platforms.
 	PlatformUninstall(ctx context.Context, in *PlatformUninstallReq, opts ...grpc.CallOption) (ArduinoCore_PlatformUninstallClient, error)
+	// Upgrade an installed platform to the latest version.
 	PlatformUpgrade(ctx context.Context, in *PlatformUpgradeReq, opts ...grpc.CallOption) (ArduinoCore_PlatformUpgradeClient, error)
 	Upload(ctx context.Context, in *UploadReq, opts ...grpc.CallOption) (ArduinoCore_UploadClient, error)
+	// Search for a platform in the platforms indexes.
 	PlatformSearch(ctx context.Context, in *PlatformSearchReq, opts ...grpc.CallOption) (*PlatformSearchResp, error)
+	// List all installed platforms.
 	PlatformList(ctx context.Context, in *PlatformListReq, opts ...grpc.CallOption) (*PlatformListResp, error)
 	LibraryDownload(ctx context.Context, in *LibraryDownloadReq, opts ...grpc.CallOption) (ArduinoCore_LibraryDownloadClient, error)
 	LibraryInstall(ctx context.Context, in *LibraryInstallReq, opts ...grpc.CallOption) (ArduinoCore_LibraryInstallClient, error)
@@ -1236,12 +1244,20 @@ type ArduinoCoreServer interface {
 	BoardList(context.Context, *BoardListReq) (*BoardListResp, error)
 	BoardListAll(context.Context, *BoardListAllReq) (*BoardListAllResp, error)
 	Compile(*CompileReq, ArduinoCore_CompileServer) error
+	// Download and install a platform and its tool dependencies.
 	PlatformInstall(*PlatformInstallReq, ArduinoCore_PlatformInstallServer) error
+	// Download a platform and its tool dependencies to the `staging/packages`
+	// subdirectory of the data directory.
 	PlatformDownload(*PlatformDownloadReq, ArduinoCore_PlatformDownloadServer) error
+	// Uninstall a platform as well as its tool dependencies that are not used by
+	// other installed platforms.
 	PlatformUninstall(*PlatformUninstallReq, ArduinoCore_PlatformUninstallServer) error
+	// Upgrade an installed platform to the latest version.
 	PlatformUpgrade(*PlatformUpgradeReq, ArduinoCore_PlatformUpgradeServer) error
 	Upload(*UploadReq, ArduinoCore_UploadServer) error
+	// Search for a platform in the platforms indexes.
 	PlatformSearch(context.Context, *PlatformSearchReq) (*PlatformSearchResp, error)
+	// List all installed platforms.
 	PlatformList(context.Context, *PlatformListReq) (*PlatformListResp, error)
 	LibraryDownload(*LibraryDownloadReq, ArduinoCore_LibraryDownloadServer) error
 	LibraryInstall(*LibraryInstallReq, ArduinoCore_LibraryInstallServer) error

@@ -63,18 +63,26 @@ service ArduinoCore {
 
   rpc Compile(CompileReq) returns (stream CompileResp);
 
+  // Download and install a platform and its tool dependencies.
   rpc PlatformInstall(PlatformInstallReq) returns (stream PlatformInstallResp);
 
+  // Download a platform and its tool dependencies to the `staging/packages`
+  // subdirectory of the data directory.
   rpc PlatformDownload(PlatformDownloadReq) returns (stream PlatformDownloadResp);
 
+  // Uninstall a platform as well as its tool dependencies that are not used by
+  // other installed platforms.
   rpc PlatformUninstall(PlatformUninstallReq) returns (stream PlatformUninstallResp);
 
+  // Upgrade an installed platform to the latest version.
   rpc PlatformUpgrade(PlatformUpgradeReq) returns (stream PlatformUpgradeResp);
 
   rpc Upload(UploadReq) returns (stream UploadResp);
 
+  // Search for a platform in the platforms indexes.
   rpc PlatformSearch(PlatformSearchReq) returns (PlatformSearchResp);
 
+  // List all installed platforms.
   rpc PlatformList(PlatformListReq) returns (PlatformListResp);
 
   rpc LibraryDownload(LibraryDownloadReq) returns (stream LibraryDownloadResp);

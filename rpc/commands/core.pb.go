@@ -21,13 +21,17 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type PlatformInstallReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	PlatformPackage      string    `protobuf:"bytes,2,opt,name=platform_package,json=platformPackage,proto3" json:"platform_package,omitempty"`
-	Architecture         string    `protobuf:"bytes,3,opt,name=architecture,proto3" json:"architecture,omitempty"`
-	Version              string    `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Vendor name of the platform (e.g., `arduino`).
+	PlatformPackage string `protobuf:"bytes,2,opt,name=platform_package,json=platformPackage,proto3" json:"platform_package,omitempty"`
+	// Architecture name of the platform (e.g., `avr`).
+	Architecture string `protobuf:"bytes,3,opt,name=architecture,proto3" json:"architecture,omitempty"`
+	// Platform version to install.
+	Version              string   `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *PlatformInstallReq) Reset()         { *m = PlatformInstallReq{} }
@@ -84,11 +88,13 @@ func (m *PlatformInstallReq) GetVersion() string {
 }
 
 type PlatformInstallResp struct {
-	Progress             *DownloadProgress `protobuf:"bytes,1,opt,name=progress,proto3" json:"progress,omitempty"`
-	TaskProgress         *TaskProgress     `protobuf:"bytes,2,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	// Progress of the downloads of the platform and tool files.
+	Progress *DownloadProgress `protobuf:"bytes,1,opt,name=progress,proto3" json:"progress,omitempty"`
+	// Description of the current stage of the installation.
+	TaskProgress         *TaskProgress `protobuf:"bytes,2,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
 }
 
 func (m *PlatformInstallResp) Reset()         { *m = PlatformInstallResp{} }
@@ -131,13 +137,16 @@ func (m *PlatformInstallResp) GetTaskProgress() *TaskProgress {
 }
 
 type PlatformDownloadReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	PlatformPackage      string    `protobuf:"bytes,2,opt,name=platform_package,json=platformPackage,proto3" json:"platform_package,omitempty"`
-	Architecture         string    `protobuf:"bytes,3,opt,name=architecture,proto3" json:"architecture,omitempty"`
-	Version              string    `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance        *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	PlatformPackage string    `protobuf:"bytes,2,opt,name=platform_package,json=platformPackage,proto3" json:"platform_package,omitempty"`
+	// Architecture name of the platform (e.g., `avr`).
+	Architecture string `protobuf:"bytes,3,opt,name=architecture,proto3" json:"architecture,omitempty"`
+	// Platform version to download.
+	Version              string   `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *PlatformDownloadReq) Reset()         { *m = PlatformDownloadReq{} }
@@ -194,6 +203,7 @@ func (m *PlatformDownloadReq) GetVersion() string {
 }
 
 type PlatformDownloadResp struct {
+	// Progress of the downloads of platform and tool files.
 	Progress             *DownloadProgress `protobuf:"bytes,1,opt,name=progress,proto3" json:"progress,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
@@ -233,12 +243,15 @@ func (m *PlatformDownloadResp) GetProgress() *DownloadProgress {
 }
 
 type PlatformUninstallReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	PlatformPackage      string    `protobuf:"bytes,2,opt,name=platform_package,json=platformPackage,proto3" json:"platform_package,omitempty"`
-	Architecture         string    `protobuf:"bytes,3,opt,name=architecture,proto3" json:"architecture,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Vendor name of the platform (e.g., `arduino`).
+	PlatformPackage string `protobuf:"bytes,2,opt,name=platform_package,json=platformPackage,proto3" json:"platform_package,omitempty"`
+	// Architecture name of the platform (e.g., `avr`).
+	Architecture         string   `protobuf:"bytes,3,opt,name=architecture,proto3" json:"architecture,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *PlatformUninstallReq) Reset()         { *m = PlatformUninstallReq{} }
@@ -288,6 +301,7 @@ func (m *PlatformUninstallReq) GetArchitecture() string {
 }
 
 type PlatformUninstallResp struct {
+	// Description of the current stage of the uninstall.
 	TaskProgress         *TaskProgress `protobuf:"bytes,1,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
@@ -327,12 +341,15 @@ func (m *PlatformUninstallResp) GetTaskProgress() *TaskProgress {
 }
 
 type PlatformUpgradeReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	PlatformPackage      string    `protobuf:"bytes,2,opt,name=platform_package,json=platformPackage,proto3" json:"platform_package,omitempty"`
-	Architecture         string    `protobuf:"bytes,3,opt,name=architecture,proto3" json:"architecture,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Vendor name of the platform (e.g., `arduino`).
+	PlatformPackage string `protobuf:"bytes,2,opt,name=platform_package,json=platformPackage,proto3" json:"platform_package,omitempty"`
+	// Architecture name of the platform (e.g., `avr`).
+	Architecture         string   `protobuf:"bytes,3,opt,name=architecture,proto3" json:"architecture,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *PlatformUpgradeReq) Reset()         { *m = PlatformUpgradeReq{} }
@@ -382,11 +399,13 @@ func (m *PlatformUpgradeReq) GetArchitecture() string {
 }
 
 type PlatformUpgradeResp struct {
-	Progress             *DownloadProgress `protobuf:"bytes,1,opt,name=progress,proto3" json:"progress,omitempty"`
-	TaskProgress         *TaskProgress     `protobuf:"bytes,2,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	// Progress of the downloads of the platform and tool files.
+	Progress *DownloadProgress `protobuf:"bytes,1,opt,name=progress,proto3" json:"progress,omitempty"`
+	// Description of the current stage of the upgrade.
+	TaskProgress         *TaskProgress `protobuf:"bytes,2,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
 }
 
 func (m *PlatformUpgradeResp) Reset()         { *m = PlatformUpgradeResp{} }
@@ -429,12 +448,16 @@ func (m *PlatformUpgradeResp) GetTaskProgress() *TaskProgress {
 }
 
 type PlatformSearchReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	SearchArgs           string    `protobuf:"bytes,2,opt,name=search_args,json=searchArgs,proto3" json:"search_args,omitempty"`
-	AllVersions          bool      `protobuf:"varint,3,opt,name=all_versions,json=allVersions,proto3" json:"all_versions,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Keywords for the search.
+	SearchArgs string `protobuf:"bytes,2,opt,name=search_args,json=searchArgs,proto3" json:"search_args,omitempty"`
+	// Whether to show all available versions. `false` causes only the newest
+	// versions of the cores to be listed in the search results.
+	AllVersions          bool     `protobuf:"varint,3,opt,name=all_versions,json=allVersions,proto3" json:"all_versions,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *PlatformSearchReq) Reset()         { *m = PlatformSearchReq{} }
@@ -484,6 +507,7 @@ func (m *PlatformSearchReq) GetAllVersions() bool {
 }
 
 type PlatformSearchResp struct {
+	// Results of the search.
 	SearchOutput         []*Platform `protobuf:"bytes,1,rep,name=search_output,json=searchOutput,proto3" json:"search_output,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
 	XXX_unrecognized     []byte      `json:"-"`
@@ -523,11 +547,14 @@ func (m *PlatformSearchResp) GetSearchOutput() []*Platform {
 }
 
 type PlatformListReq struct {
-	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	UpdatableOnly        bool      `protobuf:"varint,2,opt,name=updatable_only,json=updatableOnly,proto3" json:"updatable_only,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Set to true to only list platforms which have a newer version available
+	// than the one currently installed.
+	UpdatableOnly        bool     `protobuf:"varint,2,opt,name=updatable_only,json=updatableOnly,proto3" json:"updatable_only,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *PlatformListReq) Reset()         { *m = PlatformListReq{} }
@@ -570,6 +597,7 @@ func (m *PlatformListReq) GetUpdatableOnly() bool {
 }
 
 type PlatformListResp struct {
+	// The installed platforms.
 	InstalledPlatform    []*Platform `protobuf:"bytes,1,rep,name=installed_platform,json=installedPlatform,proto3" json:"installed_platform,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
 	XXX_unrecognized     []byte      `json:"-"`
@@ -609,13 +637,25 @@ func (m *PlatformListResp) GetInstalledPlatform() []*Platform {
 }
 
 type Platform struct {
-	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
-	Installed            string   `protobuf:"bytes,2,opt,name=Installed,proto3" json:"Installed,omitempty"`
-	Latest               string   `protobuf:"bytes,3,opt,name=Latest,proto3" json:"Latest,omitempty"`
-	Name                 string   `protobuf:"bytes,4,opt,name=Name,proto3" json:"Name,omitempty"`
-	Maintainer           string   `protobuf:"bytes,5,opt,name=Maintainer,proto3" json:"Maintainer,omitempty"`
-	Website              string   `protobuf:"bytes,6,opt,name=Website,proto3" json:"Website,omitempty"`
-	Email                string   `protobuf:"bytes,7,opt,name=Email,proto3" json:"Email,omitempty"`
+	// Platform ID (e.g., `arduino:avr`).
+	ID string `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`
+	// Version of the platform.
+	Installed string `protobuf:"bytes,2,opt,name=Installed,proto3" json:"Installed,omitempty"`
+	// Newest available version of the platform.
+	Latest string `protobuf:"bytes,3,opt,name=Latest,proto3" json:"Latest,omitempty"`
+	// Name used to identify the platform to humans (e.g., "Arduino AVR Boards").
+	Name string `protobuf:"bytes,4,opt,name=Name,proto3" json:"Name,omitempty"`
+	// Maintainer of the platform's package.
+	Maintainer string `protobuf:"bytes,5,opt,name=Maintainer,proto3" json:"Maintainer,omitempty"`
+	// A URL provided by the author of the platform's package, intended to point
+	// to their website.
+	Website string `protobuf:"bytes,6,opt,name=Website,proto3" json:"Website,omitempty"`
+	// Email of the maintainer of the platform's package.
+	Email string `protobuf:"bytes,7,opt,name=Email,proto3" json:"Email,omitempty"`
+	// List of boards provided by the platform. If the platform is installed,
+	// this is the boards listed in the platform's boards.txt. If the platform is
+	// not installed, this is an arbitrary list of board names provided by the
+	// platform author for display and may not match boards.txt.
 	Boards               []*Board `protobuf:"bytes,8,rep,name=Boards,proto3" json:"Boards,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -704,7 +744,10 @@ func (m *Platform) GetBoards() []*Board {
 }
 
 type Board struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Name used to identify the board to humans.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Fully qualified board name used to identify the board to machines. The FQBN
+	// is only available for installed boards.
 	Fqbn                 string   `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
