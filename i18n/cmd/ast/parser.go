@@ -54,7 +54,7 @@ func doFile(fset *token.FileSet, file *ast.File, catalog *po.MessageCatalog) {
 			return true
 		}
 
-		if functionName(funcCall) != "i18n.Tr" {
+		if functionName(funcCall) != "i18n.Tr" && functionName(funcCall) != "tr" {
 			return true
 		}
 
