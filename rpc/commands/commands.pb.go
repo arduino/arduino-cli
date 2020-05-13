@@ -641,8 +641,12 @@ type ArduinoCoreClient interface {
 	Version(ctx context.Context, in *VersionReq, opts ...grpc.CallOption) (*VersionResp, error)
 	// Requests details about a board
 	BoardDetails(ctx context.Context, in *BoardDetailsReq, opts ...grpc.CallOption) (*BoardDetailsResp, error)
+	// Attach a board to a sketch. When the `fqbn` field of a request is not
+	// provided, the FQBN of the attached board will be used.
 	BoardAttach(ctx context.Context, in *BoardAttachReq, opts ...grpc.CallOption) (ArduinoCore_BoardAttachClient, error)
+	// List the boards currently connected to the computer.
 	BoardList(ctx context.Context, in *BoardListReq, opts ...grpc.CallOption) (*BoardListResp, error)
+	// List all the boards provided by installed platforms.
 	BoardListAll(ctx context.Context, in *BoardListAllReq, opts ...grpc.CallOption) (*BoardListAllResp, error)
 	Compile(ctx context.Context, in *CompileReq, opts ...grpc.CallOption) (ArduinoCore_CompileClient, error)
 	// Download and install a platform and its tool dependencies.
@@ -1240,8 +1244,12 @@ type ArduinoCoreServer interface {
 	Version(context.Context, *VersionReq) (*VersionResp, error)
 	// Requests details about a board
 	BoardDetails(context.Context, *BoardDetailsReq) (*BoardDetailsResp, error)
+	// Attach a board to a sketch. When the `fqbn` field of a request is not
+	// provided, the FQBN of the attached board will be used.
 	BoardAttach(*BoardAttachReq, ArduinoCore_BoardAttachServer) error
+	// List the boards currently connected to the computer.
 	BoardList(context.Context, *BoardListReq) (*BoardListResp, error)
+	// List all the boards provided by installed platforms.
 	BoardListAll(context.Context, *BoardListAllReq) (*BoardListAllResp, error)
 	Compile(*CompileReq, ArduinoCore_CompileServer) error
 	// Download and install a platform and its tool dependencies.
