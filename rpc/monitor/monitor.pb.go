@@ -135,12 +135,15 @@ func (*StreamingOpenReq) XXX_OneofWrappers() []interface{} {
 // Tells the monitor which target to open and provides additional parameters
 // that might be needed to configure the target or the monitor itself.
 type MonitorConfig struct {
-	Target               string                   `protobuf:"bytes,1,opt,name=target,proto3" json:"target,omitempty"`
-	Type                 MonitorConfig_TargetType `protobuf:"varint,2,opt,name=type,proto3,enum=cc.arduino.cli.monitor.MonitorConfig_TargetType" json:"type,omitempty"`
-	AdditionalConfig     *_struct.Struct          `protobuf:"bytes,3,opt,name=additionalConfig,proto3" json:"additionalConfig,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
-	XXX_unrecognized     []byte                   `json:"-"`
-	XXX_sizecache        int32                    `json:"-"`
+	// The target name.
+	Target string                   `protobuf:"bytes,1,opt,name=target,proto3" json:"target,omitempty"`
+	Type   MonitorConfig_TargetType `protobuf:"varint,2,opt,name=type,proto3,enum=cc.arduino.cli.monitor.MonitorConfig_TargetType" json:"type,omitempty"`
+	// Additional parameters that might be needed to configure the target or the
+	// monitor itself.
+	AdditionalConfig     *_struct.Struct `protobuf:"bytes,3,opt,name=additionalConfig,proto3" json:"additionalConfig,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
 func (m *MonitorConfig) Reset()         { *m = MonitorConfig{} }
@@ -191,6 +194,7 @@ func (m *MonitorConfig) GetAdditionalConfig() *_struct.Struct {
 
 //
 type StreamingOpenResp struct {
+	// The data received from the target.
 	Data                 []byte   `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -276,6 +280,8 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MonitorClient interface {
+	// Open a bidirectional monitor stream. This can be used to implement
+	// something similar to the Arduino IDE's Serial Monitor.
 	StreamingOpen(ctx context.Context, opts ...grpc.CallOption) (Monitor_StreamingOpenClient, error)
 }
 
@@ -320,6 +326,8 @@ func (x *monitorStreamingOpenClient) Recv() (*StreamingOpenResp, error) {
 
 // MonitorServer is the server API for Monitor service.
 type MonitorServer interface {
+	// Open a bidirectional monitor stream. This can be used to implement
+	// something similar to the Arduino IDE's Serial Monitor.
 	StreamingOpen(Monitor_StreamingOpenServer) error
 }
 
