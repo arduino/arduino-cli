@@ -2385,25 +2385,25 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
 </tr>
 <tr>
 <td>board_uri</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The board&#39;s URI (e.g., /dev/ttyACM0).</td>
 </tr>
 <tr>
 <td>sketch_path</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Path of the sketch to attach the board to. The board attachment metadata will be saved to <code>{sketch_path}/sketch.json</code>.</td>
 </tr>
 <tr>
 <td>search_timeout</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Duration in seconds to search the given URI for a connected board before timing out. The default value is 5 seconds.</td>
 </tr>
 </tbody>
 </table>
@@ -2423,7 +2423,7 @@
 <td>task_progress</td>
 <td><a href="#cc.arduino.cli.commands.TaskProgress">TaskProgress</a></td>
 <td></td>
-<td></td>
+<td>Description of the current stage of the board attachment.</td>
 </tr>
 </tbody>
 </table>
@@ -2443,13 +2443,13 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
 </tr>
 <tr>
 <td>fqbn</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The fully qualified board name of the board you want information about (e.g., <code>arduino:avr:uno</code>).</td>
 </tr>
 </tbody>
 </table>
@@ -2469,73 +2469,73 @@
 <td>fqbn</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The fully qualified board name of the board.</td>
 </tr>
 <tr>
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Name used to identify the board to humans (e.g., Arduino/Genuino Uno).</td>
 </tr>
 <tr>
 <td>version</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Installed version of the board&#39;s platform.</td>
 </tr>
 <tr>
 <td>propertiesId</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The board ID component of the FQBN (e.g., <code>uno</code>).</td>
 </tr>
 <tr>
 <td>alias</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Board alias that can be used as a more user friendly alternative to the FQBN.</td>
 </tr>
 <tr>
 <td>official</td>
 <td><a href="#bool">bool</a></td>
 <td></td>
-<td></td>
+<td>Whether this is an official or 3<sup>rd</sup> party board.</td>
 </tr>
 <tr>
 <td>pinout</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>URL of the board&#39;s pinout documentation.</td>
 </tr>
 <tr>
 <td>package</td>
 <td><a href="#cc.arduino.cli.commands.Package">Package</a></td>
 <td></td>
-<td></td>
+<td>Data about the package that contains the board&#39;s platform.</td>
 </tr>
 <tr>
 <td>platform</td>
 <td><a href="#cc.arduino.cli.commands.BoardPlatform">BoardPlatform</a></td>
 <td></td>
-<td></td>
+<td>Data about the board&#39;s platform.</td>
 </tr>
 <tr>
 <td>toolsDependencies</td>
 <td><a href="#cc.arduino.cli.commands.ToolsDependencies">ToolsDependencies</a></td>
 <td>repeated</td>
-<td></td>
+<td>Tool dependencies of the board.</td>
 </tr>
 <tr>
 <td>config_options</td>
 <td><a href="#cc.arduino.cli.commands.ConfigOption">ConfigOption</a></td>
 <td>repeated</td>
-<td></td>
+<td>The board&#39;s custom configuration options.</td>
 </tr>
 <tr>
 <td>identification_pref</td>
 <td><a href="#cc.arduino.cli.commands.IdentificationPref">IdentificationPref</a></td>
 <td>repeated</td>
-<td></td>
+<td>Identifying information for the board (e.g., USB VID/PID).</td>
 </tr>
 </tbody>
 </table>
@@ -2555,13 +2555,13 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
 </tr>
 <tr>
 <td>search_args</td>
 <td><a href="#string">string</a></td>
 <td>repeated</td>
-<td></td>
+<td>The search query to filter the board list by.</td>
 </tr>
 </tbody>
 </table>
@@ -2581,7 +2581,7 @@
 <td>boards</td>
 <td><a href="#cc.arduino.cli.commands.BoardListItem">BoardListItem</a></td>
 <td>repeated</td>
-<td></td>
+<td>List of installed boards.</td>
 </tr>
 </tbody>
 </table>
@@ -2601,13 +2601,13 @@
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The name for use when identifying the board to a human.</td>
 </tr>
 <tr>
 <td>FQBN</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The fully qualified board name. Used to identify the board to a machine.</td>
 </tr>
 </tbody>
 </table>
@@ -2627,7 +2627,7 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
 </tr>
 </tbody>
 </table>
@@ -2647,7 +2647,7 @@
 <td>ports</td>
 <td><a href="#cc.arduino.cli.commands.DetectedPort">DetectedPort</a></td>
 <td>repeated</td>
-<td></td>
+<td>List of ports and the boards detected on those ports.</td>
 </tr>
 </tbody>
 </table>
@@ -2667,43 +2667,43 @@
 <td>architecture</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Architecture of the platform (e.g., <code>avr</code>).</td>
 </tr>
 <tr>
 <td>category</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Category of the platform. Set to <code>Contributed</code> for 3<sup>rd</sup> party platforms.</td>
 </tr>
 <tr>
 <td>url</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Download URL of the platform archive file.</td>
 </tr>
 <tr>
 <td>archiveFileName</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>File name of the platform archive.</td>
 </tr>
 <tr>
 <td>checksum</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Checksum of the platform archive.</td>
 </tr>
 <tr>
 <td>size</td>
 <td><a href="#int64">int64</a></td>
 <td></td>
-<td></td>
+<td>File size of the platform archive.</td>
 </tr>
 <tr>
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Name used to identify the platform to humans.</td>
 </tr>
 </tbody>
 </table>
@@ -2723,19 +2723,19 @@
 <td>option</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>ID of the configuration option. For identifying the option to machines.</td>
 </tr>
 <tr>
 <td>option_label</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Name of the configuration option for identifying the option to humans.</td>
 </tr>
 <tr>
 <td>values</td>
 <td><a href="#cc.arduino.cli.commands.ConfigValue">ConfigValue</a></td>
 <td>repeated</td>
-<td></td>
+<td>Possible values of the configuration option.</td>
 </tr>
 </tbody>
 </table>
@@ -2755,19 +2755,19 @@
 <td>value</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The configuration option value.</td>
 </tr>
 <tr>
 <td>value_label</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Label to identify the configuration option to humans.</td>
 </tr>
 <tr>
 <td>selected</td>
 <td><a href="#bool">bool</a></td>
 <td></td>
-<td></td>
+<td>Whether the configuration option is selected.</td>
 </tr>
 </tbody>
 </table>
@@ -2787,25 +2787,25 @@
 <td>address</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Address of the port (e.g., <code>serial:///dev/ttyACM0</code>).</td>
 </tr>
 <tr>
 <td>protocol</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Protocol of the port (e.g., <code>serial</code>).</td>
 </tr>
 <tr>
 <td>protocol_label</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>A human friendly description of the protocol (e.g., &#34;Serial Port (USB)&#34;).</td>
 </tr>
 <tr>
 <td>boards</td>
 <td><a href="#cc.arduino.cli.commands.BoardListItem">BoardListItem</a></td>
 <td>repeated</td>
-<td></td>
+<td>The boards attached to the port.</td>
 </tr>
 </tbody>
 </table>
@@ -2825,7 +2825,7 @@
 <td>online</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>URL for getting online help.</td>
 </tr>
 </tbody>
 </table>
@@ -2845,7 +2845,7 @@
 <td>usbID</td>
 <td><a href="#cc.arduino.cli.commands.USBID">USBID</a></td>
 <td></td>
-<td></td>
+<td>Identifying information for USB-connected boards.</td>
 </tr>
 </tbody>
 </table>
@@ -2865,37 +2865,37 @@
 <td>maintainer</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Maintainer of the package.</td>
 </tr>
 <tr>
 <td>url</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The URL of the platforms index file (e.g., <a href="https://downloads.arduino.cc/packages/package_index.json">https://downloads.arduino.cc/packages/package_index.json</a>).</td>
 </tr>
 <tr>
 <td>websiteURL</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>A URL provided by the package author, intended to point to their website.</td>
 </tr>
 <tr>
 <td>email</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Email address of the package maintainer.</td>
 </tr>
 <tr>
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Package vendor name.</td>
 </tr>
 <tr>
 <td>help</td>
 <td><a href="#cc.arduino.cli.commands.Help">Help</a></td>
 <td></td>
-<td></td>
+<td>Resources for getting help about using the package.</td>
 </tr>
 </tbody>
 </table>
@@ -2915,31 +2915,31 @@
 <td>checksum</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Checksum of the tool archive.</td>
 </tr>
 <tr>
 <td>host</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Operating system identifier.</td>
 </tr>
 <tr>
 <td>archiveFileName</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>File name of the tool archive.</td>
 </tr>
 <tr>
 <td>url</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Download URL of the tool archive.</td>
 </tr>
 <tr>
 <td>size</td>
 <td><a href="#int64">int64</a></td>
 <td></td>
-<td></td>
+<td>File size of the tool archive.</td>
 </tr>
 </tbody>
 </table>
@@ -2959,25 +2959,25 @@
 <td>packager</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Vendor name of the package containing the tool definition.</td>
 </tr>
 <tr>
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Tool name.</td>
 </tr>
 <tr>
 <td>version</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Tool version.</td>
 </tr>
 <tr>
 <td>systems</td>
 <td><a href="#cc.arduino.cli.commands.Systems">Systems</a></td>
 <td>repeated</td>
-<td></td>
+<td>Data for the operating system-specific builds of the tool.</td>
 </tr>
 </tbody>
 </table>
@@ -2997,13 +2997,13 @@
 <td>VID</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>USB vendor ID.</td>
 </tr>
 <tr>
 <td>PID</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>USB product ID.</td>
 </tr>
 </tbody>
 </table>
@@ -3304,19 +3304,19 @@
 <td>BoardAttach</td>
 <td><a href="#cc.arduino.cli.commands.BoardAttachReq">BoardAttachReq</a></td>
 <td><a href="#cc.arduino.cli.commands.BoardAttachResp">BoardAttachResp</a> stream</td>
-<td></td>
+<td>Attach a board to a sketch. When the <code>fqbn</code> field of a request is not provided, the FQBN of the attached board will be used.</td>
 </tr>
 <tr>
 <td>BoardList</td>
 <td><a href="#cc.arduino.cli.commands.BoardListReq">BoardListReq</a></td>
 <td><a href="#cc.arduino.cli.commands.BoardListResp">BoardListResp</a></td>
-<td></td>
+<td>List the boards currently connected to the computer.</td>
 </tr>
 <tr>
 <td>BoardListAll</td>
 <td><a href="#cc.arduino.cli.commands.BoardListAllReq">BoardListAllReq</a></td>
 <td><a href="#cc.arduino.cli.commands.BoardListAllResp">BoardListAllResp</a></td>
-<td></td>
+<td>List all the boards provided by installed platforms.</td>
 </tr>
 <tr>
 <td>Compile</td>
