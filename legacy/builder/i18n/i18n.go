@@ -40,9 +40,12 @@ type Logger interface {
 type LoggerToCustomStreams struct {
 	Stdout io.Writer
 	Stderr io.Writer
+	mux    sync.Mutex
 }
 
 func (s LoggerToCustomStreams) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
 	target := s.Stdout
 	if w == os.Stderr {
 		target = s.Stderr
@@ -51,6 +54,8 @@ func (s LoggerToCustomStreams) Fprintln(w io.Writer, level string, format string
 }
 
 func (s LoggerToCustomStreams) UnformattedFprintln(w io.Writer, str string) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
 	target := s.Stdout
 	if w == os.Stderr {
 		target = s.Stderr
@@ -59,6 +64,8 @@ func (s LoggerToCustomStreams) UnformattedFprintln(w io.Writer, str string) {
 }
 
 func (s LoggerToCustomStreams) UnformattedWrite(w io.Writer, data []byte) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
 	target := s.Stdout
 	if w == os.Stderr {
 		target = s.Stderr
