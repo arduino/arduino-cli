@@ -10,16 +10,18 @@ brew install arduino-cli
 
 ### Use the install script
 
-The easiest way to get the latest version of the Arduino CLI on any
-supported platform is using the `install.sh` script:
+The script requires `sh`. This is always available on Linux and macOS. `sh` is
+not available by default on Windows. The script may be run on Windows by
+installing [Git for Windows], then running it from Git Bash.
+
+This script will install the latest version of Arduino CLI to `$PWD/bin`:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
 ```
 
-The script will install `arduino-cli` at `$PWD/bin` but if you want to target a
-different directory, for example `~/local/bin`, set the `BINDIR` environment
-variable like this:
+If you want to target a different directory, for example `~/local/bin`, set the
+`BINDIR` environment variable like this:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/local/bin sh
@@ -100,3 +102,5 @@ docker run -v $PWD:/arduino-cli -w /arduino-cli -e PACKAGE_NAME_PREFIX='snapshot
 
 Once the build is over, you will find a `./dist/` folder containing the packages
 built out of the current source tree.
+
+[Git for Windows]: https://gitforwindows.org/
