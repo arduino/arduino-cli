@@ -281,6 +281,9 @@ func writeIfDifferent(sourcePath, destPath string) error {
 		return errors.Wrap(err, "unable to read contents of the source item")
 	}
 
+	// tag each addtional file with the filename of the source it was copied from
+	newbytes = []byte("#line 1 " + QuoteCppString(sourcePath) + "\n" + string(newbytes))
+
 	// check whether the destination file exists
 	_, err = os.Stat(destPath)
 	if os.IsNotExist(err) {
