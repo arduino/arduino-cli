@@ -15,33 +15,23 @@
 
 package i18n
 
-import (
-	"github.com/spf13/viper"
-)
+/*
+#cgo CFLAGS: -x objective-c
+#cgo LDFLAGS: -framework Foundation
+#import <Foundation/Foundation.h>
 
-// Init initializes the i18n module, setting the locale according to this order of preference:
-// 1. Configuration set in arduino-cli.yaml
-// 2. OS Locale
-// 3. en (default)
-func Init() {
-
-	if configLocale := viper.GetString("locale"); configLocale != "" {
-		if setLocale(configLocale) {
-			return
-		}
-	}
-
-	if osLocale := getLocaleIdentifierFromOS(); osLocale != "" {
-		if setLocale(osLocale) {
-			return
-		}
-	}
-
-	setLocale("en")
+const char* getLocaleIdentifier() {
+    NSString *cs = [[NSLocale currentLocale] localeIdentifier];
+    const char *cstr = [cs UTF8String];
+    return cstr;
 }
 
-// Tr returns msg translated to the selected locale
-// the msg argument must be a literal string
-func Tr(msg string, args ...interface{}) string {
-	return po.Get(msg, args...)
+*/
+import "C"
+
+func getLocaleIdentifier() string {
+	if envLocale := getLocaleIdentifierFromEnv(); envLocale != "" {
+		return envLocale
+	}
+	return C.GoString(C.getLocaleIdentifier())
 }

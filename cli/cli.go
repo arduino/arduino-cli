@@ -169,9 +169,6 @@ func preRun(cmd *cobra.Command, args []string) {
 	configuration.Init(configPath)
 	configFile := viper.ConfigFileUsed()
 
-	// initialize locale
-	i18n.SetLocale(viper.GetString("locale"))
-
 	// initialize inventory
 	inventory.Init(viper.GetString("directories.Data"))
 
@@ -258,4 +255,7 @@ func preRun(cmd *cobra.Command, args []string) {
 			os.Exit(errorcodes.ErrBadCall)
 		})
 	}
+
+	// initialize locale
+	i18n.Init()
 }

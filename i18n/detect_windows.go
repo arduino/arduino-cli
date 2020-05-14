@@ -16,32 +16,32 @@
 package i18n
 
 import (
-	"github.com/spf13/viper"
+	"fmt"
+	"strings"
+	"syscall"
+	"unsafe"
 )
 
-// Init initializes the i18n module, setting the locale according to this order of preference:
-// 1. Configuration set in arduino-cli.yaml
-// 2. OS Locale
-// 3. en (default)
-func Init() {
-
-	if configLocale := viper.GetString("locale"); configLocale != "" {
-		if setLocale(configLocale) {
-			return
+func getLocaleIdentifier() string {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("failed to get windows user locale", r)
 		}
+	}()
+
+	dll := syscall.MustLoadDLL("kernel32")
+	defer dll.Release()
+	proc := dll.MustFindProc("GetUserDefaultLocaleName")
+
+	localeNameMaxLen := 85
+	buffer := make([]uint16, localeNameMaxLen)
+	len, _, err := proc.Call(uintptr(unsafe.Pointer(&buffer[0])), uintptr(localeNameMaxLen))
+
+	if len == 0 {
+		panic(err)
 	}
 
-	if osLocale := getLocaleIdentifierFromOS(); osLocale != "" {
-		if setLocale(osLocale) {
-			return
-		}
-	}
+	locale := syscall.UTF16ToString(buffer)
 
-	setLocale("en")
-}
-
-// Tr returns msg translated to the selected locale
-// the msg argument must be a literal string
-func Tr(msg string, args ...interface{}) string {
-	return po.Get(msg, args...)
+	return strings.ReplaceAll(locale, "-", "_")
 }

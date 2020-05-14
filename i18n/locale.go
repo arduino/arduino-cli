@@ -18,6 +18,7 @@ package i18n
 //go:generate ./embed-i18n.sh
 
 import (
+	"strings"
 	"sync"
 
 	rice "github.com/GeertJohan/go.rice"
@@ -27,21 +28,35 @@ import (
 var (
 	loadOnce sync.Once
 	po       *gotext.Po
+	box      *rice.Box
 )
 
 func init() {
 	po = new(gotext.Po)
 }
 
-// SetLocale sets the locate used for i18n
-func SetLocale(locale string) {
-	box := rice.MustFindBox("./data")
+func setLocale(locale string) bool {
+	loadOnce.Do(func() {
+		box = rice.MustFindBox("./data")
+	})
+
 	poFile, err := box.Bytes(locale + ".po")
 
 	if err != nil {
-		poFile = box.MustBytes("en.po")
+		parts := strings.Split(locale, "_")
+		if len(parts) > 1 {
+			locale = parts[0]
+			poFile, err = box.Bytes(locale + ".po")
+
+			if err != nil {
+				return false
+			}
+		} else {
+			return false
+		}
 	}
 
 	po = new(gotext.Po)
 	po.Parse(poFile)
+	return true
 }
