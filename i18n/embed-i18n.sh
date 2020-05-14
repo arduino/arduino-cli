@@ -1,4 +1,4 @@
 #!/bin/sh
 
 git add -N ./data
-git diff --exit-code ./data || rice embed-go
+git diff --exit-code ./data &> /dev/null || rice embed-go

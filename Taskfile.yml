@@ -102,6 +102,7 @@ tasks:
       - test -z $(go fmt {{ default .DEFAULT_TARGETS .TARGETS }})
       - go vet {{ default .DEFAULT_TARGETS .TARGETS }}
       - "'{{.GOLINTBIN}}' {{.GOLINTFLAGS}} {{ default .DEFAULT_TARGETS .TARGETS }}"
+      - task: i18n:check
 
   check-legacy:
     desc: Check fmt and lint for the `legacy` package
@@ -132,6 +133,12 @@ tasks:
     cmds:
       - go run ./i18n/cmd/main.go transifex push ./i18n/data
 
+  i18n:check:
+    desc: Check if the i18n message catalog was updated
+    cmds:
+      - task: i18n:update
+      - git add -N ./i18n/data
+      - git diff --exit-code ./i18n/data &> /dev/null || echo "The i18n message catalog was updated, commit the changes before proceeding"
 vars:
   # all modules of this project except for "legacy/..." module
   DEFAULT_TARGETS:
