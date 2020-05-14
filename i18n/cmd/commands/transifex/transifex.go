@@ -32,14 +32,10 @@ var Command = &cobra.Command{
 var project string
 var resource string
 var apiKey string
-var languages = []string{}
 
 func init() {
 	Command.AddCommand(pullTransifexCommand)
 	Command.AddCommand(pushTransifexCommand)
-
-	Command.PersistentFlags().StringSliceVarP(&languages, "languages", "l", nil, "languages")
-	Command.MarkFlagRequired("languages")
 }
 
 func preRun(cmd *cobra.Command, args []string) {

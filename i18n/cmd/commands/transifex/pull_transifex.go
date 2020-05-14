@@ -32,6 +32,13 @@ var pullTransifexCommand = &cobra.Command{
 	Run:   pullCatalog,
 }
 
+var languages = []string{}
+
+func init() {
+	pullTransifexCommand.Flags().StringSliceVarP(&languages, "languages", "l", nil, "languages")
+	pullTransifexCommand.MarkFlagRequired("languages")
+}
+
 func pullCatalog(cmd *cobra.Command, args []string) {
 	folder := args[0]
 

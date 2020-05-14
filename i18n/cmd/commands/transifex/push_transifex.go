@@ -29,7 +29,7 @@ import (
 )
 
 var pushTransifexCommand = &cobra.Command{
-	Use:   "push -l pt_BR [catalog folder]",
+	Use:   "push [catalog folder]",
 	Short: "pushes the translation files to transifex",
 	Args:  cobra.ExactArgs(1),
 	Run:   pushCatalog,
@@ -87,15 +87,4 @@ func pushCatalog(cmd *cobra.Command, args []string) {
 			resource,
 		),
 	)
-
-	for _, lang := range languages {
-		pushFile(
-			folder,
-			lang,
-			fmt.Sprintf(
-				"https://www.transifex.com/api/2/project/%s/resource/%s/translation/%s/",
-				project, resource, lang,
-			),
-		)
-	}
 }

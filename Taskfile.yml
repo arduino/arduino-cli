@@ -130,7 +130,7 @@ tasks:
   i18n:push:
     desc: Push i18n files to transifex
     cmds:
-      - go run ./i18n/cmd/main.go transifex push -l {{.I18N_LANGS}} ./i18n/data
+      - go run ./i18n/cmd/main.go transifex push ./i18n/data
 
 vars:
   # all modules of this project except for "legacy/..." module
