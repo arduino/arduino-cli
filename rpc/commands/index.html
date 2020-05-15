@@ -15,7 +15,7 @@
       
       
       <link rel="shortcut icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.1, mkdocs-material-5.1.6">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.1.6">
     
     
       
@@ -3600,7 +3600,7 @@
 <td>exportFile</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td>The compiled binary is written to this file</td>
+<td>DEPRECATED: use exportDir instead</td>
 </tr>
 <tr>
 <td>jobs</td>
@@ -3625,6 +3625,12 @@
 <td><a href="#bool">bool</a></td>
 <td></td>
 <td>When set to true the compiled binary will not be copied to the export directory</td>
+</tr>
+<tr>
+<td>export_dir</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Optional: save the build artifacts in this directory, the directory must exist</td>
 </tr>
 </tbody>
 </table>
@@ -5030,6 +5036,12 @@
 </tr>
 <tr>
 <td>import_file</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>DEPRECTAED: Use import_dir instead</td>
+</tr>
+<tr>
+<td>import_dir</td>
 <td><a href="#string">string</a></td>
 <td></td>
 <td></td>
