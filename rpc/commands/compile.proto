@@ -34,11 +34,12 @@ message CompileReq {
   bool verbose = 10;     // Turns on verbose mode.
   bool quiet = 11;             // Suppresses almost every output.
   string vidPid = 12;   // VID/PID specific build properties.
-  string exportFile = 13;   // The compiled binary is written to this file
+  string exportFile = 13 [deprecated = true]; // DEPRECATED: use exportDir instead
   int32 jobs = 14;   // The max number of concurrent compiler instances to run (as make -jx)
   repeated string libraries = 15; // List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
   bool optimizeForDebug = 16; // Optimize compile output for debug, not for release
   bool dryRun = 17; // When set to true the compiled binary will not be copied to the export directory
+  string export_dir = 18; // Optional: save the build artifacts in this directory, the directory must exist
 }
 
 message CompileResp {

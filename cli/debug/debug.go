@@ -37,7 +37,7 @@ var (
 	verbose     bool
 	verify      bool
 	interpreter string
-	importFile  string
+	importDir   string
 )
 
 // NewCommand created a new `upload` command
@@ -54,7 +54,7 @@ func NewCommand() *cobra.Command {
 	debugCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
 	debugCommand.Flags().StringVarP(&port, "port", "p", "", "Debug port, e.g.: COM10 or /dev/ttyACM0")
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", "Debug interpreter e.g.: console, mi, mi1, mi2, mi3")
-	debugCommand.Flags().StringVarP(&importFile, "input", "i", "", "Input file to be uploaded for debug.")
+	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", "Direcory containing binaries for debug.")
 
 	return debugCommand
 }
@@ -82,7 +82,7 @@ func run(command *cobra.Command, args []string) {
 		SketchPath:  sketchPath.String(),
 		Port:        port,
 		Interpreter: interpreter,
-		ImportFile:  importFile,
+		ImportDir:   importDir,
 	}, os.Stdin, os.Stdout, ctrlc); err != nil {
 		feedback.Errorf("Error during Debug: %v", err)
 		os.Exit(errorcodes.ErrGeneric)

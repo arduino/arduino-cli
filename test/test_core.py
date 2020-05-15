@@ -122,7 +122,7 @@ def test_core_install_esp32(run_command, data_dir):
     # prevent regressions for https://github.com/arduino/arduino-cli/issues/163
     assert os.path.exists(
         os.path.join(
-            sketch_path, "test_core_install_esp32.esp32.esp32.esp32.partitions.bin"
+            sketch_path, "build/esp32.esp32.esp32/test_core_install_esp32.ino.partitions.bin"
         )
     )
 

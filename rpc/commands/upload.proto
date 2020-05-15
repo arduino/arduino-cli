@@ -28,7 +28,8 @@ message UploadReq {
 	string port = 4;
 	bool verbose = 5;
 	bool verify = 6;
-	string import_file = 7;
+	string import_file = 7 [deprecated = true]; // DEPRECTAED: Use import_dir instead
+	string import_dir = 8;
 }
 
 message UploadResp {

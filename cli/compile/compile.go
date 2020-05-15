@@ -46,7 +46,7 @@ var (
 	uploadAfterCompile bool     // Upload the binary after the compilation.
 	port               string   // Upload port, e.g.: COM10 or /dev/ttyACM0.
 	verify             bool     // Upload, verify uploaded binary after the upload.
-	exportFile         string   // The compiled binary is written to this file
+	exportDir          string   // The compiled binary is written to this file
 	dryRun             bool     // Use this flag to now write the output file
 	libraries          []string // List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
 	optimizeForDebug   bool     // Optimize compile output for debug, not for release
@@ -67,7 +67,7 @@ func NewCommand() *cobra.Command {
 	command.Flags().BoolVar(&showProperties, "show-properties", false, "Show all build properties used instead of compiling.")
 	command.Flags().BoolVar(&preprocess, "preprocess", false, "Print preprocessed code to stdout instead of compiling.")
 	command.Flags().StringVar(&buildCachePath, "build-cache-path", "", "Builds of 'core.a' are saved into this path to be cached and reused.")
-	command.Flags().StringVarP(&exportFile, "output", "o", "", "Filename of the compile output.")
+	command.Flags().StringVarP(&exportDir, "output-dir", "", "", "Save build artifacts in this directory.")
 	command.Flags().BoolVarP(&dryRun, "dry-run", "n", false, "Perform the build but do not copy the compile output file.")
 	command.Flags().StringVar(&buildPath, "build-path", "",
 		"Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.")
@@ -115,7 +115,7 @@ func run(cmd *cobra.Command, args []string) {
 		Verbose:          verbose,
 		Quiet:            quiet,
 		VidPid:           vidPid,
-		ExportFile:       exportFile,
+		ExportDir:        exportDir,
 		DryRun:           dryRun,
 		Libraries:        libraries,
 		OptimizeForDebug: optimizeForDebug,
@@ -134,7 +134,7 @@ func run(cmd *cobra.Command, args []string) {
 			Port:       port,
 			Verbose:    verbose,
 			Verify:     verify,
-			ImportFile: exportFile,
+			ImportDir:  exportDir,
 		}, os.Stdout, os.Stderr)
 
 		if err != nil {
