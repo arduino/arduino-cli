@@ -23,6 +23,7 @@ import "commands/common.proto";
 
 // Service that abstract a debug Session usage
 service Debug {
+    // Start a debug session and communicate with the debugger tool.
     rpc Debug (stream DebugReq) returns (stream DebugResp) {
     }
 }
@@ -48,18 +49,31 @@ message DebugReq {
 }
 
 message DebugConfigReq {
+    // Arduino Core Service instance from the `Init` response.
     cc.arduino.cli.commands.Instance instance = 1;
+    // Fully qualified board name of the board in use
+    // (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
+    // the sketch will be used.
     string fqbn = 2;
+    // Path to the sketch that is running on the board. The compiled executable
+    // is expected to be located under this path.
     string sketch_path = 3;
+    // Port of the debugger. Set to `none` if the debugger doesn't use a port.
     string port = 4;
+    // Which GDB command interpreter to use.
     string interpreter = 5;
     // DEPRECATED: use import_dir instead
     string import_file = 7 [deprecated = true];
+    // Directory containing the compiled executable. If `import_dir` is not
+    // specified, the executable is assumed to be in
+    // `{sketch_path}/build/{fqbn}/`.
     string import_dir = 8;
 }
 
 //
 message DebugResp {
+    // Incoming data from the debugger tool.
     bytes data = 1;
+    // Incoming error output from the debugger tool.
     string error = 2;
 }
