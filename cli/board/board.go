@@ -36,7 +36,7 @@ func NewCommand() *cobra.Command {
 	boardCommand.AddCommand(initAttachCommand())
 	boardCommand.AddCommand(initDetailsCommand())
 	boardCommand.AddCommand(initListCommand())
-	boardCommand.AddCommand(listAllCommand)
+	boardCommand.AddCommand(initListAllCommand())
 
 	return boardCommand
 }

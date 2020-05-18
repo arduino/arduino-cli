@@ -18,6 +18,8 @@ package board
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -26,7 +28,6 @@ import (
 	"github.com/arduino/arduino-cli/table"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 var showFullDetails bool
