@@ -11,9 +11,6 @@ edit_uri: ''
 # Copyright
 copyright: Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
 
-# Configuration
-site_dir: public
-
 # Theme
 theme:
   name: material
