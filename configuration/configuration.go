@@ -180,3 +180,54 @@ func IsBundledInDesktopIDE() bool {
 
 	return true
 }
+
+// FindConfigFile returns the config file path using the argument '--config-file' if specified or via the current working dir
+func FindConfigFile() string {
+
+	configFile := ""
+	for i, arg := range os.Args {
+		// 0 --config-file ss
+		if arg == "--config-file" {
+			if len(os.Args) > i+1 {
+				configFile = os.Args[i+1]
+			}
+		}
+	}
+
+	if configFile != "" {
+		if fi, err := os.Stat(configFile); err == nil {
+			if fi.IsDir() {
+				return configFile
+			}
+			return filepath.Dir(configFile)
+		}
+	}
+
+	return searchCwdForConfig()
+}
+
+func searchCwdForConfig() string {
+	cwd, err := os.Getwd()
+
+	if err != nil {
+		return ""
+	}
+
+	// go back up to root and search for the config file
+	for {
+		if _, err := os.Stat(filepath.Join(cwd, "arduino-cli.yaml")); err == nil {
+			// config file found
+			return cwd
+		} else if os.IsNotExist(err) {
+			// no config file found
+			next := filepath.Dir(cwd)
+			if next == cwd {
+				return ""
+			}
+			cwd = next
+		} else {
+			// some error we can't handle happened
+			return ""
+		}
+	}
+}

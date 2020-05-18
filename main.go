@@ -20,9 +20,11 @@ import (
 
 	"github.com/arduino/arduino-cli/cli"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/configuration"
 )
 
 func main() {
+	configuration.Init(configuration.FindConfigFile())
 	if err := cli.ArduinoCli.Execute(); err != nil {
 		os.Exit(errorcodes.ErrGeneric)
 	}
