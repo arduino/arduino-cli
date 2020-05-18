@@ -37,6 +37,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/sketch"
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/inventory"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
@@ -53,6 +54,8 @@ var (
 
 // NewCommand creates a new ArduinoCli command root
 func NewCommand() *cobra.Command {
+	cobra.AddTemplateFunc("tr", i18n.Tr)
+
 	// ArduinoCli is the root command
 	arduinoCli := &cobra.Command{
 		Use:              "arduino-cli",
@@ -61,6 +64,8 @@ func NewCommand() *cobra.Command {
 		Example:          "  " + os.Args[0] + " <command> [flags...]",
 		PersistentPreRun: preRun,
 	}
+
+	arduinoCli.SetUsageTemplate(usageTemplate)
 
 	createCliCommandTree(arduinoCli)
 
