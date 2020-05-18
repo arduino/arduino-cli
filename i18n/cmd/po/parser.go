@@ -114,7 +114,7 @@ func mustUnquote(line string) string {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	return v
+	return strings.ReplaceAll(v, "\n", "\\n")
 }
 
 func fileExists(filename string) bool {
