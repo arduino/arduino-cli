@@ -46,7 +46,7 @@ func (catalog *MessageCatalog) Add(id, value string, comment []string) {
 	}
 
 	if len(comment) != 0 {
-		catalog.Messages[id].Comments = comment
+		catalog.Messages[id].Comments = append(catalog.Messages[id].Comments, comment...)
 	}
 }
 
