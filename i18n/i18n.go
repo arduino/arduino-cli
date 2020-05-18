@@ -24,15 +24,19 @@ import (
 // 2. OS Locale
 // 3. en (default)
 func Init() {
+	initRiceBox()
+	locales := supportedLocales()
 
 	if configLocale := viper.GetString("locale"); configLocale != "" {
-		if setLocale(configLocale) {
+		if locale := findMatchingLocale(configLocale, locales); locale != "" {
+			setLocale(locale)
 			return
 		}
 	}
 
 	if osLocale := getLocaleIdentifierFromOS(); osLocale != "" {
-		if setLocale(osLocale) {
+		if locale := findMatchingLocale(osLocale, locales); locale != "" {
+			setLocale(locale)
 			return
 		}
 	}

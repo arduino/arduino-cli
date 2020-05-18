@@ -18,6 +18,8 @@ package i18n
 //go:generate ./embed-i18n.sh
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -35,28 +37,50 @@ func init() {
 	po = new(gotext.Po)
 }
 
-func setLocale(locale string) bool {
-	loadOnce.Do(func() {
-		box = rice.MustFindBox("./data")
+func initRiceBox() {
+	box = rice.MustFindBox("./data")
+}
+
+func supportedLocales() []string {
+	var locales []string
+	box.Walk("", func(path string, info os.FileInfo, err error) error {
+		if filepath.Ext(path) == ".po" {
+			locales = append(locales, strings.TrimSuffix(path, ".po"))
+		}
+		return nil
 	})
+	return locales
+}
 
-	poFile, err := box.Bytes(locale + ".po")
-
-	if err != nil {
-		parts := strings.Split(locale, "_")
-		if len(parts) > 1 {
-			locale = parts[0]
-			poFile, err = box.Bytes(locale + ".po")
-
-			if err != nil {
-				return false
-			}
-		} else {
-			return false
+func findMatchingLanguage(language string, supportedLocales []string) string {
+	var matchingLocales []string
+	for _, supportedLocale := range supportedLocales {
+		if strings.HasPrefix(supportedLocale, language) {
+			matchingLocales = append(matchingLocales, supportedLocale)
 		}
 	}
 
+	if len(matchingLocales) == 1 {
+		return matchingLocales[0]
+	}
+
+	return ""
+}
+
+func findMatchingLocale(locale string, supportedLocales []string) string {
+	for _, suportedLocale := range supportedLocales {
+		if locale == suportedLocale {
+			return suportedLocale
+		}
+	}
+
+	parts := strings.Split(locale, "_")
+
+	return findMatchingLanguage(parts[0], supportedLocales)
+}
+
+func setLocale(locale string) {
+	poFile := box.MustBytes(locale + ".po")
 	po = new(gotext.Po)
 	po.Parse(poFile)
-	return true
 }
