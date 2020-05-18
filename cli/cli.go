@@ -16,6 +16,7 @@
 package cli
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -36,8 +37,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/sketch"
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
-	"github.com/arduino/arduino-cli/configuration"
-	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/inventory"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
@@ -47,8 +46,15 @@ import (
 )
 
 var (
+	verbose      bool
+	outputFormat string
+	configFile   string
+)
+
+// NewCommand creates a new ArduinoCli command root
+func NewCommand() *cobra.Command {
 	// ArduinoCli is the root command
-	ArduinoCli = &cobra.Command{
+	arduinoCli := &cobra.Command{
 		Use:              "arduino-cli",
 		Short:            "Arduino CLI.",
 		Long:             "Arduino Command Line Interface (arduino-cli).",
@@ -56,14 +62,9 @@ var (
 		PersistentPreRun: preRun,
 	}
 
-	verbose      bool
-	outputFormat string
-	configFile   string
-)
+	createCliCommandTree(arduinoCli)
 
-// Init the cobra root command
-func init() {
-	createCliCommandTree(ArduinoCli)
+	return arduinoCli
 }
 
 // this is here only for testing
@@ -208,7 +209,4 @@ func preRun(cmd *cobra.Command, args []string) {
 			os.Exit(errorcodes.ErrBadCall)
 		})
 	}
-
-	// initialize locale
-	i18n.Init()
 }
