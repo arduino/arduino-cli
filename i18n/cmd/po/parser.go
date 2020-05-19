@@ -18,6 +18,7 @@ package po
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -36,7 +37,12 @@ func Parse(filename string) MessageCatalog {
 		os.Exit(1)
 	}
 
-	scanner := bufio.NewScanner(file)
+	return ParseReader(file)
+}
+
+// ParseReader parses the PO file into a MessageCatalog
+func ParseReader(r io.Reader) MessageCatalog {
+	scanner := bufio.NewScanner(r)
 	return parseCatalog(scanner)
 }
 
@@ -89,7 +95,7 @@ func parseCatalog(scanner *bufio.Scanner) MessageCatalog {
 		}
 
 		if state == StateMessageID && strings.HasPrefix(line, "\"") {
-			id += "\n" + mustUnquote(line)
+			id += mustUnquote(line)
 			continue
 		}
 
@@ -100,7 +106,7 @@ func parseCatalog(scanner *bufio.Scanner) MessageCatalog {
 		}
 
 		if state == StateMessageValue && strings.HasPrefix(line, "\"") {
-			value += "\n" + mustUnquote(line)
+			value += mustUnquote(line)
 			continue
 		}
 	}
@@ -114,7 +120,7 @@ func mustUnquote(line string) string {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	return strings.ReplaceAll(v, "\n", "\\n")
+	return v
 }
 
 func fileExists(filename string) bool {

@@ -91,10 +91,19 @@ func (catalog *MessageCatalog) Write(w io.Writer) {
 func printValue(w io.Writer, field, value string) {
 	if strings.Contains(value, "\n") {
 		fmt.Fprintf(w, "%s ", field)
-		for _, line := range strings.Split(value, "\n") {
-			fmt.Fprintf(w, "\"%s\"\n", strings.ReplaceAll(line, `"`, `\"`))
+		lines := strings.Split(value, "\n")
+		for i, line := range lines {
+			if i == len(lines)-1 {
+				fmt.Fprintf(w, "\"%s\"\n", escape(line))
+			} else {
+				fmt.Fprintf(w, "\"%s\\n\"\n", escape(line))
+			}
 		}
 	} else {
-		fmt.Fprintf(w, "%s \"%s\"\n", field, strings.ReplaceAll(value, `"`, `\"`))
+		fmt.Fprintf(w, "%s \"%s\"\n", field, escape(value))
 	}
+}
+
+func escape(value string) string {
+	return strings.ReplaceAll(value, `"`, `\"`)
 }
