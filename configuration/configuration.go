@@ -206,12 +206,7 @@ func FindConfigFile() string {
 	return searchCwdForConfig()
 }
 
-func searchCwdForConfig() string {
-	cwd, err := os.Getwd()
-
-	if err != nil {
-		return ""
-	}
+func searchConfigTree(cwd string) string {
 
 	// go back up to root and search for the config file
 	for {
@@ -230,4 +225,15 @@ func searchCwdForConfig() string {
 			return ""
 		}
 	}
+
+}
+
+func searchCwdForConfig() string {
+	cwd, err := os.Getwd()
+
+	if err != nil {
+		return ""
+	}
+
+	return searchConfigTree(cwd)
 }
