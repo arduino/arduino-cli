@@ -18,7 +18,7 @@ package librariesmanager
 import (
 	"net/url"
 
-	"go.bug.st/downloader"
+	"go.bug.st/downloader/v2"
 )
 
 // LibraryIndexURL is the URL where to get library index.

@@ -22,7 +22,7 @@ import (
 
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/downloader"
+	"go.bug.st/downloader/v2"
 )
 
 func TestDownloadAndChecksums(t *testing.T) {

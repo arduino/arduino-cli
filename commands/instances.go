@@ -33,7 +33,7 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"go.bug.st/downloader"
+	"go.bug.st/downloader/v2"
 )
 
 // this map contains all the running Arduino Core Services instances

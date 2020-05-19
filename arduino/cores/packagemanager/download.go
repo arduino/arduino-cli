@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
-	"go.bug.st/downloader"
+	"go.bug.st/downloader/v2"
 	semver "go.bug.st/relaxed-semver"
 )
 

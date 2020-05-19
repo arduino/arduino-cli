@@ -13,18 +13,28 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package globals
+package httpclient
 
 import (
-	"os"
-	"path/filepath"
-
-	"github.com/arduino/arduino-cli/version"
+	"net/http"
 )
 
-var (
-	// VersionInfo contains all info injected during build
-	VersionInfo = version.NewInfo(filepath.Base(os.Args[0]))
-	// DefaultIndexURL is the default index url
-	DefaultIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
-)
+// New returns a default http client for use in the cli API calls
+func New() (*http.Client, error) {
+	config, err := DefaultConfig()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return NewWithConfig(config), nil
+}
+
+// NewWithConfig creates a http client for use in the cli API calls with a given configuration
+func NewWithConfig(config *Config) *http.Client {
+	transport := newHTTPClientTransport(config)
+
+	return &http.Client{
+		Transport: transport,
+	}
+}

@@ -13,18 +13,29 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package globals
+package httpclient
 
-import (
-	"os"
-	"path/filepath"
+import "net/http"
 
-	"github.com/arduino/arduino-cli/version"
-)
+type httpClientRoundTripper struct {
+	transport http.RoundTripper
+	config    *Config
+}
 
-var (
-	// VersionInfo contains all info injected during build
-	VersionInfo = version.NewInfo(filepath.Base(os.Args[0]))
-	// DefaultIndexURL is the default index url
-	DefaultIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
-)
+func newHTTPClientTransport(config *Config) http.RoundTripper {
+	proxy := http.ProxyURL(config.Proxy)
+
+	transport := &http.Transport{
+		Proxy: proxy,
+	}
+
+	return &httpClientRoundTripper{
+		transport: transport,
+		config:    config,
+	}
+}
+
+func (h *httpClientRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	req.Header.Add("User-Agent", h.config.UserAgent)
+	return h.transport.RoundTrip(req)
+}

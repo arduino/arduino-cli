@@ -16,30 +16,24 @@
 package commands
 
 import (
-	"net/url"
 	"time"
 
-	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/httpclient"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"go.bug.st/downloader"
+	"go.bug.st/downloader/v2"
 )
 
 // GetDownloaderConfig returns the downloader configuration based on
 // current settings.
 func GetDownloaderConfig() (*downloader.Config, error) {
-	res := &downloader.Config{
-		RequestHeaders: globals.NewHTTPClientHeader(viper.GetString("network.user_agent_ext")),
+
+	httpClient, err := httpclient.New()
+	if err != nil {
+		return nil, err
 	}
-	if viper.IsSet("network.proxy") {
-		proxy := viper.GetString("network.proxy")
-		if _, err := url.Parse(proxy); err != nil {
-			return nil, errors.New("Invalid network.proxy '" + proxy + "': " + err.Error())
-		}
-		res.ProxyURL = proxy
-		logrus.Infof("Using proxy %s", proxy)
+
+	res := &downloader.Config{
+		HttpClient: *httpClient,
 	}
 	return res, nil
 }
