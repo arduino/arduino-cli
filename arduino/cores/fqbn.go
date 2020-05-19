@@ -64,6 +64,16 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 	return fqbn, nil
 }
 
+// MustParseFQBN extract an FQBN object from the input string or panics
+// if there is an error parsing the FQBN
+func MustParseFQBN(fqbnIn string) *FQBN {
+	res, err := ParseFQBN(fqbnIn)
+	if err != nil {
+		panic(err.Error())
+	}
+	return res
+}
+
 func (fqbn *FQBN) String() string {
 	res := fqbn.StringWithoutConfig()
 	if fqbn.Configs.Size() > 0 {
