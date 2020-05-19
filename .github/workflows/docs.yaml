@@ -14,6 +14,8 @@ on:
   push:
     branches:
       - master
+      # release branches have names like 0.8.x, 0.9.x, ...
+      - '[0-9]+.[0-9]+.x'
     # At this day, GitHub doesn't support YAML anchors, d'oh!
     paths:
       - 'docs/**'
@@ -24,6 +26,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      REMOTE: https://x-access-token:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git
 
     steps:
       - name: Checkout
@@ -69,12 +73,17 @@ jobs:
           python3 -m pip install -r ./requirements_docs.txt
 
       - name: Build docs website
+        # this runs on every PR to ensure the docs build is sane
+        if: github.event_name == 'pull_request'
         run: task docs:build
 
-      - name: Deploy
-        # publish docs only when PR is merged on master
-        if: github.event_name == 'push'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+      - name: Publish dev docs
+        # dev docs are published every time a commit is pushed to master
+        if: github.event_name == 'push' && github.ref == 'master'
+        run: task docs:publish DOCS_REMOTE=$REMOTE DOCS_VERSION=dev
+
+      - name: Publish versioned docs
+        # versioned docs are published every time a commit is pushed to
+        # a release branch
+        if: github.event_name == 'push' && github.ref != 'master'
+        run: task docs:publish DOCS_REMOTE=$REMOTE DOCS_VERSION=${{github.ref}}
