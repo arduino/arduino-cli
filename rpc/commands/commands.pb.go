@@ -650,6 +650,7 @@ type ArduinoCoreClient interface {
 	BoardList(ctx context.Context, in *BoardListReq, opts ...grpc.CallOption) (*BoardListResp, error)
 	// List all the boards provided by installed platforms.
 	BoardListAll(ctx context.Context, in *BoardListAllReq, opts ...grpc.CallOption) (*BoardListAllResp, error)
+	// Compile an Arduino sketch.
 	Compile(ctx context.Context, in *CompileReq, opts ...grpc.CallOption) (ArduinoCore_CompileClient, error)
 	// Download and install a platform and its tool dependencies.
 	PlatformInstall(ctx context.Context, in *PlatformInstallReq, opts ...grpc.CallOption) (ArduinoCore_PlatformInstallClient, error)
@@ -1253,6 +1254,7 @@ type ArduinoCoreServer interface {
 	BoardList(context.Context, *BoardListReq) (*BoardListResp, error)
 	// List all the boards provided by installed platforms.
 	BoardListAll(context.Context, *BoardListAllReq) (*BoardListAllResp, error)
+	// Compile an Arduino sketch.
 	Compile(*CompileReq, ArduinoCore_CompileServer) error
 	// Download and install a platform and its tool dependencies.
 	PlatformInstall(*PlatformInstallReq, ArduinoCore_PlatformInstallServer) error
