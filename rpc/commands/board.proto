@@ -204,7 +204,14 @@ message BoardSearchReq {
 }
 
 message BoardSearchResp {
-  repeated string fqbn = 1;
+  repeated SearchedBoard boards = 1;
+}
+
+message SearchedBoard {
+  string name = 1;
+  string alias = 2;
+  string fqbn = 3;
+  string externalPlatformUrl = 4;
 }
 
 message DetectedPort {

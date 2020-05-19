@@ -38,6 +38,7 @@ import (
 type PackageManager struct {
 	Log                    logrus.FieldLogger
 	Packages               cores.Packages
+	Registry               *BoardsRegistry
 	IndexDir               *paths.Path
 	PackagesDir            *paths.Path
 	DownloadDir            *paths.Path
@@ -47,9 +48,12 @@ type PackageManager struct {
 
 // NewPackageManager returns a new instance of the PackageManager
 func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) *PackageManager {
+	registry, _ := LoadBoardRegistry(nil) // TODO ...
+
 	return &PackageManager{
 		Log:                    logrus.StandardLogger(),
 		Packages:               cores.NewPackages(),
+		Registry:               registry,
 		IndexDir:               indexDir,
 		PackagesDir:            packagesDir,
 		DownloadDir:            downloadDir,

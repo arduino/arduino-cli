@@ -17,8 +17,8 @@ package board
 
 import (
 	"context"
-	"fmt"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -59,17 +60,17 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		Query:    query,
 	}
 	if res, err := board.Search(context.Background(), boardSearchReq); err != nil {
-		feedback.Errorf("Error installing board: %v", err)
+		feedback.Errorf("Error searching for board: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	} else {
-		feedback.PrintResult(searchResult{res})
+		feedback.PrintResult(searchResult{res.GetBoards()})
 	}
 }
 
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type searchResult struct {
-	boards *rpc.BoardSearchResp
+	boards []*rpc.SearchedBoard
 }
 
 func (res searchResult) Data() interface{} {
@@ -77,8 +78,23 @@ func (res searchResult) Data() interface{} {
 }
 
 func (res searchResult) String() string {
+	if len(res.boards) == 0 {
+		return "No boards found."
+	}
 
-	// TODO
+	sort.Slice(res.boards, func(i, j int) bool {
+		x, y := res.boards[i], res.boards[j]
+		return x.GetName() < y.GetName()
+	})
 
-	return fmt.Sprintf("%+v\n", res.boards)
+	t := table.New()
+	t.SetHeader("Board", "Board Name", "FQBN", "Platform")
+	for _, board := range res.boards {
+		platform := "Arduino"
+		if board.GetExternalPlatformUrl() != "" {
+			platform = "3rd party"
+		}
+		t.AddRow(board.GetAlias(), board.GetName(), board.GetFqbn(), platform)
+	}
+	return t.Render()
 }
