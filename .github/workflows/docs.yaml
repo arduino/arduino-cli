@@ -26,8 +26,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      REMOTE: https://x-access-token:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git
 
     steps:
       - name: Checkout
@@ -73,13 +71,17 @@ jobs:
           python3 -m pip install -r ./requirements_docs.txt
 
       - name: Build docs website
-        # this runs on every PR to ensure the docs build is sane
+        # this runs on every PR to ensure the docs build is sane, these docs
+        # won't be published
         if: github.event_name == 'pull_request'
         run: task docs:build
 
-      - name: Publish dev docs
+      - name: Publish docs
         # dev docs are published every time a commit is pushed to master
         if: github.event_name == 'push' && github.ref == 'master'
+        env:
+          REMOTE: https://x-access-token:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git
+          BRANCH_NAME: ${{github.ref}}
         run: task docs:publish DOCS_REMOTE=$REMOTE DOCS_VERSION=dev
 
       - name: Publish versioned docs
