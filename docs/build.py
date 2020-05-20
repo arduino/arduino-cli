@@ -94,11 +94,17 @@ def main(repo_dir):
         )
         return 0
 
+    args = [
+        "task",
+        "docs:publish",
+        f"DOCS_REMOTE={remote}",
+        f"DOCS_VERSION={docs_version}",
+        f"DOCS_ALIAS={alias}",
+    ]
     if remote:
-        args = ["mike", "deploy", "-p", "-r", remote, docs_version, alias]
-        subprocess.run(args, shell=True, check=True)
+        subprocess.run(args, shell=True, check=True, cwd=repo_dir)
     else:
-        print("mike", "deploy", docs_version, alias)
+        print(" ".join(args))
 
     return 0
 
