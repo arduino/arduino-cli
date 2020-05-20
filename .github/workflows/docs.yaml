@@ -77,15 +77,9 @@ jobs:
         run: task docs:build
 
       - name: Publish docs
-        # dev docs are published every time a commit is pushed to master
-        if: github.event_name == 'push' && github.ref == 'master'
+        # determine docs version for the commit pushed and publish accordingly using Mike
+        if: github.event_name == 'push'
         env:
           REMOTE: https://x-access-token:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git
-          BRANCH_NAME: ${{github.ref}}
-        run: task docs:publish DOCS_REMOTE=$REMOTE DOCS_VERSION=dev
 
-      - name: Publish versioned docs
-        # versioned docs are published every time a commit is pushed to
-        # a release branch
-        if: github.event_name == 'push' && github.ref != 'master'
-        run: task docs:publish DOCS_REMOTE=$REMOTE DOCS_VERSION=${{github.ref}}
+        run: python docs/build.py
