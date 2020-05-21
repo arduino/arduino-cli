@@ -10,27 +10,37 @@ brew install arduino-cli
 
 ### Use the install script
 
-The easiest way to get the latest version of the Arduino CLI on any
-supported platform is using the `install.sh` script:
+The script requires `sh`. This is always available on Linux and macOS. `sh` is
+not available by default on Windows. The script may be run on Windows by
+installing [Git for Windows], then running it from Git Bash.
+
+This script will install the latest version of Arduino CLI to `$PWD/bin`:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
 ```
 
-The script will install `arduino-cli` at `$PWD/bin` but if you want to target a
-different directory, for example `~/local/bin`, set the `BINDIR` environment
-variable like this:
+If you want to target a different directory, for example `~/local/bin`, set the
+`BINDIR` environment variable like this:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/local/bin sh
 ```
 
-### Download the latest packages
+If you would like to use the `arduino-cli` command from any location, install
+Arduino CLI to a directory already in your `PATH` or add the Arduino CLI
+installation path to your `PATH` environment variable.
 
-You can download the latest version of the pre-built binaries for the supported
-platforms from the [release page](https://github.com/arduino/arduino-cli/releases)
-or following the links in the following table. Once downloaded, extract the
-binary `arduino-cli` into a directory that is in your `PATH`.
+### Download
+
+Pre-built binaries for all the supported platforms are available for download
+from the links below.
+
+If you would like to use the `arduino-cli` command from any location, extract
+the downloaded file to a directory already in your `PATH` or add the Arduino CLI
+installation path to your `PATH` environment variable.
+
+#### Latest packages
 
 Platform  |                    |                    |
 --------- | ------------------ | ------------------ |
@@ -52,7 +62,11 @@ Mac OSX   |                    | [Mac OSX]          |
   won’t be further updated. That URL will provide the version
   `0.3.7-alpha.preview`, regardless of further releases.
 
-### Download a nightly build
+#### Previous versions
+
+These are available from the [releases page](https://github.com/arduino/arduino-cli/releases)
+
+#### Nightly builds
 
 These builds are generated everyday at 01:00 GMT from the `master` branch and
 should be considered unstable. In order to get the latest nightly build
@@ -81,9 +95,6 @@ Mac OSX   |                            | [Mac OSX]                  |
 Checksums for the nightly builds are available at
 `https://downloads.arduino.cc/arduino-cli/nightly/nightly-<DATE>-checksums.txt`
 
-Once downloaded, extract the executable `arduino-cli` into a directory
-which is in your ``PATH``.
-
 ### Build from source
 
 If you’re familiar with Golang or if you want to contribute to the
@@ -100,3 +111,5 @@ docker run -v $PWD:/arduino-cli -w /arduino-cli -e PACKAGE_NAME_PREFIX='snapshot
 
 Once the build is over, you will find a `./dist/` folder containing the packages
 built out of the current source tree.
+
+[Git for Windows]: https://gitforwindows.org/
