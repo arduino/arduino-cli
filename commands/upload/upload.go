@@ -69,6 +69,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	if port == "" {
 		return nil, fmt.Errorf("no upload port provided")
 	}
+	logrus.WithField("port", port).Tracef("Upload port")
 
 	fqbnIn := req.GetFqbn()
 	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
@@ -81,6 +82,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	if err != nil {
 		return nil, fmt.Errorf("incorrect FQBN: %s", err)
 	}
+	logrus.WithField("fqbn", fqbn).Tracef("Detected FQBN")
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
@@ -89,6 +91,11 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	if err != nil {
 		return nil, fmt.Errorf("incorrect FQBN: %s", err)
 	}
+	logrus.
+		WithField("boardPlatform", boardPlatform).
+		WithField("board", board).
+		WithField("buildPlatform", buildPlatform).
+		Tracef("Upload data")
 
 	// Load upload tool definitions
 	var uploadToolName string
@@ -102,6 +109,10 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		if uploadToolName == "" {
 			return nil, fmt.Errorf("cannot get programmer tool: undefined 'bootloader.tool' in boards.txt")
 		}
+		logrus.
+			WithField("uploadToolName", uploadToolName).
+			WithField("uploadToolPlatform", uploadToolPlatform).
+			Trace("Upload tool from 'bootloader.tool' property")
 	}
 
 	if programmerID := req.GetProgrammer(); programmerID != "" {
@@ -118,6 +129,10 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		if uploadToolName == "" {
 			return nil, fmt.Errorf("cannot get programmer tool: undefined 'program.tool' property")
 		}
+		logrus.
+			WithField("uploadToolName", uploadToolName).
+			WithField("uploadToolPlatform", uploadToolPlatform).
+			Trace("Upload tool from --programmer parameter")
 	} else {
 		uploadToolName = boardProperties.Get("upload.tool")
 		uploadToolPlatform = boardPlatform
@@ -135,6 +150,10 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 				}),
 			)
 		}
+		logrus.
+			WithField("uploadToolName", uploadToolName).
+			WithField("uploadToolPlatform", uploadToolPlatform).
+			Trace("Upload tool")
 	}
 
 	// Build configuration for upload
