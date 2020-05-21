@@ -16,7 +16,6 @@ on:
   push:
     branches:
       - master
-      - massi/publish
       # release branches have names like 0.8.x, 0.9.x, ...
       - '[0-9]+.[0-9]+.x'
     # At this day, GitHub doesn't support YAML anchors, d'oh!

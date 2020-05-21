@@ -22,7 +22,7 @@ import click
 from git import Repo
 
 
-DEV_BRANCHES = ["master", "massi/publish"]
+DEV_BRANCHES = ["master"]
 
 
 class TestScript(unittest.TestCase):
