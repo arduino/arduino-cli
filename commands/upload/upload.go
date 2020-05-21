@@ -252,26 +252,40 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	// Build recipe for upload
 	var recipe string
 	if programmer != nil {
-		recipe = uploadProperties.Get("program.pattern")
+		if err := runTool("program.pattern", uploadProperties, outStream, errStream, req.GetVerbose()); err != nil {
+			return nil, fmt.Errorf("programming error: %s", err)
+		}
 	} else {
-		recipe = uploadProperties.Get("upload.pattern")
+		if err := runTool("upload.pattern", uploadProperties, outStream, errStream, req.GetVerbose()); err != nil {
+			return nil, fmt.Errorf("uploading error: %s", err)
+		}
 	}
-	cmdLine := uploadProperties.ExpandPropsInString(recipe)
-	if req.GetVerbose() {
-		outStream.Write([]byte(fmt.Sprintln(cmdLine)))
+
+	logrus.Tracef("Upload %s on %s successful", sketch.Name, fqbnIn)
+	return &rpc.UploadResp{}, nil
+}
+
+func runTool(recipeID string, props *properties.Map, outStream, errStream io.Writer, verbose bool) error {
+	recipe, ok := props.GetOk(recipeID)
+	if !ok {
+		return fmt.Errorf("recipe not found '%s'", recipeID)
 	}
+	if strings.TrimSpace(recipe) == "" {
+		return nil // Nothing to run
+	}
+	cmdLine := props.ExpandPropsInString(recipe)
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 	if err != nil {
-		return nil, fmt.Errorf("invalid recipe '%s': %s", recipe, err)
+		return fmt.Errorf("invalid recipe '%s': %s", recipe, err)
 	}
 
 	// Run Tool
-	if req.GetVerbose() {
+	if verbose {
 		outStream.Write([]byte(fmt.Sprintln(cmdLine)))
 	}
 	cmd, err := executils.Command(cmdArgs)
 	if err != nil {
-		return nil, fmt.Errorf("cannot execute upload tool: %s", err)
+		return fmt.Errorf("cannot execute upload tool: %s", err)
 	}
 
 	executils.AttachStdoutListener(cmd, executils.PrintToStdout)
@@ -280,16 +294,14 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	cmd.Stderr = errStream
 
 	if err := cmd.Start(); err != nil {
-		return nil, fmt.Errorf("cannot execute upload tool: %s", err)
+		return fmt.Errorf("cannot execute upload tool: %s", err)
 	}
 
 	if err := cmd.Wait(); err != nil {
-		return nil, fmt.Errorf("uploading error: %s", err)
+		return fmt.Errorf("uploading error: %s", err)
 	}
 
-	logrus.Tracef("Upload %s on %s successful", sketch.Name, fqbnIn)
-
-	return &rpc.UploadResp{}, nil
+	return nil
 }
 
 func touchSerialPortAt1200bps(port string) error {
