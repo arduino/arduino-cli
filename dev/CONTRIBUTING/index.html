@@ -1,0 +1,1313 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="Arduino Command Line Interface">
+      
+      
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/CONTRIBUTING/">
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-4.6.3">
+    
+    
+      
+        <title>How to contribute - Arduino CLI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.adb8469c.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.a8b3c06d.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="#009688">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.86422ebf.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+      <link rel="stylesheet" href="../css/version-select.css">
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="teal" data-md-color-accent="orange">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#how-to-contribute" tabindex="0" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://arduino.github.io/arduino-cli/" title="Arduino CLI" aria-label="Arduino CLI" class="md-header-nav__button md-logo">
+          
+            <img alt="logo" src="../img/icon_mac_light.png" width="24" height="24">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Arduino CLI
+            </span>
+            <span class="md-header-nav__topic">
+              
+                How to contribute
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" aria-label="search" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+<a href="https://github.com/arduino/arduino-cli" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    arduino/arduino-cli
+  </div>
+</a>
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main" role="main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://arduino.github.io/arduino-cli/" title="Arduino CLI" class="md-nav__button md-logo">
+      
+        <img alt="logo" src="../img/icon_mac_light.png" width="48" height="48">
+      
+    </a>
+    Arduino CLI
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+<a href="https://github.com/arduino/arduino-cli" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    arduino/arduino-cli
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Documentation Home" class="md-nav__link">
+      Documentation Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../installation/" title="Installation" class="md-nav__link">
+      Installation
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../getting-started/" title="Getting started" class="md-nav__link">
+      Getting started
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        How to contribute
+      </label>
+    
+    <a href="./" title="How to contribute" class="md-nav__link md-nav__link--active">
+      How to contribute
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#legal-requirements" class="md-nav__link">
+    Legal requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    Prerequisites
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-the-source-code" class="md-nav__link">
+    Building the source code
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-the-tests" class="md-nav__link">
+    Running the tests
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-only-some-tests" class="md-nav__link">
+    Running only some tests
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-tests" class="md-nav__link">
+    Integration tests
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#working-on-docs" class="md-nav__link">
+    Working on docs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pull-requests" class="md-nav__link">
+    Pull Requests
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-settings" class="md-nav__link">
+    Additional settings
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../FAQ/" title="FAQ" class="md-nav__link">
+      FAQ
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+    
+    <label class="md-nav__link" for="nav-6">
+      Command reference
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-6">
+        Command reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli/" title="Arduino cli" class="md-nav__link">
+      Arduino cli
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board/" title="board" class="md-nav__link">
+      board
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_attach/" title="board attach" class="md-nav__link">
+      board attach
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_details/" title="board details" class="md-nav__link">
+      board details
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_list/" title="board list" class="md-nav__link">
+      board list
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_listall/" title="board listall" class="md-nav__link">
+      board listall
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_cache/" title="cache" class="md-nav__link">
+      cache
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_cache_clean/" title="cache clean" class="md-nav__link">
+      cache clean
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_compile/" title="compile" class="md-nav__link">
+      compile
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_config/" title="config" class="md-nav__link">
+      config
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_config_dump/" title="config dump" class="md-nav__link">
+      config dump
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_config_init/" title="config init" class="md-nav__link">
+      config init
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core/" title="core" class="md-nav__link">
+      core
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_download/" title="core download" class="md-nav__link">
+      core download
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_install/" title="core install" class="md-nav__link">
+      core install
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_list/" title="core list" class="md-nav__link">
+      core list
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_search/" title="core search" class="md-nav__link">
+      core search
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_uninstall/" title="core uninstall" class="md-nav__link">
+      core uninstall
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_update-index/" title="core update index" class="md-nav__link">
+      core update index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_upgrade/" title="core upgrade" class="md-nav__link">
+      core upgrade
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_daemon/" title="daemon" class="md-nav__link">
+      daemon
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_debug/" title="debug" class="md-nav__link">
+      debug
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib/" title="lib" class="md-nav__link">
+      lib
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_deps/" title="lib deps" class="md-nav__link">
+      lib deps
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_download/" title="lib download" class="md-nav__link">
+      lib download
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_install/" title="lib install" class="md-nav__link">
+      lib install
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_list/" title="lib list" class="md-nav__link">
+      lib list
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_search/" title="lib search" class="md-nav__link">
+      lib search
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_uninstall/" title="lib uninstall" class="md-nav__link">
+      lib uninstall
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_update-index/" title="lib update-index" class="md-nav__link">
+      lib update-index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_lib_upgrade/" title="lib upgrade" class="md-nav__link">
+      lib upgrade
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_sketch/" title="sketch" class="md-nav__link">
+      sketch
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_sketch_new/" title="sketch new" class="md-nav__link">
+      sketch new
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_upload/" title="upload" class="md-nav__link">
+      upload
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_version/" title="version" class="md-nav__link">
+      version
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
+    
+    <label class="md-nav__link" for="nav-7">
+      gRPC reference
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-7">
+        gRPC reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../rpc/commands/" title="commands" class="md-nav__link">
+      commands
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../rpc/monitor/" title="monitor" class="md-nav__link">
+      monitor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../rpc/settings/" title="settings" class="md-nav__link">
+      settings
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../rpc/debug/" title="debug" class="md-nav__link">
+      debug
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../sketch-build-process/" title="Sketch build process" class="md-nav__link">
+      Sketch build process
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../sketch-specification/" title="Sketch specification" class="md-nav__link">
+      Sketch specification
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../library-specification/" title="Library specification" class="md-nav__link">
+      Library specification
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../platform-specification/" title="Platform specification" class="md-nav__link">
+      Platform specification
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../package_index_json-specification/" title="package_index.json specification" class="md-nav__link">
+      package_index.json specification
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#legal-requirements" class="md-nav__link">
+    Legal requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    Prerequisites
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-the-source-code" class="md-nav__link">
+    Building the source code
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-the-tests" class="md-nav__link">
+    Running the tests
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-only-some-tests" class="md-nav__link">
+    Running only some tests
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-tests" class="md-nav__link">
+    Integration tests
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#working-on-docs" class="md-nav__link">
+    Working on docs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pull-requests" class="md-nav__link">
+    Pull Requests
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-settings" class="md-nav__link">
+    Additional settings
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="how-to-contribute">How to contribute<a class="headerlink" href="#how-to-contribute" title="Permanent link">&para;</a></h1>
+<p>First of all, thanks for contributing!</p>
+<p>This document provides some basic guidelines for contributing to this
+repository. To propose improvements or fix a bug, feel free to submit a PR.</p>
+<h2 id="legal-requirements">Legal requirements<a class="headerlink" href="#legal-requirements" title="Permanent link">&para;</a></h2>
+<p>Before we can accept your contributions you have to sign the <a href="https://cla-assistant.io/arduino/arduino-cli">Contributor License Agreement</a></p>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<p>To build the Arduino CLI from sources you need the following tools to be
+available in your local environment:</p>
+<ul>
+<li><a href="https://golang.org/doc/install">Go</a> version 1.12 or later</li>
+<li><a href="https://taskfile.dev/#/installation">Taskfile</a> to help you run the most common tasks from the command line</li>
+</ul>
+<p>If you want to run integration tests you will also need:</p>
+<ul>
+<li>A serial port with an Arduino device attached</li>
+<li>A working <a href="https://www.python.org/downloads/">Python</a> environment, version 3.5 or later</li>
+</ul>
+<p>If you're working on the gRPC interface you will also have to:</p>
+<ul>
+<li>download the <a href="https://github.com/protocolbuffers/protobuf/releases">protoc</a> compiler</li>
+<li>run <code>go get -u github.com/golang/protobuf/protoc-gen-go</code></li>
+</ul>
+<h2 id="building-the-source-code">Building the source code<a class="headerlink" href="#building-the-source-code" title="Permanent link">&para;</a></h2>
+<p>From the project folder root, just run:</p>
+<div class="highlight"><pre><span></span><code>task build
+</code></pre></div>
+
+<p>The project uses Go modules so dependencies will be downloaded automatically;
+at the end of the build, you should find an <code>arduino-cli</code> executable in the
+same folder.</p>
+<h2 id="running-the-tests">Running the tests<a class="headerlink" href="#running-the-tests" title="Permanent link">&para;</a></h2>
+<p>There are several checks and test suites in place to ensure the code works as
+expected and is written in a way that's consistent across the whole codebase.
+To avoid pushing changes that will cause the CI system to fail, you can run most
+of the tests locally.</p>
+<p>To ensure code style is consistent, run:</p>
+<div class="highlight"><pre><span></span><code>task check
+</code></pre></div>
+
+<p>To run unit tests:</p>
+<div class="highlight"><pre><span></span><code>task test-unit
+</code></pre></div>
+
+<p>To run integration tests (these will take some time and require special setup,
+see following paragraph):</p>
+<div class="highlight"><pre><span></span><code>task test-integration
+</code></pre></div>
+
+<h3 id="running-only-some-tests">Running only some tests<a class="headerlink" href="#running-only-some-tests" title="Permanent link">&para;</a></h3>
+<p>By default, all tests from all go packages are run. To run only unit
+tests from one or more specific packages, you can set the TARGETS
+environment variable, e.g.:</p>
+<div class="codehilite"><pre><span></span><code>TARGETS=./arduino/cores/packagemanager task test-unit
+</code></pre></div>
+
+
+<p>Alternatively, to run only some specific test(s), you can specify a regex
+to match against the test function name:</p>
+<div class="codehilite"><pre><span></span><code>TEST_REGEX=&#39;^TestTryBuild.*&#39; task test-unit
+</code></pre></div>
+
+
+<p>Both can be combined as well, typically to run only a specific test:</p>
+<div class="codehilite"><pre><span></span><code>TEST_REGEX=&#39;^TestFindBoardWithFQBN$&#39; TARGETS=./arduino/cores/packagemanager task test-unit
+</code></pre></div>
+
+
+<h3 id="integration-tests">Integration tests<a class="headerlink" href="#integration-tests" title="Permanent link">&para;</a></h3>
+<p>Being a command line interface, Arduino CLI is heavily interactive and it has to
+stay consistent in accepting the user input and providing the expected output
+and proper exit codes. On top of this, many Arduino CLI features involve
+communicating with external devices, most likely through a serial
+port, so unit tests can only go so far in giving us confidence that the code is
+working.</p>
+<p>For these reasons, in addition to regular unit tests the project has a suite of
+integration tests that actually run Arduino CLI in a different process and
+assess the options are correctly understood and the output is what we expect.</p>
+<p>To run the full suite of integration tests you need an Arduino device attached
+to a serial port and a working Python environment. Chances are that you already
+have Python installed in your system, if this is not the case you can
+<a href="https://www.python.org/downloads/">download</a> the official distribution or use the package manager provided by
+your Operating System.</p>
+<p>Some dependencies need to be installed before running the tests and to avoid
+polluting your global Python environment with dependencies that might be only
+used by the Arduino CLI, you can use a <a href="https://docs.python.org/3/tutorial/venv.html">virtual environment</a>. There are many
+ways to manage virtual environments, for example you can use a productivity tool
+called <a href="https://github.com/ofek/hatch">hatch</a>. First you need to install it (you might need to <code>sudo</code>
+the following command):</p>
+<div class="highlight"><pre><span></span><code>pip3 install --user hatch
+</code></pre></div>
+
+<p>Then you can create a virtual environment to be used while working on Arduino
+CLI:</p>
+<div class="highlight"><pre><span></span><code>hatch env arduino-cli
+</code></pre></div>
+
+<p>At this point the virtual environment was created and you need to make it active
+every time you open a new terminal session with the following command:</p>
+<div class="highlight"><pre><span></span><code>hatch shell arduino-cli
+</code></pre></div>
+
+<p>From now on, every package installed by Python will be confined to the
+<code>arduino-cli</code> virtual environment, so you can proceed installing the
+dependencies required with:</p>
+<div class="highlight"><pre><span></span><code>pip install -r test/requirements.txt
+</code></pre></div>
+
+<p>If the last step was successful, you should be able to run the tests with:</p>
+<div class="highlight"><pre><span></span><code>task test-integration
+</code></pre></div>
+
+<h2 id="working-on-docs">Working on docs<a class="headerlink" href="#working-on-docs" title="Permanent link">&para;</a></h2>
+<p>Documentation consists of several Markdown files stored under the <code>docs</code> folder
+at the root of the repo. Some of those files are automatically generated in the
+CI pipeline that builds the documentation website so you won't find them in the
+git repository and you need to generate them locally.</p>
+<p>If you're working on docs and your changes are not trivial, you might want to
+preview the documentation website locally, before opening a Pull Request. To run
+the docs toolchain locally you need to have:</p>
+<ul>
+<li><a href="https://golang.org/doc/install">Go</a> version 1.12 or later</li>
+<li><a href="https://taskfile.dev/#/installation">Taskfile</a> to help you run the most common tasks from the command line</li>
+<li>A working <a href="https://www.python.org/downloads/">Python</a> environment, version 3.5 or later</li>
+</ul>
+<p>Before running the toolchain, perform the following operations:</p>
+<ul>
+<li>go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc</li>
+</ul>
+<p>When working on docs, you can launch a command that will take care of
+generating the docs, build the static website and start a local server you can
+access with your browser to see a preview of your changes - to launch this
+command do:</p>
+<div class="highlight"><pre><span></span><code>task docs:serve
+</code></pre></div>
+
+<p>If you don't see any error, hit <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> with your browser.</p>
+<h2 id="pull-requests">Pull Requests<a class="headerlink" href="#pull-requests" title="Permanent link">&para;</a></h2>
+<p>In order to ease code reviews and have your contributions merged faster, here is
+a list of items you can check before submitting a PR:</p>
+<ul>
+<li>Create small PRs that are narrowly focused on addressing a single concern.</li>
+<li>PR titles indirectly become part of the CHANGELOG so it's crucial to provide a
+  good record of <strong>what</strong> change is being made in the title; <strong>why</strong> it was made
+  will go in the PR description, along with a link to a GitHub issue if it
+  exists.</li>
+<li>Write tests for the code you wrote.</li>
+<li>Open your PR against the <code>master</code> branch.</li>
+<li>Maintain <strong>clean commit history</strong> and use <strong>meaningful commit messages</strong>.
+  PRs with messy commit history are difficult to review and require a lot of
+  work to be merged.</li>
+<li>Your PR must pass all CI tests before we will merge it. If you're seeing an
+  error and don't think
+  it's your fault, it may not be! The reviewer will help you if there are test
+  failures that seem
+  not related to the change you are making.</li>
+</ul>
+<h2 id="additional-settings">Additional settings<a class="headerlink" href="#additional-settings" title="Permanent link">&para;</a></h2>
+<p>If you need to push a commit that's only shipping documentation changes or
+example files, thus a complete no-op for the test suite, please start the commit
+message with the string <strong>[skip ci]</strong> to skip the build and give that slot to
+someone else who does need it.</p>
+<p>If your PR doesn't need to be included in the changelog, please start the PR
+title with the string <strong>[skip changelog]</strong></p>
+                
+                  
+                
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../getting-started/" title="Getting started" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Getting started
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../FAQ/" title="FAQ" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                FAQ
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+          </div>
+        
+        powered by
+        <a href="https://www.mkdocs.org" target="_blank" rel="noopener">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.c33a9706.js"></script>
+      
+      <script>app.initialize({version:"1.1.2",url:{base:".."}})</script>
+      
+        <script src="../js/version-select.js"></script>
+      
+    
+  </body>
+</html>
