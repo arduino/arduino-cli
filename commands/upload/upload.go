@@ -51,6 +51,10 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
 
+	if req.GetBurnBootloader() && req.GetProgrammer() == "" {
+		return nil, fmt.Errorf("no programmer specified for burning bootloader")
+	}
+
 	// FIXME: make a specification on how a port is specified via command line
 	port := req.GetPort()
 	if port == "" && sketch != nil && sketch.Metadata != nil {
@@ -90,6 +94,16 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	var uploadToolName string
 	var uploadToolPlatform *cores.PlatformRelease
 	var programmer *cores.Programmer
+
+	burnBootloader := req.GetBurnBootloader()
+	if burnBootloader {
+		uploadToolName = boardProperties.Get("bootloader.tool")
+		uploadToolPlatform = boardPlatform
+		if uploadToolName == "" {
+			return nil, fmt.Errorf("cannot get programmer tool: undefined 'bootloader.tool' in boards.txt")
+		}
+	}
+
 	if programmerID := req.GetProgrammer(); programmerID != "" {
 		programmer = boardPlatform.Programmers[programmerID]
 		if programmer == nil {
@@ -153,12 +167,24 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		if v, ok := uploadProperties.GetOk("program.params.verbose"); ok {
 			uploadProperties.Set("program.verbose", v)
 		}
+		if v, ok := uploadProperties.GetOk("erase.params.verbose"); ok {
+			uploadProperties.Set("erase.verbose", v)
+		}
+		if v, ok := uploadProperties.GetOk("bootloader.params.verbose"); ok {
+			uploadProperties.Set("bootloader.verbose", v)
+		}
 	} else {
 		if v, ok := uploadProperties.GetOk("upload.params.quiet"); ok {
 			uploadProperties.Set("upload.verbose", v)
 		}
 		if v, ok := uploadProperties.GetOk("program.params.quiet"); ok {
 			uploadProperties.Set("program.verbose", v)
+		}
+		if v, ok := uploadProperties.GetOk("erase.params.quiet"); ok {
+			uploadProperties.Set("erase.verbose", v)
+		}
+		if v, ok := uploadProperties.GetOk("bootloader.params.quiet"); ok {
+			uploadProperties.Set("bootloader.verbose", v)
 		}
 	}
 
@@ -172,29 +198,31 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	}
 
 	var importPath *paths.Path
-	if importDir := req.GetImportDir(); importDir != "" {
-		importPath = paths.New(importDir)
-	} else {
-		// TODO: Create a function to obtain importPath from sketch
-		importPath = sketch.FullPath
-		// Add FQBN (without configs part) to export path
-		fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
-		importPath = importPath.Join("build").Join(fqbnSuffix)
-	}
+	if !burnBootloader {
+		if importDir := req.GetImportDir(); importDir != "" {
+			importPath = paths.New(importDir)
+		} else {
+			// TODO: Create a function to obtain importPath from sketch
+			importPath = sketch.FullPath
+			// Add FQBN (without configs part) to export path
+			fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
+			importPath = importPath.Join("build").Join(fqbnSuffix)
+		}
 
-	if !importPath.Exist() {
-		return nil, fmt.Errorf("compiled sketch not found in %s", importPath)
+		if !importPath.Exist() {
+			return nil, fmt.Errorf("compiled sketch not found in %s", importPath)
+		}
+		if !importPath.IsDir() {
+			return nil, fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
+		}
+		uploadProperties.SetPath("build.path", importPath)
+		uploadProperties.Set("build.project_name", sketch.Name+".ino")
 	}
-	if !importPath.IsDir() {
-		return nil, fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
-	}
-	uploadProperties.SetPath("build.path", importPath)
-	uploadProperties.Set("build.project_name", sketch.Name+".ino")
 
 	// If not using programmer perform some action required
 	// to set the board in bootloader mode
 	actualPort := port
-	if programmer == nil {
+	if programmer == nil && !burnBootloader {
 		// Perform reset via 1200bps touch if requested
 		if uploadProperties.GetBoolean("upload.use_1200bps_touch") {
 			ports, err := serial.GetPortsList()
@@ -250,8 +278,14 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	}
 
 	// Build recipe for upload
-	var recipe string
-	if programmer != nil {
+	if burnBootloader {
+		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, req.GetVerbose()); err != nil {
+			return nil, fmt.Errorf("chip erase error: %s", err)
+		}
+		if err := runTool("bootloader.pattern", uploadProperties, outStream, errStream, req.GetVerbose()); err != nil {
+			return nil, fmt.Errorf("burn bootloader error: %s", err)
+		}
+	} else if programmer != nil {
 		if err := runTool("program.pattern", uploadProperties, outStream, errStream, req.GetVerbose()); err != nil {
 			return nil, fmt.Errorf("programming error: %s", err)
 		}

@@ -31,12 +31,13 @@ import (
 )
 
 var (
-	fqbn       string
-	port       string
-	verbose    bool
-	verify     bool
-	importDir  string
-	programmer string
+	fqbn           string
+	port           string
+	verbose        bool
+	verify         bool
+	importDir      string
+	programmer     string
+	burnBootloader bool
 )
 
 // NewCommand created a new `upload` command
@@ -56,6 +57,7 @@ func NewCommand() *cobra.Command {
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
 	uploadCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload or 'list' to list supported programmers.")
+	uploadCommand.Flags().BoolVar(&burnBootloader, "burn-bootloader", false, "Burn bootloader (some platforms performs chip-erase too).")
 
 	return uploadCommand
 }
@@ -87,6 +89,24 @@ func run(command *cobra.Command, args []string) {
 		path = paths.New(args[0])
 	}
 	sketchPath := initSketchPath(path)
+
+	if burnBootloader {
+		if _, err := upload.Upload(context.Background(), &rpc.UploadReq{
+			Instance:       instance,
+			Fqbn:           fqbn,
+			SketchPath:     sketchPath.String(),
+			Port:           port,
+			Verbose:        verbose,
+			Verify:         verify,
+			ImportDir:      importDir,
+			Programmer:     programmer,
+			BurnBootloader: true,
+		}, os.Stdout, os.Stderr); err != nil {
+			feedback.Errorf("Error during Upload: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		os.Exit(0)
+	}
 
 	if _, err := upload.Upload(context.Background(), &rpc.UploadReq{
 		Instance:   instance,

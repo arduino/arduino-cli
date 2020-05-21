@@ -44,6 +44,10 @@ message UploadReq {
 	// not specified, the standard build directory under `sketch_path` is used.
 	string import_dir = 8;
 	string programmer = 9;
+	// Set to true if you want to program the bootloader. This option requires a
+	// programmer. If sketch_path and import_path are empty only the bootloader is
+	// uploaded.
+	bool burn_bootloader = 10;
 }
 
 message UploadResp {
