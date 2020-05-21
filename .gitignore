@@ -22,6 +22,7 @@ venv
 .DS_Store
 
 # Mkdocs
+/site/
 /public/
 /docsgen/arduino-cli
 /docs/rpc/*.md

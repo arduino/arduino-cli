@@ -34,6 +34,14 @@ tasks:
     cmds:
       - mkdocs build -s
 
+  docs:publish:
+    desc: Use Mike to build and push versioned docs
+    deps:
+      - docs:gen:commands
+      - docs:gen:protobuf
+    cmds:
+      - mike deploy -r {{.DOCS_REMOTE}} {{.DOCS_VERSION}} {{.DOCS_ALIAS}}
+
   docs:serve:
     desc: Run documentation website locally
     deps:
@@ -126,3 +134,7 @@ vars:
   GOLINTBIN:
     sh: go list -f {{"{{"}}".Target{{"}}"}}" golang.org/x/lint/golint
   GOLINTFLAGS: "-min_confidence 0.8 -set_exit_status"
+  # docs versioning
+  DOCS_VERSION: dev
+  DOCS_ALIAS: ""
+  DOCS_REMOTE: "origin"
