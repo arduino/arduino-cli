@@ -86,5 +86,6 @@ jobs:
         run: |
           git config --global user.email "bot@arduino.cc"
           git config --global user.name "ArduinoBot"
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/gh-pages:refs/remotes/origin/gh-pages
           git remote add upstream https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          python docs/build.py --remote upstream
+          python docs/build.py
