@@ -11,6 +11,8 @@ on:
       - 'cli/**'
       # potential changes to gRPC documentation
       - 'rpc/**'
+      # changes to the workflow itself
+      - '.github/workflows/docs.yaml'
   push:
     branches:
       - master
@@ -23,6 +25,7 @@ on:
       - 'docsgen/**'
       - 'cli/**'
       - 'rpc/**'
+      - '.github/workflows/docs.yaml'
 
 jobs:
   build:
