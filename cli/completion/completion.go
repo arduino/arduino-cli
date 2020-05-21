@@ -52,9 +52,8 @@ func run(cmd *cobra.Command, args []string) {
 	case "zsh":
 		buf := new(bytes.Buffer)
 		cmd.Root().GenZshCompletion(buf)
-		s := strings.Replace(buf.String(), "#", "", 1)   //remove the comment from compdef
 		r := strings.NewReplacer("[", "\\[", "]", "\\]") //insert escaping before [ and ]
-		s = r.Replace(s)
+		s := r.Replace(buf.String())
 		s = strings.ReplaceAll(s, "\\[1\\]", "[1]") // revert the case
 		os.Stdout.WriteString(s)
 		break
