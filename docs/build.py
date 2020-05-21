@@ -94,8 +94,7 @@ def main(repo_dir):
         return 0
 
     args = [
-        "task",
-        "docs:publish",
+        "task docs:publish",
         f"DOCS_REMOTE={remote}",
         f"DOCS_VERSION={docs_version}",
         f"DOCS_ALIAS={alias}",
