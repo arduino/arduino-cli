@@ -21,6 +21,9 @@ import subprocess
 from git import Repo
 
 
+DEV_BRANCHES = ["master", "massi/publish"]
+
+
 class TestScript(unittest.TestCase):
     def test_get_docs_version(self):
         ver, alias = get_docs_version("master", [])
@@ -41,7 +44,7 @@ class TestScript(unittest.TestCase):
 
 
 def get_docs_version(ref_name, release_branches):
-    if ref_name == "master":
+    if ref_name in DEV_BRANCHES:
         return "dev", ""
 
     if ref_name in release_branches:
