@@ -18,7 +18,6 @@ import re
 import unittest
 import subprocess
 
-import semver
 from git import Repo
 
 

@@ -81,5 +81,4 @@ jobs:
         if: github.event_name == 'push'
         env:
           REMOTE: https://x-access-token:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git
-
         run: python docs/build.py
