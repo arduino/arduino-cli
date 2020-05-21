@@ -18,6 +18,7 @@ import re
 import unittest
 import subprocess
 
+import click
 from git import Repo
 
 
@@ -75,11 +76,19 @@ def get_rel_branch_names(blist):
     return sorted(names, key=lambda x: int(x.split(".")[1]), reverse=True)
 
 
-def main(repo_dir):
-    # Git remote must be set to publish docs
-    remote = os.environ.get("REMOTE")
-    if not remote:
-        print("REMOTE env var must be set to publish, running dry mode")
+@click.command()
+@click.option("--test", is_flag=True)
+@click.option("--dry", is_flag=True)
+@click.option("--remote", default="origin", help="The git remote where to push.")
+def main(test, dry, remote):
+    # Run tests if requested
+    if test:
+        unittest.main(argv=[""], exit=False)
+        sys.exit(0)
+
+    # Detect repo root folder
+    here = os.path.dirname(os.path.realpath(__file__))
+    repo_dir = os.path.join(here, "..")
 
     # Get current repo
     repo = Repo(repo_dir)
@@ -96,18 +105,16 @@ def main(repo_dir):
         )
         return 0
 
-    args = [
-        "task docs:publish",
-        f"DOCS_REMOTE={remote}",
-        f"DOCS_VERSION={docs_version}",
-        f"DOCS_ALIAS={alias}",
-    ]
-    if remote:
-        subprocess.run(args, shell=True, check=True, cwd=repo_dir)
-    else:
-        print(" ".join(args))
+    # Taskfile args aren't regular args so we put everything in one string
+    cmd = (
+        f"task docs:publish DOCS_REMOTE={remote} DOCS_VERSION={docs_version} DOCS_ALIAS={alias}",
+    )
 
-    return 0
+    if dry:
+        print(cmd)
+        return 0
+
+    subprocess.run(cmd, shell=True, check=True, cwd=repo_dir)
 
 
 # Usage:
@@ -119,9 +126,4 @@ def main(repo_dir):
 #         $python build.py
 #
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "test":
-        unittest.main(argv=[""], exit=False)
-        sys.exit(0)
-
-    here = os.path.dirname(os.path.realpath(__file__))
-    sys.exit(main(os.path.join(here, "..")))
+    sys.exit(main())

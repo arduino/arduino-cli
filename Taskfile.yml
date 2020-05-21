@@ -40,7 +40,7 @@ tasks:
       - docs:gen:commands
       - docs:gen:protobuf
     cmds:
-      - mike deploy -r {{.DOCS_REMOTE}} {{.DOCS_VERSION}} {{.DOCS_ALIAS}}
+      - mike deploy -p -r {{.DOCS_REMOTE}} {{.DOCS_VERSION}} {{.DOCS_ALIAS}}
 
   docs:serve:
     desc: Run documentation website locally

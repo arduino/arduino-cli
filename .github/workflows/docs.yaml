@@ -80,9 +80,8 @@ jobs:
       - name: Publish docs
         # determine docs version for the commit pushed and publish accordingly using Mike
         if: github.event_name == 'push'
-        env:
-          REMOTE: https://x-access-token:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git
         run: |
           git config --global user.email "bot@arduino.cc"
           git config --global user.name "ArduinoBot"
-          python docs/build.py
+          git remote add upstream https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          python docs/build.py --remote upstream
