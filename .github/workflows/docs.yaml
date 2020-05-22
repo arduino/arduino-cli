@@ -11,6 +11,8 @@ on:
       - 'cli/**'
       # potential changes to gRPC documentation
       - 'rpc/**'
+      # changes to the workflow itself
+      - '.github/workflows/docs.yaml'
   push:
     branches:
       - master
@@ -22,6 +24,7 @@ on:
       - 'docsgen/**'
       - 'cli/**'
       - 'rpc/**'
+      - '.github/workflows/docs.yaml'
 
 jobs:
   build:
@@ -71,14 +74,18 @@ jobs:
           python3 -m pip install -r ./requirements_docs.txt
 
       - name: Build docs website
-        # this runs on every PR to ensure the docs build is sane, these docs
+        # This runs on every PR to ensure the docs build is sane, these docs
         # won't be published
         if: github.event_name == 'pull_request'
         run: task docs:build
 
       - name: Publish docs
-        # determine docs version for the commit pushed and publish accordingly using Mike
+        # Determine docs version for the commit pushed and publish accordingly using Mike.
+        # Publishing implies creating a git commit on the gh-pages branch, we let
+        # ArduinoBot own these commits.
         if: github.event_name == 'push'
-        env:
-          REMOTE: https://x-access-token:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git
-        run: python docs/build.py
+        run: |
+          git config --global user.email "bot@arduino.cc"
+          git config --global user.name "ArduinoBot"
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/gh-pages:refs/remotes/origin/gh-pages
+          python docs/build.py
