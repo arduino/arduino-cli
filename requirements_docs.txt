@@ -1,2 +1,5 @@
-mkdocs
-mkdocs-material
+mkdocs<1.2
+mkdocs-material<5
+mike
+gitpython
+click<7.2

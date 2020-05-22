@@ -11,15 +11,20 @@ on:
       - 'cli/**'
       # potential changes to gRPC documentation
       - 'rpc/**'
+      # changes to the workflow itself
+      - '.github/workflows/docs.yaml'
   push:
     branches:
       - master
+      # release branches have names like 0.8.x, 0.9.x, ...
+      - '[0-9]+.[0-9]+.x'
     # At this day, GitHub doesn't support YAML anchors, d'oh!
     paths:
       - 'docs/**'
       - 'docsgen/**'
       - 'cli/**'
       - 'rpc/**'
+      - '.github/workflows/docs.yaml'
 
 jobs:
   build:
@@ -69,12 +74,18 @@ jobs:
           python3 -m pip install -r ./requirements_docs.txt
 
       - name: Build docs website
+        # This runs on every PR to ensure the docs build is sane, these docs
+        # won't be published
+        if: github.event_name == 'pull_request'
         run: task docs:build
 
-      - name: Deploy
-        # publish docs only when PR is merged on master
+      - name: Publish docs
+        # Determine docs version for the commit pushed and publish accordingly using Mike.
+        # Publishing implies creating a git commit on the gh-pages branch, we let
+        # ArduinoBot own these commits.
         if: github.event_name == 'push'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+        run: |
+          git config --global user.email "bot@arduino.cc"
+          git config --global user.name "ArduinoBot"
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/gh-pages:refs/remotes/origin/gh-pages
+          python docs/build.py
