@@ -6,14 +6,10 @@ site_url: https://arduino.github.io/arduino-cli/
 # Repository
 repo_name: arduino/arduino-cli
 repo_url: https://github.com/arduino/arduino-cli
-edit_uri: ""
+edit_uri: ''
 
 # Copyright
-copyright: 'Copyright 2020 ARDUINO SA (http://www.arduino.cc/)'
-
-# Configuration
-site_dir: public
-edit_uri: ""
+copyright: Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
 
 # Theme
 theme:
@@ -57,7 +53,7 @@ markdown_extensions:
 
 # Navigation
 nav:
-  - Documentation Home: 'index.md'
+  - Documentation Home: index.md
   - installation.md
   - getting-started.md
   - CONTRIBUTING.md
@@ -104,6 +100,13 @@ nav:
     - settings: rpc/settings.md
     - debug: rpc/debug.md
   - sketch-build-process.md
+  - sketch-specification.md
   - library-specification.md
   - platform-specification.md
   - package_index.json specification: package_index_json-specification.md
+
+extra_css:
+  - css/version-select.css
+
+extra_javascript:
+  - js/version-select.js
