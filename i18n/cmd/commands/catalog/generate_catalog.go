@@ -17,19 +17,32 @@ package catalog
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/arduino/arduino-cli/i18n/cmd/ast"
 	"github.com/spf13/cobra"
 )
 
 var generateCatalogCommand = &cobra.Command{
-	Use:   "generate [source files]",
+	Use:   "generate [input folder]",
 	Short: "generates the en catalog from source files",
 	Args:  cobra.MinimumNArgs(1),
 	Run:   generateCatalog,
 }
 
 func generateCatalog(cmd *cobra.Command, args []string) {
-	catalog := ast.GenerateCatalog(args)
+
+	folder := args[0]
+	files := []string{}
+	filepath.Walk(folder, func(name string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() || filepath.Ext(name) != ".go" {
+			return nil
+		}
+
+		files = append(files, name)
+		return nil
+	})
+
+	catalog := ast.GenerateCatalog(files)
 	catalog.Write(os.Stdout)
 }
