@@ -1,35 +1,35 @@
 msgid ""
 msgstr ""
 
-#: ./cli/usage.go:31
+#: cli/usage.go:31
 msgid "Additional help topics:"
 msgstr ""
 
-#: ./cli/usage.go:26
+#: cli/usage.go:26
 msgid "Aliases:"
 msgstr ""
 
-#: ./cli/usage.go:28
+#: cli/usage.go:28
 msgid "Available Commands:"
 msgstr ""
 
-#: ./cli/usage.go:27
+#: cli/usage.go:27
 msgid "Examples:"
 msgstr ""
 
-#: ./cli/usage.go:29
+#: cli/usage.go:29
 msgid "Flags:"
 msgstr ""
 
-#: ./cli/usage.go:30
+#: cli/usage.go:30
 msgid "Global Flags:"
 msgstr ""
 
-#: ./cli/usage.go:25
+#: cli/usage.go:25
 msgid "Usage:"
 msgstr ""
 
-#: ./cli/usage.go:32
+#: cli/usage.go:32
 msgid "Use %s for more information about a command."
 msgstr ""
 
