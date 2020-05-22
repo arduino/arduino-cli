@@ -62,7 +62,7 @@ func TestLoadHardware(t *testing.T) {
 	require.Equal(t, "-v", avrPlatform.Releases[""].Properties.Get("tools.avrdude.bootloader.params.verbose"))
 	require.Equal(t, "/my/personal/avrdude", avrPlatform.Releases[""].Properties.Get("tools.avrdude.cmd.path"))
 
-	require.Equal(t, "AVRISP mkII", avrPlatform.Releases[""].Programmers["avrispmkii"].Get("name"))
+	require.Equal(t, "AVRISP mkII", avrPlatform.Releases[""].Programmers["avrispmkii"].Name)
 
 	//require.Equal(t, "{runtime.tools.ctags.path}", packages.Properties.Get("tools.ctags.path"])
 	//require.Equal(t, "\"{cmd.path}\" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives \"{source_file}\"", packages.Properties.Get("tools.ctags.pattern"])
@@ -114,7 +114,7 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	require.Equal(t, "-v", avrPlatform.Properties.Get("tools.avrdude.bootloader.params.verbose"))
 	require.Equal(t, "/my/personal/avrdude", avrPlatform.Properties.Get("tools.avrdude.cmd.path"))
 
-	require.Equal(t, "AVRISP mkII", avrPlatform.Programmers["avrispmkii"].Get("name"))
+	require.Equal(t, "AVRISP mkII", avrPlatform.Programmers["avrispmkii"].Name)
 
 	require.Equal(t, "-w -x c++ -M -MG -MP", avrPlatform.Properties.Get("preproc.includes.flags"))
 	require.Equal(t, "-w -x c++ -E -CC", avrPlatform.Properties.Get("preproc.macros.flags"))
@@ -177,8 +177,8 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 
 	require.Equal(t, 3, len(samdPlatform.Programmers))
 
-	require.Equal(t, "Atmel EDBG", samdPlatform.Programmers["edbg"].Get("name"))
-	require.Equal(t, "openocd", samdPlatform.Programmers["edbg"].Get("program.tool"))
+	require.Equal(t, "Atmel EDBG", samdPlatform.Programmers["edbg"].Name)
+	require.Equal(t, "openocd", samdPlatform.Programmers["edbg"].Properties.Get("program.tool"))
 
 	avrRedBearPlatform := packages["RedBearLab"].Platforms["avr"].Releases["1.0.0"]
 	require.Equal(t, 3, len(avrRedBearPlatform.Boards))
