@@ -92,9 +92,6 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			port = deviceURI.Host + deviceURI.Path
 		}
 	}
-	if port == "" {
-		return fmt.Errorf("no upload port provided")
-	}
 	logrus.WithField("port", port).Tracef("Upload port")
 
 	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
@@ -266,6 +263,10 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	if programmer == nil && !burnBootloader {
 		// Perform reset via 1200bps touch if requested
 		if uploadProperties.GetBoolean("upload.use_1200bps_touch") {
+			if port == "" {
+				return fmt.Errorf("no upload port provided")
+			}
+
 			ports, err := serial.GetPortsList()
 			if err != nil {
 				return fmt.Errorf("cannot get serial port list: %s", err)
@@ -310,12 +311,14 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		}
 	}
 
-	// Set serial port property
-	uploadProperties.Set("serial.port", actualPort)
-	if strings.HasPrefix(actualPort, "/dev/") {
-		uploadProperties.Set("serial.port.file", actualPort[5:])
-	} else {
-		uploadProperties.Set("serial.port.file", actualPort)
+	if port != "" {
+		// Set serial port property
+		uploadProperties.Set("serial.port", actualPort)
+		if strings.HasPrefix(actualPort, "/dev/") {
+			uploadProperties.Set("serial.port.file", actualPort[5:])
+		} else {
+			uploadProperties.Set("serial.port.file", actualPort)
+		}
 	}
 
 	// Build recipe for upload
@@ -347,6 +350,9 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	}
 	if strings.TrimSpace(recipe) == "" {
 		return nil // Nothing to run
+	}
+	if props.IsProertyMissingInExpandPropsInString("serial.port", recipe) {
+		return fmt.Errorf("no upload port provided")
 	}
 	cmdLine := props.ExpandPropsInString(recipe)
 	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
