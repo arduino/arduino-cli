@@ -51,45 +51,68 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
 
-	if req.GetBurnBootloader() && req.GetProgrammer() == "" {
-		return nil, fmt.Errorf("no programmer specified for burning bootloader")
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
+
+	err = runProgramAction(
+		pm,
+		sketch,
+		req.GetImportDir(),
+		req.GetFqbn(),
+		req.GetPort(),
+		req.GetProgrammer(),
+		req.GetVerbose(),
+		req.GetVerify(),
+		false, // burnBootloader
+		outStream,
+		errStream,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &rpc.UploadResp{}, nil
+}
+
+func runProgramAction(pm *packagemanager.PackageManager,
+	sketch *sketches.Sketch, importDir string, fqbnIn string, port string,
+	programmerID string,
+	verbose, verify, burnBootloader bool,
+	outStream io.Writer, errStream io.Writer) error {
+
+	if burnBootloader && programmerID == "" {
+		return fmt.Errorf("no programmer specified for burning bootloader")
 	}
 
 	// FIXME: make a specification on how a port is specified via command line
-	port := req.GetPort()
 	if port == "" && sketch != nil && sketch.Metadata != nil {
 		deviceURI, err := url.Parse(sketch.Metadata.CPU.Port)
 		if err != nil {
-			return nil, fmt.Errorf("invalid Device URL format: %s", err)
+			return fmt.Errorf("invalid Device URL format: %s", err)
 		}
 		if deviceURI.Scheme == "serial" {
 			port = deviceURI.Host + deviceURI.Path
 		}
 	}
 	if port == "" {
-		return nil, fmt.Errorf("no upload port provided")
+		return fmt.Errorf("no upload port provided")
 	}
 	logrus.WithField("port", port).Tracef("Upload port")
 
-	fqbnIn := req.GetFqbn()
 	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
 		fqbnIn = sketch.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
-		return nil, fmt.Errorf("no Fully Qualified Board Name provided")
+		return fmt.Errorf("no Fully Qualified Board Name provided")
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, fmt.Errorf("incorrect FQBN: %s", err)
+		return fmt.Errorf("incorrect FQBN: %s", err)
 	}
 	logrus.WithField("fqbn", fqbn).Tracef("Detected FQBN")
-
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
 	// Find target board and board properties
 	_, boardPlatform, board, boardProperties, buildPlatform, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, fmt.Errorf("incorrect FQBN: %s", err)
+		return fmt.Errorf("incorrect FQBN: %s", err)
 	}
 	logrus.
 		WithField("boardPlatform", boardPlatform).
@@ -102,12 +125,11 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	var uploadToolPlatform *cores.PlatformRelease
 	var programmer *cores.Programmer
 
-	burnBootloader := req.GetBurnBootloader()
 	if burnBootloader {
 		uploadToolName = boardProperties.Get("bootloader.tool")
 		uploadToolPlatform = boardPlatform
 		if uploadToolName == "" {
-			return nil, fmt.Errorf("cannot get programmer tool: undefined 'bootloader.tool' in boards.txt")
+			return fmt.Errorf("cannot get programmer tool: undefined 'bootloader.tool' in boards.txt")
 		}
 		logrus.
 			WithField("uploadToolName", uploadToolName).
@@ -115,19 +137,19 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 			Trace("Upload tool from 'bootloader.tool' property")
 	}
 
-	if programmerID := req.GetProgrammer(); programmerID != "" {
+	if programmerID != "" {
 		programmer = boardPlatform.Programmers[programmerID]
 		if programmer == nil {
 			// Try to find the programmer in the referenced build platform
 			programmer = buildPlatform.Programmers[programmerID]
 		}
 		if programmer == nil {
-			return nil, fmt.Errorf("programmer '%s' not available", programmerID)
+			return fmt.Errorf("programmer '%s' not available", programmerID)
 		}
 		uploadToolName = programmer.Properties.Get("program.tool")
 		uploadToolPlatform = programmer.PlatformRelease
 		if uploadToolName == "" {
-			return nil, fmt.Errorf("cannot get programmer tool: undefined 'program.tool' property")
+			return fmt.Errorf("cannot get programmer tool: undefined 'program.tool' property")
 		}
 		logrus.
 			WithField("uploadToolName", uploadToolName).
@@ -137,10 +159,10 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		uploadToolName = boardProperties.Get("upload.tool")
 		uploadToolPlatform = boardPlatform
 		if uploadToolName == "" {
-			return nil, fmt.Errorf("cannot get upload tool: undefined 'upload.tool' property")
+			return fmt.Errorf("cannot get upload tool: undefined 'upload.tool' property")
 		}
 		if split := strings.Split(uploadToolName, ":"); len(split) > 2 {
-			return nil, fmt.Errorf("invalid 'upload.tool' property: %s", uploadToolName)
+			return fmt.Errorf("invalid 'upload.tool' property: %s", uploadToolName)
 		} else if len(split) == 2 {
 			uploadToolName = split[1]
 			uploadToolPlatform = pm.GetInstalledPlatformRelease(
@@ -179,7 +201,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	}
 
 	// Set properties for verbose upload
-	if req.GetVerbose() {
+	if verbose {
 		if v, ok := uploadProperties.GetOk("upload.params.verbose"); ok {
 			uploadProperties.Set("upload.verbose", v)
 		}
@@ -208,7 +230,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	}
 
 	// Set properties for verify
-	if req.GetVerify() {
+	if verify {
 		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.verify"))
 		uploadProperties.Set("program.verify", uploadProperties.Get("program.params.verify"))
 	} else {
@@ -218,7 +240,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 
 	var importPath *paths.Path
 	if !burnBootloader {
-		if importDir := req.GetImportDir(); importDir != "" {
+		if importDir != "" {
 			importPath = paths.New(importDir)
 		} else {
 			// TODO: Create a function to obtain importPath from sketch
@@ -229,10 +251,10 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		}
 
 		if !importPath.Exist() {
-			return nil, fmt.Errorf("compiled sketch not found in %s", importPath)
+			return fmt.Errorf("compiled sketch not found in %s", importPath)
 		}
 		if !importPath.IsDir() {
-			return nil, fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
+			return fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
 		}
 		uploadProperties.SetPath("build.path", importPath)
 		uploadProperties.Set("build.project_name", sketch.Name+".ino")
@@ -246,16 +268,16 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 		if uploadProperties.GetBoolean("upload.use_1200bps_touch") {
 			ports, err := serial.GetPortsList()
 			if err != nil {
-				return nil, fmt.Errorf("cannot get serial port list: %s", err)
+				return fmt.Errorf("cannot get serial port list: %s", err)
 			}
 			for _, p := range ports {
 				if p == port {
-					if req.GetVerbose() {
+					if verbose {
 						outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", p)))
 						outStream.Write([]byte(fmt.Sprintln()))
 					}
 					if err := touchSerialPortAt1200bps(p); err != nil {
-						return nil, fmt.Errorf("cannot perform reset: %s", err)
+						return fmt.Errorf("cannot perform reset: %s", err)
 					}
 					break
 				}
@@ -270,11 +292,11 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 
 		// Wait for upload port if requested
 		if uploadProperties.GetBoolean("upload.wait_for_upload_port") {
-			if req.GetVerbose() {
+			if verbose {
 				outStream.Write([]byte(fmt.Sprintln("Waiting for upload port...")))
 			}
 			if p, err := waitForNewSerialPort(); err != nil {
-				return nil, fmt.Errorf("cannot detect serial ports: %s", err)
+				return fmt.Errorf("cannot detect serial ports: %s", err)
 			} else if p == "" {
 				feedback.Print("No new serial port detected.")
 			} else {
@@ -298,24 +320,24 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 
 	// Build recipe for upload
 	if burnBootloader {
-		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, req.GetVerbose()); err != nil {
-			return nil, fmt.Errorf("chip erase error: %s", err)
+		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, verbose); err != nil {
+			return fmt.Errorf("chip erase error: %s", err)
 		}
-		if err := runTool("bootloader.pattern", uploadProperties, outStream, errStream, req.GetVerbose()); err != nil {
-			return nil, fmt.Errorf("burn bootloader error: %s", err)
+		if err := runTool("bootloader.pattern", uploadProperties, outStream, errStream, verbose); err != nil {
+			return fmt.Errorf("burn bootloader error: %s", err)
 		}
 	} else if programmer != nil {
-		if err := runTool("program.pattern", uploadProperties, outStream, errStream, req.GetVerbose()); err != nil {
-			return nil, fmt.Errorf("programming error: %s", err)
+		if err := runTool("program.pattern", uploadProperties, outStream, errStream, verbose); err != nil {
+			return fmt.Errorf("programming error: %s", err)
 		}
 	} else {
-		if err := runTool("upload.pattern", uploadProperties, outStream, errStream, req.GetVerbose()); err != nil {
-			return nil, fmt.Errorf("uploading error: %s", err)
+		if err := runTool("upload.pattern", uploadProperties, outStream, errStream, verbose); err != nil {
+			return fmt.Errorf("uploading error: %s", err)
 		}
 	}
 
 	logrus.Tracef("Upload %s on %s successful", sketch.Name, fqbnIn)
-	return &rpc.UploadResp{}, nil
+	return nil
 }
 
 func runTool(recipeID string, props *properties.Map, outStream, errStream io.Writer, verbose bool) error {

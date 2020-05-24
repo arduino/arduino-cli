@@ -87,6 +87,9 @@ service ArduinoCore {
 
   rpc ListProgrammersAvailableForUpload(ListProgrammersAvailableForUploadReq) returns (ListProgrammersAvailableForUploadResp);
 
+  // Burn bootloader to a board.
+  rpc BurnBootloader(BurnBootloaderReq) returns (stream BurnBootloaderResp);
+
   // Search for a platform in the platforms indexes.
   rpc PlatformSearch(PlatformSearchReq) returns (PlatformSearchResp);
 

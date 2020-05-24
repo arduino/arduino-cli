@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/board"
+	"github.com/arduino/arduino-cli/cli/burnbootloader"
 	"github.com/arduino/arduino-cli/cli/cache"
 	"github.com/arduino/arduino-cli/cli/compile"
 	"github.com/arduino/arduino-cli/cli/completion"
@@ -87,6 +88,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(sketch.NewCommand())
 	cmd.AddCommand(upload.NewCommand())
 	cmd.AddCommand(debug.NewCommand())
+	cmd.AddCommand(burnbootloader.NewCommand())
 	cmd.AddCommand(version.NewCommand())
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
