@@ -339,7 +339,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		}
 	}
 
-	logrus.Tracef("Upload %s on %s successful", sketch.Name, fqbnIn)
+	logrus.Tracef("Upload successful")
 	return nil
 }
 
