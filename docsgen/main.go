@@ -28,7 +28,7 @@ func main() {
 		log.Fatal("Please provide output folder")
 	}
 
-	cli := cli.ArduinoCli
+	cli := cli.NewCommand()
 	err := doc.GenMarkdownTree(cli, os.Args[1])
 	if err != nil {
 		log.Fatal(err)
