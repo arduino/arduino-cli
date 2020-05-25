@@ -120,13 +120,13 @@ tasks:
     cmds:
       - go run ./i18n/cmd/main.go catalog generate . > ./i18n/data/en.po
       - go run ./i18n/cmd/main.go catalog update -l {{.I18N_LANGS}} ./i18n/data
-      - go generate ./i18n
+      - task: i18n:generate
 
   i18n:pull:
     desc: Pull i18n files from transifex
     cmds:
       - go run ./i18n/cmd/main.go transifex pull -l {{.I18N_LANGS}} ./i18n/data
-      - go generate ./i18n
+      - task: i18n:generate
 
   i18n:push:
     desc: Push i18n files to transifex
@@ -139,6 +139,12 @@ tasks:
       - task: i18n:update
       - git add -N ./i18n/data
       - git diff --exit-code ./i18n/data &> /dev/null || echo "The i18n message catalog was updated, commit the changes before proceeding"
+
+  i18n:generate:
+    desc: Generate embedded i18n catalog files
+    cmds:
+      - git add -N ./i18n/data
+      - git diff --exit-code ./i18n/data &> /dev/null || cd ./i18n && rice embed-go
 vars:
   # all modules of this project except for "legacy/..." module
   DEFAULT_TARGETS:

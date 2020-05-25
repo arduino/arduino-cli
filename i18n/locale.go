@@ -15,8 +15,6 @@
 
 package i18n
 
-//go:generate ./embed-i18n.sh
-
 import (
 	"os"
 	"path/filepath"
