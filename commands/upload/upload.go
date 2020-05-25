@@ -237,6 +237,10 @@ func runProgramAction(pm *packagemanager.PackageManager,
 
 	var importPath *paths.Path
 	if !burnBootloader {
+		if sketch == nil {
+			return fmt.Errorf(("no sketch specified"))
+		}
+
 		if importDir != "" {
 			importPath = paths.New(importDir)
 		} else {
