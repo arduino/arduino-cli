@@ -138,7 +138,7 @@ tasks:
     cmds:
       - task: i18n:update
       - git add -N ./i18n/data
-      - git diff --exit-code ./i18n/data &> /dev/null || echo "The i18n message catalog was updated, commit the changes before proceeding"
+      - git diff --exit-code ./i18n/data
 
   i18n:generate:
     desc: Generate embedded i18n catalog files
