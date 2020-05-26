@@ -22,6 +22,7 @@ import (
 	"go/token"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/arduino/arduino-cli/i18n/cmd/po"
 )
@@ -74,7 +75,7 @@ func doFile(fset *token.FileSet, file *ast.File, catalog *po.MessageCatalog) {
 			return true
 		}
 
-		catalog.Add(msg, msg, []string{fmt.Sprintf("#: %s:%d", pos.Filename, pos.Line)})
+		catalog.Add(msg, msg, []string{fmt.Sprintf("#: %s:%d", strings.ReplaceAll(pos.Filename, "\\", "/"), pos.Line)})
 
 		return true
 	})
