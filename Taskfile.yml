@@ -119,7 +119,6 @@ tasks:
     desc: Updates i18n files
     cmds:
       - go run ./i18n/cmd/main.go catalog generate . > ./i18n/data/en.po
-      - go run ./i18n/cmd/main.go catalog update -l {{.I18N_LANGS}} ./i18n/data
       - task: i18n:generate
 
   i18n:pull:
@@ -145,6 +144,7 @@ tasks:
     cmds:
       - git add -N ./i18n/data
       - git diff --exit-code ./i18n/data &> /dev/null || (cd ./i18n && rice embed-go)
+
 vars:
   # all modules of this project except for "legacy/..." module
   DEFAULT_TARGETS:
