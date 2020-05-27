@@ -172,11 +172,11 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 			return nil, fmt.Errorf("cannot get serial port list: %s", err)
 		}
 		for _, p := range ports {
-			if req.GetVerbose() {
-				outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", p)))
-				outStream.Write([]byte(fmt.Sprintln()))
-			}
 			if p == port {
+				if req.GetVerbose() {
+					outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", p)))
+					outStream.Write([]byte(fmt.Sprintln()))
+				}
 				if err := touchSerialPortAt1200bps(p); err != nil {
 					return nil, fmt.Errorf("cannot perform reset: %s", err)
 				}
