@@ -987,22 +987,36 @@ public final class DebugOuterClass {
         getInterpreterBytes();
 
     /**
-     * <code>bool verbose = 6;</code>
-     * @return The verbose.
-     */
-    boolean getVerbose();
-
-    /**
-     * <code>string import_file = 7;</code>
+     * <pre>
+     * DEPRECATED: use import_dir instead
+     * </pre>
+     *
+     * <code>string import_file = 7 [deprecated = true];</code>
      * @return The importFile.
      */
-    java.lang.String getImportFile();
+    @java.lang.Deprecated java.lang.String getImportFile();
     /**
-     * <code>string import_file = 7;</code>
+     * <pre>
+     * DEPRECATED: use import_dir instead
+     * </pre>
+     *
+     * <code>string import_file = 7 [deprecated = true];</code>
      * @return The bytes for importFile.
      */
-    com.google.protobuf.ByteString
+    @java.lang.Deprecated com.google.protobuf.ByteString
         getImportFileBytes();
+
+    /**
+     * <code>string import_dir = 8;</code>
+     * @return The importDir.
+     */
+    java.lang.String getImportDir();
+    /**
+     * <code>string import_dir = 8;</code>
+     * @return The bytes for importDir.
+     */
+    com.google.protobuf.ByteString
+        getImportDirBytes();
   }
   /**
    * Protobuf type {@code cc.arduino.cli.debug.DebugConfigReq}
@@ -1022,6 +1036,7 @@ public final class DebugOuterClass {
       port_ = "";
       interpreter_ = "";
       importFile_ = "";
+      importDir_ = "";
     }
 
     @java.lang.Override
@@ -1091,15 +1106,16 @@ public final class DebugOuterClass {
               interpreter_ = s;
               break;
             }
-            case 48: {
-
-              verbose_ = input.readBool();
-              break;
-            }
             case 58: {
               java.lang.String s = input.readStringRequireUtf8();
 
               importFile_ = s;
+              break;
+            }
+            case 66: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              importDir_ = s;
               break;
             }
             default: {
@@ -1301,23 +1317,17 @@ public final class DebugOuterClass {
       }
     }
 
-    public static final int VERBOSE_FIELD_NUMBER = 6;
-    private boolean verbose_;
-    /**
-     * <code>bool verbose = 6;</code>
-     * @return The verbose.
-     */
-    public boolean getVerbose() {
-      return verbose_;
-    }
-
     public static final int IMPORT_FILE_FIELD_NUMBER = 7;
     private volatile java.lang.Object importFile_;
     /**
-     * <code>string import_file = 7;</code>
+     * <pre>
+     * DEPRECATED: use import_dir instead
+     * </pre>
+     *
+     * <code>string import_file = 7 [deprecated = true];</code>
      * @return The importFile.
      */
-    public java.lang.String getImportFile() {
+    @java.lang.Deprecated public java.lang.String getImportFile() {
       java.lang.Object ref = importFile_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -1330,10 +1340,14 @@ public final class DebugOuterClass {
       }
     }
     /**
-     * <code>string import_file = 7;</code>
+     * <pre>
+     * DEPRECATED: use import_dir instead
+     * </pre>
+     *
+     * <code>string import_file = 7 [deprecated = true];</code>
      * @return The bytes for importFile.
      */
-    public com.google.protobuf.ByteString
+    @java.lang.Deprecated public com.google.protobuf.ByteString
         getImportFileBytes() {
       java.lang.Object ref = importFile_;
       if (ref instanceof java.lang.String) {
@@ -1341,6 +1355,42 @@ public final class DebugOuterClass {
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         importFile_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int IMPORT_DIR_FIELD_NUMBER = 8;
+    private volatile java.lang.Object importDir_;
+    /**
+     * <code>string import_dir = 8;</code>
+     * @return The importDir.
+     */
+    public java.lang.String getImportDir() {
+      java.lang.Object ref = importDir_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        importDir_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string import_dir = 8;</code>
+     * @return The bytes for importDir.
+     */
+    public com.google.protobuf.ByteString
+        getImportDirBytes() {
+      java.lang.Object ref = importDir_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        importDir_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -1376,11 +1426,11 @@ public final class DebugOuterClass {
       if (!getInterpreterBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 5, interpreter_);
       }
-      if (verbose_ != false) {
-        output.writeBool(6, verbose_);
-      }
       if (!getImportFileBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 7, importFile_);
+      }
+      if (!getImportDirBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 8, importDir_);
       }
       unknownFields.writeTo(output);
     }
@@ -1407,12 +1457,11 @@ public final class DebugOuterClass {
       if (!getInterpreterBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, interpreter_);
       }
-      if (verbose_ != false) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(6, verbose_);
-      }
       if (!getImportFileBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, importFile_);
+      }
+      if (!getImportDirBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, importDir_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1442,10 +1491,10 @@ public final class DebugOuterClass {
           .equals(other.getPort())) return false;
       if (!getInterpreter()
           .equals(other.getInterpreter())) return false;
-      if (getVerbose()
-          != other.getVerbose()) return false;
       if (!getImportFile()
           .equals(other.getImportFile())) return false;
+      if (!getImportDir()
+          .equals(other.getImportDir())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1469,11 +1518,10 @@ public final class DebugOuterClass {
       hash = (53 * hash) + getPort().hashCode();
       hash = (37 * hash) + INTERPRETER_FIELD_NUMBER;
       hash = (53 * hash) + getInterpreter().hashCode();
-      hash = (37 * hash) + VERBOSE_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getVerbose());
       hash = (37 * hash) + IMPORT_FILE_FIELD_NUMBER;
       hash = (53 * hash) + getImportFile().hashCode();
+      hash = (37 * hash) + IMPORT_DIR_FIELD_NUMBER;
+      hash = (53 * hash) + getImportDir().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1621,9 +1669,9 @@ public final class DebugOuterClass {
 
         interpreter_ = "";
 
-        verbose_ = false;
-
         importFile_ = "";
+
+        importDir_ = "";
 
         return this;
       }
@@ -1660,8 +1708,8 @@ public final class DebugOuterClass {
         result.sketchPath_ = sketchPath_;
         result.port_ = port_;
         result.interpreter_ = interpreter_;
-        result.verbose_ = verbose_;
         result.importFile_ = importFile_;
+        result.importDir_ = importDir_;
         onBuilt();
         return result;
       }
@@ -1729,11 +1777,12 @@ public final class DebugOuterClass {
           interpreter_ = other.interpreter_;
           onChanged();
         }
-        if (other.getVerbose() != false) {
-          setVerbose(other.getVerbose());
-        }
         if (!other.getImportFile().isEmpty()) {
           importFile_ = other.importFile_;
+          onChanged();
+        }
+        if (!other.getImportDir().isEmpty()) {
+          importDir_ = other.importDir_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -2188,42 +2237,16 @@ public final class DebugOuterClass {
         return this;
       }
 
-      private boolean verbose_ ;
-      /**
-       * <code>bool verbose = 6;</code>
-       * @return The verbose.
-       */
-      public boolean getVerbose() {
-        return verbose_;
-      }
-      /**
-       * <code>bool verbose = 6;</code>
-       * @param value The verbose to set.
-       * @return This builder for chaining.
-       */
-      public Builder setVerbose(boolean value) {
-        
-        verbose_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>bool verbose = 6;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearVerbose() {
-        
-        verbose_ = false;
-        onChanged();
-        return this;
-      }
-
       private java.lang.Object importFile_ = "";
       /**
-       * <code>string import_file = 7;</code>
+       * <pre>
+       * DEPRECATED: use import_dir instead
+       * </pre>
+       *
+       * <code>string import_file = 7 [deprecated = true];</code>
        * @return The importFile.
        */
-      public java.lang.String getImportFile() {
+      @java.lang.Deprecated public java.lang.String getImportFile() {
         java.lang.Object ref = importFile_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
@@ -2236,10 +2259,14 @@ public final class DebugOuterClass {
         }
       }
       /**
-       * <code>string import_file = 7;</code>
+       * <pre>
+       * DEPRECATED: use import_dir instead
+       * </pre>
+       *
+       * <code>string import_file = 7 [deprecated = true];</code>
        * @return The bytes for importFile.
        */
-      public com.google.protobuf.ByteString
+      @java.lang.Deprecated public com.google.protobuf.ByteString
           getImportFileBytes() {
         java.lang.Object ref = importFile_;
         if (ref instanceof String) {
@@ -2253,11 +2280,15 @@ public final class DebugOuterClass {
         }
       }
       /**
-       * <code>string import_file = 7;</code>
+       * <pre>
+       * DEPRECATED: use import_dir instead
+       * </pre>
+       *
+       * <code>string import_file = 7 [deprecated = true];</code>
        * @param value The importFile to set.
        * @return This builder for chaining.
        */
-      public Builder setImportFile(
+      @java.lang.Deprecated public Builder setImportFile(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
@@ -2268,21 +2299,29 @@ public final class DebugOuterClass {
         return this;
       }
       /**
-       * <code>string import_file = 7;</code>
+       * <pre>
+       * DEPRECATED: use import_dir instead
+       * </pre>
+       *
+       * <code>string import_file = 7 [deprecated = true];</code>
        * @return This builder for chaining.
        */
-      public Builder clearImportFile() {
+      @java.lang.Deprecated public Builder clearImportFile() {
         
         importFile_ = getDefaultInstance().getImportFile();
         onChanged();
         return this;
       }
       /**
-       * <code>string import_file = 7;</code>
+       * <pre>
+       * DEPRECATED: use import_dir instead
+       * </pre>
+       *
+       * <code>string import_file = 7 [deprecated = true];</code>
        * @param value The bytes for importFile to set.
        * @return This builder for chaining.
        */
-      public Builder setImportFileBytes(
+      @java.lang.Deprecated public Builder setImportFileBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
@@ -2290,6 +2329,82 @@ public final class DebugOuterClass {
   checkByteStringIsUtf8(value);
         
         importFile_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object importDir_ = "";
+      /**
+       * <code>string import_dir = 8;</code>
+       * @return The importDir.
+       */
+      public java.lang.String getImportDir() {
+        java.lang.Object ref = importDir_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          importDir_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string import_dir = 8;</code>
+       * @return The bytes for importDir.
+       */
+      public com.google.protobuf.ByteString
+          getImportDirBytes() {
+        java.lang.Object ref = importDir_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          importDir_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string import_dir = 8;</code>
+       * @param value The importDir to set.
+       * @return This builder for chaining.
+       */
+      public Builder setImportDir(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        importDir_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string import_dir = 8;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearImportDir() {
+        
+        importDir_ = getDefaultInstance().getImportDir();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string import_dir = 8;</code>
+       * @param value The bytes for importDir to set.
+       * @return This builder for chaining.
+       */
+      public Builder setImportDirBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        importDir_ = value;
         onChanged();
         return this;
       }
@@ -3018,16 +3133,16 @@ public final class DebugOuterClass {
       "g\032\025commands/common.proto\"h\n\010DebugReq\0226\n\010" +
       "debugReq\030\001 \001(\0132$.cc.arduino.cli.debug.De" +
       "bugConfigReq\022\014\n\004data\030\002 \001(\014\022\026\n\016send_inter" +
-      "rupt\030\003 \001(\010\"\261\001\n\016DebugConfigReq\0223\n\010instanc" +
+      "rupt\030\003 \001(\010\"\270\001\n\016DebugConfigReq\0223\n\010instanc" +
       "e\030\001 \001(\0132!.cc.arduino.cli.commands.Instan" +
       "ce\022\014\n\004fqbn\030\002 \001(\t\022\023\n\013sketch_path\030\003 \001(\t\022\014\n" +
-      "\004port\030\004 \001(\t\022\023\n\013interpreter\030\005 \001(\t\022\017\n\007verb" +
-      "ose\030\006 \001(\010\022\023\n\013import_file\030\007 \001(\t\"(\n\tDebugR" +
-      "esp\022\014\n\004data\030\001 \001(\014\022\r\n\005error\030\002 \001(\t2W\n\005Debu" +
-      "g\022N\n\005Debug\022\036.cc.arduino.cli.debug.DebugR" +
-      "eq\032\037.cc.arduino.cli.debug.DebugResp\"\000(\0010" +
-      "\001B*Z(github.com/arduino/arduino-cli/rpc/" +
-      "debugb\006proto3"
+      "\004port\030\004 \001(\t\022\023\n\013interpreter\030\005 \001(\t\022\027\n\013impo" +
+      "rt_file\030\007 \001(\tB\002\030\001\022\022\n\nimport_dir\030\010 \001(\t\"(\n" +
+      "\tDebugResp\022\014\n\004data\030\001 \001(\014\022\r\n\005error\030\002 \001(\t2" +
+      "W\n\005Debug\022N\n\005Debug\022\036.cc.arduino.cli.debug" +
+      ".DebugReq\032\037.cc.arduino.cli.debug.DebugRe" +
+      "sp\"\000(\0010\001B*Z(github.com/arduino/arduino-c" +
+      "li/rpc/debugb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -3045,7 +3160,7 @@ public final class DebugOuterClass {
     internal_static_cc_arduino_cli_debug_DebugConfigReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_cc_arduino_cli_debug_DebugConfigReq_descriptor,
-        new java.lang.String[] { "Instance", "Fqbn", "SketchPath", "Port", "Interpreter", "Verbose", "ImportFile", });
+        new java.lang.String[] { "Instance", "Fqbn", "SketchPath", "Port", "Interpreter", "ImportFile", "ImportDir", });
     internal_static_cc_arduino_cli_debug_DebugResp_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_cc_arduino_cli_debug_DebugResp_fieldAccessorTable = new

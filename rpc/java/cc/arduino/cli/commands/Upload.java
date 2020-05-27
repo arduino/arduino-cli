@@ -19,26 +19,50 @@ public final class Upload {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * Arduino Core Service instance from the `Init` response.
+     * </pre>
+     *
      * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      * @return Whether the instance field is set.
      */
     boolean hasInstance();
     /**
+     * <pre>
+     * Arduino Core Service instance from the `Init` response.
+     * </pre>
+     *
      * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      * @return The instance.
      */
     cc.arduino.cli.commands.Common.Instance getInstance();
     /**
+     * <pre>
+     * Arduino Core Service instance from the `Init` response.
+     * </pre>
+     *
      * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      */
     cc.arduino.cli.commands.Common.InstanceOrBuilder getInstanceOrBuilder();
 
     /**
+     * <pre>
+     * Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+     * If this field is not defined, the FQBN of the board attached to the sketch
+     * via the `BoardAttach` method is used.
+     * </pre>
+     *
      * <code>string fqbn = 2;</code>
      * @return The fqbn.
      */
     java.lang.String getFqbn();
     /**
+     * <pre>
+     * Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+     * If this field is not defined, the FQBN of the board attached to the sketch
+     * via the `BoardAttach` method is used.
+     * </pre>
+     *
      * <code>string fqbn = 2;</code>
      * @return The bytes for fqbn.
      */
@@ -46,11 +70,23 @@ public final class Upload {
         getFqbnBytes();
 
     /**
+     * <pre>
+     * Path where the sketch to be uploaded is stored. Unless the `import_file`
+     * field is defined, the compiled binary is assumed to be at the location and
+     * filename under this path where it is saved by the `Compile` method.
+     * </pre>
+     *
      * <code>string sketch_path = 3;</code>
      * @return The sketchPath.
      */
     java.lang.String getSketchPath();
     /**
+     * <pre>
+     * Path where the sketch to be uploaded is stored. Unless the `import_file`
+     * field is defined, the compiled binary is assumed to be at the location and
+     * filename under this path where it is saved by the `Compile` method.
+     * </pre>
+     *
      * <code>string sketch_path = 3;</code>
      * @return The bytes for sketchPath.
      */
@@ -58,11 +94,19 @@ public final class Upload {
         getSketchPathBytes();
 
     /**
+     * <pre>
+     * The port of the board.
+     * </pre>
+     *
      * <code>string port = 4;</code>
      * @return The port.
      */
     java.lang.String getPort();
     /**
+     * <pre>
+     * The port of the board.
+     * </pre>
+     *
      * <code>string port = 4;</code>
      * @return The bytes for port.
      */
@@ -70,28 +114,67 @@ public final class Upload {
         getPortBytes();
 
     /**
+     * <pre>
+     * Whether to turn on verbose output during the upload.
+     * </pre>
+     *
      * <code>bool verbose = 5;</code>
      * @return The verbose.
      */
     boolean getVerbose();
 
     /**
+     * <pre>
+     * After upload, verify that the contents of the memory on the board match the
+     * uploaded binary.
+     * </pre>
+     *
      * <code>bool verify = 6;</code>
      * @return The verify.
      */
     boolean getVerify();
 
     /**
-     * <code>string import_file = 7;</code>
+     * <pre>
+     * DEPRECATED: Use import_dir instead
+     * </pre>
+     *
+     * <code>string import_file = 7 [deprecated = true];</code>
      * @return The importFile.
      */
-    java.lang.String getImportFile();
+    @java.lang.Deprecated java.lang.String getImportFile();
     /**
-     * <code>string import_file = 7;</code>
+     * <pre>
+     * DEPRECATED: Use import_dir instead
+     * </pre>
+     *
+     * <code>string import_file = 7 [deprecated = true];</code>
      * @return The bytes for importFile.
      */
-    com.google.protobuf.ByteString
+    @java.lang.Deprecated com.google.protobuf.ByteString
         getImportFileBytes();
+
+    /**
+     * <pre>
+     * Custom path to a directory containing compiled files. When `import_dir` is
+     * not specified, the standard build directory under `sketch_path` is used.
+     * </pre>
+     *
+     * <code>string import_dir = 8;</code>
+     * @return The importDir.
+     */
+    java.lang.String getImportDir();
+    /**
+     * <pre>
+     * Custom path to a directory containing compiled files. When `import_dir` is
+     * not specified, the standard build directory under `sketch_path` is used.
+     * </pre>
+     *
+     * <code>string import_dir = 8;</code>
+     * @return The bytes for importDir.
+     */
+    com.google.protobuf.ByteString
+        getImportDirBytes();
   }
   /**
    * Protobuf type {@code cc.arduino.cli.commands.UploadReq}
@@ -110,6 +193,7 @@ public final class Upload {
       sketchPath_ = "";
       port_ = "";
       importFile_ = "";
+      importDir_ = "";
     }
 
     @java.lang.Override
@@ -189,6 +273,12 @@ public final class Upload {
               importFile_ = s;
               break;
             }
+            case 66: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              importDir_ = s;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -224,6 +314,10 @@ public final class Upload {
     public static final int INSTANCE_FIELD_NUMBER = 1;
     private cc.arduino.cli.commands.Common.Instance instance_;
     /**
+     * <pre>
+     * Arduino Core Service instance from the `Init` response.
+     * </pre>
+     *
      * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      * @return Whether the instance field is set.
      */
@@ -231,6 +325,10 @@ public final class Upload {
       return instance_ != null;
     }
     /**
+     * <pre>
+     * Arduino Core Service instance from the `Init` response.
+     * </pre>
+     *
      * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      * @return The instance.
      */
@@ -238,6 +336,10 @@ public final class Upload {
       return instance_ == null ? cc.arduino.cli.commands.Common.Instance.getDefaultInstance() : instance_;
     }
     /**
+     * <pre>
+     * Arduino Core Service instance from the `Init` response.
+     * </pre>
+     *
      * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      */
     public cc.arduino.cli.commands.Common.InstanceOrBuilder getInstanceOrBuilder() {
@@ -247,6 +349,12 @@ public final class Upload {
     public static final int FQBN_FIELD_NUMBER = 2;
     private volatile java.lang.Object fqbn_;
     /**
+     * <pre>
+     * Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+     * If this field is not defined, the FQBN of the board attached to the sketch
+     * via the `BoardAttach` method is used.
+     * </pre>
+     *
      * <code>string fqbn = 2;</code>
      * @return The fqbn.
      */
@@ -263,6 +371,12 @@ public final class Upload {
       }
     }
     /**
+     * <pre>
+     * Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+     * If this field is not defined, the FQBN of the board attached to the sketch
+     * via the `BoardAttach` method is used.
+     * </pre>
+     *
      * <code>string fqbn = 2;</code>
      * @return The bytes for fqbn.
      */
@@ -283,6 +397,12 @@ public final class Upload {
     public static final int SKETCH_PATH_FIELD_NUMBER = 3;
     private volatile java.lang.Object sketchPath_;
     /**
+     * <pre>
+     * Path where the sketch to be uploaded is stored. Unless the `import_file`
+     * field is defined, the compiled binary is assumed to be at the location and
+     * filename under this path where it is saved by the `Compile` method.
+     * </pre>
+     *
      * <code>string sketch_path = 3;</code>
      * @return The sketchPath.
      */
@@ -299,6 +419,12 @@ public final class Upload {
       }
     }
     /**
+     * <pre>
+     * Path where the sketch to be uploaded is stored. Unless the `import_file`
+     * field is defined, the compiled binary is assumed to be at the location and
+     * filename under this path where it is saved by the `Compile` method.
+     * </pre>
+     *
      * <code>string sketch_path = 3;</code>
      * @return The bytes for sketchPath.
      */
@@ -319,6 +445,10 @@ public final class Upload {
     public static final int PORT_FIELD_NUMBER = 4;
     private volatile java.lang.Object port_;
     /**
+     * <pre>
+     * The port of the board.
+     * </pre>
+     *
      * <code>string port = 4;</code>
      * @return The port.
      */
@@ -335,6 +465,10 @@ public final class Upload {
       }
     }
     /**
+     * <pre>
+     * The port of the board.
+     * </pre>
+     *
      * <code>string port = 4;</code>
      * @return The bytes for port.
      */
@@ -355,6 +489,10 @@ public final class Upload {
     public static final int VERBOSE_FIELD_NUMBER = 5;
     private boolean verbose_;
     /**
+     * <pre>
+     * Whether to turn on verbose output during the upload.
+     * </pre>
+     *
      * <code>bool verbose = 5;</code>
      * @return The verbose.
      */
@@ -365,6 +503,11 @@ public final class Upload {
     public static final int VERIFY_FIELD_NUMBER = 6;
     private boolean verify_;
     /**
+     * <pre>
+     * After upload, verify that the contents of the memory on the board match the
+     * uploaded binary.
+     * </pre>
+     *
      * <code>bool verify = 6;</code>
      * @return The verify.
      */
@@ -375,10 +518,14 @@ public final class Upload {
     public static final int IMPORT_FILE_FIELD_NUMBER = 7;
     private volatile java.lang.Object importFile_;
     /**
-     * <code>string import_file = 7;</code>
+     * <pre>
+     * DEPRECATED: Use import_dir instead
+     * </pre>
+     *
+     * <code>string import_file = 7 [deprecated = true];</code>
      * @return The importFile.
      */
-    public java.lang.String getImportFile() {
+    @java.lang.Deprecated public java.lang.String getImportFile() {
       java.lang.Object ref = importFile_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -391,10 +538,14 @@ public final class Upload {
       }
     }
     /**
-     * <code>string import_file = 7;</code>
+     * <pre>
+     * DEPRECATED: Use import_dir instead
+     * </pre>
+     *
+     * <code>string import_file = 7 [deprecated = true];</code>
      * @return The bytes for importFile.
      */
-    public com.google.protobuf.ByteString
+    @java.lang.Deprecated public com.google.protobuf.ByteString
         getImportFileBytes() {
       java.lang.Object ref = importFile_;
       if (ref instanceof java.lang.String) {
@@ -402,6 +553,52 @@ public final class Upload {
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         importFile_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int IMPORT_DIR_FIELD_NUMBER = 8;
+    private volatile java.lang.Object importDir_;
+    /**
+     * <pre>
+     * Custom path to a directory containing compiled files. When `import_dir` is
+     * not specified, the standard build directory under `sketch_path` is used.
+     * </pre>
+     *
+     * <code>string import_dir = 8;</code>
+     * @return The importDir.
+     */
+    public java.lang.String getImportDir() {
+      java.lang.Object ref = importDir_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        importDir_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Custom path to a directory containing compiled files. When `import_dir` is
+     * not specified, the standard build directory under `sketch_path` is used.
+     * </pre>
+     *
+     * <code>string import_dir = 8;</code>
+     * @return The bytes for importDir.
+     */
+    public com.google.protobuf.ByteString
+        getImportDirBytes() {
+      java.lang.Object ref = importDir_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        importDir_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -443,6 +640,9 @@ public final class Upload {
       if (!getImportFileBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 7, importFile_);
       }
+      if (!getImportDirBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 8, importDir_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -476,6 +676,9 @@ public final class Upload {
       if (!getImportFileBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, importFile_);
       }
+      if (!getImportDirBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, importDir_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -508,6 +711,8 @@ public final class Upload {
           != other.getVerify()) return false;
       if (!getImportFile()
           .equals(other.getImportFile())) return false;
+      if (!getImportDir()
+          .equals(other.getImportDir())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -537,6 +742,8 @@ public final class Upload {
           getVerify());
       hash = (37 * hash) + IMPORT_FILE_FIELD_NUMBER;
       hash = (53 * hash) + getImportFile().hashCode();
+      hash = (37 * hash) + IMPORT_DIR_FIELD_NUMBER;
+      hash = (53 * hash) + getImportDir().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -688,6 +895,8 @@ public final class Upload {
 
         importFile_ = "";
 
+        importDir_ = "";
+
         return this;
       }
 
@@ -725,6 +934,7 @@ public final class Upload {
         result.verbose_ = verbose_;
         result.verify_ = verify_;
         result.importFile_ = importFile_;
+        result.importDir_ = importDir_;
         onBuilt();
         return result;
       }
@@ -798,6 +1008,10 @@ public final class Upload {
           importFile_ = other.importFile_;
           onChanged();
         }
+        if (!other.getImportDir().isEmpty()) {
+          importDir_ = other.importDir_;
+          onChanged();
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -831,6 +1045,10 @@ public final class Upload {
       private com.google.protobuf.SingleFieldBuilderV3<
           cc.arduino.cli.commands.Common.Instance, cc.arduino.cli.commands.Common.Instance.Builder, cc.arduino.cli.commands.Common.InstanceOrBuilder> instanceBuilder_;
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        * @return Whether the instance field is set.
        */
@@ -838,6 +1056,10 @@ public final class Upload {
         return instanceBuilder_ != null || instance_ != null;
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        * @return The instance.
        */
@@ -849,6 +1071,10 @@ public final class Upload {
         }
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public Builder setInstance(cc.arduino.cli.commands.Common.Instance value) {
@@ -865,6 +1091,10 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public Builder setInstance(
@@ -879,6 +1109,10 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public Builder mergeInstance(cc.arduino.cli.commands.Common.Instance value) {
@@ -897,6 +1131,10 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public Builder clearInstance() {
@@ -911,6 +1149,10 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public cc.arduino.cli.commands.Common.Instance.Builder getInstanceBuilder() {
@@ -919,6 +1161,10 @@ public final class Upload {
         return getInstanceFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public cc.arduino.cli.commands.Common.InstanceOrBuilder getInstanceOrBuilder() {
@@ -930,6 +1176,10 @@ public final class Upload {
         }
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -948,6 +1198,12 @@ public final class Upload {
 
       private java.lang.Object fqbn_ = "";
       /**
+       * <pre>
+       * Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+       * If this field is not defined, the FQBN of the board attached to the sketch
+       * via the `BoardAttach` method is used.
+       * </pre>
+       *
        * <code>string fqbn = 2;</code>
        * @return The fqbn.
        */
@@ -964,6 +1220,12 @@ public final class Upload {
         }
       }
       /**
+       * <pre>
+       * Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+       * If this field is not defined, the FQBN of the board attached to the sketch
+       * via the `BoardAttach` method is used.
+       * </pre>
+       *
        * <code>string fqbn = 2;</code>
        * @return The bytes for fqbn.
        */
@@ -981,6 +1243,12 @@ public final class Upload {
         }
       }
       /**
+       * <pre>
+       * Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+       * If this field is not defined, the FQBN of the board attached to the sketch
+       * via the `BoardAttach` method is used.
+       * </pre>
+       *
        * <code>string fqbn = 2;</code>
        * @param value The fqbn to set.
        * @return This builder for chaining.
@@ -996,6 +1264,12 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+       * If this field is not defined, the FQBN of the board attached to the sketch
+       * via the `BoardAttach` method is used.
+       * </pre>
+       *
        * <code>string fqbn = 2;</code>
        * @return This builder for chaining.
        */
@@ -1006,6 +1280,12 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+       * If this field is not defined, the FQBN of the board attached to the sketch
+       * via the `BoardAttach` method is used.
+       * </pre>
+       *
        * <code>string fqbn = 2;</code>
        * @param value The bytes for fqbn to set.
        * @return This builder for chaining.
@@ -1024,6 +1304,12 @@ public final class Upload {
 
       private java.lang.Object sketchPath_ = "";
       /**
+       * <pre>
+       * Path where the sketch to be uploaded is stored. Unless the `import_file`
+       * field is defined, the compiled binary is assumed to be at the location and
+       * filename under this path where it is saved by the `Compile` method.
+       * </pre>
+       *
        * <code>string sketch_path = 3;</code>
        * @return The sketchPath.
        */
@@ -1040,6 +1326,12 @@ public final class Upload {
         }
       }
       /**
+       * <pre>
+       * Path where the sketch to be uploaded is stored. Unless the `import_file`
+       * field is defined, the compiled binary is assumed to be at the location and
+       * filename under this path where it is saved by the `Compile` method.
+       * </pre>
+       *
        * <code>string sketch_path = 3;</code>
        * @return The bytes for sketchPath.
        */
@@ -1057,6 +1349,12 @@ public final class Upload {
         }
       }
       /**
+       * <pre>
+       * Path where the sketch to be uploaded is stored. Unless the `import_file`
+       * field is defined, the compiled binary is assumed to be at the location and
+       * filename under this path where it is saved by the `Compile` method.
+       * </pre>
+       *
        * <code>string sketch_path = 3;</code>
        * @param value The sketchPath to set.
        * @return This builder for chaining.
@@ -1072,6 +1370,12 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * Path where the sketch to be uploaded is stored. Unless the `import_file`
+       * field is defined, the compiled binary is assumed to be at the location and
+       * filename under this path where it is saved by the `Compile` method.
+       * </pre>
+       *
        * <code>string sketch_path = 3;</code>
        * @return This builder for chaining.
        */
@@ -1082,6 +1386,12 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * Path where the sketch to be uploaded is stored. Unless the `import_file`
+       * field is defined, the compiled binary is assumed to be at the location and
+       * filename under this path where it is saved by the `Compile` method.
+       * </pre>
+       *
        * <code>string sketch_path = 3;</code>
        * @param value The bytes for sketchPath to set.
        * @return This builder for chaining.
@@ -1100,6 +1410,10 @@ public final class Upload {
 
       private java.lang.Object port_ = "";
       /**
+       * <pre>
+       * The port of the board.
+       * </pre>
+       *
        * <code>string port = 4;</code>
        * @return The port.
        */
@@ -1116,6 +1430,10 @@ public final class Upload {
         }
       }
       /**
+       * <pre>
+       * The port of the board.
+       * </pre>
+       *
        * <code>string port = 4;</code>
        * @return The bytes for port.
        */
@@ -1133,6 +1451,10 @@ public final class Upload {
         }
       }
       /**
+       * <pre>
+       * The port of the board.
+       * </pre>
+       *
        * <code>string port = 4;</code>
        * @param value The port to set.
        * @return This builder for chaining.
@@ -1148,6 +1470,10 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * The port of the board.
+       * </pre>
+       *
        * <code>string port = 4;</code>
        * @return This builder for chaining.
        */
@@ -1158,6 +1484,10 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * The port of the board.
+       * </pre>
+       *
        * <code>string port = 4;</code>
        * @param value The bytes for port to set.
        * @return This builder for chaining.
@@ -1176,6 +1506,10 @@ public final class Upload {
 
       private boolean verbose_ ;
       /**
+       * <pre>
+       * Whether to turn on verbose output during the upload.
+       * </pre>
+       *
        * <code>bool verbose = 5;</code>
        * @return The verbose.
        */
@@ -1183,6 +1517,10 @@ public final class Upload {
         return verbose_;
       }
       /**
+       * <pre>
+       * Whether to turn on verbose output during the upload.
+       * </pre>
+       *
        * <code>bool verbose = 5;</code>
        * @param value The verbose to set.
        * @return This builder for chaining.
@@ -1194,6 +1532,10 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * Whether to turn on verbose output during the upload.
+       * </pre>
+       *
        * <code>bool verbose = 5;</code>
        * @return This builder for chaining.
        */
@@ -1206,6 +1548,11 @@ public final class Upload {
 
       private boolean verify_ ;
       /**
+       * <pre>
+       * After upload, verify that the contents of the memory on the board match the
+       * uploaded binary.
+       * </pre>
+       *
        * <code>bool verify = 6;</code>
        * @return The verify.
        */
@@ -1213,6 +1560,11 @@ public final class Upload {
         return verify_;
       }
       /**
+       * <pre>
+       * After upload, verify that the contents of the memory on the board match the
+       * uploaded binary.
+       * </pre>
+       *
        * <code>bool verify = 6;</code>
        * @param value The verify to set.
        * @return This builder for chaining.
@@ -1224,6 +1576,11 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * After upload, verify that the contents of the memory on the board match the
+       * uploaded binary.
+       * </pre>
+       *
        * <code>bool verify = 6;</code>
        * @return This builder for chaining.
        */
@@ -1236,10 +1593,14 @@ public final class Upload {
 
       private java.lang.Object importFile_ = "";
       /**
-       * <code>string import_file = 7;</code>
+       * <pre>
+       * DEPRECATED: Use import_dir instead
+       * </pre>
+       *
+       * <code>string import_file = 7 [deprecated = true];</code>
        * @return The importFile.
        */
-      public java.lang.String getImportFile() {
+      @java.lang.Deprecated public java.lang.String getImportFile() {
         java.lang.Object ref = importFile_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
@@ -1252,10 +1613,14 @@ public final class Upload {
         }
       }
       /**
-       * <code>string import_file = 7;</code>
+       * <pre>
+       * DEPRECATED: Use import_dir instead
+       * </pre>
+       *
+       * <code>string import_file = 7 [deprecated = true];</code>
        * @return The bytes for importFile.
        */
-      public com.google.protobuf.ByteString
+      @java.lang.Deprecated public com.google.protobuf.ByteString
           getImportFileBytes() {
         java.lang.Object ref = importFile_;
         if (ref instanceof String) {
@@ -1269,11 +1634,15 @@ public final class Upload {
         }
       }
       /**
-       * <code>string import_file = 7;</code>
+       * <pre>
+       * DEPRECATED: Use import_dir instead
+       * </pre>
+       *
+       * <code>string import_file = 7 [deprecated = true];</code>
        * @param value The importFile to set.
        * @return This builder for chaining.
        */
-      public Builder setImportFile(
+      @java.lang.Deprecated public Builder setImportFile(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
@@ -1284,21 +1653,29 @@ public final class Upload {
         return this;
       }
       /**
-       * <code>string import_file = 7;</code>
+       * <pre>
+       * DEPRECATED: Use import_dir instead
+       * </pre>
+       *
+       * <code>string import_file = 7 [deprecated = true];</code>
        * @return This builder for chaining.
        */
-      public Builder clearImportFile() {
+      @java.lang.Deprecated public Builder clearImportFile() {
         
         importFile_ = getDefaultInstance().getImportFile();
         onChanged();
         return this;
       }
       /**
-       * <code>string import_file = 7;</code>
+       * <pre>
+       * DEPRECATED: Use import_dir instead
+       * </pre>
+       *
+       * <code>string import_file = 7 [deprecated = true];</code>
        * @param value The bytes for importFile to set.
        * @return This builder for chaining.
        */
-      public Builder setImportFileBytes(
+      @java.lang.Deprecated public Builder setImportFileBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
@@ -1306,6 +1683,107 @@ public final class Upload {
   checkByteStringIsUtf8(value);
         
         importFile_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object importDir_ = "";
+      /**
+       * <pre>
+       * Custom path to a directory containing compiled files. When `import_dir` is
+       * not specified, the standard build directory under `sketch_path` is used.
+       * </pre>
+       *
+       * <code>string import_dir = 8;</code>
+       * @return The importDir.
+       */
+      public java.lang.String getImportDir() {
+        java.lang.Object ref = importDir_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          importDir_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Custom path to a directory containing compiled files. When `import_dir` is
+       * not specified, the standard build directory under `sketch_path` is used.
+       * </pre>
+       *
+       * <code>string import_dir = 8;</code>
+       * @return The bytes for importDir.
+       */
+      public com.google.protobuf.ByteString
+          getImportDirBytes() {
+        java.lang.Object ref = importDir_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          importDir_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Custom path to a directory containing compiled files. When `import_dir` is
+       * not specified, the standard build directory under `sketch_path` is used.
+       * </pre>
+       *
+       * <code>string import_dir = 8;</code>
+       * @param value The importDir to set.
+       * @return This builder for chaining.
+       */
+      public Builder setImportDir(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        importDir_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Custom path to a directory containing compiled files. When `import_dir` is
+       * not specified, the standard build directory under `sketch_path` is used.
+       * </pre>
+       *
+       * <code>string import_dir = 8;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearImportDir() {
+        
+        importDir_ = getDefaultInstance().getImportDir();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Custom path to a directory containing compiled files. When `import_dir` is
+       * not specified, the standard build directory under `sketch_path` is used.
+       * </pre>
+       *
+       * <code>string import_dir = 8;</code>
+       * @param value The bytes for importDir to set.
+       * @return This builder for chaining.
+       */
+      public Builder setImportDirBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        importDir_ = value;
         onChanged();
         return this;
       }
@@ -1367,12 +1845,20 @@ public final class Upload {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * The output of the upload process.
+     * </pre>
+     *
      * <code>bytes out_stream = 1;</code>
      * @return The outStream.
      */
     com.google.protobuf.ByteString getOutStream();
 
     /**
+     * <pre>
+     * The error output of the upload process.
+     * </pre>
+     *
      * <code>bytes err_stream = 2;</code>
      * @return The errStream.
      */
@@ -1470,6 +1956,10 @@ public final class Upload {
     public static final int OUT_STREAM_FIELD_NUMBER = 1;
     private com.google.protobuf.ByteString outStream_;
     /**
+     * <pre>
+     * The output of the upload process.
+     * </pre>
+     *
      * <code>bytes out_stream = 1;</code>
      * @return The outStream.
      */
@@ -1480,6 +1970,10 @@ public final class Upload {
     public static final int ERR_STREAM_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString errStream_;
     /**
+     * <pre>
+     * The error output of the upload process.
+     * </pre>
+     *
      * <code>bytes err_stream = 2;</code>
      * @return The errStream.
      */
@@ -1808,6 +2302,10 @@ public final class Upload {
 
       private com.google.protobuf.ByteString outStream_ = com.google.protobuf.ByteString.EMPTY;
       /**
+       * <pre>
+       * The output of the upload process.
+       * </pre>
+       *
        * <code>bytes out_stream = 1;</code>
        * @return The outStream.
        */
@@ -1815,6 +2313,10 @@ public final class Upload {
         return outStream_;
       }
       /**
+       * <pre>
+       * The output of the upload process.
+       * </pre>
+       *
        * <code>bytes out_stream = 1;</code>
        * @param value The outStream to set.
        * @return This builder for chaining.
@@ -1829,6 +2331,10 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * The output of the upload process.
+       * </pre>
+       *
        * <code>bytes out_stream = 1;</code>
        * @return This builder for chaining.
        */
@@ -1841,6 +2347,10 @@ public final class Upload {
 
       private com.google.protobuf.ByteString errStream_ = com.google.protobuf.ByteString.EMPTY;
       /**
+       * <pre>
+       * The error output of the upload process.
+       * </pre>
+       *
        * <code>bytes err_stream = 2;</code>
        * @return The errStream.
        */
@@ -1848,6 +2358,10 @@ public final class Upload {
         return errStream_;
       }
       /**
+       * <pre>
+       * The error output of the upload process.
+       * </pre>
+       *
        * <code>bytes err_stream = 2;</code>
        * @param value The errStream to set.
        * @return This builder for chaining.
@@ -1862,6 +2376,10 @@ public final class Upload {
         return this;
       }
       /**
+       * <pre>
+       * The error output of the upload process.
+       * </pre>
+       *
        * <code>bytes err_stream = 2;</code>
        * @return This builder for chaining.
        */
@@ -1944,14 +2462,15 @@ public final class Upload {
   static {
     java.lang.String[] descriptorData = {
       "\n\025commands/upload.proto\022\027cc.arduino.cli." +
-      "commands\032\025commands/common.proto\"\247\001\n\tUplo" +
+      "commands\032\025commands/common.proto\"\277\001\n\tUplo" +
       "adReq\0223\n\010instance\030\001 \001(\0132!.cc.arduino.cli" +
       ".commands.Instance\022\014\n\004fqbn\030\002 \001(\t\022\023\n\013sket" +
       "ch_path\030\003 \001(\t\022\014\n\004port\030\004 \001(\t\022\017\n\007verbose\030\005" +
-      " \001(\010\022\016\n\006verify\030\006 \001(\010\022\023\n\013import_file\030\007 \001(" +
-      "\t\"4\n\nUploadResp\022\022\n\nout_stream\030\001 \001(\014\022\022\n\ne" +
-      "rr_stream\030\002 \001(\014B-Z+github.com/arduino/ar" +
-      "duino-cli/rpc/commandsb\006proto3"
+      " \001(\010\022\016\n\006verify\030\006 \001(\010\022\027\n\013import_file\030\007 \001(" +
+      "\tB\002\030\001\022\022\n\nimport_dir\030\010 \001(\t\"4\n\nUploadResp\022" +
+      "\022\n\nout_stream\030\001 \001(\014\022\022\n\nerr_stream\030\002 \001(\014B" +
+      "-Z+github.com/arduino/arduino-cli/rpc/co" +
+      "mmandsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -1963,7 +2482,7 @@ public final class Upload {
     internal_static_cc_arduino_cli_commands_UploadReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_cc_arduino_cli_commands_UploadReq_descriptor,
-        new java.lang.String[] { "Instance", "Fqbn", "SketchPath", "Port", "Verbose", "Verify", "ImportFile", });
+        new java.lang.String[] { "Instance", "Fqbn", "SketchPath", "Port", "Verbose", "Verify", "ImportFile", "ImportDir", });
     internal_static_cc_arduino_cli_commands_UploadResp_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_cc_arduino_cli_commands_UploadResp_fieldAccessorTable = new

@@ -911,6 +911,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Get the version of Arduino CLI in use.
+     * </pre>
      */
     public void version(cc.arduino.cli.commands.Commands.VersionReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Commands.VersionResp> responseObserver) {
@@ -928,6 +931,10 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Attach a board to a sketch. When the `fqbn` field of a request is not 
+     * provided, the FQBN of the attached board will be used.
+     * </pre>
      */
     public void boardAttach(cc.arduino.cli.commands.Board.BoardAttachReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Board.BoardAttachResp> responseObserver) {
@@ -935,6 +942,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * List the boards currently connected to the computer.
+     * </pre>
      */
     public void boardList(cc.arduino.cli.commands.Board.BoardListReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Board.BoardListResp> responseObserver) {
@@ -942,6 +952,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * List all the boards provided by installed platforms.
+     * </pre>
      */
     public void boardListAll(cc.arduino.cli.commands.Board.BoardListAllReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Board.BoardListAllResp> responseObserver) {
@@ -949,6 +962,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Compile an Arduino sketch.
+     * </pre>
      */
     public void compile(cc.arduino.cli.commands.Compile.CompileReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Compile.CompileResp> responseObserver) {
@@ -956,6 +972,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Download and install a platform and its tool dependencies.
+     * </pre>
      */
     public void platformInstall(cc.arduino.cli.commands.Core.PlatformInstallReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Core.PlatformInstallResp> responseObserver) {
@@ -963,6 +982,10 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Download a platform and its tool dependencies to the `staging/packages`
+     * subdirectory of the data directory.
+     * </pre>
      */
     public void platformDownload(cc.arduino.cli.commands.Core.PlatformDownloadReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Core.PlatformDownloadResp> responseObserver) {
@@ -970,6 +993,10 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Uninstall a platform as well as its tool dependencies that are not used by
+     * other installed platforms.
+     * </pre>
      */
     public void platformUninstall(cc.arduino.cli.commands.Core.PlatformUninstallReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Core.PlatformUninstallResp> responseObserver) {
@@ -977,6 +1004,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Upgrade an installed platform to the latest version.
+     * </pre>
      */
     public void platformUpgrade(cc.arduino.cli.commands.Core.PlatformUpgradeReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Core.PlatformUpgradeResp> responseObserver) {
@@ -984,6 +1014,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Upload a compiled sketch to an Arduino board.
+     * </pre>
      */
     public void upload(cc.arduino.cli.commands.Upload.UploadReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Upload.UploadResp> responseObserver) {
@@ -991,6 +1024,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Search for a platform in the platforms indexes.
+     * </pre>
      */
     public void platformSearch(cc.arduino.cli.commands.Core.PlatformSearchReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Core.PlatformSearchResp> responseObserver) {
@@ -998,6 +1034,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * List all installed platforms.
+     * </pre>
      */
     public void platformList(cc.arduino.cli.commands.Core.PlatformListReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Core.PlatformListResp> responseObserver) {
@@ -1311,6 +1350,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Get the version of Arduino CLI in use.
+     * </pre>
      */
     public void version(cc.arduino.cli.commands.Commands.VersionReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Commands.VersionResp> responseObserver) {
@@ -1330,6 +1372,10 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Attach a board to a sketch. When the `fqbn` field of a request is not 
+     * provided, the FQBN of the attached board will be used.
+     * </pre>
      */
     public void boardAttach(cc.arduino.cli.commands.Board.BoardAttachReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Board.BoardAttachResp> responseObserver) {
@@ -1338,6 +1384,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * List the boards currently connected to the computer.
+     * </pre>
      */
     public void boardList(cc.arduino.cli.commands.Board.BoardListReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Board.BoardListResp> responseObserver) {
@@ -1346,6 +1395,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * List all the boards provided by installed platforms.
+     * </pre>
      */
     public void boardListAll(cc.arduino.cli.commands.Board.BoardListAllReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Board.BoardListAllResp> responseObserver) {
@@ -1354,6 +1406,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Compile an Arduino sketch.
+     * </pre>
      */
     public void compile(cc.arduino.cli.commands.Compile.CompileReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Compile.CompileResp> responseObserver) {
@@ -1362,6 +1417,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Download and install a platform and its tool dependencies.
+     * </pre>
      */
     public void platformInstall(cc.arduino.cli.commands.Core.PlatformInstallReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Core.PlatformInstallResp> responseObserver) {
@@ -1370,6 +1428,10 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Download a platform and its tool dependencies to the `staging/packages`
+     * subdirectory of the data directory.
+     * </pre>
      */
     public void platformDownload(cc.arduino.cli.commands.Core.PlatformDownloadReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Core.PlatformDownloadResp> responseObserver) {
@@ -1378,6 +1440,10 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Uninstall a platform as well as its tool dependencies that are not used by
+     * other installed platforms.
+     * </pre>
      */
     public void platformUninstall(cc.arduino.cli.commands.Core.PlatformUninstallReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Core.PlatformUninstallResp> responseObserver) {
@@ -1386,6 +1452,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Upgrade an installed platform to the latest version.
+     * </pre>
      */
     public void platformUpgrade(cc.arduino.cli.commands.Core.PlatformUpgradeReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Core.PlatformUpgradeResp> responseObserver) {
@@ -1394,6 +1463,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Upload a compiled sketch to an Arduino board.
+     * </pre>
      */
     public void upload(cc.arduino.cli.commands.Upload.UploadReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Upload.UploadResp> responseObserver) {
@@ -1402,6 +1474,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Search for a platform in the platforms indexes.
+     * </pre>
      */
     public void platformSearch(cc.arduino.cli.commands.Core.PlatformSearchReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Core.PlatformSearchResp> responseObserver) {
@@ -1410,6 +1485,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * List all installed platforms.
+     * </pre>
      */
     public void platformList(cc.arduino.cli.commands.Core.PlatformListReq request,
         io.grpc.stub.StreamObserver<cc.arduino.cli.commands.Core.PlatformListResp> responseObserver) {
@@ -1549,6 +1627,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Get the version of Arduino CLI in use.
+     * </pre>
      */
     public cc.arduino.cli.commands.Commands.VersionResp version(cc.arduino.cli.commands.Commands.VersionReq request) {
       return blockingUnaryCall(
@@ -1566,6 +1647,10 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Attach a board to a sketch. When the `fqbn` field of a request is not 
+     * provided, the FQBN of the attached board will be used.
+     * </pre>
      */
     public java.util.Iterator<cc.arduino.cli.commands.Board.BoardAttachResp> boardAttach(
         cc.arduino.cli.commands.Board.BoardAttachReq request) {
@@ -1574,6 +1659,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * List the boards currently connected to the computer.
+     * </pre>
      */
     public cc.arduino.cli.commands.Board.BoardListResp boardList(cc.arduino.cli.commands.Board.BoardListReq request) {
       return blockingUnaryCall(
@@ -1581,6 +1669,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * List all the boards provided by installed platforms.
+     * </pre>
      */
     public cc.arduino.cli.commands.Board.BoardListAllResp boardListAll(cc.arduino.cli.commands.Board.BoardListAllReq request) {
       return blockingUnaryCall(
@@ -1588,6 +1679,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Compile an Arduino sketch.
+     * </pre>
      */
     public java.util.Iterator<cc.arduino.cli.commands.Compile.CompileResp> compile(
         cc.arduino.cli.commands.Compile.CompileReq request) {
@@ -1596,6 +1690,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Download and install a platform and its tool dependencies.
+     * </pre>
      */
     public java.util.Iterator<cc.arduino.cli.commands.Core.PlatformInstallResp> platformInstall(
         cc.arduino.cli.commands.Core.PlatformInstallReq request) {
@@ -1604,6 +1701,10 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Download a platform and its tool dependencies to the `staging/packages`
+     * subdirectory of the data directory.
+     * </pre>
      */
     public java.util.Iterator<cc.arduino.cli.commands.Core.PlatformDownloadResp> platformDownload(
         cc.arduino.cli.commands.Core.PlatformDownloadReq request) {
@@ -1612,6 +1713,10 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Uninstall a platform as well as its tool dependencies that are not used by
+     * other installed platforms.
+     * </pre>
      */
     public java.util.Iterator<cc.arduino.cli.commands.Core.PlatformUninstallResp> platformUninstall(
         cc.arduino.cli.commands.Core.PlatformUninstallReq request) {
@@ -1620,6 +1725,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Upgrade an installed platform to the latest version.
+     * </pre>
      */
     public java.util.Iterator<cc.arduino.cli.commands.Core.PlatformUpgradeResp> platformUpgrade(
         cc.arduino.cli.commands.Core.PlatformUpgradeReq request) {
@@ -1628,6 +1736,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Upload a compiled sketch to an Arduino board.
+     * </pre>
      */
     public java.util.Iterator<cc.arduino.cli.commands.Upload.UploadResp> upload(
         cc.arduino.cli.commands.Upload.UploadReq request) {
@@ -1636,6 +1747,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Search for a platform in the platforms indexes.
+     * </pre>
      */
     public cc.arduino.cli.commands.Core.PlatformSearchResp platformSearch(cc.arduino.cli.commands.Core.PlatformSearchReq request) {
       return blockingUnaryCall(
@@ -1643,6 +1757,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * List all installed platforms.
+     * </pre>
      */
     public cc.arduino.cli.commands.Core.PlatformListResp platformList(cc.arduino.cli.commands.Core.PlatformListReq request) {
       return blockingUnaryCall(
@@ -1747,6 +1864,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Get the version of Arduino CLI in use.
+     * </pre>
      */
     public com.google.common.util.concurrent.ListenableFuture<cc.arduino.cli.commands.Commands.VersionResp> version(
         cc.arduino.cli.commands.Commands.VersionReq request) {
@@ -1766,6 +1886,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * List the boards currently connected to the computer.
+     * </pre>
      */
     public com.google.common.util.concurrent.ListenableFuture<cc.arduino.cli.commands.Board.BoardListResp> boardList(
         cc.arduino.cli.commands.Board.BoardListReq request) {
@@ -1774,6 +1897,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * List all the boards provided by installed platforms.
+     * </pre>
      */
     public com.google.common.util.concurrent.ListenableFuture<cc.arduino.cli.commands.Board.BoardListAllResp> boardListAll(
         cc.arduino.cli.commands.Board.BoardListAllReq request) {
@@ -1782,6 +1908,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * Search for a platform in the platforms indexes.
+     * </pre>
      */
     public com.google.common.util.concurrent.ListenableFuture<cc.arduino.cli.commands.Core.PlatformSearchResp> platformSearch(
         cc.arduino.cli.commands.Core.PlatformSearchReq request) {
@@ -1790,6 +1919,9 @@ public final class ArduinoCoreGrpc {
     }
 
     /**
+     * <pre>
+     * List all installed platforms.
+     * </pre>
      */
     public com.google.common.util.concurrent.ListenableFuture<cc.arduino.cli.commands.Core.PlatformListResp> platformList(
         cc.arduino.cli.commands.Core.PlatformListReq request) {
