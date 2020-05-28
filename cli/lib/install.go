@@ -72,6 +72,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			})
 			if err != nil {
 				feedback.Errorf("Error resolving dependencies for %s: %s", libRef, err)
+				os.Exit(errorcodes.ErrGeneric)
 			}
 			for _, dep := range depsResp.GetDependencies() {
 				feedback.Printf("%s depends on %s@%s", libRef, dep.GetName(), dep.GetVersionRequired())
