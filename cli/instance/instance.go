@@ -17,7 +17,10 @@ package instance
 
 import (
 	"context"
+	"os"
 
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -28,13 +31,26 @@ import (
 // CreateInstanceIgnorePlatformIndexErrors creates and return an instance of the
 // Arduino Core Engine, but won't stop on platforms index loading errors.
 func CreateInstanceIgnorePlatformIndexErrors() *rpc.Instance {
-	i, _ := getInitResponse()
-	return i.GetInstance()
+	resp, err := getInitResponse()
+	if err != nil {
+		feedback.Errorf("Error: %s", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	rescanLibrariesIndex(resp)
+
+	return resp.GetInstance()
 }
 
 // CreateInstance creates and return an instance of the Arduino Core engine
 func CreateInstance() (*rpc.Instance, error) {
 	resp, err := getInitResponse()
+	if err != nil {
+		return nil, err
+	}
+
+	err = rescanLibrariesIndex(resp)
+
 	if err != nil {
 		return nil, err
 	}
@@ -51,8 +67,10 @@ func getInitResponse() (*rpc.InitResp, error) {
 		return nil, errors.Wrap(err, "creating instance")
 	}
 
-	// Init() succeeded but there were errors loading library indexes,
-	// let's rescan and try again
+	return resp, nil
+}
+
+func rescanLibrariesIndex(resp *rpc.InitResp) error {
 	if resp.GetLibrariesIndexError() != "" {
 		logrus.Warnf("There were errors loading the library index, trying again...")
 
@@ -60,18 +78,18 @@ func getInitResponse() (*rpc.InitResp, error) {
 		err := commands.UpdateLibrariesIndex(context.Background(),
 			&rpc.UpdateLibrariesIndexReq{Instance: resp.GetInstance()}, output.ProgressBar())
 		if err != nil {
-			return nil, errors.Wrap(err, "updating the library index")
+			return errors.Wrap(err, "updating the library index")
 		}
 
 		// rescan libraries
 		rescanResp, err := commands.Rescan(resp.GetInstance().GetId())
 		if err != nil {
-			return nil, errors.Wrap(err, "during rescan")
+			return errors.Wrap(err, "during rescan")
 		}
 
 		// errors persist
 		if rescanResp.GetLibrariesIndexError() != "" {
-			return nil, errors.New("still errors after rescan: " + rescanResp.GetLibrariesIndexError())
+			return errors.New("still errors after rescan: " + rescanResp.GetLibrariesIndexError())
 		}
 
 		// succeeded, copy over PlatformsIndexErrors in case errors occurred
@@ -80,7 +98,7 @@ func getInitResponse() (*rpc.InitResp, error) {
 		resp.PlatformsIndexErrors = rescanResp.PlatformsIndexErrors
 	}
 
-	return resp, nil
+	return nil
 }
 
 func checkPlatformErrors(resp *rpc.InitResp) error {
