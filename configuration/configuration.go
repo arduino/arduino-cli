@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/feedback"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-win32-utils"
 	"github.com/sirupsen/logrus"
 	jww "github.com/spf13/jwalterweatherman"
@@ -151,7 +152,8 @@ func IsBundledInDesktopIDE() bool {
 		return false
 	}
 
-	ideDir := filepath.Dir(executablePath)
+	ideDir := paths.New(executablePath).Parent()
+	logrus.WithField("dir", ideDir).Trace("Candidate IDE directory")
 
 	// To determine if the CLI is bundled with an IDE, We check an arbitrary
 	// number of folders that are part of the IDE install tree
@@ -161,20 +163,21 @@ func IsBundledInDesktopIDE() bool {
 	}
 
 	for _, test := range tests {
-		if _, err := os.Stat(filepath.Join(ideDir, test)); err != nil {
+		if !ideDir.Join(test).Exist() {
 			// the test folder doesn't exist or is not accessible
 			return false
 		}
 	}
 
-	// the CLI is bundled in the Arduino IDE
+	logrus.Info("The CLI is bundled in the Arduino IDE")
 
 	// Persist IDE-related config settings
 	viper.Set("IDE.Bundled", true)
 	viper.Set("IDE.Directory", ideDir)
 
 	// Check whether this is a portable install
-	if _, err := os.Stat(filepath.Join(ideDir, "portable")); err != nil {
+	if ideDir.Join("portable").Exist() {
+		logrus.Info("The IDE installation is 'portable'")
 		viper.Set("IDE.Portable", true)
 	}
 
