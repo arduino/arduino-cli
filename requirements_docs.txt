@@ -1,5 +1,5 @@
 mkdocs<1.2
 mkdocs-material<5
-mike
+mike==0.5.1
 gitpython
 click<7.2
