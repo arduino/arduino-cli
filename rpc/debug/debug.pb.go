@@ -91,13 +91,24 @@ func (m *DebugReq) GetSendInterrupt() bool {
 }
 
 type DebugConfigReq struct {
-	Instance    *commands.Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	Fqbn        string             `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
-	SketchPath  string             `protobuf:"bytes,3,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
-	Port        string             `protobuf:"bytes,4,opt,name=port,proto3" json:"port,omitempty"`
-	Interpreter string             `protobuf:"bytes,5,opt,name=interpreter,proto3" json:"interpreter,omitempty"`
+	// Arduino Core Service instance from the `Init` response.
+	Instance *commands.Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Fully qualified board name of the board in use
+	// (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
+	// the sketch will be used.
+	Fqbn string `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
+	// Path to the sketch that is running on the board. The compiled executable
+	// is expected to be located under this path.
+	SketchPath string `protobuf:"bytes,3,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
+	// Port of the debugger. Set to `none` if the debugger doesn't use a port.
+	Port string `protobuf:"bytes,4,opt,name=port,proto3" json:"port,omitempty"`
+	// Which GDB command interpreter to use.
+	Interpreter string `protobuf:"bytes,5,opt,name=interpreter,proto3" json:"interpreter,omitempty"`
 	// DEPRECATED: use import_dir instead
-	ImportFile           string   `protobuf:"bytes,7,opt,name=import_file,json=importFile,proto3" json:"import_file,omitempty"` // Deprecated: Do not use.
+	ImportFile string `protobuf:"bytes,7,opt,name=import_file,json=importFile,proto3" json:"import_file,omitempty"` // Deprecated: Do not use.
+	// Directory containing the compiled executable. If `import_dir` is not
+	// specified, the executable is assumed to be in
+	// `{sketch_path}/build/{fqbn}/`.
 	ImportDir            string   `protobuf:"bytes,8,opt,name=import_dir,json=importDir,proto3" json:"import_dir,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -181,7 +192,9 @@ func (m *DebugConfigReq) GetImportDir() string {
 
 //
 type DebugResp struct {
-	Data                 []byte   `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	// Incoming data from the debugger tool.
+	Data []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	// Incoming error output from the debugger tool.
 	Error                string   `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -275,6 +288,7 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type DebugClient interface {
+	// Start a debug session and communicate with the debugger tool.
 	Debug(ctx context.Context, opts ...grpc.CallOption) (Debug_DebugClient, error)
 }
 
@@ -319,6 +333,7 @@ func (x *debugDebugClient) Recv() (*DebugResp, error) {
 
 // DebugServer is the server API for Debug service.
 type DebugServer interface {
+	// Start a debug session and communicate with the debugger tool.
 	Debug(Debug_DebugServer) error
 }
 
