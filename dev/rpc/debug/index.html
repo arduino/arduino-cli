@@ -1078,31 +1078,31 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">cc.arduino.cli.commands.Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
 </tr>
 <tr>
 <td>fqbn</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Fully qualified board name of the board in use (e.g., <code>arduino:samd:mkr1000</code>). If this is omitted, the FQBN attached to the sketch will be used.</td>
 </tr>
 <tr>
 <td>sketch_path</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Path to the sketch that is running on the board. The compiled executable is expected to be located under this path.</td>
 </tr>
 <tr>
 <td>port</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Port of the debugger. Set to <code>none</code> if the debugger doesn&#39;t use a port.</td>
 </tr>
 <tr>
 <td>interpreter</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Which GDB command interpreter to use.</td>
 </tr>
 <tr>
 <td>import_file</td>
@@ -1114,7 +1114,7 @@
 <td>import_dir</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Directory containing the compiled executable. If <code>import_dir</code> is not specified, the executable is assumed to be in <code>{sketch_path}/build/{fqbn}/</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -1172,13 +1172,13 @@ and must not contain a <code>DebugReq</code> message.</p>
 <td>data</td>
 <td><a href="#bytes">bytes</a></td>
 <td></td>
-<td></td>
+<td>Incoming data from the debugger tool.</td>
 </tr>
 <tr>
 <td>error</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Incoming error output from the debugger tool.</td>
 </tr>
 </tbody>
 </table>
@@ -1199,7 +1199,7 @@ and must not contain a <code>DebugReq</code> message.</p>
 <td>Debug</td>
 <td><a href="#cc.arduino.cli.debug.DebugReq">DebugReq</a> stream</td>
 <td><a href="#cc.arduino.cli.debug.DebugResp">DebugResp</a> stream</td>
-<td></td>
+<td>Start a debug session and communicate with the debugger tool.</td>
 </tr>
 </tbody>
 </table>
