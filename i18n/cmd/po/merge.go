@@ -13,30 +13,30 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package board
+package po
 
-import (
-	"os"
+// Merge merges two message catalogs, preserving only keys present in source
+func Merge(source MessageCatalog, destination MessageCatalog) MessageCatalog {
+	catalog := MessageCatalog{}
+	for _, k := range source.SortedKeys() {
+		if k == "" {
+			sourceMessage := source.Messages[k]
+			destinationMessage := destination.Messages[k]
 
-	"github.com/spf13/cobra"
-)
+			if destinationMessage != nil {
+				catalog.AddMessage(k, *destinationMessage)
+			} else {
+				catalog.AddMessage(k, *sourceMessage)
+			}
 
-// NewCommand created a new `board` command
-func NewCommand() *cobra.Command {
-	boardCommand := &cobra.Command{
-		Use:   "board",
-		Short: "Arduino board commands.",
-		Long:  "Arduino board commands.",
-		Example: "  # Lists all connected boards.\n" +
-			"  " + os.Args[0] + " board list\n\n" +
-			"  # Attaches a sketch to a board.\n" +
-			"  " + os.Args[0] + " board attach serial:///dev/ttyACM0 mySketch",
+			continue
+		}
+
+		if destination.Messages[k] != nil {
+			catalog.Add(k, destination.Messages[k].Value, source.Messages[k].Comments)
+		} else {
+			catalog.Add(k, "", source.Messages[k].Comments)
+		}
 	}
-
-	boardCommand.AddCommand(initAttachCommand())
-	boardCommand.AddCommand(initDetailsCommand())
-	boardCommand.AddCommand(initListCommand())
-	boardCommand.AddCommand(initListAllCommand())
-
-	return boardCommand
+	return catalog
 }

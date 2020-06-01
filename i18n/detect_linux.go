@@ -13,30 +13,8 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package board
+package i18n
 
-import (
-	"os"
-
-	"github.com/spf13/cobra"
-)
-
-// NewCommand created a new `board` command
-func NewCommand() *cobra.Command {
-	boardCommand := &cobra.Command{
-		Use:   "board",
-		Short: "Arduino board commands.",
-		Long:  "Arduino board commands.",
-		Example: "  # Lists all connected boards.\n" +
-			"  " + os.Args[0] + " board list\n\n" +
-			"  # Attaches a sketch to a board.\n" +
-			"  " + os.Args[0] + " board attach serial:///dev/ttyACM0 mySketch",
-	}
-
-	boardCommand.AddCommand(initAttachCommand())
-	boardCommand.AddCommand(initDetailsCommand())
-	boardCommand.AddCommand(initListCommand())
-	boardCommand.AddCommand(initListAllCommand())
-
-	return boardCommand
+func getLocaleIdentifier() string {
+	return getLocaleIdentifierFromEnv()
 }

@@ -13,30 +13,25 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package board
+package i18n
 
-import (
-	"os"
+/*
+#cgo CFLAGS: -x objective-c
+#cgo LDFLAGS: -framework Foundation
+#import <Foundation/Foundation.h>
 
-	"github.com/spf13/cobra"
-)
+const char* getLocaleIdentifier() {
+    NSString *cs = [[NSLocale currentLocale] localeIdentifier];
+    const char *cstr = [cs UTF8String];
+    return cstr;
+}
 
-// NewCommand created a new `board` command
-func NewCommand() *cobra.Command {
-	boardCommand := &cobra.Command{
-		Use:   "board",
-		Short: "Arduino board commands.",
-		Long:  "Arduino board commands.",
-		Example: "  # Lists all connected boards.\n" +
-			"  " + os.Args[0] + " board list\n\n" +
-			"  # Attaches a sketch to a board.\n" +
-			"  " + os.Args[0] + " board attach serial:///dev/ttyACM0 mySketch",
+*/
+import "C"
+
+func getLocaleIdentifier() string {
+	if envLocale := getLocaleIdentifierFromEnv(); envLocale != "" {
+		return envLocale
 	}
-
-	boardCommand.AddCommand(initAttachCommand())
-	boardCommand.AddCommand(initDetailsCommand())
-	boardCommand.AddCommand(initListCommand())
-	boardCommand.AddCommand(initListAllCommand())
-
-	return boardCommand
+	return C.GoString(C.getLocaleIdentifier())
 }

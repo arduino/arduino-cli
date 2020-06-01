@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Install Go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v2
         with:
           go-version: '1.14'
 
@@ -35,6 +35,7 @@ jobs:
           go get github.com/golangci/govet
           go get golang.org/x/lint/golint
           go get github.com/golang/protobuf/protoc-gen-go
+          go get github.com/GeertJohan/go.rice/rice
         shell: bash
 
       - name: Install Taskfile

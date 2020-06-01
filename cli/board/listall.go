@@ -29,17 +29,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var listAllCommand = &cobra.Command{
-	Use:   "listall [boardname]",
-	Short: "List all known boards and their corresponding FQBN.",
-	Long: "" +
-		"List all boards that have the support platform installed. You can search\n" +
-		"for a specific board if you specify the board name",
-	Example: "" +
-		"  " + os.Args[0] + " board listall\n" +
-		"  " + os.Args[0] + " board listall zero",
-	Args: cobra.ArbitraryArgs,
-	Run:  runListAllCommand,
+func initListAllCommand() *cobra.Command {
+	var listAllCommand = &cobra.Command{
+		Use:   "listall [boardname]",
+		Short: "List all known boards and their corresponding FQBN.",
+		Long: "" +
+			"List all boards that have the support platform installed. You can search\n" +
+			"for a specific board if you specify the board name",
+		Example: "" +
+			"  " + os.Args[0] + " board listall\n" +
+			"  " + os.Args[0] + " board listall zero",
+		Args: cobra.ArbitraryArgs,
+		Run:  runListAllCommand,
+	}
+	return listAllCommand
 }
 
 // runListAllCommand list all installed boards

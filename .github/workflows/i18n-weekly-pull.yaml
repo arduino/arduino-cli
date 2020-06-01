@@ -1,0 +1,41 @@
+name: i18n-weekly-pull
+
+on:
+  schedule:
+    # run every monday at 2AM
+    - cron:  '0 2 * * 1'
+
+jobs:
+  pull-from-transifex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.14'
+
+      - name: Install Go deps
+        run: |
+          go get github.com/GeertJohan/go.rice/rice
+
+      - name: Install Taskfile
+        uses: Arduino/actions/setup-taskfile@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run task i18n:pull
+        run: task i18n:pull
+        env:
+          TRANSIFEX_PROJECT: ${{ secrets.TRANSIFEX_PROJECT }}
+          TRANSIFEX_RESOURCE: ${{ secrets.TRANSIFEX_RESOURCE }}
+          TRANSIFEX_API_KEY: ${{ secrets.TRANSIFEX_API_KEY }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v2
+        with:
+          commit-message: Updated translation files
+          title: Updated translation files
+          branch: i18n/translations-update

@@ -13,10 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-// These tests are mocked and won't work on OSX
-// +build !darwin
-
-package cli
+package configuration
 
 import (
 	"fmt"
@@ -46,7 +43,7 @@ func TestSearchConfigTreeSameFolder(t *testing.T) {
 	defer os.RemoveAll(tmp)
 	_, err := os.Create(filepath.Join(tmp, "arduino-cli.yaml"))
 	require.Nil(t, err)
-	require.Equal(t, searchConfigTree(tmp), tmp)
+	require.Equal(t, tmp, searchConfigTree(tmp))
 }
 
 func TestSearchConfigTreeInParent(t *testing.T) {
@@ -57,7 +54,7 @@ func TestSearchConfigTreeInParent(t *testing.T) {
 	require.Nil(t, err)
 	_, err = os.Create(filepath.Join(tmp, "arduino-cli.yaml"))
 	require.Nil(t, err)
-	require.Equal(t, searchConfigTree(target), tmp)
+	require.Equal(t, tmp, searchConfigTree(target))
 }
 
 var result string

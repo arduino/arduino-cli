@@ -13,30 +13,49 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package board
+package po
 
 import (
-	"os"
+	"bytes"
+	"testing"
 
-	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/require"
 )
 
-// NewCommand created a new `board` command
-func NewCommand() *cobra.Command {
-	boardCommand := &cobra.Command{
-		Use:   "board",
-		Short: "Arduino board commands.",
-		Long:  "Arduino board commands.",
-		Example: "  # Lists all connected boards.\n" +
-			"  " + os.Args[0] + " board list\n\n" +
-			"  # Attaches a sketch to a board.\n" +
-			"  " + os.Args[0] + " board attach serial:///dev/ttyACM0 mySketch",
-	}
+func TestCatalogWriter(t *testing.T) {
+	var catalog MessageCatalog
+	catalog.Add("\"test-id\"", "test-value", []string{"# comment A", "# comment B"})
+	catalog.Add("test-id\nmultiline", "test-value\nmultiline", []string{})
+	catalog.Add(`
+	test-id
+	backquoted
+	`, `
+	test-value
+	backquoted
+	`, []string{})
 
-	boardCommand.AddCommand(initAttachCommand())
-	boardCommand.AddCommand(initDetailsCommand())
-	boardCommand.AddCommand(initListCommand())
-	boardCommand.AddCommand(initListAllCommand())
+	var buf bytes.Buffer
+	catalog.Write(&buf)
 
-	return boardCommand
+	require.Equal(t, `msgid "\n"
+"	test-id\n"
+"	backquoted\n"
+"	"
+msgstr "\n"
+"	test-value\n"
+"	backquoted\n"
+"	"
+
+# comment A
+# comment B
+msgid "\"test-id\""
+msgstr "test-value"
+
+msgid "test-id\n"
+"multiline"
+msgstr "test-value\n"
+"multiline"
+
+`, buf.String())
+
 }

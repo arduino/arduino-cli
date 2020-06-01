@@ -25,13 +25,16 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var dumpCmd = &cobra.Command{
-	Use:     "dump",
-	Short:   "Prints the current configuration",
-	Long:    "Prints the current configuration.",
-	Example: "  " + os.Args[0] + " config dump",
-	Args:    cobra.NoArgs,
-	Run:     runDumpCommand,
+func initDumpCmd() *cobra.Command {
+	var dumpCmd = &cobra.Command{
+		Use:     "dump",
+		Short:   "Prints the current configuration",
+		Long:    "Prints the current configuration.",
+		Example: "  " + os.Args[0] + " config dump",
+		Args:    cobra.NoArgs,
+		Run:     runDumpCommand,
+	}
+	return dumpCmd
 }
 
 // output from this command requires special formatting, let's create a dedicated

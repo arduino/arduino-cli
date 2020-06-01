@@ -13,30 +13,35 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package board
+package i18n
 
 import (
-	"os"
-
-	"github.com/spf13/cobra"
+	"fmt"
+	"strings"
+	"syscall"
+	"unsafe"
 )
 
-// NewCommand created a new `board` command
-func NewCommand() *cobra.Command {
-	boardCommand := &cobra.Command{
-		Use:   "board",
-		Short: "Arduino board commands.",
-		Long:  "Arduino board commands.",
-		Example: "  # Lists all connected boards.\n" +
-			"  " + os.Args[0] + " board list\n\n" +
-			"  # Attaches a sketch to a board.\n" +
-			"  " + os.Args[0] + " board attach serial:///dev/ttyACM0 mySketch",
+func getLocaleIdentifier() string {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("failed to get windows user locale", r)
+		}
+	}()
+
+	dll := syscall.MustLoadDLL("kernel32")
+	defer dll.Release()
+	proc := dll.MustFindProc("GetUserDefaultLocaleName")
+
+	localeNameMaxLen := 85
+	buffer := make([]uint16, localeNameMaxLen)
+	len, _, err := proc.Call(uintptr(unsafe.Pointer(&buffer[0])), uintptr(localeNameMaxLen))
+
+	if len == 0 {
+		panic(err)
 	}
 
-	boardCommand.AddCommand(initAttachCommand())
-	boardCommand.AddCommand(initDetailsCommand())
-	boardCommand.AddCommand(initListCommand())
-	boardCommand.AddCommand(initListAllCommand())
+	locale := syscall.UTF16ToString(buffer)
 
-	return boardCommand
+	return strings.ReplaceAll(locale, "-", "_")
 }

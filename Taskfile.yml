@@ -102,6 +102,7 @@ tasks:
       - test -z $(go fmt {{ default .DEFAULT_TARGETS .TARGETS }})
       - go vet {{ default .DEFAULT_TARGETS .TARGETS }}
       - "'{{.GOLINTBIN}}' {{.GOLINTFLAGS}} {{ default .DEFAULT_TARGETS .TARGETS }}"
+      - task: i18n:check
 
   check-legacy:
     desc: Check fmt and lint for the `legacy` package
@@ -113,6 +114,36 @@ tasks:
     desc: Run the rpc client test routine (server must be already started)
     cmds:
       - go test -run TestWithClientE2E ./commands/daemon
+
+  i18n:update:
+    desc: Updates i18n files
+    cmds:
+      - go run ./i18n/cmd/main.go catalog generate . > ./i18n/data/en.po
+      - task: i18n:generate
+
+  i18n:pull:
+    desc: Pull i18n files from transifex
+    cmds:
+      - go run ./i18n/cmd/main.go transifex pull -l {{.I18N_LANGS}} ./i18n/data
+      - task: i18n:generate
+
+  i18n:push:
+    desc: Push i18n files to transifex
+    cmds:
+      - go run ./i18n/cmd/main.go transifex push ./i18n/data
+
+  i18n:check:
+    desc: Check if the i18n message catalog was updated
+    cmds:
+      - task: i18n:update
+      - git add -N ./i18n/data
+      - git diff --exit-code ./i18n/data
+
+  i18n:generate:
+    desc: Generate embedded i18n catalog files
+    cmds:
+      - git add -N ./i18n/data
+      - git diff --exit-code ./i18n/data &> /dev/null || (cd ./i18n && rice embed-go)
 
 vars:
   # all modules of this project except for "legacy/..." module
@@ -138,3 +169,4 @@ vars:
   DOCS_VERSION: dev
   DOCS_ALIAS: ""
   DOCS_REMOTE: "origin"
+  I18N_LANGS: "pt_BR"

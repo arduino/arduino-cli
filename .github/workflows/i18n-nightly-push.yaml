@@ -1,0 +1,30 @@
+name: i18n-nightly-push
+
+on:
+  schedule:
+    # run every day at 1AM
+    - cron:  '0 1 * * *'
+
+jobs:
+  push-to-transifex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.14'
+
+      - name: Install Taskfile
+        uses: Arduino/actions/setup-taskfile@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run task i18n:push
+        run: task i18n:push
+        env:
+          TRANSIFEX_PROJECT: ${{ secrets.TRANSIFEX_PROJECT }}
+          TRANSIFEX_RESOURCE: ${{ secrets.TRANSIFEX_RESOURCE }}
+          TRANSIFEX_API_KEY: ${{ secrets.TRANSIFEX_API_KEY }}
