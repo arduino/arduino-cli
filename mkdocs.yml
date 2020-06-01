@@ -99,6 +99,7 @@ nav:
     - monitor: rpc/monitor.md
     - settings: rpc/settings.md
     - debug: rpc/debug.md
+  - configuration.md
   - Integration options: integration-options.md
   - sketch-build-process.md
   - sketch-specification.md
