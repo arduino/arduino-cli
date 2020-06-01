@@ -20,6 +20,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/spf13/cobra"
 )
 
@@ -45,6 +47,10 @@ func NewCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
+	if completionNoDesc && (args[0] == "bash" || args[0] == "zsh") {
+		feedback.Errorf("Error: command description is not supported by %v", args[0])
+		os.Exit(errorcodes.ErrGeneric)
+	}
 	switch args[0] {
 	case "bash":
 		cmd.Root().GenBashCompletion(os.Stdout)
@@ -52,14 +58,17 @@ func run(cmd *cobra.Command, args []string) {
 	case "zsh":
 		buf := new(bytes.Buffer)
 		cmd.Root().GenZshCompletion(buf)
-		r := strings.NewReplacer("[", "\\[", "]", "\\]") //insert escaping before [ and ]
-		s := r.Replace(buf.String())
+		// Next 3 lines are Hack, we'll wait new version of cobra with ZshV2Completion https://github.com/spf13/cobra/pull/1070
+		//insert escaping before [ and ]
+		s := strings.ReplaceAll(buf.String(), "[", "\\[")
+		s = strings.ReplaceAll(s, "]", "\\]")
 		s = strings.ReplaceAll(s, "\\[1\\]", "[1]") // revert the case
 		os.Stdout.WriteString(s)
 		break
 	case "fish":
 		buf := new(bytes.Buffer)
 		cmd.Root().GenFishCompletion(buf, !completionNoDesc)
+		// Next 2 lines are Hack, fixed here https://github.com/spf13/cobra/pull/1122
 		s := strings.ReplaceAll(buf.String(), "arduino-cli_comp", "arduino_cli_comp") //required because fish does not support env variables with "-" in the name
 		os.Stdout.WriteString(s)
 		break
