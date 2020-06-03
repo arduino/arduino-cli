@@ -42,12 +42,3 @@ task i18n:push
 ```sh
 task i18n:pull
 ```
-
-## Adding a new language
-
-To add a new supported language add the locale string to the project's Taskfile.yml (comma separated list)
-
-e.g
-```
-I18N_LANGS: "pt_BR,es,jp"
-```

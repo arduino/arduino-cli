@@ -124,7 +124,7 @@ tasks:
   i18n:pull:
     desc: Pull i18n files from transifex
     cmds:
-      - go run ./i18n/cmd/main.go transifex pull -l {{.I18N_LANGS}} ./i18n/data
+      - go run ./i18n/cmd/main.go transifex pull ./i18n/data
       - task: i18n:generate
 
   i18n:push:
@@ -169,4 +169,3 @@ vars:
   DOCS_VERSION: dev
   DOCS_ALIAS: ""
   DOCS_REMOTE: "origin"
-  I18N_LANGS: "pt_BR"
