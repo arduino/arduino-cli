@@ -353,6 +353,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#internationalization-i18n" class="md-nav__link">
+    Internationalization (i18n)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#additional-settings" class="md-nav__link">
     Additional settings
   </a>
@@ -1041,6 +1048,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#internationalization-i18n" class="md-nav__link">
+    Internationalization (i18n)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#additional-settings" class="md-nav__link">
     Additional settings
   </a>
@@ -1221,6 +1235,34 @@ a list of items you can check before submitting a PR:</p>
   failures that seem
   not related to the change you are making.</li>
 </ul>
+<h2 id="internationalization-i18n">Internationalization (i18n)<a class="headerlink" href="#internationalization-i18n" title="Permanent link">&para;</a></h2>
+<p>In order to support i18n in the cli, any messages that are intended to be translated 
+should be wrapped in a call to <code>i18n.Tr</code>. This call allows us to build a catalog of 
+translatable strings, replacing the reference string at runtime with the localized value.</p>
+<p>Adding or modifying these messages requires an i18n update, as this process creates the
+reference catalog that are shared with translators. For that reason, the <code>task check</code>
+command will fail if the catalog was not updated to sync with changes to the source code.</p>
+<p>To update the catalog, execute the following command and commit the changes.</p>
+<div class="highlight"><pre><span></span><code>task i18n:update
+</code></pre></div>
+
+<p>To verify that the catalog is up-to-date, you may execute the command:</p>
+<div class="highlight"><pre><span></span><code>task i18n:check
+</code></pre></div>
+
+<p>Example usage:</p>
+<div class="highlight"><pre><span></span><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;github.com/arduino/arduino-cli/i18n&quot;
+)
+
+func main() {
+  fmt.Println(i18n.Tr(&quot;Hello World!&quot;))
+}
+</code></pre></div>
+
 <h2 id="additional-settings">Additional settings<a class="headerlink" href="#additional-settings" title="Permanent link">&para;</a></h2>
 <p>If you need to push a commit that's only shipping documentation changes or
 example files, thus a complete no-op for the test suite, please start the commit
