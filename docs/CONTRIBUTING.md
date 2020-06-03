@@ -190,6 +190,43 @@ a list of items you can check before submitting a PR:
   failures that seem
   not related to the change you are making.
 
+## Internationalization (i18n)
+
+In order to support i18n in the cli, any messages that are intended to be translated 
+should be wrapped in a call to `i18n.Tr`. This call allows us to build a catalog of 
+translatable strings, replacing the reference string at runtime with the localized value.
+
+Adding or modifying these messages requires an i18n update, as this process creates the
+reference catalog that are shared with translators. For that reason, the `task check`
+command will fail if the catalog was not updated to sync with changes to the source code.
+
+To update the catalog, execute the following command and commit the changes.
+
+```shell
+task i18n:update
+```
+
+To verify that the catalog is up-to-date, you may execute the command:
+
+```shell
+task i18n:check
+```
+
+Example usage:
+
+```golang
+package main
+
+import (
+  "fmt"
+  "github.com/arduino/arduino-cli/i18n"
+)
+
+func main() {
+  fmt.Println(i18n.Tr("Hello World!"))
+}
+```
+
 ## Additional settings
 
 If you need to push a commit that's only shipping documentation changes or
