@@ -247,7 +247,7 @@ CLI tool called [Mike][10] that does few things for us:
 ### Docs automation
 
 In order to avoid unwanted changes to the public website hosting the Arduino
-CLI documentation, we only allow Mike to push changes to the `gh-pages` branch,
+CLI documentation, only Mike is allowed to push changes to the `gh-pages` branch,
 and this only heppens from within the CI, in a workflow named [docs][11].
 
 The CI is responsible for guessing which version of the Arduino CLI we're
