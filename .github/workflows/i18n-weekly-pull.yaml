@@ -1,9 +1,7 @@
 name: i18n-weekly-pull
 
 on:
-  schedule:
-    # run every monday at 2AM
-    - cron:  '0 2 * * 1'
+  push
 
 jobs:
   pull-from-transifex:
