@@ -170,9 +170,9 @@ from a tool called [MkDocs][9] and hosted on [GitHub Pages][7].
 Most of the documentation consists of static content written over several
 Markdown files under the `docs` folder at the root of this git repository but
 some  other content is dynamically generated from the CI pipelines - this is the
-case of the command line reference and the gRPC interface, for example.
+case with the command line reference and the gRPC interface, for example.
 
-If you want to check out how the documentation would look like after some local
+If you want to check out how the documentation would look after some local
 changes, you might need to reproduce what happens in the CI, generating the full
 documentation website from your personal computer. To run the docs toolchain
 locally, you need to have a few dependencies and tools installed:
@@ -214,8 +214,8 @@ CI.
 
 In order to provide support for multiple Arduino CLI releases, Documentation is
 versioned so that visitors can select which version of the documentation website
-should be displayed. Unfortunately this feature isn't provided by neither GitHub
-pages nor MkDocs, so we had to implement it on top of the generation process.
+should be displayed. Unfortunately this feature isn't provided by GitHub pages
+or MkDocs, so we had to implement it on top of the generation process.
 
 Before delving into the details of the generation process, here follow some
 requirements that were established to provide versioned documentation:
@@ -230,11 +230,11 @@ requirements that were established to provide versioned documentation:
   visitors to the most recently released version of the Arduino CLI.
 
 To implement the requirements above, the execution of MkDocs is wrapped using a
-CLI tool called [Mike][10] that does few things for us:
+CLI tool called [Mike][10] that does a few things for us:
 
 * It runs MkDocs targeting subfolders named after the Arduino CLI version, e.g.
   documentation for version `0.10.1` can be found under the folder `0.10`.
-* It injects an HTML control into the documentation website that let visitors
+* It injects an HTML control into the documentation website that lets visitors
   choose which version of the docs to browse from a dropdown list.
 * It provides a redirect to a version we decide when visitors hit the landing
   page of the documentation website.
@@ -248,14 +248,14 @@ CLI tool called [Mike][10] that does few things for us:
 
 In order to avoid unwanted changes to the public website hosting the Arduino
 CLI documentation, only Mike is allowed to push changes to the `gh-pages` branch,
-and this only heppens from within the CI, in a workflow named [docs][11].
+and this only happens from within the CI, in a workflow named [docs][11].
 
 The CI is responsible for guessing which version of the Arduino CLI we're
 building docs for, so that generated contents will be stored in the appropriate
-section of the documentation website. This guessing might be fairly complex,
-reason why the logic is implemented in a Python script called [`build.py`][12].
+section of the documentation website. Because this guessing might be fairly
+complex, the logic is implemented in a Python script called [`build.py`][12].
 The script will determine the version of the Arduino CLI that was modified in
-the current commit (either `dev` or an official, numbered release) and wether
+the current commit (either `dev` or an official, numbered release) and whether
 the redirect to the latest version that happens on the landing page should be
 updated or not.
 
