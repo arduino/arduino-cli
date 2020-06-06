@@ -61,13 +61,13 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for _, platformRef := range platformsRefs {
-		plattformInstallReq := &rpc.PlatformInstallReq{
+		platformInstallReq := &rpc.PlatformInstallReq{
 			Instance:        inst,
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
 		}
-		_, err := core.PlatformInstall(context.Background(), plattformInstallReq, output.ProgressBar(), output.TaskProgress())
+		_, err := core.PlatformInstall(context.Background(), platformInstallReq, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
 			feedback.Errorf("Error during install: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
