@@ -142,13 +142,13 @@ func merge(builtSketchPath, bootloaderPath, mergedSketchPath *paths.Path, maximu
 		return err
 	}
 
-	// size := lastAddress - initialAddress
-	// if size > uint32(maximumBinSize) {
-	// 	return nil
-	// }
-	// mergedSketchPathBin := paths.New(strings.TrimSuffix(mergedSketchPath.String(), ".hex") + ".bin")
-	// data := memMerged.ToBinary(initialAddress, size, 0xFF)
-	// return mergedSketchPathBin.WriteFile(data)
-
-	return nil
+	// Write out a .bin if the addresses doesn't go too far away from origin
+	// (and consequently produce a very large bin)
+	size := lastAddress - initialAddress
+	if size > uint32(maximumBinSize) {
+		return nil
+	}
+	mergedSketchPathBin := paths.New(strings.TrimSuffix(mergedSketchPath.String(), ".hex") + ".bin")
+	data := memMerged.ToBinary(initialAddress, size, 0xFF)
+	return mergedSketchPathBin.WriteFile(data)
 }
