@@ -434,12 +434,12 @@ func QuoteCppPath(path *paths.Path) string {
 // is a string contained in double quotes, with any backslashes or
 // quotes escaped with a backslash. If a valid string was present at the
 // start of the given line, returns the unquoted string contents, the
-// remaineder of the line (everything after the closing "), and true.
+// remainder of the line (everything after the closing "), and true.
 // Otherwise, returns the empty string, the entire line and false.
 func ParseCppString(line string) (string, string, bool) {
 	// For details about how these strings are output by gcc, see:
 	// https://github.com/gcc-mirror/gcc/blob/a588355ab948cf551bc9d2b89f18e5ae5140f52c/libcpp/macro.c#L491-L511
-	// Note that the documentaiton suggests all non-printable
+	// Note that the documentation suggests all non-printable
 	// characters are also escaped, but the implementation does not
 	// actually do this. See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=51259
 	if len(line) < 1 || line[0] != '"' {

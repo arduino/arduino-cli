@@ -207,7 +207,7 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	require.Len(t, s1.AdditionalFiles, 1)
 
 	// copy the sketch over, create a fake main file we don't care about it
-	// but we need it for `SketchLoad` to suceed later
+	// but we need it for `SketchLoad` to succeed later
 	err = builder.SketchCopyAdditionalFiles(s1, tmp)
 	require.Nil(t, err)
 	fakeIno := filepath.Join(tmp, fmt.Sprintf("%s.ino", filepath.Base(tmp)))

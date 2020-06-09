@@ -60,7 +60,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 
 	resp, err := core.PlatformSearch(inst.GetId(), arguments, allVersions)
 	if err != nil {
-		feedback.Errorf("Error saerching for platforms: %v", err)
+		feedback.Errorf("Error searching for platforms: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
