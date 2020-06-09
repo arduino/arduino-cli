@@ -34,6 +34,7 @@ The Zsh completion is working with [Oh-My-Zsh](https://ohmyz.sh/) but not with [
 ### Fish
 Use `arduino-cli completion fish > arduino-cli.fish` to generate the completion file.
 At this point you can place the file in `~/.config/fish/completions` with `mv arduino-cli.fish ~/.config/fish/completions/`
+
 Remember to open a new shell to test the functionality
 
 #### Disabling command and flag descriptions
