@@ -57,7 +57,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		Query:    (strings.Join(args, " ")),
 	})
 	if err != nil {
-		feedback.Errorf("Error saerching for Library: %v", err)
+		feedback.Errorf("Error searching for Library: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
