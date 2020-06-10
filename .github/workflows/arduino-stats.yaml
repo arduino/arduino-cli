@@ -48,3 +48,4 @@ jobs:
               tags:
                 - "project:arduino-cli"
                 - "cdn:downloads.arduino.cc"
+                - "workflow:${{ github.workflow }}"
