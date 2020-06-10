@@ -46,3 +46,4 @@ jobs:
               host: ${{ github.repository }}
               tags:
                 - "project:arduino-cli"
+                - "workflow:${{ github.workflow }}"
