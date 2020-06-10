@@ -9,6 +9,27 @@ repository. To propose improvements or fix a bug, feel free to submit a PR.
 
 Before we can accept your contributions you have to sign the [Contributor License Agreement][0]
 
+## Pull Requests
+
+In order to ease code reviews and have your contributions merged faster, here is
+a list of items you can check before submitting a PR:
+
+* Create small PRs that are narrowly focused on addressing a single concern.
+* PR titles indirectly become part of the CHANGELOG so it's crucial to provide a
+  good record of **what** change is being made in the title; **why** it was made
+  will go in the PR description, along with a link to a GitHub issue if it
+  exists.
+* Write tests for the code you wrote.
+* Open your PR against the `master` branch.
+* Maintain **clean commit history** and use **meaningful commit messages**.
+  PRs with messy commit history are difficult to review and require a lot of
+  work to be merged.
+* Your PR must pass all CI tests before we will merge it. If you're seeing an
+  error and don't think
+  it's your fault, it may not be! The reviewer will help you if there are test
+  failures that seem
+  not related to the change you are making.
+
 ## Prerequisites
 
 To build the Arduino CLI from sources you need the following tools to be
@@ -141,59 +162,107 @@ task test-integration
 
 ## Working on docs
 
-Documentation consists of several Markdown files stored under the `docs` folder
-at the root of the repo. Some of those files are automatically generated in the
-CI pipeline that builds the documentation website so you won't find them in the
-git repository and you need to generate them locally.
+Documentation is provided to final users in form of static HTML content generated
+from a tool called [MkDocs][9] and hosted on [GitHub Pages][7].
 
-If you're working on docs and your changes are not trivial, you might want to
-preview the documentation website locally, before opening a Pull Request. To run
-the docs toolchain locally you need to have:
+### Local development
+
+Most of the documentation consists of static content written over several
+Markdown files under the `docs` folder at the root of this git repository but
+some  other content is dynamically generated from the CI pipelines - this is the
+case with the command line reference and the gRPC interface, for example.
+
+If you want to check out how the documentation would look after some local
+changes, you might need to reproduce what happens in the CI, generating the full
+documentation website from your personal computer. To run the docs toolchain
+locally, you need to have a few dependencies and tools installed:
 
 * [Go][1] version 1.12 or later
 * [Taskfile][2] to help you run the most common tasks from the command line
-* A working [Python][3] environment, version 3.5 or later
+* A working [Python][3] environment, see [this paragraph](#integration-tests)
+  if you need to setup one
 
-Before running the toolchain, perform the following operations:
+Before running the toolchain, perform the following operations from the root of
+the git repository (if you have a Python virtual environment, activate it before
+proceeding):
 
 * go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
+* pip install -r requirements_docs.txt
 
 When working on docs, you can launch a command that will take care of
 generating the docs, build the static website and start a local server you can
-access with your browser to see a preview of your changes - to launch this
-command do:
+later access with a web browser to see a preview of your changes. From the root
+of the git repository run:
 
 ```shell
 task docs:serve
 ```
 
-If you don't see any error, hit http://127.0.0.1:8000 with your browser.
+If you don't see any error, hit http://127.0.0.1:8000 with your browser to
+navigate the generated docs.
 
-## Pull Requests
+### Docs publishing
 
-In order to ease code reviews and have your contributions merged faster, here is
-a list of items you can check before submitting a PR:
+The present git repository has a special branch called `gh-pages` that contains
+the generated HTML code for the docs website; every time a change is pushed to
+this special branch, GitHub automatically triggers a [deployment][8] to pull the
+change and publish a new version of the website. Do not open Pull Requests to
+push changes to the `gh-pages` branch, that will be done exclusively from the
+CI.
 
-* Create small PRs that are narrowly focused on addressing a single concern.
-* PR titles indirectly become part of the CHANGELOG so it's crucial to provide a
-  good record of **what** change is being made in the title; **why** it was made
-  will go in the PR description, along with a link to a GitHub issue if it
-  exists.
-* Write tests for the code you wrote.
-* Open your PR against the `master` branch.
-* Maintain **clean commit history** and use **meaningful commit messages**.
-  PRs with messy commit history are difficult to review and require a lot of
-  work to be merged.
-* Your PR must pass all CI tests before we will merge it. If you're seeing an
-  error and don't think
-  it's your fault, it may not be! The reviewer will help you if there are test
-  failures that seem
-  not related to the change you are making.
+### Docs versioning
+
+In order to provide support for multiple Arduino CLI releases, Documentation is
+versioned so that visitors can select which version of the documentation website
+should be displayed. Unfortunately this feature isn't provided by GitHub pages
+or MkDocs, so we had to implement it on top of the generation process.
+
+Before delving into the details of the generation process, here follow some
+requirements that were established to provide versioned documentation:
+
+* A special version of the documentation called `dev` is provided to reflect the
+  status of the Arduino CLI on the `master` branch - this includes unreleased
+  features and bugfixes.
+* Docs are versioned after the minor version of an Arduino CLI release. For
+  example, Arduino CLI `0.99.1` and `0.99.2` will be both covered by
+  documentation version `0.99`.
+* The landing page of the documentation website will automatically redirect
+  visitors to the most recently released version of the Arduino CLI.
+
+To implement the requirements above, the execution of MkDocs is wrapped using a
+CLI tool called [Mike][10] that does a few things for us:
+
+* It runs MkDocs targeting subfolders named after the Arduino CLI version, e.g.
+  documentation for version `0.10.1` can be found under the folder `0.10`.
+* It injects an HTML control into the documentation website that lets visitors
+  choose which version of the docs to browse from a dropdown list.
+* It provides a redirect to a version we decide when visitors hit the landing
+  page of the documentation website.
+* It pushes generated contents to the `gh-pages` branch.
+
+> **Note:** unless you're working on the generation process itself, you should
+> never run Mike from a local environment, either directly or through the Task
+> `docs:publish`. This might result in unwanted changes to the public website.
+
+### Docs automation
+
+In order to avoid unwanted changes to the public website hosting the Arduino
+CLI documentation, only Mike is allowed to push changes to the `gh-pages` branch,
+and this only happens from within the CI, in a workflow named [docs][11].
+
+The CI is responsible for guessing which version of the Arduino CLI we're
+building docs for, so that generated contents will be stored in the appropriate
+section of the documentation website. Because this guessing might be fairly
+complex, the logic is implemented in a Python script called [`build.py`][12].
+The script will determine the version of the Arduino CLI that was modified in
+the current commit (either `dev` or an official, numbered release) and whether
+the redirect to the latest version that happens on the landing page should be
+updated or not.
 
 ## Internationalization (i18n)
 
-In order to support i18n in the cli, any messages that are intended to be translated 
-should be wrapped in a call to `i18n.Tr`. This call allows us to build a catalog of 
+In order to support i18n in the cli, any messages that are intended to be translated
+should be wrapped in a call to `i18n.Tr`. This call allows us to build a catalog of
 translatable strings, replacing the reference string at runtime with the localized value.
 
 Adding or modifying these messages requires an i18n update, as this process creates the
@@ -244,3 +313,9 @@ title with the string **[skip changelog]**
 [4]: https://docs.python.org/3/tutorial/venv.html
 [5]: https://github.com/ofek/hatch
 [6]: https://github.com/protocolbuffers/protobuf/releases
+[7]: https://pages.github.com/
+[8]: https://github.com/arduino/arduino-cli/deployments?environment=github-pages#activity-log
+[9]: https://www.mkdocs.org/
+[10]: https://github.com/jimporter/mike
+[11]: https://github.com/arduino/arduino-cli/blob/master/.github/workflows/docs.yaml
+[12]: https://github.com/arduino/arduino-cli/blob/master/docs/build.py
