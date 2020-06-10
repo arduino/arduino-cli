@@ -1,29 +1,29 @@
 # 
 # Translators:
-# Henrique Diniz <henrique.diniz@toptal.com>, 2020
+# Cristian Maglie <c.maglie@arduino.cc>, 2020
 # 
 msgid ""
 msgstr ""
-"Last-Translator: Henrique Diniz <henrique.diniz@toptal.com>, 2020\n"
-"Language-Team: Portuguese (Brazil) (https://www.transifex.com/arduino-1/teams/108174/pt_BR/)\n"
-"Language: pt_BR\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Last-Translator: Cristian Maglie <c.maglie@arduino.cc>, 2020\n"
+"Language-Team: Italian (Italy) (https://www.transifex.com/arduino-1/teams/108174/it_IT/)\n"
+"Language: it_IT\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: cli/usage.go:31
 msgid "Additional help topics:"
-msgstr ""
+msgstr "Informazioni aggiuntive:"
 
 #: cli/usage.go:26
 msgid "Aliases:"
-msgstr ""
+msgstr "Alias:"
 
 #: cli/usage.go:28
 msgid "Available Commands:"
-msgstr ""
+msgstr "Comandi disponibili:"
 
 #: cli/usage.go:27
 msgid "Examples:"
-msgstr ""
+msgstr "Esempi:"
 
 #: cli/usage.go:29
 msgid "Flags:"
@@ -39,4 +39,4 @@ msgstr ""
 
 #: cli/usage.go:32
 msgid "Use %s for more information about a command."
-msgstr "Use %s para mais informações sobre um comando."
+msgstr ""
