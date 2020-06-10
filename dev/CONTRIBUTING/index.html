@@ -298,6 +298,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#pull-requests" class="md-nav__link">
+    Pull Requests
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#prerequisites" class="md-nav__link">
     Prerequisites
   </a>
@@ -343,12 +350,39 @@
     Working on docs
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pull-requests" class="md-nav__link">
-    Pull Requests
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-development" class="md-nav__link">
+    Local development
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-publishing" class="md-nav__link">
+    Docs publishing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-versioning" class="md-nav__link">
+    Docs versioning
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-automation" class="md-nav__link">
+    Docs automation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -993,6 +1027,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#pull-requests" class="md-nav__link">
+    Pull Requests
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#prerequisites" class="md-nav__link">
     Prerequisites
   </a>
@@ -1038,12 +1079,39 @@
     Working on docs
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pull-requests" class="md-nav__link">
-    Pull Requests
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-development" class="md-nav__link">
+    Local development
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-publishing" class="md-nav__link">
+    Docs publishing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-versioning" class="md-nav__link">
+    Docs versioning
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-automation" class="md-nav__link">
+    Docs automation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1084,6 +1152,26 @@
 repository. To propose improvements or fix a bug, feel free to submit a PR.</p>
 <h2 id="legal-requirements">Legal requirements<a class="headerlink" href="#legal-requirements" title="Permanent link">&para;</a></h2>
 <p>Before we can accept your contributions you have to sign the <a href="https://cla-assistant.io/arduino/arduino-cli">Contributor License Agreement</a></p>
+<h2 id="pull-requests">Pull Requests<a class="headerlink" href="#pull-requests" title="Permanent link">&para;</a></h2>
+<p>In order to ease code reviews and have your contributions merged faster, here is
+a list of items you can check before submitting a PR:</p>
+<ul>
+<li>Create small PRs that are narrowly focused on addressing a single concern.</li>
+<li>PR titles indirectly become part of the CHANGELOG so it's crucial to provide a
+  good record of <strong>what</strong> change is being made in the title; <strong>why</strong> it was made
+  will go in the PR description, along with a link to a GitHub issue if it
+  exists.</li>
+<li>Write tests for the code you wrote.</li>
+<li>Open your PR against the <code>master</code> branch.</li>
+<li>Maintain <strong>clean commit history</strong> and use <strong>meaningful commit messages</strong>.
+  PRs with messy commit history are difficult to review and require a lot of
+  work to be merged.</li>
+<li>Your PR must pass all CI tests before we will merge it. If you're seeing an
+  error and don't think
+  it's your fault, it may not be! The reviewer will help you if there are test
+  failures that seem
+  not related to the change you are making.</li>
+</ul>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
 <p>To build the Arduino CLI from sources you need the following tools to be
 available in your local environment:</p>
@@ -1191,53 +1279,94 @@ dependencies required with:</p>
 </code></pre></div>
 
 <h2 id="working-on-docs">Working on docs<a class="headerlink" href="#working-on-docs" title="Permanent link">&para;</a></h2>
-<p>Documentation consists of several Markdown files stored under the <code>docs</code> folder
-at the root of the repo. Some of those files are automatically generated in the
-CI pipeline that builds the documentation website so you won't find them in the
-git repository and you need to generate them locally.</p>
-<p>If you're working on docs and your changes are not trivial, you might want to
-preview the documentation website locally, before opening a Pull Request. To run
-the docs toolchain locally you need to have:</p>
+<p>Documentation is provided to final users in form of static HTML content generated
+from a tool called <a href="https://www.mkdocs.org/">MkDocs</a> and hosted on <a href="https://pages.github.com/">GitHub Pages</a>.</p>
+<h3 id="local-development">Local development<a class="headerlink" href="#local-development" title="Permanent link">&para;</a></h3>
+<p>Most of the documentation consists of static content written over several
+Markdown files under the <code>docs</code> folder at the root of this git repository but
+some  other content is dynamically generated from the CI pipelines - this is the
+case with the command line reference and the gRPC interface, for example.</p>
+<p>If you want to check out how the documentation would look after some local
+changes, you might need to reproduce what happens in the CI, generating the full
+documentation website from your personal computer. To run the docs toolchain
+locally, you need to have a few dependencies and tools installed:</p>
 <ul>
 <li><a href="https://golang.org/doc/install">Go</a> version 1.12 or later</li>
 <li><a href="https://taskfile.dev/#/installation">Taskfile</a> to help you run the most common tasks from the command line</li>
-<li>A working <a href="https://www.python.org/downloads/">Python</a> environment, version 3.5 or later</li>
+<li>A working <a href="https://www.python.org/downloads/">Python</a> environment, see <a href="#integration-tests">this paragraph</a>
+  if you need to setup one</li>
 </ul>
-<p>Before running the toolchain, perform the following operations:</p>
+<p>Before running the toolchain, perform the following operations from the root of
+the git repository (if you have a Python virtual environment, activate it before
+proceeding):</p>
 <ul>
 <li>go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc</li>
+<li>pip install -r requirements_docs.txt</li>
 </ul>
 <p>When working on docs, you can launch a command that will take care of
 generating the docs, build the static website and start a local server you can
-access with your browser to see a preview of your changes - to launch this
-command do:</p>
+later access with a web browser to see a preview of your changes. From the root
+of the git repository run:</p>
 <div class="highlight"><pre><span></span><code>task docs:serve
 </code></pre></div>
 
-<p>If you don't see any error, hit <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> with your browser.</p>
-<h2 id="pull-requests">Pull Requests<a class="headerlink" href="#pull-requests" title="Permanent link">&para;</a></h2>
-<p>In order to ease code reviews and have your contributions merged faster, here is
-a list of items you can check before submitting a PR:</p>
+<p>If you don't see any error, hit <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> with your browser to
+navigate the generated docs.</p>
+<h3 id="docs-publishing">Docs publishing<a class="headerlink" href="#docs-publishing" title="Permanent link">&para;</a></h3>
+<p>The present git repository has a special branch called <code>gh-pages</code> that contains
+the generated HTML code for the docs website; every time a change is pushed to
+this special branch, GitHub automatically triggers a <a href="https://github.com/arduino/arduino-cli/deployments?environment=github-pages#activity-log">deployment</a> to pull the
+change and publish a new version of the website. Do not open Pull Requests to
+push changes to the <code>gh-pages</code> branch, that will be done exclusively from the
+CI.</p>
+<h3 id="docs-versioning">Docs versioning<a class="headerlink" href="#docs-versioning" title="Permanent link">&para;</a></h3>
+<p>In order to provide support for multiple Arduino CLI releases, Documentation is
+versioned so that visitors can select which version of the documentation website
+should be displayed. Unfortunately this feature isn't provided by GitHub pages
+or MkDocs, so we had to implement it on top of the generation process.</p>
+<p>Before delving into the details of the generation process, here follow some
+requirements that were established to provide versioned documentation:</p>
 <ul>
-<li>Create small PRs that are narrowly focused on addressing a single concern.</li>
-<li>PR titles indirectly become part of the CHANGELOG so it's crucial to provide a
-  good record of <strong>what</strong> change is being made in the title; <strong>why</strong> it was made
-  will go in the PR description, along with a link to a GitHub issue if it
-  exists.</li>
-<li>Write tests for the code you wrote.</li>
-<li>Open your PR against the <code>master</code> branch.</li>
-<li>Maintain <strong>clean commit history</strong> and use <strong>meaningful commit messages</strong>.
-  PRs with messy commit history are difficult to review and require a lot of
-  work to be merged.</li>
-<li>Your PR must pass all CI tests before we will merge it. If you're seeing an
-  error and don't think
-  it's your fault, it may not be! The reviewer will help you if there are test
-  failures that seem
-  not related to the change you are making.</li>
+<li>A special version of the documentation called <code>dev</code> is provided to reflect the
+  status of the Arduino CLI on the <code>master</code> branch - this includes unreleased
+  features and bugfixes.</li>
+<li>Docs are versioned after the minor version of an Arduino CLI release. For
+  example, Arduino CLI <code>0.99.1</code> and <code>0.99.2</code> will be both covered by
+  documentation version <code>0.99</code>.</li>
+<li>The landing page of the documentation website will automatically redirect
+  visitors to the most recently released version of the Arduino CLI.</li>
 </ul>
+<p>To implement the requirements above, the execution of MkDocs is wrapped using a
+CLI tool called <a href="https://github.com/jimporter/mike">Mike</a> that does a few things for us:</p>
+<ul>
+<li>It runs MkDocs targeting subfolders named after the Arduino CLI version, e.g.
+  documentation for version <code>0.10.1</code> can be found under the folder <code>0.10</code>.</li>
+<li>It injects an HTML control into the documentation website that lets visitors
+  choose which version of the docs to browse from a dropdown list.</li>
+<li>It provides a redirect to a version we decide when visitors hit the landing
+  page of the documentation website.</li>
+<li>It pushes generated contents to the <code>gh-pages</code> branch.</li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> unless you're working on the generation process itself, you should
+never run Mike from a local environment, either directly or through the Task
+<code>docs:publish</code>. This might result in unwanted changes to the public website.</p>
+</blockquote>
+<h3 id="docs-automation">Docs automation<a class="headerlink" href="#docs-automation" title="Permanent link">&para;</a></h3>
+<p>In order to avoid unwanted changes to the public website hosting the Arduino
+CLI documentation, only Mike is allowed to push changes to the <code>gh-pages</code> branch,
+and this only happens from within the CI, in a workflow named <a href="https://github.com/arduino/arduino-cli/blob/master/.github/workflows/docs.yaml">docs</a>.</p>
+<p>The CI is responsible for guessing which version of the Arduino CLI we're
+building docs for, so that generated contents will be stored in the appropriate
+section of the documentation website. Because this guessing might be fairly
+complex, the logic is implemented in a Python script called <a href="https://github.com/arduino/arduino-cli/blob/master/docs/build.py"><code>build.py</code></a>.
+The script will determine the version of the Arduino CLI that was modified in
+the current commit (either <code>dev</code> or an official, numbered release) and whether
+the redirect to the latest version that happens on the landing page should be
+updated or not.</p>
 <h2 id="internationalization-i18n">Internationalization (i18n)<a class="headerlink" href="#internationalization-i18n" title="Permanent link">&para;</a></h2>
-<p>In order to support i18n in the cli, any messages that are intended to be translated 
-should be wrapped in a call to <code>i18n.Tr</code>. This call allows us to build a catalog of 
+<p>In order to support i18n in the cli, any messages that are intended to be translated
+should be wrapped in a call to <code>i18n.Tr</code>. This call allows us to build a catalog of
 translatable strings, replacing the reference string at runtime with the localized value.</p>
 <p>Adding or modifying these messages requires an i18n update, as this process creates the
 reference catalog that are shared with translators. For that reason, the <code>task check</code>
