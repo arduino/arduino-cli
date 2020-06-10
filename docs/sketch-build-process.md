@@ -73,10 +73,11 @@ The folder name contains the include | `AnAwesomeServoForWhatever`
 
 The "location priority" is determined as follows (in order of highest to lowest priority):
 
-1. The library is in the sketchbook (`{sketchbook path}/libraries`)
+1. The library is in the `libraries` subfolder of the IDE's sketchbook or Arduino CLI's user directory
 1. The library is bundled with the board platform/core ([`{runtime.platform.path}/libraries`](platform-specification.md#global-predefined-properties))
 1. The library is bundled with the [referenced](platform-specification.md#referencing-another-core-variant-or-tool) board platform/core
 1. The library is bundled with the Arduino IDE ([`{runtime.ide.path}/libraries`](platform-specification.md#global-predefined-properties))
+    - This location is only used by Arduino CLI when it's located in the Arduino IDE installation folder
 
 ## Compilation
 
