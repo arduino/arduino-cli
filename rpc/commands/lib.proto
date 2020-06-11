@@ -236,7 +236,7 @@ message Library {
     // The location of the library's `utility` directory
     string utility_dir = 12;
     // If `location` is `platform_builtin` or `referenced_platform_builtin`, the
-    // identifying string for the core package (e.g., `arduino:avr@1.8.2`).
+    // identifying string for the platform package containing the library (e.g., `arduino:avr@1.8.2`).
     string container_platform = 14;
     // Value of the `name` field in library.properties.
     string real_name = 16;
