@@ -229,14 +229,11 @@ message Library {
     // The type categories of the library. Possible values: `Arduino`,
     // `Partner`, `Recommended`, `Contributed`, `Retired`.
     repeated string types = 9;
-    // The location of the library, relative to the libraries directory that
-    // contains it.
+    // The path of the library directory.
     string install_dir = 10;
-    // The location of the library's source files, relative to the libraries
-    // directory that contains it.
+    // The location of the library's source files
     string source_dir = 11;
-    // The location of the library's `utility` directory, relative to the
-    // libraries directory that contains it. 
+    // The location of the library's `utility` directory
     string utility_dir = 12;
     // If `location` is `platform_builtin` or `referenced_platform_builtin`, the
     // identifying string for the core package (e.g., `arduino:avr@1.8.2`).
