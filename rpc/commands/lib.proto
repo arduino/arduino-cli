@@ -61,7 +61,7 @@ message LibraryUninstallReq {
 }
 
 message LibraryUninstallResp {
-    // Arduino Core Service instance from the `Init` response.
+    // Description of the current stage of the uninstallation.
     TaskProgress task_progress = 1;
 }
 
