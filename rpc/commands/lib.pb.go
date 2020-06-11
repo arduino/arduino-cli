@@ -375,7 +375,7 @@ func (m *LibraryUninstallReq) GetVersion() string {
 }
 
 type LibraryUninstallResp struct {
-	// Arduino Core Service instance from the `Init` response.
+	// Description of the current stage of the uninstallation.
 	TaskProgress         *TaskProgress `protobuf:"bytes,1,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
@@ -761,7 +761,8 @@ func (m *LibrarySearchResp) GetStatus() LibrarySearchStatus {
 type SearchedLibrary struct {
 	// Library name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The index data for the available versions of the library.
+	// The index data for the available versions of the library. The key of the
+	// map is the library version.
 	Releases map[string]*LibraryRelease `protobuf:"bytes,2,rep,name=releases,proto3" json:"releases,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// The index data for the latest version of the library.
 	Latest               *LibraryRelease `protobuf:"bytes,3,opt,name=latest,proto3" json:"latest,omitempty"`
@@ -1264,17 +1265,15 @@ type Library struct {
 	// The type categories of the library. Possible values: `Arduino`,
 	// `Partner`, `Recommended`, `Contributed`, `Retired`.
 	Types []string `protobuf:"bytes,9,rep,name=types,proto3" json:"types,omitempty"`
-	// The location of the library, relative to the libraries directory that
-	// contains it.
+	// The path of the library directory.
 	InstallDir string `protobuf:"bytes,10,opt,name=install_dir,json=installDir,proto3" json:"install_dir,omitempty"`
-	// The location of the library's source files, relative to the libraries
-	// directory that contains it.
+	// The location of the library's source files.
 	SourceDir string `protobuf:"bytes,11,opt,name=source_dir,json=sourceDir,proto3" json:"source_dir,omitempty"`
-	// The location of the library's `utility` directory, relative to the
-	// libraries directory that contains it.
+	// The location of the library's `utility` directory.
 	UtilityDir string `protobuf:"bytes,12,opt,name=utility_dir,json=utilityDir,proto3" json:"utility_dir,omitempty"`
 	// If `location` is `platform_builtin` or `referenced_platform_builtin`, the
-	// identifying string for the core package (e.g., `arduino:avr@1.8.2`).
+	// identifying string for the platform containing the library
+	// (e.g., `arduino:avr@1.8.2`).
 	ContainerPlatform string `protobuf:"bytes,14,opt,name=container_platform,json=containerPlatform,proto3" json:"container_platform,omitempty"`
 	// Value of the `name` field in library.properties.
 	RealName string `protobuf:"bytes,16,opt,name=real_name,json=realName,proto3" json:"real_name,omitempty"`
