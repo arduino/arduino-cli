@@ -17,12 +17,12 @@ package builder
 
 import (
 	"math"
-	"os"
 	"strconv"
 	"strings"
 
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/marcinbor85/gohex"
 	"github.com/pkg/errors"
@@ -39,7 +39,6 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 	buildPath := ctx.BuildPath
 	sketch := ctx.Sketch
 	sketchFileName := sketch.MainFile.Name.Base()
-	logger := ctx.GetLogger()
 
 	sketchInBuildPath := buildPath.Join(sketchFileName + ".hex")
 	sketchInSubfolder := buildPath.Join(constants.FOLDER_SKETCH, sketchFileName+".hex")
@@ -63,7 +62,7 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 
 	bootloaderPath := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH).Join(constants.FOLDER_BOOTLOADERS, bootloader)
 	if bootloaderPath.NotExist() {
-		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_BOOTLOADER_FILE_MISSING, bootloaderPath)
+		utils.LogIfVerbose(constants.LOG_LEVEL_WARN, constants.MSG_BOOTLOADER_FILE_MISSING, bootloaderPath)
 		return nil
 	}
 
@@ -77,7 +76,7 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 	}
 	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath, maximumBinSize)
 	if err != nil {
-		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, err.Error())
+		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, err.Error())
 	}
 
 	return nil
