@@ -57,13 +57,11 @@ func (s *Linker) Run(ctx *types.Context) error {
 }
 
 func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties *properties.Map) error {
-	optRelax := addRelaxTrickIfATMEGA2560(buildProperties)
-
 	quotedObjectFiles := utils.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes)
 	objectFileList := strings.Join(quotedObjectFiles, constants.SPACE)
 
 	properties := buildProperties.Clone()
-	properties.Set(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS)+optRelax)
+	properties.Set(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS))
 	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel))
 	properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE, coreDotARelPath.String())
 	properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, coreArchiveFilePath.String())
@@ -75,11 +73,4 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 
 func wrapWithDoubleQuotes(value string) string {
 	return "\"" + value + "\""
-}
-
-func addRelaxTrickIfATMEGA2560(buildProperties *properties.Map) string {
-	if buildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU) == "atmega2560" {
-		return ",--relax"
-	}
-	return constants.EMPTY_STRING
 }
