@@ -6,7 +6,7 @@ require (
 	bou.ke/monkey v1.0.1
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c
-	github.com/arduino/go-paths-helper v1.0.1
+	github.com/arduino/go-paths-helper v1.2.0
 	github.com/arduino/go-properties-orderedmap v1.0.0
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
 	github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b
@@ -25,6 +25,7 @@ require (
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
 	github.com/juju/testing v0.0.0-20190429233213-dfc56b8c09fc // indirect
 	github.com/leonelquinteros/gotext v1.4.0
+	github.com/marcinbor85/gohex v0.0.0-20200531163658-baab2527a9a2
 	github.com/mattn/go-colorable v0.1.2
 	github.com/mattn/go-runewidth v0.0.2 // indirect
 	github.com/miekg/dns v1.0.5 // indirect
