@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/board"
 	"github.com/arduino/arduino-cli/cli/cache"
 	"github.com/arduino/arduino-cli/cli/compile"
+	"github.com/arduino/arduino-cli/cli/completion"
 	"github.com/arduino/arduino-cli/cli/config"
 	"github.com/arduino/arduino-cli/cli/core"
 	"github.com/arduino/arduino-cli/cli/daemon"
@@ -77,6 +78,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(board.NewCommand())
 	cmd.AddCommand(cache.NewCommand())
 	cmd.AddCommand(compile.NewCommand())
+	cmd.AddCommand(completion.NewCommand())
 	cmd.AddCommand(config.NewCommand())
 	cmd.AddCommand(core.NewCommand())
 	cmd.AddCommand(daemon.NewCommand())

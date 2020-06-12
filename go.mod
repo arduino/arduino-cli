@@ -36,7 +36,7 @@ require (
 	github.com/schollz/closestmatch v2.1.0+incompatible
 	github.com/segmentio/stats/v4 v4.5.3
 	github.com/sirupsen/logrus v1.4.2
-	github.com/spf13/cobra v0.0.5
+	github.com/spf13/cobra v1.0.0
 	github.com/spf13/jwalterweatherman v1.0.0
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/testify v1.4.0
