@@ -56,6 +56,7 @@ nav:
   - Documentation Home: index.md
   - installation.md
   - getting-started.md
+  - command-line-completion.md
   - CONTRIBUTING.md
   - FAQ.md
   - Command reference:
@@ -68,6 +69,7 @@ nav:
     - cache: commands/arduino-cli_cache.md
     - cache clean: commands/arduino-cli_cache_clean.md
     - compile: commands/arduino-cli_compile.md
+    - completion: commands/arduino-cli_completion.md
     - config: commands/arduino-cli_config.md
     - config dump: commands/arduino-cli_config_dump.md
     - config init: commands/arduino-cli_config_init.md
