@@ -13,7 +13,7 @@
         <meta name="description" content="Arduino Command Line Interface">
       
       
-        <link rel="canonical" href="https://arduino.github.io/arduino-cli/commands/arduino-cli_core/">
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/command-line-completion/">
       
       
       
@@ -35,18 +35,18 @@
       
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
-      <link rel="shortcut icon" href="../../assets/images/favicon.png">
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-4.6.3">
     
     
       
-        <title>core - Arduino CLI</title>
+        <title>Command line completion - Arduino CLI</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/application.adb8469c.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application.adb8469c.css">
       
-        <link rel="stylesheet" href="../../assets/stylesheets/application-palette.a8b3c06d.css">
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.a8b3c06d.css">
       
       
         
@@ -55,7 +55,7 @@
       
     
     
-      <script src="../../assets/javascripts/modernizr.86422ebf.js"></script>
+      <script src="../assets/javascripts/modernizr.86422ebf.js"></script>
     
     
       
@@ -64,10 +64,10 @@
         <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
       
     
-    <link rel="stylesheet" href="../../assets/fonts/material-icons.css">
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
     
     
-      <link rel="stylesheet" href="../../css/version-select.css">
+      <link rel="stylesheet" href="../css/version-select.css">
     
     
       
@@ -91,7 +91,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#arduino-cli-core" tabindex="0" class="md-skip">
+      <a href="#before-you-start" tabindex="0" class="md-skip">
         Skip to content
       </a>
     
@@ -102,7 +102,7 @@
       <div class="md-flex__cell md-flex__cell--shrink">
         <a href="https://arduino.github.io/arduino-cli/" title="Arduino CLI" aria-label="Arduino CLI" class="md-header-nav__button md-logo">
           
-            <img alt="logo" src="../../img/icon_mac_light.png" width="24" height="24">
+            <img alt="logo" src="../img/icon_mac_light.png" width="24" height="24">
           
         </a>
       </div>
@@ -117,7 +117,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                core
+                Command line completion
               
             </span>
           
@@ -194,7 +194,7 @@
   <label class="md-nav__title md-nav__title--site" for="__drawer">
     <a href="https://arduino.github.io/arduino-cli/" title="Arduino CLI" class="md-nav__button md-logo">
       
-        <img alt="logo" src="../../img/icon_mac_light.png" width="48" height="48">
+        <img alt="logo" src="../img/icon_mac_light.png" width="48" height="48">
       
     </a>
     Arduino CLI
@@ -228,7 +228,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../.." title="Documentation Home" class="md-nav__link">
+    <a href=".." title="Documentation Home" class="md-nav__link">
       Documentation Home
     </a>
   </li>
@@ -240,7 +240,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../installation/" title="Installation" class="md-nav__link">
+    <a href="../installation/" title="Installation" class="md-nav__link">
       Installation
     </a>
   </li>
@@ -252,7 +252,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../getting-started/" title="Getting started" class="md-nav__link">
+    <a href="../getting-started/" title="Getting started" class="md-nav__link">
       Getting started
     </a>
   </li>
@@ -261,219 +261,6 @@
       
       
       
-
-
-  <li class="md-nav__item">
-    <a href="../../command-line-completion/" title="Command line completion" class="md-nav__link">
-      Command line completion
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../../CONTRIBUTING/" title="How to contribute" class="md-nav__link">
-      How to contribute
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../../FAQ/" title="FAQ" class="md-nav__link">
-      FAQ
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-  
-
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-    
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7" checked>
-    
-    <label class="md-nav__link" for="nav-7">
-      Command reference
-    </label>
-    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-7">
-        Command reference
-      </label>
-      <ul class="md-nav__list" data-md-scrollfix>
-        
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli/" title="Arduino cli" class="md-nav__link">
-      Arduino cli
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_board/" title="board" class="md-nav__link">
-      board
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_board_attach/" title="board attach" class="md-nav__link">
-      board attach
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_board_details/" title="board details" class="md-nav__link">
-      board details
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_board_list/" title="board list" class="md-nav__link">
-      board list
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_board_listall/" title="board listall" class="md-nav__link">
-      board listall
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_cache/" title="cache" class="md-nav__link">
-      cache
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_cache_clean/" title="cache clean" class="md-nav__link">
-      cache clean
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_compile/" title="compile" class="md-nav__link">
-      compile
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_completion/" title="completion" class="md-nav__link">
-      completion
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_config/" title="config" class="md-nav__link">
-      config
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_config_dump/" title="config dump" class="md-nav__link">
-      config dump
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_config_init/" title="config init" class="md-nav__link">
-      config init
-    </a>
-  </li>
-
-        
-          
-          
-          
 
   
 
@@ -484,11 +271,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        core
+        Command line completion
       </label>
     
-    <a href="./" title="core" class="md-nav__link md-nav__link--active">
-      core
+    <a href="./" title="Command line completion" class="md-nav__link md-nav__link--active">
+      Command line completion
     </a>
     
       
@@ -500,58 +287,45 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#arduino-cli-core" class="md-nav__link">
-    arduino-cli core
+  <a href="#before-you-start" class="md-nav__link">
+    Before you start
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generate-the-completion-file" class="md-nav__link">
+    Generate the completion file
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bash" class="md-nav__link">
+    Bash
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#zsh" class="md-nav__link">
+    Zsh
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fish" class="md-nav__link">
+    Fish
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#synopsis" class="md-nav__link">
-    Synopsis
+  <a href="#disabling-command-and-flag-descriptions" class="md-nav__link">
+    Disabling command and flag descriptions
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    Examples
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
-    Options
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options-inherited-from-parent-commands" class="md-nav__link">
-    Options inherited from parent commands
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    SEE ALSO
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#auto-generated-by-spf13cobra-on-12-jun-2020" class="md-nav__link">
-    Auto generated by spf13/cobra on 12-Jun-2020
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -570,6 +344,49 @@
     
   </li>
 
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../CONTRIBUTING/" title="How to contribute" class="md-nav__link">
+      How to contribute
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../FAQ/" title="FAQ" class="md-nav__link">
+      FAQ
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
+    
+    <label class="md-nav__link" for="nav-7">
+      Command reference
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-7">
+        Command reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
         
           
           
@@ -577,7 +394,175 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_core_download/" title="core download" class="md-nav__link">
+    <a href="../commands/arduino-cli/" title="Arduino cli" class="md-nav__link">
+      Arduino cli
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board/" title="board" class="md-nav__link">
+      board
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_attach/" title="board attach" class="md-nav__link">
+      board attach
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_details/" title="board details" class="md-nav__link">
+      board details
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_list/" title="board list" class="md-nav__link">
+      board list
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_board_listall/" title="board listall" class="md-nav__link">
+      board listall
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_cache/" title="cache" class="md-nav__link">
+      cache
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_cache_clean/" title="cache clean" class="md-nav__link">
+      cache clean
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_compile/" title="compile" class="md-nav__link">
+      compile
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_completion/" title="completion" class="md-nav__link">
+      completion
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_config/" title="config" class="md-nav__link">
+      config
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_config_dump/" title="config dump" class="md-nav__link">
+      config dump
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_config_init/" title="config init" class="md-nav__link">
+      config init
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core/" title="core" class="md-nav__link">
+      core
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_core_download/" title="core download" class="md-nav__link">
       core download
     </a>
   </li>
@@ -589,7 +574,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_core_install/" title="core install" class="md-nav__link">
+    <a href="../commands/arduino-cli_core_install/" title="core install" class="md-nav__link">
       core install
     </a>
   </li>
@@ -601,7 +586,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_core_list/" title="core list" class="md-nav__link">
+    <a href="../commands/arduino-cli_core_list/" title="core list" class="md-nav__link">
       core list
     </a>
   </li>
@@ -613,7 +598,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_core_search/" title="core search" class="md-nav__link">
+    <a href="../commands/arduino-cli_core_search/" title="core search" class="md-nav__link">
       core search
     </a>
   </li>
@@ -625,7 +610,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_core_uninstall/" title="core uninstall" class="md-nav__link">
+    <a href="../commands/arduino-cli_core_uninstall/" title="core uninstall" class="md-nav__link">
       core uninstall
     </a>
   </li>
@@ -637,7 +622,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_core_update-index/" title="core update index" class="md-nav__link">
+    <a href="../commands/arduino-cli_core_update-index/" title="core update index" class="md-nav__link">
       core update index
     </a>
   </li>
@@ -649,7 +634,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_core_upgrade/" title="core upgrade" class="md-nav__link">
+    <a href="../commands/arduino-cli_core_upgrade/" title="core upgrade" class="md-nav__link">
       core upgrade
     </a>
   </li>
@@ -661,7 +646,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_daemon/" title="daemon" class="md-nav__link">
+    <a href="../commands/arduino-cli_daemon/" title="daemon" class="md-nav__link">
       daemon
     </a>
   </li>
@@ -673,7 +658,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_debug/" title="debug" class="md-nav__link">
+    <a href="../commands/arduino-cli_debug/" title="debug" class="md-nav__link">
       debug
     </a>
   </li>
@@ -685,7 +670,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_lib/" title="lib" class="md-nav__link">
+    <a href="../commands/arduino-cli_lib/" title="lib" class="md-nav__link">
       lib
     </a>
   </li>
@@ -697,7 +682,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_lib_deps/" title="lib deps" class="md-nav__link">
+    <a href="../commands/arduino-cli_lib_deps/" title="lib deps" class="md-nav__link">
       lib deps
     </a>
   </li>
@@ -709,7 +694,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_lib_download/" title="lib download" class="md-nav__link">
+    <a href="../commands/arduino-cli_lib_download/" title="lib download" class="md-nav__link">
       lib download
     </a>
   </li>
@@ -721,7 +706,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_lib_install/" title="lib install" class="md-nav__link">
+    <a href="../commands/arduino-cli_lib_install/" title="lib install" class="md-nav__link">
       lib install
     </a>
   </li>
@@ -733,7 +718,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_lib_list/" title="lib list" class="md-nav__link">
+    <a href="../commands/arduino-cli_lib_list/" title="lib list" class="md-nav__link">
       lib list
     </a>
   </li>
@@ -745,7 +730,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_lib_search/" title="lib search" class="md-nav__link">
+    <a href="../commands/arduino-cli_lib_search/" title="lib search" class="md-nav__link">
       lib search
     </a>
   </li>
@@ -757,7 +742,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_lib_uninstall/" title="lib uninstall" class="md-nav__link">
+    <a href="../commands/arduino-cli_lib_uninstall/" title="lib uninstall" class="md-nav__link">
       lib uninstall
     </a>
   </li>
@@ -769,7 +754,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_lib_update-index/" title="lib update-index" class="md-nav__link">
+    <a href="../commands/arduino-cli_lib_update-index/" title="lib update-index" class="md-nav__link">
       lib update-index
     </a>
   </li>
@@ -781,7 +766,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_lib_upgrade/" title="lib upgrade" class="md-nav__link">
+    <a href="../commands/arduino-cli_lib_upgrade/" title="lib upgrade" class="md-nav__link">
       lib upgrade
     </a>
   </li>
@@ -793,7 +778,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_sketch/" title="sketch" class="md-nav__link">
+    <a href="../commands/arduino-cli_sketch/" title="sketch" class="md-nav__link">
       sketch
     </a>
   </li>
@@ -805,7 +790,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_sketch_new/" title="sketch new" class="md-nav__link">
+    <a href="../commands/arduino-cli_sketch_new/" title="sketch new" class="md-nav__link">
       sketch new
     </a>
   </li>
@@ -817,7 +802,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_upload/" title="upload" class="md-nav__link">
+    <a href="../commands/arduino-cli_upload/" title="upload" class="md-nav__link">
       upload
     </a>
   </li>
@@ -829,7 +814,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../arduino-cli_version/" title="version" class="md-nav__link">
+    <a href="../commands/arduino-cli_version/" title="version" class="md-nav__link">
       version
     </a>
   </li>
@@ -865,7 +850,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../rpc/commands/" title="commands" class="md-nav__link">
+    <a href="../rpc/commands/" title="commands" class="md-nav__link">
       commands
     </a>
   </li>
@@ -877,7 +862,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../rpc/monitor/" title="monitor" class="md-nav__link">
+    <a href="../rpc/monitor/" title="monitor" class="md-nav__link">
       monitor
     </a>
   </li>
@@ -889,7 +874,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../rpc/settings/" title="settings" class="md-nav__link">
+    <a href="../rpc/settings/" title="settings" class="md-nav__link">
       settings
     </a>
   </li>
@@ -901,7 +886,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../rpc/debug/" title="debug" class="md-nav__link">
+    <a href="../rpc/debug/" title="debug" class="md-nav__link">
       debug
     </a>
   </li>
@@ -918,7 +903,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../integration-options/" title="Integration options" class="md-nav__link">
+    <a href="../integration-options/" title="Integration options" class="md-nav__link">
       Integration options
     </a>
   </li>
@@ -930,7 +915,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../sketch-build-process/" title="Sketch build process" class="md-nav__link">
+    <a href="../sketch-build-process/" title="Sketch build process" class="md-nav__link">
       Sketch build process
     </a>
   </li>
@@ -942,7 +927,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../sketch-specification/" title="Sketch specification" class="md-nav__link">
+    <a href="../sketch-specification/" title="Sketch specification" class="md-nav__link">
       Sketch specification
     </a>
   </li>
@@ -954,7 +939,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../library-specification/" title="Library specification" class="md-nav__link">
+    <a href="../library-specification/" title="Library specification" class="md-nav__link">
       Library specification
     </a>
   </li>
@@ -966,7 +951,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../platform-specification/" title="Platform specification" class="md-nav__link">
+    <a href="../platform-specification/" title="Platform specification" class="md-nav__link">
       Platform specification
     </a>
   </li>
@@ -978,7 +963,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../package_index_json-specification/" title="package_index.json specification" class="md-nav__link">
+    <a href="../package_index_json-specification/" title="package_index.json specification" class="md-nav__link">
       package_index.json specification
     </a>
   </li>
@@ -1003,58 +988,45 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#arduino-cli-core" class="md-nav__link">
-    arduino-cli core
+  <a href="#before-you-start" class="md-nav__link">
+    Before you start
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generate-the-completion-file" class="md-nav__link">
+    Generate the completion file
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bash" class="md-nav__link">
+    Bash
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#zsh" class="md-nav__link">
+    Zsh
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fish" class="md-nav__link">
+    Fish
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#synopsis" class="md-nav__link">
-    Synopsis
+  <a href="#disabling-command-and-flag-descriptions" class="md-nav__link">
+    Disabling command and flag descriptions
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    Examples
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
-    Options
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options-inherited-from-parent-commands" class="md-nav__link">
-    Options inherited from parent commands
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    SEE ALSO
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#auto-generated-by-spf13cobra-on-12-jun-2020" class="md-nav__link">
-    Auto generated by spf13/cobra on 12-Jun-2020
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1080,42 +1052,41 @@
               
                 
                 
-                  <h1>core</h1>
+                  <h1>Command line completion</h1>
                 
-                <h2 id="arduino-cli-core">arduino-cli core<a class="headerlink" href="#arduino-cli-core" title="Permanent link">&para;</a></h2>
-<p>Arduino core operations.</p>
-<h3 id="synopsis">Synopsis<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h3>
-<p>Arduino core operations.</p>
-<h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  arduino-cli core update-index
-</code></pre></div>
-
-<h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  -h, --help   help for core
-</code></pre></div>
-
-<h3 id="options-inherited-from-parent-commands">Options inherited from parent commands<a class="headerlink" href="#options-inherited-from-parent-commands" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>      --additional-urls strings   Additional URLs for the board manager.
-      --config-file string        The custom config file (if not specified the default will be used).
-      --format string             The output format, can be [text|json]. (default &quot;text&quot;)
-      --log-file string           Path to the file where logs will be written.
-      --log-format string         The output format for the logs, can be [text|json].
-      --log-level string          Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic
-  -v, --verbose                   Print the logs on the standard output.
-</code></pre></div>
-
-<h3 id="see-also">SEE ALSO<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h3>
-<ul>
-<li><a href="../arduino-cli/">arduino-cli</a>  - Arduino CLI.</li>
-<li><a href="../arduino-cli_core_download/">arduino-cli core download</a>  - Downloads one or more cores and corresponding tool dependencies.</li>
-<li><a href="../arduino-cli_core_install/">arduino-cli core install</a>    - Installs one or more cores and corresponding tool dependencies.</li>
-<li><a href="../arduino-cli_core_list/">arduino-cli core list</a>  - Shows the list of installed platforms.</li>
-<li><a href="../arduino-cli_core_search/">arduino-cli core search</a>  - Search for a core in the package index.</li>
-<li><a href="../arduino-cli_core_uninstall/">arduino-cli core uninstall</a>    - Uninstalls one or more cores and corresponding tool dependencies if no longer used.</li>
-<li><a href="../arduino-cli_core_update-index/">arduino-cli core update-index</a>  - Updates the index of cores.</li>
-<li><a href="../arduino-cli_core_upgrade/">arduino-cli core upgrade</a>    - Upgrades one or all installed platforms to the latest version.</li>
-</ul>
-<h6 id="auto-generated-by-spf13cobra-on-12-jun-2020">Auto generated by spf13/cobra on 12-Jun-2020<a class="headerlink" href="#auto-generated-by-spf13cobra-on-12-jun-2020" title="Permanent link">&para;</a></h6>
+                <p><code>arduino-cli</code> supports command-line completion (also known as <em>tab completion</em>) for basic commands.
+Currently only <code>bash</code>, <code>zsh</code>, <code>fish</code> shells are supported</p>
+<h3 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h3>
+<p>In order to generate the file required to make the completion work you have to <a href="../installation/">install</a> Arduino CLI first.</p>
+<h3 id="generate-the-completion-file">Generate the completion file<a class="headerlink" href="#generate-the-completion-file" title="Permanent link">&para;</a></h3>
+<p>To generate the completion file you can use <code>arduino-cli completion [bash|zsh|fish] [--no-descriptions]</code>.
+By default this command will print on the standard output (the shell window) the content of the completion file. To save to an actual file use the <code>&gt;</code> redirect symbol.</p>
+<h3 id="bash">Bash<a class="headerlink" href="#bash" title="Permanent link">&para;</a></h3>
+<p>Use <code>arduino-cli completion bash &gt; arduino-cli.sh</code> to generate the completion file.
+At this point you can move that file in <code>/etc/bash_completion.d/</code> (root access is required) with <code>sudo mv arduino-cli.sh /etc/bash_completion.d/</code>.</p>
+<p>A not recommended alternative is to source the completion file in <code>.bashrc</code>.</p>
+<p>Remember to open a new shell to test the functionality</p>
+<h3 id="zsh">Zsh<a class="headerlink" href="#zsh" title="Permanent link">&para;</a></h3>
+<p>Use <code>arduino-cli completion zsh &gt; _arduino-cli</code> to generate the completion file.
+At this point you can place the file in a directory listed in your <code>fpath</code> if you have already created a directory to store your completion.</p>
+<p>Or if you want you can create a directory, add it to your <code>fpath</code> and copy the file in it:</p>
+<ol>
+<li><code>mkdir ~/completion_zsh</code></li>
+<li>add <code>fpath=($HOME/completion_zsh $fpath)</code> at the beginning of your <code>.zshrc</code> file</li>
+<li><code>mv _arduino-cli ~/completion_zsh/</code></li>
+</ol>
+<p>Remember to open a new shell to test the functionality</p>
+<p><em>N.B.</em>
+The Zsh completion is working with <a href="https://ohmyz.sh/">Oh-My-Zsh</a> but not with <a href="https://github.com/sorin-ionescu/prezto">Prezto</a> (the zsh completion system is working in a different way than classic zsh). But hopefully it will be fixed in the future</p>
+<h3 id="fish">Fish<a class="headerlink" href="#fish" title="Permanent link">&para;</a></h3>
+<p>Use <code>arduino-cli completion fish &gt; arduino-cli.fish</code> to generate the completion file.
+At this point you can place the file in <code>~/.config/fish/completions</code> as stated in the <a href="http://fishshell.com/docs/current/index.html#where-to-put-completions">official documentation</a>.
+Remember to create the directory if it's not already there <code>mkdir -p ~/.config/fish/completions/</code> and then place the completion file in there with <code>mv arduino-cli.fish ~/.config/fish/completions/</code></p>
+<p>Remember to open a new shell to test the functionality</p>
+<h4 id="disabling-command-and-flag-descriptions">Disabling command and flag descriptions<a class="headerlink" href="#disabling-command-and-flag-descriptions" title="Permanent link">&para;</a></h4>
+<p>By default fish completion has command and flag description enabled by default. If you want to disable this behaviour you can simply pass the <code>--no-descriptions</code> flag when calling <code>completion</code> command and the generated file will not have descriptions</p>
+<p><em>N.B.</em>
+This flag is not compatible with bash or zsh</p>
                 
                   
                 
@@ -1137,7 +1108,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../arduino-cli_config_init/" title="config init" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../getting-started/" title="Getting started" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -1146,19 +1117,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                config init
+                Getting started
               </span>
             </div>
           </a>
         
         
-          <a href="../arduino-cli_core_download/" title="core download" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../CONTRIBUTING/" title="How to contribute" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                core download
+                How to contribute
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
@@ -1190,11 +1161,11 @@
       
     </div>
     
-      <script src="../../assets/javascripts/application.c33a9706.js"></script>
+      <script src="../assets/javascripts/application.c33a9706.js"></script>
       
-      <script>app.initialize({version:"1.1.2",url:{base:"../.."}})</script>
+      <script>app.initialize({version:"1.1.2",url:{base:".."}})</script>
       
-        <script src="../../js/version-select.js"></script>
+        <script src="../js/version-select.js"></script>
       
     
   </body>
