@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package upload
+package burnbootloader
 
 import (
 	"context"
@@ -40,25 +40,24 @@ var (
 	burnBootloader bool
 )
 
-// NewCommand created a new `upload` command
+// NewCommand created a new `burn-bootloader` command
 func NewCommand() *cobra.Command {
-	uploadCommand := &cobra.Command{
-		Use:     "upload",
-		Short:   "Upload Arduino sketches.",
-		Long:    "Upload Arduino sketches.",
-		Example: "  " + os.Args[0] + " upload /home/user/Arduino/MySketch",
+	burnBootloaderCommand := &cobra.Command{
+		Use:     "burn-bootloader",
+		Short:   "Upload the bootloader.",
+		Long:    "Upload the bootloader on the board using an external programmer.",
+		Example: "  " + os.Args[0] + " burn-bootloader -b arduino:avr:uno -P atmel-ice",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}
 
-	uploadCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	uploadCommand.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
-	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", "Direcory containing binaries to upload.")
-	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
-	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
-	uploadCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload or 'list' to list supported programmers.")
+	burnBootloaderCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	burnBootloaderCommand.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
+	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
+	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Turns on verbose mode.")
+	burnBootloaderCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Use the specified programmer to upload or 'list' to list supported programmers.")
 
-	return uploadCommand
+	return burnBootloaderCommand
 }
 
 func run(command *cobra.Command, args []string) {
@@ -83,42 +82,18 @@ func run(command *cobra.Command, args []string) {
 		os.Exit(0)
 	}
 
-	var path *paths.Path
-	if len(args) > 0 {
-		path = paths.New(args[0])
-	}
-	sketchPath := initSketchPath(path)
-
-	if burnBootloader {
-		if _, err := upload.Upload(context.Background(), &rpc.UploadReq{
-			Instance:   instance,
-			Fqbn:       fqbn,
-			SketchPath: sketchPath.String(),
-			Port:       port,
-			Verbose:    verbose,
-			Verify:     verify,
-			ImportDir:  importDir,
-			Programmer: programmer,
-		}, os.Stdout, os.Stderr); err != nil {
-			feedback.Errorf("Error during Upload: %v", err)
-			os.Exit(errorcodes.ErrGeneric)
-		}
-		os.Exit(0)
-	}
-
-	if _, err := upload.Upload(context.Background(), &rpc.UploadReq{
+	if _, err := upload.BurnBootloader(context.Background(), &rpc.BurnBootloaderReq{
 		Instance:   instance,
 		Fqbn:       fqbn,
-		SketchPath: sketchPath.String(),
 		Port:       port,
 		Verbose:    verbose,
 		Verify:     verify,
-		ImportDir:  importDir,
 		Programmer: programmer,
 	}, os.Stdout, os.Stderr); err != nil {
 		feedback.Errorf("Error during Upload: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
+	os.Exit(0)
 }
 
 // initSketchPath returns the current working directory
