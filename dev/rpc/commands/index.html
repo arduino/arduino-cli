@@ -1443,6 +1443,41 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#burnbootloaderreq" class="md-nav__link">
+    BurnBootloaderReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#burnbootloaderresp" class="md-nav__link">
+    BurnBootloaderResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#listprogrammersavailableforuploadreq" class="md-nav__link">
+    ListProgrammersAvailableForUploadReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#listprogrammersavailableforuploadresp" class="md-nav__link">
+    ListProgrammersAvailableForUploadResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#programmer" class="md-nav__link">
+    Programmer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#uploadreq" class="md-nav__link">
     UploadReq
   </a>
@@ -2252,6 +2287,41 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#burnbootloaderreq" class="md-nav__link">
+    BurnBootloaderReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#burnbootloaderresp" class="md-nav__link">
+    BurnBootloaderResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#listprogrammersavailableforuploadreq" class="md-nav__link">
+    ListProgrammersAvailableForUploadReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#listprogrammersavailableforuploadresp" class="md-nav__link">
+    ListProgrammersAvailableForUploadResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#programmer" class="md-nav__link">
+    Programmer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#uploadreq" class="md-nav__link">
     UploadReq
   </a>
@@ -2416,6 +2486,11 @@
 <li>
 <p><a href="#commands/upload.proto">commands/upload.proto</a></p>
 <ul>
+<li><a href="#cc.arduino.cli.commands.BurnBootloaderReq">BurnBootloaderReq</a></li>
+<li><a href="#cc.arduino.cli.commands.BurnBootloaderResp">BurnBootloaderResp</a></li>
+<li><a href="#cc.arduino.cli.commands.ListProgrammersAvailableForUploadReq">ListProgrammersAvailableForUploadReq</a></li>
+<li><a href="#cc.arduino.cli.commands.ListProgrammersAvailableForUploadResp">ListProgrammersAvailableForUploadResp</a></li>
+<li><a href="#cc.arduino.cli.commands.Programmer">Programmer</a></li>
 <li><a href="#cc.arduino.cli.commands.UploadReq">UploadReq</a></li>
 <li><a href="#cc.arduino.cli.commands.UploadResp">UploadResp</a></li>
 </ul>
@@ -3413,6 +3488,18 @@
 <td>Upload a compiled sketch to an Arduino board.</td>
 </tr>
 <tr>
+<td>ListProgrammersAvailableForUpload</td>
+<td><a href="#cc.arduino.cli.commands.ListProgrammersAvailableForUploadReq">ListProgrammersAvailableForUploadReq</a></td>
+<td><a href="#cc.arduino.cli.commands.ListProgrammersAvailableForUploadResp">ListProgrammersAvailableForUploadResp</a></td>
+<td></td>
+</tr>
+<tr>
+<td>BurnBootloader</td>
+<td><a href="#cc.arduino.cli.commands.BurnBootloaderReq">BurnBootloaderReq</a></td>
+<td><a href="#cc.arduino.cli.commands.BurnBootloaderResp">BurnBootloaderResp</a> stream</td>
+<td>Burn bootloader to a board.</td>
+</tr>
+<tr>
 <td>PlatformSearch</td>
 <td><a href="#cc.arduino.cli.commands.PlatformSearchReq">PlatformSearchReq</a></td>
 <td><a href="#cc.arduino.cli.commands.PlatformSearchResp">PlatformSearchResp</a></td>
@@ -3689,6 +3776,12 @@
 <td><a href="#string">string</a></td>
 <td></td>
 <td>Optional: save the build artifacts in this directory, the directory must exist.</td>
+</tr>
+<tr>
+<td>programmer</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>External programmer for upload</td>
 </tr>
 </tbody>
 </table>
@@ -5044,6 +5137,160 @@
 <p><a name="commands/upload.proto"></a>
 <p align="right"><a href="#top">Top</a></p></p>
 <h2 id="commandsuploadproto">commands/upload.proto<a class="headerlink" href="#commandsuploadproto" title="Permanent link">&para;</a></h2>
+<p><a name="cc.arduino.cli.commands.BurnBootloaderReq"></a></p>
+<h3 id="burnbootloaderreq">BurnBootloaderReq<a class="headerlink" href="#burnbootloaderreq" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
+<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
+</tr>
+<tr>
+<td>fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Fully qualified board name of the target board (e.g., <code>arduino:avr:uno</code>).</td>
+</tr>
+<tr>
+<td>port</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The port of the programmer used to program the bootloader.</td>
+</tr>
+<tr>
+<td>verbose</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>Whether to turn on verbose output during the programming.</td>
+</tr>
+<tr>
+<td>verify</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>After programming, verify the contents of the memory on the board match the uploaded binary.</td>
+</tr>
+<tr>
+<td>programmer</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The programmer to use for burning bootloader.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.BurnBootloaderResp"></a></p>
+<h3 id="burnbootloaderresp">BurnBootloaderResp<a class="headerlink" href="#burnbootloaderresp" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>out_stream</td>
+<td><a href="#bytes">bytes</a></td>
+<td></td>
+<td>The output of the burn bootloader process.</td>
+</tr>
+<tr>
+<td>err_stream</td>
+<td><a href="#bytes">bytes</a></td>
+<td></td>
+<td>The error output of the burn bootloader process.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.ListProgrammersAvailableForUploadReq"></a></p>
+<h3 id="listprogrammersavailableforuploadreq">ListProgrammersAvailableForUploadReq<a class="headerlink" href="#listprogrammersavailableforuploadreq" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.ListProgrammersAvailableForUploadResp"></a></p>
+<h3 id="listprogrammersavailableforuploadresp">ListProgrammersAvailableForUploadResp<a class="headerlink" href="#listprogrammersavailableforuploadresp" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>programmers</td>
+<td><a href="#cc.arduino.cli.commands.Programmer">Programmer</a></td>
+<td>repeated</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.Programmer"></a></p>
+<h3 id="programmer">Programmer<a class="headerlink" href="#programmer" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>platform</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>id</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.UploadReq"></a></p>
 <h3 id="uploadreq">UploadReq<a class="headerlink" href="#uploadreq" title="Permanent link">&para;</a></h3>
 <table>
@@ -5103,6 +5350,12 @@
 <td><a href="#string">string</a></td>
 <td></td>
 <td>Custom path to a directory containing compiled files. When <code>import_dir</code> is not specified, the standard build directory under <code>sketch_path</code> is used.</td>
+</tr>
+<tr>
+<td>programmer</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
