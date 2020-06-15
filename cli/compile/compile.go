@@ -50,6 +50,7 @@ var (
 	dryRun             bool     // Use this flag to now write the output file
 	libraries          []string // List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
 	optimizeForDebug   bool     // Optimize compile output for debug, not for release
+	programmer         string   // Use the specified programmer to upload
 )
 
 // NewCommand created a new `compile` command
@@ -84,6 +85,7 @@ func NewCommand() *cobra.Command {
 	command.Flags().StringSliceVar(&libraries, "libraries", []string{},
 		"List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.")
 	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, "Optional, optimize compile output for debug, not for release.")
+	command.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload.")
 
 	return command
 }
@@ -135,6 +137,7 @@ func run(cmd *cobra.Command, args []string) {
 			Verbose:    verbose,
 			Verify:     verify,
 			ImportDir:  exportDir,
+			Programmer: programmer,
 		}, os.Stdout, os.Stderr)
 
 		if err != nil {

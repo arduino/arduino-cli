@@ -284,10 +284,10 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 
 	// Create programmers properties
 	if programmersProperties, err := properties.SafeLoad(programmersTxtPath.String()); err == nil {
-		platform.Programmers = properties.MergeMapsOfProperties(
-			map[string]*properties.Map{},
-			platform.Programmers, // TODO: Very weird, why not an empty one?
-			programmersProperties.FirstLevelOf())
+		for programmerID, programmerProperties := range programmersProperties.FirstLevelOf() {
+			platform.Programmers[programmerID] = pm.loadProgrammer(programmerProperties)
+			platform.Programmers[programmerID].PlatformRelease = platform
+		}
 	} else {
 		return err
 	}
@@ -297,6 +297,13 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 	}
 
 	return nil
+}
+
+func (pm *PackageManager) loadProgrammer(programmerProperties *properties.Map) *cores.Programmer {
+	return &cores.Programmer{
+		Name:       programmerProperties.Get("name"),
+		Properties: programmerProperties,
+	}
 }
 
 func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {

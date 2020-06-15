@@ -216,6 +216,24 @@ func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadReq, stream rpc.ArduinoCor
 	return stream.Send(resp)
 }
 
+// BurnBootloader FIXMEDOC
+func (s *ArduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderReq, stream rpc.ArduinoCore_BurnBootloaderServer) error {
+	resp, err := upload.BurnBootloader(
+		stream.Context(), req,
+		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.BurnBootloaderResp{OutStream: data}) }),
+		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.BurnBootloaderResp{ErrStream: data}) }),
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
+}
+
+// ListProgrammersAvailableForUpload FIXMEDOC
+func (s *ArduinoCoreServerImpl) ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadReq) (*rpc.ListProgrammersAvailableForUploadResp, error) {
+	return upload.ListProgrammersAvailableForUpload(ctx, req)
+}
+
 // LibraryDownload FIXMEDOC
 func (s *ArduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadReq, stream rpc.ArduinoCore_LibraryDownloadServer) error {
 	resp, err := lib.LibraryDownload(

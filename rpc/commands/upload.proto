@@ -43,6 +43,7 @@ message UploadReq {
 	// Custom path to a directory containing compiled files. When `import_dir` is
 	// not specified, the standard build directory under `sketch_path` is used.
 	string import_dir = 8;
+	string programmer = 9;
 }
 
 message UploadResp {
@@ -50,4 +51,42 @@ message UploadResp {
 	bytes out_stream = 1;
 	// The error output of the upload process.
 	bytes err_stream = 2;
+}
+
+message BurnBootloaderReq {
+	// Arduino Core Service instance from the `Init` response.
+	Instance instance = 1;
+	// Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+	string fqbn = 2;
+	// The port of the programmer used to program the bootloader.
+	string port = 3;
+	// Whether to turn on verbose output during the programming.
+	bool verbose = 4;
+	// After programming, verify the contents of the memory on the board match the
+	// uploaded binary.
+	bool verify = 5;
+	// The programmer to use for burning bootloader.
+	string programmer = 6;
+}
+
+message BurnBootloaderResp {
+	// The output of the burn bootloader process.
+	bytes out_stream = 1;
+	// The error output of the burn bootloader process.
+	bytes err_stream = 2;
+}
+
+message ListProgrammersAvailableForUploadReq {
+	Instance instance = 1;
+	string fqbn = 2;
+}
+
+message ListProgrammersAvailableForUploadResp {
+	repeated Programmer programmers = 1;
+}
+
+message Programmer {
+	string platform = 1;
+	string id = 2;
+	string name = 3;
 }

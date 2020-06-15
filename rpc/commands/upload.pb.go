@@ -42,6 +42,7 @@ type UploadReq struct {
 	// Custom path to a directory containing compiled files. When `import_dir` is
 	// not specified, the standard build directory under `sketch_path` is used.
 	ImportDir            string   `protobuf:"bytes,8,opt,name=import_dir,json=importDir,proto3" json:"import_dir,omitempty"`
+	Programmer           string   `protobuf:"bytes,9,opt,name=programmer,proto3" json:"programmer,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -129,6 +130,13 @@ func (m *UploadReq) GetImportDir() string {
 	return ""
 }
 
+func (m *UploadReq) GetProgrammer() string {
+	if m != nil {
+		return m.Programmer
+	}
+	return ""
+}
+
 type UploadResp struct {
 	// The output of the upload process.
 	OutStream []byte `protobuf:"bytes,1,opt,name=out_stream,json=outStream,proto3" json:"out_stream,omitempty"`
@@ -178,33 +186,323 @@ func (m *UploadResp) GetErrStream() []byte {
 	return nil
 }
 
+type BurnBootloaderReq struct {
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+	Fqbn string `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
+	// The port of the programmer used to program the bootloader.
+	Port string `protobuf:"bytes,3,opt,name=port,proto3" json:"port,omitempty"`
+	// Whether to turn on verbose output during the programming.
+	Verbose bool `protobuf:"varint,4,opt,name=verbose,proto3" json:"verbose,omitempty"`
+	// After programming, verify the contents of the memory on the board match the
+	// uploaded binary.
+	Verify bool `protobuf:"varint,5,opt,name=verify,proto3" json:"verify,omitempty"`
+	// The programmer to use for burning bootloader.
+	Programmer           string   `protobuf:"bytes,6,opt,name=programmer,proto3" json:"programmer,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *BurnBootloaderReq) Reset()         { *m = BurnBootloaderReq{} }
+func (m *BurnBootloaderReq) String() string { return proto.CompactTextString(m) }
+func (*BurnBootloaderReq) ProtoMessage()    {}
+func (*BurnBootloaderReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_cd642cc079f8acdb, []int{2}
+}
+
+func (m *BurnBootloaderReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BurnBootloaderReq.Unmarshal(m, b)
+}
+func (m *BurnBootloaderReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BurnBootloaderReq.Marshal(b, m, deterministic)
+}
+func (m *BurnBootloaderReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BurnBootloaderReq.Merge(m, src)
+}
+func (m *BurnBootloaderReq) XXX_Size() int {
+	return xxx_messageInfo_BurnBootloaderReq.Size(m)
+}
+func (m *BurnBootloaderReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_BurnBootloaderReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BurnBootloaderReq proto.InternalMessageInfo
+
+func (m *BurnBootloaderReq) GetInstance() *Instance {
+	if m != nil {
+		return m.Instance
+	}
+	return nil
+}
+
+func (m *BurnBootloaderReq) GetFqbn() string {
+	if m != nil {
+		return m.Fqbn
+	}
+	return ""
+}
+
+func (m *BurnBootloaderReq) GetPort() string {
+	if m != nil {
+		return m.Port
+	}
+	return ""
+}
+
+func (m *BurnBootloaderReq) GetVerbose() bool {
+	if m != nil {
+		return m.Verbose
+	}
+	return false
+}
+
+func (m *BurnBootloaderReq) GetVerify() bool {
+	if m != nil {
+		return m.Verify
+	}
+	return false
+}
+
+func (m *BurnBootloaderReq) GetProgrammer() string {
+	if m != nil {
+		return m.Programmer
+	}
+	return ""
+}
+
+type BurnBootloaderResp struct {
+	// The output of the burn bootloader process.
+	OutStream []byte `protobuf:"bytes,1,opt,name=out_stream,json=outStream,proto3" json:"out_stream,omitempty"`
+	// The error output of the burn bootloader process.
+	ErrStream            []byte   `protobuf:"bytes,2,opt,name=err_stream,json=errStream,proto3" json:"err_stream,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *BurnBootloaderResp) Reset()         { *m = BurnBootloaderResp{} }
+func (m *BurnBootloaderResp) String() string { return proto.CompactTextString(m) }
+func (*BurnBootloaderResp) ProtoMessage()    {}
+func (*BurnBootloaderResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_cd642cc079f8acdb, []int{3}
+}
+
+func (m *BurnBootloaderResp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BurnBootloaderResp.Unmarshal(m, b)
+}
+func (m *BurnBootloaderResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BurnBootloaderResp.Marshal(b, m, deterministic)
+}
+func (m *BurnBootloaderResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BurnBootloaderResp.Merge(m, src)
+}
+func (m *BurnBootloaderResp) XXX_Size() int {
+	return xxx_messageInfo_BurnBootloaderResp.Size(m)
+}
+func (m *BurnBootloaderResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_BurnBootloaderResp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BurnBootloaderResp proto.InternalMessageInfo
+
+func (m *BurnBootloaderResp) GetOutStream() []byte {
+	if m != nil {
+		return m.OutStream
+	}
+	return nil
+}
+
+func (m *BurnBootloaderResp) GetErrStream() []byte {
+	if m != nil {
+		return m.ErrStream
+	}
+	return nil
+}
+
+type ListProgrammersAvailableForUploadReq struct {
+	Instance             *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	Fqbn                 string    `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *ListProgrammersAvailableForUploadReq) Reset()         { *m = ListProgrammersAvailableForUploadReq{} }
+func (m *ListProgrammersAvailableForUploadReq) String() string { return proto.CompactTextString(m) }
+func (*ListProgrammersAvailableForUploadReq) ProtoMessage()    {}
+func (*ListProgrammersAvailableForUploadReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_cd642cc079f8acdb, []int{4}
+}
+
+func (m *ListProgrammersAvailableForUploadReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListProgrammersAvailableForUploadReq.Unmarshal(m, b)
+}
+func (m *ListProgrammersAvailableForUploadReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListProgrammersAvailableForUploadReq.Marshal(b, m, deterministic)
+}
+func (m *ListProgrammersAvailableForUploadReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListProgrammersAvailableForUploadReq.Merge(m, src)
+}
+func (m *ListProgrammersAvailableForUploadReq) XXX_Size() int {
+	return xxx_messageInfo_ListProgrammersAvailableForUploadReq.Size(m)
+}
+func (m *ListProgrammersAvailableForUploadReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListProgrammersAvailableForUploadReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListProgrammersAvailableForUploadReq proto.InternalMessageInfo
+
+func (m *ListProgrammersAvailableForUploadReq) GetInstance() *Instance {
+	if m != nil {
+		return m.Instance
+	}
+	return nil
+}
+
+func (m *ListProgrammersAvailableForUploadReq) GetFqbn() string {
+	if m != nil {
+		return m.Fqbn
+	}
+	return ""
+}
+
+type ListProgrammersAvailableForUploadResp struct {
+	Programmers          []*Programmer `protobuf:"bytes,1,rep,name=programmers,proto3" json:"programmers,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
+}
+
+func (m *ListProgrammersAvailableForUploadResp) Reset()         { *m = ListProgrammersAvailableForUploadResp{} }
+func (m *ListProgrammersAvailableForUploadResp) String() string { return proto.CompactTextString(m) }
+func (*ListProgrammersAvailableForUploadResp) ProtoMessage()    {}
+func (*ListProgrammersAvailableForUploadResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_cd642cc079f8acdb, []int{5}
+}
+
+func (m *ListProgrammersAvailableForUploadResp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListProgrammersAvailableForUploadResp.Unmarshal(m, b)
+}
+func (m *ListProgrammersAvailableForUploadResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListProgrammersAvailableForUploadResp.Marshal(b, m, deterministic)
+}
+func (m *ListProgrammersAvailableForUploadResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListProgrammersAvailableForUploadResp.Merge(m, src)
+}
+func (m *ListProgrammersAvailableForUploadResp) XXX_Size() int {
+	return xxx_messageInfo_ListProgrammersAvailableForUploadResp.Size(m)
+}
+func (m *ListProgrammersAvailableForUploadResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListProgrammersAvailableForUploadResp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListProgrammersAvailableForUploadResp proto.InternalMessageInfo
+
+func (m *ListProgrammersAvailableForUploadResp) GetProgrammers() []*Programmer {
+	if m != nil {
+		return m.Programmers
+	}
+	return nil
+}
+
+type Programmer struct {
+	Platform             string   `protobuf:"bytes,1,opt,name=platform,proto3" json:"platform,omitempty"`
+	Id                   string   `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Programmer) Reset()         { *m = Programmer{} }
+func (m *Programmer) String() string { return proto.CompactTextString(m) }
+func (*Programmer) ProtoMessage()    {}
+func (*Programmer) Descriptor() ([]byte, []int) {
+	return fileDescriptor_cd642cc079f8acdb, []int{6}
+}
+
+func (m *Programmer) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Programmer.Unmarshal(m, b)
+}
+func (m *Programmer) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Programmer.Marshal(b, m, deterministic)
+}
+func (m *Programmer) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Programmer.Merge(m, src)
+}
+func (m *Programmer) XXX_Size() int {
+	return xxx_messageInfo_Programmer.Size(m)
+}
+func (m *Programmer) XXX_DiscardUnknown() {
+	xxx_messageInfo_Programmer.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Programmer proto.InternalMessageInfo
+
+func (m *Programmer) GetPlatform() string {
+	if m != nil {
+		return m.Platform
+	}
+	return ""
+}
+
+func (m *Programmer) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *Programmer) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*UploadReq)(nil), "cc.arduino.cli.commands.UploadReq")
 	proto.RegisterType((*UploadResp)(nil), "cc.arduino.cli.commands.UploadResp")
+	proto.RegisterType((*BurnBootloaderReq)(nil), "cc.arduino.cli.commands.BurnBootloaderReq")
+	proto.RegisterType((*BurnBootloaderResp)(nil), "cc.arduino.cli.commands.BurnBootloaderResp")
+	proto.RegisterType((*ListProgrammersAvailableForUploadReq)(nil), "cc.arduino.cli.commands.ListProgrammersAvailableForUploadReq")
+	proto.RegisterType((*ListProgrammersAvailableForUploadResp)(nil), "cc.arduino.cli.commands.ListProgrammersAvailableForUploadResp")
+	proto.RegisterType((*Programmer)(nil), "cc.arduino.cli.commands.Programmer")
 }
 
 func init() { proto.RegisterFile("commands/upload.proto", fileDescriptor_cd642cc079f8acdb) }
 
 var fileDescriptor_cd642cc079f8acdb = []byte{
-	// 312 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x91, 0x41, 0x4b, 0xfc, 0x30,
-	0x10, 0xc5, 0x69, 0xff, 0xfb, 0xdf, 0xdd, 0xce, 0x7a, 0x0a, 0xa8, 0x41, 0x10, 0xd7, 0xf5, 0xb2,
-	0x20, 0xdb, 0x82, 0x9e, 0xbd, 0x2c, 0x22, 0xe8, 0x49, 0x2a, 0x5e, 0xbc, 0x94, 0x34, 0xcd, 0xda,
-	0x60, 0xdb, 0x74, 0x27, 0xe9, 0x82, 0x1f, 0xc1, 0x6f, 0x2d, 0x49, 0x1a, 0x3d, 0x79, 0xea, 0xcc,
-	0xfb, 0xbd, 0x37, 0x85, 0x17, 0x38, 0xe6, 0xaa, 0x6d, 0x59, 0x57, 0xe9, 0x6c, 0xe8, 0x1b, 0xc5,
-	0xaa, 0xb4, 0x47, 0x65, 0x14, 0x39, 0xe5, 0x3c, 0x65, 0x58, 0x0d, 0xb2, 0x53, 0x29, 0x6f, 0x64,
-	0x1a, 0x5c, 0x67, 0xbf, 0x7e, 0x3b, 0xa8, 0xce, 0xfb, 0x57, 0x5f, 0x31, 0x24, 0xaf, 0xee, 0x40,
-	0x2e, 0xf6, 0xe4, 0x0e, 0xe6, 0xb2, 0xd3, 0x86, 0x75, 0x5c, 0xd0, 0x68, 0x19, 0xad, 0x17, 0x37,
-	0x97, 0xe9, 0x1f, 0x07, 0xd3, 0xc7, 0xd1, 0x98, 0xff, 0x44, 0x08, 0x81, 0xc9, 0x6e, 0x5f, 0x76,
-	0x34, 0x5e, 0x46, 0xeb, 0x24, 0x77, 0x33, 0xb9, 0x80, 0x85, 0xfe, 0x10, 0x86, 0xd7, 0x45, 0xcf,
-	0x4c, 0x4d, 0xff, 0x39, 0x04, 0x5e, 0x7a, 0x66, 0xa6, 0xb6, 0xa1, 0x5e, 0xa1, 0xa1, 0x13, 0x1f,
-	0xb2, 0x33, 0xa1, 0x30, 0x3b, 0x08, 0x2c, 0x95, 0x16, 0xf4, 0xff, 0x32, 0x5a, 0xcf, 0xf3, 0xb0,
-	0x92, 0x13, 0x98, 0x1e, 0x04, 0xca, 0xdd, 0x27, 0x9d, 0x3a, 0x30, 0x6e, 0xe4, 0x0a, 0x16, 0xb2,
-	0xb5, 0xd9, 0x62, 0x27, 0x1b, 0x41, 0x67, 0xf6, 0xd8, 0x36, 0xa6, 0x51, 0x0e, 0x5e, 0x7e, 0x90,
-	0x8d, 0x20, 0xe7, 0x30, 0x6e, 0x45, 0x25, 0x91, 0xce, 0xdd, 0x0f, 0x13, 0xaf, 0xdc, 0x4b, 0x5c,
-	0x3d, 0x01, 0x84, 0x2a, 0x74, 0x6f, 0xcd, 0x6a, 0x30, 0x85, 0x36, 0x28, 0x58, 0xeb, 0xda, 0x38,
-	0xca, 0x13, 0x35, 0x98, 0x17, 0x27, 0x58, 0x2c, 0x10, 0x03, 0x8e, 0x3d, 0x16, 0x88, 0x1e, 0x6f,
-	0x37, 0x6f, 0xd7, 0xef, 0xd2, 0xd4, 0x43, 0x69, 0x0b, 0xcb, 0xc6, 0x02, 0xc3, 0x77, 0xc3, 0x1b,
-	0x99, 0x61, 0xcf, 0xb3, 0x50, 0x66, 0x39, 0x75, 0xaf, 0x71, 0xfb, 0x1d, 0x00, 0x00, 0xff, 0xff,
-	0xb9, 0xb9, 0xe0, 0xf7, 0xd6, 0x01, 0x00, 0x00,
+	// 463 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x94, 0x51, 0x8b, 0xd3, 0x40,
+	0x10, 0xc7, 0x49, 0xda, 0xeb, 0x35, 0x13, 0x11, 0x5c, 0x50, 0x97, 0x03, 0xb5, 0xe6, 0x14, 0x0a,
+	0x72, 0x29, 0x9c, 0xcf, 0x3e, 0x58, 0xf4, 0x40, 0xb9, 0x87, 0x23, 0xe2, 0x8b, 0x2f, 0x65, 0x93,
+	0x6c, 0xaf, 0x8b, 0xc9, 0xee, 0xde, 0xec, 0xa6, 0x70, 0x1f, 0xc9, 0xef, 0xe2, 0x87, 0x92, 0xcd,
+	0x26, 0x8d, 0xa7, 0x16, 0x84, 0xa3, 0x4f, 0x9d, 0x99, 0xff, 0xcc, 0x7f, 0xa6, 0xbf, 0x84, 0xc0,
+	0xe3, 0x42, 0xd5, 0x35, 0x93, 0xa5, 0x59, 0x34, 0xba, 0x52, 0xac, 0x4c, 0x35, 0x2a, 0xab, 0xc8,
+	0xd3, 0xa2, 0x48, 0x19, 0x96, 0x8d, 0x90, 0x2a, 0x2d, 0x2a, 0x91, 0xf6, 0x5d, 0x27, 0x43, 0xbf,
+	0x0b, 0x94, 0xf4, 0xfd, 0xc9, 0x8f, 0x10, 0xa2, 0xaf, 0xad, 0x41, 0xc6, 0x6f, 0xc8, 0x3b, 0x98,
+	0x0a, 0x69, 0x2c, 0x93, 0x05, 0xa7, 0xc1, 0x2c, 0x98, 0xc7, 0xe7, 0x2f, 0xd3, 0x3d, 0x86, 0xe9,
+	0xa7, 0xae, 0x31, 0xdb, 0x8d, 0x10, 0x02, 0xe3, 0xf5, 0x4d, 0x2e, 0x69, 0x38, 0x0b, 0xe6, 0x51,
+	0xd6, 0xc6, 0xe4, 0x05, 0xc4, 0xe6, 0x3b, 0xb7, 0xc5, 0x66, 0xa5, 0x99, 0xdd, 0xd0, 0x51, 0x2b,
+	0x81, 0x2f, 0x5d, 0x31, 0xbb, 0x71, 0x43, 0x5a, 0xa1, 0xa5, 0x63, 0x3f, 0xe4, 0x62, 0x42, 0xe1,
+	0x78, 0xcb, 0x31, 0x57, 0x86, 0xd3, 0xa3, 0x59, 0x30, 0x9f, 0x66, 0x7d, 0x4a, 0x9e, 0xc0, 0x64,
+	0xcb, 0x51, 0xac, 0x6f, 0xe9, 0xa4, 0x15, 0xba, 0x8c, 0x9c, 0x42, 0x2c, 0x6a, 0x37, 0xbb, 0x5a,
+	0x8b, 0x8a, 0xd3, 0x63, 0x67, 0xb6, 0x0c, 0x69, 0x90, 0x81, 0x2f, 0x5f, 0x88, 0x8a, 0x93, 0x67,
+	0xd0, 0x65, 0xab, 0x52, 0x20, 0x9d, 0xb6, 0x0b, 0x23, 0x5f, 0xf9, 0x20, 0x90, 0x3c, 0x07, 0xd0,
+	0xa8, 0xae, 0x91, 0xd5, 0x35, 0x47, 0x1a, 0xf9, 0x4b, 0x87, 0x4a, 0xf2, 0x19, 0xa0, 0x47, 0x65,
+	0xb4, 0x33, 0x53, 0x8d, 0x5d, 0x19, 0x8b, 0x9c, 0xd5, 0x2d, 0xad, 0x07, 0x59, 0xa4, 0x1a, 0xfb,
+	0xa5, 0x2d, 0x38, 0x99, 0x23, 0xf6, 0x72, 0xe8, 0x65, 0x8e, 0xe8, 0xe5, 0xe4, 0x67, 0x00, 0x8f,
+	0x96, 0x0d, 0xca, 0xa5, 0x52, 0xd6, 0x59, 0x72, 0x3c, 0x10, 0xff, 0x1e, 0xef, 0xe8, 0xdf, 0x78,
+	0xc7, 0xfb, 0xf0, 0x1e, 0xdd, 0xc1, 0x7b, 0x17, 0xcd, 0xe4, 0x2f, 0x34, 0x19, 0x90, 0x3f, 0xff,
+	0xcd, 0xbd, 0x11, 0xdd, 0xc2, 0xab, 0x4b, 0x61, 0xec, 0xd5, 0x6e, 0x8b, 0x79, 0xbf, 0x65, 0xa2,
+	0x62, 0x79, 0xc5, 0x2f, 0x14, 0x1e, 0xf2, 0xa5, 0x4d, 0x24, 0xbc, 0xfe, 0x8f, 0xd5, 0x46, 0x93,
+	0x8f, 0x10, 0x0f, 0x14, 0x0c, 0x0d, 0x66, 0xa3, 0x79, 0x7c, 0x7e, 0xba, 0x77, 0xfd, 0x60, 0x98,
+	0xfd, 0x3e, 0x97, 0x5c, 0x02, 0x0c, 0x12, 0x39, 0x81, 0xa9, 0xae, 0x98, 0x5d, 0x2b, 0xf4, 0xd0,
+	0xa2, 0x6c, 0x97, 0x93, 0x87, 0x10, 0x8a, 0xb2, 0xbb, 0x35, 0x14, 0xa5, 0xbb, 0x5e, 0xb2, 0x9a,
+	0xf7, 0x8f, 0xd7, 0xc5, 0xcb, 0xb3, 0x6f, 0x6f, 0xae, 0x85, 0xdd, 0x34, 0xb9, 0x5b, 0xbc, 0xe8,
+	0x0e, 0xe9, 0x7f, 0xcf, 0x8a, 0x4a, 0x2c, 0x50, 0x17, 0x8b, 0xfe, 0xa8, 0x7c, 0xd2, 0x7e, 0x09,
+	0xde, 0xfe, 0x0a, 0x00, 0x00, 0xff, 0xff, 0xfd, 0x43, 0xdb, 0xdc, 0x52, 0x04, 0x00, 0x00,
 }
