@@ -97,7 +97,6 @@ func (dr detailsResult) String() string {
 	t.SetColumnWidthMode(1, table.Average)
 	t.AddRow(tr("Board name:"), details.Name)
 	t.AddRow("FQBN:", details.Fqbn)
-	t.AddRow(tr("Identification properties:"), details.PropertiesId)
 	t.AddRow(tr("Board version:"), details.Version)
 
 	if details.Official {
