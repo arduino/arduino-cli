@@ -132,7 +132,7 @@ func (dr detailsResult) String() string {
 
 	t.AddRow() // get some space from above
 	for _, tool := range details.ToolsDependencies {
-		t.AddRow(tr("Required tools:"), tool.Packager+":"+tool.Name, "", tool.Version)
+		t.AddRow(tr("Required tool:"), tool.Packager+":"+tool.Name, "", tool.Version)
 		if showFullDetails {
 			for _, sys := range tool.Systems {
 				t.AddRow("", tr("OS:"), "", sys.Host)

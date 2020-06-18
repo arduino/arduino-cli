@@ -115,8 +115,8 @@ msgid "Print details about a board."
 msgstr "Print details about a board."
 
 #: cli/board/details.go:135
-msgid "Required tools:"
-msgstr "Required tools:"
+msgid "Required tool:"
+msgstr "Required tool:"
 
 #: cli/board/details.go:47
 msgid "Show full board details"
