@@ -41,7 +41,8 @@ package index that can be used to work with experimental versions of cores:
 One note about the example above: passing a value through a command line flag
 always takes precedence over reading an environment variable, which in turn
 always takes precedence over reading the same value from the configuration file
-(if you have one).
+(if you have one). For more information, see the [configuration documentation].
+
 Consistent with the previous paragraph, when it comes to providing output the
 Arduino CLI aims to be user friendly but also slightly verbose, something that
 doesn’t play well with robots. This is why we added an option to provide output
@@ -118,6 +119,7 @@ if you’ve got a use case that doesn’t fit one of the three pillars.
 [Arduino Create]: https://create.arduino.cc
 [continuous integration]: https://en.wikipedia.org/wiki/Continuous_integration
 [continuous deployment]: https://en.wikipedia.org/wiki/Continuous_deployment
+[configuration documentation]: configuration.md
 [JSON]: https://www.json.org
 [installation script]: installation.md#use-the-install-script
 [command reference]: ../commands/arduino-cli
