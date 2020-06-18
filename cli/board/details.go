@@ -24,25 +24,27 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
+var tr = i18n.Tr
 var showFullDetails bool
 
 func initDetailsCommand() *cobra.Command {
 	var detailsCommand = &cobra.Command{
 		Use:     "details <FQBN>",
-		Short:   "Print details about a board.",
-		Long:    "Show information about a board, in particular if the board has options to be specified in the FQBN.",
+		Short:   tr("Print details about a board."),
+		Long:    tr("Show information about a board, in particular if the board has options to be specified in the FQBN."),
 		Example: "  " + os.Args[0] + " board details arduino:avr:nano",
 		Args:    cobra.ExactArgs(1),
 		Run:     runDetailsCommand,
 	}
 
-	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, "Include full details in text output")
+	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, tr("Show full board details"))
 
 	return detailsCommand
 }
@@ -50,7 +52,7 @@ func initDetailsCommand() *cobra.Command {
 func runDetailsCommand(cmd *cobra.Command, args []string) {
 	inst, err := instance.CreateInstance()
 	if err != nil {
-		feedback.Errorf("Error getting board details: %v", err)
+		feedback.Errorf(tr("Error getting board details: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -60,7 +62,7 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 	})
 
 	if err != nil {
-		feedback.Errorf("Error getting board details: %v", err)
+		feedback.Errorf(tr("Error getting board details: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -93,51 +95,51 @@ func (dr detailsResult) String() string {
 	//                 ATmega168                       cpu=atmega168
 	t := table.New()
 	t.SetColumnWidthMode(1, table.Average)
-	t.AddRow("Board name:", details.Name)
-	t.AddRow("Board fqbn:", details.Fqbn)
-	t.AddRow("Board propertiesId:", details.PropertiesId)
-	t.AddRow("Board version:", details.Version)
+	t.AddRow(tr("Board name:"), details.Name)
+	t.AddRow("FQBN:", details.Fqbn)
+	t.AddRow(tr("Identification properties:"), details.PropertiesId)
+	t.AddRow(tr("Board version:"), details.Version)
 
 	if details.Official {
 		t.AddRow() // get some space from above
-		t.AddRow("Official Arduino board:",
+		t.AddRow(tr("Official Arduino board:"),
 			table.NewCell("✔", color.New(color.FgGreen)))
 	}
 
 	for i, idp := range details.IdentificationPref {
 		if i == 0 {
 			t.AddRow() // get some space from above
-			t.AddRow("Identification Preferences:", "VID:"+idp.UsbID.VID+" PID:"+idp.UsbID.PID)
+			t.AddRow(tr("Identification properties:"), "VID:"+idp.UsbID.VID+" PID:"+idp.UsbID.PID)
 			continue
 		}
 		t.AddRow("", "VID:"+idp.UsbID.VID+" PID:"+idp.UsbID.PID)
 	}
 
 	t.AddRow() // get some space from above
-	t.AddRow("Package name:", details.Package.Name)
-	t.AddRow("Package maintainer:", details.Package.Maintainer)
-	t.AddRow("Package URL:", details.Package.Url)
-	t.AddRow("Package websiteURL:", details.Package.WebsiteURL)
-	t.AddRow("Package online help:", details.Package.Help.Online)
+	t.AddRow(tr("Package name:"), details.Package.Name)
+	t.AddRow(tr("Package maintainer:"), details.Package.Maintainer)
+	t.AddRow(tr("Package URL:"), details.Package.Url)
+	t.AddRow(tr("Package website:"), details.Package.WebsiteURL)
+	t.AddRow(tr("Package online help:"), details.Package.Help.Online)
 
 	t.AddRow() // get some space from above
-	t.AddRow("Platform name:", details.Platform.Name)
-	t.AddRow("Platform category:", details.Platform.Category)
-	t.AddRow("Platform architecture:", details.Platform.Architecture)
-	t.AddRow("Platform URL:", details.Platform.Url)
-	t.AddRow("Platform file name:", details.Platform.ArchiveFileName)
-	t.AddRow("Platform size (bytes):", fmt.Sprint(details.Platform.Size))
-	t.AddRow("Platform checksum:", details.Platform.Checksum)
+	t.AddRow(tr("Platform name:"), details.Platform.Name)
+	t.AddRow(tr("Platform category:"), details.Platform.Category)
+	t.AddRow(tr("Platform architecture:"), details.Platform.Architecture)
+	t.AddRow(tr("Platform URL:"), details.Platform.Url)
+	t.AddRow(tr("Platform file name:"), details.Platform.ArchiveFileName)
+	t.AddRow(tr("Platform size (bytes):"), fmt.Sprint(details.Platform.Size))
+	t.AddRow(tr("Platform checksum:"), details.Platform.Checksum)
 
 	t.AddRow() // get some space from above
 	for _, tool := range details.ToolsDependencies {
-		t.AddRow("Required tools:", tool.Packager+":"+tool.Name, "", tool.Version)
+		t.AddRow(tr("Required tools:"), tool.Packager+":"+tool.Name, "", tool.Version)
 		if showFullDetails {
 			for _, sys := range tool.Systems {
-				t.AddRow("", "OS:", "", sys.Host)
-				t.AddRow("", "File:", "", sys.ArchiveFileName)
-				t.AddRow("", "Size (bytes):", "", fmt.Sprint(sys.Size))
-				t.AddRow("", "Checksum:", "", sys.Checksum)
+				t.AddRow("", tr("OS:"), "", sys.Host)
+				t.AddRow("", tr("File:"), "", sys.ArchiveFileName)
+				t.AddRow("", tr("Size (bytes):"), "", fmt.Sprint(sys.Size))
+				t.AddRow("", tr("Checksum:"), "", sys.Checksum)
 				t.AddRow("", "URL:", "", sys.Url)
 				t.AddRow() // get some space from above
 			}
@@ -146,7 +148,7 @@ func (dr detailsResult) String() string {
 	}
 
 	for _, option := range details.ConfigOptions {
-		t.AddRow("Option:", option.OptionLabel, "", option.Option)
+		t.AddRow(tr("Option:"), option.OptionLabel, "", option.Option)
 		for _, value := range option.Values {
 			green := color.New(color.FgGreen)
 			if value.Selected {
