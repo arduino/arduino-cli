@@ -53,7 +53,8 @@ Config file written: /home/luca/.arduino15/arduino-cli.yaml
 ```
 
 If you inspect the contents of `arduino-cli.yaml`, you'll find the available
-options with their respective default values.
+options with their respective default values. For more information, see the
+[configuration documentation].
 
 ## Create a new sketch
 
@@ -343,6 +344,7 @@ telemetry:
   addr: :9090
 ```
 
+[configuration documentation]: configuration.md
 [client_example]: https://github.com/arduino/arduino-cli/blob/master/client_example
 [gRPC reference]: ../rpc/commands
 [Prometheus]: https://prometheus.io/
