@@ -99,7 +99,7 @@ Checksums for the nightly builds are available at
 
 If you’re familiar with Golang or if you want to contribute to the
 project, you will probably build the `arduino-cli` locally with your
-Go toolchain. Please refer to the [contributing] document for setup instructions.
+Go toolchain. Please refer to the [CONTRIBUTING] document for setup instructions.
 
 If you don’t have a working Golang environment or if you want to build
 `arduino-cli` targeting different platforms, you can use Docker to get
@@ -113,3 +113,4 @@ Once the build is over, you will find a `./dist/` folder containing the packages
 built out of the current source tree.
 
 [Git for Windows]: https://gitforwindows.org/
+[CONTRIBUTING]: CONTRIBUTING.md
