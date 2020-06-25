@@ -34,6 +34,14 @@ the source code, run the tests, and contribute your changes to the project.
 
 :sparkles: Thanks to all our [contributors]! :sparkles:
 
+## Security
+
+If you think you found a vulnerability or other security-related bug in the
+Arduino CLI, please read our [security policy] and report the bug to our
+Security Team 🛡️ Thank you!
+
+e-mail contact: security@arduino.cc
+
 
 [tests-badge]: https://github.com/Arduino/arduino-cli/workflows/test/badge.svg
 [nightly-badge]: https://github.com/Arduino/arduino-cli/workflows/nightly/badge.svg
@@ -46,3 +54,4 @@ the source code, run the tests, and contribute your changes to the project.
 [FAQ]: https://arduino.github.io/arduino-cli/FAQ/
 [How to contribute]: https://arduino.github.io/arduino-cli/CONTRIBUTING/
 [contributors]: https://github.com/arduino/arduino-cli/graphs/contributors
+[security policy]: https://github.com/arduino/arduino-cli/security/policy
