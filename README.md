@@ -36,8 +36,8 @@ the source code, run the tests, and contribute your changes to the project.
 
 ## Security
 
-If you think you found a vulnerability or a critical bug in the Arduino CLI,
-please read our [security policy] and report the bug to our 
+If you think you found a vulnerability or other security-related bug in the
+Arduino CLI, please read our [security policy] and report the bug to our
 Security Team 🛡️ Thank you!
 
 e-mail contact: security@arduino.cc
