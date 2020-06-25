@@ -1561,6 +1561,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../../configuration/" title="Configuration" class="md-nav__link">
+      Configuration
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="../../integration-options/" title="Integration options" class="md-nav__link">
       Integration options
     </a>
@@ -3515,43 +3527,43 @@
 <td>LibraryDownload</td>
 <td><a href="#cc.arduino.cli.commands.LibraryDownloadReq">LibraryDownloadReq</a></td>
 <td><a href="#cc.arduino.cli.commands.LibraryDownloadResp">LibraryDownloadResp</a> stream</td>
-<td></td>
+<td>Download the archive file of an Arduino library in the libraries index to the staging directory.</td>
 </tr>
 <tr>
 <td>LibraryInstall</td>
 <td><a href="#cc.arduino.cli.commands.LibraryInstallReq">LibraryInstallReq</a></td>
 <td><a href="#cc.arduino.cli.commands.LibraryInstallResp">LibraryInstallResp</a> stream</td>
-<td></td>
+<td>Download and install an Arduino library from the libraries index.</td>
 </tr>
 <tr>
 <td>LibraryUninstall</td>
 <td><a href="#cc.arduino.cli.commands.LibraryUninstallReq">LibraryUninstallReq</a></td>
 <td><a href="#cc.arduino.cli.commands.LibraryUninstallResp">LibraryUninstallResp</a> stream</td>
-<td></td>
+<td>Uninstall an Arduino library.</td>
 </tr>
 <tr>
 <td>LibraryUpgradeAll</td>
 <td><a href="#cc.arduino.cli.commands.LibraryUpgradeAllReq">LibraryUpgradeAllReq</a></td>
 <td><a href="#cc.arduino.cli.commands.LibraryUpgradeAllResp">LibraryUpgradeAllResp</a> stream</td>
-<td></td>
+<td>Upgrade all installed Arduino libraries to the newest version available.</td>
 </tr>
 <tr>
 <td>LibraryResolveDependencies</td>
 <td><a href="#cc.arduino.cli.commands.LibraryResolveDependenciesReq">LibraryResolveDependenciesReq</a></td>
 <td><a href="#cc.arduino.cli.commands.LibraryResolveDependenciesResp">LibraryResolveDependenciesResp</a></td>
-<td></td>
+<td>List the recursive dependencies of a library, as defined by the <code>depends</code> field of the library.properties files.</td>
 </tr>
 <tr>
 <td>LibrarySearch</td>
 <td><a href="#cc.arduino.cli.commands.LibrarySearchReq">LibrarySearchReq</a></td>
 <td><a href="#cc.arduino.cli.commands.LibrarySearchResp">LibrarySearchResp</a></td>
-<td></td>
+<td>Search the Arduino libraries index for libraries.</td>
 </tr>
 <tr>
 <td>LibraryList</td>
 <td><a href="#cc.arduino.cli.commands.LibraryListReq">LibraryListReq</a></td>
 <td><a href="#cc.arduino.cli.commands.LibraryListResp">LibraryListResp</a></td>
-<td></td>
+<td>List the installed libraries.</td>
 </tr>
 </tbody>
 </table>
@@ -4251,31 +4263,31 @@
 <td>url</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Download URL of the library archive.</td>
 </tr>
 <tr>
 <td>archivefilename</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Filename of the library archive.</td>
 </tr>
 <tr>
 <td>checksum</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Checksum of the library archive.</td>
 </tr>
 <tr>
 <td>size</td>
 <td><a href="#int64">int64</a></td>
 <td></td>
-<td></td>
+<td>File size of the library archive.</td>
 </tr>
 <tr>
 <td>cachepath</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The directory under the staging subdirectory of the data directory the library archive file will be downloaded to.</td>
 </tr>
 </tbody>
 </table>
@@ -4295,13 +4307,13 @@
 <td>library</td>
 <td><a href="#cc.arduino.cli.commands.Library">Library</a></td>
 <td></td>
-<td></td>
+<td>Information about the library.</td>
 </tr>
 <tr>
 <td>release</td>
 <td><a href="#cc.arduino.cli.commands.LibraryRelease">LibraryRelease</a></td>
 <td></td>
-<td></td>
+<td>When the <code>updatable</code> field of the <code>LibraryList</code> request is set to <code>true</code>, this will contain information on the latest version of the library in the libraries index.</td>
 </tr>
 </tbody>
 </table>
@@ -4321,139 +4333,139 @@
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The library&#39;s directory name.</td>
 </tr>
 <tr>
 <td>author</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>author</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>maintainer</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>maintainer</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>sentence</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>sentence</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>paragraph</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>paragraph</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>website</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>url</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>category</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>category</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>architectures</td>
 <td><a href="#string">string</a></td>
 <td>repeated</td>
-<td></td>
+<td>Value of the <code>architectures</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>types</td>
 <td><a href="#string">string</a></td>
 <td>repeated</td>
-<td></td>
+<td>The type categories of the library. Possible values: <code>Arduino</code>, <code>Partner</code>, <code>Recommended</code>, <code>Contributed</code>, <code>Retired</code>.</td>
 </tr>
 <tr>
 <td>install_dir</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The path of the library directory.</td>
 </tr>
 <tr>
 <td>source_dir</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The location of the library&#39;s source files.</td>
 </tr>
 <tr>
 <td>utility_dir</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The location of the library&#39;s <code>utility</code> directory.</td>
 </tr>
 <tr>
 <td>container_platform</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>If <code>location</code> is <code>platform_builtin</code> or <code>referenced_platform_builtin</code>, the identifying string for the platform containing the library (e.g., <code>arduino:avr@1.8.2</code>).</td>
 </tr>
 <tr>
 <td>real_name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>name</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>dot_a_linkage</td>
 <td><a href="#bool">bool</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>dot_a_linkage</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>precompiled</td>
 <td><a href="#bool">bool</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>precompiled</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>ld_flags</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>ldflags</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>is_legacy</td>
 <td><a href="#bool">bool</a></td>
 <td></td>
-<td></td>
+<td>A library.properties file is not present in the library&#39;s root directory.</td>
 </tr>
 <tr>
 <td>version</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>version</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>license</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>license</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>properties</td>
 <td><a href="#cc.arduino.cli.commands.Library.PropertiesEntry">Library.PropertiesEntry</a></td>
 <td>repeated</td>
-<td></td>
+<td>The data from the library&#39;s library.properties file, including unused fields.</td>
 </tr>
 <tr>
 <td>location</td>
 <td><a href="#cc.arduino.cli.commands.LibraryLocation">LibraryLocation</a></td>
 <td></td>
-<td></td>
+<td>The location type of the library installation.</td>
 </tr>
 <tr>
 <td>layout</td>
 <td><a href="#cc.arduino.cli.commands.LibraryLayout">LibraryLayout</a></td>
 <td></td>
-<td></td>
+<td>The library format type.</td>
 </tr>
 </tbody>
 </table>
@@ -4499,13 +4511,13 @@
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Library name of the dependency.</td>
 </tr>
 <tr>
 <td>version_constraint</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Version constraint of the dependency.</td>
 </tr>
 </tbody>
 </table>
@@ -4525,19 +4537,19 @@
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The name of the library dependency.</td>
 </tr>
 <tr>
 <td>versionRequired</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The required version of the library dependency.</td>
 </tr>
 <tr>
 <td>versionInstalled</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Version of the library dependency currently installed.</td>
 </tr>
 </tbody>
 </table>
@@ -4557,19 +4569,19 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
 </tr>
 <tr>
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Name of the library.</td>
 </tr>
 <tr>
 <td>version</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The version of the library to download.</td>
 </tr>
 </tbody>
 </table>
@@ -4589,7 +4601,7 @@
 <td>progress</td>
 <td><a href="#cc.arduino.cli.commands.DownloadProgress">DownloadProgress</a></td>
 <td></td>
-<td></td>
+<td>Progress of the library download.</td>
 </tr>
 </tbody>
 </table>
@@ -4609,19 +4621,19 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
 </tr>
 <tr>
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Name of the library.</td>
 </tr>
 <tr>
 <td>version</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The version of the library to install.</td>
 </tr>
 </tbody>
 </table>
@@ -4641,13 +4653,13 @@
 <td>progress</td>
 <td><a href="#cc.arduino.cli.commands.DownloadProgress">DownloadProgress</a></td>
 <td></td>
-<td></td>
+<td>Progress of the library download.</td>
 </tr>
 <tr>
 <td>task_progress</td>
 <td><a href="#cc.arduino.cli.commands.TaskProgress">TaskProgress</a></td>
 <td></td>
-<td></td>
+<td>Description of the current stage of the installation.</td>
 </tr>
 </tbody>
 </table>
@@ -4667,19 +4679,19 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
 </tr>
 <tr>
 <td>all</td>
 <td><a href="#bool">bool</a></td>
 <td></td>
-<td></td>
+<td>Whether to include built-in libraries (from platforms and the Arduino IDE) in the listing.</td>
 </tr>
 <tr>
 <td>updatable</td>
 <td><a href="#bool">bool</a></td>
 <td></td>
-<td></td>
+<td>Whether to list only libraries for which there is a newer version than the installed version available in the libraries index.</td>
 </tr>
 </tbody>
 </table>
@@ -4699,7 +4711,7 @@
 <td>installed_library</td>
 <td><a href="#cc.arduino.cli.commands.InstalledLibrary">InstalledLibrary</a></td>
 <td>repeated</td>
-<td></td>
+<td>List of installed libraries.</td>
 </tr>
 </tbody>
 </table>
@@ -4719,79 +4731,79 @@
 <td>author</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>author</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>version</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>version</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>maintainer</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>maintainer</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>sentence</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>sentence</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>paragraph</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>paragraph</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>website</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>url</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>category</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>category</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>architectures</td>
 <td><a href="#string">string</a></td>
 <td>repeated</td>
-<td></td>
+<td>Value of the <code>architectures</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>types</td>
 <td><a href="#string">string</a></td>
 <td>repeated</td>
-<td></td>
+<td>The type categories of the library, as defined in the libraries index. Possible values: <code>Arduino</code>, <code>Partner</code>, <code>Recommended</code>, <code>Contributed</code>, <code>Retired</code>.</td>
 </tr>
 <tr>
 <td>resources</td>
 <td><a href="#cc.arduino.cli.commands.DownloadResource">DownloadResource</a></td>
 <td></td>
-<td></td>
+<td>Information about the library archive file.</td>
 </tr>
 <tr>
 <td>license</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Value of the <code>license</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>provides_includes</td>
 <td><a href="#string">string</a></td>
 <td>repeated</td>
-<td></td>
+<td>Value of the <code>includes</code> field in library.properties.</td>
 </tr>
 <tr>
 <td>dependencies</td>
 <td><a href="#cc.arduino.cli.commands.LibraryDependency">LibraryDependency</a></td>
 <td>repeated</td>
-<td></td>
+<td>The names of the library&#39;s dependencies, as defined by the &#39;depends&#39; field of library.properties.</td>
 </tr>
 </tbody>
 </table>
@@ -4811,19 +4823,19 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
 </tr>
 <tr>
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Name of the library.</td>
 </tr>
 <tr>
 <td>version</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The version of the library to check dependencies of. If no version is specified, dependencies of the newest version will be listed.</td>
 </tr>
 </tbody>
 </table>
@@ -4843,7 +4855,7 @@
 <td>dependencies</td>
 <td><a href="#cc.arduino.cli.commands.LibraryDependencyStatus">LibraryDependencyStatus</a></td>
 <td>repeated</td>
-<td></td>
+<td>Dependencies of the library.</td>
 </tr>
 </tbody>
 </table>
@@ -4863,13 +4875,13 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
 </tr>
 <tr>
 <td>query</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The search query.</td>
 </tr>
 </tbody>
 </table>
@@ -4889,13 +4901,13 @@
 <td>libraries</td>
 <td><a href="#cc.arduino.cli.commands.SearchedLibrary">SearchedLibrary</a></td>
 <td>repeated</td>
-<td></td>
+<td>The results of the search.</td>
 </tr>
 <tr>
 <td>status</td>
 <td><a href="#cc.arduino.cli.commands.LibrarySearchStatus">LibrarySearchStatus</a></td>
 <td></td>
-<td></td>
+<td>Whether the search yielded results.</td>
 </tr>
 </tbody>
 </table>
@@ -4915,19 +4927,19 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
 </tr>
 <tr>
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Name of the library.</td>
 </tr>
 <tr>
 <td>version</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The version of the library to uninstall.</td>
 </tr>
 </tbody>
 </table>
@@ -4947,7 +4959,7 @@
 <td>task_progress</td>
 <td><a href="#cc.arduino.cli.commands.TaskProgress">TaskProgress</a></td>
 <td></td>
-<td></td>
+<td>Description of the current stage of the uninstallation.</td>
 </tr>
 </tbody>
 </table>
@@ -4967,7 +4979,7 @@
 <td>instance</td>
 <td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
 <td></td>
-<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
 </tr>
 </tbody>
 </table>
@@ -4987,13 +4999,13 @@
 <td>progress</td>
 <td><a href="#cc.arduino.cli.commands.DownloadProgress">DownloadProgress</a></td>
 <td></td>
-<td></td>
+<td>Progress of the downloads of files needed for the upgrades.</td>
 </tr>
 <tr>
 <td>task_progress</td>
 <td><a href="#cc.arduino.cli.commands.TaskProgress">TaskProgress</a></td>
 <td></td>
-<td></td>
+<td>Description of the current stage of the upgrade.</td>
 </tr>
 </tbody>
 </table>
@@ -5013,19 +5025,19 @@
 <td>name</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>Library name.</td>
 </tr>
 <tr>
 <td>releases</td>
 <td><a href="#cc.arduino.cli.commands.SearchedLibrary.ReleasesEntry">SearchedLibrary.ReleasesEntry</a></td>
 <td>repeated</td>
-<td></td>
+<td>The index data for the available versions of the library. The key of the map is the library version.</td>
 </tr>
 <tr>
 <td>latest</td>
 <td><a href="#cc.arduino.cli.commands.LibraryRelease">LibraryRelease</a></td>
 <td></td>
-<td></td>
+<td>The index data for the latest version of the library.</td>
 </tr>
 </tbody>
 </table>
@@ -5069,12 +5081,12 @@
 <tr>
 <td>flat_layout</td>
 <td>0</td>
-<td></td>
+<td>Library is in the 1.0 Arduino library format.</td>
 </tr>
 <tr>
 <td>recursive_layout</td>
 <td>1</td>
-<td></td>
+<td>Library is in the 1.5 Arduino library format.</td>
 </tr>
 </tbody>
 </table>
@@ -5092,22 +5104,22 @@
 <tr>
 <td>ide_builtin</td>
 <td>0</td>
-<td></td>
+<td>In the <code>libraries</code> subdirectory of the Arduino IDE installation.</td>
 </tr>
 <tr>
 <td>user</td>
 <td>1</td>
-<td>(sketchbook)</td>
+<td>In the <code>libraries</code> subdirectory of the user directory (sketchbook).</td>
 </tr>
 <tr>
 <td>platform_builtin</td>
 <td>2</td>
-<td></td>
+<td>In the <code>libraries</code> subdirectory of a platform.</td>
 </tr>
 <tr>
 <td>referenced_platform_builtin</td>
 <td>3</td>
-<td></td>
+<td>When <code>LibraryLocation</code> is used in a context where a board is specified, this indicates the library is in the <code>libraries</code> subdirectory of a platform referenced by the board&#39;s platform.</td>
 </tr>
 </tbody>
 </table>
@@ -5125,12 +5137,12 @@
 <tr>
 <td>failed</td>
 <td>0</td>
-<td></td>
+<td>No search results were found.</td>
 </tr>
 <tr>
 <td>success</td>
 <td>1</td>
-<td></td>
+<td>Search results were found.</td>
 </tr>
 </tbody>
 </table>
