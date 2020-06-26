@@ -96,8 +96,8 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		}()
 	}
 
-	logrus.Infof("Starting daemon on TCP port %s", port)
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
+	logrus.Infof("Starting daemon on TCP address 127.0.0.1:%s", port)
+	lis, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%s", port))
 	if err != nil {
 		// Invalid port, such as "Foo"
 		var dnsError *net.DNSError
@@ -121,7 +121,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	// This message will show up on the stdout of the daemon process so that gRPC clients know it is time to connect.
-	logrus.Infof("Daemon is listening on TCP port %s...", port)
+	logrus.Infof("Daemon is now listening on 127.0.0.1:%s...", port)
 	if err := s.Serve(lis); err != nil {
 		logrus.Fatalf("Failed to serve: %v", err)
 	}
