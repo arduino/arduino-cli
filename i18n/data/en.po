@@ -13,9 +13,30 @@ msgstr "Aliases:"
 msgid "Available Commands:"
 msgstr "Available Commands:"
 
+#: cli/board/details.go:98
+msgid "Board name:"
+msgstr "Board name:"
+
+#: cli/board/details.go:100
+msgid "Board version:"
+msgstr "Board version:"
+
+#: cli/board/details.go:141
+msgid "Checksum:"
+msgstr "Checksum:"
+
+#: cli/board/details.go:55
+#: cli/board/details.go:65
+msgid "Error getting board details: %v"
+msgstr "Error getting board details: %v"
+
 #: cli/usage.go:27
 msgid "Examples:"
 msgstr "Examples:"
+
+#: cli/board/details.go:139
+msgid "File:"
+msgstr "File:"
 
 #: cli/usage.go:29
 msgid "Flags:"
@@ -24,6 +45,90 @@ msgstr "Flags:"
 #: cli/usage.go:30
 msgid "Global Flags:"
 msgstr "Global Flags:"
+
+#: cli/board/details.go:111
+msgid "Identification properties:"
+msgstr "Identification properties:"
+
+#: cli/board/details.go:138
+msgid "OS:"
+msgstr "OS:"
+
+#: cli/board/details.go:104
+msgid "Official Arduino board:"
+msgstr "Official Arduino board:"
+
+#: cli/board/details.go:150
+msgid "Option:"
+msgstr "Option:"
+
+#: cli/board/details.go:120
+msgid "Package URL:"
+msgstr "Package URL:"
+
+#: cli/board/details.go:119
+msgid "Package maintainer:"
+msgstr "Package maintainer:"
+
+#: cli/board/details.go:118
+msgid "Package name:"
+msgstr "Package name:"
+
+#: cli/board/details.go:122
+msgid "Package online help:"
+msgstr "Package online help:"
+
+#: cli/board/details.go:121
+msgid "Package website:"
+msgstr "Package website:"
+
+#: cli/board/details.go:128
+msgid "Platform URL:"
+msgstr "Platform URL:"
+
+#: cli/board/details.go:127
+msgid "Platform architecture:"
+msgstr "Platform architecture:"
+
+#: cli/board/details.go:126
+msgid "Platform category:"
+msgstr "Platform category:"
+
+#: cli/board/details.go:131
+msgid "Platform checksum:"
+msgstr "Platform checksum:"
+
+#: cli/board/details.go:129
+msgid "Platform file name:"
+msgstr "Platform file name:"
+
+#: cli/board/details.go:125
+msgid "Platform name:"
+msgstr "Platform name:"
+
+#: cli/board/details.go:130
+msgid "Platform size (bytes):"
+msgstr "Platform size (bytes):"
+
+#: cli/board/details.go:40
+msgid "Print details about a board."
+msgstr "Print details about a board."
+
+#: cli/board/details.go:135
+msgid "Required tool:"
+msgstr "Required tool:"
+
+#: cli/board/details.go:47
+msgid "Show full board details"
+msgstr "Show full board details"
+
+#: cli/board/details.go:41
+msgid "Show information about a board, in particular if the board has options to be specified in the FQBN."
+msgstr "Show information about a board, in particular if the board has options to be specified in the FQBN."
+
+#: cli/board/details.go:140
+msgid "Size (bytes):"
+msgstr "Size (bytes):"
 
 #: cli/usage.go:25
 msgid "Usage:"
