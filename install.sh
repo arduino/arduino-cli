@@ -4,6 +4,16 @@
 # See https://github.com/Masterminds/glide/blob/master/LICENSE for more details
 # and copyright notice.
 
+#
+# Usage:
+#
+# To install the latest version of the CLI:
+#    ./install.sh
+#
+# To pin a specific release of the CLI:
+#    ./install.sh 0.9.0
+#
+
 PROJECT_NAME="arduino-cli"
 
 # BINDIR represents the local bin location, defaults to ./bin.
@@ -119,7 +129,11 @@ getFile() {
 }
 
 downloadFile() {
-	checkLatestVersion TAG
+	if [ -z $1 ]; then
+		checkLatestVersion TAG
+	else
+		TAG=$1
+	fi
 	echo "TAG=$TAG"
 	#  arduino-cli_0.4.0-rc1_Linux_64bit.[tar.gz, zip]
 	if [ "$OS" = "Windows" ]; then
@@ -196,6 +210,6 @@ set -e
 initArch
 initOS
 initDownloadTool
-downloadFile
+downloadFile $1
 installFile
 testVersion
