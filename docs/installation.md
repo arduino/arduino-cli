@@ -31,6 +31,13 @@ If you would like to use the `arduino-cli` command from any location, install
 Arduino CLI to a directory already in your `PATH` or add the Arduino CLI
 installation path to your `PATH` environment variable.
 
+If you want to download a specific arduino-cli version, for example `0.9.0`, pass the
+version number as a parameter like this:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s 0.9.0
+```
+
 ### Download
 
 Pre-built binaries for all the supported platforms are available for download
