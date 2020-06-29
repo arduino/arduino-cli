@@ -20,6 +20,8 @@ import pytest
 import requests
 import yaml
 from prometheus_client.parser import text_string_to_metric_families
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 
 @pytest.mark.timeout(60)
@@ -34,7 +36,10 @@ def test_telemetry_prometheus_endpoint(daemon_runner, data_dir):
 
         # Check if :9090/metrics endpoint is alive,
         # telemetry is enabled by default in daemon mode
-        metrics = requests.get("http://localhost:9090/metrics").text
+        s = requests.Session()
+        retries = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+        s.mount('http://', HTTPAdapter(max_retries=retries))
+        metrics = s.get("http://localhost:9090/metrics").text
         family = next(text_string_to_metric_families(metrics))
         sample = family.samples[0]
         assert inventory["installation"]["id"] == sample.labels["installationID"]
