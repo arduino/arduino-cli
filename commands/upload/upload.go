@@ -355,7 +355,7 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	if strings.TrimSpace(recipe) == "" {
 		return nil // Nothing to run
 	}
-	if props.IsProertyMissingInExpandPropsInString("serial.port", recipe) {
+	if props.IsPropertyMissingInExpandPropsInString("serial.port", recipe) {
 		return fmt.Errorf("no upload port provided")
 	}
 	cmdLine := props.ExpandPropsInString(recipe)
