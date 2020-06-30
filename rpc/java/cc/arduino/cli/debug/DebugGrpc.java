@@ -93,6 +93,9 @@ public final class DebugGrpc {
   public static abstract class DebugImplBase implements io.grpc.BindableService {
 
     /**
+     * <pre>
+     * Start a debug session and communicate with the debugger tool.
+     * </pre>
      */
     public io.grpc.stub.StreamObserver<cc.arduino.cli.debug.DebugOuterClass.DebugReq> debug(
         io.grpc.stub.StreamObserver<cc.arduino.cli.debug.DebugOuterClass.DebugResp> responseObserver) {
@@ -134,6 +137,9 @@ public final class DebugGrpc {
     }
 
     /**
+     * <pre>
+     * Start a debug session and communicate with the debugger tool.
+     * </pre>
      */
     public io.grpc.stub.StreamObserver<cc.arduino.cli.debug.DebugOuterClass.DebugReq> debug(
         io.grpc.stub.StreamObserver<cc.arduino.cli.debug.DebugOuterClass.DebugResp> responseObserver) {

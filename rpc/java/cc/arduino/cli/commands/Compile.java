@@ -460,6 +460,26 @@ public final class Compile {
      */
     com.google.protobuf.ByteString
         getExportDirBytes();
+
+    /**
+     * <pre>
+     * External programmer for upload
+     * </pre>
+     *
+     * <code>string programmer = 19;</code>
+     * @return The programmer.
+     */
+    java.lang.String getProgrammer();
+    /**
+     * <pre>
+     * External programmer for upload
+     * </pre>
+     *
+     * <code>string programmer = 19;</code>
+     * @return The bytes for programmer.
+     */
+    com.google.protobuf.ByteString
+        getProgrammerBytes();
   }
   /**
    * Protobuf type {@code cc.arduino.cli.commands.CompileReq}
@@ -484,6 +504,7 @@ public final class Compile {
       exportFile_ = "";
       libraries_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       exportDir_ = "";
+      programmer_ = "";
     }
 
     @java.lang.Override
@@ -629,6 +650,12 @@ public final class Compile {
               java.lang.String s = input.readStringRequireUtf8();
 
               exportDir_ = s;
+              break;
+            }
+            case 154: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              programmer_ = s;
               break;
             }
             default: {
@@ -1256,6 +1283,50 @@ public final class Compile {
       }
     }
 
+    public static final int PROGRAMMER_FIELD_NUMBER = 19;
+    private volatile java.lang.Object programmer_;
+    /**
+     * <pre>
+     * External programmer for upload
+     * </pre>
+     *
+     * <code>string programmer = 19;</code>
+     * @return The programmer.
+     */
+    public java.lang.String getProgrammer() {
+      java.lang.Object ref = programmer_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        programmer_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * External programmer for upload
+     * </pre>
+     *
+     * <code>string programmer = 19;</code>
+     * @return The bytes for programmer.
+     */
+    public com.google.protobuf.ByteString
+        getProgrammerBytes() {
+      java.lang.Object ref = programmer_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        programmer_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1323,6 +1394,9 @@ public final class Compile {
       }
       if (!getExportDirBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 18, exportDir_);
+      }
+      if (!getProgrammerBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 19, programmer_);
       }
       unknownFields.writeTo(output);
     }
@@ -1405,6 +1479,9 @@ public final class Compile {
       if (!getExportDirBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(18, exportDir_);
       }
+      if (!getProgrammerBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(19, programmer_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -1459,6 +1536,8 @@ public final class Compile {
           != other.getDryRun()) return false;
       if (!getExportDir()
           .equals(other.getExportDir())) return false;
+      if (!getProgrammer()
+          .equals(other.getProgrammer())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1518,6 +1597,8 @@ public final class Compile {
           getDryRun());
       hash = (37 * hash) + EXPORT_DIR_FIELD_NUMBER;
       hash = (53 * hash) + getExportDir().hashCode();
+      hash = (37 * hash) + PROGRAMMER_FIELD_NUMBER;
+      hash = (53 * hash) + getProgrammer().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1691,6 +1772,8 @@ public final class Compile {
 
         exportDir_ = "";
 
+        programmer_ = "";
+
         return this;
       }
 
@@ -1748,6 +1831,7 @@ public final class Compile {
         result.optimizeForDebug_ = optimizeForDebug_;
         result.dryRun_ = dryRun_;
         result.exportDir_ = exportDir_;
+        result.programmer_ = programmer_;
         onBuilt();
         return result;
       }
@@ -1870,6 +1954,10 @@ public final class Compile {
         }
         if (!other.getExportDir().isEmpty()) {
           exportDir_ = other.exportDir_;
+          onChanged();
+        }
+        if (!other.getProgrammer().isEmpty()) {
+          programmer_ = other.programmer_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -3410,6 +3498,102 @@ public final class Compile {
         onChanged();
         return this;
       }
+
+      private java.lang.Object programmer_ = "";
+      /**
+       * <pre>
+       * External programmer for upload
+       * </pre>
+       *
+       * <code>string programmer = 19;</code>
+       * @return The programmer.
+       */
+      public java.lang.String getProgrammer() {
+        java.lang.Object ref = programmer_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          programmer_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * External programmer for upload
+       * </pre>
+       *
+       * <code>string programmer = 19;</code>
+       * @return The bytes for programmer.
+       */
+      public com.google.protobuf.ByteString
+          getProgrammerBytes() {
+        java.lang.Object ref = programmer_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          programmer_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * External programmer for upload
+       * </pre>
+       *
+       * <code>string programmer = 19;</code>
+       * @param value The programmer to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProgrammer(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        programmer_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * External programmer for upload
+       * </pre>
+       *
+       * <code>string programmer = 19;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProgrammer() {
+        
+        programmer_ = getDefaultInstance().getProgrammer();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * External programmer for upload
+       * </pre>
+       *
+       * <code>string programmer = 19;</code>
+       * @param value The bytes for programmer to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProgrammerBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        programmer_ = value;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -4390,7 +4574,7 @@ public final class Compile {
   static {
     java.lang.String[] descriptorData = {
       "\n\026commands/compile.proto\022\027cc.arduino.cli" +
-      ".commands\032\025commands/common.proto\"\214\003\n\nCom" +
+      ".commands\032\025commands/common.proto\"\240\003\n\nCom" +
       "pileReq\0223\n\010instance\030\001 \001(\0132!.cc.arduino.c" +
       "li.commands.Instance\022\014\n\004fqbn\030\002 \001(\t\022\022\n\nsk" +
       "etchPath\030\003 \001(\t\022\026\n\016showProperties\030\004 \001(\010\022\022" +
@@ -4400,14 +4584,15 @@ public final class Compile {
       "\010\022\r\n\005quiet\030\013 \001(\010\022\016\n\006vidPid\030\014 \001(\t\022\026\n\nexpo" +
       "rtFile\030\r \001(\tB\002\030\001\022\014\n\004jobs\030\016 \001(\005\022\021\n\tlibrar" +
       "ies\030\017 \003(\t\022\030\n\020optimizeForDebug\030\020 \001(\010\022\016\n\006d" +
-      "ryRun\030\021 \001(\010\022\022\n\nexport_dir\030\022 \001(\t\"\253\001\n\013Comp" +
-      "ileResp\022\022\n\nout_stream\030\001 \001(\014\022\022\n\nerr_strea" +
-      "m\030\002 \001(\014\022<\n\rtask_progress\030\003 \001(\0132%.cc.ardu" +
-      "ino.cli.commands.TaskProgress\0226\n\006result\030" +
-      "\004 \001(\0162&.cc.arduino.cli.commands.CompileR" +
-      "esult*7\n\rCompileResult\022\023\n\017compile_succes" +
-      "s\020\000\022\021\n\rcompile_error\020\001B-Z+github.com/ard" +
-      "uino/arduino-cli/rpc/commandsb\006proto3"
+      "ryRun\030\021 \001(\010\022\022\n\nexport_dir\030\022 \001(\t\022\022\n\nprogr" +
+      "ammer\030\023 \001(\t\"\253\001\n\013CompileResp\022\022\n\nout_strea" +
+      "m\030\001 \001(\014\022\022\n\nerr_stream\030\002 \001(\014\022<\n\rtask_prog" +
+      "ress\030\003 \001(\0132%.cc.arduino.cli.commands.Tas" +
+      "kProgress\0226\n\006result\030\004 \001(\0162&.cc.arduino.c" +
+      "li.commands.CompileResult*7\n\rCompileResu" +
+      "lt\022\023\n\017compile_success\020\000\022\021\n\rcompile_error" +
+      "\020\001B-Z+github.com/arduino/arduino-cli/rpc" +
+      "/commandsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -4419,7 +4604,7 @@ public final class Compile {
     internal_static_cc_arduino_cli_commands_CompileReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_cc_arduino_cli_commands_CompileReq_descriptor,
-        new java.lang.String[] { "Instance", "Fqbn", "SketchPath", "ShowProperties", "Preprocess", "BuildCachePath", "BuildPath", "BuildProperties", "Warnings", "Verbose", "Quiet", "VidPid", "ExportFile", "Jobs", "Libraries", "OptimizeForDebug", "DryRun", "ExportDir", });
+        new java.lang.String[] { "Instance", "Fqbn", "SketchPath", "ShowProperties", "Preprocess", "BuildCachePath", "BuildPath", "BuildProperties", "Warnings", "Verbose", "Quiet", "VidPid", "ExportFile", "Jobs", "Libraries", "OptimizeForDebug", "DryRun", "ExportDir", "Programmer", });
     internal_static_cc_arduino_cli_commands_CompileResp_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_cc_arduino_cli_commands_CompileResp_fieldAccessorTable = new

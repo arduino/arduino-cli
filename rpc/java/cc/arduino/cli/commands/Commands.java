@@ -8740,7 +8740,7 @@ public final class Commands {
       "LibrariesIndexResp\022D\n\021download_progress\030" +
       "\001 \001(\0132).cc.arduino.cli.commands.Download" +
       "Progress\"\014\n\nVersionReq\"\036\n\013VersionResp\022\017\n" +
-      "\007version\030\001 \001(\t2\272\024\n\013ArduinoCore\022O\n\004Init\022 " +
+      "\007version\030\001 \001(\t2\314\026\n\013ArduinoCore\022O\n\004Init\022 " +
       ".cc.arduino.cli.commands.InitReq\032!.cc.ar" +
       "duino.cli.commands.InitResp\"\0000\001\022V\n\007Destr" +
       "oy\022#.cc.arduino.cli.commands.DestroyReq\032" +
@@ -8780,34 +8780,41 @@ public final class Commands {
       "formUpgradeReq\032,.cc.arduino.cli.commands" +
       ".PlatformUpgradeResp0\001\022S\n\006Upload\022\".cc.ar" +
       "duino.cli.commands.UploadReq\032#.cc.arduin" +
-      "o.cli.commands.UploadResp0\001\022i\n\016PlatformS" +
-      "earch\022*.cc.arduino.cli.commands.Platform" +
-      "SearchReq\032+.cc.arduino.cli.commands.Plat" +
-      "formSearchResp\022c\n\014PlatformList\022(.cc.ardu" +
-      "ino.cli.commands.PlatformListReq\032).cc.ar" +
-      "duino.cli.commands.PlatformListResp\022n\n\017L" +
-      "ibraryDownload\022+.cc.arduino.cli.commands" +
-      ".LibraryDownloadReq\032,.cc.arduino.cli.com" +
-      "mands.LibraryDownloadResp0\001\022k\n\016LibraryIn" +
-      "stall\022*.cc.arduino.cli.commands.LibraryI" +
-      "nstallReq\032+.cc.arduino.cli.commands.Libr" +
-      "aryInstallResp0\001\022q\n\020LibraryUninstall\022,.c" +
+      "o.cli.commands.UploadResp0\001\022\242\001\n!ListProg" +
+      "rammersAvailableForUpload\022=.cc.arduino.c" +
+      "li.commands.ListProgrammersAvailableForU" +
+      "ploadReq\032>.cc.arduino.cli.commands.ListP" +
+      "rogrammersAvailableForUploadResp\022k\n\016Burn" +
+      "Bootloader\022*.cc.arduino.cli.commands.Bur" +
+      "nBootloaderReq\032+.cc.arduino.cli.commands" +
+      ".BurnBootloaderResp0\001\022i\n\016PlatformSearch\022" +
+      "*.cc.arduino.cli.commands.PlatformSearch" +
+      "Req\032+.cc.arduino.cli.commands.PlatformSe" +
+      "archResp\022c\n\014PlatformList\022(.cc.arduino.cl" +
+      "i.commands.PlatformListReq\032).cc.arduino." +
+      "cli.commands.PlatformListResp\022n\n\017Library" +
+      "Download\022+.cc.arduino.cli.commands.Libra" +
+      "ryDownloadReq\032,.cc.arduino.cli.commands." +
+      "LibraryDownloadResp0\001\022k\n\016LibraryInstall\022" +
+      "*.cc.arduino.cli.commands.LibraryInstall" +
+      "Req\032+.cc.arduino.cli.commands.LibraryIns" +
+      "tallResp0\001\022q\n\020LibraryUninstall\022,.cc.ardu" +
+      "ino.cli.commands.LibraryUninstallReq\032-.c" +
       "c.arduino.cli.commands.LibraryUninstallR" +
-      "eq\032-.cc.arduino.cli.commands.LibraryUnin" +
-      "stallResp0\001\022t\n\021LibraryUpgradeAll\022-.cc.ar" +
-      "duino.cli.commands.LibraryUpgradeAllReq\032" +
-      "..cc.arduino.cli.commands.LibraryUpgrade" +
-      "AllResp0\001\022\215\001\n\032LibraryResolveDependencies" +
-      "\0226.cc.arduino.cli.commands.LibraryResolv" +
-      "eDependenciesReq\0327.cc.arduino.cli.comman" +
-      "ds.LibraryResolveDependenciesResp\022f\n\rLib" +
-      "rarySearch\022).cc.arduino.cli.commands.Lib" +
-      "rarySearchReq\032*.cc.arduino.cli.commands." +
-      "LibrarySearchResp\022`\n\013LibraryList\022\'.cc.ar" +
-      "duino.cli.commands.LibraryListReq\032(.cc.a" +
-      "rduino.cli.commands.LibraryListRespB-Z+g" +
-      "ithub.com/arduino/arduino-cli/rpc/comman" +
-      "dsb\006proto3"
+      "esp0\001\022t\n\021LibraryUpgradeAll\022-.cc.arduino." +
+      "cli.commands.LibraryUpgradeAllReq\032..cc.a" +
+      "rduino.cli.commands.LibraryUpgradeAllRes" +
+      "p0\001\022\215\001\n\032LibraryResolveDependencies\0226.cc." +
+      "arduino.cli.commands.LibraryResolveDepen" +
+      "denciesReq\0327.cc.arduino.cli.commands.Lib" +
+      "raryResolveDependenciesResp\022f\n\rLibrarySe" +
+      "arch\022).cc.arduino.cli.commands.LibrarySe" +
+      "archReq\032*.cc.arduino.cli.commands.Librar" +
+      "ySearchResp\022`\n\013LibraryList\022\'.cc.arduino." +
+      "cli.commands.LibraryListReq\032(.cc.arduino" +
+      ".cli.commands.LibraryListRespB-Z+github." +
+      "com/arduino/arduino-cli/rpc/commandsb\006pr" +
+      "oto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -924,26 +924,50 @@ public final class DebugOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * Arduino Core Service instance from the `Init` response.
+     * </pre>
+     *
      * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      * @return Whether the instance field is set.
      */
     boolean hasInstance();
     /**
+     * <pre>
+     * Arduino Core Service instance from the `Init` response.
+     * </pre>
+     *
      * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      * @return The instance.
      */
     cc.arduino.cli.commands.Common.Instance getInstance();
     /**
+     * <pre>
+     * Arduino Core Service instance from the `Init` response.
+     * </pre>
+     *
      * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      */
     cc.arduino.cli.commands.Common.InstanceOrBuilder getInstanceOrBuilder();
 
     /**
+     * <pre>
+     * Fully qualified board name of the board in use
+     * (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
+     * the sketch will be used.
+     * </pre>
+     *
      * <code>string fqbn = 2;</code>
      * @return The fqbn.
      */
     java.lang.String getFqbn();
     /**
+     * <pre>
+     * Fully qualified board name of the board in use
+     * (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
+     * the sketch will be used.
+     * </pre>
+     *
      * <code>string fqbn = 2;</code>
      * @return The bytes for fqbn.
      */
@@ -951,11 +975,21 @@ public final class DebugOuterClass {
         getFqbnBytes();
 
     /**
+     * <pre>
+     * Path to the sketch that is running on the board. The compiled executable
+     * is expected to be located under this path.
+     * </pre>
+     *
      * <code>string sketch_path = 3;</code>
      * @return The sketchPath.
      */
     java.lang.String getSketchPath();
     /**
+     * <pre>
+     * Path to the sketch that is running on the board. The compiled executable
+     * is expected to be located under this path.
+     * </pre>
+     *
      * <code>string sketch_path = 3;</code>
      * @return The bytes for sketchPath.
      */
@@ -963,11 +997,19 @@ public final class DebugOuterClass {
         getSketchPathBytes();
 
     /**
+     * <pre>
+     * Port of the debugger. Set to `none` if the debugger doesn't use a port.
+     * </pre>
+     *
      * <code>string port = 4;</code>
      * @return The port.
      */
     java.lang.String getPort();
     /**
+     * <pre>
+     * Port of the debugger. Set to `none` if the debugger doesn't use a port.
+     * </pre>
+     *
      * <code>string port = 4;</code>
      * @return The bytes for port.
      */
@@ -975,11 +1017,19 @@ public final class DebugOuterClass {
         getPortBytes();
 
     /**
+     * <pre>
+     * Which GDB command interpreter to use.
+     * </pre>
+     *
      * <code>string interpreter = 5;</code>
      * @return The interpreter.
      */
     java.lang.String getInterpreter();
     /**
+     * <pre>
+     * Which GDB command interpreter to use.
+     * </pre>
+     *
      * <code>string interpreter = 5;</code>
      * @return The bytes for interpreter.
      */
@@ -1007,11 +1057,23 @@ public final class DebugOuterClass {
         getImportFileBytes();
 
     /**
+     * <pre>
+     * Directory containing the compiled executable. If `import_dir` is not
+     * specified, the executable is assumed to be in
+     * `{sketch_path}/build/{fqbn}/`.
+     * </pre>
+     *
      * <code>string import_dir = 8;</code>
      * @return The importDir.
      */
     java.lang.String getImportDir();
     /**
+     * <pre>
+     * Directory containing the compiled executable. If `import_dir` is not
+     * specified, the executable is assumed to be in
+     * `{sketch_path}/build/{fqbn}/`.
+     * </pre>
+     *
      * <code>string import_dir = 8;</code>
      * @return The bytes for importDir.
      */
@@ -1153,6 +1215,10 @@ public final class DebugOuterClass {
     public static final int INSTANCE_FIELD_NUMBER = 1;
     private cc.arduino.cli.commands.Common.Instance instance_;
     /**
+     * <pre>
+     * Arduino Core Service instance from the `Init` response.
+     * </pre>
+     *
      * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      * @return Whether the instance field is set.
      */
@@ -1160,6 +1226,10 @@ public final class DebugOuterClass {
       return instance_ != null;
     }
     /**
+     * <pre>
+     * Arduino Core Service instance from the `Init` response.
+     * </pre>
+     *
      * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      * @return The instance.
      */
@@ -1167,6 +1237,10 @@ public final class DebugOuterClass {
       return instance_ == null ? cc.arduino.cli.commands.Common.Instance.getDefaultInstance() : instance_;
     }
     /**
+     * <pre>
+     * Arduino Core Service instance from the `Init` response.
+     * </pre>
+     *
      * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
      */
     public cc.arduino.cli.commands.Common.InstanceOrBuilder getInstanceOrBuilder() {
@@ -1176,6 +1250,12 @@ public final class DebugOuterClass {
     public static final int FQBN_FIELD_NUMBER = 2;
     private volatile java.lang.Object fqbn_;
     /**
+     * <pre>
+     * Fully qualified board name of the board in use
+     * (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
+     * the sketch will be used.
+     * </pre>
+     *
      * <code>string fqbn = 2;</code>
      * @return The fqbn.
      */
@@ -1192,6 +1272,12 @@ public final class DebugOuterClass {
       }
     }
     /**
+     * <pre>
+     * Fully qualified board name of the board in use
+     * (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
+     * the sketch will be used.
+     * </pre>
+     *
      * <code>string fqbn = 2;</code>
      * @return The bytes for fqbn.
      */
@@ -1212,6 +1298,11 @@ public final class DebugOuterClass {
     public static final int SKETCH_PATH_FIELD_NUMBER = 3;
     private volatile java.lang.Object sketchPath_;
     /**
+     * <pre>
+     * Path to the sketch that is running on the board. The compiled executable
+     * is expected to be located under this path.
+     * </pre>
+     *
      * <code>string sketch_path = 3;</code>
      * @return The sketchPath.
      */
@@ -1228,6 +1319,11 @@ public final class DebugOuterClass {
       }
     }
     /**
+     * <pre>
+     * Path to the sketch that is running on the board. The compiled executable
+     * is expected to be located under this path.
+     * </pre>
+     *
      * <code>string sketch_path = 3;</code>
      * @return The bytes for sketchPath.
      */
@@ -1248,6 +1344,10 @@ public final class DebugOuterClass {
     public static final int PORT_FIELD_NUMBER = 4;
     private volatile java.lang.Object port_;
     /**
+     * <pre>
+     * Port of the debugger. Set to `none` if the debugger doesn't use a port.
+     * </pre>
+     *
      * <code>string port = 4;</code>
      * @return The port.
      */
@@ -1264,6 +1364,10 @@ public final class DebugOuterClass {
       }
     }
     /**
+     * <pre>
+     * Port of the debugger. Set to `none` if the debugger doesn't use a port.
+     * </pre>
+     *
      * <code>string port = 4;</code>
      * @return The bytes for port.
      */
@@ -1284,6 +1388,10 @@ public final class DebugOuterClass {
     public static final int INTERPRETER_FIELD_NUMBER = 5;
     private volatile java.lang.Object interpreter_;
     /**
+     * <pre>
+     * Which GDB command interpreter to use.
+     * </pre>
+     *
      * <code>string interpreter = 5;</code>
      * @return The interpreter.
      */
@@ -1300,6 +1408,10 @@ public final class DebugOuterClass {
       }
     }
     /**
+     * <pre>
+     * Which GDB command interpreter to use.
+     * </pre>
+     *
      * <code>string interpreter = 5;</code>
      * @return The bytes for interpreter.
      */
@@ -1364,6 +1476,12 @@ public final class DebugOuterClass {
     public static final int IMPORT_DIR_FIELD_NUMBER = 8;
     private volatile java.lang.Object importDir_;
     /**
+     * <pre>
+     * Directory containing the compiled executable. If `import_dir` is not
+     * specified, the executable is assumed to be in
+     * `{sketch_path}/build/{fqbn}/`.
+     * </pre>
+     *
      * <code>string import_dir = 8;</code>
      * @return The importDir.
      */
@@ -1380,6 +1498,12 @@ public final class DebugOuterClass {
       }
     }
     /**
+     * <pre>
+     * Directory containing the compiled executable. If `import_dir` is not
+     * specified, the executable is assumed to be in
+     * `{sketch_path}/build/{fqbn}/`.
+     * </pre>
+     *
      * <code>string import_dir = 8;</code>
      * @return The bytes for importDir.
      */
@@ -1818,6 +1942,10 @@ public final class DebugOuterClass {
       private com.google.protobuf.SingleFieldBuilderV3<
           cc.arduino.cli.commands.Common.Instance, cc.arduino.cli.commands.Common.Instance.Builder, cc.arduino.cli.commands.Common.InstanceOrBuilder> instanceBuilder_;
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        * @return Whether the instance field is set.
        */
@@ -1825,6 +1953,10 @@ public final class DebugOuterClass {
         return instanceBuilder_ != null || instance_ != null;
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        * @return The instance.
        */
@@ -1836,6 +1968,10 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public Builder setInstance(cc.arduino.cli.commands.Common.Instance value) {
@@ -1852,6 +1988,10 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public Builder setInstance(
@@ -1866,6 +2006,10 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public Builder mergeInstance(cc.arduino.cli.commands.Common.Instance value) {
@@ -1884,6 +2028,10 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public Builder clearInstance() {
@@ -1898,6 +2046,10 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public cc.arduino.cli.commands.Common.Instance.Builder getInstanceBuilder() {
@@ -1906,6 +2058,10 @@ public final class DebugOuterClass {
         return getInstanceFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       public cc.arduino.cli.commands.Common.InstanceOrBuilder getInstanceOrBuilder() {
@@ -1917,6 +2073,10 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Arduino Core Service instance from the `Init` response.
+       * </pre>
+       *
        * <code>.cc.arduino.cli.commands.Instance instance = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -1935,6 +2095,12 @@ public final class DebugOuterClass {
 
       private java.lang.Object fqbn_ = "";
       /**
+       * <pre>
+       * Fully qualified board name of the board in use
+       * (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
+       * the sketch will be used.
+       * </pre>
+       *
        * <code>string fqbn = 2;</code>
        * @return The fqbn.
        */
@@ -1951,6 +2117,12 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Fully qualified board name of the board in use
+       * (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
+       * the sketch will be used.
+       * </pre>
+       *
        * <code>string fqbn = 2;</code>
        * @return The bytes for fqbn.
        */
@@ -1968,6 +2140,12 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Fully qualified board name of the board in use
+       * (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
+       * the sketch will be used.
+       * </pre>
+       *
        * <code>string fqbn = 2;</code>
        * @param value The fqbn to set.
        * @return This builder for chaining.
@@ -1983,6 +2161,12 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Fully qualified board name of the board in use
+       * (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
+       * the sketch will be used.
+       * </pre>
+       *
        * <code>string fqbn = 2;</code>
        * @return This builder for chaining.
        */
@@ -1993,6 +2177,12 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Fully qualified board name of the board in use
+       * (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
+       * the sketch will be used.
+       * </pre>
+       *
        * <code>string fqbn = 2;</code>
        * @param value The bytes for fqbn to set.
        * @return This builder for chaining.
@@ -2011,6 +2201,11 @@ public final class DebugOuterClass {
 
       private java.lang.Object sketchPath_ = "";
       /**
+       * <pre>
+       * Path to the sketch that is running on the board. The compiled executable
+       * is expected to be located under this path.
+       * </pre>
+       *
        * <code>string sketch_path = 3;</code>
        * @return The sketchPath.
        */
@@ -2027,6 +2222,11 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Path to the sketch that is running on the board. The compiled executable
+       * is expected to be located under this path.
+       * </pre>
+       *
        * <code>string sketch_path = 3;</code>
        * @return The bytes for sketchPath.
        */
@@ -2044,6 +2244,11 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Path to the sketch that is running on the board. The compiled executable
+       * is expected to be located under this path.
+       * </pre>
+       *
        * <code>string sketch_path = 3;</code>
        * @param value The sketchPath to set.
        * @return This builder for chaining.
@@ -2059,6 +2264,11 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Path to the sketch that is running on the board. The compiled executable
+       * is expected to be located under this path.
+       * </pre>
+       *
        * <code>string sketch_path = 3;</code>
        * @return This builder for chaining.
        */
@@ -2069,6 +2279,11 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Path to the sketch that is running on the board. The compiled executable
+       * is expected to be located under this path.
+       * </pre>
+       *
        * <code>string sketch_path = 3;</code>
        * @param value The bytes for sketchPath to set.
        * @return This builder for chaining.
@@ -2087,6 +2302,10 @@ public final class DebugOuterClass {
 
       private java.lang.Object port_ = "";
       /**
+       * <pre>
+       * Port of the debugger. Set to `none` if the debugger doesn't use a port.
+       * </pre>
+       *
        * <code>string port = 4;</code>
        * @return The port.
        */
@@ -2103,6 +2322,10 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Port of the debugger. Set to `none` if the debugger doesn't use a port.
+       * </pre>
+       *
        * <code>string port = 4;</code>
        * @return The bytes for port.
        */
@@ -2120,6 +2343,10 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Port of the debugger. Set to `none` if the debugger doesn't use a port.
+       * </pre>
+       *
        * <code>string port = 4;</code>
        * @param value The port to set.
        * @return This builder for chaining.
@@ -2135,6 +2362,10 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Port of the debugger. Set to `none` if the debugger doesn't use a port.
+       * </pre>
+       *
        * <code>string port = 4;</code>
        * @return This builder for chaining.
        */
@@ -2145,6 +2376,10 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Port of the debugger. Set to `none` if the debugger doesn't use a port.
+       * </pre>
+       *
        * <code>string port = 4;</code>
        * @param value The bytes for port to set.
        * @return This builder for chaining.
@@ -2163,6 +2398,10 @@ public final class DebugOuterClass {
 
       private java.lang.Object interpreter_ = "";
       /**
+       * <pre>
+       * Which GDB command interpreter to use.
+       * </pre>
+       *
        * <code>string interpreter = 5;</code>
        * @return The interpreter.
        */
@@ -2179,6 +2418,10 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Which GDB command interpreter to use.
+       * </pre>
+       *
        * <code>string interpreter = 5;</code>
        * @return The bytes for interpreter.
        */
@@ -2196,6 +2439,10 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Which GDB command interpreter to use.
+       * </pre>
+       *
        * <code>string interpreter = 5;</code>
        * @param value The interpreter to set.
        * @return This builder for chaining.
@@ -2211,6 +2458,10 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Which GDB command interpreter to use.
+       * </pre>
+       *
        * <code>string interpreter = 5;</code>
        * @return This builder for chaining.
        */
@@ -2221,6 +2472,10 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Which GDB command interpreter to use.
+       * </pre>
+       *
        * <code>string interpreter = 5;</code>
        * @param value The bytes for interpreter to set.
        * @return This builder for chaining.
@@ -2335,6 +2590,12 @@ public final class DebugOuterClass {
 
       private java.lang.Object importDir_ = "";
       /**
+       * <pre>
+       * Directory containing the compiled executable. If `import_dir` is not
+       * specified, the executable is assumed to be in
+       * `{sketch_path}/build/{fqbn}/`.
+       * </pre>
+       *
        * <code>string import_dir = 8;</code>
        * @return The importDir.
        */
@@ -2351,6 +2612,12 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Directory containing the compiled executable. If `import_dir` is not
+       * specified, the executable is assumed to be in
+       * `{sketch_path}/build/{fqbn}/`.
+       * </pre>
+       *
        * <code>string import_dir = 8;</code>
        * @return The bytes for importDir.
        */
@@ -2368,6 +2635,12 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Directory containing the compiled executable. If `import_dir` is not
+       * specified, the executable is assumed to be in
+       * `{sketch_path}/build/{fqbn}/`.
+       * </pre>
+       *
        * <code>string import_dir = 8;</code>
        * @param value The importDir to set.
        * @return This builder for chaining.
@@ -2383,6 +2656,12 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Directory containing the compiled executable. If `import_dir` is not
+       * specified, the executable is assumed to be in
+       * `{sketch_path}/build/{fqbn}/`.
+       * </pre>
+       *
        * <code>string import_dir = 8;</code>
        * @return This builder for chaining.
        */
@@ -2393,6 +2672,12 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Directory containing the compiled executable. If `import_dir` is not
+       * specified, the executable is assumed to be in
+       * `{sketch_path}/build/{fqbn}/`.
+       * </pre>
+       *
        * <code>string import_dir = 8;</code>
        * @param value The bytes for importDir to set.
        * @return This builder for chaining.
@@ -2466,17 +2751,29 @@ public final class DebugOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * Incoming data from the debugger tool.
+     * </pre>
+     *
      * <code>bytes data = 1;</code>
      * @return The data.
      */
     com.google.protobuf.ByteString getData();
 
     /**
+     * <pre>
+     * Incoming error output from the debugger tool.
+     * </pre>
+     *
      * <code>string error = 2;</code>
      * @return The error.
      */
     java.lang.String getError();
     /**
+     * <pre>
+     * Incoming error output from the debugger tool.
+     * </pre>
+     *
      * <code>string error = 2;</code>
      * @return The bytes for error.
      */
@@ -2579,6 +2876,10 @@ public final class DebugOuterClass {
     public static final int DATA_FIELD_NUMBER = 1;
     private com.google.protobuf.ByteString data_;
     /**
+     * <pre>
+     * Incoming data from the debugger tool.
+     * </pre>
+     *
      * <code>bytes data = 1;</code>
      * @return The data.
      */
@@ -2589,6 +2890,10 @@ public final class DebugOuterClass {
     public static final int ERROR_FIELD_NUMBER = 2;
     private volatile java.lang.Object error_;
     /**
+     * <pre>
+     * Incoming error output from the debugger tool.
+     * </pre>
+     *
      * <code>string error = 2;</code>
      * @return The error.
      */
@@ -2605,6 +2910,10 @@ public final class DebugOuterClass {
       }
     }
     /**
+     * <pre>
+     * Incoming error output from the debugger tool.
+     * </pre>
+     *
      * <code>string error = 2;</code>
      * @return The bytes for error.
      */
@@ -2946,6 +3255,10 @@ public final class DebugOuterClass {
 
       private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
       /**
+       * <pre>
+       * Incoming data from the debugger tool.
+       * </pre>
+       *
        * <code>bytes data = 1;</code>
        * @return The data.
        */
@@ -2953,6 +3266,10 @@ public final class DebugOuterClass {
         return data_;
       }
       /**
+       * <pre>
+       * Incoming data from the debugger tool.
+       * </pre>
+       *
        * <code>bytes data = 1;</code>
        * @param value The data to set.
        * @return This builder for chaining.
@@ -2967,6 +3284,10 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Incoming data from the debugger tool.
+       * </pre>
+       *
        * <code>bytes data = 1;</code>
        * @return This builder for chaining.
        */
@@ -2979,6 +3300,10 @@ public final class DebugOuterClass {
 
       private java.lang.Object error_ = "";
       /**
+       * <pre>
+       * Incoming error output from the debugger tool.
+       * </pre>
+       *
        * <code>string error = 2;</code>
        * @return The error.
        */
@@ -2995,6 +3320,10 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Incoming error output from the debugger tool.
+       * </pre>
+       *
        * <code>string error = 2;</code>
        * @return The bytes for error.
        */
@@ -3012,6 +3341,10 @@ public final class DebugOuterClass {
         }
       }
       /**
+       * <pre>
+       * Incoming error output from the debugger tool.
+       * </pre>
+       *
        * <code>string error = 2;</code>
        * @param value The error to set.
        * @return This builder for chaining.
@@ -3027,6 +3360,10 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Incoming error output from the debugger tool.
+       * </pre>
+       *
        * <code>string error = 2;</code>
        * @return This builder for chaining.
        */
@@ -3037,6 +3374,10 @@ public final class DebugOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Incoming error output from the debugger tool.
+       * </pre>
+       *
        * <code>string error = 2;</code>
        * @param value The bytes for error to set.
        * @return This builder for chaining.
