@@ -342,7 +342,7 @@ func (pm *PackageManager) GetInstalledPlatformRelease(platform *cores.Platform) 
 		pm.Log.WithField("bundle", pl.IsIDEBundled).
 			WithField("version", pl.Version).
 			WithField("managed", pm.IsManagedPlatformRelease(pl)).
-			Infof("%s: %s", msg, pl)
+			Debugf("%s: %s", msg, pl)
 	}
 
 	best := releases[0]
