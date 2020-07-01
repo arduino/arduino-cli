@@ -140,7 +140,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 
 		if !coreSupportPrecompiled {
 			logger := ctx.GetLogger()
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "The plaform does not support 'compiler.libraries.ldflags' for precompiled libraries.")
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "The platform does not support 'compiler.libraries.ldflags' for precompiled libraries.")
 
 		} else if precompiledPath != nil {
 			// Find all libraries in precompiledPath
