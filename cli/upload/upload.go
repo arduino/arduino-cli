@@ -36,6 +36,7 @@ var (
 	verbose    bool
 	verify     bool
 	importDir  string
+	importFile string
 	programmer string
 )
 
@@ -53,6 +54,7 @@ func NewCommand() *cobra.Command {
 	uploadCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
 	uploadCommand.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", "Directory containing binaries to upload.")
+	uploadCommand.Flags().StringVarP(&importDir, "input-file", "", "", "Binary file to upload.")
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
 	uploadCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload or 'list' to list supported programmers.")
@@ -80,6 +82,7 @@ func run(command *cobra.Command, args []string) {
 		Port:       port,
 		Verbose:    verbose,
 		Verify:     verify,
+		ImportFile: importFile,
 		ImportDir:  importDir,
 		Programmer: programmer,
 	}, os.Stdout, os.Stderr); err != nil {
