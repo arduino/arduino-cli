@@ -56,6 +56,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	err = runProgramAction(
 		pm,
 		sketch,
+		req.GetImportFile(),
 		req.GetImportDir(),
 		req.GetFqbn(),
 		req.GetPort(),
@@ -73,7 +74,7 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 }
 
 func runProgramAction(pm *packagemanager.PackageManager,
-	sketch *sketches.Sketch, importDir string, fqbnIn string, port string,
+	sketch *sketches.Sketch, importFile string, importDir string, fqbnIn string, port string,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
 	outStream io.Writer, errStream io.Writer) error {
@@ -241,28 +242,37 @@ func runProgramAction(pm *packagemanager.PackageManager,
 
 	var importPath *paths.Path
 	if !burnBootloader {
-		if sketch == nil {
-			return fmt.Errorf(("no sketch specified"))
-		}
-
-		if importDir != "" {
-			importPath = paths.New(importDir)
+		if importFile != "" {
+			importFilePath := paths.New(importFile)
+			importFilePath.ToAbs()
+			importPath = importFilePath.Parent()
+			uploadProperties.SetPath("build.path", importPath)
+			uploadProperties.Set("build.project_name", importFilePath.Base())
+			feedback.Printf("build.path %s", importPath.String())
+			feedback.Printf("build.project_name %s", importFilePath.Base())
 		} else {
-			// TODO: Create a function to obtain importPath from sketch
-			importPath = sketch.FullPath
-			// Add FQBN (without configs part) to export path
-			fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
-			importPath = importPath.Join("build").Join(fqbnSuffix)
-		}
+			if sketch == nil {
+				return fmt.Errorf(("no sketch specified"))
+			}
+			if importDir != "" {
+				importPath = paths.New(importDir)
+			} else {
+				// TODO: Create a function to obtain importPath from sketch
+				importPath = sketch.FullPath
+				// Add FQBN (without configs part) to export path
+				fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
+				importPath = importPath.Join("build").Join(fqbnSuffix)
+			}
 
-		if !importPath.Exist() {
-			return fmt.Errorf("compiled sketch not found in %s", importPath)
+			if !importPath.Exist() {
+				return fmt.Errorf("compiled sketch not found in %s", importPath)
+			}
+			if !importPath.IsDir() {
+				return fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
+			}
+			uploadProperties.SetPath("build.path", importPath)
+			uploadProperties.Set("build.project_name", sketch.Name+".ino")
 		}
-		if !importPath.IsDir() {
-			return fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
-		}
-		uploadProperties.SetPath("build.path", importPath)
-		uploadProperties.Set("build.project_name", sketch.Name+".ino")
 	}
 
 	// If not using programmer perform some action required
