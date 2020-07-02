@@ -244,12 +244,12 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	if !burnBootloader {
 		if importFile != "" {
 			importFilePath := paths.New(importFile)
-			importFilePath.ToAbs()
 			importPath = importFilePath.Parent()
+			// In general, the binary file extension (like .bin or .hex or even .zip) are already written explicitly in
+			// the core recipes. This why the CLI removes it before setting the build.project_name property.
+			importFileName := strings.ReplaceAll(importFilePath.Base(), importFilePath.Ext(), "")
 			uploadProperties.SetPath("build.path", importPath)
-			uploadProperties.Set("build.project_name", importFilePath.Base())
-			feedback.Printf("build.path %s", importPath.String())
-			feedback.Printf("build.project_name %s", importFilePath.Base())
+			uploadProperties.Set("build.project_name", importFileName)
 		} else {
 			if sketch == nil {
 				return fmt.Errorf(("no sketch specified"))
