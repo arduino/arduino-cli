@@ -244,6 +244,9 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	if !burnBootloader {
 		if importFile != "" {
 			importFilePath := paths.New(importFile)
+			if !importFilePath.Exist() {
+				return fmt.Errorf("binary file not found in %s", importFilePath)
+			}
 			importPath = importFilePath.Parent()
 			// In general, the binary file extension (like .bin or .hex or even .zip) are already written explicitly in
 			// the core recipes. This why the CLI removes it before setting the build.project_name property.
