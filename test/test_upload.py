@@ -13,6 +13,7 @@
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
 import os
+import time
 
 import pytest
 
@@ -45,16 +46,23 @@ def test_upload(run_command, data_dir, detected_boards):
             )
         )
 
-        # Upload using --input-dir
+        # multiple uploads requires some pauses
+        time.sleep(2)
+        # Upload using --input-dir reusing standard sketch "build" folder artifacts
         assert run_command(
-            "upload -b {fqbn} -p {port} --input-dir {sketch_path}/build/{fqbn}".format(
-                sketch_path=sketch_path, fqbn=board.fqbn, port=board.address, sketch_name=sketch_name
+            "upload -b {fqbn} -p {port} --input-dir {sketch_path}/build/{fqbn_path} {sketch_path}".format(
+                sketch_path=sketch_path, fqbn=board.fqbn, port=board.address,
+                fqbn_path=board.fqbn.replace(":", ".")
             )
         )
-        # Upload using --input-file
+
+        # multiple uploads requires some pauses
+        time.sleep(2)
+        # Upload using --input-file reusing standard sketch "build" folder artifacts
         assert run_command(
-            "upload -b {fqbn} -p {port} --input-dir {sketch_path}/build/{fqbn}/{sketch_name}.ino.bin".format(
-                sketch_path=sketch_path, fqbn=board.fqbn, port=board.address, sketch_name=sketch_name
+            "upload -b {fqbn} -p {port} --input-file {sketch_path}/build/{fqbn_path}/{sketch_name}.ino.bin".format(
+                sketch_path=sketch_path, fqbn=board.fqbn, port=board.address, sketch_name=sketch_name,
+                fqbn_path=board.fqbn.replace(":", ".")
             )
         )
 
