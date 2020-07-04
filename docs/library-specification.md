@@ -29,7 +29,7 @@ This file allows the *Library Manager* to search and install a library and its d
 
 The library.properties file is a key=value properties list. Every field in this file is UTF-8 encoded. Unless noted otherwise below, **all fields are required**. The available fields are:
 
-* **name** - the name of the library. Library names must contain only basic letters (`A`-`Z` or `a`-`z`) and numbers (`0`-`9`), spaces (` `), underscores (`_`), dots (`.`) and dashes (`-`). It cannot start or end with a space, and also it cannot start with a number. Note that libraries with a `name` value starting with `Arduino` will no longer be allowed [addition to the Library Manager index](https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ) as these names are now reserved for official Arduino libraries.
+* **name** - the name of the library. Library names must contain only basic letters (`A`-`Z` or `a`-`z`) and numbers (`0`-`9`), spaces (` `), underscores (`_`), dots (`.`) and dashes (`-`). They cannot start with a number. Note that libraries with a `name` value starting with `Arduino` will no longer be allowed [addition to the Library Manager index](https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ) as these names are now reserved for official Arduino libraries.
 * **version** - version of the library. Version should be [semver](http://semver.org/) compliant. 1.2.0 is correct; 1.2 is accepted; r5, 003, 1.1c are invalid
 * **author** - name/nickname of the authors and their email addresses (not mandatory) separated by comma ","
 * **maintainer** - name and email of the maintainer
