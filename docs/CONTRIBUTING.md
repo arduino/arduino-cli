@@ -40,7 +40,7 @@ available in your local environment:
 
 If you want to run integration tests you will also need:
 
-* A serial port with an Arduino device attached
+* A serial port with an Arduino board attached
 * A working [Python][3] environment, version 3.5 or later
 
 If you're working on the gRPC interface you will also have to:
@@ -115,8 +115,21 @@ For these reasons, in addition to regular unit tests the project has a suite of
 integration tests that actually run Arduino CLI in a different process and
 assess the options are correctly understood and the output is what we expect.
 
-To run the full suite of integration tests you need an Arduino device attached
-to a serial port and a working Python environment. Chances are that you already
+#### Hardware requirements for running the full suite of integration tests:
+
+An Arduino board attached to a serial port. The board must:
+
+* Use one of the VID/PID pairs used by Arduino or their partners (as is the case
+with all modern official Arduino boards except the classic Nano).
+* Accept uploads using the FQBN associated with that VID/PID (which will be the
+case unless you have installed a custom bootloader or removed the bootloader).
+
+Note that running the integration tests will result in a sketch being uploaded
+to every attached Arduino board meeting the above requirements.
+
+#### Software requirements for running integration tests:
+
+A working Python environment. Chances are that you already
 have Python installed in your system, if this is not the case you can
 [download][3] the official distribution or use the package manager provided by
 your Operating System.
