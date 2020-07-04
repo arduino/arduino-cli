@@ -222,8 +222,8 @@ $ arduino-cli compile --fqbn arduino:samd:mkr1000 MyFirstSketch
 Sketch uses 9600 bytes (3%) of program storage space. Maximum is 262144 bytes.
 ```
 
-To upload the sketch to your board, run the following command, this time also
-providing the serial port where the board is connected:
+To upload the sketch to your board, run the following command, using the serial
+port your board is connected to:
 
 ```sh
 $ arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:samd:mkr1000 MyFirstSketch
