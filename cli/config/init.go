@@ -33,10 +33,10 @@ const defaultFileName = "arduino-cli.yaml"
 func initInitCommand() *cobra.Command {
 	initCommand := &cobra.Command{
 		Use:   "init",
-		Short: "Initializes a new configuration file into the default location.",
-		Long:  "Initializes a new configuration file into the default location ($EXE_DIR/cli-config.yml).",
+		Short: "Writes current configuration to a configuration file.",
+		Long:  "Creates or updates the configuration file in the data directory or custom directory with the current configuration settings.",
 		Example: "" +
-			"  # Creates a default configuration file into the default location.\n" +
+			"  # Writes current configuration to the configuration file in the data directory.\n" +
 			"  " + os.Args[0] + " config init",
 		Args: cobra.NoArgs,
 		Run:  runInitCommand,
