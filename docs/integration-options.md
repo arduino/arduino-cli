@@ -38,10 +38,7 @@ package index that can be used to work with experimental versions of cores:
 
 ![configuration methods screenshot][]
 
-One note about the example above: passing a value through a command line flag
-always takes precedence over reading an environment variable, which in turn
-always takes precedence over reading the same value from the configuration file
-(if you have one). For more information, see the [configuration documentation].
+See the [configuration documentation] for details about Arduino CLI's configuration system.
 
 Consistent with the previous paragraph, when it comes to providing output the
 Arduino CLI aims to be user friendly but also slightly verbose, something that
