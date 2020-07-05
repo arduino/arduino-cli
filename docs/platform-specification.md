@@ -193,7 +193,10 @@ A full example for the AVR platform can be:
 
 #### Recipes to compute binary sketch size
 
-At the end of the build the Arduino development software shows the final binary sketch size to the user. The size is calculated using the recipe **recipe.size.pattern**. The output of the command executed using the recipe is parsed through the regular expression set in the property **recipe.size.regex**. The regular expression must match the sketch size.
+At the end of the build the Arduino development software shows the final binary sketch size to the user. The size is calculated using the recipe **recipe.size.pattern**. The output of the command executed using the recipe is parsed through the regular expressions set in the properties:
+
+* **recipe.size.regex**: Program storage space used.
+* **recipe.size.regex.data**: Dynamic memory used by global variables.
 
 For AVR we have:
 
@@ -201,7 +204,8 @@ For AVR we have:
     [....]
     ## Compute size
     recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.hex"
-    recipe.size.regex=Total\s+([0-9]+).*
+    recipe.size.regex=^(?:\.text|\.data|\.bootloader)\s+([0-9]+).*
+    recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+([0-9]+).*
 
 #### Recipes to export compiled binary
 
