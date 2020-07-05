@@ -279,7 +279,7 @@ Properties defined in a platform.txt created in the **hardware** subfolder of th
 
 ## platform.local.txt
 
-Introduced in Arduino IDE 1.5.7. This file can be used to override properties defined in platform.txt or define new properties without modifying platform.txt (e.g. when platform.txt is tracked by a version control system). It should be placed in the architecture folder.
+Introduced in Arduino IDE 1.5.7. This file can be used to override properties defined in platform.txt or define new properties without modifying platform.txt (e.g. when platform.txt is tracked by a version control system). It should be placed in the same folder as the platform.txt it supplements.
 
 
 ## boards.txt
