@@ -5,7 +5,7 @@ This is the specification for the 3rd party library format to be used with Ardui
 * rev.2.1 will be implemented starting from version Arduino IDE 1.6.10
 * rev.2.2 will be implemented starting from version Arduino IDE 1.8.10
 
-This new library format is intended to be used in tandem with **Library Manager**, available since Arduino IDE 1.6.2. The Library Manager allows users to automatically download and install libraries needed in their projects, with an easy to use graphic interface in the [Arduino IDE](https://www.arduino.cc/en/guide/libraries#toc3)/Pro IDE and [Arduino Web Editor](https://create.arduino.cc/projecthub/Arduino_Genuino/getting-started-with-arduino-web-editor-on-various-platforms-4b3e4a#toc-libraries-and-the-arduino-web-editor-11) as well as [`arduino-cli lib`](https://arduino.github.io/arduino-cli/commands/arduino-cli_lib/). It doesn't yet take care of dependencies between libraries.
+This new library format is intended to be used in tandem with **Library Manager**, available since Arduino IDE 1.6.2. The Library Manager allows users to automatically download and install libraries needed in their projects, with an easy to use graphic interface in the [Arduino IDE](https://www.arduino.cc/en/guide/libraries#toc3)/Pro IDE and [Arduino Web Editor](https://create.arduino.cc/projecthub/Arduino_Genuino/getting-started-with-arduino-web-editor-on-various-platforms-4b3e4a#toc-libraries-and-the-arduino-web-editor-11) as well as [`arduino-cli lib`](https://arduino.github.io/arduino-cli/commands/arduino-cli_lib/).
 
 More information about how Library Manager works is available [here](https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ).
 
