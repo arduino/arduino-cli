@@ -371,7 +371,7 @@ The parameter **build.variant.path** is automatically generated.
 
 ## Tools
 
-The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn bootloaders using external programmers. Currently *avrdude* is used for AVR based boards and *bossac* for SAM based boards, but there is no limit, any command line executable can be used. The command line parameters are specified using **recipes** in the same way used for platform build process.
+The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn bootloaders using external programmers. For example, *avrdude* is used for AVR based boards and *bossac* for SAM based boards, but there is no limit, any command line executable can be used. The command line parameters are specified using **recipes** in the same way used for platform build process.
 
 Tools are configured inside the platform.txt file. Every Tool is identified by a short name, the Tool ID.
 A tool can be used for different purposes:
