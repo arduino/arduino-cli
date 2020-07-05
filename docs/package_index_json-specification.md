@@ -193,7 +193,7 @@ Finally, let's see how `PLATFORMS` are made.
 Each PLATFORM describes a core for a specific architecture. The fields needed are:
 
 * `name`: the extended name of the platform that is displayed on the Boards Manager GUI
-* `architecture`: is the architecture of the plaftorm (avr, sam, etc...). It must match the architecture of the core as explained in the [Arduino platform specification](platform-specification.md#hardware-folders-structure)
+* `architecture`: is the architecture of the platform (avr, sam, etc...). It must match the architecture of the core as explained in the [Arduino platform specification](platform-specification.md#hardware-folders-structure)
 * `version`: the version of the platform.
 * `category`: this field is reserved, a 3rd party core must set it to `Contributed`
 * `help`/`online`: is a URL that is displayed on the Arduino IDE's Boards Manager as an "Online Help" link

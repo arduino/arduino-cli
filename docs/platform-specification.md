@@ -471,12 +471,12 @@ The port selected via the IDE or [`arduino-cli upload`](https://arduino.github.i
 
 ### Upload using an external programmer
 
-**TODO...**
+**TODO...**<br>
 The platform.txt associated with the selected programmer will be used.
 
 ### Burn Bootloader
 
-**TODO...**
+**TODO...**<br>
 The platform.txt associated with the selected board will be used.
 
 ## Custom board options
@@ -551,7 +551,7 @@ There is no limit to the number of custom menus that can be defined.
 
 ## Referencing another core, variant or tool
 
-Inside the boards.txt we can define a board that uses a core provided by another vendor/mantainer using the syntax **VENDOR_ID:CORE_ID**. For example, if we want to define a board that uses the "arduino" core from the "arduino" vendor we should write:
+Inside the boards.txt we can define a board that uses a core provided by another vendor/maintainer using the syntax **VENDOR_ID:CORE_ID**. For example, if we want to define a board that uses the "arduino" core from the "arduino" vendor we should write:
 
     [....]
     myboard.name=My Wonderful Arduino Compatible board

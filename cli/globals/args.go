@@ -55,7 +55,7 @@ func ParseReferenceArgs(args []string, parseArch bool) ([]*ReferenceArg, error) 
 func ParseReferenceArg(arg string, parseArch bool) (*ReferenceArg, error) {
 	ret := &ReferenceArg{}
 	if arg == "" {
-		return nil, fmt.Errorf("invalid empry core argument")
+		return nil, fmt.Errorf("invalid empty core argument")
 	}
 	toks := strings.SplitN(arg, "@", 2)
 	if toks[0] == "" {
