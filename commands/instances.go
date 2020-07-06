@@ -210,10 +210,10 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 
 		tmpFile, err := ioutil.TempFile("", "")
 		if err != nil {
-			return nil, fmt.Errorf("creating temp file for download: %s", err)
+			return nil, fmt.Errorf("creating temp file for index download: %s", err)
 		}
 		if err := tmpFile.Close(); err != nil {
-			return nil, fmt.Errorf("creating temp file for download: %s", err)
+			return nil, fmt.Errorf("creating temp file for index download: %s", err)
 		}
 		tmp := paths.New(tmpFile.Name())
 		defer tmp.Remove()
@@ -230,6 +230,36 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 		Download(d, "Updating index: "+coreIndexPath.Base(), downloadCB)
 		if d.Error() != nil {
 			return nil, fmt.Errorf("downloading index %s: %s", URL, d.Error())
+		}
+
+		// Check for signature
+		var tmpSig *paths.Path
+		if URL.Hostname() == "downloads.arduino.cc" {
+			URLSig, err := url.Parse(URL.String())
+			if err != nil {
+				return nil, fmt.Errorf("parsing url for index signature check: %s", err)
+			}
+			URLSig.Path += ".sig"
+
+			if t, err := ioutil.TempFile("", ""); err != nil {
+				return nil, fmt.Errorf("creating temp file for index signature download: %s", err)
+			} else if err := t.Close(); err != nil {
+				return nil, fmt.Errorf("creating temp file for index signature download: %s", err)
+			} else {
+				tmpSig = paths.New(t.Name())
+			}
+			defer tmpSig.Remove()
+
+			d, err := downloader.DownloadWithConfig(tmpSig.String(), URLSig.String(), *config)
+			if err != nil {
+				return nil, fmt.Errorf("downloading index signature %s: %s", URLSig, err)
+			}
+
+			coreIndexSigPath := indexpath.Join(path.Base(URLSig.Path))
+			Download(d, "Updating index: "+coreIndexSigPath.Base(), downloadCB)
+			if d.Error() != nil {
+				return nil, fmt.Errorf("downloading index signature %s: %s", URL, d.Error())
+			}
 		}
 
 		if _, err := packageindex.LoadIndex(tmp); err != nil {
