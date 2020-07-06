@@ -1969,10 +1969,10 @@ tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; 
 <h3 id="serial-port">Serial port<a class="headerlink" href="#serial-port" title="Permanent link">&para;</a></h3>
 <p>The port selected via the IDE or <a href="https://arduino.github.io/arduino-cli/commands/arduino-cli_upload/"><code>arduino-cli upload</code></a>'s <code>--port</code> option is available as a configuration property <strong>{serial.port}</strong>.</p>
 <h3 id="upload-using-an-external-programmer">Upload using an external programmer<a class="headerlink" href="#upload-using-an-external-programmer" title="Permanent link">&para;</a></h3>
-<p><strong>TODO...</strong>
+<p><strong>TODO...</strong><br>
 The platform.txt associated with the selected programmer will be used.</p>
 <h3 id="burn-bootloader">Burn Bootloader<a class="headerlink" href="#burn-bootloader" title="Permanent link">&para;</a></h3>
-<p><strong>TODO...</strong>
+<p><strong>TODO...</strong><br>
 The platform.txt associated with the selected board will be used.</p>
 <h2 id="custom-board-options">Custom board options<a class="headerlink" href="#custom-board-options" title="Permanent link">&para;</a></h2>
 <p>It can sometimes be useful to provide user selectable configuration options for a specific board. For example, a board could be provided in two or more variants with different CPUs, or may have different crystal speed based on the board model, and so on...</p>
@@ -2042,7 +2042,7 @@ duemilanove.menu.cpu.atmega168.build.mcu               =&gt;   build.mcu
 <p>There is no limit to the number of custom menus that can be defined.</p>
 <p><strong>TODO: add an example with more than one submenu</strong></p>
 <h2 id="referencing-another-core-variant-or-tool">Referencing another core, variant or tool<a class="headerlink" href="#referencing-another-core-variant-or-tool" title="Permanent link">&para;</a></h2>
-<p>Inside the boards.txt we can define a board that uses a core provided by another vendor/mantainer using the syntax <strong>VENDOR_ID:CORE_ID</strong>. For example, if we want to define a board that uses the "arduino" core from the "arduino" vendor we should write:</p>
+<p>Inside the boards.txt we can define a board that uses a core provided by another vendor/maintainer using the syntax <strong>VENDOR_ID:CORE_ID</strong>. For example, if we want to define a board that uses the "arduino" core from the "arduino" vendor we should write:</p>
 <div class="codehilite"><pre><span></span><code>[....]
 myboard.name=My Wonderful Arduino Compatible board
 myboard.build.core=arduino:arduino
