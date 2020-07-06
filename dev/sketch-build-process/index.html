@@ -1214,6 +1214,7 @@
 <h3 id="location-priority">Location Priority<a class="headerlink" href="#location-priority" title="Permanent link">&para;</a></h3>
 <p>The "location priority" is determined as follows (in order of highest to lowest priority):</p>
 <ol>
+<li>The library is in a custom libraries path specified via the <a href="../commands/arduino-cli_compile/#options"><code>--libraries</code> option</a> of <code>arduino-cli compile</code> (in decreasing order of priority when multiple custom paths are defined)</li>
 <li>The library is in the <code>libraries</code> subfolder of the IDE's sketchbook or Arduino CLI's user directory</li>
 <li>The library is bundled with the board platform/core (<a href="../platform-specification/#global-predefined-properties"><code>{runtime.platform.path}/libraries</code></a>)</li>
 <li>The library is bundled with the <a href="../platform-specification/#referencing-another-core-variant-or-tool">referenced</a> board platform/core</li>
