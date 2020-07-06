@@ -41,12 +41,13 @@ require (
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/jwalterweatherman v1.0.0
 	github.com/spf13/viper v1.6.2
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.6.1
 	go.bug.st/cleanup v1.0.0
 	go.bug.st/downloader/v2 v2.0.1
 	go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18
 	go.bug.st/serial v1.0.0
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect
+	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect
 	golang.org/x/text v0.3.2
