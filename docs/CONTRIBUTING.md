@@ -261,7 +261,7 @@ updated or not.
 
 ## Internationalization (i18n)
 
-In order to support i18n in the cli, any messages that are intended to be translated
+In order to support i18n in the CLI, any messages that are intended to be translated
 should be wrapped in a call to `i18n.Tr`. This call allows us to build a catalog of
 translatable strings, replacing the reference string at runtime with the localized value.
 

@@ -75,7 +75,7 @@ These are available from the [releases page](https://github.com/arduino/arduino-
 
 #### Nightly builds
 
-These builds are generated everyday at 01:00 GMT from the `master` branch and
+These builds are generated every day at 01:00 GMT from the `master` branch and
 should be considered unstable. In order to get the latest nightly build
 available for the supported platform, use the following links:
 
@@ -84,7 +84,7 @@ Platform  |                            |                            |
 Linux     | [Nightly Linux 32 bit]     | [Nightly Linux 64 bit]     |
 Linux ARM | [Nightly Linux ARM 32 bit] | [Nightly Linux ARM 64 bit] |
 Windows   | [Nightly Windows 32 bit]   | [Nightly Windows 64 bit]   |
-Mac OSX   |                            | [Mac OSX]                  |
+Mac OSX   |                            | [Nightly Mac OSX]                  |
 
 [Nightly Linux 64 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_64bit.tar.gz
 [Nightly Linux 32 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_32bit.tar.gz

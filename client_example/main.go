@@ -38,7 +38,7 @@ var (
 )
 
 // The main function implements an example workflow to show how to interact
-// with the gRPC Api exposed by arduino-cli when running in daemon mode.
+// with the gRPC API exposed by arduino-cli when running in daemon mode.
 func main() {
 
 	// Establish a connection with the gRPC server, started with the command:
@@ -50,7 +50,7 @@ func main() {
 	defer conn.Close()
 
 	// To avoid polluting an existing arduino-cli installation, the example
-	// client uses a temp folder to keep cores, libraries and the likes.
+	// client uses a temp folder to keep cores, libraries and the like.
 	// You can point `dataDir` to a location that better fits your needs.
 	dataDir, err = ioutil.TempDir("", "arduino-rpc-client")
 	if err != nil {
@@ -92,7 +92,7 @@ func main() {
 	log.Println("calling Init")
 	instance := initInstance(client)
 
-	// With a brand new instance, the first operation should always be updatating
+	// With a brand new instance, the first operation should always be updating
 	// the index.
 	log.Println("calling UpdateIndex")
 	callUpdateIndex(client, instance)
@@ -138,7 +138,7 @@ func main() {
 	// debugClient := dbg.NewDebugClient(conn)
 	// debugStreamingClient, err := debugClient.Debug(context.Background())
 	// if err != nil {
-	// 	 log.Fatalf("debug steraming open  error: %s\n", err)
+	// 	 log.Fatalf("debug streaming open error: %s\n", err)
 	// }
 	// log.Println("calling Debug(arduino:samd:mkr1000, hello.ino)")
 	// callDebugger(debugStreamingClient, instance)
