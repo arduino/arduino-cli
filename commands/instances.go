@@ -208,14 +208,14 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 
 		logrus.WithField("url", URL).Print("Updating index")
 
-		tmpFile, err := ioutil.TempFile("", "")
-		if err != nil {
+		var tmp *paths.Path
+		if tmpFile, err := ioutil.TempFile("", ""); err != nil {
 			return nil, fmt.Errorf("creating temp file for index download: %s", err)
-		}
-		if err := tmpFile.Close(); err != nil {
+		} else if err := tmpFile.Close(); err != nil {
 			return nil, fmt.Errorf("creating temp file for index download: %s", err)
+		} else {
+			tmp = paths.New(tmpFile.Name())
 		}
-		tmp := paths.New(tmpFile.Name())
 		defer tmp.Remove()
 
 		config, err := GetDownloaderConfig()
