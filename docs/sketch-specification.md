@@ -55,7 +55,7 @@ The Arduino IDE's **File > Save As...** only copies the code files in the sketch
 
 Arduino CLI and Arduino Web Editor use a file named sketch.json, located in the sketch root folder, to store sketch metadata.
 
-The `cpu` key contains the board configuration information. This can be set via [`arduino-cli board attach`](https://arduino.github.io/arduino-cli/commands/arduino-cli_board_attach/) or by selecting a board in the Arduino Web Editor while the sketch is open. With this configuration set, it is not necessary to specify the `--fqbn` flag to the [`arduino-cli compile`](https://arduino.github.io/arduino-cli/commands/arduino-cli_compile/) or [`arduino-cli upload`](https://arduino.github.io/arduino-cli/commands/arduino-cli_upload/) commands when compiling or uploading the sketch.
+The `cpu` key contains the board configuration information. This can be set via [`arduino-cli board attach`](https://arduino.github.io/arduino-cli/commands/arduino-cli_board_attach/) or by selecting a board in the Arduino Web Editor while the sketch is open. With this configuration set, it is not necessary to specify the `--fqbn` or `--port` flags to the [`arduino-cli compile`](https://arduino.github.io/arduino-cli/commands/arduino-cli_compile/) or [`arduino-cli upload`](https://arduino.github.io/arduino-cli/commands/arduino-cli_upload/) commands when compiling or uploading the sketch.
 
 The `included_libs` key defines the library versions the Arduino Web Editor uses when the sketch is compiled. This is Arduino Web Editor specific because all versions of all the Library Manager libraries are pre-installed in Arduino Web Editor, while only one version of each library may be installed when using the other Arduino development software.
 
