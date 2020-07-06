@@ -34,4 +34,4 @@ To run very specific test functions:
 pytest test_lib.py::test_list
 ```
 
-[0]: ../CONTRIBUTING.md
+[0]: ../docs/CONTRIBUTING.md
