@@ -41,7 +41,7 @@ available in your local environment:
 If you want to run integration tests you will also need:
 
 * A serial port with an Arduino board attached
-* A working [Python][3] environment, version 3.5 or later
+* A working [Python][3] environment, version 3.8 or later
 
 If you're working on the gRPC interface you will also have to:
 
