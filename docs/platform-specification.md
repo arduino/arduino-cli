@@ -595,4 +595,4 @@ Introduced in Arduino IDE 1.6.6. This file can be used to override properties de
 
 ## keywords.txt
 
-As of Arduino IDE 1.6.6, per-platform keywords can be defined by adding a keywords.txt file to the platform's architecture folder. These keywords are only highlighted in the Arduino IDE when one of the boards of that platform are selected. This file follows the [same format](library-specification.md#keywords) as the keywords.txt used in libraries. Each keyword must be separated from the keyword identifier by a tab.
+As of Arduino IDE 1.6.6, per-platform keywords can be defined by adding a keywords.txt file to the platform's architecture folder. These keywords are only highlighted in the Arduino IDE when one of the boards of that platform are selected. This file follows the [same format](library-specification.md#keywords) as the keywords.txt used in libraries.
