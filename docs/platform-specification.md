@@ -193,7 +193,10 @@ A full example for the AVR platform can be:
 
 #### Recipes to compute binary sketch size
 
-At the end of the build the Arduino development software shows the final binary sketch size to the user. The size is calculated using the recipe **recipe.size.pattern**. The output of the command executed using the recipe is parsed through the regular expression set in the property **recipe.size.regex**. The regular expression must match the sketch size.
+At the end of the build the Arduino development software shows the final binary sketch size to the user. The size is calculated using the recipe **recipe.size.pattern**. The output of the command executed using the recipe is parsed through the regular expressions set in the properties:
+
+* **recipe.size.regex**: Program storage space used.
+* **recipe.size.regex.data**: Dynamic memory used by global variables.
 
 For AVR we have:
 
@@ -201,7 +204,8 @@ For AVR we have:
     [....]
     ## Compute size
     recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.hex"
-    recipe.size.regex=Total\s+([0-9]+).*
+    recipe.size.regex=^(?:\.text|\.data|\.bootloader)\s+([0-9]+).*
+    recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+([0-9]+).*
 
 #### Recipes to export compiled binary
 
@@ -275,7 +279,7 @@ Properties defined in a platform.txt created in the **hardware** subfolder of th
 
 ## platform.local.txt
 
-Introduced in Arduino IDE 1.5.7. This file can be used to override properties defined in platform.txt or define new properties without modifying platform.txt (e.g. when platform.txt is tracked by a version control system). It should be placed in the architecture folder.
+Introduced in Arduino IDE 1.5.7. This file can be used to override properties defined in platform.txt or define new properties without modifying platform.txt (e.g. when platform.txt is tracked by a version control system). It should be placed in the same folder as the platform.txt it supplements.
 
 
 ## boards.txt
@@ -367,7 +371,7 @@ The parameter **build.variant.path** is automatically generated.
 
 ## Tools
 
-The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn bootloaders using external programmers. Currently *avrdude* is used for AVR based boards and *bossac* for SAM based boards, but there is no limit, any command line executable can be used. The command line parameters are specified using **recipes** in the same way used for platform build process.
+The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn bootloaders using external programmers. For example, *avrdude* is used for AVR based boards and *bossac* for SAM based boards, but there is no limit, any command line executable can be used. The command line parameters are specified using **recipes** in the same way used for platform build process.
 
 Tools are configured inside the platform.txt file. Every Tool is identified by a short name, the Tool ID.
 A tool can be used for different purposes:
@@ -456,7 +460,7 @@ Most **{upload.XXXX}** variables are used later in the avrdude upload recipe in 
     [.....]
 
 #### 1200 bps bootloader reset
-Most Arduino boards use a dedicated USB-to-serial chip, that takes care of restarting the main MCU (starting the bootloader) when the serial port is opened. However, boards that have a native USB connection (such as the Leonardo or Zero) will have to disconnect from USB when rebooting into the bootloader (after which the bootloader reconnects to USB and offers a new serial port for uploading). After the upload is complete, the bootloader disconnects from USB again, starts the sketch, which then reconnects to USB. Because of these reconnections, the standard restart-on-serial open will not work, since that would cause the serial port to disappear and be closed again. Instead, the sketch running on these boards interprets a bitrate of 1200 bps as a signal the bootloader should be started.
+Some Arduino boards use a dedicated USB-to-serial chip, that takes care of restarting the main MCU (starting the bootloader) when the serial port is opened. However, boards that have a native USB connection (such as the Leonardo or Zero) will have to disconnect from USB when rebooting into the bootloader (after which the bootloader reconnects to USB and offers a new serial port for uploading). After the upload is complete, the bootloader disconnects from USB again, starts the sketch, which then reconnects to USB. Because of these reconnections, the standard restart-on-serial open will not work, since that would cause the serial port to disappear and be closed again. Instead, the sketch running on these boards interprets a bitrate of 1200 bps as a signal the bootloader should be started.
 
 To let the Arduino development software perform these steps, two board parameters can be set:
 
