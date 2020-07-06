@@ -50,5 +50,5 @@ func VerifyArduinoDetachedSignature(targetPath *paths.Path, signaturePath *paths
 	}
 	defer signature.Close()
 	signer, err := openpgp.CheckDetachedSignature(keyRing, target, signature)
-	return true, signer, err
+	return (signer != nil && err == nil), signer, err
 }

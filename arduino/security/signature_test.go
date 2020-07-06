@@ -28,4 +28,9 @@ func TestSignatureVerification(t *testing.T) {
 	require.NotNil(t, signer)
 	require.True(t, res)
 	require.Equal(t, uint64(0x7baf404c2dfab4ae), signer.PrimaryKey.KeyId)
+
+	res, signer, err = VerifyArduinoDetachedSignature(paths.New("testdata/invalid_file.json"), paths.New("testdata/package_index.json.sig"))
+	require.False(t, res)
+	require.Nil(t, signer)
+	require.Error(t, err)
 }
