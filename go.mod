@@ -2,6 +2,9 @@ module github.com/arduino/arduino-cli
 
 go 1.14
 
+// This one must be kept until https://github.com/GeertJohan/go.rice/pull/159 is merged
+replace github.com/GeertJohan/go.rice => github.com/cmaglie/go.rice v1.0.1
+
 require (
 	bou.ke/monkey v1.0.1
 	github.com/GeertJohan/go.rice v1.0.0
