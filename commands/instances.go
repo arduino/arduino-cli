@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -234,6 +235,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 
 		// Check for signature
 		var tmpSig *paths.Path
+		var coreIndexSigPath *paths.Path
 		if URL.Hostname() == "downloads.arduino.cc" {
 			URLSig, err := url.Parse(URL.String())
 			if err != nil {
@@ -255,10 +257,18 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 				return nil, fmt.Errorf("downloading index signature %s: %s", URLSig, err)
 			}
 
-			coreIndexSigPath := indexpath.Join(path.Base(URLSig.Path))
+			coreIndexSigPath = indexpath.Join(path.Base(URLSig.Path))
 			Download(d, "Updating index: "+coreIndexSigPath.Base(), downloadCB)
 			if d.Error() != nil {
 				return nil, fmt.Errorf("downloading index signature %s: %s", URL, d.Error())
+			}
+
+			valid, _, err := security.VerifyArduinoDetachedSignature(tmp, tmpSig)
+			if err != nil {
+				return nil, fmt.Errorf("signature verification error: %s", err)
+			}
+			if !valid {
+				return nil, fmt.Errorf("index has an invalid signature")
 			}
 		}
 
@@ -272,6 +282,9 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 
 		if err := tmp.CopyTo(coreIndexPath); err != nil {
 			return nil, fmt.Errorf("saving downloaded index %s: %s", URL, err)
+		}
+		if err := tmpSig.CopyTo(coreIndexSigPath); err != nil {
+			return nil, fmt.Errorf("saving downloaded index signature: %s", err)
 		}
 	}
 	if _, err := Rescan(id); err != nil {
