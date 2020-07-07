@@ -350,6 +350,26 @@
     Integration tests
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hardware-requirements-for-running-the-full-suite-of-integration-tests" class="md-nav__link">
+    Hardware requirements for running the full suite of integration tests:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#software-requirements-for-running-integration-tests" class="md-nav__link">
+    Software requirements for running integration tests:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -1115,6 +1135,26 @@
     Integration tests
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hardware-requirements-for-running-the-full-suite-of-integration-tests" class="md-nav__link">
+    Hardware requirements for running the full suite of integration tests:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#software-requirements-for-running-integration-tests" class="md-nav__link">
+    Software requirements for running integration tests:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -1229,8 +1269,8 @@ available in your local environment:</p>
 </ul>
 <p>If you want to run integration tests you will also need:</p>
 <ul>
-<li>A serial port with an Arduino device attached</li>
-<li>A working <a href="https://www.python.org/downloads/">Python</a> environment, version 3.5 or later</li>
+<li>A serial port with an Arduino board attached</li>
+<li>A working <a href="https://www.python.org/downloads/">Python</a> environment, version 3.8 or later</li>
 </ul>
 <p>If you're working on the gRPC interface you will also have to:</p>
 <ul>
@@ -1292,8 +1332,18 @@ working.</p>
 <p>For these reasons, in addition to regular unit tests the project has a suite of
 integration tests that actually run Arduino CLI in a different process and
 assess the options are correctly understood and the output is what we expect.</p>
-<p>To run the full suite of integration tests you need an Arduino device attached
-to a serial port and a working Python environment. Chances are that you already
+<h4 id="hardware-requirements-for-running-the-full-suite-of-integration-tests">Hardware requirements for running the full suite of integration tests:<a class="headerlink" href="#hardware-requirements-for-running-the-full-suite-of-integration-tests" title="Permanent link">&para;</a></h4>
+<p>An Arduino board attached to a serial port. The board must:</p>
+<ul>
+<li>Use one of the VID/PID pairs used by Arduino or their partners (as is the case
+with all modern official Arduino boards except the classic Nano).</li>
+<li>Accept uploads using the FQBN associated with that VID/PID (which will be the
+case unless you have installed a custom bootloader or removed the bootloader).</li>
+</ul>
+<p>Note that running the integration tests will result in a sketch being uploaded
+to every attached Arduino board meeting the above requirements.</p>
+<h4 id="software-requirements-for-running-integration-tests">Software requirements for running integration tests:<a class="headerlink" href="#software-requirements-for-running-integration-tests" title="Permanent link">&para;</a></h4>
+<p>A working Python environment. Chances are that you already
 have Python installed in your system, if this is not the case you can
 <a href="https://www.python.org/downloads/">download</a> the official distribution or use the package manager provided by
 your Operating System.</p>
