@@ -283,8 +283,10 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 		if err := tmp.CopyTo(coreIndexPath); err != nil {
 			return nil, fmt.Errorf("saving downloaded index %s: %s", URL, err)
 		}
-		if err := tmpSig.CopyTo(coreIndexSigPath); err != nil {
-			return nil, fmt.Errorf("saving downloaded index signature: %s", err)
+		if tmpSig != nil {
+			if err := tmpSig.CopyTo(coreIndexSigPath); err != nil {
+				return nil, fmt.Errorf("saving downloaded index signature: %s", err)
+			}
 		}
 	}
 	if _, err := Rescan(id); err != nil {
