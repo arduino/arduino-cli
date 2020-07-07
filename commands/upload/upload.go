@@ -193,7 +193,11 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	if requiredTools, err := pm.FindToolsRequiredForBoard(board); err == nil {
 		for _, requiredTool := range requiredTools {
 			logrus.WithField("tool", requiredTool).Info("Tool required for upload")
-			uploadProperties.Merge(requiredTool.RuntimeProperties())
+			if requiredTool.IsInstalled() {
+				uploadProperties.Merge(requiredTool.RuntimeProperties())
+			} else {
+				errStream.Write([]byte(fmt.Sprintf("Warning: tool '%s' is not installed. It might not be available for your OS.", requiredTool)))
+			}
 		}
 	}
 

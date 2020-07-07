@@ -133,8 +133,10 @@ func (tr *ToolRelease) String() string {
 // RuntimeProperties returns the runtime properties for this tool
 func (tr *ToolRelease) RuntimeProperties() *properties.Map {
 	res := properties.NewMap()
-	res.Set("runtime.tools."+tr.Tool.Name+".path", tr.InstallDir.String())
-	res.Set("runtime.tools."+tr.Tool.Name+"-"+tr.Version.String()+".path", tr.InstallDir.String())
+	if tr.IsInstalled() {
+		res.Set("runtime.tools."+tr.Tool.Name+".path", tr.InstallDir.String())
+		res.Set("runtime.tools."+tr.Tool.Name+"-"+tr.Version.String()+".path", tr.InstallDir.String())
+	}
 	return res
 }
 
