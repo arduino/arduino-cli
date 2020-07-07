@@ -334,6 +334,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#brew" class="md-nav__link">
+    Brew
+  </a>
+  
+</li>
+      
       
       
       
@@ -1047,6 +1054,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#brew" class="md-nav__link">
+    Brew
+  </a>
+  
+</li>
+      
       
       
       
@@ -1076,29 +1090,29 @@ By default this command will print on the standard output (the shell window) the
 <h3 id="bash">Bash<a class="headerlink" href="#bash" title="Permanent link">&para;</a></h3>
 <p>Use <code>arduino-cli completion bash &gt; arduino-cli.sh</code> to generate the completion file.
 At this point you can move that file in <code>/etc/bash_completion.d/</code> (root access is required) with <code>sudo mv arduino-cli.sh /etc/bash_completion.d/</code>.</p>
-<p>A not recommended alternative is to source the completion file in <code>.bashrc</code>.</p>
-<p>Remember to open a new shell to test the functionality</p>
+<p>A not recommended alternative is to source the completion file in <code>~/.bashrc</code>.</p>
+<p>Remember to open a new shell to test the functionality.</p>
 <h3 id="zsh">Zsh<a class="headerlink" href="#zsh" title="Permanent link">&para;</a></h3>
 <p>Use <code>arduino-cli completion zsh &gt; _arduino-cli</code> to generate the completion file.
 At this point you can place the file in a directory listed in your <code>fpath</code> if you have already created a directory to store your completion.</p>
 <p>Or if you want you can create a directory, add it to your <code>fpath</code> and copy the file in it:</p>
 <ol>
 <li><code>mkdir ~/completion_zsh</code></li>
-<li>add <code>fpath=($HOME/completion_zsh $fpath)</code> at the beginning of your <code>.zshrc</code> file</li>
+<li>add <code>fpath=($HOME/completion_zsh $fpath)</code> at the beginning of your <code>~/.zshrc</code> file</li>
 <li><code>mv _arduino-cli ~/completion_zsh/</code></li>
 </ol>
-<p>Remember to open a new shell to test the functionality</p>
-<p><em>N.B.</em>
-The Zsh completion is working with <a href="https://ohmyz.sh/">Oh-My-Zsh</a> but not with <a href="https://github.com/sorin-ionescu/prezto">Prezto</a> (the zsh completion system is working in a different way than classic zsh). But hopefully it will be fixed in the future</p>
+<p>Remember to open a new shell to test the functionality.</p>
 <h3 id="fish">Fish<a class="headerlink" href="#fish" title="Permanent link">&para;</a></h3>
 <p>Use <code>arduino-cli completion fish &gt; arduino-cli.fish</code> to generate the completion file.
 At this point you can place the file in <code>~/.config/fish/completions</code> as stated in the <a href="http://fishshell.com/docs/current/index.html#where-to-put-completions">official documentation</a>.
 Remember to create the directory if it's not already there <code>mkdir -p ~/.config/fish/completions/</code> and then place the completion file in there with <code>mv arduino-cli.fish ~/.config/fish/completions/</code></p>
-<p>Remember to open a new shell to test the functionality</p>
+<p>Remember to open a new shell to test the functionality.</p>
 <h4 id="disabling-command-and-flag-descriptions">Disabling command and flag descriptions<a class="headerlink" href="#disabling-command-and-flag-descriptions" title="Permanent link">&para;</a></h4>
 <p>By default fish completion has command and flag description enabled by default. If you want to disable this behaviour you can simply pass the <code>--no-descriptions</code> flag when calling <code>completion</code> command and the generated file will not have descriptions</p>
 <p><em>N.B.</em>
 This flag is not compatible with bash or zsh</p>
+<h3 id="brew">Brew<a class="headerlink" href="#brew" title="Permanent link">&para;</a></h3>
+<p>If you install the <code>arduino-cli</code> using <a href="https://brew.sh/">homebrew</a> package manager the completion should work out of the box if you have followed the <a href="https://docs.brew.sh/Shell-Completion">official documentation</a>.</p>
                 
                   
                 
