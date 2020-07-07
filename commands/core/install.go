@@ -86,7 +86,9 @@ func installPlatform(pm *packagemanager.PackageManager,
 	// Package download
 	taskCB(&rpc.TaskProgress{Name: "Downloading packages"})
 	for _, tool := range toolsToInstall {
-		downloadTool(pm, tool, downloadCB)
+		if err := downloadTool(pm, tool, downloadCB); err != nil {
+			return err
+		}
 	}
 	downloadPlatform(pm, platformRelease, downloadCB)
 	taskCB(&rpc.TaskProgress{Completed: true})
