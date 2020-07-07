@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -208,14 +209,14 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 
 		logrus.WithField("url", URL).Print("Updating index")
 
-		tmpFile, err := ioutil.TempFile("", "")
-		if err != nil {
-			return nil, fmt.Errorf("creating temp file for download: %s", err)
+		var tmp *paths.Path
+		if tmpFile, err := ioutil.TempFile("", ""); err != nil {
+			return nil, fmt.Errorf("creating temp file for index download: %s", err)
+		} else if err := tmpFile.Close(); err != nil {
+			return nil, fmt.Errorf("creating temp file for index download: %s", err)
+		} else {
+			tmp = paths.New(tmpFile.Name())
 		}
-		if err := tmpFile.Close(); err != nil {
-			return nil, fmt.Errorf("creating temp file for download: %s", err)
-		}
-		tmp := paths.New(tmpFile.Name())
 		defer tmp.Remove()
 
 		config, err := GetDownloaderConfig()
@@ -232,6 +233,45 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 			return nil, fmt.Errorf("downloading index %s: %s", URL, d.Error())
 		}
 
+		// Check for signature
+		var tmpSig *paths.Path
+		var coreIndexSigPath *paths.Path
+		if URL.Hostname() == "downloads.arduino.cc" {
+			URLSig, err := url.Parse(URL.String())
+			if err != nil {
+				return nil, fmt.Errorf("parsing url for index signature check: %s", err)
+			}
+			URLSig.Path += ".sig"
+
+			if t, err := ioutil.TempFile("", ""); err != nil {
+				return nil, fmt.Errorf("creating temp file for index signature download: %s", err)
+			} else if err := t.Close(); err != nil {
+				return nil, fmt.Errorf("creating temp file for index signature download: %s", err)
+			} else {
+				tmpSig = paths.New(t.Name())
+			}
+			defer tmpSig.Remove()
+
+			d, err := downloader.DownloadWithConfig(tmpSig.String(), URLSig.String(), *config)
+			if err != nil {
+				return nil, fmt.Errorf("downloading index signature %s: %s", URLSig, err)
+			}
+
+			coreIndexSigPath = indexpath.Join(path.Base(URLSig.Path))
+			Download(d, "Updating index: "+coreIndexSigPath.Base(), downloadCB)
+			if d.Error() != nil {
+				return nil, fmt.Errorf("downloading index signature %s: %s", URL, d.Error())
+			}
+
+			valid, _, err := security.VerifyArduinoDetachedSignature(tmp, tmpSig)
+			if err != nil {
+				return nil, fmt.Errorf("signature verification error: %s", err)
+			}
+			if !valid {
+				return nil, fmt.Errorf("index has an invalid signature")
+			}
+		}
+
 		if _, err := packageindex.LoadIndex(tmp); err != nil {
 			return nil, fmt.Errorf("invalid package index in %s: %s", URL, err)
 		}
@@ -242,6 +282,11 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 
 		if err := tmp.CopyTo(coreIndexPath); err != nil {
 			return nil, fmt.Errorf("saving downloaded index %s: %s", URL, err)
+		}
+		if tmpSig != nil {
+			if err := tmpSig.CopyTo(coreIndexSigPath); err != nil {
+				return nil, fmt.Errorf("saving downloaded index signature: %s", err)
+			}
 		}
 	}
 	if _, err := Rescan(id); err != nil {
