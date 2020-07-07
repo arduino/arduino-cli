@@ -7,6 +7,8 @@ The Arduino CLI is available as a Homebrew formula since version
 brew update
 brew install arduino-cli
 ```
+#### Command line completion
+[Command line completion](command-line-completion.md#brew) files are already bundled in the homebrew installation.
 
 ### Use the install script
 
