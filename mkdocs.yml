@@ -60,7 +60,7 @@ nav:
   - CONTRIBUTING.md
   - FAQ.md
   - Command reference:
-    - commands/arduino-cli.md
+    - arduino-cli: commands/arduino-cli.md
     - board: commands/arduino-cli_board.md
     - board attach: commands/arduino-cli_board_attach.md
     - board details: commands/arduino-cli_board_details.md
