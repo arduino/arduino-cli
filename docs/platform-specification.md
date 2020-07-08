@@ -433,7 +433,7 @@ If the user didn't enable verbose mode, then **{upload.params.quiet}** is used i
 
 ### Sketch upload configuration
 
-The Upload action is triggered when the user clicks on the "Upload" button on the IDE toolbar or uses [`arduino-cli upload`](https://arduino.github.io/arduino-cli/commands/arduino-cli_upload/).
+The Upload action is triggered when the user clicks on the "Upload" button on the IDE toolbar or uses [`arduino-cli upload`](../commands/arduino-cli_upload).
 The **upload.tool** property determines the tool to be used for upload.
 A specific **upload.tool** property should be defined for every board in boards.txt:
 
@@ -483,7 +483,7 @@ If the **upload.protocol** property is not defined for a board, the Arduino IDE'
 
 ### Serial port
 
-The port selected via the IDE or [`arduino-cli upload`](https://arduino.github.io/arduino-cli/commands/arduino-cli_upload/)'s `--port` option is available as a configuration property **{serial.port}**.
+The port selected via the IDE or [`arduino-cli upload`](../commands/arduino-cli_upload)'s `--port` option is available as a configuration property **{serial.port}**.
 
 ### Upload using an external programmer
 
