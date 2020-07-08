@@ -1,6 +1,6 @@
 This specification is a 3rd party hardware format to be used in Arduino development software starting from the Arduino IDE 1.5.x series.<br>
-This specification allows a 3rd party vendor/maintainer to add support for new boards to the Arduino development software by providing a file to unzip into the *hardware* folder of Arduino's sketchbook folder.<br>
-It is also possible to add new 3rd party boards by providing just one configuration file.
+Platforms add support for new boards to the Arduino development software. They are installable either via [Boards Manager](package_index_json-specification.md) or manual installation to the *hardware* folder of Arduino's sketchbook folder.<br>
+A platform may consist of as little as a single configuration file.
 
 ## Hardware Folders structure
 
