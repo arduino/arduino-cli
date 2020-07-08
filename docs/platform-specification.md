@@ -79,7 +79,7 @@ The following meta-data must be defined:
     name=Arduino AVR Boards
     version=1.5.3
 
-The **name** will be shown in the Arduino IDE's Board menu or the Name field of [`arduino-cli core`](https://arduino.github.io/arduino-cli/commands/arduino-cli_core/)'s output.<br>
+The **name** will be shown as the Arduino IDE's Board menu section title or the Name field of [`arduino-cli core list`](../commands/arduino-cli_core_list)'s output for the platform.<br>
 The **version** is currently unused, it is reserved for future use (probably together with the Boards Manager to handle dependencies on cores).
 
 ### Build process
