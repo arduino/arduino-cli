@@ -369,6 +369,14 @@ In any case, the contents of the selected variant folder path is added to the in
 
 The parameter **build.variant.path** is automatically generated.
 
+### Hiding boards
+
+Adding a **hide** property to a board definition causes it to not be shown in the Arduino IDE's **Tools > Board** menu.
+
+    uno.hide=
+
+The value of the property is ignored; it's the presence or absence of the property that controls the board's visibility.
+
 ## Tools
 
 The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn bootloaders using external programmers. For example, *avrdude* is used for AVR based boards and *bossac* for SAM based boards, but there is no limit, any command line executable can be used. The command line parameters are specified using **recipes** in the same way used for platform build process.
