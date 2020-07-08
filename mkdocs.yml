@@ -60,12 +60,13 @@ nav:
   - CONTRIBUTING.md
   - FAQ.md
   - Command reference:
-    - commands/arduino-cli.md
+    - arduino-cli: commands/arduino-cli.md
     - board: commands/arduino-cli_board.md
     - board attach: commands/arduino-cli_board_attach.md
     - board details: commands/arduino-cli_board_details.md
     - board list: commands/arduino-cli_board_list.md
     - board listall: commands/arduino-cli_board_listall.md
+    - burn-bootloader: commands/arduino-cli_burn-bootloader.md
     - cache: commands/arduino-cli_cache.md
     - cache clean: commands/arduino-cli_cache_clean.md
     - compile: commands/arduino-cli_compile.md
