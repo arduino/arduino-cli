@@ -1082,6 +1082,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hiding-boards" class="md-nav__link">
+    Hiding boards
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1398,6 +1405,13 @@
           <li class="md-nav__item">
   <a href="#core-variants" class="md-nav__link">
     Core Variants
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hiding-boards" class="md-nav__link">
+    Hiding boards
   </a>
   
 </li>
@@ -1866,6 +1880,13 @@ leonardo.build.variant=leonardo
 <p>In the example above, both Uno and Leonardo share the same core but use different variants.<br>
 In any case, the contents of the selected variant folder path is added to the include search path and its contents are compiled and linked with the sketch.</p>
 <p>The parameter <strong>build.variant.path</strong> is automatically generated.</p>
+<h3 id="hiding-boards">Hiding boards<a class="headerlink" href="#hiding-boards" title="Permanent link">&para;</a></h3>
+<p>Adding a <strong>hide</strong> property to a board definition causes it to not be shown in the Arduino IDE's <strong>Tools &gt; Board</strong> menu.</p>
+<div class="codehilite"><pre><span></span><code>uno.hide=
+</code></pre></div>
+
+
+<p>The value of the property is ignored; it's the presence or absence of the property that controls the board's visibility.</p>
 <h2 id="tools">Tools<a class="headerlink" href="#tools" title="Permanent link">&para;</a></h2>
 <p>The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn bootloaders using external programmers. For example, <em>avrdude</em> is used for AVR based boards and <em>bossac</em> for SAM based boards, but there is no limit, any command line executable can be used. The command line parameters are specified using <strong>recipes</strong> in the same way used for platform build process.</p>
 <p>Tools are configured inside the platform.txt file. Every Tool is identified by a short name, the Tool ID.
