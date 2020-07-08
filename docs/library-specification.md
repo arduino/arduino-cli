@@ -102,6 +102,7 @@ Sketches contained inside the examples folder will be shown in the Examples menu
 
 More information:
 
+* [Arduino sketch specification](sketch-specification.md)
 * [Style guide for Arduino examples](http://arduino.cc/en/Reference/StyleGuide)
 
 #### Extra documentation
