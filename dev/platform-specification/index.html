@@ -319,8 +319,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../commands/arduino-cli/" title="Arduino cli" class="md-nav__link">
-      Arduino cli
+    <a href="../commands/arduino-cli/" title="arduino-cli" class="md-nav__link">
+      arduino-cli
     </a>
   </li>
 
@@ -381,6 +381,18 @@
   <li class="md-nav__item">
     <a href="../commands/arduino-cli_board_listall/" title="board listall" class="md-nav__link">
       board listall
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../commands/arduino-cli_burn-bootloader/" title="burn-bootloader" class="md-nav__link">
+      burn-bootloader
     </a>
   </li>
 
@@ -1124,6 +1136,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#upload-using-programmer-by-default" class="md-nav__link">
+    Upload Using Programmer by default
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1447,6 +1466,13 @@
           <li class="md-nav__item">
   <a href="#1200-bps-bootloader-reset" class="md-nav__link">
     1200 bps bootloader reset
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upload-using-programmer-by-default" class="md-nav__link">
+    Upload Using Programmer by default
   </a>
   
 </li>
@@ -1987,6 +2013,8 @@ tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; 
 <li><code>wait_for_upload_port</code> causes the upload procedure to wait for the serial port to (re)appear before and after the upload. This is only used when <code>use_1200bps_touch</code> is also set.  When set, after doing the 1200 bps touch, the development software will wait for a new serial port to appear and use that as the port for uploads. Alternatively, if the original port does not disappear within a few seconds, the upload continues with the original port (which can be the case if the board was already put into bootloader manually, or the the disconnect and reconnect was missed). Additionally, after the upload is complete, the IDE again waits for a new port to appear (or the originally selected port to be present).</li>
 </ul>
 <p>Note that the IDE implementation of this 1200 bps touch has some peculiarities, and the newer <code>arduino-cli</code> implementation also seems different (does not wait for the port after the reset, which is probably only needed in the IDE to prevent opening the wrong port on the serial monitor, and does not have a shorter timeout when the port never disappears).</p>
+<h4 id="upload-using-programmer-by-default">Upload Using Programmer by default<a class="headerlink" href="#upload-using-programmer-by-default" title="Permanent link">&para;</a></h4>
+<p>If the <strong>upload.protocol</strong> property is not defined for a board, the Arduino IDE's "Upload" process will use the same behavior as <a href="#upload-using-an-external-programmer">"Upload Using Programmer"</a>. This is convenient for boards which only support uploading via programmer.</p>
 <h3 id="serial-port">Serial port<a class="headerlink" href="#serial-port" title="Permanent link">&para;</a></h3>
 <p>The port selected via the IDE or <a href="https://arduino.github.io/arduino-cli/commands/arduino-cli_upload/"><code>arduino-cli upload</code></a>'s <code>--port</code> option is available as a configuration property <strong>{serial.port}</strong>.</p>
 <h3 id="upload-using-an-external-programmer">Upload using an external programmer<a class="headerlink" href="#upload-using-an-external-programmer" title="Permanent link">&para;</a></h3>
