@@ -469,6 +469,10 @@ To let the Arduino development software perform these steps, two board parameter
 
 Note that the IDE implementation of this 1200 bps touch has some peculiarities, and the newer `arduino-cli` implementation also seems different (does not wait for the port after the reset, which is probably only needed in the IDE to prevent opening the wrong port on the serial monitor, and does not have a shorter timeout when the port never disappears).
 
+#### Upload Using Programmer by default
+
+If the **upload.protocol** property is not defined for a board, the Arduino IDE's "Upload" process will use the same behavior as ["Upload Using Programmer"](#upload-using-an-external-programmer). This is convenient for boards which only support uploading via programmer.
+
 ### Serial port
 
 The port selected via the IDE or [`arduino-cli upload`](https://arduino.github.io/arduino-cli/commands/arduino-cli_upload/)'s `--port` option is available as a configuration property **{serial.port}**.
