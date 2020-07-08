@@ -434,6 +434,7 @@ If the user didn't enable verbose mode, then **{upload.params.quiet}** is used i
 ### Sketch upload configuration
 
 The Upload action is triggered when the user clicks on the "Upload" button on the IDE toolbar or uses [`arduino-cli upload`](../commands/arduino-cli_upload).
+Arduino uses the term "upload" for the process of transferring a program to the Arduino board.
 The **upload.tool** property determines the tool to be used for upload.
 A specific **upload.tool** property should be defined for every board in boards.txt:
 
