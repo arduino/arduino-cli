@@ -551,8 +551,6 @@ Note that when the user selects an option value, all the "sub properties" of tha
 
 There is no limit to the number of custom menus that can be defined.
 
-**TODO: add an example with more than one submenu**
-
 ## Referencing another core, variant or tool
 
 Inside the boards.txt we can define a board that uses a core provided by another vendor/maintainer using the syntax **VENDOR_ID:CORE_ID**. For example, if we want to define a board that uses the "arduino" core from the "arduino" vendor we should write:
