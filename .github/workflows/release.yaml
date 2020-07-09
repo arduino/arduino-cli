@@ -142,6 +142,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Update Homebrew formula
+        if: steps.prerelease.outputs.IS_PRE != 'true'
         uses: dawidd6/action-homebrew-bump-formula@v3
         with:
           token: ${{ secrets.ARDUINOBOT_GITHUB_TOKEN }}
