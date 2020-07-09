@@ -4,7 +4,7 @@ Boards Manager functionality is provided by [Arduino CLI](getting-started.md#add
 
 ## Naming of the JSON index file
 
-Many different index files coming from different vendors may be in use, so each vendor should name his own index file in a way that won't conflict with others. The file must be named as follows:
+Many different index files coming from different vendors may be in use, so each vendor should name their own index file in a way that won't conflict with others. The file must be named as follows:
 
 `package_YOURNAME_PACKAGENAME_index.json`
 
