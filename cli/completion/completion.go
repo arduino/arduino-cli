@@ -56,14 +56,7 @@ func run(cmd *cobra.Command, args []string) {
 		cmd.Root().GenBashCompletion(os.Stdout)
 		break
 	case "zsh":
-		buf := new(bytes.Buffer)
-		cmd.Root().GenZshCompletion(buf)
-		// Next 3 lines are Hack, we'll wait new version of cobra with ZshV2Completion https://github.com/spf13/cobra/pull/1070
-		//insert escaping before [ and ]
-		s := strings.ReplaceAll(buf.String(), "[", "\\[")
-		s = strings.ReplaceAll(s, "]", "\\]")
-		s = strings.ReplaceAll(s, "\\[1\\]", "[1]") // revert the case
-		os.Stdout.WriteString(s)
+		cmd.Root().GenZshCompletion(os.Stdout)
 		break
 	case "fish":
 		buf := new(bytes.Buffer)
