@@ -19,5 +19,9 @@ Additional board options have to be separated by commas (instead of colon):
 
 `$ arduino-cli compile --fqbn "esp8266:esp8266:generic:xtal=160,baud=57600" TestSketch`
 
+## Additional assistance
+
+If your question wasn't answered, feel free to ask on [Arduino CLI's forum board][1].
 
 [0]: platform-specification.md
+[1]: https://forum.arduino.cc/index.php?board=145.0
