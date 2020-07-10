@@ -1306,6 +1306,7 @@
 <p>Arduino development software supports multiple microcontroller architectures (e.g. AVR, SAM, etc), meaning that libraries may need to work on multiple architectures. The new 1.5 library format doesn’t contain special support for cross-architecture libraries, but it does provide a preprocessor based mechanism for libraries to target sections of code to specific architectures.</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <p>The Arduino library style guide is here : <a href="http://arduino.cc/en/Reference/APIStyleGuide">http://arduino.cc/en/Reference/APIStyleGuide</a></p>
+<p>The style guide for examples is here : <a href="http://arduino.cc/en/Reference/StyleGuide">http://arduino.cc/en/Reference/StyleGuide</a></p>
 <h2 id="15-library-format-rev-22">1.5 library format (rev. 2.2)<a class="headerlink" href="#15-library-format-rev-22" title="Permanent link">&para;</a></h2>
 <h3 id="library-metadata">Library metadata<a class="headerlink" href="#library-metadata" title="Permanent link">&para;</a></h3>
 <p>The most significant addition to the format is the ability to add information about the library itself through a properties file called <strong>library.properties</strong>.</p>
@@ -1383,11 +1384,6 @@ Servo/utility/ServoTimers.cpp
 
 
 <p>Sketches contained inside the examples folder will be shown in the Examples menu of the Arduino IDE and Arduino Web Editor.</p>
-<p>More information:</p>
-<ul>
-<li><a href="../sketch-specification/">Arduino sketch specification</a></li>
-<li><a href="http://arduino.cc/en/Reference/StyleGuide">Style guide for Arduino examples</a></li>
-</ul>
 <h4 id="extra-documentation">Extra documentation<a class="headerlink" href="#extra-documentation" title="Permanent link">&para;</a></h4>
 <p>An <strong>extras</strong> folder can be used by the developer to put documentation or other items to be bundled with the library. Remember that files placed inside this folder will increase the size of the library, so putting a 20MB PDF in a library that weights a few kilobytes may not be such a good idea.</p>
 <p>The content of the <em>extras</em> folder is totally ignored by the Arduino development software; you are free to put anything inside such as supporting documentation, etc.</p>
