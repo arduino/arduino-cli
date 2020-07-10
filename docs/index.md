@@ -1,6 +1,9 @@
 Arduino CLI is an all-in-one solution that provides builder, boards/library manager, uploader, discovery and many other
 tools needed to use any Arduino compatible board and platforms.
 
+Arduino CLI is the heart of all official Arduino development software (Arduino IDE, Arduino Web Editor, Arduino Pro
+IDE), so parts of this documentation apply to those tools as well.
+
 ## Installation
 
 You have several options to install the latest version of the Arduino CLI on your system, see the [installation] page.
