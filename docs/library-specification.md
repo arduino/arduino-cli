@@ -1,4 +1,4 @@
-This is the specification for the 3rd party library format to be used with Arduino IDE 1.5.x onwards.
+This is the specification for the Arduino library format, to be used with Arduino IDE 1.5.x onwards.
 
 * rev.1 has been implemented starting with Arduino IDE version 1.5.3 (now superseded by rev.2)
 * rev.2 will be implemented starting from version Arduino IDE 1.5.6
