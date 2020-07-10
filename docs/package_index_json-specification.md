@@ -215,8 +215,9 @@ Each PLATFORM describes a core for a specific architecture. The fields needed ar
   TOOLS
 - `boards`: the list of boards supported (note: just the names to display on the Arduino IDE and Arduino Pro IDE's
   Boards Manager GUI! the real boards definitions are inside `boards.txt` inside the core archive file)
-- `toolsDependencies`: the tools needed by this core. Each tool is referenced by the triple (`packager`, `name`,
-  `version`) as previously said. Note that you can reference tools available in other packages as well.
+- `toolsDependencies`: the tools needed by this core. They will be installed by Boards Manager along with the platform.
+  Each tool is referenced by the triple (`packager`, `name`, `version`) as previously said. Note that you can reference
+  tools available in other packages as well, even if no platform of that package is installed.
 
 The `version` field is validated by both Arduino IDE and [JSemVer](https://github.com/zafarkhaja/jsemver). Here are the
 rules Arduino IDE follows for parsing versions
