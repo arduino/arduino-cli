@@ -26,8 +26,8 @@ The root of the JSON index is an array of `packages`:
 ```json
 {
   "packages": [
-      PACKAGE_XXXX
-   ]
+    PACKAGE_XXXX
+  ]
 }
 ```
 
@@ -41,19 +41,19 @@ The root of the JSON index is an array of `packages`:
   "email": "packages@arduino.cc",
 
   "platforms": [
-      PLATFORM_AVR,
-      PLATFORM_ARM,
-      PLATFORM_XXXXX,
-      PLATFORM_YYYYY,
+    PLATFORM_AVR,
+    PLATFORM_ARM,
+    PLATFORM_XXXXX,
+    PLATFORM_YYYYY,
   ],
 
   "tools": [
-      TOOLS_COMPILER_AVR,
-      TOOLS_UPLOADER_AVR,
-      TOOLS_COMPILER_ARM,
-      TOOLS_XXXXXXX,
-      TOOLS_YYYYYYY,
-   ],
+    TOOLS_COMPILER_AVR,
+    TOOLS_UPLOADER_AVR,
+    TOOLS_COMPILER_ARM,
+    TOOLS_XXXXXXX,
+    TOOLS_YYYYYYY,
+  ],
 }
 ```
 
