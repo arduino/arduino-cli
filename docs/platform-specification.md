@@ -1,5 +1,5 @@
 This is the Arduino platform specification, for use with Arduino development software starting from the Arduino IDE 1.5.x series.<br>
-Platforms add support for new boards to the Arduino development software. They are installable either via [Boards Manager](package_index_json-specification.md) or manual installation to the *hardware* folder of Arduino's sketchbook folder.<br>
+Platforms add support for new boards to the Arduino development software. They are installable either via [Boards Manager](package_index_json-specification.md) or manual installation to the *hardware* folder of Arduino's sketchbook folder (AKA "user directory").<br>
 A platform may consist of as little as a single configuration file.
 
 ## Hardware Folders structure
