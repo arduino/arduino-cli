@@ -15,8 +15,6 @@ Arduino development software supports multiple microcontroller architectures (e.
 
 The Arduino library style guide is here : http://arduino.cc/en/Reference/APIStyleGuide
 
-The style guide for examples is here : http://arduino.cc/en/Reference/StyleGuide
-
 ## 1.5 library format (rev. 2.2)
 
 ### Library metadata
@@ -101,6 +99,11 @@ Library examples must be placed in the **examples** folder. Note that the **exam
     Servo/examples/...
 
 Sketches contained inside the examples folder will be shown in the Examples menu of the Arduino IDE and Arduino Web Editor.
+
+More information:
+
+* [Arduino sketch specification](sketch-specification.md)
+* [Style guide for Arduino examples](http://arduino.cc/en/Reference/StyleGuide)
 
 #### Extra documentation
 
