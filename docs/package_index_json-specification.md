@@ -34,27 +34,27 @@ The root of the JSON index is an array of `packages`:
 3rd party vendors should use a single `PACKAGE_XXXX` that is a dictionary map with the vendor's metadata, a list of `PLATFORMS` and a list of `TOOLS`. For example:
 
 ```json
-{
-  "name": "arduino",
-  "maintainer": "Arduino LLC",
-  "websiteURL": "http://www.arduino.cc/",
-  "email": "packages@arduino.cc",
+    {
+      "name": "arduino",
+      "maintainer": "Arduino LLC",
+      "websiteURL": "http://www.arduino.cc/",
+      "email": "packages@arduino.cc",
 
-  "platforms": [
-    PLATFORM_AVR,
-    PLATFORM_ARM,
-    PLATFORM_XXXXX,
-    PLATFORM_YYYYY,
-  ],
+      "platforms": [
+        PLATFORM_AVR,
+        PLATFORM_ARM,
+        PLATFORM_XXXXX,
+        PLATFORM_YYYYY,
+      ],
 
-  "tools": [
-    TOOLS_COMPILER_AVR,
-    TOOLS_UPLOADER_AVR,
-    TOOLS_COMPILER_ARM,
-    TOOLS_XXXXXXX,
-    TOOLS_YYYYYYY,
-  ],
-}
+      "tools": [
+        TOOLS_COMPILER_AVR,
+        TOOLS_UPLOADER_AVR,
+        TOOLS_COMPILER_ARM,
+        TOOLS_XXXXXXX,
+        TOOLS_YYYYYYY,
+      ],
+    }
 ```
 
 The metadata fields are:
