@@ -125,8 +125,8 @@ Tools are mapped as JSON in this way:
 ```
 
 The field `name` and `version` are respectively the name and version of the tool. Each tool is uniquely identified by
-the triple (`vendor`, `name`, `version`) and there can be many different versions of the same tool available at the same
-time, for example:
+the triple (`packager`, `name`, `version`). `packager` (AKA "vendor") is defined by the `name` value of the tool's
+package. There can be many different versions of the same tool available at the same time, for example:
 
 - (`arduino`, `avr-gcc`, `4.8.1-arduino2`)
 - (`arduino`, `avr-gcc`, `4.8.1-arduino3`)
