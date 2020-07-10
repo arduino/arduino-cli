@@ -185,7 +185,7 @@ A hypothetical library named "Servo" that adheres to the specification follows:
 
 ## Working with multiple architectures
 
-Libraries placed in the user’s sketchbook folder (in the libraries/ subfolder) will be made available for all boards, which may include multiple different processor architectures. To provide architecture-specific code or optimizations, library authors can use the `ARDUINO_ARCH_XXX` preprocessor macro (`#define`), where XXX is the name of the architecture (as determined by the name of the folder containing it), e.g. `ARDUINO_ARCH_AVR` will be defined when compiling for AVR-based boards. For example,
+Libraries placed in the `libraries` subfolder of the sketchbook folder (AKA "user directory") will be made available for all boards, which may include multiple different processor architectures. To provide architecture-specific code or optimizations, library authors can use the `ARDUINO_ARCH_XXX` preprocessor macro (`#define`), where XXX is the name of the architecture (as determined by the name of the folder containing it), e.g. `ARDUINO_ARCH_AVR` will be defined when compiling for AVR-based boards. For example,
 
     #if defined(ARDUINO_ARCH_AVR)
       // AVR-specific code
