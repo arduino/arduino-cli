@@ -1107,7 +1107,7 @@
                 <p>Introduced in Arduino IDE 1.6.4, Boards Manager makes it easy to install and update Arduino platforms. In order to provide Boards Manager installation support for a platform, a JSON formatted index file must be published. This is the specification for that file.</p>
 <p>Boards Manager functionality is provided by <a href="../getting-started/#adding-3rd-party-cores">Arduino CLI</a>, <a href="https://www.arduino.cc/en/Guide/Cores">Arduino IDE</a>, and Arduino Pro IDE.</p>
 <h2 id="naming-of-the-json-index-file">Naming of the JSON index file<a class="headerlink" href="#naming-of-the-json-index-file" title="Permanent link">&para;</a></h2>
-<p>Many different index files coming from different vendors may be in use, so each vendor should name his own index file in a way that won't conflict with others. The file must be named as follows:</p>
+<p>Many different index files coming from different vendors may be in use, so each vendor should name their own index file in a way that won't conflict with others. The file must be named as follows:</p>
 <p><code>package_YOURNAME_PACKAGENAME_index.json</code></p>
 <p>The prefix <code>package_</code> and the postfix <code>_index.json</code> are <strong>mandatory</strong> (otherwise the index file is not recognised by the Arduino development software) while the choice of <code>YOURNAME_PACKAGENAME</code> is left to the packager.
 We suggest using a domain name owned by the packager. For example:</p>
@@ -1119,33 +1119,33 @@ We suggest using a domain name owned by the packager. For example:</p>
 <p>The root of the JSON index is an array of <code>packages</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
   <span class="nt">&quot;packages&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="err">PACKAGE_XXXX</span>
-   <span class="p">]</span>
+    <span class="err">PACKAGE_XXXX</span>
+  <span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
 
 <p>3<sup>rd</sup> party vendors should use a single <code>PACKAGE_XXXX</code> that is a dictionary map with the vendor's metadata, a list of <code>PLATFORMS</code> and a list of <code>TOOLS</code>. For example:</p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;maintainer&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino LLC&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;websiteURL&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.arduino.cc/&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;packages@arduino.cc&quot;</span><span class="p">,</span>
+<div class="highlight"><pre><span></span><code>    <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;maintainer&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino LLC&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;websiteURL&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.arduino.cc/&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;packages@arduino.cc&quot;</span><span class="p">,</span>
 
-  <span class="nt">&quot;platforms&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="err">PLATFORM_AVR</span><span class="p">,</span>
-      <span class="err">PLATFORM_ARM</span><span class="p">,</span>
-      <span class="err">PLATFORM_XXXXX</span><span class="p">,</span>
-      <span class="err">PLATFORM_YYYYY</span><span class="p">,</span>
-  <span class="p">],</span>
+      <span class="nt">&quot;platforms&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="err">PLATFORM_AVR</span><span class="p">,</span>
+        <span class="err">PLATFORM_ARM</span><span class="p">,</span>
+        <span class="err">PLATFORM_XXXXX</span><span class="p">,</span>
+        <span class="err">PLATFORM_YYYYY</span><span class="p">,</span>
+      <span class="p">],</span>
 
-  <span class="nt">&quot;tools&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="err">TOOLS_COMPILER_AVR</span><span class="p">,</span>
-      <span class="err">TOOLS_UPLOADER_AVR</span><span class="p">,</span>
-      <span class="err">TOOLS_COMPILER_ARM</span><span class="p">,</span>
-      <span class="err">TOOLS_XXXXXXX</span><span class="p">,</span>
-      <span class="err">TOOLS_YYYYYYY</span><span class="p">,</span>
-   <span class="p">],</span>
-<span class="p">}</span>
+      <span class="nt">&quot;tools&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="err">TOOLS_COMPILER_AVR</span><span class="p">,</span>
+        <span class="err">TOOLS_UPLOADER_AVR</span><span class="p">,</span>
+        <span class="err">TOOLS_COMPILER_ARM</span><span class="p">,</span>
+        <span class="err">TOOLS_XXXXXXX</span><span class="p">,</span>
+        <span class="err">TOOLS_YYYYYYY</span><span class="p">,</span>
+      <span class="p">],</span>
+    <span class="p">}</span>
 </code></pre></div>
 
 <p>The metadata fields are:</p>
