@@ -42,8 +42,8 @@ markdown_extensions:
   - pymdownx.keys
   - pymdownx.magiclink:
       repo_url_shorthand: true
-      user: squidfunk
-      repo: mkdocs-material
+      user: arduino
+      repo: arduino-cli
   - pymdownx.mark
   - pymdownx.smartsymbols
   - pymdownx.superfences
