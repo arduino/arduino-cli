@@ -196,7 +196,7 @@ testVersion() {
 		CLI_REALPATH="$(cd -- "$(dirname -- "$CLI")" && pwd -P)"
 		LBINDIR_REALPATH="$(cd -- "$LBINDIR" && pwd -P)"
 		if [ "$CLI_REALPATH" != "$LBINDIR_REALPATH" ]; then
-			fail "An existing $PROJECT_NAME was found at $CLI. Please prepend "$LBINDIR" to your "'$PATH'" or remove the existing one."
+			echo "An existing $PROJECT_NAME was found at $CLI. Please prepend "$LBINDIR" to your "'$PATH'" or remove the existing one."
 		fi
 	fi
 
