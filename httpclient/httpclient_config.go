@@ -37,7 +37,11 @@ func DefaultConfig() (*Config, error) {
 	var err error
 	if viper.IsSet("network.proxy") {
 		proxyConfig := viper.GetString("network.proxy")
-		if proxy, err = url.Parse(proxyConfig); err != nil {
+		if proxyConfig == "" {
+			// empty configuration
+			// this workaround must be here until viper can UnSet properties:
+			// https://github.com/spf13/viper/pull/519
+		} else if proxy, err = url.Parse(proxyConfig); err != nil {
 			return nil, errors.New("Invalid network.proxy '" + proxyConfig + "': " + err.Error())
 		}
 	}
