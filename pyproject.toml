@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "arduino-cli"
+version = "0.0.0"
+description = "Project used to run integration tests for the Arduino CLI"
+authors = []
+
+[tool.poetry.dependencies]
+python = "^3.5"
+pytest = "5.3.4"
+simplejson = "3.17.0"
+semver = "2.9.0"
+pyserial = "3.4"
+pyyaml = "5.3"
+prometheus-client = "0.7.1"
+requests = "2.22.0"
+pytest-timeout = "1.3.4"
+invoke = "1.4.1"
+
+[tool.flake8]
+max-line-length = 120

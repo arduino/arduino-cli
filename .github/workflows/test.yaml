@@ -73,7 +73,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          pip install -r test/requirements.txt
+          pip install poetry
           task test-integration
 
       - name: Send unit tests coverage to Codecov
