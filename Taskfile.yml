@@ -84,7 +84,8 @@ tasks:
   test-integration:
     desc: Run integration tests only
     cmds:
-      - pytest test
+      - poetry install --no-root
+      - poetry run pytest test
 
   test-legacy:
     desc: Run tests for the `legacy` package

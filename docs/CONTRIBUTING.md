@@ -85,6 +85,7 @@ see following paragraph):
 ```shell
 task test-integration
 ```
+
 ### Running only some tests
 
 By default, all tests from all go packages are run. To run only unit
@@ -136,42 +137,22 @@ your Operating System.
 
 Some dependencies need to be installed before running the tests and to avoid
 polluting your global Python environment with dependencies that might be only
-used by the Arduino CLI, you can use a [virtual environment][4]. There are many
-ways to manage virtual environments, for example you can use a productivity tool
-called [hatch][5]. First you need to install it (you might need to `sudo`
+used by the Arduino CLI, to do so we use [Poetry][poetry-website]. First you need to install it (you might need to `sudo`
 the following command):
 
 ```shell
-pip3 install --user hatch
+pip3 install --user poetry
 ```
 
-Then you can create a virtual environment to be used while working on Arduino
-CLI:
+For more installation options read the [official documentation][poetry-docs].
 
-```shell
-hatch env arduino-cli
-```
-
-At this point the virtual environment was created and you need to make it active
-every time you open a new terminal session with the following command:
-
-```shell
-hatch shell arduino-cli
-```
-
-From now on, every package installed by Python will be confined to the
-`arduino-cli` virtual environment, so you can proceed installing the
-dependencies required with:
-
-```shell
-pip install -r test/requirements.txt
-```
-
-If the last step was successful, you should be able to run the tests with:
+After Poetry has been installed you should be able to run the tests with:
 
 ```shell
 task test-integration
 ```
+
+This will automatically install the necessary dependencies, if not already installed, and run the integration tests automatically.
 
 ## Working on docs
 
