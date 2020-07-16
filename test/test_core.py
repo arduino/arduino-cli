@@ -17,8 +17,6 @@ import platform
 import pytest
 import simplejson as json
 
-from .common import running_on_ci
-
 
 def test_core_search(run_command):
     url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
@@ -32,16 +30,12 @@ def test_core_search(run_command):
     data = json.loads(result.stdout)
     assert 0 < len(data)
     # additional URL
-    result = run_command(
-        "core search test_core --format json --additional-urls={}".format(url)
-    )
+    result = run_command("core search test_core --format json --additional-urls={}".format(url))
     assert result.ok
     data = json.loads(result.stdout)
     assert 1 == len(data)
     # show all versions
-    result = run_command(
-        "core search test_core --all --format json --additional-urls={}".format(url)
-    )
+    result = run_command("core search test_core --all --format json --additional-urls={}".format(url))
     assert result.ok
     data = json.loads(result.stdout)
     assert 2 == len(data)
@@ -106,8 +100,7 @@ def test_core_updateindex_invalid_url(run_command):
 
 
 @pytest.mark.skipif(
-    platform.system() == "Windows",
-    reason="core fails with fatal error: bits/c++config.h: No such file or directory",
+    platform.system() == "Windows", reason="core fails with fatal error: bits/c++config.h: No such file or directory",
 )
 def test_core_install_esp32(run_command, data_dir):
     # update index
@@ -121,9 +114,7 @@ def test_core_install_esp32(run_command, data_dir):
     assert run_command("compile -b esp32:esp32:esp32 {}".format(sketch_path))
     # prevent regressions for https://github.com/arduino/arduino-cli/issues/163
     assert os.path.exists(
-        os.path.join(
-            sketch_path, "build/esp32.esp32.esp32/test_core_install_esp32.ino.partitions.bin"
-        )
+        os.path.join(sketch_path, "build/esp32.esp32.esp32/test_core_install_esp32.ino.partitions.bin",)
     )
 
 

@@ -100,15 +100,11 @@ def main(test, dry, remote):
     # version is the most recent
     docs_version, alias = get_docs_version(repo.active_branch.name, rel_br_names)
     if docs_version is None:
-        print(
-            f"Can't get version from current branch '{repo.active_branch}', skip docs generation"
-        )
+        print(f"Can't get version from current branch '{repo.active_branch}', skip docs generation")
         return 0
 
     # Taskfile args aren't regular args so we put everything in one string
-    cmd = (
-        f"task docs:publish DOCS_REMOTE={remote} DOCS_VERSION={docs_version} DOCS_ALIAS={alias}",
-    )
+    cmd = (f"task docs:publish DOCS_REMOTE={remote} DOCS_VERSION={docs_version} DOCS_ALIAS={alias}",)
 
     if dry:
         print(cmd)

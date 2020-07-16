@@ -86,6 +86,6 @@ def test_inventory_creation(run_command, data_dir):
 
     # parse inventory file
     inventory_file = os.path.join(data_dir, "inventory.yaml")
-    with open(inventory_file, 'r') as stream:
+    with open(inventory_file, "r") as stream:
         inventory = yaml.safe_load(stream)
         assert "installation" in inventory

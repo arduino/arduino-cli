@@ -39,6 +39,7 @@ def test_board_listall(run_command):
     assert result.ok
     assert ["Board", "Name", "FQBN"] == result.stdout.splitlines()[0].strip().split()
 
+
 def test_board_details(run_command):
     gold_board_details = """
     {
@@ -391,7 +392,7 @@ def test_board_details(run_command):
     }
   ]
 }
-"""
+"""  # noqa: E501
     result = run_command("core update-index")
     assert result.ok
     # Download samd core pinned to 1.8.6

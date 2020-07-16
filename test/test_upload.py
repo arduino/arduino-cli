@@ -33,17 +33,9 @@ def test_upload(run_command, data_dir, detected_boards):
         sketch_path = os.path.join(data_dir, "foo")
         assert run_command("sketch new {}".format(sketch_path))
         # Build sketch
-        assert run_command(
-            "compile -b {fqbn} {sketch_path}".format(
-                fqbn=board.fqbn, sketch_path=sketch_path
-            )
-        )
+        assert run_command("compile -b {fqbn} {sketch_path}".format(fqbn=board.fqbn, sketch_path=sketch_path))
         # Upload without port must fail
-        result = run_command(
-            "upload -b {fqbn} {sketch_path}".format(
-                sketch_path=sketch_path, fqbn=board.fqbn, port=board.address
-            )
-        )
+        result = run_command("upload -b {fqbn} {sketch_path}".format(sketch_path=sketch_path, fqbn=board.fqbn))
         assert result.failed
         # Upload
         assert run_command(

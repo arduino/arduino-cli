@@ -41,12 +41,12 @@ def data_dir(tmpdir_factory):
     # 3) libraries requiring headers deep down the include path
     # for example:
     #
-    #             from C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\A7\packages\arduino\hardware\mbed\1.1.4\cores\arduino/mbed/rtos/Thread.h:29,
-    #             from C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\A7\packages\arduino\hardware\mbed\1.1.4\cores\arduino/mbed/rtos/rtos.h:28,
-    #             from C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\A7\packages\arduino\hardware\mbed\1.1.4\cores\arduino/mbed/mbed.h:23,
-    #             from C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\A7\packages\arduino\hardware\mbed\1.1.4\cores\arduino/Arduino.h:32,
-    #             from C:\Users\RUNNER~1\AppData\Local\Temp\arduino-sketch-739B2B6DD21EB014317DA2A46062811B\sketch\magic_wand.ino.cpp:1:
-    ##[error]c:\users\runneradmin\appdata\local\temp\pytest-of-runneradmin\pytest-0\a7\packages\arduino\tools\arm-none-eabi-gcc\7-2017q4\arm-none-eabi\include\c++\7.2.1\new:39:10: fatal error: bits/c++config.h: No such file or directory
+    #             from C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\A7\packages\arduino\hardware\mbed\1.1.4\cores\arduino/mbed/rtos/Thread.h:29, # noqa: E501
+    #             from C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\A7\packages\arduino\hardware\mbed\1.1.4\cores\arduino/mbed/rtos/rtos.h:28, # noqa: E501
+    #             from C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\A7\packages\arduino\hardware\mbed\1.1.4\cores\arduino/mbed/mbed.h:23, # noqa: E501
+    #             from C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\A7\packages\arduino\hardware\mbed\1.1.4\cores\arduino/Arduino.h:32, # noqa: E501
+    #             from C:\Users\RUNNER~1\AppData\Local\Temp\arduino-sketch-739B2B6DD21EB014317DA2A46062811B\sketch\magic_wand.ino.cpp:1: # noqa: E501
+    # [error]c:\users\runneradmin\appdata\local\temp\pytest-of-runneradmin\pytest-0\a7\packages\arduino\tools\arm-none-eabi-gcc\7-2017q4\arm-none-eabi\include\c++\7.2.1\new:39:10: fatal error: bits/c++config.h: No such file or directory # noqa: E501
     #
     # due to the above on Windows we cut the tmp path straight to /tmp/xxxxxxxx
     if platform.system() == "Windows":
@@ -96,9 +96,7 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
         cli_full_line = "{} {}".format(cli_path, cmd_string)
         run_context = Context()
         with run_context.cd(working_dir):
-            return run_context.run(
-                cli_full_line, echo=False, hide=True, warn=True, env=env
-            )
+            return run_context.run(cli_full_line, echo=False, hide=True, warn=True, env=env)
 
     return _run
 
@@ -125,9 +123,7 @@ def daemon_runner(pytestconfig, data_dir, downloads_dir, working_dir):
     run_context.cd(working_dir)
     # Local Class is the implementation of a Runner abstract class
     runner = Local(run_context)
-    runner.run(
-        cli_full_line, echo=False, hide=True, warn=True, env=env, asynchronous=True
-    )
+    runner.run(cli_full_line, echo=False, hide=True, warn=True, env=env, asynchronous=True)
 
     # we block here until the test function using this fixture has returned
     yield runner
