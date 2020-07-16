@@ -104,6 +104,19 @@ tasks:
       - go vet {{ default .DEFAULT_TARGETS .TARGETS }}
       - "'{{.GOLINTBIN}}' {{.GOLINTFLAGS}} {{ default .DEFAULT_TARGETS .TARGETS }}"
       - task: i18n:check
+      - task: python:check
+
+  python:check:
+    desc: Linting for Python files
+    cmds:
+      - poetry install --no-root
+      - poetry run flake8
+
+  python:format:
+    desc: Automatically formats Python files
+    cmds:
+      - poetry install --no-root
+      - poetry run black .
 
   check-legacy:
     desc: Check fmt and lint for the `legacy` package
