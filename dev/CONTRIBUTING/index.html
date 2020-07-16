@@ -1361,33 +1361,17 @@ have Python installed in your system, if this is not the case you can
 your Operating System.</p>
 <p>Some dependencies need to be installed before running the tests and to avoid
 polluting your global Python environment with dependencies that might be only
-used by the Arduino CLI, you can use a <a href="https://docs.python.org/3/tutorial/venv.html">virtual environment</a>. There are many
-ways to manage virtual environments, for example you can use a productivity tool
-called <a href="https://github.com/ofek/hatch">hatch</a>. First you need to install it (you might need to <code>sudo</code>
+used by the Arduino CLI, to do so we use [Poetry][poetry-website]. First you need to install it (you might need to <code>sudo</code>
 the following command):</p>
-<div class="highlight"><pre><span></span><code>pip3 install --user hatch
+<div class="highlight"><pre><span></span><code>pip3 install --user poetry
 </code></pre></div>
 
-<p>Then you can create a virtual environment to be used while working on Arduino
-CLI:</p>
-<div class="highlight"><pre><span></span><code>hatch env arduino-cli
-</code></pre></div>
-
-<p>At this point the virtual environment was created and you need to make it active
-every time you open a new terminal session with the following command:</p>
-<div class="highlight"><pre><span></span><code>hatch shell arduino-cli
-</code></pre></div>
-
-<p>From now on, every package installed by Python will be confined to the
-<code>arduino-cli</code> virtual environment, so you can proceed installing the
-dependencies required with:</p>
-<div class="highlight"><pre><span></span><code>pip install -r test/requirements.txt
-</code></pre></div>
-
-<p>If the last step was successful, you should be able to run the tests with:</p>
+<p>For more installation options read the [official documentation][poetry-docs].</p>
+<p>After Poetry has been installed you should be able to run the tests with:</p>
 <div class="highlight"><pre><span></span><code>task test-integration
 </code></pre></div>
 
+<p>This will automatically install the necessary dependencies, if not already installed, and run the integration tests automatically.</p>
 <h2 id="working-on-docs">Working on docs<a class="headerlink" href="#working-on-docs" title="Permanent link">&para;</a></h2>
 <p>Documentation is provided to final users in form of static HTML content generated
 from a tool called <a href="https://www.mkdocs.org/">MkDocs</a> and hosted on <a href="https://pages.github.com/">GitHub Pages</a>.</p>
