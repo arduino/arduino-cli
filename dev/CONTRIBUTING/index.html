@@ -1372,6 +1372,15 @@ the following command):</p>
 </code></pre></div>
 
 <p>This will automatically install the necessary dependencies, if not already installed, and run the integration tests automatically.</p>
+<p>When editing any Python file in the project remember to run linting checks with:</p>
+<div class="highlight"><pre><span></span><code>task python:check
+</code></pre></div>
+
+<p>This will run <code>flake8</code> automatically and return any error in the code formatting, if not already installed it will also install integration tests dependencies.</p>
+<p>In case of linting errors you should be able to solve most of them by automatically formatting with:</p>
+<div class="highlight"><pre><span></span><code>task python:format
+</code></pre></div>
+
 <h2 id="working-on-docs">Working on docs<a class="headerlink" href="#working-on-docs" title="Permanent link">&para;</a></h2>
 <p>Documentation is provided to final users in form of static HTML content generated
 from a tool called <a href="https://www.mkdocs.org/">MkDocs</a> and hosted on <a href="https://pages.github.com/">GitHub Pages</a>.</p>
