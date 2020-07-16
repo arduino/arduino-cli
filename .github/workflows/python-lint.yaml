@@ -27,10 +27,10 @@ jobs:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Activate Python
-        uses: actions/setup-python@v1
-        with:
-          python-version: '3.8'
-          architecture: 'x64'
+      uses: actions/setup-python@v1
+      with:
+        python-version: "3.8"
+        architecture: "x64"
 
     - name: Install Poetry
       run: pip install poetry
