@@ -31,14 +31,14 @@ def test_telemetry_prometheus_endpoint(daemon_runner, data_dir):
     inventory_file = os.path.join(data_dir, "inventory.yaml")
     while not os.path.exists(inventory_file):
         time.sleep(1)
-    with open(inventory_file, 'r') as stream:
+    with open(inventory_file, "r") as stream:
         inventory = yaml.safe_load(stream)
 
         # Check if :9090/metrics endpoint is alive,
         # telemetry is enabled by default in daemon mode
         s = requests.Session()
         retries = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
-        s.mount('http://', HTTPAdapter(max_retries=retries))
+        s.mount("http://", HTTPAdapter(max_retries=retries))
         metrics = s.get("http://localhost:9090/metrics").text
         family = next(text_string_to_metric_families(metrics))
         sample = family.samples[0]

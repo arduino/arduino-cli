@@ -1,0 +1,5 @@
+# TODO: move this to pyproject.toml when supported: https://gitlab.com/pycqa/flake8/merge_requests/245
+
+[flake8]
+max-line-length = 120
+ignore = E741

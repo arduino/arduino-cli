@@ -154,6 +154,20 @@ task test-integration
 
 This will automatically install the necessary dependencies, if not already installed, and run the integration tests automatically.
 
+When editing any Python file in the project remember to run linting checks with:
+
+```shell
+task python:check
+```
+
+This will run `flake8` automatically and return any error in the code formatting, if not already installed it will also install integration tests dependencies.
+
+In case of linting errors you should be able to solve most of them by automatically formatting with:
+
+```shell
+task python:format
+```
+
 ## Working on docs
 
 Documentation is provided to final users in form of static HTML content generated

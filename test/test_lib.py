@@ -63,18 +63,13 @@ def test_install(run_command):
     # Test failing-install of library with wrong dependency
     # (https://github.com/arduino/arduino-cli/issues/534)
     result = run_command("lib install MD_Parola@3.2.0")
-    assert (
-        "Error resolving dependencies for MD_Parola@3.2.0: dependency 'MD_MAX72xx' is not available"
-        in result.stderr
-    )
+    assert "Error resolving dependencies for MD_Parola@3.2.0: dependency 'MD_MAX72xx' is not available" in result.stderr
+
 
 def test_update_index(run_command):
     result = run_command("lib update-index")
     assert result.ok
-    assert (
-        "Updating index: library_index.json downloaded"
-        == result.stdout.splitlines()[-1].strip()
-    )
+    assert "Updating index: library_index.json downloaded" == result.stdout.splitlines()[-1].strip()
 
 
 def test_uninstall(run_command):
@@ -84,6 +79,7 @@ def test_uninstall(run_command):
     result = run_command("lib uninstall {}".format(" ".join(libs)))
     assert result.ok
 
+
 def test_uninstall_spaces(run_command):
     key = '"LiquidCrystal I2C"'
     assert run_command("lib install {}".format(key))
@@ -91,6 +87,7 @@ def test_uninstall_spaces(run_command):
     result = run_command("lib list --format json")
     assert result.ok
     assert len(json.loads(result.stdout)) == 0
+
 
 def test_lib_ops_caseinsensitive(run_command):
     """
@@ -108,12 +105,13 @@ def test_lib_ops_caseinsensitive(run_command):
       Types: Contributed
       Versions: [1.0.0]
     """
-    key = 'pcm'
+    key = "pcm"
     assert run_command("lib install {}".format(key))
     assert run_command("lib uninstall {}".format(key))
     result = run_command("lib list --format json")
     assert result.ok
     assert len(json.loads(result.stdout)) == 0
+
 
 def test_search(run_command):
     assert run_command("lib update-index")
@@ -151,9 +149,7 @@ def test_search_paragraph(run_command):
     within the index file.
     """
     assert run_command("lib update-index")
-    result = run_command(
-        'lib search "A simple and efficient JSON library" --format json'
-    )
+    result = run_command('lib search "A simple and efficient JSON library" --format json')
     assert result.ok
     libs_json = json.loads(result.stdout)
     assert 1 == len(libs_json.get("libraries"))

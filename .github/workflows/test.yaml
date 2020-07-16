@@ -43,6 +43,15 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Install Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.8"
+          architecture: "x64"
+
+      - name: Install Poetry
+        run: pip install poetry
+
       - name: Check the code is good
         run: task check
 
@@ -65,16 +74,8 @@ jobs:
         if: matrix.operating-system == 'ubuntu-latest'
         run: task test-legacy
 
-      - name: Install Python
-        uses: actions/setup-python@v1
-        with:
-          python-version: '3.8'
-          architecture: 'x64'
-
       - name: Run integration tests
-        run: |
-          pip install poetry
-          task test-integration
+        run: task test-integration
 
       - name: Send unit tests coverage to Codecov
         # Since secrets aren't available on forks, we only

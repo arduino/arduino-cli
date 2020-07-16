@@ -46,6 +46,22 @@ pytest test_lib.py
 pytest test_lib.py::test_list
 ```
 
+## Linting and formatting
+
+To run lint check from the project's root folder:
+
+```shell
+task python:check
+```
+
+This will run `flake8` automatically and return any error in the code formatting, if not already installed it will also install integration tests dependencies.
+
+In case of linting errors you should be able to solve most of them by automatically formatting with:
+
+```shell
+task python:format
+```
+
 [0]: ../docs/CONTRIBUTING.md
 [poetry-website]: https://python-poetry.org/
 [poetry-docs]: https://python-poetry.org/docs/

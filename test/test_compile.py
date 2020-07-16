@@ -70,9 +70,7 @@ def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
         "Compile {sketch} for {fqbn} started".format(sketch=sketch_path, fqbn=fqbn),
         "Compile {sketch} for {fqbn} successful".format(sketch=sketch_name, fqbn=fqbn),
     ]
-    assert is_message_sequence_in_json_log_traces(
-        expected_trace_sequence, json_log_lines
-    )
+    assert is_message_sequence_in_json_log_traces(expected_trace_sequence, json_log_lines)
 
     # Test the --output-dir flag with absolute path
     target = os.path.join(data_dir, "test_dir")
@@ -105,11 +103,7 @@ def test_output_flag_default_path(run_command, data_dir, working_dir):
     assert result.ok
 
     # Test the --output-dir flag defaulting to current working dir
-    result = run_command(
-        "compile -b {fqbn} {sketch_path} --output-dir test".format(
-            fqbn=fqbn, sketch_path=sketch_path
-        )
-    )
+    result = run_command("compile -b {fqbn} {sketch_path} --output-dir test".format(fqbn=fqbn, sketch_path=sketch_path))
     assert result.ok
     target = os.path.join(working_dir, "test")
     assert os.path.exists(target) and os.path.isdir(target)
@@ -138,9 +132,7 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     os.symlink(loop_file_path, loop_file_path)
 
     # Build sketch for arduino:avr:uno
-    result = run_command(
-        "compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path)
-    )
+    result = run_command("compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path))
     # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
     # returning a different error detailed message
     assert "Error during sketch processing" in result.stderr
@@ -162,9 +154,7 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     os.symlink(loop_dir_path, loop_dir_symlink_path)
 
     # Build sketch for arduino:avr:uno
-    result = run_command(
-        "compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path)
-    )
+    result = run_command("compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path))
     # The assertion is a bit relaxed also in this case because macOS behaves differently from win and linux:
     # the cli does not follow recursively the symlink til breaking
     assert "Error during sketch processing" in result.stderr
@@ -185,7 +175,7 @@ def test_compile_and_upload_combo(run_command, data_dir, detected_boards):
     # Create a test sketch
     sketch_name = "CompileAndUploadIntegrationTest"
     sketch_path = os.path.join(data_dir, sketch_name)
-    sketch_main_file = os.path.join(sketch_path, sketch_name+".ino")
+    sketch_main_file = os.path.join(sketch_path, sketch_name + ".ino")
     result = run_command("sketch new {}".format(sketch_path))
     assert result.ok
     assert "Sketch created in: {}".format(sketch_path) in result.stdout
@@ -194,17 +184,12 @@ def test_compile_and_upload_combo(run_command, data_dir, detected_boards):
     for board in detected_boards:
         log_file_name = "{fqbn}-compile.log".format(fqbn=board.fqbn.replace(":", "-"))
         log_file_path = os.path.join(data_dir, log_file_name)
-        command_log_flags = "--log-format json --log-file {} --log-level trace".format(
-            log_file_path
-        )
+        command_log_flags = "--log-format json --log-file {} --log-level trace".format(log_file_path)
 
         def run_test(s):
             result = run_command(
                 "compile -b {fqbn} --upload -p {address} {sketch_path} {log_flags}".format(
-                    fqbn=board.fqbn,
-                    address=board.address,
-                    sketch_path=s,
-                    log_flags=command_log_flags,
+                    fqbn=board.fqbn, address=board.address, sketch_path=s, log_flags=command_log_flags,
                 )
             )
             assert result.ok
@@ -213,22 +198,12 @@ def test_compile_and_upload_combo(run_command, data_dir, detected_boards):
             log_json = open(log_file_path, "r")
             json_log_lines = log_json.readlines()
             expected_trace_sequence = [
-                "Compile {sketch} for {fqbn} started".format(
-                    sketch=sketch_path, fqbn=board.fqbn
-                ),
-                "Compile {sketch} for {fqbn} successful".format(
-                    sketch=sketch_name, fqbn=board.fqbn
-                ),
-                "Upload {sketch} on {fqbn} started".format(
-                    sketch=sketch_path, fqbn=board.fqbn
-                ),
-                "Upload {sketch} on {fqbn} successful".format(
-                    sketch=sketch_name, fqbn=board.fqbn
-                ),
+                "Compile {sketch} for {fqbn} started".format(sketch=sketch_path, fqbn=board.fqbn),
+                "Compile {sketch} for {fqbn} successful".format(sketch=sketch_name, fqbn=board.fqbn),
+                "Upload {sketch} on {fqbn} started".format(sketch=sketch_path, fqbn=board.fqbn),
+                "Upload {sketch} on {fqbn} successful".format(sketch=sketch_name, fqbn=board.fqbn),
             ]
-            assert is_message_sequence_in_json_log_traces(
-                expected_trace_sequence, json_log_lines
-            )
+            assert is_message_sequence_in_json_log_traces(expected_trace_sequence, json_log_lines)
 
         run_test(sketch_path)
         run_test(sketch_main_file)
@@ -267,11 +242,7 @@ def test_compile_blacklisted_sketchname(run_command, data_dir):
     assert "Sketch created in: {}".format(sketch_path) in result.stdout
 
     # Build sketch for arduino:avr:uno
-    log_file_name = "compile.log"
-    log_file_path = os.path.join(data_dir, log_file_name)
-    result = run_command(
-        "compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path)
-    )
+    result = run_command("compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path))
     assert result.ok
 
 
@@ -290,27 +261,44 @@ def test_compile_without_precompiled_libraries(run_command, data_dir):
     # Install pre-release version of Arduino_TensorFlowLite (will be officially released
     # via lib manager after https://github.com/arduino/arduino-builder/issues/353 is in)
     import zipfile
-    with zipfile.ZipFile("test/testdata/Arduino_TensorFlowLite.zip", 'r') as zip_ref:
+
+    with zipfile.ZipFile("test/testdata/Arduino_TensorFlowLite.zip", "r") as zip_ref:
         zip_ref.extractall("{}/libraries/".format(data_dir))
     result = run_command("lib install Arduino_LSM9DS1@1.1.0")
     assert result.ok
-    result = run_command("compile -b arduino:mbed:nano33ble {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir))
+    result = run_command(
+        "compile -b arduino:mbed:nano33ble {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir)
+    )
     assert result.ok
-    result = run_command("compile -b adafruit:samd:adafruit_feather_m4 {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir))
+    result = run_command(
+        "compile -b adafruit:samd:adafruit_feather_m4 {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(
+            data_dir
+        )
+    )
     assert result.ok
 
     # Non-precompiled version of Arduino_TensorflowLite
     result = run_command("lib install Arduino_TensorflowLite@1.15.0-ALPHA")
     assert result.ok
-    result = run_command("compile -b arduino:mbed:nano33ble {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir))
+    result = run_command(
+        "compile -b arduino:mbed:nano33ble {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir)
+    )
     assert result.ok
-    result = run_command("compile -b adafruit:samd:adafruit_feather_m4 {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir))
+    result = run_command(
+        "compile -b adafruit:samd:adafruit_feather_m4 {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(
+            data_dir
+        )
+    )
     assert result.ok
 
     # Bosch sensor library
-    result = run_command("lib install \"BSEC Software Library@1.5.1474\"")
+    result = run_command('lib install "BSEC Software Library@1.5.1474"')
     assert result.ok
-    result = run_command("compile -b arduino:samd:mkr1000 {}/libraries/BSEC_Software_Library/examples/basic/".format(data_dir))
+    result = run_command(
+        "compile -b arduino:samd:mkr1000 {}/libraries/BSEC_Software_Library/examples/basic/".format(data_dir)
+    )
     assert result.ok
-    result = run_command("compile -b arduino:mbed:nano33ble {}/libraries/BSEC_Software_Library/examples/basic/".format(data_dir))
+    result = run_command(
+        "compile -b arduino:mbed:nano33ble {}/libraries/BSEC_Software_Library/examples/basic/".format(data_dir)
+    )
     assert result.ok
