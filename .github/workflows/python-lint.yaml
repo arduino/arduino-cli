@@ -6,11 +6,11 @@ on:
       - master
     paths:
       - "**.py"
-      - "test/.flake8"
+      - ".flake8"
   pull_request:
     paths:
       - "**.py"
-      - "test/.flake8"
+      - ".flake8"
 
 jobs:
   python-linting:
