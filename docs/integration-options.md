@@ -69,7 +69,7 @@ retrieving the version number of a remote running Arduino CLI server instance:
 
 gRPC is language agnostic: even if the example is written in Golang, the
 programming language used for the client can be Python, JavaScript or any of the
-many [supported ones][gRPC supported languages], leading to a variety of
+many [supported ones][grpc supported languages], leading to a variety of
 possible scenarios. The new [Arduino Pro IDE] is a good example of how to
 leverage the daemon mode of the Arduino CLI with a clean separation of concerns:
 the Pro IDE knows nothing about how to download a core, compile a sketch or talk
@@ -104,34 +104,32 @@ provide support for.
 ## Conclusions
 
 You can start playing with the Arduino CLI right away. The code is open source
-and [the repo][Arduino CLI repository] contains
-[example code showing how to implement a gRPC client][gRPC client example]. If
+and [the repo][arduino cli repository] contains
+[example code showing how to implement a gRPC client][grpc client example]. If
 you’re curious about how we designed the low level API, have a look at the
 [commands package] and don’t hesitate to leave feedback on the [issue tracker]
 if you’ve got a use case that doesn’t fit one of the three pillars.
 
-
-[Golang]: https://golang.org/
-[Arduino Pro IDE]: https://www.arduino.cc/pro/arduino-pro-ide
-[Arduino Create]: https://create.arduino.cc
+[golang]: https://golang.org/
+[arduino pro ide]: https://www.arduino.cc/pro/arduino-pro-ide
+[arduino create]: https://create.arduino.cc
 [continuous integration]: https://en.wikipedia.org/wiki/Continuous_integration
 [continuous deployment]: https://en.wikipedia.org/wiki/Continuous_deployment
 [configuration documentation]: configuration.md
-[JSON]: https://www.json.org
+[json]: https://www.json.org
 [installation script]: installation.md#use-the-install-script
 [command reference]: ../commands/arduino-cli
-[gRPC]: https://grpc.io/
-[RPC]: https://en.wikipedia.org/wiki/Remote_procedure_call
+[grpc]: https://grpc.io/
+[rpc]: https://en.wikipedia.org/wiki/Remote_procedure_call
 [daemon mode]: ../commands/arduino-cli_daemon
-[gRPC interface reference]: ../rpc/commands
-[gRPC supported languages]: https://grpc.io/docs/languages/
-[Arduino CLI repository]: https://github.com/arduino/arduino-cli
-[gRPC client example]: https://github.com/arduino/arduino-cli/blob/master/client_example
+[grpc interface reference]: ../rpc/commands
+[grpc supported languages]: https://grpc.io/docs/languages/
+[arduino cli repository]: https://github.com/arduino/arduino-cli
+[grpc client example]: https://github.com/arduino/arduino-cli/blob/master/client_example
 [commands package]: https://github.com/arduino/arduino-cli/tree/master/commands
 [issue tracker]: https://github.com/arduino/arduino-cli/issues
-
 [contextual help screenshot]: img/CLI_contextual_help_screenshot.png
 [configuration methods screenshot]: img/CLI_configuration_methods_screenshot.png
-[JSON output screenshot]: img/CLI_JSON_output_screenshot.png
-[gRPC interface screenshot]: img/CLI_gRPC_interface_screenshot.png
-[Go library interface screenshot]: img/CLI_Go_library_interface_screenshot.png
+[json output screenshot]: img/CLI_JSON_output_screenshot.png
+[grpc interface screenshot]: img/CLI_gRPC_interface_screenshot.png
+[go library interface screenshot]: img/CLI_Go_library_interface_screenshot.png

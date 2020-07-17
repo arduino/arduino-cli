@@ -3,10 +3,9 @@ name: nightly
 on:
   schedule:
     # run every day at 1AM
-    - cron:  '0 1 * * *'
+    - cron: '0 1 * * *'
 
 jobs:
-
   create-nightly-artifacts:
     runs-on: ubuntu-latest
 

@@ -136,7 +136,7 @@ Arduino/Genuino MKR1000 arduino:samd:mkr1000
 
 ## Install the core for your board
 
-To install the ``arduino:samd`` platform core, run the following:
+To install the `arduino:samd` platform core, run the following:
 
 ```sh
 $ arduino-cli core install arduino:samd
@@ -181,7 +181,7 @@ For example, to add the ESP8266 core, edit the configuration file and change the
 
 ```yaml
 board_manager:
-    additional_urls:
+  additional_urls:
     - https://arduino.esp8266.com/stable/package_esp8266com_index.json
 ```
 
@@ -300,7 +300,7 @@ Name: "SoftTimer"
     Versions: [3.0.0, 3.1.0, 3.1.1, 3.1.2, 3.1.3, 3.1.5, 3.2.0]
 ```
 
-Our favourite is ``FTDebouncer``, let's install it by running:
+Our favourite is `FTDebouncer`, let's install it by running:
 
 ```sh
 $ arduino-cli lib install FTDebouncer
@@ -311,16 +311,13 @@ Installing FTDebouncer@1.3.0...
 Installed FTDebouncer@1.3.0
 ```
 
-
-Using the ``daemon`` mode and the gRPC interface
-------------------------------------------------
+## Using the `daemon` mode and the gRPC interface
 
 Arduino CLI can be launched as a gRPC server via the `daemon` command.
 
 The [client_example] folder contains a sample client code that shows how to
 interact with the gRPC server. Available services and messages are detailed
 in the [gRPC reference] pages.
-
 
 To provide observability for the gRPC server activities besides logs,
 the `daemon` mode activates and exposes by default a [Prometheus](https://prometheus.io/)
@@ -335,7 +332,7 @@ daemon_compile{buildProperties="",exportFile="",fqbn="arduino:samd:mkr1000",inst
 daemon_board_list{installationID="ed6f1f22-1fbe-4b1f-84be-84d035b6369c",success="true"} 1 1580385724833
 ```
 
-The telemetry settings are exposed via the ``telemetry`` section
+The telemetry settings are exposed via the `telemetry` section
 in the CLI configuration:
 
 ```yaml
@@ -346,5 +343,5 @@ telemetry:
 
 [configuration documentation]: configuration.md
 [client_example]: https://github.com/arduino/arduino-cli/blob/master/client_example
-[gRPC reference]: ../rpc/commands
-[Prometheus]: https://prometheus.io/
+[grpc reference]: ../rpc/commands
+[prometheus]: https://prometheus.io/

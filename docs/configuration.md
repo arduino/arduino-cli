@@ -1,29 +1,29 @@
 ## Configuration keys
 
-* `board_manager`
-    * `additional_urls` - the URLs to any additional Board Manager package index
+- `board_manager`
+  - `additional_urls` - the URLs to any additional Board Manager package index
     files needed for your boards platforms.
-* `daemon` - options related to running Arduino CLI as a [gRPC] server.
-    * `port` - TCP port used for gRPC client connections.
-* `directories` - directories used by Arduino CLI.
-    * `data` - directory used to store Board/Library Manager index files and
+- `daemon` - options related to running Arduino CLI as a [gRPC] server.
+  - `port` - TCP port used for gRPC client connections.
+- `directories` - directories used by Arduino CLI.
+  - `data` - directory used to store Board/Library Manager index files and
     Board Manager platform installations.
-    * `downloads` - directory used to stage downloaded archives during
+  - `downloads` - directory used to stage downloaded archives during
     Board/Library Manager installations.
-    * `user` - the equivalent of the Arduino IDE's
+  - `user` - the equivalent of the Arduino IDE's
     ["sketchbook" directory][sketchbook directory]. Library Manager
     installations are made to the `libraries` subdirectory of the user
     directory.
-* `logging` - configuration options for Arduino CLI's logs.
-    * `file` - path to the file where logs will be written.
-    * `format` - output format for the logs. Allowed values are `text` or
+- `logging` - configuration options for Arduino CLI's logs.
+  - `file` - path to the file where logs will be written.
+  - `format` - output format for the logs. Allowed values are `text` or
     `json`.
-    * `level` - messages with this level and above will be logged. Valid levels
+  - `level` - messages with this level and above will be logged. Valid levels
     are: `trace`, `debug`, `info`, `warn`, `error`, `fatal`, `panic`.
-* `telemetry` - settings related to the collection of data used for continued
-improvement of Arduino CLI.
-    * `addr` - TCP port used for telemetry communication.
-    * `enabled` - controls the use of telemetry.
+- `telemetry` - settings related to the collection of data used for continued
+  improvement of Arduino CLI.
+  _ `addr` - TCP port used for telemetry communication.
+  _ `enabled` - controls the use of telemetry.
 
 ## Configuration methods
 
@@ -97,23 +97,23 @@ extension for the file's format.
 `arduino-cli config init` creates a YAML file, however a variety of common
 formats are supported:
 
-* [JSON]
-* [TOML]
-* [YAML]
-* [Java properties file]
-* [HCL]
-* envfile
-* [INI]
+- [JSON]
+- [TOML]
+- [YAML]
+- [Java properties file]
+- [HCL]
+- envfile
+- [INI]
 
 #### Locations
 
 Configuration files in the following locations are recognized by Arduino CLI:
 
-1. Location specified by the [`--config-file`][Arduino CLI command reference]
-command line flag
+1. Location specified by the [`--config-file`][arduino cli command reference]
+   command line flag
 1. Current working directory
 1. Any parent directory of the current working directory (more immediate parents
-having higher precedence)
+   having higher precedence)
 1. Arduino CLI data directory (as configured by `directories.data`)
 
 If multiple configuration files are present, the one highest on the above list
@@ -133,7 +133,7 @@ Setting an additional Board Manager URL using a YAML format configuration file:
 ```yaml
 board_manager:
   additional_urls:
-  - https://downloads.arduino.cc/packages/package_staging_index.json
+    - https://downloads.arduino.cc/packages/package_staging_index.json
 ```
 
 Doing the same using a TOML format file:
@@ -143,18 +143,17 @@ Doing the same using a TOML format file:
 additional_urls = [ "https://downloads.arduino.cc/packages/package_staging_index.json" ]
 ```
 
-
-[gRPC]: https://grpc.io
+[grpc]: https://grpc.io
 [sketchbook directory]: sketch-specification.md#sketchbook
 [arduino-cli config dump]: ../commands/arduino-cli_config_dump
-[Arduino CLI command reference]: ../commands/arduino-cli
+[arduino cli command reference]: ../commands/arduino-cli
 [arduino-cli global flags]: ../commands/arduino-cli_config/#options-inherited-from-parent-commands
 [export command]: https://ss64.com/bash/export.html
 [set command]: https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/set_1
 [arduino-cli config init]: ../commands/arduino-cli_config_init
-[JSON]: https://www.json.org
-[TOML]: https://github.com/toml-lang/toml
-[YAML]: https://en.wikipedia.org/wiki/YAML
-[Java properties file]: https://en.wikipedia.org/wiki/.properties
-[HCL]: https://github.com/hashicorp/hcl
-[INI]: https://en.wikipedia.org/wiki/INI_file
+[json]: https://www.json.org
+[toml]: https://github.com/toml-lang/toml
+[yaml]: https://en.wikipedia.org/wiki/YAML
+[java properties file]: https://en.wikipedia.org/wiki/.properties
+[hcl]: https://github.com/hashicorp/hcl
+[ini]: https://en.wikipedia.org/wiki/INI_file

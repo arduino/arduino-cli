@@ -47,27 +47,27 @@ A library is considered **optimized** for architecture `X` only if the `architec
 
 Examples:
 
-`architectures` field in `library.properties` | Compatible with `avr` | Optimized for `avr`
----|---|---
-not specified | YES | NO
-`architectures=*` | YES | NO
-`architectures=avr` | YES | YES
-`architectures=*,avr` | YES | YES
-`architectures=*,esp8266` | YES | NO
-`architectures=avr,esp8266` | YES | YES
-`architectures=samd` | NO | NO
+| `architectures` field in `library.properties` | Compatible with `avr` | Optimized for `avr` |
+| --------------------------------------------- | --------------------- | ------------------- |
+| not specified                                 | YES                   | NO                  |
+| `architectures=*`                             | YES                   | NO                  |
+| `architectures=avr`                           | YES                   | YES                 |
+| `architectures=*,avr`                         | YES                   | YES                 |
+| `architectures=*,esp8266`                     | YES                   | NO                  |
+| `architectures=avr,esp8266`                   | YES                   | YES                 |
+| `architectures=samd`                          | NO                    | NO                  |
 
 ### Folder Name Priority
 
 The "folder name priority" is determined as follows (in order of highest to lowest priority):
 
-Rule | Example for `Servo.h`
----|---
-The folder name matches the include 100% | `Servo`
-The folder name matches the include 100%, except with a `-master` suffix | `Servo-master`
-The folder name has a matching prefix | `ServoWhatever`
-The folder name has a matching suffix | `AwesomeServo`
-The folder name contains the include | `AnAwesomeServoForWhatever`
+| Rule                                                                     | Example for `Servo.h`       |
+| ------------------------------------------------------------------------ | --------------------------- |
+| The folder name matches the include 100%                                 | `Servo`                     |
+| The folder name matches the include 100%, except with a `-master` suffix | `Servo-master`              |
+| The folder name has a matching prefix                                    | `ServoWhatever`             |
+| The folder name has a matching suffix                                    | `AwesomeServo`              |
+| The folder name contains the include                                     | `AnAwesomeServoForWhatever` |
 
 ### Location Priority
 
@@ -78,7 +78,7 @@ The "location priority" is determined as follows (in order of highest to lowest 
 1. The library is bundled with the board platform/core ([`{runtime.platform.path}/libraries`](platform-specification.md#global-predefined-properties))
 1. The library is bundled with the [referenced](platform-specification.md#referencing-another-core-variant-or-tool) board platform/core
 1. The library is bundled with the Arduino IDE ([`{runtime.ide.path}/libraries`](platform-specification.md#global-predefined-properties))
-    - This location is only used by Arduino CLI when it's located in the Arduino IDE installation folder
+   - This location is only used by Arduino CLI when it's located in the Arduino IDE installation folder
 
 ## Compilation
 

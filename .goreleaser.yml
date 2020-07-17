@@ -19,8 +19,7 @@ changelog:
 # We have multiple builds in order to fine tune
 # cross compilations.
 builds:
-  -
-    # OSX
+  - # OSX
     id: arduino_cli_osx
     binary: arduino-cli
     env:
@@ -33,8 +32,7 @@ builds:
       - amd64
     ldflags:
       - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
-  -
-    # ARM
+  - # ARM
     id: arduino_cli_arm
     binary: arduino-cli
     env:
@@ -49,8 +47,7 @@ builds:
     ldflags:
       - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
       - "-extldflags '-static'"
-  -
-    # ARMv7
+  - # ARMv7
     id: arduino_cli_armv7
     binary: arduino-cli
     env:
@@ -65,8 +62,7 @@ builds:
     ldflags:
       - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
       - "-extldflags '-static'"
-  -
-    # ARM64
+  - # ARM64
     id: arduino_cli_arm64
     binary: arduino-cli
     env:
@@ -79,8 +75,7 @@ builds:
     ldflags:
       - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
       - "-extldflags '-static'"
-  -
-    # All the other platforms
+  - # All the other platforms
     id: arduino_cli
     binary: arduino-cli
     env:
@@ -96,8 +91,7 @@ builds:
       - "-extldflags '-static'"
 
 archives:
-  -
-    id: "arduino_cli"
+  - id: 'arduino_cli'
     format: tar.gz
     format_overrides:
       - goos: windows

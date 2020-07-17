@@ -6,7 +6,6 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
-
   create-release-artifacts:
     runs-on: ubuntu-latest
 

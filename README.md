@@ -12,7 +12,7 @@ board and platforms.
 [![codecov-badge]](https://codecov.io/gh/arduino/arduino-cli)
 
 > **Note:** this software is currently under active development: anything can change
-  at any time, API and UI must be considered unstable until we release version 1.0.0.
+> at any time, API and UI must be considered unstable until we release version 1.0.0.
 
 ## Docs
 
@@ -42,16 +42,15 @@ Security Team 🛡️ Thank you!
 
 e-mail contact: security@arduino.cc
 
-
 [tests-badge]: https://github.com/Arduino/arduino-cli/workflows/test/badge.svg
 [nightly-badge]: https://github.com/Arduino/arduino-cli/workflows/nightly/badge.svg
 [docs-badge]: https://github.com/Arduino/arduino-cli/workflows/docs/badge.svg
 [codecov-badge]: https://codecov.io/gh/arduino/arduino-cli/branch/master/graph/badge.svg
-[Install]: https://arduino.github.io/arduino-cli/installation
-[User documentation]: https://arduino.github.io/arduino-cli/
-[Getting Started]: https://arduino.github.io/arduino-cli/getting-started/
-[Commands reference]: https://arduino.github.io/arduino-cli/commands/arduino-cli
-[FAQ]: https://arduino.github.io/arduino-cli/FAQ/
-[How to contribute]: https://arduino.github.io/arduino-cli/CONTRIBUTING/
+[install]: https://arduino.github.io/arduino-cli/installation
+[user documentation]: https://arduino.github.io/arduino-cli/
+[getting started]: https://arduino.github.io/arduino-cli/getting-started/
+[commands reference]: https://arduino.github.io/arduino-cli/commands/arduino-cli
+[faq]: https://arduino.github.io/arduino-cli/FAQ/
+[how to contribute]: https://arduino.github.io/arduino-cli/CONTRIBUTING/
 [contributors]: https://github.com/arduino/arduino-cli/graphs/contributors
 [security policy]: https://github.com/arduino/arduino-cli/security/policy

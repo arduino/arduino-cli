@@ -8,7 +8,7 @@ The programs that run on Arduino boards are called "sketches". This term was inh
 
 Because many Arduino sketches only contain a single .ino file, it's easy to think of that file as the sketch. However, it is the folder that is the sketch. The reason is that sketches may consist of multiple code files and the folder is what groups those files into a single program.
 
-The sketch root folder name must start with a basic letter (`A`-`Z` or `a`-`z`) or number (`0`-`9`), followed by basic letters, numbers, spaces (` `), underscores (`_`), dots (`.`) and dashes (`-`). The maximum length is 63 characters.
+The sketch root folder name must start with a basic letter (`A`-`Z` or `a`-`z`) or number (`0`-`9`), followed by basic letters, numbers, spaces (``), underscores (`_`), dots (`.`) and dashes (`-`). The maximum length is 63 characters.
 
 Support for sketch folder name starting with a number was added in Arduino IDE 1.8.4.
 
@@ -22,12 +22,12 @@ Sketches may consist of multiple code files.
 
 The following extensions are supported:
 
-* .ino - [Arduino language](https://www.arduino.cc/reference/en/) files.
-* .pde - Alternate extension for Arduino language files. This file extension is also used by Processing sketches. .ino is recommended to avoid confusion.
-* .cpp - C++ files.
-* .c - C Files.
-* .S - Assembly language files.
-* .h - Header files.
+- .ino - [Arduino language](https://www.arduino.cc/reference/en/) files.
+- .pde - Alternate extension for Arduino language files. This file extension is also used by Processing sketches. .ino is recommended to avoid confusion.
+- .cpp - C++ files.
+- .c - C Files.
+- .S - Assembly language files.
+- .h - Header files.
 
 For information about how each of these files and other parts of the sketch are used during compilation, see the [Sketch build process documentation](sketch-build-process.md).
 
@@ -39,9 +39,9 @@ This is useful for files you don't want to expose to the sketch user via the IDE
 
 Arduino language files under the `src` folder are not supported.
 
-* In Arduino IDE 1.6.5-r5 and older, no recursive compilation was done.
-* In Arduino IDE 1.6.6 - 1.6.9, recursive compilation was done of all subfolders of the sketch folder.
-* In Arduino IDE 1.6.10 and newer, recursive compilation is limited to the `src` subfolder of the sketch folder.
+- In Arduino IDE 1.6.5-r5 and older, no recursive compilation was done.
+- In Arduino IDE 1.6.6 - 1.6.9, recursive compilation was done of all subfolders of the sketch folder.
+- In Arduino IDE 1.6.10 and newer, recursive compilation is limited to the `src` subfolder of the sketch folder.
 
 ### `data` subfolder
 
@@ -61,7 +61,7 @@ The `included_libs` key defines the library versions the Arduino Web Editor uses
 
 ### Secrets
 
-Arduino Web Editor has a ["Secret tab" feature](https://create.arduino.cc/projecthub/Arduino_Genuino/store-your-sensitive-data-safely-when-sharing-a-sketch-e7d0f0) that makes it easy to share sketches without accidentally exposing sensitive data (e.g., password, token). The Arduino Web Editor automatically generates macros for any identifier in the sketch which starts with `SECRET_ `and contains all uppercase characters.
+Arduino Web Editor has a ["Secret tab" feature](https://create.arduino.cc/projecthub/Arduino_Genuino/store-your-sensitive-data-safely-when-sharing-a-sketch-e7d0f0) that makes it easy to share sketches without accidentally exposing sensitive data (e.g., password, token). The Arduino Web Editor automatically generates macros for any identifier in the sketch which starts with `SECRET_`and contains all uppercase characters.
 
 When you download a sketch from Arduino Web Editor that contains a Secret tab, the empty `#define` directives for the secrets are in a file named arduino_secrets.h, with an `#include` directive to that file at the top of the primary sketch file. This is hidden when viewing the sketch in Arduino Web Editor.
 
@@ -122,5 +122,5 @@ This feature was added in Arduino IDE 1.6.9.
 
 ## See also
 
-* [Sketch build process documentation](sketch-build-process.md)
-* [Style guide for example sketches](http://arduino.cc/en/Reference/StyleGuide)
+- [Sketch build process documentation](sketch-build-process.md)
+- [Style guide for example sketches](http://arduino.cc/en/Reference/StyleGuide)

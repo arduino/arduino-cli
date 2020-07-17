@@ -25,11 +25,11 @@ task i18n:update
 
 Set the following environment variables according to the project
 
-|Variable|Description|
-|--------|-----------|
-|TRANSIFEX_PROJECT|Name of the transifex project|
-|TRANSIFEX_RESOURCE|Name of the transifex translation resource|
-|TRANSIFEX_API_KEY|API Key to access the transifex project|
+| Variable           | Description                                |
+| ------------------ | ------------------------------------------ |
+| TRANSIFEX_PROJECT  | Name of the transifex project              |
+| TRANSIFEX_RESOURCE | Name of the transifex translation resource |
+| TRANSIFEX_API_KEY  | API Key to access the transifex project    |
 
 ### Push
 

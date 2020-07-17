@@ -3,7 +3,7 @@ name: i18n-nightly-push
 on:
   schedule:
     # run every day at 1AM
-    - cron:  '0 1 * * *'
+    - cron: '0 1 * * *'
 
 jobs:
   push-to-transifex:

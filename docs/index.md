@@ -18,8 +18,7 @@ The [client_example] folder contains a sample program that shows how to use gRPC
 interface of the CLI. Available services and messages are detailed in the
 [gRPC reference] pages.
 
-
 [installation]: installation.md
-[Getting started guide]: getting-started.md
+[getting started guide]: getting-started.md
 [client_example]: https://github.com/arduino/arduino-cli/blob/master/client_example
-[gRPC reference]: rpc/commands
+[grpc reference]: rpc/commands

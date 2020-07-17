@@ -7,7 +7,9 @@ The Arduino CLI is available as a Homebrew formula since version
 brew update
 brew install arduino-cli
 ```
+
 #### Command line completion
+
 [Command line completion](command-line-completion.md#brew) files are already bundled in the homebrew installation.
 
 ### Use the install script
@@ -51,25 +53,25 @@ installation path to your `PATH` environment variable.
 
 #### Latest packages
 
-Platform  |                    |                    |
---------- | ------------------ | ------------------ |
-Linux     | [Linux 32 bit]     | [Linux 64 bit]     |
-Linux ARM | [Linux ARM 32 bit] | [Linux ARM 64 bit] |
-Windows   | [Windows 32 bit]   | [Windows 64 bit]   |
-Mac OSX   |                    | [Mac OSX]          |
+| Platform  |                    |                    |
+| --------- | ------------------ | ------------------ |
+| Linux     | [Linux 32 bit]     | [Linux 64 bit]     |
+| Linux ARM | [Linux ARM 32 bit] | [Linux ARM 64 bit] |
+| Windows   | [Windows 32 bit]   | [Windows 64 bit]   |
+| Mac OSX   |                    | [Mac OSX]          |
 
-[Linux 64 bit]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz
-[Linux 32 bit]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_32bit.tar.gz
-[Linux ARM 64 bit]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARM64.tar.gz
-[Linux ARM 32 bit]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARMv7.tar.gz
-[Windows 64 bit]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_64bit.zip
-[Windows 32 bit]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_32bit.zip
-[Mac OSX]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_64bit.tar.gz
+[linux 64 bit]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz
+[linux 32 bit]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_32bit.tar.gz
+[linux arm 64 bit]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARM64.tar.gz
+[linux arm 32 bit]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARMv7.tar.gz
+[windows 64 bit]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_64bit.zip
+[windows 32 bit]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_32bit.zip
+[mac osx]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_64bit.tar.gz
 
 > **Deprecation notice**: links in the form
-  `http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-<platform>.tar.bz2`
-  won’t be further updated. That URL will provide the version
-  `0.3.7-alpha.preview`, regardless of further releases.
+> `http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-<platform>.tar.bz2`
+> won’t be further updated. That URL will provide the version
+> `0.3.7-alpha.preview`, regardless of further releases.
 
 #### Previous versions
 
@@ -81,25 +83,25 @@ These builds are generated every day at 01:00 GMT from the `master` branch and
 should be considered unstable. In order to get the latest nightly build
 available for the supported platform, use the following links:
 
-Platform  |                            |                            |
---------- | -------------------------- | -------------------------- |
-Linux     | [Nightly Linux 32 bit]     | [Nightly Linux 64 bit]     |
-Linux ARM | [Nightly Linux ARM 32 bit] | [Nightly Linux ARM 64 bit] |
-Windows   | [Nightly Windows 32 bit]   | [Nightly Windows 64 bit]   |
-Mac OSX   |                            | [Nightly Mac OSX]                  |
+| Platform  |                            |                            |
+| --------- | -------------------------- | -------------------------- |
+| Linux     | [Nightly Linux 32 bit]     | [Nightly Linux 64 bit]     |
+| Linux ARM | [Nightly Linux ARM 32 bit] | [Nightly Linux ARM 64 bit] |
+| Windows   | [Nightly Windows 32 bit]   | [Nightly Windows 64 bit]   |
+| Mac OSX   |                            | [Nightly Mac OSX]          |
 
-[Nightly Linux 64 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_64bit.tar.gz
-[Nightly Linux 32 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_32bit.tar.gz
-[Nightly Linux ARM 64 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARM64.tar.gz
-[Nightly Linux ARM 32 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARMv7.tar.gz
-[Nightly Windows 64 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_64bit.zip
-[Nightly Windows 32 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_32bit.zip
-[Nightly Mac OSX]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_macOS_64bit.tar.gz
+[nightly linux 64 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_64bit.tar.gz
+[nightly linux 32 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_32bit.tar.gz
+[nightly linux arm 64 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARM64.tar.gz
+[nightly linux arm 32 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARMv7.tar.gz
+[nightly windows 64 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_64bit.zip
+[nightly windows 32 bit]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_32bit.zip
+[nightly mac osx]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_macOS_64bit.tar.gz
 
 > These links return a `302: Found` response, redirecting to latest
-  generated builds by replacing `latest` with the latest available build
-  date, using the format YYYYMMDD (i.e for 2019/Aug/06 `latest` is
-  replaced with `20190806` )
+> generated builds by replacing `latest` with the latest available build
+> date, using the format YYYYMMDD (i.e for 2019/Aug/06 `latest` is
+> replaced with `20190806` )
 
 Checksums for the nightly builds are available at
 `https://downloads.arduino.cc/arduino-cli/nightly/nightly-<DATE>-checksums.txt`
@@ -121,5 +123,5 @@ docker run -v $PWD:/arduino-cli -w /arduino-cli -e PACKAGE_NAME_PREFIX='snapshot
 Once the build is over, you will find a `./dist/` folder containing the packages
 built out of the current source tree.
 
-[Git for Windows]: https://gitforwindows.org/
-[CONTRIBUTING]: CONTRIBUTING.md
+[git for windows]: https://gitforwindows.org/
+[contributing]: CONTRIBUTING.md

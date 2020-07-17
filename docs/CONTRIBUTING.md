@@ -14,17 +14,17 @@ Before we can accept your contributions you have to sign the [Contributor Licens
 In order to ease code reviews and have your contributions merged faster, here is
 a list of items you can check before submitting a PR:
 
-* Create small PRs that are narrowly focused on addressing a single concern.
-* PR titles indirectly become part of the CHANGELOG so it's crucial to provide a
+- Create small PRs that are narrowly focused on addressing a single concern.
+- PR titles indirectly become part of the CHANGELOG so it's crucial to provide a
   good record of **what** change is being made in the title; **why** it was made
   will go in the PR description, along with a link to a GitHub issue if it
   exists.
-* Write tests for the code you wrote.
-* Open your PR against the `master` branch.
-* Maintain **clean commit history** and use **meaningful commit messages**.
+- Write tests for the code you wrote.
+- Open your PR against the `master` branch.
+- Maintain **clean commit history** and use **meaningful commit messages**.
   PRs with messy commit history are difficult to review and require a lot of
   work to be merged.
-* Your PR must pass all CI tests before we will merge it. If you're seeing an
+- Your PR must pass all CI tests before we will merge it. If you're seeing an
   error and don't think
   it's your fault, it may not be! The reviewer will help you if there are test
   failures that seem
@@ -35,18 +35,18 @@ a list of items you can check before submitting a PR:
 To build the Arduino CLI from sources you need the following tools to be
 available in your local environment:
 
-* [Go][1] version 1.12 or later
-* [Taskfile][2] to help you run the most common tasks from the command line
+- [Go][1] version 1.12 or later
+- [Taskfile][2] to help you run the most common tasks from the command line
 
 If you want to run integration tests you will also need:
 
-* A serial port with an Arduino board attached
-* A working [Python][3] environment, version 3.8 or later
+- A serial port with an Arduino board attached
+- A working [Python][3] environment, version 3.8 or later
 
 If you're working on the gRPC interface you will also have to:
 
-* download the [protoc][6] compiler
-* run `go get -u github.com/golang/protobuf/protoc-gen-go`
+- download the [protoc][6] compiler
+- run `go get -u github.com/golang/protobuf/protoc-gen-go`
 
 ## Building the source code
 
@@ -120,10 +120,10 @@ assess the options are correctly understood and the output is what we expect.
 
 An Arduino board attached to a serial port. The board must:
 
-* Use one of the VID/PID pairs used by Arduino or their partners (as is the case
-with all modern official Arduino boards except the classic Nano).
-* Accept uploads using the FQBN associated with that VID/PID (which will be the
-case unless you have installed a custom bootloader or removed the bootloader).
+- Use one of the VID/PID pairs used by Arduino or their partners (as is the case
+  with all modern official Arduino boards except the classic Nano).
+- Accept uploads using the FQBN associated with that VID/PID (which will be the
+  case unless you have installed a custom bootloader or removed the bootloader).
 
 Note that running the integration tests will result in a sketch being uploaded
 to every attached Arduino board meeting the above requirements.
@@ -177,7 +177,7 @@ from a tool called [MkDocs][9] and hosted on [GitHub Pages][7].
 
 Most of the documentation consists of static content written over several
 Markdown files under the `docs` folder at the root of this git repository but
-some  other content is dynamically generated from the CI pipelines - this is the
+some other content is dynamically generated from the CI pipelines - this is the
 case with the command line reference and the gRPC interface, for example.
 
 If you want to check out how the documentation would look after some local
@@ -185,17 +185,17 @@ changes, you might need to reproduce what happens in the CI, generating the full
 documentation website from your personal computer. To run the docs toolchain
 locally, you need to have a few dependencies and tools installed:
 
-* [Go][1] version 1.12 or later
-* [Taskfile][2] to help you run the most common tasks from the command line
-* A working [Python][3] environment, see [this paragraph](#integration-tests)
+- [Go][1] version 1.12 or later
+- [Taskfile][2] to help you run the most common tasks from the command line
+- A working [Python][3] environment, see [this paragraph](#integration-tests)
   if you need to setup one
 
 Before running the toolchain, perform the following operations from the root of
 the git repository (if you have a Python virtual environment, activate it before
 proceeding):
 
-* go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
-* pip install -r requirements_docs.txt
+- go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
+- pip install -r requirements_docs.txt
 
 When working on docs, you can launch a command that will take care of
 generating the docs, build the static website and start a local server you can
@@ -228,25 +228,25 @@ or MkDocs, so we had to implement it on top of the generation process.
 Before delving into the details of the generation process, here follow some
 requirements that were established to provide versioned documentation:
 
-* A special version of the documentation called `dev` is provided to reflect the
+- A special version of the documentation called `dev` is provided to reflect the
   status of the Arduino CLI on the `master` branch - this includes unreleased
   features and bugfixes.
-* Docs are versioned after the minor version of an Arduino CLI release. For
+- Docs are versioned after the minor version of an Arduino CLI release. For
   example, Arduino CLI `0.99.1` and `0.99.2` will be both covered by
   documentation version `0.99`.
-* The landing page of the documentation website will automatically redirect
+- The landing page of the documentation website will automatically redirect
   visitors to the most recently released version of the Arduino CLI.
 
 To implement the requirements above, the execution of MkDocs is wrapped using a
 CLI tool called [Mike][10] that does a few things for us:
 
-* It runs MkDocs targeting subfolders named after the Arduino CLI version, e.g.
+- It runs MkDocs targeting subfolders named after the Arduino CLI version, e.g.
   documentation for version `0.10.1` can be found under the folder `0.10`.
-* It injects an HTML control into the documentation website that lets visitors
+- It injects an HTML control into the documentation website that lets visitors
   choose which version of the docs to browse from a dropdown list.
-* It provides a redirect to a version we decide when visitors hit the landing
+- It provides a redirect to a version we decide when visitors hit the landing
   page of the documentation website.
-* It pushes generated contents to the `gh-pages` branch.
+- It pushes generated contents to the `gh-pages` branch.
 
 > **Note:** unless you're working on the generation process itself, you should
 > never run Mike from a local environment, either directly or through the Task
