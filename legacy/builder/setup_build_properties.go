@@ -67,6 +67,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	buildProperties.Set("build.fqbn", ctx.FQBN.String())
 	buildProperties.Set("ide_version", ctx.ArduinoAPIVersion)
 	buildProperties.Set("runtime.os", properties.GetOSSuffix())
+	buildProperties.Set("build.library_discovery_phase", "0")
 
 	if ctx.OptimizeForDebug {
 		if buildProperties.ContainsKey("compiler.optimization_flags.debug") {

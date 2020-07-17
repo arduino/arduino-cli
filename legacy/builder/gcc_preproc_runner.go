@@ -57,6 +57,7 @@ func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath *
 
 func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList) (*exec.Cmd, error) {
 	properties := ctx.BuildProperties.Clone()
+	properties.Set("build.library_discovery_phase", "1")
 	properties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, sourceFilePath)
 	properties.SetPath(constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH, targetFilePath)
 
