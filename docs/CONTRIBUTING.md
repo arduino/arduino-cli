@@ -168,6 +168,29 @@ In case of linting errors you should be able to solve most of them by automatica
 task python:format
 ```
 
+### Configuration files formatting
+
+To keep the configurations tidy and in order we use [Prettier][prettier-website] to automatically format all YAML files in the project.
+Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the introduction of formatting changes made by unconfigured editors.
+
+There are several ways to run Prettier, if you're using Visual Studio Code you can easily use the [`prettier-vscode` extension][prettier-vscode-extension] to automatically format as you write.
+
+Otherwise you can use the following tasks, to do so you'll need to install `npm` if not already installed. Check the [official documentation][npm-install-docs] to know how to install `npm` for your platform.
+
+To check if the files are correctly formatted run:
+
+```shell
+task config:check
+```
+
+If the output tells you that some files are not formatted correctly run:
+
+```shell
+task config:format
+```
+
+When opening a new Pull Requests checks are automatically run to verify that configuration files are correctly formatted. In case of failures we might ask you to update the PR with correct formatting.
+
 ## Working on docs
 
 Documentation is provided to final users in form of static HTML content generated
@@ -252,6 +275,29 @@ CLI tool called [Mike][10] that does a few things for us:
 > never run Mike from a local environment, either directly or through the Task
 > `docs:publish`. This might result in unwanted changes to the public website.
 
+### Docs formatting
+
+To keep the documentation tidy and in order we use [Prettier][prettier-website] to automatically format all Markdown files in the project.
+Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the introduction of formatting changes made by unconfigured editors.
+
+There are several ways to run Prettier, if you're using Visual Studio Code you can easily use the [`prettier-vscode` extension][prettier-vscode-extension] to automatically format as you write.
+
+Otherwise you can use the following tasks, to do so you'll need to install `npm` if not already installed. Check the [official documentation][npm-install-docs] to know how to install `npm` for your platform.
+
+To check if the files are correctly formatted run:
+
+```shell
+task docs:check
+```
+
+If the output tells you that some files are not formatted correctly run:
+
+```shell
+task docs:format
+```
+
+When opening a new Pull Requests checks are automatically run to verify that documentation is correctly formatted. In case of failures we might ask you to update the PR with correct formatting.
+
 ### Docs automation
 
 In order to avoid unwanted changes to the public website hosting the Arduino
@@ -327,3 +373,6 @@ title with the string **[skip changelog]**
 [10]: https://github.com/jimporter/mike
 [11]: https://github.com/arduino/arduino-cli/blob/master/.github/workflows/docs.yaml
 [12]: https://github.com/arduino/arduino-cli/blob/master/docs/build.py
+[prettier-website]: https://prettier.io/
+[prettier-vscode-extension]: https://github.com/prettier/prettier-vscode
+[npm-install-docs]: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
