@@ -1,0 +1,9 @@
+# IDE files
+.idea/
+.vscode/
+.vs/
+.ionide/
+
+# GitHub templates
+.github/ISSUE_TEMPLATE/**/*
+.github/PULL_REQUEST_TEMPLATE.md

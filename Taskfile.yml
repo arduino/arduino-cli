@@ -49,6 +49,16 @@ tasks:
     cmds:
       - mkdocs serve
 
+  docs:check:
+    desc: Run documentation linting
+    cmds:
+      - npx {{ .PRETTIER }} --check "**/*.md"
+
+  docs:format:
+    desc: Automatically formats documentation
+    cmds:
+      - npx {{ .PRETTIER }} --write "**/*.md"
+
   protoc:
     desc: Compile protobuf definitions
     cmds:
@@ -105,6 +115,18 @@ tasks:
       - "'{{.GOLINTBIN}}' {{.GOLINTFLAGS}} {{ default .DEFAULT_TARGETS .TARGETS }}"
       - task: i18n:check
       - task: python:check
+      - task: docs:check
+      - task: config:check
+
+  config:check:
+    desc: Check linting of configuration and supporting files
+    cmds:
+      - npx {{ .PRETTIER }} --check "**/*.{yml,yaml}"
+
+  config:format:
+    desc: Automatically formats configuration and supporting files
+    cmds:
+      - npx {{ .PRETTIER }} --write "**/*.{yml,yaml}"
 
   python:check:
     desc: Linting for Python files
@@ -183,3 +205,4 @@ vars:
   DOCS_VERSION: dev
   DOCS_ALIAS: ""
   DOCS_REMOTE: "origin"
+  PRETTIER: prettier@2.0.5
