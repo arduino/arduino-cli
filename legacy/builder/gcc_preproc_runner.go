@@ -77,8 +77,6 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths
 	// to create a /dev/null.d dependency file, which won't work.
 	cmd.Args = utils.Filter(cmd.Args, func(a string) bool { return a != "-MMD" })
 
-	cmd.Args = append(cmd.Args, "-DARDUINO_LIB_DISCOVERY_PHASE")
-
 	return cmd, nil
 }
 
