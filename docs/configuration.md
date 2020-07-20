@@ -20,10 +20,9 @@
     `json`.
   - `level` - messages with this level and above will be logged. Valid levels
     are: `trace`, `debug`, `info`, `warn`, `error`, `fatal`, `panic`.
-- `telemetry` - settings related to the collection of data used for continued
-  improvement of Arduino CLI.
-  _ `addr` - TCP port used for telemetry communication.
-  _ `enabled` - controls the use of telemetry.
+- `telemetry` - settings related to the collection of data used for continued improvement of Arduino CLI.
+  - `addr` - TCP port used for telemetry communication.
+  - `enabled` - controls the use of telemetry.
 
 ## Configuration methods
 

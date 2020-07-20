@@ -28,7 +28,8 @@ This file allows the _Library Manager_ to search and install a library and its d
 
 The library.properties file is a key=value properties list. Every field in this file is UTF-8 encoded. Unless noted otherwise below, **all fields are required**. The available fields are:
 
-- **name** - the name of the library. Library names must contain only basic letters (`A`-`Z` or `a`-`z`) and numbers (`0`-`9`), spaces (``), underscores (`_`), dots (`.`) and dashes (`-`). They cannot start with a number. Note that libraries with a `name` value starting with `Arduino` will no longer be allowed [addition to the Library Manager index](https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ) as these names are now reserved for official Arduino libraries.
+<!-- prettier-ignore -->
+- **name** - the name of the library. Library names must contain only basic letters (`A`-`Z` or `a`-`z`) and numbers (`0`-`9`), spaces (` `), underscores (`_`), dots (`.`) and dashes (`-`). They cannot start with a number. Note that libraries with a `name` value starting with `Arduino` will no longer be allowed [addition to the Library Manager index](https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ) as these names are now reserved for official Arduino libraries.
 - **version** - version of the library. Version should be [semver](http://semver.org/) compliant. 1.2.0 is correct; 1.2 is accepted; r5, 003, 1.1c are invalid
 - **author** - name/nickname of the authors and their email addresses (not mandatory) separated by comma ","
 - **maintainer** - name and email of the maintainer
@@ -48,7 +49,8 @@ The library.properties file is a key=value properties list. Every field in this 
 - **architectures** - (defaults to `*`) a comma separated list of architectures supported by the library. If the library doesn’t contain architecture specific code use `*` to match all architectures. This field is used as one factor in determining priority when multiple libraries match an `#include` directive and to provide a warning message when the library is compiled for a board of an architecture that doesn't match any on the list.
 - **depends** - **(available from Arduino IDE 1.8.10/Arduino CLI 0.7.0)** (optional) a comma-separated list of dependencies (libraries that are needed to build the current library). The Arduino IDE's Library Manager will offer to install the dependencies during installation of the library. [`arduino-cli lib install`](../commands/arduino-cli_lib_install) will automatically install the dependencies. Since spaces are allowed in the `name` of a library, but not commas, you can refer to libraries containing spaces in the name without ambiguity for example:<br>
   `depends=Very long library name, Another library with long-name`
-- **dot_a_linkage** - **(available from Arduino IDE 1.6.0 / arduino-builder 1.0.0-beta13)** (optional) when set to `true`, the library will be compiled using a .a (archive) file. First, all source files are compiled into .o files as normal. Then instead of including all .o files in the linker command directly, all .o files are saved into a .a file, which is then included in the linker command. [1.5 format library folder structure](#layout-of-folders-and-files) is required.
+- **dot_a_linkage** - **(available from Arduino IDE 1.6.0 / arduino-builder 1.0.0-beta13)** (optional) when set to `true`, the library will be compiled using a .a (archive) file. First, all source files are compiled into .o files as normal. Then instead of including all .o <!-- prettier-ignore -->
+files in the linker command directly, all .o files are saved into a .a file, which is then included in the linker command. [1.5 format library folder structure](#layout-of-folders-and-files) is required.
 - **includes** - **(available from Arduino IDE 1.6.10)** (optional) a comma separated list of files to be added to the sketch as `#include <...>` lines. This property is used with the "Include library" command in the Arduino IDE. If the `includes` property is missing, all the header files (.h) on the root source folder are included.
 - **precompiled** - **(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)** (optional) set to `true` to allow the use of .a (archive) and .so (shared object) files. The .a/.so file must be located at `src/{build.mcu}` where `{build.mcu}` is the architecture name of the target the file was compiled for. Ex: `cortex-m3` for the Arduino DUE. The static library should be linked as an ldflag.
 - **ldflags** - **(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)** (optional) the linker flags to be added. Ex: `ldflags=-lm`
@@ -73,7 +75,8 @@ Each folder has a specific purpose (sources, examples, documentation, etc). Fold
 
 #### Library Root folder
 
-The library root folder name must start with a basic letter (`A`-`Z` or `a`-`z`) or number (`0`-`9`), followed by basic letters, numbers, spaces (``), underscores (`_`), dots (`.`) and dashes (`-`). The maximum length is 63 characters.
+<!-- prettier-ignore -->
+The library root folder name must start with a basic letter (`A`-`Z` or `a`-`z`) or number (`0`-`9`), followed by basic letters, numbers, spaces (` `), underscores (`_`), dots (`.`) and dashes (`-`). The maximum length is 63 characters.
 
 #### Source code
 

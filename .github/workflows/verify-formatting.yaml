@@ -8,8 +8,6 @@ on:
       - '**/*.yaml'
       - '.prettierrc'
       - '.prettierignore'
-      - '!.github/ISSUE_TEMPLATE/**/*'
-      - '!.github/PULL_REQUEST_TEMPLATE.md'
   pull_request:
     paths:
       - '**/*.md'
@@ -17,8 +15,6 @@ on:
       - '**/*.yaml'
       - '.prettierrc'
       - '.prettierignore'
-      - '!.github/ISSUE_TEMPLATE/**/*'
-      - '!.github/PULL_REQUEST_TEMPLATE.md'
 
 jobs:
   verify-formatting:
