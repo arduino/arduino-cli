@@ -39,10 +39,14 @@ def test_list(run_command):
     assert "" == result.stderr
     lines = result.stdout.strip().splitlines()
     assert 2 == len(lines)
-    toks = [t.strip() for t in lines[1].split()]
+    toks = [t.strip() for t in lines[1].split(maxsplit=4)]
+    # Verifies the expected number of field
+    assert 5 == len(toks)
     # be sure line contain the current version AND the available version
     assert "" != toks[1]
     assert "" != toks[2]
+    # Verifies library sentence
+    assert "An efficient and elegant JSON library for Arduino." == toks[4]
 
     # Look at the JSON output
     result = run_command("lib list --format json")
