@@ -1,20 +1,20 @@
-name: 'Lints Python code'
+name: "Lints Python code"
 
 on:
   push:
     branches:
       - master
     paths:
-      - '**.py'
-      - '.flake8'
+      - "**.py"
+      - ".flake8"
   pull_request:
     paths:
-      - '**.py'
-      - '.flake8'
+      - "**.py"
+      - ".flake8"
 
 jobs:
   python-linting:
-    name: 'Lints Python code'
+    name: "Lints Python code"
     runs-on: ubuntu-latest
 
     steps:
@@ -29,8 +29,8 @@ jobs:
       - name: Activate Python
         uses: actions/setup-python@v1
         with:
-          python-version: '3.8'
-          architecture: 'x64'
+          python-version: "3.8"
+          architecture: "x64"
 
       - name: Install Poetry
         run: pip install poetry

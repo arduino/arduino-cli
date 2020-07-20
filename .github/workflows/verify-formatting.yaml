@@ -1,20 +1,20 @@
-name: 'Verify files formatting'
+name: "Verify files formatting"
 
 on:
   push:
     paths:
-      - '**/*.md'
-      - '**/*.yml'
-      - '**/*.yaml'
-      - '.prettierrc'
-      - '.prettierignore'
+      - "**/*.md"
+      - "**/*.yml"
+      - "**/*.yaml"
+      - ".prettierrc"
+      - ".prettierignore"
   pull_request:
     paths:
-      - '**/*.md'
-      - '**/*.yml'
-      - '**/*.yaml'
-      - '.prettierrc'
-      - '.prettierignore'
+      - "**/*.md"
+      - "**/*.yml"
+      - "**/*.yaml"
+      - ".prettierrc"
+      - ".prettierignore"
 
 jobs:
   verify-formatting:

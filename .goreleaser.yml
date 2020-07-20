@@ -91,7 +91,7 @@ builds:
       - "-extldflags '-static'"
 
 archives:
-  - id: 'arduino_cli'
+  - id: "arduino_cli"
     format: tar.gz
     format_overrides:
       - goos: windows

@@ -3,7 +3,7 @@ name: nightly
 on:
   schedule:
     # run every day at 1AM
-    - cron: '0 1 * * *'
+    - cron: "0 1 * * *"
 
 jobs:
   create-nightly-artifacts:
@@ -93,9 +93,9 @@ jobs:
       - name: upload
         uses: docker://plugins/s3
         env:
-          PLUGIN_SOURCE: 'dist/*'
-          PLUGIN_TARGET: '/arduino-cli/nightly'
-          PLUGIN_STRIP_PREFIX: 'dist/'
+          PLUGIN_SOURCE: "dist/*"
+          PLUGIN_TARGET: "/arduino-cli/nightly"
+          PLUGIN_STRIP_PREFIX: "dist/"
           PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

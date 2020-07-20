@@ -6,7 +6,7 @@ site_url: https://arduino.github.io/arduino-cli/
 # Repository
 repo_name: arduino/arduino-cli
 repo_url: https://github.com/arduino/arduino-cli
-edit_uri: ''
+edit_uri: ""
 
 # Copyright
 copyright: Copyright 2020 ARDUINO SA (http://www.arduino.cc/)

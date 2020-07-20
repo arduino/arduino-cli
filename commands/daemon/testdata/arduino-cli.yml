@@ -4,13 +4,13 @@ board_manager:
     - http://example.com
 
 daemon:
-  port: '50051'
+  port: "50051"
 
 directories:
   data: /home/massi/.arduino15
   downloads: /home/massi/.arduino15/staging
 
 logging:
-  file: ''
+  file: ""
   format: text
   level: info
