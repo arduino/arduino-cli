@@ -4,11 +4,16 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - "docs/**"
+      - ".github/workflows/docs.yaml"
   pull_request:
+    paths-ignore:
+      - "docs/**"
+      - ".github/workflows/docs.yaml"
 
 jobs:
   test-matrix:
-
     strategy:
       matrix:
         operating-system: [ubuntu-latest, windows-latest, macOS-latest]
