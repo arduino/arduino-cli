@@ -1203,10 +1203,15 @@
                   <h1>Sketch specification</h1>
                 
                 <p>This is the specification for Arduino sketches.</p>
-<p>The programs that run on Arduino boards are called "sketches". This term was inherited from <a href="https://processing.org/">Processing</a>, upon which the Arduino IDE and the core API were based.</p>
+<p>The programs that run on Arduino boards are called "sketches". This term was inherited from
+<a href="https://processing.org/">Processing</a>, upon which the Arduino IDE and the core API were based.</p>
 <h2 id="sketch-folders-and-files">Sketch folders and files<a class="headerlink" href="#sketch-folders-and-files" title="Permanent link">&para;</a></h2>
 <h3 id="sketch-root-folder">Sketch root folder<a class="headerlink" href="#sketch-root-folder" title="Permanent link">&para;</a></h3>
-<p>Because many Arduino sketches only contain a single .ino file, it's easy to think of that file as the sketch. However, it is the folder that is the sketch. The reason is that sketches may consist of multiple code files and the folder is what groups those files into a single program.</p>
+<p>Because many Arduino sketches only contain a single .ino file, it's easy to think of that file as the sketch. However,
+it is the folder that is the sketch. The reason is that sketches may consist of multiple code files and the folder is
+what groups those files into a single program.</p>
+<!-- prettier-ignore -->
+
 <p>The sketch root folder name must start with a basic letter (<code>A</code>-<code>Z</code> or <code>a</code>-<code>z</code>) or number (<code>0</code>-<code>9</code>), followed by basic letters, numbers, spaces (<code></code>), underscores (<code>_</code>), dots (<code>.</code>) and dashes (<code>-</code>). The maximum length is 63 characters.</p>
 <p>Support for sketch folder name starting with a number was added in Arduino IDE 1.8.4.</p>
 <h3 id="primary-sketch-file">Primary sketch file<a class="headerlink" href="#primary-sketch-file" title="Permanent link">&para;</a></h3>
@@ -1216,16 +1221,20 @@
 <p>The following extensions are supported:</p>
 <ul>
 <li>.ino - <a href="https://www.arduino.cc/reference/en/">Arduino language</a> files.</li>
-<li>.pde - Alternate extension for Arduino language files. This file extension is also used by Processing sketches. .ino is recommended to avoid confusion.</li>
+<li>.pde - Alternate extension for Arduino language files. This file extension is also used by Processing sketches. .ino
+  is recommended to avoid confusion.</li>
 <li>.cpp - C++ files.</li>
 <li>.c - C Files.</li>
 <li>.S - Assembly language files.</li>
 <li>.h - Header files.</li>
 </ul>
-<p>For information about how each of these files and other parts of the sketch are used during compilation, see the <a href="../sketch-build-process/">Sketch build process documentation</a>.</p>
+<p>For information about how each of these files and other parts of the sketch are used during compilation, see the
+<a href="../sketch-build-process/">Sketch build process documentation</a>.</p>
 <h3 id="src-subfolder"><code>src</code> subfolder<a class="headerlink" href="#src-subfolder" title="Permanent link">&para;</a></h3>
-<p>The contents of the <code>src</code> subfolder are compiled recursively. Unlike the code files in the sketch root folder, these files are not shown as tabs in the IDEs.</p>
-<p>This is useful for files you don't want to expose to the sketch user via the IDE's interface. It can be used to bundle libraries with the sketch in order to make it a self-contained project.</p>
+<p>The contents of the <code>src</code> subfolder are compiled recursively. Unlike the code files in the sketch root folder, these
+files are not shown as tabs in the IDEs.</p>
+<p>This is useful for files you don't want to expose to the sketch user via the IDE's interface. It can be used to bundle
+libraries with the sketch in order to make it a self-contained project.</p>
 <p>Arduino language files under the <code>src</code> folder are not supported.</p>
 <ul>
 <li>In Arduino IDE 1.6.5-r5 and older, no recursive compilation was done.</li>
@@ -1235,16 +1244,31 @@
 <h3 id="data-subfolder"><code>data</code> subfolder<a class="headerlink" href="#data-subfolder" title="Permanent link">&para;</a></h3>
 <p>The <code>data</code> folder is used to add additional files to the sketch, which will not be compiled.</p>
 <p>Files added to the sketch via the Arduino IDE's <strong>Sketch &gt; Add File...</strong> are placed in the <code>data</code> folder.</p>
-<p>The Arduino IDE's <strong>File &gt; Save As...</strong> only copies the code files in the sketch root folder and the full contents of the <code>data</code> folder, so any non-code files outside the <code>data</code> folder are stripped.</p>
+<p>The Arduino IDE's <strong>File &gt; Save As...</strong> only copies the code files in the sketch root folder and the full contents of
+the <code>data</code> folder, so any non-code files outside the <code>data</code> folder are stripped.</p>
 <h3 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h3>
-<p>Arduino CLI and Arduino Web Editor use a file named sketch.json, located in the sketch root folder, to store sketch metadata.</p>
-<p>The <code>cpu</code> key contains the board configuration information. This can be set via <a href="../commands/arduino-cli_board_attach/"><code>arduino-cli board attach</code></a> or by selecting a board in the Arduino Web Editor while the sketch is open. With this configuration set, it is not necessary to specify the <code>--fqbn</code> or <code>--port</code> flags to the <a href="../commands/arduino-cli_compile/"><code>arduino-cli compile</code></a> or <a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a> commands when compiling or uploading the sketch.</p>
-<p>The <code>included_libs</code> key defines the library versions the Arduino Web Editor uses when the sketch is compiled. This is Arduino Web Editor specific because all versions of all the Library Manager libraries are pre-installed in Arduino Web Editor, while only one version of each library may be installed when using the other Arduino development software.</p>
+<p>Arduino CLI and Arduino Web Editor use a file named sketch.json, located in the sketch root folder, to store sketch
+metadata.</p>
+<p>The <code>cpu</code> key contains the board configuration information. This can be set via
+<a href="../commands/arduino-cli_board_attach/"><code>arduino-cli board attach</code></a> or by selecting a board in the Arduino Web Editor
+while the sketch is open. With this configuration set, it is not necessary to specify the <code>--fqbn</code> or <code>--port</code> flags to
+the <a href="../commands/arduino-cli_compile/"><code>arduino-cli compile</code></a> or <a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a>
+commands when compiling or uploading the sketch.</p>
+<p>The <code>included_libs</code> key defines the library versions the Arduino Web Editor uses when the sketch is compiled. This is
+Arduino Web Editor specific because all versions of all the Library Manager libraries are pre-installed in Arduino Web
+Editor, while only one version of each library may be installed when using the other Arduino development software.</p>
 <h3 id="secrets">Secrets<a class="headerlink" href="#secrets" title="Permanent link">&para;</a></h3>
-<p>Arduino Web Editor has a <a href="https://create.arduino.cc/projecthub/Arduino_Genuino/store-your-sensitive-data-safely-when-sharing-a-sketch-e7d0f0">"Secret tab" feature</a> that makes it easy to share sketches without accidentally exposing sensitive data (e.g., password, token). The Arduino Web Editor automatically generates macros for any identifier in the sketch which starts with <code>SECRET_</code>and contains all uppercase characters.</p>
-<p>When you download a sketch from Arduino Web Editor that contains a Secret tab, the empty <code>#define</code> directives for the secrets are in a file named arduino_secrets.h, with an <code>#include</code> directive to that file at the top of the primary sketch file. This is hidden when viewing the sketch in Arduino Web Editor.</p>
+<p>Arduino Web Editor has a
+<a href="https://create.arduino.cc/projecthub/Arduino_Genuino/store-your-sensitive-data-safely-when-sharing-a-sketch-e7d0f0">"Secret tab" feature</a>
+that makes it easy to share sketches without accidentally exposing sensitive data (e.g., password, token). The Arduino
+Web Editor automatically generates macros for any identifier in the sketch which starts with <code>SECRET_</code>and contains all
+uppercase characters.</p>
+<p>When you download a sketch from Arduino Web Editor that contains a Secret tab, the empty <code>#define</code> directives for the
+secrets are in a file named arduino_secrets.h, with an <code>#include</code> directive to that file at the top of the primary
+sketch file. This is hidden when viewing the sketch in Arduino Web Editor.</p>
 <h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
-<p>Image and text files in common formats which are present in the sketch root folder are displayed in tabs in the Arduino Web Editor.</p>
+<p>Image and text files in common formats which are present in the sketch root folder are displayed in tabs in the Arduino
+Web Editor.</p>
 <h3 id="sketch-file-structure-example">Sketch file structure example<a class="headerlink" href="#sketch-file-structure-example" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>Foo
 |_ arduino_secrets.h
@@ -1268,12 +1292,18 @@
 </code></pre></div>
 
 <h2 id="sketchbook">Sketchbook<a class="headerlink" href="#sketchbook" title="Permanent link">&para;</a></h2>
-<p>The Arduino IDE provides a "sketchbook" folder (analogous to Arduino CLI's "user directory"). In addition to being the place where user libraries and manually installed platforms are installed, the sketchbook is a convenient place to store sketches. Sketches in the sketchbook folder appear under the Arduino IDE's <strong>File &gt; Sketchbook</strong> menu. However, there is no requirement to store sketches in the sketchbook folder.</p>
+<p>The Arduino IDE provides a "sketchbook" folder (analogous to Arduino CLI's "user directory"). In addition to being the
+place where user libraries and manually installed platforms are installed, the sketchbook is a convenient place to store
+sketches. Sketches in the sketchbook folder appear under the Arduino IDE's <strong>File &gt; Sketchbook</strong> menu. However, there is
+no requirement to store sketches in the sketchbook folder.</p>
 <h2 id="libraryboards-manager-links">Library/Boards Manager links<a class="headerlink" href="#libraryboards-manager-links" title="Permanent link">&para;</a></h2>
-<p>A URI in a comment in the form <code>http://librarymanager#SEARCH_TERM</code> will open a search for SEARCH_TERM in <a href="https://www.arduino.cc/en/guide/libraries#toc3">Library Manager</a> when clicked in the Arduino IDE.</p>
-<p>A URI in a comment in the form <code>http://boardsmanager#SEARCH_TERM</code> will open a search for SEARCH_TERM in <a href="https://www.arduino.cc/en/Guide/Cores">Boards Manager</a> when clicked in the Arduino IDE.</p>
+<p>A URI in a comment in the form <code>http://librarymanager#SEARCH_TERM</code> will open a search for SEARCH_TERM in
+<a href="https://www.arduino.cc/en/guide/libraries#toc3">Library Manager</a> when clicked in the Arduino IDE.</p>
+<p>A URI in a comment in the form <code>http://boardsmanager#SEARCH_TERM</code> will open a search for SEARCH_TERM in
+<a href="https://www.arduino.cc/en/Guide/Cores">Boards Manager</a> when clicked in the Arduino IDE.</p>
 <p>This can be used to offer the user an easy way to install dependencies of the sketch.</p>
-<p>This feature is only available when using the Arduino IDE, so be sure to provide supplementary documentation to help the users of other development software install the sketch dependencies.</p>
+<p>This feature is only available when using the Arduino IDE, so be sure to provide supplementary documentation to help the
+users of other development software install the sketch dependencies.</p>
 <p>This feature was added in Arduino IDE 1.6.9.</p>
 <h3 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1">// install the Arduino SAMD Boards platform to add support for your MKR WiFi 1010 board</span>

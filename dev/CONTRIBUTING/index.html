@@ -372,6 +372,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#configuration-files-formatting" class="md-nav__link">
+    Configuration files formatting
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -402,6 +409,13 @@
           <li class="md-nav__item">
   <a href="#docs-versioning" class="md-nav__link">
     Docs versioning
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-formatting" class="md-nav__link">
+    Docs formatting
   </a>
   
 </li>
@@ -1169,6 +1183,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#configuration-files-formatting" class="md-nav__link">
+    Configuration files formatting
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1199,6 +1220,13 @@
           <li class="md-nav__item">
   <a href="#docs-versioning" class="md-nav__link">
     Docs versioning
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-formatting" class="md-nav__link">
+    Docs formatting
   </a>
   
 </li>
@@ -1248,33 +1276,27 @@
                 
                 <h1 id="how-to-contribute">How to contribute<a class="headerlink" href="#how-to-contribute" title="Permanent link">&para;</a></h1>
 <p>First of all, thanks for contributing!</p>
-<p>This document provides some basic guidelines for contributing to this
-repository. To propose improvements or fix a bug, feel free to submit a PR.</p>
+<p>This document provides some basic guidelines for contributing to this repository. To propose improvements or fix a bug,
+feel free to submit a PR.</p>
 <h2 id="legal-requirements">Legal requirements<a class="headerlink" href="#legal-requirements" title="Permanent link">&para;</a></h2>
 <p>Before we can accept your contributions you have to sign the <a href="https://cla-assistant.io/arduino/arduino-cli">Contributor License Agreement</a></p>
 <h2 id="pull-requests">Pull Requests<a class="headerlink" href="#pull-requests" title="Permanent link">&para;</a></h2>
-<p>In order to ease code reviews and have your contributions merged faster, here is
-a list of items you can check before submitting a PR:</p>
+<p>In order to ease code reviews and have your contributions merged faster, here is a list of items you can check before
+submitting a PR:</p>
 <ul>
 <li>Create small PRs that are narrowly focused on addressing a single concern.</li>
-<li>PR titles indirectly become part of the CHANGELOG so it's crucial to provide a
-  good record of <strong>what</strong> change is being made in the title; <strong>why</strong> it was made
-  will go in the PR description, along with a link to a GitHub issue if it
+<li>PR titles indirectly become part of the CHANGELOG so it's crucial to provide a good record of <strong>what</strong> change is being
+  made in the title; <strong>why</strong> it was made will go in the PR description, along with a link to a GitHub issue if it
   exists.</li>
 <li>Write tests for the code you wrote.</li>
 <li>Open your PR against the <code>master</code> branch.</li>
-<li>Maintain <strong>clean commit history</strong> and use <strong>meaningful commit messages</strong>.
-  PRs with messy commit history are difficult to review and require a lot of
-  work to be merged.</li>
-<li>Your PR must pass all CI tests before we will merge it. If you're seeing an
-  error and don't think
-  it's your fault, it may not be! The reviewer will help you if there are test
-  failures that seem
-  not related to the change you are making.</li>
+<li>Maintain <strong>clean commit history</strong> and use <strong>meaningful commit messages</strong>. PRs with messy commit history are difficult
+  to review and require a lot of work to be merged.</li>
+<li>Your PR must pass all CI tests before we will merge it. If you're seeing an error and don't think it's your fault, it
+  may not be! The reviewer will help you if there are test failures that seem not related to the change you are making.</li>
 </ul>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
-<p>To build the Arduino CLI from sources you need the following tools to be
-available in your local environment:</p>
+<p>To build the Arduino CLI from sources you need the following tools to be available in your local environment:</p>
 <ul>
 <li><a href="https://golang.org/doc/install">Go</a> version 1.12 or later</li>
 <li><a href="https://taskfile.dev/#/installation">Taskfile</a> to help you run the most common tasks from the command line</li>
@@ -1294,13 +1316,11 @@ available in your local environment:</p>
 <div class="highlight"><pre><span></span><code>task build
 </code></pre></div>
 
-<p>The project uses Go modules so dependencies will be downloaded automatically;
-at the end of the build, you should find an <code>arduino-cli</code> executable in the
-same folder.</p>
+<p>The project uses Go modules so dependencies will be downloaded automatically; at the end of the build, you should find
+an <code>arduino-cli</code> executable in the same folder.</p>
 <h2 id="running-the-tests">Running the tests<a class="headerlink" href="#running-the-tests" title="Permanent link">&para;</a></h2>
-<p>There are several checks and test suites in place to ensure the code works as
-expected and is written in a way that's consistent across the whole codebase.
-To avoid pushing changes that will cause the CI system to fail, you can run most
+<p>There are several checks and test suites in place to ensure the code works as expected and is written in a way that's
+consistent across the whole codebase. To avoid pushing changes that will cause the CI system to fail, you can run most
 of the tests locally.</p>
 <p>To ensure code style is consistent, run:</p>
 <div class="highlight"><pre><span></span><code>task check
@@ -1310,21 +1330,18 @@ of the tests locally.</p>
 <div class="highlight"><pre><span></span><code>task test-unit
 </code></pre></div>
 
-<p>To run integration tests (these will take some time and require special setup,
-see following paragraph):</p>
+<p>To run integration tests (these will take some time and require special setup, see following paragraph):</p>
 <div class="highlight"><pre><span></span><code>task test-integration
 </code></pre></div>
 
 <h3 id="running-only-some-tests">Running only some tests<a class="headerlink" href="#running-only-some-tests" title="Permanent link">&para;</a></h3>
-<p>By default, all tests from all go packages are run. To run only unit
-tests from one or more specific packages, you can set the TARGETS
-environment variable, e.g.:</p>
+<p>By default, all tests from all go packages are run. To run only unit tests from one or more specific packages, you can
+set the TARGETS environment variable, e.g.:</p>
 <div class="codehilite"><pre><span></span><code>TARGETS=./arduino/cores/packagemanager task test-unit
 </code></pre></div>
 
 
-<p>Alternatively, to run only some specific test(s), you can specify a regex
-to match against the test function name:</p>
+<p>Alternatively, to run only some specific test(s), you can specify a regex to match against the test function name:</p>
 <div class="codehilite"><pre><span></span><code>TEST_REGEX=&#39;^TestTryBuild.*&#39; task test-unit
 </code></pre></div>
 
@@ -1335,34 +1352,28 @@ to match against the test function name:</p>
 
 
 <h3 id="integration-tests">Integration tests<a class="headerlink" href="#integration-tests" title="Permanent link">&para;</a></h3>
-<p>Being a command line interface, Arduino CLI is heavily interactive and it has to
-stay consistent in accepting the user input and providing the expected output
-and proper exit codes. On top of this, many Arduino CLI features involve
-communicating with external devices, most likely through a serial
-port, so unit tests can only go so far in giving us confidence that the code is
-working.</p>
-<p>For these reasons, in addition to regular unit tests the project has a suite of
-integration tests that actually run Arduino CLI in a different process and
-assess the options are correctly understood and the output is what we expect.</p>
+<p>Being a command line interface, Arduino CLI is heavily interactive and it has to stay consistent in accepting the user
+input and providing the expected output and proper exit codes. On top of this, many Arduino CLI features involve
+communicating with external devices, most likely through a serial port, so unit tests can only go so far in giving us
+confidence that the code is working.</p>
+<p>For these reasons, in addition to regular unit tests the project has a suite of integration tests that actually run
+Arduino CLI in a different process and assess the options are correctly understood and the output is what we expect.</p>
 <h4 id="hardware-requirements-for-running-the-full-suite-of-integration-tests">Hardware requirements for running the full suite of integration tests:<a class="headerlink" href="#hardware-requirements-for-running-the-full-suite-of-integration-tests" title="Permanent link">&para;</a></h4>
 <p>An Arduino board attached to a serial port. The board must:</p>
 <ul>
-<li>Use one of the VID/PID pairs used by Arduino or their partners (as is the case
-with all modern official Arduino boards except the classic Nano).</li>
-<li>Accept uploads using the FQBN associated with that VID/PID (which will be the
-case unless you have installed a custom bootloader or removed the bootloader).</li>
+<li>Use one of the VID/PID pairs used by Arduino or their partners (as is the case with all modern official Arduino boards
+  except the classic Nano).</li>
+<li>Accept uploads using the FQBN associated with that VID/PID (which will be the case unless you have installed a custom
+  bootloader or removed the bootloader).</li>
 </ul>
-<p>Note that running the integration tests will result in a sketch being uploaded
-to every attached Arduino board meeting the above requirements.</p>
+<p>Note that running the integration tests will result in a sketch being uploaded to every attached Arduino board meeting
+the above requirements.</p>
 <h4 id="software-requirements-for-running-integration-tests">Software requirements for running integration tests:<a class="headerlink" href="#software-requirements-for-running-integration-tests" title="Permanent link">&para;</a></h4>
-<p>A working Python environment. Chances are that you already
-have Python installed in your system, if this is not the case you can
-<a href="https://www.python.org/downloads/">download</a> the official distribution or use the package manager provided by
-your Operating System.</p>
-<p>Some dependencies need to be installed before running the tests and to avoid
-polluting your global Python environment with dependencies that might be only
-used by the Arduino CLI, to do so we use [Poetry][poetry-website]. First you need to install it (you might need to <code>sudo</code>
-the following command):</p>
+<p>A working Python environment. Chances are that you already have Python installed in your system, if this is not the case
+you can <a href="https://www.python.org/downloads/">download</a> the official distribution or use the package manager provided by your Operating System.</p>
+<p>Some dependencies need to be installed before running the tests and to avoid polluting your global Python environment
+with dependencies that might be only used by the Arduino CLI, to do so we use [Poetry][poetry-website]. First you need
+to install it (you might need to <code>sudo</code> the following command):</p>
 <div class="highlight"><pre><span></span><code>pip3 install --user poetry
 </code></pre></div>
 
@@ -1371,109 +1382,130 @@ the following command):</p>
 <div class="highlight"><pre><span></span><code>task test-integration
 </code></pre></div>
 
-<p>This will automatically install the necessary dependencies, if not already installed, and run the integration tests automatically.</p>
+<p>This will automatically install the necessary dependencies, if not already installed, and run the integration tests
+automatically.</p>
 <p>When editing any Python file in the project remember to run linting checks with:</p>
 <div class="highlight"><pre><span></span><code>task python:check
 </code></pre></div>
 
-<p>This will run <code>flake8</code> automatically and return any error in the code formatting, if not already installed it will also install integration tests dependencies.</p>
+<p>This will run <code>flake8</code> automatically and return any error in the code formatting, if not already installed it will also
+install integration tests dependencies.</p>
 <p>In case of linting errors you should be able to solve most of them by automatically formatting with:</p>
 <div class="highlight"><pre><span></span><code>task python:format
 </code></pre></div>
 
+<h3 id="configuration-files-formatting">Configuration files formatting<a class="headerlink" href="#configuration-files-formatting" title="Permanent link">&para;</a></h3>
+<p>To keep the configurations tidy and in order we use <a href="https://prettier.io/">Prettier</a> to automatically format all YAML files
+in the project. Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the introduction of
+formatting changes made by unconfigured editors.</p>
+<p>There are several ways to run Prettier, if you're using Visual Studio Code you can easily use the <a href="https://github.com/prettier/prettier-vscode"><code>prettier-vscode</code>
+extension</a> to automatically format as you write.</p>
+<p>Otherwise you can use the following tasks, to do so you'll need to install <code>npm</code> if not already installed. Check the
+<a href="https://docs.npmjs.com/downloading-and-installing-node-js-and-npm">official documentation</a> to know how to install <code>npm</code> for your platform.</p>
+<p>To check if the files are correctly formatted run:</p>
+<div class="highlight"><pre><span></span><code>task config:check
+</code></pre></div>
+
+<p>If the output tells you that some files are not formatted correctly run:</p>
+<div class="highlight"><pre><span></span><code>task config:format
+</code></pre></div>
+
+<p>When opening a new Pull Requests checks are automatically run to verify that configuration files are correctly
+formatted. In case of failures we might ask you to update the PR with correct formatting.</p>
 <h2 id="working-on-docs">Working on docs<a class="headerlink" href="#working-on-docs" title="Permanent link">&para;</a></h2>
-<p>Documentation is provided to final users in form of static HTML content generated
-from a tool called <a href="https://www.mkdocs.org/">MkDocs</a> and hosted on <a href="https://pages.github.com/">GitHub Pages</a>.</p>
+<p>Documentation is provided to final users in form of static HTML content generated from a tool called <a href="https://www.mkdocs.org/">MkDocs</a> and
+hosted on <a href="https://pages.github.com/">GitHub Pages</a>.</p>
 <h3 id="local-development">Local development<a class="headerlink" href="#local-development" title="Permanent link">&para;</a></h3>
-<p>Most of the documentation consists of static content written over several
-Markdown files under the <code>docs</code> folder at the root of this git repository but
-some  other content is dynamically generated from the CI pipelines - this is the
-case with the command line reference and the gRPC interface, for example.</p>
-<p>If you want to check out how the documentation would look after some local
-changes, you might need to reproduce what happens in the CI, generating the full
-documentation website from your personal computer. To run the docs toolchain
+<p>Most of the documentation consists of static content written over several Markdown files under the <code>docs</code> folder at the
+root of this git repository but some other content is dynamically generated from the CI pipelines - this is the case
+with the command line reference and the gRPC interface, for example.</p>
+<p>If you want to check out how the documentation would look after some local changes, you might need to reproduce what
+happens in the CI, generating the full documentation website from your personal computer. To run the docs toolchain
 locally, you need to have a few dependencies and tools installed:</p>
 <ul>
 <li><a href="https://golang.org/doc/install">Go</a> version 1.12 or later</li>
 <li><a href="https://taskfile.dev/#/installation">Taskfile</a> to help you run the most common tasks from the command line</li>
-<li>A working <a href="https://www.python.org/downloads/">Python</a> environment, see <a href="#integration-tests">this paragraph</a>
-  if you need to setup one</li>
+<li>A working <a href="https://www.python.org/downloads/">Python</a> environment, see <a href="#integration-tests">this paragraph</a> if you need to setup one</li>
 </ul>
-<p>Before running the toolchain, perform the following operations from the root of
-the git repository (if you have a Python virtual environment, activate it before
-proceeding):</p>
+<p>Before running the toolchain, perform the following operations from the root of the git repository (if you have a Python
+virtual environment, activate it before proceeding):</p>
 <ul>
 <li>go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc</li>
 <li>pip install -r requirements_docs.txt</li>
 </ul>
-<p>When working on docs, you can launch a command that will take care of
-generating the docs, build the static website and start a local server you can
-later access with a web browser to see a preview of your changes. From the root
-of the git repository run:</p>
+<p>When working on docs, you can launch a command that will take care of generating the docs, build the static website and
+start a local server you can later access with a web browser to see a preview of your changes. From the root of the git
+repository run:</p>
 <div class="highlight"><pre><span></span><code>task docs:serve
 </code></pre></div>
 
-<p>If you don't see any error, hit <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> with your browser to
-navigate the generated docs.</p>
+<p>If you don't see any error, hit <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> with your browser to navigate the generated docs.</p>
 <h3 id="docs-publishing">Docs publishing<a class="headerlink" href="#docs-publishing" title="Permanent link">&para;</a></h3>
-<p>The present git repository has a special branch called <code>gh-pages</code> that contains
-the generated HTML code for the docs website; every time a change is pushed to
-this special branch, GitHub automatically triggers a <a href="https://github.com/arduino/arduino-cli/deployments?environment=github-pages#activity-log">deployment</a> to pull the
-change and publish a new version of the website. Do not open Pull Requests to
-push changes to the <code>gh-pages</code> branch, that will be done exclusively from the
-CI.</p>
+<p>The present git repository has a special branch called <code>gh-pages</code> that contains the generated HTML code for the docs
+website; every time a change is pushed to this special branch, GitHub automatically triggers a <a href="https://github.com/arduino/arduino-cli/deployments?environment=github-pages#activity-log">deployment</a> to pull
+the change and publish a new version of the website. Do not open Pull Requests to push changes to the <code>gh-pages</code> branch,
+that will be done exclusively from the CI.</p>
 <h3 id="docs-versioning">Docs versioning<a class="headerlink" href="#docs-versioning" title="Permanent link">&para;</a></h3>
-<p>In order to provide support for multiple Arduino CLI releases, Documentation is
-versioned so that visitors can select which version of the documentation website
-should be displayed. Unfortunately this feature isn't provided by GitHub pages
-or MkDocs, so we had to implement it on top of the generation process.</p>
-<p>Before delving into the details of the generation process, here follow some
-requirements that were established to provide versioned documentation:</p>
+<p>In order to provide support for multiple Arduino CLI releases, Documentation is versioned so that visitors can select
+which version of the documentation website should be displayed. Unfortunately this feature isn't provided by GitHub
+pages or MkDocs, so we had to implement it on top of the generation process.</p>
+<p>Before delving into the details of the generation process, here follow some requirements that were established to
+provide versioned documentation:</p>
 <ul>
-<li>A special version of the documentation called <code>dev</code> is provided to reflect the
-  status of the Arduino CLI on the <code>master</code> branch - this includes unreleased
-  features and bugfixes.</li>
-<li>Docs are versioned after the minor version of an Arduino CLI release. For
-  example, Arduino CLI <code>0.99.1</code> and <code>0.99.2</code> will be both covered by
-  documentation version <code>0.99</code>.</li>
-<li>The landing page of the documentation website will automatically redirect
-  visitors to the most recently released version of the Arduino CLI.</li>
+<li>A special version of the documentation called <code>dev</code> is provided to reflect the status of the Arduino CLI on the
+  <code>master</code> branch - this includes unreleased features and bugfixes.</li>
+<li>Docs are versioned after the minor version of an Arduino CLI release. For example, Arduino CLI <code>0.99.1</code> and <code>0.99.2</code>
+  will be both covered by documentation version <code>0.99</code>.</li>
+<li>The landing page of the documentation website will automatically redirect visitors to the most recently released
+  version of the Arduino CLI.</li>
 </ul>
-<p>To implement the requirements above, the execution of MkDocs is wrapped using a
-CLI tool called <a href="https://github.com/jimporter/mike">Mike</a> that does a few things for us:</p>
+<p>To implement the requirements above, the execution of MkDocs is wrapped using a CLI tool called <a href="https://github.com/jimporter/mike">Mike</a> that does a
+few things for us:</p>
 <ul>
-<li>It runs MkDocs targeting subfolders named after the Arduino CLI version, e.g.
-  documentation for version <code>0.10.1</code> can be found under the folder <code>0.10</code>.</li>
-<li>It injects an HTML control into the documentation website that lets visitors
-  choose which version of the docs to browse from a dropdown list.</li>
-<li>It provides a redirect to a version we decide when visitors hit the landing
-  page of the documentation website.</li>
+<li>It runs MkDocs targeting subfolders named after the Arduino CLI version, e.g. documentation for version <code>0.10.1</code> can
+  be found under the folder <code>0.10</code>.</li>
+<li>It injects an HTML control into the documentation website that lets visitors choose which version of the docs to
+  browse from a dropdown list.</li>
+<li>It provides a redirect to a version we decide when visitors hit the landing page of the documentation website.</li>
 <li>It pushes generated contents to the <code>gh-pages</code> branch.</li>
 </ul>
 <blockquote>
-<p><strong>Note:</strong> unless you're working on the generation process itself, you should
-never run Mike from a local environment, either directly or through the Task
-<code>docs:publish</code>. This might result in unwanted changes to the public website.</p>
+<p><strong>Note:</strong> unless you're working on the generation process itself, you should never run Mike from a local environment,
+either directly or through the Task <code>docs:publish</code>. This might result in unwanted changes to the public website.</p>
 </blockquote>
+<h3 id="docs-formatting">Docs formatting<a class="headerlink" href="#docs-formatting" title="Permanent link">&para;</a></h3>
+<p>To keep the documentation tidy and in order we use <a href="https://prettier.io/">Prettier</a> to automatically format all Markdown
+files in the project. Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the
+introduction of formatting changes made by unconfigured editors.</p>
+<p>There are several ways to run Prettier, if you're using Visual Studio Code you can easily use the <a href="https://github.com/prettier/prettier-vscode"><code>prettier-vscode</code>
+extension</a> to automatically format as you write.</p>
+<p>Otherwise you can use the following tasks, to do so you'll need to install <code>npm</code> if not already installed. Check the
+<a href="https://docs.npmjs.com/downloading-and-installing-node-js-and-npm">official documentation</a> to know how to install <code>npm</code> for your platform.</p>
+<p>To check if the files are correctly formatted run:</p>
+<div class="highlight"><pre><span></span><code>task docs:check
+</code></pre></div>
+
+<p>If the output tells you that some files are not formatted correctly run:</p>
+<div class="highlight"><pre><span></span><code>task docs:format
+</code></pre></div>
+
+<p>When opening a new Pull Requests checks are automatically run to verify that documentation is correctly formatted. In
+case of failures we might ask you to update the PR with correct formatting.</p>
 <h3 id="docs-automation">Docs automation<a class="headerlink" href="#docs-automation" title="Permanent link">&para;</a></h3>
-<p>In order to avoid unwanted changes to the public website hosting the Arduino
-CLI documentation, only Mike is allowed to push changes to the <code>gh-pages</code> branch,
-and this only happens from within the CI, in a workflow named <a href="https://github.com/arduino/arduino-cli/blob/master/.github/workflows/docs.yaml">docs</a>.</p>
-<p>The CI is responsible for guessing which version of the Arduino CLI we're
-building docs for, so that generated contents will be stored in the appropriate
-section of the documentation website. Because this guessing might be fairly
-complex, the logic is implemented in a Python script called <a href="https://github.com/arduino/arduino-cli/blob/master/docs/build.py"><code>build.py</code></a>.
-The script will determine the version of the Arduino CLI that was modified in
-the current commit (either <code>dev</code> or an official, numbered release) and whether
-the redirect to the latest version that happens on the landing page should be
-updated or not.</p>
+<p>In order to avoid unwanted changes to the public website hosting the Arduino CLI documentation, only Mike is allowed to
+push changes to the <code>gh-pages</code> branch, and this only happens from within the CI, in a workflow named <a href="https://github.com/arduino/arduino-cli/blob/master/.github/workflows/docs.yaml">docs</a>.</p>
+<p>The CI is responsible for guessing which version of the Arduino CLI we're building docs for, so that generated contents
+will be stored in the appropriate section of the documentation website. Because this guessing might be fairly complex,
+the logic is implemented in a Python script called <a href="https://github.com/arduino/arduino-cli/blob/master/docs/build.py"><code>build.py</code></a>. The script will determine the version of the
+Arduino CLI that was modified in the current commit (either <code>dev</code> or an official, numbered release) and whether the
+redirect to the latest version that happens on the landing page should be updated or not.</p>
 <h2 id="internationalization-i18n">Internationalization (i18n)<a class="headerlink" href="#internationalization-i18n" title="Permanent link">&para;</a></h2>
-<p>In order to support i18n in the CLI, any messages that are intended to be translated
-should be wrapped in a call to <code>i18n.Tr</code>. This call allows us to build a catalog of
-translatable strings, replacing the reference string at runtime with the localized value.</p>
-<p>Adding or modifying these messages requires an i18n update, as this process creates the
-reference catalog that are shared with translators. For that reason, the <code>task check</code>
-command will fail if the catalog was not updated to sync with changes to the source code.</p>
+<p>In order to support i18n in the CLI, any messages that are intended to be translated should be wrapped in a call to
+<code>i18n.Tr</code>. This call allows us to build a catalog of translatable strings, replacing the reference string at runtime
+with the localized value.</p>
+<p>Adding or modifying these messages requires an i18n update, as this process creates the reference catalog that are
+shared with translators. For that reason, the <code>task check</code> command will fail if the catalog was not updated to sync with
+changes to the source code.</p>
 <p>To update the catalog, execute the following command and commit the changes.</p>
 <div class="highlight"><pre><span></span><code>task i18n:update
 </code></pre></div>
@@ -1496,12 +1528,10 @@ func main() {
 </code></pre></div>
 
 <h2 id="additional-settings">Additional settings<a class="headerlink" href="#additional-settings" title="Permanent link">&para;</a></h2>
-<p>If you need to push a commit that's only shipping documentation changes or
-example files, thus a complete no-op for the test suite, please start the commit
-message with the string <strong>[skip ci]</strong> to skip the build and give that slot to
+<p>If you need to push a commit that's only shipping documentation changes or example files, thus a complete no-op for the
+test suite, please start the commit message with the string <strong>[skip ci]</strong> to skip the build and give that slot to
 someone else who does need it.</p>
-<p>If your PR doesn't need to be included in the changelog, please start the PR
-title with the string <strong>[skip changelog]</strong></p>
+<p>If your PR doesn't need to be included in the changelog, please start the PR title with the string <strong>[skip changelog]</strong></p>
                 
                   
                 

@@ -1568,16 +1568,18 @@
                 
                   <h1>Platform specification</h1>
                 
-                <p>This is the Arduino platform specification, for use with Arduino development software starting from the Arduino IDE 1.5.x series.<br>
-Platforms add support for new boards to the Arduino development software. They are installable either via <a href="../package_index_json-specification/">Boards Manager</a> or manual installation to the <em>hardware</em> folder of Arduino's sketchbook folder (AKA "user directory").<br>
-A platform may consist of as little as a single configuration file.</p>
+                <p>This is the Arduino platform specification, for use with Arduino development software starting from the Arduino IDE
+1.5.x series.<br> Platforms add support for new boards to the Arduino development software. They are installable either
+via <a href="../package_index_json-specification/">Boards Manager</a> or manual installation to the <em>hardware</em> folder of Arduino's
+sketchbook folder (AKA "user directory").<br> A platform may consist of as little as a single configuration file.</p>
 <h2 id="hardware-folders-structure">Hardware Folders structure<a class="headerlink" href="#hardware-folders-structure" title="Permanent link">&para;</a></h2>
 <p>The new hardware folders have a hierarchical structure organized in two levels:</p>
 <ul>
 <li>the first level is the vendor/maintainer</li>
 <li>the second level is the supported architecture</li>
 </ul>
-<p>A vendor/maintainer can have multiple supported architectures. For example, below we have three hardware vendors called "arduino", "yyyyy" and "xxxxx":</p>
+<p>A vendor/maintainer can have multiple supported architectures. For example, below we have three hardware vendors called
+"arduino", "yyyyy" and "xxxxx":</p>
 <div class="codehilite"><pre><span></span><code>hardware/arduino/avr/...     - Arduino - AVR Boards
 hardware/arduino/sam/...     - Arduino - SAM (32bit ARM) Boards
 hardware/yyyyy/avr/...       - Yyy - AVR
@@ -1586,16 +1588,23 @@ hardware/xxxxx/avr/...       - Xxx - AVR
 
 
 <p>The vendor "arduino" has two supported architectures (AVR and SAM), while "xxxxx" and "yyyyy" have only AVR.</p>
-<p>If possible, follow existing architecture name conventions when creating hardware packages. The architecture folder name is used to determine library compatibility and also to permit referencing resources from another core of the same architecture so using a non-standard architecture name can only be harmful to your users. Architecture values are case sensitive (e.g. <code>AVR</code> != <code>avr</code>). Use the vendor folder name to differentiate your package, <strong>NOT</strong> the architecture name.</p>
+<p>If possible, follow existing architecture name conventions when creating hardware packages. The architecture folder name
+is used to determine library compatibility and also to permit referencing resources from another core of the same
+architecture so using a non-standard architecture name can only be harmful to your users. Architecture values are case
+sensitive (e.g. <code>AVR</code> != <code>avr</code>). Use the vendor folder name to differentiate your package, <strong>NOT</strong> the architecture
+name.</p>
 <h2 id="architecture-configurations">Architecture configurations<a class="headerlink" href="#architecture-configurations" title="Permanent link">&para;</a></h2>
 <p>Each architecture must be configured through a set of configuration files:</p>
 <ul>
-<li><strong>platform.txt</strong> contains definitions for the CPU architecture used (compiler, build process parameters, tools used for upload, etc.)</li>
+<li><strong>platform.txt</strong> contains definitions for the CPU architecture used (compiler, build process parameters, tools used
+  for upload, etc.)</li>
 <li><strong>boards.txt</strong> contains definitions for the boards (board name, parameters for building and uploading sketches, etc.)</li>
-<li><strong>programmers.txt</strong> contains definitions for external programmers (typically used to burn bootloaders or sketches on a blank CPU/board)</li>
+<li><strong>programmers.txt</strong> contains definitions for external programmers (typically used to burn bootloaders or sketches on a
+  blank CPU/board)</li>
 </ul>
 <h3 id="configuration-files-format">Configuration files format<a class="headerlink" href="#configuration-files-format" title="Permanent link">&para;</a></h3>
-<p>A configuration file is a list of "key=value" properties. The <strong>value</strong> of a property can be expressed using the value of another property by putting its name inside brackets "{" "}". For example:</p>
+<p>A configuration file is a list of "key=value" properties. The <strong>value</strong> of a property can be expressed using the value
+of another property by putting its name inside brackets "{" "}". For example:</p>
 <div class="codehilite"><pre><span></span><code>compiler.path=/tools/g++_arm_none_eabi/bin/
 compiler.c.cmd=arm-none-eabi-gcc
 [....]
@@ -1603,7 +1612,8 @@ recipe.c.o.pattern={compiler.path}{compiler.c.cmd}
 </code></pre></div>
 
 
-<p>In this example the property <strong>recipe.c.o.pattern</strong> will be set to <strong>/tools/g++_arm_none_eabi/bin/arm-none-eabi-gcc</strong> that is the composition of the two properties <strong>compiler.path</strong> and <strong>compiler.c.cmd</strong>.</p>
+<p>In this example the property <strong>recipe.c.o.pattern</strong> will be set to <strong>/tools/g++_arm_none_eabi/bin/arm-none-eabi-gcc</strong>
+that is the composition of the two properties <strong>compiler.path</strong> and <strong>compiler.c.cmd</strong>.</p>
 <h4 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">&para;</a></h4>
 <p>Lines starting with <strong>#</strong> are treated as comments and will be ignored.</p>
 <div class="codehilite"><pre><span></span><code># Like in this example
@@ -1619,38 +1629,53 @@ tools.bossac.cmd.windows=bossac.exe
 </code></pre></div>
 
 
-<p>will set the property <strong>tools.bossac.cmd</strong> to the value <strong>bossac</strong> on Linux and Mac OS and <strong>bossac.exe</strong> on Windows. Suffixes <a href="https://github.com/arduino/Arduino/blob/1.8.12/arduino-core/src/processing/app/helpers/PreferencesMap.java#L110-L112">supported</a> are <code>.linux</code>, <code>.windows</code> and <code>.macosx</code>.</p>
+<p>will set the property <strong>tools.bossac.cmd</strong> to the value <strong>bossac</strong> on Linux and Mac OS and <strong>bossac.exe</strong> on Windows.
+Suffixes
+<a href="https://github.com/arduino/Arduino/blob/1.8.12/arduino-core/src/processing/app/helpers/PreferencesMap.java#L110-L112">supported</a>
+are <code>.linux</code>, <code>.windows</code> and <code>.macosx</code>.</p>
 <h4 id="global-predefined-properties">Global Predefined properties<a class="headerlink" href="#global-predefined-properties" title="Permanent link">&para;</a></h4>
 <p>The following automatically generated properties can be used globally in all configuration files:</p>
 <ul>
-<li><code>{runtime.platform.path}</code>: the absolute path of the <a href="#platform-terminology">board platform</a> folder (i.e. the folder containing boards.txt)</li>
-<li><code>{runtime.hardware.path}</code>: the absolute path of the hardware folder (i.e. the folder containing the <a href="#platform-terminology">board platform</a> folder)</li>
+<li><code>{runtime.platform.path}</code>: the absolute path of the <a href="#platform-terminology">board platform</a> folder (i.e. the folder
+  containing boards.txt)</li>
+<li><code>{runtime.hardware.path}</code>: the absolute path of the hardware folder (i.e. the folder containing the
+  <a href="#platform-terminology">board platform</a> folder)</li>
 <li><code>{runtime.ide.path}</code>: the absolute path of the Arduino IDE or Arduino CLI folder</li>
-<li><code>{runtime.ide.version}</code>: the version number of the Arduino IDE as a number (this uses two digits per version number component, and removes the points and leading zeroes, so Arduino IDE 1.8.3 becomes <code>01.08.03</code> which becomes <code>runtime.ide.version=10803</code>). When using Arduino development software other than the Arduino IDE, this is set to a meaningless version number.</li>
+<li><code>{runtime.ide.version}</code>: the version number of the Arduino IDE as a number (this uses two digits per version number
+  component, and removes the points and leading zeroes, so Arduino IDE 1.8.3 becomes <code>01.08.03</code> which becomes
+  <code>runtime.ide.version=10803</code>). When using Arduino development software other than the Arduino IDE, this is set to a
+  meaningless version number.</li>
 <li><code>{ide_version}</code>: Compatibility alias for <code>{runtime.ide.version}</code></li>
 <li><code>{runtime.os}</code>: the running OS ("linux", "windows", "macosx")</li>
 </ul>
-<p>Compatibility note: Versions before Arduino IDE 1.6.0 only used one digit per version number component in <code>{runtime.ide.version}</code> (so 1.5.9 was <code>159</code>, not <code>10509</code>).</p>
+<p>Compatibility note: Versions before Arduino IDE 1.6.0 only used one digit per version number component in
+<code>{runtime.ide.version}</code> (so 1.5.9 was <code>159</code>, not <code>10509</code>).</p>
 <h2 id="platformtxt">platform.txt<a class="headerlink" href="#platformtxt" title="Permanent link">&para;</a></h2>
-<p>The platform.txt file contains information about a platform's specific aspects (compilers
-command line flags, paths, system libraries, etc.).</p>
+<p>The platform.txt file contains information about a platform's specific aspects (compilers command line flags, paths,
+system libraries, etc.).</p>
 <p>The following meta-data must be defined:</p>
 <div class="codehilite"><pre><span></span><code>name=Arduino AVR Boards
 version=1.5.3
 </code></pre></div>
 
 
-<p>The <strong>name</strong> will be shown as the Arduino IDE's Board menu section title or the Name field of <a href="../commands/arduino-cli_core_list"><code>arduino-cli core list</code></a>'s output for the platform.<br>
-The <strong>version</strong> is currently unused, it is reserved for future use (probably together with the Boards Manager to handle dependencies on cores).</p>
+<p>The <strong>name</strong> will be shown as the Arduino IDE's Board menu section title or the Name field of
+<a href="../commands/arduino-cli_core_list"><code>arduino-cli core list</code></a>'s output for the platform.<br> The <strong>version</strong> is currently
+unused, it is reserved for future use (probably together with the Boards Manager to handle dependencies on cores).</p>
 <h3 id="build-process">Build process<a class="headerlink" href="#build-process" title="Permanent link">&para;</a></h3>
-<p>The platform.txt file is used to configure the build process. This is done through a list of <strong>recipes</strong>. Each recipe is a command line expression that explains how to call the compiler (or other tools) for every build step and which parameter should be passed.</p>
-<p>The Arduino development software, before starting the build, determines the list of files to compile. The list is composed of:</p>
+<p>The platform.txt file is used to configure the build process. This is done through a list of <strong>recipes</strong>. Each recipe is
+a command line expression that explains how to call the compiler (or other tools) for every build step and which
+parameter should be passed.</p>
+<p>The Arduino development software, before starting the build, determines the list of files to compile. The list is
+composed of:</p>
 <ul>
 <li>the user's Sketch</li>
 <li>source code in the selected board's Core</li>
 <li>source code in the Libraries used in the sketch</li>
 </ul>
-<p>A temporary folder is created to store the build artifacts whose path is available through the global property <strong>{build.path}</strong>. A property <strong>{build.project_name}</strong> with the name of the project and a property <strong>{build.arch}</strong> with the name of the architecture is set as well.</p>
+<p>A temporary folder is created to store the build artifacts whose path is available through the global property
+<strong>{build.path}</strong>. A property <strong>{build.project_name}</strong> with the name of the project and a property <strong>{build.arch}</strong> with
+the name of the architecture is set as well.</p>
 <ul>
 <li><code>{build.path}</code>: The path to the temporary folder to store build artifacts</li>
 <li><code>{build.project_name}</code>: The project name</li>
@@ -1658,7 +1683,9 @@ The <strong>version</strong> is currently unused, it is reserved for future use 
 </ul>
 <p>There are some other <strong>{build.xxx}</strong> properties available, that are explained in the boards.txt section of this guide.</p>
 <h4 id="recipes-to-compile-source-code">Recipes to compile source code<a class="headerlink" href="#recipes-to-compile-source-code" title="Permanent link">&para;</a></h4>
-<p>We said that the Arduino development software determines a list of files to compile. Each file can be source code written in C (.c files), C++ (.cpp files) or Assembly (.S files). Every language is compiled using its respective <strong>recipe</strong>:</p>
+<p>We said that the Arduino development software determines a list of files to compile. Each file can be source code
+written in C (.c files), C++ (.cpp files) or Assembly (.S files). Every language is compiled using its respective
+<strong>recipe</strong>:</p>
 <ul>
 <li><code>recipe.c.o.pattern</code>: for C files</li>
 <li><code>recipe.cpp.o.pattern</code>: for CPP files</li>
@@ -1683,13 +1710,16 @@ recipe.c.o.pattern=&quot;{compiler.path}{compiler.c.cmd}&quot; {compiler.c.flags
 </code></pre></div>
 
 
-<p>Note that some properties, like <strong>{build.mcu}</strong> for example, are taken from the <strong>boards.txt</strong> file which is documented later in this specification.</p>
+<p>Note that some properties, like <strong>{build.mcu}</strong> for example, are taken from the <strong>boards.txt</strong> file which is documented
+later in this specification.</p>
 <h4 id="recipes-to-build-the-corea-archive-file">Recipes to build the core.a archive file<a class="headerlink" href="#recipes-to-build-the-corea-archive-file" title="Permanent link">&para;</a></h4>
-<p>The core of the selected board is compiled as described in the previous paragraph, but the object files obtained from the compile are also archived into a static library named <em>core.a</em> using the <strong>recipe.ar.pattern</strong>.</p>
+<p>The core of the selected board is compiled as described in the previous paragraph, but the object files obtained from
+the compile are also archived into a static library named <em>core.a</em> using the <strong>recipe.ar.pattern</strong>.</p>
 <p>The recipe can be built concatenating the following automatically generated properties:</p>
 <ul>
 <li><code>{object_file}</code>: the object file to include in the archive</li>
-<li><code>{archive_file_path}</code>: fully qualified archive file (ex. "/path/to/core.a"). This property was added in Arduino IDE 1.6.6/arduino builder 1.0.0-beta12 as a replacement for <code>{build.path}/{archive_file}</code>.</li>
+<li><code>{archive_file_path}</code>: fully qualified archive file (ex. "/path/to/core.a"). This property was added in Arduino IDE
+  1.6.6/arduino builder 1.0.0-beta12 as a replacement for <code>{build.path}/{archive_file}</code>.</li>
 <li><code>{archive_file}</code>: the name of the resulting archive (ex. "core.a")</li>
 </ul>
 <p>For example, Arduino provides the following for AVR:</p>
@@ -1704,11 +1734,13 @@ recipe.ar.pattern=&quot;{compiler.path}{compiler.ar.cmd}&quot; {compiler.ar.flag
 
 
 <h4 id="recipes-for-linking">Recipes for linking<a class="headerlink" href="#recipes-for-linking" title="Permanent link">&para;</a></h4>
-<p>All the artifacts produced by the previous steps (sketch object files, libraries object files and core.a archive) are linked together using the <strong>recipe.c.combine.pattern</strong>.</p>
+<p>All the artifacts produced by the previous steps (sketch object files, libraries object files and core.a archive) are
+linked together using the <strong>recipe.c.combine.pattern</strong>.</p>
 <p>The recipe can be built concatenating the following automatically generated properties:</p>
 <ul>
 <li><code>{object_files}</code>: the list of object files to include in the archive ("file1.o file2.o ....")</li>
-<li><code>{archive_file_path}</code>: fully qualified archive file (ex. "/path/to/core.a"). This property was added in Arduino IDE 1.6.6/arduino builder 1.0.0-beta12 as a replacement for <code>{build.path}/{archive_file}</code>.</li>
+<li><code>{archive_file_path}</code>: fully qualified archive file (ex. "/path/to/core.a"). This property was added in Arduino IDE
+  1.6.6/arduino builder 1.0.0-beta12 as a replacement for <code>{build.path}/{archive_file}</code>.</li>
 <li><code>{archive_file}</code>: the name of the core archive file (ex. "core.a")</li>
 </ul>
 <p>For example the following is used for AVR:</p>
@@ -1723,22 +1755,23 @@ recipe.c.combine.pattern=&quot;{compiler.path}{compiler.c.elf.cmd}&quot; {compil
 
 
 <h4 id="recipes-for-extraction-of-executable-files-and-other-binary-data">Recipes for extraction of executable files and other binary data<a class="headerlink" href="#recipes-for-extraction-of-executable-files-and-other-binary-data" title="Permanent link">&para;</a></h4>
-<p>An arbitrary number of extra steps can be performed at the end of objects linking.
-These steps can be used to extract binary data used for upload and they are defined by a set of recipes with the following format:</p>
+<p>An arbitrary number of extra steps can be performed at the end of objects linking. These steps can be used to extract
+binary data used for upload and they are defined by a set of recipes with the following format:</p>
 <div class="codehilite"><pre><span></span><code>recipe.objcopy.FILE_EXTENSION_1.pattern=[.....]
 recipe.objcopy.FILE_EXTENSION_2.pattern=[.....]
 [.....]
 </code></pre></div>
 
 
-<p><code>FILE_EXTENSION_x</code> must be replaced with the extension of the extracted file, for example the AVR platform needs two files a <code>.hex</code> and a <code>.eep</code>, so we made two recipes like:</p>
+<p><code>FILE_EXTENSION_x</code> must be replaced with the extension of the extracted file, for example the AVR platform needs two
+files a <code>.hex</code> and a <code>.eep</code>, so we made two recipes like:</p>
 <div class="codehilite"><pre><span></span><code>recipe.objcopy.eep.pattern=[.....]
 recipe.objcopy.hex.pattern=[.....]
 </code></pre></div>
 
 
-<p>There are no specific properties set by the Arduino development software here.
-A full example for the AVR platform can be:</p>
+<p>There are no specific properties set by the Arduino development software here. A full example for the AVR platform can
+be:</p>
 <div class="codehilite"><pre><span></span><code>## Create eeprom
 recipe.objcopy.eep.pattern=&quot;{compiler.path}{compiler.objcopy.cmd}&quot; {compiler.objcopy.eep.flags} &quot;{build.path}/{build.project_name}.elf&quot; &quot;{build.path}/{build.project_name}.eep&quot;
 
@@ -1748,7 +1781,9 @@ recipe.objcopy.hex.pattern=&quot;{compiler.path}{compiler.elf2hex.cmd}&quot; {co
 
 
 <h4 id="recipes-to-compute-binary-sketch-size">Recipes to compute binary sketch size<a class="headerlink" href="#recipes-to-compute-binary-sketch-size" title="Permanent link">&para;</a></h4>
-<p>At the end of the build the Arduino development software shows the final binary sketch size to the user. The size is calculated using the recipe <strong>recipe.size.pattern</strong>. The output of the command executed using the recipe is parsed through the regular expressions set in the properties:</p>
+<p>At the end of the build the Arduino development software shows the final binary sketch size to the user. The size is
+calculated using the recipe <strong>recipe.size.pattern</strong>. The output of the command executed using the recipe is parsed
+through the regular expressions set in the properties:</p>
 <ul>
 <li><strong>recipe.size.regex</strong>: Program storage space used.</li>
 <li><strong>recipe.size.regex.data</strong>: Dynamic memory used by global variables.</li>
@@ -1764,20 +1799,28 @@ recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+([0-9]+).*
 
 
 <h4 id="recipes-to-export-compiled-binary">Recipes to export compiled binary<a class="headerlink" href="#recipes-to-export-compiled-binary" title="Permanent link">&para;</a></h4>
-<p>When you do a <strong>Sketch &gt; Export compiled Binary</strong> in the Arduino IDE, the compiled binary is copied from the build folder to the sketch folder. Two binaries are copied; the standard binary, and a binary that has been merged with the bootloader file (identified by the <code>.with_bootloader</code> in the filename).</p>
+<p>When you do a <strong>Sketch &gt; Export compiled Binary</strong> in the Arduino IDE, the compiled binary is copied from the build
+folder to the sketch folder. Two binaries are copied; the standard binary, and a binary that has been merged with the
+bootloader file (identified by the <code>.with_bootloader</code> in the filename).</p>
 <p>Two recipes affect how <strong>Export compiled Binary</strong> works:</p>
 <ul>
 <li><strong>recipe.output.tmp_file</strong>: Defines the binary's filename in the build folder.</li>
 <li><strong>recipe.output.save_file</strong>: Defines the filename to use when copying the binary file to the sketch folder.</li>
 </ul>
 <p>As with other processes, there are pre and post build hooks for <strong>Export compiled Binary</strong>.</p>
-<p>The <strong>recipe.hooks.savehex.presavehex.NUMBER.pattern</strong> and <strong>recipe.hooks.savehex.postsavehex.NUMBER.pattern</strong> hooks (but not <strong>recipe.output.tmp_file</strong> and <strong>recipe.output.save_file</strong>) can be built concatenating the following automatically generated properties:</p>
+<p>The <strong>recipe.hooks.savehex.presavehex.NUMBER.pattern</strong> and <strong>recipe.hooks.savehex.postsavehex.NUMBER.pattern</strong> hooks
+(but not <strong>recipe.output.tmp_file</strong> and <strong>recipe.output.save_file</strong>) can be built concatenating the following
+automatically generated properties:</p>
 <div class="codehilite"><pre><span></span><code>{sketch_path}              - the absolute path of the sketch folder
 </code></pre></div>
 
 
 <h4 id="recipe-to-run-the-preprocessor">Recipe to run the preprocessor<a class="headerlink" href="#recipe-to-run-the-preprocessor" title="Permanent link">&para;</a></h4>
-<p>For detecting what libraries to include in the build, and for generating function prototypes, (just) the preprocessor is run. For this, the <strong>recipe.preproc.macros</strong> recipe exists. This recipe must run the preprocessor on a given source file, writing the preprocessed output to a given output file, and generate (only) preprocessor errors on standard output. This preprocessor run should happen with the same defines and other preprocessor-influencing-options as for normally compiling the source files.</p>
+<p>For detecting what libraries to include in the build, and for generating function prototypes, (just) the preprocessor is
+run. For this, the <strong>recipe.preproc.macros</strong> recipe exists. This recipe must run the preprocessor on a given source
+file, writing the preprocessed output to a given output file, and generate (only) preprocessor errors on standard
+output. This preprocessor run should happen with the same defines and other preprocessor-influencing-options as for
+normally compiling the source files.</p>
 <p>The recipes can be built concatenating other automatically generated properties (for each file compiled):</p>
 <ul>
 <li><code>{includes}</code>: the list of include paths in the format "-I/include/path -I/another/path...."</li>
@@ -1790,10 +1833,17 @@ recipe.preproc.macros=&quot;{compiler.path}{compiler.cpp.cmd}&quot; {compiler.cp
 </code></pre></div>
 
 
-<p>Note that the <code>{preprocessed_file_path}</code> might point to (your operating system's equivalent) of <code>/dev/null</code>. In this case, also passing <code>-MMD</code> to gcc is problematic, as it will try to generate a dependency file called <code>/dev/null.d</code>, which will usually result in a permission error. Since platforms typically include <code>{compiler.cpp.flags}</code> here, which includes <code>-MMD</code>, the <code>-MMD</code> option is automatically filtered out of the <code>recipe.preproc.macros</code> recipe to prevent this error.</p>
-<p>Note that older Arduino IDE versions used the <strong>recipe.preproc.includes</strong> recipe to determine includes, which is undocumented here. Since Arduino IDE 1.6.7 (arduino-builder 1.2.0) this was changed and <strong>recipe.preproc.includes</strong> is no longer used.</p>
+<p>Note that the <code>{preprocessed_file_path}</code> might point to (your operating system's equivalent) of <code>/dev/null</code>. In this
+case, also passing <code>-MMD</code> to gcc is problematic, as it will try to generate a dependency file called <code>/dev/null.d</code>,
+which will usually result in a permission error. Since platforms typically include <code>{compiler.cpp.flags}</code> here, which
+includes <code>-MMD</code>, the <code>-MMD</code> option is automatically filtered out of the <code>recipe.preproc.macros</code> recipe to prevent this
+error.</p>
+<p>Note that older Arduino IDE versions used the <strong>recipe.preproc.includes</strong> recipe to determine includes, which is
+undocumented here. Since Arduino IDE 1.6.7 (arduino-builder 1.2.0) this was changed and <strong>recipe.preproc.includes</strong> is
+no longer used.</p>
 <h4 id="pre-and-post-build-hooks-since-arduino-ide-165">Pre and post build hooks (since Arduino IDE 1.6.5)<a class="headerlink" href="#pre-and-post-build-hooks-since-arduino-ide-165" title="Permanent link">&para;</a></h4>
-<p>You can specify pre and post actions around each recipe. These are called "hooks". Here is the complete list of available hooks:</p>
+<p>You can specify pre and post actions around each recipe. These are called "hooks". Here is the complete list of
+available hooks:</p>
 <ul>
 <li><code>recipe.hooks.sketch.prebuild.NUMBER.pattern</code> (called before sketch compilation)</li>
 <li><code>recipe.hooks.sketch.postbuild.NUMBER.pattern</code> (called after sketch compilation)</li>
@@ -1808,26 +1858,35 @@ recipe.preproc.macros=&quot;{compiler.path}{compiler.cpp.cmd}&quot; {compiler.cp
 <li><code>recipe.hooks.savehex.presavehex.NUMBER.pattern</code> (called before savehex recipe execution)</li>
 <li><code>recipe.hooks.savehex.postsavehex.NUMBER.pattern</code> (called after savehex recipe execution)</li>
 </ul>
-<p>Example: you want to execute 2 commands before sketch compilation and 1 after linking. You'll add to your platform.txt
+<p>Example: you want to execute 2 commands before sketch compilation and 1 after linking. You'll add to your platform.txt</p>
 <div class="highlight"><pre><span></span><code>recipe.hooks.sketch.prebuild.1.pattern=echo sketch compilation started at
 recipe.hooks.sketch.prebuild.2.pattern=date
 
 recipe.hooks.linking.postlink.1.pattern=echo linking is complete
-</code></pre></div></p>
-<p>Warning: hooks recipes are sorted before execution. If you need to write more than 10 recipes for a single hook, pad the number with a zero, for example:
+</code></pre></div>
+
+<p>Warning: hooks recipes are sorted before execution. If you need to write more than 10 recipes for a single hook, pad the
+number with a zero, for example:</p>
 <div class="highlight"><pre><span></span><code>recipe.hooks.sketch.prebuild.01.pattern=echo 1
 recipe.hooks.sketch.prebuild.02.pattern=echo 2
 ...
 recipe.hooks.sketch.prebuild.11.pattern=echo 11
-</code></pre></div></p>
+</code></pre></div>
+
 <h2 id="global-platformtxt">Global platform.txt<a class="headerlink" href="#global-platformtxt" title="Permanent link">&para;</a></h2>
-<p>Properties defined in a platform.txt created in the <strong>hardware</strong> subfolder of the Arduino IDE installation folder will be used for all platforms and will override local properties. This feature is currently only available when using the Arduino IDE.</p>
+<p>Properties defined in a platform.txt created in the <strong>hardware</strong> subfolder of the Arduino IDE installation folder will
+be used for all platforms and will override local properties. This feature is currently only available when using the
+Arduino IDE.</p>
 <h2 id="platformlocaltxt">platform.local.txt<a class="headerlink" href="#platformlocaltxt" title="Permanent link">&para;</a></h2>
-<p>Introduced in Arduino IDE 1.5.7. This file can be used to override properties defined in platform.txt or define new properties without modifying platform.txt (e.g. when platform.txt is tracked by a version control system). It should be placed in the same folder as the platform.txt it supplements.</p>
+<p>Introduced in Arduino IDE 1.5.7. This file can be used to override properties defined in platform.txt or define new
+properties without modifying platform.txt (e.g. when platform.txt is tracked by a version control system). It should be
+placed in the same folder as the platform.txt it supplements.</p>
 <h2 id="boardstxt">boards.txt<a class="headerlink" href="#boardstxt" title="Permanent link">&para;</a></h2>
-<p>This file contains definitions and meta-data for the boards supported. Every board must be referred through its short name, the board ID. The settings for a board are defined through a set of properties
-with keys having the board ID as prefix.</p>
-<p>For example the board ID chosen for the Arduino Uno board is "uno". An extract of the Uno board configuration in boards.txt looks like:</p>
+<p>This file contains definitions and meta-data for the boards supported. Every board must be referred through its short
+name, the board ID. The settings for a board are defined through a set of properties with keys having the board ID as
+prefix.</p>
+<p>For example the board ID chosen for the Arduino Uno board is "uno". An extract of the Uno board configuration in
+boards.txt looks like:</p>
 <div class="codehilite"><pre><span></span><code>[......]
 uno.name=Arduino Uno
 uno.build.mcu=atmega328p
@@ -1840,9 +1899,13 @@ uno.build.variant=standard
 
 
 <p>Note that all the relevant keys start with the board ID <strong>uno.xxxxx</strong>.</p>
-<p>The <strong>uno.name</strong> property contains the human-friendly name of the board. This is shown in the Board menu of the IDEs, the "Board Name" field of Arduino CLI's text output, or the "name" key of Arduino CLI's JSON output.</p>
-<p>The <strong>uno.build.board</strong> property is used to set a compile-time variable <strong>ARDUINO_{build.board}</strong> to allow use of conditional code between <code>#ifdef</code>s. A <strong>build.board</strong> value is automatically generated if not defined. In this case the variable defined at compile time will be <code>ARDUINO_AVR_UNO</code>.</p>
-<p>The other properties will override the corresponding global properties when the user selects the board. These properties will be globally available, in other configuration files too, without the board ID prefix:</p>
+<p>The <strong>uno.name</strong> property contains the human-friendly name of the board. This is shown in the Board menu of the IDEs,
+the "Board Name" field of Arduino CLI's text output, or the "name" key of Arduino CLI's JSON output.</p>
+<p>The <strong>uno.build.board</strong> property is used to set a compile-time variable <strong>ARDUINO_{build.board}</strong> to allow use of
+conditional code between <code>#ifdef</code>s. A <strong>build.board</strong> value is automatically generated if not defined. In this case the
+variable defined at compile time will be <code>ARDUINO_AVR_UNO</code>.</p>
+<p>The other properties will override the corresponding global properties when the user selects the board. These properties
+will be globally available, in other configuration files too, without the board ID prefix:</p>
 <div class="codehilite"><pre><span></span><code>uno.build.mcu           =&gt;   build.mcu
 uno.build.f_cpu         =&gt;   build.f_cpu
 uno.build.board         =&gt;   build.board
@@ -1851,21 +1914,27 @@ uno.build.variant       =&gt;   build.variant
 </code></pre></div>
 
 
-<p>This explains the presence of <strong>{build.mcu}</strong> or <strong>{build.board}</strong> in the platform.txt recipes: their value is overwritten respectively by <strong>{uno.build.mcu}</strong> and <strong>{uno.build.board}</strong> when the Uno board is selected!
-Moreover the following properties are automatically generated:</p>
+<p>This explains the presence of <strong>{build.mcu}</strong> or <strong>{build.board}</strong> in the platform.txt recipes: their value is
+overwritten respectively by <strong>{uno.build.mcu}</strong> and <strong>{uno.build.board}</strong> when the Uno board is selected! Moreover the
+following properties are automatically generated:</p>
 <ul>
-<li><code>{build.core.path}</code>: The path to the selected board's core folder (inside the <a href="#platform-terminology">core platform</a>, for example hardware/arduino/avr/core/arduino)</li>
-<li><code>{build.system.path}</code>: The path to the <a href="#platform-terminology">core platform</a>'s system folder if available (for example hardware/arduino/sam/system)</li>
-<li><code>{build.variant.path}</code>: The path to the selected board variant folder (inside the <a href="#platform-terminology">variant platform</a>, for example hardware/arduino/avr/variants/micro)</li>
+<li><code>{build.core.path}</code>: The path to the selected board's core folder (inside the <a href="#platform-terminology">core platform</a>,
+  for example hardware/arduino/avr/core/arduino)</li>
+<li><code>{build.system.path}</code>: The path to the <a href="#platform-terminology">core platform</a>'s system folder if available (for
+  example hardware/arduino/sam/system)</li>
+<li><code>{build.variant.path}</code>: The path to the selected board variant folder (inside the
+  <a href="#platform-terminology">variant platform</a>, for example hardware/arduino/avr/variants/micro)</li>
 </ul>
 <h3 id="cores">Cores<a class="headerlink" href="#cores" title="Permanent link">&para;</a></h3>
-<p>Cores are placed inside the <strong>cores</strong> subfolder. Many different cores can be provided within a single platform. For example the following could be a valid platform layout:</p>
+<p>Cores are placed inside the <strong>cores</strong> subfolder. Many different cores can be provided within a single platform. For
+example the following could be a valid platform layout:</p>
 <ul>
 <li><code>hardware/arduino/avr/cores/</code>: Cores folder for "avr" architecture, package "arduino"</li>
 <li><code>hardware/arduino/avr/cores/arduino</code>: the Arduino Core</li>
 <li><code>hardware/arduino/avr/cores/rtos</code>: an hypothetical RTOS Core</li>
 </ul>
-<p>The board's property <strong>build.core</strong> is used to find the core that must be compiled and linked when the board is selected. For example if a board needs the Arduino core the <strong>build.core</strong> variable should be set to:</p>
+<p>The board's property <strong>build.core</strong> is used to find the core that must be compiled and linked when the board is
+selected. For example if a board needs the Arduino core the <strong>build.core</strong> variable should be set to:</p>
 <div class="codehilite"><pre><span></span><code>uno.build.core=arduino
 </code></pre></div>
 
@@ -1875,11 +1944,14 @@ Moreover the following properties are automatically generated:</p>
 </code></pre></div>
 
 
-<p>In any case the contents of the selected core folder are compiled and the core folder path is added to the include files search path.</p>
+<p>In any case the contents of the selected core folder are compiled and the core folder path is added to the include files
+search path.</p>
 <h3 id="core-variants">Core Variants<a class="headerlink" href="#core-variants" title="Permanent link">&para;</a></h3>
-<p>Sometimes a board needs some tweaking on default core configuration (different pin mapping is a typical example). A core variant folder is an additional folder that is compiled together with the core and allows to easily add specific configurations.</p>
-<p>Variants must be placed inside the <strong>variants</strong> folder in the current architecture.
-For example, Arduino AVR Boards uses:</p>
+<p>Sometimes a board needs some tweaking on default core configuration (different pin mapping is a typical example). A core
+variant folder is an additional folder that is compiled together with the core and allows to easily add specific
+configurations.</p>
+<p>Variants must be placed inside the <strong>variants</strong> folder in the current architecture. For example, Arduino AVR Boards
+uses:</p>
 <ul>
 <li><code>hardware/arduino/avr/cores</code>: Core folder for "avr" architecture, "arduino" package</li>
 <li><code>hardware/arduino/avr/cores/arduino</code>: The Arduino core</li>
@@ -1887,7 +1959,8 @@ For example, Arduino AVR Boards uses:</p>
 <li><code>hardware/arduino/avr/variants/standard</code>: ATmega328 based variants</li>
 <li><code>hardware/arduino/avr/variants/leonardo</code>: ATmega32U4 based variants</li>
 </ul>
-<p>In this example, the Arduino Uno board needs the <em>standard</em> variant so the <strong>build.variant</strong> property is set to <em>standard</em>:</p>
+<p>In this example, the Arduino Uno board needs the <em>standard</em> variant so the <strong>build.variant</strong> property is set to
+<em>standard</em>:</p>
 <div class="codehilite"><pre><span></span><code>[.....]
 uno.build.core=arduino
 uno.build.variant=standard
@@ -1903,8 +1976,9 @@ leonardo.build.variant=leonardo
 </code></pre></div>
 
 
-<p>In the example above, both Uno and Leonardo share the same core but use different variants.<br>
-In any case, the contents of the selected variant folder path is added to the include search path and its contents are compiled and linked with the sketch.</p>
+<p>In the example above, both Uno and Leonardo share the same core but use different variants.<br> In any case, the
+contents of the selected variant folder path is added to the include search path and its contents are compiled and
+linked with the sketch.</p>
 <p>The parameter <strong>build.variant.path</strong> is automatically generated.</p>
 <h3 id="hiding-boards">Hiding boards<a class="headerlink" href="#hiding-boards" title="Permanent link">&para;</a></h3>
 <p>Adding a <strong>hide</strong> property to a board definition causes it to not be shown in the Arduino IDE's <strong>Tools &gt; Board</strong> menu.</p>
@@ -1914,16 +1988,20 @@ In any case, the contents of the selected variant folder path is added to the in
 
 <p>The value of the property is ignored; it's the presence or absence of the property that controls the board's visibility.</p>
 <h2 id="tools">Tools<a class="headerlink" href="#tools" title="Permanent link">&para;</a></h2>
-<p>The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn bootloaders using external programmers. For example, <em>avrdude</em> is used for AVR based boards and <em>bossac</em> for SAM based boards, but there is no limit, any command line executable can be used. The command line parameters are specified using <strong>recipes</strong> in the same way used for platform build process.</p>
-<p>Tools are configured inside the platform.txt file. Every Tool is identified by a short name, the Tool ID.
-A tool can be used for different purposes:</p>
+<p>The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn
+bootloaders using external programmers. For example, <em>avrdude</em> is used for AVR based boards and <em>bossac</em> for SAM based
+boards, but there is no limit, any command line executable can be used. The command line parameters are specified using
+<strong>recipes</strong> in the same way used for platform build process.</p>
+<p>Tools are configured inside the platform.txt file. Every Tool is identified by a short name, the Tool ID. A tool can be
+used for different purposes:</p>
 <ul>
 <li><strong>upload</strong> a sketch to the target board (using a bootloader preinstalled on the board)</li>
 <li><strong>program</strong> a sketch to the target board using an external programmer</li>
 <li><strong>erase</strong> the target board's flash memory using an external programmer</li>
 <li>burn a <strong>bootloader</strong> into the target board using an external programmer</li>
 </ul>
-<p>Each action has its own recipe and its configuration is done through a set of properties having key starting with <strong>tools</strong> prefix followed by the tool ID and the action:</p>
+<p>Each action has its own recipe and its configuration is done through a set of properties having key starting with
+<strong>tools</strong> prefix followed by the tool ID and the action:</p>
 <div class="codehilite"><pre><span></span><code>[....]
 tools.avrdude.upload.pattern=[......]
 [....]
@@ -1936,8 +2014,8 @@ tools.avrdude.bootloader.pattern=[......]
 </code></pre></div>
 
 
-<p>A tool may have some actions not defined (it's not mandatory to define all four actions).<br>
-Let's look at how the <strong>upload</strong> action is defined for avrdude:</p>
+<p>A tool may have some actions not defined (it's not mandatory to define all four actions).<br> Let's look at how the
+<strong>upload</strong> action is defined for avrdude:</p>
 <div class="codehilite"><pre><span></span><code>tools.avrdude.path={runtime.tools.avrdude.path}
 tools.avrdude.cmd.path={path}/bin/avrdude
 tools.avrdude.config.path={path}/etc/avrdude.conf
@@ -1946,11 +2024,18 @@ tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; 
 </code></pre></div>
 
 
-<p>A <strong>{runtime.tools.TOOL_NAME.path}</strong> and <strong>{runtime.tools.TOOL_NAME-TOOL_VERSION.path}</strong> property is generated for the tools of Arduino AVR Boards and any other platform installed via Boards Manager. <strong>{runtime.tools.TOOL_NAME.path}</strong> points to the latest version of the tool available.</p>
-<p>The tool configuration properties are available globally without the prefix. For example, the <strong>tools.avrdude.cmd.path</strong> property can be used as <strong>{cmd.path}</strong> inside the recipe, and the same happens for all the other avrdude configuration variables.</p>
+<p>A <strong>{runtime.tools.TOOL_NAME.path}</strong> and <strong>{runtime.tools.TOOL_NAME-TOOL_VERSION.path}</strong> property is generated for the
+tools of Arduino AVR Boards and any other platform installed via Boards Manager. <strong>{runtime.tools.TOOL_NAME.path}</strong>
+points to the latest version of the tool available.</p>
+<p>The tool configuration properties are available globally without the prefix. For example, the <strong>tools.avrdude.cmd.path</strong>
+property can be used as <strong>{cmd.path}</strong> inside the recipe, and the same happens for all the other avrdude configuration
+variables.</p>
 <h4 id="verbose-parameter">Verbose parameter<a class="headerlink" href="#verbose-parameter" title="Permanent link">&para;</a></h4>
-<p>It is possible for the user to enable verbosity from the Preferences panel of the IDEs or Arduino CLI's <code>--verbose</code> flag. This preference is transferred to the command line using the <strong>ACTION.verbose</strong> property (where ACTION is the action we are considering).<br>
-When the verbose mode is enabled the <strong>tools.TOOL_ID.ACTION.params.verbose</strong> property is copied into <strong>ACTION.verbose</strong>. When the verbose mode is disabled, the <strong>tools.TOOL_ID.ACTION.params.quiet</strong> property is copied into <strong>ACTION.verbose</strong>. Confused? Maybe an example will clear things:</p>
+<p>It is possible for the user to enable verbosity from the Preferences panel of the IDEs or Arduino CLI's <code>--verbose</code>
+flag. This preference is transferred to the command line using the <strong>ACTION.verbose</strong> property (where ACTION is the
+action we are considering).<br> When the verbose mode is enabled the <strong>tools.TOOL_ID.ACTION.params.verbose</strong> property is
+copied into <strong>ACTION.verbose</strong>. When the verbose mode is disabled, the <strong>tools.TOOL_ID.ACTION.params.quiet</strong> property is
+copied into <strong>ACTION.verbose</strong>. Confused? Maybe an example will clear things:</p>
 <div class="codehilite"><pre><span></span><code>tools.avrdude.upload.params.verbose=-v -v -v -v
 tools.avrdude.upload.params.quiet=-q -q
 tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D &quot;-Uflash:w:{build.path}/{build.project_name}.hex:i&quot;
@@ -1968,10 +2053,10 @@ tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; 
 
 
 <h3 id="sketch-upload-configuration">Sketch upload configuration<a class="headerlink" href="#sketch-upload-configuration" title="Permanent link">&para;</a></h3>
-<p>The Upload action is triggered when the user clicks on the "Upload" button on the IDE toolbar or uses <a href="../commands/arduino-cli_upload"><code>arduino-cli upload</code></a>.
-Arduino uses the term "upload" for the process of transferring a program to the Arduino board.
-The <strong>upload.tool</strong> property determines the tool to be used for upload.
-A specific <strong>upload.tool</strong> property should be defined for every board in boards.txt:</p>
+<p>The Upload action is triggered when the user clicks on the "Upload" button on the IDE toolbar or uses
+<a href="../commands/arduino-cli_upload"><code>arduino-cli upload</code></a>. Arduino uses the term "upload" for the process of transferring a
+program to the Arduino board. The <strong>upload.tool</strong> property determines the tool to be used for upload. A specific
+<strong>upload.tool</strong> property should be defined for every board in boards.txt:</p>
 <div class="codehilite"><pre><span></span><code>[......]
 uno.upload.tool=avrdude
 [......]
@@ -2007,41 +2092,62 @@ tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; 
 
 
 <h4 id="1200-bps-bootloader-reset">1200 bps bootloader reset<a class="headerlink" href="#1200-bps-bootloader-reset" title="Permanent link">&para;</a></h4>
-<p>Some Arduino boards use a dedicated USB-to-serial chip, that takes care of restarting the main MCU (starting the bootloader) when the serial port is opened. However, boards that have a native USB connection (such as the Leonardo or Zero) will have to disconnect from USB when rebooting into the bootloader (after which the bootloader reconnects to USB and offers a new serial port for uploading). After the upload is complete, the bootloader disconnects from USB again, starts the sketch, which then reconnects to USB. Because of these reconnections, the standard restart-on-serial open will not work, since that would cause the serial port to disappear and be closed again. Instead, the sketch running on these boards interprets a bitrate of 1200 bps as a signal the bootloader should be started.</p>
+<p>Some Arduino boards use a dedicated USB-to-serial chip, that takes care of restarting the main MCU (starting the
+bootloader) when the serial port is opened. However, boards that have a native USB connection (such as the Leonardo or
+Zero) will have to disconnect from USB when rebooting into the bootloader (after which the bootloader reconnects to USB
+and offers a new serial port for uploading). After the upload is complete, the bootloader disconnects from USB again,
+starts the sketch, which then reconnects to USB. Because of these reconnections, the standard restart-on-serial open
+will not work, since that would cause the serial port to disappear and be closed again. Instead, the sketch running on
+these boards interprets a bitrate of 1200 bps as a signal the bootloader should be started.</p>
 <p>To let the Arduino development software perform these steps, two board parameters can be set:</p>
 <ul>
 <li><code>use_1200bps_touch</code> causes the selected serial port to be briefly opened at 1200 bps (8N1) before starting the upload.</li>
-<li><code>wait_for_upload_port</code> causes the upload procedure to wait for the serial port to (re)appear before and after the upload. This is only used when <code>use_1200bps_touch</code> is also set.  When set, after doing the 1200 bps touch, the development software will wait for a new serial port to appear and use that as the port for uploads. Alternatively, if the original port does not disappear within a few seconds, the upload continues with the original port (which can be the case if the board was already put into bootloader manually, or the the disconnect and reconnect was missed). Additionally, after the upload is complete, the IDE again waits for a new port to appear (or the originally selected port to be present).</li>
+<li><code>wait_for_upload_port</code> causes the upload procedure to wait for the serial port to (re)appear before and after the
+  upload. This is only used when <code>use_1200bps_touch</code> is also set. When set, after doing the 1200 bps touch, the
+  development software will wait for a new serial port to appear and use that as the port for uploads. Alternatively, if
+  the original port does not disappear within a few seconds, the upload continues with the original port (which can be
+  the case if the board was already put into bootloader manually, or the the disconnect and reconnect was missed).
+  Additionally, after the upload is complete, the IDE again waits for a new port to appear (or the originally selected
+  port to be present).</li>
 </ul>
-<p>Note that the IDE implementation of this 1200 bps touch has some peculiarities, and the newer <code>arduino-cli</code> implementation also seems different (does not wait for the port after the reset, which is probably only needed in the IDE to prevent opening the wrong port on the serial monitor, and does not have a shorter timeout when the port never disappears).</p>
+<p>Note that the IDE implementation of this 1200 bps touch has some peculiarities, and the newer <code>arduino-cli</code>
+implementation also seems different (does not wait for the port after the reset, which is probably only needed in the
+IDE to prevent opening the wrong port on the serial monitor, and does not have a shorter timeout when the port never
+disappears).</p>
 <h4 id="upload-using-programmer-by-default">Upload Using Programmer by default<a class="headerlink" href="#upload-using-programmer-by-default" title="Permanent link">&para;</a></h4>
-<p>If the <strong>upload.protocol</strong> property is not defined for a board, the Arduino IDE's "Upload" process will use the same behavior as <a href="#upload-using-an-external-programmer">"Upload Using Programmer"</a>. This is convenient for boards which only support uploading via programmer.</p>
+<p>If the <strong>upload.protocol</strong> property is not defined for a board, the Arduino IDE's "Upload" process will use the same
+behavior as <a href="#upload-using-an-external-programmer">"Upload Using Programmer"</a>. This is convenient for boards which only
+support uploading via programmer.</p>
 <h3 id="serial-port">Serial port<a class="headerlink" href="#serial-port" title="Permanent link">&para;</a></h3>
-<p>The full path (e.g., <code>/dev/ttyACM0</code>) of the port selected via the IDE or <a href="../commands/arduino-cli_upload"><code>arduino-cli upload</code></a>'s <code>--port</code> option is available as a configuration property <strong>{serial.port}</strong>.</p>
-<p>The file component of the port's path (e.g., <code>ttyACM0</code>) is available as the configuration property <strong>{serial.port.file}</strong>.</p>
+<p>The full path (e.g., <code>/dev/ttyACM0</code>) of the port selected via the IDE or
+<a href="../commands/arduino-cli_upload"><code>arduino-cli upload</code></a>'s <code>--port</code> option is available as a configuration property
+<strong>{serial.port}</strong>.</p>
+<p>The file component of the port's path (e.g., <code>ttyACM0</code>) is available as the configuration property
+<strong>{serial.port.file}</strong>.</p>
 <h3 id="upload-using-an-external-programmer">Upload using an external programmer<a class="headerlink" href="#upload-using-an-external-programmer" title="Permanent link">&para;</a></h3>
-<p><strong>TODO...</strong><br>
-The platform.txt associated with the selected programmer will be used.</p>
+<p><strong>TODO...</strong><br> The platform.txt associated with the selected programmer will be used.</p>
 <h3 id="burn-bootloader">Burn Bootloader<a class="headerlink" href="#burn-bootloader" title="Permanent link">&para;</a></h3>
-<p><strong>TODO...</strong><br>
-The platform.txt associated with the selected board will be used.</p>
+<p><strong>TODO...</strong><br> The platform.txt associated with the selected board will be used.</p>
 <h2 id="custom-board-options">Custom board options<a class="headerlink" href="#custom-board-options" title="Permanent link">&para;</a></h2>
-<p>It can sometimes be useful to provide user selectable configuration options for a specific board. For example, a board could be provided in two or more variants with different CPUs, or may have different crystal speed based on the board model, and so on...</p>
+<p>It can sometimes be useful to provide user selectable configuration options for a specific board. For example, a board
+could be provided in two or more variants with different CPUs, or may have different crystal speed based on the board
+model, and so on...</p>
 <p>When using Arduino CLI, the option can be selected via the FQBN.</p>
 <p>In the Arduino IDE the options add extra menu items under the "Tools" menu.</p>
 <p>In Arduino Web Editor, the options are displayed in the "Flavours" menu.</p>
-<p>Let's see an example of how a custom option is implemented.
-The board used in the example is the Arduino Duemilanove. This board was produced in two models, one with an ATmega168 CPU and another with an ATmega328P.<br>
-We are going then to define a custom option, using the "cpu" MENU_ID, that allows the user to choose between the two
-different microcontrollers.</p>
-<p>We must first define a set of <strong>menu.MENU_ID=Text</strong> properties. Text is what is displayed on the GUI for every custom menu we are going to create and must be declared at the beginning of the boards.txt file:</p>
+<p>Let's see an example of how a custom option is implemented. The board used in the example is the Arduino Duemilanove.
+This board was produced in two models, one with an ATmega168 CPU and another with an ATmega328P.<br> We are going then
+to define a custom option, using the "cpu" MENU_ID, that allows the user to choose between the two different
+microcontrollers.</p>
+<p>We must first define a set of <strong>menu.MENU_ID=Text</strong> properties. Text is what is displayed on the GUI for every custom
+menu we are going to create and must be declared at the beginning of the boards.txt file:</p>
 <div class="codehilite"><pre><span></span><code>menu.cpu=Processor
 [.....]
 </code></pre></div>
 
 
-<p>in this case, the menu name is "Processor".<br>
-Now let's add, always in the boards.txt file, the default configuration (common to all processors) for the duemilanove board:</p>
+<p>in this case, the menu name is "Processor".<br> Now let's add, always in the boards.txt file, the default configuration
+(common to all processors) for the duemilanove board:</p>
 <div class="codehilite"><pre><span></span><code>menu.cpu=Processor
 [.....]
 duemilanove.name=Arduino Duemilanove
@@ -2064,9 +2170,9 @@ duemilanove.menu.cpu.atmega168=ATmega168
 </code></pre></div>
 
 
-<p>We have defined two values: "atmega328" and "atmega168".<br>
-Note that the property keys must follow the format <strong>BOARD_ID.menu.MENU_ID.OPTION_ID=Text</strong>, where Text is what is displayed under the "Processor" menu in the IDE's GUI.<br>
-Finally, the specific configuration for each option value:</p>
+<p>We have defined two values: "atmega328" and "atmega168".<br> Note that the property keys must follow the format
+<strong>BOARD_ID.menu.MENU_ID.OPTION_ID=Text</strong>, where Text is what is displayed under the "Processor" menu in the IDE's
+GUI.<br> Finally, the specific configuration for each option value:</p>
 <div class="codehilite"><pre><span></span><code>[.....]
 ## Arduino Duemilanove w/ ATmega328P
 duemilanove.menu.cpu.atmega328=ATmega328P
@@ -2083,7 +2189,9 @@ duemilanove.menu.cpu.atmega168.build.mcu=atmega168
 </code></pre></div>
 
 
-<p>Note that when the user selects an option value, all the "sub properties" of that value are copied in the global configuration. For example when the user selects "ATmega168" from the "Processor" menu, or uses the FQBN <code>arduino:avr:duemilanove:cpu=atmega168</code> with Arduino CLI, the configuration under atmega168 is made available globally:</p>
+<p>Note that when the user selects an option value, all the "sub properties" of that value are copied in the global
+configuration. For example when the user selects "ATmega168" from the "Processor" menu, or uses the FQBN
+<code>arduino:avr:duemilanove:cpu=atmega168</code> with Arduino CLI, the configuration under atmega168 is made available globally:</p>
 <div class="codehilite"><pre><span></span><code>duemilanove.menu.cpu.atmega168.upload.maximum_size     =&gt;   upload.maximum_size
 duemilanove.menu.cpu.atmega168.upload.speed            =&gt;   upload.speed
 duemilanove.menu.cpu.atmega168.build.mcu               =&gt;   build.mcu
@@ -2092,7 +2200,9 @@ duemilanove.menu.cpu.atmega168.build.mcu               =&gt;   build.mcu
 
 <p>There is no limit to the number of custom menus that can be defined.</p>
 <h2 id="referencing-another-core-variant-or-tool">Referencing another core, variant or tool<a class="headerlink" href="#referencing-another-core-variant-or-tool" title="Permanent link">&para;</a></h2>
-<p>Inside the boards.txt we can define a board that uses a core provided by another vendor/maintainer using the syntax <strong>VENDOR_ID:CORE_ID</strong>. For example, if we want to define a board that uses the "arduino" core from the "arduino" vendor we should write:</p>
+<p>Inside the boards.txt we can define a board that uses a core provided by another vendor/maintainer using the syntax
+<strong>VENDOR_ID:CORE_ID</strong>. For example, if we want to define a board that uses the "arduino" core from the "arduino" vendor
+we should write:</p>
 <div class="codehilite"><pre><span></span><code>[....]
 myboard.name=My Wonderful Arduino Compatible board
 myboard.build.core=arduino:arduino
@@ -2100,9 +2210,13 @@ myboard.build.core=arduino:arduino
 </code></pre></div>
 
 
-<p>Note that we don't need to specify any architecture since the same architecture of "myboard" is used, so we just say "arduino:arduino" instead of "arduino:avr:arduino".</p>
-<p>The platform.txt settings are inherited from the referenced core platform, thus there is no need to provide a platform.txt unless there are some specific properties that need to be overridden.</p>
-<p>The libraries from the referenced platform are used, thus there is no need to provide those libraries. If libraries are provided the list of available libraries are the sum of the 2 libraries where the referencing platform has priority over the referenced platform.</p>
+<p>Note that we don't need to specify any architecture since the same architecture of "myboard" is used, so we just say
+"arduino:arduino" instead of "arduino:avr:arduino".</p>
+<p>The platform.txt settings are inherited from the referenced core platform, thus there is no need to provide a
+platform.txt unless there are some specific properties that need to be overridden.</p>
+<p>The libraries from the referenced platform are used, thus there is no need to provide those libraries. If libraries are
+provided the list of available libraries are the sum of the 2 libraries where the referencing platform has priority over
+the referenced platform.</p>
 <p>In the same way we can use variants and tools defined on another platform:</p>
 <div class="codehilite"><pre><span></span><code>[....]
 myboard.build.variant=arduino:standard
@@ -2112,22 +2226,31 @@ myboard.bootloader.tool=arduino:avrdude
 </code></pre></div>
 
 
-<p>Using this syntax allows us to reduce the minimum set of files needed to define a new "hardware" to just the boards.txt file.</p>
-<p>Note that referencing a variant in another platform does <em>not</em> inherit any properties from that platform's platform.txt (like referencing a core does).</p>
+<p>Using this syntax allows us to reduce the minimum set of files needed to define a new "hardware" to just the boards.txt
+file.</p>
+<p>Note that referencing a variant in another platform does <em>not</em> inherit any properties from that platform's platform.txt
+(like referencing a core does).</p>
 <h3 id="platform-terminology">Platform Terminology<a class="headerlink" href="#platform-terminology" title="Permanent link">&para;</a></h3>
-<p>Because boards can reference cores, variants and tools in different platforms, this means that a single build or upload can use data from up to four different platforms. To keep this clear, the following terminology is used:</p>
+<p>Because boards can reference cores, variants and tools in different platforms, this means that a single build or upload
+can use data from up to four different platforms. To keep this clear, the following terminology is used:</p>
 <ul>
-<li>The "board platform" is the platform that defines the currently selected board (e.g. the platform that contains the board.txt the board is defined in.</li>
+<li>The "board platform" is the platform that defines the currently selected board (e.g. the platform that contains the
+  board.txt the board is defined in.</li>
 <li>The "core platform" is the the platform that contains the core to be used.</li>
 <li>The "variant platform" is the platform that contains the variant to be used.</li>
 <li>The "tool platform" is the platform that contains the tool used for the current operation.</li>
 </ul>
 <p>In the most common case, without any references, all of these will refer to the same platform.</p>
-<p>Note that the above terminology is not in widespread use, but was invented for clarity within this document. In the actual arduino-cli code, the "board platform" is called <code>targetPlatform</code>, the "core platform" is called <code>actualPlatform</code>, the others are pretty much nameless.</p>
+<p>Note that the above terminology is not in widespread use, but was invented for clarity within this document. In the
+actual arduino-cli code, the "board platform" is called <code>targetPlatform</code>, the "core platform" is called
+<code>actualPlatform</code>, the others are pretty much nameless.</p>
 <h2 id="boardslocaltxt">boards.local.txt<a class="headerlink" href="#boardslocaltxt" title="Permanent link">&para;</a></h2>
-<p>Introduced in Arduino IDE 1.6.6. This file can be used to override properties defined in boards.txt or define new properties without modifying boards.txt.</p>
+<p>Introduced in Arduino IDE 1.6.6. This file can be used to override properties defined in boards.txt or define new
+properties without modifying boards.txt.</p>
 <h2 id="keywordstxt">keywords.txt<a class="headerlink" href="#keywordstxt" title="Permanent link">&para;</a></h2>
-<p>As of Arduino IDE 1.6.6, per-platform keywords can be defined by adding a keywords.txt file to the platform's architecture folder. These keywords are only highlighted in the Arduino IDE when one of the boards of that platform are selected. This file follows the <a href="../library-specification/#keywords">same format</a> as the keywords.txt used in libraries.</p>
+<p>As of Arduino IDE 1.6.6, per-platform keywords can be defined by adding a keywords.txt file to the platform's
+architecture folder. These keywords are only highlighted in the Arduino IDE when one of the boards of that platform are
+selected. This file follows the <a href="../library-specification/#keywords">same format</a> as the keywords.txt used in libraries.</p>
                 
                   
                 

@@ -1106,18 +1106,36 @@
                 
                   <h1>Sketch build process</h1>
                 
-                <p>The process the Arduino development software uses to build a sketch. More useful information can be found in the <a href="../platform-specification/">Arduino platform specification</a>. Note that the following refers specifically to the build process for AVR targets. Other architectures will have a similar build process.</p>
+                <p>The process the Arduino development software uses to build a sketch. More useful information can be found in the
+<a href="../platform-specification/">Arduino platform specification</a>. Note that the following refers specifically to the build
+process for AVR targets. Other architectures will have a similar build process.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>A number of things have to happen for your Arduino code to get onto the Arduino board. First, the Arduino development software performs some minor pre-processing to turn your sketch into a C++ program. Next, dependencies of the sketch are located. It then gets passed to a compiler (avr-gcc), which turns the human readable code into machine readable instructions (or object files). Then your code gets combined with (linked against) the standard Arduino libraries that provide basic functions like <code>digitalWrite()</code> or <code>Serial.print()</code>. The result is a single Intel hex file, which contains the specific bytes that need to be written to the program memory of the chip on the Arduino board. This file is then uploaded to the board: transmitted over the USB or serial connection via the bootloader already on the chip or with external programming hardware.</p>
+<p>A number of things have to happen for your Arduino code to get onto the Arduino board. First, the Arduino development
+software performs some minor pre-processing to turn your sketch into a C++ program. Next, dependencies of the sketch are
+located. It then gets passed to a compiler (avr-gcc), which turns the human readable code into machine readable
+instructions (or object files). Then your code gets combined with (linked against) the standard Arduino libraries that
+provide basic functions like <code>digitalWrite()</code> or <code>Serial.print()</code>. The result is a single Intel hex file, which contains
+the specific bytes that need to be written to the program memory of the chip on the Arduino board. This file is then
+uploaded to the board: transmitted over the USB or serial connection via the bootloader already on the chip or with
+external programming hardware.</p>
 <h2 id="pre-processing">Pre-Processing<a class="headerlink" href="#pre-processing" title="Permanent link">&para;</a></h2>
-<p>The Arduino development software performs a few transformations to your sketch before passing it to the avr-gcc compiler:</p>
+<p>The Arduino development software performs a few transformations to your sketch before passing it to the avr-gcc
+compiler:</p>
 <ul>
-<li>All .ino and .pde files in the sketch folder (shown in the Arduino IDE as tabs with no extension) are concatenated together, starting with the file that matches the folder name followed by the others in alphabetical order, and the .cpp extension is added to the filename.</li>
-<li>If not already present, <code>#include &lt;Arduino.h&gt;</code> is added to the sketch. This header file (found in the core folder for the currently selected board) includes all the definitions needed for the standard Arduino core.</li>
-<li>Prototypes are generated for all function definitions in .ino/.pde files that don't already have prototypes. In some rare cases prototype generation may fail for some functions. To work around this, you can provide your own prototypes for these functions.</li>
+<li>All .ino and .pde files in the sketch folder (shown in the Arduino IDE as tabs with no extension) are concatenated
+  together, starting with the file that matches the folder name followed by the others in alphabetical order, and the
+  .cpp extension is added to the filename.</li>
+<li>If not already present, <code>#include &lt;Arduino.h&gt;</code> is added to the sketch. This header file (found in the core folder for
+  the currently selected board) includes all the definitions needed for the standard Arduino core.</li>
+<li>Prototypes are generated for all function definitions in .ino/.pde files that don't already have prototypes. In some
+  rare cases prototype generation may fail for some functions. To work around this, you can provide your own prototypes
+  for these functions.</li>
 <li><code>#line</code> directives are added to make warning or error messages reflect the original sketch layout.</li>
 </ul>
-<p>No pre-processing is done to files in a sketch with any extension other than .ino or .pde. Additionally, .h files in the sketch are not automatically #included from the main sketch file. Further, if you want to call functions defined in a .c file from a .cpp file (like one generated from your sketch), you'll need to wrap its declarations in an <code>extern "C" {}</code> block that is defined only inside of C++ files.</p>
+<p>No pre-processing is done to files in a sketch with any extension other than .ino or .pde. Additionally, .h files in the
+sketch are not automatically #included from the main sketch file. Further, if you want to call functions defined in a .c
+file from a .cpp file (like one generated from your sketch), you'll need to wrap its declarations in an <code>extern "C" {}</code>
+block that is defined only inside of C++ files.</p>
 <h2 id="dependency-resolution">Dependency Resolution<a class="headerlink" href="#dependency-resolution" title="Permanent link">&para;</a></h2>
 <p>The sketch is scanned recursively for dependencies. There are predefined include search paths:</p>
 <ol>
@@ -1126,24 +1144,35 @@
 <li>Standard system directories (e.g., <a href="../platform-specification/#tools"><code>{runtime.tools.avr-gcc.path}/avr/include</code></a>)</li>
 <li>Include search paths added to resolve prior dependencies</li>
 </ol>
-<p>If the dependency is not present in any of those locations, the installed libraries are then searched (see the <a href="#location-priority"><strong>Location Priority</strong> table</a> below for library locations). For information on the allowed library sub-folder structures see <a href="../library-specification/#source-code">the Arduino library specification</a>. <code>-I</code> options are generated for the path to each library dependency and appended to the <a href="../platform-specification/#recipes-to-compile-source-code"><code>includes</code> property</a>, to be used in <a href="../platform-specification/#recipes-to-compile-source-code">compilation recipes</a> in platform.txt.</p>
-<p>If multiple libraries contain a file that matches the <code>#include</code> directive, the priority is determined by applying the following rules, one by one in this order, until a rule determines a winner:</p>
+<p>If the dependency is not present in any of those locations, the installed libraries are then searched (see the
+<a href="#location-priority"><strong>Location Priority</strong> table</a> below for library locations). For information on the allowed library
+sub-folder structures see <a href="../library-specification/#source-code">the Arduino library specification</a>. <code>-I</code> options are
+generated for the path to each library dependency and appended to the
+<a href="../platform-specification/#recipes-to-compile-source-code"><code>includes</code> property</a>, to be used in
+<a href="../platform-specification/#recipes-to-compile-source-code">compilation recipes</a> in platform.txt.</p>
+<p>If multiple libraries contain a file that matches the <code>#include</code> directive, the priority is determined by applying the
+following rules, one by one in this order, until a rule determines a winner:</p>
 <ol>
-<li>A library that is architecture compatible wins against a library that is not architecture compatible (see <a href="#architecture-matching"><strong>Architecture Matching</strong></a>)</li>
+<li>A library that is architecture compatible wins against a library that is not architecture compatible (see
+   <a href="#architecture-matching"><strong>Architecture Matching</strong></a>)</li>
 <li>A library that has better "folder name priority" wins (see <a href="#folder-name-priority"><strong>Folder Name Priority</strong></a>)</li>
-<li>A library that is architecture optimized wins against a library that is not architecture optimized (see <a href="#architecture-matching"><strong>Architecture Matching</strong></a>)</li>
+<li>A library that is architecture optimized wins against a library that is not architecture optimized (see
+   <a href="#architecture-matching"><strong>Architecture Matching</strong></a>)</li>
 <li>A library that has a better "location priority" wins (see <a href="#location-priority"><strong>Location Priority</strong></a>)</li>
 <li>A library that has a folder name with a better score using the "closest-match" algorithm wins</li>
 <li>A library that has a folder name that comes first in alphanumeric order wins</li>
 </ol>
 <h3 id="architecture-matching">Architecture Matching<a class="headerlink" href="#architecture-matching" title="Permanent link">&para;</a></h3>
-<p>A library is considered <strong>compatible</strong> with architecture <code>X</code> if the <code>architectures</code> field in <a href="../library-specification/#library-metadata">library.properties</a>:</p>
+<p>A library is considered <strong>compatible</strong> with architecture <code>X</code> if the <code>architectures</code> field in
+<a href="../library-specification/#library-metadata">library.properties</a>:</p>
 <ul>
 <li>explicitly contains the architecture <code>X</code></li>
 <li>contains the catch-all <code>*</code></li>
 <li>is not specified at all.</li>
 </ul>
-<p>A library is considered <strong>optimized</strong> for architecture <code>X</code> only if the <code>architectures</code> field in library.properties explicitly contains the architecture <code>X</code>. This means that a library that is optimized for architecture <code>X</code> is also compatible with it.</p>
+<p>A library is considered <strong>optimized</strong> for architecture <code>X</code> only if the <code>architectures</code> field in library.properties
+explicitly contains the architecture <code>X</code>. This means that a library that is optimized for architecture <code>X</code> is also
+compatible with it.</p>
 <p>Examples:</p>
 <table>
 <thead>
@@ -1226,27 +1255,45 @@
 <h3 id="location-priority">Location Priority<a class="headerlink" href="#location-priority" title="Permanent link">&para;</a></h3>
 <p>The "location priority" is determined as follows (in order of highest to lowest priority):</p>
 <ol>
-<li>The library is in a custom libraries path specified via the <a href="../commands/arduino-cli_compile/#options"><code>--libraries</code> option</a> of <code>arduino-cli compile</code> (in decreasing order of priority when multiple custom paths are defined)</li>
+<li>The library is in a custom libraries path specified via the
+   <a href="../commands/arduino-cli_compile/#options"><code>--libraries</code> option</a> of <code>arduino-cli compile</code> (in decreasing order of
+   priority when multiple custom paths are defined)</li>
 <li>The library is in the <code>libraries</code> subfolder of the IDE's sketchbook or Arduino CLI's user directory</li>
-<li>The library is bundled with the board platform/core (<a href="../platform-specification/#global-predefined-properties"><code>{runtime.platform.path}/libraries</code></a>)</li>
-<li>The library is bundled with the <a href="../platform-specification/#referencing-another-core-variant-or-tool">referenced</a> board platform/core</li>
-<li>The library is bundled with the Arduino IDE (<a href="../platform-specification/#global-predefined-properties"><code>{runtime.ide.path}/libraries</code></a>)<ul>
+<li>The library is bundled with the board platform/core
+   (<a href="../platform-specification/#global-predefined-properties"><code>{runtime.platform.path}/libraries</code></a>)</li>
+<li>The library is bundled with the <a href="../platform-specification/#referencing-another-core-variant-or-tool">referenced</a>
+   board platform/core</li>
+<li>The library is bundled with the Arduino IDE
+   (<a href="../platform-specification/#global-predefined-properties"><code>{runtime.ide.path}/libraries</code></a>)<ul>
 <li>This location is only used by Arduino CLI when it's located in the Arduino IDE installation folder</li>
 </ul>
 </li>
 </ol>
 <h2 id="compilation">Compilation<a class="headerlink" href="#compilation" title="Permanent link">&para;</a></h2>
-<p>Sketches are compiled by avr-gcc and avr-g++ according to the variables in the boards.txt file of the selected board's <a href="../platform-specification/">platform</a>.</p>
+<p>Sketches are compiled by avr-gcc and avr-g++ according to the variables in the boards.txt file of the selected board's
+<a href="../platform-specification/">platform</a>.</p>
 <p>The sketch is built in a temporary directory in the system-wide temporary directory (e.g. /tmp on Linux).</p>
-<p>Files taken as source files for the build process are .S, .c and .cpp files (including the .cpp file generated from the sketch's .ino and .pde files during the sketch pre-processing step).
-Source files of the target are compiled and output with .o extensions to this build directory, as are the main sketch files and any other source files in the sketch and any source files in any libraries which are <code>#include</code>d in the sketch.</p>
-<p>Before compiling a source file, an attempt is made to reuse the previously compiled .o file, which speeds up the build process. A special .d (dependency) file provides a list of all other files included by the source. The compile step is skipped if the .o and .d files exist and have timestamps newer than the source and all the dependent files. If the source or any dependent file has been modified, or any error occurs verifying the files, the compiler is run normally, writing a new .o &amp; .d file. After a new board is selected from the IDE's Board menu, all source files are rebuilt on the next compile.</p>
-<p>These .o files are then linked together into a static library and the main sketch file is linked against this library. Only the parts of the library needed for your sketch are included in the final .hex file, reducing the size of most sketches.</p>
+<p>Files taken as source files for the build process are .S, .c and .cpp files (including the .cpp file generated from the
+sketch's .ino and .pde files during the sketch pre-processing step). Source files of the target are compiled and output
+with .o extensions to this build directory, as are the main sketch files and any other source files in the sketch and
+any source files in any libraries which are <code>#include</code>d in the sketch.</p>
+<p>Before compiling a source file, an attempt is made to reuse the previously compiled .o file, which speeds up the build
+process. A special .d (dependency) file provides a list of all other files included by the source. The compile step is
+skipped if the .o and .d files exist and have timestamps newer than the source and all the dependent files. If the
+source or any dependent file has been modified, or any error occurs verifying the files, the compiler is run normally,
+writing a new .o &amp; .d file. After a new board is selected from the IDE's Board menu, all source files are rebuilt on the
+next compile.</p>
+<p>These .o files are then linked together into a static library and the main sketch file is linked against this library.
+Only the parts of the library needed for your sketch are included in the final .hex file, reducing the size of most
+sketches.</p>
 <p>The .hex file is the final output of the compilation which is then uploaded to the board.</p>
-<p>If verbose output during compilation is enabled, the complete command line of each external command executed as part of the build process will be printed in the console.</p>
+<p>If verbose output during compilation is enabled, the complete command line of each external command executed as part of
+the build process will be printed in the console.</p>
 <h2 id="uploading">Uploading<a class="headerlink" href="#uploading" title="Permanent link">&para;</a></h2>
-<p>Sketches are uploaded by avrdude. The upload process is also controlled by variables in the boards and main preferences files. See the <a href="../platform-specification/">Arduino platform specification</a> page for details.</p>
-<p>If verbose output during upload is enabled, debugging information will be output to the console, including avrdude command lines and verbose output.</p>
+<p>Sketches are uploaded by avrdude. The upload process is also controlled by variables in the boards and main preferences
+files. See the <a href="../platform-specification/">Arduino platform specification</a> page for details.</p>
+<p>If verbose output during upload is enabled, debugging information will be output to the console, including avrdude
+command lines and verbose output.</p>
                 
                   
                 

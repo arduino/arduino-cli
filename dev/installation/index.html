@@ -1119,8 +1119,7 @@
                   <h1>Installation</h1>
                 
                 <h3 id="install-via-homebrew-macoslinux">Install via Homebrew (macOS/Linux)<a class="headerlink" href="#install-via-homebrew-macoslinux" title="Permanent link">&para;</a></h3>
-<p>The Arduino CLI is available as a Homebrew formula since version
-<code>0.5.0</code>:</p>
+<p>The Arduino CLI is available as a Homebrew formula since version <code>0.5.0</code>:</p>
 <div class="highlight"><pre><span></span><code>brew update
 brew install arduino-cli
 </code></pre></div>
@@ -1128,32 +1127,27 @@ brew install arduino-cli
 <h4 id="command-line-completion">Command line completion<a class="headerlink" href="#command-line-completion" title="Permanent link">&para;</a></h4>
 <p><a href="../command-line-completion/#brew">Command line completion</a> files are already bundled in the homebrew installation.</p>
 <h3 id="use-the-install-script">Use the install script<a class="headerlink" href="#use-the-install-script" title="Permanent link">&para;</a></h3>
-<p>The script requires <code>sh</code>. This is always available on Linux and macOS. <code>sh</code> is
-not available by default on Windows. The script may be run on Windows by
-installing <a href="https://gitforwindows.org/">Git for Windows</a>, then running it from Git Bash.</p>
+<p>The script requires <code>sh</code>. This is always available on Linux and macOS. <code>sh</code> is not available by default on Windows. The
+script may be run on Windows by installing <a href="https://gitforwindows.org/">Git for Windows</a>, then running it from Git Bash.</p>
 <p>This script will install the latest version of Arduino CLI to <code>$PWD/bin</code>:</p>
 <div class="highlight"><pre><span></span><code>curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh <span class="p">|</span> sh
 </code></pre></div>
 
-<p>If you want to target a different directory, for example <code>~/local/bin</code>, set the
-<code>BINDIR</code> environment variable like this:</p>
+<p>If you want to target a different directory, for example <code>~/local/bin</code>, set the <code>BINDIR</code> environment variable like this:</p>
 <div class="highlight"><pre><span></span><code>curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh <span class="p">|</span> <span class="nv">BINDIR</span><span class="o">=</span>~/local/bin sh
 </code></pre></div>
 
-<p>If you would like to use the <code>arduino-cli</code> command from any location, install
-Arduino CLI to a directory already in your <code>PATH</code> or add the Arduino CLI
-installation path to your <code>PATH</code> environment variable.</p>
-<p>If you want to download a specific arduino-cli version, for example <code>0.9.0</code>, pass the
-version number as a parameter like this:</p>
+<p>If you would like to use the <code>arduino-cli</code> command from any location, install Arduino CLI to a directory already in your
+<code>PATH</code> or add the Arduino CLI installation path to your <code>PATH</code> environment variable.</p>
+<p>If you want to download a specific arduino-cli version, for example <code>0.9.0</code>, pass the version number as a parameter like
+this:</p>
 <div class="highlight"><pre><span></span><code>curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh <span class="p">|</span> sh -s <span class="m">0</span>.9.0
 </code></pre></div>
 
 <h3 id="download">Download<a class="headerlink" href="#download" title="Permanent link">&para;</a></h3>
-<p>Pre-built binaries for all the supported platforms are available for download
-from the links below.</p>
-<p>If you would like to use the <code>arduino-cli</code> command from any location, extract
-the downloaded file to a directory already in your <code>PATH</code> or add the Arduino CLI
-installation path to your <code>PATH</code> environment variable.</p>
+<p>Pre-built binaries for all the supported platforms are available for download from the links below.</p>
+<p>If you would like to use the <code>arduino-cli</code> command from any location, extract the downloaded file to a directory already
+in your <code>PATH</code> or add the Arduino CLI installation path to your <code>PATH</code> environment variable.</p>
 <h4 id="latest-packages">Latest packages<a class="headerlink" href="#latest-packages" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
@@ -1188,16 +1182,14 @@ installation path to your <code>PATH</code> environment variable.</p>
 </table>
 <blockquote>
 <p><strong>Deprecation notice</strong>: links in the form
-  <code>http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-&lt;platform&gt;.tar.bz2</code>
-  won’t be further updated. That URL will provide the version
-  <code>0.3.7-alpha.preview</code>, regardless of further releases.</p>
+<code>http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-&lt;platform&gt;.tar.bz2</code> won’t be further updated. That URL
+will provide the version <code>0.3.7-alpha.preview</code>, regardless of further releases.</p>
 </blockquote>
 <h4 id="previous-versions">Previous versions<a class="headerlink" href="#previous-versions" title="Permanent link">&para;</a></h4>
 <p>These are available from the <a href="https://github.com/arduino/arduino-cli/releases">releases page</a></p>
 <h4 id="nightly-builds">Nightly builds<a class="headerlink" href="#nightly-builds" title="Permanent link">&para;</a></h4>
-<p>These builds are generated every day at 01:00 GMT from the <code>master</code> branch and
-should be considered unstable. In order to get the latest nightly build
-available for the supported platform, use the following links:</p>
+<p>These builds are generated every day at 01:00 GMT from the <code>master</code> branch and should be considered unstable. In order
+to get the latest nightly build available for the supported platform, use the following links:</p>
 <table>
 <thead>
 <tr>
@@ -1214,8 +1206,8 @@ available for the supported platform, use the following links:</p>
 </tr>
 <tr>
 <td>Linux ARM</td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARMv7.tar.gz">Nightly Linux ARM 32 bit</a></td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARM64.tar.gz">Nightly Linux ARM 64 bit</a></td>
+<td><a href="">Nightly Linux ARM 32 bit</a></td>
+<td><a href="">Nightly Linux ARM 64 bit</a></td>
 </tr>
 <tr>
 <td>Windows</td>
@@ -1229,26 +1221,23 @@ available for the supported platform, use the following links:</p>
 </tr>
 </tbody>
 </table>
+<p><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARM64.tar.gz">https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARM64.tar.gz</a></p>
+<p><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARMv7.tar.gz">https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARMv7.tar.gz</a></p>
 <blockquote>
-<p>These links return a <code>302: Found</code> response, redirecting to latest
-  generated builds by replacing <code>latest</code> with the latest available build
-  date, using the format YYYYMMDD (i.e for 2019/Aug/06 <code>latest</code> is
-  replaced with <code>20190806</code> )</p>
+<p>These links return a <code>302: Found</code> response, redirecting to latest generated builds by replacing <code>latest</code> with the
+latest available build date, using the format YYYYMMDD (i.e for 2019/Aug/06 <code>latest</code> is replaced with <code>20190806</code> )</p>
 </blockquote>
 <p>Checksums for the nightly builds are available at
 <code>https://downloads.arduino.cc/arduino-cli/nightly/nightly-&lt;DATE&gt;-checksums.txt</code></p>
 <h3 id="build-from-source">Build from source<a class="headerlink" href="#build-from-source" title="Permanent link">&para;</a></h3>
-<p>If you’re familiar with Golang or if you want to contribute to the
-project, you will probably build the <code>arduino-cli</code> locally with your
-Go toolchain. Please refer to the <a href="../CONTRIBUTING/">CONTRIBUTING</a> document for setup instructions.</p>
-<p>If you don’t have a working Golang environment or if you want to build
-<code>arduino-cli</code> targeting different platforms, you can use Docker to get
-a binary directly from sources. From the project folder run:</p>
+<p>If you’re familiar with Golang or if you want to contribute to the project, you will probably build the <code>arduino-cli</code>
+locally with your Go toolchain. Please refer to the <a href="../CONTRIBUTING/">CONTRIBUTING</a> document for setup instructions.</p>
+<p>If you don’t have a working Golang environment or if you want to build <code>arduino-cli</code> targeting different platforms, you
+can use Docker to get a binary directly from sources. From the project folder run:</p>
 <div class="highlight"><pre><span></span><code>docker run -v <span class="nv">$PWD</span>:/arduino-cli -w /arduino-cli -e <span class="nv">PACKAGE_NAME_PREFIX</span><span class="o">=</span><span class="s1">&#39;snapshot&#39;</span> arduino/arduino-cli:builder-1 goreleaser --rm-dist --snapshot --skip-publish
 </code></pre></div>
 
-<p>Once the build is over, you will find a <code>./dist/</code> folder containing the packages
-built out of the current source tree.</p>
+<p>Once the build is over, you will find a <code>./dist/</code> folder containing the packages built out of the current source tree.</p>
                 
                   
                 

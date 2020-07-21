@@ -1042,14 +1042,12 @@
 <p>When you run <code>arduino-cli board list</code>, your board doesn't show up. Possible causes:</p>
 <ul>
 <li>Your board is a cheaper clone, or</li>
-<li>It mounts a USB2Serial converter like FT232 or CH340: these chips
-   always report the same USB VID/PID to the operating system, so the
-   only thing we know is that the board mounts that specific
-   USB2Serial chip, but we don’t know which board that chip is on.</li>
+<li>It mounts a USB2Serial converter like FT232 or CH340: these chips always report the same USB VID/PID to the operating
+  system, so the only thing we know is that the board mounts that specific USB2Serial chip, but we don’t know which
+  board that chip is on.</li>
 </ul>
 <h2 id="whats-the-fqbn-string">What's the FQBN string?<a class="headerlink" href="#whats-the-fqbn-string" title="Permanent link">&para;</a></h2>
-<p>For a deeper understanding of how FQBN works, you should understand
-the <a href="../platform-specification/">Arduino platform specification</a>.</p>
+<p>For a deeper understanding of how FQBN works, you should understand the <a href="../platform-specification/">Arduino platform specification</a>.</p>
 <h2 id="how-to-set-multiple-board-options">How to set multiple board options?<a class="headerlink" href="#how-to-set-multiple-board-options" title="Permanent link">&para;</a></h2>
 <p>Additional board options have to be separated by commas (instead of colon):</p>
 <p><code>$ arduino-cli compile --fqbn "esp8266:esp8266:generic:xtal=160,baud=57600" TestSketch</code></p>

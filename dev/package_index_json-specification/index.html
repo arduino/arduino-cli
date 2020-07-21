@@ -1104,55 +1104,60 @@
                 
                   <h1>package_index.json specification</h1>
                 
-                <p>Introduced in Arduino IDE 1.6.4, Boards Manager makes it easy to install and update Arduino platforms. In order to provide Boards Manager installation support for a platform, a JSON formatted index file must be published. This is the specification for that file.</p>
-<p>Boards Manager functionality is provided by <a href="../getting-started/#adding-3rd-party-cores">Arduino CLI</a>, <a href="https://www.arduino.cc/en/Guide/Cores">Arduino IDE</a>, and Arduino Pro IDE.</p>
+                <p>Introduced in Arduino IDE 1.6.4, Boards Manager makes it easy to install and update Arduino platforms. In order to
+provide Boards Manager installation support for a platform, a JSON formatted index file must be published. This is the
+specification for that file.</p>
+<p>Boards Manager functionality is provided by <a href="../getting-started/#adding-3rd-party-cores">Arduino CLI</a>,
+<a href="https://www.arduino.cc/en/Guide/Cores">Arduino IDE</a>, and Arduino Pro IDE.</p>
 <h2 id="naming-of-the-json-index-file">Naming of the JSON index file<a class="headerlink" href="#naming-of-the-json-index-file" title="Permanent link">&para;</a></h2>
-<p>Many different index files coming from different vendors may be in use, so each vendor should name their own index file in a way that won't conflict with others. The file must be named as follows:</p>
+<p>Many different index files coming from different vendors may be in use, so each vendor should name their own index file
+in a way that won't conflict with others. The file must be named as follows:</p>
 <p><code>package_YOURNAME_PACKAGENAME_index.json</code></p>
-<p>The prefix <code>package_</code> and the postfix <code>_index.json</code> are <strong>mandatory</strong> (otherwise the index file is not recognised by the Arduino development software) while the choice of <code>YOURNAME_PACKAGENAME</code> is left to the packager.
-We suggest using a domain name owned by the packager. For example:</p>
+<p>The prefix <code>package_</code> and the postfix <code>_index.json</code> are <strong>mandatory</strong> (otherwise the index file is not recognised by the
+Arduino development software) while the choice of <code>YOURNAME_PACKAGENAME</code> is left to the packager. We suggest using a
+domain name owned by the packager. For example:</p>
 <p><code>package_arduino.cc_index.json</code></p>
 <p>or</p>
 <p><code>package_example.com_avr_boards_index.json</code></p>
-<p>The index URL is periodically checked for updates so expect a constant flow of downloads (proportional to the number of active users).</p>
+<p>The index URL is periodically checked for updates so expect a constant flow of downloads (proportional to the number of
+active users).</p>
 <h2 id="json-index-file-contents">JSON Index file contents<a class="headerlink" href="#json-index-file-contents" title="Permanent link">&para;</a></h2>
 <p>The root of the JSON index is an array of <code>packages</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-  <span class="nt">&quot;packages&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="err">PACKAGE_XXXX</span>
-  <span class="p">]</span>
+  <span class="nt">&quot;packages&quot;</span><span class="p">:</span> <span class="p">[</span><span class="err">PACKAGE_XXXX</span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
 
-<p>3<sup>rd</sup> party vendors should use a single <code>PACKAGE_XXXX</code> that is a dictionary map with the vendor's metadata, a list of <code>PLATFORMS</code> and a list of <code>TOOLS</code>. For example:</p>
+<p>3<sup>rd</sup> party vendors should use a single <code>PACKAGE_XXXX</code> that is a dictionary map with the vendor's metadata, a list of
+<code>PLATFORMS</code> and a list of <code>TOOLS</code>. For example:</p>
+<!-- prettier-ignore -->
+
 <div class="highlight"><pre><span></span><code>    <span class="p">{</span>
       <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span>
       <span class="nt">&quot;maintainer&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino LLC&quot;</span><span class="p">,</span>
       <span class="nt">&quot;websiteURL&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.arduino.cc/&quot;</span><span class="p">,</span>
       <span class="nt">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;packages@arduino.cc&quot;</span><span class="p">,</span>
 
-      <span class="nt">&quot;platforms&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="err">PLATFORM_AVR</span><span class="p">,</span>
-        <span class="err">PLATFORM_ARM</span><span class="p">,</span>
-        <span class="err">PLATFORM_XXXXX</span><span class="p">,</span>
-        <span class="err">PLATFORM_YYYYY</span><span class="p">,</span>
-      <span class="p">],</span>
+      <span class="nt">&quot;platforms&quot;</span><span class="p">:</span> <span class="p">[</span><span class="err">PLATFORM_AVR</span><span class="p">,</span> <span class="err">PLATFORM_ARM</span><span class="p">,</span> <span class="err">PLATFORM_XXXXX</span><span class="p">,</span> <span class="err">PLATFORM_YYYYY</span><span class="p">],</span>
 
       <span class="nt">&quot;tools&quot;</span><span class="p">:</span> <span class="p">[</span>
         <span class="err">TOOLS_COMPILER_AVR</span><span class="p">,</span>
         <span class="err">TOOLS_UPLOADER_AVR</span><span class="p">,</span>
         <span class="err">TOOLS_COMPILER_ARM</span><span class="p">,</span>
         <span class="err">TOOLS_XXXXXXX</span><span class="p">,</span>
-        <span class="err">TOOLS_YYYYYYY</span><span class="p">,</span>
-      <span class="p">],</span>
+        <span class="err">TOOLS_YYYYYYY</span>
+      <span class="p">]</span>
     <span class="p">}</span>
 </code></pre></div>
 
 <p>The metadata fields are:</p>
 <ul>
-<li><code>name</code>: the folder used for the installed cores. The <a href="../platform-specification/#hardware-folders-structure">vendor folder</a> name of the installed package is determined by this field</li>
+<li><code>name</code>: the folder used for the installed cores. The
+  <a href="../platform-specification/#hardware-folders-structure">vendor folder</a> name of the installed package is determined by
+  this field</li>
 <li><code>maintainer</code>: the extended name of the vendor that is displayed on the Arduino IDE/Pro IDE's Boards Manager GUI</li>
-<li><code>websiteURL</code>: the URL to the vendor's website, appears on the Arduino IDE/Pro IDE's Boards Manager as a "More info" link</li>
+<li><code>websiteURL</code>: the URL to the vendor's website, appears on the Arduino IDE/Pro IDE's Boards Manager as a "More info"
+  link</li>
 <li><code>email</code>: the email of the vendor/maintainer</li>
 </ul>
 <p>Now, before looking at <code>PLATFORMS</code>, let's explore first how <code>TOOLS</code> are made.</p>
@@ -1204,8 +1209,9 @@ We suggest using a domain name owned by the packager. For example:</p>
         <span class="p">}</span><span class="err">,</span>
 </code></pre></div>
 
-<p>The field <code>name</code> and <code>version</code> are respectively the name and version of the tool.
-Each tool is uniquely identified by the triple (<code>vendor</code>, <code>name</code>, <code>version</code>) and there can be many different versions of the same tool available at the same time, for example:</p>
+<p>The field <code>name</code> and <code>version</code> are respectively the name and version of the tool. Each tool is uniquely identified by
+the triple (<code>vendor</code>, <code>name</code>, <code>version</code>) and there can be many different versions of the same tool available at the same
+time, for example:</p>
 <ul>
 <li>(<code>arduino</code>, <code>avr-gcc</code>, <code>4.8.1-arduino2</code>)</li>
 <li>(<code>arduino</code>, <code>avr-gcc</code>, <code>4.8.1-arduino3</code>)</li>
@@ -1215,30 +1221,37 @@ Each tool is uniquely identified by the triple (<code>vendor</code>, <code>name<
 <li>(<code>arduino</code>, <code>avrdude</code>, <code>6.1</code>)</li>
 <li>.....</li>
 </ul>
-<p>Each tool version may come in different build flavours for different OS. Each flavour is listed under the <code>systems</code> array. In the example above <code>avr-gcc</code> comes with builds for:</p>
+<p>Each tool version may come in different build flavours for different OS. Each flavour is listed under the <code>systems</code>
+array. In the example above <code>avr-gcc</code> comes with builds for:</p>
 <ul>
 <li>Linux 64-bit (<code>x86_64-linux-gnu</code>),</li>
 <li>Linux 32-bit (<code>i686-linux-gnu</code>),</li>
 <li>Windows (<code>i686-mingw32</code>),</li>
 <li>Mac (<code>i386-apple-darwin11</code>)</li>
 </ul>
-<p>The IDE will take care to install the right flavour based on the <code>host</code> value, or fail if a needed flavour is missing.<br>
-Note that this information is not used to select the toolchain during compilation. If you want this specific version to be used, you should use the notation {runtime.tools.TOOLNAME-VERSION.path} in the platform.txt.</p>
+<p>The IDE will take care to install the right flavour based on the <code>host</code> value, or fail if a needed flavour is
+missing.<br> Note that this information is not used to select the toolchain during compilation. If you want this
+specific version to be used, you should use the notation {runtime.tools.TOOLNAME-VERSION.path} in the platform.txt.</p>
 <p>The other fields are:</p>
 <ul>
 <li><code>url</code>: the download URL of the tool's archive</li>
-<li><code>archiveFileName</code>: the name of the file saved to disk after the download (some web servers don't provide the filename through the HTTP request)</li>
+<li><code>archiveFileName</code>: the name of the file saved to disk after the download (some web servers don't provide the filename
+  through the HTTP request)</li>
 <li><code>size</code>: the size of the archive in bytes</li>
-<li><code>checksum</code>: the checksum of the archive, used to check if the file has been corrupted. The format is <code>ALGORITHM:CHECKSUM</code>, currently <code>MD5</code>, <code>SHA-1</code>,<code>SHA-256</code> algorithm are supported, we recommend <code>SHA-256</code>.  On *nix or MacOSX you may be able to use the command <code>shasum -a 256 filename</code> to generate SHA-256 checksums. There are many free options for Windows including md5deep, there are also online utilities for generating checksums.</li>
+<li><code>checksum</code>: the checksum of the archive, used to check if the file has been corrupted. The format is
+  <code>ALGORITHM:CHECKSUM</code>, currently <code>MD5</code>, <code>SHA-1</code>,<code>SHA-256</code> algorithm are supported, we recommend <code>SHA-256</code>. On *nix or
+  MacOSX you may be able to use the command <code>shasum -a 256 filename</code> to generate SHA-256 checksums. There are many free
+  options for Windows including md5deep, there are also online utilities for generating checksums.</li>
 </ul>
 <h5 id="how-a-tools-path-is-determined-in-platformtxt">How a tool's path is determined in platform.txt<a class="headerlink" href="#how-a-tools-path-is-determined-in-platformtxt" title="Permanent link">&para;</a></h5>
-<p>When the IDE needs a tool it downloads the corresponding archive file and unpacks the content into
-a private folder that can be referenced from <code>platform.txt</code> using one of the following properties:</p>
+<p>When the IDE needs a tool it downloads the corresponding archive file and unpacks the content into a private folder that
+can be referenced from <code>platform.txt</code> using one of the following properties:</p>
 <ul>
 <li><code>{runtime.tools.TOOLNAME-VERSION.path}</code></li>
 <li><code>{runtime.tools.TOOLNAME.path}</code></li>
 </ul>
-<p>For example to obtain the avr-gcc 4.8.1 folder we can use <code>{runtime.tools.avr-gcc-4.8.1-arduino5.path}</code> or <code>{runtime.tools.avr-gcc.path}</code>.</p>
+<p>For example to obtain the avr-gcc 4.8.1 folder we can use <code>{runtime.tools.avr-gcc-4.8.1-arduino5.path}</code> or
+<code>{runtime.tools.avr-gcc.path}</code>.</p>
 <h3 id="platforms-definitions">Platforms definitions<a class="headerlink" href="#platforms-definitions" title="Permanent link">&para;</a></h3>
 <p>Finally, let's see how <code>PLATFORMS</code> are made.</p>
 <div class="highlight"><pre><span></span><code>        <span class="p">{</span>
@@ -1272,24 +1285,33 @@ a private folder that can be referenced from <code>platform.txt</code> using one
 <p>Each PLATFORM describes a core for a specific architecture. The fields needed are:</p>
 <ul>
 <li><code>name</code>: the extended name of the platform that is displayed on the Boards Manager GUI</li>
-<li><code>architecture</code>: is the architecture of the platform (avr, sam, etc...). It must match the architecture of the core as explained in the <a href="../platform-specification/#hardware-folders-structure">Arduino platform specification</a></li>
+<li><code>architecture</code>: is the architecture of the platform (avr, sam, etc...). It must match the architecture of the core as
+  explained in the <a href="../platform-specification/#hardware-folders-structure">Arduino platform specification</a></li>
 <li><code>version</code>: the version of the platform.</li>
 <li><code>category</code>: this field is reserved, a 3<sup>rd</sup> party core must set it to <code>Contributed</code></li>
 <li><code>help</code>/<code>online</code>: is a URL that is displayed on the Arduino IDE's Boards Manager as an "Online Help" link</li>
-<li><code>url</code>, <code>archiveFileName</code>, <code>size</code> and <code>checksum</code>: metadata of the core archive file. The meaning is the same as for the TOOLS</li>
-<li><code>boards</code>: the list of boards supported (note: just the names to display on the Arduino IDE and Arduino Pro IDE's Boards Manager GUI! the real boards definitions are inside <code>boards.txt</code> inside the core archive file)</li>
-<li><code>toolsDependencies</code>: the tools needed by this core. Each tool is referenced by the triple (<code>packager</code>, <code>name</code>, <code>version</code>) as previously said. Note that you can reference tools available in other packages as well.</li>
+<li><code>url</code>, <code>archiveFileName</code>, <code>size</code> and <code>checksum</code>: metadata of the core archive file. The meaning is the same as for the
+  TOOLS</li>
+<li><code>boards</code>: the list of boards supported (note: just the names to display on the Arduino IDE and Arduino Pro IDE's
+  Boards Manager GUI! the real boards definitions are inside <code>boards.txt</code> inside the core archive file)</li>
+<li><code>toolsDependencies</code>: the tools needed by this core. Each tool is referenced by the triple (<code>packager</code>, <code>name</code>,
+  <code>version</code>) as previously said. Note that you can reference tools available in other packages as well.</li>
 </ul>
-<p>The <code>version</code> field is validated by both Arduino IDE and <a href="https://github.com/zafarkhaja/jsemver">JSemVer</a>. Here are the rules Arduino IDE follows for parsing versions (<a href="https://github.com/arduino/Arduino/blob/master/arduino-core/src/cc/arduino/contributions/VersionHelper.java">source</a>):</p>
+<p>The <code>version</code> field is validated by both Arduino IDE and <a href="https://github.com/zafarkhaja/jsemver">JSemVer</a>. Here are the
+rules Arduino IDE follows for parsing versions
+(<a href="https://github.com/arduino/Arduino/blob/master/arduino-core/src/cc/arduino/contributions/VersionHelper.java">source</a>):</p>
 <ul>
 <li>Split the version at the - character and continue with the first part.</li>
-<li>If there are no dots (<code>.</code>), parse <code>version</code> as an integer and form a Version from that integer using <code>Version.forIntegers</code></li>
-<li>If there is one dot, split <code>version</code> into two, parse each part as an integer, and form a Version from those integers using <code>Version.forIntegers</code></li>
+<li>If there are no dots (<code>.</code>), parse <code>version</code> as an integer and form a Version from that integer using
+  <code>Version.forIntegers</code></li>
+<li>If there is one dot, split <code>version</code> into two, parse each part as an integer, and form a Version from those integers
+  using <code>Version.forIntegers</code></li>
 <li>Otherwise, simply parse <code>version</code> into a Version using <code>Version.valueOf</code></li>
 </ul>
-<p>Note: if you miss a bracket in the JSON index, then add the URL to your Preferences, and open Boards Manager it can cause the Arduino IDE to no longer load until you have deleted the file from your arduino15 folder.</p>
+<p>Note: if you miss a bracket in the JSON index, then add the URL to your Preferences, and open Boards Manager it can
+cause the Arduino IDE to no longer load until you have deleted the file from your arduino15 folder.</p>
 <h3 id="example-json-index-file">Example JSON index file<a class="headerlink" href="#example-json-index-file" title="Permanent link">&para;</a></h3>
-<p><div class="highlight"><pre><span></span><code><span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
   <span class="nt">&quot;packages&quot;</span><span class="p">:</span> <span class="p">[</span>
     <span class="p">{</span>
       <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;myboard&quot;</span><span class="p">,</span>
@@ -1312,10 +1334,7 @@ a private folder that can be referenced from <code>platform.txt</code> using one
           <span class="nt">&quot;archiveFileName&quot;</span><span class="p">:</span> <span class="s2">&quot;myboard-1.0.0.zip&quot;</span><span class="p">,</span>
           <span class="nt">&quot;checksum&quot;</span><span class="p">:</span> <span class="s2">&quot;SHA-256:ec3ff8a1dc96d3ba6f432b9b837a35fd4174a34b3d2927de1d51010e8b94f9f1&quot;</span><span class="p">,</span>
           <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="s2">&quot;15005&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;boards&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board&quot;</span><span class="p">},</span>
-            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board Pro&quot;</span><span class="p">}</span>
-          <span class="p">],</span>
+          <span class="nt">&quot;boards&quot;</span><span class="p">:</span> <span class="p">[{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board&quot;</span> <span class="p">},</span> <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board Pro&quot;</span> <span class="p">}],</span>
           <span class="nt">&quot;toolsDependencies&quot;</span><span class="p">:</span> <span class="p">[</span>
             <span class="p">{</span>
               <span class="nt">&quot;packager&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span>
@@ -1341,10 +1360,7 @@ a private folder that can be referenced from <code>platform.txt</code> using one
           <span class="nt">&quot;archiveFileName&quot;</span><span class="p">:</span> <span class="s2">&quot;myboard-1.0.1.zip&quot;</span><span class="p">,</span>
           <span class="nt">&quot;checksum&quot;</span><span class="p">:</span> <span class="s2">&quot;SHA-256:9c86ee28a7ce9fe33e8b07ec643316131e0031b0d22e63bb398902a5fdadbca9&quot;</span><span class="p">,</span>
           <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="s2">&quot;15125&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;boards&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board&quot;</span><span class="p">},</span>
-            <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board Pro&quot;</span><span class="p">}</span>
-          <span class="p">],</span>
+          <span class="nt">&quot;boards&quot;</span><span class="p">:</span> <span class="p">[{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board&quot;</span> <span class="p">},</span> <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;My Board Pro&quot;</span> <span class="p">}],</span>
           <span class="nt">&quot;toolsDependencies&quot;</span><span class="p">:</span> <span class="p">[</span>
             <span class="p">{</span>
               <span class="nt">&quot;packager&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span>
@@ -1359,19 +1375,23 @@ a private folder that can be referenced from <code>platform.txt</code> using one
           <span class="p">]</span>
         <span class="p">}</span>
       <span class="p">],</span>
-      <span class="nt">&quot;tools&quot;</span><span class="p">:[]</span>
+      <span class="nt">&quot;tools&quot;</span><span class="p">:</span> <span class="p">[]</span>
     <span class="p">}</span>
   <span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-In the example there is one <code>PACKAGE</code>, My Board. The package is compatible with the AVR architecture. There are two versions of the <code>PACKAGE</code>, 1.0.0 and 1.0.1. No <code>TOOLS</code> needed to be installed so that section was left blank.</p>
-<p>Here is the Boards Manager entry created by the example:
-<img alt="Boards Manager screenshot" src="../img/boards-manager-screenshot.png" /></p>
+
+<p>In the example there is one <code>PACKAGE</code>, My Board. The package is compatible with the AVR architecture. There are two
+versions of the <code>PACKAGE</code>, 1.0.0 and 1.0.1. No <code>TOOLS</code> needed to be installed so that section was left blank.</p>
+<p>Here is the Boards Manager entry created by the example: <img alt="Boards Manager screenshot" src="../img/boards-manager-screenshot.png" /></p>
 <h2 id="installation-archive-structure">Installation archive structure<a class="headerlink" href="#installation-archive-structure" title="Permanent link">&para;</a></h2>
 <p>The installation archives contain the Board support files. Supported formats are .zip, .tar.bz2, and .tar.gz.</p>
-<p>The folder structure of the core archive is slightly different from the standard manually installed Arduino IDE 1.5+ compatible hardware folder structure. You must remove the architecture folder(e.g., <code>avr</code> or <code>arm</code>), moving all the files and folders within the architecture folder up a level.</p>
+<p>The folder structure of the core archive is slightly different from the standard manually installed Arduino IDE 1.5+
+compatible hardware folder structure. You must remove the architecture folder(e.g., <code>avr</code> or <code>arm</code>), moving all the
+files and folders within the architecture folder up a level.</p>
 <hr />
-<p>After adding Boards Manager support for your boards, please share the JSON index file URL on the <a href="https://github.com/arduino/Arduino/wiki/Unofficial-list-of-3rd-party-boards-support-urls">Unofficial list of 3<sup>rd</sup> party boards support urls</a>.</p>
+<p>After adding Boards Manager support for your boards, please share the JSON index file URL on the
+<a href="https://github.com/arduino/Arduino/wiki/Unofficial-list-of-3rd-party-boards-support-urls">Unofficial list of 3<sup>rd</sup> party boards support urls</a>.</p>
                 
                   
                 

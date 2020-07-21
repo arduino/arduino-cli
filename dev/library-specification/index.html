@@ -1301,9 +1301,17 @@
 <li>rev.2.1 will be implemented starting from version Arduino IDE 1.6.10</li>
 <li>rev.2.2 will be implemented starting from version Arduino IDE 1.8.10</li>
 </ul>
-<p>This new library format is intended to be used in tandem with <strong>Library Manager</strong>, available since Arduino IDE 1.6.2. The Library Manager allows users to automatically download and install libraries needed in their projects, with an easy to use graphic interface in the <a href="https://www.arduino.cc/en/guide/libraries#toc3">Arduino IDE</a>/Pro IDE and <a href="https://create.arduino.cc/projecthub/Arduino_Genuino/getting-started-with-arduino-web-editor-on-various-platforms-4b3e4a#toc-libraries-and-the-arduino-web-editor-11">Arduino Web Editor</a> as well as <a href="../commands/arduino-cli_lib"><code>arduino-cli lib</code></a>.</p>
-<p>More information about how Library Manager works is available <a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">here</a>.</p>
-<p>Arduino development software supports multiple microcontroller architectures (e.g. AVR, SAM, etc), meaning that libraries may need to work on multiple architectures. The new 1.5 library format doesn’t contain special support for cross-architecture libraries, but it does provide a preprocessor based mechanism for libraries to target sections of code to specific architectures.</p>
+<p>This new library format is intended to be used in tandem with <strong>Library Manager</strong>, available since Arduino IDE 1.6.2.
+The Library Manager allows users to automatically download and install libraries needed in their projects, with an easy
+to use graphic interface in the <a href="https://www.arduino.cc/en/guide/libraries#toc3">Arduino IDE</a>/Pro IDE and
+<a href="https://create.arduino.cc/projecthub/Arduino_Genuino/getting-started-with-arduino-web-editor-on-various-platforms-4b3e4a#toc-libraries-and-the-arduino-web-editor-11">Arduino Web Editor</a>
+as well as <a href="../commands/arduino-cli_lib"><code>arduino-cli lib</code></a>.</p>
+<p>More information about how Library Manager works is available
+<a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">here</a>.</p>
+<p>Arduino development software supports multiple microcontroller architectures (e.g. AVR, SAM, etc), meaning that
+libraries may need to work on multiple architectures. The new 1.5 library format doesn’t contain special support for
+cross-architecture libraries, but it does provide a preprocessor based mechanism for libraries to target sections of
+code to specific architectures.</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="http://arduino.cc/en/Reference/APIStyleGuide">Arduino library style guide</a></li>
@@ -1311,17 +1319,26 @@
 </ul>
 <h2 id="15-library-format-rev-22">1.5 library format (rev. 2.2)<a class="headerlink" href="#15-library-format-rev-22" title="Permanent link">&para;</a></h2>
 <h3 id="library-metadata">Library metadata<a class="headerlink" href="#library-metadata" title="Permanent link">&para;</a></h3>
-<p>The most significant addition to the format is the ability to add information about the library itself through a properties file called <strong>library.properties</strong>.</p>
-<p>This file allows the <em>Library Manager</em> to search and install a library and its dependencies in an easy and automated way. It must be located in the root of the library folder.</p>
+<p>The most significant addition to the format is the ability to add information about the library itself through a
+properties file called <strong>library.properties</strong>.</p>
+<p>This file allows the <em>Library Manager</em> to search and install a library and its dependencies in an easy and automated
+way. It must be located in the root of the library folder.</p>
 <h4 id="libraryproperties-file-format">library.properties file format<a class="headerlink" href="#libraryproperties-file-format" title="Permanent link">&para;</a></h4>
-<p>The library.properties file is a key=value properties list. Every field in this file is UTF-8 encoded. Unless noted otherwise below, <strong>all fields are required</strong>. The available fields are:</p>
+<p>The library.properties file is a key=value properties list. Every field in this file is UTF-8 encoded. Unless noted
+otherwise below, <strong>all fields are required</strong>. The available fields are:</p>
 <ul>
-<li><strong>name</strong> - the name of the library. Library names must contain only basic letters (<code>A</code>-<code>Z</code> or <code>a</code>-<code>z</code>) and numbers (<code>0</code>-<code>9</code>), spaces (<code></code>), underscores (<code>_</code>), dots (<code>.</code>) and dashes (<code>-</code>). They cannot start with a number. Note that libraries with a <code>name</code> value starting with <code>Arduino</code> will no longer be allowed <a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">addition to the Library Manager index</a> as these names are now reserved for official Arduino libraries.</li>
-<li><strong>version</strong> - version of the library. Version should be <a href="http://semver.org/">semver</a> compliant. 1.2.0 is correct; 1.2 is accepted; r5, 003, 1.1c are invalid</li>
+<li><strong>name</strong> - the name of the library. Library names must contain only basic letters (A-Z or a-z) and numbers (0-9),
+  spaces ( ), underscores (_), dots (.) and dashes (-). They cannot start with a number. Note that libraries with a
+  <code>name</code> value starting with <code>Arduino</code> will no longer be allowed
+  <a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">addition to the Library Manager index</a> as these names
+  are now reserved for official Arduino libraries.</li>
+<li><strong>version</strong> - version of the library. Version should be <a href="http://semver.org/">semver</a> compliant. 1.2.0 is correct; 1.2
+  is accepted; r5, 003, 1.1c are invalid</li>
 <li><strong>author</strong> - name/nickname of the authors and their email addresses (not mandatory) separated by comma ","</li>
 <li><strong>maintainer</strong> - name and email of the maintainer</li>
 <li><strong>sentence</strong> - a sentence explaining the purpose of the library</li>
-<li><strong>paragraph</strong> - a longer description of the library. The value of <strong>sentence</strong> always will be prepended, so you should start by writing the second sentence here</li>
+<li><strong>paragraph</strong> - a longer description of the library. The value of <strong>sentence</strong> always will be prepended, so you should
+  start by writing the second sentence here</li>
 <li><strong>category</strong> - (defaults to <code>Uncategorized</code>) if present, one of these:<ul>
 <li>Display</li>
 <li>Communication</li>
@@ -1334,14 +1351,33 @@
 <li>Other</li>
 </ul>
 </li>
-<li><strong>url</strong> - the URL of the library project, for a person to visit. For example, the library's GitHub page. This is used for the "More info" links in Library Manager</li>
-<li><strong>architectures</strong> - (defaults to <code>*</code>) a comma separated list of architectures supported by the library. If the library doesn’t contain architecture specific code use <code>*</code> to match all architectures. This field is used as one factor in determining priority when multiple libraries match an <code>#include</code> directive and to provide a warning message when the library is compiled for a board of an architecture that doesn't match any on the list.</li>
-<li><strong>depends</strong> - <strong>(available from Arduino IDE 1.8.10/Arduino CLI 0.7.0)</strong> (optional) a comma-separated list of dependencies (libraries that are needed to build the current library). The Arduino IDE's Library Manager will offer to install the dependencies during installation of the library. <a href="../commands/arduino-cli_lib_install"><code>arduino-cli lib install</code></a> will automatically install the dependencies. Since spaces are allowed in the <code>name</code> of a library, but not commas, you can refer to libraries containing spaces in the name without ambiguity for example:<br>
-<code>depends=Very long library name, Another library with long-name</code></li>
-<li><strong>dot_a_linkage</strong> - <strong>(available from Arduino IDE 1.6.0 / arduino-builder 1.0.0-beta13)</strong> (optional) when set to <code>true</code>, the library will be compiled using a .a (archive) file. First, all source files are compiled into .o files as normal. Then instead of including all .o files in the linker command directly, all .o files are saved into a .a file, which is then included in the linker command. <a href="#layout-of-folders-and-files">1.5 format library folder structure</a> is required.</li>
-<li><strong>includes</strong> - <strong>(available from Arduino IDE 1.6.10)</strong> (optional) a comma separated list of files to be added to the sketch as <code>#include &lt;...&gt;</code> lines. This property is used with the "Include library" command in the Arduino IDE. If the <code>includes</code> property is missing, all the header files (.h) on the root source folder are included.</li>
-<li><strong>precompiled</strong> - <strong>(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)</strong> (optional) set to <code>true</code> to allow the use of .a (archive) and .so (shared object) files. The .a/.so file must be located at <code>src/{build.mcu}</code> where <code>{build.mcu}</code> is the architecture name of the target the file was compiled for. Ex: <code>cortex-m3</code> for the Arduino DUE. The static library should be linked as an ldflag.</li>
-<li><strong>ldflags</strong> - <strong>(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)</strong> (optional) the linker flags to be added. Ex: <code>ldflags=-lm</code></li>
+<li><strong>url</strong> - the URL of the library project, for a person to visit. For example, the library's GitHub page. This is used
+  for the "More info" links in Library Manager</li>
+<li><strong>architectures</strong> - (defaults to <code>*</code>) a comma separated list of architectures supported by the library. If the library
+  doesn’t contain architecture specific code use <code>*</code> to match all architectures. This field is used as one factor in
+  determining priority when multiple libraries match an <code>#include</code> directive and to provide a warning message when the
+  library is compiled for a board of an architecture that doesn't match any on the list.</li>
+<li><strong>depends</strong> - <strong>(available from Arduino IDE 1.8.10/Arduino CLI 0.7.0)</strong> (optional) a comma-separated list of
+  dependencies (libraries that are needed to build the current library). The Arduino IDE's Library Manager will offer to
+  install the dependencies during installation of the library.
+  <a href="../commands/arduino-cli_lib_install"><code>arduino-cli lib install</code></a> will automatically install the dependencies. Since
+  spaces are allowed in the <code>name</code> of a library, but not commas, you can refer to libraries containing spaces in the
+  name without ambiguity for example:<br> <code>depends=Very long library name, Another library with long-name</code></li>
+<li><strong>dot_a_linkage</strong> - <strong>(available from Arduino IDE 1.6.0 / arduino-builder 1.0.0-beta13)</strong> (optional) when set to
+  <code>true</code>, the library will be compiled using a .a (archive) file. First, all source files are compiled into .o files as
+  normal. Then instead of including all .o
+    <!-- prettier-ignore -->
+  files in the linker command directly, all .o files are saved into a .a file, which is then included in the linker
+  command. <a href="#layout-of-folders-and-files">1.5 format library folder structure</a> is required.</li>
+<li><strong>includes</strong> - <strong>(available from Arduino IDE 1.6.10)</strong> (optional) a comma separated list of files to be added to the
+  sketch as <code>#include &lt;...&gt;</code> lines. This property is used with the "Include library" command in the Arduino IDE. If the
+  <code>includes</code> property is missing, all the header files (.h) on the root source folder are included.</li>
+<li><strong>precompiled</strong> - <strong>(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)</strong> (optional) set to <code>true</code> to allow the
+  use of .a (archive) and .so (shared object) files. The .a/.so file must be located at <code>src/{build.mcu}</code> where
+  <code>{build.mcu}</code> is the architecture name of the target the file was compiled for. Ex: <code>cortex-m3</code> for the Arduino DUE.
+  The static library should be linked as an ldflag.</li>
+<li><strong>ldflags</strong> - <strong>(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)</strong> (optional) the linker flags to be added.
+  Ex: <code>ldflags=-lm</code></li>
 </ul>
 <p>Example:</p>
 <div class="codehilite"><pre><span></span><code>name=WebServer
@@ -1359,9 +1395,11 @@ depends=ArduinoHttpClient
 
 
 <h3 id="layout-of-folders-and-files">Layout of folders and files<a class="headerlink" href="#layout-of-folders-and-files" title="Permanent link">&para;</a></h3>
-<p>Each folder has a specific purpose (sources, examples, documentation, etc). Folders not covered in this specification may be added as needed to future revisions.</p>
+<p>Each folder has a specific purpose (sources, examples, documentation, etc). Folders not covered in this specification
+may be added as needed to future revisions.</p>
 <h4 id="library-root-folder">Library Root folder<a class="headerlink" href="#library-root-folder" title="Permanent link">&para;</a></h4>
-<p>The library root folder name must start with a basic letter (<code>A</code>-<code>Z</code> or <code>a</code>-<code>z</code>) or number (<code>0</code>-<code>9</code>), followed by basic letters, numbers, spaces (<code></code>), underscores (<code>_</code>), dots (<code>.</code>) and dashes (<code>-</code>). The maximum length is 63 characters.</p>
+<p>The library root folder name must start with a basic letter (A-Z or a-z) or number (0-9), followed by basic letters,
+numbers, spaces ( ), underscores (_), dots (.) and dashes (-). The maximum length is 63 characters.</p>
 <h4 id="source-code">Source code<a class="headerlink" href="#source-code" title="Permanent link">&para;</a></h4>
 <p>For 1.5.x+-only libraries, the source code resides in the <strong>src</strong> folder. For example:</p>
 <div class="codehilite"><pre><span></span><code>Servo/src/Servo.h
@@ -1369,8 +1407,18 @@ Servo/src/Servo.cpp
 </code></pre></div>
 
 
-<p>The source code found in <strong>src</strong> folder and <em>all its subfolders</em> is compiled and linked in the user’s sketch. Only the <em>src</em> folder is added to the include search path (both when compiling the sketch and the library). When the user imports a library into their sketch (from the Arduino IDE's "Sketch &gt; Include Library" menu or the Arduino Web Editor's "Include" button), the default behavior (configurable via the <a href="#libraryproperties-file-format">library.properties <code>includes</code> field</a>) is for an <code>#include</code> statement to be added for all header (.h) files in the src/ directory (but not its subfolders). As a result, these header files form something of a de facto interface to your library; in general, the only header files in the root src/ folder should be those that you want to expose to the user's sketch and plan to maintain compatibility with in future versions of the library. Place internal header files in a subfolder of the src/ folder.</p>
-<p>For backward compatibility with Arduino IDE 1.0.x, the library author may opt to place source code into the root folder, instead of the folder called <strong>src</strong>. In this case the 1.0 library format is applied and the source code is searched from the <strong>library root folder</strong> and the <strong>utility</strong> folder, for example:</p>
+<p>The source code found in <strong>src</strong> folder and <em>all its subfolders</em> is compiled and linked in the user’s sketch. Only the
+<em>src</em> folder is added to the include search path (both when compiling the sketch and the library). When the user imports
+a library into their sketch (from the Arduino IDE's "Sketch &gt; Include Library" menu or the Arduino Web Editor's
+"Include" button), the default behavior (configurable via the
+<a href="#libraryproperties-file-format">library.properties <code>includes</code> field</a>) is for an <code>#include</code> statement to be added for
+all header (.h) files in the src/ directory (but not its subfolders). As a result, these header files form something of
+a de facto interface to your library; in general, the only header files in the root src/ folder should be those that you
+want to expose to the user's sketch and plan to maintain compatibility with in future versions of the library. Place
+internal header files in a subfolder of the src/ folder.</p>
+<p>For backward compatibility with Arduino IDE 1.0.x, the library author may opt to place source code into the root folder,
+instead of the folder called <strong>src</strong>. In this case the 1.0 library format is applied and the source code is searched
+from the <strong>library root folder</strong> and the <strong>utility</strong> folder, for example:</p>
 <div class="codehilite"><pre><span></span><code>Servo/Servo.h
 Servo/Servo.cpp
 Servo/utility/ServoTimers.h
@@ -1378,29 +1426,38 @@ Servo/utility/ServoTimers.cpp
 </code></pre></div>
 
 
-<p>This will allow existing 1.0 format libraries to compile under Arduino IDE 1.5.x+ as well and vice-versa. If a library only needs to run on Arduino IDE 1.5.x+, we recommend placing all source code in the src/ folder. If a library requires recursive compilation of nested source folders, its code must be in the src/ folder (since Arduino IDE 1.0.x doesn’t support recursive compilation, backwards compatibility wouldn’t be possible anyway).</p>
+<p>This will allow existing 1.0 format libraries to compile under Arduino IDE 1.5.x+ as well and vice-versa. If a library
+only needs to run on Arduino IDE 1.5.x+, we recommend placing all source code in the src/ folder. If a library requires
+recursive compilation of nested source folders, its code must be in the src/ folder (since Arduino IDE 1.0.x doesn’t
+support recursive compilation, backwards compatibility wouldn’t be possible anyway).</p>
 <h4 id="library-examples">Library Examples<a class="headerlink" href="#library-examples" title="Permanent link">&para;</a></h4>
-<p>Library examples must be placed in the <strong>examples</strong> folder. Note that the <strong>examples</strong> folder must be written exactly like that (with lower case letters).</p>
+<p>Library examples must be placed in the <strong>examples</strong> folder. Note that the <strong>examples</strong> folder must be written exactly
+like that (with lower case letters).</p>
 <div class="codehilite"><pre><span></span><code>Servo/examples/...
 </code></pre></div>
 
 
-<p>Sketches contained inside the examples folder will be shown in the Examples menu of the Arduino IDE and Arduino Web Editor.</p>
+<p>Sketches contained inside the examples folder will be shown in the Examples menu of the Arduino IDE and Arduino Web
+Editor.</p>
 <p>More information:</p>
 <ul>
 <li><a href="../sketch-specification/">Arduino sketch specification</a></li>
 <li><a href="http://arduino.cc/en/Reference/StyleGuide">Style guide for Arduino examples</a></li>
 </ul>
 <h4 id="extra-documentation">Extra documentation<a class="headerlink" href="#extra-documentation" title="Permanent link">&para;</a></h4>
-<p>An <strong>extras</strong> folder can be used by the developer to put documentation or other items to be bundled with the library. Remember that files placed inside this folder will increase the size of the library, so putting a 20MB PDF in a library that weights a few kilobytes may not be such a good idea.</p>
-<p>The content of the <em>extras</em> folder is totally ignored by the Arduino development software; you are free to put anything inside such as supporting documentation, etc.</p>
+<p>An <strong>extras</strong> folder can be used by the developer to put documentation or other items to be bundled with the library.
+Remember that files placed inside this folder will increase the size of the library, so putting a 20MB PDF in a library
+that weights a few kilobytes may not be such a good idea.</p>
+<p>The content of the <em>extras</em> folder is totally ignored by the Arduino development software; you are free to put anything
+inside such as supporting documentation, etc.</p>
 <h3 id="keywords">Keywords<a class="headerlink" href="#keywords" title="Permanent link">&para;</a></h3>
-<p>A list of keywords for the library may be specified in a file named keywords.txt located in the root of the library folder. When a keyword of any installed library is used in a sketch the Arduino IDE colors it.</p>
+<p>A list of keywords for the library may be specified in a file named keywords.txt located in the root of the library
+folder. When a keyword of any installed library is used in a sketch the Arduino IDE colors it.</p>
 <div class="codehilite"><pre><span></span><code>Servo/keywords.txt
 </code></pre></div>
 
 
-<p>An example keywords.txt file:
+<p>An example keywords.txt file:</p>
 <div class="highlight"><pre><span></span><code># Syntax Coloring Map For ExampleLibrary
 
 # Datatypes (KEYWORD1)
@@ -1413,12 +1470,14 @@ doSomething KEYWORD2
 
 # Constants (LITERAL1)
 </code></pre></div>
-This file would cause the Arduino IDE to highlight <code>Test</code> as a DataType, and <code>doSomething</code> as a method / function.</p>
+
+<p>This file would cause the Arduino IDE to highlight <code>Test</code> as a DataType, and <code>doSomething</code> as a method / function.</p>
 <h4 id="keywordstxt-format">keywords.txt format<a class="headerlink" href="#keywordstxt-format" title="Permanent link">&para;</a></h4>
-<p>keywords.txt is formatted in four fields which are separated by a single true tab (not spaces):
+<p>keywords.txt is formatted in four fields which are separated by a single true tab (not spaces):</p>
 <div class="highlight"><pre><span></span><code>KEYWORD KEYWORD_TOKENTYPE   REFERENCE_LINK  RSYNTAXTEXTAREA_TOKENTYPE
 </code></pre></div>
-It is permitted to leave a field empty.</p>
+
+<p>It is permitted to leave a field empty.</p>
 <h5 id="keyword_tokentype"><code>KEYWORD_TOKENTYPE</code><a class="headerlink" href="#keyword_tokentype" title="Permanent link">&para;</a></h5>
 <table>
 <thead>
@@ -1457,9 +1516,13 @@ It is permitted to leave a field empty.</p>
 </tbody>
 </table>
 <h5 id="reference_link"><code>REFERENCE_LINK</code><a class="headerlink" href="#reference_link" title="Permanent link">&para;</a></h5>
-<p>This field specifies the <a href="https://www.arduino.cc/reference/en">Arduino Language Reference</a> page to open via the Arduino IDE's <strong>Right Click &gt; Find in Reference</strong> or <strong>Help &gt; Find in Reference</strong> when the cursor is on that keyword. Generally it does not make sense to define the <code>REFERENCE_LINK</code> field for 3<sup>rd</sup> party library keywords since they are not likely to be in the Arduino Language Reference.</p>
+<p>This field specifies the <a href="https://www.arduino.cc/reference/en">Arduino Language Reference</a> page to open via the Arduino
+IDE's <strong>Right Click &gt; Find in Reference</strong> or <strong>Help &gt; Find in Reference</strong> when the cursor is on that keyword. Generally
+it does not make sense to define the <code>REFERENCE_LINK</code> field for 3<sup>rd</sup> party library keywords since they are not likely to
+be in the Arduino Language Reference.</p>
 <h5 id="rsyntaxtextarea_tokentype"><code>RSYNTAXTEXTAREA_TOKENTYPE</code><a class="headerlink" href="#rsyntaxtextarea_tokentype" title="Permanent link">&para;</a></h5>
-<p>In Arduino IDE 1.6.5 and newer this field overrides <code>KEYWORD_TOKENTYPE</code>. In previous IDE versions the <code>RSYNTAXTEXTAREA_TOKENTYPE</code> field is ignored and <code>KEYWORD_TOKENTYPE</code> is used instead.</p>
+<p>In Arduino IDE 1.6.5 and newer this field overrides <code>KEYWORD_TOKENTYPE</code>. In previous IDE versions the
+<code>RSYNTAXTEXTAREA_TOKENTYPE</code> field is ignored and <code>KEYWORD_TOKENTYPE</code> is used instead.</p>
 <table>
 <thead>
 <tr>
@@ -1497,7 +1560,12 @@ It is permitted to leave a field empty.</p>
 </tbody>
 </table>
 <h3 id="development-flag-file">Development flag file<a class="headerlink" href="#development-flag-file" title="Permanent link">&para;</a></h3>
-<p>Normally the Arduino IDE treats the contents of the library folder as read-only. This is to prevent users from accidentally modifying example sketches. During the library development process you may want to edit example sketches in place using the Arduino IDE. With Arduino IDE 1.6.6 and newer, the read-only behavior can be disabled by adding a file named .development to the root of the library folder. A <a href="#libraryproperties-file-format">library.properties</a> file must also be present. The <a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">Library Manager indexer</a> will not pick up releases that contain a .development file so be sure not to push this file to your remote repository.</p>
+<p>Normally the Arduino IDE treats the contents of the library folder as read-only. This is to prevent users from
+accidentally modifying example sketches. During the library development process you may want to edit example sketches in
+place using the Arduino IDE. With Arduino IDE 1.6.6 and newer, the read-only behavior can be disabled by adding a file
+named .development to the root of the library folder. A <a href="#libraryproperties-file-format">library.properties</a> file must
+also be present. The <a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">Library Manager indexer</a> will not
+pick up releases that contain a .development file so be sure not to push this file to your remote repository.</p>
 <h3 id="a-complete-example">A complete example<a class="headerlink" href="#a-complete-example" title="Permanent link">&para;</a></h3>
 <p>A hypothetical library named "Servo" that adheres to the specification follows:</p>
 <div class="codehilite"><pre><span></span><code>Servo/
@@ -1516,7 +1584,11 @@ Servo/extras/Servo_Connectors.pdf
 
 
 <h2 id="working-with-multiple-architectures">Working with multiple architectures<a class="headerlink" href="#working-with-multiple-architectures" title="Permanent link">&para;</a></h2>
-<p>Libraries placed in the <code>libraries</code> subfolder of the sketchbook folder (AKA "user directory") will be made available for all boards, which may include multiple different processor architectures. To provide architecture-specific code or optimizations, library authors can use the <code>ARDUINO_ARCH_XXX</code> preprocessor macro (<code>#define</code>), where XXX is the name of the architecture (as determined by the name of the folder containing it), e.g. <code>ARDUINO_ARCH_AVR</code> will be defined when compiling for AVR-based boards. For example,</p>
+<p>Libraries placed in the <code>libraries</code> subfolder of the sketchbook folder (AKA "user directory") will be made available for
+all boards, which may include multiple different processor architectures. To provide architecture-specific code or
+optimizations, library authors can use the <code>ARDUINO_ARCH_XXX</code> preprocessor macro (<code>#define</code>), where XXX is the name of
+the architecture (as determined by the name of the folder containing it), e.g. <code>ARDUINO_ARCH_AVR</code> will be defined when
+compiling for AVR-based boards. For example,</p>
 <div class="codehilite"><pre><span></span><code>#if defined(ARDUINO_ARCH_AVR)
   // AVR-specific code
 #elif defined(ARDUINO_ARCH_SAM)
@@ -1527,7 +1599,8 @@ Servo/extras/Servo_Connectors.pdf
 </code></pre></div>
 
 
-<p>Alternatively, if a library only works on certain architectures, you can provide an explicit error message (instead of allowing the compilation to fail in a difficult to understand way):</p>
+<p>Alternatively, if a library only works on certain architectures, you can provide an explicit error message (instead of
+allowing the compilation to fail in a difficult to understand way):</p>
 <div class="codehilite"><pre><span></span><code>#if defined(ARDUINO_ARCH_AVR)
   // AVR-specific code
 #elif defined(ARDUINO_ARCH_SAM)
@@ -1539,7 +1612,10 @@ Servo/extras/Servo_Connectors.pdf
 
 
 <h2 id="old-library-format-pre-15">Old library format (pre-1.5)<a class="headerlink" href="#old-library-format-pre-15" title="Permanent link">&para;</a></h2>
-<p>In order to support old libraries (from Arduino IDE 1.0.x), the Arduino IDE/Pro IDE and Arduino CLI will also compile libraries missing a library.properties metadata file. As a result, these libraries should behave as they did in Arduino IDE 1.0.x, although they will be available for all boards, including non-AVR ones (which wouldn’t have been present in Arduino IDE 1.0.x).</p>
+<p>In order to support old libraries (from Arduino IDE 1.0.x), the Arduino IDE/Pro IDE and Arduino CLI will also compile
+libraries missing a library.properties metadata file. As a result, these libraries should behave as they did in Arduino
+IDE 1.0.x, although they will be available for all boards, including non-AVR ones (which wouldn’t have been present in
+Arduino IDE 1.0.x).</p>
                 
                   
                 

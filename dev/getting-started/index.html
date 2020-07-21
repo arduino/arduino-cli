@@ -1108,11 +1108,11 @@
                 
                   <h1>Getting started</h1>
                 
-                <p>Despite the lack of feature parity at the moment, Arduino CLI provides many of
-the features you can find in the Arduino IDE. Let's see some examples.</p>
+                <p>Despite the lack of feature parity at the moment, Arduino CLI provides many of the features you can find in the Arduino
+IDE. Let's see some examples.</p>
 <h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
-<p><code>arduino-cli</code> is a container of commands and each command has its own
-dedicated help text that can be shown with the <code>help</code> command like this:</p>
+<p><code>arduino-cli</code> is a container of commands and each command has its own dedicated help text that can be shown with the
+<code>help</code> command like this:</p>
 <div class="highlight"><pre><span></span><code><span class="gp">$</span> arduino-cli <span class="nb">help</span> core
 <span class="go">Arduino Core operations.</span>
 
@@ -1147,27 +1147,23 @@ dedicated help text that can be shown with the <code>help</code> command like th
 </code></pre></div>
 
 <h2 id="create-a-configuration-file">Create a configuration file<a class="headerlink" href="#create-a-configuration-file" title="Permanent link">&para;</a></h2>
-<p>Arduino CLI doesn't strictly require a configuration file to work because the
-command line interface provides any possible functionality. However, having one
-can spare you a lot of typing when issuing a command, so let's go ahead and
+<p>Arduino CLI doesn't strictly require a configuration file to work because the command line interface provides any
+possible functionality. However, having one can spare you a lot of typing when issuing a command, so let's go ahead and
 create it with:</p>
 <div class="highlight"><pre><span></span><code>$ arduino-cli config init
 Config file written: /home/luca/.arduino15/arduino-cli.yaml
 </code></pre></div>
 
-<p>If you inspect the contents of <code>arduino-cli.yaml</code>, you'll find the available
-options with their respective default values. For more information, see the
-<a href="../configuration/">configuration documentation</a>.</p>
+<p>If you inspect the contents of <code>arduino-cli.yaml</code>, you'll find the available options with their respective default
+values. For more information, see the <a href="../configuration/">configuration documentation</a>.</p>
 <h2 id="create-a-new-sketch">Create a new sketch<a class="headerlink" href="#create-a-new-sketch" title="Permanent link">&para;</a></h2>
-<p>To create a new sketch named <code>MyFirstSketch</code> in the current directory, run
-the following command:</p>
+<p>To create a new sketch named <code>MyFirstSketch</code> in the current directory, run the following command:</p>
 <div class="highlight"><pre><span></span><code>$ arduino-cli sketch new MyFirstSketch
 Sketch created in: /home/luca/MyFirstSketch
 </code></pre></div>
 
-<p>A sketch is a folder containing assets like source files and libraries; the
-<code>new</code> command creates for you a .ino file called <code>MyFirstSketch.ino</code>
-containing Arduino boilerplate code:</p>
+<p>A sketch is a folder containing assets like source files and libraries; the <code>new</code> command creates for you a .ino file
+called <code>MyFirstSketch.ino</code> containing Arduino boilerplate code:</p>
 <div class="highlight"><pre><span></span><code>$ cat <span class="nv">$HOME</span>/MyFirstSketch/MyFirstSketch.ino
 void setup<span class="o">()</span> <span class="o">{</span>
 <span class="o">}</span>
@@ -1176,8 +1172,8 @@ void loop<span class="o">()</span> <span class="o">{</span>
 <span class="o">}</span>
 </code></pre></div>
 
-<p>At this point you can use your favourite file editor or IDE to open the
-file <code>$HOME/MyFirstSketch/MyFirstSketch.ino</code> and change the code like this:</p>
+<p>At this point you can use your favourite file editor or IDE to open the file <code>$HOME/MyFirstSketch/MyFirstSketch.ino</code> and
+change the code like this:</p>
 <div class="highlight"><pre><span></span><code><span class="kt">void</span> <span class="nf">setup</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">pinMode</span><span class="p">(</span><span class="n">LED_BUILTIN</span><span class="p">,</span> <span class="n">OUTPUT</span><span class="p">);</span>
 <span class="p">}</span>
@@ -1191,26 +1187,23 @@ file <code>$HOME/MyFirstSketch/MyFirstSketch.ino</code> and change the code like
 </code></pre></div>
 
 <h2 id="connect-the-board-to-your-pc">Connect the board to your PC<a class="headerlink" href="#connect-the-board-to-your-pc" title="Permanent link">&para;</a></h2>
-<p>The first thing to do upon a fresh install is to update the local cache of
-available platforms and libraries by running:</p>
+<p>The first thing to do upon a fresh install is to update the local cache of available platforms and libraries by running:</p>
 <div class="highlight"><pre><span></span><code>$ arduino-cli core update-index
 Updating index: package_index.json downloaded
 </code></pre></div>
 
-<p>After connecting the board to your PC by using the USB cable, you should be
-able to check whether it's been recognized by running:</p>
+<p>After connecting the board to your PC by using the USB cable, you should be able to check whether it's been recognized
+by running:</p>
 <div class="highlight"><pre><span></span><code>$ arduino-cli board list
 Port         Type              Board Name              FQBN                 Core
 /dev/ttyACM1 Serial Port <span class="o">(</span>USB<span class="o">)</span> Arduino/Genuino MKR1000 arduino:samd:mkr1000 arduino:samd
 </code></pre></div>
 
-<p>In this example, the MKR1000 board was recognized and from the output of the
-command you see the platform core called <code>arduino:samd</code> is the one that needs
-to be installed to make it work.</p>
-<p>If you see an <code>Unknown</code> board listed, uploading
-should still work as long as you identify the platform core and use the correct
-FQBN string. When a board is not detected for whatever reason, you can list all
-the supported boards and their FQBN strings by running the following:</p>
+<p>In this example, the MKR1000 board was recognized and from the output of the command you see the platform core called
+<code>arduino:samd</code> is the one that needs to be installed to make it work.</p>
+<p>If you see an <code>Unknown</code> board listed, uploading should still work as long as you identify the platform core and use the
+correct FQBN string. When a board is not detected for whatever reason, you can list all the supported boards and their
+FQBN strings by running the following:</p>
 <div class="highlight"><pre><span></span><code>$ arduino-cli board listall mkr
 Board Name              FQBN
 Arduino MKR FOX <span class="m">1200</span>    arduino:samd:mkrfox1200
@@ -1253,17 +1246,15 @@ arduino:samd    <span class="m">1</span>.6.19          <span class="m">1</span>.
 
 <p>Great! Now we are ready to compile and upload the sketch.</p>
 <h2 id="adding-3rd-party-cores">Adding 3<sup>rd</sup> party cores<a class="headerlink" href="#adding-3rd-party-cores" title="Permanent link">&para;</a></h2>
-<p>If your board requires 3<sup>rd</sup> party core packages to work, you can list the URLs
-to additional package indexes in the Arduino CLI configuration file.</p>
-<p>For example, to add the ESP8266 core, edit the configuration file and change the
-<code>board_manager</code> settings as follows:</p>
+<p>If your board requires 3<sup>rd</sup> party core packages to work, you can list the URLs to additional package indexes in the
+Arduino CLI configuration file.</p>
+<p>For example, to add the ESP8266 core, edit the configuration file and change the <code>board_manager</code> settings as follows:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">board_manager</span><span class="p">:</span>
-    <span class="nt">additional_urls</span><span class="p">:</span>
+  <span class="nt">additional_urls</span><span class="p">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">https://arduino.esp8266.com/stable/package_esp8266com_index.json</span>
 </code></pre></div>
 
-<p>From now on, commands supporting custom cores will automatically use the
-additional URL from the configuration file:</p>
+<p>From now on, commands supporting custom cores will automatically use the additional URL from the configuration file:</p>
 <div class="highlight"><pre><span></span><code>$ arduino-cli core update-index
 Updating index: package_index.json downloaded
 Updating index: package_esp8266com_index.json downloaded
@@ -1274,9 +1265,8 @@ ID              Version Name
 esp8266:esp8266 <span class="m">2</span>.5.2   esp8266
 </code></pre></div>
 
-<p>Alternatively, you can pass a link to the additional package index file with the
-<code>--additional-urls</code> option, that has to be specified every time and for every
-command that operates on a 3<sup>rd</sup> party platform core, for example:</p>
+<p>Alternatively, you can pass a link to the additional package index file with the <code>--additional-urls</code> option, that has to
+be specified every time and for every command that operates on a 3<sup>rd</sup> party platform core, for example:</p>
 <div class="highlight"><pre><span></span><code>$ arduino-cli  core update-index --additional-urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
 Updating index: package_esp8266com_index.json downloaded
 
@@ -1286,14 +1276,12 @@ esp8266:esp8266 <span class="m">2</span>.5.2   esp8266
 </code></pre></div>
 
 <h2 id="compile-and-upload-the-sketch">Compile and upload the sketch<a class="headerlink" href="#compile-and-upload-the-sketch" title="Permanent link">&para;</a></h2>
-<p>To compile the sketch you run the <code>compile</code> command, passing the proper FQBN
-string:</p>
+<p>To compile the sketch you run the <code>compile</code> command, passing the proper FQBN string:</p>
 <div class="highlight"><pre><span></span><code>$ arduino-cli compile --fqbn arduino:samd:mkr1000 MyFirstSketch
 Sketch uses <span class="m">9600</span> bytes <span class="o">(</span><span class="m">3</span>%<span class="o">)</span> of program storage space. Maximum is <span class="m">262144</span> bytes.
 </code></pre></div>
 
-<p>To upload the sketch to your board, run the following command, using the serial
-port your board is connected to:</p>
+<p>To upload the sketch to your board, run the following command, using the serial port your board is connected to:</p>
 <div class="highlight"><pre><span></span><code>$ arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:samd:mkr1000 MyFirstSketch
 No new serial port detected.
 Atmel SMART device 0x10010005 found
@@ -1328,9 +1316,8 @@ CPU reset.
 </code></pre></div>
 
 <h2 id="add-libraries">Add libraries<a class="headerlink" href="#add-libraries" title="Permanent link">&para;</a></h2>
-<p>If you need to add more functionalities to your sketch, chances are some of the
-libraries available in the Arduino ecosystem already provide what you need.
-For example, if you need a debouncing strategy to better handle button inputs,
+<p>If you need to add more functionalities to your sketch, chances are some of the libraries available in the Arduino
+ecosystem already provide what you need. For example, if you need a debouncing strategy to better handle button inputs,
 you can try searching for the <code>debouncer</code> keyword:</p>
 <div class="highlight"><pre><span></span><code>$ arduino-cli lib search debouncer
 Name: <span class="s2">&quot;Debouncer&quot;</span>
@@ -1376,13 +1363,11 @@ Installed FTDebouncer@1.3.0
 
 <h2 id="using-the-daemon-mode-and-the-grpc-interface">Using the <code>daemon</code> mode and the gRPC interface<a class="headerlink" href="#using-the-daemon-mode-and-the-grpc-interface" title="Permanent link">&para;</a></h2>
 <p>Arduino CLI can be launched as a gRPC server via the <code>daemon</code> command.</p>
-<p>The <a href="https://github.com/arduino/arduino-cli/blob/master/client_example">client_example</a> folder contains a sample client code that shows how to
-interact with the gRPC server. Available services and messages are detailed
-in the <a href="../rpc/commands">gRPC reference</a> pages.</p>
-<p>To provide observability for the gRPC server activities besides logs,
-the <code>daemon</code> mode activates and exposes by default a <a href="https://prometheus.io/">Prometheus</a>
-endpoint (<a href="http://localhost:9090/metrics">http://localhost:9090/metrics</a>) that can be fetched for
-telemetry data like:</p>
+<p>The <a href="https://github.com/arduino/arduino-cli/blob/master/client_example">client_example</a> folder contains a sample client code that shows how to interact with the gRPC server. Available
+services and messages are detailed in the <a href="../rpc/commands">gRPC reference</a> pages.</p>
+<p>To provide observability for the gRPC server activities besides logs, the <code>daemon</code> mode activates and exposes by default
+a <a href="https://prometheus.io/">Prometheus</a> endpoint (<a href="http://localhost:9090/metrics">http://localhost:9090/metrics</a>) that can be fetched for telemetry data
+like:</p>
 <div class="highlight"><pre><span></span><code># TYPE daemon_compile counter
 daemon_compile{buildProperties=&quot;&quot;,exportFile=&quot;&quot;,fqbn=&quot;arduino:samd:mkr1000&quot;,installationID=&quot;ed6f1f22-1fbe-4b1f-84be-84d035b6369c&quot;,jobs=&quot;0&quot;,libraries=&quot;&quot;,preprocess=&quot;false&quot;,quiet=&quot;false&quot;,showProperties=&quot;false&quot;,sketchPath=&quot;5ff767c6fa5a91230f5cb4e267c889aa61489ab2c4f70f35f921f934c1462cb6&quot;,success=&quot;true&quot;,verbose=&quot;true&quot;,vidPid=&quot;&quot;,warnings=&quot;&quot;} 1 1580385724726
 
@@ -1390,8 +1375,7 @@ daemon_compile{buildProperties=&quot;&quot;,exportFile=&quot;&quot;,fqbn=&quot;a
 daemon_board_list{installationID=&quot;ed6f1f22-1fbe-4b1f-84be-84d035b6369c&quot;,success=&quot;true&quot;} 1 1580385724833
 </code></pre></div>
 
-<p>The telemetry settings are exposed via the <code>telemetry</code> section
-in the CLI configuration:</p>
+<p>The telemetry settings are exposed via the <code>telemetry</code> section in the CLI configuration:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">telemetry</span><span class="p">:</span>
   <span class="nt">enabled</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
   <span class="nt">addr</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">:9090</span>
