@@ -46,7 +46,7 @@ def test_list(run_command):
     assert "" != toks[1]
     assert "" != toks[2]
     # Verifies library sentence
-    assert "An efficient and elegant JSON library for Arduino." == toks[4]
+    assert "An efficient and elegant JSON library f…" == toks[4]
 
     # Look at the JSON output
     result = run_command("lib list --format json")

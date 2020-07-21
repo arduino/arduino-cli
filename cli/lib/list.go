@@ -90,7 +90,10 @@ func (ir installedResult) String() string {
 	}
 
 	t := table.New()
-	t.SetHeader("Name", "Installed", "Available", "Location", "Sentence")
+	t.SetHeader("Name", "Installed", "Available", "Location", "Description")
+	t.SetColumnWidthMode(1, table.Average)
+	t.SetColumnWidthMode(2, table.Average)
+	t.SetColumnWidthMode(4, table.Average)
 
 	lastName := ""
 	for _, libMeta := range ir.installedLibs {
@@ -115,7 +118,10 @@ func (ir installedResult) String() string {
 			sentence := lib.Sentence
 			if sentence == "" {
 				sentence = "-"
+			} else if len(sentence) > 40 {
+				sentence = sentence[:39] + "…"
 			}
+
 			t.AddRow(name, lib.Version, available, location, sentence)
 		}
 	}
