@@ -4,27 +4,27 @@ on:
   pull_request:
     paths:
       # existing docs
-      - 'docs/**'
+      - "docs/**"
       # changes to the cli reference generator
-      - 'docsgen/**'
+      - "docsgen/**"
       # potential changes to commands documentation
-      - 'cli/**'
+      - "cli/**"
       # potential changes to gRPC documentation
-      - 'rpc/**'
+      - "rpc/**"
       # changes to the workflow itself
-      - '.github/workflows/docs.yaml'
+      - ".github/workflows/docs.yaml"
   push:
     branches:
       - master
       # release branches have names like 0.8.x, 0.9.x, ...
-      - '[0-9]+.[0-9]+.x'
+      - "[0-9]+.[0-9]+.x"
     # At this day, GitHub doesn't support YAML anchors, d'oh!
     paths:
-      - 'docs/**'
-      - 'docsgen/**'
-      - 'cli/**'
-      - 'rpc/**'
-      - '.github/workflows/docs.yaml'
+      - "docs/**"
+      - "docsgen/**"
+      - "cli/**"
+      - "rpc/**"
+      - ".github/workflows/docs.yaml"
 
 jobs:
   build:
@@ -42,7 +42,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v2-beta
         with:
-          go-version: '1.14'
+          go-version: "1.14"
 
       - name: Install Go dependencies
         run: |
@@ -57,8 +57,8 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
-          python-version: '3.6'
-          architecture: 'x64'
+          python-version: "3.6"
+          architecture: "x64"
 
       - name: Cache dependencies
         uses: actions/cache@v1

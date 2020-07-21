@@ -1,10 +1,10 @@
-Despite the lack of feature parity at the moment, Arduino CLI provides many of
-the features you can find in the Arduino IDE. Let's see some examples.
+Despite the lack of feature parity at the moment, Arduino CLI provides many of the features you can find in the Arduino
+IDE. Let's see some examples.
 
 ## Before you start
 
-`arduino-cli` is a container of commands and each command has its own
-dedicated help text that can be shown with the `help` command like this:
+`arduino-cli` is a container of commands and each command has its own dedicated help text that can be shown with the
+`help` command like this:
 
 ```console
 $ arduino-cli help core
@@ -42,9 +42,8 @@ Use "arduino-cli core [command] --help" for more information about a command.
 
 ## Create a configuration file
 
-Arduino CLI doesn't strictly require a configuration file to work because the
-command line interface provides any possible functionality. However, having one
-can spare you a lot of typing when issuing a command, so let's go ahead and
+Arduino CLI doesn't strictly require a configuration file to work because the command line interface provides any
+possible functionality. However, having one can spare you a lot of typing when issuing a command, so let's go ahead and
 create it with:
 
 ```sh
@@ -52,23 +51,20 @@ $ arduino-cli config init
 Config file written: /home/luca/.arduino15/arduino-cli.yaml
 ```
 
-If you inspect the contents of `arduino-cli.yaml`, you'll find the available
-options with their respective default values. For more information, see the
-[configuration documentation].
+If you inspect the contents of `arduino-cli.yaml`, you'll find the available options with their respective default
+values. For more information, see the [configuration documentation].
 
 ## Create a new sketch
 
-To create a new sketch named `MyFirstSketch` in the current directory, run
-the following command:
+To create a new sketch named `MyFirstSketch` in the current directory, run the following command:
 
 ```sh
 $ arduino-cli sketch new MyFirstSketch
 Sketch created in: /home/luca/MyFirstSketch
 ```
 
-A sketch is a folder containing assets like source files and libraries; the
-`new` command creates for you a .ino file called `MyFirstSketch.ino`
-containing Arduino boilerplate code:
+A sketch is a folder containing assets like source files and libraries; the `new` command creates for you a .ino file
+called `MyFirstSketch.ino` containing Arduino boilerplate code:
 
 ```sh
 $ cat $HOME/MyFirstSketch/MyFirstSketch.ino
@@ -79,8 +75,8 @@ void loop() {
 }
 ```
 
-At this point you can use your favourite file editor or IDE to open the
-file `$HOME/MyFirstSketch/MyFirstSketch.ino` and change the code like this:
+At this point you can use your favourite file editor or IDE to open the file `$HOME/MyFirstSketch/MyFirstSketch.ino` and
+change the code like this:
 
 ```c
 void setup() {
@@ -97,16 +93,15 @@ void loop() {
 
 ## Connect the board to your PC
 
-The first thing to do upon a fresh install is to update the local cache of
-available platforms and libraries by running:
+The first thing to do upon a fresh install is to update the local cache of available platforms and libraries by running:
 
 ```sh
 $ arduino-cli core update-index
 Updating index: package_index.json downloaded
 ```
 
-After connecting the board to your PC by using the USB cable, you should be
-able to check whether it's been recognized by running:
+After connecting the board to your PC by using the USB cable, you should be able to check whether it's been recognized
+by running:
 
 ```sh
 $ arduino-cli board list
@@ -114,14 +109,12 @@ Port         Type              Board Name              FQBN                 Core
 /dev/ttyACM1 Serial Port (USB) Arduino/Genuino MKR1000 arduino:samd:mkr1000 arduino:samd
 ```
 
-In this example, the MKR1000 board was recognized and from the output of the
-command you see the platform core called `arduino:samd` is the one that needs
-to be installed to make it work.
+In this example, the MKR1000 board was recognized and from the output of the command you see the platform core called
+`arduino:samd` is the one that needs to be installed to make it work.
 
-If you see an `Unknown` board listed, uploading
-should still work as long as you identify the platform core and use the correct
-FQBN string. When a board is not detected for whatever reason, you can list all
-the supported boards and their FQBN strings by running the following:
+If you see an `Unknown` board listed, uploading should still work as long as you identify the platform core and use the
+correct FQBN string. When a board is not detected for whatever reason, you can list all the supported boards and their
+FQBN strings by running the following:
 
 ```sh
 $ arduino-cli board listall mkr
@@ -136,7 +129,7 @@ Arduino/Genuino MKR1000 arduino:samd:mkr1000
 
 ## Install the core for your board
 
-To install the ``arduino:samd`` platform core, run the following:
+To install the `arduino:samd` platform core, run the following:
 
 ```sh
 $ arduino-cli core install arduino:samd
@@ -173,20 +166,18 @@ Great! Now we are ready to compile and upload the sketch.
 
 ## Adding 3rd party cores
 
-If your board requires 3rd party core packages to work, you can list the URLs
-to additional package indexes in the Arduino CLI configuration file.
+If your board requires 3rd party core packages to work, you can list the URLs to additional package indexes in the
+Arduino CLI configuration file.
 
-For example, to add the ESP8266 core, edit the configuration file and change the
-`board_manager` settings as follows:
+For example, to add the ESP8266 core, edit the configuration file and change the `board_manager` settings as follows:
 
 ```yaml
 board_manager:
-    additional_urls:
+  additional_urls:
     - https://arduino.esp8266.com/stable/package_esp8266com_index.json
 ```
 
-From now on, commands supporting custom cores will automatically use the
-additional URL from the configuration file:
+From now on, commands supporting custom cores will automatically use the additional URL from the configuration file:
 
 ```sh
 $ arduino-cli core update-index
@@ -199,9 +190,8 @@ ID              Version Name
 esp8266:esp8266 2.5.2   esp8266
 ```
 
-Alternatively, you can pass a link to the additional package index file with the
-`--additional-urls` option, that has to be specified every time and for every
-command that operates on a 3rd party platform core, for example:
+Alternatively, you can pass a link to the additional package index file with the `--additional-urls` option, that has to
+be specified every time and for every command that operates on a 3rd party platform core, for example:
 
 ```sh
 $ arduino-cli  core update-index --additional-urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
@@ -214,16 +204,14 @@ esp8266:esp8266 2.5.2   esp8266
 
 ## Compile and upload the sketch
 
-To compile the sketch you run the `compile` command, passing the proper FQBN
-string:
+To compile the sketch you run the `compile` command, passing the proper FQBN string:
 
 ```sh
 $ arduino-cli compile --fqbn arduino:samd:mkr1000 MyFirstSketch
 Sketch uses 9600 bytes (3%) of program storage space. Maximum is 262144 bytes.
 ```
 
-To upload the sketch to your board, run the following command, using the serial
-port your board is connected to:
+To upload the sketch to your board, run the following command, using the serial port your board is connected to:
 
 ```sh
 $ arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:samd:mkr1000 MyFirstSketch
@@ -261,9 +249,8 @@ CPU reset.
 
 ## Add libraries
 
-If you need to add more functionalities to your sketch, chances are some of the
-libraries available in the Arduino ecosystem already provide what you need.
-For example, if you need a debouncing strategy to better handle button inputs,
+If you need to add more functionalities to your sketch, chances are some of the libraries available in the Arduino
+ecosystem already provide what you need. For example, if you need a debouncing strategy to better handle button inputs,
 you can try searching for the `debouncer` keyword:
 
 ```sh
@@ -300,7 +287,7 @@ Name: "SoftTimer"
     Versions: [3.0.0, 3.1.0, 3.1.1, 3.1.2, 3.1.3, 3.1.5, 3.2.0]
 ```
 
-Our favourite is ``FTDebouncer``, let's install it by running:
+Our favourite is `FTDebouncer`, let's install it by running:
 
 ```sh
 $ arduino-cli lib install FTDebouncer
@@ -311,21 +298,16 @@ Installing FTDebouncer@1.3.0...
 Installed FTDebouncer@1.3.0
 ```
 
-
-Using the ``daemon`` mode and the gRPC interface
-------------------------------------------------
+## Using the `daemon` mode and the gRPC interface
 
 Arduino CLI can be launched as a gRPC server via the `daemon` command.
 
-The [client_example] folder contains a sample client code that shows how to
-interact with the gRPC server. Available services and messages are detailed
-in the [gRPC reference] pages.
+The [client_example] folder contains a sample client code that shows how to interact with the gRPC server. Available
+services and messages are detailed in the [gRPC reference] pages.
 
-
-To provide observability for the gRPC server activities besides logs,
-the `daemon` mode activates and exposes by default a [Prometheus](https://prometheus.io/)
-endpoint (http://localhost:9090/metrics) that can be fetched for
-telemetry data like:
+To provide observability for the gRPC server activities besides logs, the `daemon` mode activates and exposes by default
+a [Prometheus](https://prometheus.io/) endpoint (http://localhost:9090/metrics) that can be fetched for telemetry data
+like:
 
 ```text
 # TYPE daemon_compile counter
@@ -335,8 +317,7 @@ daemon_compile{buildProperties="",exportFile="",fqbn="arduino:samd:mkr1000",inst
 daemon_board_list{installationID="ed6f1f22-1fbe-4b1f-84be-84d035b6369c",success="true"} 1 1580385724833
 ```
 
-The telemetry settings are exposed via the ``telemetry`` section
-in the CLI configuration:
+The telemetry settings are exposed via the `telemetry` section in the CLI configuration:
 
 ```yaml
 telemetry:
@@ -346,5 +327,5 @@ telemetry:
 
 [configuration documentation]: configuration.md
 [client_example]: https://github.com/arduino/arduino-cli/blob/master/client_example
-[gRPC reference]: ../rpc/commands
-[Prometheus]: https://prometheus.io/
+[grpc reference]: ../rpc/commands
+[prometheus]: https://prometheus.io/

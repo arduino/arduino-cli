@@ -3,7 +3,7 @@ name: github-stats
 on:
   schedule:
     # run every 30 minutes
-    - cron:  '*/30 * * * *'
+    - cron: "*/30 * * * *"
 
 jobs:
   push-stats:

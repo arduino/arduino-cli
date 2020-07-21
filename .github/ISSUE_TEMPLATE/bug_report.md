@@ -1,21 +1,19 @@
 ---
 name: 🐛 Bug Report
 about: If something isn't working as expected 🤔.
-
 ---
 
 ## Bug Report
 
 ### Current behavior
-<!-- Paste the full command you run -->
 
+<!-- Paste the full command you run -->
 
 <!-- Add a clear and concise description of the behavior. -->
 
-
 ### Expected behavior
-<!-- Add a clear and concise description of what you expected to happen. -->
 
+<!-- Add a clear and concise description of what you expected to happen. -->
 
 ### Environment
 
@@ -23,4 +21,5 @@ about: If something isn't working as expected 🤔.
 - OS and platform:
 
 ### Additional context
+
 <!-- (Optional) Add any other context about the problem here. -->

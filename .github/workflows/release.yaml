@@ -3,10 +3,9 @@ name: release
 on:
   push:
     tags:
-      - '[0-9]+.[0-9]+.[0-9]+*'
+      - "[0-9]+.[0-9]+.[0-9]+*"
 
 jobs:
-
   create-release-artifacts:
     runs-on: ubuntu-latest
 
@@ -134,9 +133,9 @@ jobs:
       - name: Upload release files on Arduino downloads servers
         uses: docker://plugins/s3
         env:
-          PLUGIN_SOURCE: 'dist/*'
-          PLUGIN_TARGET: '/arduino-cli/'
-          PLUGIN_STRIP_PREFIX: 'dist/'
+          PLUGIN_SOURCE: "dist/*"
+          PLUGIN_TARGET: "/arduino-cli/"
+          PLUGIN_STRIP_PREFIX: "dist/"
           PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

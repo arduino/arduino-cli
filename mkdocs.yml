@@ -6,7 +6,7 @@ site_url: https://arduino.github.io/arduino-cli/
 # Repository
 repo_name: arduino/arduino-cli
 repo_url: https://github.com/arduino/arduino-cli
-edit_uri: ''
+edit_uri: ""
 
 # Copyright
 copyright: Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
@@ -50,6 +50,9 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
+  - mdx_truly_sane_lists:
+      nested_indent: 2
+      truly_sane: true
 
 # Navigation
 nav:
@@ -60,48 +63,48 @@ nav:
   - CONTRIBUTING.md
   - FAQ.md
   - Command reference:
-    - arduino-cli: commands/arduino-cli.md
-    - board: commands/arduino-cli_board.md
-    - board attach: commands/arduino-cli_board_attach.md
-    - board details: commands/arduino-cli_board_details.md
-    - board list: commands/arduino-cli_board_list.md
-    - board listall: commands/arduino-cli_board_listall.md
-    - burn-bootloader: commands/arduino-cli_burn-bootloader.md
-    - cache: commands/arduino-cli_cache.md
-    - cache clean: commands/arduino-cli_cache_clean.md
-    - compile: commands/arduino-cli_compile.md
-    - completion: commands/arduino-cli_completion.md
-    - config: commands/arduino-cli_config.md
-    - config dump: commands/arduino-cli_config_dump.md
-    - config init: commands/arduino-cli_config_init.md
-    - core: commands/arduino-cli_core.md
-    - core download: commands/arduino-cli_core_download.md
-    - core install: commands/arduino-cli_core_install.md
-    - core list: commands/arduino-cli_core_list.md
-    - core search: commands/arduino-cli_core_search.md
-    - core uninstall: commands/arduino-cli_core_uninstall.md
-    - core update index: commands/arduino-cli_core_update-index.md
-    - core upgrade: commands/arduino-cli_core_upgrade.md
-    - daemon: commands/arduino-cli_daemon.md
-    - debug: commands/arduino-cli_debug.md
-    - lib: commands/arduino-cli_lib.md
-    - lib deps: commands/arduino-cli_lib_deps.md
-    - lib download: commands/arduino-cli_lib_download.md
-    - lib install: commands/arduino-cli_lib_install.md
-    - lib list: commands/arduino-cli_lib_list.md
-    - lib search: commands/arduino-cli_lib_search.md
-    - lib uninstall: commands/arduino-cli_lib_uninstall.md
-    - lib update-index: commands/arduino-cli_lib_update-index.md
-    - lib upgrade: commands/arduino-cli_lib_upgrade.md
-    - sketch: commands/arduino-cli_sketch.md
-    - sketch new: commands/arduino-cli_sketch_new.md
-    - upload: commands/arduino-cli_upload.md
-    - version: commands/arduino-cli_version.md
+      - arduino-cli: commands/arduino-cli.md
+      - board: commands/arduino-cli_board.md
+      - board attach: commands/arduino-cli_board_attach.md
+      - board details: commands/arduino-cli_board_details.md
+      - board list: commands/arduino-cli_board_list.md
+      - board listall: commands/arduino-cli_board_listall.md
+      - burn-bootloader: commands/arduino-cli_burn-bootloader.md
+      - cache: commands/arduino-cli_cache.md
+      - cache clean: commands/arduino-cli_cache_clean.md
+      - compile: commands/arduino-cli_compile.md
+      - completion: commands/arduino-cli_completion.md
+      - config: commands/arduino-cli_config.md
+      - config dump: commands/arduino-cli_config_dump.md
+      - config init: commands/arduino-cli_config_init.md
+      - core: commands/arduino-cli_core.md
+      - core download: commands/arduino-cli_core_download.md
+      - core install: commands/arduino-cli_core_install.md
+      - core list: commands/arduino-cli_core_list.md
+      - core search: commands/arduino-cli_core_search.md
+      - core uninstall: commands/arduino-cli_core_uninstall.md
+      - core update index: commands/arduino-cli_core_update-index.md
+      - core upgrade: commands/arduino-cli_core_upgrade.md
+      - daemon: commands/arduino-cli_daemon.md
+      - debug: commands/arduino-cli_debug.md
+      - lib: commands/arduino-cli_lib.md
+      - lib deps: commands/arduino-cli_lib_deps.md
+      - lib download: commands/arduino-cli_lib_download.md
+      - lib install: commands/arduino-cli_lib_install.md
+      - lib list: commands/arduino-cli_lib_list.md
+      - lib search: commands/arduino-cli_lib_search.md
+      - lib uninstall: commands/arduino-cli_lib_uninstall.md
+      - lib update-index: commands/arduino-cli_lib_update-index.md
+      - lib upgrade: commands/arduino-cli_lib_upgrade.md
+      - sketch: commands/arduino-cli_sketch.md
+      - sketch new: commands/arduino-cli_sketch_new.md
+      - upload: commands/arduino-cli_upload.md
+      - version: commands/arduino-cli_version.md
   - gRPC reference:
-    - commands: rpc/commands.md
-    - monitor: rpc/monitor.md
-    - settings: rpc/settings.md
-    - debug: rpc/debug.md
+      - commands: rpc/commands.md
+      - monitor: rpc/monitor.md
+      - settings: rpc/settings.md
+      - debug: rpc/debug.md
   - configuration.md
   - Integration options: integration-options.md
   - sketch-build-process.md

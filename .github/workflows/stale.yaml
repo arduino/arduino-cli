@@ -3,9 +3,9 @@ name: stale-bot
 on:
   schedule:
     # run every day at midnight
-    - cron:  '0 0 * * *'
+    - cron: "0 0 * * *"
   issue_comment:
-    types: ['created']
+    types: ["created"]
 
 jobs:
   stale-bot:
