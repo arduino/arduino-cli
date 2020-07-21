@@ -484,7 +484,9 @@ If the **upload.protocol** property is not defined for a board, the Arduino IDE'
 
 ### Serial port
 
-The port selected via the IDE or [`arduino-cli upload`](../commands/arduino-cli_upload)'s `--port` option is available as a configuration property **{serial.port}**.
+The full path (e.g., `/dev/ttyACM0`) of the port selected via the IDE or [`arduino-cli upload`](../commands/arduino-cli_upload)'s `--port` option is available as a configuration property **{serial.port}**.
+
+The file component of the port's path (e.g., `ttyACM0`) is available as the configuration property **{serial.port.file}**.
 
 ### Upload using an external programmer
 
