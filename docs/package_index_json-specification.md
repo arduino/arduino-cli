@@ -33,27 +33,22 @@ The root of the JSON index is an array of `packages`:
 
 <!-- prettier-ignore -->
 ```json
-{
-  "name": "arduino",
-  "maintainer": "Arduino LLC",
-  "websiteURL": "http://www.arduino.cc/",
-  "email": "packages@arduino.cc",
+    {
+      "name": "arduino",
+      "maintainer": "Arduino LLC",
+      "websiteURL": "http://www.arduino.cc/",
+      "email": "packages@arduino.cc",
 
-  "platforms": [
-      PLATFORM_AVR,
-      PLATFORM_ARM,
-      PLATFORM_XXXXX,
-      PLATFORM_YYYYY,
-  ],
+      "platforms": [PLATFORM_AVR, PLATFORM_ARM, PLATFORM_XXXXX, PLATFORM_YYYYY],
 
-  "tools": [
-      TOOLS_COMPILER_AVR,
-      TOOLS_UPLOADER_AVR,
-      TOOLS_COMPILER_ARM,
-      TOOLS_XXXXXXX,
-      TOOLS_YYYYYYY,
-   ],
-}
+      "tools": [
+        TOOLS_COMPILER_AVR,
+        TOOLS_UPLOADER_AVR,
+        TOOLS_COMPILER_ARM,
+        TOOLS_XXXXXXX,
+        TOOLS_YYYYYYY
+      ]
+    }
 
 ```
 
