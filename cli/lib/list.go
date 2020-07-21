@@ -119,7 +119,7 @@ func (ir installedResult) String() string {
 			if sentence == "" {
 				sentence = "-"
 			} else if len(sentence) > 40 {
-				sentence = sentence[:39] + "…"
+				sentence = sentence[:37] + "..."
 			}
 
 			t.AddRow(name, lib.Version, available, location, sentence)
