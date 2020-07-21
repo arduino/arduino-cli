@@ -1,7 +1,7 @@
 # Integration tests
 
-This dir contains integration tests, aimed to test the Command Line Interface
-and its output from a pure user point of view.
+This dir contains integration tests, aimed to test the Command Line Interface and its output from a pure user point of
+view.
 
 ## Installation
 
@@ -25,8 +25,8 @@ task test-integration
 
 This will create and install all necessary dependencies if not already existing and then run integrations tests.
 
-To run specific modules you must run `pytest` from the virtual environment created by Poetry.
-If dependencies have not already been installed first run `poetry install`.
+To run specific modules you must run `pytest` from the virtual environment created by Poetry. If dependencies have not
+already been installed first run `poetry install`.
 
 ```shell
 poetry run pytest test/test_lib.py
@@ -54,7 +54,8 @@ To run lint check from the project's root folder:
 task python:check
 ```
 
-This will run `flake8` automatically and return any error in the code formatting, if not already installed it will also install integration tests dependencies.
+This will run `flake8` automatically and return any error in the code formatting, if not already installed it will also
+install integration tests dependencies.
 
 In case of linting errors you should be able to solve most of them by automatically formatting with:
 

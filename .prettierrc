@@ -1,4 +1,12 @@
 {
   "semi": false,
-  "printWidth": 120
+  "printWidth": 120,
+  "overrides": [
+    {
+      "files": "*.md",
+      "options": {
+        "proseWrap": "always"
+      }
+    }
+  ]
 }
