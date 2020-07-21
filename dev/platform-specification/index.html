@@ -2017,7 +2017,8 @@ tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; 
 <h4 id="upload-using-programmer-by-default">Upload Using Programmer by default<a class="headerlink" href="#upload-using-programmer-by-default" title="Permanent link">&para;</a></h4>
 <p>If the <strong>upload.protocol</strong> property is not defined for a board, the Arduino IDE's "Upload" process will use the same behavior as <a href="#upload-using-an-external-programmer">"Upload Using Programmer"</a>. This is convenient for boards which only support uploading via programmer.</p>
 <h3 id="serial-port">Serial port<a class="headerlink" href="#serial-port" title="Permanent link">&para;</a></h3>
-<p>The port selected via the IDE or <a href="../commands/arduino-cli_upload"><code>arduino-cli upload</code></a>'s <code>--port</code> option is available as a configuration property <strong>{serial.port}</strong>.</p>
+<p>The full path (e.g., <code>/dev/ttyACM0</code>) of the port selected via the IDE or <a href="../commands/arduino-cli_upload"><code>arduino-cli upload</code></a>'s <code>--port</code> option is available as a configuration property <strong>{serial.port}</strong>.</p>
+<p>The file component of the port's path (e.g., <code>ttyACM0</code>) is available as the configuration property <strong>{serial.port.file}</strong>.</p>
 <h3 id="upload-using-an-external-programmer">Upload using an external programmer<a class="headerlink" href="#upload-using-an-external-programmer" title="Permanent link">&para;</a></h3>
 <p><strong>TODO...</strong><br>
 The platform.txt associated with the selected programmer will be used.</p>
