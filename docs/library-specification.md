@@ -13,8 +13,8 @@ Arduino development software supports multiple microcontroller architectures (e.
 
 ## See also
 
-* [Arduino library style guide](http://arduino.cc/en/Reference/APIStyleGuide)
-* [Library dependency resolution process documentation](../sketch-build-process/#dependency-resolution)
+- [Arduino library style guide](http://arduino.cc/en/Reference/APIStyleGuide)
+- [Library dependency resolution process documentation](../sketch-build-process/#dependency-resolution)
 
 ## 1.5 library format (rev. 2.2)
 
