@@ -1782,15 +1782,22 @@ linked together using the <strong>recipe.c.combine.pattern</strong>.</p>
 <li><code>{archive_file_path}</code>: fully qualified archive file (ex. "/path/to/core.a"). This property was added in Arduino IDE
   1.6.6/arduino builder 1.0.0-beta12 as a replacement for <code>{build.path}/{archive_file}</code>.</li>
 <li><code>{archive_file}</code>: the name of the core archive file (ex. "core.a")</li>
+<li><code>{compiler.libraries.ldflags}</code>: the linking flags for precompiled libraries, which consist of automatically generated
+  <code>-L</code> flags for the library path and <code>-l</code> flags for library files, as well as any custom flags provided via the
+  <code>ldflags</code> field of library.properties. In order to support precompiled libraries, platform.txt must contain a
+  definition of <code>compiler.libraries.ldflags</code>, to which any automatically generated flags will be appended. Support for
+  precompiled libraries was added in Arduino IDE 1.8.6/arduino-builder 1.4.0.</li>
 </ul>
 <p>For example the following is used for AVR:</p>
 <div class="codehilite"><pre><span></span><code>compiler.c.elf.flags=-Os -Wl,--gc-sections
 compiler.c.elf.cmd=avr-gcc
 
+compiler.libraries.ldflags=
+
 [......]
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern=&quot;{compiler.path}{compiler.c.elf.cmd}&quot; {compiler.c.elf.flags} -mmcu={build.mcu} -o &quot;{build.path}/{build.project_name}.elf&quot; {object_files} &quot;{archive_file_path}&quot; &quot;-L{build.path}&quot; -lm
+recipe.c.combine.pattern=&quot;{compiler.path}{compiler.c.elf.cmd}&quot; {compiler.c.elf.flags} -mmcu={build.mcu} -o &quot;{build.path}/{build.project_name}.elf&quot; {object_files} {compiler.libraries.ldflags} &quot;{archive_file_path}&quot; &quot;-L{build.path}&quot; -lm
 </code></pre></div>
 
 
