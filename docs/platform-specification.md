@@ -363,8 +363,8 @@ The **uno.name** property contains the human-friendly name of the board. This is
 the "Board Name" field of Arduino CLI's text output, or the "name" key of Arduino CLI's JSON output.
 
 The **uno.build.board** property is used to set a compile-time variable **ARDUINO\_{build.board}** to allow use of
-conditional code between `#ifdef`s. A **build.board** value is automatically generated if not defined. In this case the
-variable defined at compile time will be `ARDUINO_AVR_UNO`.
+conditional code between `#ifdef`s. If not defined, a **build.board** value is automatically generated and the Arduino
+development software outputs a warning. In this case the variable defined at compile time will be `ARDUINO_AVR_UNO`.
 
 The other properties will override the corresponding global properties when the user selects the board. These properties
 will be globally available, in other configuration files too, without the board ID prefix:
