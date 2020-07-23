@@ -968,6 +968,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#precompiled-binaries" class="md-nav__link">
+    Precompiled binaries
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#library-examples" class="md-nav__link">
     Library Examples
   </a>
@@ -1177,6 +1184,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#precompiled-binaries" class="md-nav__link">
+    Precompiled binaries
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#library-examples" class="md-nav__link">
     Library Examples
   </a>
@@ -1373,10 +1387,10 @@ otherwise below, <strong>all fields are required</strong>. The available fields 
   sketch as <code>#include &lt;...&gt;</code> lines. This property is used with the "Include library" command in the Arduino IDE. If the
   <code>includes</code> property is missing, all the header files (.h) on the root source folder are included.</li>
 <li><strong>precompiled</strong> - <strong>(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)</strong> (optional) enables support for .a
-  (archive) and .so (shared object) files. The .a/.so file must be located at <code>src/{build.mcu}</code> where <code>{build.mcu}</code> is
-  the architecture name of the target the file was compiled for. Ex: <code>cortex-m3</code> for the Arduino DUE. The static library
-  should be linked as an ldflag. The <strong>precompiled</strong> field has two supported values, which control how any source files
-  in the library are handled:<ul>
+  (archive) and .so (shared object) files. See the <a href="#precompiled-binaries">"Precompiled binaries"</a> section for
+  documentation of the required location in the library for these files. The static library should be linked as an
+  ldflag. The <strong>precompiled</strong> field has two supported values, which control how any source files in the library are
+  handled:<ul>
 <li>true - Source files are always compiled. This is useful for "mixed" libraries, such as those that contain both open
   source code and the precompiled binary of a closed source component. Support for "mixed" libraries was inadvertently
   lost in Arduino IDE 1.8.12/arduino-builder 1.5.2/Arduino CLI 0.8.0, and returned in Arduino IDE
@@ -1442,6 +1456,37 @@ Servo/utility/ServoTimers.cpp
 only needs to run on Arduino IDE 1.5.x+, we recommend placing all source code in the src/ folder. If a library requires
 recursive compilation of nested source folders, its code must be in the src/ folder (since Arduino IDE 1.0.x doesn’t
 support recursive compilation, backwards compatibility wouldn’t be possible anyway).</p>
+<h4 id="precompiled-binaries">Precompiled binaries<a class="headerlink" href="#precompiled-binaries" title="Permanent link">&para;</a></h4>
+<p>The <code>precompiled</code> field of <a href="#libraryproperties-file-format">library.properties</a> enables support for the use of
+precompiled libraries. This requires providing .a (archive) or .so (shared object) files which are compiled for a
+particular processor architecture. The target architecture of the files is indicated by folder names.</p>
+<p>The binaries must be located at <code>src/{build.mcu}</code>, where <code>{build.mcu}</code> is the architecture name of the target the file
+was compiled for. Ex: <code>cortex-m3</code> for the Arduino Due.</p>
+<p>The filenames of the compiled binaries should start with <code>lib</code> (e.g., <code>libFoo.a</code>).</p>
+<p><strong>(available from Arduino IDE 1.8.12/arduino-builder 1.5.2/Arduino CLI 0.8.0)</strong> The floating point ABI configuration of
+ARM core microcontrollers may be adjusted via compiler flags. An extra subfolder level can be used to provide files
+compiled for a specific floating point configuration: <code>src/{build.mcu}/{build.fpu}-{build.float-abi}</code>, where
+<code>{build.fpu}</code> is the value of the <code>-mfpu</code> compiler flag and <code>{build.float-abi}</code> is the value of the <code>-mfloat-abi</code>
+compiler flag. <strong>(available from Arduino IDE 1.8.13/arduino-builder 1.5.3/Arduino CLI 0.11.0)</strong> If floating point
+configuration flags are used but no folder matching that configuration is found, <code>src/{build.mcu}</code> is used as a
+fallback.</p>
+<p>Below is an example library <code>src</code> folder structure that provides:</p>
+<ul>
+<li>Header file containing the declarations for the library API.</li>
+<li>Source file to use as a fallback for other architectures (<code>precompiled=full</code> mode).</li>
+<li>Archive file for the ARM Cortex M0+ architecture of the Arduino SAMD boards.</li>
+<li>Archive file for the ARM Cortex M4 architecture of the Arduino Nano 33 BLE, as a fallback for backwards compatibility
+  with Arduino development software before the floating point configuration support was added.</li>
+<li>Archive file for the ARM Cortex M4 architecture of the Arduino Nano 33 BLE, compiled for the
+  <code>-mfloat-abi=softfp -mfpu=fpv4-sp-d16</code> floating point ABI configuration.</li>
+</ul>
+<div class="highlight"><pre><span></span><code>Servo/src/Servo.h
+Servo/src/Servo.cpp
+Servo/src/cortex-m0plus/libServo.a
+Servo/src/cortex-m4/libServo.a
+Servo/src/cortex-m4/fpv4-sp-d16-softfp/libServo.a
+</code></pre></div>
+
 <h4 id="library-examples">Library Examples<a class="headerlink" href="#library-examples" title="Permanent link">&para;</a></h4>
 <p>Library examples must be placed in the <strong>examples</strong> folder. Note that the <strong>examples</strong> folder must be written exactly
 like that (with lower case letters).</p>
