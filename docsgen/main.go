@@ -29,6 +29,7 @@ func main() {
 	}
 
 	cli := cli.NewCommand()
+	cli.DisableAutoGenTag = true  // Disable addition of auto-generated date stamp
 	err := doc.GenMarkdownTree(cli, os.Args[1])
 	if err != nil {
 		log.Fatal(err)
