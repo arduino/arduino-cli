@@ -82,10 +82,20 @@ otherwise below, **all fields are required**. The available fields are:
 - **includes** - **(available from Arduino IDE 1.6.10)** (optional) a comma separated list of files to be added to the
   sketch as `#include <...>` lines. This property is used with the "Include library" command in the Arduino IDE. If the
   `includes` property is missing, all the header files (.h) on the root source folder are included.
-- **precompiled** - **(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)** (optional) set to `true` to allow the
-  use of .a (archive) and .so (shared object) files. The .a/.so file must be located at `src/{build.mcu}` where
-  `{build.mcu}` is the architecture name of the target the file was compiled for. Ex: `cortex-m3` for the Arduino DUE.
-  The static library should be linked as an ldflag.
+- **precompiled** - **(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)** (optional) enables support for .a
+  (archive) and .so (shared object) files. The .a/.so file must be located at `src/{build.mcu}` where `{build.mcu}` is
+  the architecture name of the target the file was compiled for. Ex: `cortex-m3` for the Arduino DUE. The static library
+  should be linked as an ldflag. The **precompiled** field has two supported values, which control how any source files
+  in the library are handled:
+  - true - Source files are always compiled. This is useful for "mixed" libraries, such as those that contain both open
+    source code and the precompiled binary of a closed source component. Support for "mixed" libraries was inadvertently
+    lost in Arduino IDE 1.8.12/arduino-builder 1.5.2/Arduino CLI 0.8.0, and returned in Arduino IDE
+    1.8.13/arduino-builder 1.5.3/Arduino CLI 0.11.0.
+  - full - **(available from Arduino IDE 1.8.13/arduino-builder 1.5.3/Arduino CLI 0.11.0)** If the library provides a
+    precompiled library for the board being compiled for, the source files will not be compiled. If no precompiled
+    library was provided for the selected board, source files are compiled as a fallback. This is useful for
+    precompiling the library to reduce compilation time for specific target hardware, but also providing support for
+    arbitrary boards by compiling the library on demand.
 - **ldflags** - **(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)** (optional) the linker flags to be added.
   Ex: `ldflags=-lm`
 
