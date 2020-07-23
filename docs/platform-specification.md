@@ -407,6 +407,17 @@ or if the RTOS core is needed, to:
 In any case the contents of the selected core folder are compiled and the core folder path is added to the include files
 search path.
 
+#### ArduinoCore-API
+
+Although much of the implementation of a core is architecture-specific, the standardized core API and the hardware
+independent components should be the same for every Arduino platform. In order to free platform authors from the burden
+of individually maintaining duplicates of this common code, Arduino has published it in a dedicated repository from
+which it may easily be shared by all platforms. In addition to significantly reducing the effort required to write and
+maintain a core, ArduinoCore-API assists core authors in providing the unprecedented level of portability between
+platforms that is a hallmark of the Arduino project.
+
+See the [arduino/ArduinoCore-API repository](https://github.com/arduino/ArduinoCore-API) for more information.
+
 ### Core Variants
 
 Sometimes a board needs some tweaking on default core configuration (different pin mapping is a typical example). A core
