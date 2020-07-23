@@ -1210,8 +1210,8 @@ active users).</p>
 </code></pre></div>
 
 <p>The field <code>name</code> and <code>version</code> are respectively the name and version of the tool. Each tool is uniquely identified by
-the triple (<code>vendor</code>, <code>name</code>, <code>version</code>) and there can be many different versions of the same tool available at the same
-time, for example:</p>
+the triple (<code>packager</code>, <code>name</code>, <code>version</code>). <code>packager</code> (AKA "vendor") is defined by the <code>name</code> value of the tool's
+package. There can be many different versions of the same tool available at the same time, for example:</p>
 <ul>
 <li>(<code>arduino</code>, <code>avr-gcc</code>, <code>4.8.1-arduino2</code>)</li>
 <li>(<code>arduino</code>, <code>avr-gcc</code>, <code>4.8.1-arduino3</code>)</li>
@@ -1294,8 +1294,9 @@ can be referenced from <code>platform.txt</code> using one of the following prop
   TOOLS</li>
 <li><code>boards</code>: the list of boards supported (note: just the names to display on the Arduino IDE and Arduino Pro IDE's
   Boards Manager GUI! the real boards definitions are inside <code>boards.txt</code> inside the core archive file)</li>
-<li><code>toolsDependencies</code>: the tools needed by this core. Each tool is referenced by the triple (<code>packager</code>, <code>name</code>,
-  <code>version</code>) as previously said. Note that you can reference tools available in other packages as well.</li>
+<li><code>toolsDependencies</code>: the tools needed by this core. They will be installed by Boards Manager along with the platform.
+  Each tool is referenced by the triple (<code>packager</code>, <code>name</code>, <code>version</code>) as previously said. Note that you can reference
+  tools available in other packages as well, even if no platform of that package is installed.</li>
 </ul>
 <p>The <code>version</code> field is validated by both Arduino IDE and <a href="https://github.com/zafarkhaja/jsemver">JSemVer</a>. Here are the
 rules Arduino IDE follows for parsing versions
