@@ -24,6 +24,8 @@ jobs:
           endpoint: ${{ secrets.JIRA_BASE_URL }}
           user: ${{ secrets.JIRA_USER_EMAIL }}
           authentication-method: api-token
+          overrides:
+            reporter: 5adda8a3626b42214cd24596
           EOM
 
       - name: Create issue
