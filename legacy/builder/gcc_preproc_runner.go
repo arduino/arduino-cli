@@ -57,6 +57,7 @@ func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath *
 
 func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList) (*exec.Cmd, error) {
 	properties := ctx.BuildProperties.Clone()
+	properties.Set("build.library_discovery_phase", "1")
 	properties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, sourceFilePath)
 	properties.SetPath(constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH, targetFilePath)
 
@@ -76,8 +77,6 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths
 	// Remove -MMD argument if present. Leaving it will make gcc try
 	// to create a /dev/null.d dependency file, which won't work.
 	cmd.Args = utils.Filter(cmd.Args, func(a string) bool { return a != "-MMD" })
-
-	cmd.Args = append(cmd.Args, "-DARDUINO_LIB_DISCOVERY_PHASE")
 
 	return cmd, nil
 }
