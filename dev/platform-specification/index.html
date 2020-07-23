@@ -1085,6 +1085,19 @@
     Cores
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#arduinocore-api" class="md-nav__link">
+    ArduinoCore-API
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1425,6 +1438,19 @@
   <a href="#cores" class="md-nav__link">
     Cores
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#arduinocore-api" class="md-nav__link">
+    ArduinoCore-API
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1960,6 +1986,14 @@ selected. For example if a board needs the Arduino core the <strong>build.core</
 
 <p>In any case the contents of the selected core folder are compiled and the core folder path is added to the include files
 search path.</p>
+<h4 id="arduinocore-api">ArduinoCore-API<a class="headerlink" href="#arduinocore-api" title="Permanent link">&para;</a></h4>
+<p>Although much of the implementation of a core is architecture-specific, the standardized core API and the hardware
+independent components should be the same for every Arduino platform. In order to free platform authors from the burden
+of individually maintaining duplicates of this common code, Arduino has published it in a dedicated repository from
+which it may easily be shared by all platforms. In addition to significantly reducing the effort required to write and
+maintain a core, ArduinoCore-API assists core authors in providing the unprecedented level of portability between
+platforms that is a hallmark of the Arduino project.</p>
+<p>See the <a href="https://github.com/arduino/ArduinoCore-API">arduino/ArduinoCore-API repository</a> for more information.</p>
 <h3 id="core-variants">Core Variants<a class="headerlink" href="#core-variants" title="Permanent link">&para;</a></h3>
 <p>Sometimes a board needs some tweaking on default core configuration (different pin mapping is a typical example). A core
 variant folder is an additional folder that is compiled together with the core and allows to easily add specific
