@@ -1115,6 +1115,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#serial-monitor-control-signal-configuration" class="md-nav__link">
+    Serial Monitor control signal configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#hiding-boards" class="md-nav__link">
     Hiding boards
   </a>
@@ -1464,6 +1471,13 @@
           <li class="md-nav__item">
   <a href="#board-vidpid" class="md-nav__link">
     Board VID/PID
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serial-monitor-control-signal-configuration" class="md-nav__link">
+    Serial Monitor control signal configuration
   </a>
   
 </li>
@@ -2049,6 +2063,25 @@ uno.pid.1=0x0001
 board. The snippet above is defining the 2341:0043 and 2341:0001 pairs used by Uno boards.</p>
 <p>The Arduino development software uses the <strong>vid</strong> and <strong>pid</strong> properties to automatically identify the boards connected
 to the computer. This convenience feature isn't available for boards that don't present a unique VID/PID pair.</p>
+<h3 id="serial-monitor-control-signal-configuration">Serial Monitor control signal configuration<a class="headerlink" href="#serial-monitor-control-signal-configuration" title="Permanent link">&para;</a></h3>
+<p>Arduino boards that use a USB to TTL serial adapter chip for communication with the computer (e.g., Uno, Nano, Mega)
+often utilize the DTR (data terminal ready) or RTS (request to send) serial control signals as a mechanism for the
+Arduino development software to trigger a reset of the primary microcontroller. The adapter's DTR and RTS pins are set
+<code>LOW</code> when the control signals are asserted by the computer and this <code>LOW</code> level is converted into a pulse on the
+microcontroller's reset pin by an "auto-reset" circuit on the board. The auto-reset system is necessary to activate the
+bootloader at the start of an upload.</p>
+<p>This system is also used to reset the microcontroller when Serial Monitor is started. The reset is convenient because it
+allows viewing all serial output from the time the program starts. In case the reset caused by opening Serial Monitor is
+not desirable, the control signal assertion behavior of Serial Monitor is configurable via the <strong>serial.disableDTR</strong> and
+<strong>serial.disableRTS</strong> properties. Setting these properties to <code>true</code> will prevent Serial Monitor from asserting the
+control signals when that board is selected:</p>
+<div class="codehilite"><pre><span></span><code>[.....]
+uno.serial.disableDTR=true
+uno.serial.disableRTS=true
+[.....]
+</code></pre></div>
+
+
 <h3 id="hiding-boards">Hiding boards<a class="headerlink" href="#hiding-boards" title="Permanent link">&para;</a></h3>
 <p>Adding a <strong>hide</strong> property to a board definition causes it to not be shown in the Arduino IDE's <strong>Tools &gt; Board</strong> menu.</p>
 <div class="codehilite"><pre><span></span><code>uno.hide=
