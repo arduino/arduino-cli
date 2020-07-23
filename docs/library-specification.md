@@ -83,10 +83,10 @@ otherwise below, **all fields are required**. The available fields are:
   sketch as `#include <...>` lines. This property is used with the "Include library" command in the Arduino IDE. If the
   `includes` property is missing, all the header files (.h) on the root source folder are included.
 - **precompiled** - **(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)** (optional) enables support for .a
-  (archive) and .so (shared object) files. The .a/.so file must be located at `src/{build.mcu}` where `{build.mcu}` is
-  the architecture name of the target the file was compiled for. Ex: `cortex-m3` for the Arduino DUE. The static library
-  should be linked as an ldflag. The **precompiled** field has two supported values, which control how any source files
-  in the library are handled:
+  (archive) and .so (shared object) files. See the ["Precompiled binaries"](#precompiled-binaries) section for
+  documentation of the required location in the library for these files. The static library should be linked as an
+  ldflag. The **precompiled** field has two supported values, which control how any source files in the library are
+  handled:
   - true - Source files are always compiled. This is useful for "mixed" libraries, such as those that contain both open
     source code and the precompiled binary of a closed source component. Support for "mixed" libraries was inadvertently
     lost in Arduino IDE 1.8.12/arduino-builder 1.5.2/Arduino CLI 0.8.0, and returned in Arduino IDE
@@ -153,6 +153,43 @@ This will allow existing 1.0 format libraries to compile under Arduino IDE 1.5.x
 only needs to run on Arduino IDE 1.5.x+, we recommend placing all source code in the src/ folder. If a library requires
 recursive compilation of nested source folders, its code must be in the src/ folder (since Arduino IDE 1.0.x doesn’t
 support recursive compilation, backwards compatibility wouldn’t be possible anyway).
+
+#### Precompiled binaries
+
+The `precompiled` field of [library.properties](#libraryproperties-file-format) enables support for the use of
+precompiled libraries. This requires providing .a (archive) or .so (shared object) files which are compiled for a
+particular processor architecture. The target architecture of the files is indicated by folder names.
+
+The binaries must be located at `src/{build.mcu}`, where `{build.mcu}` is the architecture name of the target the file
+was compiled for. Ex: `cortex-m3` for the Arduino Due.
+
+The filenames of the compiled binaries should start with `lib` (e.g., `libFoo.a`).
+
+**(available from Arduino IDE 1.8.12/arduino-builder 1.5.2/Arduino CLI 0.8.0)** The floating point ABI configuration of
+ARM core microcontrollers may be adjusted via compiler flags. An extra subfolder level can be used to provide files
+compiled for a specific floating point configuration: `src/{build.mcu}/{build.fpu}-{build.float-abi}`, where
+`{build.fpu}` is the value of the `-mfpu` compiler flag and `{build.float-abi}` is the value of the `-mfloat-abi`
+compiler flag. **(available from Arduino IDE 1.8.13/arduino-builder 1.5.3/Arduino CLI 0.11.0)** If floating point
+configuration flags are used but no folder matching that configuration is found, `src/{build.mcu}` is used as a
+fallback.
+
+Below is an example library `src` folder structure that provides:
+
+- Header file containing the declarations for the library API.
+- Source file to use as a fallback for other architectures (`precompiled=full` mode).
+- Archive file for the ARM Cortex M0+ architecture of the Arduino SAMD boards.
+- Archive file for the ARM Cortex M4 architecture of the Arduino Nano 33 BLE, as a fallback for backwards compatibility
+  with Arduino development software before the floating point configuration support was added.
+- Archive file for the ARM Cortex M4 architecture of the Arduino Nano 33 BLE, compiled for the
+  `-mfloat-abi=softfp -mfpu=fpv4-sp-d16` floating point ABI configuration.
+
+```
+Servo/src/Servo.h
+Servo/src/Servo.cpp
+Servo/src/cortex-m0plus/libServo.a
+Servo/src/cortex-m4/libServo.a
+Servo/src/cortex-m4/fpv4-sp-d16-softfp/libServo.a
+```
 
 #### Library Examples
 
