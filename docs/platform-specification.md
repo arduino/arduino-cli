@@ -443,6 +443,22 @@ linked with the sketch.
 
 The parameter **build.variant.path** is automatically generated.
 
+### Board VID/PID
+
+USB vendor IDs (VID) and product IDs (PID) identify USB devices to the computer. If the board uses a unique VID/PID
+pair, it may be defined in boards.txt:
+
+    uno.vid.0=0x2341
+    uno.pid.0=0x0043
+    uno.vid.1=0x2341
+    uno.pid.1=0x0001
+
+The **vid** and **pid** properties end with an arbitrary number, which allows multiple VID/PID pairs to be defined for a
+board. The snippet above is defining the 2341:0043 and 2341:0001 pairs used by Uno boards.
+
+The Arduino development software uses the **vid** and **pid** properties to automatically identify the boards connected
+to the computer. This convenience feature isn't available for boards that don't present a unique VID/PID pair.
+
 ### Hiding boards
 
 Adding a **hide** property to a board definition causes it to not be shown in the Arduino IDE's **Tools > Board** menu.
