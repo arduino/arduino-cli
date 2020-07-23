@@ -8,41 +8,41 @@ jobs:
   create-issue:
     runs-on: ubuntu-latest
 
-  env:
-    JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+    env:
+      JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
 
-  steps:
-    - name: Installs Jira CLI
-      uses: atlassian/gajira-cli@master
-      with:
-        version: 1.0.23
+    steps:
+      - name: Installs Jira CLI
+        uses: atlassian/gajira-cli@master
+        with:
+          version: 1.0.23
 
-    - name: Create issue
-      run: |
-        jira create \
-        --noedit \
-        -e ${{ secrets.JIRA_BASE_URL }} \
-        -u ${{ secrets.JIRA_USER_EMAIL }} \
-        -p ${{ secrets.JIRA_PROJECT_CODE }} \
-        -i Task \
-        -o summary="${{ github.event.issues.issue.title }}" \
-        -o description="${{ github.event.issues.issue.body }}\n${{ github.event.issues.issue.html_url }}" \
-        >> output
+      - name: Create issue
+        run: |
+          jira create \
+          --noedit \
+          -e ${{ secrets.JIRA_BASE_URL }} \
+          -u ${{ secrets.JIRA_USER_EMAIL }} \
+          -p ${{ secrets.JIRA_PROJECT_CODE }} \
+          -i Task \
+          -o summary="${{ github.event.issues.issue.title }}" \
+          -o description="${{ github.event.issues.issue.body }}\n${{ github.event.issues.issue.html_url }}" \
+          >> output
 
-    - name: Set label on Jira issue
-      run: |
-        jira label add
-        $(cat output | awk '{split($0,a," "); print a[2]}')
-        grooming arduino-cli
+      - name: Set label on Jira issue
+        run: |
+          jira label add
+          $(cat output | awk '{split($0,a," "); print a[2]}')
+          grooming arduino-cli
 
-    - name: Set label on Github issue
-      uses: actions/github-script@v2
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          github.issues.addLabels({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            labels: ['tracked']
-          })
+      - name: Set label on Github issue
+        uses: actions/github-script@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['tracked']
+            })
