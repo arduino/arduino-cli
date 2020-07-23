@@ -1372,10 +1372,22 @@ otherwise below, <strong>all fields are required</strong>. The available fields 
 <li><strong>includes</strong> - <strong>(available from Arduino IDE 1.6.10)</strong> (optional) a comma separated list of files to be added to the
   sketch as <code>#include &lt;...&gt;</code> lines. This property is used with the "Include library" command in the Arduino IDE. If the
   <code>includes</code> property is missing, all the header files (.h) on the root source folder are included.</li>
-<li><strong>precompiled</strong> - <strong>(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)</strong> (optional) set to <code>true</code> to allow the
-  use of .a (archive) and .so (shared object) files. The .a/.so file must be located at <code>src/{build.mcu}</code> where
-  <code>{build.mcu}</code> is the architecture name of the target the file was compiled for. Ex: <code>cortex-m3</code> for the Arduino DUE.
-  The static library should be linked as an ldflag.</li>
+<li><strong>precompiled</strong> - <strong>(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)</strong> (optional) enables support for .a
+  (archive) and .so (shared object) files. The .a/.so file must be located at <code>src/{build.mcu}</code> where <code>{build.mcu}</code> is
+  the architecture name of the target the file was compiled for. Ex: <code>cortex-m3</code> for the Arduino DUE. The static library
+  should be linked as an ldflag. The <strong>precompiled</strong> field has two supported values, which control how any source files
+  in the library are handled:<ul>
+<li>true - Source files are always compiled. This is useful for "mixed" libraries, such as those that contain both open
+  source code and the precompiled binary of a closed source component. Support for "mixed" libraries was inadvertently
+  lost in Arduino IDE 1.8.12/arduino-builder 1.5.2/Arduino CLI 0.8.0, and returned in Arduino IDE
+  1.8.13/arduino-builder 1.5.3/Arduino CLI 0.11.0.</li>
+<li>full - <strong>(available from Arduino IDE 1.8.13/arduino-builder 1.5.3/Arduino CLI 0.11.0)</strong> If the library provides a
+  precompiled library for the board being compiled for, the source files will not be compiled. If no precompiled
+  library was provided for the selected board, source files are compiled as a fallback. This is useful for
+  precompiling the library to reduce compilation time for specific target hardware, but also providing support for
+  arbitrary boards by compiling the library on demand.</li>
+</ul>
+</li>
 <li><strong>ldflags</strong> - <strong>(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)</strong> (optional) the linker flags to be added.
   Ex: <code>ldflags=-lm</code></li>
 </ul>
