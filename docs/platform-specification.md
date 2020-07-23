@@ -477,6 +477,26 @@ board. The snippet above is defining the 2341:0043 and 2341:0001 pairs used by U
 The Arduino development software uses the **vid** and **pid** properties to automatically identify the boards connected
 to the computer. This convenience feature isn't available for boards that don't present a unique VID/PID pair.
 
+### Serial Monitor control signal configuration
+
+Arduino boards that use a USB to TTL serial adapter chip for communication with the computer (e.g., Uno, Nano, Mega)
+often utilize the DTR (data terminal ready) or RTS (request to send) serial control signals as a mechanism for the
+Arduino development software to trigger a reset of the primary microcontroller. The adapter's DTR and RTS pins are set
+`LOW` when the control signals are asserted by the computer and this `LOW` level is converted into a pulse on the
+microcontroller's reset pin by an "auto-reset" circuit on the board. The auto-reset system is necessary to activate the
+bootloader at the start of an upload.
+
+This system is also used to reset the microcontroller when Serial Monitor is started. The reset is convenient because it
+allows viewing all serial output from the time the program starts. In case the reset caused by opening Serial Monitor is
+not desirable, the control signal assertion behavior of Serial Monitor is configurable via the **serial.disableDTR** and
+**serial.disableRTS** properties. Setting these properties to `true` will prevent Serial Monitor from asserting the
+control signals when that board is selected:
+
+    [.....]
+    uno.serial.disableDTR=true
+    uno.serial.disableRTS=true
+    [.....]
+
 ### Hiding boards
 
 Adding a **hide** property to a board definition causes it to not be shown in the Arduino IDE's **Tools > Board** menu.
