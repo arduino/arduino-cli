@@ -33,7 +33,8 @@ jobs:
           -p ${{ secrets.JIRA_PROJECT_CODE }} \
           -i Task \
           -o summary="${{ github.event.issue.title }}" \
-          -o description="${{ github.event.issue.body }}\n${{ github.event.issue.html_url }}" \
+          -o description="${{ github.event.issue.body }}
+          ${{ github.event.issue.html_url }}" \
           >> output
 
       - name: Set label on Jira issue
