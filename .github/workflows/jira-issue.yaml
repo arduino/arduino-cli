@@ -24,8 +24,6 @@ jobs:
           endpoint: ${{ secrets.JIRA_BASE_URL }}
           user: ${{ secrets.JIRA_USER_EMAIL }}
           authentication-method: api-token
-          overrides:
-            reporter: 5adda8a3626b42214cd24596
           EOM
 
       - name: Create issue
@@ -34,8 +32,8 @@ jobs:
           --noedit \
           -p ${{ secrets.JIRA_PROJECT_CODE }} \
           -i Task \
-          -o summary="${{ github.event.issues.issue.title }}" \
-          -o description="${{ github.event.issues.issue.body }}\n${{ github.event.issues.issue.html_url }}" \
+          -o summary="${{ github.event.issue.title }}" \
+          -o description="${{ github.event.issue.body }}\n${{ github.event.issue.html_url }}" \
           >> output
 
       - name: Set label on Jira issue
