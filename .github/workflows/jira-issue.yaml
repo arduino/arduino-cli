@@ -17,12 +17,19 @@ jobs:
         with:
           version: 1.0.23
 
+      - name: Writes Jira CLI configs
+        run: |
+          mkdir ~/.jira.d
+          cat <<EOM >~/.jira.d/config.yml
+          endpoint: ${{ secrets.JIRA_BASE_URL }}
+          user: ${{ secrets.JIRA_USER_EMAIL }}
+          authentication-method: api-token
+          EOM
+
       - name: Create issue
         run: |
           jira create \
           --noedit \
-          -e ${{ secrets.JIRA_BASE_URL }} \
-          -u ${{ secrets.JIRA_USER_EMAIL }} \
           -p ${{ secrets.JIRA_PROJECT_CODE }} \
           -i Task \
           -o summary="${{ github.event.issues.issue.title }}" \
