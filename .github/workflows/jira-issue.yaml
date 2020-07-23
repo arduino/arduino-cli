@@ -38,7 +38,7 @@ jobs:
 
       - name: Set label on Jira issue
         run: |
-          jira label add
+          jira labels add
           $(cat output | awk '{split($0,a," "); print a[2]}')
           grooming arduino-cli
 
