@@ -189,16 +189,23 @@ The recipe can be built concatenating the following automatically generated prop
 - `{archive_file_path}`: fully qualified archive file (ex. "/path/to/core.a"). This property was added in Arduino IDE
   1.6.6/arduino builder 1.0.0-beta12 as a replacement for `{build.path}/{archive_file}`.
 - `{archive_file}`: the name of the core archive file (ex. "core.a")
+- `{compiler.libraries.ldflags}`: the linking flags for precompiled libraries, which consist of automatically generated
+  `-L` flags for the library path and `-l` flags for library files, as well as any custom flags provided via the
+  `ldflags` field of library.properties. In order to support precompiled libraries, platform.txt must contain a
+  definition of `compiler.libraries.ldflags`, to which any automatically generated flags will be appended. Support for
+  precompiled libraries was added in Arduino IDE 1.8.6/arduino-builder 1.4.0.
 
 For example the following is used for AVR:
 
     compiler.c.elf.flags=-Os -Wl,--gc-sections
     compiler.c.elf.cmd=avr-gcc
 
+    compiler.libraries.ldflags=
+
     [......]
 
     ## Combine gc-sections, archives, and objects
-    recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} -mmcu={build.mcu} -o "{build.path}/{build.project_name}.elf" {object_files} "{archive_file_path}" "-L{build.path}" -lm
+    recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} -mmcu={build.mcu} -o "{build.path}/{build.project_name}.elf" {object_files} {compiler.libraries.ldflags} "{archive_file_path}" "-L{build.path}" -lm
 
 #### Recipes for extraction of executable files and other binary data
 
