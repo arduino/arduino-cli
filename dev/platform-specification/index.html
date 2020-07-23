@@ -1095,6 +1095,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#board-vidpid" class="md-nav__link">
+    Board VID/PID
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#hiding-boards" class="md-nav__link">
     Hiding boards
   </a>
@@ -1424,6 +1431,13 @@
           <li class="md-nav__item">
   <a href="#core-variants" class="md-nav__link">
     Core Variants
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#board-vidpid" class="md-nav__link">
+    Board VID/PID
   </a>
   
 </li>
@@ -1980,6 +1994,20 @@ leonardo.build.variant=leonardo
 contents of the selected variant folder path is added to the include search path and its contents are compiled and
 linked with the sketch.</p>
 <p>The parameter <strong>build.variant.path</strong> is automatically generated.</p>
+<h3 id="board-vidpid">Board VID/PID<a class="headerlink" href="#board-vidpid" title="Permanent link">&para;</a></h3>
+<p>USB vendor IDs (VID) and product IDs (PID) identify USB devices to the computer. If the board uses a unique VID/PID
+pair, it may be defined in boards.txt:</p>
+<div class="codehilite"><pre><span></span><code>uno.vid.0=0x2341
+uno.pid.0=0x0043
+uno.vid.1=0x2341
+uno.pid.1=0x0001
+</code></pre></div>
+
+
+<p>The <strong>vid</strong> and <strong>pid</strong> properties end with an arbitrary number, which allows multiple VID/PID pairs to be defined for a
+board. The snippet above is defining the 2341:0043 and 2341:0001 pairs used by Uno boards.</p>
+<p>The Arduino development software uses the <strong>vid</strong> and <strong>pid</strong> properties to automatically identify the boards connected
+to the computer. This convenience feature isn't available for boards that don't present a unique VID/PID pair.</p>
 <h3 id="hiding-boards">Hiding boards<a class="headerlink" href="#hiding-boards" title="Permanent link">&para;</a></h3>
 <p>Adding a <strong>hide</strong> property to a board definition causes it to not be shown in the Arduino IDE's <strong>Tools &gt; Board</strong> menu.</p>
 <div class="codehilite"><pre><span></span><code>uno.hide=
