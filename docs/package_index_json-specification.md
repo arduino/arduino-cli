@@ -125,8 +125,8 @@ Tools are mapped as JSON in this way:
 ```
 
 The field `name` and `version` are respectively the name and version of the tool. Each tool is uniquely identified by
-the triple (`vendor`, `name`, `version`) and there can be many different versions of the same tool available at the same
-time, for example:
+the triple (`packager`, `name`, `version`). `packager` (AKA "vendor") is defined by the `name` value of the tool's
+package. There can be many different versions of the same tool available at the same time, for example:
 
 - (`arduino`, `avr-gcc`, `4.8.1-arduino2`)
 - (`arduino`, `avr-gcc`, `4.8.1-arduino3`)
@@ -215,8 +215,9 @@ Each PLATFORM describes a core for a specific architecture. The fields needed ar
   TOOLS
 - `boards`: the list of boards supported (note: just the names to display on the Arduino IDE and Arduino Pro IDE's
   Boards Manager GUI! the real boards definitions are inside `boards.txt` inside the core archive file)
-- `toolsDependencies`: the tools needed by this core. Each tool is referenced by the triple (`packager`, `name`,
-  `version`) as previously said. Note that you can reference tools available in other packages as well.
+- `toolsDependencies`: the tools needed by this core. They will be installed by Boards Manager along with the platform.
+  Each tool is referenced by the triple (`packager`, `name`, `version`) as previously said. Note that you can reference
+  tools available in other packages as well, even if no platform of that package is installed.
 
 The `version` field is validated by both Arduino IDE and [JSemVer](https://github.com/zafarkhaja/jsemver). Here are the
 rules Arduino IDE follows for parsing versions
