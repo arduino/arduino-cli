@@ -347,6 +347,8 @@ If your PR doesn't need to be included in the changelog, please start the PR tit
 [10]: https://github.com/jimporter/mike
 [11]: https://github.com/arduino/arduino-cli/blob/master/.github/workflows/docs.yaml
 [12]: https://github.com/arduino/arduino-cli/blob/master/docs/build.py
+[poetry-website]: https://python-poetry.org/
+[poetry-docs]: https://python-poetry.org/docs/
 [prettier-website]: https://prettier.io/
 [prettier-vscode-extension]: https://github.com/prettier/prettier-vscode
 [npm-install-docs]: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
