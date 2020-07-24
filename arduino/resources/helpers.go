@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/arduino/go-paths-helper"
+	"github.com/pkg/errors"
 	"go.bug.st/downloader/v2"
 )
 
@@ -30,7 +31,14 @@ func (r *DownloadResource) ArchivePath(downloadDir *paths.Path) (*paths.Path, er
 	if err := staging.MkdirAll(); err != nil {
 		return nil, err
 	}
-	return staging.Join(r.ArchiveFileName), nil
+
+	// Filter out paths from file name
+	archiveFileName := paths.New(r.ArchiveFileName).Base()
+	archivePath := staging.Join(archiveFileName).Clean()
+	if archivePath.IsDir() {
+		return nil, errors.Errorf("invalid filename or exinsting directory: %s", archivePath)
+	}
+	return archivePath, nil
 }
 
 // IsCached returns true if the specified DownloadResource has already been downloaded
