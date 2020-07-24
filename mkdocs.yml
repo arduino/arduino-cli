@@ -96,8 +96,11 @@ nav:
       - lib uninstall: commands/arduino-cli_lib_uninstall.md
       - lib update-index: commands/arduino-cli_lib_update-index.md
       - lib upgrade: commands/arduino-cli_lib_upgrade.md
+      - outdated: commands/arduino-cli_outdated.md
       - sketch: commands/arduino-cli_sketch.md
       - sketch new: commands/arduino-cli_sketch_new.md
+      - update: commands/arduino-cli_update.md
+      - upgrade: commands/arduino-cli_upgrade.md
       - upload: commands/arduino-cli_upload.md
       - version: commands/arduino-cli_version.md
   - gRPC reference:
