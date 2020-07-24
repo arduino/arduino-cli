@@ -39,6 +39,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/cli/sketch"
 	"github.com/arduino/arduino-cli/cli/update"
+	"github.com/arduino/arduino-cli/cli/upgrade"
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/i18n"
@@ -90,6 +91,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(outdated.NewCommand())
 	cmd.AddCommand(sketch.NewCommand())
 	cmd.AddCommand(update.NewCommand())
+	cmd.AddCommand(upgrade.NewCommand())
 	cmd.AddCommand(upload.NewCommand())
 	cmd.AddCommand(debug.NewCommand())
 	cmd.AddCommand(burnbootloader.NewCommand())
