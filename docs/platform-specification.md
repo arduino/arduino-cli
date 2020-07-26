@@ -607,6 +607,30 @@ Most **{upload.XXXX}** variables are used later in the avrdude upload recipe in 
     tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
     [.....]
 
+#### Upload verification
+
+Upload verification can be enabled via the Arduino IDE's **File > Preferences > Verify code after upload** or
+`arduino-cli upload --verify`. This uses a system similar to the [verbose parameter](#verbose-parameter).
+
+**tools.TOOL_ID.ACTION.params.verify** defines the value of the **ACTION.verify** property when verification is enabled
+and **tools.TOOL_ID.ACTION.params.noverify** the value when verification is disabled.
+
+The **{ACTION.verify}** property is only defined for the `upload` and `program` actions of `upload.tool`.
+
+Prior to Arduino IDE 1.6.9, **tools.TOOL_ID.ACTION.params.verify/noverify** were not supported and `{upload.verify}` was
+set to `true`/`false` according to the verification preference setting, while `{program.verify}` was left undefined. For
+this reason, backwards compatibility with older IDE versions requires the addition of definitions for the
+**upload.verify** and **program.verify** properties to platform.txt:
+
+    [.....]
+    tools.avrdude.upload.verify=
+    [.....]
+    tools.avrdude.program.verify=
+    [.....]
+
+These definitions are overridden with the value defined by **tools.TOOL_ID.ACTION.params.verify/noverify** when a modern
+version of Arduino development software is in use.
+
 #### 1200 bps bootloader reset
 
 Some Arduino boards use a dedicated USB-to-serial chip, that takes care of restarting the main MCU (starting the
