@@ -293,6 +293,8 @@ which will usually result in a permission error. Since platforms typically inclu
 includes `-MMD`, the `-MMD` option is automatically filtered out of the `recipe.preproc.macros` recipe to prevent this
 error.
 
+If **recipe.preproc.macros** is not defined, it is automatically generated from **recipe.cpp.o.pattern**.
+
 Note that older Arduino IDE versions used the **recipe.preproc.includes** recipe to determine includes, which is
 undocumented here. Since Arduino IDE 1.6.7 (arduino-builder 1.2.0) this was changed and **recipe.preproc.includes** is
 no longer used.
