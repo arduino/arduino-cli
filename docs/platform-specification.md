@@ -84,6 +84,10 @@ The following automatically generated properties can be used globally in all con
   meaningless version number.
 - `{ide_version}`: Compatibility alias for `{runtime.ide.version}`
 - `{runtime.os}`: the running OS ("linux", "windows", "macosx")
+- `{extra.time.utc}`: Unix time (seconds since 1970-01-01T00:00:00Z) according to the machine the build is running on
+- `{extra.time.local}`: Unix time with local timezone and DST offset
+- `{extra.time.zone}`: local timezone offset without the DST component
+- `{extra.time.dst}`: local daylight savings time offset
 
 Compatibility note: Versions before Arduino IDE 1.6.0 only used one digit per version number component in
 `{runtime.ide.version}` (so 1.5.9 was `159`, not `10509`).
