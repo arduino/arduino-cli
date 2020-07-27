@@ -22,6 +22,8 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -34,7 +36,7 @@ import (
 func NewCommand() *cobra.Command {
 	outdatedCommand := &cobra.Command{
 		Use:   "outdated",
-		Short: "Lists cores and libraries that can be upgraded\n",
+		Short: "Lists cores and libraries that can be upgraded",
 		Long: "This commands shows a list of installed cores and/or libraries\n" +
 			"that can be upgraded. If nothing needs to be updated the output is empty.",
 		Example: "  " + os.Args[0] + " outdated\n",
@@ -54,6 +56,23 @@ func runOutdatedCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino outdated`")
 
+	// Updates indexes before getting list of outdated cores and libraries
+	_, err = commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
+		Instance: inst,
+	}, output.ProgressBar())
+	if err != nil {
+		feedback.Errorf("Error updating core index: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	err = commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexReq{
+		Instance: inst,
+	}, output.ProgressBar())
+	if err != nil {
+		feedback.Errorf("Error updating library index: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
 	// Gets outdated cores
 	targets, err := core.GetPlatforms(inst.Id, true)
 	if err != nil {
@@ -64,7 +83,7 @@ func runOutdatedCommand(cmd *cobra.Command, args []string) {
 	// Gets outdated libraries
 	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
 		Instance:  inst,
-		All:       true,
+		All:       false,
 		Updatable: true,
 	})
 	if err != nil {

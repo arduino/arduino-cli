@@ -27,9 +27,9 @@ def test_outdated(run_command):
     assert run_command("core install arduino:samd")
     assert run_command("lib install ArduinoJson")
 
-    # Verifies only outdate core and library are returned
+    # Verifies only outdated cores and libraries are returned
     result = run_command("outdated")
     assert result.ok
-    lines = result.stdout.splitlines()
-    assert lines[1].startswith("Arduino AVR Boards")
-    assert lines[2].startswith("USBHost")
+    lines = [l.strip() for l in result.stdout.splitlines()]
+    assert lines[-3].startswith("Arduino AVR Boards")
+    assert lines[-2].startswith("USBHost")

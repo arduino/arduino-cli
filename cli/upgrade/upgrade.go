@@ -53,7 +53,24 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino upgrade`")
 
-	err = lib.LibraryUpgradeAll(inst.Id, output.ProgressBar(), output.TaskProgress())
+	// Gets list of libraries to upgrade, cores' libraries are ignored since they're upgraded
+	// when the core is
+	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
+		Instance:  inst,
+		All:       false,
+		Updatable: true,
+	})
+	if err != nil {
+		feedback.Errorf("Error retrieving library list: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	libraries := []string{}
+	for _, l := range res.InstalledLibrary {
+		libraries = append(libraries, l.Library.Name)
+	}
+
+	// Upgrades libraries
+	err = lib.LibraryUpgrade(inst.Id, libraries, output.ProgressBar(), output.TaskProgress())
 	if err != nil {
 		feedback.Errorf("Error upgrading libraries: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
