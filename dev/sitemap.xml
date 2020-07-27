@@ -156,11 +156,23 @@
      <lastmod>2020-07-27</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
+     <loc>https://arduino.github.io/arduino-cli/commands/arduino-cli_outdated/</loc>
+     <lastmod>2020-07-27</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
      <loc>https://arduino.github.io/arduino-cli/commands/arduino-cli_sketch/</loc>
      <lastmod>2020-07-27</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://arduino.github.io/arduino-cli/commands/arduino-cli_sketch_new/</loc>
+     <lastmod>2020-07-27</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://arduino.github.io/arduino-cli/commands/arduino-cli_update/</loc>
+     <lastmod>2020-07-27</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://arduino.github.io/arduino-cli/commands/arduino-cli_upgrade/</loc>
      <lastmod>2020-07-27</lastmod>
      <changefreq>daily</changefreq>
     </url><url>

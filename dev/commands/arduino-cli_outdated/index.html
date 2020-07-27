@@ -13,7 +13,7 @@
         <meta name="description" content="Arduino Command Line Interface">
       
       
-        <link rel="canonical" href="https://arduino.github.io/arduino-cli/commands/arduino-cli_lib_update-index/">
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/commands/arduino-cli_outdated/">
       
       
       
@@ -40,7 +40,7 @@
     
     
       
-        <title>lib update-index - Arduino CLI</title>
+        <title>outdated - Arduino CLI</title>
       
     
     
@@ -91,7 +91,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#arduino-cli-lib-update-index" tabindex="0" class="md-skip">
+      <a href="#arduino-cli-outdated" tabindex="0" class="md-skip">
         Skip to content
       </a>
     
@@ -117,7 +117,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                lib update-index
+                outdated
               
             </span>
           
@@ -691,6 +691,30 @@
           
           
 
+
+  <li class="md-nav__item">
+    <a href="../arduino-cli_lib_update-index/" title="lib update-index" class="md-nav__link">
+      lib update-index
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../arduino-cli_lib_upgrade/" title="lib upgrade" class="md-nav__link">
+      lib upgrade
+    </a>
+  </li>
+
+        
+          
+          
+          
+
   
 
 
@@ -700,11 +724,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        lib update-index
+        outdated
       </label>
     
-    <a href="./" title="lib update-index" class="md-nav__link md-nav__link--active">
-      lib update-index
+    <a href="./" title="outdated" class="md-nav__link md-nav__link--active">
+      outdated
     </a>
     
       
@@ -716,8 +740,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#arduino-cli-lib-update-index" class="md-nav__link">
-    arduino-cli lib update-index
+  <a href="#arduino-cli-outdated" class="md-nav__link">
+    arduino-cli outdated
   </a>
   
     <nav class="md-nav">
@@ -771,30 +795,6 @@
   
 </nav>
     
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_lib_upgrade/" title="lib upgrade" class="md-nav__link">
-      lib upgrade
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../arduino-cli_outdated/" title="outdated" class="md-nav__link">
-      outdated
-    </a>
   </li>
 
         
@@ -1050,8 +1050,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#arduino-cli-lib-update-index" class="md-nav__link">
-    arduino-cli lib update-index
+  <a href="#arduino-cli-outdated" class="md-nav__link">
+    arduino-cli outdated
   </a>
   
     <nav class="md-nav">
@@ -1114,21 +1114,22 @@
               
                 
                 
-                  <h1>lib update-index</h1>
+                  <h1>outdated</h1>
                 
-                <h2 id="arduino-cli-lib-update-index">arduino-cli lib update-index<a class="headerlink" href="#arduino-cli-lib-update-index" title="Permanent link">&para;</a></h2>
-<p>Updates the libraries index.</p>
+                <h2 id="arduino-cli-outdated">arduino-cli outdated<a class="headerlink" href="#arduino-cli-outdated" title="Permanent link">&para;</a></h2>
+<p>Lists cores and libraries that can be upgraded</p>
 <h3 id="synopsis">Synopsis<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h3>
-<p>Updates the libraries index to the latest version.</p>
-<div class="highlight"><pre><span></span><code>arduino-cli lib update-index [flags]
+<p>This commands shows a list of installed cores and/or libraries
+that can be upgraded. If nothing needs to be updated the output is empty.</p>
+<div class="highlight"><pre><span></span><code>arduino-cli outdated [flags]
 </code></pre></div>
 
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  arduino-cli lib update-index
+<div class="highlight"><pre><span></span><code>  arduino-cli outdated
 </code></pre></div>
 
 <h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  -h, --help   help for update-index
+<div class="highlight"><pre><span></span><code>  -h, --help   help for outdated
 </code></pre></div>
 
 <h3 id="options-inherited-from-parent-commands">Options inherited from parent commands<a class="headerlink" href="#options-inherited-from-parent-commands" title="Permanent link">&para;</a></h3>
@@ -1143,7 +1144,7 @@
 
 <h3 id="see-also">SEE ALSO<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="../arduino-cli_lib/">arduino-cli lib</a>  - Arduino commands about libraries.</li>
+<li><a href="../arduino-cli/">arduino-cli</a>  - Arduino CLI.</li>
 </ul>
                 
                   
@@ -1166,7 +1167,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../arduino-cli_lib_uninstall/" title="lib uninstall" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../arduino-cli_lib_upgrade/" title="lib upgrade" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -1175,19 +1176,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                lib uninstall
+                lib upgrade
               </span>
             </div>
           </a>
         
         
-          <a href="../arduino-cli_lib_upgrade/" title="lib upgrade" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../arduino-cli_sketch/" title="sketch" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                lib upgrade
+                sketch
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
