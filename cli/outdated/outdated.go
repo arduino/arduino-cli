@@ -22,8 +22,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -56,23 +54,6 @@ func runOutdatedCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino outdated`")
 
-	// Updates indexes before getting list of outdated cores and libraries
-	_, err = commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
-		Instance: inst,
-	}, output.ProgressBar())
-	if err != nil {
-		feedback.Errorf("Error updating core index: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
-	err = commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexReq{
-		Instance: inst,
-	}, output.ProgressBar())
-	if err != nil {
-		feedback.Errorf("Error updating library index: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
 	// Gets outdated cores
 	targets, err := core.GetPlatforms(inst.Id, true)
 	if err != nil {
@@ -91,25 +72,25 @@ func runOutdatedCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	tab := table.New()
-	tab.SetHeader("Name", "Installed version", "New version")
-
 	// Prints outdated cores
+	tab := table.New()
+	tab.SetHeader("Core name", "Installed version", "New version")
 	if len(targets) > 0 {
 		for _, t := range targets {
 			plat := t.Platform
 			tab.AddRow(plat.Name, t.Version, plat.GetLatestRelease().Version)
 		}
+		feedback.Print(tab.Render())
 	}
 
 	// Prints outdated libraries
+	tab = table.New()
+	tab.SetHeader("Library name", "Installed version", "New version")
 	libs := res.GetInstalledLibrary()
 	if len(libs) > 0 {
 		for _, l := range libs {
 			tab.AddRow(l.Library.Name, l.Library.Version, l.Release.Version)
 		}
-	}
-	if len(targets) > 0 || len(libs) > 0 {
 		feedback.Print(tab.Render())
 	}
 

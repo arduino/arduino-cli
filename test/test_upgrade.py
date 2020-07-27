@@ -31,8 +31,8 @@ def test_upgrade(run_command):
     result = run_command("outdated")
     assert result.ok
     lines = result.stdout.splitlines()
-    assert lines[-3].startswith("Arduino AVR Boards")
-    assert lines[-2].startswith("USBHost")
+    assert lines[1].startswith("Arduino AVR Boards")
+    assert lines[4].startswith("USBHost")
 
     result = run_command("upgrade")
     assert result.ok
@@ -40,7 +40,4 @@ def test_upgrade(run_command):
     # Verifies cores and libraries have been updated
     result = run_command("outdated")
     assert result.ok
-    lines = result.stdout.splitlines()
-    for l in lines:
-        assert "Arduino AVR Boards" not in l
-        assert "USBHost" not in l
+    assert result.stdout == ""

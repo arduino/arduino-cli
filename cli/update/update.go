@@ -24,7 +24,10 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -39,8 +42,12 @@ func NewCommand() *cobra.Command {
 		Args:    cobra.NoArgs,
 		Run:     runUpdateCommand,
 	}
-
+	updateCommand.Flags().BoolVar(&updateFlags.showOutdated, "outdated", false, "Show outdated cores and libraries after index update")
 	return updateCommand
+}
+
+var updateFlags struct {
+	showOutdated bool
 }
 
 func runUpdateCommand(cmd *cobra.Command, args []string) {
@@ -62,6 +69,49 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 	if err != nil {
 		feedback.Errorf("Error updating library index: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	if updateFlags.showOutdated {
+		// Gets outdated cores
+		targets, err := core.GetPlatforms(instance.Id, true)
+		if err != nil {
+			feedback.Errorf("Error retrieving core list: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+
+		// Gets outdated libraries
+		res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
+			Instance:  instance,
+			All:       false,
+			Updatable: true,
+		})
+		if err != nil {
+			feedback.Errorf("Error retrieving library list: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+
+		// Prints outdated cores
+		tab := table.New()
+		tab.SetHeader("Core name", "Installed version", "New version")
+		if len(targets) > 0 {
+			for _, t := range targets {
+				plat := t.Platform
+				tab.AddRow(plat.Name, t.Version, plat.GetLatestRelease().Version)
+			}
+			feedback.Print(tab.Render())
+		}
+
+		// Prints outdated libraries
+		tab = table.New()
+		tab.SetHeader("Library name", "Installed version", "New version")
+		libs := res.GetInstalledLibrary()
+		if len(libs) > 0 {
+			for _, l := range libs {
+				tab.AddRow(l.Library.Name, l.Library.Version, l.Release.Version)
+			}
+			feedback.Print(tab.Render())
+		}
+
 	}
 
 	logrus.Info("Done")

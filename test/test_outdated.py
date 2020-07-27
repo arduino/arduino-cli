@@ -31,5 +31,5 @@ def test_outdated(run_command):
     result = run_command("outdated")
     assert result.ok
     lines = [l.strip() for l in result.stdout.splitlines()]
-    assert lines[-3].startswith("Arduino AVR Boards")
-    assert lines[-2].startswith("USBHost")
+    assert lines[1].startswith("Arduino AVR Boards")
+    assert lines[4].startswith("USBHost")
