@@ -2,11 +2,15 @@ name: "Mirror new issue to Jira for grooming"
 
 on:
   issues:
-    types: [opened]
+    types: [opened, labeled]
 
 jobs:
   create-issue:
     runs-on: ubuntu-latest
+
+    if: >
+      github.event.action == 'opened' &&
+      !contains(github.event.issue.labels.*.name, 'tracked')
 
     env:
       JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
@@ -54,3 +58,48 @@ jobs:
               repo: context.repo.repo,
               labels: ['tracked']
             })
+
+  label-issue:
+    runs-on: ubuntu-latest
+
+    if: >
+      (github.event.issue.author_association == 'OWNER' ||
+      github.event.issue.author_association == 'COLLABORATOR' ||
+      github.event.issue.author_association == 'MEMBER') &&
+      github.event.action == 'labeled' &&
+      github.event.label.name == 'tracked'
+
+    env:
+      JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
+    steps:
+      - name: Installs Jira CLI
+        uses: atlassian/gajira-cli@master
+        with:
+          version: 1.0.23
+
+      - name: Writes Jira CLI configs
+        run: |
+          mkdir ~/.jira.d
+          cat <<EOM >~/.jira.d/config.yml
+          endpoint: ${{ secrets.JIRA_BASE_URL }}
+          user: ${{ secrets.JIRA_USER_EMAIL }}
+          authentication-method: api-token
+          EOM
+
+      - name: Create issue
+        run: |
+          jira create \
+          --noedit \
+          -p ${{ secrets.JIRA_PROJECT_CODE }} \
+          -i Task \
+          -o summary="${{ github.event.issue.title }}" \
+          -o description="${{ github.event.issue.body }}
+          ${{ github.event.issue.html_url }}" \
+          >> output
+
+      - name: Set label on Jira issue
+        run: |
+          jira labels add \
+          $(cat output | awk '{split($0,a," "); print a[2]}') \
+          grooming arduino-cli
