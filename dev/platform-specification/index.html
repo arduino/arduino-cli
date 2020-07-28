@@ -1193,6 +1193,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#upload-verification" class="md-nav__link">
+    Upload verification
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#1200-bps-bootloader-reset" class="md-nav__link">
     1200 bps bootloader reset
   </a>
@@ -1267,6 +1274,13 @@
         <li class="md-nav__item">
   <a href="#boardslocaltxt" class="md-nav__link">
     boards.local.txt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platform-bundled-libraries" class="md-nav__link">
+    Platform bundled libraries
   </a>
   
 </li>
@@ -1554,6 +1568,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#upload-verification" class="md-nav__link">
+    Upload verification
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#1200-bps-bootloader-reset" class="md-nav__link">
     1200 bps bootloader reset
   </a>
@@ -1628,6 +1649,13 @@
         <li class="md-nav__item">
   <a href="#boardslocaltxt" class="md-nav__link">
     boards.local.txt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platform-bundled-libraries" class="md-nav__link">
+    Platform bundled libraries
   </a>
   
 </li>
@@ -2241,6 +2269,26 @@ tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; 
 </code></pre></div>
 
 
+<h4 id="upload-verification">Upload verification<a class="headerlink" href="#upload-verification" title="Permanent link">&para;</a></h4>
+<p>Upload verification can be enabled via the Arduino IDE's <strong>File &gt; Preferences &gt; Verify code after upload</strong> or
+<code>arduino-cli upload --verify</code>. This uses a system similar to the <a href="#verbose-parameter">verbose parameter</a>.</p>
+<p><strong>tools.TOOL_ID.ACTION.params.verify</strong> defines the value of the <strong>ACTION.verify</strong> property when verification is enabled
+and <strong>tools.TOOL_ID.ACTION.params.noverify</strong> the value when verification is disabled.</p>
+<p>The <strong>{ACTION.verify}</strong> property is only defined for the <code>upload</code> and <code>program</code> actions of <code>upload.tool</code>.</p>
+<p>Prior to Arduino IDE 1.6.9, <strong>tools.TOOL_ID.ACTION.params.verify/noverify</strong> were not supported and <code>{upload.verify}</code> was
+set to <code>true</code>/<code>false</code> according to the verification preference setting, while <code>{program.verify}</code> was left undefined. For
+this reason, backwards compatibility with older IDE versions requires the addition of definitions for the
+<strong>upload.verify</strong> and <strong>program.verify</strong> properties to platform.txt:</p>
+<div class="codehilite"><pre><span></span><code>[.....]
+tools.avrdude.upload.verify=
+[.....]
+tools.avrdude.program.verify=
+[.....]
+</code></pre></div>
+
+
+<p>These definitions are overridden with the value defined by <strong>tools.TOOL_ID.ACTION.params.verify/noverify</strong> when a modern
+version of Arduino development software is in use.</p>
 <h4 id="1200-bps-bootloader-reset">1200 bps bootloader reset<a class="headerlink" href="#1200-bps-bootloader-reset" title="Permanent link">&para;</a></h4>
 <p>Some Arduino boards use a dedicated USB-to-serial chip, that takes care of restarting the main MCU (starting the
 bootloader) when the serial port is opened. However, boards that have a native USB connection (such as the Leonardo or
@@ -2364,9 +2412,9 @@ myboard.build.core=arduino:arduino
 "arduino:arduino" instead of "arduino:avr:arduino".</p>
 <p>The platform.txt settings are inherited from the referenced core platform, thus there is no need to provide a
 platform.txt unless there are some specific properties that need to be overridden.</p>
-<p>The libraries from the referenced platform are used, thus there is no need to provide those libraries. If libraries are
-provided the list of available libraries are the sum of the 2 libraries where the referencing platform has priority over
-the referenced platform.</p>
+<p>The <a href="#platform-bundled-libraries">bundled libraries</a> from the referenced platform are used, thus there is no need for
+the referencing platform to bundle those libraries. If libraries are provided the list of available libraries are the
+sum of the 2 libraries where the referencing platform has priority over the referenced platform.</p>
 <p>In the same way we can use variants and tools defined on another platform:</p>
 <div class="codehilite"><pre><span></span><code>[....]
 myboard.build.variant=arduino:standard
@@ -2397,6 +2445,15 @@ actual arduino-cli code, the "board platform" is called <code>targetPlatform</co
 <h2 id="boardslocaltxt">boards.local.txt<a class="headerlink" href="#boardslocaltxt" title="Permanent link">&para;</a></h2>
 <p>Introduced in Arduino IDE 1.6.6. This file can be used to override properties defined in boards.txt or define new
 properties without modifying boards.txt.</p>
+<h2 id="platform-bundled-libraries">Platform bundled libraries<a class="headerlink" href="#platform-bundled-libraries" title="Permanent link">&para;</a></h2>
+<p>Arduino libraries placed in the platform's <code>libraries</code> subfolder are accessible when a board of the platform, or of a
+platform that <a href="#referencing-another-core-variant-or-tool">references</a> the platform's core, is selected. When any other
+board is selected, the platform bundled libraries are inaccessible.</p>
+<p>These are often architecture-specific libraries (e.g., SPI, Wire) which must be implemented differently for each
+architecture.</p>
+<p>Platform bundled libraries may be used to provide specialized versions of libraries which use the
+<a href="../sketch-build-process/#dependency-resolution">dependency resolution system</a> to override built-in libraries.</p>
+<p>For more information, see the <a href="../library-specification/">Arduino library specification</a>.</p>
 <h2 id="keywordstxt">keywords.txt<a class="headerlink" href="#keywordstxt" title="Permanent link">&para;</a></h2>
 <p>As of Arduino IDE 1.6.6, per-platform keywords can be defined by adding a keywords.txt file to the platform's
 architecture folder. These keywords are only highlighted in the Arduino IDE when one of the boards of that platform are
