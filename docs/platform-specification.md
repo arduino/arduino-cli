@@ -768,6 +768,12 @@ There is no limit to the number of custom menus that can be defined.
 
 ## Referencing another core, variant or tool
 
+The Arduino platform referencing system allows using components of other platforms in cases where it would otherwise be
+necessary to duplicate those components. This feature allows us to reduce the minimum set of files needed to define a
+new "hardware" to just the boards.txt file.
+
+### Core reference
+
 Inside the boards.txt we can define a board that uses a core provided by another vendor/maintainer using the syntax
 **VENDOR_ID:CORE_ID**. For example, if we want to define a board that uses the "arduino" core from the "arduino" vendor
 we should write:
@@ -787,19 +793,26 @@ The [bundled libraries](#platform-bundled-libraries) from the referenced platfor
 the referencing platform to bundle those libraries. If libraries are provided the list of available libraries are the
 sum of the 2 libraries where the referencing platform has priority over the referenced platform.
 
-In the same way we can use variants and tools defined on another platform:
+### Variant reference
+
+In the same way we can use a variant defined on another platform using the syntax **VENDOR_ID:VARIANT_ID**:
 
     [....]
     myboard.build.variant=arduino:standard
-    myboard.upload.tool=arduino:avrdude
-    myboard.bootloader.tool=arduino:avrdude
     [....]
-
-Using this syntax allows us to reduce the minimum set of files needed to define a new "hardware" to just the boards.txt
-file.
 
 Note that referencing a variant in another platform does _not_ inherit any properties from that platform's platform.txt
 (like referencing a core does).
+
+### Tool references
+
+Tool recipes defined in the platform.txt of other platforms can also be referenced using the syntax
+**VENDOR_ID:TOOL_ID**:
+
+    [....]
+    myboard.upload.tool=arduino:avrdude
+    myboard.bootloader.tool=arduino:avrdude
+    [....]
 
 ### Platform Terminology
 
