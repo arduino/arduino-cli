@@ -1935,6 +1935,7 @@ case, also passing <code>-MMD</code> to gcc is problematic, as it will try to ge
 which will usually result in a permission error. Since platforms typically include <code>{compiler.cpp.flags}</code> here, which
 includes <code>-MMD</code>, the <code>-MMD</code> option is automatically filtered out of the <code>recipe.preproc.macros</code> recipe to prevent this
 error.</p>
+<p>If <strong>recipe.preproc.macros</strong> is not defined, it is automatically generated from <strong>recipe.cpp.o.pattern</strong>.</p>
 <p>Note that older Arduino IDE versions used the <strong>recipe.preproc.includes</strong> recipe to determine includes, which is
 undocumented here. Since Arduino IDE 1.6.7 (arduino-builder 1.2.0) this was changed and <strong>recipe.preproc.includes</strong> is
 no longer used.</p>
