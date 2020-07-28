@@ -783,9 +783,9 @@ Note that we don't need to specify any architecture since the same architecture 
 The platform.txt settings are inherited from the referenced core platform, thus there is no need to provide a
 platform.txt unless there are some specific properties that need to be overridden.
 
-The libraries from the referenced platform are used, thus there is no need to provide those libraries. If libraries are
-provided the list of available libraries are the sum of the 2 libraries where the referencing platform has priority over
-the referenced platform.
+The [bundled libraries](#platform-bundled-libraries) from the referenced platform are used, thus there is no need for
+the referencing platform to bundle those libraries. If libraries are provided the list of available libraries are the
+sum of the 2 libraries where the referencing platform has priority over the referenced platform.
 
 In the same way we can use variants and tools defined on another platform:
 
@@ -822,6 +822,20 @@ actual arduino-cli code, the "board platform" is called `targetPlatform`, the "c
 
 Introduced in Arduino IDE 1.6.6. This file can be used to override properties defined in boards.txt or define new
 properties without modifying boards.txt.
+
+## Platform bundled libraries
+
+Arduino libraries placed in the platform's `libraries` subfolder are accessible when a board of the platform, or of a
+platform that [references](#referencing-another-core-variant-or-tool) the platform's core, is selected. When any other
+board is selected, the platform bundled libraries are inaccessible.
+
+These are often architecture-specific libraries (e.g., SPI, Wire) which must be implemented differently for each
+architecture.
+
+Platform bundled libraries may be used to provide specialized versions of libraries which use the
+[dependency resolution system](sketch-build-process.md#dependency-resolution) to override built-in libraries.
+
+For more information, see the [Arduino library specification](library-specification.md).
 
 ## keywords.txt
 
