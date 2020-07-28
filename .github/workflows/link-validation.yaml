@@ -1,0 +1,25 @@
+name: Verifies documentation links
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  schedule:
+    - cron: "0 3 * * 1" # Every Monday at 03:00
+
+jobs:
+  verify-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Install Taskfile
+        uses: Arduino/actions/setup-taskfile@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify links
+        run: task docs:check-links
