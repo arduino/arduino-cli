@@ -97,6 +97,7 @@ The following automatically generated properties can be used globally in all con
   intent, `-DARDUINO_LIB_DISCOVERY_PHASE` was added to `recipe.preproc.macros` during library discovery in Arduino
   Builder 1.5.3/Arduino CLI 0.10.0. That flag was replaced by the more flexible `{build.library_discovery_phase}`
   property.
+- `{compiler.optimization_flags}`: see ["Sketch debugging configuration"](#sketch-debugging-configuration) for details
 - `{extra.time.utc}`: Unix time (seconds since 1970-01-01T00:00:00Z) according to the machine the build is running on
 - `{extra.time.local}`: Unix time with local timezone and DST offset
 - `{extra.time.zone}`: local timezone offset without the DST component
@@ -538,6 +539,7 @@ used for different purposes:
 - **program** a sketch to the target board using an external programmer
 - **erase** the target board's flash memory using an external programmer
 - burn a **bootloader** into the target board using an external programmer
+- **debug** a sketch
 
 Each action has its own recipe and its configuration is done through a set of properties having key starting with
 **tools** prefix followed by the tool ID and the action:
@@ -698,6 +700,32 @@ The file component of the port's path (e.g., `ttyACM0`) is available as the conf
 ### Burn Bootloader
 
 **TODO...**<br> The platform.txt associated with the selected board will be used.
+
+### Sketch debugging configuration
+
+Starting from Arduino CLI 0.9.0 / Arduino Pro IDE v0.0.5-alpha.preview, sketch debugging support is available for
+platforms.
+
+The debug action is triggered when the user clicks **Debug > Start Debugging** in the Arduino Pro IDE or runs the
+[`arduino-cli debug`](../commands/arduino-cli_debug/) command.
+
+The **debug.tool** property specifies the tool ID of the tool to be used for debugging. A **debug.tool** property may be
+defined for each board in boards.txt.
+
+The compiler optimization level that is appropriate for normal usage will often not provide a good experience while
+debugging. For this reason, it may be helpful to use different compiler flags when compiling a sketch for use with the
+debugger. The flags for use when compiling for debugging can be defined via the **compiler.optimization_flags.debug**
+property, and those for normal use via the **compiler.optimization_flags.release** property. The
+**compiler.optimization_flags** property will be defined according to one or the other depending on the Arduino Pro
+IDE's **Sketch > Optimize for Debugging** setting or [`arduino-cli compile`](../commands/arduino-cli_compile)'s
+`--optimize-for-debug` option.
+
+The debug recipe is defined via **tools.TOOL_NAME.debug.pattern**. It can be built concatenating the following
+automatically generated properties:
+
+- `{interpreter}`: the GDB command interpreter to use. It is configurable via
+  [`arduino-cli debug --interpreter`](../commands/arduino-cli_debug). This property was added in Arduino CLI 0.10.0 /
+  Arduino Pro IDE v0.0.7-alpha.preview.
 
 ## Custom board options
 
