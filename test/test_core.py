@@ -107,7 +107,7 @@ def test_core_install_esp32(run_command, data_dir):
     url = "https://dl.espressif.com/dl/package_esp32_index.json"
     assert run_command("core update-index --additional-urls={}".format(url))
     # install 3rd-party core
-    assert run_command("core install esp32:esp32 --additional-urls={}".format(url))
+    assert run_command("core install esp32:esp32@1.0.4 --additional-urls={}".format(url))
     # create a sketch and compile to double check the core was successfully installed
     sketch_path = os.path.join(data_dir, "test_core_install_esp32")
     assert run_command("sketch new {}".format(sketch_path))
