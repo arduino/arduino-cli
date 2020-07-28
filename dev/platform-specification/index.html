@@ -1737,6 +1737,17 @@ are <code>.linux</code>, <code>.windows</code> and <code>.macosx</code>.</p>
   meaningless version number.</li>
 <li><code>{ide_version}</code>: Compatibility alias for <code>{runtime.ide.version}</code></li>
 <li><code>{runtime.os}</code>: the running OS ("linux", "windows", "macosx")</li>
+<li><code>{software}</code>: set to "ARDUINO"</li>
+<li><code>{name}</code>: platform vendor name</li>
+<li><code>{_id}</code>: <a href="#boardstxt">board ID</a> of the board being compiled for</li>
+<li><code>{build.fqbn}</code>: the FQBN (fully qualified board name) of the board being compiled for. The FQBN follows the format:
+  <code>VENDOR:ARCHITECTURE:BOARD_ID[:MENU_ID=OPTION_ID[,MENU2_ID=OPTION_ID ...]]</code></li>
+<li><code>{build.source.path}</code>: Path to the sketch being compiled. If the sketch is in an unsaved state, it will the path of
+  its temporary folder.</li>
+<li><code>{extra.time.utc}</code>: Unix time (seconds since 1970-01-01T00:00:00Z) according to the machine the build is running on</li>
+<li><code>{extra.time.local}</code>: Unix time with local timezone and DST offset</li>
+<li><code>{extra.time.zone}</code>: local timezone offset without the DST component</li>
+<li><code>{extra.time.dst}</code>: local daylight savings time offset</li>
 </ul>
 <p>Compatibility note: Versions before Arduino IDE 1.6.0 only used one digit per version number component in
 <code>{runtime.ide.version}</code> (so 1.5.9 was <code>159</code>, not <code>10509</code>).</p>
