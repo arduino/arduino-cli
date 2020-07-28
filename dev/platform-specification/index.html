@@ -1260,6 +1260,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#core-reference" class="md-nav__link">
+    Core reference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variant-reference" class="md-nav__link">
+    Variant reference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-references" class="md-nav__link">
+    Tool references
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#platform-terminology" class="md-nav__link">
     Platform Terminology
   </a>
@@ -1633,6 +1654,27 @@
   
     <nav class="md-nav">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-reference" class="md-nav__link">
+    Core reference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variant-reference" class="md-nav__link">
+    Variant reference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-references" class="md-nav__link">
+    Tool references
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#platform-terminology" class="md-nav__link">
@@ -2398,6 +2440,10 @@ duemilanove.menu.cpu.atmega168.build.mcu               =&gt;   build.mcu
 
 <p>There is no limit to the number of custom menus that can be defined.</p>
 <h2 id="referencing-another-core-variant-or-tool">Referencing another core, variant or tool<a class="headerlink" href="#referencing-another-core-variant-or-tool" title="Permanent link">&para;</a></h2>
+<p>The Arduino platform referencing system allows using components of other platforms in cases where it would otherwise be
+necessary to duplicate those components. This feature allows us to reduce the minimum set of files needed to define a
+new "hardware" to just the boards.txt file.</p>
+<h3 id="core-reference">Core reference<a class="headerlink" href="#core-reference" title="Permanent link">&para;</a></h3>
 <p>Inside the boards.txt we can define a board that uses a core provided by another vendor/maintainer using the syntax
 <strong>VENDOR_ID:CORE_ID</strong>. For example, if we want to define a board that uses the "arduino" core from the "arduino" vendor
 we should write:</p>
@@ -2415,19 +2461,26 @@ platform.txt unless there are some specific properties that need to be overridde
 <p>The <a href="#platform-bundled-libraries">bundled libraries</a> from the referenced platform are used, thus there is no need for
 the referencing platform to bundle those libraries. If libraries are provided the list of available libraries are the
 sum of the 2 libraries where the referencing platform has priority over the referenced platform.</p>
-<p>In the same way we can use variants and tools defined on another platform:</p>
+<h3 id="variant-reference">Variant reference<a class="headerlink" href="#variant-reference" title="Permanent link">&para;</a></h3>
+<p>In the same way we can use a variant defined on another platform using the syntax <strong>VENDOR_ID:VARIANT_ID</strong>:</p>
 <div class="codehilite"><pre><span></span><code>[....]
 myboard.build.variant=arduino:standard
+[....]
+</code></pre></div>
+
+
+<p>Note that referencing a variant in another platform does <em>not</em> inherit any properties from that platform's platform.txt
+(like referencing a core does).</p>
+<h3 id="tool-references">Tool references<a class="headerlink" href="#tool-references" title="Permanent link">&para;</a></h3>
+<p>Tool recipes defined in the platform.txt of other platforms can also be referenced using the syntax
+<strong>VENDOR_ID:TOOL_ID</strong>:</p>
+<div class="codehilite"><pre><span></span><code>[....]
 myboard.upload.tool=arduino:avrdude
 myboard.bootloader.tool=arduino:avrdude
 [....]
 </code></pre></div>
 
 
-<p>Using this syntax allows us to reduce the minimum set of files needed to define a new "hardware" to just the boards.txt
-file.</p>
-<p>Note that referencing a variant in another platform does <em>not</em> inherit any properties from that platform's platform.txt
-(like referencing a core does).</p>
 <h3 id="platform-terminology">Platform Terminology<a class="headerlink" href="#platform-terminology" title="Permanent link">&para;</a></h3>
 <p>Because boards can reference cores, variants and tools in different platforms, this means that a single build or upload
 can use data from up to four different platforms. To keep this clear, the following terminology is used:</p>
