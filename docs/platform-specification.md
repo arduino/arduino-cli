@@ -91,6 +91,12 @@ The following automatically generated properties can be used globally in all con
   `VENDOR:ARCHITECTURE:BOARD_ID[:MENU_ID=OPTION_ID[,MENU2_ID=OPTION_ID ...]]`
 - `{build.source.path}`: Path to the sketch being compiled. If the sketch is in an unsaved state, it will the path of
   its temporary folder.
+- `{build.library_discovery_phase}`: set to 1 during library discovery and to 0 during normal build. A macro defined
+  with this property can be used to disable the inclusion of heavyweight headers during discovery to reduce compilation
+  time. This property was added in Arduino IDE 1.8.14/Arduino Builder 1.6.0/Arduino CLI 0.12.0. Note: with the same
+  intent, `-DARDUINO_LIB_DISCOVERY_PHASE` was added to `recipe.preproc.macros` during library discovery in Arduino
+  Builder 1.5.3/Arduino CLI 0.10.0. That flag was replaced by the more flexible `{build.library_discovery_phase}`
+  property.
 - `{extra.time.utc}`: Unix time (seconds since 1970-01-01T00:00:00Z) according to the machine the build is running on
 - `{extra.time.local}`: Unix time with local timezone and DST offset
 - `{extra.time.zone}`: local timezone offset without the DST component
