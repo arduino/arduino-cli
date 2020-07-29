@@ -95,10 +95,10 @@ tracker] if you’ve got a use case that doesn’t fit one of the three pillars.
 [configuration documentation]: configuration.md
 [json]: https://www.json.org
 [installation script]: installation.md#use-the-install-script
-[command reference]: ../commands/arduino-cli
+[command reference]: commands/arduino-cli.md
 [grpc]: https://grpc.io/
 [rpc]: https://en.wikipedia.org/wiki/Remote_procedure_call
-[daemon mode]: ../commands/arduino-cli_daemon
+[daemon mode]: commands/arduino-cli_daemon.md
 [grpc interface reference]: ../rpc/commands
 [grpc supported languages]: https://grpc.io/docs/languages/
 [arduino cli repository]: https://github.com/arduino/arduino-cli

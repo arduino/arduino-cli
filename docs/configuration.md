@@ -126,12 +126,12 @@ additional_urls = [ "https://downloads.arduino.cc/packages/package_staging_index
 
 [grpc]: https://grpc.io
 [sketchbook directory]: sketch-specification.md#sketchbook
-[arduino-cli config dump]: ../commands/arduino-cli_config_dump
-[arduino cli command reference]: ../commands/arduino-cli
-[arduino-cli global flags]: ../commands/arduino-cli_config/#options-inherited-from-parent-commands
+[arduino-cli config dump]: commands/arduino-cli_config_dump.md
+[arduino cli command reference]: commands/arduino-cli.md
+[arduino-cli global flags]: commands/arduino-cli_config.md#options-inherited-from-parent-commands
 [export command]: https://ss64.com/bash/export.html
 [set command]: https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/set_1
-[arduino-cli config init]: ../commands/arduino-cli_config_init
+[arduino-cli config init]: commands/arduino-cli_config_init.md
 [json]: https://www.json.org
 [toml]: https://github.com/toml-lang/toml
 [yaml]: https://en.wikipedia.org/wiki/YAML
