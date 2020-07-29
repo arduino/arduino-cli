@@ -1260,6 +1260,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#core-reference" class="md-nav__link">
+    Core reference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variant-reference" class="md-nav__link">
+    Variant reference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-references" class="md-nav__link">
+    Tool references
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#platform-terminology" class="md-nav__link">
     Platform Terminology
   </a>
@@ -1274,6 +1295,13 @@
         <li class="md-nav__item">
   <a href="#boardslocaltxt" class="md-nav__link">
     boards.local.txt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platform-bundled-libraries" class="md-nav__link">
+    Platform bundled libraries
   </a>
   
 </li>
@@ -1628,6 +1656,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#core-reference" class="md-nav__link">
+    Core reference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variant-reference" class="md-nav__link">
+    Variant reference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-references" class="md-nav__link">
+    Tool references
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#platform-terminology" class="md-nav__link">
     Platform Terminology
   </a>
@@ -1642,6 +1691,13 @@
         <li class="md-nav__item">
   <a href="#boardslocaltxt" class="md-nav__link">
     boards.local.txt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platform-bundled-libraries" class="md-nav__link">
+    Platform bundled libraries
   </a>
   
 </li>
@@ -1758,6 +1814,12 @@ are <code>.linux</code>, <code>.windows</code> and <code>.macosx</code>.</p>
   <code>VENDOR:ARCHITECTURE:BOARD_ID[:MENU_ID=OPTION_ID[,MENU2_ID=OPTION_ID ...]]</code></li>
 <li><code>{build.source.path}</code>: Path to the sketch being compiled. If the sketch is in an unsaved state, it will the path of
   its temporary folder.</li>
+<li><code>{build.library_discovery_phase}</code>: set to 1 during library discovery and to 0 during normal build. A macro defined
+  with this property can be used to disable the inclusion of heavyweight headers during discovery to reduce compilation
+  time. This property was added in Arduino IDE 1.8.14/Arduino Builder 1.6.0/Arduino CLI 0.12.0. Note: with the same
+  intent, <code>-DARDUINO_LIB_DISCOVERY_PHASE</code> was added to <code>recipe.preproc.macros</code> during library discovery in Arduino
+  Builder 1.5.3/Arduino CLI 0.10.0. That flag was replaced by the more flexible <code>{build.library_discovery_phase}</code>
+  property.</li>
 <li><code>{extra.time.utc}</code>: Unix time (seconds since 1970-01-01T00:00:00Z) according to the machine the build is running on</li>
 <li><code>{extra.time.local}</code>: Unix time with local timezone and DST offset</li>
 <li><code>{extra.time.zone}</code>: local timezone offset without the DST component</li>
@@ -2384,6 +2446,10 @@ duemilanove.menu.cpu.atmega168.build.mcu               =&gt;   build.mcu
 
 <p>There is no limit to the number of custom menus that can be defined.</p>
 <h2 id="referencing-another-core-variant-or-tool">Referencing another core, variant or tool<a class="headerlink" href="#referencing-another-core-variant-or-tool" title="Permanent link">&para;</a></h2>
+<p>The Arduino platform referencing system allows using components of other platforms in cases where it would otherwise be
+necessary to duplicate those components. This feature allows us to reduce the minimum set of files needed to define a
+new "hardware" to just the boards.txt file.</p>
+<h3 id="core-reference">Core reference<a class="headerlink" href="#core-reference" title="Permanent link">&para;</a></h3>
 <p>Inside the boards.txt we can define a board that uses a core provided by another vendor/maintainer using the syntax
 <strong>VENDOR_ID:CORE_ID</strong>. For example, if we want to define a board that uses the "arduino" core from the "arduino" vendor
 we should write:</p>
@@ -2398,22 +2464,29 @@ myboard.build.core=arduino:arduino
 "arduino:arduino" instead of "arduino:avr:arduino".</p>
 <p>The platform.txt settings are inherited from the referenced core platform, thus there is no need to provide a
 platform.txt unless there are some specific properties that need to be overridden.</p>
-<p>The libraries from the referenced platform are used, thus there is no need to provide those libraries. If libraries are
-provided the list of available libraries are the sum of the 2 libraries where the referencing platform has priority over
-the referenced platform.</p>
-<p>In the same way we can use variants and tools defined on another platform:</p>
+<p>The <a href="#platform-bundled-libraries">bundled libraries</a> from the referenced platform are used, thus there is no need for
+the referencing platform to bundle those libraries. If libraries are provided the list of available libraries are the
+sum of the 2 libraries where the referencing platform has priority over the referenced platform.</p>
+<h3 id="variant-reference">Variant reference<a class="headerlink" href="#variant-reference" title="Permanent link">&para;</a></h3>
+<p>In the same way we can use a variant defined on another platform using the syntax <strong>VENDOR_ID:VARIANT_ID</strong>:</p>
 <div class="codehilite"><pre><span></span><code>[....]
 myboard.build.variant=arduino:standard
+[....]
+</code></pre></div>
+
+
+<p>Note that referencing a variant in another platform does <em>not</em> inherit any properties from that platform's platform.txt
+(like referencing a core does).</p>
+<h3 id="tool-references">Tool references<a class="headerlink" href="#tool-references" title="Permanent link">&para;</a></h3>
+<p>Tool recipes defined in the platform.txt of other platforms can also be referenced using the syntax
+<strong>VENDOR_ID:TOOL_ID</strong>:</p>
+<div class="codehilite"><pre><span></span><code>[....]
 myboard.upload.tool=arduino:avrdude
 myboard.bootloader.tool=arduino:avrdude
 [....]
 </code></pre></div>
 
 
-<p>Using this syntax allows us to reduce the minimum set of files needed to define a new "hardware" to just the boards.txt
-file.</p>
-<p>Note that referencing a variant in another platform does <em>not</em> inherit any properties from that platform's platform.txt
-(like referencing a core does).</p>
 <h3 id="platform-terminology">Platform Terminology<a class="headerlink" href="#platform-terminology" title="Permanent link">&para;</a></h3>
 <p>Because boards can reference cores, variants and tools in different platforms, this means that a single build or upload
 can use data from up to four different platforms. To keep this clear, the following terminology is used:</p>
@@ -2431,6 +2504,15 @@ actual arduino-cli code, the "board platform" is called <code>targetPlatform</co
 <h2 id="boardslocaltxt">boards.local.txt<a class="headerlink" href="#boardslocaltxt" title="Permanent link">&para;</a></h2>
 <p>Introduced in Arduino IDE 1.6.6. This file can be used to override properties defined in boards.txt or define new
 properties without modifying boards.txt.</p>
+<h2 id="platform-bundled-libraries">Platform bundled libraries<a class="headerlink" href="#platform-bundled-libraries" title="Permanent link">&para;</a></h2>
+<p>Arduino libraries placed in the platform's <code>libraries</code> subfolder are accessible when a board of the platform, or of a
+platform that <a href="#referencing-another-core-variant-or-tool">references</a> the platform's core, is selected. When any other
+board is selected, the platform bundled libraries are inaccessible.</p>
+<p>These are often architecture-specific libraries (e.g., SPI, Wire) which must be implemented differently for each
+architecture.</p>
+<p>Platform bundled libraries may be used to provide specialized versions of libraries which use the
+<a href="../sketch-build-process/#dependency-resolution">dependency resolution system</a> to override built-in libraries.</p>
+<p>For more information, see the <a href="../library-specification/">Arduino library specification</a>.</p>
 <h2 id="keywordstxt">keywords.txt<a class="headerlink" href="#keywordstxt" title="Permanent link">&para;</a></h2>
 <p>As of Arduino IDE 1.6.6, per-platform keywords can be defined by adding a keywords.txt file to the platform's
 architecture folder. These keywords are only highlighted in the Arduino IDE when one of the boards of that platform are
