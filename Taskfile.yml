@@ -11,6 +11,7 @@ tasks:
       # we invoke `arduino-cli` like this instead of `./arduino-cli` to remove
       # the `./` chars from the examples
       - PATH=. arduino-cli ../docs/commands
+      - task: docs:format
 
   docs:gen:protobuf:
     desc: Generate markdown contents for protobuffers
@@ -19,6 +20,7 @@ tasks:
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,monitor.md --proto_path=rpc ./rpc/monitor/*.proto'
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,settings.md --proto_path=rpc ./rpc/settings/*.proto'
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,debug.md --proto_path=rpc ./rpc/debug/*.proto'
+      - task: docs:format
 
   docs:gen:
     desc: Generate documentation files
