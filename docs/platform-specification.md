@@ -116,7 +116,7 @@ The following meta-data must be defined:
     version=1.5.3
 
 The **name** will be shown as the Arduino IDE's Board menu section title or the Name field of
-[`arduino-cli core list`](../commands/arduino-cli_core_list)'s output for the platform.<br> The **version** is currently
+[`arduino-cli core list`](commands/arduino-cli_core_list.md)'s output for the platform.<br> The **version** is currently
 unused, it is reserved for future use (probably together with the Boards Manager to handle dependencies on cores).
 
 ### Build process
@@ -592,7 +592,7 @@ If the user didn't enable verbose mode, then **{upload.params.quiet}** is used i
 ### Sketch upload configuration
 
 The Upload action is triggered when the user clicks on the "Upload" button on the IDE toolbar or uses
-[`arduino-cli upload`](../commands/arduino-cli_upload). Arduino uses the term "upload" for the process of transferring a
+[`arduino-cli upload`](commands/arduino-cli_upload.md). Arduino uses the term "upload" for the process of transferring a
 program to the Arduino board. The **upload.tool** property determines the tool to be used for upload. A specific
 **upload.tool** property should be defined for every board in boards.txt:
 
@@ -685,7 +685,7 @@ support uploading via programmer.
 ### Serial port
 
 The full path (e.g., `/dev/ttyACM0`) of the port selected via the IDE or
-[`arduino-cli upload`](../commands/arduino-cli_upload)'s `--port` option is available as a configuration property
+[`arduino-cli upload`](commands/arduino-cli_upload.md)'s `--port` option is available as a configuration property
 **{serial.port}**.
 
 The file component of the port's path (e.g., `ttyACM0`) is available as the configuration property

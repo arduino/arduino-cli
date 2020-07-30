@@ -218,8 +218,8 @@ If you don't see any error, hit http://127.0.0.1:8000 with your browser to navig
 ### Docs publishing
 
 The present git repository has a special branch called `gh-pages` that contains the generated HTML code for the docs
-website; every time a change is pushed to this special branch, GitHub automatically triggers a [deployment][8] to pull
-the change and publish a new version of the website. Do not open Pull Requests to push changes to the `gh-pages` branch,
+website; every time a change is pushed to this special branch, GitHub automatically triggers a deployment to pull the
+change and publish a new version of the website. Do not open Pull Requests to push changes to the `gh-pages` branch,
 that will be done exclusively from the CI.
 
 ### Docs versioning
@@ -342,7 +342,6 @@ If your PR doesn't need to be included in the changelog, please start the PR tit
 [5]: https://github.com/ofek/hatch
 [6]: https://github.com/protocolbuffers/protobuf/releases
 [7]: https://pages.github.com/
-[8]: https://github.com/arduino/arduino-cli/deployments?environment=github-pages#activity-log
 [9]: https://www.mkdocs.org/
 [10]: https://github.com/jimporter/mike
 [11]: https://github.com/arduino/arduino-cli/blob/master/.github/workflows/docs.yaml

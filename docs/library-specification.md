@@ -9,7 +9,7 @@ This new library format is intended to be used in tandem with **Library Manager*
 The Library Manager allows users to automatically download and install libraries needed in their projects, with an easy
 to use graphic interface in the [Arduino IDE](https://www.arduino.cc/en/guide/libraries#toc3)/Pro IDE and
 [Arduino Web Editor](https://create.arduino.cc/projecthub/Arduino_Genuino/getting-started-with-arduino-web-editor-on-various-platforms-4b3e4a#toc-libraries-and-the-arduino-web-editor-11)
-as well as [`arduino-cli lib`](../commands/arduino-cli_lib).
+as well as [`arduino-cli lib`](commands/arduino-cli_lib.md).
 
 More information about how Library Manager works is available
 [here](https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ).
@@ -22,7 +22,7 @@ code to specific architectures.
 ## See also
 
 - [Arduino library style guide](http://arduino.cc/en/Reference/APIStyleGuide)
-- [Library dependency resolution process documentation](../sketch-build-process/#dependency-resolution)
+- [Library dependency resolution process documentation](sketch-build-process.md#dependency-resolution)
 
 ## 1.5 library format (rev. 2.2)
 
@@ -70,7 +70,7 @@ otherwise below, **all fields are required**. The available fields are:
 - **depends** - **(available from Arduino IDE 1.8.10/Arduino CLI 0.7.0)** (optional) a comma-separated list of
   dependencies (libraries that are needed to build the current library). The Arduino IDE's Library Manager will offer to
   install the dependencies during installation of the library.
-  [`arduino-cli lib install`](../commands/arduino-cli_lib_install) will automatically install the dependencies. Since
+  [`arduino-cli lib install`](commands/arduino-cli_lib_install.md) will automatically install the dependencies. Since
   spaces are allowed in the `name` of a library, but not commas, you can refer to libraries containing spaces in the
   name without ambiguity for example:<br> `depends=Very long library name, Another library with long-name`
 - **dot_a_linkage** - **(available from Arduino IDE 1.6.0 / arduino-builder 1.0.0-beta13)** (optional) when set to

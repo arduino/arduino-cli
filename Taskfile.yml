@@ -54,6 +54,18 @@ tasks:
     cmds:
       - npx {{ .PRETTIER }} --check "**/*.md"
 
+  docs:check-links:
+    desc: Verifies there are no dead links in documentation
+    cmds:
+      - |
+        npx -p markdown-link-check -c '
+        STATUS=0
+        for file in $(find -name "*.md"); do
+          markdown-link-check -c markdown-link-check-config.json -q "$file"
+          STATUS=$(( $STATUS + $? ))
+        done
+        exit $STATUS'
+
   docs:format:
     desc: Automatically formats documentation
     cmds:
