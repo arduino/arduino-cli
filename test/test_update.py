@@ -38,7 +38,7 @@ def test_update_showing_outdated(run_command):
     assert run_command("lib install ArduinoJson")
 
     # Verifies outdated cores and libraries are printed after updating indexes
-    result = run_command("update --outdated")
+    result = run_command("update --show-outdated")
     assert result.ok
     lines = [l.strip() for l in result.stdout.splitlines()]
 

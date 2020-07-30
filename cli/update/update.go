@@ -42,7 +42,7 @@ func NewCommand() *cobra.Command {
 		Args:    cobra.NoArgs,
 		Run:     runUpdateCommand,
 	}
-	updateCommand.Flags().BoolVar(&updateFlags.showOutdated, "outdated", false, "Show outdated cores and libraries after index update")
+	updateCommand.Flags().BoolVar(&updateFlags.showOutdated, "show-outdated", false, "Show outdated cores and libraries after index update")
 	return updateCommand
 }
 
