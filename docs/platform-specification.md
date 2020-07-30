@@ -707,7 +707,7 @@ Starting from Arduino CLI 0.9.0 / Arduino Pro IDE v0.0.5-alpha.preview, sketch d
 platforms.
 
 The debug action is triggered when the user clicks **Debug > Start Debugging** in the Arduino Pro IDE or runs the
-[`arduino-cli debug`](../commands/arduino-cli_debug/) command.
+[`arduino-cli debug`](commands/arduino-cli_debug.md) command.
 
 The **debug.tool** property specifies the tool ID of the tool to be used for debugging. A **debug.tool** property may be
 defined for each board in boards.txt.
@@ -717,14 +717,14 @@ debugging. For this reason, it may be helpful to use different compiler flags wh
 debugger. The flags for use when compiling for debugging can be defined via the **compiler.optimization_flags.debug**
 property, and those for normal use via the **compiler.optimization_flags.release** property. The
 **compiler.optimization_flags** property will be defined according to one or the other depending on the Arduino Pro
-IDE's **Sketch > Optimize for Debugging** setting or [`arduino-cli compile`](../commands/arduino-cli_compile)'s
+IDE's **Sketch > Optimize for Debugging** setting or [`arduino-cli compile`](commands/arduino-cli_compile.md)'s
 `--optimize-for-debug` option.
 
 The debug recipe is defined via **tools.TOOL_NAME.debug.pattern**. It can be built concatenating the following
 automatically generated properties:
 
 - `{interpreter}`: the GDB command interpreter to use. It is configurable via
-  [`arduino-cli debug --interpreter`](../commands/arduino-cli_debug). This property was added in Arduino CLI 0.10.0 /
+  [`arduino-cli debug --interpreter`](commands/arduino-cli_debug.md). This property was added in Arduino CLI 0.10.0 /
   Arduino Pro IDE v0.0.7-alpha.preview.
 
 ## Custom board options
