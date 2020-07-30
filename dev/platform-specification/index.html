@@ -1837,7 +1837,7 @@ version=1.5.3
 
 
 <p>The <strong>name</strong> will be shown as the Arduino IDE's Board menu section title or the Name field of
-<a href="../commands/arduino-cli_core_list"><code>arduino-cli core list</code></a>'s output for the platform.<br> The <strong>version</strong> is currently
+<a href="../commands/arduino-cli_core_list/"><code>arduino-cli core list</code></a>'s output for the platform.<br> The <strong>version</strong> is currently
 unused, it is reserved for future use (probably together with the Boards Manager to handle dependencies on cores).</p>
 <h3 id="build-process">Build process<a class="headerlink" href="#build-process" title="Permanent link">&para;</a></h3>
 <p>The platform.txt file is used to configure the build process. This is done through a list of <strong>recipes</strong>. Each recipe is
@@ -2280,7 +2280,7 @@ tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; 
 
 <h3 id="sketch-upload-configuration">Sketch upload configuration<a class="headerlink" href="#sketch-upload-configuration" title="Permanent link">&para;</a></h3>
 <p>The Upload action is triggered when the user clicks on the "Upload" button on the IDE toolbar or uses
-<a href="../commands/arduino-cli_upload"><code>arduino-cli upload</code></a>. Arduino uses the term "upload" for the process of transferring a
+<a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a>. Arduino uses the term "upload" for the process of transferring a
 program to the Arduino board. The <strong>upload.tool</strong> property determines the tool to be used for upload. A specific
 <strong>upload.tool</strong> property should be defined for every board in boards.txt:</p>
 <div class="codehilite"><pre><span></span><code>[......]
@@ -2366,7 +2366,7 @@ behavior as <a href="#upload-using-an-external-programmer">"Upload Using Program
 support uploading via programmer.</p>
 <h3 id="serial-port">Serial port<a class="headerlink" href="#serial-port" title="Permanent link">&para;</a></h3>
 <p>The full path (e.g., <code>/dev/ttyACM0</code>) of the port selected via the IDE or
-<a href="../commands/arduino-cli_upload"><code>arduino-cli upload</code></a>'s <code>--port</code> option is available as a configuration property
+<a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a>'s <code>--port</code> option is available as a configuration property
 <strong>{serial.port}</strong>.</p>
 <p>The file component of the port's path (e.g., <code>ttyACM0</code>) is available as the configuration property
 <strong>{serial.port.file}</strong>.</p>

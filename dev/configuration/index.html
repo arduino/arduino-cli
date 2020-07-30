@@ -1260,9 +1260,9 @@
 <p>If a configuration option is configured by multiple methods, the value set by the method highest on the above list
 overwrites the ones below it.</p>
 <p>If a configuration option is not set, Arduino CLI uses a default value.</p>
-<p><a href="../commands/arduino-cli_config_dump"><code>arduino-cli config dump</code></a> displays the current configuration values.</p>
+<p><a href="../commands/arduino-cli_config_dump/"><code>arduino-cli config dump</code></a> displays the current configuration values.</p>
 <h3 id="command-line-flags">Command line flags<a class="headerlink" href="#command-line-flags" title="Permanent link">&para;</a></h3>
-<p>Arduino CLI's command line flags are documented in the command line help and the <a href="../commands/arduino-cli">Arduino CLI command reference</a>.</p>
+<p>Arduino CLI's command line flags are documented in the command line help and the <a href="../commands/arduino-cli/">Arduino CLI command reference</a>.</p>
 <h4 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h4>
 <p>Setting an additional Board Manager URL using the <a href="../commands/arduino-cli_config/#options-inherited-from-parent-commands"><code>--additional-urls</code></a> command line flag:</p>
 <div class="highlight"><pre><span></span><code>$ arduino-cli core update-index --additional-urls https://downloads.arduino.cc/packages/package_staging_index.json
@@ -1280,7 +1280,7 @@ can use the <a href="https://docs.microsoft.com/en-us/windows-server/administrat
 </code></pre></div>
 
 <h3 id="configuration-file">Configuration file<a class="headerlink" href="#configuration-file" title="Permanent link">&para;</a></h3>
-<p><a href="../commands/arduino-cli_config_init"><code>arduino-cli config init</code></a> creates or updates a configuration file with the current
+<p><a href="../commands/arduino-cli_config_init/"><code>arduino-cli config init</code></a> creates or updates a configuration file with the current
 configuration settings.</p>
 <p>This allows saving the options set by command line flags or environment variables. For example:</p>
 <div class="highlight"><pre><span></span><code>arduino-cli config init --additional-urls https://downloads.arduino.cc/packages/package_staging_index.json
@@ -1302,7 +1302,7 @@ configuration settings.</p>
 <h4 id="locations">Locations<a class="headerlink" href="#locations" title="Permanent link">&para;</a></h4>
 <p>Configuration files in the following locations are recognized by Arduino CLI:</p>
 <ol>
-<li>Location specified by the <a href="../commands/arduino-cli"><code>--config-file</code></a> command line flag</li>
+<li>Location specified by the <a href="../commands/arduino-cli/"><code>--config-file</code></a> command line flag</li>
 <li>Current working directory</li>
 <li>Any parent directory of the current working directory (more immediate parents having higher precedence)</li>
 <li>Arduino CLI data directory (as configured by <code>directories.data</code>)</li>
