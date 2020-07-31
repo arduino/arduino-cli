@@ -1239,6 +1239,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#sketch-debugging-configuration" class="md-nav__link">
+    Sketch debugging configuration
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1635,6 +1642,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#sketch-debugging-configuration" class="md-nav__link">
+    Sketch debugging configuration
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1820,6 +1834,7 @@ are <code>.linux</code>, <code>.windows</code> and <code>.macosx</code>.</p>
   intent, <code>-DARDUINO_LIB_DISCOVERY_PHASE</code> was added to <code>recipe.preproc.macros</code> during library discovery in Arduino
   Builder 1.5.3/Arduino CLI 0.10.0. That flag was replaced by the more flexible <code>{build.library_discovery_phase}</code>
   property.</li>
+<li><code>{compiler.optimization_flags}</code>: see <a href="#sketch-debugging-configuration">"Sketch debugging configuration"</a> for details</li>
 <li><code>{extra.time.utc}</code>: Unix time (seconds since 1970-01-01T00:00:00Z) according to the machine the build is running on</li>
 <li><code>{extra.time.local}</code>: Unix time with local timezone and DST offset</li>
 <li><code>{extra.time.zone}</code>: local timezone offset without the DST component</li>
@@ -2225,6 +2240,7 @@ used for different purposes:</p>
 <li><strong>program</strong> a sketch to the target board using an external programmer</li>
 <li><strong>erase</strong> the target board's flash memory using an external programmer</li>
 <li>burn a <strong>bootloader</strong> into the target board using an external programmer</li>
+<li><strong>debug</strong> a sketch</li>
 </ul>
 <p>Each action has its own recipe and its configuration is done through a set of properties having key starting with
 <strong>tools</strong> prefix followed by the tool ID and the action:</p>
@@ -2374,6 +2390,27 @@ support uploading via programmer.</p>
 <p><strong>TODO...</strong><br> The platform.txt associated with the selected programmer will be used.</p>
 <h3 id="burn-bootloader">Burn Bootloader<a class="headerlink" href="#burn-bootloader" title="Permanent link">&para;</a></h3>
 <p><strong>TODO...</strong><br> The platform.txt associated with the selected board will be used.</p>
+<h3 id="sketch-debugging-configuration">Sketch debugging configuration<a class="headerlink" href="#sketch-debugging-configuration" title="Permanent link">&para;</a></h3>
+<p>Starting from Arduino CLI 0.9.0 / Arduino Pro IDE v0.0.5-alpha.preview, sketch debugging support is available for
+platforms.</p>
+<p>The debug action is triggered when the user clicks <strong>Debug &gt; Start Debugging</strong> in the Arduino Pro IDE or runs the
+<a href="../commands/arduino-cli_debug/"><code>arduino-cli debug</code></a> command.</p>
+<p>The <strong>debug.tool</strong> property specifies the tool ID of the tool to be used for debugging. A <strong>debug.tool</strong> property may be
+defined for each board in boards.txt.</p>
+<p>The compiler optimization level that is appropriate for normal usage will often not provide a good experience while
+debugging. For this reason, it may be helpful to use different compiler flags when compiling a sketch for use with the
+debugger. The flags for use when compiling for debugging can be defined via the <strong>compiler.optimization_flags.debug</strong>
+property, and those for normal use via the <strong>compiler.optimization_flags.release</strong> property. The
+<strong>compiler.optimization_flags</strong> property will be defined according to one or the other depending on the Arduino Pro
+IDE's <strong>Sketch &gt; Optimize for Debugging</strong> setting or <a href="../commands/arduino-cli_compile/"><code>arduino-cli compile</code></a>'s
+<code>--optimize-for-debug</code> option.</p>
+<p>The debug recipe is defined via <strong>tools.TOOL_NAME.debug.pattern</strong>. It can be built concatenating the following
+automatically generated properties:</p>
+<ul>
+<li><code>{interpreter}</code>: the GDB command interpreter to use. It is configurable via
+  <a href="../commands/arduino-cli_debug/"><code>arduino-cli debug --interpreter</code></a>. This property was added in Arduino CLI 0.10.0 /
+  Arduino Pro IDE v0.0.7-alpha.preview.</li>
+</ul>
 <h2 id="custom-board-options">Custom board options<a class="headerlink" href="#custom-board-options" title="Permanent link">&para;</a></h2>
 <p>It can sometimes be useful to provide user selectable configuration options for a specific board. For example, a board
 could be provided in two or more variants with different CPUs, or may have different crystal speed based on the board
