@@ -1152,23 +1152,32 @@
 <p><a name="top"></a></p>
 <h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="#monitor/monitor.proto">monitor/monitor.proto</a>
-    - <a href="#cc.arduino.cli.monitor.MonitorConfig">MonitorConfig</a>
-    - <a href="#cc.arduino.cli.monitor.StreamingOpenReq">StreamingOpenReq</a>
-    - <a href="#cc.arduino.cli.monitor.StreamingOpenResp">StreamingOpenResp</a><p>- <a href="#cc.arduino.cli.monitor.MonitorConfig.TargetType">MonitorConfig.TargetType</a></p>
-<p>- <a href="#cc.arduino.cli.monitor.Monitor">Monitor</a></p>
+<li>
+<p><a href="#monitor/monitor.proto">monitor/monitor.proto</a></p>
+<ul>
+<li><a href="#cc.arduino.cli.monitor.MonitorConfig">MonitorConfig</a></li>
+<li><a href="#cc.arduino.cli.monitor.StreamingOpenReq">StreamingOpenReq</a></li>
+<li><a href="#cc.arduino.cli.monitor.StreamingOpenResp">StreamingOpenResp</a></li>
+</ul>
+<ul>
+<li><a href="#cc.arduino.cli.monitor.MonitorConfig.TargetType">MonitorConfig.TargetType</a></li>
+</ul>
+<ul>
+<li><a href="#cc.arduino.cli.monitor.Monitor">Monitor</a></li>
+</ul>
 </li>
 </ul>
 <ul>
 <li><a href="#scalar-value-types">Scalar Value Types</a></li>
 </ul>
-<p><a name="monitor/monitor.proto"></a>
-<p align="right"><a href="#top">Top</a></p></p>
+<p><a name="monitor/monitor.proto"></a></p>
+<p align="right"><a href="#top">Top</a></p>
+
 <h2 id="monitormonitorproto">monitor/monitor.proto<a class="headerlink" href="#monitormonitorproto" title="Permanent link">&para;</a></h2>
 <p><a name="cc.arduino.cli.monitor.MonitorConfig"></a></p>
 <h3 id="monitorconfig">MonitorConfig<a class="headerlink" href="#monitorconfig" title="Permanent link">&para;</a></h3>
-<p>Tells the monitor which target to open and provides additional parameters
-that might be needed to configure the target or the monitor itself.</p>
+<p>Tells the monitor which target to open and provides additional parameters that might be needed to configure the target
+or the monitor itself.</p>
 <table>
 <thead>
 <tr>
@@ -1201,11 +1210,9 @@ that might be needed to configure the target or the monitor itself.</p>
 </table>
 <p><a name="cc.arduino.cli.monitor.StreamingOpenReq"></a></p>
 <h3 id="streamingopenreq">StreamingOpenReq<a class="headerlink" href="#streamingopenreq" title="Permanent link">&para;</a></h3>
-<p>The top-level message sent by the client for the <code>StreamingOpen</code> method.
-Multiple <code>StreamingOpenReq</code> messages can be sent but the first message
-must contain a <code>monitor_config</code> message to initialize the monitor target.
-All subsequent messages must contain bytes to be sent to the target
-and must not contain a <code>monitor_config</code> message.</p>
+<p>The top-level message sent by the client for the <code>StreamingOpen</code> method. Multiple <code>StreamingOpenReq</code> messages can be
+sent but the first message must contain a <code>monitor_config</code> message to initialize the monitor target. All subsequent
+messages must contain bytes to be sent to the target and must not contain a <code>monitor_config</code> message.</p>
 <table>
 <thead>
 <tr>
