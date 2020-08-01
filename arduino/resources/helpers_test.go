@@ -84,6 +84,29 @@ func TestResourcesSanityChecks(t *testing.T) {
 	}
 }
 
+func TestResourceErrorHandling(t *testing.T) {
+	tmp, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	defer tmp.RemoveAll()
+
+	r := &DownloadResource{
+		ArchiveFileName: "..",
+		CachePath:       "cache",
+	}
+
+	c, err := r.IsCached(tmp)
+	require.Error(t, err)
+	require.False(t, c)
+
+	d, err := r.Download(tmp, nil)
+	require.Error(t, err)
+	require.Nil(t, d)
+
+	e, err := r.TestLocalArchiveIntegrity(tmp)
+	require.Error(t, err)
+	require.False(t, e)
+}
+
 func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 	goldUserAgentValue := fmt.Sprintf("arduino-cli/0.0.0-test.preview (amd64; linux; go1.12.4) Commit:deadbeef/Build:2019-06-12 11:11:11.111")
 	goldUserAgentString := "User-Agent: " + goldUserAgentValue

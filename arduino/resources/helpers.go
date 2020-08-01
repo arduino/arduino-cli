@@ -52,6 +52,11 @@ func (r *DownloadResource) IsCached(downloadDir *paths.Path) (bool, error) {
 
 // Download a DownloadResource.
 func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config) (*downloader.Downloader, error) {
+	path, err := r.ArchivePath(downloadDir)
+	if err != nil {
+		return nil, fmt.Errorf("getting archive path: %s", err)
+	}
+
 	cached, err := r.TestLocalArchiveIntegrity(downloadDir)
 	if err != nil {
 		return nil, fmt.Errorf("testing local archive integrity: %s", err)
@@ -59,11 +64,6 @@ func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.
 	if cached {
 		// File is cached, nothing to do here
 		return nil, nil
-	}
-
-	path, err := r.ArchivePath(downloadDir)
-	if err != nil {
-		return nil, fmt.Errorf("getting archive path: %s", err)
 	}
 
 	if stats, err := path.Stat(); os.IsNotExist(err) {
