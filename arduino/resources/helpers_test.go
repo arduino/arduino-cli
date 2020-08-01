@@ -36,6 +36,54 @@ func (h *EchoHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 	request.Write(writer)
 }
 
+func TestResourcesSanityChecks(t *testing.T) {
+	tmp, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	defer tmp.RemoveAll()
+
+	{
+		testArchiveFileNames := []string{
+			"test.txt",
+			"/test.txt",
+			"somepath/to/test.txt",
+			"/../test.txt",
+			"some/../test.txt",
+			"../test.txt",
+		}
+		for _, testArchiveFileName := range testArchiveFileNames {
+			r := &DownloadResource{
+				ArchiveFileName: testArchiveFileName,
+				CachePath:       "cache",
+			}
+			archivePath, err := r.ArchivePath(tmp)
+			require.NoError(t, err)
+			expectedArchivePath := tmp.Join("cache", "test.txt")
+			require.Equal(t, expectedArchivePath.String(), archivePath.String())
+		}
+	}
+
+	{
+		r := &DownloadResource{
+			ArchiveFileName: "/test.txt",
+			CachePath:       "cache",
+		}
+		archivePath, err := r.ArchivePath(tmp)
+		require.NoError(t, err)
+		expectedArchivePath := tmp.Join("cache", "test.txt")
+		require.Equal(t, expectedArchivePath.String(), archivePath.String())
+	}
+
+	{
+		r := &DownloadResource{
+			ArchiveFileName: "..",
+			CachePath:       "cache",
+		}
+		archivePath, err := r.ArchivePath(tmp)
+		require.Error(t, err)
+		require.Nil(t, archivePath)
+	}
+}
+
 func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 	goldUserAgentValue := fmt.Sprintf("arduino-cli/0.0.0-test.preview (amd64; linux; go1.12.4) Commit:deadbeef/Build:2019-06-12 11:11:11.111")
 	goldUserAgentString := "User-Agent: " + goldUserAgentValue
