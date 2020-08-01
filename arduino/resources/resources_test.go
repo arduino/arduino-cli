@@ -80,13 +80,25 @@ func TestDownloadAndChecksums(t *testing.T) {
 	r.Checksum = "BOH:12312312312313123123123123123123"
 	_, err = r.TestLocalArchiveChecksum(tmp)
 	require.Error(t, err)
+	_, err = r.TestLocalArchiveIntegrity(tmp)
+	require.Error(t, err)
+	_, err = r.Download(tmp, nil)
+	require.Error(t, err)
 
 	r.Checksum = "MD5 667cf48afcc12c38c8c1637947a04224"
 	_, err = r.TestLocalArchiveChecksum(tmp)
 	require.Error(t, err)
+	_, err = r.TestLocalArchiveIntegrity(tmp)
+	require.Error(t, err)
+	_, err = r.Download(tmp, nil)
+	require.Error(t, err)
 
 	r.Checksum = "MD5:zmxcbzxmncbzxmnbczxmnbczxmnbcnnb"
 	_, err = r.TestLocalArchiveChecksum(tmp)
+	require.Error(t, err)
+	_, err = r.TestLocalArchiveIntegrity(tmp)
+	require.Error(t, err)
+	_, err = r.Download(tmp, nil)
 	require.Error(t, err)
 
 	r.Checksum = "SHA-1:c007e47637cc6ad6176e7d94aeffc232ee34c1c1"
