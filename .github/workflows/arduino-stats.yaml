@@ -7,6 +7,9 @@ on:
 
 jobs:
   push-stats:
+    # This workflow is only of value to the arduino/arduino-cli repository and
+    # would always fail in forks
+    if: github.repository == 'arduino/arduino-cli'
     runs-on: ubuntu-latest
 
     steps:
