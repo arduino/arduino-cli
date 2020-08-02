@@ -84,7 +84,7 @@ jobs:
         if: >
           matrix.operating-system == 'ubuntu-latest' &&
           github.event_name == 'push'
-        uses: codecov/codecov-action@v1.0.2
+        uses: codecov/codecov-action@v1
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage_unit.txt
@@ -98,7 +98,7 @@ jobs:
         if: >
           matrix.operating-system == 'ubuntu-latest' &&
           github.event_name == 'push'
-        uses: codecov/codecov-action@v1.0.2
+        uses: codecov/codecov-action@v1
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage_legacy.txt
@@ -112,7 +112,7 @@ jobs:
         if: >
           matrix.operating-system == 'ubuntu-latest' &&
           github.event_name == 'push'
-        uses: codecov/codecov-action@v1.0.2
+        uses: codecov/codecov-action@v1
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage_integ.txt
