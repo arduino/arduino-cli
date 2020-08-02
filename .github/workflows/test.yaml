@@ -77,43 +77,28 @@ jobs:
         run: task test-integration
 
       - name: Send unit tests coverage to Codecov
-        # Since secrets aren't available on forks, we only
-        # upload coverage on `push`. This might change if
-        # Codecov whitelists GitHub, lifting the need
-        # for a token.
         if: >
           matrix.operating-system == 'ubuntu-latest' &&
           github.event_name == 'push'
         uses: codecov/codecov-action@v1
         with:
-          token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage_unit.txt
           flags: unit
 
       - name: Send legacy tests coverage to Codecov
-        # Since secrets aren't available on forks, we only
-        # upload coverage on `push`. This might change if
-        # Codecov whitelists GitHub, lifting the need
-        # for a token.
         if: >
           matrix.operating-system == 'ubuntu-latest' &&
           github.event_name == 'push'
         uses: codecov/codecov-action@v1
         with:
-          token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage_legacy.txt
           flags: unit
 
       - name: Send integration tests coverage to Codecov
-        # Since secrets aren't available on forks, we only
-        # upload coverage on `push`. This might change if
-        # Codecov whitelists GitHub, lifting the need
-        # for a token.
         if: >
           matrix.operating-system == 'ubuntu-latest' &&
           github.event_name == 'push'
         uses: codecov/codecov-action@v1
         with:
-          token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage_integ.txt
           flags: integ
