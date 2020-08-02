@@ -40,7 +40,7 @@ func (r *DownloadResource) ArchivePath(downloadDir *paths.Path) (*paths.Path, er
 	archiveFileName := archiveFile.Base()
 	archivePath := staging.Join(archiveFileName).Clean()
 	if archivePath.IsDir() {
-		return nil, errors.Errorf("invalid filename or exinsting directory: %s", archivePath)
+		return nil, errors.Errorf("archive filename points to an existing directory: %s", archivePath)
 	}
 	return archivePath, nil
 }
