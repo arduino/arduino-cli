@@ -2,8 +2,6 @@ name: Verifies documentation links
 
 on:
   push:
-    branches:
-      - master
   pull_request:
   schedule:
     - cron: "0 3 * * 1" # Every Monday at 03:00
