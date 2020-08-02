@@ -46,9 +46,11 @@ func TestResourcesSanityChecks(t *testing.T) {
 			"test.txt",
 			"/test.txt",
 			"somepath/to/test.txt",
-			"/../test.txt",
-			"some/../test.txt",
+			"/somepath/to/test.txt",
+			"path/to/../test.txt",
+			"/path/to/../test.txt",
 			"../test.txt",
+			"/../test.txt",
 		}
 		for _, testArchiveFileName := range testArchiveFileNames {
 			r := &DownloadResource{
@@ -74,13 +76,28 @@ func TestResourcesSanityChecks(t *testing.T) {
 	}
 
 	{
-		r := &DownloadResource{
-			ArchiveFileName: "..",
-			CachePath:       "cache",
+		testArchiveFileNames := []string{
+			"/",
+			".",
+			"/.",
+			"..",
+			"/..",
+			"path/..",
+			"/path/..",
+			"path/path/..",
+			"/path/path/..",
+			".." + string([]byte{0xC0, 0xAF}) + "test.txt",
+			"/.." + string([]byte{0xC0, 0xAF}) + "test.txt",
 		}
-		archivePath, err := r.ArchivePath(tmp)
-		require.Error(t, err)
-		require.Nil(t, archivePath)
+		for _, testArchiveFileName := range testArchiveFileNames {
+			r := &DownloadResource{
+				ArchiveFileName: testArchiveFileName,
+				CachePath:       "cache",
+			}
+			archivePath, err := r.ArchivePath(tmp)
+			require.Nil(t, archivePath)
+			require.Error(t, err)
+		}
 	}
 }
 

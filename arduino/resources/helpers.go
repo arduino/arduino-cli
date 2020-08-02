@@ -33,7 +33,11 @@ func (r *DownloadResource) ArchivePath(downloadDir *paths.Path) (*paths.Path, er
 	}
 
 	// Filter out paths from file name
-	archiveFileName := paths.New(r.ArchiveFileName).Base()
+	archiveFile, err := paths.SafeNew(r.ArchiveFileName)
+	if err != nil {
+		return nil, errors.Errorf("invalid filename: %s", r.ArchiveFileName)
+	}
+	archiveFileName := archiveFile.Base()
 	archivePath := staging.Join(archiveFileName).Clean()
 	if archivePath.IsDir() {
 		return nil, errors.Errorf("invalid filename or exinsting directory: %s", archivePath)
