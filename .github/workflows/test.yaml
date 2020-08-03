@@ -55,7 +55,7 @@ jobs:
         run: task check
 
       - name: Install protoc compiler
-        uses: arduino/setup-protoc@v1.1.0
+        uses: arduino/setup-protoc@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
