@@ -2,8 +2,6 @@ name: "Lints Python code"
 
 on:
   push:
-    branches:
-      - master
     paths:
       - "**.py"
       - ".flake8"
