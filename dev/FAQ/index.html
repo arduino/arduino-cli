@@ -332,6 +332,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#where-is-the-serial-monitor" class="md-nav__link">
+    Where is the Serial Monitor?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#additional-assistance" class="md-nav__link">
     Additional assistance
   </a>
@@ -1049,6 +1056,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#where-is-the-serial-monitor" class="md-nav__link">
+    Where is the Serial Monitor?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#additional-assistance" class="md-nav__link">
     Additional assistance
   </a>
@@ -1087,6 +1101,14 @@
 <h2 id="how-to-set-multiple-board-options">How to set multiple board options?<a class="headerlink" href="#how-to-set-multiple-board-options" title="Permanent link">&para;</a></h2>
 <p>Additional board options have to be separated by commas (instead of colon):</p>
 <p><code>$ arduino-cli compile --fqbn "esp8266:esp8266:generic:xtal=160,baud=57600" TestSketch</code></p>
+<h2 id="where-is-the-serial-monitor">Where is the Serial Monitor?<a class="headerlink" href="#where-is-the-serial-monitor" title="Permanent link">&para;</a></h2>
+<p>Being this a command line tool we believe it's up to the user to choose their preferred way of interacting with the
+serial connection. If we were to integrate it into the CLI we'd end up putting a tool inside a tool, and this would be
+something that we're trying to avoid.</p>
+<p>There are many excellent serial terminals to chose from. On Linux or macOS, you may already have <a href="https://www.gnu.org/software/screen/manual/screen.html">screen</a>
+installed. On Windows, a good choice for command line usage is Plink, included with <a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</a>.</p>
+<p>Arduino CLI does provide a gRPC interface which offers the capability for powerful integration with custom monitors. See
+the <a href="../rpc/monitor/">Monitor service documentation</a>.</p>
 <h2 id="additional-assistance">Additional assistance<a class="headerlink" href="#additional-assistance" title="Permanent link">&para;</a></h2>
 <p>If your question wasn't answered, feel free to ask on <a href="https://forum.arduino.cc/index.php?board=145.0">Arduino CLI's forum board</a>.</p>
                 
