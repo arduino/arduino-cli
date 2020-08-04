@@ -118,7 +118,7 @@ jobs:
           file: ./coverage_integ.txt
           flags: integ
 
-  create-pull-request-artifacts:
+  create-test-artifacts:
     runs-on: ubuntu-latest
     needs: test-matrix
 
@@ -143,11 +143,63 @@ jobs:
           export PACKAGE_NAME_PREFIX
           goreleaser --snapshot
 
-      - name: Upload artifacts
+      # Uploads all architectures as separate artifacts
+      - name: Upload Linux 32 bit artifact
         uses: actions/upload-artifact@v2
         with:
-          name: dist
-          path: |
-            dist/*.tar.gz
-            dist/*.zip
-            dist/*checksums.txt
+          name: Linux_32bit
+          path: dist/*Linux_32bit.tar.gz
+
+      - name: Upload Linux 64 bit artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Linux_64bit
+          path: dist/*Linux_64bit.tar.gz
+
+      - name: Upload Windows 32 bit artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Windows_32bit
+          path: dist/*Windows_32bit.zip
+
+      - name: Upload Windows 64 bit artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Windows_64bit
+          path: dist/*Windows_64bit.zip
+
+      - name: Upload Linux ARMv6 artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Linux_ARMv6
+          path: dist/*Linux_ARMv6.tar.gz
+
+      - name: Upload Linux ARMv7 artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Linux_ARMv7
+          path: dist/*Linux_ARMv7.tar.gz
+
+      - name: Upload Linux ARM64 artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Linux_ARM64
+          path: dist/*Linux_ARM64.tar.gz
+
+      - name: Upload Linux ARM64 bit artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Linux_ARM64
+          path: dist/*Linux_ARM64.tar.gz
+
+      - name: Upload MacOS 64 bit artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: macOS_64bit
+          path: dist/*macOS_64bit.tar.gz
+
+      - name: Upload checksums
+        uses: actions/upload-artifact@v2
+        with:
+          name: checksums
+          path: dist/*checksums.txt
