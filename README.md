@@ -7,7 +7,7 @@ tools needed to use any Arduino compatible board and platforms.
 
 [![tests-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=test)
 [![nightly-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=nightly)
-[![docs-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=docs)
+[![docs-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=publish-docs)
 [![codecov-badge]](https://codecov.io/gh/arduino/arduino-cli)
 
 > **Note:** this software is currently under active development: anything can change at any time, API and UI must be
@@ -42,7 +42,7 @@ e-mail contact: security@arduino.cc
 
 [tests-badge]: https://github.com/Arduino/arduino-cli/workflows/test/badge.svg
 [nightly-badge]: https://github.com/Arduino/arduino-cli/workflows/nightly/badge.svg
-[docs-badge]: https://github.com/Arduino/arduino-cli/workflows/docs/badge.svg
+[docs-badge]: https://github.com/Arduino/arduino-cli/workflows/publish-docs/badge.svg
 [codecov-badge]: https://codecov.io/gh/arduino/arduino-cli/branch/master/graph/badge.svg
 [install]: https://arduino.github.io/arduino-cli/installation
 [user documentation]: https://arduino.github.io/arduino-cli/
