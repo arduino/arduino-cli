@@ -1529,7 +1529,7 @@ extension</a> to automatically format as you write.</p>
 case of failures we might ask you to update the PR with correct formatting.</p>
 <h3 id="docs-automation">Docs automation<a class="headerlink" href="#docs-automation" title="Permanent link">&para;</a></h3>
 <p>In order to avoid unwanted changes to the public website hosting the Arduino CLI documentation, only Mike is allowed to
-push changes to the <code>gh-pages</code> branch, and this only happens from within the CI, in a workflow named <a href="https://github.com/arduino/arduino-cli/blob/master/.github/workflows/docs.yaml">docs</a>.</p>
+push changes to the <code>gh-pages</code> branch, and this only happens from within the CI, in a workflow named <a href="https://github.com/arduino/arduino-cli/blob/master/.github/workflows/publish-docs.yaml">publish-docs</a>.</p>
 <p>The CI is responsible for guessing which version of the Arduino CLI we're building docs for, so that generated contents
 will be stored in the appropriate section of the documentation website. Because this guessing might be fairly complex,
 the logic is implemented in a Python script called <a href="https://github.com/arduino/arduino-cli/blob/master/docs/build.py"><code>build.py</code></a>. The script will determine the version of the
