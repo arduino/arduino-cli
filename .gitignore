@@ -1,5 +1,5 @@
 /debug
-/arduino-cli
+/arduino-cli*
 /main
 /.vscode/
 /cmd/formatter/debug.test
