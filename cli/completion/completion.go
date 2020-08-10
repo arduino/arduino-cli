@@ -16,9 +16,7 @@
 package completion
 
 import (
-	"bytes"
 	"os"
-	"strings"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -29,7 +27,7 @@ var (
 	completionNoDesc bool //Disable completion description for shells that support it
 )
 
-// NewCommand created a new `version` command
+// NewCommand created a new `completion` command
 func NewCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:       "completion [bash|zsh|fish] [--no-descriptions]",
@@ -47,7 +45,7 @@ func NewCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	if completionNoDesc && (args[0] == "bash" || args[0] == "zsh") {
+	if completionNoDesc && (args[0] == "bash") {
 		feedback.Errorf("Error: command description is not supported by %v", args[0])
 		os.Exit(errorcodes.ErrGeneric)
 	}
@@ -56,14 +54,14 @@ func run(cmd *cobra.Command, args []string) {
 		cmd.Root().GenBashCompletion(os.Stdout)
 		break
 	case "zsh":
-		cmd.Root().GenZshCompletion(os.Stdout)
+		if completionNoDesc {
+			cmd.Root().GenZshCompletionNoDesc(os.Stdout)
+		} else {
+			cmd.Root().GenZshCompletion(os.Stdout)
+		}
 		break
 	case "fish":
-		buf := new(bytes.Buffer)
-		cmd.Root().GenFishCompletion(buf, !completionNoDesc)
-		// Next 2 lines are Hack, fixed here https://github.com/spf13/cobra/pull/1122
-		s := strings.ReplaceAll(buf.String(), "arduino-cli_comp", "arduino_cli_comp") //required because fish does not support env variables with "-" in the name
-		os.Stdout.WriteString(s)
+		cmd.Root().GenFishCompletion(os.Stdout, !completionNoDesc)
 		break
 	}
 }

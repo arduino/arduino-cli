@@ -46,11 +46,11 @@ Remember to open a new shell to test the functionality.
 
 #### Disabling command and flag descriptions
 
-By default fish completion has command and flag description enabled by default. If you want to disable this behaviour
-you can simply pass the `--no-descriptions` flag when calling `completion` command and the generated file will not have
-descriptions
+By default fish and zsh completion have command and flag description enabled by default. If you want to disable this
+behaviour you can simply pass the `--no-descriptions` flag when calling `completion` command and the generated file will
+not have descriptions
 
-_N.B._ This flag is not compatible with bash or zsh
+_N.B._ This flag is not compatible with bash
 
 ### Brew
 

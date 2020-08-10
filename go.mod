@@ -38,7 +38,7 @@ require (
 	github.com/schollz/closestmatch v2.1.0+incompatible
 	github.com/segmentio/stats/v4 v4.5.3
 	github.com/sirupsen/logrus v1.4.2
-	github.com/spf13/cobra v1.0.0
+	github.com/spf13/cobra v1.0.1-0.20200710201246-675ae5f5a98c
 	github.com/spf13/jwalterweatherman v1.0.0
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/testify v1.6.1
@@ -55,5 +55,5 @@ require (
 	google.golang.org/grpc v1.27.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
-	gopkg.in/yaml.v2 v2.2.4
+	gopkg.in/yaml.v2 v2.3.0
 )
