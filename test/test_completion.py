@@ -34,7 +34,7 @@ def test_completion_zsh(run_command):
     assert result.ok
     assert result.stderr == ""
     assert "#compdef _arduino-cli arduino-cli" in result.stdout
-    assert "function _arduino-cli" in result.stdout
+    assert "_arduino-cli()" in result.stdout
 
 
 def test_completion_fish(run_command):
@@ -42,7 +42,7 @@ def test_completion_fish(run_command):
     assert result.ok
     assert result.stderr == ""
     assert "# fish completion for arduino-cli" in result.stdout
-    assert "function __arduino-cli_perform_completion" in result.stdout
+    assert "function __arduino_cli_perform_completion" in result.stdout
 
 
 def test_completion_bash_no_desc(run_command):
@@ -54,9 +54,11 @@ def test_completion_bash_no_desc(run_command):
 
 def test_completion_zsh_no_desc(run_command):
     result = run_command("completion zsh --no-descriptions")
-    assert not result.ok
-    assert result.stdout == ""
-    assert "Error: command description is not supported by zsh" in result.stderr
+    assert result.ok
+    assert result.stderr == ""
+    assert "#compdef _arduino-cli arduino-cli" in result.stdout
+    assert "_arduino-cli()" in result.stdout
+    assert "__completeNoDesc" in result.stdout
 
 
 def test_completion_fish_no_desc(run_command):
@@ -64,5 +66,5 @@ def test_completion_fish_no_desc(run_command):
     assert result.ok
     assert result.stderr == ""
     assert "# fish completion for arduino-cli" in result.stdout
-    assert "function __arduino-cli_perform_completion" in result.stdout
+    assert "function __arduino_cli_perform_completion" in result.stdout
     assert "__completeNoDesc" in result.stdout
