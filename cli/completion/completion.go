@@ -16,9 +16,7 @@
 package completion
 
 import (
-	"bytes"
 	"os"
-	"strings"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -63,11 +61,7 @@ func run(cmd *cobra.Command, args []string) {
 		}
 		break
 	case "fish":
-		buf := new(bytes.Buffer)
-		cmd.Root().GenFishCompletion(buf, !completionNoDesc)
-		// Next 2 lines are Hack, fixed here https://github.com/spf13/cobra/pull/1122
-		s := strings.ReplaceAll(buf.String(), "arduino-cli_comp", "arduino_cli_comp") //required because fish does not support env variables with "-" in the name
-		os.Stdout.WriteString(s)
+		cmd.Root().GenFishCompletion(os.Stdout, !completionNoDesc)
 		break
 	}
 }
