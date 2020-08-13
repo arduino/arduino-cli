@@ -49,7 +49,7 @@ def test_core_search_no_args(run_command):
     # update custom index and install test core (installed cores affect `core search`)
     url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
     assert run_command("core update-index --additional-urls={}".format(url))
-    assert run_command("core install test:x86 --additional-urls={}".format(url))
+    assert run_command("core install test:x86 --skip-post-install --additional-urls={}".format(url))
 
     # list all with no additional urls, ensure the test core won't show up
     result = run_command("core search")
@@ -115,7 +115,7 @@ def test_core_install_esp32(run_command, data_dir):
     url = "https://dl.espressif.com/dl/package_esp32_index.json"
     assert run_command("core update-index --additional-urls={}".format(url))
     # install 3rd-party core
-    assert run_command("core install esp32:esp32@1.0.4 --additional-urls={}".format(url))
+    assert run_command("core install esp32:esp32@1.0.4 --skip-post-install --additional-urls={}".format(url))
     # create a sketch and compile to double check the core was successfully installed
     sketch_path = os.path.join(data_dir, "test_core_install_esp32")
     assert run_command("sketch new {}".format(sketch_path))
@@ -157,13 +157,13 @@ def test_core_install(run_command):
     assert run_command("core update-index")
 
     # Install a specific core version
-    assert run_command("core install arduino:avr@1.6.16")
+    assert run_command("core install --skip-post-install arduino:avr@1.6.16")
     result = run_command("core list --format json")
     assert result.ok
     assert _in(result.stdout, "arduino:avr", "1.6.16")
 
     # Replace it with a more recent one
-    assert run_command("core install arduino:avr@1.6.17")
+    assert run_command("core install --skip-post-install arduino:avr@1.6.17")
     result = run_command("core list --format json")
     assert result.ok
     assert _in(result.stdout, "arduino:avr", "1.6.17")
@@ -186,7 +186,7 @@ def test_core_install(run_command):
 
 def test_core_uninstall(run_command):
     assert run_command("core update-index")
-    assert run_command("core install arduino:avr")
+    assert run_command("core install --skip-post-install arduino:avr")
     result = run_command("core list --format json")
     assert result.ok
     assert _in(result.stdout, "arduino:avr")
