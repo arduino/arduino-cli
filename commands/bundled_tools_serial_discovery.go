@@ -131,8 +131,7 @@ func ListBoards(pm *packagemanager.PackageManager) ([]*BoardPort, error) {
 	}
 
 	// build the command to be executed
-	args := []string{t.InstallDir.Join("serial-discovery").String()}
-	cmd, err := executils.Command(args)
+	cmd, err := executils.Command(t.InstallDir.Join("serial-discovery").String())
 	if err != nil {
 		return nil, errors.Wrap(err, "creating discovery process")
 	}
