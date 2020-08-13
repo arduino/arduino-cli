@@ -5,10 +5,33 @@ on:
   pull_request:
 
 jobs:
+  checks-if-docs-are-modified:
+    runs-on: ubuntu-latest
+    outputs:
+      docs-check: ${{ steps.check.outputs.only-docs-modified }}
+
+    steps:
+      - name: Check if docs are modified
+        id: check
+        run: |
+          # Not a PR, keep going
+          if [[ -z "${{ github.event.pull_request }}" ]]; then
+            echo "::set-output name=only-docs-modified::false"
+            exit 0
+          fi
+
+          FILES=$(curl --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' ${{ github.event.pull_request.url }}/files | \
+          jq -c '.[] | select(.filename | match("^(?!docs).*")) | .filename')
+          echo "$FILES"
+          [[ -z "$FILES" ]] && echo "::set-output name=only-docs-modified::false" || echo "::set-output name=only-docs-modified::true"
+
   test-matrix:
     strategy:
       matrix:
         operating-system: [ubuntu-latest, windows-latest, macOS-latest]
+
+    needs: checks-if-docs-are-modified
+    if: needs.checks-if-docs-are-modified.outputs.docs-check == 'false'
 
     runs-on: ${{ matrix.operating-system }}
 
@@ -186,3 +209,14 @@ jobs:
         with:
           name: checksums
           path: dist/*checksums.txt
+
+  # This is a job that does nothing, it's only needed so that we can mark it as
+  # required in the repository' settings.
+  required-job:
+    name: required
+    needs: test-matrix
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: End
+        run: echo Done
