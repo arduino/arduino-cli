@@ -44,11 +44,11 @@ e-mail contact: security@arduino.cc
 [nightly-badge]: https://github.com/Arduino/arduino-cli/workflows/nightly/badge.svg
 [docs-badge]: https://github.com/Arduino/arduino-cli/workflows/publish-docs/badge.svg
 [codecov-badge]: https://codecov.io/gh/arduino/arduino-cli/branch/master/graph/badge.svg
-[install]: https://arduino.github.io/arduino-cli/installation
-[user documentation]: https://arduino.github.io/arduino-cli/
-[getting started]: https://arduino.github.io/arduino-cli/getting-started/
-[commands reference]: https://arduino.github.io/arduino-cli/commands/arduino-cli
-[faq]: https://arduino.github.io/arduino-cli/FAQ/
-[how to contribute]: https://arduino.github.io/arduino-cli/CONTRIBUTING/
+[install]: https://arduino.github.io/arduino-cli/latest/installation
+[user documentation]: https://arduino.github.io/arduino-cli/latest/
+[getting started]: https://arduino.github.io/arduino-cli/latest/getting-started/
+[commands reference]: https://arduino.github.io/arduino-cli/latest/commands/arduino-cli
+[faq]: https://arduino.github.io/arduino-cli/latest/FAQ/
+[how to contribute]: https://arduino.github.io/arduino-cli/latest/CONTRIBUTING/
 [contributors]: https://github.com/arduino/arduino-cli/graphs/contributors
 [security policy]: https://github.com/arduino/arduino-cli/security/policy
