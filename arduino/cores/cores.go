@@ -48,6 +48,7 @@ type PlatformRelease struct {
 	Menus          *properties.Map        `json:"-"`
 	InstallDir     *paths.Path            `json:"-"`
 	IsIDEBundled   bool                   `json:"-"`
+	IsTrusted      bool                   `json:"-"`
 }
 
 // BoardManifest contains information about a board. These metadata are usually
