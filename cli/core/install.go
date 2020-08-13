@@ -42,7 +42,12 @@ func initInstallCommand() *cobra.Command {
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}
+	installCommand.Flags().BoolVar(&installFlags.skipPostInstall, "skip-post-install", false, "Do not run post-install scripts.")
 	return installCommand
+}
+
+var installFlags struct {
+	skipPostInstall bool
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
@@ -66,6 +71,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
+			SkipPostInstall: installFlags.skipPostInstall,
 		}
 		_, err := core.PlatformInstall(context.Background(), platformInstallReq, output.ProgressBar(), output.TaskProgress())
 		if err != nil {

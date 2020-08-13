@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/executils"
-	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
 
@@ -35,33 +34,31 @@ func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease
 	if err := platformRelease.Resource.Install(pm.DownloadDir, pm.TempDir, destDir); err != nil {
 		return errors.Errorf("installing platform %s: %s", platformRelease, err)
 	}
-
-	// Perform post install
-	if platformRelease.IsTrusted {
-		if err := pm.runPostInstallScript(destDir); err != nil {
-			return errors.Errorf("running post install script for %s: %s", platformRelease, err)
-		}
+	if d, err := destDir.Abs(); err == nil {
+		platformRelease.InstallDir = d
+	} else {
+		return err
 	}
-
 	return nil
 }
 
-func (pm *PackageManager) runPostInstallScript(destDir *paths.Path) error {
-	absDestDir, err := destDir.Abs()
-	if err != nil {
-		return err
+// RunPostInstallScript runs the post_install.sh (or post_install.bat) script for the
+// specified platformRelease.
+func (pm *PackageManager) RunPostInstallScript(platformRelease *cores.PlatformRelease) error {
+	if !platformRelease.IsInstalled() {
+		return errors.New("platform not installed")
 	}
 	postInstallFilename := "post_install.sh"
 	if runtime.GOOS == "windows" {
 		postInstallFilename = "post_install.bat"
 	}
-	postInstall := absDestDir.Join(postInstallFilename)
+	postInstall := platformRelease.InstallDir.Join(postInstallFilename)
 	if postInstall.Exist() && postInstall.IsNotDir() {
 		cmd, err := executils.Command(postInstall.String())
 		if err != nil {
 			return err
 		}
-		cmd.Dir = absDestDir.String()
+		cmd.Dir = platformRelease.InstallDir.String()
 		cmd.Stdout = nil
 		cmd.Stderr = nil
 		if err := cmd.Run(); err != nil {

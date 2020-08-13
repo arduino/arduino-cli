@@ -45,7 +45,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
 	}
-	if err := upgradePlatform(pm, ref, downloadCB, taskCB); err != nil {
+	if err := upgradePlatform(pm, ref, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
 		return nil, err
 	}
 
@@ -57,7 +57,8 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 }
 
 func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB,
+	skipPostInstall bool) error {
 	if platformRef.PlatformVersion != nil {
 		return fmt.Errorf("upgrade doesn't accept parameters with version")
 	}
@@ -84,7 +85,7 @@ func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 		if err != nil {
 			return fmt.Errorf("platform %s is not installed", platformRef)
 		}
-		err = installPlatform(pm, platform, tools, downloadCB, taskCB)
+		err = installPlatform(pm, platform, tools, downloadCB, taskCB, skipPostInstall)
 		if err != nil {
 			return err
 		}
