@@ -47,17 +47,21 @@ func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease
 }
 
 func (pm *PackageManager) runPostInstallScript(destDir *paths.Path) error {
+	absDestDir, err := destDir.Abs()
+	if err != nil {
+		return err
+	}
 	postInstallFilename := "post_install.sh"
 	if runtime.GOOS == "windows" {
 		postInstallFilename = "post_install.bat"
 	}
-	postInstall := destDir.Join(postInstallFilename)
+	postInstall := absDestDir.Join(postInstallFilename)
 	if postInstall.Exist() && postInstall.IsNotDir() {
 		cmd, err := executils.Command(postInstall.String())
 		if err != nil {
 			return err
 		}
-		cmd.Dir = destDir.String()
+		cmd.Dir = absDestDir.String()
 		cmd.Stdout = nil
 		cmd.Stderr = nil
 		if err := cmd.Run(); err != nil {
@@ -65,7 +69,6 @@ func (pm *PackageManager) runPostInstallScript(destDir *paths.Path) error {
 		}
 	}
 	return nil
-
 }
 
 // IsManagedPlatformRelease returns true if the PlatforRelease is managed by the PackageManager
