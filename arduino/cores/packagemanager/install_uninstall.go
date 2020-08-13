@@ -52,7 +52,7 @@ func (pm *PackageManager) runPostInstallScript(destDir *paths.Path) error {
 		postInstallFilename = "post_install.bat"
 	}
 	postInstall := destDir.Join(postInstallFilename)
-	if postInstall.Exist() && !postInstall.IsDir() {
+	if postInstall.Exist() && postInstall.IsNotDir() {
 		cmd, err := executils.Command(postInstall.String())
 		if err != nil {
 			return err
