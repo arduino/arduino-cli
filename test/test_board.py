@@ -398,7 +398,7 @@ def test_board_details(run_command):
     # Download samd core pinned to 1.8.6
     result = run_command("core install arduino:samd@1.8.6")
     assert result.ok
-    result = run_command("board details arduino:samd:nano_33_iot --format json")
+    result = run_command("board details -b arduino:samd:nano_33_iot --format json")
     assert result.ok
     # Sort everything before compare
     result = json.loads(result.stdout)
@@ -413,3 +413,28 @@ def test_board_details(run_command):
     assert result["platform"] == gold_board_details["platform"]
     for usb_id in gold_board_details["identification_pref"]:
         assert usb_id in result["identification_pref"]
+
+
+# old `arduino-cli board details` did not need -b <fqbn> flag to work
+def test_board_details_old(run_command):
+    result = run_command("core update-index")
+    assert result.ok
+    # Download samd core pinned to 1.8.6
+    result = run_command("core install arduino:samd@1.8.6")
+    assert result.ok
+    result = run_command("board details arduino:samd:nano_33_iot")
+    assert not result.ok
+    assert result.stdout == ""
+    assert 'Error: unknown command "arduino:samd:nano_33_iot" for "arduino-cli board details"' in result.stderr
+
+
+def test_board_details_no_flags(run_command):
+    result = run_command("core update-index")
+    assert result.ok
+    # Download samd core pinned to 1.8.6
+    result = run_command("core install arduino:samd@1.8.6")
+    assert result.ok
+    result = run_command("board details")
+    assert not result.ok
+    assert 'Error: required flag(s) "fqbn" not set in result.stderr'
+    assert result.stdout == ""
