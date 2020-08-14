@@ -41,13 +41,13 @@ func initDetailsCommand() *cobra.Command {
 		Short:   tr("Print details about a board."),
 		Long:    tr("Show information about a board, in particular if the board has options to be specified in the FQBN."),
 		Example: "  " + os.Args[0] + " board details -b arduino:avr:nano",
-		Args:    cobra.NoArgs,
+		Args:    cobra.MaximumNArgs(1),
 		Run:     runDetailsCommand,
 	}
 
 	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, tr("Show full board details"))
 	detailsCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	detailsCommand.MarkFlagRequired("fqbn")
+	// detailsCommand.MarkFlagRequired("fqbn") // enable once `board details <fqbn>` is removed
 
 	return detailsCommand
 }
@@ -57,6 +57,11 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 	if err != nil {
 		feedback.Errorf(tr("Error getting board details: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	// remove once `board details <fqbn>` is removed
+	if fqbn == "" && len(args) > 0 {
+		fqbn = args[0]
 	}
 
 	res, err := board.Details(context.Background(), &rpc.BoardDetailsReq{

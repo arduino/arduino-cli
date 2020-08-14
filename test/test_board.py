@@ -18,30 +18,7 @@ import simplejson as json
 from .common import running_on_ci
 
 
-@pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
-def test_board_list(run_command):
-    result = run_command("core update-index")
-    assert result.ok
-    result = run_command("board list --format json")
-    assert result.ok
-    # check is a valid json and contains a list of ports
-    ports = json.loads(result.stdout)
-    assert isinstance(ports, list)
-    for port in ports:
-        assert "protocol" in port
-        assert "protocol_label" in port
-
-
-@pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
-def test_board_listall(run_command):
-    assert run_command("core update-index")
-    result = run_command("board listall")
-    assert result.ok
-    assert ["Board", "Name", "FQBN"] == result.stdout.splitlines()[0].strip().split()
-
-
-def test_board_details(run_command):
-    gold_board_details = """
+gold_board = """
     {
   "fqbn": "arduino:samd:nano_33_iot",
   "name": "Arduino NANO 33 IoT",
@@ -393,6 +370,31 @@ def test_board_details(run_command):
   ]
 }
 """  # noqa: E501
+
+
+@pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
+def test_board_list(run_command):
+    result = run_command("core update-index")
+    assert result.ok
+    result = run_command("board list --format json")
+    assert result.ok
+    # check is a valid json and contains a list of ports
+    ports = json.loads(result.stdout)
+    assert isinstance(ports, list)
+    for port in ports:
+        assert "protocol" in port
+        assert "protocol_label" in port
+
+
+@pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
+def test_board_listall(run_command):
+    assert run_command("core update-index")
+    result = run_command("board listall")
+    assert result.ok
+    assert ["Board", "Name", "FQBN"] == result.stdout.splitlines()[0].strip().split()
+
+
+def test_board_details(run_command):
     result = run_command("core update-index")
     assert result.ok
     # Download samd core pinned to 1.8.6
@@ -402,7 +404,7 @@ def test_board_details(run_command):
     assert result.ok
     # Sort everything before compare
     result = json.loads(result.stdout)
-    gold_board_details = json.loads(gold_board_details)
+    gold_board_details = json.loads(gold_board)
 
     assert result["fqbn"] == gold_board_details["fqbn"]
     assert result["name"] == gold_board_details["name"]
@@ -422,10 +424,21 @@ def test_board_details_old(run_command):
     # Download samd core pinned to 1.8.6
     result = run_command("core install arduino:samd@1.8.6")
     assert result.ok
-    result = run_command("board details arduino:samd:nano_33_iot")
-    assert not result.ok
-    assert result.stdout == ""
-    assert 'Error: unknown command "arduino:samd:nano_33_iot" for "arduino-cli board details"' in result.stderr
+    result = run_command("board details arduino:samd:nano_33_iot --format json")
+    assert result.ok
+    # Sort everything before compare
+    result = json.loads(result.stdout)
+    gold_board_details = json.loads(gold_board)
+
+    assert result["fqbn"] == gold_board_details["fqbn"]
+    assert result["name"] == gold_board_details["name"]
+    assert result["version"] == gold_board_details["version"]
+    assert result["propertiesId"] == gold_board_details["propertiesId"]
+    assert result["official"] == gold_board_details["official"]
+    assert result["package"] == gold_board_details["package"]
+    assert result["platform"] == gold_board_details["platform"]
+    for usb_id in gold_board_details["identification_pref"]:
+        assert usb_id in result["identification_pref"]
 
 
 def test_board_details_no_flags(run_command):
@@ -436,5 +449,5 @@ def test_board_details_no_flags(run_command):
     assert result.ok
     result = run_command("board details")
     assert not result.ok
-    assert 'Error: required flag(s) "fqbn" not set in result.stderr'
+    assert "Error getting board details: parsing fqbn: invalid fqbn:"
     assert result.stdout == ""
