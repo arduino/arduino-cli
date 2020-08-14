@@ -2,7 +2,8 @@
 
 - [ ] The PR has no duplicates (please search among the [Pull Requests](https://github.com/arduino/arduino-cli/pulls)
       before creating one)
-- [ ] The PR follows [our contributing guidelines](https://arduino.github.io/arduino-cli/CONTRIBUTING/#pull-requests)
+- [ ] The PR follows
+      [our contributing guidelines](https://arduino.github.io/arduino-cli/latest/CONTRIBUTING/#pull-requests)
 - [ ] Tests for the changes have been added (for bug fixes / features)
 - [ ] Docs have been added / updated (for bug fixes / features)
 
@@ -23,4 +24,4 @@
 
 ---
 
-See [how to contribute](https://arduino.github.io/arduino-cli/CONTRIBUTING/)
+See [how to contribute](https://arduino.github.io/arduino-cli/latest/CONTRIBUTING/)
