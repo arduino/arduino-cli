@@ -81,5 +81,12 @@ func Command(args []string) (*exec.Cmd, error) {
 	}
 	cmd := exec.Command(args[0], args[1:]...)
 	TellCommandNotToSpawnShell(cmd)
+
+	// This is required because some tools detects if the program is running
+	// from terminal by looking at the stdin/out bindings.
+	// https://github.com/arduino/arduino-cli/issues/844
+	cmd.Stdout = NullWriter
+	cmd.Stderr = NullWriter
+	cmd.Stdin = NullReader
 	return cmd, nil
 }
