@@ -422,7 +422,7 @@ def test_board_details_old(run_command):
     result = run_command("core update-index")
     assert result.ok
     # Download samd core pinned to 1.8.6
-    result = run_command("core install --skip-post-install arduino:samd@1.8.6")
+    result = run_command("core install arduino:samd@1.8.6")
     assert result.ok
     result = run_command("board details arduino:samd:nano_33_iot --format json")
     assert result.ok

@@ -20,11 +20,11 @@ def test_outdated(run_command):
     assert run_command("lib update-index")
 
     # Installs an outdated core and library
-    assert run_command("core install --skip-post-install arduino:avr@1.6.3")
+    assert run_command("core install arduino:avr@1.6.3")
     assert run_command("lib install USBHost@1.0.0")
 
     # Installs latest version of a core and a library
-    assert run_command("core install --skip-post-install arduino:samd")
+    assert run_command("core install arduino:samd")
     assert run_command("lib install ArduinoJson")
 
     # Verifies only outdated cores and libraries are returned

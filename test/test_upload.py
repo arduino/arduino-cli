@@ -28,7 +28,7 @@ def test_upload(run_command, data_dir, detected_boards):
 
     for board in detected_boards:
         # Download core
-        assert run_command("core install --skip-post-install {}".format(board.core))
+        assert run_command("core install {}".format(board.core))
         # Create a sketch
         sketch_path = os.path.join(data_dir, "foo")
         assert run_command("sketch new {}".format(sketch_path))
@@ -51,7 +51,7 @@ def test_upload_after_attach(run_command, data_dir, detected_boards):
 
     for board in detected_boards:
         # Download core
-        assert run_command("core install --skip-post-install {}".format(board.core))
+        assert run_command("core install {}".format(board.core))
         # Create a sketch
         sketch_path = os.path.join(data_dir, "foo")
         assert run_command("sketch new {}".format(sketch_path))

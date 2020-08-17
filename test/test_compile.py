@@ -27,7 +27,7 @@ def test_compile_without_fqbn(run_command):
     assert result.ok
 
     # Install Arduino AVR Boards
-    result = run_command("core install --skip-post-install arduino:avr@1.8.3")
+    result = run_command("core install arduino:avr@1.8.3")
     assert result.ok
 
     # Build sketch without FQBN
@@ -41,7 +41,7 @@ def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
     assert result.ok
 
     # Download latest AVR
-    result = run_command("core install --skip-post-install arduino:avr")
+    result = run_command("core install arduino:avr")
     assert result.ok
 
     sketch_name = "CompileIntegrationTest"
@@ -93,7 +93,7 @@ def test_output_flag_default_path(run_command, data_dir, working_dir):
     assert result.ok
 
     # Install Arduino AVR Boards
-    result = run_command("core install --skip-post-install arduino:avr@1.8.3")
+    result = run_command("core install arduino:avr@1.8.3")
     assert result.ok
 
     # Create a test sketch
@@ -115,7 +115,7 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     assert result.ok
 
     # Install Arduino AVR Boards
-    result = run_command("core install --skip-post-install arduino:avr@1.8.3")
+    result = run_command("core install arduino:avr@1.8.3")
     assert result.ok
 
     sketch_name = "CompileIntegrationTestSymlinkSelfLoop"
@@ -168,8 +168,8 @@ def test_compile_and_upload_combo(run_command, data_dir, detected_boards):
     assert result.ok
 
     # Install required core(s)
-    result = run_command("core install --skip-post-install arduino:avr@1.8.3")
-    result = run_command("core install --skip-post-install arduino:samd@1.8.7")
+    result = run_command("core install arduino:avr@1.8.3")
+    result = run_command("core install arduino:samd@1.8.7")
     assert result.ok
 
     # Create a test sketch
@@ -229,7 +229,7 @@ def test_compile_blacklisted_sketchname(run_command, data_dir):
     assert result.ok
 
     # Install Arduino AVR Boards
-    result = run_command("core install --skip-post-install arduino:avr@1.8.3")
+    result = run_command("core install arduino:avr@1.8.3")
     assert result.ok
 
     sketch_name = "RCS"
@@ -253,11 +253,11 @@ def test_compile_without_precompiled_libraries(run_command, data_dir):
     assert result.ok
     # arduino:mbed 1.1.5 is incompatible with the Arduino_TensorFlowLite library
     # see: https://github.com/arduino/ArduinoCore-nRF528x-mbedos/issues/93
-    result = run_command("core install --skip-post-install arduino:mbed@1.1.4 --additional-urls={}".format(url))
+    result = run_command("core install arduino:mbed@1.1.4 --additional-urls={}".format(url))
     assert result.ok
-    result = run_command("core install --skip-post-install arduino:samd@1.8.7 --additional-urls={}".format(url))
+    result = run_command("core install arduino:samd@1.8.7 --additional-urls={}".format(url))
     assert result.ok
-    result = run_command("core install --skip-post-install adafruit:samd@1.6.0 --additional-urls={}".format(url))
+    result = run_command("core install adafruit:samd@1.6.0 --additional-urls={}".format(url))
     assert result.ok
 
     # Install pre-release version of Arduino_TensorFlowLite (will be officially released
