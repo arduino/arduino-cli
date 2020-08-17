@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -42,12 +43,40 @@ func initInstallCommand() *cobra.Command {
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}
-	installCommand.Flags().BoolVar(&installFlags.skipPostInstall, "skip-post-install", false, "Do not run post-install scripts.")
+	addPostInstallFlagsToCommand(installCommand)
 	return installCommand
 }
 
-var installFlags struct {
+var postInstallFlags struct {
+	runPostInstall  bool
 	skipPostInstall bool
+}
+
+func addPostInstallFlagsToCommand(cmd *cobra.Command) {
+	cmd.Flags().BoolVar(&postInstallFlags.runPostInstall, "run-post-install", false, "Force run of post-install scripts (if the CLI is not running interactively).")
+	cmd.Flags().BoolVar(&postInstallFlags.skipPostInstall, "skip-post-install", false, "Force skip of post-install scripts (if the CLI is running interactively).")
+}
+
+func detectSkipPostInstallValue() bool {
+	if postInstallFlags.runPostInstall && postInstallFlags.skipPostInstall {
+		feedback.Errorf("The flags --run-post-install and --skip-post-install can't be both set at the same time.")
+		os.Exit(errorcodes.ErrBadArgument)
+	}
+	if postInstallFlags.runPostInstall {
+		logrus.Info("Will run post-install by user request")
+		return false
+	}
+	if postInstallFlags.skipPostInstall {
+		logrus.Info("Will skip post-install by user request")
+		return true
+	}
+
+	if !configuration.IsInteractive {
+		logrus.Info("Not running from console, will skip post-install by default")
+		return true
+	}
+	logrus.Info("Running from console, will run post-install by default")
+	return false
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
@@ -71,7 +100,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
-			SkipPostInstall: installFlags.skipPostInstall,
+			SkipPostInstall: detectSkipPostInstallValue(),
 		}
 		_, err := core.PlatformInstall(context.Background(), platformInstallReq, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
