@@ -33,18 +33,21 @@ import (
 
 var tr = i18n.Tr
 var showFullDetails bool
+var fqbn string
 
 func initDetailsCommand() *cobra.Command {
 	var detailsCommand = &cobra.Command{
-		Use:     "details <FQBN>",
+		Use:     "details -b <FQBN>",
 		Short:   tr("Print details about a board."),
 		Long:    tr("Show information about a board, in particular if the board has options to be specified in the FQBN."),
-		Example: "  " + os.Args[0] + " board details arduino:avr:nano",
-		Args:    cobra.ExactArgs(1),
+		Example: "  " + os.Args[0] + " board details -b arduino:avr:nano",
+		Args:    cobra.MaximumNArgs(1),
 		Run:     runDetailsCommand,
 	}
 
 	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, tr("Show full board details"))
+	detailsCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	// detailsCommand.MarkFlagRequired("fqbn") // enable once `board details <fqbn>` is removed
 
 	return detailsCommand
 }
@@ -56,9 +59,14 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
+	// remove once `board details <fqbn>` is removed
+	if fqbn == "" && len(args) > 0 {
+		fqbn = args[0]
+	}
+
 	res, err := board.Details(context.Background(), &rpc.BoardDetailsReq{
 		Instance: inst,
-		Fqbn:     args[0],
+		Fqbn:     fqbn,
 	})
 
 	if err != nil {
