@@ -377,8 +377,6 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 		return fmt.Errorf("cannot execute upload tool: %s", err)
 	}
 
-	executils.AttachStdoutListener(cmd, executils.PrintToStdout)
-	executils.AttachStderrListener(cmd, executils.PrintToStderr)
 	cmd.Stdout = outStream
 	cmd.Stderr = errStream
 
