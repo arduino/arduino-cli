@@ -73,7 +73,7 @@ func (m *BoardDetailsReq) GetFqbn() string {
 type BoardDetailsResp struct {
 	// The fully qualified board name of the board.
 	Fqbn string `protobuf:"bytes,1,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
-	// Name used to identify the board to humans (e.g., Arduino/Genuino Uno).
+	// Name used to identify the board to humans (e.g., Arduino Uno).
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Installed version of the board's platform.
 	Version string `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`

@@ -50,7 +50,7 @@ From the project folder root, just run:
 task build
 ```
 
-The project uses Go modules so dependencies will be downloaded automatically; at the end of the build, you should find
+The project uses Go modules so dependencies will be downloaded automatically. At the end of the build, you should find
 an `arduino-cli` executable in the same folder.
 
 ## Running the tests
@@ -159,11 +159,11 @@ To keep the configurations tidy and in order we use [Prettier][prettier-website]
 in the project. Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the introduction of
 formatting changes made by unconfigured editors.
 
-There are several ways to run Prettier, if you're using Visual Studio Code you can easily use the [`prettier-vscode`
+There are several ways to run Prettier. If you're using Visual Studio Code you can easily use the [`prettier-vscode`
 extension][prettier-vscode-extension] to automatically format as you write.
 
-Otherwise you can use the following tasks, to do so you'll need to install `npm` if not already installed. Check the
-[official documentation][npm-install-docs] to know how to install `npm` for your platform.
+Otherwise you can use the following tasks. To do so you'll need to install `npm` if not already installed. Check the
+[official documentation][npm-install-docs] to learn how to install `npm` for your platform.
 
 To check if the files are correctly formatted run:
 
@@ -177,7 +177,7 @@ If the output tells you that some files are not formatted correctly run:
 task config:format
 ```
 
-When opening a new Pull Requests checks are automatically run to verify that configuration files are correctly
+When opening a new Pull Request, checks are automatically run to verify that configuration files are correctly
 formatted. In case of failures we might ask you to update the PR with correct formatting.
 
 ## Working on docs
@@ -257,11 +257,11 @@ To keep the documentation tidy and in order we use [Prettier][prettier-website] 
 files in the project. Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the
 introduction of formatting changes made by unconfigured editors.
 
-There are several ways to run Prettier, if you're using Visual Studio Code you can easily use the [`prettier-vscode`
+There are several ways to run Prettier. If you're using Visual Studio Code you can easily use the [`prettier-vscode`
 extension][prettier-vscode-extension] to automatically format as you write.
 
-Otherwise you can use the following tasks, to do so you'll need to install `npm` if not already installed. Check the
-[official documentation][npm-install-docs] to know how to install `npm` for your platform.
+Otherwise you can use the following tasks. To do so you'll need to install `npm` if not already installed. Check the
+[official documentation][npm-install-docs] to learn how to install `npm` for your platform.
 
 To check if the files are correctly formatted run:
 
@@ -275,7 +275,7 @@ If the output tells you that some files are not formatted correctly run:
 task docs:format
 ```
 
-When opening a new Pull Requests checks are automatically run to verify that documentation is correctly formatted. In
+When opening a new Pull Request, checks are automatically run to verify that documentation is correctly formatted. In
 case of failures we might ask you to update the PR with correct formatting.
 
 ### Docs automation
@@ -283,7 +283,7 @@ case of failures we might ask you to update the PR with correct formatting.
 In order to avoid unwanted changes to the public website hosting the Arduino CLI documentation, only Mike is allowed to
 push changes to the `gh-pages` branch, and this only happens from within the CI, in a workflow named [publish-docs][11].
 
-The CI is responsible for guessing which version of the Arduino CLI we're building docs for, so that generated contents
+The CI is responsible for guessing which version of the Arduino CLI we're building docs for, so that generated content
 will be stored in the appropriate section of the documentation website. Because this guessing might be fairly complex,
 the logic is implemented in a Python script called [`build.py`][12]. The script will determine the version of the
 Arduino CLI that was modified in the current commit (either `dev` or an official, numbered release) and whether the
@@ -295,8 +295,8 @@ In order to support i18n in the CLI, any messages that are intended to be transl
 `i18n.Tr`. This call allows us to build a catalog of translatable strings, replacing the reference string at runtime
 with the localized value.
 
-Adding or modifying these messages requires an i18n update, as this process creates the reference catalog that are
-shared with translators. For that reason, the `task check` command will fail if the catalog was not updated to sync with
+Adding or modifying these messages requires an i18n update, as this process creates the reference catalog that is shared
+with translators. For that reason, the `task check` command will fail if the catalog was not updated to sync with
 changes to the source code.
 
 To update the catalog, execute the following command and commit the changes.

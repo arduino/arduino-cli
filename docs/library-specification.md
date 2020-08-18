@@ -1,13 +1,13 @@
 This is the specification for the Arduino library format, to be used with Arduino IDE 1.5.x onwards.
 
 - rev.1 has been implemented starting with Arduino IDE version 1.5.3 (now superseded by rev.2)
-- rev.2 will be implemented starting from version Arduino IDE 1.5.6
-- rev.2.1 will be implemented starting from version Arduino IDE 1.6.10
-- rev.2.2 will be implemented starting from version Arduino IDE 1.8.10
+- rev.2 will be implemented starting from Arduino IDE version 1.5.6
+- rev.2.1 will be implemented starting from Arduino IDE version 1.6.10
+- rev.2.2 will be implemented starting from Arduino IDE version 1.8.10
 
 This new library format is intended to be used in tandem with **Library Manager**, available since Arduino IDE 1.6.2.
 The Library Manager allows users to automatically download and install libraries needed in their projects, with an easy
-to use graphic interface in the [Arduino IDE](https://www.arduino.cc/en/guide/libraries#toc3)/Pro IDE and
+to use graphical interface in the [Arduino IDE](https://www.arduino.cc/en/guide/libraries#toc3)/Pro IDE and
 [Arduino Web Editor](https://create.arduino.cc/projecthub/Arduino_Genuino/getting-started-with-arduino-web-editor-on-various-platforms-4b3e4a#toc-libraries-and-the-arduino-web-editor-11)
 as well as [`arduino-cli lib`](commands/arduino-cli_lib.md).
 
@@ -46,7 +46,7 @@ otherwise below, **all fields are required**. The available fields are:
   are now reserved for official Arduino libraries.
 - **version** - version of the library. Version should be [semver](http://semver.org/) compliant. 1.2.0 is correct; 1.2
   is accepted; r5, 003, 1.1c are invalid
-- **author** - name/nickname of the authors and their email addresses (not mandatory) separated by comma ","
+- **author** - name/nickname of the authors and their email addresses (not mandatory) separated by comma (,)
 - **maintainer** - name and email of the maintainer
 - **sentence** - a sentence explaining the purpose of the library
 - **paragraph** - a longer description of the library. The value of **sentence** will be prepended to this, so you
@@ -125,7 +125,8 @@ numbers, spaces ( ), underscores (\_), dots (.) and dashes (-). The maximum leng
 
 #### Source code
 
-For 1.5.x+-only libraries, the source code resides in the **src** folder. For example:
+For libraries intended to be used with Arduino IDE 1.5.x+ only, the source code resides in the **src** folder. For
+example:
 
     Servo/src/Servo.h
     Servo/src/Servo.cpp
@@ -149,7 +150,7 @@ from the **library root folder** and the **utility** folder, for example:
     Servo/utility/ServoTimers.h
     Servo/utility/ServoTimers.cpp
 
-This will allow existing 1.0 format libraries to compile under Arduino IDE 1.5.x+ as well and vice-versa. If a library
+This will allow existing 1.0 format libraries to compile under Arduino IDE 1.5.x+ as well, and vice-versa. If a library
 only needs to run on Arduino IDE 1.5.x+, we recommend placing all source code in the src/ folder. If a library requires
 recursive compilation of nested source folders, its code must be in the src/ folder (since Arduino IDE 1.0.x doesn’t
 support recursive compilation, backwards compatibility wouldn’t be possible anyway).
@@ -193,8 +194,8 @@ Servo/src/cortex-m4/fpv4-sp-d16-softfp/libServo.a
 
 #### Library Examples
 
-Library examples must be placed in the **examples** folder. Note that the **examples** folder must be written exactly
-like that (with lower case letters).
+Library examples must be placed in the **examples** folder. Note that the **examples** folder name must be written
+exactly like that (with lower case letters).
 
     Servo/examples/...
 
@@ -238,7 +239,7 @@ doSomething	KEYWORD2
 # Constants (LITERAL1)
 ```
 
-This file would cause the Arduino IDE to highlight `Test` as a DataType, and `doSomething` as a method / function.
+This file would cause the Arduino IDE to highlight `Test` as a data type, and `doSomething` as a method / function.
 
 #### keywords.txt format
 
@@ -311,8 +312,11 @@ A hypothetical library named "Servo" that adheres to the specification follows:
 Libraries placed in the `libraries` subfolder of the sketchbook folder (AKA "user directory") will be made available for
 all boards, which may include multiple different processor architectures. To provide architecture-specific code or
 optimizations, library authors can use the `ARDUINO_ARCH_XXX` preprocessor macro (`#define`), where XXX is the name of
-the architecture (as determined by the name of the folder containing it), e.g. `ARDUINO_ARCH_AVR` will be defined when
-compiling for AVR-based boards. For example,
+the architecture (as determined by the name of the
+[architecture folder](platform-specification.md#hardware-folders-structure) of the board's platform). For example,
+`ARDUINO_ARCH_AVR` will be defined when compiling for AVR-based boards.
+
+An example:
 
     #if defined(ARDUINO_ARCH_AVR)
       // AVR-specific code

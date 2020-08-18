@@ -22,7 +22,7 @@ or
 
 `package_example.com_avr_boards_index.json`
 
-The index URL is periodically checked for updates so expect a constant flow of downloads (proportional to the number of
+The index URL is periodically checked for updates, so expect a constant flow of downloads (proportional to the number of
 active users).
 
 ## JSON Index file contents
@@ -161,13 +161,13 @@ The other fields are:
 
 ##### How a tool's path is determined in platform.txt
 
-When the IDE needs a tool it downloads the corresponding archive file and unpacks the content into a private folder that
-can be referenced from `platform.txt` using one of the following properties:
+When the IDE needs a tool, it downloads the corresponding archive file and unpacks the content into a private folder
+that can be referenced from `platform.txt` using one of the following properties:
 
 - `{runtime.tools.TOOLNAME-VERSION.path}`
 - `{runtime.tools.TOOLNAME.path}`
 
-For example to obtain the avr-gcc 4.8.1 folder we can use `{runtime.tools.avr-gcc-4.8.1-arduino5.path}` or
+For example, to obtain the avr-gcc 4.8.1 folder we can use `{runtime.tools.avr-gcc-4.8.1-arduino5.path}` or
 `{runtime.tools.avr-gcc.path}`.
 
 ### Platforms definitions

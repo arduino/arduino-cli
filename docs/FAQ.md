@@ -19,7 +19,7 @@ Additional board options have to be separated by commas (instead of colon):
 
 ## Where is the Serial Monitor?
 
-Being this a command line tool we believe it's up to the user to choose their preferred way of interacting with the
+This being a command line tool, we believe it's up to the user to choose their preferred way of interacting with the
 serial connection. If we were to integrate it into the CLI we'd end up putting a tool inside a tool, and this would be
 something that we're trying to avoid.
 
