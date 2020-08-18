@@ -20,11 +20,12 @@ A vendor/maintainer can have multiple supported architectures. For example, belo
 
 The vendor "arduino" has two supported architectures (AVR and SAM), while "xxxxx" and "yyyyy" have only AVR.
 
-If possible, follow existing architecture name conventions when creating hardware packages. The architecture folder name
-is used to determine library compatibility and also to permit referencing resources from another core of the same
-architecture so using a non-standard architecture name can only be harmful to your users. Architecture values are case
-sensitive (e.g. `AVR` != `avr`). Use the vendor folder name to differentiate your package, **NOT** the architecture
-name.
+Architecture values are case sensitive (e.g. `AVR` != `avr`).
+
+If possible, follow existing architecture name conventions when creating hardware packages. Use the vendor folder name
+to differentiate your package. The architecture folder name is used to determine library compatibility and to permit
+referencing resources from another core of the same architecture, so use of a non-standard architecture name can have a
+harmful effect.
 
 ## Architecture configurations
 
