@@ -70,6 +70,7 @@ type Library struct {
 	Version                *semver.Version
 	License                string
 	Properties             *properties.Map
+	Examples               paths.PathList
 }
 
 func (library *Library) String() string {

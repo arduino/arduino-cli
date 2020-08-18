@@ -21,6 +21,7 @@ import (
 
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -94,6 +95,9 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 		library.Version = v
 	}
 
+	if err := addExamples(library); err != nil {
+		return nil, errors.Errorf("scanning examples: %s", err)
+	}
 	library.Name = libraryDir.Base()
 	library.RealName = strings.TrimSpace(libProperties.Get("name"))
 	library.Author = strings.TrimSpace(libProperties.Get("author"))
@@ -122,6 +126,56 @@ func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, er
 		IsLegacy:      true,
 		Version:       semver.MustParse(""),
 	}
+	if err := addExamples(library); err != nil {
+		return nil, errors.Errorf("scanning examples: %s", err)
+	}
 	addUtilityDirectory(library)
 	return library, nil
+}
+
+func addExamples(lib *Library) error {
+	files, err := lib.InstallDir.ReadDir()
+	if err != nil {
+		return err
+	}
+	examples := paths.NewPathList()
+	for _, file := range files {
+		name := strings.ToLower(file.Base())
+		if name != "example" && name != "examples" {
+			continue
+		}
+		if !file.IsDir() {
+			continue
+		}
+		if err := addExamplesToPathList(file, &examples); err != nil {
+			return err
+		}
+		break
+	}
+
+	lib.Examples = examples
+	return nil
+}
+
+func addExamplesToPathList(examplesPath *paths.Path, list *paths.PathList) error {
+	files, err := examplesPath.ReadDir()
+	if err != nil {
+		return err
+	}
+	for _, file := range files {
+		if isExample(file) {
+			list.Add(file)
+		} else if file.IsDir() {
+			if err := addExamplesToPathList(file, list); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// isExample returns true if examplePath contains an example
+func isExample(examplePath *paths.Path) bool {
+	mainIno := examplePath.Join(examplePath.Base() + ".ino")
+	return mainIno.Exist() && mainIno.IsNotDir()
 }

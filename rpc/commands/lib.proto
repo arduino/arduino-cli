@@ -261,6 +261,8 @@ message Library {
     LibraryLocation location = 24;
     // The library format type.
     LibraryLayout layout = 25;
+    // The example sketches provided by the library
+    repeated string examples = 26;
 }
 
 enum LibraryLayout {
