@@ -868,7 +868,7 @@ can use data from up to four different platforms. To keep this clear, the follow
 In the most common case: a board platform without any references, all of these will refer to the same platform.
 
 Note that the above terminology is not in widespread use, but was invented for clarity within this document. In the
-actual Arduino Cli code, the "board platform" is called `targetPlatform`, the "core platform" is called
+actual Arduino CLI code, the "board platform" is called `targetPlatform`, the "core platform" is called
 `actualPlatform`, the others are pretty much nameless.
 
 ## boards.local.txt
