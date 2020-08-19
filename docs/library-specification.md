@@ -49,9 +49,9 @@ otherwise below, **all fields are required**. The available fields are:
 - **author** - name/nickname of the authors and their email addresses (not mandatory) separated by comma ","
 - **maintainer** - name and email of the maintainer
 - **sentence** - a sentence explaining the purpose of the library
-- **paragraph** - a longer description of the library. The value of **sentence** always will be prepended, so you should
-  start by writing the second sentence here
-- **category** - (defaults to `Uncategorized`) if present, one of these:
+- **paragraph** - a longer description of the library. The value of **sentence** will be prepended to this, so you
+  should start by writing the second sentence here
+- **category** - (defaults to `Uncategorized`) allowed values:
   - Display
   - Communication
   - Signal Input/Output
@@ -213,7 +213,7 @@ Remember that files placed inside this folder will increase the size of the libr
 that weights a few kilobytes may not be such a good idea.
 
 The content of the _extras_ folder is totally ignored by the Arduino development software; you are free to put anything
-inside such as supporting documentation, etc.
+inside.
 
 ### Keywords
 

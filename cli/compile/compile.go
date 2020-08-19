@@ -84,7 +84,7 @@ func NewCommand() *cobra.Command {
 	command.Flags().StringVar(&vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if board supports them.")
 	command.Flags().StringSliceVar(&libraries, "libraries", []string{},
 		"List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.")
-	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, "Optional, optimize compile output for debug, not for release.")
+	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, "Optional, optimize compile output for debugging, rather than for release.")
 	command.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload.")
 
 	return command

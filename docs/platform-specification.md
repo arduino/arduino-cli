@@ -314,8 +314,8 @@ error.
 
 If **recipe.preproc.macros** is not defined, it is automatically generated from **recipe.cpp.o.pattern**.
 
-Note that older Arduino IDE versions used the **recipe.preproc.includes** recipe to determine includes, which is
-undocumented here. Since Arduino IDE 1.6.7 (arduino-builder 1.2.0) this was changed and **recipe.preproc.includes** is
+Note that older Arduino IDE versions used the **recipe.preproc.includes** recipe (which is not documented here) to
+determine includes. Since Arduino IDE 1.6.7 (arduino-builder 1.2.0) this was changed and **recipe.preproc.includes** is
 no longer used.
 
 #### Pre and post build hooks (since Arduino IDE 1.6.5)

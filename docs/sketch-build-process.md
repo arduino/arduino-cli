@@ -102,10 +102,10 @@ The "folder name priority" is determined as follows (in order of highest to lowe
 
 The "location priority" is determined as follows (in order of highest to lowest priority):
 
-1. The library is in a custom libraries path specified via the
+1. The library is under a custom libraries path specified via the
    [`--libraries` option](commands/arduino-cli_compile.md#options) of `arduino-cli compile` (in decreasing order of
    priority when multiple custom paths are defined)
-1. The library is in the `libraries` subfolder of the IDE's sketchbook or Arduino CLI's user directory
+1. The library is under the `libraries` subfolder of the IDE's sketchbook or Arduino CLI's user directory
 1. The library is bundled with the board platform/core
    ([`{runtime.platform.path}/libraries`](platform-specification.md#global-predefined-properties))
 1. The library is bundled with the [referenced](platform-specification.md#referencing-another-core-variant-or-tool)
