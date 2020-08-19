@@ -76,8 +76,8 @@ func runExamplesCommand(cmd *cobra.Command, args []string) {
 // feedback.Result implementation
 
 type libraryExamples struct {
-	Library  *rpc.Library
-	Examples []string
+	Library  *rpc.Library `json:"library"`
+	Examples []string     `json:"examples"`
 }
 
 type libraryExamplesResult struct {
