@@ -35,6 +35,7 @@ func NewCommand() *cobra.Command {
 	libCommand.AddCommand(initDownloadCommand())
 	libCommand.AddCommand(initInstallCommand())
 	libCommand.AddCommand(initListCommand())
+	libCommand.AddCommand(initExamplesCommand())
 	libCommand.AddCommand(initSearchCommand())
 	libCommand.AddCommand(initUninstallCommand())
 	libCommand.AddCommand(initUpgradeCommand())
