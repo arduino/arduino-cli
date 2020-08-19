@@ -104,10 +104,9 @@ func (ir libraryExamplesResult) String() string {
 		r := fmt.Sprintf("Examples for library %s\n", color.GreenString("%s", name))
 		for _, example := range lib.Examples {
 			examplePath := paths.New(example)
-			r += fmt.Sprintf("  - %s%c%s\n",
-				color.New(color.Faint).Sprintf("%s", examplePath.Parent()),
-				os.PathSeparator,
-				color.HiWhiteString("%s", examplePath.Base()))
+			r += fmt.Sprintf("  - %s%s\n",
+				color.New(color.Faint).Sprintf("%s%c", examplePath.Parent(), os.PathSeparator),
+				examplePath.Base())
 		}
 		res = append(res, r)
 	}
