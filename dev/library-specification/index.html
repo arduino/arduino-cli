@@ -1347,13 +1347,13 @@
                 <p>This is the specification for the Arduino library format, to be used with Arduino IDE 1.5.x onwards.</p>
 <ul>
 <li>rev.1 has been implemented starting with Arduino IDE version 1.5.3 (now superseded by rev.2)</li>
-<li>rev.2 will be implemented starting from version Arduino IDE 1.5.6</li>
-<li>rev.2.1 will be implemented starting from version Arduino IDE 1.6.10</li>
-<li>rev.2.2 will be implemented starting from version Arduino IDE 1.8.10</li>
+<li>rev.2 will be implemented starting from Arduino IDE version 1.5.6</li>
+<li>rev.2.1 will be implemented starting from Arduino IDE version 1.6.10</li>
+<li>rev.2.2 will be implemented starting from Arduino IDE version 1.8.10</li>
 </ul>
 <p>This new library format is intended to be used in tandem with <strong>Library Manager</strong>, available since Arduino IDE 1.6.2.
 The Library Manager allows users to automatically download and install libraries needed in their projects, with an easy
-to use graphic interface in the <a href="https://www.arduino.cc/en/guide/libraries#toc3">Arduino IDE</a>/Pro IDE and
+to use graphical interface in the <a href="https://www.arduino.cc/en/guide/libraries#toc3">Arduino IDE</a>/Pro IDE and
 <a href="https://create.arduino.cc/projecthub/Arduino_Genuino/getting-started-with-arduino-web-editor-on-various-platforms-4b3e4a#toc-libraries-and-the-arduino-web-editor-11">Arduino Web Editor</a>
 as well as <a href="../commands/arduino-cli_lib/"><code>arduino-cli lib</code></a>.</p>
 <p>More information about how Library Manager works is available
@@ -1384,7 +1384,7 @@ otherwise below, <strong>all fields are required</strong>. The available fields 
   are now reserved for official Arduino libraries.</li>
 <li><strong>version</strong> - version of the library. Version should be <a href="http://semver.org/">semver</a> compliant. 1.2.0 is correct; 1.2
   is accepted; r5, 003, 1.1c are invalid</li>
-<li><strong>author</strong> - name/nickname of the authors and their email addresses (not mandatory) separated by comma ","</li>
+<li><strong>author</strong> - name/nickname of the authors and their email addresses (not mandatory) separated by comma (,)</li>
 <li><strong>maintainer</strong> - name and email of the maintainer</li>
 <li><strong>sentence</strong> - a sentence explaining the purpose of the library</li>
 <li><strong>paragraph</strong> - a longer description of the library. The value of <strong>sentence</strong> will be prepended to this, so you
@@ -1463,7 +1463,8 @@ may be added as needed to future revisions.</p>
 <p>The library root folder name must start with a basic letter (A-Z or a-z) or number (0-9), followed by basic letters,
 numbers, spaces ( ), underscores (_), dots (.) and dashes (-). The maximum length is 63 characters.</p>
 <h4 id="source-code">Source code<a class="headerlink" href="#source-code" title="Permanent link">&para;</a></h4>
-<p>For 1.5.x+-only libraries, the source code resides in the <strong>src</strong> folder. For example:</p>
+<p>For libraries intended to be used with Arduino IDE 1.5.x+ only, the source code resides in the <strong>src</strong> folder. For
+example:</p>
 <div class="codehilite"><pre><span></span><code>Servo/src/Servo.h
 Servo/src/Servo.cpp
 </code></pre></div>
@@ -1488,7 +1489,7 @@ Servo/utility/ServoTimers.cpp
 </code></pre></div>
 
 
-<p>This will allow existing 1.0 format libraries to compile under Arduino IDE 1.5.x+ as well and vice-versa. If a library
+<p>This will allow existing 1.0 format libraries to compile under Arduino IDE 1.5.x+ as well, and vice-versa. If a library
 only needs to run on Arduino IDE 1.5.x+, we recommend placing all source code in the src/ folder. If a library requires
 recursive compilation of nested source folders, its code must be in the src/ folder (since Arduino IDE 1.0.x doesn’t
 support recursive compilation, backwards compatibility wouldn’t be possible anyway).</p>
@@ -1524,8 +1525,8 @@ Servo/src/cortex-m4/fpv4-sp-d16-softfp/libServo.a
 </code></pre></div>
 
 <h4 id="library-examples">Library Examples<a class="headerlink" href="#library-examples" title="Permanent link">&para;</a></h4>
-<p>Library examples must be placed in the <strong>examples</strong> folder. Note that the <strong>examples</strong> folder must be written exactly
-like that (with lower case letters).</p>
+<p>Library examples must be placed in the <strong>examples</strong> folder. Note that the <strong>examples</strong> folder name must be written
+exactly like that (with lower case letters).</p>
 <div class="codehilite"><pre><span></span><code>Servo/examples/...
 </code></pre></div>
 
@@ -1564,7 +1565,7 @@ doSomething KEYWORD2
 # Constants (LITERAL1)
 </code></pre></div>
 
-<p>This file would cause the Arduino IDE to highlight <code>Test</code> as a DataType, and <code>doSomething</code> as a method / function.</p>
+<p>This file would cause the Arduino IDE to highlight <code>Test</code> as a data type, and <code>doSomething</code> as a method / function.</p>
 <h4 id="keywordstxt-format">keywords.txt format<a class="headerlink" href="#keywordstxt-format" title="Permanent link">&para;</a></h4>
 <p>keywords.txt is formatted in four fields which are separated by a single true tab (not spaces):</p>
 <div class="highlight"><pre><span></span><code>KEYWORD KEYWORD_TOKENTYPE   REFERENCE_LINK  RSYNTAXTEXTAREA_TOKENTYPE
@@ -1680,8 +1681,10 @@ Servo/extras/Servo_Connectors.pdf
 <p>Libraries placed in the <code>libraries</code> subfolder of the sketchbook folder (AKA "user directory") will be made available for
 all boards, which may include multiple different processor architectures. To provide architecture-specific code or
 optimizations, library authors can use the <code>ARDUINO_ARCH_XXX</code> preprocessor macro (<code>#define</code>), where XXX is the name of
-the architecture (as determined by the name of the folder containing it), e.g. <code>ARDUINO_ARCH_AVR</code> will be defined when
-compiling for AVR-based boards. For example,</p>
+the architecture (as determined by the name of the
+<a href="../platform-specification/#hardware-folders-structure">architecture folder</a> of the board's platform). For example,
+<code>ARDUINO_ARCH_AVR</code> will be defined when compiling for AVR-based boards.</p>
+<p>An example:</p>
 <div class="codehilite"><pre><span></span><code>#if defined(ARDUINO_ARCH_AVR)
   // AVR-specific code
 #elif defined(ARDUINO_ARCH_SAM)

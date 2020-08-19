@@ -1155,7 +1155,7 @@ domain name owned by the packager. For example:</p>
 <p><code>package_arduino.cc_index.json</code></p>
 <p>or</p>
 <p><code>package_example.com_avr_boards_index.json</code></p>
-<p>The index URL is periodically checked for updates so expect a constant flow of downloads (proportional to the number of
+<p>The index URL is periodically checked for updates, so expect a constant flow of downloads (proportional to the number of
 active users).</p>
 <h2 id="json-index-file-contents">JSON Index file contents<a class="headerlink" href="#json-index-file-contents" title="Permanent link">&para;</a></h2>
 <p>The root of the JSON index is an array of <code>packages</code>:</p>
@@ -1267,7 +1267,7 @@ array. In the example above <code>avr-gcc</code> comes with builds for:</p>
 </ul>
 <p>The IDE will take care to install the right flavour based on the <code>host</code> value, or fail if a needed flavour is
 missing.<br> Note that this information is not used to select the toolchain during compilation. If you want this
-specific version to be used, you should use the notation {runtime.tools.TOOLNAME-VERSION.path} in the platform.txt.</p>
+specific version to be used, you should use the notation <code>{runtime.tools.TOOLNAME-VERSION.path}</code> in the platform.txt.</p>
 <p>The other fields are:</p>
 <ul>
 <li><code>url</code>: the download URL of the tool's archive</li>
@@ -1280,13 +1280,13 @@ specific version to be used, you should use the notation {runtime.tools.TOOLNAME
   Windows, including md5deep. There are also online utilities for generating checksums.</li>
 </ul>
 <h5 id="how-a-tools-path-is-determined-in-platformtxt">How a tool's path is determined in platform.txt<a class="headerlink" href="#how-a-tools-path-is-determined-in-platformtxt" title="Permanent link">&para;</a></h5>
-<p>When the IDE needs a tool it downloads the corresponding archive file and unpacks the content into a private folder that
-can be referenced from <code>platform.txt</code> using one of the following properties:</p>
+<p>When the IDE needs a tool, it downloads the corresponding archive file and unpacks the content into a private folder
+that can be referenced from <code>platform.txt</code> using one of the following properties:</p>
 <ul>
 <li><code>{runtime.tools.TOOLNAME-VERSION.path}</code></li>
 <li><code>{runtime.tools.TOOLNAME.path}</code></li>
 </ul>
-<p>For example to obtain the avr-gcc 4.8.1 folder we can use <code>{runtime.tools.avr-gcc-4.8.1-arduino5.path}</code> or
+<p>For example, to obtain the avr-gcc 4.8.1 folder we can use <code>{runtime.tools.avr-gcc-4.8.1-arduino5.path}</code> or
 <code>{runtime.tools.avr-gcc.path}</code>.</p>
 <h3 id="platforms-definitions">Platforms definitions<a class="headerlink" href="#platforms-definitions" title="Permanent link">&para;</a></h3>
 <p>Finally, let's see how <code>PLATFORMS</code> are made.</p>
@@ -1338,7 +1338,7 @@ can be referenced from <code>platform.txt</code> using one of the following prop
 rules Arduino IDE follows for parsing versions
 (<a href="https://github.com/arduino/Arduino/blob/master/arduino-core/src/cc/arduino/contributions/VersionHelper.java">source</a>):</p>
 <ul>
-<li>Split the version at the - character and continue with the first part.</li>
+<li>Split the version at the <code>-</code> character and continue with the first part.</li>
 <li>If there are no dots (<code>.</code>), parse <code>version</code> as an integer and form a Version from that integer using
   <code>Version.forIntegers</code></li>
 <li>If there is one dot, split <code>version</code> into two, parse each part as an integer, and form a Version from those integers

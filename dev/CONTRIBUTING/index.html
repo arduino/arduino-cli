@@ -1352,7 +1352,7 @@ submitting a PR:</p>
 <div class="highlight"><pre><span></span><code>task build
 </code></pre></div>
 
-<p>The project uses Go modules so dependencies will be downloaded automatically; at the end of the build, you should find
+<p>The project uses Go modules so dependencies will be downloaded automatically. At the end of the build, you should find
 an <code>arduino-cli</code> executable in the same folder.</p>
 <h2 id="running-the-tests">Running the tests<a class="headerlink" href="#running-the-tests" title="Permanent link">&para;</a></h2>
 <p>There are several checks and test suites in place to ensure the code works as expected and is written in a way that's
@@ -1434,10 +1434,10 @@ install integration tests dependencies.</p>
 <p>To keep the configurations tidy and in order we use <a href="https://prettier.io/">Prettier</a> to automatically format all YAML files
 in the project. Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the introduction of
 formatting changes made by unconfigured editors.</p>
-<p>There are several ways to run Prettier, if you're using Visual Studio Code you can easily use the <a href="https://github.com/prettier/prettier-vscode"><code>prettier-vscode</code>
+<p>There are several ways to run Prettier. If you're using Visual Studio Code you can easily use the <a href="https://github.com/prettier/prettier-vscode"><code>prettier-vscode</code>
 extension</a> to automatically format as you write.</p>
-<p>Otherwise you can use the following tasks, to do so you'll need to install <code>npm</code> if not already installed. Check the
-<a href="https://docs.npmjs.com/downloading-and-installing-node-js-and-npm">official documentation</a> to know how to install <code>npm</code> for your platform.</p>
+<p>Otherwise you can use the following tasks. To do so you'll need to install <code>npm</code> if not already installed. Check the
+<a href="https://docs.npmjs.com/downloading-and-installing-node-js-and-npm">official documentation</a> to learn how to install <code>npm</code> for your platform.</p>
 <p>To check if the files are correctly formatted run:</p>
 <div class="highlight"><pre><span></span><code>task config:check
 </code></pre></div>
@@ -1446,7 +1446,7 @@ extension</a> to automatically format as you write.</p>
 <div class="highlight"><pre><span></span><code>task config:format
 </code></pre></div>
 
-<p>When opening a new Pull Requests checks are automatically run to verify that configuration files are correctly
+<p>When opening a new Pull Request, checks are automatically run to verify that configuration files are correctly
 formatted. In case of failures we might ask you to update the PR with correct formatting.</p>
 <h2 id="working-on-docs">Working on docs<a class="headerlink" href="#working-on-docs" title="Permanent link">&para;</a></h2>
 <p>Documentation is provided to final users in form of static HTML content generated from a tool called <a href="https://www.mkdocs.org/">MkDocs</a> and
@@ -1513,10 +1513,10 @@ either directly or through the Task <code>docs:publish</code>. This might result
 <p>To keep the documentation tidy and in order we use <a href="https://prettier.io/">Prettier</a> to automatically format all Markdown
 files in the project. Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the
 introduction of formatting changes made by unconfigured editors.</p>
-<p>There are several ways to run Prettier, if you're using Visual Studio Code you can easily use the <a href="https://github.com/prettier/prettier-vscode"><code>prettier-vscode</code>
+<p>There are several ways to run Prettier. If you're using Visual Studio Code you can easily use the <a href="https://github.com/prettier/prettier-vscode"><code>prettier-vscode</code>
 extension</a> to automatically format as you write.</p>
-<p>Otherwise you can use the following tasks, to do so you'll need to install <code>npm</code> if not already installed. Check the
-<a href="https://docs.npmjs.com/downloading-and-installing-node-js-and-npm">official documentation</a> to know how to install <code>npm</code> for your platform.</p>
+<p>Otherwise you can use the following tasks. To do so you'll need to install <code>npm</code> if not already installed. Check the
+<a href="https://docs.npmjs.com/downloading-and-installing-node-js-and-npm">official documentation</a> to learn how to install <code>npm</code> for your platform.</p>
 <p>To check if the files are correctly formatted run:</p>
 <div class="highlight"><pre><span></span><code>task docs:check
 </code></pre></div>
@@ -1525,12 +1525,12 @@ extension</a> to automatically format as you write.</p>
 <div class="highlight"><pre><span></span><code>task docs:format
 </code></pre></div>
 
-<p>When opening a new Pull Requests checks are automatically run to verify that documentation is correctly formatted. In
+<p>When opening a new Pull Request, checks are automatically run to verify that documentation is correctly formatted. In
 case of failures we might ask you to update the PR with correct formatting.</p>
 <h3 id="docs-automation">Docs automation<a class="headerlink" href="#docs-automation" title="Permanent link">&para;</a></h3>
 <p>In order to avoid unwanted changes to the public website hosting the Arduino CLI documentation, only Mike is allowed to
 push changes to the <code>gh-pages</code> branch, and this only happens from within the CI, in a workflow named <a href="https://github.com/arduino/arduino-cli/blob/master/.github/workflows/publish-docs.yaml">publish-docs</a>.</p>
-<p>The CI is responsible for guessing which version of the Arduino CLI we're building docs for, so that generated contents
+<p>The CI is responsible for guessing which version of the Arduino CLI we're building docs for, so that generated content
 will be stored in the appropriate section of the documentation website. Because this guessing might be fairly complex,
 the logic is implemented in a Python script called <a href="https://github.com/arduino/arduino-cli/blob/master/docs/build.py"><code>build.py</code></a>. The script will determine the version of the
 Arduino CLI that was modified in the current commit (either <code>dev</code> or an official, numbered release) and whether the
@@ -1539,8 +1539,8 @@ redirect to the latest version that happens on the landing page should be update
 <p>In order to support i18n in the CLI, any messages that are intended to be translated should be wrapped in a call to
 <code>i18n.Tr</code>. This call allows us to build a catalog of translatable strings, replacing the reference string at runtime
 with the localized value.</p>
-<p>Adding or modifying these messages requires an i18n update, as this process creates the reference catalog that are
-shared with translators. For that reason, the <code>task check</code> command will fail if the catalog was not updated to sync with
+<p>Adding or modifying these messages requires an i18n update, as this process creates the reference catalog that is shared
+with translators. For that reason, the <code>task check</code> command will fail if the catalog was not updated to sync with
 changes to the source code.</p>
 <p>To update the catalog, execute the following command and commit the changes.</p>
 <div class="highlight"><pre><span></span><code>task i18n:update
