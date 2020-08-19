@@ -138,6 +138,7 @@ func ListBoards(pm *packagemanager.PackageManager) ([]*BoardPort, error) {
 	}
 
 	// attach in/out pipes to the process
+	cmd.Stdin = nil
 	in, err := cmd.StdinPipe()
 	if err != nil {
 		return nil, fmt.Errorf("creating stdin pipe for discovery: %s", err)
