@@ -25,8 +25,8 @@ programmatically - think about automation pipelines or a [CI][continuous integra
 system. There are some niceties to observe when you write software that’s supposed to be easy to run when unattended and
 one in particular is the ability to run without a configuration file. This is possible because every configuration
 option you find in the arduino-cli.yaml configuration file can be provided either through a command line flag or by
-setting an environment variable. To give an example, the following commands are all equivalent and will proceed fetching
-the unstable package index that can be used to work with experimental versions of cores:
+setting an environment variable. To give an example, the following commands are all equivalent and will fetch the
+package index used to work with unstable experimental versions of Arduino's cores:
 
 ![configuration methods screenshot][]
 
@@ -34,7 +34,7 @@ See the [configuration documentation] for details about Arduino CLI's configurat
 
 Consistent with the previous paragraph, when it comes to providing output the Arduino CLI aims to be user friendly but
 also slightly verbose, something that doesn’t play well with robots. This is why we added an option to provide output
-that’s easy to parse, for example the following figure shows what getting the software version in [JSON] format looks
+that’s easy to parse. For example, the following figure shows what getting the software version in [JSON] format looks
 like.
 
 ![JSON output screenshot][]
@@ -70,15 +70,15 @@ Arduino CLI is written in [Golang] and the code is organized in a way that makes
 including the modules you need in another Golang application at compile time. Both the first and second pillars rely on
 a common Golang API, a set of functions that abstract all the functionalities offered by the Arduino CLI, so that when
 we provide a fix or a new feature, they are automatically available to both the command line and gRPC interfaces. The
-source modules implementing this API can be imported in other Golang programs to embed a full fledged Arduino CLI. For
+source modules implementing this API can be imported in other Golang programs to embed a full-fledged Arduino CLI. For
 example, this is how some backend services powering [Arduino Create] can compile sketches and manage libraries. Just to
 give you a taste of what it means to embed the Arduino CLI, here is how to search for a core using the API:
 
 ![Go library interface screenshot][]
 
-Embedding the Arduino CLI is limited to Golang applications and requires a deep knowledge of its internals; for the
-average use case the gRPC interface might be a better alternative, nevertheless this remains a valid option that we use
-and provide support for.
+Embedding the Arduino CLI is limited to Golang applications and requires a deep knowledge of its internals. For the
+average use case, the gRPC interface might be a better alternative. Nevertheless, this remains a valid option that we
+use and provide support for.
 
 ## Conclusions
 

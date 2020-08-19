@@ -21,7 +21,7 @@ option go_package = "github.com/arduino/arduino-cli/rpc/monitor";
 
 import "google/protobuf/struct.proto";
 
-// Service that abstract a Monitor usage
+// Service that abstracts a Monitor usage
 service Monitor {
   // Open a bidirectional monitor stream. This can be used to implement
   // something similar to the Arduino IDE's Serial Monitor.

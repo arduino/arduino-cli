@@ -22,7 +22,7 @@ or
 
 `package_example.com_avr_boards_index.json`
 
-The index URL is periodically checked for updates so expect a constant flow of downloads (proportional to the number of
+The index URL is periodically checked for updates, so expect a constant flow of downloads (proportional to the number of
 active users).
 
 ## JSON Index file contents
@@ -146,7 +146,7 @@ array. In the example above `avr-gcc` comes with builds for:
 
 The IDE will take care to install the right flavour based on the `host` value, or fail if a needed flavour is
 missing.<br> Note that this information is not used to select the toolchain during compilation. If you want this
-specific version to be used, you should use the notation {runtime.tools.TOOLNAME-VERSION.path} in the platform.txt.
+specific version to be used, you should use the notation `{runtime.tools.TOOLNAME-VERSION.path}` in the platform.txt.
 
 The other fields are:
 
@@ -161,13 +161,13 @@ The other fields are:
 
 ##### How a tool's path is determined in platform.txt
 
-When the IDE needs a tool it downloads the corresponding archive file and unpacks the content into a private folder that
-can be referenced from `platform.txt` using one of the following properties:
+When the IDE needs a tool, it downloads the corresponding archive file and unpacks the content into a private folder
+that can be referenced from `platform.txt` using one of the following properties:
 
 - `{runtime.tools.TOOLNAME-VERSION.path}`
 - `{runtime.tools.TOOLNAME.path}`
 
-For example to obtain the avr-gcc 4.8.1 folder we can use `{runtime.tools.avr-gcc-4.8.1-arduino5.path}` or
+For example, to obtain the avr-gcc 4.8.1 folder we can use `{runtime.tools.avr-gcc-4.8.1-arduino5.path}` or
 `{runtime.tools.avr-gcc.path}`.
 
 ### Platforms definitions
@@ -223,7 +223,7 @@ The `version` field is validated by both Arduino IDE and [JSemVer](https://githu
 rules Arduino IDE follows for parsing versions
 ([source](https://github.com/arduino/Arduino/blob/master/arduino-core/src/cc/arduino/contributions/VersionHelper.java)):
 
-- Split the version at the - character and continue with the first part.
+- Split the version at the `-` character and continue with the first part.
 - If there are no dots (`.`), parse `version` as an integer and form a Version from that integer using
   `Version.forIntegers`
 - If there is one dot, split `version` into two, parse each part as an integer, and form a Version from those integers

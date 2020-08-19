@@ -32,7 +32,7 @@ message BoardDetailsReq {
 message BoardDetailsResp {
     // The fully qualified board name of the board.
     string fqbn = 1;
-    // Name used to identify the board to humans (e.g., Arduino/Genuino Uno).
+    // Name used to identify the board to humans (e.g., Arduino Uno).
     string name = 2;
     // Installed version of the board's platform.
     string version = 3;

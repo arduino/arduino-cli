@@ -11,7 +11,7 @@ Follow the [Getting started guide] to see how to use the most common CLI command
 
 ## Using the gRPC interface
 
-The [client_example] folder contains a sample program that shows how to use gRPC interface of the CLI. Available
+The [client_example] folder contains a sample program that shows how to use the gRPC interface of the CLI. Available
 services and messages are detailed in the [gRPC reference] pages.
 
 [installation]: installation.md

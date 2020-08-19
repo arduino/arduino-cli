@@ -14,7 +14,7 @@ what groups those files into a single program.
 <!-- prettier-ignore -->
 The sketch root folder name must start with a basic letter (`A`-`Z` or `a`-`z`) or number (`0`-`9`), followed by basic letters, numbers, spaces (` `), underscores (`_`), dots (`.`) and dashes (`-`). The maximum length is 63 characters.
 
-Support for sketch folder name starting with a number was added in Arduino IDE 1.8.4.
+Support for sketch folder names starting with a number was added in Arduino IDE 1.8.4.
 
 ### Primary sketch file
 
@@ -79,9 +79,9 @@ Editor, while only one version of each library may be installed when using the o
 
 Arduino Web Editor has a
 ["Secret tab" feature](https://create.arduino.cc/projecthub/Arduino_Genuino/store-your-sensitive-data-safely-when-sharing-a-sketch-e7d0f0)
-that makes it easy to share sketches without accidentally exposing sensitive data (e.g., password, token). The Arduino
-Web Editor automatically generates macros for any identifier in the sketch which starts with `SECRET_`and contains all
-uppercase characters.
+that makes it easy to share sketches without accidentally exposing sensitive data (e.g., passwords or tokens). The
+Arduino Web Editor automatically generates macros for any identifier in the sketch which starts with `SECRET_` and
+contains all uppercase characters.
 
 When you download a sketch from Arduino Web Editor that contains a Secret tab, the empty `#define` directives for the
 secrets are in a file named arduino_secrets.h, with an `#include` directive to that file at the top of the primary

@@ -19,12 +19,12 @@ The Arduino development software performs a few transformations to your sketch b
 compiler:
 
 - All .ino and .pde files in the sketch folder (shown in the Arduino IDE as tabs with no extension) are concatenated
-  together, starting with the file that matches the folder name followed by the others in alphabetical order, and the
-  .cpp extension is added to the filename.
+  together, starting with the file that matches the folder name followed by the others in alphabetical order. The .cpp
+  filename extension is then added to the resulting file.
 - If not already present, `#include <Arduino.h>` is added to the sketch. This header file (found in the core folder for
   the currently selected board) includes all the definitions needed for the standard Arduino core.
 - Prototypes are generated for all function definitions in .ino/.pde files that don't already have prototypes. In some
-  rare cases prototype generation may fail for some functions. To work around this, you can provide your own prototypes
+  rare cases, prototype generation may fail for some functions. To work around this, you can provide your own prototypes
   for these functions.
 - `#line` directives are added to make warning or error messages reflect the original sketch layout.
 
