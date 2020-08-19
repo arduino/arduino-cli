@@ -156,8 +156,8 @@ The other fields are:
 - `size`: the size of the archive in bytes
 - `checksum`: the checksum of the archive, used to check if the file has been corrupted. The format is
   `ALGORITHM:CHECKSUM`, currently `MD5`, `SHA-1`,`SHA-256` algorithm are supported, we recommend `SHA-256`. On \*nix or
-  MacOSX you may be able to use the command `shasum -a 256 filename` to generate SHA-256 checksums. There are many free
-  options for Windows including md5deep, there are also online utilities for generating checksums.
+  macOS you can use the command `shasum -a 256 filename` to generate SHA-256 checksums. There are free options for
+  Windows, including md5deep. There are also online utilities for generating checksums.
 
 ##### How a tool's path is determined in platform.txt
 
@@ -307,7 +307,7 @@ cause the Arduino IDE to no longer load until you have deleted the file from you
 ```
 
 In the example there is one `PACKAGE`, My Board. The package is compatible with the AVR architecture. There are two
-versions of the `PACKAGE`, 1.0.0 and 1.0.1. No `TOOLS` needed to be installed so that section was left blank.
+versions of the `PACKAGE`, 1.0.0 and 1.0.1. No `TOOLS` needed to be installed so that section was left empty.
 
 Here is the Boards Manager entry created by the example: ![Boards Manager screenshot](img/boards-manager-screenshot.png)
 
