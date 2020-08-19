@@ -31,11 +31,14 @@ import (
 
 func initListCommand() *cobra.Command {
 	listCommand := &cobra.Command{
-		Use:     "list",
-		Short:   "Shows a list of all installed libraries.",
-		Long:    "Shows a list of all installed libraries.",
+		Use:   "list [LIBNAME]",
+		Short: "Shows a list of installed libraries.",
+		Long: "Shows a list of installed libraries.\n\n" +
+			"If the LIBNAME parameter is specified the listing is limited to that specific\n" +
+			"library. By default the libraries provided as built-in by platforms/core are\n" +
+			"not listed, they can be listed by adding the --all flag.",
 		Example: "  " + os.Args[0] + " lib list",
-		Args:    cobra.NoArgs,
+		Args:    cobra.MaximumNArgs(1),
 		Run:     runListCommand,
 	}
 	listCommand.Flags().BoolVar(&listFlags.all, "all", false, "Include built-in libraries (from platforms and IDE) in listing.")
@@ -52,10 +55,16 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
 	logrus.Info("Listing")
 
+	name := ""
+	if len(args) > 0 {
+		name = args[0]
+	}
+
 	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
 		Instance:  instance,
 		All:       listFlags.all,
 		Updatable: listFlags.updatable,
+		Name:      name,
 	})
 	if err != nil {
 		feedback.Errorf("Error listing Libraries: %v", err)

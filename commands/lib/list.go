@@ -17,6 +17,7 @@ package lib
 
 import (
 	"context"
+	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
@@ -34,10 +35,15 @@ type installedLib struct {
 func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResp, error) {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 
+	nameFilter := strings.ToLower(req.GetName())
+
 	instaledLib := []*rpc.InstalledLibrary{}
 	res := listLibraries(lm, req.GetUpdatable(), req.GetAll())
 	if len(res) > 0 {
 		for _, lib := range res {
+			if nameFilter != "" && strings.ToLower(lib.Library.Name) != nameFilter {
+				continue
+			}
 			libtmp := GetOutputLibrary(lib.Library)
 			release := GetOutputRelease(lib.Available)
 			instaledLib = append(instaledLib, &rpc.InstalledLibrary{

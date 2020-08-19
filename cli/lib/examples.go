@@ -51,21 +51,19 @@ func runExamplesCommand(cmd *cobra.Command, args []string) {
 	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
 		Instance: instance,
 		All:      true,
+		Name:     args[0],
 	})
 	if err != nil {
 		feedback.Errorf("Error getting libraries info: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	libs := res.GetInstalledLibrary()
 	found := []*libraryExamples{}
-	for _, lib := range libs {
-		if lib.Library.Name == args[0] {
-			found = append(found, &libraryExamples{
-				Library:  lib.Library,
-				Examples: lib.Library.Examples,
-			})
-		}
+	for _, lib := range res.GetInstalledLibrary() {
+		found = append(found, &libraryExamples{
+			Library:  lib.Library,
+			Examples: lib.Library.Examples,
+		})
 	}
 
 	feedback.PrintResult(libraryExamplesResult{found})

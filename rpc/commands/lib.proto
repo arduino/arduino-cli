@@ -193,7 +193,9 @@ message LibraryListReq {
     bool all = 2;
     // Whether to list only libraries for which there is a newer version than
     // the installed version available in the libraries index.
-	bool updatable = 3;
+    bool updatable = 3;
+    // If set filters out the libraries not matching name
+    string name = 4;
 }
 
 message LibraryListResp {
