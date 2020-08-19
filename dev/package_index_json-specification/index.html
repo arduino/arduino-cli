@@ -1276,8 +1276,8 @@ specific version to be used, you should use the notation {runtime.tools.TOOLNAME
 <li><code>size</code>: the size of the archive in bytes</li>
 <li><code>checksum</code>: the checksum of the archive, used to check if the file has been corrupted. The format is
   <code>ALGORITHM:CHECKSUM</code>, currently <code>MD5</code>, <code>SHA-1</code>,<code>SHA-256</code> algorithm are supported, we recommend <code>SHA-256</code>. On *nix or
-  MacOSX you may be able to use the command <code>shasum -a 256 filename</code> to generate SHA-256 checksums. There are many free
-  options for Windows including md5deep, there are also online utilities for generating checksums.</li>
+  macOS you can use the command <code>shasum -a 256 filename</code> to generate SHA-256 checksums. There are free options for
+  Windows, including md5deep. There are also online utilities for generating checksums.</li>
 </ul>
 <h5 id="how-a-tools-path-is-determined-in-platformtxt">How a tool's path is determined in platform.txt<a class="headerlink" href="#how-a-tools-path-is-determined-in-platformtxt" title="Permanent link">&para;</a></h5>
 <p>When the IDE needs a tool it downloads the corresponding archive file and unpacks the content into a private folder that
@@ -1419,7 +1419,7 @@ cause the Arduino IDE to no longer load until you have deleted the file from you
 </code></pre></div>
 
 <p>In the example there is one <code>PACKAGE</code>, My Board. The package is compatible with the AVR architecture. There are two
-versions of the <code>PACKAGE</code>, 1.0.0 and 1.0.1. No <code>TOOLS</code> needed to be installed so that section was left blank.</p>
+versions of the <code>PACKAGE</code>, 1.0.0 and 1.0.1. No <code>TOOLS</code> needed to be installed so that section was left empty.</p>
 <p>Here is the Boards Manager entry created by the example: <img alt="Boards Manager screenshot" src="../img/boards-manager-screenshot.png" /></p>
 <h2 id="installation-archive-structure">Installation archive structure<a class="headerlink" href="#installation-archive-structure" title="Permanent link">&para;</a></h2>
 <p>The installation archives contain the Board support files. Supported formats are .zip, .tar.bz2, and .tar.gz.</p>

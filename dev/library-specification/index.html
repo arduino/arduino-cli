@@ -1387,9 +1387,9 @@ otherwise below, <strong>all fields are required</strong>. The available fields 
 <li><strong>author</strong> - name/nickname of the authors and their email addresses (not mandatory) separated by comma ","</li>
 <li><strong>maintainer</strong> - name and email of the maintainer</li>
 <li><strong>sentence</strong> - a sentence explaining the purpose of the library</li>
-<li><strong>paragraph</strong> - a longer description of the library. The value of <strong>sentence</strong> always will be prepended, so you should
-  start by writing the second sentence here</li>
-<li><strong>category</strong> - (defaults to <code>Uncategorized</code>) if present, one of these:<ul>
+<li><strong>paragraph</strong> - a longer description of the library. The value of <strong>sentence</strong> will be prepended to this, so you
+  should start by writing the second sentence here</li>
+<li><strong>category</strong> - (defaults to <code>Uncategorized</code>) allowed values:<ul>
 <li>Display</li>
 <li>Communication</li>
 <li>Signal Input/Output</li>
@@ -1542,7 +1542,7 @@ Editor.</p>
 Remember that files placed inside this folder will increase the size of the library, so putting a 20MB PDF in a library
 that weights a few kilobytes may not be such a good idea.</p>
 <p>The content of the <em>extras</em> folder is totally ignored by the Arduino development software; you are free to put anything
-inside such as supporting documentation, etc.</p>
+inside.</p>
 <h3 id="keywords">Keywords<a class="headerlink" href="#keywords" title="Permanent link">&para;</a></h3>
 <p>A list of keywords for the library may be specified in a file named keywords.txt located in the root of the library
 folder. When a keyword of any installed library is used in a sketch the Arduino IDE colors it.</p>

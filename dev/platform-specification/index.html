@@ -1762,11 +1762,11 @@ hardware/xxxxx/avr/...       - Xxx - AVR
 
 
 <p>The vendor "arduino" has two supported architectures (AVR and SAM), while "xxxxx" and "yyyyy" have only AVR.</p>
-<p>If possible, follow existing architecture name conventions when creating hardware packages. The architecture folder name
-is used to determine library compatibility and also to permit referencing resources from another core of the same
-architecture so using a non-standard architecture name can only be harmful to your users. Architecture values are case
-sensitive (e.g. <code>AVR</code> != <code>avr</code>). Use the vendor folder name to differentiate your package, <strong>NOT</strong> the architecture
-name.</p>
+<p>Architecture values are case sensitive (e.g. <code>AVR</code> != <code>avr</code>).</p>
+<p>If possible, follow existing architecture name conventions when creating hardware packages. Use the vendor folder name
+to differentiate your package. The architecture folder name is used to determine library compatibility and to permit
+referencing resources from another core of the same architecture, so use of a non-standard architecture name can have a
+harmful effect.</p>
 <h2 id="architecture-configurations">Architecture configurations<a class="headerlink" href="#architecture-configurations" title="Permanent link">&para;</a></h2>
 <p>Each architecture must be configured through a set of configuration files:</p>
 <ul>
@@ -2038,8 +2038,8 @@ which will usually result in a permission error. Since platforms typically inclu
 includes <code>-MMD</code>, the <code>-MMD</code> option is automatically filtered out of the <code>recipe.preproc.macros</code> recipe to prevent this
 error.</p>
 <p>If <strong>recipe.preproc.macros</strong> is not defined, it is automatically generated from <strong>recipe.cpp.o.pattern</strong>.</p>
-<p>Note that older Arduino IDE versions used the <strong>recipe.preproc.includes</strong> recipe to determine includes, which is
-undocumented here. Since Arduino IDE 1.6.7 (arduino-builder 1.2.0) this was changed and <strong>recipe.preproc.includes</strong> is
+<p>Note that older Arduino IDE versions used the <strong>recipe.preproc.includes</strong> recipe (which is not documented here) to
+determine includes. Since Arduino IDE 1.6.7 (arduino-builder 1.2.0) this was changed and <strong>recipe.preproc.includes</strong> is
 no longer used.</p>
 <h4 id="pre-and-post-build-hooks-since-arduino-ide-165">Pre and post build hooks (since Arduino IDE 1.6.5)<a class="headerlink" href="#pre-and-post-build-hooks-since-arduino-ide-165" title="Permanent link">&para;</a></h4>
 <p>You can specify pre and post actions around each recipe. These are called "hooks". Here is the complete list of
