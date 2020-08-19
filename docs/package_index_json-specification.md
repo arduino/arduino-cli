@@ -146,7 +146,7 @@ array. In the example above `avr-gcc` comes with builds for:
 
 The IDE will take care to install the right flavour based on the `host` value, or fail if a needed flavour is
 missing.<br> Note that this information is not used to select the toolchain during compilation. If you want this
-specific version to be used, you should use the notation {runtime.tools.TOOLNAME-VERSION.path} in the platform.txt.
+specific version to be used, you should use the notation `{runtime.tools.TOOLNAME-VERSION.path}` in the platform.txt.
 
 The other fields are:
 
@@ -223,7 +223,7 @@ The `version` field is validated by both Arduino IDE and [JSemVer](https://githu
 rules Arduino IDE follows for parsing versions
 ([source](https://github.com/arduino/Arduino/blob/master/arduino-core/src/cc/arduino/contributions/VersionHelper.java)):
 
-- Split the version at the - character and continue with the first part.
+- Split the version at the `-` character and continue with the first part.
 - If there are no dots (`.`), parse `version` as an integer and form a Version from that integer using
   `Version.forIntegers`
 - If there is one dot, split `version` into two, parse each part as an integer, and form a Version from those integers

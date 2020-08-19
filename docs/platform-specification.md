@@ -1,6 +1,8 @@
 This is the Arduino platform specification, for use with Arduino development software starting from the Arduino IDE
-1.5.x series.<br> Platforms add support for new boards to the Arduino development software. They are installable either
-via [Boards Manager](package_index_json-specification.md) or manual installation to the _hardware_ folder of Arduino's
+1.5.x series.
+
+Platforms add support for new boards to the Arduino development software. They are installable either via
+[Boards Manager](package_index_json-specification.md) or manual installation to the _hardware_ folder of Arduino's
 sketchbook folder (AKA "user directory").<br> A platform may consist of as little as a single configuration file.
 
 ## Hardware Folders structure
@@ -240,8 +242,9 @@ files a `.hex` and a `.eep`, so we made two recipes like:
     recipe.objcopy.eep.pattern=[.....]
     recipe.objcopy.hex.pattern=[.....]
 
-There are no specific properties set by the Arduino development software here. A full example for the AVR platform can
-be:
+There are no specific properties set by the Arduino development software here.
+
+A full example for the AVR platform can be:
 
     ## Create eeprom
     recipe.objcopy.eep.pattern="{compiler.path}{compiler.objcopy.cmd}" {compiler.objcopy.eep.flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.eep"
@@ -596,8 +599,10 @@ If the user didn't enable verbose mode, then **{upload.params.quiet}** is used i
 
 The Upload action is triggered when the user clicks on the "Upload" button on the IDE toolbar or uses
 [`arduino-cli upload`](commands/arduino-cli_upload.md). Arduino uses the term "upload" for the process of transferring a
-program to the Arduino board. The **upload.tool** property determines the tool to be used for upload. A specific
-**upload.tool** property should be defined for every board in boards.txt:
+program to the Arduino board.
+
+The **upload.tool** property determines the tool to be used for upload. A specific **upload.tool** property should be
+defined for every board in boards.txt:
 
     [......]
     uno.upload.tool=avrdude
@@ -745,8 +750,8 @@ This board was produced in two models, one with an ATmega168 microcontroller and
 going then to define a custom option, using the "cpu" MENU_ID, that allows the user to choose between the two different
 microcontrollers.
 
-We must first define a set of **menu.MENU_ID=Text** properties. Text is what is displayed on the GUI for every custom
-menu we are going to create and must be declared at the beginning of the boards.txt file:
+We must first define a set of **menu.MENU_ID=Text** properties. **Text** is what is displayed on the GUI for every
+custom menu we are going to create and must be declared at the beginning of the boards.txt file:
 
     menu.cpu=Processor
     [.....]
@@ -774,7 +779,7 @@ Now let's define the possible values of the "cpu" option:
     [.....]
 
 We have defined two values: "atmega328" and "atmega168".<br> Note that the property keys must follow the format
-**BOARD_ID.menu.MENU_ID.OPTION_ID=Text**, where Text is what is displayed under the "Processor" menu in the IDE's
+**BOARD_ID.menu.MENU_ID.OPTION_ID=Text**, where **Text** is what is displayed under the "Processor" menu in the IDE's
 GUI.<br> Finally, the specific configuration for each option value:
 
     [.....]
