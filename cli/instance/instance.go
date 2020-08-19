@@ -80,6 +80,40 @@ func getInitResponse() (*rpc.InitResp, error) {
 		resp.PlatformsIndexErrors = rescanResp.PlatformsIndexErrors
 	}
 
+	// Init() succeeded but there were errors loading platform indexes,
+	// let's rescan and try again
+	if resp.GetPlatformsIndexErrors() != nil {
+
+		// log each error
+		for _, err := range resp.GetPlatformsIndexErrors() {
+			logrus.Errorf("Error loading platform index: %v", err)
+		}
+
+		// update platform index
+		_, err := commands.UpdateIndex(context.Background(),
+			&rpc.UpdateIndexReq{Instance: resp.GetInstance()}, output.ProgressBar())
+		if err != nil {
+			return nil, errors.Wrap(err, "updating the core index")
+		}
+
+		// rescan
+		rescanResp, err := commands.Rescan(resp.GetInstance().GetId())
+		if err != nil {
+			return nil, errors.Wrap(err, "during rescan")
+		}
+
+		// errors persist
+		if rescanResp.GetPlatformsIndexErrors() != nil {
+			for _, err := range rescanResp.GetPlatformsIndexErrors() {
+				logrus.Errorf("Still errors after rescan: %v", err)
+			}
+		}
+
+		// succeeded, copy over PlatformsIndexErrors in case errors occurred
+		// during rescan
+		resp.PlatformsIndexErrors = rescanResp.PlatformsIndexErrors
+	}
+
 	return resp, nil
 }
 
