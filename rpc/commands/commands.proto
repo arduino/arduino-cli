@@ -31,6 +31,9 @@ service ArduinoCore {
   // BOOTSTRAP COMMANDS
   //-------------------
 
+  // Adds a new index url to user configuration
+  rpc AddIndex(AddIndexReq) returns (stream AddIndexResp) {}
+
   // Start a new instance of the Arduino Core Service
   rpc Init(InitReq) returns (stream InitResp) {}
 
@@ -55,7 +58,7 @@ service ArduinoCore {
   // Requests details about a board
   rpc BoardDetails(BoardDetailsReq) returns (BoardDetailsResp);
 
-  // Attach a board to a sketch. When the `fqbn` field of a request is not 
+  // Attach a board to a sketch. When the `fqbn` field of a request is not
   // provided, the FQBN of the attached board will be used.
   rpc BoardAttach(BoardAttachReq) returns (stream BoardAttachResp);
 
@@ -118,6 +121,22 @@ service ArduinoCore {
 
   // List the installed libraries.
   rpc LibraryList(LibraryListReq) returns (LibraryListResp);
+}
+
+message AddIndexReq {
+  // An Arduino Core Service instance.
+  Instance instance = 1;
+
+  // List of URLs added to user settings
+  repeated string index_url = 2;
+}
+
+message AddIndexResp {
+  // Progress of the indexes download
+  DownloadProgress download_progress = 1;
+
+  // Eventual warning or error messages
+  repeated string messages = 2;
 }
 
 message InitReq {

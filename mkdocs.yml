@@ -78,6 +78,7 @@ nav:
       - config dump: commands/arduino-cli_config_dump.md
       - config init: commands/arduino-cli_config_init.md
       - core: commands/arduino-cli_core.md
+      - core add index: commands/arduino-cli_core_add-index.md
       - core download: commands/arduino-cli_core_download.md
       - core install: commands/arduino-cli_core_install.md
       - core list: commands/arduino-cli_core_list.md

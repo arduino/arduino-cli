@@ -131,6 +131,17 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoC
 	return stream.Send(resp)
 }
 
+// AddIndex FIXMEDOC
+func (s *ArduinoCoreServerImpl) AddIndex(req *rpc.AddIndexReq, stream rpc.ArduinoCore_AddIndexServer) error {
+	resp, err := core.AddIndex(stream.Context(), req,
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.AddIndexResp{DownloadProgress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
+}
+
 // PlatformInstall FIXMEDOC
 func (s *ArduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallReq, stream rpc.ArduinoCore_PlatformInstallServer) error {
 	resp, err := core.PlatformInstall(

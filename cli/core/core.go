@@ -30,6 +30,7 @@ func NewCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " core update-index",
 	}
 
+	coreCommand.AddCommand(initAddIndexCommand())
 	coreCommand.AddCommand(initDownloadCommand())
 	coreCommand.AddCommand(initInstallCommand())
 	coreCommand.AddCommand(initListCommand())

@@ -186,3 +186,83 @@ def test_core_uninstall(run_command):
     result = run_command("core list --format json")
     assert result.ok
     assert not _in(result.stdout, "arduino:avr")
+
+
+def test_add_index_with_invalid_url(run_command):
+    assert run_command("core update-index")
+
+    url = "http://www.invalid-domain-asjkdakdhadjkh.com/package_example_index.json"
+    result = run_command(f"core add-index {url}")
+    assert result.failed
+    lines = result.stderr.strip().splitlines()
+    assert "no such host" in lines[-1]
+
+
+def test_add_index_unaudited_url(run_command):
+    assert run_command("core update-index")
+
+    url = "https://dl.espressif.com/dl/package_esp32_index.json"
+    result = run_command(f"core add-index {url}")
+    assert result.ok
+    lines = result.stdout.strip().splitlines()
+    assert (
+        "WARNING: A 3rd party package index https://dl.espressif.com/dl/package_esp32_index.json was added. "
+        + "The boards platforms from this index have not been audited for security by Arduino. "
+        + "Platforms can run custom executables on your computer, so use it at your own risk."
+        in lines
+    )
+
+
+def test_add_index(run_command):
+    assert run_command("core update-index")
+
+    url = "https://downloads.arduino.cc/packages/package_index.json"
+    result = run_command(f"core add-index {url}")
+    assert result.ok
+    lines = result.stdout.strip().splitlines()
+    assert not (
+        "WARNING: A 3rd party package index https://downloads.arduino.cc/packages/package_index.json was added. "
+        + "The boards platforms from this index have not been audited for security by Arduino. "
+        + "Platforms can run custom executables on your computer, so use it at your own risk."
+        in lines
+    )
+
+
+def test_add_index_with_multiple_urls(run_command):
+    assert run_command("core update-index")
+
+    urls = " ".join(
+        [
+            "https://downloads.arduino.cc/packages/package_index.json",
+            "https://dl.espressif.com/dl/package_esp32_index.json",
+        ]
+    )
+    result = run_command(f"core add-index {urls}")
+    assert result.ok
+    lines = result.stdout.strip().splitlines()
+    assert (
+        "WARNING: A 3rd party package index https://dl.espressif.com/dl/package_esp32_index.json was added. "
+        + "The boards platforms from this index have not been audited for security by Arduino. "
+        + "Platforms can run custom executables on your computer, so use it at your own risk."
+        in lines
+    )
+    assert not (
+        "WARNING: A 3rd party package index https://downloads.arduino.cc/packages/package_index.json was added. "
+        + "The boards platforms from this index have not been audited for security by Arduino. "
+        + "Platforms can run custom executables on your computer, so use it at your own risk."
+        in lines
+    )
+
+
+def test_add_index_with_multiple_urls_and_invalid_url(run_command):
+    assert run_command("core update-index")
+
+    urls = " ".join(
+        [
+            "https://downloads.arduino.cc/packages/package_index.json",
+            "http://www.invalid-domain-asjkdakdhadjkh.com/package_example_index.json",
+            "https://dl.espressif.com/dl/package_esp32_index.json",
+        ]
+    )
+    result = run_command(f"core add-index {urls}")
+    assert result.failed
