@@ -449,5 +449,5 @@ def test_board_details_no_flags(run_command):
     assert result.ok
     result = run_command("board details")
     assert not result.ok
-    assert "Error getting board details: parsing fqbn: invalid fqbn:"
+    assert "Error getting board details: parsing fqbn: invalid fqbn:" in result.stderr
     assert result.stdout == ""

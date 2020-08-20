@@ -99,6 +99,14 @@ def test_core_updateindex_invalid_url(run_command):
     assert result.failed
 
 
+def test_core_install_without_updateindex(run_command):
+    # Missing "core update-index"
+    # Download samd core pinned to 1.8.6
+    result = run_command("core install arduino:samd@1.8.6")
+    assert result.ok
+    assert "Updating index: package_index.json downloaded" in result.stdout
+
+
 @pytest.mark.skipif(
     platform.system() == "Windows", reason="core fails with fatal error: bits/c++config.h: No such file or directory",
 )
