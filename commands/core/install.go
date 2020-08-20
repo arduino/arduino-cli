@@ -144,7 +144,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 		log.Info("Running post_install script")
 		taskCB(&rpc.TaskProgress{Message: "Configuring platform"})
 		if err := pm.RunPostInstallScript(platformRelease); err != nil {
-			return errors.Errorf("running post install: %s", err)
+			taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("WARNING: cannot run post install: %s", err)})
 		}
 	} else {
 		log.Info("Skipping platform configuration (post_install run).")
