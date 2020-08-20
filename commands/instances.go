@@ -17,6 +17,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/url"
@@ -26,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/arduino-cli/cli/globals"
@@ -293,6 +295,280 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 		return nil, fmt.Errorf("rescanning filesystem: %s", err)
 	}
 	return &rpc.UpdateIndexResp{}, nil
+}
+
+// UpdateCoreLibrariesIndex updates both Cores and Libraries indexes
+func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexReq, downloadCB DownloadProgressCB) error {
+	_, err := UpdateIndex(ctx, &rpc.UpdateIndexReq{
+		Instance: req.Instance,
+	}, downloadCB)
+	if err != nil {
+		return err
+	}
+
+	err = UpdateLibrariesIndex(ctx, &rpc.UpdateLibrariesIndexReq{
+		Instance: req.Instance,
+	}, downloadCB)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Outdated returns a list struct containing both Core and Libraries that can be updated
+func Outdated(ctx context.Context, req *rpc.OutdatedReq) (*rpc.OutdatedResp, error) {
+	id := req.GetInstance().GetId()
+
+	libraryManager := GetLibraryManager(id)
+	if libraryManager == nil {
+		return nil, errors.New("invalid instance")
+	}
+
+	outdatedLibraries := []*rpc.InstalledLibrary{}
+	for _, libAlternatives := range libraryManager.Libraries {
+		for _, library := range libAlternatives.Alternatives {
+			if library.Location != libraries.User {
+				continue
+			}
+			available := libraryManager.Index.FindLibraryUpdate(library)
+			if available == nil {
+				continue
+			}
+
+			outdatedLibraries = append(outdatedLibraries, &rpc.InstalledLibrary{
+				Library: getOutputLibrary(library),
+				Release: getOutputRelease(available),
+			})
+		}
+	}
+
+	packageManager := GetPackageManager(id)
+	if packageManager == nil {
+		return nil, errors.New("invalid instance")
+	}
+
+	outdatedPlatforms := []*rpc.Platform{}
+	for _, targetPackage := range packageManager.Packages {
+		for _, installed := range targetPackage.Platforms {
+			if installedRelease := packageManager.GetInstalledPlatformRelease(installed); installedRelease != nil {
+				latest := installed.GetLatestRelease()
+				if latest == nil || latest == installedRelease {
+					continue
+				}
+				rpcPlatform := PlatformReleaseToRPC(latest)
+				rpcPlatform.Installed = installedRelease.Version.String()
+
+				outdatedPlatforms = append(
+					outdatedPlatforms,
+					rpcPlatform,
+				)
+			}
+		}
+	}
+
+	return &rpc.OutdatedResp{
+		OutdatedLibrary:  outdatedLibraries,
+		OutdatedPlatform: outdatedPlatforms,
+	}, nil
+}
+
+func getOutputLibrary(lib *libraries.Library) *rpc.Library {
+	insdir := ""
+	if lib.InstallDir != nil {
+		insdir = lib.InstallDir.String()
+	}
+	srcdir := ""
+	if lib.SourceDir != nil {
+		srcdir = lib.SourceDir.String()
+	}
+	utldir := ""
+	if lib.UtilityDir != nil {
+		utldir = lib.UtilityDir.String()
+	}
+	cntplat := ""
+	if lib.ContainerPlatform != nil {
+		cntplat = lib.ContainerPlatform.String()
+	}
+
+	return &rpc.Library{
+		Name:              lib.Name,
+		Author:            lib.Author,
+		Maintainer:        lib.Maintainer,
+		Sentence:          lib.Sentence,
+		Paragraph:         lib.Paragraph,
+		Website:           lib.Website,
+		Category:          lib.Category,
+		Architectures:     lib.Architectures,
+		Types:             lib.Types,
+		InstallDir:        insdir,
+		SourceDir:         srcdir,
+		UtilityDir:        utldir,
+		Location:          lib.Location.ToRPCLibraryLocation(),
+		ContainerPlatform: cntplat,
+		Layout:            lib.Layout.ToRPCLibraryLayout(),
+		RealName:          lib.RealName,
+		DotALinkage:       lib.DotALinkage,
+		Precompiled:       lib.Precompiled,
+		LdFlags:           lib.LDflags,
+		IsLegacy:          lib.IsLegacy,
+		Version:           lib.Version.String(),
+		License:           lib.License,
+	}
+}
+
+func getOutputRelease(lib *librariesindex.Release) *rpc.LibraryRelease {
+	if lib != nil {
+		return &rpc.LibraryRelease{
+			Author:        lib.Author,
+			Version:       lib.Version.String(),
+			Maintainer:    lib.Maintainer,
+			Sentence:      lib.Sentence,
+			Paragraph:     lib.Paragraph,
+			Website:       lib.Website,
+			Category:      lib.Category,
+			Architectures: lib.Architectures,
+			Types:         lib.Types,
+		}
+	}
+	return &rpc.LibraryRelease{}
+}
+
+// Upgrade downloads and installs outdated Cores and Libraries
+func Upgrade(ctx context.Context, req *rpc.UpgradeReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
+	downloaderConfig, err := GetDownloaderConfig()
+	if err != nil {
+		return err
+	}
+
+	lm := GetLibraryManager(req.Instance.Id)
+	if lm == nil {
+		return fmt.Errorf("invalid handle")
+	}
+
+	for _, libAlternatives := range lm.Libraries {
+		for _, library := range libAlternatives.Alternatives {
+			if library.Location != libraries.User {
+				continue
+			}
+			available := lm.Index.FindLibraryUpdate(library)
+			if available == nil {
+				continue
+			}
+
+			// Downloads latest library release
+			taskCB(&rpc.TaskProgress{Name: "Downloading " + available.String()})
+			if d, err := available.Resource.Download(lm.DownloadsDir, downloaderConfig); err != nil {
+				return err
+			} else if err := Download(d, available.String(), downloadCB); err != nil {
+				return err
+			}
+
+			// Installs downloaded library
+			taskCB(&rpc.TaskProgress{Name: "Installing " + available.String()})
+			libPath, libReplaced, err := lm.InstallPrerequisiteCheck(available)
+			if err == librariesmanager.ErrAlreadyInstalled {
+				taskCB(&rpc.TaskProgress{Message: "Already installed " + available.String(), Completed: true})
+				continue
+			} else if err != nil {
+				return fmt.Errorf("checking lib install prerequisites: %s", err)
+			}
+
+			if libReplaced != nil {
+				taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("Replacing %s with %s", libReplaced, available)})
+			}
+
+			if err := lm.Install(available, libPath); err != nil {
+				return err
+			}
+
+			taskCB(&rpc.TaskProgress{Message: "Installed " + available.String(), Completed: true})
+		}
+	}
+
+	pm := GetPackageManager(req.Instance.Id)
+	if pm == nil {
+		return fmt.Errorf("invalid handle")
+	}
+
+	for _, targetPackage := range pm.Packages {
+		for _, installed := range targetPackage.Platforms {
+			if installedRelease := pm.GetInstalledPlatformRelease(installed); installedRelease != nil {
+				latest := installed.GetLatestRelease()
+				if latest == nil || latest == installedRelease {
+					continue
+				}
+
+				ref := &packagemanager.PlatformReference{
+					Package:              latest.Platform.Package.Name,
+					PlatformArchitecture: latest.Platform.Architecture,
+					PlatformVersion:      latest.Version,
+				}
+
+				taskCB(&rpc.TaskProgress{Name: "Downloading " + latest.String()})
+				_, tools, err := pm.FindPlatformReleaseDependencies(ref)
+				if err != nil {
+					return fmt.Errorf("platform %s is not installed", ref)
+				}
+
+				toolsToInstall := []*cores.ToolRelease{}
+				for _, tool := range tools {
+					if tool.IsInstalled() {
+						taskCB(&rpc.TaskProgress{Name: "Tool " + tool.String() + " already installed", Completed: true})
+					} else {
+						toolsToInstall = append(toolsToInstall, tool)
+					}
+				}
+
+				// Downloads platform tools
+				for _, tool := range toolsToInstall {
+					if err := DownloadToolRelease(pm, tool, downloadCB); err != nil {
+						taskCB(&rpc.TaskProgress{Message: "Error downloading tool " + tool.String()})
+						return err
+					}
+				}
+
+				// Downloads platform
+				if d, err := pm.DownloadPlatformRelease(latest, downloaderConfig); err != nil {
+					return err
+				} else if err := Download(d, latest.String(), downloadCB); err != nil {
+					return err
+				}
+
+				taskCB(&rpc.TaskProgress{Name: "Installing " + latest.String()})
+
+				// Installs tools
+				for _, tool := range toolsToInstall {
+					if err := InstallToolRelease(pm, tool, taskCB); err != nil {
+						taskCB(&rpc.TaskProgress{Message: "Error installing tool " + tool.String()})
+						return err
+					}
+				}
+
+				// Installs platform
+				err = pm.InstallPlatform(latest)
+				if err != nil {
+					taskCB(&rpc.TaskProgress{Message: "Error installing " + latest.String()})
+					return err
+				}
+
+				// Uninstall previously installed release
+				err = pm.UninstallPlatform(installedRelease)
+
+				// In case uninstall fails tries to rollback
+				if err != nil {
+					taskCB(&rpc.TaskProgress{Message: "Error upgrading platform: " + err.Error()})
+
+					// Rollback
+					if err := pm.UninstallPlatform(latest); err != nil {
+						taskCB(&rpc.TaskProgress{Message: "Error rolling-back changes: " + err.Error()})
+					}
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 // Rescan restart discoveries for the given instance

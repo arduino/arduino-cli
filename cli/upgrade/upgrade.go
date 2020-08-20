@@ -23,8 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
-	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -53,46 +52,12 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino upgrade`")
 
-	// Gets list of libraries to upgrade, cores' libraries are ignored since they're upgraded
-	// when the core is
-	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
-		Instance:  inst,
-		All:       false,
-		Updatable: true,
-	})
-	if err != nil {
-		feedback.Errorf("Error retrieving library list: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	libraries := []string{}
-	for _, l := range res.InstalledLibrary {
-		libraries = append(libraries, l.Library.Name)
-	}
+	err = commands.Upgrade(context.Background(), &rpc.UpgradeReq{
+		Instance: inst,
+	}, output.NewDownloadProgressBarCB(), output.TaskProgress())
 
-	// Upgrades libraries
-	err = lib.LibraryUpgrade(inst.Id, libraries, output.ProgressBar(), output.TaskProgress())
 	if err != nil {
-		feedback.Errorf("Error upgrading libraries: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
-	targets, err := core.GetPlatforms(inst.Id, true)
-	if err != nil {
-		feedback.Errorf("Error retrieving core list: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
-	for _, t := range targets {
-		r := &rpc.PlatformUpgradeReq{
-			Instance:        inst,
-			PlatformPackage: t.Platform.Package.Name,
-			Architecture:    t.Platform.Architecture,
-		}
-		_, err := core.PlatformUpgrade(context.Background(), r, output.ProgressBar(), output.TaskProgress())
-		if err != nil {
-			feedback.Errorf("Error during upgrade: %v", err)
-			os.Exit(errorcodes.ErrGeneric)
-		}
+		feedback.Errorf("Error upgrading: %v", err)
 	}
 
 	logrus.Info("Done")

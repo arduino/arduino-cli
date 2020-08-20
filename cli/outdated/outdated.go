@@ -22,8 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
@@ -48,37 +47,25 @@ func NewCommand() *cobra.Command {
 func runOutdatedCommand(cmd *cobra.Command, args []string) {
 	inst, err := instance.CreateInstance()
 	if err != nil {
-		feedback.Errorf("Error upgrading: %v", err)
+		feedback.Errorf("Error running outdated command: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	logrus.Info("Executing `arduino outdated`")
 
-	// Gets outdated cores
-	targets, err := core.GetPlatforms(inst.Id, true)
-	if err != nil {
-		feedback.Errorf("Error retrieving core list: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
-	// Gets outdated libraries
-	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
-		Instance:  inst,
-		All:       false,
-		Updatable: true,
+	outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedReq{
+		Instance: inst,
 	})
 	if err != nil {
-		feedback.Errorf("Error retrieving library list: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Errorf("Error retrieving outdated cores and libraries: %v", err)
 	}
 
 	// Prints outdated cores
 	tab := table.New()
 	tab.SetHeader("Core name", "Installed version", "New version")
-	if len(targets) > 0 {
-		for _, t := range targets {
-			plat := t.Platform
-			tab.AddRow(plat.Name, t.Version, plat.GetLatestRelease().Version)
+	if len(outdatedResp.OutdatedPlatform) > 0 {
+		for _, p := range outdatedResp.OutdatedPlatform {
+			tab.AddRow(p.Name, p.Installed, p.Latest)
 		}
 		feedback.Print(tab.Render())
 	}
@@ -86,9 +73,8 @@ func runOutdatedCommand(cmd *cobra.Command, args []string) {
 	// Prints outdated libraries
 	tab = table.New()
 	tab.SetHeader("Library name", "Installed version", "New version")
-	libs := res.GetInstalledLibrary()
-	if len(libs) > 0 {
-		for _, l := range libs {
+	if len(outdatedResp.OutdatedLibrary) > 0 {
+		for _, l := range outdatedResp.OutdatedLibrary {
 			tab.AddRow(l.Library.Name, l.Library.Version, l.Release.Version)
 		}
 		feedback.Print(tab.Render())
