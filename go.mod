@@ -20,7 +20,7 @@ require (
 	github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 // indirect
 	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
-	github.com/golang/protobuf v1.3.3
+	github.com/golang/protobuf v1.4.1
 	github.com/h2non/filetype v1.0.8 // indirect
 	github.com/imjasonmiller/godice v0.1.2
 	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5 // indirect
@@ -51,8 +51,8 @@ require (
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect
 	golang.org/x/text v0.3.2
-	google.golang.org/genproto v0.0.0-20200204135345-fa8e72b47b90 // indirect
 	google.golang.org/grpc v1.27.0
+	google.golang.org/protobuf v1.25.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
 	gopkg.in/yaml.v2 v2.3.0
