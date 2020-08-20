@@ -140,7 +140,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 	}
 
 	// Perform post install
-	if !skipPostInstall && platformRelease.IsTrusted {
+	if !skipPostInstall {
 		log.Info("Running post_install script")
 		taskCB(&rpc.TaskProgress{Message: "Configuring platform (post_install run)"})
 		if err := pm.RunPostInstallScript(platformRelease); err != nil {
