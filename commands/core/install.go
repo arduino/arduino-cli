@@ -17,13 +17,13 @@ package core
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/pkg/errors"
 )
 
 // PlatformInstall FIXMEDOC
@@ -49,7 +49,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 		return nil, fmt.Errorf("finding platform dependencies: %s", err)
 	}
 
-	err = installPlatform(pm, platform, tools, downloadCB, taskCB)
+	err = installPlatform(pm, platform, tools, downloadCB, taskCB, req.GetSkipPostInstall())
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,8 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 
 func installPlatform(pm *packagemanager.PackageManager,
 	platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB,
+	skipPostInstall bool) error {
 	log := pm.Log.WithField("platform", platformRelease)
 
 	// Prerequisite checks before install
@@ -136,6 +137,18 @@ func installPlatform(pm *packagemanager.PackageManager,
 
 			return fmt.Errorf("updating platform: %s", errUn)
 		}
+	}
+
+	// Perform post install
+	if !skipPostInstall && platformRelease.IsTrusted {
+		log.Info("Running post_install script")
+		taskCB(&rpc.TaskProgress{Message: "Configuring platform (post_install run)"})
+		if err := pm.RunPostInstallScript(platformRelease); err != nil {
+			return errors.Errorf("running post install: %s", err)
+		}
+	} else if skipPostInstall {
+		log.Info("Skipping platform configuration (post_install run).")
+		taskCB(&rpc.TaskProgress{Message: "Skipping platform configuration (post_install run)"})
 	}
 
 	log.Info("Platform installed")

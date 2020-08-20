@@ -75,7 +75,7 @@ func TellCommandNotToSpawnShell(cmd *exec.Cmd) {
 // Command creates a command with the provided command line arguments.
 // The first argument is the path to the executable, the remainder are the
 // arguments to the command.
-func Command(args []string) (*exec.Cmd, error) {
+func Command(args ...string) (*exec.Cmd, error) {
 	if args == nil || len(args) == 0 {
 		return nil, fmt.Errorf("no executable specified")
 	}

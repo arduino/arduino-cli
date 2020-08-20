@@ -42,6 +42,7 @@ func initUpgradeCommand() *cobra.Command {
 			"  " + os.Args[0] + " core upgrade arduino:samd",
 		Run: runUpgradeCommand,
 	}
+	addPostInstallFlagsToCommand(upgradeCommand)
 	return upgradeCommand
 }
 
@@ -91,6 +92,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			Instance:        inst,
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
+			SkipPostInstall: detectSkipPostInstallValue(),
 		}
 
 		_, err := core.PlatformUpgrade(context.Background(), r, output.ProgressBar(), output.TaskProgress())

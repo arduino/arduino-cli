@@ -29,7 +29,8 @@ require (
 	github.com/leonelquinteros/gotext v1.4.0
 	github.com/marcinbor85/gohex v0.0.0-20200531163658-baab2527a9a2
 	github.com/mattn/go-colorable v0.1.2
-	github.com/mattn/go-runewidth v0.0.2 // indirect
+	github.com/mattn/go-isatty v0.0.8
+	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/miekg/dns v1.0.5 // indirect
 	github.com/oleksandr/bonjour v0.0.0-20160508152359-5dcf00d8b228 // indirect
 	github.com/pkg/errors v0.9.1

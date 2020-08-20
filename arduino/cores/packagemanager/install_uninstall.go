@@ -17,8 +17,11 @@ package packagemanager
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/executils"
+	"github.com/pkg/errors"
 )
 
 // InstallPlatform installs a specific release of a platform.
@@ -28,7 +31,41 @@ func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease
 		"hardware",
 		platformRelease.Platform.Architecture,
 		platformRelease.Version.String())
-	return platformRelease.Resource.Install(pm.DownloadDir, pm.TempDir, destDir)
+	if err := platformRelease.Resource.Install(pm.DownloadDir, pm.TempDir, destDir); err != nil {
+		return errors.Errorf("installing platform %s: %s", platformRelease, err)
+	}
+	if d, err := destDir.Abs(); err == nil {
+		platformRelease.InstallDir = d
+	} else {
+		return err
+	}
+	return nil
+}
+
+// RunPostInstallScript runs the post_install.sh (or post_install.bat) script for the
+// specified platformRelease.
+func (pm *PackageManager) RunPostInstallScript(platformRelease *cores.PlatformRelease) error {
+	if !platformRelease.IsInstalled() {
+		return errors.New("platform not installed")
+	}
+	postInstallFilename := "post_install.sh"
+	if runtime.GOOS == "windows" {
+		postInstallFilename = "post_install.bat"
+	}
+	postInstall := platformRelease.InstallDir.Join(postInstallFilename)
+	if postInstall.Exist() && postInstall.IsNotDir() {
+		cmd, err := executils.Command(postInstall.String())
+		if err != nil {
+			return err
+		}
+		cmd.Dir = platformRelease.InstallDir.String()
+		cmd.Stdout = nil
+		cmd.Stderr = nil
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // IsManagedPlatformRelease returns true if the PlatforRelease is managed by the PackageManager

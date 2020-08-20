@@ -64,7 +64,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 	}
 	entry.Debug("Executing debugger")
 
-	cmd, err := executils.Command(commandLine)
+	cmd, err := executils.Command(commandLine...)
 	if err != nil {
 		return nil, errors.Wrap(err, "Cannot execute debug tool")
 	}

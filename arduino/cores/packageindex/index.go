@@ -21,13 +21,16 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/resources"
+	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
 
 // Index represents Cores and Tools struct as seen from package_index.json file.
 type Index struct {
-	Packages []*indexPackage `json:"packages"`
+	Packages  []*indexPackage `json:"packages"`
+	IsTrusted bool
 }
 
 // indexPackage represents a single entry from package_index.json file.
@@ -98,11 +101,11 @@ type indexHelp struct {
 // with the existing contents of the cores.Packages passed as parameter.
 func (index Index) MergeIntoPackages(outPackages cores.Packages) {
 	for _, inPackage := range index.Packages {
-		inPackage.extractPackageIn(outPackages)
+		inPackage.extractPackageIn(outPackages, index.IsTrusted)
 	}
 }
 
-func (inPackage indexPackage) extractPackageIn(outPackages cores.Packages) {
+func (inPackage indexPackage) extractPackageIn(outPackages cores.Packages, trusted bool) {
 	outPackage := outPackages.GetOrCreatePackage(inPackage.Name)
 	outPackage.Maintainer = inPackage.Maintainer
 	outPackage.WebsiteURL = inPackage.WebsiteURL
@@ -115,11 +118,11 @@ func (inPackage indexPackage) extractPackageIn(outPackages cores.Packages) {
 	}
 
 	for _, inPlatform := range inPackage.Platforms {
-		inPlatform.extractPlatformIn(outPackage)
+		inPlatform.extractPlatformIn(outPackage, trusted)
 	}
 }
 
-func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *cores.Package) error {
+func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *cores.Package, trusted bool) error {
 	outPlatform := outPackage.GetOrCreatePlatform(inPlatformRelease.Architecture)
 	// FIXME: shall we use the Name and Category of the latest release? or maybe move Name and Category in PlatformRelease?
 	outPlatform.Name = inPlatformRelease.Name
@@ -133,6 +136,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	if err != nil {
 		return fmt.Errorf("creating release: %s", err)
 	}
+	outPlatformRelease.IsTrusted = trusted
 	outPlatformRelease.Resource = &resources.DownloadResource{
 		ArchiveFileName: inPlatformRelease.ArchiveFileName,
 		Checksum:        inPlatformRelease.Checksum,
@@ -213,5 +217,19 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 		return nil, err
 	}
 
+	jsonSignatureFile := jsonIndexFile.Parent().Join(jsonIndexFile.Base() + ".sig")
+	trusted, _, err := security.VerifyArduinoDetachedSignature(jsonIndexFile, jsonSignatureFile)
+	if err != nil {
+		logrus.
+			WithField("index", jsonIndexFile).
+			WithField("signatureFile", jsonSignatureFile).
+			WithError(err).Infof("Checking signature")
+	} else {
+		logrus.
+			WithField("index", jsonIndexFile).
+			WithField("signatureFile", jsonSignatureFile).
+			WithField("trusted", trusted).Infof("Checking signature")
+		index.IsTrusted = trusted
+	}
 	return &index, nil
 }
