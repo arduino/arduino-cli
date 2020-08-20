@@ -85,7 +85,7 @@ func PlatformSearch(instanceID int32, searchArgs string, allVersions bool) (*rpc
 
 	out := make([]*rpc.Platform, len(res))
 	for i, platformRelease := range res {
-		out[i] = PlatformReleaseToRPC(platformRelease)
+		out[i] = commands.PlatformReleaseToRPC(platformRelease)
 	}
 	return &rpc.PlatformSearchResp{SearchOutput: out}, nil
 }

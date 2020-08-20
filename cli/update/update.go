@@ -24,8 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
@@ -55,48 +53,28 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino update`")
 
-	_, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
+	err := commands.UpdateCoreLibrariesIndex(context.Background(), &rpc.UpdateCoreLibrariesIndexReq{
 		Instance: instance,
 	}, output.ProgressBar())
 	if err != nil {
-		feedback.Errorf("Error updating core index: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
-	err = commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexReq{
-		Instance: instance,
-	}, output.ProgressBar())
-	if err != nil {
-		feedback.Errorf("Error updating library index: %v", err)
+		feedback.Errorf("Error updating core and libraries index: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	if updateFlags.showOutdated {
-		// Gets outdated cores
-		targets, err := core.GetPlatforms(instance.Id, true)
-		if err != nil {
-			feedback.Errorf("Error retrieving core list: %v", err)
-			os.Exit(errorcodes.ErrGeneric)
-		}
-
-		// Gets outdated libraries
-		res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
-			Instance:  instance,
-			All:       false,
-			Updatable: true,
+		outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedReq{
+			Instance: instance,
 		})
 		if err != nil {
-			feedback.Errorf("Error retrieving library list: %v", err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Errorf("Error retrieving outdated cores and libraries: %v", err)
 		}
 
 		// Prints outdated cores
 		tab := table.New()
 		tab.SetHeader("Core name", "Installed version", "New version")
-		if len(targets) > 0 {
-			for _, t := range targets {
-				plat := t.Platform
-				tab.AddRow(plat.Name, t.Version, plat.GetLatestRelease().Version)
+		if len(outdatedResp.OutdatedPlatform) > 0 {
+			for _, p := range outdatedResp.OutdatedPlatform {
+				tab.AddRow(p.Name, p.Installed, p.Latest)
 			}
 			feedback.Print(tab.Render())
 		}
@@ -104,14 +82,12 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 		// Prints outdated libraries
 		tab = table.New()
 		tab.SetHeader("Library name", "Installed version", "New version")
-		libs := res.GetInstalledLibrary()
-		if len(libs) > 0 {
-			for _, l := range libs {
+		if len(outdatedResp.OutdatedLibrary) > 0 {
+			for _, l := range outdatedResp.OutdatedLibrary {
 				tab.AddRow(l.Library.Name, l.Library.Version, l.Release.Version)
 			}
 			feedback.Print(tab.Render())
 		}
-
 	}
 
 	logrus.Info("Done")

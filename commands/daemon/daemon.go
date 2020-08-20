@@ -101,6 +101,42 @@ func (s *ArduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 	return stream.Send(&rpc.UpdateLibrariesIndexResp{})
 }
 
+// UpdateCoreLibrariesIndex FIXMEDOC
+func (s *ArduinoCoreServerImpl) UpdateCoreLibrariesIndex(req *rpc.UpdateCoreLibrariesIndexReq, stream rpc.ArduinoCore_UpdateCoreLibrariesIndexServer) error {
+	err := commands.UpdateCoreLibrariesIndex(stream.Context(), req,
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateCoreLibrariesIndexResp{DownloadProgress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(&rpc.UpdateCoreLibrariesIndexResp{})
+}
+
+// Outdated FIXMEDOC
+func (s *ArduinoCoreServerImpl) Outdated(ctx context.Context, req *rpc.OutdatedReq) (*rpc.OutdatedResp, error) {
+	return commands.Outdated(ctx, req)
+}
+
+// Upgrade FIXMEDOC
+func (s *ArduinoCoreServerImpl) Upgrade(req *rpc.UpgradeReq, stream rpc.ArduinoCore_UpgradeServer) error {
+	err := commands.Upgrade(stream.Context(), req,
+		func(p *rpc.DownloadProgress) {
+			stream.Send(&rpc.UpgradeResp{
+				Progress: p,
+			})
+		},
+		func(p *rpc.TaskProgress) {
+			stream.Send(&rpc.UpgradeResp{
+				TaskProgress: p,
+			})
+		},
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(&rpc.UpgradeResp{})
+}
+
 // Init FIXMEDOC
 func (s *ArduinoCoreServerImpl) Init(req *rpc.InitReq, stream rpc.ArduinoCore_InitServer) error {
 	resp, err := commands.Init(stream.Context(), req,
@@ -195,7 +231,7 @@ func (s *ArduinoCoreServerImpl) PlatformList(ctx context.Context, req *rpc.Platf
 
 	installed := []*rpc.Platform{}
 	for _, p := range platforms {
-		rpcPlatform := core.PlatformReleaseToRPC(p)
+		rpcPlatform := commands.PlatformReleaseToRPC(p)
 		rpcPlatform.Installed = p.Version.String()
 		installed = append(installed, rpcPlatform)
 	}

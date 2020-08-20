@@ -46,6 +46,15 @@ service ArduinoCore {
   // Update libraries index
   rpc UpdateLibrariesIndex(UpdateLibrariesIndexReq) returns (stream UpdateLibrariesIndexResp) {}
 
+  // Update packages indexes for both Cores and Libraries
+  rpc UpdateCoreLibrariesIndex(UpdateCoreLibrariesIndexReq) returns (stream UpdateCoreLibrariesIndexResp) {}
+
+  // Outdated returns a message with a list of outdated Cores and Libraries
+  rpc Outdated(OutdatedReq) returns (OutdatedResp) {}
+
+  // Upgrade both Cores and Libraries
+  rpc Upgrade(UpgradeReq) returns (stream UpgradeResp) {}
+
   // Get the version of Arduino CLI in use.
   rpc Version(VersionReq) returns (VersionResp) {}
 
@@ -55,7 +64,7 @@ service ArduinoCore {
   // Requests details about a board
   rpc BoardDetails(BoardDetailsReq) returns (BoardDetailsResp);
 
-  // Attach a board to a sketch. When the `fqbn` field of a request is not 
+  // Attach a board to a sketch. When the `fqbn` field of a request is not
   // provided, the FQBN of the attached board will be used.
   rpc BoardAttach(BoardAttachReq) returns (stream BoardAttachResp);
 
@@ -163,7 +172,7 @@ message RescanResp {
 
 message UpdateIndexReq {
   // Arduino Core Service instance from the Init response.
-	Instance instance = 1;
+  Instance instance = 1;
 }
 
 message UpdateIndexResp {
@@ -173,12 +182,46 @@ message UpdateIndexResp {
 
 message UpdateLibrariesIndexReq {
   // Arduino Core Service instance from the Init response.
-	Instance instance = 1;
+  Instance instance = 1;
 }
 
 message UpdateLibrariesIndexResp {
   // Progress of the libraries index download.
   DownloadProgress download_progress = 1;
+}
+
+message UpdateCoreLibrariesIndexReq {
+  // Arduino Core Service instance from the Init response.
+  Instance instance = 1;
+}
+
+message UpdateCoreLibrariesIndexResp {
+  // Progress of the index download.
+  DownloadProgress download_progress = 1;
+}
+
+message OutdatedReq {
+  // Arduino Core Service instance from the Init response.
+  Instance instance = 1;
+}
+
+message OutdatedResp {
+  // List of installed libraries that can be updated.
+  repeated InstalledLibrary outdated_library = 1;
+  // List of installed cores that can be updated.
+  repeated Platform outdated_platform = 2;
+}
+
+message UpgradeReq {
+  // Arduino Core Service instance from the Init response.
+  Instance instance = 1;
+}
+
+message UpgradeResp {
+	// Progress of the downloads of the platforms and libraries files.
+	DownloadProgress progress = 1;
+	// Description of the current stage of the upgrade.
+	TaskProgress task_progress = 2;
 }
 
 message VersionReq {}
