@@ -286,7 +286,8 @@ func runProgramAction(pm *packagemanager.PackageManager,
 						outStream.Write([]byte(fmt.Sprintln()))
 					}
 					if err := touchSerialPortAt1200bps(p); err != nil {
-						return fmt.Errorf("cannot perform reset: %s", err)
+						outStream.Write([]byte(fmt.Sprintf("Cannot perform port reset: %s", err)))
+						outStream.Write([]byte(fmt.Sprintln()))
 					}
 					break
 				}
