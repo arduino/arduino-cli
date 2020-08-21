@@ -16,6 +16,7 @@ require (
 	github.com/cmaglie/pb v1.0.27
 	github.com/codeclysm/cc v1.2.2 // indirect
 	github.com/codeclysm/extract v2.2.0+incompatible
+	github.com/codeclysm/extract/v3 v3.0.0
 	github.com/fatih/color v1.7.0
 	github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 // indirect
 	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
@@ -25,7 +26,6 @@ require (
 	github.com/imjasonmiller/godice v0.1.2
 	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5 // indirect
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
-	github.com/juju/testing v0.0.0-20190429233213-dfc56b8c09fc // indirect
 	github.com/leonelquinteros/gotext v1.4.0
 	github.com/marcinbor85/gohex v0.0.0-20200531163658-baab2527a9a2
 	github.com/mattn/go-colorable v0.1.2
@@ -54,7 +54,6 @@ require (
 	golang.org/x/text v0.3.2
 	google.golang.org/grpc v1.27.0
 	google.golang.org/protobuf v1.25.0
-	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
 	gopkg.in/yaml.v2 v2.3.0
 )
