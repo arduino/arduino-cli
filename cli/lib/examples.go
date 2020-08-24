@@ -35,24 +35,35 @@ import (
 
 func initExamplesCommand() *cobra.Command {
 	examplesCommand := &cobra.Command{
-		Use:     "examples LIBRARY_NAME",
-		Short:   "Shows the list of the examples for the given library.",
-		Long:    "Shows the list of the examples for the given library.",
+		Use:     "examples [LIBRARY_NAME]",
+		Short:   "Shows the list of the examples for libraries.",
+		Long:    "Shows the list of the examples for libraries. A name may be given as argument to search a specific library.",
 		Example: "  " + os.Args[0] + " lib examples Wire",
-		Args:    cobra.ExactArgs(1),
+		Args:    cobra.MaximumNArgs(1),
 		Run:     runExamplesCommand,
 	}
+	examplesCommand.Flags().StringVarP(&examplesFlags.fqbn, "fqbn", "b", "", "Show libraries for the specified board FQBN.")
 	return examplesCommand
+}
+
+var examplesFlags struct {
+	fqbn string
 }
 
 func runExamplesCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
 	logrus.Info("Show examples for library")
 
+	name := ""
+	if len(args) > 0 {
+		name = args[0]
+	}
+
 	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
 		Instance: instance,
 		All:      true,
-		Name:     args[0],
+		Name:     name,
+		Fqbn:     examplesFlags.fqbn,
 	})
 	if err != nil {
 		feedback.Errorf("Error getting libraries info: %v", err)

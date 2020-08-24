@@ -42,6 +42,7 @@ func initListCommand() *cobra.Command {
 		Run:     runListCommand,
 	}
 	listCommand.Flags().BoolVar(&listFlags.all, "all", false, "Include built-in libraries (from platforms and IDE) in listing.")
+	listCommand.Flags().StringVarP(&listFlags.fqbn, "fqbn", "b", "", "Show libraries for the specified board FQBN.")
 	listCommand.Flags().BoolVar(&listFlags.updatable, "updatable", false, "List updatable libraries.")
 	return listCommand
 }
@@ -49,6 +50,7 @@ func initListCommand() *cobra.Command {
 var listFlags struct {
 	all       bool
 	updatable bool
+	fqbn      string
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
@@ -65,6 +67,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		All:       listFlags.all,
 		Updatable: listFlags.updatable,
 		Name:      name,
+		Fqbn:      listFlags.fqbn,
 	})
 	if err != nil {
 		feedback.Errorf("Error listing Libraries: %v", err)

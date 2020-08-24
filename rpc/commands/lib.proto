@@ -196,6 +196,9 @@ message LibraryListReq {
     bool updatable = 3;
     // If set filters out the libraries not matching name
     string name = 4;
+    // By setting this field all duplicate libraries are filtered out leaving
+    // only the libraries that will be used to compile for the specified board FQBN.
+    string fqbn = 5;
 }
 
 message LibraryListResp {
