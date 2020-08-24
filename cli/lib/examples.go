@@ -18,6 +18,7 @@ package lib
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -91,6 +92,10 @@ func (ir libraryExamplesResult) String() string {
 		return "No libraries found."
 	}
 
+	sort.Slice(ir.Examples, func(i, j int) bool {
+		return strings.ToLower(ir.Examples[i].Library.Name) < strings.ToLower(ir.Examples[j].Library.Name)
+	})
+
 	res := []string{}
 	for _, lib := range ir.Examples {
 		name := lib.Library.Name
@@ -100,6 +105,9 @@ func (ir libraryExamplesResult) String() string {
 			name += " (" + lib.Library.GetLocation().String() + ")"
 		}
 		r := fmt.Sprintf("Examples for library %s\n", color.GreenString("%s", name))
+		sort.Slice(lib.Examples, func(i, j int) bool {
+			return strings.ToLower(lib.Examples[i]) < strings.ToLower(lib.Examples[j])
+		})
 		for _, example := range lib.Examples {
 			examplePath := paths.New(example)
 			r += fmt.Sprintf("  - %s%s\n",
