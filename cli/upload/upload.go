@@ -45,7 +45,7 @@ func NewCommand() *cobra.Command {
 	uploadCommand := &cobra.Command{
 		Use:     "upload",
 		Short:   "Upload Arduino sketches.",
-		Long:    "Upload Arduino sketches.",
+		Long:    "Upload Arduino sketches. This does NOT compile the sketch prior to upload.",
 		Example: "  " + os.Args[0] + " upload /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
