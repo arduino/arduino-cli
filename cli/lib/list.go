@@ -17,6 +17,8 @@ package lib
 
 import (
 	"os"
+	"sort"
+	"strings"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -100,6 +102,10 @@ func (ir installedResult) String() string {
 	if ir.installedLibs == nil || len(ir.installedLibs) == 0 {
 		return "No libraries installed."
 	}
+	sort.Slice(ir.installedLibs, func(i, j int) bool {
+		return strings.ToLower(ir.installedLibs[i].Library.Name) < strings.ToLower(ir.installedLibs[j].Library.Name) ||
+			strings.ToLower(ir.installedLibs[i].Library.ContainerPlatform) < strings.ToLower(ir.installedLibs[j].Library.ContainerPlatform)
+	})
 
 	t := table.New()
 	t.SetHeader("Name", "Installed", "Available", "Location", "Description")
