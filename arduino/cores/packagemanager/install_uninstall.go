@@ -54,13 +54,11 @@ func (pm *PackageManager) RunPostInstallScript(platformRelease *cores.PlatformRe
 	}
 	postInstall := platformRelease.InstallDir.Join(postInstallFilename)
 	if postInstall.Exist() && postInstall.IsNotDir() {
-		cmd, err := executils.Command(postInstall.String())
+		cmd, err := executils.NewProcessFromPath(postInstall)
 		if err != nil {
 			return err
 		}
-		cmd.Dir = platformRelease.InstallDir.String()
-		cmd.Stdout = nil
-		cmd.Stderr = nil
+		cmd.SetDirFromPath(platformRelease.InstallDir)
 		if err := cmd.Run(); err != nil {
 			return err
 		}
