@@ -372,7 +372,6 @@ gold_board = """
 """  # noqa: E501
 
 
-@pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
 def test_board_list(run_command):
     result = run_command("core update-index")
     assert result.ok
