@@ -17,7 +17,6 @@ package executils
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os/exec"
 )
@@ -70,21 +69,4 @@ func call(stack []*exec.Cmd, pipes []*io.PipeWriter) (err error) {
 // command prompt while runnning on Windows. It has no effects on other OS.
 func TellCommandNotToSpawnShell(cmd *exec.Cmd) {
 	tellCommandNotToSpawnShell(cmd)
-}
-
-// Command creates a command with the provided command line arguments.
-// The first argument is the path to the executable, the remainder are the
-// arguments to the command.
-func Command(args ...string) (*exec.Cmd, error) {
-	if args == nil || len(args) == 0 {
-		return nil, fmt.Errorf("no executable specified")
-	}
-	cmd := exec.Command(args[0], args[1:]...)
-	TellCommandNotToSpawnShell(cmd)
-
-	// This is required because some tools detects if the program is running
-	// from terminal by looking at the stdin/out bindings.
-	// https://github.com/arduino/arduino-cli/issues/844
-	cmd.Stdin = NullReader
-	return cmd, nil
 }
