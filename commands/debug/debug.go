@@ -64,7 +64,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 	}
 	entry.Debug("Executing debugger")
 
-	cmd, err := executils.Command(commandLine...)
+	cmd, err := executils.NewProcess(commandLine...)
 	if err != nil {
 		return nil, errors.Wrap(err, "Cannot execute debug tool")
 	}
@@ -77,8 +77,8 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 	defer in.Close()
 
 	// Merge tool StdOut and StdErr to stream them in the io.Writer passed stream
-	cmd.Stdout = out
-	cmd.Stderr = out
+	cmd.RedirectStdoutTo(out)
+	cmd.RedirectStderrTo(out)
 
 	// Start the debug command
 	if err := cmd.Start(); err != nil {
@@ -91,7 +91,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 				if sig, ok := <-interrupt; !ok {
 					break
 				} else {
-					cmd.Process.Signal(sig)
+					cmd.Signal(sig)
 				}
 			}
 		}()
@@ -103,7 +103,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 		// In any case, try process termination after a second to avoid leaving
 		// zombie process.
 		time.Sleep(time.Second)
-		cmd.Process.Kill()
+		cmd.Kill()
 	}()
 
 	// Wait for process to finish

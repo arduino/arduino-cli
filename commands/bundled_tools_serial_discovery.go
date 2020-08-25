@@ -131,13 +131,12 @@ func ListBoards(pm *packagemanager.PackageManager) ([]*BoardPort, error) {
 	}
 
 	// build the command to be executed
-	cmd, err := executils.Command(t.InstallDir.Join("serial-discovery").String())
+	cmd, err := executils.NewProcessFromPath(t.InstallDir.Join("serial-discovery"))
 	if err != nil {
 		return nil, errors.Wrap(err, "creating discovery process")
 	}
 
 	// attach in/out pipes to the process
-	cmd.Stdin = nil
 	in, err := cmd.StdinPipe()
 	if err != nil {
 		return nil, fmt.Errorf("creating stdin pipe for discovery: %s", err)
@@ -187,7 +186,7 @@ func ListBoards(pm *packagemanager.PackageManager) ([]*BoardPort, error) {
 	out.Close()
 	// kill the process if it takes too long to quit
 	time.AfterFunc(time.Second, func() {
-		cmd.Process.Kill()
+		cmd.Kill()
 	})
 	cmd.Wait()
 

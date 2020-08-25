@@ -373,13 +373,13 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	if verbose {
 		outStream.Write([]byte(fmt.Sprintln(cmdLine)))
 	}
-	cmd, err := executils.Command(cmdArgs...)
+	cmd, err := executils.NewProcess(cmdArgs...)
 	if err != nil {
 		return fmt.Errorf("cannot execute upload tool: %s", err)
 	}
 
-	cmd.Stdout = outStream
-	cmd.Stderr = errStream
+	cmd.RedirectStdoutTo(outStream)
+	cmd.RedirectStderrTo(errStream)
 
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("cannot execute upload tool: %s", err)
