@@ -914,6 +914,11 @@ The [bundled libraries](#platform-bundled-libraries) from the referenced platfor
 the referencing platform to bundle those libraries. If libraries are provided, the list of available libraries is the
 sum of the two libraries, where the referencing platform has priority over the referenced platform.
 
+The [programmers](#programmerstxt) from the referenced platform are made available, thus there is no need for the
+referencing platform to define those programmers. If the referencing platform does provide its own programmer
+definitions, the list of available programmer is the sum of the programmers of the two platforms. In Arduino IDE 1.8.12
+and older, all programmers of all installed platforms were made available.
+
 ### Variant reference
 
 In the same way we can use a variant defined on another platform using the syntax **VENDOR_ID:VARIANT_ID**:
