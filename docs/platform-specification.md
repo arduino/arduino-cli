@@ -739,7 +739,27 @@ The file component of the port's path (e.g., `ttyACM0`) is available as the conf
 
 ### Upload using an external programmer
 
-**TODO...**<br> The platform.txt associated with the selected programmer will be used.
+The `program` action is triggered via the **Sketch > Upload Using Programmer** feature of the IDEs or
+[`arduino-cli upload --programmer <programmer ID>`](commands/arduino-cli_upload.md). This action is used to transfer a
+compiled sketch to a board using an external programmer.
+
+The **program.tool** property determines the tool to be used for this action. This property is typically defined for
+each programmer in [programmers.txt](#programmerstxt):
+
+    [......]
+    usbasp.program.tool=avrdude
+    [......]
+    arduinoasisp.program.tool=avrdude
+    [......]
+
+This action can use the same [upload verification preference system](#upload-verification) as the `upload` action, via
+the **program.verify** property.
+
+When using the Arduino IDE, if the selected programmer is from a different platform than the board, the `program` recipe
+defined in the programmer's platform is used without overrides from the properties defined in the
+[platform.txt](#platformtxt) of the [board platform](#platform-terminology). When using Arduino development software
+other than the Arduino IDE, the handling of properties is the same as when doing a
+[standard Upload](#sketch-upload-configuration).
 
 ### Burn Bootloader
 
