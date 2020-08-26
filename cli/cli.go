@@ -106,7 +106,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	viper.BindPFlag("logging.format", cmd.PersistentFlags().Lookup("log-format"))
 	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be {text|json}.")
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", "The custom config file (if not specified the default will be used).")
-	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, "Additional URLs for the board manager.")
+	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, "Comma-separated list of additional URLs for the board manager.")
 	viper.BindPFlag("board_manager.additional_urls", cmd.PersistentFlags().Lookup("additional-urls"))
 }
 
