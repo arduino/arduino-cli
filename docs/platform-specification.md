@@ -529,6 +529,44 @@ Adding a **hide** property to a board definition causes it to not be shown in th
 
 The value of the property is ignored; it's the presence or absence of the property that controls the board's visibility.
 
+## programmers.txt
+
+This file contains definitions for external programmers. These programmers are used by:
+
+- The [**Tools > Burn Bootloader**](#burn-bootloader) feature of the IDEs and
+  [`arduino-cli burn-bootloader`](commands/arduino-cli_burn-bootloader.md)
+- The [**Sketch > Upload Using Programmer**](#upload-using-an-external-programmer) feature of the IDEs and
+  [`arduino-cli upload --programmer <programmer ID>`](commands/arduino-cli_upload.md#options)
+
+programmers.txt works similarly to [boards.txt](#boardstxt). Programmers are referenced by their short name: the
+programmer ID. The settings for a programmer are defined through a set of properties with keys that use the programmer
+ID as prefix.
+
+For example, the programmer ID chosen for the
+["Arduino as ISP" programmer](https://www.arduino.cc/en/Tutorial/ArduinoISP) is "arduinoasisp". The definition of this
+programmer in programmers.txt looks like:
+
+    [......]
+    arduinoasisp.name=Arduino as ISP
+    arduinoasisp.protocol=stk500v1
+    arduinoasisp.program.speed=19200
+    arduinoasisp.program.tool=avrdude
+    arduinoasisp.program.extra_params=-P{serial.port} -b{program.speed}
+    [......]
+
+These properties can only be used in the recipes of the actions that use the programmer (`erase`, `bootloader`, and
+`program`).
+
+The **arduinoasisp.name** property defines the human-friendly name of the programmer. This is shown in the **Tools >
+Programmer** menu of the IDEs and the output of [`arduino-cli upload --programmer list`](commands/arduino-cli_upload.md)
+and [`arduino-cli burn-bootloader --programmer list`](commands/arduino-cli_burn-bootloader.md).
+
+In Arduino IDE 1.8.12 and older, all programmers of all installed platforms were made available for use. Starting with
+Arduino IDE 1.8.13 (and in all relevant versions of other Arduino development tools), only the programmers defined by
+the [board and core platform](#platform-terminology) of the currently selected board are available. For this reason,
+platforms may now need to define copies of the programmers that were previously assumed to be provided by another
+platform.
+
 ## Tools
 
 The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn
