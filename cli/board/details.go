@@ -102,10 +102,16 @@ func (dr detailsResult) String() string {
 	//                 ATmega328P (Old Bootloader)     cpu=atmega328old
 	//                 ATmega168                       cpu=atmega168
 	t := table.New()
+	addIfNotEmpty := func(label, content string) {
+		if content != "" {
+			t.AddRow(label, content)
+		}
+	}
+
 	t.SetColumnWidthMode(1, table.Average)
 	t.AddRow(tr("Board name:"), details.Name)
 	t.AddRow("FQBN:", details.Fqbn)
-	t.AddRow(tr("Board version:"), details.Version)
+	addIfNotEmpty(tr("Board version:"), details.Version)
 
 	if details.Official {
 		t.AddRow() // get some space from above
@@ -123,20 +129,22 @@ func (dr detailsResult) String() string {
 	}
 
 	t.AddRow() // get some space from above
-	t.AddRow(tr("Package name:"), details.Package.Name)
-	t.AddRow(tr("Package maintainer:"), details.Package.Maintainer)
-	t.AddRow(tr("Package URL:"), details.Package.Url)
-	t.AddRow(tr("Package website:"), details.Package.WebsiteURL)
-	t.AddRow(tr("Package online help:"), details.Package.Help.Online)
+	addIfNotEmpty(tr("Package name:"), details.Package.Name)
+	addIfNotEmpty(tr("Package maintainer:"), details.Package.Maintainer)
+	addIfNotEmpty(tr("Package URL:"), details.Package.Url)
+	addIfNotEmpty(tr("Package website:"), details.Package.WebsiteURL)
+	addIfNotEmpty(tr("Package online help:"), details.Package.Help.Online)
 
 	t.AddRow() // get some space from above
-	t.AddRow(tr("Platform name:"), details.Platform.Name)
-	t.AddRow(tr("Platform category:"), details.Platform.Category)
-	t.AddRow(tr("Platform architecture:"), details.Platform.Architecture)
-	t.AddRow(tr("Platform URL:"), details.Platform.Url)
-	t.AddRow(tr("Platform file name:"), details.Platform.ArchiveFileName)
-	t.AddRow(tr("Platform size (bytes):"), fmt.Sprint(details.Platform.Size))
-	t.AddRow(tr("Platform checksum:"), details.Platform.Checksum)
+	addIfNotEmpty(tr("Platform name:"), details.Platform.Name)
+	addIfNotEmpty(tr("Platform category:"), details.Platform.Category)
+	addIfNotEmpty(tr("Platform architecture:"), details.Platform.Architecture)
+	addIfNotEmpty(tr("Platform URL:"), details.Platform.Url)
+	addIfNotEmpty(tr("Platform file name:"), details.Platform.ArchiveFileName)
+	if details.Platform.Size != 0 {
+		addIfNotEmpty(tr("Platform size (bytes):"), fmt.Sprint(details.Platform.Size))
+	}
+	addIfNotEmpty(tr("Platform checksum:"), details.Platform.Checksum)
 
 	t.AddRow() // get some space from above
 	for _, tool := range details.ToolsDependencies {
