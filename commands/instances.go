@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"path"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -675,4 +676,29 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 	}
 
 	return res, nil
+}
+
+// SketchLoad collects and returns all files composing a sketch
+func SketchLoad(ctx context.Context, req *rpc.SketchLoadReq) (*rpc.SketchLoadResp, error) {
+	sketch, err := builder.SketchLoad(req.SketchPath, "")
+	if err != nil {
+		return nil, fmt.Errorf("Error loading sketch: %v", err)
+	}
+
+	otherSketchFiles := make([]string, len(sketch.OtherSketchFiles))
+	for i, file := range sketch.OtherSketchFiles {
+		otherSketchFiles[i] = file.Path
+	}
+
+	additionalFiles := make([]string, len(sketch.AdditionalFiles))
+	for i, file := range sketch.AdditionalFiles {
+		additionalFiles[i] = file.Path
+	}
+
+	return &rpc.SketchLoadResp{
+		MainFile:         sketch.MainFile.Path,
+		LocationPath:     sketch.LocationPath,
+		OtherSketchFiles: otherSketchFiles,
+		AdditionalFiles:  additionalFiles,
+	}, nil
 }
