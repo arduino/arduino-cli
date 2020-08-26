@@ -763,7 +763,30 @@ other than the Arduino IDE, the handling of properties is the same as when doing
 
 ### Burn Bootloader
 
-**TODO...**<br> The platform.txt associated with the selected board will be used.
+The `erase` and `bootloader` actions are triggered via the **Tools > Burn Bootloader** feature of the Arduino IDE or
+[`arduino-cli burn-bootloader`](commands/arduino-cli_burn-bootloader.md). This action is used to flash a bootloader to
+the board.
+
+"Burn Bootloader" is unique in that it uses two actions, which are executed in sequence:
+
+1. `erase` is typically used to erase the microcontroller's flash memory and set the configuration fuses according to
+   the properties defined in the [board definition](#boardstxt)
+1. `bootloader` is used to flash the bootloader to the board
+
+The **bootloader.tool** property determines the tool to be used for the `erase` and `bootloader` actions both. This
+property is typically defined for each board in boards.txt:
+
+    [......]
+    uno.bootloader.tool=avrdude
+    [......]
+    leonardo.bootloader.tool=avrdude
+    [......]
+
+When using the Arduino IDE, if the board uses a
+[core reference](https://arduino.github.io/arduino-cli/dev/platform-specification/#core-reference), the platform.txt of
+the [core platform](#platform-terminology) is not used at all in defining the recipes for `erase` and `bootloader`
+actions. When using Arduino development software other than the Arduino IDE, the handling of properties from the core
+platform's platform.txt is done as usual.
 
 ### Sketch debugging configuration
 
