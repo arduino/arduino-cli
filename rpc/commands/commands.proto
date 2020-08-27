@@ -59,7 +59,7 @@ service ArduinoCore {
   rpc Version(VersionReq) returns (VersionResp) {}
 
   // Returns all files composing a Sketch
-  rpc SketchLoad(SketchLoadReq) returns (SketchLoadResp) {}
+  rpc LoadSketch(LoadSketchReq) returns (LoadSketchResp) {}
 
   // BOARD COMMANDS
   // --------------
@@ -222,9 +222,9 @@ message UpgradeReq {
 
 message UpgradeResp {
   // Progress of the downloads of the platforms and libraries files.
-  DownloadProgress progress = 2;
+  DownloadProgress progress = 1;
   // Description of the current stage of the upgrade.
-  TaskProgress task_progress = 3;
+  TaskProgress task_progress = 2;
 }
 
 message VersionReq {}
@@ -234,12 +234,14 @@ message VersionResp {
   string version = 1;
 }
 
-message SketchLoadReq {
+message LoadSketchReq {
+  // Arduino Core Service instance from the Init response.
+  Instance instance = 1;
   // Absolute path to single sketch file or a sketch folder
-  string sketch_path = 1;
+  string sketch_path = 2;
 }
 
-message SketchLoadResp {
+message LoadSketchResp {
   // Absolute path to a main sketch files
   string main_file = 1;
   // Absolute path to folder that contains main_file

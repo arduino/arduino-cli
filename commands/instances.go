@@ -678,11 +678,11 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 	return res, nil
 }
 
-// SketchLoad collects and returns all files composing a sketch
-func SketchLoad(ctx context.Context, req *rpc.SketchLoadReq) (*rpc.SketchLoadResp, error) {
+// LoadSketch collects and returns all files composing a sketch
+func LoadSketch(ctx context.Context, req *rpc.LoadSketchReq) (*rpc.LoadSketchResp, error) {
 	sketch, err := builder.SketchLoad(req.SketchPath, "")
 	if err != nil {
-		return nil, fmt.Errorf("Error loading sketch: %v", err)
+		return nil, fmt.Errorf("Error loading sketch %v: %v", req.SketchPath, err)
 	}
 
 	otherSketchFiles := make([]string, len(sketch.OtherSketchFiles))
@@ -695,7 +695,7 @@ func SketchLoad(ctx context.Context, req *rpc.SketchLoadReq) (*rpc.SketchLoadRes
 		additionalFiles[i] = file.Path
 	}
 
-	return &rpc.SketchLoadResp{
+	return &rpc.LoadSketchResp{
 		MainFile:         sketch.MainFile.Path,
 		LocationPath:     sketch.LocationPath,
 		OtherSketchFiles: otherSketchFiles,
