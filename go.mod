@@ -15,8 +15,7 @@ require (
 	github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b
 	github.com/cmaglie/pb v1.0.27
 	github.com/codeclysm/cc v1.2.2 // indirect
-	github.com/codeclysm/extract v2.2.0+incompatible
-	github.com/codeclysm/extract/v3 v3.0.0
+	github.com/codeclysm/extract/v3 v3.0.1
 	github.com/fatih/color v1.7.0
 	github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 // indirect
 	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
@@ -24,7 +23,6 @@ require (
 	github.com/golang/protobuf v1.4.1
 	github.com/h2non/filetype v1.0.8 // indirect
 	github.com/imjasonmiller/godice v0.1.2
-	github.com/juju/errors v0.0.0-20181118221551-089d3ea4e4d5 // indirect
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
 	github.com/leonelquinteros/gotext v1.4.0
 	github.com/marcinbor85/gohex v0.0.0-20200531163658-baab2527a9a2
