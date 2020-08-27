@@ -60,13 +60,16 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 	}
 
 	details.Platform = &rpc.BoardPlatform{
-		Architecture:    boardPlatform.Platform.Architecture,
-		Category:        boardPlatform.Platform.Category,
-		Url:             boardPlatform.Resource.URL,
-		ArchiveFileName: boardPlatform.Resource.ArchiveFileName,
-		Checksum:        boardPlatform.Resource.Checksum,
-		Size:            boardPlatform.Resource.Size,
-		Name:            boardPlatform.Platform.Name,
+		Architecture: boardPlatform.Platform.Architecture,
+		Category:     boardPlatform.Platform.Category,
+		Name:         boardPlatform.Platform.Name,
+	}
+
+	if boardPlatform.Resource != nil {
+		details.Platform.Url = boardPlatform.Resource.URL
+		details.Platform.ArchiveFileName = boardPlatform.Resource.ArchiveFileName
+		details.Platform.Checksum = boardPlatform.Resource.Checksum
+		details.Platform.Size = boardPlatform.Resource.Size
 	}
 
 	details.IdentificationPref = []*rpc.IdentificationPref{}
