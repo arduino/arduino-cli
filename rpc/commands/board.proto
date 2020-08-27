@@ -55,6 +55,8 @@ message BoardDetailsResp {
     repeated ConfigOption config_options = 11;
     // Identifying information for the board (e.g., USB VID/PID).
     repeated IdentificationPref identification_pref = 12;
+    // List of programmers supported by the board
+    repeated Programmer programmers = 13;
 }
 
 message IdentificationPref {

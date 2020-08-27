@@ -367,6 +367,23 @@ gold_board = """
         "PID": "0x0057"
       }
     }
+  ],
+  "programmers": [
+    {
+      "platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
+      "id": "edbg",
+      "name": "Atmel EDBG"
+    },
+    {
+      "platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
+      "id": "atmel_ice",
+      "name": "Atmel-ICE"
+    },
+    {
+      "platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
+      "id": "sam_ice",
+      "name": "Atmel SAM-ICE"
+    }
   ]
 }
 """  # noqa: E501
@@ -414,6 +431,8 @@ def test_board_details(run_command):
     assert result["platform"] == gold_board_details["platform"]
     for usb_id in gold_board_details["identification_pref"]:
         assert usb_id in result["identification_pref"]
+    for programmer in gold_board_details["programmers"]:
+        assert programmer in result["programmers"]
 
 
 # old `arduino-cli board details` did not need -b <fqbn> flag to work
@@ -438,6 +457,8 @@ def test_board_details_old(run_command):
     assert result["platform"] == gold_board_details["platform"]
     for usb_id in gold_board_details["identification_pref"]:
         assert usb_id in result["identification_pref"]
+    for programmer in gold_board_details["programmers"]:
+        assert programmer in result["programmers"]
 
 
 def test_board_details_no_flags(run_command):
@@ -450,3 +471,37 @@ def test_board_details_no_flags(run_command):
     assert not result.ok
     assert "Error getting board details: parsing fqbn: invalid fqbn:" in result.stderr
     assert result.stdout == ""
+
+
+def test_board_details_list_programmers_without_flag(run_command):
+    result = run_command("core update-index")
+    assert result.ok
+    # Download samd core pinned to 1.8.6
+    result = run_command("core install arduino:samd@1.8.6")
+    assert result.ok
+    result = run_command("board details -b arduino:samd:nano_33_iot")
+    assert result.ok
+    lines = [l.strip() for l in result.stdout.splitlines()]
+    assert (
+        "Programmers:               Id                                                                     Name"
+        in lines
+    )
+    assert "edbg                                                                   Atmel EDBG" in lines
+    assert "atmel_ice                                                              Atmel-ICE" in lines
+    assert "sam_ice                                                                Atmel SAM-ICE" in lines
+
+
+def test_board_details_list_programmers_flag(run_command):
+    result = run_command("core update-index")
+    assert result.ok
+    # Download samd core pinned to 1.8.6
+    result = run_command("core install arduino:samd@1.8.6")
+    assert result.ok
+    result = run_command("board details -b arduino:samd:nano_33_iot --list-programmers")
+    assert result.ok
+
+    lines = [l.strip() for l in result.stdout.splitlines()]
+    assert "Id        Programmer name" in lines
+    assert "edbg      Atmel EDBG" in lines
+    assert "atmel_ice Atmel-ICE" in lines
+    assert "sam_ice   Atmel SAM-ICE" in lines

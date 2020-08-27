@@ -34,6 +34,7 @@ import (
 var tr = i18n.Tr
 var showFullDetails bool
 var fqbn string
+var listProgrammers bool
 
 func initDetailsCommand() *cobra.Command {
 	var detailsCommand = &cobra.Command{
@@ -47,6 +48,7 @@ func initDetailsCommand() *cobra.Command {
 
 	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, tr("Show full board details"))
 	detailsCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	detailsCommand.Flags().BoolVarP(&listProgrammers, "list-programmers", "", false, tr("Show list of available programmers"))
 	// detailsCommand.MarkFlagRequired("fqbn") // enable once `board details <fqbn>` is removed
 
 	return detailsCommand
@@ -89,6 +91,16 @@ func (dr detailsResult) Data() interface{} {
 
 func (dr detailsResult) String() string {
 	details := dr.details
+
+	if listProgrammers {
+		t := table.New()
+		t.AddRow(tr("Id"), tr("Programmer name"))
+		for _, programmer := range details.Programmers {
+			t.AddRow(programmer.GetId(), programmer.GetName())
+		}
+		return t.Render()
+	}
+
 	// Table is 4 columns wide:
 	// |               |                             | |                       |
 	// Board name:     Arduino Nano
@@ -178,6 +190,11 @@ func (dr detailsResult) String() string {
 					option.Option+"="+value.Value)
 			}
 		}
+	}
+
+	t.AddRow(tr("Programmers:"), tr("Id"), tr("Name"))
+	for _, programmer := range details.Programmers {
+		t.AddRow("", programmer.GetId(), programmer.GetName())
 	}
 
 	return t.Render()
