@@ -4913,6 +4913,12 @@
 <td></td>
 <td>The library format type.</td>
 </tr>
+<tr>
+<td>examples</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>The example sketches provided by the library</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.Library.PropertiesEntry"></a></p>
@@ -5138,6 +5144,18 @@
 <td><a href="#bool">bool</a></td>
 <td></td>
 <td>Whether to list only libraries for which there is a newer version than the installed version available in the libraries index.</td>
+</tr>
+<tr>
+<td>name</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>If set filters out the libraries not matching name</td>
+</tr>
+<tr>
+<td>fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>By setting this field all duplicate libraries are filtered out leaving only the libraries that will be used to compile for the specified board FQBN.</td>
 </tr>
 </tbody>
 </table>

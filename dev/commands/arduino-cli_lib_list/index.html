@@ -1117,10 +1117,12 @@
                   <h1>lib list</h1>
                 
                 <h2 id="arduino-cli-lib-list">arduino-cli lib list<a class="headerlink" href="#arduino-cli-lib-list" title="Permanent link">&para;</a></h2>
-<p>Shows a list of all installed libraries.</p>
+<p>Shows a list of installed libraries.</p>
 <h3 id="synopsis">Synopsis<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h3>
-<p>Shows a list of all installed libraries.</p>
-<div class="highlight"><pre><span></span><code>arduino-cli lib list [flags]
+<p>Shows a list of installed libraries.</p>
+<p>If the LIBNAME parameter is specified the listing is limited to that specific library. By default the libraries provided
+as built-in by platforms/core are not listed, they can be listed by adding the --all flag.</p>
+<div class="highlight"><pre><span></span><code>arduino-cli lib list [LIBNAME] [flags]
 </code></pre></div>
 
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
@@ -1128,9 +1130,10 @@
 </code></pre></div>
 
 <h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>      --all         Include built-in libraries (from platforms and IDE) in listing.
-  -h, --help        help for list
-      --updatable   List updatable libraries.
+<div class="highlight"><pre><span></span><code>      --all           Include built-in libraries (from platforms and IDE) in listing.
+  -b, --fqbn string   Show libraries for the specified board FQBN.
+  -h, --help          help for list
+      --updatable     List updatable libraries.
 </code></pre></div>
 
 <h3 id="options-inherited-from-parent-commands">Options inherited from parent commands<a class="headerlink" href="#options-inherited-from-parent-commands" title="Permanent link">&para;</a></h3>
