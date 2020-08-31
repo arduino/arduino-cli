@@ -1,12 +1,12 @@
 ## Configuration keys
 
 - `board_manager`
-  - `additional_urls` - the URLs to any additional Board Manager package index files needed for your boards platforms.
+  - `additional_urls` - the URLs to any additional Boards Manager package index files needed for your boards platforms.
 - `daemon` - options related to running Arduino CLI as a [gRPC] server.
   - `port` - TCP port used for gRPC client connections.
 - `directories` - directories used by Arduino CLI.
-  - `data` - directory used to store Board/Library Manager index files and Board Manager platform installations.
-  - `downloads` - directory used to stage downloaded archives during Board/Library Manager installations.
+  - `data` - directory used to store Boards/Library Manager index files and Boards Manager platform installations.
+  - `downloads` - directory used to stage downloaded archives during Boards/Library Manager installations.
   - `user` - the equivalent of the Arduino IDE's ["sketchbook" directory][sketchbook directory]. Library Manager
     installations are made to the `libraries` subdirectory of the user directory.
 - `logging` - configuration options for Arduino CLI's logs.
@@ -39,7 +39,7 @@ Arduino CLI's command line flags are documented in the command line help and the
 
 #### Example
 
-Setting an additional Board Manager URL using the [`--additional-urls`][arduino-cli global flags] command line flag:
+Setting an additional Boards Manager URL using the [`--additional-urls`][arduino-cli global flags] command line flag:
 
 ```shell
 $ arduino-cli core update-index --additional-urls https://downloads.arduino.cc/packages/package_staging_index.json
@@ -56,7 +56,7 @@ can use the [`set` command][set command].
 
 #### Example
 
-Setting an additional Board Manager URL using the `ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS` environment variable:
+Setting an additional Boards Manager URL using the `ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS` environment variable:
 
 ```sh
 $ export ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS=https://downloads.arduino.cc/packages/package_staging_index.json
@@ -109,7 +109,7 @@ arduino-cli config dump --verbose
 
 #### Example
 
-Setting an additional Board Manager URL using a YAML format configuration file:
+Setting an additional Boards Manager URL using a YAML format configuration file:
 
 ```yaml
 board_manager:
