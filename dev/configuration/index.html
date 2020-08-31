@@ -1223,7 +1223,7 @@
                 <h2 id="configuration-keys">Configuration keys<a class="headerlink" href="#configuration-keys" title="Permanent link">&para;</a></h2>
 <ul>
 <li><code>board_manager</code><ul>
-<li><code>additional_urls</code> - the URLs to any additional Board Manager package index files needed for your boards platforms.</li>
+<li><code>additional_urls</code> - the URLs to any additional Boards Manager package index files needed for your boards platforms.</li>
 </ul>
 </li>
 <li><code>daemon</code> - options related to running Arduino CLI as a <a href="https://grpc.io">gRPC</a> server.<ul>
@@ -1231,8 +1231,8 @@
 </ul>
 </li>
 <li><code>directories</code> - directories used by Arduino CLI.<ul>
-<li><code>data</code> - directory used to store Board/Library Manager index files and Board Manager platform installations.</li>
-<li><code>downloads</code> - directory used to stage downloaded archives during Board/Library Manager installations.</li>
+<li><code>data</code> - directory used to store Boards/Library Manager index files and Boards Manager platform installations.</li>
+<li><code>downloads</code> - directory used to stage downloaded archives during Boards/Library Manager installations.</li>
 <li><code>user</code> - the equivalent of the Arduino IDE's <a href="../sketch-specification/#sketchbook">"sketchbook" directory</a>. Library Manager
   installations are made to the <code>libraries</code> subdirectory of the user directory.</li>
 </ul>
@@ -1264,7 +1264,7 @@ overwrites the ones below it.</p>
 <h3 id="command-line-flags">Command line flags<a class="headerlink" href="#command-line-flags" title="Permanent link">&para;</a></h3>
 <p>Arduino CLI's command line flags are documented in the command line help and the <a href="../commands/arduino-cli/">Arduino CLI command reference</a>.</p>
 <h4 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h4>
-<p>Setting an additional Board Manager URL using the <a href="../commands/arduino-cli_config/#options-inherited-from-parent-commands"><code>--additional-urls</code></a> command line flag:</p>
+<p>Setting an additional Boards Manager URL using the <a href="../commands/arduino-cli_config/#options-inherited-from-parent-commands"><code>--additional-urls</code></a> command line flag:</p>
 <div class="highlight"><pre><span></span><code>$ arduino-cli core update-index --additional-urls https://downloads.arduino.cc/packages/package_staging_index.json
 </code></pre></div>
 
@@ -1275,7 +1275,7 @@ variable sets the <code>directories.user</code> configuration option.</p>
 <p>On Linux or macOS, you can use the <a href="https://ss64.com/bash/export.html"><code>export</code> command</a> to set environment variables. On Windows cmd, you
 can use the <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/set_1"><code>set</code> command</a>.</p>
 <h4 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">&para;</a></h4>
-<p>Setting an additional Board Manager URL using the <code>ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</code> environment variable:</p>
+<p>Setting an additional Boards Manager URL using the <code>ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</code> environment variable:</p>
 <div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</span><span class="o">=</span>https://downloads.arduino.cc/packages/package_staging_index.json
 </code></pre></div>
 
@@ -1314,7 +1314,7 @@ combined.</p>
 </code></pre></div>
 
 <h4 id="example_2">Example<a class="headerlink" href="#example_2" title="Permanent link">&para;</a></h4>
-<p>Setting an additional Board Manager URL using a YAML format configuration file:</p>
+<p>Setting an additional Boards Manager URL using a YAML format configuration file:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">board_manager</span><span class="p">:</span>
   <span class="nt">additional_urls</span><span class="p">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">https://downloads.arduino.cc/packages/package_staging_index.json</span>
