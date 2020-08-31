@@ -45,3 +45,9 @@ message TaskProgress {
     // Whether the task is complete.
     bool completed = 3;
 }
+
+message Programmer {
+	string platform = 1;
+	string id = 2;
+	string name = 3;
+}

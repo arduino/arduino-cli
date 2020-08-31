@@ -68,21 +68,6 @@ func run(command *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if programmer == "list" {
-		resp, err := upload.ListProgrammersAvailableForUpload(context.Background(), &rpc.ListProgrammersAvailableForUploadReq{
-			Instance: instance,
-			Fqbn:     fqbn,
-		})
-		if err != nil {
-			feedback.Errorf("Error listing programmers: %v", err)
-			os.Exit(errorcodes.ErrGeneric)
-		}
-		feedback.PrintResult(&programmersList{
-			Programmers: resp.GetProgrammers(),
-		})
-		os.Exit(0)
-	}
-
 	var path *paths.Path
 	if len(args) > 0 {
 		path = paths.New(args[0])

@@ -129,5 +129,14 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		})
 	}
 
+	details.Programmers = []*rpc.Programmer{}
+	for id, p := range boardPlatform.Programmers {
+		details.Programmers = append(details.Programmers, &rpc.Programmer{
+			Platform: boardPlatform.Platform.Name,
+			Id:       id,
+			Name:     p.Name,
+		})
+	}
+
 	return details, nil
 }

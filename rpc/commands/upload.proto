@@ -84,9 +84,3 @@ message ListProgrammersAvailableForUploadReq {
 message ListProgrammersAvailableForUploadResp {
 	repeated Programmer programmers = 1;
 }
-
-message Programmer {
-	string platform = 1;
-	string id = 2;
-	string name = 3;
-}
