@@ -1170,6 +1170,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#programmerstxt" class="md-nav__link">
+    programmers.txt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#tools" class="md-nav__link">
     Tools
   </a>
@@ -1569,6 +1576,13 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#programmerstxt" class="md-nav__link">
+    programmers.txt
+  </a>
   
 </li>
       
@@ -2229,6 +2243,40 @@ uno.serial.disableRTS=true
 
 
 <p>The value of the property is ignored; it's the presence or absence of the property that controls the board's visibility.</p>
+<h2 id="programmerstxt">programmers.txt<a class="headerlink" href="#programmerstxt" title="Permanent link">&para;</a></h2>
+<p>This file contains definitions for external programmers. These programmers are used by:</p>
+<ul>
+<li>The <a href="#burn-bootloader"><strong>Tools &gt; Burn Bootloader</strong></a> feature of the IDEs and
+  <a href="../commands/arduino-cli_burn-bootloader/"><code>arduino-cli burn-bootloader</code></a></li>
+<li>The <a href="#upload-using-an-external-programmer"><strong>Sketch &gt; Upload Using Programmer</strong></a> feature of the IDEs and
+  <a href="../commands/arduino-cli_upload/#options"><code>arduino-cli upload --programmer &lt;programmer ID&gt;</code></a></li>
+</ul>
+<p>programmers.txt works similarly to <a href="#boardstxt">boards.txt</a>. Programmers are referenced by their short name: the
+programmer ID. The settings for a programmer are defined through a set of properties with keys that use the programmer
+ID as prefix.</p>
+<p>For example, the programmer ID chosen for the
+<a href="https://www.arduino.cc/en/Tutorial/ArduinoISP">"Arduino as ISP" programmer</a> is "arduinoasisp". The definition of this
+programmer in programmers.txt looks like:</p>
+<div class="codehilite"><pre><span></span><code>[......]
+arduinoasisp.name=Arduino as ISP
+arduinoasisp.protocol=stk500v1
+arduinoasisp.program.speed=19200
+arduinoasisp.program.tool=avrdude
+arduinoasisp.program.extra_params=-P{serial.port} -b{program.speed}
+[......]
+</code></pre></div>
+
+
+<p>These properties can only be used in the recipes of the actions that use the programmer (<code>erase</code>, <code>bootloader</code>, and
+<code>program</code>).</p>
+<p>The <strong>arduinoasisp.name</strong> property defines the human-friendly name of the programmer. This is shown in the <strong>Tools &gt;
+Programmer</strong> menu of the IDEs and the output of <a href="../commands/arduino-cli_upload/"><code>arduino-cli upload --programmer list</code></a>
+and <a href="../commands/arduino-cli_burn-bootloader/"><code>arduino-cli burn-bootloader --programmer list</code></a>.</p>
+<p>In Arduino IDE 1.8.12 and older, all programmers of all installed platforms were made available for use. Starting with
+Arduino IDE 1.8.13 (and in all relevant versions of other Arduino development tools), only the programmers defined by
+the <a href="#platform-terminology">board and core platform</a> of the currently selected board are available. For this reason,
+platforms may now need to define copies of the programmers that were previously assumed to be provided by another
+platform.</p>
 <h2 id="tools">Tools<a class="headerlink" href="#tools" title="Permanent link">&para;</a></h2>
 <p>The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn
 bootloaders using external programmers. For example, <em>avrdude</em> is used for AVR based boards and <em>bossac</em> for SAM based
@@ -2389,9 +2437,51 @@ support uploading via programmer.</p>
 <p>The file component of the port's path (e.g., <code>ttyACM0</code>) is available as the configuration property
 <strong>{serial.port.file}</strong>.</p>
 <h3 id="upload-using-an-external-programmer">Upload using an external programmer<a class="headerlink" href="#upload-using-an-external-programmer" title="Permanent link">&para;</a></h3>
-<p><strong>TODO...</strong><br> The platform.txt associated with the selected programmer will be used.</p>
+<p>The <code>program</code> action is triggered via the <strong>Sketch &gt; Upload Using Programmer</strong> feature of the IDEs or
+<a href="../commands/arduino-cli_upload/"><code>arduino-cli upload --programmer &lt;programmer ID&gt;</code></a>. This action is used to transfer a
+compiled sketch to a board using an external programmer.</p>
+<p>The <strong>program.tool</strong> property determines the tool to be used for this action. This property is typically defined for
+each programmer in <a href="#programmerstxt">programmers.txt</a>:</p>
+<div class="codehilite"><pre><span></span><code>[......]
+usbasp.program.tool=avrdude
+[......]
+arduinoasisp.program.tool=avrdude
+[......]
+</code></pre></div>
+
+
+<p>This action can use the same <a href="#upload-verification">upload verification preference system</a> as the <code>upload</code> action, via
+the <strong>program.verify</strong> property.</p>
+<p>When using the Arduino IDE, if the selected programmer is from a different platform than the board, the <code>program</code> recipe
+defined in the programmer's platform is used without overrides from the properties defined in the
+<a href="#platformtxt">platform.txt</a> of the <a href="#platform-terminology">board platform</a>. When using Arduino development software
+other than the Arduino IDE, the handling of properties is the same as when doing a
+<a href="#sketch-upload-configuration">standard Upload</a>.</p>
 <h3 id="burn-bootloader">Burn Bootloader<a class="headerlink" href="#burn-bootloader" title="Permanent link">&para;</a></h3>
-<p><strong>TODO...</strong><br> The platform.txt associated with the selected board will be used.</p>
+<p>The <code>erase</code> and <code>bootloader</code> actions are triggered via the <strong>Tools &gt; Burn Bootloader</strong> feature of the Arduino IDE or
+<a href="../commands/arduino-cli_burn-bootloader/"><code>arduino-cli burn-bootloader</code></a>. This action is used to flash a bootloader to
+the board.</p>
+<p>"Burn Bootloader" is unique in that it uses two actions, which are executed in sequence:</p>
+<ol>
+<li><code>erase</code> is typically used to erase the microcontroller's flash memory and set the configuration fuses according to
+   the properties defined in the <a href="#boardstxt">board definition</a></li>
+<li><code>bootloader</code> is used to flash the bootloader to the board</li>
+</ol>
+<p>The <strong>bootloader.tool</strong> property determines the tool to be used for the <code>erase</code> and <code>bootloader</code> actions both. This
+property is typically defined for each board in boards.txt:</p>
+<div class="codehilite"><pre><span></span><code>[......]
+uno.bootloader.tool=avrdude
+[......]
+leonardo.bootloader.tool=avrdude
+[......]
+</code></pre></div>
+
+
+<p>When using the Arduino IDE, if the board uses a
+<a href="https://arduino.github.io/arduino-cli/dev/platform-specification/#core-reference">core reference</a>, the platform.txt of
+the <a href="#platform-terminology">core platform</a> is not used at all in defining the recipes for <code>erase</code> and <code>bootloader</code>
+actions. When using Arduino development software other than the Arduino IDE, the handling of properties from the core
+platform's platform.txt is done as usual.</p>
 <h3 id="sketch-debugging-configuration">Sketch debugging configuration<a class="headerlink" href="#sketch-debugging-configuration" title="Permanent link">&para;</a></h3>
 <p>Starting from Arduino CLI 0.9.0 / Arduino Pro IDE v0.0.5-alpha.preview, sketch debugging support is available for
 platforms.</p>
@@ -2506,6 +2596,10 @@ platform.txt unless there are some specific properties that need to be overridde
 <p>The <a href="#platform-bundled-libraries">bundled libraries</a> from the referenced platform are used, thus there is no need for
 the referencing platform to bundle those libraries. If libraries are provided, the list of available libraries is the
 sum of the two libraries, where the referencing platform has priority over the referenced platform.</p>
+<p>The <a href="#programmerstxt">programmers</a> from the referenced platform are made available, thus there is no need for the
+referencing platform to define those programmers. If the referencing platform does provide its own programmer
+definitions, the list of available programmer is the sum of the programmers of the two platforms. In Arduino IDE 1.8.12
+and older, all programmers of all installed platforms were made available.</p>
 <h3 id="variant-reference">Variant reference<a class="headerlink" href="#variant-reference" title="Permanent link">&para;</a></h3>
 <p>In the same way we can use a variant defined on another platform using the syntax <strong>VENDOR_ID:VARIANT_ID</strong>:</p>
 <div class="codehilite"><pre><span></span><code>[....]
