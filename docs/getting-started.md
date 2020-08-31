@@ -20,7 +20,7 @@ Available Commands:
     download     Downloads one or more cores and corresponding tool dependencies.
     install      Installs one or more cores and corresponding tool dependencies.
     list         Shows the list of installed platforms.
-    search       Search for a core in the package index.
+    search       Search for a core in Boards Manager.
     uninstall    Uninstalls one or more cores and corresponding tool dependencies if no more used.
     update-index Updates the index of cores.
     upgrade      Upgrades one or all installed platforms to the latest version.
@@ -29,7 +29,7 @@ Flags:
     -h, --help   help for core
 
 Global Flags:
-        --additional-urls strings   Additional URLs for the board manager.
+        --additional-urls strings   Additional URLs for Boards Manager.
         --config-file string        The custom config file (if not specified the default will be used).
         --format string             The output format, can be [text|json]. (default "text")
         --log-file string           Path to the file where logs will be written.

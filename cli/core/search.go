@@ -37,8 +37,8 @@ var (
 func initSearchCommand() *cobra.Command {
 	searchCommand := &cobra.Command{
 		Use:     "search <keywords...>",
-		Short:   "Search for a core in the package index.",
-		Long:    "Search for a core in the package index using the specified keywords.",
+		Short:   "Search for a core in Boards Manager.",
+		Long:    "Search for a core in Boards Manager using the specified keywords.",
 		Example: "  " + os.Args[0] + " core search MKRZero -a -v",
 		Args:    cobra.ArbitraryArgs,
 		Run:     runSearchCommand,

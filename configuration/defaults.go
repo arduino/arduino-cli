@@ -26,7 +26,7 @@ func setDefaults(dataDir, userDir string) {
 	viper.SetDefault("logging.level", "info")
 	viper.SetDefault("logging.format", "text")
 
-	// board manager
+	// Boards Manager
 	viper.SetDefault("board_manager.additional_urls", []string{})
 
 	// arduino directories
