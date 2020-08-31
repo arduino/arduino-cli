@@ -17,7 +17,11 @@ package lib
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -32,12 +36,57 @@ type installedLib struct {
 
 // LibraryList FIXMEDOC
 func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResp, error) {
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
+	if pm == nil {
+		return nil, errors.New("invalid instance")
+	}
+
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	if lm == nil {
+		return nil, errors.New("invalid instance")
+	}
+
+	nameFilter := strings.ToLower(req.GetName())
 
 	instaledLib := []*rpc.InstalledLibrary{}
 	res := listLibraries(lm, req.GetUpdatable(), req.GetAll())
 	if len(res) > 0 {
+		if f := req.GetFqbn(); f != "" {
+			fqbn, err := cores.ParseFQBN(req.GetFqbn())
+			if err != nil {
+				return nil, fmt.Errorf("parsing fqbn: %s", err)
+			}
+			_, boardPlatform, _, _, refBoardPlatform, err := pm.ResolveFQBN(fqbn)
+			if err != nil {
+				return nil, fmt.Errorf("loading board data: %s", err)
+			}
+
+			filteredRes := map[string]*installedLib{}
+			for _, lib := range res {
+				if cp := lib.Library.ContainerPlatform; cp != nil {
+					if cp != boardPlatform && cp != refBoardPlatform {
+						// Filter all libraries from extraneous platforms
+						continue
+					}
+				}
+				if latest, has := filteredRes[lib.Library.Name]; has {
+					if latest.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) >= lib.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) {
+						continue
+					}
+				}
+				filteredRes[lib.Library.Name] = lib
+			}
+
+			res = []*installedLib{}
+			for _, lib := range filteredRes {
+				res = append(res, lib)
+			}
+		}
+
 		for _, lib := range res {
+			if nameFilter != "" && strings.ToLower(lib.Library.Name) != nameFilter {
+				continue
+			}
 			libtmp := GetOutputLibrary(lib.Library)
 			release := GetOutputRelease(lib.Available)
 			instaledLib = append(instaledLib, &rpc.InstalledLibrary{
@@ -117,6 +166,7 @@ func GetOutputLibrary(lib *libraries.Library) *rpc.Library {
 		IsLegacy:          lib.IsLegacy,
 		Version:           lib.Version.String(),
 		License:           lib.License,
+		Examples:          lib.Examples.AsStrings(),
 	}
 }
 

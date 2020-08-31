@@ -70,6 +70,7 @@ type Library struct {
 	Version                *semver.Version
 	License                string
 	Properties             *properties.Map
+	Examples               paths.PathList
 }
 
 func (library *Library) String() string {
@@ -136,4 +137,19 @@ func (library *Library) SourceDirs() []SourceDir {
 			})
 	}
 	return dirs
+}
+
+// LocationPriorityFor returns a number representing the location priority for the given library
+// using the given platform and referenced-platform. Higher value means higher priority.
+func (library *Library) LocationPriorityFor(platformRelease, refPlatformRelease *cores.PlatformRelease) int {
+	if library.Location == IDEBuiltIn {
+		return 1
+	} else if library.ContainerPlatform == refPlatformRelease {
+		return 2
+	} else if library.ContainerPlatform == platformRelease {
+		return 3
+	} else if library.Location == User {
+		return 4
+	}
+	return 0
 }

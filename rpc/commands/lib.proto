@@ -193,7 +193,12 @@ message LibraryListReq {
     bool all = 2;
     // Whether to list only libraries for which there is a newer version than
     // the installed version available in the libraries index.
-	bool updatable = 3;
+    bool updatable = 3;
+    // If set filters out the libraries not matching name
+    string name = 4;
+    // By setting this field all duplicate libraries are filtered out leaving
+    // only the libraries that will be used to compile for the specified board FQBN.
+    string fqbn = 5;
 }
 
 message LibraryListResp {
@@ -261,6 +266,8 @@ message Library {
     LibraryLocation location = 24;
     // The library format type.
     LibraryLayout layout = 25;
+    // The example sketches provided by the library
+    repeated string examples = 26;
 }
 
 enum LibraryLayout {
