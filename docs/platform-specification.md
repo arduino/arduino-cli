@@ -529,6 +529,44 @@ Adding a **hide** property to a board definition causes it to not be shown in th
 
 The value of the property is ignored; it's the presence or absence of the property that controls the board's visibility.
 
+## programmers.txt
+
+This file contains definitions for external programmers. These programmers are used by:
+
+- The [**Tools > Burn Bootloader**](#burn-bootloader) feature of the IDEs and
+  [`arduino-cli burn-bootloader`](commands/arduino-cli_burn-bootloader.md)
+- The [**Sketch > Upload Using Programmer**](#upload-using-an-external-programmer) feature of the IDEs and
+  [`arduino-cli upload --programmer <programmer ID>`](commands/arduino-cli_upload.md#options)
+
+programmers.txt works similarly to [boards.txt](#boardstxt). Programmers are referenced by their short name: the
+programmer ID. The settings for a programmer are defined through a set of properties with keys that use the programmer
+ID as prefix.
+
+For example, the programmer ID chosen for the
+["Arduino as ISP" programmer](https://www.arduino.cc/en/Tutorial/ArduinoISP) is "arduinoasisp". The definition of this
+programmer in programmers.txt looks like:
+
+    [......]
+    arduinoasisp.name=Arduino as ISP
+    arduinoasisp.protocol=stk500v1
+    arduinoasisp.program.speed=19200
+    arduinoasisp.program.tool=avrdude
+    arduinoasisp.program.extra_params=-P{serial.port} -b{program.speed}
+    [......]
+
+These properties can only be used in the recipes of the actions that use the programmer (`erase`, `bootloader`, and
+`program`).
+
+The **arduinoasisp.name** property defines the human-friendly name of the programmer. This is shown in the **Tools >
+Programmer** menu of the IDEs and the output of [`arduino-cli upload --programmer list`](commands/arduino-cli_upload.md)
+and [`arduino-cli burn-bootloader --programmer list`](commands/arduino-cli_burn-bootloader.md).
+
+In Arduino IDE 1.8.12 and older, all programmers of all installed platforms were made available for use. Starting with
+Arduino IDE 1.8.13 (and in all relevant versions of other Arduino development tools), only the programmers defined by
+the [board and core platform](#platform-terminology) of the currently selected board are available. For this reason,
+platforms may now need to define copies of the programmers that were previously assumed to be provided by another
+platform.
+
 ## Tools
 
 The Arduino development software uses external command line tools to upload the compiled sketch to the board or to burn
@@ -701,11 +739,54 @@ The file component of the port's path (e.g., `ttyACM0`) is available as the conf
 
 ### Upload using an external programmer
 
-**TODO...**<br> The platform.txt associated with the selected programmer will be used.
+The `program` action is triggered via the **Sketch > Upload Using Programmer** feature of the IDEs or
+[`arduino-cli upload --programmer <programmer ID>`](commands/arduino-cli_upload.md). This action is used to transfer a
+compiled sketch to a board using an external programmer.
+
+The **program.tool** property determines the tool to be used for this action. This property is typically defined for
+each programmer in [programmers.txt](#programmerstxt):
+
+    [......]
+    usbasp.program.tool=avrdude
+    [......]
+    arduinoasisp.program.tool=avrdude
+    [......]
+
+This action can use the same [upload verification preference system](#upload-verification) as the `upload` action, via
+the **program.verify** property.
+
+When using the Arduino IDE, if the selected programmer is from a different platform than the board, the `program` recipe
+defined in the programmer's platform is used without overrides from the properties defined in the
+[platform.txt](#platformtxt) of the [board platform](#platform-terminology). When using Arduino development software
+other than the Arduino IDE, the handling of properties is the same as when doing a
+[standard Upload](#sketch-upload-configuration).
 
 ### Burn Bootloader
 
-**TODO...**<br> The platform.txt associated with the selected board will be used.
+The `erase` and `bootloader` actions are triggered via the **Tools > Burn Bootloader** feature of the Arduino IDE or
+[`arduino-cli burn-bootloader`](commands/arduino-cli_burn-bootloader.md). This action is used to flash a bootloader to
+the board.
+
+"Burn Bootloader" is unique in that it uses two actions, which are executed in sequence:
+
+1. `erase` is typically used to erase the microcontroller's flash memory and set the configuration fuses according to
+   the properties defined in the [board definition](#boardstxt)
+1. `bootloader` is used to flash the bootloader to the board
+
+The **bootloader.tool** property determines the tool to be used for the `erase` and `bootloader` actions both. This
+property is typically defined for each board in boards.txt:
+
+    [......]
+    uno.bootloader.tool=avrdude
+    [......]
+    leonardo.bootloader.tool=avrdude
+    [......]
+
+When using the Arduino IDE, if the board uses a
+[core reference](https://arduino.github.io/arduino-cli/dev/platform-specification/#core-reference), the platform.txt of
+the [core platform](#platform-terminology) is not used at all in defining the recipes for `erase` and `bootloader`
+actions. When using Arduino development software other than the Arduino IDE, the handling of properties from the core
+platform's platform.txt is done as usual.
 
 ### Sketch debugging configuration
 
@@ -832,6 +913,11 @@ platform.txt unless there are some specific properties that need to be overridde
 The [bundled libraries](#platform-bundled-libraries) from the referenced platform are used, thus there is no need for
 the referencing platform to bundle those libraries. If libraries are provided, the list of available libraries is the
 sum of the two libraries, where the referencing platform has priority over the referenced platform.
+
+The [programmers](#programmerstxt) from the referenced platform are made available, thus there is no need for the
+referencing platform to define those programmers. If the referencing platform does provide its own programmer
+definitions, the list of available programmer is the sum of the programmers of the two platforms. In Arduino IDE 1.8.12
+and older, all programmers of all installed platforms were made available.
 
 ### Variant reference
 
