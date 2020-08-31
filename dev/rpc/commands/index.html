@@ -1041,6 +1041,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#loadsketchreq" class="md-nav__link">
+    LoadSketchReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loadsketchresp" class="md-nav__link">
+    LoadSketchResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#outdatedreq" class="md-nav__link">
     OutdatedReq
   </a>
@@ -1939,6 +1953,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#loadsketchreq" class="md-nav__link">
+    LoadSketchReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loadsketchresp" class="md-nav__link">
+    LoadSketchResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#outdatedreq" class="md-nav__link">
     OutdatedReq
   </a>
@@ -2545,6 +2573,8 @@
 <li><a href="#cc.arduino.cli.commands.DestroyResp">DestroyResp</a></li>
 <li><a href="#cc.arduino.cli.commands.InitReq">InitReq</a></li>
 <li><a href="#cc.arduino.cli.commands.InitResp">InitResp</a></li>
+<li><a href="#cc.arduino.cli.commands.LoadSketchReq">LoadSketchReq</a></li>
+<li><a href="#cc.arduino.cli.commands.LoadSketchResp">LoadSketchResp</a></li>
 <li><a href="#cc.arduino.cli.commands.OutdatedReq">OutdatedReq</a></li>
 <li><a href="#cc.arduino.cli.commands.OutdatedResp">OutdatedResp</a></li>
 <li><a href="#cc.arduino.cli.commands.RescanReq">RescanReq</a></li>
@@ -3389,6 +3419,70 @@
 </tr>
 </tbody>
 </table>
+<p><a name="cc.arduino.cli.commands.LoadSketchReq"></a></p>
+<h3 id="loadsketchreq">LoadSketchReq<a class="headerlink" href="#loadsketchreq" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
+<td></td>
+<td>Arduino Core Service instance from the Init response.</td>
+</tr>
+<tr>
+<td>sketch_path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Absolute path to single sketch file or a sketch folder</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.LoadSketchResp"></a></p>
+<h3 id="loadsketchresp">LoadSketchResp<a class="headerlink" href="#loadsketchresp" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>main_file</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Absolute path to a main sketch files</td>
+</tr>
+<tr>
+<td>location_path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Absolute path to folder that contains main_file</td>
+</tr>
+<tr>
+<td>other_sketch_files</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of absolute paths to other sketch files</td>
+</tr>
+<tr>
+<td>additional_files</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of absolute paths to additional sketch files</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.OutdatedReq"></a></p>
 <h3 id="outdatedreq">OutdatedReq<a class="headerlink" href="#outdatedreq" title="Permanent link">&para;</a></h3>
 <table>
@@ -3736,6 +3830,12 @@
 <td><a href="#cc.arduino.cli.commands.VersionReq">VersionReq</a></td>
 <td><a href="#cc.arduino.cli.commands.VersionResp">VersionResp</a></td>
 <td>Get the version of Arduino CLI in use.</td>
+</tr>
+<tr>
+<td>LoadSketch</td>
+<td><a href="#cc.arduino.cli.commands.LoadSketchReq">LoadSketchReq</a></td>
+<td><a href="#cc.arduino.cli.commands.LoadSketchResp">LoadSketchResp</a></td>
+<td>Returns all files composing a Sketch</td>
 </tr>
 <tr>
 <td>BoardDetails</td>
