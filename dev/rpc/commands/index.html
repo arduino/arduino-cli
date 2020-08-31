@@ -1194,6 +1194,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#programmer" class="md-nav__link">
+    Programmer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#taskprogress" class="md-nav__link">
     TaskProgress
   </a>
@@ -1570,13 +1577,6 @@
           <li class="md-nav__item">
   <a href="#listprogrammersavailableforuploadresp" class="md-nav__link">
     ListProgrammersAvailableForUploadResp
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#programmer" class="md-nav__link">
-    Programmer
   </a>
   
 </li>
@@ -2106,6 +2106,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#programmer" class="md-nav__link">
+    Programmer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#taskprogress" class="md-nav__link">
     TaskProgress
   </a>
@@ -2487,13 +2494,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#programmer" class="md-nav__link">
-    Programmer
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#uploadreq" class="md-nav__link">
     UploadReq
   </a>
@@ -2601,6 +2601,7 @@
 <ul>
 <li><a href="#cc.arduino.cli.commands.DownloadProgress">DownloadProgress</a></li>
 <li><a href="#cc.arduino.cli.commands.Instance">Instance</a></li>
+<li><a href="#cc.arduino.cli.commands.Programmer">Programmer</a></li>
 <li><a href="#cc.arduino.cli.commands.TaskProgress">TaskProgress</a></li>
 </ul>
 </li>
@@ -2678,7 +2679,6 @@
 <li><a href="#cc.arduino.cli.commands.BurnBootloaderResp">BurnBootloaderResp</a></li>
 <li><a href="#cc.arduino.cli.commands.ListProgrammersAvailableForUploadReq">ListProgrammersAvailableForUploadReq</a></li>
 <li><a href="#cc.arduino.cli.commands.ListProgrammersAvailableForUploadResp">ListProgrammersAvailableForUploadResp</a></li>
-<li><a href="#cc.arduino.cli.commands.Programmer">Programmer</a></li>
 <li><a href="#cc.arduino.cli.commands.UploadReq">UploadReq</a></li>
 <li><a href="#cc.arduino.cli.commands.UploadResp">UploadResp</a></li>
 </ul>
@@ -2858,6 +2858,12 @@
 <td><a href="#cc.arduino.cli.commands.IdentificationPref">IdentificationPref</a></td>
 <td>repeated</td>
 <td>Identifying information for the board (e.g., USB VID/PID).</td>
+</tr>
+<tr>
+<td>programmers</td>
+<td><a href="#cc.arduino.cli.commands.Programmer">Programmer</a></td>
+<td>repeated</td>
+<td>List of programmers supported by the board</td>
 </tr>
 </tbody>
 </table>
@@ -4030,6 +4036,38 @@
 <td><a href="#int32">int32</a></td>
 <td></td>
 <td>The ID of the instance.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.Programmer"></a></p>
+<h3 id="programmer">Programmer<a class="headerlink" href="#programmer" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>platform</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>id</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -5676,38 +5714,6 @@
 <td>programmers</td>
 <td><a href="#cc.arduino.cli.commands.Programmer">Programmer</a></td>
 <td>repeated</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.Programmer"></a></p>
-<h3 id="programmer">Programmer<a class="headerlink" href="#programmer" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>platform</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>id</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>name</td>
-<td><a href="#string">string</a></td>
-<td></td>
 <td></td>
 </tr>
 </tbody>
