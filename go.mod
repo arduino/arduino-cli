@@ -20,7 +20,7 @@ require (
 	github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 // indirect
 	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
-	github.com/golang/protobuf v1.4.1
+	github.com/golang/protobuf v1.4.2
 	github.com/h2non/filetype v1.0.8 // indirect
 	github.com/imjasonmiller/godice v0.1.2
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect

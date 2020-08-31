@@ -70,6 +70,9 @@ func main() {
 	log.Println("calling Version")
 	callVersion(client)
 
+	log.Println("calling LoadSketch")
+	callLoadSketch(client)
+
 	// Use SetValue to configure the arduino-cli directories.
 	log.Println("calling SetValue")
 	callSetValue(settingsClient)
@@ -877,4 +880,19 @@ func waitForPrompt(debugStreamingOpenClient dbg.Debug_DebugClient, prompt string
 			}
 		}
 	}
+}
+
+func callLoadSketch(client rpc.ArduinoCoreClient) {
+	currDir, _ := os.Getwd()
+	sketch, err := client.LoadSketch(context.Background(), &rpc.LoadSketchReq{
+		SketchPath: filepath.Join(currDir, "hello"),
+	})
+	if err != nil {
+		log.Fatalf("Error getting version: %s", err)
+	}
+
+	log.Printf("Sketch main file: %s", sketch.GetMainFile())
+	log.Printf("Sketch location: %s", sketch.GetLocationPath())
+	log.Printf("Other sketch files: %v", sketch.GetOtherSketchFiles())
+	log.Printf("Sketch additional files: %v", sketch.GetAdditionalFiles())
 }
