@@ -337,3 +337,8 @@ func (s *ArduinoCoreServerImpl) LibrarySearch(ctx context.Context, req *rpc.Libr
 func (s *ArduinoCoreServerImpl) LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResp, error) {
 	return lib.LibraryList(ctx, req)
 }
+
+// ArchiveSketch FIXMEDOC
+func (s *ArduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchReq) (*rpc.ArchiveSketchResp, error) {
+	return commands.ArchiveSketch(ctx, req)
+}

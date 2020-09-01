@@ -16,12 +16,16 @@
 package commands
 
 import (
+	"archive/zip"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/url"
+	"os"
 	"path"
+	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -701,4 +705,152 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchReq) (*rpc.LoadSketchRes
 		OtherSketchFiles: otherSketchFiles,
 		AdditionalFiles:  additionalFiles,
 	}, nil
+}
+
+// ArchiveSketch FIXMEDOC
+func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchReq) (*rpc.ArchiveSketchResp, error) {
+	// sketchName is the name of the sketch without extension, for example "MySketch"
+	var sketchName string
+
+	sketchPath := paths.New(req.SketchPath)
+	if sketchPath == nil {
+		sketchPath = paths.New(".")
+	}
+
+	sketchPath, err := sketchPath.Clean().Abs()
+	if err != nil {
+		return nil, fmt.Errorf("Error getting absolute sketch path %v", err)
+	}
+
+	// Get the sketch name and make sketchPath point to the ino file
+	if sketchPath.IsDir() {
+		sketchName = sketchPath.Base()
+		sketchPath = sketchPath.Join(sketchName + ".ino")
+	} else if sketchPath.Ext() == ".ino" {
+		sketchName = strings.TrimSuffix(sketchPath.Base(), ".ino")
+	}
+
+	// Checks if it's really a sketch
+	if sketchPath.NotExist() {
+		return nil, fmt.Errorf("specified path is not a sketch: %v", sketchPath.String())
+	}
+
+	archivePath := paths.New(req.ArchivePath)
+	if archivePath == nil {
+		archivePath = sketchPath.Parent().Parent()
+	}
+
+	archivePath, err = archivePath.Clean().Abs()
+	if err != nil {
+		return nil, fmt.Errorf("Error getting absolute archive path %v", err)
+	}
+
+	// Makes archivePath point to a zip file
+	if archivePath.IsDir() {
+		archivePath = archivePath.Join(sketchName + ".zip")
+	} else if archivePath.Ext() == "" {
+		archivePath = paths.New(archivePath.String() + ".zip")
+	}
+
+	if archivePath.Exist() {
+		return nil, fmt.Errorf("archive already exists")
+	}
+
+	archive, err := os.Create(archivePath.Clean().String())
+	if err != nil {
+		return nil, fmt.Errorf("Error creating archive: %v", err)
+	}
+	defer archive.Close()
+
+	zipWriter := zip.NewWriter(archive)
+	defer zipWriter.Close()
+
+	filesToZip, err := getSketchContent(sketchPath.Parent())
+	if err != nil {
+		return nil, fmt.Errorf("Error retrieving sketch files: %v", err)
+	}
+
+	for _, f := range filesToZip {
+
+		if !req.IncludeBuildDir {
+			filePath, err := sketchPath.Parent().Parent().RelTo(f)
+			if err != nil {
+				return nil, fmt.Errorf("Error calculating relative file path: %v", err)
+			}
+
+			// Skips build folder
+			if strings.HasPrefix(filePath.String(), sketchName+"/build") {
+				continue
+			}
+		}
+
+		// We get the parent path since we want the archive to unpack as a folder.
+		// If we don't do this the archive would contain all the sketch files as top level.
+		err = addFileToSketchArchive(zipWriter, f, sketchPath.Parent().Parent())
+		if err != nil {
+			return nil, fmt.Errorf("Error adding file to archive: %v", err)
+		}
+	}
+
+	return &rpc.ArchiveSketchResp{}, nil
+}
+
+// Recursively retrieves all files in the sketch folder
+func getSketchContent(sketchFolder *paths.Path) (paths.PathList, error) {
+	sketchFiles, err := sketchFolder.ReadDir()
+	if err != nil {
+		return nil, err
+	}
+	for _, f := range sketchFiles {
+		if f.IsDir() {
+			files, err := getSketchContent(f)
+			if err != nil {
+				return nil, err
+			}
+
+			sketchFiles = append(sketchFiles, files...)
+		}
+	}
+	finalFiles := paths.PathList{}
+	for _, f := range sketchFiles {
+		if f.IsNotDir() {
+			finalFiles = append(finalFiles, f)
+		}
+	}
+	return finalFiles, nil
+}
+
+// Adds a single file to an existing zip file
+func addFileToSketchArchive(zipWriter *zip.Writer, filePath, sketchPath *paths.Path) error {
+	f, err := filePath.Open()
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	info, err := f.Stat()
+	if err != nil {
+		return err
+	}
+
+	header, err := zip.FileInfoHeader(info)
+	if err != nil {
+		return err
+	}
+
+	filePath, err = sketchPath.RelTo(filePath)
+	if err != nil {
+		return err
+	}
+
+	header.Name = filePath.String()
+	header.Method = zip.Deflate
+
+	writer, err := zipWriter.CreateHeader(header)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(writer, f)
+	return err
 }

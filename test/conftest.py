@@ -92,10 +92,12 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
     }
     os.makedirs(os.path.join(data_dir, "packages"))
 
-    def _run(cmd_string):
+    def _run(cmd_string, custom_working_dir=None):
+        if not custom_working_dir:
+            custom_working_dir = working_dir
         cli_full_line = "{} {}".format(cli_path, cmd_string)
         run_context = Context()
-        with run_context.cd(working_dir):
+        with run_context.cd(custom_working_dir):
             return run_context.run(cli_full_line, echo=False, hide=True, warn=True, env=env)
 
     return _run

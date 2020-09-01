@@ -21,6 +21,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/cli/archive"
 	"github.com/arduino/arduino-cli/cli/board"
 	"github.com/arduino/arduino-cli/cli/burnbootloader"
 	"github.com/arduino/arduino-cli/cli/cache"
@@ -79,6 +80,7 @@ func NewCommand() *cobra.Command {
 
 // this is here only for testing
 func createCliCommandTree(cmd *cobra.Command) {
+	cmd.AddCommand(archive.NewCommand())
 	cmd.AddCommand(board.NewCommand())
 	cmd.AddCommand(cache.NewCommand())
 	cmd.AddCommand(compile.NewCommand())
