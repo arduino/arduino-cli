@@ -31,13 +31,12 @@ import (
 )
 
 var (
-	fqbn           string
-	port           string
-	verbose        bool
-	verify         bool
-	importDir      string
-	programmer     string
-	burnBootloader bool
+	fqbn       string
+	port       string
+	verbose    bool
+	verify     bool
+	importDir  string
+	programmer string
 )
 
 // NewCommand created a new `upload` command
@@ -73,23 +72,6 @@ func run(command *cobra.Command, args []string) {
 		path = paths.New(args[0])
 	}
 	sketchPath := initSketchPath(path)
-
-	if burnBootloader {
-		if _, err := upload.Upload(context.Background(), &rpc.UploadReq{
-			Instance:   instance,
-			Fqbn:       fqbn,
-			SketchPath: sketchPath.String(),
-			Port:       port,
-			Verbose:    verbose,
-			Verify:     verify,
-			ImportDir:  importDir,
-			Programmer: programmer,
-		}, os.Stdout, os.Stderr); err != nil {
-			feedback.Errorf("Error during Upload: %v", err)
-			os.Exit(errorcodes.ErrGeneric)
-		}
-		os.Exit(0)
-	}
 
 	if _, err := upload.Upload(context.Background(), &rpc.UploadReq{
 		Instance:   instance,
