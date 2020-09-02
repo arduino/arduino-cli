@@ -25,6 +25,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
@@ -779,7 +780,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchReq) (*rpc.Archive
 			}
 
 			// Skips build folder
-			if strings.HasPrefix(filePath.String(), sketchName+"/build") {
+			if strings.HasPrefix(filePath.String(), sketchName+string(filepath.Separator)+"build") {
 				continue
 			}
 		}
