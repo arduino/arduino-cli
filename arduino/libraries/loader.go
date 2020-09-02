@@ -56,6 +56,14 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 		}
 	}
 
+	commaSeparatedToList := func(in string) []string {
+		res := []string{}
+		for _, e := range strings.Split(in, ",") {
+			res = append(res, strings.TrimSpace(e))
+		}
+		return res
+	}
+
 	library := &Library{}
 	library.Location = location
 	library.InstallDir = libraryDir
@@ -71,10 +79,7 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	if libProperties.Get("architectures") == "" {
 		libProperties.Set("architectures", "*")
 	}
-	library.Architectures = []string{}
-	for _, arch := range strings.Split(libProperties.Get("architectures"), ",") {
-		library.Architectures = append(library.Architectures, strings.TrimSpace(arch))
-	}
+	library.Architectures = commaSeparatedToList(libProperties.Get("architectures"))
 
 	libProperties.Set("category", strings.TrimSpace(libProperties.Get("category")))
 	if !ValidCategories[libProperties.Get("category")] {
