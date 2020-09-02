@@ -100,6 +100,10 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 		library.Version = v
 	}
 
+	if includes := libProperties.Get("includes"); includes != "" {
+		library.sourceHeaders = commaSeparatedToList(includes)
+	}
+
 	if err := addExamples(library); err != nil {
 		return nil, errors.Errorf("scanning examples: %s", err)
 	}

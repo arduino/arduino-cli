@@ -52,13 +52,11 @@ func (resolver *Cpp) ScanFromLibrariesManager(lm *librariesmanager.LibrariesMana
 
 // ScanLibrary reads a library to find and cache C++ headers for later retrieval
 func (resolver *Cpp) ScanLibrary(lib *libraries.Library) error {
-	cppHeaders, err := lib.SourceDir.ReadDir()
+	cppHeaders, err := lib.SourceHeaders()
 	if err != nil {
-		return fmt.Errorf("reading lib src dir: %s", err)
+		return fmt.Errorf("reading lib headers: %s", err)
 	}
-	cppHeaders.FilterSuffix(".h", ".hpp", ".hh")
-	for _, cppHeaderPath := range cppHeaders {
-		cppHeader := cppHeaderPath.Base()
+	for _, cppHeader := range cppHeaders {
 		l := resolver.headers[cppHeader]
 		l.Add(lib)
 		resolver.headers[cppHeader] = l
