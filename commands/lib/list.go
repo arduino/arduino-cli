@@ -17,7 +17,6 @@ package lib
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -27,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/pkg/errors"
 )
 
 type installedLib struct {
@@ -87,7 +87,10 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryList
 			if nameFilter != "" && strings.ToLower(lib.Library.Name) != nameFilter {
 				continue
 			}
-			libtmp := GetOutputLibrary(lib.Library)
+			libtmp, err := GetOutputLibrary(lib.Library)
+			if err != nil {
+				return nil, err
+			}
 			release := GetOutputRelease(lib.Available)
 			instaledLib = append(instaledLib, &rpc.InstalledLibrary{
 				Library: libtmp,
@@ -125,7 +128,7 @@ func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bo
 }
 
 // GetOutputLibrary FIXMEDOC
-func GetOutputLibrary(lib *libraries.Library) *rpc.Library {
+func GetOutputLibrary(lib *libraries.Library) (*rpc.Library, error) {
 	insdir := ""
 	if lib.InstallDir != nil {
 		insdir = lib.InstallDir.String()
@@ -141,6 +144,11 @@ func GetOutputLibrary(lib *libraries.Library) *rpc.Library {
 	cntplat := ""
 	if lib.ContainerPlatform != nil {
 		cntplat = lib.ContainerPlatform.String()
+	}
+
+	libHeaders, err := lib.SourceHeaders()
+	if err != nil {
+		return nil, errors.Errorf("getting library headers: %s", err)
 	}
 
 	return &rpc.Library{
@@ -167,7 +175,8 @@ func GetOutputLibrary(lib *libraries.Library) *rpc.Library {
 		Version:           lib.Version.String(),
 		License:           lib.License,
 		Examples:          lib.Examples.AsStrings(),
-	}
+		ProvidesIncludes:  libHeaders,
+	}, nil
 }
 
 // GetOutputRelease FIXMEDOC

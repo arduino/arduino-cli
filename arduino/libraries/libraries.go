@@ -16,6 +16,8 @@
 package libraries
 
 import (
+	"fmt"
+
 	"github.com/arduino/arduino-cli/arduino/cores"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -71,6 +73,7 @@ type Library struct {
 	License                string
 	Properties             *properties.Map
 	Examples               paths.PathList
+	sourceHeaders          []string
 }
 
 func (library *Library) String() string {
@@ -152,4 +155,21 @@ func (library *Library) LocationPriorityFor(platformRelease, refPlatformRelease 
 		return 4
 	}
 	return 0
+}
+
+// SourceHeaders returns the C++ headers in the library.
+func (library *Library) SourceHeaders() ([]string, error) {
+	if library.sourceHeaders == nil {
+		cppHeaders, err := library.SourceDir.ReadDir()
+		if err != nil {
+			return nil, fmt.Errorf("reading lib src dir: %s", err)
+		}
+		cppHeaders.FilterSuffix(".h", ".hpp", ".hh")
+		res := []string{}
+		for _, cppHeader := range cppHeaders {
+			res = append(res, cppHeader.Base())
+		}
+		library.sourceHeaders = res
+	}
+	return library.sourceHeaders, nil
 }
