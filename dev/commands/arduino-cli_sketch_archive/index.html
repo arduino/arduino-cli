@@ -13,7 +13,7 @@
         <meta name="description" content="Arduino Command Line Interface">
       
       
-        <link rel="canonical" href="https://arduino.github.io/arduino-cli/commands/arduino-cli_sketch/">
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/commands/arduino-cli_sketch_archive/">
       
       
       
@@ -40,7 +40,7 @@
     
     
       
-        <title>sketch - Arduino CLI</title>
+        <title>Arduino cli sketch archive - Arduino CLI</title>
       
     
     
@@ -91,7 +91,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#arduino-cli-sketch" tabindex="0" class="md-skip">
+      <a href="#arduino-cli-sketch-archive" tabindex="0" class="md-skip">
         Skip to content
       </a>
     
@@ -117,7 +117,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                sketch
+                Arduino cli sketch archive
               
             </span>
           
@@ -298,12 +298,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7" checked>
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
     
     <label class="md-nav__link" for="nav-7">
       Command reference
@@ -727,86 +725,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        sketch
-      </label>
-    
-    <a href="./" title="sketch" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../arduino-cli_sketch/" title="sketch" class="md-nav__link">
       sketch
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#arduino-cli-sketch" class="md-nav__link">
-    arduino-cli sketch
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#synopsis" class="md-nav__link">
-    Synopsis
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    Examples
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
-    Options
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options-inherited-from-parent-commands" class="md-nav__link">
-    Options inherited from parent commands
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    SEE ALSO
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -1050,8 +973,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#arduino-cli-sketch" class="md-nav__link">
-    arduino-cli sketch
+  <a href="#arduino-cli-sketch-archive" class="md-nav__link">
+    arduino-cli sketch archive
   </a>
   
     <nav class="md-nav">
@@ -1114,18 +1037,26 @@
               
                 
                 
-                  <h1>sketch</h1>
+                  <h1>Arduino cli sketch archive</h1>
                 
-                <h2 id="arduino-cli-sketch">arduino-cli sketch<a class="headerlink" href="#arduino-cli-sketch" title="Permanent link">&para;</a></h2>
-<p>Arduino CLI sketch commands.</p>
+                <h2 id="arduino-cli-sketch-archive">arduino-cli sketch archive<a class="headerlink" href="#arduino-cli-sketch-archive" title="Permanent link">&para;</a></h2>
+<p>Creates a zip file containing all sketch files.</p>
 <h3 id="synopsis">Synopsis<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h3>
-<p>Arduino CLI sketch commands.</p>
+<p>Creates a zip file containing all sketch files.</p>
+<div class="highlight"><pre><span></span><code>arduino-cli sketch archive &lt;sketchPath&gt; &lt;archivePath&gt; [flags]
+</code></pre></div>
+
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  arduino-cli sketch new MySketch
+<div class="highlight"><pre><span></span><code>  arduino-cli archive
+  arduino-cli archive .
+  arduino-cli archive . MySketchArchive.zip
+  arduino-cli archive /home/user/Arduino/MySketch
+  arduino-cli archive /home/user/Arduino/MySketch /home/user/MySketchArchive.zip
 </code></pre></div>
 
 <h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  -h, --help   help for sketch
+<div class="highlight"><pre><span></span><code>  -h, --help                help for archive
+      --include-build-dir   Includes build directory in the archive.
 </code></pre></div>
 
 <h3 id="options-inherited-from-parent-commands">Options inherited from parent commands<a class="headerlink" href="#options-inherited-from-parent-commands" title="Permanent link">&para;</a></h3>
@@ -1140,9 +1071,7 @@
 
 <h3 id="see-also">SEE ALSO<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="../arduino-cli/">arduino-cli</a> - Arduino CLI.</li>
-<li><a href="../arduino-cli_sketch_archive/">arduino-cli sketch archive</a> - Creates a zip file containing all sketch files.</li>
-<li><a href="../arduino-cli_sketch_new/">arduino-cli sketch new</a> - Create a new Sketch</li>
+<li><a href="../arduino-cli_sketch/">arduino-cli sketch</a> - Arduino CLI sketch commands.</li>
 </ul>
                 
                   
@@ -1161,41 +1090,6 @@
       
         
 <footer class="md-footer">
-  
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid">
-        
-          <a href="../arduino-cli_outdated/" title="outdated" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
-            </div>
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Previous
-                </span>
-                outdated
-              </span>
-            </div>
-          </a>
-        
-        
-          <a href="../arduino-cli_sketch_new/" title="sketch new" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
-                </span>
-                sketch new
-              </span>
-            </div>
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
-            </div>
-          </a>
-        
-      </nav>
-    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">

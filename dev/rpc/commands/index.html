@@ -1013,6 +1013,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#archivesketchreq" class="md-nav__link">
+    ArchiveSketchReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archivesketchresp" class="md-nav__link">
+    ArchiveSketchResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#destroyreq" class="md-nav__link">
     DestroyReq
   </a>
@@ -1925,6 +1939,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#archivesketchreq" class="md-nav__link">
+    ArchiveSketchReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archivesketchresp" class="md-nav__link">
+    ArchiveSketchResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#destroyreq" class="md-nav__link">
     DestroyReq
   </a>
@@ -2569,6 +2597,8 @@
 <li>
 <p><a href="#commands/commands.proto">commands/commands.proto</a></p>
 <ul>
+<li><a href="#cc.arduino.cli.commands.ArchiveSketchReq">ArchiveSketchReq</a></li>
+<li><a href="#cc.arduino.cli.commands.ArchiveSketchResp">ArchiveSketchResp</a></li>
 <li><a href="#cc.arduino.cli.commands.DestroyReq">DestroyReq</a></li>
 <li><a href="#cc.arduino.cli.commands.DestroyResp">DestroyResp</a></li>
 <li><a href="#cc.arduino.cli.commands.InitReq">InitReq</a></li>
@@ -3339,6 +3369,40 @@
 <p align="right"><a href="#top">Top</a></p>
 
 <h2 id="commandscommandsproto">commands/commands.proto<a class="headerlink" href="#commandscommandsproto" title="Permanent link">&para;</a></h2>
+<p><a name="cc.arduino.cli.commands.ArchiveSketchReq"></a></p>
+<h3 id="archivesketchreq">ArchiveSketchReq<a class="headerlink" href="#archivesketchreq" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sketch_path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Absolute path to Sketch file or folder containing Sketch file</td>
+</tr>
+<tr>
+<td>archive_path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Absolute path to archive that will be created or folder that will contain it</td>
+</tr>
+<tr>
+<td>include_build_dir</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>Specifies if build directory should be included in the archive</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.ArchiveSketchResp"></a></p>
+<h3 id="archivesketchresp">ArchiveSketchResp<a class="headerlink" href="#archivesketchresp" title="Permanent link">&para;</a></h3>
 <p><a name="cc.arduino.cli.commands.DestroyReq"></a></p>
 <h3 id="destroyreq">DestroyReq<a class="headerlink" href="#destroyreq" title="Permanent link">&para;</a></h3>
 <table>
@@ -3842,6 +3906,12 @@
 <td><a href="#cc.arduino.cli.commands.LoadSketchReq">LoadSketchReq</a></td>
 <td><a href="#cc.arduino.cli.commands.LoadSketchResp">LoadSketchResp</a></td>
 <td>Returns all files composing a Sketch</td>
+</tr>
+<tr>
+<td>ArchiveSketch</td>
+<td><a href="#cc.arduino.cli.commands.ArchiveSketchReq">ArchiveSketchReq</a></td>
+<td><a href="#cc.arduino.cli.commands.ArchiveSketchResp">ArchiveSketchResp</a></td>
+<td>Creates a zip file containing all files of specified Sketch</td>
 </tr>
 <tr>
 <td>BoardDetails</td>
