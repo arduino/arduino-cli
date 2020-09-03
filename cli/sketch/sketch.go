@@ -31,6 +31,7 @@ func NewCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(initNewCommand())
+	cmd.AddCommand(initArchiveCommand())
 
 	return cmd
 }

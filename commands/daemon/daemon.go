@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 )
@@ -336,4 +337,9 @@ func (s *ArduinoCoreServerImpl) LibrarySearch(ctx context.Context, req *rpc.Libr
 // LibraryList FIXMEDOC
 func (s *ArduinoCoreServerImpl) LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResp, error) {
 	return lib.LibraryList(ctx, req)
+}
+
+// ArchiveSketch FIXMEDOC
+func (s *ArduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchReq) (*rpc.ArchiveSketchResp, error) {
+	return sketch.ArchiveSketch(ctx, req)
 }

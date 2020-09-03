@@ -15,6 +15,8 @@
 import os
 import platform
 import signal
+import shutil
+from pathlib import Path
 
 import pytest
 import simplejson as json
@@ -84,18 +86,29 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
     Useful reference:
         http://docs.pyinvoke.org/en/1.4/api/runners.html#invoke.runners.Result
     """
-    cli_path = os.path.join(str(pytestconfig.rootdir), "..", "arduino-cli")
+
+    cli_path = Path(pytestconfig.rootdir).parent / "arduino-cli"
     env = {
         "ARDUINO_DATA_DIR": data_dir,
         "ARDUINO_DOWNLOADS_DIR": downloads_dir,
         "ARDUINO_SKETCHBOOK_DIR": data_dir,
     }
-    os.makedirs(os.path.join(data_dir, "packages"))
+    (Path(data_dir) / "packages").mkdir()
 
-    def _run(cmd_string):
-        cli_full_line = "{} {}".format(cli_path, cmd_string)
+    def _run(cmd_string, custom_working_dir=None):
+        if not custom_working_dir:
+            custom_working_dir = working_dir
+        cli_full_line = '"{}" {}'.format(cli_path, cmd_string)
         run_context = Context()
-        with run_context.cd(working_dir):
+        # It might happen that we need to change directories between drives on Windows,
+        # in that case the "/d" flag must be used otherwise directory wouldn't change
+        cd_command = "cd"
+        if platform.system() == "Windows":
+            cd_command += " /d"
+        # Context.cd() is not used since it doesn't work correctly on Windows.
+        # It escapes spaces in the path using "\ " but it doesn't always work,
+        # wrapping the path in quotation marks is the safest approach
+        with run_context.prefix(f'{cd_command} "{custom_working_dir}"'):
             return run_context.run(cli_full_line, echo=False, hide=True, warn=True, env=env)
 
     return _run
@@ -112,15 +125,23 @@ def daemon_runner(pytestconfig, data_dir, downloads_dir, working_dir):
         http://docs.pyinvoke.org/en/1.4/api/runners.html#invoke.runners.Local
         http://docs.pyinvoke.org/en/1.4/api/runners.html
     """
-    cli_full_line = os.path.join(str(pytestconfig.rootdir), "..", "arduino-cli daemon")
+    cli_full_line = str(Path(pytestconfig.rootdir).parent / "arduino-cli daemon")
     env = {
         "ARDUINO_DATA_DIR": data_dir,
         "ARDUINO_DOWNLOADS_DIR": downloads_dir,
         "ARDUINO_SKETCHBOOK_DIR": data_dir,
     }
-    os.makedirs(os.path.join(data_dir, "packages"))
+    (Path(data_dir) / "packages").mkdir()
     run_context = Context()
-    run_context.cd(working_dir)
+    # It might happen that we need to change directories between drives on Windows,
+    # in that case the "/d" flag must be used otherwise directory wouldn't change
+    cd_command = "cd"
+    if platform.system() == "Windows":
+        cd_command += " /d"
+    # Context.cd() is not used since it doesn't work correctly on Windows.
+    # It escapes spaces in the path using "\ " but it doesn't always work,
+    # wrapping the path in quotation marks is the safest approach
+    run_context.prefix(f'{cd_command} "{working_dir}"')
     # Local Class is the implementation of a Runner abstract class
     runner = Local(run_context)
     runner.run(cli_full_line, echo=False, hide=True, warn=True, env=env, asynchronous=True)
@@ -165,3 +186,12 @@ def detected_boards(run_command):
             )
 
     return detected_boards
+
+
+@pytest.fixture(scope="function")
+def copy_sketch(working_dir):
+    # Copies sketch for testing
+    sketch_path = Path(__file__).parent / "testdata" / "sketch_simple"
+    test_sketch_path = Path(working_dir) / "sketch_simple"
+    shutil.copytree(sketch_path, test_sketch_path)
+    yield str(test_sketch_path)

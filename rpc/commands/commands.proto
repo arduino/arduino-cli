@@ -61,6 +61,9 @@ service ArduinoCore {
   // Returns all files composing a Sketch
   rpc LoadSketch(LoadSketchReq) returns (LoadSketchResp) {}
 
+  // Creates a zip file containing all files of specified Sketch
+  rpc ArchiveSketch(ArchiveSketchReq) returns (ArchiveSketchResp) {}
+
   // BOARD COMMANDS
   // --------------
 
@@ -251,3 +254,14 @@ message LoadSketchResp {
   // List of absolute paths to additional sketch files
   repeated string additional_files = 4;
 }
+
+message ArchiveSketchReq{
+  // Absolute path to Sketch file or folder containing Sketch file
+  string sketch_path = 1;
+  // Absolute path to archive that will be created or folder that will contain it
+  string archive_path = 2;
+  // Specifies if build directory should be included in the archive
+  bool include_build_dir = 3;
+}
+
+message ArchiveSketchResp { }
