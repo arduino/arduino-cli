@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package archive
+package sketch
 
 import (
 	"context"
@@ -21,7 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -29,8 +29,8 @@ import (
 
 var includeBuildDir bool
 
-// NewCommand creates a new `archive` command
-func NewCommand() *cobra.Command {
+// initArchiveCommand creates a new `archive` command
+func initArchiveCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "archive <sketchPath> <archivePath>",
 		Short: "Creates a zip file containing all sketch files.",
@@ -51,7 +51,7 @@ func NewCommand() *cobra.Command {
 }
 
 func runArchiveCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino archive`")
+	logrus.Info("Executing `arduino sketch archive`")
 
 	sketchPath := ""
 	if len(args) >= 1 {
@@ -63,7 +63,7 @@ func runArchiveCommand(cmd *cobra.Command, args []string) {
 		archivePath = args[1]
 	}
 
-	_, err := commands.ArchiveSketch(context.Background(),
+	_, err := sketch.ArchiveSketch(context.Background(),
 		&rpc.ArchiveSketchReq{
 			SketchPath:      sketchPath,
 			ArchivePath:     archivePath,

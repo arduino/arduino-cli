@@ -15,6 +15,7 @@
 import os
 import platform
 import signal
+import shutil
 from pathlib import Path
 
 import pytest
@@ -185,3 +186,12 @@ def detected_boards(run_command):
             )
 
     return detected_boards
+
+
+@pytest.fixture(scope="function")
+def copy_sketch(working_dir):
+    # Copies sketch for testing
+    sketch_path = Path(__file__).parent / "testdata" / "sketch_simple"
+    test_sketch_path = Path(working_dir) / "sketch_simple"
+    shutil.copytree(sketch_path, test_sketch_path)
+    yield str(test_sketch_path)

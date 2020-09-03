@@ -224,10 +224,10 @@ message UpgradeReq {
 }
 
 message UpgradeResp {
-	// Progress of the downloads of the platforms and libraries files.
-	DownloadProgress progress = 1;
-	// Description of the current stage of the upgrade.
-	TaskProgress task_progress = 2;
+  // Progress of the downloads of the platforms and libraries files.
+  DownloadProgress progress = 1;
+  // Description of the current stage of the upgrade.
+  TaskProgress task_progress = 2;
 }
 
 message VersionReq {}
