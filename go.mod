@@ -6,7 +6,6 @@ go 1.14
 replace github.com/GeertJohan/go.rice => github.com/cmaglie/go.rice v1.0.1
 
 require (
-	bou.ke/monkey v1.0.1
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c
 	github.com/arduino/go-paths-helper v1.3.1
