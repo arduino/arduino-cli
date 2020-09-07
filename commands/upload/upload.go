@@ -73,10 +73,11 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 }
 
 func runProgramAction(pm *packagemanager.PackageManager,
-	sketch *sketches.Sketch, importFile string, importDir string, fqbnIn string, port string,
+	sketch *sketches.Sketch,
+	importFile, importDir, fqbnIn, port string,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
-	outStream io.Writer, errStream io.Writer) error {
+	outStream, errStream io.Writer) error {
 
 	if burnBootloader && programmerID == "" {
 		return fmt.Errorf("no programmer specified for burning bootloader")
