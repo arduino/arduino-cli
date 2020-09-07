@@ -69,8 +69,8 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		{"", "", blonk, nil, "<nil>", "", true},
 		// 05: use importFile to detect build.path and project_name, sketch is ignored.
 		{"testdata/build_path_2/Blink.ino.hex", "", blonk, nil, "testdata/build_path_2", "Blink.ino", false},
-		// 06: use importPath as build.path and Blonk as project name (forced by the sketch)
-		{"", "testdata/build_path_2", blonk, nil, "testdata/build_path_2", "Blonk.ino", false},
+		// 06: use importPath as build.path and Blink as project name, ignore the sketch Blonk
+		{"", "testdata/build_path_2", blonk, nil, "testdata/build_path_2", "Blink.ino", false},
 		// 07: error: used both importPath and importFile
 		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", blonk, nil, "<nil>", "", true},
 
@@ -86,8 +86,8 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		{"", "", blonk, fqbn, "testdata/Blonk/build/arduino.samd.mkr1000", "Blonk.ino", false},
 		// 13: use importFile to detect build.path and project_name, sketch+fqbn is ignored.
 		{"testdata/build_path_2/Blink.ino.hex", "", blonk, fqbn, "testdata/build_path_2", "Blink.ino", false},
-		// 14: use importPath as build.path and Blonk as project name (forced by the sketch), fqbn ignored
-		{"", "testdata/build_path_2", blonk, fqbn, "testdata/build_path_2", "Blonk.ino", false},
+		// 14: use importPath as build.path and Blink as project name, ignore the sketch Blonk, ignore fqbn
+		{"", "testdata/build_path_2", blonk, fqbn, "testdata/build_path_2", "Blink.ino", false},
 		// 15: error: used both importPath and importFile
 		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", blonk, fqbn, "<nil>", "", true},
 	}

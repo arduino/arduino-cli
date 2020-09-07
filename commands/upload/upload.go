@@ -44,12 +44,9 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
-	if req.GetSketchPath() == "" {
-		return nil, fmt.Errorf("missing sketchPath")
-	}
 	sketchPath := paths.New(req.GetSketchPath())
 	sketch, err := sketches.NewSketchFromPath(sketchPath)
-	if err != nil {
+	if err != nil && req.GetImportDir() == "" && req.GetImportFile() == "" {
 		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
 
@@ -474,16 +471,9 @@ func determineBuildPathAndSketchName(importFile, importDir string, sketch *sketc
 	}
 
 	if importDir != "" {
-		// Case 2: importDir flag with a sketch
-		if sketch != nil {
-			// In this case we have both the build path and the sketch name given,
-			// so we just return them as-is
-			return paths.New(importDir), sketch.Name + ".ino", nil
-		}
+		// Case 2: importDir flag has been specified
 
-		// Case 3: importDir flag without a sketch
-
-		// In this case we have a build path but the sketch name is not given, we may
+		// In this case we have a build path but ignore the sketch name, we'll
 		// try to determine the sketch name by applying some euristics to the build folder.
 		// - "build.path" as importDir
 		// - "build.project_name" after trying to autodetect it from the build folder.
@@ -495,12 +485,12 @@ func determineBuildPathAndSketchName(importFile, importDir string, sketch *sketc
 		return buildPath, sketchName, nil
 	}
 
-	// Case 4: nothing given...
+	// Case 3: nothing given...
 	if sketch == nil {
 		return nil, "", fmt.Errorf("no sketch or build directory/file specified")
 	}
 
-	// Case 5: only sketch specified. In this case we use the default sketch build path
+	// Case 4: only sketch specified. In this case we use the default sketch build path
 	// and the given sketch name.
 
 	// TODO: Create a function to obtain importPath from sketch

@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/go-paths-helper"
+	"github.com/pkg/errors"
 )
 
 // Sketch is a sketch for Arduino
@@ -43,8 +44,16 @@ type BoardMetadata struct {
 
 // NewSketchFromPath loads a sketch from the specified path
 func NewSketchFromPath(path *paths.Path) (*Sketch, error) {
+	path, err := path.Abs()
+	if err != nil {
+		return nil, errors.Errorf("getting sketch path: %s", err)
+	}
 	if !path.IsDir() {
 		path = path.Parent()
+	}
+	sketchFile := path.Join(path.Base() + ".ino")
+	if !sketchFile.Exist() {
+		return nil, errors.Errorf("no valid sketch found in %s: missing %s", path, sketchFile.Base())
 	}
 	sketch := &Sketch{
 		FullPath: path,
