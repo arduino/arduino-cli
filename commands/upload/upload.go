@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -32,6 +33,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/serial"
 )
@@ -240,43 +242,19 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		uploadProperties.Set("program.verify", uploadProperties.Get("program.params.noverify"))
 	}
 
-	var importPath *paths.Path
 	if !burnBootloader {
-		if importFile != "" {
-			importFilePath := paths.New(importFile)
-			if !importFilePath.Exist() {
-				return fmt.Errorf("binary file not found in %s", importFilePath)
-			}
-			importPath = importFilePath.Parent()
-			// In general, the binary file extension (like .bin or .hex or even .zip) are already written explicitly in
-			// the core recipes inside platform.txt. This why the CLI removes it before setting the build.project_name
-			// property.
-			importFileName := strings.TrimSuffix(importFilePath.Base(), importFilePath.Ext())
-			uploadProperties.SetPath("build.path", importPath)
-			uploadProperties.Set("build.project_name", importFileName)
-		} else {
-			if sketch == nil {
-				return fmt.Errorf(("no sketch specified"))
-			}
-			if importDir != "" {
-				importPath = paths.New(importDir)
-			} else {
-				// TODO: Create a function to obtain importPath from sketch
-				importPath = sketch.FullPath
-				// Add FQBN (without configs part) to export path
-				fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
-				importPath = importPath.Join("build").Join(fqbnSuffix)
-			}
-
-			if !importPath.Exist() {
-				return fmt.Errorf("compiled sketch not found in %s", importPath)
-			}
-			if !importPath.IsDir() {
-				return fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
-			}
-			uploadProperties.SetPath("build.path", importPath)
-			uploadProperties.Set("build.project_name", sketch.Name+".ino")
+		importPath, sketchName, err := determineBuildPathAndSketchName(importFile, importDir, sketch, fqbn)
+		if err != nil {
+			return errors.Errorf("retrieving build artifacts: %s", err)
 		}
+		if !importPath.Exist() {
+			return fmt.Errorf("compiled sketch not found in %s", importPath)
+		}
+		if !importPath.IsDir() {
+			return fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
+		}
+		uploadProperties.SetPath("build.path", importPath)
+		uploadProperties.Set("build.project_name", sketchName)
 	}
 
 	// If not using programmer perform some action required
@@ -462,4 +440,110 @@ func waitForNewSerialPort() (string, error) {
 	}
 
 	return "", nil
+}
+
+func determineBuildPathAndSketchName(importFile, importDir string, sketch *sketches.Sketch, fqbn *cores.FQBN) (*paths.Path, string, error) {
+	// In general, compiling a sketch will produce a set of files that are
+	// named as the sketch but have different extensions, for example Sketch.ino
+	// may produce: Sketch.ino.bin; Sketch.ino.hex; Sketch.ino.zip; etc...
+	// These files are created together in the build directory and anyone of
+	// them may be required for upload.
+
+	// The upload recipes are already written using the 'build.project_name' property
+	// concatenated with an explicit extension. To perform the upload we should now
+	// determine the project name (e.g. 'sketch.ino) and set the 'build.project_name'
+	// property accordingly, together with the 'build.path' property to point to the
+	// directory containing the build artifacts.
+
+	// Case 1: importFile flag has been specified
+	if importFile != "" {
+		if importDir != "" {
+			return nil, "", fmt.Errorf("importFile and importDir cannot be used together")
+		}
+
+		// We have a path like "path/to/my/build/SketchName.ino.bin". We are going to
+		// ignore the extension and set:
+		// - "build.path" as "path/to/my/build"
+		// - "build.project_name" as "SketchName.ino"
+
+		importFilePath := paths.New(importFile)
+		if !importFilePath.Exist() {
+			return nil, "", fmt.Errorf("binary file not found in %s", importFilePath)
+		}
+		return importFilePath.Parent(), strings.TrimSuffix(importFilePath.Base(), importFilePath.Ext()), nil
+	}
+
+	if importDir != "" {
+		// Case 2: importDir flag with a sketch
+		if sketch != nil {
+			// In this case we have both the build path and the sketch name given,
+			// so we just return them as-is
+			return paths.New(importDir), sketch.Name + ".ino", nil
+		}
+
+		// Case 3: importDir flag without a sketch
+
+		// In this case we have a build path but the sketch name is not given, we may
+		// try to determine the sketch name by applying some euristics to the build folder.
+		// - "build.path" as importDir
+		// - "build.project_name" after trying to autodetect it from the build folder.
+		buildPath := paths.New(importDir)
+		sketchName, err := detectSketchNameFromBuildPath(buildPath)
+		if err != nil {
+			return nil, "", errors.Errorf("autodetect build artifact: %s", err)
+		}
+		return buildPath, sketchName, nil
+	}
+
+	// Case 4: nothing given...
+	if sketch == nil {
+		return nil, "", fmt.Errorf("no sketch or build directory/file specified")
+	}
+
+	// Case 5: only sketch specified. In this case we use the default sketch build path
+	// and the given sketch name.
+
+	// TODO: Create a function to obtain importPath from sketch
+	// Add FQBN (without configs part) to export path
+	if fqbn == nil {
+		return nil, "", fmt.Errorf("missing FQBN")
+	}
+	fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
+	return sketch.FullPath.Join("build").Join(fqbnSuffix), sketch.Name + ".ino", nil
+}
+
+func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {
+	files, err := buildPath.ReadDir()
+	if err != nil {
+		return "", err
+	}
+
+	candidateName := ""
+	var candidateFile *paths.Path
+	for _, file := range files {
+		// Build artifacts are usually names as "Blink.ino.hex" or "Blink.ino.bin".
+		// Extract the "Blink.ino" part
+		name := strings.TrimSuffix(file.Base(), file.Ext())
+
+		// Sometimes we may have particular files like:
+		// Blink.ino.with_bootloader.bin
+		if filepath.Ext(name) != ".ino" {
+			// just ignore those files
+			continue
+		}
+
+		if candidateName == "" {
+			candidateName = name
+			candidateFile = file
+		}
+
+		if candidateName != name {
+			return "", errors.Errorf("multiple build artifacts found: '%s' and '%s'", candidateFile, file)
+		}
+	}
+
+	if candidateName == "" {
+		return "", errors.New("could not find a valid build artifact")
+	}
+	return candidateName, nil
 }
