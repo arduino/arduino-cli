@@ -15,8 +15,8 @@ venv
 
 # gRPC client example folder
 /client_example/client_example
-*.bin
-*.elf
+/client_example/**/*.bin
+/client_example/**/*.elf
 
 # Misc.
 .DS_Store
