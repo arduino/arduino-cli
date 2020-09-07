@@ -37,6 +37,14 @@ func TestDetectSketchNameFromBuildPath(t *testing.T) {
 	sk3, err3 := detectSketchNameFromBuildPath(paths.New("testdata/build_path_3"))
 	require.Error(t, err3)
 	require.Equal(t, "", sk3)
+
+	sk4, err4 := detectSketchNameFromBuildPath(paths.New("testdata/build_path_4"))
+	require.Error(t, err4)
+	require.Equal(t, "", sk4)
+
+	sk5, err5 := detectSketchNameFromBuildPath(paths.New("testdata/build_path_invalid"))
+	require.Error(t, err5)
+	require.Equal(t, "", sk5)
 }
 
 func TestDetermineBuildPathAndSketchName(t *testing.T) {
