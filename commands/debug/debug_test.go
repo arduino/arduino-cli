@@ -26,14 +26,16 @@ import (
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-var customHardware = paths.New("testdata", "custom_hardware")
-var dataDir = paths.New("testdata", "data_dir", "packages")
-var sketch = "hello"
-var sketchPath = paths.New("testdata", sketch)
-
 func TestGetCommandLine(t *testing.T) {
+	customHardware := paths.New("testdata", "custom_hardware")
+	dataDir := paths.New("testdata", "data_dir", "packages")
+	sketch := "hello"
+	sketchPath := paths.New("testdata", sketch)
+	require.NoError(t, sketchPath.ToAbs())
+
 	pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
 	pm.LoadHardwareFromDirectory(customHardware)
 	pm.LoadHardwareFromDirectory(dataDir)
@@ -59,9 +61,9 @@ func TestGetCommandLine(t *testing.T) {
 		fmt.Sprintf(" -c \"gdb_port pipe\" -c \"telnet_port 0\" -c init -c halt %s/build/arduino-test.samd.arduino_zero_edbg/hello.ino.elf", sketchPath)
 
 	command, err := getCommandLine(req, pm)
-	assert.Nil(t, err)
+	require.Nil(t, err)
 	commandToTest := strings.Join(command[:], " ")
-	assert.Equal(t, filepath.FromSlash(goldCommand), filepath.FromSlash(commandToTest))
+	require.Equal(t, filepath.FromSlash(goldCommand), filepath.FromSlash(commandToTest))
 
 	// Other samd boards such as mkr1000 can be debugged using an external tool such as Atmel ICE connected to
 	// the board debug port
@@ -83,5 +85,4 @@ func TestGetCommandLine(t *testing.T) {
 	assert.Nil(t, err)
 	commandToTest2 := strings.Join(command2[:], " ")
 	assert.Equal(t, filepath.FromSlash(goldCommand2), filepath.FromSlash(commandToTest2))
-
 }
