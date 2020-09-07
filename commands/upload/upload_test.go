@@ -99,7 +99,14 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 			}
-			require.Equal(t, test.resBuildPath, fmt.Sprint(buildPath))
+			if test.resBuildPath == "<nil>" {
+				require.Nil(t, buildPath)
+			} else {
+				resBuildPath := paths.New(test.resBuildPath)
+				require.NoError(t, resBuildPath.ToAbs())
+				require.NoError(t, buildPath.ToAbs())
+				require.Equal(t, resBuildPath.String(), buildPath.String())
+			}
 			require.Equal(t, test.resSketchName, sketchName)
 		})
 	}
