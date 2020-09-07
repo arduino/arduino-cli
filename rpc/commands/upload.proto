@@ -39,7 +39,9 @@ message UploadReq {
 	// After upload, verify that the contents of the memory on the board match the
 	// uploaded binary.
 	bool verify = 6;
-	string import_file = 7 [deprecated = true]; // DEPRECATED: Use import_dir instead
+	// When `import_file` is specified, it overrides the `import_dir` and `sketch_path`
+	// params.
+	string import_file = 7;
 	// Custom path to a directory containing compiled files. When `import_dir` is
 	// not specified, the standard build directory under `sketch_path` is used.
 	string import_dir = 8;

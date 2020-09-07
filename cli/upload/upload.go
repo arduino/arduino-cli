@@ -36,6 +36,7 @@ var (
 	verbose    bool
 	verify     bool
 	importDir  string
+	importFile string
 	programmer string
 )
 
@@ -47,17 +48,26 @@ func NewCommand() *cobra.Command {
 		Long:    "Upload Arduino sketches. This does NOT compile the sketch prior to upload.",
 		Example: "  " + os.Args[0] + " upload /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
+		PreRun:  checkFlagsConflicts,
 		Run:     run,
 	}
 
 	uploadCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
 	uploadCommand.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", "Directory containing binaries to upload.")
+	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", "Binary file to upload.")
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
 	uploadCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload or 'list' to list supported programmers.")
 
 	return uploadCommand
+}
+
+func checkFlagsConflicts(command *cobra.Command, args []string) {
+	if importFile != "" && importDir != "" {
+		feedback.Errorf("error: --input-file and --input-dir flags cannot be used together")
+		os.Exit(errorcodes.ErrBadArgument)
+	}
 }
 
 func run(command *cobra.Command, args []string) {
@@ -80,6 +90,7 @@ func run(command *cobra.Command, args []string) {
 		Port:       port,
 		Verbose:    verbose,
 		Verify:     verify,
+		ImportFile: importFile,
 		ImportDir:  importDir,
 		Programmer: programmer,
 	}, os.Stdout, os.Stderr); err != nil {
