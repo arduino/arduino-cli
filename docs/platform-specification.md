@@ -927,8 +927,8 @@ In the same way we can use a variant defined on another platform using the synta
     myboard.build.variant=arduino:standard
     [....]
 
-Note that referencing a variant in another platform does _not_ inherit any properties from that platform's platform.txt
-(like referencing a core does).
+Note that, unlike core references, other resources (platform.txt, bundled libraries, programmers) are _not_ inherited
+from the referenced platform.
 
 ### Tool references
 
@@ -939,6 +939,9 @@ Tool recipes defined in the platform.txt of other platforms can also be referenc
     myboard.upload.tool=arduino:avrdude
     myboard.bootloader.tool=arduino:avrdude
     [....]
+
+Note that, unlike core references, referencing a tool recipe does _not_ result in any other resources being inherited
+from the referenced platform.
 
 ### Platform Terminology
 
