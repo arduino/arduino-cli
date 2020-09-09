@@ -56,9 +56,13 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllRe
 				if !match(board.Name()) {
 					continue
 				}
+				if !req.GetIncludeHiddenBoards() && board.IsHidden() {
+					continue
+				}
 				list.Boards = append(list.Boards, &rpc.BoardListItem{
-					Name: board.Name(),
-					FQBN: board.FQBN(),
+					Name:     board.Name(),
+					FQBN:     board.FQBN(),
+					IsHidden: board.IsHidden(),
 				})
 			}
 		}

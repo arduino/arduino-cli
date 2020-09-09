@@ -42,8 +42,11 @@ func initListAllCommand() *cobra.Command {
 		Args: cobra.ArbitraryArgs,
 		Run:  runListAllCommand,
 	}
+	listAllCommand.Flags().BoolVarP(&showHiddenBoard, "show-hidden", "a", false, "Show also boards marked as 'hidden' in the platform")
 	return listAllCommand
 }
+
+var showHiddenBoard bool
 
 // runListAllCommand list all installed boards
 func runListAllCommand(cmd *cobra.Command, args []string) {
@@ -54,8 +57,9 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 	}
 
 	list, err := board.ListAll(context.Background(), &rpc.BoardListAllReq{
-		Instance:   inst,
-		SearchArgs: args,
+		Instance:            inst,
+		SearchArgs:          args,
+		IncludeHiddenBoards: showHiddenBoard,
 	})
 	if err != nil {
 		feedback.Errorf("Error listing boards: %v", err)
@@ -81,9 +85,13 @@ func (dr resultAll) String() string {
 	})
 
 	t := table.New()
-	t.SetHeader("Board Name", "FQBN")
+	t.SetHeader("Board Name", "FQBN", "")
 	for _, item := range dr.list.GetBoards() {
-		t.AddRow(item.GetName(), item.GetFQBN())
+		hidden := ""
+		if item.IsHidden {
+			hidden = "(hidden)"
+		}
+		t.AddRow(item.GetName(), item.GetFQBN(), hidden)
 	}
 	return t.Render()
 }
