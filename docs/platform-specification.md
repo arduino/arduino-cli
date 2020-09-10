@@ -984,3 +984,23 @@ For more information, see the [Arduino library specification](library-specificat
 As of Arduino IDE 1.6.6, per-platform keywords can be defined by adding a keywords.txt file to the platform's
 architecture folder. These keywords are only highlighted in the Arduino IDE when one of the boards of that platform are
 selected. This file follows the [same format](library-specification.md#keywords) as the keywords.txt used in libraries.
+
+## Post-install script
+
+After Boards Manager finishes installation of a platform, it checks for the presence of a script named:
+
+- `post_install.bat` - when running on Windows
+- `post_install.sh` - when running on any non-Windows operating system
+
+If present, the script is executed.
+
+This script may be used to configure the user's system for the platform, such as installing drivers.
+
+The circumstances under which the post-install script will run are different depending on which Arduino development
+software is in use:
+
+- **Arduino IDE**: (all versions) runs the script when the installed platform is signed with Arduino's private key.
+- **Arduino CLI**: (since 0.12.0) runs the script for any installed platform when Arduino CLI is in "interactive" mode.
+  This behavior
+  [can be configured](https://arduino.github.io/arduino-cli/latest/commands/arduino-cli_core_install/#options)
+- **Arduino Pro IDE**: (since 0.1.0) runs the script for any installed platform.
