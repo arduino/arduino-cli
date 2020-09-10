@@ -197,6 +197,8 @@ message BoardListAllReq {
     Instance instance = 1;
     // The search query to filter the board list by.
     repeated string search_args = 2;
+    // Set to true to get also the boards marked as "hidden" in the platform
+    bool include_hidden_boards = 3;
 }
 
 message BoardListAllResp {
@@ -209,4 +211,6 @@ message BoardListItem {
     string name = 1;
     // The fully qualified board name. Used to identify the board to a machine.
     string FQBN = 2;
+    // If the board is marked as "hidden" in the platform
+    bool is_hidden = 3;
 }

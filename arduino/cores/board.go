@@ -54,6 +54,11 @@ func (b *Board) FQBN() string {
 	return platform.Package.Name + ":" + platform.Architecture + ":" + b.BoardID
 }
 
+// IsHidden returns true if the board is marked as hidden in the platform
+func (b *Board) IsHidden() bool {
+	return b.Properties.GetBoolean("hide")
+}
+
 func (b *Board) String() string {
 	return b.FQBN()
 }

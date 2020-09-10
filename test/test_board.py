@@ -416,6 +416,17 @@ def test_board_details(run_command):
     # Download samd core pinned to 1.8.6
     result = run_command("core install arduino:samd@1.8.6")
     assert result.ok
+
+    # Test board listall with and without showing hidden elements
+    result = run_command("board listall MIPS --format json")
+    assert result.ok
+    assert result.stdout == "{}"
+
+    result = run_command("board listall MIPS -a --format json")
+    assert result.ok
+    result = json.loads(result.stdout)
+    assert result["boards"][0]["name"] == "Arduino Tian (MIPS Console port)"
+
     result = run_command("board details -b arduino:samd:nano_33_iot --format json")
     assert result.ok
     # Sort everything before compare
