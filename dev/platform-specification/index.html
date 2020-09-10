@@ -2608,8 +2608,8 @@ myboard.build.variant=arduino:standard
 </code></pre></div>
 
 
-<p>Note that referencing a variant in another platform does <em>not</em> inherit any properties from that platform's platform.txt
-(like referencing a core does).</p>
+<p>Note that, unlike core references, other resources (platform.txt, bundled libraries, programmers) are <em>not</em> inherited
+from the referenced platform.</p>
 <h3 id="tool-references">Tool references<a class="headerlink" href="#tool-references" title="Permanent link">&para;</a></h3>
 <p>Tool recipes defined in the platform.txt of other platforms can also be referenced using the syntax
 <strong>VENDOR_ID:TOOL_ID</strong>:</p>
@@ -2620,6 +2620,8 @@ myboard.bootloader.tool=arduino:avrdude
 </code></pre></div>
 
 
+<p>Note that, unlike core references, referencing a tool recipe does <em>not</em> result in any other resources being inherited
+from the referenced platform.</p>
 <h3 id="platform-terminology">Platform Terminology<a class="headerlink" href="#platform-terminology" title="Permanent link">&para;</a></h3>
 <p>Because boards can reference cores, variants and tools in different platforms, this means that a single build or upload
 can use data from up to four different platforms. To keep this clear, the following terminology is used:</p>
