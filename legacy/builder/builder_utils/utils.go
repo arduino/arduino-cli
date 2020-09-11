@@ -258,6 +258,9 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 			return nil, errors.WithStack(err)
 		}
 	} else if ctx.Verbose {
+		if ctx.CompilationDatabase != nil {
+			ctx.CompilationDatabase.KeepEntry(source)
+		}
 		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, objectFile)
 	}
 
