@@ -17,6 +17,7 @@ package packagemanager
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -34,7 +35,7 @@ func (pm *PackageManager) IdentifyBoard(idProps *properties.Map) []*cores.Board 
 			if !ok {
 				return false, false
 			}
-			if v1 != v2 {
+			if !strings.EqualFold(v1, v2) {
 				return true, false
 			}
 		}
