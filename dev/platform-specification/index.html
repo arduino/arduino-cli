@@ -1327,6 +1327,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#post-install-script" class="md-nav__link">
+    Post-install script
+  </a>
+  
+</li>
+      
       
       
       
@@ -1733,6 +1740,13 @@
         <li class="md-nav__item">
   <a href="#keywordstxt" class="md-nav__link">
     keywords.txt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#post-install-script" class="md-nav__link">
+    Post-install script
   </a>
   
 </li>
@@ -2652,6 +2666,23 @@ architecture.</p>
 <p>As of Arduino IDE 1.6.6, per-platform keywords can be defined by adding a keywords.txt file to the platform's
 architecture folder. These keywords are only highlighted in the Arduino IDE when one of the boards of that platform are
 selected. This file follows the <a href="../library-specification/#keywords">same format</a> as the keywords.txt used in libraries.</p>
+<h2 id="post-install-script">Post-install script<a class="headerlink" href="#post-install-script" title="Permanent link">&para;</a></h2>
+<p>After Boards Manager finishes installation of a platform, it checks for the presence of a script named:</p>
+<ul>
+<li><code>post_install.bat</code> - when running on Windows</li>
+<li><code>post_install.sh</code> - when running on any non-Windows operating system</li>
+</ul>
+<p>If present, the script is executed.</p>
+<p>This script may be used to configure the user's system for the platform, such as installing drivers.</p>
+<p>The circumstances under which the post-install script will run are different depending on which Arduino development
+software is in use:</p>
+<ul>
+<li><strong>Arduino IDE</strong>: (all versions) runs the script when the installed platform is signed with Arduino's private key.</li>
+<li><strong>Arduino CLI</strong>: (since 0.12.0) runs the script for any installed platform when Arduino CLI is in "interactive" mode.
+  This behavior
+  <a href="https://arduino.github.io/arduino-cli/latest/commands/arduino-cli_core_install/#options">can be configured</a></li>
+<li><strong>Arduino Pro IDE</strong>: (since 0.1.0) runs the script for any installed platform.</li>
+</ul>
                 
                   
                 
