@@ -112,7 +112,7 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 }
 
 func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
-	out, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_SIZE_PATTERN, false /* stdout */, utils.Capture /* stderr */, utils.Show)
+	_, out, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_SIZE_PATTERN, false /* stdout */, utils.Capture /* stderr */, utils.Show)
 	if err != nil {
 		resErr = errors.New("Error while determining sketch size: " + err.Error())
 		return

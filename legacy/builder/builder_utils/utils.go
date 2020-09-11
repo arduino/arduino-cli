@@ -249,7 +249,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 		return nil, errors.WithStack(err)
 	}
 	if !objIsUpToDate {
-		_, _, err = ExecRecipe(ctx, properties, recipe, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
+		_, _, _, err = ExecRecipe(ctx, properties, recipe, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
@@ -480,7 +480,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 		properties.SetPath(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, archiveFilePath)
 		properties.SetPath(constants.BUILD_PROPERTIES_OBJECT_FILE, objectFile)
 
-		if _, _, err := ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show); err != nil {
+		if _, _, _, err := ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show); err != nil {
 			return nil, errors.WithStack(err)
 		}
 	}
@@ -488,14 +488,15 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 	return archiveFilePath, nil
 }
 
-func ExecRecipe(ctx *types.Context, buildProperties *properties.Map, recipe string, removeUnsetProperties bool, stdout int, stderr int) ([]byte, []byte, error) {
+func ExecRecipe(ctx *types.Context, buildProperties *properties.Map, recipe string, removeUnsetProperties bool, stdout int, stderr int) (*exec.Cmd, []byte, []byte, error) {
 	// See util.ExecCommand for stdout/stderr arguments
 	command, err := PrepareCommandForRecipe(ctx, buildProperties, recipe, removeUnsetProperties)
 	if err != nil {
-		return nil, nil, errors.WithStack(err)
+		return nil, nil, nil, errors.WithStack(err)
 	}
 
-	return utils.ExecCommand(ctx, command, stdout, stderr)
+	outbytes, errbytes, err := utils.ExecCommand(ctx, command, stdout, stderr)
+	return command, outbytes, errbytes, err
 }
 
 const COMMANDLINE_LIMIT = 30000

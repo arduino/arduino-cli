@@ -67,7 +67,7 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 	properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, coreArchiveFilePath.String())
 	properties.Set(constants.BUILD_PROPERTIES_OBJECT_FILES, objectFileList)
 
-	_, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_C_COMBINE_PATTERN, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
+	_, _, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_C_COMBINE_PATTERN, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
 	return err
 }
 
