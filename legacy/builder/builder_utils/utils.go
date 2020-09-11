@@ -249,11 +249,17 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 		return nil, errors.WithStack(err)
 	}
 	if !objIsUpToDate {
-		_, _, _, err = ExecRecipe(ctx, properties, recipe, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
+		command, _, _, err := ExecRecipe(ctx, properties, recipe, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
+		if ctx.CompilationDatabase != nil {
+			ctx.CompilationDatabase.ReplaceEntry(source, command)
+		}
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
 	} else if ctx.Verbose {
+		if ctx.CompilationDatabase != nil {
+			ctx.CompilationDatabase.KeepEntry(source)
+		}
 		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, objectFile)
 	}
 

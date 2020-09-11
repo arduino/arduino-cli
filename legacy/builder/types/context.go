@@ -19,6 +19,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries"
@@ -158,6 +159,9 @@ type Context struct {
 	// Out and Err stream to redirect all Exec commands
 	ExecStdout io.Writer
 	ExecStderr io.Writer
+
+	// Compilation Database to build/update
+	CompilationDatabase *builder.CompilationDatabase
 }
 
 func (ctx *Context) ExtractBuildOptions() *properties.Map {

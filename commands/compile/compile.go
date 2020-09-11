@@ -24,6 +24,7 @@ import (
 	"strconv"
 	"strings"
 
+	clibuilder "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
@@ -119,6 +120,12 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.PackageManager = pm
 	builderCtx.FQBN = fqbn
 	builderCtx.SketchLocation = sketch.FullPath
+	// TODO: Make optional using commandline option?
+	if !req.GetDryRun() {
+		builderCtx.CompilationDatabase = clibuilder.NewCompilationDatabase(
+			sketch.FullPath.Join("compile_commands.json"),
+		)
+	}
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories()

@@ -101,6 +101,11 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 	mainErr := runCommands(ctx, commands)
 
+	// TODO: Make proper step?
+	if ctx.CompilationDatabase != nil {
+		ctx.CompilationDatabase.UpdateFile(mainErr != nil)
+	}
+
 	commands = []types.Command{
 		&PrintUsedAndNotUsedLibraries{SketchError: mainErr != nil},
 
