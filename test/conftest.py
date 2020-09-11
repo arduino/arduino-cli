@@ -54,8 +54,11 @@ def data_dir(tmpdir_factory):
     if platform.system() == "Windows":
         with tempfile.TemporaryDirectory() as tmp:
             yield tmp
+            shutil.rmtree(tmp, ignore_errors=True)
     else:
-        yield str(tmpdir_factory.mktemp("ArduinoTest"))
+        data = tmpdir_factory.mktemp("ArduinoTest")
+        yield str(data)
+        shutil.rmtree(data, ignore_errors=True)
 
 
 @pytest.fixture(scope="session")
@@ -64,7 +67,9 @@ def downloads_dir(tmpdir_factory):
     To save time and bandwidth, all the tests will access
     the same download cache folder.
     """
-    return str(tmpdir_factory.mktemp("ArduinoTest"))
+    download_dir = tmpdir_factory.mktemp("ArduinoTest")
+    yield str(download_dir)
+    shutil.rmtree(download_dir, ignore_errors=True)
 
 
 @pytest.fixture(scope="function")
@@ -74,7 +79,9 @@ def working_dir(tmpdir_factory):
     will be created before running each test and deleted
     at the end, this way all the tests work in isolation.
     """
-    return str(tmpdir_factory.mktemp("ArduinoTestWork"))
+    work_dir = tmpdir_factory.mktemp("ArduinoTestWork")
+    yield str(work_dir)
+    shutil.rmtree(work_dir, ignore_errors=True)
 
 
 @pytest.fixture(scope="function")
@@ -95,9 +102,12 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
     }
     (Path(data_dir) / "packages").mkdir()
 
-    def _run(cmd_string, custom_working_dir=None):
+    def _run(cmd_string, custom_working_dir=None, custom_env=None):
+
         if not custom_working_dir:
             custom_working_dir = working_dir
+        if not custom_env:
+            custom_env = env
         cli_full_line = '"{}" {}'.format(cli_path, cmd_string)
         run_context = Context()
         # It might happen that we need to change directories between drives on Windows,
@@ -109,7 +119,7 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
         # It escapes spaces in the path using "\ " but it doesn't always work,
         # wrapping the path in quotation marks is the safest approach
         with run_context.prefix(f'{cd_command} "{custom_working_dir}"'):
-            return run_context.run(cli_full_line, echo=False, hide=True, warn=True, env=env)
+            return run_context.run(cli_full_line, echo=False, hide=True, warn=True, env=custom_env)
 
     return _run
 
@@ -195,3 +205,64 @@ def copy_sketch(working_dir):
     test_sketch_path = Path(working_dir) / "sketch_simple"
     shutil.copytree(sketch_path, test_sketch_path)
     yield str(test_sketch_path)
+
+
+@pytest.fixture(scope="function")
+def core_update_index(run_command, data_dir, downloads_dir, working_dir, tmpdir_factory):
+    """
+    To save time and bandwidth we install and cache cores indexes and copy them to each individual test environment
+    """
+
+    def _update_index():
+        index_dir = tmpdir_factory.getbasetemp() / "core-indexes"
+        if not index_dir.exists():
+            index_dir.mkdir()
+            env = {
+                "ARDUINO_DATA_DIR": str(index_dir),
+                "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+            }
+            run_command("core update-index", working_dir, env)
+        shutil.copytree(index_dir, data_dir, dirs_exist_ok=True)
+
+    return _update_index
+
+
+@pytest.fixture(scope="function")
+def lib_update_index(run_command, data_dir, downloads_dir, working_dir, tmpdir_factory):
+    """
+    To save time and bandwidth we install and cache libraries indexes and copy them to each individual test environment
+    """
+
+    def _update_index():
+        index_dir = tmpdir_factory.getbasetemp() / "lib-indexes"
+        if not index_dir.exists():
+            index_dir.mkdir()
+            env = {
+                "ARDUINO_DATA_DIR": str(index_dir),
+                "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+            }
+            run_command("lib update-index", working_dir, env)
+        shutil.copyfile(index_dir / "library_index.json", Path(data_dir) / "library_index.json")
+
+    return _update_index
+
+
+@pytest.fixture(scope="function")
+def core_install(run_command, data_dir, downloads_dir, working_dir, tmpdir_factory):
+    """
+    To save time and bandwidth we install and cache cores and copy them to each individual test environment
+    """
+    data_dir = Path(data_dir) / "packages"
+
+    def _install(core):
+        core_dir = tmpdir_factory.getbasetemp() / core.replace(":", "")
+        if not core_dir.exists():
+            core_dir.mkdir()
+            env = {
+                "ARDUINO_DATA_DIR": str(core_dir),
+                "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+            }
+            run_command(f"core install {core}", working_dir, env)
+        shutil.copytree(core_dir / "packages", data_dir, dirs_exist_ok=True)
+
+    return _install

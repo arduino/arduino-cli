@@ -15,9 +15,9 @@
 import simplejson as json
 
 
-def test_list(run_command):
+def test_list(run_command, core_update_index):
     # Init the environment explicitly
-    assert run_command("core update-index")
+    core_update_index()
 
     # When output is empty, nothing is printed out, no matter the output format
     result = run_command("lib list")
