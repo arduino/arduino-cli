@@ -92,7 +92,7 @@ tasks:
   build:
     desc: Build the project
     cmds:
-      - go build -v -i {{.LDFLAGS}}
+      - go build -v {{.LDFLAGS}}
 
   test:
     desc: Run the full testsuite, `legacy` will be skipped
