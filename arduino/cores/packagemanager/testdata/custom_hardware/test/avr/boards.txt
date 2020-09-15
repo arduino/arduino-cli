@@ -15,3 +15,7 @@ c.pid.1=0x0004
 d.name=Board D
 d.vid.1=0x9999
 d.pid.1=0x0005
+
+e.name=Board E
+e.vid.1=0xAB00
+e.pid.1=0xcd00
