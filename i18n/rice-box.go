@@ -4,7 +4,7 @@ package i18n
 import (
 	"time"
 
-	"github.com/GeertJohan/go.rice/embedded"
+	"github.com/cmaglie/go.rice/embedded"
 )
 
 func init() {

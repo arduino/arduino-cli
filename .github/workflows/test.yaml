@@ -32,7 +32,7 @@ jobs:
           go get github.com/golangci/govet
           go get golang.org/x/lint/golint
           go get github.com/golang/protobuf/protoc-gen-go
-          go get github.com/GeertJohan/go.rice/rice
+          go get github.com/cmaglie/go.rice/rice
         shell: bash
 
       - name: Install Taskfile
