@@ -203,3 +203,9 @@ def test_core_zipslip(run_command):
     # Install a core and check if malicious content has been extracted.
     run_command("core install zipslip:x86 --additional-urls={}".format(url))
     assert os.path.exists("/tmp/evil.txt") is False
+
+
+def test_core_broken_install(run_command):
+    url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
+    assert run_command("core update-index --additional-urls={}".format(url))
+    assert not run_command("core install brokenchecksum:x86 --additional-urls={}".format(url))

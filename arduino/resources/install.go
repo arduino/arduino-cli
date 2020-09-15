@@ -32,6 +32,13 @@ import (
 // Note that tempPath and destDir must be on the same filesystem partition
 // otherwise the last step will fail.
 func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.Path) error {
+	// Check the integrity of the package
+	if ok, err := release.TestLocalArchiveIntegrity(downloadDir); err != nil {
+		return fmt.Errorf("testing local archive integrity: %s", err)
+	} else if !ok {
+		return fmt.Errorf("checking local archive integrity")
+	}
+
 	// Create a temporary dir to extract package
 	if err := tempPath.MkdirAll(); err != nil {
 		return fmt.Errorf("creating temp dir for extraction: %s", err)
