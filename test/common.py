@@ -14,6 +14,7 @@
 # a commercial license, send an email to license@arduino.cc.
 import os
 import collections
+import json
 
 
 Board = collections.namedtuple("Board", "address fqbn package architecture id core")
@@ -25,3 +26,12 @@ def running_on_ci():
     """
     val = os.getenv("APPVEYOR") or os.getenv("DRONE") or os.getenv("GITHUB_WORKFLOW")
     return val is not None
+
+
+def parse_json_traces(log_json_lines):
+    trace_entries = []
+    for entry in log_json_lines:
+        entry = json.loads(entry)
+        if entry.get("level") == "trace":
+            trace_entries.append(entry.get("msg"))
+    return trace_entries

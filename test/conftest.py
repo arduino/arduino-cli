@@ -16,6 +16,7 @@ import os
 import platform
 import signal
 import shutil
+import time
 from pathlib import Path
 
 import pytest
@@ -23,6 +24,7 @@ import simplejson as json
 from invoke import Local
 from invoke.context import Context
 import tempfile
+from filelock import FileLock
 
 from .common import Board
 
@@ -54,22 +56,32 @@ def data_dir(tmpdir_factory):
     if platform.system() == "Windows":
         with tempfile.TemporaryDirectory() as tmp:
             yield tmp
-            shutil.rmtree(tmp, ignore_errors=True)
+            # shutil.rmtree(tmp, ignore_errors=True)
     else:
         data = tmpdir_factory.mktemp("ArduinoTest")
         yield str(data)
-        shutil.rmtree(data, ignore_errors=True)
+        # shutil.rmtree(data, ignore_errors=True)
 
 
 @pytest.fixture(scope="session")
-def downloads_dir(tmpdir_factory):
+def downloads_dir(tmpdir_factory, worker_id):
     """
     To save time and bandwidth, all the tests will access
     the same download cache folder.
     """
-    download_dir = tmpdir_factory.mktemp("ArduinoTest")
+    download_dir = tmpdir_factory.mktemp("ArduinoTest", numbered=False)
+
+    # This folders should be created only once per session, if we're running
+    # tests in parallel using multiple processes we need to make sure this
+    # this fixture is executed only once, thus the use of the lockfile
+    if not worker_id == "master":
+        lock = Path(download_dir / "lock")
+        with FileLock(lock):
+            if not lock.is_file():
+                lock.touch()
+
     yield str(download_dir)
-    shutil.rmtree(download_dir, ignore_errors=True)
+    # shutil.rmtree(download_dir, ignore_errors=True)
 
 
 @pytest.fixture(scope="function")
@@ -81,7 +93,7 @@ def working_dir(tmpdir_factory):
     """
     work_dir = tmpdir_factory.mktemp("ArduinoTestWork")
     yield str(work_dir)
-    shutil.rmtree(work_dir, ignore_errors=True)
+    # shutil.rmtree(work_dir, ignore_errors=True)
 
 
 @pytest.fixture(scope="function")
@@ -208,61 +220,16 @@ def copy_sketch(working_dir):
 
 
 @pytest.fixture(scope="function")
-def core_update_index(run_command, data_dir, downloads_dir, working_dir, tmpdir_factory):
-    """
-    To save time and bandwidth we install and cache cores indexes and copy them to each individual test environment
-    """
+def wait_for_board(run_command):
+    def _waiter(seconds=10):
+        # Waits for the specified amount of second for a board to be visible.
+        # This is necessary since it might happen that a board is not immediately
+        # available after a test upload and subsequent tests might consequently fail.
+        time_end = time.time() + seconds
+        while time.time() < time_end:
+            result = run_command("board list --format json")
+            ports = json.loads(result.stdout)
+            if len([p.get("boards", []) for p in ports]) > 0:
+                break
 
-    def _update_index():
-        index_dir = tmpdir_factory.getbasetemp() / "core-indexes"
-        if not index_dir.exists():
-            index_dir.mkdir()
-            env = {
-                "ARDUINO_DATA_DIR": str(index_dir),
-                "ARDUINO_DOWNLOADS_DIR": downloads_dir,
-            }
-            run_command("core update-index", working_dir, env)
-        shutil.copytree(index_dir, data_dir, dirs_exist_ok=True)
-
-    return _update_index
-
-
-@pytest.fixture(scope="function")
-def lib_update_index(run_command, data_dir, downloads_dir, working_dir, tmpdir_factory):
-    """
-    To save time and bandwidth we install and cache libraries indexes and copy them to each individual test environment
-    """
-
-    def _update_index():
-        index_dir = tmpdir_factory.getbasetemp() / "lib-indexes"
-        if not index_dir.exists():
-            index_dir.mkdir()
-            env = {
-                "ARDUINO_DATA_DIR": str(index_dir),
-                "ARDUINO_DOWNLOADS_DIR": downloads_dir,
-            }
-            run_command("lib update-index", working_dir, env)
-        shutil.copyfile(index_dir / "library_index.json", Path(data_dir) / "library_index.json")
-
-    return _update_index
-
-
-@pytest.fixture(scope="function")
-def core_install(run_command, data_dir, downloads_dir, working_dir, tmpdir_factory):
-    """
-    To save time and bandwidth we install and cache cores and copy them to each individual test environment
-    """
-    data_dir = Path(data_dir) / "packages"
-
-    def _install(core):
-        core_dir = tmpdir_factory.getbasetemp() / core.replace(":", "")
-        if not core_dir.exists():
-            core_dir.mkdir()
-            env = {
-                "ARDUINO_DATA_DIR": str(core_dir),
-                "ARDUINO_DOWNLOADS_DIR": downloads_dir,
-            }
-            run_command(f"core install {core}", working_dir, env)
-        shutil.copytree(core_dir / "packages", data_dir, dirs_exist_ok=True)
-
-    return _install
+    return _waiter

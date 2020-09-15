@@ -14,17 +14,17 @@
 # a commercial license, send an email to license@arduino.cc.
 
 
-def test_upgrade(run_command, core_update_index, lib_update_index, core_install):
+def test_upgrade(run_command):
     # Updates index for cores and libraries
-    core_update_index()
-    lib_update_index()
+    run_command("core update-index")
+    run_command("lib update-index")
 
     # Installs an outdated core and library
-    core_install("arduino:avr@1.6.3")
+    run_command("core install arduino:avr@1.6.3")
     assert run_command("lib install USBHost@1.0.0")
 
     # Installs latest version of a core and a library
-    core_install("arduino:samd")
+    run_command("core install arduino:samd")
     assert run_command("lib install ArduinoJson")
 
     # Verifies outdated core and libraries are shown

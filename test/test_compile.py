@@ -12,33 +12,32 @@
 # otherwise use the software for commercial activities involving the Arduino
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
-import json
 import os
 import platform
 
 import pytest
 
-from .common import running_on_ci
+from .common import running_on_ci, parse_json_traces
 
 
-def test_compile_without_fqbn(run_command, core_update_index, core_install):
+def test_compile_without_fqbn(run_command):
     # Init the environment explicitly
-    core_update_index()
+    run_command("core update-index")
 
     # Install Arduino AVR Boards
-    core_install("arduino:avr@1.8.3")
+    run_command("core install arduino:avr@1.8.3")
 
     # Build sketch without FQBN
     result = run_command("compile")
     assert result.failed
 
 
-def test_compile_with_simple_sketch(run_command, data_dir, working_dir, core_update_index, core_install):
+def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
     # Init the environment explicitly
-    core_update_index()
+    run_command("core update-index")
 
     # Download latest AVR
-    core_install("arduino:avr")
+    run_command("core install arduino:avr")
 
     sketch_name = "CompileIntegrationTest"
     sketch_path = os.path.join(data_dir, sketch_name)
@@ -80,12 +79,12 @@ def test_compile_with_simple_sketch(run_command, data_dir, working_dir, core_upd
     running_on_ci() and platform.system() == "Windows",
     reason="Test disabled on Github Actions Win VM until tmpdir inconsistent behavior bug is fixed",
 )
-def test_output_flag_default_path(run_command, data_dir, working_dir, core_update_index, core_install):
+def test_output_flag_default_path(run_command, data_dir, working_dir):
     # Init the environment explicitly
-    core_update_index()
+    run_command("core update-index")
 
     # Install Arduino AVR Boards
-    core_install("arduino:avr@1.8.3")
+    run_command("core install arduino:avr@1.8.3")
 
     # Create a test sketch
     sketch_path = os.path.join(data_dir, "test_output_flag_default_path")
@@ -100,12 +99,12 @@ def test_output_flag_default_path(run_command, data_dir, working_dir, core_updat
     assert os.path.exists(target) and os.path.isdir(target)
 
 
-def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir, core_update_index, core_install):
+def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     # Init the environment explicitly
-    core_update_index()
+    run_command("core update-index")
 
     # Install Arduino AVR Boards
-    core_install("arduino:avr@1.8.3")
+    run_command("core install arduino:avr@1.8.3")
 
     sketch_name = "CompileIntegrationTestSymlinkSelfLoop"
     sketch_path = os.path.join(data_dir, sketch_name)
@@ -150,68 +149,16 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir, core_u
     assert not result.ok
 
 
-@pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
-def test_compile_and_upload_combo(run_command, data_dir, detected_boards, core_update_index, core_install):
-    # Init the environment explicitly
-    core_update_index()
-
-    # Install required core(s)
-    core_install("arduino:avr@1.8.3")
-    core_install("arduino:samd@1.8.6")
-
-    # Create a test sketch
-    sketch_name = "CompileAndUploadIntegrationTest"
-    sketch_path = os.path.join(data_dir, sketch_name)
-    sketch_main_file = os.path.join(sketch_path, sketch_name + ".ino")
-    result = run_command("sketch new {}".format(sketch_path))
-    assert result.ok
-    assert "Sketch created in: {}".format(sketch_path) in result.stdout
-
-    # Build sketch for each detected board
-    for board in detected_boards:
-        log_file_name = "{fqbn}-compile.log".format(fqbn=board.fqbn.replace(":", "-"))
-        log_file_path = os.path.join(data_dir, log_file_name)
-        command_log_flags = "--log-format json --log-file {} --log-level trace".format(log_file_path)
-
-        def run_test(s):
-            result = run_command(
-                "compile -b {fqbn} --upload -p {address} {sketch_path} {log_flags}".format(
-                    fqbn=board.fqbn, address=board.address, sketch_path=s, log_flags=command_log_flags,
-                )
-            )
-            assert result.ok
-
-            # check from the logs if the bin file were uploaded on the current board
-            log_json = open(log_file_path, "r")
-            traces = parse_json_traces(log_json.readlines())
-            assert f"Compile {sketch_path} for {board.fqbn} started" in traces
-            assert f"Compile {sketch_name} for {board.fqbn} successful" in traces
-            assert f"Upload {sketch_path} on {board.fqbn} started" in traces
-            assert "Upload successful" in traces
-
-        run_test(sketch_path)
-        run_test(sketch_main_file)
-
-
-def parse_json_traces(log_json_lines):
-    trace_entries = []
-    for entry in log_json_lines:
-        entry = json.loads(entry)
-        if entry.get("level") == "trace":
-            trace_entries.append(entry.get("msg"))
-    return trace_entries
-
-
-def test_compile_blacklisted_sketchname(run_command, data_dir, core_update_index, core_install):
+def test_compile_blacklisted_sketchname(run_command, data_dir):
     """
     Compile should ignore folders named `RCS`, `.git` and the likes, but
     it should be ok for a sketch to be named like RCS.ino
     """
     # Init the environment explicitly
-    core_update_index()
+    run_command("core update-index")
 
     # Install Arduino AVR Boards
-    core_install("arduino:avr@1.8.3")
+    run_command("core install arduino:avr@1.8.3")
 
     sketch_name = "RCS"
     sketch_path = os.path.join(data_dir, sketch_name)
