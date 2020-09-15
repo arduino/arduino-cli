@@ -284,6 +284,21 @@ pytest = ">=3.10"
 
 [[package]]
 category = "main"
+description = "pytest-httpserver is a httpserver for pytest"
+name = "pytest-httpserver"
+optional = false
+python-versions = ">=3.4"
+version = "0.3.5"
+
+[package.dependencies]
+werkzeug = "*"
+
+[package.extras]
+dev = ["autopep8", "coverage", "flake8", "ipdb", "pytest", "pytest-cov", "reno", "requests", "rope", "sphinx", "sphinx-rtd-theme", "wheel"]
+test = ["coverage", "pytest", "pytest-cov", "requests"]
+
+[[package]]
+category = "main"
 description = "py.test plugin to abort hanging tests"
 name = "pytest-timeout"
 optional = false
@@ -397,8 +412,20 @@ brotli = ["brotlipy (>=0.6.0)"]
 secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "pyOpenSSL (>=0.14)", "ipaddress"]
 socks = ["PySocks (>=1.5.6,<1.5.7 || >1.5.7,<2.0)"]
 
+[[package]]
+category = "main"
+description = "The comprehensive WSGI web application library."
+name = "werkzeug"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+version = "1.0.1"
+
+[package.extras]
+dev = ["pytest", "pytest-timeout", "coverage", "tox", "sphinx", "pallets-sphinx-themes", "sphinx-issues"]
+watchdog = ["watchdog"]
+
 [metadata]
-content-hash = "90512767957cbb8e850d740e35b3672221d517d7fea4b8c7d62a7d0b6b18e77d"
+content-hash = "3500e684ec97eabc4ffd38614f8e9af23630e1650f5ff095ad031396a8b2acf2"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -513,6 +540,10 @@ pytest = [
 pytest-forked = [
     {file = "pytest-forked-1.3.0.tar.gz", hash = "sha256:6aa9ac7e00ad1a539c41bec6d21011332de671e938c7637378ec9710204e37ca"},
     {file = "pytest_forked-1.3.0-py2.py3-none-any.whl", hash = "sha256:dc4147784048e70ef5d437951728825a131b81714b398d5d52f17c7c144d8815"},
+]
+pytest-httpserver = [
+    {file = "pytest_httpserver-0.3.5-py3-none-any.whl", hash = "sha256:c55289404b7604bfd1c103d243824b441add501828e05807795c2b851b9b0747"},
+    {file = "pytest_httpserver-0.3.5.tar.gz", hash = "sha256:1d553dc0fb27483d00a1e25ddcfc38bd3438336ed60f862cad8c50b11621a11a"},
 ]
 pytest-timeout = [
     {file = "pytest-timeout-1.3.4.tar.gz", hash = "sha256:80faa19cd245a42b87a51699d640c00d937c02b749052bfca6bae8bdbe12c48e"},
@@ -630,4 +661,8 @@ typed-ast = [
 urllib3 = [
     {file = "urllib3-1.25.9-py2.py3-none-any.whl", hash = "sha256:88206b0eb87e6d677d424843ac5209e3fb9d0190d0ee169599165ec25e9d9115"},
     {file = "urllib3-1.25.9.tar.gz", hash = "sha256:3018294ebefce6572a474f0604c2021e33b3fd8006ecd11d62107a5d2a963527"},
+]
+werkzeug = [
+    {file = "Werkzeug-1.0.1-py2.py3-none-any.whl", hash = "sha256:2de2a5db0baeae7b2d2664949077c2ac63fbd16d98da0ff71837f7d1dea3fd43"},
+    {file = "Werkzeug-1.0.1.tar.gz", hash = "sha256:6c80b1e5ad3665290ea39320b91e1be1e0d5f60652b964a3070216de83d2e47c"},
 ]

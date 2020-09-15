@@ -19,6 +19,7 @@ flake8 = "^3.8.3"
 black = { version = "^19.10b0", allow-prereleases = true }
 filelock = "^3.0.12"
 pytest-xdist = "^2.1.0"
+pytest_httpserver = "^0.3.5"
 
 [tool.black]
 line-length = 120
