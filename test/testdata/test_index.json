@@ -49,6 +49,37 @@
             "tools": [],
             "email": "test@example.com",
             "name": "test"
+        },
+        {
+            "name": "zipslip",
+            "tools": [],
+            "email": "test@example.com",
+            "maintainer": "Arduino",
+            "help": {
+                "online": "https://github.com/Arduino/arduino-cli"
+            },
+            "websiteURL": "https://github.com/Arduino/arduino-cli",
+            "platforms": [
+                {
+                    "category": "Zipslip Test",
+                    "help": {
+                        "online": "https://github.com/Arduino/arduino-cli"
+                    },
+                    "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/evil.zip",
+                    "checksum": "SHA-256:9b85dfe23f13318efc0e541327f584a0f3674a773d46a7eb8b25f0f408d07f96",
+                    "name": "zipslip",
+                    "version": "1.0.0",
+                    "architecture": "x86",
+                    "archiveFileName": "evil.zip",
+                    "size": "2184",
+                    "toolsDependencies": [],
+                    "boards": [
+                        {
+                            "name": "Test Board"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

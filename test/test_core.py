@@ -194,3 +194,12 @@ def test_core_uninstall(run_command):
     result = run_command("core list --format json")
     assert result.ok
     assert not _in(result.stdout, "arduino:avr")
+
+
+def test_core_zipslip(run_command):
+    url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
+    assert run_command("core update-index --additional-urls={}".format(url))
+
+    # Install a core and check if malicious content has been extracted.
+    run_command("core install zipslip:x86 --additional-urls={}".format(url))
+    assert os.path.exists("/tmp/evil.txt") is False
