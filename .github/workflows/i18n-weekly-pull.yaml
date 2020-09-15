@@ -22,7 +22,7 @@ jobs:
 
       - name: Install Go deps
         run: |
-          go get github.com/GeertJohan/go.rice/rice
+          go get github.com/cmaglie/go.rice/rice
 
       - name: Install Taskfile
         uses: Arduino/actions/setup-taskfile@master

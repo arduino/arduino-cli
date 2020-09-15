@@ -21,7 +21,7 @@ import (
 	"strings"
 	"sync"
 
-	rice "github.com/GeertJohan/go.rice"
+	rice "github.com/cmaglie/go.rice"
 	"github.com/leonelquinteros/gotext"
 )
 

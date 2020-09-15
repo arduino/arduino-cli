@@ -18,8 +18,8 @@ package security
 import (
 	"fmt"
 
-	rice "github.com/GeertJohan/go.rice"
 	"github.com/arduino/go-paths-helper"
+	rice "github.com/cmaglie/go.rice"
 	"golang.org/x/crypto/openpgp"
 )
 

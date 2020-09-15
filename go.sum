@@ -28,8 +28,8 @@ github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+Ce
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
-github.com/cmaglie/go.rice v1.0.1 h1:3jnwuiZ7w6VZ9348Ux6BNdknTsUsUfQxk/uqZZw7OdQ=
-github.com/cmaglie/go.rice v1.0.1/go.mod h1:6n5Svb/wfzAWT9V3ZtDe8xk6rjbOX/cHu3obOH0Loew=
+github.com/cmaglie/go.rice v1.0.3 h1:ZBLmBdQp6ejc+n8eMNH0uuRSKkg6kKe6ORjXKnyHBYw=
+github.com/cmaglie/go.rice v1.0.3/go.mod h1:AF3bOWkvdOpp8/S3UL8qbQ4N7DiISIbJtj54GWFPAsc=
 github.com/cmaglie/pb v1.0.27 h1:ynGj8vBXR+dtj4B7Q/W/qGt31771Ux5iFfRQBnwdQiA=
 github.com/cmaglie/pb v1.0.27/go.mod h1:GilkKZMXYjBA4NxItWFfO+lwkp59PLHQ+IOW/b/kmZI=
 github.com/codeclysm/cc v1.2.2 h1:1ChS4EvWTjw6bH2sd6QiMcmih0itVVrWdh9MmOliX/I=
@@ -163,6 +163,7 @@ github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
+github.com/nkovacs/streamquote v1.0.0 h1:PmVIV08Zlx2lZK5fFZlMZ04eHcDTIFJCv/5/0twVUow=
 github.com/nkovacs/streamquote v1.0.0/go.mod h1:BN+NaZ2CmdKqUuTUXUEm9j95B2TRbpOWpxbJYzzgUsc=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
 github.com/oleksandr/bonjour v0.0.0-20160508152359-5dcf00d8b228 h1:Cvfd2dOlXIPTeEkOT/h8PyK4phBngOM4at9/jlgy7d4=
