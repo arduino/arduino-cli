@@ -62,10 +62,18 @@ tools.one-extra-params.program.pattern={cmd.path} {conf.board} {conf.general} {p
 
 # Upload with programmer test 1
 tools.two.cmd.path=echo
-tools.two.conf.general=conf-general
-tools.two.upload.conf=conf-upload
-tools.two.upload.params.verbose=verbose
-tools.two.upload.params.quiet=quiet
-tools.two.upload.params.verify=verify
-tools.two.upload.params.noverify=noverify
-tools.two.upload.pattern={cmd.path} two {conf.board} {conf.general} {upload.conf} {upload.verbose} {upload.verify} {upload.protocol} "{serial.port}" -b{upload.speed} "{build.path}/{build.project_name}.hex"
+tools.two.conf.general=conf-two-general
+
+tools.two.erase.conf=conf-two-erase
+tools.two.erase.params.verbose=verbose
+tools.two.erase.params.quiet=quiet
+tools.two.erase.params.verify=verify
+tools.two.erase.params.noverify=noverify
+tools.two.erase.pattern={cmd.path} ERASE {conf.board} {conf.general} {erase.conf} {erase.verbose} {erase.verify} {bootloader.protocol} "{serial.port}" -b{upload.speed}
+
+tools.two.bootloader.conf=conf-two-bootloader
+tools.two.bootloader.params.verbose=verbose
+tools.two.bootloader.params.quiet=quiet
+tools.two.bootloader.params.verify=verify
+tools.two.bootloader.params.noverify=noverify
+tools.two.bootloader.pattern={cmd.path} BURN {conf.board} {conf.general} {bootloader.conf} {bootloader.verbose} {bootloader.verify} {bootloader.protocol} "{serial.port}" -b{upload.speed} -F{bootloader.fuses} "{runtime.platform.path}/bootloaders/{bootloader.file}"

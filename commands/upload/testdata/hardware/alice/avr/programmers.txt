@@ -13,8 +13,7 @@ progr3.program.tool=one-extra-params
 progr3.program.extra_params={serial.port}
 
 progr4.name=Programmer 4
-progr4.program.protocol=prog4protocol
+progr4.program.protocol=prog4protocol-upload
 progr4.program.tool=one
 progr4.bootloader.protocol=prog4protocol-bootloader
-progr4.bootloader.tool=one
-progr4.protocol=genprog4protocol
+progr4.bootloader.tool=two

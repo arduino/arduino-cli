@@ -166,6 +166,11 @@ func TestUploadPropertiesComposition(t *testing.T) {
 		{buildPath1, "alice:avr:board1", "port", "progr1", true,
 			"ERASE conf-board1 conf-general conf-erase $$VERBOSE-VERIFY$$ genprog1protocol port -bspeed",
 			"BURN conf-board1 conf-general conf-bootloader $$VERBOSE-VERIFY$$ genprog1protocol port -bspeed -F0xFF " + cwd + "/testdata/hardware/alice/avr/bootloaders/niceboot/niceboot.hex"},
+
+		// 12: burn bootloader, preferences override from programmers.txt
+		{buildPath1, "alice:avr:board1", "port", "progr4", true,
+			"ERASE conf-board1 conf-two-general conf-two-erase $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed",
+			"BURN conf-board1 conf-two-general conf-two-bootloader $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed -F0xFF " + cwd + "/testdata/hardware/alice/avr/bootloaders/niceboot/niceboot.hex"},
 	}
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("SubTest%02d", i), func(t *testing.T) {
