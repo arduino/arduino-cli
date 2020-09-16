@@ -11,6 +11,13 @@ tools.one.upload.params.verify=verify
 tools.one.upload.params.noverify=noverify
 tools.one.upload.pattern={cmd.path} {conf.board} {conf.general} {upload.conf} {upload.verbose} {upload.verify} {upload.protocol} "{serial.port}" -b{upload.speed} "{build.path}/{build.project_name}.hex"
 
+tools.one.program.conf=conf-program
+tools.one.program.params.verbose=verbose
+tools.one.program.params.quiet=quiet
+tools.one.program.params.verify=verify
+tools.one.program.params.noverify=noverify
+tools.one.program.pattern={cmd.path} {conf.board} {conf.general} {program.conf} {program.verbose} {program.verify} {program.protocol} "{serial.port}" -b{upload.speed} "{build.path}/{build.project_name}.hex"
+
 # Upload test 2
 tools.one-noport.cmd.path=echo
 tools.one-noport.conf.general=conf-general
@@ -20,3 +27,31 @@ tools.one-noport.upload.params.quiet=quiet
 tools.one-noport.upload.params.verify=verify
 tools.one-noport.upload.params.noverify=noverify
 tools.one-noport.upload.pattern={cmd.path} {conf.board} {conf.general} {upload.conf} {upload.verbose} {upload.verify} {upload.protocol} -b{upload.speed} "{build.path}/{build.project_name}.hex"
+
+tools.one-noport.program.conf=conf-program
+tools.one-noport.program.params.verbose=verbose
+tools.one-noport.program.params.quiet=quiet
+tools.one-noport.program.params.verify=verify
+tools.one-noport.program.params.noverify=noverify
+tools.one-noport.program.pattern={cmd.path} {conf.board} {conf.general} {program.conf} {program.verbose} {program.verify} {program.protocol} -b{upload.speed} "{build.path}/{build.project_name}.hex"
+
+# Recipes for "tool.one-extra-params"
+tools.one-extra-params.cmd.path=echo
+tools.one-extra-params.conf.general=conf-general
+
+tools.one-extra-params.program.conf=conf-program
+tools.one-extra-params.program.params.verbose=verbose
+tools.one-extra-params.program.params.quiet=quiet
+tools.one-extra-params.program.params.verify=verify
+tools.one-extra-params.program.params.noverify=noverify
+tools.one-extra-params.program.pattern={cmd.path} {conf.board} {conf.general} {program.conf} {program.verbose} {program.verify} {program.protocol} {program.extra_params} -b{upload.speed} "{build.path}/{build.project_name}.hex"
+
+# Upload with programmer test 1
+tools.two.cmd.path=echo
+tools.two.conf.general=conf-general
+tools.two.upload.conf=conf-upload
+tools.two.upload.params.verbose=verbose
+tools.two.upload.params.quiet=quiet
+tools.two.upload.params.verify=verify
+tools.two.upload.params.noverify=noverify
+tools.two.upload.pattern={cmd.path} two {conf.board} {conf.general} {upload.conf} {upload.verbose} {upload.verify} {upload.protocol} "{serial.port}" -b{upload.speed} "{build.path}/{build.project_name}.hex"

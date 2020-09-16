@@ -26,5 +26,3 @@ board2.bootloader.extended_fuses=0xFD
 board2.bootloader.unlock_bits=0x3F
 board2.bootloader.lock_bits=0x0F
 board2.bootloader.file=optiboot/optiboot_atmega328.hex
-
-

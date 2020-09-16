@@ -145,6 +145,16 @@ func TestUploadPropertiesComposition(t *testing.T) {
 		// classic upload, no port
 		{buildPath1, "alice:avr:board2", "port", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex"},
 		{buildPath1, "alice:avr:board2", "", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex"},
+
+		// upload with programmer, requires port
+		{buildPath1, "alice:avr:board1", "port", "progr1", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ progprotocol port -bspeed testdata/build_path_1/sketch.ino.hex"},
+		{buildPath1, "alice:avr:board1", "", "progr1", false, "FAIL"},
+		// upload with programmer, no port
+		{buildPath1, "alice:avr:board1", "port", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/build_path_1/sketch.ino.hex"},
+		{buildPath1, "alice:avr:board1", "", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/build_path_1/sketch.ino.hex"},
+		// upload with programmer, require port through extra params
+		{buildPath1, "alice:avr:board1", "port", "progr3", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog3protocol port -bspeed testdata/build_path_1/sketch.ino.hex"},
+		{buildPath1, "alice:avr:board1", "", "progr3", false, "FAIL"},
 	}
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("SubTest%02d", i), func(t *testing.T) {
