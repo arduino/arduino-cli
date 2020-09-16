@@ -4,7 +4,6 @@ version=1.0.0
 # Upload test 1
 tools.one.cmd.path=echo
 tools.one.conf.general=conf-general
-
 tools.one.upload.conf=conf-upload
 tools.one.upload.params.verbose=verbose
 tools.one.upload.params.quiet=quiet
@@ -14,8 +13,10 @@ tools.one.upload.pattern={cmd.path} {conf.board} {conf.general} {upload.conf} {u
 
 # Upload test 2
 tools.one-noport.cmd.path=echo
+tools.one-noport.conf.general=conf-general
+tools.one-noport.upload.conf=conf-upload
 tools.one-noport.upload.params.verbose=verbose
 tools.one-noport.upload.params.quiet=quiet
-tools.one-noport.upload.verify=verify
+tools.one-noport.upload.params.verify=verify
 tools.one-noport.upload.params.noverify=noverify
-tools.one-noport.upload.pattern={cmd.path} {conf.general} {conf.upload} {upload.verbose} {upload.verify} {build.mcu} {upload.protocol} "{serial.port}" -b{upload.speed} "{build.path}/{build.project_name}.hex"
+tools.one-noport.upload.pattern={cmd.path} {conf.board} {conf.general} {upload.conf} {upload.verbose} {upload.verify} {upload.protocol} -b{upload.speed} "{build.path}/{build.project_name}.hex"

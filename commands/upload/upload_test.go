@@ -141,6 +141,10 @@ func TestUploadPropertiesComposition(t *testing.T) {
 	tests := []test{
 		// classic upload, requires port
 		{buildPath1, "alice:avr:board1", "port", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol port -bspeed testdata/build_path_1/sketch.ino.hex"},
+		{buildPath1, "alice:avr:board1", "", "", false, "FAIL"},
+		// classic upload, no port
+		{buildPath1, "alice:avr:board2", "port", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex"},
+		{buildPath1, "alice:avr:board2", "", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex"},
 	}
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("SubTest%02d", i), func(t *testing.T) {
@@ -160,9 +164,13 @@ func TestUploadPropertiesComposition(t *testing.T) {
 				outStream,
 				errStream,
 			)
-			require.NoError(t, err)
-			out := strings.TrimSpace(outStream.String())
-			require.Equal(t, strings.ReplaceAll(test.expected, "$$VERBOSE-VERIFY$$", "quiet noverify"), out)
+			if test.expected == "FAIL" {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				out := strings.TrimSpace(outStream.String())
+				require.Equal(t, strings.ReplaceAll(test.expected, "$$VERBOSE-VERIFY$$", "quiet noverify"), out)
+			}
 		})
 		t.Run(fmt.Sprintf("SubTest%02d-WithVerifyAndVerbose", i), func(t *testing.T) {
 			outStream := &bytes.Buffer{}
@@ -181,15 +189,19 @@ func TestUploadPropertiesComposition(t *testing.T) {
 				outStream,
 				errStream,
 			)
-			require.NoError(t, err)
-			out := strings.Split(outStream.String(), "\n")
-			// With verbose enabled, the upload will output 3 lines:
-			// - the command line that the cli is going to run
-			// - the output of the command
-			// - an empty line
-			// we are interested in the second line
-			require.Len(t, out, 3)
-			require.Equal(t, strings.ReplaceAll(test.expected, "$$VERBOSE-VERIFY$$", "verbose verify"), out[1])
+			if test.expected == "FAIL" {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				out := strings.Split(outStream.String(), "\n")
+				// With verbose enabled, the upload will output 3 lines:
+				// - the command line that the cli is going to run
+				// - the output of the command
+				// - an empty line
+				// we are interested in the second line
+				require.Len(t, out, 3)
+				require.Equal(t, strings.ReplaceAll(test.expected, "$$VERBOSE-VERIFY$$", "verbose verify"), out[1])
+			}
 		})
 	}
 }
