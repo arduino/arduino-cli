@@ -174,6 +174,7 @@ def test_compile_blacklisted_sketchname(run_command, data_dir):
     assert result.ok
 
 
+@pytest.mark.skip()
 def test_compile_without_precompiled_libraries(run_command, data_dir):
     # Init the environment explicitly
     url = "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json"
