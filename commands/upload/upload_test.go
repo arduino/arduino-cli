@@ -16,10 +16,13 @@
 package upload
 
 import (
+	"bytes"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -116,6 +119,77 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 				require.Equal(t, resBuildPath.String(), buildPath.String())
 			}
 			require.Equal(t, test.resSketchName, sketchName)
+		})
+	}
+}
+
+func TestUploadPropertiesComposition(t *testing.T) {
+	pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
+	err := pm.LoadHardwareFromDirectory(paths.New("testdata", "hardware"))
+	require.NoError(t, err)
+	buildPath1 := paths.New("testdata", "build_path_1")
+
+	type test struct {
+		importDir      *paths.Path
+		fqbn           string
+		port           string
+		programmer     string
+		burnBootloader bool
+		expected       string
+	}
+
+	tests := []test{
+		// classic upload, requires port
+		{buildPath1, "alice:avr:board1", "port", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol port -bspeed testdata/build_path_1/sketch.ino.hex"},
+	}
+	for i, test := range tests {
+		t.Run(fmt.Sprintf("SubTest%02d", i), func(t *testing.T) {
+			outStream := &bytes.Buffer{}
+			errStream := &bytes.Buffer{}
+			err := runProgramAction(
+				pm,
+				nil,                     // sketch
+				"",                      // importFile
+				test.importDir.String(), // importDir
+				test.fqbn,               // FQBN
+				test.port,               // port
+				test.programmer,         // programmer
+				false,                   // verbose
+				false,                   // verify
+				test.burnBootloader,     // burnBootloader
+				outStream,
+				errStream,
+			)
+			require.NoError(t, err)
+			out := strings.TrimSpace(outStream.String())
+			require.Equal(t, strings.ReplaceAll(test.expected, "$$VERBOSE-VERIFY$$", "quiet noverify"), out)
+		})
+		t.Run(fmt.Sprintf("SubTest%02d-WithVerifyAndVerbose", i), func(t *testing.T) {
+			outStream := &bytes.Buffer{}
+			errStream := &bytes.Buffer{}
+			err := runProgramAction(
+				pm,
+				nil,                     // sketch
+				"",                      // importFile
+				test.importDir.String(), // importDir
+				test.fqbn,               // FQBN
+				test.port,               // port
+				test.programmer,         // programmer
+				true,                    // verbose
+				true,                    // verify
+				test.burnBootloader,     // burnBootloader
+				outStream,
+				errStream,
+			)
+			require.NoError(t, err)
+			out := strings.Split(outStream.String(), "\n")
+			// With verbose enabled, the upload will output 3 lines:
+			// - the command line that the cli is going to run
+			// - the output of the command
+			// - an empty line
+			// we are interested in the second line
+			require.Len(t, out, 3)
+			require.Equal(t, strings.ReplaceAll(test.expected, "$$VERBOSE-VERIFY$$", "verbose verify"), out[1])
 		})
 	}
 }
