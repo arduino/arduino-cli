@@ -234,9 +234,13 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	if verify {
 		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.verify"))
 		uploadProperties.Set("program.verify", uploadProperties.Get("program.params.verify"))
+		uploadProperties.Set("erase.verify", uploadProperties.Get("erase.params.verify"))
+		uploadProperties.Set("bootloader.verify", uploadProperties.Get("bootloader.params.verify"))
 	} else {
 		uploadProperties.Set("upload.verify", uploadProperties.Get("upload.params.noverify"))
 		uploadProperties.Set("program.verify", uploadProperties.Get("program.params.noverify"))
+		uploadProperties.Set("erase.verify", uploadProperties.Get("erase.params.noverify"))
+		uploadProperties.Set("bootloader.verify", uploadProperties.Get("bootloader.params.noverify"))
 	}
 
 	if !burnBootloader {

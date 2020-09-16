@@ -3,14 +3,9 @@ board1.conf.board=conf-board1
 board1.upload.tool=one
 board1.upload.protocol=protocol
 board1.upload.speed=speed
-
 board1.bootloader.tool=one
-board1.bootloader.low_fuses=0xFF
-board1.bootloader.high_fuses=0xDE
-board1.bootloader.extended_fuses=0xFD
-board1.bootloader.unlock_bits=0x3F
-board1.bootloader.lock_bits=0x0F
-board1.bootloader.file=optiboot/optiboot_atmega328.hex
+board1.bootloader.fuses=0xFF
+board1.bootloader.file=niceboot/niceboot.hex
 
 
 board2.name=board2

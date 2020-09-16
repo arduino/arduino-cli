@@ -18,6 +18,20 @@ tools.one.program.params.verify=verify
 tools.one.program.params.noverify=noverify
 tools.one.program.pattern={cmd.path} {conf.board} {conf.general} {program.conf} {program.verbose} {program.verify} {program.protocol} "{serial.port}" -b{upload.speed} "{build.path}/{build.project_name}.hex"
 
+tools.one.erase.conf=conf-erase
+tools.one.erase.params.verbose=verbose
+tools.one.erase.params.quiet=quiet
+tools.one.erase.params.verify=verify
+tools.one.erase.params.noverify=noverify
+tools.one.erase.pattern={cmd.path} ERASE {conf.board} {conf.general} {erase.conf} {erase.verbose} {erase.verify} {protocol} "{serial.port}" -b{upload.speed}
+
+tools.one.bootloader.conf=conf-bootloader
+tools.one.bootloader.params.verbose=verbose
+tools.one.bootloader.params.quiet=quiet
+tools.one.bootloader.params.verify=verify
+tools.one.bootloader.params.noverify=noverify
+tools.one.bootloader.pattern={cmd.path} BURN {conf.board} {conf.general} {bootloader.conf} {bootloader.verbose} {bootloader.verify} {protocol} "{serial.port}" -b{upload.speed} -F{bootloader.fuses} "{runtime.platform.path}/bootloaders/{bootloader.file}"
+
 # Upload test 2
 tools.one-noport.cmd.path=echo
 tools.one-noport.conf.general=conf-general
