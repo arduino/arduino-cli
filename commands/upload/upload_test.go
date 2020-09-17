@@ -142,7 +142,7 @@ func TestUploadPropertiesComposition(t *testing.T) {
 
 	cwdPath, err := paths.Getwd()
 	require.NoError(t, err)
-	cwd := cwdPath.String()
+	cwd := strings.ReplaceAll(cwdPath.String(), "\\", "/")
 
 	tests := []test{
 		// 0: classic upload, requires port
@@ -195,7 +195,9 @@ func TestUploadPropertiesComposition(t *testing.T) {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				out := strings.Split(outStream.String(), "\n")
+				outFiltered := strings.ReplaceAll(outStream.String(), "\r", "")
+				outFiltered = strings.ReplaceAll(outFiltered, "\\", "/")
+				out := strings.Split(outFiltered, "\n")
 				// With verbose disable, the upload will output at least 2 lines:
 				// - the output of the command (1 or 2 lines)
 				// - an empty line
@@ -231,7 +233,9 @@ func TestUploadPropertiesComposition(t *testing.T) {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-				out := strings.Split(outStream.String(), "\n")
+				outFiltered := strings.ReplaceAll(outStream.String(), "\r", "")
+				outFiltered = strings.ReplaceAll(outFiltered, "\\", "/")
+				out := strings.Split(outFiltered, "\n")
 				// With verbose enabled, the upload will output at least 3 lines:
 				// - the first command line that the cli is going to run
 				// - the output of the first command
