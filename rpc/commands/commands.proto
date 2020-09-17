@@ -221,6 +221,9 @@ message OutdatedResp {
 message UpgradeReq {
   // Arduino Core Service instance from the Init response.
   Instance instance = 1;
+
+  // Set to true to not run (eventual) post install scripts for trusted platforms
+  bool skipPostInstall = 2;
 }
 
 message UpgradeResp {
