@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
@@ -128,7 +129,7 @@ func TestUploadPropertiesComposition(t *testing.T) {
 	err := pm.LoadHardwareFromDirectory(paths.New("testdata", "hardware"))
 	require.NoError(t, err)
 	buildPath1 := paths.New("testdata", "build_path_1")
-
+	logrus.SetLevel(logrus.TraceLevel)
 	type test struct {
 		importDir      *paths.Path
 		fqbn           string
