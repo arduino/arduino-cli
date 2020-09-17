@@ -117,23 +117,8 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		WithField("buildPlatform", buildPlatform).
 		Tracef("Upload data")
 
-	// Load upload tool definitions
-	var uploadToolName string
-	var uploadToolPlatform *cores.PlatformRelease
+	// Extract programmer properties (when specified)
 	var programmer *cores.Programmer
-
-	if burnBootloader {
-		uploadToolName = boardProperties.Get("bootloader.tool")
-		uploadToolPlatform = boardPlatform
-		if uploadToolName == "" {
-			return fmt.Errorf("cannot get programmer tool: undefined 'bootloader.tool' in boards.txt")
-		}
-		logrus.
-			WithField("uploadToolName", uploadToolName).
-			WithField("uploadToolPlatform", uploadToolPlatform).
-			Trace("Upload tool from 'bootloader.tool' property")
-	}
-
 	if programmerID != "" {
 		programmer = boardPlatform.Programmers[programmerID]
 		if programmer == nil {
@@ -143,36 +128,54 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		if programmer == nil {
 			return fmt.Errorf("programmer '%s' not available", programmerID)
 		}
-		uploadToolName = programmer.Properties.Get("program.tool")
+	}
+
+	// Determine upload tool
+	var uploadToolID string
+	{
+		toolProperty := "upload.tool"
+		if burnBootloader {
+			toolProperty = "bootloader.tool"
+		} else if programmer != nil {
+			toolProperty = "program.tool"
+		}
+
+		// create a temporary configuration only for the selection of upload tool
+		props := properties.NewMap()
+		props.Merge(boardPlatform.Properties)
+		props.Merge(boardPlatform.RuntimeProperties())
+		props.Merge(boardProperties)
+		if programmer != nil {
+			props.Merge(programmer.Properties)
+		}
+		if t, ok := props.GetOk(toolProperty); ok {
+			uploadToolID = t
+		} else {
+			return fmt.Errorf("cannot get programmer tool: undefined '%s' property", toolProperty)
+		}
+	}
+
+	var uploadToolPlatform *cores.PlatformRelease
+	if programmer != nil {
 		uploadToolPlatform = programmer.PlatformRelease
-		if uploadToolName == "" {
-			return fmt.Errorf("cannot get programmer tool: undefined 'program.tool' property")
-		}
-		logrus.
-			WithField("uploadToolName", uploadToolName).
-			WithField("uploadToolPlatform", uploadToolPlatform).
-			Trace("Upload tool from --programmer parameter")
 	} else {
-		uploadToolName = boardProperties.Get("upload.tool")
 		uploadToolPlatform = boardPlatform
-		if uploadToolName == "" {
-			return fmt.Errorf("cannot get upload tool: undefined 'upload.tool' property")
-		}
-		if split := strings.Split(uploadToolName, ":"); len(split) > 2 {
-			return fmt.Errorf("invalid 'upload.tool' property: %s", uploadToolName)
-		} else if len(split) == 2 {
-			uploadToolName = split[1]
-			uploadToolPlatform = pm.GetInstalledPlatformRelease(
-				pm.FindPlatform(&packagemanager.PlatformReference{
-					Package:              split[0],
-					PlatformArchitecture: boardPlatform.Platform.Architecture,
-				}),
-			)
-		}
-		logrus.
-			WithField("uploadToolName", uploadToolName).
-			WithField("uploadToolPlatform", uploadToolPlatform).
-			Trace("Upload tool")
+	}
+	logrus.
+		WithField("uploadToolID", uploadToolID).
+		WithField("uploadToolPlatform", uploadToolPlatform).
+		Trace("Upload tool")
+
+	if split := strings.Split(uploadToolID, ":"); len(split) > 2 {
+		return fmt.Errorf("invalid 'upload.tool' property: %s", uploadToolID)
+	} else if len(split) == 2 {
+		uploadToolID = split[1]
+		uploadToolPlatform = pm.GetInstalledPlatformRelease(
+			pm.FindPlatform(&packagemanager.PlatformReference{
+				Package:              split[0],
+				PlatformArchitecture: boardPlatform.Platform.Architecture,
+			}),
+		)
 	}
 
 	// Build configuration for upload
@@ -183,9 +186,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	uploadProperties.Merge(boardPlatform.Properties)
 	uploadProperties.Merge(boardPlatform.RuntimeProperties())
 	uploadProperties.Merge(boardProperties)
-
-	uploadToolProperties := uploadProperties.SubTree("tools." + uploadToolName)
-	uploadProperties.Merge(uploadToolProperties)
+	uploadProperties.Merge(uploadProperties.SubTree("tools." + uploadToolID))
 	if programmer != nil {
 		uploadProperties.Merge(programmer.Properties)
 	}
@@ -311,7 +312,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		}
 	}
 
-	// Build recipe for upload
+	// Run recipes for upload
 	if burnBootloader {
 		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, verbose); err != nil {
 			return fmt.Errorf("chip erase error: %s", err)
