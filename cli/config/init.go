@@ -17,16 +17,17 @@ package config
 
 import (
 	"os"
-	"path/filepath"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var destDir string
+var overwrite bool
 
 const defaultFileName = "arduino-cli.yaml"
 
@@ -42,34 +43,65 @@ func initInitCommand() *cobra.Command {
 		Run:  runInitCommand,
 	}
 	initCommand.Flags().StringVar(&destDir, "dest-dir", "", "Sets where to save the configuration file.")
+	initCommand.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing config file.")
 	return initCommand
 }
 
 func runInitCommand(cmd *cobra.Command, args []string) {
-	if destDir == "" {
-		destDir = viper.GetString("directories.Data")
+	configFlag := cmd.InheritedFlags().Lookup("config-file")
+	configFilePath := ""
+
+	if configFlag != nil {
+		configFilePath = configFlag.Value.String()
 	}
 
-	absPath, err := filepath.Abs(destDir)
-	if err != nil {
-		feedback.Errorf("Cannot find absolute path: %v", err)
+	if configFilePath != "" && destDir != "" {
+		feedback.Errorf("Can't use both --config-file and --dest-dir flags at the same time.")
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	configFileAbsPath := filepath.Join(absPath, defaultFileName)
+
+	var configFileAbsPath *paths.Path
+	var absPath *paths.Path
+	var err error
+
+	switch {
+	case configFilePath != "":
+		configFileAbsPath, err = paths.New(configFilePath).Abs()
+		if err != nil {
+			feedback.Errorf("Cannot find absolute path: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+
+		absPath = configFileAbsPath.Parent()
+	case destDir == "":
+		destDir = viper.GetString("directories.Data")
+		fallthrough
+	default:
+		absPath, err = paths.New(destDir).Abs()
+		if err != nil {
+			feedback.Errorf("Cannot find absolute path: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		configFileAbsPath = absPath.Join(defaultFileName)
+	}
+
+	if !overwrite && configFileAbsPath.Exist() {
+		feedback.Error("Config file already exists, use --overwrite to discard the existing one.")
+		os.Exit(errorcodes.ErrGeneric)
+	}
 
 	logrus.Infof("Writing config file to: %s", absPath)
-
-	if err := os.MkdirAll(absPath, os.FileMode(0755)); err != nil {
+	if err := absPath.MkdirAll(); err != nil {
 		feedback.Errorf("Cannot create config file directory: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if err := viper.WriteConfigAs(configFileAbsPath); err != nil {
+	if err := viper.WriteConfigAs(configFileAbsPath.String()); err != nil {
 		feedback.Errorf("Cannot create config file: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	msg := "Config file written to: " + configFileAbsPath
+	msg := "Config file written to: " + configFileAbsPath.String()
 	logrus.Info(msg)
 	feedback.Print(msg)
 }
