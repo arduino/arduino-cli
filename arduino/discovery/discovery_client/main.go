@@ -37,7 +37,10 @@ func main() {
 	if err := disc.Start(); err != nil {
 		log.Fatal("Error starting discovery:", err)
 	}
-	fmt.Println("Discovery STARTed")
+	if err := disc.StartSync(); err != nil {
+		log.Fatal("Error starting discovery:", err)
+	}
+	discEvent := disc.EventChannel(10)
 
 	if err := ui.Init(); err != nil {
 		log.Fatalf("failed to initialize termui: %v", err)
@@ -52,22 +55,18 @@ func main() {
 	l.SetRect(0, 0, w, h)
 
 	updateList := func() {
-		if list, err := disc.List(); err != nil {
-			log.Fatal("Error listing ports:", err)
-		} else {
-			rows := []string{}
-			rows = append(rows, "Available ports list:")
-			for i, port := range list {
-				rows = append(rows, fmt.Sprintf(" [%04d] Address: %s", i, port.AddressLabel))
-				rows = append(rows, fmt.Sprintf("        Protocol: %s", port.ProtocolLabel))
-				keys := port.Properties.Keys()
-				sort.Strings(keys)
-				for _, k := range keys {
-					rows = append(rows, fmt.Sprintf("                  %s=%s", k, port.Properties.Get(k)))
-				}
+		rows := []string{}
+		rows = append(rows, "Available ports list:")
+		for i, port := range disc.ListSync() {
+			rows = append(rows, fmt.Sprintf(" [%04d] Address: %s", i, port.AddressLabel))
+			rows = append(rows, fmt.Sprintf("        Protocol: %s", port.ProtocolLabel))
+			keys := port.Properties.Keys()
+			sort.Strings(keys)
+			for _, k := range keys {
+				rows = append(rows, fmt.Sprintf("                  %s=%s", k, port.Properties.Get(k)))
 			}
-			l.Rows = rows
 		}
+		l.Rows = rows
 	}
 	updateList()
 	ui.Render(l)
@@ -113,7 +112,7 @@ out:
 				previousKey = e.ID
 			}
 
-		case <-time.After(2 * time.Second):
+		case <-discEvent:
 			updateList()
 		}
 

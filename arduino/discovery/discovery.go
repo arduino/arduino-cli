@@ -33,13 +33,14 @@ type PluggableDiscovery struct {
 	process              *executils.Process
 	outgoingCommandsPipe io.Writer
 	incomingMessagesChan <-chan *discoveryMessage
-	listener             func(*Port)
 
 	// All the following fields are guarded by statusMutex
 	statusMutex           sync.Mutex
 	incomingMessagesError error
 	alive                 bool
 	eventsMode            bool
+	eventChan             chan<- *Event
+	cachedPorts           map[string]*Port
 }
 
 type discoveryMessage struct {
@@ -57,6 +58,12 @@ type Port struct {
 	ProtocolLabel            string          `json:"protocolLabel"`
 	Properties               *properties.Map `json:"prefs"`
 	IdentificationProperties *properties.Map `json:"identificationPrefs"`
+}
+
+// Event is a pluggable discovery event
+type Event struct {
+	Type string
+	Port *Port
 }
 
 // New create and connect to the given pluggable discovery
@@ -89,17 +96,45 @@ func New(args ...string) (*PluggableDiscovery, error) {
 
 func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *discoveryMessage) {
 	decoder := json.NewDecoder(in)
+	closeAndReportError := func(err error) {
+		disc.statusMutex.Lock()
+		disc.alive = false
+		disc.incomingMessagesError = err
+		disc.statusMutex.Unlock()
+		close(outChan)
+	}
 	for {
 		var msg discoveryMessage
 		if err := decoder.Decode(&msg); err != nil {
-			disc.statusMutex.Lock()
-			disc.alive = false
-			disc.incomingMessagesError = err
-			disc.statusMutex.Unlock()
-			close(outChan)
+			closeAndReportError(err)
 			return
 		}
-		outChan <- &msg
+
+		if msg.EventType == "add" {
+			if msg.Port == nil {
+				closeAndReportError(errors.New("invalid 'add' message: missing port"))
+				return
+			}
+			disc.statusMutex.Lock()
+			disc.cachedPorts[msg.Port.Address] = msg.Port
+			if disc.eventChan != nil {
+				disc.eventChan <- &Event{"add", msg.Port}
+			}
+			disc.statusMutex.Unlock()
+		} else if msg.EventType == "remove" {
+			if msg.Port == nil {
+				closeAndReportError(errors.New("invalid 'remove' message: missing port"))
+				return
+			}
+			disc.statusMutex.Lock()
+			delete(disc.cachedPorts, msg.Port.Address)
+			if disc.eventChan != nil {
+				disc.eventChan <- &Event{"remove", msg.Port}
+			}
+			disc.statusMutex.Unlock()
+		} else {
+			outChan <- &msg
+		}
 	}
 }
 
@@ -206,19 +241,48 @@ func (disc *PluggableDiscovery) List() ([]*Port, error) {
 	}
 }
 
+// EventChannel creates a channel used to receive events from the pluggable discovery.
+// The event channel must be consumed as quickly as possible since it may block the
+// discovery if it becomes full. The channel size is configurable.
+func (disc *PluggableDiscovery) EventChannel(size int) <-chan *Event {
+	c := make(chan *Event, size)
+	disc.statusMutex.Lock()
+	defer disc.statusMutex.Unlock()
+	disc.eventChan = c
+	return c
+}
+
 // StartSync puts the discovery in "events" mode: the discovery will send "add"
 // and "remove" events each time a new port is detected or removed respectively.
 // After calling StartSync an initial burst of "add" events may be generated to
 // report all the ports available at the moment of the start.
-func (disc *PluggableDiscovery) StartSync(listener func(*Port)) error {
+func (disc *PluggableDiscovery) StartSync() error {
 	disc.statusMutex.Lock()
-	eventsMode := disc.eventsMode
-	disc.statusMutex.Unlock()
+	defer disc.statusMutex.Unlock()
 
-	if eventsMode {
+	if disc.eventsMode {
 		return errors.New("already in events mode")
 	}
-	disc.listener = listener
+	if err := disc.sendCommand("START_SYNC\n"); err != nil {
+		return err
+	}
 
+	// START_SYNC does not give any response
+
+	disc.eventsMode = true
+	disc.cachedPorts = map[string]*Port{}
 	return nil
+}
+
+// ListSync returns a list of the available ports. The list is a cache of all the
+// add/remove events happened from the StartSync call and it will not consume any
+// resource from the underliying discovery.
+func (disc *PluggableDiscovery) ListSync() []*Port {
+	disc.statusMutex.Lock()
+	defer disc.statusMutex.Unlock()
+	res := []*Port{}
+	for _, port := range disc.cachedPorts {
+		res = append(res, port)
+	}
+	return res
 }
