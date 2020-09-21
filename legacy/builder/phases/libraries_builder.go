@@ -112,7 +112,7 @@ func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *p
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
-		objectFiles = append(objectFiles, libraryObjectFiles...)
+		objectFiles.AddAll(libraryObjectFiles)
 
 		ctx.Progress.CompleteStep()
 		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
