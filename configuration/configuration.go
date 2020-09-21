@@ -198,15 +198,10 @@ func FindConfigFile() string {
 	}
 
 	if configFile != "" {
-		if fi, err := os.Stat(configFile); err == nil {
-			if fi.IsDir() {
-				return configFile
-			}
-			return filepath.Dir(configFile)
-		}
+		return filepath.Dir(configFile)
 	}
 
-	return searchCwdForConfig()
+	return ""
 }
 
 func searchConfigTree(cwd string) string {
@@ -229,14 +224,4 @@ func searchConfigTree(cwd string) string {
 		}
 	}
 
-}
-
-func searchCwdForConfig() string {
-	cwd, err := os.Getwd()
-
-	if err != nil {
-		return ""
-	}
-
-	return searchConfigTree(cwd)
 }
