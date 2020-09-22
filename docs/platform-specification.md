@@ -940,6 +940,9 @@ Tool recipes defined in the platform.txt of other platforms can also be referenc
     myboard.bootloader.tool=arduino:avrdude
     [....]
 
+When using Arduino CLI or Arduino Pro IDE (but not Arduino IDE), properties used in the referenced tool recipe may be
+overridden in the referencing platform's platform.txt.
+
 Note that, unlike core references, referencing a tool recipe does _not_ result in any other resources being inherited
 from the referenced platform.
 
