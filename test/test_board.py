@@ -390,8 +390,7 @@ gold_board = """
 
 
 def test_board_list(run_command):
-    result = run_command("core update-index")
-    assert result.ok
+    run_command("core update-index")
     result = run_command("board list --format json")
     assert result.ok
     # check is a valid json and contains a list of ports
@@ -404,18 +403,16 @@ def test_board_list(run_command):
 
 @pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
 def test_board_listall(run_command):
-    assert run_command("core update-index")
+    run_command("core update-index")
     result = run_command("board listall")
     assert result.ok
     assert ["Board", "Name", "FQBN"] == result.stdout.splitlines()[0].strip().split()
 
 
 def test_board_details(run_command):
-    result = run_command("core update-index")
-    assert result.ok
+    run_command("core update-index")
     # Download samd core pinned to 1.8.6
-    result = run_command("core install arduino:samd@1.8.6")
-    assert result.ok
+    run_command("core install arduino:samd@1.8.6")
 
     # Test board listall with and without showing hidden elements
     result = run_command("board listall MIPS --format json")
@@ -448,11 +445,9 @@ def test_board_details(run_command):
 
 # old `arduino-cli board details` did not need -b <fqbn> flag to work
 def test_board_details_old(run_command):
-    result = run_command("core update-index")
-    assert result.ok
+    run_command("core update-index")
     # Download samd core pinned to 1.8.6
-    result = run_command("core install arduino:samd@1.8.6")
-    assert result.ok
+    run_command("core install arduino:samd@1.8.6")
     result = run_command("board details arduino:samd:nano_33_iot --format json")
     assert result.ok
     # Sort everything before compare
@@ -473,11 +468,9 @@ def test_board_details_old(run_command):
 
 
 def test_board_details_no_flags(run_command):
-    result = run_command("core update-index")
-    assert result.ok
+    run_command("core update-index")
     # Download samd core pinned to 1.8.6
-    result = run_command("core install arduino:samd@1.8.6")
-    assert result.ok
+    run_command("core install arduino:samd@1.8.6")
     result = run_command("board details")
     assert not result.ok
     assert "Error getting board details: parsing fqbn: invalid fqbn:" in result.stderr
@@ -485,11 +478,9 @@ def test_board_details_no_flags(run_command):
 
 
 def test_board_details_list_programmers_without_flag(run_command):
-    result = run_command("core update-index")
-    assert result.ok
+    run_command("core update-index")
     # Download samd core pinned to 1.8.6
-    result = run_command("core install arduino:samd@1.8.6")
-    assert result.ok
+    run_command("core install arduino:samd@1.8.6")
     result = run_command("board details -b arduino:samd:nano_33_iot")
     assert result.ok
     lines = [l.strip() for l in result.stdout.splitlines()]
@@ -503,11 +494,9 @@ def test_board_details_list_programmers_without_flag(run_command):
 
 
 def test_board_details_list_programmers_flag(run_command):
-    result = run_command("core update-index")
-    assert result.ok
+    run_command("core update-index")
     # Download samd core pinned to 1.8.6
-    result = run_command("core install arduino:samd@1.8.6")
-    assert result.ok
+    run_command("core install arduino:samd@1.8.6")
     result = run_command("board details -b arduino:samd:nano_33_iot --list-programmers")
     assert result.ok
 

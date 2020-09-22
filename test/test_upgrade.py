@@ -16,15 +16,15 @@
 
 def test_upgrade(run_command):
     # Updates index for cores and libraries
-    assert run_command("core update-index")
-    assert run_command("lib update-index")
+    run_command("core update-index")
+    run_command("lib update-index")
 
     # Installs an outdated core and library
-    assert run_command("core install arduino:avr@1.6.3")
+    run_command("core install arduino:avr@1.6.3")
     assert run_command("lib install USBHost@1.0.0")
 
     # Installs latest version of a core and a library
-    assert run_command("core install arduino:samd")
+    run_command("core install arduino:samd")
     assert run_command("lib install ArduinoJson")
 
     # Verifies outdated core and libraries are shown

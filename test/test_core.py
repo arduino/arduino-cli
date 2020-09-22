@@ -16,11 +16,16 @@ import os
 import platform
 import pytest
 import simplejson as json
+from pathlib import Path
 
 
-def test_core_search(run_command):
-    url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
-    assert run_command("core update-index --additional-urls={}".format(url))
+def test_core_search(run_command, httpserver):
+    # Set up the server to serve our custom index file
+    test_index = Path(__file__).parent / "testdata" / "test_index.json"
+    httpserver.expect_request("/test_index.json").respond_with_data(test_index.read_text())
+
+    url = httpserver.url_for("/test_index.json")
+    assert run_command(f"core update-index --additional-urls={url}")
     # search a specific core
     result = run_command("core search avr")
     assert result.ok
@@ -41,15 +46,19 @@ def test_core_search(run_command):
     assert 2 == len(data)
 
 
-def test_core_search_no_args(run_command):
+def test_core_search_no_args(run_command, httpserver):
     """
     This tests `core search` with and without additional URLs in case no args
     are passed (i.e. all results are shown).
     """
+    # Set up the server to serve our custom index file
+    test_index = Path(__file__).parent / "testdata" / "test_index.json"
+    httpserver.expect_request("/test_index.json").respond_with_data(test_index.read_text())
+
     # update custom index and install test core (installed cores affect `core search`)
-    url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
-    assert run_command("core update-index --additional-urls={}".format(url))
-    assert run_command("core install test:x86 --additional-urls={}".format(url))
+    url = httpserver.url_for("/test_index.json")
+    assert run_command(f"core update-index --additional-urls={url}")
+    assert run_command(f"core install test:x86 --additional-urls={url}")
 
     # list all with no additional urls, ensure the test core won't show up
     result = run_command("core search")
@@ -69,7 +78,7 @@ def test_core_search_no_args(run_command):
     assert len(platforms) == num_platforms
 
     # list all with additional urls, check the test core is there
-    result = run_command("core search --additional-urls={}".format(url))
+    result = run_command(f"core search --additional-urls={url}")
     assert result.ok
     num_platforms = 0
     found = False
@@ -81,7 +90,7 @@ def test_core_search_no_args(run_command):
     assert found
 
     # same thing in JSON format, also check the number of platforms found is the same
-    result = run_command("core search --format json --additional-urls={}".format(url))
+    result = run_command(f"core search --format json --additional-urls={url}")
     assert result.ok
     found = False
     platforms = json.loads(result.stdout)

@@ -16,6 +16,7 @@ import os
 import platform
 import signal
 import shutil
+import time
 from pathlib import Path
 
 import pytest
@@ -23,6 +24,7 @@ import simplejson as json
 from invoke import Local
 from invoke.context import Context
 import tempfile
+from filelock import FileLock
 
 from .common import Board
 
@@ -54,17 +56,32 @@ def data_dir(tmpdir_factory):
     if platform.system() == "Windows":
         with tempfile.TemporaryDirectory() as tmp:
             yield tmp
+            # shutil.rmtree(tmp, ignore_errors=True)
     else:
-        yield str(tmpdir_factory.mktemp("ArduinoTest"))
+        data = tmpdir_factory.mktemp("ArduinoTest")
+        yield str(data)
+        # shutil.rmtree(data, ignore_errors=True)
 
 
 @pytest.fixture(scope="session")
-def downloads_dir(tmpdir_factory):
+def downloads_dir(tmpdir_factory, worker_id):
     """
     To save time and bandwidth, all the tests will access
     the same download cache folder.
     """
-    return str(tmpdir_factory.mktemp("ArduinoTest"))
+    download_dir = tmpdir_factory.mktemp("ArduinoTest", numbered=False)
+
+    # This folders should be created only once per session, if we're running
+    # tests in parallel using multiple processes we need to make sure this
+    # this fixture is executed only once, thus the use of the lockfile
+    if not worker_id == "master":
+        lock = Path(download_dir / "lock")
+        with FileLock(lock):
+            if not lock.is_file():
+                lock.touch()
+
+    yield str(download_dir)
+    # shutil.rmtree(download_dir, ignore_errors=True)
 
 
 @pytest.fixture(scope="function")
@@ -74,7 +91,9 @@ def working_dir(tmpdir_factory):
     will be created before running each test and deleted
     at the end, this way all the tests work in isolation.
     """
-    return str(tmpdir_factory.mktemp("ArduinoTestWork"))
+    work_dir = tmpdir_factory.mktemp("ArduinoTestWork")
+    yield str(work_dir)
+    # shutil.rmtree(work_dir, ignore_errors=True)
 
 
 @pytest.fixture(scope="function")
@@ -95,9 +114,12 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
     }
     (Path(data_dir) / "packages").mkdir()
 
-    def _run(cmd_string, custom_working_dir=None):
+    def _run(cmd_string, custom_working_dir=None, custom_env=None):
+
         if not custom_working_dir:
             custom_working_dir = working_dir
+        if not custom_env:
+            custom_env = env
         cli_full_line = '"{}" {}'.format(cli_path, cmd_string)
         run_context = Context()
         # It might happen that we need to change directories between drives on Windows,
@@ -109,7 +131,7 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
         # It escapes spaces in the path using "\ " but it doesn't always work,
         # wrapping the path in quotation marks is the safest approach
         with run_context.prefix(f'{cd_command} "{custom_working_dir}"'):
-            return run_context.run(cli_full_line, echo=False, hide=True, warn=True, env=env)
+            return run_context.run(cli_full_line, echo=False, hide=True, warn=True, env=custom_env)
 
     return _run
 
@@ -195,3 +217,19 @@ def copy_sketch(working_dir):
     test_sketch_path = Path(working_dir) / "sketch_simple"
     shutil.copytree(sketch_path, test_sketch_path)
     yield str(test_sketch_path)
+
+
+@pytest.fixture(scope="function")
+def wait_for_board(run_command):
+    def _waiter(seconds=10):
+        # Waits for the specified amount of second for a board to be visible.
+        # This is necessary since it might happen that a board is not immediately
+        # available after a test upload and subsequent tests might consequently fail.
+        time_end = time.time() + seconds
+        while time.time() < time_end:
+            result = run_command("board list --format json")
+            ports = json.loads(result.stdout)
+            if len([p.get("boards", []) for p in ports]) > 0:
+                break
+
+    return _waiter

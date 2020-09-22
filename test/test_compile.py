@@ -12,23 +12,20 @@
 # otherwise use the software for commercial activities involving the Arduino
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
-import json
 import os
 import platform
 
 import pytest
 
-from .common import running_on_ci
+from .common import running_on_ci, parse_json_traces
 
 
 def test_compile_without_fqbn(run_command):
     # Init the environment explicitly
-    result = run_command("core update-index")
-    assert result.ok
+    run_command("core update-index")
 
     # Install Arduino AVR Boards
-    result = run_command("core install arduino:avr@1.8.3")
-    assert result.ok
+    run_command("core install arduino:avr@1.8.3")
 
     # Build sketch without FQBN
     result = run_command("compile")
@@ -37,12 +34,10 @@ def test_compile_without_fqbn(run_command):
 
 def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
     # Init the environment explicitly
-    result = run_command("core update-index")
-    assert result.ok
+    run_command("core update-index")
 
     # Download latest AVR
-    result = run_command("core install arduino:avr")
-    assert result.ok
+    run_command("core install arduino:avr")
 
     sketch_name = "CompileIntegrationTest"
     sketch_path = os.path.join(data_dir, sketch_name)
@@ -65,12 +60,9 @@ def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
 
     # let's test from the logs if the hex file produced by successful compile is moved to our sketch folder
     log_json = open(log_file_path, "r")
-    json_log_lines = log_json.readlines()
-    expected_trace_sequence = [
-        "Compile {sketch} for {fqbn} started".format(sketch=sketch_path, fqbn=fqbn),
-        "Compile {sketch} for {fqbn} successful".format(sketch=sketch_name, fqbn=fqbn),
-    ]
-    assert is_message_sequence_in_json_log_traces(expected_trace_sequence, json_log_lines)
+    traces = parse_json_traces(log_json.readlines())
+    assert f"Compile {sketch_path} for {fqbn} started" in traces
+    assert f"Compile {sketch_name} for {fqbn} successful" in traces
 
     # Test the --output-dir flag with absolute path
     target = os.path.join(data_dir, "test_dir")
@@ -89,12 +81,10 @@ def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
 )
 def test_output_flag_default_path(run_command, data_dir, working_dir):
     # Init the environment explicitly
-    result = run_command("core update-index")
-    assert result.ok
+    run_command("core update-index")
 
     # Install Arduino AVR Boards
-    result = run_command("core install arduino:avr@1.8.3")
-    assert result.ok
+    run_command("core install arduino:avr@1.8.3")
 
     # Create a test sketch
     sketch_path = os.path.join(data_dir, "test_output_flag_default_path")
@@ -111,12 +101,10 @@ def test_output_flag_default_path(run_command, data_dir, working_dir):
 
 def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     # Init the environment explicitly
-    result = run_command("core update-index")
-    assert result.ok
+    run_command("core update-index")
 
     # Install Arduino AVR Boards
-    result = run_command("core install arduino:avr@1.8.3")
-    assert result.ok
+    run_command("core install arduino:avr@1.8.3")
 
     sketch_name = "CompileIntegrationTestSymlinkSelfLoop"
     sketch_path = os.path.join(data_dir, sketch_name)
@@ -161,76 +149,16 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     assert not result.ok
 
 
-@pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
-def test_compile_and_upload_combo(run_command, data_dir, detected_boards):
-    # Init the environment explicitly
-    result = run_command("core update-index")
-    assert result.ok
-
-    # Install required core(s)
-    result = run_command("core install arduino:avr@1.8.3")
-    result = run_command("core install arduino:samd@1.8.7")
-    assert result.ok
-
-    # Create a test sketch
-    sketch_name = "CompileAndUploadIntegrationTest"
-    sketch_path = os.path.join(data_dir, sketch_name)
-    sketch_main_file = os.path.join(sketch_path, sketch_name + ".ino")
-    result = run_command("sketch new {}".format(sketch_path))
-    assert result.ok
-    assert "Sketch created in: {}".format(sketch_path) in result.stdout
-
-    # Build sketch for each detected board
-    for board in detected_boards:
-        log_file_name = "{fqbn}-compile.log".format(fqbn=board.fqbn.replace(":", "-"))
-        log_file_path = os.path.join(data_dir, log_file_name)
-        command_log_flags = "--log-format json --log-file {} --log-level trace".format(log_file_path)
-
-        def run_test(s):
-            result = run_command(
-                "compile -b {fqbn} --upload -p {address} {sketch_path} {log_flags}".format(
-                    fqbn=board.fqbn, address=board.address, sketch_path=s, log_flags=command_log_flags,
-                )
-            )
-            assert result.ok
-
-            # check from the logs if the bin file were uploaded on the current board
-            log_json = open(log_file_path, "r")
-            json_log_lines = log_json.readlines()
-            expected_trace_sequence = [
-                "Compile {sketch} for {fqbn} started".format(sketch=sketch_path, fqbn=board.fqbn),
-                "Compile {sketch} for {fqbn} successful".format(sketch=sketch_name, fqbn=board.fqbn),
-                "Upload {sketch} on {fqbn} started".format(sketch=sketch_path, fqbn=board.fqbn),
-                "Upload {sketch} on {fqbn} successful".format(sketch=sketch_name, fqbn=board.fqbn),
-            ]
-            assert is_message_sequence_in_json_log_traces(expected_trace_sequence, json_log_lines)
-
-        run_test(sketch_path)
-        run_test(sketch_main_file)
-
-
-def is_message_sequence_in_json_log_traces(message_sequence, log_json_lines):
-    trace_entries = []
-    for entry in log_json_lines:
-        entry = json.loads(entry)
-        if entry.get("level") == "trace":
-            if entry.get("msg") in message_sequence:
-                trace_entries.append(entry.get("msg"))
-    return message_sequence == trace_entries
-
-
 def test_compile_blacklisted_sketchname(run_command, data_dir):
     """
     Compile should ignore folders named `RCS`, `.git` and the likes, but
     it should be ok for a sketch to be named like RCS.ino
     """
     # Init the environment explicitly
-    result = run_command("core update-index")
-    assert result.ok
+    run_command("core update-index")
 
     # Install Arduino AVR Boards
-    result = run_command("core install arduino:avr@1.8.3")
-    assert result.ok
+    run_command("core install arduino:avr@1.8.3")
 
     sketch_name = "RCS"
     sketch_path = os.path.join(data_dir, sketch_name)
@@ -246,6 +174,7 @@ def test_compile_blacklisted_sketchname(run_command, data_dir):
     assert result.ok
 
 
+@pytest.mark.skip()
 def test_compile_without_precompiled_libraries(run_command, data_dir):
     # Init the environment explicitly
     url = "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json"
