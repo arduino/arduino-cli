@@ -1,15 +1,51 @@
 # How to contribute
 
-First of all, thanks for contributing!
+First of all, thanks for contributing! This document provides some basic guidelines for contributing to this repository.
 
-This document provides some basic guidelines for contributing to this repository. To propose improvements or fix a bug,
-feel free to submit a PR.
+There are several ways you can get involved:
 
-## Legal requirements
+| Type of contribution                              | Contribution method                                     |
+| ------------------------------------------------- | ------------------------------------------------------- |
+| - Support request<br/>- Question<br/>- Discussion | Post on the [Arduino Forum][forum]                      |
+| - Bug report<br/>- Feature request                | Issue report (read the [issue guidelines][issues])      |
+| Beta testing                                      | Try out the [nightly build][nightly]                    |
+| - Bug fix<br/>- Enhancement                       | Pull Request (read the [pull request guidelines][prs])  |
+| Translations for Arduino CLI                      | [transifex][translate]                                  |
+| Monetary                                          | - [Donate][donate]<br/>- [Buy official products][store] |
+
+## Issue Reports
+
+Do you need help or have a question about using Arduino CLI? Support requests should be made to Arduino CLI's dedicated
+board in the [Arduino forum][forum].
+
+High quality bug reports and feature requests are valuable contributions to the Arduino CLI project.
+
+### Before reporting an issue
+
+- Give the [nightly build][nightly] a test drive to see if your issue was already resolved.
+- Search [existing pull requests and issues][issue-tracker] to see if it was already reported. If you have additional
+  information to provide about an existing issue, please comment there. You can use the [Reactions feature][reactions]
+  if you only want to express support.
+
+### Qualities of an excellent report
+
+- The issue title should be descriptive. Vague titles make it difficult to understand the purpose of the issue, which
+  might cause your issue to be overlooked.
+- Provide a full set of steps necessary to reproduce the issue. Demonstration code or commands should be complete and
+  simplified to the minimum necessary to reproduce the issue.
+- Be responsive. We may need you to provide additional information in order to investigate and resolve the issue.
+- If you find a solution to your problem, please comment on your issue report with an explanation of how you were able
+  to fix it and close the issue.
+
+## Pull Requests
+
+To propose improvements or fix a bug, feel free to submit a PR.
+
+### Legal requirements
 
 Before we can accept your contributions you have to sign the [Contributor License Agreement][0]
 
-## Pull Requests
+### Pull request checklist
 
 In order to ease code reviews and have your contributions merged faster, here is a list of items you can check before
 submitting a PR:
@@ -25,7 +61,7 @@ submitting a PR:
 - Your PR must pass all CI tests before we will merge it. If you're seeing an error and don't think it's your fault, it
   may not be! The reviewer will help you if there are test failures that seem not related to the change you are making.
 
-## Prerequisites
+### Prerequisites
 
 To build the Arduino CLI from sources you need the following tools to be available in your local environment:
 
@@ -42,7 +78,7 @@ If you're working on the gRPC interface you will also have to:
 - download the [protoc][6] compiler
 - run `go get -u github.com/golang/protobuf/protoc-gen-go`
 
-## Building the source code
+### Building the source code
 
 From the project folder root, just run:
 
@@ -53,7 +89,7 @@ task build
 The project uses Go modules so dependencies will be downloaded automatically. At the end of the build, you should find
 an `arduino-cli` executable in the same folder.
 
-## Running the tests
+### Running the tests
 
 There are several checks and test suites in place to ensure the code works as expected and is written in a way that's
 consistent across the whole codebase. To avoid pushing changes that will cause the CI system to fail, you can run most
@@ -77,7 +113,7 @@ To run integration tests (these will take some time and require special setup, s
 task test-integration
 ```
 
-### Running only some tests
+#### Running only some tests
 
 By default, all tests from all go packages are run. To run only unit tests from one or more specific packages, you can
 set the TARGETS environment variable, e.g.:
@@ -102,7 +138,7 @@ confidence that the code is working.
 For these reasons, in addition to regular unit tests the project has a suite of integration tests that actually run
 Arduino CLI in a different process and assess the options are correctly understood and the output is what we expect.
 
-#### Hardware requirements for running the full suite of integration tests:
+##### Hardware requirements for running the full suite of integration tests:
 
 An Arduino board attached to a serial port. The board must:
 
@@ -114,7 +150,7 @@ An Arduino board attached to a serial port. The board must:
 Note that running the integration tests will result in a sketch being uploaded to every attached Arduino board meeting
 the above requirements.
 
-#### Software requirements for running integration tests:
+##### Software requirements for running integration tests:
 
 A working Python environment. Chances are that you already have Python installed in your system, if this is not the case
 you can [download][3] the official distribution or use the package manager provided by your Operating System.
@@ -153,7 +189,7 @@ In case of linting errors you should be able to solve most of them by automatica
 task python:format
 ```
 
-### Configuration files formatting
+#### Configuration files formatting
 
 To keep the configurations tidy and in order we use [Prettier][prettier-website] to automatically format all YAML files
 in the project. Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the introduction of
@@ -180,12 +216,12 @@ task config:format
 When opening a new Pull Request, checks are automatically run to verify that configuration files are correctly
 formatted. In case of failures we might ask you to update the PR with correct formatting.
 
-## Working on docs
+### Working on docs
 
 Documentation is provided to final users in form of static HTML content generated from a tool called [MkDocs][9] and
 hosted on [GitHub Pages][7].
 
-### Local development
+#### Local development
 
 Most of the documentation consists of static content written over several Markdown files under the `docs` folder at the
 root of this git repository but some other content is dynamically generated from the CI pipelines - this is the case
@@ -215,14 +251,14 @@ task docs:serve
 
 If you don't see any error, hit http://127.0.0.1:8000 with your browser to navigate the generated docs.
 
-### Docs publishing
+#### Docs publishing
 
 The present git repository has a special branch called `gh-pages` that contains the generated HTML code for the docs
 website; every time a change is pushed to this special branch, GitHub automatically triggers a deployment to pull the
 change and publish a new version of the website. Do not open Pull Requests to push changes to the `gh-pages` branch,
 that will be done exclusively from the CI.
 
-### Docs versioning
+#### Docs versioning
 
 In order to provide support for multiple Arduino CLI releases, Documentation is versioned so that visitors can select
 which version of the documentation website should be displayed. Unfortunately this feature isn't provided by GitHub
@@ -251,7 +287,7 @@ few things for us:
 > **Note:** unless you're working on the generation process itself, you should never run Mike from a local environment,
 > either directly or through the Task `docs:publish`. This might result in unwanted changes to the public website.
 
-### Docs formatting
+#### Docs formatting
 
 To keep the documentation tidy and in order we use [Prettier][prettier-website] to automatically format all Markdown
 files in the project. Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the
@@ -278,7 +314,7 @@ task docs:format
 When opening a new Pull Request, checks are automatically run to verify that documentation is correctly formatted. In
 case of failures we might ask you to update the PR with correct formatting.
 
-### Docs automation
+#### Docs automation
 
 In order to avoid unwanted changes to the public website hosting the Arduino CLI documentation, only Mike is allowed to
 push changes to the `gh-pages` branch, and this only happens from within the CI, in a workflow named [publish-docs][11].
@@ -289,7 +325,7 @@ the logic is implemented in a Python script called [`build.py`][12]. The script 
 Arduino CLI that was modified in the current commit (either `dev` or an official, numbered release) and whether the
 redirect to the latest version that happens on the landing page should be updated or not.
 
-## Internationalization (i18n)
+### Internationalization (i18n)
 
 In order to support i18n in the CLI, any messages that are intended to be translated should be wrapped in a call to
 `i18n.Tr`. This call allows us to build a catalog of translatable strings, replacing the reference string at runtime
@@ -326,7 +362,7 @@ func main() {
 }
 ```
 
-## Additional settings
+### Additional settings
 
 If you need to push a commit that's only shipping documentation changes or example files, thus a complete no-op for the
 test suite, please start the commit message with the string **[skip ci]** to skip the build and give that slot to
@@ -347,6 +383,15 @@ If your PR doesn't need to be included in the changelog, please start the commit
 [10]: https://github.com/jimporter/mike
 [11]: https://github.com/arduino/arduino-cli/blob/master/.github/workflows/publish-docs.yaml
 [12]: https://github.com/arduino/arduino-cli/blob/master/docs/build.py
+[forum]: https://forum.arduino.cc/index.php?board=145.0
+[issues]: #issue-reports
+[nightly]: https://arduino.github.io/arduino-cli/latest/installation/#nightly-builds
+[prs]: #pull-requests
+[translate]: https://www.transifex.com/arduino-1/arduino-cli/
+[donate]: https://www.arduino.cc/en/Main/Contribute
+[store]: https://store.arduino.cc
+[issue-tracker]: https://github.com/arduino/arduino-cli/issues?q=
+[reactions]: https://github.com/blog/2119-add-reactions-to-pull-requests-issues-and-comments
 [prettier-website]: https://prettier.io/
 [prettier-vscode-extension]: https://github.com/prettier/prettier-vscode
 [npm-install-docs]: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
