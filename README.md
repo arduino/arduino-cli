@@ -33,6 +33,10 @@ contribute your changes to the project.
 
 :sparkles: Thanks to all our [contributors]! :sparkles:
 
+### Beta testing
+
+[Nightly builds] are available for beta testing.
+
 ## Security
 
 If you think you found a vulnerability or other security-related bug in the Arduino CLI, please read our [security
@@ -51,4 +55,5 @@ e-mail contact: security@arduino.cc
 [faq]: https://arduino.github.io/arduino-cli/latest/FAQ/
 [how to contribute]: https://arduino.github.io/arduino-cli/latest/CONTRIBUTING/
 [contributors]: https://github.com/arduino/arduino-cli/graphs/contributors
+[nightly builds]: https://arduino.github.io/arduino-cli/latest/installation/#nightly-builds
 [security policy]: https://github.com/arduino/arduino-cli/security/policy
