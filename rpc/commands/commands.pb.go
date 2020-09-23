@@ -772,7 +772,7 @@ type UpgradeReq struct {
 
 	// Arduino Core Service instance from the Init response.
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	// Set to true to not run (eventual) post install scripts for trusted platforms
+	// Set to true to not run (eventual) post install scripts
 	SkipPostInstall bool `protobuf:"varint,2,opt,name=skipPostInstall,proto3" json:"skipPostInstall,omitempty"`
 }
 

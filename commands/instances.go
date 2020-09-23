@@ -568,6 +568,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeReq, downloadCB DownloadProgre
 					if err := pm.UninstallPlatform(latest); err != nil {
 						logrus.WithError(err).Error("Error rolling-back changes.")
 						taskCB(&rpc.TaskProgress{Message: "Error rolling-back changes: " + err.Error()})
+						return err
 					}
 				}
 
