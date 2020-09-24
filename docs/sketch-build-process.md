@@ -114,6 +114,27 @@ The "location priority" is determined as follows (in order of highest to lowest 
    ([`{runtime.ide.path}/libraries`](platform-specification.md#global-predefined-properties))
    - This location is only used by Arduino CLI when it's located in the Arduino IDE installation folder
 
+#### Location priorities in Arduino Web Editor
+
+The location priorities system works in the same manner in [Arduino Web Editor](https://create.arduino.cc/editor), but
+its cloud-based nature may make the locations of libraries less obvious.
+
+1. **Custom**: the imported libraries, shown under the **Libraries > Custom** tab.
+   - These libraries are under `/tmp/\<some number>/custom`
+1. **Pinned**: libraries that were [associated with the sketch](sketch-specification.md#metadata) by choosing a specific
+   version from the library's "Include" dropdown menu.
+   - These libraries are under `/tmp/\<some number>/pinned`
+   - Note: clicking the "Include" button does not result in the library being pinned to the sketch.
+1. **[Platform bundled](platform-specification.md#platform-bundled-libraries)**: these are listed under the
+   **Libraries > Default** tab, but with "for \<architecture name\>" appended to the library name (e.g., "SPI for AVR").
+   - These libraries are under `/home/builder/.arduino15/packages`
+   1. [Board platform](platform-specification.md#platform-terminology) bundled
+   1. [Core platform](platform-specification.md#platform-terminology) bundled
+1. **Built-in**:
+   - The non-platform bundled libraries listed under the **Libraries > Default** tab.
+   - Libraries listed under **Libraries > Library Manager**.
+   - These libraries are under `/home/builder/opt/libraries/latest`
+
 ## Compilation
 
 Sketches are compiled by avr-gcc and avr-g++ according to the variables in the boards.txt file of the selected board's
