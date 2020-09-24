@@ -271,6 +271,8 @@ message Library {
     // Value of the `includes` field in library.properties or, if missing, the list of
     // include files available on the library source root directory.
     repeated string provides_includes = 27;
+    // Map of FQBNs that specifies if library is compatible with this library
+    map<string, bool> compatible_with = 28;
 }
 
 enum LibraryLayout {
@@ -287,7 +289,7 @@ enum LibraryLocation {
     user = 1;
     // In the `libraries` subdirectory of a platform.
     platform_builtin = 2;
-    // When `LibraryLocation` is used in a context where a board is specified, 
+    // When `LibraryLocation` is used in a context where a board is specified,
     // this indicates the library is in the `libraries` subdirectory of a
     // platform referenced by the board's platform.
     referenced_platform_builtin = 3;
