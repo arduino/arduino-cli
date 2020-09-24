@@ -22,12 +22,11 @@ import (
 	"net/url"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/arduino/sketches"
-	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/executils"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -275,19 +274,14 @@ func runProgramAction(pm *packagemanager.PackageManager,
 						outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", p)))
 						outStream.Write([]byte(fmt.Sprintln()))
 					}
-					if err := touchSerialPortAt1200bps(p); err != nil {
+					logrus.Infof("Touching port %s at 1200bps", port)
+					if err := serialutils.TouchSerialPortAt1200bps(p); err != nil {
 						outStream.Write([]byte(fmt.Sprintf("Cannot perform port reset: %s", err)))
 						outStream.Write([]byte(fmt.Sprintln()))
 					}
 					break
 				}
 			}
-
-			// Scanning for available ports seems to open the port or
-			// otherwise assert DTR, which would cancel the WDT reset if
-			// it happened within 250 ms. So we wait until the reset should
-			// have already occurred before we start scanning.
-			time.Sleep(500 * time.Millisecond)
 		}
 
 		// Wait for upload port if requested
@@ -295,18 +289,11 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			if verbose {
 				outStream.Write([]byte(fmt.Sprintln("Waiting for upload port...")))
 			}
-			if p, err := waitForNewSerialPort(); err != nil {
-				return fmt.Errorf("cannot detect serial ports: %s", err)
-			} else if p == "" {
-				feedback.Print("No new serial port detected.")
-			} else {
-				actualPort = p
-			}
 
-			// on OS X, if the port is opened too quickly after it is detected,
-			// a "Resource busy" error occurs, add a delay to workaround.
-			// This apply to other platforms as well.
-			time.Sleep(500 * time.Millisecond)
+			actualPort, err = serialutils.WaitForNewSerialPortOrDefaultTo(actualPort)
+			if err != nil {
+				return errors.WithMessage(err, "detecting serial port")
+			}
 		}
 	}
 
@@ -380,64 +367,6 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	}
 
 	return nil
-}
-
-func touchSerialPortAt1200bps(port string) error {
-	logrus.Infof("Touching port %s at 1200bps", port)
-
-	// Open port
-	p, err := serial.Open(port, &serial.Mode{BaudRate: 1200})
-	if err != nil {
-		return fmt.Errorf("opening port: %s", err)
-	}
-	defer p.Close()
-
-	if err = p.SetDTR(false); err != nil {
-		return fmt.Errorf("cannot set DTR")
-	}
-	return nil
-}
-
-// waitForNewSerialPort is meant to be called just after a reset. It watches the ports connected
-// to the machine until a port appears. The new appeared port is returned
-func waitForNewSerialPort() (string, error) {
-	logrus.Infof("Waiting for upload port...")
-
-	getPortMap := func() (map[string]bool, error) {
-		ports, err := serial.GetPortsList()
-		if err != nil {
-			return nil, err
-		}
-		res := map[string]bool{}
-		for _, port := range ports {
-			res[port] = true
-		}
-		return res, nil
-	}
-
-	last, err := getPortMap()
-	if err != nil {
-		return "", fmt.Errorf("scanning serial port: %s", err)
-	}
-
-	deadline := time.Now().Add(10 * time.Second)
-	for time.Now().Before(deadline) {
-		now, err := getPortMap()
-		if err != nil {
-			return "", fmt.Errorf("scanning serial port: %s", err)
-		}
-
-		for p := range now {
-			if !last[p] {
-				return p, nil // Found it!
-			}
-		}
-
-		last = now
-		time.Sleep(250 * time.Millisecond)
-	}
-
-	return "", nil
 }
 
 func determineBuildPathAndSketchName(importFile, importDir string, sketch *sketches.Sketch, fqbn *cores.FQBN) (*paths.Path, string, error) {
