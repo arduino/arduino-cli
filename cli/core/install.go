@@ -43,7 +43,7 @@ func initInstallCommand() *cobra.Command {
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 	}
-	addPostInstallFlagsToCommand(installCommand)
+	AddPostInstallFlagsToCommand(installCommand)
 	return installCommand
 }
 
@@ -52,12 +52,15 @@ var postInstallFlags struct {
 	skipPostInstall bool
 }
 
-func addPostInstallFlagsToCommand(cmd *cobra.Command) {
+// AddPostInstallFlagsToCommand adds flags that can be used to force running or skipping
+// of post installation scripts
+func AddPostInstallFlagsToCommand(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&postInstallFlags.runPostInstall, "run-post-install", false, "Force run of post-install scripts (if the CLI is not running interactively).")
 	cmd.Flags().BoolVar(&postInstallFlags.skipPostInstall, "skip-post-install", false, "Force skip of post-install scripts (if the CLI is running interactively).")
 }
 
-func detectSkipPostInstallValue() bool {
+// DetectSkipPostInstallValue returns true if a post install script must be run
+func DetectSkipPostInstallValue() bool {
 	if postInstallFlags.runPostInstall && postInstallFlags.skipPostInstall {
 		feedback.Errorf("The flags --run-post-install and --skip-post-install can't be both set at the same time.")
 		os.Exit(errorcodes.ErrBadArgument)
@@ -100,7 +103,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
-			SkipPostInstall: detectSkipPostInstallValue(),
+			SkipPostInstall: DetectSkipPostInstallValue(),
 		}
 		_, err := core.PlatformInstall(context.Background(), platformInstallReq, output.ProgressBar(), output.TaskProgress())
 		if err != nil {

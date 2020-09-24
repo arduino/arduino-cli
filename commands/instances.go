@@ -515,6 +515,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeReq, downloadCB DownloadProgre
 				toolsToInstall := []*cores.ToolRelease{}
 				for _, tool := range tools {
 					if tool.IsInstalled() {
+						logrus.WithField("tool", tool).Warn("Tool already installed")
 						taskCB(&rpc.TaskProgress{Name: "Tool " + tool.String() + " already installed", Completed: true})
 					} else {
 						toolsToInstall = append(toolsToInstall, tool)
@@ -536,7 +537,8 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeReq, downloadCB DownloadProgre
 					return err
 				}
 
-				taskCB(&rpc.TaskProgress{Name: "Installing " + latest.String()})
+				logrus.Info("Updating platform " + installed.String())
+				taskCB(&rpc.TaskProgress{Name: "Updating " + latest.String()})
 
 				// Installs tools
 				for _, tool := range toolsToInstall {
@@ -549,6 +551,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeReq, downloadCB DownloadProgre
 				// Installs platform
 				err = pm.InstallPlatform(latest)
 				if err != nil {
+					logrus.WithError(err).Error("Cannot install platform")
 					taskCB(&rpc.TaskProgress{Message: "Error installing " + latest.String()})
 					return err
 				}
@@ -558,12 +561,27 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeReq, downloadCB DownloadProgre
 
 				// In case uninstall fails tries to rollback
 				if err != nil {
+					logrus.WithError(err).Error("Error updating platform.")
 					taskCB(&rpc.TaskProgress{Message: "Error upgrading platform: " + err.Error()})
 
 					// Rollback
 					if err := pm.UninstallPlatform(latest); err != nil {
+						logrus.WithError(err).Error("Error rolling-back changes.")
 						taskCB(&rpc.TaskProgress{Message: "Error rolling-back changes: " + err.Error()})
+						return err
 					}
+				}
+
+				// Perform post install
+				if !req.SkipPostInstall {
+					logrus.Info("Running post_install script")
+					taskCB(&rpc.TaskProgress{Message: "Configuring platform"})
+					if err := pm.RunPostInstallScript(latest); err != nil {
+						taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("WARNING: cannot run post install: %s", err)})
+					}
+				} else {
+					logrus.Info("Skipping platform configuration (post_install run).")
+					taskCB(&rpc.TaskProgress{Message: "Skipping platform configuration"})
 				}
 			}
 		}

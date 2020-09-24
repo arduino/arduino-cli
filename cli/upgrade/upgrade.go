@@ -19,6 +19,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/arduino/arduino-cli/cli/core"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -40,6 +41,7 @@ func NewCommand() *cobra.Command {
 		Run:     runUpgradeCommand,
 	}
 
+	core.AddPostInstallFlagsToCommand(upgradeCommand)
 	return upgradeCommand
 }
 
@@ -53,7 +55,8 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino upgrade`")
 
 	err = commands.Upgrade(context.Background(), &rpc.UpgradeReq{
-		Instance: inst,
+		Instance:        inst,
+		SkipPostInstall: core.DetectSkipPostInstallValue(),
 	}, output.NewDownloadProgressBarCB(), output.TaskProgress())
 
 	if err != nil {
