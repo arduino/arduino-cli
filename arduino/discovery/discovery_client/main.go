@@ -29,18 +29,27 @@ import (
 )
 
 func main() {
-	disc, err := discovery.New(os.Args[1:]...)
-	if err != nil {
-		log.Fatal("Error initializing discovery:", err)
-	}
+	discoveries := []*discovery.PluggableDiscovery{}
+	discEvent := make(chan *discovery.Event)
+	for _, discCmd := range os.Args[1:] {
+		disc, err := discovery.New(discCmd)
+		if err != nil {
+			log.Fatal("Error initializing discovery:", err)
+		}
 
-	if err := disc.Start(); err != nil {
-		log.Fatal("Error starting discovery:", err)
+		if err := disc.Start(); err != nil {
+			log.Fatal("Error starting discovery:", err)
+		}
+		if err := disc.StartSync(); err != nil {
+			log.Fatal("Error starting discovery:", err)
+		}
+		go func() {
+			for msg := range disc.EventChannel(10) {
+				discEvent <- msg
+			}
+		}()
+		discoveries = append(discoveries, disc)
 	}
-	if err := disc.StartSync(); err != nil {
-		log.Fatal("Error starting discovery:", err)
-	}
-	discEvent := disc.EventChannel(10)
 
 	if err := ui.Init(); err != nil {
 		log.Fatalf("failed to initialize termui: %v", err)
@@ -57,13 +66,15 @@ func main() {
 	updateList := func() {
 		rows := []string{}
 		rows = append(rows, "Available ports list:")
-		for i, port := range disc.ListSync() {
-			rows = append(rows, fmt.Sprintf(" [%04d] Address: %s", i, port.AddressLabel))
-			rows = append(rows, fmt.Sprintf("        Protocol: %s", port.ProtocolLabel))
-			keys := port.Properties.Keys()
-			sort.Strings(keys)
-			for _, k := range keys {
-				rows = append(rows, fmt.Sprintf("                  %s=%s", k, port.Properties.Get(k)))
+		for _, disc := range discoveries {
+			for i, port := range disc.ListSync() {
+				rows = append(rows, fmt.Sprintf(" [%04d] Address: %s", i, port.AddressLabel))
+				rows = append(rows, fmt.Sprintf("        Protocol: %s", port.ProtocolLabel))
+				keys := port.Properties.Keys()
+				sort.Strings(keys)
+				for _, k := range keys {
+					rows = append(rows, fmt.Sprintf("                  %s=%s", k, port.Properties.Get(k)))
+				}
 			}
 		}
 		l.Rows = rows
@@ -118,13 +129,16 @@ out:
 
 		ui.Render(l)
 	}
-	if err := disc.Quit(); err != nil {
-		log.Fatal("Error starting discovery:", err)
-	}
-	fmt.Println("Discovery QUITed")
 
-	for disc.IsAlive() {
-		time.Sleep(time.Millisecond)
+	for _, disc := range discoveries {
+		if err := disc.Quit(); err != nil {
+			log.Fatal("Error stopping discovery:", err)
+		}
+		fmt.Println("Discovery QUITed")
+		for disc.IsAlive() {
+			time.Sleep(time.Millisecond)
+		}
+		fmt.Println("Discovery correctly terminated")
 	}
-	fmt.Println("Discovery correctly terminated")
+
 }
