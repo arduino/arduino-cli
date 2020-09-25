@@ -963,6 +963,19 @@
     Location Priority
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#location-priorities-in-arduino-web-editor" class="md-nav__link">
+    Location priorities in Arduino Web Editor
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -1101,6 +1114,19 @@
   <a href="#location-priority" class="md-nav__link">
     Location Priority
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#location-priorities-in-arduino-web-editor" class="md-nav__link">
+    Location priorities in Arduino Web Editor
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1302,6 +1328,34 @@ compatible with it.</p>
 <li>The library is bundled with the Arduino IDE
    (<a href="../platform-specification/#global-predefined-properties"><code>{runtime.ide.path}/libraries</code></a>)<ul>
 <li>This location is only used by Arduino CLI when it's located in the Arduino IDE installation folder</li>
+</ul>
+</li>
+</ol>
+<h4 id="location-priorities-in-arduino-web-editor">Location priorities in Arduino Web Editor<a class="headerlink" href="#location-priorities-in-arduino-web-editor" title="Permanent link">&para;</a></h4>
+<p>The location priorities system works in the same manner in <a href="https://create.arduino.cc/editor">Arduino Web Editor</a>, but
+its cloud-based nature may make the locations of libraries less obvious.</p>
+<ol>
+<li><strong>Custom</strong>: the imported libraries, shown under the <strong>Libraries &gt; Custom</strong> tab.<ul>
+<li>These libraries are under <code>/tmp/\&lt;some number&gt;/custom</code></li>
+</ul>
+</li>
+<li><strong>Pinned</strong>: libraries that were <a href="../sketch-specification/#metadata">associated with the sketch</a> by choosing a specific
+   version from the library's "Include" dropdown menu.<ul>
+<li>These libraries are under <code>/tmp/\&lt;some number&gt;/pinned</code></li>
+<li>Note: clicking the "Include" button does not result in the library being pinned to the sketch.</li>
+</ul>
+</li>
+<li><strong><a href="../platform-specification/#platform-bundled-libraries">Platform bundled</a></strong>: these are listed under the
+   <strong>Libraries &gt; Default</strong> tab, but with "for \&lt;architecture name>" appended to the library name (e.g., "SPI for AVR").<ul>
+<li>These libraries are under <code>/home/builder/.arduino15/packages</code>
+ 1. <a href="../platform-specification/#platform-terminology">Board platform</a> bundled
+ 1. <a href="../platform-specification/#platform-terminology">Core platform</a> bundled</li>
+</ul>
+</li>
+<li><strong>Built-in</strong>:<ul>
+<li>The non-platform bundled libraries listed under the <strong>Libraries &gt; Default</strong> tab.</li>
+<li>Libraries listed under <strong>Libraries &gt; Library Manager</strong>.</li>
+<li>These libraries are under <code>/home/builder/opt/libraries/latest</code></li>
 </ul>
 </li>
 </ol>
