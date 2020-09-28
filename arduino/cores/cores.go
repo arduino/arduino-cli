@@ -35,12 +35,18 @@ type Platform struct {
 	Package      *Package                    `json:"-"`
 }
 
+// PlatformReleaseHelp represents the help URL for this Platform release
+type PlatformReleaseHelp struct {
+	Online string `json:"-"`
+}
+
 // PlatformRelease represents a release of a plaform package.
 type PlatformRelease struct {
 	Resource       *resources.DownloadResource
 	Version        *semver.Version
 	BoardsManifest []*BoardManifest
 	Dependencies   ToolDependencies       // The Dependency entries to load tools.
+	Help           PlatformReleaseHelp    `json:"-"`
 	Platform       *Platform              `json:"-"`
 	Properties     *properties.Map        `json:"-"`
 	Boards         map[string]*Board      `json:"-"`

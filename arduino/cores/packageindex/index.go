@@ -144,6 +144,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 		URL:             inPlatformRelease.URL,
 		CachePath:       "packages",
 	}
+	outPlatformRelease.Help = cores.PlatformReleaseHelp{Online: inPlatformRelease.Help.Online}
 	outPlatformRelease.BoardsManifest = inPlatformRelease.extractBoardsManifest()
 	if deps, err := inPlatformRelease.extractDeps(); err == nil {
 		outPlatformRelease.Dependencies = deps
