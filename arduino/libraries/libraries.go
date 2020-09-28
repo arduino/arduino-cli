@@ -73,6 +73,7 @@ type Library struct {
 	License                string
 	Properties             *properties.Map
 	Examples               paths.PathList
+	declaredHeaders        []string
 	sourceHeaders          []string
 }
 
@@ -157,7 +158,15 @@ func (library *Library) LocationPriorityFor(platformRelease, refPlatformRelease 
 	return 0
 }
 
-// SourceHeaders returns the C++ headers in the library.
+// DeclaredHeaders returns the C++ headers that the library declares in library.properties
+func (library *Library) DeclaredHeaders() []string {
+	if library.declaredHeaders == nil {
+		library.declaredHeaders = []string{}
+	}
+	return library.declaredHeaders
+}
+
+// SourceHeaders returns all the C++ headers in the library even if not declared in library.properties
 func (library *Library) SourceHeaders() ([]string, error) {
 	if library.sourceHeaders == nil {
 		cppHeaders, err := library.SourceDir.ReadDir()
