@@ -146,11 +146,6 @@ func GetOutputLibrary(lib *libraries.Library) (*rpc.Library, error) {
 		cntplat = lib.ContainerPlatform.String()
 	}
 
-	libHeaders, err := lib.SourceHeaders()
-	if err != nil {
-		return nil, errors.Errorf("getting library headers: %s", err)
-	}
-
 	return &rpc.Library{
 		Name:              lib.Name,
 		Author:            lib.Author,
@@ -175,7 +170,7 @@ func GetOutputLibrary(lib *libraries.Library) (*rpc.Library, error) {
 		Version:           lib.Version.String(),
 		License:           lib.License,
 		Examples:          lib.Examples.AsStrings(),
-		ProvidesIncludes:  libHeaders,
+		ProvidesIncludes:  lib.DeclaredHeaders(),
 	}, nil
 }
 

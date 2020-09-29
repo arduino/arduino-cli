@@ -56,21 +56,18 @@ def test_list(run_command):
     assert 1 == len(data)
     # be sure data contains the available version
     assert "" != data[0]["release"]["version"]
-    # be sure data contains the correct provides_includes field
-    assert "ArduinoJson.h" == data[0]["library"]["provides_includes"][0]
-    assert "ArduinoJson.hpp" == data[0]["library"]["provides_includes"][1]
 
     # Install something we can list without provides_includes field given in library.properties
-    result = run_command("lib install Braccio@2.0.4")
+    result = run_command("lib install Arduino_APDS9960@1.0.3")
     assert result.ok
     # Look at the JSON output
-    result = run_command("lib list Braccio --format json")
+    result = run_command("lib list Arduino_APDS9960 --format json")
     assert result.ok
     assert "" == result.stderr
     data = json.loads(result.stdout)
     assert 1 == len(data)
     # be sure data contains the correct provides_includes field
-    assert "Braccio.h" == data[0]["library"]["provides_includes"][0]
+    assert "Arduino_APDS9960.h" == data[0]["library"]["provides_includes"][0]
 
 
 def test_install(run_command):
