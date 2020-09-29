@@ -16,10 +16,13 @@
 package packagemanager
 
 import (
+	"encoding/json"
 	"fmt"
 	"runtime"
+	"strconv"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/pkg/errors"
 )
@@ -39,6 +42,92 @@ func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease
 	} else {
 		return err
 	}
+	if err := pm.cacheInstalledJSON(platformRelease); err != nil {
+		return errors.Errorf("creating installed.json in %s: %s", platformRelease.InstallDir, err)
+	}
+	return nil
+}
+
+func platformReleaseToIndex(pr *cores.PlatformRelease) packageindex.IndexPlatformRelease {
+	boards := []packageindex.IndexBoard{}
+	for name := range pr.Boards {
+		boards = append(boards, packageindex.IndexBoard{
+			Name: name,
+		})
+	}
+
+	tools := []packageindex.IndexToolDependency{}
+	for _, t := range pr.Dependencies {
+		tools = append(tools, packageindex.IndexToolDependency{
+			Packager: t.ToolPackager,
+			Name:     t.ToolName,
+			Version:  t.ToolVersion,
+		})
+	}
+	return packageindex.IndexPlatformRelease{
+		Name:             pr.Platform.Name,
+		Architecture:     pr.Platform.Architecture,
+		Version:          pr.Version,
+		Category:         pr.Platform.Category,
+		URL:              pr.Resource.URL,
+		ArchiveFileName:  pr.Resource.ArchiveFileName,
+		Checksum:         pr.Resource.Checksum,
+		Size:             json.Number(strconv.FormatInt(pr.Resource.Size, 10)),
+		Boards:           boards,
+		Help:             packageindex.IndexHelp{Online: pr.Help.Online},
+		ToolDependencies: tools,
+	}
+}
+
+func packageToolsToIndex(tools map[string]*cores.Tool) []*packageindex.IndexToolRelease {
+	ret := []*packageindex.IndexToolRelease{}
+	for name, tool := range tools {
+		for _, toolRelease := range tool.Releases {
+			flavours := []packageindex.IndexToolReleaseFlavour{}
+			for _, flavour := range toolRelease.Flavors {
+				flavours = append(flavours, packageindex.IndexToolReleaseFlavour{
+					OS:              flavour.OS,
+					URL:             flavour.Resource.URL,
+					ArchiveFileName: flavour.Resource.ArchiveFileName,
+					Size:            json.Number(strconv.FormatInt(flavour.Resource.Size, 10)),
+					Checksum:        flavour.Resource.Checksum,
+				})
+			}
+			ret = append(ret, &packageindex.IndexToolRelease{
+				Name:    name,
+				Version: toolRelease.Version,
+				Systems: flavours,
+			})
+		}
+	}
+	return ret
+}
+
+func (pm *PackageManager) cacheInstalledJSON(platformRelease *cores.PlatformRelease) error {
+	indexPlatformRelease := platformReleaseToIndex(platformRelease)
+	indexPackageToolReleases := packageToolsToIndex(platformRelease.Platform.Package.Tools)
+
+	index := packageindex.Index{
+		IsTrusted: platformRelease.IsTrusted,
+		Packages: []*packageindex.IndexPackage{
+			{
+				Name:       platformRelease.Platform.Package.Name,
+				Maintainer: platformRelease.Platform.Package.Maintainer,
+				WebsiteURL: platformRelease.Platform.Package.WebsiteURL,
+				URL:        platformRelease.Platform.Package.URL,
+				Email:      platformRelease.Platform.Package.Email,
+				Platforms:  []*packageindex.IndexPlatformRelease{&indexPlatformRelease},
+				Tools:      indexPackageToolReleases,
+				Help:       packageindex.IndexHelp{Online: platformRelease.Platform.Package.Help.Online},
+			},
+		},
+	}
+	platformJSON, err := json.MarshalIndent(index, "", "  ")
+	if err != nil {
+		return err
+	}
+	installedJSON := platformRelease.InstallDir.Join("installed.json")
+	installedJSON.WriteFile(platformJSON)
 	return nil
 }
 
