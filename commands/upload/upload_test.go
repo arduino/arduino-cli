@@ -55,7 +55,6 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		fqbn          *cores.FQBN
 		resBuildPath  string
 		resSketchName string
-		hasError      bool
 	}
 
 	blonk, err := sketches.NewSketchFromPath(paths.New("testdata/Blonk"))
@@ -66,52 +65,50 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 
 	tests := []test{
 		// 00: error: no data passed in
-		{"", "", nil, nil, "<nil>", "", true},
+		{"", "", nil, nil, "<nil>", ""},
 		// 01: use importFile to detect build.path and project_name
-		{"testdata/build_path_2/Blink.ino.hex", "", nil, nil, "testdata/build_path_2", "Blink.ino", false},
+		{"testdata/build_path_2/Blink.ino.hex", "", nil, nil, "testdata/build_path_2", "Blink.ino"},
 		// 02: use importPath as build.path and project_name
-		{"", "testdata/build_path_2", nil, nil, "testdata/build_path_2", "Blink.ino", false},
+		{"", "testdata/build_path_2", nil, nil, "testdata/build_path_2", "Blink.ino"},
 		// 03: error: used both importPath and importFile
-		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", nil, nil, "<nil>", "", true},
+		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", nil, nil, "<nil>", ""},
 		// 04: error: only sketch without FQBN
-		{"", "", blonk, nil, "<nil>", "", true},
+		{"", "", blonk, nil, "<nil>", ""},
 		// 05: use importFile to detect build.path and project_name, sketch is ignored.
-		{"testdata/build_path_2/Blink.ino.hex", "", blonk, nil, "testdata/build_path_2", "Blink.ino", false},
+		{"testdata/build_path_2/Blink.ino.hex", "", blonk, nil, "testdata/build_path_2", "Blink.ino"},
 		// 06: use importPath as build.path and Blink as project name, ignore the sketch Blonk
-		{"", "testdata/build_path_2", blonk, nil, "testdata/build_path_2", "Blink.ino", false},
+		{"", "testdata/build_path_2", blonk, nil, "testdata/build_path_2", "Blink.ino"},
 		// 07: error: used both importPath and importFile
-		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", blonk, nil, "<nil>", "", true},
+		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", blonk, nil, "<nil>", ""},
 
 		// 08: error: no data passed in
-		{"", "", nil, fqbn, "<nil>", "", true},
+		{"", "", nil, fqbn, "<nil>", ""},
 		// 09: use importFile to detect build.path and project_name, fqbn ignored
-		{"testdata/build_path_2/Blink.ino.hex", "", nil, fqbn, "testdata/build_path_2", "Blink.ino", false},
+		{"testdata/build_path_2/Blink.ino.hex", "", nil, fqbn, "testdata/build_path_2", "Blink.ino"},
 		// 10: use importPath as build.path and project_name, fqbn ignored
-		{"", "testdata/build_path_2", nil, fqbn, "testdata/build_path_2", "Blink.ino", false},
+		{"", "testdata/build_path_2", nil, fqbn, "testdata/build_path_2", "Blink.ino"},
 		// 11: error: used both importPath and importFile
-		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", nil, fqbn, "<nil>", "", true},
+		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", nil, fqbn, "<nil>", ""},
 		// 12: use sketch to determine project name and sketch+fqbn to determine build path
-		{"", "", blonk, fqbn, "testdata/Blonk/build/arduino.samd.mkr1000", "Blonk.ino", false},
+		{"", "", blonk, fqbn, "testdata/Blonk/build/arduino.samd.mkr1000", "Blonk.ino"},
 		// 13: use importFile to detect build.path and project_name, sketch+fqbn is ignored.
-		{"testdata/build_path_2/Blink.ino.hex", "", blonk, fqbn, "testdata/build_path_2", "Blink.ino", false},
+		{"testdata/build_path_2/Blink.ino.hex", "", blonk, fqbn, "testdata/build_path_2", "Blink.ino"},
 		// 14: use importPath as build.path and Blink as project name, ignore the sketch Blonk, ignore fqbn
-		{"", "testdata/build_path_2", blonk, fqbn, "testdata/build_path_2", "Blink.ino", false},
+		{"", "testdata/build_path_2", blonk, fqbn, "testdata/build_path_2", "Blink.ino"},
 		// 15: error: used both importPath and importFile
-		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", blonk, fqbn, "<nil>", "", true},
+		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", blonk, fqbn, "<nil>", ""},
 	}
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("SubTest%02d", i), func(t *testing.T) {
 			buildPath, sketchName, err := determineBuildPathAndSketchName(test.importFile, test.importDir, test.sketch, test.fqbn)
-			if test.hasError {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-			}
 			if test.resBuildPath == "<nil>" {
+				require.Error(t, err)
 				require.Nil(t, buildPath)
 			} else {
+				require.NoError(t, err)
 				resBuildPath := paths.New(test.resBuildPath)
 				require.NoError(t, resBuildPath.ToAbs())
+				require.NotNil(t, buildPath)
 				require.NoError(t, buildPath.ToAbs())
 				require.Equal(t, resBuildPath.String(), buildPath.String())
 			}
