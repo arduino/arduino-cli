@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -145,6 +146,15 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 		CachePath:       "packages",
 	}
 	outPlatformRelease.Help = cores.PlatformReleaseHelp{Online: inPlatformRelease.Help.Online}
+	outPlatformRelease.Boards = map[string]*cores.Board{}
+	for _, board := range inPlatformRelease.Boards {
+		outPlatformRelease.Boards[board.Name] = &cores.Board{
+			Properties: properties.NewFromHashmap(map[string]string{
+				"name": board.Name,
+			}),
+			PlatformRelease: outPlatformRelease,
+		}
+	}
 	outPlatformRelease.BoardsManifest = inPlatformRelease.extractBoardsManifest()
 	if deps, err := inPlatformRelease.extractDeps(); err == nil {
 		outPlatformRelease.Dependencies = deps
