@@ -97,6 +97,11 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		{"", "testdata/build_path_2", blonk, fqbn, "testdata/build_path_2", "Blink.ino"},
 		// 15: error: used both importPath and importFile
 		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", blonk, fqbn, "<nil>", ""},
+
+		// 16: importPath containing multiple firmwares, but one has the same name as the containing folder
+		{"", "testdata/firmware", nil, fqbn, "testdata/firmware", "firmware.ino"},
+		// 17: importFile among multiple firmwares
+		{"testdata/firmware/another_firmware.ino.bin", "", nil, fqbn, "testdata/firmware", "another_firmware.ino"},
 	}
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("SubTest%02d", i), func(t *testing.T) {

@@ -438,6 +438,15 @@ func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {
 		return "", err
 	}
 
+	if absBuildPath, err := buildPath.Abs(); err == nil {
+		candidateName := absBuildPath.Base() + ".ino"
+		f := files.Clone()
+		f.FilterPrefix(candidateName + ".")
+		if f.Len() > 0 {
+			return candidateName, nil
+		}
+	}
+
 	candidateName := ""
 	var candidateFile *paths.Path
 	for _, file := range files {
