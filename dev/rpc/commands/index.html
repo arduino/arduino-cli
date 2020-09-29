@@ -1394,6 +1394,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#librarycompatiblewithentry" class="md-nav__link">
+    Library.CompatibleWithEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#librarypropertiesentry" class="md-nav__link">
     Library.PropertiesEntry
   </a>
@@ -2320,6 +2327,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#librarycompatiblewithentry" class="md-nav__link">
+    Library.CompatibleWithEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#librarypropertiesentry" class="md-nav__link">
     Library.PropertiesEntry
   </a>
@@ -2673,6 +2687,7 @@
 <li><a href="#cc.arduino.cli.commands.DownloadResource">DownloadResource</a></li>
 <li><a href="#cc.arduino.cli.commands.InstalledLibrary">InstalledLibrary</a></li>
 <li><a href="#cc.arduino.cli.commands.Library">Library</a></li>
+<li><a href="#cc.arduino.cli.commands.Library.CompatibleWithEntry">Library.CompatibleWithEntry</a></li>
 <li><a href="#cc.arduino.cli.commands.Library.PropertiesEntry">Library.PropertiesEntry</a></li>
 <li><a href="#cc.arduino.cli.commands.LibraryDependency">LibraryDependency</a></li>
 <li><a href="#cc.arduino.cli.commands.LibraryDependencyStatus">LibraryDependencyStatus</a></li>
@@ -5012,6 +5027,38 @@
 <td><a href="#string">string</a></td>
 <td>repeated</td>
 <td>Value of the <code>includes</code> field in library.properties or, if missing, the list of include files available on the library source root directory.</td>
+</tr>
+<tr>
+<td>compatible_with</td>
+<td><a href="#cc.arduino.cli.commands.Library.CompatibleWithEntry">Library.CompatibleWithEntry</a></td>
+<td>repeated</td>
+<td>Map of FQBNs that specifies if library is compatible with this library</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.Library.CompatibleWithEntry"></a></p>
+<h3 id="librarycompatiblewithentry">Library.CompatibleWithEntry<a class="headerlink" href="#librarycompatiblewithentry" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>key</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>value</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
