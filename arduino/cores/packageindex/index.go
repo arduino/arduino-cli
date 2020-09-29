@@ -30,24 +30,24 @@ import (
 
 // Index represents Cores and Tools struct as seen from package_index.json file.
 type Index struct {
-	Packages  []*indexPackage `json:"packages"`
+	Packages  []*IndexPackage `json:"packages"`
 	IsTrusted bool
 }
 
-// indexPackage represents a single entry from package_index.json file.
-type indexPackage struct {
+// IndexPackage represents a single entry from package_index.json file.
+type IndexPackage struct {
 	Name       string                  `json:"name,required"`
 	Maintainer string                  `json:"maintainer,required"`
 	WebsiteURL string                  `json:"websiteUrl"`
 	URL        string                  `json:"Url"`
 	Email      string                  `json:"email"`
-	Platforms  []*indexPlatformRelease `json:"platforms,required"`
-	Tools      []*indexToolRelease     `json:"tools,required"`
-	Help       indexHelp               `json:"help,omitempty"`
+	Platforms  []*IndexPlatformRelease `json:"platforms,required"`
+	Tools      []*IndexToolRelease     `json:"tools,required"`
+	Help       IndexHelp               `json:"help,omitempty"`
 }
 
-// indexPlatformRelease represents a single Core Platform from package_index.json file.
-type indexPlatformRelease struct {
+// IndexPlatformRelease represents a single Core Platform from package_index.json file.
+type IndexPlatformRelease struct {
 	Name             string                `json:"name,required"`
 	Architecture     string                `json:"architecture"`
 	Version          *semver.Version       `json:"version,required"`
@@ -56,27 +56,27 @@ type indexPlatformRelease struct {
 	ArchiveFileName  string                `json:"archiveFileName,required"`
 	Checksum         string                `json:"checksum,required"`
 	Size             json.Number           `json:"size,required"`
-	Boards           []indexBoard          `json:"boards"`
-	Help             indexHelp             `json:"help,omitempty"`
-	ToolDependencies []indexToolDependency `json:"toolsDependencies,required"`
+	Boards           []IndexBoard          `json:"boards"`
+	Help             IndexHelp             `json:"help,omitempty"`
+	ToolDependencies []IndexToolDependency `json:"toolsDependencies,required"`
 }
 
-// indexToolDependency represents a single dependency of a core from a tool.
-type indexToolDependency struct {
+// IndexToolDependency represents a single dependency of a core from a tool.
+type IndexToolDependency struct {
 	Packager string                 `json:"packager,required"`
 	Name     string                 `json:"name,required"`
 	Version  *semver.RelaxedVersion `json:"version,required"`
 }
 
-// indexToolRelease represents a single Tool from package_index.json file.
-type indexToolRelease struct {
+// IndexToolRelease represents a single Tool from package_index.json file.
+type IndexToolRelease struct {
 	Name    string                    `json:"name,required"`
 	Version *semver.RelaxedVersion    `json:"version,required"`
-	Systems []indexToolReleaseFlavour `json:"systems,required"`
+	Systems []IndexToolReleaseFlavour `json:"systems,required"`
 }
 
-// indexToolReleaseFlavour represents a single tool flavor in the package_index.json file.
-type indexToolReleaseFlavour struct {
+// IndexToolReleaseFlavour represents a single tool flavor in the package_index.json file.
+type IndexToolReleaseFlavour struct {
 	OS              string      `json:"host,required"`
 	URL             string      `json:"url,required"`
 	ArchiveFileName string      `json:"archiveFileName,required"`
@@ -84,17 +84,18 @@ type indexToolReleaseFlavour struct {
 	Checksum        string      `json:"checksum,required"`
 }
 
-// indexBoard represents a single Board as written in package_index.json file.
-type indexBoard struct {
+// IndexBoard represents a single Board as written in package_index.json file.
+type IndexBoard struct {
 	Name string         `json:"name"`
-	ID   []indexBoardID `json:"id"`
+	ID   []indexBoardID `json:"id,omitempty"`
 }
 
 type indexBoardID struct {
 	USB string `json:"usb"`
 }
 
-type indexHelp struct {
+// IndexHelp represents the help URL
+type IndexHelp struct {
 	Online string `json:"online,omitempty"`
 }
 
@@ -106,7 +107,7 @@ func (index Index) MergeIntoPackages(outPackages cores.Packages) {
 	}
 }
 
-func (inPackage indexPackage) extractPackageIn(outPackages cores.Packages, trusted bool) {
+func (inPackage IndexPackage) extractPackageIn(outPackages cores.Packages, trusted bool) {
 	outPackage := outPackages.GetOrCreatePackage(inPackage.Name)
 	outPackage.Maintainer = inPackage.Maintainer
 	outPackage.WebsiteURL = inPackage.WebsiteURL
@@ -123,7 +124,7 @@ func (inPackage indexPackage) extractPackageIn(outPackages cores.Packages, trust
 	}
 }
 
-func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *cores.Package, trusted bool) error {
+func (inPlatformRelease IndexPlatformRelease) extractPlatformIn(outPackage *cores.Package, trusted bool) error {
 	outPlatform := outPackage.GetOrCreatePlatform(inPlatformRelease.Architecture)
 	// FIXME: shall we use the Name and Category of the latest release? or maybe move Name and Category in PlatformRelease?
 	outPlatform.Name = inPlatformRelease.Name
@@ -164,7 +165,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	return nil
 }
 
-func (inPlatformRelease indexPlatformRelease) extractDeps() (cores.ToolDependencies, error) {
+func (inPlatformRelease IndexPlatformRelease) extractDeps() (cores.ToolDependencies, error) {
 	ret := make(cores.ToolDependencies, len(inPlatformRelease.ToolDependencies))
 	for i, dep := range inPlatformRelease.ToolDependencies {
 		ret[i] = &cores.ToolDependency{
@@ -176,7 +177,7 @@ func (inPlatformRelease indexPlatformRelease) extractDeps() (cores.ToolDependenc
 	return ret, nil
 }
 
-func (inPlatformRelease indexPlatformRelease) extractBoardsManifest() []*cores.BoardManifest {
+func (inPlatformRelease IndexPlatformRelease) extractBoardsManifest() []*cores.BoardManifest {
 	boards := make([]*cores.BoardManifest, len(inPlatformRelease.Boards))
 	for i, board := range inPlatformRelease.Boards {
 		manifest := &cores.BoardManifest{Name: board.Name}
@@ -190,15 +191,15 @@ func (inPlatformRelease indexPlatformRelease) extractBoardsManifest() []*cores.B
 	return boards
 }
 
-func (inToolRelease indexToolRelease) extractToolIn(outPackage *cores.Package) {
+func (inToolRelease IndexToolRelease) extractToolIn(outPackage *cores.Package) {
 	outTool := outPackage.GetOrCreateTool(inToolRelease.Name)
 
 	outToolRelease := outTool.GetOrCreateRelease(inToolRelease.Version)
 	outToolRelease.Flavors = inToolRelease.extractFlavours()
 }
 
-// extractFlavours extracts a map[OS]Flavor object from an indexToolRelease entry.
-func (inToolRelease indexToolRelease) extractFlavours() []*cores.Flavor {
+// extractFlavours extracts a map[OS]Flavor object from an IndexToolRelease entry.
+func (inToolRelease IndexToolRelease) extractFlavours() []*cores.Flavor {
 	ret := make([]*cores.Flavor, len(inToolRelease.Systems))
 	for i, flavour := range inToolRelease.Systems {
 		size, _ := flavour.Size.Int64()
