@@ -70,6 +70,76 @@ def test_list(run_command):
     assert "Arduino_APDS9960.h" == data[0]["library"]["provides_includes"][0]
 
 
+def test_list_exit_code(run_command):
+    # Init the environment explicitly
+    assert run_command("core update-index")
+
+    assert run_command("core list")
+
+    # Verifies lib list doesn't fail when platform is not specified
+    result = run_command("lib list")
+    assert result.ok
+    assert result.stderr.strip() == ""
+
+    # Verify lib list command fails because specified platform is not installed
+    result = run_command("lib list -b arduino:samd:mkr1000")
+    assert result.failed
+    assert (
+        result.stderr.strip() == "Error listing Libraries: loading board data: platform arduino:samd is not installed"
+    )
+
+    assert run_command('lib install "AllThingsTalk LoRaWAN SDK"')
+
+    # Verifies lib list command keeps failing
+    result = run_command("lib list -b arduino:samd:mkr1000")
+    assert result.failed
+    assert (
+        result.stderr.strip() == "Error listing Libraries: loading board data: platform arduino:samd is not installed"
+    )
+
+    assert run_command("core install arduino:samd")
+
+    # Verifies lib list command now works since platform has been installed
+    result = run_command("lib list -b arduino:samd:mkr1000")
+    assert result.ok
+    assert result.stderr.strip() == ""
+
+
+def test_list_with_fqbn(run_command):
+    # Init the environment explicitly
+    assert run_command("core update-index")
+
+    # Install core
+    assert run_command("core install arduino:avr")
+
+    # Install some library
+    assert run_command("lib install ArduinoJson")
+    assert run_command("lib install wm8978-esp32")
+
+    # Look at the plain text output
+    result = run_command("lib list -b arduino:avr:uno")
+    assert result.ok
+    assert "" == result.stderr
+    lines = result.stdout.strip().splitlines()
+    assert 2 == len(lines)
+
+    # Verifies library is compatible
+    toks = [t.strip() for t in lines[1].split(maxsplit=4)]
+    assert 5 == len(toks)
+    assert "ArduinoJson" == toks[0]
+
+    # Look at the JSON output
+    result = run_command("lib list -b arduino:avr:uno --format json")
+    assert result.ok
+    assert "" == result.stderr
+    data = json.loads(result.stdout)
+    assert 1 == len(data)
+
+    # Verifies library is compatible
+    assert data[0]["library"]["name"] == "ArduinoJson"
+    assert data[0]["library"]["compatible_with"]["arduino:avr:uno"]
+
+
 def test_install(run_command):
     libs = ['"AzureIoTProtocol_MQTT"', '"CMMC MQTT Connector"', '"WiFiNINA"']
     # Should be safe to run install multiple times

@@ -76,7 +76,16 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	libs := res.GetInstalledLibrary()
+	libs := []*rpc.InstalledLibrary{}
+	if listFlags.fqbn == "" {
+		libs = res.GetInstalledLibrary()
+	} else {
+		for _, lib := range res.GetInstalledLibrary() {
+			if lib.Library.CompatibleWith[listFlags.fqbn] {
+				libs = append(libs, lib)
+			}
+		}
+	}
 
 	// To uniform the output to other commands, when there are no result
 	// print out an empty slice.
@@ -139,7 +148,6 @@ func (ir installedResult) String() string {
 			} else if len(sentence) > 40 {
 				sentence = sentence[:37] + "..."
 			}
-
 			t.AddRow(name, lib.Version, available, location, sentence)
 		}
 	}

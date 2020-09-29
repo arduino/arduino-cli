@@ -75,6 +75,7 @@ type Library struct {
 	Examples               paths.PathList
 	declaredHeaders        []string
 	sourceHeaders          []string
+	CompatibleWith         map[string]bool
 }
 
 func (library *Library) String() string {

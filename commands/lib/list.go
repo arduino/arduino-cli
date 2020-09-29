@@ -50,57 +50,67 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryList
 
 	instaledLib := []*rpc.InstalledLibrary{}
 	res := listLibraries(lm, req.GetUpdatable(), req.GetAll())
-	if len(res) > 0 {
-		if f := req.GetFqbn(); f != "" {
-			fqbn, err := cores.ParseFQBN(req.GetFqbn())
-			if err != nil {
-				return nil, fmt.Errorf("parsing fqbn: %s", err)
-			}
-			_, boardPlatform, _, _, refBoardPlatform, err := pm.ResolveFQBN(fqbn)
-			if err != nil {
-				return nil, fmt.Errorf("loading board data: %s", err)
-			}
-
-			filteredRes := map[string]*installedLib{}
-			for _, lib := range res {
-				if cp := lib.Library.ContainerPlatform; cp != nil {
-					if cp != boardPlatform && cp != refBoardPlatform {
-						// Filter all libraries from extraneous platforms
-						continue
-					}
-				}
-				if latest, has := filteredRes[lib.Library.Name]; has {
-					if latest.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) >= lib.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) {
-						continue
-					}
-				}
-				filteredRes[lib.Library.Name] = lib
-			}
-
-			res = []*installedLib{}
-			for _, lib := range filteredRes {
-				res = append(res, lib)
-			}
+	if f := req.GetFqbn(); f != "" {
+		fqbn, err := cores.ParseFQBN(req.GetFqbn())
+		if err != nil {
+			return nil, fmt.Errorf("parsing fqbn: %s", err)
+		}
+		_, boardPlatform, _, _, refBoardPlatform, err := pm.ResolveFQBN(fqbn)
+		if err != nil {
+			return nil, fmt.Errorf("loading board data: %s", err)
 		}
 
+		filteredRes := map[string]*installedLib{}
 		for _, lib := range res {
-			if nameFilter != "" && strings.ToLower(lib.Library.Name) != nameFilter {
-				continue
+			if cp := lib.Library.ContainerPlatform; cp != nil {
+				if cp != boardPlatform && cp != refBoardPlatform {
+					// Filter all libraries from extraneous platforms
+					continue
+				}
 			}
-			libtmp, err := GetOutputLibrary(lib.Library)
-			if err != nil {
-				return nil, err
+			if latest, has := filteredRes[lib.Library.Name]; has {
+				if latest.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) >= lib.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) {
+					continue
+				}
 			}
-			release := GetOutputRelease(lib.Available)
-			instaledLib = append(instaledLib, &rpc.InstalledLibrary{
-				Library: libtmp,
-				Release: release,
-			})
+
+			// Check if library is compatible with board specified by FBQN
+			compatible := false
+			for _, arch := range lib.Library.Architectures {
+				compatible = (arch == fqbn.PlatformArch || arch == "*")
+				if compatible {
+					break
+				}
+			}
+			lib.Library.CompatibleWith = map[string]bool{
+				f: compatible,
+			}
+
+			filteredRes[lib.Library.Name] = lib
 		}
 
-		return &rpc.LibraryListResp{InstalledLibrary: instaledLib}, nil
+		res = []*installedLib{}
+		for _, lib := range filteredRes {
+			res = append(res, lib)
+		}
 	}
-	return &rpc.LibraryListResp{}, nil
+
+	for _, lib := range res {
+		if nameFilter != "" && strings.ToLower(lib.Library.Name) != nameFilter {
+			continue
+		}
+		libtmp, err := GetOutputLibrary(lib.Library)
+		if err != nil {
+			return nil, err
+		}
+		release := GetOutputRelease(lib.Available)
+		instaledLib = append(instaledLib, &rpc.InstalledLibrary{
+			Library: libtmp,
+			Release: release,
+		})
+	}
+
+	return &rpc.LibraryListResp{InstalledLibrary: instaledLib}, nil
 }
 
 // listLibraries returns the list of installed libraries. If updatable is true it
@@ -171,6 +181,7 @@ func GetOutputLibrary(lib *libraries.Library) (*rpc.Library, error) {
 		License:           lib.License,
 		Examples:          lib.Examples.AsStrings(),
 		ProvidesIncludes:  lib.DeclaredHeaders(),
+		CompatibleWith:    lib.CompatibleWith,
 	}, nil
 }
 
