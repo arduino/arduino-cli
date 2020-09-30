@@ -210,10 +210,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 			}
 
 			platform := targetPackage.GetOrCreatePlatform(architecture)
-			release, err := platform.GetOrCreateRelease(version)
-			if err != nil {
-				return fmt.Errorf("loading platform release: %s", err)
-			}
+			release := platform.GetOrCreateRelease(version)
 			release.IsIDEBundled = isIDEBundled
 			if isIDEBundled {
 				pm.Log.Infof("Package is built-in")
@@ -246,10 +243,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 				if err != nil {
 					return fmt.Errorf("invalid version dir %s: %s", versionDir, err)
 				}
-				release, err := platform.GetOrCreateRelease(version)
-				if err != nil {
-					return fmt.Errorf("loading platform release %s: %s", versionDir, err)
-				}
+				release := platform.GetOrCreateRelease(version)
 				if err := pm.loadPlatformRelease(release, versionDir); err != nil {
 					return fmt.Errorf("loading platform release %s: %s", versionDir, err)
 				}
