@@ -32,7 +32,7 @@ func main() {
 	discoveries := []*discovery.PluggableDiscovery{}
 	discEvent := make(chan *discovery.Event)
 	for _, discCmd := range os.Args[1:] {
-		disc, err := discovery.New(discCmd)
+		disc, err := discovery.New("", discCmd)
 		if err != nil {
 			log.Fatal("Error initializing discovery:", err)
 		}

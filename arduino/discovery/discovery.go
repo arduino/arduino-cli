@@ -29,6 +29,7 @@ import (
 // PluggableDiscovery is a tool that detects communication ports to interact
 // with the boards.
 type PluggableDiscovery struct {
+	id                   string
 	args                 []string
 	process              *executils.Process
 	outgoingCommandsPipe io.Writer
@@ -67,7 +68,7 @@ type Event struct {
 }
 
 // New create and connect to the given pluggable discovery
-func New(args ...string) (*PluggableDiscovery, error) {
+func New(id string, args ...string) (*PluggableDiscovery, error) {
 	proc, err := executils.NewProcess(args...)
 	if err != nil {
 		return nil, err
@@ -85,6 +86,7 @@ func New(args ...string) (*PluggableDiscovery, error) {
 	}
 	messageChan := make(chan *discoveryMessage)
 	disc := &PluggableDiscovery{
+		id:                   id,
 		process:              proc,
 		incomingMessagesChan: messageChan,
 		outgoingCommandsPipe: stdin,
@@ -92,6 +94,11 @@ func New(args ...string) (*PluggableDiscovery, error) {
 	}
 	go disc.jsonDecodeLoop(stdout, messageChan)
 	return disc, nil
+}
+
+// GetID returns the identifier for this discovery
+func (disc *PluggableDiscovery) GetID() string {
+	return disc.id
 }
 
 func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *discoveryMessage) {
