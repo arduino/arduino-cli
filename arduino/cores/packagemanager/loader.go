@@ -265,9 +265,19 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 	platform.InstallDir = path
 
 	// Some useful paths
+	installedJSONPath := path.Join("installed.json")
 	platformTxtPath := path.Join("platform.txt")
 	platformTxtLocalPath := path.Join("platform.local.txt")
 	programmersTxtPath := path.Join("programmers.txt")
+
+	// If the installed.json file is found load it, this is done to handle the
+	// case in which the platform's index and its url have been deleted locally,
+	// if we don't load it some information about the platform is lost
+	if installedJSONPath.Exist() {
+		if _, err := pm.LoadPackageIndexFromFile(installedJSONPath); err != nil {
+			return fmt.Errorf("loading %s: %s", installedJSONPath, err)
+		}
+	}
 
 	// Create platform properties
 	platform.Properties = platform.Properties.Clone() // TODO: why CLONE?

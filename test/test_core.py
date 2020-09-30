@@ -64,17 +64,24 @@ def test_core_search_no_args(run_command, httpserver):
     result = run_command("core search")
     assert result.ok
     num_platforms = 0
+    found = False
     for l in result.stdout.splitlines()[1:]:  # ignore the header on first line
         if l:  # ignore empty lines
-            assert not l.startswith("test:x86")
+            if l.startswith("test:x86"):
+                found = True
             num_platforms += 1
 
     # same thing in JSON format, also check the number of platforms found is the same
     result = run_command("core search --format json")
     assert result.ok
     platforms = json.loads(result.stdout)
+    found = False
+    platforms = json.loads(result.stdout)
     for elem in platforms:
-        assert elem.get("Name") != "test_core"
+        if elem.get("Name") == "test_core":
+            found = True
+            break
+    assert found
     assert len(platforms) == num_platforms
 
     # list all with additional urls, check the test core is there
