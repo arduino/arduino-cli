@@ -23,7 +23,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -87,10 +86,11 @@ type IndexToolReleaseFlavour struct {
 // IndexBoard represents a single Board as written in package_index.json file.
 type IndexBoard struct {
 	Name string         `json:"name"`
-	ID   []indexBoardID `json:"id,omitempty"`
+	ID   []IndexBoardID `json:"id,omitempty"`
 }
 
-type indexBoardID struct {
+// IndexBoardID represents the ID of a single board. i.e. uno, yun, diecimila, micro and the likes
+type IndexBoardID struct {
 	USB string `json:"usb"`
 }
 
@@ -147,15 +147,6 @@ func (inPlatformRelease IndexPlatformRelease) extractPlatformIn(outPackage *core
 		CachePath:       "packages",
 	}
 	outPlatformRelease.Help = cores.PlatformReleaseHelp{Online: inPlatformRelease.Help.Online}
-	outPlatformRelease.Boards = map[string]*cores.Board{}
-	for _, board := range inPlatformRelease.Boards {
-		outPlatformRelease.Boards[board.Name] = &cores.Board{
-			Properties: properties.NewFromHashmap(map[string]string{
-				"name": board.Name,
-			}),
-			PlatformRelease: outPlatformRelease,
-		}
-	}
 	outPlatformRelease.BoardsManifest = inPlatformRelease.extractBoardsManifest()
 	if deps, err := inPlatformRelease.extractDeps(); err == nil {
 		outPlatformRelease.Dependencies = deps

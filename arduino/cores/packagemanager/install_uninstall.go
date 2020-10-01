@@ -50,10 +50,16 @@ func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease
 
 func platformReleaseToIndex(pr *cores.PlatformRelease) packageindex.IndexPlatformRelease {
 	boards := []packageindex.IndexBoard{}
-	for name := range pr.Boards {
-		boards = append(boards, packageindex.IndexBoard{
-			Name: name,
-		})
+	for _, manifest := range pr.BoardsManifest {
+		board := packageindex.IndexBoard{
+			Name: manifest.Name,
+		}
+		for _, id := range manifest.ID {
+			if id.USB != "" {
+				board.ID = []packageindex.IndexBoardID{{USB: id.USB}}
+			}
+		}
+		boards = append(boards, board)
 	}
 
 	tools := []packageindex.IndexToolDependency{}
