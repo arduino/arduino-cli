@@ -18,7 +18,6 @@ package config
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -60,21 +59,5 @@ func (dr dumpResult) String() string {
 
 func runDumpCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config dump`")
-
-	configFlag := cmd.InheritedFlags().Lookup("config-file")
-	configFile := ""
-	if configFlag != nil {
-		configFile = configFlag.Value.String()
-	}
-
-	if configFile != "" {
-		viper.SetConfigFile(configFile)
-		err := viper.MergeInConfig()
-		if err != nil {
-			feedback.Errorf("Error reading config file: %s", configFile)
-			os.Exit(errorcodes.ErrBadArgument)
-		}
-	}
-
 	feedback.PrintResult(dumpResult{viper.AllSettings()})
 }

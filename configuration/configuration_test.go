@@ -30,6 +30,12 @@ func tmpDirOrDie() string {
 	if err != nil {
 		panic(fmt.Sprintf("error creating tmp dir: %v", err))
 	}
+	// Symlinks are evaluated becase the temp folder on Mac OS is inside /var, it's not writable
+	// and is a symlink to /private/var, we want the full path so we do this
+	dir, err = filepath.EvalSymlinks(dir)
+	if err != nil {
+		panic(fmt.Sprintf("error evaluating tmp dir symlink: %v", err))
+	}
 	return dir
 }
 
@@ -70,4 +76,41 @@ func BenchmarkSearchConfigTree(b *testing.B) {
 		s = searchConfigTree(target)
 	}
 	result = s
+}
+
+func TestFindConfigFile(t *testing.T) {
+	configFile := FindConfigFile([]string{"--config-file"})
+	require.Equal(t, "", configFile)
+
+	configFile = FindConfigFile([]string{"--config-file", "some/path/to/config"})
+	require.Equal(t, "some/path/to/config", configFile)
+
+	configFile = FindConfigFile([]string{"--config-file", "some/path/to/config/arduino-cli.yaml"})
+	require.Equal(t, "some/path/to/config/arduino-cli.yaml", configFile)
+
+	configFile = FindConfigFile([]string{})
+	require.Equal(t, "", configFile)
+
+	// Create temporary directories
+	tmp := tmpDirOrDie()
+	defer os.RemoveAll(tmp)
+	target := filepath.Join(tmp, "foo", "bar", "baz")
+	os.MkdirAll(target, os.ModePerm)
+	require.Nil(t, os.Chdir(target))
+
+	// Create a config file
+	f, err := os.Create(filepath.Join(target, "..", "..", "arduino-cli.yaml"))
+	require.Nil(t, err)
+	f.Close()
+
+	configFile = FindConfigFile([]string{})
+	require.Equal(t, filepath.Join(tmp, "foo", "arduino-cli.yaml"), configFile)
+
+	// Create another config file
+	f, err = os.Create(filepath.Join(target, "arduino-cli.yaml"))
+	require.Nil(t, err)
+	f.Close()
+
+	configFile = FindConfigFile([]string{})
+	require.Equal(t, filepath.Join(target, "arduino-cli.yaml"), configFile)
 }

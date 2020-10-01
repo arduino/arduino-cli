@@ -26,8 +26,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-var destDir string
-var overwrite bool
+var (
+	destDir   string
+	destFile  string
+	overwrite bool
+)
 
 const defaultFileName = "arduino-cli.yaml"
 
@@ -38,25 +41,21 @@ func initInitCommand() *cobra.Command {
 		Long:  "Creates or updates the configuration file in the data directory or custom directory with the current configuration settings.",
 		Example: "" +
 			"  # Writes current configuration to the configuration file in the data directory.\n" +
-			"  " + os.Args[0] + " config init",
+			"  " + os.Args[0] + " config init" +
+			"  " + os.Args[0] + " config init --dest-dir /home/user/MyDirectory" +
+			"  " + os.Args[0] + " config init --dest-file /home/user/MyDirectory/my_settings.yaml",
 		Args: cobra.NoArgs,
 		Run:  runInitCommand,
 	}
 	initCommand.Flags().StringVar(&destDir, "dest-dir", "", "Sets where to save the configuration file.")
+	initCommand.Flags().StringVar(&destFile, "dest-file", "", "Sets where to save the configuration file.")
 	initCommand.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing config file.")
 	return initCommand
 }
 
 func runInitCommand(cmd *cobra.Command, args []string) {
-	configFlag := cmd.InheritedFlags().Lookup("config-file")
-	configFilePath := ""
-
-	if configFlag != nil {
-		configFilePath = configFlag.Value.String()
-	}
-
-	if configFilePath != "" && destDir != "" {
-		feedback.Errorf("Can't use both --config-file and --dest-dir flags at the same time.")
+	if destFile != "" && destDir != "" {
+		feedback.Errorf("Can't use both --dest-file and --dest-dir flags at the same time.")
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -65,8 +64,8 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	var err error
 
 	switch {
-	case configFilePath != "":
-		configFileAbsPath, err = paths.New(configFilePath).Abs()
+	case destFile != "":
+		configFileAbsPath, err = paths.New(destFile).Abs()
 		if err != nil {
 			feedback.Errorf("Cannot find absolute path: %v", err)
 			os.Exit(errorcodes.ErrGeneric)

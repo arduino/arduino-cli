@@ -35,7 +35,13 @@ import (
 func Init(configPath string) {
 	// Config file metadata
 	jww.SetStdoutThreshold(jww.LevelFatal)
-	viper.SetConfigName("arduino-cli")
+
+	configDir := paths.New(configPath)
+	if configDir != nil && !configDir.IsDir() {
+		viper.SetConfigName(strings.TrimSuffix(configDir.Base(), configDir.Ext()))
+	} else {
+		viper.SetConfigName("arduino-cli")
+	}
 
 	// Get default data path if none was provided
 	if configPath == "" {
@@ -43,7 +49,7 @@ func Init(configPath string) {
 	}
 
 	// Add paths where to search for a config file
-	viper.AddConfigPath(configPath)
+	viper.AddConfigPath(filepath.Dir(configPath))
 
 	// Bind env vars
 	viper.SetEnvPrefix("ARDUINO")
@@ -185,23 +191,37 @@ func IsBundledInDesktopIDE() bool {
 }
 
 // FindConfigFile returns the config file path using the argument '--config-file' if specified or via the current working dir
-func FindConfigFile() string {
-
+func FindConfigFile(args []string) string {
 	configFile := ""
-	for i, arg := range os.Args {
+	for i, arg := range args {
 		// 0 --config-file ss
 		if arg == "--config-file" {
-			if len(os.Args) > i+1 {
-				configFile = os.Args[i+1]
+			if len(args) > i+1 {
+				configFile = args[i+1]
 			}
 		}
 	}
 
 	if configFile != "" {
-		return filepath.Dir(configFile)
+		return configFile
 	}
 
-	return ""
+	return searchCwdForConfig()
+}
+
+func searchCwdForConfig() string {
+	cwd, err := os.Getwd()
+
+	if err != nil {
+		return ""
+	}
+
+	configFile := searchConfigTree(cwd)
+	if configFile == "" {
+		return configFile
+	}
+
+	return configFile + string(os.PathSeparator) + "arduino-cli.yaml"
 }
 
 func searchConfigTree(cwd string) string {
