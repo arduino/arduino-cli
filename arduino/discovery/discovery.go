@@ -61,6 +61,13 @@ type Port struct {
 	IdentificationProperties *properties.Map `json:"identificationPrefs"`
 }
 
+func (p *Port) String() string {
+	if p == nil {
+		return "none"
+	}
+	return p.Address
+}
+
 // Event is a pluggable discovery event
 type Event struct {
 	Type string
@@ -98,6 +105,10 @@ func New(id string, args ...string) (*PluggableDiscovery, error) {
 
 // GetID returns the identifier for this discovery
 func (disc *PluggableDiscovery) GetID() string {
+	return disc.id
+}
+
+func (disc *PluggableDiscovery) String() string {
 	return disc.id
 }
 
