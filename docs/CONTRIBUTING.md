@@ -129,7 +129,9 @@ pip3 install --user poetry
 
 For more installation options read the [official documentation][poetry-docs].
 
-After Poetry has been installed you should be able to run the tests with:
+#### Running tests
+
+After the software requirements have been installed you should be able to run the tests with:
 
 ```shell
 task test-integration
@@ -137,6 +139,28 @@ task test-integration
 
 This will automatically install the necessary dependencies, if not already installed, and run the integration tests
 automatically.
+
+To run specific modules you must run `pytest` from the virtual environment created by Poetry.
+
+```shell
+poetry run pytest test/test_lib.py
+```
+
+To run very specific test functions:
+
+```shell
+poetry run pytest test/test_lib.py::test_list
+```
+
+You can avoid writing the `poetry run` prefix each time by creating a new shell inside the virtual environment:
+
+```shell
+poetry shell
+pytest test_lib.py
+pytest test_lib.py::test_list
+```
+
+#### Linting and formatting
 
 When editing any Python file in the project remember to run linting checks with:
 
