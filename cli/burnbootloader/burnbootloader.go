@@ -55,7 +55,7 @@ func NewCommand() *cobra.Command {
 	burnBootloaderCommand.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
 	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Turns on verbose mode.")
-	burnBootloaderCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Use the specified programmer to upload or 'list' to list supported programmers.")
+	burnBootloaderCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Use the specified programmer to upload.")
 
 	return burnBootloaderCommand
 }
@@ -65,21 +65,6 @@ func run(command *cobra.Command, args []string) {
 	if err != nil {
 		feedback.Errorf("Error during Upload: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
-	}
-
-	if programmer == "list" {
-		resp, err := upload.ListProgrammersAvailableForUpload(context.Background(), &rpc.ListProgrammersAvailableForUploadReq{
-			Instance: instance,
-			Fqbn:     fqbn,
-		})
-		if err != nil {
-			feedback.Errorf("Error listing programmers: %v", err)
-			os.Exit(errorcodes.ErrGeneric)
-		}
-		feedback.PrintResult(&programmersList{
-			Programmers: resp.GetProgrammers(),
-		})
-		os.Exit(0)
 	}
 
 	if _, err := upload.BurnBootloader(context.Background(), &rpc.BurnBootloaderReq{

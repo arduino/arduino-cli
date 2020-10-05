@@ -58,7 +58,7 @@ func NewCommand() *cobra.Command {
 	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", "Binary file to upload.")
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
-	uploadCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload or 'list' to list supported programmers.")
+	uploadCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload.")
 
 	return uploadCommand
 }
