@@ -1,0 +1,33 @@
+diff --git a/mkdocs-material/src/partials/footer.html b/mkdocs-material/src/partials/footer.html
+index 21924c41..31acf71b 100644
+--- a/mkdocs-material/src/partials/footer.html
++++ b/mkdocs-material/src/partials/footer.html
+@@ -81,27 +81,5 @@
+   {% endif %}
+
+   <!-- Further information -->
+-  <div class="md-footer-meta md-typeset">
+-    <div class="md-footer-meta__inner md-grid">
+-
+-      <!-- Copyright and theme information -->
+-      <div class="md-footer-copyright">
+-        {% if config.copyright %}
+-          <div class="md-footer-copyright__highlight">
+-            {{ config.copyright }}
+-          </div>
+-        {% endif %}
+-        Made with
+-        <a
+-          href="https://squidfunk.github.io/mkdocs-material/"
+-          target="_blank" rel="noopener"
+-        >
+-          Material for MkDocs
+-        </a>
+-      </div>
+-
+-      <!-- Social links -->
+-      {% include "partials/social.html" %}
+-    </div>
+-  </div>
++  <div id="arduino-footer"></div>
+ </footer>

@@ -1,0 +1,12 @@
+diff --git a/mkdocs-material/src/assets/stylesheets/main/layout/_base.scss b/mkdocs-material/src/assets/stylesheets/main/layout/_base.scss
+index 10245844..bc91241a 100644
+--- a/mkdocs-material/src/assets/stylesheets/main/layout/_base.scss
++++ b/mkdocs-material/src/assets/stylesheets/main/layout/_base.scss
+@@ -108,6 +108,7 @@ hr {
+   display: flex;
+   flex-direction: column;
+   flex-grow: 1;
++  margin-top: 8em;
+
+   // Hack: we must not use flex, or Firefox will only print the first page
+   // see https://mzl.la/39DgR3m

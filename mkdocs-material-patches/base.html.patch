@@ -1,0 +1,61 @@
+diff --git a/mkdocs-material/src/base.html b/mkdocs-material/src/base.html
+index 9cb7ebf9..ebdcb325 100644
+--- a/mkdocs-material/src/base.html
++++ b/mkdocs-material/src/base.html
+@@ -236,7 +236,9 @@
+
+     <!-- Application header -->
+     {% block header %}
+-      {% include "partials/header.html" %}
++    <div id="arduino-header" class="temporary">
++    </div>
++      <!-- {% include "partials/header.html" %} -->
+     {% endblock %}
+
+     <!-- Container, necessary for web-application context -->
+@@ -378,20 +380,35 @@
+         {{- translations | tojson -}}
+       </script>
+
+-      <!-- Application configuration -->
+-      {% block config %}{% endblock %}
++      <!-- Custom Arduino header-footer -->
++      <link rel="stylesheet" type="text/css" href="https://cdn.arduino.cc/header-footer/prod/index.v2.css">
++      <script src="https://cdn.arduino.cc/header-footer/prod/index.v2.js"></script>
+
+-      <!-- Application initialization -->
+-      <script>
+-        app = initialize({
+-          base: "{{ base_url }}",
+-          features: {{ config.theme.features or [] | tojson }},
+-          search: Object.assign({
+-            worker: "{{ 'assets/javascripts/worker/search.js' | url }}"
+-          }, typeof search !== "undefined" && search)
++      <script type="text/javascript">
++        window.auth = new arduinoHF.CustomAuth({
++          no_auth: true
++        });
++      </script>
++
++      <script type="text/javascript">
++        // Init header
++        window.arduinoHeader = new window.arduinoHF.Header(document.getElementById('arduino-header'), window.auth, {
++            env: 'prod',
++            style: 'arduino',
++            search: {
++              tab: 'reference'
++            }
+         })
++
++        window.arduinoFooter = new window.arduinoHF.Footer(document.getElementById('arduino-footer'), {
++          env: 'prod',
++          style: 'arduino'
++        });
+       </script>
+
++      <!-- Application configuration -->
++      {% block config %}{% endblock %}
++
+       <!-- Custom JavaScript -->
+       {% for path in config["extra_javascript"] %}
+         <script src="{{ path | url }}"></script>

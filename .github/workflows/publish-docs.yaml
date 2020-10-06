@@ -82,6 +82,9 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install -r ./requirements_docs.txt
 
+      - name: Build docs theme
+        run: task docs:build-theme
+
       - name: Publish docs
         # Determine docs version for the commit pushed and publish accordingly using Mike.
         # Publishing implies creating a git commit on the gh-pages branch, we let

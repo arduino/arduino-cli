@@ -13,11 +13,18 @@ copyright: Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
 
 # Theme
 theme:
-  name: material
+  name: null
+  custom_dir: mkdocs-material/material
   logo: img/icon_mac_light.png
   palette:
     primary: teal
     accent: orange
+  language: en
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon:
+    logo: logo
 
 # Extensions
 markdown_extensions:

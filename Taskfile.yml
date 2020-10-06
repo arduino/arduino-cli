@@ -28,12 +28,31 @@ tasks:
       - task: docs:gen:commands
       - task: docs:gen:protobuf
 
+  docs:patch-theme:
+    desc: Downloads documentation theme and patch it with custom header and footer
+    cmds:
+      - |
+        [[ -d mkdocs-material ]] && git clone https://github.com/squidfunk/mkdocs-material.git -b 5.5.14 --depth 1
+        # Ugly hack so that this doesn't fail if patch is already applied
+        git apply --check mkdocs-material-patches/*.patch && git apply mkdocs-material-patches/*.patch; echo
+
+  docs:build-theme:
+    decs: Builds documentation theme
+    dir: ./mkdocs-material
+    cmds:
+      - task: docs:patch-theme
+      - ignore_error: true
+      - npm install
+      - npm run-script build
+
   docs:build:
     desc: Build documentation website contents
     deps:
       - docs:gen:commands
       - docs:gen:protobuf
     cmds:
+      - task: docs:build-theme
+      - ignore_error: true
       - mkdocs build -s
 
   docs:publish:
@@ -62,7 +81,7 @@ tasks:
       - |
         npx -p markdown-link-check -c '
         STATUS=0
-        for file in $(find -name "*.md"); do
+        for file in $(find -path ./mkdocs-material -prune -o -name "*.md" -print); do
           markdown-link-check -c markdown-link-check-config.json -q "$file"
           STATUS=$(( $STATUS + $? ))
         done
