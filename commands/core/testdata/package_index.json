@@ -1,0 +1,135 @@
+{
+  "packages": [
+    {
+      "name": "arduino",
+      "maintainer": "Arduino",
+      "websiteURL": "https://www.arduino.cc/",
+      "email": "packages@arduino.cc",
+      "help": {
+        "online": "http://www.arduino.cc/en/Reference/HomePage"
+      },
+      "platforms": [
+        {
+          "name": "Arduino AVR Boards",
+          "architecture": "avr",
+          "version": "1.8.3",
+          "category": "Arduino",
+          "help": {
+            "online": "http://www.arduino.cc/en/Reference/HomePage"
+          },
+          "url": "http://downloads.arduino.cc/cores/avr-1.8.3.tar.bz2",
+          "archiveFileName": "avr-1.8.3.tar.bz2",
+          "checksum": "SHA-256:de8a9b982477762d3d3e52fc2b682cdd8ff194dc3f1d46f4debdea6a01b33c14",
+          "size": "4941548",
+          "boards": [
+            { "name": "Arduino Yún" },
+            { "name": "Arduino Uno" },
+            { "name": "Arduino Uno WiFi" },
+            { "name": "Arduino Diecimila" },
+            { "name": "Arduino Nano" },
+            { "name": "Arduino Mega" },
+            { "name": "Arduino MegaADK" },
+            { "name": "Arduino Leonardo" },
+            { "name": "Arduino Leonardo Ethernet" },
+            { "name": "Arduino Micro" },
+            { "name": "Arduino Esplora" },
+            { "name": "Arduino Mini" },
+            { "name": "Arduino Ethernet" },
+            { "name": "Arduino Fio" },
+            { "name": "Arduino BT" },
+            { "name": "Arduino LilyPadUSB" },
+            { "name": "Arduino Lilypad" },
+            { "name": "Arduino Pro" },
+            { "name": "Arduino ATMegaNG" },
+            { "name": "Arduino Robot Control" },
+            { "name": "Arduino Robot Motor" },
+            { "name": "Arduino Gemma" },
+            { "name": "Adafruit Circuit Playground" },
+            { "name": "Arduino Yún Mini" },
+            { "name": "Arduino Industrial 101" },
+            { "name": "Linino One" }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "7.3.0-atmel3.6.1-arduino7"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.3.0-arduino17"
+            },
+            {
+              "packager": "arduino",
+              "name": "arduinoOTA",
+              "version": "1.3.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Retrokits-RK002",
+      "maintainer": "Retrokits (www.retrokits.com)",
+      "websiteURL": "https://www.retrokits.com",
+      "email": "info@retrokits.com",
+      "help": { "online": "https://www.retrokits.com/rk002/arduino" },
+      "platforms": [
+        {
+          "name": "RK002",
+          "architecture": "arm",
+          "version": "1.0.5",
+          "category": "Contributed",
+          "help": {
+            "online": "https://www.retrokits.com/rk002/arduino"
+          },
+          "url": "https://www.retrokits.com/rk002/arduino/retrokits-rk002-1.0.5.tar.bz2",
+          "archiveFileName": "retrokits-rk002-1.0.5.tar.bz2",
+          "checksum": "SHA-256:9a012867baf4bb26f656f84502e0acce6a653c3452cca4505ebac77256802fb6",
+          "size": "290784",
+          "boards": [{ "name": "RK002" }],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "version": "4.8.3-2014q1",
+              "name": "arm-none-eabi-gcc"
+            }
+          ]
+        }
+      ],
+      "tools": []
+    },
+    {
+      "name": "Retrokits-RK002",
+      "maintainer": "Retrokits (www.retrokits.com)",
+      "websiteURL": "https://www.retrokits.com",
+      "email": "info@retrokits.com",
+      "help": { "online": "https://www.retrokits.com/rk002/arduino" },
+      "platforms": [
+        {
+          "name": "RK002",
+          "architecture": "arm",
+          "version": "1.0.6",
+          "category": "Contributed",
+          "help": {
+            "online": "https://www.retrokits.com/rk002/arduino"
+          },
+          "url": "https://www.retrokits.com/rk002/arduino/retrokits-rk002-1.0.6.tar.bz2",
+          "archiveFileName": "retrokits-rk002-1.0.6.tar.bz2",
+          "checksum": "SHA-256:8a3b63efcf4dfaed047a37844861387e542d8519485b5305d5979630cb3feb20",
+          "size": "291631",
+          "boards": [{ "name": "RK002" }],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "version": "4.8.3-2014q1",
+              "name": "arm-none-eabi-gcc"
+            }
+          ]
+        }
+      ],
+      "tools": []
+    }
+  ]
+}

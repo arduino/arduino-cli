@@ -59,7 +59,9 @@ func PlatformSearch(instanceID int32, searchArgs string, allVersions bool) (*rpc
 				}
 
 				// platform has a valid release, check if it matches the search arguments
-				if match(platform.Name, searchArgs) || match(platform.Architecture, searchArgs) || exactMatch(platform.String(), searchArgs) {
+				if match(platform.Name, searchArgs) || match(platform.Architecture, searchArgs) ||
+					exactMatch(platform.String(), searchArgs) || match(targetPackage.Name, searchArgs) ||
+					match(targetPackage.Maintainer, searchArgs) || match(targetPackage.WebsiteURL, searchArgs) {
 					if allVersions {
 						res = append(res, platform.GetAllReleases()...)
 					} else {
