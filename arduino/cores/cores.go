@@ -218,7 +218,7 @@ func (release *PlatformRelease) RequiresToolRelease(toolRelease *ToolRelease) bo
 	for _, toolDep := range release.Dependencies {
 		if toolDep.ToolName == toolRelease.Tool.Name &&
 			toolDep.ToolPackager == toolRelease.Tool.Package.Name &&
-			toolDep.ToolVersion == toolRelease.Version {
+			toolDep.ToolVersion.Equal(toolRelease.Version) {
 			return true
 		}
 	}
