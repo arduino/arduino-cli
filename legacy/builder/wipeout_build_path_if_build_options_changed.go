@@ -21,8 +21,8 @@ import (
 
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
@@ -30,6 +30,9 @@ import (
 type WipeoutBuildPathIfBuildOptionsChanged struct{}
 
 func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
+	if ctx.Clean {
+		return doCleanup(ctx.BuildPath)
+	}
 	if ctx.BuildOptionsJsonPrevious == "" {
 		return nil
 	}
@@ -64,18 +67,22 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 		}
 	}
 
+	return doCleanup(ctx.BuildPath)
+}
+
+func doCleanup(buildPath *paths.Path) error {
 	// FIXME: this should go outside legacy and behind a `logrus` call so users can
 	// control when this should be printed.
 	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED)
 
-	buildPath := ctx.BuildPath
-	files, err := gohasissues.ReadDir(buildPath.String())
-	if err != nil {
-		return errors.WithStack(err)
+	if files, err := buildPath.ReadDir(); err != nil {
+		return errors.WithMessage(err, "cleaning build path")
+	} else {
+		for _, file := range files {
+			if err := file.RemoveAll(); err != nil {
+				return errors.WithMessage(err, "cleaning build path")
+			}
+		}
 	}
-	for _, file := range files {
-		buildPath.Join(file.Name()).RemoveAll()
-	}
-
 	return nil
 }

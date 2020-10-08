@@ -40,6 +40,7 @@ message CompileReq {
   bool optimizeForDebug = 16; // Optimize compile output for debug, not for release.
   bool dryRun = 17; // When set to `true` the compiled binary will not be copied to the export directory.
   string export_dir = 18; // Optional: save the build artifacts in this directory, the directory must exist.
+  bool clean = 19; // Optional: cleanup the build folder and do not use any previously cached build
 }
 
 message CompileResp {
