@@ -1159,7 +1159,6 @@
 <div class="highlight"><pre><span></span><code>brew update
 brew install arduino-cli
 </code></pre></div>
-
 <h4 id="command-line-completion">Command line completion<a class="headerlink" href="#command-line-completion" title="Permanent link">&para;</a></h4>
 <p><a href="../command-line-completion/#brew">Command line completion</a> files are already bundled in the homebrew installation.</p>
 <h3 id="use-the-install-script">Use the install script<a class="headerlink" href="#use-the-install-script" title="Permanent link">&para;</a></h3>
@@ -1168,18 +1167,15 @@ script may be run on Windows by installing <a href="https://gitforwindows.org/">
 <p>This script will install the latest version of Arduino CLI to <code>$PWD/bin</code>:</p>
 <div class="highlight"><pre><span></span><code>curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh <span class="p">|</span> sh
 </code></pre></div>
-
 <p>If you want to target a different directory, for example <code>~/local/bin</code>, set the <code>BINDIR</code> environment variable like this:</p>
 <div class="highlight"><pre><span></span><code>curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh <span class="p">|</span> <span class="nv">BINDIR</span><span class="o">=</span>~/local/bin sh
 </code></pre></div>
-
 <p>If you would like to use the <code>arduino-cli</code> command from any location, install Arduino CLI to a directory already in your
 <code>PATH</code> or add the Arduino CLI installation path to your <code>PATH</code> environment variable.</p>
 <p>If you want to download a specific arduino-cli version, for example <code>0.9.0</code>, pass the version number as a parameter like
 this:</p>
 <div class="highlight"><pre><span></span><code>curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh <span class="p">|</span> sh -s <span class="m">0</span>.9.0
 </code></pre></div>
-
 <h3 id="download">Download<a class="headerlink" href="#download" title="Permanent link">&para;</a></h3>
 <p>Pre-built binaries for all the supported platforms are available for download from the links below.</p>
 <p>If you would like to use the <code>arduino-cli</code> command from any location, extract the downloaded file to a directory already
@@ -1258,9 +1254,7 @@ to get the latest nightly build available for the supported platform, use the fo
 </tbody>
 </table>
 <!-- prettier-ignore -->
-
 <!-- prettier-ignore -->
-
 <blockquote>
 <p>These links return a <code>302: Found</code> response, redirecting to latest generated builds by replacing <code>latest</code> with the
 latest available build date, using the format YYYYMMDD (i.e for 2019/Aug/06 <code>latest</code> is replaced with <code>20190806</code> )</p>
@@ -1274,7 +1268,6 @@ locally with your Go toolchain. Please refer to the <a href="../CONTRIBUTING/">C
 can use Docker to get a binary directly from sources. From the project folder run:</p>
 <div class="highlight"><pre><span></span><code>docker run -v <span class="nv">$PWD</span>:/arduino-cli -w /arduino-cli -e <span class="nv">PACKAGE_NAME_PREFIX</span><span class="o">=</span><span class="s1">&#39;snapshot&#39;</span> arduino/arduino-cli:builder-1 goreleaser --rm-dist --snapshot --skip-publish
 </code></pre></div>
-
 <p>Once the build is over, you will find a <code>./dist/</code> folder containing the packages built out of the current source tree.</p>
                 
                   

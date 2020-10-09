@@ -1163,11 +1163,9 @@ active users).</p>
   <span class="nt">&quot;packages&quot;</span><span class="p">:</span> <span class="p">[</span><span class="err">PACKAGE_XXXX</span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>3<sup>rd</sup> party vendors should use a single <code>PACKAGE_XXXX</code> that is a dictionary map with the vendor's metadata, a list of
 <code>PLATFORMS</code> and a list of <code>TOOLS</code>. For example:</p>
 <!-- prettier-ignore -->
-
 <div class="highlight"><pre><span></span><code>    <span class="p">{</span>
       <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span>
       <span class="nt">&quot;maintainer&quot;</span><span class="p">:</span> <span class="s2">&quot;Arduino LLC&quot;</span><span class="p">,</span>
@@ -1185,7 +1183,6 @@ active users).</p>
       <span class="p">]</span>
     <span class="p">}</span>
 </code></pre></div>
-
 <p>The metadata fields are:</p>
 <ul>
 <li><code>name</code>: the folder used for the installed cores. The
@@ -1244,7 +1241,6 @@ active users).</p>
           <span class="p">]</span>
         <span class="p">}</span><span class="err">,</span>
 </code></pre></div>
-
 <p>The field <code>name</code> and <code>version</code> are respectively the name and version of the tool. Each tool is uniquely identified by
 the triple (<code>packager</code>, <code>name</code>, <code>version</code>). <code>packager</code> (AKA "vendor") is defined by the <code>name</code> value of the tool's
 package. There can be many different versions of the same tool available at the same time, for example:</p>
@@ -1317,7 +1313,6 @@ that can be referenced from <code>platform.txt</code> using one of the following
           <span class="p">]</span>
         <span class="p">}</span><span class="err">,</span>
 </code></pre></div>
-
 <p>Each PLATFORM describes a core for a specific architecture. The fields needed are:</p>
 <ul>
 <li><code>name</code>: the extended name of the platform that is displayed on the Boards Manager GUI</li>
@@ -1417,7 +1412,6 @@ cause the Arduino IDE to no longer load until you have deleted the file from you
   <span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>In the example there is one <code>PACKAGE</code>, My Board. The package is compatible with the AVR architecture. There are two
 versions of the <code>PACKAGE</code>, 1.0.0 and 1.0.1. No <code>TOOLS</code> needed to be installed so that section was left empty.</p>
 <p>Here is the Boards Manager entry created by the example: <img alt="Boards Manager screenshot" src="../img/boards-manager-screenshot.png" /></p>

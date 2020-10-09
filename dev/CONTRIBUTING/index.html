@@ -1515,7 +1515,6 @@ submitting a PR:</p>
 <p>From the project folder root, just run:</p>
 <div class="highlight"><pre><span></span><code>task build
 </code></pre></div>
-
 <p>The project uses Go modules so dependencies will be downloaded automatically. At the end of the build, you should find
 an <code>arduino-cli</code> executable in the same folder.</p>
 <h3 id="running-the-tests">Running the tests<a class="headerlink" href="#running-the-tests" title="Permanent link">&para;</a></h3>
@@ -1525,31 +1524,25 @@ of the tests locally.</p>
 <p>To ensure code style is consistent, run:</p>
 <div class="highlight"><pre><span></span><code>task check
 </code></pre></div>
-
 <p>To run unit tests:</p>
 <div class="highlight"><pre><span></span><code>task test-unit
 </code></pre></div>
-
 <p>To run integration tests (these will take some time and require special setup, see following paragraph):</p>
 <div class="highlight"><pre><span></span><code>task test-integration
 </code></pre></div>
-
 <h4 id="running-only-some-tests">Running only some tests<a class="headerlink" href="#running-only-some-tests" title="Permanent link">&para;</a></h4>
 <p>By default, all tests from all go packages are run. To run only unit tests from one or more specific packages, you can
 set the TARGETS environment variable, e.g.:</p>
 <div class="codehilite"><pre><span></span><code>TARGETS=./arduino/cores/packagemanager task test-unit
 </code></pre></div>
 
-
 <p>Alternatively, to run only some specific test(s), you can specify a regex to match against the test function name:</p>
 <div class="codehilite"><pre><span></span><code>TEST_REGEX=&#39;^TestTryBuild.*&#39; task test-unit
 </code></pre></div>
 
-
 <p>Both can be combined as well, typically to run only a specific test:</p>
 <div class="codehilite"><pre><span></span><code>TEST_REGEX=&#39;^TestFindBoardWithFQBN$&#39; TARGETS=./arduino/cores/packagemanager task test-unit
 </code></pre></div>
-
 
 <h3 id="integration-tests">Integration tests<a class="headerlink" href="#integration-tests" title="Permanent link">&para;</a></h3>
 <p>Being a command line interface, Arduino CLI is heavily interactive and it has to stay consistent in accepting the user
@@ -1576,40 +1569,33 @@ with dependencies that might be only used by the Arduino CLI, to do so we use <a
 to install it (you might need to <code>sudo</code> the following command):</p>
 <div class="highlight"><pre><span></span><code>pip3 install --user poetry
 </code></pre></div>
-
 <p>For more installation options read the <a href="https://python-poetry.org/docs/">official documentation</a>.</p>
 <h4 id="running-tests">Running tests<a class="headerlink" href="#running-tests" title="Permanent link">&para;</a></h4>
 <p>After the software requirements have been installed you should be able to run the tests with:</p>
 <div class="highlight"><pre><span></span><code>task test-integration
 </code></pre></div>
-
 <p>This will automatically install the necessary dependencies, if not already installed, and run the integration tests
 automatically.</p>
 <p>To run specific modules you must run <code>pytest</code> from the virtual environment created by Poetry.</p>
 <div class="highlight"><pre><span></span><code>poetry run pytest test/test_lib.py
 </code></pre></div>
-
 <p>To run very specific test functions:</p>
 <div class="highlight"><pre><span></span><code>poetry run pytest test/test_lib.py::test_list
 </code></pre></div>
-
 <p>You can avoid writing the <code>poetry run</code> prefix each time by creating a new shell inside the virtual environment:</p>
 <div class="highlight"><pre><span></span><code>poetry shell
 pytest test_lib.py
 pytest test_lib.py::test_list
 </code></pre></div>
-
 <h4 id="linting-and-formatting">Linting and formatting<a class="headerlink" href="#linting-and-formatting" title="Permanent link">&para;</a></h4>
 <p>When editing any Python file in the project remember to run linting checks with:</p>
 <div class="highlight"><pre><span></span><code>task python:check
 </code></pre></div>
-
 <p>This will run <code>flake8</code> automatically and return any error in the code formatting, if not already installed it will also
 install integration tests dependencies.</p>
 <p>In case of linting errors you should be able to solve most of them by automatically formatting with:</p>
 <div class="highlight"><pre><span></span><code>task python:format
 </code></pre></div>
-
 <h4 id="configuration-files-formatting">Configuration files formatting<a class="headerlink" href="#configuration-files-formatting" title="Permanent link">&para;</a></h4>
 <p>To keep the configurations tidy and in order we use <a href="https://prettier.io/">Prettier</a> to automatically format all YAML files
 in the project. Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the introduction of
@@ -1621,11 +1607,9 @@ extension</a> to automatically format as you write.</p>
 <p>To check if the files are correctly formatted run:</p>
 <div class="highlight"><pre><span></span><code>task config:check
 </code></pre></div>
-
 <p>If the output tells you that some files are not formatted correctly run:</p>
 <div class="highlight"><pre><span></span><code>task config:format
 </code></pre></div>
-
 <p>When opening a new Pull Request, checks are automatically run to verify that configuration files are correctly
 formatted. In case of failures we might ask you to update the PR with correct formatting.</p>
 <h3 id="working-on-docs">Working on docs<a class="headerlink" href="#working-on-docs" title="Permanent link">&para;</a></h3>
@@ -1654,7 +1638,6 @@ start a local server you can later access with a web browser to see a preview of
 repository run:</p>
 <div class="highlight"><pre><span></span><code>task docs:serve
 </code></pre></div>
-
 <p>If you don't see any error, hit <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> with your browser to navigate the generated docs.</p>
 <h4 id="docs-publishing">Docs publishing<a class="headerlink" href="#docs-publishing" title="Permanent link">&para;</a></h4>
 <p>The present git repository has a special branch called <code>gh-pages</code> that contains the generated HTML code for the docs
@@ -1700,11 +1683,9 @@ extension</a> to automatically format as you write.</p>
 <p>To check if the files are correctly formatted run:</p>
 <div class="highlight"><pre><span></span><code>task docs:check
 </code></pre></div>
-
 <p>If the output tells you that some files are not formatted correctly run:</p>
 <div class="highlight"><pre><span></span><code>task docs:format
 </code></pre></div>
-
 <p>When opening a new Pull Request, checks are automatically run to verify that documentation is correctly formatted. In
 case of failures we might ask you to update the PR with correct formatting.</p>
 <h4 id="docs-automation">Docs automation<a class="headerlink" href="#docs-automation" title="Permanent link">&para;</a></h4>
@@ -1725,11 +1706,9 @@ changes to the source code.</p>
 <p>To update the catalog, execute the following command and commit the changes.</p>
 <div class="highlight"><pre><span></span><code>task i18n:update
 </code></pre></div>
-
 <p>To verify that the catalog is up-to-date, you may execute the command:</p>
 <div class="highlight"><pre><span></span><code>task i18n:check
 </code></pre></div>
-
 <p>Example usage:</p>
 <div class="highlight"><pre><span></span><code>package main
 
@@ -1742,7 +1721,6 @@ func main() {
   fmt.Println(i18n.Tr(&quot;Hello World!&quot;))
 }
 </code></pre></div>
-
 <h3 id="additional-settings">Additional settings<a class="headerlink" href="#additional-settings" title="Permanent link">&para;</a></h3>
 <p>If you need to push a commit that's only shipping documentation changes or example files, thus a complete no-op for the
 test suite, please start the commit message with the string <strong>[skip ci]</strong> to skip the build and give that slot to

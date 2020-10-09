@@ -1455,7 +1455,6 @@ includes=WebServer.h
 depends=ArduinoHttpClient
 </code></pre></div>
 
-
 <h3 id="layout-of-folders-and-files">Layout of folders and files<a class="headerlink" href="#layout-of-folders-and-files" title="Permanent link">&para;</a></h3>
 <p>Each folder has a specific purpose (sources, examples, documentation, etc). Folders not covered in this specification
 may be added as needed to future revisions.</p>
@@ -1468,7 +1467,6 @@ example:</p>
 <div class="codehilite"><pre><span></span><code>Servo/src/Servo.h
 Servo/src/Servo.cpp
 </code></pre></div>
-
 
 <p>The source code found in <strong>src</strong> folder and <em>all its subfolders</em> is compiled and linked in the user’s sketch. Only the
 <em>src</em> folder is added to the include search path (both when compiling the sketch and the library). When the user imports
@@ -1487,7 +1485,6 @@ Servo/Servo.cpp
 Servo/utility/ServoTimers.h
 Servo/utility/ServoTimers.cpp
 </code></pre></div>
-
 
 <p>This will allow existing 1.0 format libraries to compile under Arduino IDE 1.5.x+ as well, and vice-versa. If a library
 only needs to run on Arduino IDE 1.5.x+, we recommend placing all source code in the src/ folder. If a library requires
@@ -1523,13 +1520,11 @@ Servo/src/cortex-m0plus/libServo.a
 Servo/src/cortex-m4/libServo.a
 Servo/src/cortex-m4/fpv4-sp-d16-softfp/libServo.a
 </code></pre></div>
-
 <h4 id="library-examples">Library Examples<a class="headerlink" href="#library-examples" title="Permanent link">&para;</a></h4>
 <p>Library examples must be placed in the <strong>examples</strong> folder. Note that the <strong>examples</strong> folder name must be written
 exactly like that (with lower case letters).</p>
 <div class="codehilite"><pre><span></span><code>Servo/examples/...
 </code></pre></div>
-
 
 <p>Sketches contained inside the examples folder will be shown in the Examples menu of the Arduino IDE and Arduino Web
 Editor.</p>
@@ -1550,7 +1545,6 @@ folder. When a keyword of any installed library is used in a sketch the Arduino 
 <div class="codehilite"><pre><span></span><code>Servo/keywords.txt
 </code></pre></div>
 
-
 <p>An example keywords.txt file:</p>
 <div class="highlight"><pre><span></span><code># Syntax Coloring Map For ExampleLibrary
 
@@ -1564,13 +1558,11 @@ doSomething KEYWORD2
 
 # Constants (LITERAL1)
 </code></pre></div>
-
 <p>This file would cause the Arduino IDE to highlight <code>Test</code> as a data type, and <code>doSomething</code> as a method / function.</p>
 <h4 id="keywordstxt-format">keywords.txt format<a class="headerlink" href="#keywordstxt-format" title="Permanent link">&para;</a></h4>
 <p>keywords.txt is formatted in four fields which are separated by a single true tab (not spaces):</p>
 <div class="highlight"><pre><span></span><code>KEYWORD KEYWORD_TOKENTYPE   REFERENCE_LINK  RSYNTAXTEXTAREA_TOKENTYPE
 </code></pre></div>
-
 <p>It is permitted to leave a field empty.</p>
 <h5 id="keyword_tokentype"><code>KEYWORD_TOKENTYPE</code><a class="headerlink" href="#keyword_tokentype" title="Permanent link">&para;</a></h5>
 <table>
@@ -1676,7 +1668,6 @@ Servo/extras/
 Servo/extras/Servo_Connectors.pdf
 </code></pre></div>
 
-
 <h2 id="working-with-multiple-architectures">Working with multiple architectures<a class="headerlink" href="#working-with-multiple-architectures" title="Permanent link">&para;</a></h2>
 <p>Libraries placed in the <code>libraries</code> subfolder of the sketchbook folder (AKA "user directory") will be made available for
 all boards, which may include multiple different processor architectures. To provide architecture-specific code or
@@ -1694,7 +1685,6 @@ the architecture (as determined by the name of the
 #endif
 </code></pre></div>
 
-
 <p>Alternatively, if a library only works on certain architectures, you can provide an explicit error message (instead of
 allowing the compilation to fail in a difficult to understand way):</p>
 <div class="codehilite"><pre><span></span><code>#if defined(ARDUINO_ARCH_AVR)
@@ -1705,7 +1695,6 @@ allowing the compilation to fail in a difficult to understand way):</p>
   #error “This library only supports boards with an AVR or SAM processor.”
 #endif
 </code></pre></div>
-
 
 <h2 id="old-library-format-pre-15">Old library format (pre-1.5)<a class="headerlink" href="#old-library-format-pre-15" title="Permanent link">&para;</a></h2>
 <p>In order to support old libraries (from Arduino IDE 1.0.x), the Arduino IDE/Pro IDE and Arduino CLI will also compile

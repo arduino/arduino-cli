@@ -1789,7 +1789,6 @@ hardware/yyyyy/avr/...       - Yyy - AVR
 hardware/xxxxx/avr/...       - Xxx - AVR
 </code></pre></div>
 
-
 <p>The vendor "arduino" has two supported architectures (AVR and SAM), while "xxxxx" and "yyyyy" have only AVR.</p>
 <p>Architecture values are case sensitive (e.g. <code>AVR</code> != <code>avr</code>).</p>
 <p>If possible, follow existing architecture name conventions when creating hardware packages. Use the vendor folder name
@@ -1814,7 +1813,6 @@ compiler.c.cmd=arm-none-eabi-gcc
 recipe.c.o.pattern={compiler.path}{compiler.c.cmd}
 </code></pre></div>
 
-
 <p>In this example the property <strong>recipe.c.o.pattern</strong> will be set to <strong>/tools/g++_arm_none_eabi/bin/arm-none-eabi-gcc</strong>,
 which is the composition of the properties <strong>compiler.path</strong> and <strong>compiler.c.cmd</strong>.</p>
 <h4 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">&para;</a></h4>
@@ -1824,13 +1822,11 @@ which is the composition of the properties <strong>compiler.path</strong> and <s
 # I&#39;m a comment!
 </code></pre></div>
 
-
 <h4 id="automatic-property-override-for-specific-os">Automatic property override for specific OS<a class="headerlink" href="#automatic-property-override-for-specific-os" title="Permanent link">&para;</a></h4>
 <p>We can specify an OS-specific value for a property. For example the following file:</p>
 <div class="codehilite"><pre><span></span><code>tools.bossac.cmd=bossac
 tools.bossac.cmd.windows=bossac.exe
 </code></pre></div>
-
 
 <p>will set the property <strong>tools.bossac.cmd</strong> to the value <strong>bossac</strong> on Linux and macOS and <strong>bossac.exe</strong> on Windows.
 <a href="https://github.com/arduino/Arduino/blob/1.8.12/arduino-core/src/processing/app/helpers/PreferencesMap.java#L110-L112">Supported</a>
@@ -1877,7 +1873,6 @@ system libraries, etc.).</p>
 <div class="codehilite"><pre><span></span><code>name=Arduino AVR Boards
 version=1.5.3
 </code></pre></div>
-
 
 <p>The <strong>name</strong> will be shown as the Arduino IDE's Board menu section title or the Name field of
 <a href="../commands/arduino-cli_core_list/"><code>arduino-cli core list</code></a>'s output for the platform.<br> The <strong>version</strong> is currently
@@ -1929,7 +1924,6 @@ compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -MMD
 recipe.c.o.pattern=&quot;{compiler.path}{compiler.c.cmd}&quot; {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {build.extra_flags} {includes} &quot;{source_file}&quot; -o &quot;{object_file}&quot;
 </code></pre></div>
 
-
 <p>Note that some properties, like <strong>{build.mcu}</strong> for example, are taken from the <strong>boards.txt</strong> file which is documented
 later in this specification.</p>
 <h4 id="recipes-to-build-the-corea-archive-file">Recipes to build the core.a archive file<a class="headerlink" href="#recipes-to-build-the-corea-archive-file" title="Permanent link">&para;</a></h4>
@@ -1951,7 +1945,6 @@ compiler.ar.flags=rcs
 ## Create archives
 recipe.ar.pattern=&quot;{compiler.path}{compiler.ar.cmd}&quot; {compiler.ar.flags} &quot;{archive_file_path}&quot; &quot;{object_file}&quot;
 </code></pre></div>
-
 
 <h4 id="recipes-for-linking">Recipes for linking<a class="headerlink" href="#recipes-for-linking" title="Permanent link">&para;</a></h4>
 <p>All the artifacts produced by the previous steps (sketch object files, libraries object files and core.a archive) are
@@ -1980,7 +1973,6 @@ compiler.libraries.ldflags=
 recipe.c.combine.pattern=&quot;{compiler.path}{compiler.c.elf.cmd}&quot; {compiler.c.elf.flags} -mmcu={build.mcu} -o &quot;{build.path}/{build.project_name}.elf&quot; {object_files} {compiler.libraries.ldflags} &quot;{archive_file_path}&quot; &quot;-L{build.path}&quot; -lm
 </code></pre></div>
 
-
 <h4 id="recipes-for-extraction-of-executable-files-and-other-binary-data">Recipes for extraction of executable files and other binary data<a class="headerlink" href="#recipes-for-extraction-of-executable-files-and-other-binary-data" title="Permanent link">&para;</a></h4>
 <p>An arbitrary number of extra steps can be performed at the end of objects linking. These steps can be used to extract
 binary data used for upload and they are defined by a set of recipes with the following format:</p>
@@ -1989,13 +1981,11 @@ recipe.objcopy.FILE_EXTENSION_2.pattern=[.....]
 [.....]
 </code></pre></div>
 
-
 <p><code>FILE_EXTENSION_x</code> must be replaced with the extension of the extracted file, for example the AVR platform needs two
 files a <code>.hex</code> and a <code>.eep</code>, so we made two recipes like:</p>
 <div class="codehilite"><pre><span></span><code>recipe.objcopy.eep.pattern=[.....]
 recipe.objcopy.hex.pattern=[.....]
 </code></pre></div>
-
 
 <p>There are no specific properties set by the Arduino development software here.</p>
 <p>A full example for the AVR platform can be:</p>
@@ -2005,7 +1995,6 @@ recipe.objcopy.eep.pattern=&quot;{compiler.path}{compiler.objcopy.cmd}&quot; {co
 ## Create hex
 recipe.objcopy.hex.pattern=&quot;{compiler.path}{compiler.elf2hex.cmd}&quot; {compiler.elf2hex.flags} &quot;{build.path}/{build.project_name}.elf&quot; &quot;{build.path}/{build.project_name}.hex&quot;
 </code></pre></div>
-
 
 <h4 id="recipes-to-compute-binary-sketch-size">Recipes to compute binary sketch size<a class="headerlink" href="#recipes-to-compute-binary-sketch-size" title="Permanent link">&para;</a></h4>
 <p>At the end of the build the Arduino development software shows the final binary sketch size to the user. The size is
@@ -2024,7 +2013,6 @@ recipe.size.regex=^(?:\.text|\.data|\.bootloader)\s+([0-9]+).*
 recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+([0-9]+).*
 </code></pre></div>
 
-
 <h4 id="recipes-to-export-compiled-binary">Recipes to export compiled binary<a class="headerlink" href="#recipes-to-export-compiled-binary" title="Permanent link">&para;</a></h4>
 <p>When you do a <strong>Sketch &gt; Export compiled Binary</strong> in the Arduino IDE, the compiled binary is copied from the build
 folder to the sketch folder. Two binaries are copied; the standard binary, and a binary that has been merged with the
@@ -2040,7 +2028,6 @@ bootloader file (identified by the <code>.with_bootloader</code> in the filename
 automatically generated properties:</p>
 <div class="codehilite"><pre><span></span><code>{sketch_path}              - the absolute path of the sketch folder
 </code></pre></div>
-
 
 <h4 id="recipe-to-run-the-preprocessor">Recipe to run the preprocessor<a class="headerlink" href="#recipe-to-run-the-preprocessor" title="Permanent link">&para;</a></h4>
 <p>For detecting which libraries to include in the build, and for generating function prototypes, (just) the preprocessor
@@ -2058,7 +2045,6 @@ normally compiling the source files.</p>
 <div class="codehilite"><pre><span></span><code>preproc.macros.flags=-w -x c++ -E -CC
 recipe.preproc.macros=&quot;{compiler.path}{compiler.cpp.cmd}&quot; {compiler.cpp.flags} {preproc.macros.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} &quot;{source_file}&quot; -o &quot;{preprocessed_file_path}&quot;
 </code></pre></div>
-
 
 <p>Note that the <code>{preprocessed_file_path}</code> might point to (your operating system's equivalent) of <code>/dev/null</code>. In this
 case, also passing <code>-MMD</code> to gcc is problematic, as it will try to generate a dependency file called <code>/dev/null.d</code>,
@@ -2093,7 +2079,6 @@ recipe.hooks.sketch.prebuild.2.pattern=date
 
 recipe.hooks.linking.postlink.1.pattern=echo linking is complete
 </code></pre></div>
-
 <p>Warning: hooks recipes are sorted before execution. If you need to write more than 10 recipes for a single hook, pad the
 number with a zero, for example:</p>
 <div class="highlight"><pre><span></span><code>recipe.hooks.sketch.prebuild.01.pattern=echo 1
@@ -2101,7 +2086,6 @@ recipe.hooks.sketch.prebuild.02.pattern=echo 2
 ...
 recipe.hooks.sketch.prebuild.11.pattern=echo 11
 </code></pre></div>
-
 <h2 id="global-platformtxt">Global platform.txt<a class="headerlink" href="#global-platformtxt" title="Permanent link">&para;</a></h2>
 <p>Properties defined in a platform.txt created in the <strong>hardware</strong> subfolder of the Arduino IDE installation folder will
 be used for all platforms and will override local properties. This feature is currently only available when using the
@@ -2126,7 +2110,6 @@ uno.build.variant=standard
 [......]
 </code></pre></div>
 
-
 <p>Note that all the relevant keys start with the board ID <strong>uno.xxxxx</strong>.</p>
 <p>The <strong>uno.name</strong> property contains the human-friendly name of the board. This is shown in the Board menu of the IDEs,
 the "Board Name" field of Arduino CLI's text output, or the "name" key of Arduino CLI's JSON output.</p>
@@ -2141,7 +2124,6 @@ uno.build.board         =&gt;   build.board
 uno.build.core          =&gt;   build.core
 uno.build.variant       =&gt;   build.variant
 </code></pre></div>
-
 
 <p>This explains the presence of <strong>{build.mcu}</strong> or <strong>{build.board}</strong> in the platform.txt recipes: their value is
 overwritten respectively by <strong>{uno.build.mcu}</strong> and <strong>{uno.build.board}</strong> when the Uno board is selected! Moreover the
@@ -2167,11 +2149,9 @@ selected. For example if a board needs the Arduino core the <strong>build.core</
 <div class="codehilite"><pre><span></span><code>uno.build.core=arduino
 </code></pre></div>
 
-
 <p>or if the RTOS core is needed, to:</p>
 <div class="codehilite"><pre><span></span><code>uno.build.core=rtos
 </code></pre></div>
-
 
 <p>In any case the contents of the selected core folder are compiled and the core folder path is added to the include files
 search path.</p>
@@ -2204,14 +2184,12 @@ uno.build.variant=standard
 [.....]
 </code></pre></div>
 
-
 <p>instead, the Arduino Leonardo board needs the <em>leonardo</em> variant:</p>
 <div class="codehilite"><pre><span></span><code>[.....]
 leonardo.build.core=arduino
 leonardo.build.variant=leonardo
 [.....]
 </code></pre></div>
-
 
 <p>In the example above, both Uno and Leonardo share the same core but use different variants.<br> In any case, the
 contents of the selected variant folder path is added to the include search path and its contents are compiled and
@@ -2225,7 +2203,6 @@ uno.pid.0=0x0043
 uno.vid.1=0x2341
 uno.pid.1=0x0001
 </code></pre></div>
-
 
 <p>The <strong>vid</strong> and <strong>pid</strong> properties end with an arbitrary number, which allows multiple VID/PID pairs to be defined for a
 board. The snippet above is defining the 2341:0043 and 2341:0001 pairs used by Uno boards.</p>
@@ -2249,12 +2226,10 @@ uno.serial.disableRTS=true
 [.....]
 </code></pre></div>
 
-
 <h3 id="hiding-boards">Hiding boards<a class="headerlink" href="#hiding-boards" title="Permanent link">&para;</a></h3>
 <p>Adding a <strong>hide</strong> property to a board definition causes it to not be shown in the Arduino IDE's <strong>Tools &gt; Board</strong> menu.</p>
 <div class="codehilite"><pre><span></span><code>uno.hide=
 </code></pre></div>
-
 
 <p>The value of the property is ignored; it's the presence or absence of the property that controls the board's visibility.</p>
 <h2 id="programmerstxt">programmers.txt<a class="headerlink" href="#programmerstxt" title="Permanent link">&para;</a></h2>
@@ -2279,7 +2254,6 @@ arduinoasisp.program.tool=avrdude
 arduinoasisp.program.extra_params=-P{serial.port} -b{program.speed}
 [......]
 </code></pre></div>
-
 
 <p>These properties can only be used in the recipes of the actions that use the programmer (<code>erase</code>, <code>bootloader</code>, and
 <code>program</code>).</p>
@@ -2318,7 +2292,6 @@ tools.avrdude.bootloader.pattern=[......]
 [.....]
 </code></pre></div>
 
-
 <p>A tool may have some actions not defined (it's not mandatory to define all four actions).<br> Let's look at how the
 <strong>upload</strong> action is defined for avrdude:</p>
 <div class="codehilite"><pre><span></span><code>tools.avrdude.path={runtime.tools.avrdude.path}
@@ -2327,7 +2300,6 @@ tools.avrdude.config.path={path}/etc/avrdude.conf
 
 tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D &quot;-Uflash:w:{build.path}/{build.project_name}.hex:i&quot;
 </code></pre></div>
-
 
 <p>A <strong>{runtime.tools.TOOL_NAME.path}</strong> and <strong>{runtime.tools.TOOL_NAME-TOOL_VERSION.path}</strong> property is generated for the
 tools of Arduino AVR Boards and any other platform installed via Boards Manager. <strong>{runtime.tools.TOOL_NAME.path}</strong>
@@ -2346,16 +2318,13 @@ tools.avrdude.upload.params.quiet=-q -q
 tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D &quot;-Uflash:w:{build.path}/{build.project_name}.hex:i&quot;
 </code></pre></div>
 
-
 <p>In this example if the user enables verbose mode, then <strong>{upload.params.verbose}</strong> is used in <strong>{upload.verbose}</strong>:</p>
 <div class="codehilite"><pre><span></span><code>tools.avrdude.upload.params.verbose    =&gt;    upload.verbose
 </code></pre></div>
 
-
 <p>If the user didn't enable verbose mode, then <strong>{upload.params.quiet}</strong> is used in <strong>{upload.verbose}</strong>:</p>
 <div class="codehilite"><pre><span></span><code>tools.avrdude.upload.params.quiet      =&gt;    upload.verbose
 </code></pre></div>
-
 
 <h3 id="sketch-upload-configuration">Sketch upload configuration<a class="headerlink" href="#sketch-upload-configuration" title="Permanent link">&para;</a></h3>
 <p>The Upload action is triggered when the user clicks on the "Upload" button on the IDE toolbar or uses
@@ -2369,7 +2338,6 @@ uno.upload.tool=avrdude
 leonardo.upload.tool=avrdude
 [......]
 </code></pre></div>
-
 
 <p>Other upload parameters can also be defined for the board. For example, in the Arduino AVR Boards boards.txt we have:</p>
 <div class="codehilite"><pre><span></span><code>[.....]
@@ -2389,13 +2357,11 @@ leonardo.upload.wait_for_upload_port=true
 [.....]
 </code></pre></div>
 
-
 <p>Most <strong>{upload.XXXX}</strong> variables are used later in the avrdude upload recipe in platform.txt:</p>
 <div class="codehilite"><pre><span></span><code>[.....]
 tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D &quot;-Uflash:w:{build.path}/{build.project_name}.hex:i&quot;
 [.....]
 </code></pre></div>
-
 
 <h4 id="upload-verification">Upload verification<a class="headerlink" href="#upload-verification" title="Permanent link">&para;</a></h4>
 <p>Upload verification can be enabled via the Arduino IDE's <strong>File &gt; Preferences &gt; Verify code after upload</strong> or
@@ -2413,7 +2379,6 @@ tools.avrdude.upload.verify=
 tools.avrdude.program.verify=
 [.....]
 </code></pre></div>
-
 
 <p>These definitions are overridden with the value defined by <strong>tools.TOOL_ID.ACTION.params.verify/noverify</strong> when a modern
 version of Arduino development software is in use.</p>
@@ -2463,7 +2428,6 @@ arduinoasisp.program.tool=avrdude
 [......]
 </code></pre></div>
 
-
 <p>This action can use the same <a href="#upload-verification">upload verification preference system</a> as the <code>upload</code> action, via
 the <strong>program.verify</strong> property.</p>
 <p>When using the Arduino IDE, if the selected programmer is from a different platform than the board, the <code>program</code> recipe
@@ -2489,7 +2453,6 @@ uno.bootloader.tool=avrdude
 leonardo.bootloader.tool=avrdude
 [......]
 </code></pre></div>
-
 
 <p>When using the Arduino IDE, if the board uses a
 <a href="https://arduino.github.io/arduino-cli/dev/platform-specification/#core-reference">core reference</a>, the platform.txt of
@@ -2534,7 +2497,6 @@ custom menu we are going to create and must be declared at the beginning of the 
 [.....]
 </code></pre></div>
 
-
 <p>in this case, the menu name is "Processor".<br> Now let's add, always in the boards.txt file, the default configuration
 (common to all processors) for the duemilanove board:</p>
 <div class="codehilite"><pre><span></span><code>menu.cpu=Processor
@@ -2549,7 +2511,6 @@ duemilanove.build.variant=standard
 [.....]
 </code></pre></div>
 
-
 <p>Now let's define the possible values of the "cpu" option:</p>
 <div class="codehilite"><pre><span></span><code>[.....]
 duemilanove.menu.cpu.atmega328=ATmega328P
@@ -2557,7 +2518,6 @@ duemilanove.menu.cpu.atmega328=ATmega328P
 duemilanove.menu.cpu.atmega168=ATmega168
 [.....]
 </code></pre></div>
-
 
 <p>We have defined two values: "atmega328" and "atmega168".<br> Note that the property keys must follow the format
 <strong>BOARD_ID.menu.MENU_ID.OPTION_ID=Text</strong>, where <strong>Text</strong> is what is displayed under the "Processor" menu in the IDE's
@@ -2577,7 +2537,6 @@ duemilanove.menu.cpu.atmega168.build.mcu=atmega168
 [.....]
 </code></pre></div>
 
-
 <p>Note that when the user selects an option value, all the "sub properties" of that value are copied in the global
 configuration. For example, when the user selects "ATmega168" from the "Processor" menu, or uses the FQBN
 <code>arduino:avr:duemilanove:cpu=atmega168</code> with Arduino CLI, the configuration under atmega168 is made available globally:</p>
@@ -2585,7 +2544,6 @@ configuration. For example, when the user selects "ATmega168" from the "Processo
 duemilanove.menu.cpu.atmega168.upload.speed            =&gt;   upload.speed
 duemilanove.menu.cpu.atmega168.build.mcu               =&gt;   build.mcu
 </code></pre></div>
-
 
 <p>There is no limit to the number of custom menus that can be defined.</p>
 <h2 id="referencing-another-core-variant-or-tool">Referencing another core, variant or tool<a class="headerlink" href="#referencing-another-core-variant-or-tool" title="Permanent link">&para;</a></h2>
@@ -2601,7 +2559,6 @@ myboard.name=My Wonderful Arduino Compatible board
 myboard.build.core=arduino:arduino
 [....]
 </code></pre></div>
-
 
 <p>Note that we don't need to specify any architecture since the same architecture of "myboard" is used, so we just say
 "arduino:arduino" instead of "arduino:avr:arduino".</p>
@@ -2621,7 +2578,6 @@ myboard.build.variant=arduino:standard
 [....]
 </code></pre></div>
 
-
 <p>Note that, unlike core references, other resources (platform.txt, bundled libraries, programmers) are <em>not</em> inherited
 from the referenced platform.</p>
 <h3 id="tool-references">Tool references<a class="headerlink" href="#tool-references" title="Permanent link">&para;</a></h3>
@@ -2632,7 +2588,6 @@ myboard.upload.tool=arduino:avrdude
 myboard.bootloader.tool=arduino:avrdude
 [....]
 </code></pre></div>
-
 
 <p>When using Arduino CLI or Arduino Pro IDE (but not Arduino IDE), properties used in the referenced tool recipe may be
 overridden in the referencing platform's platform.txt.</p>
