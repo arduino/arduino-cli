@@ -43,14 +43,6 @@ func Init(configPath string) {
 		viper.SetConfigName("arduino-cli")
 	}
 
-	// Get default data path if none was provided
-	if configPath == "" {
-		configPath = getDefaultArduinoDataDir()
-	}
-
-	// Add paths where to search for a config file
-	viper.AddConfigPath(filepath.Dir(configPath))
-
 	// Bind env vars
 	viper.SetEnvPrefix("ARDUINO")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -60,6 +52,18 @@ func Init(configPath string) {
 	viper.BindEnv("directories.User", "ARDUINO_SKETCHBOOK_DIR")
 	viper.BindEnv("directories.Downloads", "ARDUINO_DOWNLOADS_DIR")
 	viper.BindEnv("directories.Data", "ARDUINO_DATA_DIR")
+
+	if configPath == "" {
+		// Get default data path if none was provided
+		if configPath = viper.GetString("directories.Data"); configPath != "" {
+			viper.AddConfigPath(configPath)
+		} else {
+			configPath = getDefaultArduinoDataDir()
+			viper.AddConfigPath(configPath)
+		}
+	} else {
+		viper.AddConfigPath(filepath.Dir(configPath))
+	}
 
 	// Early access directories.Data and directories.User in case
 	// those were set through env vars or cli flags

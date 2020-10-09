@@ -102,7 +102,7 @@ def test_init_config_file_flag_with_overwrite_flag(run_command, working_dir):
     assert str(config_file) in result.stdout
 
 
-def test_dump(run_command, working_dir):
+def test_dump(run_command, data_dir, working_dir):
     # Create a config file first
     config_file = Path(working_dir) / "config" / "test" / "config.yaml"
     assert not config_file.exists()
@@ -110,10 +110,21 @@ def test_dump(run_command, working_dir):
     assert result.ok
     assert config_file.exists()
 
-    result = run_command("config dump --format json")
+    result = run_command(f'config dump --config-file "{config_file}" --format json')
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert [] == settings_json["board_manager"]["additional_urls"]
+
+    result = run_command('config init --additional-urls "https://example.com"')
+    assert result.ok
+    config_file = Path(data_dir) / "arduino-cli.yaml"
+    assert str(config_file) in result.stdout
+    assert config_file.exists()
+
+    result = run_command("config dump --format json")
+    assert result.ok
+    settings_json = json.loads(result.stdout)
+    assert ["https://example.com"] == settings_json["board_manager"]["additional_urls"]
 
 
 def test_dump_with_config_file_flag(run_command, working_dir):
