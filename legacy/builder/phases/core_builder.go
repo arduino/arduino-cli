@@ -94,7 +94,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 		archivedCoreName := GetCachedCoreArchiveFileName(buildProperties.Get(constants.BUILD_PROPERTIES_FQBN),
 			buildProperties.Get("compiler.optimization_flags"), realCoreFolder)
 		targetArchivedCore = buildCachePath.Join(archivedCoreName)
-		canUseArchivedCore := !builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, targetArchivedCore)
+		canUseArchivedCore := !ctx.Clean && !builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, targetArchivedCore)
 
 		if canUseArchivedCore {
 			// use archived core

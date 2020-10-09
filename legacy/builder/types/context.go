@@ -70,6 +70,7 @@ type Context struct {
 	ArduinoAPIVersion    string
 	FQBN                 *cores.FQBN
 	CodeCompleteAt       string
+	Clean                bool
 
 	// Build options are serialized here
 	BuildOptionsJson         string

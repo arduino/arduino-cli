@@ -59,6 +59,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		"exportDir":       telemetry.Sanitize(req.GetExportDir()),
 		"jobs":            strconv.FormatInt(int64(req.Jobs), 10),
 		"libraries":       strings.Join(req.Libraries, ","),
+		"clean":           strconv.FormatBool(req.GetClean()),
 	}
 
 	if req.GetExportFile() != "" {
@@ -188,6 +189,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.ExecStdout = outStream
 	builderCtx.ExecStderr = errStream
 	builderCtx.SetLogger(i18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
+	builderCtx.Clean = req.GetClean()
 
 	// if --preprocess or --show-properties were passed, we can stop here
 	if req.GetShowProperties() {

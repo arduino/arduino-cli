@@ -51,6 +51,7 @@ var (
 	libraries          []string // List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
 	optimizeForDebug   bool     // Optimize compile output for debug, not for release
 	programmer         string   // Use the specified programmer to upload
+	clean              bool     // Cleanup the build folder and do not use any cached build
 )
 
 // NewCommand created a new `compile` command
@@ -86,6 +87,7 @@ func NewCommand() *cobra.Command {
 		"List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.")
 	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, "Optional, optimize compile output for debugging, rather than for release.")
 	command.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload.")
+	command.Flags().BoolVar(&clean, "clean", false, "Optional, cleanup the build folder and do not use any cached build.")
 
 	return command
 }
@@ -121,6 +123,7 @@ func run(cmd *cobra.Command, args []string) {
 		DryRun:           dryRun,
 		Libraries:        libraries,
 		OptimizeForDebug: optimizeForDebug,
+		Clean:            clean,
 	}, os.Stdout, os.Stderr, viper.GetString("logging.level") == "debug")
 
 	if err != nil {
