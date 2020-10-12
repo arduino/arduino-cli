@@ -21,23 +21,23 @@ import (
 	"github.com/spf13/viper"
 )
 
-func setDefaults(dataDir, userDir string) {
+func setDefaults(settings *viper.Viper, dataDir, userDir string) {
 	// logging
-	viper.SetDefault("logging.level", "info")
-	viper.SetDefault("logging.format", "text")
+	settings.SetDefault("logging.level", "info")
+	settings.SetDefault("logging.format", "text")
 
 	// Boards Manager
-	viper.SetDefault("board_manager.additional_urls", []string{})
+	settings.SetDefault("board_manager.additional_urls", []string{})
 
 	// arduino directories
-	viper.SetDefault("directories.Data", dataDir)
-	viper.SetDefault("directories.Downloads", filepath.Join(dataDir, "staging"))
-	viper.SetDefault("directories.User", userDir)
+	settings.SetDefault("directories.Data", dataDir)
+	settings.SetDefault("directories.Downloads", filepath.Join(dataDir, "staging"))
+	settings.SetDefault("directories.User", userDir)
 
 	// daemon settings
-	viper.SetDefault("daemon.port", "50051")
+	settings.SetDefault("daemon.port", "50051")
 
 	//telemetry settings
-	viper.SetDefault("telemetry.enabled", true)
-	viper.SetDefault("telemetry.addr", ":9090")
+	settings.SetDefault("telemetry.enabled", true)
+	settings.SetDefault("telemetry.addr", ":9090")
 }

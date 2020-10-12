@@ -29,54 +29,70 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Settings is a global instance of viper holding configurations for the CLI and the gRPC consumers
+var Settings *viper.Viper
+
 // Init initialize defaults and read the configuration file.
 // Please note the logging system hasn't been configured yet,
 // so logging shouldn't be used here.
-func Init(configPath string) {
+func Init(configPath string) *viper.Viper {
 	// Config file metadata
 	jww.SetStdoutThreshold(jww.LevelFatal)
-	viper.SetConfigName("arduino-cli")
+	settings := viper.New()
 
-	// Get default data path if none was provided
-	if configPath == "" {
-		configPath = getDefaultArduinoDataDir()
+	configDir := paths.New(configPath)
+	if configDir != nil && !configDir.IsDir() {
+		settings.SetConfigName(strings.TrimSuffix(configDir.Base(), configDir.Ext()))
+	} else {
+		settings.SetConfigName("arduino-cli")
 	}
 
-	// Add paths where to search for a config file
-	viper.AddConfigPath(configPath)
-
 	// Bind env vars
-	viper.SetEnvPrefix("ARDUINO")
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.AutomaticEnv()
+	settings.SetEnvPrefix("ARDUINO")
+	settings.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	settings.AutomaticEnv()
 
 	// Bind env aliases to keep backward compatibility
-	viper.BindEnv("directories.User", "ARDUINO_SKETCHBOOK_DIR")
-	viper.BindEnv("directories.Downloads", "ARDUINO_DOWNLOADS_DIR")
-	viper.BindEnv("directories.Data", "ARDUINO_DATA_DIR")
+	settings.BindEnv("directories.User", "ARDUINO_SKETCHBOOK_DIR")
+	settings.BindEnv("directories.Downloads", "ARDUINO_DOWNLOADS_DIR")
+	settings.BindEnv("directories.Data", "ARDUINO_DATA_DIR")
+
+	if configPath == "" {
+		// Get default data path if none was provided
+		if configPath = settings.GetString("directories.Data"); configPath != "" {
+			settings.AddConfigPath(configPath)
+		} else {
+			configPath = getDefaultArduinoDataDir()
+			settings.AddConfigPath(configPath)
+		}
+	} else {
+		settings.AddConfigPath(filepath.Dir(configPath))
+	}
 
 	// Early access directories.Data and directories.User in case
 	// those were set through env vars or cli flags
-	dataDir := viper.GetString("directories.Data")
+	dataDir := settings.GetString("directories.Data")
 	if dataDir == "" {
 		dataDir = getDefaultArduinoDataDir()
 	}
-	userDir := viper.GetString("directories.User")
+	userDir := settings.GetString("directories.User")
 	if userDir == "" {
 		userDir = getDefaultUserDir()
 	}
 
 	// Set default values for all the settings
-	setDefaults(dataDir, userDir)
+	setDefaults(settings, dataDir, userDir)
 
 	// Attempt to read config file
-	if err := viper.ReadInConfig(); err != nil {
+	if err := settings.ReadInConfig(); err != nil {
 		// ConfigFileNotFoundError is acceptable, anything else
 		// should be reported to the user
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
 			feedback.Errorf("Error reading config file: %v", err)
 		}
 	}
+
+	return settings
 }
 
 // getDefaultArduinoDataDir returns the full path to the default arduino folder
@@ -130,14 +146,14 @@ func getDefaultUserDir() string {
 }
 
 // IsBundledInDesktopIDE returns true if the CLI is bundled with the Arduino IDE.
-func IsBundledInDesktopIDE() bool {
+func IsBundledInDesktopIDE(settings *viper.Viper) bool {
 	// value is cached the first time we run the check
-	if viper.IsSet("IDE.Bundled") {
-		return viper.GetBool("IDE.Bundled")
+	if settings.IsSet("IDE.Bundled") {
+		return settings.GetBool("IDE.Bundled")
 	}
 
-	viper.Set("IDE.Bundled", false)
-	viper.Set("IDE.Portable", false)
+	settings.Set("IDE.Bundled", false)
+	settings.Set("IDE.Portable", false)
 
 	logrus.Info("Checking if CLI is Bundled into the IDE")
 	executable, err := os.Executable()
@@ -172,41 +188,50 @@ func IsBundledInDesktopIDE() bool {
 	logrus.Info("The CLI is bundled in the Arduino IDE")
 
 	// Persist IDE-related config settings
-	viper.Set("IDE.Bundled", true)
-	viper.Set("IDE.Directory", ideDir)
+	settings.Set("IDE.Bundled", true)
+	settings.Set("IDE.Directory", ideDir)
 
 	// Check whether this is a portable install
 	if ideDir.Join("portable").Exist() {
 		logrus.Info("The IDE installation is 'portable'")
-		viper.Set("IDE.Portable", true)
+		settings.Set("IDE.Portable", true)
 	}
 
 	return true
 }
 
 // FindConfigFile returns the config file path using the argument '--config-file' if specified or via the current working dir
-func FindConfigFile() string {
-
+func FindConfigFile(args []string) string {
 	configFile := ""
-	for i, arg := range os.Args {
+	for i, arg := range args {
 		// 0 --config-file ss
 		if arg == "--config-file" {
-			if len(os.Args) > i+1 {
-				configFile = os.Args[i+1]
+			if len(args) > i+1 {
+				configFile = args[i+1]
 			}
 		}
 	}
 
 	if configFile != "" {
-		if fi, err := os.Stat(configFile); err == nil {
-			if fi.IsDir() {
-				return configFile
-			}
-			return filepath.Dir(configFile)
-		}
+		return configFile
 	}
 
 	return searchCwdForConfig()
+}
+
+func searchCwdForConfig() string {
+	cwd, err := os.Getwd()
+
+	if err != nil {
+		return ""
+	}
+
+	configFile := searchConfigTree(cwd)
+	if configFile == "" {
+		return configFile
+	}
+
+	return configFile + string(os.PathSeparator) + "arduino-cli.yaml"
 }
 
 func searchConfigTree(cwd string) string {
@@ -229,14 +254,4 @@ func searchConfigTree(cwd string) string {
 		}
 	}
 
-}
-
-func searchCwdForConfig() string {
-	cwd, err := os.Getwd()
-
-	if err != nil {
-		return ""
-	}
-
-	return searchConfigTree(cwd)
 }

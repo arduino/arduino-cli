@@ -39,7 +39,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 // Compile FIXMEDOC
@@ -122,11 +121,11 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.SketchLocation = sketch.FullPath
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
-	builderCtx.HardwareDirs = configuration.HardwareDirectories()
-	builderCtx.BuiltInToolsDirs = configuration.BundleToolsDirectories()
+	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
+	builderCtx.BuiltInToolsDirs = configuration.BundleToolsDirectories(configuration.Settings)
 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
-	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir())
+	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 
 	if req.GetBuildPath() != "" {
 		builderCtx.BuildPath = paths.New(req.GetBuildPath())
@@ -168,7 +167,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.ArduinoAPIVersion = "10607"
 
 	// Check if Arduino IDE is installed and get it's libraries location.
-	dataDir := paths.New(viper.GetString("directories.Data"))
+	dataDir := paths.New(configuration.Settings.GetString("directories.Data"))
 	preferencesTxt := dataDir.Join("preferences.txt")
 	ideProperties, err := properties.LoadFromPath(preferencesTxt)
 	if err == nil {

@@ -18,9 +18,8 @@ package daemon
 import (
 	"context"
 	"encoding/json"
+	"path/filepath"
 	"testing"
-
-	"github.com/spf13/viper"
 
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/settings"
@@ -30,19 +29,18 @@ import (
 var svc = SettingsService{}
 
 func init() {
-	configuration.Init("testdata")
+	configuration.Settings = configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))
 }
 
 func reset() {
-	viper.Reset()
-	configuration.Init("testdata")
+	configuration.Settings = configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))
 }
 
 func TestGetAll(t *testing.T) {
 	resp, err := svc.GetAll(context.Background(), &rpc.GetAllRequest{})
 	require.Nil(t, err)
 
-	content, err := json.Marshal(viper.AllSettings())
+	content, err := json.Marshal(configuration.Settings.AllSettings())
 	require.Nil(t, err)
 
 	require.Equal(t, string(content), resp.GetJsonData())
@@ -53,8 +51,8 @@ func TestMerge(t *testing.T) {
 	_, err := svc.Merge(context.Background(), &rpc.RawData{JsonData: bulkSettings})
 	require.Nil(t, err)
 
-	require.Equal(t, "420", viper.GetString("daemon.port"))
-	require.Equal(t, "bar", viper.GetString("foo"))
+	require.Equal(t, "420", configuration.Settings.GetString("daemon.port"))
+	require.Equal(t, "bar", configuration.Settings.GetString("foo"))
 
 	reset()
 }
@@ -80,5 +78,5 @@ func TestSetValue(t *testing.T) {
 	}
 	_, err := svc.SetValue(context.Background(), val)
 	require.Nil(t, err)
-	require.Equal(t, "bar", viper.GetString("foo"))
+	require.Equal(t, "bar", configuration.Settings.GetString("foo"))
 }

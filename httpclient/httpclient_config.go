@@ -22,7 +22,7 @@ import (
 	"runtime"
 
 	"github.com/arduino/arduino-cli/cli/globals"
-	"github.com/spf13/viper"
+	"github.com/arduino/arduino-cli/configuration"
 )
 
 // Config is the configuration of the http client
@@ -35,8 +35,8 @@ type Config struct {
 func DefaultConfig() (*Config, error) {
 	var proxy *url.URL
 	var err error
-	if viper.IsSet("network.proxy") {
-		proxyConfig := viper.GetString("network.proxy")
+	if configuration.Settings.IsSet("network.proxy") {
+		proxyConfig := configuration.Settings.GetString("network.proxy")
 		if proxyConfig == "" {
 			// empty configuration
 			// this workaround must be here until viper can UnSet properties:
@@ -54,7 +54,7 @@ func DefaultConfig() (*Config, error) {
 
 // UserAgent returns the user agent for the cli http client
 func UserAgent() string {
-	subComponent := viper.GetString("network.user_agent_ext")
+	subComponent := configuration.Settings.GetString("network.user_agent_ext")
 	if subComponent != "" {
 		subComponent = " " + subComponent
 	}

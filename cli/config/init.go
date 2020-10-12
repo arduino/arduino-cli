@@ -21,9 +21,9 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var destDir string
@@ -47,7 +47,7 @@ func initInitCommand() *cobra.Command {
 
 func runInitCommand(cmd *cobra.Command, args []string) {
 	if destDir == "" {
-		destDir = viper.GetString("directories.Data")
+		destDir = configuration.Settings.GetString("directories.Data")
 	}
 
 	absPath, err := filepath.Abs(destDir)
@@ -64,7 +64,7 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if err := viper.WriteConfigAs(configFileAbsPath); err != nil {
+	if err := configuration.Settings.WriteConfigAs(configFileAbsPath); err != nil {
 		feedback.Errorf("Cannot create config file: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}

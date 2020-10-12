@@ -20,8 +20,8 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/settings"
-	"github.com/spf13/viper"
 )
 
 // SettingsService implements the `Settings` service
@@ -30,7 +30,7 @@ type SettingsService struct{}
 // GetAll returns a message with a string field containing all the settings
 // currently in use, marshalled in JSON format.
 func (s *SettingsService) GetAll(ctx context.Context, req *rpc.GetAllRequest) (*rpc.RawData, error) {
-	b, err := json.Marshal(viper.AllSettings())
+	b, err := json.Marshal(configuration.Settings.AllSettings())
 	if err == nil {
 		return &rpc.RawData{
 			JsonData: string(b),
@@ -47,7 +47,7 @@ func (s *SettingsService) Merge(ctx context.Context, req *rpc.RawData) (*rpc.Mer
 		return nil, err
 	}
 
-	if err := viper.MergeConfigMap(toMerge); err != nil {
+	if err := configuration.Settings.MergeConfigMap(toMerge); err != nil {
 		return nil, err
 	}
 
@@ -61,11 +61,11 @@ func (s *SettingsService) GetValue(ctx context.Context, req *rpc.GetValueRequest
 	key := req.GetKey()
 	value := &rpc.Value{}
 
-	if !viper.InConfig(key) {
+	if !configuration.Settings.InConfig(key) {
 		return nil, errors.New("key not found in settings")
 	}
 
-	b, err := json.Marshal(viper.Get(key))
+	b, err := json.Marshal(configuration.Settings.Get(key))
 	if err == nil {
 		value.Key = key
 		value.JsonData = string(b)
@@ -81,7 +81,7 @@ func (s *SettingsService) SetValue(ctx context.Context, val *rpc.Value) (*rpc.Se
 
 	err := json.Unmarshal([]byte(val.GetJsonData()), &value)
 	if err == nil {
-		viper.Set(key, value)
+		configuration.Settings.Set(key, value)
 	}
 
 	return &rpc.SetValueResponse{}, err

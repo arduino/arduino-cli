@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -213,11 +212,11 @@ func TestBoardOptionsFunctions(t *testing.T) {
 
 func TestFindToolsRequiredForBoard(t *testing.T) {
 	os.Setenv("ARDUINO_DATA_DIR", dataDir1.String())
-	configuration.Init("")
+	configuration.Settings = configuration.Init("")
 	pm := packagemanager.NewPackageManager(
 		dataDir1,
-		configuration.PackagesDir(),
-		paths.New(viper.GetString("directories.Downloads")),
+		configuration.PackagesDir(configuration.Settings),
+		paths.New(configuration.Settings.GetString("directories.Downloads")),
 		dataDir1,
 	)
 

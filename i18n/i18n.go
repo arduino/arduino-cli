@@ -15,9 +15,7 @@
 
 package i18n
 
-import (
-	"github.com/spf13/viper"
-)
+import "github.com/arduino/arduino-cli/configuration"
 
 // Init initializes the i18n module, setting the locale according to this order of preference:
 // 1. Configuration set in arduino-cli.yaml
@@ -27,7 +25,7 @@ func Init() {
 	initRiceBox()
 	locales := supportedLocales()
 
-	if configLocale := viper.GetString("locale"); configLocale != "" {
+	if configLocale := configuration.Settings.GetString("locale"); configLocale != "" {
 		if locale := findMatchingLocale(configLocale, locales); locale != "" {
 			setLocale(locale)
 			return

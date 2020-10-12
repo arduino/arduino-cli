@@ -30,12 +30,12 @@ import (
 
 // LoadHardware read all plaforms from the configured paths
 func (pm *PackageManager) LoadHardware() error {
-	dirs := configuration.HardwareDirectories()
+	dirs := configuration.HardwareDirectories(configuration.Settings)
 	if err := pm.LoadHardwareFromDirectories(dirs); err != nil {
 		return err
 	}
 
-	dirs = configuration.BundleToolsDirectories()
+	dirs = configuration.BundleToolsDirectories(configuration.Settings)
 	return pm.LoadToolsFromBundleDirectories(dirs)
 }
 

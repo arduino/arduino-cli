@@ -71,3 +71,8 @@ func BenchmarkSearchConfigTree(b *testing.B) {
 	}
 	result = s
 }
+
+func TestInit(t *testing.T) {
+	settings := Init("")
+	require.NotNil(t, settings)
+}
