@@ -270,6 +270,19 @@ For AVR we have:
     recipe.size.regex=^(?:\.text|\.data|\.bootloader)\s+([0-9]+).*
     recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+([0-9]+).*
 
+Two properties can be used to define the total available memory:
+
+- `{upload.maximum_size}`: available program storage space
+- `{upload.maximum_data_size}`: available dynamic memory for global variables
+
+If the binary sketch size exceeds the value of these properties, the compilation process fails.
+
+This information is displayed in the console output after compiling a sketch, along with the relative memory usage
+value:
+
+    Sketch uses 924 bytes (2%) of program storage space. Maximum is 32256 bytes.
+    Global variables use 9 bytes (0%) of dynamic memory, leaving 2039 bytes for local variables. Maximum is 2048 bytes.
+
 #### Recipes to export compiled binary
 
 When you do a **Sketch > Export compiled Binary** in the Arduino IDE, the compiled binary is copied from the build
