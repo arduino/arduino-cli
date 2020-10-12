@@ -18,7 +18,6 @@ package daemon
 import (
 	"context"
 	"encoding/json"
-	"path/filepath"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -31,12 +30,12 @@ import (
 var svc = SettingsService{}
 
 func init() {
-	configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))
+	configuration.Init("testdata")
 }
 
 func reset() {
 	viper.Reset()
-	configuration.Init(filepath.Join("testdata", "arduino-cli.yaml"))
+	configuration.Init("testdata")
 }
 
 func TestGetAll(t *testing.T) {
