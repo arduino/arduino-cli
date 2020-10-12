@@ -90,35 +90,49 @@ Tools are mapped as JSON in this way:
 ```json
         {
           "name": "avr-gcc",
-          "version": "4.8.1-arduino5",
+          "version": "7.3.0-atmel3.6.1-arduino7",
           "systems": [
             {
-              "host": "i386-apple-darwin11",
-              "url": "http://downloads.arduino.cc/tools/avr-gcc-4.8.1-arduino5-i386-apple-darwin11.tar.bz2",
-              "archiveFileName": "avr-gcc-4.8.1-arduino5-i386-apple-darwin11.tar.bz2",
-              "size": "24437400",
-              "checksum": "SHA-256:111b3ef00d737d069eb237a8933406cbb928e4698689e24663cffef07688a901"
+              "size": "34683056",
+              "checksum": "SHA-256:3903553d035da59e33cff9941b857c3cb379cb0638105dfdf69c97f0acc8e7b5",
+              "host": "arm-linux-gnueabihf",
+              "archiveFileName": "avr-gcc-7.3.0-atmel3.6.1-arduino7-arm-linux-gnueabihf.tar.bz2",
+              "url": "http://downloads.arduino.cc/tools/avr-gcc-7.3.0-atmel3.6.1-arduino7-arm-linux-gnueabihf.tar.bz2"
             },
             {
-              "host": "x86_64-linux-gnu",
-              "url": "http://downloads.arduino.cc/tools/avr-gcc-4.8.1-arduino5-x86_64-pc-linux-gnu.tar.bz2",
-              "archiveFileName": "avr-gcc-4.8.1-arduino5-x86_64-pc-linux-gnu.tar.bz2",
-              "size": "27093036",
-              "checksum": "SHA-256:9054fcc174397a419ba56c4ce1bfcbcad275a6a080cc144905acc9b0351ee9cc"
+              "size": "38045723",
+              "checksum": "SHA-256:03d322b9df6da17289e9e7c6233c34a8535d9c645c19efc772ba19e56914f339",
+              "host": "aarch64-linux-gnu",
+              "archiveFileName": "avr-gcc-7.3.0-atmel3.6.1-arduino7-aarch64-pc-linux-gnu.tar.bz2",
+              "url": "http://downloads.arduino.cc/tools/avr-gcc-7.3.0-atmel3.6.1-arduino7-aarch64-pc-linux-gnu.tar.bz2"
             },
             {
-              "host": "i686-linux-gnu",
-              "url": "http://downloads.arduino.cc/tools/avr-gcc-4.8.1-arduino5-i686-pc-linux-gnu.tar.bz2",
-              "archiveFileName": "avr-gcc-4.8.1-arduino5-i686-pc-linux-gnu.tar.bz2",
-              "size": "25882375",
-              "checksum": "SHA-256:7648b7f549b37191da0b0be53bae791b652f82ac3cb4e7877f85075aaf32141f"
+              "size": "36684546",
+              "checksum": "SHA-256:f6ed2346953fcf88df223469088633eb86de997fa27ece117fd1ef170d69c1f8",
+              "host": "x86_64-apple-darwin14",
+              "archiveFileName": "avr-gcc-7.3.0-atmel3.6.1-arduino7-x86_64-apple-darwin14.tar.bz2",
+              "url": "http://downloads.arduino.cc/tools/avr-gcc-7.3.0-atmel3.6.1-arduino7-x86_64-apple-darwin14.tar.bz2"
             },
             {
+              "size": "52519412",
+              "checksum": "SHA-256:a54f64755fff4cb792a1495e5defdd789902a2a3503982e81b898299cf39800e",
               "host": "i686-mingw32",
-              "url": "http://downloads.arduino.cc/tools/avr-gcc-4.8.1-arduino5-i686-mingw32.zip",
-              "archiveFileName": "avr-gcc-4.8.1-arduino5-i686-mingw32.zip",
-              "size": "46044779",
-              "checksum": "SHA-256:d4303226a7b41d3c445d901b5aa5903458def3fc7b7ff4ffef37cabeb37d424d"
+              "archiveFileName": "avr-gcc-7.3.0-atmel3.6.1-arduino7-i686-w64-mingw32.zip",
+              "url": "http://downloads.arduino.cc/tools/avr-gcc-7.3.0-atmel3.6.1-arduino7-i686-w64-mingw32.zip"
+            },
+            {
+              "size": "37176991",
+              "checksum": "SHA-256:954bbffb33545bcdcd473af993da2980bf32e8461ff55a18e0eebc7b2ef69a4c",
+              "host": "i686-linux-gnu",
+              "archiveFileName": "avr-gcc-7.3.0-atmel3.6.1-arduino7-i686-pc-linux-gnu.tar.bz2",
+              "url": "http://downloads.arduino.cc/tools/avr-gcc-7.3.0-atmel3.6.1-arduino7-i686-pc-linux-gnu.tar.bz2"
+            },
+            {
+              "size": "37630618",
+              "checksum": "SHA-256:bd8c37f6952a2130ac9ee32c53f6a660feb79bee8353c8e289eb60fdcefed91e",
+              "host": "x86_64-linux-gnu",
+              "archiveFileName": "avr-gcc-7.3.0-atmel3.6.1-arduino7-x86_64-pc-linux-gnu.tar.bz2",
+              "url": "http://downloads.arduino.cc/tools/avr-gcc-7.3.0-atmel3.6.1-arduino7-x86_64-pc-linux-gnu.tar.bz2"
             }
           ]
         },
@@ -128,9 +142,9 @@ The field `name` and `version` are respectively the name and version of the tool
 the triple (`packager`, `name`, `version`). `packager` (AKA "vendor") is defined by the `name` value of the tool's
 package. There can be many different versions of the same tool available at the same time, for example:
 
-- (`arduino`, `avr-gcc`, `4.8.1-arduino2`)
-- (`arduino`, `avr-gcc`, `4.8.1-arduino3`)
-- (`arduino`, `avr-gcc`, `4.8.1-arduino5`)
+- (`arduino`, `avr-gcc`, `5.4.0-atmel3.6.1-arduino2`)
+- (`arduino`, `avr-gcc`, `7.3.0-atmel3.6.1-arduino5`)
+- (`arduino`, `avr-gcc`, `7.3.0-atmel3.6.1-arduino7`)
 - (`arduino`, `avrdude`, `5.11`)
 - (`arduino`, `avrdude`, `6.0`)
 - (`arduino`, `avrdude`, `6.1`)
@@ -139,10 +153,12 @@ package. There can be many different versions of the same tool available at the 
 Each tool version may come in different build flavours for different OS. Each flavour is listed under the `systems`
 array. In the example above `avr-gcc` comes with builds for:
 
-- Linux 64-bit (`x86_64-linux-gnu`),
-- Linux 32-bit (`i686-linux-gnu`),
+- ARM Linux 32-bit (`arm-linux-gnueabihf`),
+- ARM Linux 64-bit (`aarch64-linux-gnu`),
+- macOS 64-bit (`x86_64-apple-darwin14`),
 - Windows (`i686-mingw32`),
-- Mac (`i386-apple-darwin11`)
+- Linux 32-bit (`i686-linux-gnu`),
+- Linux 64-bit (`x86_64-linux-gnu`)
 
 The IDE will take care to install the right flavour based on the `host` value, or fail if a needed flavour is
 missing.<br> Note that this information is not used to select the toolchain during compilation. If you want this
