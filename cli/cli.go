@@ -99,15 +99,12 @@ func createCliCommandTree(cmd *cobra.Command) {
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
 	cmd.PersistentFlags().String("log-level", "", "Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic")
-	configuration.Settings.BindPFlag("logging.level", cmd.PersistentFlags().Lookup("log-level"))
 	cmd.PersistentFlags().String("log-file", "", "Path to the file where logs will be written.")
-	configuration.Settings.BindPFlag("logging.file", cmd.PersistentFlags().Lookup("log-file"))
 	cmd.PersistentFlags().String("log-format", "", "The output format for the logs, can be {text|json}.")
-	configuration.Settings.BindPFlag("logging.format", cmd.PersistentFlags().Lookup("log-format"))
 	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be {text|json}.")
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, "Comma-separated list of additional URLs for the Boards Manager.")
-	configuration.Settings.BindPFlag("board_manager.additional_urls", cmd.PersistentFlags().Lookup("additional-urls"))
+	configuration.BindFlags(cmd, configuration.Settings)
 }
 
 // convert the string passed to the `--log-level` option to the corresponding

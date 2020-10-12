@@ -30,6 +30,12 @@ func tmpDirOrDie() string {
 	if err != nil {
 		panic(fmt.Sprintf("error creating tmp dir: %v", err))
 	}
+	// Symlinks are evaluated becase the temp folder on Mac OS is inside /var, it's not writable
+	// and is a symlink to /private/var, we want the full path so we do this
+	dir, err = filepath.EvalSymlinks(dir)
+	if err != nil {
+		panic(fmt.Sprintf("error evaluating tmp dir symlink: %v", err))
+	}
 	return dir
 }
 
@@ -73,6 +79,59 @@ func BenchmarkSearchConfigTree(b *testing.B) {
 }
 
 func TestInit(t *testing.T) {
-	settings := Init("")
+	tmp := tmpDirOrDie()
+	defer os.RemoveAll(tmp)
+	settings := Init(filepath.Join(tmp, "arduino-cli.yaml"))
 	require.NotNil(t, settings)
+
+	require.Equal(t, "info", settings.GetString("logging.level"))
+	require.Equal(t, "text", settings.GetString("logging.format"))
+
+	require.Empty(t, settings.GetStringSlice("board_manager.additional_urls"))
+
+	require.NotEmpty(t, settings.GetString("directories.Data"))
+	require.NotEmpty(t, settings.GetString("directories.Downloads"))
+	require.NotEmpty(t, settings.GetString("directories.User"))
+
+	require.Equal(t, "50051", settings.GetString("daemon.port"))
+
+	require.Equal(t, true, settings.GetBool("telemetry.enabled"))
+	require.Equal(t, ":9090", settings.GetString("telemetry.addr"))
+}
+
+func TestFindConfigFile(t *testing.T) {
+	configFile := FindConfigFile([]string{"--config-file"})
+	require.Equal(t, "", configFile)
+
+	configFile = FindConfigFile([]string{"--config-file", "some/path/to/config"})
+	require.Equal(t, "some/path/to/config", configFile)
+
+	configFile = FindConfigFile([]string{"--config-file", "some/path/to/config/arduino-cli.yaml"})
+	require.Equal(t, "some/path/to/config/arduino-cli.yaml", configFile)
+
+	configFile = FindConfigFile([]string{})
+	require.Equal(t, "", configFile)
+
+	// Create temporary directories
+	tmp := tmpDirOrDie()
+	defer os.RemoveAll(tmp)
+	target := filepath.Join(tmp, "foo", "bar", "baz")
+	os.MkdirAll(target, os.ModePerm)
+	require.Nil(t, os.Chdir(target))
+
+	// Create a config file
+	f, err := os.Create(filepath.Join(target, "..", "..", "arduino-cli.yaml"))
+	require.Nil(t, err)
+	f.Close()
+
+	configFile = FindConfigFile([]string{})
+	require.Equal(t, filepath.Join(tmp, "foo", "arduino-cli.yaml"), configFile)
+
+	// Create another config file
+	f, err = os.Create(filepath.Join(target, "arduino-cli.yaml"))
+	require.Nil(t, err)
+	f.Close()
+
+	configFile = FindConfigFile([]string{})
+	require.Equal(t, filepath.Join(target, "arduino-cli.yaml"), configFile)
 }
