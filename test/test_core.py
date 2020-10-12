@@ -45,6 +45,37 @@ def test_core_search(run_command, httpserver):
     data = json.loads(result.stdout)
     assert 2 == len(data)
 
+    # Search all Retrokit platforms
+    result = run_command(f"core search retrokit --all --additional-urls={url}")
+    assert result.ok
+    assert 3 == len(result.stdout.strip().splitlines())
+    lines = [l.split(maxsplit=2) for l in result.stdout.strip().splitlines()]
+    assert ["Retrokits-RK002:arm", "1.0.5", "RK002"] in lines
+    assert ["Retrokits-RK002:arm", "1.0.6", "RK002"] in lines
+
+    # Search using Retrokit Package Maintainer
+    result = run_command(f"core search Retrokits-RK002 --all --additional-urls={url}")
+    assert result.ok
+    assert 3 == len(result.stdout.strip().splitlines())
+    lines = [l.split(maxsplit=2) for l in result.stdout.strip().splitlines()]
+    assert ["Retrokits-RK002:arm", "1.0.5", "RK002"] in lines
+    assert ["Retrokits-RK002:arm", "1.0.6", "RK002"] in lines
+
+    # Search using the Retrokit Platform name
+    result = run_command(f"core search rk002 --all --additional-urls={url}")
+    assert result.ok
+    assert 3 == len(result.stdout.strip().splitlines())
+    lines = [l.split(maxsplit=2) for l in result.stdout.strip().splitlines()]
+    assert ["Retrokits-RK002:arm", "1.0.5", "RK002"] in lines
+    assert ["Retrokits-RK002:arm", "1.0.6", "RK002"] in lines
+
+    # Search using a board name
+    result = run_command(f"core search myboard --all --additional-urls={url}")
+    assert result.ok
+    assert 2 == len(result.stdout.strip().splitlines())
+    lines = [l.split(maxsplit=2) for l in result.stdout.strip().splitlines()]
+    assert ["Package:x86", "1.2.3", "Platform"] in lines
+
 
 def test_core_search_no_args(run_command, httpserver):
     """
