@@ -124,9 +124,9 @@ unused, it is reserved for future use (probably together with the Boards Manager
 
 ### Build process
 
-The platform.txt file is used to configure the build process. This is done through a list of **recipes**. Each recipe is
-a command line expression that explains how to call the compiler (or other tools) for every build step and which
-parameter should be passed.
+The platform.txt file is used to configure the [build process](sketch-build-process.md). This is done through a list of
+**recipes**. Each recipe is a command line expression that explains how to call the compiler (or other tools) for every
+build step and which parameter should be passed.
 
 The Arduino development software, before starting the build, determines the list of files to compile. The list is
 composed of:
