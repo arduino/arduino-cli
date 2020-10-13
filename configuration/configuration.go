@@ -36,30 +36,26 @@ var Settings *viper.Viper
 // Init initialize defaults and read the configuration file.
 // Please note the logging system hasn't been configured yet,
 // so logging shouldn't be used here.
-func Init(configPath string) *viper.Viper {
-	// Config file metadata
+func Init(configFile string) *viper.Viper {
 	jww.SetStdoutThreshold(jww.LevelFatal)
+
+	// Create a new viper instance with default values for all the settings
 	settings := viper.New()
-	// Set default values for all the settings
 	SetDefaults(settings)
 
-	configDir := paths.New(configPath)
-	if configDir != nil && !configDir.IsDir() {
-		settings.SetConfigName(strings.TrimSuffix(configDir.Base(), configDir.Ext()))
+	// Set config name and config path
+	if configFilePath := paths.New(configFile); configFilePath != nil {
+		settings.SetConfigName(strings.TrimSuffix(configFilePath.Base(), configFilePath.Ext()))
+		settings.AddConfigPath(configFilePath.Parent().String())
 	} else {
-		settings.SetConfigName("arduino-cli")
-	}
-
-	if configPath == "" {
+		configDir := settings.GetString("directories.Data")
 		// Get default data path if none was provided
-		if configPath = settings.GetString("directories.Data"); configPath != "" {
-			settings.AddConfigPath(configPath)
-		} else {
-			configPath = getDefaultArduinoDataDir()
-			settings.AddConfigPath(configPath)
+		if configDir == "" {
+			configDir = getDefaultArduinoDataDir()
 		}
-	} else {
-		settings.AddConfigPath(filepath.Dir(configPath))
+
+		settings.SetConfigName("arduino-cli")
+		settings.AddConfigPath(configDir)
 	}
 
 	// Attempt to read config file
