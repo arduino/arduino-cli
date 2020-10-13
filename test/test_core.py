@@ -225,3 +225,24 @@ def test_core_broken_install(run_command):
     url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
     assert run_command("core update-index --additional-urls={}".format(url))
     assert not run_command("core install brokenchecksum:x86 --additional-urls={}".format(url))
+
+
+def test_core_install_creates_installed_json(run_command, data_dir):
+    assert run_command("core update-index")
+    assert run_command("core install arduino:avr@1.6.23")
+
+    installed_json_file = Path(data_dir, "packages", "arduino", "hardware", "avr", "1.6.23", "installed.json")
+    assert installed_json_file.exists()
+    installed_json = json.load(installed_json_file.open("r"))
+
+    expected_installed_json = json.load((Path(__file__).parent / "testdata" / "installed.json").open("r"))
+
+    def ordered(obj):
+        if isinstance(obj, dict):
+            return sorted({k: ordered(v) for k, v in obj.items()})
+        if isinstance(obj, list):
+            return sorted(ordered(x) for x in obj)
+        else:
+            return obj
+
+    assert ordered(installed_json) == ordered(expected_installed_json)

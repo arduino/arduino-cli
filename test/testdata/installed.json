@@ -4,7 +4,7 @@
       "name": "arduino",
       "maintainer": "Arduino",
       "websiteUrl": "http://www.arduino.cc/",
-      "Url": "",
+      "Url": "https://downloads.arduino.cc/packages/package_index.json",
       "email": "packages@arduino.cc",
       "platforms": [
         {
@@ -1908,5 +1908,5 @@
       }
     }
   ],
-  "IsTrusted": false
+  "IsTrusted": true
 }
