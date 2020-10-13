@@ -25,7 +25,7 @@ import (
 )
 
 func main() {
-	configuration.Settings = configuration.Init(configuration.FindConfigFile(os.Args))
+	configuration.Settings = configuration.Init(configuration.FindConfigFileInArgsOrWorkingDirectory(os.Args))
 	i18n.Init()
 	arduinoCmd := cli.NewCommand()
 	if err := arduinoCmd.Execute(); err != nil {

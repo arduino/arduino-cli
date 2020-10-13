@@ -22,6 +22,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -41,7 +42,7 @@ func tmpDirOrDie() string {
 
 func TestSearchConfigTreeNotFound(t *testing.T) {
 	tmp := tmpDirOrDie()
-	require.Empty(t, searchConfigTree(tmp))
+	require.Empty(t, searchConfigTree(paths.New(tmp)))
 }
 
 func TestSearchConfigTreeSameFolder(t *testing.T) {
@@ -49,7 +50,7 @@ func TestSearchConfigTreeSameFolder(t *testing.T) {
 	defer os.RemoveAll(tmp)
 	_, err := os.Create(filepath.Join(tmp, "arduino-cli.yaml"))
 	require.Nil(t, err)
-	require.Equal(t, tmp, searchConfigTree(tmp))
+	require.Equal(t, tmp, searchConfigTree(paths.New(tmp)).String())
 }
 
 func TestSearchConfigTreeInParent(t *testing.T) {
@@ -60,10 +61,10 @@ func TestSearchConfigTreeInParent(t *testing.T) {
 	require.Nil(t, err)
 	_, err = os.Create(filepath.Join(tmp, "arduino-cli.yaml"))
 	require.Nil(t, err)
-	require.Equal(t, tmp, searchConfigTree(target))
+	require.Equal(t, tmp, searchConfigTree(paths.New(target)).String())
 }
 
-var result string
+var result *paths.Path
 
 func BenchmarkSearchConfigTree(b *testing.B) {
 	tmp := tmpDirOrDie()
@@ -71,9 +72,9 @@ func BenchmarkSearchConfigTree(b *testing.B) {
 	target := filepath.Join(tmp, "foo", "bar", "baz")
 	os.MkdirAll(target, os.ModePerm)
 
-	var s string
+	var s *paths.Path
 	for n := 0; n < b.N; n++ {
-		s = searchConfigTree(target)
+		s = searchConfigTree(paths.New(target))
 	}
 	result = s
 }
@@ -100,16 +101,16 @@ func TestInit(t *testing.T) {
 }
 
 func TestFindConfigFile(t *testing.T) {
-	configFile := FindConfigFile([]string{"--config-file"})
+	configFile := FindConfigFileInArgsOrWorkingDirectory([]string{"--config-file"})
 	require.Equal(t, "", configFile)
 
-	configFile = FindConfigFile([]string{"--config-file", "some/path/to/config"})
+	configFile = FindConfigFileInArgsOrWorkingDirectory([]string{"--config-file", "some/path/to/config"})
 	require.Equal(t, "some/path/to/config", configFile)
 
-	configFile = FindConfigFile([]string{"--config-file", "some/path/to/config/arduino-cli.yaml"})
+	configFile = FindConfigFileInArgsOrWorkingDirectory([]string{"--config-file", "some/path/to/config/arduino-cli.yaml"})
 	require.Equal(t, "some/path/to/config/arduino-cli.yaml", configFile)
 
-	configFile = FindConfigFile([]string{})
+	configFile = FindConfigFileInArgsOrWorkingDirectory([]string{})
 	require.Equal(t, "", configFile)
 
 	// Create temporary directories
@@ -124,7 +125,7 @@ func TestFindConfigFile(t *testing.T) {
 	require.Nil(t, err)
 	f.Close()
 
-	configFile = FindConfigFile([]string{})
+	configFile = FindConfigFileInArgsOrWorkingDirectory([]string{})
 	require.Equal(t, filepath.Join(tmp, "foo", "arduino-cli.yaml"), configFile)
 
 	// Create another config file
@@ -132,6 +133,6 @@ func TestFindConfigFile(t *testing.T) {
 	require.Nil(t, err)
 	f.Close()
 
-	configFile = FindConfigFile([]string{})
+	configFile = FindConfigFileInArgsOrWorkingDirectory([]string{})
 	require.Equal(t, filepath.Join(target, "arduino-cli.yaml"), configFile)
 }

@@ -187,58 +187,34 @@ func IsBundledInDesktopIDE(settings *viper.Viper) bool {
 	return true
 }
 
-// FindConfigFile returns the config file path using the argument '--config-file' if specified or via the current working dir
-func FindConfigFile(args []string) string {
-	configFile := ""
+// FindConfigFileInArgsOrWorkingDirectory returns the config file path using the
+// argument '--config-file' (if specified) or looking in the current working dir
+func FindConfigFileInArgsOrWorkingDirectory(args []string) string {
+	// Look for '--config-file' argument
 	for i, arg := range args {
-		// 0 --config-file ss
 		if arg == "--config-file" {
 			if len(args) > i+1 {
-				configFile = args[i+1]
+				return args[i+1]
 			}
 		}
 	}
 
-	if configFile != "" {
-		return configFile
-	}
-
-	return searchCwdForConfig()
-}
-
-func searchCwdForConfig() string {
-	cwd, err := os.Getwd()
-
-	if err != nil {
+	// Look into current working directory
+	if cwd, err := paths.Getwd(); err != nil {
 		return ""
+	} else if configFile := searchConfigTree(cwd); configFile != nil {
+		return configFile.Join("arduino-cli.yaml").String()
 	}
-
-	configFile := searchConfigTree(cwd)
-	if configFile == "" {
-		return configFile
-	}
-
-	return configFile + string(os.PathSeparator) + "arduino-cli.yaml"
+	return ""
 }
 
-func searchConfigTree(cwd string) string {
-
+func searchConfigTree(cwd *paths.Path) *paths.Path {
 	// go back up to root and search for the config file
-	for {
-		if _, err := os.Stat(filepath.Join(cwd, "arduino-cli.yaml")); err == nil {
-			// config file found
-			return cwd
-		} else if os.IsNotExist(err) {
-			// no config file found
-			next := filepath.Dir(cwd)
-			if next == cwd {
-				return ""
-			}
-			cwd = next
-		} else {
-			// some error we can't handle happened
-			return ""
+	for _, path := range cwd.Parents() {
+		if path.Join("arduino-cli.yaml").Exist() {
+			return path
 		}
 	}
 
+	return nil
 }
