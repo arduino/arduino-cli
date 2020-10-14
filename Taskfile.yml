@@ -34,7 +34,7 @@ tasks:
       - |
         [[ -d mkdocs-material ]] && git clone https://github.com/squidfunk/mkdocs-material.git -b 5.5.14 --depth 1
         # Ugly hack so that this doesn't fail if patch is already applied
-        git apply --check mkdocs-material-patches/*.patch && git apply mkdocs-material-patches/*.patch; echo
+        git apply --check mkdocs-material-patches/*.patch && git apply mkdocs-material-patches/*.patch; true
 
   docs:build-theme:
     decs: Builds documentation theme
