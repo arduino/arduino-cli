@@ -21,16 +21,12 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/executils"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
-	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -119,104 +115,9 @@ func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) 
 		return nil, errors.New("the ImportFile parameter has been deprecated, use ImportDir instead")
 	}
 
-	// TODO: make a generic function to extract sketch from request
-	// and remove duplication in commands/compile.go
-	if req.GetSketchPath() == "" {
-		return nil, fmt.Errorf("missing sketchPath")
-	}
-	sketchPath := paths.New(req.GetSketchPath())
-	sketch, err := sketches.NewSketchFromPath(sketchPath)
+	toolProperties, err := getDebugProperties(req, pm)
 	if err != nil {
-		return nil, errors.Wrap(err, "opening sketch")
-	}
-
-	fqbnIn := req.GetFqbn()
-	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
-		fqbnIn = sketch.Metadata.CPU.Fqbn
-	}
-	if fqbnIn == "" {
-		return nil, fmt.Errorf("no Fully Qualified Board Name provided")
-	}
-	fqbn, err := cores.ParseFQBN(fqbnIn)
-	if err != nil {
-		return nil, errors.Wrap(err, "error parsing FQBN")
-	}
-
-	// Find target board and board properties
-	_, _, board, boardProperties, _, err := pm.ResolveFQBN(fqbn)
-	if err != nil {
-		return nil, errors.Wrap(err, "error resolving FQBN")
-	}
-
-	// Load programmer tool
-	toolName, have := boardProperties.GetOk("debug.tool")
-	if !have || toolName == "" {
-		return nil, fmt.Errorf("cannot get programmer tool: undefined 'debug.tool' property")
-	}
-
-	var referencedPlatformRelease *cores.PlatformRelease
-	if split := strings.Split(toolName, ":"); len(split) > 2 {
-		return nil, fmt.Errorf("invalid 'debug.tool' property: %s", toolName)
-	} else if len(split) == 2 {
-		referencedPackageName := split[0]
-		toolName = split[1]
-		architecture := board.PlatformRelease.Platform.Architecture
-
-		if referencedPackage := pm.Packages[referencedPackageName]; referencedPackage == nil {
-			return nil, fmt.Errorf("required platform %s:%s not installed", referencedPackageName, architecture)
-		} else if referencedPlatform := referencedPackage.Platforms[architecture]; referencedPlatform == nil {
-			return nil, fmt.Errorf("required platform %s:%s not installed", referencedPackageName, architecture)
-		} else {
-			referencedPlatformRelease = pm.GetInstalledPlatformRelease(referencedPlatform)
-		}
-	}
-
-	// Build configuration for debug
-	toolProperties := properties.NewMap()
-	if referencedPlatformRelease != nil {
-		toolProperties.Merge(referencedPlatformRelease.Properties)
-	}
-	toolProperties.Merge(board.PlatformRelease.Properties)
-	toolProperties.Merge(board.PlatformRelease.RuntimeProperties())
-	toolProperties.Merge(boardProperties)
-
-	requestedToolProperties := toolProperties.SubTree("tools." + toolName)
-	toolProperties.Merge(requestedToolProperties)
-	if requiredTools, err := pm.FindToolsRequiredForBoard(board); err == nil {
-		for _, requiredTool := range requiredTools {
-			logrus.WithField("tool", requiredTool).Info("Tool required for debug")
-			toolProperties.Merge(requiredTool.RuntimeProperties())
-		}
-	}
-
-	var importPath *paths.Path
-	if importDir := req.GetImportDir(); importDir != "" {
-		importPath = paths.New(importDir)
-	} else {
-		// TODO: Create a function to obtain importPath from sketch
-		importPath = sketch.FullPath
-		// Add FQBN (without configs part) to export path
-		fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
-		importPath = importPath.Join("build").Join(fqbnSuffix)
-	}
-	if !importPath.Exist() {
-		return nil, fmt.Errorf("compiled sketch not found in %s", importPath)
-	}
-	if !importPath.IsDir() {
-		return nil, fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
-	}
-	toolProperties.SetPath("build.path", importPath)
-	toolProperties.Set("build.project_name", sketch.Name+".ino")
-
-	// Set debug port property
-	port := req.GetPort()
-	if port != "" {
-		toolProperties.Set("debug.port", port)
-		if strings.HasPrefix(port, "/dev/") {
-			toolProperties.Set("debug.port.file", port[5:])
-		} else {
-			toolProperties.Set("debug.port.file", port)
-		}
+		return nil, err
 	}
 
 	// Set debugger interpreter (default value should be "console")

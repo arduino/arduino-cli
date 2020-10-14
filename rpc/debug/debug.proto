@@ -26,6 +26,8 @@ service Debug {
     // Start a debug session and communicate with the debugger tool.
     rpc Debug (stream DebugReq) returns (stream DebugResp) {
     }
+
+    rpc GetDebugInfo(GetDebugInfoReq) returns (GetDebugInfoResp) {}
 }
 
 // The top-level message sent by the client for the `Debug` method.
@@ -58,7 +60,7 @@ message DebugConfigReq {
     // Path to the sketch that is running on the board. The compiled executable
     // is expected to be located under this path.
     string sketch_path = 3;
-    // Port of the debugger. Set to `none` if the debugger doesn't use a port.
+    // Port of the debugger (optional).
     string port = 4;
     // Which GDB command interpreter to use.
     string interpreter = 5;
@@ -76,4 +78,40 @@ message DebugResp {
     bytes data = 1;
     // Incoming error output from the debugger tool.
     string error = 2;
+}
+
+message GetDebugInfoReq {
+    // Arduino Core Service instance from the `Init` response.
+    cc.arduino.cli.commands.Instance instance = 1;
+    // Fully qualified board name of the board in use
+    // (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
+    // the sketch will be used.
+    string fqbn = 2;
+    // Path to the sketch that is running on the board. The compiled executable
+    // is expected to be located under this path.
+    string sketch_path = 3;
+    // Port of the debugger (optional).
+    string port = 4;
+    // Directory containing the compiled executable. If `import_dir` is not
+    // specified, the executable is assumed to be in `{sketch_path}/build/{fqbn}/`.
+    string import_dir = 5;
+}
+
+message GetDebugInfoResp {
+    // The executable binary to debug
+    string executable = 1;
+    // The toolchain type used for the build (for example "gcc")
+    string toolchain = 2;
+    // The toolchain directory
+    string toolchain_path = 3;
+    // The toolchain architecture prefix (for example "arm-none-eabi-")
+    string toolchain_prefix = 4;
+    // The GDB server type used to connect to the programmer/board (for example "openocd")
+    string server = 5;
+    // The GDB server directory
+    string server_path = 6;
+    // Extra configuration parameters wrt toolchain
+    map<string, string> toolchain_configuration = 7;
+    // Extra configuration parameters wrt GDB server
+    map<string, string> server_configuration = 8;
 }

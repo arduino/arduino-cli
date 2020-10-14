@@ -16,10 +16,12 @@
 package daemon
 
 import (
+	"context"
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/utils"
 	cmd "github.com/arduino/arduino-cli/commands/debug"
+	"github.com/arduino/arduino-cli/rpc/debug"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
 	"github.com/pkg/errors"
 )
@@ -63,4 +65,9 @@ func (s *DebugService) Debug(stream dbg.Debug_DebugServer) error {
 		return (err)
 	}
 	return stream.Send(resp)
+}
+
+// GetDebugInfo return metadata about a debug session
+func (s *DebugService) GetDebugInfo(ctx context.Context, req *debug.GetDebugInfoReq) (*debug.GetDebugInfoResp, error) {
+	return cmd.GetDebugInfo(ctx, req)
 }

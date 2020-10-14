@@ -17,6 +17,7 @@ package debug
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 
@@ -24,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/debug"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -38,6 +38,7 @@ var (
 	verify      bool
 	interpreter string
 	importDir   string
+	printInfo   bool
 )
 
 // NewCommand created a new `upload` command
@@ -55,6 +56,7 @@ func NewCommand() *cobra.Command {
 	debugCommand.Flags().StringVarP(&port, "port", "p", "", "Debug port, e.g.: COM10 or /dev/ttyACM0")
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", "Debug interpreter e.g.: console, mi, mi1, mi2, mi3")
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", "Directory containing binaries for debug.")
+	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, "Show metadata about the debug session instead of starting the debugger.")
 
 	return debugCommand
 }
@@ -72,20 +74,39 @@ func run(command *cobra.Command, args []string) {
 	}
 	sketchPath := initSketchPath(path)
 
-	// Intercept SIGINT and forward them to debug process
-	ctrlc := make(chan os.Signal, 1)
-	signal.Notify(ctrlc, os.Interrupt)
+	if printInfo {
 
-	if _, err := debug.Debug(context.Background(), &dbg.DebugConfigReq{
-		Instance:    &rpc.Instance{Id: instance.GetId()},
-		Fqbn:        fqbn,
-		SketchPath:  sketchPath.String(),
-		Port:        port,
-		Interpreter: interpreter,
-		ImportDir:   importDir,
-	}, os.Stdin, os.Stdout, ctrlc); err != nil {
-		feedback.Errorf("Error during Debug: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
+		if res, err := debug.GetDebugInfo(context.Background(), &dbg.GetDebugInfoReq{
+			Instance:   instance,
+			Fqbn:       fqbn,
+			SketchPath: sketchPath.String(),
+			Port:       port,
+			ImportDir:  importDir,
+		}); err != nil {
+			feedback.Errorf("Error getting Debug info: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		} else {
+			feedback.PrintResult(&debugInfoResult{res})
+		}
+
+	} else {
+
+		// Intercept SIGINT and forward them to debug process
+		ctrlc := make(chan os.Signal, 1)
+		signal.Notify(ctrlc, os.Interrupt)
+
+		if _, err := debug.Debug(context.Background(), &dbg.DebugConfigReq{
+			Instance:    instance,
+			Fqbn:        fqbn,
+			SketchPath:  sketchPath.String(),
+			Port:        port,
+			Interpreter: interpreter,
+			ImportDir:   importDir,
+		}, os.Stdin, os.Stdout, ctrlc); err != nil {
+			feedback.Errorf("Error during Debug: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+
 	}
 }
 
@@ -102,4 +123,16 @@ func initSketchPath(sketchPath *paths.Path) *paths.Path {
 	}
 	logrus.Infof("Reading sketch from dir: %s", wd)
 	return wd
+}
+
+type debugInfoResult struct {
+	info *dbg.GetDebugInfoResp
+}
+
+func (r *debugInfoResult) Data() interface{} {
+	return r.info
+}
+
+func (r *debugInfoResult) String() string {
+	return fmt.Sprintf("%+v", r.info)
 }
