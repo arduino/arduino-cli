@@ -42,13 +42,13 @@ import (
 	"github.com/arduino/arduino-cli/cli/upgrade"
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/inventory"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -99,15 +99,12 @@ func createCliCommandTree(cmd *cobra.Command) {
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
 	cmd.PersistentFlags().String("log-level", "", "Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic")
-	viper.BindPFlag("logging.level", cmd.PersistentFlags().Lookup("log-level"))
 	cmd.PersistentFlags().String("log-file", "", "Path to the file where logs will be written.")
-	viper.BindPFlag("logging.file", cmd.PersistentFlags().Lookup("log-file"))
 	cmd.PersistentFlags().String("log-format", "", "The output format for the logs, can be {text|json}.")
-	viper.BindPFlag("logging.format", cmd.PersistentFlags().Lookup("log-format"))
 	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be {text|json}.")
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, "Comma-separated list of additional URLs for the Boards Manager.")
-	viper.BindPFlag("board_manager.additional_urls", cmd.PersistentFlags().Lookup("additional-urls"))
+	configuration.BindFlags(cmd, configuration.Settings)
 }
 
 // convert the string passed to the `--log-level` option to the corresponding
@@ -136,10 +133,10 @@ func parseFormatString(arg string) (feedback.OutputFormat, bool) {
 }
 
 func preRun(cmd *cobra.Command, args []string) {
-	configFile := viper.ConfigFileUsed()
+	configFile := configuration.Settings.ConfigFileUsed()
 
 	// initialize inventory
-	inventory.Init(viper.GetString("directories.Data"))
+	inventory.Init(configuration.Settings.GetString("directories.Data"))
 
 	//
 	// Prepare logging
@@ -157,13 +154,13 @@ func preRun(cmd *cobra.Command, args []string) {
 	}
 
 	// set the Logger format
-	logFormat := strings.ToLower(viper.GetString("logging.format"))
+	logFormat := strings.ToLower(configuration.Settings.GetString("logging.format"))
 	if logFormat == "json" {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
 	}
 
 	// should we log to file?
-	logFile := viper.GetString("logging.file")
+	logFile := configuration.Settings.GetString("logging.file")
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
@@ -180,8 +177,8 @@ func preRun(cmd *cobra.Command, args []string) {
 	}
 
 	// configure logging filter
-	if lvl, found := toLogLevel(viper.GetString("logging.level")); !found {
-		feedback.Errorf("Invalid option for --log-level: %s", viper.GetString("logging.level"))
+	if lvl, found := toLogLevel(configuration.Settings.GetString("logging.level")); !found {
+		feedback.Errorf("Invalid option for --log-level: %s", configuration.Settings.GetString("logging.level"))
 		os.Exit(errorcodes.ErrBadArgument)
 	} else {
 		logrus.SetLevel(lvl)

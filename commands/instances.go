@@ -36,7 +36,6 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"go.bug.st/downloader/v2"
 )
 
@@ -200,9 +199,9 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 		return nil, fmt.Errorf("invalid handle")
 	}
 
-	indexpath := paths.New(viper.GetString("directories.Data"))
+	indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
 	urls := []string{globals.DefaultIndexURL}
-	urls = append(urls, viper.GetStringSlice("board_manager.additional_urls")...)
+	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
 	for _, u := range urls {
 		URL, err := url.Parse(u)
 		if err != nil {
@@ -614,7 +613,7 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 	res := &createInstanceResult{}
 
 	// setup downloads directory
-	downloadsDir := paths.New(viper.GetString("directories.Downloads"))
+	downloadsDir := paths.New(configuration.Settings.GetString("directories.Downloads"))
 	if downloadsDir.NotExist() {
 		err := downloadsDir.MkdirAll()
 		if err != nil {
@@ -623,8 +622,8 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 	}
 
 	// setup data directory
-	dataDir := paths.New(viper.GetString("directories.Data"))
-	packagesDir := configuration.PackagesDir()
+	dataDir := paths.New(configuration.Settings.GetString("directories.Data"))
+	packagesDir := configuration.PackagesDir(configuration.Settings)
 	if packagesDir.NotExist() {
 		err := packagesDir.MkdirAll()
 		if err != nil {
@@ -633,11 +632,11 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 	}
 
 	if !getLibOnly {
-		res.Pm = packagemanager.NewPackageManager(dataDir, configuration.PackagesDir(),
+		res.Pm = packagemanager.NewPackageManager(dataDir, configuration.PackagesDir(configuration.Settings),
 			downloadsDir, dataDir.Join("tmp"))
 
 		urls := []string{globals.DefaultIndexURL}
-		urls = append(urls, viper.GetStringSlice("board_manager.additional_urls")...)
+		urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
 		for _, u := range urls {
 			URL, err := url.Parse(u)
 			if err != nil {
@@ -664,12 +663,12 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 	res.Lm = librariesmanager.NewLibraryManager(dataDir, downloadsDir)
 
 	// Add IDE builtin libraries dir
-	if bundledLibsDir := configuration.IDEBundledLibrariesDir(); bundledLibsDir != nil {
+	if bundledLibsDir := configuration.IDEBundledLibrariesDir(configuration.Settings); bundledLibsDir != nil {
 		res.Lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
 	}
 
 	// Add user libraries dir
-	libDir := configuration.LibrariesDir()
+	libDir := configuration.LibrariesDir(configuration.Settings)
 	res.Lm.AddLibrariesDir(libDir, libraries.User)
 
 	// Add libraries dirs from installed platforms

@@ -19,12 +19,13 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"net/http"
+
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/inventory"
 	"github.com/segmentio/stats/v4"
 	"github.com/segmentio/stats/v4/prometheus"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"net/http"
 )
 
 // serverPattern is the telemetry endpoint resource path for consume metrics
@@ -42,7 +43,7 @@ func Activate(metricPrefix string) {
 	stats.Register(ph)
 
 	// Configure using viper settings
-	serverAddr := viper.GetString("telemetry.addr")
+	serverAddr := configuration.Settings.GetString("telemetry.addr")
 	logrus.Infof("Setting up Prometheus telemetry on %s%s", serverAddr, serverPattern)
 	go func() {
 		http.Handle(serverPattern, ph)

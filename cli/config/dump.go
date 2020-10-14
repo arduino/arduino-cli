@@ -19,9 +19,9 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 )
 
@@ -59,5 +59,5 @@ func (dr dumpResult) String() string {
 
 func runDumpCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino config dump`")
-	feedback.PrintResult(dumpResult{viper.AllSettings()})
+	feedback.PrintResult(dumpResult{configuration.Settings.AllSettings()})
 }

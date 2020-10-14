@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli"
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/spf13/cobra/doc"
 )
 
@@ -28,8 +29,9 @@ func main() {
 		log.Fatal("Please provide output folder")
 	}
 
+	configuration.Settings = configuration.Init(configuration.FindConfigFileInArgsOrWorkingDirectory(os.Args))
 	cli := cli.NewCommand()
-	cli.DisableAutoGenTag = true  // Disable addition of auto-generated date stamp
+	cli.DisableAutoGenTag = true // Disable addition of auto-generated date stamp
 	err := doc.GenMarkdownTree(cli, os.Args[1])
 	if err != nil {
 		log.Fatal(err)

@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands/daemon"
+	"github.com/arduino/arduino-cli/configuration"
 	srv_commands "github.com/arduino/arduino-cli/rpc/commands"
 	srv_debug "github.com/arduino/arduino-cli/rpc/debug"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/monitor"
@@ -36,7 +37,6 @@ import (
 	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
 
@@ -44,14 +44,14 @@ import (
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "daemon",
-		Short:   fmt.Sprintf("Run as a daemon on port %s", viper.GetString("daemon.port")),
+		Short:   fmt.Sprintf("Run as a daemon on port %s", configuration.Settings.GetString("daemon.port")),
 		Long:    "Running as a daemon the initialization of cores and libraries is done only once.",
 		Example: "  " + os.Args[0] + " daemon",
 		Args:    cobra.NoArgs,
 		Run:     runDaemonCommand,
 	}
 	cmd.PersistentFlags().String("port", "", "The TCP port the daemon will listen to")
-	viper.BindPFlag("daemon.port", cmd.PersistentFlags().Lookup("port"))
+	configuration.Settings.BindPFlag("daemon.port", cmd.PersistentFlags().Lookup("port"))
 	cmd.Flags().BoolVar(&daemonize, "daemonize", false, "Do not terminate daemon process if the parent process dies")
 	return cmd
 }
@@ -60,16 +60,16 @@ var daemonize bool
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
 
-	if viper.GetBool("telemetry.enabled") {
+	if configuration.Settings.GetBool("telemetry.enabled") {
 		telemetry.Activate("daemon")
 		stats.Incr("daemon", stats.T("success", "true"))
 		defer stats.Flush()
 	}
-	port := viper.GetString("daemon.port")
+	port := configuration.Settings.GetString("daemon.port")
 	s := grpc.NewServer()
 
 	// Set specific user-agent for the daemon
-	viper.Set("network.user_agent_ext", "daemon")
+	configuration.Settings.Set("network.user_agent_ext", "daemon")
 
 	// register the commands service
 	srv_commands.RegisterArduinoCoreServer(s, &daemon.ArduinoCoreServerImpl{

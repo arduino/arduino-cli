@@ -46,7 +46,7 @@ func TestPlatformSearch(t *testing.T) {
 	err := paths.New("testdata").Join("package_index.json").CopyTo(dataDir.Join("package_index.json"))
 	require.Nil(t, err)
 
-	configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
+	configuration.Settings = configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
 
 	inst, err := instance.CreateInstance()
 	require.Nil(t, err)

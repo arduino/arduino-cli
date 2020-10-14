@@ -21,26 +21,26 @@ import (
 )
 
 // HardwareDirectories returns all paths that may contains hardware packages.
-func HardwareDirectories() paths.PathList {
+func HardwareDirectories(settings *viper.Viper) paths.PathList {
 	res := paths.PathList{}
 
-	if IsBundledInDesktopIDE() {
-		ideDir := paths.New(viper.GetString("IDE.Directory"))
+	if IsBundledInDesktopIDE(settings) {
+		ideDir := paths.New(settings.GetString("IDE.Directory"))
 		bundledHardwareDir := ideDir.Join("hardware")
 		if bundledHardwareDir.IsDir() {
 			res.Add(bundledHardwareDir)
 		}
 	}
 
-	if viper.IsSet("directories.Data") {
-		packagesDir := PackagesDir()
+	if settings.IsSet("directories.Data") {
+		packagesDir := PackagesDir(Settings)
 		if packagesDir.IsDir() {
 			res.Add(packagesDir)
 		}
 	}
 
-	if viper.IsSet("directories.User") {
-		skDir := paths.New(viper.GetString("directories.User"))
+	if settings.IsSet("directories.User") {
+		skDir := paths.New(settings.GetString("directories.User"))
 		hwDir := skDir.Join("hardware")
 		if hwDir.IsDir() {
 			res.Add(hwDir)
@@ -51,11 +51,11 @@ func HardwareDirectories() paths.PathList {
 }
 
 // BundleToolsDirectories returns all paths that may contains bundled-tools.
-func BundleToolsDirectories() paths.PathList {
+func BundleToolsDirectories(settings *viper.Viper) paths.PathList {
 	res := paths.PathList{}
 
-	if IsBundledInDesktopIDE() {
-		ideDir := paths.New(viper.GetString("IDE.Directory"))
+	if IsBundledInDesktopIDE(settings) {
+		ideDir := paths.New(settings.GetString("IDE.Directory"))
 		bundledToolsDir := ideDir.Join("hardware", "tools")
 		if bundledToolsDir.IsDir() {
 			res = append(res, bundledToolsDir)
@@ -68,9 +68,9 @@ func BundleToolsDirectories() paths.PathList {
 // IDEBundledLibrariesDir returns the libraries directory bundled in
 // the Arduino IDE. If there is no Arduino IDE or the directory doesn't
 // exists then nil is returned
-func IDEBundledLibrariesDir() *paths.Path {
-	if IsBundledInDesktopIDE() {
-		ideDir := paths.New(viper.GetString("IDE.Directory"))
+func IDEBundledLibrariesDir(settings *viper.Viper) *paths.Path {
+	if IsBundledInDesktopIDE(settings) {
+		ideDir := paths.New(Settings.GetString("IDE.Directory"))
 		libDir := ideDir.Join("libraries")
 		if libDir.IsDir() {
 			return libDir
@@ -82,11 +82,11 @@ func IDEBundledLibrariesDir() *paths.Path {
 
 // LibrariesDir returns the full path to the user directory containing
 // custom libraries
-func LibrariesDir() *paths.Path {
-	return paths.New(viper.GetString("directories.User")).Join("libraries")
+func LibrariesDir(settings *viper.Viper) *paths.Path {
+	return paths.New(settings.GetString("directories.User")).Join("libraries")
 }
 
 // PackagesDir returns the full path to the packages folder
-func PackagesDir() *paths.Path {
-	return paths.New(viper.GetString("directories.Data")).Join("packages")
+func PackagesDir(settings *viper.Viper) *paths.Path {
+	return paths.New(settings.GetString("directories.Data")).Join("packages")
 }

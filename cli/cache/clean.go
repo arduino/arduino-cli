@@ -20,9 +20,9 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func initCleanCommand() *cobra.Command {
@@ -40,7 +40,7 @@ func initCleanCommand() *cobra.Command {
 func runCleanCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino cache clean`")
 
-	cachePath := viper.GetString("directories.Downloads")
+	cachePath := configuration.Settings.GetString("directories.Downloads")
 	err := os.RemoveAll(cachePath)
 	if err != nil {
 		feedback.Errorf("Error cleaning caches: %v", err)

@@ -22,9 +22,14 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
+
+func init() {
+	configuration.Settings = configuration.Init("")
+}
 
 func TestGetByVidPid(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
