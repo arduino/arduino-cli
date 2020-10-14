@@ -29,7 +29,7 @@ func main() {
 		log.Fatal("Please provide output folder")
 	}
 
-	configuration.Settings = configuration.Init(configuration.FindConfigFile(os.Args))
+	configuration.Settings = configuration.Init(configuration.FindConfigFileInArgsOrWorkingDirectory(os.Args))
 	cli := cli.NewCommand()
 	cli.DisableAutoGenTag = true // Disable addition of auto-generated date stamp
 	err := doc.GenMarkdownTree(cli, os.Args[1])
