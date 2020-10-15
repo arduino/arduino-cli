@@ -31,8 +31,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// GetDebugInfo returns metadata to start debugging with the specified board
-func GetDebugInfo(ctx context.Context, req *debug.GetDebugInfoReq) (*debug.GetDebugInfoResp, error) {
+// GetDebugConfig returns metadata to start debugging with the specified board
+func GetDebugConfig(ctx context.Context, req *debug.DebugConfigReq) (*debug.GetDebugConfigResp, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
 	props, err := getDebugProperties(req, pm)
@@ -42,7 +42,7 @@ func GetDebugInfo(ctx context.Context, req *debug.GetDebugInfoReq) (*debug.GetDe
 
 	server := props.Get("server")
 	toolchain := props.Get("toolchain")
-	resp := &debug.GetDebugInfoResp{
+	resp := &debug.GetDebugConfigResp{
 		Executable:             props.Get("executable"),
 		Server:                 server,
 		ServerPath:             props.Get("server." + server + ".path"),
@@ -55,15 +55,7 @@ func GetDebugInfo(ctx context.Context, req *debug.GetDebugInfoReq) (*debug.GetDe
 	return resp, nil
 }
 
-// Target represents a target for a debug action
-type Target interface {
-	GetSketchPath() string
-	GetFqbn() string
-	GetImportDir() string
-	GetPort() string
-}
-
-func getDebugProperties(req Target, pm *packagemanager.PackageManager) (*properties.Map, error) {
+func getDebugProperties(req *debug.DebugConfigReq, pm *packagemanager.PackageManager) (*properties.Map, error) {
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
 	if req.GetSketchPath() == "" {

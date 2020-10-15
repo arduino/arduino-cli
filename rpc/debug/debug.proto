@@ -27,12 +27,12 @@ service Debug {
     rpc Debug (stream DebugReq) returns (stream DebugResp) {
     }
 
-    rpc GetDebugInfo(GetDebugInfoReq) returns (GetDebugInfoResp) {}
+    rpc GetDebugConfig(DebugConfigReq) returns (GetDebugConfigResp) {}
 }
 
 // The top-level message sent by the client for the `Debug` method.
 // Multiple `DebugReq` messages can be sent but the first message
-// must contain a `DebugReq` message to initialize the debug session.
+// must contain a `DebugConfigReq` message to initialize the debug session.
 // All subsequent messages must contain bytes to be sent to the debug session
 // and must not contain a `DebugReq` message.
 message DebugReq {
@@ -78,24 +78,7 @@ message DebugResp {
     string error = 2;
 }
 
-message GetDebugInfoReq {
-    // Arduino Core Service instance from the `Init` response.
-    cc.arduino.cli.commands.Instance instance = 1;
-    // Fully qualified board name of the board in use
-    // (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
-    // the sketch will be used.
-    string fqbn = 2;
-    // Path to the sketch that is running on the board. The compiled executable
-    // is expected to be located under this path.
-    string sketch_path = 3;
-    // Port of the debugger (optional).
-    string port = 4;
-    // Directory containing the compiled executable. If `import_dir` is not
-    // specified, the executable is assumed to be in `{sketch_path}/build/{fqbn}/`.
-    string import_dir = 5;
-}
-
-message GetDebugInfoResp {
+message GetDebugConfigResp {
     // The executable binary to debug
     string executable = 1;
     // The toolchain type used for the build (for example "gcc")

@@ -78,15 +78,18 @@ func run(command *cobra.Command, args []string) {
 	}
 	sketchPath := initSketchPath(path)
 
+	debugConfigRequested := &dbg.DebugConfigReq{
+		Instance:    instance,
+		Fqbn:        fqbn,
+		SketchPath:  sketchPath.String(),
+		Port:        port,
+		Interpreter: interpreter,
+		ImportDir:   importDir,
+	}
+
 	if printInfo {
 
-		if res, err := debug.GetDebugInfo(context.Background(), &dbg.GetDebugInfoReq{
-			Instance:   instance,
-			Fqbn:       fqbn,
-			SketchPath: sketchPath.String(),
-			Port:       port,
-			ImportDir:  importDir,
-		}); err != nil {
+		if res, err := debug.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
 			feedback.Errorf("Error getting Debug info: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		} else {
@@ -99,14 +102,7 @@ func run(command *cobra.Command, args []string) {
 		ctrlc := make(chan os.Signal, 1)
 		signal.Notify(ctrlc, os.Interrupt)
 
-		if _, err := debug.Debug(context.Background(), &dbg.DebugConfigReq{
-			Instance:    instance,
-			Fqbn:        fqbn,
-			SketchPath:  sketchPath.String(),
-			Port:        port,
-			Interpreter: interpreter,
-			ImportDir:   importDir,
-		}, os.Stdin, os.Stdout, ctrlc); err != nil {
+		if _, err := debug.Debug(context.Background(), debugConfigRequested, os.Stdin, os.Stdout, ctrlc); err != nil {
 			feedback.Errorf("Error during Debug: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
@@ -130,7 +126,7 @@ func initSketchPath(sketchPath *paths.Path) *paths.Path {
 }
 
 type debugInfoResult struct {
-	info *dbg.GetDebugInfoResp
+	info *dbg.GetDebugConfigResp
 }
 
 func (r *debugInfoResult) Data() interface{} {
