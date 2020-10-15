@@ -13,10 +13,31 @@ on:
       - "cli/**"
       - "rpc/**"
       - ".github/workflows/publish-docs.yaml"
+  # On branch or tag creation (will be filtered by the publish-determination job)
+  create:
 
 jobs:
+  publish-determination:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.determination.outputs.result }}
+    steps:
+      - name: Determine if documentation should be published on this workflow run
+        id: determination
+        run: |
+          RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
+          if [[ "${{ github.event_name }}" == "push" || ( "${{ github.event_name }}" == "create" && "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX ) ]]; then
+            RESULT="true"
+          else
+            RESULT="false"
+          fi
+
+          echo "::set-output name=result::$RESULT"
+
   publish:
     runs-on: ubuntu-latest
+    needs: publish-determination
+    if: needs.publish-determination.outputs.result == 'true'
 
     steps:
       - name: Checkout
