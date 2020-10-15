@@ -18,7 +18,6 @@ package debug
 import (
 	"context"
 	"fmt"
-	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -39,12 +38,6 @@ func GetDebugInfo(ctx context.Context, req *debug.GetDebugInfoReq) (*debug.GetDe
 	props, err := getDebugProperties(req, pm)
 	if err != nil {
 		return nil, err
-	}
-
-	keys := props.Keys()
-	sort.StringSlice(keys).Sort()
-	for _, k := range keys {
-		fmt.Printf("%s=%s\n", k, props.Get(k))
 	}
 
 	server := props.Get("server")

@@ -20,13 +20,17 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"sort"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/debug"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
+	"github.com/arduino/arduino-cli/table"
 	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
+	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -134,5 +138,32 @@ func (r *debugInfoResult) Data() interface{} {
 }
 
 func (r *debugInfoResult) String() string {
-	return fmt.Sprintf("%+v", r.info)
+	t := table.New()
+	green := color.New(color.FgHiGreen)
+	dimGreen := color.New(color.FgGreen)
+	t.AddRow("Executable to debug", table.NewCell(r.info.GetExecutable(), green))
+	t.AddRow("Toolchain type", table.NewCell(r.info.GetToolchain(), green))
+	t.AddRow("Toolchain path", table.NewCell(r.info.GetToolchainPath(), dimGreen))
+	t.AddRow("Toolchain prefix", table.NewCell(r.info.GetToolchainPrefix(), dimGreen))
+	if len(r.info.GetToolchainConfiguration()) > 0 {
+		conf := properties.NewFromHashmap(r.info.GetToolchainConfiguration())
+		keys := conf.Keys()
+		sort.Strings(keys)
+		t.AddRow("Toolchain custom configurations")
+		for _, k := range keys {
+			t.AddRow(table.NewCell(" - "+k, dimGreen), table.NewCell(conf.Get(k), dimGreen))
+		}
+	}
+	t.AddRow("GDB Server type", table.NewCell(r.info.GetServer(), green))
+	t.AddRow("GDB Server path", table.NewCell(r.info.GetServerPath(), dimGreen))
+	if len(r.info.GetServerConfiguration()) > 0 {
+		conf := properties.NewFromHashmap(r.info.GetServerConfiguration())
+		keys := conf.Keys()
+		sort.Strings(keys)
+		t.AddRow(fmt.Sprintf("%s custom configurations", r.info.GetServer()))
+		for _, k := range keys {
+			t.AddRow(table.NewCell(" - "+k, dimGreen), table.NewCell(conf.Get(k), dimGreen))
+		}
+	}
+	return t.Render()
 }
