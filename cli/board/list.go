@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/arduino-cli/table"
@@ -43,15 +44,29 @@ func initListCommand() *cobra.Command {
 
 	listCommand.Flags().StringVar(&listFlags.timeout, "timeout", "0s",
 		"The connected devices search timeout, raise it if your board doesn't show up (e.g. to 10s).")
+	listCommand.Flags().BoolVarP(&listFlags.watch, "watch", "w", false,
+		"Command keeps running and prints list of connected boards whenever there is a change.")
+
 	return listCommand
 }
 
 var listFlags struct {
 	timeout string // Expressed in a parsable duration, is the timeout for the list and attach commands.
+	watch   bool
 }
 
 // runListCommand detects and lists the connected arduino boards
 func runListCommand(cmd *cobra.Command, args []string) {
+	if listFlags.watch {
+		inst, err := instance.CreateInstance()
+		if err != nil {
+			feedback.Errorf("Error detecting boards: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		watchList(inst)
+		os.Exit(0)
+	}
+
 	if timeout, err := time.ParseDuration(listFlags.timeout); err != nil {
 		feedback.Errorf("Invalid timeout: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
@@ -72,6 +87,48 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	}
 
 	feedback.PrintResult(result{ports})
+}
+
+func watchList(inst *rpc.Instance) {
+	pm := commands.GetPackageManager(inst.Id)
+	eventsChan, err := commands.WatchListBoards(pm)
+	if err != nil {
+		feedback.Errorf("Error detecting boards: %v", err)
+		os.Exit(errorcodes.ErrNetwork)
+	}
+
+	boardPorts := map[string]*commands.BoardPort{}
+	for event := range eventsChan {
+		switch event.Type {
+		case "add":
+			boardPorts[event.Port.Address] = &commands.BoardPort{
+				Address:             event.Port.Address,
+				Label:               event.Port.AddressLabel,
+				Prefs:               event.Port.Properties,
+				IdentificationPrefs: event.Port.IdentificationProperties,
+				Protocol:            event.Port.Protocol,
+				ProtocolLabel:       event.Port.ProtocolLabel,
+			}
+		case "remove":
+			delete(boardPorts, event.Port.Address)
+		}
+
+		ports := []*rpc.DetectedPort{}
+		for _, p := range boardPorts {
+			boardList, err := board.Identify(pm, p)
+			if err != nil {
+				feedback.Errorf("Error identifying board: %v", err)
+				os.Exit(errorcodes.ErrNetwork)
+			}
+			ports = append(ports, &rpc.DetectedPort{
+				Address:       p.Address,
+				Protocol:      p.Protocol,
+				ProtocolLabel: p.ProtocolLabel,
+				Boards:        boardList,
+			})
+		}
+		feedback.PrintResult(result{ports})
+	}
 }
 
 // output from this command requires special formatting, let's create a dedicated
