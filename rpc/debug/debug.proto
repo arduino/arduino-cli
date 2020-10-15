@@ -64,8 +64,6 @@ message DebugConfigReq {
     string port = 4;
     // Which GDB command interpreter to use.
     string interpreter = 5;
-    // DEPRECATED: use import_dir instead
-    string import_file = 7 [deprecated = true];
     // Directory containing the compiled executable. If `import_dir` is not
     // specified, the executable is assumed to be in
     // `{sketch_path}/build/{fqbn}/`.

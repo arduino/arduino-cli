@@ -109,10 +109,6 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 
 // getCommandLine compose a debug command represented by a core recipe
 func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) ([]string, error) {
-	if req.GetImportFile() != "" {
-		return nil, errors.New("the ImportFile parameter has been deprecated, use ImportDir instead")
-	}
-
 	debugInfo, err := GetDebugInfo(context.Background(), &dbg.GetDebugInfoReq{
 		Instance:   req.GetInstance(),
 		Fqbn:       req.GetFqbn(),
