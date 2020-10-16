@@ -29,26 +29,26 @@ func TestDiscoveryStdioHandling(t *testing.T) {
 
 	_, err = disc.outgoingCommandsPipe.Write([]byte(`{ "eventType":`)) // send partial JSON
 	require.NoError(t, err)
-	msg, err := disc.waitMessage(time.Millisecond * 200)
+	msg, err := disc.waitMessage(time.Millisecond * 1000)
 	require.Error(t, err)
 	require.Nil(t, msg)
 
 	_, err = disc.outgoingCommandsPipe.Write([]byte(`"ev1" }{ `)) // complete previous json and start another one
 	require.NoError(t, err)
 
-	msg, err = disc.waitMessage(time.Millisecond * 200)
+	msg, err = disc.waitMessage(time.Millisecond * 1000)
 	require.NoError(t, err)
 	require.NotNil(t, msg)
 	require.Equal(t, "ev1", msg.EventType)
 
-	msg, err = disc.waitMessage(time.Millisecond * 200)
+	msg, err = disc.waitMessage(time.Millisecond * 1000)
 	require.Error(t, err)
 	require.Nil(t, msg)
 
 	_, err = disc.outgoingCommandsPipe.Write([]byte(`"eventType":"ev2" }`)) // complete previous json
 	require.NoError(t, err)
 
-	msg, err = disc.waitMessage(time.Millisecond * 200)
+	msg, err = disc.waitMessage(time.Millisecond * 1000)
 	require.NoError(t, err)
 	require.NotNil(t, msg)
 	require.Equal(t, "ev2", msg.EventType)
