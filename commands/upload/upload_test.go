@@ -131,13 +131,13 @@ func TestUploadPropertiesComposition(t *testing.T) {
 	buildPath1 := paths.New("testdata", "build_path_1")
 	logrus.SetLevel(logrus.TraceLevel)
 	type test struct {
-		importDir      *paths.Path
-		fqbn           string
-		port           string
-		programmer     string
-		burnBootloader bool
-		expected       string
-		expected2      string
+		importDir       *paths.Path
+		fqbn            string
+		port            string
+		programmer      string
+		burnBootloader  bool
+		expectedOutput  string
+		expectedOutput2 string
 	}
 
 	cwdPath, err := paths.Getwd()
@@ -146,112 +146,72 @@ func TestUploadPropertiesComposition(t *testing.T) {
 
 	tests := []test{
 		// 0: classic upload, requires port
-		{buildPath1, "alice:avr:board1", "port", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol port -bspeed testdata/build_path_1/sketch.ino.hex", ""},
+		{buildPath1, "alice:avr:board1", "port", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol port -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
 		{buildPath1, "alice:avr:board1", "", "", false, "FAIL", ""},
 		// 2: classic upload, no port
-		{buildPath1, "alice:avr:board2", "port", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex", ""},
-		{buildPath1, "alice:avr:board2", "", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex", ""},
+		{buildPath1, "alice:avr:board2", "port", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board2", "", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
 
 		// 4: upload with programmer, requires port
-		{buildPath1, "alice:avr:board1", "port", "progr1", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ progprotocol port -bspeed testdata/build_path_1/sketch.ino.hex", ""},
+		{buildPath1, "alice:avr:board1", "port", "progr1", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ progprotocol port -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
 		{buildPath1, "alice:avr:board1", "", "progr1", false, "FAIL", ""},
 		// 6: upload with programmer, no port
-		{buildPath1, "alice:avr:board1", "port", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/build_path_1/sketch.ino.hex", ""},
-		{buildPath1, "alice:avr:board1", "", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/build_path_1/sketch.ino.hex", ""},
+		{buildPath1, "alice:avr:board1", "port", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board1", "", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
 		// 8: upload with programmer, require port through extra params
-		{buildPath1, "alice:avr:board1", "port", "progr3", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog3protocol port -bspeed testdata/build_path_1/sketch.ino.hex", ""},
+		{buildPath1, "alice:avr:board1", "port", "progr3", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog3protocol port -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
 		{buildPath1, "alice:avr:board1", "", "progr3", false, "FAIL", ""},
 
 		// 10: burn bootloader, require port
 		{buildPath1, "alice:avr:board1", "port", "", true, "FAIL", ""}, // requires programmer
 		{buildPath1, "alice:avr:board1", "port", "progr1", true,
-			"ERASE conf-board1 conf-general conf-erase $$VERBOSE-VERIFY$$ genprog1protocol port -bspeed",
-			"BURN conf-board1 conf-general conf-bootloader $$VERBOSE-VERIFY$$ genprog1protocol port -bspeed -F0xFF " + cwd + "/testdata/hardware/alice/avr/bootloaders/niceboot/niceboot.hex"},
+			"ERASE conf-board1 conf-general conf-erase $$VERBOSE-VERIFY$$ genprog1protocol port -bspeed\n",
+			"BURN conf-board1 conf-general conf-bootloader $$VERBOSE-VERIFY$$ genprog1protocol port -bspeed -F0xFF " + cwd + "/testdata/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
 
 		// 12: burn bootloader, preferences override from programmers.txt
 		{buildPath1, "alice:avr:board1", "port", "progr4", true,
-			"ERASE conf-board1 conf-two-general conf-two-erase $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed",
-			"BURN conf-board1 conf-two-general conf-two-bootloader $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed -F0xFF " + cwd + "/testdata/hardware/alice/avr/bootloaders/niceboot/niceboot.hex"},
+			"ERASE conf-board1 conf-two-general conf-two-erase $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed\n",
+			"BURN conf-board1 conf-two-general conf-two-bootloader $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed -F0xFF " + cwd + "/testdata/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
 	}
+
+	testRunner := func(t *testing.T, test test, verboseVerify bool) {
+		outStream := &bytes.Buffer{}
+		errStream := &bytes.Buffer{}
+		err := runProgramAction(
+			pm,
+			nil,                     // sketch
+			"",                      // importFile
+			test.importDir.String(), // importDir
+			test.fqbn,               // FQBN
+			test.port,               // port
+			test.programmer,         // programmer
+			verboseVerify,           // verbose
+			verboseVerify,           // verify
+			test.burnBootloader,     // burnBootloader
+			outStream,
+			errStream,
+		)
+		verboseVerifyOutput := "verbose verify"
+		if !verboseVerify {
+			verboseVerifyOutput = "quiet noverify"
+		}
+		if test.expectedOutput == "FAIL" {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+			outFiltered := strings.ReplaceAll(outStream.String(), "\r", "")
+			outFiltered = strings.ReplaceAll(outFiltered, "\\", "/")
+			require.Contains(t, outFiltered, strings.ReplaceAll(test.expectedOutput, "$$VERBOSE-VERIFY$$", verboseVerifyOutput))
+			require.Contains(t, outFiltered, strings.ReplaceAll(test.expectedOutput2, "$$VERBOSE-VERIFY$$", verboseVerifyOutput))
+		}
+	}
+
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("SubTest%02d", i), func(t *testing.T) {
-			outStream := &bytes.Buffer{}
-			errStream := &bytes.Buffer{}
-			err := runProgramAction(
-				pm,
-				nil,                     // sketch
-				"",                      // importFile
-				test.importDir.String(), // importDir
-				test.fqbn,               // FQBN
-				test.port,               // port
-				test.programmer,         // programmer
-				false,                   // verbose
-				false,                   // verify
-				test.burnBootloader,     // burnBootloader
-				outStream,
-				errStream,
-			)
-			if test.expected == "FAIL" {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				outFiltered := strings.ReplaceAll(outStream.String(), "\r", "")
-				outFiltered = strings.ReplaceAll(outFiltered, "\\", "/")
-				out := strings.Split(outFiltered, "\n")
-				// With verbose disable, the upload will output at least 2 lines:
-				// - the output of the command (1 or 2 lines)
-				// - an empty line
-				if test.expected2 != "" {
-					require.Len(t, out, 3)
-				} else {
-					require.Len(t, out, 2)
-				}
-				require.Equal(t, strings.ReplaceAll(test.expected, "$$VERBOSE-VERIFY$$", "quiet noverify"), out[0])
-				if test.expected2 != "" {
-					require.Equal(t, strings.ReplaceAll(test.expected2, "$$VERBOSE-VERIFY$$", "quiet noverify"), out[1])
-				}
-			}
+			testRunner(t, test, false)
 		})
 		t.Run(fmt.Sprintf("SubTest%02d-WithVerifyAndVerbose", i), func(t *testing.T) {
-			outStream := &bytes.Buffer{}
-			errStream := &bytes.Buffer{}
-			err := runProgramAction(
-				pm,
-				nil,                     // sketch
-				"",                      // importFile
-				test.importDir.String(), // importDir
-				test.fqbn,               // FQBN
-				test.port,               // port
-				test.programmer,         // programmer
-				true,                    // verbose
-				true,                    // verify
-				test.burnBootloader,     // burnBootloader
-				outStream,
-				errStream,
-			)
-			if test.expected == "FAIL" {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				outFiltered := strings.ReplaceAll(outStream.String(), "\r", "")
-				outFiltered = strings.ReplaceAll(outFiltered, "\\", "/")
-				out := strings.Split(outFiltered, "\n")
-				// With verbose enabled, the upload will output at least 3 lines:
-				// - the first command line that the cli is going to run
-				// - the output of the first command
-				// - OPTIONAL: the second command line that the cli is going to run
-				// - OPTIONAL: the output of the second command
-				// - an empty line
-				if test.expected2 != "" {
-					require.Len(t, out, 5)
-				} else {
-					require.Len(t, out, 3)
-				}
-				require.Equal(t, strings.ReplaceAll(test.expected, "$$VERBOSE-VERIFY$$", "verbose verify"), out[1])
-				if test.expected2 != "" {
-					require.Equal(t, strings.ReplaceAll(test.expected2, "$$VERBOSE-VERIFY$$", "verbose verify"), out[3])
-				}
-			}
+			testRunner(t, test, true)
 		})
 	}
 }
