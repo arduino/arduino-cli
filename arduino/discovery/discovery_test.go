@@ -24,31 +24,31 @@ import (
 )
 
 func TestDiscoveryStdioHandling(t *testing.T) {
-	disc, err := New("go", "run", "testdata/cat/main.go") // copy stdin to stdout
+	disc, err := New("test", "go", "run", "testdata/cat/main.go") // copy stdin to stdout
 	require.NoError(t, err)
 
 	_, err = disc.outgoingCommandsPipe.Write([]byte(`{ "eventType":`)) // send partial JSON
 	require.NoError(t, err)
-	msg, err := disc.waitMessage(time.Millisecond * 100)
+	msg, err := disc.waitMessage(time.Millisecond * 200)
 	require.Error(t, err)
 	require.Nil(t, msg)
 
 	_, err = disc.outgoingCommandsPipe.Write([]byte(`"ev1" }{ `)) // complete previous json and start another one
 	require.NoError(t, err)
 
-	msg, err = disc.waitMessage(time.Millisecond * 100)
+	msg, err = disc.waitMessage(time.Millisecond * 200)
 	require.NoError(t, err)
 	require.NotNil(t, msg)
 	require.Equal(t, "ev1", msg.EventType)
 
-	msg, err = disc.waitMessage(time.Millisecond * 100)
+	msg, err = disc.waitMessage(time.Millisecond * 200)
 	require.Error(t, err)
 	require.Nil(t, msg)
 
 	_, err = disc.outgoingCommandsPipe.Write([]byte(`"eventType":"ev2" }`)) // complete previous json
 	require.NoError(t, err)
 
-	msg, err = disc.waitMessage(time.Millisecond * 100)
+	msg, err = disc.waitMessage(time.Millisecond * 200)
 	require.NoError(t, err)
 	require.NotNil(t, msg)
 	require.Equal(t, "ev2", msg.EventType)
@@ -57,7 +57,7 @@ func TestDiscoveryStdioHandling(t *testing.T) {
 
 	err = disc.outgoingCommandsPipe.(io.ReadCloser).Close()
 	require.NoError(t, err)
-	time.Sleep(time.Millisecond * 100)
+	time.Sleep(time.Millisecond * 200)
 
 	require.False(t, disc.IsAlive())
 }
