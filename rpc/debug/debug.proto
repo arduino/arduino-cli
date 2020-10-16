@@ -68,6 +68,8 @@ message DebugConfigReq {
     // specified, the executable is assumed to be in
     // `{sketch_path}/build/{fqbn}/`.
     string import_dir = 8;
+    // The programmer to use for debugging.
+    string programmer = 9;
 }
 
 //

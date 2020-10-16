@@ -105,6 +105,16 @@ func getDebugProperties(req *debug.DebugConfigReq, pm *packagemanager.PackageMan
 		}
 	}
 
+	if req.GetProgrammer() != "" {
+		if p, ok := platformRelease.Programmers[req.GetProgrammer()]; ok {
+			toolProperties.Merge(p.Properties)
+		} else if refP, ok := referencedPlatformRelease.Programmers[req.GetProgrammer()]; ok {
+			toolProperties.Merge(refP.Properties)
+		} else {
+			return nil, fmt.Errorf("programmer '%s' not found", req.GetProgrammer())
+		}
+	}
+
 	var importPath *paths.Path
 	if importDir := req.GetImportDir(); importDir != "" {
 		importPath = paths.New(importDir)

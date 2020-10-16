@@ -43,6 +43,7 @@ var (
 	interpreter string
 	importDir   string
 	printInfo   bool
+	programmer  string
 )
 
 // NewCommand created a new `upload` command
@@ -51,13 +52,14 @@ func NewCommand() *cobra.Command {
 		Use:     "debug",
 		Short:   "Debug Arduino sketches.",
 		Long:    "Debug Arduino sketches. (this command opens an interactive gdb session)",
-		Example: "  " + os.Args[0] + " debug -b arduino:samd:mkr1000  /home/user/Arduino/MySketch",
+		Example: "  " + os.Args[0] + " debug -b arduino:samd:mkr1000 -P atmel_ice /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}
 
 	debugCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
 	debugCommand.Flags().StringVarP(&port, "port", "p", "", "Debug port, e.g.: COM10 or /dev/ttyACM0")
+	debugCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Programmer to use for debugging")
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", "Debug interpreter e.g.: console, mi, mi1, mi2, mi3")
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", "Directory containing binaries for debug.")
 	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, "Show metadata about the debug session instead of starting the debugger.")
@@ -85,6 +87,7 @@ func run(command *cobra.Command, args []string) {
 		Port:        port,
 		Interpreter: interpreter,
 		ImportDir:   importDir,
+		Programmer:  programmer,
 	}
 
 	if printInfo {
