@@ -150,8 +150,7 @@ func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) 
 	// Extract path to GDB Server
 	switch debugInfo.GetServer() {
 	case "openocd":
-		openocd := paths.New(debugInfo.ServerPath).Join("openocd")
-		serverCmd := fmt.Sprintf(`target extended-remote | "%s"`, openocd)
+		serverCmd := fmt.Sprintf(`target extended-remote | "%s"`, debugInfo.ServerPath)
 
 		if cfg := debugInfo.ServerConfiguration["scripts_dir"]; cfg != "" {
 			serverCmd += fmt.Sprintf(` -s "%s"`, cfg)
