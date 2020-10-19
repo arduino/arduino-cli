@@ -16,7 +16,8 @@
 * **What is the new behavior?**
 <!-- if this is a feature change -->
 
-- **Does this PR introduce a breaking change?**
+- **Does this PR introduce a breaking change, and is
+[titled accordingly](https://arduino.github.io/arduino-cli/latest/CONTRIBUTING/#breaking)?**
 <!-- What changes might users need to make in their workflow or application due to this PR? -->
 
 * **Other information**:
