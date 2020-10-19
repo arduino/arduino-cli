@@ -21,6 +21,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -121,7 +122,11 @@ func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) 
 	var gdbPath *paths.Path
 	switch debugInfo.GetToolchain() {
 	case "gcc":
-		gdbPath = paths.New(debugInfo.ToolchainPath).Join(debugInfo.ToolchainPrefix + "gdb")
+		gdbexecutable := debugInfo.ToolchainPrefix + "gdb"
+		if runtime.GOOS == "windows" {
+			gdbexecutable += ".exe"
+		}
+		gdbPath = paths.New(debugInfo.ToolchainPath).Join(gdbexecutable)
 	default:
 		return nil, errors.Errorf("unsupported toolchain '%s'", debugInfo.GetToolchain())
 	}
@@ -131,8 +136,9 @@ func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) 
 	gdbInterpreter := req.GetInterpreter()
 	if gdbInterpreter == "" {
 		gdbInterpreter = "console"
-	} else {
-		add("--interpreter=" + gdbInterpreter)
+	}
+	add("--interpreter=" + gdbInterpreter)
+	if gdbInterpreter != "console" {
 		add("-ex")
 		add("set pagination off")
 	}

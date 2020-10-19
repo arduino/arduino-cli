@@ -113,6 +113,22 @@ recipe.output.save_file={build.project_name}.{build.variant}.{build.preferred_ou
 recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
 recipe.size.regex=\.text\s+([0-9]+).*
 
+
+# Debugger configuration (general options)
+# ----------------------------------------
+# EXPERIMENTAL feature:
+#  - this is alpha and may be subject to change without notice
+debug.executable={build.path}/{build.project_name}.elf
+debug.toolchain=gcc
+debug.toolchain.path={runtime.tools.arm-none-eabi-gcc-7-2017q4.path}/bin/
+debug.toolchain.prefix=arm-none-eabi-
+debug.server=openocd
+debug.server.openocd.path={runtime.tools.openocd-0.10.0-arduino7.path}/bin/openocd
+debug.server.openocd.path.windows={runtime.tools.openocd-0.10.0-arduino7.path}/bin/openocd.exe
+debug.server.openocd.scripts_dir={runtime.tools.openocd-0.10.0-arduino7.path}/share/openocd/scripts/
+debug.server.openocd.script={runtime.platform.path}/variants/{build.variant}/{build.openocdscript}
+
+
 # Upload/Debug tools
 # ------------------
 
@@ -219,13 +235,3 @@ tools.openocd-withbootsize.erase.pattern=
 tools.openocd-withbootsize.bootloader.params.verbose=-d2
 tools.openocd-withbootsize.bootloader.params.quiet=-d0
 tools.openocd-withbootsize.bootloader.pattern="{path}/{cmd}" {bootloader.verbose} -s "{path}/share/openocd/scripts/" -f "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "telnet_port disabled; init; halt; at91samd bootloader 0; program {{runtime.platform.path}/bootloaders/{bootloader.file}} verify reset; shutdown"
-
-#
-# GDB (Debugger)
-#
-
-tools.gdb-openocd.path={runtime.tools.arm-none-eabi-gcc-7-2017q4.path}/bin/
-tools.gdb-openocd.cmd=arm-none-eabi-gdb
-tools.gdb-openocd.cmd.windows=arm-none-eabi-gdb.exe
-tools.gdb-openocd.interpreter=console
-tools.gdb-openocd.debug.pattern="{path}/{cmd}" --interpreter={interpreter}  -ex 'target extended-remote | {tools.openocd.path}/{tools.openocd.cmd} -s "{tools.openocd.path}/share/openocd/scripts/" --file "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "gdb_port pipe" -c "telnet_port 0" -c init -c halt' {build.path}/{build.project_name}.elf
