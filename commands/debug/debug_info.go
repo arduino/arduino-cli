@@ -29,6 +29,8 @@ import (
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // GetDebugConfig returns metadata to start debugging with the specified board
@@ -150,5 +152,10 @@ func getDebugProperties(req *debug.DebugConfigReq, pm *packagemanager.PackageMan
 	for k, v := range toolProperties.SubTree("debug").AsMap() {
 		debugProperties.Set(k, toolProperties.ExpandPropsInString(v))
 	}
+
+	if !debugProperties.ContainsKey("executable") {
+		return nil, status.Error(codes.Unimplemented, fmt.Sprintf("debugging not supported for board %s", req.GetFqbn()))
+	}
+
 	return debugProperties, nil
 }
