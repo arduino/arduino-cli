@@ -68,6 +68,11 @@ func (fb *Feedback) SetFormat(f OutputFormat) {
 	fb.format = f
 }
 
+// GetFormat returns the output format currently set
+func (fb *Feedback) GetFormat() OutputFormat {
+	return fb.format
+}
+
 // OutputWriter returns the underlying io.Writer to be used when the Print*
 // api is not enough.
 func (fb *Feedback) OutputWriter() io.Writer {
