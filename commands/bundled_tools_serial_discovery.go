@@ -32,65 +32,75 @@ import (
 
 var (
 	mutex     = sync.Mutex{}
-	sdVersion = semver.ParseRelaxed("1.0.0")
+	sdVersion = semver.ParseRelaxed("1.1.0")
 	flavors   = []*cores.Flavor{
 		{
 			OS: "i686-pc-linux-gnu",
 			Resource: &resources.DownloadResource{
-				ArchiveFileName: fmt.Sprintf("serial-discovery-linux32-v%s.tar.bz2", sdVersion),
-				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery-linux32-v%s.tar.bz2", sdVersion),
-				Size:            1469113,
-				Checksum:        "SHA-256:35d96977844ad8d5ca9363e1ae5794450e5f7cf3d29ce7fdfe656b59e7fff725",
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Linux_32bit.tar.bz2", sdVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Linux_32bit.tar.bz2", sdVersion),
+				Size:            1589443,
+				Checksum:        "SHA-256:e60fa16da2735f80410c636234a405bd1cc9306090cab4e312c4189e38f93f72",
 				CachePath:       "tools",
 			},
 		},
 		{
 			OS: "x86_64-pc-linux-gnu",
 			Resource: &resources.DownloadResource{
-				ArchiveFileName: fmt.Sprintf("serial-discovery-linux64-v%s.tar.bz2", sdVersion),
-				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery-linux64-v%s.tar.bz2", sdVersion),
-				Size:            1503971,
-				Checksum:        "SHA-256:1a870d4d823ea6ebec403f63b10a1dbc9c623a6efea5cfa9141fa20045b731e2",
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Linux_64bit.tar.bz2", sdVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Linux_64bit.tar.bz2", sdVersion),
+				Size:            1611875,
+				Checksum:        "SHA-256:6232f852543094e9f73e1994e6888646fdcd24eca15fd4e5bde716a8e23046dc",
 				CachePath:       "tools",
 			},
 		},
 		{
 			OS: "i686-mingw32",
 			Resource: &resources.DownloadResource{
-				ArchiveFileName: fmt.Sprintf("serial-discovery-windows-v%s.zip", sdVersion),
-				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery-windows-v%s.zip", sdVersion),
-				Size:            1512379,
-				Checksum:        "SHA-256:b956128ab27a3a883c938d17cad640ba396876472f2ed25d8e661f12f5d0f584",
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Windows_32bit.zip", sdVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Windows_32bit.zip", sdVersion),
+				Size:            1719070,
+				Checksum:        "SHA-256:3efdc744a0ca11c5f9088525eb4363e90e2b6a43a0db23c5c6975a10d739c7cb",
+				CachePath:       "tools",
+			},
+		},
+		{
+			OS: "x86_64-mingw32",
+			Resource: &resources.DownloadResource{
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Windows_64bit.zip", sdVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Windows_64bit.zip", sdVersion),
+				Size:            1683799,
+				Checksum:        "SHA-256:c6296b92459160f4c0bf7d2e1234cd53fd64f44cb3fa8c3a4b10dd6670466c69",
 				CachePath:       "tools",
 			},
 		},
 		{
 			OS: "x86_64-apple-darwin",
 			Resource: &resources.DownloadResource{
-				ArchiveFileName: fmt.Sprintf("serial-discovery-macosx-v%s.tar.bz2", sdVersion),
-				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery-macosx-v%s.tar.bz2", sdVersion),
-				Size:            746132,
-				Checksum:        "SHA-256:fcff1b972b70a73cd738facc6d99174d8323293b60c12149c8f6f3084fb2170e",
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_macOS_64bit.tar.bz2", sdVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_macOS_64bit.tar.bz2", sdVersion),
+				Size:            1620346,
+				Checksum:        "SHA-256:4052a64dd68090726247dea7f03656eae951549df9878362dcedfcef116a9e9f",
 				CachePath:       "tools",
 			},
 		},
 		{
 			OS: "arm-linux-gnueabihf",
 			Resource: &resources.DownloadResource{
-				ArchiveFileName: fmt.Sprintf("serial-discovery-linuxarm-v%s.tar.bz2", sdVersion),
-				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery-linuxarm-v%s.tar.bz2", sdVersion),
-				Size:            1395174,
-				Checksum:        "SHA-256:f196765caa62d38475208c27b3b516e61427d5d3a8ddc6e863acb4e4a3984701",
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Linux_ARM.tar.bz2", sdVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Linux_ARM.tar.bz2", sdVersion),
+				Size:            1511104,
+				Checksum:        "SHA-256:fe68fd5abdfebe0f01c48c3eac16d27af46ec2391da87de44571e6ea2dab31e7",
 				CachePath:       "tools",
 			},
 		},
 		{
 			OS: "arm64-linux-gnueabihf",
 			Resource: &resources.DownloadResource{
-				ArchiveFileName: fmt.Sprintf("serial-discovery-linuxarm64-v%s.tar.bz2", sdVersion),
-				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery-linuxarm64-v%s.tar.bz2", sdVersion),
-				Size:            1402706,
-				Checksum:        "SHA-256:c87010ed670254c06ac7abbc4daf7446e4e17f1945a75fc2602dd5930835dd25",
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Linux_ARM64.tar.bz2", sdVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Linux_ARM64.tar.bz2", sdVersion),
+				Size:            1500998,
+				Checksum:        "SHA-256:1e6bcb6b7790d38863df15395c96baba239cb56233d7ef2d78bcb2b3efb1bc5d",
 				CachePath:       "tools",
 			},
 		},
