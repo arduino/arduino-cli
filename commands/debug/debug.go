@@ -109,13 +109,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 
 // getCommandLine compose a debug command represented by a core recipe
 func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) ([]string, error) {
-	debugInfo, err := GetDebugConfig(context.Background(), &dbg.DebugConfigReq{
-		Instance:   req.GetInstance(),
-		Fqbn:       req.GetFqbn(),
-		SketchPath: req.GetSketchPath(),
-		ImportDir:  req.GetImportDir(),
-		Port:       req.GetPort(),
-	})
+	debugInfo, err := getDebugProperties(req, pm)
 	if err != nil {
 		return nil, err
 	}

@@ -37,27 +37,10 @@ import (
 func GetDebugConfig(ctx context.Context, req *debug.DebugConfigReq) (*debug.GetDebugConfigResp, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
-	props, err := getDebugProperties(req, pm)
-	if err != nil {
-		return nil, err
-	}
-
-	server := props.Get("server")
-	toolchain := props.Get("toolchain")
-	resp := &debug.GetDebugConfigResp{
-		Executable:             props.Get("executable"),
-		Server:                 server,
-		ServerPath:             props.Get("server." + server + ".path"),
-		ServerConfiguration:    props.SubTree("server." + server).AsMap(),
-		Toolchain:              toolchain,
-		ToolchainPath:          props.Get("toolchain.path"),
-		ToolchainPrefix:        props.Get("toolchain.prefix"),
-		ToolchainConfiguration: props.SubTree("toolchain." + toolchain).AsMap(),
-	}
-	return resp, nil
+	return getDebugProperties(req, pm)
 }
 
-func getDebugProperties(req *debug.DebugConfigReq, pm *packagemanager.PackageManager) (*properties.Map, error) {
+func getDebugProperties(req *debug.DebugConfigReq, pm *packagemanager.PackageManager) (*debug.GetDebugConfigResp, error) {
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
 	if req.GetSketchPath() == "" {
@@ -157,5 +140,16 @@ func getDebugProperties(req *debug.DebugConfigReq, pm *packagemanager.PackageMan
 		return nil, status.Error(codes.Unimplemented, fmt.Sprintf("debugging not supported for board %s", req.GetFqbn()))
 	}
 
-	return debugProperties, nil
+	server := debugProperties.Get("server")
+	toolchain := debugProperties.Get("toolchain")
+	return &debug.GetDebugConfigResp{
+		Executable:             debugProperties.Get("executable"),
+		Server:                 server,
+		ServerPath:             debugProperties.Get("server." + server + ".path"),
+		ServerConfiguration:    debugProperties.SubTree("server." + server).AsMap(),
+		Toolchain:              toolchain,
+		ToolchainPath:          debugProperties.Get("toolchain.path"),
+		ToolchainPrefix:        debugProperties.Get("toolchain.prefix"),
+		ToolchainConfiguration: debugProperties.SubTree("toolchain." + toolchain).AsMap(),
+	}, nil
 }
