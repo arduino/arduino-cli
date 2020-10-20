@@ -86,13 +86,15 @@ type indexToolReleaseFlavour struct {
 // indexBoard represents a single Board as written in package_index.json file.
 type indexBoard struct {
 	Name string         `json:"name"`
-	ID   []indexBoardID `json:"id"`
+	ID   []indexBoardID `json:"id,omitempty"`
 }
 
+// indexBoardID represents the ID of a single board. i.e. uno, yun, diecimila, micro and the likes
 type indexBoardID struct {
 	USB string `json:"usb"`
 }
 
+// indexHelp represents the help URL
 type indexHelp struct {
 	Online string `json:"online,omitempty"`
 }
@@ -102,6 +104,82 @@ type indexHelp struct {
 func (index Index) MergeIntoPackages(outPackages cores.Packages) {
 	for _, inPackage := range index.Packages {
 		inPackage.extractPackageIn(outPackages, index.IsTrusted)
+	}
+}
+
+// IndexFromPlatformRelease creates an Index that contains a single indexPackage
+// which in turn contains a single indexPlatformRelease converted from the one
+// passed as argument
+func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
+	boards := []indexBoard{}
+	for _, manifest := range pr.BoardsManifest {
+		board := indexBoard{
+			Name: manifest.Name,
+		}
+		for _, id := range manifest.ID {
+			if id.USB != "" {
+				board.ID = []indexBoardID{{USB: id.USB}}
+			}
+		}
+		boards = append(boards, board)
+	}
+
+	tools := []indexToolDependency{}
+	for _, t := range pr.Dependencies {
+		tools = append(tools, indexToolDependency{
+			Packager: t.ToolPackager,
+			Name:     t.ToolName,
+			Version:  t.ToolVersion,
+		})
+	}
+
+	packageTools := []*indexToolRelease{}
+	for name, tool := range pr.Platform.Package.Tools {
+		for _, toolRelease := range tool.Releases {
+			flavours := []indexToolReleaseFlavour{}
+			for _, flavour := range toolRelease.Flavors {
+				flavours = append(flavours, indexToolReleaseFlavour{
+					OS:              flavour.OS,
+					URL:             flavour.Resource.URL,
+					ArchiveFileName: flavour.Resource.ArchiveFileName,
+					Size:            json.Number(fmt.Sprintf("%d", flavour.Resource.Size)),
+					Checksum:        flavour.Resource.Checksum,
+				})
+			}
+			packageTools = append(packageTools, &indexToolRelease{
+				Name:    name,
+				Version: toolRelease.Version,
+				Systems: flavours,
+			})
+		}
+	}
+
+	return Index{
+		IsTrusted: pr.IsTrusted,
+		Packages: []*indexPackage{
+			{
+				Name:       pr.Platform.Package.Name,
+				Maintainer: pr.Platform.Package.Maintainer,
+				WebsiteURL: pr.Platform.Package.WebsiteURL,
+				URL:        pr.Platform.Package.URL,
+				Email:      pr.Platform.Package.Email,
+				Platforms: []*indexPlatformRelease{{
+					Name:             pr.Platform.Name,
+					Architecture:     pr.Platform.Architecture,
+					Version:          pr.Version,
+					Category:         pr.Platform.Category,
+					URL:              pr.Resource.URL,
+					ArchiveFileName:  pr.Resource.ArchiveFileName,
+					Checksum:         pr.Resource.Checksum,
+					Size:             json.Number(fmt.Sprintf("%d", pr.Resource.Size)),
+					Boards:           boards,
+					Help:             indexHelp{Online: pr.Help.Online},
+					ToolDependencies: tools,
+				}},
+				Tools: packageTools,
+				Help:  indexHelp{Online: pr.Platform.Package.Help.Online},
+			},
+		},
 	}
 }
 
@@ -144,6 +222,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 		URL:             inPlatformRelease.URL,
 		CachePath:       "packages",
 	}
+	outPlatformRelease.Help = cores.PlatformReleaseHelp{Online: inPlatformRelease.Help.Online}
 	outPlatformRelease.BoardsManifest = inPlatformRelease.extractBoardsManifest()
 	if deps, err := inPlatformRelease.extractDeps(); err == nil {
 		outPlatformRelease.Dependencies = deps

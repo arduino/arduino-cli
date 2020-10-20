@@ -95,17 +95,24 @@ def test_core_search_no_args(run_command, httpserver):
     result = run_command("core search")
     assert result.ok
     num_platforms = 0
+    found = False
     for l in result.stdout.splitlines()[1:]:  # ignore the header on first line
         if l:  # ignore empty lines
-            assert not l.startswith("test:x86")
+            if l.startswith("test:x86"):
+                found = True
             num_platforms += 1
 
     # same thing in JSON format, also check the number of platforms found is the same
     result = run_command("core search --format json")
     assert result.ok
     platforms = json.loads(result.stdout)
+    found = False
+    platforms = json.loads(result.stdout)
     for elem in platforms:
-        assert elem.get("Name") != "test_core"
+        if elem.get("Name") == "test_core":
+            found = True
+            break
+    assert found
     assert len(platforms) == num_platforms
 
     # list all with additional urls, check the test core is there
@@ -270,3 +277,24 @@ def test_core_broken_install(run_command):
     url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
     assert run_command("core update-index --additional-urls={}".format(url))
     assert not run_command("core install brokenchecksum:x86 --additional-urls={}".format(url))
+
+
+def test_core_install_creates_installed_json(run_command, data_dir):
+    assert run_command("core update-index")
+    assert run_command("core install arduino:avr@1.6.23")
+
+    installed_json_file = Path(data_dir, "packages", "arduino", "hardware", "avr", "1.6.23", "installed.json")
+    assert installed_json_file.exists()
+    installed_json = json.load(installed_json_file.open("r"))
+
+    expected_installed_json = json.load((Path(__file__).parent / "testdata" / "installed.json").open("r"))
+
+    def ordered(obj):
+        if isinstance(obj, dict):
+            return sorted({k: ordered(v) for k, v in obj.items()})
+        if isinstance(obj, list):
+            return sorted(ordered(x) for x in obj)
+        else:
+            return obj
+
+    assert ordered(installed_json) == ordered(expected_installed_json)

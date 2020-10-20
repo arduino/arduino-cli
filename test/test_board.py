@@ -12,10 +12,7 @@
 # otherwise use the software for commercial activities involving the Arduino
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
-import pytest
 import simplejson as json
-
-from .common import running_on_ci
 
 
 gold_board = """
@@ -401,12 +398,40 @@ def test_board_list(run_command):
         assert "protocol_label" in port
 
 
-@pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
 def test_board_listall(run_command):
     run_command("core update-index")
-    result = run_command("board listall")
-    assert result.ok
-    assert ["Board", "Name", "FQBN"] == result.stdout.splitlines()[0].strip().split()
+    run_command("core install arduino:avr@1.8.3")
+    res = run_command("board listall")
+    assert res.ok
+    lines = [l.rsplit(maxsplit=1) for l in res.stdout.strip().splitlines()]
+    assert len(lines) == 27
+    assert ["Board Name", "FQBN"] in lines
+    assert ["Arduino Yún", "arduino:avr:yun"] in lines
+    assert ["Arduino Uno", "arduino:avr:uno"] in lines
+    assert ["Arduino Duemilanove or Diecimila", "arduino:avr:diecimila"] in lines
+    assert ["Arduino Nano", "arduino:avr:nano"] in lines
+    assert ["Arduino Mega or Mega 2560", "arduino:avr:mega"] in lines
+    assert ["Arduino Mega ADK", "arduino:avr:megaADK"] in lines
+    assert ["Arduino Leonardo", "arduino:avr:leonardo"] in lines
+    assert ["Arduino Leonardo ETH", "arduino:avr:leonardoeth"] in lines
+    assert ["Arduino Micro", "arduino:avr:micro"] in lines
+    assert ["Arduino Esplora", "arduino:avr:esplora"] in lines
+    assert ["Arduino Mini", "arduino:avr:mini"] in lines
+    assert ["Arduino Ethernet", "arduino:avr:ethernet"] in lines
+    assert ["Arduino Fio", "arduino:avr:fio"] in lines
+    assert ["Arduino BT", "arduino:avr:bt"] in lines
+    assert ["LilyPad Arduino USB", "arduino:avr:LilyPadUSB"] in lines
+    assert ["LilyPad Arduino", "arduino:avr:lilypad"] in lines
+    assert ["Arduino Pro or Pro Mini", "arduino:avr:pro"] in lines
+    assert ["Arduino NG or older", "arduino:avr:atmegang"] in lines
+    assert ["Arduino Robot Control", "arduino:avr:robotControl"] in lines
+    assert ["Arduino Robot Motor", "arduino:avr:robotMotor"] in lines
+    assert ["Arduino Gemma", "arduino:avr:gemma"] in lines
+    assert ["Adafruit Circuit Playground", "arduino:avr:circuitplay32u4cat"] in lines
+    assert ["Arduino Yún Mini", "arduino:avr:yunmini"] in lines
+    assert ["Arduino Industrial 101", "arduino:avr:chiwawa"] in lines
+    assert ["Linino One", "arduino:avr:one"] in lines
+    assert ["Arduino Uno WiFi", "arduino:avr:unowifi"] in lines
 
 
 def test_board_details(run_command):

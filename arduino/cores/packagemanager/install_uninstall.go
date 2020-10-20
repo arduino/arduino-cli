@@ -16,10 +16,12 @@
 package packagemanager
 
 import (
+	"encoding/json"
 	"fmt"
 	"runtime"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/pkg/errors"
 )
@@ -39,6 +41,20 @@ func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease
 	} else {
 		return err
 	}
+	if err := pm.cacheInstalledJSON(platformRelease); err != nil {
+		return errors.Errorf("creating installed.json in %s: %s", platformRelease.InstallDir, err)
+	}
+	return nil
+}
+
+func (pm *PackageManager) cacheInstalledJSON(platformRelease *cores.PlatformRelease) error {
+	index := packageindex.IndexFromPlatformRelease(platformRelease)
+	platformJSON, err := json.MarshalIndent(index, "", "  ")
+	if err != nil {
+		return err
+	}
+	installedJSON := platformRelease.InstallDir.Join("installed.json")
+	installedJSON.WriteFile(platformJSON)
 	return nil
 }
 
