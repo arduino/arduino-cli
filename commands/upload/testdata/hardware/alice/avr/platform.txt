@@ -1,0 +1,79 @@
+name=Upload Test Platform (Alice)
+version=1.0.0
+
+# Upload test 1
+tools.one.cmd.path=echo
+tools.one.conf.general=conf-general
+tools.one.upload.conf=conf-upload
+tools.one.upload.params.verbose=verbose
+tools.one.upload.params.quiet=quiet
+tools.one.upload.params.verify=verify
+tools.one.upload.params.noverify=noverify
+tools.one.upload.pattern={cmd.path} {conf.board} {conf.general} {upload.conf} {upload.verbose} {upload.verify} {upload.protocol} "{serial.port}" -b{upload.speed} "{build.path}/{build.project_name}.hex"
+
+tools.one.program.conf=conf-program
+tools.one.program.params.verbose=verbose
+tools.one.program.params.quiet=quiet
+tools.one.program.params.verify=verify
+tools.one.program.params.noverify=noverify
+tools.one.program.pattern={cmd.path} {conf.board} {conf.general} {program.conf} {program.verbose} {program.verify} {program.protocol} "{serial.port}" -b{upload.speed} "{build.path}/{build.project_name}.hex"
+
+tools.one.erase.conf=conf-erase
+tools.one.erase.params.verbose=verbose
+tools.one.erase.params.quiet=quiet
+tools.one.erase.params.verify=verify
+tools.one.erase.params.noverify=noverify
+tools.one.erase.pattern={cmd.path} ERASE {conf.board} {conf.general} {erase.conf} {erase.verbose} {erase.verify} {protocol} "{serial.port}" -b{upload.speed}
+
+tools.one.bootloader.conf=conf-bootloader
+tools.one.bootloader.params.verbose=verbose
+tools.one.bootloader.params.quiet=quiet
+tools.one.bootloader.params.verify=verify
+tools.one.bootloader.params.noverify=noverify
+tools.one.bootloader.pattern={cmd.path} BURN {conf.board} {conf.general} {bootloader.conf} {bootloader.verbose} {bootloader.verify} {protocol} "{serial.port}" -b{upload.speed} -F{bootloader.fuses} "{runtime.platform.path}/bootloaders/{bootloader.file}"
+
+# Upload test 2
+tools.one-noport.cmd.path=echo
+tools.one-noport.conf.general=conf-general
+tools.one-noport.upload.conf=conf-upload
+tools.one-noport.upload.params.verbose=verbose
+tools.one-noport.upload.params.quiet=quiet
+tools.one-noport.upload.params.verify=verify
+tools.one-noport.upload.params.noverify=noverify
+tools.one-noport.upload.pattern={cmd.path} {conf.board} {conf.general} {upload.conf} {upload.verbose} {upload.verify} {upload.protocol} -b{upload.speed} "{build.path}/{build.project_name}.hex"
+
+tools.one-noport.program.conf=conf-program
+tools.one-noport.program.params.verbose=verbose
+tools.one-noport.program.params.quiet=quiet
+tools.one-noport.program.params.verify=verify
+tools.one-noport.program.params.noverify=noverify
+tools.one-noport.program.pattern={cmd.path} {conf.board} {conf.general} {program.conf} {program.verbose} {program.verify} {program.protocol} -b{upload.speed} "{build.path}/{build.project_name}.hex"
+
+# Recipes for "tool.one-extra-params"
+tools.one-extra-params.cmd.path=echo
+tools.one-extra-params.conf.general=conf-general
+
+tools.one-extra-params.program.conf=conf-program
+tools.one-extra-params.program.params.verbose=verbose
+tools.one-extra-params.program.params.quiet=quiet
+tools.one-extra-params.program.params.verify=verify
+tools.one-extra-params.program.params.noverify=noverify
+tools.one-extra-params.program.pattern={cmd.path} {conf.board} {conf.general} {program.conf} {program.verbose} {program.verify} {program.protocol} {program.extra_params} -b{upload.speed} "{build.path}/{build.project_name}.hex"
+
+# Upload with programmer test 1
+tools.two.cmd.path=echo
+tools.two.conf.general=conf-two-general
+
+tools.two.erase.conf=conf-two-erase
+tools.two.erase.params.verbose=verbose
+tools.two.erase.params.quiet=quiet
+tools.two.erase.params.verify=verify
+tools.two.erase.params.noverify=noverify
+tools.two.erase.pattern={cmd.path} ERASE {conf.board} {conf.general} {erase.conf} {erase.verbose} {erase.verify} {bootloader.protocol} "{serial.port}" -b{upload.speed}
+
+tools.two.bootloader.conf=conf-two-bootloader
+tools.two.bootloader.params.verbose=verbose
+tools.two.bootloader.params.quiet=quiet
+tools.two.bootloader.params.verify=verify
+tools.two.bootloader.params.noverify=noverify
+tools.two.bootloader.pattern={cmd.path} BURN {conf.board} {conf.general} {bootloader.conf} {bootloader.verbose} {bootloader.verify} {bootloader.protocol} "{serial.port}" -b{upload.speed} -F{bootloader.fuses} "{runtime.platform.path}/bootloaders/{bootloader.file}"
