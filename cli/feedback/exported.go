@@ -34,6 +34,11 @@ func SetFormat(f OutputFormat) {
 	fb.SetFormat(f)
 }
 
+// GetFormat returns the currently set output format
+func GetFormat() OutputFormat {
+	return fb.GetFormat()
+}
+
 // OutputWriter returns the underlying io.Writer to be used when the Print*
 // api is not enough
 func OutputWriter() io.Writer {

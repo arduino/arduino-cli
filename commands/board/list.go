@@ -23,6 +23,7 @@ import (
 	"regexp"
 	"sync"
 
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/httpclient"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -107,6 +108,39 @@ func identifyViaCloudAPI(port *commands.BoardPort) ([]*rpc.BoardListItem, error)
 	return apiByVidPid(id.Get("vid"), id.Get("pid"))
 }
 
+// Identify returns a list of boards checking first the installed platforms or the Cloud API
+func Identify(pm *packagemanager.PackageManager, port *commands.BoardPort) ([]*rpc.BoardListItem, error) {
+	boards := []*rpc.BoardListItem{}
+
+	// first query installed cores through the Package Manager
+	logrus.Debug("Querying installed cores for board identification...")
+	for _, board := range pm.IdentifyBoard(port.IdentificationPrefs) {
+		boards = append(boards, &rpc.BoardListItem{
+			Name: board.Name(),
+			FQBN: board.FQBN(),
+		})
+	}
+
+	// if installed cores didn't recognize the board, try querying
+	// the builder API if the board is a USB device port
+	if len(boards) == 0 {
+		items, err := identifyViaCloudAPI(port)
+		if err == ErrNotFound {
+			// the board couldn't be detected, print a warning
+			logrus.Debug("Board not recognized")
+		} else if err != nil {
+			// this is bad, bail out
+			return nil, errors.Wrap(err, "error getting board info from Arduino Cloud")
+		}
+
+		// add a DetectedPort entry in any case: the `Boards` field will
+		// be empty but the port will be shown anyways (useful for 3rd party
+		// boards)
+		boards = items
+	}
+	return boards, nil
+}
+
 // List FIXMEDOC
 func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 	m.Lock()
@@ -135,33 +169,9 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 
 	retVal := []*rpc.DetectedPort{}
 	for _, port := range ports {
-		b := []*rpc.BoardListItem{}
-
-		// first query installed cores through the Package Manager
-		logrus.Debug("Querying installed cores for board identification...")
-		for _, board := range pm.IdentifyBoard(port.IdentificationPrefs) {
-			b = append(b, &rpc.BoardListItem{
-				Name: board.Name(),
-				FQBN: board.FQBN(),
-			})
-		}
-
-		// if installed cores didn't recognize the board, try querying
-		// the builder API if the board is a USB device port
-		if len(b) == 0 {
-			items, err := identifyViaCloudAPI(port)
-			if err == ErrNotFound {
-				// the board couldn't be detected, print a warning
-				logrus.Debug("Board not recognized")
-			} else if err != nil {
-				// this is bad, bail out
-				return nil, errors.Wrap(err, "error getting board info from Arduino Cloud")
-			}
-
-			// add a DetectedPort entry in any case: the `Boards` field will
-			// be empty but the port will be shown anyways (useful for 3rd party
-			// boards)
-			b = items
+		boards, err := Identify(pm, port)
+		if err != nil {
+			return nil, err
 		}
 
 		// boards slice can be empty at this point if neither the cores nor the
@@ -170,7 +180,7 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 			Address:       port.Address,
 			Protocol:      port.Protocol,
 			ProtocolLabel: port.ProtocolLabel,
-			Boards:        b,
+			Boards:        boards,
 		}
 		retVal = append(retVal, p)
 	}

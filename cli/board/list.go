@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/arduino-cli/table"
@@ -43,15 +44,29 @@ func initListCommand() *cobra.Command {
 
 	listCommand.Flags().StringVar(&listFlags.timeout, "timeout", "0s",
 		"The connected devices search timeout, raise it if your board doesn't show up (e.g. to 10s).")
+	listCommand.Flags().BoolVarP(&listFlags.watch, "watch", "w", false,
+		"Command keeps running and prints list of connected boards whenever there is a change.")
+
 	return listCommand
 }
 
 var listFlags struct {
 	timeout string // Expressed in a parsable duration, is the timeout for the list and attach commands.
+	watch   bool
 }
 
 // runListCommand detects and lists the connected arduino boards
 func runListCommand(cmd *cobra.Command, args []string) {
+	if listFlags.watch {
+		inst, err := instance.CreateInstance()
+		if err != nil {
+			feedback.Errorf("Error detecting boards: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		watchList(cmd, inst)
+		os.Exit(0)
+	}
+
 	if timeout, err := time.ParseDuration(listFlags.timeout); err != nil {
 		feedback.Errorf("Invalid timeout: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
@@ -72,6 +87,48 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	}
 
 	feedback.PrintResult(result{ports})
+}
+
+func watchList(cmd *cobra.Command, inst *rpc.Instance) {
+	pm := commands.GetPackageManager(inst.Id)
+	eventsChan, err := commands.WatchListBoards(pm)
+	if err != nil {
+		feedback.Errorf("Error detecting boards: %v", err)
+		os.Exit(errorcodes.ErrNetwork)
+	}
+
+	// This is done to avoid printing the header each time a new event is received
+	if feedback.GetFormat() == feedback.Text {
+		t := table.New()
+		t.SetHeader("Port", "Type", "Event", "Board Name", "FQBN", "Core")
+		feedback.Print(t.Render())
+	}
+
+	for event := range eventsChan {
+		boards := []*rpc.BoardListItem{}
+		if event.Type == "add" {
+			boards, err = board.Identify(pm, &commands.BoardPort{
+				Address:             event.Port.Address,
+				Label:               event.Port.AddressLabel,
+				Prefs:               event.Port.Properties,
+				IdentificationPrefs: event.Port.IdentificationProperties,
+				Protocol:            event.Port.Protocol,
+				ProtocolLabel:       event.Port.ProtocolLabel,
+			})
+			if err != nil {
+				feedback.Errorf("Error identifying board: %v", err)
+				os.Exit(errorcodes.ErrNetwork)
+			}
+		}
+
+		feedback.PrintResult(watchEvent{
+			Type:          event.Type,
+			Address:       event.Port.Address,
+			Protocol:      event.Port.Protocol,
+			ProtocolLabel: event.Port.ProtocolLabel,
+			Boards:        boards,
+		})
+	}
 }
 
 // output from this command requires special formatting, let's create a dedicated
@@ -131,6 +188,62 @@ func (dr result) String() string {
 			coreName := ""
 			t.AddRow(address, protocol, board, fqbn, coreName)
 		}
+	}
+	return t.Render()
+}
+
+type watchEvent struct {
+	Type          string               `json:"type"`
+	Address       string               `json:"address,omitempty"`
+	Protocol      string               `json:"protocol,omitempty"`
+	ProtocolLabel string               `json:"protocol_label,omitempty"`
+	Boards        []*rpc.BoardListItem `json:"boards,omitempty"`
+}
+
+func (dr watchEvent) Data() interface{} {
+	return dr
+}
+
+func (dr watchEvent) String() string {
+	t := table.New()
+
+	event := map[string]string{
+		"add":    "Connected",
+		"remove": "Disconnected",
+	}[dr.Type]
+
+	address := fmt.Sprintf("%s://%s", dr.Protocol, dr.Address)
+	if dr.Protocol == "serial" || dr.Protocol == "" {
+		address = dr.Address
+	}
+	protocol := dr.ProtocolLabel
+	if boards := dr.Boards; len(boards) > 0 {
+		sort.Slice(boards, func(i, j int) bool {
+			x, y := boards[i], boards[j]
+			return x.GetName() < y.GetName() || (x.GetName() == y.GetName() && x.GetFQBN() < y.GetFQBN())
+		})
+		for _, b := range boards {
+			board := b.GetName()
+
+			// to improve the user experience, show on a dedicated column
+			// the name of the core supporting the board detected
+			var coreName = ""
+			fqbn, err := cores.ParseFQBN(b.GetFQBN())
+			if err == nil {
+				coreName = fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch)
+			}
+
+			t.AddRow(address, protocol, event, board, fqbn, coreName)
+
+			// reset address and protocol, we only show them on the first row
+			address = ""
+			protocol = ""
+		}
+	} else {
+		board := ""
+		fqbn := ""
+		coreName := ""
+		t.AddRow(address, protocol, event, board, fqbn, coreName)
 	}
 	return t.Render()
 }
