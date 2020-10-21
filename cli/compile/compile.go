@@ -47,11 +47,11 @@ var (
 	port               string   // Upload port, e.g.: COM10 or /dev/ttyACM0.
 	verify             bool     // Upload, verify uploaded binary after the upload.
 	exportDir          string   // The compiled binary is written to this file
-	dryRun             bool     // Use this flag to now write the output file
 	libraries          []string // List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
 	optimizeForDebug   bool     // Optimize compile output for debug, not for release
 	programmer         string   // Use the specified programmer to upload
 	clean              bool     // Cleanup the build folder and do not use any cached build
+	exportBinaries     bool     // Copies compiled binaries to sketch folder when true
 )
 
 // NewCommand created a new `compile` command
@@ -70,7 +70,6 @@ func NewCommand() *cobra.Command {
 	command.Flags().BoolVar(&preprocess, "preprocess", false, "Print preprocessed code to stdout instead of compiling.")
 	command.Flags().StringVar(&buildCachePath, "build-cache-path", "", "Builds of 'core.a' are saved into this path to be cached and reused.")
 	command.Flags().StringVarP(&exportDir, "output-dir", "", "", "Save build artifacts in this directory.")
-	command.Flags().BoolVarP(&dryRun, "dry-run", "n", false, "Perform the build but do not copy the compile output file.")
 	command.Flags().StringVar(&buildPath, "build-path", "",
 		"Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.")
 	command.Flags().StringSliceVar(&buildProperties, "build-properties", []string{},
@@ -88,6 +87,9 @@ func NewCommand() *cobra.Command {
 	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, "Optional, optimize compile output for debugging, rather than for release.")
 	command.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload.")
 	command.Flags().BoolVar(&clean, "clean", false, "Optional, cleanup the build folder and do not use any cached build.")
+	command.Flags().BoolVarP(&exportBinaries, "export-binaries", "e", false, "If set built binaries will be exported to the sketch folder.")
+
+	configuration.Settings.BindPFlag("sketch.always_export_binaries", command.Flags().Lookup("export-binaries"))
 
 	return command
 }
@@ -120,10 +122,10 @@ func run(cmd *cobra.Command, args []string) {
 		Quiet:            quiet,
 		VidPid:           vidPid,
 		ExportDir:        exportDir,
-		DryRun:           dryRun,
 		Libraries:        libraries,
 		OptimizeForDebug: optimizeForDebug,
 		Clean:            clean,
+		ExportBinaries:   exportBinaries,
 	}, os.Stdout, os.Stderr, configuration.Settings.GetString("logging.level") == "debug")
 
 	if err != nil {

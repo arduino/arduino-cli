@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/serialutils"
@@ -425,16 +426,9 @@ func determineBuildPathAndSketchName(importFile, importDir string, sketch *sketc
 		return nil, "", fmt.Errorf("no sketch or build directory/file specified")
 	}
 
-	// Case 4: only sketch specified. In this case we use the default sketch build path
+	// Case 4: only sketch specified. In this case we use the generated build path
 	// and the given sketch name.
-
-	// TODO: Create a function to obtain importPath from sketch
-	// Add FQBN (without configs part) to export path
-	if fqbn == nil {
-		return nil, "", fmt.Errorf("missing FQBN")
-	}
-	fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
-	return sketch.FullPath.Join("build").Join(fqbnSuffix), sketch.Name + ".ino", nil
+	return bldr.GenBuildPath(sketch.FullPath), sketch.Name + ".ino", nil
 }
 
 func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {

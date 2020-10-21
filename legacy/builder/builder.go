@@ -42,10 +42,6 @@ const DEFAULT_SOFTWARE = "ARDUINO"
 type Builder struct{}
 
 func (s *Builder) Run(ctx *types.Context) error {
-	if ctx.BuildPath == nil {
-		ctx.BuildPath = bldr.GenBuildPath(ctx.SketchLocation)
-	}
-
 	if err := bldr.EnsureBuildPathExists(ctx.BuildPath.String()); err != nil {
 		return err
 	}

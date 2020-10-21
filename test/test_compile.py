@@ -14,10 +14,13 @@
 # a commercial license, send an email to license@arduino.cc.
 import os
 import platform
+import tempfile
+import hashlib
+from pathlib import Path
 
 import pytest
 
-from .common import running_on_ci, parse_json_traces
+from .common import running_on_ci
 
 
 def test_compile_without_fqbn(run_command):
@@ -40,39 +43,34 @@ def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
     run_command("core install arduino:avr")
 
     sketch_name = "CompileIntegrationTest"
-    sketch_path = os.path.join(data_dir, sketch_name)
+    sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    result = run_command("sketch new {}".format(sketch_path))
+    result = run_command(f"sketch new {sketch_path}")
     assert result.ok
-    assert "Sketch created in: {}".format(sketch_path) in result.stdout
+    assert f"Sketch created in: {sketch_path}" in result.stdout
 
     # Build sketch for arduino:avr:uno
-    log_file_name = "compile.log"
-    log_file_path = os.path.join(data_dir, log_file_name)
-    result = run_command(
-        "compile -b {fqbn} {sketch_path} --log-format json --log-file {log_file} --log-level trace".format(
-            fqbn=fqbn, sketch_path=sketch_path, log_file=log_file_path
-        )
-    )
+    result = run_command(f"compile -b {fqbn} {sketch_path}")
     assert result.ok
 
-    # let's test from the logs if the hex file produced by successful compile is moved to our sketch folder
-    log_json = open(log_file_path, "r")
-    traces = parse_json_traces(log_json.readlines())
-    assert f"Compile {sketch_path} for {fqbn} started" in traces
-    assert f"Compile {sketch_name} for {fqbn} successful" in traces
+    # Verifies expected binaries have been built
+    sketch_path_md5 = hashlib.md5(bytes(sketch_path)).hexdigest().upper()
+    build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
+    assert (build_dir / f"{sketch_name}.ino.eep").exists()
+    assert (build_dir / f"{sketch_name}.ino.elf").exists()
+    assert (build_dir / f"{sketch_name}.ino.hex").exists()
+    assert (build_dir / f"{sketch_name}.ino.with_bootloader.bin").exists()
+    assert (build_dir / f"{sketch_name}.ino.with_bootloader.hex").exists()
 
-    # Test the --output-dir flag with absolute path
-    target = os.path.join(data_dir, "test_dir")
-    result = run_command(
-        "compile -b {fqbn} {sketch_path} --output-dir {target}".format(
-            fqbn=fqbn, sketch_path=sketch_path, target=target
-        )
-    )
-    assert result.ok
-    assert os.path.exists(target) and os.path.isdir(target)
+    # Verifies binaries are not exported by default to Sketch folder
+    sketch_build_dir = Path(sketch_path, "build", fqbn.replace(":", "."))
+    assert not (sketch_build_dir / f"{sketch_name}.ino.eep").exists()
+    assert not (sketch_build_dir / f"{sketch_name}.ino.elf").exists()
+    assert not (sketch_build_dir / f"{sketch_name}.ino.hex").exists()
+    assert not (sketch_build_dir / f"{sketch_name}.ino.with_bootloader.bin").exists()
+    assert not (sketch_build_dir / f"{sketch_name}.ino.with_bootloader.hex").exists()
 
 
 @pytest.mark.skipif(
@@ -233,3 +231,71 @@ def test_compile_without_precompiled_libraries(run_command, data_dir):
         "compile -b arduino:mbed:nano33ble {}/libraries/BSEC_Software_Library/examples/basic/".format(data_dir)
     )
     assert result.ok
+
+
+def test_compile_with_output_dir_flag(run_command, data_dir):
+    # Init the environment explicitly
+    run_command("core update-index")
+
+    # Download latest AVR
+    run_command("core install arduino:avr")
+
+    sketch_name = "CompileWithOutputDir"
+    sketch_path = Path(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    # Create a test sketch
+    result = run_command(f"sketch new {sketch_path}")
+    assert result.ok
+    assert f"Sketch created in: {sketch_path}" in result.stdout
+
+    # Test the --output-dir flag with absolute path
+    output_dir = Path(data_dir, "test_dir", "output_dir")
+    result = run_command(f"compile -b {fqbn} {sketch_path} --output-dir {output_dir}")
+    assert result.ok
+
+    # Verifies expected binaries have been built
+    sketch_path_md5 = hashlib.md5(bytes(sketch_path)).hexdigest().upper()
+    build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
+    assert (build_dir / f"{sketch_name}.ino.eep").exists()
+    assert (build_dir / f"{sketch_name}.ino.elf").exists()
+    assert (build_dir / f"{sketch_name}.ino.hex").exists()
+    assert (build_dir / f"{sketch_name}.ino.with_bootloader.bin").exists()
+    assert (build_dir / f"{sketch_name}.ino.with_bootloader.hex").exists()
+
+    # Verifies binaries are exported when --output-dir flag is specified
+    assert output_dir.exists()
+    assert output_dir.is_dir()
+    assert (output_dir / f"{sketch_name}.ino.eep").exists()
+    assert (output_dir / f"{sketch_name}.ino.elf").exists()
+    assert (output_dir / f"{sketch_name}.ino.hex").exists()
+    assert (output_dir / f"{sketch_name}.ino.with_bootloader.bin").exists()
+    assert (output_dir / f"{sketch_name}.ino.with_bootloader.hex").exists()
+
+
+def test_compile_with_export_binaries_flag(run_command, data_dir):
+    # Init the environment explicitly
+    run_command("core update-index")
+
+    # Download latest AVR
+    run_command("core install arduino:avr")
+
+    sketch_name = "CompileWithExportBinariesFlag"
+    sketch_path = Path(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    # Create a test sketch
+    assert run_command("sketch new {}".format(sketch_path))
+
+    # Test the --output-dir flag with absolute path
+    result = run_command(f"compile -b {fqbn} {sketch_path} --export-binaries")
+    assert result.ok
+    assert Path(sketch_path, "build").exists()
+    assert Path(sketch_path, "build").is_dir()
+
+    # Verifies binaries are exported when --export-binaries flag is set
+    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.eep").exists()
+    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.elf").exists()
+    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.hex").exists()
+    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.with_bootloader.bin").exists()
+    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.with_bootloader.hex").exists()

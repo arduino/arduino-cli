@@ -13,7 +13,7 @@
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
 import os
-import time
+from pathlib import Path
 
 import pytest
 
@@ -28,36 +28,75 @@ def test_upload(run_command, data_dir, detected_boards):
     run_command("core update-index")
 
     for board in detected_boards:
-        # Download core
+        # Download platform
         run_command(f"core install {board.core}")
         # Create a sketch
-        sketch_name = "foo"
-        sketch_path = os.path.join(data_dir, sketch_name)
+        sketch_name = f"TestUploadSketch{board.id}"
+        sketch_path = Path(data_dir, sketch_name)
         fqbn = board.fqbn
         address = board.address
         assert run_command(f"sketch new {sketch_path}")
         # Build sketch
         assert run_command(f"compile -b {fqbn} {sketch_path}")
+
+        # Verifies binaries are not exported
+        assert not (sketch_path / "build").exists()
+
         # Upload without port must fail
-        result = run_command(f"upload -b {fqbn} {sketch_path}")
-        assert result.failed
+        assert not run_command(f"upload -b {fqbn} {sketch_path}")
+
         # Upload
-        res = run_command(f"upload -b {fqbn} -p {address} {sketch_path}")
-        print(res.stderr)
-        assert res
+        assert run_command(f"upload -b {fqbn} -p {address} {sketch_path}")
 
-        # multiple uploads requires some pauses
-        time.sleep(2)
-        # Upload using --input-dir reusing standard sketch "build" folder artifacts
-        fqbn_path = fqbn.replace(":", ".")
-        assert run_command(f"upload -b {fqbn} -p {address} --input-dir {sketch_path}/build/{fqbn_path} {sketch_path}")
 
-        # multiple uploads requires some pauses
-        time.sleep(2)
-        # Upload using --input-file reusing standard sketch "build" folder artifacts
-        assert run_command(
-            f"upload -b {fqbn} -p {address} --input-file {sketch_path}/build/{fqbn_path}/{sketch_name}.ino.bin"
-        )
+def test_upload_with_input_dir_flag(run_command, data_dir, detected_boards):
+    # Init the environment explicitly
+    run_command("core update-index")
+
+    for board in detected_boards:
+        # Download board platform
+        run_command(f"core install {board.core}")
+
+        # Create sketch
+        sketch_name = f"TestUploadInputDirSketch{board.id}"
+        sketch_path = Path(data_dir, sketch_name)
+        fqbn = board.fqbn
+        address = board.address
+        assert run_command(f"sketch new {sketch_path}")
+
+        # Build sketch and export binaries to custom directory
+        output_dir = Path(data_dir, "test_dir", sketch_name, "build")
+        assert run_command(f"compile -b {fqbn} {sketch_path} --output-dir {output_dir}")
+
+        # Upload with --input-dir flag
+        assert run_command(f"upload -b {fqbn} -p {address} --input-dir {output_dir} {sketch_path}")
+
+
+def test_upload_with_input_file_flag(run_command, data_dir, detected_boards):
+    # Init the environment explicitly
+    run_command("core update-index")
+
+    for board in detected_boards:
+        # Download board platform
+        run_command(f"core install {board.core}")
+
+        # Create sketch
+        sketch_name = f"TestUploadInputFileSketch{board.id}"
+        sketch_path = Path(data_dir, sketch_name)
+        fqbn = board.fqbn
+        address = board.address
+        assert run_command(f"sketch new {sketch_path}")
+
+        # Build sketch and export binaries to custom directory
+        output_dir = Path(data_dir, "test_dir", sketch_name, "build")
+        assert run_command(f"compile -b {fqbn} {sketch_path} --output-dir {output_dir}")
+
+        # We don't need a specific file when using the --input-file flag to upload since
+        # it's just used to calculate the directory, so it's enough to get a random file
+        # that's inside that directory
+        input_file = next(output_dir.glob(f"{sketch_name}.ino.*"))
+        # Upload using --input-file
+        assert run_command(f"upload -b {fqbn} -p {address} --input-file {input_file}")
 
 
 def test_upload_after_attach(run_command, data_dir, detected_boards):
