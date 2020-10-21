@@ -204,12 +204,9 @@ def test_search(run_command):
 
     result = run_command("lib search --names")
     assert result.ok
-    out_lines = result.stdout.strip().splitlines()
-    # Create an array with just the name of the vars
-    libs = []
-    for line in out_lines:
-        start = line.find('"') + 1
-        libs.append(line[start:-1])
+    lines = [l.strip() for l in result.stdout.strip().splitlines()]
+    assert "Updating index: library_index.json downloaded" in lines
+    libs = [l[6:].strip('"') for l in lines if "Name:" in l]
 
     expected = {"WiFi101", "WiFi101OTA", "Firebase Arduino based on WiFi101"}
     assert expected == {lib for lib in libs if "WiFi101" in lib}
