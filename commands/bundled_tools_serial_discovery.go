@@ -18,7 +18,6 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -32,14 +31,13 @@ import (
 )
 
 var (
-	mutex     = sync.Mutex{}
-	sdVersion = semver.ParseRelaxed("1.1.0")
-	flavors   = []*cores.Flavor{
+	serialDiscoveryVersion = semver.ParseRelaxed("1.1.0")
+	serialDiscoveryFlavors = []*cores.Flavor{
 		{
 			OS: "i686-pc-linux-gnu",
 			Resource: &resources.DownloadResource{
-				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Linux_32bit.tar.bz2", sdVersion),
-				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Linux_32bit.tar.bz2", sdVersion),
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Linux_32bit.tar.bz2", serialDiscoveryVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Linux_32bit.tar.bz2", serialDiscoveryVersion),
 				Size:            1589443,
 				Checksum:        "SHA-256:e60fa16da2735f80410c636234a405bd1cc9306090cab4e312c4189e38f93f72",
 				CachePath:       "tools",
@@ -48,8 +46,8 @@ var (
 		{
 			OS: "x86_64-pc-linux-gnu",
 			Resource: &resources.DownloadResource{
-				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Linux_64bit.tar.bz2", sdVersion),
-				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Linux_64bit.tar.bz2", sdVersion),
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Linux_64bit.tar.bz2", serialDiscoveryVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Linux_64bit.tar.bz2", serialDiscoveryVersion),
 				Size:            1611875,
 				Checksum:        "SHA-256:6232f852543094e9f73e1994e6888646fdcd24eca15fd4e5bde716a8e23046dc",
 				CachePath:       "tools",
@@ -58,8 +56,8 @@ var (
 		{
 			OS: "i686-mingw32",
 			Resource: &resources.DownloadResource{
-				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Windows_32bit.zip", sdVersion),
-				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Windows_32bit.zip", sdVersion),
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Windows_32bit.zip", serialDiscoveryVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Windows_32bit.zip", serialDiscoveryVersion),
 				Size:            1719070,
 				Checksum:        "SHA-256:3efdc744a0ca11c5f9088525eb4363e90e2b6a43a0db23c5c6975a10d739c7cb",
 				CachePath:       "tools",
@@ -68,8 +66,8 @@ var (
 		{
 			OS: "x86_64-mingw32",
 			Resource: &resources.DownloadResource{
-				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Windows_64bit.zip", sdVersion),
-				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Windows_64bit.zip", sdVersion),
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Windows_64bit.zip", serialDiscoveryVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Windows_64bit.zip", serialDiscoveryVersion),
 				Size:            1683799,
 				Checksum:        "SHA-256:c6296b92459160f4c0bf7d2e1234cd53fd64f44cb3fa8c3a4b10dd6670466c69",
 				CachePath:       "tools",
@@ -78,8 +76,8 @@ var (
 		{
 			OS: "x86_64-apple-darwin",
 			Resource: &resources.DownloadResource{
-				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_macOS_64bit.tar.bz2", sdVersion),
-				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_macOS_64bit.tar.bz2", sdVersion),
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_macOS_64bit.tar.bz2", serialDiscoveryVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_macOS_64bit.tar.bz2", serialDiscoveryVersion),
 				Size:            1620346,
 				Checksum:        "SHA-256:4052a64dd68090726247dea7f03656eae951549df9878362dcedfcef116a9e9f",
 				CachePath:       "tools",
@@ -88,8 +86,8 @@ var (
 		{
 			OS: "arm-linux-gnueabihf",
 			Resource: &resources.DownloadResource{
-				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Linux_ARM.tar.bz2", sdVersion),
-				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Linux_ARM.tar.bz2", sdVersion),
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Linux_ARM.tar.bz2", serialDiscoveryVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Linux_ARM.tar.bz2", serialDiscoveryVersion),
 				Size:            1511104,
 				Checksum:        "SHA-256:fe68fd5abdfebe0f01c48c3eac16d27af46ec2391da87de44571e6ea2dab31e7",
 				CachePath:       "tools",
@@ -98,8 +96,8 @@ var (
 		{
 			OS: "arm64-linux-gnueabihf",
 			Resource: &resources.DownloadResource{
-				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Linux_ARM64.tar.bz2", sdVersion),
-				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Linux_ARM64.tar.bz2", sdVersion),
+				ArchiveFileName: fmt.Sprintf("serial-discovery_v%s_Linux_ARM64.tar.bz2", serialDiscoveryVersion),
+				URL:             fmt.Sprintf("https://downloads.arduino.cc/tools/serial-discovery_v%s_Linux_ARM64.tar.bz2", serialDiscoveryVersion),
 				Size:            1500998,
 				Checksum:        "SHA-256:1e6bcb6b7790d38863df15395c96baba239cb56233d7ef2d78bcb2b3efb1bc5d",
 				CachePath:       "tools",
@@ -233,8 +231,8 @@ func WatchListBoards(pm *packagemanager.PackageManager) (<-chan *discovery.Event
 
 func getBuiltinSerialDiscoveryTool(pm *packagemanager.PackageManager) (*cores.ToolRelease, error) {
 	builtinPackage := pm.Packages.GetOrCreatePackage("builtin")
-	ctagsTool := builtinPackage.GetOrCreateTool("serial-discovery")
-	ctagsRel := ctagsTool.GetOrCreateRelease(sdVersion)
-	ctagsRel.Flavors = flavors
-	return pm.Package("builtin").Tool("serial-discovery").Release(sdVersion).Get()
+	serialDiscoveryTool := builtinPackage.GetOrCreateTool("serial-discovery")
+	serialDiscoveryToolRel := serialDiscoveryTool.GetOrCreateRelease(serialDiscoveryVersion)
+	serialDiscoveryToolRel.Flavors = serialDiscoveryFlavors
+	return pm.Package("builtin").Tool("serial-discovery").Release(serialDiscoveryVersion).Get()
 }
