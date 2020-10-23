@@ -258,6 +258,19 @@ func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadReq, stream rpc.ArduinoCor
 	return stream.Send(resp)
 }
 
+// UploadUsingProgrammer FIXMEDOC
+func (s *ArduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgrammerReq, stream rpc.ArduinoCore_UploadUsingProgrammerServer) error {
+	resp, err := upload.UsingProgrammer(
+		stream.Context(), req,
+		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadUsingProgrammerResp{OutStream: data}) }),
+		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadUsingProgrammerResp{ErrStream: data}) }),
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(resp)
+}
+
 // BurnBootloader FIXMEDOC
 func (s *ArduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderReq, stream rpc.ArduinoCore_BurnBootloaderServer) error {
 	resp, err := upload.BurnBootloader(
