@@ -187,6 +187,22 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 	return opts
 }
 
+func (ctx *Context) InjectBuildOptions(opts *properties.Map) {
+	ctx.HardwareDirs = paths.NewPathList(strings.Split(opts.Get("hardwareFolders"), ",")...)
+	ctx.BuiltInToolsDirs = paths.NewPathList(strings.Split(opts.Get("builtInToolsFolders"), ",")...)
+	ctx.BuiltInLibrariesDirs = paths.NewPathList(strings.Split(opts.Get("builtInLibrariesFolders"), ",")...)
+	ctx.OtherLibrariesDirs = paths.NewPathList(strings.Split(opts.Get("otherLibrariesFolders"), ",")...)
+	ctx.SketchLocation = opts.GetPath("sketchLocation")
+	fqbn, err := cores.ParseFQBN(opts.Get("fqbn"))
+	if err != nil {
+		i18n.ErrorfWithLogger(ctx.GetLogger(), "Error in FQBN: %s", err)
+	}
+	ctx.FQBN = fqbn
+	ctx.ArduinoAPIVersion = opts.Get("runtime.ide.version")
+	ctx.CustomBuildProperties = strings.Split(opts.Get("customBuildProperties"), ",")
+	ctx.OptimizationFlags = opts.Get("compiler.optimization_flags")
+}
+
 func (ctx *Context) GetLogger() i18n.Logger {
 	if ctx.logger == nil {
 		return &i18n.HumanLogger{}
