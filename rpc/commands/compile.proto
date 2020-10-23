@@ -37,9 +37,9 @@ message CompileReq {
   int32 jobs = 14;   // The max number of concurrent compiler instances to run (as `make -jx`). If jobs is set to 0, it will use the number of available CPUs as the maximum.
   repeated string libraries = 15; // List of custom libraries paths separated by commas.
   bool optimizeForDebug = 16; // Optimize compile output for debug, not for release.
-  string export_dir = 17; // Optional: save the build artifacts in this directory, the directory must exist.
-  bool clean = 18; // Optional: cleanup the build folder and do not use any previously cached build
-  bool export_binaries = 19; // When set to `true` the compiled binary will be copied to the export directory.
+  string export_dir = 18; // Optional: save the build artifacts in this directory, the directory must exist.
+  bool clean = 19; // Optional: cleanup the build folder and do not use any previously cached build
+  bool export_binaries = 20; // When set to `true` the compiled binary will be copied to the export directory.
 }
 
 message CompileResp {
