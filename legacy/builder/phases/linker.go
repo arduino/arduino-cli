@@ -59,23 +59,38 @@ func (s *Linker) Run(ctx *types.Context) error {
 func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties *properties.Map) error {
 	objectFileList := strings.Join(utils.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes), " ")
 
-	// If command line length is too big (> 30000 chars), try to collect the object files into an archive
-	// and use that archive to complete the build.
+	// If command line length is too big (> 30000 chars), try to collect the object files into archives
+	// and use that archives to complete the build.
 	if len(objectFileList) > 30000 {
-		objectFilesArchive := ctx.BuildPath.Join("object_files.a")
-		// Recreate the archive at every build
-		_ = objectFilesArchive.Remove()
+
+		// We must create an object file for each visited directory: this is required becuase gcc-ar checks
+		// if an object file is already in the archive by looking ONLY at the filename WITHOUT the path, so
+		// it may happen that a subdir/spi.o inside the archive may be overwritten by a anotherdir/spi.o
+		// because thery are both named spi.o.
+
 		properties := buildProperties.Clone()
-		properties.Set("archive_file", objectFilesArchive.Base())
-		properties.SetPath("archive_file_path", objectFilesArchive)
-		for _, objFile := range objectFiles {
-			properties.SetPath("object_file", objFile)
+		archives := map[string]bool{}
+		for _, object := range objectFiles {
+			archive := object.Parent().Join("objs.a")
+			if !archives[archive.String()] {
+				archives[archive.String()] = true
+				// Cleanup old archives
+				_ = archive.Remove()
+			}
+			properties.Set("archive_file", archive.Base())
+			properties.SetPath("archive_file_path", archive)
+			properties.SetPath("object_file", object)
 			_, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, false, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
 			if err != nil {
 				return err
 			}
 		}
-		objectFileList = "-Wl,--whole-archive " + wrapWithDoubleQuotes(objectFilesArchive.String()) + " -Wl,--no-whole-archive"
+
+		objectFileList = ""
+		for archive := range archives {
+			objectFileList += " " + wrapWithDoubleQuotes(archive)
+		}
+		objectFileList = "-Wl,--whole-archive" + objectFileList + " -Wl,--no-whole-archive"
 	}
 
 	properties := buildProperties.Clone()
