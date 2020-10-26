@@ -57,8 +57,26 @@ func (s *Linker) Run(ctx *types.Context) error {
 }
 
 func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties *properties.Map) error {
-	quotedObjectFiles := utils.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes)
-	objectFileList := strings.Join(quotedObjectFiles, " ")
+	objectFileList := strings.Join(utils.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes), " ")
+
+	// If command line length is too big (> 30000 chars), try to collect the object files into an archive
+	// and use that archive to complete the build.
+	if len(objectFileList) > 30000 {
+		objectFilesArchive := ctx.BuildPath.Join("object_files.a")
+		// Recreate the archive at every build
+		_ = objectFilesArchive.Remove()
+		properties := buildProperties.Clone()
+		properties.Set("archive_file", objectFilesArchive.Base())
+		properties.SetPath("archive_file_path", objectFilesArchive)
+		for _, objFile := range objectFiles {
+			properties.SetPath("object_file", objFile)
+			_, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, false, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+			if err != nil {
+				return err
+			}
+		}
+		objectFileList = "-Wl,--whole-archive " + wrapWithDoubleQuotes(objectFilesArchive.String()) + " -Wl,--no-whole-archive"
+	}
 
 	properties := buildProperties.Clone()
 	properties.Set(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS))
