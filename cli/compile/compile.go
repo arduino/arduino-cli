@@ -62,9 +62,9 @@ func NewCommand() *cobra.Command {
 		Long:  "Compiles Arduino sketches.",
 		Example: "" +
 			"  " + os.Args[0] + " compile -b arduino:avr:uno /home/user/Arduino/MySketch\n" +
-			"  " + os.Args[0] + " compile -b arduino:avr:uno --build-property='build.extra_flags=\"-DMY_DEFINE=\"hello world\"\"' /home/user/Arduino/MySketch\n" +
-			"  " + os.Args[0] + " compile -b arduino:avr:uno --build-property='build.extra_flags=-DPIN=2 \"-DMY_DEFINE=\"hello world\"\"' /home/user/Arduino/MySketch\n" +
-			"  " + os.Args[0] + " compile -b arduino:avr:uno --build-property=build.extra_flags=-DPIN=2 --build-property='compiler.cpp.extra_flags=\"-DSSID=\"hello world\"\"'-DMY_DEFINE=\"hello world\"' /home/user/Arduino/MySketch\n",
+			"  " + os.Args[0] + " compile -b arduino:avr:uno --build-property=\"build.extra_flags=\\\"-DMY_DEFINE=\\\"hello world\\\"\\\"\" /home/user/Arduino/MySketch\n" +
+			"  " + os.Args[0] + " compile -b arduino:avr:uno --build-property=\"build.extra_flags=-DPIN=2 \\\"-DMY_DEFINE=\\\"hello world\\\"\\\"\" /home/user/Arduino/MySketch\n" +
+			"  " + os.Args[0] + " compile -b arduino:avr:uno --build-property=build.extra_flags=-DPIN=2 --build-property=\"compiler.cpp.extra_flags=\\\"-DSSID=\\\"hello world\\\"\\\"\"-DMY_DEFINE=\"hello world\"' /home/user/Arduino/MySketch\n",
 		Args: cobra.MaximumNArgs(1),
 		Run:  run,
 	}
