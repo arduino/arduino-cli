@@ -25,6 +25,8 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/sirupsen/logrus"
@@ -51,6 +53,15 @@ var searchFlags struct {
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
+
+	err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexReq{
+		Instance: instance,
+	}, output.ProgressBar())
+	if err != nil {
+		feedback.Errorf("Error updating library index: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
 	logrus.Info("Executing `arduino lib search`")
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
 		Instance: instance,

@@ -16,6 +16,7 @@
 package core
 
 import (
+	"context"
 	"os"
 	"sort"
 	"strings"
@@ -23,6 +24,8 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/cli/output"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/arduino-cli/table"
@@ -52,6 +55,14 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	inst, err := instance.CreateInstance()
 	if err != nil {
 		feedback.Errorf("Error searching for platforms: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	_, err = commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
+		Instance: inst,
+	}, output.ProgressBar())
+	if err != nil {
+		feedback.Errorf("Error updating index: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 

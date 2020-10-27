@@ -48,32 +48,39 @@ def test_core_search(run_command, httpserver):
     # Search all Retrokit platforms
     result = run_command(f"core search retrokit --all --additional-urls={url}")
     assert result.ok
-    assert 3 == len(result.stdout.strip().splitlines())
-    lines = [l.split(maxsplit=2) for l in result.stdout.strip().splitlines()]
+    lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
+    assert 11 == len(lines)
+    assert ["Updating", "index:", "package_index.json", "downloaded"] in lines
+    assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines
     assert ["Retrokits-RK002:arm", "1.0.5", "RK002"] in lines
     assert ["Retrokits-RK002:arm", "1.0.6", "RK002"] in lines
 
     # Search using Retrokit Package Maintainer
     result = run_command(f"core search Retrokits-RK002 --all --additional-urls={url}")
     assert result.ok
-    assert 3 == len(result.stdout.strip().splitlines())
-    lines = [l.split(maxsplit=2) for l in result.stdout.strip().splitlines()]
+    lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
+    assert 11 == len(lines)
+    assert ["Updating", "index:", "package_index.json", "downloaded"] in lines
+    assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines
     assert ["Retrokits-RK002:arm", "1.0.5", "RK002"] in lines
     assert ["Retrokits-RK002:arm", "1.0.6", "RK002"] in lines
 
     # Search using the Retrokit Platform name
     result = run_command(f"core search rk002 --all --additional-urls={url}")
     assert result.ok
-    assert 3 == len(result.stdout.strip().splitlines())
-    lines = [l.split(maxsplit=2) for l in result.stdout.strip().splitlines()]
+    assert 11 == len(lines)
+    assert ["Updating", "index:", "package_index.json", "downloaded"] in lines
+    assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines
     assert ["Retrokits-RK002:arm", "1.0.5", "RK002"] in lines
     assert ["Retrokits-RK002:arm", "1.0.6", "RK002"] in lines
 
     # Search using a board name
     result = run_command(f"core search myboard --all --additional-urls={url}")
     assert result.ok
-    assert 2 == len(result.stdout.strip().splitlines())
-    lines = [l.split(maxsplit=2) for l in result.stdout.strip().splitlines()]
+    assert 10 == len(result.stdout.strip().splitlines())
+    lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
+    assert ["Updating", "index:", "package_index.json", "downloaded"] in lines
+    assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines
     assert ["Package:x86", "1.2.3", "Platform"] in lines
 
 
@@ -95,48 +102,38 @@ def test_core_search_no_args(run_command, httpserver):
     result = run_command("core search")
     assert result.ok
     num_platforms = 0
-    found = False
-    for l in result.stdout.splitlines()[1:]:  # ignore the header on first line
-        if l:  # ignore empty lines
-            if l.startswith("test:x86"):
-                found = True
-            num_platforms += 1
+    lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
+    # Index update output and the header are printed on the first lines
+    assert ["Updating", "index:", "package_index.json", "downloaded"] in lines[:6]
+    assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines[:6]
+    assert ["ID", "Version", "Name"] == lines[5]
+    assert ["test:x86", "2.0.0", "test_core"] in lines[6:]
+    num_platforms = len(lines[6:])
 
     # same thing in JSON format, also check the number of platforms found is the same
     result = run_command("core search --format json")
     assert result.ok
     platforms = json.loads(result.stdout)
-    found = False
-    platforms = json.loads(result.stdout)
-    for elem in platforms:
-        if elem.get("Name") == "test_core":
-            found = True
-            break
-    assert found
+    assert 1 == len([e for e in platforms if e.get("Name") == "test_core"])
     assert len(platforms) == num_platforms
 
     # list all with additional urls, check the test core is there
     result = run_command(f"core search --additional-urls={url}")
     assert result.ok
     num_platforms = 0
-    found = False
-    for l in result.stdout.splitlines()[1:]:  # ignore the header on first line
-        if l:  # ignore empty lines
-            if l.startswith("test:x86"):
-                found = True
-            num_platforms += 1
-    assert found
+    lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
+    # Index update output and the header are printed on the first lines
+    assert ["Updating", "index:", "package_index.json", "downloaded"] in lines[:9]
+    assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines[:9]
+    assert ["ID", "Version", "Name"] == lines[8]
+    assert ["test:x86", "2.0.0", "test_core"] in lines[9:]
+    num_platforms = len(lines[9:])
 
     # same thing in JSON format, also check the number of platforms found is the same
     result = run_command(f"core search --format json --additional-urls={url}")
     assert result.ok
-    found = False
     platforms = json.loads(result.stdout)
-    for elem in platforms:
-        if elem.get("Name") == "test_core":
-            found = True
-            break
-    assert found
+    assert 1 == len([e for e in platforms if e.get("Name") == "test_core"])
     assert len(platforms) == num_platforms
 
 
