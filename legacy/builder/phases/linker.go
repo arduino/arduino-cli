@@ -69,11 +69,11 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 		// because thery are both named spi.o.
 
 		properties := buildProperties.Clone()
-		archives := map[string]bool{}
+		archives := paths.NewPathList()
 		for _, object := range objectFiles {
 			archive := object.Parent().Join("objs.a")
-			if !archives[archive.String()] {
-				archives[archive.String()] = true
+			if !archives.Contains(archive) {
+				archives.Add(archive)
 				// Cleanup old archives
 				_ = archive.Remove()
 			}
@@ -86,11 +86,8 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 			}
 		}
 
-		objectFileList = ""
-		for archive := range archives {
-			objectFileList += " " + wrapWithDoubleQuotes(archive)
-		}
-		objectFileList = "-Wl,--whole-archive" + objectFileList + " -Wl,--no-whole-archive"
+		objectFileList = strings.Join(utils.Map(archives.AsStrings(), wrapWithDoubleQuotes), " ")
+		objectFileList = "-Wl,--whole-archive " + objectFileList + " -Wl,--no-whole-archive"
 	}
 
 	properties := buildProperties.Clone()
