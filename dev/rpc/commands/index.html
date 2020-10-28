@@ -1616,6 +1616,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#uploadusingprogrammerreq" class="md-nav__link">
+    UploadUsingProgrammerReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uploadusingprogrammerresp" class="md-nav__link">
+    UploadUsingProgrammerResp
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2549,6 +2563,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#uploadusingprogrammerreq" class="md-nav__link">
+    UploadUsingProgrammerReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uploadusingprogrammerresp" class="md-nav__link">
+    UploadUsingProgrammerResp
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2726,6 +2754,8 @@
 <li><a href="#cc.arduino.cli.commands.ListProgrammersAvailableForUploadResp">ListProgrammersAvailableForUploadResp</a></li>
 <li><a href="#cc.arduino.cli.commands.UploadReq">UploadReq</a></li>
 <li><a href="#cc.arduino.cli.commands.UploadResp">UploadResp</a></li>
+<li><a href="#cc.arduino.cli.commands.UploadUsingProgrammerReq">UploadUsingProgrammerReq</a></li>
+<li><a href="#cc.arduino.cli.commands.UploadUsingProgrammerResp">UploadUsingProgrammerResp</a></li>
 </ul>
 </li>
 </ul>
@@ -4004,13 +4034,19 @@
 <td>Upload</td>
 <td><a href="#cc.arduino.cli.commands.UploadReq">UploadReq</a></td>
 <td><a href="#cc.arduino.cli.commands.UploadResp">UploadResp</a> stream</td>
-<td>Upload a compiled sketch to an Arduino board.</td>
+<td>Upload a compiled sketch to a board.</td>
+</tr>
+<tr>
+<td>UploadUsingProgrammer</td>
+<td><a href="#cc.arduino.cli.commands.UploadUsingProgrammerReq">UploadUsingProgrammerReq</a></td>
+<td><a href="#cc.arduino.cli.commands.UploadUsingProgrammerResp">UploadUsingProgrammerResp</a> stream</td>
+<td>Upload a compiled sketch to a board using a programmer.</td>
 </tr>
 <tr>
 <td>ListProgrammersAvailableForUpload</td>
 <td><a href="#cc.arduino.cli.commands.ListProgrammersAvailableForUploadReq">ListProgrammersAvailableForUploadReq</a></td>
 <td><a href="#cc.arduino.cli.commands.ListProgrammersAvailableForUploadResp">ListProgrammersAvailableForUploadResp</a></td>
-<td></td>
+<td>List programmers available for a board.</td>
 </tr>
 <tr>
 <td>BurnBootloader</td>
@@ -5947,12 +5983,106 @@
 <td>programmer</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>The programmer to use for upload. If set an UploadUsingProgrammer is triggered instead of a normal upload. The UploadUsingProgrammer call may also be used for explicit error check.</td>
 </tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.UploadResp"></a></p>
 <h3 id="uploadresp">UploadResp<a class="headerlink" href="#uploadresp" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>out_stream</td>
+<td><a href="#bytes">bytes</a></td>
+<td></td>
+<td>The output of the upload process.</td>
+</tr>
+<tr>
+<td>err_stream</td>
+<td><a href="#bytes">bytes</a></td>
+<td></td>
+<td>The error output of the upload process.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.UploadUsingProgrammerReq"></a></p>
+<h3 id="uploadusingprogrammerreq">UploadUsingProgrammerReq<a class="headerlink" href="#uploadusingprogrammerreq" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
+<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
+</tr>
+<tr>
+<td>fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Fully qualified board name of the target board (e.g., <code>arduino:avr:uno</code>). If this field is not defined, the FQBN of the board attached to the sketch via the <code>BoardAttach</code> method is used.</td>
+</tr>
+<tr>
+<td>sketch_path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Path where the sketch to be uploaded is stored. Unless the <code>import_file</code> field is defined, the compiled binary is assumed to be at the location and filename under this path where it is saved by the <code>Compile</code> method.</td>
+</tr>
+<tr>
+<td>port</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The port of the board.</td>
+</tr>
+<tr>
+<td>verbose</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>Whether to turn on verbose output during the upload.</td>
+</tr>
+<tr>
+<td>verify</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>After upload, verify that the contents of the memory on the board match the uploaded binary.</td>
+</tr>
+<tr>
+<td>import_file</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>When <code>import_file</code> is specified, it overrides the <code>import_dir</code> and <code>sketch_path</code> params.</td>
+</tr>
+<tr>
+<td>import_dir</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Custom path to a directory containing compiled files. When <code>import_dir</code> is not specified, the standard build directory under <code>sketch_path</code> is used.</td>
+</tr>
+<tr>
+<td>programmer</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The programmer to use for upload.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.UploadUsingProgrammerResp"></a></p>
+<h3 id="uploadusingprogrammerresp">UploadUsingProgrammerResp<a class="headerlink" href="#uploadusingprogrammerresp" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
