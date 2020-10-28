@@ -71,6 +71,27 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	return &rpc.UploadResp{}, nil
 }
 
+// UsingProgrammer FIXMEDOC
+func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerReq, outStream io.Writer, errStream io.Writer) (*rpc.UploadUsingProgrammerResp, error) {
+	logrus.Tracef("Upload using programmer %s on %s started", req.GetSketchPath(), req.GetFqbn())
+
+	if req.GetProgrammer() == "" {
+		return nil, errors.New("programmer not specified")
+	}
+	_, err := Upload(ctx, &rpc.UploadReq{
+		Instance:   req.GetInstance(),
+		SketchPath: req.GetSketchPath(),
+		ImportFile: req.GetImportFile(),
+		ImportDir:  req.GetImportDir(),
+		Fqbn:       req.GetFqbn(),
+		Port:       req.GetPort(),
+		Programmer: req.GetProgrammer(),
+		Verbose:    req.GetVerbose(),
+		Verify:     req.GetVerify(),
+	}, outStream, errStream)
+	return &rpc.UploadUsingProgrammerResp{}, err
+}
+
 func runProgramAction(pm *packagemanager.PackageManager,
 	sketch *sketches.Sketch,
 	importFile, importDir, fqbnIn, port string,

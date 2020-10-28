@@ -23,15 +23,15 @@ import "commands/common.proto";
 
 message UploadReq {
 	// Arduino Core Service instance from the `Init` response.
-    Instance instance = 1;
+	Instance instance = 1;
 	// Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
 	// If this field is not defined, the FQBN of the board attached to the sketch
 	// via the `BoardAttach` method is used.
-    string fqbn = 2;
+	string fqbn = 2;
 	// Path where the sketch to be uploaded is stored. Unless the `import_file`
 	// field is defined, the compiled binary is assumed to be at the location and
 	// filename under this path where it is saved by the `Compile` method.
-    string sketch_path = 3;
+	string sketch_path = 3;
 	// The port of the board.
 	string port = 4;
 	// Whether to turn on verbose output during the upload.
@@ -45,10 +45,48 @@ message UploadReq {
 	// Custom path to a directory containing compiled files. When `import_dir` is
 	// not specified, the standard build directory under `sketch_path` is used.
 	string import_dir = 8;
+	// The programmer to use for upload. If set an UploadUsingProgrammer is triggered
+	// instead of a normal upload. The UploadUsingProgrammer call may also be used for
+	// explicit error check.
 	string programmer = 9;
 }
 
 message UploadResp {
+	// The output of the upload process.
+	bytes out_stream = 1;
+	// The error output of the upload process.
+	bytes err_stream = 2;
+}
+
+message UploadUsingProgrammerReq {
+	// Arduino Core Service instance from the `Init` response.
+	Instance instance = 1;
+	// Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
+	// If this field is not defined, the FQBN of the board attached to the sketch
+	// via the `BoardAttach` method is used.
+	string fqbn = 2;
+	// Path where the sketch to be uploaded is stored. Unless the `import_file`
+	// field is defined, the compiled binary is assumed to be at the location and
+	// filename under this path where it is saved by the `Compile` method.
+	string sketch_path = 3;
+	// The port of the board.
+	string port = 4;
+	// Whether to turn on verbose output during the upload.
+	bool verbose = 5;
+	// After upload, verify that the contents of the memory on the board match the
+	// uploaded binary.
+	bool verify = 6;
+	// When `import_file` is specified, it overrides the `import_dir` and `sketch_path`
+	// params.
+	string import_file = 7;
+	// Custom path to a directory containing compiled files. When `import_dir` is
+	// not specified, the standard build directory under `sketch_path` is used.
+	string import_dir = 8;
+	// The programmer to use for upload.
+	string programmer = 9;
+}
+
+message UploadUsingProgrammerResp {
 	// The output of the upload process.
 	bytes out_stream = 1;
 	// The error output of the upload process.
