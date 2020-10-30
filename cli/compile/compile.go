@@ -141,7 +141,7 @@ func run(cmd *cobra.Command, args []string) {
 			Port:       port,
 			Verbose:    verbose,
 			Verify:     verify,
-			ImportDir:  exportDir,
+			ImportDir:  buildPath,
 			Programmer: programmer,
 		}, os.Stdout, os.Stderr)
 
