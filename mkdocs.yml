@@ -83,7 +83,7 @@ nav:
       - core list: commands/arduino-cli_core_list.md
       - core search: commands/arduino-cli_core_search.md
       - core uninstall: commands/arduino-cli_core_uninstall.md
-      - core update index: commands/arduino-cli_core_update-index.md
+      - core update-index: commands/arduino-cli_core_update-index.md
       - core upgrade: commands/arduino-cli_core_upgrade.md
       - daemon: commands/arduino-cli_daemon.md
       - debug: commands/arduino-cli_debug.md
