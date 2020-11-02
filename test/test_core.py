@@ -71,6 +71,7 @@ def test_core_search(run_command, httpserver):
     assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines
     assert ["Retrokits-RK002:arm", "1.0.5", "RK002"] in lines
     assert ["Retrokits-RK002:arm", "1.0.6", "RK002"] in lines
+    header_index = lines.index(["ID", "Version", "Name"])
     # We use black to format and flake8 to lint .py files but they disagree on certain
     # things like this one, thus we ignore this specific flake8 rule and stand by black
     # opinion.
@@ -86,6 +87,7 @@ def test_core_search(run_command, httpserver):
     assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines
     assert ["Retrokits-RK002:arm", "1.0.5", "RK002"] in lines
     assert ["Retrokits-RK002:arm", "1.0.6", "RK002"] in lines
+    header_index = lines.index(["ID", "Version", "Name"])
     # We use black to format and flake8 to lint .py files but they disagree on certain
     # things like this one, thus we ignore this specific flake8 rule and stand by black
     # opinion.
@@ -100,6 +102,7 @@ def test_core_search(run_command, httpserver):
     assert ["Updating", "index:", "package_index.json", "downloaded"] in lines
     assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines
     assert ["Package:x86", "1.2.3", "Platform"] in lines
+    header_index = lines.index(["ID", "Version", "Name"])
     # We use black to format and flake8 to lint .py files but they disagree on certain
     # things like this one, thus we ignore this specific flake8 rule and stand by black
     # opinion.
