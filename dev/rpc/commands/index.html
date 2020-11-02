@@ -4331,12 +4331,6 @@
 <td>VID/PID specific build properties.</td>
 </tr>
 <tr>
-<td>exportFile</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>DEPRECATED: use exportDir instead</td>
-</tr>
-<tr>
 <td>jobs</td>
 <td><a href="#int32">int32</a></td>
 <td></td>
@@ -4355,12 +4349,6 @@
 <td>Optimize compile output for debug, not for release.</td>
 </tr>
 <tr>
-<td>dryRun</td>
-<td><a href="#bool">bool</a></td>
-<td></td>
-<td>When set to <code>true</code> the compiled binary will not be copied to the export directory.</td>
-</tr>
-<tr>
 <td>export_dir</td>
 <td><a href="#string">string</a></td>
 <td></td>
@@ -4371,6 +4359,12 @@
 <td><a href="#bool">bool</a></td>
 <td></td>
 <td>Optional: cleanup the build folder and do not use any previously cached build</td>
+</tr>
+<tr>
+<td>export_binaries</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>When set to <code>true</code> the compiled binary will be copied to the export directory.</td>
 </tr>
 </tbody>
 </table>
