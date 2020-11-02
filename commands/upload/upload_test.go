@@ -21,6 +21,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
@@ -76,15 +77,14 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		{"", "testdata/build_path_2", nil, nil, "testdata/build_path_2", "Blink.ino"},
 		// 03: error: used both importPath and importFile
 		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", nil, nil, "<nil>", ""},
-		// 04: error: only sketch without FQBN
-		{"", "", blonk, nil, "<nil>", ""},
+		// 04: only sketch without FQBN
+		{"", "", blonk, nil, builder.GenBuildPath(blonk.FullPath).String(), "Blonk.ino"},
 		// 05: use importFile to detect build.path and project_name, sketch is ignored.
 		{"testdata/build_path_2/Blink.ino.hex", "", blonk, nil, "testdata/build_path_2", "Blink.ino"},
 		// 06: use importPath as build.path and Blink as project name, ignore the sketch Blonk
 		{"", "testdata/build_path_2", blonk, nil, "testdata/build_path_2", "Blink.ino"},
 		// 07: error: used both importPath and importFile
 		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", blonk, nil, "<nil>", ""},
-
 		// 08: error: no data passed in
 		{"", "", nil, fqbn, "<nil>", ""},
 		// 09: use importFile to detect build.path and project_name, fqbn ignored
@@ -94,14 +94,13 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		// 11: error: used both importPath and importFile
 		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", nil, fqbn, "<nil>", ""},
 		// 12: use sketch to determine project name and sketch+fqbn to determine build path
-		{"", "", blonk, fqbn, "testdata/Blonk/build/arduino.samd.mkr1000", "Blonk.ino"},
+		{"", "", blonk, fqbn, builder.GenBuildPath(blonk.FullPath).String(), "Blonk.ino"},
 		// 13: use importFile to detect build.path and project_name, sketch+fqbn is ignored.
 		{"testdata/build_path_2/Blink.ino.hex", "", blonk, fqbn, "testdata/build_path_2", "Blink.ino"},
 		// 14: use importPath as build.path and Blink as project name, ignore the sketch Blonk, ignore fqbn
 		{"", "testdata/build_path_2", blonk, fqbn, "testdata/build_path_2", "Blink.ino"},
 		// 15: error: used both importPath and importFile
 		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", blonk, fqbn, "<nil>", ""},
-
 		// 16: importPath containing multiple firmwares, but one has the same name as the containing folder
 		{"", "testdata/firmware", nil, fqbn, "testdata/firmware", "firmware.ino"},
 		// 17: importFile among multiple firmwares

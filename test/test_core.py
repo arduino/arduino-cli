@@ -16,6 +16,8 @@ import os
 import platform
 import pytest
 import simplejson as json
+import tempfile
+import hashlib
 from pathlib import Path
 
 
@@ -189,17 +191,18 @@ def test_core_install_without_updateindex(run_command):
 def test_core_install_esp32(run_command, data_dir):
     # update index
     url = "https://dl.espressif.com/dl/package_esp32_index.json"
-    assert run_command("core update-index --additional-urls={}".format(url))
+    assert run_command(f"core update-index --additional-urls={url}")
     # install 3rd-party core
-    assert run_command("core install esp32:esp32@1.0.4 --additional-urls={}".format(url))
+    assert run_command(f"core install esp32:esp32@1.0.4 --additional-urls={url}")
     # create a sketch and compile to double check the core was successfully installed
-    sketch_path = os.path.join(data_dir, "test_core_install_esp32")
-    assert run_command("sketch new {}".format(sketch_path))
-    assert run_command("compile -b esp32:esp32:esp32 {}".format(sketch_path))
+    sketch_name = "test_core_install_esp32"
+    sketch_path = os.path.join(data_dir, sketch_name)
+    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(f"compile -b esp32:esp32:esp32 {sketch_path}")
     # prevent regressions for https://github.com/arduino/arduino-cli/issues/163
-    assert os.path.exists(
-        os.path.join(sketch_path, "build/esp32.esp32.esp32/test_core_install_esp32.ino.partitions.bin",)
-    )
+    sketch_path_md5 = hashlib.md5(sketch_path.encode()).hexdigest().upper()
+    build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
+    assert (build_dir / f"{sketch_name}.ino.partitions.bin").exists()
 
 
 def test_core_download(run_command, downloads_dir):

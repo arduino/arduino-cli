@@ -24,6 +24,7 @@ import (
 	"strconv"
 	"strings"
 
+	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
@@ -54,15 +55,11 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		"verbose":         strconv.FormatBool(req.Verbose),
 		"quiet":           strconv.FormatBool(req.Quiet),
 		"vidPid":          req.VidPid,
-		"exportFile":      telemetry.Sanitize(req.ExportFile), // deprecated
 		"exportDir":       telemetry.Sanitize(req.GetExportDir()),
 		"jobs":            strconv.FormatInt(int64(req.Jobs), 10),
 		"libraries":       strings.Join(req.Libraries, ","),
 		"clean":           strconv.FormatBool(req.GetClean()),
-	}
-
-	if req.GetExportFile() != "" {
-		outStream.Write([]byte(fmt.Sprintln("Compile.ExportFile has been deprecated. The ExportFile parameter will be ignored, use ExportDir instead.")))
+		"exportBinaries":  strconv.FormatBool(req.GetExportBinaries()),
 	}
 
 	// Use defer func() to evaluate tags map when function returns
@@ -127,12 +124,14 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 
-	if req.GetBuildPath() != "" {
+	if req.GetBuildPath() == "" {
+		builderCtx.BuildPath = bldr.GenBuildPath(sketch.FullPath)
+	} else {
 		builderCtx.BuildPath = paths.New(req.GetBuildPath())
-		err = builderCtx.BuildPath.MkdirAll()
-		if err != nil {
-			return nil, fmt.Errorf("cannot create build directory: %s", err)
-		}
+	}
+
+	if err = builderCtx.BuildPath.MkdirAll(); err != nil {
+		return nil, fmt.Errorf("cannot create build directory: %s", err)
 	}
 
 	builderCtx.Verbose = req.GetVerbose()
@@ -202,7 +201,8 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		return nil, err
 	}
 
-	if !req.GetDryRun() {
+	// If the export directory is set we assume you want to export the binaries
+	if req.GetExportBinaries() || req.GetExportDir() != "" {
 		var exportPath *paths.Path
 		if exportDir := req.GetExportDir(); exportDir != "" {
 			exportPath = paths.New(exportDir)
