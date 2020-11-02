@@ -109,6 +109,9 @@ func (ir installedResult) Data() interface{} {
 
 func (ir installedResult) String() string {
 	if ir.installedLibs == nil || len(ir.installedLibs) == 0 {
+		if listFlags.updatable {
+			return "No updates available."
+		}
 		return "No libraries installed."
 	}
 	sort.Slice(ir.installedLibs, func(i, j int) bool {
