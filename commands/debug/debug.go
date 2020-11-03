@@ -21,17 +21,14 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
+	"runtime"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/executils"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
 	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -44,17 +41,15 @@ import (
 // It also implements tool process lifecycle management
 func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*dbg.DebugResp, error) {
 
-	// Get tool commandLine from core recipe
+	// Get debugging command line to run debugger
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	commandLine, err := getCommandLine(req, pm)
 	if err != nil {
 		return nil, errors.Wrap(err, "Cannot get command line for tool")
 	}
 
-	// Transform every path to forward slashes (on Windows some tools further
-	// escapes the command line so the backslash "\" gets in the way).
-	for i, param := range commandLine {
-		commandLine[i] = filepath.ToSlash(param)
+	for i, arg := range commandLine {
+		fmt.Printf("%2d: %s\n", i, arg)
 	}
 
 	// Run Tool
@@ -115,130 +110,74 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 
 // getCommandLine compose a debug command represented by a core recipe
 func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) ([]string, error) {
-	if req.GetImportFile() != "" {
-		return nil, errors.New("the ImportFile parameter has been deprecated, use ImportDir instead")
-	}
-
-	// TODO: make a generic function to extract sketch from request
-	// and remove duplication in commands/compile.go
-	if req.GetSketchPath() == "" {
-		return nil, fmt.Errorf("missing sketchPath")
-	}
-	sketchPath := paths.New(req.GetSketchPath())
-	sketch, err := sketches.NewSketchFromPath(sketchPath)
+	debugInfo, err := getDebugProperties(req, pm)
 	if err != nil {
-		return nil, errors.Wrap(err, "opening sketch")
+		return nil, err
 	}
 
-	fqbnIn := req.GetFqbn()
-	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
-		fqbnIn = sketch.Metadata.CPU.Fqbn
-	}
-	if fqbnIn == "" {
-		return nil, fmt.Errorf("no Fully Qualified Board Name provided")
-	}
-	fqbn, err := cores.ParseFQBN(fqbnIn)
-	if err != nil {
-		return nil, errors.Wrap(err, "error parsing FQBN")
-	}
+	cmdArgs := []string{}
+	add := func(s string) { cmdArgs = append(cmdArgs, s) }
 
-	// Find target board and board properties
-	_, _, board, boardProperties, _, err := pm.ResolveFQBN(fqbn)
-	if err != nil {
-		return nil, errors.Wrap(err, "error resolving FQBN")
-	}
-
-	// Load programmer tool
-	toolName, have := boardProperties.GetOk("debug.tool")
-	if !have || toolName == "" {
-		return nil, fmt.Errorf("cannot get programmer tool: undefined 'debug.tool' property")
-	}
-
-	var referencedPlatformRelease *cores.PlatformRelease
-	if split := strings.Split(toolName, ":"); len(split) > 2 {
-		return nil, fmt.Errorf("invalid 'debug.tool' property: %s", toolName)
-	} else if len(split) == 2 {
-		referencedPackageName := split[0]
-		toolName = split[1]
-		architecture := board.PlatformRelease.Platform.Architecture
-
-		if referencedPackage := pm.Packages[referencedPackageName]; referencedPackage == nil {
-			return nil, fmt.Errorf("required platform %s:%s not installed", referencedPackageName, architecture)
-		} else if referencedPlatform := referencedPackage.Platforms[architecture]; referencedPlatform == nil {
-			return nil, fmt.Errorf("required platform %s:%s not installed", referencedPackageName, architecture)
-		} else {
-			referencedPlatformRelease = pm.GetInstalledPlatformRelease(referencedPlatform)
+	// Add path to GDB Client to command line
+	var gdbPath *paths.Path
+	switch debugInfo.GetToolchain() {
+	case "gcc":
+		gdbexecutable := debugInfo.ToolchainPrefix + "gdb"
+		if runtime.GOOS == "windows" {
+			gdbexecutable += ".exe"
 		}
+		gdbPath = paths.New(debugInfo.ToolchainPath).Join(gdbexecutable)
+	default:
+		return nil, errors.Errorf("unsupported toolchain '%s'", debugInfo.GetToolchain())
+	}
+	add(gdbPath.String())
+
+	// Set GDB interpreter (default value should be "console")
+	gdbInterpreter := req.GetInterpreter()
+	if gdbInterpreter == "" {
+		gdbInterpreter = "console"
+	}
+	add("--interpreter=" + gdbInterpreter)
+	if gdbInterpreter != "console" {
+		add("-ex")
+		add("set pagination off")
 	}
 
-	// Build configuration for debug
-	toolProperties := properties.NewMap()
-	if referencedPlatformRelease != nil {
-		toolProperties.Merge(referencedPlatformRelease.Properties)
-	}
-	toolProperties.Merge(board.PlatformRelease.Properties)
-	toolProperties.Merge(board.PlatformRelease.RuntimeProperties())
-	toolProperties.Merge(boardProperties)
+	// Add extra GDB execution commands
+	add("-ex")
+	add("set remotetimeout 5")
 
-	requestedToolProperties := toolProperties.SubTree("tools." + toolName)
-	toolProperties.Merge(requestedToolProperties)
-	if requiredTools, err := pm.FindToolsRequiredForBoard(board); err == nil {
-		for _, requiredTool := range requiredTools {
-			logrus.WithField("tool", requiredTool).Info("Tool required for debug")
-			toolProperties.Merge(requiredTool.RuntimeProperties())
+	// Extract path to GDB Server
+	switch debugInfo.GetServer() {
+	case "openocd":
+		serverCmd := fmt.Sprintf(`target extended-remote | "%s"`, debugInfo.ServerPath)
+
+		if cfg := debugInfo.ServerConfiguration["scripts_dir"]; cfg != "" {
+			serverCmd += fmt.Sprintf(` -s "%s"`, cfg)
 		}
-	}
 
-	var importPath *paths.Path
-	if importDir := req.GetImportDir(); importDir != "" {
-		importPath = paths.New(importDir)
-	} else {
-		// TODO: Create a function to obtain importPath from sketch
-		importPath = sketch.FullPath
-		// Add FQBN (without configs part) to export path
-		fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
-		importPath = importPath.Join("build").Join(fqbnSuffix)
-	}
-	if !importPath.Exist() {
-		return nil, fmt.Errorf("compiled sketch not found in %s", importPath)
-	}
-	if !importPath.IsDir() {
-		return nil, fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
-	}
-	toolProperties.SetPath("build.path", importPath)
-	toolProperties.Set("build.project_name", sketch.Name+".ino")
-
-	// Set debug port property
-	port := req.GetPort()
-	if port != "" {
-		toolProperties.Set("debug.port", port)
-		if strings.HasPrefix(port, "/dev/") {
-			toolProperties.Set("debug.port.file", port[5:])
-		} else {
-			toolProperties.Set("debug.port.file", port)
+		if script := debugInfo.ServerConfiguration["script"]; script != "" {
+			serverCmd += fmt.Sprintf(` --file "%s"`, script)
 		}
+
+		serverCmd += ` -c "gdb_port pipe"`
+		serverCmd += ` -c "telnet_port 0"`
+
+		add("-ex")
+		add(serverCmd)
+
+	default:
+		return nil, errors.Errorf("unsupported gdb server '%s'", debugInfo.GetServer())
 	}
 
-	// Set debugger interpreter (default value should be "console")
-	interpreter := req.GetInterpreter()
-	if interpreter != "" {
-		toolProperties.Set("interpreter", interpreter)
-	} else {
-		toolProperties.Set("interpreter", "console")
+	// Add executable
+	add(debugInfo.Executable)
+
+	// Transform every path to forward slashes (on Windows some tools further
+	// escapes the command line so the backslash "\" gets in the way).
+	for i, param := range cmdArgs {
+		cmdArgs[i] = filepath.ToSlash(param)
 	}
 
-	// Build recipe for tool
-	recipe := toolProperties.Get("debug.pattern")
-
-	// REMOVEME: hotfix for samd core 1.8.5/1.8.6
-	if recipe == `"{path}/{cmd}" --interpreter=mi2 -ex "set pagination off" -ex 'target extended-remote | {tools.openocd.path}/{tools.openocd.cmd} -s "{tools.openocd.path}/share/openocd/scripts/" --file "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "gdb_port pipe" -c "telnet_port 0"' {build.path}/{build.project_name}.elf` {
-		recipe = `"{path}/{cmd}" --interpreter={interpreter} -ex "set remotetimeout 5" -ex "set pagination off" -ex 'target extended-remote | "{tools.openocd.path}/{tools.openocd.cmd}" -s "{tools.openocd.path}/share/openocd/scripts/" --file "{runtime.platform.path}/variants/{build.variant}/{build.openocdscript}" -c "gdb_port pipe" -c "telnet_port 0"' "{build.path}/{build.project_name}.elf"`
-	}
-
-	cmdLine := toolProperties.ExpandPropsInString(recipe)
-	cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
-	if err != nil {
-		return nil, fmt.Errorf("invalid recipe '%s': %s", recipe, err)
-	}
 	return cmdArgs, nil
 }

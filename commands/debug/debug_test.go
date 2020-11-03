@@ -53,12 +53,12 @@ func TestGetCommandLine(t *testing.T) {
 		SketchPath: sketchPath.String(),
 	}
 
-	goldCommand := fmt.Sprintf("%s/arduino-test/tools/arm-none-eabi-gcc/7-2017q4/bin//arm-none-eabi-gdb%s", dataDir, toolExtension) +
-		" --interpreter=console -ex target extended-remote |" +
-		fmt.Sprintf(" %s/arduino-test/tools/openocd/0.10.0-arduino7/bin/openocd%s", dataDir, toolExtension) +
+	goldCommand := fmt.Sprintf("%s/arduino-test/tools/arm-none-eabi-gcc/7-2017q4/bin/arm-none-eabi-gdb%s", dataDir, toolExtension) +
+		" --interpreter=console -ex set remotetimeout 5 -ex target extended-remote |" +
+		fmt.Sprintf(" \"%s/arduino-test/tools/openocd/0.10.0-arduino7/bin/openocd%s\"", dataDir, toolExtension) +
 		fmt.Sprintf(" -s \"%s/arduino-test/tools/openocd/0.10.0-arduino7/share/openocd/scripts/\"", dataDir) +
 		fmt.Sprintf(" --file \"%s/arduino-test/samd/variants/arduino_zero/openocd_scripts/arduino_zero.cfg\"", customHardware) +
-		fmt.Sprintf(" -c \"gdb_port pipe\" -c \"telnet_port 0\" -c init -c halt %s/build/arduino-test.samd.arduino_zero_edbg/hello.ino.elf", sketchPath)
+		fmt.Sprintf(" -c \"gdb_port pipe\" -c \"telnet_port 0\" %s/build/arduino-test.samd.arduino_zero_edbg/hello.ino.elf", sketchPath)
 
 	command, err := getCommandLine(req, pm)
 	require.Nil(t, err)
@@ -74,12 +74,12 @@ func TestGetCommandLine(t *testing.T) {
 		Interpreter: "mi1",
 	}
 
-	goldCommand2 := fmt.Sprintf("%s/arduino-test/tools/arm-none-eabi-gcc/7-2017q4/bin//arm-none-eabi-gdb%s", dataDir, toolExtension) +
-		" --interpreter=mi1 -ex target extended-remote |" +
-		fmt.Sprintf(" %s/arduino-test/tools/openocd/0.10.0-arduino7/bin/openocd%s", dataDir, toolExtension) +
+	goldCommand2 := fmt.Sprintf("%s/arduino-test/tools/arm-none-eabi-gcc/7-2017q4/bin/arm-none-eabi-gdb%s", dataDir, toolExtension) +
+		" --interpreter=mi1 -ex set pagination off -ex set remotetimeout 5 -ex target extended-remote |" +
+		fmt.Sprintf(" \"%s/arduino-test/tools/openocd/0.10.0-arduino7/bin/openocd%s\"", dataDir, toolExtension) +
 		fmt.Sprintf(" -s \"%s/arduino-test/tools/openocd/0.10.0-arduino7/share/openocd/scripts/\"", dataDir) +
 		fmt.Sprintf(" --file \"%s/arduino-test/samd/variants/mkr1000/openocd_scripts/arduino_zero.cfg\"", customHardware) +
-		fmt.Sprintf(" -c \"gdb_port pipe\" -c \"telnet_port 0\" -c init -c halt %s/build/arduino-test.samd.mkr1000/hello.ino.elf", sketchPath)
+		fmt.Sprintf(" -c \"gdb_port pipe\" -c \"telnet_port 0\" %s/build/arduino-test.samd.mkr1000/hello.ino.elf", sketchPath)
 
 	command2, err := getCommandLine(req2, pm)
 	assert.Nil(t, err)

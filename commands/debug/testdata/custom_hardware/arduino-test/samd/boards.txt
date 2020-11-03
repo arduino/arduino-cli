@@ -20,7 +20,6 @@ arduino_zero_edbg.name=Arduino Zero (Programming Port)
 arduino_zero_edbg.vid.0=0x03eb
 arduino_zero_edbg.pid.0=0x2157
 
-arduino_zero_edbg.debug.tool=gdb-openocd
 arduino_zero_edbg.upload.tool=openocd
 arduino_zero_edbg.upload.protocol=sam-ba
 arduino_zero_edbg.upload.maximum_size=262144
@@ -55,7 +54,6 @@ mkr1000.pid.2=0x824e
 mkr1000.vid.3=0x2341
 mkr1000.pid.3=0x024e
 
-mkr1000.debug.tool=gdb-openocd
 mkr1000.upload.tool=bossac
 mkr1000.upload.protocol=sam-ba
 mkr1000.upload.maximum_size=262144
