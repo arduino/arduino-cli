@@ -87,7 +87,11 @@ func NewCommand() *cobra.Command {
 	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, "Optional, optimize compile output for debugging, rather than for release.")
 	command.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload.")
 	command.Flags().BoolVar(&clean, "clean", false, "Optional, cleanup the build folder and do not use any cached build.")
-	command.Flags().BoolVarP(&exportBinaries, "export-binaries", "e", false, "If set built binaries will be exported to the sketch folder.")
+	// We must use the following syntax for this flag since it's also bound to settings, we could use the other one too
+	// but it wouldn't make sense since we still must explicitly set the exportBinaries variable by reading from settings.
+	// This must be done because the value is set when the binding is accessed from viper. Accessing from cobra would only
+	// read the value if the flag is set explicitly by the user.
+	command.Flags().BoolP("export-binaries", "e", false, "If set built binaries will be exported to the sketch folder.")
 
 	configuration.Settings.BindPFlag("sketch.always_export_binaries", command.Flags().Lookup("export-binaries"))
 
@@ -107,6 +111,10 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	sketchPath := initSketchPath(path)
+	// We must read this from settings since the value is set when the binding is accessed from viper,
+	// accessing it from cobra would only read it if the flag is explicitly set by the user and ignore
+	// the config file and the env vars.
+	exportBinaries = configuration.Settings.GetBool("sketch.always_export_binaries")
 
 	_, err = compile.Compile(context.Background(), &rpc.CompileReq{
 		Instance:         inst,
