@@ -924,6 +924,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#getdebugconfigresp" class="md-nav__link">
+    GetDebugConfigResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getdebugconfigrespserverconfigurationentry" class="md-nav__link">
+    GetDebugConfigResp.ServerConfigurationEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getdebugconfigresptoolchainconfigurationentry" class="md-nav__link">
+    GetDebugConfigResp.ToolchainConfigurationEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#debug" class="md-nav__link">
     Debug
   </a>
@@ -1099,6 +1120,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#getdebugconfigresp" class="md-nav__link">
+    GetDebugConfigResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getdebugconfigrespserverconfigurationentry" class="md-nav__link">
+    GetDebugConfigResp.ServerConfigurationEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getdebugconfigresptoolchainconfigurationentry" class="md-nav__link">
+    GetDebugConfigResp.ToolchainConfigurationEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#debug" class="md-nav__link">
     Debug
   </a>
@@ -1144,6 +1186,9 @@
 <li><a href="#cc.arduino.cli.debug.DebugConfigReq">DebugConfigReq</a></li>
 <li><a href="#cc.arduino.cli.debug.DebugReq">DebugReq</a></li>
 <li><a href="#cc.arduino.cli.debug.DebugResp">DebugResp</a></li>
+<li><a href="#cc.arduino.cli.debug.GetDebugConfigResp">GetDebugConfigResp</a></li>
+<li><a href="#cc.arduino.cli.debug.GetDebugConfigResp.ServerConfigurationEntry">GetDebugConfigResp.ServerConfigurationEntry</a></li>
+<li><a href="#cc.arduino.cli.debug.GetDebugConfigResp.ToolchainConfigurationEntry">GetDebugConfigResp.ToolchainConfigurationEntry</a></li>
 </ul>
 <ul>
 <li><a href="#cc.arduino.cli.debug.Debug">Debug</a></li>
@@ -1191,7 +1236,7 @@
 <td>port</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td>Port of the debugger. Set to <code>none</code> if the debugger doesn&#39;t use a port.</td>
+<td>Port of the debugger (optional).</td>
 </tr>
 <tr>
 <td>interpreter</td>
@@ -1200,24 +1245,24 @@
 <td>Which GDB command interpreter to use.</td>
 </tr>
 <tr>
-<td>import_file</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>DEPRECATED: use import_dir instead</td>
-</tr>
-<tr>
 <td>import_dir</td>
 <td><a href="#string">string</a></td>
 <td></td>
 <td>Directory containing the compiled executable. If <code>import_dir</code> is not specified, the executable is assumed to be in <code>{sketch_path}/build/{fqbn}/</code>.</td>
+</tr>
+<tr>
+<td>programmer</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The programmer to use for debugging.</td>
 </tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.debug.DebugReq"></a></p>
 <h3 id="debugreq">DebugReq<a class="headerlink" href="#debugreq" title="Permanent link">&para;</a></h3>
 <p>The top-level message sent by the client for the <code>Debug</code> method. Multiple <code>DebugReq</code> messages can be sent but the first
-message must contain a <code>DebugReq</code> message to initialize the debug session. All subsequent messages must contain bytes to
-be sent to the debug session and must not contain a <code>DebugReq</code> message.</p>
+message must contain a <code>DebugConfigReq</code> message to initialize the debug session. All subsequent messages must contain
+bytes to be sent to the debug session and must not contain a <code>DebugReq</code> message.</p>
 <p>Content must be either a debug session config or data to be sent.</p>
 <table>
 <thead>
@@ -1275,6 +1320,120 @@ be sent to the debug session and must not contain a <code>DebugReq</code> messag
 </tr>
 </tbody>
 </table>
+<p><a name="cc.arduino.cli.debug.GetDebugConfigResp"></a></p>
+<h3 id="getdebugconfigresp">GetDebugConfigResp<a class="headerlink" href="#getdebugconfigresp" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>executable</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The executable binary to debug</td>
+</tr>
+<tr>
+<td>toolchain</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The toolchain type used for the build (for example &#34;gcc&#34;)</td>
+</tr>
+<tr>
+<td>toolchain_path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The toolchain directory</td>
+</tr>
+<tr>
+<td>toolchain_prefix</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The toolchain architecture prefix (for example &#34;arm-none-eabi-&#34;)</td>
+</tr>
+<tr>
+<td>server</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The GDB server type used to connect to the programmer/board (for example &#34;openocd&#34;)</td>
+</tr>
+<tr>
+<td>server_path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The GDB server directory</td>
+</tr>
+<tr>
+<td>toolchain_configuration</td>
+<td><a href="#cc.arduino.cli.debug.GetDebugConfigResp.ToolchainConfigurationEntry">GetDebugConfigResp.ToolchainConfigurationEntry</a></td>
+<td>repeated</td>
+<td>Extra configuration parameters wrt toolchain</td>
+</tr>
+<tr>
+<td>server_configuration</td>
+<td><a href="#cc.arduino.cli.debug.GetDebugConfigResp.ServerConfigurationEntry">GetDebugConfigResp.ServerConfigurationEntry</a></td>
+<td>repeated</td>
+<td>Extra configuration parameters wrt GDB server</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.debug.GetDebugConfigResp.ServerConfigurationEntry"></a></p>
+<h3 id="getdebugconfigrespserverconfigurationentry">GetDebugConfigResp.ServerConfigurationEntry<a class="headerlink" href="#getdebugconfigrespserverconfigurationentry" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>key</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>value</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.debug.GetDebugConfigResp.ToolchainConfigurationEntry"></a></p>
+<h3 id="getdebugconfigresptoolchainconfigurationentry">GetDebugConfigResp.ToolchainConfigurationEntry<a class="headerlink" href="#getdebugconfigresptoolchainconfigurationentry" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>key</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>value</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.debug.Debug"></a></p>
 <h3 id="debug">Debug<a class="headerlink" href="#debug" title="Permanent link">&para;</a></h3>
 <p>Service that abstract a debug Session usage</p>
@@ -1293,6 +1452,12 @@ be sent to the debug session and must not contain a <code>DebugReq</code> messag
 <td><a href="#cc.arduino.cli.debug.DebugReq">DebugReq</a> stream</td>
 <td><a href="#cc.arduino.cli.debug.DebugResp">DebugResp</a> stream</td>
 <td>Start a debug session and communicate with the debugger tool.</td>
+</tr>
+<tr>
+<td>GetDebugConfig</td>
+<td><a href="#cc.arduino.cli.debug.DebugConfigReq">DebugConfigReq</a></td>
+<td><a href="#cc.arduino.cli.debug.GetDebugConfigResp">GetDebugConfigResp</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
