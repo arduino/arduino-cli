@@ -54,6 +54,10 @@ github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZm
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
+github.com/facchinm/gohex v0.0.0-20200531163658-baab2527a9a2 h1:wxlJYuJ7fk9Hb1i3ITRCi96oyRKenYffFdIA+V3A22c=
+github.com/facchinm/gohex v0.0.0-20200531163658-baab2527a9a2/go.mod h1:sErAiirjQXs3P13DBW7oPmJ6Q0WsFjYXVAhz7Xt59UQ=
+github.com/facchinm/gohex v0.0.0-20201008150446-be2a6be25790 h1:GTx/F+6TdhQAMtaDrpGDgnAzxYJhTVuTdSKpMsUbMNA=
+github.com/facchinm/gohex v0.0.0-20201008150446-be2a6be25790/go.mod h1:sErAiirjQXs3P13DBW7oPmJ6Q0WsFjYXVAhz7Xt59UQ=
 github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 h1:C6sOwknxwWfLBEQ91zhmptlfxf7pVEs5s6wOnDxNpS4=
