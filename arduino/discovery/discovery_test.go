@@ -20,35 +20,41 @@ import (
 	"testing"
 	"time"
 
+	"github.com/arduino/arduino-cli/executils"
 	"github.com/stretchr/testify/require"
 )
 
 func TestDiscoveryStdioHandling(t *testing.T) {
-	disc, err := New("test", "go", "run", "testdata/cat/main.go") // copy stdin to stdout
+	builder, err := executils.NewProcess("go", "build")
+	require.NoError(t, err)
+	builder.SetDir("testdata/cat")
+	require.NoError(t, builder.Run())
+
+	disc, err := New("test", "testdata/cat/cat") // copy stdin to stdout
 	require.NoError(t, err)
 
 	_, err = disc.outgoingCommandsPipe.Write([]byte(`{ "eventType":`)) // send partial JSON
 	require.NoError(t, err)
-	msg, err := disc.waitMessage(time.Millisecond * 1000)
+	msg, err := disc.waitMessage(time.Millisecond * 100)
 	require.Error(t, err)
 	require.Nil(t, msg)
 
 	_, err = disc.outgoingCommandsPipe.Write([]byte(`"ev1" }{ `)) // complete previous json and start another one
 	require.NoError(t, err)
 
-	msg, err = disc.waitMessage(time.Millisecond * 1000)
+	msg, err = disc.waitMessage(time.Millisecond * 100)
 	require.NoError(t, err)
 	require.NotNil(t, msg)
 	require.Equal(t, "ev1", msg.EventType)
 
-	msg, err = disc.waitMessage(time.Millisecond * 1000)
+	msg, err = disc.waitMessage(time.Millisecond * 100)
 	require.Error(t, err)
 	require.Nil(t, msg)
 
 	_, err = disc.outgoingCommandsPipe.Write([]byte(`"eventType":"ev2" }`)) // complete previous json
 	require.NoError(t, err)
 
-	msg, err = disc.waitMessage(time.Millisecond * 1000)
+	msg, err = disc.waitMessage(time.Millisecond * 100)
 	require.NoError(t, err)
 	require.NotNil(t, msg)
 	require.Equal(t, "ev2", msg.EventType)
@@ -57,7 +63,7 @@ func TestDiscoveryStdioHandling(t *testing.T) {
 
 	err = disc.outgoingCommandsPipe.(io.ReadCloser).Close()
 	require.NoError(t, err)
-	time.Sleep(time.Millisecond * 200)
+	time.Sleep(time.Millisecond * 100)
 
 	require.False(t, disc.IsAlive())
 }
