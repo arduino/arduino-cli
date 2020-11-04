@@ -1380,6 +1380,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#gitlibraryinstallreq" class="md-nav__link">
+    GitLibraryInstallReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitlibraryinstallresp" class="md-nav__link">
+    GitLibraryInstallResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#installedlibrary" class="md-nav__link">
     InstalledLibrary
   </a>
@@ -1536,6 +1550,20 @@
           <li class="md-nav__item">
   <a href="#searchedlibraryreleasesentry" class="md-nav__link">
     SearchedLibrary.ReleasesEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ziplibraryinstallreq" class="md-nav__link">
+    ZipLibraryInstallReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ziplibraryinstallresp" class="md-nav__link">
+    ZipLibraryInstallResp
   </a>
   
 </li>
@@ -2327,6 +2355,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#gitlibraryinstallreq" class="md-nav__link">
+    GitLibraryInstallReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gitlibraryinstallresp" class="md-nav__link">
+    GitLibraryInstallResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#installedlibrary" class="md-nav__link">
     InstalledLibrary
   </a>
@@ -2483,6 +2525,20 @@
           <li class="md-nav__item">
   <a href="#searchedlibraryreleasesentry" class="md-nav__link">
     SearchedLibrary.ReleasesEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ziplibraryinstallreq" class="md-nav__link">
+    ZipLibraryInstallReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ziplibraryinstallresp" class="md-nav__link">
+    ZipLibraryInstallResp
   </a>
   
 </li>
@@ -2713,6 +2769,8 @@
 <p><a href="#commands/lib.proto">commands/lib.proto</a></p>
 <ul>
 <li><a href="#cc.arduino.cli.commands.DownloadResource">DownloadResource</a></li>
+<li><a href="#cc.arduino.cli.commands.GitLibraryInstallReq">GitLibraryInstallReq</a></li>
+<li><a href="#cc.arduino.cli.commands.GitLibraryInstallResp">GitLibraryInstallResp</a></li>
 <li><a href="#cc.arduino.cli.commands.InstalledLibrary">InstalledLibrary</a></li>
 <li><a href="#cc.arduino.cli.commands.Library">Library</a></li>
 <li><a href="#cc.arduino.cli.commands.Library.CompatibleWithEntry">Library.CompatibleWithEntry</a></li>
@@ -2736,6 +2794,8 @@
 <li><a href="#cc.arduino.cli.commands.LibraryUpgradeAllResp">LibraryUpgradeAllResp</a></li>
 <li><a href="#cc.arduino.cli.commands.SearchedLibrary">SearchedLibrary</a></li>
 <li><a href="#cc.arduino.cli.commands.SearchedLibrary.ReleasesEntry">SearchedLibrary.ReleasesEntry</a></li>
+<li><a href="#cc.arduino.cli.commands.ZipLibraryInstallReq">ZipLibraryInstallReq</a></li>
+<li><a href="#cc.arduino.cli.commands.ZipLibraryInstallResp">ZipLibraryInstallResp</a></li>
 </ul>
 <ul>
 <li><a href="#cc.arduino.cli.commands.LibraryLayout">LibraryLayout</a></li>
@@ -4079,6 +4139,18 @@
 <td>Download and install an Arduino library from the libraries index.</td>
 </tr>
 <tr>
+<td>ZipLibraryInstall</td>
+<td><a href="#cc.arduino.cli.commands.ZipLibraryInstallReq">ZipLibraryInstallReq</a></td>
+<td><a href="#cc.arduino.cli.commands.ZipLibraryInstallResp">ZipLibraryInstallResp</a> stream</td>
+<td>Install a library from a Zip File</td>
+</tr>
+<tr>
+<td>GitLibraryInstall</td>
+<td><a href="#cc.arduino.cli.commands.GitLibraryInstallReq">GitLibraryInstallReq</a></td>
+<td><a href="#cc.arduino.cli.commands.GitLibraryInstallResp">GitLibraryInstallResp</a> stream</td>
+<td>Download and install a library from a git url</td>
+</tr>
+<tr>
 <td>LibraryUninstall</td>
 <td><a href="#cc.arduino.cli.commands.LibraryUninstallReq">LibraryUninstallReq</a></td>
 <td><a href="#cc.arduino.cli.commands.LibraryUninstallResp">LibraryUninstallResp</a> stream</td>
@@ -4873,6 +4945,52 @@
 <td><a href="#string">string</a></td>
 <td></td>
 <td>The directory under the staging subdirectory of the data directory the library archive file will be downloaded to.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.GitLibraryInstallReq"></a></p>
+<h3 id="gitlibraryinstallreq">GitLibraryInstallReq<a class="headerlink" href="#gitlibraryinstallreq" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
+<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
+</tr>
+<tr>
+<td>url</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>URL to the repository containing the library</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.GitLibraryInstallResp"></a></p>
+<h3 id="gitlibraryinstallresp">GitLibraryInstallResp<a class="headerlink" href="#gitlibraryinstallresp" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>task_progress</td>
+<td><a href="#cc.arduino.cli.commands.TaskProgress">TaskProgress</a></td>
+<td></td>
+<td>Description of the current stage of the installation.</td>
 </tr>
 </tbody>
 </table>
@@ -5705,6 +5823,52 @@
 <td><a href="#cc.arduino.cli.commands.LibraryRelease">LibraryRelease</a></td>
 <td></td>
 <td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.ZipLibraryInstallReq"></a></p>
+<h3 id="ziplibraryinstallreq">ZipLibraryInstallReq<a class="headerlink" href="#ziplibraryinstallreq" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
+<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
+</tr>
+<tr>
+<td>Path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Path to the archived library</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.ZipLibraryInstallResp"></a></p>
+<h3 id="ziplibraryinstallresp">ZipLibraryInstallResp<a class="headerlink" href="#ziplibraryinstallresp" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>task_progress</td>
+<td><a href="#cc.arduino.cli.commands.TaskProgress">TaskProgress</a></td>
+<td></td>
+<td>Description of the current stage of the installation.</td>
 </tr>
 </tbody>
 </table>
