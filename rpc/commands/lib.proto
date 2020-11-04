@@ -294,3 +294,27 @@ enum LibraryLocation {
     // platform referenced by the board's platform.
     referenced_platform_builtin = 3;
 }
+
+message ZipLibraryInstallReq {
+    // Arduino Core Service instance from the `Init` response.
+    Instance instance = 1;
+    //Path to the archived library
+    string Path = 2;
+}
+
+message ZipLibraryInstallResp {
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 1;
+}
+
+message GitLibraryInstallReq {
+    // Arduino Core Service instance from the `Init` response.
+    Instance instance = 1;
+    // URL to the repository containing the library
+    string url = 2;
+}
+
+message GitLibraryInstallResp {
+    // Description of the current stage of the installation.
+    TaskProgress task_progress = 1;
+} 

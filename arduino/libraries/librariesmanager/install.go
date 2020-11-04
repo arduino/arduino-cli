@@ -16,13 +16,18 @@
 package librariesmanager
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/codeclysm/extract/v3"
+	"gopkg.in/src-d/go-git.v4"
 )
 
 var (
@@ -83,5 +88,44 @@ func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 	}
 
 	lm.Libraries[lib.Name].Remove(lib)
+	return nil
+}
+
+//InstallZipLib  installs a Zip library on the specified path.
+func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath string) error {
+	libsDir := lm.getUserLibrariesDir()
+	if libsDir == nil {
+		return fmt.Errorf("User directory not set")
+	}
+
+	file, err := os.Open(archivePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	if err := extract.Archive(ctx, file, libsDir.String(), nil); err != nil {
+		return fmt.Errorf("extracting archive: %s", err)
+	}
+	return nil
+}
+
+//InstallGitLib  installs a library hosted on a git repository on the specified path.
+func (lm *LibrariesManager) InstallGitLib(url string) error {
+	libsDir := lm.getUserLibrariesDir()
+	if libsDir == nil {
+		return fmt.Errorf("User directory not set")
+	}
+	i := strings.LastIndex(url, "/")
+	folder := strings.TrimRight(url[i+1:], ".git")
+	path := libsDir.Join(folder)
+
+	_, err := git.PlainClone(path.String(), false, &git.CloneOptions{
+		URL:      url,
+		Progress: os.Stdout,
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }

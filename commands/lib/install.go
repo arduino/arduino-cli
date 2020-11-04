@@ -75,3 +75,25 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 	taskCB(&rpc.TaskProgress{Message: "Installed " + libRelease.String(), Completed: true})
 	return nil
 }
+
+//ZipLibraryInstall FIXMEDOC
+func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallReq, taskCB commands.TaskProgressCB) error {
+	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	archivePath := req.GetPath()
+	if err := lm.InstallZipLib(ctx, archivePath); err != nil {
+		return err
+	}
+	taskCB(&rpc.TaskProgress{Message: "Installed Archived Library", Completed: true})
+	return nil
+}
+
+//GitLibraryInstall FIXMEDOC
+func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallReq, taskCB commands.TaskProgressCB) error {
+	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	url := req.GetUrl()
+	if err := lm.InstallGitLib(url); err != nil {
+		return err
+	}
+	taskCB(&rpc.TaskProgress{Message: "Installed Library from Git URL", Completed: true})
+	return nil
+}

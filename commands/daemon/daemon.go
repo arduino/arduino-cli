@@ -356,3 +356,27 @@ func (s *ArduinoCoreServerImpl) LibraryList(ctx context.Context, req *rpc.Librar
 func (s *ArduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchReq) (*rpc.ArchiveSketchResp, error) {
 	return sketch.ArchiveSketch(ctx, req)
 }
+
+//ZipLibraryInstall FIXMEDOC
+func (s *ArduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallReq, stream rpc.ArduinoCore_ZipLibraryInstallServer) error {
+	err := lib.ZipLibraryInstall(
+		stream.Context(), req,
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.ZipLibraryInstallResp{TaskProgress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(&rpc.ZipLibraryInstallResp{})
+}
+
+//GitLibraryInstall FIXMEDOC
+func (s *ArduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallReq, stream rpc.ArduinoCore_GitLibraryInstallServer) error {
+	err := lib.GitLibraryInstall(
+		stream.Context(), req,
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.GitLibraryInstallResp{TaskProgress: p}) },
+	)
+	if err != nil {
+		return err
+	}
+	return stream.Send(&rpc.GitLibraryInstallResp{})
+}
