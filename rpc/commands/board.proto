@@ -206,6 +206,22 @@ message BoardListAllResp {
     repeated BoardListItem boards = 1;
 }
 
+message BoardListWatchReq {
+    // Arduino Core Service instance from the `Init` response.
+    Instance instance = 1;
+    // Set this to true to stop the discovery process
+    bool interrupt = 2;
+}
+
+message BoardListWatchResp {
+    // Event type as received from the serial discovery tool
+    string event_type = 1;
+    // Information about the port
+    DetectedPort port = 2;
+    // Eventual errors when detecting connected boards
+    string error = 3;
+}
+
 message BoardListItem {
     // The name for use when identifying the board to a human.
     string name = 1;

@@ -108,8 +108,8 @@ func identifyViaCloudAPI(port *commands.BoardPort) ([]*rpc.BoardListItem, error)
 	return apiByVidPid(id.Get("vid"), id.Get("pid"))
 }
 
-// Identify returns a list of boards checking first the installed platforms or the Cloud API
-func Identify(pm *packagemanager.PackageManager, port *commands.BoardPort) ([]*rpc.BoardListItem, error) {
+// identify returns a list of boards checking first the installed platforms or the Cloud API
+func identify(pm *packagemanager.PackageManager, port *commands.BoardPort) ([]*rpc.BoardListItem, error) {
 	boards := []*rpc.BoardListItem{}
 
 	// first query installed cores through the Package Manager
@@ -169,7 +169,7 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 
 	retVal := []*rpc.DetectedPort{}
 	for _, port := range ports {
-		boards, err := Identify(pm, port)
+		boards, err := identify(pm, port)
 		if err != nil {
 			return nil, err
 		}
@@ -186,4 +186,53 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 	}
 
 	return retVal, nil
+}
+
+// Watch returns a channel that receives boards connection and disconnection events.
+// The discovery process can be interrupted by sending a message to the interrupt channel.
+func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResp, error) {
+	pm := commands.GetPackageManager(instanceID)
+	eventsChan, err := commands.WatchListBoards(pm)
+	if err != nil {
+		return nil, err
+	}
+
+	outChan := make(chan *rpc.BoardListWatchResp)
+	go func() {
+		for {
+			select {
+			case event := <-eventsChan:
+				boards := []*rpc.BoardListItem{}
+				boardsError := ""
+				if event.Type == "add" {
+					boards, err = identify(pm, &commands.BoardPort{
+						Address:             event.Port.Address,
+						Label:               event.Port.AddressLabel,
+						Prefs:               event.Port.Properties,
+						IdentificationPrefs: event.Port.IdentificationProperties,
+						Protocol:            event.Port.Protocol,
+						ProtocolLabel:       event.Port.ProtocolLabel,
+					})
+					if err != nil {
+						boardsError = err.Error()
+					}
+				}
+
+				outChan <- &rpc.BoardListWatchResp{
+					EventType: event.Type,
+					Port: &rpc.DetectedPort{
+						Address:       event.Port.Address,
+						Protocol:      event.Port.Protocol,
+						ProtocolLabel: event.Port.ProtocolLabel,
+						Boards:        boards,
+					},
+					Error: boardsError,
+				}
+			case <-interrupt:
+				break
+			}
+		}
+	}()
+
+	return outChan, nil
 }

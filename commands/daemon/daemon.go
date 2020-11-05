@@ -19,6 +19,7 @@ package daemon
 
 import (
 	"context"
+	"io"
 
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
@@ -56,6 +57,39 @@ func (s *ArduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardLis
 // BoardListAll FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllResp, error) {
 	return board.ListAll(ctx, req)
+}
+
+// BoardListWatch FIXMEDOC
+func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCore_BoardListWatchServer) error {
+	msg, err := stream.Recv()
+	if err == io.EOF {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	interrupt := make(chan bool)
+	go func() {
+		msg, err := stream.Recv()
+		if err != nil {
+			interrupt <- true
+		}
+		if msg != nil {
+			interrupt <- msg.Interrupt
+		}
+	}()
+
+	eventsChan, err := board.Watch(msg.Instance.Id, interrupt)
+	if err != nil {
+		return err
+	}
+
+	for event := range eventsChan {
+		stream.Send(event)
+	}
+
+	return nil
 }
 
 // BoardAttach FIXMEDOC

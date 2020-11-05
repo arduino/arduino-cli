@@ -26,6 +26,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	dbg "github.com/arduino/arduino-cli/rpc/debug"
@@ -153,6 +154,10 @@ func main() {
 	// List connected boards
 	log.Println("calling BoardList()")
 	callBoardList(client, instance)
+
+	// Watch for boards connection and disconnection
+	log.Println("calling BoardListWatch()")
+	callBoardListWatch(client, instance)
 
 	// Uninstall a platform
 	log.Println("calling PlatformUninstall(arduino:samd)")
@@ -590,6 +595,41 @@ func callBoardList(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 	for _, port := range boardListResp.GetPorts() {
 		log.Printf("port: %s, boards: %+v\n", port.GetAddress(), port.GetBoards())
 	}
+}
+
+func callBoardListWatch(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
+	watchClient, err := client.BoardListWatch(context.Background())
+	if err != nil {
+		log.Fatalf("Board list watch error: %s\n", err)
+	}
+
+	// Start the watcher
+	watchClient.Send(&rpc.BoardListWatchReq{
+		Instance: instance,
+	})
+
+	go func() {
+		for {
+			res, err := watchClient.Recv()
+			if err != nil {
+				log.Fatalf("Board list watch error: %s\n", err)
+			}
+
+			log.Printf("event: %s, address: %s\n", res.EventType, res.Port.Address)
+			if res.EventType == "add" {
+				log.Printf("protocol: %s, ", res.Port.Protocol)
+				log.Printf("protocolLabel: %s, ", res.Port.ProtocolLabel)
+				log.Printf("boards: %s\n\n", res.Port.Boards)
+			}
+		}
+	}()
+
+	// Watch for 10 seconds and then interrupts
+	timer := time.NewTicker(time.Duration(10 * time.Second))
+	<-timer.C
+	watchClient.Send(&rpc.BoardListWatchReq{
+		Interrupt: true,
+	})
 }
 
 func callPlatformUnInstall(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
