@@ -57,12 +57,16 @@ var (
 // NewCommand created a new `compile` command
 func NewCommand() *cobra.Command {
 	command := &cobra.Command{
-		Use:     "compile",
-		Short:   "Compiles Arduino sketches.",
-		Long:    "Compiles Arduino sketches.",
-		Example: "  " + os.Args[0] + " compile -b arduino:avr:uno /home/user/Arduino/MySketch",
-		Args:    cobra.MaximumNArgs(1),
-		Run:     run,
+		Use:   "compile",
+		Short: "Compiles Arduino sketches.",
+		Long:  "Compiles Arduino sketches.",
+		Example: "" +
+			"  " + os.Args[0] + " compile -b arduino:avr:uno /home/user/Arduino/MySketch\n" +
+			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property "build.extra_flags=\"-DMY_DEFINE=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n" +
+			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property "build.extra_flags=-DPIN=2 \"-DMY_DEFINE=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n" +
+			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property build.extra_flags=-DPIN=2 --build-property "compiler.cpp.extra_flags=\"-DSSID=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n",
+		Args: cobra.MaximumNArgs(1),
+		Run:  run,
 	}
 
 	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
@@ -74,6 +78,8 @@ func NewCommand() *cobra.Command {
 		"Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.")
 	command.Flags().StringSliceVar(&buildProperties, "build-properties", []string{},
 		"List of custom build properties separated by commas. Or can be used multiple times for multiple properties.")
+	command.Flags().StringArrayVar(&buildProperties, "build-property", []string{},
+		"Override a build property with a custom value. Can be used multiple times for multiple properties.")
 	command.Flags().StringVar(&warnings, "warnings", "none",
 		`Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
 	command.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
@@ -94,6 +100,8 @@ func NewCommand() *cobra.Command {
 	command.Flags().BoolP("export-binaries", "e", false, "If set built binaries will be exported to the sketch folder.")
 
 	configuration.Settings.BindPFlag("sketch.always_export_binaries", command.Flags().Lookup("export-binaries"))
+
+	command.Flags().MarkDeprecated("build-properties", "please use --build-property instead.")
 
 	return command
 }

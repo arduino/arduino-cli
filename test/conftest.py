@@ -212,11 +212,14 @@ def detected_boards(run_command):
 
 @pytest.fixture(scope="function")
 def copy_sketch(working_dir):
-    # Copies sketch for testing
-    sketch_path = Path(__file__).parent / "testdata" / "sketch_simple"
-    test_sketch_path = Path(working_dir) / "sketch_simple"
-    shutil.copytree(sketch_path, test_sketch_path)
-    yield str(test_sketch_path)
+    def _copy(sketch_name):
+        # Copies sketch to working directory for testing
+        sketch_path = Path(__file__).parent / "testdata" / sketch_name
+        test_sketch_path = Path(working_dir, sketch_name)
+        shutil.copytree(sketch_path, test_sketch_path)
+        return str(test_sketch_path)
+
+    return _copy
 
 
 @pytest.fixture(scope="function")
