@@ -21,7 +21,7 @@ code to specific architectures.
 
 ## See also
 
-- [Arduino library style guide](http://arduino.cc/en/Reference/APIStyleGuide)
+- [Arduino library style guide](https://www.arduino.cc/en/Reference/APIStyleGuide)
 - [Library dependency resolution process documentation](sketch-build-process.md#dependency-resolution)
 
 ## 1.5 library format (rev. 2.2)
@@ -205,7 +205,7 @@ Editor.
 More information:
 
 - [Arduino sketch specification](sketch-specification.md)
-- [Style guide for Arduino examples](http://arduino.cc/en/Reference/StyleGuide)
+- [Style guide for Arduino examples](https://www.arduino.cc/en/Reference/StyleGuide)
 
 #### Extra documentation
 
