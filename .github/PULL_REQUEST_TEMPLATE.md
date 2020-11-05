@@ -18,7 +18,8 @@
 
 - **Does this PR introduce a breaking change, and is
 [titled accordingly](https://arduino.github.io/arduino-cli/latest/CONTRIBUTING/#breaking)?**
-<!-- What changes might users need to make in their workflow or application due to this PR? -->
+<!-- If this PR is merged, will any users need to change their code, command-line invocations, build scripts or data files
+when upgrading from an older version of arduino-cli? -->
 
 * **Other information**:
 <!-- Any additional information that could help the review process -->
