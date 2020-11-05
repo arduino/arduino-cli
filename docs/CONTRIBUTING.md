@@ -54,11 +54,10 @@ submitting a PR:
 - PR titles indirectly become part of the CHANGELOG so it's crucial to provide a good record of **what** change is being
   made in the title; **why** it was made will go in the PR description, along with a link to a GitHub issue if it
   exists.
-- <a id="breaking"></a>A breaking change is a change that forces users to change their code, command-line invocations,
-  build scripts or data files when upgrading from an older version of arduino-cli. If the PR contains a breaking change,
-  please start the commit message and PR title with the string **[breaking]**. Don't forget to describe what changes
-  might users need to make in their workflow or application due to this PR
-- Write tests for the code you wrote.
+- <a id="breaking"></a> If the PR contains a breaking change, please start the commit message and PR title with the
+  string **[breaking]**. Don't forget to describe what changes users might need to make in their workflow or application
+  due to this PR. A breaking change is a change that forces users to change their code, command-line invocations, build
+  scripts or data files when upgrading from an older version of Arduino CLI.
 - Open your PR against the `master` branch.
 - Maintain **clean commit history** and use **meaningful commit messages**. PRs with messy commit history are difficult
   to review and require a lot of work to be merged.
