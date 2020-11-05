@@ -58,6 +58,7 @@ submitting a PR:
   string **[breaking]**. Don't forget to describe what changes users might need to make in their workflow or application
   due to this PR. A breaking change is a change that forces users to change their code, command-line invocations, build
   scripts or data files when upgrading from an older version of Arduino CLI.
+- Write tests for the code you wrote.
 - Open your PR against the `master` branch.
 - Maintain **clean commit history** and use **meaningful commit messages**. PRs with messy commit history are difficult
   to review and require a lot of work to be merged.
