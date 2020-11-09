@@ -12,54 +12,44 @@
 # otherwise use the software for commercial activities involving the Arduino
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
-import os
-import platform
 import zipfile
 from pathlib import Path
 
-import pytest
 
-from test.common import running_on_ci
-
-
-@pytest.mark.skipif(
-    running_on_ci() and platform.system() == "Windows",
-    reason="Test disabled on Github Actions Win VM until tmpdir inconsistent behavior bug is fixed",
-)
 def test_sketch_new(run_command, working_dir):
     # Create a test sketch in current directory
     current_path = working_dir
     sketch_name = "SketchNewIntegrationTest"
-    current_sketch_path = os.path.join(current_path, sketch_name)
-    result = run_command("sketch new {}".format(sketch_name))
+    current_sketch_path = Path(current_path, sketch_name)
+    result = run_command(f"sketch new {sketch_name}")
     assert result.ok
-    assert "Sketch created in: {}".format(current_sketch_path) in result.stdout
-    assert os.path.isfile(os.path.join(current_sketch_path, sketch_name + ".ino"))
+    assert f"Sketch created in: {current_sketch_path}" in result.stdout
+    assert Path(current_sketch_path, f"{sketch_name}.ino").is_file()
 
     # Create a test sketch in current directory but using an absolute path
     sketch_name = "SketchNewIntegrationTestAbsolute"
-    current_sketch_path = os.path.join(current_path, sketch_name)
-    result = run_command("sketch new {}".format(current_sketch_path))
+    current_sketch_path = Path(current_path, sketch_name)
+    result = run_command(f'sketch new "{current_sketch_path}"')
     assert result.ok
-    assert "Sketch created in: {}".format(current_sketch_path) in result.stdout
-    assert os.path.isfile(os.path.join(current_sketch_path, sketch_name + ".ino"))
+    assert f"Sketch created in: {current_sketch_path}" in result.stdout
+    assert Path(current_sketch_path, f"{sketch_name}.ino").is_file()
 
     # Create a test sketch in current directory subpath but using an absolute path
     sketch_name = "SketchNewIntegrationTestSubpath"
-    sketch_subpath = os.path.join("subpath", sketch_name)
-    current_sketch_path = os.path.join(current_path, sketch_subpath)
-    result = run_command("sketch new {}".format(sketch_subpath))
+    sketch_subpath = Path("subpath", sketch_name)
+    current_sketch_path = Path(current_path, sketch_subpath)
+    result = run_command(f"sketch new {sketch_subpath}")
     assert result.ok
-    assert "Sketch created in: {}".format(current_sketch_path) in result.stdout
-    assert os.path.isfile(os.path.join(current_sketch_path, sketch_name + ".ino"))
+    assert f"Sketch created in: {current_sketch_path}" in result.stdout
+    assert Path(current_sketch_path, f"{sketch_name}.ino").is_file()
 
     # Create a test sketch in current directory using .ino extension
     sketch_name = "SketchNewIntegrationTestDotIno"
-    current_sketch_path = os.path.join(current_path, sketch_name)
-    result = run_command("sketch new {}".format(sketch_name + ".ino"))
+    current_sketch_path = Path(current_path, sketch_name)
+    result = run_command(f"sketch new {sketch_name}.ino")
     assert result.ok
-    assert "Sketch created in: {}".format(current_sketch_path) in result.stdout
-    assert os.path.isfile(os.path.join(current_sketch_path, sketch_name + ".ino"))
+    assert f"Sketch created in: {current_sketch_path}" in result.stdout
+    assert Path(current_sketch_path, f"{sketch_name}.ino").is_file()
 
 
 def verify_zip_contains_sketch_excluding_build_dir(files):
