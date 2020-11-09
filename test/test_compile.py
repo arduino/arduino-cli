@@ -538,3 +538,26 @@ def test_compile_with_export_binaries_config(run_command, data_dir, downloads_di
     assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.hex").exists()
     assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.with_bootloader.bin").exists()
     assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.with_bootloader.hex").exists()
+
+
+def test_compile_with_invalid_url(run_command, data_dir):
+    # Init the environment explicitly
+    run_command("core update-index")
+
+    # Download latest AVR
+    run_command("core install arduino:avr")
+
+    sketch_name = "CompileWithInvalidURL"
+    sketch_path = Path(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    # Create a test sketch
+    assert run_command(f'sketch new "{sketch_path}"')
+
+    # Create settings with custom invalid URL
+    assert run_command("config init --dest-dir . --additional-urls https://example.com/package_example_index.json")
+
+    # Verifies compilation fails cause of invalid URL
+    res = run_command(f'compile -b {fqbn} "{sketch_path}"')
+    assert res.failed
+    assert "There were errors loading platform indexes" in res.stderr
