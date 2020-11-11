@@ -930,6 +930,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#boardlistwatchreq" class="md-nav__link">
+    BoardListWatchReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#boardlistwatchresp" class="md-nav__link">
+    BoardListWatchResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#boardplatform" class="md-nav__link">
     BoardPlatform
   </a>
@@ -1905,6 +1919,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#boardlistwatchreq" class="md-nav__link">
+    BoardListWatchReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#boardlistwatchresp" class="md-nav__link">
+    BoardListWatchResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#boardplatform" class="md-nav__link">
     BoardPlatform
   </a>
@@ -2678,6 +2706,8 @@
 <li><a href="#cc.arduino.cli.commands.BoardListItem">BoardListItem</a></li>
 <li><a href="#cc.arduino.cli.commands.BoardListReq">BoardListReq</a></li>
 <li><a href="#cc.arduino.cli.commands.BoardListResp">BoardListResp</a></li>
+<li><a href="#cc.arduino.cli.commands.BoardListWatchReq">BoardListWatchReq</a></li>
+<li><a href="#cc.arduino.cli.commands.BoardListWatchResp">BoardListWatchResp</a></li>
 <li><a href="#cc.arduino.cli.commands.BoardPlatform">BoardPlatform</a></li>
 <li><a href="#cc.arduino.cli.commands.ConfigOption">ConfigOption</a></li>
 <li><a href="#cc.arduino.cli.commands.ConfigValue">ConfigValue</a></li>
@@ -3123,6 +3153,64 @@
 <td><a href="#cc.arduino.cli.commands.DetectedPort">DetectedPort</a></td>
 <td>repeated</td>
 <td>List of ports and the boards detected on those ports.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.BoardListWatchReq"></a></p>
+<h3 id="boardlistwatchreq">BoardListWatchReq<a class="headerlink" href="#boardlistwatchreq" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
+<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
+</tr>
+<tr>
+<td>interrupt</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>Set this to true to stop the discovery process</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.BoardListWatchResp"></a></p>
+<h3 id="boardlistwatchresp">BoardListWatchResp<a class="headerlink" href="#boardlistwatchresp" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>event_type</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Event type as received from the serial discovery tool</td>
+</tr>
+<tr>
+<td>port</td>
+<td><a href="#cc.arduino.cli.commands.DetectedPort">DetectedPort</a></td>
+<td></td>
+<td>Information about the port</td>
+</tr>
+<tr>
+<td>error</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Eventual errors when detecting connected boards</td>
 </tr>
 </tbody>
 </table>
@@ -4059,6 +4147,12 @@
 <td><a href="#cc.arduino.cli.commands.BoardListAllReq">BoardListAllReq</a></td>
 <td><a href="#cc.arduino.cli.commands.BoardListAllResp">BoardListAllResp</a></td>
 <td>List all the boards provided by installed platforms.</td>
+</tr>
+<tr>
+<td>BoardListWatch</td>
+<td><a href="#cc.arduino.cli.commands.BoardListWatchReq">BoardListWatchReq</a> stream</td>
+<td><a href="#cc.arduino.cli.commands.BoardListWatchResp">BoardListWatchResp</a> stream</td>
+<td>List boards connection and disconnected events.</td>
 </tr>
 <tr>
 <td>Compile</td>
