@@ -31,7 +31,6 @@ import (
 
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
@@ -39,7 +38,7 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-func ParseCommandLine(input string, logger i18n.Logger) ([]string, error) {
+func ParseCommandLine(input string) ([]string, error) {
 	var parts []string
 	escapingChar := constants.EMPTY_STRING
 	escapedArg := constants.EMPTY_STRING
@@ -74,7 +73,7 @@ func ParseCommandLine(input string, logger i18n.Logger) ([]string, error) {
 	}
 
 	if escapingChar != constants.EMPTY_STRING {
-		return nil, i18n.ErrorfWithLogger(logger, constants.MSG_INVALID_QUOTING, escapingChar)
+		return nil, errors.Errorf("Invalid quoting: no closing [%s] char found.", escapingChar)
 	}
 
 	return parts, nil
@@ -189,8 +188,8 @@ func TrimSpace(value string) string {
 	return strings.TrimSpace(value)
 }
 
-func PrepareCommand(pattern string, logger i18n.Logger) (*exec.Cmd, error) {
-	parts, err := ParseCommandLine(pattern, logger)
+func PrepareCommand(pattern string) (*exec.Cmd, error) {
+	parts, err := ParseCommandLine(pattern)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

@@ -512,7 +512,7 @@ func PrepareCommandForRecipe(ctx *types.Context, buildProperties *properties.Map
 		commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
 	}
 
-	command, err := utils.PrepareCommand(commandLine, logger)
+	command, err := utils.PrepareCommand(commandLine)
 
 	// if the overall commandline is too long for the platform
 	// try reducing the length by making the filenames relative

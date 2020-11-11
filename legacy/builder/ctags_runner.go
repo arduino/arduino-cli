@@ -41,7 +41,7 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 	}
 
 	commandLine := properties.ExpandPropsInString(pattern)
-	command, err := utils.PrepareCommand(commandLine, logger)
+	command, err := utils.PrepareCommand(commandLine)
 	if err != nil {
 		return errors.WithStack(err)
 	}

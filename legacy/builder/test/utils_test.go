@@ -16,17 +16,17 @@
 package test
 
 import (
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
-	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
+
+	"github.com/arduino/arduino-cli/legacy/builder/utils"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCommandLineParser(t *testing.T) {
 	command := "\"/home/federico/materiale/works_Arduino/Arduino/build/hardware/tools/coan\" source -m -E -P -kb -c -g -Os -w -ffunction-sections -fdata-sections -MMD -mmcu=atmega32u4 -DF_CPU=16000000L -DARDUINO=010600 -DARDUINO_AVR_LEONARDO -DARDUINO_ARCH_AVR  -DUSB_VID=0x2341 -DUSB_PID=0x8036 '-DUSB_MANUFACTURER=' '-DUSB_PRODUCT=\"Arduino Leonardo\"' \"/tmp/sketch321469072.cpp\""
 
-	parts, err := utils.ParseCommandLine(command, i18n.HumanLogger{})
+	parts, err := utils.ParseCommandLine(command)
 	NoError(t, err)
 
 	require.Equal(t, 23, len(parts))
@@ -78,7 +78,7 @@ func TestPrintableCommand(t *testing.T) {
 func TestCommandLineParserError(t *testing.T) {
 	command := "\"command missing quote"
 
-	_, err := utils.ParseCommandLine(command, i18n.HumanLogger{})
+	_, err := utils.ParseCommandLine(command)
 	require.Error(t, err)
 }
 
