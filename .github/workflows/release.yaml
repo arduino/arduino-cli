@@ -31,9 +31,6 @@ jobs:
   notarize-macos:
     runs-on: macos-latest
     needs: create-release-artifacts
-    env:
-      INSTALLER_CERT_MAC_PASSWORD: ${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}
-      INSTALLER_CERT_MAC_P12: "/tmp/ArduinoCerts2020.p12"
 
     steps:
       - name: Checkout
@@ -64,7 +61,7 @@ jobs:
         run: |
           gon gon.config.hcl
 
-      - name: Notarize binary, re-package it and update checksum
+      - name: Re-package binary and update checksum
         # This step performs the following:
         # 1. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
         # 2. Recalculate package checksum and replace it in the goreleaser nnnnnn-checksums.txt file
