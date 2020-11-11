@@ -16,7 +16,6 @@
 package builder
 
 import (
-	"fmt"
 	"os"
 	"reflect"
 	"strconv"
@@ -159,7 +158,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 	}
 
 	// Output arduino-preprocessed source
-	fmt.Println(ctx.Source)
+	ctx.ExecStdout.Write([]byte(ctx.Source))
 	return nil
 }
 
