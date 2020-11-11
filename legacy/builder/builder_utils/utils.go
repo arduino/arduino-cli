@@ -25,7 +25,6 @@ import (
 	"sync"
 
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
@@ -490,7 +489,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 
 func ExecRecipe(ctx *types.Context, buildProperties *properties.Map, recipe string, stdout int, stderr int) ([]byte, []byte, error) {
 	// See util.ExecCommand for stdout/stderr arguments
-	command, err := PrepareCommandForRecipe(ctx, buildProperties, recipe, false)
+	command, err := PrepareCommandForRecipe(buildProperties, recipe, false)
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}
@@ -500,11 +499,10 @@ func ExecRecipe(ctx *types.Context, buildProperties *properties.Map, recipe stri
 
 const COMMANDLINE_LIMIT = 30000
 
-func PrepareCommandForRecipe(ctx *types.Context, buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*exec.Cmd, error) {
-	logger := ctx.GetLogger()
+func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*exec.Cmd, error) {
 	pattern := buildProperties.Get(recipe)
 	if pattern == "" {
-		return nil, i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, recipe)
+		return nil, errors.Errorf("%s pattern is missing", recipe)
 	}
 
 	commandLine := buildProperties.ExpandPropsInString(pattern)
