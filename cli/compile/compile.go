@@ -16,10 +16,12 @@
 package compile
 
 import (
+	"bytes"
 	"context"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/configuration"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -124,7 +126,7 @@ func run(cmd *cobra.Command, args []string) {
 	// the config file and the env vars.
 	exportBinaries = configuration.Settings.GetBool("sketch.always_export_binaries")
 
-	_, err = compile.Compile(context.Background(), &rpc.CompileReq{
+	compileReq := &rpc.CompileReq{
 		Instance:         inst,
 		Fqbn:             fqbn,
 		SketchPath:       sketchPath.String(),
@@ -142,15 +144,22 @@ func run(cmd *cobra.Command, args []string) {
 		OptimizeForDebug: optimizeForDebug,
 		Clean:            clean,
 		ExportBinaries:   exportBinaries,
-	}, os.Stdout, os.Stderr, configuration.Settings.GetString("logging.level") == "debug")
-
+	}
+	compileOut := new(bytes.Buffer)
+	compileErr := new(bytes.Buffer)
+	verboseCompile := configuration.Settings.GetString("logging.level") == "debug"
+	if output.OutputFormat == "json" {
+		_, err = compile.Compile(context.Background(), compileReq, compileOut, compileErr, verboseCompile)
+	} else {
+		_, err = compile.Compile(context.Background(), compileReq, os.Stdout, os.Stderr, verboseCompile)
+	}
 	if err != nil {
 		feedback.Errorf("Error during build: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	if uploadAfterCompile {
-		_, err := upload.Upload(context.Background(), &rpc.UploadReq{
+		uploadReq := &rpc.UploadReq{
 			Instance:   inst,
 			Fqbn:       fqbn,
 			SketchPath: sketchPath.String(),
@@ -159,13 +168,26 @@ func run(cmd *cobra.Command, args []string) {
 			Verify:     verify,
 			ImportDir:  buildPath,
 			Programmer: programmer,
-		}, os.Stdout, os.Stderr)
-
+		}
+		var err error
+		if output.OutputFormat == "json" {
+			// TODO: do not print upload output in json mode
+			uploadOut := new(bytes.Buffer)
+			uploadErr := new(bytes.Buffer)
+			_, err = upload.Upload(context.Background(), uploadReq, uploadOut, uploadErr)
+		} else {
+			_, err = upload.Upload(context.Background(), uploadReq, os.Stdout, os.Stderr)
+		}
 		if err != nil {
 			feedback.Errorf("Error during Upload: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
+
+	feedback.PrintResult(&compileResult{
+		CompileOut: compileOut.String(),
+		CompileErr: compileErr.String(),
+	})
 }
 
 // initSketchPath returns the current working directory
@@ -181,4 +203,18 @@ func initSketchPath(sketchPath *paths.Path) *paths.Path {
 	}
 	logrus.Infof("Reading sketch from dir: %s", wd)
 	return wd
+}
+
+type compileResult struct {
+	CompileOut string
+	CompileErr string
+}
+
+func (r *compileResult) Data() interface{} {
+	return r
+}
+
+func (r *compileResult) String() string {
+	// The output is already printed via os.Stdout/os.Stdin
+	return ""
 }
