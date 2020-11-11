@@ -116,9 +116,6 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.PackageManager = pm
 	builderCtx.FQBN = fqbn
 	builderCtx.SketchLocation = sketch.FullPath
-	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
-		sketch.FullPath.Join("compile_commands.json"),
-	)
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
@@ -132,10 +129,12 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	} else {
 		builderCtx.BuildPath = paths.New(req.GetBuildPath())
 	}
-
 	if err = builderCtx.BuildPath.MkdirAll(); err != nil {
 		return nil, fmt.Errorf("cannot create build directory: %s", err)
 	}
+	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
+		builderCtx.BuildPath.Join("compile_commands.json"),
+	)
 
 	builderCtx.Verbose = req.GetVerbose()
 
