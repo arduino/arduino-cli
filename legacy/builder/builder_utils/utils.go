@@ -249,7 +249,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 		return nil, errors.WithStack(err)
 	}
 	if !objIsUpToDate {
-		_, _, err = ExecRecipe(ctx, properties, recipe, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
+		_, _, err := ExecRecipe(ctx, properties, recipe, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
@@ -480,7 +480,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 		properties.SetPath(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, archiveFilePath)
 		properties.SetPath(constants.BUILD_PROPERTIES_OBJECT_FILE, objectFile)
 
-		if _, _, err := ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show); err != nil {
+		if _, _, err := ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */); err != nil {
 			return nil, errors.WithStack(err)
 		}
 	}
@@ -488,9 +488,9 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 	return archiveFilePath, nil
 }
 
-func ExecRecipe(ctx *types.Context, buildProperties *properties.Map, recipe string, removeUnsetProperties bool, stdout int, stderr int) ([]byte, []byte, error) {
+func ExecRecipe(ctx *types.Context, buildProperties *properties.Map, recipe string, stdout int, stderr int) ([]byte, []byte, error) {
 	// See util.ExecCommand for stdout/stderr arguments
-	command, err := PrepareCommandForRecipe(ctx, buildProperties, recipe, removeUnsetProperties)
+	command, err := PrepareCommandForRecipe(ctx, buildProperties, recipe, false)
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}

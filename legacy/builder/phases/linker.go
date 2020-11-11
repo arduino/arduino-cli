@@ -80,7 +80,7 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 			properties.Set("archive_file", archive.Base())
 			properties.SetPath("archive_file_path", archive)
 			properties.SetPath("object_file", object)
-			_, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, false, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+			_, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
 			if err != nil {
 				return err
 			}
@@ -97,7 +97,7 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 	properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, coreArchiveFilePath.String())
 	properties.Set("object_files", objectFileList)
 
-	_, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_C_COMBINE_PATTERN, false, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+	_, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_C_COMBINE_PATTERN, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
 	return err
 }
 
