@@ -80,6 +80,9 @@ service ArduinoCore {
   // List all the boards provided by installed platforms.
   rpc BoardListAll(BoardListAllReq) returns (BoardListAllResp);
 
+  // List boards connection and disconnected events.
+  rpc BoardListWatch(stream BoardListWatchReq) returns (stream BoardListWatchResp);
+
   // Compile an Arduino sketch.
   rpc Compile(CompileReq) returns (stream CompileResp);
 

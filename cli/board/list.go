@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/arduino-cli/table"
@@ -90,8 +89,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 }
 
 func watchList(cmd *cobra.Command, inst *rpc.Instance) {
-	pm := commands.GetPackageManager(inst.Id)
-	eventsChan, err := commands.WatchListBoards(pm)
+	eventsChan, err := board.Watch(inst.Id, nil)
 	if err != nil {
 		feedback.Errorf("Error detecting boards: %v", err)
 		os.Exit(errorcodes.ErrNetwork)
@@ -105,28 +103,13 @@ func watchList(cmd *cobra.Command, inst *rpc.Instance) {
 	}
 
 	for event := range eventsChan {
-		boards := []*rpc.BoardListItem{}
-		if event.Type == "add" {
-			boards, err = board.Identify(pm, &commands.BoardPort{
-				Address:             event.Port.Address,
-				Label:               event.Port.AddressLabel,
-				Prefs:               event.Port.Properties,
-				IdentificationPrefs: event.Port.IdentificationProperties,
-				Protocol:            event.Port.Protocol,
-				ProtocolLabel:       event.Port.ProtocolLabel,
-			})
-			if err != nil {
-				feedback.Errorf("Error identifying board: %v", err)
-				os.Exit(errorcodes.ErrNetwork)
-			}
-		}
-
 		feedback.PrintResult(watchEvent{
-			Type:          event.Type,
+			Type:          event.EventType,
 			Address:       event.Port.Address,
 			Protocol:      event.Port.Protocol,
 			ProtocolLabel: event.Port.ProtocolLabel,
-			Boards:        boards,
+			Boards:        event.Port.Boards,
+			Error:         event.Error,
 		})
 	}
 }
@@ -198,6 +181,7 @@ type watchEvent struct {
 	Protocol      string               `json:"protocol,omitempty"`
 	ProtocolLabel string               `json:"protocol_label,omitempty"`
 	Boards        []*rpc.BoardListItem `json:"boards,omitempty"`
+	Error         string               `json:"error,omitempty"`
 }
 
 func (dr watchEvent) Data() interface{} {
