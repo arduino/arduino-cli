@@ -47,7 +47,13 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 		if ctx.DebugLevel >= 10 {
 			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_RUNNING_RECIPE, recipe)
 		}
-		_, _, _, err := builder_utils.ExecRecipe(ctx, properties, recipe, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+
+		command, err := builder_utils.PrepareCommandForRecipe(properties, recipe, false)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+
+		_, _, err = utils.ExecCommand(ctx, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
 		if err != nil {
 			return errors.WithStack(err)
 		}
