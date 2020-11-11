@@ -20,6 +20,7 @@ package cc.arduino.cli.commands;
 option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 
 import "commands/common.proto";
+import "commands/lib.proto";
 
 message CompileReq {
   Instance instance = 1;  // Arduino Core Service instance from the `Init` response.
@@ -45,4 +46,6 @@ message CompileReq {
 message CompileResp {
   bytes out_stream = 1; // The output of the compilation process.
   bytes err_stream = 2; // The error output of the compilation process.
+  string build_path = 3; // The compiler build path
+  repeated Library used_libraries = 4; // The libraries used in the build
 }

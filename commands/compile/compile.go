@@ -189,6 +189,20 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.SetLogger(i18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
 	builderCtx.Clean = req.GetClean()
 
+	// Use defer() to create an rpc.CompileResp with all the information available at the
+	// moment of return.
+	defer func() {
+		if r != nil {
+			importedLibs := []*rpc.Library{}
+			for _, lib := range builderCtx.ImportedLibraries {
+				importedLibs = append(importedLibs, lib.ToRPCLibrary())
+			}
+
+			r.BuildPath = builderCtx.BuildPath.String()
+			r.UsedLibraries = importedLibs
+		}
+	}()
+
 	// if --preprocess or --show-properties were passed, we can stop here
 	if req.GetShowProperties() {
 		return &rpc.CompileResp{}, builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
