@@ -106,7 +106,7 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 	}
 
 	commandLine := properties.ExpandPropsInString(pattern)
-	command, err := utils.PrepareCommand(commandLine, logger, "")
+	command, err := utils.PrepareCommand(commandLine, logger)
 	if err != nil {
 		return errors.WithStack(err)
 	}

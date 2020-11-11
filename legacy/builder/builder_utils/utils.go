@@ -507,19 +507,30 @@ func PrepareCommandForRecipe(ctx *types.Context, buildProperties *properties.Map
 		return nil, i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, recipe)
 	}
 
-	var err error
 	commandLine := buildProperties.ExpandPropsInString(pattern)
 	if removeUnsetProperties {
 		commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
 	}
 
-	relativePath := ""
+	command, err := utils.PrepareCommand(commandLine, logger)
 
+	// if the overall commandline is too long for the platform
+	// try reducing the length by making the filenames relative
+	// and changing working directory to build.path
 	if len(commandLine) > COMMANDLINE_LIMIT {
-		relativePath = buildProperties.Get("build.path")
+		relativePath := buildProperties.Get("build.path")
+		for i, arg := range command.Args {
+			if _, err := os.Stat(arg); os.IsNotExist(err) {
+				continue
+			}
+			rel, err := filepath.Rel(relativePath, arg)
+			if err == nil && !strings.Contains(rel, "..") && len(rel) < len(arg) {
+				command.Args[i] = rel
+			}
+		}
+		command.Dir = relativePath
 	}
 
-	command, err := utils.PrepareCommand(commandLine, logger, relativePath)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

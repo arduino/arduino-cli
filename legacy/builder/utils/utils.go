@@ -189,7 +189,7 @@ func TrimSpace(value string) string {
 	return strings.TrimSpace(value)
 }
 
-func PrepareCommand(pattern string, logger i18n.Logger, relativePath string) (*exec.Cmd, error) {
+func PrepareCommand(pattern string, logger i18n.Logger) (*exec.Cmd, error) {
 	parts, err := ParseCommandLine(pattern, logger)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -201,26 +201,10 @@ func PrepareCommand(pattern string, logger i18n.Logger, relativePath string) (*e
 		if part == "" {
 			continue
 		}
-		// if relativePath is specified, the overall commandline is too long for the platform
-		// try reducing the length by making the filenames relative
-		// and changing working directory to build.path
-		if relativePath != "" {
-			if _, err := os.Stat(part); !os.IsNotExist(err) {
-				tmp, err := filepath.Rel(relativePath, part)
-				if err == nil && !strings.Contains(tmp, "..") && len(tmp) < len(part) {
-					part = tmp
-				}
-			}
-		}
 		args = append(args, part)
 	}
 
 	cmd := exec.Command(command, args...)
-
-	if relativePath != "" {
-		cmd.Dir = relativePath
-	}
-
 	return cmd, nil
 }
 
