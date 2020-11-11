@@ -3,10 +3,10 @@ package builder
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/arduino/go-paths-helper"
-	"io/ioutil"
 	"os"
 	"os/exec"
+
+	"github.com/arduino/go-paths-helper"
 )
 
 type compilationCommand struct {
@@ -29,16 +29,10 @@ func NewCompilationDatabase(filename *paths.Path) *CompilationDatabase {
 func (db *CompilationDatabase) UpdateFile(complete bool) {
 	// TODO: Read any existing file and use its contents for any
 	// kept files, or any files not in db.contents if !complete.
-	fmt.Printf("Writing compilation database to \"%s\"...\n", db.filename.String())
-
-	contents := db.contents
-	jsonContents, err := json.MarshalIndent(contents, "", " ")
-	if err != nil {
+	if jsonContents, err := json.MarshalIndent(db.contents, "", " "); err != nil {
 		fmt.Printf("Error serializing compilation database: %s", err)
 		return
-	}
-	err = ioutil.WriteFile(db.filename.String(), jsonContents, 0644)
-	if err != nil {
+	} else if err := db.filename.WriteFile(jsonContents); err != nil {
 		fmt.Printf("Error writing compilation database: %s", err)
 	}
 }
