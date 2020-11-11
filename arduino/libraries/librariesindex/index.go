@@ -20,6 +20,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/resources"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -56,6 +57,21 @@ type Release struct {
 	ProvidesIncludes []string
 
 	Library *Library `json:"-"`
+}
+
+// ToRPCLibraryRelease transform this Release into a rpc.LibraryRelease
+func (r *Release) ToRPCLibraryRelease() *rpc.LibraryRelease {
+	return &rpc.LibraryRelease{
+		Author:        r.Author,
+		Version:       r.Version.String(),
+		Maintainer:    r.Maintainer,
+		Sentence:      r.Sentence,
+		Paragraph:     r.Paragraph,
+		Website:       r.Website,
+		Category:      r.Category,
+		Architectures: r.Architectures,
+		Types:         r.Types,
+	}
 }
 
 // GetName returns the name of this library.

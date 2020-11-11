@@ -99,13 +99,12 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryList
 		if nameFilter != "" && strings.ToLower(lib.Library.Name) != nameFilter {
 			continue
 		}
-		libtmp, err := GetOutputLibrary(lib.Library)
-		if err != nil {
-			return nil, err
+		var release *rpc.LibraryRelease
+		if lib.Available != nil {
+			release = lib.Available.ToRPCLibraryRelease()
 		}
-		release := GetOutputRelease(lib.Available)
 		instaledLib = append(instaledLib, &rpc.InstalledLibrary{
-			Library: libtmp,
+			Library: lib.Library.ToRPCLibrary(),
 			Release: release,
 		})
 	}
@@ -135,70 +134,4 @@ func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bo
 		}
 	}
 	return res
-}
-
-// GetOutputLibrary FIXMEDOC
-func GetOutputLibrary(lib *libraries.Library) (*rpc.Library, error) {
-	insdir := ""
-	if lib.InstallDir != nil {
-		insdir = lib.InstallDir.String()
-	}
-	srcdir := ""
-	if lib.SourceDir != nil {
-		srcdir = lib.SourceDir.String()
-	}
-	utldir := ""
-	if lib.UtilityDir != nil {
-		utldir = lib.UtilityDir.String()
-	}
-	cntplat := ""
-	if lib.ContainerPlatform != nil {
-		cntplat = lib.ContainerPlatform.String()
-	}
-
-	return &rpc.Library{
-		Name:              lib.Name,
-		Author:            lib.Author,
-		Maintainer:        lib.Maintainer,
-		Sentence:          lib.Sentence,
-		Paragraph:         lib.Paragraph,
-		Website:           lib.Website,
-		Category:          lib.Category,
-		Architectures:     lib.Architectures,
-		Types:             lib.Types,
-		InstallDir:        insdir,
-		SourceDir:         srcdir,
-		UtilityDir:        utldir,
-		Location:          lib.Location.ToRPCLibraryLocation(),
-		ContainerPlatform: cntplat,
-		Layout:            lib.Layout.ToRPCLibraryLayout(),
-		RealName:          lib.RealName,
-		DotALinkage:       lib.DotALinkage,
-		Precompiled:       lib.Precompiled,
-		LdFlags:           lib.LDflags,
-		IsLegacy:          lib.IsLegacy,
-		Version:           lib.Version.String(),
-		License:           lib.License,
-		Examples:          lib.Examples.AsStrings(),
-		ProvidesIncludes:  lib.DeclaredHeaders(),
-		CompatibleWith:    lib.CompatibleWith,
-	}, nil
-}
-
-// GetOutputRelease FIXMEDOC
-func GetOutputRelease(lib *librariesindex.Release) *rpc.LibraryRelease { //
-	if lib != nil {
-		return &rpc.LibraryRelease{
-			Author:        lib.Author,
-			Version:       lib.Version.String(),
-			Maintainer:    lib.Maintainer,
-			Sentence:      lib.Sentence,
-			Paragraph:     lib.Paragraph,
-			Website:       lib.Website,
-			Category:      lib.Category,
-			Architectures: lib.Architectures,
-			Types:         lib.Types,
-		}
-	}
-	return &rpc.LibraryRelease{}
 }

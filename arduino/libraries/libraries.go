@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	semver "go.bug.st/relaxed-semver"
@@ -83,6 +84,49 @@ func (library *Library) String() string {
 		return library.Name
 	}
 	return library.Name + "@" + library.Version.String()
+}
+
+// ToRPCLibrary converts this library into an rpc.Library
+func (library *Library) ToRPCLibrary() *rpc.Library {
+	pathOrEmpty := func(p *paths.Path) string {
+		if p == nil {
+			return ""
+		}
+		return p.String()
+	}
+	platformOrEmpty := func(p *cores.PlatformRelease) string {
+		if p == nil {
+			return ""
+		}
+		return p.String()
+	}
+	return &rpc.Library{
+		Name:              library.Name,
+		Author:            library.Author,
+		Maintainer:        library.Maintainer,
+		Sentence:          library.Sentence,
+		Paragraph:         library.Paragraph,
+		Website:           library.Website,
+		Category:          library.Category,
+		Architectures:     library.Architectures,
+		Types:             library.Types,
+		InstallDir:        pathOrEmpty(library.InstallDir),
+		SourceDir:         pathOrEmpty(library.SourceDir),
+		UtilityDir:        pathOrEmpty(library.UtilityDir),
+		Location:          library.Location.ToRPCLibraryLocation(),
+		ContainerPlatform: platformOrEmpty(library.ContainerPlatform),
+		Layout:            library.Layout.ToRPCLibraryLayout(),
+		RealName:          library.RealName,
+		DotALinkage:       library.DotALinkage,
+		Precompiled:       library.Precompiled,
+		LdFlags:           library.LDflags,
+		IsLegacy:          library.IsLegacy,
+		Version:           library.Version.String(),
+		License:           library.License,
+		Examples:          library.Examples.AsStrings(),
+		ProvidesIncludes:  library.DeclaredHeaders(),
+		CompatibleWith:    library.CompatibleWith,
+	}
 }
 
 // SupportsAnyArchitectureIn returns true if any of the following is true:
