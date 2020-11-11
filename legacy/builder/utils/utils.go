@@ -32,7 +32,6 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -145,14 +144,6 @@ func WrapWithHyphenI(value string) string {
 
 func TrimSpace(value string) string {
 	return strings.TrimSpace(value)
-}
-
-func PrepareCommand(pattern string) (*exec.Cmd, error) {
-	parts, err := properties.SplitQuotedString(pattern, `"'`, false)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	return exec.Command(parts[0], parts[1:]...), nil
 }
 
 func printableArgument(arg string) string {

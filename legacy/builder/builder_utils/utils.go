@@ -511,7 +511,11 @@ func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, rem
 		commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
 	}
 
-	command, err := utils.PrepareCommand(commandLine)
+	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	command := exec.Command(parts[0], parts[1:]...)
 
 	// if the overall commandline is too long for the platform
 	// try reducing the length by making the filenames relative
@@ -528,10 +532,6 @@ func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, rem
 			}
 		}
 		command.Dir = relativePath
-	}
-
-	if err != nil {
-		return nil, errors.WithStack(err)
 	}
 
 	return command, nil

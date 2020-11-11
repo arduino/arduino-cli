@@ -78,10 +78,10 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
 	targetFilePath := ctx.PreprocPath.Join(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E)
 
-	properties := buildProperties.Clone()
+	preprocProperties := buildProperties.Clone()
 	toolProps := buildProperties.SubTree("tools").SubTree("arduino-preprocessor")
-	properties.Merge(toolProps)
-	properties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, targetFilePath)
+	preprocProperties.Merge(toolProps)
+	preprocProperties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, targetFilePath)
 	if ctx.CodeCompleteAt != "" {
 		if runtime.GOOS == "windows" {
 			//use relative filepath to avoid ":" escaping
@@ -93,21 +93,22 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 				ctx.CodeCompleteAt = strings.Join(splt[1:], ":")
 			}
 		}
-		properties.Set("codecomplete", "-output-code-completions="+ctx.CodeCompleteAt)
+		preprocProperties.Set("codecomplete", "-output-code-completions="+ctx.CodeCompleteAt)
 	} else {
-		properties.Set("codecomplete", "")
+		preprocProperties.Set("codecomplete", "")
 	}
 
-	pattern := properties.Get(constants.BUILD_PROPERTIES_PATTERN)
+	pattern := preprocProperties.Get(constants.BUILD_PROPERTIES_PATTERN)
 	if pattern == constants.EMPTY_STRING {
 		return errors.New("arduino-preprocessor pattern is missing")
 	}
 
-	commandLine := properties.ExpandPropsInString(pattern)
-	command, err := utils.PrepareCommand(commandLine)
+	commandLine := preprocProperties.ExpandPropsInString(pattern)
+	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	command := exec.Command(parts[0], parts[1:]...)
 
 	if runtime.GOOS == "windows" {
 		// chdir in the uppermost directory to avoid UTF-8 bug in clang (https://github.com/arduino/arduino-preprocessor/issues/2)
