@@ -191,6 +191,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.ExecStderr = errStream
 	builderCtx.SetLogger(i18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
 	builderCtx.Clean = req.GetClean()
+	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 
 	// Use defer() to create an rpc.CompileResp with all the information available at the
 	// moment of return.

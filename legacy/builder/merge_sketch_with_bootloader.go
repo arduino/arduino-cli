@@ -31,6 +31,10 @@ import (
 type MergeSketchWithBootloader struct{}
 
 func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
+	if ctx.OnlyUpdateCompilationDatabase {
+		return nil
+	}
+
 	buildProperties := ctx.BuildProperties
 	if !buildProperties.ContainsKey(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK) && !buildProperties.ContainsKey(constants.BUILD_PROPERTIES_BOOTLOADER_FILE) {
 		return nil

@@ -53,6 +53,13 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 			return errors.WithStack(err)
 		}
 
+		if ctx.OnlyUpdateCompilationDatabase {
+			if ctx.Verbose {
+				ctx.GetLogger().Println("info", "Skipping: {0}", strings.Join(command.Args, " "))
+			}
+			return nil
+		}
+
 		_, _, err = utils.ExecCommand(ctx, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
 		if err != nil {
 			return errors.WithStack(err)

@@ -167,6 +167,8 @@ type Context struct {
 
 	// Compilation Database to build/update
 	CompilationDatabase *builder.CompilationDatabase
+	// Set to true to skip build and produce only Compilation Database
+	OnlyUpdateCompilationDatabase bool
 }
 
 // ExecutableSectionSize represents a section of the executable output file

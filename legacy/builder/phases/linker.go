@@ -30,6 +30,13 @@ import (
 type Linker struct{}
 
 func (s *Linker) Run(ctx *types.Context) error {
+	if ctx.OnlyUpdateCompilationDatabase {
+		if ctx.Verbose {
+			ctx.GetLogger().Println("info", "Skip linking of final executable.")
+		}
+		return nil
+	}
+
 	objectFilesSketch := ctx.SketchObjectFiles
 	objectFilesLibraries := ctx.LibrariesObjectFiles
 	objectFilesCore := ctx.CoreObjectsFiles
