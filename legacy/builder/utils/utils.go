@@ -189,9 +189,7 @@ func TrimSpace(value string) string {
 	return strings.TrimSpace(value)
 }
 
-type argFilterFunc func(int, string, []string) bool
-
-func PrepareCommandFilteredArgs(pattern string, filter argFilterFunc, logger i18n.Logger, relativePath string) (*exec.Cmd, error) {
+func PrepareCommand(pattern string, logger i18n.Logger, relativePath string) (*exec.Cmd, error) {
 	parts, err := ParseCommandLine(pattern, logger)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -199,21 +197,22 @@ func PrepareCommandFilteredArgs(pattern string, filter argFilterFunc, logger i18
 	command := parts[0]
 	parts = parts[1:]
 	var args []string
-	for idx, part := range parts {
-		if filter(idx, part, parts) {
-			// if relativePath is specified, the overall commandline is too long for the platform
-			// try reducing the length by making the filenames relative
-			// and changing working directory to build.path
-			if relativePath != "" {
-				if _, err := os.Stat(part); !os.IsNotExist(err) {
-					tmp, err := filepath.Rel(relativePath, part)
-					if err == nil && !strings.Contains(tmp, "..") && len(tmp) < len(part) {
-						part = tmp
-					}
+	for _, part := range parts {
+		if part == "" {
+			continue
+		}
+		// if relativePath is specified, the overall commandline is too long for the platform
+		// try reducing the length by making the filenames relative
+		// and changing working directory to build.path
+		if relativePath != "" {
+			if _, err := os.Stat(part); !os.IsNotExist(err) {
+				tmp, err := filepath.Rel(relativePath, part)
+				if err == nil && !strings.Contains(tmp, "..") && len(tmp) < len(part) {
+					part = tmp
 				}
 			}
-			args = append(args, part)
 		}
+		args = append(args, part)
 	}
 
 	cmd := exec.Command(command, args...)
@@ -223,14 +222,6 @@ func PrepareCommandFilteredArgs(pattern string, filter argFilterFunc, logger i18
 	}
 
 	return cmd, nil
-}
-
-func filterEmptyArg(_ int, arg string, _ []string) bool {
-	return arg != constants.EMPTY_STRING
-}
-
-func PrepareCommand(pattern string, logger i18n.Logger, relativePath string) (*exec.Cmd, error) {
-	return PrepareCommandFilteredArgs(pattern, filterEmptyArg, logger, relativePath)
 }
 
 func printableArgument(arg string) string {
