@@ -29,55 +29,14 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
-
-func ParseCommandLine(input string) ([]string, error) {
-	var parts []string
-	escapingChar := constants.EMPTY_STRING
-	escapedArg := constants.EMPTY_STRING
-	for _, inputPart := range strings.Split(input, constants.SPACE) {
-		inputPart = strings.TrimSpace(inputPart)
-		if len(inputPart) == 0 {
-			continue
-		}
-
-		if escapingChar == constants.EMPTY_STRING {
-			if inputPart[0] != '"' && inputPart[0] != '\'' {
-				parts = append(parts, inputPart)
-				continue
-			}
-
-			escapingChar = string(inputPart[0])
-			inputPart = inputPart[1:]
-			escapedArg = constants.EMPTY_STRING
-		}
-
-		if inputPart[len(inputPart)-1] != '"' && inputPart[len(inputPart)-1] != '\'' {
-			escapedArg = escapedArg + inputPart + " "
-			continue
-		}
-
-		escapedArg = escapedArg + inputPart[:len(inputPart)-1]
-		escapedArg = strings.TrimSpace(escapedArg)
-		if len(escapedArg) > 0 {
-			parts = append(parts, escapedArg)
-		}
-		escapingChar = constants.EMPTY_STRING
-	}
-
-	if escapingChar != constants.EMPTY_STRING {
-		return nil, errors.Errorf("Invalid quoting: no closing [%s] char found.", escapingChar)
-	}
-
-	return parts, nil
-}
 
 type filterFiles func([]os.FileInfo) []os.FileInfo
 
@@ -189,22 +148,11 @@ func TrimSpace(value string) string {
 }
 
 func PrepareCommand(pattern string) (*exec.Cmd, error) {
-	parts, err := ParseCommandLine(pattern)
+	parts, err := properties.SplitQuotedString(pattern, `"'`, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	command := parts[0]
-	parts = parts[1:]
-	var args []string
-	for _, part := range parts {
-		if part == "" {
-			continue
-		}
-		args = append(args, part)
-	}
-
-	cmd := exec.Command(command, args...)
-	return cmd, nil
+	return exec.Command(parts[0], parts[1:]...), nil
 }
 
 func printableArgument(arg string) string {

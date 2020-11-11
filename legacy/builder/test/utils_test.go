@@ -23,39 +23,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCommandLineParser(t *testing.T) {
-	command := "\"/home/federico/materiale/works_Arduino/Arduino/build/hardware/tools/coan\" source -m -E -P -kb -c -g -Os -w -ffunction-sections -fdata-sections -MMD -mmcu=atmega32u4 -DF_CPU=16000000L -DARDUINO=010600 -DARDUINO_AVR_LEONARDO -DARDUINO_ARCH_AVR  -DUSB_VID=0x2341 -DUSB_PID=0x8036 '-DUSB_MANUFACTURER=' '-DUSB_PRODUCT=\"Arduino Leonardo\"' \"/tmp/sketch321469072.cpp\""
-
-	parts, err := utils.ParseCommandLine(command)
-	NoError(t, err)
-
-	require.Equal(t, 23, len(parts))
-
-	require.Equal(t, "/home/federico/materiale/works_Arduino/Arduino/build/hardware/tools/coan", parts[0])
-	require.Equal(t, "source", parts[1])
-	require.Equal(t, "-m", parts[2])
-	require.Equal(t, "-E", parts[3])
-	require.Equal(t, "-P", parts[4])
-	require.Equal(t, "-kb", parts[5])
-	require.Equal(t, "-c", parts[6])
-	require.Equal(t, "-g", parts[7])
-	require.Equal(t, "-Os", parts[8])
-	require.Equal(t, "-w", parts[9])
-	require.Equal(t, "-ffunction-sections", parts[10])
-	require.Equal(t, "-fdata-sections", parts[11])
-	require.Equal(t, "-MMD", parts[12])
-	require.Equal(t, "-mmcu=atmega32u4", parts[13])
-	require.Equal(t, "-DF_CPU=16000000L", parts[14])
-	require.Equal(t, "-DARDUINO=010600", parts[15])
-	require.Equal(t, "-DARDUINO_AVR_LEONARDO", parts[16])
-	require.Equal(t, "-DARDUINO_ARCH_AVR", parts[17])
-	require.Equal(t, "-DUSB_VID=0x2341", parts[18])
-	require.Equal(t, "-DUSB_PID=0x8036", parts[19])
-	require.Equal(t, "-DUSB_MANUFACTURER=", parts[20])
-	require.Equal(t, "-DUSB_PRODUCT=\"Arduino Leonardo\"", parts[21])
-	require.Equal(t, "/tmp/sketch321469072.cpp", parts[22])
-}
-
 func TestPrintableCommand(t *testing.T) {
 	parts := []string{
 		"/path/to/dir with spaces/cmd",
@@ -73,13 +40,6 @@ func TestPrintableCommand(t *testing.T) {
 		" lastarg"
 	result := utils.PrintableCommand(parts)
 	require.Equal(t, correct, result)
-}
-
-func TestCommandLineParserError(t *testing.T) {
-	command := "\"command missing quote"
-
-	_, err := utils.ParseCommandLine(command)
-	require.Error(t, err)
 }
 
 func TestMapTrimSpace(t *testing.T) {
