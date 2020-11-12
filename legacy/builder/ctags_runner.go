@@ -18,7 +18,6 @@ package builder
 import (
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/ctags"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/pkg/errors"
@@ -29,7 +28,6 @@ type CTagsRunner struct{}
 func (s *CTagsRunner) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
 	ctagsTargetFilePath := ctx.CTagsTargetFile
-	logger := ctx.GetLogger()
 
 	properties := buildProperties.Clone()
 	properties.Merge(buildProperties.SubTree(constants.BUILD_PROPERTIES_TOOLS_KEY).SubTree(constants.CTAGS))
@@ -37,11 +35,11 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 
 	pattern := properties.Get(constants.BUILD_PROPERTIES_PATTERN)
 	if pattern == constants.EMPTY_STRING {
-		return i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, constants.CTAGS)
+		return errors.Errorf("%s pattern is missing", constants.CTAGS)
 	}
 
 	commandLine := properties.ExpandPropsInString(pattern)
-	command, err := utils.PrepareCommand(commandLine, logger, "")
+	command, err := utils.PrepareCommand(commandLine)
 	if err != nil {
 		return errors.WithStack(err)
 	}

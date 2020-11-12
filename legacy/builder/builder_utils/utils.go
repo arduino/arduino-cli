@@ -25,7 +25,6 @@ import (
 	"sync"
 
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
@@ -249,7 +248,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 		return nil, errors.WithStack(err)
 	}
 	if !objIsUpToDate {
-		_, _, err = ExecRecipe(ctx, properties, recipe, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
+		_, _, _, err := ExecRecipe(ctx, properties, recipe, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
@@ -480,7 +479,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 		properties.SetPath(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, archiveFilePath)
 		properties.SetPath(constants.BUILD_PROPERTIES_OBJECT_FILE, objectFile)
 
-		if _, _, err := ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show); err != nil {
+		if _, _, _, err := ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */); err != nil {
 			return nil, errors.WithStack(err)
 		}
 	}
@@ -488,38 +487,49 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 	return archiveFilePath, nil
 }
 
-func ExecRecipe(ctx *types.Context, buildProperties *properties.Map, recipe string, removeUnsetProperties bool, stdout int, stderr int) ([]byte, []byte, error) {
+func ExecRecipe(ctx *types.Context, buildProperties *properties.Map, recipe string, stdout int, stderr int) (*exec.Cmd, []byte, []byte, error) {
 	// See util.ExecCommand for stdout/stderr arguments
-	command, err := PrepareCommandForRecipe(ctx, buildProperties, recipe, removeUnsetProperties)
+	command, err := PrepareCommandForRecipe(buildProperties, recipe, false)
 	if err != nil {
-		return nil, nil, errors.WithStack(err)
+		return nil, nil, nil, errors.WithStack(err)
 	}
 
-	return utils.ExecCommand(ctx, command, stdout, stderr)
+	outbytes, errbytes, err := utils.ExecCommand(ctx, command, stdout, stderr)
+	return command, outbytes, errbytes, err
 }
 
 const COMMANDLINE_LIMIT = 30000
 
-func PrepareCommandForRecipe(ctx *types.Context, buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*exec.Cmd, error) {
-	logger := ctx.GetLogger()
+func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*exec.Cmd, error) {
 	pattern := buildProperties.Get(recipe)
 	if pattern == "" {
-		return nil, i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, recipe)
+		return nil, errors.Errorf("%s pattern is missing", recipe)
 	}
 
-	var err error
 	commandLine := buildProperties.ExpandPropsInString(pattern)
 	if removeUnsetProperties {
 		commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
 	}
 
-	relativePath := ""
+	command, err := utils.PrepareCommand(commandLine)
 
+	// if the overall commandline is too long for the platform
+	// try reducing the length by making the filenames relative
+	// and changing working directory to build.path
 	if len(commandLine) > COMMANDLINE_LIMIT {
-		relativePath = buildProperties.Get("build.path")
+		relativePath := buildProperties.Get("build.path")
+		for i, arg := range command.Args {
+			if _, err := os.Stat(arg); os.IsNotExist(err) {
+				continue
+			}
+			rel, err := filepath.Rel(relativePath, arg)
+			if err == nil && !strings.Contains(rel, "..") && len(rel) < len(arg) {
+				command.Args[i] = rel
+			}
+		}
+		command.Dir = relativePath
 	}
 
-	command, err := utils.PrepareCommand(commandLine, logger, relativePath)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

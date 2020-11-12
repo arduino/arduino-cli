@@ -29,56 +29,14 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
-
-func ParseCommandLine(input string, logger i18n.Logger) ([]string, error) {
-	var parts []string
-	escapingChar := constants.EMPTY_STRING
-	escapedArg := constants.EMPTY_STRING
-	for _, inputPart := range strings.Split(input, constants.SPACE) {
-		inputPart = strings.TrimSpace(inputPart)
-		if len(inputPart) == 0 {
-			continue
-		}
-
-		if escapingChar == constants.EMPTY_STRING {
-			if inputPart[0] != '"' && inputPart[0] != '\'' {
-				parts = append(parts, inputPart)
-				continue
-			}
-
-			escapingChar = string(inputPart[0])
-			inputPart = inputPart[1:]
-			escapedArg = constants.EMPTY_STRING
-		}
-
-		if inputPart[len(inputPart)-1] != '"' && inputPart[len(inputPart)-1] != '\'' {
-			escapedArg = escapedArg + inputPart + " "
-			continue
-		}
-
-		escapedArg = escapedArg + inputPart[:len(inputPart)-1]
-		escapedArg = strings.TrimSpace(escapedArg)
-		if len(escapedArg) > 0 {
-			parts = append(parts, escapedArg)
-		}
-		escapingChar = constants.EMPTY_STRING
-	}
-
-	if escapingChar != constants.EMPTY_STRING {
-		return nil, i18n.ErrorfWithLogger(logger, constants.MSG_INVALID_QUOTING, escapingChar)
-	}
-
-	return parts, nil
-}
 
 type filterFiles func([]os.FileInfo) []os.FileInfo
 
@@ -189,48 +147,12 @@ func TrimSpace(value string) string {
 	return strings.TrimSpace(value)
 }
 
-type argFilterFunc func(int, string, []string) bool
-
-func PrepareCommandFilteredArgs(pattern string, filter argFilterFunc, logger i18n.Logger, relativePath string) (*exec.Cmd, error) {
-	parts, err := ParseCommandLine(pattern, logger)
+func PrepareCommand(pattern string) (*exec.Cmd, error) {
+	parts, err := properties.SplitQuotedString(pattern, `"'`, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	command := parts[0]
-	parts = parts[1:]
-	var args []string
-	for idx, part := range parts {
-		if filter(idx, part, parts) {
-			// if relativePath is specified, the overall commandline is too long for the platform
-			// try reducing the length by making the filenames relative
-			// and changing working directory to build.path
-			if relativePath != "" {
-				if _, err := os.Stat(part); !os.IsNotExist(err) {
-					tmp, err := filepath.Rel(relativePath, part)
-					if err == nil && !strings.Contains(tmp, "..") && len(tmp) < len(part) {
-						part = tmp
-					}
-				}
-			}
-			args = append(args, part)
-		}
-	}
-
-	cmd := exec.Command(command, args...)
-
-	if relativePath != "" {
-		cmd.Dir = relativePath
-	}
-
-	return cmd, nil
-}
-
-func filterEmptyArg(_ int, arg string, _ []string) bool {
-	return arg != constants.EMPTY_STRING
-}
-
-func PrepareCommand(pattern string, logger i18n.Logger, relativePath string) (*exec.Cmd, error) {
-	return PrepareCommandFilteredArgs(pattern, filterEmptyArg, logger, relativePath)
+	return exec.Command(parts[0], parts[1:]...), nil
 }
 
 func printableArgument(arg string) string {

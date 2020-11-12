@@ -24,7 +24,6 @@ import (
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -78,7 +77,6 @@ type ArduinoPreprocessorRunner struct{}
 func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
 	targetFilePath := ctx.PreprocPath.Join(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E)
-	logger := ctx.GetLogger()
 
 	properties := buildProperties.Clone()
 	toolProps := buildProperties.SubTree("tools").SubTree("arduino-preprocessor")
@@ -102,11 +100,11 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 
 	pattern := properties.Get(constants.BUILD_PROPERTIES_PATTERN)
 	if pattern == constants.EMPTY_STRING {
-		return i18n.ErrorfWithLogger(logger, constants.MSG_PATTERN_MISSING, "arduino-preprocessor")
+		return errors.New("arduino-preprocessor pattern is missing")
 	}
 
 	commandLine := properties.ExpandPropsInString(pattern)
-	command, err := utils.PrepareCommand(commandLine, logger, "")
+	command, err := utils.PrepareCommand(commandLine)
 	if err != nil {
 		return errors.WithStack(err)
 	}

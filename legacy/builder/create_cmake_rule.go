@@ -240,8 +240,8 @@ func canExportCmakeProject(ctx *types.Context) bool {
 	return ctx.BuildProperties.Get("compiler.export_cmake") != ""
 }
 
-func extractCompileFlags(ctx *types.Context, receipe string, defines, dynamicLibs, linkerflags, linkDirectories *[]string, logger i18n.Logger) {
-	command, _ := builder_utils.PrepareCommandForRecipe(ctx, ctx.BuildProperties, receipe, true)
+func extractCompileFlags(ctx *types.Context, recipe string, defines, dynamicLibs, linkerflags, linkDirectories *[]string, logger i18n.Logger) {
+	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true)
 
 	for _, arg := range command.Args {
 		if strings.HasPrefix(arg, "-D") {
