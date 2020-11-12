@@ -58,10 +58,10 @@ jobs:
           security import ${{ env.INSTALLER_CERT_MAC_PATH }} -k ${{ env.KEYCHAIN }} -f pkcs12 -A -T /usr/bin/codesign -P ${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}
           security set-key-partition-list -S apple-tool:,apple: -s -k ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
 
-      - name: Install gon via HomeBrew for code signing and app notarization
+      - name: Install gon for code signing and app notarization
         run: |
-          brew tap mitchellh/gon
-          brew install mitchellh/gon/gon
+          wget -q https://github.com/mitchellh/gon/releases/download/v0.2.3/gon_macos.zip
+          unzip gon_macos.zip -d /usr/local/bin
 
       - name: Sign and notarize binary
         env:
