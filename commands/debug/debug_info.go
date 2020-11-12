@@ -81,6 +81,7 @@ func getDebugProperties(req *debug.DebugConfigReq, pm *packagemanager.PackageMan
 	toolProperties.Merge(boardProperties)
 
 	// HOTFIX: Remove me when the `arduino:samd` core is updated
+	//         (remember to remove it also in arduino/board/details.go)
 	if !toolProperties.ContainsKey("debug.executable") {
 		if platformRelease.String() == "arduino:samd@1.8.9" || platformRelease.String() == "arduino:samd@1.8.8" {
 			toolProperties.Set("debug.executable", "{build.path}/{build.project_name}.elf")
