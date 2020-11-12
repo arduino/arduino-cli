@@ -467,6 +467,14 @@ def test_board_details(run_command):
     for programmer in gold_board_details["programmers"]:
         assert programmer in result["programmers"]
 
+    # Download samd core pinned to 1.8.8
+    run_command("core install arduino:samd@1.8.8")
+
+    result = run_command("board details -b arduino:samd:nano_33_iot --format json")
+    assert result.ok
+    result = json.loads(result.stdout)
+    assert result["debugging_supported"] is True
+
 
 # old `arduino-cli board details` did not need -b <fqbn> flag to work
 def test_board_details_old(run_command):

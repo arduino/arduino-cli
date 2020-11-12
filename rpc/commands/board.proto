@@ -57,6 +57,8 @@ message BoardDetailsResp {
     repeated IdentificationPref identification_pref = 12;
     // List of programmers supported by the board
     repeated Programmer programmers = 13;
+    // Set to true if the board supports debugging
+    bool debugging_supported = 14;
 }
 
 message IdentificationPref {
