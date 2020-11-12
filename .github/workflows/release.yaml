@@ -42,12 +42,16 @@ jobs:
           name: dist
 
       - name: Import Code-Signing Certificates
-        uses: Apple-Actions/import-codesign-certs@v1
-        with:
-          # The certificates in a PKCS12 file encoded as a base64 string
-          p12-file-base64: ${{ secrets.INSTALLER_CERT_MAC_P12 }}
-          # The password used to import the PKCS12 file.
-          p12-password: ${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}
+        env:
+          KEYCHAIN: "sign.keychain"
+          INSTALLER_CERT_MAC_PATH: "/tmp/ArduinoCerts2020.p12"
+        run: |
+          echo "${{ secrets.INSTALLER_CERT_MAC_P12 }}" | base64 --decode > ${{ env.INSTALLER_CERT_MAC_PATH }}
+          security create-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
+          security default-keychain -s ${{ env.KEYCHAIN }}
+          security unlock-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
+          security import ${{ env.INSTALLER_CERT_MAC_PATH }} -k ${{ env.KEYCHAIN }} -f pkcs12 -A -T /usr/bin/codesign -P ${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}
+          security set-key-partition-list -S apple-tool:,apple: -s -k ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
 
       - name: Install gon via HomeBrew for code signing and app notarization
         run: |
