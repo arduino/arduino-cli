@@ -557,7 +557,10 @@ def test_compile_with_invalid_url(run_command, data_dir):
     # Create settings with custom invalid URL
     assert run_command("config init --dest-dir . --additional-urls https://example.com/package_example_index.json")
 
-    # Verifies compilation fails cause of invalid URL
+    # Verifies compilation fails cause of missing local index file
     res = run_command(f'compile -b {fqbn} "{sketch_path}"')
     assert res.failed
-    assert "There were errors loading platform indexes" in res.stderr
+    lines = [l.strip() for l in res.stderr.splitlines()]
+    assert "Error creating instance: error loading platform index:" in lines
+    expected_index_file = Path(data_dir, "package_example_index.json")
+    assert f"loading json index file {expected_index_file}: " + f"open {expected_index_file}:" in lines[-1]

@@ -230,9 +230,9 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 			return nil, fmt.Errorf("downloading index %s: %s", URL, err)
 		}
 		coreIndexPath := indexpath.Join(path.Base(URL.Path))
-		Download(d, "Updating index: "+coreIndexPath.Base(), downloadCB)
-		if d.Error() != nil {
-			return nil, fmt.Errorf("downloading index %s: %s", URL, d.Error())
+		err = Download(d, "Updating index: "+coreIndexPath.Base(), downloadCB)
+		if err != nil {
+			return nil, fmt.Errorf("downloading index %s: %s", URL, err)
 		}
 
 		// Check for signature

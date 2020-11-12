@@ -17,6 +17,8 @@ package instance
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
@@ -126,8 +128,7 @@ func checkPlatformErrors(resp *rpc.InitResp) error {
 		for _, err := range resp.GetPlatformsIndexErrors() {
 			logrus.Errorf("Error loading platform index: %v", err)
 		}
-		// return
-		return errors.New("There were errors loading platform indexes")
+		return fmt.Errorf("error loading platform index: \n%v", strings.Join(resp.GetPlatformsIndexErrors(), "\n"))
 	}
 
 	return nil

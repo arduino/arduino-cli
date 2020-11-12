@@ -21,15 +21,12 @@ require (
 	github.com/h2non/filetype v1.0.8 // indirect
 	github.com/imjasonmiller/godice v0.1.2
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
-	github.com/kr/pretty v0.2.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leonelquinteros/gotext v1.4.0
-	github.com/marcinbor85/gohex v0.0.0-20200531163658-baab2527a9a2
 	github.com/mattn/go-colorable v0.1.2
 	github.com/mattn/go-isatty v0.0.8
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/miekg/dns v1.0.5 // indirect
-	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/oleksandr/bonjour v0.0.0-20160508152359-5dcf00d8b228 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/pmylund/sortutil v0.0.0-20120526081524-abeda66eb583
@@ -40,11 +37,10 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v1.0.1-0.20200710201246-675ae5f5a98c
 	github.com/spf13/jwalterweatherman v1.0.0
-	github.com/spf13/pflag v1.0.3
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/testify v1.6.1
 	go.bug.st/cleanup v1.0.0
-	go.bug.st/downloader/v2 v2.0.1
+	go.bug.st/downloader/v2 v2.1.0
 	go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18
 	go.bug.st/serial v1.1.1
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect
@@ -53,7 +49,6 @@ require (
 	golang.org/x/text v0.3.2
 	google.golang.org/grpc v1.27.0
 	google.golang.org/protobuf v1.25.0
-	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1
 	gopkg.in/yaml.v2 v2.3.0

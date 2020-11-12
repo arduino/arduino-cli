@@ -47,3 +47,29 @@ def test_update_showing_outdated(run_command):
     assert "Updating index: library_index.json downloaded" in lines
     assert lines[-5].startswith("Arduino AVR Boards")
     assert lines[-2].startswith("USBHost")
+
+
+def test_update_with_url_not_found(run_command, httpserver):
+    assert run_command("update")
+
+    # Brings up a local server to fake a failure
+    httpserver.expect_request("/test_index.json").respond_with_data(status=404)
+    url = httpserver.url_for("/test_index.json")
+
+    res = run_command(f"update --additional-urls={url}")
+    assert res.failed
+    lines = [l.strip() for l in res.stderr.splitlines()]
+    assert f"Error updating core and libraries index: downloading index {url}: 404 NOT FOUND" in lines
+
+
+def test_update_with_url_internal_server_error(run_command, httpserver):
+    assert run_command("update")
+
+    # Brings up a local server to fake a failure
+    httpserver.expect_request("/test_index.json").respond_with_data(status=500)
+    url = httpserver.url_for("/test_index.json")
+
+    res = run_command(f"update --additional-urls={url}")
+    assert res.failed
+    lines = [l.strip() for l in res.stderr.splitlines()]
+    assert f"Error updating core and libraries index: downloading index {url}: 500 INTERNAL SERVER ERROR" in lines
