@@ -48,7 +48,16 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 
 	selected := resolver.ResolveFor(header, ctx.TargetPlatform.Platform.Architecture)
 	if alreadyImported := importedLibraries.FindByName(selected.Name); alreadyImported != nil {
-		selected = alreadyImported
+		// Certain libraries might have the same name but be different.
+		// This usually happens when the user includes two or more custom libraries that have
+		// different header name but are stored in a parent folder with identical name, like
+		// ./Lib1/src/lib1.h and ./Lib2/src/lib2.h
+		// Without this check the library resolution would be stuck in a loop.
+		// This behaviour has been reported in this issue:
+		// https://github.com/arduino/arduino-cli/issues/973
+		if selected == alreadyImported {
+			selected = alreadyImported
+		}
 	}
 
 	ctx.LibrariesResolutionResults[header] = types.LibraryResolutionResult{
