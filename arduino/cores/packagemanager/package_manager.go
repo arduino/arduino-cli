@@ -124,14 +124,20 @@ func (pm *PackageManager) FindBoardWithFQBN(fqbnIn string) (*cores.Board, error)
 }
 
 // ResolveFQBN returns, in order:
+//
 // - the Package pointed by the fqbn
+//
 // - the PlatformRelease pointed by the fqbn
+//
 // - the Board pointed by the fqbn
+//
 // - the build properties for the board considering also the
-//   configuration part of the fqbn
+// configuration part of the fqbn
+//
 // - the PlatformRelease to be used for the build (if the board
-//   requires a 3rd party core it may be different from the
-//   PlatformRelease pointed by the fqbn)
+// requires a 3rd party core it may be different from the
+// PlatformRelease pointed by the fqbn)
+//
 // - an error if any of the above is not found
 //
 // In case of error the partial results found in the meantime are
