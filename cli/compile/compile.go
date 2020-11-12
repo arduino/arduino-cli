@@ -154,12 +154,8 @@ func run(cmd *cobra.Command, args []string) {
 	} else {
 		compileRes, err = compile.Compile(context.Background(), compileReq, os.Stdout, os.Stderr, verboseCompile)
 	}
-	if err != nil {
-		feedback.Errorf("Error during build: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
 
-	if uploadAfterCompile {
+	if err == nil && uploadAfterCompile {
 		uploadReq := &rpc.UploadReq{
 			Instance:   inst,
 			Fqbn:       fqbn,
@@ -189,7 +185,12 @@ func run(cmd *cobra.Command, args []string) {
 		CompileOut:    compileOut.String(),
 		CompileErr:    compileErr.String(),
 		BuilderResult: compileRes,
+		Success:       err == nil,
 	})
+	if err != nil && output.OutputFormat != "json" {
+		feedback.Errorf("Error during build: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 }
 
 // initSketchPath returns the current working directory
@@ -211,6 +212,7 @@ type compileResult struct {
 	CompileOut    string           `json:"compiler_out"`
 	CompileErr    string           `json:"compiler_err"`
 	BuilderResult *rpc.CompileResp `json:"builder_result"`
+	Success       bool             `json:"success"`
 }
 
 func (r *compileResult) Data() interface{} {

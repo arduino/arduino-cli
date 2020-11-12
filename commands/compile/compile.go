@@ -212,7 +212,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 	// if it's a regular build, go on...
 	if err := builder.RunBuilder(builderCtx); err != nil {
-		return nil, err
+		return &rpc.CompileResp{}, err
 	}
 
 	// If the export directory is set we assume you want to export the binaries
