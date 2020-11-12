@@ -57,17 +57,47 @@ func (s *Linker) Run(ctx *types.Context) error {
 }
 
 func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties *properties.Map) error {
-	quotedObjectFiles := utils.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes)
-	objectFileList := strings.Join(quotedObjectFiles, constants.SPACE)
+	objectFileList := strings.Join(utils.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes), " ")
+
+	// If command line length is too big (> 30000 chars), try to collect the object files into archives
+	// and use that archives to complete the build.
+	if len(objectFileList) > 30000 {
+
+		// We must create an object file for each visited directory: this is required becuase gcc-ar checks
+		// if an object file is already in the archive by looking ONLY at the filename WITHOUT the path, so
+		// it may happen that a subdir/spi.o inside the archive may be overwritten by a anotherdir/spi.o
+		// because thery are both named spi.o.
+
+		properties := buildProperties.Clone()
+		archives := paths.NewPathList()
+		for _, object := range objectFiles {
+			archive := object.Parent().Join("objs.a")
+			if !archives.Contains(archive) {
+				archives.Add(archive)
+				// Cleanup old archives
+				_ = archive.Remove()
+			}
+			properties.Set("archive_file", archive.Base())
+			properties.SetPath("archive_file_path", archive)
+			properties.SetPath("object_file", object)
+			_, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, false, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+			if err != nil {
+				return err
+			}
+		}
+
+		objectFileList = strings.Join(utils.Map(archives.AsStrings(), wrapWithDoubleQuotes), " ")
+		objectFileList = "-Wl,--whole-archive " + objectFileList + " -Wl,--no-whole-archive"
+	}
 
 	properties := buildProperties.Clone()
 	properties.Set(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS))
 	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel))
 	properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE, coreDotARelPath.String())
 	properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, coreArchiveFilePath.String())
-	properties.Set(constants.BUILD_PROPERTIES_OBJECT_FILES, objectFileList)
+	properties.Set("object_files", objectFileList)
 
-	_, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_C_COMBINE_PATTERN, false /* stdout */, utils.ShowIfVerbose /* stderr */, utils.Show)
+	_, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_C_COMBINE_PATTERN, false, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
 	return err
 }
 
