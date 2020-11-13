@@ -41,27 +41,35 @@ jobs:
         with:
           name: dist
 
-      - name: Download Gon
+      - name: Import Code-Signing Certificates
+        env:
+          KEYCHAIN: "sign.keychain"
+          INSTALLER_CERT_MAC_PATH: "/tmp/ArduinoCerts2020.p12"
         run: |
-          wget -q https://github.com/mitchellh/gon/releases/download/v0.2.2/gon_0.2.2_macos.zip
-          unzip gon_0.2.2_macos.zip -d /usr/local/bin
-          rm -f gon_0.2.2_macos.zip
+          echo "${{ secrets.INSTALLER_CERT_MAC_P12 }}" | base64 --decode > ${{ env.INSTALLER_CERT_MAC_PATH }}
+          security create-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
+          security default-keychain -s ${{ env.KEYCHAIN }}
+          security unlock-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
+          security import ${{ env.INSTALLER_CERT_MAC_PATH }} -k ${{ env.KEYCHAIN }} -f pkcs12 -A -T /usr/bin/codesign -P ${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}
+          security set-key-partition-list -S apple-tool:,apple: -s -k ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
 
-      - name: Notarize binary, re-package it and update checksum
+      - name: Install gon for code signing and app notarization
+        run: |
+          wget -q https://github.com/mitchellh/gon/releases/download/v0.2.3/gon_macos.zip
+          unzip gon_macos.zip -d /usr/local/bin
+
+      - name: Sign and notarize binary
         env:
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
-        # This step performs the following:
-        # 1. Download keychain from GH secrets and decode it from base64
-        # 2. Add the keychain to the system keychains and unlock it
-        # 3. Call Gon to start notarization process (using AC_USERNAME and AC_PASSWORD)
-        # 4. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
-        # 5. Recalculate package checksum and replace it in the goreleaser nnnnnn-checksums.txt file
         run: |
-          echo "${{ secrets.KEYCHAIN }}" | base64 --decode  > ~/Library/Keychains/apple-developer.keychain-db
-          security list-keychains -s ~/Library/Keychains/apple-developer.keychain-db
-          security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" ~/Library/Keychains/apple-developer.keychain-db
           gon gon.config.hcl
+
+      - name: Re-package binary and update checksum
+        # This step performs the following:
+        # 1. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
+        # 2. Recalculate package checksum and replace it in the goreleaser nnnnnn-checksums.txt file
+        run: |
           # GitHub's upload/download-artifact@v1 actions don't preserve file permissions,
           # so we need to add execution permission back until @v2 actions are released.
           chmod +x dist/arduino_cli_osx_darwin_amd64/arduino-cli
