@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/spf13/cobra"
 )
@@ -40,8 +41,10 @@ func initInstallCommand() *cobra.Command {
 		Run:  runInstallCommand,
 	}
 	installCommand.Flags().BoolVar(&installFlags.noDeps, "no-deps", false, "Do not install dependencies.")
-	installCommand.Flags().BoolVar(&installFlags.gitURL, "git-url", false, "Enter git url for libraries hosted on repositories")
-	installCommand.Flags().BoolVar(&installFlags.zipPath, "zip-path", false, "Enter a path to zip file")
+	if configuration.Settings.GetBool("library.enable_unsafe_install") {
+		installCommand.Flags().BoolVar(&installFlags.gitURL, "git-url", false, "Enter git url for libraries hosted on repositories")
+		installCommand.Flags().BoolVar(&installFlags.zipPath, "zip-path", false, "Enter a path to zip file")
+	}
 	return installCommand
 }
 
@@ -53,6 +56,11 @@ var installFlags struct {
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
+
+	if installFlags.zipPath || installFlags.gitURL {
+		feedback.Print("--git-url and --zip-path flags are dangerous, use it at your own risk.")
+	}
+
 	if installFlags.zipPath {
 		ziplibraryInstallReq := &rpc.ZipLibraryInstallReq{
 			Instance: instance,
@@ -63,7 +71,10 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			feedback.Errorf("Error installing Zip Library: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
-	} else if installFlags.gitURL {
+		return
+	}
+
+	if installFlags.gitURL {
 		gitlibraryInstallReq := &rpc.GitLibraryInstallReq{
 			Instance: instance,
 			Url:      args[0],
@@ -73,58 +84,59 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			feedback.Errorf("Error installing Git Library: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
+		return
+	}
+
+	libRefs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
+	if err != nil {
+		feedback.Errorf("Arguments error: %v", err)
+		os.Exit(errorcodes.ErrBadArgument)
+	}
+
+	toInstall := map[string]*rpc.LibraryDependencyStatus{}
+	if installFlags.noDeps {
+		for _, libRef := range libRefs {
+			toInstall[libRef.Name] = &rpc.LibraryDependencyStatus{
+				Name:            libRef.Name,
+				VersionRequired: libRef.Version,
+			}
+		}
 	} else {
-		libRefs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
-		if err != nil {
-			feedback.Errorf("Arguments error: %v", err)
-			os.Exit(errorcodes.ErrBadArgument)
-		}
-
-		toInstall := map[string]*rpc.LibraryDependencyStatus{}
-		if installFlags.noDeps {
-			for _, libRef := range libRefs {
-				toInstall[libRef.Name] = &rpc.LibraryDependencyStatus{
-					Name:            libRef.Name,
-					VersionRequired: libRef.Version,
-				}
-			}
-		} else {
-			for _, libRef := range libRefs {
-				depsResp, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesReq{
-					Instance: instance,
-					Name:     libRef.Name,
-					Version:  libRef.Version,
-				})
-				if err != nil {
-					feedback.Errorf("Error resolving dependencies for %s: %s", libRef, err)
-					os.Exit(errorcodes.ErrGeneric)
-				}
-				for _, dep := range depsResp.GetDependencies() {
-					feedback.Printf("%s depends on %s@%s", libRef, dep.GetName(), dep.GetVersionRequired())
-					if existingDep, has := toInstall[dep.GetName()]; has {
-						if existingDep.GetVersionRequired() != dep.GetVersionRequired() {
-							// TODO: make a better error
-							feedback.Errorf("The library %s is required in two different versions: %s and %s",
-								dep.GetName(), dep.GetVersionRequired(), existingDep.GetVersionRequired())
-							os.Exit(errorcodes.ErrGeneric)
-						}
-					}
-					toInstall[dep.GetName()] = dep
-				}
-			}
-		}
-
-		for _, library := range toInstall {
-			libraryInstallReq := &rpc.LibraryInstallReq{
+		for _, libRef := range libRefs {
+			depsResp, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesReq{
 				Instance: instance,
-				Name:     library.Name,
-				Version:  library.VersionRequired,
-			}
-			err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.ProgressBar(), output.TaskProgress())
+				Name:     libRef.Name,
+				Version:  libRef.Version,
+			})
 			if err != nil {
-				feedback.Errorf("Error installing %s: %v", library, err)
+				feedback.Errorf("Error resolving dependencies for %s: %s", libRef, err)
 				os.Exit(errorcodes.ErrGeneric)
 			}
+			for _, dep := range depsResp.GetDependencies() {
+				feedback.Printf("%s depends on %s@%s", libRef, dep.GetName(), dep.GetVersionRequired())
+				if existingDep, has := toInstall[dep.GetName()]; has {
+					if existingDep.GetVersionRequired() != dep.GetVersionRequired() {
+						// TODO: make a better error
+						feedback.Errorf("The library %s is required in two different versions: %s and %s",
+							dep.GetName(), dep.GetVersionRequired(), existingDep.GetVersionRequired())
+						os.Exit(errorcodes.ErrGeneric)
+					}
+				}
+				toInstall[dep.GetName()] = dep
+			}
+		}
+	}
+
+	for _, library := range toInstall {
+		libraryInstallReq := &rpc.LibraryInstallReq{
+			Instance: instance,
+			Name:     library.Name,
+			Version:  library.VersionRequired,
+		}
+		err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.ProgressBar(), output.TaskProgress())
+		if err != nil {
+			feedback.Errorf("Error installing %s: %v", library, err)
+			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
 }

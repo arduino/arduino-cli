@@ -12,8 +12,8 @@
 # otherwise use the software for commercial activities involving the Arduino
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
-import os
 import simplejson as json
+from pathlib import Path
 
 
 def test_list(run_command):
@@ -145,7 +145,7 @@ def test_lib_download(run_command, downloads_dir):
 
     # Download a specific lib version
     assert run_command("lib download AudioZero@1.0.0")
-    assert os.path.exists(os.path.join(downloads_dir, "libraries", "AudioZero-1.0.0.zip"))
+    assert Path(downloads_dir, "libraries", "AudioZero-1.0.0.zip").exists()
 
     # Wrong lib version
     result = run_command("lib download AudioZero@69.42.0")
@@ -168,23 +168,88 @@ def test_install(run_command):
     assert "Error resolving dependencies for MD_Parola@3.2.0: dependency 'MD_MAX72xx' is not available" in result.stderr
 
 
-def test_install_with_git_url(run_command):
+def test_install_git_url_and_zip_path_flags_visibility(run_command, data_dir, downloads_dir):
+    # Verifies installation fail because flags are not found
+    git_url = "https://github.com/arduino-libraries/WiFi101.git"
+    res = run_command(f"lib install --git-url {git_url}")
+    assert res.failed
+    assert "Error: unknown flag: --git-url" in res.stderr
+
+    assert run_command("lib download AudioZero@1.0.0")
+    zip_path = Path(downloads_dir, "libraries", "AudioZero-1.0.0.zip")
+    res = run_command(f"lib install --zip-path {zip_path}")
+    assert res.failed
+    assert "Error: unknown flag: --zip-path" in res.stderr
+
+    env = {
+        "ARDUINO_DATA_DIR": data_dir,
+        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+        "ARDUINO_SKETCHBOOK_DIR": data_dir,
+        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
+    }
+    # Verifies installation is successful when flags are enabled with env var
+    res = run_command(f"lib install --git-url {git_url}", custom_env=env)
+    assert res.ok
+    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
+
+    res = run_command(f"lib install --zip-path {zip_path}", custom_env=env)
+    assert res.ok
+    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
+
+    # Uninstall libraries to install them again
+    assert run_command("lib uninstall WiFi101 AudioZero")
+
+    # Verifies installation is successful when flags are enabled with settings file
+    assert run_command("config init --dest-dir .", custom_env=env)
+
+    res = run_command(f"lib install --git-url {git_url}")
+    assert res.ok
+    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
+
+    res = run_command(f"lib install --zip-path {zip_path}")
+    assert res.ok
+    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
+
+
+def test_install_with_git_url(run_command, data_dir, downloads_dir):
+    # Initialize configs to enable --git-url flag
+    env = {
+        "ARDUINO_DATA_DIR": data_dir,
+        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+        "ARDUINO_SKETCHBOOK_DIR": data_dir,
+        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
+    }
+    assert run_command("config init --dest-dir .", custom_env=env)
+
     # Test git-url library install
-    assert run_command("lib install --git-url https://github.com/arduino-libraries/WiFi101.git")
+    res = run_command("lib install --git-url https://github.com/arduino-libraries/WiFi101.git")
+    assert res.ok
+    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
 
     # Test failing-install as repository already exists
-    result = run_command("lib install --git-url https://github.com/arduino-libraries/WiFi101.git")
-    assert "Error installing Git Library: repository already exists" in result.stderr
+    res = run_command("lib install --git-url https://github.com/arduino-libraries/WiFi101.git")
+    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
+    assert "Error installing Git Library: repository already exists" in res.stderr
 
 
-def test_install_with_zip_path(run_command, downloads_dir):
+def test_install_with_zip_path(run_command, data_dir, downloads_dir):
+    # Initialize configs to enable --zip-path flag
+    env = {
+        "ARDUINO_DATA_DIR": data_dir,
+        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+        "ARDUINO_SKETCHBOOK_DIR": data_dir,
+        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
+    }
+    assert run_command("config init --dest-dir .", custom_env=env)
+
     # Download a specific lib version
     assert run_command("lib download AudioZero@1.0.0")
-    assert os.path.exists(os.path.join(downloads_dir, "libraries", "AudioZero-1.0.0.zip"))
 
-    zip_path = os.path.join(downloads_dir, "libraries", "AudioZero-1.0.0.zip")
+    zip_path = Path(downloads_dir, "libraries", "AudioZero-1.0.0.zip")
     # Test zip-path install
-    assert run_command("lib install --zip-path {zip_path}".format(zip_path=zip_path))
+    res = run_command(f"lib install --zip-path {zip_path}")
+    assert res.ok
+    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
 
 
 def test_update_index(run_command):
