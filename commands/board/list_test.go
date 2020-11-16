@@ -53,6 +53,8 @@ func TestGetByVidPid(t *testing.T) {
 	require.Len(t, res, 1)
 	require.Equal(t, "Arduino/Genuino MKR1000", res[0].Name)
 	require.Equal(t, "arduino:samd:mkr1000", res[0].FQBN)
+	require.Equal(t, "0xf420", res[0].VID)
+	require.Equal(t, "0XF069", res[0].PID)
 
 	// wrong vid (too long), wrong pid (not an hex value)
 	res, err = apiByVidPid("0xfffff", "0xDEFG")

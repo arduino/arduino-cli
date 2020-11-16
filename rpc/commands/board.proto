@@ -231,4 +231,8 @@ message BoardListItem {
     string FQBN = 2;
     // If the board is marked as "hidden" in the platform
     bool is_hidden = 3;
+    // Vendor ID
+    string VID = 4;
+    // Product ID
+    string PID = 5;
 }
