@@ -179,6 +179,8 @@ func (f *Flavor) isExactMatchWith(osName, osArch string) bool {
 		return regexpLinux32.MatchString(f.OS)
 	case "windows,386":
 		return regexpWindows32.MatchString(f.OS)
+	case "windows,amd64":
+		return regexpWindows64.MatchString(f.OS)
 	case "darwin,arm64":
 		return regexpMacArm64.MatchString(f.OS)
 	case "darwin,amd64":

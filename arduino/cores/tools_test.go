@@ -60,6 +60,7 @@ func TestFlavorCompatibility(t *testing.T) {
 	}
 	tests := []*test{
 		{&Flavor{OS: "i686-mingw32"}, []*os{windows32, windows64}, []*os{windows32}},
+		{&Flavor{OS: "x86_64-mingw32"}, []*os{windows64}, []*os{windows64}},
 		{&Flavor{OS: "i386-apple-darwin11"}, []*os{darwin32, darwin64, darwinArm64}, []*os{darwin32}},
 		{&Flavor{OS: "x86_64-apple-darwin"}, []*os{darwin64, darwinArm64}, []*os{darwin64}},
 		{&Flavor{OS: "arm64-apple-darwin"}, []*os{darwinArm64}, []*os{darwinArm64}},
