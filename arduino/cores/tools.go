@@ -141,13 +141,13 @@ func (tr *ToolRelease) RuntimeProperties() *properties.Map {
 }
 
 var (
-	regexpArmLinux   = regexp.MustCompile("arm.*-linux-gnueabihf")
-	regexpArm64Linux = regexp.MustCompile("(aarch64|arm64)-linux-gnu")
-	regexpAmd64      = regexp.MustCompile("x86_64-.*linux-gnu")
-	regexpi386       = regexp.MustCompile("i[3456]86-.*linux-gnu")
-	regexpWindows    = regexp.MustCompile("i[3456]86-.*(mingw32|cygwin)")
-	regexpMac64Bit   = regexp.MustCompile("(i[3456]86|x86_64)-apple-darwin.*")
-	regexpmac32Bit   = regexp.MustCompile("i[3456]86-apple-darwin.*")
+	regexpLinuxArm   = regexp.MustCompile("arm.*-linux-gnueabihf")
+	regexpLinuxArm64 = regexp.MustCompile("(aarch64|arm64)-linux-gnu")
+	regexpLinux64    = regexp.MustCompile("x86_64-.*linux-gnu")
+	regexpLinux32    = regexp.MustCompile("i[3456]86-.*linux-gnu")
+	regexpWindows32  = regexp.MustCompile("i[3456]86-.*(mingw32|cygwin)")
+	regexpMac64Bit   = regexp.MustCompile("x86_64-apple-darwin.*")
+	regexpMac32Bit   = regexp.MustCompile("i[3456]86-apple-darwin.*")
 	regexpArmBSD     = regexp.MustCompile("arm.*-freebsd[0-9]*")
 )
 
@@ -162,19 +162,19 @@ func (f *Flavor) isCompatibleWith(osName, osArch string) bool {
 
 	switch osName + "," + osArch {
 	case "linux,arm", "linux,armbe":
-		return regexpArmLinux.MatchString(f.OS)
+		return regexpLinuxArm.MatchString(f.OS)
 	case "linux,arm64":
-		return regexpArm64Linux.MatchString(f.OS)
+		return regexpLinuxArm64.MatchString(f.OS)
 	case "linux,amd64":
-		return regexpAmd64.MatchString(f.OS)
+		return regexpLinux64.MatchString(f.OS)
 	case "linux,386":
-		return regexpi386.MatchString(f.OS)
+		return regexpLinux32.MatchString(f.OS)
 	case "windows,386", "windows,amd64":
-		return regexpWindows.MatchString(f.OS)
+		return regexpWindows32.MatchString(f.OS)
 	case "darwin,amd64":
-		return regexpmac32Bit.MatchString(f.OS) || regexpMac64Bit.MatchString(f.OS)
+		return regexpMac32Bit.MatchString(f.OS) || regexpMac64Bit.MatchString(f.OS)
 	case "darwin,386":
-		return regexpmac32Bit.MatchString(f.OS)
+		return regexpMac32Bit.MatchString(f.OS)
 	case "freebsd,arm":
 		return regexpArmBSD.MatchString(f.OS)
 	case "freebsd,386", "freebsd,amd64":
