@@ -28,7 +28,7 @@ jobs:
         run: goreleaser --snapshot
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: dist
           path: dist
@@ -88,7 +88,7 @@ jobs:
           perl -pi -w -e "s/.*${PACKAGE_FILENAME}/${CLI_CHECKSUM}  ${PACKAGE_FILENAME}/g;" dist/*-checksums.txt
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: dist
           path: dist
