@@ -146,8 +146,10 @@ var (
 	regexpLinux64    = regexp.MustCompile("x86_64-.*linux-gnu")
 	regexpLinux32    = regexp.MustCompile("i[3456]86-.*linux-gnu")
 	regexpWindows32  = regexp.MustCompile("i[3456]86-.*(mingw32|cygwin)")
-	regexpMac64Bit   = regexp.MustCompile("x86_64-apple-darwin.*")
-	regexpMac32Bit   = regexp.MustCompile("i[3456]86-apple-darwin.*")
+	regexpWindows64  = regexp.MustCompile("(amd64|x86_64)-.*(mingw32|cygwin)")
+	regexpMac64      = regexp.MustCompile("x86_64-apple-darwin.*")
+	regexpMac32      = regexp.MustCompile("i[3456]86-apple-darwin.*")
+	regexpMacArm64   = regexp.MustCompile("arm64-apple-darwin.*")
 	regexpFreeBSDArm = regexp.MustCompile("arm.*-freebsd[0-9]*")
 	regexpFreeBSD32  = regexp.MustCompile("i?[3456]86-freebsd[0-9]*")
 	regexpFreeBSD64  = regexp.MustCompile("amd64-freebsd[0-9]*")
@@ -177,10 +179,12 @@ func (f *Flavor) isExactMatchWith(osName, osArch string) bool {
 		return regexpLinux32.MatchString(f.OS)
 	case "windows,386":
 		return regexpWindows32.MatchString(f.OS)
+	case "darwin,arm64":
+		return regexpMacArm64.MatchString(f.OS)
 	case "darwin,amd64":
-		return regexpMac64Bit.MatchString(f.OS)
+		return regexpMac64.MatchString(f.OS)
 	case "darwin,386":
-		return regexpMac32Bit.MatchString(f.OS)
+		return regexpMac32.MatchString(f.OS)
 	case "freebsd,arm":
 		return regexpFreeBSDArm.MatchString(f.OS)
 	case "freebsd,386":
@@ -200,7 +204,10 @@ func (f *Flavor) isCompatibleWith(osName, osArch string) bool {
 	case "windows,amd64":
 		return regexpWindows32.MatchString(f.OS)
 	case "darwin,amd64":
-		return regexpMac32Bit.MatchString(f.OS)
+		return regexpMac32.MatchString(f.OS)
+	case "darwin,arm64":
+		// Compatibility guaranteed through Rosetta emulation
+		return regexpMac64.MatchString(f.OS) || regexpMac32.MatchString(f.OS)
 	}
 	return false
 }
