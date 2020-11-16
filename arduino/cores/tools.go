@@ -148,7 +148,9 @@ var (
 	regexpWindows32  = regexp.MustCompile("i[3456]86-.*(mingw32|cygwin)")
 	regexpMac64Bit   = regexp.MustCompile("x86_64-apple-darwin.*")
 	regexpMac32Bit   = regexp.MustCompile("i[3456]86-apple-darwin.*")
-	regexpArmBSD     = regexp.MustCompile("arm.*-freebsd[0-9]*")
+	regexpFreeBSDArm = regexp.MustCompile("arm.*-freebsd[0-9]*")
+	regexpFreeBSD32  = regexp.MustCompile("i?[3456]86-freebsd[0-9]*")
+	regexpFreeBSD64  = regexp.MustCompile("amd64-freebsd[0-9]*")
 )
 
 func (f *Flavor) isExactMatchWithCurrentMachine() bool {
@@ -180,10 +182,11 @@ func (f *Flavor) isExactMatchWith(osName, osArch string) bool {
 	case "darwin,386":
 		return regexpMac32Bit.MatchString(f.OS)
 	case "freebsd,arm":
-		return regexpArmBSD.MatchString(f.OS)
-	case "freebsd,386", "freebsd,amd64":
-		genericFreeBSDexp := regexp.MustCompile(osArch + "%s-freebsd[0-9]*")
-		return genericFreeBSDexp.MatchString(f.OS)
+		return regexpFreeBSDArm.MatchString(f.OS)
+	case "freebsd,386":
+		return regexpFreeBSD32.MatchString(f.OS)
+	case "freebsd,amd64":
+		return regexpFreeBSD64.MatchString(f.OS)
 	}
 	return false
 }
