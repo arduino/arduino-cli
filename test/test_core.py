@@ -174,10 +174,30 @@ def test_core_search_no_args(run_command, httpserver):
     assert len(platforms) == num_platforms
 
 
-def test_core_updateindex_invalid_url(run_command):
-    url = "http://www.invalid-domain-asjkdakdhadjkh.com/package_example_index.json"
-    result = run_command("core update-index --additional-urls={}".format(url))
+def test_core_updateindex_url_not_found(run_command, httpserver):
+    assert run_command("core update-index")
+
+    # Brings up a local server to fake a failure
+    httpserver.expect_request("/test_index.json").respond_with_data(status=404)
+    url = httpserver.url_for("/test_index.json")
+
+    result = run_command(f"core update-index --additional-urls={url}")
     assert result.failed
+    lines = [l.strip() for l in result.stderr.splitlines()]
+    assert f"Error updating index: downloading index {url}: 404 NOT FOUND" in lines
+
+
+def test_core_updateindex_internal_server_error(run_command, httpserver):
+    assert run_command("core update-index")
+
+    # Brings up a local server to fake a failure
+    httpserver.expect_request("/test_index.json").respond_with_data(status=500)
+    url = httpserver.url_for("/test_index.json")
+
+    result = run_command(f"core update-index --additional-urls={url}")
+    assert result.failed
+    lines = [l.strip() for l in result.stderr.splitlines()]
+    assert f"Error updating index: downloading index {url}: 500 INTERNAL SERVER ERROR" in lines
 
 
 def test_core_install_without_updateindex(run_command):

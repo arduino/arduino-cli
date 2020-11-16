@@ -16,6 +16,7 @@
 package commands
 
 import (
+	"errors"
 	"time"
 
 	"github.com/arduino/arduino-cli/httpclient"
@@ -59,6 +60,10 @@ func Download(d *downloader.Downloader, label string, downloadCB DownloadProgres
 	}, 250*time.Millisecond)
 	if d.Error() != nil {
 		return d.Error()
+	}
+	// The URL is not reachable for some reason
+	if d.Resp.StatusCode >= 400 && d.Resp.StatusCode <= 599 {
+		return errors.New(d.Resp.Status)
 	}
 	downloadCB(&rpc.DownloadProgress{Completed: true})
 	return nil

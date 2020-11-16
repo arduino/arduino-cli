@@ -17,10 +17,14 @@ package instance
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -51,9 +55,13 @@ func getInitResponse() (*rpc.InitResp, error) {
 		return nil, errors.Wrap(err, "creating instance")
 	}
 
-	// Init() succeeded but there were errors loading library indexes,
-	// let's rescan and try again
-	if resp.GetLibrariesIndexError() != "" {
+	// Gets the data directory to verify if library_index.json and package_index.json exist
+	dataDir := paths.New(configuration.Settings.GetString("directories.data"))
+
+	// The library_index.json file doesn't exists, that means the CLI is run for the first time
+	// so we proceed with the first update that downloads the file
+	libraryIndex := dataDir.Join("library_index.json")
+	if libraryIndex.NotExist() {
 		logrus.Warnf("There were errors loading the library index, trying again...")
 
 		// update all indexes
@@ -80,15 +88,11 @@ func getInitResponse() (*rpc.InitResp, error) {
 		resp.PlatformsIndexErrors = rescanResp.PlatformsIndexErrors
 	}
 
-	// Init() succeeded but there were errors loading platform indexes,
-	// let's rescan and try again
-	if resp.GetPlatformsIndexErrors() != nil {
-
-		// log each error
-		for _, err := range resp.GetPlatformsIndexErrors() {
-			logrus.Errorf("Error loading platform index: %v", err)
-		}
-
+	// The package_index.json file doesn't exists, that means the CLI is run for the first time,
+	// similarly to the library update we download that file and all the other package indexes
+	// from additional_urls
+	packageIndex := dataDir.Join("package_index.json")
+	if packageIndex.NotExist() {
 		// update platform index
 		_, err := commands.UpdateIndex(context.Background(),
 			&rpc.UpdateIndexReq{Instance: resp.GetInstance()}, output.ProgressBar())
@@ -124,8 +128,7 @@ func checkPlatformErrors(resp *rpc.InitResp) error {
 		for _, err := range resp.GetPlatformsIndexErrors() {
 			logrus.Errorf("Error loading platform index: %v", err)
 		}
-		// return
-		return errors.New("There were errors loading platform indexes")
+		return fmt.Errorf("error loading platform index: \n%v", strings.Join(resp.GetPlatformsIndexErrors(), "\n"))
 	}
 
 	return nil
