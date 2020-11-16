@@ -42,9 +42,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Download artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: dist
+          # to ensure compatibility with v1
+          path: dist
 
       - name: Import Code-Signing Certificates
         env:
@@ -97,9 +99,11 @@ jobs:
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: dist
+          # to ensure compatibility with v1
+          path: dist
 
       - name: upload
         uses: docker://plugins/s3
