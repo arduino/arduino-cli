@@ -151,11 +151,15 @@ var (
 	regexpArmBSD     = regexp.MustCompile("arm.*-freebsd[0-9]*")
 )
 
+func (f *Flavor) isExactMatchWithCurrentMachine() bool {
+	return f.isExactMatchWith(runtime.GOOS, runtime.GOARCH)
+}
+
 func (f *Flavor) isCompatibleWithCurrentMachine() bool {
 	return f.isCompatibleWith(runtime.GOOS, runtime.GOARCH)
 }
 
-func (f *Flavor) isCompatibleWith(osName, osArch string) bool {
+func (f *Flavor) isExactMatchWith(osName, osArch string) bool {
 	if f.OS == "all" {
 		return true
 	}
@@ -169,10 +173,10 @@ func (f *Flavor) isCompatibleWith(osName, osArch string) bool {
 		return regexpLinux64.MatchString(f.OS)
 	case "linux,386":
 		return regexpLinux32.MatchString(f.OS)
-	case "windows,386", "windows,amd64":
+	case "windows,386":
 		return regexpWindows32.MatchString(f.OS)
 	case "darwin,amd64":
-		return regexpMac32Bit.MatchString(f.OS) || regexpMac64Bit.MatchString(f.OS)
+		return regexpMac64Bit.MatchString(f.OS)
 	case "darwin,386":
 		return regexpMac32Bit.MatchString(f.OS)
 	case "freebsd,arm":
@@ -184,8 +188,27 @@ func (f *Flavor) isCompatibleWith(osName, osArch string) bool {
 	return false
 }
 
+func (f *Flavor) isCompatibleWith(osName, osArch string) bool {
+	if f.isExactMatchWith(osName, osArch) {
+		return true
+	}
+
+	switch osName + "," + osArch {
+	case "windows,amd64":
+		return regexpWindows32.MatchString(f.OS)
+	case "darwin,amd64":
+		return regexpMac32Bit.MatchString(f.OS)
+	}
+	return false
+}
+
 // GetCompatibleFlavour returns the downloadable resource compatible with the running O.S.
 func (tr *ToolRelease) GetCompatibleFlavour() *resources.DownloadResource {
+	for _, flavour := range tr.Flavors {
+		if flavour.isExactMatchWithCurrentMachine() {
+			return flavour.Resource
+		}
+	}
 	for _, flavour := range tr.Flavors {
 		if flavour.isCompatibleWithCurrentMachine() {
 			return flavour.Resource

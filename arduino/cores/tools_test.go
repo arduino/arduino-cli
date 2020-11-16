@@ -52,13 +52,14 @@ func TestFlavorCompatibility(t *testing.T) {
 	}
 
 	type test struct {
-		Flavour   *Flavor
-		Positives []*os
+		Flavour     *Flavor
+		Compatibles []*os
+		ExactMatch  []*os
 	}
 	tests := []*test{
-		{&Flavor{OS: "i686-mingw32"}, []*os{windows32, windows64}},
-		{&Flavor{OS: "i386-apple-darwin11"}, []*os{darwin32, darwin64}},
-		{&Flavor{OS: "x86_64-apple-darwin"}, []*os{darwin64}},
+		{&Flavor{OS: "i686-mingw32"}, []*os{windows32, windows64}, []*os{windows32}},
+		{&Flavor{OS: "i386-apple-darwin11"}, []*os{darwin32, darwin64}, []*os{darwin32}},
+		{&Flavor{OS: "x86_64-apple-darwin"}, []*os{darwin64}, []*os{darwin64}},
 
 		// Raspberry PI, BBB or other ARM based host
 		// PI: "arm-linux-gnueabihf"
@@ -66,21 +67,21 @@ func TestFlavorCompatibility(t *testing.T) {
 		// Ubuntu Mate on PI2: "arm-linux-gnueabihf"
 		// Debian 7.9 on BBB: "arm-linux-gnueabihf"
 		// Raspbian on PI Zero: "arm-linux-gnueabihf"
-		{&Flavor{OS: "arm-linux-gnueabihf"}, []*os{linuxArm, linuxArmbe}},
+		{&Flavor{OS: "arm-linux-gnueabihf"}, []*os{linuxArm, linuxArmbe}, []*os{linuxArm, linuxArmbe}},
 		// Arch-linux on PI2: "armv7l-unknown-linux-gnueabihf"
-		{&Flavor{OS: "armv7l-unknown-linux-gnueabihf"}, []*os{linuxArm, linuxArmbe}},
+		{&Flavor{OS: "armv7l-unknown-linux-gnueabihf"}, []*os{linuxArm, linuxArmbe}, []*os{linuxArm, linuxArmbe}},
 
-		{&Flavor{OS: "i686-linux-gnu"}, []*os{linux32}},
-		{&Flavor{OS: "i686-pc-linux-gnu"}, []*os{linux32}},
-		{&Flavor{OS: "x86_64-linux-gnu"}, []*os{linux64}},
-		{&Flavor{OS: "x86_64-pc-linux-gnu"}, []*os{linux64}},
-		{&Flavor{OS: "aarch64-linux-gnu"}, []*os{linuxArm64}},
-		{&Flavor{OS: "arm64-linux-gnu"}, []*os{linuxArm64}},
+		{&Flavor{OS: "i686-linux-gnu"}, []*os{linux32}, []*os{linux32}},
+		{&Flavor{OS: "i686-pc-linux-gnu"}, []*os{linux32}, []*os{linux32}},
+		{&Flavor{OS: "x86_64-linux-gnu"}, []*os{linux64}, []*os{linux64}},
+		{&Flavor{OS: "x86_64-pc-linux-gnu"}, []*os{linux64}, []*os{linux64}},
+		{&Flavor{OS: "aarch64-linux-gnu"}, []*os{linuxArm64}, []*os{linuxArm64}},
+		{&Flavor{OS: "arm64-linux-gnu"}, []*os{linuxArm64}, []*os{linuxArm64}},
 	}
 
-	check := func(test *test, os *os) {
-		// if the os is in the "positive" set CompatibleWith must return true...
-		for _, positiveOs := range test.Positives {
+	checkCompatible := func(test *test, os *os) {
+		// if the os is in the "positive" set iCompatibleWith must return true...
+		for _, positiveOs := range test.Compatibles {
 			if positiveOs == os {
 				require.True(t, test.Flavour.isCompatibleWith(os.Os, os.Arch), "'%s' tag compatible with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
 				return
@@ -89,10 +90,22 @@ func TestFlavorCompatibility(t *testing.T) {
 		// ...otherwise false
 		require.False(t, test.Flavour.isCompatibleWith(os.Os, os.Arch), "'%s' tag compatible with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
 	}
+	checkExactMatch := func(test *test, os *os) {
+		// if the os is in the "positive" set iCompatibleWith must return true...
+		for _, positiveOs := range test.ExactMatch {
+			if positiveOs == os {
+				require.True(t, test.Flavour.isExactMatchWith(os.Os, os.Arch), "'%s' tag exact match with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
+				return
+			}
+		}
+		// ...otherwise false
+		require.False(t, test.Flavour.isExactMatchWith(os.Os, os.Arch), "'%s' tag exact match with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
+	}
 
 	for _, test := range tests {
 		for _, os := range oses {
-			check(test, os)
+			checkCompatible(test, os)
+			checkExactMatch(test, os)
 		}
 	}
 }
