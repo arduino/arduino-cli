@@ -28,6 +28,9 @@ func SetDefaults(settings *viper.Viper) {
 	settings.SetDefault("logging.level", "info")
 	settings.SetDefault("logging.format", "text")
 
+	// Libraries
+	settings.SetDefault("library.enable_unsafe_install", false)
+
 	// Boards Manager
 	settings.SetDefault("board_manager.additional_urls", []string{})
 
@@ -52,6 +55,7 @@ func SetDefaults(settings *viper.Viper) {
 	settings.AutomaticEnv()
 
 	// Bind env aliases to keep backward compatibility
+	settings.BindEnv("library.enable_unsafe_install", "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL")
 	settings.BindEnv("directories.User", "ARDUINO_SKETCHBOOK_DIR")
 	settings.BindEnv("directories.Downloads", "ARDUINO_DOWNLOADS_DIR")
 	settings.BindEnv("directories.Data", "ARDUINO_DATA_DIR")
