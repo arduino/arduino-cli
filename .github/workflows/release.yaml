@@ -135,7 +135,7 @@ jobs:
           prerelease: ${{ steps.prerelease.outputs.IS_PRE }}
 
       - name: Upload release files on Github
-        uses: svenstaro/upload-release-action@v1-release
+        uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: dist/*
