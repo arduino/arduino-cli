@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: build
         env:
@@ -39,7 +39,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Download artifacts
         uses: actions/download-artifact@v1

@@ -17,7 +17,7 @@ jobs:
         run: git config --global core.autocrlf false
 
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: Install Go
         uses: actions/setup-go@v2
@@ -113,7 +113,7 @@ jobs:
 
     steps:
       - name: checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: build
         shell: bash
