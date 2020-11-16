@@ -155,14 +155,6 @@ var (
 	regexpFreeBSD64  = regexp.MustCompile("amd64-freebsd[0-9]*")
 )
 
-func (f *Flavor) isExactMatchWithCurrentMachine() bool {
-	return f.isExactMatchWith(runtime.GOOS, runtime.GOARCH)
-}
-
-func (f *Flavor) isCompatibleWithCurrentMachine() bool {
-	return f.isCompatibleWith(runtime.GOOS, runtime.GOARCH)
-}
-
 func (f *Flavor) isExactMatchWith(osName, osArch string) bool {
 	if f.OS == "all" {
 		return true
@@ -197,34 +189,42 @@ func (f *Flavor) isExactMatchWith(osName, osArch string) bool {
 	return false
 }
 
-func (f *Flavor) isCompatibleWith(osName, osArch string) bool {
+func (f *Flavor) isCompatibleWith(osName, osArch string) (bool, int) {
 	if f.isExactMatchWith(osName, osArch) {
-		return true
+		return true, 1000
 	}
 
 	switch osName + "," + osArch {
 	case "windows,amd64":
-		return regexpWindows32.MatchString(f.OS)
+		return regexpWindows32.MatchString(f.OS), 10
 	case "darwin,amd64":
-		return regexpMac32.MatchString(f.OS)
+		return regexpMac32.MatchString(f.OS), 10
 	case "darwin,arm64":
 		// Compatibility guaranteed through Rosetta emulation
-		return regexpMac64.MatchString(f.OS) || regexpMac32.MatchString(f.OS)
+		if regexpMac64.MatchString(f.OS) {
+			// Prefer amd64 version if available
+			return true, 20
+		}
+		return regexpMac32.MatchString(f.OS), 10
 	}
-	return false
+
+	return false, 0
 }
 
 // GetCompatibleFlavour returns the downloadable resource compatible with the running O.S.
 func (tr *ToolRelease) GetCompatibleFlavour() *resources.DownloadResource {
+	return tr.GetFlavourCompatibleWith(runtime.GOOS, runtime.GOARCH)
+}
+
+// GetFlavourCompatibleWith returns the downloadable resource compatible with the specified O.S.
+func (tr *ToolRelease) GetFlavourCompatibleWith(osName, osArch string) *resources.DownloadResource {
+	var resource *resources.DownloadResource
+	priority := -1
 	for _, flavour := range tr.Flavors {
-		if flavour.isExactMatchWithCurrentMachine() {
-			return flavour.Resource
+		if comp, p := flavour.isCompatibleWith(osName, osArch); comp && p > priority {
+			resource = flavour.Resource
+			priority = p
 		}
 	}
-	for _, flavour := range tr.Flavors {
-		if flavour.isCompatibleWithCurrentMachine() {
-			return flavour.Resource
-		}
-	}
-	return nil
+	return resource
 }
