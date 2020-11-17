@@ -88,6 +88,21 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 		}
 	}
 
+	ctx.ExecutableSectionsSize = []types.ExecutableSectionSize{
+		{
+			Name:    "text",
+			Size:    textSize,
+			MaxSize: maxTextSize,
+		},
+	}
+	if maxDataSize > 0 {
+		ctx.ExecutableSectionsSize = append(ctx.ExecutableSectionsSize, types.ExecutableSectionSize{
+			Name:    "data",
+			Size:    dataSize,
+			MaxSize: maxDataSize,
+		})
+	}
+
 	if textSize > maxTextSize {
 		logger.Println(constants.LOG_LEVEL_ERROR, constants.MSG_SIZER_TEXT_TOO_BIG)
 		return errors.New("text section exceeds available space in board")

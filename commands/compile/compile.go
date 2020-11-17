@@ -200,6 +200,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 			r.BuildPath = builderCtx.BuildPath.String()
 			r.UsedLibraries = importedLibs
+			r.ExecutableSectionsSize = builderCtx.ExecutableSectionsSize.ToRPCExecutableSectionSizeArray()
 		}
 	}()
 
