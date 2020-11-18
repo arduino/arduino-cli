@@ -252,7 +252,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 		return nil, errors.WithStack(err)
 	}
 	if ctx.CompilationDatabase != nil {
-		ctx.CompilationDatabase.ReplaceEntry(source, command)
+		ctx.CompilationDatabase.Add(source, command)
 	}
 	if !objIsUpToDate && !ctx.OnlyUpdateCompilationDatabase {
 		_, _, err = utils.ExecCommand(ctx, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)

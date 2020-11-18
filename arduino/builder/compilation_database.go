@@ -24,26 +24,29 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
-type compilationCommand struct {
+// CompilationDatabase keeps track of all the compile commands run by the builder
+type CompilationDatabase struct {
+	contents []CompilationCommand
+	filename *paths.Path
+}
+
+// CompilationCommand keeps track of a single run of a compile command
+type CompilationCommand struct {
 	Directory string   `json:"directory"`
 	Arguments []string `json:"arguments"`
 	File      string   `json:"file"`
 }
 
-type CompilationDatabase struct {
-	contents []compilationCommand
-	filename *paths.Path
-}
-
+// NewCompilationDatabase creates an empty CompilationDatabase
 func NewCompilationDatabase(filename *paths.Path) *CompilationDatabase {
 	return &CompilationDatabase{
 		filename: filename,
 	}
 }
 
-func (db *CompilationDatabase) UpdateFile(complete bool) {
-	// TODO: Read any existing file and use its contents for any
-	// kept files, or any files not in db.contents if !complete.
+// SaveToFile save the CompilationDatabase to file as a clangd-compatible compile_commands.json,
+// see https://clang.llvm.org/docs/JSONCompilationDatabase.html
+func (db *CompilationDatabase) SaveToFile() {
 	if jsonContents, err := json.MarshalIndent(db.contents, "", " "); err != nil {
 		fmt.Printf("Error serializing compilation database: %s", err)
 		return
@@ -52,31 +55,27 @@ func (db *CompilationDatabase) UpdateFile(complete bool) {
 	}
 }
 
-func (db *CompilationDatabase) dirForCommand(command *exec.Cmd) string {
+func dirForCommand(command *exec.Cmd) string {
 	// This mimics what Cmd.Run also does: Use Dir if specified,
 	// current directory otherwise
 	if command.Dir != "" {
 		return command.Dir
-	} else {
-		dir, err := os.Getwd()
-		if err != nil {
-			fmt.Printf("Error getting current directory for compilation database: %s", err)
-			return ""
-		}
-		return dir
 	}
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("Error getting current directory for compilation database: %s", err)
+		return ""
+	}
+	return dir
 }
 
-func (db *CompilationDatabase) ReplaceEntry(filename *paths.Path, command *exec.Cmd) {
-	entry := compilationCommand{
-		Directory: db.dirForCommand(command),
+// Add adds a new CompilationDatabase entry
+func (db *CompilationDatabase) Add(target *paths.Path, command *exec.Cmd) {
+	entry := CompilationCommand{
+		Directory: dirForCommand(command),
 		Arguments: command.Args,
-		File:      filename.String(),
+		File:      target.String(),
 	}
 
 	db.contents = append(db.contents, entry)
-}
-
-func (db *CompilationDatabase) KeepEntry(filename *paths.Path) {
-	// TODO
 }
