@@ -80,9 +80,14 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 			properties.Set("archive_file", archive.Base())
 			properties.SetPath("archive_file_path", archive)
 			properties.SetPath("object_file", object)
-			_, _, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_AR_PATTERN, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+
+			command, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_AR_PATTERN, false)
 			if err != nil {
-				return err
+				return errors.WithStack(err)
+			}
+
+			if _, _, err := utils.ExecCommand(ctx, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */); err != nil {
+				return errors.WithStack(err)
 			}
 		}
 
@@ -97,7 +102,12 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 	properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, coreArchiveFilePath.String())
 	properties.Set("object_files", objectFileList)
 
-	_, _, _, err := builder_utils.ExecRecipe(ctx, properties, constants.RECIPE_C_COMBINE_PATTERN, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+	command, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false)
+	if err != nil {
+		return err
+	}
+
+	_, _, err = utils.ExecCommand(ctx, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
 	return err
 }
 

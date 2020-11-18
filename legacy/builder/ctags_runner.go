@@ -16,10 +16,13 @@
 package builder
 
 import (
+	"os/exec"
+
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/ctags"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
@@ -29,21 +32,21 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
 	ctagsTargetFilePath := ctx.CTagsTargetFile
 
-	properties := buildProperties.Clone()
-	properties.Merge(buildProperties.SubTree(constants.BUILD_PROPERTIES_TOOLS_KEY).SubTree(constants.CTAGS))
-	properties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, ctagsTargetFilePath)
+	ctagsProperties := buildProperties.Clone()
+	ctagsProperties.Merge(buildProperties.SubTree(constants.BUILD_PROPERTIES_TOOLS_KEY).SubTree(constants.CTAGS))
+	ctagsProperties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, ctagsTargetFilePath)
 
-	pattern := properties.Get(constants.BUILD_PROPERTIES_PATTERN)
+	pattern := ctagsProperties.Get(constants.BUILD_PROPERTIES_PATTERN)
 	if pattern == constants.EMPTY_STRING {
 		return errors.Errorf("%s pattern is missing", constants.CTAGS)
 	}
 
-	commandLine := properties.ExpandPropsInString(pattern)
-	command, err := utils.PrepareCommand(commandLine)
+	commandLine := ctagsProperties.ExpandPropsInString(pattern)
+	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-
+	command := exec.Command(parts[0], parts[1:]...)
 	sourceBytes, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Ignore /* stderr */)
 	if err != nil {
 		return errors.WithStack(err)
