@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 )
@@ -159,6 +160,32 @@ type Context struct {
 	// Out and Err stream to redirect all Exec commands
 	ExecStdout io.Writer
 	ExecStderr io.Writer
+
+	// Sizer results
+	ExecutableSectionsSize ExecutablesFileSections
+}
+
+// ExecutableSectionSize represents a section of the executable output file
+type ExecutableSectionSize struct {
+	Name    string
+	Size    int
+	MaxSize int
+}
+
+// ExecutablesFileSections is an array of ExecutablesFileSection
+type ExecutablesFileSections []ExecutableSectionSize
+
+// ToRPCExecutableSectionSizeArray transforms this array into a []*rpc.ExecutableSectionSize
+func (s ExecutablesFileSections) ToRPCExecutableSectionSizeArray() []*rpc.ExecutableSectionSize {
+	res := []*rpc.ExecutableSectionSize{}
+	for _, section := range s {
+		res = append(res, &rpc.ExecutableSectionSize{
+			Name:    section.Name,
+			Size:    int64(section.Size),
+			MaxSize: int64(section.MaxSize),
+		})
+	}
+	return res
 }
 
 func (ctx *Context) ExtractBuildOptions() *properties.Map {

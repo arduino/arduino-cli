@@ -17,6 +17,7 @@ import platform
 import tempfile
 import hashlib
 from pathlib import Path
+import simplejson as json
 
 import pytest
 
@@ -54,6 +55,14 @@ def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
     # Build sketch for arduino:avr:uno
     result = run_command(f"compile -b {fqbn} {sketch_path}")
     assert result.ok
+
+    # Build sketch for arduino:avr:uno with json output
+    result = run_command(f"compile -b {fqbn} {sketch_path} --format json")
+    assert result.ok
+    # check is a valid json and contains requested data
+    compile_output = json.loads(result.stdout)
+    assert compile_output["compiler_out"] != ""
+    assert compile_output["compiler_err"] == ""
 
     # Verifies expected binaries have been built
     sketch_path_md5 = hashlib.md5(bytes(sketch_path)).hexdigest().upper()

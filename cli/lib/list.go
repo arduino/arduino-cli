@@ -140,19 +140,22 @@ func (ir installedResult) String() string {
 			location = lib.GetContainerPlatform()
 		}
 
+		available := ""
+		sentence := ""
 		if libMeta.GetRelease() != nil {
-			available := libMeta.GetRelease().GetVersion()
-			if available == "" {
-				available = "-"
-			}
-			sentence := lib.Sentence
-			if sentence == "" {
-				sentence = "-"
-			} else if len(sentence) > 40 {
-				sentence = sentence[:37] + "..."
-			}
-			t.AddRow(name, lib.Version, available, location, sentence)
+			available = libMeta.GetRelease().GetVersion()
+			sentence = lib.Sentence
 		}
+
+		if available == "" {
+			available = "-"
+		}
+		if sentence == "" {
+			sentence = "-"
+		} else if len(sentence) > 40 {
+			sentence = sentence[:37] + "..."
+		}
+		t.AddRow(name, lib.Version, available, location, sentence)
 	}
 
 	return t.Render()
