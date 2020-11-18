@@ -1262,6 +1262,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#executablesectionsize" class="md-nav__link">
+    ExecutableSectionSize
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2251,6 +2258,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#executablesectionsize" class="md-nav__link">
+    ExecutableSectionSize
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2770,6 +2784,7 @@
 <ul>
 <li><a href="#cc.arduino.cli.commands.CompileReq">CompileReq</a></li>
 <li><a href="#cc.arduino.cli.commands.CompileResp">CompileResp</a></li>
+<li><a href="#cc.arduino.cli.commands.ExecutableSectionSize">ExecutableSectionSize</a></li>
 </ul>
 </li>
 </ul>
@@ -4575,6 +4590,56 @@
 <td><a href="#bytes">bytes</a></td>
 <td></td>
 <td>The error output of the compilation process.</td>
+</tr>
+<tr>
+<td>build_path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The compiler build path</td>
+</tr>
+<tr>
+<td>used_libraries</td>
+<td><a href="#cc.arduino.cli.commands.Library">Library</a></td>
+<td>repeated</td>
+<td>The libraries used in the build</td>
+</tr>
+<tr>
+<td>executable_sections_size</td>
+<td><a href="#cc.arduino.cli.commands.ExecutableSectionSize">ExecutableSectionSize</a></td>
+<td>repeated</td>
+<td>The size of the executable split by sections</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.ExecutableSectionSize"></a></p>
+<h3 id="executablesectionsize">ExecutableSectionSize<a class="headerlink" href="#executablesectionsize" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>size</td>
+<td><a href="#int64">int64</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>maxSize</td>
+<td><a href="#int64">int64</a></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
