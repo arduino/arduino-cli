@@ -42,8 +42,8 @@ func initInitCommand() *cobra.Command {
 		Long:  "Creates or updates the configuration file in the data directory or custom directory with the current configuration settings.",
 		Example: "" +
 			"  # Writes current configuration to the configuration file in the data directory.\n" +
-			"  " + os.Args[0] + " config init" +
-			"  " + os.Args[0] + " config init --dest-dir /home/user/MyDirectory" +
+			"  " + os.Args[0] + " config init\n" +
+			"  " + os.Args[0] + " config init --dest-dir /home/user/MyDirectory\n" +
 			"  " + os.Args[0] + " config init --dest-file /home/user/MyDirectory/my_settings.yaml",
 		Args: cobra.NoArgs,
 		Run:  runInitCommand,

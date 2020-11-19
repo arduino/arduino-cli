@@ -29,8 +29,12 @@ func NewCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " config init",
 	}
 
+	configCommand.AddCommand(initAddCommand())
+	configCommand.AddCommand(initDeleteCommand())
 	configCommand.AddCommand(initDumpCmd())
 	configCommand.AddCommand(initInitCommand())
+	configCommand.AddCommand(initRemoveCommand())
+	configCommand.AddCommand(initSetCommand())
 
 	return configCommand
 }
