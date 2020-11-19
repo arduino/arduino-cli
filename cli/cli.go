@@ -104,6 +104,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be {text|json}.")
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", "The custom config file (if not specified the default will be used).")
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, "Comma-separated list of additional URLs for the Boards Manager.")
+	cmd.PersistentFlags().StringSlice("additional-paths", []string{}, "Comma-separated list of additional file paths for the Boards Manager.")
 	configuration.BindFlags(cmd, configuration.Settings)
 }
 

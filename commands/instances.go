@@ -203,27 +203,19 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 	json_paths := []string{}
 	json_paths = append(json_paths, configuration.Settings.GetStringSlice("board_manager.additional_paths")...)
 	for _, x := range json_paths {
+		logrus.Info("JSON_PATH: ", x)
 		//path_to_json, err := paths.New(x).Abs()
 		path_to_json := indexpath.Join(x)
 
-		if _, err := packageindex.LoadIndex(path_to_json); err != nil {
+		if _, err := packageindex.LoadIndexNoSign(path_to_json, false); err != nil {
 			return nil, fmt.Errorf("invalid package index in %s: %s", path_to_json, err)
 		}
 
-		if err := indexpath.MkdirAll(); err != nil {
-			return nil, fmt.Errorf("can't create data directory %s: %s", indexpath, err)
-		}
-
-		//may not be necessary
-		//coreIndexPath := indexpath.Join(path.Base(path_to_json.Path))
-		//if err := tmp.CopyTo(coreIndexPath); err != nil {
-		//	return nil, fmt.Errorf("saving downloaded index %s: %s", path_to_json, err)
-		//}
 	}
 	urls := []string{globals.DefaultIndexURL}
 	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
 	for _, u := range urls {
-		logrus.Info("URL: %s", u)
+		logrus.Info("URL: ", u)
 		URL, err := url.Parse(u)
 		if err != nil {
 			logrus.Warnf("unable to parse additional URL: %s", u)
@@ -259,7 +251,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 		// Check for signature
 		var tmpSig *paths.Path
 		var coreIndexSigPath *paths.Path
-		if URL.Hostname() == "downloads.WRONG.net" {
+		if URL.Hostname() == "downloads.arduino.cc" {
 			URLSig, err := url.Parse(URL.String())
 			if err != nil {
 				return nil, fmt.Errorf("parsing url for index signature check: %s", err)
