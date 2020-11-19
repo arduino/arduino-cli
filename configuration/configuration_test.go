@@ -89,6 +89,7 @@ func TestInit(t *testing.T) {
 	require.Equal(t, "text", settings.GetString("logging.format"))
 
 	require.Empty(t, settings.GetStringSlice("board_manager.additional_urls"))
+	require.Empty(t, settings.GetStringSlice("board_manager.additional_paths"))
 
 	require.NotEmpty(t, settings.GetString("directories.Data"))
 	require.NotEmpty(t, settings.GetString("directories.Downloads"))

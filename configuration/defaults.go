@@ -33,6 +33,7 @@ func SetDefaults(settings *viper.Viper) {
 
 	// Boards Manager
 	settings.SetDefault("board_manager.additional_urls", []string{})
+	settings.SetDefault("board_manager.additional_paths", []string{})
 
 	// arduino directories
 	settings.SetDefault("directories.Data", getDefaultArduinoDataDir())

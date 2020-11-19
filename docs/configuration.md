@@ -2,6 +2,7 @@
 
 - `board_manager`
   - `additional_urls` - the URLs to any additional Boards Manager package index files needed for your boards platforms.
+  - `additional_paths` - the file paths to any additional Boards Manager package index files needed for your boards platforms.
 - `daemon` - options related to running Arduino CLI as a [gRPC] server.
   - `port` - TCP port used for gRPC client connections.
 - `directories` - directories used by Arduino CLI.
@@ -64,6 +65,12 @@ Setting an additional Boards Manager URL using the `ARDUINO_BOARD_MANAGER_ADDITI
 
 ```sh
 $ export ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS=https://downloads.arduino.cc/packages/package_staging_index.json
+```
+
+Setting an additional Boards Manager URL using the `ARDUINO_BOARD_MANAGER_ADDITIONAL_PATHS` environment variable:
+
+```sh
+$ export ARDUINO_BOARD_MANAGER_ADDITIONAL_PATHS=packages/package_staging_index.json
 ```
 
 ### Configuration file
