@@ -26,8 +26,8 @@ import (
 
 // CompilationDatabase keeps track of all the compile commands run by the builder
 type CompilationDatabase struct {
-	contents []CompilationCommand
-	filename *paths.Path
+	Contents []CompilationCommand
+	File     *paths.Path
 }
 
 // CompilationCommand keeps track of a single run of a compile command
@@ -40,17 +40,17 @@ type CompilationCommand struct {
 // NewCompilationDatabase creates an empty CompilationDatabase
 func NewCompilationDatabase(filename *paths.Path) *CompilationDatabase {
 	return &CompilationDatabase{
-		filename: filename,
+		File: filename,
 	}
 }
 
 // SaveToFile save the CompilationDatabase to file as a clangd-compatible compile_commands.json,
 // see https://clang.llvm.org/docs/JSONCompilationDatabase.html
 func (db *CompilationDatabase) SaveToFile() {
-	if jsonContents, err := json.MarshalIndent(db.contents, "", " "); err != nil {
+	if jsonContents, err := json.MarshalIndent(db.Contents, "", " "); err != nil {
 		fmt.Printf("Error serializing compilation database: %s", err)
 		return
-	} else if err := db.filename.WriteFile(jsonContents); err != nil {
+	} else if err := db.File.WriteFile(jsonContents); err != nil {
 		fmt.Printf("Error writing compilation database: %s", err)
 	}
 }
@@ -77,5 +77,5 @@ func (db *CompilationDatabase) Add(target *paths.Path, command *exec.Cmd) {
 		File:      target.String(),
 	}
 
-	db.contents = append(db.contents, entry)
+	db.Contents = append(db.Contents, entry)
 }
