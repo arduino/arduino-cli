@@ -33,7 +33,8 @@ type CompilationDatabase struct {
 // CompilationCommand keeps track of a single run of a compile command
 type CompilationCommand struct {
 	Directory string   `json:"directory"`
-	Arguments []string `json:"arguments"`
+	Command   string   `json:"command,omitempty"`
+	Arguments []string `json:"arguments,omitempty"`
 	File      string   `json:"file"`
 }
 
@@ -42,6 +43,19 @@ func NewCompilationDatabase(filename *paths.Path) *CompilationDatabase {
 	return &CompilationDatabase{
 		File: filename,
 	}
+}
+
+// LoadCompilationDatabase reads a compilation database from a file
+func LoadCompilationDatabase(file *paths.Path) (*CompilationDatabase, error) {
+	f, err := file.ReadFile()
+	if err != nil {
+		return nil, err
+	}
+	res := &CompilationDatabase{
+		File:     file,
+		Contents: []CompilationCommand{},
+	}
+	return res, json.Unmarshal(f, &res.Contents)
 }
 
 // SaveToFile save the CompilationDatabase to file as a clangd-compatible compile_commands.json,
