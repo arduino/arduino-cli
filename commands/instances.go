@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
+	"os"
 	"path"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
@@ -202,16 +203,25 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 	indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
 	json_paths := []string{}
 	json_paths = append(json_paths, configuration.Settings.GetStringSlice("board_manager.additional_paths")...)
+
 	for _, x := range json_paths {
 		logrus.Info("JSON_PATH: ", x)
-		//path_to_json, err := paths.New(x).Abs()
-		path_to_json := indexpath.Join(x)
 
-		if _, err := packageindex.LoadIndexNoSign(path_to_json, false); err != nil {
+		path_to_json, _ := paths.New(x).Abs()
+
+		if _, err := packageindex.LoadIndexNoSign(path_to_json); err != nil {
 			return nil, fmt.Errorf("invalid package index in %s: %s", path_to_json, err)
+		} else {
+			fi, _ := os.Stat(x)
+			downloadCB(&rpc.DownloadProgress{
+				File:      "Updating index: " + path_to_json.Base(),
+				TotalSize: fi.Size(),
+			})
+			downloadCB(&rpc.DownloadProgress{Completed: true})
 		}
 
 	}
+
 	urls := []string{globals.DefaultIndexURL}
 	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
 	for _, u := range urls {
@@ -662,12 +672,12 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 			}
 		}
 
-		indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
+		//indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
 		json_paths := []string{}
 		json_paths = append(json_paths, configuration.Settings.GetStringSlice("board_manager.additional_paths")...)
 		for _, x := range json_paths {
 			//path_to_json, err := paths.New(x).Abs()
-			path_to_json := indexpath.Join(x)
+			path_to_json, _ := paths.New(x).Abs()
 
 			_, err := res.Pm.LoadPackageIndexFromFile(path_to_json)
 			if err != nil {
