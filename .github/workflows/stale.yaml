@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Mark stale
         if: github.event_name == 'schedule'
-        uses: actions/github-script@0.2.0
+        uses: actions/github-script@v3
         with:
           github-token: ${{github.token}}
           script: |
@@ -47,7 +47,7 @@ jobs:
 
       - name: Mark active
         if: github.event_name == 'issue_comment'
-        uses: actions/github-script@0.2.0
+        uses: actions/github-script@v3
         with:
           github-token: ${{github.token}}
           script: |
@@ -75,7 +75,7 @@ jobs:
 
       - name: Close stale
         if: github.event_name == 'schedule'
-        uses: actions/github-script@0.2.0
+        uses: actions/github-script@v3
         with:
           github-token: ${{github.token}}
           script: |

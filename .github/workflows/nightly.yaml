@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v1
+        with:
+          fetch-depth: 0
 
       - name: build
         env:
@@ -28,7 +30,7 @@ jobs:
         run: goreleaser --snapshot
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: dist
           path: dist
@@ -39,12 +41,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Download artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: dist
+          # to ensure compatibility with v1
+          path: dist
 
       - name: Import Code-Signing Certificates
         env:
@@ -86,7 +90,7 @@ jobs:
           perl -pi -w -e "s/.*${PACKAGE_FILENAME}/${CLI_CHECKSUM}  ${PACKAGE_FILENAME}/g;" dist/*-checksums.txt
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: dist
           path: dist
@@ -97,9 +101,11 @@ jobs:
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: dist
+          # to ensure compatibility with v1
+          path: dist
 
       - name: upload
         uses: docker://plugins/s3

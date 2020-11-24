@@ -18,12 +18,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+        with:
+          fetch-depth: 0
 
       - name: Build
         run: goreleaser
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: dist
           path: dist
@@ -34,12 +36,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Download artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: dist
+          # to ensure compatibility with v1
+          path: dist
 
       - name: Import Code-Signing Certificates
         env:
@@ -81,7 +85,7 @@ jobs:
           perl -pi -w -e "s/.*arduino-cli_${TAG}_macOS_64bit.tar.gz/${CLI_CHECKSUM}  arduino-cli_${TAG}_macOS_64bit.tar.gz/g;" dist/*-checksums.txt
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: dist
           path: dist
@@ -92,12 +96,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Download artifact
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: dist
+          # to ensure compatibility with v1
+          path: dist
 
       - name: Read CHANGELOG
         id: changelog
@@ -120,7 +126,7 @@ jobs:
 
       - name: Create Github Release
         id: create_release
-        uses: actions/create-release@master
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -131,7 +137,7 @@ jobs:
           prerelease: ${{ steps.prerelease.outputs.IS_PRE }}
 
       - name: Upload release files on Github
-        uses: svenstaro/upload-release-action@v1-release
+        uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: dist/*
