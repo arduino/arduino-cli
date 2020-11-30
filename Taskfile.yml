@@ -202,15 +202,19 @@ vars:
   # build vars
   COMMIT:
     sh: echo ${TRAVIS_COMMIT:-`git log -n 1 --format=%h`}
+  TIMESTAMP:
+    sh: echo "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
   LDFLAGS: >
-    -ldflags '-X github.com/arduino/arduino-cli/version.commit={{.COMMIT}}'
+    -ldflags '-X github.com/arduino/arduino-cli/version.commit={{.COMMIT}}
+    -X github.com/arduino/arduino-cli/version.date={{.TIMESTAMP}}'
   # test vars
   GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
   TEST_VERSIONSTRING: "0.0.0-test.preview"
   TEST_COMMIT: "deadbeef"
   TEST_LDFLAGS: >
     -ldflags  '-X github.com/arduino/arduino-cli/version.versionString={{.TEST_VERSIONSTRING}}
-    -X github.com/arduino/arduino-cli/version.commit={{.TEST_COMMIT}}'
+    -X github.com/arduino/arduino-cli/version.commit={{.TEST_COMMIT}}
+    -X github.com/arduino/arduino-cli/version.date={{.TIMESTAMP}}'
   # check-lint vars
   GOLINTBIN:
     sh: go list -f {{"{{"}}".Target{{"}}"}}" golang.org/x/lint/golint

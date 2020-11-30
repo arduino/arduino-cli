@@ -31,7 +31,10 @@ builds:
     goarch:
       - amd64
     ldflags:
-      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - -s -w
+      - -X github.com/arduino/arduino-cli/version.versionString={{.Tag}}
+      - -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - -X github.com/arduino/arduino-cli/version.date={{.Date}}
   - # ARM
     id: arduino_cli_arm
     binary: arduino-cli
@@ -45,7 +48,10 @@ builds:
     goarm:
       - 6
     ldflags:
-      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - -s -w
+      - -X github.com/arduino/arduino-cli/version.versionString={{.Tag}}
+      - -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - -X github.com/arduino/arduino-cli/version.date={{.Date}}
       - "-extldflags '-static'"
   - # ARMv7
     id: arduino_cli_armv7
@@ -60,7 +66,10 @@ builds:
     goarm:
       - 7
     ldflags:
-      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - -s -w
+      - -X github.com/arduino/arduino-cli/version.versionString={{.Tag}}
+      - -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - -X github.com/arduino/arduino-cli/version.date={{.Date}}
       - "-extldflags '-static'"
   - # ARM64
     id: arduino_cli_arm64
@@ -73,7 +82,10 @@ builds:
     goarch:
       - arm64
     ldflags:
-      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - -s -w
+      - -X github.com/arduino/arduino-cli/version.versionString={{.Tag}}
+      - -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - -X github.com/arduino/arduino-cli/version.date={{.Date}}
       - "-extldflags '-static'"
   - # All the other platforms
     id: arduino_cli
@@ -87,7 +99,10 @@ builds:
       - amd64
       - 386
     ldflags:
-      - -s -w -X github.com/arduino/arduino-cli/version.versionString={{.Tag}} -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - -s -w
+      - -X github.com/arduino/arduino-cli/version.versionString={{.Tag}}
+      - -X github.com/arduino/arduino-cli/version.commit={{ .ShortCommit }}
+      - -X github.com/arduino/arduino-cli/version.date={{.Date}}
       - "-extldflags '-static'"
 
 archives:
