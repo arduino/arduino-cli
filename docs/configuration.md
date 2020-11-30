@@ -9,6 +9,10 @@
   - `downloads` - directory used to stage downloaded archives during Boards/Library Manager installations.
   - `user` - the equivalent of the Arduino IDE's ["sketchbook" directory][sketchbook directory]. Library Manager
     installations are made to the `libraries` subdirectory of the user directory.
+- `library` - configuration options relating to Arduino libraries.
+  - `enable_unsafe_install` - set to `true` to enable the use of the `--git-url` and `--zip-file` flags with
+    [`arduino-cli lib install`][arduino cli lib install]. These are considered "unsafe" installation methods because
+    they allow installing files that have not passed through the Library Manager submission process.
 - `logging` - configuration options for Arduino CLI's logs.
   - `file` - path to the file where logs will be written.
   - `format` - output format for the logs. Allowed values are `text` or `json`.
@@ -126,6 +130,7 @@ additional_urls = [ "https://downloads.arduino.cc/packages/package_staging_index
 
 [grpc]: https://grpc.io
 [sketchbook directory]: sketch-specification.md#sketchbook
+[arduino cli lib install]: commands/arduino-cli_lib_install.md
 [arduino-cli config dump]: commands/arduino-cli_config_dump.md
 [arduino cli command reference]: commands/arduino-cli.md
 [arduino-cli global flags]: commands/arduino-cli_config.md#options-inherited-from-parent-commands
