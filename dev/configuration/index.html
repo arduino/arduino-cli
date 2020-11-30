@@ -1237,6 +1237,12 @@
   installations are made to the <code>libraries</code> subdirectory of the user directory.</li>
 </ul>
 </li>
+<li><code>library</code> - configuration options relating to Arduino libraries.<ul>
+<li><code>enable_unsafe_install</code> - set to <code>true</code> to enable the use of the <code>--git-url</code> and <code>--zip-file</code> flags with
+  <a href="../commands/arduino-cli_lib_install/"><code>arduino-cli lib install</code></a>. These are considered "unsafe" installation methods because
+  they allow installing files that have not passed through the Library Manager submission process.</li>
+</ul>
+</li>
 <li><code>logging</code> - configuration options for Arduino CLI's logs.<ul>
 <li><code>file</code> - path to the file where logs will be written.</li>
 <li><code>format</code> - output format for the logs. Allowed values are <code>text</code> or <code>json</code>.</li>
