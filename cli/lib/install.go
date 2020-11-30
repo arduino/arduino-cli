@@ -17,10 +17,13 @@ package lib
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
@@ -41,10 +44,8 @@ func initInstallCommand() *cobra.Command {
 		Run:  runInstallCommand,
 	}
 	installCommand.Flags().BoolVar(&installFlags.noDeps, "no-deps", false, "Do not install dependencies.")
-	if configuration.Settings.GetBool("library.enable_unsafe_install") {
-		installCommand.Flags().BoolVar(&installFlags.gitURL, "git-url", false, "Enter git url for libraries hosted on repositories")
-		installCommand.Flags().BoolVar(&installFlags.zipPath, "zip-path", false, "Enter a path to zip file")
-	}
+	installCommand.Flags().BoolVar(&installFlags.gitURL, "git-url", false, "Enter git url for libraries hosted on repositories")
+	installCommand.Flags().BoolVar(&installFlags.zipPath, "zip-path", false, "Enter a path to zip file")
 	return installCommand
 }
 
@@ -58,7 +59,16 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
 
 	if installFlags.zipPath || installFlags.gitURL {
-		feedback.Print("--git-url and --zip-path flags are dangerous, use it at your own risk.")
+		if !configuration.Settings.GetBool("library.enable_unsafe_install") {
+			documentationURL := "https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys"
+			if !strings.Contains(globals.VersionInfo.VersionString, "git") {
+				split := strings.Split(globals.VersionInfo.VersionString, ".")
+				documentationURL = fmt.Sprintf("https://arduino.github.io/arduino-cli/%s.%s/configuration/#configuration-keys", split[0], split[1])
+			}
+			feedback.Errorf("--git-url and --zip-path are disabled by default, for more information see: %v", documentationURL)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		feedback.Print("--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
 	}
 
 	if installFlags.zipPath {

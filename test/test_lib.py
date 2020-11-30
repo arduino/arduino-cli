@@ -173,13 +173,13 @@ def test_install_git_url_and_zip_path_flags_visibility(run_command, data_dir, do
     git_url = "https://github.com/arduino-libraries/WiFi101.git"
     res = run_command(f"lib install --git-url {git_url}")
     assert res.failed
-    assert "Error: unknown flag: --git-url" in res.stderr
+    assert "--git-url and --zip-path are disabled by default, for more information see:" in res.stderr
 
     assert run_command("lib download AudioZero@1.0.0")
     zip_path = Path(downloads_dir, "libraries", "AudioZero-1.0.0.zip")
     res = run_command(f"lib install --zip-path {zip_path}")
     assert res.failed
-    assert "Error: unknown flag: --zip-path" in res.stderr
+    assert "--git-url and --zip-path are disabled by default, for more information see:" in res.stderr
 
     env = {
         "ARDUINO_DATA_DIR": data_dir,
@@ -190,11 +190,11 @@ def test_install_git_url_and_zip_path_flags_visibility(run_command, data_dir, do
     # Verifies installation is successful when flags are enabled with env var
     res = run_command(f"lib install --git-url {git_url}", custom_env=env)
     assert res.ok
-    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
+    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
     res = run_command(f"lib install --zip-path {zip_path}", custom_env=env)
     assert res.ok
-    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
+    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
     # Uninstall libraries to install them again
     assert run_command("lib uninstall WiFi101 AudioZero")
@@ -204,11 +204,11 @@ def test_install_git_url_and_zip_path_flags_visibility(run_command, data_dir, do
 
     res = run_command(f"lib install --git-url {git_url}")
     assert res.ok
-    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
+    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
     res = run_command(f"lib install --zip-path {zip_path}")
     assert res.ok
-    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
+    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
 
 def test_install_with_git_url(run_command, data_dir, downloads_dir):
@@ -224,11 +224,11 @@ def test_install_with_git_url(run_command, data_dir, downloads_dir):
     # Test git-url library install
     res = run_command("lib install --git-url https://github.com/arduino-libraries/WiFi101.git")
     assert res.ok
-    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
+    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
     # Test failing-install as repository already exists
     res = run_command("lib install --git-url https://github.com/arduino-libraries/WiFi101.git")
-    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
+    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
     assert "Error installing Git Library: repository already exists" in res.stderr
 
 
@@ -249,7 +249,7 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     # Test zip-path install
     res = run_command(f"lib install --zip-path {zip_path}")
     assert res.ok
-    assert "--git-url and --zip-path flags are dangerous, use it at your own risk." in res.stdout
+    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
 
 def test_update_index(run_command):
