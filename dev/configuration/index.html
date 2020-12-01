@@ -1224,6 +1224,8 @@
 <ul>
 <li><code>board_manager</code><ul>
 <li><code>additional_urls</code> - the URLs to any additional Boards Manager package index files needed for your boards platforms.</li>
+<li><code>additional_paths</code> - the absolute file paths to any additional Boards Manager package index files needed for your
+  boards platforms.</li>
 </ul>
 </li>
 <li><code>daemon</code> - options related to running Arduino CLI as a <a href="https://grpc.io">gRPC</a> server.<ul>
@@ -1283,6 +1285,9 @@ can use the <a href="https://docs.microsoft.com/en-us/windows-server/administrat
 <p>Setting an additional Boards Manager URL using the <code>ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</code> environment variable:</p>
 <div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</span><span class="o">=</span>https://downloads.arduino.cc/packages/package_staging_index.json
 </code></pre></div>
+<p>Setting an additional Boards Manager file using the <code>ARDUINO_BOARD_MANAGER_ADDITIONAL_PATHS</code> environment variable:</p>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">ARDUINO_BOARD_MANAGER_ADDITIONAL_PATHS</span><span class="o">=</span>/path/to/your/package_staging_index.json
+</code></pre></div>
 <h3 id="configuration-file">Configuration file<a class="headerlink" href="#configuration-file" title="Permanent link">&para;</a></h3>
 <p><a href="../commands/arduino-cli_config_init/"><code>arduino-cli config init</code></a> creates or updates a configuration file with the current
 configuration settings.</p>
@@ -1324,6 +1329,15 @@ combined.</p>
 <p>Doing the same using a TOML format file:</p>
 <div class="highlight"><pre><span></span><code><span class="k">[board_manager]</span>
 <span class="n">additional_urls</span> <span class="o">=</span> <span class="k">[ &quot;https://downloads.arduino.cc/packages/package_staging_index.json&quot; ]</span>
+</code></pre></div>
+<p>Setting an additional Boards Manager File using a YAML format configuration file:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">board_manager</span><span class="p">:</span>
+  <span class="nt">additional_paths</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/your/package_staging_index.json</span>
+</code></pre></div>
+<p>Doing the same using a TOML format file:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[board_manager]</span>
+<span class="n">additional_paths</span> <span class="o">=</span> <span class="k">[ &quot;/path/to/your/package_staging_index.json&quot; ]</span>
 </code></pre></div>
                 
                   
