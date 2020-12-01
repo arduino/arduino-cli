@@ -201,24 +201,22 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 	}
 
 	indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
-	json_paths := []string{}
-	json_paths = append(json_paths, configuration.Settings.GetStringSlice("board_manager.additional_paths")...)
 
-	for _, x := range json_paths {
-		logrus.Info("JSON_PATH: ", x)
+	for _, x := range configuration.Settings.GetStringSlice("board_manager.additional_paths") {
+		logrus.Info("JSON PATH: ", x)
 
-		path_to_json, _ := paths.New(x).Abs()
+		pathJSON, _ := paths.New(x).Abs()
 
-		if _, err := packageindex.LoadIndexNoSign(path_to_json); err != nil {
-			return nil, fmt.Errorf("invalid package index in %s: %s", path_to_json, err)
-		} else {
-			fi, _ := os.Stat(x)
-			downloadCB(&rpc.DownloadProgress{
-				File:      "Updating index: " + path_to_json.Base(),
-				TotalSize: fi.Size(),
-			})
-			downloadCB(&rpc.DownloadProgress{Completed: true})
+		if _, err := packageindex.LoadIndexNoSign(pathJSON); err != nil {
+			return nil, fmt.Errorf("invalid package index in %s: %s", pathJSON, err)
 		}
+
+		fi, _ := os.Stat(x)
+		downloadCB(&rpc.DownloadProgress{
+			File:      "Updating index: " + pathJSON.Base(),
+			TotalSize: fi.Size(),
+		})
+		downloadCB(&rpc.DownloadProgress{Completed: true})
 
 	}
 
@@ -672,14 +670,10 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 			}
 		}
 
-		//indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
-		json_paths := []string{}
-		json_paths = append(json_paths, configuration.Settings.GetStringSlice("board_manager.additional_paths")...)
-		for _, x := range json_paths {
-			//path_to_json, err := paths.New(x).Abs()
-			path_to_json, _ := paths.New(x).Abs()
+		for _, x := range configuration.Settings.GetStringSlice("board_manager.additional_paths") {
+			pathJSON, _ := paths.New(x).Abs()
 
-			_, err := res.Pm.LoadPackageIndexFromFile(path_to_json)
+			_, err := res.Pm.LoadPackageIndexFromFile(pathJSON)
 			if err != nil {
 				res.PlatformIndexErrors = append(res.PlatformIndexErrors, err.Error())
 			}
