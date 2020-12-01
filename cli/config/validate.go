@@ -21,18 +21,19 @@ import (
 )
 
 var validMap = map[string]reflect.Kind{
-	"board_manager.additional_urls": reflect.Slice,
-	"daemon.port":                   reflect.String,
-	"directories.data":              reflect.String,
-	"directories.downloads":         reflect.String,
-	"directories.user":              reflect.String,
-	"library.enable_unsafe_install": reflect.Bool,
-	"logging.file":                  reflect.String,
-	"logging.format":                reflect.String,
-	"logging.level":                 reflect.String,
-	"sketch.always_export_binaries": reflect.Bool,
-	"telemetry.addr":                reflect.String,
-	"telemetry.enabled":             reflect.Bool,
+	"board_manager.additional_urls":  reflect.Slice,
+	"board_manager.additional_paths": reflect.Slice,
+	"daemon.port":                    reflect.String,
+	"directories.data":               reflect.String,
+	"directories.downloads":          reflect.String,
+	"directories.user":               reflect.String,
+	"library.enable_unsafe_install":  reflect.Bool,
+	"logging.file":                   reflect.String,
+	"logging.format":                 reflect.String,
+	"logging.level":                  reflect.String,
+	"sketch.always_export_binaries":  reflect.Bool,
+	"telemetry.addr":                 reflect.String,
+	"telemetry.enabled":              reflect.Bool,
 }
 
 func typeOf(key string) (reflect.Kind, error) {
