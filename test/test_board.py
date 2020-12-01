@@ -442,7 +442,7 @@ def test_board_details(run_command):
     # Test board listall with and without showing hidden elements
     result = run_command("board listall MIPS --format json")
     assert result.ok
-    assert result.stdout == "{}"
+    assert result.stdout == "{}\n"
 
     result = run_command("board listall MIPS -a --format json")
     assert result.ok

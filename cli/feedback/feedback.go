@@ -118,7 +118,7 @@ func (fb *Feedback) printJSON(v interface{}) {
 	if d, err := json.MarshalIndent(v, "", "  "); err != nil {
 		fb.Errorf("Error during JSON encoding of the output: %v", err)
 	} else {
-		fmt.Fprint(fb.out, string(d))
+		fmt.Fprintf(fb.out, "%v\n", string(d))
 	}
 }
 
