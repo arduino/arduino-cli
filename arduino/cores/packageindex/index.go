@@ -313,7 +313,7 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	return &index, nil
 }
 
-// LoadIndex reads a package_index.json from a file and returns the corresponding Index structure.
+// LoadIndexNoSign reads a package_index.json from a file and returns the corresponding Index structure.
 func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 	buff, err := jsonIndexFile.ReadFile()
 	if err != nil {
