@@ -2,7 +2,8 @@
 
 - `board_manager`
   - `additional_urls` - the URLs to any additional Boards Manager package index files needed for your boards platforms.
-  - `additional_paths` - the file paths to any additional Boards Manager package index files needed for your boards platforms.
+  - `additional_paths` - the absolute file paths to any additional Boards Manager package index files needed for your
+    boards platforms.
 - `daemon` - options related to running Arduino CLI as a [gRPC] server.
   - `port` - TCP port used for gRPC client connections.
 - `directories` - directories used by Arduino CLI.
@@ -67,10 +68,10 @@ Setting an additional Boards Manager URL using the `ARDUINO_BOARD_MANAGER_ADDITI
 $ export ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS=https://downloads.arduino.cc/packages/package_staging_index.json
 ```
 
-Setting an additional Boards Manager URL using the `ARDUINO_BOARD_MANAGER_ADDITIONAL_PATHS` environment variable:
+Setting an additional Boards Manager file using the `ARDUINO_BOARD_MANAGER_ADDITIONAL_PATHS` environment variable:
 
 ```sh
-$ export ARDUINO_BOARD_MANAGER_ADDITIONAL_PATHS=packages/package_staging_index.json
+$ export ARDUINO_BOARD_MANAGER_ADDITIONAL_PATHS=/path/to/your/package_staging_index.json
 ```
 
 ### Configuration file
@@ -133,6 +134,21 @@ Doing the same using a TOML format file:
 ```toml
 [board_manager]
 additional_urls = [ "https://downloads.arduino.cc/packages/package_staging_index.json" ]
+```
+
+Setting an additional Boards Manager File using a YAML format configuration file:
+
+```yaml
+board_manager:
+  additional_paths:
+    - /path/to/your/package_staging_index.json
+```
+
+Doing the same using a TOML format file:
+
+```toml
+[board_manager]
+additional_paths = [ "/path/to/your/package_staging_index.json" ]
 ```
 
 [grpc]: https://grpc.io
