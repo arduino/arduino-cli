@@ -76,6 +76,7 @@ func BindFlags(cmd *cobra.Command, settings *viper.Viper) {
 	settings.BindPFlag("logging.file", cmd.Flag("log-file"))
 	settings.BindPFlag("logging.format", cmd.Flag("log-format"))
 	settings.BindPFlag("board_manager.additional_urls", cmd.Flag("additional-urls"))
+	settings.BindPFlag("board_manager.additional_paths", cmd.Flag("additional-paths"))
 }
 
 // getDefaultArduinoDataDir returns the full path to the default arduino folder
