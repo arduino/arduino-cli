@@ -426,4 +426,4 @@ If your PR doesn't need to be included in the changelog, please start the commit
 [npm-install-docs]: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
 [poetry-website]: https://python-poetry.org/
 [poetry-docs]: https://python-poetry.org/docs/
-[upgrading-file]: ../UPGRADING
+[upgrading-file]: UPGRADING.md
