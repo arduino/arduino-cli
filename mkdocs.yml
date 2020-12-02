@@ -77,6 +77,10 @@ nav:
       - config: commands/arduino-cli_config.md
       - config dump: commands/arduino-cli_config_dump.md
       - config init: commands/arduino-cli_config_init.md
+      - config add: commands/arduino-cli_config_add.md
+      - config delete: commands/arduino-cli_config_delete.md
+      - config remove: commands/arduino-cli_config_remove.md
+      - config set: commands/arduino-cli_config_set.md
       - core: commands/arduino-cli_core.md
       - core download: commands/arduino-cli_core_download.md
       - core install: commands/arduino-cli_core_install.md
@@ -90,6 +94,7 @@ nav:
       - lib: commands/arduino-cli_lib.md
       - lib deps: commands/arduino-cli_lib_deps.md
       - lib download: commands/arduino-cli_lib_download.md
+      - lib examples: commands/arduino-cli_lib_examples.md
       - lib install: commands/arduino-cli_lib_install.md
       - lib list: commands/arduino-cli_lib_list.md
       - lib search: commands/arduino-cli_lib_search.md
@@ -98,6 +103,7 @@ nav:
       - lib upgrade: commands/arduino-cli_lib_upgrade.md
       - outdated: commands/arduino-cli_outdated.md
       - sketch: commands/arduino-cli_sketch.md
+      - sketch archive: commands/arduino-cli_sketch_archive.md
       - sketch new: commands/arduino-cli_sketch_new.md
       - update: commands/arduino-cli_update.md
       - upgrade: commands/arduino-cli_upgrade.md
