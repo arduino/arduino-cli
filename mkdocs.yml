@@ -61,6 +61,7 @@ nav:
   - getting-started.md
   - command-line-completion.md
   - CONTRIBUTING.md
+  - UPGRADING.md
   - FAQ.md
   - Command reference:
       - arduino-cli: commands/arduino-cli.md

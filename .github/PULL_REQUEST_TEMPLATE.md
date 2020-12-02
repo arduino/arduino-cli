@@ -6,6 +6,7 @@
       [our contributing guidelines](https://arduino.github.io/arduino-cli/latest/CONTRIBUTING/#pull-requests)
 - [ ] Tests for the changes have been added (for bug fixes / features)
 - [ ] Docs have been added / updated (for bug fixes / features)
+- [ ] `UPGRADING.md` has been updated with a migration guide (for breaking changes)
 
 * **What kind of change does this PR introduce?**
 <!-- Bug fix, feature, docs update, ... -->
