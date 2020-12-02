@@ -58,6 +58,7 @@ markdown_extensions:
 nav:
   - Documentation Home: index.md
   - installation.md
+  - UPGRADING.md
   - getting-started.md
   - command-line-completion.md
   - CONTRIBUTING.md
