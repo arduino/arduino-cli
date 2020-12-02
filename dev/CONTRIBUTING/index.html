@@ -252,6 +252,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../UPGRADING/" title="Upgrading" class="md-nav__link">
+      Upgrading
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="../getting-started/" title="Getting started" class="md-nav__link">
       Getting started
     </a>
@@ -530,13 +542,13 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-8" type="checkbox" id="nav-8">
     
-    <label class="md-nav__link" for="nav-7">
+    <label class="md-nav__link" for="nav-8">
       Command reference
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-7">
+      <label class="md-nav__title" for="nav-8">
         Command reference
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -1106,13 +1118,13 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-8" type="checkbox" id="nav-8">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-9" type="checkbox" id="nav-9">
     
-    <label class="md-nav__link" for="nav-8">
+    <label class="md-nav__link" for="nav-9">
       gRPC reference
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-8">
+      <label class="md-nav__title" for="nav-9">
         gRPC reference
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -1560,6 +1572,11 @@ submitting a PR:</p>
 <li>PR titles indirectly become part of the CHANGELOG so it's crucial to provide a good record of <strong>what</strong> change is being
   made in the title; <strong>why</strong> it was made will go in the PR description, along with a link to a GitHub issue if it
   exists.</li>
+<li><a id="breaking"></a> If the PR contains a breaking change, please start the commit message and PR title with the
+  string <strong>[breaking]</strong>. Don't forget to describe in the PR description and in the <a href="../UPGRADING/"><code>UPGRADING.md</code></a> file
+  what changes users might need to make in their workflow or application due to this PR. A breaking change is a change
+  that forces users to change their code, command-line invocations, build scripts or data files when upgrading from an
+  older version of Arduino CLI.</li>
 <li>Write tests for the code you wrote.</li>
 <li>Open your PR against the <code>master</code> branch.</li>
 <li>Maintain <strong>clean commit history</strong> and use <strong>meaningful commit messages</strong>. PRs with messy commit history are difficult
