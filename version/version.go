@@ -24,6 +24,7 @@ var (
 	versionString        = ""
 	commit               = ""
 	status               = "alpha"
+	date                 = ""
 )
 
 // Info FIXMEDOC
@@ -32,6 +33,7 @@ type Info struct {
 	VersionString string `json:"VersionString"`
 	Commit        string `json:"Commit"`
 	Status        string `json:"Status"`
+	Date          string `json:"Date"`
 }
 
 // NewInfo FIXMEDOC
@@ -41,11 +43,12 @@ func NewInfo(application string) *Info {
 		VersionString: versionString,
 		Commit:        commit,
 		Status:        status,
+		Date:          date,
 	}
 }
 
 func (i *Info) String() string {
-	return fmt.Sprintf("%s %s Version: %s Commit: %s", i.Application, i.Status, i.VersionString, i.Commit)
+	return fmt.Sprintf("%s %s Version: %s Commit: %s Date: %s", i.Application, i.Status, i.VersionString, i.Commit, i.Date)
 }
 
 //nolint:gochecknoinits
