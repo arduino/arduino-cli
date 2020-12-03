@@ -279,9 +279,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
-    Unreleased
+  <a href="#0140" class="md-nav__link">
+    0.14.0
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changes-in-debug-command" class="md-nav__link">
+    Changes in debug command
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1097,9 +1110,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased" class="md-nav__link">
-    Unreleased
+  <a href="#0140" class="md-nav__link">
+    0.14.0
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changes-in-debug-command" class="md-nav__link">
+    Changes in debug command
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1122,7 +1148,37 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
-<h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h2 id="0140">0.14.0<a class="headerlink" href="#0140" title="Permanent link">&para;</a></h2>
+<h3 id="changes-in-debug-command">Changes in <code>debug</code> command<a class="headerlink" href="#changes-in-debug-command" title="Permanent link">&para;</a></h3>
+<p>Previously it was required:</p>
+<ul>
+<li>To provide a debug command line recipe in <code>platform.txt</code> like <code>tools.reciped-id.debug.pattern=.....</code> that will start a
+  <code>gdb</code> session for the selected board.</li>
+<li>To add a <code>debug.tool</code> definition in the <code>boards.txt</code> to recall that recipe, for example <code>myboard.debug.tool=recipe-id</code></li>
+</ul>
+<p>Now:</p>
+<ul>
+<li>Only the configuration needs to be supplied, the <code>arduino-cli</code> or the GUI tool will figure out how to call and setup
+  the <code>gdb</code> session. An example of configuration is the following:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>debug.executable={build.path}/{build.project_name}.elf
+debug.toolchain=gcc
+debug.toolchain.path={runtime.tools.arm-none-eabi-gcc-7-2017q4.path}/bin/
+debug.toolchain.prefix=arm-none-eabi-
+debug.server=openocd
+debug.server.openocd.path={runtime.tools.openocd-0.10.0-arduino7.path}/bin/
+debug.server.openocd.scripts_dir={runtime.tools.openocd-0.10.0-arduino7.path}/share/openocd/scripts/
+debug.server.openocd.script={runtime.platform.path}/variants/{build.variant}/{build.openocdscript}
+</code></pre></div>
+<p>The <code>debug.server.XXXX</code> subkeys are optional and also "free text", this means that the configuration may be extended as
+needed by the specific server. For now only <code>openocd</code> is supported. Anyway, if this change works, any other kind of
+server may be fairly easily added.</p>
+<p>The <code>debug.xxx=yyy</code> definitions above may be supplied and overlayed in the usual ways:</p>
+<ul>
+<li>on <code>platform.txt</code>: definition here will be shared through all boards in the platform</li>
+<li>on <code>boards.txt</code> as part of a board definition: they will override the global platform definitions</li>
+<li>on <code>programmers.txt</code>: they will override the boards and global platform definitions if the programmer is selected</li>
+</ul>
                 
                   
                 
