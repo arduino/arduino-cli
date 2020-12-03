@@ -356,7 +356,10 @@ def test_core_install_creates_installed_json(run_command, data_dir):
 
 
 def test_core_update_with_local_url(run_command):
-    test_index = Path(__file__).parent / "testdata" / "test_index.json"
+    test_index = str(Path(__file__).parent / "testdata" / "test_index.json")
+    if platform.system() == "Windows":
+        test_index = f"/{test_index}".replace("\\", "/")
+
     res = run_command(f'core update-index --additional-urls="file://{test_index}"')
     assert res.ok
     assert "Updating index: test_index.json downloaded" in res.stdout

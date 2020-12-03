@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"runtime"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -212,8 +213,15 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 			continue
 		}
 
+		logrus.WithField("url", URL).Print("Updating index")
+
 		if URL.Scheme == "file" {
 			path := paths.New(URL.Path)
+			if runtime.GOOS == "windows" {
+				// Parsed local file URLs on Windows are returned with a leading /
+				// so we remove it
+				path = paths.New(URL.Path[1:])
+			}
 			pathJSON, err := path.Abs()
 			if err != nil {
 				return nil, fmt.Errorf("can't get absolute path of %v: %w", path, err)
@@ -223,7 +231,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 				return nil, fmt.Errorf("invalid package index in %s: %s", pathJSON, err)
 			}
 
-			fi, _ := os.Stat(URL.Path)
+			fi, _ := os.Stat(path.String())
 			downloadCB(&rpc.DownloadProgress{
 				File:      "Updating index: " + pathJSON.Base(),
 				TotalSize: fi.Size(),
@@ -231,8 +239,6 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 			downloadCB(&rpc.DownloadProgress{Completed: true})
 			continue
 		}
-
-		logrus.WithField("url", URL).Print("Updating index")
 
 		var tmp *paths.Path
 		if tmpFile, err := ioutil.TempFile("", ""); err != nil {
@@ -669,6 +675,11 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 
 			if URL.Scheme == "file" {
 				path := paths.New(URL.Path)
+				if runtime.GOOS == "windows" {
+					// Parsed local file URLs on Windows are returned with a leading /
+					// so we remove it
+					path = paths.New(URL.Path[1:])
+				}
 				pathJSON, err := path.Abs()
 				if err != nil {
 					return nil, fmt.Errorf("can't get absolute path of %v: %w", path, err)
