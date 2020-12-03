@@ -169,6 +169,11 @@ type Context struct {
 	CompilationDatabase *builder.CompilationDatabase
 	// Set to true to skip build and produce only Compilation Database
 	OnlyUpdateCompilationDatabase bool
+
+	// Source code overrides (filename -> content map).
+	// The provided source data is used instead of reading it from disk.
+	// The keys of the map are paths relative to sketch folder.
+	SourceOverride map[string]string
 }
 
 // ExecutableSectionSize represents a section of the executable output file

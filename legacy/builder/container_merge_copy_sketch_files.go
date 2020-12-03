@@ -28,7 +28,7 @@ func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
 	if sk == nil {
 		return errors.New("unable to convert legacy sketch to the new type")
 	}
-	offset, source, err := bldr.SketchMergeSources(sk)
+	offset, source, err := bldr.SketchMergeSources(sk, ctx.SourceOverride)
 	if err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
 		return errors.WithStack(err)
 	}
 
-	if err := bldr.SketchCopyAdditionalFiles(sk, ctx.SketchBuildPath.String()); err != nil {
+	if err := bldr.SketchCopyAdditionalFiles(sk, ctx.SketchBuildPath.String(), ctx.SourceOverride); err != nil {
 		return errors.WithStack(err)
 	}
 
