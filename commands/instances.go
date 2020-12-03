@@ -23,7 +23,6 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"runtime"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -33,6 +32,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/security"
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -207,7 +207,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
 	for _, u := range urls {
 		logrus.Info("URL: ", u)
-		URL, err := url.Parse(u)
+		URL, err := utils.URLParse(u)
 		if err != nil {
 			logrus.Warnf("unable to parse additional URL: %s", u)
 			continue
@@ -217,23 +217,13 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 
 		if URL.Scheme == "file" {
 			path := paths.New(URL.Path)
-			if runtime.GOOS == "windows" {
-				// Parsed local file URLs on Windows are returned with a leading /
-				// so we remove it
-				path = paths.New(URL.Path[1:])
-			}
-			pathJSON, err := path.Abs()
-			if err != nil {
-				return nil, fmt.Errorf("can't get absolute path of %v: %w", path, err)
-			}
-
-			if _, err := packageindex.LoadIndexNoSign(pathJSON); err != nil {
-				return nil, fmt.Errorf("invalid package index in %s: %s", pathJSON, err)
+			if _, err := packageindex.LoadIndexNoSign(path); err != nil {
+				return nil, fmt.Errorf("invalid package index in %s: %s", path, err)
 			}
 
 			fi, _ := os.Stat(path.String())
 			downloadCB(&rpc.DownloadProgress{
-				File:      "Updating index: " + pathJSON.Base(),
+				File:      "Updating index: " + path.Base(),
 				TotalSize: fi.Size(),
 			})
 			downloadCB(&rpc.DownloadProgress{Completed: true})
@@ -667,7 +657,7 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 		urls := []string{globals.DefaultIndexURL}
 		urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
 		for _, u := range urls {
-			URL, err := url.Parse(u)
+			URL, err := utils.URLParse(u)
 			if err != nil {
 				logrus.Warnf("Unable to parse index URL: %s, skip...", u)
 				continue
@@ -675,17 +665,11 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 
 			if URL.Scheme == "file" {
 				path := paths.New(URL.Path)
-				if runtime.GOOS == "windows" {
-					// Parsed local file URLs on Windows are returned with a leading /
-					// so we remove it
-					path = paths.New(URL.Path[1:])
-				}
-				pathJSON, err := path.Abs()
 				if err != nil {
 					return nil, fmt.Errorf("can't get absolute path of %v: %w", path, err)
 				}
 
-				_, err = res.Pm.LoadPackageIndexFromFile(pathJSON)
+				_, err = res.Pm.LoadPackageIndexFromFile(path)
 				if err != nil {
 					res.PlatformIndexErrors = append(res.PlatformIndexErrors, err.Error())
 				}
