@@ -353,3 +353,10 @@ def test_core_install_creates_installed_json(run_command, data_dir):
             return obj
 
     assert ordered(installed_json) == ordered(expected_installed_json)
+
+
+def test_core_update_with_local_url(run_command):
+    test_index = Path(__file__).parent / "testdata" / "test_index.json"
+    res = run_command(f'core update-index --additional-urls="file://{test_index}"')
+    assert res.ok
+    assert "Updating index: test_index.json downloaded" in res.stdout

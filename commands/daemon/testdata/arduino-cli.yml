@@ -2,7 +2,6 @@ board_manager:
   additional_urls:
     - http://foobar.com
     - http://example.com
-  additional_paths: []
 
 daemon:
   port: "50051"

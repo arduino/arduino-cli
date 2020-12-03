@@ -202,24 +202,6 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 
 	indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
 
-	for _, x := range configuration.Settings.GetStringSlice("board_manager.additional_paths") {
-		logrus.Info("JSON PATH: ", x)
-
-		pathJSON, _ := paths.New(x).Abs()
-
-		if _, err := packageindex.LoadIndexNoSign(pathJSON); err != nil {
-			return nil, fmt.Errorf("invalid package index in %s: %s", pathJSON, err)
-		}
-
-		fi, _ := os.Stat(x)
-		downloadCB(&rpc.DownloadProgress{
-			File:      "Updating index: " + pathJSON.Base(),
-			TotalSize: fi.Size(),
-		})
-		downloadCB(&rpc.DownloadProgress{Completed: true})
-
-	}
-
 	urls := []string{globals.DefaultIndexURL}
 	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
 	for _, u := range urls {
@@ -227,6 +209,26 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 		URL, err := url.Parse(u)
 		if err != nil {
 			logrus.Warnf("unable to parse additional URL: %s", u)
+			continue
+		}
+
+		if URL.Scheme == "file" {
+			path := paths.New(URL.Path)
+			pathJSON, err := path.Abs()
+			if err != nil {
+				return nil, fmt.Errorf("can't get absolute path of %v: %w", path, err)
+			}
+
+			if _, err := packageindex.LoadIndexNoSign(pathJSON); err != nil {
+				return nil, fmt.Errorf("invalid package index in %s: %s", pathJSON, err)
+			}
+
+			fi, _ := os.Stat(URL.Path)
+			downloadCB(&rpc.DownloadProgress{
+				File:      "Updating index: " + pathJSON.Base(),
+				TotalSize: fi.Size(),
+			})
+			downloadCB(&rpc.DownloadProgress{Completed: true})
 			continue
 		}
 
@@ -665,16 +667,21 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 				continue
 			}
 
-			if err := res.Pm.LoadPackageIndex(URL); err != nil {
-				res.PlatformIndexErrors = append(res.PlatformIndexErrors, err.Error())
+			if URL.Scheme == "file" {
+				path := paths.New(URL.Path)
+				pathJSON, err := path.Abs()
+				if err != nil {
+					return nil, fmt.Errorf("can't get absolute path of %v: %w", path, err)
+				}
+
+				_, err = res.Pm.LoadPackageIndexFromFile(pathJSON)
+				if err != nil {
+					res.PlatformIndexErrors = append(res.PlatformIndexErrors, err.Error())
+				}
+				continue
 			}
-		}
 
-		for _, x := range configuration.Settings.GetStringSlice("board_manager.additional_paths") {
-			pathJSON, _ := paths.New(x).Abs()
-
-			_, err := res.Pm.LoadPackageIndexFromFile(pathJSON)
-			if err != nil {
+			if err := res.Pm.LoadPackageIndex(URL); err != nil {
 				res.PlatformIndexErrors = append(res.PlatformIndexErrors, err.Error())
 			}
 		}
