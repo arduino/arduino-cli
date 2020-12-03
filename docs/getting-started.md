@@ -183,12 +183,12 @@ For example, to add the NRF52832 core, edit the configuration file and change th
 
 ```yaml
 board_manager:
-  additional_paths:
-    - /absolute/path/to/your/package_nrf52832_index.json
+  additional_urls:
+    - https://arduino.esp8266.com/stable/package_esp8266com_index.json
+    - file:///absolute/path/to/your/package_nrf52832_index.json
 ```
 
-From now on, commands supporting custom cores will automatically use the additional URL and additional paths from the
-configuration file:
+From now on, commands supporting custom cores will automatically use the additional URL from the configuration file:
 
 ```sh
 $ arduino-cli core update-index
@@ -214,14 +214,13 @@ ID              Version Name
 esp8266:esp8266 2.5.2   esp8266
 ```
 
-The same applies to the additional package index file provided by file paths. Use the `--additional-paths` option, that
-has to be specified every time and for every command that operates on a 3rd party platform core, for example:
+The same applies to the additional package index file provided by file paths:
 
 ```sh
-$ arduino-cli  core update-index --additional-paths /absolute/path/to/your/package_esp8266com_index.json
+$ arduino-cli  core update-index --additional-urls file:///absolute/path/to/your/package_esp8266com_index.json
 Updating index: package_esp8266com_index.json downloaded
 
-$ arduino-cli core search esp8266 --additional-paths /absolute/path/to/your/package_esp8266com_index.json
+$ arduino-cli core search esp8266 --additional-urls file:///absolute/path/to/your/package_esp8266com_index.json
 ID              Version Name
 esp8266:esp8266 2.5.2   esp8266
 ```

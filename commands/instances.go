@@ -32,6 +32,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/security"
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
@@ -202,35 +203,32 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 
 	indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
 
-	for _, x := range configuration.Settings.GetStringSlice("board_manager.additional_paths") {
-		logrus.Info("JSON PATH: ", x)
-
-		pathJSON, _ := paths.New(x).Abs()
-
-		if _, err := packageindex.LoadIndexNoSign(pathJSON); err != nil {
-			return nil, fmt.Errorf("invalid package index in %s: %s", pathJSON, err)
-		}
-
-		fi, _ := os.Stat(x)
-		downloadCB(&rpc.DownloadProgress{
-			File:      "Updating index: " + pathJSON.Base(),
-			TotalSize: fi.Size(),
-		})
-		downloadCB(&rpc.DownloadProgress{Completed: true})
-
-	}
-
 	urls := []string{globals.DefaultIndexURL}
 	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
 	for _, u := range urls {
 		logrus.Info("URL: ", u)
-		URL, err := url.Parse(u)
+		URL, err := utils.URLParse(u)
 		if err != nil {
 			logrus.Warnf("unable to parse additional URL: %s", u)
 			continue
 		}
 
 		logrus.WithField("url", URL).Print("Updating index")
+
+		if URL.Scheme == "file" {
+			path := paths.New(URL.Path)
+			if _, err := packageindex.LoadIndexNoSign(path); err != nil {
+				return nil, fmt.Errorf("invalid package index in %s: %s", path, err)
+			}
+
+			fi, _ := os.Stat(path.String())
+			downloadCB(&rpc.DownloadProgress{
+				File:      "Updating index: " + path.Base(),
+				TotalSize: fi.Size(),
+			})
+			downloadCB(&rpc.DownloadProgress{Completed: true})
+			continue
+		}
 
 		var tmp *paths.Path
 		if tmpFile, err := ioutil.TempFile("", ""); err != nil {
@@ -659,22 +657,26 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 		urls := []string{globals.DefaultIndexURL}
 		urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
 		for _, u := range urls {
-			URL, err := url.Parse(u)
+			URL, err := utils.URLParse(u)
 			if err != nil {
 				logrus.Warnf("Unable to parse index URL: %s, skip...", u)
 				continue
 			}
 
-			if err := res.Pm.LoadPackageIndex(URL); err != nil {
-				res.PlatformIndexErrors = append(res.PlatformIndexErrors, err.Error())
+			if URL.Scheme == "file" {
+				path := paths.New(URL.Path)
+				if err != nil {
+					return nil, fmt.Errorf("can't get absolute path of %v: %w", path, err)
+				}
+
+				_, err = res.Pm.LoadPackageIndexFromFile(path)
+				if err != nil {
+					res.PlatformIndexErrors = append(res.PlatformIndexErrors, err.Error())
+				}
+				continue
 			}
-		}
 
-		for _, x := range configuration.Settings.GetStringSlice("board_manager.additional_paths") {
-			pathJSON, _ := paths.New(x).Abs()
-
-			_, err := res.Pm.LoadPackageIndexFromFile(pathJSON)
-			if err != nil {
+			if err := res.Pm.LoadPackageIndex(URL); err != nil {
 				res.PlatformIndexErrors = append(res.PlatformIndexErrors, err.Error())
 			}
 		}
