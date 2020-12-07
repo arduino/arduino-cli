@@ -43,11 +43,12 @@ The `debug.xxx=yyy` definitions above may be supplied and overlayed in the usual
 Previously, if the `--build-path` was not specified, compiling a Sketch would copy the generated binaries in
 `<sketch_folder>/build/<fqbn>/`, uploading to a board required that path to exist and contain the necessary binaries.
 
-The `--dry-run` flag is removed, `compile` now never copies generated binaries to the sketch folder. The
-`--export-binaries` (`-e`) flag is introduced to copy the binaries from the build folder to the sketch one. Specifying
-the `--output-dir` doesn't require using setting also the `--export-binaries` flag. A related settings and env var has
-been added to avoid the need to always specify the `--export-binaries` flag: `sketch.always_export_binaries` and
-`ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES`.
+The `--dry-run` flag was removed.
+
+The default, `compile` does not copy generated binaries to the sketch folder. The `--export-binaries` (`-e`) flag was
+introduced to copy the binaries from the build folder to the sketch one. `--export-binaries` is not required when using
+the `--output-dir` flag. A related configuration key and environment variable has been added to avoid the need to always
+specify the `--export-binaries` flag: `sketch.always_export_binaries` and `ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES`.
 
 If `--input-dir` or `--input-file` is not set when calling `upload` the command will search for the deterministically
 created build directory in the temp folder and use the binaries found there.
@@ -56,12 +57,12 @@ The gRPC interface has been updated accordingly, `dryRun` is removed.
 
 ### Programmers can't be listed anymore using `burn-bootloader -P list`
 
-The `-P` flags is meant to select the programmer used to burn the bootloader on the specified board, the `-P list` was
-an hackish way to list all the possible programmers that could be used for that board.
+The `-P` flag is used to select the programmer used to burn the bootloader on the specified board. Using `-P list` to
+list all the possible programmers for the current board was hackish.
 
 This way has been removed in favour of `board details <fqbn> --list-programmers`.
 
-### `lib install --git-url` and `--zip-file` must now be esplicitly enabled
+### `lib install --git-url` and `--zip-file` must now be explicitly enabled
 
 With the introduction of the `--git-url` and `--zip-file` flags the new config key `library.enable_unsafe_install` has
 been added to enable them.
