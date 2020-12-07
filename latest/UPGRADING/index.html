@@ -293,6 +293,27 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#binaries-export-must-now-be-explicitly-specified" class="md-nav__link">
+    Binaries export must now be explicitly specified
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#programmers-cant-be-listed-anymore-using-burn-bootloader-p-list" class="md-nav__link">
+    Programmers can't be listed anymore using burn-bootloader -P list
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lib-install-git-url-and-zip-file-must-now-be-explicitly-enabled" class="md-nav__link">
+    lib install --git-url and --zip-file must now be explicitly enabled
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1124,6 +1145,27 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#binaries-export-must-now-be-explicitly-specified" class="md-nav__link">
+    Binaries export must now be explicitly specified
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#programmers-cant-be-listed-anymore-using-burn-bootloader-p-list" class="md-nav__link">
+    Programmers can't be listed anymore using burn-bootloader -P list
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lib-install-git-url-and-zip-file-must-now-be-explicitly-enabled" class="md-nav__link">
+    lib install --git-url and --zip-file must now be explicitly enabled
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1179,6 +1221,25 @@ server may be fairly easily added.</p>
 <li>on <code>boards.txt</code> as part of a board definition: they will override the global platform definitions</li>
 <li>on <code>programmers.txt</code>: they will override the boards and global platform definitions if the programmer is selected</li>
 </ul>
+<h3 id="binaries-export-must-now-be-explicitly-specified">Binaries export must now be explicitly specified<a class="headerlink" href="#binaries-export-must-now-be-explicitly-specified" title="Permanent link">&para;</a></h3>
+<p>Previously, if the <code>--build-path</code> was not specified, compiling a Sketch would copy the generated binaries in
+<code>&lt;sketch_folder&gt;/build/&lt;fqbn&gt;/</code>, uploading to a board required that path to exist and contain the necessary binaries.</p>
+<p>The <code>--dry-run</code> flag was removed.</p>
+<p>The default, <code>compile</code> does not copy generated binaries to the sketch folder. The <code>--export-binaries</code> (<code>-e</code>) flag was
+introduced to copy the binaries from the build folder to the sketch one. <code>--export-binaries</code> is not required when using
+the <code>--output-dir</code> flag. A related configuration key and environment variable has been added to avoid the need to always
+specify the <code>--export-binaries</code> flag: <code>sketch.always_export_binaries</code> and <code>ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES</code>.</p>
+<p>If <code>--input-dir</code> or <code>--input-file</code> is not set when calling <code>upload</code> the command will search for the deterministically
+created build directory in the temp folder and use the binaries found there.</p>
+<p>The gRPC interface has been updated accordingly, <code>dryRun</code> is removed.</p>
+<h3 id="programmers-cant-be-listed-anymore-using-burn-bootloader-p-list">Programmers can't be listed anymore using <code>burn-bootloader -P list</code><a class="headerlink" href="#programmers-cant-be-listed-anymore-using-burn-bootloader-p-list" title="Permanent link">&para;</a></h3>
+<p>The <code>-P</code> flag is used to select the programmer used to burn the bootloader on the specified board. Using <code>-P list</code> to
+list all the possible programmers for the current board was hackish.</p>
+<p>This way has been removed in favour of <code>board details &lt;fqbn&gt; --list-programmers</code>.</p>
+<h3 id="lib-install-git-url-and-zip-file-must-now-be-explicitly-enabled"><code>lib install --git-url</code> and <code>--zip-file</code> must now be explicitly enabled<a class="headerlink" href="#lib-install-git-url-and-zip-file-must-now-be-explicitly-enabled" title="Permanent link">&para;</a></h3>
+<p>With the introduction of the <code>--git-url</code> and <code>--zip-file</code> flags the new config key <code>library.enable_unsafe_install</code> has
+been added to enable them.</p>
+<p>This changes the ouput of the <code>config dump</code> command.</p>
                 
                   
                 
