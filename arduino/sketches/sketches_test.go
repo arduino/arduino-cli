@@ -43,3 +43,19 @@ func TestSketchLoadingFromFolderOrMainFile(t *testing.T) {
 		require.True(t, sk.FullPath.EquivalentTo(skFolder))
 	}
 }
+
+func TestSketchBuildPath(t *testing.T) {
+	// Verifies build path is returned if sketch path is set
+	sketchPath := paths.New("testdata/Sketch1")
+	sketch, err := NewSketchFromPath(sketchPath)
+	require.NoError(t, err)
+	buildPath, err := sketch.BuildPath()
+	require.NoError(t, err)
+	require.Contains(t, buildPath.String(), "arduino-sketch-")
+
+	// Verifies error is returned if sketch path is not set
+	sketch = &Sketch{}
+	buildPath, err = sketch.BuildPath()
+	require.Nil(t, buildPath)
+	require.Error(t, err, "sketch path is empty")
+}

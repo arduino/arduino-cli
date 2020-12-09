@@ -51,6 +51,7 @@ func TestGetCommandLine(t *testing.T) {
 		Instance:   &rpc.Instance{Id: 1},
 		Fqbn:       "arduino-test:samd:arduino_zero_edbg",
 		SketchPath: sketchPath.String(),
+		ImportDir:  sketchPath.Join("build", "arduino-test.samd.arduino_zero_edbg").String(),
 	}
 
 	goldCommand := fmt.Sprintf("%s/arduino-test/tools/arm-none-eabi-gcc/7-2017q4/bin/arm-none-eabi-gdb%s", dataDir, toolExtension) +
@@ -72,6 +73,7 @@ func TestGetCommandLine(t *testing.T) {
 		Fqbn:        "arduino-test:samd:mkr1000",
 		SketchPath:  sketchPath.String(),
 		Interpreter: "mi1",
+		ImportDir:   sketchPath.Join("build", "arduino-test.samd.mkr1000").String(),
 	}
 
 	goldCommand2 := fmt.Sprintf("%s/arduino-test/tools/arm-none-eabi-gcc/7-2017q4/bin/arm-none-eabi-gdb%s", dataDir, toolExtension) +
