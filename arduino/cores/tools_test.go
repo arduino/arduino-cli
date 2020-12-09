@@ -18,6 +18,7 @@ package cores
 import (
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/stretchr/testify/require"
 )
 
@@ -26,39 +27,44 @@ func TestFlavorCompatibility(t *testing.T) {
 		Os   string
 		Arch string
 	}
-	windowsi386 := &os{"windows", "386"}
-	windowsx8664 := &os{"windows", "amd64"}
-	linuxi386 := &os{"linux", "386"}
-	linuxamd64 := &os{"linux", "amd64"}
-	linuxarm := &os{"linux", "arm"}
-	linuxarmbe := &os{"linux", "armbe"}
-	linuxarm64 := &os{"linux", "arm64"}
-	darwini386 := &os{"darwin", "386"}
-	darwinamd64 := &os{"darwin", "amd64"}
-	freebsdi386 := &os{"freebsd", "386"}
-	freebsdamd64 := &os{"freebsd", "amd64"}
+	windows32 := &os{"windows", "386"}
+	windows64 := &os{"windows", "amd64"}
+	linux32 := &os{"linux", "386"}
+	linux64 := &os{"linux", "amd64"}
+	linuxArm := &os{"linux", "arm"}
+	linuxArmbe := &os{"linux", "armbe"}
+	linuxArm64 := &os{"linux", "arm64"}
+	darwin32 := &os{"darwin", "386"}
+	darwin64 := &os{"darwin", "amd64"}
+	darwinArm64 := &os{"darwin", "arm64"}
+	freebsd32 := &os{"freebsd", "386"}
+	freebsd64 := &os{"freebsd", "amd64"}
 	oses := []*os{
-		windowsi386,
-		windowsx8664,
-		linuxi386,
-		linuxamd64,
-		linuxarm,
-		linuxarmbe,
-		linuxarm64,
-		darwini386,
-		darwinamd64,
-		freebsdi386,
-		freebsdamd64,
+		windows32,
+		windows64,
+		linux32,
+		linux64,
+		linuxArm,
+		linuxArmbe,
+		linuxArm64,
+		darwin32,
+		darwin64,
+		darwinArm64,
+		freebsd32,
+		freebsd64,
 	}
 
 	type test struct {
-		Flavour   *Flavor
-		Positives []*os
+		Flavour     *Flavor
+		Compatibles []*os
+		ExactMatch  []*os
 	}
 	tests := []*test{
-		{&Flavor{OS: "i686-mingw32"}, []*os{windowsi386, windowsx8664}},
-		{&Flavor{OS: "i386-apple-darwin11"}, []*os{darwini386, darwinamd64}},
-		{&Flavor{OS: "x86_64-apple-darwin"}, []*os{darwinamd64}},
+		{&Flavor{OS: "i686-mingw32"}, []*os{windows32, windows64}, []*os{windows32}},
+		{&Flavor{OS: "x86_64-mingw32"}, []*os{windows64}, []*os{windows64}},
+		{&Flavor{OS: "i386-apple-darwin11"}, []*os{darwin32, darwin64, darwinArm64}, []*os{darwin32}},
+		{&Flavor{OS: "x86_64-apple-darwin"}, []*os{darwin64, darwinArm64}, []*os{darwin64}},
+		{&Flavor{OS: "arm64-apple-darwin"}, []*os{darwinArm64}, []*os{darwinArm64}},
 
 		// Raspberry PI, BBB or other ARM based host
 		// PI: "arm-linux-gnueabihf"
@@ -66,31 +72,102 @@ func TestFlavorCompatibility(t *testing.T) {
 		// Ubuntu Mate on PI2: "arm-linux-gnueabihf"
 		// Debian 7.9 on BBB: "arm-linux-gnueabihf"
 		// Raspbian on PI Zero: "arm-linux-gnueabihf"
-		{&Flavor{OS: "arm-linux-gnueabihf"}, []*os{linuxarm, linuxarmbe}},
+		{&Flavor{OS: "arm-linux-gnueabihf"}, []*os{linuxArm, linuxArmbe}, []*os{linuxArm, linuxArmbe}},
 		// Arch-linux on PI2: "armv7l-unknown-linux-gnueabihf"
-		{&Flavor{OS: "armv7l-unknown-linux-gnueabihf"}, []*os{linuxarm, linuxarmbe}},
+		{&Flavor{OS: "armv7l-unknown-linux-gnueabihf"}, []*os{linuxArm, linuxArmbe}, []*os{linuxArm, linuxArmbe}},
 
-		{&Flavor{OS: "i686-linux-gnu"}, []*os{linuxi386}},
-		{&Flavor{OS: "i686-pc-linux-gnu"}, []*os{linuxi386}},
-		{&Flavor{OS: "x86_64-linux-gnu"}, []*os{linuxamd64}},
-		{&Flavor{OS: "x86_64-pc-linux-gnu"}, []*os{linuxamd64}},
-		{&Flavor{OS: "aarch64-linux-gnu"}, []*os{linuxarm64}},
-		{&Flavor{OS: "arm64-linux-gnu"}, []*os{linuxarm64}},
+		{&Flavor{OS: "i686-linux-gnu"}, []*os{linux32}, []*os{linux32}},
+		{&Flavor{OS: "i686-pc-linux-gnu"}, []*os{linux32}, []*os{linux32}},
+		{&Flavor{OS: "x86_64-linux-gnu"}, []*os{linux64}, []*os{linux64}},
+		{&Flavor{OS: "x86_64-pc-linux-gnu"}, []*os{linux64}, []*os{linux64}},
+		{&Flavor{OS: "aarch64-linux-gnu"}, []*os{linuxArm64}, []*os{linuxArm64}},
+		{&Flavor{OS: "arm64-linux-gnu"}, []*os{linuxArm64}, []*os{linuxArm64}},
 	}
 
-	check := func(test *test, os *os) {
-		for _, positiveOs := range test.Positives {
-			if positiveOs == os {
-				require.True(t, test.Flavour.isCompatibleWith(os.Os, os.Arch), "'%s' tag compatible with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
+	checkCompatible := func(test *test, os *os) {
+		// if the os is in the "positive" set iCompatibleWith must return true...
+		res, _ := test.Flavour.isCompatibleWith(os.Os, os.Arch)
+		for _, compatibleOs := range test.Compatibles {
+			if compatibleOs == os {
+				require.True(t, res, "'%s' tag compatible with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
 				return
 			}
 		}
-		require.False(t, test.Flavour.isCompatibleWith(os.Os, os.Arch), "'%s' tag compatible with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
+		// ...otherwise false
+		require.False(t, res, "'%s' tag compatible with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
+	}
+	checkExactMatch := func(test *test, os *os) {
+		// if the os is in the "positive" set iExactMatchWith must return true...
+		for _, positiveOs := range test.ExactMatch {
+			if positiveOs == os {
+				require.True(t, test.Flavour.isExactMatchWith(os.Os, os.Arch), "'%s' tag exact match with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
+				return
+			}
+		}
+		// ...otherwise false
+		require.False(t, test.Flavour.isExactMatchWith(os.Os, os.Arch), "'%s' tag exact match with '%s,%s' pair", test.Flavour.OS, os.Os, os.Arch)
 	}
 
 	for _, test := range tests {
 		for _, os := range oses {
-			check(test, os)
+			checkCompatible(test, os)
+			checkExactMatch(test, os)
 		}
 	}
+}
+
+func TestFlavorPrioritySelection(t *testing.T) {
+	res := (&ToolRelease{
+		Flavors: []*Flavor{
+			{OS: "i386-apple-darwin11", Resource: &resources.DownloadResource{ArchiveFileName: "1"}},
+			{OS: "x86_64-apple-darwin", Resource: &resources.DownloadResource{ArchiveFileName: "2"}},
+			{OS: "arm64-apple-darwin", Resource: &resources.DownloadResource{ArchiveFileName: "3"}},
+		},
+	}).GetFlavourCompatibleWith("darwin", "arm64")
+	require.NotNil(t, res)
+	require.Equal(t, "3", res.ArchiveFileName)
+
+	res = (&ToolRelease{
+		Flavors: []*Flavor{
+			{OS: "i386-apple-darwin11", Resource: &resources.DownloadResource{ArchiveFileName: "1"}},
+			{OS: "x86_64-apple-darwin", Resource: &resources.DownloadResource{ArchiveFileName: "2"}},
+		},
+	}).GetFlavourCompatibleWith("darwin", "arm64")
+	require.NotNil(t, res)
+	require.Equal(t, "2", res.ArchiveFileName)
+
+	res = (&ToolRelease{
+		Flavors: []*Flavor{
+			{OS: "x86_64-apple-darwin", Resource: &resources.DownloadResource{ArchiveFileName: "2"}},
+			{OS: "i386-apple-darwin11", Resource: &resources.DownloadResource{ArchiveFileName: "1"}},
+		},
+	}).GetFlavourCompatibleWith("darwin", "arm64")
+	require.NotNil(t, res)
+	require.Equal(t, "2", res.ArchiveFileName)
+
+	res = (&ToolRelease{
+		Flavors: []*Flavor{
+			{OS: "i386-apple-darwin11", Resource: &resources.DownloadResource{ArchiveFileName: "1"}},
+		},
+	}).GetFlavourCompatibleWith("darwin", "arm64")
+	require.NotNil(t, res)
+	require.Equal(t, "1", res.ArchiveFileName)
+
+	res = (&ToolRelease{
+		Flavors: []*Flavor{
+			{OS: "i686-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "1"}},
+			{OS: "x86_64-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "2"}},
+		},
+	}).GetFlavourCompatibleWith("windows", "amd64")
+	require.NotNil(t, res)
+	require.Equal(t, "2", res.ArchiveFileName)
+
+	res = (&ToolRelease{
+		Flavors: []*Flavor{
+			{OS: "x86_64-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "2"}},
+			{OS: "i686-mingw32", Resource: &resources.DownloadResource{ArchiveFileName: "1"}},
+		},
+	}).GetFlavourCompatibleWith("windows", "amd64")
+	require.NotNil(t, res)
+	require.Equal(t, "2", res.ArchiveFileName)
 }
