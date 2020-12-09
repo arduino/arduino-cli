@@ -141,55 +141,90 @@ func (tr *ToolRelease) RuntimeProperties() *properties.Map {
 }
 
 var (
-	regexpArmLinux   = regexp.MustCompile("arm.*-linux-gnueabihf")
-	regexpArm64Linux = regexp.MustCompile("(aarch64|arm64)-linux-gnu")
-	regexpAmd64      = regexp.MustCompile("x86_64-.*linux-gnu")
-	regexpi386       = regexp.MustCompile("i[3456]86-.*linux-gnu")
-	regexpWindows    = regexp.MustCompile("i[3456]86-.*(mingw32|cygwin)")
-	regexpMac64Bit   = regexp.MustCompile("(i[3456]86|x86_64)-apple-darwin.*")
-	regexpmac32Bit   = regexp.MustCompile("i[3456]86-apple-darwin.*")
-	regexpArmBSD     = regexp.MustCompile("arm.*-freebsd[0-9]*")
+	regexpLinuxArm   = regexp.MustCompile("arm.*-linux-gnueabihf")
+	regexpLinuxArm64 = regexp.MustCompile("(aarch64|arm64)-linux-gnu")
+	regexpLinux64    = regexp.MustCompile("x86_64-.*linux-gnu")
+	regexpLinux32    = regexp.MustCompile("i[3456]86-.*linux-gnu")
+	regexpWindows32  = regexp.MustCompile("i[3456]86-.*(mingw32|cygwin)")
+	regexpWindows64  = regexp.MustCompile("(amd64|x86_64)-.*(mingw32|cygwin)")
+	regexpMac64      = regexp.MustCompile("x86_64-apple-darwin.*")
+	regexpMac32      = regexp.MustCompile("i[3456]86-apple-darwin.*")
+	regexpMacArm64   = regexp.MustCompile("arm64-apple-darwin.*")
+	regexpFreeBSDArm = regexp.MustCompile("arm.*-freebsd[0-9]*")
+	regexpFreeBSD32  = regexp.MustCompile("i?[3456]86-freebsd[0-9]*")
+	regexpFreeBSD64  = regexp.MustCompile("amd64-freebsd[0-9]*")
 )
 
-func (f *Flavor) isCompatibleWithCurrentMachine() bool {
-	return f.isCompatibleWith(runtime.GOOS, runtime.GOARCH)
-}
-
-func (f *Flavor) isCompatibleWith(osName, osArch string) bool {
+func (f *Flavor) isExactMatchWith(osName, osArch string) bool {
 	if f.OS == "all" {
 		return true
 	}
 
 	switch osName + "," + osArch {
 	case "linux,arm", "linux,armbe":
-		return regexpArmLinux.MatchString(f.OS)
+		return regexpLinuxArm.MatchString(f.OS)
 	case "linux,arm64":
-		return regexpArm64Linux.MatchString(f.OS)
+		return regexpLinuxArm64.MatchString(f.OS)
 	case "linux,amd64":
-		return regexpAmd64.MatchString(f.OS)
+		return regexpLinux64.MatchString(f.OS)
 	case "linux,386":
-		return regexpi386.MatchString(f.OS)
-	case "windows,386", "windows,amd64":
-		return regexpWindows.MatchString(f.OS)
+		return regexpLinux32.MatchString(f.OS)
+	case "windows,386":
+		return regexpWindows32.MatchString(f.OS)
+	case "windows,amd64":
+		return regexpWindows64.MatchString(f.OS)
+	case "darwin,arm64":
+		return regexpMacArm64.MatchString(f.OS)
 	case "darwin,amd64":
-		return regexpmac32Bit.MatchString(f.OS) || regexpMac64Bit.MatchString(f.OS)
+		return regexpMac64.MatchString(f.OS)
 	case "darwin,386":
-		return regexpmac32Bit.MatchString(f.OS)
+		return regexpMac32.MatchString(f.OS)
 	case "freebsd,arm":
-		return regexpArmBSD.MatchString(f.OS)
-	case "freebsd,386", "freebsd,amd64":
-		genericFreeBSDexp := regexp.MustCompile(osArch + "%s-freebsd[0-9]*")
-		return genericFreeBSDexp.MatchString(f.OS)
+		return regexpFreeBSDArm.MatchString(f.OS)
+	case "freebsd,386":
+		return regexpFreeBSD32.MatchString(f.OS)
+	case "freebsd,amd64":
+		return regexpFreeBSD64.MatchString(f.OS)
 	}
 	return false
 }
 
+func (f *Flavor) isCompatibleWith(osName, osArch string) (bool, int) {
+	if f.isExactMatchWith(osName, osArch) {
+		return true, 1000
+	}
+
+	switch osName + "," + osArch {
+	case "windows,amd64":
+		return regexpWindows32.MatchString(f.OS), 10
+	case "darwin,amd64":
+		return regexpMac32.MatchString(f.OS), 10
+	case "darwin,arm64":
+		// Compatibility guaranteed through Rosetta emulation
+		if regexpMac64.MatchString(f.OS) {
+			// Prefer amd64 version if available
+			return true, 20
+		}
+		return regexpMac32.MatchString(f.OS), 10
+	}
+
+	return false, 0
+}
+
 // GetCompatibleFlavour returns the downloadable resource compatible with the running O.S.
 func (tr *ToolRelease) GetCompatibleFlavour() *resources.DownloadResource {
+	return tr.GetFlavourCompatibleWith(runtime.GOOS, runtime.GOARCH)
+}
+
+// GetFlavourCompatibleWith returns the downloadable resource compatible with the specified O.S.
+func (tr *ToolRelease) GetFlavourCompatibleWith(osName, osArch string) *resources.DownloadResource {
+	var resource *resources.DownloadResource
+	priority := -1
 	for _, flavour := range tr.Flavors {
-		if flavour.isCompatibleWithCurrentMachine() {
-			return flavour.Resource
+		if comp, p := flavour.isCompatibleWith(osName, osArch); comp && p > priority {
+			resource = flavour.Resource
+			priority = p
 		}
 	}
-	return nil
+	return resource
 }
