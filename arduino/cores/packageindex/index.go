@@ -210,10 +210,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	if err != nil {
 		return fmt.Errorf("invalid platform archive size: %s", err)
 	}
-	outPlatformRelease, err := outPlatform.GetOrCreateRelease(inPlatformRelease.Version)
-	if err != nil {
-		return fmt.Errorf("creating release: %s", err)
-	}
+	outPlatformRelease := outPlatform.GetOrCreateRelease(inPlatformRelease.Version)
 	outPlatformRelease.IsTrusted = trusted
 	outPlatformRelease.Resource = &resources.DownloadResource{
 		ArchiveFileName: inPlatformRelease.ArchiveFileName,

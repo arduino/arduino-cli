@@ -112,13 +112,13 @@ func (dep *ToolDependency) String() string {
 
 // GetOrCreateRelease returns the specified release corresponding the provided version,
 // or creates a new one if not found.
-func (platform *Platform) GetOrCreateRelease(version *semver.Version) (*PlatformRelease, error) {
+func (platform *Platform) GetOrCreateRelease(version *semver.Version) *PlatformRelease {
 	tag := ""
 	if version != nil {
 		tag = version.String()
 	}
 	if release, ok := platform.Releases[tag]; ok {
-		return release, nil
+		return release
 	}
 	release := &PlatformRelease{
 		Version:     version,
@@ -128,7 +128,7 @@ func (platform *Platform) GetOrCreateRelease(version *semver.Version) (*Platform
 		Platform:    platform,
 	}
 	platform.Releases[tag] = release
-	return release, nil
+	return release
 }
 
 // FindReleaseWithVersion returns the specified release corresponding the provided version,

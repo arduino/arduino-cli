@@ -115,7 +115,7 @@ func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB
 		return err
 	}
 
-	// Check for bultin serial-discovery tool
+	// Check for builtin serial-discovery tool
 	serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(instance.PackageManager)
 	serialDiscoveryInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCB, taskCB)
 	if err != nil {
