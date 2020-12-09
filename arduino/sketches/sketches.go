@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
@@ -97,4 +98,13 @@ func (s *Sketch) ExportMetadata() error {
 		return fmt.Errorf("writing sketch metadata %s: %s", sketchJSON, err)
 	}
 	return nil
+}
+
+// BuildPath returns this Sketch build path in the temp directory of the system.
+// Returns an error if the Sketch's FullPath is not set
+func (s *Sketch) BuildPath() (*paths.Path, error) {
+	if s.FullPath == nil {
+		return nil, fmt.Errorf("sketch path is empty")
+	}
+	return builder.GenBuildPath(s.FullPath), nil
 }

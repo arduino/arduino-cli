@@ -120,10 +120,10 @@ func getDebugProperties(req *debug.DebugConfigReq, pm *packagemanager.PackageMan
 		importPath = paths.New(importDir)
 	} else {
 		// TODO: Create a function to obtain importPath from sketch
-		importPath = sketch.FullPath
-		// Add FQBN (without configs part) to export path
-		fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
-		importPath = importPath.Join("build").Join(fqbnSuffix)
+		importPath, err = sketch.BuildPath()
+		if err != nil {
+			return nil, fmt.Errorf("can't find build path for sketch: %v", err)
+		}
 	}
 	if !importPath.Exist() {
 		return nil, fmt.Errorf("compiled sketch not found in %s", importPath)
