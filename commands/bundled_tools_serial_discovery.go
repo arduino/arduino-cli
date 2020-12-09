@@ -18,6 +18,7 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -121,12 +122,14 @@ type eventJSON struct {
 	Ports     []*BoardPort `json:"ports"`
 }
 
+var listBoardMutex sync.Mutex
+
 // ListBoards foo
 func ListBoards(pm *packagemanager.PackageManager) ([]*BoardPort, error) {
 	// ensure the connection to the discoverer is unique to avoid messing up
 	// the messages exchanged
-	mutex.Lock()
-	defer mutex.Unlock()
+	listBoardMutex.Lock()
+	defer listBoardMutex.Unlock()
 
 	// get the bundled tool
 	t, err := getBuiltinSerialDiscoveryTool(pm)
