@@ -213,6 +213,9 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		uploadProperties.Merge(programmer.Properties)
 	}
 
+	for _, tool := range pm.GetAllInstalledToolsReleases() {
+		uploadProperties.Merge(tool.RuntimeProperties())
+	}
 	if requiredTools, err := pm.FindToolsRequiredForBoard(board); err == nil {
 		for _, requiredTool := range requiredTools {
 			logrus.WithField("tool", requiredTool).Info("Tool required for upload")
