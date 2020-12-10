@@ -1,11 +1,11 @@
-## Arduino Uno/Mega/Duemilanove is not detected
+## Arduino Nano/Uno/Mega is not detected
 
-When you run `arduino-cli board list`, your board doesn't show up. Possible causes:
+When you run [`arduino-cli board list`][arduino cli board list], your board doesn't show up. Possible causes:
 
-- Your board is a cheaper clone, or
-- It mounts a USB2Serial converter like FT232 or CH340: these chips always report the same USB VID/PID to the operating
-  system, so the only thing we know is that the board mounts that specific USB2Serial chip, but we don’t know which
-  board that chip is on.
+- Your board is a cheaper derivative, or
+- It's a board, such the classic Nano, that uses a USB to serial converter like FTDI FT232 or CH340. These chips always
+  report the same USB VID/PID to the operating system, so the only thing we know is that the board mounts that specific
+  USB2Serial chip, but we don’t know which board that chip is on.
 
 ## What's the FQBN string?
 
@@ -33,6 +33,7 @@ the [Monitor service documentation][monitor service].
 
 If your question wasn't answered, feel free to ask on [Arduino CLI's forum board][1].
 
+[arduino cli board list]: commands/arduino-cli_board_list.md
 [0]: platform-specification.md
 [1]: https://forum.arduino.cc/index.php?board=145.0
 [screen]: https://www.gnu.org/software/screen/manual/screen.html
