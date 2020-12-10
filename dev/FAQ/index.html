@@ -91,7 +91,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#arduino-unomegaduemilanove-is-not-detected" tabindex="0" class="md-skip">
+      <a href="#arduino-nanounomega-is-not-detected" tabindex="0" class="md-skip">
         Skip to content
       </a>
     
@@ -323,8 +323,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#arduino-unomegaduemilanove-is-not-detected" class="md-nav__link">
-    Arduino Uno/Mega/Duemilanove is not detected
+  <a href="#arduino-nanounomega-is-not-detected" class="md-nav__link">
+    Arduino Nano/Uno/Mega is not detected
   </a>
   
 </li>
@@ -1119,8 +1119,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#arduino-unomegaduemilanove-is-not-detected" class="md-nav__link">
-    Arduino Uno/Mega/Duemilanove is not detected
+  <a href="#arduino-nanounomega-is-not-detected" class="md-nav__link">
+    Arduino Nano/Uno/Mega is not detected
   </a>
   
 </li>
@@ -1172,13 +1172,13 @@
                 
                   <h1>FAQ</h1>
                 
-                <h2 id="arduino-unomegaduemilanove-is-not-detected">Arduino Uno/Mega/Duemilanove is not detected<a class="headerlink" href="#arduino-unomegaduemilanove-is-not-detected" title="Permanent link">&para;</a></h2>
-<p>When you run <code>arduino-cli board list</code>, your board doesn't show up. Possible causes:</p>
+                <h2 id="arduino-nanounomega-is-not-detected">Arduino Nano/Uno/Mega is not detected<a class="headerlink" href="#arduino-nanounomega-is-not-detected" title="Permanent link">&para;</a></h2>
+<p>When you run <a href="../commands/arduino-cli_board_list/"><code>arduino-cli board list</code></a>, your board doesn't show up. Possible causes:</p>
 <ul>
-<li>Your board is a cheaper clone, or</li>
-<li>It mounts a USB2Serial converter like FT232 or CH340: these chips always report the same USB VID/PID to the operating
-  system, so the only thing we know is that the board mounts that specific USB2Serial chip, but we don’t know which
-  board that chip is on.</li>
+<li>Your board is a cheaper derivative, or</li>
+<li>It's a board, such the classic Nano, that uses a USB to serial converter like FTDI FT232 or CH340. These chips always
+  report the same USB VID/PID to the operating system, so the only thing we know is that the board mounts that specific
+  USB2Serial chip, but we don’t know which board that chip is on.</li>
 </ul>
 <h2 id="whats-the-fqbn-string">What's the FQBN string?<a class="headerlink" href="#whats-the-fqbn-string" title="Permanent link">&para;</a></h2>
 <p>For a deeper understanding of how FQBN works, you should understand the <a href="../platform-specification/">Arduino platform specification</a>.</p>
