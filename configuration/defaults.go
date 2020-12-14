@@ -45,9 +45,9 @@ func SetDefaults(settings *viper.Viper) {
 	// daemon settings
 	settings.SetDefault("daemon.port", "50051")
 
-	//telemetry settings
-	settings.SetDefault("telemetry.enabled", true)
-	settings.SetDefault("telemetry.addr", ":9090")
+	// metrics settings
+	settings.SetDefault("metrics.enabled", true)
+	settings.SetDefault("metrics.addr", ":9090")
 
 	// Bind env vars
 	settings.SetEnvPrefix("ARDUINO")

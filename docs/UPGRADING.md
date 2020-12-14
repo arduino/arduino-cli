@@ -2,6 +2,23 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## Unreleased
+
+### Rename `telemetry` settings to `metrics`
+
+All instances of the term `telemetry` in the code and the documentation has been changed to `metrics`. This has been
+done to clarify that no data is currently gathered from users of the CLI.
+
+To handle this change the users must edit their config file, usually `arduino-cli.yaml`, and change the `telemetry` key
+to `metrics`. The modification must be done by manually editing the file using a text editor, it can't be done via CLI.
+No other action is necessary.
+
+The default folders for the `arduino-cli.yaml` are:
+
+- Linux: `/home/<your_username>/.arduino15/arduino-cli.yaml`
+- OS X: `/Users/<your_username>/Library/Arduino15/arduino-cli.yaml`
+- Windows: `C:\Users\<your_username>\AppData\Arduino15\arduino-cli.yaml`
+
 ## 0.14.0
 
 ### Changes in `debug` command

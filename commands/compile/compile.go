@@ -33,8 +33,8 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/metrics"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/arduino/arduino-cli/telemetry"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -47,7 +47,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 	tags := map[string]string{
 		"fqbn":            req.Fqbn,
-		"sketchPath":      telemetry.Sanitize(req.SketchPath),
+		"sketchPath":      metrics.Sanitize(req.SketchPath),
 		"showProperties":  strconv.FormatBool(req.ShowProperties),
 		"preprocess":      strconv.FormatBool(req.Preprocess),
 		"buildProperties": strings.Join(req.BuildProperties, ","),
@@ -55,7 +55,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		"verbose":         strconv.FormatBool(req.Verbose),
 		"quiet":           strconv.FormatBool(req.Quiet),
 		"vidPid":          req.VidPid,
-		"exportDir":       telemetry.Sanitize(req.GetExportDir()),
+		"exportDir":       metrics.Sanitize(req.GetExportDir()),
 		"jobs":            strconv.FormatInt(int64(req.Jobs), 10),
 		"libraries":       strings.Join(req.Libraries, ","),
 		"clean":           strconv.FormatBool(req.GetClean()),

@@ -25,7 +25,7 @@ from requests.packages.urllib3.util.retry import Retry
 
 
 @pytest.mark.timeout(60)
-def test_telemetry_prometheus_endpoint(daemon_runner, data_dir):
+def test_metrics_prometheus_endpoint(daemon_runner, data_dir):
     # Wait for the inventory file to be created and then parse it
     # in order to check the generated ids
     inventory_file = os.path.join(data_dir, "inventory.yaml")
@@ -35,7 +35,7 @@ def test_telemetry_prometheus_endpoint(daemon_runner, data_dir):
         inventory = yaml.safe_load(stream)
 
         # Check if :9090/metrics endpoint is alive,
-        # telemetry is enabled by default in daemon mode
+        # metrics is enabled by default in daemon mode
         s = requests.Session()
         retries = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
         s.mount("http://", HTTPAdapter(max_retries=retries))
