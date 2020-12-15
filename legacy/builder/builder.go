@@ -96,6 +96,10 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 	mainErr := runCommands(ctx, commands)
 
+	if ctx.CompilationDatabase != nil {
+		ctx.CompilationDatabase.SaveToFile()
+	}
+
 	commands = []types.Command{
 		&PrintUsedAndNotUsedLibraries{SketchError: mainErr != nil},
 

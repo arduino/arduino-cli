@@ -247,18 +247,24 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	if !objIsUpToDate {
-		command, err := PrepareCommandForRecipe(properties, recipe, false)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-
+	command, err := PrepareCommandForRecipe(properties, recipe, false)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	if ctx.CompilationDatabase != nil {
+		ctx.CompilationDatabase.Add(source, command)
+	}
+	if !objIsUpToDate && !ctx.OnlyUpdateCompilationDatabase {
 		_, _, err = utils.ExecCommand(ctx, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
 	} else if ctx.Verbose {
-		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, objectFile)
+		if objIsUpToDate {
+			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, objectFile)
+		} else {
+			logger.Println("info", "Skipping compile of: {0}", objectFile)
+		}
 	}
 
 	return objectFile, nil
@@ -452,10 +458,15 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 	logger := ctx.GetLogger()
 	archiveFilePath := buildPath.JoinPath(archiveFile)
 
-	rebuildArchive := false
+	if ctx.OnlyUpdateCompilationDatabase {
+		if ctx.Verbose {
+			logger.Println("info", "Skipping archive creation of: {0}", archiveFilePath)
+		}
+		return archiveFilePath, nil
+	}
 
 	if archiveFileStat, err := archiveFilePath.Stat(); err == nil {
-
+		rebuildArchive := false
 		for _, objectFile := range objectFilesToArchive {
 			objectFileStat, err := objectFile.Stat()
 			if err != nil || objectFileStat.ModTime().After(archiveFileStat.ModTime()) {

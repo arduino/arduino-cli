@@ -32,7 +32,9 @@ type Sizer struct {
 }
 
 func (s *Sizer) Run(ctx *types.Context) error {
-
+	if ctx.OnlyUpdateCompilationDatabase {
+		return nil
+	}
 	if s.SketchError {
 		return nil
 	}

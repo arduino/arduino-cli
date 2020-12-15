@@ -19,6 +19,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries"
@@ -163,6 +164,11 @@ type Context struct {
 
 	// Sizer results
 	ExecutableSectionsSize ExecutablesFileSections
+
+	// Compilation Database to build/update
+	CompilationDatabase *builder.CompilationDatabase
+	// Set to true to skip build and produce only Compilation Database
+	OnlyUpdateCompilationDatabase bool
 }
 
 // ExecutableSectionSize represents a section of the executable output file

@@ -35,25 +35,26 @@ import (
 )
 
 var (
-	fqbn               string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
-	showProperties     bool     // Show all build preferences used instead of compiling.
-	preprocess         bool     // Print preprocessed code to stdout.
-	buildCachePath     string   // Builds of 'core.a' are saved into this path to be cached and reused.
-	buildPath          string   // Path where to save compiled files.
-	buildProperties    []string // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
-	warnings           string   // Used to tell gcc which warning level to use.
-	verbose            bool     // Turns on verbose mode.
-	quiet              bool     // Suppresses almost every output.
-	vidPid             string   // VID/PID specific build properties.
-	uploadAfterCompile bool     // Upload the binary after the compilation.
-	port               string   // Upload port, e.g.: COM10 or /dev/ttyACM0.
-	verify             bool     // Upload, verify uploaded binary after the upload.
-	exportDir          string   // The compiled binary is written to this file
-	libraries          []string // List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
-	optimizeForDebug   bool     // Optimize compile output for debug, not for release
-	programmer         string   // Use the specified programmer to upload
-	clean              bool     // Cleanup the build folder and do not use any cached build
-	exportBinaries     bool     // Copies compiled binaries to sketch folder when true
+	fqbn                    string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	showProperties          bool     // Show all build preferences used instead of compiling.
+	preprocess              bool     // Print preprocessed code to stdout.
+	buildCachePath          string   // Builds of 'core.a' are saved into this path to be cached and reused.
+	buildPath               string   // Path where to save compiled files.
+	buildProperties         []string // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
+	warnings                string   // Used to tell gcc which warning level to use.
+	verbose                 bool     // Turns on verbose mode.
+	quiet                   bool     // Suppresses almost every output.
+	vidPid                  string   // VID/PID specific build properties.
+	uploadAfterCompile      bool     // Upload the binary after the compilation.
+	port                    string   // Upload port, e.g.: COM10 or /dev/ttyACM0.
+	verify                  bool     // Upload, verify uploaded binary after the upload.
+	exportDir               string   // The compiled binary is written to this file
+	libraries               []string // List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
+	optimizeForDebug        bool     // Optimize compile output for debug, not for release
+	programmer              string   // Use the specified programmer to upload
+	clean                   bool     // Cleanup the build folder and do not use any cached build
+	exportBinaries          bool     // Copies compiled binaries to sketch folder when true
+	compilationDatabaseOnly bool     // Only create compilation database without actually compiling
 )
 
 // NewCommand created a new `compile` command
@@ -94,6 +95,7 @@ func NewCommand() *cobra.Command {
 		"List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.")
 	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, "Optional, optimize compile output for debugging, rather than for release.")
 	command.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload.")
+	command.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, "Just produce the compilation database, without actually compiling.")
 	command.Flags().BoolVar(&clean, "clean", false, "Optional, cleanup the build folder and do not use any cached build.")
 	// We must use the following syntax for this flag since it's also bound to settings, we could use the other one too
 	// but it wouldn't make sense since we still must explicitly set the exportBinaries variable by reading from settings.
@@ -127,23 +129,24 @@ func run(cmd *cobra.Command, args []string) {
 	exportBinaries = configuration.Settings.GetBool("sketch.always_export_binaries")
 
 	compileReq := &rpc.CompileReq{
-		Instance:         inst,
-		Fqbn:             fqbn,
-		SketchPath:       sketchPath.String(),
-		ShowProperties:   showProperties,
-		Preprocess:       preprocess,
-		BuildCachePath:   buildCachePath,
-		BuildPath:        buildPath,
-		BuildProperties:  buildProperties,
-		Warnings:         warnings,
-		Verbose:          verbose,
-		Quiet:            quiet,
-		VidPid:           vidPid,
-		ExportDir:        exportDir,
-		Libraries:        libraries,
-		OptimizeForDebug: optimizeForDebug,
-		Clean:            clean,
-		ExportBinaries:   exportBinaries,
+		Instance:                      inst,
+		Fqbn:                          fqbn,
+		SketchPath:                    sketchPath.String(),
+		ShowProperties:                showProperties,
+		Preprocess:                    preprocess,
+		BuildCachePath:                buildCachePath,
+		BuildPath:                     buildPath,
+		BuildProperties:               buildProperties,
+		Warnings:                      warnings,
+		Verbose:                       verbose,
+		Quiet:                         quiet,
+		VidPid:                        vidPid,
+		ExportDir:                     exportDir,
+		Libraries:                     libraries,
+		OptimizeForDebug:              optimizeForDebug,
+		Clean:                         clean,
+		ExportBinaries:                exportBinaries,
+		CreateCompilationDatabaseOnly: compilationDatabaseOnly,
 	}
 	compileOut := new(bytes.Buffer)
 	compileErr := new(bytes.Buffer)

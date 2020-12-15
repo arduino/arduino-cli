@@ -129,10 +129,12 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	} else {
 		builderCtx.BuildPath = paths.New(req.GetBuildPath())
 	}
-
 	if err = builderCtx.BuildPath.MkdirAll(); err != nil {
 		return nil, fmt.Errorf("cannot create build directory: %s", err)
 	}
+	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
+		builderCtx.BuildPath.Join("compile_commands.json"),
+	)
 
 	builderCtx.Verbose = req.GetVerbose()
 
@@ -188,6 +190,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	builderCtx.ExecStderr = errStream
 	builderCtx.SetLogger(i18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
 	builderCtx.Clean = req.GetClean()
+	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 
 	// Use defer() to create an rpc.CompileResp with all the information available at the
 	// moment of return.
