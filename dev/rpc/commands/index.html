@@ -1340,6 +1340,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#compilereqsourceoverrideentry" class="md-nav__link">
+    CompileReq.SourceOverrideEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#compileresp" class="md-nav__link">
     CompileResp
   </a>
@@ -2336,6 +2343,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#compilereqsourceoverrideentry" class="md-nav__link">
+    CompileReq.SourceOverrideEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#compileresp" class="md-nav__link">
     CompileResp
   </a>
@@ -2867,6 +2881,7 @@
 <p><a href="#commands/compile.proto">commands/compile.proto</a></p>
 <ul>
 <li><a href="#cc.arduino.cli.commands.CompileReq">CompileReq</a></li>
+<li><a href="#cc.arduino.cli.commands.CompileReq.SourceOverrideEntry">CompileReq.SourceOverrideEntry</a></li>
 <li><a href="#cc.arduino.cli.commands.CompileResp">CompileResp</a></li>
 <li><a href="#cc.arduino.cli.commands.ExecutableSectionSize">ExecutableSectionSize</a></li>
 </ul>
@@ -4654,6 +4669,38 @@
 <td><a href="#bool">bool</a></td>
 <td></td>
 <td>When set to <code>true</code> only the compilation database will be produced and no actual build will be performed.</td>
+</tr>
+<tr>
+<td>source_override</td>
+<td><a href="#cc.arduino.cli.commands.CompileReq.SourceOverrideEntry">CompileReq.SourceOverrideEntry</a></td>
+<td>repeated</td>
+<td>This map (source file -&gt; new content) let the builder use the provided content instead of reading the corresponding file on disk. This is useful for IDE that have unsaved changes in memory. The path must be relative to the sketch directory. Only files from the sketch are allowed.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.CompileReq.SourceOverrideEntry"></a></p>
+<h3 id="compilereqsourceoverrideentry">CompileReq.SourceOverrideEntry<a class="headerlink" href="#compilereqsourceoverrideentry" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>key</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>value</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
