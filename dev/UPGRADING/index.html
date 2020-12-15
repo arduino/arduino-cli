@@ -314,6 +314,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#change-behaviour-of-config-file-flag-with-config-commands" class="md-nav__link">
+    Change behaviour of --config-file flag with config commands
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1166,6 +1173,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#change-behaviour-of-config-file-flag-with-config-commands" class="md-nav__link">
+    Change behaviour of --config-file flag with config commands
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1240,6 +1254,10 @@ list all the possible programmers for the current board was hackish.</p>
 <p>With the introduction of the <code>--git-url</code> and <code>--zip-file</code> flags the new config key <code>library.enable_unsafe_install</code> has
 been added to enable them.</p>
 <p>This changes the ouput of the <code>config dump</code> command.</p>
+<h3 id="change-behaviour-of-config-file-flag-with-config-commands">Change behaviour of <code>--config-file</code> flag with <code>config</code> commands<a class="headerlink" href="#change-behaviour-of-config-file-flag-with-config-commands" title="Permanent link">&para;</a></h3>
+<p>To create a new config file with <code>config init</code> one must now use <code>--dest-dir</code> or the new <code>--dest-file</code> flags. Previously
+the config file would always be overwritten by this command, now it fails if the it already exists, to force the
+previous behaviour the user must set the <code>--overwrite</code> flag.</p>
                 
                   
                 
