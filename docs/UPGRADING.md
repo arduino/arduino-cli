@@ -68,3 +68,9 @@ With the introduction of the `--git-url` and `--zip-file` flags the new config k
 been added to enable them.
 
 This changes the ouput of the `config dump` command.
+
+### Change behaviour of `--config-file` flag with `config` commands
+
+To create a new config file with `config init` one must now use `--dest-dir` or the new `--dest-file` flags. Previously
+the config file would always be overwritten by this command, now it fails if the it already exists, to force the
+previous behaviour the user must set the `--overwrite` flag.
