@@ -80,6 +80,7 @@ func (t *Table) Render() string {
 	average := make([]int, t.columnsCount)
 	widths := make([]int, t.columnsCount)
 	count := make([]int, t.columnsCount)
+	minimum := make([]int, t.columnsCount)
 	for _, row := range t.rows {
 		for x, cell := range row.cells {
 			l := cell.Len()
@@ -98,6 +99,15 @@ func (t *Table) Render() string {
 			average[x] = average[x] / count[x]
 		}
 	}
+	// table headers will dictate the absolute min width
+	for x := range minimum {
+		if t.hasHeader {
+			minimum[x] = t.rows[0].cells[x].Len()
+		} else {
+			minimum[x] = 1
+		}
+	}
+
 	variance := make([]int, t.columnsCount)
 	for _, row := range t.rows {
 		for x, cell := range row.cells {
@@ -127,6 +137,9 @@ func (t *Table) Render() string {
 				case Average:
 					selectedWidth = average[x] + variance[x]*3
 				}
+			}
+			if selectedWidth < minimum[x] {
+				selectedWidth = minimum[x]
 			}
 			res += separator
 			res += cell.Pad(selectedWidth)
