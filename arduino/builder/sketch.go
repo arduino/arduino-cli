@@ -216,12 +216,23 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 }
 
 // SketchMergeSources merges all the source files included in a sketch
-func SketchMergeSources(sketch *sketch.Sketch) (int, string, error) {
+func SketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, string, error) {
 	lineOffset := 0
 	mergedSource := ""
 
+	getSource := func(i *sketch.Item) (string, error) {
+		path, err := filepath.Rel(sk.LocationPath, i.Path)
+		if err != nil {
+			return "", errors.Wrap(err, "unable to compute relative path to the sketch for the item")
+		}
+		if override, ok := overrides[path]; ok {
+			return override, nil
+		}
+		return i.GetSourceStr()
+	}
+
 	// add Arduino.h inclusion directive if missing
-	mainSrc, err := sketch.MainFile.GetSourceStr()
+	mainSrc, err := getSource(sk.MainFile)
 	if err != nil {
 		return 0, "", err
 	}
@@ -230,12 +241,12 @@ func SketchMergeSources(sketch *sketch.Sketch) (int, string, error) {
 		lineOffset++
 	}
 
-	mergedSource += "#line 1 " + QuoteCppString(sketch.MainFile.Path) + "\n"
+	mergedSource += "#line 1 " + QuoteCppString(sk.MainFile.Path) + "\n"
 	mergedSource += mainSrc + "\n"
 	lineOffset++
 
-	for _, item := range sketch.OtherSketchFiles {
-		src, err := item.GetSourceStr()
+	for _, item := range sk.OtherSketchFiles {
+		src, err := getSource(item)
 		if err != nil {
 			return 0, "", err
 		}
@@ -248,7 +259,7 @@ func SketchMergeSources(sketch *sketch.Sketch) (int, string, error) {
 
 // SketchCopyAdditionalFiles copies the additional files for a sketch to the
 // specified destination directory.
-func SketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath string) error {
+func SketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath string, overrides map[string]string) error {
 	if err := os.MkdirAll(destPath, os.FileMode(0755)); err != nil {
 		return errors.Wrap(err, "unable to create a folder to save the sketch files")
 	}
@@ -265,7 +276,20 @@ func SketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath string) error {
 			return errors.Wrap(err, "unable to create the folder containing the item")
 		}
 
-		err = writeIfDifferent(item.Path, targetPath)
+		var sourceBytes []byte
+		if override, ok := overrides[relpath]; ok {
+			// use override source
+			sourceBytes = []byte(override)
+		} else {
+			// read the source file
+			s, err := item.GetSourceBytes()
+			if err != nil {
+				return errors.Wrap(err, "unable to read contents of the source item")
+			}
+			sourceBytes = s
+		}
+
+		err = writeIfDifferent(sourceBytes, targetPath)
 		if err != nil {
 			return errors.Wrap(err, "unable to write to destination file")
 		}
@@ -274,18 +298,12 @@ func SketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath string) error {
 	return nil
 }
 
-func writeIfDifferent(sourcePath, destPath string) error {
-	// read the source file
-	newbytes, err := ioutil.ReadFile(sourcePath)
-	if err != nil {
-		return errors.Wrap(err, "unable to read contents of the source item")
-	}
-
+func writeIfDifferent(source []byte, destPath string) error {
 	// check whether the destination file exists
-	_, err = os.Stat(destPath)
+	_, err := os.Stat(destPath)
 	if os.IsNotExist(err) {
 		// write directly
-		return ioutil.WriteFile(destPath, newbytes, os.FileMode(0644))
+		return ioutil.WriteFile(destPath, source, os.FileMode(0644))
 	}
 
 	// read the destination file if it ex
@@ -295,8 +313,8 @@ func writeIfDifferent(sourcePath, destPath string) error {
 	}
 
 	// overwrite if contents are different
-	if bytes.Compare(existingBytes, newbytes) != 0 {
-		return ioutil.WriteFile(destPath, newbytes, os.FileMode(0644))
+	if bytes.Compare(existingBytes, source) != 0 {
+		return ioutil.WriteFile(destPath, source, os.FileMode(0644))
 	}
 
 	// source and destination are the same, don't write anything

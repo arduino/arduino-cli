@@ -18,6 +18,7 @@ package compile
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -55,6 +56,7 @@ var (
 	clean                   bool     // Cleanup the build folder and do not use any cached build
 	exportBinaries          bool     // Copies compiled binaries to sketch folder when true
 	compilationDatabaseOnly bool     // Only create compilation database without actually compiling
+	sourceOverrides         string   // Path to a .json file that contains a set of replacements of the sketch source code.
 )
 
 // NewCommand created a new `compile` command
@@ -102,6 +104,8 @@ func NewCommand() *cobra.Command {
 	// This must be done because the value is set when the binding is accessed from viper. Accessing from cobra would only
 	// read the value if the flag is set explicitly by the user.
 	command.Flags().BoolP("export-binaries", "e", false, "If set built binaries will be exported to the sketch folder.")
+	command.Flags().StringVar(&sourceOverrides, "source-override", "", "Optional. Path to a .json file that contains a set of replacements of the sketch source code.")
+	command.Flag("source-override").Hidden = true
 
 	configuration.Settings.BindPFlag("sketch.always_export_binaries", command.Flags().Lookup("export-binaries"))
 
@@ -128,6 +132,23 @@ func run(cmd *cobra.Command, args []string) {
 	// the config file and the env vars.
 	exportBinaries = configuration.Settings.GetBool("sketch.always_export_binaries")
 
+	var overrides map[string]string
+	if sourceOverrides != "" {
+		data, err := paths.New(sourceOverrides).ReadFile()
+		if err != nil {
+			feedback.Errorf("Error opening source code overrides data file: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		var o struct {
+			Overrides map[string]string `json:"overrides"`
+		}
+		if err := json.Unmarshal(data, &o); err != nil {
+			feedback.Errorf("Error: invalid source code overrides data file: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		overrides = o.Overrides
+	}
+
 	compileReq := &rpc.CompileReq{
 		Instance:                      inst,
 		Fqbn:                          fqbn,
@@ -147,6 +168,7 @@ func run(cmd *cobra.Command, args []string) {
 		Clean:                         clean,
 		ExportBinaries:                exportBinaries,
 		CreateCompilationDatabaseOnly: compilationDatabaseOnly,
+		SourceOverride:                overrides,
 	}
 	compileOut := new(bytes.Buffer)
 	compileErr := new(bytes.Buffer)

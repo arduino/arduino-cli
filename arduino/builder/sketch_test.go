@@ -180,7 +180,7 @@ func TestMergeSketchSources(t *testing.T) {
 		t.Fatalf("unable to read golden file %s: %v", mergedPath, err)
 	}
 
-	offset, source, err := builder.SketchMergeSources(s)
+	offset, source, err := builder.SketchMergeSources(s, nil)
 	require.Nil(t, err)
 	require.Equal(t, 2, offset)
 	require.Equal(t, string(mergedBytes), source)
@@ -192,7 +192,7 @@ func TestMergeSketchSourcesArduinoIncluded(t *testing.T) {
 	require.NotNil(t, s)
 
 	// ensure not to include Arduino.h when it's already there
-	_, source, err := builder.SketchMergeSources(s)
+	_, source, err := builder.SketchMergeSources(s, nil)
 	require.Nil(t, err)
 	require.Equal(t, 1, strings.Count(source, "<Arduino.h>"))
 }
@@ -208,7 +208,7 @@ func TestCopyAdditionalFiles(t *testing.T) {
 
 	// copy the sketch over, create a fake main file we don't care about it
 	// but we need it for `SketchLoad` to succeed later
-	err = builder.SketchCopyAdditionalFiles(s1, tmp)
+	err = builder.SketchCopyAdditionalFiles(s1, tmp, nil)
 	require.Nil(t, err)
 	fakeIno := filepath.Join(tmp, fmt.Sprintf("%s.ino", filepath.Base(tmp)))
 	require.Nil(t, ioutil.WriteFile(fakeIno, []byte{}, os.FileMode(0644)))
@@ -223,7 +223,7 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	require.Nil(t, err)
 
 	// copy again
-	err = builder.SketchCopyAdditionalFiles(s1, tmp)
+	err = builder.SketchCopyAdditionalFiles(s1, tmp, nil)
 	require.Nil(t, err)
 
 	// verify file hasn't changed
