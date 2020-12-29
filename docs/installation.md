@@ -11,6 +11,53 @@ brew install arduino-cli
 
 [Command line completion](command-line-completion.md#brew) files are already bundled in the homebrew installation.
 
+### Install via APT (Debian and Derivatives (e.g. Ubuntu, Linux Mint, Raspbian...)) _(Stable branch only)_
+
+> Repo built and maintained by [Stig124](https://github.com/Stig124)
+
+Compatible archs (run `uname -m` to find the arch):
+
+```md
+    - x86_64 (i386/i686 | amd64)
+    - ARMhf (ARMv7)
+    - ARM64
+```
+
+#### Prerequisites
+
+```bash
+sudo apt install -y apt-transport-https gpg software-properties-common
+```
+
+#### First get the repo signing key
+
+```bash
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key 279A21604BD7A551CD0742FE3E154464D54EBA5C
+```
+
+#### Adding the repository
+
+_Pay no attention to the focal word (focal is the Ubuntu 20.04 codename), it works on every debian-based distro_
+
+```bash
+echo "deb https://apt.test124.dev focal stable" | sudo tee /etc/apt/sources.list.d/cli.list
+```
+
+#### Installing the package
+
+`sudo apt update` and `sudo apt install arduinocli`
+
+#### Remove the package
+
+> Note : `apt purge` isn't going to work, need to reset manually if needed
+
+```bash
+sudo apt remove arduinocli
+```
+
+> The script that fetch and builds the packages is available on
+> [Github](https://github.com/Stig124/arduino-clidebfetchbuild)
+
 ### Use the install script
 
 The script requires `sh`. This is always available on Linux and macOS. `sh` is not available by default on Windows. The
