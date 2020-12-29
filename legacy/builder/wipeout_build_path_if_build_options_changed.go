@@ -45,13 +45,13 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	json.Unmarshal([]byte(previousBuildOptionsJson), &prevOpts)
 
 	// If SketchLocation path is different but filename is the same, consider it equal
-	if filepath.Base(opts.Get("sketchLocation")) == filepath.Base(prevOpts.Get("sketchLocation")) {
+	if prevOpts != nil && filepath.Base(opts.Get("sketchLocation")) == filepath.Base(prevOpts.Get("sketchLocation")) {
 		opts.Remove("sketchLocation")
 		prevOpts.Remove("sketchLocation")
 	}
 
 	// If options are not changed check if core has
-	if opts.Equals(prevOpts) {
+	if prevOpts != nil && opts.Equals(prevOpts) {
 		// check if any of the files contained in the core folders has changed
 		// since the json was generated - like platform.txt or similar
 		// if so, trigger a "safety" wipe
