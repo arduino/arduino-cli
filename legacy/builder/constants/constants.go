@@ -125,6 +125,7 @@ const MSG_USING_CACHED_INCLUDES = "Using cached library dependencies for file: {
 const MSG_WARNING_LIB_INVALID_CATEGORY = "WARNING: Category '{0}' in library {1} is not valid. Setting to '{2}'"
 const MSG_WARNING_PLATFORM_OLD_VALUES = "Warning: platform.txt from core '{0}' contains deprecated {1}, automatically converted to {2}. Consider upgrading this core."
 const MSG_WARNING_SPURIOUS_FILE_IN_LIB = "WARNING: Spurious {0} folder in '{1}' library"
+const MSG_INVESTIGATE = " (unusual state to investigate)"
 const PACKAGE_NAME = "name"
 const PACKAGE_TOOLS = "tools"
 const PLATFORM_ARCHITECTURE = "architecture"
