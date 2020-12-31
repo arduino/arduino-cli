@@ -40,11 +40,10 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	previousBuildOptionsJson := ctx.BuildOptionsJsonPrevious
 
 	var opts *properties.Map
-	var prevOpts *properties.Map
 	json.Unmarshal([]byte(buildOptionsJson), &opts)
-	json.Unmarshal([]byte(previousBuildOptionsJson), &prevOpts)
 
-	if prevOpts == nil {
+	var prevOpts *properties.Map
+	if err := json.Unmarshal([]byte(previousBuildOptionsJson), &prevOpts); err != nil || prevOpts == nil {
 		ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, constants.MSG_BUILD_OPTIONS_INVALID, constants.BUILD_OPTIONS_FILE)
 		return doCleanup(ctx.BuildPath)
 	}
