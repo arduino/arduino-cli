@@ -279,6 +279,26 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rename-telemetry-settings-to-metrics" class="md-nav__link">
+    Rename telemetry settings to metrics
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0140" class="md-nav__link">
     0.14.0
   </a>
@@ -1138,6 +1158,26 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rename-telemetry-settings-to-metrics" class="md-nav__link">
+    Rename telemetry settings to metrics
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0140" class="md-nav__link">
     0.14.0
   </a>
@@ -1204,6 +1244,19 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="rename-telemetry-settings-to-metrics">Rename <code>telemetry</code> settings to <code>metrics</code><a class="headerlink" href="#rename-telemetry-settings-to-metrics" title="Permanent link">&para;</a></h3>
+<p>All instances of the term <code>telemetry</code> in the code and the documentation has been changed to <code>metrics</code>. This has been
+done to clarify that no data is currently gathered from users of the CLI.</p>
+<p>To handle this change the users must edit their config file, usually <code>arduino-cli.yaml</code>, and change the <code>telemetry</code> key
+to <code>metrics</code>. The modification must be done by manually editing the file using a text editor, it can't be done via CLI.
+No other action is necessary.</p>
+<p>The default folders for the <code>arduino-cli.yaml</code> are:</p>
+<ul>
+<li>Linux: <code>/home/&lt;your_username&gt;/.arduino15/arduino-cli.yaml</code></li>
+<li>OS X: <code>/Users/&lt;your_username&gt;/Library/Arduino15/arduino-cli.yaml</code></li>
+<li>Windows: <code>C:\Users\&lt;your_username&gt;\AppData\Arduino15\arduino-cli.yaml</code></li>
+</ul>
 <h2 id="0140">0.14.0<a class="headerlink" href="#0140" title="Permanent link">&para;</a></h2>
 <h3 id="changes-in-debug-command">Changes in <code>debug</code> command<a class="headerlink" href="#changes-in-debug-command" title="Permanent link">&para;</a></h3>
 <p>Previously it was required:</p>
