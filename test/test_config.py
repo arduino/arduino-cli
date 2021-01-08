@@ -40,8 +40,8 @@ def test_init_with_existing_custom_config(run_command, data_dir, working_dir, do
     assert "" == configs["logging"]["file"]
     assert "text" == configs["logging"]["format"]
     assert "info" == configs["logging"]["level"]
-    assert ":9090" == configs["telemetry"]["addr"]
-    assert configs["telemetry"]["enabled"]
+    assert ":9090" == configs["metrics"]["addr"]
+    assert configs["metrics"]["enabled"]
 
     config_file_path = Path(working_dir) / "config" / "test" / "config.yaml"
     assert not config_file_path.exists()
@@ -60,8 +60,8 @@ def test_init_with_existing_custom_config(run_command, data_dir, working_dir, do
     assert "" == configs["logging"]["file"]
     assert "text" == configs["logging"]["format"]
     assert "info" == configs["logging"]["level"]
-    assert ":9090" == configs["telemetry"]["addr"]
-    assert configs["telemetry"]["enabled"]
+    assert ":9090" == configs["metrics"]["addr"]
+    assert configs["metrics"]["enabled"]
 
 
 def test_init_overwrite_existing_custom_file(run_command, data_dir, working_dir, downloads_dir):
@@ -80,8 +80,8 @@ def test_init_overwrite_existing_custom_file(run_command, data_dir, working_dir,
     assert "" == configs["logging"]["file"]
     assert "text" == configs["logging"]["format"]
     assert "info" == configs["logging"]["level"]
-    assert ":9090" == configs["telemetry"]["addr"]
-    assert configs["telemetry"]["enabled"]
+    assert ":9090" == configs["metrics"]["addr"]
+    assert configs["metrics"]["enabled"]
 
     result = run_command("config init --overwrite")
     assert result.ok
@@ -98,8 +98,8 @@ def test_init_overwrite_existing_custom_file(run_command, data_dir, working_dir,
     assert "" == configs["logging"]["file"]
     assert "text" == configs["logging"]["format"]
     assert "info" == configs["logging"]["level"]
-    assert ":9090" == configs["telemetry"]["addr"]
-    assert configs["telemetry"]["enabled"]
+    assert ":9090" == configs["metrics"]["addr"]
+    assert configs["metrics"]["enabled"]
 
 
 def test_init_dest_absolute_path(run_command, working_dir):

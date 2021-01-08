@@ -31,8 +31,8 @@ var validMap = map[string]reflect.Kind{
 	"logging.format":                reflect.String,
 	"logging.level":                 reflect.String,
 	"sketch.always_export_binaries": reflect.Bool,
-	"telemetry.addr":                reflect.String,
-	"telemetry.enabled":             reflect.Bool,
+	"metrics.addr":                  reflect.String,
+	"metrics.enabled":               reflect.Bool,
 }
 
 func typeOf(key string) (reflect.Kind, error) {

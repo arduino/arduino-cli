@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package telemetry
+package metrics
 
 import (
 	"crypto/hmac"
@@ -28,10 +28,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// serverPattern is the telemetry endpoint resource path for consume metrics
+// serverPattern is the metrics endpoint resource path for consume metrics
 var serverPattern = "/metrics"
 
-// Activate configures and starts the telemetry server exposing a Prometheus resource
+// Activate configures and starts the metrics server exposing a Prometheus resource
 func Activate(metricPrefix string) {
 	// Create a Prometheus default handler
 	ph := prometheus.DefaultHandler
@@ -43,8 +43,8 @@ func Activate(metricPrefix string) {
 	stats.Register(ph)
 
 	// Configure using viper settings
-	serverAddr := configuration.Settings.GetString("telemetry.addr")
-	logrus.Infof("Setting up Prometheus telemetry on %s%s", serverAddr, serverPattern)
+	serverAddr := configuration.Settings.GetString("metrics.addr")
+	logrus.Infof("Setting up Prometheus metrics on %s%s", serverAddr, serverPattern)
 	go func() {
 		http.Handle(serverPattern, ph)
 		logrus.Error(http.ListenAndServe(serverAddr, nil))

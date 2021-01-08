@@ -329,7 +329,7 @@ The [client_example] folder contains a sample client code that shows how to inte
 services and messages are detailed in the [gRPC reference] pages.
 
 To provide observability for the gRPC server activities besides logs, the `daemon` mode activates and exposes by default
-a [Prometheus](https://prometheus.io/) endpoint (http://localhost:9090/metrics) that can be fetched for telemetry data
+a [Prometheus](https://prometheus.io/) endpoint (http://localhost:9090/metrics) that can be fetched for metrics data
 like:
 
 ```text
@@ -340,10 +340,10 @@ daemon_compile{buildProperties="",exportFile="",fqbn="arduino:samd:mkr1000",inst
 daemon_board_list{installationID="ed6f1f22-1fbe-4b1f-84be-84d035b6369c",success="true"} 1 1580385724833
 ```
 
-The telemetry settings are exposed via the `telemetry` section in the CLI configuration:
+The metrics settings are exposed via the `metrics` section in the CLI configuration:
 
 ```yaml
-telemetry:
+metrics:
   enabled: true
   addr: :9090
 ```

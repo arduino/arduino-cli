@@ -96,8 +96,8 @@ func TestInit(t *testing.T) {
 
 	require.Equal(t, "50051", settings.GetString("daemon.port"))
 
-	require.Equal(t, true, settings.GetBool("telemetry.enabled"))
-	require.Equal(t, ":9090", settings.GetString("telemetry.addr"))
+	require.Equal(t, true, settings.GetBool("metrics.enabled"))
+	require.Equal(t, ":9090", settings.GetString("metrics.addr"))
 }
 
 func TestFindConfigFile(t *testing.T) {

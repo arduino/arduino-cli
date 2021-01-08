@@ -29,11 +29,11 @@ import (
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands/daemon"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/metrics"
 	srv_commands "github.com/arduino/arduino-cli/rpc/commands"
 	srv_debug "github.com/arduino/arduino-cli/rpc/debug"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/monitor"
 	srv_settings "github.com/arduino/arduino-cli/rpc/settings"
-	"github.com/arduino/arduino-cli/telemetry"
 	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -60,8 +60,8 @@ var daemonize bool
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
 
-	if configuration.Settings.GetBool("telemetry.enabled") {
-		telemetry.Activate("daemon")
+	if configuration.Settings.GetBool("metrics.enabled") {
+		metrics.Activate("daemon")
 		stats.Incr("daemon", stats.T("success", "true"))
 		defer stats.Flush()
 	}
@@ -90,7 +90,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		go func() {
 			// Stdin is closed when the controlling parent process ends
 			_, _ = io.Copy(ioutil.Discard, os.Stdin)
-			// Flush telemetry stats (this is a no-op if telemetry is disabled)
+			// Flush metrics stats (this is a no-op if metrics is disabled)
 			stats.Flush()
 			os.Exit(0)
 		}()
