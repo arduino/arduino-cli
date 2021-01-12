@@ -16,10 +16,10 @@
 package inventory
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
-	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/gofrs/uuid"
 	"github.com/spf13/viper"
 )
@@ -35,7 +35,7 @@ var (
 )
 
 // Init configures the Read Only config storage
-func Init(configPath string) {
+func Init(configPath string) error {
 	configFilePath := filepath.Join(configPath, Name)
 	Store.SetConfigName(Name)
 	Store.SetConfigType(Type)
@@ -45,40 +45,49 @@ func Init(configPath string) {
 		// ConfigFileNotFoundError is acceptable, anything else
 		// should be reported to the user
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			generateInstallationData()
-			writeStore(configFilePath)
+			if err := generateInstallationData(); err != nil {
+				return err
+			}
+			if err := writeStore(configFilePath); err != nil {
+				return err
+			}
 		} else {
-			feedback.Errorf("Error reading inventory file: %v", err)
+			return fmt.Errorf("reading inventory file: %w", err)
 		}
 	}
+
+	return nil
 }
 
-func generateInstallationData() {
+func generateInstallationData() error {
 	installationID, err := uuid.NewV4()
 	if err != nil {
-		feedback.Errorf("Error generating installation.id: %v", err)
+		return fmt.Errorf("generating installation.id: %w", err)
 	}
 	Store.Set("installation.id", installationID.String())
 
 	installationSecret, err := uuid.NewV4()
 	if err != nil {
-		feedback.Errorf("Error generating installation.secret: %v", err)
+		return fmt.Errorf("generating installation.secret: %w", err)
 	}
 	Store.Set("installation.secret", installationSecret.String())
+	return nil
 }
 
-func writeStore(configFilePath string) {
+func writeStore(configFilePath string) error {
 	configPath := filepath.Dir(configFilePath)
 
 	// Create config dir if not present,
 	// MkdirAll will retrun no error if the path already exists
 	if err := os.MkdirAll(configPath, os.FileMode(0755)); err != nil {
-		feedback.Errorf("Error creating inventory dir: %v", err)
+		return fmt.Errorf("invalid path creating config dir: %s error: %w", configPath, err)
 	}
 
 	// Create file if not present
 	err := Store.WriteConfigAs(configFilePath)
 	if err != nil {
-		feedback.Errorf("Error writing inventory file: %v", err)
+		return fmt.Errorf("invalid path writing inventory file: %s error: %w", configFilePath, err)
 	}
+
+	return nil
 }
