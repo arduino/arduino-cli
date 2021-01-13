@@ -121,7 +121,7 @@ nav:
   - sketch-specification.md
   - library-specification.md
   - platform-specification.md
-  - package_index.json specification: package_index_json-specification.md
+  - Package index specification: package_index_json-specification.md
 
 extra_css:
   - css/version-select.css
