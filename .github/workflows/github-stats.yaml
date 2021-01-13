@@ -34,7 +34,7 @@ jobs:
               const baseName = `arduino-cli_${rel.name}_`
 
               // Get a list of assets for this release
-              const opts = github.repos.listAssetsForRelease.endpoint.merge({
+              const opts = github.repos.listReleaseAssets.endpoint.merge({
                 ...context.repo,
                 release_id: rel.id
               })
