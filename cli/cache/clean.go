@@ -28,8 +28,8 @@ import (
 func initCleanCommand() *cobra.Command {
 	cleanCommand := &cobra.Command{
 		Use:     "clean",
-		Short:   "Clean arduino cache.",
-		Long:    "Clean the files i.e. `~/arduino15/staging` in Linux.",
+		Short:   "Delete Boards/Library Manager download cache.",
+		Long:    "Delete contents of the `directories.downloads` folder, where archive files are staged during installation of libraries and boards platforms.",
 		Example: "  " + os.Args[0] + " cache clean",
 		Args:    cobra.NoArgs,
 		Run:     runCleanCommand,
