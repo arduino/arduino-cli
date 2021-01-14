@@ -40,8 +40,8 @@ The library.properties file is a key=value properties list. Every field in this 
 otherwise below, **all fields are required**. The available fields are:
 
 - **name** - the name of the library. Library names must contain only basic letters (A-Z or a-z) and numbers (0-9),
-  spaces ( ), underscores (\_), dots (.) and dashes (-). They cannot start with a number. Note that libraries with a
-  `name` value starting with `Arduino` will no longer be allowed
+  spaces ( ), underscores (\_), dots (.) and dashes (-). They must start with a letter or number. They must contain at
+  least one letter. Note that libraries with a `name` value starting with `Arduino` will no longer be allowed
   [addition to the Library Manager index](https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ) as these names
   are now reserved for official Arduino libraries.
 - **version** - version of the library. Version should be [semver](http://semver.org/) compliant. 1.2.0 is correct; 1.2
