@@ -1222,8 +1222,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../package_index_json-specification/" title="package_index.json specification" class="md-nav__link">
-      package_index.json specification
+    <a href="../package_index_json-specification/" title="Package index specification" class="md-nav__link">
+      Package index specification
     </a>
   </li>
 
@@ -1462,8 +1462,8 @@ way. It must be located in the root of the library folder.</p>
 otherwise below, <strong>all fields are required</strong>. The available fields are:</p>
 <ul>
 <li><strong>name</strong> - the name of the library. Library names must contain only basic letters (A-Z or a-z) and numbers (0-9),
-  spaces ( ), underscores (_), dots (.) and dashes (-). They cannot start with a number. Note that libraries with a
-  <code>name</code> value starting with <code>Arduino</code> will no longer be allowed
+  spaces ( ), underscores (_), dots (.) and dashes (-). They must start with a letter or number. They must contain at
+  least one letter. Note that libraries with a <code>name</code> value starting with <code>Arduino</code> will no longer be allowed
   <a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">addition to the Library Manager index</a> as these names
   are now reserved for official Arduino libraries.</li>
 <li><strong>version</strong> - version of the library. Version should be <a href="http://semver.org/">semver</a> compliant. 1.2.0 is correct; 1.2
