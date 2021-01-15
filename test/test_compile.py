@@ -181,33 +181,26 @@ def test_compile_blacklisted_sketchname(run_command, data_dir):
     assert result.ok
 
 
-@pytest.mark.skip()
 def test_compile_without_precompiled_libraries(run_command, data_dir):
     # Init the environment explicitly
     url = "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json"
     result = run_command("core update-index --additional-urls={}".format(url))
     assert result.ok
-    # arduino:mbed 1.1.5 is incompatible with the Arduino_TensorFlowLite library
-    # see: https://github.com/arduino/ArduinoCore-nRF528x-mbedos/issues/93
-    result = run_command("core install arduino:mbed@1.1.4 --additional-urls={}".format(url))
+    result = run_command("core install arduino:mbed@1.3.1 --additional-urls={}".format(url))
     assert result.ok
     result = run_command("core install arduino:samd@1.8.7 --additional-urls={}".format(url))
     assert result.ok
     result = run_command("core install adafruit:samd@1.6.0 --additional-urls={}".format(url))
     assert result.ok
 
-    # Install pre-release version of Arduino_TensorFlowLite (will be officially released
-    # via lib manager after https://github.com/arduino/arduino-builder/issues/353 is in)
-    import zipfile
-
-    with zipfile.ZipFile("test/testdata/Arduino_TensorFlowLite.zip", "r") as zip_ref:
-        zip_ref.extractall("{}/libraries/".format(data_dir))
-    result = run_command("lib install Arduino_LSM9DS1@1.1.0")
+    # Precompiled version of Arduino_TensorflowLite
+    result = run_command("lib install Arduino_TensorflowLite@2.1.1-ALPHA-precompiled")
     assert result.ok
     result = run_command(
         "compile -b arduino:mbed:nano33ble {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir)
     )
     assert result.ok
+    # should work on adafruit too after https://github.com/arduino/arduino-cli/pull/1134
     result = run_command(
         "compile -b adafruit:samd:adafruit_feather_m4 {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(
             data_dir
@@ -216,7 +209,7 @@ def test_compile_without_precompiled_libraries(run_command, data_dir):
     assert result.ok
 
     # Non-precompiled version of Arduino_TensorflowLite
-    result = run_command("lib install Arduino_TensorflowLite@1.15.0-ALPHA")
+    result = run_command("lib install Arduino_TensorflowLite@2.1.0-ALPHA")
     assert result.ok
     result = run_command(
         "compile -b arduino:mbed:nano33ble {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir)
@@ -241,6 +234,12 @@ def test_compile_without_precompiled_libraries(run_command, data_dir):
     )
     assert result.ok
 
+    # USBBlaster library
+    result = run_command('lib install "USBBlaster@1.0.0"')
+    assert result.ok
+    result = run_command(
+        "compile -b arduino:samd:mkrvidor4000 {}/libraries/USBBlaster/examples/USB_Blaster/".format(data_dir)
+    )
 
 def test_compile_with_build_properties_flag(run_command, data_dir, copy_sketch):
     # Init the environment explicitly
