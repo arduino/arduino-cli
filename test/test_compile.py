@@ -237,9 +237,8 @@ def test_compile_without_precompiled_libraries(run_command, data_dir):
     # USBBlaster library
     result = run_command('lib install "USBBlaster@1.0.0"')
     assert result.ok
-    result = run_command(
-        "compile -b arduino:samd:mkrvidor4000 {}/libraries/USBBlaster/examples/USB_Blaster/".format(data_dir)
-    )
+    result = run_command(f"compile -b arduino:samd:mkrvidor4000 {data_dir}/libraries/USBBlaster/examples/USB_Blaster/")
+
 
 def test_compile_with_build_properties_flag(run_command, data_dir, copy_sketch):
     # Init the environment explicitly
