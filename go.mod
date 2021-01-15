@@ -40,7 +40,7 @@ require (
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/testify v1.6.1
 	go.bug.st/cleanup v1.0.0
-	go.bug.st/downloader/v2 v2.1.0
+	go.bug.st/downloader/v2 v2.1.1
 	go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18
 	go.bug.st/serial v1.1.1
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect

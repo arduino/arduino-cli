@@ -15,8 +15,6 @@ github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c h1:agh2JT9
 github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c/go.mod h1:HK7SpkEax/3P+0w78iRQx1sz1vCDYYw9RXwHjQTB5i8=
 github.com/arduino/go-paths-helper v1.0.1/go.mod h1:HpxtKph+g238EJHq4geEPv9p+gl3v5YYu35Yb+w31Ck=
 github.com/arduino/go-paths-helper v1.2.0/go.mod h1:HpxtKph+g238EJHq4geEPv9p+gl3v5YYu35Yb+w31Ck=
-github.com/arduino/go-paths-helper v1.3.2 h1:5U9TSKQODiwSVgTxskC0PNl0l0Vf40GUlp99Zy2SK8w=
-github.com/arduino/go-paths-helper v1.3.2/go.mod h1:HpxtKph+g238EJHq4geEPv9p+gl3v5YYu35Yb+w31Ck=
 github.com/arduino/go-paths-helper v1.4.0 h1:ilnseAdxmN1bFnLxxXHRtcdmt9jBf3O4jtYfWfqule4=
 github.com/arduino/go-paths-helper v1.4.0/go.mod h1:V82BWgAAp4IbmlybxQdk9Bpkz8M4Qyx+RAFKaG9NuvU=
 github.com/arduino/go-properties-orderedmap v1.3.0 h1:4No/vQopB36e7WUIk6H6TxiSEJPiMrVOCZylYmua39o=
@@ -267,8 +265,8 @@ github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
 go.bug.st/cleanup v1.0.0 h1:XVj1HZxkBXeq3gMT7ijWUpHyIC1j8XAoNSyQ06CskgA=
 go.bug.st/cleanup v1.0.0/go.mod h1:EqVmTg2IBk4znLbPD28xne3abjsJftMdqqJEjhn70bk=
-go.bug.st/downloader/v2 v2.1.0 h1:VqGOrJrjgz8c0c8ExvF9dvvcpcrbo2IrI+rOoXKD6nQ=
-go.bug.st/downloader/v2 v2.1.0/go.mod h1:VZW2V1iGKV8rJL2ZEGIDzzBeKowYv34AedJz13RzVII=
+go.bug.st/downloader/v2 v2.1.1 h1:nyqbUizo3E2IxCCm4YFac4FtSqqFpqWP+Aae5GCMuw4=
+go.bug.st/downloader/v2 v2.1.1/go.mod h1:VZW2V1iGKV8rJL2ZEGIDzzBeKowYv34AedJz13RzVII=
 go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18 h1:F1qxtaFuewctYc/SsHRn+Q7Dtwi+yJGPgVq8YLtQz98=
 go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18/go.mod h1:Cx1VqMtEhE9pIkEyUj3LVVVPkv89dgW8aCKrRPDR/uE=
 go.bug.st/serial v1.1.1 h1:5J1DpaIaSIruBi7jVnKXnhRS+YQ9+2PLJMtIZKoIgnc=
