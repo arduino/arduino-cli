@@ -78,6 +78,10 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 		properties := buildProperties.Clone()
 		archives := paths.NewPathList()
 		for _, object := range objectFiles {
+			if object.HasSuffix(".a") {
+				archives.Add(object)
+				continue
+			}
 			archive := object.Parent().Join("objs.a")
 			if !archives.Contains(archive) {
 				archives.Add(archive)
