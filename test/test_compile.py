@@ -184,60 +184,36 @@ def test_compile_blacklisted_sketchname(run_command, data_dir):
 def test_compile_without_precompiled_libraries(run_command, data_dir):
     # Init the environment explicitly
     url = "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json"
-    result = run_command("core update-index --additional-urls={}".format(url))
-    assert result.ok
-    result = run_command("core install arduino:mbed@1.3.1 --additional-urls={}".format(url))
-    assert result.ok
-    result = run_command("core install arduino:samd@1.8.7 --additional-urls={}".format(url))
-    assert result.ok
-    result = run_command("core install adafruit:samd@1.6.0 --additional-urls={}".format(url))
-    assert result.ok
+    assert run_command(f"core update-index --additional-urls={url}")
+    assert run_command(f"core install arduino:mbed@1.3.1 --additional-urls={url}")
 
     # Precompiled version of Arduino_TensorflowLite
-    result = run_command("lib install Arduino_TensorflowLite@2.1.1-ALPHA-precompiled")
-    assert result.ok
-    result = run_command(
-        "compile -b arduino:mbed:nano33ble {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir)
-    )
-    assert result.ok
+    assert run_command("lib install Arduino_LSM9DS1")
+    assert run_command("lib install Arduino_TensorflowLite@2.1.1-ALPHA-precompiled")
+
+    sketch_path = Path(data_dir, "libraries", "Arduino_TensorFlowLite", "examples", "hello_world")
+    assert run_command(f"compile -b arduino:mbed:nano33ble {sketch_path}")
+
+    assert run_command(f"core install arduino:samd@1.8.7 --additional-urls={url}")
+    assert run_command(f"core install adafruit:samd@1.6.4 --additional-urls={url}")
     # should work on adafruit too after https://github.com/arduino/arduino-cli/pull/1134
-    result = run_command(
-        "compile -b adafruit:samd:adafruit_feather_m4 {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(
-            data_dir
-        )
-    )
-    assert result.ok
+    assert run_command(f"compile -b adafruit:samd:adafruit_feather_m4 {sketch_path}")
 
     # Non-precompiled version of Arduino_TensorflowLite
-    result = run_command("lib install Arduino_TensorflowLite@2.1.0-ALPHA")
-    assert result.ok
-    result = run_command(
-        "compile -b arduino:mbed:nano33ble {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(data_dir)
-    )
-    assert result.ok
-    result = run_command(
-        "compile -b adafruit:samd:adafruit_feather_m4 {}/libraries/Arduino_TensorFlowLite/examples/magic_wand/".format(
-            data_dir
-        )
-    )
-    assert result.ok
+    assert run_command("lib install Arduino_TensorflowLite@2.1.0-ALPHA")
+    assert run_command(f"compile -b arduino:mbed:nano33ble {sketch_path}")
+    assert run_command(f"compile -b adafruit:samd:adafruit_feather_m4 {sketch_path}")
 
     # Bosch sensor library
-    result = run_command('lib install "BSEC Software Library@1.5.1474"')
-    assert result.ok
-    result = run_command(
-        "compile -b arduino:samd:mkr1000 {}/libraries/BSEC_Software_Library/examples/basic/".format(data_dir)
-    )
-    assert result.ok
-    result = run_command(
-        "compile -b arduino:mbed:nano33ble {}/libraries/BSEC_Software_Library/examples/basic/".format(data_dir)
-    )
-    assert result.ok
+    assert run_command('lib install "BSEC Software Library@1.5.1474"')
+    sketch_path = Path(data_dir, "libraries", "BSEC_Software_Library", "examples", "basic")
+    assert run_command(f"compile -b arduino:samd:mkr1000 {sketch_path}")
+    assert run_command(f"compile -b arduino:mbed:nano33ble {sketch_path}")
 
     # USBBlaster library
-    result = run_command('lib install "USBBlaster@1.0.0"')
-    assert result.ok
-    result = run_command(f"compile -b arduino:samd:mkrvidor4000 {data_dir}/libraries/USBBlaster/examples/USB_Blaster/")
+    assert run_command('lib install "USBBlaster@1.0.0"')
+    sketch_path = Path(data_dir, "libraries", "USBBlaster", "examples", "USB_Blaster")
+    assert run_command(f"compile -b arduino:samd:mkrvidor4000 {sketch_path}")
 
 
 def test_compile_with_build_properties_flag(run_command, data_dir, copy_sketch):
