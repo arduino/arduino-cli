@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"strings"
 
@@ -111,21 +112,42 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 }
 
 //InstallGitLib  installs a library hosted on a git repository on the specified path.
-func (lm *LibrariesManager) InstallGitLib(url string) error {
+func (lm *LibrariesManager) InstallGitLib(gitURL string) error {
 	libsDir := lm.getUserLibrariesDir()
 	if libsDir == nil {
 		return fmt.Errorf("User directory not set")
 	}
-	i := strings.LastIndex(url, "/")
-	folder := strings.TrimRight(url[i+1:], ".git")
-	path := libsDir.Join(folder)
 
-	_, err := git.PlainClone(path.String(), false, &git.CloneOptions{
-		URL:      url,
+	libraryName, err := parseGitURL(gitURL)
+	if err != nil {
+		return err
+	}
+
+	installPath := libsDir.Join(libraryName)
+
+	_, err = git.PlainClone(installPath.String(), false, &git.CloneOptions{
+		URL:      gitURL,
 		Progress: os.Stdout,
 	})
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func parseGitURL(gitURL string) (string, error) {
+	var res string
+	if strings.HasPrefix(gitURL, "git") || strings.HasPrefix(gitURL, "ssh") {
+		// We can't parse these as URLs
+		i := strings.LastIndex(gitURL, "/")
+		res = strings.TrimRight(gitURL[i+1:], ".git")
+	} else if path := paths.New(gitURL); path.Exist() {
+		res = path.Base()
+	} else if parsed, err := url.Parse(gitURL); err == nil {
+		i := strings.LastIndex(parsed.Path, "/")
+		res = strings.TrimRight(parsed.Path[i+1:], ".git")
+	} else {
+		return "", fmt.Errorf("invalid git url")
+	}
+	return res, nil
 }

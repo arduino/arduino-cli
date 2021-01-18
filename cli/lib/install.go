@@ -29,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/arduino/go-paths-helper"
 	"github.com/spf13/cobra"
 )
 
@@ -85,9 +86,18 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if installFlags.gitURL {
+		url := args[0]
+		if url == "." {
+			wd, err := paths.Getwd()
+			if err != nil {
+				feedback.Errorf("Couldn't get current working directory: %v", err)
+				os.Exit(errorcodes.ErrGeneric)
+			}
+			url = wd.String()
+		}
 		gitlibraryInstallReq := &rpc.GitLibraryInstallReq{
 			Instance: instance,
-			Url:      args[0],
+			Url:      url,
 		}
 		err := lib.GitLibraryInstall(context.Background(), gitlibraryInstallReq, output.TaskProgress())
 		if err != nil {
