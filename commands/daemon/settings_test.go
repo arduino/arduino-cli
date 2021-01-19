@@ -23,6 +23,7 @@ import (
 
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/settings"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -79,4 +80,30 @@ func TestSetValue(t *testing.T) {
 	_, err := svc.SetValue(context.Background(), val)
 	require.Nil(t, err)
 	require.Equal(t, "bar", configuration.Settings.GetString("foo"))
+}
+
+func TestWrite(t *testing.T) {
+	// Writes some settings
+	val := &rpc.Value{
+		Key:      "foo",
+		JsonData: `"bar"`,
+	}
+	_, err := svc.SetValue(context.Background(), val)
+	require.NoError(t, err)
+
+	tempDir := paths.TempDir()
+	testFolder, _ := tempDir.MkTempDir("testdata")
+
+	// Verifies config files doesn't exist
+	configFile := testFolder.Join("arduino-cli.yml")
+	require.True(t, configFile.NotExist())
+
+	_, err = svc.Write(context.Background(), &rpc.WriteRequest{
+		FilePath: configFile.String(),
+	})
+	require.NoError(t, err)
+
+	// Verifies config file is created.
+	// We don't verify the content since we expect config library, Viper, to work
+	require.True(t, configFile.Exist())
 }
