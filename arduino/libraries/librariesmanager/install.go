@@ -137,7 +137,7 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string) error {
 
 func parseGitURL(gitURL string) (string, error) {
 	var res string
-	if strings.HasPrefix(gitURL, "git") || strings.HasPrefix(gitURL, "ssh") {
+	if strings.HasPrefix(gitURL, "git@") {
 		// We can't parse these as URLs
 		i := strings.LastIndex(gitURL, "/")
 		res = strings.TrimRight(gitURL[i+1:], ".git")
