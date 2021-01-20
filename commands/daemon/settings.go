@@ -86,3 +86,14 @@ func (s *SettingsService) SetValue(ctx context.Context, val *rpc.Value) (*rpc.Se
 
 	return &rpc.SetValueResponse{}, err
 }
+
+// Write to file set in request the settings currently stored in memory.
+// We don't have a Read() function, that's not necessary since we only want one config file to be used
+// and that's picked up when the CLI is run as daemon, either using the default path or a custom one
+// set with the --config-file flag.
+func (s *SettingsService) Write(ctx context.Context, req *rpc.WriteRequest) (*rpc.WriteResponse, error) {
+	if err := configuration.Settings.WriteConfigAs(req.FilePath); err != nil {
+		return nil, err
+	}
+	return &rpc.WriteResponse{}, nil
+}

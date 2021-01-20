@@ -90,6 +90,10 @@ func main() {
 	log.Println("calling GetValue(foo)")
 	callGetValue(settingsClient)
 
+	// Write settings to file.
+	log.Println("calling Write()")
+	callWrite(settingsClient)
+
 	// Before we can do anything with the CLI, an "instance" must be created.
 	// We keep a reference to the created instance because we will need it to
 	// run subsequent commands.
@@ -254,6 +258,17 @@ func callGetAll(client settings.SettingsClient) {
 	}
 
 	log.Printf("Settings: %s", getAllResp.GetJsonData())
+}
+
+func callWrite(client settings.SettingsClient) {
+	_, err := client.Write(context.Background(),
+		&settings.WriteRequest{
+			FilePath: path.Join(dataDir, "written-settings.yml"),
+		})
+
+	if err != nil {
+		log.Fatalf("Error writing settings: %s", err)
+	}
 }
 
 func initInstance(client rpc.ArduinoCoreClient) *rpc.Instance {

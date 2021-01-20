@@ -30,6 +30,8 @@ service Settings {
   rpc GetValue(GetValueRequest) returns (Value);
   // Set the value of a specific setting.
   rpc SetValue(Value) returns (SetValueResponse);
+  // Writes to file settings currently stored in memory
+  rpc Write(WriteRequest) returns (WriteResponse);
 }
 
 message RawData {
@@ -51,3 +53,12 @@ message GetValueRequest {
 }
 message MergeResponse {}
 message SetValueResponse {}
+
+message WriteRequest {
+  // Path to settings file (e.g. /path/to/arduino-cli.yaml)
+  string filePath = 1;
+}
+
+message WriteResponse {
+  // TODO
+}
