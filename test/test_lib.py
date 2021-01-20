@@ -438,7 +438,7 @@ def test_install_with_git_url_local_file_uri(run_command, downloads_dir, data_di
     repo_dir = Path(data_dir, "WiFi101")
     assert Repo.clone_from(git_url, repo_dir)
 
-    assert run_command(f"lib install --git-url {repo_dir.as_uri()}", custom_working_dir=repo_dir, custom_env=env)
+    assert run_command(f"lib install --git-url {repo_dir.as_uri()}", custom_env=env)
 
 
 def test_install_with_git_local_url(run_command, downloads_dir, data_dir):
@@ -460,4 +460,26 @@ def test_install_with_git_local_url(run_command, downloads_dir, data_dir):
     repo_dir = Path(data_dir, "WiFi101")
     assert Repo.clone_from(git_url, repo_dir)
 
-    assert run_command(f"lib install --git-url {repo_dir}", custom_working_dir=repo_dir, custom_env=env)
+    assert run_command(f"lib install --git-url {repo_dir}", custom_env=env)
+
+
+def test_install_with_git_url_relative_path(run_command, downloads_dir, data_dir):
+    assert run_command("update")
+
+    env = {
+        "ARDUINO_DATA_DIR": data_dir,
+        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+        "ARDUINO_SKETCHBOOK_DIR": data_dir,
+        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
+    }
+
+    lib_install_dir = Path(data_dir, "libraries", "WiFi101")
+    # Verifies library is not installed
+    assert not lib_install_dir.exists()
+
+    # Clone repository locally
+    git_url = "https://github.com/arduino-libraries/WiFi101.git"
+    repo_dir = Path(data_dir, "WiFi101")
+    assert Repo.clone_from(git_url, repo_dir)
+
+    assert run_command("lib install --git-url ./WiFi101", custom_working_dir=data_dir, custom_env=env)
