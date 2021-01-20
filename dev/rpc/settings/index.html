@@ -1017,6 +1017,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#writerequest" class="md-nav__link">
+    WriteRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#writeresponse" class="md-nav__link">
+    WriteResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#settings" class="md-nav__link">
     Settings
   </a>
@@ -1225,6 +1239,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#writerequest" class="md-nav__link">
+    WriteRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#writeresponse" class="md-nav__link">
+    WriteResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#settings" class="md-nav__link">
     Settings
   </a>
@@ -1273,6 +1301,8 @@
 <li><a href="#cc.arduino.cli.settings.RawData">RawData</a></li>
 <li><a href="#cc.arduino.cli.settings.SetValueResponse">SetValueResponse</a></li>
 <li><a href="#cc.arduino.cli.settings.Value">Value</a></li>
+<li><a href="#cc.arduino.cli.settings.WriteRequest">WriteRequest</a></li>
+<li><a href="#cc.arduino.cli.settings.WriteResponse">WriteResponse</a></li>
 </ul>
 <ul>
 <li><a href="#cc.arduino.cli.settings.Settings">Settings</a></li>
@@ -1358,6 +1388,29 @@
 </tr>
 </tbody>
 </table>
+<p><a name="cc.arduino.cli.settings.WriteRequest"></a></p>
+<h3 id="writerequest">WriteRequest<a class="headerlink" href="#writerequest" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>filePath</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Path to settings file (e.g. /path/to/arduino-cli.yaml)</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.settings.WriteResponse"></a></p>
+<h3 id="writeresponse">WriteResponse<a class="headerlink" href="#writeresponse" title="Permanent link">&para;</a></h3>
+<p>TODO</p>
 <p><a name="cc.arduino.cli.settings.Settings"></a></p>
 <h3 id="settings">Settings<a class="headerlink" href="#settings" title="Permanent link">&para;</a></h3>
 <p>The Settings service provides an interface to Arduino CLI&#39;s configuration options</p>
@@ -1394,6 +1447,12 @@
 <td><a href="#cc.arduino.cli.settings.Value">Value</a></td>
 <td><a href="#cc.arduino.cli.settings.SetValueResponse">SetValueResponse</a></td>
 <td>Set the value of a specific setting.</td>
+</tr>
+<tr>
+<td>Write</td>
+<td><a href="#cc.arduino.cli.settings.WriteRequest">WriteRequest</a></td>
+<td><a href="#cc.arduino.cli.settings.WriteResponse">WriteResponse</a></td>
+<td>Writes to file settings currently stored in memory</td>
 </tr>
 </tbody>
 </table>
