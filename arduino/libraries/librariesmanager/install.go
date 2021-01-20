@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v3"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-git.v4"
 )
 
@@ -99,15 +100,62 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 		return fmt.Errorf("User directory not set")
 	}
 
+	tmpDir, err := paths.MkTempDir(paths.TempDir().String(), "arduino-cli-lib-")
+	if err != nil {
+		return err
+	}
+
 	file, err := os.Open(archivePath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	if err := extract.Archive(ctx, file, libsDir.String(), nil); err != nil {
-		return fmt.Errorf("extracting archive: %s", err)
+	// Extract to a temporary directory so we can check if the zip is structured correctly.
+	// We also use the top level folder from the archive to infer the library name.
+	if err := extract.Archive(ctx, file, tmpDir.String(), nil); err != nil {
+		return fmt.Errorf("extracting archive: %w", err)
 	}
+
+	paths, err := tmpDir.ReadDir()
+	if err != nil {
+		return err
+	}
+
+	if len(paths) > 1 {
+		return fmt.Errorf("archive is not valid: multiple files found in zip file top level")
+	}
+
+	libraryName := paths[0].Base()
+	installPath := libsDir.Join(libraryName)
+
+	// Deletes libraries folder if already installed
+	if _, ok := lm.Libraries[libraryName]; ok {
+		logrus.
+			WithField("library name", libraryName).
+			WithField("install path", installPath).
+			Trace("Deleting library")
+		installPath.RemoveAll()
+	}
+
+	logrus.
+		WithField("library name", libraryName).
+		WithField("install path", installPath).
+		WithField("zip file", archivePath).
+		Trace("Installing library")
+
+	files, err := tmpDir.Join(libraryName).ReadDirRecursive()
+	files.FilterOutDirs()
+	for _, f := range files {
+		finalPath := installPath.Join(f.Base())
+		if err := finalPath.Parent().MkdirAll(); err != nil {
+			return fmt.Errorf("creating directory: %w", err)
+		}
+		if err := f.CopyTo(finalPath); err != nil {
+			return fmt.Errorf("copying library: %w", err)
+		}
+	}
+
 	return nil
 }
 
@@ -120,18 +168,42 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string) error {
 
 	libraryName, err := parseGitURL(gitURL)
 	if err != nil {
+		logrus.
+			WithError(err).
+			Warn("Parsing git URL")
 		return err
 	}
 
 	installPath := libsDir.Join(libraryName)
 
+	// Deletes libraries folder if already installed
+	if _, ok := lm.Libraries[libraryName]; ok {
+		logrus.
+			WithField("library name", libraryName).
+			WithField("install path", installPath).
+			Trace("Deleting library")
+		installPath.RemoveAll()
+	}
+
+	logrus.
+		WithField("library name", libraryName).
+		WithField("install path", installPath).
+		WithField("git url", gitURL).
+		Trace("Installing library")
+
 	_, err = git.PlainClone(installPath.String(), false, &git.CloneOptions{
 		URL:      gitURL,
+		Depth:    1,
 		Progress: os.Stdout,
 	})
 	if err != nil {
+		logrus.
+			WithError(err).
+			Warn("Cloning git repository")
 		return err
 	}
+	// We don't want the installed library to be a git repository thus we delete this folder
+	installPath.Join(".git").RemoveAll()
 	return nil
 }
 

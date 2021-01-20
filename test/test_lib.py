@@ -225,15 +225,25 @@ def test_install_with_git_url(run_command, data_dir, downloads_dir):
     }
     assert run_command("config init --dest-dir .", custom_env=env)
 
+    lib_install_dir = Path(data_dir, "libraries", "WiFi101")
+    # Verifies library is not already installed
+    assert not lib_install_dir.exists()
+
+    git_url = "https://github.com/arduino-libraries/WiFi101.git"
+
     # Test git-url library install
-    res = run_command("lib install --git-url https://github.com/arduino-libraries/WiFi101.git")
+    res = run_command(f"lib install --git-url {git_url}")
     assert res.ok
     assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
-    # Test failing-install as repository already exists
-    res = run_command("lib install --git-url https://github.com/arduino-libraries/WiFi101.git")
-    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
-    assert "Error installing Git Library: repository already exists" in res.stderr
+    # Verifies library is installed in expected path
+    assert lib_install_dir.exists()
+
+    # Reinstall library
+    assert run_command(f"lib install --git-url {git_url}")
+
+    # Verifies library remains installed
+    assert lib_install_dir.exists()
 
 
 def test_install_with_zip_path(run_command, data_dir, downloads_dir):
@@ -249,11 +259,24 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     # Download a specific lib version
     assert run_command("lib download AudioZero@1.0.0")
 
+    lib_install_dir = Path(data_dir, "libraries", "AudioZero-1.0.0")
+    # Verifies library is not already installed
+    assert not lib_install_dir.exists()
+
     zip_path = Path(downloads_dir, "libraries", "AudioZero-1.0.0.zip")
     # Test zip-path install
     res = run_command(f"lib install --zip-path {zip_path}")
     assert res.ok
     assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
+
+    # Verifies library is installed in expected path
+    assert lib_install_dir.exists()
+
+    # Reinstall library
+    assert run_command(f"lib install --zip-path {zip_path}")
+
+    # Verifies library remains installed
+    assert lib_install_dir.exists()
 
 
 def test_update_index(run_command):
@@ -440,6 +463,9 @@ def test_install_with_git_url_local_file_uri(run_command, downloads_dir, data_di
 
     assert run_command(f"lib install --git-url {repo_dir.as_uri()}", custom_env=env)
 
+    # Verifies library is installed
+    assert lib_install_dir.exists()
+
 
 def test_install_with_git_local_url(run_command, downloads_dir, data_dir):
     assert run_command("update")
@@ -462,6 +488,9 @@ def test_install_with_git_local_url(run_command, downloads_dir, data_dir):
 
     assert run_command(f"lib install --git-url {repo_dir}", custom_env=env)
 
+    # Verifies library is installed
+    assert lib_install_dir.exists()
+
 
 def test_install_with_git_url_relative_path(run_command, downloads_dir, data_dir):
     assert run_command("update")
@@ -483,3 +512,31 @@ def test_install_with_git_url_relative_path(run_command, downloads_dir, data_dir
     assert Repo.clone_from(git_url, repo_dir)
 
     assert run_command("lib install --git-url ./WiFi101", custom_working_dir=data_dir, custom_env=env)
+
+    # Verifies library is installed
+    assert lib_install_dir.exists()
+
+
+def test_install_with_git_url_does_not_create_git_repo(run_command, downloads_dir, data_dir):
+    assert run_command("update")
+
+    env = {
+        "ARDUINO_DATA_DIR": data_dir,
+        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+        "ARDUINO_SKETCHBOOK_DIR": data_dir,
+        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
+    }
+
+    lib_install_dir = Path(data_dir, "libraries", "WiFi101")
+    # Verifies library is not installed
+    assert not lib_install_dir.exists()
+
+    # Clone repository locally
+    git_url = "https://github.com/arduino-libraries/WiFi101.git"
+    repo_dir = Path(data_dir, "WiFi101")
+    assert Repo.clone_from(git_url, repo_dir)
+
+    assert run_command(f"lib install --git-url {repo_dir}", custom_env=env)
+
+    # Verifies installed library is not a git repository
+    assert not Path(lib_install_dir, ".git").exists()
