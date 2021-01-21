@@ -47,6 +47,7 @@ jobs:
         uses: Arduino/actions/setup-taskfile@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
 
       - name: Setup Go
         uses: actions/setup-go@v2

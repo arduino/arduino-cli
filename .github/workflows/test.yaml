@@ -39,6 +39,7 @@ jobs:
         uses: Arduino/actions/setup-taskfile@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
 
       - name: Install Python
         uses: actions/setup-python@v1
@@ -117,16 +118,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: build
-        shell: bash
-        run: |
-          PACKAGE_NAME_PREFIX="${{ github.workflow }}"
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.event.number }}"
-          fi
-          PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.sha }}"
-          export PACKAGE_NAME_PREFIX
-          goreleaser --snapshot
+      - name: Install Taskfile
+        uses: arduino/actions/setup-taskfile@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Build
+        run: task dist:all
 
       # Uploads all architectures as separate artifacts
       - name: Upload Linux 32 bit artifact

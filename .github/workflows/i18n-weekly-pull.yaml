@@ -28,6 +28,7 @@ jobs:
         uses: Arduino/actions/setup-taskfile@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
 
       - name: Run task i18n:pull
         run: task i18n:pull
