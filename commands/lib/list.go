@@ -103,8 +103,12 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryList
 		if lib.Available != nil {
 			release = lib.Available.ToRPCLibraryRelease()
 		}
+		rpcLib, err := lib.Library.ToRPCLibrary()
+		if err != nil {
+			return nil, fmt.Errorf("converting library %s to rpc struct: %w", lib.Library.Name, err)
+		}
 		instaledLib = append(instaledLib, &rpc.InstalledLibrary{
-			Library: lib.Library.ToRPCLibrary(),
+			Library: rpcLib,
 			Release: release,
 		})
 	}

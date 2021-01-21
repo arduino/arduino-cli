@@ -145,6 +145,27 @@ def test_list_with_fqbn(run_command):
     assert data[0]["library"]["compatible_with"]["arduino:avr:uno"]
 
 
+def test_list_all_with_fqbn(run_command):
+    assert run_command("update")
+
+    # Install core
+    assert run_command("core install arduino:avr")
+
+    result = run_command("lib list --all --fqbn arduino:avr:uno --format json")
+    assert result.ok
+    assert "" == result.stderr
+
+    data = json.loads(result.stdout)
+    assert 5 == len(data)
+
+    libs = {l["library"]["name"]: l["library"]["provides_includes"] for l in data}
+    assert ["SoftwareSerial.h"] == libs["SoftwareSerial"]
+    assert ["Wire.h"] == libs["Wire"]
+    assert ["EEPROM.h"] == libs["EEPROM"]
+    assert ["HID.h"] == libs["HID"]
+    assert ["SPI.h"] == libs["SPI"]
+
+
 def test_lib_download(run_command, downloads_dir):
 
     # Download a specific lib version
