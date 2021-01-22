@@ -9,20 +9,28 @@ jobs:
   create-release-artifacts:
     runs-on: ubuntu-latest
 
-    container:
-      image: arduino/arduino-cli:builder-1
-      volumes:
-        # cache go dependencies across pipeline's steps
-        - ${{ github.workspace }}/go:/go
-
     steps:
       - name: Checkout
         uses: actions/checkout@v1
         with:
           fetch-depth: 0
 
+      - name: Create changelog
+        uses: arduino/create-changelog@1.2.0
+        with:
+          tag-regex: '^[0-9]+\.[0-9]+\.[0-9]+$'
+          filter-regex: '^\[(skip|changelog)[ ,-](skip|changelog)\].*'
+          case-insensitive-regex: true
+          changelog-file-path: "dist/CHANGELOG.md"
+
+      - name: Install Taskfile
+        uses: arduino/actions/setup-taskfile@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
       - name: Build
-        run: goreleaser
+        run: task dist:all
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -72,14 +80,14 @@ jobs:
       - name: Re-package binary and update checksum
         # This step performs the following:
         # 1. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
-        # 2. Recalculate package checksum and replace it in the goreleaser nnnnnn-checksums.txt file
+        # 2. Recalculate package checksum and replace it in the nnnnnn-checksums.txt file
         run: |
           # GitHub's upload/download-artifact@v1 actions don't preserve file permissions,
           # so we need to add execution permission back until @v2 actions are released.
-          chmod +x dist/arduino_cli_osx_darwin_amd64/arduino-cli
+          chmod +x dist/arduino-cli_osx_darwin_amd64/arduino-cli
           TAG=${GITHUB_REF/refs\/tags\//}
           tar -czvf dist/arduino-cli_${TAG}_macOS_64bit.tar.gz \
-          -C dist/arduino_cli_osx_darwin_amd64/  arduino-cli   \
+          -C dist/arduino-cli_osx_darwin_amd64/  arduino-cli   \
           -C ../../ LICENSE.txt
           CLI_CHECKSUM=$(shasum -a 256 dist/arduino-cli_${TAG}_macOS_64bit.tar.gz | cut -d " " -f 1)
           perl -pi -w -e "s/.*arduino-cli_${TAG}_macOS_64bit.tar.gz/${CLI_CHECKSUM}  arduino-cli_${TAG}_macOS_64bit.tar.gz/g;" dist/*-checksums.txt

@@ -39,6 +39,7 @@ jobs:
         uses: Arduino/actions/setup-taskfile@master
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
 
       - name: Install Python
         uses: actions/setup-python@v1
@@ -105,28 +106,27 @@ jobs:
     runs-on: ubuntu-latest
     needs: test-matrix
 
-    container:
-      image: arduino/arduino-cli:builder-1
-      volumes:
-        # cache go dependencies across pipeline's steps
-        - ${{ github.workspace }}/go:/go
-
     steps:
       - name: checkout
         uses: actions/checkout@v1
         with:
           fetch-depth: 0
 
-      - name: build
-        shell: bash
+      - name: Install Taskfile
+        uses: arduino/actions/setup-taskfile@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Build
         run: |
           PACKAGE_NAME_PREFIX="${{ github.workflow }}"
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.event.number }}"
           fi
-          PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.sha }}"
+          PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.sha }}-"
           export PACKAGE_NAME_PREFIX
-          goreleaser --snapshot
+          task dist:all
 
       # Uploads all architectures as separate artifacts
       - name: Upload Linux 32 bit artifact

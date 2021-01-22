@@ -106,13 +106,14 @@ If you’re familiar with Golang or if you want to contribute to the project, yo
 locally with your Go toolchain. Please refer to the [CONTRIBUTING] document for setup instructions.
 
 If you don’t have a working Golang environment or if you want to build `arduino-cli` targeting different platforms, you
-can use Docker to get a binary directly from sources. From the project folder run:
+can use [Task][task-site] to get a binary directly from sources. From the project folder run:
 
 ```sh
-docker run -v $PWD:/arduino-cli -w /arduino-cli -e PACKAGE_NAME_PREFIX='snapshot' arduino/arduino-cli:builder-1 goreleaser --rm-dist --snapshot --skip-publish
+task dist:all
 ```
 
 Once the build is over, you will find a `./dist/` folder containing the packages built out of the current source tree.
 
 [git for windows]: https://gitforwindows.org/
 [contributing]: CONTRIBUTING.md
+[task-site]: https://taskfile.dev/#/installation

@@ -12,22 +12,22 @@ jobs:
     if: github.repository == 'arduino/arduino-cli'
     runs-on: ubuntu-latest
 
-    container:
-      image: arduino/arduino-cli:builder-1
-      volumes:
-        # cache go dependencies across pipeline's steps
-        - ${{ github.workspace }}/go:/go
-
     steps:
       - name: checkout
         uses: actions/checkout@v1
         with:
           fetch-depth: 0
 
-      - name: build
+      - name: Install Taskfile
+        uses: arduino/actions/setup-taskfile@master
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Build
         env:
-          PACKAGE_NAME_PREFIX: ${{ github.workflow }}
-        run: goreleaser --snapshot
+          NIGHTLY: true
+        run: task dist:all
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -77,14 +77,14 @@ jobs:
       - name: Re-package binary and update checksum
         # This step performs the following:
         # 1. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
-        # 2. Recalculate package checksum and replace it in the goreleaser nnnnnn-checksums.txt file
+        # 2. Recalculate package checksum and replace it in the nnnnnn-checksums.txt file
         run: |
           # GitHub's upload/download-artifact@v1 actions don't preserve file permissions,
           # so we need to add execution permission back until @v2 actions are released.
-          chmod +x dist/arduino_cli_osx_darwin_amd64/arduino-cli
+          chmod +x dist/arduino-cli_osx_darwin_amd64/arduino-cli
           PACKAGE_FILENAME="$(basename dist/arduino-cli_${{ github.workflow }}-*_macOS_64bit.tar.gz)"
           tar -czvf dist/$PACKAGE_FILENAME \
-          -C dist/arduino_cli_osx_darwin_amd64/  arduino-cli   \
+          -C dist/arduino-cli_osx_darwin_amd64/  arduino-cli   \
           -C ../../ LICENSE.txt
           CLI_CHECKSUM=$(shasum -a 256 dist/$PACKAGE_FILENAME | cut -d " " -f 1)
           perl -pi -w -e "s/.*${PACKAGE_FILENAME}/${CLI_CHECKSUM}  ${PACKAGE_FILENAME}/g;" dist/*-checksums.txt
