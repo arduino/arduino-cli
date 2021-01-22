@@ -79,7 +79,7 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 func doCleanup(buildPath *paths.Path) error {
 	// FIXME: this should go outside legacy and behind a `logrus` call so users can
 	// control when this should be printed.
-	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + MSG_REBUILD_ALL)
+	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + constants.MSG_REBUILD_ALL)
 
 	if files, err := buildPath.ReadDir(); err != nil {
 		return errors.WithMessage(err, "cleaning build path")
