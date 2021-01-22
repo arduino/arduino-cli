@@ -540,3 +540,58 @@ def test_install_with_git_url_does_not_create_git_repo(run_command, downloads_di
 
     # Verifies installed library is not a git repository
     assert not Path(lib_install_dir, ".git").exists()
+
+
+def test_install_with_git_url_multiple_libraries(run_command, downloads_dir, data_dir):
+    assert run_command("update")
+
+    env = {
+        "ARDUINO_DATA_DIR": data_dir,
+        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+        "ARDUINO_SKETCHBOOK_DIR": data_dir,
+        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
+    }
+
+    wifi_install_dir = Path(data_dir, "libraries", "WiFi101")
+    ble_install_dir = Path(data_dir, "libraries", "ArduinoBLE")
+    # Verifies libraries are not installed
+    assert not wifi_install_dir.exists()
+    assert not ble_install_dir.exists()
+
+    wifi_url = "https://github.com/arduino-libraries/WiFi101.git"
+    ble_url = "https://github.com/arduino-libraries/ArduinoBLE.git"
+
+    assert run_command(f"lib install --git-url {wifi_url} {ble_url}", custom_env=env)
+
+    # Verifies library are installed
+    assert wifi_install_dir.exists()
+    assert ble_install_dir.exists()
+
+
+def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, data_dir):
+    assert run_command("update")
+
+    env = {
+        "ARDUINO_DATA_DIR": data_dir,
+        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+        "ARDUINO_SKETCHBOOK_DIR": data_dir,
+        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
+    }
+
+    # Downloads zip to be installed later
+    assert run_command("lib download WiFi101@0.16.1")
+    assert run_command("lib download ArduinoBLE@1.1.3")
+    wifi_zip_path = Path(downloads_dir, "libraries", "WiFi101-0.16.1.zip")
+    ble_zip_path = Path(downloads_dir, "libraries", "ArduinoBLE-1.1.3.zip")
+
+    wifi_install_dir = Path(data_dir, "libraries", "WiFi101-0.16.1")
+    ble_install_dir = Path(data_dir, "libraries", "ArduinoBLE-1.1.3")
+    # Verifies libraries are not installed
+    assert not wifi_install_dir.exists()
+    assert not ble_install_dir.exists()
+
+    assert run_command(f"lib install --zip-path {wifi_zip_path} {ble_zip_path}", custom_env=env)
+
+    # Verifies library are installed
+    assert wifi_install_dir.exists()
+    assert ble_install_dir.exists()
