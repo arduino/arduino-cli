@@ -37,7 +37,8 @@ def test_version(run_command):
     assert result.ok
     parsed_out = json.loads(result.stdout)
     assert parsed_out.get("Application", False) == "arduino-cli"
-    assert isinstance(semver.parse(parsed_out.get("VersionString", False)), dict)
+    version = parsed_out.get("VersionString", False)
+    assert semver.VersionInfo.isvalid(version=version) or "git-snapshot" in version or "nightly" in version
     assert isinstance(parsed_out.get("Commit", False), str)
 
 
