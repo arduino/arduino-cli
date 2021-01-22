@@ -81,10 +81,10 @@ jobs:
         run: |
           # GitHub's upload/download-artifact@v1 actions don't preserve file permissions,
           # so we need to add execution permission back until @v2 actions are released.
-          chmod +x dist/arduino_cli_osx_darwin_amd64/arduino-cli
+          chmod +x dist/arduino-cli_osx_darwin_amd64/arduino-cli
           PACKAGE_FILENAME="$(basename dist/arduino-cli_${{ github.workflow }}-*_macOS_64bit.tar.gz)"
           tar -czvf dist/$PACKAGE_FILENAME \
-          -C dist/arduino_cli_osx_darwin_amd64/  arduino-cli   \
+          -C dist/arduino-cli_osx_darwin_amd64/  arduino-cli   \
           -C ../../ LICENSE.txt
           CLI_CHECKSUM=$(shasum -a 256 dist/$PACKAGE_FILENAME | cut -d " " -f 1)
           perl -pi -w -e "s/.*${PACKAGE_FILENAME}/${CLI_CHECKSUM}  ${PACKAGE_FILENAME}/g;" dist/*-checksums.txt
