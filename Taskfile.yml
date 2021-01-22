@@ -213,7 +213,7 @@ vars:
     sh: echo "{{now | date "20060102"}}"
   TAG:
     sh: echo "`git tag --points-at=HEAD 2> /dev/null`"
-  VERSION: "{{ if .NIGHTLY }}nightly-{{ .TIMESTAMP_SHORT }}{{ else if .TAG }}{{ .TAG }}{{ else }}{{ .PACKAGE_NAME_PREFIX }}snapshot{{ end }}"
+  VERSION: "{{ if .NIGHTLY }}nightly-{{ .TIMESTAMP_SHORT }}{{ else if .TAG }}{{ .TAG }}{{ else }}{{ .PACKAGE_NAME_PREFIX }}git-snapshot{{ end }}"
   LDFLAGS: >
     -ldflags
     '
