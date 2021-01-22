@@ -120,9 +120,9 @@ jobs:
 
       - name: Build
         run: |
-          PACKAGE_NAME_PREFIX="${{ github.workflow }}-"
+          PACKAGE_NAME_PREFIX="${{ github.workflow }}"
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.event.number }}-"
+            PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.event.number }}"
           fi
           PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.sha }}-"
           export PACKAGE_NAME_PREFIX
