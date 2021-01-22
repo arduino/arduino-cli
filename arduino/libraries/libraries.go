@@ -87,7 +87,7 @@ func (library *Library) String() string {
 }
 
 // ToRPCLibrary converts this library into an rpc.Library
-func (library *Library) ToRPCLibrary() *rpc.Library {
+func (library *Library) ToRPCLibrary() (*rpc.Library, error) {
 	pathOrEmpty := func(p *paths.Path) string {
 		if p == nil {
 			return ""
@@ -100,6 +100,18 @@ func (library *Library) ToRPCLibrary() *rpc.Library {
 		}
 		return p.String()
 	}
+
+	// If the the "includes" property is empty or not included in the "library.properties" file
+	// we search for headers by reading the library files directly
+	headers := library.DeclaredHeaders()
+	if len(headers) == 0 {
+		var err error
+		headers, err = library.SourceHeaders()
+		if err != nil {
+			return nil, fmt.Errorf("gathering library headers: %w", err)
+		}
+	}
+
 	return &rpc.Library{
 		Name:              library.Name,
 		Author:            library.Author,
@@ -124,9 +136,9 @@ func (library *Library) ToRPCLibrary() *rpc.Library {
 		Version:           library.Version.String(),
 		License:           library.License,
 		Examples:          library.Examples.AsStrings(),
-		ProvidesIncludes:  library.DeclaredHeaders(),
+		ProvidesIncludes:  headers,
 		CompatibleWith:    library.CompatibleWith,
-	}
+	}, nil
 }
 
 // SupportsAnyArchitectureIn returns true if any of the following is true:
