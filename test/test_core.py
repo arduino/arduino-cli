@@ -18,6 +18,7 @@ import pytest
 import simplejson as json
 import tempfile
 import hashlib
+from git import Repo
 from pathlib import Path
 
 
@@ -363,3 +364,24 @@ def test_core_update_with_local_url(run_command):
     res = run_command(f'core update-index --additional-urls="file://{test_index}"')
     assert res.ok
     assert "Updating index: test_index.json downloaded" in res.stdout
+
+
+def test_core_search_list_manually_installed_cores(run_command, data_dir):
+    assert run_command("core update-index")
+
+    # Verifies only cores in
+    res = run_command("core search --format json")
+    assert res.ok
+    cores = json.loads(res.stdout)
+    assert len(cores) == 17
+
+    # Manually installs a core in sketchbooks hardware folder
+    git_url = "https://github.com/arduino/ArduinoCore-avr.git"
+    repo_dir = Path(data_dir, "hardware", "arduino-beta-development", "avr")
+    assert Repo.clone_from(git_url, repo_dir)
+
+    # Verifies manually installed core is correctly found
+    res = run_command("core search --format json")
+    assert res.ok
+    cores = json.loads(res.stdout)
+    assert len(cores) == 18

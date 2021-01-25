@@ -48,7 +48,7 @@ func PlatformSearch(instanceID int32, searchArgs string, allVersions bool) (*rpc
 		for _, targetPackage := range pm.Packages {
 			for _, platform := range targetPackage.Platforms {
 				// discard invalid platforms
-				if platform == nil || platform.Name == "" {
+				if platform == nil {
 					continue
 				}
 
