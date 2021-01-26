@@ -316,8 +316,21 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityDir != nil {
 			includes = append(includes, library.UtilityDir)
 		}
+
+		if library, ok := sourceFile.Origin.(*libraries.Library); ok {
+			if library.Precompiled && library.PrecompiledWithSources {
+				// Fully precompiled libraries should have no dependencies
+				// to avoid ABI breakage
+				if ctx.Verbose {
+					ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, constants.MSG_SKIP_PRECOMPILED_LIBRARY, library.Name)
+				}
+				return nil
+			}
+		}
+
 		var preproc_err error
 		var preproc_stderr []byte
+
 		if unchanged && cache.valid {
 			include = cache.Next().Include
 			if first && ctx.Verbose {
