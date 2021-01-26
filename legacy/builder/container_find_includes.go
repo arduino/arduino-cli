@@ -318,9 +318,12 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		}
 
 		if library, ok := sourceFile.Origin.(*libraries.Library); ok {
-			if library.Precompiled == true && library.PrecompiledWithSources == true {
+			if library.Precompiled && library.PrecompiledWithSources {
 				// Fully precompiled libraries should have no dependencies
 				// to avoid ABI breakage
+				if ctx.Verbose {
+					ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, constants.MSG_SKIP_PRECOMPILED_LIBRARY, library.Name)
+				}
 				return nil
 			}
 		}

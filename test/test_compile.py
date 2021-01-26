@@ -590,3 +590,42 @@ def test_compile_with_archives_and_long_paths(run_command):
     sketch_path = Path(lib_output[0]["library"]["install_dir"], "examples", "ArduinoIoTCloud-Advanced")
 
     assert run_command(f"compile -b esp8266:esp8266:huzzah {sketch_path}")
+
+
+def test_compile_with_precompiled_library(run_command, data_dir):
+    assert run_command("update")
+
+    assert run_command("core install arduino:samd@1.8.11")
+    fqbn = "arduino:samd:mkrzero"
+
+    # Install precompiled library
+    # For more information see:
+    # https://arduino.github.io/arduino-cli/latest/library-specification/#precompiled-binaries
+    assert run_command('lib install "BSEC Software Library@1.5.1474"')
+    sketch_folder = Path(data_dir, "libraries", "BSEC_Software_Library", "examples", "basic")
+
+    # Compile and verify dependencies detection for fully precompiled library is not skipped
+    result = run_command(f"compile -b {fqbn} {sketch_folder} -v")
+    assert result.ok
+    assert "Skipping dependencies detection for precompiled library BSEC Software Library" not in result.stdout
+
+
+def test_compile_with_fully_precompiled_library(run_command, data_dir):
+    assert run_command("update")
+
+    assert run_command("core install arduino:mbed@1.3.1")
+    fqbn = "arduino:mbed:nano33ble"
+
+    # Install fully precompiled library
+    # For more information see:
+    # https://arduino.github.io/arduino-cli/latest/library-specification/#precompiled-binaries
+    assert run_command("lib install Arduino_TensorFlowLite@2.1.1-ALPHA-precompiled")
+    sketch_folder = Path(data_dir, "libraries", "Arduino_TensorFlowLite", "examples", "hello_world")
+
+    # Install example dependency
+    # assert run_command("lib install Arduino_LSM9DS1")
+
+    # Compile and verify dependencies detection for fully precompiled library is skipped
+    result = run_command(f"compile -b {fqbn} {sketch_folder} -v")
+    assert result.ok
+    assert "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite" in result.stdout
