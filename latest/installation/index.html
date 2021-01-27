@@ -1349,8 +1349,8 @@ latest available build date, using the format YYYYMMDD (i.e for 2019/Aug/06 <cod
 <p>If you’re familiar with Golang or if you want to contribute to the project, you will probably build the <code>arduino-cli</code>
 locally with your Go toolchain. Please refer to the <a href="../CONTRIBUTING/">CONTRIBUTING</a> document for setup instructions.</p>
 <p>If you don’t have a working Golang environment or if you want to build <code>arduino-cli</code> targeting different platforms, you
-can use Docker to get a binary directly from sources. From the project folder run:</p>
-<div class="highlight"><pre><span></span><code>docker run -v <span class="nv">$PWD</span>:/arduino-cli -w /arduino-cli -e <span class="nv">PACKAGE_NAME_PREFIX</span><span class="o">=</span><span class="s1">&#39;snapshot&#39;</span> arduino/arduino-cli:builder-1 goreleaser --rm-dist --snapshot --skip-publish
+can use <a href="https://taskfile.dev/#/installation">Task</a> to get a binary directly from sources. From the project folder run:</p>
+<div class="highlight"><pre><span></span><code>task dist:all
 </code></pre></div>
 <p>Once the build is over, you will find a <code>./dist/</code> folder containing the packages built out of the current source tree.</p>
                 
