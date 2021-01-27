@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"os"
 
+	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/configuration"
@@ -127,6 +128,15 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	sketchPath := initSketchPath(path)
+
+	// .pde files are still supported but deprecated, this warning urges the user to rename them
+	if files := sketches.CheckForPdeFiles(sketchPath); len(files) > 0 {
+		feedback.Error("Sketches with .pde extension are deprecated, please rename the following files to .ino:")
+		for _, f := range files {
+			feedback.Error(f)
+		}
+	}
+
 	// We must read this from settings since the value is set when the binding is accessed from viper,
 	// accessing it from cobra would only read it if the flag is explicitly set by the user and ignore
 	// the config file and the env vars.

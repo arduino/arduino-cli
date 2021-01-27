@@ -16,6 +16,7 @@ import os
 import platform
 import tempfile
 import hashlib
+import shutil
 from pathlib import Path
 import simplejson as json
 
@@ -629,3 +630,68 @@ def test_compile_with_fully_precompiled_library(run_command, data_dir):
     result = run_command(f"compile -b {fqbn} {sketch_folder} -v")
     assert result.ok
     assert "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite" in result.stdout
+
+
+def test_compile_sketch_with_pde_extension(run_command, data_dir):
+    # Init the environment explicitly
+    assert run_command("update")
+
+    # Install core to compile
+    assert run_command("core install arduino:avr@1.8.3")
+
+    sketch_name = "CompilePdeSketch"
+    sketch_path = Path(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    # Create a test sketch
+    assert run_command(f"sketch new {sketch_path}")
+
+    # Renames sketch file to pde
+    sketch_file = Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name}.pde")
+
+    # Build sketch from folder
+    res = run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    assert res.ok
+    assert "Sketches with .pde extension are deprecated, please rename the following files to .ino:" in res.stderr
+    assert str(sketch_file) in res.stderr
+
+    # Build sketch from file
+    res = run_command(f"compile --clean -b {fqbn} {sketch_file}")
+    assert res.ok
+    assert "Sketches with .pde extension are deprecated, please rename the following files to .ino" in res.stderr
+    assert str(sketch_file) in res.stderr
+
+
+def test_compile_sketch_with_multiple_main_files(run_command, data_dir):
+    # Init the environment explicitly
+    assert run_command("update")
+
+    # Install core to compile
+    assert run_command("core install arduino:avr@1.8.3")
+
+    sketch_name = "CompileSketchMultipleMainFiles"
+    sketch_path = Path(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    # Create a test sketch
+    assert run_command(f"sketch new {sketch_path}")
+
+    # Copy .ino sketch file to .pde
+    sketch_ino_file = Path(sketch_path, f"{sketch_name}.ino")
+    sketch_pde_file = Path(sketch_path / f"{sketch_name}.pde")
+    shutil.copyfile(sketch_ino_file, sketch_pde_file)
+
+    # Build sketch from folder
+    res = run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    assert res.failed
+    assert "Error during build: opening sketch: multiple main sketch files found" in res.stderr
+
+    # Build sketch from .ino file
+    res = run_command(f"compile --clean -b {fqbn} {sketch_ino_file}")
+    assert res.failed
+    assert "Error during build: opening sketch: multiple main sketch files found" in res.stderr
+
+    # Build sketch from .pde file
+    res = run_command(f"compile --clean -b {fqbn} {sketch_pde_file}")
+    assert res.failed
+    assert "Error during build: opening sketch: multiple main sketch files found" in res.stderr
