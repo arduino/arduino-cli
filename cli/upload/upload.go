@@ -19,6 +19,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -82,6 +83,14 @@ func run(command *cobra.Command, args []string) {
 		path = paths.New(args[0])
 	}
 	sketchPath := initSketchPath(path)
+
+	// .pde files are still supported but deprecated, this warning urges the user to rename them
+	if files := sketches.CheckForPdeFiles(sketchPath); len(files) > 0 {
+		feedback.Error("Sketches with .pde extension are deprecated, please rename the following files to .ino:")
+		for _, f := range files {
+			feedback.Error(f)
+		}
+	}
 
 	if _, err := upload.Upload(context.Background(), &rpc.UploadReq{
 		Instance:   instance,
