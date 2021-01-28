@@ -144,16 +144,8 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 		WithField("zip file", archivePath).
 		Trace("Installing library")
 
-	files, err := tmpDir.Join(libraryName).ReadDirRecursive()
-	files.FilterOutDirs()
-	for _, f := range files {
-		finalPath := installPath.Join(f.Base())
-		if err := finalPath.Parent().MkdirAll(); err != nil {
-			return fmt.Errorf("creating directory: %w", err)
-		}
-		if err := f.CopyTo(finalPath); err != nil {
-			return fmt.Errorf("copying library: %w", err)
-		}
+	if err := tmpDir.Join(libraryName).CopyDirTo(installPath); err != nil {
+		return fmt.Errorf("copying library: %w", err)
 	}
 
 	return nil
