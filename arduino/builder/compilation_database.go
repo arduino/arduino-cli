@@ -41,7 +41,8 @@ type CompilationCommand struct {
 // NewCompilationDatabase creates an empty CompilationDatabase
 func NewCompilationDatabase(filename *paths.Path) *CompilationDatabase {
 	return &CompilationDatabase{
-		File: filename,
+		File:     filename,
+		Contents: []CompilationCommand{},
 	}
 }
 
@@ -51,10 +52,7 @@ func LoadCompilationDatabase(file *paths.Path) (*CompilationDatabase, error) {
 	if err != nil {
 		return nil, err
 	}
-	res := &CompilationDatabase{
-		File:     file,
-		Contents: []CompilationCommand{},
-	}
+	res := NewCompilationDatabase(file)
 	return res, json.Unmarshal(f, &res.Contents)
 }
 
