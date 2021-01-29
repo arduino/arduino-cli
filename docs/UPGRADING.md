@@ -4,6 +4,8 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## Unreleased
 
+## 0.15.0
+
 ### Rename `telemetry` settings to `metrics`
 
 All instances of the term `telemetry` in the code and the documentation has been changed to `metrics`. This has been
