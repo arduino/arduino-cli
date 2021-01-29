@@ -194,16 +194,23 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 	builderCtx.SourceOverride = req.GetSourceOverride()
 
+	r = &rpc.CompileResp{}
+	defer func() {
+		if p := builderCtx.BuildPath; p != nil {
+			r.BuildPath = p.String()
+		}
+	}()
+
 	// if --preprocess or --show-properties were passed, we can stop here
 	if req.GetShowProperties() {
-		return &rpc.CompileResp{}, builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
+		return r, builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
 	} else if req.GetPreprocess() {
-		return &rpc.CompileResp{}, builder.RunPreprocess(builderCtx)
+		return r, builder.RunPreprocess(builderCtx)
 	}
 
 	// if it's a regular build, go on...
 	if err := builder.RunBuilder(builderCtx); err != nil {
-		return &rpc.CompileResp{}, err
+		return r, err
 	}
 
 	// If the export directory is set we assume you want to export the binaries
@@ -219,17 +226,17 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		}
 		logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
 		if err := exportPath.MkdirAll(); err != nil {
-			return nil, errors.Wrap(err, "creating output dir")
+			return r, errors.Wrap(err, "creating output dir")
 		}
 
 		// Copy all "sketch.ino.*" artifacts to the export directory
 		baseName, ok := builderCtx.BuildProperties.GetOk("build.project_name") // == "sketch.ino"
 		if !ok {
-			return nil, errors.New("missing 'build.project_name' build property")
+			return r, errors.New("missing 'build.project_name' build property")
 		}
 		buildFiles, err := builderCtx.BuildPath.ReadDir()
 		if err != nil {
-			return nil, errors.Errorf("reading build directory: %s", err)
+			return r, errors.Errorf("reading build directory: %s", err)
 		}
 		buildFiles.FilterPrefix(baseName)
 		for _, buildFile := range buildFiles {
@@ -239,7 +246,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 				WithField("dest", exportedFile).
 				Trace("Copying artifact.")
 			if err = buildFile.CopyTo(exportedFile); err != nil {
-				return nil, errors.Wrapf(err, "copying output file %s", buildFile)
+				return r, errors.Wrapf(err, "copying output file %s", buildFile)
 			}
 		}
 	}
@@ -248,7 +255,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	for _, lib := range builderCtx.ImportedLibraries {
 		rpcLib, err := lib.ToRPCLibrary()
 		if err != nil {
-			return nil, fmt.Errorf("converting library %s to rpc struct: %w", lib.Name, err)
+			return r, fmt.Errorf("converting library %s to rpc struct: %w", lib.Name, err)
 		}
 		importedLibs = append(importedLibs, rpcLib)
 	}
@@ -256,7 +263,6 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	logrus.Tracef("Compile %s for %s successful", sketch.Name, fqbnIn)
 
 	return &rpc.CompileResp{
-		BuildPath:              builderCtx.BuildPath.String(),
 		UsedLibraries:          importedLibs,
 		ExecutableSectionsSize: builderCtx.ExecutableSectionsSize.ToRPCExecutableSectionSizeArray(),
 	}, nil
