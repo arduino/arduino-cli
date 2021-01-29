@@ -297,12 +297,26 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
 
     # Verifies library is installed in expected path
     assert lib_install_dir.exists()
+    files = list(lib_install_dir.glob("**/*"))
+    assert lib_install_dir / "examples" / "SimpleAudioPlayerZero" / "SimpleAudioPlayerZero.ino" in files
+    assert lib_install_dir / "src" / "AudioZero.h" in files
+    assert lib_install_dir / "src" / "AudioZero.cpp" in files
+    assert lib_install_dir / "keywords.txt" in files
+    assert lib_install_dir / "library.properties" in files
+    assert lib_install_dir / "README.adoc" in files
 
     # Reinstall library
     assert run_command(f"lib install --zip-path {zip_path}")
 
     # Verifies library remains installed
     assert lib_install_dir.exists()
+    files = list(lib_install_dir.glob("**/*"))
+    assert lib_install_dir / "examples" / "SimpleAudioPlayerZero" / "SimpleAudioPlayerZero.ino" in files
+    assert lib_install_dir / "src" / "AudioZero.h" in files
+    assert lib_install_dir / "src" / "AudioZero.cpp" in files
+    assert lib_install_dir / "keywords.txt" in files
+    assert lib_install_dir / "library.properties" in files
+    assert lib_install_dir / "README.adoc" in files
 
 
 def test_update_index(run_command):
