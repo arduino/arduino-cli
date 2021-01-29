@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -172,7 +173,8 @@ func addExamplesToPathList(examplesPath *paths.Path, list *paths.PathList) error
 		return err
 	}
 	for _, file := range files {
-		if isExample(file) {
+		_, err := sketches.NewSketchFromPath(file)
+		if err == nil {
 			list.Add(file)
 		} else if file.IsDir() {
 			if err := addExamplesToPathList(file, list); err != nil {
@@ -181,10 +183,4 @@ func addExamplesToPathList(examplesPath *paths.Path, list *paths.PathList) error
 		}
 	}
 	return nil
-}
-
-// isExample returns true if examplePath contains an example
-func isExample(examplePath *paths.Path) bool {
-	mainIno := examplePath.Join(examplePath.Base() + ".ino")
-	return mainIno.Exist() && mainIno.IsNotDir()
 }

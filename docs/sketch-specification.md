@@ -18,7 +18,10 @@ Support for sketch folder names starting with a number was added in Arduino IDE 
 
 ### Primary sketch file
 
-Every sketch must contain a .ino or .pde file with a file name matching the sketch root folder name.
+Every sketch must contain a `.ino` file with a file name matching the sketch root folder name.
+
+`.pde` is also supported but **deprecated** and will be removed in the future, using the `.ino` extension is strongly
+recommended.
 
 ### Additional code files
 
@@ -28,7 +31,7 @@ The following extensions are supported:
 
 - .ino - [Arduino language](https://www.arduino.cc/reference/en/) files.
 - .pde - Alternate extension for Arduino language files. This file extension is also used by Processing sketches. .ino
-  is recommended to avoid confusion.
+  is recommended to avoid confusion. **`.pde` extension is deprecated and will be removed in the future.**
 - .cpp - C++ files.
 - .c - C Files.
 - .S - Assembly language files.

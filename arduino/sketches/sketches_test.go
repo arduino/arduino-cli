@@ -53,9 +53,59 @@ func TestSketchBuildPath(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, buildPath.String(), "arduino-sketch-")
 
+	// Verifies sketch path is returned if sketch has .pde extension
+	sketchPath = paths.New("testdata", "SketchPde")
+	sketch, err = NewSketchFromPath(sketchPath)
+	require.NoError(t, err)
+	require.NotNil(t, sketch)
+	buildPath, err = sketch.BuildPath()
+	require.NoError(t, err)
+	require.Contains(t, buildPath.String(), "arduino-sketch-")
+
+	// Verifies error is returned if there are multiple main files
+	sketchPath = paths.New("testdata", "SketchMultipleMainFiles")
+	sketch, err = NewSketchFromPath(sketchPath)
+	require.Nil(t, sketch)
+	require.Error(t, err, "multiple main sketch files found")
+
 	// Verifies error is returned if sketch path is not set
 	sketch = &Sketch{}
 	buildPath, err = sketch.BuildPath()
 	require.Nil(t, buildPath)
 	require.Error(t, err, "sketch path is empty")
+}
+
+func TestCheckForPdeFiles(t *testing.T) {
+	sketchPath := paths.New("testdata", "Sketch1")
+	files := CheckForPdeFiles(sketchPath)
+	require.Empty(t, files)
+
+	sketchPath = paths.New("testdata", "SketchPde")
+	files = CheckForPdeFiles(sketchPath)
+	require.Len(t, files, 1)
+	require.Equal(t, sketchPath.Join("SketchPde.pde"), files[0])
+
+	sketchPath = paths.New("testdata", "SketchMultipleMainFiles")
+	files = CheckForPdeFiles(sketchPath)
+	require.Len(t, files, 1)
+	require.Equal(t, sketchPath.Join("SketchMultipleMainFiles.pde"), files[0])
+
+	sketchPath = paths.New("testdata", "Sketch1", "Sketch1.ino")
+	files = CheckForPdeFiles(sketchPath)
+	require.Empty(t, files)
+
+	sketchPath = paths.New("testdata", "SketchPde", "SketchPde.pde")
+	files = CheckForPdeFiles(sketchPath)
+	require.Len(t, files, 1)
+	require.Equal(t, sketchPath.Parent().Join("SketchPde.pde"), files[0])
+
+	sketchPath = paths.New("testdata", "SketchMultipleMainFiles", "SketchMultipleMainFiles.ino")
+	files = CheckForPdeFiles(sketchPath)
+	require.Len(t, files, 1)
+	require.Equal(t, sketchPath.Parent().Join("SketchMultipleMainFiles.pde"), files[0])
+
+	sketchPath = paths.New("testdata", "SketchMultipleMainFiles", "SketchMultipleMainFiles.pde")
+	files = CheckForPdeFiles(sketchPath)
+	require.Len(t, files, 1)
+	require.Equal(t, sketchPath.Parent().Join("SketchMultipleMainFiles.pde"), files[0])
 }

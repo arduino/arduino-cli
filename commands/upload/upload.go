@@ -26,6 +26,7 @@ import (
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
@@ -452,7 +453,7 @@ func determineBuildPathAndSketchName(importFile, importDir string, sketch *sketc
 
 	// Case 4: only sketch specified. In this case we use the generated build path
 	// and the given sketch name.
-	return bldr.GenBuildPath(sketch.FullPath), sketch.Name + ".ino", nil
+	return bldr.GenBuildPath(sketch.FullPath), sketch.Name + sketch.MainFileExtension, nil
 }
 
 func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {
@@ -462,11 +463,13 @@ func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {
 	}
 
 	if absBuildPath, err := buildPath.Abs(); err == nil {
-		candidateName := absBuildPath.Base() + ".ino"
-		f := files.Clone()
-		f.FilterPrefix(candidateName + ".")
-		if f.Len() > 0 {
-			return candidateName, nil
+		for ext := range globals.MainFileValidExtensions {
+			candidateName := absBuildPath.Base() + ext
+			f := files.Clone()
+			f.FilterPrefix(candidateName + ".")
+			if f.Len() > 0 {
+				return candidateName, nil
+			}
 		}
 	}
 
@@ -479,7 +482,7 @@ func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {
 
 		// Sometimes we may have particular files like:
 		// Blink.ino.with_bootloader.bin
-		if filepath.Ext(name) != ".ino" {
+		if _, ok := globals.MainFileValidExtensions[filepath.Ext(name)]; !ok {
 			// just ignore those files
 			continue
 		}
