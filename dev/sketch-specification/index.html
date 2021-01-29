@@ -1334,14 +1334,16 @@ what groups those files into a single program.</p>
 <p>The sketch root folder name must start with a basic letter (<code>A</code>-<code>Z</code> or <code>a</code>-<code>z</code>) or number (<code>0</code>-<code>9</code>), followed by basic letters, numbers, spaces (<code></code>), underscores (<code>_</code>), dots (<code>.</code>) and dashes (<code>-</code>). The maximum length is 63 characters.</p>
 <p>Support for sketch folder names starting with a number was added in Arduino IDE 1.8.4.</p>
 <h3 id="primary-sketch-file">Primary sketch file<a class="headerlink" href="#primary-sketch-file" title="Permanent link">&para;</a></h3>
-<p>Every sketch must contain a .ino or .pde file with a file name matching the sketch root folder name.</p>
+<p>Every sketch must contain a <code>.ino</code> file with a file name matching the sketch root folder name.</p>
+<p><code>.pde</code> is also supported but <strong>deprecated</strong> and will be removed in the future, using the <code>.ino</code> extension is strongly
+recommended.</p>
 <h3 id="additional-code-files">Additional code files<a class="headerlink" href="#additional-code-files" title="Permanent link">&para;</a></h3>
 <p>Sketches may consist of multiple code files.</p>
 <p>The following extensions are supported:</p>
 <ul>
 <li>.ino - <a href="https://www.arduino.cc/reference/en/">Arduino language</a> files.</li>
 <li>.pde - Alternate extension for Arduino language files. This file extension is also used by Processing sketches. .ino
-  is recommended to avoid confusion.</li>
+  is recommended to avoid confusion. <strong><code>.pde</code> extension is deprecated and will be removed in the future.</strong></li>
 <li>.cpp - C++ files.</li>
 <li>.c - C Files.</li>
 <li>.S - Assembly language files.</li>
