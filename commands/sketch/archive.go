@@ -23,10 +23,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/globals"
+	"github.com/arduino/arduino-cli/arduino/sketches"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/pkg/errors"
 )
 
 // ArchiveSketch FIXMEDOC
@@ -39,39 +38,13 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchReq) (*rpc.Archive
 		sketchPath = paths.New(".")
 	}
 
-	sketchPath, err := sketchPath.Clean().Abs()
+	sketch, err := sketches.NewSketchFromPath(sketchPath)
 	if err != nil {
-		return nil, fmt.Errorf("Error getting absolute sketch path %v", err)
+		return nil, err
 	}
 
-	// Make sketchPath point to the sketch folder
-	if sketchPath.IsNotDir() {
-		sketchPath = sketchPath.Parent()
-	}
-
-	sketchName = sketchPath.Base()
-
-	// sketchMainFile is the path to the sketch main file
-	var sketchMainFile *paths.Path
-
-	for ext := range globals.MainFileValidExtensions {
-		candidateSketchMainFile := sketchPath.Join(sketchPath.Base() + ext)
-		if candidateSketchMainFile.Exist() {
-			if sketchMainFile == nil {
-				sketchMainFile = candidateSketchMainFile
-			} else {
-				return nil, errors.Errorf("multiple main sketch files found (%v, %v)",
-					sketchMainFile,
-					candidateSketchMainFile,
-				)
-			}
-		}
-	}
-
-	// Checks if it's really a sketch
-	if sketchMainFile == nil {
-		return nil, fmt.Errorf("specified path is not a sketch: %v", sketchPath.String())
-	}
+	sketchPath = sketch.FullPath
+	sketchName = sketch.Name
 
 	archivePath := paths.New(req.ArchivePath)
 	if archivePath == nil {

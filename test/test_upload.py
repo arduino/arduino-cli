@@ -13,9 +13,8 @@
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
 import os
-import hashlib
-import tempfile
 import shutil
+import json
 from pathlib import Path
 
 import pytest
@@ -250,7 +249,10 @@ def test_upload_sketch_with_pde_extension(run_command, data_dir, detected_boards
         assert run_command(f"core install {core}")
 
         # Compile sketch first
-        assert run_command(f"compile --clean -b {board.fqbn} {sketch_path}")
+        res = run_command(f"compile --clean -b {board.fqbn} {sketch_path} --format json")
+        assert res.ok
+        data = json.loads(res.stdout)
+        build_dir = Path(data["builder_result"]["build_path"])
 
         # Upload from sketch folder
         wait_for_board()
@@ -260,9 +262,6 @@ def test_upload_sketch_with_pde_extension(run_command, data_dir, detected_boards
         wait_for_board()
         assert run_command(f"upload -b {board.fqbn} -p {board.address} {sketch_file}")
 
-        # Upload from build folder
-        sketch_path_md5 = hashlib.md5(bytes(sketch_path)).hexdigest().upper()
-        build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
         wait_for_board()
         res = run_command(f"upload -b {board.fqbn} -p {board.address} --input-dir {build_dir}")
         assert (
@@ -301,14 +300,14 @@ def test_upload_with_input_dir_containing_multiple_binaries(run_command, data_di
         assert run_command(f"core install {core}")
 
         # Compile both sketches and copy binaries in the same directory same build directory
-        assert run_command(f"compile --clean -b {board.fqbn} {sketch_one_path}")
-        assert run_command(f"compile --clean -b {board.fqbn} {sketch_two_path}")
-
-        sketch_path_md5 = hashlib.md5(bytes(sketch_one_path)).hexdigest().upper()
-        build_dir_one = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
-
-        sketch_path_md5 = hashlib.md5(bytes(sketch_two_path)).hexdigest().upper()
-        build_dir_two = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
+        res = run_command(f"compile --clean -b {board.fqbn} {sketch_one_path} --format json")
+        assert res.ok
+        data = json.loads(res.stdout)
+        build_dir_one = Path(data["builder_result"]["build_path"])
+        res = run_command(f"compile --clean -b {board.fqbn} {sketch_two_path} --format json")
+        assert res.ok
+        data = json.loads(res.stdout)
+        build_dir_two = Path(data["builder_result"]["build_path"])
 
         # Copy binaries to same folder
         binaries_dir = Path(data_dir, "build", "BuiltBinaries")

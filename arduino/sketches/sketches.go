@@ -138,14 +138,10 @@ func CheckForPdeFiles(sketch *paths.Path) []*paths.Path {
 		sketch = sketch.Parent()
 	}
 
-	// It's not a problem if we can't read files right now
-	files, _ := sketch.ReadDirRecursive()
-	files.FilterOutDirs()
-	res := []*paths.Path{}
-	for _, f := range files {
-		if f.Ext() == ".pde" {
-			res = append(res, f)
-		}
+	files, err := sketch.ReadDirRecursive()
+	if err != nil {
+		return []*paths.Path{}
 	}
-	return res
+	files.FilterSuffix(".pde")
+	return files
 }
