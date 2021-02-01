@@ -90,6 +90,10 @@ func main() {
 	log.Println("calling GetValue(foo)")
 	callGetValue(settingsClient)
 
+	// List all the settings.
+	log.Println("calling GetAll()")
+	callGetAll(settingsClient)
+
 	// Write settings to file.
 	log.Println("calling Write()")
 	callWrite(settingsClient)
@@ -100,8 +104,16 @@ func main() {
 	log.Println("calling Init")
 	instance := initInstance(client)
 
+	// We set up the proxy and then run the update to verify that the proxy settings are currently used
+	log.Println("calling setProxy")
+	callSetProxy(settingsClient)
+
 	// With a brand new instance, the first operation should always be updating
 	// the index.
+	log.Println("calling UpdateIndex")
+	callUpdateIndex(client, instance)
+
+	// And we run update again
 	log.Println("calling UpdateIndex")
 	callUpdateIndex(client, instance)
 
@@ -218,6 +230,31 @@ func callSetValue(client settings.SettingsClient) {
 		&settings.Value{
 			Key:      "directories",
 			JsonData: `{"data": "` + dataDir + `", "downloads": "` + path.Join(dataDir, "staging") + `", "user": "` + path.Join(dataDir, "sketchbook") + `"}`,
+		})
+
+	if err != nil {
+		log.Fatalf("Error setting settings value: %s", err)
+
+	}
+}
+
+func callSetProxy(client settings.SettingsClient) {
+	_, err := client.SetValue(context.Background(),
+		&settings.Value{
+			Key:      "network.proxy",
+			JsonData: `"http://localhost:3128"`,
+		})
+
+	if err != nil {
+		log.Fatalf("Error setting settings value: %s", err)
+	}
+}
+
+func callUnsetProxy(client settings.SettingsClient) {
+	_, err := client.SetValue(context.Background(),
+		&settings.Value{
+			Key:      "network.proxy",
+			JsonData: `""`,
 		})
 
 	if err != nil {
