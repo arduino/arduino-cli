@@ -19,6 +19,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/settings"
@@ -40,6 +42,31 @@ func (s *SettingsService) GetAll(ctx context.Context, req *rpc.GetAllRequest) (*
 	return nil, err
 }
 
+// mapper converts a map of nested maps to a map of scalar values.
+// For example:
+//    {"foo": "bar", "daemon":{"port":"420"}, "sketch": {"always_export_binaries": "true"}}
+// would convert to:
+//    {"foo": "bar", "daemon.port":"420", "sketch.always_export_binaries": "true"}
+func mapper(toMap map[string]interface{}) map[string]interface{} {
+	res := map[string]interface{}{}
+	for k, v := range toMap {
+		switch data := v.(type) {
+		case map[string]interface{}:
+			for mK, mV := range mapper(data) {
+				// Concatenate keys
+				res[fmt.Sprintf("%s.%s", k, mK)] = mV
+			}
+			// This is done to avoid skipping keys containing empty maps
+			if len(data) == 0 {
+				res[k] = map[string]interface{}{}
+			}
+		default:
+			res[k] = v
+		}
+	}
+	return res
+}
+
 // Merge applies multiple settings values at once.
 func (s *SettingsService) Merge(ctx context.Context, req *rpc.RawData) (*rpc.MergeResponse, error) {
 	var toMerge map[string]interface{}
@@ -47,8 +74,13 @@ func (s *SettingsService) Merge(ctx context.Context, req *rpc.RawData) (*rpc.Mer
 		return nil, err
 	}
 
-	if err := configuration.Settings.MergeConfigMap(toMerge); err != nil {
-		return nil, err
+	mapped := mapper(toMerge)
+
+	// Set each value individually.
+	// This is done because Viper ignores empty strings or maps when
+	// using the MergeConfigMap function.
+	for k, v := range mapped {
+		configuration.Settings.Set(k, v)
 	}
 
 	return &rpc.MergeResponse{}, nil
@@ -61,7 +93,17 @@ func (s *SettingsService) GetValue(ctx context.Context, req *rpc.GetValueRequest
 	key := req.GetKey()
 	value := &rpc.Value{}
 
-	if !configuration.Settings.InConfig(key) {
+	// Check if settings key actually existing, we don't use Viper.InConfig()
+	// since that doesn't check for keys formatted like daemon.port or those set
+	// with Viper.Set(). This way we check for all existing settings for sure.
+	keyExists := false
+	for _, k := range configuration.Settings.AllKeys() {
+		if k == key || strings.HasPrefix(k, key) {
+			keyExists = true
+			break
+		}
+	}
+	if !keyExists {
 		return nil, errors.New("key not found in settings")
 	}
 
