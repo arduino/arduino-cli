@@ -50,9 +50,8 @@ func (s *SettingsService) GetAll(ctx context.Context, req *rpc.GetAllRequest) (*
 func mapper(toMap map[string]interface{}) map[string]interface{} {
 	res := map[string]interface{}{}
 	for k, v := range toMap {
-		switch v.(type) {
+		switch data := v.(type) {
 		case map[string]interface{}:
-			data := v.(map[string]interface{})
 			for mK, mV := range mapper(data) {
 				// Concatenate keys
 				res[fmt.Sprintf("%s.%s", k, mK)] = mV

@@ -77,6 +77,9 @@ func TestMerge(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, "", configuration.Settings.GetString("daemon.port"))
+	// Verifies other values are not changed
+	require.Equal(t, "", configuration.Settings.GetString("foo"))
+	require.Equal(t, false, configuration.Settings.GetBool("sketch.always_export_binaries"))
 
 	reset()
 }
