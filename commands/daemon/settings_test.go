@@ -48,12 +48,35 @@ func TestGetAll(t *testing.T) {
 }
 
 func TestMerge(t *testing.T) {
-	bulkSettings := `{"foo": "bar", "daemon":{"port":"420"}}`
-	_, err := svc.Merge(context.Background(), &rpc.RawData{JsonData: bulkSettings})
-	require.Nil(t, err)
+	// Verify defaults
+	require.Equal(t, "50051", configuration.Settings.GetString("daemon.port"))
+	require.Equal(t, "", configuration.Settings.GetString("foo"))
+	require.Equal(t, false, configuration.Settings.GetBool("sketch.always_export_binaries"))
+
+	bulkSettings := `{"foo": "bar", "daemon":{"port":"420"}, "sketch": {"always_export_binaries": "true"}}`
+	res, err := svc.Merge(context.Background(), &rpc.RawData{JsonData: bulkSettings})
+	require.NotNil(t, res)
+	require.NoError(t, err)
 
 	require.Equal(t, "420", configuration.Settings.GetString("daemon.port"))
 	require.Equal(t, "bar", configuration.Settings.GetString("foo"))
+	require.Equal(t, true, configuration.Settings.GetBool("sketch.always_export_binaries"))
+
+	bulkSettings = `{"foo":"", "daemon": {}, "sketch": {"always_export_binaries": "false"}}`
+	res, err = svc.Merge(context.Background(), &rpc.RawData{JsonData: bulkSettings})
+	require.NotNil(t, res)
+	require.NoError(t, err)
+
+	require.Equal(t, "50051", configuration.Settings.GetString("daemon.port"))
+	require.Equal(t, "", configuration.Settings.GetString("foo"))
+	require.Equal(t, false, configuration.Settings.GetBool("sketch.always_export_binaries"))
+
+	bulkSettings = `{"daemon": {"port":""}}`
+	res, err = svc.Merge(context.Background(), &rpc.RawData{JsonData: bulkSettings})
+	require.NotNil(t, res)
+	require.NoError(t, err)
+
+	require.Equal(t, "", configuration.Settings.GetString("daemon.port"))
 
 	reset()
 }
@@ -61,8 +84,32 @@ func TestMerge(t *testing.T) {
 func TestGetValue(t *testing.T) {
 	key := &rpc.GetValueRequest{Key: "daemon"}
 	resp, err := svc.GetValue(context.Background(), key)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.Equal(t, `{"port":"50051"}`, resp.GetJsonData())
+
+	key = &rpc.GetValueRequest{Key: "daemon.port"}
+	resp, err = svc.GetValue(context.Background(), key)
+	require.NoError(t, err)
+	require.Equal(t, `"50051"`, resp.GetJsonData())
+}
+
+func TestGetMergedValue(t *testing.T) {
+	// Verifies value is not set
+	key := &rpc.GetValueRequest{Key: "foo"}
+	res, err := svc.GetValue(context.Background(), key)
+	require.Nil(t, res)
+	require.Error(t, err, "Error getting settings value")
+
+	// Merge value
+	bulkSettings := `{"foo": "bar"}`
+	_, err = svc.Merge(context.Background(), &rpc.RawData{JsonData: bulkSettings})
+	require.NoError(t, err)
+
+	// Verifies value is correctly returned
+	key = &rpc.GetValueRequest{Key: "foo"}
+	res, err = svc.GetValue(context.Background(), key)
+	require.NoError(t, err)
+	require.Equal(t, `"bar"`, res.GetJsonData())
 }
 
 func TestGetValueNotFound(t *testing.T) {
