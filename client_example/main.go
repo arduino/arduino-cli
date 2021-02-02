@@ -83,8 +83,20 @@ func main() {
 	callGetAll(settingsClient)
 
 	// Merge applies multiple settings values at once.
-	log.Println("calling Merge(`{\"foo\": \"bar\", \"daemon\":{\"port\":\"422\"}}`)")
-	callMerge(settingsClient)
+	log.Println("calling Merge()")
+	callMerge(settingsClient, `{"foo": {"value": "bar"}, "daemon":{"port":"422"}, "board_manager": {"additional_urls":["https://example.com"]}}`)
+
+	log.Println("calling GetAll()")
+	callGetAll(settingsClient)
+
+	log.Println("calling Merge()")
+	callMerge(settingsClient, `{"foo": {} }`)
+
+	log.Println("calling GetAll()")
+	callGetAll(settingsClient)
+
+	log.Println("calling Merge()")
+	callMerge(settingsClient, `{"foo": "bar" }`)
 
 	// Get the value of the foo key.
 	log.Println("calling GetValue(foo)")
@@ -262,11 +274,10 @@ func callUnsetProxy(client settings.SettingsClient) {
 	}
 }
 
-func callMerge(client settings.SettingsClient) {
-	bulkSettings := `{"foo": "bar", "daemon":{"port":"422"}}`
+func callMerge(client settings.SettingsClient, jsonData string) {
 	_, err := client.Merge(context.Background(),
 		&settings.RawData{
-			JsonData: bulkSettings,
+			JsonData: jsonData,
 		})
 
 	if err != nil {
