@@ -51,13 +51,14 @@ func PlatformReleaseToRPC(platformRelease *cores.PlatformRelease) *rpc.Platform 
 	}
 
 	result := &rpc.Platform{
-		ID:         platformRelease.Platform.String(),
-		Name:       platformRelease.Platform.Name,
-		Maintainer: platformRelease.Platform.Package.Maintainer,
-		Website:    platformRelease.Platform.Package.WebsiteURL,
-		Email:      platformRelease.Platform.Package.Email,
-		Boards:     boards,
-		Latest:     platformRelease.Version.String(),
+		ID:                platformRelease.Platform.String(),
+		Name:              platformRelease.Platform.Name,
+		Maintainer:        platformRelease.Platform.Package.Maintainer,
+		Website:           platformRelease.Platform.Package.WebsiteURL,
+		Email:             platformRelease.Platform.Package.Email,
+		Boards:            boards,
+		Latest:            platformRelease.Version.String(),
+		ManuallyInstalled: platformRelease.Platform.ManuallyInstalled,
 	}
 
 	return result

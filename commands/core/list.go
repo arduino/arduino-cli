@@ -39,6 +39,21 @@ func GetPlatforms(req *rpc.PlatformListReq) ([]*rpc.Platform, error) {
 	for _, targetPackage := range packageManager.Packages {
 		for _, platform := range targetPackage.Platforms {
 			platformRelease := packageManager.GetInstalledPlatformRelease(platform)
+
+			// If both All and UpdatableOnly are set All takes precedence
+			if req.All {
+				installedVersion := ""
+				if platformRelease == nil {
+					platformRelease = platform.GetLatestRelease()
+				} else {
+					installedVersion = platformRelease.Version.String()
+				}
+				rpcPlatform := commands.PlatformReleaseToRPC(platform.GetLatestRelease())
+				rpcPlatform.Installed = installedVersion
+				res = append(res, rpcPlatform)
+				continue
+			}
+
 			if platformRelease != nil {
 				if req.UpdatableOnly {
 					if latest := platform.GetLatestRelease(); latest == nil || latest == platformRelease {

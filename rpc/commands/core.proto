@@ -109,6 +109,10 @@ message PlatformListReq {
 	// Set to true to only list platforms which have a newer version available
 	// than the one currently installed.
 	bool updatable_only = 2;
+	// Set to true to list platforms installed manually in the user' sketchbook
+	// hardware folder, installed with the PlatformManager through the CLI or IDE
+	// and that are available to install
+	bool all = 3;
 }
 
 message PlatformListResp {
@@ -137,6 +141,9 @@ message Platform {
 	// not installed, this is an arbitrary list of board names provided by the
 	// platform author for display and may not match boards.txt.
 	repeated Board Boards = 8;
+	// If true this Platform has been installed manually in the user' sketchbook
+	// hardware folder
+	bool ManuallyInstalled = 9;
 }
 
 message Board {

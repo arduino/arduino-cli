@@ -28,11 +28,12 @@ import (
 
 // Platform represents a platform package.
 type Platform struct {
-	Architecture string // The name of the architecture of this package.
-	Name         string
-	Category     string
-	Releases     map[string]*PlatformRelease // The Releases of this platform, labeled by version.
-	Package      *Package                    `json:"-"`
+	Architecture      string // The name of the architecture of this package.
+	Name              string
+	Category          string
+	Releases          map[string]*PlatformRelease // The Releases of this platform, labeled by version.
+	Package           *Package                    `json:"-"`
+	ManuallyInstalled bool                        // true if the Platform has been installed without the CLI
 }
 
 // PlatformReleaseHelp represents the help URL for this Platform release

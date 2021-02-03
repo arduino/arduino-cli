@@ -166,17 +166,14 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 			return fmt.Errorf("looking for boards.txt in %s: %s", possibleBoardTxtPath, err)
 
 		} else if exist {
-
-			// case: ARCHITECTURE/boards.txt
-			// this is the general case for unversioned Platform
-			version := semver.MustParse("")
-
-			// FIXME: this check is duplicated, find a better way to handle this
-			if exist, err := platformPath.Join("boards.txt").ExistCheck(); err != nil {
-				return fmt.Errorf("opening boards.txt: %s", err)
-			} else if !exist {
-				continue
+			platformTxtPath := platformPath.Join("platform.txt")
+			platformProperties, err := properties.SafeLoad(platformTxtPath.String())
+			if err != nil {
+				return fmt.Errorf("loading platform.txt: %w", err)
 			}
+
+			platformName := platformProperties.Get("name")
+			version := semver.MustParse(platformProperties.Get("version"))
 
 			// check if package_bundled_index.json exists
 			isIDEBundled := false
@@ -210,6 +207,12 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 			}
 
 			platform := targetPackage.GetOrCreatePlatform(architecture)
+			if platform.Name == "" {
+				platform.Name = platformName
+			}
+			if !isIDEBundled {
+				platform.ManuallyInstalled = true
+			}
 			release := platform.GetOrCreateRelease(version)
 			release.IsIDEBundled = isIDEBundled
 			if isIDEBundled {
