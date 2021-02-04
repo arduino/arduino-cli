@@ -27,6 +27,7 @@ import (
 )
 
 func TestLoadHardware(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "hardware"),
 	}
