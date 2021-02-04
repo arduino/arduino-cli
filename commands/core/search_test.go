@@ -22,6 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -52,7 +53,11 @@ func TestPlatformSearch(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, inst)
 
-	res, err := PlatformSearch(inst.GetId(), "retrokit", true)
+	res, err := PlatformSearch(&rpc.PlatformSearchReq{
+		Instance:    inst,
+		SearchArgs:  "retrokit",
+		AllVersions: true,
+	})
 	require.Nil(t, err)
 	require.NotNil(t, res)
 
@@ -78,7 +83,11 @@ func TestPlatformSearch(t *testing.T) {
 		Boards:     []*commands.Board{{Name: "RK002"}},
 	})
 
-	res, err = PlatformSearch(inst.GetId(), "retrokit", false)
+	res, err = PlatformSearch(&rpc.PlatformSearchReq{
+		Instance:    inst,
+		SearchArgs:  "retrokit",
+		AllVersions: false,
+	})
 	require.Nil(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 1)
@@ -94,7 +103,11 @@ func TestPlatformSearch(t *testing.T) {
 	})
 
 	// Search the Package Maintainer
-	res, err = PlatformSearch(inst.GetId(), "Retrokits (www.retrokits.com)", true)
+	res, err = PlatformSearch(&rpc.PlatformSearchReq{
+		Instance:    inst,
+		SearchArgs:  "Retrokits (www.retrokits.com)",
+		AllVersions: true,
+	})
 	require.Nil(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 2)
@@ -120,7 +133,11 @@ func TestPlatformSearch(t *testing.T) {
 	})
 
 	// Search using the Package name
-	res, err = PlatformSearch(inst.GetId(), "Retrokits-RK002", true)
+	res, err = PlatformSearch(&rpc.PlatformSearchReq{
+		Instance:    inst,
+		SearchArgs:  "Retrokits-RK002",
+		AllVersions: true,
+	})
 	require.Nil(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 2)
@@ -146,7 +163,11 @@ func TestPlatformSearch(t *testing.T) {
 	})
 
 	// Search using the Platform name
-	res, err = PlatformSearch(inst.GetId(), "rk002", true)
+	res, err = PlatformSearch(&rpc.PlatformSearchReq{
+		Instance:    inst,
+		SearchArgs:  "rk002",
+		AllVersions: true,
+	})
 	require.Nil(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 2)
@@ -172,7 +193,11 @@ func TestPlatformSearch(t *testing.T) {
 	})
 
 	// Search using a board name
-	res, err = PlatformSearch(inst.GetId(), "Yún", true)
+	res, err = PlatformSearch(&rpc.PlatformSearchReq{
+		Instance:    inst,
+		SearchArgs:  "Yún",
+		AllVersions: true,
+	})
 	require.Nil(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 1)

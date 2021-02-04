@@ -34,8 +34,10 @@ func exactMatch(line, searchArgs string) bool {
 }
 
 // PlatformSearch FIXMEDOC
-func PlatformSearch(instanceID int32, searchArgs string, allVersions bool) (*rpc.PlatformSearchResp, error) {
-	pm := commands.GetPackageManager(instanceID)
+func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error) {
+	searchArgs := req.SearchArgs
+	allVersions := req.AllVersions
+	pm := commands.GetPackageManager(req.Instance.Id)
 	if pm == nil {
 		return nil, errors.New("invalid instance")
 	}

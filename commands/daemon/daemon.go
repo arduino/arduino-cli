@@ -259,24 +259,16 @@ func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeReq, str
 
 // PlatformSearch FIXMEDOC
 func (s *ArduinoCoreServerImpl) PlatformSearch(ctx context.Context, req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error) {
-	return core.PlatformSearch(req.GetInstance().GetId(), req.GetSearchArgs(), req.GetAllVersions())
+	return core.PlatformSearch(req)
 }
 
 // PlatformList FIXMEDOC
 func (s *ArduinoCoreServerImpl) PlatformList(ctx context.Context, req *rpc.PlatformListReq) (*rpc.PlatformListResp, error) {
-	platforms, err := core.GetPlatforms(req.Instance.Id, req.UpdatableOnly)
+	platforms, err := core.GetPlatforms(req)
 	if err != nil {
 		return nil, err
 	}
-
-	installed := []*rpc.Platform{}
-	for _, p := range platforms {
-		rpcPlatform := commands.PlatformReleaseToRPC(p)
-		rpcPlatform.Installed = p.Version.String()
-		installed = append(installed, rpcPlatform)
-	}
-
-	return &rpc.PlatformListResp{InstalledPlatform: installed}, nil
+	return &rpc.PlatformListResp{InstalledPlatform: platforms}, nil
 }
 
 // Upload FIXMEDOC

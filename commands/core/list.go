@@ -16,14 +16,15 @@
 package core
 
 import (
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/pkg/errors"
 )
 
 // GetPlatforms returns a list of installed platforms, optionally filtered by
 // those requiring an update.
-func GetPlatforms(instanceID int32, updatableOnly bool) ([]*cores.PlatformRelease, error) {
+func GetPlatforms(req *rpc.PlatformListReq) ([]*rpc.Platform, error) {
+	instanceID := req.Instance.Id
 	i := commands.GetInstance(instanceID)
 	if i == nil {
 		return nil, errors.Errorf("unable to find an instance with ID: %d", instanceID)
@@ -34,17 +35,20 @@ func GetPlatforms(instanceID int32, updatableOnly bool) ([]*cores.PlatformReleas
 		return nil, errors.New("invalid instance")
 	}
 
-	res := []*cores.PlatformRelease{}
+	res := []*rpc.Platform{}
 	for _, targetPackage := range packageManager.Packages {
 		for _, platform := range targetPackage.Platforms {
-			if platformRelease := packageManager.GetInstalledPlatformRelease(platform); platformRelease != nil {
-				if updatableOnly {
+			platformRelease := packageManager.GetInstalledPlatformRelease(platform)
+			if platformRelease != nil {
+				if req.UpdatableOnly {
 					if latest := platform.GetLatestRelease(); latest == nil || latest == platformRelease {
 						continue
 					}
 				}
 
-				res = append(res, platformRelease)
+				rpcPlatform := commands.PlatformReleaseToRPC(platformRelease)
+				rpcPlatform.Installed = platformRelease.Version.String()
+				res = append(res, rpcPlatform)
 			}
 		}
 	}
