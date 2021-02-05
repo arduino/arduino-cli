@@ -19,11 +19,11 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/core"
+	rpc "github.com/arduino/arduino-cli/rpc/commands"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -55,7 +55,10 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino core list`")
 
-	platforms, err := core.GetPlatforms(inst.Id, listFlags.updatableOnly)
+	platforms, err := core.GetPlatforms(&rpc.PlatformListReq{
+		Instance:      inst,
+		UpdatableOnly: listFlags.updatableOnly,
+	})
 	if err != nil {
 		feedback.Errorf("Error listing platforms: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
@@ -67,7 +70,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type installedResult struct {
-	platforms []*cores.PlatformRelease
+	platforms []*rpc.Platform
 }
 
 func (ir installedResult) Data() interface{} {
@@ -82,10 +85,10 @@ func (ir installedResult) String() string {
 	t := table.New()
 	t.SetHeader("ID", "Installed", "Latest", "Name")
 	sort.Slice(ir.platforms, func(i, j int) bool {
-		return ir.platforms[i].Platform.String() < ir.platforms[j].Platform.String()
+		return ir.platforms[i].ID < ir.platforms[j].ID
 	})
 	for _, p := range ir.platforms {
-		t.AddRow(p.Platform.String(), p.Version.String(), p.Platform.GetLatestRelease().Version.String(), p.Platform.Name)
+		t.AddRow(p.ID, p.Installed, p.Latest, p.Name)
 	}
 
 	return t.Render()
