@@ -4,6 +4,14 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## Unreleased
 
+### Change type of `CompileReq.ExportBinaries` message in gRPC interface
+
+This change affects only the gRPC consumers.
+
+In the `CompileReq` message the `export_binaries` property type has been changed from `bool` to
+`google.protobuf.BoolValue`. This has been done to handle settings bindings by gRPC consumers and the CLI in the same
+way so that they an identical behaviour.
+
 ## 0.15.0
 
 ### Rename `telemetry` settings to `metrics`

@@ -55,7 +55,6 @@ var (
 	optimizeForDebug        bool     // Optimize compile output for debug, not for release
 	programmer              string   // Use the specified programmer to upload
 	clean                   bool     // Cleanup the build folder and do not use any cached build
-	exportBinaries          bool     // Copies compiled binaries to sketch folder when true
 	compilationDatabaseOnly bool     // Only create compilation database without actually compiling
 	sourceOverrides         string   // Path to a .json file that contains a set of replacements of the sketch source code.
 )
@@ -100,8 +99,7 @@ func NewCommand() *cobra.Command {
 	command.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload.")
 	command.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, "Just produce the compilation database, without actually compiling.")
 	command.Flags().BoolVar(&clean, "clean", false, "Optional, cleanup the build folder and do not use any cached build.")
-	// We must use the following syntax for this flag since it's also bound to settings, we could use the other one too
-	// but it wouldn't make sense since we still must explicitly set the exportBinaries variable by reading from settings.
+	// We must use the following syntax for this flag since it's also bound to settings.
 	// This must be done because the value is set when the binding is accessed from viper. Accessing from cobra would only
 	// read the value if the flag is set explicitly by the user.
 	command.Flags().BoolP("export-binaries", "e", false, "If set built binaries will be exported to the sketch folder.")
@@ -137,11 +135,6 @@ func run(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	// We must read this from settings since the value is set when the binding is accessed from viper,
-	// accessing it from cobra would only read it if the flag is explicitly set by the user and ignore
-	// the config file and the env vars.
-	exportBinaries = configuration.Settings.GetBool("sketch.always_export_binaries")
-
 	var overrides map[string]string
 	if sourceOverrides != "" {
 		data, err := paths.New(sourceOverrides).ReadFile()
@@ -176,7 +169,6 @@ func run(cmd *cobra.Command, args []string) {
 		Libraries:                     libraries,
 		OptimizeForDebug:              optimizeForDebug,
 		Clean:                         clean,
-		ExportBinaries:                exportBinaries,
 		CreateCompilationDatabaseOnly: compilationDatabaseOnly,
 		SourceOverride:                overrides,
 	}

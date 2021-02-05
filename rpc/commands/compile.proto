@@ -19,6 +19,7 @@ package cc.arduino.cli.commands;
 
 option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 
+import "google/protobuf/wrappers.proto";
 import "commands/common.proto";
 import "commands/lib.proto";
 
@@ -40,9 +41,9 @@ message CompileReq {
   bool optimizeForDebug = 16; // Optimize compile output for debug, not for release.
   string export_dir = 18; // Optional: save the build artifacts in this directory, the directory must exist.
   bool clean = 19; // Optional: cleanup the build folder and do not use any previously cached build
-  bool export_binaries = 20; // When set to `true` the compiled binary will be copied to the export directory.
   bool create_compilation_database_only = 21; // When set to `true` only the compilation database will be produced and no actual build will be performed.
   map<string, string> source_override = 22; // This map (source file -> new content) let the builder use the provided content instead of reading the corresponding file on disk. This is useful for IDE that have unsaved changes in memory. The path must be relative to the sketch directory. Only files from the sketch are allowed.
+  google.protobuf.BoolValue export_binaries = 23;  // When set to `true` the compiled binary will be copied to the export directory.
 }
 
 message CompileResp {
