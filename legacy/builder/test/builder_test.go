@@ -46,7 +46,7 @@ func prepareBuilderTestContext(t *testing.T, sketchPath *paths.Path, fqbn string
 func TestBuilderEmptySketch(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(t, paths.New("sketch1", "sketch.ino"), "arduino:avr:uno")
+	ctx := prepareBuilderTestContext(t, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 	ctx.DebugLevel = 10
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -63,13 +63,13 @@ func TestBuilderEmptySketch(t *testing.T) {
 	exist, err = buildPath.Join(constants.FOLDER_PREPROC, constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E).ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "sketch.ino.cpp.o").ExistCheck()
+	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "sketch1.ino.cpp.o").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
-	exist, err = buildPath.Join("sketch.ino.elf").ExistCheck()
+	exist, err = buildPath.Join("sketch1.ino.elf").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
-	exist, err = buildPath.Join("sketch.ino.hex").ExistCheck()
+	exist, err = buildPath.Join("sketch1.ino.hex").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
 }
@@ -277,7 +277,7 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 func TestBuilderSketchWithBackup(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(t, paths.New("sketch_with_backup_files", "sketch.ino"), "arduino:avr:uno")
+	ctx := prepareBuilderTestContext(t, paths.New("sketch_with_backup_files", "sketch_with_backup_files.ino"), "arduino:avr:uno")
 	ctx.HardwareDirs = append(ctx.HardwareDirs, paths.New("downloaded_board_manager_stuff"))
 	ctx.BuiltInToolsDirs = append(ctx.BuiltInToolsDirs, paths.New("downloaded_board_manager_stuff"))
 
@@ -293,7 +293,7 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 func TestBuilderSketchWithOldLib(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(t, paths.New("sketch_with_old_lib", "sketch.ino"), "arduino:avr:uno")
+	ctx := prepareBuilderTestContext(t, paths.New("sketch_with_old_lib", "sketch_with_old_lib.ino"), "arduino:avr:uno")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -344,7 +344,7 @@ func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testin
 func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(t, paths.New("sketch1", "sketch.ino"), "arduino:avr:uno")
+	ctx := prepareBuilderTestContext(t, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 
 	var err error
 	ctx.BuildPath, err = paths.New("sketch1", "build").Abs()
@@ -365,7 +365,7 @@ func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
 func TestBuilderCacheCoreAFile(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(t, paths.New("sketch1", "sketch.ino"), "arduino:avr:uno")
+	ctx := prepareBuilderTestContext(t, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 
 	SetupBuildPath(t, ctx)
 	defer ctx.BuildPath.RemoveAll()

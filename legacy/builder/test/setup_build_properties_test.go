@@ -31,7 +31,7 @@ func TestSetupBuildProperties(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
-		SketchLocation:    paths.New("sketch1", "sketch.ino"),
+		SketchLocation:    paths.New("sketch1", "sketch1.ino"),
 		FQBN:              parseFQBN(t, "arduino:avr:uno"),
 		ArduinoAPIVersion: "10600",
 	}
@@ -97,7 +97,7 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
 		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
-		SketchLocation:    paths.New("sketch1", "sketch.ino"),
+		SketchLocation:    paths.New("sketch1", "sketch1.ino"),
 		FQBN:              parseFQBN(t, "arduino:avr:uno"),
 		ArduinoAPIVersion: "10600",
 
@@ -138,7 +138,7 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
-		SketchLocation:    paths.New("sketch1", "sketch.ino"),
+		SketchLocation:    paths.New("sketch1", "sketch1.ino"),
 		FQBN:              parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 		ArduinoAPIVersion: "10600",
 	}
@@ -176,7 +176,7 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 	ctx := &types.Context{
 		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
-		SketchLocation:    paths.New("sketch1", "sketch.ino"),
+		SketchLocation:    paths.New("sketch1", "sketch1.ino"),
 		FQBN:              parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 		ArduinoAPIVersion: "10600",
 	}
