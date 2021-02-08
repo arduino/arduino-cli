@@ -109,3 +109,24 @@ func TestCheckForPdeFiles(t *testing.T) {
 	require.Len(t, files, 1)
 	require.Equal(t, sketchPath.Parent().Join("SketchMultipleMainFiles.pde"), files[0])
 }
+
+func TestSketchLoadWithCasing(t *testing.T) {
+	sketchFolder := paths.New("testdata", "SketchCasingWrong")
+
+	sketch, err := NewSketchFromPath(sketchFolder)
+	require.Nil(t, sketch)
+
+	sketchFolderAbs, _ := sketchFolder.Abs()
+	sketchMainFileAbs := sketchFolderAbs.Join("SketchCasingWrong.ino")
+	expectedError := fmt.Sprintf("no valid sketch found in %s: missing %s", sketchFolderAbs, sketchMainFileAbs)
+	require.EqualError(t, err, expectedError)
+}
+
+func TestSketchLoadingCorrectCasing(t *testing.T) {
+	sketchFolder := paths.New("testdata", "SketchCasingCorrect")
+	sketch, err := NewSketchFromPath(sketchFolder)
+	require.NotNil(t, sketch)
+	require.NoError(t, err)
+	require.Equal(t, sketch.Name, "SketchCasingCorrect")
+	require.True(t, sketch.FullPath.EquivalentTo(sketchFolder))
+}

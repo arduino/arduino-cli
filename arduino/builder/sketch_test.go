@@ -230,3 +230,17 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	info2, err := os.Stat(s2.AdditionalFiles[0].Path)
 	require.Equal(t, info1.ModTime(), info2.ModTime())
 }
+
+func TestLoadSketchCaseMismatch(t *testing.T) {
+	// pass the path to the sketch folder
+	sketchPath := filepath.Join("testdata", t.Name())
+	mainFilePath := filepath.Join(sketchPath, t.Name()+".ino")
+	s, err := builder.SketchLoad(sketchPath, "")
+	require.Nil(t, s)
+	require.Error(t, err)
+
+	// pass the path to the main file
+	s, err = builder.SketchLoad(mainFilePath, "")
+	require.Nil(t, s)
+	require.Error(t, err)
+}

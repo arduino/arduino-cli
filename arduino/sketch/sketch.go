@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/globals"
+	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
 
@@ -116,10 +117,43 @@ func New(sketchFolderPath, mainFilePath, buildPath string, allFilesPaths []strin
 	sort.Sort(ItemByPath(additionalFiles))
 	sort.Sort(ItemByPath(otherSketchFiles))
 
+	if err := CheckSketchCasing(sketchFolderPath); err != nil {
+		return nil, err
+	}
+
 	return &Sketch{
 		MainFile:         mainFile,
 		LocationPath:     sketchFolderPath,
 		OtherSketchFiles: otherSketchFiles,
 		AdditionalFiles:  additionalFiles,
 	}, nil
+}
+
+// CheckSketchCasing returns an error if the casing of the sketch folder and the main file are different.
+// Correct:
+//    MySketch/MySketch.ino
+// Wrong:
+//    MySketch/mysketch.ino
+//    mysketch/MySketch.ino
+//
+// This is mostly necessary to avoid errors on Mac OS X.
+// For more info see: https://github.com/arduino/arduino-cli/issues/1174
+func CheckSketchCasing(sketchFolder string) error {
+	sketchPath := paths.New(sketchFolder)
+	files, err := sketchPath.ReadDir()
+	if err != nil {
+		return errors.Errorf("reading files: %v", err)
+	}
+	files.FilterOutDirs()
+
+	sketchName := sketchPath.Base()
+	files.FilterPrefix(sketchName)
+
+	if files.Len() == 0 {
+		sketchFolderPath := paths.New(sketchFolder)
+		sketchFile := sketchFolderPath.Join(sketchFolderPath.Base() + globals.MainFileValidExtension)
+		return errors.Errorf("no valid sketch found in %s: missing %s", sketchFolderPath, sketchFile)
+	}
+
+	return nil
 }

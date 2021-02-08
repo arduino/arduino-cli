@@ -16,12 +16,15 @@
 package sketch_test
 
 import (
+	"fmt"
 	"path/filepath"
 	"sort"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewItem(t *testing.T) {
@@ -43,9 +46,9 @@ func TestNewItem(t *testing.T) {
 
 func TestSort(t *testing.T) {
 	items := []*sketch.Item{
-		&sketch.Item{"foo"},
-		&sketch.Item{"baz"},
-		&sketch.Item{"bar"},
+		{"foo"},
+		{"baz"},
+		{"bar"},
 	}
 
 	sort.Sort(sketch.ItemByPath(items))
@@ -70,4 +73,38 @@ func TestNew(t *testing.T) {
 	assert.Equal(t, sketchFolderPath, sketch.LocationPath)
 	assert.Len(t, sketch.OtherSketchFiles, 0)
 	assert.Len(t, sketch.AdditionalFiles, 1)
+}
+
+func TestNewSketchCasingWrong(t *testing.T) {
+	sketchPath := paths.New("testdata", "SketchCasingWrong")
+	mainFilePath := paths.New("testadata", "sketchcasingwrong.ino").String()
+	sketch, err := sketch.New(sketchPath.String(), mainFilePath, "", []string{mainFilePath})
+	assert.Nil(t, sketch)
+	expectedError := fmt.Sprintf("no valid sketch found in %s: missing %s", sketchPath.String(), sketchPath.Join(sketchPath.Base()+".ino"))
+	assert.EqualError(t, err, expectedError)
+}
+
+func TestNewSketchCasingCorrect(t *testing.T) {
+	sketchPath := paths.New("testdata", "SketchCasingCorrect").String()
+	mainFilePath := paths.New("testadata", "SketchCasingCorrect.ino").String()
+	sketch, err := sketch.New(sketchPath, mainFilePath, "", []string{mainFilePath})
+	assert.NotNil(t, sketch)
+	assert.NoError(t, err)
+	assert.Equal(t, sketchPath, sketch.LocationPath)
+	assert.Equal(t, mainFilePath, sketch.MainFile.Path)
+	assert.Len(t, sketch.OtherSketchFiles, 0)
+	assert.Len(t, sketch.AdditionalFiles, 0)
+}
+
+func TestCheckSketchCasingWrong(t *testing.T) {
+	sketchFolder := paths.New("testdata", "SketchCasingWrong")
+	err := sketch.CheckSketchCasing(sketchFolder.String())
+	expectedError := fmt.Sprintf("no valid sketch found in %s: missing %s", sketchFolder, sketchFolder.Join(sketchFolder.Base()+".ino"))
+	assert.EqualError(t, err, expectedError)
+}
+
+func TestCheckSketchCasingCorrect(t *testing.T) {
+	sketchFolder := paths.New("testdata", "SketchCasingCorrect").String()
+	err := sketch.CheckSketchCasing(sketchFolder)
+	require.NoError(t, err)
 }
