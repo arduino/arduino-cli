@@ -81,7 +81,7 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("sketch2", "SketchWithIfDef.ino"),
+		SketchLocation:       paths.New("SketchWithIfDef", "SketchWithIfDef.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
@@ -109,7 +109,7 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch2", "SketchWithIfDef.preprocessed.txt"), ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("SketchWithIfDef", "SketchWithIfDef.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
@@ -121,7 +121,7 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("sketch3", "Baladuino.ino"),
+		SketchLocation:       paths.New("Baladuino", "Baladuino.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
@@ -149,7 +149,7 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch3", "Baladuino.preprocessed.txt"), ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("Baladuino", "Baladuino.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
@@ -161,7 +161,7 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("sketch4", "CharWithEscapedDoubleQuote.ino"),
+		SketchLocation:       paths.New("CharWithEscapedDoubleQuote", "CharWithEscapedDoubleQuote.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
@@ -189,7 +189,7 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch4", "CharWithEscapedDoubleQuote.preprocessed.txt"), ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("CharWithEscapedDoubleQuote", "CharWithEscapedDoubleQuote.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
@@ -201,7 +201,7 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("sketch5", "IncludeBetweenMultilineComment.ino"),
+		SketchLocation:       paths.New("IncludeBetweenMultilineComment", "IncludeBetweenMultilineComment.ino"),
 		FQBN:                 parseFQBN(t, "arduino:sam:arduino_due_x_dbg"),
 		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
@@ -229,7 +229,7 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch5", "IncludeBetweenMultilineComment.preprocessed.txt"), ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("IncludeBetweenMultilineComment", "IncludeBetweenMultilineComment.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
@@ -241,7 +241,7 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("sketch6", "/LineContinuations.ino"),
+		SketchLocation:       paths.New("LineContinuations", "LineContinuations.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
@@ -269,7 +269,7 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch6", "LineContinuations.preprocessed.txt"), ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("LineContinuations", "LineContinuations.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
@@ -281,7 +281,7 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("sketch7", "StringWithComment.ino"),
+		SketchLocation:       paths.New("StringWithComment", "StringWithComment.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
@@ -309,7 +309,7 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch7", "StringWithComment.preprocessed.txt"), ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("StringWithComment", "StringWithComment.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
 }
 
@@ -321,7 +321,7 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("sketch8", "SketchWithStruct.ino"),
+		SketchLocation:       paths.New("SketchWithStruct", "SketchWithStruct.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
@@ -349,7 +349,7 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 		NoError(t, err)
 	}
 
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch8", "SketchWithStruct.preprocessed.txt"), ctx)
+	preprocessed := LoadAndInterpolate(t, filepath.Join("SketchWithStruct", "SketchWithStruct.preprocessed.txt"), ctx)
 	obtained := strings.Replace(ctx.Source, "\r\n", "\n", -1)
 	// ctags based preprocessing removes the space after "dostuff", but this is still OK
 	// TODO: remove this exception when moving to a more powerful parser
@@ -407,7 +407,7 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := paths.New("sketch_no_functions_two_files", "main.ino")
+	sketchLocation := paths.New("sketch_no_functions_two_files", "sketch_no_functions_two_files.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := &types.Context{
@@ -415,7 +415,7 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("sketch_no_functions_two_files", "main.ino"),
+		SketchLocation:       paths.New("sketch_no_functions_two_files", "sketch_no_functions_two_files.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
@@ -455,7 +455,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("sketch_no_functions", "main.ino"),
+		SketchLocation:       paths.New("sketch_no_functions", "sketch_no_functions.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
@@ -464,7 +464,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
 
-	sketchLocation := paths.New("sketch_no_functions", "main.ino")
+	sketchLocation := paths.New("sketch_no_functions", "sketch_no_functions.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	commands := []types.Command{
@@ -493,7 +493,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := paths.New("sketch_with_default_args", "sketch.ino")
+	sketchLocation := paths.New("sketch_with_default_args", "sketch_with_default_args.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := &types.Context{
@@ -536,7 +536,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := paths.New("sketch_with_inline_function", "sketch.ino")
+	sketchLocation := paths.New("sketch_with_inline_function", "sketch_with_inline_function.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := &types.Context{
@@ -590,7 +590,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := paths.New("sketch_with_function_signature_inside_ifdef", "sketch.ino")
+	sketchLocation := paths.New("sketch_with_function_signature_inside_ifdef", "sketch_with_function_signature_inside_ifdef.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := &types.Context{
@@ -633,7 +633,7 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := paths.New("sketch_with_usbcon", "sketch.ino")
+	sketchLocation := paths.New("sketch_with_usbcon", "sketch_with_usbcon.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := &types.Context{
@@ -676,7 +676,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := paths.New("sketch_with_typename", "sketch.ino")
+	sketchLocation := paths.New("sketch_with_typename", "sketch_with_typename.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := &types.Context{
@@ -724,7 +724,7 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := paths.New("sketch_with_ifdef", "sketch.ino")
+	sketchLocation := paths.New("sketch_with_ifdef", "sketch_with_ifdef.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := &types.Context{
@@ -770,7 +770,7 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := paths.New("sketch_with_ifdef", "sketch.ino")
+	sketchLocation := paths.New("sketch_with_ifdef", "sketch_with_ifdef.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := &types.Context{
@@ -816,7 +816,7 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 func TestPrototypesAdderSketchWithConst(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := paths.New("sketch_with_const", "sketch.ino")
+	sketchLocation := paths.New("sketch_with_const", "sketch_with_const.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := &types.Context{
@@ -864,7 +864,7 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("eol_processing", "sketch.ino"),
+		SketchLocation:       paths.New("eol_processing", "eol_processing.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
 		ArduinoAPIVersion:    "10600",
 		Verbose:              true,

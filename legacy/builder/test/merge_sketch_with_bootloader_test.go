@@ -36,7 +36,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("sketch1", "sketch.ino"),
+		SketchLocation:       paths.New("sketch1", "sketch1.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
 		ArduinoAPIVersion:    "10600",
 	}
@@ -77,7 +77,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 :0C01B000F1F30E940000FBCFF894FFCF99
 :00000001FF
 `
-	err = buildPath.Join("sketch", "sketch.ino.hex").WriteFile([]byte(fakeSketchHex))
+	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	NoError(t, err)
 
 	commands := []types.Command{
@@ -90,7 +90,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 		NoError(t, err)
 	}
 
-	bytes, err := buildPath.Join("sketch", "sketch.ino.with_bootloader.hex").ReadFile()
+	bytes, err := buildPath.Join("sketch", "sketch1.ino.with_bootloader.hex").ReadFile()
 	NoError(t, err)
 	mergedSketchHex := string(bytes)
 
@@ -106,7 +106,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("sketch1", "sketch.ino"),
+		SketchLocation:       paths.New("sketch1", "sketch1.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
 		ArduinoAPIVersion:    "10600",
 	}
@@ -147,7 +147,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 :0C01B000F1F30E940000FBCFF894FFCF99
 :00000001FF
 `
-	err = buildPath.Join("sketch.ino.hex").WriteFile([]byte(fakeSketchHex))
+	err = buildPath.Join("sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	NoError(t, err)
 
 	commands := []types.Command{
@@ -160,7 +160,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 		NoError(t, err)
 	}
 
-	bytes, err := buildPath.Join("sketch.ino.with_bootloader.hex").ReadFile()
+	bytes, err := buildPath.Join("sketch1.ino.with_bootloader.hex").ReadFile()
 	NoError(t, err)
 	mergedSketchHex := string(bytes)
 
@@ -177,7 +177,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("sketch1", "sketch.ino"),
+		SketchLocation:       paths.New("sketch1", "sketch1.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
 		ArduinoAPIVersion:    "10600",
 	}
@@ -215,7 +215,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		SketchLocation:       paths.New("sketch1", "sketch.ino"),
+		SketchLocation:       paths.New("sketch1", "sketch1.ino"),
 		FQBN:                 parseFQBN(t, "my_avr_platform:avr:mymega:cpu=atmega2560"),
 		ArduinoAPIVersion:    "10600",
 	}
@@ -256,7 +256,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 :0C01B000F1F30E940000FBCFF894FFCF99
 :00000001FF
 `
-	err = buildPath.Join("sketch", "sketch.ino.hex").WriteFile([]byte(fakeSketchHex))
+	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	NoError(t, err)
 
 	commands := []types.Command{
@@ -269,7 +269,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 		NoError(t, err)
 	}
 
-	bytes, err := buildPath.Join("sketch", "sketch.ino.with_bootloader.hex").ReadFile()
+	bytes, err := buildPath.Join("sketch", "sketch1.ino.with_bootloader.hex").ReadFile()
 	NoError(t, err)
 	mergedSketchHex := string(bytes)
 

@@ -21,6 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/globals"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
@@ -70,19 +71,19 @@ func NewSketchFromPath(path *paths.Path) (*Sketch, error) {
 		}
 	}
 
-	if mainSketchFile == nil {
+	if mainSketchFile == nil || sketch.CheckSketchCasing(path.String()) != nil {
 		sketchFile := path.Join(path.Base() + globals.MainFileValidExtension)
 		return nil, errors.Errorf("no valid sketch found in %s: missing %s", path, sketchFile)
 	}
 
-	sketch := &Sketch{
+	s := &Sketch{
 		FullPath:          path,
 		MainFileExtension: mainSketchFile.Ext(),
 		Name:              path.Base(),
 		Metadata:          &Metadata{},
 	}
-	sketch.ImportMetadata()
-	return sketch, nil
+	s.ImportMetadata()
+	return s, nil
 }
 
 // ImportMetadata imports metadata into the sketch from a sketch.json file in the root
