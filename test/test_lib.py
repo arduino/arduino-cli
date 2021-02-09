@@ -668,3 +668,38 @@ def test_lib_examples_with_pde_file(run_command, data_dir):
     assert str(Path(data_dir, "libraries", "Encoder", "examples", "NoInterrupts")) in examples
     assert str(Path(data_dir, "libraries", "Encoder", "examples", "SpeedTest")) in examples
     assert str(Path(data_dir, "libraries", "Encoder", "examples", "TwoKnobs")) in examples
+
+
+def test_lib_examples_with_case_mismatch(run_command, data_dir):
+    assert run_command("update")
+
+    assert run_command("lib install WiFiManager@2.0.3-alpha")
+
+    res = run_command("lib examples WiFiManager --format json")
+    assert res.ok
+    data = json.loads(res.stdout)
+    assert len(data) == 1
+    examples = data[0]["examples"]
+
+    assert len(examples) == 14
+
+    examples_path = Path(data_dir, "libraries", "WiFiManager", "examples")
+    # Verifies sketches with correct casing are listed
+    assert str(examples_path / "Advanced") in examples
+    assert str(examples_path / "AutoConnect" / "AutoConnectWithFeedbackLED") in examples
+    assert str(examples_path / "AutoConnect" / "AutoConnectWithFSParameters") in examples
+    assert str(examples_path / "AutoConnect" / "AutoConnectWithFSParametersAndCustomIP") in examples
+    assert str(examples_path / "Basic") in examples
+    assert str(examples_path / "DEV" / "OnDemandConfigPortal") in examples
+    assert str(examples_path / "NonBlocking" / "AutoConnectNonBlocking") in examples
+    assert str(examples_path / "NonBlocking" / "AutoConnectNonBlockingwParams") in examples
+    assert str(examples_path / "Old_examples" / "AutoConnectWithFeedback") in examples
+    assert str(examples_path / "Old_examples" / "AutoConnectWithReset") in examples
+    assert str(examples_path / "Old_examples" / "AutoConnectWithStaticIP") in examples
+    assert str(examples_path / "Old_examples" / "AutoConnectWithTimeout") in examples
+    assert str(examples_path / "OnDemand" / "OnDemandConfigPortal") in examples
+    assert str(examples_path / "ParamsChildClass") in examples
+
+    # Verifies sketches with wrong casing are not returned
+    assert str(examples_path / "NonBlocking" / "OnDemandNonBlocking") not in examples
+    assert str(examples_path / "OnDemand" / "OnDemandWebPortal") not in examples

@@ -337,3 +337,48 @@ def test_upload_with_input_dir_containing_multiple_binaries(run_command, data_di
         assert (
             "Sketches with .pde extension are deprecated, please rename the following files to .ino:" not in res.stderr
         )
+
+
+def test_compile_and_upload_combo_sketch_with_mismatched_casing(run_command, data_dir, detected_boards, wait_for_board):
+    assert run_command("update")
+
+    # Create a sketch
+    sketch_name = "CompileUploadComboMismatchCasing"
+    sketch_path = Path(data_dir, sketch_name)
+    assert run_command(f"sketch new {sketch_path}")
+
+    # Rename main .ino file so casing is different from sketch name
+    Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name.lower()}.ino")
+
+    for board in detected_boards:
+        # Install core
+        core = ":".join(board.fqbn.split(":")[:2])
+        assert run_command(f"core install {core}")
+
+        # Try to compile
+        res = run_command(f"compile --clean -b {board.fqbn} -u -p {board.address} {sketch_path}")
+        assert res.failed
+        assert "Error during build: opening sketch: no valid sketch found" in res.stderr
+
+
+def test_upload_sketch_with_mismatched_casing(run_command, data_dir, detected_boards, wait_for_board):
+    assert run_command("update")
+
+    # Create a sketch
+    sketch_name = "UploadMismatchCasing"
+    sketch_path = Path(data_dir, sketch_name)
+    assert run_command(f"sketch new {sketch_path}")
+
+    # Rename main .ino file so casing is different from sketch name
+    Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name.lower()}.ino")
+
+    for board in detected_boards:
+        # Install core
+        core = ":".join(board.fqbn.split(":")[:2])
+        assert run_command(f"core install {core}")
+
+        # Tries to upload given sketch, it has not been compiled but it fails even before
+        # searching for binaries since the sketch is not valid
+        res = run_command(f"upload -b {board.fqbn} -p {board.address} {sketch_path}")
+        assert res.failed
+        assert "Error during Upload: opening sketch: no valid sketch found" in res.stderr
