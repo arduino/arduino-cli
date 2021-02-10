@@ -180,7 +180,7 @@ func TestUploadPropertiesComposition(t *testing.T) {
 	testRunner := func(t *testing.T, test test, verboseVerify bool) {
 		outStream := &bytes.Buffer{}
 		errStream := &bytes.Buffer{}
-		err := runProgramAction(
+		status := runProgramAction(
 			pm,
 			nil,                     // sketch
 			"",                      // importFile
@@ -201,9 +201,9 @@ func TestUploadPropertiesComposition(t *testing.T) {
 			verboseVerifyOutput = "quiet noverify"
 		}
 		if test.expectedOutput == "FAIL" {
-			require.Error(t, err)
+			require.NotNil(t, status)
 		} else {
-			require.NoError(t, err)
+			require.Nil(t, status)
 			outFiltered := strings.ReplaceAll(outStream.String(), "\r", "")
 			outFiltered = strings.ReplaceAll(outFiltered, "\\", "/")
 			require.Contains(t, outFiltered, strings.ReplaceAll(test.expectedOutput, "$$VERBOSE-VERIFY$$", verboseVerifyOutput))

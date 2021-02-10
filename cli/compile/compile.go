@@ -29,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
+	"google.golang.org/grpc/status"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -230,16 +231,17 @@ func run(cmd *cobra.Command, args []string) {
 			Programmer: programmer,
 			UserFields: fields,
 		}
+		var st *status.Status
 		if output.OutputFormat == "json" {
 			// TODO: do not print upload output in json mode
 			uploadOut := new(bytes.Buffer)
 			uploadErr := new(bytes.Buffer)
-			_, err = upload.Upload(context.Background(), uploadRequest, uploadOut, uploadErr)
+			_, st = upload.Upload(context.Background(), uploadRequest, uploadOut, uploadErr)
 		} else {
-			_, err = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
+			_, st = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
 		}
-		if err != nil {
-			feedback.Errorf(tr("Error during Upload: %v"), err)
+		if st != nil {
+			feedback.Errorf(tr("Error during Upload: %v"), st.Message())
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}

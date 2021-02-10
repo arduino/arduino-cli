@@ -22,10 +22,11 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/status"
 )
 
 // BurnBootloader FIXMEDOC
-func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderRequest, outStream io.Writer, errStream io.Writer) (*rpc.BurnBootloaderResponse, error) {
+func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderRequest, outStream io.Writer, errStream io.Writer) (*rpc.BurnBootloaderResponse, *status.Status) {
 	logrus.
 		WithField("fqbn", req.GetFqbn()).
 		WithField("port", req.GetPort()).
