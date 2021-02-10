@@ -32,6 +32,7 @@ import (
 	dbg "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 )
 
 var (

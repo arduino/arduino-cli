@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/configuration"
+	"google.golang.org/grpc/status"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -197,7 +198,7 @@ func run(cmd *cobra.Command, args []string) {
 			ImportDir:  buildPath,
 			Programmer: programmer,
 		}
-		var err error
+		var err *status.Status
 		if output.OutputFormat == "json" {
 			// TODO: do not print upload output in json mode
 			uploadOut := new(bytes.Buffer)

@@ -314,7 +314,7 @@ func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.Arduin
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadResponse{ErrStream: data}) }),
 	)
 	if err != nil {
-		return err
+		return err.Err()
 	}
 	return stream.Send(resp)
 }
@@ -327,7 +327,7 @@ func (s *ArduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgra
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadUsingProgrammerResponse{ErrStream: data}) }),
 	)
 	if err != nil {
-		return err
+		return err.Err()
 	}
 	return stream.Send(resp)
 }
@@ -340,7 +340,7 @@ func (s *ArduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, s
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.BurnBootloaderResponse{ErrStream: data}) }),
 	)
 	if err != nil {
-		return err
+		return err.Err()
 	}
 	return stream.Send(resp)
 }

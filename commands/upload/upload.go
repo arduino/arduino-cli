@@ -35,10 +35,12 @@ import (
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Upload FIXMEDOC
-func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadResponse, error) {
+func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadResponse, *status.Status) {
 	logrus.Tracef("Upload %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	// TODO: make a generic function to extract sketch from request
@@ -46,12 +48,12 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil && req.GetImportDir() == "" && req.GetImportFile() == "" {
-		return nil, fmt.Errorf("opening sketch: %s", err)
+		return nil, status.Newf(codes.InvalidArgument, "Sketch not found: %s", err)
 	}
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
-	err = runProgramAction(
+	return &rpc.UploadResponse{}, runProgramAction(
 		pm,
 		sk,
 		req.GetImportFile(),
@@ -66,18 +68,14 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		errStream,
 		req.GetDryRun(),
 	)
-	if err != nil {
-		return nil, err
-	}
-	return &rpc.UploadResponse{}, nil
 }
 
 // UsingProgrammer FIXMEDOC
-func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadUsingProgrammerResponse, error) {
+func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadUsingProgrammerResponse, *status.Status) {
 	logrus.Tracef("Upload using programmer %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	if req.GetProgrammer() == "" {
-		return nil, errors.New("programmer not specified")
+		return nil, status.New(codes.InvalidArgument, "Programmer not specified")
 	}
 	_, err := Upload(ctx, &rpc.UploadRequest{
 		Instance:   req.GetInstance(),
@@ -99,17 +97,17 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
 	outStream, errStream io.Writer,
-	dryRun bool) error {
+	dryRun bool) *status.Status {
 
 	if burnBootloader && programmerID == "" {
-		return fmt.Errorf("no programmer specified for burning bootloader")
+		return status.New(codes.InvalidArgument, "Programmer not specified")
 	}
 
 	// FIXME: make a specification on how a port is specified via command line
 	if port == "" && sk != nil && sk.Metadata != nil {
 		deviceURI, err := url.Parse(sk.Metadata.CPU.Port)
 		if err != nil {
-			return fmt.Errorf("invalid Device URL format: %s", err)
+			return status.Newf(codes.InvalidArgument, "Invalid Device URL format: %s", err)
 		}
 		if deviceURI.Scheme == "serial" {
 			port = deviceURI.Host + deviceURI.Path
@@ -121,18 +119,18 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		fqbnIn = sk.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
-		return fmt.Errorf("no Fully Qualified Board Name provided")
+		return status.New(codes.InvalidArgument, "No FQBN (Fully Qualified Board Name) provided")
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return fmt.Errorf("incorrect FQBN: %s", err)
+		return status.Newf(codes.InvalidArgument, fmt.Sprintf("Invalid FQBN: %s", err))
 	}
 	logrus.WithField("fqbn", fqbn).Tracef("Detected FQBN")
 
 	// Find target board and board properties
 	_, boardPlatform, board, boardProperties, buildPlatform, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return fmt.Errorf("incorrect FQBN: %s", err)
+		return status.Newf(codes.InvalidArgument, "Could not resolve FQBN: %s", err)
 	}
 	logrus.
 		WithField("boardPlatform", boardPlatform).
@@ -149,7 +147,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			programmer = buildPlatform.Programmers[programmerID]
 		}
 		if programmer == nil {
-			return fmt.Errorf("programmer '%s' not available", programmerID)
+			return status.Newf(codes.InvalidArgument, "Programmer '%s' not available", programmerID)
 		}
 	}
 
@@ -174,7 +172,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		if t, ok := props.GetOk(toolProperty); ok {
 			uploadToolID = t
 		} else {
-			return fmt.Errorf("cannot get programmer tool: undefined '%s' property", toolProperty)
+			return status.Newf(codes.FailedPrecondition, "Cannot get programmer tool: undefined '%s' property", toolProperty)
 		}
 	}
 
@@ -190,7 +188,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		Trace("Upload tool")
 
 	if split := strings.Split(uploadToolID, ":"); len(split) > 2 {
-		return fmt.Errorf("invalid 'upload.tool' property: %s", uploadToolID)
+		return status.Newf(codes.FailedPrecondition, "Invalid 'upload.tool' property: %s", uploadToolID)
 	} else if len(split) == 2 {
 		uploadToolID = split[1]
 		uploadToolPlatform = pm.GetInstalledPlatformRelease(
@@ -229,7 +227,10 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	}
 
 	if !uploadProperties.ContainsKey("upload.protocol") && programmer == nil {
-		return fmt.Errorf("a programmer is required to upload for this board")
+		err, _ := status.
+			Newf(codes.InvalidArgument, "A programmer is required to upload on this board").
+			WithDetails(&rpc.ProgrammerIsRequiredForUploadError{})
+		return err
 	}
 
 	// Set properties for verbose upload
@@ -277,13 +278,13 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	if !burnBootloader {
 		importPath, sketchName, err := determineBuildPathAndSketchName(importFile, importDir, sk, fqbn)
 		if err != nil {
-			return errors.Errorf("retrieving build artifacts: %s", err)
+			return status.Newf(codes.Internal, "Error finding build artifacts: %s", err)
 		}
 		if !importPath.Exist() {
-			return fmt.Errorf("compiled sketch not found in %s", importPath)
+			return status.Newf(codes.Internal, "Compiled sketch not found in %s", importPath)
 		}
 		if !importPath.IsDir() {
-			return fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
+			return status.Newf(codes.Internal, "Expected compiled sketch in directory %s, but is a file instead", importPath)
 		}
 		uploadProperties.SetPath("build.path", importPath)
 		uploadProperties.Set("build.project_name", sketchName)
@@ -367,18 +368,18 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	// Run recipes for upload
 	if burnBootloader {
 		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
-			return fmt.Errorf("chip erase error: %s", err)
+			return status.Newf(codes.Internal, "Failed chip erase: %s", err)
 		}
 		if err := runTool("bootloader.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
-			return fmt.Errorf("burn bootloader error: %s", err)
+			return status.Newf(codes.Internal, "Failed to burn bootloader: %s", err)
 		}
 	} else if programmer != nil {
 		if err := runTool("program.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
-			return fmt.Errorf("programming error: %s", err)
+			return status.Newf(codes.Internal, "Failed programming: %s", err)
 		}
 	} else {
 		if err := runTool("upload.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
-			return fmt.Errorf("uploading error: %s", err)
+			return status.Newf(codes.Internal, "Failed uploading: %s", err)
 		}
 	}
 
