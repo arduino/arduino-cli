@@ -29,7 +29,7 @@ func TestSetupBuildProperties(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
 		SketchLocation:    paths.New("sketch1", "sketch1.ino"),
 		FQBN:              parseFQBN(t, "arduino:avr:uno"),
@@ -95,7 +95,7 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
 		SketchLocation:    paths.New("sketch1", "sketch1.ino"),
 		FQBN:              parseFQBN(t, "arduino:avr:uno"),
@@ -136,7 +136,7 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
 		SketchLocation:    paths.New("sketch1", "sketch1.ino"),
 		FQBN:              parseFQBN(t, "my_avr_platform:avr:custom_yun"),
@@ -174,7 +174,7 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
 		SketchLocation:    paths.New("sketch1", "sketch1.ino"),
 		FQBN:              parseFQBN(t, "my_avr_platform:avr:custom_yun"),

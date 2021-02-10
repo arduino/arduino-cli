@@ -379,9 +379,9 @@ Arduino IDE.
 
 ## platform.local.txt
 
-Introduced in Arduino IDE 1.5.7. This file can be used to override properties defined in platform.txt or define new
-properties without modifying platform.txt (e.g. when platform.txt is tracked by a version control system). It should be
-placed in the same folder as the platform.txt it supplements.
+Introduced in Arduino IDE 1.5.7. This file can be used to override properties defined in `platform.txt` or define new
+properties without modifying `platform.txt` (e.g. when `platform.txt` is tracked by a version control system). It must
+be placed in the same folder as the `platform.txt` it supplements.
 
 ## boards.txt
 
@@ -978,8 +978,8 @@ actual Arduino CLI code, the "board platform" is called `targetPlatform`, the "c
 
 ## boards.local.txt
 
-Introduced in Arduino IDE 1.6.6. This file can be used to override properties defined in boards.txt or define new
-properties without modifying boards.txt.
+Introduced in Arduino IDE 1.6.6. This file can be used to override properties defined in `boards.txt` or define new
+properties without modifying `boards.txt`. It must be placed in the same folder as the `boards.txt` it supplements.
 
 ## Platform bundled libraries
 

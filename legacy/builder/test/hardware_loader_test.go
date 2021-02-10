@@ -28,8 +28,11 @@ import (
 
 func TestLoadHardware(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
+	downloadedHardwareAvr := paths.New("downloaded_hardware", "arduino", "avr")
+	paths.New("hardware", "arduino", "avr", "boards.local.txt").CopyTo(downloadedHardwareAvr.Join("boards.local.txt"))
+	paths.New("hardware", "arduino", "avr", "platform.local.txt").CopyTo(downloadedHardwareAvr.Join("platform.local.txt"))
 	ctx := &types.Context{
-		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "hardware"),
+		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware")),
 	}
 
 	commands := []types.Command{
@@ -42,7 +45,7 @@ func TestLoadHardware(t *testing.T) {
 	}
 
 	packages := ctx.Hardware
-	require.Equal(t, 2, len(packages))
+	require.Equal(t, 1, len(packages))
 	require.NotNil(t, packages["arduino"])
 	require.Equal(t, 2, len(packages["arduino"].Platforms))
 
@@ -73,7 +76,7 @@ func TestLoadHardware(t *testing.T) {
 
 func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	ctx := &types.Context{
-		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"),
+		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "user_hardware"),
 	}
 
 	commands := []types.Command{
@@ -92,9 +95,9 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them
-		require.Equal(t, 3, len(packages))
+		require.Equal(t, 2, len(packages))
 	} else {
-		require.Equal(t, 4, len(packages))
+		require.Equal(t, 3, len(packages))
 	}
 
 	require.NotNil(t, packages["arduino"])
@@ -191,7 +194,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 
 func TestLoadLotsOfHardware(t *testing.T) {
 	ctx := &types.Context{
-		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "hardware", "user_hardware"),
+		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "user_hardware"),
 	}
 
 	commands := []types.Command{
@@ -207,9 +210,9 @@ func TestLoadLotsOfHardware(t *testing.T) {
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them
-		require.Equal(t, 5, len(packages))
+		require.Equal(t, 4, len(packages))
 	} else {
-		require.Equal(t, 6, len(packages))
+		require.Equal(t, 5, len(packages))
 	}
 
 	require.NotNil(t, packages["arduino"])
