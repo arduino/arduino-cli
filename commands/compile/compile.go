@@ -239,10 +239,9 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		if exportDir := req.GetExportDir(); exportDir != "" {
 			exportPath = paths.New(exportDir)
 		} else {
-			exportPath = sketch.FullPath
 			// Add FQBN (without configs part) to export path
 			fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
-			exportPath = exportPath.Join("build").Join(fqbnSuffix)
+			exportPath = sketch.FullPath.Join("build", fqbnSuffix)
 		}
 		logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
 		if err := exportPath.MkdirAll(); err != nil {
