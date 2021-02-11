@@ -227,15 +227,21 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	}
 
 	// If the export directory is set we assume you want to export the binaries
-	if exportBinaries || req.GetExportDir() != "" {
+	if req.GetExportDir() != "" {
+		exportBinaries = true
+	}
+	// If CreateCompilationDatabaseOnly is set, we do not need to export anything
+	if req.GetCreateCompilationDatabaseOnly() {
+		exportBinaries = false
+	}
+	if exportBinaries {
 		var exportPath *paths.Path
 		if exportDir := req.GetExportDir(); exportDir != "" {
 			exportPath = paths.New(exportDir)
 		} else {
-			exportPath = sketch.FullPath
 			// Add FQBN (without configs part) to export path
 			fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
-			exportPath = exportPath.Join("build").Join(fqbnSuffix)
+			exportPath = sketch.FullPath.Join("build", fqbnSuffix)
 		}
 		logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
 		if err := exportPath.MkdirAll(); err != nil {
