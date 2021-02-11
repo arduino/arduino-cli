@@ -27,7 +27,7 @@ import (
 
 func TestTargetBoardResolverUno(t *testing.T) {
 	ctx := &types.Context{
-		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		FQBN:         parseFQBN(t, "arduino:avr:uno"),
 	}
 
@@ -52,7 +52,7 @@ func TestTargetBoardResolverUno(t *testing.T) {
 
 func TestTargetBoardResolverDue(t *testing.T) {
 	ctx := &types.Context{
-		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		FQBN:         parseFQBN(t, "arduino:sam:arduino_due_x"),
 	}
 
@@ -77,7 +77,7 @@ func TestTargetBoardResolverDue(t *testing.T) {
 
 func TestTargetBoardResolverMega1280(t *testing.T) {
 	ctx := &types.Context{
-		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		FQBN:         parseFQBN(t, "arduino:avr:mega:cpu=atmega1280"),
 	}
 
@@ -103,7 +103,7 @@ func TestTargetBoardResolverMega1280(t *testing.T) {
 
 func TestTargetBoardResolverMega2560(t *testing.T) {
 	ctx := &types.Context{
-		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware"),
+		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		FQBN:         parseFQBN(t, "arduino:avr:mega:cpu=atmega2560"),
 	}
 
@@ -129,7 +129,7 @@ func TestTargetBoardResolverMega2560(t *testing.T) {
 
 func TestTargetBoardResolverCustomYun(t *testing.T) {
 	ctx := &types.Context{
-		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
 		FQBN:         parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 	}
 
@@ -155,7 +155,7 @@ func TestTargetBoardResolverCustomYun(t *testing.T) {
 
 func TestTargetBoardResolverCustomCore(t *testing.T) {
 	ctx := &types.Context{
-		HardwareDirs: paths.NewPathList(filepath.Join("..", "hardware"), "hardware", "downloaded_hardware", "user_hardware"),
+		HardwareDirs: paths.NewPathList("hardware"),
 		FQBN:         parseFQBN(t, "watterott:avr:attiny841:core=spencekonde,info=info"),
 	}
 
