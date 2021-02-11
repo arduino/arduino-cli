@@ -45,6 +45,19 @@ import (
 // Compile FIXMEDOC
 func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.Writer, debug bool) (r *rpc.CompileResp, e error) {
 
+	// There is a binding between the export binaries setting and the CLI flag to explicitly set it,
+	// since we want this binding to work also for the gRPC interface we must read it here in this
+	// package instead of the cli/compile one, otherwise we'd lose the binding.
+	exportBinaries := configuration.Settings.GetBool("sketch.always_export_binaries")
+	// If we'd just read the binding in any case, even if the request sets the export binaries setting,
+	// the settings value would always overwrite the request one and it wouldn't have any effect
+	// setting it for individual requests. To solve this we use a wrapper.BoolValue to handle
+	// the optionality of this property, otherwise we would have no way of knowing if the property
+	// was set in the request or it's just the default boolean value.
+	if reqExportBinaries := req.GetExportBinaries(); reqExportBinaries != nil {
+		exportBinaries = reqExportBinaries.Value
+	}
+
 	tags := map[string]string{
 		"fqbn":            req.Fqbn,
 		"sketchPath":      metrics.Sanitize(req.SketchPath),
@@ -59,7 +72,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 		"jobs":            strconv.FormatInt(int64(req.Jobs), 10),
 		"libraries":       strings.Join(req.Libraries, ","),
 		"clean":           strconv.FormatBool(req.GetClean()),
-		"exportBinaries":  strconv.FormatBool(req.GetExportBinaries()),
+		"exportBinaries":  strconv.FormatBool(exportBinaries),
 	}
 
 	// Use defer func() to evaluate tags map when function returns
@@ -214,7 +227,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 	}
 
 	// If the export directory is set we assume you want to export the binaries
-	if req.GetExportBinaries() || req.GetExportDir() != "" {
+	if exportBinaries || req.GetExportDir() != "" {
 		var exportPath *paths.Path
 		if exportDir := req.GetExportDir(); exportDir != "" {
 			exportPath = paths.New(exportDir)
