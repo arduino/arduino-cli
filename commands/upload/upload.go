@@ -228,6 +228,10 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		}
 	}
 
+	if !uploadProperties.ContainsKey("upload.protocol") && programmer == nil {
+		return fmt.Errorf("a programmer is required to upload for this board")
+	}
+
 	// Set properties for verbose upload
 	if verbose {
 		if v, ok := uploadProperties.GetOk("upload.params.verbose"); ok {
