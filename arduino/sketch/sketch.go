@@ -70,6 +70,7 @@ type Sketch struct {
 	LocationPath     string
 	OtherSketchFiles []*Item
 	AdditionalFiles  []*Item
+	RootFolderFiles  []*Item
 }
 
 // New creates an Sketch instance by reading all the files composing a sketch and grouping them
@@ -95,6 +96,7 @@ func New(sketchFolderPath, mainFilePath, buildPath string, allFilesPaths []strin
 	// organize the Items
 	additionalFiles := []*Item{}
 	otherSketchFiles := []*Item{}
+	rootFolderFiles := []*Item{}
 	for p, item := range pathToItem {
 		ext := strings.ToLower(filepath.Ext(p))
 		if _, found := globals.MainFileValidExtensions[ext]; found {
@@ -102,12 +104,16 @@ func New(sketchFolderPath, mainFilePath, buildPath string, allFilesPaths []strin
 			// sketch root and ignore if it's not.
 			if filepath.Dir(p) == sketchFolderPath {
 				otherSketchFiles = append(otherSketchFiles, item)
+				rootFolderFiles = append(rootFolderFiles, item)
 			}
 		} else if _, found := globals.AdditionalFileValidExtensions[ext]; found {
 			// item is a valid sketch file, grab it only if the buildPath is empty
 			// or the file is within the buildPath
 			if buildPath == "" || !strings.Contains(filepath.Dir(p), buildPath) {
 				additionalFiles = append(additionalFiles, item)
+				if filepath.Dir(p) == sketchFolderPath {
+					rootFolderFiles = append(rootFolderFiles, item)
+				}
 			}
 		} else {
 			return nil, errors.Errorf("unknown sketch file extension '%s'", ext)
@@ -116,6 +122,7 @@ func New(sketchFolderPath, mainFilePath, buildPath string, allFilesPaths []strin
 
 	sort.Sort(ItemByPath(additionalFiles))
 	sort.Sort(ItemByPath(otherSketchFiles))
+	sort.Sort(ItemByPath(rootFolderFiles))
 
 	if err := CheckSketchCasing(sketchFolderPath); err != nil {
 		return nil, err
@@ -126,6 +133,7 @@ func New(sketchFolderPath, mainFilePath, buildPath string, allFilesPaths []strin
 		LocationPath:     sketchFolderPath,
 		OtherSketchFiles: otherSketchFiles,
 		AdditionalFiles:  additionalFiles,
+		RootFolderFiles:  rootFolderFiles,
 	}, nil
 }
 

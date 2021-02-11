@@ -65,6 +65,11 @@ func TestLoadSketchFolder(t *testing.T) {
 	require.Equal(t, "header.h", filepath.Base(s.AdditionalFiles[0].Path))
 	require.Equal(t, "s_file.S", filepath.Base(s.AdditionalFiles[1].Path))
 	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
+	require.Len(t, s.RootFolderFiles, 4)
+	require.Equal(t, "header.h", filepath.Base(s.RootFolderFiles[0].Path))
+	require.Equal(t, "old.pde", filepath.Base(s.RootFolderFiles[1].Path))
+	require.Equal(t, "other.ino", filepath.Base(s.RootFolderFiles[2].Path))
+	require.Equal(t, "s_file.S", filepath.Base(s.RootFolderFiles[3].Path))
 
 	// pass the path to the main file
 	sketchPath = mainFilePath
@@ -79,6 +84,11 @@ func TestLoadSketchFolder(t *testing.T) {
 	require.Equal(t, "header.h", filepath.Base(s.AdditionalFiles[0].Path))
 	require.Equal(t, "s_file.S", filepath.Base(s.AdditionalFiles[1].Path))
 	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
+	require.Len(t, s.RootFolderFiles, 4)
+	require.Equal(t, "header.h", filepath.Base(s.RootFolderFiles[0].Path))
+	require.Equal(t, "old.pde", filepath.Base(s.RootFolderFiles[1].Path))
+	require.Equal(t, "other.ino", filepath.Base(s.RootFolderFiles[2].Path))
+	require.Equal(t, "s_file.S", filepath.Base(s.RootFolderFiles[3].Path))
 }
 
 func TestLoadSketchFolderPde(t *testing.T) {
@@ -97,6 +107,11 @@ func TestLoadSketchFolderPde(t *testing.T) {
 	require.Equal(t, "header.h", filepath.Base(s.AdditionalFiles[0].Path))
 	require.Equal(t, "s_file.S", filepath.Base(s.AdditionalFiles[1].Path))
 	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
+	require.Len(t, s.RootFolderFiles, 4)
+	require.Equal(t, "header.h", filepath.Base(s.RootFolderFiles[0].Path))
+	require.Equal(t, "old.pde", filepath.Base(s.RootFolderFiles[1].Path))
+	require.Equal(t, "other.ino", filepath.Base(s.RootFolderFiles[2].Path))
+	require.Equal(t, "s_file.S", filepath.Base(s.RootFolderFiles[3].Path))
 }
 
 func TestLoadSketchFolderBothInoAndPde(t *testing.T) {
@@ -128,6 +143,11 @@ func TestLoadSketchFolderSymlink(t *testing.T) {
 	require.Equal(t, "header.h", filepath.Base(s.AdditionalFiles[0].Path))
 	require.Equal(t, "s_file.S", filepath.Base(s.AdditionalFiles[1].Path))
 	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
+	require.Len(t, s.RootFolderFiles, 4)
+	require.Equal(t, "header.h", filepath.Base(s.RootFolderFiles[0].Path))
+	require.Equal(t, "old.pde", filepath.Base(s.RootFolderFiles[1].Path))
+	require.Equal(t, "other.ino", filepath.Base(s.RootFolderFiles[2].Path))
+	require.Equal(t, "s_file.S", filepath.Base(s.RootFolderFiles[3].Path))
 
 	// pass the path to the main file
 	symlinkSketchPath = mainFilePath
@@ -142,6 +162,11 @@ func TestLoadSketchFolderSymlink(t *testing.T) {
 	require.Equal(t, "header.h", filepath.Base(s.AdditionalFiles[0].Path))
 	require.Equal(t, "s_file.S", filepath.Base(s.AdditionalFiles[1].Path))
 	require.Equal(t, "helper.h", filepath.Base(s.AdditionalFiles[2].Path))
+	require.Len(t, s.RootFolderFiles, 4)
+	require.Equal(t, "header.h", filepath.Base(s.RootFolderFiles[0].Path))
+	require.Equal(t, "old.pde", filepath.Base(s.RootFolderFiles[1].Path))
+	require.Equal(t, "other.ino", filepath.Base(s.RootFolderFiles[2].Path))
+	require.Equal(t, "s_file.S", filepath.Base(s.RootFolderFiles[3].Path))
 }
 
 func TestLoadSketchFolderIno(t *testing.T) {
