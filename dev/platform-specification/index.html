@@ -2187,9 +2187,9 @@ recipe.hooks.sketch.prebuild.11.pattern=echo 11
 be used for all platforms and will override local properties. This feature is currently only available when using the
 Arduino IDE.</p>
 <h2 id="platformlocaltxt">platform.local.txt<a class="headerlink" href="#platformlocaltxt" title="Permanent link">&para;</a></h2>
-<p>Introduced in Arduino IDE 1.5.7. This file can be used to override properties defined in platform.txt or define new
-properties without modifying platform.txt (e.g. when platform.txt is tracked by a version control system). It should be
-placed in the same folder as the platform.txt it supplements.</p>
+<p>Introduced in Arduino IDE 1.5.7. This file can be used to override properties defined in <code>platform.txt</code> or define new
+properties without modifying <code>platform.txt</code> (e.g. when <code>platform.txt</code> is tracked by a version control system). It must
+be placed in the same folder as the <code>platform.txt</code> it supplements.</p>
 <h2 id="boardstxt">boards.txt<a class="headerlink" href="#boardstxt" title="Permanent link">&para;</a></h2>
 <p>This file contains definitions and metadata for the boards supported by the platform. Boards are referenced by their
 short name, the board ID. The settings for a board are defined through a set of properties with keys having the board ID
@@ -2704,8 +2704,8 @@ can use data from up to four different platforms. To keep this clear, the follow
 actual Arduino CLI code, the "board platform" is called <code>targetPlatform</code>, the "core platform" is called
 <code>actualPlatform</code>, the others are pretty much nameless.</p>
 <h2 id="boardslocaltxt">boards.local.txt<a class="headerlink" href="#boardslocaltxt" title="Permanent link">&para;</a></h2>
-<p>Introduced in Arduino IDE 1.6.6. This file can be used to override properties defined in boards.txt or define new
-properties without modifying boards.txt.</p>
+<p>Introduced in Arduino IDE 1.6.6. This file can be used to override properties defined in <code>boards.txt</code> or define new
+properties without modifying <code>boards.txt</code>. It must be placed in the same folder as the <code>boards.txt</code> it supplements.</p>
 <h2 id="platform-bundled-libraries">Platform bundled libraries<a class="headerlink" href="#platform-bundled-libraries" title="Permanent link">&para;</a></h2>
 <p>Arduino libraries placed in the platform's <code>libraries</code> subfolder are accessible when a board of the platform, or of a
 platform that <a href="#referencing-another-core-variant-or-tool">references</a> the platform's core, is selected. When any other
