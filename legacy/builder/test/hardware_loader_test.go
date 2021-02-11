@@ -29,8 +29,8 @@ import (
 func TestLoadHardware(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 	downloadedHardwareAvr := paths.New("downloaded_hardware", "arduino", "avr")
-	paths.New("hardware", "arduino", "avr", "boards.local.txt").CopyTo(downloadedHardwareAvr.Join("boards.local.txt"))
-	paths.New("hardware", "arduino", "avr", "platform.local.txt").CopyTo(downloadedHardwareAvr.Join("platform.local.txt"))
+	paths.New("custom_local_txts", "boards.local.txt").CopyTo(downloadedHardwareAvr.Join("boards.local.txt"))
+	paths.New("custom_local_txts", "platform.local.txt").CopyTo(downloadedHardwareAvr.Join("platform.local.txt"))
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware")),
 	}
