@@ -73,6 +73,9 @@ func TestNew(t *testing.T) {
 	assert.Equal(t, sketchFolderPath, sketch.LocationPath)
 	assert.Len(t, sketch.OtherSketchFiles, 0)
 	assert.Len(t, sketch.AdditionalFiles, 1)
+	assert.Equal(t, sketch.AdditionalFiles[0].Path, paths.New(sketchFolderPath).Join("other.cpp").String())
+	assert.Len(t, sketch.RootFolderFiles, 1)
+	assert.Equal(t, sketch.RootFolderFiles[0].Path, paths.New(sketchFolderPath).Join("other.cpp").String())
 }
 
 func TestNewSketchCasingWrong(t *testing.T) {
@@ -94,6 +97,7 @@ func TestNewSketchCasingCorrect(t *testing.T) {
 	assert.Equal(t, mainFilePath, sketch.MainFile.Path)
 	assert.Len(t, sketch.OtherSketchFiles, 0)
 	assert.Len(t, sketch.AdditionalFiles, 0)
+	assert.Len(t, sketch.RootFolderFiles, 0)
 }
 
 func TestCheckSketchCasingWrong(t *testing.T) {

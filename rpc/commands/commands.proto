@@ -125,7 +125,7 @@ service ArduinoCore {
   // Download and install an Arduino library from the libraries index.
   rpc LibraryInstall(LibraryInstallReq) returns (stream LibraryInstallResp);
 
-  // Install a library from a Zip File 
+  // Install a library from a Zip File
   rpc ZipLibraryInstall(ZipLibraryInstallReq) returns (stream ZipLibraryInstallResp);
 
   // Download and install a library from a git url
@@ -269,6 +269,8 @@ message LoadSketchResp {
   repeated string other_sketch_files = 3;
   // List of absolute paths to additional sketch files
   repeated string additional_files = 4;
+  // List of absolute paths to supported files in the sketch root folder, main file excluded
+  repeated string root_folder_files = 5;
 }
 
 message ArchiveSketchReq{

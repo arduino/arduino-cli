@@ -636,7 +636,7 @@ type SettingsClient interface {
 	GetValue(ctx context.Context, in *GetValueRequest, opts ...grpc.CallOption) (*Value, error)
 	// Set the value of a specific setting.
 	SetValue(ctx context.Context, in *Value, opts ...grpc.CallOption) (*SetValueResponse, error)
-	// Writes to file current in memory settings
+	// Writes to file settings currently stored in memory
 	Write(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*WriteResponse, error)
 }
 
@@ -703,7 +703,7 @@ type SettingsServer interface {
 	GetValue(context.Context, *GetValueRequest) (*Value, error)
 	// Set the value of a specific setting.
 	SetValue(context.Context, *Value) (*SetValueResponse, error)
-	// Writes to file current in memory settings
+	// Writes to file settings currently stored in memory
 	Write(context.Context, *WriteRequest) (*WriteResponse, error)
 }
 

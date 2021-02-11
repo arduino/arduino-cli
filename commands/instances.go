@@ -744,10 +744,16 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchReq) (*rpc.LoadSketchRes
 		additionalFiles[i] = file.Path
 	}
 
+	rootFolderFiles := make([]string, len(sketch.RootFolderFiles))
+	for i, file := range sketch.RootFolderFiles {
+		rootFolderFiles[i] = file.Path
+	}
+
 	return &rpc.LoadSketchResp{
 		MainFile:         sketch.MainFile.Path,
 		LocationPath:     sketch.LocationPath,
 		OtherSketchFiles: otherSketchFiles,
 		AdditionalFiles:  additionalFiles,
+		RootFolderFiles:  rootFolderFiles,
 	}, nil
 }
