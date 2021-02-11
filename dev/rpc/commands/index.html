@@ -4665,12 +4665,6 @@
 <td>Optional: cleanup the build folder and do not use any previously cached build</td>
 </tr>
 <tr>
-<td>export_binaries</td>
-<td><a href="#bool">bool</a></td>
-<td></td>
-<td>When set to <code>true</code> the compiled binary will be copied to the export directory.</td>
-</tr>
-<tr>
 <td>create_compilation_database_only</td>
 <td><a href="#bool">bool</a></td>
 <td></td>
@@ -4681,6 +4675,12 @@
 <td><a href="#cc.arduino.cli.commands.CompileReq.SourceOverrideEntry">CompileReq.SourceOverrideEntry</a></td>
 <td>repeated</td>
 <td>This map (source file -&gt; new content) let the builder use the provided content instead of reading the corresponding file on disk. This is useful for IDE that have unsaved changes in memory. The path must be relative to the sketch directory. Only files from the sketch are allowed.</td>
+</tr>
+<tr>
+<td>export_binaries</td>
+<td><a href="#google.protobuf.BoolValue">google.protobuf.BoolValue</a></td>
+<td></td>
+<td>When set to <code>true</code> the compiled binary will be copied to the export directory.</td>
 </tr>
 </tbody>
 </table>

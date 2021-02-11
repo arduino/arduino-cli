@@ -283,6 +283,19 @@
     Unreleased
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#change-type-of-compilereqexportbinaries-message-in-grpc-interface" class="md-nav__link">
+    Change type of CompileReq.ExportBinaries message in gRPC interface
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1169,6 +1182,19 @@
     Unreleased
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#change-type-of-compilereqexportbinaries-message-in-grpc-interface" class="md-nav__link">
+    Change type of CompileReq.ExportBinaries message in gRPC interface
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1259,6 +1285,11 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="change-type-of-compilereqexportbinaries-message-in-grpc-interface">Change type of <code>CompileReq.ExportBinaries</code> message in gRPC interface<a class="headerlink" href="#change-type-of-compilereqexportbinaries-message-in-grpc-interface" title="Permanent link">&para;</a></h3>
+<p>This change affects only the gRPC consumers.</p>
+<p>In the <code>CompileReq</code> message the <code>export_binaries</code> property type has been changed from <code>bool</code> to
+<code>google.protobuf.BoolValue</code>. This has been done to handle settings bindings by gRPC consumers and the CLI in the same
+way so that they an identical behaviour.</p>
 <h2 id="0150">0.15.0<a class="headerlink" href="#0150" title="Permanent link">&para;</a></h2>
 <h3 id="rename-telemetry-settings-to-metrics">Rename <code>telemetry</code> settings to <code>metrics</code><a class="headerlink" href="#rename-telemetry-settings-to-metrics" title="Permanent link">&para;</a></h3>
 <p>All instances of the term <code>telemetry</code> in the code and the documentation has been changed to <code>metrics</code>. This has been
