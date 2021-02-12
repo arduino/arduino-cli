@@ -16,6 +16,7 @@
 package librariesindex
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
@@ -135,6 +136,10 @@ func (idx *Index) FindLibraryUpdate(lib *libraries.Library) *Release {
 	indexLib := idx.FindIndexedLibrary(lib)
 	if indexLib == nil {
 		return nil
+	}
+	if lib.Version == nil {
+		fmt.Printf("[WARN] version for library loaded from %s is nil\n", lib.InstallDir)
+		return indexLib.Latest
 	}
 	if indexLib.Latest.Version.GreaterThan(lib.Version) {
 		return indexLib.Latest
