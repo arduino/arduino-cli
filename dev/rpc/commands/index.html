@@ -4876,6 +4876,12 @@
 <td>repeated</td>
 <td>List of boards provided by the platform. If the platform is installed, this is the boards listed in the platform&#39;s boards.txt. If the platform is not installed, this is an arbitrary list of board names provided by the platform author for display and may not match boards.txt.</td>
 </tr>
+<tr>
+<td>ManuallyInstalled</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>If true this Platform has been installed manually in the user&#39; sketchbook hardware folder</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.PlatformDownloadReq"></a></p>
@@ -5029,6 +5035,12 @@
 <td><a href="#bool">bool</a></td>
 <td></td>
 <td>Set to true to only list platforms which have a newer version available than the one currently installed.</td>
+</tr>
+<tr>
+<td>all</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>Set to true to list platforms installed manually in the user&#39; sketchbook hardware folder, installed with the PlatformManager through the CLI or IDE and that are available to install</td>
 </tr>
 </tbody>
 </table>
