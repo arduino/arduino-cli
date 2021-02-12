@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
 
       - name: Create changelog
-        uses: arduino/create-changelog@1.2.0
+        uses: arduino/create-changelog@v1
         with:
           tag-regex: '^[0-9]+\.[0-9]+\.[0-9]+$'
           filter-regex: '^\[(skip|changelog)[ ,-](skip|changelog)\].*'
