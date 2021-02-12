@@ -49,24 +49,24 @@ func TestLoadHardware(t *testing.T) {
 	require.NotNil(t, packages["arduino"])
 	require.Equal(t, 2, len(packages["arduino"].Platforms))
 
-	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Releases[""].Boards["uno"].BoardID)
-	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Releases[""].Boards["uno"].Properties.Get("_id"))
+	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["uno"].BoardID)
+	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["uno"].Properties.Get("_id"))
 
-	require.Equal(t, "yun", packages["arduino"].Platforms["avr"].Releases[""].Boards["yun"].BoardID)
-	require.Equal(t, "true", packages["arduino"].Platforms["avr"].Releases[""].Boards["yun"].Properties.Get("upload.wait_for_upload_port"))
+	require.Equal(t, "yun", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["yun"].BoardID)
+	require.Equal(t, "true", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["yun"].Properties.Get("upload.wait_for_upload_port"))
 
-	require.Equal(t, "{build.usb_flags}", packages["arduino"].Platforms["avr"].Releases[""].Boards["robotMotor"].Properties.Get("build.extra_flags"))
+	require.Equal(t, "{build.usb_flags}", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["robotMotor"].Properties.Get("build.extra_flags"))
 
-	require.Equal(t, "arduino_due_x", packages["arduino"].Platforms["sam"].Releases[""].Boards["arduino_due_x"].BoardID)
+	require.Equal(t, "arduino_due_x", packages["arduino"].Platforms["sam"].Releases["1.6.7"].Boards["arduino_due_x"].BoardID)
 
-	require.Equal(t, "ATmega123", packages["arduino"].Platforms["avr"].Releases[""].Boards["diecimila"].Properties.Get("menu.cpu.atmega123"))
+	require.Equal(t, "ATmega123", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["diecimila"].Properties.Get("menu.cpu.atmega123"))
 
 	avrPlatform := packages["arduino"].Platforms["avr"]
-	require.Equal(t, "Arduino AVR Boards", avrPlatform.Releases[""].Properties.Get("name"))
-	require.Equal(t, "-v", avrPlatform.Releases[""].Properties.Get("tools.avrdude.bootloader.params.verbose"))
-	require.Equal(t, "/my/personal/avrdude", avrPlatform.Releases[""].Properties.Get("tools.avrdude.cmd.path"))
+	require.Equal(t, "Arduino AVR Boards", avrPlatform.Releases["1.6.10"].Properties.Get("name"))
+	require.Equal(t, "-v", avrPlatform.Releases["1.6.10"].Properties.Get("tools.avrdude.bootloader.params.verbose"))
+	require.Equal(t, "/my/personal/avrdude", avrPlatform.Releases["1.6.10"].Properties.Get("tools.avrdude.cmd.path"))
 
-	require.Equal(t, "AVRISP mkII", avrPlatform.Releases[""].Programmers["avrispmkii"].Name)
+	require.Equal(t, "AVRISP mkII", avrPlatform.Releases["1.6.10"].Programmers["avrispmkii"].Name)
 
 	//require.Equal(t, "{runtime.tools.ctags.path}", packages.Properties.Get("tools.ctags.path"])
 	//require.Equal(t, "\"{cmd.path}\" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives \"{source_file}\"", packages.Properties.Get("tools.ctags.pattern"])
@@ -103,17 +103,17 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	require.NotNil(t, packages["arduino"])
 	require.Equal(t, 2, len(packages["arduino"].Platforms))
 
-	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Releases[""].Boards["uno"].BoardID)
-	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Releases[""].Boards["uno"].Properties.Get("_id"))
+	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["uno"].BoardID)
+	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["uno"].Properties.Get("_id"))
 
-	require.Equal(t, "yun", packages["arduino"].Platforms["avr"].Releases[""].Boards["yun"].BoardID)
-	require.Equal(t, "true", packages["arduino"].Platforms["avr"].Releases[""].Boards["yun"].Properties.Get("upload.wait_for_upload_port"))
+	require.Equal(t, "yun", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["yun"].BoardID)
+	require.Equal(t, "true", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["yun"].Properties.Get("upload.wait_for_upload_port"))
 
-	require.Equal(t, "{build.usb_flags}", packages["arduino"].Platforms["avr"].Releases[""].Boards["robotMotor"].Properties.Get("build.extra_flags"))
+	require.Equal(t, "{build.usb_flags}", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["robotMotor"].Properties.Get("build.extra_flags"))
 
-	require.Equal(t, "arduino_due_x", packages["arduino"].Platforms["sam"].Releases[""].Boards["arduino_due_x"].BoardID)
+	require.Equal(t, "arduino_due_x", packages["arduino"].Platforms["sam"].Releases["1.6.7"].Boards["arduino_due_x"].BoardID)
 
-	avrPlatform := packages["arduino"].Platforms["avr"].Releases[""]
+	avrPlatform := packages["arduino"].Platforms["avr"].Releases["1.6.10"]
 	require.Equal(t, "Arduino AVR Boards", avrPlatform.Properties.Get("name"))
 	require.Equal(t, "-v", avrPlatform.Properties.Get("tools.avrdude.bootloader.params.verbose"))
 	require.Equal(t, "/my/personal/avrdude", avrPlatform.Properties.Get("tools.avrdude.cmd.path"))
@@ -128,7 +128,7 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	require.NotNil(t, packages["my_avr_platform"])
 	myAVRPlatform := packages["my_avr_platform"]
 	//require.Equal(t, "hello world", myAVRPlatform.Properties.Get("example"))
-	myAVRPlatformAvrArch := myAVRPlatform.Platforms["avr"].Releases[""]
+	myAVRPlatformAvrArch := myAVRPlatform.Platforms["avr"].Releases["9.9.9"]
 	require.Equal(t, "custom_yun", myAVRPlatformAvrArch.Boards["custom_yun"].BoardID)
 
 	require.False(t, myAVRPlatformAvrArch.Properties.ContainsKey("preproc.includes.flags"))
@@ -219,15 +219,15 @@ func TestLoadLotsOfHardware(t *testing.T) {
 	require.NotNil(t, packages["my_avr_platform"])
 
 	require.Equal(t, 3, len(packages["arduino"].Platforms))
-	require.Equal(t, 20, len(packages["arduino"].Platforms["avr"].Releases[""].Boards))
-	require.Equal(t, 2, len(packages["arduino"].Platforms["sam"].Releases[""].Boards))
+	require.Equal(t, 20, len(packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards))
+	require.Equal(t, 2, len(packages["arduino"].Platforms["sam"].Releases["1.6.7"].Boards))
 	require.Equal(t, 3, len(packages["arduino"].Platforms["samd"].Releases["1.6.5"].Boards))
 
 	require.Equal(t, 1, len(packages["my_avr_platform"].Platforms))
-	require.Equal(t, 2, len(packages["my_avr_platform"].Platforms["avr"].Releases[""].Boards))
+	require.Equal(t, 2, len(packages["my_avr_platform"].Platforms["avr"].Releases["9.9.9"].Boards))
 
 	if runtime.GOOS != "windows" {
 		require.Equal(t, 1, len(packages["my_symlinked_avr_platform"].Platforms))
-		require.Equal(t, 2, len(packages["my_symlinked_avr_platform"].Platforms["avr"].Releases[""].Boards))
+		require.Equal(t, 2, len(packages["my_symlinked_avr_platform"].Platforms["avr"].Releases["9.9.9"].Boards))
 	}
 }

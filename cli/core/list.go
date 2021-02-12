@@ -39,11 +39,13 @@ func initListCommand() *cobra.Command {
 		Run:     runListCommand,
 	}
 	listCommand.Flags().BoolVar(&listFlags.updatableOnly, "updatable", false, "List updatable platforms.")
+	listCommand.Flags().BoolVar(&listFlags.all, "all", false, "If set return all installable and installed cores, including manually installed.")
 	return listCommand
 }
 
 var listFlags struct {
 	updatableOnly bool
+	all           bool
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
@@ -58,6 +60,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	platforms, err := core.GetPlatforms(&rpc.PlatformListReq{
 		Instance:      inst,
 		UpdatableOnly: listFlags.updatableOnly,
+		All:           listFlags.all,
 	})
 	if err != nil {
 		feedback.Errorf("Error listing platforms: %v", err)
