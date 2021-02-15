@@ -163,6 +163,7 @@ func CheckSketchCasing(sketchFolder string) error {
 	return nil
 }
 
+// InvalidSketchFoldernameError is returned when the sketch directory doesn't match the sketch name
 type InvalidSketchFoldernameError struct {
 	SketchFolder *paths.Path
 	SketchFile   *paths.Path
