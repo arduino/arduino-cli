@@ -81,9 +81,11 @@ func TestNewSketchCasingWrong(t *testing.T) {
 	sketchPath := paths.New("testdata", "SketchCasingWrong")
 	mainFilePath := paths.New("testadata", "sketchcasingwrong.ino").String()
 	sketch, err := New(sketchPath.String(), mainFilePath, "", []string{mainFilePath})
-	assert.NotNil(t, sketch)
+	assert.Nil(t, sketch)
 	assert.Error(t, err)
 	assert.IsType(t, &InvalidSketchFoldernameError{}, err)
+	e := err.(*InvalidSketchFoldernameError)
+	assert.NotNil(t, e.Sketch)
 	expectedError := fmt.Sprintf("no valid sketch found in %s: missing %s", sketchPath.String(), sketchPath.Join(sketchPath.Base()+".ino"))
 	assert.EqualError(t, err, expectedError)
 }

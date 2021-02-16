@@ -64,8 +64,9 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 
 		// load sketch
 		sketch, err := bldr.SketchLoad(sketchLocation.String(), ctx.BuildPath.String())
-		if _, ok := err.(*sk.InvalidSketchFoldernameError); ctx.IgnoreSketchFolderNameErrors && ok {
+		if e, ok := err.(*sk.InvalidSketchFoldernameError); ctx.IgnoreSketchFolderNameErrors && ok {
 			// ignore error
+			sketch = e.Sketch
 		} else if err != nil {
 			return errors.WithStack(err)
 		}
