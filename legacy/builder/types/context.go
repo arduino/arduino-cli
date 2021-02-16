@@ -91,19 +91,20 @@ type Context struct {
 	PlatformKeyRewrites    PlatforKeysRewrite
 	HardwareRewriteResults map[*cores.PlatformRelease][]PlatforKeyRewrite
 
-	BuildProperties      *properties.Map
-	BuildCore            string
-	BuildPath            *paths.Path
-	BuildCachePath       *paths.Path
-	SketchBuildPath      *paths.Path
-	CoreBuildPath        *paths.Path
-	CoreBuildCachePath   *paths.Path
-	CoreArchiveFilePath  *paths.Path
-	CoreObjectsFiles     paths.PathList
-	LibrariesBuildPath   *paths.Path
-	LibrariesObjectFiles paths.PathList
-	PreprocPath          *paths.Path
-	SketchObjectFiles    paths.PathList
+	BuildProperties              *properties.Map
+	BuildCore                    string
+	BuildPath                    *paths.Path
+	BuildCachePath               *paths.Path
+	SketchBuildPath              *paths.Path
+	CoreBuildPath                *paths.Path
+	CoreBuildCachePath           *paths.Path
+	CoreArchiveFilePath          *paths.Path
+	CoreObjectsFiles             paths.PathList
+	LibrariesBuildPath           *paths.Path
+	LibrariesObjectFiles         paths.PathList
+	PreprocPath                  *paths.Path
+	SketchObjectFiles            paths.PathList
+	IgnoreSketchFolderNameErrors bool
 
 	CollectedSourceFiles *UniqueSourceFileQueue
 

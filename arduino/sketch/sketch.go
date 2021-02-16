@@ -16,6 +16,7 @@
 package sketch
 
 import (
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"sort"
@@ -124,17 +125,22 @@ func New(sketchFolderPath, mainFilePath, buildPath string, allFilesPaths []strin
 	sort.Sort(ItemByPath(otherSketchFiles))
 	sort.Sort(ItemByPath(rootFolderFiles))
 
-	if err := CheckSketchCasing(sketchFolderPath); err != nil {
-		return nil, err
-	}
-
-	return &Sketch{
+	sk := &Sketch{
 		MainFile:         mainFile,
 		LocationPath:     sketchFolderPath,
 		OtherSketchFiles: otherSketchFiles,
 		AdditionalFiles:  additionalFiles,
 		RootFolderFiles:  rootFolderFiles,
-	}, nil
+	}
+	err := CheckSketchCasing(sketchFolderPath)
+	if e, ok := err.(*InvalidSketchFoldernameError); ok {
+		e.Sketch = sk
+		return nil, e
+	}
+	if err != nil {
+		return nil, err
+	}
+	return sk, nil
 }
 
 // CheckSketchCasing returns an error if the casing of the sketch folder and the main file are different.
@@ -160,8 +166,19 @@ func CheckSketchCasing(sketchFolder string) error {
 	if files.Len() == 0 {
 		sketchFolderPath := paths.New(sketchFolder)
 		sketchFile := sketchFolderPath.Join(sketchFolderPath.Base() + globals.MainFileValidExtension)
-		return errors.Errorf("no valid sketch found in %s: missing %s", sketchFolderPath, sketchFile)
+		return &InvalidSketchFoldernameError{SketchFolder: sketchFolderPath, SketchFile: sketchFile}
 	}
 
 	return nil
+}
+
+// InvalidSketchFoldernameError is returned when the sketch directory doesn't match the sketch name
+type InvalidSketchFoldernameError struct {
+	SketchFolder *paths.Path
+	SketchFile   *paths.Path
+	Sketch       *Sketch
+}
+
+func (e *InvalidSketchFoldernameError) Error() string {
+	return fmt.Sprintf("no valid sketch found in %s: missing %s", e.SketchFolder, e.SketchFile)
 }

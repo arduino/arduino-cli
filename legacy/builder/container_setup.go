@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	sk "github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
@@ -63,7 +64,10 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 
 		// load sketch
 		sketch, err := bldr.SketchLoad(sketchLocation.String(), ctx.BuildPath.String())
-		if err != nil {
+		if e, ok := err.(*sk.InvalidSketchFoldernameError); ctx.IgnoreSketchFolderNameErrors && ok {
+			// ignore error
+			sketch = e.Sketch
+		} else if err != nil {
 			return errors.WithStack(err)
 		}
 		if sketch.MainFile == nil {
