@@ -34,6 +34,9 @@ import (
 
 // TestLocalArchiveChecksum test if the checksum of the local archive match the checksum of the DownloadResource
 func (r *DownloadResource) TestLocalArchiveChecksum(downloadDir *paths.Path) (bool, error) {
+	if r.Checksum == "" {
+		return false, fmt.Errorf("missing checksum for: %s", r.ArchiveFileName)
+	}
 	split := strings.SplitN(r.Checksum, ":", 2)
 	if len(split) != 2 {
 		return false, fmt.Errorf("invalid checksum format: %s", r.Checksum)
@@ -69,7 +72,12 @@ func (r *DownloadResource) TestLocalArchiveChecksum(downloadDir *paths.Path) (bo
 	if _, err := io.Copy(algo, file); err != nil {
 		return false, fmt.Errorf("computing hash: %s", err)
 	}
-	return bytes.Compare(algo.Sum(nil), digest) == 0, nil
+
+	if bytes.Compare(algo.Sum(nil), digest) != 0 {
+		return false, fmt.Errorf("archive hash differs from hash in index")
+	}
+
+	return true, nil
 }
 
 // TestLocalArchiveSize test if the local archive size match the DownloadResource size
@@ -82,7 +90,11 @@ func (r *DownloadResource) TestLocalArchiveSize(downloadDir *paths.Path) (bool, 
 	if err != nil {
 		return false, fmt.Errorf("getting archive info: %s", err)
 	}
-	return info.Size() == r.Size, nil
+	if info.Size() != r.Size {
+		return false, fmt.Errorf("fetched archive size differs from size specified in index")
+	}
+
+	return true, nil
 }
 
 // TestLocalArchiveIntegrity checks for integrity of the local archive.
@@ -94,7 +106,7 @@ func (r *DownloadResource) TestLocalArchiveIntegrity(downloadDir *paths.Path) (b
 	}
 
 	if ok, err := r.TestLocalArchiveSize(downloadDir); err != nil {
-		return false, fmt.Errorf("teting archive size: %s", err)
+		return false, fmt.Errorf("testing archive size: %s", err)
 	} else if !ok {
 		return false, nil
 	}
@@ -163,5 +175,9 @@ func CheckDirChecksum(root string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return file.Checksum == checksum, nil
+	if file.Checksum != checksum {
+		return false, fmt.Errorf("Checksum differs from checksum in package.json")
+	}
+
+	return true, nil
 }
