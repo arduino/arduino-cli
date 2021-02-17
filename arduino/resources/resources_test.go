@@ -26,19 +26,21 @@ import (
 )
 
 func TestDownloadAndChecksums(t *testing.T) {
+	testFileName := "core.zip"
 	tmp, err := paths.MkTempDir("", "")
 	require.NoError(t, err)
 	defer tmp.RemoveAll()
-	testFile := tmp.Join("cache", "index.html")
+	testFile := tmp.Join("cache", testFileName)
 
+	// taken from test/testdata/test_index.json
 	r := &DownloadResource{
-		ArchiveFileName: "index.html",
+		ArchiveFileName: testFileName,
 		CachePath:       "cache",
-		Checksum:        "SHA-256:e021e1a223d03069d5f08dea25a58ca445a7376d9bdf980f756034f118449e66",
-		Size:            1119,
-		URL:             "https://downloads.arduino.cc/index.html",
+		Checksum:        "SHA-256:6a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092",
+		Size:            486,
+		URL:             "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/core.zip",
 	}
-	digest, err := hex.DecodeString("e021e1a223d03069d5f08dea25a58ca445a7376d9bdf980f756034f118449e66")
+	digest, err := hex.DecodeString("6a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092")
 	require.NoError(t, err)
 
 	downloadAndTestChecksum := func() {
@@ -73,9 +75,13 @@ func TestDownloadAndChecksums(t *testing.T) {
 	// Download if cached file has less data (resume)
 	data, err = testFile.ReadFile()
 	require.NoError(t, err)
-	err = testFile.WriteFile(data[:1000])
+	err = testFile.WriteFile(data[:100])
 	require.NoError(t, err)
 	downloadAndTestChecksum()
+
+	r.Checksum = ""
+	_, err = r.TestLocalArchiveChecksum(tmp)
+	require.Error(t, err)
 
 	r.Checksum = "BOH:12312312312313123123123123123123"
 	_, err = r.TestLocalArchiveChecksum(tmp)
@@ -89,20 +95,15 @@ func TestDownloadAndChecksums(t *testing.T) {
 	_, err = r.TestLocalArchiveChecksum(tmp)
 	require.Error(t, err)
 
-	r.Checksum = "SHA-1:c007e47637cc6ad6176e7d94aeffc232ee34c1c1"
+	r.Checksum = "SHA-1:16e1495aff482f2650733e1661d5f7c69040ec13"
 	res, err := r.TestLocalArchiveChecksum(tmp)
 	require.NoError(t, err)
 	require.True(t, res)
 
-	r.Checksum = "MD5:2e388576eefd92a15967868d5f566f29"
+	r.Checksum = "MD5:3bcc3aab6842ff124df6a5cfba678ca1"
 	res, err = r.TestLocalArchiveChecksum(tmp)
 	require.NoError(t, err)
 	require.True(t, res)
-
-	r.Checksum = "MD5:12312312312312312312313131231231"
-	res, err = r.TestLocalArchiveChecksum(tmp)
-	require.NoError(t, err)
-	require.False(t, res)
 
 	_, err = r.TestLocalArchiveChecksum(paths.New("/not-existent"))
 	require.Error(t, err)
