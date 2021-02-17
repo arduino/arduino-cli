@@ -136,6 +136,8 @@ func (idx *Index) FindLibraryUpdate(lib *libraries.Library) *Release {
 	if indexLib == nil {
 		return nil
 	}
+	// library.Version is nil when when the version field in
+	// a library descriptor is malformed and could not be parsed.
 	if lib.Version == nil {
 		return indexLib.Latest
 	}
