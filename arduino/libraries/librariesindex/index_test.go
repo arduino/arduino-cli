@@ -78,6 +78,10 @@ func TestIndexer(t *testing.T) {
 	require.NotNil(t, rtcUpdate)
 	require.Equal(t, "RTCZero@1.6.0", rtcUpdate.String())
 
+	rtcUpdateNoVersion := index.FindLibraryUpdate(&libraries.Library{Name: "RTCZero", Version: nil})
+	require.NotNil(t, rtcUpdateNoVersion)
+	require.Equal(t, "RTCZero@1.6.0", rtcUpdateNoVersion.String())
+
 	rtcNoUpdate := index.FindLibraryUpdate(&libraries.Library{Name: "RTCZero", Version: semver.MustParse("3.0.0")})
 	require.Nil(t, rtcNoUpdate)
 

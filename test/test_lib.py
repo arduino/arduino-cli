@@ -703,3 +703,65 @@ def test_lib_examples_with_case_mismatch(run_command, data_dir):
     # Verifies sketches with wrong casing are not returned
     assert str(examples_path / "NonBlocking" / "OnDemandNonBlocking") not in examples
     assert str(examples_path / "OnDemand" / "OnDemandWebPortal") not in examples
+
+
+def test_lib_list_using_library_with_invalid_version(run_command, data_dir):
+    assert run_command("update")
+
+    # Install a library
+    assert run_command("lib install WiFi101@0.16.1")
+
+    # Verifies library is correctly returned
+    res = run_command("lib list --format json")
+    assert res.ok
+    data = json.loads(res.stdout)
+    assert len(data) == 1
+    assert "0.16.1" == data[0]["library"]["version"]
+
+    # Changes the version of the currently installed library so that it's
+    # invalid
+    lib_path = Path(data_dir, "libraries", "WiFi101")
+    Path(lib_path, "library.properties").write_text("version=1.0001")
+
+    # Verifies version is now empty
+    res = run_command("lib list --format json")
+    assert res.ok
+    data = json.loads(res.stdout)
+    assert len(data) == 1
+    assert "version" not in data[0]["library"]
+
+
+def test_lib_upgrade_using_library_with_invalid_version(run_command, data_dir):
+    assert run_command("update")
+
+    # Install a library
+    assert run_command("lib install WiFi101@0.16.1")
+
+    # Verifies library is correctly returned
+    res = run_command("lib list --format json")
+    assert res.ok
+    data = json.loads(res.stdout)
+    assert len(data) == 1
+    assert "0.16.1" == data[0]["library"]["version"]
+
+    # Changes the version of the currently installed library so that it's
+    # invalid
+    lib_path = Path(data_dir, "libraries", "WiFi101")
+    Path(lib_path, "library.properties").write_text("version=1.0001")
+
+    # Verifies version is now empty
+    res = run_command("lib list --format json")
+    assert res.ok
+    data = json.loads(res.stdout)
+    assert len(data) == 1
+    assert "version" not in data[0]["library"]
+
+    # Upgrade library
+    assert run_command("lib upgrade WiFi101")
+
+    # Verifies library has been updated
+    res = run_command("lib list --format json")
+    assert res.ok
+    data = json.loads(res.stdout)
+    assert len(data) == 1
+    assert "" != data[0]["library"]["version"]
