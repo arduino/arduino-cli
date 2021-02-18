@@ -50,7 +50,7 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 			if installedLib.Location != libraries.User {
 				continue
 			}
-			if installedLib.Version.Equal(indexLibrary.Version) {
+			if installedLib.Version != nil && installedLib.Version.Equal(indexLibrary.Version) {
 				return installedLib.InstallDir, nil, ErrAlreadyInstalled
 			}
 			replaced = installedLib
