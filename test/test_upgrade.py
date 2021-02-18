@@ -13,6 +13,8 @@
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
 
+from pathlib import Path
+
 
 def test_upgrade(run_command):
     # Updates index for cores and libraries
@@ -41,3 +43,25 @@ def test_upgrade(run_command):
     result = run_command("outdated")
     assert result.ok
     assert result.stdout == ""
+
+
+def test_upgrade_using_library_with_invalid_version(run_command, data_dir):
+    assert run_command("update")
+
+    # Install latest version of a library
+    assert run_command("lib install WiFi101")
+
+    # Verifies library is not shown
+    res = run_command("outdated")
+    assert res.ok
+    assert "WiFi101" not in res.stdout
+
+    # Changes the version of the currently installed library so that it's
+    # invalid
+    lib_path = Path(data_dir, "libraries", "WiFi101")
+    Path(lib_path, "library.properties").write_text("version=1.0001")
+
+    # Verifies library gets upgraded
+    res = run_command("upgrade")
+    assert res.ok
+    assert "WiFi101" in res.stdout
