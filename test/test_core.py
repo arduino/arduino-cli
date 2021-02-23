@@ -48,68 +48,39 @@ def test_core_search(run_command, httpserver):
     data = json.loads(result.stdout)
     assert 2 == len(data)
 
+    def get_platforms(stdout):
+        data = json.loads(stdout)
+        platforms = {p["ID"]: [] for p in data}
+        for p in data:
+            platforms[p["ID"]].append(p["Latest"])
+        return platforms
+
     # Search all Retrokit platforms
-    result = run_command(f"core search retrokit --all --additional-urls={url}")
+    result = run_command(f"core search retrokit --all --additional-urls={url} --format json")
     assert result.ok
-    lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
-    assert ["Updating", "index:", "package_index.json", "downloaded"] in lines
-    assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines
-    assert ["Retrokits-RK002:arm", "1.0.5", "RK002"] in lines
-    assert ["Retrokits-RK002:arm", "1.0.6", "RK002"] in lines
-    header_index = lines.index(["ID", "Version", "Name"])
-    # We use black to format and flake8 to lint .py files but they disagree on certain
-    # things like this one, thus we ignore this specific flake8 rule and stand by black
-    # opinion.
-    # We ignore this specific case because ignoring it globally would probably cause more
-    # issue. For more info about the rule see: https://www.flake8rules.com/rules/E203.html
-    assert 2 == len(lines[header_index + 1 :])  # noqa: E203
+    platforms = get_platforms(result.stdout)
+    assert "1.0.5" in platforms["Retrokits-RK002:arm"]
+    assert "1.0.6" in platforms["Retrokits-RK002:arm"]
 
     # Search using Retrokit Package Maintainer
-    result = run_command(f"core search Retrokits-RK002 --all --additional-urls={url}")
+    result = run_command(f"core search Retrokits-RK002 --all --additional-urls={url} --format json")
     assert result.ok
-    lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
-    assert ["Updating", "index:", "package_index.json", "downloaded"] in lines
-    assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines
-    assert ["Retrokits-RK002:arm", "1.0.5", "RK002"] in lines
-    assert ["Retrokits-RK002:arm", "1.0.6", "RK002"] in lines
-    header_index = lines.index(["ID", "Version", "Name"])
-    # We use black to format and flake8 to lint .py files but they disagree on certain
-    # things like this one, thus we ignore this specific flake8 rule and stand by black
-    # opinion.
-    # We ignore this specific case because ignoring it globally would probably cause more
-    # issue. For more info about the rule see: https://www.flake8rules.com/rules/E203.html
-    assert 2 == len(lines[header_index + 1 :])  # noqa: E203
+    platforms = get_platforms(result.stdout)
+    assert "1.0.5" in platforms["Retrokits-RK002:arm"]
+    assert "1.0.6" in platforms["Retrokits-RK002:arm"]
 
     # Search using the Retrokit Platform name
-    result = run_command(f"core search rk002 --all --additional-urls={url}")
+    result = run_command(f"core search rk002 --all --additional-urls={url} --format json")
     assert result.ok
-    lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
-    assert ["Updating", "index:", "package_index.json", "downloaded"] in lines
-    assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines
-    assert ["Retrokits-RK002:arm", "1.0.5", "RK002"] in lines
-    assert ["Retrokits-RK002:arm", "1.0.6", "RK002"] in lines
-    header_index = lines.index(["ID", "Version", "Name"])
-    # We use black to format and flake8 to lint .py files but they disagree on certain
-    # things like this one, thus we ignore this specific flake8 rule and stand by black
-    # opinion.
-    # We ignore this specific case because ignoring it globally would probably cause more
-    # issue. For more info about the rule see: https://www.flake8rules.com/rules/E203.html
-    assert 2 == len(lines[header_index + 1 :])  # noqa: E203
+    platforms = get_platforms(result.stdout)
+    assert "1.0.5" in platforms["Retrokits-RK002:arm"]
+    assert "1.0.6" in platforms["Retrokits-RK002:arm"]
 
     # Search using a board name
-    result = run_command(f"core search myboard --all --additional-urls={url}")
+    result = run_command(f"core search myboard --all --additional-urls={url} --format json")
     assert result.ok
-    lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
-    assert ["Updating", "index:", "package_index.json", "downloaded"] in lines
-    assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines
-    assert ["Package:x86", "1.2.3", "Platform"] in lines
-    header_index = lines.index(["ID", "Version", "Name"])
-    # We use black to format and flake8 to lint .py files but they disagree on certain
-    # things like this one, thus we ignore this specific flake8 rule and stand by black
-    # opinion.
-    # We ignore this specific case because ignoring it globally would probably cause more
-    # issue. For more info about the rule see: https://www.flake8rules.com/rules/E203.html
-    assert 1 == len(lines[header_index + 1 :])  # noqa: E203
+    platforms = get_platforms(result.stdout)
+    assert "1.2.3" in platforms["Package:x86"]
 
 
 def test_core_search_no_args(run_command, httpserver):
@@ -173,6 +144,32 @@ def test_core_search_no_args(run_command, httpserver):
     platforms = json.loads(result.stdout)
     assert 1 == len([e for e in platforms if e.get("Name") == "test_core"])
     assert len(platforms) == num_platforms
+
+
+def test_core_search_fuzzy(run_command):
+    assert run_command("update")
+
+    def run_fuzzy_search(search_args, expected_ids):
+        res = run_command(f"core search --format json {search_args}")
+        assert res.ok
+        data = json.loads(res.stdout)
+        platform_ids = [p["ID"] for p in data]
+        for platform_id in expected_ids:
+            assert platform_id in platform_ids
+
+    run_fuzzy_search("mkr1000", ["arduino:samd"])
+    run_fuzzy_search("mkr 100", ["arduino:samd"])
+
+    run_fuzzy_search("yún", ["arduino:avr"])
+    run_fuzzy_search("yùn", ["arduino:avr"])
+    run_fuzzy_search("yun", ["arduino:avr"])
+
+    run_fuzzy_search("nano", ["arduino:avr", "arduino:megaavr", "arduino:samd", "arduino:mbed"])
+    run_fuzzy_search("nano33", ["arduino:samd", "arduino:mbed"])
+    run_fuzzy_search("nano 33", ["arduino:avr", "arduino:megaavr", "arduino:samd", "arduino:mbed"])
+    run_fuzzy_search("nano ble", ["arduino:avr", "arduino:megaavr", "arduino:samd", "arduino:mbed"])
+    run_fuzzy_search("ble", ["arduino:mbed"])
+    run_fuzzy_search("ble nano", ["arduino:avr", "arduino:megaavr", "arduino:samd", "arduino:mbed"])
 
 
 def test_core_updateindex_url_not_found(run_command, httpserver):
