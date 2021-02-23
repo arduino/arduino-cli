@@ -42,7 +42,7 @@ require (
 	go.bug.st/cleanup v1.0.0
 	go.bug.st/downloader/v2 v2.1.1
 	go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18
-	go.bug.st/serial v1.1.1
+	go.bug.st/serial v1.1.2
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect
 	golang.org/x/crypto v0.0.0-20200406173513-056763e48d71
 	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
