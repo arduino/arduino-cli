@@ -383,11 +383,11 @@ def test_search(run_command):
     libs_json = json.loads(result.stdout)
     assert len(libs) == len(libs_json.get("libraries"))
 
-    result = run_command("lib search")
+    result = run_command("lib search --names")
     assert result.ok
 
     # Search for a specific target
-    result = run_command("lib search ArduinoJson --format json")
+    result = run_command("lib search --names ArduinoJson --format json")
     assert result.ok
     libs_json = json.loads(result.stdout)
     assert len(libs_json.get("libraries")) >= 1
@@ -399,10 +399,39 @@ def test_search_paragraph(run_command):
     within the index file.
     """
     assert run_command("lib update-index")
-    result = run_command('lib search "A simple and efficient JSON library" --format json')
+    result = run_command('lib search "A simple and efficient JSON library" --names --format json')
     assert result.ok
-    libs_json = json.loads(result.stdout)
-    assert 1 == len(libs_json.get("libraries"))
+    data = json.loads(result.stdout)
+    libraries = [l["name"] for l in data["libraries"]]
+    assert "ArduinoJson" in libraries
+
+
+def test_lib_search_fuzzy(run_command):
+    run_command("update")
+
+    def run_search(search_args, expected_libraries):
+        res = run_command(f"lib search --names --format json {search_args}")
+        assert res.ok
+        data = json.loads(res.stdout)
+        libraries = [l["name"] for l in data["libraries"]]
+        for l in expected_libraries:
+            assert l in libraries
+
+    run_search("Arduino_MKRIoTCarrier", ["Arduino_MKRIoTCarrier"])
+    run_search("Arduino mkr iot carrier", ["Arduino_MKRIoTCarrier"])
+    run_search("Arduinomkriotcarrier", ["Arduino_MKRIoTCarrier"])
+
+    run_search(
+        "dht",
+        ["DHT sensor library", "DHT sensor library for ESPx", "DHT12", "SimpleDHT", "TinyDHT sensor library", "SDHT"],
+    )
+    run_search(
+        "dht11", ["DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "TinyDHT sensor library", "SDHT"]
+    )
+    run_search("dht12", ["AM232X", "DHT12", "DHT12 sensor library", "SDHT"])
+    run_search("dht22", ["DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"])
+    run_search("dht sensor", ["DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"])
+    run_search("sensor dht", ["DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"])
 
 
 def test_lib_list_with_updatable_flag(run_command):

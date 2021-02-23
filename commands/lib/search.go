@@ -24,7 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/imjasonmiller/godice"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -44,33 +44,21 @@ func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesMana
 	res := []*rpc.SearchedLibrary{}
 	status := rpc.LibrarySearchStatus_success
 
-	for _, lib := range lm.Index.Libraries {
-		qry := strings.ToLower(req.GetQuery())
-		if strings.Contains(strings.ToLower(lib.Name), qry) ||
-			strings.Contains(strings.ToLower(lib.Latest.Paragraph), qry) ||
-			strings.Contains(strings.ToLower(lib.Latest.Sentence), qry) {
-			releases := map[string]*rpc.LibraryRelease{}
-			for str, rel := range lib.Releases {
-				releases[str] = GetLibraryParameters(rel)
-			}
-			latest := GetLibraryParameters(lib.Latest)
-
-			searchedLib := &rpc.SearchedLibrary{
-				Name:     lib.Name,
-				Releases: releases,
-				Latest:   latest,
-			}
-			res = append(res, searchedLib)
+	// If the query is empty all libraries are returned
+	if strings.Trim(req.GetQuery(), " ") == "" {
+		for _, lib := range lm.Index.Libraries {
+			res = append(res, indexLibraryToRPCSearchLibrary(lib))
 		}
+		return &rpc.LibrarySearchResp{Libraries: res, Status: status}, nil
 	}
 
-	if len(res) == 0 {
-		status = rpc.LibrarySearchStatus_failed
-		for _, lib := range lm.Index.Libraries {
-			if godice.CompareString(req.GetQuery(), lib.Name) > similarityThreshold {
-				res = append(res, &rpc.SearchedLibrary{
-					Name: lib.Name,
-				})
+	for _, lib := range lm.Index.Libraries {
+		words := strings.Split(req.GetQuery(), " ")
+		toTest := []string{lib.Name, lib.Latest.Paragraph, lib.Latest.Sentence}
+
+		for _, word := range words {
+			if len(fuzzy.FindNormalizedFold(word, toTest)) > 0 {
+				res = append(res, indexLibraryToRPCSearchLibrary(lib))
 			}
 		}
 	}
@@ -78,8 +66,23 @@ func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesMana
 	return &rpc.LibrarySearchResp{Libraries: res, Status: status}, nil
 }
 
-// GetLibraryParameters FIXMEDOC
-func GetLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
+// indexLibraryToRPCSearchLibrary converts a librariindex.Library to rpc.SearchLibrary
+func indexLibraryToRPCSearchLibrary(lib *librariesindex.Library) *rpc.SearchedLibrary {
+	releases := map[string]*rpc.LibraryRelease{}
+	for str, rel := range lib.Releases {
+		releases[str] = getLibraryParameters(rel)
+	}
+	latest := getLibraryParameters(lib.Latest)
+
+	return &rpc.SearchedLibrary{
+		Name:     lib.Name,
+		Releases: releases,
+		Latest:   latest,
+	}
+}
+
+// getLibraryParameters FIXMEDOC
+func getLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
 	return &rpc.LibraryRelease{
 		Author:           rel.Author,
 		Version:          rel.Version.String(),
