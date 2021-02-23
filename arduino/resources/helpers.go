@@ -44,26 +44,23 @@ func (r *DownloadResource) IsCached(downloadDir *paths.Path) (bool, error) {
 
 // Download a DownloadResource.
 func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config) (*downloader.Downloader, error) {
-	cached, err := r.TestLocalArchiveIntegrity(downloadDir)
-	if err != nil {
-		return nil, fmt.Errorf("testing local archive integrity: %s", err)
-	}
-	if cached {
-		// File is cached, nothing to do here
-		return nil, nil
-	}
-
 	path, err := r.ArchivePath(downloadDir)
 	if err != nil {
 		return nil, fmt.Errorf("getting archive path: %s", err)
 	}
 
-	if stats, err := path.Stat(); os.IsNotExist(err) {
+	if _, err := path.Stat(); os.IsNotExist(err) {
 		// normal download
-	} else if err == nil && stats.Size() > r.Size {
-		// file is bigger than expected, retry download...
-		if err := path.Remove(); err != nil {
-			return nil, fmt.Errorf("removing corrupted archive file: %s", err)
+	} else if err == nil {
+		// check local file integrity
+		ok, err := r.TestLocalArchiveIntegrity(downloadDir)
+		if err != nil || !ok {
+			if err := path.Remove(); err != nil {
+				return nil, fmt.Errorf("removing corrupted archive file: %s", err)
+			}
+		} else {
+			// File is cached, nothing to do here
+			return nil, nil
 		}
 	} else if err == nil {
 		// resume download
