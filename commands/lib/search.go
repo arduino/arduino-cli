@@ -69,18 +69,18 @@ func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesMana
 		}
 		return r
 	}, query)
-
-	// Use both uncleaned and cleaned query
-	for _, q := range []string{query, cleanQuery} {
-		for _, lib := range lm.Index.Libraries {
+	for _, lib := range lm.Index.Libraries {
+		// Use both uncleaned and cleaned query
+		for _, q := range []string{query, cleanQuery} {
 			toTest := []string{lib.Name, lib.Latest.Paragraph, lib.Latest.Sentence}
 			for _, rank := range fuzzy.RankFindNormalizedFold(q, toTest) {
 				if rank.Distance < maximumSearchDistance {
 					res = append(res, indexLibraryToRPCSearchLibrary(lib))
-					break
+					goto nextLib
 				}
 			}
 		}
+	nextLib:
 	}
 
 	return &rpc.LibrarySearchResp{Libraries: res, Status: status}, nil
