@@ -158,7 +158,7 @@ def test_core_search_fuzzy(run_command):
             assert platform_id in platform_ids
 
     run_fuzzy_search("mkr1000", ["arduino:samd"])
-    run_fuzzy_search("mkr 100", ["arduino:samd"])
+    run_fuzzy_search("mkr 1000", ["arduino:samd"])
 
     run_fuzzy_search("yún", ["arduino:avr"])
     run_fuzzy_search("yùn", ["arduino:avr"])

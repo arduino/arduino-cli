@@ -53,18 +53,32 @@ func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesMana
 
 	// maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
 	// This value is completely arbitrary and picked randomly.
-	maximumSearchDistance := 65
+	maximumSearchDistance := 150
 	// Use a lower distance for shorter query or the user might be flooded with unrelated results
 	if len(query) <= 4 {
 		maximumSearchDistance = 40
 	}
 
-	for _, lib := range lm.Index.Libraries {
-		toTest := []string{lib.Name, lib.Latest.Paragraph, lib.Latest.Sentence}
-		for _, rank := range fuzzy.RankFindNormalizedFold(req.GetQuery(), toTest) {
-			if rank.Distance < maximumSearchDistance {
-				res = append(res, indexLibraryToRPCSearchLibrary(lib))
-				break
+	// Removes some chars from query strings to enhance results
+	cleanQuery := strings.Map(func(r rune) rune {
+		switch r {
+		case '_':
+		case '-':
+		case ' ':
+			return -1
+		}
+		return r
+	}, query)
+
+	// Use both uncleaned and cleaned query
+	for _, q := range []string{query, cleanQuery} {
+		for _, lib := range lm.Index.Libraries {
+			toTest := []string{lib.Name, lib.Latest.Paragraph, lib.Latest.Sentence}
+			for _, rank := range fuzzy.RankFindNormalizedFold(q, toTest) {
+				if rank.Distance < maximumSearchDistance {
+					res = append(res, indexLibraryToRPCSearchLibrary(lib))
+					break
+				}
 			}
 		}
 	}

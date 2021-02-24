@@ -82,18 +82,32 @@ func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error)
 					toTest = append(toTest, board.Name)
 				}
 
+				// Removes some chars from query strings to enhance results
+				cleanSearchArgs := strings.Map(func(r rune) rune {
+					switch r {
+					case '_':
+					case '-':
+					case ' ':
+						return -1
+					}
+					return r
+				}, searchArgs)
+
 				// Fuzzy search
-				for _, rank := range fuzzy.RankFindNormalizedFold(searchArgs, toTest) {
-					// Accepts only results that close to the searched terms
-					if rank.Distance < maximumSearchDistance {
-						if allVersions {
-							res = append(res, platform.GetAllReleases()...)
-						} else {
-							res = append(res, platformRelease)
+				for _, arg := range []string{searchArgs, cleanSearchArgs} {
+					for _, rank := range fuzzy.RankFindNormalizedFold(arg, toTest) {
+						// Accepts only results that close to the searched terms
+						if rank.Distance < maximumSearchDistance {
+							if allVersions {
+								res = append(res, platform.GetAllReleases()...)
+							} else {
+								res = append(res, platformRelease)
+							}
+							goto nextPlatform
 						}
-						break
 					}
 				}
+			nextPlatform:
 			}
 		}
 	}

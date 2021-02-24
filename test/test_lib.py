@@ -418,8 +418,8 @@ def test_lib_search_fuzzy(run_command):
             assert l in libraries
 
     run_search("Arduino_MKRIoTCarrier", ["Arduino_MKRIoTCarrier"])
-    run_search("Arduino mkr iot carrier", [])
-    run_search("mkr iot carrier", [])
+    run_search("Arduino mkr iot carrier", ["Arduino_MKRIoTCarrier"])
+    run_search("mkr iot carrier", ["Arduino_MKRIoTCarrier"])
     run_search("mkriotcarrier", ["Arduino_MKRIoTCarrier"])
     run_search("Arduinomkriotcarrier", ["Arduino_MKRIoTCarrier"])
 
@@ -432,6 +432,10 @@ def test_lib_search_fuzzy(run_command):
     run_search("dht22", ["DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"])
     run_search("dht sensor", ["DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"])
     run_search("sensor dht", [])
+
+    run_search("arduino json", ["ArduinoJson", "Arduino_JSON"])
+    run_search("arduinojson", ["ArduinoJson", "Arduino_JSON"])
+    run_search("json", ["ArduinoJson", "Arduino_JSON"])
 
 
 def test_lib_list_with_updatable_flag(run_command):
