@@ -42,6 +42,8 @@ message LibraryInstallReq {
     string name = 2;
     // The version of the library to install.
     string version = 3;
+    // Set to true to skip installation of specified library's dependencies, defaults to false.
+    bool noDeps = 4;
 }
 
 message LibraryInstallResp {
@@ -317,4 +319,4 @@ message GitLibraryInstallReq {
 message GitLibraryInstallResp {
     // Description of the current stage of the installation.
     TaskProgress task_progress = 1;
-} 
+}
