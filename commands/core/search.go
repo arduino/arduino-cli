@@ -65,7 +65,7 @@ func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error)
 					continue
 				}
 
-				words := strings.Split(searchArgs, " ")
+				// Gather all strings that can be used for searching
 				toTest := []string{
 					platform.String(),
 					platform.Name,
@@ -77,14 +77,13 @@ func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error)
 				for _, board := range platformRelease.BoardsManifest {
 					toTest = append(toTest, board.Name)
 				}
-				for _, word := range words {
-					if len(fuzzy.FindNormalizedFold(word, toTest)) > 0 {
-						if allVersions {
-							res = append(res, platform.GetAllReleases()...)
-						} else {
-							res = append(res, platformRelease)
-						}
-						break
+
+				// Fuzzy search
+				if len(fuzzy.FindNormalizedFold(searchArgs, toTest)) > 0 {
+					if allVersions {
+						res = append(res, platform.GetAllReleases()...)
+					} else {
+						res = append(res, platformRelease)
 					}
 				}
 			}

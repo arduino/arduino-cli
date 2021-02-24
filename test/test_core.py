@@ -166,10 +166,10 @@ def test_core_search_fuzzy(run_command):
 
     run_fuzzy_search("nano", ["arduino:avr", "arduino:megaavr", "arduino:samd", "arduino:mbed"])
     run_fuzzy_search("nano33", ["arduino:samd", "arduino:mbed"])
-    run_fuzzy_search("nano 33", ["arduino:avr", "arduino:megaavr", "arduino:samd", "arduino:mbed"])
-    run_fuzzy_search("nano ble", ["arduino:avr", "arduino:megaavr", "arduino:samd", "arduino:mbed"])
+    run_fuzzy_search("nano 33", ["arduino:samd", "arduino:mbed"])
+    run_fuzzy_search("nano ble", ["arduino:mbed"])
     run_fuzzy_search("ble", ["arduino:mbed"])
-    run_fuzzy_search("ble nano", ["arduino:avr", "arduino:megaavr", "arduino:samd", "arduino:mbed"])
+    run_fuzzy_search("ble nano", [])
 
 
 def test_core_updateindex_url_not_found(run_command, httpserver):

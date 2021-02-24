@@ -53,13 +53,9 @@ func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesMana
 	}
 
 	for _, lib := range lm.Index.Libraries {
-		words := strings.Split(req.GetQuery(), " ")
 		toTest := []string{lib.Name, lib.Latest.Paragraph, lib.Latest.Sentence}
-
-		for _, word := range words {
-			if len(fuzzy.FindNormalizedFold(word, toTest)) > 0 {
-				res = append(res, indexLibraryToRPCSearchLibrary(lib))
-			}
+		if len(fuzzy.FindNormalizedFold(req.GetQuery(), toTest)) > 0 {
+			res = append(res, indexLibraryToRPCSearchLibrary(lib))
 		}
 	}
 
