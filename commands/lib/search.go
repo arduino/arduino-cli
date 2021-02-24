@@ -28,8 +28,6 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-var similarityThreshold = 0.7
-
 // LibrarySearch FIXMEDOC
 func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.LibrarySearchResp, error) {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
@@ -41,21 +39,33 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 }
 
 func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesManager) (*rpc.LibrarySearchResp, error) {
+	query := req.GetQuery()
 	res := []*rpc.SearchedLibrary{}
 	status := rpc.LibrarySearchStatus_success
 
 	// If the query is empty all libraries are returned
-	if strings.Trim(req.GetQuery(), " ") == "" {
+	if strings.Trim(query, " ") == "" {
 		for _, lib := range lm.Index.Libraries {
 			res = append(res, indexLibraryToRPCSearchLibrary(lib))
 		}
 		return &rpc.LibrarySearchResp{Libraries: res, Status: status}, nil
 	}
 
+	// maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
+	// This value is completely arbitrary and picked randomly.
+	maximumSearchDistance := 65
+	// Use a lower distance for shorter query or the user might be flooded with unrelated results
+	if len(query) <= 4 {
+		maximumSearchDistance = 40
+	}
+
 	for _, lib := range lm.Index.Libraries {
 		toTest := []string{lib.Name, lib.Latest.Paragraph, lib.Latest.Sentence}
-		if len(fuzzy.FindNormalizedFold(req.GetQuery(), toTest)) > 0 {
-			res = append(res, indexLibraryToRPCSearchLibrary(lib))
+		for _, rank := range fuzzy.RankFindNormalizedFold(req.GetQuery(), toTest) {
+			if rank.Distance < maximumSearchDistance {
+				res = append(res, indexLibraryToRPCSearchLibrary(lib))
+				break
+			}
 		}
 	}
 

@@ -427,10 +427,8 @@ def test_lib_search_fuzzy(run_command):
         "dht",
         ["DHT sensor library", "DHT sensor library for ESPx", "DHT12", "SimpleDHT", "TinyDHT sensor library", "SDHT"],
     )
-    run_search(
-        "dht11", ["DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "TinyDHT sensor library", "SDHT"]
-    )
-    run_search("dht12", ["AM232X", "DHT12", "DHT12 sensor library", "SDHT"])
+    run_search("dht11", ["DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"])
+    run_search("dht12", ["DHT12", "DHT12 sensor library", "SDHT"])
     run_search("dht22", ["DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"])
     run_search("dht sensor", ["DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"])
     run_search("sensor dht", [])

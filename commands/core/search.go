@@ -26,6 +26,10 @@ import (
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
+// maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
+// This value is completely arbitrary and picked randomly.
+const maximumSearchDistance = 20
+
 // PlatformSearch FIXMEDOC
 func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error) {
 	searchArgs := strings.Trim(req.SearchArgs, " ")
@@ -79,11 +83,15 @@ func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error)
 				}
 
 				// Fuzzy search
-				if len(fuzzy.FindNormalizedFold(searchArgs, toTest)) > 0 {
-					if allVersions {
-						res = append(res, platform.GetAllReleases()...)
-					} else {
-						res = append(res, platformRelease)
+				for _, rank := range fuzzy.RankFindNormalizedFold(searchArgs, toTest) {
+					// Accepts only results that close to the searched terms
+					if rank.Distance < maximumSearchDistance {
+						if allVersions {
+							res = append(res, platform.GetAllReleases()...)
+						} else {
+							res = append(res, platformRelease)
+						}
+						break
 					}
 				}
 			}
