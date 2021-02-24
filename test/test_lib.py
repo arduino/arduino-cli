@@ -194,8 +194,55 @@ def test_install(run_command):
 
     # Test failing-install of library with wrong dependency
     # (https://github.com/arduino/arduino-cli/issues/534)
-    result = run_command("lib install MD_Parola@3.2.0")
-    assert "Error resolving dependencies for MD_Parola@3.2.0: dependency 'MD_MAX72xx' is not available" in result.stderr
+    res = run_command("lib install MD_Parola@3.2.0")
+    assert res.failed
+    assert "Error resolving dependencies for MD_Parola@3.2.0: dependency 'MD_MAX72xx' is not available" in res.stderr
+
+
+def test_install_library_with_dependencies(run_command):
+    assert run_command("update")
+
+    # Verifies libraries are not installed
+    res = run_command("lib list --format json")
+    assert res.ok
+    data = json.loads(res.stdout)
+    installed_libraries = [l["library"]["name"] for l in data]
+    assert "MD_Parola" not in installed_libraries
+    assert "MD_MAX72XX" not in installed_libraries
+
+    # Install library
+    assert run_command("lib install MD_Parola@3.5.5")
+
+    # Verifies library's dependencies are correctly installed
+    res = run_command("lib list --format json")
+    assert res.ok
+    data = json.loads(res.stdout)
+    installed_libraries = [l["library"]["name"] for l in data]
+    assert "MD_Parola" in installed_libraries
+    assert "MD_MAX72XX" in installed_libraries
+
+
+def test_install_no_deps(run_command):
+    assert run_command("update")
+
+    # Verifies libraries are not installed
+    res = run_command("lib list --format json")
+    assert res.ok
+    data = json.loads(res.stdout)
+    installed_libraries = [l["library"]["name"] for l in data]
+    assert "MD_Parola" not in installed_libraries
+    assert "MD_MAX72XX" not in installed_libraries
+
+    # Install library skipping dependencies installation
+    assert run_command("lib install MD_Parola@3.5.5 --no-deps")
+
+    # Verifies library's dependencies are not installed
+    res = run_command("lib list --format json")
+    assert res.ok
+    data = json.loads(res.stdout)
+    installed_libraries = [l["library"]["name"] for l in data]
+    assert "MD_Parola" in installed_libraries
+    assert "MD_MAX72XX" not in installed_libraries
 
 
 def test_install_git_url_and_zip_path_flags_visibility(run_command, data_dir, downloads_dir):

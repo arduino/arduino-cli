@@ -32,17 +32,49 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 
-	libRelease, err := findLibraryIndexRelease(lm, req)
-	if err != nil {
-		return fmt.Errorf("looking for library: %s", err)
+	toInstall := map[string]*rpc.LibraryDependencyStatus{}
+	if req.NoDeps {
+		toInstall[req.Name] = &rpc.LibraryDependencyStatus{
+			Name:            req.Name,
+			VersionRequired: req.Version,
+		}
+	} else {
+		res, err := LibraryResolveDependencies(ctx, &rpc.LibraryResolveDependenciesReq{
+			Instance: req.Instance,
+			Name:     req.Name,
+			Version:  req.Version,
+		})
+		if err != nil {
+			return fmt.Errorf("Error resolving dependencies for %s@%s: %s", req.Name, req.Version, err)
+		}
+
+		for _, dep := range res.Dependencies {
+			if existingDep, has := toInstall[dep.Name]; has {
+				if existingDep.VersionRequired != dep.VersionRequired {
+					return fmt.Errorf("two different versions of the library %s are required: %s and %s",
+						dep.Name, dep.VersionRequired, existingDep.VersionRequired)
+				}
+			}
+			toInstall[dep.Name] = dep
+		}
 	}
 
-	if err := downloadLibrary(lm, libRelease, downloadCB, taskCB); err != nil {
-		return fmt.Errorf("downloading library: %s", err)
-	}
+	for _, lib := range toInstall {
+		libRelease, err := findLibraryIndexRelease(lm, &rpc.LibraryInstallReq{
+			Name:    lib.Name,
+			Version: lib.VersionRequired,
+		})
+		if err != nil {
+			return fmt.Errorf("looking for library: %s", err)
+		}
 
-	if err := installLibrary(lm, libRelease, taskCB); err != nil {
-		return err
+		if err := downloadLibrary(lm, libRelease, downloadCB, taskCB); err != nil {
+			return fmt.Errorf("downloading library: %s", err)
+		}
+
+		if err := installLibrary(lm, libRelease, taskCB); err != nil {
+			return err
+		}
 	}
 
 	if _, err := commands.Rescan(req.GetInstance().GetId()); err != nil {

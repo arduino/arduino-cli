@@ -207,6 +207,10 @@ func main() {
 	log.Println("calling LibraryInstall(WiFi101@0.15.2)")
 	callLibInstall(client, instance, "0.15.2")
 
+	// Install a library skipping deps installation
+	log.Println("calling LibraryInstall(Arduino_MKRIoTCarrier@0.9.9) skipping dependencies")
+	callLibInstallNoDeps(client, instance, "0.9.9")
+
 	// Upgrade all libs to latest
 	log.Println("calling LibraryUpgradeAll()")
 	callLibUpgradeAll(client, instance)
@@ -813,6 +817,38 @@ func callLibInstall(client rpc.ArduinoCoreClient, instance *rpc.Instance, versio
 	}
 }
 
+func callLibInstallNoDeps(client rpc.ArduinoCoreClient, instance *rpc.Instance, version string) {
+	installRespStream, err := client.LibraryInstall(context.Background(),
+		&rpc.LibraryInstallReq{
+			Instance: instance,
+			Name:     "Arduino_MKRIoTCarrier",
+			Version:  version,
+			NoDeps:   true,
+		})
+
+	if err != nil {
+		log.Fatalf("Error installing library: %s", err)
+	}
+
+	for {
+		installResp, err := installRespStream.Recv()
+		if err == io.EOF {
+			log.Print("Lib install done")
+			break
+		}
+
+		if err != nil {
+			log.Fatalf("Install error: %s", err)
+		}
+
+		if installResp.GetProgress() != nil {
+			log.Printf("DOWNLOAD: %s\n", installResp.GetProgress())
+		}
+		if installResp.GetTaskProgress() != nil {
+			log.Printf("TASK: %s\n", installResp.GetTaskProgress())
+		}
+	}
+}
 func callLibUpgradeAll(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 	libUpgradeAllRespStream, err := client.LibraryUpgradeAll(context.Background(),
 		&rpc.LibraryUpgradeAllReq{
