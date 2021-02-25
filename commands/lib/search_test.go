@@ -48,7 +48,12 @@ func TestSearchLibrarySimilar(t *testing.T) {
 	}
 
 	assert := assert.New(t)
-	assert.Equal(resp.GetStatus(), rpc.LibrarySearchStatus_failed)
-	assert.Equal(len(resp.GetLibraries()), 1)
-	assert.Equal(resp.GetLibraries()[0].Name, "Arduino")
+	assert.Equal(resp.GetStatus(), rpc.LibrarySearchStatus_success)
+	assert.Equal(len(resp.GetLibraries()), 2)
+	libs := map[string]*rpc.SearchedLibrary{}
+	for _, l := range resp.GetLibraries() {
+		libs[l.Name] = l
+	}
+	assert.Contains(libs, "ArduinoTestPackage")
+	assert.Contains(libs, "Arduino")
 }

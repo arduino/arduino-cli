@@ -19,10 +19,10 @@ require (
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang/protobuf v1.4.2
 	github.com/h2non/filetype v1.0.8 // indirect
-	github.com/imjasonmiller/godice v0.1.2
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leonelquinteros/gotext v1.4.0
+	github.com/lithammer/fuzzysearch v1.1.1
 	github.com/mattn/go-colorable v0.1.2
 	github.com/mattn/go-isatty v0.0.8
 	github.com/mattn/go-runewidth v0.0.9 // indirect

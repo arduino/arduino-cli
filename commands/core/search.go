@@ -23,19 +23,16 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
-func match(line, searchArgs string) bool {
-	return strings.Contains(strings.ToLower(line), strings.ToLower(searchArgs))
-}
-
-func exactMatch(line, searchArgs string) bool {
-	return strings.Compare(strings.ToLower(line), strings.ToLower(searchArgs)) == 0
-}
+// maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
+// This value is completely arbitrary and picked randomly.
+const maximumSearchDistance = 20
 
 // PlatformSearch FIXMEDOC
 func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error) {
-	searchArgs := req.SearchArgs
+	searchArgs := strings.Trim(req.SearchArgs, " ")
 	allVersions := req.AllVersions
 	pm := commands.GetPackageManager(req.Instance.Id)
 	if pm == nil {
@@ -63,29 +60,54 @@ func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error)
 					continue
 				}
 
-				// platform has a valid release, check if it matches the search arguments
-				if match(platform.Name, searchArgs) || match(platform.Architecture, searchArgs) ||
-					exactMatch(platform.String(), searchArgs) || match(targetPackage.Name, searchArgs) ||
-					match(targetPackage.Maintainer, searchArgs) || match(targetPackage.WebsiteURL, searchArgs) {
+				if searchArgs == "" {
 					if allVersions {
 						res = append(res, platform.GetAllReleases()...)
 					} else {
 						res = append(res, platformRelease)
 					}
-				} else {
-					// if we didn't find a match in the platform data, search for
-					// a match in the boards manifest
-					for _, board := range platformRelease.BoardsManifest {
-						if match(board.Name, searchArgs) {
+					continue
+				}
+
+				// Gather all strings that can be used for searching
+				toTest := []string{
+					platform.String(),
+					platform.Name,
+					platform.Architecture,
+					targetPackage.Name,
+					targetPackage.Maintainer,
+					targetPackage.WebsiteURL,
+				}
+				for _, board := range platformRelease.BoardsManifest {
+					toTest = append(toTest, board.Name)
+				}
+
+				// Removes some chars from query strings to enhance results
+				cleanSearchArgs := strings.Map(func(r rune) rune {
+					switch r {
+					case '_':
+					case '-':
+					case ' ':
+						return -1
+					}
+					return r
+				}, searchArgs)
+
+				// Fuzzy search
+				for _, arg := range []string{searchArgs, cleanSearchArgs} {
+					for _, rank := range fuzzy.RankFindNormalizedFold(arg, toTest) {
+						// Accepts only results that close to the searched terms
+						if rank.Distance < maximumSearchDistance {
 							if allVersions {
 								res = append(res, platform.GetAllReleases()...)
 							} else {
 								res = append(res, platformRelease)
 							}
-							break
+							goto nextPlatform
 						}
 					}
 				}
+			nextPlatform:
 			}
 		}
 	}
