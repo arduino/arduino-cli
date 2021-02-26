@@ -197,7 +197,8 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 		// check if file is readable
 		f, err := os.Open(path)
 		if err != nil {
-			return nil
+			feedback.Errorf("Failed to open sketch file: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
 		}
 		f.Close()
 
