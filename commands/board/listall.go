@@ -48,11 +48,31 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllRe
 	list := &rpc.BoardListAllResp{Boards: []*rpc.BoardListItem{}}
 	for _, targetPackage := range pm.Packages {
 		for _, platform := range targetPackage.Platforms {
-			platformRelease := pm.GetInstalledPlatformRelease(platform)
-			if platformRelease == nil {
+			installedPlatformRelease := pm.GetInstalledPlatformRelease(platform)
+			// We only want to list boards for installed platforms
+			if installedPlatformRelease == nil {
 				continue
 			}
-			for _, board := range platformRelease.Boards {
+
+			installedVersion := installedPlatformRelease.Version.String()
+
+			latestVersion := ""
+			if latestPlatformRelease := platform.GetLatestRelease(); latestPlatformRelease != nil {
+				latestVersion = latestPlatformRelease.Version.String()
+			}
+
+			rpcPlatform := &rpc.Platform{
+				ID:                platform.String(),
+				Installed:         installedVersion,
+				Latest:            latestVersion,
+				Name:              platform.Name,
+				Maintainer:        platform.Package.Maintainer,
+				Website:           platform.Package.WebsiteURL,
+				Email:             platform.Package.Email,
+				ManuallyInstalled: platform.ManuallyInstalled,
+			}
+
+			for _, board := range installedPlatformRelease.Boards {
 				if !match(board.Name()) {
 					continue
 				}
@@ -63,6 +83,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllRe
 					Name:     board.Name(),
 					FQBN:     board.FQBN(),
 					IsHidden: board.IsHidden(),
+					Platform: rpcPlatform,
 				})
 			}
 		}

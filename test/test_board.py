@@ -12,6 +12,8 @@
 # otherwise use the software for commercial activities involving the Arduino
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
+from pathlib import Path
+from git import Repo
 import simplejson as json
 
 
@@ -399,39 +401,58 @@ def test_board_list(run_command):
 
 
 def test_board_listall(run_command):
-    run_command("core update-index")
-    run_command("core install arduino:avr@1.8.3")
-    res = run_command("board listall")
+    assert run_command("update")
+    assert run_command("core install arduino:avr@1.8.3")
+    res = run_command("board listall --format json")
     assert res.ok
-    lines = [l.rsplit(maxsplit=1) for l in res.stdout.strip().splitlines()]
-    assert len(lines) == 27
-    assert ["Board Name", "FQBN"] in lines
-    assert ["Arduino Yún", "arduino:avr:yun"] in lines
-    assert ["Arduino Uno", "arduino:avr:uno"] in lines
-    assert ["Arduino Duemilanove or Diecimila", "arduino:avr:diecimila"] in lines
-    assert ["Arduino Nano", "arduino:avr:nano"] in lines
-    assert ["Arduino Mega or Mega 2560", "arduino:avr:mega"] in lines
-    assert ["Arduino Mega ADK", "arduino:avr:megaADK"] in lines
-    assert ["Arduino Leonardo", "arduino:avr:leonardo"] in lines
-    assert ["Arduino Leonardo ETH", "arduino:avr:leonardoeth"] in lines
-    assert ["Arduino Micro", "arduino:avr:micro"] in lines
-    assert ["Arduino Esplora", "arduino:avr:esplora"] in lines
-    assert ["Arduino Mini", "arduino:avr:mini"] in lines
-    assert ["Arduino Ethernet", "arduino:avr:ethernet"] in lines
-    assert ["Arduino Fio", "arduino:avr:fio"] in lines
-    assert ["Arduino BT", "arduino:avr:bt"] in lines
-    assert ["LilyPad Arduino USB", "arduino:avr:LilyPadUSB"] in lines
-    assert ["LilyPad Arduino", "arduino:avr:lilypad"] in lines
-    assert ["Arduino Pro or Pro Mini", "arduino:avr:pro"] in lines
-    assert ["Arduino NG or older", "arduino:avr:atmegang"] in lines
-    assert ["Arduino Robot Control", "arduino:avr:robotControl"] in lines
-    assert ["Arduino Robot Motor", "arduino:avr:robotMotor"] in lines
-    assert ["Arduino Gemma", "arduino:avr:gemma"] in lines
-    assert ["Adafruit Circuit Playground", "arduino:avr:circuitplay32u4cat"] in lines
-    assert ["Arduino Yún Mini", "arduino:avr:yunmini"] in lines
-    assert ["Arduino Industrial 101", "arduino:avr:chiwawa"] in lines
-    assert ["Linino One", "arduino:avr:one"] in lines
-    assert ["Arduino Uno WiFi", "arduino:avr:unowifi"] in lines
+    data = json.loads(res.stdout)
+    boards = {b["FQBN"]: b for b in data["boards"]}
+    assert len(boards) == 26
+    assert "arduino:avr:yun" in boards
+    assert "Arduino Yún" == boards["arduino:avr:yun"]["name"]
+    platform = boards["arduino:avr:yun"]["platform"]
+    assert "arduino:avr" == platform["ID"]
+    assert "1.8.3" == platform["Installed"]
+    assert "" != platform["Latest"]
+    assert "Arduino AVR Boards" == platform["Name"]
+
+    assert "arduino:avr:uno" in boards
+    assert "Arduino Uno" == boards["arduino:avr:uno"]["name"]
+    platform = boards["arduino:avr:uno"]["platform"]
+    assert "arduino:avr" == platform["ID"]
+    assert "1.8.3" == platform["Installed"]
+    assert "" != platform["Latest"]
+    assert "Arduino AVR Boards" == platform["Name"]
+
+
+def test_board_listall_with_manually_installed_platform(run_command, data_dir):
+    assert run_command("update")
+
+    # Manually installs a core in sketchbooks hardware folder
+    git_url = "https://github.com/arduino/ArduinoCore-samd.git"
+    repo_dir = Path(data_dir, "hardware", "arduino-beta-development", "samd")
+    assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.11"])
+
+    res = run_command("board listall --format json")
+    assert res.ok
+    data = json.loads(res.stdout)
+    boards = {b["FQBN"]: b for b in data["boards"]}
+    assert len(boards) == 17
+    assert "arduino-beta-development:samd:nano_33_iot" in boards
+    assert "Arduino NANO 33 IoT" == boards["arduino-beta-development:samd:nano_33_iot"]["name"]
+    platform = boards["arduino-beta-development:samd:nano_33_iot"]["platform"]
+    assert "arduino-beta-development:samd" == platform["ID"]
+    assert "1.8.11" == platform["Installed"]
+    assert "1.8.11" == platform["Latest"]
+    assert "Arduino SAMD (32-bits ARM Cortex-M0+) Boards" == platform["Name"]
+
+    assert "arduino-beta-development:samd:mkr1000" in boards
+    assert "Arduino MKR1000" == boards["arduino-beta-development:samd:mkr1000"]["name"]
+    platform = boards["arduino-beta-development:samd:mkr1000"]["platform"]
+    assert "arduino-beta-development:samd" == platform["ID"]
+    assert "1.8.11" == platform["Installed"]
+    assert "1.8.11" == platform["Latest"]
+    assert "Arduino SAMD (32-bits ARM Cortex-M0+) Boards" == platform["Name"]
 
 
 def test_board_details(run_command):

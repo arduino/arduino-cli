@@ -235,4 +235,6 @@ message BoardListItem {
     string VID = 4;
     // Product ID
     string PID = 5;
+    // Platform this board belongs to
+    Platform platform = 6;
 }
