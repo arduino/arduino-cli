@@ -1,5 +1,5 @@
-Arduino CLI is an all-in-one solution that provides builder, Boards/Library Manager, uploader, discovery and many other
-tools needed to use any Arduino compatible board and platforms.
+Arduino CLI is an all-in-one solution that provides Boards/Library Managers, sketch builder, board detection, uploader,
+and many other tools needed to use any Arduino compatible board and platform.
 
 ## Installation
 
