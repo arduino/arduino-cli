@@ -121,7 +121,7 @@ may be added as needed to future revisions.
 #### Library Root folder
 
 The library root folder name must start with a basic letter (A-Z or a-z) or number (0-9), followed by basic letters,
-numbers, spaces ( ), underscores (\_), dots (.) and dashes (-). The maximum length is 63 characters.
+numbers, underscores (\_), dots (.) and dashes (-). The maximum length is 63 characters.
 
 #### Source code
 

@@ -11,8 +11,8 @@ Because many Arduino sketches only contain a single .ino file, it's easy to thin
 it is the folder that is the sketch. The reason is that sketches may consist of multiple code files and the folder is
 what groups those files into a single program.
 
-<!-- prettier-ignore -->
-The sketch root folder name must start with a basic letter (`A`-`Z` or `a`-`z`) or number (`0`-`9`), followed by basic letters, numbers, spaces (` `), underscores (`_`), dots (`.`) and dashes (`-`). The maximum length is 63 characters.
+The sketch root folder name must start with a basic letter (`A`-`Z` or `a`-`z`) or number (`0`-`9`), followed by basic
+letters, numbers, underscores (`_`), dots (`.`) and dashes (`-`). The maximum length is 63 characters.
 
 Support for sketch folder names starting with a number was added in Arduino IDE 1.8.4.
 
