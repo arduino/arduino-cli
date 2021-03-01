@@ -594,7 +594,6 @@ used for different purposes:
 - **program** a sketch to the target board using an external programmer
 - **erase** the target board's flash memory using an external programmer
 - burn a **bootloader** into the target board using an external programmer
-- **debug** a sketch
 
 Each action has its own recipe and its configuration is done through a set of properties having key starting with
 **tools** prefix followed by the tool ID and the action:
@@ -806,11 +805,8 @@ platform's platform.txt is done as usual.
 Starting from Arduino CLI 0.9.0 / Arduino Pro IDE v0.0.5-alpha.preview, sketch debugging support is available for
 platforms.
 
-The debug action is triggered when the user clicks **Debug > Start Debugging** in the Arduino Pro IDE or runs the
+The debug action is triggered when the user clicks the Debug button in the Arduino Pro IDE or runs the
 [`arduino-cli debug`](commands/arduino-cli_debug.md) command.
-
-The **debug.tool** property specifies the tool ID of the tool to be used for debugging. A **debug.tool** property may be
-defined for each board in boards.txt.
 
 The compiler optimization level that is appropriate for normal usage will often not provide a good experience while
 debugging. For this reason, it may be helpful to use different compiler flags when compiling a sketch for use with the
@@ -819,13 +815,6 @@ property, and those for normal use via the **compiler.optimization_flags.release
 **compiler.optimization_flags** property will be defined according to one or the other depending on the Arduino Pro
 IDE's **Sketch > Optimize for Debugging** setting or [`arduino-cli compile`](commands/arduino-cli_compile.md)'s
 `--optimize-for-debug` option.
-
-The debug recipe is defined via **tools.TOOL_NAME.debug.pattern**. It can be built concatenating the following
-automatically generated properties:
-
-- `{interpreter}`: the GDB command interpreter to use. It is configurable via
-  [`arduino-cli debug --interpreter`](commands/arduino-cli_debug.md). This property was added in Arduino CLI 0.10.0 /
-  Arduino Pro IDE v0.0.7-alpha.preview.
 
 ## Custom board options
 
