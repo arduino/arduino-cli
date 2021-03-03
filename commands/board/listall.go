@@ -22,7 +22,12 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 )
+
+// maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
+// This value is completely arbitrary and picked randomly.
+const maximumSearchDistance = 20
 
 // ListAll FIXMEDOC
 func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllResp, error) {
@@ -31,18 +36,18 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllRe
 		return nil, errors.New("invalid instance")
 	}
 
-	args := req.GetSearchArgs()
-	match := func(name string) bool {
-		if len(args) == 0 {
+	searchArgs := strings.Join(req.SearchArgs, " ")
+
+	match := func(toTest []string) bool {
+		if len(searchArgs) == 0 {
 			return true
 		}
-		name = strings.ToLower(name)
-		for _, term := range args {
-			if !strings.Contains(name, strings.ToLower(term)) {
-				return false
+		for _, rank := range fuzzy.RankFindNormalizedFold(searchArgs, toTest) {
+			if rank.Distance < maximumSearchDistance {
+				return true
 			}
 		}
-		return true
+		return false
 	}
 
 	list := &rpc.BoardListAllResp{Boards: []*rpc.BoardListItem{}}
@@ -72,13 +77,26 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllRe
 				ManuallyInstalled: platform.ManuallyInstalled,
 			}
 
+			toTest := []string{
+				platform.String(),
+				platform.Name,
+				platform.Architecture,
+				targetPackage.Name,
+				targetPackage.Maintainer,
+			}
+
 			for _, board := range installedPlatformRelease.Boards {
-				if !match(board.Name()) {
-					continue
-				}
 				if !req.GetIncludeHiddenBoards() && board.IsHidden() {
 					continue
 				}
+
+				toTest := toTest
+				toTest = append(toTest, strings.Split(board.Name(), " ")...)
+				toTest = append(toTest, board.FQBN())
+				if !match(toTest) {
+					continue
+				}
+
 				list.Boards = append(list.Boards, &rpc.BoardListItem{
 					Name:     board.Name(),
 					FQBN:     board.FQBN(),
