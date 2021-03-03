@@ -20,7 +20,6 @@ import (
 	"strconv"
 
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-properties-orderedmap"
@@ -53,10 +52,10 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 	logger := ctx.GetLogger()
 
 	properties := buildProperties.Clone()
-	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel))
+	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+ctx.WarningsLevel))
 
-	maxTextSizeString := properties.Get(constants.PROPERTY_UPLOAD_MAX_SIZE)
-	maxDataSizeString := properties.Get(constants.PROPERTY_UPLOAD_MAX_DATA_SIZE)
+	maxTextSizeString := properties.Get("upload.maximum_size")
+	maxDataSizeString := properties.Get("upload.maximum_data_size")
 
 	if maxTextSizeString == "" {
 		return nil
@@ -77,16 +76,22 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 
 	textSize, dataSize, _, err := execSizeRecipe(ctx, properties)
 	if err != nil {
-		logger.Println(constants.LOG_LEVEL_WARN, constants.MSG_SIZER_ERROR_NO_RULE)
+		logger.Println("warn", "Couldn't determine program size")
 		return nil
 	}
 
-	logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_SIZER_TEXT_FULL, strconv.Itoa(textSize), strconv.Itoa(maxTextSize), strconv.Itoa(textSize*100/maxTextSize))
+	logger.Println("info",
+		"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes.",
+		strconv.Itoa(textSize), strconv.Itoa(maxTextSize), strconv.Itoa(textSize*100/maxTextSize))
 	if dataSize >= 0 {
 		if maxDataSize > 0 {
-			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_SIZER_DATA_FULL, strconv.Itoa(dataSize), strconv.Itoa(maxDataSize), strconv.Itoa(dataSize*100/maxDataSize), strconv.Itoa(maxDataSize-dataSize))
+			logger.Println("info",
+				"Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes for local variables. Maximum is {1} bytes.",
+				strconv.Itoa(dataSize), strconv.Itoa(maxDataSize), strconv.Itoa(dataSize*100/maxDataSize), strconv.Itoa(maxDataSize-dataSize))
 		} else {
-			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_SIZER_DATA, strconv.Itoa(dataSize))
+			logger.Println("info",
+				"Global variables use {0} bytes of dynamic memory.",
+				strconv.Itoa(dataSize))
 		}
 	}
 
@@ -106,22 +111,22 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 	}
 
 	if textSize > maxTextSize {
-		logger.Println(constants.LOG_LEVEL_ERROR, constants.MSG_SIZER_TEXT_TOO_BIG)
+		logger.Println("error", "Sketch too big; see https://support.arduino.cc/hc/en-us/articles/360013825179 for tips on reducing it.")
 		return errors.New("text section exceeds available space in board")
 	}
 
 	if maxDataSize > 0 && dataSize > maxDataSize {
-		logger.Println(constants.LOG_LEVEL_ERROR, constants.MSG_SIZER_DATA_TOO_BIG)
+		logger.Println("error", "Not enough memory; see https://support.arduino.cc/hc/en-us/articles/360013825179 for tips on reducing your footprint.")
 		return errors.New("data section exceeds available space in board")
 	}
 
-	if properties.Get(constants.PROPERTY_WARN_DATA_PERCENT) != "" {
-		warnDataPercentage, err := strconv.Atoi(properties.Get(constants.PROPERTY_WARN_DATA_PERCENT))
+	if w := properties.Get("build.warn_data_percentage"); w != "" {
+		warnDataPercentage, err := strconv.Atoi(w)
 		if err != nil {
 			return err
 		}
 		if maxDataSize > 0 && dataSize > maxDataSize*warnDataPercentage/100 {
-			logger.Println(constants.LOG_LEVEL_WARN, constants.MSG_SIZER_LOW_MEMORY)
+			logger.Println("warn", "Low memory available, stability problems may occur.")
 		}
 	}
 
@@ -129,7 +134,7 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 }
 
 func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
-	command, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_SIZE_PATTERN, false)
+	command, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.size.pattern", false)
 	if err != nil {
 		resErr = errors.New("Error while determining sketch size: " + err.Error())
 		return
@@ -144,7 +149,7 @@ func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize in
 	// force multiline match prepending "(?m)" to the actual regexp
 	// return an error if RECIPE_SIZE_REGEXP doesn't exist
 
-	textSize, err = computeSize(properties.Get(constants.RECIPE_SIZE_REGEXP), out)
+	textSize, err = computeSize(properties.Get("recipe.size.regex"), out)
 	if err != nil {
 		resErr = errors.New("Invalid size regexp: " + err.Error())
 		return
@@ -154,13 +159,13 @@ func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize in
 		return
 	}
 
-	dataSize, err = computeSize(properties.Get(constants.RECIPE_SIZE_REGEXP_DATA), out)
+	dataSize, err = computeSize(properties.Get("recipe.size.regex.data"), out)
 	if err != nil {
 		resErr = errors.New("Invalid data size regexp: " + err.Error())
 		return
 	}
 
-	eepromSize, err = computeSize(properties.Get(constants.RECIPE_SIZE_REGEXP_EEPROM), out)
+	eepromSize, err = computeSize(properties.Get("recipe.size.regex.eeprom"), out)
 	if err != nil {
 		resErr = errors.New("Invalid eeprom size regexp: " + err.Error())
 		return
