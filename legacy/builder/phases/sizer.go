@@ -16,6 +16,7 @@
 package phases
 
 import (
+	"encoding/json"
 	"regexp"
 	"strconv"
 
@@ -40,11 +41,56 @@ func (s *Sizer) Run(ctx *types.Context) error {
 
 	buildProperties := ctx.BuildProperties
 
-	err := checkSize(ctx, buildProperties)
-	if err != nil {
+	if buildProperties.ContainsKey("recipe.advanced_size.pattern") {
+		err := checkSizeAdvanced(ctx, buildProperties)
 		return errors.WithStack(err)
 	}
 
+	err := checkSize(ctx, buildProperties)
+	return errors.WithStack(err)
+}
+
+func checkSizeAdvanced(ctx *types.Context, properties *properties.Map) error {
+	command, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.advanced_size.pattern", false)
+	if err != nil {
+		return errors.New("Error while determining sketch size: " + err.Error())
+	}
+
+	out, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Show /* stderr */)
+	if err != nil {
+		return errors.New("Error while determining sketch size: " + err.Error())
+	}
+
+	type AdvancedSizerResponse struct {
+		// Output are the messages displayed in console to the user
+		Output string `json:"output"`
+		// Severity may be one of "info", "warning" or "error". Warnings and errors will
+		// likely be printed in red. Errors will stop build/upload.
+		Severity string `json:"severity"`
+		// Sections are the sections sizes for machine readable use
+		Sections []types.ExecutableSectionSize `json:"sections"`
+		// ErrorMessage is a one line error message like:
+		// "text section exceeds available space in board"
+		// it must be set when Severity is "error"
+		ErrorMessage string `json:"error"`
+	}
+
+	var resp AdvancedSizerResponse
+	if err := json.Unmarshal(out, &resp); err != nil {
+		return errors.New("Error while determining sketch size: " + err.Error())
+	}
+
+	ctx.ExecutableSectionsSize = resp.Sections
+	logger := ctx.GetLogger()
+	switch resp.Severity {
+	case "error":
+		logger.Println("error", "{0}", resp.Output)
+		return errors.New(resp.ErrorMessage)
+	case "warning":
+		logger.Println("warn", "{0}", resp.Output)
+	default: // "info"
+		logger.Println("info", "{0}", resp.Output)
+	}
 	return nil
 }
 
