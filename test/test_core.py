@@ -370,7 +370,8 @@ def test_core_search_manually_installed_cores_not_printed(run_command, data_dir)
     res = run_command("core search --format json")
     assert res.ok
     cores = json.loads(res.stdout)
-    assert len(cores) == 17
+    num_cores = len(cores)
+    assert num_cores > 0
 
     # Manually installs a core in sketchbooks hardware folder
     git_url = "https://github.com/arduino/ArduinoCore-avr.git"
@@ -381,7 +382,7 @@ def test_core_search_manually_installed_cores_not_printed(run_command, data_dir)
     res = run_command("core search --format json")
     assert res.ok
     cores = json.loads(res.stdout)
-    assert len(cores) == 17
+    assert num_cores == len(cores)
     mapped = {core["ID"]: core for core in cores}
     core_id = "arduino-beta-development:avr"
     assert core_id not in mapped
@@ -394,7 +395,8 @@ def test_core_list_all_manually_installed_core(run_command, data_dir):
     res = run_command("core list --all --format json")
     assert res.ok
     cores = json.loads(res.stdout)
-    assert len(cores) == 17
+    num_cores = len(cores)
+    assert num_cores > 0
 
     # Manually installs a core in sketchbooks hardware folder
     git_url = "https://github.com/arduino/ArduinoCore-avr.git"
@@ -405,7 +407,7 @@ def test_core_list_all_manually_installed_core(run_command, data_dir):
     res = run_command("core list --all --format json")
     assert res.ok
     cores = json.loads(res.stdout)
-    assert len(cores) == 18
+    assert num_cores + 1 == len(cores)
     mapped = {core["ID"]: core for core in cores}
     expected_core_id = "arduino-beta-development:avr"
     assert expected_core_id in mapped
@@ -420,7 +422,8 @@ def test_core_list_updatable_all_flags(run_command, data_dir):
     res = run_command("core list --all --updatable --format json")
     assert res.ok
     cores = json.loads(res.stdout)
-    assert len(cores) == 17
+    num_cores = len(cores)
+    assert num_cores > 0
 
     # Manually installs a core in sketchbooks hardware folder
     git_url = "https://github.com/arduino/ArduinoCore-avr.git"
@@ -431,7 +434,7 @@ def test_core_list_updatable_all_flags(run_command, data_dir):
     res = run_command("core list --all --updatable --format json")
     assert res.ok
     cores = json.loads(res.stdout)
-    assert len(cores) == 18
+    assert num_cores + 1 == len(cores)
     mapped = {core["ID"]: core for core in cores}
     expected_core_id = "arduino-beta-development:avr"
     assert expected_core_id in mapped
