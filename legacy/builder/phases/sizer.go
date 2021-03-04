@@ -16,6 +16,7 @@
 package phases
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -41,11 +42,53 @@ func (s *Sizer) Run(ctx *types.Context) error {
 
 	buildProperties := ctx.BuildProperties
 
-	err := checkSize(ctx, buildProperties)
-	if err != nil {
-		return errors.WithStack(err)
+	if buildProperties.ContainsKey("recipe.advanced_size.pattern") {
+		return checkSizeAdvanced(ctx, buildProperties)
 	}
 
+	return checkSize(ctx, buildProperties)
+}
+
+func checkSizeAdvanced(ctx *types.Context, properties *properties.Map) error {
+	command, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.advanced_size.pattern", false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	if err != nil {
+		return errors.New(tr("Error while determining sketch size: %s", err))
+	}
+
+	out, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Show /* stderr */)
+	if err != nil {
+		return errors.New(tr("Error while determining sketch size: %s", err))
+	}
+
+	type AdvancedSizerResponse struct {
+		// Output are the messages displayed in console to the user
+		Output string `json:"output"`
+		// Severity may be one of "info", "warning" or "error". Warnings and errors will
+		// likely be printed in red. Errors will stop build/upload.
+		Severity string `json:"severity"`
+		// Sections are the sections sizes for machine readable use
+		Sections []types.ExecutableSectionSize `json:"sections"`
+		// ErrorMessage is a one line error message like:
+		// "text section exceeds available space in board"
+		// it must be set when Severity is "error"
+		ErrorMessage string `json:"error"`
+	}
+
+	var resp AdvancedSizerResponse
+	if err := json.Unmarshal(out, &resp); err != nil {
+		return errors.New(tr("Error while determining sketch size: %s", err))
+	}
+
+	ctx.ExecutableSectionsSize = resp.Sections
+	switch resp.Severity {
+	case "error":
+		ctx.Warn(resp.Output)
+		return errors.New(resp.ErrorMessage)
+	case "warning":
+		ctx.Warn(resp.Output)
+	default: // or "info"
+		ctx.Info(resp.Output)
+	}
 	return nil
 }
 
