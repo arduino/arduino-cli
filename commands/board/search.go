@@ -18,6 +18,7 @@ package board
 import (
 	"context"
 	"errors"
+	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands"
@@ -74,14 +75,6 @@ func Search(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResp,
 				ManuallyInstalled: platform.ManuallyInstalled,
 			}
 
-			toTest := []string{
-				platform.String(),
-				platform.Name,
-				platform.Architecture,
-				targetPackage.Name,
-				targetPackage.Maintainer,
-			}
-
 			// Platforms that are not installed don't have a list of boards
 			// generated from their boards.txt file so we need two different
 			// ways of reading board data.
@@ -93,10 +86,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResp,
 						continue
 					}
 
-					toTest := toTest
-					toTest = append(toTest, strings.Split(board.Name(), " ")...)
-					toTest = append(toTest, board.Name())
-					toTest = append(toTest, board.FQBN())
+					toTest := append(strings.Split(board.Name(), " "), board.Name(), board.FQBN())
 					if !match(toTest) {
 						continue
 					}
@@ -110,8 +100,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResp,
 				}
 			} else {
 				for _, board := range latestPlatformRelease.BoardsManifest {
-					toTest = append(toTest, strings.Split(board.Name, " ")...)
-					toTest = append(toTest, board.Name)
+					toTest := append(strings.Split(board.Name, " "), board.Name)
 					if !match(toTest) {
 						continue
 					}
@@ -124,5 +113,9 @@ func Search(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResp,
 			}
 		}
 	}
+
+	sort.Slice(res.Boards, func(i, j int) bool {
+		return res.Boards[i].Name < res.Boards[j].Name
+	})
 	return res, nil
 }
