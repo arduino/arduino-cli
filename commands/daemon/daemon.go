@@ -59,6 +59,11 @@ func (s *ArduinoCoreServerImpl) BoardListAll(ctx context.Context, req *rpc.Board
 	return board.ListAll(ctx, req)
 }
 
+// BoardSearch exposes to the gRPC interface the board search command
+func (s *ArduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResp, error) {
+	return board.Search(ctx, req)
+}
+
 // BoardListWatch FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCore_BoardListWatchServer) error {
 	msg, err := stream.Recv()
