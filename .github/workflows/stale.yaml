@@ -7,6 +7,10 @@ on:
   issue_comment:
     types: ["created"]
 
+env:
+  # Name of the label used to mark issues as stale.
+  STALE_LABEL: "status: stale"
+
 jobs:
   stale-bot:
     runs-on: ubuntu-latest
@@ -41,7 +45,7 @@ jobs:
               github.issues.addLabels({
                 ...context.repo,
                 issue_number: issue.number,
-                labels: ['stale']
+                labels: ['${{ env.STALE_LABEL }}']
               });
             }
 
@@ -52,7 +56,7 @@ jobs:
           github-token: ${{github.token}}
           script: |
             // Every time a comment is added to an issue, close it if it contains
-            // the `stale` label.
+            // the stale label.
 
             // Load issue's labels.
             const opts = github.issues.listLabelsOnIssue.endpoint.merge({
@@ -61,13 +65,13 @@ jobs:
             });
             const labels = await github.paginate(opts);
 
-            // Search for `stale`.
+            // Search for stale label.
             for (const label of labels) {
-              if (label.name === 'stale') {
+              if (label.name === '${{ env.STALE_LABEL }}') {
                 await github.issues.removeLabel({
                   ...context.repo,
                   issue_number: context.issue.number,
-                  name: 'stale'
+                  name: '${{ env.STALE_LABEL }}'
                 })
                 return;
               }
@@ -79,11 +83,11 @@ jobs:
         with:
           github-token: ${{github.token}}
           script: |
-            // Load all the `stale` issues
+            // Load all the stale issues
             const opts = github.issues.listForRepo.endpoint.merge({
               ...context.repo,
               state: 'open',
-              labels: ['stale'],
+              labels: ['${{ env.STALE_LABEL }}'],
             });
             const issues = await github.paginate(opts);
 
