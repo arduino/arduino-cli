@@ -24,7 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
-	"github.com/facchinm/gohex"
+	"github.com/marcinbor85/gohex"
 	"github.com/pkg/errors"
 )
 
