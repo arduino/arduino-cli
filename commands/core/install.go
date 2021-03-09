@@ -91,7 +91,10 @@ func installPlatform(pm *packagemanager.PackageManager,
 			return err
 		}
 	}
-	downloadPlatform(pm, platformRelease, downloadCB)
+	err := downloadPlatform(pm, platformRelease, downloadCB)
+	if err != nil {
+		return err
+	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 
 	// Install tools first
@@ -114,7 +117,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 	}
 
 	// Install
-	err := pm.InstallPlatform(platformRelease)
+	err = pm.InstallPlatform(platformRelease)
 	if err != nil {
 		log.WithError(err).Error("Cannot install platform")
 		return err
