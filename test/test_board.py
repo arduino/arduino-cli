@@ -606,6 +606,18 @@ def test_board_search(run_command, data_dir):
     assert "Arduino Nano 33 BLE" in names
     assert "Arduino Portenta H7" in names
 
+    # Search in non installed boards
+    res = run_command("board search --format json nano 33")
+    assert res.ok
+    data = json.loads(res.stdout)
+    # Verifies boards are returned
+    assert len(data) > 0
+    # Verifies no board has FQBN set since no platform is installed
+    assert len([board["FQBN"] for board in data if "FQBN" in board]) == 0
+    names = [board["name"] for board in data if "name" in board]
+    assert "Arduino Nano 33 BLE" in names
+    assert "Arduino Nano 33 IoT" in names
+
     # Install a platform from index
     assert run_command("core install arduino:avr@1.8.3")
 
@@ -618,6 +630,14 @@ def test_board_search(run_command, data_dir):
     installed_boards = {board["FQBN"]: board for board in data if "FQBN" in board}
     assert "arduino:avr:uno" in installed_boards
     assert "Arduino Uno" == installed_boards["arduino:avr:uno"]["name"]
+    assert "arduino:avr:yun" in installed_boards
+    assert "Arduino Yún" == installed_boards["arduino:avr:yun"]["name"]
+
+    res = run_command("board search --format json arduino yun")
+    assert res.ok
+    data = json.loads(res.stdout)
+    assert len(data) > 0
+    installed_boards = {board["FQBN"]: board for board in data if "FQBN" in board}
     assert "arduino:avr:yun" in installed_boards
     assert "Arduino Yún" == installed_boards["arduino:avr:yun"]["name"]
 
@@ -646,38 +666,6 @@ def test_board_search(run_command, data_dir):
     assert "arduino-beta-development:samd:nano_33_iot" in installed_boards
     assert "Arduino NANO 33 IoT" == installed_boards["arduino-beta-development:samd:nano_33_iot"]["name"]
     assert "arduino-beta-development:samd:arduino_zero_native" in installed_boards
-
-
-def test_board_search_fuzzy(run_command, data_dir):
-    assert run_command("update")
-
-    # Search in non installed boards
-    res = run_command("board search --format json nano 33")
-    assert res.ok
-    data = json.loads(res.stdout)
-    # Verifies boards are returned
-    assert len(data) > 0
-    # Verifies no board has FQBN set since no platform is installed
-    assert len([board["FQBN"] for board in data if "FQBN" in board]) == 0
-    names = [board["name"] for board in data if "name" in board]
-    assert "Arduino Nano 33 BLE" in names
-    assert "Arduino Nano 33 IoT" in names
-
-    # Install a platform from index
-    assert run_command("core install arduino:avr@1.8.3")
-
-    res = run_command("board search --format json arduino yun")
-    assert res.ok
-    data = json.loads(res.stdout)
-    assert len(data) > 0
-    installed_boards = {board["FQBN"]: board for board in data if "FQBN" in board}
-    assert "arduino:avr:yun" in installed_boards
-    assert "Arduino Yún" == installed_boards["arduino:avr:yun"]["name"]
-
-    # Manually installs a core in sketchbooks hardware folder
-    git_url = "https://github.com/arduino/ArduinoCore-samd.git"
-    repo_dir = Path(data_dir, "hardware", "arduino-beta-development", "samd")
-    assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.11"])
 
     res = run_command("board search --format json mkr1000")
     assert res.ok

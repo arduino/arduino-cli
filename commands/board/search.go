@@ -21,9 +21,9 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 // Search returns all boards that match the search arg.
@@ -36,20 +36,23 @@ func Search(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResp,
 		return nil, errors.New("invalid instance")
 	}
 
-	searchArgs := strings.Trim(req.SearchArgs, " ")
+	searchArgs := strings.Split(strings.Trim(req.SearchArgs, " "), " ")
 
-	match := func(toTest []string) bool {
+	match := func(toTest []string) (bool, error) {
 		if len(searchArgs) == 0 {
-			return true
+			return true, nil
 		}
-		const maximumSearchDistance = 20
 
-		for _, rank := range fuzzy.RankFindNormalizedFold(searchArgs, toTest) {
-			if rank.Distance < maximumSearchDistance {
-				return true
+		for _, t := range toTest {
+			matches, err := utils.Match(t, searchArgs)
+			if err != nil {
+				return false, err
+			}
+			if matches {
+				return matches, nil
 			}
 		}
-		return false
+		return false, nil
 	}
 
 	res := &rpc.BoardSearchResp{Boards: []*rpc.BoardListItem{}}
@@ -87,7 +90,9 @@ func Search(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResp,
 					}
 
 					toTest := append(strings.Split(board.Name(), " "), board.Name(), board.FQBN())
-					if !match(toTest) {
+					if ok, err := match(toTest); err != nil {
+						return nil, err
+					} else if !ok {
 						continue
 					}
 
@@ -101,7 +106,9 @@ func Search(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResp,
 			} else {
 				for _, board := range latestPlatformRelease.BoardsManifest {
 					toTest := append(strings.Split(board.Name, " "), board.Name)
-					if !match(toTest) {
+					if ok, err := match(toTest); err != nil {
+						return nil, err
+					} else if !ok {
 						continue
 					}
 
