@@ -238,3 +238,17 @@ message BoardListItem {
     // Platform this board belongs to
     Platform platform = 6;
 }
+
+message BoardSearchReq {
+    // Arduino Core Service instance from the `Init` response.
+    Instance instance = 1;
+    // The search query to filter the board list by.
+    string search_args = 2;
+    // Set to true to get also the boards marked as "hidden" in installed platforms
+    bool include_hidden_boards = 3;
+}
+
+message BoardSearchResp {
+    // List of installed and installable boards.
+    repeated BoardListItem boards = 1;
+}

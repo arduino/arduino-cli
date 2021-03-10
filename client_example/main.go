@@ -150,6 +150,9 @@ func main() {
 	log.Println("calling BoardDetails(arduino:samd:mkr1000)")
 	callBoardsDetails(client, instance)
 
+	log.Println("calling BoardSearch()")
+	callBoardSearch(client, instance)
+
 	// Attach a board to a sketch.
 	// Uncomment if you do have an actual board connected.
 	// log.Println("calling BoardAttach(serial:///dev/ttyACM0)")
@@ -522,6 +525,22 @@ func callBoardsDetails(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
 	log.Printf("Board details for %s", details.GetName())
 	log.Printf("Required tools: %s", details.GetToolsDependencies())
 	log.Printf("Config options: %s", details.GetConfigOptions())
+}
+
+func callBoardSearch(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
+	res, err := client.BoardSearch(context.Background(),
+		&rpc.BoardSearchReq{
+			Instance:   instance,
+			SearchArgs: "",
+		})
+
+	if err != nil {
+		log.Fatalf("Error getting board data: %s\n", err)
+	}
+
+	for _, board := range res.Boards {
+		log.Printf("Board Name: %s, Board Platform: %s\n", board.Name, board.Platform.ID)
+	}
 }
 
 func callBoardAttach(client rpc.ArduinoCoreClient, instance *rpc.Instance) {
