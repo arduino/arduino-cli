@@ -185,6 +185,7 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 			Protocol:      port.Protocol,
 			ProtocolLabel: port.ProtocolLabel,
 			Boards:        boards,
+			SerialNumber:  port.Prefs.Get("serialNumber"),
 		}
 		retVal = append(retVal, p)
 	}
@@ -222,6 +223,11 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 					}
 				}
 
+				serialNumber := ""
+				if props := event.Port.Properties; props != nil {
+					serialNumber = props.Get("serialNumber")
+				}
+
 				outChan <- &rpc.BoardListWatchResp{
 					EventType: event.Type,
 					Port: &rpc.DetectedPort{
@@ -229,6 +235,7 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 						Protocol:      event.Port.Protocol,
 						ProtocolLabel: event.Port.ProtocolLabel,
 						Boards:        boards,
+						SerialNumber:  serialNumber,
 					},
 					Error: boardsError,
 				}

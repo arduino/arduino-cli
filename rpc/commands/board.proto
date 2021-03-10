@@ -59,6 +59,8 @@ message BoardDetailsResp {
     repeated Programmer programmers = 13;
     // Set to true if the board supports debugging
     bool debugging_supported = 14;
+    // If a board with the specified FQBN is connected returns its serial number too
+    string serialNumber = 15;
 }
 
 message IdentificationPref {
@@ -192,6 +194,8 @@ message DetectedPort {
     string protocol_label = 3;
     // The boards attached to the port.
     repeated BoardListItem boards = 4;
+    // Serial number of connected board
+    string serial_number = 5;
 }
 
 message BoardListAllReq {
