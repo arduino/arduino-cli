@@ -3180,6 +3180,12 @@
 <td></td>
 <td>Set to true if the board supports debugging</td>
 </tr>
+<tr>
+<td>serialNumber</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>If a board with the specified FQBN is connected returns its serial number too</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.BoardListAllReq"></a></p>
@@ -3589,6 +3595,12 @@
 <td><a href="#cc.arduino.cli.commands.BoardListItem">BoardListItem</a></td>
 <td>repeated</td>
 <td>The boards attached to the port.</td>
+</tr>
+<tr>
+<td>serial_number</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Serial number of connected board</td>
 </tr>
 </tbody>
 </table>
