@@ -1035,6 +1035,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#boardsearchreq" class="md-nav__link">
+    BoardSearchReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#boardsearchresp" class="md-nav__link">
+    BoardSearchResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#configoption" class="md-nav__link">
     ConfigOption
   </a>
@@ -2038,6 +2052,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#boardsearchreq" class="md-nav__link">
+    BoardSearchReq
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#boardsearchresp" class="md-nav__link">
+    BoardSearchResp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#configoption" class="md-nav__link">
     ConfigOption
   </a>
@@ -2821,6 +2849,8 @@
 <li><a href="#cc.arduino.cli.commands.BoardListWatchReq">BoardListWatchReq</a></li>
 <li><a href="#cc.arduino.cli.commands.BoardListWatchResp">BoardListWatchResp</a></li>
 <li><a href="#cc.arduino.cli.commands.BoardPlatform">BoardPlatform</a></li>
+<li><a href="#cc.arduino.cli.commands.BoardSearchReq">BoardSearchReq</a></li>
+<li><a href="#cc.arduino.cli.commands.BoardSearchResp">BoardSearchResp</a></li>
 <li><a href="#cc.arduino.cli.commands.ConfigOption">ConfigOption</a></li>
 <li><a href="#cc.arduino.cli.commands.ConfigValue">ConfigValue</a></li>
 <li><a href="#cc.arduino.cli.commands.DetectedPort">DetectedPort</a></li>
@@ -3405,6 +3435,58 @@
 <td><a href="#string">string</a></td>
 <td></td>
 <td>Name used to identify the platform to humans.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.BoardSearchReq"></a></p>
+<h3 id="boardsearchreq">BoardSearchReq<a class="headerlink" href="#boardsearchreq" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.Instance">Instance</a></td>
+<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
+</tr>
+<tr>
+<td>search_args</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The search query to filter the board list by.</td>
+</tr>
+<tr>
+<td>include_hidden_boards</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>Set to true to get also the boards marked as &#34;hidden&#34; in installed platforms</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.BoardSearchResp"></a></p>
+<h3 id="boardsearchresp">BoardSearchResp<a class="headerlink" href="#boardsearchresp" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>boards</td>
+<td><a href="#cc.arduino.cli.commands.BoardListItem">BoardListItem</a></td>
+<td>repeated</td>
+<td>List of installed and installable boards.</td>
 </tr>
 </tbody>
 </table>
@@ -4291,6 +4373,12 @@
 <td><a href="#cc.arduino.cli.commands.BoardListAllReq">BoardListAllReq</a></td>
 <td><a href="#cc.arduino.cli.commands.BoardListAllResp">BoardListAllResp</a></td>
 <td>List all the boards provided by installed platforms.</td>
+</tr>
+<tr>
+<td>BoardSearch</td>
+<td><a href="#cc.arduino.cli.commands.BoardSearchReq">BoardSearchReq</a></td>
+<td><a href="#cc.arduino.cli.commands.BoardSearchResp">BoardSearchResp</a></td>
+<td>Search boards in installed and not installed Platforms.</td>
 </tr>
 <tr>
 <td>BoardListWatch</td>
