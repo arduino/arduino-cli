@@ -109,6 +109,7 @@ func watchList(cmd *cobra.Command, inst *rpc.Instance) {
 			Protocol:      event.Port.Protocol,
 			ProtocolLabel: event.Port.ProtocolLabel,
 			Boards:        event.Port.Boards,
+			SerialNumber:  event.Port.SerialNumber,
 			Error:         event.Error,
 		})
 	}
@@ -181,6 +182,7 @@ type watchEvent struct {
 	Protocol      string               `json:"protocol,omitempty"`
 	ProtocolLabel string               `json:"protocol_label,omitempty"`
 	Boards        []*rpc.BoardListItem `json:"boards,omitempty"`
+	SerialNumber  string               `json:"serial_number,omitempty"`
 	Error         string               `json:"error,omitempty"`
 }
 

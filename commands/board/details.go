@@ -146,25 +146,5 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		})
 	}
 
-	// Get connected boards
-	ports, err := commands.ListBoards(pm)
-	if err != nil {
-		return nil, err
-	}
-	for _, port := range ports {
-		// Skip the port if serial number is not found
-		if !port.Prefs.ContainsKey("serialNumber") {
-			continue
-		}
-
-		// Search for a board with the same FQBN set in request
-		for _, board := range pm.IdentifyBoard(port.IdentificationPrefs) {
-			if board.FQBN() == req.Fqbn {
-				details.SerialNumber = port.Prefs.Get("serialNumber")
-				break
-			}
-		}
-	}
-
 	return details, nil
 }
