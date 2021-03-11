@@ -440,3 +440,37 @@ def test_core_list_updatable_all_flags(run_command, data_dir):
     assert expected_core_id in mapped
     assert "Arduino AVR Boards" == mapped[expected_core_id]["Name"]
     assert "1.8.3" == mapped[expected_core_id]["Latest"]
+
+
+def test_core_upgrade_removes_unused_tools(run_command, data_dir):
+    assert run_command("update")
+
+    # Installs a core
+    assert run_command("core install arduino:avr@1.8.2")
+
+    # Verifies expected tool is installed
+    tool_path = Path(data_dir, "packages", "arduino", "tools", "avr-gcc", "7.3.0-atmel3.6.1-arduino5")
+    assert tool_path.exists()
+
+    # Upgrades core
+    assert run_command("core upgrade arduino:avr")
+
+    # Verifies tool is uninstalled since it's not used by newer core version
+    assert not tool_path.exists()
+
+
+def test_core_install_removes_unused_tools(run_command, data_dir):
+    assert run_command("update")
+
+    # Installs a core
+    assert run_command("core install arduino:avr@1.8.2")
+
+    # Verifies expected tool is installed
+    tool_path = Path(data_dir, "packages", "arduino", "tools", "avr-gcc", "7.3.0-atmel3.6.1-arduino5")
+    assert tool_path.exists()
+
+    # Installs newer version of already installed core
+    assert run_command("core install arduino:avr@1.8.3")
+
+    # Verifies tool is uninstalled since it's not used by newer core version
+    assert not tool_path.exists()

@@ -519,6 +519,17 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeReq, downloadCB DownloadProgre
 				}
 
 				ref := &packagemanager.PlatformReference{
+					Package:              installedRelease.Platform.Package.Name,
+					PlatformArchitecture: installedRelease.Platform.Architecture,
+					PlatformVersion:      installedRelease.Version,
+				}
+				// Get list of installed tools needed by the currently installed version
+				_, installedTools, err := pm.FindPlatformReleaseDependencies(ref)
+				if err != nil {
+					return err
+				}
+
+				ref = &packagemanager.PlatformReference{
 					Package:              latest.Platform.Package.Name,
 					PlatformArchitecture: latest.Platform.Architecture,
 					PlatformVersion:      latest.Version,
@@ -587,6 +598,24 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeReq, downloadCB DownloadProgre
 						logrus.WithError(err).Error("Error rolling-back changes.")
 						taskCB(&rpc.TaskProgress{Message: "Error rolling-back changes: " + err.Error()})
 						return err
+					}
+				}
+
+				// Uninstall unused tools
+				for _, toolRelease := range installedTools {
+					if !pm.IsToolRequired(toolRelease) {
+						log := pm.Log.WithField("Tool", toolRelease)
+
+						log.Info("Uninstalling tool")
+						taskCB(&rpc.TaskProgress{Name: "Uninstalling " + toolRelease.String() + ", tool is no more required"})
+
+						if err := pm.UninstallTool(toolRelease); err != nil {
+							log.WithError(err).Error("Error uninstalling")
+							return err
+						}
+
+						log.Info("Tool uninstalled")
+						taskCB(&rpc.TaskProgress{Message: toolRelease.String() + " uninstalled", Completed: true})
 					}
 				}
 

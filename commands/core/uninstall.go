@@ -63,7 +63,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallReq, taskC
 
 	for _, tool := range tools {
 		if !pm.IsToolRequired(tool) {
-			uninstallToolReleasse(pm, tool, taskCB)
+			uninstallToolRelease(pm, tool, taskCB)
 		}
 	}
 
@@ -90,7 +90,7 @@ func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease
 	return nil
 }
 
-func uninstallToolReleasse(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, taskCB commands.TaskProgressCB) error {
+func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, taskCB commands.TaskProgressCB) error {
 	log := pm.Log.WithField("Tool", toolRelease)
 
 	log.Info("Uninstalling tool")
