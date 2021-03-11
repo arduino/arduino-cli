@@ -50,7 +50,10 @@ message StreamingOpenReq {
 // Tells the monitor which target to open and provides additional parameters
 // that might be needed to configure the target or the monitor itself.
 message MonitorConfig {
-  enum TargetType { SERIAL = 0; }
+  enum TargetType {
+    SERIAL = 0;
+    NULL = 99;
+  }
 
   // The target name.
   string target = 1;

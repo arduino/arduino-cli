@@ -16,6 +16,7 @@
 package daemon
 
 import (
+	"errors"
 	"fmt"
 	"io"
 
@@ -60,6 +61,16 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 		var err error
 		if mon, err = monitors.OpenSerialMonitor(config.GetTarget(), int(baudRate)); err != nil {
 			return err
+		}
+
+	case rpc.MonitorConfig_NULL:
+		if addCfg, ok := config.GetAdditionalConfig().AsMap()["OutputRate"]; !ok {
+			mon = monitors.OpenNullMonitor(100.0) // 100 bytes per second as default
+		} else if outputRate, ok := addCfg.(float64); !ok {
+			return errors.New("OutputRate in Null monitor must be a float64")
+		} else {
+			// get the Monitor instance
+			mon = monitors.OpenNullMonitor(outputRate)
 		}
 	}
 
