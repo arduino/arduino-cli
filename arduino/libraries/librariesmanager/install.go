@@ -132,7 +132,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 	libraryName := extractionPath.Base()
 	installPath := libsDir.Join(libraryName)
 
-	if err := installPath.Parent().MkdirAll(); err != nil {
+	if err := libsDir.MkdirAll(); err != nil {
 		return err
 	}
 	defer func() {
