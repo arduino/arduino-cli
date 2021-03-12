@@ -76,11 +76,11 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 	if installFlags.zipPath {
 		for _, path := range args {
-			ziplibraryInstallReq := &rpc.ZipLibraryInstallReq{
-				Instance: instance,
-				Path:     path,
-			}
-			err := lib.ZipLibraryInstall(context.Background(), ziplibraryInstallReq, output.TaskProgress())
+			err := lib.ZipLibraryInstall(context.Background(), &rpc.ZipLibraryInstallReq{
+				Instance:  instance,
+				Path:      path,
+				Overwrite: true,
+			}, output.TaskProgress())
 			if err != nil {
 				feedback.Errorf("Error installing Zip Library: %v", err)
 				os.Exit(errorcodes.ErrGeneric)
@@ -99,11 +99,11 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 				}
 				url = wd.String()
 			}
-			gitlibraryInstallReq := &rpc.GitLibraryInstallReq{
-				Instance: instance,
-				Url:      url,
-			}
-			err := lib.GitLibraryInstall(context.Background(), gitlibraryInstallReq, output.TaskProgress())
+			err := lib.GitLibraryInstall(context.Background(), &rpc.GitLibraryInstallReq{
+				Instance:  instance,
+				Url:       url,
+				Overwrite: true,
+			}, output.TaskProgress())
 			if err != nil {
 				feedback.Errorf("Error installing Git Library: %v", err)
 				os.Exit(errorcodes.ErrGeneric)

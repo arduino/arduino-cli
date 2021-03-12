@@ -94,7 +94,7 @@ func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 }
 
 //InstallZipLib  installs a Zip library on the specified path.
-func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath string) error {
+func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath string, overwrite bool) error {
 	libsDir := lm.getUserLibrariesDir()
 	if libsDir == nil {
 		return fmt.Errorf("User directory not set")
@@ -104,6 +104,8 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 	if err != nil {
 		return err
 	}
+	// Deletes temp dir used to extract archive when finished
+	defer tmpDir.RemoveAll()
 
 	file, err := os.Open(archivePath)
 	if err != nil {
@@ -126,11 +128,26 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 		return fmt.Errorf("archive is not valid: multiple files found in zip file top level")
 	}
 
-	libraryName := paths[0].Base()
+	extractionPath := paths[0]
+	libraryName := extractionPath.Base()
 	installPath := libsDir.Join(libraryName)
 
-	// Deletes libraries folder if already installed
-	if _, ok := lm.Libraries[libraryName]; ok {
+	if err := libsDir.MkdirAll(); err != nil {
+		return err
+	}
+	defer func() {
+		// Clean up install dir if installation failed
+		files, err := installPath.ReadDir()
+		if err == nil && len(files) == 0 {
+			installPath.RemoveAll()
+		}
+	}()
+
+	// Delete library folder if already installed
+	if installPath.IsDir() {
+		if !overwrite {
+			return fmt.Errorf("library %s already installed", libraryName)
+		}
 		logrus.
 			WithField("library name", libraryName).
 			WithField("install path", installPath).
@@ -144,15 +161,16 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 		WithField("zip file", archivePath).
 		Trace("Installing library")
 
-	if err := tmpDir.Join(libraryName).CopyDirTo(installPath); err != nil {
-		return fmt.Errorf("copying library: %w", err)
+	// Copy extracted library in the destination directory
+	if err := extractionPath.CopyDirTo(installPath); err != nil {
+		return fmt.Errorf("moving extracted archive to destination dir: %s", err)
 	}
 
 	return nil
 }
 
 //InstallGitLib  installs a library hosted on a git repository on the specified path.
-func (lm *LibrariesManager) InstallGitLib(gitURL string) error {
+func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 	libsDir := lm.getUserLibrariesDir()
 	if libsDir == nil {
 		return fmt.Errorf("User directory not set")
@@ -170,6 +188,9 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string) error {
 
 	// Deletes libraries folder if already installed
 	if _, ok := lm.Libraries[libraryName]; ok {
+		if !overwrite {
+			return fmt.Errorf("library %s already installed", libraryName)
+		}
 		logrus.
 			WithField("library name", libraryName).
 			WithField("install path", installPath).

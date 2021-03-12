@@ -302,6 +302,8 @@ message ZipLibraryInstallReq {
     Instance instance = 1;
     //Path to the archived library
     string Path = 2;
+    // Set to true to overwrite an already installed library with the same name. Defaults to false.
+    bool overwrite = 3;
 }
 
 message ZipLibraryInstallResp {
@@ -314,6 +316,8 @@ message GitLibraryInstallReq {
     Instance instance = 1;
     // URL to the repository containing the library
     string url = 2;
+    // Set to true to overwrite an already installed library with the same name. Defaults to false.
+    bool overwrite = 3;
 }
 
 message GitLibraryInstallResp {
