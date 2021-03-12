@@ -104,6 +104,8 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 	if err != nil {
 		return err
 	}
+	// Deletes temp dir used to extract archive when finished
+	defer tmpDir.RemoveAll()
 
 	file, err := os.Open(archivePath)
 	if err != nil {
@@ -116,10 +118,6 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 	if err := extract.Archive(ctx, file, tmpDir.String(), nil); err != nil {
 		return fmt.Errorf("extracting archive: %w", err)
 	}
-	defer func() {
-		// Deletes temp dir used to extract archive
-		tmpDir.RemoveAll()
-	}()
 
 	paths, err := tmpDir.ReadDir()
 	if err != nil {
@@ -139,12 +137,9 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 	}
 	defer func() {
 		// Clean up install dir if installation failed
-		files, err := installPath.Parent().ReadDir()
-		if err != nil {
-			return
-		}
-		if len(files) == 0 {
-			installPath.Parent().RemoveAll()
+		files, err := installPath.ReadDir()
+		if err == nil && len(files) == 0 {
+			installPath.RemoveAll()
 		}
 	}()
 
