@@ -30,7 +30,7 @@ import (
 // Boards are searched in all platforms, including those in the index that are not yet
 // installed. Note that platforms that are not installed don't include boards' FQBNs.
 // If no search argument is used all boards are returned.
-func Search(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResponse, error) {
+func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")

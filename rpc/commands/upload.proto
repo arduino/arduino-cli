@@ -21,7 +21,7 @@ option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 
 import "commands/common.proto";
 
-message UploadReq {
+message UploadRequest {
 	// Arduino Core Service instance from the `Init` response.
 	Instance instance = 1;
 	// Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
@@ -58,7 +58,7 @@ message UploadResponse {
 	bytes err_stream = 2;
 }
 
-message UploadUsingProgrammerReq {
+message UploadUsingProgrammerRequest {
 	// Arduino Core Service instance from the `Init` response.
 	Instance instance = 1;
 	// Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
@@ -93,7 +93,7 @@ message UploadUsingProgrammerResponse {
 	bytes err_stream = 2;
 }
 
-message BurnBootloaderReq {
+message BurnBootloaderRequest {
 	// Arduino Core Service instance from the `Init` response.
 	Instance instance = 1;
 	// Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
@@ -116,7 +116,7 @@ message BurnBootloaderResponse {
 	bytes err_stream = 2;
 }
 
-message ListProgrammersAvailableForUploadReq {
+message ListProgrammersAvailableForUploadRequest {
 	Instance instance = 1;
 	string fqbn = 2;
 }

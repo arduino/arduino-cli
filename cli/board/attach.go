@@ -64,7 +64,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		path = initSketchPath(path)
 	}
 
-	if _, err = board.Attach(context.Background(), &rpc.BoardAttachReq{
+	if _, err = board.Attach(context.Background(), &rpc.BoardAttachRequest{
 		Instance:      instance,
 		BoardUri:      args[0],
 		SketchPath:    path.String(),

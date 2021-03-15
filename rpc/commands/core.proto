@@ -21,7 +21,7 @@ option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 
 import "commands/common.proto";
 
-message PlatformInstallReq {
+message PlatformInstallRequest {
 	// Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
 	// Vendor name of the platform (e.g., `arduino`).
@@ -41,7 +41,7 @@ message PlatformInstallResponse {
 	TaskProgress task_progress = 2;
 }
 
-message PlatformDownloadReq {
+message PlatformDownloadRequest {
 	// Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
 	string platform_package  = 2;
@@ -56,7 +56,7 @@ message PlatformDownloadResponse {
 	DownloadProgress progress = 1;
 }
 
-message PlatformUninstallReq {
+message PlatformUninstallRequest {
 	// Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
 	// Vendor name of the platform (e.g., `arduino`).
@@ -70,7 +70,7 @@ message PlatformUninstallResponse {
 	TaskProgress task_progress = 1;
 }
 
-message PlatformUpgradeReq {
+message PlatformUpgradeRequest {
 	// Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
 	// Vendor name of the platform (e.g., `arduino`).
@@ -88,7 +88,7 @@ message PlatformUpgradeResponse {
 	TaskProgress task_progress = 2;
 }
 
-message PlatformSearchReq {
+message PlatformSearchRequest {
 	// Arduino Core Service instance from the `Init` response.
 	Instance instance = 1;
 	// Keywords for the search.
@@ -103,7 +103,7 @@ message PlatformSearchResponse {
 	repeated Platform search_output = 1;
 }
 
-message PlatformListReq {
+message PlatformListRequest {
 	// Arduino Core Service instance from the `Init` response.
 	Instance instance = 1;
 	// Set to true to only list platforms which have a newer version available

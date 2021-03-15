@@ -57,7 +57,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino core list`")
 
-	platforms, err := core.GetPlatforms(&rpc.PlatformListReq{
+	platforms, err := core.GetPlatforms(&rpc.PlatformListRequest{
 		Instance:      inst,
 		UpdatableOnly: listFlags.updatableOnly,
 		All:           listFlags.all,

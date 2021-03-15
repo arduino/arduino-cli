@@ -64,7 +64,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		name = args[0]
 	}
 
-	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
+	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListRequest{
 		Instance:  instance,
 		All:       listFlags.all,
 		Updatable: listFlags.updatable,

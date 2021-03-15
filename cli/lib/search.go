@@ -54,7 +54,7 @@ var searchFlags struct {
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
 
-	err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexReq{
+	err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
 		Instance: instance,
 	}, output.ProgressBar())
 	if err != nil {
@@ -63,7 +63,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	}
 
 	logrus.Info("Executing `arduino lib search`")
-	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
+	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance: instance,
 		Query:    (strings.Join(args, " ")),
 	})

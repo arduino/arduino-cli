@@ -74,7 +74,7 @@ func runArchiveCommand(cmd *cobra.Command, args []string) {
 	}
 
 	_, err := sketch.ArchiveSketch(context.Background(),
-		&rpc.ArchiveSketchReq{
+		&rpc.ArchiveSketchRequest{
 			SketchPath:      sketchPath,
 			ArchivePath:     archivePath,
 			IncludeBuildDir: includeBuildDir,

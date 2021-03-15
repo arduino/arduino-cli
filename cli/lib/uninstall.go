@@ -52,7 +52,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for _, library := range refs {
-		err := lib.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{
+		err := lib.LibraryUninstall(context.Background(), &rpc.LibraryUninstallRequest{
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version,

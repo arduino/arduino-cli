@@ -58,7 +58,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	res, err := board.Search(context.Background(), &rpc.BoardSearchReq{
+	res, err := board.Search(context.Background(), &rpc.BoardSearchRequest{
 		Instance:            inst,
 		SearchArgs:          strings.Join(args, " "),
 		IncludeHiddenBoards: searchFlags.showHiddenBoard,

@@ -53,7 +53,7 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino update`")
 
-	err := commands.UpdateCoreLibrariesIndex(context.Background(), &rpc.UpdateCoreLibrariesIndexReq{
+	err := commands.UpdateCoreLibrariesIndex(context.Background(), &rpc.UpdateCoreLibrariesIndexRequest{
 		Instance: instance,
 	}, output.ProgressBar())
 	if err != nil {
@@ -62,7 +62,7 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if updateFlags.showOutdated {
-		outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedReq{
+		outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedRequest{
 			Instance: instance,
 		})
 		if err != nil {

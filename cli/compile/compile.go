@@ -152,7 +152,7 @@ func run(cmd *cobra.Command, args []string) {
 		overrides = o.Overrides
 	}
 
-	compileReq := &rpc.CompileReq{
+	compileRequest := &rpc.CompileRequest{
 		Instance:                      inst,
 		Fqbn:                          fqbn,
 		SketchPath:                    sketchPath.String(),
@@ -177,13 +177,13 @@ func run(cmd *cobra.Command, args []string) {
 	verboseCompile := configuration.Settings.GetString("logging.level") == "debug"
 	var compileRes *rpc.CompileResponse
 	if output.OutputFormat == "json" {
-		compileRes, err = compile.Compile(context.Background(), compileReq, compileOut, compileErr, verboseCompile)
+		compileRes, err = compile.Compile(context.Background(), compileRequest, compileOut, compileErr, verboseCompile)
 	} else {
-		compileRes, err = compile.Compile(context.Background(), compileReq, os.Stdout, os.Stderr, verboseCompile)
+		compileRes, err = compile.Compile(context.Background(), compileRequest, os.Stdout, os.Stderr, verboseCompile)
 	}
 
 	if err == nil && uploadAfterCompile {
-		uploadReq := &rpc.UploadReq{
+		uploadRequest := &rpc.UploadRequest{
 			Instance:   inst,
 			Fqbn:       fqbn,
 			SketchPath: sketchPath.String(),
@@ -198,9 +198,9 @@ func run(cmd *cobra.Command, args []string) {
 			// TODO: do not print upload output in json mode
 			uploadOut := new(bytes.Buffer)
 			uploadErr := new(bytes.Buffer)
-			_, err = upload.Upload(context.Background(), uploadReq, uploadOut, uploadErr)
+			_, err = upload.Upload(context.Background(), uploadRequest, uploadOut, uploadErr)
 		} else {
-			_, err = upload.Upload(context.Background(), uploadReq, os.Stdout, os.Stderr)
+			_, err = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
 		}
 		if err != nil {
 			feedback.Errorf("Error during Upload: %v", err)

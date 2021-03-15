@@ -66,7 +66,7 @@ func run(command *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if _, err := upload.BurnBootloader(context.Background(), &rpc.BurnBootloaderReq{
+	if _, err := upload.BurnBootloader(context.Background(), &rpc.BurnBootloaderRequest{
 		Instance:   instance,
 		Fqbn:       fqbn,
 		Port:       port,

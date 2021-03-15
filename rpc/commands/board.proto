@@ -21,7 +21,7 @@ option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 
 import "commands/common.proto";
 
-message BoardDetailsReq {
+message BoardDetailsRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     // The fully qualified board name of the board you want information about
@@ -157,7 +157,7 @@ message ConfigValue {
     bool selected = 3;
 }
 
-message BoardAttachReq {
+message BoardAttachRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     // The board's URI (e.g., /dev/ttyACM0).
@@ -175,7 +175,7 @@ message BoardAttachResponse {
     TaskProgress task_progress = 1;
 }
 
-message BoardListReq {
+message BoardListRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
 }
@@ -198,7 +198,7 @@ message DetectedPort {
     string serial_number = 5;
 }
 
-message BoardListAllReq {
+message BoardListAllRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     // The search query to filter the board list by.
@@ -212,7 +212,7 @@ message BoardListAllResponse {
     repeated BoardListItem boards = 1;
 }
 
-message BoardListWatchReq {
+message BoardListWatchRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     // Set this to true to stop the discovery process
@@ -243,7 +243,7 @@ message BoardListItem {
     Platform platform = 6;
 }
 
-message BoardSearchReq {
+message BoardSearchRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     // The search query to filter the board list by.

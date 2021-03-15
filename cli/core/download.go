@@ -60,7 +60,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for i, platformRef := range platformsRefs {
-		platformDownloadreq := &rpc.PlatformDownloadReq{
+		platformDownloadreq := &rpc.PlatformDownloadRequest{
 			Instance:        inst,
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,

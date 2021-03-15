@@ -131,7 +131,7 @@ func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB
 }
 
 // Init FIXMEDOC
-func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (*rpc.InitResponse, error) {
+func Init(ctx context.Context, req *rpc.InitRequest, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (*rpc.InitResponse, error) {
 	res, err := createInstance(ctx, req.GetLibraryManagerOnly())
 	if err != nil {
 		return nil, fmt.Errorf("cannot initialize package manager: %s", err)
@@ -158,7 +158,7 @@ func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, 
 }
 
 // Destroy FIXMEDOC
-func Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResponse, error) {
+func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse, error) {
 	id := req.GetInstance().GetId()
 	if _, ok := instances[id]; !ok {
 		return nil, fmt.Errorf("invalid handle")
@@ -169,7 +169,7 @@ func Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResponse, er
 }
 
 // UpdateLibrariesIndex updates the library_index.json
-func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexReq, downloadCB func(*rpc.DownloadProgress)) error {
+func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB func(*rpc.DownloadProgress)) error {
 	logrus.Info("Updating libraries index")
 	lm := GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
@@ -194,7 +194,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexReq,
 }
 
 // UpdateIndex FIXMEDOC
-func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResponse, error) {
+func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResponse, error) {
 	id := req.GetInstance().GetId()
 	_, ok := instances[id]
 	if !ok {
@@ -317,15 +317,15 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 }
 
 // UpdateCoreLibrariesIndex updates both Cores and Libraries indexes
-func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexReq, downloadCB DownloadProgressCB) error {
-	_, err := UpdateIndex(ctx, &rpc.UpdateIndexReq{
+func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexRequest, downloadCB DownloadProgressCB) error {
+	_, err := UpdateIndex(ctx, &rpc.UpdateIndexRequest{
 		Instance: req.Instance,
 	}, downloadCB)
 	if err != nil {
 		return err
 	}
 
-	err = UpdateLibrariesIndex(ctx, &rpc.UpdateLibrariesIndexReq{
+	err = UpdateLibrariesIndex(ctx, &rpc.UpdateLibrariesIndexRequest{
 		Instance: req.Instance,
 	}, downloadCB)
 	if err != nil {
@@ -336,7 +336,7 @@ func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesI
 }
 
 // Outdated returns a list struct containing both Core and Libraries that can be updated
-func Outdated(ctx context.Context, req *rpc.OutdatedReq) (*rpc.OutdatedResponse, error) {
+func Outdated(ctx context.Context, req *rpc.OutdatedRequest) (*rpc.OutdatedResponse, error) {
 	id := req.GetInstance().GetId()
 
 	libraryManager := GetLibraryManager(id)
@@ -454,7 +454,7 @@ func getOutputRelease(lib *librariesindex.Release) *rpc.LibraryRelease {
 }
 
 // Upgrade downloads and installs outdated Cores and Libraries
-func Upgrade(ctx context.Context, req *rpc.UpgradeReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
+func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
 	downloaderConfig, err := GetDownloaderConfig()
 	if err != nil {
 		return err
@@ -757,7 +757,7 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 }
 
 // LoadSketch collects and returns all files composing a sketch
-func LoadSketch(ctx context.Context, req *rpc.LoadSketchReq) (*rpc.LoadSketchResponse, error) {
+func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
 	sketch, err := builder.SketchLoad(req.SketchPath, "")
 	if err != nil {
 		return nil, fmt.Errorf("Error loading sketch %v: %v", req.SketchPath, err)

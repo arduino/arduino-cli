@@ -32,126 +32,126 @@ service ArduinoCoreService {
   //-------------------
 
   // Start a new instance of the Arduino Core Service
-  rpc Init(InitReq) returns (stream InitResponse) {}
+  rpc Init(InitRequest) returns (stream InitResponse) {}
 
   // Destroy an instance of the Arduino Core Service
-  rpc Destroy(DestroyReq) returns (DestroyResponse) {}
+  rpc Destroy(DestroyRequest) returns (DestroyResponse) {}
 
   // Rescan instance of the Arduino Core Service
-  rpc Rescan(RescanReq) returns (RescanResponse) {}
+  rpc Rescan(RescanRequest) returns (RescanResponse) {}
 
   // Update package index of the Arduino Core Service
-  rpc UpdateIndex(UpdateIndexReq) returns (stream UpdateIndexResponse) {}
+  rpc UpdateIndex(UpdateIndexRequest) returns (stream UpdateIndexResponse) {}
 
   // Update libraries index
-  rpc UpdateLibrariesIndex(UpdateLibrariesIndexReq) returns (stream UpdateLibrariesIndexResponse) {}
+  rpc UpdateLibrariesIndex(UpdateLibrariesIndexRequest) returns (stream UpdateLibrariesIndexResponse) {}
 
   // Update packages indexes for both Cores and Libraries
-  rpc UpdateCoreLibrariesIndex(UpdateCoreLibrariesIndexReq) returns (stream UpdateCoreLibrariesIndexResponse) {}
+  rpc UpdateCoreLibrariesIndex(UpdateCoreLibrariesIndexRequest) returns (stream UpdateCoreLibrariesIndexResponse) {}
 
   // Outdated returns a message with a list of outdated Cores and Libraries
-  rpc Outdated(OutdatedReq) returns (OutdatedResponse) {}
+  rpc Outdated(OutdatedRequest) returns (OutdatedResponse) {}
 
   // Upgrade both Cores and Libraries
-  rpc Upgrade(UpgradeReq) returns (stream UpgradeResponse) {}
+  rpc Upgrade(UpgradeRequest) returns (stream UpgradeResponse) {}
 
   // Get the version of Arduino CLI in use.
-  rpc Version(VersionReq) returns (VersionResponse) {}
+  rpc Version(VersionRequest) returns (VersionResponse) {}
 
   // Returns all files composing a Sketch
-  rpc LoadSketch(LoadSketchReq) returns (LoadSketchResponse) {}
+  rpc LoadSketch(LoadSketchRequest) returns (LoadSketchResponse) {}
 
   // Creates a zip file containing all files of specified Sketch
-  rpc ArchiveSketch(ArchiveSketchReq) returns (ArchiveSketchResponse) {}
+  rpc ArchiveSketch(ArchiveSketchRequest) returns (ArchiveSketchResponse) {}
 
   // BOARD COMMANDS
   // --------------
 
   // Requests details about a board
-  rpc BoardDetails(BoardDetailsReq) returns (BoardDetailsResponse);
+  rpc BoardDetails(BoardDetailsRequest) returns (BoardDetailsResponse);
 
   // Attach a board to a sketch. When the `fqbn` field of a request is not
   // provided, the FQBN of the attached board will be used.
-  rpc BoardAttach(BoardAttachReq) returns (stream BoardAttachResponse);
+  rpc BoardAttach(BoardAttachRequest) returns (stream BoardAttachResponse);
 
   // List the boards currently connected to the computer.
-  rpc BoardList(BoardListReq) returns (BoardListResponse);
+  rpc BoardList(BoardListRequest) returns (BoardListResponse);
 
   // List all the boards provided by installed platforms.
-  rpc BoardListAll(BoardListAllReq) returns (BoardListAllResponse);
+  rpc BoardListAll(BoardListAllRequest) returns (BoardListAllResponse);
 
   // Search boards in installed and not installed Platforms.
-  rpc BoardSearch(BoardSearchReq) returns (BoardSearchResponse);
+  rpc BoardSearch(BoardSearchRequest) returns (BoardSearchResponse);
 
   // List boards connection and disconnected events.
-  rpc BoardListWatch(stream BoardListWatchReq) returns (stream BoardListWatchResponse);
+  rpc BoardListWatch(stream BoardListWatchRequest) returns (stream BoardListWatchResponse);
 
   // Compile an Arduino sketch.
-  rpc Compile(CompileReq) returns (stream CompileResponse);
+  rpc Compile(CompileRequest) returns (stream CompileResponse);
 
   // Download and install a platform and its tool dependencies.
-  rpc PlatformInstall(PlatformInstallReq) returns (stream PlatformInstallResponse);
+  rpc PlatformInstall(PlatformInstallRequest) returns (stream PlatformInstallResponse);
 
   // Download a platform and its tool dependencies to the `staging/packages`
   // subdirectory of the data directory.
-  rpc PlatformDownload(PlatformDownloadReq) returns (stream PlatformDownloadResponse);
+  rpc PlatformDownload(PlatformDownloadRequest) returns (stream PlatformDownloadResponse);
 
   // Uninstall a platform as well as its tool dependencies that are not used by
   // other installed platforms.
-  rpc PlatformUninstall(PlatformUninstallReq) returns (stream PlatformUninstallResponse);
+  rpc PlatformUninstall(PlatformUninstallRequest) returns (stream PlatformUninstallResponse);
 
   // Upgrade an installed platform to the latest version.
-  rpc PlatformUpgrade(PlatformUpgradeReq) returns (stream PlatformUpgradeResponse);
+  rpc PlatformUpgrade(PlatformUpgradeRequest) returns (stream PlatformUpgradeResponse);
 
   // Upload a compiled sketch to a board.
-  rpc Upload(UploadReq) returns (stream UploadResponse);
+  rpc Upload(UploadRequest) returns (stream UploadResponse);
 
   // Upload a compiled sketch to a board using a programmer.
-  rpc UploadUsingProgrammer(UploadUsingProgrammerReq) returns (stream UploadUsingProgrammerResponse);
+  rpc UploadUsingProgrammer(UploadUsingProgrammerRequest) returns (stream UploadUsingProgrammerResponse);
 
   // List programmers available for a board.
-  rpc ListProgrammersAvailableForUpload(ListProgrammersAvailableForUploadReq) returns (ListProgrammersAvailableForUploadResponse);
+  rpc ListProgrammersAvailableForUpload(ListProgrammersAvailableForUploadRequest) returns (ListProgrammersAvailableForUploadResponse);
 
   // Burn bootloader to a board.
-  rpc BurnBootloader(BurnBootloaderReq) returns (stream BurnBootloaderResponse);
+  rpc BurnBootloader(BurnBootloaderRequest) returns (stream BurnBootloaderResponse);
 
   // Search for a platform in the platforms indexes.
-  rpc PlatformSearch(PlatformSearchReq) returns (PlatformSearchResponse);
+  rpc PlatformSearch(PlatformSearchRequest) returns (PlatformSearchResponse);
 
   // List all installed platforms.
-  rpc PlatformList(PlatformListReq) returns (PlatformListResponse);
+  rpc PlatformList(PlatformListRequest) returns (PlatformListResponse);
 
   // Download the archive file of an Arduino library in the libraries index to
   // the staging directory.
-  rpc LibraryDownload(LibraryDownloadReq) returns (stream LibraryDownloadResponse);
+  rpc LibraryDownload(LibraryDownloadRequest) returns (stream LibraryDownloadResponse);
 
   // Download and install an Arduino library from the libraries index.
-  rpc LibraryInstall(LibraryInstallReq) returns (stream LibraryInstallResponse);
+  rpc LibraryInstall(LibraryInstallRequest) returns (stream LibraryInstallResponse);
 
   // Install a library from a Zip File
-  rpc ZipLibraryInstall(ZipLibraryInstallReq) returns (stream ZipLibraryInstallResponse);
+  rpc ZipLibraryInstall(ZipLibraryInstallRequest) returns (stream ZipLibraryInstallResponse);
 
   // Download and install a library from a git url
-  rpc GitLibraryInstall(GitLibraryInstallReq) returns (stream GitLibraryInstallResponse);
+  rpc GitLibraryInstall(GitLibraryInstallRequest) returns (stream GitLibraryInstallResponse);
 
   // Uninstall an Arduino library.
-  rpc LibraryUninstall(LibraryUninstallReq) returns (stream LibraryUninstallResponse);
+  rpc LibraryUninstall(LibraryUninstallRequest) returns (stream LibraryUninstallResponse);
 
   // Upgrade all installed Arduino libraries to the newest version available.
-  rpc LibraryUpgradeAll(LibraryUpgradeAllReq) returns (stream LibraryUpgradeAllResponse);
+  rpc LibraryUpgradeAll(LibraryUpgradeAllRequest) returns (stream LibraryUpgradeAllResponse);
 
   // List the recursive dependencies of a library, as defined by the `depends`
   // field of the library.properties files.
-  rpc LibraryResolveDependencies(LibraryResolveDependenciesReq) returns (LibraryResolveDependenciesResponse);
+  rpc LibraryResolveDependencies(LibraryResolveDependenciesRequest) returns (LibraryResolveDependenciesResponse);
 
   // Search the Arduino libraries index for libraries.
-  rpc LibrarySearch(LibrarySearchReq) returns (LibrarySearchResponse);
+  rpc LibrarySearch(LibrarySearchRequest) returns (LibrarySearchResponse);
 
   // List the installed libraries.
-  rpc LibraryList(LibraryListReq) returns (LibraryListResponse);
+  rpc LibraryList(LibraryListRequest) returns (LibraryListResponse);
 }
 
-message InitReq {
+message InitRequest {
   // Start a Arduino Core Service instance that will provide only Library
   // Manager functionality.
   bool library_manager_only = 2;
@@ -172,13 +172,13 @@ message InitResponse {
   TaskProgress task_progress = 5;
 }
 
-message DestroyReq {
+message DestroyRequest {
   // The Arduino Core Service instance to destroy.
   Instance instance = 1;
 }
 message DestroyResponse {}
 
-message RescanReq {
+message RescanRequest {
   // Arduino Core Service instance from the Init response.
   Instance instance = 1;
 }
@@ -192,7 +192,7 @@ message RescanResponse {
   string libraries_index_error = 2;
 }
 
-message UpdateIndexReq {
+message UpdateIndexRequest {
   // Arduino Core Service instance from the Init response.
   Instance instance = 1;
 }
@@ -202,7 +202,7 @@ message UpdateIndexResponse {
   DownloadProgress download_progress = 1;
 }
 
-message UpdateLibrariesIndexReq {
+message UpdateLibrariesIndexRequest {
   // Arduino Core Service instance from the Init response.
   Instance instance = 1;
 }
@@ -212,7 +212,7 @@ message UpdateLibrariesIndexResponse {
   DownloadProgress download_progress = 1;
 }
 
-message UpdateCoreLibrariesIndexReq {
+message UpdateCoreLibrariesIndexRequest {
   // Arduino Core Service instance from the Init response.
   Instance instance = 1;
 }
@@ -222,7 +222,7 @@ message UpdateCoreLibrariesIndexResponse {
   DownloadProgress download_progress = 1;
 }
 
-message OutdatedReq {
+message OutdatedRequest {
   // Arduino Core Service instance from the Init response.
   Instance instance = 1;
 }
@@ -234,7 +234,7 @@ message OutdatedResponse {
   repeated Platform outdated_platform = 2;
 }
 
-message UpgradeReq {
+message UpgradeRequest {
   // Arduino Core Service instance from the Init response.
   Instance instance = 1;
 
@@ -249,14 +249,14 @@ message UpgradeResponse {
   TaskProgress task_progress = 2;
 }
 
-message VersionReq {}
+message VersionRequest {}
 
 message VersionResponse {
   // The version of Arduino CLI in use.
   string version = 1;
 }
 
-message LoadSketchReq {
+message LoadSketchRequest {
   // Arduino Core Service instance from the Init response.
   Instance instance = 1;
   // Absolute path to single sketch file or a sketch folder
@@ -276,7 +276,7 @@ message LoadSketchResponse {
   repeated string root_folder_files = 5;
 }
 
-message ArchiveSketchReq{
+message ArchiveSketchRequest{
   // Absolute path to Sketch file or folder containing Sketch file
   string sketch_path = 1;
   // Absolute path to archive that will be created or folder that will contain it

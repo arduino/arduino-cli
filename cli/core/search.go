@@ -58,7 +58,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	_, err = commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
+	_, err = commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{
 		Instance: inst,
 	}, output.ProgressBar())
 	if err != nil {
@@ -69,7 +69,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	arguments := strings.ToLower(strings.Join(args, " "))
 	logrus.Infof("Executing `arduino core search` with args: '%s'", arguments)
 
-	resp, err := core.PlatformSearch(&rpc.PlatformSearchReq{
+	resp, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:    inst,
 		SearchArgs:  arguments,
 		AllVersions: allVersions,

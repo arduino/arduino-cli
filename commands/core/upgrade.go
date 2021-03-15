@@ -32,7 +32,7 @@ var (
 )
 
 // PlatformUpgrade FIXMEDOC
-func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
+func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())

@@ -53,7 +53,7 @@ func runOutdatedCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino outdated`")
 
-	outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedReq{
+	outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedRequest{
 		Instance: inst,
 	})
 	if err != nil {

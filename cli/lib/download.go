@@ -51,12 +51,12 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for _, library := range refs {
-		libraryDownloadReq := &rpc.LibraryDownloadReq{
+		libraryDownloadRequest := &rpc.LibraryDownloadRequest{
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version,
 		}
-		_, err := lib.LibraryDownload(context.Background(), libraryDownloadReq, output.ProgressBar())
+		_, err := lib.LibraryDownload(context.Background(), libraryDownloadRequest, output.ProgressBar())
 		if err != nil {
 			feedback.Errorf("Error downloading %s: %v", library, err)
 			os.Exit(errorcodes.ErrNetwork)

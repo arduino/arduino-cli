@@ -91,7 +91,7 @@ func run(command *cobra.Command, args []string) {
 		}
 	}
 
-	if _, err := upload.Upload(context.Background(), &rpc.UploadReq{
+	if _, err := upload.Upload(context.Background(), &rpc.UploadRequest{
 		Instance:   instance,
 		Fqbn:       fqbn,
 		SketchPath: sketchPath.String(),

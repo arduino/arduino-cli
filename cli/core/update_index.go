@@ -45,7 +45,7 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
 	logrus.Info("Executing `arduino core update-index`")
 
-	_, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
+	_, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{
 		Instance: instance,
 	}, output.ProgressBar())
 	if err != nil {

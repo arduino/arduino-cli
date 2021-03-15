@@ -45,7 +45,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, inst)
 
-	res, err := PlatformSearch(&rpc.PlatformSearchReq{
+	res, err := PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:    inst,
 		SearchArgs:  "retrokit",
 		AllVersions: true,
@@ -75,7 +75,7 @@ func TestPlatformSearch(t *testing.T) {
 		Boards:     []*commands.Board{{Name: "RK002"}},
 	})
 
-	res, err = PlatformSearch(&rpc.PlatformSearchReq{
+	res, err = PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:    inst,
 		SearchArgs:  "retrokit",
 		AllVersions: false,
@@ -95,7 +95,7 @@ func TestPlatformSearch(t *testing.T) {
 	})
 
 	// Search the Package Maintainer
-	res, err = PlatformSearch(&rpc.PlatformSearchReq{
+	res, err = PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:    inst,
 		SearchArgs:  "Retrokits (www.retrokits.com)",
 		AllVersions: true,
@@ -125,7 +125,7 @@ func TestPlatformSearch(t *testing.T) {
 	})
 
 	// Search using the Package name
-	res, err = PlatformSearch(&rpc.PlatformSearchReq{
+	res, err = PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:    inst,
 		SearchArgs:  "Retrokits-RK002",
 		AllVersions: true,
@@ -155,7 +155,7 @@ func TestPlatformSearch(t *testing.T) {
 	})
 
 	// Search using the Platform name
-	res, err = PlatformSearch(&rpc.PlatformSearchReq{
+	res, err = PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:    inst,
 		SearchArgs:  "rk002",
 		AllVersions: true,
@@ -185,7 +185,7 @@ func TestPlatformSearch(t *testing.T) {
 	})
 
 	// Search using a board name
-	res, err = PlatformSearch(&rpc.PlatformSearchReq{
+	res, err = PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:    inst,
 		SearchArgs:  "Yún",
 		AllVersions: true,
@@ -231,7 +231,7 @@ func TestPlatformSearch(t *testing.T) {
 		},
 	})
 
-	res, err = PlatformSearch(&rpc.PlatformSearchReq{
+	res, err = PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:    inst,
 		SearchArgs:  "yun",
 		AllVersions: true,

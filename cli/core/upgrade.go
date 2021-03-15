@@ -57,7 +57,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
-		targets, err := core.GetPlatforms(&rpc.PlatformListReq{
+		targets, err := core.GetPlatforms(&rpc.PlatformListRequest{
 			Instance:      inst,
 			UpdatableOnly: true,
 		})
@@ -91,7 +91,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			continue
 		}
 
-		r := &rpc.PlatformUpgradeReq{
+		r := &rpc.PlatformUpgradeRequest{
 			Instance:        inst,
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,

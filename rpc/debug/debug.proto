@@ -24,10 +24,10 @@ import "commands/common.proto";
 // DebugService abstracts a debug Session usage
 service DebugService {
     // Start a debug session and communicate with the debugger tool.
-    rpc Debug (stream DebugReq) returns (stream DebugResponse) {
+    rpc Debug (stream DebugRequest) returns (stream DebugResponse) {
     }
 
-    rpc GetDebugConfig(DebugConfigReq) returns (GetDebugConfigResponse) {}
+    rpc GetDebugConfig(DebugConfigRequest) returns (GetDebugConfigResponse) {}
 }
 
 // The top-level message sent by the client for the `Debug` method.
@@ -35,13 +35,13 @@ service DebugService {
 // must contain a `DebugConfigReq` message to initialize the debug session.
 // All subsequent messages must contain bytes to be sent to the debug session
 // and must not contain a `DebugReq` message.
-message DebugReq {
+message DebugRequest {
     // Content must be either a debug session config or data to be sent.
 
     // Provides information to the debug that specifies which is the target.
     // The first `StreamingOpenReq` message must contain a `DebugReq`
     // message.
-    DebugConfigReq debugReq = 1;
+    DebugConfigRequest debugRequest = 1;
 
     // The data to be sent to the target being monitored.
     bytes data = 2;
@@ -50,7 +50,7 @@ message DebugReq {
     bool send_interrupt = 3;
 }
 
-message DebugConfigReq {
+message DebugConfigRequest {
     // Arduino Core Service instance from the `Init` response.
     cc.arduino.cli.commands.Instance instance = 1;
     // Fully qualified board name of the board in use

@@ -81,7 +81,7 @@ func run(command *cobra.Command, args []string) {
 	}
 	sketchPath := initSketchPath(path)
 
-	debugConfigRequested := &dbg.DebugConfigReq{
+	debugConfigRequested := &dbg.DebugConfigRequest{
 		Instance:    instance,
 		Fqbn:        fqbn,
 		SketchPath:  sketchPath.String(),

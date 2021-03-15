@@ -66,7 +66,7 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 		fqbn = args[0]
 	}
 
-	res, err := board.Details(context.Background(), &rpc.BoardDetailsReq{
+	res, err := board.Details(context.Background(), &rpc.BoardDetailsRequest{
 		Instance: inst,
 		Fqbn:     fqbn,
 	})

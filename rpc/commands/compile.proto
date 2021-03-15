@@ -23,7 +23,7 @@ import "google/protobuf/wrappers.proto";
 import "commands/common.proto";
 import "commands/lib.proto";
 
-message CompileReq {
+message CompileRequest {
   Instance instance = 1;  // Arduino Core Service instance from the `Init` response.
   string fqbn = 2;   // Fully Qualified Board Name, e.g.: `arduino:avr:uno`. If this field is not defined, the FQBN of the board attached to the sketch via the `BoardAttach` method is used.
   string sketchPath = 3;  // The path where the sketch is stored.

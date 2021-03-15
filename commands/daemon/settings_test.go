@@ -54,7 +54,7 @@ func TestMerge(t *testing.T) {
 	require.Equal(t, false, configuration.Settings.GetBool("sketch.always_export_binaries"))
 
 	bulkSettings := `{"foo": "bar", "daemon":{"port":"420"}, "sketch": {"always_export_binaries": "true"}}`
-	res, err := svc.Merge(context.Background(), &rpc.RawData{JsonData: bulkSettings})
+	res, err := svc.Merge(context.Background(), &rpc.MergeRequest{JsonData: bulkSettings})
 	require.NotNil(t, res)
 	require.NoError(t, err)
 
@@ -63,7 +63,7 @@ func TestMerge(t *testing.T) {
 	require.Equal(t, true, configuration.Settings.GetBool("sketch.always_export_binaries"))
 
 	bulkSettings = `{"foo":"", "daemon": {}, "sketch": {"always_export_binaries": "false"}}`
-	res, err = svc.Merge(context.Background(), &rpc.RawData{JsonData: bulkSettings})
+	res, err = svc.Merge(context.Background(), &rpc.MergeRequest{JsonData: bulkSettings})
 	require.NotNil(t, res)
 	require.NoError(t, err)
 
@@ -72,7 +72,7 @@ func TestMerge(t *testing.T) {
 	require.Equal(t, false, configuration.Settings.GetBool("sketch.always_export_binaries"))
 
 	bulkSettings = `{"daemon": {"port":""}}`
-	res, err = svc.Merge(context.Background(), &rpc.RawData{JsonData: bulkSettings})
+	res, err = svc.Merge(context.Background(), &rpc.MergeRequest{JsonData: bulkSettings})
 	require.NotNil(t, res)
 	require.NoError(t, err)
 
@@ -105,7 +105,7 @@ func TestGetMergedValue(t *testing.T) {
 
 	// Merge value
 	bulkSettings := `{"foo": "bar"}`
-	_, err = svc.Merge(context.Background(), &rpc.RawData{JsonData: bulkSettings})
+	_, err = svc.Merge(context.Background(), &rpc.MergeRequest{JsonData: bulkSettings})
 	require.NoError(t, err)
 
 	// Verifies value is correctly returned
@@ -123,7 +123,7 @@ func TestGetValueNotFound(t *testing.T) {
 }
 
 func TestSetValue(t *testing.T) {
-	val := &rpc.Value{
+	val := &rpc.SetValueRequest{
 		Key:      "foo",
 		JsonData: `"bar"`,
 	}
@@ -134,7 +134,7 @@ func TestSetValue(t *testing.T) {
 
 func TestWrite(t *testing.T) {
 	// Writes some settings
-	val := &rpc.Value{
+	val := &rpc.SetValueRequest{
 		Key:      "foo",
 		JsonData: `"bar"`,
 	}

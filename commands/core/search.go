@@ -31,7 +31,7 @@ import (
 const maximumSearchDistance = 20
 
 // PlatformSearch FIXMEDOC
-func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResponse, error) {
+func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, error) {
 	searchArgs := strings.Trim(req.SearchArgs, " ")
 	allVersions := req.AllVersions
 	pm := commands.GetPackageManager(req.Instance.Id)

@@ -35,7 +35,7 @@ type installedLib struct {
 }
 
 // LibraryList FIXMEDOC
-func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResponse, error) {
+func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")

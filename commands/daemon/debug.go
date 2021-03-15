@@ -31,7 +31,7 @@ type DebugService struct{}
 
 // Debug returns a stream response that can be used to fetch data from the
 // target. The first message passed through the `Debug` request must
-// contain DebugReq configuration params, not data.
+// contain DebugRequest configuration params, not data.
 func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 
 	// Grab the first message
@@ -41,7 +41,7 @@ func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 	}
 
 	// Ensure it's a config message and not data
-	req := msg.GetDebugReq()
+	req := msg.GetDebugRequest()
 	if req == nil {
 		return errors.Errorf("First message must contain debug request, not data")
 	}
@@ -68,6 +68,6 @@ func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 }
 
 // GetDebugConfig return metadata about a debug session
-func (s *DebugService) GetDebugConfig(ctx context.Context, req *debug.DebugConfigReq) (*debug.GetDebugConfigResponse, error) {
+func (s *DebugService) GetDebugConfig(ctx context.Context, req *debug.DebugConfigRequest) (*debug.GetDebugConfigResponse, error) {
 	return cmd.GetDebugConfig(ctx, req)
 }

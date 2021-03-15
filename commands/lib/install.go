@@ -27,7 +27,7 @@ import (
 )
 
 // LibraryInstall FIXMEDOC
-func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
+func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
@@ -39,7 +39,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
 			VersionRequired: req.Version,
 		}
 	} else {
-		res, err := LibraryResolveDependencies(ctx, &rpc.LibraryResolveDependenciesReq{
+		res, err := LibraryResolveDependencies(ctx, &rpc.LibraryResolveDependenciesRequest{
 			Instance: req.Instance,
 			Name:     req.Name,
 			Version:  req.Version,
@@ -60,7 +60,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallReq,
 	}
 
 	for _, lib := range toInstall {
-		libRelease, err := findLibraryIndexRelease(lm, &rpc.LibraryInstallReq{
+		libRelease, err := findLibraryIndexRelease(lm, &rpc.LibraryInstallRequest{
 			Name:    lib.Name,
 			Version: lib.VersionRequired,
 		})
@@ -109,7 +109,7 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 }
 
 //ZipLibraryInstall FIXMEDOC
-func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallReq, taskCB commands.TaskProgressCB) error {
+func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if err := lm.InstallZipLib(ctx, req.Path, req.Overwrite); err != nil {
 		return err
@@ -119,7 +119,7 @@ func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallReq, taskC
 }
 
 //GitLibraryInstall FIXMEDOC
-func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallReq, taskCB commands.TaskProgressCB) error {
+func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallRequest, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if err := lm.InstallGitLib(req.Url, req.Overwrite); err != nil {
 		return err

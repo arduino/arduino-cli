@@ -24,11 +24,11 @@ service SettingsService {
   // List all the settings.
   rpc GetAll(GetAllRequest) returns (GetAllResponse);
   // Set multiple settings values at once.
-  rpc Merge(RawData) returns (MergeResponse);
+  rpc Merge(MergeRequest) returns (MergeResponse);
   // Get the value of a specific setting.
   rpc GetValue(GetValueRequest) returns (GetValueResponse);
   // Set the value of a specific setting.
-  rpc SetValue(Value) returns (SetValueResponse);
+  rpc SetValue(SetValueRequest) returns (SetValueResponse);
   // Writes to file settings currently stored in memory
   rpc Write(WriteRequest) returns (WriteResponse);
 }
@@ -38,7 +38,7 @@ message GetAllResponse {
   string jsonData = 1;
 }
 
-message RawData {
+message MergeRequest {
     // The settings, in JSON format.
     string jsonData = 1;
 }
@@ -50,7 +50,7 @@ message GetValueResponse {
   string jsonData = 2;
 }
 
-message Value {
+message SetValueRequest {
   // The key of the setting.
   string key = 1;
   // The setting, in JSON format.

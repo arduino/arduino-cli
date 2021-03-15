@@ -25,7 +25,7 @@ import "google/protobuf/struct.proto";
 service MonitorService {
   // Open a bidirectional monitor stream. This can be used to implement
   // something similar to the Arduino IDE's Serial Monitor.
-  rpc StreamingOpen(stream StreamingOpenReq)
+  rpc StreamingOpen(stream StreamingOpenRequest)
       returns (stream StreamingOpenResponse) {}
 }
 
@@ -34,7 +34,7 @@ service MonitorService {
 // must contain a `monitor_config` message to initialize the monitor target.
 // All subsequent messages must contain bytes to be sent to the target
 // and must not contain a `monitor_config` message.
-message StreamingOpenReq {
+message StreamingOpenRequest {
   // Content must be either a monitor config or data to be sent.
   oneof content {
     // Provides information to the monitor that specifies which is the target.

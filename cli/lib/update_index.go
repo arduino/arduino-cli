@@ -37,7 +37,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			instance := instance.CreateInstanceIgnorePlatformIndexErrors()
-			err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexReq{
+			err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
 				Instance: instance,
 			}, output.ProgressBar())
 			if err != nil {

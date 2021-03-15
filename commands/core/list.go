@@ -23,7 +23,7 @@ import (
 
 // GetPlatforms returns a list of installed platforms, optionally filtered by
 // those requiring an update.
-func GetPlatforms(req *rpc.PlatformListReq) ([]*rpc.Platform, error) {
+func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
 	instanceID := req.Instance.Id
 	i := commands.GetInstance(instanceID)
 	if i == nil {

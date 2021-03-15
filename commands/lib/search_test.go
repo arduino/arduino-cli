@@ -16,7 +16,7 @@ func TestSearchLibrary(t *testing.T) {
 	lm := librariesmanager.NewLibraryManager(customIndexPath, nil)
 	lm.LoadIndex()
 
-	req := &rpc.LibrarySearchReq{
+	req := &rpc.LibrarySearchRequest{
 		Instance: &rpc.Instance{Id: 1},
 		Query:    "test",
 	}
@@ -37,7 +37,7 @@ func TestSearchLibrarySimilar(t *testing.T) {
 	lm := librariesmanager.NewLibraryManager(customIndexPath, nil)
 	lm.LoadIndex()
 
-	req := &rpc.LibrarySearchReq{
+	req := &rpc.LibrarySearchRequest{
 		Instance: &rpc.Instance{Id: 1},
 		Query:    "arduino",
 	}

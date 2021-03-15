@@ -56,7 +56,7 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	list, err := board.ListAll(context.Background(), &rpc.BoardListAllReq{
+	list, err := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
 		Instance:            inst,
 		SearchArgs:          args,
 		IncludeHiddenBoards: showHiddenBoard,

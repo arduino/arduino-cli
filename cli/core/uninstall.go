@@ -63,7 +63,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 	for _, platformRef := range platformsRefs {
-		_, err := core.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
+		_, err := core.PlatformUninstall(context.Background(), &rpc.PlatformUninstallRequest{
 			Instance:        inst,
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,

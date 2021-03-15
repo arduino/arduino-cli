@@ -48,7 +48,7 @@ func CreateInstance() (*rpc.Instance, error) {
 
 func getInitResponse() (*rpc.InitResponse, error) {
 	// invoke Init()
-	resp, err := commands.Init(context.Background(), &rpc.InitReq{}, output.ProgressBar(), output.TaskProgress())
+	resp, err := commands.Init(context.Background(), &rpc.InitRequest{}, output.ProgressBar(), output.TaskProgress())
 
 	// Init() failed
 	if err != nil {
@@ -66,7 +66,7 @@ func getInitResponse() (*rpc.InitResponse, error) {
 
 		// update all indexes
 		err := commands.UpdateLibrariesIndex(context.Background(),
-			&rpc.UpdateLibrariesIndexReq{Instance: resp.GetInstance()}, output.ProgressBar())
+			&rpc.UpdateLibrariesIndexRequest{Instance: resp.GetInstance()}, output.ProgressBar())
 		if err != nil {
 			return nil, errors.Wrap(err, "updating the library index")
 		}
@@ -95,7 +95,7 @@ func getInitResponse() (*rpc.InitResponse, error) {
 	if packageIndex.NotExist() {
 		// update platform index
 		_, err := commands.UpdateIndex(context.Background(),
-			&rpc.UpdateIndexReq{Instance: resp.GetInstance()}, output.ProgressBar())
+			&rpc.UpdateIndexRequest{Instance: resp.GetInstance()}, output.ProgressBar())
 		if err != nil {
 			return nil, errors.Wrap(err, "updating the core index")
 		}

@@ -76,7 +76,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 	if installFlags.zipPath {
 		for _, path := range args {
-			err := lib.ZipLibraryInstall(context.Background(), &rpc.ZipLibraryInstallReq{
+			err := lib.ZipLibraryInstall(context.Background(), &rpc.ZipLibraryInstallRequest{
 				Instance:  instance,
 				Path:      path,
 				Overwrite: true,
@@ -99,7 +99,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 				}
 				url = wd.String()
 			}
-			err := lib.GitLibraryInstall(context.Background(), &rpc.GitLibraryInstallReq{
+			err := lib.GitLibraryInstall(context.Background(), &rpc.GitLibraryInstallRequest{
 				Instance:  instance,
 				Url:       url,
 				Overwrite: true,
@@ -119,13 +119,13 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for _, libRef := range libRefs {
-		libraryInstallReq := &rpc.LibraryInstallReq{
+		libraryInstallRequest := &rpc.LibraryInstallRequest{
 			Instance: instance,
 			Name:     libRef.Name,
 			Version:  libRef.Version,
 			NoDeps:   installFlags.noDeps,
 		}
-		err := lib.LibraryInstall(context.Background(), libraryInstallReq, output.ProgressBar(), output.TaskProgress())
+		err := lib.LibraryInstall(context.Background(), libraryInstallRequest, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
 			feedback.Errorf("Error installing %s: %v", libRef.Name, err)
 			os.Exit(errorcodes.ErrGeneric)

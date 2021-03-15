@@ -21,7 +21,7 @@ option go_package = "github.com/arduino/arduino-cli/rpc/commands";
 
 import "commands/common.proto";
 
-message LibraryDownloadReq {
+message LibraryDownloadRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     // Name of the library.
@@ -35,7 +35,7 @@ message LibraryDownloadResponse {
     DownloadProgress progress = 1;
 }
 
-message LibraryInstallReq {
+message LibraryInstallRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     // Name of the library.
@@ -53,7 +53,7 @@ message LibraryInstallResponse {
     TaskProgress task_progress = 2;
 }
 
-message LibraryUninstallReq {
+message LibraryUninstallRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     // Name of the library.
@@ -67,7 +67,7 @@ message LibraryUninstallResponse {
     TaskProgress task_progress = 1;
 }
 
-message LibraryUpgradeAllReq {
+message LibraryUpgradeAllRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
 }
@@ -79,7 +79,7 @@ message LibraryUpgradeAllResponse {
     TaskProgress task_progress = 2;
 }
 
-message LibraryResolveDependenciesReq {
+message LibraryResolveDependenciesRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     // Name of the library.
@@ -103,7 +103,7 @@ message LibraryDependencyStatus {
     string versionInstalled = 3;
 }
 
-message LibrarySearchReq {
+message LibrarySearchRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     // The search query.
@@ -187,7 +187,7 @@ message DownloadResource {
     string cachepath = 5;
 }
 
-message LibraryListReq {
+message LibraryListRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     // Whether to include built-in libraries (from platforms and the Arduino
@@ -297,7 +297,7 @@ enum LibraryLocation {
     referenced_platform_builtin = 3;
 }
 
-message ZipLibraryInstallReq {
+message ZipLibraryInstallRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     //Path to the archived library
@@ -311,7 +311,7 @@ message ZipLibraryInstallResponse {
     TaskProgress task_progress = 1;
 }
 
-message GitLibraryInstallReq {
+message GitLibraryInstallRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     // URL to the repository containing the library

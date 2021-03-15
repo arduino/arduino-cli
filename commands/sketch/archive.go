@@ -29,7 +29,7 @@ import (
 )
 
 // ArchiveSketch FIXMEDOC
-func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchReq) (*rpc.ArchiveSketchResponse, error) {
+func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.ArchiveSketchResponse, error) {
 	// sketchName is the name of the sketch without extension, for example "MySketch"
 	var sketchName string
 

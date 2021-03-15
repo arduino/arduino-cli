@@ -47,7 +47,7 @@ func TestGetCommandLine(t *testing.T) {
 	}
 
 	// Arduino Zero has an integrated debugger port, anc it could be debugged directly using USB
-	req := &dbg.DebugConfigReq{
+	req := &dbg.DebugConfigRequest{
 		Instance:   &rpc.Instance{Id: 1},
 		Fqbn:       "arduino-test:samd:arduino_zero_edbg",
 		SketchPath: sketchPath.String(),
@@ -68,7 +68,7 @@ func TestGetCommandLine(t *testing.T) {
 
 	// Other samd boards such as mkr1000 can be debugged using an external tool such as Atmel ICE connected to
 	// the board debug port
-	req2 := &dbg.DebugConfigReq{
+	req2 := &dbg.DebugConfigRequest{
 		Instance:    &rpc.Instance{Id: 1},
 		Fqbn:        "arduino-test:samd:mkr1000",
 		SketchPath:  sketchPath.String(),

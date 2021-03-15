@@ -39,7 +39,7 @@ import (
 // grpc Out <- tool stdOut
 // grpc Out <- tool stdErr
 // It also implements tool process lifecycle management
-func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*dbg.DebugResponse, error) {
+func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*dbg.DebugResponse, error) {
 
 	// Get debugging command line to run debugger
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
@@ -109,7 +109,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 }
 
 // getCommandLine compose a debug command represented by a core recipe
-func getCommandLine(req *dbg.DebugConfigReq, pm *packagemanager.PackageManager) ([]string, error) {
+func getCommandLine(req *dbg.DebugConfigRequest, pm *packagemanager.PackageManager) ([]string, error) {
 	debugInfo, err := getDebugProperties(req, pm)
 	if err != nil {
 		return nil, err

@@ -54,7 +54,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino upgrade`")
 
-	err = commands.Upgrade(context.Background(), &rpc.UpgradeReq{
+	err = commands.Upgrade(context.Background(), &rpc.UpgradeRequest{
 		Instance:        inst,
 		SkipPostInstall: core.DetectSkipPostInstallValue(),
 	}, output.NewDownloadProgressBarCB(), output.TaskProgress())

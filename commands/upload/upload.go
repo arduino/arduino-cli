@@ -40,7 +40,7 @@ import (
 )
 
 // Upload FIXMEDOC
-func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStream io.Writer) (*rpc.UploadResponse, error) {
+func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadResponse, error) {
 	logrus.Tracef("Upload %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	// TODO: make a generic function to extract sketch from request
@@ -74,13 +74,13 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 }
 
 // UsingProgrammer FIXMEDOC
-func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerReq, outStream io.Writer, errStream io.Writer) (*rpc.UploadUsingProgrammerResponse, error) {
+func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadUsingProgrammerResponse, error) {
 	logrus.Tracef("Upload using programmer %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	if req.GetProgrammer() == "" {
 		return nil, errors.New("programmer not specified")
 	}
-	_, err := Upload(ctx, &rpc.UploadReq{
+	_, err := Upload(ctx, &rpc.UploadRequest{
 		Instance:   req.GetInstance(),
 		SketchPath: req.GetSketchPath(),
 		ImportFile: req.GetImportFile(),

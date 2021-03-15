@@ -27,7 +27,7 @@ import (
 )
 
 // PlatformInstall FIXMEDOC
-func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
+func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())

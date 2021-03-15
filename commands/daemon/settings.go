@@ -68,7 +68,7 @@ func mapper(toMap map[string]interface{}) map[string]interface{} {
 }
 
 // Merge applies multiple settings values at once.
-func (s *SettingsService) Merge(ctx context.Context, req *rpc.RawData) (*rpc.MergeResponse, error) {
+func (s *SettingsService) Merge(ctx context.Context, req *rpc.MergeRequest) (*rpc.MergeResponse, error) {
 	var toMerge map[string]interface{}
 	if err := json.Unmarshal([]byte(req.GetJsonData()), &toMerge); err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func (s *SettingsService) GetValue(ctx context.Context, req *rpc.GetValueRequest
 }
 
 // SetValue updates or set a value for a certain key.
-func (s *SettingsService) SetValue(ctx context.Context, val *rpc.Value) (*rpc.SetValueResponse, error) {
+func (s *SettingsService) SetValue(ctx context.Context, val *rpc.SetValueRequest) (*rpc.SetValueResponse, error) {
 	key := val.GetKey()
 	var value interface{}
 
