@@ -21,8 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/utils"
 	cmd "github.com/arduino/arduino-cli/commands/debug"
-	"github.com/arduino/arduino-cli/rpc/debug"
-	dbg "github.com/arduino/arduino-cli/rpc/debug"
+	dbg "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/pkg/errors"
 )
 
@@ -68,6 +67,6 @@ func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 }
 
 // GetDebugConfig return metadata about a debug session
-func (s *DebugService) GetDebugConfig(ctx context.Context, req *debug.DebugConfigRequest) (*debug.GetDebugConfigResponse, error) {
+func (s *DebugService) GetDebugConfig(ctx context.Context, req *dbg.DebugConfigRequest) (*dbg.GetDebugConfigResponse, error) {
 	return cmd.GetDebugConfig(ctx, req)
 }

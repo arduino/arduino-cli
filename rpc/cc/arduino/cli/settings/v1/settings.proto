@@ -17,7 +17,7 @@ syntax = "proto3";
 
 package cc.arduino.cli.settings.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/settings";
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1;settings";
 
 // The SettingsService provides an interface to Arduino CLI configuration options
 service SettingsService {

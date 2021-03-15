@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // LibraryLocation represents where the library is installed

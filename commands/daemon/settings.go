@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/configuration"
-	rpc "github.com/arduino/arduino-cli/rpc/settings"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
 )
 
 // SettingsService implements the `Settings` service

@@ -27,7 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/executils"
-	dbg "github.com/arduino/arduino-cli/rpc/debug"
+	dbg "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"

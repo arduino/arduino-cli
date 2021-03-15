@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands/lib"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // LibraryReferenceArg is a command line argument that reference a library.

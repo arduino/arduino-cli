@@ -17,14 +17,14 @@ syntax = "proto3";
 
 package cc.arduino.cli.commands.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/commands";
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
-import "commands/common.proto";
-import "commands/board.proto";
-import "commands/compile.proto";
-import "commands/core.proto";
-import "commands/upload.proto";
-import "commands/lib.proto";
+import "cc/arduino/cli/commands/v1/common.proto";
+import "cc/arduino/cli/commands/v1/board.proto";
+import "cc/arduino/cli/commands/v1/compile.proto";
+import "cc/arduino/cli/commands/v1/core.proto";
+import "cc/arduino/cli/commands/v1/upload.proto";
+import "cc/arduino/cli/commands/v1/lib.proto";
 
 // The main Arduino Platform service API
 service ArduinoCoreService {

@@ -17,7 +17,7 @@ syntax = "proto3";
 
 package cc.arduino.cli.monitor.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/monitor";
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/monitor/v1;monitor";
 
 import "google/protobuf/struct.proto";
 

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/assert"
 )

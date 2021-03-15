@@ -2,17 +2,5 @@ version: v1beta1
 lint:
   ignore_only:
     ENUM_ZERO_VALUE_SUFFIX:
-      - commands/lib.proto
-      - monitor/monitor.proto
-    PACKAGE_DIRECTORY_MATCH:
-      - commands/board.proto
-      - commands/commands.proto
-      - commands/common.proto
-      - commands/compile.proto
-      - commands/core.proto
-      - commands/lib.proto
-      - commands/upload.proto
-      - debug/debug.proto
-      - monitor/monitor.proto
-      - settings/settings.proto
-    
+      - cc/arduino/cli/commands/v1/lib.proto
+      - cc/arduino/cli/monitor/v1/monitor.proto

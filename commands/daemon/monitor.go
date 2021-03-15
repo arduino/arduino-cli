@@ -21,7 +21,7 @@ import (
 	"sync/atomic"
 
 	"github.com/arduino/arduino-cli/arduino/monitors"
-	rpc "github.com/arduino/arduino-cli/rpc/monitor"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/monitor/v1"
 )
 
 // MonitorService implements the `Monitor` service

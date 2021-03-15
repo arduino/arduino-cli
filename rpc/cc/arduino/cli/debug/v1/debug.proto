@@ -17,9 +17,9 @@ syntax = "proto3";
 
 package cc.arduino.cli.debug.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/debug";
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1;debug";
 
-import "commands/common.proto";
+import "cc/arduino/cli/commands/v1/common.proto";
 
 // DebugService abstracts a debug Session usage
 service DebugService {
