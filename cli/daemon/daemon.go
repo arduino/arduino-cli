@@ -72,18 +72,18 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	configuration.Settings.Set("network.user_agent_ext", "daemon")
 
 	// register the commands service
-	srv_commands.RegisterArduinoCoreServer(s, &daemon.ArduinoCoreServerImpl{
+	srv_commands.RegisterArduinoCoreServiceServer(s, &daemon.ArduinoCoreServerImpl{
 		VersionString: globals.VersionInfo.VersionString,
 	})
 
 	// Register the monitors service
-	srv_monitor.RegisterMonitorServer(s, &daemon.MonitorService{})
+	srv_monitor.RegisterMonitorServiceServer(s, &daemon.MonitorService{})
 
 	// Register the settings service
-	srv_settings.RegisterSettingsServer(s, &daemon.SettingsService{})
+	srv_settings.RegisterSettingsServiceServer(s, &daemon.SettingsService{})
 
 	// Register the debug session service
-	srv_debug.RegisterDebugServer(s, &daemon.DebugService{})
+	srv_debug.RegisterDebugServiceServer(s, &daemon.DebugService{})
 
 	if !daemonize {
 		// When parent process ends terminate also the daemon

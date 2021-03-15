@@ -30,7 +30,7 @@ type MonitorService struct{}
 // StreamingOpen returns a stream response that can be used to fetch data from the
 // monitor target. The first message passed through the `StreamingOpenReq` must
 // contain monitor configuration params, not data.
-func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) error {
+func (s *MonitorService) StreamingOpen(stream rpc.MonitorService_StreamingOpenServer) error {
 	// grab the first message
 	msg, err := stream.Recv()
 	if err != nil {

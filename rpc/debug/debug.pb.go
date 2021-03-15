@@ -467,22 +467,22 @@ var file_debug_debug_proto_rawDesc = []byte{
 	0x74, 0x69, 0x6f, 0x6e, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76,
 	0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75,
-	0x65, 0x3a, 0x02, 0x38, 0x01, 0x32, 0xbb, 0x01, 0x0a, 0x05, 0x44, 0x65, 0x62, 0x75, 0x67, 0x12,
-	0x4e, 0x0a, 0x05, 0x44, 0x65, 0x62, 0x75, 0x67, 0x12, 0x1e, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72,
+	0x65, 0x3a, 0x02, 0x38, 0x01, 0x32, 0xc2, 0x01, 0x0a, 0x0c, 0x44, 0x65, 0x62, 0x75, 0x67, 0x53,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x4e, 0x0a, 0x05, 0x44, 0x65, 0x62, 0x75, 0x67, 0x12,
+	0x1e, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69,
+	0x2e, 0x64, 0x65, 0x62, 0x75, 0x67, 0x2e, 0x44, 0x65, 0x62, 0x75, 0x67, 0x52, 0x65, 0x71, 0x1a,
+	0x1f, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69,
+	0x2e, 0x64, 0x65, 0x62, 0x75, 0x67, 0x2e, 0x44, 0x65, 0x62, 0x75, 0x67, 0x52, 0x65, 0x73, 0x70,
+	0x22, 0x00, 0x28, 0x01, 0x30, 0x01, 0x12, 0x62, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x62,
+	0x75, 0x67, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x24, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72,
 	0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x64, 0x65, 0x62, 0x75, 0x67, 0x2e,
-	0x44, 0x65, 0x62, 0x75, 0x67, 0x52, 0x65, 0x71, 0x1a, 0x1f, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72,
-	0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x64, 0x65, 0x62, 0x75, 0x67, 0x2e,
-	0x44, 0x65, 0x62, 0x75, 0x67, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x28, 0x01, 0x30, 0x01, 0x12,
-	0x62, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x62, 0x75, 0x67, 0x43, 0x6f, 0x6e, 0x66, 0x69,
-	0x67, 0x12, 0x24, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63,
-	0x6c, 0x69, 0x2e, 0x64, 0x65, 0x62, 0x75, 0x67, 0x2e, 0x44, 0x65, 0x62, 0x75, 0x67, 0x43, 0x6f,
-	0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x71, 0x1a, 0x28, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64,
-	0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x64, 0x65, 0x62, 0x75, 0x67, 0x2e, 0x47,
-	0x65, 0x74, 0x44, 0x65, 0x62, 0x75, 0x67, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x73,
-	0x70, 0x22, 0x00, 0x42, 0x2a, 0x5a, 0x28, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
-	0x6d, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e,
-	0x6f, 0x2d, 0x63, 0x6c, 0x69, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x64, 0x65, 0x62, 0x75, 0x67, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x44, 0x65, 0x62, 0x75, 0x67, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x71, 0x1a, 0x28,
+	0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e,
+	0x64, 0x65, 0x62, 0x75, 0x67, 0x2e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x62, 0x75, 0x67, 0x43, 0x6f,
+	0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x42, 0x2a, 0x5a, 0x28, 0x67, 0x69,
+	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f,
+	0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2d, 0x63, 0x6c, 0x69, 0x2f, 0x72, 0x70, 0x63,
+	0x2f, 0x64, 0x65, 0x62, 0x75, 0x67, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -512,10 +512,10 @@ var file_debug_debug_proto_depIdxs = []int32{
 	6, // 1: cc.arduino.cli.debug.DebugConfigReq.instance:type_name -> cc.arduino.cli.commands.Instance
 	4, // 2: cc.arduino.cli.debug.GetDebugConfigResp.toolchain_configuration:type_name -> cc.arduino.cli.debug.GetDebugConfigResp.ToolchainConfigurationEntry
 	5, // 3: cc.arduino.cli.debug.GetDebugConfigResp.server_configuration:type_name -> cc.arduino.cli.debug.GetDebugConfigResp.ServerConfigurationEntry
-	0, // 4: cc.arduino.cli.debug.Debug.Debug:input_type -> cc.arduino.cli.debug.DebugReq
-	1, // 5: cc.arduino.cli.debug.Debug.GetDebugConfig:input_type -> cc.arduino.cli.debug.DebugConfigReq
-	2, // 6: cc.arduino.cli.debug.Debug.Debug:output_type -> cc.arduino.cli.debug.DebugResp
-	3, // 7: cc.arduino.cli.debug.Debug.GetDebugConfig:output_type -> cc.arduino.cli.debug.GetDebugConfigResp
+	0, // 4: cc.arduino.cli.debug.DebugService.Debug:input_type -> cc.arduino.cli.debug.DebugReq
+	1, // 5: cc.arduino.cli.debug.DebugService.GetDebugConfig:input_type -> cc.arduino.cli.debug.DebugConfigReq
+	2, // 6: cc.arduino.cli.debug.DebugService.Debug:output_type -> cc.arduino.cli.debug.DebugResp
+	3, // 7: cc.arduino.cli.debug.DebugService.GetDebugConfig:output_type -> cc.arduino.cli.debug.GetDebugConfigResp
 	6, // [6:8] is the sub-list for method output_type
 	4, // [4:6] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name
@@ -606,47 +606,47 @@ var _ grpc.ClientConnInterface
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
-// DebugClient is the client API for Debug service.
+// DebugServiceClient is the client API for DebugService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type DebugClient interface {
+type DebugServiceClient interface {
 	// Start a debug session and communicate with the debugger tool.
-	Debug(ctx context.Context, opts ...grpc.CallOption) (Debug_DebugClient, error)
+	Debug(ctx context.Context, opts ...grpc.CallOption) (DebugService_DebugClient, error)
 	GetDebugConfig(ctx context.Context, in *DebugConfigReq, opts ...grpc.CallOption) (*GetDebugConfigResp, error)
 }
 
-type debugClient struct {
+type debugServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewDebugClient(cc grpc.ClientConnInterface) DebugClient {
-	return &debugClient{cc}
+func NewDebugServiceClient(cc grpc.ClientConnInterface) DebugServiceClient {
+	return &debugServiceClient{cc}
 }
 
-func (c *debugClient) Debug(ctx context.Context, opts ...grpc.CallOption) (Debug_DebugClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Debug_serviceDesc.Streams[0], "/cc.arduino.cli.debug.Debug/Debug", opts...)
+func (c *debugServiceClient) Debug(ctx context.Context, opts ...grpc.CallOption) (DebugService_DebugClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_DebugService_serviceDesc.Streams[0], "/cc.arduino.cli.debug.DebugService/Debug", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &debugDebugClient{stream}
+	x := &debugServiceDebugClient{stream}
 	return x, nil
 }
 
-type Debug_DebugClient interface {
+type DebugService_DebugClient interface {
 	Send(*DebugReq) error
 	Recv() (*DebugResp, error)
 	grpc.ClientStream
 }
 
-type debugDebugClient struct {
+type debugServiceDebugClient struct {
 	grpc.ClientStream
 }
 
-func (x *debugDebugClient) Send(m *DebugReq) error {
+func (x *debugServiceDebugClient) Send(m *DebugReq) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *debugDebugClient) Recv() (*DebugResp, error) {
+func (x *debugServiceDebugClient) Recv() (*DebugResp, error) {
 	m := new(DebugResp)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -654,56 +654,56 @@ func (x *debugDebugClient) Recv() (*DebugResp, error) {
 	return m, nil
 }
 
-func (c *debugClient) GetDebugConfig(ctx context.Context, in *DebugConfigReq, opts ...grpc.CallOption) (*GetDebugConfigResp, error) {
+func (c *debugServiceClient) GetDebugConfig(ctx context.Context, in *DebugConfigReq, opts ...grpc.CallOption) (*GetDebugConfigResp, error) {
 	out := new(GetDebugConfigResp)
-	err := c.cc.Invoke(ctx, "/cc.arduino.cli.debug.Debug/GetDebugConfig", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/cc.arduino.cli.debug.DebugService/GetDebugConfig", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// DebugServer is the server API for Debug service.
-type DebugServer interface {
+// DebugServiceServer is the server API for DebugService service.
+type DebugServiceServer interface {
 	// Start a debug session and communicate with the debugger tool.
-	Debug(Debug_DebugServer) error
+	Debug(DebugService_DebugServer) error
 	GetDebugConfig(context.Context, *DebugConfigReq) (*GetDebugConfigResp, error)
 }
 
-// UnimplementedDebugServer can be embedded to have forward compatible implementations.
-type UnimplementedDebugServer struct {
+// UnimplementedDebugServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedDebugServiceServer struct {
 }
 
-func (*UnimplementedDebugServer) Debug(Debug_DebugServer) error {
+func (*UnimplementedDebugServiceServer) Debug(DebugService_DebugServer) error {
 	return status.Errorf(codes.Unimplemented, "method Debug not implemented")
 }
-func (*UnimplementedDebugServer) GetDebugConfig(context.Context, *DebugConfigReq) (*GetDebugConfigResp, error) {
+func (*UnimplementedDebugServiceServer) GetDebugConfig(context.Context, *DebugConfigReq) (*GetDebugConfigResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDebugConfig not implemented")
 }
 
-func RegisterDebugServer(s *grpc.Server, srv DebugServer) {
-	s.RegisterService(&_Debug_serviceDesc, srv)
+func RegisterDebugServiceServer(s *grpc.Server, srv DebugServiceServer) {
+	s.RegisterService(&_DebugService_serviceDesc, srv)
 }
 
-func _Debug_Debug_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(DebugServer).Debug(&debugDebugServer{stream})
+func _DebugService_Debug_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(DebugServiceServer).Debug(&debugServiceDebugServer{stream})
 }
 
-type Debug_DebugServer interface {
+type DebugService_DebugServer interface {
 	Send(*DebugResp) error
 	Recv() (*DebugReq, error)
 	grpc.ServerStream
 }
 
-type debugDebugServer struct {
+type debugServiceDebugServer struct {
 	grpc.ServerStream
 }
 
-func (x *debugDebugServer) Send(m *DebugResp) error {
+func (x *debugServiceDebugServer) Send(m *DebugResp) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *debugDebugServer) Recv() (*DebugReq, error) {
+func (x *debugServiceDebugServer) Recv() (*DebugReq, error) {
 	m := new(DebugReq)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -711,37 +711,37 @@ func (x *debugDebugServer) Recv() (*DebugReq, error) {
 	return m, nil
 }
 
-func _Debug_GetDebugConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _DebugService_GetDebugConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DebugConfigReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DebugServer).GetDebugConfig(ctx, in)
+		return srv.(DebugServiceServer).GetDebugConfig(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cc.arduino.cli.debug.Debug/GetDebugConfig",
+		FullMethod: "/cc.arduino.cli.debug.DebugService/GetDebugConfig",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DebugServer).GetDebugConfig(ctx, req.(*DebugConfigReq))
+		return srv.(DebugServiceServer).GetDebugConfig(ctx, req.(*DebugConfigReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Debug_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "cc.arduino.cli.debug.Debug",
-	HandlerType: (*DebugServer)(nil),
+var _DebugService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "cc.arduino.cli.debug.DebugService",
+	HandlerType: (*DebugServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetDebugConfig",
-			Handler:    _Debug_GetDebugConfig_Handler,
+			Handler:    _DebugService_GetDebugConfig_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "Debug",
-			Handler:       _Debug_Debug_Handler,
+			Handler:       _DebugService_Debug_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},

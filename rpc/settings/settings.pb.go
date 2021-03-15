@@ -418,38 +418,38 @@ var file_settings_settings_proto_rawDesc = []byte{
 	0x72, 0x69, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x66,
 	0x69, 0x6c, 0x65, 0x50, 0x61, 0x74, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x66,
 	0x69, 0x6c, 0x65, 0x50, 0x61, 0x74, 0x68, 0x22, 0x0f, 0x0a, 0x0d, 0x57, 0x72, 0x69, 0x74, 0x65,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xb6, 0x03, 0x0a, 0x08, 0x53, 0x65, 0x74,
-	0x74, 0x69, 0x6e, 0x67, 0x73, 0x12, 0x52, 0x0a, 0x06, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x12,
-	0x26, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69,
-	0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64,
-	0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67,
-	0x73, 0x2e, 0x52, 0x61, 0x77, 0x44, 0x61, 0x74, 0x61, 0x12, 0x51, 0x0a, 0x05, 0x4d, 0x65, 0x72,
-	0x67, 0x65, 0x12, 0x20, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e,
-	0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x52, 0x61, 0x77,
-	0x44, 0x61, 0x74, 0x61, 0x1a, 0x26, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e,
-	0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x4d,
-	0x65, 0x72, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x54, 0x0a, 0x08,
-	0x47, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x28, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72,
-	0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e,
-	0x67, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e,
-	0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x56, 0x61, 0x6c,
-	0x75, 0x65, 0x12, 0x55, 0x0a, 0x08, 0x53, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x1e,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xbd, 0x03, 0x0a, 0x0f, 0x53, 0x65, 0x74,
+	0x74, 0x69, 0x6e, 0x67, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x52, 0x0a, 0x06,
+	0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x12, 0x26, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75,
+	0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73,
+	0x2e, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20,
 	0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e,
-	0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x1a, 0x29,
-	0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e,
-	0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x53, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75,
-	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x56, 0x0a, 0x05, 0x57, 0x72, 0x69,
-	0x74, 0x65, 0x12, 0x25, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e,
-	0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x57, 0x72, 0x69,
-	0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e, 0x63, 0x63, 0x2e, 0x61,
+	0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x52, 0x61, 0x77, 0x44, 0x61, 0x74, 0x61,
+	0x12, 0x51, 0x0a, 0x05, 0x4d, 0x65, 0x72, 0x67, 0x65, 0x12, 0x20, 0x2e, 0x63, 0x63, 0x2e, 0x61,
 	0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69,
-	0x6e, 0x67, 0x73, 0x2e, 0x57, 0x72, 0x69, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x42, 0x2d, 0x5a, 0x2b, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
-	0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2d,
-	0x63, 0x6c, 0x69, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6e, 0x67, 0x73, 0x2e, 0x52, 0x61, 0x77, 0x44, 0x61, 0x74, 0x61, 0x1a, 0x26, 0x2e, 0x63, 0x63,
+	0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74,
+	0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x4d, 0x65, 0x72, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x54, 0x0a, 0x08, 0x47, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12,
+	0x28, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69,
+	0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x56, 0x61, 0x6c,
+	0x75, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x63, 0x63, 0x2e, 0x61,
+	0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69,
+	0x6e, 0x67, 0x73, 0x2e, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x55, 0x0a, 0x08, 0x53, 0x65, 0x74,
+	0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x1e, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69,
+	0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e,
+	0x56, 0x61, 0x6c, 0x75, 0x65, 0x1a, 0x29, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69,
+	0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e,
+	0x53, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x56, 0x0a, 0x05, 0x57, 0x72, 0x69, 0x74, 0x65, 0x12, 0x25, 0x2e, 0x63, 0x63, 0x2e, 0x61,
+	0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69,
+	0x6e, 0x67, 0x73, 0x2e, 0x57, 0x72, 0x69, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x26, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c,
+	0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x57, 0x72, 0x69, 0x74, 0x65,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x2d, 0x5a, 0x2b, 0x67, 0x69, 0x74, 0x68,
+	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x61,
+	0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2d, 0x63, 0x6c, 0x69, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x73,
+	0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -476,16 +476,16 @@ var file_settings_settings_proto_goTypes = []interface{}{
 	(*WriteResponse)(nil),    // 7: cc.arduino.cli.settings.WriteResponse
 }
 var file_settings_settings_proto_depIdxs = []int32{
-	2, // 0: cc.arduino.cli.settings.Settings.GetAll:input_type -> cc.arduino.cli.settings.GetAllRequest
-	0, // 1: cc.arduino.cli.settings.Settings.Merge:input_type -> cc.arduino.cli.settings.RawData
-	3, // 2: cc.arduino.cli.settings.Settings.GetValue:input_type -> cc.arduino.cli.settings.GetValueRequest
-	1, // 3: cc.arduino.cli.settings.Settings.SetValue:input_type -> cc.arduino.cli.settings.Value
-	6, // 4: cc.arduino.cli.settings.Settings.Write:input_type -> cc.arduino.cli.settings.WriteRequest
-	0, // 5: cc.arduino.cli.settings.Settings.GetAll:output_type -> cc.arduino.cli.settings.RawData
-	4, // 6: cc.arduino.cli.settings.Settings.Merge:output_type -> cc.arduino.cli.settings.MergeResponse
-	1, // 7: cc.arduino.cli.settings.Settings.GetValue:output_type -> cc.arduino.cli.settings.Value
-	5, // 8: cc.arduino.cli.settings.Settings.SetValue:output_type -> cc.arduino.cli.settings.SetValueResponse
-	7, // 9: cc.arduino.cli.settings.Settings.Write:output_type -> cc.arduino.cli.settings.WriteResponse
+	2, // 0: cc.arduino.cli.settings.SettingsService.GetAll:input_type -> cc.arduino.cli.settings.GetAllRequest
+	0, // 1: cc.arduino.cli.settings.SettingsService.Merge:input_type -> cc.arduino.cli.settings.RawData
+	3, // 2: cc.arduino.cli.settings.SettingsService.GetValue:input_type -> cc.arduino.cli.settings.GetValueRequest
+	1, // 3: cc.arduino.cli.settings.SettingsService.SetValue:input_type -> cc.arduino.cli.settings.Value
+	6, // 4: cc.arduino.cli.settings.SettingsService.Write:input_type -> cc.arduino.cli.settings.WriteRequest
+	0, // 5: cc.arduino.cli.settings.SettingsService.GetAll:output_type -> cc.arduino.cli.settings.RawData
+	4, // 6: cc.arduino.cli.settings.SettingsService.Merge:output_type -> cc.arduino.cli.settings.MergeResponse
+	1, // 7: cc.arduino.cli.settings.SettingsService.GetValue:output_type -> cc.arduino.cli.settings.Value
+	5, // 8: cc.arduino.cli.settings.SettingsService.SetValue:output_type -> cc.arduino.cli.settings.SetValueResponse
+	7, // 9: cc.arduino.cli.settings.SettingsService.Write:output_type -> cc.arduino.cli.settings.WriteResponse
 	5, // [5:10] is the sub-list for method output_type
 	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -624,10 +624,10 @@ var _ grpc.ClientConnInterface
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
-// SettingsClient is the client API for Settings service.
+// SettingsServiceClient is the client API for SettingsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type SettingsClient interface {
+type SettingsServiceClient interface {
 	// List all the settings.
 	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*RawData, error)
 	// Set multiple settings values at once.
@@ -640,61 +640,61 @@ type SettingsClient interface {
 	Write(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*WriteResponse, error)
 }
 
-type settingsClient struct {
+type settingsServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewSettingsClient(cc grpc.ClientConnInterface) SettingsClient {
-	return &settingsClient{cc}
+func NewSettingsServiceClient(cc grpc.ClientConnInterface) SettingsServiceClient {
+	return &settingsServiceClient{cc}
 }
 
-func (c *settingsClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*RawData, error) {
+func (c *settingsServiceClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*RawData, error) {
 	out := new(RawData)
-	err := c.cc.Invoke(ctx, "/cc.arduino.cli.settings.Settings/GetAll", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/cc.arduino.cli.settings.SettingsService/GetAll", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *settingsClient) Merge(ctx context.Context, in *RawData, opts ...grpc.CallOption) (*MergeResponse, error) {
+func (c *settingsServiceClient) Merge(ctx context.Context, in *RawData, opts ...grpc.CallOption) (*MergeResponse, error) {
 	out := new(MergeResponse)
-	err := c.cc.Invoke(ctx, "/cc.arduino.cli.settings.Settings/Merge", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/cc.arduino.cli.settings.SettingsService/Merge", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *settingsClient) GetValue(ctx context.Context, in *GetValueRequest, opts ...grpc.CallOption) (*Value, error) {
+func (c *settingsServiceClient) GetValue(ctx context.Context, in *GetValueRequest, opts ...grpc.CallOption) (*Value, error) {
 	out := new(Value)
-	err := c.cc.Invoke(ctx, "/cc.arduino.cli.settings.Settings/GetValue", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/cc.arduino.cli.settings.SettingsService/GetValue", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *settingsClient) SetValue(ctx context.Context, in *Value, opts ...grpc.CallOption) (*SetValueResponse, error) {
+func (c *settingsServiceClient) SetValue(ctx context.Context, in *Value, opts ...grpc.CallOption) (*SetValueResponse, error) {
 	out := new(SetValueResponse)
-	err := c.cc.Invoke(ctx, "/cc.arduino.cli.settings.Settings/SetValue", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/cc.arduino.cli.settings.SettingsService/SetValue", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *settingsClient) Write(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*WriteResponse, error) {
+func (c *settingsServiceClient) Write(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*WriteResponse, error) {
 	out := new(WriteResponse)
-	err := c.cc.Invoke(ctx, "/cc.arduino.cli.settings.Settings/Write", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/cc.arduino.cli.settings.SettingsService/Write", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// SettingsServer is the server API for Settings service.
-type SettingsServer interface {
+// SettingsServiceServer is the server API for SettingsService service.
+type SettingsServiceServer interface {
 	// List all the settings.
 	GetAll(context.Context, *GetAllRequest) (*RawData, error)
 	// Set multiple settings values at once.
@@ -707,143 +707,143 @@ type SettingsServer interface {
 	Write(context.Context, *WriteRequest) (*WriteResponse, error)
 }
 
-// UnimplementedSettingsServer can be embedded to have forward compatible implementations.
-type UnimplementedSettingsServer struct {
+// UnimplementedSettingsServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedSettingsServiceServer struct {
 }
 
-func (*UnimplementedSettingsServer) GetAll(context.Context, *GetAllRequest) (*RawData, error) {
+func (*UnimplementedSettingsServiceServer) GetAll(context.Context, *GetAllRequest) (*RawData, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
 }
-func (*UnimplementedSettingsServer) Merge(context.Context, *RawData) (*MergeResponse, error) {
+func (*UnimplementedSettingsServiceServer) Merge(context.Context, *RawData) (*MergeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Merge not implemented")
 }
-func (*UnimplementedSettingsServer) GetValue(context.Context, *GetValueRequest) (*Value, error) {
+func (*UnimplementedSettingsServiceServer) GetValue(context.Context, *GetValueRequest) (*Value, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetValue not implemented")
 }
-func (*UnimplementedSettingsServer) SetValue(context.Context, *Value) (*SetValueResponse, error) {
+func (*UnimplementedSettingsServiceServer) SetValue(context.Context, *Value) (*SetValueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetValue not implemented")
 }
-func (*UnimplementedSettingsServer) Write(context.Context, *WriteRequest) (*WriteResponse, error) {
+func (*UnimplementedSettingsServiceServer) Write(context.Context, *WriteRequest) (*WriteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Write not implemented")
 }
 
-func RegisterSettingsServer(s *grpc.Server, srv SettingsServer) {
-	s.RegisterService(&_Settings_serviceDesc, srv)
+func RegisterSettingsServiceServer(s *grpc.Server, srv SettingsServiceServer) {
+	s.RegisterService(&_SettingsService_serviceDesc, srv)
 }
 
-func _Settings_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SettingsService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAllRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SettingsServer).GetAll(ctx, in)
+		return srv.(SettingsServiceServer).GetAll(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cc.arduino.cli.settings.Settings/GetAll",
+		FullMethod: "/cc.arduino.cli.settings.SettingsService/GetAll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SettingsServer).GetAll(ctx, req.(*GetAllRequest))
+		return srv.(SettingsServiceServer).GetAll(ctx, req.(*GetAllRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Settings_Merge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SettingsService_Merge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RawData)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SettingsServer).Merge(ctx, in)
+		return srv.(SettingsServiceServer).Merge(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cc.arduino.cli.settings.Settings/Merge",
+		FullMethod: "/cc.arduino.cli.settings.SettingsService/Merge",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SettingsServer).Merge(ctx, req.(*RawData))
+		return srv.(SettingsServiceServer).Merge(ctx, req.(*RawData))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Settings_GetValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SettingsService_GetValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetValueRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SettingsServer).GetValue(ctx, in)
+		return srv.(SettingsServiceServer).GetValue(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cc.arduino.cli.settings.Settings/GetValue",
+		FullMethod: "/cc.arduino.cli.settings.SettingsService/GetValue",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SettingsServer).GetValue(ctx, req.(*GetValueRequest))
+		return srv.(SettingsServiceServer).GetValue(ctx, req.(*GetValueRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Settings_SetValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SettingsService_SetValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Value)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SettingsServer).SetValue(ctx, in)
+		return srv.(SettingsServiceServer).SetValue(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cc.arduino.cli.settings.Settings/SetValue",
+		FullMethod: "/cc.arduino.cli.settings.SettingsService/SetValue",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SettingsServer).SetValue(ctx, req.(*Value))
+		return srv.(SettingsServiceServer).SetValue(ctx, req.(*Value))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Settings_Write_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SettingsService_Write_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(WriteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SettingsServer).Write(ctx, in)
+		return srv.(SettingsServiceServer).Write(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cc.arduino.cli.settings.Settings/Write",
+		FullMethod: "/cc.arduino.cli.settings.SettingsService/Write",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SettingsServer).Write(ctx, req.(*WriteRequest))
+		return srv.(SettingsServiceServer).Write(ctx, req.(*WriteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Settings_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "cc.arduino.cli.settings.Settings",
-	HandlerType: (*SettingsServer)(nil),
+var _SettingsService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "cc.arduino.cli.settings.SettingsService",
+	HandlerType: (*SettingsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetAll",
-			Handler:    _Settings_GetAll_Handler,
+			Handler:    _SettingsService_GetAll_Handler,
 		},
 		{
 			MethodName: "Merge",
-			Handler:    _Settings_Merge_Handler,
+			Handler:    _SettingsService_Merge_Handler,
 		},
 		{
 			MethodName: "GetValue",
-			Handler:    _Settings_GetValue_Handler,
+			Handler:    _SettingsService_GetValue_Handler,
 		},
 		{
 			MethodName: "SetValue",
-			Handler:    _Settings_SetValue_Handler,
+			Handler:    _SettingsService_SetValue_Handler,
 		},
 		{
 			MethodName: "Write",
-			Handler:    _Settings_Write_Handler,
+			Handler:    _SettingsService_Write_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

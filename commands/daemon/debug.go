@@ -32,7 +32,7 @@ type DebugService struct{}
 // Debug returns a stream response that can be used to fetch data from the
 // target. The first message passed through the `Debug` request must
 // contain DebugReq configuration params, not data.
-func (s *DebugService) Debug(stream dbg.Debug_DebugServer) error {
+func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 
 	// Grab the first message
 	msg, err := stream.Recv()

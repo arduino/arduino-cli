@@ -379,17 +379,18 @@ var file_monitor_monitor_proto_rawDesc = []byte{
 	0x73, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c,
 	0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x12, 0x18, 0x0a, 0x07, 0x64, 0x72, 0x6f, 0x70, 0x70, 0x65,
 	0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x07, 0x64, 0x72, 0x6f, 0x70, 0x70, 0x65, 0x64,
-	0x32, 0x75, 0x0a, 0x07, 0x4d, 0x6f, 0x6e, 0x69, 0x74, 0x6f, 0x72, 0x12, 0x6a, 0x0a, 0x0d, 0x53,
-	0x74, 0x72, 0x65, 0x61, 0x6d, 0x69, 0x6e, 0x67, 0x4f, 0x70, 0x65, 0x6e, 0x12, 0x28, 0x2e, 0x63,
-	0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x6d, 0x6f,
-	0x6e, 0x69, 0x74, 0x6f, 0x72, 0x2e, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x69, 0x6e, 0x67, 0x4f,
-	0x70, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x1a, 0x29, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75,
-	0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x6d, 0x6f, 0x6e, 0x69, 0x74, 0x6f, 0x72, 0x2e,
-	0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x69, 0x6e, 0x67, 0x4f, 0x70, 0x65, 0x6e, 0x52, 0x65, 0x73,
-	0x70, 0x22, 0x00, 0x28, 0x01, 0x30, 0x01, 0x42, 0x2c, 0x5a, 0x2a, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x72,
-	0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2d, 0x63, 0x6c, 0x69, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x6d, 0x6f,
-	0x6e, 0x69, 0x74, 0x6f, 0x72, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x32, 0x7c, 0x0a, 0x0e, 0x4d, 0x6f, 0x6e, 0x69, 0x74, 0x6f, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69,
+	0x63, 0x65, 0x12, 0x6a, 0x0a, 0x0d, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x69, 0x6e, 0x67, 0x4f,
+	0x70, 0x65, 0x6e, 0x12, 0x28, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f,
+	0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x6d, 0x6f, 0x6e, 0x69, 0x74, 0x6f, 0x72, 0x2e, 0x53, 0x74, 0x72,
+	0x65, 0x61, 0x6d, 0x69, 0x6e, 0x67, 0x4f, 0x70, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x1a, 0x29, 0x2e,
+	0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x6d,
+	0x6f, 0x6e, 0x69, 0x74, 0x6f, 0x72, 0x2e, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x69, 0x6e, 0x67,
+	0x4f, 0x70, 0x65, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x28, 0x01, 0x30, 0x01, 0x42, 0x2c,
+	0x5a, 0x2a, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x61, 0x72, 0x64,
+	0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2d, 0x63, 0x6c, 0x69,
+	0x2f, 0x72, 0x70, 0x63, 0x2f, 0x6d, 0x6f, 0x6e, 0x69, 0x74, 0x6f, 0x72, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -417,8 +418,8 @@ var file_monitor_monitor_proto_depIdxs = []int32{
 	2, // 0: cc.arduino.cli.monitor.StreamingOpenReq.monitorConfig:type_name -> cc.arduino.cli.monitor.MonitorConfig
 	0, // 1: cc.arduino.cli.monitor.MonitorConfig.type:type_name -> cc.arduino.cli.monitor.MonitorConfig.TargetType
 	4, // 2: cc.arduino.cli.monitor.MonitorConfig.additionalConfig:type_name -> google.protobuf.Struct
-	1, // 3: cc.arduino.cli.monitor.Monitor.StreamingOpen:input_type -> cc.arduino.cli.monitor.StreamingOpenReq
-	3, // 4: cc.arduino.cli.monitor.Monitor.StreamingOpen:output_type -> cc.arduino.cli.monitor.StreamingOpenResp
+	1, // 3: cc.arduino.cli.monitor.MonitorService.StreamingOpen:input_type -> cc.arduino.cli.monitor.StreamingOpenReq
+	3, // 4: cc.arduino.cli.monitor.MonitorService.StreamingOpen:output_type -> cc.arduino.cli.monitor.StreamingOpenResp
 	4, // [4:5] is the sub-list for method output_type
 	3, // [3:4] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
@@ -503,47 +504,47 @@ var _ grpc.ClientConnInterface
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
-// MonitorClient is the client API for Monitor service.
+// MonitorServiceClient is the client API for MonitorService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type MonitorClient interface {
+type MonitorServiceClient interface {
 	// Open a bidirectional monitor stream. This can be used to implement
 	// something similar to the Arduino IDE's Serial Monitor.
-	StreamingOpen(ctx context.Context, opts ...grpc.CallOption) (Monitor_StreamingOpenClient, error)
+	StreamingOpen(ctx context.Context, opts ...grpc.CallOption) (MonitorService_StreamingOpenClient, error)
 }
 
-type monitorClient struct {
+type monitorServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewMonitorClient(cc grpc.ClientConnInterface) MonitorClient {
-	return &monitorClient{cc}
+func NewMonitorServiceClient(cc grpc.ClientConnInterface) MonitorServiceClient {
+	return &monitorServiceClient{cc}
 }
 
-func (c *monitorClient) StreamingOpen(ctx context.Context, opts ...grpc.CallOption) (Monitor_StreamingOpenClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Monitor_serviceDesc.Streams[0], "/cc.arduino.cli.monitor.Monitor/StreamingOpen", opts...)
+func (c *monitorServiceClient) StreamingOpen(ctx context.Context, opts ...grpc.CallOption) (MonitorService_StreamingOpenClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_MonitorService_serviceDesc.Streams[0], "/cc.arduino.cli.monitor.MonitorService/StreamingOpen", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &monitorStreamingOpenClient{stream}
+	x := &monitorServiceStreamingOpenClient{stream}
 	return x, nil
 }
 
-type Monitor_StreamingOpenClient interface {
+type MonitorService_StreamingOpenClient interface {
 	Send(*StreamingOpenReq) error
 	Recv() (*StreamingOpenResp, error)
 	grpc.ClientStream
 }
 
-type monitorStreamingOpenClient struct {
+type monitorServiceStreamingOpenClient struct {
 	grpc.ClientStream
 }
 
-func (x *monitorStreamingOpenClient) Send(m *StreamingOpenReq) error {
+func (x *monitorServiceStreamingOpenClient) Send(m *StreamingOpenReq) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *monitorStreamingOpenClient) Recv() (*StreamingOpenResp, error) {
+func (x *monitorServiceStreamingOpenClient) Recv() (*StreamingOpenResp, error) {
 	m := new(StreamingOpenResp)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -551,44 +552,44 @@ func (x *monitorStreamingOpenClient) Recv() (*StreamingOpenResp, error) {
 	return m, nil
 }
 
-// MonitorServer is the server API for Monitor service.
-type MonitorServer interface {
+// MonitorServiceServer is the server API for MonitorService service.
+type MonitorServiceServer interface {
 	// Open a bidirectional monitor stream. This can be used to implement
 	// something similar to the Arduino IDE's Serial Monitor.
-	StreamingOpen(Monitor_StreamingOpenServer) error
+	StreamingOpen(MonitorService_StreamingOpenServer) error
 }
 
-// UnimplementedMonitorServer can be embedded to have forward compatible implementations.
-type UnimplementedMonitorServer struct {
+// UnimplementedMonitorServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedMonitorServiceServer struct {
 }
 
-func (*UnimplementedMonitorServer) StreamingOpen(Monitor_StreamingOpenServer) error {
+func (*UnimplementedMonitorServiceServer) StreamingOpen(MonitorService_StreamingOpenServer) error {
 	return status.Errorf(codes.Unimplemented, "method StreamingOpen not implemented")
 }
 
-func RegisterMonitorServer(s *grpc.Server, srv MonitorServer) {
-	s.RegisterService(&_Monitor_serviceDesc, srv)
+func RegisterMonitorServiceServer(s *grpc.Server, srv MonitorServiceServer) {
+	s.RegisterService(&_MonitorService_serviceDesc, srv)
 }
 
-func _Monitor_StreamingOpen_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(MonitorServer).StreamingOpen(&monitorStreamingOpenServer{stream})
+func _MonitorService_StreamingOpen_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(MonitorServiceServer).StreamingOpen(&monitorServiceStreamingOpenServer{stream})
 }
 
-type Monitor_StreamingOpenServer interface {
+type MonitorService_StreamingOpenServer interface {
 	Send(*StreamingOpenResp) error
 	Recv() (*StreamingOpenReq, error)
 	grpc.ServerStream
 }
 
-type monitorStreamingOpenServer struct {
+type monitorServiceStreamingOpenServer struct {
 	grpc.ServerStream
 }
 
-func (x *monitorStreamingOpenServer) Send(m *StreamingOpenResp) error {
+func (x *monitorServiceStreamingOpenServer) Send(m *StreamingOpenResp) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *monitorStreamingOpenServer) Recv() (*StreamingOpenReq, error) {
+func (x *monitorServiceStreamingOpenServer) Recv() (*StreamingOpenReq, error) {
 	m := new(StreamingOpenReq)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -596,14 +597,14 @@ func (x *monitorStreamingOpenServer) Recv() (*StreamingOpenReq, error) {
 	return m, nil
 }
 
-var _Monitor_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "cc.arduino.cli.monitor.Monitor",
-	HandlerType: (*MonitorServer)(nil),
+var _MonitorService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "cc.arduino.cli.monitor.MonitorService",
+	HandlerType: (*MonitorServiceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "StreamingOpen",
-			Handler:       _Monitor_StreamingOpen_Handler,
+			Handler:       _MonitorService_StreamingOpen_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},

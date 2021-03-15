@@ -26,8 +26,8 @@ import "commands/core.proto";
 import "commands/upload.proto";
 import "commands/lib.proto";
 
-// The main Arduino Platform Service
-service ArduinoCore {
+// The main Arduino Platform service API
+service ArduinoCoreService {
   // BOOTSTRAP COMMANDS
   //-------------------
 

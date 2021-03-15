@@ -19,9 +19,8 @@ package cc.arduino.cli.settings;
 
 option go_package = "github.com/arduino/arduino-cli/rpc/settings";
 
-// The Settings service provides an interface to Arduino CLI's configuration
-// options
-service Settings {
+// The SettingsService provides an interface to Arduino CLI configuration options
+service SettingsService {
   // List all the settings.
   rpc GetAll(GetAllRequest) returns (RawData);
   // Set multiple settings values at once.

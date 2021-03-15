@@ -65,7 +65,7 @@ func (s *ArduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardS
 }
 
 // BoardListWatch FIXMEDOC
-func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCore_BoardListWatchServer) error {
+func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_BoardListWatchServer) error {
 	msg, err := stream.Recv()
 	if err == io.EOF {
 		return nil
@@ -98,7 +98,7 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCore_BoardListW
 }
 
 // BoardAttach FIXMEDOC
-func (s *ArduinoCoreServerImpl) BoardAttach(req *rpc.BoardAttachReq, stream rpc.ArduinoCore_BoardAttachServer) error {
+func (s *ArduinoCoreServerImpl) BoardAttach(req *rpc.BoardAttachReq, stream rpc.ArduinoCoreService_BoardAttachServer) error {
 
 	resp, err := board.Attach(stream.Context(), req,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.BoardAttachResp{TaskProgress: p}) },
@@ -120,7 +120,7 @@ func (s *ArduinoCoreServerImpl) Rescan(ctx context.Context, req *rpc.RescanReq) 
 }
 
 // UpdateIndex FIXMEDOC
-func (s *ArduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexReq, stream rpc.ArduinoCore_UpdateIndexServer) error {
+func (s *ArduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexReq, stream rpc.ArduinoCoreService_UpdateIndexServer) error {
 	resp, err := commands.UpdateIndex(stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateIndexResp{DownloadProgress: p}) },
 	)
@@ -131,7 +131,7 @@ func (s *ArduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexReq, stream rpc.
 }
 
 // UpdateLibrariesIndex FIXMEDOC
-func (s *ArduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesIndexReq, stream rpc.ArduinoCore_UpdateLibrariesIndexServer) error {
+func (s *ArduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesIndexReq, stream rpc.ArduinoCoreService_UpdateLibrariesIndexServer) error {
 	err := commands.UpdateLibrariesIndex(stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateLibrariesIndexResp{DownloadProgress: p}) },
 	)
@@ -142,7 +142,7 @@ func (s *ArduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 }
 
 // UpdateCoreLibrariesIndex FIXMEDOC
-func (s *ArduinoCoreServerImpl) UpdateCoreLibrariesIndex(req *rpc.UpdateCoreLibrariesIndexReq, stream rpc.ArduinoCore_UpdateCoreLibrariesIndexServer) error {
+func (s *ArduinoCoreServerImpl) UpdateCoreLibrariesIndex(req *rpc.UpdateCoreLibrariesIndexReq, stream rpc.ArduinoCoreService_UpdateCoreLibrariesIndexServer) error {
 	err := commands.UpdateCoreLibrariesIndex(stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateCoreLibrariesIndexResp{DownloadProgress: p}) },
 	)
@@ -158,7 +158,7 @@ func (s *ArduinoCoreServerImpl) Outdated(ctx context.Context, req *rpc.OutdatedR
 }
 
 // Upgrade FIXMEDOC
-func (s *ArduinoCoreServerImpl) Upgrade(req *rpc.UpgradeReq, stream rpc.ArduinoCore_UpgradeServer) error {
+func (s *ArduinoCoreServerImpl) Upgrade(req *rpc.UpgradeReq, stream rpc.ArduinoCoreService_UpgradeServer) error {
 	err := commands.Upgrade(stream.Context(), req,
 		func(p *rpc.DownloadProgress) {
 			stream.Send(&rpc.UpgradeResp{
@@ -178,7 +178,7 @@ func (s *ArduinoCoreServerImpl) Upgrade(req *rpc.UpgradeReq, stream rpc.ArduinoC
 }
 
 // Init FIXMEDOC
-func (s *ArduinoCoreServerImpl) Init(req *rpc.InitReq, stream rpc.ArduinoCore_InitServer) error {
+func (s *ArduinoCoreServerImpl) Init(req *rpc.InitReq, stream rpc.ArduinoCoreService_InitServer) error {
 	resp, err := commands.Init(stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.InitResp{DownloadProgress: p}) },
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.InitResp{TaskProgress: p}) },
@@ -200,7 +200,7 @@ func (s *ArduinoCoreServerImpl) LoadSketch(ctx context.Context, req *rpc.LoadSke
 }
 
 // Compile FIXMEDOC
-func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoCore_CompileServer) error {
+func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoCoreService_CompileServer) error {
 	resp, err := compile.Compile(
 		stream.Context(), req,
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResp{OutStream: data}) }),
@@ -213,7 +213,7 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileReq, stream rpc.ArduinoC
 }
 
 // PlatformInstall FIXMEDOC
-func (s *ArduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallReq, stream rpc.ArduinoCore_PlatformInstallServer) error {
+func (s *ArduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallReq, stream rpc.ArduinoCoreService_PlatformInstallServer) error {
 	resp, err := core.PlatformInstall(
 		stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.PlatformInstallResp{Progress: p}) },
@@ -226,7 +226,7 @@ func (s *ArduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallReq, str
 }
 
 // PlatformDownload FIXMEDOC
-func (s *ArduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReq, stream rpc.ArduinoCore_PlatformDownloadServer) error {
+func (s *ArduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReq, stream rpc.ArduinoCoreService_PlatformDownloadServer) error {
 	resp, err := core.PlatformDownload(
 		stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.PlatformDownloadResp{Progress: p}) },
@@ -238,7 +238,7 @@ func (s *ArduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReq, s
 }
 
 // PlatformUninstall FIXMEDOC
-func (s *ArduinoCoreServerImpl) PlatformUninstall(req *rpc.PlatformUninstallReq, stream rpc.ArduinoCore_PlatformUninstallServer) error {
+func (s *ArduinoCoreServerImpl) PlatformUninstall(req *rpc.PlatformUninstallReq, stream rpc.ArduinoCoreService_PlatformUninstallServer) error {
 	resp, err := core.PlatformUninstall(
 		stream.Context(), req,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.PlatformUninstallResp{TaskProgress: p}) },
@@ -250,7 +250,7 @@ func (s *ArduinoCoreServerImpl) PlatformUninstall(req *rpc.PlatformUninstallReq,
 }
 
 // PlatformUpgrade FIXMEDOC
-func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeReq, stream rpc.ArduinoCore_PlatformUpgradeServer) error {
+func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeReq, stream rpc.ArduinoCoreService_PlatformUpgradeServer) error {
 	resp, err := core.PlatformUpgrade(
 		stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.PlatformUpgradeResp{Progress: p}) },
@@ -277,7 +277,7 @@ func (s *ArduinoCoreServerImpl) PlatformList(ctx context.Context, req *rpc.Platf
 }
 
 // Upload FIXMEDOC
-func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadReq, stream rpc.ArduinoCore_UploadServer) error {
+func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadReq, stream rpc.ArduinoCoreService_UploadServer) error {
 	resp, err := upload.Upload(
 		stream.Context(), req,
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadResp{OutStream: data}) }),
@@ -290,7 +290,7 @@ func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadReq, stream rpc.ArduinoCor
 }
 
 // UploadUsingProgrammer FIXMEDOC
-func (s *ArduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgrammerReq, stream rpc.ArduinoCore_UploadUsingProgrammerServer) error {
+func (s *ArduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgrammerReq, stream rpc.ArduinoCoreService_UploadUsingProgrammerServer) error {
 	resp, err := upload.UsingProgrammer(
 		stream.Context(), req,
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadUsingProgrammerResp{OutStream: data}) }),
@@ -303,7 +303,7 @@ func (s *ArduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgra
 }
 
 // BurnBootloader FIXMEDOC
-func (s *ArduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderReq, stream rpc.ArduinoCore_BurnBootloaderServer) error {
+func (s *ArduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderReq, stream rpc.ArduinoCoreService_BurnBootloaderServer) error {
 	resp, err := upload.BurnBootloader(
 		stream.Context(), req,
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.BurnBootloaderResp{OutStream: data}) }),
@@ -321,7 +321,7 @@ func (s *ArduinoCoreServerImpl) ListProgrammersAvailableForUpload(ctx context.Co
 }
 
 // LibraryDownload FIXMEDOC
-func (s *ArduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadReq, stream rpc.ArduinoCore_LibraryDownloadServer) error {
+func (s *ArduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadReq, stream rpc.ArduinoCoreService_LibraryDownloadServer) error {
 	resp, err := lib.LibraryDownload(
 		stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryDownloadResp{Progress: p}) },
@@ -333,7 +333,7 @@ func (s *ArduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadReq, str
 }
 
 // LibraryInstall FIXMEDOC
-func (s *ArduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallReq, stream rpc.ArduinoCore_LibraryInstallServer) error {
+func (s *ArduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallReq, stream rpc.ArduinoCoreService_LibraryInstallServer) error {
 	err := lib.LibraryInstall(
 		stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryInstallResp{Progress: p}) },
@@ -346,7 +346,7 @@ func (s *ArduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallReq, strea
 }
 
 // LibraryUninstall FIXMEDOC
-func (s *ArduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallReq, stream rpc.ArduinoCore_LibraryUninstallServer) error {
+func (s *ArduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallReq, stream rpc.ArduinoCoreService_LibraryUninstallServer) error {
 	err := lib.LibraryUninstall(stream.Context(), req,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryUninstallResp{TaskProgress: p}) },
 	)
@@ -357,7 +357,7 @@ func (s *ArduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallReq, s
 }
 
 // LibraryUpgradeAll FIXMEDOC
-func (s *ArduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllReq, stream rpc.ArduinoCore_LibraryUpgradeAllServer) error {
+func (s *ArduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllReq, stream rpc.ArduinoCoreService_LibraryUpgradeAllServer) error {
 	err := lib.LibraryUpgradeAll(req.GetInstance().GetId(),
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryUpgradeAllResp{Progress: p}) },
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryUpgradeAllResp{TaskProgress: p}) },
@@ -389,7 +389,7 @@ func (s *ArduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.Arch
 }
 
 //ZipLibraryInstall FIXMEDOC
-func (s *ArduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallReq, stream rpc.ArduinoCore_ZipLibraryInstallServer) error {
+func (s *ArduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallReq, stream rpc.ArduinoCoreService_ZipLibraryInstallServer) error {
 	err := lib.ZipLibraryInstall(
 		stream.Context(), req,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.ZipLibraryInstallResp{TaskProgress: p}) },
@@ -401,7 +401,7 @@ func (s *ArduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallReq,
 }
 
 //GitLibraryInstall FIXMEDOC
-func (s *ArduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallReq, stream rpc.ArduinoCore_GitLibraryInstallServer) error {
+func (s *ArduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallReq, stream rpc.ArduinoCoreService_GitLibraryInstallServer) error {
 	err := lib.GitLibraryInstall(
 		stream.Context(), req,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.GitLibraryInstallResp{TaskProgress: p}) },

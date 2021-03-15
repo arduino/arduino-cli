@@ -53,8 +53,3 @@ lint:
       - debug/debug.proto
       - monitor/monitor.proto
       - settings/settings.proto
-    SERVICE_SUFFIX:
-      - commands/commands.proto
-      - debug/debug.proto
-      - monitor/monitor.proto
-      - settings/settings.proto

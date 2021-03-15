@@ -21,8 +21,8 @@ option go_package = "github.com/arduino/arduino-cli/rpc/debug";
 
 import "commands/common.proto";
 
-// Service that abstract a debug Session usage
-service Debug {
+// DebugService abstracts a debug Session usage
+service DebugService {
     // Start a debug session and communicate with the debugger tool.
     rpc Debug (stream DebugReq) returns (stream DebugResp) {
     }
