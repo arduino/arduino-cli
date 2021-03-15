@@ -1,0 +1,60 @@
+version: v1beta1
+lint:
+  ignore_only:
+    ENUM_VALUE_PREFIX:
+      - commands/lib.proto
+      - monitor/monitor.proto
+    ENUM_VALUE_UPPER_SNAKE_CASE:
+      - commands/lib.proto
+    ENUM_ZERO_VALUE_SUFFIX:
+      - commands/lib.proto
+      - monitor/monitor.proto
+    FIELD_LOWER_SNAKE_CASE:
+      - commands/board.proto
+      - commands/commands.proto
+      - commands/common.proto
+      - commands/compile.proto
+      - commands/core.proto
+      - commands/lib.proto
+      - debug/debug.proto
+      - monitor/monitor.proto
+      - settings/settings.proto
+    PACKAGE_DIRECTORY_MATCH:
+      - commands/board.proto
+      - commands/commands.proto
+      - commands/common.proto
+      - commands/compile.proto
+      - commands/core.proto
+      - commands/lib.proto
+      - commands/upload.proto
+      - debug/debug.proto
+      - monitor/monitor.proto
+      - settings/settings.proto
+    PACKAGE_VERSION_SUFFIX:
+      - commands/board.proto
+      - commands/commands.proto
+      - commands/common.proto
+      - commands/compile.proto
+      - commands/core.proto
+      - commands/lib.proto
+      - commands/upload.proto
+      - debug/debug.proto
+      - monitor/monitor.proto
+      - settings/settings.proto
+    RPC_REQUEST_RESPONSE_UNIQUE:
+      - settings/settings.proto
+    RPC_REQUEST_STANDARD_NAME:
+      - commands/commands.proto
+      - debug/debug.proto
+      - monitor/monitor.proto
+      - settings/settings.proto
+    RPC_RESPONSE_STANDARD_NAME:
+      - commands/commands.proto
+      - debug/debug.proto
+      - monitor/monitor.proto
+      - settings/settings.proto
+    SERVICE_SUFFIX:
+      - commands/commands.proto
+      - debug/debug.proto
+      - monitor/monitor.proto
+      - settings/settings.proto
