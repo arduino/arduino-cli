@@ -15,7 +15,7 @@
 
 syntax = "proto3";
 
-package cc.arduino.cli.monitor;
+package cc.arduino.cli.monitor.v1;
 
 option go_package = "github.com/arduino/arduino-cli/rpc/monitor";
 

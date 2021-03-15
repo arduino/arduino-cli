@@ -15,14 +15,4 @@ lint:
       - debug/debug.proto
       - monitor/monitor.proto
       - settings/settings.proto
-    PACKAGE_VERSION_SUFFIX:
-      - commands/board.proto
-      - commands/commands.proto
-      - commands/common.proto
-      - commands/compile.proto
-      - commands/core.proto
-      - commands/lib.proto
-      - commands/upload.proto
-      - debug/debug.proto
-      - monitor/monitor.proto
-      - settings/settings.proto
+    

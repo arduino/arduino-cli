@@ -15,7 +15,7 @@
 
 syntax = "proto3";
 
-package cc.arduino.cli.settings;
+package cc.arduino.cli.settings.v1;
 
 option go_package = "github.com/arduino/arduino-cli/rpc/settings";
 

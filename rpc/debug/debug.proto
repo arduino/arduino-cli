@@ -15,7 +15,7 @@
 
 syntax = "proto3";
 
-package cc.arduino.cli.debug;
+package cc.arduino.cli.debug.v1;
 
 option go_package = "github.com/arduino/arduino-cli/rpc/debug";
 
@@ -52,7 +52,7 @@ message DebugRequest {
 
 message DebugConfigRequest {
     // Arduino Core Service instance from the `Init` response.
-    cc.arduino.cli.commands.Instance instance = 1;
+    cc.arduino.cli.commands.v1.Instance instance = 1;
     // Fully qualified board name of the board in use
     // (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
     // the sketch will be used.
