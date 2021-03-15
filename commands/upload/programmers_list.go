@@ -25,7 +25,7 @@ import (
 )
 
 // ListProgrammersAvailableForUpload FIXMEDOC
-func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadReq) (*rpc.ListProgrammersAvailableForUploadResp, error) {
+func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadReq) (*rpc.ListProgrammersAvailableForUploadResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
 	fqbnIn := req.GetFqbn()
@@ -60,7 +60,7 @@ func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgram
 		result = append(result, createRPCProgrammer(id, programmer))
 	}
 
-	return &rpc.ListProgrammersAvailableForUploadResp{
+	return &rpc.ListProgrammersAvailableForUploadResponse{
 		Programmers: result,
 	}, nil
 }

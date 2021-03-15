@@ -175,7 +175,7 @@ func run(cmd *cobra.Command, args []string) {
 	compileOut := new(bytes.Buffer)
 	compileErr := new(bytes.Buffer)
 	verboseCompile := configuration.Settings.GetString("logging.level") == "debug"
-	var compileRes *rpc.CompileResp
+	var compileRes *rpc.CompileResponse
 	if output.OutputFormat == "json" {
 		compileRes, err = compile.Compile(context.Background(), compileReq, compileOut, compileErr, verboseCompile)
 	} else {
@@ -236,10 +236,10 @@ func initSketchPath(sketchPath *paths.Path) *paths.Path {
 }
 
 type compileResult struct {
-	CompileOut    string           `json:"compiler_out"`
-	CompileErr    string           `json:"compiler_err"`
-	BuilderResult *rpc.CompileResp `json:"builder_result"`
-	Success       bool             `json:"success"`
+	CompileOut    string               `json:"compiler_out"`
+	CompileErr    string               `json:"compiler_err"`
+	BuilderResult *rpc.CompileResponse `json:"builder_result"`
+	Success       bool                 `json:"success"`
 }
 
 func (r *compileResult) Data() interface{} {

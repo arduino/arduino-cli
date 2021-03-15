@@ -46,7 +46,7 @@ func CreateInstance() (*rpc.Instance, error) {
 	return resp.GetInstance(), checkPlatformErrors(resp)
 }
 
-func getInitResponse() (*rpc.InitResp, error) {
+func getInitResponse() (*rpc.InitResponse, error) {
 	// invoke Init()
 	resp, err := commands.Init(context.Background(), &rpc.InitReq{}, output.ProgressBar(), output.TaskProgress())
 
@@ -121,7 +121,7 @@ func getInitResponse() (*rpc.InitResp, error) {
 	return resp, nil
 }
 
-func checkPlatformErrors(resp *rpc.InitResp) error {
+func checkPlatformErrors(resp *rpc.InitResponse) error {
 	// Init() and/or rescan succeeded, but there were errors loading platform indexes
 	if resp.GetPlatformsIndexErrors() != nil {
 		// log each error

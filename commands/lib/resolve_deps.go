@@ -25,7 +25,7 @@ import (
 )
 
 // LibraryResolveDependencies FIXMEDOC
-func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesReq) (*rpc.LibraryResolveDependenciesResp, error) {
+func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesReq) (*rpc.LibraryResolveDependenciesResponse, error) {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 
 	// Search the requested lib
@@ -69,5 +69,5 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 			VersionInstalled: installed,
 		})
 	}
-	return &rpc.LibraryResolveDependenciesResp{Dependencies: res}, nil
+	return &rpc.LibraryResolveDependenciesResponse{Dependencies: res}, nil
 }

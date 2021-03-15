@@ -39,7 +39,7 @@ import (
 // grpc Out <- tool stdOut
 // grpc Out <- tool stdErr
 // It also implements tool process lifecycle management
-func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*dbg.DebugResp, error) {
+func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*dbg.DebugResponse, error) {
 
 	// Get debugging command line to run debugger
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
@@ -67,7 +67,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 	// Get stdIn pipe from tool
 	in, err := cmd.StdinPipe()
 	if err != nil {
-		return &dbg.DebugResp{Error: err.Error()}, nil
+		return &dbg.DebugResponse{Error: err.Error()}, nil
 	}
 	defer in.Close()
 
@@ -77,7 +77,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 
 	// Start the debug command
 	if err := cmd.Start(); err != nil {
-		return &dbg.DebugResp{Error: err.Error()}, nil
+		return &dbg.DebugResponse{Error: err.Error()}, nil
 	}
 
 	if interrupt != nil {
@@ -103,9 +103,9 @@ func Debug(ctx context.Context, req *dbg.DebugConfigReq, inStream io.Reader, out
 
 	// Wait for process to finish
 	if err := cmd.Wait(); err != nil {
-		return &dbg.DebugResp{Error: err.Error()}, nil
+		return &dbg.DebugResponse{Error: err.Error()}, nil
 	}
-	return &dbg.DebugResp{}, nil
+	return &dbg.DebugResponse{}, nil
 }
 
 // getCommandLine compose a debug command represented by a core recipe

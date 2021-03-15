@@ -134,7 +134,7 @@ func initSketchPath(sketchPath *paths.Path) *paths.Path {
 }
 
 type debugInfoResult struct {
-	info *dbg.GetDebugConfigResp
+	info *dbg.GetDebugConfigResponse
 }
 
 func (r *debugInfoResult) Data() interface{} {

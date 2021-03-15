@@ -40,7 +40,7 @@ import (
 )
 
 // Upload FIXMEDOC
-func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStream io.Writer) (*rpc.UploadResp, error) {
+func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStream io.Writer) (*rpc.UploadResponse, error) {
 	logrus.Tracef("Upload %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	// TODO: make a generic function to extract sketch from request
@@ -70,11 +70,11 @@ func Upload(ctx context.Context, req *rpc.UploadReq, outStream io.Writer, errStr
 	if err != nil {
 		return nil, err
 	}
-	return &rpc.UploadResp{}, nil
+	return &rpc.UploadResponse{}, nil
 }
 
 // UsingProgrammer FIXMEDOC
-func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerReq, outStream io.Writer, errStream io.Writer) (*rpc.UploadUsingProgrammerResp, error) {
+func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerReq, outStream io.Writer, errStream io.Writer) (*rpc.UploadUsingProgrammerResponse, error) {
 	logrus.Tracef("Upload using programmer %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	if req.GetProgrammer() == "" {
@@ -91,7 +91,7 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerReq, out
 		Verbose:    req.GetVerbose(),
 		Verify:     req.GetVerify(),
 	}, outStream, errStream)
-	return &rpc.UploadUsingProgrammerResp{}, err
+	return &rpc.UploadUsingProgrammerResponse{}, err
 }
 
 func runProgramAction(pm *packagemanager.PackageManager,

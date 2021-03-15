@@ -43,7 +43,7 @@ import (
 )
 
 // Compile FIXMEDOC
-func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.Writer, debug bool) (r *rpc.CompileResp, e error) {
+func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.Writer, debug bool) (r *rpc.CompileResponse, e error) {
 
 	// There is a binding between the export binaries setting and the CLI flag to explicitly set it,
 	// since we want this binding to work also for the gRPC interface we must read it here in this
@@ -207,7 +207,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 	builderCtx.SourceOverride = req.GetSourceOverride()
 
-	r = &rpc.CompileResp{}
+	r = &rpc.CompileResponse{}
 	defer func() {
 		if p := builderCtx.BuildPath; p != nil {
 			r.BuildPath = p.String()
@@ -281,7 +281,7 @@ func Compile(ctx context.Context, req *rpc.CompileReq, outStream, errStream io.W
 
 	logrus.Tracef("Compile %s for %s successful", sketch.Name, fqbnIn)
 
-	return &rpc.CompileResp{
+	return &rpc.CompileResponse{
 		UsedLibraries:          importedLibs,
 		ExecutableSectionsSize: builderCtx.ExecutableSectionsSize.ToRPCExecutableSectionSizeArray(),
 	}, nil

@@ -44,6 +44,54 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+type GetAllResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The settings, in JSON format.
+	JsonData string `protobuf:"bytes,1,opt,name=jsonData,proto3" json:"jsonData,omitempty"`
+}
+
+func (x *GetAllResponse) Reset() {
+	*x = GetAllResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_settings_settings_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetAllResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAllResponse) ProtoMessage() {}
+
+func (x *GetAllResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_settings_settings_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAllResponse.ProtoReflect.Descriptor instead.
+func (*GetAllResponse) Descriptor() ([]byte, []int) {
+	return file_settings_settings_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *GetAllResponse) GetJsonData() string {
+	if x != nil {
+		return x.JsonData
+	}
+	return ""
+}
+
 type RawData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -56,7 +104,7 @@ type RawData struct {
 func (x *RawData) Reset() {
 	*x = RawData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_settings_settings_proto_msgTypes[0]
+		mi := &file_settings_settings_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -69,7 +117,7 @@ func (x *RawData) String() string {
 func (*RawData) ProtoMessage() {}
 
 func (x *RawData) ProtoReflect() protoreflect.Message {
-	mi := &file_settings_settings_proto_msgTypes[0]
+	mi := &file_settings_settings_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -82,10 +130,67 @@ func (x *RawData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RawData.ProtoReflect.Descriptor instead.
 func (*RawData) Descriptor() ([]byte, []int) {
-	return file_settings_settings_proto_rawDescGZIP(), []int{0}
+	return file_settings_settings_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *RawData) GetJsonData() string {
+	if x != nil {
+		return x.JsonData
+	}
+	return ""
+}
+
+type GetValueResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The key of the setting.
+	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	// The setting, in JSON format.
+	JsonData string `protobuf:"bytes,2,opt,name=jsonData,proto3" json:"jsonData,omitempty"`
+}
+
+func (x *GetValueResponse) Reset() {
+	*x = GetValueResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_settings_settings_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetValueResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetValueResponse) ProtoMessage() {}
+
+func (x *GetValueResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_settings_settings_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetValueResponse.ProtoReflect.Descriptor instead.
+func (*GetValueResponse) Descriptor() ([]byte, []int) {
+	return file_settings_settings_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetValueResponse) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *GetValueResponse) GetJsonData() string {
 	if x != nil {
 		return x.JsonData
 	}
@@ -106,7 +211,7 @@ type Value struct {
 func (x *Value) Reset() {
 	*x = Value{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_settings_settings_proto_msgTypes[1]
+		mi := &file_settings_settings_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -119,7 +224,7 @@ func (x *Value) String() string {
 func (*Value) ProtoMessage() {}
 
 func (x *Value) ProtoReflect() protoreflect.Message {
-	mi := &file_settings_settings_proto_msgTypes[1]
+	mi := &file_settings_settings_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -132,7 +237,7 @@ func (x *Value) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Value.ProtoReflect.Descriptor instead.
 func (*Value) Descriptor() ([]byte, []int) {
-	return file_settings_settings_proto_rawDescGZIP(), []int{1}
+	return file_settings_settings_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Value) GetKey() string {
@@ -158,7 +263,7 @@ type GetAllRequest struct {
 func (x *GetAllRequest) Reset() {
 	*x = GetAllRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_settings_settings_proto_msgTypes[2]
+		mi := &file_settings_settings_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -171,7 +276,7 @@ func (x *GetAllRequest) String() string {
 func (*GetAllRequest) ProtoMessage() {}
 
 func (x *GetAllRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_settings_settings_proto_msgTypes[2]
+	mi := &file_settings_settings_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -184,7 +289,7 @@ func (x *GetAllRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllRequest.ProtoReflect.Descriptor instead.
 func (*GetAllRequest) Descriptor() ([]byte, []int) {
-	return file_settings_settings_proto_rawDescGZIP(), []int{2}
+	return file_settings_settings_proto_rawDescGZIP(), []int{4}
 }
 
 type GetValueRequest struct {
@@ -199,7 +304,7 @@ type GetValueRequest struct {
 func (x *GetValueRequest) Reset() {
 	*x = GetValueRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_settings_settings_proto_msgTypes[3]
+		mi := &file_settings_settings_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -212,7 +317,7 @@ func (x *GetValueRequest) String() string {
 func (*GetValueRequest) ProtoMessage() {}
 
 func (x *GetValueRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_settings_settings_proto_msgTypes[3]
+	mi := &file_settings_settings_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -225,7 +330,7 @@ func (x *GetValueRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetValueRequest.ProtoReflect.Descriptor instead.
 func (*GetValueRequest) Descriptor() ([]byte, []int) {
-	return file_settings_settings_proto_rawDescGZIP(), []int{3}
+	return file_settings_settings_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetValueRequest) GetKey() string {
@@ -244,7 +349,7 @@ type MergeResponse struct {
 func (x *MergeResponse) Reset() {
 	*x = MergeResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_settings_settings_proto_msgTypes[4]
+		mi := &file_settings_settings_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -257,7 +362,7 @@ func (x *MergeResponse) String() string {
 func (*MergeResponse) ProtoMessage() {}
 
 func (x *MergeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_settings_settings_proto_msgTypes[4]
+	mi := &file_settings_settings_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -270,7 +375,7 @@ func (x *MergeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MergeResponse.ProtoReflect.Descriptor instead.
 func (*MergeResponse) Descriptor() ([]byte, []int) {
-	return file_settings_settings_proto_rawDescGZIP(), []int{4}
+	return file_settings_settings_proto_rawDescGZIP(), []int{6}
 }
 
 type SetValueResponse struct {
@@ -282,7 +387,7 @@ type SetValueResponse struct {
 func (x *SetValueResponse) Reset() {
 	*x = SetValueResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_settings_settings_proto_msgTypes[5]
+		mi := &file_settings_settings_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -295,7 +400,7 @@ func (x *SetValueResponse) String() string {
 func (*SetValueResponse) ProtoMessage() {}
 
 func (x *SetValueResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_settings_settings_proto_msgTypes[5]
+	mi := &file_settings_settings_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -308,7 +413,7 @@ func (x *SetValueResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetValueResponse.ProtoReflect.Descriptor instead.
 func (*SetValueResponse) Descriptor() ([]byte, []int) {
-	return file_settings_settings_proto_rawDescGZIP(), []int{5}
+	return file_settings_settings_proto_rawDescGZIP(), []int{7}
 }
 
 type WriteRequest struct {
@@ -323,7 +428,7 @@ type WriteRequest struct {
 func (x *WriteRequest) Reset() {
 	*x = WriteRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_settings_settings_proto_msgTypes[6]
+		mi := &file_settings_settings_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -336,7 +441,7 @@ func (x *WriteRequest) String() string {
 func (*WriteRequest) ProtoMessage() {}
 
 func (x *WriteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_settings_settings_proto_msgTypes[6]
+	mi := &file_settings_settings_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -349,7 +454,7 @@ func (x *WriteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WriteRequest.ProtoReflect.Descriptor instead.
 func (*WriteRequest) Descriptor() ([]byte, []int) {
-	return file_settings_settings_proto_rawDescGZIP(), []int{6}
+	return file_settings_settings_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *WriteRequest) GetFilePath() string {
@@ -368,7 +473,7 @@ type WriteResponse struct {
 func (x *WriteResponse) Reset() {
 	*x = WriteResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_settings_settings_proto_msgTypes[7]
+		mi := &file_settings_settings_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -381,7 +486,7 @@ func (x *WriteResponse) String() string {
 func (*WriteResponse) ProtoMessage() {}
 
 func (x *WriteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_settings_settings_proto_msgTypes[7]
+	mi := &file_settings_settings_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -394,7 +499,7 @@ func (x *WriteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WriteResponse.ProtoReflect.Descriptor instead.
 func (*WriteResponse) Descriptor() ([]byte, []int) {
-	return file_settings_settings_proto_rawDescGZIP(), []int{7}
+	return file_settings_settings_proto_rawDescGZIP(), []int{9}
 }
 
 var File_settings_settings_proto protoreflect.FileDescriptor
@@ -403,8 +508,15 @@ var file_settings_settings_proto_rawDesc = []byte{
 	0x0a, 0x17, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2f, 0x73, 0x65, 0x74, 0x74, 0x69,
 	0x6e, 0x67, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x17, 0x63, 0x63, 0x2e, 0x61, 0x72,
 	0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e,
-	0x67, 0x73, 0x22, 0x25, 0x0a, 0x07, 0x52, 0x61, 0x77, 0x44, 0x61, 0x74, 0x61, 0x12, 0x1a, 0x0a,
-	0x08, 0x6a, 0x73, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x67, 0x73, 0x22, 0x2c, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x6a, 0x73, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x61,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6a, 0x73, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x61,
+	0x22, 0x25, 0x0a, 0x07, 0x52, 0x61, 0x77, 0x44, 0x61, 0x74, 0x61, 0x12, 0x1a, 0x0a, 0x08, 0x6a,
+	0x73, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6a,
+	0x73, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x61, 0x22, 0x40, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x56, 0x61,
+	0x6c, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6b,
+	0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x1a, 0x0a,
+	0x08, 0x6a, 0x73, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x08, 0x6a, 0x73, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x61, 0x22, 0x35, 0x0a, 0x05, 0x56, 0x61, 0x6c,
 	0x75, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x03, 0x6b, 0x65, 0x79, 0x12, 0x1a, 0x0a, 0x08, 0x6a, 0x73, 0x6f, 0x6e, 0x44, 0x61, 0x74, 0x61,
@@ -418,38 +530,40 @@ var file_settings_settings_proto_rawDesc = []byte{
 	0x72, 0x69, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x66,
 	0x69, 0x6c, 0x65, 0x50, 0x61, 0x74, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x66,
 	0x69, 0x6c, 0x65, 0x50, 0x61, 0x74, 0x68, 0x22, 0x0f, 0x0a, 0x0d, 0x57, 0x72, 0x69, 0x74, 0x65,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xbd, 0x03, 0x0a, 0x0f, 0x53, 0x65, 0x74,
-	0x74, 0x69, 0x6e, 0x67, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x52, 0x0a, 0x06,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xcf, 0x03, 0x0a, 0x0f, 0x53, 0x65, 0x74,
+	0x74, 0x69, 0x6e, 0x67, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x59, 0x0a, 0x06,
 	0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x12, 0x26, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75,
 	0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73,
-	0x2e, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20,
+	0x2e, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27,
 	0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e,
-	0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x52, 0x61, 0x77, 0x44, 0x61, 0x74, 0x61,
-	0x12, 0x51, 0x0a, 0x05, 0x4d, 0x65, 0x72, 0x67, 0x65, 0x12, 0x20, 0x2e, 0x63, 0x63, 0x2e, 0x61,
-	0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69,
-	0x6e, 0x67, 0x73, 0x2e, 0x52, 0x61, 0x77, 0x44, 0x61, 0x74, 0x61, 0x1a, 0x26, 0x2e, 0x63, 0x63,
+	0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x41, 0x6c, 0x6c, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x51, 0x0a, 0x05, 0x4d, 0x65, 0x72, 0x67, 0x65,
+	0x12, 0x20, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c,
+	0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x52, 0x61, 0x77, 0x44, 0x61,
+	0x74, 0x61, 0x1a, 0x26, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e,
+	0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x4d, 0x65, 0x72,
+	0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x5f, 0x0a, 0x08, 0x47, 0x65,
+	0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x28, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75,
+	0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73,
+	0x2e, 0x47, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x29, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c,
+	0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x56, 0x61,
+	0x6c, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x55, 0x0a, 0x08, 0x53,
+	0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x1e, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64,
+	0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67,
+	0x73, 0x2e, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x1a, 0x29, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64,
+	0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67,
+	0x73, 0x2e, 0x53, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x56, 0x0a, 0x05, 0x57, 0x72, 0x69, 0x74, 0x65, 0x12, 0x25, 0x2e, 0x63, 0x63,
 	0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74,
-	0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x4d, 0x65, 0x72, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x12, 0x54, 0x0a, 0x08, 0x47, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12,
-	0x28, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69,
-	0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x56, 0x61, 0x6c,
-	0x75, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x63, 0x63, 0x2e, 0x61,
-	0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69,
-	0x6e, 0x67, 0x73, 0x2e, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x55, 0x0a, 0x08, 0x53, 0x65, 0x74,
-	0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x1e, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69,
-	0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e,
-	0x56, 0x61, 0x6c, 0x75, 0x65, 0x1a, 0x29, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69,
-	0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e,
-	0x53, 0x65, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x56, 0x0a, 0x05, 0x57, 0x72, 0x69, 0x74, 0x65, 0x12, 0x25, 0x2e, 0x63, 0x63, 0x2e, 0x61,
-	0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69,
-	0x6e, 0x67, 0x73, 0x2e, 0x57, 0x72, 0x69, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x1a, 0x26, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e, 0x63, 0x6c,
-	0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x57, 0x72, 0x69, 0x74, 0x65,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x2d, 0x5a, 0x2b, 0x67, 0x69, 0x74, 0x68,
-	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2f, 0x61,
-	0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2d, 0x63, 0x6c, 0x69, 0x2f, 0x72, 0x70, 0x63, 0x2f, 0x73,
-	0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x57, 0x72, 0x69, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x26, 0x2e, 0x63, 0x63, 0x2e, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2e,
+	0x63, 0x6c, 0x69, 0x2e, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x57, 0x72, 0x69,
+	0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x2d, 0x5a, 0x2b, 0x67, 0x69,
+	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f,
+	0x2f, 0x61, 0x72, 0x64, 0x75, 0x69, 0x6e, 0x6f, 0x2d, 0x63, 0x6c, 0x69, 0x2f, 0x72, 0x70, 0x63,
+	0x2f, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -464,28 +578,30 @@ func file_settings_settings_proto_rawDescGZIP() []byte {
 	return file_settings_settings_proto_rawDescData
 }
 
-var file_settings_settings_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_settings_settings_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_settings_settings_proto_goTypes = []interface{}{
-	(*RawData)(nil),          // 0: cc.arduino.cli.settings.RawData
-	(*Value)(nil),            // 1: cc.arduino.cli.settings.Value
-	(*GetAllRequest)(nil),    // 2: cc.arduino.cli.settings.GetAllRequest
-	(*GetValueRequest)(nil),  // 3: cc.arduino.cli.settings.GetValueRequest
-	(*MergeResponse)(nil),    // 4: cc.arduino.cli.settings.MergeResponse
-	(*SetValueResponse)(nil), // 5: cc.arduino.cli.settings.SetValueResponse
-	(*WriteRequest)(nil),     // 6: cc.arduino.cli.settings.WriteRequest
-	(*WriteResponse)(nil),    // 7: cc.arduino.cli.settings.WriteResponse
+	(*GetAllResponse)(nil),   // 0: cc.arduino.cli.settings.GetAllResponse
+	(*RawData)(nil),          // 1: cc.arduino.cli.settings.RawData
+	(*GetValueResponse)(nil), // 2: cc.arduino.cli.settings.GetValueResponse
+	(*Value)(nil),            // 3: cc.arduino.cli.settings.Value
+	(*GetAllRequest)(nil),    // 4: cc.arduino.cli.settings.GetAllRequest
+	(*GetValueRequest)(nil),  // 5: cc.arduino.cli.settings.GetValueRequest
+	(*MergeResponse)(nil),    // 6: cc.arduino.cli.settings.MergeResponse
+	(*SetValueResponse)(nil), // 7: cc.arduino.cli.settings.SetValueResponse
+	(*WriteRequest)(nil),     // 8: cc.arduino.cli.settings.WriteRequest
+	(*WriteResponse)(nil),    // 9: cc.arduino.cli.settings.WriteResponse
 }
 var file_settings_settings_proto_depIdxs = []int32{
-	2, // 0: cc.arduino.cli.settings.SettingsService.GetAll:input_type -> cc.arduino.cli.settings.GetAllRequest
-	0, // 1: cc.arduino.cli.settings.SettingsService.Merge:input_type -> cc.arduino.cli.settings.RawData
-	3, // 2: cc.arduino.cli.settings.SettingsService.GetValue:input_type -> cc.arduino.cli.settings.GetValueRequest
-	1, // 3: cc.arduino.cli.settings.SettingsService.SetValue:input_type -> cc.arduino.cli.settings.Value
-	6, // 4: cc.arduino.cli.settings.SettingsService.Write:input_type -> cc.arduino.cli.settings.WriteRequest
-	0, // 5: cc.arduino.cli.settings.SettingsService.GetAll:output_type -> cc.arduino.cli.settings.RawData
-	4, // 6: cc.arduino.cli.settings.SettingsService.Merge:output_type -> cc.arduino.cli.settings.MergeResponse
-	1, // 7: cc.arduino.cli.settings.SettingsService.GetValue:output_type -> cc.arduino.cli.settings.Value
-	5, // 8: cc.arduino.cli.settings.SettingsService.SetValue:output_type -> cc.arduino.cli.settings.SetValueResponse
-	7, // 9: cc.arduino.cli.settings.SettingsService.Write:output_type -> cc.arduino.cli.settings.WriteResponse
+	4, // 0: cc.arduino.cli.settings.SettingsService.GetAll:input_type -> cc.arduino.cli.settings.GetAllRequest
+	1, // 1: cc.arduino.cli.settings.SettingsService.Merge:input_type -> cc.arduino.cli.settings.RawData
+	5, // 2: cc.arduino.cli.settings.SettingsService.GetValue:input_type -> cc.arduino.cli.settings.GetValueRequest
+	3, // 3: cc.arduino.cli.settings.SettingsService.SetValue:input_type -> cc.arduino.cli.settings.Value
+	8, // 4: cc.arduino.cli.settings.SettingsService.Write:input_type -> cc.arduino.cli.settings.WriteRequest
+	0, // 5: cc.arduino.cli.settings.SettingsService.GetAll:output_type -> cc.arduino.cli.settings.GetAllResponse
+	6, // 6: cc.arduino.cli.settings.SettingsService.Merge:output_type -> cc.arduino.cli.settings.MergeResponse
+	2, // 7: cc.arduino.cli.settings.SettingsService.GetValue:output_type -> cc.arduino.cli.settings.GetValueResponse
+	7, // 8: cc.arduino.cli.settings.SettingsService.SetValue:output_type -> cc.arduino.cli.settings.SetValueResponse
+	9, // 9: cc.arduino.cli.settings.SettingsService.Write:output_type -> cc.arduino.cli.settings.WriteResponse
 	5, // [5:10] is the sub-list for method output_type
 	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -500,7 +616,7 @@ func file_settings_settings_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_settings_settings_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RawData); i {
+			switch v := v.(*GetAllResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -512,7 +628,7 @@ func file_settings_settings_proto_init() {
 			}
 		}
 		file_settings_settings_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Value); i {
+			switch v := v.(*RawData); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -524,7 +640,7 @@ func file_settings_settings_proto_init() {
 			}
 		}
 		file_settings_settings_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAllRequest); i {
+			switch v := v.(*GetValueResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -536,7 +652,7 @@ func file_settings_settings_proto_init() {
 			}
 		}
 		file_settings_settings_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetValueRequest); i {
+			switch v := v.(*Value); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -548,7 +664,7 @@ func file_settings_settings_proto_init() {
 			}
 		}
 		file_settings_settings_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MergeResponse); i {
+			switch v := v.(*GetAllRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -560,7 +676,7 @@ func file_settings_settings_proto_init() {
 			}
 		}
 		file_settings_settings_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SetValueResponse); i {
+			switch v := v.(*GetValueRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -572,7 +688,7 @@ func file_settings_settings_proto_init() {
 			}
 		}
 		file_settings_settings_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*WriteRequest); i {
+			switch v := v.(*MergeResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -584,6 +700,30 @@ func file_settings_settings_proto_init() {
 			}
 		}
 		file_settings_settings_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SetValueResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_settings_settings_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*WriteRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_settings_settings_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*WriteResponse); i {
 			case 0:
 				return &v.state
@@ -602,7 +742,7 @@ func file_settings_settings_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_settings_settings_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -629,11 +769,11 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type SettingsServiceClient interface {
 	// List all the settings.
-	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*RawData, error)
+	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	// Set multiple settings values at once.
 	Merge(ctx context.Context, in *RawData, opts ...grpc.CallOption) (*MergeResponse, error)
 	// Get the value of a specific setting.
-	GetValue(ctx context.Context, in *GetValueRequest, opts ...grpc.CallOption) (*Value, error)
+	GetValue(ctx context.Context, in *GetValueRequest, opts ...grpc.CallOption) (*GetValueResponse, error)
 	// Set the value of a specific setting.
 	SetValue(ctx context.Context, in *Value, opts ...grpc.CallOption) (*SetValueResponse, error)
 	// Writes to file settings currently stored in memory
@@ -648,8 +788,8 @@ func NewSettingsServiceClient(cc grpc.ClientConnInterface) SettingsServiceClient
 	return &settingsServiceClient{cc}
 }
 
-func (c *settingsServiceClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*RawData, error) {
-	out := new(RawData)
+func (c *settingsServiceClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
+	out := new(GetAllResponse)
 	err := c.cc.Invoke(ctx, "/cc.arduino.cli.settings.SettingsService/GetAll", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -666,8 +806,8 @@ func (c *settingsServiceClient) Merge(ctx context.Context, in *RawData, opts ...
 	return out, nil
 }
 
-func (c *settingsServiceClient) GetValue(ctx context.Context, in *GetValueRequest, opts ...grpc.CallOption) (*Value, error) {
-	out := new(Value)
+func (c *settingsServiceClient) GetValue(ctx context.Context, in *GetValueRequest, opts ...grpc.CallOption) (*GetValueResponse, error) {
+	out := new(GetValueResponse)
 	err := c.cc.Invoke(ctx, "/cc.arduino.cli.settings.SettingsService/GetValue", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -696,11 +836,11 @@ func (c *settingsServiceClient) Write(ctx context.Context, in *WriteRequest, opt
 // SettingsServiceServer is the server API for SettingsService service.
 type SettingsServiceServer interface {
 	// List all the settings.
-	GetAll(context.Context, *GetAllRequest) (*RawData, error)
+	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
 	// Set multiple settings values at once.
 	Merge(context.Context, *RawData) (*MergeResponse, error)
 	// Get the value of a specific setting.
-	GetValue(context.Context, *GetValueRequest) (*Value, error)
+	GetValue(context.Context, *GetValueRequest) (*GetValueResponse, error)
 	// Set the value of a specific setting.
 	SetValue(context.Context, *Value) (*SetValueResponse, error)
 	// Writes to file settings currently stored in memory
@@ -711,13 +851,13 @@ type SettingsServiceServer interface {
 type UnimplementedSettingsServiceServer struct {
 }
 
-func (*UnimplementedSettingsServiceServer) GetAll(context.Context, *GetAllRequest) (*RawData, error) {
+func (*UnimplementedSettingsServiceServer) GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
 }
 func (*UnimplementedSettingsServiceServer) Merge(context.Context, *RawData) (*MergeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Merge not implemented")
 }
-func (*UnimplementedSettingsServiceServer) GetValue(context.Context, *GetValueRequest) (*Value, error) {
+func (*UnimplementedSettingsServiceServer) GetValue(context.Context, *GetValueRequest) (*GetValueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetValue not implemented")
 }
 func (*UnimplementedSettingsServiceServer) SetValue(context.Context, *Value) (*SetValueResponse, error) {

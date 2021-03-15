@@ -58,7 +58,7 @@ func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 			return command.GetData(), err
 		}),
 		utils.FeedStreamTo(func(data []byte) {
-			stream.Send(&dbg.DebugResp{Data: data})
+			stream.Send(&dbg.DebugResponse{Data: data})
 		}),
 		signalChan)
 	if err != nil {
@@ -68,6 +68,6 @@ func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 }
 
 // GetDebugConfig return metadata about a debug session
-func (s *DebugService) GetDebugConfig(ctx context.Context, req *debug.DebugConfigReq) (*debug.GetDebugConfigResp, error) {
+func (s *DebugService) GetDebugConfig(ctx context.Context, req *debug.DebugConfigReq) (*debug.GetDebugConfigResponse, error) {
 	return cmd.GetDebugConfig(ctx, req)
 }

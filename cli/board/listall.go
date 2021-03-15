@@ -72,7 +72,7 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type resultAll struct {
-	list *rpc.BoardListAllResp
+	list *rpc.BoardListAllResponse
 }
 
 func (dr resultAll) Data() interface{} {

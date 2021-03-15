@@ -22,20 +22,32 @@ option go_package = "github.com/arduino/arduino-cli/rpc/settings";
 // The SettingsService provides an interface to Arduino CLI configuration options
 service SettingsService {
   // List all the settings.
-  rpc GetAll(GetAllRequest) returns (RawData);
+  rpc GetAll(GetAllRequest) returns (GetAllResponse);
   // Set multiple settings values at once.
   rpc Merge(RawData) returns (MergeResponse);
   // Get the value of a specific setting.
-  rpc GetValue(GetValueRequest) returns (Value);
+  rpc GetValue(GetValueRequest) returns (GetValueResponse);
   // Set the value of a specific setting.
   rpc SetValue(Value) returns (SetValueResponse);
   // Writes to file settings currently stored in memory
   rpc Write(WriteRequest) returns (WriteResponse);
 }
 
+message GetAllResponse {
+  // The settings, in JSON format.
+  string jsonData = 1;
+}
+
 message RawData {
     // The settings, in JSON format.
     string jsonData = 1;
+}
+
+message GetValueResponse {
+  // The key of the setting.
+  string key = 1;
+  // The setting, in JSON format.
+  string jsonData = 2;
 }
 
 message Value {

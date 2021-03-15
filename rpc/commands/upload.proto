@@ -51,7 +51,7 @@ message UploadReq {
 	string programmer = 9;
 }
 
-message UploadResp {
+message UploadResponse {
 	// The output of the upload process.
 	bytes out_stream = 1;
 	// The error output of the upload process.
@@ -86,7 +86,7 @@ message UploadUsingProgrammerReq {
 	string programmer = 9;
 }
 
-message UploadUsingProgrammerResp {
+message UploadUsingProgrammerResponse {
 	// The output of the upload process.
 	bytes out_stream = 1;
 	// The error output of the upload process.
@@ -109,7 +109,7 @@ message BurnBootloaderReq {
 	string programmer = 6;
 }
 
-message BurnBootloaderResp {
+message BurnBootloaderResponse {
 	// The output of the burn bootloader process.
 	bytes out_stream = 1;
 	// The error output of the burn bootloader process.
@@ -121,6 +121,6 @@ message ListProgrammersAvailableForUploadReq {
 	string fqbn = 2;
 }
 
-message ListProgrammersAvailableForUploadResp {
+message ListProgrammersAvailableForUploadResponse {
 	repeated Programmer programmers = 1;
 }

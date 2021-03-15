@@ -27,7 +27,7 @@ import (
 )
 
 // LibraryDownload FIXMEDOC
-func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadCB commands.DownloadProgressCB) (*rpc.LibraryDownloadResp, error) {
+func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadCB commands.DownloadProgressCB) (*rpc.LibraryDownloadResponse, error) {
 	logrus.Info("Executing `arduino lib download`")
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
@@ -43,7 +43,7 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadReq, downloadC
 		return nil, err
 	}
 
-	return &rpc.LibraryDownloadResp{}, nil
+	return &rpc.LibraryDownloadResponse{}, nil
 }
 
 func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release,

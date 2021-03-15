@@ -35,7 +35,7 @@ type installedLib struct {
 }
 
 // LibraryList FIXMEDOC
-func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResp, error) {
+func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -113,7 +113,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryList
 		})
 	}
 
-	return &rpc.LibraryListResp{InstalledLibrary: instaledLib}, nil
+	return &rpc.LibraryListResponse{InstalledLibrary: instaledLib}, nil
 }
 
 // listLibraries returns the list of installed libraries. If updatable is true it

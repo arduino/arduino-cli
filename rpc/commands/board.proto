@@ -29,7 +29,7 @@ message BoardDetailsReq {
     string fqbn = 2;
 }
 
-message BoardDetailsResp {
+message BoardDetailsResponse {
     // The fully qualified board name of the board.
     string fqbn = 1;
     // Name used to identify the board to humans (e.g., Arduino Uno).
@@ -170,7 +170,7 @@ message BoardAttachReq {
     string search_timeout = 4;
 }
 
-message BoardAttachResp {
+message BoardAttachResponse {
     // Description of the current stage of the board attachment.
     TaskProgress task_progress = 1;
 }
@@ -180,7 +180,7 @@ message BoardListReq {
     Instance instance = 1;
 }
 
-message BoardListResp {
+message BoardListResponse {
     // List of ports and the boards detected on those ports.
     repeated DetectedPort ports = 1;
 }
@@ -207,7 +207,7 @@ message BoardListAllReq {
     bool include_hidden_boards = 3;
 }
 
-message BoardListAllResp {
+message BoardListAllResponse {
     // List of installed boards.
     repeated BoardListItem boards = 1;
 }
@@ -219,7 +219,7 @@ message BoardListWatchReq {
     bool interrupt = 2;
 }
 
-message BoardListWatchResp {
+message BoardListWatchResponse {
     // Event type as received from the serial discovery tool
     string event_type = 1;
     // Information about the port
@@ -252,7 +252,7 @@ message BoardSearchReq {
     bool include_hidden_boards = 3;
 }
 
-message BoardSearchResp {
+message BoardSearchResponse {
     // List of installed and installable boards.
     repeated BoardListItem boards = 1;
 }

@@ -34,7 +34,7 @@ message PlatformInstallReq {
 	bool skipPostInstall = 5;
 }
 
-message PlatformInstallResp {
+message PlatformInstallResponse {
 	// Progress of the downloads of the platform and tool files.
 	DownloadProgress progress = 1;
 	// Description of the current stage of the installation.
@@ -51,7 +51,7 @@ message PlatformDownloadReq {
 	string version = 4;
 }
 
-message PlatformDownloadResp {
+message PlatformDownloadResponse {
 	// Progress of the downloads of platform and tool files.
 	DownloadProgress progress = 1;
 }
@@ -65,7 +65,7 @@ message PlatformUninstallReq {
 	string architecture = 3;
 }
 
-message PlatformUninstallResp {
+message PlatformUninstallResponse {
 	// Description of the current stage of the uninstall.
 	TaskProgress task_progress = 1;
 }
@@ -81,7 +81,7 @@ message PlatformUpgradeReq {
 	bool skipPostInstall = 4;
 }
 
-message PlatformUpgradeResp {
+message PlatformUpgradeResponse {
 	// Progress of the downloads of the platform and tool files.
 	DownloadProgress progress = 1;
 	// Description of the current stage of the upgrade.
@@ -98,7 +98,7 @@ message PlatformSearchReq {
 	bool all_versions = 3;
 }
 
-message PlatformSearchResp {
+message PlatformSearchResponse {
 	// Results of the search.
 	repeated Platform search_output = 1;
 }
@@ -115,7 +115,7 @@ message PlatformListReq {
 	bool all = 3;
 }
 
-message PlatformListResp {
+message PlatformListResponse {
 	// The installed platforms.
 	repeated Platform installed_platform = 1;
 }

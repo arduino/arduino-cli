@@ -30,7 +30,7 @@ import (
 const maximumSearchDistance = 20
 
 // ListAll FIXMEDOC
-func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllResp, error) {
+func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -58,7 +58,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllRe
 		return false, nil
 	}
 
-	list := &rpc.BoardListAllResp{Boards: []*rpc.BoardListItem{}}
+	list := &rpc.BoardListAllResponse{Boards: []*rpc.BoardListItem{}}
 	for _, targetPackage := range pm.Packages {
 		for _, platform := range targetPackage.Platforms {
 			installedPlatformRelease := pm.GetInstalledPlatformRelease(platform)

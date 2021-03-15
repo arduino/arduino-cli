@@ -25,7 +25,7 @@ import (
 )
 
 // BurnBootloader FIXMEDOC
-func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderReq, outStream io.Writer, errStream io.Writer) (*rpc.BurnBootloaderResp, error) {
+func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderReq, outStream io.Writer, errStream io.Writer) (*rpc.BurnBootloaderResponse, error) {
 	logrus.
 		WithField("fqbn", req.GetFqbn()).
 		WithField("port", req.GetPort()).
@@ -51,5 +51,5 @@ func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderReq, outStream i
 	if err != nil {
 		return nil, err
 	}
-	return &rpc.BurnBootloaderResp{}, nil
+	return &rpc.BurnBootloaderResponse{}, nil
 }

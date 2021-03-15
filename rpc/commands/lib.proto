@@ -30,7 +30,7 @@ message LibraryDownloadReq {
     string version = 3;
 }
 
-message LibraryDownloadResp {
+message LibraryDownloadResponse {
     // Progress of the library download.
     DownloadProgress progress = 1;
 }
@@ -46,7 +46,7 @@ message LibraryInstallReq {
     bool noDeps = 4;
 }
 
-message LibraryInstallResp {
+message LibraryInstallResponse {
     // Progress of the library download.
     DownloadProgress progress = 1;
     // Description of the current stage of the installation.
@@ -62,7 +62,7 @@ message LibraryUninstallReq {
     string version = 3;
 }
 
-message LibraryUninstallResp {
+message LibraryUninstallResponse {
     // Description of the current stage of the uninstallation.
     TaskProgress task_progress = 1;
 }
@@ -72,7 +72,7 @@ message LibraryUpgradeAllReq {
     Instance instance = 1;
 }
 
-message LibraryUpgradeAllResp {
+message LibraryUpgradeAllResponse {
     // Progress of the downloads of files needed for the upgrades.
     DownloadProgress progress = 1;
     // Description of the current stage of the upgrade.
@@ -89,7 +89,7 @@ message LibraryResolveDependenciesReq {
     string version = 3;
 }
 
-message LibraryResolveDependenciesResp {
+message LibraryResolveDependenciesResponse {
     // Dependencies of the library.
     repeated LibraryDependencyStatus dependencies = 1;
 }
@@ -117,7 +117,7 @@ enum LibrarySearchStatus {
     success = 1;
 }
 
-message LibrarySearchResp {
+message LibrarySearchResponse {
     // The results of the search.
     repeated SearchedLibrary libraries = 1;
     // Whether the search yielded results.
@@ -203,7 +203,7 @@ message LibraryListReq {
     string fqbn = 5;
 }
 
-message LibraryListResp {
+message LibraryListResponse {
     // List of installed libraries.
     repeated InstalledLibrary installed_library = 1;
 }
@@ -306,7 +306,7 @@ message ZipLibraryInstallReq {
     bool overwrite = 3;
 }
 
-message ZipLibraryInstallResp {
+message ZipLibraryInstallResponse {
     // Description of the current stage of the installation.
     TaskProgress task_progress = 1;
 }
@@ -320,7 +320,7 @@ message GitLibraryInstallReq {
     bool overwrite = 3;
 }
 
-message GitLibraryInstallResp {
+message GitLibraryInstallResponse {
     // Description of the current stage of the installation.
     TaskProgress task_progress = 1;
 }

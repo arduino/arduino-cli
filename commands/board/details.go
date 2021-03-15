@@ -27,7 +27,7 @@ import (
 
 // Details returns all details for a board including tools and HW identifiers.
 // This command basically gather al the information and translates it into the required grpc struct properties
-func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
+func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -44,7 +44,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		return nil, fmt.Errorf("loading board data: %s", err)
 	}
 
-	details := &rpc.BoardDetailsResp{}
+	details := &rpc.BoardDetailsResponse{}
 	details.Name = board.Name()
 	details.Fqbn = board.FQBN()
 	details.PropertiesId = board.BoardID

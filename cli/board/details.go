@@ -82,7 +82,7 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type detailsResult struct {
-	details *rpc.BoardDetailsResp
+	details *rpc.BoardDetailsResponse
 }
 
 func (dr detailsResult) Data() interface{} {

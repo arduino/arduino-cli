@@ -29,7 +29,7 @@ import (
 )
 
 // LibrarySearch FIXMEDOC
-func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.LibrarySearchResp, error) {
+func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.LibrarySearchResponse, error) {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
 		return nil, errors.New("invalid instance")
@@ -38,7 +38,7 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 	return searchLibrary(req, lm)
 }
 
-func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesManager) (*rpc.LibrarySearchResp, error) {
+func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesManager) (*rpc.LibrarySearchResponse, error) {
 	query := req.GetQuery()
 	res := []*rpc.SearchedLibrary{}
 	status := rpc.LibrarySearchStatus_success
@@ -72,7 +72,7 @@ func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesMana
 		res = append(res, indexLibraryToRPCSearchLibrary(lib))
 	}
 
-	return &rpc.LibrarySearchResp{Libraries: res, Status: status}, nil
+	return &rpc.LibrarySearchResponse{Libraries: res, Status: status}, nil
 }
 
 // indexLibraryToRPCSearchLibrary converts a librariindex.Library to rpc.SearchLibrary

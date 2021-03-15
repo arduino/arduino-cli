@@ -48,8 +48,3 @@ lint:
       - debug/debug.proto
       - monitor/monitor.proto
       - settings/settings.proto
-    RPC_RESPONSE_STANDARD_NAME:
-      - commands/commands.proto
-      - debug/debug.proto
-      - monitor/monitor.proto
-      - settings/settings.proto

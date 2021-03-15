@@ -46,7 +46,7 @@ message CompileReq {
   google.protobuf.BoolValue export_binaries = 23;  // When set to `true` the compiled binary will be copied to the export directory.
 }
 
-message CompileResp {
+message CompileResponse {
   bytes out_stream = 1; // The output of the compilation process.
   bytes err_stream = 2; // The error output of the compilation process.
   string build_path = 3; // The compiler build path

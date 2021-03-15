@@ -24,10 +24,10 @@ import "commands/common.proto";
 // DebugService abstracts a debug Session usage
 service DebugService {
     // Start a debug session and communicate with the debugger tool.
-    rpc Debug (stream DebugReq) returns (stream DebugResp) {
+    rpc Debug (stream DebugReq) returns (stream DebugResponse) {
     }
 
-    rpc GetDebugConfig(DebugConfigReq) returns (GetDebugConfigResp) {}
+    rpc GetDebugConfig(DebugConfigReq) returns (GetDebugConfigResponse) {}
 }
 
 // The top-level message sent by the client for the `Debug` method.
@@ -73,14 +73,14 @@ message DebugConfigReq {
 }
 
 //
-message DebugResp {
+message DebugResponse {
     // Incoming data from the debugger tool.
     bytes data = 1;
     // Incoming error output from the debugger tool.
     string error = 2;
 }
 
-message GetDebugConfigResp {
+message GetDebugConfigResponse {
     // The executable binary to debug
     string executable = 1;
     // The toolchain type used for the build (for example "gcc")

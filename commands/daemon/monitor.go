@@ -158,7 +158,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.MonitorService_StreamingOpenSe
 
 			slots := atomic.LoadInt32(&writeSlots)
 			if !rateLimitEnabled || slots > 0 {
-				if err = stream.Send(&rpc.StreamingOpenResp{
+				if err = stream.Send(&rpc.StreamingOpenResponse{
 					Data:    buffer[:bufferUsed],
 					Dropped: int32(dropped),
 				}); err != nil {

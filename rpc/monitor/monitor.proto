@@ -26,7 +26,7 @@ service MonitorService {
   // Open a bidirectional monitor stream. This can be used to implement
   // something similar to the Arduino IDE's Serial Monitor.
   rpc StreamingOpen(stream StreamingOpenReq)
-      returns (stream StreamingOpenResp) {}
+      returns (stream StreamingOpenResponse) {}
 }
 
 // The top-level message sent by the client for the `StreamingOpen` method.
@@ -74,7 +74,7 @@ message MonitorConfig {
 }
 
 //
-message StreamingOpenResp {
+message StreamingOpenResponse {
     // The data received from the target.
     bytes data = 1;
 

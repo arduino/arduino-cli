@@ -34,13 +34,13 @@ import (
 )
 
 // GetDebugConfig returns metadata to start debugging with the specified board
-func GetDebugConfig(ctx context.Context, req *debug.DebugConfigReq) (*debug.GetDebugConfigResp, error) {
+func GetDebugConfig(ctx context.Context, req *debug.DebugConfigReq) (*debug.GetDebugConfigResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
 	return getDebugProperties(req, pm)
 }
 
-func getDebugProperties(req *debug.DebugConfigReq, pm *packagemanager.PackageManager) (*debug.GetDebugConfigResp, error) {
+func getDebugProperties(req *debug.DebugConfigReq, pm *packagemanager.PackageManager) (*debug.GetDebugConfigResponse, error) {
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
 	if req.GetSketchPath() == "" {
@@ -157,7 +157,7 @@ func getDebugProperties(req *debug.DebugConfigReq, pm *packagemanager.PackageMan
 
 	server := debugProperties.Get("server")
 	toolchain := debugProperties.Get("toolchain")
-	return &debug.GetDebugConfigResp{
+	return &debug.GetDebugConfigResponse{
 		Executable:             debugProperties.Get("executable"),
 		Server:                 server,
 		ServerPath:             debugProperties.Get("server." + server + ".path"),

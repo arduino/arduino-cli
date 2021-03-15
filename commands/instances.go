@@ -131,7 +131,7 @@ func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB
 }
 
 // Init FIXMEDOC
-func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (*rpc.InitResp, error) {
+func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (*rpc.InitResponse, error) {
 	res, err := createInstance(ctx, req.GetLibraryManagerOnly())
 	if err != nil {
 		return nil, fmt.Errorf("cannot initialize package manager: %s", err)
@@ -150,7 +150,7 @@ func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, 
 		return nil, err
 	}
 
-	return &rpc.InitResp{
+	return &rpc.InitResponse{
 		Instance:             &rpc.Instance{Id: handle},
 		PlatformsIndexErrors: res.PlatformIndexErrors,
 		LibrariesIndexError:  res.LibrariesIndexError,
@@ -158,14 +158,14 @@ func Init(ctx context.Context, req *rpc.InitReq, downloadCB DownloadProgressCB, 
 }
 
 // Destroy FIXMEDOC
-func Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResp, error) {
+func Destroy(ctx context.Context, req *rpc.DestroyReq) (*rpc.DestroyResponse, error) {
 	id := req.GetInstance().GetId()
 	if _, ok := instances[id]; !ok {
 		return nil, fmt.Errorf("invalid handle")
 	}
 
 	delete(instances, id)
-	return &rpc.DestroyResp{}, nil
+	return &rpc.DestroyResponse{}, nil
 }
 
 // UpdateLibrariesIndex updates the library_index.json
@@ -194,7 +194,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexReq,
 }
 
 // UpdateIndex FIXMEDOC
-func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResp, error) {
+func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResponse, error) {
 	id := req.GetInstance().GetId()
 	_, ok := instances[id]
 	if !ok {
@@ -313,7 +313,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexReq, downloadCB Downlo
 	if _, err := Rescan(id); err != nil {
 		return nil, fmt.Errorf("rescanning filesystem: %s", err)
 	}
-	return &rpc.UpdateIndexResp{}, nil
+	return &rpc.UpdateIndexResponse{}, nil
 }
 
 // UpdateCoreLibrariesIndex updates both Cores and Libraries indexes
@@ -336,7 +336,7 @@ func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesI
 }
 
 // Outdated returns a list struct containing both Core and Libraries that can be updated
-func Outdated(ctx context.Context, req *rpc.OutdatedReq) (*rpc.OutdatedResp, error) {
+func Outdated(ctx context.Context, req *rpc.OutdatedReq) (*rpc.OutdatedResponse, error) {
 	id := req.GetInstance().GetId()
 
 	libraryManager := GetLibraryManager(id)
@@ -386,7 +386,7 @@ func Outdated(ctx context.Context, req *rpc.OutdatedReq) (*rpc.OutdatedResp, err
 		}
 	}
 
-	return &rpc.OutdatedResp{
+	return &rpc.OutdatedResponse{
 		OutdatedLibrary:  outdatedLibraries,
 		OutdatedPlatform: outdatedPlatforms,
 	}, nil
@@ -638,7 +638,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeReq, downloadCB DownloadProgre
 }
 
 // Rescan restart discoveries for the given instance
-func Rescan(instanceID int32) (*rpc.RescanResp, error) {
+func Rescan(instanceID int32) (*rpc.RescanResponse, error) {
 	coreInstance, ok := instances[instanceID]
 	if !ok {
 		return nil, fmt.Errorf("invalid handle")
@@ -651,7 +651,7 @@ func Rescan(instanceID int32) (*rpc.RescanResp, error) {
 	coreInstance.PackageManager = res.Pm
 	coreInstance.lm = res.Lm
 
-	return &rpc.RescanResp{
+	return &rpc.RescanResponse{
 		PlatformsIndexErrors: res.PlatformIndexErrors,
 		LibrariesIndexError:  res.LibrariesIndexError,
 	}, nil
@@ -757,7 +757,7 @@ func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult
 }
 
 // LoadSketch collects and returns all files composing a sketch
-func LoadSketch(ctx context.Context, req *rpc.LoadSketchReq) (*rpc.LoadSketchResp, error) {
+func LoadSketch(ctx context.Context, req *rpc.LoadSketchReq) (*rpc.LoadSketchResponse, error) {
 	sketch, err := builder.SketchLoad(req.SketchPath, "")
 	if err != nil {
 		return nil, fmt.Errorf("Error loading sketch %v: %v", req.SketchPath, err)
@@ -778,7 +778,7 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchReq) (*rpc.LoadSketchRes
 		rootFolderFiles[i] = file.Path
 	}
 
-	return &rpc.LoadSketchResp{
+	return &rpc.LoadSketchResponse{
 		MainFile:         sketch.MainFile.Path,
 		LocationPath:     sketch.LocationPath,
 		OtherSketchFiles: otherSketchFiles,

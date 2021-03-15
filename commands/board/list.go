@@ -195,14 +195,14 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 
 // Watch returns a channel that receives boards connection and disconnection events.
 // The discovery process can be interrupted by sending a message to the interrupt channel.
-func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResp, error) {
+func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResponse, error) {
 	pm := commands.GetPackageManager(instanceID)
 	eventsChan, err := commands.WatchListBoards(pm)
 	if err != nil {
 		return nil, err
 	}
 
-	outChan := make(chan *rpc.BoardListWatchResp)
+	outChan := make(chan *rpc.BoardListWatchResponse)
 	go func() {
 		for {
 			select {
@@ -228,7 +228,7 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 					serialNumber = props.Get("serialNumber")
 				}
 
-				outChan <- &rpc.BoardListWatchResp{
+				outChan <- &rpc.BoardListWatchResponse{
 					EventType: event.Type,
 					Port: &rpc.DetectedPort{
 						Address:       event.Port.Address,

@@ -66,7 +66,7 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type checkDepResult struct {
-	deps *rpc.LibraryResolveDependenciesResp
+	deps *rpc.LibraryResolveDependenciesResponse
 }
 
 func (dr checkDepResult) Data() interface{} {
