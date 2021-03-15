@@ -68,7 +68,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 			}
 
 			rpcPlatform := &rpc.Platform{
-				ID:                platform.String(),
+				Id:                platform.String(),
 				Installed:         installedVersion,
 				Latest:            latestPlatformRelease.Version.String(),
 				Name:              platform.Name,
@@ -98,7 +98,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 
 					res.Boards = append(res.Boards, &rpc.BoardListItem{
 						Name:     board.Name(),
-						FQBN:     board.FQBN(),
+						Fqbn:     board.FQBN(),
 						IsHidden: board.IsHidden(),
 						Platform: rpcPlatform,
 					})

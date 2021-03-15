@@ -88,10 +88,10 @@ func (ir installedResult) String() string {
 	t := table.New()
 	t.SetHeader("ID", "Installed", "Latest", "Name")
 	sort.Slice(ir.platforms, func(i, j int) bool {
-		return ir.platforms[i].ID < ir.platforms[j].ID
+		return ir.platforms[i].Id < ir.platforms[j].Id
 	})
 	for _, p := range ir.platforms {
-		t.AddRow(p.ID, p.Installed, p.Latest, p.Name)
+		t.AddRow(p.Id, p.Installed, p.Latest, p.Name)
 	}
 
 	return t.Render()

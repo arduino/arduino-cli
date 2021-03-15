@@ -4,16 +4,6 @@ lint:
     ENUM_ZERO_VALUE_SUFFIX:
       - commands/lib.proto
       - monitor/monitor.proto
-    FIELD_LOWER_SNAKE_CASE:
-      - commands/board.proto
-      - commands/commands.proto
-      - commands/common.proto
-      - commands/compile.proto
-      - commands/core.proto
-      - commands/lib.proto
-      - debug/debug.proto
-      - monitor/monitor.proto
-      - settings/settings.proto
     PACKAGE_DIRECTORY_MATCH:
       - commands/board.proto
       - commands/commands.proto

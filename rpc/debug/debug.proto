@@ -41,7 +41,7 @@ message DebugRequest {
     // Provides information to the debug that specifies which is the target.
     // The first `StreamingOpenReq` message must contain a `DebugReq`
     // message.
-    DebugConfigRequest debugRequest = 1;
+    DebugConfigRequest debug_request = 1;
 
     // The data to be sent to the target being monitored.
     bytes data = 2;

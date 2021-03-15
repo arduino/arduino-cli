@@ -98,10 +98,10 @@ func (sr searchResults) String() string {
 		t := table.New()
 		t.SetHeader("ID", "Version", "Name")
 		sort.Slice(sr.platforms, func(i, j int) bool {
-			return sr.platforms[i].ID < sr.platforms[j].ID
+			return sr.platforms[i].Id < sr.platforms[j].Id
 		})
 		for _, item := range sr.platforms {
-			t.AddRow(item.GetID(), item.GetLatest(), item.GetName())
+			t.AddRow(item.GetId(), item.GetLatest(), item.GetName())
 		}
 		return t.Render()
 	}

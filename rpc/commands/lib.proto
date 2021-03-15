@@ -43,7 +43,7 @@ message LibraryInstallRequest {
     // The version of the library to install.
     string version = 3;
     // Set to true to skip installation of specified library's dependencies, defaults to false.
-    bool noDeps = 4;
+    bool no_deps = 4;
 }
 
 message LibraryInstallResponse {
@@ -98,9 +98,9 @@ message LibraryDependencyStatus {
     // The name of the library dependency.
     string name = 1;
     // The required version of the library dependency.
-    string versionRequired = 2;
+    string version_required = 2;
     // Version of the library dependency currently installed.
-    string versionInstalled = 3;
+    string version_installed = 3;
 }
 
 message LibrarySearchRequest {
@@ -301,7 +301,7 @@ message ZipLibraryInstallRequest {
     // Arduino Core Service instance from the `Init` response.
     Instance instance = 1;
     //Path to the archived library
-    string Path = 2;
+    string path = 2;
     // Set to true to overwrite an already installed library with the same name. Defaults to false.
     bool overwrite = 3;
 }

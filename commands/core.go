@@ -51,7 +51,7 @@ func PlatformReleaseToRPC(platformRelease *cores.PlatformRelease) *rpc.Platform 
 	}
 
 	result := &rpc.Platform{
-		ID:                platformRelease.Platform.String(),
+		Id:                platformRelease.Platform.String(),
 		Name:              platformRelease.Platform.Name,
 		Maintainer:        platformRelease.Platform.Package.Maintainer,
 		Website:           platformRelease.Platform.Package.WebsiteURL,

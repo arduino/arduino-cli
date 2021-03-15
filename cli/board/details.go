@@ -137,17 +137,17 @@ func (dr detailsResult) String() string {
 	for i, idp := range details.IdentificationPref {
 		if i == 0 {
 			t.AddRow() // get some space from above
-			t.AddRow(tr("Identification properties:"), "VID:"+idp.UsbID.VID+" PID:"+idp.UsbID.PID)
+			t.AddRow(tr("Identification properties:"), "VID:"+idp.UsbId.Vid+" PID:"+idp.UsbId.Pid)
 			continue
 		}
-		t.AddRow("", "VID:"+idp.UsbID.VID+" PID:"+idp.UsbID.PID)
+		t.AddRow("", "VID:"+idp.UsbId.Vid+" PID:"+idp.UsbId.Pid)
 	}
 
 	t.AddRow() // get some space from above
 	addIfNotEmpty(tr("Package name:"), details.Package.Name)
 	addIfNotEmpty(tr("Package maintainer:"), details.Package.Maintainer)
 	addIfNotEmpty(tr("Package URL:"), details.Package.Url)
-	addIfNotEmpty(tr("Package website:"), details.Package.WebsiteURL)
+	addIfNotEmpty(tr("Package website:"), details.Package.WebsiteUrl)
 	addIfNotEmpty(tr("Package online help:"), details.Package.Help.Online)
 
 	t.AddRow() // get some space from above

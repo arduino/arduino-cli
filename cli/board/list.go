@@ -147,7 +147,7 @@ func (dr result) String() string {
 		if boards := port.GetBoards(); len(boards) > 0 {
 			sort.Slice(boards, func(i, j int) bool {
 				x, y := boards[i], boards[j]
-				return x.GetName() < y.GetName() || (x.GetName() == y.GetName() && x.GetFQBN() < y.GetFQBN())
+				return x.GetName() < y.GetName() || (x.GetName() == y.GetName() && x.GetFqbn() < y.GetFqbn())
 			})
 			for _, b := range boards {
 				board := b.GetName()
@@ -155,7 +155,7 @@ func (dr result) String() string {
 				// to improve the user experience, show on a dedicated column
 				// the name of the core supporting the board detected
 				var coreName = ""
-				fqbn, err := cores.ParseFQBN(b.GetFQBN())
+				fqbn, err := cores.ParseFQBN(b.GetFqbn())
 				if err == nil {
 					coreName = fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch)
 				}
@@ -206,7 +206,7 @@ func (dr watchEvent) String() string {
 	if boards := dr.Boards; len(boards) > 0 {
 		sort.Slice(boards, func(i, j int) bool {
 			x, y := boards[i], boards[j]
-			return x.GetName() < y.GetName() || (x.GetName() == y.GetName() && x.GetFQBN() < y.GetFQBN())
+			return x.GetName() < y.GetName() || (x.GetName() == y.GetName() && x.GetFqbn() < y.GetFqbn())
 		})
 		for _, b := range boards {
 			board := b.GetName()
@@ -214,7 +214,7 @@ func (dr watchEvent) String() string {
 			// to improve the user experience, show on a dedicated column
 			// the name of the core supporting the board detected
 			var coreName = ""
-			fqbn, err := cores.ParseFQBN(b.GetFQBN())
+			fqbn, err := cores.ParseFQBN(b.GetFqbn())
 			if err == nil {
 				coreName = fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch)
 			}

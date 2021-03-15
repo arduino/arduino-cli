@@ -72,7 +72,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 		}
 
 		for _, t := range targets {
-			args = append(args, t.ID)
+			args = append(args, t.Id)
 		}
 	}
 

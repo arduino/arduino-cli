@@ -37,7 +37,7 @@ message BoardDetailsResponse {
     // Installed version of the board's platform.
     string version = 3;
     // The board ID component of the FQBN (e.g., `uno`).
-    string propertiesId = 4;
+    string properties_id = 4;
     // Board alias that can be used as a more user friendly alternative to the
     // FQBN.
     string alias = 5;
@@ -50,7 +50,7 @@ message BoardDetailsResponse {
     // Data about the board's platform.
     BoardPlatform platform = 9;
     // Tool dependencies of the board.
-    repeated ToolsDependencies toolsDependencies = 10;
+    repeated ToolsDependencies tools_dependencies = 10;
     // The board's custom configuration options.
     repeated ConfigOption config_options = 11;
     // Identifying information for the board (e.g., USB VID/PID).
@@ -60,19 +60,19 @@ message BoardDetailsResponse {
     // Set to true if the board supports debugging
     bool debugging_supported = 14;
     // If a board with the specified FQBN is connected returns its serial number too
-    string serialNumber = 15;
+    string serial_number = 15;
 }
 
 message IdentificationPref {
     // Identifying information for USB-connected boards.
-    USBID usbID = 1;
+    USBID usb_id = 1;
 }
 
 message USBID {
     // USB vendor ID.
-    string VID = 1;
+    string vid = 1;
     // USB product ID.
-    string PID = 2;
+    string pid = 2;
 }
 
 message Package {
@@ -82,7 +82,7 @@ message Package {
     // (e.g., https://downloads.arduino.cc/packages/package_index.json).
     string url = 2;
     // A URL provided by the package author, intended to point to their website.
-    string websiteURL = 3;
+    string website_url = 3;
     // Email address of the package maintainer.
     string email = 4;
     // Package vendor name.
@@ -104,7 +104,7 @@ message BoardPlatform {
     // Download URL of the platform archive file.
     string url = 3;
     // File name of the platform archive.
-    string archiveFileName = 4;
+    string archive_file_name = 4;
     // Checksum of the platform archive.
     string checksum = 5;
     // File size of the platform archive.
@@ -131,7 +131,7 @@ message Systems {
     // Operating system identifier.
     string host = 2;
     // File name of the tool archive.
-    string archiveFileName = 3;
+    string archive_file_name = 3;
     // Download URL of the tool archive.
     string url = 4;
     // File size of the tool archive.
@@ -232,13 +232,13 @@ message BoardListItem {
     // The name for use when identifying the board to a human.
     string name = 1;
     // The fully qualified board name. Used to identify the board to a machine.
-    string FQBN = 2;
+    string fqbn = 2;
     // If the board is marked as "hidden" in the platform
     bool is_hidden = 3;
     // Vendor ID
-    string VID = 4;
+    string vid = 4;
     // Product ID
-    string PID = 5;
+    string pid = 5;
     // Platform this board belongs to
     Platform platform = 6;
 }

@@ -38,9 +38,9 @@ message StreamingOpenRequest {
   // Content must be either a monitor config or data to be sent.
   oneof content {
     // Provides information to the monitor that specifies which is the target.
-    // The first `StreamingOpenReq` message must contain a `monitor_config`
+    // The first `StreamingOpenReq` message must contain a `config`
     // message.
-    MonitorConfig monitorConfig = 1;
+    MonitorConfig config = 1;
 
     // The data to be sent to the target being monitored.
     bytes data = 2;
@@ -64,7 +64,7 @@ message MonitorConfig {
   TargetType type = 2;
   // Additional parameters that might be needed to configure the target or the
   // monitor itself.
-  google.protobuf.Struct additionalConfig = 3;
+  google.protobuf.Struct additional_config = 3;
 
   // This parameter indicates how many bytes should be buffered on the server side
   // before dropping. If >0 then the server will enable a rate limiter and will send

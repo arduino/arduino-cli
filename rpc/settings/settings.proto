@@ -35,26 +35,26 @@ service SettingsService {
 
 message GetAllResponse {
   // The settings, in JSON format.
-  string jsonData = 1;
+  string json_data = 1;
 }
 
 message MergeRequest {
     // The settings, in JSON format.
-    string jsonData = 1;
+    string json_data = 1;
 }
 
 message GetValueResponse {
   // The key of the setting.
   string key = 1;
   // The setting, in JSON format.
-  string jsonData = 2;
+  string json_data = 2;
 }
 
 message SetValueRequest {
   // The key of the setting.
   string key = 1;
   // The setting, in JSON format.
-  string jsonData = 2;
+  string json_data = 2;
 }
 
 message GetAllRequest {}
@@ -67,7 +67,7 @@ message SetValueResponse {}
 
 message WriteRequest {
   // Path to settings file (e.g. /path/to/arduino-cli.yaml)
-  string filePath = 1;
+  string file_path = 1;
 }
 
 message WriteResponse {

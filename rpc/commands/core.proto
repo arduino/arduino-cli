@@ -31,7 +31,7 @@ message PlatformInstallRequest {
 	// Platform version to install.
 	string version = 4;
 	// Set to true to not run (eventual) post install scripts for trusted platforms
-	bool skipPostInstall = 5;
+	bool skip_post_install = 5;
 }
 
 message PlatformInstallResponse {
@@ -78,7 +78,7 @@ message PlatformUpgradeRequest {
 	// Architecture name of the platform (e.g., `avr`).
 	string architecture = 3;
 	// Set to true to not run (eventual) post install scripts for trusted platforms
-	bool skipPostInstall = 4;
+	bool skip_post_install = 4;
 }
 
 message PlatformUpgradeResponse {

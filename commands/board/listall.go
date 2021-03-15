@@ -75,7 +75,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 			}
 
 			rpcPlatform := &rpc.Platform{
-				ID:                platform.String(),
+				Id:                platform.String(),
 				Installed:         installedVersion,
 				Latest:            latestVersion,
 				Name:              platform.Name,
@@ -108,7 +108,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 
 				list.Boards = append(list.Boards, &rpc.BoardListItem{
 					Name:     board.Name(),
-					FQBN:     board.FQBN(),
+					Fqbn:     board.FQBN(),
 					IsHidden: board.IsHidden(),
 					Platform: rpcPlatform,
 				})

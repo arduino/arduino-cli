@@ -239,7 +239,7 @@ message UpgradeRequest {
   Instance instance = 1;
 
   // Set to true to not run (eventual) post install scripts
-  bool skipPostInstall = 2;
+  bool skip_post_install = 2;
 }
 
 message UpgradeResponse {

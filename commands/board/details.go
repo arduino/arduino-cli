@@ -61,7 +61,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 	details.Package = &rpc.Package{
 		Name:       boardPackage.Name,
 		Maintainer: boardPackage.Maintainer,
-		WebsiteURL: boardPackage.WebsiteURL,
+		WebsiteUrl: boardPackage.WebsiteURL,
 		Email:      boardPackage.Email,
 		Help:       &rpc.Help{Online: boardPackage.Help.Online},
 		Url:        boardPackage.URL,
@@ -85,7 +85,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 	pids := board.Properties.SubTree("pid")
 	for id, vid := range vids.AsMap() {
 		if pid, ok := pids.GetOk(id); ok {
-			idPref := rpc.IdentificationPref{UsbID: &rpc.USBID{VID: vid, PID: pid}}
+			idPref := rpc.IdentificationPref{UsbId: &rpc.USBID{Vid: vid, Pid: pid}}
 			details.IdentificationPref = append(details.IdentificationPref, &idPref)
 		}
 	}

@@ -55,7 +55,7 @@ func TestPlatformSearch(t *testing.T) {
 
 	require.Len(t, res.SearchOutput, 2)
 	require.Contains(t, res.SearchOutput, &commands.Platform{
-		ID:         "Retrokits-RK002:arm",
+		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.5",
 		Name:       "RK002",
@@ -65,7 +65,7 @@ func TestPlatformSearch(t *testing.T) {
 		Boards:     []*commands.Board{{Name: "RK002"}},
 	})
 	require.Contains(t, res.SearchOutput, &commands.Platform{
-		ID:         "Retrokits-RK002:arm",
+		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
 		Name:       "RK002",
@@ -84,7 +84,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 1)
 	require.Contains(t, res.SearchOutput, &commands.Platform{
-		ID:         "Retrokits-RK002:arm",
+		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
 		Name:       "RK002",
@@ -104,7 +104,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 2)
 	require.Contains(t, res.SearchOutput, &commands.Platform{
-		ID:         "Retrokits-RK002:arm",
+		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.5",
 		Name:       "RK002",
@@ -114,7 +114,7 @@ func TestPlatformSearch(t *testing.T) {
 		Boards:     []*commands.Board{{Name: "RK002"}},
 	})
 	require.Contains(t, res.SearchOutput, &commands.Platform{
-		ID:         "Retrokits-RK002:arm",
+		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
 		Name:       "RK002",
@@ -134,7 +134,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 2)
 	require.Contains(t, res.SearchOutput, &commands.Platform{
-		ID:         "Retrokits-RK002:arm",
+		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.5",
 		Name:       "RK002",
@@ -144,7 +144,7 @@ func TestPlatformSearch(t *testing.T) {
 		Boards:     []*commands.Board{{Name: "RK002"}},
 	})
 	require.Contains(t, res.SearchOutput, &commands.Platform{
-		ID:         "Retrokits-RK002:arm",
+		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
 		Name:       "RK002",
@@ -164,7 +164,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 2)
 	require.Contains(t, res.SearchOutput, &commands.Platform{
-		ID:         "Retrokits-RK002:arm",
+		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.5",
 		Name:       "RK002",
@@ -174,7 +174,7 @@ func TestPlatformSearch(t *testing.T) {
 		Boards:     []*commands.Board{{Name: "RK002"}},
 	})
 	require.Contains(t, res.SearchOutput, &commands.Platform{
-		ID:         "Retrokits-RK002:arm",
+		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
 		Name:       "RK002",
@@ -194,7 +194,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 1)
 	require.Contains(t, res.SearchOutput, &commands.Platform{
-		ID:         "arduino:avr",
+		Id:         "arduino:avr",
 		Installed:  "",
 		Latest:     "1.8.3",
 		Name:       "Arduino AVR Boards",
@@ -240,7 +240,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 1)
 	require.Contains(t, res.SearchOutput, &commands.Platform{
-		ID:         "arduino:avr",
+		Id:         "arduino:avr",
 		Installed:  "",
 		Latest:     "1.8.3",
 		Name:       "Arduino AVR Boards",

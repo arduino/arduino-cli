@@ -38,7 +38,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.MonitorService_StreamingOpenSe
 	}
 
 	// ensure it's a config message and not data
-	config := msg.GetMonitorConfig()
+	config := msg.GetConfig()
 	if config == nil {
 		return errors.New("first message must contain monitor configuration, not data")
 	}

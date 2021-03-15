@@ -91,7 +91,7 @@ func (dr resultAll) String() string {
 		if item.IsHidden {
 			hidden = "(hidden)"
 		}
-		t.AddRow(item.GetName(), item.GetFQBN(), hidden)
+		t.AddRow(item.GetName(), item.GetFqbn(), hidden)
 	}
 	return t.Render()
 }

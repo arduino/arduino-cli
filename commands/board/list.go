@@ -88,9 +88,9 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 
 		retVal = append(retVal, &rpc.BoardListItem{
 			Name: name,
-			FQBN: fqbn,
-			VID:  vid,
-			PID:  pid,
+			Fqbn: fqbn,
+			Vid:  vid,
+			Pid:  pid,
 		})
 	} else {
 		return nil, errors.Wrap(err, "error querying Arduino Cloud Api")
@@ -119,9 +119,9 @@ func identify(pm *packagemanager.PackageManager, port *commands.BoardPort) ([]*r
 	for _, board := range pm.IdentifyBoard(port.IdentificationPrefs) {
 		boards = append(boards, &rpc.BoardListItem{
 			Name: board.Name(),
-			FQBN: board.FQBN(),
-			VID:  port.IdentificationPrefs.Get("vid"),
-			PID:  port.IdentificationPrefs.Get("pid"),
+			Fqbn: board.FQBN(),
+			Vid:  port.IdentificationPrefs.Get("vid"),
+			Pid:  port.IdentificationPrefs.Get("pid"),
 		})
 	}
 
