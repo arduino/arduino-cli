@@ -55,8 +55,8 @@ message StreamingOpenRequest {
 // that might be needed to configure the target or the monitor itself.
 message MonitorConfig {
   enum TargetType {
-    SERIAL = 0;
-    NULL = 99;
+    TARGET_TYPE_SERIAL = 0;
+    TARGET_TYPE_NULL = 99;
   }
 
   // The target name.

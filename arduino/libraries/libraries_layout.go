@@ -72,9 +72,9 @@ func (d *LibraryLayout) UnmarshalJSON(b []byte) error {
 func (d *LibraryLayout) ToRPCLibraryLayout() rpc.LibraryLayout {
 	switch *d {
 	case FlatLayout:
-		return rpc.LibraryLayout_flat_layout
+		return rpc.LibraryLayout_LIBRARY_LAYOUT_FLAT
 	case RecursiveLayout:
-		return rpc.LibraryLayout_recursive_layout
+		return rpc.LibraryLayout_LIBRARY_LAYOUT_RECURSIVE
 	}
 	panic(fmt.Sprintf("invalid LibraryLayout value %d", *d))
 }

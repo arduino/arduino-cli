@@ -112,9 +112,9 @@ message LibrarySearchRequest {
 
 enum LibrarySearchStatus {
     // No search results were found.
-    failed = 0;
+    LIBRARY_SEARCH_STATUS_FAILED = 0;
     // Search results were found.
-    success = 1;
+    LIBRARY_SEARCH_STATUS_SUCCESS = 1;
 }
 
 message LibrarySearchResponse {
@@ -279,22 +279,22 @@ message Library {
 
 enum LibraryLayout {
     // Library is in the 1.0 Arduino library format.
-    flat_layout = 0;
+    LIBRARY_LAYOUT_FLAT = 0;
     // Library is in the 1.5 Arduino library format.
-    recursive_layout = 1;
+    LIBRARY_LAYOUT_RECURSIVE = 1;
 }
 
 enum LibraryLocation {
     // In the `libraries` subdirectory of the Arduino IDE installation.
-    ide_builtin = 0;
+    LIBRARY_LOCATION_IDE_BUILTIN = 0;
     // In the `libraries` subdirectory of the user directory (sketchbook).
-    user = 1;
+    LIBRARY_LOCATION_USER = 1;
     // In the `libraries` subdirectory of a platform.
-    platform_builtin = 2;
+    LIBRARY_LOCATION_PLATFORM_BUILTIN = 2;
     // When `LibraryLocation` is used in a context where a board is specified,
     // this indicates the library is in the `libraries` subdirectory of a
     // platform referenced by the board's platform.
-    referenced_platform_builtin = 3;
+    LIBRARY_LOCATION_REFERENCED_PLATFORM_BUILTIN = 3;
 }
 
 message ZipLibraryInstallRequest {

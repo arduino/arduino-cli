@@ -41,7 +41,7 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.Lib
 func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.LibrariesManager) (*rpc.LibrarySearchResponse, error) {
 	query := req.GetQuery()
 	res := []*rpc.SearchedLibrary{}
-	status := rpc.LibrarySearchStatus_success
+	status := rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS
 
 	searchArgs := strings.Split(strings.Trim(query, " "), " ")
 

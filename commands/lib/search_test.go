@@ -27,7 +27,7 @@ func TestSearchLibrary(t *testing.T) {
 	}
 
 	assert := assert.New(t)
-	assert.Equal(resp.GetStatus(), rpc.LibrarySearchStatus_success)
+	assert.Equal(resp.GetStatus(), rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS)
 	assert.Equal(len(resp.GetLibraries()), 2)
 	assert.True(strings.Contains(resp.GetLibraries()[0].Name, "Test"))
 	assert.True(strings.Contains(resp.GetLibraries()[1].Name, "Test"))
@@ -48,7 +48,7 @@ func TestSearchLibrarySimilar(t *testing.T) {
 	}
 
 	assert := assert.New(t)
-	assert.Equal(resp.GetStatus(), rpc.LibrarySearchStatus_success)
+	assert.Equal(resp.GetStatus(), rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS)
 	assert.Equal(len(resp.GetLibraries()), 2)
 	libs := map[string]*rpc.SearchedLibrary{}
 	for _, l := range resp.GetLibraries() {

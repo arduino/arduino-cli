@@ -46,7 +46,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.MonitorService_StreamingOpenSe
 	// select which type of monitor we need
 	var mon monitors.Monitor
 	switch config.GetType() {
-	case rpc.MonitorConfig_SERIAL:
+	case rpc.MonitorConfig_TARGET_TYPE_SERIAL:
 		// grab port speed from additional config data
 		var baudRate float64
 		addCfg := config.GetAdditionalConfig()
@@ -63,7 +63,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.MonitorService_StreamingOpenSe
 			return err
 		}
 
-	case rpc.MonitorConfig_NULL:
+	case rpc.MonitorConfig_TARGET_TYPE_NULL:
 		if addCfg, ok := config.GetAdditionalConfig().AsMap()["OutputRate"]; !ok {
 			mon = monitors.OpenNullMonitor(100.0) // 100 bytes per second as default
 		} else if outputRate, ok := addCfg.(float64); !ok {
