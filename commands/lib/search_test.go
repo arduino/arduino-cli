@@ -39,7 +39,7 @@ func TestSearchLibrarySimilar(t *testing.T) {
 
 	req := &rpc.LibrarySearchReq{
 		Instance: &rpc.Instance{Id: 1},
-		Query:    "ardino",
+		Query:    "arduino",
 	}
 
 	resp, err := searchLibrary(req, lm)
