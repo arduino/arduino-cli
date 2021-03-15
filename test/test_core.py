@@ -76,11 +76,32 @@ def test_core_search(run_command, httpserver):
     assert "1.0.5" in platforms["Retrokits-RK002:arm"]
     assert "1.0.6" in platforms["Retrokits-RK002:arm"]
 
-    # Search using a board name
+    # Search using board names
     result = run_command(f"core search myboard --all --additional-urls={url} --format json")
     assert result.ok
     platforms = get_platforms(result.stdout)
     assert "1.2.3" in platforms["Package:x86"]
+
+    def run_search(search_args, expected_ids):
+        res = run_command(f"core search --format json {search_args}")
+        assert res.ok
+        data = json.loads(res.stdout)
+        platform_ids = [p["ID"] for p in data]
+        for platform_id in expected_ids:
+            assert platform_id in platform_ids
+
+    run_search("mkr1000", ["arduino:samd"])
+    run_search("mkr 1000", ["arduino:samd"])
+
+    run_search("yún", ["arduino:avr"])
+    run_search("yùn", ["arduino:avr"])
+    run_search("yun", ["arduino:avr"])
+
+    run_search("nano", ["arduino:avr", "arduino:megaavr", "arduino:samd", "arduino:mbed"])
+    run_search("nano 33", ["arduino:samd", "arduino:mbed"])
+    run_search("nano ble", ["arduino:mbed"])
+    run_search("ble", ["arduino:mbed"])
+    run_search("ble nano", ["arduino:mbed"])
 
 
 def test_core_search_no_args(run_command, httpserver):
@@ -144,32 +165,6 @@ def test_core_search_no_args(run_command, httpserver):
     platforms = json.loads(result.stdout)
     assert 1 == len([e for e in platforms if e.get("Name") == "test_core"])
     assert len(platforms) == num_platforms
-
-
-def test_core_search_fuzzy(run_command):
-    assert run_command("update")
-
-    def run_fuzzy_search(search_args, expected_ids):
-        res = run_command(f"core search --format json {search_args}")
-        assert res.ok
-        data = json.loads(res.stdout)
-        platform_ids = [p["ID"] for p in data]
-        for platform_id in expected_ids:
-            assert platform_id in platform_ids
-
-    run_fuzzy_search("mkr1000", ["arduino:samd"])
-    run_fuzzy_search("mkr 1000", ["arduino:samd"])
-
-    run_fuzzy_search("yún", ["arduino:avr"])
-    run_fuzzy_search("yùn", ["arduino:avr"])
-    run_fuzzy_search("yun", ["arduino:avr"])
-
-    run_fuzzy_search("nano", ["arduino:avr", "arduino:megaavr", "arduino:samd", "arduino:mbed"])
-    run_fuzzy_search("nano33", ["arduino:samd", "arduino:mbed"])
-    run_fuzzy_search("nano 33", ["arduino:samd", "arduino:mbed"])
-    run_fuzzy_search("nano ble", ["arduino:mbed"])
-    run_fuzzy_search("ble", ["arduino:mbed"])
-    run_fuzzy_search("ble nano", [])
 
 
 def test_core_updateindex_url_not_found(run_command, httpserver):
