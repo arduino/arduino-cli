@@ -21,9 +21,9 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 // maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
@@ -44,6 +44,26 @@ func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error)
 		vid, pid := searchArgs[:4], searchArgs[5:]
 		res = pm.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid)
 	} else {
+
+		searchArgs := strings.Split(searchArgs, " ")
+
+		match := func(toTest []string) (bool, error) {
+			if len(searchArgs) == 0 {
+				return true, nil
+			}
+
+			for _, t := range toTest {
+				matches, err := utils.Match(t, searchArgs)
+				if err != nil {
+					return false, err
+				}
+				if matches {
+					return matches, nil
+				}
+			}
+			return false, nil
+		}
+
 		for _, targetPackage := range pm.Packages {
 			for _, platform := range targetPackage.Platforms {
 				// discard invalid platforms
@@ -60,15 +80,6 @@ func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error)
 					continue
 				}
 
-				if searchArgs == "" {
-					if allVersions {
-						res = append(res, platform.GetAllReleases()...)
-					} else {
-						res = append(res, platformRelease)
-					}
-					continue
-				}
-
 				// Gather all strings that can be used for searching
 				toTest := []string{
 					platform.String(),
@@ -82,32 +93,18 @@ func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error)
 					toTest = append(toTest, board.Name)
 				}
 
-				// Removes some chars from query strings to enhance results
-				cleanSearchArgs := strings.Map(func(r rune) rune {
-					switch r {
-					case '_':
-					case '-':
-					case ' ':
-						return -1
-					}
-					return r
-				}, searchArgs)
-
-				// Fuzzy search
-				for _, arg := range []string{searchArgs, cleanSearchArgs} {
-					for _, rank := range fuzzy.RankFindNormalizedFold(arg, toTest) {
-						// Accepts only results that close to the searched terms
-						if rank.Distance < maximumSearchDistance {
-							if allVersions {
-								res = append(res, platform.GetAllReleases()...)
-							} else {
-								res = append(res, platformRelease)
-							}
-							goto nextPlatform
-						}
-					}
+				// Search
+				if ok, err := match(toTest); err != nil {
+					return nil, err
+				} else if !ok {
+					continue
 				}
-			nextPlatform:
+
+				if allVersions {
+					res = append(res, platform.GetAllReleases()...)
+				} else {
+					res = append(res, platformRelease)
+				}
 			}
 		}
 	}

@@ -22,9 +22,9 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/lithammer/fuzzysearch/fuzzy"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -43,44 +43,33 @@ func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesMana
 	res := []*rpc.SearchedLibrary{}
 	status := rpc.LibrarySearchStatus_success
 
-	// If the query is empty all libraries are returned
-	if strings.Trim(query, " ") == "" {
-		for _, lib := range lm.Index.Libraries {
-			res = append(res, indexLibraryToRPCSearchLibrary(lib))
-		}
-		return &rpc.LibrarySearchResp{Libraries: res, Status: status}, nil
-	}
+	searchArgs := strings.Split(strings.Trim(query, " "), " ")
 
-	// maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
-	// This value is completely arbitrary and picked randomly.
-	maximumSearchDistance := 150
-	// Use a lower distance for shorter query or the user might be flooded with unrelated results
-	if len(query) <= 4 {
-		maximumSearchDistance = 40
-	}
-
-	// Removes some chars from query strings to enhance results
-	cleanQuery := strings.Map(func(r rune) rune {
-		switch r {
-		case '_':
-		case '-':
-		case ' ':
-			return -1
+	match := func(toTest []string) (bool, error) {
+		if len(searchArgs) == 0 {
+			return true, nil
 		}
-		return r
-	}, query)
-	for _, lib := range lm.Index.Libraries {
-		// Use both uncleaned and cleaned query
-		for _, q := range []string{query, cleanQuery} {
-			toTest := []string{lib.Name, lib.Latest.Paragraph, lib.Latest.Sentence}
-			for _, rank := range fuzzy.RankFindNormalizedFold(q, toTest) {
-				if rank.Distance < maximumSearchDistance {
-					res = append(res, indexLibraryToRPCSearchLibrary(lib))
-					goto nextLib
-				}
+
+		for _, t := range toTest {
+			matches, err := utils.Match(t, searchArgs)
+			if err != nil {
+				return false, err
+			}
+			if matches {
+				return matches, nil
 			}
 		}
-	nextLib:
+		return false, nil
+	}
+
+	for _, lib := range lm.Index.Libraries {
+		toTest := []string{lib.Name, lib.Latest.Paragraph, lib.Latest.Sentence}
+		if ok, err := match(toTest); err != nil {
+			return nil, err
+		} else if !ok {
+			continue
+		}
+		res = append(res, indexLibraryToRPCSearchLibrary(lib))
 	}
 
 	return &rpc.LibrarySearchResp{Libraries: res, Status: status}, nil

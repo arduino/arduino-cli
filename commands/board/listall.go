@@ -20,9 +20,9 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 // maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
@@ -36,18 +36,26 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllRe
 		return nil, errors.New("invalid instance")
 	}
 
-	searchArgs := strings.Join(req.SearchArgs, " ")
+	searchArgs := []string{}
+	for _, s := range req.SearchArgs {
+		searchArgs = append(searchArgs, strings.Trim(s, " "))
+	}
 
-	match := func(toTest []string) bool {
+	match := func(toTest []string) (bool, error) {
 		if len(searchArgs) == 0 {
-			return true
+			return true, nil
 		}
-		for _, rank := range fuzzy.RankFindNormalizedFold(searchArgs, toTest) {
-			if rank.Distance < maximumSearchDistance {
-				return true
+
+		for _, t := range toTest {
+			matches, err := utils.Match(t, searchArgs)
+			if err != nil {
+				return false, err
+			}
+			if matches {
+				return matches, nil
 			}
 		}
-		return false
+		return false, nil
 	}
 
 	list := &rpc.BoardListAllResp{Boards: []*rpc.BoardListItem{}}
@@ -90,10 +98,11 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllRe
 					continue
 				}
 
-				toTest := toTest
-				toTest = append(toTest, strings.Split(board.Name(), " ")...)
+				toTest := append(toTest, board.Name())
 				toTest = append(toTest, board.FQBN())
-				if !match(toTest) {
+				if ok, err := match(toTest); err != nil {
+					return nil, err
+				} else if !ok {
 					continue
 				}
 

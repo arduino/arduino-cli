@@ -21,7 +21,6 @@ require (
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leonelquinteros/gotext v1.4.0
-	github.com/lithammer/fuzzysearch v1.1.1
 	github.com/marcinbor85/gohex v0.0.0-20210308104911-55fb1c624d84
 	github.com/mattn/go-colorable v0.1.2
 	github.com/mattn/go-isatty v0.0.8
