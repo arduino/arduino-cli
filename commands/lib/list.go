@@ -48,7 +48,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 
 	nameFilter := strings.ToLower(req.GetName())
 
-	instaledLib := []*rpc.InstalledLibrary{}
+	instaledLibs := []*rpc.InstalledLibrary{}
 	res := listLibraries(lm, req.GetUpdatable(), req.GetAll())
 	if f := req.GetFqbn(); f != "" {
 		fqbn, err := cores.ParseFQBN(req.GetFqbn())
@@ -107,13 +107,13 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		if err != nil {
 			return nil, fmt.Errorf("converting library %s to rpc struct: %w", lib.Library.Name, err)
 		}
-		instaledLib = append(instaledLib, &rpc.InstalledLibrary{
+		instaledLibs = append(instaledLibs, &rpc.InstalledLibrary{
 			Library: rpcLib,
 			Release: release,
 		})
 	}
 
-	return &rpc.LibraryListResponse{InstalledLibrary: instaledLib}, nil
+	return &rpc.LibraryListResponse{InstalledLibraries: instaledLibs}, nil
 }
 
 // listLibraries returns the list of installed libraries. If updatable is true it

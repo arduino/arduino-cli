@@ -387,8 +387,8 @@ func Outdated(ctx context.Context, req *rpc.OutdatedRequest) (*rpc.OutdatedRespo
 	}
 
 	return &rpc.OutdatedResponse{
-		OutdatedLibrary:  outdatedLibraries,
-		OutdatedPlatform: outdatedPlatforms,
+		OutdatedLibraries: outdatedLibraries,
+		OutdatedPlatforms: outdatedPlatforms,
 	}, nil
 }
 

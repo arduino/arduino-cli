@@ -229,9 +229,9 @@ message OutdatedRequest {
 
 message OutdatedResponse {
   // List of installed libraries that can be updated.
-  repeated InstalledLibrary outdated_library = 1;
+  repeated InstalledLibrary outdated_libraries = 1;
   // List of installed cores that can be updated.
-  repeated Platform outdated_platform = 2;
+  repeated Platform outdated_platforms = 2;
 }
 
 message UpgradeRequest {

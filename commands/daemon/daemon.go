@@ -273,7 +273,7 @@ func (s *ArduinoCoreServerImpl) PlatformList(ctx context.Context, req *rpc.Platf
 	if err != nil {
 		return nil, err
 	}
-	return &rpc.PlatformListResponse{InstalledPlatform: platforms}, nil
+	return &rpc.PlatformListResponse{InstalledPlatforms: platforms}, nil
 }
 
 // Upload FIXMEDOC

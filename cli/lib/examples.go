@@ -71,7 +71,7 @@ func runExamplesCommand(cmd *cobra.Command, args []string) {
 	}
 
 	found := []*libraryExamples{}
-	for _, lib := range res.GetInstalledLibrary() {
+	for _, lib := range res.GetInstalledLibraries() {
 		found = append(found, &libraryExamples{
 			Library:  lib.Library,
 			Examples: lib.Library.Examples,

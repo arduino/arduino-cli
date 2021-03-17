@@ -134,7 +134,7 @@ func (dr detailsResult) String() string {
 			table.NewCell("✔", color.New(color.FgGreen)))
 	}
 
-	for i, idp := range details.IdentificationPref {
+	for i, idp := range details.IdentificationPrefs {
 		if i == 0 {
 			t.AddRow() // get some space from above
 			t.AddRow(tr("Identification properties:"), "VID:"+idp.UsbId.Vid+" PID:"+idp.UsbId.Pid)

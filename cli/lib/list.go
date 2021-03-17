@@ -78,9 +78,9 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 	libs := []*rpc.InstalledLibrary{}
 	if listFlags.fqbn == "" {
-		libs = res.GetInstalledLibrary()
+		libs = res.GetInstalledLibraries()
 	} else {
-		for _, lib := range res.GetInstalledLibrary() {
+		for _, lib := range res.GetInstalledLibraries() {
 			if lib.Library.CompatibleWith[listFlags.fqbn] {
 				libs = append(libs, lib)
 			}

@@ -72,8 +72,8 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 		// Prints outdated cores
 		tab := table.New()
 		tab.SetHeader("Core name", "Installed version", "New version")
-		if len(outdatedResp.OutdatedPlatform) > 0 {
-			for _, p := range outdatedResp.OutdatedPlatform {
+		if len(outdatedResp.OutdatedPlatforms) > 0 {
+			for _, p := range outdatedResp.OutdatedPlatforms {
 				tab.AddRow(p.Name, p.Installed, p.Latest)
 			}
 			feedback.Print(tab.Render())
@@ -82,8 +82,8 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 		// Prints outdated libraries
 		tab = table.New()
 		tab.SetHeader("Library name", "Installed version", "New version")
-		if len(outdatedResp.OutdatedLibrary) > 0 {
-			for _, l := range outdatedResp.OutdatedLibrary {
+		if len(outdatedResp.OutdatedLibraries) > 0 {
+			for _, l := range outdatedResp.OutdatedLibraries {
 				tab.AddRow(l.Library.Name, l.Library.Version, l.Release.Version)
 			}
 			feedback.Print(tab.Render())

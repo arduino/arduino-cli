@@ -117,5 +117,5 @@ message PlatformListRequest {
 
 message PlatformListResponse {
 	// The installed platforms.
-	repeated Platform installed_platform = 1;
+	repeated Platform installed_platforms = 1;
 }

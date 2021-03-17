@@ -205,7 +205,7 @@ message LibraryListRequest {
 
 message LibraryListResponse {
     // List of installed libraries.
-    repeated InstalledLibrary installed_library = 1;
+    repeated InstalledLibrary installed_libraries = 1;
 }
 
 message InstalledLibrary {
