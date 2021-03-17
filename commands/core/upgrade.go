@@ -64,7 +64,6 @@ func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 	}
 
 	// Search the latest version for all specified platforms
-	toInstallRefs := []*packagemanager.PlatformReference{}
 	platform := pm.FindPlatform(platformRef)
 	if platform == nil {
 		return fmt.Errorf("platform %s not found", platformRef)
@@ -78,17 +77,15 @@ func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 		return ErrAlreadyLatest
 	}
 	platformRef.PlatformVersion = latest.Version
-	toInstallRefs = append(toInstallRefs, platformRef)
 
-	for _, platformRef := range toInstallRefs {
-		platform, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
-		if err != nil {
-			return fmt.Errorf("platform %s is not installed", platformRef)
-		}
-		err = installPlatform(pm, platform, tools, downloadCB, taskCB, skipPostInstall)
-		if err != nil {
-			return err
-		}
+	platformRelease, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
+	if err != nil {
+		return fmt.Errorf("platform %s is not installed", platformRef)
 	}
+	err = installPlatform(pm, platformRelease, tools, downloadCB, taskCB, skipPostInstall)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
