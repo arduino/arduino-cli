@@ -289,6 +289,9 @@ func SketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath string, overrides
 			sourceBytes = s
 		}
 
+		// tag each addtional file with the filename of the source it was copied from
+		sourceBytes = append([]byte("#line 1 "+QuoteCppString(item.Path)+"\n"), sourceBytes...)
+
 		err = writeIfDifferent(sourceBytes, targetPath)
 		if err != nil {
 			return errors.Wrap(err, "unable to write to destination file")
