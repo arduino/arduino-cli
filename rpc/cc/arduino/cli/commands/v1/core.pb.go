@@ -428,7 +428,8 @@ type PlatformUpgradeRequest struct {
 	PlatformPackage string `protobuf:"bytes,2,opt,name=platform_package,json=platformPackage,proto3" json:"platform_package,omitempty"`
 	// Architecture name of the platform (e.g., `avr`).
 	Architecture string `protobuf:"bytes,3,opt,name=architecture,proto3" json:"architecture,omitempty"`
-	// Set to true to not run (eventual) post install scripts for trusted platforms
+	// Set to true to not run (eventual) post install scripts for trusted
+	// platforms
 	SkipPostInstall bool `protobuf:"varint,4,opt,name=skip_post_install,json=skipPostInstall,proto3" json:"skip_post_install,omitempty"`
 }
 
@@ -675,8 +676,8 @@ type PlatformListRequest struct {
 	// than the one currently installed.
 	UpdatableOnly bool `protobuf:"varint,2,opt,name=updatable_only,json=updatableOnly,proto3" json:"updatable_only,omitempty"`
 	// Set to true to list platforms installed manually in the user' sketchbook
-	// hardware folder, installed with the PlatformManager through the CLI or IDE
-	// and that are available to install
+	// hardware folder, installed with the PlatformManager through the CLI or
+	// IDE and that are available to install
 	All bool `protobuf:"varint,3,opt,name=all,proto3" json:"all,omitempty"`
 }
 

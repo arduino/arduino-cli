@@ -176,7 +176,9 @@ message DestroyRequest {
   // The Arduino Core Service instance to destroy.
   Instance instance = 1;
 }
-message DestroyResponse {}
+
+message DestroyResponse {
+}
 
 message RescanRequest {
   // Arduino Core Service instance from the Init response.
@@ -237,7 +239,6 @@ message OutdatedResponse {
 message UpgradeRequest {
   // Arduino Core Service instance from the Init response.
   Instance instance = 1;
-
   // Set to true to not run (eventual) post install scripts
   bool skip_post_install = 2;
 }
@@ -249,7 +250,8 @@ message UpgradeResponse {
   TaskProgress task_progress = 2;
 }
 
-message VersionRequest {}
+message VersionRequest {
+}
 
 message VersionResponse {
   // The version of Arduino CLI in use.
@@ -285,4 +287,5 @@ message ArchiveSketchRequest{
   bool include_build_dir = 3;
 }
 
-message ArchiveSketchResponse { }
+message ArchiveSketchResponse {
+}

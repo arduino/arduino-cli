@@ -46,26 +46,60 @@ type CompileRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Instance                      *Instance           `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`                                                                                                                            // Arduino Core Service instance from the `Init` response.
-	Fqbn                          string              `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`                                                                                                                                    // Fully Qualified Board Name, e.g.: `arduino:avr:uno`. If this field is not defined, the FQBN of the board attached to the sketch via the `BoardAttach` method is used.
-	SketchPath                    string              `protobuf:"bytes,3,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`                                                                                                      // The path where the sketch is stored.
-	ShowProperties                bool                `protobuf:"varint,4,opt,name=show_properties,json=showProperties,proto3" json:"show_properties,omitempty"`                                                                                         // Show all build preferences used instead of compiling.
-	Preprocess                    bool                `protobuf:"varint,5,opt,name=preprocess,proto3" json:"preprocess,omitempty"`                                                                                                                       // Print preprocessed code to stdout instead of compiling.
-	BuildCachePath                string              `protobuf:"bytes,6,opt,name=build_cache_path,json=buildCachePath,proto3" json:"build_cache_path,omitempty"`                                                                                        // Builds of 'core.a' are saved into this path to be cached and reused.
-	BuildPath                     string              `protobuf:"bytes,7,opt,name=build_path,json=buildPath,proto3" json:"build_path,omitempty"`                                                                                                         // Path to use to store the files used for the compilation. If omitted, a directory will be created in the operating system's default temporary path.
-	BuildProperties               []string            `protobuf:"bytes,8,rep,name=build_properties,json=buildProperties,proto3" json:"build_properties,omitempty"`                                                                                       // List of custom build properties separated by commas.
-	Warnings                      string              `protobuf:"bytes,9,opt,name=warnings,proto3" json:"warnings,omitempty"`                                                                                                                            // Used to tell gcc which warning level to use. The level names are: "none", "default", "more" and "all".
-	Verbose                       bool                `protobuf:"varint,10,opt,name=verbose,proto3" json:"verbose,omitempty"`                                                                                                                            // Turns on verbose mode.
-	Quiet                         bool                `protobuf:"varint,11,opt,name=quiet,proto3" json:"quiet,omitempty"`                                                                                                                                // Suppresses almost every output.
-	VidPid                        string              `protobuf:"bytes,12,opt,name=vid_pid,json=vidPid,proto3" json:"vid_pid,omitempty"`                                                                                                                 // VID/PID specific build properties.
-	Jobs                          int32               `protobuf:"varint,14,opt,name=jobs,proto3" json:"jobs,omitempty"`                                                                                                                                  // The max number of concurrent compiler instances to run (as `make -jx`). If jobs is set to 0, it will use the number of available CPUs as the maximum.
-	Libraries                     []string            `protobuf:"bytes,15,rep,name=libraries,proto3" json:"libraries,omitempty"`                                                                                                                         // List of custom libraries paths separated by commas.
-	OptimizeForDebug              bool                `protobuf:"varint,16,opt,name=optimize_for_debug,json=optimizeForDebug,proto3" json:"optimize_for_debug,omitempty"`                                                                                // Optimize compile output for debug, not for release.
-	ExportDir                     string              `protobuf:"bytes,18,opt,name=export_dir,json=exportDir,proto3" json:"export_dir,omitempty"`                                                                                                        // Optional: save the build artifacts in this directory, the directory must exist.
-	Clean                         bool                `protobuf:"varint,19,opt,name=clean,proto3" json:"clean,omitempty"`                                                                                                                                // Optional: cleanup the build folder and do not use any previously cached build
-	CreateCompilationDatabaseOnly bool                `protobuf:"varint,21,opt,name=create_compilation_database_only,json=createCompilationDatabaseOnly,proto3" json:"create_compilation_database_only,omitempty"`                                       // When set to `true` only the compilation database will be produced and no actual build will be performed.
-	SourceOverride                map[string]string   `protobuf:"bytes,22,rep,name=source_override,json=sourceOverride,proto3" json:"source_override,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // This map (source file -> new content) let the builder use the provided content instead of reading the corresponding file on disk. This is useful for IDE that have unsaved changes in memory. The path must be relative to the sketch directory. Only files from the sketch are allowed.
-	ExportBinaries                *wrappers.BoolValue `protobuf:"bytes,23,opt,name=export_binaries,json=exportBinaries,proto3" json:"export_binaries,omitempty"`                                                                                         // When set to `true` the compiled binary will be copied to the export directory.
+	// Arduino Core Service instance from the `Init` response.
+	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
+	// Fully Qualified Board Name, e.g.: `arduino:avr:uno`. If this field is
+	// not defined, the FQBN of the board attached to the sketch via the
+	// `BoardAttach` method is used.
+	Fqbn string `protobuf:"bytes,2,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
+	// The path where the sketch is stored.
+	SketchPath string `protobuf:"bytes,3,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
+	// Show all build preferences used instead of compiling.
+	ShowProperties bool `protobuf:"varint,4,opt,name=show_properties,json=showProperties,proto3" json:"show_properties,omitempty"`
+	// Print preprocessed code to stdout instead of compiling.
+	Preprocess bool `protobuf:"varint,5,opt,name=preprocess,proto3" json:"preprocess,omitempty"`
+	// Builds of 'core.a' are saved into this path to be cached and reused.
+	BuildCachePath string `protobuf:"bytes,6,opt,name=build_cache_path,json=buildCachePath,proto3" json:"build_cache_path,omitempty"`
+	// Path to use to store the files used for the compilation. If omitted,
+	// a directory will be created in the operating system's default temporary
+	// path.
+	BuildPath string `protobuf:"bytes,7,opt,name=build_path,json=buildPath,proto3" json:"build_path,omitempty"`
+	// List of custom build properties separated by commas.
+	BuildProperties []string `protobuf:"bytes,8,rep,name=build_properties,json=buildProperties,proto3" json:"build_properties,omitempty"`
+	// Used to tell gcc which warning level to use. The level names are: "none",
+	// "default", "more" and "all".
+	Warnings string `protobuf:"bytes,9,opt,name=warnings,proto3" json:"warnings,omitempty"`
+	// Turns on verbose mode.
+	Verbose bool `protobuf:"varint,10,opt,name=verbose,proto3" json:"verbose,omitempty"`
+	// Suppresses almost every output.
+	Quiet bool `protobuf:"varint,11,opt,name=quiet,proto3" json:"quiet,omitempty"`
+	// VID/PID specific build properties.
+	VidPid string `protobuf:"bytes,12,opt,name=vid_pid,json=vidPid,proto3" json:"vid_pid,omitempty"`
+	// The max number of concurrent compiler instances to run (as `make -jx`).
+	// If jobs is set to 0, it will use the number of available CPUs as the
+	// maximum.
+	Jobs int32 `protobuf:"varint,14,opt,name=jobs,proto3" json:"jobs,omitempty"`
+	// List of custom libraries paths separated by commas.
+	Libraries []string `protobuf:"bytes,15,rep,name=libraries,proto3" json:"libraries,omitempty"`
+	// Optimize compile output for debug, not for release.
+	OptimizeForDebug bool `protobuf:"varint,16,opt,name=optimize_for_debug,json=optimizeForDebug,proto3" json:"optimize_for_debug,omitempty"`
+	// Optional: save the build artifacts in this directory, the directory must
+	// exist.
+	ExportDir string `protobuf:"bytes,18,opt,name=export_dir,json=exportDir,proto3" json:"export_dir,omitempty"`
+	// Optional: cleanup the build folder and do not use any previously cached
+	// build
+	Clean bool `protobuf:"varint,19,opt,name=clean,proto3" json:"clean,omitempty"`
+	// When set to `true` only the compilation database will be produced and no
+	// actual build will be performed.
+	CreateCompilationDatabaseOnly bool `protobuf:"varint,21,opt,name=create_compilation_database_only,json=createCompilationDatabaseOnly,proto3" json:"create_compilation_database_only,omitempty"`
+	// This map (source file -> new content) let the builder use the provided
+	// content instead of reading the corresponding file on disk. This is useful
+	// for IDE that have unsaved changes in memory. The path must be relative to
+	// the sketch directory. Only files from the sketch are allowed.
+	SourceOverride map[string]string `protobuf:"bytes,22,rep,name=source_override,json=sourceOverride,proto3" json:"source_override,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// When set to `true` the compiled binary will be copied to the export
+	// directory.
+	ExportBinaries *wrappers.BoolValue `protobuf:"bytes,23,opt,name=export_binaries,json=exportBinaries,proto3" json:"export_binaries,omitempty"`
 }
 
 func (x *CompileRequest) Reset() {
@@ -245,11 +279,16 @@ type CompileResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	OutStream              []byte                   `protobuf:"bytes,1,opt,name=out_stream,json=outStream,proto3" json:"out_stream,omitempty"`                                          // The output of the compilation process.
-	ErrStream              []byte                   `protobuf:"bytes,2,opt,name=err_stream,json=errStream,proto3" json:"err_stream,omitempty"`                                          // The error output of the compilation process.
-	BuildPath              string                   `protobuf:"bytes,3,opt,name=build_path,json=buildPath,proto3" json:"build_path,omitempty"`                                          // The compiler build path
-	UsedLibraries          []*Library               `protobuf:"bytes,4,rep,name=used_libraries,json=usedLibraries,proto3" json:"used_libraries,omitempty"`                              // The libraries used in the build
-	ExecutableSectionsSize []*ExecutableSectionSize `protobuf:"bytes,5,rep,name=executable_sections_size,json=executableSectionsSize,proto3" json:"executable_sections_size,omitempty"` // The size of the executable split by sections
+	// The output of the compilation process.
+	OutStream []byte `protobuf:"bytes,1,opt,name=out_stream,json=outStream,proto3" json:"out_stream,omitempty"`
+	// The error output of the compilation process.
+	ErrStream []byte `protobuf:"bytes,2,opt,name=err_stream,json=errStream,proto3" json:"err_stream,omitempty"`
+	// The compiler build path
+	BuildPath string `protobuf:"bytes,3,opt,name=build_path,json=buildPath,proto3" json:"build_path,omitempty"`
+	// The libraries used in the build
+	UsedLibraries []*Library `protobuf:"bytes,4,rep,name=used_libraries,json=usedLibraries,proto3" json:"used_libraries,omitempty"`
+	// The size of the executable split by sections
+	ExecutableSectionsSize []*ExecutableSectionSize `protobuf:"bytes,5,rep,name=executable_sections_size,json=executableSectionsSize,proto3" json:"executable_sections_size,omitempty"`
 }
 
 func (x *CompileResponse) Reset() {

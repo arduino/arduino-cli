@@ -24,34 +24,73 @@ import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/lib.proto";
 
 message CompileRequest {
-  Instance instance = 1;  // Arduino Core Service instance from the `Init` response.
-  string fqbn = 2;   // Fully Qualified Board Name, e.g.: `arduino:avr:uno`. If this field is not defined, the FQBN of the board attached to the sketch via the `BoardAttach` method is used.
-  string sketch_path = 3;  // The path where the sketch is stored.
-  bool show_properties = 4;  // Show all build preferences used instead of compiling.
-  bool preprocess = 5;      // Print preprocessed code to stdout instead of compiling.
-  string build_cache_path = 6;    // Builds of 'core.a' are saved into this path to be cached and reused.
-  string build_path = 7;         // Path to use to store the files used for the compilation. If omitted, a directory will be created in the operating system's default temporary path.
-  repeated string build_properties = 8; // List of custom build properties separated by commas.
-  string warnings = 9;   // Used to tell gcc which warning level to use. The level names are: "none", "default", "more" and "all".
-  bool verbose = 10;     // Turns on verbose mode.
-  bool quiet = 11;             // Suppresses almost every output.
-  string vid_pid = 12;   // VID/PID specific build properties.
-  int32 jobs = 14;   // The max number of concurrent compiler instances to run (as `make -jx`). If jobs is set to 0, it will use the number of available CPUs as the maximum.
-  repeated string libraries = 15; // List of custom libraries paths separated by commas.
-  bool optimize_for_debug = 16; // Optimize compile output for debug, not for release.
-  string export_dir = 18; // Optional: save the build artifacts in this directory, the directory must exist.
-  bool clean = 19; // Optional: cleanup the build folder and do not use any previously cached build
-  bool create_compilation_database_only = 21; // When set to `true` only the compilation database will be produced and no actual build will be performed.
-  map<string, string> source_override = 22; // This map (source file -> new content) let the builder use the provided content instead of reading the corresponding file on disk. This is useful for IDE that have unsaved changes in memory. The path must be relative to the sketch directory. Only files from the sketch are allowed.
-  google.protobuf.BoolValue export_binaries = 23;  // When set to `true` the compiled binary will be copied to the export directory.
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Fully Qualified Board Name, e.g.: `arduino:avr:uno`. If this field is
+  // not defined, the FQBN of the board attached to the sketch via the
+  // `BoardAttach` method is used.
+  string fqbn = 2;
+  // The path where the sketch is stored.
+  string sketch_path = 3;           
+  // Show all build preferences used instead of compiling.
+  bool show_properties = 4;         
+  // Print preprocessed code to stdout instead of compiling.
+  bool preprocess = 5;              
+  // Builds of 'core.a' are saved into this path to be cached and reused.
+  string build_cache_path = 6;      
+  // Path to use to store the files used for the compilation. If omitted,
+  // a directory will be created in the operating system's default temporary
+  // path.
+  string build_path = 7;            
+  // List of custom build properties separated by commas.
+  repeated string build_properties = 8;
+  // Used to tell gcc which warning level to use. The level names are: "none",
+  // "default", "more" and "all".
+  string warnings = 9;  
+  // Turns on verbose mode.
+  bool verbose = 10;    
+  // Suppresses almost every output.
+  bool quiet = 11;      
+  // VID/PID specific build properties.
+  string vid_pid = 12;  
+  // The max number of concurrent compiler instances to run (as `make -jx`).
+  // If jobs is set to 0, it will use the number of available CPUs as the
+  // maximum.
+  int32 jobs = 14;
+  // List of custom libraries paths separated by commas.
+  repeated string libraries = 15;             
+  // Optimize compile output for debug, not for release.
+  bool optimize_for_debug = 16;               
+  // Optional: save the build artifacts in this directory, the directory must
+  // exist.
+  string export_dir = 18;                     
+  // Optional: cleanup the build folder and do not use any previously cached
+  // build
+  bool clean = 19;                            
+  // When set to `true` only the compilation database will be produced and no
+  // actual build will be performed.
+  bool create_compilation_database_only = 21; 
+  // This map (source file -> new content) let the builder use the provided
+  // content instead of reading the corresponding file on disk. This is useful
+  // for IDE that have unsaved changes in memory. The path must be relative to
+  // the sketch directory. Only files from the sketch are allowed.
+  map<string, string> source_override = 22;        
+  // When set to `true` the compiled binary will be copied to the export
+  // directory.
+  google.protobuf.BoolValue export_binaries = 23;  
 }
 
 message CompileResponse {
-  bytes out_stream = 1; // The output of the compilation process.
-  bytes err_stream = 2; // The error output of the compilation process.
-  string build_path = 3; // The compiler build path
-  repeated Library used_libraries = 4; // The libraries used in the build
-  repeated ExecutableSectionSize executable_sections_size = 5; // The size of the executable split by sections
+  // The output of the compilation process.
+  bytes out_stream = 1;
+  // The error output of the compilation process.
+  bytes err_stream = 2; 
+  // The compiler build path
+  string build_path = 3;
+  // The libraries used in the build
+  repeated Library used_libraries = 4;
+  // The size of the executable split by sections
+  repeated ExecutableSectionSize executable_sections_size = 5;
 }
 
 message ExecutableSectionSize {

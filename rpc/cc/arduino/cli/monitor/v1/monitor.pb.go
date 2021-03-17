@@ -211,10 +211,10 @@ type MonitorConfig struct {
 	// Additional parameters that might be needed to configure the target or the
 	// monitor itself.
 	AdditionalConfig *_struct.Struct `protobuf:"bytes,3,opt,name=additional_config,json=additionalConfig,proto3" json:"additional_config,omitempty"`
-	// This parameter indicates how many bytes should be buffered on the server side
-	// before dropping. If >0 then the server will enable a rate limiter and will send
-	// incoming data to the client only when the client allows it: see the
-	// StreamingOpenReq.recv_acknowledge parameter for details.
+	// This parameter indicates how many bytes should be buffered on the server
+	// side before dropping. If >0 then the server will enable a rate limiter and
+	// will send incoming data to the client only when the client allows it: see
+	// the StreamingOpenReq.recv_acknowledge parameter for details.
 	RecvRateLimitBuffer int32 `protobuf:"varint,4,opt,name=recv_rate_limit_buffer,json=recvRateLimitBuffer,proto3" json:"recv_rate_limit_buffer,omitempty"`
 }
 
@@ -278,7 +278,6 @@ func (x *MonitorConfig) GetRecvRateLimitBuffer() int32 {
 	return 0
 }
 
-//
 type StreamingOpenResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
