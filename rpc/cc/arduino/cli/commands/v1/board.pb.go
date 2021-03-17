@@ -132,7 +132,8 @@ type BoardDetailsResponse struct {
 	Programmers []*Programmer `protobuf:"bytes,13,rep,name=programmers,proto3" json:"programmers,omitempty"`
 	// Set to true if the board supports debugging
 	DebuggingSupported bool `protobuf:"varint,14,opt,name=debugging_supported,json=debuggingSupported,proto3" json:"debugging_supported,omitempty"`
-	// If a board with the specified FQBN is connected returns its serial number too
+	// If a board with the specified FQBN is connected returns its serial number
+	// too
 	SerialNumber string `protobuf:"bytes,15,opt,name=serial_number,json=serialNumber,proto3" json:"serial_number,omitempty"`
 }
 
@@ -1557,7 +1558,8 @@ type BoardSearchRequest struct {
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
 	// The search query to filter the board list by.
 	SearchArgs string `protobuf:"bytes,2,opt,name=search_args,json=searchArgs,proto3" json:"search_args,omitempty"`
-	// Set to true to get also the boards marked as "hidden" in installed platforms
+	// Set to true to get also the boards marked as "hidden" in installed
+	// platforms
 	IncludeHiddenBoards bool `protobuf:"varint,3,opt,name=include_hidden_boards,json=includeHiddenBoards,proto3" json:"include_hidden_boards,omitempty"`
 }
 

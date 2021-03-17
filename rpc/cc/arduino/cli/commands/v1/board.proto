@@ -59,7 +59,8 @@ message BoardDetailsResponse {
   repeated Programmer programmers = 13;
   // Set to true if the board supports debugging
   bool debugging_supported = 14;
-  // If a board with the specified FQBN is connected returns its serial number too
+  // If a board with the specified FQBN is connected returns its serial number
+  // too
   string serial_number = 15;
 }
 
@@ -246,7 +247,8 @@ message BoardSearchRequest {
   Instance instance = 1;
   // The search query to filter the board list by.
   string search_args = 2;
-  // Set to true to get also the boards marked as "hidden" in installed platforms
+  // Set to true to get also the boards marked as "hidden" in installed
+  // platforms
   bool include_hidden_boards = 3;
 }
 

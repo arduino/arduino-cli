@@ -319,7 +319,8 @@ type LibraryInstallRequest struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// The version of the library to install.
 	Version string `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
-	// Set to true to skip installation of specified library's dependencies, defaults to false.
+	// Set to true to skip installation of specified library's dependencies,
+	// defaults to false.
 	NoDeps bool `protobuf:"varint,4,opt,name=no_deps,json=noDeps,proto3" json:"no_deps,omitempty"`
 }
 
@@ -1338,7 +1339,8 @@ type LibraryListRequest struct {
 	// If set filters out the libraries not matching name
 	Name string `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	// By setting this field all duplicate libraries are filtered out leaving
-	// only the libraries that will be used to compile for the specified board FQBN.
+	// only the libraries that will be used to compile for the specified board
+	// FQBN.
 	Fqbn string `protobuf:"bytes,5,opt,name=fqbn,proto3" json:"fqbn,omitempty"`
 }
 
@@ -1573,8 +1575,8 @@ type Library struct {
 	Layout LibraryLayout `protobuf:"varint,25,opt,name=layout,proto3,enum=cc.arduino.cli.commands.v1.LibraryLayout" json:"layout,omitempty"`
 	// The example sketches provided by the library
 	Examples []string `protobuf:"bytes,26,rep,name=examples,proto3" json:"examples,omitempty"`
-	// Value of the `includes` field in library.properties or, if missing, the list of
-	// include files available on the library source root directory.
+	// Value of the `includes` field in library.properties or, if missing, the
+	// list of include files available on the library source root directory.
 	ProvidesIncludes []string `protobuf:"bytes,27,rep,name=provides_includes,json=providesIncludes,proto3" json:"provides_includes,omitempty"`
 	// Map of FQBNs that specifies if library is compatible with this library
 	CompatibleWith map[string]bool `protobuf:"bytes,28,rep,name=compatible_with,json=compatibleWith,proto3" json:"compatible_with,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
@@ -1801,9 +1803,10 @@ type ZipLibraryInstallRequest struct {
 
 	// Arduino Core Service instance from the `Init` response.
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	//Path to the archived library
+	// Path to the archived library
 	Path string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
-	// Set to true to overwrite an already installed library with the same name. Defaults to false.
+	// Set to true to overwrite an already installed library with the same name.
+	// Defaults to false.
 	Overwrite bool `protobuf:"varint,3,opt,name=overwrite,proto3" json:"overwrite,omitempty"`
 }
 
@@ -1917,7 +1920,8 @@ type GitLibraryInstallRequest struct {
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
 	// URL to the repository containing the library
 	Url string `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
-	// Set to true to overwrite an already installed library with the same name. Defaults to false.
+	// Set to true to overwrite an already installed library with the same name.
+	// Defaults to false.
 	Overwrite bool `protobuf:"varint,3,opt,name=overwrite,proto3" json:"overwrite,omitempty"`
 }
 

@@ -19,7 +19,8 @@ package cc.arduino.cli.settings.v1;
 
 option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1;settings";
 
-// The SettingsService provides an interface to Arduino CLI configuration options
+// The SettingsService provides an interface to Arduino CLI configuration
+// options
 service SettingsService {
   // List all the settings.
   rpc GetAll(GetAllRequest) returns (GetAllResponse);
@@ -43,8 +44,8 @@ message GetAllResponse {
 }
 
 message MergeRequest {
-    // The settings, in JSON format.
-    string json_data = 1;
+  // The settings, in JSON format.
+  string json_data = 1;
 }
 
 message GetValueResponse {
@@ -61,24 +62,20 @@ message SetValueRequest {
   string json_data = 2;
 }
 
-message GetAllRequest {
-}
+message GetAllRequest {}
 
 message GetValueRequest {
   // The key of the setting.
   string key = 1;
 }
 
-message MergeResponse {
-}
+message MergeResponse {}
 
-message SetValueResponse {
-}
+message SetValueResponse {}
 
 message WriteRequest {
   // Path to settings file (e.g. /path/to/arduino-cli.yaml)
   string file_path = 1;
 }
 
-message WriteResponse {
-}
+message WriteResponse {}

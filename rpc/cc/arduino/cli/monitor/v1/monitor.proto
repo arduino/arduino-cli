@@ -25,7 +25,8 @@ import "google/protobuf/struct.proto";
 service MonitorService {
   // Open a bidirectional monitor stream. This can be used to implement
   // something similar to the Arduino IDE's Serial Monitor.
-  rpc StreamingOpen(stream StreamingOpenRequest) returns (stream StreamingOpenResponse) {}
+  rpc StreamingOpen(stream StreamingOpenRequest)
+      returns (stream StreamingOpenResponse) {}
 }
 
 // The top-level message sent by the client for the `StreamingOpen` method.
@@ -65,10 +66,10 @@ message MonitorConfig {
   // monitor itself.
   google.protobuf.Struct additional_config = 3;
 
-  // This parameter indicates how many bytes should be buffered on the server side
-  // before dropping. If >0 then the server will enable a rate limiter and will send
-  // incoming data to the client only when the client allows it: see the
-  // StreamingOpenReq.recv_acknowledge parameter for details.
+  // This parameter indicates how many bytes should be buffered on the server
+  // side before dropping. If >0 then the server will enable a rate limiter and
+  // will send incoming data to the client only when the client allows it: see
+  // the StreamingOpenReq.recv_acknowledge parameter for details.
   int32 recv_rate_limit_buffer = 4;
 }
 

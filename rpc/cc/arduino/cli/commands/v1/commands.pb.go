@@ -1035,7 +1035,8 @@ type LoadSketchResponse struct {
 	OtherSketchFiles []string `protobuf:"bytes,3,rep,name=other_sketch_files,json=otherSketchFiles,proto3" json:"other_sketch_files,omitempty"`
 	// List of absolute paths to additional sketch files
 	AdditionalFiles []string `protobuf:"bytes,4,rep,name=additional_files,json=additionalFiles,proto3" json:"additional_files,omitempty"`
-	// List of absolute paths to supported files in the sketch root folder, main file excluded
+	// List of absolute paths to supported files in the sketch root folder, main
+	// file excluded
 	RootFolderFiles []string `protobuf:"bytes,5,rep,name=root_folder_files,json=rootFolderFiles,proto3" json:"root_folder_files,omitempty"`
 }
 
@@ -1113,7 +1114,8 @@ type ArchiveSketchRequest struct {
 
 	// Absolute path to Sketch file or folder containing Sketch file
 	SketchPath string `protobuf:"bytes,1,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
-	// Absolute path to archive that will be created or folder that will contain it
+	// Absolute path to archive that will be created or folder that will contain
+	// it
 	ArchivePath string `protobuf:"bytes,2,opt,name=archive_path,json=archivePath,proto3" json:"archive_path,omitempty"`
 	// Specifies if build directory should be included in the archive
 	IncludeBuildDir bool `protobuf:"varint,3,opt,name=include_build_dir,json=includeBuildDir,proto3" json:"include_build_dir,omitempty"`

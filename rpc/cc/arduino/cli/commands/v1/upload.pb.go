@@ -62,15 +62,15 @@ type UploadRequest struct {
 	// After upload, verify that the contents of the memory on the board match the
 	// uploaded binary.
 	Verify bool `protobuf:"varint,6,opt,name=verify,proto3" json:"verify,omitempty"`
-	// When `import_file` is specified, it overrides the `import_dir` and `sketch_path`
-	// params.
+	// When `import_file` is specified, it overrides the `import_dir` and
+	// `sketch_path` params.
 	ImportFile string `protobuf:"bytes,7,opt,name=import_file,json=importFile,proto3" json:"import_file,omitempty"`
 	// Custom path to a directory containing compiled files. When `import_dir` is
 	// not specified, the standard build directory under `sketch_path` is used.
 	ImportDir string `protobuf:"bytes,8,opt,name=import_dir,json=importDir,proto3" json:"import_dir,omitempty"`
-	// The programmer to use for upload. If set an UploadUsingProgrammer is triggered
-	// instead of a normal upload. The UploadUsingProgrammer call may also be used for
-	// explicit error check.
+	// The programmer to use for upload. If set an UploadUsingProgrammer is
+	// triggered instead of a normal upload. The UploadUsingProgrammer call may
+	// also be used for explicit error check.
 	Programmer string `protobuf:"bytes,9,opt,name=programmer,proto3" json:"programmer,omitempty"`
 }
 
@@ -248,8 +248,8 @@ type UploadUsingProgrammerRequest struct {
 	// After upload, verify that the contents of the memory on the board match the
 	// uploaded binary.
 	Verify bool `protobuf:"varint,6,opt,name=verify,proto3" json:"verify,omitempty"`
-	// When `import_file` is specified, it overrides the `import_dir` and `sketch_path`
-	// params.
+	// When `import_file` is specified, it overrides the `import_dir` and
+	// `sketch_path` params.
 	ImportFile string `protobuf:"bytes,7,opt,name=import_file,json=importFile,proto3" json:"import_file,omitempty"`
 	// Custom path to a directory containing compiled files. When `import_dir` is
 	// not specified, the standard build directory under `sketch_path` is used.

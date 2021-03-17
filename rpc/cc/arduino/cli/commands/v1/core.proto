@@ -30,7 +30,8 @@ message PlatformInstallRequest {
   string architecture = 3;
   // Platform version to install.
   string version = 4;
-  // Set to true to not run (eventual) post install scripts for trusted platforms
+  // Set to true to not run (eventual) post install scripts for trusted
+  // platforms
   bool skip_post_install = 5;
 }
 

@@ -38,12 +38,12 @@ message DownloadProgress {
 }
 
 message TaskProgress {
-    // Description of the task.
-    string name = 1;
-    // Additional information about the task.
-    string message = 2;
-    // Whether the task is complete.
-    bool completed = 3;
+  // Description of the task.
+  string name = 1;
+  // Additional information about the task.
+  string message = 2;
+  // Whether the task is complete.
+  bool completed = 3;
 }
 
 message Programmer {

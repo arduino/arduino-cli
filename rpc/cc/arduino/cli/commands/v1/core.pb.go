@@ -53,7 +53,8 @@ type PlatformInstallRequest struct {
 	Architecture string `protobuf:"bytes,3,opt,name=architecture,proto3" json:"architecture,omitempty"`
 	// Platform version to install.
 	Version string `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
-	// Set to true to not run (eventual) post install scripts for trusted platforms
+	// Set to true to not run (eventual) post install scripts for trusted
+	// platforms
 	SkipPostInstall bool `protobuf:"varint,5,opt,name=skip_post_install,json=skipPostInstall,proto3" json:"skip_post_install,omitempty"`
 }
 
