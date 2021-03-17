@@ -177,14 +177,14 @@ message DownloadResource {
   // Download URL of the library archive.
   string url = 1;
   // Filename of the library archive.
-  string archivefilename = 2;
+  string archive_filename = 2;
   // Checksum of the library archive.
   string checksum = 3;
   // File size of the library archive.
   int64  size = 4;
   // The directory under the staging subdirectory of the data directory the
   // library archive file will be downloaded to.
-  string cachepath = 5;
+  string cache_path = 5;
 }
 
 message LibraryListRequest {

@@ -107,10 +107,10 @@ func getLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
 		Dependencies:     getLibraryDependenciesParameter(rel.GetDependencies()),
 		Resources: &rpc.DownloadResource{
 			Url:             rel.Resource.URL,
-			Archivefilename: rel.Resource.ArchiveFileName,
+			ArchiveFilename: rel.Resource.ArchiveFileName,
 			Checksum:        rel.Resource.Checksum,
 			Size:            rel.Resource.Size,
-			Cachepath:       rel.Resource.CachePath,
+			CachePath:       rel.Resource.CachePath,
 		},
 	}
 }
