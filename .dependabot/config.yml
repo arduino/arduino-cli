@@ -7,4 +7,4 @@ update_configs:
       - match:
           update_type: "security"
     default_labels:
-      - "component/dependencies"
+      - "topic: dependencies"
