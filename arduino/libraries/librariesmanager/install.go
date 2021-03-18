@@ -124,6 +124,9 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 		return err
 	}
 
+	// Ignores metadata from Mac OS X
+	paths.FilterOutPrefix("__MACOSX")
+
 	if len(paths) > 1 {
 		return fmt.Errorf("archive is not valid: multiple files found in zip file top level")
 	}

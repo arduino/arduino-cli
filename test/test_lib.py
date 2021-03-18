@@ -834,3 +834,37 @@ def test_lib_upgrade_using_library_with_invalid_version(run_command, data_dir):
     data = json.loads(res.stdout)
     assert len(data) == 1
     assert "" != data[0]["library"]["version"]
+
+
+def test_install_zip_lib_with_macos_metadata(run_command, data_dir, downloads_dir):
+    # Initialize configs to enable --zip-path flag
+    env = {
+        "ARDUINO_DATA_DIR": data_dir,
+        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+        "ARDUINO_SKETCHBOOK_DIR": data_dir,
+        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
+    }
+    assert run_command("config init --dest-dir .", custom_env=env)
+
+    lib_install_dir = Path(data_dir, "libraries", "fake-lib")
+    # Verifies library is not already installed
+    assert not lib_install_dir.exists()
+
+    zip_path = Path(__file__).parent / "testdata" / "fake-lib.zip"
+    # Test zip-path install
+    res = run_command(f"lib install --zip-path {zip_path}")
+    assert res.ok
+    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
+
+    # Verifies library is installed in expected path
+    assert lib_install_dir.exists()
+    files = list(lib_install_dir.glob("**/*"))
+    assert lib_install_dir / "library.properties" in files
+
+    # Reinstall library
+    assert run_command(f"lib install --zip-path {zip_path}")
+
+    # Verifies library remains installed
+    assert lib_install_dir.exists()
+    files = list(lib_install_dir.glob("**/*"))
+    assert lib_install_dir / "library.properties" in files
