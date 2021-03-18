@@ -44,13 +44,20 @@ message StreamingOpenReq {
 
     // The data to be sent to the target being monitored.
     bytes data = 2;
+
+    // When the rate limiter is enabled, this parameter is used to report the
+    // number of successfully processed StreamingOpenResp messages (with data).
+    int32 recv_acknowledge = 3;
   }
 }
 
 // Tells the monitor which target to open and provides additional parameters
 // that might be needed to configure the target or the monitor itself.
 message MonitorConfig {
-  enum TargetType { SERIAL = 0; }
+  enum TargetType {
+    SERIAL = 0;
+    NULL = 99;
+  }
 
   // The target name.
   string target = 1;
@@ -58,10 +65,22 @@ message MonitorConfig {
   // Additional parameters that might be needed to configure the target or the
   // monitor itself.
   google.protobuf.Struct additionalConfig = 3;
+
+  // This parameter indicates how many bytes should be buffered on the server side
+  // before dropping. If >0 then the server will enable a rate limiter and will send
+  // incoming data to the client only when the client allows it: see the
+  // StreamingOpenReq.recv_acknowledge parameter for details.
+  int32 recv_rate_limit_buffer = 4;
 }
 
 //
 message StreamingOpenResp {
     // The data received from the target.
     bytes data = 1;
+
+    // The number of bytes dropped.
+    // During regular updates this number should be 0, but in case the
+    // client is not able to process the recv window quickly enough this
+    // parameter will report the number of dropped bytes.
+    int32 dropped = 2;
 }

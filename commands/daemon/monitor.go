@@ -16,8 +16,9 @@
 package daemon
 
 import (
-	"fmt"
+	"errors"
 	"io"
+	"sync/atomic"
 
 	"github.com/arduino/arduino-cli/arduino/monitors"
 	rpc "github.com/arduino/arduino-cli/rpc/monitor"
@@ -39,7 +40,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 	// ensure it's a config message and not data
 	config := msg.GetMonitorConfig()
 	if config == nil {
-		return fmt.Errorf("first message must contain monitor configuration, not data")
+		return errors.New("first message must contain monitor configuration, not data")
 	}
 
 	// select which type of monitor we need
@@ -61,12 +62,33 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 		if mon, err = monitors.OpenSerialMonitor(config.GetTarget(), int(baudRate)); err != nil {
 			return err
 		}
+
+	case rpc.MonitorConfig_NULL:
+		if addCfg, ok := config.GetAdditionalConfig().AsMap()["OutputRate"]; !ok {
+			mon = monitors.OpenNullMonitor(100.0) // 100 bytes per second as default
+		} else if outputRate, ok := addCfg.(float64); !ok {
+			return errors.New("OutputRate in Null monitor must be a float64")
+		} else {
+			// get the Monitor instance
+			mon = monitors.OpenNullMonitor(outputRate)
+		}
 	}
 
 	// we'll use these channels to communicate with the goroutines
 	// handling the stream and the target respectively
 	streamClosed := make(chan error)
 	targetClosed := make(chan error)
+
+	// set rate limiting window
+	bufferSize := int(config.GetRecvRateLimitBuffer())
+	rateLimitEnabled := (bufferSize > 0)
+	if !rateLimitEnabled {
+		bufferSize = 1024
+	}
+	buffer := make([]byte, bufferSize)
+	bufferUsed := 0
+
+	var writeSlots int32
 
 	// now we can read the other messages and re-route to the monitor...
 	go func() {
@@ -84,6 +106,11 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 				break
 			}
 
+			if rateLimitEnabled {
+				// Increase rate limiter write slots
+				atomic.AddInt32(&writeSlots, msg.GetRecvAcknowledge())
+			}
+
 			if _, err := mon.Write(msg.GetData()); err != nil {
 				// error writing to target
 				targetClosed <- err
@@ -94,27 +121,58 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 
 	// ...and read from the monitor and forward to the output stream
 	go func() {
-		buf := make([]byte, 8)
+		dropBuffer := make([]byte, 10240)
+		dropped := 0
 		for {
-			n, err := mon.Read(buf)
-			if err != nil {
-				// error reading from target
-				targetClosed <- err
-				break
+			if bufferUsed < bufferSize {
+				if n, err := mon.Read(buffer[bufferUsed:]); err != nil {
+					// error reading from target
+					targetClosed <- err
+					break
+				} else if n == 0 {
+					// target was closed
+					targetClosed <- nil
+					break
+				} else {
+					bufferUsed += n
+				}
+			} else {
+				// FIXME: a very rare condition but still...
+				// we may be waiting here while, in the meantime, a transmit slot is
+				// freed: in this case the (filled) buffer will stay in the server
+				// until the following Read exits (-> the next char arrives from the
+				// monitor).
+
+				if n, err := mon.Read(dropBuffer); err != nil {
+					// error reading from target
+					targetClosed <- err
+					break
+				} else if n == 0 {
+					// target was closed
+					targetClosed <- nil
+					break
+				} else {
+					dropped += n
+				}
 			}
 
-			if n == 0 {
-				// target was closed
-				targetClosed <- nil
-				break
-			}
+			slots := atomic.LoadInt32(&writeSlots)
+			if !rateLimitEnabled || slots > 0 {
+				if err = stream.Send(&rpc.StreamingOpenResp{
+					Data:    buffer[:bufferUsed],
+					Dropped: int32(dropped),
+				}); err != nil {
+					// error sending to stream
+					streamClosed <- err
+					break
+				}
+				bufferUsed = 0
+				dropped = 0
 
-			if err = stream.Send(&rpc.StreamingOpenResp{
-				Data: buf[:n],
-			}); err != nil {
-				// error sending to stream
-				streamClosed <- err
-				break
+				// Rate limit, filling all the available window
+				if rateLimitEnabled {
+					slots = atomic.AddInt32(&writeSlots, -1)
+				}
 			}
 		}
 	}()
