@@ -17,7 +17,6 @@ package daemon
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"sync/atomic"
 
@@ -41,7 +40,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 	// ensure it's a config message and not data
 	config := msg.GetMonitorConfig()
 	if config == nil {
-		return fmt.Errorf("first message must contain monitor configuration, not data")
+		return errors.New("first message must contain monitor configuration, not data")
 	}
 
 	// select which type of monitor we need
@@ -173,7 +172,6 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 				// Rate limit, filling all the available window
 				if rateLimitEnabled {
 					slots = atomic.AddInt32(&writeSlots, -1)
-					//fmt.Println("FREE SLOTS:", slots)
 				}
 			}
 		}
