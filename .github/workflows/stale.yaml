@@ -8,6 +8,8 @@ on:
     types: ["created"]
 
 env:
+  # Name of the label that makes issues subject to the stale bot.
+  STALE_ENABLE_LABEL: "status: waiting for information"
   # Name of the label used to mark issues as stale.
   STALE_LABEL: "status: stale"
 
@@ -21,11 +23,11 @@ jobs:
         with:
           github-token: ${{github.token}}
           script: |
-            // Get a list of all open issues labeled `waiting for feedback`
+            // Get a list of all open issues labeled as waiting for feedback
             const opts = github.issues.listForRepo.endpoint.merge({
               ...context.repo,
               state: 'open',
-              labels: ['waiting for feedback'],
+              labels: ['${{ env.STALE_ENABLE_LABEL }}'],
             });
             const issues = await github.paginate(opts);
 
