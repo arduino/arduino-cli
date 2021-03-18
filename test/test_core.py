@@ -50,9 +50,9 @@ def test_core_search(run_command, httpserver):
 
     def get_platforms(stdout):
         data = json.loads(stdout)
-        platforms = {p["ID"]: [] for p in data}
+        platforms = {p["id"]: [] for p in data}
         for p in data:
-            platforms[p["ID"]].append(p["Latest"])
+            platforms[p["id"]].append(p["latest"])
         return platforms
 
     # Search all Retrokit platforms
@@ -86,7 +86,7 @@ def test_core_search(run_command, httpserver):
         res = run_command(f"core search --format json {search_args}")
         assert res.ok
         data = json.loads(res.stdout)
-        platform_ids = [p["ID"] for p in data]
+        platform_ids = [p["id"] for p in data]
         for platform_id in expected_ids:
             assert platform_id in platform_ids
 
@@ -139,7 +139,7 @@ def test_core_search_no_args(run_command, httpserver):
     result = run_command("core search --format json")
     assert result.ok
     platforms = json.loads(result.stdout)
-    assert 1 == len([e for e in platforms if e.get("Name") == "test_core"])
+    assert 1 == len([e for e in platforms if e.get("name") == "test_core"])
     assert len(platforms) == num_platforms
 
     # list all with additional urls, check the test core is there
@@ -163,7 +163,7 @@ def test_core_search_no_args(run_command, httpserver):
     result = run_command(f"core search --format json --additional-urls={url}")
     assert result.ok
     platforms = json.loads(result.stdout)
-    assert 1 == len([e for e in platforms if e.get("Name") == "test_core"])
+    assert 1 == len([e for e in platforms if e.get("name") == "test_core"])
     assert len(platforms) == num_platforms
 
 
@@ -240,10 +240,10 @@ def test_core_download(run_command, downloads_dir):
 def _in(jsondata, name, version=None):
     installed_cores = json.loads(jsondata)
     for c in installed_cores:
-        if name == c.get("ID"):
+        if name == c.get("id"):
             if version is None:
                 return True
-            elif version == c.get("Installed"):
+            elif version == c.get("installed"):
                 return True
     return False
 
@@ -378,7 +378,7 @@ def test_core_search_manually_installed_cores_not_printed(run_command, data_dir)
     assert res.ok
     cores = json.loads(res.stdout)
     assert num_cores == len(cores)
-    mapped = {core["ID"]: core for core in cores}
+    mapped = {core["id"]: core for core in cores}
     core_id = "arduino-beta-development:avr"
     assert core_id not in mapped
 
@@ -403,11 +403,11 @@ def test_core_list_all_manually_installed_core(run_command, data_dir):
     assert res.ok
     cores = json.loads(res.stdout)
     assert num_cores + 1 == len(cores)
-    mapped = {core["ID"]: core for core in cores}
+    mapped = {core["id"]: core for core in cores}
     expected_core_id = "arduino-beta-development:avr"
     assert expected_core_id in mapped
-    assert "Arduino AVR Boards" == mapped[expected_core_id]["Name"]
-    assert "1.8.3" == mapped[expected_core_id]["Latest"]
+    assert "Arduino AVR Boards" == mapped[expected_core_id]["name"]
+    assert "1.8.3" == mapped[expected_core_id]["latest"]
 
 
 def test_core_list_updatable_all_flags(run_command, data_dir):
@@ -430,11 +430,11 @@ def test_core_list_updatable_all_flags(run_command, data_dir):
     assert res.ok
     cores = json.loads(res.stdout)
     assert num_cores + 1 == len(cores)
-    mapped = {core["ID"]: core for core in cores}
+    mapped = {core["id"]: core for core in cores}
     expected_core_id = "arduino-beta-development:avr"
     assert expected_core_id in mapped
-    assert "Arduino AVR Boards" == mapped[expected_core_id]["Name"]
-    assert "1.8.3" == mapped[expected_core_id]["Latest"]
+    assert "Arduino AVR Boards" == mapped[expected_core_id]["name"]
+    assert "1.8.3" == mapped[expected_core_id]["latest"]
 
 
 def test_core_upgrade_removes_unused_tools(run_command, data_dir):
@@ -483,10 +483,10 @@ def test_core_list_with_installed_json(run_command, data_dir):
     res = run_command("core list --format json")
     assert res.ok
     cores = json.loads(res.stdout)
-    mapped = {core["ID"]: core for core in cores}
+    mapped = {core["id"]: core for core in cores}
     assert len(mapped) == 1
     assert "adafruit:avr" in mapped
-    assert mapped["adafruit:avr"]["Name"] == "Adafruit AVR Boards"
+    assert mapped["adafruit:avr"]["name"] == "Adafruit AVR Boards"
 
     # Deletes installed.json file, this file stores information about the core,
     # that is used mostly when removing package indexes and their cores are still installed;
@@ -500,10 +500,10 @@ def test_core_list_with_installed_json(run_command, data_dir):
     res = run_command("core list --format json")
     assert res.ok
     cores = json.loads(res.stdout)
-    mapped = {core["ID"]: core for core in cores}
+    mapped = {core["id"]: core for core in cores}
     assert len(mapped) == 1
     assert "adafruit:avr" in mapped
     # Name for this core changes since if there's installed.json file we read it from
     # platform.txt, turns out that this core has different names used in different files
     # thus the change.
-    assert mapped["adafruit:avr"]["Name"] == "Adafruit Boards"
+    assert mapped["adafruit:avr"]["name"] == "Adafruit Boards"
