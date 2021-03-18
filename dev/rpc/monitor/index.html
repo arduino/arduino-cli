@@ -1290,6 +1290,12 @@ or the monitor itself.</p>
 <td></td>
 <td>Additional parameters that might be needed to configure the target or the monitor itself.</td>
 </tr>
+<tr>
+<td>recv_rate_limit_buffer</td>
+<td><a href="#int32">int32</a></td>
+<td></td>
+<td>This parameter indicates how many bytes should be buffered on the server side before dropping. If &gt;0 then the server will enable a rate limiter and will send incoming data to the client only when the client allows it: see the StreamingOpenReq.recv_acknowledge parameter for details.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.monitor.StreamingOpenReq"></a></p>
@@ -1319,6 +1325,12 @@ messages must contain bytes to be sent to the target and must not contain a <cod
 <td></td>
 <td>The data to be sent to the target being monitored.</td>
 </tr>
+<tr>
+<td>recv_acknowledge</td>
+<td><a href="#int32">int32</a></td>
+<td></td>
+<td>When the rate limiter is enabled, this parameter is used to report the number of successfully processed StreamingOpenResp messages (with data).</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.monitor.StreamingOpenResp"></a></p>
@@ -1339,6 +1351,12 @@ messages must contain bytes to be sent to the target and must not contain a <cod
 <td></td>
 <td>The data received from the target.</td>
 </tr>
+<tr>
+<td>dropped</td>
+<td><a href="#int32">int32</a></td>
+<td></td>
+<td>The number of bytes dropped. During regular updates this number should be 0, but in case the client is not able to process the recv window quickly enough this parameter will report the number of dropped bytes.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.monitor.MonitorConfig.TargetType"></a></p>
@@ -1355,6 +1373,11 @@ messages must contain bytes to be sent to the target and must not contain a <cod
 <tr>
 <td>SERIAL</td>
 <td>0</td>
+<td></td>
+</tr>
+<tr>
+<td>NULL</td>
+<td>99</td>
 <td></td>
 </tr>
 </tbody>
