@@ -172,7 +172,6 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 				return fmt.Errorf("loading platform.txt: %w", err)
 			}
 
-			platformName := platformProperties.Get("name")
 			version := semver.MustParse(platformProperties.Get("version"))
 
 			// check if package_bundled_index.json exists
@@ -207,9 +206,6 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 			}
 
 			platform := targetPackage.GetOrCreatePlatform(architecture)
-			if platform.Name == "" {
-				platform.Name = platformName
-			}
 			if !isIDEBundled {
 				platform.ManuallyInstalled = true
 			}
@@ -287,6 +283,10 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 		platform.Properties.Merge(p)
 	} else {
 		return fmt.Errorf("loading %s: %s", platformTxtLocalPath, err)
+	}
+
+	if platform.Platform.Name == "" {
+		platform.Platform.Name = platform.Properties.Get("name")
 	}
 
 	// Create programmers properties
