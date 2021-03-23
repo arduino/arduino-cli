@@ -35,13 +35,13 @@ var (
 		".hpp": empty,
 		".hh":  empty,
 		".cpp": empty,
-		".s":   empty,
+		".S":   empty,
 	}
 
 	// SourceFilesValidExtensions lists valid extensions for source files (no headers)
 	SourceFilesValidExtensions = map[string]struct{}{
 		".c":   empty,
 		".cpp": empty,
-		".s":   empty,
+		".S":   empty,
 	}
 )
