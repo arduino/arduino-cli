@@ -105,7 +105,7 @@ message BoardPlatform {
   // Download URL of the platform archive file.
   string url = 3;
   // File name of the platform archive.
-  string archive_file_name = 4;
+  string archive_filename = 4;
   // Checksum of the platform archive.
   string checksum = 5;
   // File size of the platform archive.
@@ -131,7 +131,7 @@ message Systems {
   // Operating system identifier.
   string host = 2;
   // File name of the tool archive.
-  string archive_file_name = 3;
+  string archive_filename = 3;
   // Download URL of the tool archive.
   string url = 4;
   // File size of the tool archive.

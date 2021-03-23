@@ -155,7 +155,7 @@ func (dr detailsResult) String() string {
 	addIfNotEmpty(tr("Platform category:"), details.Platform.Category)
 	addIfNotEmpty(tr("Platform architecture:"), details.Platform.Architecture)
 	addIfNotEmpty(tr("Platform URL:"), details.Platform.Url)
-	addIfNotEmpty(tr("Platform file name:"), details.Platform.ArchiveFileName)
+	addIfNotEmpty(tr("Platform file name:"), details.Platform.ArchiveFilename)
 	if details.Platform.Size != 0 {
 		addIfNotEmpty(tr("Platform size (bytes):"), fmt.Sprint(details.Platform.Size))
 	}
@@ -167,7 +167,7 @@ func (dr detailsResult) String() string {
 		if showFullDetails {
 			for _, sys := range tool.Systems {
 				t.AddRow("", tr("OS:"), "", sys.Host)
-				t.AddRow("", tr("File:"), "", sys.ArchiveFileName)
+				t.AddRow("", tr("File:"), "", sys.ArchiveFilename)
 				t.AddRow("", tr("Size (bytes):"), "", fmt.Sprint(sys.Size))
 				t.AddRow("", tr("Checksum:"), "", sys.Checksum)
 				t.AddRow("", "URL:", "", sys.Url)

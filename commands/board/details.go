@@ -75,7 +75,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 
 	if boardPlatform.Resource != nil {
 		details.Platform.Url = boardPlatform.Resource.URL
-		details.Platform.ArchiveFileName = boardPlatform.Resource.ArchiveFileName
+		details.Platform.ArchiveFilename = boardPlatform.Resource.ArchiveFileName
 		details.Platform.Checksum = boardPlatform.Resource.Checksum
 		details.Platform.Size = boardPlatform.Resource.Size
 	}
@@ -124,7 +124,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 					Checksum:        f.Resource.Checksum,
 					Size:            f.Resource.Size,
 					Host:            f.OS,
-					ArchiveFileName: f.Resource.ArchiveFileName,
+					ArchiveFilename: f.Resource.ArchiveFileName,
 					Url:             f.Resource.URL,
 				})
 			}
