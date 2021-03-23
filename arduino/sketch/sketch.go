@@ -99,7 +99,7 @@ func New(sketchFolderPath, mainFilePath, buildPath string, allFilesPaths []strin
 	otherSketchFiles := []*Item{}
 	rootFolderFiles := []*Item{}
 	for p, item := range pathToItem {
-		ext := strings.ToLower(filepath.Ext(p))
+		ext := filepath.Ext(p)
 		if _, found := globals.MainFileValidExtensions[ext]; found {
 			// item is a valid main file, see if it's stored at the
 			// sketch root and ignore if it's not.

@@ -187,7 +187,7 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 		}
 
 		// ignore if file extension doesn't match
-		ext := strings.ToLower(filepath.Ext(path))
+		ext := filepath.Ext(path)
 		_, isMain := globals.MainFileValidExtensions[ext]
 		_, isAdditional := globals.AdditionalFileValidExtensions[ext]
 		if !(isMain || isAdditional) {
