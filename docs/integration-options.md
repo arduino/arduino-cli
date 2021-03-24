@@ -99,7 +99,7 @@ tracker] if you’ve got a use case that doesn’t fit one of the three pillars.
 [grpc]: https://grpc.io/
 [rpc]: https://en.wikipedia.org/wiki/Remote_procedure_call
 [daemon mode]: commands/arduino-cli_daemon.md
-[grpc interface reference]: ../rpc/commands
+[grpc interface reference]: rpc/commands.md
 [grpc supported languages]: https://grpc.io/docs/languages/
 [arduino cli repository]: https://github.com/arduino/arduino-cli
 [grpc client example]: https://github.com/arduino/arduino-cli/blob/master/client_example
