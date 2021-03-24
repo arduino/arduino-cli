@@ -65,7 +65,7 @@ tasks:
       - |
         npx -p markdown-link-check -c '
         STATUS=0
-        for file in $(find -name "*.md"); do
+        for file in $(find docs -name "*.md") README.md test/README.md client_example/README.md; do
           markdown-link-check -c markdown-link-check-config.json -q "$file"
           STATUS=$(( $STATUS + $? ))
         done
