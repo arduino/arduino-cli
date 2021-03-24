@@ -18,6 +18,34 @@ import simplejson as json
 import pytest
 from git import Repo
 from pathlib import Path
+import tempfile
+import requests
+import zipfile
+import io
+import re
+
+
+# Util function to download library from URL
+def download_lib(url, download_dir):
+    tmp = Path(tempfile.TemporaryDirectory().name)
+    tmp.mkdir(parents=True, exist_ok=True)
+    regex = re.compile(r"^(.*)-[0-9]+.[0-9]+.[0-9]")
+    response = requests.get(url)
+    # Download and unzips library removing version suffix
+    with zipfile.ZipFile(io.BytesIO(response.content)) as thezip:
+        for zipinfo in thezip.infolist():
+            with thezip.open(zipinfo) as f:
+                dest_dir = tmp / regex.sub("\\g<1>", zipinfo.filename)
+                if zipinfo.is_dir():
+                    dest_dir.mkdir(parents=True, exist_ok=True)
+                else:
+                    dest_dir.write_bytes(f.read())
+
+    # Recreates zip with folder without version suffix
+    z = zipfile.ZipFile(download_dir, "w")
+    for f in tmp.glob("**/*"):
+        z.write(f, arcname=f.relative_to(tmp))
+    z.close()
 
 
 def test_list(run_command):
@@ -252,8 +280,12 @@ def test_install_git_url_and_zip_path_flags_visibility(run_command, data_dir, do
     assert res.failed
     assert "--git-url and --zip-path are disabled by default, for more information see:" in res.stderr
 
-    assert run_command("lib download AudioZero@1.0.0")
-    zip_path = Path(downloads_dir, "libraries", "AudioZero-1.0.0.zip")
+    # Download library
+    url = "https://github.com/arduino-libraries/AudioZero/archive/refs/tags/1.1.1.zip"
+    zip_path = Path(downloads_dir, "libraries", "AudioZero.zip")
+    zip_path.parent.mkdir(parents=True, exist_ok=True)
+    download_lib(url, zip_path)
+
     res = run_command(f"lib install --zip-path {zip_path}")
     assert res.failed
     assert "--git-url and --zip-path are disabled by default, for more information see:" in res.stderr
@@ -330,13 +362,16 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     assert run_command("config init --dest-dir .", custom_env=env)
 
     # Download a specific lib version
-    assert run_command("lib download AudioZero@1.0.0")
+    # Download library
+    url = "https://github.com/arduino-libraries/AudioZero/archive/refs/tags/1.1.1.zip"
+    zip_path = Path(downloads_dir, "libraries", "AudioZero.zip")
+    zip_path.parent.mkdir(parents=True, exist_ok=True)
+    download_lib(url, zip_path)
 
-    lib_install_dir = Path(data_dir, "libraries", "AudioZero-1.0.0")
+    lib_install_dir = Path(data_dir, "libraries", "AudioZero")
     # Verifies library is not already installed
     assert not lib_install_dir.exists()
 
-    zip_path = Path(downloads_dir, "libraries", "AudioZero-1.0.0.zip")
     # Test zip-path install
     res = run_command(f"lib install --zip-path {zip_path}")
     assert res.ok
@@ -688,13 +723,14 @@ def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, da
     }
 
     # Downloads zip to be installed later
-    assert run_command("lib download WiFi101@0.16.1")
-    assert run_command("lib download ArduinoBLE@1.1.3")
     wifi_zip_path = Path(downloads_dir, "libraries", "WiFi101-0.16.1.zip")
     ble_zip_path = Path(downloads_dir, "libraries", "ArduinoBLE-1.1.3.zip")
+    download_lib("https://github.com/arduino-libraries/WiFi101/archive/refs/tags/0.16.1.zip", wifi_zip_path)
+    download_lib("https://github.com/arduino-libraries/ArduinoBLE/archive/refs/tags/1.1.3.zip", ble_zip_path)
 
-    wifi_install_dir = Path(data_dir, "libraries", "WiFi101-0.16.1")
-    ble_install_dir = Path(data_dir, "libraries", "ArduinoBLE-1.1.3")
+    wifi_install_dir = Path(data_dir, "libraries", "WiFi101")
+    ble_install_dir = Path(data_dir, "libraries", "ArduinoBLE")
+
     # Verifies libraries are not installed
     assert not wifi_install_dir.exists()
     assert not ble_install_dir.exists()
@@ -860,6 +896,7 @@ def test_install_zip_lib_with_macos_metadata(run_command, data_dir, downloads_di
     assert lib_install_dir.exists()
     files = list(lib_install_dir.glob("**/*"))
     assert lib_install_dir / "library.properties" in files
+    assert lib_install_dir / "src" / "fake-lib.h" in files
 
     # Reinstall library
     assert run_command(f"lib install --zip-path {zip_path}")
@@ -868,3 +905,71 @@ def test_install_zip_lib_with_macos_metadata(run_command, data_dir, downloads_di
     assert lib_install_dir.exists()
     files = list(lib_install_dir.glob("**/*"))
     assert lib_install_dir / "library.properties" in files
+    assert lib_install_dir / "src" / "fake-lib.h" in files
+
+
+def test_install_zip_invalid_library(run_command, data_dir, downloads_dir):
+    # Initialize configs to enable --zip-path flag
+    env = {
+        "ARDUINO_DATA_DIR": data_dir,
+        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+        "ARDUINO_SKETCHBOOK_DIR": data_dir,
+        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
+    }
+    assert run_command("config init --dest-dir .", custom_env=env)
+
+    lib_install_dir = Path(data_dir, "libraries", "lib-without-header")
+    # Verifies library is not already installed
+    assert not lib_install_dir.exists()
+
+    zip_path = Path(__file__).parent / "testdata" / "lib-without-header.zip"
+    # Test zip-path install
+    res = run_command(f"lib install --zip-path {zip_path}")
+    assert res.failed
+    assert 'library is not valid: missing header file "lib-without-header.h"' in res.stderr
+
+    lib_install_dir = Path(data_dir, "libraries", "lib-without-properties")
+    # Verifies library is not already installed
+    assert not lib_install_dir.exists()
+
+    zip_path = Path(__file__).parent / "testdata" / "lib-without-properties.zip"
+    # Test zip-path install
+    res = run_command(f"lib install --zip-path {zip_path}")
+    assert res.failed
+    assert 'library is not valid: missing file "library.properties"' in res.stderr
+
+
+def test_install_git_invalid_library(run_command, data_dir, downloads_dir):
+    # Initialize configs to enable --zip-path flag
+    env = {
+        "ARDUINO_DATA_DIR": data_dir,
+        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+        "ARDUINO_SKETCHBOOK_DIR": data_dir,
+        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
+    }
+    assert run_command("config init --dest-dir .", custom_env=env)
+
+    # Create fake library repository
+    repo_dir = Path(data_dir, "lib-without-header")
+    repo = Repo.init(repo_dir)
+    lib_properties = Path(repo_dir, "library.properties")
+    lib_properties.touch()
+    repo.index.add([str(lib_properties)])
+    repo.index.commit("First commit")
+
+    res = run_command(f"lib install --git-url {repo_dir}", custom_env=env)
+    assert res.failed
+    assert 'library is not valid: missing header file "lib-without-header.h"' in res.stderr
+
+    # Create another fake library repository
+    repo_dir = Path(data_dir, "lib-without-properties")
+    repo = Repo.init(repo_dir)
+    lib_header = Path(repo_dir, "src", "lib-without-properties.h")
+    lib_header.parent.mkdir(parents=True, exist_ok=True)
+    lib_header.touch()
+    repo.index.add([str(lib_header)])
+    repo.index.commit("First commit")
+
+    res = run_command(f"lib install --git-url {repo_dir}", custom_env=env)
+    assert res.failed
+    assert 'library is not valid: missing file "library.properties"' in res.stderr

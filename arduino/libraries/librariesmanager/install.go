@@ -133,6 +133,11 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 
 	extractionPath := paths[0]
 	libraryName := extractionPath.Base()
+
+	if err := validateLibrary(libraryName, extractionPath); err != nil {
+		return err
+	}
+
 	installPath := libsDir.Join(libraryName)
 
 	if err := libsDir.MkdirAll(); err != nil {
@@ -218,6 +223,13 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 			Warn("Cloning git repository")
 		return err
 	}
+
+	if err := validateLibrary(libraryName, installPath); err != nil {
+		// Clean up installation directory since this is not a valid library
+		installPath.RemoveAll()
+		return err
+	}
+
 	// We don't want the installed library to be a git repository thus we delete this folder
 	installPath.Join(".git").RemoveAll()
 	return nil
@@ -238,4 +250,24 @@ func parseGitURL(gitURL string) (string, error) {
 		return "", fmt.Errorf("invalid git url")
 	}
 	return res, nil
+}
+
+// validateLibrary verifies the dir contains a valid library, meaning it has both
+// an header <name>.h, either in src or root folder, and a library.properties file
+func validateLibrary(name string, dir *paths.Path) error {
+	// Verify library contains library header.
+	// Checks also root folder for legacy reasons.
+	// For more info see:
+	// https://arduino.github.io/arduino-cli/latest/library-specification/#source-code
+	libraryHeader := name + ".h"
+	if !dir.Join("src", libraryHeader).Exist() && !dir.Join(libraryHeader).Exist() {
+		return fmt.Errorf(`library is not valid: missing header file "%s"`, libraryHeader)
+	}
+
+	// Verifies library contains library.properties
+	if !dir.Join("library.properties").Exist() {
+		return fmt.Errorf(`library is not valid: missing file "library.properties"`)
+	}
+
+	return nil
 }
