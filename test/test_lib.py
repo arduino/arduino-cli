@@ -951,11 +951,11 @@ def test_install_git_invalid_library(run_command, data_dir, downloads_dir):
 
     # Create fake library repository
     repo_dir = Path(data_dir, "lib-without-header")
-    repo = Repo.init(repo_dir)
-    lib_properties = Path(repo_dir, "library.properties")
-    lib_properties.touch()
-    repo.index.add([str(lib_properties)])
-    repo.index.commit("First commit")
+    with Repo.init(repo_dir) as repo:
+        lib_properties = Path(repo_dir, "library.properties")
+        lib_properties.touch()
+        repo.index.add([str(lib_properties)])
+        repo.index.commit("First commit")
 
     res = run_command(f"lib install --git-url {repo_dir}", custom_env=env)
     assert res.failed
@@ -963,12 +963,12 @@ def test_install_git_invalid_library(run_command, data_dir, downloads_dir):
 
     # Create another fake library repository
     repo_dir = Path(data_dir, "lib-without-properties")
-    repo = Repo.init(repo_dir)
-    lib_header = Path(repo_dir, "src", "lib-without-properties.h")
-    lib_header.parent.mkdir(parents=True, exist_ok=True)
-    lib_header.touch()
-    repo.index.add([str(lib_header)])
-    repo.index.commit("First commit")
+    with Repo.init(repo_dir) as repo:
+        lib_header = Path(repo_dir, "src", "lib-without-properties.h")
+        lib_header.parent.mkdir(parents=True, exist_ok=True)
+        lib_header.touch()
+        repo.index.add([str(lib_header)])
+        repo.index.commit("First commit")
 
     res = run_command(f"lib install --git-url {repo_dir}", custom_env=env)
     assert res.failed
