@@ -13,6 +13,8 @@
 # software without disclosing the source code of your own applications. To purchase
 # a commercial license, send an email to license@arduino.cc.
 import os
+import datetime
+import time
 import platform
 import pytest
 import simplejson as json
@@ -123,9 +125,7 @@ def test_core_search_no_args(run_command, httpserver):
     assert result.ok
     num_platforms = 0
     lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
-    # Index update output and the header are printed on the first lines
-    assert ["Updating", "index:", "package_index.json", "downloaded"] in lines
-    assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines
+    # The header is printed on the first lines
     assert ["test:x86", "2.0.0", "test_core"] in lines
     header_index = lines.index(["ID", "Version", "Name"])
     # We use black to format and flake8 to lint .py files but they disagree on certain
@@ -147,9 +147,7 @@ def test_core_search_no_args(run_command, httpserver):
     assert result.ok
     num_platforms = 0
     lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
-    # Index update output and the header are printed on the first lines
-    assert ["Updating", "index:", "package_index.json", "downloaded"] in lines
-    assert ["Updating", "index:", "package_index.json.sig", "downloaded"] in lines
+    # The header is printed on the first lines
     assert ["test:x86", "2.0.0", "test_core"] in lines
     header_index = lines.index(["ID", "Version", "Name"])
     # We use black to format and flake8 to lint .py files but they disagree on certain
@@ -507,3 +505,28 @@ def test_core_list_with_installed_json(run_command, data_dir):
     # platform.txt, turns out that this core has different names used in different files
     # thus the change.
     assert mapped["adafruit:avr"]["name"] == "Adafruit Boards"
+
+
+def test_core_search_update_index_delay(run_command, data_dir):
+    assert run_command("update")
+
+    # Verifies index update is not run
+    res = run_command("core search")
+    assert res.ok
+    assert "Updating index" not in res.stdout
+
+    # Change edit time of package index file
+    index_file = Path(data_dir, "package_index.json")
+    date = datetime.datetime.now() - datetime.timedelta(hours=25)
+    mod_time = time.mktime(date.timetuple())
+    os.utime(index_file, (mod_time, mod_time))
+
+    # Verifies index update is run
+    res = run_command("core search")
+    assert res.ok
+    assert "Updating index" in res.stdout
+
+    # Verifies index update is not run again
+    res = run_command("core search")
+    assert res.ok
+    assert "Updating index" not in res.stdout
