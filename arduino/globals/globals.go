@@ -30,12 +30,15 @@ var (
 
 	// AdditionalFileValidExtensions lists any file extension the builder considers as valid
 	AdditionalFileValidExtensions = map[string]struct{}{
-		".h":   empty,
-		".c":   empty,
-		".hpp": empty,
-		".hh":  empty,
-		".cpp": empty,
-		".S":   empty,
+		".h":    empty,
+		".c":    empty,
+		".hpp":  empty,
+		".hh":   empty,
+		".cpp":  empty,
+		".S":    empty,
+		".adoc": empty,
+		".md":   empty,
+		".json": empty,
 	}
 
 	// SourceFilesValidExtensions lists valid extensions for source files (no headers)

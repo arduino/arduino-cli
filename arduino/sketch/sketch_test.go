@@ -79,7 +79,7 @@ func TestNew(t *testing.T) {
 
 func TestNewSketchCasingWrong(t *testing.T) {
 	sketchPath := paths.New("testdata", "SketchCasingWrong")
-	mainFilePath := paths.New("testadata", "sketchcasingwrong.ino").String()
+	mainFilePath := sketchPath.Join("sketchcasingwrong.ino").String()
 	sketch, err := New(sketchPath.String(), mainFilePath, "", []string{mainFilePath})
 	assert.Nil(t, sketch)
 	assert.Error(t, err)
@@ -91,12 +91,12 @@ func TestNewSketchCasingWrong(t *testing.T) {
 }
 
 func TestNewSketchCasingCorrect(t *testing.T) {
-	sketchPath := paths.New("testdata", "SketchCasingCorrect").String()
-	mainFilePath := paths.New("testadata", "SketchCasingCorrect.ino").String()
-	sketch, err := New(sketchPath, mainFilePath, "", []string{mainFilePath})
+	sketchPath := paths.New("testdata", "SketchCasingCorrect")
+	mainFilePath := sketchPath.Join("SketchCasingCorrect.ino").String()
+	sketch, err := New(sketchPath.String(), mainFilePath, "", []string{mainFilePath})
 	assert.NotNil(t, sketch)
 	assert.NoError(t, err)
-	assert.Equal(t, sketchPath, sketch.LocationPath)
+	assert.Equal(t, sketchPath.String(), sketch.LocationPath)
 	assert.Equal(t, mainFilePath, sketch.MainFile.Path)
 	assert.Len(t, sketch.OtherSketchFiles, 0)
 	assert.Len(t, sketch.AdditionalFiles, 0)
@@ -114,4 +114,27 @@ func TestCheckSketchCasingCorrect(t *testing.T) {
 	sketchFolder := paths.New("testdata", "SketchCasingCorrect").String()
 	err := CheckSketchCasing(sketchFolder)
 	require.NoError(t, err)
+}
+
+func TestSketchWithMarkdownAsciidocJson(t *testing.T) {
+	sketchPath := paths.New("testdata", "SketchWithMarkdownAsciidocJson")
+	mainFilePath := sketchPath.Join("SketchWithMarkdownAsciidocJson.ino").String()
+	adocFilePath := sketchPath.Join("foo.adoc").String()
+	jsonFilePath := sketchPath.Join("foo.json").String()
+	mdFilePath := sketchPath.Join("foo.md").String()
+
+	sketch, err := New(sketchPath.String(), mainFilePath, "", []string{mainFilePath, adocFilePath, jsonFilePath, mdFilePath})
+	assert.NotNil(t, sketch)
+	assert.NoError(t, err)
+	assert.Equal(t, sketchPath.String(), sketch.LocationPath)
+	assert.Equal(t, mainFilePath, sketch.MainFile.Path)
+	assert.Len(t, sketch.OtherSketchFiles, 0)
+	require.Len(t, sketch.AdditionalFiles, 3)
+	require.Equal(t, "foo.adoc", filepath.Base(sketch.AdditionalFiles[0].Path))
+	require.Equal(t, "foo.json", filepath.Base(sketch.AdditionalFiles[1].Path))
+	require.Equal(t, "foo.md", filepath.Base(sketch.AdditionalFiles[2].Path))
+	assert.Len(t, sketch.RootFolderFiles, 3)
+	require.Equal(t, "foo.adoc", filepath.Base(sketch.RootFolderFiles[0].Path))
+	require.Equal(t, "foo.json", filepath.Base(sketch.RootFolderFiles[1].Path))
+	require.Equal(t, "foo.md", filepath.Base(sketch.RootFolderFiles[2].Path))
 }

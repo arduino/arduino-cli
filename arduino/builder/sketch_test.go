@@ -269,3 +269,23 @@ func TestLoadSketchCaseMismatch(t *testing.T) {
 	require.Nil(t, s)
 	require.Error(t, err)
 }
+
+func TestSketchWithMarkdownAsciidocJson(t *testing.T) {
+	sketchPath := filepath.Join("testdata", t.Name())
+	mainFilePath := filepath.Join(sketchPath, t.Name()+".ino")
+
+	sketch, err := builder.SketchLoad(sketchPath, "")
+	require.NotNil(t, sketch)
+	require.NoError(t, err)
+	require.Equal(t, sketchPath, sketch.LocationPath)
+	require.Equal(t, mainFilePath, sketch.MainFile.Path)
+	require.Len(t, sketch.OtherSketchFiles, 0)
+	require.Len(t, sketch.AdditionalFiles, 3)
+	require.Equal(t, "foo.adoc", filepath.Base(sketch.AdditionalFiles[0].Path))
+	require.Equal(t, "foo.json", filepath.Base(sketch.AdditionalFiles[1].Path))
+	require.Equal(t, "foo.md", filepath.Base(sketch.AdditionalFiles[2].Path))
+	require.Len(t, sketch.RootFolderFiles, 3)
+	require.Equal(t, "foo.adoc", filepath.Base(sketch.RootFolderFiles[0].Path))
+	require.Equal(t, "foo.json", filepath.Base(sketch.RootFolderFiles[1].Path))
+	require.Equal(t, "foo.md", filepath.Base(sketch.RootFolderFiles[2].Path))
+}
