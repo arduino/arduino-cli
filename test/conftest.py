@@ -56,7 +56,9 @@ def data_dir(tmpdir_factory):
     if platform.system() == "Windows":
         with tempfile.TemporaryDirectory() as tmp:
             yield tmp
-            shutil.rmtree(tmp, ignore_errors=True)
+            # We don't need to remove the directory since
+            # tempfile.TemporaryDirectory deletes itself
+            # automatically when exits its scope.
     else:
         data = tmpdir_factory.mktemp("ArduinoTest")
         yield str(data)
