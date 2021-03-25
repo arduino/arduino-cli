@@ -957,9 +957,14 @@ def test_install_git_invalid_library(run_command, data_dir, downloads_dir):
         repo.index.add([str(lib_properties)])
         repo.index.commit("First commit")
 
+    lib_install_dir = Path(data_dir, "libraries", "lib-without-header")
+    # Verifies library is not already installed
+    assert not lib_install_dir.exists()
+
     res = run_command(f"lib install --git-url {repo_dir}", custom_env=env)
     assert res.failed
     assert 'library is not valid: missing header file "lib-without-header.h"' in res.stderr
+    assert not lib_install_dir.exists()
 
     # Create another fake library repository
     repo_dir = Path(data_dir, "lib-without-properties")
@@ -970,6 +975,11 @@ def test_install_git_invalid_library(run_command, data_dir, downloads_dir):
         repo.index.add([str(lib_header)])
         repo.index.commit("First commit")
 
+    lib_install_dir = Path(data_dir, "libraries", "lib-without-properties")
+    # Verifies library is not already installed
+    assert not lib_install_dir.exists()
+
     res = run_command(f"lib install --git-url {repo_dir}", custom_env=env)
     assert res.failed
     assert 'library is not valid: missing file "library.properties"' in res.stderr
+    assert not lib_install_dir.exists()
