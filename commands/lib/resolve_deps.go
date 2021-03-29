@@ -21,11 +21,11 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // LibraryResolveDependencies FIXMEDOC
-func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesReq) (*rpc.LibraryResolveDependenciesResp, error) {
+func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, error) {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 
 	// Search the requested lib
@@ -69,5 +69,5 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 			VersionInstalled: installed,
 		})
 	}
-	return &rpc.LibraryResolveDependenciesResp{Dependencies: res}, nil
+	return &rpc.LibraryResolveDependenciesResponse{Dependencies: res}, nil
 }

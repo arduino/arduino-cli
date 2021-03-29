@@ -25,7 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/spf13/cobra"
 )
@@ -58,7 +58,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	res, err := board.Search(context.Background(), &rpc.BoardSearchReq{
+	res, err := board.Search(context.Background(), &rpc.BoardSearchRequest{
 		Instance:            inst,
 		SearchArgs:          strings.Join(args, " "),
 		IncludeHiddenBoards: searchFlags.showHiddenBoard,
@@ -93,7 +93,7 @@ func (r searchResults) String() string {
 		if item.IsHidden {
 			hidden = "(hidden)"
 		}
-		t.AddRow(item.GetName(), item.GetFQBN(), item.Platform.ID, hidden)
+		t.AddRow(item.GetName(), item.GetFqbn(), item.Platform.Id, hidden)
 	}
 	return t.Render()
 }

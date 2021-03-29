@@ -25,7 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -60,7 +60,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for i, platformRef := range platformsRefs {
-		platformDownloadreq := &rpc.PlatformDownloadReq{
+		platformDownloadreq := &rpc.PlatformDownloadRequest{
 			Instance:        inst,
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,

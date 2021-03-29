@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands/lib"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // LibraryReferenceArg is a command line argument that reference a library.
@@ -76,7 +76,7 @@ func ParseLibraryReferenceArgs(args []string) ([]*LibraryReferenceArg, error) {
 // library and possibly adjust the case of the name to match a library in the index
 func ParseLibraryReferenceArgAndAdjustCase(instance *rpc.Instance, arg string) (*LibraryReferenceArg, error) {
 	libRef, err := ParseLibraryReferenceArg(arg)
-	res, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
+	res, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance: instance,
 		Query:    libRef.Name,
 	})

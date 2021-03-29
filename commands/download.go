@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/httpclient"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"go.bug.st/downloader/v2"
 )
 

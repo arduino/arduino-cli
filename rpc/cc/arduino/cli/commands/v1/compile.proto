@@ -1,0 +1,100 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+//
+// This software is released under the GNU General Public License version 3,
+// which covers the main part of arduino-cli.
+// The terms of this license can be found at:
+// https://www.gnu.org/licenses/gpl-3.0.en.html
+//
+// You can be released from the requirements of the above licenses by purchasing
+// a commercial license. Buying such a license is mandatory if you want to
+// modify or otherwise use the software for commercial activities involving the
+// Arduino software without disclosing the source code of your own applications.
+// To purchase a commercial license, send an email to license@arduino.cc.
+
+syntax = "proto3";
+
+package cc.arduino.cli.commands.v1;
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
+
+import "google/protobuf/wrappers.proto";
+import "cc/arduino/cli/commands/v1/common.proto";
+import "cc/arduino/cli/commands/v1/lib.proto";
+
+message CompileRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Fully Qualified Board Name, e.g.: `arduino:avr:uno`. If this field is
+  // not defined, the FQBN of the board attached to the sketch via the
+  // `BoardAttach` method is used.
+  string fqbn = 2;
+  // The path where the sketch is stored.
+  string sketch_path = 3;
+  // Show all build preferences used instead of compiling.
+  bool show_properties = 4;
+  // Print preprocessed code to stdout instead of compiling.
+  bool preprocess = 5;
+  // Builds of 'core.a' are saved into this path to be cached and reused.
+  string build_cache_path = 6;
+  // Path to use to store the files used for the compilation. If omitted,
+  // a directory will be created in the operating system's default temporary
+  // path.
+  string build_path = 7;
+  // List of custom build properties separated by commas.
+  repeated string build_properties = 8;
+  // Used to tell gcc which warning level to use. The level names are: "none",
+  // "default", "more" and "all".
+  string warnings = 9;
+  // Turns on verbose mode.
+  bool verbose = 10;
+  // Suppresses almost every output.
+  bool quiet = 11;
+  // VID/PID specific build properties.
+  string vid_pid = 12;
+  // The max number of concurrent compiler instances to run (as `make -jx`).
+  // If jobs is set to 0, it will use the number of available CPUs as the
+  // maximum.
+  int32 jobs = 14;
+  // List of custom libraries paths separated by commas.
+  repeated string libraries = 15;
+  // Optimize compile output for debug, not for release.
+  bool optimize_for_debug = 16;
+  // Optional: save the build artifacts in this directory, the directory must
+  // exist.
+  string export_dir = 18;
+  // Optional: cleanup the build folder and do not use any previously cached
+  // build
+  bool clean = 19;
+  // When set to `true` only the compilation database will be produced and no
+  // actual build will be performed.
+  bool create_compilation_database_only = 21;
+  // This map (source file -> new content) let the builder use the provided
+  // content instead of reading the corresponding file on disk. This is useful
+  // for IDE that have unsaved changes in memory. The path must be relative to
+  // the sketch directory. Only files from the sketch are allowed.
+  map<string, string> source_override = 22;
+  // When set to `true` the compiled binary will be copied to the export
+  // directory.
+  google.protobuf.BoolValue export_binaries = 23;
+}
+
+message CompileResponse {
+  // The output of the compilation process.
+  bytes out_stream = 1;
+  // The error output of the compilation process.
+  bytes err_stream = 2;
+  // The compiler build path
+  string build_path = 3;
+  // The libraries used in the build
+  repeated Library used_libraries = 4;
+  // The size of the executable split by sections
+  repeated ExecutableSectionSize executable_sections_size = 5;
+}
+
+message ExecutableSectionSize {
+  string name = 1;
+  int64 size = 2;
+  int64 max_size = 3;
+}

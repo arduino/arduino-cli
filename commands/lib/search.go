@@ -24,12 +24,12 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
 )
 
 // LibrarySearch FIXMEDOC
-func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.LibrarySearchResp, error) {
+func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, error) {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
 		return nil, errors.New("invalid instance")
@@ -38,10 +38,10 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchReq) (*rpc.Library
 	return searchLibrary(req, lm)
 }
 
-func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesManager) (*rpc.LibrarySearchResp, error) {
+func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.LibrariesManager) (*rpc.LibrarySearchResponse, error) {
 	query := req.GetQuery()
 	res := []*rpc.SearchedLibrary{}
-	status := rpc.LibrarySearchStatus_success
+	status := rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS
 
 	searchArgs := strings.Split(strings.Trim(query, " "), " ")
 
@@ -72,7 +72,7 @@ func searchLibrary(req *rpc.LibrarySearchReq, lm *librariesmanager.LibrariesMana
 		res = append(res, indexLibraryToRPCSearchLibrary(lib))
 	}
 
-	return &rpc.LibrarySearchResp{Libraries: res, Status: status}, nil
+	return &rpc.LibrarySearchResponse{Libraries: res, Status: status}, nil
 }
 
 // indexLibraryToRPCSearchLibrary converts a librariindex.Library to rpc.SearchLibrary
@@ -107,10 +107,10 @@ func getLibraryParameters(rel *librariesindex.Release) *rpc.LibraryRelease {
 		Dependencies:     getLibraryDependenciesParameter(rel.GetDependencies()),
 		Resources: &rpc.DownloadResource{
 			Url:             rel.Resource.URL,
-			Archivefilename: rel.Resource.ArchiveFileName,
+			ArchiveFilename: rel.Resource.ArchiveFileName,
 			Checksum:        rel.Resource.Checksum,
 			Size:            rel.Resource.Size,
-			Cachepath:       rel.Resource.CachePath,
+			CachePath:       rel.Resource.CachePath,
 		},
 	}
 }

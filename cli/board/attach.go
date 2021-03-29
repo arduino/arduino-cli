@@ -24,7 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -64,7 +64,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		path = initSketchPath(path)
 	}
 
-	if _, err = board.Attach(context.Background(), &rpc.BoardAttachReq{
+	if _, err = board.Attach(context.Background(), &rpc.BoardAttachRequest{
 		Instance:      instance,
 		BoardUri:      args[0],
 		SketchPath:    path.String(),

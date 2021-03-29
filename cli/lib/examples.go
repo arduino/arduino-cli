@@ -25,7 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/lib"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
@@ -59,7 +59,7 @@ func runExamplesCommand(cmd *cobra.Command, args []string) {
 		name = args[0]
 	}
 
-	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListReq{
+	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListRequest{
 		Instance: instance,
 		All:      true,
 		Name:     name,
@@ -71,7 +71,7 @@ func runExamplesCommand(cmd *cobra.Command, args []string) {
 	}
 
 	found := []*libraryExamples{}
-	for _, lib := range res.GetInstalledLibrary() {
+	for _, lib := range res.GetInstalledLibraries() {
 		found = append(found, &libraryExamples{
 			Library:  lib.Library,
 			Examples: lib.Library.Examples,
@@ -112,7 +112,7 @@ func (ir libraryExamplesResult) String() string {
 		name := lib.Library.Name
 		if lib.Library.ContainerPlatform != "" {
 			name += " (" + lib.Library.GetContainerPlatform() + ")"
-		} else if lib.Library.Location != rpc.LibraryLocation_user {
+		} else if lib.Library.Location != rpc.LibraryLocation_LIBRARY_LOCATION_USER {
 			name += " (" + lib.Library.GetLocation().String() + ")"
 		}
 		r := fmt.Sprintf("Examples for library %s\n", color.GreenString("%s", name))

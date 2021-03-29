@@ -24,12 +24,12 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/sketches"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 )
 
 // ArchiveSketch FIXMEDOC
-func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchReq) (*rpc.ArchiveSketchResp, error) {
+func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.ArchiveSketchResponse, error) {
 	// sketchName is the name of the sketch without extension, for example "MySketch"
 	var sketchName string
 
@@ -104,7 +104,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchReq) (*rpc.Archive
 		}
 	}
 
-	return &rpc.ArchiveSketchResp{}, nil
+	return &rpc.ArchiveSketchResponse{}, nil
 }
 
 // Adds a single file to an existing zip file

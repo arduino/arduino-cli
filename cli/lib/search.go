@@ -28,7 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/lib"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	semver "go.bug.st/relaxed-semver"
@@ -54,7 +54,7 @@ var searchFlags struct {
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
 
-	err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexReq{
+	err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
 		Instance: instance,
 	}, output.ProgressBar())
 	if err != nil {
@@ -63,7 +63,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	}
 
 	logrus.Info("Executing `arduino lib search`")
-	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchReq{
+	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance: instance,
 		Query:    (strings.Join(args, " ")),
 	})
@@ -83,7 +83,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type result struct {
-	results   *rpc.LibrarySearchResp
+	results   *rpc.LibrarySearchResponse
 	namesOnly bool
 }
 
@@ -124,12 +124,12 @@ func (res result) String() string {
 
 	var out strings.Builder
 
-	if res.results.GetStatus() == rpc.LibrarySearchStatus_failed {
+	if res.results.GetStatus() == rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_FAILED {
 		out.WriteString("No libraries matching your search.\nDid you mean...\n")
 	}
 
 	for _, lib := range results {
-		if res.results.GetStatus() == rpc.LibrarySearchStatus_success {
+		if res.results.GetStatus() == rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS {
 			out.WriteString(fmt.Sprintf("Name: \"%s\"\n", lib.Name))
 			if res.namesOnly {
 				continue

@@ -21,7 +21,7 @@ import (
 	"sync/atomic"
 
 	"github.com/arduino/arduino-cli/arduino/monitors"
-	rpc "github.com/arduino/arduino-cli/rpc/monitor"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/monitor/v1"
 )
 
 // MonitorService implements the `Monitor` service
@@ -30,7 +30,7 @@ type MonitorService struct{}
 // StreamingOpen returns a stream response that can be used to fetch data from the
 // monitor target. The first message passed through the `StreamingOpenReq` must
 // contain monitor configuration params, not data.
-func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) error {
+func (s *MonitorService) StreamingOpen(stream rpc.MonitorService_StreamingOpenServer) error {
 	// grab the first message
 	msg, err := stream.Recv()
 	if err != nil {
@@ -38,7 +38,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 	}
 
 	// ensure it's a config message and not data
-	config := msg.GetMonitorConfig()
+	config := msg.GetConfig()
 	if config == nil {
 		return errors.New("first message must contain monitor configuration, not data")
 	}
@@ -46,7 +46,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 	// select which type of monitor we need
 	var mon monitors.Monitor
 	switch config.GetType() {
-	case rpc.MonitorConfig_SERIAL:
+	case rpc.MonitorConfig_TARGET_TYPE_SERIAL:
 		// grab port speed from additional config data
 		var baudRate float64
 		addCfg := config.GetAdditionalConfig()
@@ -63,7 +63,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 			return err
 		}
 
-	case rpc.MonitorConfig_NULL:
+	case rpc.MonitorConfig_TARGET_TYPE_NULL:
 		if addCfg, ok := config.GetAdditionalConfig().AsMap()["OutputRate"]; !ok {
 			mon = monitors.OpenNullMonitor(100.0) // 100 bytes per second as default
 		} else if outputRate, ok := addCfg.(float64); !ok {
@@ -158,7 +158,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.Monitor_StreamingOpenServer) e
 
 			slots := atomic.LoadInt32(&writeSlots)
 			if !rateLimitEnabled || slots > 0 {
-				if err = stream.Send(&rpc.StreamingOpenResp{
+				if err = stream.Send(&rpc.StreamingOpenResponse{
 					Data:    buffer[:bufferUsed],
 					Dropped: int32(dropped),
 				}); err != nil {

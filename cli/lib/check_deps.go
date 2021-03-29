@@ -24,7 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/lib"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -51,7 +51,7 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
-	deps, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesReq{
+	deps, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesRequest{
 		Instance: instance,
 		Name:     libRef.Name,
 		Version:  libRef.Version,
@@ -66,7 +66,7 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type checkDepResult struct {
-	deps *rpc.LibraryResolveDependenciesResp
+	deps *rpc.LibraryResolveDependenciesResponse
 }
 
 func (dr checkDepResult) Data() interface{} {

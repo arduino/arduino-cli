@@ -22,7 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 var (
@@ -32,8 +32,8 @@ var (
 )
 
 // PlatformUpgrade FIXMEDOC
-func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformUpgradeResp, error) {
+func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
@@ -53,7 +53,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeReq,
 		return nil, err
 	}
 
-	return &rpc.PlatformUpgradeResp{}, nil
+	return &rpc.PlatformUpgradeResponse{}, nil
 }
 
 func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference,

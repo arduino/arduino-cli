@@ -21,8 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/utils"
 	cmd "github.com/arduino/arduino-cli/commands/debug"
-	"github.com/arduino/arduino-cli/rpc/debug"
-	dbg "github.com/arduino/arduino-cli/rpc/debug"
+	dbg "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/pkg/errors"
 )
 
@@ -31,8 +30,8 @@ type DebugService struct{}
 
 // Debug returns a stream response that can be used to fetch data from the
 // target. The first message passed through the `Debug` request must
-// contain DebugReq configuration params, not data.
-func (s *DebugService) Debug(stream dbg.Debug_DebugServer) error {
+// contain DebugRequest configuration params, not data.
+func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 
 	// Grab the first message
 	msg, err := stream.Recv()
@@ -41,7 +40,7 @@ func (s *DebugService) Debug(stream dbg.Debug_DebugServer) error {
 	}
 
 	// Ensure it's a config message and not data
-	req := msg.GetDebugReq()
+	req := msg.GetDebugRequest()
 	if req == nil {
 		return errors.Errorf("First message must contain debug request, not data")
 	}
@@ -58,7 +57,7 @@ func (s *DebugService) Debug(stream dbg.Debug_DebugServer) error {
 			return command.GetData(), err
 		}),
 		utils.FeedStreamTo(func(data []byte) {
-			stream.Send(&dbg.DebugResp{Data: data})
+			stream.Send(&dbg.DebugResponse{Data: data})
 		}),
 		signalChan)
 	if err != nil {
@@ -68,6 +67,6 @@ func (s *DebugService) Debug(stream dbg.Debug_DebugServer) error {
 }
 
 // GetDebugConfig return metadata about a debug session
-func (s *DebugService) GetDebugConfig(ctx context.Context, req *debug.DebugConfigReq) (*debug.GetDebugConfigResp, error) {
+func (s *DebugService) GetDebugConfig(ctx context.Context, req *dbg.DebugConfigRequest) (*dbg.GetDebugConfigResponse, error) {
 	return cmd.GetDebugConfig(ctx, req)
 }

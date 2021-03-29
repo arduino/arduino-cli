@@ -23,7 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/core"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -57,7 +57,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino core list`")
 
-	platforms, err := core.GetPlatforms(&rpc.PlatformListReq{
+	platforms, err := core.GetPlatforms(&rpc.PlatformListRequest{
 		Instance:      inst,
 		UpdatableOnly: listFlags.updatableOnly,
 		All:           listFlags.all,
@@ -88,10 +88,10 @@ func (ir installedResult) String() string {
 	t := table.New()
 	t.SetHeader("ID", "Installed", "Latest", "Name")
 	sort.Slice(ir.platforms, func(i, j int) bool {
-		return ir.platforms[i].ID < ir.platforms[j].ID
+		return ir.platforms[i].Id < ir.platforms[j].Id
 	})
 	for _, p := range ir.platforms {
-		t.AddRow(p.ID, p.Installed, p.Latest, p.Name)
+		t.AddRow(p.Id, p.Installed, p.Latest, p.Name)
 	}
 
 	return t.Render()

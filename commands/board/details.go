@@ -22,12 +22,12 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // Details returns all details for a board including tools and HW identifiers.
 // This command basically gather al the information and translates it into the required grpc struct properties
-func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsResp, error) {
+func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -44,7 +44,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 		return nil, fmt.Errorf("loading board data: %s", err)
 	}
 
-	details := &rpc.BoardDetailsResp{}
+	details := &rpc.BoardDetailsResponse{}
 	details.Name = board.Name()
 	details.Fqbn = board.FQBN()
 	details.PropertiesId = board.BoardID
@@ -61,7 +61,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 	details.Package = &rpc.Package{
 		Name:       boardPackage.Name,
 		Maintainer: boardPackage.Maintainer,
-		WebsiteURL: boardPackage.WebsiteURL,
+		WebsiteUrl: boardPackage.WebsiteURL,
 		Email:      boardPackage.Email,
 		Help:       &rpc.Help{Online: boardPackage.Help.Online},
 		Url:        boardPackage.URL,
@@ -75,18 +75,18 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 
 	if boardPlatform.Resource != nil {
 		details.Platform.Url = boardPlatform.Resource.URL
-		details.Platform.ArchiveFileName = boardPlatform.Resource.ArchiveFileName
+		details.Platform.ArchiveFilename = boardPlatform.Resource.ArchiveFileName
 		details.Platform.Checksum = boardPlatform.Resource.Checksum
 		details.Platform.Size = boardPlatform.Resource.Size
 	}
 
-	details.IdentificationPref = []*rpc.IdentificationPref{}
+	details.IdentificationPrefs = []*rpc.IdentificationPref{}
 	vids := board.Properties.SubTree("vid")
 	pids := board.Properties.SubTree("pid")
 	for id, vid := range vids.AsMap() {
 		if pid, ok := pids.GetOk(id); ok {
-			idPref := rpc.IdentificationPref{UsbID: &rpc.USBID{VID: vid, PID: pid}}
-			details.IdentificationPref = append(details.IdentificationPref, &idPref)
+			idPref := rpc.IdentificationPref{UsbId: &rpc.USBID{Vid: vid, Pid: pid}}
+			details.IdentificationPrefs = append(details.IdentificationPrefs, &idPref)
 		}
 	}
 
@@ -124,7 +124,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsReq) (*rpc.BoardDetailsRe
 					Checksum:        f.Resource.Checksum,
 					Size:            f.Resource.Size,
 					Host:            f.OS,
-					ArchiveFileName: f.Resource.ArchiveFileName,
+					ArchiveFilename: f.Resource.ArchiveFileName,
 					Url:             f.Resource.URL,
 				})
 			}

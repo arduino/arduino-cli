@@ -20,12 +20,12 @@ import (
 	"io"
 
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 )
 
 // BurnBootloader FIXMEDOC
-func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderReq, outStream io.Writer, errStream io.Writer) (*rpc.BurnBootloaderResp, error) {
+func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderRequest, outStream io.Writer, errStream io.Writer) (*rpc.BurnBootloaderResponse, error) {
 	logrus.
 		WithField("fqbn", req.GetFqbn()).
 		WithField("port", req.GetPort()).
@@ -51,5 +51,5 @@ func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderReq, outStream i
 	if err != nil {
 		return nil, err
 	}
-	return &rpc.BurnBootloaderResp{}, nil
+	return &rpc.BurnBootloaderResponse{}, nil
 }

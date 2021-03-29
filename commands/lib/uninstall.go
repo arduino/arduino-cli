@@ -20,11 +20,11 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // LibraryUninstall FIXMEDOC
-func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallReq, taskCB commands.TaskProgressCB) error {
+func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	ref, err := createLibIndexReference(lm, req)
 	if err != nil {

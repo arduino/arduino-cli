@@ -22,7 +22,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v2
         with:
-          go-version: "1.14"
+          go-version: "1.16"
 
       - name: Install Go deps
         # Since 10/23/2019 pwsh is the default shell
@@ -50,16 +50,27 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
 
+      - name: Install buf (protoc linter)
+        if: runner.os == 'Linux'
+        run: |
+          go install github.com/bufbuild/buf/cmd/buf@latest
+          go install github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking@latest
+          go install github.com/bufbuild/buf/cmd/protoc-gen-buf-lint@latest
+        shell: bash
+
       - name: Check the code is good
+        if: runner.os == 'Linux'
         run: task check
 
       - name: Install protoc compiler
+        if: runner.os == 'Linux'
         uses: arduino/setup-protoc@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check protocol buffers compile correctly
-        run: task protoc
+        if: runner.os == 'Linux'
+        run: task protoc:compile
 
       - name: Build the CLI
         run: task build

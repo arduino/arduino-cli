@@ -26,7 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/httpclient"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
 	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
@@ -88,9 +88,9 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 
 		retVal = append(retVal, &rpc.BoardListItem{
 			Name: name,
-			FQBN: fqbn,
-			VID:  vid,
-			PID:  pid,
+			Fqbn: fqbn,
+			Vid:  vid,
+			Pid:  pid,
 		})
 	} else {
 		return nil, errors.Wrap(err, "error querying Arduino Cloud Api")
@@ -119,9 +119,9 @@ func identify(pm *packagemanager.PackageManager, port *commands.BoardPort) ([]*r
 	for _, board := range pm.IdentifyBoard(port.IdentificationPrefs) {
 		boards = append(boards, &rpc.BoardListItem{
 			Name: board.Name(),
-			FQBN: board.FQBN(),
-			VID:  port.IdentificationPrefs.Get("vid"),
-			PID:  port.IdentificationPrefs.Get("pid"),
+			Fqbn: board.FQBN(),
+			Vid:  port.IdentificationPrefs.Get("vid"),
+			Pid:  port.IdentificationPrefs.Get("pid"),
 		})
 	}
 
@@ -195,14 +195,14 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 
 // Watch returns a channel that receives boards connection and disconnection events.
 // The discovery process can be interrupted by sending a message to the interrupt channel.
-func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResp, error) {
+func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResponse, error) {
 	pm := commands.GetPackageManager(instanceID)
 	eventsChan, err := commands.WatchListBoards(pm)
 	if err != nil {
 		return nil, err
 	}
 
-	outChan := make(chan *rpc.BoardListWatchResp)
+	outChan := make(chan *rpc.BoardListWatchResponse)
 	go func() {
 		for {
 			select {
@@ -228,7 +228,7 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 					serialNumber = props.Get("serialNumber")
 				}
 
-				outChan <- &rpc.BoardListWatchResp{
+				outChan <- &rpc.BoardListWatchResponse{
 					EventType: event.Type,
 					Port: &rpc.DetectedPort{
 						Address:       event.Port.Address,

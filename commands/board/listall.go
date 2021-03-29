@@ -22,7 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
@@ -30,7 +30,7 @@ import (
 const maximumSearchDistance = 20
 
 // ListAll FIXMEDOC
-func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllResp, error) {
+func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListAllResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -58,7 +58,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllRe
 		return false, nil
 	}
 
-	list := &rpc.BoardListAllResp{Boards: []*rpc.BoardListItem{}}
+	list := &rpc.BoardListAllResponse{Boards: []*rpc.BoardListItem{}}
 	for _, targetPackage := range pm.Packages {
 		for _, platform := range targetPackage.Platforms {
 			installedPlatformRelease := pm.GetInstalledPlatformRelease(platform)
@@ -75,7 +75,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllRe
 			}
 
 			rpcPlatform := &rpc.Platform{
-				ID:                platform.String(),
+				Id:                platform.String(),
 				Installed:         installedVersion,
 				Latest:            latestVersion,
 				Name:              platform.Name,
@@ -108,7 +108,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllReq) (*rpc.BoardListAllRe
 
 				list.Boards = append(list.Boards, &rpc.BoardListItem{
 					Name:     board.Name(),
-					FQBN:     board.FQBN(),
+					Fqbn:     board.FQBN(),
 					IsHidden: board.IsHidden(),
 					Platform: rpcPlatform,
 				})

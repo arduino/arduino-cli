@@ -24,7 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
 
@@ -51,12 +51,12 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for _, library := range refs {
-		libraryDownloadReq := &rpc.LibraryDownloadReq{
+		libraryDownloadRequest := &rpc.LibraryDownloadRequest{
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version,
 		}
-		_, err := lib.LibraryDownload(context.Background(), libraryDownloadReq, output.ProgressBar())
+		_, err := lib.LibraryDownload(context.Background(), libraryDownloadRequest, output.ProgressBar())
 		if err != nil {
 			feedback.Errorf("Error downloading %s: %v", library, err)
 			os.Exit(errorcodes.ErrNetwork)

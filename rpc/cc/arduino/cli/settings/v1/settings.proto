@@ -15,50 +15,67 @@
 
 syntax = "proto3";
 
-package cc.arduino.cli.settings;
+package cc.arduino.cli.settings.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/settings";
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1;settings";
 
-// The Settings service provides an interface to Arduino CLI's configuration
+// The SettingsService provides an interface to Arduino CLI configuration
 // options
-service Settings {
+service SettingsService {
   // List all the settings.
-  rpc GetAll(GetAllRequest) returns (RawData);
+  rpc GetAll(GetAllRequest) returns (GetAllResponse);
+
   // Set multiple settings values at once.
-  rpc Merge(RawData) returns (MergeResponse);
+  rpc Merge(MergeRequest) returns (MergeResponse);
+
   // Get the value of a specific setting.
-  rpc GetValue(GetValueRequest) returns (Value);
+  rpc GetValue(GetValueRequest) returns (GetValueResponse);
+
   // Set the value of a specific setting.
-  rpc SetValue(Value) returns (SetValueResponse);
+  rpc SetValue(SetValueRequest) returns (SetValueResponse);
+
   // Writes to file settings currently stored in memory
   rpc Write(WriteRequest) returns (WriteResponse);
 }
 
-message RawData {
-    // The settings, in JSON format.
-    string jsonData = 1;
+message GetAllResponse {
+  // The settings, in JSON format.
+  string json_data = 1;
 }
 
-message Value {
+message MergeRequest {
+  // The settings, in JSON format.
+  string json_data = 1;
+}
+
+message GetValueResponse {
   // The key of the setting.
   string key = 1;
   // The setting, in JSON format.
-  string jsonData = 2;
+  string json_data = 2;
+}
+
+message SetValueRequest {
+  // The key of the setting.
+  string key = 1;
+  // The setting, in JSON format.
+  string json_data = 2;
 }
 
 message GetAllRequest {}
+
 message GetValueRequest {
   // The key of the setting.
   string key = 1;
 }
+
 message MergeResponse {}
+
 message SetValueResponse {}
 
 message WriteRequest {
   // Path to settings file (e.g. /path/to/arduino-cli.yaml)
-  string filePath = 1;
+  string file_path = 1;
 }
 
-message WriteResponse {
-  // TODO
-}
+message WriteResponse {}

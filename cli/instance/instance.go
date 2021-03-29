@@ -23,7 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -46,9 +46,9 @@ func CreateInstance() (*rpc.Instance, error) {
 	return resp.GetInstance(), checkPlatformErrors(resp)
 }
 
-func getInitResponse() (*rpc.InitResp, error) {
+func getInitResponse() (*rpc.InitResponse, error) {
 	// invoke Init()
-	resp, err := commands.Init(context.Background(), &rpc.InitReq{}, output.ProgressBar(), output.TaskProgress())
+	resp, err := commands.Init(context.Background(), &rpc.InitRequest{}, output.ProgressBar(), output.TaskProgress())
 
 	// Init() failed
 	if err != nil {
@@ -66,7 +66,7 @@ func getInitResponse() (*rpc.InitResp, error) {
 
 		// update all indexes
 		err := commands.UpdateLibrariesIndex(context.Background(),
-			&rpc.UpdateLibrariesIndexReq{Instance: resp.GetInstance()}, output.ProgressBar())
+			&rpc.UpdateLibrariesIndexRequest{Instance: resp.GetInstance()}, output.ProgressBar())
 		if err != nil {
 			return nil, errors.Wrap(err, "updating the library index")
 		}
@@ -95,7 +95,7 @@ func getInitResponse() (*rpc.InitResp, error) {
 	if packageIndex.NotExist() {
 		// update platform index
 		_, err := commands.UpdateIndex(context.Background(),
-			&rpc.UpdateIndexReq{Instance: resp.GetInstance()}, output.ProgressBar())
+			&rpc.UpdateIndexRequest{Instance: resp.GetInstance()}, output.ProgressBar())
 		if err != nil {
 			return nil, errors.Wrap(err, "updating the core index")
 		}
@@ -121,7 +121,7 @@ func getInitResponse() (*rpc.InitResp, error) {
 	return resp, nil
 }
 
-func checkPlatformErrors(resp *rpc.InitResp) error {
+func checkPlatformErrors(resp *rpc.InitResponse) error {
 	// Init() and/or rescan succeeded, but there were errors loading platform indexes
 	if resp.GetPlatformsIndexErrors() != nil {
 		// log each error

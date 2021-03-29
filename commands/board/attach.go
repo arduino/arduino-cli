@@ -27,13 +27,13 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketches"
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
-	"github.com/arduino/board-discovery"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	discovery "github.com/arduino/board-discovery"
 	"github.com/arduino/go-paths-helper"
 )
 
 // Attach FIXMEDOC
-func Attach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskProgressCB) (*rpc.BoardAttachResp, error) {
+func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.TaskProgressCB) (*rpc.BoardAttachResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -104,7 +104,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachReq, taskCB commands.TaskPr
 		return nil, fmt.Errorf("cannot export sketch metadata: %s", err)
 	}
 	taskCB(&rpc.TaskProgress{Name: "Selected fqbn: " + sketch.Metadata.CPU.Fqbn, Completed: true})
-	return &rpc.BoardAttachResp{}, nil
+	return &rpc.BoardAttachResponse{}, nil
 }
 
 // FIXME: Those should probably go in a "BoardManager" pkg or something

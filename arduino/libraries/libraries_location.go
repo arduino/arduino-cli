@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // LibraryLocation represents where the library is installed
@@ -89,13 +89,13 @@ func (d *LibraryLocation) UnmarshalJSON(b []byte) error {
 func (d *LibraryLocation) ToRPCLibraryLocation() rpc.LibraryLocation {
 	switch *d {
 	case IDEBuiltIn:
-		return rpc.LibraryLocation_ide_builtin
+		return rpc.LibraryLocation_LIBRARY_LOCATION_IDE_BUILTIN
 	case PlatformBuiltIn:
-		return rpc.LibraryLocation_platform_builtin
+		return rpc.LibraryLocation_LIBRARY_LOCATION_PLATFORM_BUILTIN
 	case ReferencedPlatformBuiltIn:
-		return rpc.LibraryLocation_referenced_platform_builtin
+		return rpc.LibraryLocation_LIBRARY_LOCATION_REFERENCED_PLATFORM_BUILTIN
 	case User:
-		return rpc.LibraryLocation_user
+		return rpc.LibraryLocation_LIBRARY_LOCATION_USER
 	}
 	panic(fmt.Sprintf("invalid LibraryLocation value %d", *d))
 }
@@ -103,13 +103,13 @@ func (d *LibraryLocation) ToRPCLibraryLocation() rpc.LibraryLocation {
 // FromRPCLibraryLocation converts a rpc.LibraryLocation to a LibraryLocation
 func FromRPCLibraryLocation(l rpc.LibraryLocation) LibraryLocation {
 	switch l {
-	case rpc.LibraryLocation_ide_builtin:
+	case rpc.LibraryLocation_LIBRARY_LOCATION_IDE_BUILTIN:
 		return IDEBuiltIn
-	case rpc.LibraryLocation_platform_builtin:
+	case rpc.LibraryLocation_LIBRARY_LOCATION_PLATFORM_BUILTIN:
 		return PlatformBuiltIn
-	case rpc.LibraryLocation_referenced_platform_builtin:
+	case rpc.LibraryLocation_LIBRARY_LOCATION_REFERENCED_PLATFORM_BUILTIN:
 		return ReferencedPlatformBuiltIn
-	case rpc.LibraryLocation_user:
+	case rpc.LibraryLocation_LIBRARY_LOCATION_USER:
 		return User
 	}
 	panic(fmt.Sprintf("invalid rpc.LibraryLocation value %d", l))

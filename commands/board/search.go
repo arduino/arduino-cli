@@ -23,14 +23,14 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // Search returns all boards that match the search arg.
 // Boards are searched in all platforms, including those in the index that are not yet
 // installed. Note that platforms that are not installed don't include boards' FQBNs.
 // If no search argument is used all boards are returned.
-func Search(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResp, error) {
+func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -55,7 +55,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResp,
 		return false, nil
 	}
 
-	res := &rpc.BoardSearchResp{Boards: []*rpc.BoardListItem{}}
+	res := &rpc.BoardSearchResponse{Boards: []*rpc.BoardListItem{}}
 	for _, targetPackage := range pm.Packages {
 		for _, platform := range targetPackage.Platforms {
 			latestPlatformRelease := platform.GetLatestRelease()
@@ -68,7 +68,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResp,
 			}
 
 			rpcPlatform := &rpc.Platform{
-				ID:                platform.String(),
+				Id:                platform.String(),
 				Installed:         installedVersion,
 				Latest:            latestPlatformRelease.Version.String(),
 				Name:              platform.Name,
@@ -98,7 +98,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchReq) (*rpc.BoardSearchResp,
 
 					res.Boards = append(res.Boards, &rpc.BoardListItem{
 						Name:     board.Name(),
-						FQBN:     board.FQBN(),
+						Fqbn:     board.FQBN(),
 						IsHidden: board.IsHidden(),
 						Platform: rpcPlatform,
 					})

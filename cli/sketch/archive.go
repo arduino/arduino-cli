@@ -23,7 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/commands/sketch"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -74,7 +74,7 @@ func runArchiveCommand(cmd *cobra.Command, args []string) {
 	}
 
 	_, err := sketch.ArchiveSketch(context.Background(),
-		&rpc.ArchiveSketchReq{
+		&rpc.ArchiveSketchRequest{
 			SketchPath:      sketchPath,
 			ArchivePath:     archivePath,
 			IncludeBuildDir: includeBuildDir,

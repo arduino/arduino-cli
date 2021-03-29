@@ -27,7 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -58,7 +58,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	_, err = commands.UpdateIndex(context.Background(), &rpc.UpdateIndexReq{
+	_, err = commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{
 		Instance: inst,
 	}, output.ProgressBar())
 	if err != nil {
@@ -69,7 +69,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	arguments := strings.ToLower(strings.Join(args, " "))
 	logrus.Infof("Executing `arduino core search` with args: '%s'", arguments)
 
-	resp, err := core.PlatformSearch(&rpc.PlatformSearchReq{
+	resp, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:    inst,
 		SearchArgs:  arguments,
 		AllVersions: allVersions,
@@ -98,10 +98,10 @@ func (sr searchResults) String() string {
 		t := table.New()
 		t.SetHeader("ID", "Version", "Name")
 		sort.Slice(sr.platforms, func(i, j int) bool {
-			return sr.platforms[i].ID < sr.platforms[j].ID
+			return sr.platforms[i].Id < sr.platforms[j].Id
 		})
 		for _, item := range sr.platforms {
-			t.AddRow(item.GetID(), item.GetLatest(), item.GetName())
+			t.AddRow(item.GetId(), item.GetLatest(), item.GetName())
 		}
 		return t.Render()
 	}

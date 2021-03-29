@@ -15,18 +15,18 @@
 
 syntax = "proto3";
 
-package cc.arduino.cli.monitor;
+package cc.arduino.cli.monitor.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/monitor";
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/monitor/v1;monitor";
 
 import "google/protobuf/struct.proto";
 
-// Service that abstracts a Monitor usage
-service Monitor {
+// MonitorService provides services for boards monitor
+service MonitorService {
   // Open a bidirectional monitor stream. This can be used to implement
   // something similar to the Arduino IDE's Serial Monitor.
-  rpc StreamingOpen(stream StreamingOpenReq)
-      returns (stream StreamingOpenResp) {}
+  rpc StreamingOpen(stream StreamingOpenRequest)
+      returns (stream StreamingOpenResponse) {}
 }
 
 // The top-level message sent by the client for the `StreamingOpen` method.
@@ -34,13 +34,13 @@ service Monitor {
 // must contain a `monitor_config` message to initialize the monitor target.
 // All subsequent messages must contain bytes to be sent to the target
 // and must not contain a `monitor_config` message.
-message StreamingOpenReq {
+message StreamingOpenRequest {
   // Content must be either a monitor config or data to be sent.
   oneof content {
     // Provides information to the monitor that specifies which is the target.
-    // The first `StreamingOpenReq` message must contain a `monitor_config`
+    // The first `StreamingOpenReq` message must contain a `config`
     // message.
-    MonitorConfig monitorConfig = 1;
+    MonitorConfig config = 1;
 
     // The data to be sent to the target being monitored.
     bytes data = 2;
@@ -55,8 +55,8 @@ message StreamingOpenReq {
 // that might be needed to configure the target or the monitor itself.
 message MonitorConfig {
   enum TargetType {
-    SERIAL = 0;
-    NULL = 99;
+    TARGET_TYPE_SERIAL = 0;
+    TARGET_TYPE_NULL = 99;
   }
 
   // The target name.
@@ -64,23 +64,22 @@ message MonitorConfig {
   TargetType type = 2;
   // Additional parameters that might be needed to configure the target or the
   // monitor itself.
-  google.protobuf.Struct additionalConfig = 3;
+  google.protobuf.Struct additional_config = 3;
 
-  // This parameter indicates how many bytes should be buffered on the server side
-  // before dropping. If >0 then the server will enable a rate limiter and will send
-  // incoming data to the client only when the client allows it: see the
-  // StreamingOpenReq.recv_acknowledge parameter for details.
+  // This parameter indicates how many bytes should be buffered on the server
+  // side before dropping. If >0 then the server will enable a rate limiter and
+  // will send incoming data to the client only when the client allows it: see
+  // the StreamingOpenReq.recv_acknowledge parameter for details.
   int32 recv_rate_limit_buffer = 4;
 }
 
-//
-message StreamingOpenResp {
-    // The data received from the target.
-    bytes data = 1;
+message StreamingOpenResponse {
+  // The data received from the target.
+  bytes data = 1;
 
-    // The number of bytes dropped.
-    // During regular updates this number should be 0, but in case the
-    // client is not able to process the recv window quickly enough this
-    // parameter will report the number of dropped bytes.
-    int32 dropped = 2;
+  // The number of bytes dropped.
+  // During regular updates this number should be 0, but in case the
+  // client is not able to process the recv window quickly enough this
+  // parameter will report the number of dropped bytes.
+  int32 dropped = 2;
 }

@@ -24,7 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -52,7 +52,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for _, library := range refs {
-		err := lib.LibraryUninstall(context.Background(), &rpc.LibraryUninstallReq{
+		err := lib.LibraryUninstall(context.Background(), &rpc.LibraryUninstallRequest{
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version,

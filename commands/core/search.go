@@ -23,7 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
@@ -31,7 +31,7 @@ import (
 const maximumSearchDistance = 20
 
 // PlatformSearch FIXMEDOC
-func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error) {
+func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, error) {
 	searchArgs := strings.Trim(req.SearchArgs, " ")
 	allVersions := req.AllVersions
 	pm := commands.GetPackageManager(req.Instance.Id)
@@ -113,5 +113,5 @@ func PlatformSearch(req *rpc.PlatformSearchReq) (*rpc.PlatformSearchResp, error)
 	for i, platformRelease := range res {
 		out[i] = commands.PlatformReleaseToRPC(platformRelease)
 	}
-	return &rpc.PlatformSearchResp{SearchOutput: out}, nil
+	return &rpc.PlatformSearchResponse{SearchOutput: out}, nil
 }

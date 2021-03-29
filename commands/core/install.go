@@ -22,13 +22,13 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
 )
 
 // PlatformInstall FIXMEDOC
-func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResp, error) {
+func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
@@ -59,7 +59,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallReq,
 		return nil, err
 	}
 
-	return &rpc.PlatformInstallResp{}, nil
+	return &rpc.PlatformInstallResponse{}, nil
 }
 
 func installPlatform(pm *packagemanager.PackageManager,

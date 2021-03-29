@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/configuration"
-	rpc "github.com/arduino/arduino-cli/rpc/settings"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
 )
 
 // SettingsService implements the `Settings` service
@@ -31,10 +31,10 @@ type SettingsService struct{}
 
 // GetAll returns a message with a string field containing all the settings
 // currently in use, marshalled in JSON format.
-func (s *SettingsService) GetAll(ctx context.Context, req *rpc.GetAllRequest) (*rpc.RawData, error) {
+func (s *SettingsService) GetAll(ctx context.Context, req *rpc.GetAllRequest) (*rpc.GetAllResponse, error) {
 	b, err := json.Marshal(configuration.Settings.AllSettings())
 	if err == nil {
-		return &rpc.RawData{
+		return &rpc.GetAllResponse{
 			JsonData: string(b),
 		}, nil
 	}
@@ -68,7 +68,7 @@ func mapper(toMap map[string]interface{}) map[string]interface{} {
 }
 
 // Merge applies multiple settings values at once.
-func (s *SettingsService) Merge(ctx context.Context, req *rpc.RawData) (*rpc.MergeResponse, error) {
+func (s *SettingsService) Merge(ctx context.Context, req *rpc.MergeRequest) (*rpc.MergeResponse, error) {
 	var toMerge map[string]interface{}
 	if err := json.Unmarshal([]byte(req.GetJsonData()), &toMerge); err != nil {
 		return nil, err
@@ -89,9 +89,8 @@ func (s *SettingsService) Merge(ctx context.Context, req *rpc.RawData) (*rpc.Mer
 // GetValue returns a settings value given its key. If the key is not present
 // an error will be returned, so that we distinguish empty settings from missing
 // ones.
-func (s *SettingsService) GetValue(ctx context.Context, req *rpc.GetValueRequest) (*rpc.Value, error) {
+func (s *SettingsService) GetValue(ctx context.Context, req *rpc.GetValueRequest) (*rpc.GetValueResponse, error) {
 	key := req.GetKey()
-	value := &rpc.Value{}
 
 	// Check if settings key actually existing, we don't use Viper.InConfig()
 	// since that doesn't check for keys formatted like daemon.port or those set
@@ -108,6 +107,7 @@ func (s *SettingsService) GetValue(ctx context.Context, req *rpc.GetValueRequest
 	}
 
 	b, err := json.Marshal(configuration.Settings.Get(key))
+	value := &rpc.GetValueResponse{}
 	if err == nil {
 		value.Key = key
 		value.JsonData = string(b)
@@ -117,7 +117,7 @@ func (s *SettingsService) GetValue(ctx context.Context, req *rpc.GetValueRequest
 }
 
 // SetValue updates or set a value for a certain key.
-func (s *SettingsService) SetValue(ctx context.Context, val *rpc.Value) (*rpc.SetValueResponse, error) {
+func (s *SettingsService) SetValue(ctx context.Context, val *rpc.SetValueRequest) (*rpc.SetValueResponse, error) {
 	key := val.GetKey()
 	var value interface{}
 

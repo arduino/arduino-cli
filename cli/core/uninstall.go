@@ -25,7 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -63,7 +63,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 	for _, platformRef := range platformsRefs {
-		_, err := core.PlatformUninstall(context.Background(), &rpc.PlatformUninstallReq{
+		_, err := core.PlatformUninstall(context.Background(), &rpc.PlatformUninstallRequest{
 			Instance:        inst,
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,

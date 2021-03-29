@@ -15,7 +15,7 @@
 
 package commands
 
-import rpc "github.com/arduino/arduino-cli/rpc/commands"
+import rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 
 // DownloadProgressCB is a callback to get updates on download progress
 type DownloadProgressCB func(curr *rpc.DownloadProgress)

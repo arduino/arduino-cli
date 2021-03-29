@@ -24,7 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/spf13/cobra"
 )
@@ -56,7 +56,7 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	list, err := board.ListAll(context.Background(), &rpc.BoardListAllReq{
+	list, err := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
 		Instance:            inst,
 		SearchArgs:          args,
 		IncludeHiddenBoards: showHiddenBoard,
@@ -72,7 +72,7 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type resultAll struct {
-	list *rpc.BoardListAllResp
+	list *rpc.BoardListAllResponse
 }
 
 func (dr resultAll) Data() interface{} {
@@ -91,7 +91,7 @@ func (dr resultAll) String() string {
 		if item.IsHidden {
 			hidden = "(hidden)"
 		}
-		t.AddRow(item.GetName(), item.GetFQBN(), hidden)
+		t.AddRow(item.GetName(), item.GetFqbn(), hidden)
 	}
 	return t.Render()
 }

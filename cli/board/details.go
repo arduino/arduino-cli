@@ -25,7 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/i18n"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -66,7 +66,7 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 		fqbn = args[0]
 	}
 
-	res, err := board.Details(context.Background(), &rpc.BoardDetailsReq{
+	res, err := board.Details(context.Background(), &rpc.BoardDetailsRequest{
 		Instance: inst,
 		Fqbn:     fqbn,
 	})
@@ -82,7 +82,7 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type detailsResult struct {
-	details *rpc.BoardDetailsResp
+	details *rpc.BoardDetailsResponse
 }
 
 func (dr detailsResult) Data() interface{} {
@@ -134,20 +134,20 @@ func (dr detailsResult) String() string {
 			table.NewCell("✔", color.New(color.FgGreen)))
 	}
 
-	for i, idp := range details.IdentificationPref {
+	for i, idp := range details.IdentificationPrefs {
 		if i == 0 {
 			t.AddRow() // get some space from above
-			t.AddRow(tr("Identification properties:"), "VID:"+idp.UsbID.VID+" PID:"+idp.UsbID.PID)
+			t.AddRow(tr("Identification properties:"), "VID:"+idp.UsbId.Vid+" PID:"+idp.UsbId.Pid)
 			continue
 		}
-		t.AddRow("", "VID:"+idp.UsbID.VID+" PID:"+idp.UsbID.PID)
+		t.AddRow("", "VID:"+idp.UsbId.Vid+" PID:"+idp.UsbId.Pid)
 	}
 
 	t.AddRow() // get some space from above
 	addIfNotEmpty(tr("Package name:"), details.Package.Name)
 	addIfNotEmpty(tr("Package maintainer:"), details.Package.Maintainer)
 	addIfNotEmpty(tr("Package URL:"), details.Package.Url)
-	addIfNotEmpty(tr("Package website:"), details.Package.WebsiteURL)
+	addIfNotEmpty(tr("Package website:"), details.Package.WebsiteUrl)
 	addIfNotEmpty(tr("Package online help:"), details.Package.Help.Online)
 
 	t.AddRow() // get some space from above
@@ -155,7 +155,7 @@ func (dr detailsResult) String() string {
 	addIfNotEmpty(tr("Platform category:"), details.Platform.Category)
 	addIfNotEmpty(tr("Platform architecture:"), details.Platform.Architecture)
 	addIfNotEmpty(tr("Platform URL:"), details.Platform.Url)
-	addIfNotEmpty(tr("Platform file name:"), details.Platform.ArchiveFileName)
+	addIfNotEmpty(tr("Platform file name:"), details.Platform.ArchiveFilename)
 	if details.Platform.Size != 0 {
 		addIfNotEmpty(tr("Platform size (bytes):"), fmt.Sprint(details.Platform.Size))
 	}
@@ -167,7 +167,7 @@ func (dr detailsResult) String() string {
 		if showFullDetails {
 			for _, sys := range tool.Systems {
 				t.AddRow("", tr("OS:"), "", sys.Host)
-				t.AddRow("", tr("File:"), "", sys.ArchiveFileName)
+				t.AddRow("", tr("File:"), "", sys.ArchiveFilename)
 				t.AddRow("", tr("Size (bytes):"), "", fmt.Sprint(sys.Size))
 				t.AddRow("", tr("Checksum:"), "", sys.Checksum)
 				t.AddRow("", "URL:", "", sys.Url)

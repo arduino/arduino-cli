@@ -21,11 +21,11 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // ListProgrammersAvailableForUpload FIXMEDOC
-func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadReq) (*rpc.ListProgrammersAvailableForUploadResp, error) {
+func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadRequest) (*rpc.ListProgrammersAvailableForUploadResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
 	fqbnIn := req.GetFqbn()
@@ -60,7 +60,7 @@ func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgram
 		result = append(result, createRPCProgrammer(id, programmer))
 	}
 
-	return &rpc.ListProgrammersAvailableForUploadResp{
+	return &rpc.ListProgrammersAvailableForUploadResponse{
 		Programmers: result,
 	}, nil
 }

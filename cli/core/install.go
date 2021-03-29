@@ -26,7 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/configuration"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -98,14 +98,14 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for _, platformRef := range platformsRefs {
-		platformInstallReq := &rpc.PlatformInstallReq{
+		platformInstallRequest := &rpc.PlatformInstallRequest{
 			Instance:        inst,
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
 			SkipPostInstall: DetectSkipPostInstallValue(),
 		}
-		_, err := core.PlatformInstall(context.Background(), platformInstallReq, output.ProgressBar(), output.TaskProgress())
+		_, err := core.PlatformInstall(context.Background(), platformInstallRequest, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
 			feedback.Errorf("Error during install: %v", err)
 			os.Exit(errorcodes.ErrGeneric)

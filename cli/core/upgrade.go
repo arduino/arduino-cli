@@ -25,7 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -57,7 +57,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
-		targets, err := core.GetPlatforms(&rpc.PlatformListReq{
+		targets, err := core.GetPlatforms(&rpc.PlatformListRequest{
 			Instance:      inst,
 			UpdatableOnly: true,
 		})
@@ -72,7 +72,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 		}
 
 		for _, t := range targets {
-			args = append(args, t.ID)
+			args = append(args, t.Id)
 		}
 	}
 
@@ -91,7 +91,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			continue
 		}
 
-		r := &rpc.PlatformUpgradeReq{
+		r := &rpc.PlatformUpgradeRequest{
 			Instance:        inst,
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,

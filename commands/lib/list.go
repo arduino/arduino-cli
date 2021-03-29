@@ -25,7 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
-	rpc "github.com/arduino/arduino-cli/rpc/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
 )
 
@@ -35,7 +35,7 @@ type installedLib struct {
 }
 
 // LibraryList FIXMEDOC
-func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryListResp, error) {
+func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, errors.New("invalid instance")
@@ -48,7 +48,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryList
 
 	nameFilter := strings.ToLower(req.GetName())
 
-	instaledLib := []*rpc.InstalledLibrary{}
+	instaledLibs := []*rpc.InstalledLibrary{}
 	res := listLibraries(lm, req.GetUpdatable(), req.GetAll())
 	if f := req.GetFqbn(); f != "" {
 		fqbn, err := cores.ParseFQBN(req.GetFqbn())
@@ -107,13 +107,13 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListReq) (*rpc.LibraryList
 		if err != nil {
 			return nil, fmt.Errorf("converting library %s to rpc struct: %w", lib.Library.Name, err)
 		}
-		instaledLib = append(instaledLib, &rpc.InstalledLibrary{
+		instaledLibs = append(instaledLibs, &rpc.InstalledLibrary{
 			Library: rpcLib,
 			Release: release,
 		})
 	}
 
-	return &rpc.LibraryListResp{InstalledLibrary: instaledLib}, nil
+	return &rpc.LibraryListResponse{InstalledLibraries: instaledLibs}, nil
 }
 
 // listLibraries returns the list of installed libraries. If updatable is true it
