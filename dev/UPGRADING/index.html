@@ -279,6 +279,40 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#not-yet-released" class="md-nav__link">
+    Not yet released
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes-in-grpc-api-and-cli-json-output" class="md-nav__link">
+    Breaking changes in gRPC API and CLI JSON output.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-api-breaking-changes" class="md-nav__link">
+    gRPC API breaking changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arduino-cli-json-output-breaking-changes" class="md-nav__link">
+    arduino-cli JSON output breaking changes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0160" class="md-nav__link">
     0.16.0
   </a>
@@ -1178,6 +1212,40 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#not-yet-released" class="md-nav__link">
+    Not yet released
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes-in-grpc-api-and-cli-json-output" class="md-nav__link">
+    Breaking changes in gRPC API and CLI JSON output.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-api-breaking-changes" class="md-nav__link">
+    gRPC API breaking changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arduino-cli-json-output-breaking-changes" class="md-nav__link">
+    arduino-cli JSON output breaking changes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0160" class="md-nav__link">
     0.16.0
   </a>
@@ -1284,6 +1352,393 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="not-yet-released">Not yet released<a class="headerlink" href="#not-yet-released" title="Permanent link">&para;</a></h2>
+<h3 id="breaking-changes-in-grpc-api-and-cli-json-output">Breaking changes in gRPC API and CLI JSON output.<a class="headerlink" href="#breaking-changes-in-grpc-api-and-cli-json-output" title="Permanent link">&para;</a></h3>
+<p>Starting from this release we applied a more rigorous and stricter naming conventions in gRPC API following the official
+guidelines: <a href="https://developers.google.com/protocol-buffers/docs/style">https://developers.google.com/protocol-buffers/docs/style</a></p>
+<p>We also started using a linter to implement checks for gRPC API style errors.</p>
+<p>This provides a better consistency and higher quality API but inevitably introduces breaking changes.</p>
+<h3 id="grpc-api-breaking-changes">gRPC API breaking changes<a class="headerlink" href="#grpc-api-breaking-changes" title="Permanent link">&para;</a></h3>
+<p>Consumers of the gRPC API should regenerate their bindings and update all structures naming where necessary. Most of the
+changes are trivial and falls into the following categories:</p>
+<ul>
+<li>Service names have been suffixed with <code>...Service</code> (for example <code>ArduinoCore</code> -&gt; <code>ArduinoCoreService</code>)</li>
+<li>Message names suffix has been changed from <code>...Req</code>/<code>...Resp</code> to <code>...Request</code>/<code>...Response</code> (for example
+  <code>BoardDetailsReq</code> -&gt; <code>BoardDetailsRequest</code>)</li>
+<li>Enumerations now have their class name prefixed (for example the enumeration value <code>FLAT</code> in <code>LibraryLayout</code> has been
+  changed to <code>LIBRARY_LAYOUT_FLAT</code>)</li>
+<li>Use of lower-snake case on all fields (for example: <code>ID</code> -&gt; <code>id</code>, <code>FQBN</code> -&gt; <code>fqbn</code>, <code>Name</code> -&gt; <code>name</code>,
+  <code>ArchiveFilename</code> -&gt; <code>archive_filename</code>)</li>
+<li>Package names are now versioned (for example <code>cc.arduino.cli.commands</code> -&gt; <code>cc.arduino.cli.commands.v1</code>)</li>
+<li>Repeated responses are now in plural form (<code>identification_pref</code> -&gt; <code>identification_prefs</code>, <code>platform</code> -&gt; <code>platforms</code>)</li>
+</ul>
+<h3 id="arduino-cli-json-output-breaking-changes">arduino-cli JSON output breaking changes<a class="headerlink" href="#arduino-cli-json-output-breaking-changes" title="Permanent link">&para;</a></h3>
+<p>Consumers of the JSON output of the CLI must update their clients if they use one of the following commands:</p>
+<ul>
+<li>
+<p>in <code>core search</code> command the following fields have been renamed:</p>
+<ul>
+<li><code>Boards</code> -&gt; <code>boards</code></li>
+<li><code>Email</code> -&gt; <code>email</code></li>
+<li><code>ID</code> -&gt; <code>id</code></li>
+<li><code>Latest</code> -&gt; <code>latest</code></li>
+<li><code>Maintainer</code> -&gt; <code>maintainer</code></li>
+<li><code>Name</code> -&gt; <code>name</code></li>
+<li><code>Website</code> -&gt; <code>website</code></li>
+</ul>
+<p>The new output is like:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli core search Due --format json
+[
+  {
+    &quot;id&quot;: &quot;arduino:sam&quot;,
+    &quot;latest&quot;: &quot;1.6.12&quot;,
+    &quot;name&quot;: &quot;Arduino SAM Boards (32-bits ARM Cortex-M3)&quot;,
+    &quot;maintainer&quot;: &quot;Arduino&quot;,
+    &quot;website&quot;: &quot;http://www.arduino.cc/&quot;,
+    &quot;email&quot;: &quot;packages@arduino.cc&quot;,
+    &quot;boards&quot;: [
+      {
+        &quot;name&quot;: &quot;Arduino Due (Native USB Port)&quot;,
+        &quot;fqbn&quot;: &quot;arduino:sam:arduino_due_x&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Arduino Due (Programming Port)&quot;,
+        &quot;fqbn&quot;: &quot;arduino:sam:arduino_due_x_dbg&quot;
+      }
+    ]
+  }
+]
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p>in <code>board details</code> command the following fields have been renamed:</p>
+<ul>
+<li><code>identification_pref</code> -&gt; <code>identification_prefs</code></li>
+<li><code>usbID</code> -&gt; <code>usb_id</code></li>
+<li><code>PID</code> -&gt; <code>pid</code></li>
+<li><code>VID</code> -&gt; <code>vid</code></li>
+<li><code>websiteURL</code> -&gt; <code>website_url</code></li>
+<li><code>archiveFileName</code> -&gt; <code>archive_filename</code></li>
+<li><code>propertiesId</code> -&gt; <code>properties_id</code></li>
+<li><code>toolsDependencies</code> -&gt; <code>tools_dependencies</code></li>
+</ul>
+<p>The new output is like:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli board details arduino:avr:uno --format json
+{
+  &quot;fqbn&quot;: &quot;arduino:avr:uno&quot;,
+  &quot;name&quot;: &quot;Arduino Uno&quot;,
+  &quot;version&quot;: &quot;1.8.3&quot;,
+  &quot;properties_id&quot;: &quot;uno&quot;,
+  &quot;official&quot;: true,
+  &quot;package&quot;: {
+    &quot;maintainer&quot;: &quot;Arduino&quot;,
+    &quot;url&quot;: &quot;https://downloads.arduino.cc/packages/package_index.json&quot;,
+    &quot;website_url&quot;: &quot;http://www.arduino.cc/&quot;,
+    &quot;email&quot;: &quot;packages@arduino.cc&quot;,
+    &quot;name&quot;: &quot;arduino&quot;,
+    &quot;help&quot;: {
+      &quot;online&quot;: &quot;http://www.arduino.cc/en/Reference/HomePage&quot;
+    }
+  },
+  &quot;platform&quot;: {
+    &quot;architecture&quot;: &quot;avr&quot;,
+    &quot;category&quot;: &quot;Arduino&quot;,
+    &quot;url&quot;: &quot;http://downloads.arduino.cc/cores/avr-1.8.3.tar.bz2&quot;,
+    &quot;archive_filename&quot;: &quot;avr-1.8.3.tar.bz2&quot;,
+    &quot;checksum&quot;: &quot;SHA-256:de8a9b982477762d3d3e52fc2b682cdd8ff194dc3f1d46f4debdea6a01b33c14&quot;,
+    &quot;size&quot;: 4941548,
+    &quot;name&quot;: &quot;Arduino AVR Boards&quot;
+  },
+  &quot;tools_dependencies&quot;: [
+    {
+      &quot;packager&quot;: &quot;arduino&quot;,
+      &quot;name&quot;: &quot;avr-gcc&quot;,
+      &quot;version&quot;: &quot;7.3.0-atmel3.6.1-arduino7&quot;,
+      &quot;systems&quot;: [
+        {
+          &quot;checksum&quot;: &quot;SHA-256:3903553d035da59e33cff9941b857c3cb379cb0638105dfdf69c97f0acc8e7b5&quot;,
+          &quot;host&quot;: &quot;arm-linux-gnueabihf&quot;,
+          &quot;archive_filename&quot;: &quot;avr-gcc-7.3.0-atmel3.6.1-arduino7-arm-linux-gnueabihf.tar.bz2&quot;,
+          &quot;url&quot;: &quot;http://downloads.arduino.cc/tools/avr-gcc-7.3.0-atmel3.6.1-arduino7-arm-linux-gnueabihf.tar.bz2&quot;,
+          &quot;size&quot;: 34683056
+        },
+        { ... }
+      ]
+    },
+    { ... }
+  ],
+  &quot;identification_prefs&quot;: [
+    {
+      &quot;usb_id&quot;: {
+        &quot;vid&quot;: &quot;0x2341&quot;,
+        &quot;pid&quot;: &quot;0x0043&quot;
+      }
+    },
+    { ... }
+  ],
+  &quot;programmers&quot;: [
+    {
+      &quot;platform&quot;: &quot;Arduino AVR Boards&quot;,
+      &quot;id&quot;: &quot;parallel&quot;,
+      &quot;name&quot;: &quot;Parallel Programmer&quot;
+    },
+    { ... }
+  ]
+}
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p>in <code>board listall</code> command the following fields have been renamed:</p>
+<ul>
+<li><code>FQBN</code> -&gt; <code>fqbn</code></li>
+<li><code>Email</code> -&gt; <code>email</code></li>
+<li><code>ID</code> -&gt; <code>id</code></li>
+<li><code>Installed</code> -&gt; <code>installed</code></li>
+<li><code>Latest</code> -&gt; <code>latest</code></li>
+<li><code>Name</code> -&gt; <code>name</code></li>
+<li><code>Maintainer</code> -&gt; <code>maintainer</code></li>
+<li><code>Website</code> -&gt; <code>website</code></li>
+</ul>
+<p>The new output is like:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli board listall Uno --format json
+{
+  &quot;boards&quot;: [
+    {
+      &quot;name&quot;: &quot;Arduino Uno&quot;,
+      &quot;fqbn&quot;: &quot;arduino:avr:uno&quot;,
+      &quot;platform&quot;: {
+        &quot;id&quot;: &quot;arduino:avr&quot;,
+        &quot;installed&quot;: &quot;1.8.3&quot;,
+        &quot;latest&quot;: &quot;1.8.3&quot;,
+        &quot;name&quot;: &quot;Arduino AVR Boards&quot;,
+        &quot;maintainer&quot;: &quot;Arduino&quot;,
+        &quot;website&quot;: &quot;http://www.arduino.cc/&quot;,
+        &quot;email&quot;: &quot;packages@arduino.cc&quot;
+      }
+    }
+  ]
+}
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p>in <code>board search</code> command the following fields have been renamed:</p>
+<ul>
+<li><code>FQBN</code> -&gt; <code>fqbn</code></li>
+<li><code>Email</code> -&gt; <code>email</code></li>
+<li><code>ID</code> -&gt; <code>id</code></li>
+<li><code>Installed</code> -&gt; <code>installed</code></li>
+<li><code>Latest</code> -&gt; <code>latest</code></li>
+<li><code>Name</code> -&gt; <code>name</code></li>
+<li><code>Maintainer</code> -&gt; <code>maintainer</code></li>
+<li><code>Website</code> -&gt; <code>website</code></li>
+</ul>
+<p>The new output is like:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli board search Uno --format json
+[
+  {
+    &quot;name&quot;: &quot;Arduino Uno&quot;,
+    &quot;fqbn&quot;: &quot;arduino:avr:uno&quot;,
+    &quot;platform&quot;: {
+      &quot;id&quot;: &quot;arduino:avr&quot;,
+      &quot;installed&quot;: &quot;1.8.3&quot;,
+      &quot;latest&quot;: &quot;1.8.3&quot;,
+      &quot;name&quot;: &quot;Arduino AVR Boards&quot;,
+      &quot;maintainer&quot;: &quot;Arduino&quot;,
+      &quot;website&quot;: &quot;http://www.arduino.cc/&quot;,
+      &quot;email&quot;: &quot;packages@arduino.cc&quot;
+    }
+  }
+]
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p>in <code>lib deps</code> command the following fields have been renamed:</p>
+<ul>
+<li><code>versionRequired</code> -&gt; <code>version_required</code></li>
+<li><code>versionInstalled</code> -&gt; <code>version_installed</code></li>
+</ul>
+<p>The new output is like:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli lib deps Arduino_MKRIoTCarrier --format json
+{
+  &quot;dependencies&quot;: [
+    {
+      &quot;name&quot;: &quot;Adafruit seesaw Library&quot;,
+      &quot;version_required&quot;: &quot;1.3.1&quot;
+    },
+    {
+      &quot;name&quot;: &quot;SD&quot;,
+      &quot;version_required&quot;: &quot;1.2.4&quot;,
+      &quot;version_installed&quot;: &quot;1.2.3&quot;
+    },
+    { ... }
+  ]
+}
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p>in <code>lib search</code> command the following fields have been renamed:</p>
+<ul>
+<li><code>archivefilename</code> -&gt; <code>archive_filename</code></li>
+<li><code>cachepath</code> -&gt; <code>cache_path</code></li>
+</ul>
+<p>The new output is like:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli lib search NTPClient --format json
+{
+  &quot;libraries&quot;: [
+    {
+      &quot;name&quot;: &quot;NTPClient&quot;,
+      &quot;releases&quot;: {
+        &quot;1.0.0&quot;: {
+          &quot;author&quot;: &quot;Fabrice Weinberg&quot;,
+          &quot;version&quot;: &quot;1.0.0&quot;,
+          &quot;maintainer&quot;: &quot;Fabrice Weinberg \u003cfabrice@weinberg.me\u003e&quot;,
+          &quot;sentence&quot;: &quot;An NTPClient to connect to a time server&quot;,
+          &quot;paragraph&quot;: &quot;Get time from a NTP server and keep it in sync.&quot;,
+          &quot;website&quot;: &quot;https://github.com/FWeinb/NTPClient&quot;,
+          &quot;category&quot;: &quot;Timing&quot;,
+          &quot;architectures&quot;: [
+            &quot;esp8266&quot;
+          ],
+          &quot;types&quot;: [
+            &quot;Arduino&quot;
+          ],
+          &quot;resources&quot;: {
+            &quot;url&quot;: &quot;https://downloads.arduino.cc/libraries/github.com/arduino-libraries/NTPClient-1.0.0.zip&quot;,
+            &quot;archive_filename&quot;: &quot;NTPClient-1.0.0.zip&quot;,
+            &quot;checksum&quot;: &quot;SHA-256:b1f2907c9d51ee253bad23d05e2e9c1087ab1e7ba3eb12ee36881ba018d81678&quot;,
+            &quot;size&quot;: 6284,
+            &quot;cache_path&quot;: &quot;libraries&quot;
+          }
+        },
+        &quot;2.0.0&quot;: { ... },
+        &quot;3.0.0&quot;: { ... },
+        &quot;3.1.0&quot;: { ... },
+        &quot;3.2.0&quot;: { ... }
+      },
+      &quot;latest&quot;: {
+        &quot;author&quot;: &quot;Fabrice Weinberg&quot;,
+        &quot;version&quot;: &quot;3.2.0&quot;,
+        &quot;maintainer&quot;: &quot;Fabrice Weinberg \u003cfabrice@weinberg.me\u003e&quot;,
+        &quot;sentence&quot;: &quot;An NTPClient to connect to a time server&quot;,
+        &quot;paragraph&quot;: &quot;Get time from a NTP server and keep it in sync.&quot;,
+        &quot;website&quot;: &quot;https://github.com/arduino-libraries/NTPClient&quot;,
+        &quot;category&quot;: &quot;Timing&quot;,
+        &quot;architectures&quot;: [
+          &quot;*&quot;
+        ],
+        &quot;types&quot;: [
+          &quot;Arduino&quot;
+        ],
+        &quot;resources&quot;: {
+          &quot;url&quot;: &quot;https://downloads.arduino.cc/libraries/github.com/arduino-libraries/NTPClient-3.2.0.zip&quot;,
+          &quot;archive_filename&quot;: &quot;NTPClient-3.2.0.zip&quot;,
+          &quot;checksum&quot;: &quot;SHA-256:122d00df276972ba33683aff0f7fe5eb6f9a190ac364f8238a7af25450fd3e31&quot;,
+          &quot;size&quot;: 7876,
+          &quot;cache_path&quot;: &quot;libraries&quot;
+        }
+      }
+    }
+  ],
+  &quot;status&quot;: 1
+}
+</code></pre></div>
+</li>
+</ul>
+<ul>
+<li>
+<p>in <code>board list</code> command the following fields have been renamed:</p>
+<ul>
+<li><code>FQBN</code> -&gt; <code>fqbn</code></li>
+<li><code>VID</code> -&gt; <code>vid</code></li>
+<li><code>PID</code> -&gt; <code>pid</code></li>
+</ul>
+<p>The new output is like:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli board list --format json
+[
+  {
+    &quot;address&quot;: &quot;/dev/ttyACM0&quot;,
+    &quot;protocol&quot;: &quot;serial&quot;,
+    &quot;protocol_label&quot;: &quot;Serial Port (USB)&quot;,
+    &quot;boards&quot;: [
+      {
+        &quot;name&quot;: &quot;Arduino Nano 33 BLE&quot;,
+        &quot;fqbn&quot;: &quot;arduino:mbed:nano33ble&quot;,
+        &quot;vid&quot;: &quot;0x2341&quot;,
+        &quot;pid&quot;: &quot;0x805a&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Arduino Nano 33 BLE&quot;,
+        &quot;fqbn&quot;: &quot;arduino-dev:mbed:nano33ble&quot;,
+        &quot;vid&quot;: &quot;0x2341&quot;,
+        &quot;pid&quot;: &quot;0x805a&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Arduino Nano 33 BLE&quot;,
+        &quot;fqbn&quot;: &quot;arduino-dev:nrf52:nano33ble&quot;,
+        &quot;vid&quot;: &quot;0x2341&quot;,
+        &quot;pid&quot;: &quot;0x805a&quot;
+      },
+      {
+        &quot;name&quot;: &quot;Arduino Nano 33 BLE&quot;,
+        &quot;fqbn&quot;: &quot;arduino-beta:mbed:nano33ble&quot;,
+        &quot;vid&quot;: &quot;0x2341&quot;,
+        &quot;pid&quot;: &quot;0x805a&quot;
+      }
+    ],
+    &quot;serial_number&quot;: &quot;BECC45F754185EC9&quot;
+  }
+]
+$ arduino-cli board list -w --format json
+{
+  &quot;type&quot;: &quot;add&quot;,
+  &quot;address&quot;: &quot;/dev/ttyACM0&quot;,
+  &quot;protocol&quot;: &quot;serial&quot;,
+  &quot;protocol_label&quot;: &quot;Serial Port (USB)&quot;,
+  &quot;boards&quot;: [
+    {
+      &quot;name&quot;: &quot;Arduino Nano 33 BLE&quot;,
+      &quot;fqbn&quot;: &quot;arduino-dev:nrf52:nano33ble&quot;,
+      &quot;vid&quot;: &quot;0x2341&quot;,
+      &quot;pid&quot;: &quot;0x805a&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Arduino Nano 33 BLE&quot;,
+      &quot;fqbn&quot;: &quot;arduino-dev:mbed:nano33ble&quot;,
+      &quot;vid&quot;: &quot;0x2341&quot;,
+      &quot;pid&quot;: &quot;0x805a&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Arduino Nano 33 BLE&quot;,
+      &quot;fqbn&quot;: &quot;arduino-beta:mbed:nano33ble&quot;,
+      &quot;vid&quot;: &quot;0x2341&quot;,
+      &quot;pid&quot;: &quot;0x805a&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Arduino Nano 33 BLE&quot;,
+      &quot;fqbn&quot;: &quot;arduino:mbed:nano33ble&quot;,
+      &quot;vid&quot;: &quot;0x2341&quot;,
+      &quot;pid&quot;: &quot;0x805a&quot;
+    }
+  ],
+  &quot;serial_number&quot;: &quot;BECC45F754185EC9&quot;
+}
+{
+  &quot;type&quot;: &quot;remove&quot;,
+  &quot;address&quot;: &quot;/dev/ttyACM0&quot;
+}
+</code></pre></div>
+</li>
+</ul>
 <h2 id="0160">0.16.0<a class="headerlink" href="#0160" title="Permanent link">&para;</a></h2>
 <h3 id="change-type-of-compilereqexportbinaries-message-in-grpc-interface">Change type of <code>CompileReq.ExportBinaries</code> message in gRPC interface<a class="headerlink" href="#change-type-of-compilereqexportbinaries-message-in-grpc-interface" title="Permanent link">&para;</a></h3>
 <p>This change affects only the gRPC consumers.</p>
