@@ -59,9 +59,6 @@ message BoardDetailsResponse {
   repeated Programmer programmers = 13;
   // Set to true if the board supports debugging
   bool debugging_supported = 14;
-  // If a board with the specified FQBN is connected returns its serial number
-  // too
-  string serial_number = 15;
 }
 
 message IdentificationPref {
