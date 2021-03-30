@@ -66,8 +66,12 @@ func main() {
 
 	settingsClient := settings.NewSettingsServiceClient(conn)
 
+	callUpload(client, initInstance(client))
+	return
 	// Now we can call various methods of the API...
-
+	log.Println("calling LibraryDownload(WiFi101@0.15.2)")
+	callLibDownload(client, initInstance(client))
+	return
 	// `Version` can be called without any setup or init procedure.
 	log.Println("calling Version")
 	callVersion(client)
@@ -635,12 +639,11 @@ func callUpload(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
 	uplRespStream, err := client.Upload(context.Background(),
 		&rpc.UploadRequest{
 			Instance:   instance,
-			Fqbn:       "arduino:samd:mkr1000",
+			Fqbn:       "MegaCoreX:megaavr:4809",
 			SketchPath: filepath.Join(currDir, "hello"),
 			Port:       "/dev/ttyACM0",
 			Verbose:    true,
 		})
-
 	if err != nil {
 		log.Fatalf("Upload error: %s\n", err)
 	}
@@ -654,6 +657,13 @@ func callUpload(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
 
 		if err != nil {
 			log.Fatalf("Upload error: %s", err)
+			s, _ := status.FromError(err)
+			log.Printf(`CODE=%s`, s.Code())
+			log.Printf(`MSG="%+v"`, s.Message())
+			for _, d := range s.Details() {
+				_, ok := d.(*rpc.ProgrammerIsRequiredForUploadError)
+				log.Printf(`DETAILS=Programmer required? %v`, ok)
+			}
 			break
 		}
 
