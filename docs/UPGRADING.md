@@ -2,7 +2,7 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
-## Not yet released
+## 0.18.0
 
 ### Breaking changes in gRPC API and CLI JSON output.
 
