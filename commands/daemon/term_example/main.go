@@ -21,7 +21,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/arduino/arduino-cli/rpc/monitor"
+	monitor "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/monitor/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/structpb"
 )
@@ -40,7 +40,7 @@ func main() {
 	defer conn.Close()
 
 	// Open a monitor instance
-	mon := monitor.NewMonitorClient(conn)
+	mon := monitor.NewMonitorServiceClient(conn)
 	stream, err := mon.StreamingOpen(context.Background())
 	if err != nil {
 		log.Fatal("Error opening stream:", err)
@@ -53,10 +53,10 @@ func main() {
 		log.Fatal("Error creating config:", err)
 	}
 
-	if err := stream.Send(&monitor.StreamingOpenReq{
-		Content: &monitor.StreamingOpenReq_MonitorConfig{
-			MonitorConfig: &monitor.MonitorConfig{
-				Type:                monitor.MonitorConfig_NULL,
+	if err := stream.Send(&monitor.StreamingOpenRequest{
+		Content: &monitor.StreamingOpenRequest_Config{
+			Config: &monitor.MonitorConfig{
+				Type:                monitor.MonitorConfig_TARGET_TYPE_NULL,
 				AdditionalConfig:    additionalConf,
 				RecvRateLimitBuffer: 1024,
 			},
@@ -65,8 +65,8 @@ func main() {
 		log.Fatal("Error opening stream:", err)
 	}
 
-	if err := stream.Send(&monitor.StreamingOpenReq{
-		Content: &monitor.StreamingOpenReq_RecvAcknowledge{
+	if err := stream.Send(&monitor.StreamingOpenRequest{
+		Content: &monitor.StreamingOpenRequest_RecvAcknowledge{
 			RecvAcknowledge: 5,
 		},
 	}); err != nil {
@@ -84,8 +84,8 @@ func main() {
 		if r.Dropped > 0 {
 			fmt.Printf("DROPPED %d bytes!!!\n", r.Dropped)
 		}
-		if err := stream.Send(&monitor.StreamingOpenReq{
-			Content: &monitor.StreamingOpenReq_RecvAcknowledge{
+		if err := stream.Send(&monitor.StreamingOpenRequest{
+			Content: &monitor.StreamingOpenRequest_RecvAcknowledge{
 				RecvAcknowledge: 1,
 			},
 		}); err != nil {
