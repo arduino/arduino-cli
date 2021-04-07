@@ -204,6 +204,29 @@ func (sc *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) err
 	return nil
 }
 
+// LoadLibraryFromDir loads one single library from the libRootDir.
+// libRootDir must point to the root of a valid library.
+// An error is returned if the path doesn't exist or loading of the library fails.
+func (lm *LibrariesManager) LoadLibraryFromDir(libRootDir *paths.Path, location libraries.LibraryLocation) error {
+	if libRootDir.NotExist() {
+		return fmt.Errorf("library path does not exist: %s", libRootDir)
+	}
+
+	library, err := libraries.Load(libRootDir, location)
+	if err != nil {
+		return fmt.Errorf("loading library from %s: %s", libRootDir, err)
+	}
+
+	alternatives, ok := lm.Libraries[library.Name]
+	if !ok {
+		alternatives = &LibraryAlternatives{}
+		lm.Libraries[library.Name] = alternatives
+	}
+	alternatives.Add(library)
+
+	return nil
+}
+
 // FindByReference return the installed library matching the Reference
 // name and version or, if the version is nil, the library installed
 // in the User folder.

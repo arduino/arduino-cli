@@ -61,6 +61,12 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 		return errors.WithStack(err)
 	}
 
+	for _, dir := range ctx.LibrariesDirs {
+		if err := lm.LoadLibraryFromDir(dir, libraries.User); err != nil {
+			return err
+		}
+	}
+
 	if debugLevel > 0 {
 		for _, lib := range lm.Libraries {
 			for _, libAlt := range lib.Alternatives {

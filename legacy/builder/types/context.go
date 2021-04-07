@@ -67,6 +67,7 @@ type Context struct {
 	BuiltInToolsDirs     paths.PathList
 	BuiltInLibrariesDirs paths.PathList
 	OtherLibrariesDirs   paths.PathList
+	LibrariesDirs        paths.PathList // List of paths pointing to individual libraries root folders
 	SketchLocation       *paths.Path
 	WatchedLocations     paths.PathList
 	ArduinoAPIVersion    string

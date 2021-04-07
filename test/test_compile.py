@@ -887,3 +887,65 @@ def test_compile_manually_installed_platform_using_boards_local_txt(run_command,
     shutil.copyfile(Path(__file__).parent / "testdata" / "boards.local.txt", boards_local_txt)
 
     assert run_command(f"compile --clean -b {fqbn} {sketch_path}")
+
+
+def test_compile_with_library(run_command, data_dir):
+    assert run_command("update")
+
+    assert run_command("core install arduino:avr@1.8.3")
+
+    sketch_name = "CompileSketchWithWiFi101Dependency"
+    sketch_path = Path(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+    # Create new sketch and add library include
+    assert run_command(f"sketch new {sketch_path}")
+    sketch_file = sketch_path / f"{sketch_name}.ino"
+    lines = []
+    with open(sketch_file, "r") as f:
+        lines = f.readlines()
+    lines = ["#include <WiFi101.h>\n"] + lines
+    with open(sketch_file, "w") as f:
+        f.writelines(lines)
+
+    # Manually installs a library
+    git_url = "https://github.com/arduino-libraries/WiFi101.git"
+    lib_path = Path(data_dir, "my-libraries", "WiFi101")
+    assert Repo.clone_from(git_url, lib_path, multi_options=["-b 0.16.1"])
+
+    res = run_command(f"compile -b {fqbn} {sketch_path} --library {lib_path} -v")
+    assert res.ok
+    assert "WiFi101" in res.stdout
+
+
+def test_compile_with_library_priority(run_command, data_dir):
+    assert run_command("update")
+
+    assert run_command("core install arduino:avr@1.8.3")
+
+    sketch_name = "CompileSketchWithWiFi101Dependency"
+    sketch_path = Path(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    # Manually installs the same library and add a new custom header to it
+    git_url = "https://github.com/arduino-libraries/WiFi101.git"
+    lib_path = Path(data_dir, "my-libraries", "WiFi101")
+    assert Repo.clone_from(git_url, lib_path, multi_options=["-b 0.16.1"])
+    with open(lib_path / "src" / "WiFiSomething.h", "x") as f:
+        f.writelines(["#ifndef WIFI_SOMETHING\n", "#define WIFI_SOMETHING\n", "#endif\n"])
+
+    # Install the same library we installed manually
+    assert run_command("lib install WiFi101")
+
+    # Create new sketch and add custom header include
+    assert run_command(f"sketch new {sketch_path}")
+    sketch_file = sketch_path / f"{sketch_name}.ino"
+    lines = []
+    with open(sketch_file, "r") as f:
+        lines = f.readlines()
+    lines = ["#include <WiFiSomething.h>"] + lines
+    with open(sketch_file, "w") as f:
+        f.writelines(lines)
+
+    res = run_command(f"compile -b {fqbn} {sketch_path} --library {lib_path} -v")
+    assert res.ok
+    assert "WiFi101" in res.stdout
