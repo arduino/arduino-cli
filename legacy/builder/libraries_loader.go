@@ -62,7 +62,8 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	}
 
 	for _, dir := range ctx.LibrariesDirs {
-		if err := lm.LoadLibraryFromDir(dir, libraries.User); err != nil {
+		// Libraries specified this way have top priority
+		if err := lm.LoadLibraryFromDir(dir, libraries.Unmanaged); err != nil {
 			return err
 		}
 	}

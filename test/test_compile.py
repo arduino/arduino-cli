@@ -928,24 +928,30 @@ def test_compile_with_library_priority(run_command, data_dir):
 
     # Manually installs the same library and add a new custom header to it
     git_url = "https://github.com/arduino-libraries/WiFi101.git"
-    lib_path = Path(data_dir, "my-libraries", "WiFi101")
-    assert Repo.clone_from(git_url, lib_path, multi_options=["-b 0.16.1"])
-    with open(lib_path / "src" / "WiFiSomething.h", "x") as f:
-        f.writelines(["#ifndef WIFI_SOMETHING\n", "#define WIFI_SOMETHING\n", "#endif\n"])
+    manually_install_lib_path = Path(data_dir, "my-libraries", "WiFi101")
+    assert Repo.clone_from(git_url, manually_install_lib_path, multi_options=["-b 0.16.1"])
+    # with open(manually_install_lib_path / "src" / "WiFiSomething.h", "x") as f:
+    #     f.writelines(["#ifndef WIFI_SOMETHING\n", "#define WIFI_SOMETHING\n", "#endif\n"])
 
     # Install the same library we installed manually
     assert run_command("lib install WiFi101")
 
-    # Create new sketch and add custom header include
+    # Create new sketch and add library include
     assert run_command(f"sketch new {sketch_path}")
     sketch_file = sketch_path / f"{sketch_name}.ino"
     lines = []
     with open(sketch_file, "r") as f:
         lines = f.readlines()
-    lines = ["#include <WiFiSomething.h>"] + lines
+    lines = ["#include <WiFi101.h>"] + lines
     with open(sketch_file, "w") as f:
         f.writelines(lines)
 
-    res = run_command(f"compile -b {fqbn} {sketch_path} --library {lib_path} -v")
+    res = run_command(f"compile -b {fqbn} {sketch_path} --library {manually_install_lib_path} -v")
     assert res.ok
-    assert "WiFi101" in res.stdout
+    cli_installed_lib_path = Path(data_dir, "libraries", "WiFi101")
+    expected_output = [
+        'Multiple libraries were found for "WiFi101.h"',
+        f" Used: {manually_install_lib_path}",
+        f" Not used: {cli_installed_lib_path}",
+    ]
+    assert "\n".join(expected_output) in res.stdout

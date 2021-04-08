@@ -297,6 +297,8 @@ enum LibraryLocation {
   // this indicates the library is in the `libraries` subdirectory of a
   // platform referenced by the board's platform.
   LIBRARY_LOCATION_REFERENCED_PLATFORM_BUILTIN = 3;
+  // Outside the `libraries` folders managed by the CLI.
+  LIBRARY_LOCATION_UNMANAGED = 4;
 }
 
 message ZipLibraryInstallRequest {

@@ -98,7 +98,7 @@ func NewCommand() *cobra.Command {
 	command.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	command.Flags().StringVar(&vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if board supports them.")
 	command.Flags().StringSliceVar(&library, "library", []string{},
-		"List of paths to libraries root folders. Can be used multiple times for different libraries.")
+		"List of paths to libraries root folders. Libraries set this way have top priority in case of conflicts. Can be used multiple times for different libraries.")
 	command.Flags().StringSliceVar(&libraries, "libraries", []string{},
 		"List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths.")
 	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, "Optional, optimize compile output for debugging, rather than for release.")
