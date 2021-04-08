@@ -922,16 +922,14 @@ def test_compile_with_library_priority(run_command, data_dir):
 
     assert run_command("core install arduino:avr@1.8.3")
 
-    sketch_name = "CompileSketchWithWiFi101Dependency"
+    sketch_name = "CompileSketchWithLibraryPriority"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
-    # Manually installs the same library and add a new custom header to it
+    # Manually installs a library
     git_url = "https://github.com/arduino-libraries/WiFi101.git"
     manually_install_lib_path = Path(data_dir, "my-libraries", "WiFi101")
     assert Repo.clone_from(git_url, manually_install_lib_path, multi_options=["-b 0.16.1"])
-    # with open(manually_install_lib_path / "src" / "WiFiSomething.h", "x") as f:
-    #     f.writelines(["#ifndef WIFI_SOMETHING\n", "#define WIFI_SOMETHING\n", "#endif\n"])
 
     # Install the same library we installed manually
     assert run_command("lib install WiFi101")
