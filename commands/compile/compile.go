@@ -137,7 +137,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 
-	builderCtx.LibrariesDirs = paths.NewPathList(req.Library...)
+	builderCtx.LibraryDirs = paths.NewPathList(req.Library...)
 
 	if req.GetBuildPath() == "" {
 		builderCtx.BuildPath = bldr.GenBuildPath(sketch.FullPath)

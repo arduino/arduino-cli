@@ -78,7 +78,7 @@ message CompileRequest {
   // When set to `true` the compiled binary will be copied to the export
   // directory.
   google.protobuf.BoolValue export_binaries = 23;
-  // List of paths to libraries root folders
+  // List of paths to library root folders
   repeated string library = 24;
 }
 

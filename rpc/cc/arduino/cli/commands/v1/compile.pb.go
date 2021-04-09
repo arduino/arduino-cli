@@ -100,7 +100,7 @@ type CompileRequest struct {
 	// When set to `true` the compiled binary will be copied to the export
 	// directory.
 	ExportBinaries *wrapperspb.BoolValue `protobuf:"bytes,23,opt,name=export_binaries,json=exportBinaries,proto3" json:"export_binaries,omitempty"`
-	// List of paths to libraries root folders
+	// List of paths to library root folders
 	Library []string `protobuf:"bytes,24,rep,name=library,proto3" json:"library,omitempty"`
 }
 
