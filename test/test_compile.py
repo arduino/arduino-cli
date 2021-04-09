@@ -953,3 +953,46 @@ def test_compile_with_library_priority(run_command, data_dir):
         f" Not used: {cli_installed_lib_path}",
     ]
     assert "\n".join(expected_output) in res.stdout
+
+
+def test_recompile_with_different_library(run_command, data_dir):
+    assert run_command("update")
+
+    assert run_command("core install arduino:avr@1.8.3")
+
+    sketch_name = "RecompileCompileSketchWithDifferentLibrary"
+    sketch_path = Path(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    # Install library
+    assert run_command("lib install WiFi101")
+
+    # Manually installs the same library already installed
+    git_url = "https://github.com/arduino-libraries/WiFi101.git"
+    manually_install_lib_path = Path(data_dir, "my-libraries", "WiFi101")
+    assert Repo.clone_from(git_url, manually_install_lib_path, multi_options=["-b 0.16.1"])
+
+    # Create new sketch and add library include
+    assert run_command(f"sketch new {sketch_path}")
+    sketch_file = sketch_path / f"{sketch_name}.ino"
+    lines = []
+    with open(sketch_file, "r") as f:
+        lines = f.readlines()
+    lines = ["#include <WiFi101.h>"] + lines
+    with open(sketch_file, "w") as f:
+        f.writelines(lines)
+
+    sketch_path_md5 = hashlib.md5(bytes(sketch_path)).hexdigest().upper()
+    build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
+
+    # Compile sketch using library not managed by CLI
+    res = run_command(f"compile -b {fqbn} --library {manually_install_lib_path} {sketch_path} -v")
+    assert res.ok
+    obj_path = build_dir / "libraries" / "WiFi101" / "WiFi.cpp.o"
+    assert f"Using previously compiled file: {obj_path}" not in res.stdout
+
+    # Compile again using library installed from CLI
+    res = run_command(f"compile -b {fqbn} {sketch_path} -v")
+    assert res.ok
+    obj_path = build_dir / "libraries" / "WiFi101" / "WiFi.cpp.o"
+    assert f"Using previously compiled file: {obj_path}" not in res.stdout
