@@ -158,6 +158,8 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 		priority += 2
 	case libraries.User:
 		priority += 3
+	case libraries.Unmanaged:
+		priority += 4
 	default:
 		panic(fmt.Sprintf("Invalid library location: %d", lib.Location))
 	}

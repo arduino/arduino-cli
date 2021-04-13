@@ -357,6 +357,16 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 		return false, nil
 	}
 
+	// The first line of the depfile contains the path to the object file to generate.
+	// The second line of the depfile contains the path to the source file.
+	// All subsequent lines contain the header files necessary to compile the object file.
+
+	// If we don't do this check it might happen that trying to compile a source file
+	// that has the same name but a different path wouldn't recreate the object file.
+	if sourceFile.String() != strings.Trim(rows[1], " ") {
+		return false, nil
+	}
+
 	rows = rows[1:]
 	for _, row := range rows {
 		depStat, err := os.Stat(row)

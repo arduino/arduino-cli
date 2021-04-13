@@ -51,12 +51,16 @@ var (
 	port                    string   // Upload port, e.g.: COM10 or /dev/ttyACM0.
 	verify                  bool     // Upload, verify uploaded binary after the upload.
 	exportDir               string   // The compiled binary is written to this file
-	libraries               []string // List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
 	optimizeForDebug        bool     // Optimize compile output for debug, not for release
 	programmer              string   // Use the specified programmer to upload
 	clean                   bool     // Cleanup the build folder and do not use any cached build
 	compilationDatabaseOnly bool     // Only create compilation database without actually compiling
 	sourceOverrides         string   // Path to a .json file that contains a set of replacements of the sketch source code.
+	// library and libraries sound similar but they're actually different.
+	// library expects a path to the root folder of one single library.
+	// libraries expects a path to a directory containing multiple libraries, similarly to the <directories.user>/libraries path.
+	library   []string // List of paths to libraries root folders. Can be used multiple times for different libraries
+	libraries []string // List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries paths.
 )
 
 // NewCommand created a new `compile` command
@@ -93,8 +97,10 @@ func NewCommand() *cobra.Command {
 	command.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
 	command.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	command.Flags().StringVar(&vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if board supports them.")
+	command.Flags().StringSliceVar(&library, "library", []string{},
+		"List of paths to libraries root folders. Libraries set this way have top priority in case of conflicts. Can be used multiple times for different libraries.")
 	command.Flags().StringSliceVar(&libraries, "libraries", []string{},
-		"List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.")
+		"List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths.")
 	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, "Optional, optimize compile output for debugging, rather than for release.")
 	command.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload.")
 	command.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, "Just produce the compilation database, without actually compiling.")
@@ -171,6 +177,7 @@ func run(cmd *cobra.Command, args []string) {
 		Clean:                         clean,
 		CreateCompilationDatabaseOnly: compilationDatabaseOnly,
 		SourceOverride:                overrides,
+		Library:                       library,
 	}
 	compileOut := new(bytes.Buffer)
 	compileErr := new(bytes.Buffer)
