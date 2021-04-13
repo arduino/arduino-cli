@@ -82,10 +82,10 @@ func (alts *LibraryAlternatives) FindVersion(version *semver.Version) *libraries
 }
 
 // Names returns an array with all the names of the installed libraries.
-func (sc LibrariesManager) Names() []string {
-	res := make([]string, len(sc.Libraries))
+func (lm LibrariesManager) Names() []string {
+	res := make([]string, len(lm.Libraries))
 	i := 0
-	for n := range sc.Libraries {
+	for n := range lm.Libraries {
 		res[i] = n
 		i++
 	}
@@ -109,27 +109,27 @@ func NewLibraryManager(indexDir *paths.Path, downloadsDir *paths.Path) *Librarie
 
 // LoadIndex reads a library_index.json from a file and returns
 // the corresponding Index structure.
-func (sc *LibrariesManager) LoadIndex() error {
-	index, err := librariesindex.LoadIndex(sc.IndexFile)
+func (lm *LibrariesManager) LoadIndex() error {
+	index, err := librariesindex.LoadIndex(lm.IndexFile)
 	if err != nil {
-		sc.Index = librariesindex.EmptyIndex
+		lm.Index = librariesindex.EmptyIndex
 		return err
 	}
-	sc.Index = index
+	lm.Index = index
 	return nil
 }
 
 // AddLibrariesDir adds path to the list of directories
 // to scan when searching for libraries. If a path is already
 // in the list it is ignored.
-func (sc *LibrariesManager) AddLibrariesDir(path *paths.Path, location libraries.LibraryLocation) {
-	for _, dir := range sc.LibrariesDir {
+func (lm *LibrariesManager) AddLibrariesDir(path *paths.Path, location libraries.LibraryLocation) {
+	for _, dir := range lm.LibrariesDir {
 		if dir.Path.EquivalentTo(path) {
 			return
 		}
 	}
 	logrus.WithField("dir", path).WithField("location", location.String()).Info("Adding libraries dir")
-	sc.LibrariesDir = append(sc.LibrariesDir, &LibrariesDir{
+	lm.LibrariesDir = append(lm.LibrariesDir, &LibrariesDir{
 		Path:     path,
 		Location: location,
 	})
@@ -138,18 +138,18 @@ func (sc *LibrariesManager) AddLibrariesDir(path *paths.Path, location libraries
 // AddPlatformReleaseLibrariesDir add the libraries directory in the
 // specified PlatformRelease to the list of directories to scan when
 // searching for libraries.
-func (sc *LibrariesManager) AddPlatformReleaseLibrariesDir(plaftormRelease *cores.PlatformRelease, location libraries.LibraryLocation) {
+func (lm *LibrariesManager) AddPlatformReleaseLibrariesDir(plaftormRelease *cores.PlatformRelease, location libraries.LibraryLocation) {
 	path := plaftormRelease.GetLibrariesDir()
 	if path == nil {
 		return
 	}
-	for _, dir := range sc.LibrariesDir {
+	for _, dir := range lm.LibrariesDir {
 		if dir.Path.EquivalentTo(path) {
 			return
 		}
 	}
 	logrus.WithField("dir", path).WithField("location", location.String()).Info("Adding libraries dir")
-	sc.LibrariesDir = append(sc.LibrariesDir, &LibrariesDir{
+	lm.LibrariesDir = append(lm.LibrariesDir, &LibrariesDir{
 		Path:            path,
 		Location:        location,
 		PlatformRelease: plaftormRelease,
@@ -157,17 +157,17 @@ func (sc *LibrariesManager) AddPlatformReleaseLibrariesDir(plaftormRelease *core
 }
 
 // RescanLibraries reload all installed libraries in the system.
-func (sc *LibrariesManager) RescanLibraries() error {
-	for _, dir := range sc.LibrariesDir {
-		if err := sc.LoadLibrariesFromDir(dir); err != nil {
+func (lm *LibrariesManager) RescanLibraries() error {
+	for _, dir := range lm.LibrariesDir {
+		if err := lm.LoadLibrariesFromDir(dir); err != nil {
 			return fmt.Errorf("loading libs from %s: %s", dir.Path, err)
 		}
 	}
 	return nil
 }
 
-func (sc *LibrariesManager) getUserLibrariesDir() *paths.Path {
-	for _, dir := range sc.LibrariesDir {
+func (lm *LibrariesManager) getUserLibrariesDir() *paths.Path {
+	for _, dir := range lm.LibrariesDir {
 		if dir.Location == libraries.User {
 			return dir.Path
 		}
@@ -177,7 +177,7 @@ func (sc *LibrariesManager) getUserLibrariesDir() *paths.Path {
 
 // LoadLibrariesFromDir loads all libraries in the given directory. Returns
 // nil if the directory doesn't exists.
-func (sc *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) error {
+func (lm *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) error {
 	subDirs, err := librariesDir.Path.ReadDir()
 	if os.IsNotExist(err) {
 		return nil
@@ -194,22 +194,45 @@ func (sc *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) err
 			return fmt.Errorf("loading library from %s: %s", subDir, err)
 		}
 		library.ContainerPlatform = librariesDir.PlatformRelease
-		alternatives, ok := sc.Libraries[library.Name]
+		alternatives, ok := lm.Libraries[library.Name]
 		if !ok {
 			alternatives = &LibraryAlternatives{}
-			sc.Libraries[library.Name] = alternatives
+			lm.Libraries[library.Name] = alternatives
 		}
 		alternatives.Add(library)
 	}
 	return nil
 }
 
+// LoadLibraryFromDir loads one single library from the libRootDir.
+// libRootDir must point to the root of a valid library.
+// An error is returned if the path doesn't exist or loading of the library fails.
+func (lm *LibrariesManager) LoadLibraryFromDir(libRootDir *paths.Path, location libraries.LibraryLocation) error {
+	if libRootDir.NotExist() {
+		return fmt.Errorf("library path does not exist: %s", libRootDir)
+	}
+
+	library, err := libraries.Load(libRootDir, location)
+	if err != nil {
+		return fmt.Errorf("loading library from %s: %s", libRootDir, err)
+	}
+
+	alternatives, ok := lm.Libraries[library.Name]
+	if !ok {
+		alternatives = &LibraryAlternatives{}
+		lm.Libraries[library.Name] = alternatives
+	}
+	alternatives.Add(library)
+
+	return nil
+}
+
 // FindByReference return the installed library matching the Reference
 // name and version or, if the version is nil, the library installed
 // in the User folder.
-func (sc *LibrariesManager) FindByReference(libRef *librariesindex.Reference) *libraries.Library {
+func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference) *libraries.Library {
 	saneName := utils.SanitizeName(libRef.Name)
-	alternatives, have := sc.Libraries[saneName]
+	alternatives, have := lm.Libraries[saneName]
 	if !have {
 		return nil
 	}

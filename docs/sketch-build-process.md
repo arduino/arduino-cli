@@ -102,6 +102,8 @@ The "folder name priority" is determined as follows (in order of highest to lowe
 
 The "location priority" is determined as follows (in order of highest to lowest priority):
 
+1. The library is specified using the [`--library` option](commands/arduino-cli_compile.md#options) of
+   `arduino-cli compile`
 1. The library is under a custom libraries path specified via the
    [`--libraries` option](commands/arduino-cli_compile.md#options) of `arduino-cli compile` (in decreasing order of
    priority when multiple custom paths are defined)

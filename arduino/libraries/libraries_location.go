@@ -35,6 +35,9 @@ const (
 	ReferencedPlatformBuiltIn
 	// User are user installed libraries
 	User
+	// Unmanaged is for libraries set manually by the user in the CLI command or from the gRPC function.
+	// Ideally it's used for `libraries` outside folders managed by the CLI.
+	Unmanaged
 )
 
 func (d *LibraryLocation) String() string {
@@ -47,6 +50,8 @@ func (d *LibraryLocation) String() string {
 		return "ref-platform"
 	case User:
 		return "user"
+	case Unmanaged:
+		return "unmanaged"
 	}
 	panic(fmt.Sprintf("invalid LibraryLocation value %d", *d))
 }
@@ -62,6 +67,8 @@ func (d *LibraryLocation) MarshalJSON() ([]byte, error) {
 		return json.Marshal("ref-platform")
 	case User:
 		return json.Marshal("user")
+	case Unmanaged:
+		return json.Marshal("unmanaged")
 	}
 	return nil, fmt.Errorf("invalid library location value: %d", *d)
 }
@@ -81,6 +88,8 @@ func (d *LibraryLocation) UnmarshalJSON(b []byte) error {
 		*d = ReferencedPlatformBuiltIn
 	case "user":
 		*d = User
+	case "unmanaged":
+		*d = Unmanaged
 	}
 	return fmt.Errorf("invalid library location: %s", s)
 }
@@ -96,6 +105,8 @@ func (d *LibraryLocation) ToRPCLibraryLocation() rpc.LibraryLocation {
 		return rpc.LibraryLocation_LIBRARY_LOCATION_REFERENCED_PLATFORM_BUILTIN
 	case User:
 		return rpc.LibraryLocation_LIBRARY_LOCATION_USER
+	case Unmanaged:
+		return rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED
 	}
 	panic(fmt.Sprintf("invalid LibraryLocation value %d", *d))
 }
@@ -111,6 +122,8 @@ func FromRPCLibraryLocation(l rpc.LibraryLocation) LibraryLocation {
 		return ReferencedPlatformBuiltIn
 	case rpc.LibraryLocation_LIBRARY_LOCATION_USER:
 		return User
+	case rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED:
+		return Unmanaged
 	}
 	panic(fmt.Sprintf("invalid rpc.LibraryLocation value %d", l))
 }
