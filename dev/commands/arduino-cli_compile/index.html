@@ -1220,7 +1220,8 @@
   -e, --export-binaries              If set built binaries will be exported to the sketch folder.
   -b, --fqbn string                  Fully Qualified Board Name, e.g.: arduino:avr:uno
   -h, --help                         help for compile
-      --libraries strings            List of custom libraries paths separated by commas. Or can be used multiple times for multiple libraries paths.
+      --libraries strings            List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths.
+      --library strings              List of paths to libraries root folders. Libraries set this way have top priority in case of conflicts. Can be used multiple times for different libraries.
       --only-compilation-database    Just produce the compilation database, without actually compiling.
       --optimize-for-debug           Optional, optimize compile output for debugging, rather than for release.
       --output-dir string            Save build artifacts in this directory.

@@ -4838,7 +4838,7 @@
 <td>libraries</td>
 <td><a href="#string">string</a></td>
 <td>repeated</td>
-<td>List of custom libraries paths separated by commas.</td>
+<td>List of custom libraries dir paths.</td>
 </tr>
 <tr>
 <td>optimize_for_debug</td>
@@ -4875,6 +4875,12 @@
 <td><a href="#google.protobuf.BoolValue">google.protobuf.BoolValue</a></td>
 <td></td>
 <td>When set to <code>true</code> the compiled binary will be copied to the export directory.</td>
+</tr>
+<tr>
+<td>library</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>List of paths to library root folders</td>
 </tr>
 </tbody>
 </table>
@@ -6375,6 +6381,11 @@
 <td>LIBRARY_LOCATION_REFERENCED_PLATFORM_BUILTIN</td>
 <td>3</td>
 <td>When <code>LibraryLocation</code> is used in a context where a board is specified, this indicates the library is in the <code>libraries</code> subdirectory of a platform referenced by the board&#39;s platform.</td>
+</tr>
+<tr>
+<td>LIBRARY_LOCATION_UNMANAGED</td>
+<td>4</td>
+<td>Outside the <code>libraries</code> folders managed by the CLI.</td>
 </tr>
 </tbody>
 </table>
