@@ -296,25 +296,25 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		// Perform reset via 1200bps touch if requested
 		if uploadProperties.GetBoolean("upload.use_1200bps_touch") {
 			if port == "" {
-				return fmt.Errorf("no upload port provided")
-			}
-
-			ports, err := serial.GetPortsList()
-			if err != nil {
-				return fmt.Errorf("cannot get serial port list: %s", err)
-			}
-			for _, p := range ports {
-				if p == port {
-					if verbose {
-						outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", p)))
-						outStream.Write([]byte(fmt.Sprintln()))
+				outStream.Write([]byte(fmt.Sprintln("Skipping 1200-bps touch reset: no serial port selected!")))
+			} else {
+				ports, err := serial.GetPortsList()
+				if err != nil {
+					return fmt.Errorf("cannot get serial port list: %s", err)
+				}
+				for _, p := range ports {
+					if p == port {
+						if verbose {
+							outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", p)))
+							outStream.Write([]byte(fmt.Sprintln()))
+						}
+						logrus.Infof("Touching port %s at 1200bps", port)
+						if err := serialutils.TouchSerialPortAt1200bps(p); err != nil {
+							outStream.Write([]byte(fmt.Sprintf("Cannot perform port reset: %s", err)))
+							outStream.Write([]byte(fmt.Sprintln()))
+						}
+						break
 					}
-					logrus.Infof("Touching port %s at 1200bps", port)
-					if err := serialutils.TouchSerialPortAt1200bps(p); err != nil {
-						outStream.Write([]byte(fmt.Sprintf("Cannot perform port reset: %s", err)))
-						outStream.Write([]byte(fmt.Sprintln()))
-					}
-					break
 				}
 			}
 		}
