@@ -18,9 +18,7 @@ package builder
 import (
 	"encoding/json"
 	"path/filepath"
-	"os"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -43,8 +41,7 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 
 	var opts *properties.Map
 	if err := json.Unmarshal([]byte(buildOptionsJson), &opts); err != nil || opts == nil {
-		ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, constants.MSG_BUILD_OPTIONS_INVALID, constants.BUILD_OPTIONS_FILE)
-		os.Exit(errorcodes.ErrGeneric)
+	    panic(constants.BUILD_OPTIONS_FILE + " is invalid")
 	}
 
 	var prevOpts *properties.Map
