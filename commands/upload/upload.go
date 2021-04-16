@@ -36,7 +36,6 @@ import (
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"go.bug.st/serial"
 )
 
 // Upload FIXMEDOC
@@ -293,44 +292,45 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	// to set the board in bootloader mode
 	actualPort := port
 	if programmer == nil && !burnBootloader {
-		// Perform reset via 1200bps touch if requested
-		if uploadProperties.GetBoolean("upload.use_1200bps_touch") {
-			if port == "" {
-				outStream.Write([]byte(fmt.Sprintln("Skipping 1200-bps touch reset: no serial port selected!")))
-			} else {
-				ports, err := serial.GetPortsList()
-				if err != nil {
-					return fmt.Errorf("cannot get serial port list: %s", err)
-				}
-				for _, p := range ports {
-					if p == port {
-						if verbose {
-							outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", p)))
-							outStream.Write([]byte(fmt.Sprintln()))
-						}
-						logrus.Infof("Touching port %s at 1200bps", port)
-						if err := serialutils.TouchSerialPortAt1200bps(p); err != nil {
-							outStream.Write([]byte(fmt.Sprintf("Cannot perform port reset: %s", err)))
-							outStream.Write([]byte(fmt.Sprintln()))
-						}
-						break
-					}
-				}
-			}
+		// Perform reset via 1200bps touch if requested and wait for upload port if requested.
+		touch := uploadProperties.GetBoolean("upload.use_1200bps_touch")
+		wait := uploadProperties.GetBoolean("upload.wait_for_upload_port")
+		if touch && port == "" {
+			outStream.Write([]byte(fmt.Sprintln("Skipping 1200-bps touch reset: no serial port selected!")))
 		}
 
-		// Wait for upload port if requested
-		if uploadProperties.GetBoolean("upload.wait_for_upload_port") {
-			if verbose {
-				outStream.Write([]byte(fmt.Sprintln("Waiting for upload port...")))
-			}
-
-			actualPort, err = serialutils.WaitForNewSerialPortOrDefaultTo(actualPort)
-			if err != nil {
-				return errors.WithMessage(err, "detecting serial port")
+		if newPort, err := serialutils.TouchAndWait(port, wait); err != nil {
+		} else {
+			if newPort != "" {
+				actualPort = newPort
 			}
 		}
+		// ports, err := serial.GetPortsList()
+		// for _, p := range ports {
+		// if p == port {
+		// 	if verbose {
+		// 		outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", p)))
+		// 		outStream.Write([]byte(fmt.Sprintln()))
+		// 	}
+		// 	logrus.Infof("Touching port %s at 1200bps", port)
+		// 	if err := serialutils.TouchSerialPortAt1200bps(p); err != nil {
+		// 		outStream.Write([]byte(fmt.Sprintf("Cannot perform port reset: %s", err)))
+		// 		outStream.Write([]byte(fmt.Sprintln()))
+		// 	}
+		// 	break
+		// }
+		// }
 	}
+
+	// Wait for upload port if requested
+	// if verbose {
+	// 	outStream.Write([]byte(fmt.Sprintln("Waiting for upload port...")))
+	// }
+
+	// actualPort, err = serialutils.WaitForNewSerialPortOrDefaultTo(actualPort)
+	// if err != nil {
+	// 	return errors.WithMessage(err, "detecting serial port")
+	// }
 
 	if port != "" {
 		// Set serial port property

@@ -16,6 +16,7 @@
 package serialutils
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -118,6 +119,80 @@ func WaitForNewSerialPort() (string, error) {
 		for p := range now {
 			if !last[p] {
 				return p, nil // Found it!
+			}
+		}
+
+		last = now
+		time.Sleep(250 * time.Millisecond)
+	}
+
+	return "", nil
+}
+
+// TouchAndWait FIXMEDOCS
+func TouchAndWait(portToTouch string, wait bool) (string, error) {
+	getPortMap := func() (map[string]bool, error) {
+		ports, err := serial.GetPortsList()
+		if err != nil {
+			return nil, errors.WithMessage(err, "listing serial ports")
+		}
+		res := map[string]bool{}
+		for _, port := range ports {
+			res[port] = true
+		}
+		return res, nil
+	}
+
+	last, err := getPortMap()
+	fmt.Println("LAST:", last)
+	if err != nil {
+		return "", err
+	}
+
+	if portToTouch != "" {
+		fmt.Println("TOUCH:", portToTouch)
+		TouchSerialPortAt1200bps(portToTouch)
+	}
+
+	if !wait {
+		return "", nil
+	}
+	deadline := time.Now().Add(10 * time.Second)
+	for time.Now().Before(deadline) {
+		now, err := getPortMap()
+		fmt.Println("NOW:", now)
+		if err != nil {
+			return "", err
+		}
+		hasNewPorts := false
+		for p := range now {
+			if !last[p] {
+				hasNewPorts = true
+				break
+			}
+		}
+
+		if hasNewPorts {
+			fmt.Println("HAS NEW PORTS!")
+			// on OS X, if the port is opened too quickly after it is detected,
+			// a "Resource busy" error occurs, add a delay to workaround.
+			// This apply to other platforms as well.
+			time.Sleep(time.Second)
+
+			// Some boards have a glitch in the bootloader: some user experienced
+			// the USB serial port appearing and disappearing rapidly before
+			// settling.
+			// This check ensure that the port is stable after one second.
+			check, err := getPortMap()
+			fmt.Println("CHECK:", check)
+			if err != nil {
+				return "", err
+			}
+			for p := range check {
+				if !last[p] {
+					fmt.Println("FOUND:", p)
+					return p, nil // Found it!
+				}
 			}
 		}
 
