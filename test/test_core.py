@@ -99,11 +99,11 @@ def test_core_search(run_command, httpserver):
     run_search("yùn", ["arduino:avr"])
     run_search("yun", ["arduino:avr"])
 
-    run_search("nano", ["arduino:avr", "arduino:megaavr", "arduino:samd", "arduino:mbed"])
-    run_search("nano 33", ["arduino:samd", "arduino:mbed"])
-    run_search("nano ble", ["arduino:mbed"])
-    run_search("ble", ["arduino:mbed"])
-    run_search("ble nano", ["arduino:mbed"])
+    run_search("nano", ["arduino:avr", "arduino:megaavr", "arduino:samd", "arduino:mbed_nano"])
+    run_search("nano 33", ["arduino:samd", "arduino:mbed_nano"])
+    run_search("nano ble", ["arduino:mbed_nano"])
+    run_search("ble", ["arduino:mbed_nano"])
+    run_search("ble nano", ["arduino:mbed_nano"])
 
 
 def test_core_search_no_args(run_command, httpserver):
