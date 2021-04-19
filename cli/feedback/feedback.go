@@ -17,11 +17,13 @@ package feedback
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/status"
 )
 
 // OutputFormat is used to determine the output format
@@ -102,6 +104,16 @@ func (fb *Feedback) Print(v interface{}) {
 // Errorf behaves like fmt.Printf but writes on the error writer and adds a
 // newline. It also logs the error.
 func (fb *Feedback) Errorf(format string, v ...interface{}) {
+	// Unbox grpc status errors
+	for i := range v {
+		if s, isStatus := v[i].(*status.Status); isStatus {
+			v[i] = errors.New(s.Message())
+		} else if err, isErr := v[i].(error); isErr {
+			if s, isStatus := status.FromError(err); isStatus {
+				v[i] = errors.New(s.Message())
+			}
+		}
+	}
 	fb.Error(fmt.Sprintf(format, v...))
 }
 
