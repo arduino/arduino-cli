@@ -93,7 +93,7 @@ func Reset(portToTouch string, wait bool, cb *ResetProgressCallbacks) (string, e
 		return "", err
 	}
 
-	if portToTouch != "" {
+	if portToTouch != "" && last[portToTouch] {
 		if cb != nil && cb.Debug != nil {
 			cb.Debug(fmt.Sprintf("TOUCH: %v", portToTouch))
 		}

@@ -335,15 +335,6 @@ func runProgramAction(pm *packagemanager.PackageManager,
 				actualPort = newPort
 			}
 		}
-		// ports, err := serial.GetPortsList()
-		// for _, p := range ports {
-		// if p == port {
-		// 	logrus.Infof("Touching port %s at 1200bps", port)
-		// 	if err := serialutils.TouchSerialPortAt1200bps(p); err != nil {
-		// 	}
-		// 	break
-		// }
-		// }
 	}
 
 	if port != "" {
