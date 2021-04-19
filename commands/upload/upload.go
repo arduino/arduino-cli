@@ -299,7 +299,37 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			outStream.Write([]byte(fmt.Sprintln("Skipping 1200-bps touch reset: no serial port selected!")))
 		}
 
-		if newPort, err := serialutils.TouchAndWait(port, wait); err != nil {
+		var cb *serialutils.ResetProgressCallbacks
+		if verbose {
+			cb = &serialutils.ResetProgressCallbacks{
+				TouchingPort: func(port string) {
+					logrus.WithField("phase", "board reset").Infof("Performing 1200-bps touch reset on serial port %s", port)
+					outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", port)))
+					outStream.Write([]byte(fmt.Sprintln()))
+				},
+				WaitingForNewSerial: func() {
+					logrus.WithField("phase", "board reset").Info("Waiting for upload port...")
+					outStream.Write([]byte(fmt.Sprintln("Waiting for upload port...")))
+				},
+				BootloaderPortFound: func(port string) {
+					if port != "" {
+						logrus.WithField("phase", "board reset").Infof("Upload port found on %s", port)
+						outStream.Write([]byte(fmt.Sprintf("Upload port found on %s", port)))
+						outStream.Write([]byte(fmt.Sprintln()))
+					} else {
+						logrus.WithField("phase", "board reset").Infof("No upload port found, using %s as fallback", actualPort)
+						outStream.Write([]byte(fmt.Sprintf("No upload port found, using %s as fallback", actualPort)))
+						outStream.Write([]byte(fmt.Sprintln()))
+					}
+				},
+				Debug: func(msg string) {
+					logrus.WithField("phase", "board reset").Debug(msg)
+				},
+			}
+		}
+		if newPort, err := serialutils.Reset(port, wait, cb); err != nil {
+			outStream.Write([]byte(fmt.Sprintf("Cannot perform port reset: %s", err)))
+			outStream.Write([]byte(fmt.Sprintln()))
 		} else {
 			if newPort != "" {
 				actualPort = newPort
@@ -308,29 +338,13 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		// ports, err := serial.GetPortsList()
 		// for _, p := range ports {
 		// if p == port {
-		// 	if verbose {
-		// 		outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", p)))
-		// 		outStream.Write([]byte(fmt.Sprintln()))
-		// 	}
 		// 	logrus.Infof("Touching port %s at 1200bps", port)
 		// 	if err := serialutils.TouchSerialPortAt1200bps(p); err != nil {
-		// 		outStream.Write([]byte(fmt.Sprintf("Cannot perform port reset: %s", err)))
-		// 		outStream.Write([]byte(fmt.Sprintln()))
 		// 	}
 		// 	break
 		// }
 		// }
 	}
-
-	// Wait for upload port if requested
-	// if verbose {
-	// 	outStream.Write([]byte(fmt.Sprintln("Waiting for upload port...")))
-	// }
-
-	// actualPort, err = serialutils.WaitForNewSerialPortOrDefaultTo(actualPort)
-	// if err != nil {
-	// 	return errors.WithMessage(err, "detecting serial port")
-	// }
 
 	if port != "" {
 		// Set serial port property

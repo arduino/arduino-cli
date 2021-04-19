@@ -23,27 +23,6 @@ import (
 	"go.bug.st/serial"
 )
 
-// Reset a board using the 1200 bps port-touch. If wait is true, it will wait
-// for a new port to appear (which could change sometimes) and returns that.
-// The error is set if the port listing fails.
-func Reset(port string, wait bool) (string, error) {
-	// Touch port at 1200bps
-	if err := TouchSerialPortAt1200bps(port); err != nil {
-		return "", errors.New("1200bps Touch")
-	}
-
-	if wait {
-		// Wait for port to disappear and reappear
-		if p, err := WaitForNewSerialPortOrDefaultTo(port); err == nil {
-			port = p
-		} else {
-			return "", errors.WithMessage(err, "detecting upload port")
-		}
-	}
-
-	return port, nil
-}
-
 // TouchSerialPortAt1200bps open and close the serial port at 1200 bps. This
 // is used on many Arduino boards as a signal to put the board in "bootloader"
 // mode.
@@ -72,97 +51,75 @@ func TouchSerialPortAt1200bps(port string) error {
 	return nil
 }
 
-// WaitForNewSerialPortOrDefaultTo is meant to be called just after a reset. It watches the ports connected
-// to the machine until a port appears. The new appeared port is returned or, if the operation
-// timeouts, the default port provided as parameter is returned.
-func WaitForNewSerialPortOrDefaultTo(defaultPort string) (string, error) {
-	if p, err := WaitForNewSerialPort(); err != nil {
-		return "", errors.WithMessage(err, "detecting upload port")
-	} else if p != "" {
-		// on OS X, if the port is opened too quickly after it is detected,
-		// a "Resource busy" error occurs, add a delay to workaround.
-		// This apply to other platforms as well.
-		time.Sleep(500 * time.Millisecond)
-
-		return p, nil
-	}
-	return defaultPort, nil
-}
-
-// WaitForNewSerialPort is meant to be called just after a reset. It watches the ports connected
-// to the machine until a port appears. The new appeared port is returned.
-func WaitForNewSerialPort() (string, error) {
-	getPortMap := func() (map[string]bool, error) {
-		ports, err := serial.GetPortsList()
-		if err != nil {
-			return nil, errors.WithMessage(err, "listing serial ports")
-		}
-		res := map[string]bool{}
-		for _, port := range ports {
-			res[port] = true
-		}
-		return res, nil
-	}
-
-	last, err := getPortMap()
+func getPortMap() (map[string]bool, error) {
+	ports, err := serial.GetPortsList()
 	if err != nil {
-		return "", err
+		return nil, errors.WithMessage(err, "listing serial ports")
 	}
-
-	deadline := time.Now().Add(10 * time.Second)
-	for time.Now().Before(deadline) {
-		now, err := getPortMap()
-		if err != nil {
-			return "", err
-		}
-
-		for p := range now {
-			if !last[p] {
-				return p, nil // Found it!
-			}
-		}
-
-		last = now
-		time.Sleep(250 * time.Millisecond)
+	res := map[string]bool{}
+	for _, port := range ports {
+		res[port] = true
 	}
-
-	return "", nil
+	return res, nil
 }
 
-// TouchAndWait FIXMEDOCS
-func TouchAndWait(portToTouch string, wait bool) (string, error) {
-	getPortMap := func() (map[string]bool, error) {
-		ports, err := serial.GetPortsList()
-		if err != nil {
-			return nil, errors.WithMessage(err, "listing serial ports")
-		}
-		res := map[string]bool{}
-		for _, port := range ports {
-			res[port] = true
-		}
-		return res, nil
-	}
+// ResetProgressCallbacks is a struct that defines a bunch of function callback
+// to observe the Reset function progress.
+type ResetProgressCallbacks struct {
+	// TouchingPort is called to signal the 1200-bps touch of the reported port
+	TouchingPort func(port string)
+	// WaitingForNewSerial is called to signal that we are waiting for a new port
+	WaitingForNewSerial func()
+	// BootloaderPortFound is called to signal that the wait is completed and to
+	// report the port found, or the empty string if no ports have been found and
+	// the wait has timed-out.
+	BootloaderPortFound func(port string)
+	// Debug reports messages useful for debugging purposes. In normal conditions
+	// these messages should not be displayed to the user.
+	Debug func(msg string)
+}
 
+// Reset a board using the 1200 bps port-touch. If wait is true, it will wait
+// for a new port to appear (which could change sometimes) and returns that
+// one, otherwise the empty string is returned if the new port can not be
+// detected or if the wait parameter is false.
+// The error is set if the port listing fails.
+func Reset(portToTouch string, wait bool, cb *ResetProgressCallbacks) (string, error) {
 	last, err := getPortMap()
-	fmt.Println("LAST:", last)
+	if cb != nil && cb.Debug != nil {
+		cb.Debug(fmt.Sprintf("LAST: %v", last))
+	}
 	if err != nil {
 		return "", err
 	}
 
 	if portToTouch != "" {
-		fmt.Println("TOUCH:", portToTouch)
-		TouchSerialPortAt1200bps(portToTouch)
+		if cb != nil && cb.Debug != nil {
+			cb.Debug(fmt.Sprintf("TOUCH: %v", portToTouch))
+		}
+		if cb != nil && cb.TouchingPort != nil {
+			cb.TouchingPort(portToTouch)
+		}
+		if err := TouchSerialPortAt1200bps(portToTouch); err != nil {
+			fmt.Println("TOUCH: error during reset:", err)
+		}
 	}
 
 	if !wait {
 		return "", nil
 	}
+	if cb != nil && cb.WaitingForNewSerial != nil {
+		cb.WaitingForNewSerial()
+	}
+
 	deadline := time.Now().Add(10 * time.Second)
 	for time.Now().Before(deadline) {
 		now, err := getPortMap()
-		fmt.Println("NOW:", now)
 		if err != nil {
 			return "", err
+		}
+		if cb != nil && cb.Debug != nil {
+			cb.Debug(fmt.Sprintf("WAIT: %v", now))
 		}
 		hasNewPorts := false
 		for p := range now {
@@ -173,7 +130,10 @@ func TouchAndWait(portToTouch string, wait bool) (string, error) {
 		}
 
 		if hasNewPorts {
-			fmt.Println("HAS NEW PORTS!")
+			if cb != nil && cb.Debug != nil {
+				cb.Debug("New ports found!")
+			}
+
 			// on OS X, if the port is opened too quickly after it is detected,
 			// a "Resource busy" error occurs, add a delay to workaround.
 			// This apply to other platforms as well.
@@ -184,15 +144,22 @@ func TouchAndWait(portToTouch string, wait bool) (string, error) {
 			// settling.
 			// This check ensure that the port is stable after one second.
 			check, err := getPortMap()
-			fmt.Println("CHECK:", check)
 			if err != nil {
 				return "", err
 			}
+			if cb != nil && cb.Debug != nil {
+				cb.Debug(fmt.Sprintf("CHECK: %v", check))
+			}
 			for p := range check {
 				if !last[p] {
-					fmt.Println("FOUND:", p)
+					if cb != nil && cb.BootloaderPortFound != nil {
+						cb.BootloaderPortFound(p)
+					}
 					return p, nil // Found it!
 				}
+			}
+			if cb != nil && cb.Debug != nil {
+				cb.Debug("Port check failed... still waiting")
 			}
 		}
 
@@ -200,5 +167,8 @@ func TouchAndWait(portToTouch string, wait bool) (string, error) {
 		time.Sleep(250 * time.Millisecond)
 	}
 
+	if cb != nil && cb.BootloaderPortFound != nil {
+		cb.BootloaderPortFound("")
+	}
 	return "", nil
 }
