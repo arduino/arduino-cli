@@ -344,7 +344,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		}
 	}
 
-	if port != "" {
+	if actualPort != "" {
 		// Set serial port property
 		uploadProperties.Set("serial.port", actualPort)
 		if strings.HasPrefix(actualPort, "/dev/") {
