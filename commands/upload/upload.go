@@ -293,9 +293,16 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	actualPort := port
 	if programmer == nil && !burnBootloader {
 		// Perform reset via 1200bps touch if requested and wait for upload port if requested.
+
 		touch := uploadProperties.GetBoolean("upload.use_1200bps_touch")
 		wait := uploadProperties.GetBoolean("upload.wait_for_upload_port")
-		if touch && port == "" {
+		portToTouch := ""
+		if touch {
+			portToTouch = port
+		}
+
+		// if touch is requested but port is not specified, print a warning
+		if touch && portToTouch == "" {
 			outStream.Write([]byte(fmt.Sprintln("Skipping 1200-bps touch reset: no serial port selected!")))
 		}
 
@@ -327,7 +334,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 				},
 			}
 		}
-		if newPort, err := serialutils.Reset(port, wait, cb); err != nil {
+		if newPort, err := serialutils.Reset(portToTouch, wait, cb); err != nil {
 			outStream.Write([]byte(fmt.Sprintf("Cannot perform port reset: %s", err)))
 			outStream.Write([]byte(fmt.Sprintln()))
 		} else {

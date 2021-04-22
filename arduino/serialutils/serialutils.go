@@ -79,10 +79,13 @@ type ResetProgressCallbacks struct {
 	Debug func(msg string)
 }
 
-// Reset a board using the 1200 bps port-touch. If wait is true, it will wait
-// for a new port to appear (which could change sometimes) and returns that
-// one, otherwise the empty string is returned if the new port can not be
-// detected or if the wait parameter is false.
+// Reset a board using the 1200 bps port-touch and wait for new ports.
+// Both reset and wait are optional:
+// - if port is "" touch will be skipped
+// - if wait is false waiting will be skipped
+// If wait is true, this function will wait for a new port to appear and returns that
+// one, otherwise the empty string is returned if the new port can not be detected or
+// if the wait parameter is false.
 // The error is set if the port listing fails.
 func Reset(portToTouch string, wait bool, cb *ResetProgressCallbacks) (string, error) {
 	last, err := getPortMap()
