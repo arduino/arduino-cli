@@ -216,6 +216,17 @@ func Init(req *rpc.InitRequest) (<-chan *rpc.InitResponse, *status.Status) {
 			}
 		}
 
+		// We load hardware before verifying builtin tools are installed
+		// otherwise we wouldn't find them and reinstall them each time
+		// and they would never get reloaded.
+		for _, err := range instance.PackageManager.LoadHardware() {
+			outChan <- &rpc.InitResponse{
+				Message: &rpc.InitResponse_Error{
+					Error: err.Proto(),
+				},
+			}
+		}
+
 		taskCallback := func(msg *rpc.TaskProgress) {
 			outChan <- &rpc.InitResponse{
 				Message: &rpc.InitResponse_InitProgress{
@@ -237,9 +248,19 @@ func Init(req *rpc.InitRequest) (<-chan *rpc.InitResponse, *status.Status) {
 		}
 
 		// Install tools if necessary
-		ctagsTool, _ := getBuiltinCtagsTool(instance.PackageManager)
-		if ctagsTool == nil {
-			if _, err := instance.installToolIfMissing(ctagsTool, downloadCallback, taskCallback); err != nil {
+		toolHasBeenInstalled := false
+		ctagsTool, err := getBuiltinCtagsTool(instance.PackageManager)
+		if err != nil {
+			s := status.Newf(codes.Internal, err.Error())
+			outChan <- &rpc.InitResponse{
+				Message: &rpc.InitResponse_Error{
+					Error: s.Proto(),
+				},
+			}
+		} else {
+			ctagsInstalled, err := instance.installToolIfMissing(ctagsTool, downloadCallback, taskCallback)
+			toolHasBeenInstalled = toolHasBeenInstalled || ctagsInstalled
+			if err != nil {
 				s := status.Newf(codes.Internal, err.Error())
 				outChan <- &rpc.InitResponse{
 					Message: &rpc.InitResponse_Error{
@@ -250,8 +271,17 @@ func Init(req *rpc.InitRequest) (<-chan *rpc.InitResponse, *status.Status) {
 		}
 
 		serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(instance.PackageManager)
-		if serialDiscoveryTool == nil {
-			if _, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCallback, taskCallback); err != nil {
+		if err != nil {
+			s := status.Newf(codes.Internal, err.Error())
+			outChan <- &rpc.InitResponse{
+				Message: &rpc.InitResponse_Error{
+					Error: s.Proto(),
+				},
+			}
+		} else {
+			serialDiscoveryToolInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCallback, taskCallback)
+			toolHasBeenInstalled = toolHasBeenInstalled || serialDiscoveryToolInstalled
+			if err != nil {
 				s := status.Newf(codes.Internal, err.Error())
 				outChan <- &rpc.InitResponse{
 					Message: &rpc.InitResponse_Error{
@@ -261,12 +291,15 @@ func Init(req *rpc.InitRequest) (<-chan *rpc.InitResponse, *status.Status) {
 			}
 		}
 
-		// Load hardware only after tools have been installed
-		for _, err := range instance.PackageManager.LoadHardware() {
-			outChan <- &rpc.InitResponse{
-				Message: &rpc.InitResponse_Error{
-					Error: err.Proto(),
-				},
+		if toolHasBeenInstalled {
+			// We installed at least one new tool after loading hardware
+			// so we must reload again otherwise we would never found them.
+			for _, err := range instance.PackageManager.LoadHardware() {
+				outChan <- &rpc.InitResponse{
+					Message: &rpc.InitResponse_Error{
+						Error: err.Proto(),
+					},
+				}
 			}
 		}
 
