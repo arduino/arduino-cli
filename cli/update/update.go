@@ -78,6 +78,12 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if updateFlags.showOutdated {
+		// To show outdated platforms and libraries we need to initialize our instance
+		// otherwise nothing would be shown
+		for _, err := range instance.Init(inst) {
+			feedback.Errorf("Error initializing instance: %v", err)
+		}
+
 		outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedRequest{
 			Instance: inst,
 		})
