@@ -49,8 +49,15 @@ var updateFlags struct {
 }
 
 func runUpdateCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
-
+	// We don't initialize any CoreInstance when updating indexes since we don't need to.
+	// Also meaningless errors might be returned when calling this command with --additional-urls
+	// since the CLI would be searching for a corresponding file for the additional urls set
+	// as argument but none would be obviously found.
+	instance, status := instance.Create()
+	if status != nil {
+		feedback.Errorf("Error creating instance: %v", status)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 	logrus.Info("Executing `arduino update`")
 
 	err := commands.UpdateCoreLibrariesIndex(context.Background(), &rpc.UpdateCoreLibrariesIndexRequest{

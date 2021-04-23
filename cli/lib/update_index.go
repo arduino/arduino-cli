@@ -36,7 +36,15 @@ func initUpdateIndexCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " lib update-index",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			instance := instance.CreateAndInit()
+			// We don't initialize any CoreInstance when updating indexes since we don't need to.
+			// Also meaningless errors might be returned when calling this command with --additional-urls
+			// since the CLI would be searching for a corresponding file for the additional urls set
+			// as argument but none would be obviously found.
+			instance, status := instance.Create()
+			if status != nil {
+				feedback.Errorf("Error creating instance: %v", status)
+				os.Exit(errorcodes.ErrGeneric)
+			}
 			err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
 				Instance: instance,
 			}, output.ProgressBar())
