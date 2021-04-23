@@ -173,6 +173,7 @@ func (s *ArduinoCoreServerImpl) Upgrade(req *rpc.UpgradeRequest, stream rpc.Ardu
 	return stream.Send(&rpc.UpgradeResponse{})
 }
 
+// Create FIXMEDOC
 func (s *ArduinoCoreServerImpl) Create(_ context.Context, req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
 	res, status := commands.Create(req)
 	if status != nil {

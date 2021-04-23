@@ -152,12 +152,12 @@ func Create(req *rpc.CreateRequest) (*rpc.CreateResponse, *status.Status) {
 	)
 
 	// Save instance
-	instanceId := instancesCount
-	instances[instanceId] = instance
+	instanceID := instancesCount
+	instances[instanceID] = instance
 	instancesCount++
 
 	return &rpc.CreateResponse{
-		Instance: &rpc.Instance{Id: instanceId},
+		Instance: &rpc.Instance{Id: instanceID},
 	}, nil
 }
 
