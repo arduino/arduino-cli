@@ -83,12 +83,7 @@ func DetectSkipPostInstallValue() bool {
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
-	inst, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Error installing: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
+	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino core install`")
 
 	platformsRefs, err := globals.ParseReferenceArgs(args, true)

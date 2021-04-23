@@ -71,11 +71,7 @@ func checkFlagsConflicts(command *cobra.Command, args []string) {
 }
 
 func run(command *cobra.Command, args []string) {
-	instance, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Error during Upload: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	instance := instance.CreateAndInit()
 
 	var path *paths.Path
 	if len(args) > 0 {

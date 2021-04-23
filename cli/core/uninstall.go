@@ -42,12 +42,7 @@ func initUninstallCommand() *cobra.Command {
 }
 
 func runUninstallCommand(cmd *cobra.Command, args []string) {
-	inst, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Error uninstalling: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
+	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino core uninstall`")
 
 	platformsRefs, err := globals.ParseReferenceArgs(args, true)

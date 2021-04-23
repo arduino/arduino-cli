@@ -36,7 +36,7 @@ func initUpdateIndexCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " lib update-index",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			instance := instance.CreateInstanceIgnorePlatformIndexErrors()
+			instance := instance.CreateAndInit()
 			err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
 				Instance: instance,
 			}, output.ProgressBar())

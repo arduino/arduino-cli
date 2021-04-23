@@ -49,7 +49,7 @@ var updateFlags struct {
 }
 
 func runUpdateCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
+	instance := instance.CreateAndInit()
 
 	logrus.Info("Executing `arduino update`")
 

@@ -19,7 +19,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands"
@@ -45,12 +44,7 @@ func NewCommand() *cobra.Command {
 }
 
 func runOutdatedCommand(cmd *cobra.Command, args []string) {
-	inst, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Error running outdated command: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
+	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino outdated`")
 
 	outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedRequest{

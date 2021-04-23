@@ -44,7 +44,7 @@ func initDepsCommand() *cobra.Command {
 }
 
 func runDepsCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
+	instance := instance.CreateAndInit()
 	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance, args[0])
 	if err != nil {
 		feedback.Errorf("Arguments error: %v", err)

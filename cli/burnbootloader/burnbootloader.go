@@ -24,19 +24,15 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/upload"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 var (
-	fqbn           string
-	port           string
-	verbose        bool
-	verify         bool
-	importDir      string
-	programmer     string
-	burnBootloader bool
+	fqbn       string
+	port       string
+	verbose    bool
+	verify     bool
+	programmer string
 )
 
 // NewCommand created a new `burn-bootloader` command
@@ -60,11 +56,7 @@ func NewCommand() *cobra.Command {
 }
 
 func run(command *cobra.Command, args []string) {
-	instance, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Error during Upload: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	instance := instance.CreateAndInit()
 
 	if _, err := upload.BurnBootloader(context.Background(), &rpc.BurnBootloaderRequest{
 		Instance:   instance,
@@ -78,19 +70,4 @@ func run(command *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	os.Exit(0)
-}
-
-// initSketchPath returns the current working directory
-func initSketchPath(sketchPath *paths.Path) *paths.Path {
-	if sketchPath != nil {
-		return sketchPath
-	}
-
-	wd, err := paths.Getwd()
-	if err != nil {
-		feedback.Errorf("Couldn't get current working directory: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	logrus.Infof("Reading sketch from dir: %s", wd)
-	return wd
 }

@@ -51,11 +51,7 @@ var attachFlags struct {
 }
 
 func runAttachCommand(cmd *cobra.Command, args []string) {
-	instance, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Attach board error: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	instance := instance.CreateAndInit()
 
 	var path *paths.Path
 	if len(args) > 1 {
@@ -64,7 +60,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		path = initSketchPath(path)
 	}
 
-	if _, err = board.Attach(context.Background(), &rpc.BoardAttachRequest{
+	if _, err := board.Attach(context.Background(), &rpc.BoardAttachRequest{
 		Instance:      instance,
 		BoardUri:      args[0],
 		SketchPath:    path.String(),

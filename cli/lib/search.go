@@ -52,7 +52,7 @@ var searchFlags struct {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
+	instance := instance.CreateAndInit()
 
 	err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
 		Instance: instance,

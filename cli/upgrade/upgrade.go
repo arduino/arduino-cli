@@ -20,7 +20,6 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/core"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
@@ -46,15 +45,10 @@ func NewCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	inst, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Error upgrading: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
+	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino upgrade`")
 
-	err = commands.Upgrade(context.Background(), &rpc.UpgradeRequest{
+	err := commands.Upgrade(context.Background(), &rpc.UpgradeRequest{
 		Instance:        inst,
 		SkipPostInstall: core.DetectSkipPostInstallValue(),
 	}, output.NewDownloadProgressBarCB(), output.TaskProgress())

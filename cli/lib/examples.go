@@ -51,7 +51,7 @@ var examplesFlags struct {
 }
 
 func runExamplesCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
+	instance := instance.CreateAndInit()
 	logrus.Info("Show examples for library")
 
 	name := ""

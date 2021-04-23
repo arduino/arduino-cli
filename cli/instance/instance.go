@@ -17,118 +17,125 @@ package instance
 
 import (
 	"context"
-	"fmt"
-	"strings"
+	"os"
 
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-// CreateInstanceIgnorePlatformIndexErrors creates and return an instance of the
-// Arduino Core Engine, but won't stop on platforms index loading errors.
-func CreateInstanceIgnorePlatformIndexErrors() *rpc.Instance {
-	i, _ := getInitResponse()
-	return i.GetInstance()
+// CreateAndInit return a new initialized instance.
+// If Create fails the CLI prints an error and exits since
+// to execute further operations a valid Instance is mandatory.
+// If Init returns errors they're printed only.
+func CreateAndInit() *rpc.Instance {
+	instance, err := Create()
+	if err != nil {
+		feedback.Errorf("Error creating instance: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	for _, err := range Init(instance) {
+		feedback.Errorf("Error initializing instance: %v", err)
+	}
+	return instance
 }
 
-// CreateInstance creates and return an instance of the Arduino Core engine
-func CreateInstance() (*rpc.Instance, error) {
-	resp, err := getInitResponse()
+// Create and return a new Instance.
+func Create() (*rpc.Instance, *status.Status) {
+	res, err := commands.Create(&rpc.CreateRequest{})
 	if err != nil {
 		return nil, err
 	}
-
-	return resp.GetInstance(), checkPlatformErrors(resp)
+	return res.Instance, nil
 }
 
-func getInitResponse() (*rpc.InitResponse, error) {
-	// invoke Init()
-	resp, err := commands.Init(context.Background(), &rpc.InitRequest{}, output.ProgressBar(), output.TaskProgress())
+// Init initializes instance by loading installed libraries and platforms.
+// In case of loading failures return a list gRPC Status errors for each
+// platform or library that we failed to load.
+// Package and library indexes files are automatically updated if the
+// CLI is run for the first time.
+func Init(instance *rpc.Instance) []*status.Status {
+	errs := []*status.Status{}
 
-	// Init() failed
-	if err != nil {
-		return nil, errors.Wrap(err, "creating instance")
+	// In case the CLI is executed for the first time
+	if err := firstUpdate(instance); err != nil {
+		return append(errs, err)
 	}
 
+	initChan, err := commands.Init(&rpc.InitRequest{
+		Instance: instance,
+	})
+	if err != nil {
+		return append(errs, err)
+	}
+
+	downloadCallback := output.ProgressBar()
+	taskCallback := output.TaskProgress()
+
+	for res := range initChan {
+		if err := res.GetError(); err != nil {
+			errs = append(errs, status.FromProto(err))
+		}
+
+		if progress := res.GetInitProgress(); progress != nil {
+			if progress.DownloadProgress != nil {
+				downloadCallback(progress.DownloadProgress)
+			}
+			if progress.TaskProgress != nil {
+				taskCallback(progress.TaskProgress)
+			}
+		}
+	}
+
+	return errs
+}
+
+// firstUpdate downloads libraries and packages indexes if they don't exist.
+// This ideally is only executed the first time the CLI is run.
+func firstUpdate(instance *rpc.Instance) *status.Status {
 	// Gets the data directory to verify if library_index.json and package_index.json exist
 	dataDir := paths.New(configuration.Settings.GetString("directories.data"))
 
+	libraryIndex := dataDir.Join("library_index.json")
+	packageIndex := dataDir.Join("package_index.json")
+
+	if libraryIndex.Exist() && packageIndex.Exist() {
+		return nil
+	}
+
 	// The library_index.json file doesn't exists, that means the CLI is run for the first time
 	// so we proceed with the first update that downloads the file
-	libraryIndex := dataDir.Join("library_index.json")
 	if libraryIndex.NotExist() {
-		logrus.Warnf("There were errors loading the library index, trying again...")
-
-		// update all indexes
 		err := commands.UpdateLibrariesIndex(context.Background(),
-			&rpc.UpdateLibrariesIndexRequest{Instance: resp.GetInstance()}, output.ProgressBar())
+			&rpc.UpdateLibrariesIndexRequest{
+				Instance: instance,
+			},
+			output.ProgressBar(),
+		)
 		if err != nil {
-			return nil, errors.Wrap(err, "updating the library index")
+			return status.Newf(codes.FailedPrecondition, err.Error())
 		}
-
-		// rescan libraries
-		rescanResp, err := commands.Rescan(resp.GetInstance().GetId())
-		if err != nil {
-			return nil, errors.Wrap(err, "during rescan")
-		}
-
-		// errors persist
-		if rescanResp.GetLibrariesIndexError() != "" {
-			return nil, errors.New("still errors after rescan: " + rescanResp.GetLibrariesIndexError())
-		}
-
-		// succeeded, copy over PlatformsIndexErrors in case errors occurred
-		// during rescan
-		resp.LibrariesIndexError = ""
-		resp.PlatformsIndexErrors = rescanResp.PlatformsIndexErrors
 	}
 
 	// The package_index.json file doesn't exists, that means the CLI is run for the first time,
 	// similarly to the library update we download that file and all the other package indexes
 	// from additional_urls
-	packageIndex := dataDir.Join("package_index.json")
 	if packageIndex.NotExist() {
-		// update platform index
 		_, err := commands.UpdateIndex(context.Background(),
-			&rpc.UpdateIndexRequest{Instance: resp.GetInstance()}, output.ProgressBar())
+			&rpc.UpdateIndexRequest{
+				Instance: instance,
+			},
+			output.ProgressBar(),
+		)
 		if err != nil {
-			return nil, errors.Wrap(err, "updating the core index")
+			return status.Newf(codes.FailedPrecondition, err.Error())
 		}
-
-		// rescan
-		rescanResp, err := commands.Rescan(resp.GetInstance().GetId())
-		if err != nil {
-			return nil, errors.Wrap(err, "during rescan")
-		}
-
-		// errors persist
-		if rescanResp.GetPlatformsIndexErrors() != nil {
-			for _, err := range rescanResp.GetPlatformsIndexErrors() {
-				logrus.Errorf("Still errors after rescan: %v", err)
-			}
-		}
-
-		// succeeded, copy over PlatformsIndexErrors in case errors occurred
-		// during rescan
-		resp.PlatformsIndexErrors = rescanResp.PlatformsIndexErrors
-	}
-
-	return resp, nil
-}
-
-func checkPlatformErrors(resp *rpc.InitResponse) error {
-	// Init() and/or rescan succeeded, but there were errors loading platform indexes
-	if resp.GetPlatformsIndexErrors() != nil {
-		// log each error
-		for _, err := range resp.GetPlatformsIndexErrors() {
-			logrus.Errorf("Error loading platform index: %v", err)
-		}
-		return fmt.Errorf("error loading platform index: \n%v", strings.Join(resp.GetPlatformsIndexErrors(), "\n"))
 	}
 
 	return nil

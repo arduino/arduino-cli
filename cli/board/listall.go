@@ -50,11 +50,7 @@ var showHiddenBoard bool
 
 // runListAllCommand list all installed boards
 func runListAllCommand(cmd *cobra.Command, args []string) {
-	inst, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Error listing boards: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	inst := instance.CreateAndInit()
 
 	list, err := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
 		Instance:            inst,

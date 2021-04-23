@@ -120,11 +120,7 @@ func NewCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	inst, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Error creating instance: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	inst := instance.CreateAndInit()
 
 	var path *paths.Path
 	if len(args) > 0 {
@@ -183,6 +179,7 @@ func run(cmd *cobra.Command, args []string) {
 	compileErr := new(bytes.Buffer)
 	verboseCompile := configuration.Settings.GetString("logging.level") == "debug"
 	var compileRes *rpc.CompileResponse
+	var err error
 	if output.OutputFormat == "json" {
 		compileRes, err = compile.Compile(context.Background(), compileRequest, compileOut, compileErr, verboseCompile)
 	} else {
