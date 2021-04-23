@@ -199,7 +199,7 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPat
 		platformTxtPath := platformPath.Join("platform.txt")
 		platformProperties, err := properties.SafeLoad(platformTxtPath.String())
 		if err != nil {
-			return status.Newf(codes.FailedPrecondition, "loading platform.txt: %w", err)
+			return status.Newf(codes.FailedPrecondition, "loading platform.txt: %v", err)
 		}
 
 		version := semver.MustParse(platformProperties.Get("version"))

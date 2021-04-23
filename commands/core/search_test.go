@@ -41,8 +41,7 @@ func TestPlatformSearch(t *testing.T) {
 
 	configuration.Settings = configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
 
-	inst, err := instance.CreateInstance()
-	require.Nil(t, err)
+	inst := instance.CreateAndInit()
 	require.NotNil(t, inst)
 
 	res, err := PlatformSearch(&rpc.PlatformSearchRequest{

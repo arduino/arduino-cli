@@ -228,7 +228,8 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	loadIndex("https://dl.espressif.com/dl/package_esp32_index.json")
 	loadIndex("http://arduino.esp8266.com/stable/package_esp8266com_index.json")
 	loadIndex("https://adafruit.github.io/arduino-board-index/package_adafruit_index.json")
-	require.NoError(t, pm.LoadHardware())
+	errs := pm.LoadHardware()
+	require.Len(t, errs, 0)
 	esp32, err := pm.FindBoardWithFQBN("esp32:esp32:esp32")
 	require.NoError(t, err)
 	esptool231 := pm.FindToolDependency(&cores.ToolDependency{
