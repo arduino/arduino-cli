@@ -80,7 +80,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []*status.
 	packagersPaths.FilterDirs()
 
 	// Load custom platform properties if available
-	// "Global" platform.txt used by the Java IDE to overwrite all installed platforms.
+	// "Global" platform.txt used to overwrite all installed platforms.
 	// For more info: https://arduino.github.io/arduino-cli/latest/platform-specification/#global-platformtxt
 	if globalPlatformTxt := path.Join("platform.txt"); globalPlatformTxt.Exist() {
 		pm.Log.Infof("Loading custom platform properties: %s", globalPlatformTxt)
