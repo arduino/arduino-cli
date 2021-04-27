@@ -33,7 +33,7 @@ func LibraryUpgradeAll(instanceID int32, downloadCB commands.DownloadProgressCB,
 		return err
 	}
 
-	_, status := commands.Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: instanceID}})
+	status := commands.Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: instanceID}}, nil)
 	if status != nil {
 		return fmt.Errorf("rescanning libraries: %s", status.Err())
 	}

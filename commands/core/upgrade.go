@@ -49,7 +49,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
 		return nil, err
 	}
 
-	_, status := commands.Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: req.Instance.Id}})
+	status := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil)
 	if status != nil {
 		return nil, status.Err()
 	}

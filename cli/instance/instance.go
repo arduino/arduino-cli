@@ -68,17 +68,12 @@ func Init(instance *rpc.Instance) []*status.Status {
 		return append(errs, err)
 	}
 
-	initChan, err := commands.Init(&rpc.InitRequest{
-		Instance: instance,
-	})
-	if err != nil {
-		return append(errs, err)
-	}
-
 	downloadCallback := output.ProgressBar()
 	taskCallback := output.TaskProgress()
 
-	for res := range initChan {
+	err := commands.Init(&rpc.InitRequest{
+		Instance: instance,
+	}, func(res *rpc.InitResponse) {
 		if err := res.GetError(); err != nil {
 			errs = append(errs, status.FromProto(err))
 		}
@@ -91,6 +86,9 @@ func Init(instance *rpc.Instance) []*status.Status {
 				taskCallback(progress.TaskProgress)
 			}
 		}
+	})
+	if err != nil {
+		return append(errs, err)
 	}
 
 	return errs

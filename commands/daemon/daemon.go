@@ -184,21 +184,12 @@ func (s *ArduinoCoreServerImpl) Create(_ context.Context, req *rpc.CreateRequest
 
 // Init FIXMEDOC
 func (s *ArduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCoreService_InitServer) error {
-	messageChan, err := commands.Init(req)
+	err := commands.Init(req, func(message *rpc.InitResponse) {
+		stream.Send(message)
+	})
 	if err != nil {
-		return stream.Send(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Error{
-				Error: err.Proto(),
-			},
-		})
+		return err.Err()
 	}
-
-	for message := range messageChan {
-		if err := stream.Send(message); err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 
