@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/configuration"
@@ -163,7 +162,13 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 
 	// A platform can only be inside a directory, thus we skip everything else.
 	platformsDirs.FilterDirs()
+	// Filter out directories like .git and similar things
+	platformsDirs.FilterOutPrefix(".")
 	for _, platformPath := range platformsDirs {
+		// Tools are not a platform
+		if platformPath.Base() == "tools" {
+			continue
+		}
 		if err := pm.loadPlatform(targetPackage, platformPath); err != nil {
 			statuses = append(statuses, err)
 		}
@@ -178,13 +183,10 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPath *paths.Path) *status.Status {
 	// This is not a platform
 	if platformPath.IsNotDir() {
-		return nil
+		return status.Newf(codes.NotFound, "path is not a platform directory: %s", platformPath)
 	}
 
 	architecture := platformPath.Base()
-	if strings.HasPrefix(architecture, ".") || architecture == "tools" {
-		return nil
-	}
 
 	// There are two possible platform directory structures:
 	// - ARCHITECTURE/boards.txt
