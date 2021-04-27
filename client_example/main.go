@@ -113,8 +113,11 @@ func main() {
 	// Before we can do anything with the CLI, an "instance" must be created.
 	// We keep a reference to the created instance because we will need it to
 	// run subsequent commands.
+	log.Println("calling Create")
+	instance := createInstance(client)
+
 	log.Println("calling Init")
-	instance := initInstance(client)
+	initInstance(client, instance)
 
 	// We set up the proxy and then run the update to verify that the proxy settings are currently used
 	log.Println("calling setProxy")
@@ -128,6 +131,11 @@ func main() {
 	// And we run update again
 	log.Println("calling UpdateIndex")
 	callUpdateIndex(client, instance)
+
+	// Indexes are not implicitly detected after an update
+	// so we must initialize again explicitly
+	log.Println("calling Init")
+	initInstance(client, instance)
 
 	// Let's search for a platform (also known as 'core') called 'samd'.
 	log.Println("calling PlatformSearch(samd)")
@@ -197,6 +205,11 @@ func main() {
 	// Update the Library index
 	log.Println("calling UpdateLibrariesIndex()")
 	callUpdateLibraryIndex(client, instance)
+
+	// Indexes are not implicitly detected after an update
+	// so we must initialize again explicitly
+	log.Println("calling Init")
+	initInstance(client, instance)
 
 	// Download a library
 	log.Println("calling LibraryDownload(WiFi101@0.15.2)")
@@ -326,47 +339,46 @@ func callWrite(client settings.SettingsServiceClient) {
 	}
 }
 
-func initInstance(client rpc.ArduinoCoreServiceClient) *rpc.Instance {
-	// The configuration for this example client only contains the path to
-	// the data folder.
-	initRespStream, err := client.Init(context.Background(), &rpc.InitRequest{})
+func createInstance(client rpc.ArduinoCoreServiceClient) *rpc.Instance {
+	res, err := client.Create(context.Background(), &rpc.CreateRequest{})
 	if err != nil {
 		log.Fatalf("Error creating server instance: %s", err)
+	}
+	return res.Instance
+}
 
+func initInstance(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
+	stream, err := client.Init(context.Background(), &rpc.InitRequest{
+		Instance: instance,
+	})
+	if err != nil {
+		log.Fatalf("Error initializing server instance: %s", err)
 	}
 
-	var instance *rpc.Instance
-	// Loop and consume the server stream until all the setup procedures are done.
 	for {
-		initResp, err := initRespStream.Recv()
-		// The server is done.
+		res, err := stream.Recv()
+		// Server has finished sending
 		if err == io.EOF {
 			break
 		}
 
-		// There was an error.
 		if err != nil {
 			log.Fatalf("Init error: %s", err)
 		}
 
-		// The server sent us a valid instance, let's print its ID.
-		if initResp.GetInstance() != nil {
-			instance = initResp.GetInstance()
-			log.Printf("Got a new instance with ID: %v", instance.GetId())
+		if status := res.GetError(); status != nil {
+			log.Printf("Init error %s", status.String())
 		}
 
-		// When a download is ongoing, log the progress
-		if initResp.GetDownloadProgress() != nil {
-			log.Printf("DOWNLOAD: %s", initResp.GetDownloadProgress())
-		}
-
-		// When an overall task is ongoing, log the progress
-		if initResp.GetTaskProgress() != nil {
-			log.Printf("TASK: %s", initResp.GetTaskProgress())
+		if progress := res.GetInitProgress(); progress != nil {
+			if downloadProgress := progress.GetDownloadProgress(); downloadProgress != nil {
+				log.Printf("DOWNLOAD: %s", downloadProgress)
+			}
+			if taskProgress := progress.GetTaskProgress(); taskProgress != nil {
+				log.Printf("TASK: %s", taskProgress)
+			}
 		}
 	}
-
-	return instance
 }
 
 func callUpdateIndex(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
