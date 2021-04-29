@@ -257,8 +257,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) *sta
 			},
 		})
 	} else {
-		ctagsInstalled, err := instance.installToolIfMissing(ctagsTool, downloadCallback, taskCallback)
-		toolHasBeenInstalled = toolHasBeenInstalled || ctagsInstalled
+		toolHasBeenInstalled, err = instance.installToolIfMissing(ctagsTool, downloadCallback, taskCallback)
 		if err != nil {
 			s := status.Newf(codes.Internal, err.Error())
 			responseCallback(&rpc.InitResponse{
@@ -278,8 +277,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) *sta
 			},
 		})
 	} else {
-		serialDiscoveryToolInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCallback, taskCallback)
-		toolHasBeenInstalled = toolHasBeenInstalled || serialDiscoveryToolInstalled
+		toolHasBeenInstalled, err = instance.installToolIfMissing(serialDiscoveryTool, downloadCallback, taskCallback)
 		if err != nil {
 			s := status.Newf(codes.Internal, err.Error())
 			responseCallback(&rpc.InitResponse{
