@@ -162,13 +162,13 @@ func Create(req *rpc.CreateRequest) (*rpc.CreateResponse, *status.Status) {
 }
 
 // Init loads installed libraries and Platforms in CoreInstance with specified ID,
-// an gRPC status error is returned if the CoreInstance doesn't exist.
+// a gRPC status error is returned if the CoreInstance doesn't exist.
+// All responses are sent through responseCallback, can be nil to ignore all responses.
 // Failures don't stop the loading process, in case of loading failure the Platform or library
-// is simply skipped and an error gRPC status is sent in the returned channel.
-// Channel is closed when loading is finished.
-func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
-	if resp == nil {
-		resp = func(r *rpc.InitResponse) {}
+// is simply skipped and an error gRPC status is sent to responseCallback.
+func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) *status.Status {
+	if responseCallback == nil {
+		responseCallback = func(r *rpc.InitResponse) {}
 	}
 	instance := instances[req.Instance.Id]
 	if instance == nil {
@@ -182,7 +182,7 @@ func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
 		URL, err := utils.URLParse(u)
 		if err != nil {
 			s := status.Newf(codes.InvalidArgument, "Invalid additional URL: %v", err)
-			resp(&rpc.InitResponse{
+			responseCallback(&rpc.InitResponse{
 				Message: &rpc.InitResponse_Error{
 					Error: s.Proto(),
 				},
@@ -196,7 +196,7 @@ func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
 			_, err := instance.PackageManager.LoadPackageIndexFromFile(indexFile)
 			if err != nil {
 				s := status.Newf(codes.FailedPrecondition, "Loading index file: %v", err)
-				resp(&rpc.InitResponse{
+				responseCallback(&rpc.InitResponse{
 					Message: &rpc.InitResponse_Error{
 						Error: s.Proto(),
 					},
@@ -207,7 +207,7 @@ func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
 
 		if err := instance.PackageManager.LoadPackageIndex(URL); err != nil {
 			s := status.Newf(codes.FailedPrecondition, "Loading index file: %v", err)
-			resp(&rpc.InitResponse{
+			responseCallback(&rpc.InitResponse{
 				Message: &rpc.InitResponse_Error{
 					Error: s.Proto(),
 				},
@@ -219,7 +219,7 @@ func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
 	// otherwise we wouldn't find them and reinstall them each time
 	// and they would never get reloaded.
 	for _, err := range instance.PackageManager.LoadHardware() {
-		resp(&rpc.InitResponse{
+		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Error{
 				Error: err.Proto(),
 			},
@@ -227,7 +227,7 @@ func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
 	}
 
 	taskCallback := func(msg *rpc.TaskProgress) {
-		resp(&rpc.InitResponse{
+		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_InitProgress{
 				InitProgress: &rpc.InitResponse_Progress{
 					TaskProgress: msg,
@@ -237,7 +237,7 @@ func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
 	}
 
 	downloadCallback := func(msg *rpc.DownloadProgress) {
-		resp(&rpc.InitResponse{
+		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_InitProgress{
 				InitProgress: &rpc.InitResponse_Progress{
 					DownloadProgress: msg,
@@ -251,7 +251,7 @@ func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
 	ctagsTool, err := getBuiltinCtagsTool(instance.PackageManager)
 	if err != nil {
 		s := status.Newf(codes.Internal, err.Error())
-		resp(&rpc.InitResponse{
+		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Error{
 				Error: s.Proto(),
 			},
@@ -261,7 +261,7 @@ func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
 		toolHasBeenInstalled = toolHasBeenInstalled || ctagsInstalled
 		if err != nil {
 			s := status.Newf(codes.Internal, err.Error())
-			resp(&rpc.InitResponse{
+			responseCallback(&rpc.InitResponse{
 				Message: &rpc.InitResponse_Error{
 					Error: s.Proto(),
 				},
@@ -272,7 +272,7 @@ func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
 	serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(instance.PackageManager)
 	if err != nil {
 		s := status.Newf(codes.Internal, err.Error())
-		resp(&rpc.InitResponse{
+		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Error{
 				Error: s.Proto(),
 			},
@@ -282,7 +282,7 @@ func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
 		toolHasBeenInstalled = toolHasBeenInstalled || serialDiscoveryToolInstalled
 		if err != nil {
 			s := status.Newf(codes.Internal, err.Error())
-			resp(&rpc.InitResponse{
+			responseCallback(&rpc.InitResponse{
 				Message: &rpc.InitResponse_Error{
 					Error: s.Proto(),
 				},
@@ -294,7 +294,7 @@ func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
 		// We installed at least one new tool after loading hardware
 		// so we must reload again otherwise we would never found them.
 		for _, err := range instance.PackageManager.LoadHardware() {
-			resp(&rpc.InitResponse{
+			responseCallback(&rpc.InitResponse{
 				Message: &rpc.InitResponse_Error{
 					Error: err.Proto(),
 				},
@@ -313,7 +313,7 @@ func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
 
 	if err := instance.lm.LoadIndex(); err != nil {
 		s := status.Newf(codes.FailedPrecondition, "Loading index file: %v", err)
-		resp(&rpc.InitResponse{
+		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Error{
 				Error: s.Proto(),
 			},
@@ -322,7 +322,7 @@ func Init(req *rpc.InitRequest, resp func(r *rpc.InitResponse)) *status.Status {
 
 	for _, err := range instance.lm.RescanLibraries() {
 		s := status.Newf(codes.FailedPrecondition, "Loading libraries: %v", err)
-		resp(&rpc.InitResponse{
+		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Error{
 				Error: s.Proto(),
 			},
