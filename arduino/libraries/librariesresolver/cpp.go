@@ -138,7 +138,9 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 		priority += 0
 	}
 
-	if realName == header || name == header {
+	if realName == header && name == header {
+		priority += 600
+	} else if realName == header || name == header {
 		priority += 500
 	} else if realName == header+"-master" || name == header+"-master" {
 		priority += 400
