@@ -20,11 +20,11 @@ tasks:
   all:
     desc: Build for distribution for all platforms
     cmds:
+      - task: Linux_ARMv6
       - task: Windows_32bit
       - task: Windows_64bit
       - task: Linux_32bit
       - task: Linux_64bit
-      - task: Linux_ARMv6
       - task: Linux_ARMv7
       - task: Linux_ARM64
       - task: macOS_64bit
@@ -207,5 +207,5 @@ tasks:
 
 vars:
   CONTAINER: "docker.elastic.co/beats-dev/golang-crossbuild"
-  GO_VERSION: "1.14.7"
+  GO_VERSION: "1.15.10"
   CHECKSUM_FILE: "{{ .VERSION }}-checksums.txt"

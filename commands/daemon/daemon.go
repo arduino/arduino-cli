@@ -34,6 +34,7 @@ import (
 
 // ArduinoCoreServerImpl FIXMEDOC
 type ArduinoCoreServerImpl struct {
+	rpc.UnimplementedArduinoCoreServiceServer
 	VersionString string
 }
 

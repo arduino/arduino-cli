@@ -27,7 +27,9 @@ import (
 )
 
 // SettingsService implements the `Settings` service
-type SettingsService struct{}
+type SettingsService struct {
+	rpc.UnimplementedSettingsServiceServer
+}
 
 // GetAll returns a message with a string field containing all the settings
 // currently in use, marshalled in JSON format.

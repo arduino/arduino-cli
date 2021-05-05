@@ -26,7 +26,9 @@ import (
 )
 
 // DebugService implements the `Debug` service
-type DebugService struct{}
+type DebugService struct {
+	dbg.UnimplementedDebugServiceServer
+}
 
 // Debug returns a stream response that can be used to fetch data from the
 // target. The first message passed through the `Debug` request must

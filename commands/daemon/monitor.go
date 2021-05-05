@@ -25,7 +25,9 @@ import (
 )
 
 // MonitorService implements the `Monitor` service
-type MonitorService struct{}
+type MonitorService struct {
+	rpc.UnimplementedMonitorServiceServer
+}
 
 // StreamingOpen returns a stream response that can be used to fetch data from the
 // monitor target. The first message passed through the `StreamingOpenReq` must
