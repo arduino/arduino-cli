@@ -74,7 +74,10 @@ func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
 		return res[i].Name < res[j].Name
 	})
 	sort.SliceStable(res, func(i, j int) bool {
-		return res[i].Deprecated && res[j].Deprecated
+		if !res[i].Deprecated && res[j].Deprecated {
+			return true
+		}
+		return false
 	})
 	return res, nil
 }
