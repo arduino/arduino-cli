@@ -76,6 +76,8 @@ message Platform {
   // If true this Platform has been installed manually in the user' sketchbook
   // hardware folder
   bool manually_installed = 9;
+  // If true this Platform has been deprecated
+  bool deprecated = 10;
 }
 
 message Board {

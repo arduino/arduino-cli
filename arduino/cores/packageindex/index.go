@@ -50,6 +50,7 @@ type indexPlatformRelease struct {
 	Name             string                `json:"name,required"`
 	Architecture     string                `json:"architecture"`
 	Version          *semver.Version       `json:"version,required"`
+	Deprecated       bool                  `json:"deprecated"`
 	Category         string                `json:"category"`
 	URL              string                `json:"url"`
 	ArchiveFileName  string                `json:"archiveFileName,required"`

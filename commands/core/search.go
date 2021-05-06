@@ -18,6 +18,7 @@ package core
 import (
 	"errors"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -113,5 +114,13 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 	for i, platformRelease := range res {
 		out[i] = commands.PlatformReleaseToRPC(platformRelease)
 	}
+	// Sort result alphabetically and put deprecated platforms at the bottom
+	sort.Slice(out, func(i, j int) bool {
+		return out[i].Name < out[j].Name
+	})
+	sort.SliceStable(
+		out, func(i, j int) bool {
+			return out[i].Deprecated && out[j].Deprecated
+		})
 	return &rpc.PlatformSearchResponse{SearchOutput: out}, nil
 }
