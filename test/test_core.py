@@ -614,6 +614,7 @@ def test_core_list_sorted_results(run_command, httpserver):
     # verify that deprecated platforms are the last ones
     assert platforms == not_deprecated + deprecated
 
+
 def test_core_list_deprecated_platform_with_installed_json(run_command, httpserver, data_dir):
     # Set up the server to serve our custom index file
     test_index = Path(__file__).parent / "testdata" / "test_index.json"
