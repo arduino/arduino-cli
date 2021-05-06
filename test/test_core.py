@@ -530,3 +530,81 @@ def test_core_search_update_index_delay(run_command, data_dir):
     res = run_command("core search")
     assert res.ok
     assert "Updating index" not in res.stdout
+
+
+def test_core_search_sorted_results(run_command, httpserver):
+    # Set up the server to serve our custom index file
+    test_index = Path(__file__).parent / "testdata" / "test_index.json"
+    httpserver.expect_request("/test_index.json").respond_with_data(test_index.read_text())
+
+    # update custom index
+    url = httpserver.url_for("/test_index.json")
+    assert run_command(f"core update-index --additional-urls={url}")
+
+    # list all with additional url specified
+    result = run_command(f"core search --additional-urls={url}")
+    assert result.ok
+
+    lines = [l.strip().split(maxsplit=2) for l in result.stdout.strip().splitlines()][1:]
+    not_deprecated = [l for l in lines if not l[2].startsWith("[DEPRECATED]")]
+    deprecated = [l for l in lines if l[2].startsWith("[DEPRECATED]")]
+
+    # verify that results are already sorted correctly
+    assert not_deprecated == sorted(not_deprecated, key=lambda tokens: tokens[2])
+    assert deprecated == sorted(deprecated, key=lambda tokens: tokens[2])
+
+    # verify that deprecated platforms are the last ones
+    assert lines == deprecated + not_deprecated
+
+    # test same behaviour with json output
+    result = run_command(f"core search --additional-urls={url} --format=json")
+    assert result.ok
+
+    platforms = json.loads(result.stdout)
+    not_deprecated = [p for p in platforms if not p.get("deprecated")]
+    deprecated = [p for p in platforms if p.get("deprecated")]
+
+    # verify that results are already sorted correctly
+    assert not_deprecated == sorted(not_deprecated, key=lambda keys: keys["name"])
+    assert deprecated == sorted(deprecated, key=lambda keys: keys["name"])
+    # verify that deprecated platforms are the last ones
+    assert platforms == deprecated + not_deprecated
+
+
+def test_core_list_sorted_results(run_command, httpserver):
+    # Set up the server to serve our custom index file
+    test_index = Path(__file__).parent / "testdata" / "test_index.json"
+    httpserver.expect_request("/test_index.json").respond_with_data(test_index.read_text())
+
+    # update custom index
+    url = httpserver.url_for("/test_index.json")
+    assert run_command(f"core update-index --additional-urls={url}")
+
+    # list all with additional url specified
+    result = run_command(f"core list --additional-urls={url}")
+    assert result.ok
+
+    lines = [l.strip().split(maxsplit=3) for l in result.stdout.strip().splitlines()][1:]
+    not_deprecated = [l for l in lines if not l[3].startsWith("[DEPRECATED]")]
+    deprecated = [l for l in lines if l[3].startsWith("[DEPRECATED]")]
+
+    # verify that results are already sorted correctly
+    assert not_deprecated == sorted(not_deprecated, key=lambda tokens: tokens[3])
+    assert deprecated == sorted(deprecated, key=lambda tokens: tokens[3])
+
+    # verify that deprecated platforms are the last ones
+    assert lines == deprecated + not_deprecated
+
+    # test same behaviour with json output
+    result = run_command(f"core list --additional-urls={url} --format=json")
+    assert result.ok
+
+    platforms = json.loads(result.stdout)
+    not_deprecated = [p for p in platforms if not p.get("deprecated")]
+    deprecated = [p for p in platforms if p.get("deprecated")]
+
+    # verify that results are already sorted correctly
+    assert not_deprecated == sorted(not_deprecated, key=lambda keys: keys["name"])
+    assert deprecated == sorted(deprecated, key=lambda keys: keys["name"])
+    # verify that deprecated platforms are the last ones
+    assert platforms == deprecated + not_deprecated
