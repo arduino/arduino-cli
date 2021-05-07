@@ -3,7 +3,7 @@
 The Arduino CLI is an open source Command Line Application written in [Golang] that can be used from a terminal to
 compile, verify and upload sketches to Arduino boards and that’s capable of managing all the software and tools needed
 in the process. But don’t get fooled by its name: Arduino CLI can do much more than the average console application, as
-shown by the [Arduino Pro IDE] and [Arduino Create], which rely on it for similar purposes but each one in a completely
+shown by the [Arduino Pro IDE] and [Arduino Cloud], which rely on it for similar purposes but each one in a completely
 different way from the other. In this article we introduce the three pillars of the Arduino CLI, explaining how we
 designed the software so that it can be effectively leveraged under different scenarios.
 
@@ -71,7 +71,7 @@ including the modules you need in another Golang application at compile time. Bo
 a common Golang API, a set of functions that abstract all the functionalities offered by the Arduino CLI, so that when
 we provide a fix or a new feature, they are automatically available to both the command line and gRPC interfaces. The
 source modules implementing this API can be imported in other Golang programs to embed a full-fledged Arduino CLI. For
-example, this is how some backend services powering [Arduino Create] can compile sketches and manage libraries. Just to
+example, this is how some backend services powering [Arduino Cloud] can compile sketches and manage libraries. Just to
 give you a taste of what it means to embed the Arduino CLI, here is how to search for a core using the API:
 
 ![Go library interface screenshot][]
@@ -89,7 +89,7 @@ tracker] if you’ve got a use case that doesn’t fit one of the three pillars.
 
 [golang]: https://golang.org/
 [arduino pro ide]: https://www.arduino.cc/pro/arduino-pro-ide
-[arduino create]: https://create.arduino.cc
+[arduino cloud]: https://create.arduino.cc
 [continuous integration]: https://en.wikipedia.org/wiki/Continuous_integration
 [continuous deployment]: https://en.wikipedia.org/wiki/Continuous_deployment
 [configuration documentation]: configuration.md
