@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"regexp"
 	"sort"
+	"strings"
 	"sync"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -151,7 +152,7 @@ func identify(pm *packagemanager.PackageManager, port *commands.BoardPort) ([]*r
 
 	// Sort by FQBN alphabetically
 	sort.Slice(boards, func(i, j int) bool {
-		return boards[i].Fqbn < boards[j].Fqbn
+		return strings.ToLower(boards[i].Fqbn) < strings.ToLower(boards[j].Fqbn)
 	})
 
 	// Put Arduino boards before others in case there are non Arduino boards with identical VID:PID combination
