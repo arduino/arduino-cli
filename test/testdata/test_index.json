@@ -193,6 +193,7 @@
                     "checksum": "SHA-256:6a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092",
                     "name": "Platform",
                     "version": "1.2.3",
+                    "deprecated": true,
                     "architecture": "x86",
                     "archiveFileName": "core.zip",
                     "size": "486",
