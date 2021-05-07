@@ -17,6 +17,7 @@ package core
 
 import (
 	"sort"
+	"strings"
 
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -71,7 +72,7 @@ func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
 	}
 	// Sort result alphabetically and put deprecated platforms at the bottom
 	sort.Slice(res, func(i, j int) bool {
-		return res[i].Name < res[j].Name
+		return strings.ToLower(res[i].Name) < strings.ToLower(res[j].Name)
 	})
 	sort.SliceStable(res, func(i, j int) bool {
 		if !res[i].Deprecated && res[j].Deprecated {

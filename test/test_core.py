@@ -550,8 +550,8 @@ def test_core_search_sorted_results(run_command, httpserver):
     deprecated = [l for l in lines if l[2].startswith("[DEPRECATED]")]
 
     # verify that results are already sorted correctly
-    assert not_deprecated == sorted(not_deprecated, key=lambda tokens: tokens[2])
-    assert deprecated == sorted(deprecated, key=lambda tokens: tokens[2])
+    assert not_deprecated == sorted(not_deprecated, key=lambda tokens: tokens[2].lower())
+    assert deprecated == sorted(deprecated, key=lambda tokens: tokens[2].lower())
 
     # verify that deprecated platforms are the last ones
     assert lines == not_deprecated + deprecated
@@ -565,8 +565,8 @@ def test_core_search_sorted_results(run_command, httpserver):
     deprecated = [p for p in platforms if p.get("deprecated")]
 
     # verify that results are already sorted correctly
-    assert not_deprecated == sorted(not_deprecated, key=lambda keys: keys["name"])
-    assert deprecated == sorted(deprecated, key=lambda keys: keys["name"])
+    assert not_deprecated == sorted(not_deprecated, key=lambda keys: keys["name"].lower())
+    assert deprecated == sorted(deprecated, key=lambda keys: keys["name"].lower())
     # verify that deprecated platforms are the last ones
     assert platforms == not_deprecated + deprecated
 
@@ -593,8 +593,8 @@ def test_core_list_sorted_results(run_command, httpserver):
     deprecated = [l for l in lines if l[3].startswith("[DEPRECATED]")]
 
     # verify that results are already sorted correctly
-    assert not_deprecated == sorted(not_deprecated, key=lambda tokens: tokens[3])
-    assert deprecated == sorted(deprecated, key=lambda tokens: tokens[3])
+    assert not_deprecated == sorted(not_deprecated, key=lambda tokens: tokens[3].lower())
+    assert deprecated == sorted(deprecated, key=lambda tokens: tokens[3].lower())
 
     # verify that deprecated platforms are the last ones
     assert lines == not_deprecated + deprecated
@@ -609,8 +609,8 @@ def test_core_list_sorted_results(run_command, httpserver):
     deprecated = [p for p in platforms if p.get("deprecated")]
 
     # verify that results are already sorted correctly
-    assert not_deprecated == sorted(not_deprecated, key=lambda keys: keys["name"])
-    assert deprecated == sorted(deprecated, key=lambda keys: keys["name"])
+    assert not_deprecated == sorted(not_deprecated, key=lambda keys: keys["name"].lower())
+    assert deprecated == sorted(deprecated, key=lambda keys: keys["name"].lower())
     # verify that deprecated platforms are the last ones
     assert platforms == not_deprecated + deprecated
 
