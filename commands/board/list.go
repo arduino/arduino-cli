@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"sort"
 	"sync"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -117,11 +118,16 @@ func identify(pm *packagemanager.PackageManager, port *commands.BoardPort) ([]*r
 	// first query installed cores through the Package Manager
 	logrus.Debug("Querying installed cores for board identification...")
 	for _, board := range pm.IdentifyBoard(port.IdentificationPrefs) {
+		// We need the Platform maintaner for sorting so we set it here
+		platform := &rpc.Platform{
+			Maintainer: board.PlatformRelease.Platform.Package.Maintainer,
+		}
 		boards = append(boards, &rpc.BoardListItem{
-			Name: board.Name(),
-			Fqbn: board.FQBN(),
-			Vid:  port.IdentificationPrefs.Get("vid"),
-			Pid:  port.IdentificationPrefs.Get("pid"),
+			Name:     board.Name(),
+			Fqbn:     board.FQBN(),
+			Platform: platform,
+			Vid:      port.IdentificationPrefs.Get("vid"),
+			Pid:      port.IdentificationPrefs.Get("pid"),
 		})
 	}
 
@@ -142,6 +148,25 @@ func identify(pm *packagemanager.PackageManager, port *commands.BoardPort) ([]*r
 		// boards)
 		boards = items
 	}
+
+	// Sort by FQBN alphabetically
+	sort.Slice(boards, func(i, j int) bool {
+		return boards[i].Fqbn < boards[j].Fqbn
+	})
+
+	// Put Arduino boards before others in case there are non Arduino boards with identical VID:PID combination
+	sort.SliceStable(boards, func(i, j int) bool {
+		if boards[i].Platform.Maintainer == "Arduino" && boards[j].Platform.Maintainer != "Arduino" {
+			return true
+		}
+		return false
+	})
+
+	// We need the Board's Platform only for sorting but it shouldn't be present in the output
+	for _, board := range boards {
+		board.Platform = nil
+	}
+
 	return boards, nil
 }
 
