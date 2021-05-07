@@ -89,7 +89,7 @@ tracker] if you’ve got a use case that doesn’t fit one of the three pillars.
 
 [golang]: https://golang.org/
 [arduino pro ide]: https://www.arduino.cc/pro/arduino-pro-ide
-[arduino Cloud]: https://create.arduino.cc
+[arduino cloud]: https://create.arduino.cc
 [continuous integration]: https://en.wikipedia.org/wiki/Continuous_integration
 [continuous deployment]: https://en.wikipedia.org/wiki/Continuous_deployment
 [configuration documentation]: configuration.md
