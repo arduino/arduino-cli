@@ -19,12 +19,16 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
+	semver "go.bug.st/relaxed-semver"
 )
 
 func init() {
@@ -108,4 +112,54 @@ func TestBoardDetectionViaAPIWithNonUSBPort(t *testing.T) {
 	items, err := identifyViaCloudAPI(port)
 	require.Equal(t, err, ErrNotFound)
 	require.Empty(t, items)
+}
+
+func TestBoardIdentifySorting(t *testing.T) {
+	dataDir := paths.TempDir().Join("test", "data_dir")
+	os.Setenv("ARDUINO_DATA_DIR", dataDir.String())
+	dataDir.MkdirAll()
+	defer paths.TempDir().Join("test").RemoveAll()
+
+	// We don't really care about the paths in this case
+	pm := packagemanager.NewPackageManager(dataDir, dataDir, dataDir, dataDir)
+
+	// Create some boards with identical VID:PID combination
+	pack := pm.Packages.GetOrCreatePackage("packager")
+	pack.Maintainer = "NotArduino"
+	platform := pack.GetOrCreatePlatform("platform")
+	platformRelease := platform.GetOrCreateRelease(semver.MustParse("0.0.0"))
+	platformRelease.InstallDir = dataDir
+	board := platformRelease.GetOrCreateBoard("boardA")
+	board.Properties.Set("vid", "0x0000")
+	board.Properties.Set("pid", "0x0000")
+	board = platformRelease.GetOrCreateBoard("boardB")
+	board.Properties.Set("vid", "0x0000")
+	board.Properties.Set("pid", "0x0000")
+
+	// Create some Arduino boards with same VID:PID combination as boards created previously
+	pack = pm.Packages.GetOrCreatePackage("arduino")
+	pack.Maintainer = "Arduino"
+	platform = pack.GetOrCreatePlatform("avr")
+	platformRelease = platform.GetOrCreateRelease(semver.MustParse("0.0.0"))
+	platformRelease.InstallDir = dataDir
+	board = platformRelease.GetOrCreateBoard("nessuno")
+	board.Properties.Set("vid", "0x0000")
+	board.Properties.Set("pid", "0x0000")
+	board = platformRelease.GetOrCreateBoard("assurdo")
+	board.Properties.Set("vid", "0x0000")
+	board.Properties.Set("pid", "0x0000")
+
+	idPrefs := properties.NewMap()
+	idPrefs.Set("vid", "0x0000")
+	idPrefs.Set("pid", "0x0000")
+	res, err := identify(pm, &commands.BoardPort{IdentificationPrefs: idPrefs})
+	require.NoError(t, err)
+	require.NotNil(t, res)
+	require.Len(t, res, 4)
+
+	// Verify expected sorting
+	require.Equal(t, res[0].Fqbn, "arduino:avr:assurdo")
+	require.Equal(t, res[1].Fqbn, "arduino:avr:nessuno")
+	require.Equal(t, res[2].Fqbn, "packager:platform:boardA")
+	require.Equal(t, res[3].Fqbn, "packager:platform:boardB")
 }
