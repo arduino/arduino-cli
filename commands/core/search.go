@@ -117,7 +117,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 	// Sort result alphabetically and put deprecated platforms at the bottom
 	sort.Slice(
 		out, func(i, j int) bool {
-			return out[i].Name < out[j].Name
+			return strings.ToLower(out[i].Name) < strings.ToLower(out[j].Name)
 		})
 	sort.SliceStable(
 		out, func(i, j int) bool {
