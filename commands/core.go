@@ -59,6 +59,7 @@ func PlatformReleaseToRPC(platformRelease *cores.PlatformRelease) *rpc.Platform 
 		Boards:            boards,
 		Latest:            platformRelease.Version.String(),
 		ManuallyInstalled: platformRelease.Platform.ManuallyInstalled,
+		Deprecated:        platformRelease.Platform.Deprecated,
 	}
 
 	return result

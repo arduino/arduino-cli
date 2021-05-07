@@ -50,6 +50,7 @@ type indexPlatformRelease struct {
 	Name             string                `json:"name,required"`
 	Architecture     string                `json:"architecture"`
 	Version          *semver.Version       `json:"version,required"`
+	Deprecated       bool                  `json:"deprecated"`
 	Category         string                `json:"category"`
 	URL              string                `json:"url"`
 	ArchiveFileName  string                `json:"archiveFileName,required"`
@@ -167,6 +168,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 					Name:             pr.Platform.Name,
 					Architecture:     pr.Platform.Architecture,
 					Version:          pr.Version,
+					Deprecated:       pr.Platform.Deprecated,
 					Category:         pr.Platform.Category,
 					URL:              pr.Resource.URL,
 					ArchiveFileName:  pr.Resource.ArchiveFileName,
@@ -205,6 +207,13 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	// FIXME: shall we use the Name and Category of the latest release? or maybe move Name and Category in PlatformRelease?
 	outPlatform.Name = inPlatformRelease.Name
 	outPlatform.Category = inPlatformRelease.Category
+	// If the Platform is installed before deprecation installed.json file does not include "deprecated" field.
+	// The installed.json is read during loading phase of an installed Platform, if the deprecated field is not found
+	// the package_index.json field would be overwritten and the deprecation info would be lost.
+	// This check prevents that behaviour.
+	if !outPlatform.Deprecated {
+		outPlatform.Deprecated = inPlatformRelease.Deprecated
+	}
 
 	size, err := inPlatformRelease.Size.Int64()
 	if err != nil {

@@ -277,3 +277,38 @@ func TestPlatformSearch(t *testing.T) {
 		},
 	})
 }
+
+func TestPlatformSearchSorting(t *testing.T) {
+	dataDir := paths.TempDir().Join("test", "data_dir")
+	downloadDir := paths.TempDir().Join("test", "staging")
+	os.Setenv("ARDUINO_DATA_DIR", dataDir.String())
+	os.Setenv("ARDUINO_DOWNLOADS_DIR", downloadDir.String())
+	dataDir.MkdirAll()
+	downloadDir.MkdirAll()
+	defer paths.TempDir().Join("test").RemoveAll()
+	err := paths.New("testdata").Join("package_index.json").CopyTo(dataDir.Join("package_index.json"))
+	require.Nil(t, err)
+
+	configuration.Settings = configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
+
+	inst, err := instance.CreateInstance()
+	require.Nil(t, err)
+	require.NotNil(t, inst)
+
+	res, err := PlatformSearch(&rpc.PlatformSearchRequest{
+		Instance:    inst,
+		SearchArgs:  "",
+		AllVersions: false,
+	})
+	require.Nil(t, err)
+	require.NotNil(t, res)
+
+	require.Len(t, res.SearchOutput, 3)
+	require.Equal(t, res.SearchOutput[0].Name, "Arduino AVR Boards")
+	require.Equal(t, res.SearchOutput[0].Deprecated, false)
+	require.Equal(t, res.SearchOutput[1].Name, "RK002")
+	require.Equal(t, res.SearchOutput[1].Deprecated, false)
+	require.Equal(t, res.SearchOutput[2].Name, "Platform")
+	require.Equal(t, res.SearchOutput[2].Deprecated, true)
+
+}

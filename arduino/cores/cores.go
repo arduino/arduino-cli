@@ -34,6 +34,7 @@ type Platform struct {
 	Releases          map[string]*PlatformRelease // The Releases of this platform, labeled by version.
 	Package           *Package                    `json:"-"`
 	ManuallyInstalled bool                        // true if the Platform has been installed without the CLI
+	Deprecated        bool                        // true if the Platform has been deprecated
 }
 
 // PlatformReleaseHelp represents the help URL for this Platform release
