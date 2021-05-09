@@ -415,7 +415,7 @@ The default folders for the `arduino-cli.yaml` are:
 
 - Linux: `/home/<your_username>/.arduino15/arduino-cli.yaml`
 - OS X: `/Users/<your_username>/Library/Arduino15/arduino-cli.yaml`
-- Windows: `C:\Users\<your_username>\AppData\Arduino15\arduino-cli.yaml`
+- Windows: `C:\Users\<your_username>\AppData\Local\Arduino15\arduino-cli.yaml`
 
 ## 0.14.0
 
