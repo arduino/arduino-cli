@@ -1021,3 +1021,29 @@ def test_compile_with_conflicting_libraries_include(run_command, data_dir, copy_
     assert 'Multiple libraries were found for "OneWire.h"' in lines
     assert f"Used: {one_wire_lib_path}" in lines
     assert f"Not used: {one_wire_ng_lib_path}" in lines
+
+
+def test_compile_with_invalid_build_options_json(run_command, data_dir):
+    assert run_command("update")
+
+    assert run_command("core install arduino:avr@1.8.3")
+
+    sketch_name = "CompileInvalidBuildOptionsJson"
+    sketch_path = Path(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    # Create a test sketch
+    assert run_command(f"sketch new {sketch_path}")
+
+    # Get the build directory
+    sketch_path_md5 = hashlib.md5(bytes(sketch_path)).hexdigest().upper()
+    build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
+
+    assert run_command(f"compile -b {fqbn} {sketch_path} --verbose")
+
+    # Breaks the build.options.json file
+    build_options_json = build_dir / "build.options.json"
+    with open(build_options_json, "w") as f:
+        f.write("invalid json")
+
+    assert run_command(f"compile -b {fqbn} {sketch_path} --verbose")

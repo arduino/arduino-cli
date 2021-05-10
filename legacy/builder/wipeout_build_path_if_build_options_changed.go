@@ -40,9 +40,15 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	previousBuildOptionsJson := ctx.BuildOptionsJsonPrevious
 
 	var opts *properties.Map
+	if err := json.Unmarshal([]byte(buildOptionsJson), &opts); err != nil || opts == nil {
+	    panic(constants.BUILD_OPTIONS_FILE + " is invalid")
+	}
+
 	var prevOpts *properties.Map
-	json.Unmarshal([]byte(buildOptionsJson), &opts)
-	json.Unmarshal([]byte(previousBuildOptionsJson), &prevOpts)
+	if err := json.Unmarshal([]byte(previousBuildOptionsJson), &prevOpts); err != nil || prevOpts == nil {
+		ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, constants.MSG_BUILD_OPTIONS_INVALID + constants.MSG_REBUILD_ALL, constants.BUILD_OPTIONS_FILE)
+		return doCleanup(ctx.BuildPath)
+	}
 
 	// If SketchLocation path is different but filename is the same, consider it equal
 	if filepath.Base(opts.Get("sketchLocation")) == filepath.Base(prevOpts.Get("sketchLocation")) {
@@ -73,7 +79,7 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 func doCleanup(buildPath *paths.Path) error {
 	// FIXME: this should go outside legacy and behind a `logrus` call so users can
 	// control when this should be printed.
-	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED)
+	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + constants.MSG_REBUILD_ALL)
 
 	if files, err := buildPath.ReadDir(); err != nil {
 		return errors.WithMessage(err, "cleaning build path")
