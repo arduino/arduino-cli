@@ -33,6 +33,8 @@ var validMap = map[string]reflect.Kind{
 	"sketch.always_export_binaries": reflect.Bool,
 	"metrics.addr":                  reflect.String,
 	"metrics.enabled":               reflect.Bool,
+	"network.proxy":                 reflect.String,
+	"network.user_agent_ext":        reflect.String,
 }
 
 func typeOf(key string) (reflect.Kind, error) {
