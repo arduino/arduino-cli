@@ -143,18 +143,3 @@ func TestCppHeaderResolver(t *testing.T) {
 	require.Equal(t, "Calculus Unified Lib", resolve("calculus_lib.h", l6, l7))
 	require.Equal(t, "Calculus Unified Lib", resolve("calculus_lib.h", l7, l6))
 }
-
-func TestCppHeaderResolverWithLibrariesInStrangeDirectoryNames(t *testing.T) {
-	resolver := NewCppResolver()
-	librarylist := libraries.List{}
-	librarylist.Add(&libraries.Library{Name: "onewire_2_3_4", RealName: "OneWire", Architectures: []string{"*"}})
-	librarylist.Add(&libraries.Library{Name: "onewireng_2_3_4", RealName: "OneWireNg", Architectures: []string{"avr"}})
-	resolver.headers["OneWire.h"] = librarylist
-	require.Equal(t, "onewire_2_3_4", resolver.ResolveFor("OneWire.h", "avr").Name)
-
-	librarylist2 := libraries.List{}
-	librarylist2.Add(&libraries.Library{Name: "OneWire", RealName: "OneWire", Architectures: []string{"*"}})
-	librarylist2.Add(&libraries.Library{Name: "onewire_2_3_4", RealName: "OneWire", Architectures: []string{"avr"}})
-	resolver.headers["OneWire.h"] = librarylist2
-	require.Equal(t, "OneWire", resolver.ResolveFor("OneWire.h", "avr").Name)
-}
