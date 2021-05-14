@@ -121,7 +121,6 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 	header = strings.TrimSuffix(header, filepath.Ext(header))
 	header = simplify(header)
 	name := simplify(lib.Name)
-	realName := simplify(lib.RealName)
 
 	priority := 0
 
@@ -138,17 +137,15 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 		priority += 0
 	}
 
-	if realName == header && name == header {
-		priority += 600
-	} else if realName == header || name == header {
+	if name == header {
 		priority += 500
-	} else if realName == header+"-master" || name == header+"-master" {
+	} else if name == header+"-master" {
 		priority += 400
-	} else if strings.HasPrefix(realName, header) || strings.HasPrefix(name, header) {
+	} else if strings.HasPrefix(name, header) {
 		priority += 300
-	} else if strings.HasSuffix(realName, header) || strings.HasSuffix(name, header) {
+	} else if strings.HasSuffix(name, header) {
 		priority += 200
-	} else if strings.Contains(realName, header) || strings.Contains(name, header) {
+	} else if strings.Contains(name, header) {
 		priority += 100
 	}
 
