@@ -581,7 +581,7 @@ def test_compile_with_archives_and_long_paths(run_command):
     assert run_command("update")
 
     # Install core to compile
-    assert run_command("core install esp8266:esp8266")
+    assert run_command("core install esp8266:esp8266@2.7.4")
 
     # Install test library
     assert run_command("lib install ArduinoIoTCloud")
