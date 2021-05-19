@@ -55,13 +55,13 @@ def data_dir(tmpdir_factory):
     # due to the above on Windows we cut the tmp path straight to /tmp/xxxxxxxx
     if platform.system() == "Windows":
         with tempfile.TemporaryDirectory() as tmp:
-            yield tmp
+            yield os.path.realpath(tmp)
             # We don't need to remove the directory since
             # tempfile.TemporaryDirectory deletes itself
             # automatically when exits its scope.
     else:
         data = tmpdir_factory.mktemp("ArduinoTest")
-        yield str(data)
+        yield os.path.realpath(data)
         shutil.rmtree(data, ignore_errors=True)
 
 
@@ -82,7 +82,7 @@ def downloads_dir(tmpdir_factory, worker_id):
             if not lock.is_file():
                 lock.touch()
 
-    yield str(download_dir)
+    yield os.path.realpath(download_dir)
     shutil.rmtree(download_dir, ignore_errors=True)
 
 
@@ -94,7 +94,7 @@ def working_dir(tmpdir_factory):
     at the end, this way all the tests work in isolation.
     """
     work_dir = tmpdir_factory.mktemp("ArduinoTestWork")
-    yield str(work_dir)
+    yield os.path.realpath(work_dir)
     shutil.rmtree(work_dir, ignore_errors=True)
 
 

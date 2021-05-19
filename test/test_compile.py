@@ -928,7 +928,7 @@ def test_compile_with_library_priority(run_command, data_dir):
 
     # Manually installs a library
     git_url = "https://github.com/arduino-libraries/WiFi101.git"
-    manually_install_lib_path = os.path.realpath(Path(data_dir, "my-libraries", "WiFi101"))
+    manually_install_lib_path = Path(data_dir, "my-libraries", "WiFi101")
     assert Repo.clone_from(git_url, manually_install_lib_path, multi_options=["-b 0.16.1"])
 
     # Install the same library we installed manually
@@ -946,7 +946,7 @@ def test_compile_with_library_priority(run_command, data_dir):
 
     res = run_command(f"compile -b {fqbn} {sketch_path} --library {manually_install_lib_path} -v")
     assert res.ok
-    cli_installed_lib_path = os.path.realpath(Path(data_dir, "libraries", "WiFi101"))
+    cli_installed_lib_path = Path(data_dir, "libraries", "WiFi101")
     expected_output = [
         'Multiple libraries were found for "WiFi101.h"',
         f" Used: {manually_install_lib_path}",
