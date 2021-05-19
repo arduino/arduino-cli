@@ -67,7 +67,7 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 
 	library := &Library{}
 	library.Location = location
-	library.InstallDir = libraryDir
+	library.InstallDir = libraryDir.Canonical()
 	if libraryDir.Join("src").Exist() {
 		library.Layout = RecursiveLayout
 		library.SourceDir = libraryDir.Join("src")
@@ -127,7 +127,7 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 
 func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, error) {
 	library := &Library{
-		InstallDir:    path,
+		InstallDir:    path.Canonical(),
 		Location:      location,
 		SourceDir:     path,
 		Layout:        FlatLayout,
