@@ -25,7 +25,7 @@ jobs:
           go get github.com/cmaglie/go.rice/rice
 
       - name: Install Taskfile
-        uses: Arduino/actions/setup-taskfile@master
+        uses: arduino/setup-task@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
