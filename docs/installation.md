@@ -7,9 +7,18 @@ brew update
 brew install arduino-cli
 ```
 
+### Install via MacPorts (macOS)
+
+The Arduino CLI is available as a MacPorts port since version `0.18.1`:
+
+```
+sudo port selfupdate
+sudo port install arduino-cli
+```
+
 #### Command line completion
 
-[Command line completion](command-line-completion.md#brew) files are already bundled in the homebrew installation.
+[Command line completion](command-line-completion.md#brew) files are already bundled in the Homebrew and MacPorts installation.
 
 ### Use the install script
 
