@@ -122,7 +122,8 @@ getFile() {
 	if [ "$DOWNLOAD_TOOL" = "curl" ]; then
 		httpStatusCode=$(curl -s -w '%{http_code}' -L "$url" -o "$filePath")
 	elif [ "$DOWNLOAD_TOOL" = "wget" ]; then
-		body=$(wget --server-response --content-on-error -q -O "$filePath" "$url")
+		tmpFile=$(mktemp)
+		body=$(wget --server-response --content-on-error -q -O "$filePath" "$url" 2> $tmpFile || true)
 		httpStatusCode=$(cat $tmpFile | awk '/^  HTTP/{print $2}')
 	fi
 	echo "$httpStatusCode"
