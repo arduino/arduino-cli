@@ -998,6 +998,33 @@ def test_recompile_with_different_library(run_command, data_dir):
     assert f"Using previously compiled file: {obj_path}" not in res.stdout
 
 
+def test_compile_with_conflicting_libraries_include(run_command, data_dir, copy_sketch):
+    assert run_command("update")
+
+    assert run_command("core install arduino:avr@1.8.3")
+
+    # Install conflicting libraries
+    git_url = "https://github.com/pstolarz/OneWireNg.git"
+    one_wire_ng_lib_path = Path(data_dir, "libraries", "onewireng_0_8_1")
+    assert Repo.clone_from(git_url, one_wire_ng_lib_path, multi_options=["-b 0.8.1"])
+
+    git_url = "https://github.com/PaulStoffregen/OneWire.git"
+    one_wire_lib_path = Path(data_dir, "libraries", "onewire_2_3_5")
+    assert Repo.clone_from(git_url, one_wire_lib_path, multi_options=["-b v2.3.5"])
+
+    sketch_path = copy_sketch("sketch_with_conflicting_libraries_include")
+    fqbn = "arduino:avr:uno"
+
+    res = run_command(f"compile -b {fqbn} {sketch_path} --verbose")
+    assert res.ok
+    expected_output = [
+        'Multiple libraries were found for "OneWire.h"',
+        f" Used: {one_wire_lib_path}",
+        f" Not used: {one_wire_ng_lib_path}",
+    ]
+    assert "\n".join(expected_output) in res.stdout
+
+
 def test_compile_with_invalid_build_options_json(run_command, data_dir):
     assert run_command("update")
 
@@ -1051,7 +1078,7 @@ def test_compile_with_esp32_bundled_libraries(run_command, data_dir, copy_sketch
     fqbn = "esp32:esp32:esp32"
 
     res = run_command(f"compile -b {fqbn} {sketch_path} --verbose")
-    assert res.ok
+    assert res.failed
 
     core_bundled_lib_path = Path(data_dir, "packages", "esp32", "hardware", "esp32", core_version, "libraries", "SD")
     cli_installed_lib_path = Path(data_dir, "libraries", "SD")
@@ -1060,7 +1087,7 @@ def test_compile_with_esp32_bundled_libraries(run_command, data_dir, copy_sketch
         f" Used: {core_bundled_lib_path}",
         f" Not used: {cli_installed_lib_path}",
     ]
-    assert "\n".join(expected_output) in res.stdout
+    assert "\n".join(expected_output) not in res.stdout
 
 
 def test_compile_with_esp8266_bundled_libraries(run_command, data_dir, copy_sketch):
@@ -1090,7 +1117,7 @@ def test_compile_with_esp8266_bundled_libraries(run_command, data_dir, copy_sket
     fqbn = "esp8266:esp8266:generic"
 
     res = run_command(f"compile -b {fqbn} {sketch_path} --verbose")
-    assert res.ok
+    assert res.failed
 
     core_bundled_lib_path = Path(
         data_dir, "packages", "esp8266", "hardware", "esp8266", core_version, "libraries", "SD"
@@ -1101,4 +1128,4 @@ def test_compile_with_esp8266_bundled_libraries(run_command, data_dir, copy_sket
         f" Used: {core_bundled_lib_path}",
         f" Not used: {cli_installed_lib_path}",
     ]
-    assert "\n".join(expected_output) in res.stdout
+    assert "\n".join(expected_output) not in res.stdout
