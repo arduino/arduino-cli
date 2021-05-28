@@ -1036,6 +1036,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#library-name-priority" class="md-nav__link">
+    Library Name Priority
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#folder-name-priority" class="md-nav__link">
     Folder Name Priority
   </a>
@@ -1188,6 +1195,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#library-name-priority" class="md-nav__link">
+    Library Name Priority
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#folder-name-priority" class="md-nav__link">
     Folder Name Priority
   </a>
@@ -1301,7 +1315,10 @@ following rules, one by one in this order, until a rule determines a winner:</p>
 <ol>
 <li>A library that is architecture compatible wins against a library that is not architecture compatible (see
    <a href="#architecture-matching"><strong>Architecture Matching</strong></a>)</li>
-<li>A library that has better "folder name priority" wins (see <a href="#folder-name-priority"><strong>Folder Name Priority</strong></a>)</li>
+<li>A library with both <a href="#library-name-priority">library name</a> and <a href="#folder-name-priority">folder name</a> matching the
+   include wins</li>
+<li>A library that has better "library name priority" or "folder name priority" wins (see
+   <a href="#library-name-priority"><strong>Library Name Priority</strong></a> and <a href="#folder-name-priority"><strong>Folder Name Priority</strong></a>)</li>
 <li>A library that is architecture optimized wins against a library that is not architecture optimized (see
    <a href="#architecture-matching"><strong>Architecture Matching</strong></a>)</li>
 <li>A library that has a better "location priority" wins (see <a href="#location-priority"><strong>Location Priority</strong></a>)</li>
@@ -1363,6 +1380,40 @@ compatible with it.</p>
 <td><code>architectures=samd</code></td>
 <td>NO</td>
 <td>NO</td>
+</tr>
+</tbody>
+</table>
+<h3 id="library-name-priority">Library Name Priority<a class="headerlink" href="#library-name-priority" title="Permanent link">&para;</a></h3>
+<p>A library's name is defined by the <a href="../library-specification/#libraryproperties-file-format">library.properties</a> <code>name</code>
+field. That value is sanitized by replacing spaces with <code>_</code> before comparing it to the file name of the include.</p>
+<p>The "library name priority" is determined as follows (in order of highest to lowest priority):</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Example for <code>Arduino_Low_Power.h</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The library name matches the include 100%</td>
+<td><code>Arduino Low Power</code></td>
+</tr>
+<tr>
+<td>The library name matches the include 100%, except with a <code>-master</code> suffix</td>
+<td><code>Arduino Low Power-master</code></td>
+</tr>
+<tr>
+<td>The library name has a matching prefix</td>
+<td><code>Arduino Low Power Whatever</code></td>
+</tr>
+<tr>
+<td>The library name has a matching suffix</td>
+<td><code>Awesome Arduino Low Power</code></td>
+</tr>
+<tr>
+<td>The library name contains the include</td>
+<td><code>The Arduino Low Power Lib</code></td>
 </tr>
 </tbody>
 </table>
