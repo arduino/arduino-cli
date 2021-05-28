@@ -54,7 +54,10 @@ following rules, one by one in this order, until a rule determines a winner:
 
 1. A library that is architecture compatible wins against a library that is not architecture compatible (see
    [**Architecture Matching**](#architecture-matching))
-1. A library that has better "folder name priority" wins (see [**Folder Name Priority**](#folder-name-priority))
+1. A library with both [library name](#library-name-priority) and [folder name](#folder-name-priority) matching the
+   include wins
+1. A library that has better "library name priority" or "folder name priority" wins (see
+   [**Library Name Priority**](#library-name-priority) and [**Folder Name Priority**](#folder-name-priority))
 1. A library that is architecture optimized wins against a library that is not architecture optimized (see
    [**Architecture Matching**](#architecture-matching))
 1. A library that has a better "location priority" wins (see [**Location Priority**](#location-priority))
@@ -85,6 +88,21 @@ Examples:
 | `architectures=*,esp8266`                     | YES                   | NO                  |
 | `architectures=avr,esp8266`                   | YES                   | YES                 |
 | `architectures=samd`                          | NO                    | NO                  |
+
+### Library Name Priority
+
+A library's name is defined by the [library.properties](library-specification.md#libraryproperties-file-format) `name`
+field. That value is sanitized by replacing spaces with `_` before comparing it to the file name of the include.
+
+The "library name priority" is determined as follows (in order of highest to lowest priority):
+
+| Rule                                                                      | Example for `Arduino_Low_Power.h` |
+| ------------------------------------------------------------------------- | --------------------------------- |
+| The library name matches the include 100%                                 | `Arduino Low Power`               |
+| The library name matches the include 100%, except with a `-master` suffix | `Arduino Low Power-master`        |
+| The library name has a matching prefix                                    | `Arduino Low Power Whatever`      |
+| The library name has a matching suffix                                    | `Awesome Arduino Low Power`       |
+| The library name contains the include                                     | `The Arduino Low Power Lib`       |
 
 ### Folder Name Priority
 
