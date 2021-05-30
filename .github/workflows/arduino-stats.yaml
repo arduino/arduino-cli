@@ -28,7 +28,7 @@ jobs:
           # Fetch jq 1.6 as VM has only 1.5 ATM
           wget -q https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O jq
           chmod +x jq
-          PATH=${{ github.workspace }}:$PATH
+          PATH="${{ github.workspace }}:$PATH"
           .github/tools/fetch_athena_stats.sh
 
       - name: Send metrics

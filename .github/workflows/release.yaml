@@ -58,12 +58,12 @@ jobs:
           KEYCHAIN: "sign.keychain"
           INSTALLER_CERT_MAC_PATH: "/tmp/ArduinoCerts2020.p12"
         run: |
-          echo "${{ secrets.INSTALLER_CERT_MAC_P12 }}" | base64 --decode > ${{ env.INSTALLER_CERT_MAC_PATH }}
-          security create-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
-          security default-keychain -s ${{ env.KEYCHAIN }}
-          security unlock-keychain -p ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
-          security import ${{ env.INSTALLER_CERT_MAC_PATH }} -k ${{ env.KEYCHAIN }} -f pkcs12 -A -T /usr/bin/codesign -P ${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}
-          security set-key-partition-list -S apple-tool:,apple: -s -k ${{ secrets.KEYCHAIN_PASSWORD }} ${{ env.KEYCHAIN }}
+          echo "${{ secrets.INSTALLER_CERT_MAC_P12 }}" | base64 --decode > "${{ env.INSTALLER_CERT_MAC_PATH }}"
+          security create-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" "${{ env.KEYCHAIN }}"
+          security default-keychain -s "${{ env.KEYCHAIN }}"
+          security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" "${{ env.KEYCHAIN }}"
+          security import "${{ env.INSTALLER_CERT_MAC_PATH }}" -k "${{ env.KEYCHAIN }}" -f pkcs12 -A -T /usr/bin/codesign -P "${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}"
+          security set-key-partition-list -S apple-tool:,apple: -s -k "${{ secrets.KEYCHAIN_PASSWORD }}" "${{ env.KEYCHAIN }}"
 
       - name: Install gon for code signing and app notarization
         run: |
@@ -85,11 +85,11 @@ jobs:
           # GitHub's upload/download-artifact@v1 actions don't preserve file permissions,
           # so we need to add execution permission back until @v2 actions are released.
           chmod +x dist/arduino-cli_osx_darwin_amd64/arduino-cli
-          TAG=${GITHUB_REF/refs\/tags\//}
-          tar -czvf dist/arduino-cli_${TAG}_macOS_64bit.tar.gz \
+          TAG="${GITHUB_REF/refs\/tags\//}"
+          tar -czvf "dist/arduino-cli_${TAG}_macOS_64bit.tar.gz" \
           -C dist/arduino-cli_osx_darwin_amd64/  arduino-cli   \
           -C ../../ LICENSE.txt
-          CLI_CHECKSUM=$(shasum -a 256 dist/arduino-cli_${TAG}_macOS_64bit.tar.gz | cut -d " " -f 1)
+          CLI_CHECKSUM="$(shasum -a 256 "dist/arduino-cli_${TAG}_macOS_64bit.tar.gz" | cut -d " " -f 1)"
           perl -pi -w -e "s/.*arduino-cli_${TAG}_macOS_64bit.tar.gz/${CLI_CHECKSUM}  arduino-cli_${TAG}_macOS_64bit.tar.gz/g;" dist/*-checksums.txt
 
       - name: Upload artifacts
@@ -116,11 +116,11 @@ jobs:
       - name: Read CHANGELOG
         id: changelog
         run: |
-          body=$(cat dist/CHANGELOG.md)
+          body="$(cat dist/CHANGELOG.md)"
           body="${body//'%'/'%25'}"
           body="${body//$'\n'/'%0A'}"
           body="${body//$'\r'/'%0D'}"
-          echo $body
+          echo "$body"
           echo "::set-output name=BODY::$body"
 
       - name: Identify Prerelease
@@ -130,7 +130,7 @@ jobs:
         run: |
           wget -q -P /tmp https://github.com/fsaintjacques/semver-tool/archive/3.0.0.zip
           unzip -p /tmp/3.0.0.zip semver-tool-3.0.0/src/semver >/tmp/semver && chmod +x /tmp/semver
-          if [[ $(/tmp/semver get prerel ${GITHUB_REF/refs\/tags\//}) ]]; then echo "::set-output name=IS_PRE::true"; fi
+          if [[ "$(/tmp/semver get prerel "${GITHUB_REF/refs\/tags\//}")" ]]; then echo "::set-output name=IS_PRE::true"; fi
 
       - name: Create Github Release
         id: create_release
