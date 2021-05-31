@@ -182,12 +182,6 @@ jobs:
           name: Linux_ARM64
           path: dist/*Linux_ARM64.tar.gz
 
-      - name: Upload Linux ARM64 bit artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: Linux_ARM64
-          path: dist/*Linux_ARM64.tar.gz
-
       - name: Upload MacOS 64 bit artifact
         uses: actions/upload-artifact@v2
         with:
