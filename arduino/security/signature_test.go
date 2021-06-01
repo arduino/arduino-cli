@@ -27,7 +27,7 @@ var (
 	PackageSignaturePath = paths.New("testdata/package_index.json.sig")
 	BoardIndexPath       = paths.New("testdata/module_firmware_index.json")
 	BoardSignaturePath   = paths.New("testdata/module_firmware_index.json.sig")
-	BoardKey             = paths.New("keys/module_firmware_index_public.gpg.key")
+	BoardKey             = paths.New("testdata/module_firmware_index_public.gpg.key")
 	InvalidIndexPath     = paths.New("testdata/invalid_file.json")
 )
 
