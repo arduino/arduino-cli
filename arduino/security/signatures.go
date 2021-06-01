@@ -17,6 +17,8 @@ package security
 
 import (
 	"fmt"
+	"io"
+	"os"
 
 	"github.com/arduino/go-paths-helper"
 	rice "github.com/cmaglie/go.rice"
@@ -29,28 +31,41 @@ import (
 // fails this function returns false. The PGP entity in the trusted keychain that
 // produced the signature is returned too.
 func VerifyArduinoDetachedSignature(targetPath *paths.Path, signaturePath *paths.Path) (bool, *openpgp.Entity, error) {
-	return VerifyDetachedSignature(targetPath, signaturePath, paths.New("arduino_public.gpg.key"))
-}
-
-// VerifyDetachedSignature checks that the detached GPG signature (in the
-// signaturePath file) matches the given targetPath file and is an authentic
-// signature from the bundled trusted keychain. the keyPath is the path of the public key used.
-// If any of the above conditions fails this function returns false.
-// The PGP entity in the trusted keychain that produced the signature is returned too.
-func VerifyDetachedSignature(targetPath *paths.Path, signaturePath *paths.Path, keyPath *paths.Path) (bool, *openpgp.Entity, error) {
 	keysBox, err := rice.FindBox("keys")
 	if err != nil {
 		panic("could not find bundled signature keys")
 	}
-	arduinoKeyringFile, err := keysBox.Open(keyPath.String())
+	arduinoKeyringFile, err := keysBox.Open("arduino_public.gpg.key")
 	if err != nil {
 		panic("could not find bundled signature keys")
 	}
+	return verifySignature(targetPath, signaturePath, arduinoKeyringFile)
+}
+
+// VerifyDetachedSignature checks that the detached GPG signature (in the
+// signaturePath file) matches the given targetPath file and is an authentic
+// signature from the bundled trusted keychain. The keyPath is the path of the public key used.
+// This function allows to specify the path of the key to use.
+// If any of the above conditions fails this function returns false.
+// The PGP entity in the trusted keychain that produced the signature is returned too.
+func VerifyDetachedSignature(targetPath *paths.Path, signaturePath *paths.Path, keyPath *paths.Path) (bool, *openpgp.Entity, error) {
+	arduinoKeyringFile, err := os.Open(keyPath.String())
+	if err != nil {
+		panic("could not open signature keys")
+	}
+	defer arduinoKeyringFile.Close()
+	return verifySignature(targetPath, signaturePath, arduinoKeyringFile)
+}
+
+//verifySignature is an helper function that checks that the detached GPG signature (in the
+// signaturePath file) matches the given targetPath file and is an authentic
+// signature. If any of the above conditions fails this function returns false.
+// The PGP entity in the trusted keychain that produced the signature is returned too.
+func verifySignature(targetPath *paths.Path, signaturePath *paths.Path, arduinoKeyringFile io.Reader) (bool, *openpgp.Entity, error) {
 	keyRing, err := openpgp.ReadKeyRing(arduinoKeyringFile)
 	if err != nil {
 		return false, nil, fmt.Errorf("retrieving Arduino public keys: %s", err)
 	}
-
 	target, err := targetPath.Open()
 	if err != nil {
 		return false, nil, fmt.Errorf("opening target file: %s", err)
