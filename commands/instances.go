@@ -17,7 +17,6 @@ package commands
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/url"
@@ -37,6 +36,7 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/downloader/v2"
 )
@@ -179,14 +179,40 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	if err != nil {
 		return err
 	}
-	d, err := lm.UpdateIndex(config)
+
+	if err := lm.IndexFile.Parent().MkdirAll(); err != nil {
+		return err
+	}
+
+	// Create a temp dir to stage all downloads
+	tmp, err := paths.MkTempDir("", "library_index_download")
 	if err != nil {
 		return err
 	}
-	Download(d, "Updating index: library_index.json", downloadCB)
-	if d.Error() != nil {
-		return d.Error()
+	defer tmp.RemoveAll()
+
+	// Download gzipped library_index
+	tmpIndexGz := tmp.Join("library_index.json.gz")
+	if d, err := downloader.DownloadWithConfig(tmpIndexGz.String(), librariesmanager.LibraryIndexGZURL.String(), *config, downloader.NoResume); err != nil {
+		return err
+	} else {
+		if err := Download(d, "Updating index: library_index.json.gz", downloadCB); err != nil {
+			return errors.Wrap(err, "downloading library_index.json.gz")
+		}
 	}
+
+	// Extract the real library_index
+	tmpIndex := tmp.Join("library_index.json")
+	if err := paths.GUnzip(tmpIndexGz, tmpIndex); err != nil {
+		return errors.Wrap(err, "unzipping library_index.json.gz")
+	}
+
+	// Copy extracted library_index to final destination
+	lm.IndexFile.Remove()
+	if err := tmpIndex.CopyTo(lm.IndexFile); err != nil {
+		return errors.Wrap(err, "writing library_index.json")
+	}
+
 	if _, err := Rescan(req.GetInstance().GetId()); err != nil {
 		return fmt.Errorf("rescanning filesystem: %s", err)
 	}
