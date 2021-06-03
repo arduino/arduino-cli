@@ -29,7 +29,8 @@ import (
 // signaturePath file) matches the given targetPath file and is an authentic
 // signature from the bundled trusted keychain. If any of the above conditions
 // fails this function returns false. The PGP entity in the trusted keychain that
-// produced the signature is returned too.
+// produced the signature is returned too. This function use the default and bundled
+// arduino_public.gpg.key
 func VerifyArduinoDetachedSignature(targetPath *paths.Path, signaturePath *paths.Path) (bool, *openpgp.Entity, error) {
 	keysBox, err := rice.FindBox("keys")
 	if err != nil {
@@ -39,7 +40,7 @@ func VerifyArduinoDetachedSignature(targetPath *paths.Path, signaturePath *paths
 	if err != nil {
 		panic("could not find bundled signature keys")
 	}
-	return verifySignature(targetPath, signaturePath, arduinoKeyringFile)
+	return VerifySignature(targetPath, signaturePath, arduinoKeyringFile)
 }
 
 // VerifyDetachedSignature checks that the detached GPG signature (in the
@@ -54,14 +55,15 @@ func VerifyDetachedSignature(targetPath *paths.Path, signaturePath *paths.Path, 
 		panic("could not open signature keys")
 	}
 	defer arduinoKeyringFile.Close()
-	return verifySignature(targetPath, signaturePath, arduinoKeyringFile)
+	return VerifySignature(targetPath, signaturePath, arduinoKeyringFile)
 }
 
-//verifySignature is an helper function that checks that the detached GPG signature (in the
+// VerifySignature checks that the detached GPG signature (in the
 // signaturePath file) matches the given targetPath file and is an authentic
-// signature. If any of the above conditions fails this function returns false.
+// signature. This function allows to pass an io.Reader to read the custom key.
+//  If any of the above conditions fails this function returns false.
 // The PGP entity in the trusted keychain that produced the signature is returned too.
-func verifySignature(targetPath *paths.Path, signaturePath *paths.Path, arduinoKeyringFile io.Reader) (bool, *openpgp.Entity, error) {
+func VerifySignature(targetPath *paths.Path, signaturePath *paths.Path, arduinoKeyringFile io.Reader) (bool, *openpgp.Entity, error) {
 	keyRing, err := openpgp.ReadKeyRing(arduinoKeyringFile)
 	if err != nil {
 		return false, nil, fmt.Errorf("retrieving Arduino public keys: %s", err)

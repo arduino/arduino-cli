@@ -19,16 +19,17 @@ import (
 	"testing"
 
 	"github.com/arduino/go-paths-helper"
+	rice "github.com/cmaglie/go.rice"
 	"github.com/stretchr/testify/require"
 )
 
 var (
-	PackageIndexPath     = paths.New("testdata/package_index.json")
-	PackageSignaturePath = paths.New("testdata/package_index.json.sig")
-	BoardIndexPath       = paths.New("testdata/module_firmware_index.json")
-	BoardSignaturePath   = paths.New("testdata/module_firmware_index.json.sig")
-	BoardKey             = paths.New("testdata/module_firmware_index_public.gpg.key")
-	InvalidIndexPath     = paths.New("testdata/invalid_file.json")
+	PackageIndexPath      = paths.New("testdata/package_index.json")
+	PackageSignaturePath  = paths.New("testdata/package_index.json.sig")
+	ModuleFWIndexPath     = paths.New("testdata/module_firmware_index.json")
+	ModuleFWSignaturePath = paths.New("testdata/module_firmware_index.json.sig")
+	ModuleFWIndexKey      = paths.New("testdata/module_firmware_index_public.gpg.key")
+	InvalidIndexPath      = paths.New("testdata/invalid_file.json")
 )
 
 func TestVerifyArduinoDetachedSignature(t *testing.T) {
@@ -45,13 +46,34 @@ func TestVerifyArduinoDetachedSignature(t *testing.T) {
 }
 
 func TestVerifyDetachedSignature(t *testing.T) {
-	res, signer, err := VerifyDetachedSignature(BoardIndexPath, BoardSignaturePath, BoardKey)
+	res, signer, err := VerifyDetachedSignature(ModuleFWIndexPath, ModuleFWSignaturePath, ModuleFWIndexKey)
 	require.NoError(t, err)
 	require.NotNil(t, signer)
 	require.True(t, res)
 	require.Equal(t, uint64(0x82f2d7c7c5a22a73), signer.PrimaryKey.KeyId)
 
-	res, signer, err = VerifyDetachedSignature(InvalidIndexPath, PackageSignaturePath, BoardKey)
+	res, signer, err = VerifyDetachedSignature(InvalidIndexPath, PackageSignaturePath, ModuleFWIndexKey)
+	require.False(t, res)
+	require.Nil(t, signer)
+	require.Error(t, err)
+}
+
+func TestVerifySignature(t *testing.T) {
+	keysBox, err := rice.FindBox("keys")
+	if err != nil {
+		panic("could not find bundled signature keys")
+	}
+	arduinoKeyringFile, err := keysBox.Open("arduino_public.gpg.key")
+	if err != nil {
+		panic("could not find bundled signature keys")
+	}
+	res, signer, err := VerifySignature(PackageIndexPath, PackageSignaturePath, arduinoKeyringFile)
+	require.NoError(t, err)
+	require.NotNil(t, signer)
+	require.True(t, res)
+	require.Equal(t, uint64(0x7baf404c2dfab4ae), signer.PrimaryKey.KeyId)
+
+	res, signer, err = VerifySignature(InvalidIndexPath, PackageSignaturePath, arduinoKeyringFile)
 	require.False(t, res)
 	require.Nil(t, signer)
 	require.Error(t, err)
