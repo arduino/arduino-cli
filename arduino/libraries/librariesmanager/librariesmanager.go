@@ -35,9 +35,10 @@ type LibrariesManager struct {
 	LibrariesDir []*LibrariesDir
 	Libraries    map[string]*LibraryAlternatives `json:"libraries"`
 
-	Index        *librariesindex.Index
-	IndexFile    *paths.Path
-	DownloadsDir *paths.Path
+	Index              *librariesindex.Index
+	IndexFile          *paths.Path
+	IndexFileSignature *paths.Path
+	DownloadsDir       *paths.Path
 }
 
 // LibrariesDir is a directory containing libraries
@@ -95,15 +96,17 @@ func (lm LibrariesManager) Names() []string {
 
 // NewLibraryManager creates a new library manager
 func NewLibraryManager(indexDir *paths.Path, downloadsDir *paths.Path) *LibrariesManager {
-	var indexFile *paths.Path
+	var indexFile, indexFileSignature *paths.Path
 	if indexDir != nil {
 		indexFile = indexDir.Join("library_index.json")
+		indexFileSignature = indexDir.Join("library_index.json.sig")
 	}
 	return &LibrariesManager{
-		Libraries:    map[string]*LibraryAlternatives{},
-		IndexFile:    indexFile,
-		DownloadsDir: downloadsDir,
-		Index:        librariesindex.EmptyIndex,
+		Libraries:          map[string]*LibraryAlternatives{},
+		IndexFile:          indexFile,
+		IndexFileSignature: indexFileSignature,
+		DownloadsDir:       downloadsDir,
+		Index:              librariesindex.EmptyIndex,
 	}
 }
 
