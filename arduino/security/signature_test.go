@@ -22,14 +22,36 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSignatureVerification(t *testing.T) {
-	res, signer, err := VerifyArduinoDetachedSignature(paths.New("testdata/package_index.json"), paths.New("testdata/package_index.json.sig"))
+var (
+	PackageIndexPath     = paths.New("testdata/package_index.json")
+	PackageSignaturePath = paths.New("testdata/package_index.json.sig")
+	BoardIndexPath       = paths.New("testdata/module_firmware_index.json")
+	BoardSignaturePath   = paths.New("testdata/module_firmware_index.json.sig")
+	BoardKey             = paths.New("testdata/module_firmware_index_public.gpg.key")
+	InvalidIndexPath     = paths.New("testdata/invalid_file.json")
+)
+
+func TestVerifyArduinoDetachedSignature(t *testing.T) {
+	res, signer, err := VerifyArduinoDetachedSignature(PackageIndexPath, PackageSignaturePath)
 	require.NoError(t, err)
 	require.NotNil(t, signer)
 	require.True(t, res)
 	require.Equal(t, uint64(0x7baf404c2dfab4ae), signer.PrimaryKey.KeyId)
 
-	res, signer, err = VerifyArduinoDetachedSignature(paths.New("testdata/invalid_file.json"), paths.New("testdata/package_index.json.sig"))
+	res, signer, err = VerifyArduinoDetachedSignature(InvalidIndexPath, PackageSignaturePath)
+	require.False(t, res)
+	require.Nil(t, signer)
+	require.Error(t, err)
+}
+
+func TestVerifyDetachedSignature(t *testing.T) {
+	res, signer, err := VerifyDetachedSignature(BoardIndexPath, BoardSignaturePath, BoardKey)
+	require.NoError(t, err)
+	require.NotNil(t, signer)
+	require.True(t, res)
+	require.Equal(t, uint64(0x82f2d7c7c5a22a73), signer.PrimaryKey.KeyId)
+
+	res, signer, err = VerifyDetachedSignature(InvalidIndexPath, PackageSignaturePath, BoardKey)
 	require.False(t, res)
 	require.Nil(t, signer)
 	require.Error(t, err)
