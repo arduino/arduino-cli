@@ -1503,9 +1503,9 @@ otherwise below, <strong>all fields are required</strong>. The available fields 
     <!-- prettier-ignore -->
   files in the linker command directly, all .o files are saved into a .a file, which is then included in the linker
   command. <a href="#layout-of-folders-and-files">1.5 format library folder structure</a> is required.</li>
-<li><strong>includes</strong> - <strong>(available from Arduino IDE 1.6.10)</strong> (optional) a comma separated list of files to be added to the
-  sketch as <code>#include &lt;...&gt;</code> lines. This property is used with the "Include library" command in the Arduino IDE. If the
-  <code>includes</code> property is missing, all the header files (.h) on the root source folder are included.</li>
+<li><strong>includes</strong> - <strong>(available from Arduino IDE 1.6.10)</strong> (optional) a comma separated list of files of the library to be
+  added to the sketch as <code>#include &lt;...&gt;</code> lines. This property is used with the "Include library" command in the Arduino
+  IDE. If the <code>includes</code> property is missing, all the header files (.h) on the root source folder are included.</li>
 <li><strong>precompiled</strong> - <strong>(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)</strong> (optional) enables support for .a
   (archive) and .so (shared object) files. See the <a href="#precompiled-binaries">"Precompiled binaries"</a> section for
   documentation of the required location in the library for these files. The static library should be linked as an
