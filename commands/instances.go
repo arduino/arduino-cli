@@ -193,22 +193,22 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 
 	// Download gzipped library_index
 	tmpIndexGz := tmp.Join("library_index.json.gz")
-	if d, err := downloader.DownloadWithConfig(tmpIndexGz.String(), librariesmanager.LibraryIndexGZURL.String(), *config, downloader.NoResume); err != nil {
-		return err
-	} else {
+	if d, err := downloader.DownloadWithConfig(tmpIndexGz.String(), librariesmanager.LibraryIndexGZURL.String(), *config, downloader.NoResume); err == nil {
 		if err := Download(d, "Updating index: library_index.json.gz", downloadCB); err != nil {
 			return errors.Wrap(err, "downloading library_index.json.gz")
 		}
+	} else {
+		return err
 	}
 
 	// Download signature
 	tmpSignature := tmp.Join("library_index.json.sig")
-	if d, err := downloader.DownloadWithConfig(tmpSignature.String(), librariesmanager.LibraryIndexSignature.String(), *config, downloader.NoResume); err != nil {
-		return err
-	} else {
+	if d, err := downloader.DownloadWithConfig(tmpSignature.String(), librariesmanager.LibraryIndexSignature.String(), *config, downloader.NoResume); err == nil {
 		if err := Download(d, "Updating index: library_index.json.sig", downloadCB); err != nil {
 			return errors.Wrap(err, "downloading library_index.json.sig")
 		}
+	} else {
+		return err
 	}
 
 	// Extract the real library_index
@@ -221,7 +221,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	if ok, _, err := security.VerifyArduinoDetachedSignature(tmpIndex, tmpSignature); err != nil {
 		return errors.Wrap(err, "verifying signature")
 	} else if !ok {
-		return errors.New("library_index.json has an invalid signature!")
+		return errors.New("library_index.json has an invalid signature")
 	}
 
 	// Copy extracted library_index and signature to final destination
