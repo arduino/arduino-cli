@@ -23,7 +23,8 @@ def test_update(run_command):
 
     assert "Updating index: package_index.json downloaded" in lines
     assert "Updating index: package_index.json.sig downloaded" in lines
-    assert "Updating index: library_index.json downloaded" in lines
+    assert "Updating index: library_index.json.gz downloaded" in lines
+    assert "Updating index: library_index.json.sig downloaded" in lines
 
 
 def test_update_showing_outdated(run_command):
@@ -46,7 +47,8 @@ def test_update_showing_outdated(run_command):
 
     assert "Updating index: package_index.json downloaded" in lines
     assert "Updating index: package_index.json.sig downloaded" in lines
-    assert "Updating index: library_index.json downloaded" in lines
+    assert "Updating index: library_index.json.gz downloaded" in lines
+    assert "Updating index: library_index.json.sig downloaded" in lines
     assert lines[-5].startswith("Arduino AVR Boards")
     assert lines[-2].startswith("USBHost")
 
