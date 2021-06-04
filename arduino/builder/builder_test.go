@@ -36,11 +36,11 @@ func tmpDirOrDie() string {
 }
 
 func TestGenBuildPath(t *testing.T) {
-	want := filepath.Join(os.TempDir(), "arduino-sketch-ACBD18DB4CC2F85CEDEF654FCCC4A4D8")
-	assert.Equal(t, want, builder.GenBuildPath(paths.New("foo")).String())
+	want := paths.TempDir().Join("arduino-sketch-ACBD18DB4CC2F85CEDEF654FCCC4A4D8")
+	assert.True(t, builder.GenBuildPath(paths.New("foo")).EquivalentTo(want))
 
-	want = filepath.Join(os.TempDir(), "arduino-sketch-D41D8CD98F00B204E9800998ECF8427E")
-	assert.Equal(t, want, builder.GenBuildPath(nil).String())
+	want = paths.TempDir().Join("arduino-sketch-D41D8CD98F00B204E9800998ECF8427E")
+	assert.True(t, builder.GenBuildPath(nil).EquivalentTo(want))
 }
 
 func TestEnsureBuildPathExists(t *testing.T) {
