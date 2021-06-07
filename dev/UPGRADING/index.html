@@ -279,6 +279,26 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#removed-rarely-used-golang-api" class="md-nav__link">
+    Removed rarely used golang API
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0180" class="md-nav__link">
     0.18.0
   </a>
@@ -1212,6 +1232,26 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#removed-rarely-used-golang-api" class="md-nav__link">
+    Removed rarely used golang API
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0180" class="md-nav__link">
     0.18.0
   </a>
@@ -1352,6 +1392,12 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="removed-rarely-used-golang-api">Removed rarely used golang API<a class="headerlink" href="#removed-rarely-used-golang-api" title="Permanent link">&para;</a></h3>
+<p>The following function from the <code>github.com/arduino/arduino-cli/arduino/libraries</code> module is no longer available:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="p">(</span><span class="nx">lm</span> <span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span> <span class="nx">UpdateIndex</span><span class="p">(</span><span class="nx">config</span> <span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Downloader</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</code></pre></div>
+<p>We recommend using the equivalent gRPC API to perform the update of the index.</p>
 <h2 id="0180">0.18.0<a class="headerlink" href="#0180" title="Permanent link">&para;</a></h2>
 <h3 id="breaking-changes-in-grpc-api-and-cli-json-output">Breaking changes in gRPC API and CLI JSON output.<a class="headerlink" href="#breaking-changes-in-grpc-api-and-cli-json-output" title="Permanent link">&para;</a></h3>
 <p>Starting from this release we applied a more rigorous and stricter naming conventions in gRPC API following the official
