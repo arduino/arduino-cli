@@ -2,6 +2,18 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## Unreleased
+
+### Removed rarely used golang API
+
+The following function from the `github.com/arduino/arduino-cli/arduino/libraries` module is no longer available:
+
+```go
+func (lm *LibrariesManager) UpdateIndex(config *downloader.Config) (*downloader.Downloader, error) {
+```
+
+We recommend using the equivalent gRPC API to perform the update of the index.
+
 ## 0.18.0
 
 ### Breaking changes in gRPC API and CLI JSON output.

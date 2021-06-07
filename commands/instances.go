@@ -17,7 +17,6 @@ package commands
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/url"
@@ -37,6 +36,7 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/downloader/v2"
 )
@@ -179,14 +179,62 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	if err != nil {
 		return err
 	}
-	d, err := lm.UpdateIndex(config)
+
+	if err := lm.IndexFile.Parent().MkdirAll(); err != nil {
+		return err
+	}
+
+	// Create a temp dir to stage all downloads
+	tmp, err := paths.MkTempDir("", "library_index_download")
 	if err != nil {
 		return err
 	}
-	Download(d, "Updating index: library_index.json", downloadCB)
-	if d.Error() != nil {
-		return d.Error()
+	defer tmp.RemoveAll()
+
+	// Download gzipped library_index
+	tmpIndexGz := tmp.Join("library_index.json.gz")
+	if d, err := downloader.DownloadWithConfig(tmpIndexGz.String(), librariesmanager.LibraryIndexGZURL.String(), *config, downloader.NoResume); err == nil {
+		if err := Download(d, "Updating index: library_index.json.gz", downloadCB); err != nil {
+			return errors.Wrap(err, "downloading library_index.json.gz")
+		}
+	} else {
+		return err
 	}
+
+	// Download signature
+	tmpSignature := tmp.Join("library_index.json.sig")
+	if d, err := downloader.DownloadWithConfig(tmpSignature.String(), librariesmanager.LibraryIndexSignature.String(), *config, downloader.NoResume); err == nil {
+		if err := Download(d, "Updating index: library_index.json.sig", downloadCB); err != nil {
+			return errors.Wrap(err, "downloading library_index.json.sig")
+		}
+	} else {
+		return err
+	}
+
+	// Extract the real library_index
+	tmpIndex := tmp.Join("library_index.json")
+	if err := paths.GUnzip(tmpIndexGz, tmpIndex); err != nil {
+		return errors.Wrap(err, "unzipping library_index.json.gz")
+	}
+
+	// Check signature
+	if ok, _, err := security.VerifyArduinoDetachedSignature(tmpIndex, tmpSignature); err != nil {
+		return errors.Wrap(err, "verifying signature")
+	} else if !ok {
+		return errors.New("library_index.json has an invalid signature")
+	}
+
+	// Copy extracted library_index and signature to final destination
+	lm.IndexFile.Remove()
+	lm.IndexFileSignature.Remove()
+	if err := tmpIndex.CopyTo(lm.IndexFile); err != nil {
+		return errors.Wrap(err, "writing library_index.json")
+	}
+	if err := tmpSignature.CopyTo(lm.IndexFileSignature); err != nil {
+		return errors.Wrap(err, "writing library_index.json.sig")
+	}
+
+	// Rescan libraries
 	if _, err := Rescan(req.GetInstance().GetId()); err != nil {
 		return fmt.Errorf("rescanning filesystem: %s", err)
 	}

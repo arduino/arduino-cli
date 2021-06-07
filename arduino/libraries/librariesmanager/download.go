@@ -17,16 +17,13 @@ package librariesmanager
 
 import (
 	"net/url"
-
-	"go.bug.st/downloader/v2"
 )
 
-// LibraryIndexURL is the URL where to get library index.
+// LibraryIndexURL is the URL where to get the library index.
 var LibraryIndexURL, _ = url.Parse("https://downloads.arduino.cc/libraries/library_index.json")
 
-// UpdateIndex downloads the libraries index file from Arduino repository.
-func (lm *LibrariesManager) UpdateIndex(config *downloader.Config) (*downloader.Downloader, error) {
-	lm.IndexFile.Parent().MkdirAll()
-	// TODO: Download from gzipped URL index
-	return downloader.DownloadWithConfig(lm.IndexFile.String(), LibraryIndexURL.String(), *config, downloader.NoResume)
-}
+// LibraryIndexGZURL is the URL where to get the gzipped library index.
+var LibraryIndexGZURL, _ = url.Parse("https://downloads.arduino.cc/libraries/library_index.json.gz")
+
+// LibraryIndexSignature is the URL where to get the library index signature.
+var LibraryIndexSignature, _ = url.Parse("https://downloads.arduino.cc/libraries/library_index.json.sig")
