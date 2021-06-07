@@ -64,7 +64,7 @@ func Init(instance *rpc.Instance) []*status.Status {
 	errs := []*status.Status{}
 
 	// In case the CLI is executed for the first time
-	if err := firstUpdate(instance); err != nil {
+	if err := FirstUpdate(instance); err != nil {
 		return append(errs, err)
 	}
 
@@ -96,9 +96,9 @@ func Init(instance *rpc.Instance) []*status.Status {
 	return errs
 }
 
-// firstUpdate downloads libraries and packages indexes if they don't exist.
+// FirstUpdate downloads libraries and packages indexes if they don't exist.
 // This ideally is only executed the first time the CLI is run.
-func firstUpdate(instance *rpc.Instance) *status.Status {
+func FirstUpdate(instance *rpc.Instance) *status.Status {
 	// Gets the data directory to verify if library_index.json and package_index.json exist
 	dataDir := paths.New(configuration.Settings.GetString("directories.data"))
 

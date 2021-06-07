@@ -61,7 +61,11 @@ func initSearchCommand() *cobra.Command {
 const indexUpdateInterval = "24h"
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
+	inst, status := instance.Create()
+	if status != nil {
+		feedback.Errorf("Error creating instance: %v", status)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 
 	if indexesNeedUpdating(indexUpdateInterval) {
 		_, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{
@@ -71,6 +75,10 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 			feedback.Errorf("Error updating index: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
+	}
+
+	for _, err := range instance.Init(inst) {
+		feedback.Errorf("Error initializing instance: %v", err)
 	}
 
 	arguments := strings.ToLower(strings.Join(args, " "))

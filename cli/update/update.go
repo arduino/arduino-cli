@@ -49,19 +49,28 @@ var updateFlags struct {
 }
 
 func runUpdateCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino update`")
 	// We don't initialize any CoreInstance when updating indexes since we don't need to.
 	// Also meaningless errors might be returned when calling this command with --additional-urls
 	// since the CLI would be searching for a corresponding file for the additional urls set
 	// as argument but none would be obviously found.
-	instance, status := instance.Create()
+	inst, status := instance.Create()
 	if status != nil {
 		feedback.Errorf("Error creating instance: %v", status)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	logrus.Info("Executing `arduino update`")
+
+	// In case this is the first time the CLI is run we need to update indexes
+	// to make it work correctly, we must do this explicitly in this command since
+	// we must use instance.Create instead of instance.CreateAndInit for the
+	// reason stated above.
+	if err := instance.FirstUpdate(inst); err != nil {
+		feedback.Errorf("Error updating indexes: %v", status)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 
 	err := commands.UpdateCoreLibrariesIndex(context.Background(), &rpc.UpdateCoreLibrariesIndexRequest{
-		Instance: instance,
+		Instance: inst,
 	}, output.ProgressBar())
 	if err != nil {
 		feedback.Errorf("Error updating core and libraries index: %v", err)
@@ -70,7 +79,7 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 
 	if updateFlags.showOutdated {
 		outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedRequest{
-			Instance: instance,
+			Instance: inst,
 		})
 		if err != nil {
 			feedback.Errorf("Error retrieving outdated cores and libraries: %v", err)

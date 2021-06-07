@@ -40,13 +40,23 @@ func initUpdateIndexCommand() *cobra.Command {
 			// Also meaningless errors might be returned when calling this command with --additional-urls
 			// since the CLI would be searching for a corresponding file for the additional urls set
 			// as argument but none would be obviously found.
-			instance, status := instance.Create()
+			inst, status := instance.Create()
 			if status != nil {
 				feedback.Errorf("Error creating instance: %v", status)
 				os.Exit(errorcodes.ErrGeneric)
 			}
+
+			// In case this is the first time the CLI is run we need to update indexes
+			// to make it work correctly, we must do this explicitly in this command since
+			// we must use instance.Create instead of instance.CreateAndInit for the
+			// reason stated above.
+			if err := instance.FirstUpdate(inst); err != nil {
+				feedback.Errorf("Error updating indexes: %v", status)
+				os.Exit(errorcodes.ErrGeneric)
+			}
+
 			err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
-				Instance: instance,
+				Instance: inst,
 			}, output.ProgressBar())
 			if err != nil {
 				feedback.Errorf("Error updating library index: %v", err)

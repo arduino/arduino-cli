@@ -52,19 +52,27 @@ var searchFlags struct {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
+	inst, status := instance.Create()
+	if status != nil {
+		feedback.Errorf("Error creating instance: %v", status)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 
 	err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
-		Instance: instance,
+		Instance: inst,
 	}, output.ProgressBar())
 	if err != nil {
 		feedback.Errorf("Error updating library index: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
+	for _, err := range instance.Init(inst) {
+		feedback.Errorf("Error initializing instance: %v", err)
+	}
+
 	logrus.Info("Executing `arduino lib search`")
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
-		Instance: instance,
+		Instance: inst,
 		Query:    (strings.Join(args, " ")),
 	})
 	if err != nil {
