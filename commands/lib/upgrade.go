@@ -20,6 +20,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // LibraryUpgradeAll upgrades all the available libraries
@@ -32,8 +33,9 @@ func LibraryUpgradeAll(instanceID int32, downloadCB commands.DownloadProgressCB,
 		return err
 	}
 
-	if _, err := commands.Rescan(instanceID); err != nil {
-		return fmt.Errorf("rescanning libraries: %s", err)
+	_, status := commands.Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: instanceID}})
+	if status != nil {
+		return fmt.Errorf("rescanning libraries: %s", status.Err())
 	}
 
 	return nil

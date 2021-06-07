@@ -17,6 +17,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/url"
@@ -36,9 +37,10 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/downloader/v2"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // this map contains all the running Arduino Core Services instances
@@ -52,19 +54,11 @@ var instancesCount int32 = 1
 type CoreInstance struct {
 	PackageManager *packagemanager.PackageManager
 	lm             *librariesmanager.LibrariesManager
-	getLibOnly     bool
 }
 
 // InstanceContainer FIXMEDOC
 type InstanceContainer interface {
 	GetInstance() *rpc.Instance
-}
-
-type createInstanceResult struct {
-	Pm                  *packagemanager.PackageManager
-	Lm                  *librariesmanager.LibrariesManager
-	PlatformIndexErrors []string
-	LibrariesIndexError string
 }
 
 // GetInstance returns a CoreInstance for the given ID, or nil if ID
@@ -107,54 +101,204 @@ func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, down
 	return true, nil
 }
 
-func (instance *CoreInstance) checkForBuiltinTools(downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
-	// Check for ctags tool
-	ctags, _ := getBuiltinCtagsTool(instance.PackageManager)
-	ctagsInstalled, err := instance.installToolIfMissing(ctags, downloadCB, taskCB)
-	if err != nil {
-		return err
-	}
+// Create a new CoreInstance ready to be initialized, supporting directories are also created.
+func Create(req *rpc.CreateRequest) (*rpc.CreateResponse, *status.Status) {
+	instance := &CoreInstance{}
 
-	// Check for builtin serial-discovery tool
-	serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(instance.PackageManager)
-	serialDiscoveryInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCB, taskCB)
-	if err != nil {
-		return err
-	}
-
-	if ctagsInstalled || serialDiscoveryInstalled {
-		if err := instance.PackageManager.LoadHardware(); err != nil {
-			return fmt.Errorf("could not load hardware packages: %s", err)
+	// Setup downloads directory
+	downloadsDir := paths.New(configuration.Settings.GetString("directories.Downloads"))
+	if downloadsDir.NotExist() {
+		err := downloadsDir.MkdirAll()
+		if err != nil {
+			s := status.Newf(codes.FailedPrecondition, err.Error())
+			return nil, s
 		}
 	}
-	return nil
+
+	// Setup data directory
+	dataDir := paths.New(configuration.Settings.GetString("directories.Data"))
+	packagesDir := configuration.PackagesDir(configuration.Settings)
+	if packagesDir.NotExist() {
+		err := packagesDir.MkdirAll()
+		if err != nil {
+			s := status.Newf(codes.FailedPrecondition, err.Error())
+			return nil, s
+		}
+	}
+
+	// Create package manager
+	instance.PackageManager = packagemanager.NewPackageManager(
+		dataDir,
+		configuration.PackagesDir(configuration.Settings),
+		downloadsDir,
+		dataDir.Join("tmp"),
+	)
+
+	// Create library manager and add libraries directories
+	instance.lm = librariesmanager.NewLibraryManager(
+		dataDir,
+		downloadsDir,
+	)
+
+	// Add directories of libraries bundled with IDE
+	if bundledLibsDir := configuration.IDEBundledLibrariesDir(configuration.Settings); bundledLibsDir != nil {
+		instance.lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
+	}
+
+	// Add libraries directory from config file
+	instance.lm.AddLibrariesDir(
+		configuration.LibrariesDir(configuration.Settings),
+		libraries.User,
+	)
+
+	// Save instance
+	instanceId := instancesCount
+	instances[instanceId] = instance
+	instancesCount++
+
+	return &rpc.CreateResponse{
+		Instance: &rpc.Instance{Id: instanceId},
+	}, nil
 }
 
-// Init FIXMEDOC
-func Init(ctx context.Context, req *rpc.InitRequest, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (*rpc.InitResponse, error) {
-	res, err := createInstance(ctx, req.GetLibraryManagerOnly())
-	if err != nil {
-		return nil, fmt.Errorf("cannot initialize package manager: %s", err)
+// Init loads installed libraries and Platforms in CoreInstance with specified ID,
+// an gRPC status error is returned if the CoreInstance doesn't exist.
+// Failures don't stop the loading process, in case of loading failure the Platform or library
+// is simply skipped and an error gRPC status is sent in the returned channel.
+// Channel is closed when loading is finished.
+func Init(req *rpc.InitRequest) (<-chan *rpc.InitResponse, *status.Status) {
+	instance := instances[req.Instance.Id]
+	if instance == nil {
+		return nil, status.Newf(codes.InvalidArgument, "Invalid instance ID")
 	}
 
-	instance := &CoreInstance{
-		PackageManager: res.Pm,
-		lm:             res.Lm,
-		getLibOnly:     req.GetLibraryManagerOnly(),
-	}
-	handle := instancesCount
-	instancesCount++
-	instances[handle] = instance
+	outChan := make(chan *rpc.InitResponse)
+	go func() {
+		defer close(outChan)
 
-	if err := instance.checkForBuiltinTools(downloadCB, taskCB); err != nil {
-		return nil, err
-	}
+		// Load Platforms
+		urls := []string{globals.DefaultIndexURL}
+		urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
+		for _, u := range urls {
+			URL, err := utils.URLParse(u)
+			if err != nil {
+				s := status.Newf(codes.InvalidArgument, "Invalid additional URL: %v", err)
+				outChan <- &rpc.InitResponse{
+					Message: &rpc.InitResponse_Error{
+						Error: s.Proto(),
+					},
+				}
+				continue
+			}
 
-	return &rpc.InitResponse{
-		Instance:             &rpc.Instance{Id: handle},
-		PlatformsIndexErrors: res.PlatformIndexErrors,
-		LibrariesIndexError:  res.LibrariesIndexError,
-	}, nil
+			if URL.Scheme == "file" {
+				indexFile := paths.New(URL.Path)
+
+				_, err := instance.PackageManager.LoadPackageIndexFromFile(indexFile)
+				if err != nil {
+					s := status.Newf(codes.FailedPrecondition, "Loading index file: %v", err)
+					outChan <- &rpc.InitResponse{
+						Message: &rpc.InitResponse_Error{
+							Error: s.Proto(),
+						},
+					}
+				}
+				continue
+			}
+
+			if err := instance.PackageManager.LoadPackageIndex(URL); err != nil {
+				s := status.Newf(codes.FailedPrecondition, "Loading index file: %v", err)
+				outChan <- &rpc.InitResponse{
+					Message: &rpc.InitResponse_Error{
+						Error: s.Proto(),
+					},
+				}
+			}
+		}
+
+		taskCallback := func(msg *rpc.TaskProgress) {
+			outChan <- &rpc.InitResponse{
+				Message: &rpc.InitResponse_InitProgress{
+					InitProgress: &rpc.InitResponse_Progress{
+						TaskProgress: msg,
+					},
+				},
+			}
+		}
+
+		downloadCallback := func(msg *rpc.DownloadProgress) {
+			outChan <- &rpc.InitResponse{
+				Message: &rpc.InitResponse_InitProgress{
+					InitProgress: &rpc.InitResponse_Progress{
+						DownloadProgress: msg,
+					},
+				},
+			}
+		}
+
+		// Install tools if necessary
+		ctagsTool, _ := getBuiltinCtagsTool(instance.PackageManager)
+		if ctagsTool == nil {
+			if _, err := instance.installToolIfMissing(ctagsTool, downloadCallback, taskCallback); err != nil {
+				s := status.Newf(codes.Internal, err.Error())
+				outChan <- &rpc.InitResponse{
+					Message: &rpc.InitResponse_Error{
+						Error: s.Proto(),
+					},
+				}
+			}
+		}
+
+		serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(instance.PackageManager)
+		if serialDiscoveryTool == nil {
+			if _, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCallback, taskCallback); err != nil {
+				s := status.Newf(codes.Internal, err.Error())
+				outChan <- &rpc.InitResponse{
+					Message: &rpc.InitResponse_Error{
+						Error: s.Proto(),
+					},
+				}
+			}
+		}
+
+		// Load hardware only after tools have been installed
+		for _, err := range instance.PackageManager.LoadHardware() {
+			outChan <- &rpc.InitResponse{
+				Message: &rpc.InitResponse_Error{
+					Error: err.Proto(),
+				},
+			}
+		}
+
+		// Load libraries
+		for _, pack := range instance.PackageManager.Packages {
+			for _, platform := range pack.Platforms {
+				if platformRelease := instance.PackageManager.GetInstalledPlatformRelease(platform); platformRelease != nil {
+					instance.lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
+				}
+			}
+		}
+
+		if err := instance.lm.LoadIndex(); err != nil {
+			s := status.Newf(codes.FailedPrecondition, "Loading index file: %v", err)
+			outChan <- &rpc.InitResponse{
+				Message: &rpc.InitResponse_Error{
+					Error: s.Proto(),
+				},
+			}
+		}
+
+		for _, err := range instance.lm.RescanLibraries() {
+			s := status.Newf(codes.FailedPrecondition, "Loading libraries: %v", err)
+			outChan <- &rpc.InitResponse{
+				Message: &rpc.InitResponse_Error{
+					Error: s.Proto(),
+				},
+			}
+		}
+	}()
+
+	return outChan, nil
 }
 
 // Destroy FIXMEDOC
@@ -234,9 +378,21 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 		return errors.Wrap(err, "writing library_index.json.sig")
 	}
 
-	// Rescan libraries
-	if _, err := Rescan(req.GetInstance().GetId()); err != nil {
-		return fmt.Errorf("rescanning filesystem: %s", err)
+	// Reinitializes an existing instance
+	initChan, status := Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: req.Instance.Id}})
+	if status != nil {
+		return status.Err()
+	}
+
+	// Handle responses
+	for response := range initChan {
+		if err := response.GetError(); err != nil {
+			// We return right away without iterating all the errors, the chance
+			// of failure in this case is slim but it would be great in the future
+			// to handle errors when updating the libraries indexes much like we
+			// do when initializing an instance.
+			return fmt.Errorf("rescanning filesystem: %s", err)
+		}
 	}
 	return nil
 }
@@ -358,9 +514,23 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 			}
 		}
 	}
-	if _, err := Rescan(id); err != nil {
-		return nil, fmt.Errorf("rescanning filesystem: %s", err)
+
+	// Reinitializes an existing instance
+	initChan, status := Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: req.Instance.Id}})
+	if status != nil {
+		return nil, status.Err()
 	}
+	// Handle responses
+	for response := range initChan {
+		if err := response.GetError(); err != nil {
+			// We return right away without iterating all the errors, the chance
+			// of failure in this case is slim but it would be great in the future
+			// to handle errors when updating the platforms indexes much like we
+			// do when initializing an instance.
+			return nil, fmt.Errorf("rescanning filesystem: %s", err)
+		}
+	}
+
 	return &rpc.UpdateIndexResponse{}, nil
 }
 
@@ -683,125 +853,6 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 	}
 
 	return nil
-}
-
-// Rescan restart discoveries for the given instance
-func Rescan(instanceID int32) (*rpc.RescanResponse, error) {
-	coreInstance, ok := instances[instanceID]
-	if !ok {
-		return nil, fmt.Errorf("invalid handle")
-	}
-
-	res, err := createInstance(context.Background(), coreInstance.getLibOnly)
-	if err != nil {
-		return nil, fmt.Errorf("rescanning filesystem: %s", err)
-	}
-	coreInstance.PackageManager = res.Pm
-	coreInstance.lm = res.Lm
-
-	return &rpc.RescanResponse{
-		PlatformsIndexErrors: res.PlatformIndexErrors,
-		LibrariesIndexError:  res.LibrariesIndexError,
-	}, nil
-}
-
-func createInstance(ctx context.Context, getLibOnly bool) (*createInstanceResult, error) {
-	res := &createInstanceResult{}
-
-	// setup downloads directory
-	downloadsDir := paths.New(configuration.Settings.GetString("directories.Downloads"))
-	if downloadsDir.NotExist() {
-		err := downloadsDir.MkdirAll()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	// setup data directory
-	dataDir := paths.New(configuration.Settings.GetString("directories.Data"))
-	packagesDir := configuration.PackagesDir(configuration.Settings)
-	if packagesDir.NotExist() {
-		err := packagesDir.MkdirAll()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if !getLibOnly {
-		res.Pm = packagemanager.NewPackageManager(dataDir, configuration.PackagesDir(configuration.Settings),
-			downloadsDir, dataDir.Join("tmp"))
-
-		urls := []string{globals.DefaultIndexURL}
-		urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
-		for _, u := range urls {
-			URL, err := utils.URLParse(u)
-			if err != nil {
-				logrus.Warnf("Unable to parse index URL: %s, skip...", u)
-				continue
-			}
-
-			if URL.Scheme == "file" {
-				path := paths.New(URL.Path)
-				if err != nil {
-					return nil, fmt.Errorf("can't get absolute path of %v: %w", path, err)
-				}
-
-				_, err = res.Pm.LoadPackageIndexFromFile(path)
-				if err != nil {
-					res.PlatformIndexErrors = append(res.PlatformIndexErrors, err.Error())
-				}
-				continue
-			}
-
-			if err := res.Pm.LoadPackageIndex(URL); err != nil {
-				res.PlatformIndexErrors = append(res.PlatformIndexErrors, err.Error())
-			}
-		}
-
-		if err := res.Pm.LoadHardware(); err != nil {
-			return res, fmt.Errorf("error loading hardware packages: %s", err)
-		}
-	}
-
-	if len(res.PlatformIndexErrors) == 0 {
-		res.PlatformIndexErrors = nil
-	}
-
-	// Initialize library manager
-	// --------------------------
-	res.Lm = librariesmanager.NewLibraryManager(dataDir, downloadsDir)
-
-	// Add IDE builtin libraries dir
-	if bundledLibsDir := configuration.IDEBundledLibrariesDir(configuration.Settings); bundledLibsDir != nil {
-		res.Lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
-	}
-
-	// Add user libraries dir
-	libDir := configuration.LibrariesDir(configuration.Settings)
-	res.Lm.AddLibrariesDir(libDir, libraries.User)
-
-	// Add libraries dirs from installed platforms
-	if res.Pm != nil {
-		for _, targetPackage := range res.Pm.Packages {
-			for _, platform := range targetPackage.Platforms {
-				if platformRelease := res.Pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
-					res.Lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
-				}
-			}
-		}
-	}
-
-	// Load index and auto-update it if needed
-	if err := res.Lm.LoadIndex(); err != nil {
-		res.LibrariesIndexError = err.Error()
-	}
-
-	// Scan for libraries
-	if err := res.Lm.RescanLibraries(); err != nil {
-		return res, fmt.Errorf("libraries rescan: %s", err)
-	}
-
-	return res, nil
 }
 
 // LoadSketch collects and returns all files composing a sketch

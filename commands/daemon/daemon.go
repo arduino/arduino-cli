@@ -115,11 +115,6 @@ func (s *ArduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyReq
 	return commands.Destroy(ctx, req)
 }
 
-// Rescan FIXMEDOC
-func (s *ArduinoCoreServerImpl) Rescan(ctx context.Context, req *rpc.RescanRequest) (*rpc.RescanResponse, error) {
-	return commands.Rescan(req.GetInstance().GetId())
-}
-
 // UpdateIndex FIXMEDOC
 func (s *ArduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream rpc.ArduinoCoreService_UpdateIndexServer) error {
 	resp, err := commands.UpdateIndex(stream.Context(), req,
@@ -178,16 +173,32 @@ func (s *ArduinoCoreServerImpl) Upgrade(req *rpc.UpgradeRequest, stream rpc.Ardu
 	return stream.Send(&rpc.UpgradeResponse{})
 }
 
+func (s *ArduinoCoreServerImpl) Create(_ context.Context, req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
+	res, status := commands.Create(req)
+	if status != nil {
+		return nil, status.Err()
+	}
+	return res, nil
+}
+
 // Init FIXMEDOC
 func (s *ArduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCoreService_InitServer) error {
-	resp, err := commands.Init(stream.Context(), req,
-		func(p *rpc.DownloadProgress) { stream.Send(&rpc.InitResponse{DownloadProgress: p}) },
-		func(p *rpc.TaskProgress) { stream.Send(&rpc.InitResponse{TaskProgress: p}) },
-	)
+	messageChan, err := commands.Init(req)
 	if err != nil {
-		return err
+		return stream.Send(&rpc.InitResponse{
+			Message: &rpc.InitResponse_Error{
+				Error: err.Proto(),
+			},
+		})
 	}
-	return stream.Send(resp)
+
+	for message := range messageChan {
+		if err := stream.Send(message); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // Version FIXMEDOC

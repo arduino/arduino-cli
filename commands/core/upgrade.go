@@ -49,8 +49,9 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
 		return nil, err
 	}
 
-	if _, err := commands.Rescan(req.GetInstance().GetId()); err != nil {
-		return nil, err
+	_, status := commands.Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: req.Instance.Id}})
+	if status != nil {
+		return nil, status.Err()
 	}
 
 	return &rpc.PlatformUpgradeResponse{}, nil

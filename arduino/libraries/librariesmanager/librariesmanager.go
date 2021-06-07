@@ -27,6 +27,8 @@ import (
 	"github.com/pmylund/sortutil"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // LibrariesManager keeps the current status of the libraries in the system
@@ -160,13 +162,14 @@ func (lm *LibrariesManager) AddPlatformReleaseLibrariesDir(plaftormRelease *core
 }
 
 // RescanLibraries reload all installed libraries in the system.
-func (lm *LibrariesManager) RescanLibraries() error {
+func (lm *LibrariesManager) RescanLibraries() []*status.Status {
+	statuses := []*status.Status{}
 	for _, dir := range lm.LibrariesDir {
-		if err := lm.LoadLibrariesFromDir(dir); err != nil {
-			return fmt.Errorf("loading libs from %s: %s", dir.Path, err)
+		if errs := lm.LoadLibrariesFromDir(dir); len(errs) > 0 {
+			statuses = append(statuses, errs...)
 		}
 	}
-	return nil
+	return statuses
 }
 
 func (lm *LibrariesManager) getUserLibrariesDir() *paths.Path {
@@ -180,13 +183,15 @@ func (lm *LibrariesManager) getUserLibrariesDir() *paths.Path {
 
 // LoadLibrariesFromDir loads all libraries in the given directory. Returns
 // nil if the directory doesn't exists.
-func (lm *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) error {
+func (lm *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) []*status.Status {
+	statuses := []*status.Status{}
 	subDirs, err := librariesDir.Path.ReadDir()
 	if os.IsNotExist(err) {
-		return nil
+		return statuses
 	}
 	if err != nil {
-		return fmt.Errorf("reading dir %s: %s", librariesDir.Path, err)
+		s := status.Newf(codes.FailedPrecondition, "reading dir %s: %s", librariesDir.Path, err)
+		return append(statuses, s)
 	}
 	subDirs.FilterDirs()
 	subDirs.FilterOutHiddenFiles()
@@ -194,7 +199,9 @@ func (lm *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) err
 	for _, subDir := range subDirs {
 		library, err := libraries.Load(subDir, librariesDir.Location)
 		if err != nil {
-			return fmt.Errorf("loading library from %s: %s", subDir, err)
+			s := status.Newf(codes.Internal, "loading library from %s: %s", subDir, err)
+			statuses = append(statuses, s)
+			continue
 		}
 		library.ContainerPlatform = librariesDir.PlatformRelease
 		alternatives, ok := lm.Libraries[library.Name]
@@ -204,7 +211,8 @@ func (lm *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) err
 		}
 		alternatives.Add(library)
 	}
-	return nil
+
+	return statuses
 }
 
 // LoadLibraryFromDir loads one single library from the libRootDir.
