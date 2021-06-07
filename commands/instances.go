@@ -17,7 +17,6 @@ package commands
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/url"
@@ -37,6 +36,7 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.bug.st/downloader/v2"
 	"google.golang.org/grpc/codes"
@@ -407,22 +407,6 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 		return errors.Wrap(err, "writing library_index.json.sig")
 	}
 
-	// Reinitializes an existing instance
-	initChan, status := Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: req.Instance.Id}})
-	if status != nil {
-		return status.Err()
-	}
-
-	// Handle responses
-	for response := range initChan {
-		if err := response.GetError(); err != nil {
-			// We return right away without iterating all the errors, the chance
-			// of failure in this case is slim but it would be great in the future
-			// to handle errors when updating the libraries indexes much like we
-			// do when initializing an instance.
-			return fmt.Errorf("rescanning filesystem: %s", err)
-		}
-	}
 	return nil
 }
 
@@ -541,22 +525,6 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 			if err := tmpSig.CopyTo(coreIndexSigPath); err != nil {
 				return nil, fmt.Errorf("saving downloaded index signature: %s", err)
 			}
-		}
-	}
-
-	// Reinitializes an existing instance
-	initChan, status := Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: req.Instance.Id}})
-	if status != nil {
-		return nil, status.Err()
-	}
-	// Handle responses
-	for response := range initChan {
-		if err := response.GetError(); err != nil {
-			// We return right away without iterating all the errors, the chance
-			// of failure in this case is slim but it would be great in the future
-			// to handle errors when updating the platforms indexes much like we
-			// do when initializing an instance.
-			return nil, fmt.Errorf("rescanning filesystem: %s", err)
 		}
 	}
 
