@@ -14,8 +14,8 @@ github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c h1:agh2JT9
 github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c/go.mod h1:HK7SpkEax/3P+0w78iRQx1sz1vCDYYw9RXwHjQTB5i8=
 github.com/arduino/go-paths-helper v1.0.1/go.mod h1:HpxtKph+g238EJHq4geEPv9p+gl3v5YYu35Yb+w31Ck=
 github.com/arduino/go-paths-helper v1.2.0/go.mod h1:HpxtKph+g238EJHq4geEPv9p+gl3v5YYu35Yb+w31Ck=
-github.com/arduino/go-paths-helper v1.4.0 h1:ilnseAdxmN1bFnLxxXHRtcdmt9jBf3O4jtYfWfqule4=
-github.com/arduino/go-paths-helper v1.4.0/go.mod h1:V82BWgAAp4IbmlybxQdk9Bpkz8M4Qyx+RAFKaG9NuvU=
+github.com/arduino/go-paths-helper v1.6.0 h1:S7/d7DqB9XlnvF9KrgSiGmo2oWKmYW6O/DTjj3Bijx4=
+github.com/arduino/go-paths-helper v1.6.0/go.mod h1:V82BWgAAp4IbmlybxQdk9Bpkz8M4Qyx+RAFKaG9NuvU=
 github.com/arduino/go-properties-orderedmap v1.3.0 h1:4No/vQopB36e7WUIk6H6TxiSEJPiMrVOCZylYmua39o=
 github.com/arduino/go-properties-orderedmap v1.3.0/go.mod h1:DKjD2VXY/NZmlingh4lSFMEYCVubfeArCsGPGDwb2yk=
 github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b h1:9hDi4F2st6dbLC3y4i02zFT5quS4X6iioWifGlVwfy4=
