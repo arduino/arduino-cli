@@ -20,11 +20,11 @@ tasks:
   all:
     desc: Build for distribution for all platforms
     cmds:
-      - task: Linux_ARMv6
       - task: Windows_32bit
       - task: Windows_64bit
       - task: Linux_32bit
       - task: Linux_64bit
+      - task: Linux_ARMv6
       - task: Linux_ARMv7
       - task: Linux_ARM64
       - task: macOS_64bit
@@ -135,7 +135,7 @@ tasks:
       PLATFORM_DIR: "{{ .PROJECT_NAME }}_linux_arm_7"
       BUILD_COMMAND: "go build -o {{ .DIST_DIR }}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{ .LDFLAGS }}"
       BUILD_PLATFORM: "linux/armv7"
-      CONTAINER_TAG: "{{ .GO_VERSION }}-arm"
+      CONTAINER_TAG: "{{ .GO_VERSION }}-armhf"
       PACKAGE_PLATFORM: "Linux_ARMv7"
       PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.gz"
 
@@ -157,7 +157,35 @@ tasks:
       PLATFORM_DIR: "{{ .PROJECT_NAME }}_linux_arm_6"
       BUILD_COMMAND: "go build -o {{ .DIST_DIR }}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{ .LDFLAGS }}"
       BUILD_PLATFORM: "linux/armv6"
-      CONTAINER_TAG: "{{ .GO_VERSION }}-armel"
+      # We are experiencing the following error with ARMv6 build:
+      #
+      #   # github.com/arduino/arduino-cli
+      #   net(.text): unexpected relocation type 296 (R_ARM_V4BX)
+      #   panic: runtime error: invalid memory address or nil pointer dereference
+      #   [signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0x51ae53]
+      #
+      #   goroutine 1 [running]:
+      #   cmd/link/internal/loader.(*Loader).SymName(0xc000095c00, 0x0, 0xc0000958d8, 0x5a0ac)
+      #           /usr/local/go/src/cmd/link/internal/loader/loader.go:684 +0x53
+      #   cmd/link/internal/ld.dynrelocsym2(0xc000095880, 0x5a0ac)
+      #           /usr/local/go/src/cmd/link/internal/ld/data.go:777 +0x295
+      #   cmd/link/internal/ld.(*dodataState).dynreloc2(0xc007df9800, 0xc000095880)
+      #           /usr/local/go/src/cmd/link/internal/ld/data.go:794 +0x89
+      #   cmd/link/internal/ld.(*Link).dodata2(0xc000095880, 0xc007d00000, 0x60518, 0x60518)
+      #           /usr/local/go/src/cmd/link/internal/ld/data.go:1434 +0x4d4
+      #   cmd/link/internal/ld.Main(0x8729a0, 0x4, 0x8, 0x1, 0xd, 0xe, 0x0, 0x0, 0x6d7737, 0x12, ...)
+      #           /usr/local/go/src/cmd/link/internal/ld/main.go:302 +0x123a
+      #   main.main()
+      #           /usr/local/go/src/cmd/link/main.go:68 +0x1dc
+      #   Error: failed building for linux/armv6: exit status 2
+      #
+      # This seems to be a problem in the go builder 1.16.x that removed support for the R_ARM_V4BX instruction:
+      #    https://github.com/golang/go/pull/44998
+      #    https://groups.google.com/g/golang-codereviews/c/yzN80xxwu2E
+      #
+      # Until there is a fix released we must use a recent gcc for Linux_ARMv6 build, so for this
+      # build we select the debian10 based container.
+      CONTAINER_TAG: "{{ .GO_VERSION }}-armel-debian10"
       PACKAGE_PLATFORM: "Linux_ARMv6"
       PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.gz"
 
