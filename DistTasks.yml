@@ -157,7 +157,7 @@ tasks:
       PLATFORM_DIR: "{{ .PROJECT_NAME }}_linux_arm_6"
       BUILD_COMMAND: "go build -o {{ .DIST_DIR }}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{ .LDFLAGS }}"
       BUILD_PLATFORM: "linux/armv6"
-      CONTAINER_TAG: "{{ .GO_VERSION }}-arm"
+      CONTAINER_TAG: "{{ .GO_VERSION }}-armel"
       PACKAGE_PLATFORM: "Linux_ARMv6"
       PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.gz"
 
@@ -207,5 +207,5 @@ tasks:
 
 vars:
   CONTAINER: "docker.elastic.co/beats-dev/golang-crossbuild"
-  GO_VERSION: "1.15.10"
+  GO_VERSION: "1.16.4"
   CHECKSUM_FILE: "{{ .VERSION }}-checksums.txt"
