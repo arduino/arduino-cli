@@ -229,7 +229,20 @@ tasks:
       PLATFORM_DIR: "{{ .PROJECT_NAME }}_osx_darwin_amd64"
       BUILD_COMMAND: "go build -o {{ .DIST_DIR }}/{{ .PLATFORM_DIR }}/{{ .PROJECT_NAME }} {{ .LDFLAGS }}"
       BUILD_PLATFORM: "darwin/amd64"
-      CONTAINER_TAG: "{{ .GO_VERSION }}-darwin"
+      # We are experiencing the following error with macOS_64bit build:
+      #
+      #   Undefined symbols for architecture x86_64:
+      #     "_clock_gettime", referenced from:
+      #         _runtime.walltime_trampoline in go.o
+      #   ld: symbol(s) not found for architecture x86_64
+      #   clang: error: linker command failed with exit code 1 (use -v to see invocation)
+      #
+      # The reason seems that go 1.16.x use a macos API which is available since 10.12
+      #    https://github.com/techknowlogick/xgo/issues/100#issuecomment-780894190
+      #
+      # To compile it we need an SDK >=10.12 so we use the debian10 based container that
+      # has the SDK 10.14 installed.
+      CONTAINER_TAG: "{{ .GO_VERSION }}-darwin-debian10"
       PACKAGE_PLATFORM: "macOS_64bit"
       PACKAGE_NAME: "{{ .PROJECT_NAME }}_{{ .VERSION }}_{{ .PACKAGE_PLATFORM }}.tar.gz"
 
