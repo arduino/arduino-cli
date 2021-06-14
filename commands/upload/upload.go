@@ -292,13 +292,15 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	// to set the board in bootloader mode
 	actualPort := port
 	if programmer == nil && !burnBootloader {
-		// Perform reset via 1200bps touch if requested and wait for upload port if requested.
 
+		// Perform reset via 1200bps touch if requested and wait for upload port also if requested.
 		touch := uploadProperties.GetBoolean("upload.use_1200bps_touch")
-		wait := uploadProperties.GetBoolean("upload.wait_for_upload_port")
+		wait := false
 		portToTouch := ""
 		if touch {
 			portToTouch = port
+			// Waits for upload port only if a 1200bps touch is done
+			wait = uploadProperties.GetBoolean("upload.wait_for_upload_port")
 		}
 
 		// if touch is requested but port is not specified, print a warning
