@@ -39,6 +39,7 @@ var (
 		".adoc": empty,
 		".md":   empty,
 		".json": empty,
+		".tpp":  empty,
 	}
 
 	// SourceFilesValidExtensions lists valid extensions for source files (no headers)
