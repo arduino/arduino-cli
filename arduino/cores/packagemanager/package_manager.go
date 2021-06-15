@@ -58,6 +58,12 @@ func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) 
 	}
 }
 
+// Clear resets the PackageManager to its initial state
+func (pm *PackageManager) Clear() {
+	pm.Packages = cores.NewPackages()
+	pm.CustomGlobalProperties = properties.NewMap()
+}
+
 // FindPlatformReleaseProvidingBoardsWithVidPid FIXMEDOC
 func (pm *PackageManager) FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid string) []*cores.PlatformRelease {
 	res := []*cores.PlatformRelease{}

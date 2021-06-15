@@ -175,6 +175,13 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) *sta
 		return status.Newf(codes.InvalidArgument, "Invalid instance ID")
 	}
 
+	// We need to clear the PackageManager currently in use by this instance
+	// in case this is not the first Init on this instances, that might happen
+	// after reinitializing an instance after installing or uninstalling a core.
+	// If this is not done the information of the uninstall core is kept in memory,
+	// even if it should not.
+	instance.PackageManager.Clear()
+
 	// Load Platforms
 	urls := []string{globals.DefaultIndexURL}
 	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)

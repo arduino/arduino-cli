@@ -320,3 +320,20 @@ func TestIdentifyBoard(t *testing.T) {
 	require.Equal(t, "[test:avr:e]", fmt.Sprintf("%v", identify("0xAB00", "0xcd00")))
 	require.Equal(t, "[test:avr:e]", fmt.Sprintf("%v", identify("0xab00", "0xCD00")))
 }
+
+func TestPackageManagerClear(t *testing.T) {
+	// Create a PackageManager and load the harware
+	packageManager := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
+	packageManager.LoadHardwareFromDirectory(customHardware)
+
+	// Creates another PackageManager but don't load the hardware
+	emptyPackageManager := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
+
+	// Verifies they're not equal
+	require.NotEqual(t, &packageManager, &emptyPackageManager)
+
+	// Clear the first PackageManager that contains loaded hardware
+	packageManager.Clear()
+	// Verifies both PackageManagers are now equal
+	require.Equal(t, &packageManager, &emptyPackageManager)
+}
