@@ -45,11 +45,7 @@ func initDownloadCommand() *cobra.Command {
 }
 
 func runDownloadCommand(cmd *cobra.Command, args []string) {
-	inst, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Error downloading: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	inst := instance.CreateAndInit()
 
 	logrus.Info("Executing `arduino core download`")
 

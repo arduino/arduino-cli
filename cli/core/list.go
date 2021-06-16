@@ -49,12 +49,7 @@ var listFlags struct {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
-	inst, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Error listing platforms: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
+	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino core list`")
 
 	platforms, err := core.GetPlatforms(&rpc.PlatformListRequest{

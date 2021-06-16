@@ -56,7 +56,7 @@ def test_list(run_command):
     result = run_command("lib list")
     assert result.ok
     assert "" == result.stderr
-    assert "No libraries installed." == result.stdout.strip()
+    assert "No libraries installed." in result.stdout.strip()
     result = run_command("lib list --format json")
     assert result.ok
     assert "" == result.stderr
@@ -520,7 +520,7 @@ def test_lib_list_with_updatable_flag(run_command):
     result = run_command("lib list --updatable")
     assert result.ok
     assert "" == result.stderr
-    assert "No updates available." == result.stdout.strip()
+    assert "No updates available." in result.stdout.strip()
     # No library to update in json
     result = run_command("lib list --updatable --format json")
     assert result.ok

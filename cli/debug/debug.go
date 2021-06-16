@@ -69,11 +69,7 @@ func NewCommand() *cobra.Command {
 }
 
 func run(command *cobra.Command, args []string) {
-	instance, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Error during Debug: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	instance := instance.CreateAndInit()
 
 	var path *paths.Path
 	if len(args) > 0 {

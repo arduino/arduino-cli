@@ -67,10 +67,11 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 		}
 	}
 
-	_, err = commands.Rescan(req.GetInstance().GetId())
-	if err != nil {
-		return nil, err
+	status := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil)
+	if status != nil {
+		return nil, status.Err()
 	}
+
 	return &rpc.PlatformUninstallResponse{}, nil
 }
 

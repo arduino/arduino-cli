@@ -1,5 +1,7 @@
 version: v1beta1
 lint:
+  ignore:
+    - google
   ignore_only:
     ENUM_ZERO_VALUE_SUFFIX:
       - cc/arduino/cli/commands/v1/lib.proto

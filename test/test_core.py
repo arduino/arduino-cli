@@ -541,6 +541,11 @@ def test_core_search_sorted_results(run_command, httpserver):
     url = httpserver.url_for("/test_index.json")
     assert run_command(f"core update-index --additional-urls={url}")
 
+    # This is done only to avoid index update output when calling core search
+    # since it automatically updates them if they're outdated and it makes it
+    # harder to parse the list of cores
+    assert run_command("core search")
+
     # list all with additional url specified
     result = run_command(f"core search --additional-urls={url}")
     assert result.ok

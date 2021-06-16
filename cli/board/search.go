@@ -52,11 +52,7 @@ var searchFlags struct {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	inst, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Error searching boards: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	inst := instance.CreateAndInit()
 
 	res, err := board.Search(context.Background(), &rpc.BoardSearchRequest{
 		Instance:            inst,

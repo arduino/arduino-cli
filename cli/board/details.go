@@ -55,11 +55,7 @@ func initDetailsCommand() *cobra.Command {
 }
 
 func runDetailsCommand(cmd *cobra.Command, args []string) {
-	inst, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf(tr("Error getting board details: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	inst := instance.CreateAndInit()
 
 	// remove once `board details <fqbn>` is removed
 	if fqbn == "" && len(args) > 0 {

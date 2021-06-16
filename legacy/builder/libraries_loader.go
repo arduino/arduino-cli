@@ -57,8 +57,14 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 		lm.AddLibrariesDir(folder, libraries.User)
 	}
 
-	if err := lm.RescanLibraries(); err != nil {
-		return errors.WithStack(err)
+	if errs := lm.RescanLibraries(); len(errs) > 0 {
+		// With the refactoring of the initialization step of the CLI we changed how
+		// errors are returned when loading platforms and libraries, that meant returning a list of
+		// errors instead of a single one to enhance the experience for the user.
+		// I have no intention right now to start a refactoring of the legacy package too, so
+		// here's this shitty solution for now.
+		// When we're gonna refactor the legacy package this will be gone.
+		return errors.WithStack(errs[0].Err())
 	}
 
 	for _, dir := range ctx.LibraryDirs {

@@ -544,9 +544,9 @@ def test_compile_with_invalid_url(run_command, data_dir):
 
     # Verifies compilation fails cause of missing local index file
     res = run_command(f'compile -b {fqbn} "{sketch_path}"')
-    assert res.failed
+    assert res.ok
     lines = [l.strip() for l in res.stderr.splitlines()]
-    assert "Error creating instance: error loading platform index:" in lines
+    assert "Error initializing instance: Loading index file: loading json index file" in lines[0]
     expected_index_file = Path(data_dir, "package_example_index.json")
     assert f"loading json index file {expected_index_file}: " + f"open {expected_index_file}:" in lines[-1]
 

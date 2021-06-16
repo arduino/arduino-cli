@@ -77,8 +77,9 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest,
 		}
 	}
 
-	if _, err := commands.Rescan(req.GetInstance().GetId()); err != nil {
-		return fmt.Errorf("rescanning libraries: %s", err)
+	status := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil)
+	if status != nil {
+		return fmt.Errorf("rescanning libraries: %s", status.Err())
 	}
 	return nil
 }

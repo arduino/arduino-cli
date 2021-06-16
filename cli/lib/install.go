@@ -59,7 +59,7 @@ var installFlags struct {
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
+	instance := instance.CreateAndInit()
 
 	if installFlags.zipPath || installFlags.gitURL {
 		if !configuration.Settings.GetBool("library.enable_unsafe_install") {

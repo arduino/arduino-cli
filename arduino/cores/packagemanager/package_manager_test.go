@@ -228,7 +228,8 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	loadIndex("https://dl.espressif.com/dl/package_esp32_index.json")
 	loadIndex("http://arduino.esp8266.com/stable/package_esp8266com_index.json")
 	loadIndex("https://adafruit.github.io/arduino-board-index/package_adafruit_index.json")
-	require.NoError(t, pm.LoadHardware())
+	errs := pm.LoadHardware()
+	require.Len(t, errs, 0)
 	esp32, err := pm.FindBoardWithFQBN("esp32:esp32:esp32")
 	require.NoError(t, err)
 	esptool231 := pm.FindToolDependency(&cores.ToolDependency{
@@ -318,4 +319,21 @@ func TestIdentifyBoard(t *testing.T) {
 	// Check mixed case
 	require.Equal(t, "[test:avr:e]", fmt.Sprintf("%v", identify("0xAB00", "0xcd00")))
 	require.Equal(t, "[test:avr:e]", fmt.Sprintf("%v", identify("0xab00", "0xCD00")))
+}
+
+func TestPackageManagerClear(t *testing.T) {
+	// Create a PackageManager and load the harware
+	packageManager := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
+	packageManager.LoadHardwareFromDirectory(customHardware)
+
+	// Creates another PackageManager but don't load the hardware
+	emptyPackageManager := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
+
+	// Verifies they're not equal
+	require.NotEqual(t, &packageManager, &emptyPackageManager)
+
+	// Clear the first PackageManager that contains loaded hardware
+	packageManager.Clear()
+	// Verifies both PackageManagers are now equal
+	require.Equal(t, &packageManager, &emptyPackageManager)
 }

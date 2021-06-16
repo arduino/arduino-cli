@@ -127,8 +127,8 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 
 func TestUploadPropertiesComposition(t *testing.T) {
 	pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
-	err := pm.LoadHardwareFromDirectory(paths.New("testdata", "hardware"))
-	require.NoError(t, err)
+	errs := pm.LoadHardwareFromDirectory(paths.New("testdata", "hardware"))
+	require.Len(t, errs, 0)
 	buildPath1 := paths.New("testdata", "build_path_1")
 	logrus.SetLevel(logrus.TraceLevel)
 	type test struct {

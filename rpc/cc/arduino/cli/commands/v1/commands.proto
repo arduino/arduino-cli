@@ -19,6 +19,8 @@ package cc.arduino.cli.commands.v1;
 
 option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
+import "google/rpc/status.proto";
+
 import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/board.proto";
 import "cc/arduino/cli/commands/v1/compile.proto";
@@ -31,14 +33,15 @@ service ArduinoCoreService {
   // BOOTSTRAP COMMANDS
   //-------------------
 
-  // Start a new instance of the Arduino Core Service
+  // Create a new Arduino Core instance
+  rpc Create(CreateRequest) returns (CreateResponse) {}
+
+  // Initializes an existing Arduino Core instance by loading platforms and
+  // libraries
   rpc Init(InitRequest) returns (stream InitResponse) {}
 
   // Destroy an instance of the Arduino Core Service
   rpc Destroy(DestroyRequest) returns (DestroyResponse) {}
-
-  // Rescan instance of the Arduino Core Service
-  rpc Rescan(RescanRequest) returns (RescanResponse) {}
 
   // Update package index of the Arduino Core Service
   rpc UpdateIndex(UpdateIndexRequest) returns (stream UpdateIndexResponse) {}
@@ -169,25 +172,29 @@ service ArduinoCoreService {
   rpc LibraryList(LibraryListRequest) returns (LibraryListResponse);
 }
 
+message CreateRequest {}
+
+message CreateResponse {
+  // An Arduino Core instance.
+  Instance instance = 1;
+}
+
 message InitRequest {
-  // Start a Arduino Core Service instance that will provide only Library
-  // Manager functionality.
-  bool library_manager_only = 2;
+  // An Arduino Core instance.
+  Instance instance = 1;
 }
 
 message InitResponse {
-  // An Arduino Core Service instance.
-  Instance instance = 1;
-  // Error messages related to any problems encountered while parsing the
-  // platforms index files.
-  repeated string platforms_index_errors = 2;
-  // Error message if a problem was encountered while parsing the libraries
-  // index file.
-  string libraries_index_error = 3;
-  // Progress of the downloads of platforms and libraries index files.
-  DownloadProgress download_progress = 4;
-  // Describes the current stage of the initialization.
-  TaskProgress task_progress = 5;
+  message Progress {
+    // Progress of the downloads of platforms and libraries index files.
+    DownloadProgress download_progress = 1;
+    // Describes the current stage of the initialization.
+    TaskProgress task_progress = 2;
+  }
+  oneof message {
+    Progress init_progress = 1;
+    google.rpc.Status error = 2;
+  }
 }
 
 message DestroyRequest {
@@ -196,20 +203,6 @@ message DestroyRequest {
 }
 
 message DestroyResponse {}
-
-message RescanRequest {
-  // Arduino Core Service instance from the Init response.
-  Instance instance = 1;
-}
-
-message RescanResponse {
-  // Error messages related to any problems encountered while parsing the
-  // platforms index file.
-  repeated string platforms_index_errors = 1;
-  // Error message if a problem was encountered while parsing the libraries
-  // index file.
-  string libraries_index_error = 2;
-}
 
 message UpdateIndexRequest {
   // Arduino Core Service instance from the Init response.

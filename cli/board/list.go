@@ -57,11 +57,7 @@ var listFlags struct {
 // runListCommand detects and lists the connected arduino boards
 func runListCommand(cmd *cobra.Command, args []string) {
 	if listFlags.watch {
-		inst, err := instance.CreateInstance()
-		if err != nil {
-			feedback.Errorf("Error detecting boards: %v", err)
-			os.Exit(errorcodes.ErrGeneric)
-		}
+		inst := instance.CreateAndInit()
 		watchList(cmd, inst)
 		os.Exit(0)
 	}
@@ -73,12 +69,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		time.Sleep(timeout)
 	}
 
-	inst, err := instance.CreateInstance()
-	if err != nil {
-		feedback.Errorf("Error detecting boards: %v", err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
+	inst := instance.CreateAndInit()
 	ports, err := board.List(inst.GetId())
 	if err != nil {
 		feedback.Errorf("Error detecting boards: %v", err)

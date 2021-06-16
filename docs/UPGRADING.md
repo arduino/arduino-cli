@@ -4,6 +4,102 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## Unreleased
 
+### Change of behaviour of gRPC `Init` function
+
+Previously the `Init` function was used to both create a new `CoreInstance` and initialize it, so that the internal
+package and library managers were already populated with all the information available from `*_index.json` files,
+installed platforms and libraries and so on.
+
+Now the initialization phase is split into two, first the client must create a new `CoreInstance` with the `Create`
+function, that does mainly two things:
+
+- create all folders necessary to correctly run the CLI if not already existing
+- create and return a new `CoreInstance`
+
+The `Create` function will only fail if folders creation is not successful.
+
+The returned instance is relatively unusable since no library and no platform is loaded, some functions that don't need
+that information can still be called though.
+
+The `Init` function has been greatly overhauled and it doesn't fail completely if one or more platforms or libraries
+fail to load now.
+
+Also the option `library_manager_only` has been removed, the package manager is always initialized and platforms are
+loaded.
+
+The `Init` was already a server-side streaming function but it would always return one and only one response, this has
+been modified so that each response is either an error or a notification on the initialization process so that it works
+more like an actual stream of information.
+
+Previously a client would call the function like so:
+
+```typescript
+const initReq = new InitRequest()
+initReq.setLibraryManagerOnly(false)
+const initResp = await new Promise<InitResponse>((resolve, reject) => {
+  let resp: InitResponse | undefined = undefined
+  const stream = client.init(initReq)
+  stream.on("data", (data: InitResponse) => (resp = data))
+  stream.on("end", () => resolve(resp!))
+  stream.on("error", (err) => reject(err))
+})
+
+const instance = initResp.getInstance()
+if (!instance) {
+  throw new Error("Could not retrieve instance from the initialize response.")
+}
+```
+
+Now something similar should be done.
+
+```typescript
+const createReq = new CreateRequest()
+const instance = client.create(createReq)
+
+if (!instance) {
+  throw new Error("Could not retrieve instance from the initialize response.")
+}
+
+const initReq = new InitRequest()
+initReq.setInstance(instance)
+const initResp = client.init(initReq)
+initResp.on("data", (o: InitResponse) => {
+  const downloadProgress = o.getDownloadProgress()
+  if (downloadProgress) {
+    // Handle download progress
+  }
+  const taskProgress = o.getTaskProgress()
+  if (taskProgress) {
+    // Handle task progress
+  }
+  const err = o.getError()
+  if (err) {
+    // Handle error
+  }
+})
+
+await new Promise<void>((resolve, reject) => {
+  initResp.on("error", (err) => reject(err))
+  initResp.on("end", resolve)
+})
+```
+
+Previously if even one platform or library failed to load everything else would fail too, that doesn't happen anymore.
+Now it's easier for both the CLI and the gRPC clients to handle gracefully platforms or libraries updates that might
+break the initialization step and make everything unusable.
+
+### Removal of gRPC `Rescan` function
+
+The `Rescan` function has been removed, in its place the `Init` function must be used.
+
+### Change of behaviour of gRPC `UpdateIndex` and `UpdateLibrariesIndex` functions
+
+Previously both `UpdateIndex` and `UpdateLibrariesIndex` functions implicitly called `Rescan` so that the internal
+`CoreInstance` was updated with the eventual new information obtained in the update.
+
+This behaviour is now removed and the internal `CoreInstance` must be explicitly updated by the gRPC client using the
+`Init` function.
+
 ### Removed rarely used golang API
 
 The following function from the `github.com/arduino/arduino-cli/arduino/libraries` module is no longer available:

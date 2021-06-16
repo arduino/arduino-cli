@@ -43,7 +43,7 @@ func initDownloadCommand() *cobra.Command {
 }
 
 func runDownloadCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateInstanceIgnorePlatformIndexErrors()
+	instance := instance.CreateAndInit()
 	refs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
 	if err != nil {
 		feedback.Errorf("Invalid argument passed: %v", err)
