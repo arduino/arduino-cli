@@ -287,6 +287,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#change-of-behaviour-of-grpc-init-function" class="md-nav__link">
+    Change of behaviour of gRPC Init function
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removal-of-grpc-rescan-function" class="md-nav__link">
+    Removal of gRPC Rescan function
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#change-of-behaviour-of-grpc-updateindex-and-updatelibrariesindex-functions" class="md-nav__link">
+    Change of behaviour of gRPC UpdateIndex and UpdateLibrariesIndex functions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#removed-rarely-used-golang-api" class="md-nav__link">
     Removed rarely used golang API
   </a>
@@ -1240,6 +1261,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#change-of-behaviour-of-grpc-init-function" class="md-nav__link">
+    Change of behaviour of gRPC Init function
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removal-of-grpc-rescan-function" class="md-nav__link">
+    Removal of gRPC Rescan function
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#change-of-behaviour-of-grpc-updateindex-and-updatelibrariesindex-functions" class="md-nav__link">
+    Change of behaviour of gRPC UpdateIndex and UpdateLibrariesIndex functions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#removed-rarely-used-golang-api" class="md-nav__link">
     Removed rarely used golang API
   </a>
@@ -1393,6 +1435,83 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="change-of-behaviour-of-grpc-init-function">Change of behaviour of gRPC <code>Init</code> function<a class="headerlink" href="#change-of-behaviour-of-grpc-init-function" title="Permanent link">&para;</a></h3>
+<p>Previously the <code>Init</code> function was used to both create a new <code>CoreInstance</code> and initialize it, so that the internal
+package and library managers were already populated with all the information available from <code>*_index.json</code> files,
+installed platforms and libraries and so on.</p>
+<p>Now the initialization phase is split into two, first the client must create a new <code>CoreInstance</code> with the <code>Create</code>
+function, that does mainly two things:</p>
+<ul>
+<li>create all folders necessary to correctly run the CLI if not already existing</li>
+<li>create and return a new <code>CoreInstance</code></li>
+</ul>
+<p>The <code>Create</code> function will only fail if folders creation is not successful.</p>
+<p>The returned instance is relatively unusable since no library and no platform is loaded, some functions that don't need
+that information can still be called though.</p>
+<p>The <code>Init</code> function has been greatly overhauled and it doesn't fail completely if one or more platforms or libraries
+fail to load now.</p>
+<p>Also the option <code>library_manager_only</code> has been removed, the package manager is always initialized and platforms are
+loaded.</p>
+<p>The <code>Init</code> was already a server-side streaming function but it would always return one and only one response, this has
+been modified so that each response is either an error or a notification on the initialization process so that it works
+more like an actual stream of information.</p>
+<p>Previously a client would call the function like so:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">initReq</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InitRequest</span><span class="p">()</span>
+<span class="nx">initReq</span><span class="p">.</span><span class="nx">setLibraryManagerOnly</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">initResp</span> <span class="o">=</span> <span class="k">await</span> <span class="k">new</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="nx">InitResponse</span><span class="o">&gt;</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">resp</span>: <span class="kt">InitResponse</span> <span class="o">|</span> <span class="kc">undefined</span> <span class="o">=</span> <span class="kc">undefined</span>
+  <span class="kd">const</span> <span class="nx">stream</span> <span class="o">=</span> <span class="nx">client</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="nx">initReq</span><span class="p">)</span>
+  <span class="nx">stream</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span>: <span class="kt">InitResponse</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">resp</span> <span class="o">=</span> <span class="nx">data</span><span class="p">))</span>
+  <span class="nx">stream</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">resolve</span><span class="p">(</span><span class="nx">resp</span><span class="o">!</span><span class="p">))</span>
+  <span class="nx">stream</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">reject</span><span class="p">(</span><span class="nx">err</span><span class="p">))</span>
+<span class="p">})</span>
+
+<span class="kd">const</span> <span class="nx">instance</span> <span class="o">=</span> <span class="nx">initResp</span><span class="p">.</span><span class="nx">getInstance</span><span class="p">()</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">instance</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;Could not retrieve instance from the initialize response.&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Now something similar should be done.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">const</span> <span class="nx">createReq</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CreateRequest</span><span class="p">()</span>
+<span class="kd">const</span> <span class="nx">instance</span> <span class="o">=</span> <span class="nx">client</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">createReq</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">instance</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;Could not retrieve instance from the initialize response.&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">initReq</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InitRequest</span><span class="p">()</span>
+<span class="nx">initReq</span><span class="p">.</span><span class="nx">setInstance</span><span class="p">(</span><span class="nx">instance</span><span class="p">)</span>
+<span class="kd">const</span> <span class="nx">initResp</span> <span class="o">=</span> <span class="nx">client</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="nx">initReq</span><span class="p">)</span>
+<span class="nx">initResp</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nx">o</span>: <span class="kt">InitResponse</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">downloadProgress</span> <span class="o">=</span> <span class="nx">o</span><span class="p">.</span><span class="nx">getDownloadProgress</span><span class="p">()</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">downloadProgress</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Handle download progress</span>
+  <span class="p">}</span>
+  <span class="kd">const</span> <span class="nx">taskProgress</span> <span class="o">=</span> <span class="nx">o</span><span class="p">.</span><span class="nx">getTaskProgress</span><span class="p">()</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">taskProgress</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Handle task progress</span>
+  <span class="p">}</span>
+  <span class="kd">const</span> <span class="nx">err</span> <span class="o">=</span> <span class="nx">o</span><span class="p">.</span><span class="nx">getError</span><span class="p">()</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Handle error</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="k">await</span> <span class="k">new</span> <span class="nx">Promise</span><span class="o">&lt;</span><span class="k">void</span><span class="o">&gt;</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">initResp</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">reject</span><span class="p">(</span><span class="nx">err</span><span class="p">))</span>
+  <span class="nx">initResp</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="nx">resolve</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div>
+<p>Previously if even one platform or library failed to load everything else would fail too, that doesn't happen anymore.
+Now it's easier for both the CLI and the gRPC clients to handle gracefully platforms or libraries updates that might
+break the initialization step and make everything unusable.</p>
+<h3 id="removal-of-grpc-rescan-function">Removal of gRPC <code>Rescan</code> function<a class="headerlink" href="#removal-of-grpc-rescan-function" title="Permanent link">&para;</a></h3>
+<p>The <code>Rescan</code> function has been removed, in its place the <code>Init</code> function must be used.</p>
+<h3 id="change-of-behaviour-of-grpc-updateindex-and-updatelibrariesindex-functions">Change of behaviour of gRPC <code>UpdateIndex</code> and <code>UpdateLibrariesIndex</code> functions<a class="headerlink" href="#change-of-behaviour-of-grpc-updateindex-and-updatelibrariesindex-functions" title="Permanent link">&para;</a></h3>
+<p>Previously both <code>UpdateIndex</code> and <code>UpdateLibrariesIndex</code> functions implicitly called <code>Rescan</code> so that the internal
+<code>CoreInstance</code> was updated with the eventual new information obtained in the update.</p>
+<p>This behaviour is now removed and the internal <code>CoreInstance</code> must be explicitly updated by the gRPC client using the
+<code>Init</code> function.</p>
 <h3 id="removed-rarely-used-golang-api">Removed rarely used golang API<a class="headerlink" href="#removed-rarely-used-golang-api" title="Permanent link">&para;</a></h3>
 <p>The following function from the <code>github.com/arduino/arduino-cli/arduino/libraries</code> module is no longer available:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="p">(</span><span class="nx">lm</span> <span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span> <span class="nx">UpdateIndex</span><span class="p">(</span><span class="nx">config</span> <span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Downloader</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>

@@ -1139,6 +1139,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#createrequest" class="md-nav__link">
+    CreateRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#createresponse" class="md-nav__link">
+    CreateResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#destroyrequest" class="md-nav__link">
     DestroyRequest
   </a>
@@ -1167,6 +1181,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#initresponseprogress" class="md-nav__link">
+    InitResponse.Progress
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#loadsketchrequest" class="md-nav__link">
     LoadSketchRequest
   </a>
@@ -1190,20 +1211,6 @@
           <li class="md-nav__item">
   <a href="#outdatedresponse" class="md-nav__link">
     OutdatedResponse
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rescanrequest" class="md-nav__link">
-    RescanRequest
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rescanresponse" class="md-nav__link">
-    RescanResponse
   </a>
   
 </li>
@@ -2156,6 +2163,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#createrequest" class="md-nav__link">
+    CreateRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#createresponse" class="md-nav__link">
+    CreateResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#destroyrequest" class="md-nav__link">
     DestroyRequest
   </a>
@@ -2184,6 +2205,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#initresponseprogress" class="md-nav__link">
+    InitResponse.Progress
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#loadsketchrequest" class="md-nav__link">
     LoadSketchRequest
   </a>
@@ -2207,20 +2235,6 @@
           <li class="md-nav__item">
   <a href="#outdatedresponse" class="md-nav__link">
     OutdatedResponse
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rescanrequest" class="md-nav__link">
-    RescanRequest
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rescanresponse" class="md-nav__link">
-    RescanResponse
   </a>
   
 </li>
@@ -2869,16 +2883,17 @@
 <ul>
 <li><a href="#cc.arduino.cli.commands.v1.ArchiveSketchRequest">ArchiveSketchRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.ArchiveSketchResponse">ArchiveSketchResponse</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.CreateRequest">CreateRequest</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.CreateResponse">CreateResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.DestroyRequest">DestroyRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.DestroyResponse">DestroyResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.InitRequest">InitRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.InitResponse">InitResponse</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.InitResponse.Progress">InitResponse.Progress</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.LoadSketchRequest">LoadSketchRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.LoadSketchResponse">LoadSketchResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.OutdatedRequest">OutdatedRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.OutdatedResponse">OutdatedResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.RescanRequest">RescanRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.RescanResponse">RescanResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndexRequest">UpdateCoreLibrariesIndexRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndexResponse">UpdateCoreLibrariesIndexResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.UpdateIndexRequest">UpdateIndexRequest</a></li>
@@ -3834,6 +3849,28 @@
 </table>
 <p><a name="cc.arduino.cli.commands.v1.ArchiveSketchResponse"></a></p>
 <h3 id="archivesketchresponse">ArchiveSketchResponse<a class="headerlink" href="#archivesketchresponse" title="Permanent link">&para;</a></h3>
+<p><a name="cc.arduino.cli.commands.v1.CreateRequest"></a></p>
+<h3 id="createrequest">CreateRequest<a class="headerlink" href="#createrequest" title="Permanent link">&para;</a></h3>
+<p><a name="cc.arduino.cli.commands.v1.CreateResponse"></a></p>
+<h3 id="createresponse">CreateResponse<a class="headerlink" href="#createresponse" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
+<td></td>
+<td>An Arduino Core instance.</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.DestroyRequest"></a></p>
 <h3 id="destroyrequest">DestroyRequest<a class="headerlink" href="#destroyrequest" title="Permanent link">&para;</a></h3>
 <table>
@@ -3869,10 +3906,10 @@
 </thead>
 <tbody>
 <tr>
-<td>library_manager_only</td>
-<td><a href="#bool">bool</a></td>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
 <td></td>
-<td>Start a Arduino Core Service instance that will provide only Library Manager functionality.</td>
+<td>An Arduino Core instance.</td>
 </tr>
 </tbody>
 </table>
@@ -3889,23 +3926,31 @@
 </thead>
 <tbody>
 <tr>
-<td>instance</td>
-<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
+<td>init_progress</td>
+<td><a href="#cc.arduino.cli.commands.v1.InitResponse.Progress">InitResponse.Progress</a></td>
 <td></td>
-<td>An Arduino Core Service instance.</td>
+<td></td>
 </tr>
 <tr>
-<td>platforms_index_errors</td>
-<td><a href="#string">string</a></td>
-<td>repeated</td>
-<td>Error messages related to any problems encountered while parsing the platforms index files.</td>
-</tr>
-<tr>
-<td>libraries_index_error</td>
-<td><a href="#string">string</a></td>
+<td>error</td>
+<td><a href="#google.rpc.Status">google.rpc.Status</a></td>
 <td></td>
-<td>Error message if a problem was encountered while parsing the libraries index file.</td>
+<td></td>
 </tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.InitResponse.Progress"></a></p>
+<h3 id="initresponseprogress">InitResponse.Progress<a class="headerlink" href="#initresponseprogress" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td>download_progress</td>
 <td><a href="#cc.arduino.cli.commands.v1.DownloadProgress">DownloadProgress</a></td>
@@ -4033,52 +4078,6 @@
 <td><a href="#cc.arduino.cli.commands.v1.Platform">Platform</a></td>
 <td>repeated</td>
 <td>List of installed cores that can be updated.</td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.v1.RescanRequest"></a></p>
-<h3 id="rescanrequest">RescanRequest<a class="headerlink" href="#rescanrequest" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>instance</td>
-<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
-<td></td>
-<td>Arduino Core Service instance from the Init response.</td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.v1.RescanResponse"></a></p>
-<h3 id="rescanresponse">RescanResponse<a class="headerlink" href="#rescanresponse" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>platforms_index_errors</td>
-<td><a href="#string">string</a></td>
-<td>repeated</td>
-<td>Error messages related to any problems encountered while parsing the platforms index file.</td>
-</tr>
-<tr>
-<td>libraries_index_error</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>Error message if a problem was encountered while parsing the libraries index file.</td>
 </tr>
 </tbody>
 </table>
@@ -4291,22 +4290,22 @@
 </thead>
 <tbody>
 <tr>
+<td>Create</td>
+<td><a href="#cc.arduino.cli.commands.v1.CreateRequest">CreateRequest</a></td>
+<td><a href="#cc.arduino.cli.commands.v1.CreateResponse">CreateResponse</a></td>
+<td>Create a new Arduino Core instance</td>
+</tr>
+<tr>
 <td>Init</td>
 <td><a href="#cc.arduino.cli.commands.v1.InitRequest">InitRequest</a></td>
 <td><a href="#cc.arduino.cli.commands.v1.InitResponse">InitResponse</a> stream</td>
-<td>Start a new instance of the Arduino Core Service</td>
+<td>Initializes an existing Arduino Core instance by loading platforms and libraries</td>
 </tr>
 <tr>
 <td>Destroy</td>
 <td><a href="#cc.arduino.cli.commands.v1.DestroyRequest">DestroyRequest</a></td>
 <td><a href="#cc.arduino.cli.commands.v1.DestroyResponse">DestroyResponse</a></td>
 <td>Destroy an instance of the Arduino Core Service</td>
-</tr>
-<tr>
-<td>Rescan</td>
-<td><a href="#cc.arduino.cli.commands.v1.RescanRequest">RescanRequest</a></td>
-<td><a href="#cc.arduino.cli.commands.v1.RescanResponse">RescanResponse</a></td>
-<td>Rescan instance of the Arduino Core Service</td>
 </tr>
 <tr>
 <td>UpdateIndex</td>
