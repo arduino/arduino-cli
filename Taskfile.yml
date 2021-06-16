@@ -86,10 +86,10 @@ tasks:
   protoc:compile:
     desc: Compile protobuf definitions
     cmds:
-      - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/cc/arduino/cli/commands/v1/*.proto'
-      - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/cc/arduino/cli/monitor/v1/*.proto'
-      - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/cc/arduino/cli/settings/v1/*.proto'
-      - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=plugins=grpc,paths=source_relative:rpc ./rpc/cc/arduino/cli/debug/v1/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=./rpc --go_opt=paths=source_relative --go-grpc_out=./rpc --go-grpc_opt=paths=source_relative ./rpc/cc/arduino/cli/commands/v1/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=./rpc --go_opt=paths=source_relative --go-grpc_out=./rpc --go-grpc_opt=paths=source_relative ./rpc/cc/arduino/cli/monitor/v1/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=./rpc --go_opt=paths=source_relative --go-grpc_out=./rpc --go-grpc_opt=paths=source_relative ./rpc/cc/arduino/cli/settings/v1/*.proto'
+      - '{{ default "protoc" .PROTOC_BINARY }} --proto_path=rpc --go_out=./rpc --go_opt=paths=source_relative --go-grpc_out=./rpc --go-grpc_opt=paths=source_relative ./rpc/cc/arduino/cli/debug/v1/*.proto'
 
   protoc:docs:
     desc: Generate docs for protobuf definitions

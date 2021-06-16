@@ -25,11 +25,11 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v2
         with:
-          go-version: "1.14"
+          go-version: "1.16"
 
       - name: Installs Go dependencies
         shell: bash
-        run: go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
+        run: go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.4.1
 
       - name: Install protoc compiler
         uses: arduino/setup-protoc@v1
