@@ -320,7 +320,14 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 	}
 
 	if platform.Platform.Name == "" {
-		platform.Platform.Name = platform.Properties.Get("name")
+		if name, ok := platform.Properties.GetOk("name"); ok {
+			platform.Platform.Name = name
+		} else {
+			// If the platform.txt file doesn't exist for this platform and it's not in any
+			// package index there is no way of retrieving its name, so we build one using
+			// the available information, that is the packager name and the architecture.
+			platform.Platform.Name = fmt.Sprintf("%s-%s", platform.Platform.Package.Name, platform.Platform.Architecture)
+		}
 	}
 
 	// Create programmers properties
