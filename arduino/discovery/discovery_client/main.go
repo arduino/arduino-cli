@@ -37,6 +37,9 @@ func main() {
 			log.Fatal("Error initializing discovery:", err)
 		}
 
+		if err := disc.Hello(); err != nil {
+			log.Fatal("Error starting discovery:", err)
+		}
 		if err := disc.Start(); err != nil {
 			log.Fatal("Error starting discovery:", err)
 		}

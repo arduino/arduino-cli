@@ -103,7 +103,7 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 
 func identifyViaCloudAPI(port *commands.BoardPort) ([]*rpc.BoardListItem, error) {
 	// If the port is not USB do not try identification via cloud
-	id := port.IdentificationPrefs
+	id := port.Properties
 	if !id.ContainsKey("vid") || !id.ContainsKey("pid") {
 		return nil, ErrNotFound
 	}
@@ -118,7 +118,7 @@ func identify(pm *packagemanager.PackageManager, port *commands.BoardPort) ([]*r
 
 	// first query installed cores through the Package Manager
 	logrus.Debug("Querying installed cores for board identification...")
-	for _, board := range pm.IdentifyBoard(port.IdentificationPrefs) {
+	for _, board := range pm.IdentifyBoard(port.Properties) {
 		// We need the Platform maintaner for sorting so we set it here
 		platform := &rpc.Platform{
 			Maintainer: board.PlatformRelease.Platform.Package.Maintainer,
@@ -127,8 +127,8 @@ func identify(pm *packagemanager.PackageManager, port *commands.BoardPort) ([]*r
 			Name:     board.Name(),
 			Fqbn:     board.FQBN(),
 			Platform: platform,
-			Vid:      port.IdentificationPrefs.Get("vid"),
-			Pid:      port.IdentificationPrefs.Get("pid"),
+			Vid:      port.Properties.Get("vid"),
+			Pid:      port.Properties.Get("pid"),
 		})
 	}
 
@@ -211,7 +211,7 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 			Protocol:      port.Protocol,
 			ProtocolLabel: port.ProtocolLabel,
 			Boards:        boards,
-			SerialNumber:  port.Prefs.Get("serialNumber"),
+			SerialNumber:  port.Properties.Get("serialNumber"),
 		}
 		retVal = append(retVal, p)
 	}
@@ -237,12 +237,11 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 				boardsError := ""
 				if event.Type == "add" {
 					boards, err = identify(pm, &commands.BoardPort{
-						Address:             event.Port.Address,
-						Label:               event.Port.AddressLabel,
-						Prefs:               event.Port.Properties,
-						IdentificationPrefs: event.Port.IdentificationProperties,
-						Protocol:            event.Port.Protocol,
-						ProtocolLabel:       event.Port.ProtocolLabel,
+						Address:       event.Port.Address,
+						Label:         event.Port.AddressLabel,
+						Properties:    event.Port.Properties,
+						Protocol:      event.Port.Protocol,
+						ProtocolLabel: event.Port.ProtocolLabel,
 					})
 					if err != nil {
 						boardsError = err.Error()
