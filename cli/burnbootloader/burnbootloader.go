@@ -41,7 +41,7 @@ func NewCommand() *cobra.Command {
 		Use:     "burn-bootloader",
 		Short:   "Upload the bootloader.",
 		Long:    "Upload the bootloader on the board using an external programmer.",
-		Example: "  " + os.Args[0] + " burn-bootloader -b arduino:avr:uno -P atmel-ice",
+		Example: "  " + os.Args[0] + " burn-bootloader -b arduino:avr:uno -P atmel_ice",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}
