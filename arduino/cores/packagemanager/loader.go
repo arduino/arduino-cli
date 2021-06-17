@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/configuration"
@@ -250,8 +251,7 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPat
 			pm.Log.Infof("Package is built-in")
 		}
 		if err := pm.loadPlatformRelease(release, platformPath); err != nil {
-			return status.Newf(codes.FailedPrecondition, "loading platform release: %s", err)
-
+			return status.Newf(codes.FailedPrecondition, "loading platform release %s: %s", release, err)
 		}
 		pm.Log.WithField("platform", release).Infof("Loaded platform")
 
@@ -279,7 +279,7 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPat
 			}
 			release := platform.GetOrCreateRelease(version)
 			if err := pm.loadPlatformRelease(release, versionDir); err != nil {
-				return status.Newf(codes.FailedPrecondition, "loading platform release: %s", err)
+				return status.Newf(codes.FailedPrecondition, "loading platform release %s: %s", release, err)
 			}
 			pm.Log.WithField("platform", release).Infof("Loaded platform")
 		}
@@ -341,7 +341,7 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 	}
 
 	if err := pm.loadBoards(platform); err != nil {
-		return err
+		return fmt.Errorf("loading boards: %s", err)
 	}
 
 	return nil
@@ -374,14 +374,39 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 
 	propertiesByBoard := boardsProperties.FirstLevelOf()
 
-	platform.Menus = propertiesByBoard["menu"]
+	if menus, ok := propertiesByBoard["menu"]; ok {
+		platform.Menus = menus
+	} else {
+		platform.Menus = properties.NewMap()
+	}
 
-	delete(propertiesByBoard, "menu") // TODO: check this one
+	// This is not a board id so we remove it to correctly
+	// set all other boards properties
+	delete(propertiesByBoard, "menu")
 
+	skippedBoards := []string{}
 	for boardID, boardProperties := range propertiesByBoard {
-		boardProperties.Set("_id", boardID) // TODO: What is that for??
-		board := platform.GetOrCreateBoard(boardID)
+		var board *cores.Board
+		for _, key := range boardProperties.FirstLevelKeys() {
+			if key == "menu" && platform.Menus.Size() == 0 {
+				fqbn := fmt.Sprintf("%s:%s:%s", platform.Platform.Package.Name, platform.Platform.Architecture, boardID)
+				skippedBoards = append(skippedBoards, fqbn)
+				goto next_board
+			}
+		}
+		// The board's ID must be available in a board's properties since it can
+		// be used in all configuration files for several reasons, like settings compilation
+		// flags depending on the board id.
+		// For more info:
+		// https://arduino.github.io/arduino-cli/latest/platform-specification/#global-predefined-properties
+		boardProperties.Set("_id", boardID)
+		board = platform.GetOrCreateBoard(boardID)
 		board.Properties.Merge(boardProperties)
+	next_board:
+	}
+
+	if len(skippedBoards) > 0 {
+		return fmt.Errorf("skip loading of boards %s: malformed custom board options", strings.Join(skippedBoards, ", "))
 	}
 
 	return nil

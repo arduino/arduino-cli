@@ -839,8 +839,9 @@ custom menu we are going to create and must be declared at the beginning of the 
     menu.cpu=Processor
     [.....]
 
-in this case, the menu name is "Processor".<br> Now let's add, always in the boards.txt file, the default configuration
-(common to all processors) for the duemilanove board:
+in this case, the menu name is "Processor". This step is really important, if a board defines an option but the name of
+that option is not defined the board won't be loaded. <br> Now let's add, always in the boards.txt file, the default
+configuration (common to all processors) for the duemilanove board:
 
     menu.cpu=Processor
     [.....]
