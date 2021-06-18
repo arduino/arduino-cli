@@ -1728,6 +1728,33 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ccarduinoclicommandsv1portproto" class="md-nav__link">
+    cc/arduino/cli/commands/v1/port.proto
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#port" class="md-nav__link">
+    Port
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#portpropertiesentry" class="md-nav__link">
+    Port.PropertiesEntry
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ccarduinoclicommandsv1uploadproto" class="md-nav__link">
     cc/arduino/cli/commands/v1/upload.proto
   </a>
@@ -2752,6 +2779,33 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ccarduinoclicommandsv1portproto" class="md-nav__link">
+    cc/arduino/cli/commands/v1/port.proto
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#port" class="md-nav__link">
+    Port
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#portpropertiesentry" class="md-nav__link">
+    Port.PropertiesEntry
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ccarduinoclicommandsv1uploadproto" class="md-nav__link">
     cc/arduino/cli/commands/v1/upload.proto
   </a>
@@ -2990,6 +3044,15 @@
 <li><a href="#cc.arduino.cli.commands.v1.LibraryLayout">LibraryLayout</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.LibraryLocation">LibraryLocation</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.LibrarySearchStatus">LibrarySearchStatus</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>
+<p><a href="#cc/arduino/cli/commands/v1/port.proto">cc/arduino/cli/commands/v1/port.proto</a></p>
+<ul>
+<li><a href="#cc.arduino.cli.commands.v1.Port">Port</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.Port.PropertiesEntry">Port.PropertiesEntry</a></li>
 </ul>
 </li>
 </ul>
@@ -6414,6 +6477,81 @@
 <td>LIBRARY_SEARCH_STATUS_SUCCESS</td>
 <td>1</td>
 <td>Search results were found.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc/arduino/cli/commands/v1/port.proto"></a></p>
+<p align="right"><a href="#top">Top</a></p>
+
+<h2 id="ccarduinoclicommandsv1portproto">cc/arduino/cli/commands/v1/port.proto<a class="headerlink" href="#ccarduinoclicommandsv1portproto" title="Permanent link">&para;</a></h2>
+<p><a name="cc.arduino.cli.commands.v1.Port"></a></p>
+<h3 id="port">Port<a class="headerlink" href="#port" title="Permanent link">&para;</a></h3>
+<p>Port represents a board port that may be used to upload or to monitor a board</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>address</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Address of the port (e.g., <code>/dev/ttyACM0</code>).</td>
+</tr>
+<tr>
+<td>label</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The port label to show on the GUI (e.g. &#34;ttyACM0&#34;)</td>
+</tr>
+<tr>
+<td>protocol</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Protocol of the port (e.g., <code>serial</code>, <code>network</code>, ...).</td>
+</tr>
+<tr>
+<td>protocol_label</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>A human friendly description of the protocol (e.g., &#34;Serial Port (USB)&#34;).</td>
+</tr>
+<tr>
+<td>properties</td>
+<td><a href="#cc.arduino.cli.commands.v1.Port.PropertiesEntry">Port.PropertiesEntry</a></td>
+<td>repeated</td>
+<td>A set of properties of the port</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.Port.PropertiesEntry"></a></p>
+<h3 id="portpropertiesentry">Port.PropertiesEntry<a class="headerlink" href="#portpropertiesentry" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>key</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>value</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
