@@ -60,3 +60,4 @@ altra.build.core=arduino
 altra.build.variant=standard
 altra.menu.cpu.atmega328=ATmega328P
 altra.menu.cpu.atmega168=ATmega168
+altra.menufoo=bar

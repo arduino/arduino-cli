@@ -388,7 +388,7 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 	for boardID, boardProperties := range propertiesByBoard {
 		var board *cores.Board
 		for key := range boardProperties.AsMap() {
-			if !strings.HasPrefix(key, "menu") {
+			if !strings.HasPrefix(key, "menu.") {
 				continue
 			}
 			// Menu keys are formed like this:
