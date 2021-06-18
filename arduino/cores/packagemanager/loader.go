@@ -387,8 +387,16 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 	skippedBoards := []string{}
 	for boardID, boardProperties := range propertiesByBoard {
 		var board *cores.Board
-		for _, key := range boardProperties.FirstLevelKeys() {
-			if key == "menu" && platform.Menus.Size() == 0 {
+		for key := range boardProperties.AsMap() {
+			if !strings.HasPrefix(key, "menu") {
+				continue
+			}
+			// Menu keys are formed like this:
+			//     menu.cache.off=false
+			//     menu.cache.on=true
+			// so we assume that the a second element in the slice exists
+			menuName := strings.Split(key, ".")[1]
+			if !platform.Menus.ContainsKey(menuName) {
 				fqbn := fmt.Sprintf("%s:%s:%s", platform.Platform.Package.Name, platform.Platform.Architecture, boardID)
 				skippedBoards = append(skippedBoards, fqbn)
 				goto next_board

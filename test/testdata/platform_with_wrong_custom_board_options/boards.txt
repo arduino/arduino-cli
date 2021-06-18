@@ -1,3 +1,5 @@
+menu.cpu=Processor
+
 nessuno.name=Arduino Nessuno
 nessuno.vid.0=0x2341
 nessuno.pid.0=0x0043
@@ -56,3 +58,5 @@ altra.build.f_cpu=16000000L
 altra.build.board=AVR_ALTRA
 altra.build.core=arduino
 altra.build.variant=standard
+altra.menu.cpu.atmega328=ATmega328P
+altra.menu.cpu.atmega168=ATmega168
