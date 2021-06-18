@@ -260,7 +260,7 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 					Error: boardsError,
 				}
 			case <-interrupt:
-				break
+				return
 			}
 		}
 	}()
