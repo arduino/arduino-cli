@@ -1,3 +1,5 @@
+menu.cpu=Processor
+
 custom_yun.name=Arduino Yún
 custom_yun.upload.via_ssh=true
 
