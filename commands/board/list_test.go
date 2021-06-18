@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -106,7 +106,7 @@ func TestGetByVidPidMalformedResponse(t *testing.T) {
 }
 
 func TestBoardDetectionViaAPIWithNonUSBPort(t *testing.T) {
-	port := &commands.BoardPort{
+	port := &discovery.Port{
 		Properties: properties.NewMap(),
 	}
 	items, err := identifyViaCloudAPI(port)
@@ -152,7 +152,7 @@ func TestBoardIdentifySorting(t *testing.T) {
 	idPrefs := properties.NewMap()
 	idPrefs.Set("vid", "0x0000")
 	idPrefs.Set("pid", "0x0000")
-	res, err := identify(pm, &commands.BoardPort{Properties: idPrefs})
+	res, err := identify(pm, &discovery.Port{Properties: idPrefs})
 	require.NoError(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res, 4)

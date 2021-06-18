@@ -26,6 +26,7 @@ import (
 	"sync"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/httpclient"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -101,7 +102,7 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	return retVal, nil
 }
 
-func identifyViaCloudAPI(port *commands.BoardPort) ([]*rpc.BoardListItem, error) {
+func identifyViaCloudAPI(port *discovery.Port) ([]*rpc.BoardListItem, error) {
 	// If the port is not USB do not try identification via cloud
 	id := port.Properties
 	if !id.ContainsKey("vid") || !id.ContainsKey("pid") {
@@ -113,7 +114,7 @@ func identifyViaCloudAPI(port *commands.BoardPort) ([]*rpc.BoardListItem, error)
 }
 
 // identify returns a list of boards checking first the installed platforms or the Cloud API
-func identify(pm *packagemanager.PackageManager, port *commands.BoardPort) ([]*rpc.BoardListItem, error) {
+func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.BoardListItem, error) {
 	boards := []*rpc.BoardListItem{}
 
 	// first query installed cores through the Package Manager
@@ -236,13 +237,7 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 				boards := []*rpc.BoardListItem{}
 				boardsError := ""
 				if event.Type == "add" {
-					boards, err = identify(pm, &commands.BoardPort{
-						Address:       event.Port.Address,
-						Label:         event.Port.AddressLabel,
-						Properties:    event.Port.Properties,
-						Protocol:      event.Port.Protocol,
-						ProtocolLabel: event.Port.ProtocolLabel,
-					})
+					boards, err = identify(pm, event.Port)
 					if err != nil {
 						boardsError = err.Error()
 					}
@@ -265,7 +260,7 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 					Error: boardsError,
 				}
 			case <-interrupt:
-				break
+				return
 			}
 		}
 	}()
