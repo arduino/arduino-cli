@@ -709,6 +709,6 @@ def test_core_with_wrong_custom_board_options_is_loaded(run_command, data_dir):
         "Error initializing instance: "
         + "loading platform release arduino-beta-dev:platform_with_wrong_custom_board_options@4.2.0: "
         + "loading boards: "
-        + "skip loading of boards arduino-beta-dev:platform_with_wrong_custom_board_options:nessuno: "
+        + "skipping loading of boards arduino-beta-dev:platform_with_wrong_custom_board_options:nessuno: "
         + "malformed custom board options"
     ) in res.stderr

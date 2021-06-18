@@ -395,10 +395,10 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 			}
 		}
 		// The board's ID must be available in a board's properties since it can
-		// be used in all configuration files for several reasons, like settings compilation
+		// be used in all configuration files for several reasons, like setting compilation
 		// flags depending on the board id.
 		// For more info:
-		// https://arduino.github.io/arduino-cli/latest/platform-specification/#global-predefined-properties
+		// https://arduino.github.io/arduino-cli/dev/platform-specification/#global-predefined-properties
 		boardProperties.Set("_id", boardID)
 		board = platform.GetOrCreateBoard(boardID)
 		board.Properties.Merge(boardProperties)
@@ -406,7 +406,7 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 	}
 
 	if len(skippedBoards) > 0 {
-		return fmt.Errorf("skip loading of boards %s: malformed custom board options", strings.Join(skippedBoards, ", "))
+		return fmt.Errorf("skipping loading of boards %s: malformed custom board options", strings.Join(skippedBoards, ", "))
 	}
 
 	return nil
