@@ -60,5 +60,6 @@ func (pm *PackageManager) IdentifyBoard(idProps *properties.Map) []*cores.Board 
 			id++
 		}
 	}
+
 	return foundBoards
 }

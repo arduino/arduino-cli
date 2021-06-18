@@ -25,11 +25,13 @@ import (
 )
 
 func TestDiscoveryStdioHandling(t *testing.T) {
+	// Build `cat` helper inside testdata/cat
 	builder, err := executils.NewProcess("go", "build")
 	require.NoError(t, err)
 	builder.SetDir("testdata/cat")
 	require.NoError(t, builder.Run())
 
+	// Run cat and test if streaming json works as expected
 	disc, err := New("test", "testdata/cat/cat") // copy stdin to stdout
 	require.NoError(t, err)
 

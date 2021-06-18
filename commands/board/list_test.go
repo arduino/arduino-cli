@@ -107,7 +107,7 @@ func TestGetByVidPidMalformedResponse(t *testing.T) {
 
 func TestBoardDetectionViaAPIWithNonUSBPort(t *testing.T) {
 	port := &commands.BoardPort{
-		IdentificationPrefs: properties.NewMap(),
+		Properties: properties.NewMap(),
 	}
 	items, err := identifyViaCloudAPI(port)
 	require.Equal(t, err, ErrNotFound)
@@ -152,7 +152,7 @@ func TestBoardIdentifySorting(t *testing.T) {
 	idPrefs := properties.NewMap()
 	idPrefs.Set("vid", "0x0000")
 	idPrefs.Set("pid", "0x0000")
-	res, err := identify(pm, &commands.BoardPort{IdentificationPrefs: idPrefs})
+	res, err := identify(pm, &commands.BoardPort{Properties: idPrefs})
 	require.NoError(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res, 4)
