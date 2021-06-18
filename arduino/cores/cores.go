@@ -44,19 +44,20 @@ type PlatformReleaseHelp struct {
 
 // PlatformRelease represents a release of a plaform package.
 type PlatformRelease struct {
-	Resource       *resources.DownloadResource
-	Version        *semver.Version
-	BoardsManifest []*BoardManifest
-	Dependencies   ToolDependencies       // The Dependency entries to load tools.
-	Help           PlatformReleaseHelp    `json:"-"`
-	Platform       *Platform              `json:"-"`
-	Properties     *properties.Map        `json:"-"`
-	Boards         map[string]*Board      `json:"-"`
-	Programmers    map[string]*Programmer `json:"-"`
-	Menus          *properties.Map        `json:"-"`
-	InstallDir     *paths.Path            `json:"-"`
-	IsIDEBundled   bool                   `json:"-"`
-	IsTrusted      bool                   `json:"-"`
+	Resource                *resources.DownloadResource
+	Version                 *semver.Version
+	BoardsManifest          []*BoardManifest
+	Dependencies            ToolDependencies       // The Dependency entries to load tools.
+	Help                    PlatformReleaseHelp    `json:"-"`
+	Platform                *Platform              `json:"-"`
+	Properties              *properties.Map        `json:"-"`
+	Boards                  map[string]*Board      `json:"-"`
+	Programmers             map[string]*Programmer `json:"-"`
+	Menus                   *properties.Map        `json:"-"`
+	InstallDir              *paths.Path            `json:"-"`
+	IsIDEBundled            bool                   `json:"-"`
+	IsTrusted               bool                   `json:"-"`
+	PluggableDiscoveryAware bool                   `json:"-"` // true if the Platform supports pluggable discovery (no compatibility layer required)
 }
 
 // BoardManifest contains information about a board. These metadata are usually

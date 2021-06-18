@@ -139,3 +139,41 @@ func (b *Board) GeneratePropertiesForConfiguration(config string) (*properties.M
 	}
 	return b.GetBuildProperties(fqbn.Configs)
 }
+
+func (b *Board) IsBoardMatchingIdProperties(query *properties.Map) bool {
+	portIdPropsSet := b.Properties.SubTree("upload_port")
+	if portIdPropsSet.Size() == 0 {
+		return false
+	}
+
+	check := func(p *properties.Map) bool {
+		for k, v := range p.AsMap() {
+			if !strings.EqualFold(query.Get(k), v) {
+				return false
+			}
+		}
+		return true
+	}
+
+	idx := 0
+	haveIndexedProperties := false
+	for {
+		idProps := portIdPropsSet.SubTree(fmt.Sprintf("%d", idx))
+		idx++
+		if idProps.Size() > 0 {
+			haveIndexedProperties = true
+			if check(idProps) {
+				return true
+			}
+		} else if idx > 0 {
+			// Always check sub-id 0 and 1 (https://github.com/arduino/arduino-cli/issues/456)
+			break
+		}
+	}
+
+	if !haveIndexedProperties {
+		return check(portIdPropsSet)
+	}
+
+	return false
+}
