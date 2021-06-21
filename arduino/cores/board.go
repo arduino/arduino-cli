@@ -140,9 +140,11 @@ func (b *Board) GeneratePropertiesForConfiguration(config string) (*properties.M
 	return b.GetBuildProperties(fqbn.Configs)
 }
 
-func (b *Board) IsBoardMatchingIdProperties(query *properties.Map) bool {
-	portIdPropsSet := b.Properties.SubTree("upload_port")
-	if portIdPropsSet.Size() == 0 {
+// IsBoardMatchingIDProperties returns true if the board match the given
+// identification properties
+func (b *Board) IsBoardMatchingIDProperties(query *properties.Map) bool {
+	portIDPropsSet := b.Properties.SubTree("upload_port")
+	if portIDPropsSet.Size() == 0 {
 		return false
 	}
 
@@ -158,7 +160,7 @@ func (b *Board) IsBoardMatchingIdProperties(query *properties.Map) bool {
 	idx := 0
 	haveIndexedProperties := false
 	for {
-		idProps := portIdPropsSet.SubTree(fmt.Sprintf("%d", idx))
+		idProps := portIDPropsSet.SubTree(fmt.Sprintf("%d", idx))
 		idx++
 		if idProps.Size() > 0 {
 			haveIndexedProperties = true
@@ -172,7 +174,7 @@ func (b *Board) IsBoardMatchingIdProperties(query *properties.Map) bool {
 	}
 
 	if !haveIndexedProperties {
-		return check(portIdPropsSet)
+		return check(portIDPropsSet)
 	}
 
 	return false

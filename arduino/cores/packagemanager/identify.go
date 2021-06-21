@@ -28,7 +28,7 @@ func (pm *PackageManager) IdentifyBoard(idProps *properties.Map) []*cores.Board 
 	}
 	foundBoards := []*cores.Board{}
 	for _, board := range pm.InstalledBoards() {
-		if board.IsBoardMatchingIdProperties(idProps) {
+		if board.IsBoardMatchingIDProperties(idProps) {
 			foundBoards = append(foundBoards, board)
 		}
 	}
