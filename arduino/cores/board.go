@@ -148,6 +148,7 @@ func (b *Board) IsBoardMatchingIDProperties(query *properties.Map) bool {
 		return false
 	}
 
+	// check checks if the given set of properties p match the "query"
 	check := func(p *properties.Map) bool {
 		for k, v := range p.AsMap() {
 			if !strings.EqualFold(query.Get(k), v) {
@@ -157,6 +158,7 @@ func (b *Board) IsBoardMatchingIDProperties(query *properties.Map) bool {
 		return true
 	}
 
+	// First check the identification properties with sub index "upload_port.N.xxx"
 	idx := 0
 	haveIndexedProperties := false
 	for {
@@ -173,6 +175,7 @@ func (b *Board) IsBoardMatchingIDProperties(query *properties.Map) bool {
 		}
 	}
 
+	// if there are no subindexed then check the whole "upload_port.xxx"
 	if !haveIndexedProperties {
 		return check(portIDPropsSet)
 	}
