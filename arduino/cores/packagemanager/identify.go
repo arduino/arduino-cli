@@ -16,48 +16,20 @@
 package packagemanager
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/arduino/arduino-cli/arduino/cores"
 	properties "github.com/arduino/go-properties-orderedmap"
 )
 
-// IdentifyBoard returns a list of boards matching the provided identification properties.
+// IdentifyBoard returns a list of boards whose identification properties match the
+// provided ones.
 func (pm *PackageManager) IdentifyBoard(idProps *properties.Map) []*cores.Board {
 	if idProps.Size() == 0 {
 		return []*cores.Board{}
 	}
-
-	checkSuffix := func(props *properties.Map, s string) (present bool, matched bool) {
-		for k, v1 := range idProps.AsMap() {
-			v2, ok := props.GetOk(k + s)
-			if !ok {
-				return false, false
-			}
-			if !strings.EqualFold(v1, v2) {
-				return true, false
-			}
-		}
-		return false, true
-	}
-
 	foundBoards := []*cores.Board{}
 	for _, board := range pm.InstalledBoards() {
-		if _, matched := checkSuffix(board.Properties, ""); matched {
+		if board.IsBoardMatchingIDProperties(idProps) {
 			foundBoards = append(foundBoards, board)
-			continue
-		}
-		id := 0
-		for {
-			present, matched := checkSuffix(board.Properties, fmt.Sprintf(".%d", id))
-			if matched {
-				foundBoards = append(foundBoards, board)
-			}
-			if !present && id > 0 { // Always check id 0 and 1 (https://github.com/arduino/arduino-cli/issues/456)
-				break
-			}
-			id++
 		}
 	}
 

@@ -61,7 +61,7 @@ func TestGetByVidPid(t *testing.T) {
 	require.Equal(t, "0XF069", res[0].Pid)
 
 	// wrong vid (too long), wrong pid (not an hex value)
-	res, err = apiByVidPid("0xfffff", "0xDEFG")
+	_, err = apiByVidPid("0xfffff", "0xDEFG")
 	require.NotNil(t, err)
 }
 
@@ -130,11 +130,11 @@ func TestBoardIdentifySorting(t *testing.T) {
 	platformRelease := platform.GetOrCreateRelease(semver.MustParse("0.0.0"))
 	platformRelease.InstallDir = dataDir
 	board := platformRelease.GetOrCreateBoard("boardA")
-	board.Properties.Set("vid", "0x0000")
-	board.Properties.Set("pid", "0x0000")
+	board.Properties.Set("upload_port.vid", "0x0000")
+	board.Properties.Set("upload_port.pid", "0x0000")
 	board = platformRelease.GetOrCreateBoard("boardB")
-	board.Properties.Set("vid", "0x0000")
-	board.Properties.Set("pid", "0x0000")
+	board.Properties.Set("upload_port.vid", "0x0000")
+	board.Properties.Set("upload_port.pid", "0x0000")
 
 	// Create some Arduino boards with same VID:PID combination as boards created previously
 	pack = pm.Packages.GetOrCreatePackage("arduino")
@@ -143,11 +143,11 @@ func TestBoardIdentifySorting(t *testing.T) {
 	platformRelease = platform.GetOrCreateRelease(semver.MustParse("0.0.0"))
 	platformRelease.InstallDir = dataDir
 	board = platformRelease.GetOrCreateBoard("nessuno")
-	board.Properties.Set("vid", "0x0000")
-	board.Properties.Set("pid", "0x0000")
+	board.Properties.Set("upload_port.vid", "0x0000")
+	board.Properties.Set("upload_port.pid", "0x0000")
 	board = platformRelease.GetOrCreateBoard("assurdo")
-	board.Properties.Set("vid", "0x0000")
-	board.Properties.Set("pid", "0x0000")
+	board.Properties.Set("upload_port.vid", "0x0000")
+	board.Properties.Set("upload_port.pid", "0x0000")
 
 	idPrefs := properties.NewMap()
 	idPrefs.Set("vid", "0x0000")

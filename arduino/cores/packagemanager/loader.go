@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -319,6 +320,10 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 		return fmt.Errorf("loading %s: %s", platformTxtLocalPath, err)
 	}
 
+	if platform.Properties.SubTree("discovery").Size() > 0 {
+		platform.PluggableDiscoveryAware = true
+	}
+
 	if platform.Platform.Name == "" {
 		if name, ok := platform.Properties.GetOk("name"); ok {
 			platform.Platform.Name = name
@@ -380,6 +385,14 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 		platform.Menus = properties.NewMap()
 	}
 
+	if !platform.PluggableDiscoveryAware {
+		for _, boardProperties := range propertiesByBoard {
+			convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties)
+		}
+	}
+
+	platform.Menus = propertiesByBoard["menu"]
+
 	// This is not a board id so we remove it to correctly
 	// set all other boards properties
 	delete(propertiesByBoard, "menu")
@@ -418,6 +431,44 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 	}
 
 	return nil
+}
+
+// Converts the old:
+//
+//   - xxx.vid.N
+//   - xxx.pid.N
+//
+// properties into pluggable discovery compatible:
+//
+//   - xxx.upload_port.N.vid
+//   - xxx.upload_port.N.pid
+//
+func convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties *properties.Map) {
+	n := 0
+	outputVidPid := func(vid, pid string) {
+		boardProperties.Set(fmt.Sprintf("upload_port.%d.vid", n), vid)
+		boardProperties.Set(fmt.Sprintf("upload_port.%d.pid", n), pid)
+		n++
+	}
+	if boardProperties.ContainsKey("vid") && boardProperties.ContainsKey("pid") {
+		outputVidPid(boardProperties.Get("vid"), boardProperties.Get("pid"))
+	}
+
+	for _, k := range boardProperties.Keys() {
+		if strings.HasPrefix(k, "vid.") {
+			idx, err := strconv.ParseUint(k[4:], 10, 64)
+			if err != nil {
+				continue
+			}
+			vidKey := fmt.Sprintf("vid.%d", idx)
+			pidKey := fmt.Sprintf("pid.%d", idx)
+			vid, vidOk := boardProperties.GetOk(vidKey)
+			pid, pidOk := boardProperties.GetOk(pidKey)
+			if vidOk && pidOk {
+				outputVidPid(vid, pid)
+			}
+		}
+	}
 }
 
 func (pm *PackageManager) loadToolsFromPackage(targetPackage *cores.Package, toolsPath *paths.Path) []*status.Status {

@@ -339,3 +339,153 @@ func TestBoardOptions(t *testing.T) {
 	// require.NoError(t, err, "marshaling result")
 	// fmt.Print(string(data))
 }
+
+func TestBoardMatching(t *testing.T) {
+	brd01 := &Board{
+		Properties: properties.NewFromHashmap(map[string]string{
+			"upload_port.pid": "0x0010",
+			"upload_port.vid": "0x2341",
+		}),
+	}
+	require.True(t, brd01.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pid": "0x0010",
+		"vid": "0x2341",
+	})))
+	require.False(t, brd01.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pid": "xxx",
+		"vid": "0x2341",
+	})))
+	require.False(t, brd01.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pid": "0x0010",
+	})))
+	// Extra port properties are OK
+	require.True(t, brd01.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pid":    "0x0010",
+		"vid":    "0x2341",
+		"serial": "942947289347893247",
+	})))
+
+	// Indexed identifications
+	brd02 := &Board{
+		Properties: properties.NewFromHashmap(map[string]string{
+			"upload_port.0.pid": "0x0010",
+			"upload_port.0.vid": "0x2341",
+			"upload_port.1.pid": "0x0042",
+			"upload_port.1.vid": "0x2341",
+			"upload_port.2.pid": "0x0010",
+			"upload_port.2.vid": "0x2A03",
+			"upload_port.3.pid": "0x0042",
+			"upload_port.3.vid": "0x2A03",
+			"upload_port.4.pid": "0x0210",
+			"upload_port.4.vid": "0x2341",
+			"upload_port.5.pid": "0x0242",
+			"upload_port.5.vid": "0x2341",
+		}),
+	}
+	require.True(t, brd02.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pid": "0x0242",
+		"vid": "0x2341",
+	})))
+	require.True(t, brd02.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pid":    "0x0242",
+		"vid":    "0x2341",
+		"serial": "897439287289347",
+	})))
+
+	// Indexed starting from 1
+	brd03 := &Board{
+		Properties: properties.NewFromHashmap(map[string]string{
+			"upload_port.1.pid": "0x0042",
+			"upload_port.1.vid": "0x2341",
+			"upload_port.2.pid": "0x0010",
+			"upload_port.2.vid": "0x2A03",
+			"upload_port.3.pid": "0x0042",
+			"upload_port.3.vid": "0x2A03",
+			"upload_port.4.pid": "0x0210",
+			"upload_port.4.vid": "0x2341",
+			"upload_port.5.pid": "0x0242",
+			"upload_port.5.vid": "0x2341",
+		}),
+	}
+	require.True(t, brd03.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pid": "0x0242",
+		"vid": "0x2341",
+	})))
+	require.True(t, brd03.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pid":    "0x0242",
+		"vid":    "0x2341",
+		"serial": "897439287289347",
+	})))
+
+	// Mixed indentificiations (not-permitted)
+	brd04 := &Board{
+		Properties: properties.NewFromHashmap(map[string]string{
+			"upload_port.pid":   "0x2222",
+			"upload_port.vid":   "0x3333",
+			"upload_port.0.pid": "0x0010",
+			"upload_port.0.vid": "0x2341",
+			"upload_port.1.pid": "0x0042",
+			"upload_port.1.vid": "0x2341",
+			"upload_port.2.pid": "0x0010",
+			"upload_port.2.vid": "0x2A03",
+			"upload_port.3.pid": "0x0042",
+			"upload_port.3.vid": "0x2A03",
+		}),
+	}
+	require.True(t, brd04.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pid": "0x0042",
+		"vid": "0x2341",
+	})))
+	require.True(t, brd04.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pid":    "0x0042",
+		"vid":    "0x2341",
+		"serial": "897439287289347",
+	})))
+	require.False(t, brd04.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pid": "0x2222",
+		"vid": "0x3333",
+	})))
+	require.False(t, brd04.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pid":    "0x2222",
+		"vid":    "0x3333",
+		"serial": "897439287289347",
+	})))
+
+	// Mixed protocols
+	brd05 := &Board{
+		Properties: properties.NewFromHashmap(map[string]string{
+			"upload_port.0.pid":    "0x0010",
+			"upload_port.0.vid":    "0x2341",
+			"upload_port.1.pears":  "2",
+			"upload_port.1.apples": "3",
+			"upload_port.1.lemons": "X",
+			"upload_port.2.pears":  "100",
+			"upload_port.3.mac":    "0x0010",
+			"upload_port.3.vid":    "0x2341",
+		}),
+	}
+	require.True(t, brd05.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pid": "0x0010",
+		"vid": "0x2341",
+	})))
+	require.True(t, brd05.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pears":  "2",
+		"apples": "3",
+		"lemons": "X",
+	})))
+	require.True(t, brd05.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pears": "100",
+	})))
+	require.True(t, brd05.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"mac": "0x0010",
+		"vid": "0x2341",
+	})))
+	require.False(t, brd05.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pears": "2",
+	})))
+	require.True(t, brd05.IsBoardMatchingIDProperties(properties.NewFromHashmap(map[string]string{
+		"pears":  "100",
+		"apples": "300",
+		"lemons": "XXX",
+	})))
+}

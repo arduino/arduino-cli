@@ -139,3 +139,46 @@ func (b *Board) GeneratePropertiesForConfiguration(config string) (*properties.M
 	}
 	return b.GetBuildProperties(fqbn.Configs)
 }
+
+// IsBoardMatchingIDProperties returns true if the board match the given
+// identification properties
+func (b *Board) IsBoardMatchingIDProperties(query *properties.Map) bool {
+	portIDPropsSet := b.Properties.SubTree("upload_port")
+	if portIDPropsSet.Size() == 0 {
+		return false
+	}
+
+	// check checks if the given set of properties p match the "query"
+	check := func(p *properties.Map) bool {
+		for k, v := range p.AsMap() {
+			if !strings.EqualFold(query.Get(k), v) {
+				return false
+			}
+		}
+		return true
+	}
+
+	// First check the identification properties with sub index "upload_port.N.xxx"
+	idx := 0
+	haveIndexedProperties := false
+	for {
+		idProps := portIDPropsSet.SubTree(fmt.Sprintf("%d", idx))
+		idx++
+		if idProps.Size() > 0 {
+			haveIndexedProperties = true
+			if check(idProps) {
+				return true
+			}
+		} else if idx > 1 {
+			// Always check sub-id 0 and 1 (https://github.com/arduino/arduino-cli/issues/456)
+			break
+		}
+	}
+
+	// if there are no subindexed then check the whole "upload_port.xxx"
+	if !haveIndexedProperties {
+		return check(portIDPropsSet)
+	}
+
+	return false
+}
