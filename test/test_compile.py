@@ -1129,3 +1129,29 @@ def test_compile_with_esp8266_bundled_libraries(run_command, data_dir, copy_sket
         f" Not used: {cli_installed_lib_path}",
     ]
     assert "\n".join(expected_output) not in res.stdout
+
+
+def test_compile_sketch_with_tpp_file_include(run_command, copy_sketch):
+    assert run_command("update")
+
+    # Download latest AVR
+    run_command("core install arduino:avr")
+
+    sketch_name = "sketch_with_tpp_file_include"
+    sketch_path = copy_sketch(sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    assert run_command(f"compile -b {fqbn} {sketch_path} --verbose")
+
+
+def test_compile_sketch_with_ipp_file_include(run_command, copy_sketch):
+    assert run_command("update")
+
+    # Download latest AVR
+    run_command("core install arduino:avr")
+
+    sketch_name = "sketch_with_ipp_file_include"
+    sketch_path = copy_sketch(sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    assert run_command(f"compile -b {fqbn} {sketch_path} --verbose")
