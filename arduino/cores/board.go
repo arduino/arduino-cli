@@ -169,7 +169,7 @@ func (b *Board) IsBoardMatchingIDProperties(query *properties.Map) bool {
 			if check(idProps) {
 				return true
 			}
-		} else if idx > 0 {
+		} else if idx > 1 {
 			// Always check sub-id 0 and 1 (https://github.com/arduino/arduino-cli/issues/456)
 			break
 		}
