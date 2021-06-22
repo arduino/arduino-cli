@@ -138,3 +138,37 @@ func TestSketchWithMarkdownAsciidocJson(t *testing.T) {
 	require.Equal(t, "foo.json", filepath.Base(sketch.RootFolderFiles[1].Path))
 	require.Equal(t, "foo.md", filepath.Base(sketch.RootFolderFiles[2].Path))
 }
+
+func TestSketchWithTppFile(t *testing.T) {
+	sketchPath := paths.New("testdata", "SketchWithTppFile")
+	mainFilePath := sketchPath.Join("SketchWithTppFile.ino").String()
+	templateFile := sketchPath.Join("template.tpp").String()
+
+	sketch, err := New(sketchPath.String(), mainFilePath, "", []string{mainFilePath, templateFile})
+	require.NotNil(t, sketch)
+	require.NoError(t, err)
+	require.Equal(t, sketchPath.String(), sketch.LocationPath)
+	require.Equal(t, mainFilePath, sketch.MainFile.Path)
+	require.Len(t, sketch.OtherSketchFiles, 0)
+	require.Len(t, sketch.AdditionalFiles, 1)
+	require.Equal(t, "template.tpp", filepath.Base(sketch.AdditionalFiles[0].Path))
+	require.Len(t, sketch.RootFolderFiles, 1)
+	require.Equal(t, "template.tpp", filepath.Base(sketch.RootFolderFiles[0].Path))
+}
+
+func TestSketchWithIppFile(t *testing.T) {
+	sketchPath := paths.New("testdata", "SketchWithIppFile")
+	mainFilePath := sketchPath.Join("SketchWithIppFile.ino").String()
+	templateFile := sketchPath.Join("template.ipp").String()
+
+	sketch, err := New(sketchPath.String(), mainFilePath, "", []string{mainFilePath, templateFile})
+	require.NotNil(t, sketch)
+	require.NoError(t, err)
+	require.Equal(t, sketchPath.String(), sketch.LocationPath)
+	require.Equal(t, mainFilePath, sketch.MainFile.Path)
+	require.Len(t, sketch.OtherSketchFiles, 0)
+	require.Len(t, sketch.AdditionalFiles, 1)
+	require.Equal(t, "template.ipp", filepath.Base(sketch.AdditionalFiles[0].Path))
+	require.Len(t, sketch.RootFolderFiles, 1)
+	require.Equal(t, "template.ipp", filepath.Base(sketch.RootFolderFiles[0].Path))
+}
