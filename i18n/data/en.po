@@ -54,7 +54,7 @@ msgstr "Global Flags:"
 msgid "Id"
 msgstr "Id"
 
-#: cli/board/details.go:136
+#: cli/board/details.go:135
 msgid "Identification properties:"
 msgstr "Identification properties:"
 
