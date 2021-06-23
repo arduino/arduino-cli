@@ -89,9 +89,6 @@ func New(id string, args ...string) (*PluggableDiscovery, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := proc.Start(); err != nil {
-		return nil, err
-	}
 	messageChan := make(chan *discoveryMessage)
 	disc := &PluggableDiscovery{
 		id:                   id,
@@ -201,9 +198,20 @@ func (disc *PluggableDiscovery) sendCommand(command string) error {
 	}
 }
 
-// Hello sends the HELLO command to the discovery to agree on the pluggable discovery protocol. This
-// must be the first command to run in the communication with the discovery.
-func (disc *PluggableDiscovery) Hello() error {
+func (disc *PluggableDiscovery) runProcess() error {
+	if err := disc.process.Start(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Run starts the discovery executable process and sends the HELLO command to the discovery to agree on the
+// pluggable discovery protocol. This must be the first command to run in the communication with the discovery.
+func (disc *PluggableDiscovery) Run() error {
+	if err := disc.runProcess(); err != nil {
+		return err
+	}
+
 	if err := disc.sendCommand("HELLO 1 \"arduino-cli " + globals.VersionInfo.VersionString + "\"\n"); err != nil {
 		return err
 	}

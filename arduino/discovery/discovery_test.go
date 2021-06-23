@@ -35,6 +35,9 @@ func TestDiscoveryStdioHandling(t *testing.T) {
 	disc, err := New("test", "testdata/cat/cat") // copy stdin to stdout
 	require.NoError(t, err)
 
+	err = disc.runProcess()
+	require.NoError(t, err)
+
 	_, err = disc.outgoingCommandsPipe.Write([]byte(`{ "eventType":`)) // send partial JSON
 	require.NoError(t, err)
 	msg, err := disc.waitMessage(time.Millisecond * 100)
