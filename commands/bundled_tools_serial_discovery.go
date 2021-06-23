@@ -128,7 +128,7 @@ func ListBoards(pm *packagemanager.PackageManager) ([]*discovery.Port, error) {
 	}
 	defer disc.Quit()
 
-	if err = disc.Hello(); err != nil {
+	if err = disc.Run(); err != nil {
 		return nil, fmt.Errorf("starting discovery: %v", err)
 	}
 
@@ -160,7 +160,7 @@ func WatchListBoards(pm *packagemanager.PackageManager) (<-chan *discovery.Event
 		return nil, err
 	}
 
-	if err = disc.Hello(); err != nil {
+	if err = disc.Run(); err != nil {
 		return nil, fmt.Errorf("starting discovery: %v", err)
 	}
 
