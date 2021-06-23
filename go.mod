@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c
 	github.com/arduino/go-paths-helper v1.6.0
-	github.com/arduino/go-properties-orderedmap v1.3.0
+	github.com/arduino/go-properties-orderedmap v1.5.0
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
 	github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b
 	github.com/cmaglie/go.rice v1.0.3 // This one must be kept until https://github.com/GeertJohan/go.rice/pull/159 is merged
