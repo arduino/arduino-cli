@@ -441,6 +441,39 @@ func (pm *PackageManager) InstalledBoards() []*cores.Board {
 	return boards
 }
 
+func (pm *PackageManager) FindToolsRequiredFromPlatformRelease(platform *cores.PlatformRelease) ([]*cores.ToolRelease, error) {
+	pm.Log.Infof("Searching tools required for platform %s", platform)
+
+	// maps "PACKAGER:TOOL" => ToolRelease
+	foundTools := map[string]*cores.ToolRelease{}
+	// A Platform may not specify required tools (because it's a platform that comes from a
+	// user/hardware dir without a package_index.json) then add all available tools
+	for _, targetPackage := range pm.Packages {
+		for _, tool := range targetPackage.Tools {
+			rel := tool.GetLatestInstalled()
+			if rel != nil {
+				foundTools[rel.Tool.Name] = rel
+			}
+		}
+	}
+	// replace the default tools above with the specific required by the current platform
+	requiredTools := []*cores.ToolRelease{}
+	platform.ToolDependencies.Sort()
+	for _, toolDep := range platform.ToolDependencies {
+		pm.Log.WithField("tool", toolDep).Infof("Required tool")
+		tool := pm.FindToolDependency(toolDep)
+		if tool == nil {
+			return nil, fmt.Errorf("tool release not found: %s", toolDep)
+		}
+		requiredTools = append(requiredTools, tool)
+		delete(foundTools, tool.Tool.Name)
+	}
+	for _, toolRel := range foundTools {
+		requiredTools = append(requiredTools, toolRel)
+	}
+	return requiredTools, nil
+}
+
 // GetTool searches for tool in all packages and platforms.
 func (pm *PackageManager) GetTool(toolID string) *cores.Tool {
 	split := strings.Split(toolID, ":")
