@@ -16,7 +16,6 @@ require (
 	github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 // indirect
 	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
-	github.com/golang/protobuf v1.5.2
 	github.com/h2non/filetype v1.0.8 // indirect
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
 	github.com/kr/text v0.2.0 // indirect
@@ -38,7 +37,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.0.0
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/testify v1.6.1
-	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	go.bug.st/cleanup v1.0.0
 	go.bug.st/downloader/v2 v2.1.1
 	go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18
@@ -48,7 +46,7 @@ require (
 	golang.org/x/net v0.0.0-20210505024714-0287a6fb4125
 	golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6 // indirect
 	golang.org/x/text v0.3.6
-	google.golang.org/genproto v0.0.0-20210504143626-3b2ad6ccc450 // indirect
+	google.golang.org/genproto v0.0.0-20210504143626-3b2ad6ccc450
 	google.golang.org/grpc v1.37.0
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect

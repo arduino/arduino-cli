@@ -145,36 +145,9 @@ func (b *Board) GeneratePropertiesForConfiguration(config string) (*properties.M
 // containing the properties required to identify the board. The returned sets
 // must not be changed by the caller.
 func (b *Board) GetIdentificationProperties() []*properties.Map {
-	if b.identificationProperties != nil {
-		return b.identificationProperties
+	if b.identificationProperties == nil {
+		b.identificationProperties = b.Properties.ExtractSubIndexSets("upload_port")
 	}
-	b.identificationProperties = []*properties.Map{}
-
-	portIDPropsSet := b.Properties.SubTree("upload_port")
-	if portIDPropsSet.Size() == 0 {
-		return b.identificationProperties
-	}
-
-	// First check the identification properties with sub index "upload_port.N.xxx"
-	idx := 0
-	haveIndexedProperties := false
-	for {
-		idProps := portIDPropsSet.SubTree(fmt.Sprintf("%d", idx))
-		idx++
-		if idProps.Size() > 0 {
-			haveIndexedProperties = true
-			b.identificationProperties = append(b.identificationProperties, idProps)
-		} else if idx > 1 {
-			// Always check sub-id 0 and 1 (https://github.com/arduino/arduino-cli/issues/456)
-			break
-		}
-	}
-
-	// if there are no subindexed then check the whole "upload_port.xxx"
-	if !haveIndexedProperties {
-		b.identificationProperties = append(b.identificationProperties, portIDPropsSet)
-	}
-
 	return b.identificationProperties
 }
 
