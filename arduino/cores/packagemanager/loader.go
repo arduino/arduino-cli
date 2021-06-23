@@ -588,3 +588,96 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) er
 	}
 	return nil
 }
+
+// LoadDiscoveries load all discoveries for all loaded platforms
+// Returns error if:
+// * A PluggableDiscovery instance can't be created
+// * Tools required by the PlatformRelease cannot be found
+// * Command line to start PluggableDiscovery has malformed or mismatched quotes
+func (pm *PackageManager) LoadDiscoveries() []*status.Status {
+	statuses := []*status.Status{}
+	for _, platform := range pm.InstalledPlatformReleases() {
+		statuses = append(statuses, pm.loadDiscoveries(platform)...)
+	}
+	return statuses
+}
+
+func (pm *PackageManager) loadDiscoveries(release *cores.PlatformRelease) []*status.Status {
+	statuses := []*status.Status{}
+	discoveryProperties := release.Properties.SubTree("discovery")
+
+	if discoveryProperties.Size() == 0 {
+		return nil
+	}
+
+	// Handles discovery properties formatted like so:
+	//
+	// Case 1:
+	//    "discovery.required": "PLATFORM:DISCOVERY_NAME",
+	//
+	// Case 2:
+	//    "discovery.required.0": "PLATFORM:DISCOVERY_ID_1",
+	//    "discovery.required.1": "PLATFORM:DISCOVERY_ID_2",
+	//
+	// If both indexed and unindexed properties are found the unindexed are ignored
+	for _, id := range discoveryProperties.ExtractSubIndexLists("required") {
+		tool := pm.GetTool(id)
+		if tool == nil {
+			statuses = append(statuses, status.Newf(codes.FailedPrecondition, "discovery not found: %s", id))
+			continue
+		}
+		toolRelease := tool.GetLatestInstalled()
+		discoveryPath := toolRelease.InstallDir.Join(tool.Name).String()
+		d, err := discovery.New(id, discoveryPath)
+		if err != nil {
+			statuses = append(statuses, status.Newf(codes.FailedPrecondition, "creating discovery: %s", err))
+			continue
+		}
+		pm.discoveryManager.Add(d)
+	}
+
+	discoveryIDs := discoveryProperties.FirstLevelOf()
+	delete(discoveryIDs, "required")
+	// Get the list of tools only we if have there are discoveries that use Direct discovery integration.
+	// See:
+	// https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#direct-discovery-integration-not-recommended
+	// We need the tools only in that case since we might need some tool's
+	// runtime properties to expand the discovery pattern to run it correctly.
+	var tools []*cores.ToolRelease
+	if len(discoveryIDs) > 0 {
+		var err error
+		tools, err = pm.FindToolsRequiredFromPlatformRelease(release)
+		if err != nil {
+			statuses = append(statuses, status.New(codes.Internal, err.Error()))
+		}
+	}
+
+	// Handles discovery properties formatted like so:
+	//
+	// discovery.DISCOVERY_ID.pattern: "COMMAND_TO_EXECUTE"
+	for discoveryID, props := range discoveryIDs {
+		pattern, ok := props.GetOk("pattern")
+		if !ok {
+			statuses = append(statuses, status.Newf(codes.FailedPrecondition, "can't find pattern for discovery with id %s", discoveryID))
+			continue
+		}
+		configuration := release.Properties.Clone()
+		configuration.Merge(release.RuntimeProperties())
+		configuration.Merge(props)
+
+		for _, tool := range tools {
+			configuration.Merge(tool.RuntimeProperties())
+		}
+
+		cmd := configuration.ExpandPropsInString(pattern)
+		if cmdArgs, err := properties.SplitQuotedString(cmd, `"'`, true); err != nil {
+			statuses = append(statuses, status.New(codes.Internal, err.Error()))
+		} else if d, err := discovery.New(discoveryID, cmdArgs...); err != nil {
+			statuses = append(statuses, status.New(codes.Internal, err.Error()))
+		} else {
+			pm.discoveryManager.Add(d)
+		}
+	}
+
+	return statuses
+}
