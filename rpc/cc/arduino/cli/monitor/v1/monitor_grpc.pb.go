@@ -11,6 +11,7 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
+// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
 // MonitorServiceClient is the client API for MonitorService service.
@@ -31,7 +32,7 @@ func NewMonitorServiceClient(cc grpc.ClientConnInterface) MonitorServiceClient {
 }
 
 func (c *monitorServiceClient) StreamingOpen(ctx context.Context, opts ...grpc.CallOption) (MonitorService_StreamingOpenClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_MonitorService_serviceDesc.Streams[0], "/cc.arduino.cli.monitor.v1.MonitorService/StreamingOpen", opts...)
+	stream, err := c.cc.NewStream(ctx, &MonitorService_ServiceDesc.Streams[0], "/cc.arduino.cli.monitor.v1.MonitorService/StreamingOpen", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -87,8 +88,8 @@ type UnsafeMonitorServiceServer interface {
 	mustEmbedUnimplementedMonitorServiceServer()
 }
 
-func RegisterMonitorServiceServer(s *grpc.Server, srv MonitorServiceServer) {
-	s.RegisterService(&_MonitorService_serviceDesc, srv)
+func RegisterMonitorServiceServer(s grpc.ServiceRegistrar, srv MonitorServiceServer) {
+	s.RegisterService(&MonitorService_ServiceDesc, srv)
 }
 
 func _MonitorService_StreamingOpen_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -117,7 +118,10 @@ func (x *monitorServiceStreamingOpenServer) Recv() (*StreamingOpenRequest, error
 	return m, nil
 }
 
-var _MonitorService_serviceDesc = grpc.ServiceDesc{
+// MonitorService_ServiceDesc is the grpc.ServiceDesc for MonitorService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var MonitorService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "cc.arduino.cli.monitor.v1.MonitorService",
 	HandlerType: (*MonitorServiceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
