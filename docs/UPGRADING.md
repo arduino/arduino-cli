@@ -93,6 +93,112 @@ removed, in its place:
 
 `Context.Sketch` types has been changed from `Sketch` to `sketch.Sketch`.
 
+### Change in `board details` response (gRPC and JSON output)
+
+The `board details` output WRT board identification properties has changed, before it was:
+
+```
+$ arduino-cli board details arduino:samd:mkr1000
+Board name:                Arduino MKR1000
+FQBN:                      arduino:samd:mkr1000
+Board version:             1.8.11
+Debugging supported:       ✔
+
+Official Arduino board:    ✔
+
+Identification properties: VID:0x2341 PID:0x824e
+                           VID:0x2341 PID:0x024e
+                           VID:0x2341 PID:0x804e
+                           VID:0x2341 PID:0x004e
+[...]
+
+$ arduino-cli board details arduino:samd:mkr1000 --format json
+[...]
+  "identification_prefs": [
+    {
+      "usb_id": {
+        "vid": "0x2341",
+        "pid": "0x804e"
+      }
+    },
+    {
+      "usb_id": {
+        "vid": "0x2341",
+        "pid": "0x004e"
+      }
+    },
+    {
+      "usb_id": {
+        "vid": "0x2341",
+        "pid": "0x824e"
+      }
+    },
+    {
+      "usb_id": {
+        "vid": "0x2341",
+        "pid": "0x024e"
+      }
+    }
+  ],
+[...]
+```
+
+now the properties have been renamed from `identification_prefs` to `identification_properties` and they are no more
+specific to USB but they can theoretically be any set of key/values:
+
+```
+$ arduino-cli board details arduino:samd:mkr1000
+Board name:                Arduino MKR1000
+FQBN:                      arduino:samd:mkr1000
+Board version:             1.8.11
+Debugging supported:       ✔
+
+Official Arduino board:    ✔
+
+Identification properties: vid=0x2341
+                           pid=0x804e
+
+Identification properties: vid=0x2341
+                           pid=0x004e
+
+Identification properties: vid=0x2341
+                           pid=0x824e
+
+Identification properties: vid=0x2341
+                           pid=0x024e
+[...]
+
+$ arduino-cli board details arduino:samd:mkr1000 --format json
+[...]
+  "identification_properties": [
+    {
+      "properties": {
+        "pid": "0x804e",
+        "vid": "0x2341"
+      }
+    },
+    {
+      "properties": {
+        "pid": "0x004e",
+        "vid": "0x2341"
+      }
+    },
+    {
+      "properties": {
+        "pid": "0x824e",
+        "vid": "0x2341"
+      }
+    },
+    {
+      "properties": {
+        "pid": "0x024e",
+        "vid": "0x2341"
+      }
+    }
+  ]
+}
+```
+
 ### Change of behaviour of gRPC `Init` function
 
 Previously the `Init` function was used to both create a new `CoreInstance` and initialize it, so that the internal
