@@ -80,7 +80,7 @@ type indexToolReleaseFlavour struct {
 	OS              string      `json:"host,required"`
 	URL             string      `json:"url,required"`
 	ArchiveFileName string      `json:"archiveFileName,required"`
-	Size            json.Number `json:"size,required"`
+	Size            json.Number `json:"size,required,string"`
 	Checksum        string      `json:"checksum,required"`
 }
 
