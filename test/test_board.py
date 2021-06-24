@@ -537,14 +537,11 @@ def test_board_details_list_programmers_without_flag(run_command):
     run_command("core install arduino:samd@1.8.6")
     result = run_command("board details -b arduino:samd:nano_33_iot")
     assert result.ok
-    lines = [l.strip() for l in result.stdout.splitlines()]
-    assert (
-        "Programmers:               Id                                                                     Name"
-        in lines
-    )
-    assert "edbg                                                                   Atmel EDBG" in lines
-    assert "atmel_ice                                                              Atmel-ICE" in lines
-    assert "sam_ice                                                                Atmel SAM-ICE" in lines
+    lines = [l.strip().split() for l in result.stdout.splitlines()]
+    assert ["Programmers:", "Id", "Name"] in lines
+    assert ["edbg", "Atmel", "EDBG"] in lines
+    assert ["atmel_ice", "Atmel-ICE"] in lines
+    assert ["sam_ice", "Atmel", "SAM-ICE"] in lines
 
 
 def test_board_details_list_programmers_flag(run_command):
