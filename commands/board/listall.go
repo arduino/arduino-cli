@@ -17,19 +17,20 @@ package board
 
 import (
 	"context"
-	"errors"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // ListAll FIXMEDOC
-func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListAllResponse, error) {
+func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListAllResponse, *status.Status) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, status.New(codes.InvalidArgument, tr("Invalid instance"))
 	}
 
 	searchArgs := strings.Join(req.GetSearchArgs(), " ")

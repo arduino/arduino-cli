@@ -33,6 +33,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -168,7 +170,7 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 }
 
 // List FIXMEDOC
-func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
+func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e *status.Status) {
 	tags := map[string]string{}
 	// Use defer func() to evaluate tags map when function returns
 	// and set success flag inspecting the error named return parameter
@@ -182,15 +184,15 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 
 	pm := commands.GetPackageManager(req.GetInstance().Id)
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, status.New(codes.InvalidArgument, tr("Invalid instance"))
 	}
 
 	dm := pm.DiscoveryManager()
 	if errs := dm.RunAll(); len(errs) > 0 {
-		return nil, fmt.Errorf("%v", errs)
+		return nil, status.New(codes.FailedPrecondition, tr("Error getting port list: %v", errs))
 	}
 	if errs := dm.StartAll(); len(errs) > 0 {
-		return nil, fmt.Errorf("%v", errs)
+		return nil, status.New(codes.FailedPrecondition, tr("Error getting port list: %v", errs))
 	}
 	defer func() {
 		if errs := dm.StopAll(); len(errs) > 0 {
@@ -202,12 +204,12 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 	retVal := []*rpc.DetectedPort{}
 	ports, errs := pm.DiscoveryManager().List()
 	if len(errs) > 0 {
-		return nil, fmt.Errorf("%v", errs)
+		return nil, status.New(codes.FailedPrecondition, tr("Error getting port list: %v", errs))
 	}
 	for _, port := range ports {
 		boards, err := identify(pm, port)
 		if err != nil {
-			return nil, err
+			return nil, status.New(codes.Internal, err.Error())
 		}
 
 		// boards slice can be empty at this point if neither the cores nor the
@@ -224,14 +226,14 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 
 // Watch returns a channel that receives boards connection and disconnection events.
 // The discovery process can be interrupted by sending a message to the interrupt channel.
-func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResponse, error) {
+func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResponse, *status.Status) {
 	pm := commands.GetPackageManager(instanceID)
 	dm := pm.DiscoveryManager()
 
 	runErrs := dm.RunAll()
 	if len(runErrs) == len(dm.IDs()) {
 		// All discoveries failed to run, we can't do anything
-		return nil, fmt.Errorf("%v", runErrs)
+		return nil, status.New(codes.FailedPrecondition, fmt.Sprintf("%v", runErrs))
 	}
 
 	eventsChan, errs := dm.StartSyncAll()

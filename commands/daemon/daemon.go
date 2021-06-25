@@ -43,14 +43,19 @@ var tr = i18n.Tr
 
 // BoardDetails FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
-	return board.Details(ctx, req)
+	resp, err := board.Details(ctx, req)
+	if err != nil {
+		return nil, err.Err()
+	}
+
+	return resp, nil
 }
 
 // BoardList FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardListRequest) (*rpc.BoardListResponse, error) {
 	ports, err := board.List(req)
 	if err != nil {
-		return nil, err
+		return nil, err.Err()
 	}
 
 	return &rpc.BoardListResponse{
@@ -60,12 +65,22 @@ func (s *ArduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardLis
 
 // BoardListAll FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListAllResponse, error) {
-	return board.ListAll(ctx, req)
+	resp, err := board.ListAll(ctx, req)
+	if err != nil {
+		return nil, err.Err()
+	}
+
+	return resp, nil
 }
 
 // BoardSearch exposes to the gRPC interface the board search command
 func (s *ArduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, error) {
-	return board.Search(ctx, req)
+	resp, err := board.Search(ctx, req)
+	if err != nil {
+		return nil, err.Err()
+	}
+
+	return resp, nil
 }
 
 // BoardListWatch FIXMEDOC
@@ -112,9 +127,9 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_Boa
 		}
 	}()
 
-	eventsChan, err := board.Watch(msg.Instance.Id, interrupt)
-	if err != nil {
-		return err
+	eventsChan, stat := board.Watch(msg.Instance.Id, interrupt)
+	if stat != nil {
+		return stat.Err()
 	}
 
 	for event := range eventsChan {
@@ -134,7 +149,7 @@ func (s *ArduinoCoreServerImpl) BoardAttach(req *rpc.BoardAttachRequest, stream 
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.BoardAttachResponse{TaskProgress: p}) },
 	)
 	if err != nil {
-		return err
+		return err.Err()
 	}
 	return stream.Send(resp)
 }
