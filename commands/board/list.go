@@ -33,6 +33,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -173,7 +175,7 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 }
 
 // List FIXMEDOC
-func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
+func List(instanceID int32) (r []*rpc.DetectedPort, e *status.Status) {
 	m.Lock()
 	defer m.Unlock()
 
@@ -190,19 +192,19 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 
 	pm := commands.GetPackageManager(instanceID)
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, status.New(codes.InvalidArgument, "invalid instance")
 	}
 
 	ports, err := commands.ListBoards(pm)
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting port list from serial-discovery")
+		return nil, status.New(codes.FailedPrecondition, errors.Wrap(err, "error getting port list from serial-discovery").Error())
 	}
 
 	retVal := []*rpc.DetectedPort{}
 	for _, port := range ports {
 		boards, err := identify(pm, port)
 		if err != nil {
-			return nil, err
+			return nil, status.New(codes.Internal, err.Error())
 		}
 
 		// boards slice can be empty at this point if neither the cores nor the
@@ -222,11 +224,11 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 
 // Watch returns a channel that receives boards connection and disconnection events.
 // The discovery process can be interrupted by sending a message to the interrupt channel.
-func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResponse, error) {
+func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResponse, *status.Status) {
 	pm := commands.GetPackageManager(instanceID)
 	eventsChan, err := commands.WatchListBoards(pm)
 	if err != nil {
-		return nil, err
+		return nil, status.New(codes.FailedPrecondition, err.Error())
 	}
 
 	outChan := make(chan *rpc.BoardListWatchResponse)

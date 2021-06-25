@@ -17,23 +17,24 @@ package board
 
 import (
 	"context"
-	"errors"
 	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Search returns all boards that match the search arg.
 // Boards are searched in all platforms, including those in the index that are not yet
 // installed. Note that platforms that are not installed don't include boards' FQBNs.
 // If no search argument is used all boards are returned.
-func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, error) {
+func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, *status.Status) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, status.New(codes.InvalidArgument, "invalid instance")
 	}
 
 	searchArgs := strings.Split(strings.Trim(req.SearchArgs, " "), " ")
@@ -91,7 +92,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 
 					toTest := append(strings.Split(board.Name(), " "), board.Name(), board.FQBN())
 					if ok, err := match(toTest); err != nil {
-						return nil, err
+						return nil, status.New(codes.InvalidArgument, err.Error())
 					} else if !ok {
 						continue
 					}
@@ -107,7 +108,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 				for _, board := range latestPlatformRelease.BoardsManifest {
 					toTest := append(strings.Split(board.Name, " "), board.Name)
 					if ok, err := match(toTest); err != nil {
-						return nil, err
+						return nil, status.New(codes.InvalidArgument, err.Error())
 					} else if !ok {
 						continue
 					}
