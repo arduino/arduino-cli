@@ -193,10 +193,13 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 		return nil, errors.New("invalid instance")
 	}
 
-	ports, err := commands.ListBoards(pm)
-	if err != nil {
-		return nil, errors.Wrap(err, "error getting port list from serial-discovery")
+	if err := pm.DiscoveryManager().RunAll(); err != nil {
+		return nil, err
 	}
+	if err := pm.DiscoveryManager().StartAll(); err != nil {
+		return nil, err
+	}
+	ports := pm.DiscoveryManager().List()
 
 	retVal := []*rpc.DetectedPort{}
 	for _, port := range ports {

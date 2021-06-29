@@ -43,16 +43,22 @@ func (dm *DiscoveryManager) Add(disc *discovery.PluggableDiscovery) error {
 	return nil
 }
 
+// RunAll the discoveries for this DiscoveryManager,
+// returns the first error it meets or nil
+func (dm *DiscoveryManager) RunAll() error {
+	for _, d := range dm.discoveries {
+		if err := d.Run(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // StartAll the discoveries for this DiscoveryManager,
 // returns the first error it meets or nil
 func (dm *DiscoveryManager) StartAll() error {
 	for _, d := range dm.discoveries {
-		err := d.Start()
-		if err != nil {
-			return err
-		}
-		err = d.StartSync()
-		if err != nil {
+		if err := d.Start(); err != nil {
 			return err
 		}
 	}
@@ -71,29 +77,20 @@ func (dm *DiscoveryManager) StopAll() error {
 	return nil
 }
 
+func (dm *DiscoveryManager) List() []*discovery.Port {
+	res := []*discovery.Port{}
+	for _, disc := range dm.discoveries {
+		l, err := disc.List()
+		if err != nil {
+			continue
+		}
+		res = append(res, l...)
+	}
+	return res
+}
+
 // ListPorts return the current list of ports detected from all discoveries
-func (dm *DiscoveryManager) ListPorts() []*discovery.Port {
-	// c := make(chan []*discovery.Port, len(dm.discoveries))
-
-	// var wg sync.WaitGroup
-	// for _, d := range dm.discoveries {
-	// 	wg.Add(1)
-	// 	d := d
-	// 	go func() {
-	// 		c <- d.ListSync()
-	// 		wg.Done()
-	// 	}()
-	// }
-	// wg.Wait()
-	// // Close the channel only after all the goroutines are finished
-	// close(c)
-
-	// ports := []*discovery.Port{}
-	// for p := range c {
-	// 	ports = append(ports, p...)
-	// }
-
-	// return ports
+func (dm *DiscoveryManager) ListSync() []*discovery.Port {
 	res := []*discovery.Port{}
 	for _, disc := range dm.discoveries {
 		res = append(res, disc.ListSync()...)
