@@ -288,6 +288,14 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) *sta
 		}
 	}
 
+	for _, err := range instance.PackageManager.LoadDiscoveries() {
+		responseCallback(&rpc.InitResponse{
+			Message: &rpc.InitResponse_Error{
+				Error: err.Proto(),
+			},
+		})
+	}
+
 	// Load libraries
 	for _, pack := range instance.PackageManager.Packages {
 		for _, platform := range pack.Platforms {
