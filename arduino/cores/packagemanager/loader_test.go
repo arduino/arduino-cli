@@ -109,58 +109,75 @@ arduino_zero_native.pid.3=0x024d
 func TestLoadDiscoveries(t *testing.T) {
 	// Create all the necessary data to load discoveries
 	fakePath := paths.New("fake-path")
-	packageManager := NewPackageManager(fakePath, fakePath, fakePath, fakePath)
-	pack := packageManager.Packages.GetOrCreatePackage("arduino")
-	// ble-discovery tool
-	tool := pack.GetOrCreateTool("arduino:ble-discovery")
-	toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
-	// We set this to fake the tool is installed
-	toolRelease.InstallDir = fakePath
-	tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
 
-	// serial-discovery tool
-	tool = pack.GetOrCreateTool("arduino:serial-discovery")
-	tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
-	toolRelease = tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
-	// We set this to fake the tool is installed
-	toolRelease.InstallDir = fakePath
+	createTestPackageManager := func() *PackageManager {
+		packageManager := NewPackageManager(fakePath, fakePath, fakePath, fakePath)
+		pack := packageManager.Packages.GetOrCreatePackage("arduino")
+		// ble-discovery tool
+		tool := pack.GetOrCreateTool("ble-discovery")
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+		tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
 
-	platform := pack.GetOrCreatePlatform("avr")
-	release := platform.GetOrCreateRelease(semver.MustParse("1.0.0"))
+		// serial-discovery tool
+		tool = pack.GetOrCreateTool("serial-discovery")
+		tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+		toolRelease = tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
 
+		platform := pack.GetOrCreatePlatform("avr")
+		release := platform.GetOrCreateRelease(semver.MustParse("1.0.0"))
+		release.InstallDir = fakePath
+
+		return packageManager
+	}
+
+	packageManager := createTestPackageManager()
+	release := packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
 	release.Properties = properties.NewFromHashmap(map[string]string{
 		"discovery.required": "arduino:ble-discovery",
 	})
 
-	discoveries, err := packageManager.LoadDiscoveries(release)
+	errs := packageManager.LoadDiscoveries()
+	require.Len(t, errs, 0)
+	discoveries := packageManager.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 1)
-	require.NoError(t, err)
-	require.Equal(t, discoveries[0].GetID(), "arduino:ble-discovery")
+	require.Contains(t, discoveries, "arduino:ble-discovery")
 
+	packageManager = createTestPackageManager()
+	release = packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
 	release.Properties = properties.NewFromHashmap(map[string]string{
 		"discovery.required.0": "arduino:ble-discovery",
 		"discovery.required.1": "arduino:serial-discovery",
 	})
 
-	discoveries, err = packageManager.LoadDiscoveries(release)
+	errs = packageManager.LoadDiscoveries()
+	require.Len(t, errs, 0)
+	discoveries = packageManager.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 2)
-	require.NoError(t, err)
-	require.Equal(t, discoveries[0].GetID(), "arduino:ble-discovery")
-	require.Equal(t, discoveries[1].GetID(), "arduino:serial-discovery")
+	require.Contains(t, discoveries, "arduino:ble-discovery")
+	require.Contains(t, discoveries, "arduino:serial-discovery")
 
+	packageManager = createTestPackageManager()
+	release = packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
 	release.Properties = properties.NewFromHashmap(map[string]string{
 		"discovery.required.0":     "arduino:ble-discovery",
 		"discovery.required.1":     "arduino:serial-discovery",
 		"discovery.teensy.pattern": "\"{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports\" -J2",
 	})
 
-	discoveries, err = packageManager.LoadDiscoveries(release)
+	errs = packageManager.LoadDiscoveries()
+	require.Len(t, errs, 0)
+	discoveries = packageManager.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 3)
-	require.NoError(t, err)
-	require.Equal(t, discoveries[0].GetID(), "arduino:ble-discovery")
-	require.Equal(t, discoveries[1].GetID(), "arduino:serial-discovery")
-	require.Equal(t, discoveries[2].GetID(), "teensy")
+	require.Contains(t, discoveries, "arduino:ble-discovery")
+	require.Contains(t, discoveries, "arduino:serial-discovery")
+	require.Contains(t, discoveries, "teensy")
 
+	packageManager = createTestPackageManager()
+	release = packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
 	release.Properties = properties.NewFromHashmap(map[string]string{
 		"discovery.required":       "arduino:some-discovery",
 		"discovery.required.0":     "arduino:ble-discovery",
@@ -168,10 +185,11 @@ func TestLoadDiscoveries(t *testing.T) {
 		"discovery.teensy.pattern": "\"{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports\" -J2",
 	})
 
-	discoveries, err = packageManager.LoadDiscoveries(release)
+	errs = packageManager.LoadDiscoveries()
+	require.Len(t, errs, 0)
+	discoveries = packageManager.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 3)
-	require.NoError(t, err)
-	require.Equal(t, discoveries[0].GetID(), "arduino:ble-discovery")
-	require.Equal(t, discoveries[1].GetID(), "arduino:serial-discovery")
-	require.Equal(t, discoveries[2].GetID(), "teensy")
+	require.Contains(t, discoveries, "arduino:ble-discovery")
+	require.Contains(t, discoveries, "arduino:serial-discovery")
+	require.Contains(t, discoveries, "teensy")
 }

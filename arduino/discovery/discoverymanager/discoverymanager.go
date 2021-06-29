@@ -35,6 +35,15 @@ func New() *DiscoveryManager {
 	}
 }
 
+// IDs returns the list of discoveries' ids in this DiscoveryManager
+func (dm *DiscoveryManager) IDs() []string {
+	ids := []string{}
+	for id := range dm.discoveries {
+		ids = append(ids, id)
+	}
+	return ids
+}
+
 // Add adds a discovery to the list of managed discoveries
 func (dm *DiscoveryManager) Add(disc *discovery.PluggableDiscovery) error {
 	id := disc.GetID()
