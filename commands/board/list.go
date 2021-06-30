@@ -237,6 +237,7 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 	outChan := make(chan *rpc.BoardListWatchResponse)
 
 	go func() {
+		defer close(outChan)
 		for _, err := range errs {
 			outChan <- &rpc.BoardListWatchResponse{
 				EventType: "error",
@@ -272,6 +273,16 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 					Error:     boardsError,
 				}
 			case <-interrupt:
+				err := pm.DiscoveryManager().QuitAll()
+				if err != nil {
+					outChan <- &rpc.BoardListWatchResponse{
+						EventType: "error",
+						Error:     err.Error(),
+					}
+					// Don't close the channel if quitting all discoveries
+					// failed, otherwise some processes might be left running.
+					continue
+				}
 				return
 			}
 		}
