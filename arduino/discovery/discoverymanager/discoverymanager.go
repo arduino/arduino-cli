@@ -106,6 +106,22 @@ func (dm *DiscoveryManager) StopAll() error {
 	return nil
 }
 
+// QuitAll quits all the discoveries managed by this DiscoveryManager.
+// Returns the first error it meets or nil
+func (dm *DiscoveryManager) QuitAll() error {
+	for _, d := range dm.discoveries {
+		err := d.Quit()
+		if err != nil {
+			return err
+		}
+	}
+	if dm.globalEventCh != nil {
+		close(dm.globalEventCh)
+		dm.globalEventCh = nil
+	}
+	return nil
+}
+
 func (dm *DiscoveryManager) List() []*discovery.Port {
 	res := []*discovery.Port{}
 	for _, disc := range dm.discoveries {
