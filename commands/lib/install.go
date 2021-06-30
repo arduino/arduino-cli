@@ -24,11 +24,13 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // LibraryInstall FIXMEDOC
 func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) *status.Status {
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 
@@ -45,13 +47,13 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest,
 			Version:  req.Version,
 		})
 		if err != nil {
-			return fmt.Errorf(tr("Error resolving dependencies for %[1]s@%[2]s: %[3]s"), req.Name, req.Version, err)
+			return status.Newf(err.Code(), tr("Error resolving dependencies for %[1]s@%[2]s: %[3]s", req.Name, req.Version, err.Message()))
 		}
 
 		for _, dep := range res.Dependencies {
 			if existingDep, has := toInstall[dep.Name]; has {
 				if existingDep.VersionRequired != dep.VersionRequired {
-					return fmt.Errorf(tr("two different versions of the library %[1]s are required: %[2]s and %[3]s"),
+					return status.Newf(codes.FailedPrecondition, tr("Two different versions of the library %[1]s are required: %[2]s and %[3]s"),
 						dep.Name, dep.VersionRequired, existingDep.VersionRequired)
 				}
 			}
@@ -65,31 +67,31 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest,
 			Version: lib.VersionRequired,
 		})
 		if err != nil {
-			return fmt.Errorf(tr("looking for library: %s"), err)
+			return status.Newf(codes.InvalidArgument, tr("Error looking for library: %s", err))
 		}
 
 		if err := downloadLibrary(lm, libRelease, downloadCB, taskCB); err != nil {
-			return fmt.Errorf(tr("downloading library: %s"), err)
+			return status.Newf(codes.Unknown, tr("Error downloading library: %s", err))
 		}
 
 		if err := installLibrary(lm, libRelease, taskCB); err != nil {
-			return err
+			return status.New(codes.PermissionDenied, err.Error())
 		}
 	}
 
-	status := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil)
-	if status != nil {
-		return fmt.Errorf(tr("rescanning libraries: %s"), status.Err())
+	stat := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil)
+	if stat != nil {
+		return status.Newf(stat.Code(), tr("Error rescanning libraries: %s", stat.Err()))
 	}
 	return nil
 }
 
 func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release, taskCB commands.TaskProgressCB) error {
-	taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Installing %s"), libRelease)})
+	taskCB(&rpc.TaskProgress{Name: tr("Installing %s", libRelease)})
 	logrus.WithField("library", libRelease).Info("Installing library")
 	libPath, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease)
 	if err == librariesmanager.ErrAlreadyInstalled {
-		taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Already installed %s"), libRelease), Completed: true})
+		taskCB(&rpc.TaskProgress{Message: tr("Already installed %s", libRelease), Completed: true})
 		return nil
 	}
 
@@ -98,33 +100,33 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 	}
 
 	if libReplaced != nil {
-		taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Replacing %[1]s with %[2]s"), libReplaced, libRelease)})
+		taskCB(&rpc.TaskProgress{Message: tr("Replacing %[1]s with %[2]s", libReplaced, libRelease)})
 	}
 
 	if err := lm.Install(libRelease, libPath); err != nil {
 		return err
 	}
 
-	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Installed %s"), libRelease), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: tr("Installed %s", libRelease), Completed: true})
 	return nil
 }
 
 //ZipLibraryInstall FIXMEDOC
-func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, taskCB commands.TaskProgressCB) error {
+func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, taskCB commands.TaskProgressCB) *status.Status {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if err := lm.InstallZipLib(ctx, req.Path, req.Overwrite); err != nil {
-		return err
+		return status.New(codes.InvalidArgument, err.Error())
 	}
-	taskCB(&rpc.TaskProgress{Message: tr("Installed Archived Library"), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})
 	return nil
 }
 
 //GitLibraryInstall FIXMEDOC
-func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallRequest, taskCB commands.TaskProgressCB) error {
+func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallRequest, taskCB commands.TaskProgressCB) *status.Status {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if err := lm.InstallGitLib(req.Url, req.Overwrite); err != nil {
-		return err
+		return status.New(codes.InvalidArgument, err.Error())
 	}
-	taskCB(&rpc.TaskProgress{Message: tr("Installed Library from Git URL"), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})
 	return nil
 }

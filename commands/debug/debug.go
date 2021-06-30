@@ -32,6 +32,8 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var tr = i18n.Tr
@@ -42,13 +44,13 @@ var tr = i18n.Tr
 // grpc Out <- tool stdOut
 // grpc Out <- tool stdErr
 // It also implements tool process lifecycle management
-func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*dbg.DebugResponse, error) {
+func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*dbg.DebugResponse, *status.Status) {
 
 	// Get debugging command line to run debugger
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	commandLine, err := getCommandLine(req, pm)
 	if err != nil {
-		return nil, errors.Wrap(err, tr("Cannot get command line for tool"))
+		return nil, status.New(codes.FailedPrecondition, tr("Cannot get command line for tool: %s", err))
 	}
 
 	for i, arg := range commandLine {
@@ -64,7 +66,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader,
 
 	cmd, err := executils.NewProcess(commandLine...)
 	if err != nil {
-		return nil, errors.Wrap(err, tr("Cannot execute debug tool"))
+		return nil, status.New(codes.FailedPrecondition, tr("Cannot execute debug tool: %s", err))
 	}
 
 	// Get stdIn pipe from tool

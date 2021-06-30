@@ -17,20 +17,21 @@ package core
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // PlatformUninstall FIXMEDOC
-func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB commands.TaskProgressCB) (*rpc.PlatformUninstallResponse, error) {
+func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB commands.TaskProgressCB) (*rpc.PlatformUninstallResponse, *status.Status) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, status.New(codes.InvalidArgument, tr("Invalid instance"))
 	}
 
 	ref := &packagemanager.PlatformReference{
@@ -40,12 +41,12 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 	if ref.PlatformVersion == nil {
 		platform := pm.FindPlatform(ref)
 		if platform == nil {
-			return nil, fmt.Errorf(tr("platform not found: %s"), ref)
+			return nil, status.Newf(codes.InvalidArgument, tr("Platform not found: %s"), ref)
 
 		}
 		platformRelease := pm.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
-			return nil, fmt.Errorf(tr("platform not installed: %s"), ref)
+			return nil, status.Newf(codes.InvalidArgument, tr("Platform not installed: %s"), ref)
 
 		}
 		ref.PlatformVersion = platformRelease.Version
@@ -53,12 +54,12 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		return nil, fmt.Errorf(tr("finding platform dependencies: %s"), err)
+		return nil, status.Newf(codes.Internal, tr("Error finding platform dependencies: %s"), err)
 	}
 
 	err = uninstallPlatformRelease(pm, platform, taskCB)
 	if err != nil {
-		return nil, err
+		return nil, status.New(codes.PermissionDenied, err.Error())
 	}
 
 	for _, tool := range tools {
@@ -69,7 +70,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 
 	status := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil)
 	if status != nil {
-		return nil, status.Err()
+		return nil, status
 	}
 
 	return &rpc.PlatformUninstallResponse{}, nil

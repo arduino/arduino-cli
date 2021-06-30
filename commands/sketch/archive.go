@@ -18,7 +18,6 @@ package sketch
 import (
 	"archive/zip"
 	"context"
-	"fmt"
 	"io"
 	"path/filepath"
 	"strings"
@@ -27,12 +26,14 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var tr = i18n.Tr
 
 // ArchiveSketch FIXMEDOC
-func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.ArchiveSketchResponse, error) {
+func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.ArchiveSketchResponse, *status.Status) {
 	// sketchName is the name of the sketch without extension, for example "MySketch"
 	var sketchName string
 
@@ -43,7 +44,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 
 	s, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, err
+		return nil, status.Convert(err)
 	}
 
 	sketchPath = s.FullPath
@@ -56,7 +57,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 
 	archivePath, err = archivePath.Clean().Abs()
 	if err != nil {
-		return nil, fmt.Errorf(tr("Error getting absolute archive path %v"), err)
+		return nil, status.Newf(codes.Unknown, tr("Error getting absolute archive path %v"), err)
 	}
 
 	// Makes archivePath point to a zip file
@@ -67,18 +68,18 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 	}
 
 	if archivePath.Exist() {
-		return nil, fmt.Errorf(tr("archive already exists"))
+		return nil, status.New(codes.InvalidArgument, tr("Archive already exists"))
 	}
 
 	filesToZip, err := sketchPath.ReadDirRecursive()
 	if err != nil {
-		return nil, fmt.Errorf(tr("Error retrieving sketch files: %v"), err)
+		return nil, status.Newf(codes.Unknown, tr("Error retrieving sketch files: %v"), err)
 	}
 	filesToZip.FilterOutDirs()
 
 	archive, err := archivePath.Create()
 	if err != nil {
-		return nil, fmt.Errorf(tr("Error creating archive: %v"), err)
+		return nil, status.Newf(codes.PermissionDenied, tr("Error creating archive: %v"), err)
 	}
 	defer archive.Close()
 
@@ -90,7 +91,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 		if !req.IncludeBuildDir {
 			filePath, err := sketchPath.Parent().RelTo(f)
 			if err != nil {
-				return nil, fmt.Errorf(tr("Error calculating relative file path: %v"), err)
+				return nil, status.Newf(codes.Unknown, tr("Error calculating relative file path: %v"), err)
 			}
 
 			// Skips build folder
@@ -103,7 +104,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 		// If we don't do this the archive would contain all the sketch files as top level.
 		err = addFileToSketchArchive(zipWriter, f, sketchPath.Parent())
 		if err != nil {
-			return nil, fmt.Errorf(tr("Error adding file to archive: %v"), err)
+			return nil, status.Newf(codes.Unknown, tr("Error adding file to archive: %v"), err)
 		}
 	}
 

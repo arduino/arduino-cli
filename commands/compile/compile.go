@@ -17,7 +17,6 @@ package compile
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"path/filepath"
 	"sort"
@@ -41,12 +40,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var tr = i18n.Tr
 
 // Compile FIXMEDOC
-func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream io.Writer, debug bool) (r *rpc.CompileResponse, e error) {
+func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream io.Writer, debug bool) (r *rpc.CompileResponse, e *status.Status) {
 
 	// There is a binding between the export binaries setting and the CLI flag to explicitly set it,
 	// since we want this binding to work also for the gRPC interface we must read it here in this
@@ -90,17 +91,17 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, status.New(codes.InvalidArgument, tr("Invalid instance"))
 	}
 
 	logrus.Tracef("Compile %s for %s started", req.GetSketchPath(), req.GetFqbn())
 	if req.GetSketchPath() == "" {
-		return nil, fmt.Errorf(tr("missing sketchPath"))
+		return nil, status.New(codes.InvalidArgument, tr("Missing sketch path"))
 	}
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, fmt.Errorf(tr("opening sketch: %s"), err)
+		return nil, status.Newf(codes.NotFound, tr("Error opening sketch: %s"), err)
 	}
 
 	fqbnIn := req.GetFqbn()
@@ -108,11 +109,11 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		fqbnIn = sk.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
-		return nil, fmt.Errorf(tr("no FQBN provided"))
+		return nil, status.New(codes.InvalidArgument, tr("No FQBN (Fully Qualified Board Name) provided"))
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, fmt.Errorf(tr("incorrect FQBN: %s"), err)
+		return nil, status.Newf(codes.InvalidArgument, tr("Invalid FQBN: %s"), err)
 	}
 
 	targetPlatform := pm.FindPlatform(&packagemanager.PlatformReference{
@@ -125,7 +126,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		// 	"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
 		// 		version.GetAppName()+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
 		// feedback.Error(errorMessage)
-		return nil, fmt.Errorf(tr("platform not installed"))
+		return nil, status.New(codes.NotFound, tr("Platform not installed"))
 	}
 
 	builderCtx := &types.Context{}
@@ -148,7 +149,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		builderCtx.BuildPath = paths.New(req.GetBuildPath())
 	}
 	if err = builderCtx.BuildPath.MkdirAll(); err != nil {
-		return nil, fmt.Errorf(tr("cannot create build directory: %s"), err)
+		return nil, status.Newf(codes.PermissionDenied, tr("Cannot create build directory: %s"), err)
 	}
 	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
 		builderCtx.BuildPath.Join("compile_commands.json"),
@@ -178,7 +179,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		builderCtx.BuildCachePath = paths.New(req.GetBuildCachePath())
 		err = builderCtx.BuildCachePath.MkdirAll()
 		if err != nil {
-			return nil, fmt.Errorf(tr("cannot create build cache directory: %s"), err)
+			return nil, status.Newf(codes.PermissionDenied, tr("Cannot create build cache directory: %s"), err)
 		}
 	}
 
@@ -221,14 +222,14 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	// if --preprocess or --show-properties were passed, we can stop here
 	if req.GetShowProperties() {
-		return r, builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
+		return r, status.Convert(builder.RunParseHardwareAndDumpBuildProperties(builderCtx))
 	} else if req.GetPreprocess() {
-		return r, builder.RunPreprocess(builderCtx)
+		return r, status.Convert(builder.RunPreprocess(builderCtx))
 	}
 
 	// if it's a regular build, go on...
 	if err := builder.RunBuilder(builderCtx); err != nil {
-		return r, err
+		return r, status.Convert(err)
 	}
 
 	// If the export directory is set we assume you want to export the binaries
@@ -250,17 +251,17 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 		logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
 		if err := exportPath.MkdirAll(); err != nil {
-			return r, errors.Wrap(err, tr("creating output dir"))
+			return r, status.New(codes.PermissionDenied, errors.Wrap(err, tr("Error creating output dir")).Error())
 		}
 
 		// Copy all "sketch.ino.*" artifacts to the export directory
 		baseName, ok := builderCtx.BuildProperties.GetOk("build.project_name") // == "sketch.ino"
 		if !ok {
-			return r, errors.New(tr("missing 'build.project_name' build property"))
+			return r, status.New(codes.Internal, tr("Missing 'build.project_name' build property"))
 		}
 		buildFiles, err := builderCtx.BuildPath.ReadDir()
 		if err != nil {
-			return r, errors.Errorf(tr("reading build directory: %s"), err)
+			return r, status.Newf(codes.PermissionDenied, tr("Error reading build directory: %s"), err)
 		}
 		buildFiles.FilterPrefix(baseName)
 		for _, buildFile := range buildFiles {
@@ -270,7 +271,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 				WithField("dest", exportedFile).
 				Trace("Copying artifact.")
 			if err = buildFile.CopyTo(exportedFile); err != nil {
-				return r, errors.Wrapf(err, tr("copying output file %s"), buildFile)
+				return r, status.New(codes.PermissionDenied, tr("Error copying output file %[1]s: %[2]s", buildFile, err))
 			}
 		}
 	}
@@ -279,7 +280,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	for _, lib := range builderCtx.ImportedLibraries {
 		rpcLib, err := lib.ToRPCLibrary()
 		if err != nil {
-			return r, fmt.Errorf(tr("converting library %[1]s to rpc struct: %[2]w"), lib.Name, err)
+			return r, status.Newf(codes.PermissionDenied, tr("Error converting library %[1]s to rpc struct: %[2]s", lib.Name, err))
 		}
 		importedLibs = append(importedLibs, rpcLib)
 	}

@@ -17,7 +17,6 @@ package lib
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -26,7 +25,8 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type installedLib struct {
@@ -35,15 +35,15 @@ type installedLib struct {
 }
 
 // LibraryList FIXMEDOC
-func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, error) {
+func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, *status.Status) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, status.New(codes.InvalidArgument, tr("Invalid instance"))
 	}
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, status.New(codes.InvalidArgument, tr("Invalid instance"))
 	}
 
 	nameFilter := strings.ToLower(req.GetName())
@@ -53,11 +53,11 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 	if f := req.GetFqbn(); f != "" {
 		fqbn, err := cores.ParseFQBN(req.GetFqbn())
 		if err != nil {
-			return nil, fmt.Errorf(tr("parsing fqbn: %s"), err)
+			return nil, status.Newf(codes.InvalidArgument, tr("Error parsing FQBN: %s", err))
 		}
 		_, boardPlatform, _, _, refBoardPlatform, err := pm.ResolveFQBN(fqbn)
 		if err != nil {
-			return nil, fmt.Errorf(tr("loading board data: %s"), err)
+			return nil, status.Newf(codes.InvalidArgument, tr("Error loading board data: %s", err))
 		}
 
 		filteredRes := map[string]*installedLib{}
@@ -105,7 +105,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		}
 		rpcLib, err := lib.Library.ToRPCLibrary()
 		if err != nil {
-			return nil, fmt.Errorf(tr("converting library %[1]s to rpc struct: %[2]w"), lib.Library.Name, err)
+			return nil, status.Newf(codes.PermissionDenied, tr("Error converting library %[1]s to rpc struct: %[2]s", lib.Library.Name, err))
 		}
 		instaledLibs = append(instaledLibs, &rpc.InstalledLibrary{
 			Library: rpcLib,

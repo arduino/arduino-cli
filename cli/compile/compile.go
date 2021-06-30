@@ -183,16 +183,16 @@ func run(cmd *cobra.Command, args []string) {
 	compileErr := new(bytes.Buffer)
 	verboseCompile := configuration.Settings.GetString("logging.level") == "debug"
 	var compileRes *rpc.CompileResponse
-	var err error
+	var st *status.Status
 	if output.OutputFormat == "json" {
-		compileRes, err = compile.Compile(context.Background(), compileRequest, compileOut, compileErr, verboseCompile)
+		compileRes, st = compile.Compile(context.Background(), compileRequest, compileOut, compileErr, verboseCompile)
 	} else {
-		compileRes, err = compile.Compile(context.Background(), compileRequest, os.Stdout, os.Stderr, verboseCompile)
+		compileRes, st = compile.Compile(context.Background(), compileRequest, os.Stdout, os.Stderr, verboseCompile)
 	}
 
-	if err == nil && uploadAfterCompile {
+	if st == nil && uploadAfterCompile {
 		var sk *sketch.Sketch
-		sk, err = sketch.New(sketchPath)
+		sk, err := sketch.New(sketchPath)
 		if err != nil {
 			feedback.Errorf(tr("Error during Upload: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
@@ -250,10 +250,10 @@ func run(cmd *cobra.Command, args []string) {
 		CompileOut:    compileOut.String(),
 		CompileErr:    compileErr.String(),
 		BuilderResult: compileRes,
-		Success:       err == nil,
+		Success:       st == nil,
 	})
-	if err != nil && output.OutputFormat != "json" {
-		feedback.Errorf(tr("Error during build: %v"), err)
+	if st != nil && output.OutputFormat != "json" {
+		feedback.Errorf(tr("Error during build: %v"), st.Message())
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }
