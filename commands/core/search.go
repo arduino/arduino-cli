@@ -16,7 +16,6 @@
 package core
 
 import (
-	"errors"
 	"regexp"
 	"sort"
 	"strings"
@@ -25,6 +24,8 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
@@ -32,12 +33,12 @@ import (
 const maximumSearchDistance = 20
 
 // PlatformSearch FIXMEDOC
-func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, error) {
+func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, *status.Status) {
 	searchArgs := strings.Trim(req.SearchArgs, " ")
 	allVersions := req.AllVersions
 	pm := commands.GetPackageManager(req.Instance.Id)
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, status.New(codes.InvalidArgument, "invalid instance")
 	}
 
 	res := []*cores.PlatformRelease{}
@@ -96,7 +97,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 
 				// Search
 				if ok, err := match(toTest); err != nil {
-					return nil, err
+					return nil, status.New(codes.InvalidArgument, err.Error())
 				} else if !ok {
 					continue
 				}

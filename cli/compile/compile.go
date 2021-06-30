@@ -180,7 +180,7 @@ func run(cmd *cobra.Command, args []string) {
 	compileErr := new(bytes.Buffer)
 	verboseCompile := configuration.Settings.GetString("logging.level") == "debug"
 	var compileRes *rpc.CompileResponse
-	var err error
+	var err *status.Status
 	if output.OutputFormat == "json" {
 		compileRes, err = compile.Compile(context.Background(), compileRequest, compileOut, compileErr, verboseCompile)
 	} else {
@@ -198,7 +198,6 @@ func run(cmd *cobra.Command, args []string) {
 			ImportDir:  buildPath,
 			Programmer: programmer,
 		}
-		var err *status.Status
 		if output.OutputFormat == "json" {
 			// TODO: do not print upload output in json mode
 			uploadOut := new(bytes.Buffer)

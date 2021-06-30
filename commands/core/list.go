@@ -21,21 +21,22 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // GetPlatforms returns a list of installed platforms, optionally filtered by
 // those requiring an update.
-func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
+func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, *status.Status) {
 	instanceID := req.Instance.Id
 	i := commands.GetInstance(instanceID)
 	if i == nil {
-		return nil, errors.Errorf("unable to find an instance with ID: %d", instanceID)
+		return nil, status.Newf(codes.InvalidArgument, "unable to find an instance with ID: %d", instanceID)
 	}
 
 	packageManager := i.PackageManager
 	if packageManager == nil {
-		return nil, errors.New("invalid instance")
+		return nil, status.New(codes.InvalidArgument, "invalid instance")
 	}
 
 	res := []*rpc.Platform{}

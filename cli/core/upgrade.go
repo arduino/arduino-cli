@@ -94,7 +94,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 		}
 
 		_, err := core.PlatformUpgrade(context.Background(), r, output.ProgressBar(), output.TaskProgress())
-		if err == core.ErrAlreadyLatest {
+		if err.Message() == core.ErrAlreadyLatest.Error() {
 			feedback.Printf("Platform %s is already at the latest version", platformRef)
 		} else if err != nil {
 			feedback.Errorf("Error during upgrade: %v", err)

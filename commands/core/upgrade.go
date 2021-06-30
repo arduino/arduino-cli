@@ -23,6 +23,8 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -33,11 +35,11 @@ var (
 
 // PlatformUpgrade FIXMEDOC
 func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformUpgradeResponse, *status.Status) {
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, status.New(codes.InvalidArgument, "invalid instance")
 	}
 
 	// Extract all PlatformReference to platforms that have updates
@@ -46,12 +48,12 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
 		PlatformArchitecture: req.Architecture,
 	}
 	if err := upgradePlatform(pm, ref, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
-		return nil, err
+		return nil, status.Convert(err)
 	}
 
 	status := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil)
 	if status != nil {
-		return nil, status.Err()
+		return nil, status
 	}
 
 	return &rpc.PlatformUpgradeResponse{}, nil

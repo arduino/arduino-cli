@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
@@ -117,7 +116,7 @@ func FirstUpdate(instance *rpc.Instance) *status.Status {
 			output.ProgressBar(),
 		)
 		if err != nil {
-			return status.Newf(codes.FailedPrecondition, err.Error())
+			return err
 		}
 	}
 
@@ -132,7 +131,7 @@ func FirstUpdate(instance *rpc.Instance) *status.Status {
 			output.ProgressBar(),
 		)
 		if err != nil {
-			return status.Newf(codes.FailedPrecondition, err.Error())
+			return err
 		}
 	}
 
