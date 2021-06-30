@@ -339,3 +339,66 @@ func TestPackageManagerClear(t *testing.T) {
 	// Verifies both PackageManagers are now equal
 	require.Equal(t, &packageManager, &emptyPackageManager)
 }
+
+func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
+	// Create all the necessary data to load discoveries
+	fakePath := paths.New("fake-path")
+
+	pm := packagemanager.NewPackageManager(fakePath, fakePath, fakePath, fakePath)
+	pack := pm.Packages.GetOrCreatePackage("arduino")
+	// some tool
+	tool := pack.GetOrCreateTool("some-tool")
+	toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("4.2.0"))
+	// We set this to fake the tool is installed
+	toolRelease.InstallDir = fakePath
+	// some tool
+	tool = pack.GetOrCreateTool("some-tool")
+	toolRelease = tool.GetOrCreateRelease(semver.ParseRelaxed("5.6.7"))
+	// We set this to fake the tool is installed
+	toolRelease.InstallDir = fakePath
+	// some other tool
+	tool = pack.GetOrCreateTool("some-other-tool")
+	toolRelease = tool.GetOrCreateRelease(semver.ParseRelaxed("6.6.6"))
+	// We set this to fake the tool is installed
+	toolRelease.InstallDir = fakePath
+	// ble-discovery tool
+	tool = pack.GetOrCreateTool("ble-discovery")
+	toolRelease = tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+	// We set this to fake the tool is installed
+	toolRelease.InstallDir = fakePath
+	tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
+
+	// serial-discovery tool
+	tool = pack.GetOrCreateTool("serial-discovery")
+	tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+	toolRelease = tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
+	// We set this to fake the tool is installed
+	toolRelease.InstallDir = fakePath
+
+	platform := pack.GetOrCreatePlatform("avr")
+	release := platform.GetOrCreateRelease(semver.MustParse("1.0.0"))
+	release.ToolDependencies = append(release.ToolDependencies, &cores.ToolDependency{
+		ToolName:     "some-tool",
+		ToolVersion:  semver.ParseRelaxed("4.2.0"),
+		ToolPackager: "arduino",
+	})
+	release.ToolDependencies = append(release.ToolDependencies, &cores.ToolDependency{
+		ToolName:     "some-other-tool",
+		ToolVersion:  semver.ParseRelaxed("6.6.6"),
+		ToolPackager: "arduino",
+	})
+	release.DiscoveryDependencies = append(release.DiscoveryDependencies, &cores.DiscoveryDependency{
+		Name:     "ble-discovery",
+		Packager: "arduino",
+	})
+	release.DiscoveryDependencies = append(release.DiscoveryDependencies, &cores.DiscoveryDependency{
+		Name:     "serial-discovery",
+		Packager: "arduino",
+	})
+	// We set this to fake the platform is installed
+	release.InstallDir = fakePath
+
+	tools, err := pm.FindToolsRequiredFromPlatformRelease(release)
+	require.NoError(t, err)
+	require.Len(t, tools, 4)
+}
