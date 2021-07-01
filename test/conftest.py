@@ -196,7 +196,7 @@ def detected_boards(run_command):
     detected_boards = []
     for port in json.loads(result.stdout):
         for board in port.get("boards", []):
-            fqbn = board.get("FQBN")
+            fqbn = board.get("fqbn")
             package, architecture, _id = fqbn.split(":")
             detected_boards.append(
                 Board(
