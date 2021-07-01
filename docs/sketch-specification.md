@@ -36,6 +36,7 @@ The following extensions are supported:
 - .c - C Files.
 - .S - Assembly language files.
 - .h - Header files.
+- .tpp, .ipp - Header files (available from Arduino CLI 0.19.0).
 
 For information about how each of these files and other parts of the sketch are used during compilation, see the
 [Sketch build process documentation](sketch-build-process.md).
