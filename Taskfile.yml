@@ -224,7 +224,7 @@ vars:
     sh: echo `go list ./... | grep -v legacy | tr '\n' ' '`
   # build vars
   COMMIT:
-    sh: echo "$(git log -n 1 --format=%h)"
+    sh: echo "$(git log --no-show-signature -n 1 --format=%h)"
   TIMESTAMP:
     sh: echo "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
   TIMESTAMP_SHORT:
