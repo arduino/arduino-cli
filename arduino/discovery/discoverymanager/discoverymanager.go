@@ -58,6 +58,11 @@ func (dm *DiscoveryManager) Add(disc *discovery.PluggableDiscovery) error {
 // returns the first error it meets or nil
 func (dm *DiscoveryManager) RunAll() error {
 	for _, d := range dm.discoveries {
+		if d.IsAlive() {
+			// This discovery is already running, nothing to do
+			continue
+		}
+
 		if err := d.Run(); err != nil {
 			return err
 		}
@@ -81,6 +86,11 @@ func (dm *DiscoveryManager) StartAll() error {
 func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
 	errs := []error{}
 	for _, d := range dm.discoveries {
+		if d.IsEventMode() {
+			// Already started, nothing to do
+			continue
+		}
+
 		eventCh := d.EventChannel(5)
 		if err := d.StartSync(); err != nil {
 			errs = append(errs, err)
