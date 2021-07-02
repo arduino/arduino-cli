@@ -17,6 +17,7 @@ package cores
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 	"strings"
 
@@ -47,7 +48,8 @@ type PlatformRelease struct {
 	Resource                *resources.DownloadResource
 	Version                 *semver.Version
 	BoardsManifest          []*BoardManifest
-	Dependencies            ToolDependencies       // The Dependency entries to load tools.
+	ToolDependencies        ToolDependencies
+	DiscoveryDependencies   DiscoveryDependencies
 	Help                    PlatformReleaseHelp    `json:"-"`
 	Platform                *Platform              `json:"-"`
 	Properties              *properties.Map        `json:"-"`
@@ -111,6 +113,30 @@ type ToolDependency struct {
 
 func (dep *ToolDependency) String() string {
 	return dep.ToolPackager + ":" + dep.ToolName + "@" + dep.ToolVersion.String()
+}
+
+// DiscoveryDependencies is a list of DiscoveryDependency
+type DiscoveryDependencies []*DiscoveryDependency
+
+// Sort the DiscoveryDependencies by name.
+func (d DiscoveryDependencies) Sort() {
+	sort.Slice(d, func(i, j int) bool {
+		if d[i].Packager != d[j].Packager {
+			return d[i].Packager < d[j].Packager
+		}
+		return d[i].Name < d[j].Name
+	})
+}
+
+// DiscoveryDependency identifies a specific discovery, version is omitted
+// since the latest version will always be used
+type DiscoveryDependency struct {
+	Name     string
+	Packager string
+}
+
+func (d *DiscoveryDependency) String() string {
+	return fmt.Sprintf("%s:%s", d.Packager, d.Name)
 }
 
 // GetOrCreateRelease returns the specified release corresponding the provided version,
@@ -224,10 +250,18 @@ func (release *PlatformRelease) GetOrCreateBoard(boardID string) *Board {
 // RequiresToolRelease returns true if the PlatformRelease requires the
 // toolReleased passed as parameter
 func (release *PlatformRelease) RequiresToolRelease(toolRelease *ToolRelease) bool {
-	for _, toolDep := range release.Dependencies {
+	for _, toolDep := range release.ToolDependencies {
 		if toolDep.ToolName == toolRelease.Tool.Name &&
 			toolDep.ToolPackager == toolRelease.Tool.Package.Name &&
 			toolDep.ToolVersion.Equal(toolRelease.Version) {
+			return true
+		}
+	}
+	for _, discovery := range release.DiscoveryDependencies {
+		if discovery.Name == toolRelease.Tool.Name &&
+			discovery.Packager == toolRelease.Tool.Package.Name &&
+			// We always want the latest discovery version available
+			toolRelease.Version.Equal(toolRelease.Tool.LatestRelease().Version) {
 			return true
 		}
 	}

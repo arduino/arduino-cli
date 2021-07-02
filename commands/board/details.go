@@ -115,7 +115,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 	}
 
 	details.ToolsDependencies = []*rpc.ToolsDependencies{}
-	for _, tool := range boardPlatform.Dependencies {
+	for _, tool := range boardPlatform.ToolDependencies {
 		toolRelease := pm.FindToolDependency(tool)
 		var systems []*rpc.Systems
 		if toolRelease != nil {

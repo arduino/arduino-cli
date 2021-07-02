@@ -54,7 +54,7 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 			{Name: "Arduino/Genuino Uno"},
 			{Name: "Arduino Uno WiFi"},
 		},
-		Dependencies: cores.ToolDependencies{
+		ToolDependencies: cores.ToolDependencies{
 			{
 				ToolPackager: "arduino",
 				ToolName:     "avr-gcc",
@@ -71,7 +71,16 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 				ToolVersion:  semver.ParseRelaxed("1.2.1"),
 			},
 		},
-
+		DiscoveryDependencies: cores.DiscoveryDependencies{
+			{
+				Packager: "arduino",
+				Name:     "ble-discovery",
+			},
+			{
+				Packager: "arduino",
+				Name:     "serial-discovery",
+			},
+		},
 		Platform: &cores.Platform{
 			Name:         "Arduino AVR Boards",
 			Architecture: "avr",
@@ -85,6 +94,109 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 				Email:      "packages@arduino.cc",
 				Help:       cores.PackageHelp{Online: "http://www.arduino.cc/en/Reference/HomePage"},
 				Tools: map[string]*cores.Tool{
+					"serial-discovery": {
+						Name: "serial-discovery",
+						Releases: map[string]*cores.ToolRelease{
+							"1.0.0": {
+								Version: semver.ParseRelaxed("1.0.0"),
+								Flavors: []*cores.Flavor{
+									{
+										OS: "arm-linux-gnueabihf",
+										Resource: &resources.DownloadResource{
+											URL:             "some-serial-discovery-1.0.0-url",
+											ArchiveFileName: "serial-discovery-1.0.0.tar.bz2",
+											Checksum:        "SHA-256:some-serial-discovery-1.0.0-sha",
+											Size:            201341,
+										},
+									},
+									{
+										OS: "i686-mingw32",
+										Resource: &resources.DownloadResource{
+											URL:             "some-serial-discovery-1.0.0-other-url",
+											ArchiveFileName: "serial-discovery-1.0.0.tar.gz",
+											Checksum:        "SHA-256:some-serial-discovery-1.0.0-other-sha",
+											Size:            222918,
+										},
+									},
+								},
+							},
+							"0.1.0": {
+								Version: semver.ParseRelaxed("0.1.0"),
+								Flavors: []*cores.Flavor{
+									{
+										OS: "arm-linux-gnueabihf",
+										Resource: &resources.DownloadResource{
+											URL:             "some-serial-discovery-0.1.0-url",
+											ArchiveFileName: "serial-discovery-0.1.0.tar.bz2",
+											Checksum:        "SHA-256:some-serial-discovery-0.1.0-sha",
+											Size:            201341,
+										},
+									},
+									{
+										OS: "i686-mingw32",
+										Resource: &resources.DownloadResource{
+											URL:             "some-serial-discovery-0.1.0-other-url",
+											ArchiveFileName: "serial-discovery-0.1.0.tar.gz",
+											Checksum:        "SHA-256:some-serial-discovery-0.1.0-other-sha",
+											Size:            222918,
+										},
+									},
+								},
+							},
+						},
+					},
+					"ble-discovery": {
+						Name: "ble-discovery",
+						Releases: map[string]*cores.ToolRelease{
+							"1.0.0": {
+								Version: semver.ParseRelaxed("1.0.0"),
+								Flavors: []*cores.Flavor{
+									{
+										OS: "arm-linux-gnueabihf",
+										Resource: &resources.DownloadResource{
+											URL:             "some-ble-discovery-1.0.0-url",
+											ArchiveFileName: "ble-discovery-1.0.0.tar.bz2",
+											Checksum:        "SHA-256:some-ble-discovery-1.0.0-sha",
+											Size:            201341,
+										},
+									},
+									{
+										OS: "i686-mingw32",
+										Resource: &resources.DownloadResource{
+											URL:             "some-ble-discovery-1.0.0-other-url",
+											ArchiveFileName: "ble-discovery-1.0.0.tar.gz",
+											Checksum:        "SHA-256:some-ble-discovery-1.0.0-other-sha",
+											Size:            222918,
+										},
+									},
+								},
+							},
+							"0.1.0": {
+								Version: semver.ParseRelaxed("0.1.0"),
+								Flavors: []*cores.Flavor{
+									{
+										OS: "arm-linux-gnueabihf",
+										Resource: &resources.DownloadResource{
+											URL:             "some-ble-discovery-0.1.0-url",
+											ArchiveFileName: "ble-discovery-0.1.0.tar.bz2",
+											Checksum:        "SHA-256:some-ble-discovery-0.1.0-sha",
+											Size:            201341,
+										},
+									},
+
+									{
+										OS: "i686-mingw32",
+										Resource: &resources.DownloadResource{
+											URL:             "some-ble-discovery-0.1.0-other-url",
+											ArchiveFileName: "ble-discovery-0.1.0.tar.gz",
+											Checksum:        "SHA-256:some-ble-discovery-0.1.0-other-sha",
+											Size:            222918,
+										},
+									},
+								},
+							},
+						},
+					},
 					"bossac": {
 						Name: "bossac",
 						Releases: map[string]*cores.ToolRelease{
@@ -233,8 +345,98 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 						Version:  semver.ParseRelaxed("1.2.1"),
 					},
 				},
+				DiscoveryDependencies: []indexDiscoveryDependency{
+					{
+						Packager: "arduino",
+						Name:     "ble-discovery",
+					},
+					{
+						Packager: "arduino",
+						Name:     "serial-discovery",
+					},
+				},
 			}},
 			Tools: []*indexToolRelease{
+				{
+					Name:    "serial-discovery",
+					Version: semver.ParseRelaxed("1.0.0"),
+					Systems: []indexToolReleaseFlavour{
+						{
+							OS:              "arm-linux-gnueabihf",
+							URL:             "some-serial-discovery-1.0.0-url",
+							ArchiveFileName: "serial-discovery-1.0.0.tar.bz2",
+							Checksum:        "SHA-256:some-serial-discovery-1.0.0-sha",
+							Size:            "201341",
+						},
+						{
+							OS:              "i686-mingw32",
+							URL:             "some-serial-discovery-1.0.0-other-url",
+							ArchiveFileName: "serial-discovery-1.0.0.tar.gz",
+							Checksum:        "SHA-256:some-serial-discovery-1.0.0-other-sha",
+							Size:            "222918",
+						},
+					},
+				},
+				{
+					Name:    "serial-discovery",
+					Version: semver.ParseRelaxed("0.1.0"),
+					Systems: []indexToolReleaseFlavour{
+						{
+							OS:              "arm-linux-gnueabihf",
+							URL:             "some-serial-discovery-0.1.0-url",
+							ArchiveFileName: "serial-discovery-0.1.0.tar.bz2",
+							Checksum:        "SHA-256:some-serial-discovery-0.1.0-sha",
+							Size:            "201341",
+						},
+						{
+							OS:              "i686-mingw32",
+							URL:             "some-serial-discovery-0.1.0-other-url",
+							ArchiveFileName: "serial-discovery-0.1.0.tar.gz",
+							Checksum:        "SHA-256:some-serial-discovery-0.1.0-other-sha",
+							Size:            "222918",
+						},
+					},
+				},
+				{
+					Name:    "ble-discovery",
+					Version: semver.ParseRelaxed("1.0.0"),
+					Systems: []indexToolReleaseFlavour{
+						{
+							OS:              "arm-linux-gnueabihf",
+							URL:             "some-ble-discovery-1.0.0-url",
+							ArchiveFileName: "ble-discovery-1.0.0.tar.bz2",
+							Checksum:        "SHA-256:some-ble-discovery-1.0.0-sha",
+							Size:            "201341",
+						},
+						{
+							OS:              "i686-mingw32",
+							URL:             "some-ble-discovery-1.0.0-other-url",
+							ArchiveFileName: "ble-discovery-1.0.0.tar.gz",
+							Checksum:        "SHA-256:some-ble-discovery-1.0.0-other-sha",
+							Size:            "222918",
+						},
+					},
+				},
+				{
+					Name:    "ble-discovery",
+					Version: semver.ParseRelaxed("0.1.0"),
+					Systems: []indexToolReleaseFlavour{
+						{
+							OS:              "arm-linux-gnueabihf",
+							URL:             "some-ble-discovery-0.1.0-url",
+							ArchiveFileName: "ble-discovery-0.1.0.tar.bz2",
+							Checksum:        "SHA-256:some-ble-discovery-0.1.0-sha",
+							Size:            "201341",
+						},
+						{
+							OS:              "i686-mingw32",
+							URL:             "some-ble-discovery-0.1.0-other-url",
+							ArchiveFileName: "ble-discovery-0.1.0.tar.gz",
+							Checksum:        "SHA-256:some-ble-discovery-0.1.0-other-sha",
+							Size:            "222918",
+						},
+					},
+				},
 				{
 					Name:    "bossac",
 					Version: semver.ParseRelaxed("1.6.1-arduino"),
@@ -349,6 +551,7 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 			require.Equal(t, expectedPlatform.Size, indexPlatform.Size)
 			require.ElementsMatch(t, expectedPlatform.Boards, indexPlatform.Boards)
 			require.ElementsMatch(t, expectedPlatform.ToolDependencies, indexPlatform.ToolDependencies)
+			require.ElementsMatch(t, expectedPlatform.DiscoveryDependencies, indexPlatform.DiscoveryDependencies)
 		}
 	}
 }
