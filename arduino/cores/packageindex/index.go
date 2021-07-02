@@ -47,18 +47,19 @@ type indexPackage struct {
 
 // indexPlatformRelease represents a single Core Platform from package_index.json file.
 type indexPlatformRelease struct {
-	Name             string                `json:"name,required"`
-	Architecture     string                `json:"architecture"`
-	Version          *semver.Version       `json:"version,required"`
-	Deprecated       bool                  `json:"deprecated"`
-	Category         string                `json:"category"`
-	URL              string                `json:"url"`
-	ArchiveFileName  string                `json:"archiveFileName,required"`
-	Checksum         string                `json:"checksum,required"`
-	Size             json.Number           `json:"size,required"`
-	Boards           []indexBoard          `json:"boards"`
-	Help             indexHelp             `json:"help,omitempty"`
-	ToolDependencies []indexToolDependency `json:"toolsDependencies,required"`
+	Name                  string                     `json:"name,required"`
+	Architecture          string                     `json:"architecture"`
+	Version               *semver.Version            `json:"version,required"`
+	Deprecated            bool                       `json:"deprecated"`
+	Category              string                     `json:"category"`
+	URL                   string                     `json:"url"`
+	ArchiveFileName       string                     `json:"archiveFileName,required"`
+	Checksum              string                     `json:"checksum,required"`
+	Size                  json.Number                `json:"size,required"`
+	Boards                []indexBoard               `json:"boards"`
+	Help                  indexHelp                  `json:"help,omitempty"`
+	ToolDependencies      []indexToolDependency      `json:"toolsDependencies"`
+	DiscoveryDependencies []indexDiscoveryDependency `json:"discoveryDependencies"`
 }
 
 // indexToolDependency represents a single dependency of a core from a tool.
@@ -66,6 +67,12 @@ type indexToolDependency struct {
 	Packager string                 `json:"packager,required"`
 	Name     string                 `json:"name,required"`
 	Version  *semver.RelaxedVersion `json:"version,required"`
+}
+
+// indexDiscoveryDependency represents a single dependency of a core from a pluggable discovery tool.
+type indexDiscoveryDependency struct {
+	Packager string `json:"packager"`
+	Name     string `json:"name"`
 }
 
 // indexToolRelease represents a single Tool from package_index.json file.
@@ -126,11 +133,19 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 	}
 
 	tools := []indexToolDependency{}
-	for _, t := range pr.Dependencies {
+	for _, t := range pr.ToolDependencies {
 		tools = append(tools, indexToolDependency{
 			Packager: t.ToolPackager,
 			Name:     t.ToolName,
 			Version:  t.ToolVersion,
+		})
+	}
+
+	discoveries := []indexDiscoveryDependency{}
+	for _, d := range pr.DiscoveryDependencies {
+		discoveries = append(discoveries, indexDiscoveryDependency{
+			Packager: d.Packager,
+			Name:     d.Name,
 		})
 	}
 
@@ -165,18 +180,19 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 				URL:        pr.Platform.Package.URL,
 				Email:      pr.Platform.Package.Email,
 				Platforms: []*indexPlatformRelease{{
-					Name:             pr.Platform.Name,
-					Architecture:     pr.Platform.Architecture,
-					Version:          pr.Version,
-					Deprecated:       pr.Platform.Deprecated,
-					Category:         pr.Platform.Category,
-					URL:              pr.Resource.URL,
-					ArchiveFileName:  pr.Resource.ArchiveFileName,
-					Checksum:         pr.Resource.Checksum,
-					Size:             json.Number(fmt.Sprintf("%d", pr.Resource.Size)),
-					Boards:           boards,
-					Help:             indexHelp{Online: pr.Help.Online},
-					ToolDependencies: tools,
+					Name:                  pr.Platform.Name,
+					Architecture:          pr.Platform.Architecture,
+					Version:               pr.Version,
+					Deprecated:            pr.Platform.Deprecated,
+					Category:              pr.Platform.Category,
+					URL:                   pr.Resource.URL,
+					ArchiveFileName:       pr.Resource.ArchiveFileName,
+					Checksum:              pr.Resource.Checksum,
+					Size:                  json.Number(fmt.Sprintf("%d", pr.Resource.Size)),
+					Boards:                boards,
+					Help:                  indexHelp{Online: pr.Help.Online},
+					ToolDependencies:      tools,
+					DiscoveryDependencies: discoveries,
 				}},
 				Tools: packageTools,
 				Help:  indexHelp{Online: pr.Platform.Package.Help.Online},
@@ -230,24 +246,32 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	}
 	outPlatformRelease.Help = cores.PlatformReleaseHelp{Online: inPlatformRelease.Help.Online}
 	outPlatformRelease.BoardsManifest = inPlatformRelease.extractBoardsManifest()
-	if deps, err := inPlatformRelease.extractDeps(); err == nil {
-		outPlatformRelease.Dependencies = deps
-	} else {
-		return fmt.Errorf("invalid tool dependencies: %s", err)
-	}
+	outPlatformRelease.ToolDependencies = inPlatformRelease.extractToolDependencies()
+	outPlatformRelease.DiscoveryDependencies = inPlatformRelease.extractDiscoveryDependencies()
 	return nil
 }
 
-func (inPlatformRelease indexPlatformRelease) extractDeps() (cores.ToolDependencies, error) {
-	ret := make(cores.ToolDependencies, len(inPlatformRelease.ToolDependencies))
-	for i, dep := range inPlatformRelease.ToolDependencies {
-		ret[i] = &cores.ToolDependency{
-			ToolName:     dep.Name,
-			ToolVersion:  dep.Version,
-			ToolPackager: dep.Packager,
+func (inPlatformRelease indexPlatformRelease) extractToolDependencies() cores.ToolDependencies {
+	res := make(cores.ToolDependencies, len(inPlatformRelease.ToolDependencies))
+	for i, tool := range inPlatformRelease.ToolDependencies {
+		res[i] = &cores.ToolDependency{
+			ToolName:     tool.Name,
+			ToolVersion:  tool.Version,
+			ToolPackager: tool.Packager,
 		}
 	}
-	return ret, nil
+	return res
+}
+
+func (inPlatformRelease indexPlatformRelease) extractDiscoveryDependencies() cores.DiscoveryDependencies {
+	res := make(cores.DiscoveryDependencies, len(inPlatformRelease.DiscoveryDependencies))
+	for i, discovery := range inPlatformRelease.DiscoveryDependencies {
+		res[i] = &cores.DiscoveryDependency{
+			Name:     discovery.Name,
+			Packager: discovery.Packager,
+		}
+	}
+	return res
 }
 
 func (inPlatformRelease indexPlatformRelease) extractBoardsManifest() []*cores.BoardManifest {

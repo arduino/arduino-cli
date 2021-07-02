@@ -76,13 +76,13 @@ func (packages Packages) Names() []string {
 	return res
 }
 
-// GetDepsOfPlatformRelease returns the deps of a specified release of a core.
-func (packages Packages) GetDepsOfPlatformRelease(release *PlatformRelease) ([]*ToolRelease, error) {
+// GetPlatformReleaseToolDependencies returns the tool releases needed by the specified PlatformRelease
+func (packages Packages) GetPlatformReleaseToolDependencies(release *PlatformRelease) ([]*ToolRelease, error) {
 	if release == nil {
 		return nil, errors.New("release cannot be nil")
 	}
 	ret := []*ToolRelease{}
-	for _, dep := range release.Dependencies {
+	for _, dep := range release.ToolDependencies {
 		pkg, exists := packages[dep.ToolPackager]
 		if !exists {
 			return nil, fmt.Errorf("package %s not found", dep.ToolPackager)
@@ -98,6 +98,33 @@ func (packages Packages) GetDepsOfPlatformRelease(release *PlatformRelease) ([]*
 		ret = append(ret, toolRelease)
 	}
 	return ret, nil
+}
+
+// GetPlatformReleaseDiscoveryDependencies returns the discovery releases needed by the specified PlatformRelease
+func (packages Packages) GetPlatformReleaseDiscoveryDependencies(release *PlatformRelease) ([]*ToolRelease, error) {
+	if release == nil {
+		return nil, fmt.Errorf("release cannot be nil")
+	}
+
+	res := []*ToolRelease{}
+	for _, discovery := range release.DiscoveryDependencies {
+		pkg, exists := packages[discovery.Packager]
+		if !exists {
+			return nil, fmt.Errorf("package %s not found", discovery.Packager)
+		}
+		tool, exists := pkg.Tools[discovery.Name]
+		if !exists {
+			return nil, fmt.Errorf("tool %s not found", discovery.Name)
+		}
+
+		// We always want to use the latest available release for discoveries
+		latestRelease := tool.LatestRelease()
+		if latestRelease == nil {
+			return nil, fmt.Errorf("can't find latest release of %s", discovery.Name)
+		}
+		res = append(res, latestRelease)
+	}
+	return res, nil
 }
 
 // GetOrCreatePlatform returns the Platform object with the specified architecture

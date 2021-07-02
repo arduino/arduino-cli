@@ -91,11 +91,19 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 	}
 
 	// replaces "latest" with latest version too
-	toolDeps, err := pm.Packages.GetDepsOfPlatformRelease(release)
+	toolDeps, err := pm.Packages.GetPlatformReleaseToolDependencies(release)
 	if err != nil {
 		return nil, nil, fmt.Errorf("getting tool dependencies for platform %s: %s", release.String(), err)
 	}
-	return release, toolDeps, nil
+
+	// discovery dependencies differ from normal tool since we always want to use the latest \
+	// available version for the platform package
+	discoveryDependencies, err := pm.Packages.GetPlatformReleaseDiscoveryDependencies(release)
+	if err != nil {
+		return nil, nil, fmt.Errorf("getting discovery dependencies for platform %s: %s", release.String(), err)
+	}
+
+	return release, append(toolDeps, discoveryDependencies...), nil
 }
 
 // DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Downloader
