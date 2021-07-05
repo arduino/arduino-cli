@@ -141,7 +141,7 @@ func (b *Board) GeneratePropertiesForConfiguration(config string) (*properties.M
 	return b.GetBuildProperties(fqbn.Configs)
 }
 
-// GetIdentificationProperties calculate and returns a list of properties sets
+// GetIdentificationProperties calculates and returns a list of properties sets
 // containing the properties required to identify the board. The returned sets
 // must not be changed by the caller.
 func (b *Board) GetIdentificationProperties() []*properties.Map {
