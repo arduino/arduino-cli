@@ -429,7 +429,7 @@ func (pm *PackageManager) InstalledBoards() []*cores.Board {
 	return boards
 }
 
-// GetTool search for tool in all packages and platforms.
+// GetTool searches for tool in all packages and platforms.
 func (pm *PackageManager) GetTool(toolId string) *cores.Tool {
 	split := strings.Split(toolId, ":")
 	if len(split) != 2 {
