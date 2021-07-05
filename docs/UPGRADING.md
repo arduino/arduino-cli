@@ -143,7 +143,7 @@ $ arduino-cli board details arduino:samd:mkr1000 --format json
 [...]
 ```
 
-now the properties have been renamed from `identification_prefs` to `identification_properties` and they are no more
+now the properties have been renamed from `identification_prefs` to `identification_properties` and they are no longer
 specific to USB but they can theoretically be any set of key/values:
 
 ```
