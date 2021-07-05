@@ -429,6 +429,21 @@ func (pm *PackageManager) InstalledBoards() []*cores.Board {
 	return boards
 }
 
+// GetTool searches for tool in all packages and platforms.
+func (pm *PackageManager) GetTool(toolID string) *cores.Tool {
+	split := strings.Split(toolID, ":")
+	if len(split) != 2 {
+		return nil
+	}
+	if pack, ok := pm.Packages[split[0]]; !ok {
+		return nil
+	} else if tool, ok := pack.Tools[split[1]]; !ok {
+		return nil
+	} else {
+		return tool
+	}
+}
+
 // FindToolsRequiredForBoard FIXMEDOC
 func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.ToolRelease, error) {
 	pm.Log.Infof("Searching tools required for board %s", board)
@@ -477,4 +492,16 @@ func (pm *PackageManager) FindToolDependency(dep *cores.ToolDependency) *cores.T
 		return nil
 	}
 	return toolRelease
+}
+
+// FindDiscoveryDependency returns the ToolRelease referenced by the DiscoveryDepenency or nil if
+// the referenced discovery doesn't exists.
+func (pm *PackageManager) FindDiscoveryDependency(discovery *cores.DiscoveryDependency) *cores.ToolRelease {
+	if pack := pm.Packages[discovery.Packager]; pack == nil {
+		return nil
+	} else if toolRelease := pack.Tools[discovery.Name]; toolRelease == nil {
+		return nil
+	} else {
+		return toolRelease.GetLatestInstalled()
+	}
 }
