@@ -28,7 +28,7 @@ func TestRequiresToolRelease(t *testing.T) {
 	toolDependencyPackager := "arduino"
 
 	release := PlatformRelease{
-		Dependencies: ToolDependencies{
+		ToolDependencies: ToolDependencies{
 			{
 				ToolName:     toolDependencyName,
 				ToolVersion:  semver.ParseRelaxed(toolDependencyVersion),
@@ -53,5 +53,42 @@ func TestRequiresToolRelease(t *testing.T) {
 	toolRelease.Tool.Package.Name = toolDependencyPackager
 	require.False(t, release.RequiresToolRelease(toolRelease))
 	toolRelease.Version = semver.ParseRelaxed(toolDependencyVersion)
+	require.True(t, release.RequiresToolRelease(toolRelease))
+}
+
+func TestRequiresToolReleaseDiscovery(t *testing.T) {
+	toolDependencyName := "ble-discovery"
+	toolDependencyPackager := "arduino"
+
+	release := PlatformRelease{
+		DiscoveryDependencies: DiscoveryDependencies{
+			{
+				Name:     toolDependencyName,
+				Packager: toolDependencyPackager,
+			},
+		},
+	}
+
+	toolRelease := &ToolRelease{
+		Version: semver.ParseRelaxed("0.1.0"),
+		Tool: &Tool{
+			Name: toolDependencyName + "not",
+			Releases: map[string]*ToolRelease{
+				"1.0.0": {Version: semver.ParseRelaxed("1.0.0")},
+				"0.1.0": {Version: semver.ParseRelaxed("0.1.0")},
+				"0.0.1": {Version: semver.ParseRelaxed("0.0.1")},
+			},
+			Package: &Package{
+				Name: toolDependencyPackager + "not",
+			},
+		},
+	}
+
+	require.False(t, release.RequiresToolRelease(toolRelease))
+	toolRelease.Tool.Name = toolDependencyName
+	require.False(t, release.RequiresToolRelease(toolRelease))
+	toolRelease.Tool.Package.Name = toolDependencyPackager
+	require.False(t, release.RequiresToolRelease(toolRelease))
+	toolRelease.Version = semver.ParseRelaxed("1.0.0")
 	require.True(t, release.RequiresToolRelease(toolRelease))
 }

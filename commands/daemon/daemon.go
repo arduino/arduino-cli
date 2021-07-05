@@ -15,8 +15,6 @@
 
 package daemon
 
-//go:generate protoc -I arduino --go_out=plugins=grpc:arduino arduino/arduino.proto
-
 import (
 	"context"
 	"io"

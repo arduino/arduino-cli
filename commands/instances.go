@@ -181,6 +181,8 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) *sta
 	// If this is not done the information of the uninstall core is kept in memory,
 	// even if it should not.
 	instance.PackageManager.Clear()
+	ctagsTool := getBuiltinCtagsTool(instance.PackageManager)
+	serialDiscoveryTool := getBuiltinSerialDiscoveryTool(instance.PackageManager)
 
 	// Load Platforms
 	urls := []string{globals.DefaultIndexURL}
@@ -254,8 +256,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) *sta
 	}
 
 	// Install tools if necessary
-	toolHasBeenInstalled := false
-	ctagsTool, err := getBuiltinCtagsTool(instance.PackageManager)
+	ctagsHasBeenInstalled, err := instance.installToolIfMissing(ctagsTool, downloadCallback, taskCallback)
 	if err != nil {
 		s := status.Newf(codes.Internal, err.Error())
 		responseCallback(&rpc.InitResponse{
@@ -263,19 +264,9 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) *sta
 				Error: s.Proto(),
 			},
 		})
-	} else {
-		toolHasBeenInstalled, err = instance.installToolIfMissing(ctagsTool, downloadCallback, taskCallback)
-		if err != nil {
-			s := status.Newf(codes.Internal, err.Error())
-			responseCallback(&rpc.InitResponse{
-				Message: &rpc.InitResponse_Error{
-					Error: s.Proto(),
-				},
-			})
-		}
 	}
 
-	serialDiscoveryTool, _ := getBuiltinSerialDiscoveryTool(instance.PackageManager)
+	serialHasBeenInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCallback, taskCallback)
 	if err != nil {
 		s := status.Newf(codes.Internal, err.Error())
 		responseCallback(&rpc.InitResponse{
@@ -283,19 +274,9 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) *sta
 				Error: s.Proto(),
 			},
 		})
-	} else {
-		toolHasBeenInstalled, err = instance.installToolIfMissing(serialDiscoveryTool, downloadCallback, taskCallback)
-		if err != nil {
-			s := status.Newf(codes.Internal, err.Error())
-			responseCallback(&rpc.InitResponse{
-				Message: &rpc.InitResponse_Error{
-					Error: s.Proto(),
-				},
-			})
-		}
 	}
 
-	if toolHasBeenInstalled {
+	if ctagsHasBeenInstalled || serialHasBeenInstalled {
 		// We installed at least one new tool after loading hardware
 		// so we must reload again otherwise we would never found them.
 		for _, err := range instance.PackageManager.LoadHardware() {
