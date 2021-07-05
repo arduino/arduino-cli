@@ -353,15 +353,15 @@ gold_board = """
       ]
     }
   ],
-  "identification_prefs": [
+  "identification_properties": [
     {
-      "usb_id": {
+      "properties": {
         "vid": "0x2341",
         "pid": "0x8057"
       }
     },
     {
-      "usb_id": {
+      "properties": {
         "vid": "0x2341",
         "pid": "0x0057"
       }
@@ -483,8 +483,8 @@ def test_board_details(run_command):
     assert result["official"] == gold_board_details["official"]
     assert result["package"] == gold_board_details["package"]
     assert result["platform"] == gold_board_details["platform"]
-    for usb_id in gold_board_details["identification_prefs"]:
-        assert usb_id in result["identification_prefs"]
+    for usb_id in gold_board_details["identification_properties"]:
+        assert usb_id in result["identification_properties"]
     for programmer in gold_board_details["programmers"]:
         assert programmer in result["programmers"]
 
@@ -515,8 +515,8 @@ def test_board_details_old(run_command):
     assert result["official"] == gold_board_details["official"]
     assert result["package"] == gold_board_details["package"]
     assert result["platform"] == gold_board_details["platform"]
-    for usb_id in gold_board_details["identification_prefs"]:
-        assert usb_id in result["identification_prefs"]
+    for usb_id in gold_board_details["identification_properties"]:
+        assert usb_id in result["identification_properties"]
     for programmer in gold_board_details["programmers"]:
         assert programmer in result["programmers"]
 
@@ -537,14 +537,11 @@ def test_board_details_list_programmers_without_flag(run_command):
     run_command("core install arduino:samd@1.8.6")
     result = run_command("board details -b arduino:samd:nano_33_iot")
     assert result.ok
-    lines = [l.strip() for l in result.stdout.splitlines()]
-    assert (
-        "Programmers:               Id                                                                     Name"
-        in lines
-    )
-    assert "edbg                                                                   Atmel EDBG" in lines
-    assert "atmel_ice                                                              Atmel-ICE" in lines
-    assert "sam_ice                                                                Atmel SAM-ICE" in lines
+    lines = [l.strip().split() for l in result.stdout.splitlines()]
+    assert ["Programmers:", "Id", "Name"] in lines
+    assert ["edbg", "Atmel", "EDBG"] in lines
+    assert ["atmel_ice", "Atmel-ICE"] in lines
+    assert ["sam_ice", "Atmel", "SAM-ICE"] in lines
 
 
 def test_board_details_list_programmers_flag(run_command):
