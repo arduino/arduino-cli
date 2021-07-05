@@ -112,10 +112,7 @@ func ListBoards(pm *packagemanager.PackageManager) ([]*discovery.Port, error) {
 	defer listBoardMutex.Unlock()
 
 	// get the bundled tool
-	t, err := getBuiltinSerialDiscoveryTool(pm)
-	if err != nil {
-		return nil, err
-	}
+	t := getBuiltinSerialDiscoveryTool(pm)
 
 	// determine if it's installed
 	if !t.IsInstalled() {
@@ -146,11 +143,7 @@ func ListBoards(pm *packagemanager.PackageManager) ([]*discovery.Port, error) {
 
 // WatchListBoards returns a channel that receives events from the bundled discovery tool
 func WatchListBoards(pm *packagemanager.PackageManager) (<-chan *discovery.Event, error) {
-	t, err := getBuiltinSerialDiscoveryTool(pm)
-	if err != nil {
-		return nil, err
-	}
-
+	t := getBuiltinSerialDiscoveryTool(pm)
 	if !t.IsInstalled() {
 		return nil, fmt.Errorf("missing serial-discovery tool")
 	}
@@ -175,10 +168,10 @@ func WatchListBoards(pm *packagemanager.PackageManager) (<-chan *discovery.Event
 	return disc.EventChannel(10), nil
 }
 
-func getBuiltinSerialDiscoveryTool(pm *packagemanager.PackageManager) (*cores.ToolRelease, error) {
+func getBuiltinSerialDiscoveryTool(pm *packagemanager.PackageManager) *cores.ToolRelease {
 	builtinPackage := pm.Packages.GetOrCreatePackage("builtin")
 	serialDiscoveryTool := builtinPackage.GetOrCreateTool("serial-discovery")
 	serialDiscoveryToolRel := serialDiscoveryTool.GetOrCreateRelease(serialDiscoveryVersion)
 	serialDiscoveryToolRel.Flavors = serialDiscoveryFlavors
-	return pm.Package("builtin").Tool("serial-discovery").Release(serialDiscoveryVersion).Get()
+	return serialDiscoveryToolRel
 }
