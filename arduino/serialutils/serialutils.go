@@ -142,7 +142,7 @@ func Reset(portToTouch string, wait bool, cb *ResetProgressCallbacks, dryRun boo
 	deadline := time.Now().Add(10 * time.Second)
 	if dryRun {
 		// use a much lower timeout in dryRun
-		deadline = time.Now().Add(2 * time.Second)
+		deadline = time.Now().Add(100 * time.Millisecond)
 	}
 	for time.Now().Before(deadline) {
 		now, err := getPorts()
