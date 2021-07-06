@@ -709,8 +709,15 @@ func callBoardListWatch(client rpc.ArduinoCoreServiceClient, instance *rpc.Insta
 	go func() {
 		for {
 			res, err := watchClient.Recv()
-			if err != nil {
+			if err == io.EOF {
+				log.Print("closing board watch connection")
+				return
+			} else if err != nil {
 				log.Fatalf("Board list watch error: %s\n", err)
+			}
+			if res.EventType == "error" {
+				log.Printf("res: %s\n", res.Error)
+				continue
 			}
 
 			log.Printf("event: %s, address: %s\n", res.EventType, res.Port.Address)
